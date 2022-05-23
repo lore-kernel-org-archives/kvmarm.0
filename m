@@ -2,63 +2,88 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF76BC433FE
-	for <kvmarm@archiver.kernel.org>; Tue, 24 May 2022 16:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BFD8C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 24 May 2022 16:58:19 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5634940C23;
-	Tue, 24 May 2022 12:00:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75F024B1B7;
+	Tue, 24 May 2022 12:58:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 53KCgPBZMfng; Tue, 24 May 2022 12:00:19 -0400 (EDT)
+	with ESMTP id WTDBlF14Zhip; Tue, 24 May 2022 12:58:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ABEE408F4;
-	Tue, 24 May 2022 12:00:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4555E4B20A;
+	Tue, 24 May 2022 12:58:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A9B3E40431
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2022 12:00:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 790B84B11F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 May 2022 13:44:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J-h3naP6PjOv for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 May 2022 12:00:16 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4BF9640414
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2022 12:00:16 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id CA89B61770;
- Tue, 24 May 2022 16:00:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4306FC34116;
- Tue, 24 May 2022 16:00:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1653408015;
- bh=cBNge5pbPFNpjc3yYWweALItim0uRV+wmebu8g7bA2c=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=atltLFXempL6x/KsznXjHI61bZ+fC/LFl6WxxmOoaH9GEL8cZDTo8l5EyLg1SGqex
- 72w3xxkv2WxgbTIl9KPFdMry56ayIQBSkd2QY7VceQAgpeln7Rcw1EinghXRokPeNA
- QIACpjTkB0iMG66KQ0yWAy4WG3YpqoZX91cSm/ekvNPizJz32O+/2nQa/8LR0lpwlT
- Izv04cAQLGtGIIYFrAVP7aifZ3Av18AkOW74vKm82dO8/7PHLSHjz3khIVDw+Jt0S/
- s0Iu2n2lSXC7xDRv1rdsp0sMGRwU9dAVKJK+QVNSXT2v+7A2cfjHZkJ6xVjBVkKNkn
- aEFH6niC+tKyQ==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 03/10] KVM: arm64: Don't hypercall before EL2 init
-Date: Tue, 24 May 2022 12:00:00 -0400
-Message-Id: <20220524160009.826957-3-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220524160009.826957-1-sashal@kernel.org>
-References: <20220524160009.826957-1-sashal@kernel.org>
+ with ESMTP id DLzVW2KV5WaI for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 May 2022 13:44:34 -0400 (EDT)
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com
+ [209.85.208.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3960849ED5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 May 2022 13:44:34 -0400 (EDT)
+Received: by mail-lj1-f169.google.com with SMTP id r3so11212508ljd.7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 May 2022 10:44:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Lt+QmLRlAmSG7nATNb3de1rpq1KDptBx8X9RCMbUflw=;
+ b=Rr3FTbZSH6OEOK11OGjw8VhElwCyNuOyvzb6UGiQa0VN2z4nznXexLQevuNvWvmzge
+ CTYxbMdQDt/ABY+5MJUs3UQ9cjgZB5HpfDYKoRS1NjSjEXU07Em23YCDUfUVa0uX8nb/
+ 9z73CqVXPwVsA8Daek73ky1cd2penETPszXb/oyC1JTxYrs3iF1+pny/UHRiTwvpdI8k
+ g8tK6SALO5ySpktT2RjFFNN6TQsPT7nll0EKnmQlStwKvKJ60ZHIYNM+jC9XU/fKERYw
+ C53AE92+J6jh3ctfSI6kiJseh3KT/sVgJBhffuZkOWwWVE+RPT6LvCRHczR7+R0zJEmT
+ JfYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Lt+QmLRlAmSG7nATNb3de1rpq1KDptBx8X9RCMbUflw=;
+ b=6zKXaVtN6WYIbS6zJPs7xHld5jJNxQV+AtwmV01EQooW6Ohlg2A9gYk25HMWQ4AkL6
+ zy8ixJTNa0/LV+wUvoH5UdjkQj9V3Ml/wc1Hq2S6BSk3NiP4HHPh69Th3cEbjcGWF2ux
+ LygPC3XKAd48tYgTLLfsxAyqOppXzXz8RZ2JtMdk2JE2Valwgg5r6bb6ri+mw1tHg5uf
+ q/IaChwM04ySIAslTzgIDdv6j05Ko57LneeM4sUJZ6guFOrEoryZ92PA2TyMbsiQ9YZF
+ aRQznBhti8YgwuHR1vI8pTUjb5zkgU6TmvOM+v1q4BzZojpLZ8Akn+DQhc3XFshcrxOQ
+ DJ2A==
+X-Gm-Message-State: AOAM5330oIvGYpsf6rx3Hhg3Fcum7/5HOBVarFlrPt/b2hnp0Wmu6AOd
+ pkrGLR6gLn/2QQBsViGqV8LFMcABmtzm0cElLfsI2Q==
+X-Google-Smtp-Source: ABdhPJzDb1QQeQPt37UpqWbTLpFmjnccbcNhzyRtox2/Lhza8BwHrGwgro263+zixdfWhTwF6P7oNs645WQMXX3iLvE=
+X-Received: by 2002:a05:651c:b20:b0:253:f4ec:b7d0 with SMTP id
+ b32-20020a05651c0b2000b00253f4ecb7d0mr159601ljr.198.1653327872507; Mon, 23
+ May 2022 10:44:32 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Cc: Sasha Levin <sashal@kernel.org>, Marc Zyngier <maz@kernel.org>,
- catalin.marinas@arm.com, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <20220516232138.1783324-1-dmatlack@google.com>
+ <20220516232138.1783324-22-dmatlack@google.com>
+ <CAL715WJ5DVM-A8EFND0iQ-MH9nAhE3rvWdYWaEgRTCJEVeegRg@mail.gmail.com>
+ <YovGUDrYZMZ7PXeY@google.com>
+In-Reply-To: <YovGUDrYZMZ7PXeY@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 23 May 2022 10:44:05 -0700
+Message-ID: <CALzav=fUTYGjDuWQxJusH4CzkEwGja-4xAmpqEOZdUfBftYwYw@mail.gmail.com>
+Subject: Re: [PATCH v6 21/22] KVM: Allow for different capacities in
+ kvm_mmu_memory_cache structs
+To: Sean Christopherson <seanjc@google.com>
+X-Mailman-Approved-At: Tue, 24 May 2022 12:58:17 -0400
+Cc: Albert Ou <aou@eecs.berkeley.edu>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
+ <kvm-riscv@lists.infradead.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)" <kvm@vger.kernel.org>,
+ Huacai Chen <chenhuacai@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <linux-mips@vger.kernel.org>,
+ "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Marc Zyngier <maz@kernel.org>, Ben Gardon <bgardon@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Mingwei Zhang <mizhang@google.com>,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+ Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,87 +100,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Quentin Perret <qperret@google.com>
+On Mon, May 23, 2022 at 10:37 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, May 20, 2022, Mingwei Zhang wrote:
+> > On Mon, May 16, 2022 at 4:24 PM David Matlack <dmatlack@google.com> wrote:
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > index e089db822c12..5e2e75014256 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -369,14 +369,31 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+> > >                 return (void *)__get_free_page(gfp_flags);
+> > >  }
+> > >
+> > > -int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
+> > > +static int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
+> > >  {
+> > > +       gfp_t gfp = GFP_KERNEL_ACCOUNT;
+> > >         void *obj;
+> > >
+> > >         if (mc->nobjs >= min)
+> > >                 return 0;
+> > > -       while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
+> > > -               obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
+> > > +
+> > > +       if (unlikely(!mc->objects)) {
+> > > +               if (WARN_ON_ONCE(!capacity))
+> > > +                       return -EIO;
+> > > +
+> > > +               mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
+> > > +               if (!mc->objects)
+> > > +                       return -ENOMEM;
+> > > +
+> > > +               mc->capacity = capacity;
+> >
+> > Do we want to ensure the minimum value of the capacity? I think
+> > otherwise, we may more likely start using memory from GFP_ATOMIC if
+> > the capacity is less than, say 5? But the minimum value seems related
+> > to each cache type.
+>
+> Eh, if we specify a minimum, just make the arch default the minimum.  That way we
+> avoid adding even more magic/arbitrary numbers.  E.g. for whatever reason, MIPS's
+> default is '4'.
 
-[ Upstream commit 2e40316753ee552fb598e8da8ca0d20a04e67453 ]
-
-Will reported the following splat when running with Protected KVM
-enabled:
-
-[    2.427181] ------------[ cut here ]------------
-[    2.427668] WARNING: CPU: 3 PID: 1 at arch/arm64/kvm/mmu.c:489 __create_hyp_private_mapping+0x118/0x1ac
-[    2.428424] Modules linked in:
-[    2.429040] CPU: 3 PID: 1 Comm: swapper/0 Not tainted 5.18.0-rc2-00084-g8635adc4efc7 #1
-[    2.429589] Hardware name: QEMU QEMU Virtual Machine, BIOS 0.0.0 02/06/2015
-[    2.430286] pstate: 80000005 (Nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[    2.430734] pc : __create_hyp_private_mapping+0x118/0x1ac
-[    2.431091] lr : create_hyp_exec_mappings+0x40/0x80
-[    2.431377] sp : ffff80000803baf0
-[    2.431597] x29: ffff80000803bb00 x28: 0000000000000000 x27: 0000000000000000
-[    2.432156] x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
-[    2.432561] x23: ffffcd96c343b000 x22: 0000000000000000 x21: ffff80000803bb40
-[    2.433004] x20: 0000000000000004 x19: 0000000000001800 x18: 0000000000000000
-[    2.433343] x17: 0003e68cf7efdd70 x16: 0000000000000004 x15: fffffc81f602a2c8
-[    2.434053] x14: ffffdf8380000000 x13: ffffcd9573200000 x12: ffffcd96c343b000
-[    2.434401] x11: 0000000000000004 x10: ffffcd96c1738000 x9 : 0000000000000004
-[    2.434812] x8 : ffff80000803bb40 x7 : 7f7f7f7f7f7f7f7f x6 : 544f422effff306b
-[    2.435136] x5 : 000000008020001e x4 : ffff207d80a88c00 x3 : 0000000000000005
-[    2.435480] x2 : 0000000000001800 x1 : 000000014f4ab800 x0 : 000000000badca11
-[    2.436149] Call trace:
-[    2.436600]  __create_hyp_private_mapping+0x118/0x1ac
-[    2.437576]  create_hyp_exec_mappings+0x40/0x80
-[    2.438180]  kvm_init_vector_slots+0x180/0x194
-[    2.458941]  kvm_arch_init+0x80/0x274
-[    2.459220]  kvm_init+0x48/0x354
-[    2.459416]  arm_init+0x20/0x2c
-[    2.459601]  do_one_initcall+0xbc/0x238
-[    2.459809]  do_initcall_level+0x94/0xb4
-[    2.460043]  do_initcalls+0x54/0x94
-[    2.460228]  do_basic_setup+0x1c/0x28
-[    2.460407]  kernel_init_freeable+0x110/0x178
-[    2.460610]  kernel_init+0x20/0x1a0
-[    2.460817]  ret_from_fork+0x10/0x20
-[    2.461274] ---[ end trace 0000000000000000 ]---
-
-Indeed, the Protected KVM mode promotes __create_hyp_private_mapping()
-to a hypercall as EL1 no longer has access to the hypervisor's stage-1
-page-table. However, the call from kvm_init_vector_slots() happens after
-pKVM has been initialized on the primary CPU, but before it has been
-initialized on secondaries. As such, if the KVM initcall procedure is
-migrated from one CPU to another in this window, the hypercall may end up
-running on a CPU for which EL2 has not been initialized.
-
-Fortunately, the pKVM hypervisor doesn't rely on the host to re-map the
-vectors in the private range, so the hypercall in question is in fact
-superfluous. Skip it when pKVM is enabled.
-
-Reported-by: Will Deacon <will@kernel.org>
-Signed-off-by: Quentin Perret <qperret@google.com>
-[maz: simplified the checks slightly]
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20220513092607.35233-1-qperret@google.com
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/arm64/kvm/arm.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 0b2f684cd8ca..a30c036577a3 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1458,7 +1458,8 @@ static int kvm_init_vector_slots(void)
- 	base = kern_hyp_va(kvm_ksym_ref(__bp_harden_hyp_vecs));
- 	kvm_init_vector_slot(base, HYP_VECTOR_SPECTRE_DIRECT);
- 
--	if (kvm_system_needs_idmapped_vectors() && !has_vhe()) {
-+	if (kvm_system_needs_idmapped_vectors() &&
-+	    !is_protected_kvm_enabled()) {
- 		err = create_hyp_exec_mappings(__pa_symbol(__bp_harden_hyp_vecs),
- 					       __BP_HARDEN_HYP_VECS_SZ, &base);
- 		if (err)
--- 
-2.35.1
-
+I'm not exactly sure what you had in mind Mingwei. But there is a bug
+in this code if min > capacity. This function will happily return 0
+after filling up the cache, even though it did not allocate min
+objects. The same bug existed before this patch if min >
+ARRAY_SIZE(mc->objects). I can include a separate patch to fix this
+bug (e.g. WARN and return -ENOMEM if min > capacity).
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
