@@ -2,96 +2,49 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 168ADC433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 23 May 2022 06:30:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B783C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 23 May 2022 08:55:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 611E04B08F;
-	Mon, 23 May 2022 02:30:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9127549E3A;
+	Mon, 23 May 2022 04:55:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered)
-	header.i=@cmpxchg-org.20210112.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WZckPbAEd-9e; Mon, 23 May 2022 02:30:56 -0400 (EDT)
+	with ESMTP id kT+wB5a2L4wg; Mon, 23 May 2022 04:55:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D170649F49;
-	Mon, 23 May 2022 02:30:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F1A0C49EB4;
+	Mon, 23 May 2022 04:55:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C4614B246
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2022 10:39:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A09A949E3A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 May 2022 04:55:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AB4CS8UKCspF for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 May 2022 10:39:42 -0400 (EDT)
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com
- [209.85.219.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8CB724B1FB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2022 10:39:42 -0400 (EDT)
-Received: by mail-qv1-f50.google.com with SMTP id v5so6780063qvs.10
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2022 07:39:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=cmpxchg-org.20210112.gappssmtp.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=TTmi/1xkgT1AjVxJzskAr+COf/0zmPlsvxgfjW6STHE=;
- b=Gxvhl+k8BBXk02rLhNHh59M59iKaZySmrURL5ViwDbexkz4AQDcT1PrTxGRwwIA9b6
- /1f2ADWNgafFMzN43IhcFiyinqNnehHn/mS0YJbtMR6z731PyisnndoOkG4QNw19YD3d
- 5k+xSboSMaMN7QvahZpDuaMGQOESeBd5F4Bx3mh8jgB1uyY3ssyoK0Xq2S2xeP72/K83
- PKpXip7h0Y+PpB3dm95FI4ngwmEccKM7+EXoqGyFtJ1eCsv33X6U8TW4FvS5JNrN09KR
- w9b5Y7kbJX4XTJASFVGfGrpW2a4CWNMPykU0xVE8Gyft/WvrlN09/Biji8rIPx+RUWjW
- tCtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=TTmi/1xkgT1AjVxJzskAr+COf/0zmPlsvxgfjW6STHE=;
- b=GjQL+RLPrf6bG7OuiCs+NmL9J/JtuumOvjW0uau9sD7ilYa8agIQa7PgyaiUnFBfz6
- vVnP922+FUIziPaKwVNK4X8jSH5y0ZaYJBLJ2N2CXRsfCOqqGLfE5pMxQNKIEi4kUzsp
- F9zoJuaaooOCuYgaCum88S0e8mSa+Rh/CUTskV/F9zbsS/SHbf7REURLKJRzBV+Pexaq
- Lvpd9NmJ57ZbqVFf7YAX2KRyS3R9/dVOqjJxdwqLd51zhwAnB5cnaQimZr56o13Scoi8
- m8scIDojRv7A1DoBz6T5h37mlcVGI/Q7bZVwsBSAFC/h2yuqrEqXiXcvj+wceP0AmMSK
- Z/Ug==
-X-Gm-Message-State: AOAM533L9Zzg7DEZeKsIbTmnVEILfm/5eAZBvEjg4sd0KOAqqIENJfsw
- /eUPm5a/AwMhHwLHLtpGyAvN4Q==
-X-Google-Smtp-Source: ABdhPJzkvB4GuJsVQAvtAye6NIsbWLxTJ8yuyfKdI6Dpev7Y/X++dkHVcr1QgV/boWcwi159jErlrw==
-X-Received: by 2002:ad4:4208:0:b0:461:d262:7842 with SMTP id
- k8-20020ad44208000000b00461d2627842mr8117176qvp.113.1653057582042; 
- Fri, 20 May 2022 07:39:42 -0700 (PDT)
-Received: from localhost (cpe-98-15-154-102.hvc.res.rr.com. [98.15.154.102])
- by smtp.gmail.com with ESMTPSA id
- 196-20020a3706cd000000b0069fd12a957bsm3076730qkg.17.2022.05.20.07.39.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 May 2022 07:39:41 -0700 (PDT)
-Date: Fri, 20 May 2022 10:39:40 -0400
-From: Johannes Weiner <hannes@cmpxchg.org>
-To: Yosry Ahmed <yosryahmed@google.com>
-Subject: Re: [PATCH v4 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
- page table uses.
-Message-ID: <YoeoLJNQTam5fJSu@cmpxchg.org>
-References: <20220429201131.3397875-1-yosryahmed@google.com>
- <20220429201131.3397875-2-yosryahmed@google.com>
- <87ilqoi77b.wl-maz@kernel.org>
- <CAJD7tkY7JF25XXUFq2mGroetMkfo-2zGOaQC94pjZE3D42+oaw@mail.gmail.com>
- <Yn2TGJ4vZ/fst+CY@cmpxchg.org> <Yn2YYl98Vhh/UL0w@google.com>
- <Yn5+OtZSSUZZgTQj@cmpxchg.org> <Yn6DeEGLyR4Q0cDp@google.com>
- <CALvZod6nERq4j=L0V+pc-rd5+QKi4yb_23tWV-1MF53xL5KE6Q@mail.gmail.com>
- <CAJD7tka-5+XRkthNV4qCg8woPCpjcwynQoRBame-3GP1L8y+WQ@mail.gmail.com>
+ with ESMTP id d6RMUb8v3cCl for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 May 2022 04:55:17 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CCC644086F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 May 2022 04:55:17 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A4B5ED1;
+ Mon, 23 May 2022 01:55:17 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C200D3F73D;
+ Mon, 23 May 2022 01:55:15 -0700 (PDT)
+Date: Mon, 23 May 2022 09:55:30 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Andre Przywara <andre.przywara@foss.arm.com>
+Subject: Re: [PATCH v2 kvmtool 12/12] arm64: Allow the user to specify the
+ RAM base address
+Message-ID: <YotMAqt8uX4VrKB5@monolith.localdoman>
+References: <20220516155526.181694-1-alexandru.elisei@arm.com>
+ <20220516155526.181694-13-alexandru.elisei@arm.com>
+ <20220520182015.3e8948b8@donnerap.cambridge.arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <CAJD7tka-5+XRkthNV4qCg8woPCpjcwynQoRBame-3GP1L8y+WQ@mail.gmail.com>
-X-Mailman-Approved-At: Mon, 23 May 2022 02:30:55 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Roman Gushchin <roman.gushchin@linux.dev>, Michal Hocko <mhocko@kernel.org>,
- Linux-MM <linux-mm@kvack.org>, Zefan Li <lizefan.x@bytedance.com>,
- kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, Shakeel Butt <shakeelb@google.com>,
- Cgroups <cgroups@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Tejun Heo <tj@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <20220520182015.3e8948b8@donnerap.cambridge.arm.com>
+Cc: julien@xen.org, maz@kernel.org, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -108,59 +61,238 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, May 19, 2022 at 06:56:54PM -0700, Yosry Ahmed wrote:
-> On Fri, May 13, 2022 at 10:14 AM Shakeel Butt <shakeelb@google.com> wrote:
-> >
-> > On Fri, May 13, 2022 at 9:12 AM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > [...]
-> > >
-> > > It was mostly an honest question, I too am trying to understand what userspace
-> > > wants to do with this information.  I was/am also trying to understand the benefits
-> > > of doing the tracking through page_state and not a dedicated KVM stat.  E.g. KVM
-> > > already has specific stats for the number of leaf pages mapped into a VM, why not
-> > > do the same for non-leaf pages?
-> >
-> > Let me answer why a more general stat is useful and the potential
-> > userspace reaction:
-> >
-> > For a memory type which is significant enough, it is useful to expose
-> > it in the general interfaces, so that the general data/stat collection
-> > infra can collect them instead of having workload dependent stat
-> > collectors. In addition, not necessarily that stat has to have a
-> > userspace reaction in an online fashion. We do collect stats for
-> > offline analysis which greatly influence the priority order of
-> > optimization workitems.
-> >
-> > Next the question is do we really need a separate stat item
-> > (secondary_pagetable instead of just plain pagetable) exposed in the
-> > stable API? To me secondary_pagetable is general (not kvm specific)
-> > enough and can be significant, so having a separate dedicated stat
-> > should be ok. Though I am ok with lump it with pagetable stat for now
-> > but we do want it to be accounted somewhere.
+Hi Andre,
+
+Thank you for having a look!
+
+On Fri, May 20, 2022 at 06:20:15PM +0100, Andre Przywara wrote:
+> On Mon, 16 May 2022 16:55:26 +0100
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Any thoughts on this? Johannes?
+> Hi,
+> 
+> > Allow the user to specify the RAM base address by using -m/--mem size@addr
+> > command line argument. The base address must be above 2GB, as to not
+> > overlap with the MMIO I/O region.
+> 
+> Just started to play with this, in general the series looks good to me on
+> a first glance. I will review in anger next week.
+> Meanwhile: when you start kvmtool without explicitly specifying a ram size
+> on the command line, the code misses to initialise cfg.ram_addr, so it
+> stays at 0 and kvmtool reports:
+>   Fatal: RAM address is below 2GB
+> One possible fix would be to initialise this in get_ram_size() to
+> kvm__arch_default_ram_address(), I guess, but you might find a better solution.
 
-I agree that this memory should show up in vmstat/memory.stat in some
-form or another.
+This is indeed an issue. I usually specify the number of vcpus and the
+memory size when I create a VM, and I overlooked what happens with the
+default values. I will incorporate this scenario into my testing.
 
-The arguments on whether this should be part of NR_PAGETABLE or a
-separate entry seem a bit vague to me. I was hoping somebody more
-familiar with KVM could provide a better picture of memory consumption
-in that area.
+Will send an updated series with the bug fixed as soon as possible. In the
+meantime, this fixed the issue for me and I plan to incorporate it into the
+series after more testing:
 
-Sean had mentioned that these allocations already get tracked through
-GFP_KERNEL_ACCOUNT. That's good, but if they are significant enough to
-track, they should be represented in memory.stat in some form. Sean
-also pointed out though that those allocations tend to scale rather
-differently than the page tables, so it probably makes sense to keep
-those two things separate at least.
+diff --git a/builtin-run.c b/builtin-run.c
+index 26e6e9974009..36a255bc14f9 100644
+--- a/builtin-run.c
++++ b/builtin-run.c
+@@ -137,7 +137,6 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
+        if (kvm->cfg.ram_size == 0)
+                die("Invalid RAM size: %s", arg);
 
-Any thoughts on putting shadow page tables and iommu page tables into
-the existing NR_PAGETABLE item? If not, what are the cons?
+-       kvm->cfg.ram_addr = kvm__arch_default_ram_address();
+        if (kvm__arch_has_cfg_ram_address() && *next == '@') {
+                next++;
+                if (*next == '\0')
+@@ -622,6 +621,7 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
 
-And creating (maybe later) a separate NR_VIRT for the other
-GPF_KERNEL_ACCOUNT allocations in kvm?
+        nr_online_cpus = sysconf(_SC_NPROCESSORS_ONLN);
+        kvm->cfg.custom_rootfs_name = "default";
++       kvm->cfg.ram_addr = kvm__arch_default_ram_address();
+
+        while (argc != 0) {
+                BUILD_OPTIONS(options, &kvm->cfg, kvm);
+
+Thanks,
+Alex
+
+> 
+> Cheers,
+> Andre
+> 
+> > 
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >  arm/aarch64/include/kvm/kvm-arch.h |  2 ++
+> >  arm/aarch64/kvm.c                  |  5 ++++-
+> >  arm/kvm.c                          |  7 +++++--
+> >  builtin-run.c                      | 29 +++++++++++++++++++++++++----
+> >  include/kvm/kvm-config.h           |  1 +
+> >  include/kvm/kvm.h                  | 12 ++++++++++++
+> >  6 files changed, 49 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
+> > index ff857ca6e7b4..02d09a413831 100644
+> > --- a/arm/aarch64/include/kvm/kvm-arch.h
+> > +++ b/arm/aarch64/include/kvm/kvm-arch.h
+> > @@ -10,6 +10,8 @@ void kvm__arch_enable_mte(struct kvm *kvm);
+> >  
+> >  #define MAX_PAGE_SIZE	SZ_64K
+> >  
+> > +#define ARCH_HAS_CFG_RAM_ADDRESS	1
+> > +
+> >  #include "arm-common/kvm-arch.h"
+> >  
+> >  #endif /* KVM__KVM_ARCH_H */
+> > diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+> > index af8e7eae0da2..14ffae9e39dc 100644
+> > --- a/arm/aarch64/kvm.c
+> > +++ b/arm/aarch64/kvm.c
+> > @@ -44,6 +44,9 @@ void kvm__arch_validate_cfg(struct kvm *kvm)
+> >  		die("RAM size 0x%llx exceeds maximum allowed 0x%llx",
+> >  		    kvm->cfg.ram_size, ARM_LOMAP_MAX_MEMORY);
+> >  	}
+> > +
+> > +	if (kvm->cfg.ram_addr < ARM_MEMORY_AREA)
+> > +		die("RAM address is below %luGB", ARM_MEMORY_AREA >> 30);
+> >  }
+> >  
+> >  u64 kvm__arch_default_ram_address(void)
+> > @@ -117,7 +120,7 @@ int kvm__get_vm_type(struct kvm *kvm)
+> >  		return 0;
+> >  
+> >  	/* Otherwise, compute the minimal required IPA size */
+> > -	max_ipa = ARM_MEMORY_AREA + kvm->cfg.ram_size - 1;
+> > +	max_ipa = kvm->cfg.ram_addr + kvm->cfg.ram_size - 1;
+> >  	ipa_bits = max(32, fls_long(max_ipa));
+> >  	pr_debug("max_ipa %lx ipa_bits %d max_ipa_bits %d",
+> >  		 max_ipa, ipa_bits, max_ipa_bits);
+> > diff --git a/arm/kvm.c b/arm/kvm.c
+> > index abcccfabf59e..d51cc15d8b1c 100644
+> > --- a/arm/kvm.c
+> > +++ b/arm/kvm.c
+> > @@ -55,7 +55,7 @@ void kvm__init_ram(struct kvm *kvm)
+> >  	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+> >  		MADV_HUGEPAGE);
+> >  
+> > -	phys_start	= ARM_MEMORY_AREA;
+> > +	phys_start	= kvm->cfg.ram_addr;
+> >  	phys_size	= kvm->ram_size;
+> >  	host_mem	= kvm->ram_start;
+> >  
+> > @@ -65,6 +65,9 @@ void kvm__init_ram(struct kvm *kvm)
+> >  		    "address 0x%llx [err %d]", phys_size, phys_start, err);
+> >  
+> >  	kvm->arch.memory_guest_start = phys_start;
+> > +
+> > +	pr_debug("RAM created at 0x%llx - 0x%llx",
+> > +		 phys_start, phys_start + phys_size - 1);
+> >  }
+> >  
+> >  void kvm__arch_delete_ram(struct kvm *kvm)
+> > @@ -201,7 +204,7 @@ bool kvm__load_firmware(struct kvm *kvm, const char *firmware_filename)
+> >  
+> >  	/* For default firmware address, lets load it at the begining of RAM */
+> >  	if (fw_addr == 0)
+> > -		fw_addr = ARM_MEMORY_AREA;
+> > +		fw_addr = kvm->arch.memory_guest_start;
+> >  
+> >  	if (!validate_fw_addr(kvm, fw_addr))
+> >  		die("Bad firmware destination: 0x%016llx", fw_addr);
+> > diff --git a/builtin-run.c b/builtin-run.c
+> > index 57c58be55159..26e6e9974009 100644
+> > --- a/builtin-run.c
+> > +++ b/builtin-run.c
+> > @@ -131,12 +131,22 @@ static u64 parse_mem_option(const char *nptr, char **next)
+> >  static int mem_parser(const struct option *opt, const char *arg, int unset)
+> >  {
+> >  	struct kvm *kvm = opt->ptr;
+> > -	char *next;
+> > +	char *next, *nptr;
+> >  
+> >  	kvm->cfg.ram_size = parse_mem_option(arg, &next);
+> >  	if (kvm->cfg.ram_size == 0)
+> >  		die("Invalid RAM size: %s", arg);
+> >  
+> > +	kvm->cfg.ram_addr = kvm__arch_default_ram_address();
+> > +	if (kvm__arch_has_cfg_ram_address() && *next == '@') {
+> > +		next++;
+> > +		if (*next == '\0')
+> > +			die("Missing memory address: %s", arg);
+> > +
+> > +		nptr = next;
+> > +		kvm->cfg.ram_addr = parse_mem_option(nptr, &next);
+> > +	}
+> > +
+> >  	if (*next != '\0')
+> >  		die("Invalid memory specifier: %s", arg);
+> >  
+> > @@ -147,15 +157,26 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
+> >  #define OPT_ARCH_RUN(...)
+> >  #endif
+> >  
+> > +#ifdef ARCH_HAS_CFG_RAM_ADDRESS
+> > +#define MEM_OPT_HELP_SHORT	"size[BKMGTP][@addr[BKMGTP]]"
+> > +#define MEM_OPT_HELP_LONG						\
+> > +	"Virtual machine memory size and optional base address, both"	\
+> > +	" measured by default in megabytes (M)"
+> > +#else
+> > +#define MEM_OPT_HELP_SHORT	"size[BKMGTP]"
+> > +#define MEM_OPT_HELP_LONG						\
+> > +	"Virtual machine memory size, by default measured in"		\
+> > +	" in megabytes (M)"
+> > +#endif
+> > +
+> >  #define BUILD_OPTIONS(name, cfg, kvm)					\
+> >  	struct option name[] = {					\
+> >  	OPT_GROUP("Basic options:"),					\
+> >  	OPT_STRING('\0', "name", &(cfg)->guest_name, "guest name",	\
+> >  			"A name for the guest"),			\
+> >  	OPT_INTEGER('c', "cpus", &(cfg)->nrcpus, "Number of CPUs"),	\
+> > -	OPT_CALLBACK('m', "mem", NULL, "size[BKMGTP]",			\
+> > -		     "Virtual machine memory size, by default measured"	\
+> > -		     " in megabytes (M)", mem_parser, kvm),		\
+> > +	OPT_CALLBACK('m', "mem", NULL, MEM_OPT_HELP_SHORT,		\
+> > +		     MEM_OPT_HELP_LONG, mem_parser, kvm),		\
+> >  	OPT_CALLBACK('d', "disk", kvm, "image or rootfs_dir", "Disk "	\
+> >  			" image or rootfs directory", img_name_parser,	\
+> >  			kvm),						\
+> > diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+> > index 31bc89520d52..45fe1caaebce 100644
+> > --- a/include/kvm/kvm-config.h
+> > +++ b/include/kvm/kvm-config.h
+> > @@ -23,6 +23,7 @@ struct kvm_config {
+> >  	struct kvm_config_arch arch;
+> >  	struct disk_image_params disk_image[MAX_DISK_IMAGES];
+> >  	struct vfio_device_params *vfio_devices;
+> > +	u64 ram_addr;		/* Guest memory physical base address, in bytes */
+> >  	u64 ram_size;		/* Guest memory size, in bytes */
+> >  	u8 num_net_devices;
+> >  	u8 num_vfio_devices;
+> > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> > index 360430b78b1e..eb23e2f77310 100644
+> > --- a/include/kvm/kvm.h
+> > +++ b/include/kvm/kvm.h
+> > @@ -197,6 +197,18 @@ int kvm__arch_free_firmware(struct kvm *kvm);
+> >  bool kvm__arch_cpu_supports_vm(void);
+> >  void kvm__arch_read_term(struct kvm *kvm);
+> >  
+> > +#ifdef ARCH_HAS_CFG_RAM_ADDRESS
+> > +static inline bool kvm__arch_has_cfg_ram_address(void)
+> > +{
+> > +	return true;
+> > +}
+> > +#else
+> > +static inline bool kvm__arch_has_cfg_ram_address(void)
+> > +{
+> > +	return false;
+> > +}
+> > +#endif
+> > +
+> >  void *guest_flat_to_host(struct kvm *kvm, u64 offset);
+> >  u64 host_to_guest_flat(struct kvm *kvm, void *ptr);
+> >  
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
