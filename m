@@ -2,50 +2,91 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A864C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 23 May 2022 17:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4644EC433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 23 May 2022 17:37:29 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE6B24B1FE;
-	Mon, 23 May 2022 13:20:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD17A4B1B0;
+	Mon, 23 May 2022 13:37:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xNcuEbnItQ31; Mon, 23 May 2022 13:20:24 -0400 (EDT)
+	with ESMTP id FDMHLc5nIaJZ; Mon, 23 May 2022 13:37:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27B9149F0C;
-	Mon, 23 May 2022 13:20:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9919B4B20B;
+	Mon, 23 May 2022 13:37:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9073749EED
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 May 2022 13:20:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F4214B1FC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 May 2022 13:37:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LS995omszRNZ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 May 2022 13:20:20 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DE9849EC3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 May 2022 13:20:20 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 22DFE1595;
- Mon, 23 May 2022 10:20:20 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0A9023F73D;
- Mon, 23 May 2022 10:20:18 -0700 (PDT)
-Date: Mon, 23 May 2022 18:20:32 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andre Przywara <andre.przywara@foss.arm.com>
-Subject: Re: [PATCH v2 kvmtool 12/12] arm64: Allow the user to specify the
- RAM base address
-Message-ID: <YovCYCswWOtTaaFe@monolith.localdoman>
-References: <20220516155526.181694-1-alexandru.elisei@arm.com>
- <20220516155526.181694-13-alexandru.elisei@arm.com>
- <20220520182015.3e8948b8@donnerap.cambridge.arm.com>
- <YotMAqt8uX4VrKB5@monolith.localdoman>
+ with ESMTP id w9nOfsODrAku for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 May 2022 13:37:25 -0400 (EDT)
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com
+ [209.85.216.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 739134B1B0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 May 2022 13:37:25 -0400 (EDT)
+Received: by mail-pj1-f53.google.com with SMTP id z11so4856352pjc.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 May 2022 10:37:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=uPvB4xKkZsbv/NQuw+LVF1ZeOmndZIablC0q46ZFciY=;
+ b=XvH+fP7b6A7IaMFFBQF7IkZCZBYDCe5tYb80MfrbM2f0FYzFokK+x6mgbkPTeOgoUg
+ LclNFKJEWXiNeIZWkIZLNbNNePqmTZSw88j10EPFP/TCd88RX+QFgo+8KXnJ7ZFWEqw8
+ e258spbjBdsYFehtuKv0B7wbQEdEuoZG2QfXIkOIkFlhdL9EvniL6ve+PR8g87Ue1Ipd
+ qlKgwGG9OiDFl7+72jz8mhlBqYjKbIOUmNWAcLmyrAe5QY5hfjJUdhA+UHLy5+ZIOXNQ
+ y5rtJrUIwrCDHAi+YfCoOzCaRCeBurqBgL7bm+aoHAkTBJ7vzfBVMAs7LZYNqcNRbsWw
+ xF8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=uPvB4xKkZsbv/NQuw+LVF1ZeOmndZIablC0q46ZFciY=;
+ b=urwlK3PZNW4SuVtWubiHTwx0xQue0sO/793uFnd/JuiZN7g6SOjNY7z5t3G0KQkp1l
+ qquqLJ4D0DY9IrBR0A2ztnAG8nghwxgI3uir73p9jQBC7iZmHUI1pTRCu7w7IBhzyBy7
+ 1qpijfjgDd599iQYV3PR+ll+vA1STRs9KAfwIzZn67hqkR8ChIzlfa4SnZBF6ygrq1ec
+ g4QTTs/FePlq0fzo49jhuDrs7Kih4bd7rG3aX4yujFIYA7JThla3IEWnFBecYb1ipyIe
+ 5wa7DMWdRXJ33rrJwx7inpeBTabO4slY8kHU/pNnT8cz2Oy4fXfQc0p/h2cHsJ4X6Xbk
+ ruig==
+X-Gm-Message-State: AOAM5300fo8mfAjWh9bjPZhKPPmEc0KAZEMmx8YH3eFMJkL1oe/cPNv3
+ +DbK0xzGkeBQXsoJWwDqOhrG6A==
+X-Google-Smtp-Source: ABdhPJw4AGNGxsFqbqwZIS+BFk/8egtH9UXiumvmBRxLQ0/47sCH59HMfF1NiH7idboGwFW37lheDQ==
+X-Received: by 2002:a17:90b:4b90:b0:1e0:1b0:1a1 with SMTP id
+ lr16-20020a17090b4b9000b001e001b001a1mr146255pjb.70.1653327444125; 
+ Mon, 23 May 2022 10:37:24 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157]) by smtp.gmail.com with ESMTPSA id
+ j13-20020a170902da8d00b0015e8d4eb260sm5388000plx.170.2022.05.23.10.37.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 23 May 2022 10:37:23 -0700 (PDT)
+Date: Mon, 23 May 2022 17:37:20 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Mingwei Zhang <mizhang@google.com>
+Subject: Re: [PATCH v6 21/22] KVM: Allow for different capacities in
+ kvm_mmu_memory_cache structs
+Message-ID: <YovGUDrYZMZ7PXeY@google.com>
+References: <20220516232138.1783324-1-dmatlack@google.com>
+ <20220516232138.1783324-22-dmatlack@google.com>
+ <CAL715WJ5DVM-A8EFND0iQ-MH9nAhE3rvWdYWaEgRTCJEVeegRg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <YotMAqt8uX4VrKB5@monolith.localdoman>
-Cc: linux-arm-kernel@lists.infradead.org, maz@kernel.org, julien@xen.org,
- kvmarm@lists.cs.columbia.edu, will@kernel.org
+In-Reply-To: <CAL715WJ5DVM-A8EFND0iQ-MH9nAhE3rvWdYWaEgRTCJEVeegRg@mail.gmail.com>
+Cc: Albert Ou <aou@eecs.berkeley.edu>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
+ <kvm-riscv@lists.infradead.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)" <kvm@vger.kernel.org>,
+ Huacai Chen <chenhuacai@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <linux-mips@vger.kernel.org>, Ben Gardon <bgardon@google.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Marc Zyngier <maz@kernel.org>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, maciej.szmigiero@oracle.com,
+ "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -62,254 +103,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On Fri, May 20, 2022, Mingwei Zhang wrote:
+> On Mon, May 16, 2022 at 4:24 PM David Matlack <dmatlack@google.com> wrote:
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index e089db822c12..5e2e75014256 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -369,14 +369,31 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+> >                 return (void *)__get_free_page(gfp_flags);
+> >  }
+> >
+> > -int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
+> > +static int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
+> >  {
+> > +       gfp_t gfp = GFP_KERNEL_ACCOUNT;
+> >         void *obj;
+> >
+> >         if (mc->nobjs >= min)
+> >                 return 0;
+> > -       while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
+> > -               obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
+> > +
+> > +       if (unlikely(!mc->objects)) {
+> > +               if (WARN_ON_ONCE(!capacity))
+> > +                       return -EIO;
+> > +
+> > +               mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
+> > +               if (!mc->objects)
+> > +                       return -ENOMEM;
+> > +
+> > +               mc->capacity = capacity;
+> 
+> Do we want to ensure the minimum value of the capacity? I think
+> otherwise, we may more likely start using memory from GFP_ATOMIC if
+> the capacity is less than, say 5? But the minimum value seems related
+> to each cache type.
 
-Pushed an updated branch [1] with the fix below and another fix for
-checking when memory exceeds 4GB on aarch32. Minimally tested while I put
-my testing scripts in order.
-
-[1] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/arm-allow-the-user-to-define-ram-address-v3-wip1
-
-Thanks,
-Alex
-
-On Mon, May 23, 2022 at 09:55:30AM +0100, Alexandru Elisei wrote:
-> Hi Andre,
-> 
-> Thank you for having a look!
-> 
-> On Fri, May 20, 2022 at 06:20:15PM +0100, Andre Przywara wrote:
-> > On Mon, 16 May 2022 16:55:26 +0100
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi,
-> > 
-> > > Allow the user to specify the RAM base address by using -m/--mem size@addr
-> > > command line argument. The base address must be above 2GB, as to not
-> > > overlap with the MMIO I/O region.
-> > 
-> > Just started to play with this, in general the series looks good to me on
-> > a first glance. I will review in anger next week.
-> > Meanwhile: when you start kvmtool without explicitly specifying a ram size
-> > on the command line, the code misses to initialise cfg.ram_addr, so it
-> > stays at 0 and kvmtool reports:
-> >   Fatal: RAM address is below 2GB
-> > One possible fix would be to initialise this in get_ram_size() to
-> > kvm__arch_default_ram_address(), I guess, but you might find a better solution.
-> 
-> This is indeed an issue. I usually specify the number of vcpus and the
-> memory size when I create a VM, and I overlooked what happens with the
-> default values. I will incorporate this scenario into my testing.
-> 
-> Will send an updated series with the bug fixed as soon as possible. In the
-> meantime, this fixed the issue for me and I plan to incorporate it into the
-> series after more testing:
-> 
-> diff --git a/builtin-run.c b/builtin-run.c
-> index 26e6e9974009..36a255bc14f9 100644
-> --- a/builtin-run.c
-> +++ b/builtin-run.c
-> @@ -137,7 +137,6 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
->         if (kvm->cfg.ram_size == 0)
->                 die("Invalid RAM size: %s", arg);
-> 
-> -       kvm->cfg.ram_addr = kvm__arch_default_ram_address();
->         if (kvm__arch_has_cfg_ram_address() && *next == '@') {
->                 next++;
->                 if (*next == '\0')
-> @@ -622,6 +621,7 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
-> 
->         nr_online_cpus = sysconf(_SC_NPROCESSORS_ONLN);
->         kvm->cfg.custom_rootfs_name = "default";
-> +       kvm->cfg.ram_addr = kvm__arch_default_ram_address();
-> 
->         while (argc != 0) {
->                 BUILD_OPTIONS(options, &kvm->cfg, kvm);
-> 
-> Thanks,
-> Alex
-> 
-> > 
-> > Cheers,
-> > Andre
-> > 
-> > > 
-> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > ---
-> > >  arm/aarch64/include/kvm/kvm-arch.h |  2 ++
-> > >  arm/aarch64/kvm.c                  |  5 ++++-
-> > >  arm/kvm.c                          |  7 +++++--
-> > >  builtin-run.c                      | 29 +++++++++++++++++++++++++----
-> > >  include/kvm/kvm-config.h           |  1 +
-> > >  include/kvm/kvm.h                  | 12 ++++++++++++
-> > >  6 files changed, 49 insertions(+), 7 deletions(-)
-> > > 
-> > > diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
-> > > index ff857ca6e7b4..02d09a413831 100644
-> > > --- a/arm/aarch64/include/kvm/kvm-arch.h
-> > > +++ b/arm/aarch64/include/kvm/kvm-arch.h
-> > > @@ -10,6 +10,8 @@ void kvm__arch_enable_mte(struct kvm *kvm);
-> > >  
-> > >  #define MAX_PAGE_SIZE	SZ_64K
-> > >  
-> > > +#define ARCH_HAS_CFG_RAM_ADDRESS	1
-> > > +
-> > >  #include "arm-common/kvm-arch.h"
-> > >  
-> > >  #endif /* KVM__KVM_ARCH_H */
-> > > diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-> > > index af8e7eae0da2..14ffae9e39dc 100644
-> > > --- a/arm/aarch64/kvm.c
-> > > +++ b/arm/aarch64/kvm.c
-> > > @@ -44,6 +44,9 @@ void kvm__arch_validate_cfg(struct kvm *kvm)
-> > >  		die("RAM size 0x%llx exceeds maximum allowed 0x%llx",
-> > >  		    kvm->cfg.ram_size, ARM_LOMAP_MAX_MEMORY);
-> > >  	}
-> > > +
-> > > +	if (kvm->cfg.ram_addr < ARM_MEMORY_AREA)
-> > > +		die("RAM address is below %luGB", ARM_MEMORY_AREA >> 30);
-> > >  }
-> > >  
-> > >  u64 kvm__arch_default_ram_address(void)
-> > > @@ -117,7 +120,7 @@ int kvm__get_vm_type(struct kvm *kvm)
-> > >  		return 0;
-> > >  
-> > >  	/* Otherwise, compute the minimal required IPA size */
-> > > -	max_ipa = ARM_MEMORY_AREA + kvm->cfg.ram_size - 1;
-> > > +	max_ipa = kvm->cfg.ram_addr + kvm->cfg.ram_size - 1;
-> > >  	ipa_bits = max(32, fls_long(max_ipa));
-> > >  	pr_debug("max_ipa %lx ipa_bits %d max_ipa_bits %d",
-> > >  		 max_ipa, ipa_bits, max_ipa_bits);
-> > > diff --git a/arm/kvm.c b/arm/kvm.c
-> > > index abcccfabf59e..d51cc15d8b1c 100644
-> > > --- a/arm/kvm.c
-> > > +++ b/arm/kvm.c
-> > > @@ -55,7 +55,7 @@ void kvm__init_ram(struct kvm *kvm)
-> > >  	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
-> > >  		MADV_HUGEPAGE);
-> > >  
-> > > -	phys_start	= ARM_MEMORY_AREA;
-> > > +	phys_start	= kvm->cfg.ram_addr;
-> > >  	phys_size	= kvm->ram_size;
-> > >  	host_mem	= kvm->ram_start;
-> > >  
-> > > @@ -65,6 +65,9 @@ void kvm__init_ram(struct kvm *kvm)
-> > >  		    "address 0x%llx [err %d]", phys_size, phys_start, err);
-> > >  
-> > >  	kvm->arch.memory_guest_start = phys_start;
-> > > +
-> > > +	pr_debug("RAM created at 0x%llx - 0x%llx",
-> > > +		 phys_start, phys_start + phys_size - 1);
-> > >  }
-> > >  
-> > >  void kvm__arch_delete_ram(struct kvm *kvm)
-> > > @@ -201,7 +204,7 @@ bool kvm__load_firmware(struct kvm *kvm, const char *firmware_filename)
-> > >  
-> > >  	/* For default firmware address, lets load it at the begining of RAM */
-> > >  	if (fw_addr == 0)
-> > > -		fw_addr = ARM_MEMORY_AREA;
-> > > +		fw_addr = kvm->arch.memory_guest_start;
-> > >  
-> > >  	if (!validate_fw_addr(kvm, fw_addr))
-> > >  		die("Bad firmware destination: 0x%016llx", fw_addr);
-> > > diff --git a/builtin-run.c b/builtin-run.c
-> > > index 57c58be55159..26e6e9974009 100644
-> > > --- a/builtin-run.c
-> > > +++ b/builtin-run.c
-> > > @@ -131,12 +131,22 @@ static u64 parse_mem_option(const char *nptr, char **next)
-> > >  static int mem_parser(const struct option *opt, const char *arg, int unset)
-> > >  {
-> > >  	struct kvm *kvm = opt->ptr;
-> > > -	char *next;
-> > > +	char *next, *nptr;
-> > >  
-> > >  	kvm->cfg.ram_size = parse_mem_option(arg, &next);
-> > >  	if (kvm->cfg.ram_size == 0)
-> > >  		die("Invalid RAM size: %s", arg);
-> > >  
-> > > +	kvm->cfg.ram_addr = kvm__arch_default_ram_address();
-> > > +	if (kvm__arch_has_cfg_ram_address() && *next == '@') {
-> > > +		next++;
-> > > +		if (*next == '\0')
-> > > +			die("Missing memory address: %s", arg);
-> > > +
-> > > +		nptr = next;
-> > > +		kvm->cfg.ram_addr = parse_mem_option(nptr, &next);
-> > > +	}
-> > > +
-> > >  	if (*next != '\0')
-> > >  		die("Invalid memory specifier: %s", arg);
-> > >  
-> > > @@ -147,15 +157,26 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
-> > >  #define OPT_ARCH_RUN(...)
-> > >  #endif
-> > >  
-> > > +#ifdef ARCH_HAS_CFG_RAM_ADDRESS
-> > > +#define MEM_OPT_HELP_SHORT	"size[BKMGTP][@addr[BKMGTP]]"
-> > > +#define MEM_OPT_HELP_LONG						\
-> > > +	"Virtual machine memory size and optional base address, both"	\
-> > > +	" measured by default in megabytes (M)"
-> > > +#else
-> > > +#define MEM_OPT_HELP_SHORT	"size[BKMGTP]"
-> > > +#define MEM_OPT_HELP_LONG						\
-> > > +	"Virtual machine memory size, by default measured in"		\
-> > > +	" in megabytes (M)"
-> > > +#endif
-> > > +
-> > >  #define BUILD_OPTIONS(name, cfg, kvm)					\
-> > >  	struct option name[] = {					\
-> > >  	OPT_GROUP("Basic options:"),					\
-> > >  	OPT_STRING('\0', "name", &(cfg)->guest_name, "guest name",	\
-> > >  			"A name for the guest"),			\
-> > >  	OPT_INTEGER('c', "cpus", &(cfg)->nrcpus, "Number of CPUs"),	\
-> > > -	OPT_CALLBACK('m', "mem", NULL, "size[BKMGTP]",			\
-> > > -		     "Virtual machine memory size, by default measured"	\
-> > > -		     " in megabytes (M)", mem_parser, kvm),		\
-> > > +	OPT_CALLBACK('m', "mem", NULL, MEM_OPT_HELP_SHORT,		\
-> > > +		     MEM_OPT_HELP_LONG, mem_parser, kvm),		\
-> > >  	OPT_CALLBACK('d', "disk", kvm, "image or rootfs_dir", "Disk "	\
-> > >  			" image or rootfs directory", img_name_parser,	\
-> > >  			kvm),						\
-> > > diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
-> > > index 31bc89520d52..45fe1caaebce 100644
-> > > --- a/include/kvm/kvm-config.h
-> > > +++ b/include/kvm/kvm-config.h
-> > > @@ -23,6 +23,7 @@ struct kvm_config {
-> > >  	struct kvm_config_arch arch;
-> > >  	struct disk_image_params disk_image[MAX_DISK_IMAGES];
-> > >  	struct vfio_device_params *vfio_devices;
-> > > +	u64 ram_addr;		/* Guest memory physical base address, in bytes */
-> > >  	u64 ram_size;		/* Guest memory size, in bytes */
-> > >  	u8 num_net_devices;
-> > >  	u8 num_vfio_devices;
-> > > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> > > index 360430b78b1e..eb23e2f77310 100644
-> > > --- a/include/kvm/kvm.h
-> > > +++ b/include/kvm/kvm.h
-> > > @@ -197,6 +197,18 @@ int kvm__arch_free_firmware(struct kvm *kvm);
-> > >  bool kvm__arch_cpu_supports_vm(void);
-> > >  void kvm__arch_read_term(struct kvm *kvm);
-> > >  
-> > > +#ifdef ARCH_HAS_CFG_RAM_ADDRESS
-> > > +static inline bool kvm__arch_has_cfg_ram_address(void)
-> > > +{
-> > > +	return true;
-> > > +}
-> > > +#else
-> > > +static inline bool kvm__arch_has_cfg_ram_address(void)
-> > > +{
-> > > +	return false;
-> > > +}
-> > > +#endif
-> > > +
-> > >  void *guest_flat_to_host(struct kvm *kvm, u64 offset);
-> > >  u64 host_to_guest_flat(struct kvm *kvm, void *ptr);
-> > >  
-> > 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Eh, if we specify a minimum, just make the arch default the minimum.  That way we
+avoid adding even more magic/arbitrary numbers.  E.g. for whatever reason, MIPS's
+default is '4'.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
