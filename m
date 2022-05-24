@@ -2,57 +2,57 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE665C43217
-	for <kvmarm@archiver.kernel.org>; Tue, 24 May 2022 15:59:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF76BC433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 24 May 2022 16:00:20 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F2A214B1CB;
-	Tue, 24 May 2022 11:59:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5634940C23;
+	Tue, 24 May 2022 12:00:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jblOP+SkuQH5; Tue, 24 May 2022 11:59:49 -0400 (EDT)
+	with ESMTP id 53KCgPBZMfng; Tue, 24 May 2022 12:00:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C237649F46;
-	Tue, 24 May 2022 11:59:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ABEE408F4;
+	Tue, 24 May 2022 12:00:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE64D49F46
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2022 11:59:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A9B3E40431
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2022 12:00:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1SqSAHrFc9SG for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 May 2022 11:59:46 -0400 (EDT)
+ with ESMTP id J-h3naP6PjOv for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 May 2022 12:00:16 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6846149F1F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2022 11:59:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4BF9640414
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 May 2022 12:00:16 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 1150961766;
- Tue, 24 May 2022 15:59:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE324C34118;
- Tue, 24 May 2022 15:59:43 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id CA89B61770;
+ Tue, 24 May 2022 16:00:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4306FC34116;
+ Tue, 24 May 2022 16:00:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1653407984;
- bh=8XdEz1/vwZ99tD8Wo3ZCfiVTCYwr9sJE8HOhkN0TxME=;
+ s=k20201202; t=1653408015;
+ bh=cBNge5pbPFNpjc3yYWweALItim0uRV+wmebu8g7bA2c=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=FsFt90++T2RGlPHnwuIqeqcU8OdLay1ElbT9Rd/D+Bozi2ReoyoMktLuvyJu9o0Wn
- ZiJkq6ZMptlTTt5+vtmSX45Dsx377ru/fnEvkDcUNwPoHwMlk5oIcVbX5iWorxZqKz
- DNjV1ggdKA/ouq1TZ3QM4uTQhhr3qyZaqGEicjbN7ilB9cT+w/SuPubuaUEz8zeMag
- wcQzXWaOzNkA7JduZaaXF0Nje0addWncOU97LxdF4cDYoA9bF01cH/iqXigMOUjQ24
- sSIpD5mRfAY4J5dMhceY6xXPdmUK9g01glSzPAckFzhkOzM090eNnsHstp1te9bYk0
- /iUZWwsGhLubA==
+ b=atltLFXempL6x/KsznXjHI61bZ+fC/LFl6WxxmOoaH9GEL8cZDTo8l5EyLg1SGqex
+ 72w3xxkv2WxgbTIl9KPFdMry56ayIQBSkd2QY7VceQAgpeln7Rcw1EinghXRokPeNA
+ QIACpjTkB0iMG66KQ0yWAy4WG3YpqoZX91cSm/ekvNPizJz32O+/2nQa/8LR0lpwlT
+ Izv04cAQLGtGIIYFrAVP7aifZ3Av18AkOW74vKm82dO8/7PHLSHjz3khIVDw+Jt0S/
+ s0Iu2n2lSXC7xDRv1rdsp0sMGRwU9dAVKJK+QVNSXT2v+7A2cfjHZkJ6xVjBVkKNkn
+ aEFH6niC+tKyQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.17 05/12] KVM: arm64: Don't hypercall before EL2 init
-Date: Tue, 24 May 2022 11:59:19 -0400
-Message-Id: <20220524155929.826793-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 03/10] KVM: arm64: Don't hypercall before EL2 init
+Date: Tue, 24 May 2022 12:00:00 -0400
+Message-Id: <20220524160009.826957-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220524155929.826793-1-sashal@kernel.org>
-References: <20220524155929.826793-1-sashal@kernel.org>
+In-Reply-To: <20220524160009.826957-1-sashal@kernel.org>
+References: <20220524160009.826957-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -140,10 +140,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 25d8aff273a1..4dd5f3b08aaa 100644
+index 0b2f684cd8ca..a30c036577a3 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -1496,7 +1496,8 @@ static int kvm_init_vector_slots(void)
+@@ -1458,7 +1458,8 @@ static int kvm_init_vector_slots(void)
  	base = kern_hyp_va(kvm_ksym_ref(__bp_harden_hyp_vecs));
  	kvm_init_vector_slot(base, HYP_VECTOR_SPECTRE_DIRECT);
  
