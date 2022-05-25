@@ -2,46 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 888C3C433FE
-	for <kvmarm@archiver.kernel.org>; Wed, 25 May 2022 16:57:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3768EC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 25 May 2022 19:43:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28BCE4B2FF;
-	Wed, 25 May 2022 12:57:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2BA54B2F8;
+	Wed, 25 May 2022 15:43:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tuZXh7mMOc1Q; Wed, 25 May 2022 12:57:09 -0400 (EDT)
+	with ESMTP id QmcTZ8FPmuS6; Wed, 25 May 2022 15:43:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 012054B306;
-	Wed, 25 May 2022 12:57:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C8CE4B2EF;
+	Wed, 25 May 2022 15:43:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A62114B26A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2022 12:57:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E8B3D4B2EC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2022 15:43:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GudfoKHgkVtw for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 May 2022 12:57:07 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 10FFB4B2EE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2022 12:57:06 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 910631474;
- Wed, 25 May 2022 09:57:05 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2D6293F66F;
- Wed, 25 May 2022 09:57:04 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: will@kernel.org, julien.thierry.kdev@gmail.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- andre.przywara@arm.com
-Subject: [PATCH kvmtool 2/2] mips: Do not emulate a serial device
-Date: Wed, 25 May 2022 17:57:04 +0100
-Message-Id: <20220525165704.186754-3-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220525165704.186754-1-alexandru.elisei@arm.com>
-References: <20220525165704.186754-1-alexandru.elisei@arm.com>
+ with ESMTP id OC1UL6opy7px for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 May 2022 15:43:16 -0400 (EDT)
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com
+ [209.85.166.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9727B4B2E6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2022 15:43:16 -0400 (EDT)
+Received: by mail-io1-f48.google.com with SMTP id s23so22408715iog.13
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 May 2022 12:43:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=z0lWFS4RsOAMu5NvP2sJzZSKmQWbrRzXyQ2tDvM4c80=;
+ b=oLfXvI+ru0PyJcz/8dUyYrR1Vs9h5L7qb4goGPpFYErzdxCfrgmxsUup859/1ttnDv
+ 9RsxVNnz+svdM61+K62WpzMlHwFBiQNbxPtOAxrwqAcCF1bgTu9yZ1eMXNNg04ncjTuM
+ Pq37kkS7x2Uongemr6+bJUkdWZmEENsXZAbj7/NiQ2PhR0kBdKkKEihwleM8rs7vUpoP
+ GvtBfiNYUsZKUqXDs1JBIT2yiJyEGQAwzLZLkkT5fUwn0qyIsmLW1ZX8w9RN2gJvWrAc
+ gIhzbN1SesqlyC9kJKVCve+PLZPYHa53HDT1wK3c4H4PhM7X2O+jYSfCh24aqVVTQB6f
+ 415w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=z0lWFS4RsOAMu5NvP2sJzZSKmQWbrRzXyQ2tDvM4c80=;
+ b=x1K0ysK7cGmtTivE1ySU5x/zI8uXppWpy/ix3x43MGFXLMi2gEdVkAHicepuLQOTYj
+ fBMdfOTH/erQsTBDLIHzJTCX09x52+LP3Hd4KZH59oZ3yiLOYgLOj3ClCKTHdEQrGQjo
+ LDfdOMW7CCZX2W2UGY7NKQDWTUj/ChsRRNmmrNTOTUniMWU60NaCnWu/bYjCaDTqSBcW
+ CqjTHdNemRbqg/7R8wnfWK1leGaxdg88TqbWVKHmbu9qL9OubApDkLy16dOZGyHWixlV
+ TSFV0DvSC1FJowgs14pBvtbBHJqgY6XczCbfUeVZCYrJVhvMy027NvCTTGs9Bm1zSGjm
+ aX4A==
+X-Gm-Message-State: AOAM533Cp+kez2GheqQNJLVF69OepHd2Sz/QwgfQGLzjQUC1NArhBEv5
+ 4mzrIDngQGoj0ExHd6pd292/Sw==
+X-Google-Smtp-Source: ABdhPJwb9oqHSahGvYvC/9/gLijqv7jIBdtNORfHT5pI6Y7smDAD3xMAGFXE247Pyu1dtJUcqZZ1uQ==
+X-Received: by 2002:a6b:8b8c:0:b0:65e:486c:15ad with SMTP id
+ n134-20020a6b8b8c000000b0065e486c15admr14384529iod.145.1653507795610; 
+ Wed, 25 May 2022 12:43:15 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com.
+ [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
+ b7-20020a021907000000b0032e8480d706sm4377308jab.57.2022.05.25.12.43.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 25 May 2022 12:43:14 -0700 (PDT)
+Date: Wed, 25 May 2022 19:43:11 +0000
+From: Oliver Upton <oupton@google.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v3 09/13] KVM: selftests: aarch64: Add
+ aarch64/page_fault_test
+Message-ID: <Yo6Gz6o1csFCqN9x@google.com>
+References: <20220408004120.1969099-1-ricarkol@google.com>
+ <20220408004120.1969099-10-ricarkol@google.com>
 MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20220408004120.1969099-10-ricarkol@google.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
+ pbonzini@redhat.com, axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -53,69 +86,230 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Q29tbWl0IDQ1YjQ5NjhlMGRlMSAoImh3L3NlcmlhbDogQVJNL2FybTY0OiBVc2UgTU1JTyBhdCBo
-aWdoZXIgYWRkcmVzc2VzIikKY2hhbmdlZCBob3cgdGhlIGFkZHJlc3MgZm9yIHRoZSBVQVJUIGlz
-IGNvbXB1dGVkIGJ5IHVzaW5nIEtWTV9JT1BPUlRfQVJFQS4KVGhlIHN5bWJvbCBpcyBub3QgZGVm
-aW5lZCBmb3IgTUlQUywgd2hpY2ggcmVzdWx0cyBpbiB0aGUgZm9sbG93aW5nCmNvbXBpbGF0aW9u
-IGVycm9yOgoKaHcvc2VyaWFsLmM6MjE6Mjc6IGVycm9yOiDigJhLVk1fSU9QT1JUX0FSRUHigJkg
-dW5kZWNsYXJlZCBoZXJlIChub3QgaW4gYSBmdW5jdGlvbik7IGRpZCB5b3UgbWVhbiDigJhLVk1f
-TUlQU19JT1BPUlRfQVJFQeKAmT8KICAgMjEgfCAjZGVmaW5lIHNlcmlhbF9pb2Jhc2VfMCAgKEtW
-TV9JT1BPUlRfQVJFQSArIDB4M2Y4KQogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAg
-Xn5+fn5+fn5+fn5+fn5+Cmh3L3NlcmlhbC5jOjI5OjI3OiBub3RlOiBpbiBleHBhbnNpb24gb2Yg
-bWFjcm8g4oCYc2VyaWFsX2lvYmFzZV8w4oCZCiAgIDI5IHwgI2RlZmluZSBzZXJpYWxfaW9iYXNl
-KG5yKSBzZXJpYWxfaW9iYXNlXyMjbnIKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAg
-IF5+fn5+fn5+fn5+fn5+Cmh3L3NlcmlhbC5jOjkyOjE1OiBub3RlOiBpbiBleHBhbnNpb24gb2Yg
-bWFjcm8g4oCYc2VyaWFsX2lvYmFzZeKAmQogICA5MiB8ICAgLmlvYmFzZSAgID0gc2VyaWFsX2lv
-YmFzZSgwKSwKICAgICAgfCAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn4KCkJlZm9yZSB0aGUg
-Y29tbWl0LCB0aGUgc2VyaWFsIHdhcyBwbGFjZWQgYXQgYWRkcmVzc2VzIDB4M2Y4LCAweDJmOCwK
-MHgzZTggYW5kIDB4MmU4LiBIb3dldmVyLCBNSVBTIHB1dHMgdGhlIFJBTSBhdCB0aG9zZSBhZGRy
-ZXNzZXMsIHVwIHRvCktWTV9NTUlPX1NUQVJULCB3aGljaCBpcyAweDEwMDAwMDAwLiBNZWFuaW5n
-IHRoYXQgc2VyaWFsIGRldmljZQplbXVsYXRpb24gbmV2ZXIgd29ya2VkLCBhcyB0aG9zZSBhZGRy
-ZXNzZXMgd2VyZSBwYXJ0IG9mIGEgdmFsaWQgbWVtc2xvdApyZXByZXNlbnRpbmcgbWVtb3J5LiBU
-aGlzIGhhcyBiZWVuIHRoZSBjYXNlIHNpbmNlIGNvbW1pdCA3MjgxYThkYjE5OWIKKCJrdm0gdG9v
-bHMsIG1pcHM6IEFkZCBNSVBTIHN1cHBvcnQiKSBmcm9tIDIwMTQuCgpBIHF1aWNrIGV4YW1pbmF0
-aW9uIG9mIHRoZSBNSVBTIGNvZGUgcmV2ZWFscyB0aGF0IHRoZSBhcmNoaXRlY3R1cmUgcmVsaWVz
-Cm9uIGh5cGVyY2FsbHMgZnJvbSB0aGUgZ3Vlc3QgYW5kIHRoZSB2aXJ0aW8gY29uc29sZSBmb3Ig
-aW5wdXQgYW5kIG91dHB1dC4KU2luY2Ugbm9ib2R5IGNvbXBsYWluZWQgYWJvdXQgdGhlIG1pc3Np
-bmcgc2VyaWFsIGRldmljZSwgYXNzdW1lIHRoYXQgaXQgaXMKaW5kZWVkIG5vdCBuZWVkZWQgYW5k
-IGRvIG5vdCBjb21waWxlIGl0IGZvciBNSVBTLgoKU2lnbmVkLW9mZi1ieTogQWxleGFuZHJ1IEVs
-aXNlaSA8YWxleGFuZHJ1LmVsaXNlaUBhcm0uY29tPgotLS0KIE1ha2VmaWxlICAgfCA3ICsrKysr
-LS0KIG1pcHMva3ZtLmMgfCA1ICsrKysrCiAyIGZpbGVzIGNoYW5nZWQsIDEwIGluc2VydGlvbnMo
-KyksIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvTWFrZWZpbGUgYi9NYWtlZmlsZQppbmRl
-eCA5ZTY3Yzc2MzdiMWUuLjY0NjQ0NDZhOWYyNCAxMDA2NDQKLS0tIGEvTWFrZWZpbGUKKysrIGIv
-TWFrZWZpbGUKQEAgLTU2LDcgKzU2LDYgQEAgT0JKUwkrPSBkaXNrL2NvcmUubwogT0JKUwkrPSBm
-cmFtZWJ1ZmZlci5vCiBPQkpTCSs9IGd1ZXN0X2NvbXBhdC5vCiBPQkpTCSs9IGh3L3J0Yy5vCi1P
-QkpTCSs9IGh3L3NlcmlhbC5vCiBPQkpTCSs9IGlycS5vCiBPQkpTCSs9IGt2bS1jcHUubwogT0JK
-UwkrPSBrdm0ubwpAQCAtMTI3LDYgKzEyNiw3IEBAIGVuZGlmCiBpZmVxICgkKEFSQ0gpLHg4NikK
-IAlERUZJTkVTICs9IC1EQ09ORklHX1g4NgogCU9CSlMJKz0gaHcvaTgwNDIubworCU9CSlMJKz0g
-aHcvc2VyaWFsLm8KIAlPQkpTCSs9IHg4Ni9ib290Lm8KIAlPQkpTCSs9IHg4Ni9jcHVpZC5vCiAJ
-T0JKUwkrPSB4ODYvaW50ZXJydXB0Lm8KQEAgLTE0NCw2ICsxNDQsNyBAQCBlbmRpZgogIyBQT1dF
-Ui9wcGM6ICBBY3R1YWxseSBvbmx5IHN1cHBvcnQgcHBjNjQgY3VycmVudGx5LgogaWZlcSAoJChB
-UkNIKSwgcG93ZXJwYykKIAlERUZJTkVTICs9IC1EQ09ORklHX1BQQworCU9CSlMJKz0gaHcvc2Vy
-aWFsLm8KIAlPQkpTCSs9IHBvd2VycGMvYm9vdC5vCiAJT0JKUwkrPSBwb3dlcnBjL2lvcG9ydC5v
-CiAJT0JKUwkrPSBwb3dlcnBjL2t2bS5vCkBAIC0xNjEsNyArMTYyLDggQEAgZW5kaWYKIAogIyBB
-Uk0KIE9CSlNfQVJNX0NPTU1PTgkJOj0gYXJtL2ZkdC5vIGFybS9naWMubyBhcm0vZ2ljdjJtLm8g
-YXJtL2lvcG9ydC5vIFwKLQkJCSAgIGFybS9rdm0ubyBhcm0va3ZtLWNwdS5vIGFybS9wY2kubyBh
-cm0vdGltZXIubworCQkJICAgYXJtL2t2bS5vIGFybS9rdm0tY3B1Lm8gYXJtL3BjaS5vIGFybS90
-aW1lci5vIFwKKwkJCSAgIGh3L3NlcmlhbC5vCiBIRFJTX0FSTV9DT01NT04JCTo9IGFybS9pbmNs
-dWRlCiBpZmVxICgkKEFSQ0gpLCBhcm0pCiAJREVGSU5FUwkJKz0gLURDT05GSUdfQVJNCkBAIC0y
-MDMsNiArMjA1LDcgQEAgZW5kaWYKIGlmZXEgKCQoQVJDSCkscmlzY3YpCiAJREVGSU5FUwkJKz0g
-LURDT05GSUdfUklTQ1YKIAlBUkNIX0lOQ0xVREUJOj0gcmlzY3YvaW5jbHVkZQorCU9CSlMJCSs9
-IGh3L3NlcmlhbC5vCiAJT0JKUwkJKz0gcmlzY3YvZmR0Lm8KIAlPQkpTCQkrPSByaXNjdi9pb3Bv
-cnQubwogCU9CSlMJCSs9IHJpc2N2L2lycS5vCmRpZmYgLS1naXQgYS9taXBzL2t2bS5jIGIvbWlw
-cy9rdm0uYwppbmRleCAzNDcwZGJiMmU0MzMuLmU2NjhjYmJlZmIyNSAxMDA2NDQKLS0tIGEvbWlw
-cy9rdm0uYworKysgYi9taXBzL2t2bS5jCkBAIC0xLDMgKzEsNCBAQAorI2luY2x1ZGUgImt2bS84
-MjUwLXNlcmlhbC5oIgogI2luY2x1ZGUgImt2bS9rdm0uaCIKICNpbmNsdWRlICJrdm0vaW9wb3J0
-LmgiCiAjaW5jbHVkZSAia3ZtL3ZpcnRpby1jb25zb2xlLmgiCkBAIC0zNTksMyArMzYwLDcgQEAg
-Ym9vbCBrdm1fX2FyY2hfbG9hZF9rZXJuZWxfaW1hZ2Uoc3RydWN0IGt2bSAqa3ZtLCBpbnQgZmRf
-a2VybmVsLCBpbnQgZmRfaW5pdHJkLAogdm9pZCBpb3BvcnRfX21hcF9pcnEodTggKmlycSkKIHsK
-IH0KKwordm9pZCBzZXJpYWw4MjUwX19pbmplY3Rfc3lzcnEoc3RydWN0IGt2bSAqa3ZtLCBjaGFy
-IHN5c3JxKQoreworfQotLSAKMi4zNi4xCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1
-bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9r
-dm1hcm0K
+Hi Ricardo,
+
+On Thu, Apr 07, 2022 at 05:41:16PM -0700, Ricardo Koller wrote:
+> diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> new file mode 100644
+> index 000000000000..04fc6007f630
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+
+[...]
+
+> +/* Guest virtual addresses that point to the test page and its PTE. */
+> +#define TEST_GVA				0xc0000000
+> +#define TEST_EXEC_GVA				0xc0000008
+> +#define TEST_PTE_GVA				0xd0000000
+> +#define TEST_DATA				0x0123456789ABCDEF
+> +
+> +#define CMD_NONE				(0)
+> +#define CMD_SKIP_TEST				(1ULL << 1)
+> +#define CMD_HOLE_PT				(1ULL << 2)
+> +#define CMD_HOLE_TEST				(1ULL << 3)
+> +
+> +#define PREPARE_FN_NR				10
+> +#define CHECK_FN_NR				10
+> +
+> +uint64_t pte_gpa;
+> +
+> +enum { PT, TEST, NR_MEMSLOTS};
+
+nit: fix formatting (just use newlines for each value).
+
+> +struct memslot_desc {
+> +	void *hva;
+> +	uint64_t gpa;
+> +	uint64_t size;
+> +	uint64_t guest_pages;
+> +	uint64_t backing_pages;
+> +	enum vm_mem_backing_src_type src_type;
+> +	uint32_t idx;
+> +} memslot[NR_MEMSLOTS] = {
+> +	{
+> +		.idx = TEST_PT_SLOT_INDEX,
+> +		.backing_pages = PT_MEMSLOT_BACKING_SRC_NPAGES,
+> +	},
+> +	{
+> +		.idx = TEST_MEM_SLOT_INDEX,
+> +		.backing_pages = TEST_MEMSLOT_BACKING_SRC_NPAGES,
+
+nit: initialize fields in the order they appear in the struct.
+
+[...]
+
+> +static void guest_write64(void)
+> +{
+> +	uint64_t val;
+> +
+> +	WRITE_ONCE(*((uint64_t *)TEST_GVA), TEST_DATA);
+> +	val = READ_ONCE(*(uint64_t *)TEST_GVA);
+
+nit: you could proabably avoid casting with a global pointer.
+
+  static uint64_t *guest_test_memory = (uint64_t *)TEST_GVA;
+
+[...]
+
+> +static void guest_test_check(struct test_desc *test)
+> +{
+> +	void (*check_fn)(void);
+> +	int i;
+> +
+> +	for (i = 0; i < CHECK_FN_NR; i++) {
+> +		check_fn = test->guest_test_check[i];
+> +		if (!check_fn)
+> +			continue;
+> +		check_fn();
+
+nit:
+
+  if (check_fn)
+          check_fn();
+
+One less line :)
+
+> +	}
+> +}
+> +
+> +static void guest_code(struct test_desc *test)
+> +{
+> +	if (!test->guest_test)
+> +		test->guest_test = guest_nop;
+
+In other cases you've chosen to skip function calls if NULL. Is there a
+need to call something here that I've missed or could you just do:
+
+  if (test->guest_test)
+          test->guest_test();
+
+below?
+
+> +	if (!guest_prepare(test))
+> +		GUEST_SYNC(CMD_SKIP_TEST);
+> +
+> +	GUEST_SYNC(test->mem_mark_cmd);
+> +	test->guest_test();
+> +
+> +	guest_test_check(test);
+> +	GUEST_DONE();
+> +}
+
+[...]
+
+> +
+> +#define SNAME(s)			#s
+> +#define SCAT2(a, b)			SNAME(a ## _ ## b)
+> +#define SCAT3(a, b, c)			SCAT2(a, SCAT2(b, c))
+> +
+> +#define _CHECK(_test)			_CHECK_##_test
+> +#define _PREPARE(_test)			_PREPARE_##_test
+> +#define _PREPARE_guest_read64		guest_prepare_nop
+> +#define _PREPARE_guest_ld_preidx	guest_prepare_nop
+> +#define _PREPARE_guest_write64		guest_prepare_nop
+> +#define _PREPARE_guest_st_preidx	guest_prepare_nop
+> +#define _PREPARE_guest_exec		guest_prepare_nop
+> +#define _PREPARE_guest_at		guest_prepare_nop
+
+Since you check for NULL in guest_prepare(), could you just use NULL for
+these and drop guest_prepare_nop()?
+
+> +#define _PREPARE_guest_dc_zva		guest_check_dc_zva
+> +#define _PREPARE_guest_cas		guest_check_lse
+> +
+> +/* With or without access flag checks */
+> +#define _PREPARE_with_af		guest_set_ha, guest_clear_pte_af
+> +#define _PREPARE_no_af			guest_prepare_nop
+> +#define _CHECK_with_af			guest_check_pte_af
+> +#define _CHECK_no_af			guest_check_nop
+> +
+> +/* Performs an access and checks that no faults (no events) were triggered. */
+> +#define TEST_ACCESS(_access, _with_af, _mark_cmd)				\
+> +{										\
+> +	.name			= SCAT3(_access, _with_af, #_mark_cmd),		\
+> +	.guest_prepare		= { _PREPARE(_with_af),				\
+> +				    _PREPARE(_access) },			\
+> +	.mem_mark_cmd		= _mark_cmd,					\
+> +	.guest_test		= _access,					\
+> +	.guest_test_check	= { _CHECK(_with_af) },				\
+> +	.expected_events	= { 0 },					\
+> +}
+> +
+> +static struct test_desc tests[] = {
+> +	/* Check that HW is setting the Access Flag (AF) (sanity checks). */
+> +	TEST_ACCESS(guest_read64, with_af, CMD_NONE),
+> +	TEST_ACCESS(guest_ld_preidx, with_af, CMD_NONE),
+> +	TEST_ACCESS(guest_cas, with_af, CMD_NONE),
+> +	TEST_ACCESS(guest_write64, with_af, CMD_NONE),
+> +	TEST_ACCESS(guest_st_preidx, with_af, CMD_NONE),
+> +	TEST_ACCESS(guest_dc_zva, with_af, CMD_NONE),
+> +	TEST_ACCESS(guest_exec, with_af, CMD_NONE),
+> +
+> +	/*
+> +	 * Accessing a hole in the test memslot (punched with fallocate or
+> +	 * madvise) shouldn't fault (more sanity checks).
+> +	 */
+> +	TEST_ACCESS(guest_read64, no_af, CMD_HOLE_TEST),
+> +	TEST_ACCESS(guest_cas, no_af, CMD_HOLE_TEST),
+> +	TEST_ACCESS(guest_ld_preidx, no_af, CMD_HOLE_TEST),
+> +	TEST_ACCESS(guest_write64, no_af, CMD_HOLE_TEST),
+> +	TEST_ACCESS(guest_st_preidx, no_af, CMD_HOLE_TEST),
+> +	TEST_ACCESS(guest_at, no_af, CMD_HOLE_TEST),
+> +	TEST_ACCESS(guest_dc_zva, no_af, CMD_HOLE_TEST),
+> +
+> +	{ 0 },
+
+nit: no comma, we don't want to ever add anything after the sentinel I
+presume.
+
+> +};
+> +
+> +static void for_each_test_and_guest_mode(
+> +		void (*func)(enum vm_guest_mode m, void *a),
+> +		enum vm_mem_backing_src_type src_type)
+> +{
+
+Could you avoid the forward declaration and instead move definitions
+around to satisfy the compiler?
+
+> +	struct test_desc *t;
+> +
+> +	for (t = &tests[0]; t->name; t++) {
+> +		if (t->skip)
+> +			continue;
+> +
+> +		struct test_params p = {
+> +			.src_type = src_type,
+> +			.test_desc = t,
+> +		};
+> +
+> +		for_each_guest_mode(run_test, &p);
+> +	}
+> +}
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> index 16753a1f28e3..cb5849fd8fd1 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> @@ -125,6 +125,12 @@ enum {
+>  #define ESR_EC_WP_CURRENT	0x35
+>  #define ESR_EC_BRK_INS		0x3c
+>  
+> +/* Access flag */
+> +#define PTE_AF			(1ULL << 10)
+> +
+> +/* Acces flag update enable/disable */
+
+typo: Access
+
+--
+Thanks,
+Oliver
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
