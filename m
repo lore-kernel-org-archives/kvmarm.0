@@ -2,61 +2,61 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED5E5C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 27 May 2022 08:04:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55393C433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 27 May 2022 08:04:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90A2D4B29C;
-	Fri, 27 May 2022 04:04:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 083544B35E;
+	Fri, 27 May 2022 04:04:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ndQk8yM8kV1A; Fri, 27 May 2022 04:04:20 -0400 (EDT)
+	with ESMTP id 8Ll55Lbgwn1Q; Fri, 27 May 2022 04:04:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A92E4B354;
-	Fri, 27 May 2022 04:04:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D33554B2C1;
+	Fri, 27 May 2022 04:04:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 712FA4B29C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 May 2022 04:04:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B10C4B1E1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 May 2022 04:04:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gMEo1Cs5ZLQD for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 May 2022 04:04:18 -0400 (EDT)
+ with ESMTP id 61YpYTOT8BjT for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 May 2022 04:04:36 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C4DB4B357
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 May 2022 04:04:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 24EB74B26D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 May 2022 04:04:36 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1653638657;
+ s=mimecast20190719; t=1653638675;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=P4jpm8XSirJ1238sxZZHFV9+DDVhOPJcfnDADqydjXI=;
- b=egfbuRXg63NhSk5C80CPSCV61n2Nh/hvg7R+0hm/1pE6ofr/iE2zICItMUGdcCjS6f9EqZ
- wVbfeJ3kQPwLQL/rLUL3E5fft5D6y3boislmSn7wzIVToMMWwGtaYS80o4kDNijbtYMOPt
- Xwy6pR/pns6Rgvc6dIS+tl1IExBT1S0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=kcK/t9iW1JR5lhmsZM8idJt1ZlBlpeTLocByfzKuNnU=;
+ b=hccRh0Wml44hy4J1a2Id3t/M6KAlkMT8w8KFxW8iut7ie4+0lnJf83cmGfn/w1mKuFY6S1
+ nnooZJTGeSkal0L36XLqlTluCBA0H7mRXnOuAsLNEyVRbgX6fA4XXGUyjrZqXClmrZKvkx
+ ivExal5MtiwEAztc5913bekSZJdjHAM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-5-M6zTRbdCOiKQyGV6iliAuA-1; Fri, 27 May 2022 04:04:14 -0400
-X-MC-Unique: M6zTRbdCOiKQyGV6iliAuA-1
+ us-mta-125-RzrZnFTLOkWOtiHCvt0Maw-1; Fri, 27 May 2022 04:04:34 -0400
+X-MC-Unique: RzrZnFTLOkWOtiHCvt0Maw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
  [10.11.54.4])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 04D042949BAE;
- Fri, 27 May 2022 08:04:14 +0000 (UTC)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CFC77187506C;
+ Fri, 27 May 2022 08:04:33 +0000 (UTC)
 Received: from gshan.redhat.com (ovpn-12-91.pek2.redhat.com [10.72.12.91])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A90A42026D64;
- Fri, 27 May 2022 08:04:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C23382024CBB;
+ Fri, 27 May 2022 08:04:24 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v7 04/22] KVM: arm64: Support EVENT_REGISTER hypercall
-Date: Fri, 27 May 2022 16:02:35 +0800
-Message-Id: <20220527080253.1562538-5-gshan@redhat.com>
+Subject: [PATCH v7 06/22] KVM: arm64: Support EVENT_CONTEXT hypercall
+Date: Fri, 27 May 2022 16:02:37 +0800
+Message-Id: <20220527080253.1562538-7-gshan@redhat.com>
 In-Reply-To: <20220527080253.1562538-1-gshan@redhat.com>
 References: <20220527080253.1562538-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -81,66 +81,61 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This supports EVENT_REGISTER hypercall, which is used by guest
-to register event. The event won't be raised until it's registered
-and enabled. There are several cases where the request is injected:
+This supports EVENT_CONTEXT hypercall. It's called inside the event
+handler to retrieve the specified register in the saved or preempted
+context.
 
-  * The event isn't supported by KVM
-
-  * The event has been registered or pending for unregistration
-
-  * The reserved bits or relative mode are set in @flags argument
+  * The request is rejected if no running event handler exists or the
+    parameter ID is out of range.
 
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- arch/arm64/kvm/sdei.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ arch/arm64/kvm/sdei.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
-index 0c4415fcad16..40c2d585470d 100644
+index a4046e7b21d8..2fec2dcd02b0 100644
 --- a/arch/arm64/kvm/sdei.c
 +++ b/arch/arm64/kvm/sdei.c
-@@ -13,6 +13,34 @@
- #include <kvm/arm_hypercalls.h>
- #include <asm/kvm_sdei.h>
+@@ -44,7 +44,7 @@ static unsigned long event_register(struct kvm_vcpu *vcpu)
+ static unsigned long event_enable(struct kvm_vcpu *vcpu, bool enable)
+ {
+ 	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
+-	unsigned int num = smccc_get_arg(vcpu, 1);
++	int num = smccc_get_arg(vcpu, 1);
  
-+static unsigned long event_register(struct kvm_vcpu *vcpu)
+ 	if (num >= KVM_NR_SDEI_EVENTS)
+ 		return SDEI_INVALID_PARAMETERS;
+@@ -68,6 +68,23 @@ static unsigned long event_enable(struct kvm_vcpu *vcpu, bool enable)
+ 	return SDEI_SUCCESS;
+ }
+ 
++static unsigned long event_context(struct kvm_vcpu *vcpu)
 +{
 +	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
-+	unsigned int num = smccc_get_arg(vcpu, 1);
-+	unsigned long flags = smccc_get_arg(vcpu, 4);
++	struct kvm_sdei_event_context *ctxt = &vsdei->ctxt;
++	unsigned int param_id = smccc_get_arg(vcpu, 1);
 +
-+	if (num >= KVM_NR_SDEI_EVENTS)
-+		return SDEI_INVALID_PARAMETERS;
-+
-+	/* Reject if the reserved bits or relative mode are set */
-+	if (flags & ~0x1UL)
-+		return SDEI_INVALID_PARAMETERS;
-+
-+	/*
-+	 * Reject if the event has been registered or pending for
-+	 * unregistration.
-+	 */
-+	if (test_bit(num, &vsdei->registered) ||
-+	    test_bit(num, &vsdei->running))
++	/* Reject if event handler isn't running */
++	if (!vsdei->running)
 +		return SDEI_DENIED;
 +
-+	vsdei->handlers[num].ep_addr = smccc_get_arg(vcpu, 2);
-+	vsdei->handlers[num].ep_arg = smccc_get_arg(vcpu, 3);
-+	set_bit(num, &vsdei->registered);
++	/* Reject if the parameter ID is out of range */
++	if (param_id >= ARRAY_SIZE(ctxt->regs))
++		return SDEI_INVALID_PARAMETERS;
 +
-+	return SDEI_SUCCESS;
++	return ctxt->regs[param_id];
 +}
 +
  int kvm_sdei_call(struct kvm_vcpu *vcpu)
  {
  	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
-@@ -31,6 +59,9 @@ int kvm_sdei_call(struct kvm_vcpu *vcpu)
- 	}
- 
- 	switch (func) {
-+	case SDEI_1_0_FN_SDEI_EVENT_REGISTER:
-+		ret = event_register(vcpu);
+@@ -95,6 +112,9 @@ int kvm_sdei_call(struct kvm_vcpu *vcpu)
+ 	case SDEI_1_0_FN_SDEI_EVENT_DISABLE:
+ 		ret = event_enable(vcpu, false);
+ 		break;
++	case SDEI_1_0_FN_SDEI_EVENT_CONTEXT:
++		ret = event_context(vcpu);
 +		break;
  	default:
  		ret = SDEI_NOT_SUPPORTED;
