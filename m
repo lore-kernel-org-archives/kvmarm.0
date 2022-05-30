@@ -2,62 +2,61 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC29C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 30 May 2022 14:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64C20C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 30 May 2022 14:51:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB6BD4B346;
-	Mon, 30 May 2022 10:42:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBD0B4B178;
+	Mon, 30 May 2022 10:51:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UzcaBGjAV0Li; Mon, 30 May 2022 10:42:01 -0400 (EDT)
+	with ESMTP id FRbWyIA27ujP; Mon, 30 May 2022 10:51:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98EEF49EE3;
-	Mon, 30 May 2022 10:42:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B2CCA4B192;
+	Mon, 30 May 2022 10:51:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA12F49EE3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 May 2022 10:41:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF6B94B178
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 May 2022 10:51:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eB1ZXd3Gc3qn for <kvmarm@lists.cs.columbia.edu>;
- Mon, 30 May 2022 10:41:58 -0400 (EDT)
+ with ESMTP id JxQRLzWCXbZX for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 May 2022 10:51:29 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9CC0949EB4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 May 2022 10:41:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E3C554B19F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 May 2022 10:51:29 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id C553760F47;
- Mon, 30 May 2022 14:41:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5CCEC385B8;
- Mon, 30 May 2022 14:41:56 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id D7B9C60F47;
+ Mon, 30 May 2022 14:51:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE87DC3411E;
+ Mon, 30 May 2022 14:51:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1653921717;
- bh=8abrn0+fyaPOA35f7xmWZpHOHqa414fCZZbKmkVupjM=;
+ s=k20201202; t=1653922288;
+ bh=zIS303ND/ipmUxzUl0cjT6WILUpauYfW4NIWc/vz/oo=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=pqwLJQyttHeCPer1sfDH0foSp8e/arMMnFrMmAru9XrZ6jm7g/ajrEcIvpf4/sGG8
- j+mEfsV8h2gk7WZptLWACzxOAyIyN2p8t5LHZluCv/mpLj+mKbccprao57jsNMQgcn
- FKnAHaVnVyGHF05wiz5jDb2dm4jpMxLWhZX4mwr8OjIXrsErRQIZobH/VG6z6E33sl
- eSFuyCLMbqKiHRCj5NUnbmS7KTlV9tKcZqIlEKX2ldQ9IEAo8XtAivLXb7Uzn19oUF
- 7gL9/wR8KRd9D24wVXGUQLmuu7LICcpmWXyk7qDp+lD3dUMcZkhyXK1y3YoUuHEYi5
- gurOAs1LGl21w==
-Date: Mon, 30 May 2022 16:41:54 +0200
+ b=d96MfobovSzVRjGjNOhCLFB3kwhwzT9duEtP6BfpsqNOx6Dlsw7TL9p8OynqPl1xx
+ tZKJt5XBiPYT7FhnT15yJHRl+crOFznGvfjbA5bV168fGTK6O9R0fR0oV9o84wOZFK
+ RL7W/9N7rGmrgYPw1m8mM0DiBLrHw045eorTvRl2uKfaa6+pe5aoDFVZwGkhMvCU6U
+ rtG+RwDDUd8fjuUHP3oP3mnXmYwYM1Pc2C4ROTu4rxRrPMS+pQBqcJtynGnkBSMxo+
+ L1InQ8FcyYzr3egtS/KL6QGm7PZMpG8mb9UEbo6Vb2IQxP8sBke6IVpuoSsDc638WT
+ NW+1mUzJwx7dQ==
+Date: Mon, 30 May 2022 16:51:25 +0200
 From: Mark Brown <broonie@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 01/18] KVM: arm64: Always start with clearing SVE flag on
+Subject: Re: [PATCH 02/18] KVM: arm64: Always start with clearing SME flag on
  load
-Message-ID: <YpTXsgd1MPpJEjUJ@sirena.org.uk>
+Message-ID: <YpTZ7btyYNOidHmO@sirena.org.uk>
 References: <20220528113829.1043361-1-maz@kernel.org>
- <20220528113829.1043361-2-maz@kernel.org>
+ <20220528113829.1043361-3-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20220528113829.1043361-2-maz@kernel.org>
+In-Reply-To: <20220528113829.1043361-3-maz@kernel.org>
 X-Cookie: May your camel be as swift as the wind.
 Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,64 +68,50 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============8282362885616285232=="
+Content-Type: multipart/mixed; boundary="===============6380787444174705675=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
---===============8282362885616285232==
+--===============6380787444174705675==
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ttQtBwibfUEMVFH9"
+	protocol="application/pgp-signature"; boundary="09dlo0gX1RQg6igT"
 Content-Disposition: inline
 
 
---ttQtBwibfUEMVFH9
+--09dlo0gX1RQg6igT
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, May 28, 2022 at 12:38:11PM +0100, Marc Zyngier wrote:
-> On each vcpu load, we set the KVM_ARM64_HOST_SVE_ENABLED
-> flag if SVE is enabled for EL0 on the host. This is used to restore
-> the correct state on vpcu put.
->=20
-> However, it appears that nothing ever clears this flag. Once
-> set, it will stick until the vcpu is destroyed, which has the
-> potential to spuriously enable SVE for userspace.
+On Sat, May 28, 2022 at 12:38:12PM +0100, Marc Zyngier wrote:
+> On each vcpu load, we set the KVM_ARM64_HOST_SME_ENABLED
+> flag if SVE is enabled for EL0 on the host. This is used to
+> restore the correct state on vpcu put.
 
-Oh dear.
+s/SVE/SME/
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+but otherwise
 
-> We probably never saw the issue because no VMM uses SVE, but
-> that's still pretty bad. Unconditionally clearing the flag
-> on vcpu load addresses the issue.
+Reviwed-by: Mark Brown <broonie@kernel.org>
 
-Unless I'm missing something since we currently always disable
-SVE on syscall even if the VMM were using SVE for some reason
-(SVE memcpy()?) we should already have disabled SVE for EL0 in
-sve_user_discard() during kernel entry so EL0 access to SVE
-should be disabled in the system register by the time we get
-here.
-
---ttQtBwibfUEMVFH9
+--09dlo0gX1RQg6igT
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmKU17EACgkQJNaLcl1U
-h9Bxzgf/W2VmJBtB0a4vcrBCgfX7ollA3ex5VNB6egRZO8MINJrGPpI+Jv5J21sA
-1ouYS/mgLxtq0X8ACQX1wcCv4SHFzZ+fOj0D7PM85BvUxWWF4AYlyjZ9dfpx0t4X
-BQykcxau0Ep3Gj27LAkCQxvAe/X5QEuymskYptEMrIigKy2Af+LwdwJNy03Pw/M7
-BJBGRk6DKpX9GBCnNx/zVjAp3wkpW50q67c2S+A35z2VzD5Fpk7zQWtwQGCp+X/D
-/UZr74rJl6izdLI+ycIFUr41Lq95C7cl4/mHC1h4S9i9ceklOthnl1BgxOY0c/FT
-zsZnSWRL7SBHTEnNr46EjfpsiId3Cg==
-=aTTw
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmKU2ewACgkQJNaLcl1U
+h9CsOAf/ch7hbdVBEYHqj9l2Bu7hPD45KvDptN/N2xZb8fzBVzmvvY+hO36KHUUJ
+Wpdw3LosZwyeVxuDAKFeJRPZm/KeiNTS8eD51W6ZjeL4gDXLY1i0WFpDIr4Ue74b
+mrElUFTjjrxgBQDSL2nwY9+dgwYxrKAM7697ortKfcU1aUUg9NfoOTagFwzFy0pn
+P4ylovcmwFO9OWVhk9gXJwcaAi/4NttFQHrgMUkXyn9CTPLP3XzMeRxn6v+KBHCK
+sbdXlECu/fK7NEkHylhE5IPKfZRqAgn4TydtOM5LseTeiLbasOPqWWF0sRRnfOjC
++o+/WxGkZCXXwQR8mhH/TR9JEOdfDA==
+=SNHP
 -----END PGP SIGNATURE-----
 
---ttQtBwibfUEMVFH9--
+--09dlo0gX1RQg6igT--
 
---===============8282362885616285232==
+--===============6380787444174705675==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -137,4 +122,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---===============8282362885616285232==--
+--===============6380787444174705675==--
