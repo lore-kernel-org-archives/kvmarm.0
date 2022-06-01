@@ -2,52 +2,91 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1313C433EF
-	for <kvmarm@archiver.kernel.org>; Wed,  1 Jun 2022 20:13:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F646C43334
+	for <kvmarm@archiver.kernel.org>; Wed,  1 Jun 2022 21:50:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 49C554B356;
-	Wed,  1 Jun 2022 16:13:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 72EC94B34F;
+	Wed,  1 Jun 2022 17:50:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FeyE3R0jKPIp; Wed,  1 Jun 2022 16:13:17 -0400 (EDT)
+	with ESMTP id I5ocLbexwmwo; Wed,  1 Jun 2022 17:50:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D3414B371;
-	Wed,  1 Jun 2022 16:13:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A0F84B325;
+	Wed,  1 Jun 2022 17:50:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 47BBC4B356
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jun 2022 16:13:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AAEC94B2F9
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jun 2022 17:50:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sUfB-TfRoTf7 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Jun 2022 16:13:15 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 550A64B349
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jun 2022 16:13:15 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A3A4D6E;
- Wed,  1 Jun 2022 13:13:14 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 278173F73D;
- Wed,  1 Jun 2022 13:13:13 -0700 (PDT)
-Date: Wed, 1 Jun 2022 21:13:27 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v3 kvmtool 09/13] builtin_run: Allow standard size
- specifiers for memory
-Message-ID: <YpfIZ3rNVf1//5RB@monolith.localdoman>
-References: <20220525112345.121321-1-alexandru.elisei@arm.com>
- <20220525112345.121321-10-alexandru.elisei@arm.com>
- <20220601143955.55e00cfd@donnerap.cambridge.arm.com>
- <Ypd1DtVQwktvXITa@monolith.localdoman>
- <20220601171400.7318cc0b@donnerap.cambridge.arm.com>
- <YpfAXNgyNQ3Y0J/a@monolith.localdoman>
+ with ESMTP id rAJ4ygK5UNdz for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Jun 2022 17:50:15 -0400 (EDT)
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com
+ [209.85.215.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C69DE4B29F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jun 2022 17:50:15 -0400 (EDT)
+Received: by mail-pg1-f173.google.com with SMTP id g184so3076493pgc.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Jun 2022 14:50:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=wtNc6vsdvCONh901oUDxUYMrSPwB6qCC1LifRnPszzE=;
+ b=gXjrdBaEUJ4aniM1oO17dFrQzIcqDCt/p0aPX9bbbNiqAki3ZGctCJxBg/scrZxgzy
+ wkw6XGE20R7B5ses6wtX2mwpVMeIZhjPHpInaM06VMSoFMFh0BecBIAfvJcjcli6Sznu
+ 1cjTx8YTC7X/jh6GXnvzOEF79W/2ti9soQxCwMeUwYMXnXUDyCvAoZ5QYa0AtEZPXwUr
+ sexRt2loi5uZREoRSekUEt23sbxCN7y4OaEhhPlAlnMFT6Zxfzoc14yaywuVHzuLqGmJ
+ ZaZ/8aF+XNVQyuPwqc/vpA1J8z61hDBMrY238xFpunjC9IEV2y92q+0IC900GIiZQDRd
+ Vcow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=wtNc6vsdvCONh901oUDxUYMrSPwB6qCC1LifRnPszzE=;
+ b=t0lJPn4Sf89b4UcRrKeNJlyjZeRrc/WtPaoJFkgBXbrFFHfI9fVbc6i4UolszCrDwV
+ BEmBEzTOcwgFCU9IKgofcUvB4s+LRdtZ5YcUvDDaW5ao2Q4uwLVBDkvrciuGrY/nWtLI
+ BFfl5H4+E7mkU/FdfKsNoTkqcJ1PzeKHeuU/gyC5wwVG8vi6FuTy099BPs+M3NfH6z/1
+ ZtiQNfcnU3dFwdRlZWSnZgpv4MYIbICgqxlkdSScdTvh6cSM3autxFGD59KmFz6ELCJX
+ q80X6kT3J2KLCmjYjbqKAL4VK1WAQvlHDzWUzliAFT1DGX8FJyNNS2YVhfsATqWxhBrv
+ Sijw==
+X-Gm-Message-State: AOAM532/VvYmFnxoz8C5vwk52SGDLi+bEr2r5NoJNOW2IMUFAJIN+afe
+ FRXu++zBKpVS/qUzX2ttkbqJ7w==
+X-Google-Smtp-Source: ABdhPJxBE89eXAVr68S29Z79fNidjFx+ZSv6EXZSi54+CPjIC8VWjCZQsIuDii0qQo4ngn3QM4Zb9g==
+X-Received: by 2002:a65:6bce:0:b0:3f2:5f88:6f7d with SMTP id
+ e14-20020a656bce000000b003f25f886f7dmr1260962pgw.253.1654120214085; 
+ Wed, 01 Jun 2022 14:50:14 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com.
+ [34.83.12.150]) by smtp.gmail.com with ESMTPSA id
+ j13-20020a17090a318d00b001e2da6766ecsm4287700pjb.31.2022.06.01.14.50.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 01 Jun 2022 14:50:13 -0700 (PDT)
+Date: Wed, 1 Jun 2022 14:50:10 -0700
+From: Ricardo Koller <ricarkol@google.com>
+To: David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v6 22/22] KVM: x86/mmu: Extend Eager Page Splitting to
+ nested MMUs
+Message-ID: <YpffEuTSJ3QJwLiy@google.com>
+References: <20220516232138.1783324-1-dmatlack@google.com>
+ <20220516232138.1783324-23-dmatlack@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <YpfAXNgyNQ3Y0J/a@monolith.localdoman>
-Cc: linux-arm-kernel@lists.infradead.org, maz@kernel.org, julien@xen.org,
- kvmarm@lists.cs.columbia.edu, will@kernel.org
+In-Reply-To: <20220516232138.1783324-23-dmatlack@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <linux-mips@vger.kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
+ <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ maciej.szmigiero@oracle.com,
+ "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -64,265 +103,477 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+Hi David,
 
-On Wed, Jun 01, 2022 at 08:39:08PM +0100, Alexandru Elisei wrote:
-> Hi,
+On Mon, May 16, 2022 at 11:21:38PM +0000, David Matlack wrote:
+> Add support for Eager Page Splitting pages that are mapped by nested
+> MMUs. Walk through the rmap first splitting all 1GiB pages to 2MiB
+> pages, and then splitting all 2MiB pages to 4KiB pages.
 > 
-> On Wed, Jun 01, 2022 at 05:14:00PM +0100, Andre Przywara wrote:
-> > On Wed, 1 Jun 2022 15:17:50 +0100
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi Alex,
-> > 
-> > > Hi,
-> > > 
-> > > Thank you for having a look! Replies below.
-> > > 
-> > > On Wed, Jun 01, 2022 at 02:39:55PM +0100, Andre Przywara wrote:
-> > > > On Wed, 25 May 2022 12:23:41 +0100
-> > > > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > > > 
-> > > > Hi,
-> > > >   
-> > > > > From: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > > > > 
-> > > > > Allow the user to use the standard B (bytes), K (kilobytes), M (megabytes),
-> > > > > G (gigabytes), T (terabytes) and P (petabytes) suffixes for memory size.
-> > > > > When none are specified, the default is megabytes.
-> > > > > 
-> > > > > Also raise an error if the guest specifies 0 as the memory size, instead
-> > > > > of treating it as uninitialized, as kvmtool has done so far.
-> > > > > 
-> > > > > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > > > ---
-> > > > >  builtin-run.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++----
-> > > > >  1 file changed, 60 insertions(+), 5 deletions(-)
-> > > > > 
-> > > > > diff --git a/builtin-run.c b/builtin-run.c
-> > > > > index 2ef159cdb2a3..a49698d5b2fe 100644
-> > > > > --- a/builtin-run.c
-> > > > > +++ b/builtin-run.c
-> > > > > @@ -49,9 +49,11 @@
-> > > > >  #include <ctype.h>
-> > > > >  #include <stdio.h>
-> > > > >  
-> > > > > -#define MB_SHIFT		(20)
-> > > > >  #define KB_SHIFT		(10)
-> > > > > +#define MB_SHIFT		(20)
-> > > > >  #define GB_SHIFT		(30)
-> > > > > +#define TB_SHIFT		(40)
-> > > > > +#define PB_SHIFT		(50)  
-> > > > 
-> > > > Can we lose the parentheses?  
-> > > 
-> > > Yes.
-> > > 
-> > > >   
-> > > > >  
-> > > > >  __thread struct kvm_cpu *current_kvm_cpu;
-> > > > >  
-> > > > > @@ -87,6 +89,60 @@ void kvm_run_set_wrapper_sandbox(void)
-> > > > >  	kvm_run_wrapper = KVM_RUN_SANDBOX;
-> > > > >  }
-> > > > >  
-> > > > > +static int parse_mem_unit(char **next)
-> > > > > +{
-> > > > > +	int shift = -1;
-> > > > > +
-> > > > > +	switch (**next) {
-> > > > > +	case 'B': case 'b': shift = 0; break;
-> > > > > +	case 'K': case 'k': shift = KB_SHIFT; break;
-> > > > > +	case 'M': case 'm': shift = MB_SHIFT; break;
-> > > > > +	case 'G': case 'g': shift = GB_SHIFT; break;
-> > > > > +	case 'T': case 't': shift = TB_SHIFT; break;
-> > > > > +	case 'P': case 'p': shift = PB_SHIFT; break;
-> > > > > +	}
-> > > > > +
-> > > > > +	if (shift == -1) {
-> > > > > +		/* The default is megabytes. */
-> > > > > +		shift = MB_SHIFT;  
-> > > > 
-> > > > Doesn't that look better inside the switch/case?
-> > > > 	default: return MB_SHIFT;  
-> > > 
-> > > I think that change alone breaks the logic.
-> > > 
-> > > The code needs to advance next if and only if it matches on one of the
-> > > characters. I'll have a go at advancing next in each of the switch arms
-> > > above (with the exception of the default one, which I'll add) to see how it
-> > > ends up looking.
-> > 
-> > Mmh, but I meant:
-> > {
-> > 	switch (**next) {
-> > 	case 'B': case 'b': shift = 0; break;
-> > 	case 'K': case 'k': shift = KB_SHIFT; break;
-> > 	case 'M': case 'm': shift = MB_SHIFT; break;
-> > 	case 'G': case 'g': shift = GB_SHIFT; break;
-> > 	case 'T': case 't': shift = TB_SHIFT; break;
-> > 	case 'P': case 'p': shift = PB_SHIFT; break;
-> > 	default: return MB_SHIFT;  
-> > 	}
-> > 
-> > 	(*next)++;
-> > 
-> > 	return shift;
-> > }
-> > 
-> > that should solve it, shouldn't it?
-> > 
-> > > 
-> > > >   
-> > > > > +	} else {
-> > > > > +		(*next)++;
-> > > > > +	}
-> > > > > +
-> > > > > +	return shift;
-> > > > > +}
-> > > > > +
-> > > > > +static u64 parse_mem_option(const char *nptr, char **next)
-> > > > > +{
-> > > > > +	u64 shift;
-> > > > > +	u64 val;
-> > > > > +
-> > > > > +	val = strtoull(nptr, next, 10);
-> > > > > +	if (errno == ERANGE)
-> > > > > +		die("Memory too large: %s", nptr);  
-> > > > 
-> > > > strtoull does not clear errno if it succeeds, so it retains the
-> > > > previous error value. So we would need to set errno to 0 just before
-> > > > calling strtoull.  
-> > > 
-> > > This was intentional on my part, because I was under the impression that
-> > > kvmtool treats all instances where errno != 0 as a fatal error. I think I
-> > > was wrong about that, I see at least one instance when that isn't the case,
-> > > in kvm_setup_guest_init -> extract_file. So it isn't a rule that a non-zero
-> > > errno is a fatal error.
-> > > 
-> > > I'll change the code to zero errno before calling strtoull.
-> > 
-> > Thanks!
-> > 
-> > > 
-> > > >   
-> > > > > +	shift = parse_mem_unit(next);
-> > > > > +
-> > > > > +	if ((val << shift) < val)
-> > > > > +		die("Memory too large: %s", nptr);
-> > > > > +
-> > > > > +	return val << shift;
-> > > > > +}
-> > > > > +
-> > > > > +static int mem_parser(const struct option *opt, const char *arg, int unset)
-> > > > > +{
-> > > > > +	struct kvm *kvm = opt->ptr;
-> > > > > +	char *next;
-> > > > > +
-> > > > > +	kvm->cfg.ram_size = parse_mem_option(arg, &next);
-> > > > > +	if (kvm->cfg.ram_size == 0)
-> > > > > +		die("Invalid RAM size: %s", arg);  
-> > > > 
-> > > > Does 0 hold any significant value (anymore)? I think we die() if we
-> > > > encounter invalid values in parse_mem_option()?  
-> > > 
-> > > strtoull does not consider an error to convert the string "0" to an
-> > > unsigned long long.
-> > 
-> > I was wondering if we treat 0 as an indicator of a conversion error, or as
-> > a too-low memory size value here. I don't think we should special case the
+> Note, Eager Page Splitting is limited to nested MMUs as a policy rather
+> than due to any technical reason (the sp->role.guest_mode check could
+> just be deleted and Eager Page Splitting would work correctly for all
+> shadow MMU pages). There is really no reason to support Eager Page
+> Splitting for tdp_mmu=N, since such support will eventually be phased
+> out, and there is no current use case supporting Eager Page Splitting on
+> hosts where TDP is either disabled or unavailable in hardware.
+> Furthermore, future improvements to nested MMU scalability may diverge
+> the code from the legacy shadow paging implementation. These
+> improvements will be simpler to make if Eager Page Splitting does not
+> have to worry about legacy shadow paging.
 > 
-> It's both. It's an error because (man 2 strotoull, cherry-pick to prove my
-> point):
+> Splitting huge pages mapped by nested MMUs requires dealing with some
+> extra complexity beyond that of the TDP MMU:
 > 
-> "If there were no digits at all, strtoul() stores the original value of
-> nptr in *endptr (and returns 0)"
+> (1) The shadow MMU has a limit on the number of shadow pages that are
+>     allowed to be allocated. So, as a policy, Eager Page Splitting
+>     refuses to split if there are KVM_MIN_FREE_MMU_PAGES or fewer
+>     pages available.
 > 
-> As for the second part, I'm not sure how setting the size of the VM memory
-> to 0 can be considered anything else but an error. I am willing to be
-> convinced otherwise though.
+> (2) Splitting a huge page may end up re-using an existing lower level
+>     shadow page tables. This is unlike the TDP MMU which always allocates
+>     new shadow page tables when splitting.
 > 
-> > latter, as even 1MB or 2MB are typically too low values for a "normal"
-> > kvmtool run ("Fatal: kernel image too big to contain in guest memory.").
-> > On the other hand, with --firmware I think we can run a (admittedly very
-> > limited) guest with 0MB of RAM.
+> (3) When installing the lower level SPTEs, they must be added to the
+>     rmap which may require allocating additional pte_list_desc structs.
 > 
-> That leaves us with the rather interesting question of how the firmware
-> image can fit in RAM if the size of the RAM is 0. It looks to me like
-> kvm__load_firmware should fail in this situation.
+> Case (2) is especially interesting since it may require a TLB flush,
+> unlike the TDP MMU which can fully split huge pages without any TLB
+> flushes. Specifically, an existing lower level page table may point to
+> even lower level page tables that are not fully populated, effectively
+> unmapping a portion of the huge page, which requires a flush.
 > 
-> > 
-> > So if we care about garbage as an argument, we should do it by the book
-> > (strtoul manpage), and compare the next pointer to the input string
+> This commit performs such flushes after dropping the huge page and
+> before installing the lower level page table. This TLB flush could
+> instead be delayed until the MMU lock is about to be dropped, which
+> would batch flushes for multiple splits.  However these flushes should
+> be rare in practice (a huge page must be aliased in multiple SPTEs and
+> have been split for NX Huge Pages in only some of them). Flushing
+> immediately is simpler to plumb and also reduces the chances of tripping
+> over a CPU bug (e.g. see iTLB multihit).
 > 
-> I believe my approach is by the man page, where strotoull returns ERANGE on
-> overflow, and 0 if no valid numbers are found. Care to point out what I am
-> missing?
+> Suggested-by: Peter Feiner <pfeiner@google.com>
+> [ This commit is based off of the original implementation of Eager Page
+>   Splitting from Peter in Google's kernel from 2016. ]
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  .../admin-guide/kernel-parameters.txt         |   3 +-
+>  arch/x86/include/asm/kvm_host.h               |  24 ++
+>  arch/x86/kvm/mmu/mmu.c                        | 267 +++++++++++++++++-
+>  arch/x86/kvm/x86.c                            |   6 +
+>  include/linux/kvm_host.h                      |   1 +
+>  virt/kvm/kvm_main.c                           |   2 +-
+>  6 files changed, 293 insertions(+), 10 deletions(-)
+> 
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index 3f1cc5e317ed..bc3ad3d4df0b 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -2387,8 +2387,7 @@
+>  			the KVM_CLEAR_DIRTY ioctl, and only for the pages being
+>  			cleared.
+>  
+> -			Eager page splitting currently only supports splitting
+> -			huge pages mapped by the TDP MMU.
+> +			Eager page splitting is only supported when kvm.tdp_mmu=Y.
+>  
+>  			Default is Y (on).
+>  
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 9193a700fe2d..ea99e61cc556 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1265,6 +1265,28 @@ struct kvm_arch {
+>  	 * the global KVM_MAX_VCPU_IDS may lead to significant memory waste.
+>  	 */
+>  	u32 max_vcpu_ids;
+> +
+> +	/*
+> +	 * Memory caches used to allocate shadow pages when performing eager
+> +	 * page splitting. No need for a shadowed_info_cache since eager page
+> +	 * splitting only allocates direct shadow pages.
+> +	 *
+> +	 * Protected by kvm->slots_lock.
+> +	 */
+> +	struct kvm_mmu_memory_cache split_shadow_page_cache;
+> +	struct kvm_mmu_memory_cache split_page_header_cache;
+> +
+> +	/*
+> +	 * Memory cache used to allocate pte_list_desc structs while splitting
+> +	 * huge pages. In the worst case, to split one huge page, 512
+> +	 * pte_list_desc structs are needed to add each lower level leaf sptep
+> +	 * to the rmap plus 1 to extend the parent_ptes rmap of the lower level
+> +	 * page table.
+> +	 *
+> +	 * Protected by kvm->slots_lock.
+> +	 */
+> +#define SPLIT_DESC_CACHE_CAPACITY 513
+> +	struct kvm_mmu_memory_cache split_desc_cache;
+>  };
+>  
+>  struct kvm_vm_stat {
+> @@ -1639,6 +1661,8 @@ void kvm_mmu_zap_all(struct kvm *kvm);
+>  void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
+>  void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long kvm_nr_mmu_pages);
+>  
+> +void free_split_caches(struct kvm *kvm);
+> +
+>  int load_pdptrs(struct kvm_vcpu *vcpu, unsigned long cr3);
+>  
+>  int emulator_write_phys(struct kvm_vcpu *vcpu, gpa_t gpa,
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 964a8fa63e1b..7c5eab61c4ea 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5966,6 +5966,15 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+>  	node->track_write = kvm_mmu_pte_write;
+>  	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
+>  	kvm_page_track_register_notifier(kvm, node);
+> +
+> +	kvm->arch.split_page_header_cache.kmem_cache = mmu_page_header_cache;
+> +	kvm->arch.split_page_header_cache.gfp_zero = __GFP_ZERO;
+> +
+> +	kvm->arch.split_shadow_page_cache.gfp_zero = __GFP_ZERO;
+> +
+> +	kvm->arch.split_desc_cache.kmem_cache = pte_list_desc_cache;
+> +	kvm->arch.split_desc_cache.gfp_zero = __GFP_ZERO;
+> +
+>  	return 0;
+>  }
+>  
+> @@ -6097,15 +6106,252 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+>  		kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
+>  }
+>  
+> +void free_split_caches(struct kvm *kvm)
+> +{
+> +	lockdep_assert_held(&kvm->slots_lock);
+> +
+> +	kvm_mmu_free_memory_cache(&kvm->arch.split_desc_cache);
+> +	kvm_mmu_free_memory_cache(&kvm->arch.split_page_header_cache);
+> +	kvm_mmu_free_memory_cache(&kvm->arch.split_shadow_page_cache);
+> +}
+> +
+> +static inline bool need_topup(struct kvm_mmu_memory_cache *cache, int min)
+> +{
+> +	return kvm_mmu_memory_cache_nr_free_objects(cache) < min;
+> +}
+> +
+> +static bool need_topup_split_caches_or_resched(struct kvm *kvm)
+> +{
+> +	if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
+> +		return true;
+> +
+> +	/*
+> +	 * In the worst case, SPLIT_DESC_CACHE_CAPACITY descriptors are needed
+> +	 * to split a single huge page. Calculating how many are actually needed
+> +	 * is possible but not worth the complexity.
+> +	 */
+> +	return need_topup(&kvm->arch.split_desc_cache, SPLIT_DESC_CACHE_CAPACITY) ||
+> +	       need_topup(&kvm->arch.split_page_header_cache, 1) ||
+> +	       need_topup(&kvm->arch.split_shadow_page_cache, 1);
+> +}
+> +
+> +static int topup_split_caches(struct kvm *kvm)
+> +{
+> +	int r;
+> +
+> +	lockdep_assert_held(&kvm->slots_lock);
+> +
+> +	r = __kvm_mmu_topup_memory_cache(&kvm->arch.split_desc_cache,
+> +					 SPLIT_DESC_CACHE_CAPACITY,
+> +					 SPLIT_DESC_CACHE_CAPACITY);
+> +	if (r)
+> +		return r;
+> +
+> +	r = kvm_mmu_topup_memory_cache(&kvm->arch.split_page_header_cache, 1);
+> +	if (r)
+> +		return r;
+> +
+> +	return kvm_mmu_topup_memory_cache(&kvm->arch.split_shadow_page_cache, 1);
+> +}
+> +
+> +static struct kvm_mmu_page *nested_mmu_get_sp_for_split(struct kvm *kvm, u64 *huge_sptep)
+> +{
+> +	struct kvm_mmu_page *huge_sp = sptep_to_sp(huge_sptep);
+> +	struct shadow_page_caches caches = {};
+> +	union kvm_mmu_page_role role;
+> +	unsigned int access;
+> +	gfn_t gfn;
+> +
+> +	gfn = kvm_mmu_page_get_gfn(huge_sp, huge_sptep - huge_sp->spt);
+> +	access = kvm_mmu_page_get_access(huge_sp, huge_sptep - huge_sp->spt);
+> +
+> +	/*
+> +	 * Note, huge page splitting always uses direct shadow pages, regardless
+> +	 * of whether the huge page itself is mapped by a direct or indirect
+> +	 * shadow page, since the huge page region itself is being directly
+> +	 * mapped with smaller pages.
+> +	 */
+> +	role = kvm_mmu_child_role(huge_sptep, /*direct=*/true, access);
+> +
+> +	/* Direct SPs do not require a shadowed_info_cache. */
+> +	caches.page_header_cache = &kvm->arch.split_page_header_cache;
+> +	caches.shadow_page_cache = &kvm->arch.split_shadow_page_cache;
+> +
+> +	/* Safe to pass NULL for vCPU since requesting a direct SP. */
+> +	return __kvm_mmu_get_shadow_page(kvm, NULL, &caches, gfn, role);
+> +}
+> +
+> +static void nested_mmu_split_huge_page(struct kvm *kvm,
+> +				       const struct kvm_memory_slot *slot,
+> +				       u64 *huge_sptep)
+> +
+> +{
+> +	struct kvm_mmu_memory_cache *cache = &kvm->arch.split_desc_cache;
+> +	u64 huge_spte = READ_ONCE(*huge_sptep);
+> +	struct kvm_mmu_page *sp;
+> +	bool flush = false;
+> +	u64 *sptep, spte;
+> +	gfn_t gfn;
+> +	int index;
+> +
+> +	sp = nested_mmu_get_sp_for_split(kvm, huge_sptep);
+> +
+> +	for (index = 0; index < PT64_ENT_PER_PAGE; index++) {
+> +		sptep = &sp->spt[index];
+> +		gfn = kvm_mmu_page_get_gfn(sp, index);
+> +
+> +		/*
+> +		 * The SP may already have populated SPTEs, e.g. if this huge
+> +		 * page is aliased by multiple sptes with the same access
+> +		 * permissions. These entries are guaranteed to map the same
+> +		 * gfn-to-pfn translation since the SP is direct, so no need to
+> +		 * modify them.
+> +		 *
+> +		 * However, if a given SPTE points to a lower level page table,
+> +		 * that lower level page table may only be partially populated.
+> +		 * Installing such SPTEs would effectively unmap a potion of the
+> +		 * huge page. Unmapping guest memory always requires a TLB flush
+> +		 * since a subsequent operation on the unmapped regions would
+> +		 * fail to detect the need to flush.
+> +		 */
+> +		if (is_shadow_present_pte(*sptep)) {
+> +			flush |= !is_last_spte(*sptep, sp->role.level);
+> +			continue;
+> +		}
+> +
+> +		spte = make_huge_page_split_spte(huge_spte, sp->role, index);
+> +		mmu_spte_set(sptep, spte);
+> +		__rmap_add(kvm, cache, slot, sptep, gfn, sp->role.access);
+> +	}
+> +
+> +	/*
+> +	 * Replace the huge spte with a pointer to the populated lower level
+> +	 * page table. If the lower-level page table indentically maps the huge
+> +	 * page (i.e. no memory is unmapped), there's no need for a TLB flush.
+> +	 * Otherwise, flush TLBs after dropping the huge page and before
+> +	 * installing the shadow page table.
+> +	 */
+> +	__drop_large_spte(kvm, huge_sptep, flush);
+> +	__link_shadow_page(cache, huge_sptep, sp);
+> +}
+> +
+> +static int nested_mmu_try_split_huge_page(struct kvm *kvm,
+> +					  const struct kvm_memory_slot *slot,
+> +					  u64 *huge_sptep)
+> +{
+> +	struct kvm_mmu_page *huge_sp = sptep_to_sp(huge_sptep);
+> +	int level, r = 0;
+> +	gfn_t gfn;
+> +	u64 spte;
+> +
+> +	/* Grab information for the tracepoint before dropping the MMU lock. */
+> +	gfn = kvm_mmu_page_get_gfn(huge_sp, huge_sptep - huge_sp->spt);
+> +	level = huge_sp->role.level;
+> +	spte = *huge_sptep;
+> +
+> +	if (kvm_mmu_available_pages(kvm) <= KVM_MIN_FREE_MMU_PAGES) {
+> +		r = -ENOSPC;
+> +		goto out;
+> +	}
+> +
+> +	if (need_topup_split_caches_or_resched(kvm)) {
+> +		write_unlock(&kvm->mmu_lock);
+> +		cond_resched();
+> +		/*
+> +		 * If the topup succeeds, return -EAGAIN to indicate that the
+> +		 * rmap iterator should be restarted because the MMU lock was
+> +		 * dropped.
+> +		 */
+> +		r = topup_split_caches(kvm) ?: -EAGAIN;
+> +		write_lock(&kvm->mmu_lock);
+> +		goto out;
+> +	}
+> +
+> +	nested_mmu_split_huge_page(kvm, slot, huge_sptep);
+> +
+> +out:
+> +	trace_kvm_mmu_split_huge_page(gfn, spte, level, r);
+> +	return r;
+> +}
+> +
+> +static bool nested_mmu_try_split_huge_pages(struct kvm *kvm,
+> +					    struct kvm_rmap_head *rmap_head,
+> +					    const struct kvm_memory_slot *slot)
+> +{
+> +	struct rmap_iterator iter;
+> +	struct kvm_mmu_page *sp;
+> +	u64 *huge_sptep;
+> +	int r;
+> +
+> +restart:
+> +	for_each_rmap_spte(rmap_head, &iter, huge_sptep) {
+> +		sp = sptep_to_sp(huge_sptep);
+> +
+> +		/* TDP MMU is enabled, so rmap only contains nested MMU SPs. */
+> +		if (WARN_ON_ONCE(!sp->role.guest_mode))
+> +			continue;
+> +
+> +		/* The rmaps should never contain non-leaf SPTEs. */
+> +		if (WARN_ON_ONCE(!is_large_pte(*huge_sptep)))
+> +			continue;
+> +
+> +		/* SPs with level >PG_LEVEL_4K should never by unsync. */
+> +		if (WARN_ON_ONCE(sp->unsync))
+> +			continue;
+> +
+> +		/* Don't bother splitting huge pages on invalid SPs. */
+> +		if (sp->role.invalid)
+> +			continue;
+> +
+> +		r = nested_mmu_try_split_huge_page(kvm, slot, huge_sptep);
+> +
+> +		/*
+> +		 * The split succeeded or needs to be retried because the MMU
+> +		 * lock was dropped. Either way, restart the iterator to get it
+> +		 * back into a consistent state.
+> +		 */
+> +		if (!r || r == -EAGAIN)
+> +			goto restart;
+> +
+> +		/* The split failed and shouldn't be retried (e.g. -ENOMEM). */
+> +		break;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +static void kvm_nested_mmu_try_split_huge_pages(struct kvm *kvm,
+> +						const struct kvm_memory_slot *slot,
+> +						gfn_t start, gfn_t end,
+> +						int target_level)
+> +{
+> +	int level;
+> +
+> +	/*
+> +	 * Split huge pages starting with KVM_MAX_HUGEPAGE_LEVEL and working
+> +	 * down to the target level. This ensures pages are recursively split
+> +	 * all the way to the target level. There's no need to split pages
+> +	 * already at the target level.
+> +	 */
+> +	for (level = KVM_MAX_HUGEPAGE_LEVEL; level > target_level; level--) {
+> +		slot_handle_level_range(kvm, slot, nested_mmu_try_split_huge_pages,
+> +					level, level, start, end - 1, true, false);
+> +	}
+> +}
+> +
+>  /* Must be called with the mmu_lock held in write-mode. */
+>  void kvm_mmu_try_split_huge_pages(struct kvm *kvm,
+>  				   const struct kvm_memory_slot *memslot,
+>  				   u64 start, u64 end,
+>  				   int target_level)
+>  {
+> -	if (is_tdp_mmu_enabled(kvm))
+> -		kvm_tdp_mmu_try_split_huge_pages(kvm, memslot, start, end,
+> -						 target_level, false);
+> +	if (!is_tdp_mmu_enabled(kvm))
+> +		return;
+> +
+> +	if (kvm_memslots_have_rmaps(kvm))
+> +		kvm_nested_mmu_try_split_huge_pages(kvm, memslot, start, end, target_level);
+> +
+> +	kvm_tdp_mmu_try_split_huge_pages(kvm, memslot, start, end, target_level, false);
+>  
+>  	/*
+>  	 * A TLB flush is unnecessary at this point for the same resons as in
+> @@ -6120,12 +6366,19 @@ void kvm_mmu_slot_try_split_huge_pages(struct kvm *kvm,
+>  	u64 start = memslot->base_gfn;
+>  	u64 end = start + memslot->npages;
+>  
+> -	if (is_tdp_mmu_enabled(kvm)) {
+> -		read_lock(&kvm->mmu_lock);
+> -		kvm_tdp_mmu_try_split_huge_pages(kvm, memslot, start, end, target_level, true);
+> -		read_unlock(&kvm->mmu_lock);
+> +	if (!is_tdp_mmu_enabled(kvm))
+> +		return;
+> +
+> +	if (kvm_memslots_have_rmaps(kvm)) {
+> +		write_lock(&kvm->mmu_lock);
+> +		kvm_nested_mmu_try_split_huge_pages(kvm, memslot, start, end, target_level);
+> +		write_unlock(&kvm->mmu_lock);
+>  	}
+>  
+> +	read_lock(&kvm->mmu_lock);
+> +	kvm_tdp_mmu_try_split_huge_pages(kvm, memslot, start, end, target_level, true);
+> +	read_unlock(&kvm->mmu_lock);
+> +
+>  	/*
+>  	 * No TLB flush is necessary here. KVM will flush TLBs after
+>  	 * write-protecting and/or clearing dirty on the newly split SPTEs to
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 04812eaaf61b..4fe018ddd1cd 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12197,6 +12197,12 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+>  		 * page faults will create the large-page sptes.
+>  		 */
+>  		kvm_mmu_zap_collapsible_sptes(kvm, new);
+> +
+> +		/*
+> +		 * Free any memory left behind by eager page splitting. Ignore
+> +		 * the module parameter since userspace might have changed it.
+> +		 */
+> +		free_split_caches(kvm);
+>  	} else {
+>  		/*
+>  		 * Initially-all-set does not require write protecting any page,
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index f94f72bbd2d3..17fc9247504d 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1336,6 +1336,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm);
+>  
+>  #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
+>  int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min);
+> +int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min);
 
-Did some thinking, and I think I understand where you're coming from: the
-comparison against 0 serves both to check for invalid user input and as a
-logical condition for the correct flow of the program.
-
-That's not ideal, as in the future kvmtool might allow 0 as a valid
-address. I'll split the two checks, and move the check for valid input to
-parse_mem_option, and do it like you suggested (and as is described in the
-man page).
+If you end up with a v7, could you move this to the previous commit,
+please. In that case this would include not making
+__kvm_mmu_topup_memory_cache a static in the previous one as well.
 
 Thanks,
-Alex
+Ricardo
 
+>  int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc);
+>  void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
+>  void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 5e2e75014256..b9573e958a03 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -369,7 +369,7 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+>  		return (void *)__get_free_page(gfp_flags);
+>  }
+>  
+> -static int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
+> +int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
+>  {
+>  	gfp_t gfp = GFP_KERNEL_ACCOUNT;
+>  	void *obj;
+> -- 
+> 2.36.0.550.gb090851708-goog
 > 
-> Thanks,
-> Alex
-> 
-> > address, plus checking for the returned value being 0, so that
-> > "-m gimme-all" is explicitly denied. But that would need to happen in
-> > parse_mem_option(), I think, not here.
-> > 
-> > If we cannot be asked, that's probably fine, but I just wanted to
-> > check this.
-> > 
-> > Cheers,
-> > Andre
-> > 
-> > > > > +
-> > > > > +	if (*next != '\0')
-> > > > > +		die("Invalid memory specifier: %s", arg);
-> > > > > +
-> > > > > +	return 0;
-> > > > > +}
-> > > > > +
-> > > > >  #ifndef OPT_ARCH_RUN
-> > > > >  #define OPT_ARCH_RUN(...)
-> > > > >  #endif
-> > > > > @@ -97,8 +153,9 @@ void kvm_run_set_wrapper_sandbox(void)
-> > > > >  	OPT_STRING('\0', "name", &(cfg)->guest_name, "guest name",	\
-> > > > >  			"A name for the guest"),			\
-> > > > >  	OPT_INTEGER('c', "cpus", &(cfg)->nrcpus, "Number of CPUs"),	\
-> > > > > -	OPT_U64('m', "mem", &(cfg)->ram_size, "Virtual machine memory"	\
-> > > > > -		" size in MB."),					\
-> > > > > +	OPT_CALLBACK('m', "mem", NULL, "size[BKMGTP]",			\
-> > > > > +		     "Virtual machine memory size, by default measured"	\
-> > > > > +		     " in megabytes (M)", mem_parser, kvm),		\
-> > > > >  	OPT_CALLBACK('d', "disk", kvm, "image or rootfs_dir", "Disk "	\
-> > > > >  			" image or rootfs directory", img_name_parser,	\
-> > > > >  			kvm),						\
-> > > > > @@ -522,8 +579,6 @@ static void kvm_run_validate_cfg(struct kvm *kvm)
-> > > > >  		pr_warning("Ignoring initrd file when loading a firmware image");
-> > > > >  
-> > > > >  	if (kvm->cfg.ram_size) {
-> > > > > -		/* User specifies RAM size in megabytes. */
-> > > > > -		kvm->cfg.ram_size <<= MB_SHIFT;
-> > > > >  		available_ram = host_ram_size();
-> > > > >  		if (available_ram && kvm->cfg.ram_size > available_ram) {
-> > > > >  			pr_warning("Guest memory size %lluMB exceeds host physical RAM size %lluMB",  
-> > > >   
-> > 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
