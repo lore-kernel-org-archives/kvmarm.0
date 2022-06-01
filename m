@@ -2,58 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A73F2C433EF
-	for <kvmarm@archiver.kernel.org>; Wed,  1 Jun 2022 13:53:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16656CCA468
+	for <kvmarm@archiver.kernel.org>; Wed,  1 Jun 2022 13:55:48 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2ACEE49E36;
-	Wed,  1 Jun 2022 09:53:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8868F49F0B;
+	Wed,  1 Jun 2022 09:55:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gcWc4BDjwFAR; Wed,  1 Jun 2022 09:53:45 -0400 (EDT)
+	with ESMTP id 5xN1z8M5nAbH; Wed,  1 Jun 2022 09:55:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA0E74B206;
-	Wed,  1 Jun 2022 09:53:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 263904083E;
+	Wed,  1 Jun 2022 09:55:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E9F0349E36
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jun 2022 09:53:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E17D4083E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jun 2022 09:55:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LcI3ovuqxg+P for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Jun 2022 09:53:41 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7BB4449B07
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jun 2022 09:53:41 -0400 (EDT)
+ with ESMTP id PO50PB3JPV4t for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Jun 2022 09:55:44 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE1CF4052C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jun 2022 09:55:43 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id E8B19B81B0E;
- Wed,  1 Jun 2022 13:53:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47836C385B8;
- Wed,  1 Jun 2022 13:53:38 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 98E80615BA;
+ Wed,  1 Jun 2022 13:55:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B48DBC385B8;
+ Wed,  1 Jun 2022 13:55:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1654091619;
- bh=/j62wDdCZ6jM4TCnRCrFXNWm9VQZyd9sGMYL8iWTtiw=;
+ s=k20201202; t=1654091742;
+ bh=jePdNX0EfcO7Gm4KTYdBeSyuCnF+gYdC8iKD6gEPixU=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=P9zYJWWvQ+FBaK14Wy6gQOzaYNrXveC8PpiPmk8tHPgtuzb8kpIglG0ypwx4Mw/IX
- Ui3BPrkZUZfEgR8/vbGMw7IPN22hCgN2X+IBG0Vso7gngRyW2qg51LNhHyY73kikUz
- zI9IPqzRWlgsQ/1vU4uwlZKkDdqM9fd52kHzT2TBOLMYUjQjQ+T1DL/yjvXoS6UB50
- UQ9g+ZIGw5uq1jVSHbpdmdUh5BQ1YJnutmFLlU/icFTBdzAlshz67FQaHbuTDesnPl
- NBBInGDnTXDyQpIhizFg0ICbg1oRgbZ/e2OuLX5KH6dLi23JyLJ+5Gko28Rd5092jH
- NEodPqzCsf0uA==
+ b=sgkyxWNmr8WQc5ABsxbYzeTaZgaBp/MbeCmzY2jBn/1anPBsPga4KODLgnDbnwAl0
+ 9k+59u3gppNbuhGgAHDAaX/u/BT5NGzBagExtcujS5JqNbleIo7gvqI/RXXy1ye8es
+ t1ZaGhb7EpgUwdNhxDyCzP46JuqjmqLz07cHe33j3lRGiaVw1DG/5K0iLV78qlpGbR
+ JhvOz7jcFMcQGBHG0LOp1WgvhQKKpnfBjjrfUZFNXFWMKA6KaG+LAgMBelLbUcFdn/
+ Qwb8C8aANjCGsm4gM7rEwv2qKDwc4iwTJdEnzkSjP0aRCkDAtIH2NwhPMBJ7Q7LKxa
+ gZa2xoiL3H76w==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.18 35/49] KVM: arm64: vgic: Do not ignore
+Subject: [PATCH AUTOSEL 5.17 34/48] KVM: arm64: vgic: Do not ignore
  vgic_its_restore_cte failures
-Date: Wed,  1 Jun 2022 09:51:59 -0400
-Message-Id: <20220601135214.2002647-35-sashal@kernel.org>
+Date: Wed,  1 Jun 2022 09:54:07 -0400
+Message-Id: <20220601135421.2003328-34-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220601135214.2002647-1-sashal@kernel.org>
-References: <20220601135214.2002647-1-sashal@kernel.org>
+In-Reply-To: <20220601135421.2003328-1-sashal@kernel.org>
+References: <20220601135421.2003328-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -102,7 +102,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 23 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 2e13402be3bd..eeee272729dd 100644
+index 089fc2ffcb43..d4b849364d07 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
 @@ -976,15 +976,16 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
