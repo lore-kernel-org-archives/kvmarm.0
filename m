@@ -2,91 +2,91 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20295C433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jun 2022 19:40:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E906C43334
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Jun 2022 20:06:52 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B45174B1DB;
-	Thu,  2 Jun 2022 15:40:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B06824B224;
+	Thu,  2 Jun 2022 16:06:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id q-0bQfI4p6SP; Thu,  2 Jun 2022 15:40:19 -0400 (EDT)
+	with ESMTP id 2EGZKGz5i0HY; Thu,  2 Jun 2022 16:06:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 65C184B1E0;
-	Thu,  2 Jun 2022 15:40:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BC1C4B205;
+	Thu,  2 Jun 2022 16:06:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE1DA4B1D7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jun 2022 15:40:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C6394B1FE
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jun 2022 16:06:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0eE9+743m+L4 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Jun 2022 15:40:17 -0400 (EDT)
+ with ESMTP id MUsaCTuEor7P for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Jun 2022 16:06:47 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 61BE04B1B0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jun 2022 15:40:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E4984B128
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jun 2022 16:06:47 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1654198817;
+ s=mimecast20190719; t=1654200406;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NdoryK+M36tETRrBxVGT5YI1I+RfGYSfPrbycvvJUV4=;
- b=Beucg6SgFwepLXSPjbT5BRcxhi59jEB3kTxGYMhopyKied5tYeTox9dUXg3Kjf+krQxH04
- VLJ6ypRlxVMdJ3koaoKibBxAK/g+g8opOsMepHh3xThTA2/hNnxBq0ijDkIUZqeCuaJBzk
- kQiRMKQu4FaM2SXYC/Hyp/RbaIlkNc0=
+ bh=l/i4joqQe4Nrt/4Qofvmf5cvZ87wqEYmhoQLV8Tt5QU=;
+ b=hfBBuTecn1WrtOm+emok13XeE+X69z/N3DQYitVe3sX/1xmFbYYLGJCsMnCYSx7wh9Xif8
+ xsouUhhEjZKSH5cyaRhWUfykH8EE46eNfFNofOLEohXab6CxRKdZsgEYXQnxt2DH3OBJa3
+ /3AJznGFPF0NAf2eZ+EBJX+CzQWUvLc=
 Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
  [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-221-iSwG_voQMoWzukAyhnf4ZA-1; Thu, 02 Jun 2022 15:40:16 -0400
-X-MC-Unique: iSwG_voQMoWzukAyhnf4ZA-1
+ us-mta-447-zo-8CMoINPSFTpEan5PuiQ-1; Thu, 02 Jun 2022 16:06:45 -0400
+X-MC-Unique: zo-8CMoINPSFTpEan5PuiQ-1
 Received: by mail-wm1-f71.google.com with SMTP id
- n35-20020a05600c3ba300b0039c1d2c6680so2414043wms.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Jun 2022 12:40:15 -0700 (PDT)
+ n35-20020a05600c3ba300b0039c1d2c6680so2428032wms.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Jun 2022 13:06:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
  :content-language:to:cc:references:from:in-reply-to
  :content-transfer-encoding;
- bh=NdoryK+M36tETRrBxVGT5YI1I+RfGYSfPrbycvvJUV4=;
- b=JlmZ53Bs1k9fy1OkYpla1OOg/cSfbHT3EQY7Pk3bu2QXS+RXhz+IaDqUicHCjlIaAE
- LQSJgerOQRC8MlBM+C1+c2HW4p8bF1rVXG3IRF9DJEIks4De1SwtrttGY+SP2jP+NAdS
- 09uLA+m9GB2oTxjm6eVPG0YRG3rwpYECXS68hXxLdOt5BZerYaIwFEWLVPugqgGJ+xQs
- 124kqU10njz7741HicfC0bjk0QZyIz9Egz7PKfgJhEFR02v2MtCLT9hipxpwojpOG0iI
- GQP41TVtfHbejef/UtFQqdhkM+8dGogCyxekjCsTuEIBusV4ECzPJUimeD0UgfeoxE9W
- jaNg==
-X-Gm-Message-State: AOAM5309moDdrHWK7omFAbDoXtgkL1nFQ9ZkNZJ0CySN9y17irSqYmwf
- qLve1d5QaLCDBBWqg0yAxOm+lxaHFu3lAD60jWvNQSNtUcYyT0lJJu0AfvW7BVxfj4cEypASlpu
- s0OpWMhLvCQwmY8GDPBQjAxpB
-X-Received: by 2002:adf:f111:0:b0:210:313a:790b with SMTP id
- r17-20020adff111000000b00210313a790bmr4970453wro.367.1654198814985; 
- Thu, 02 Jun 2022 12:40:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy1s5DssqlB5RpZ26KQXt0NnkQ5b0EABlSV0CQ/B9bC+wJyIEVOl0GMjrc+H86jrSvxpVsdPA==
-X-Received: by 2002:adf:f111:0:b0:210:313a:790b with SMTP id
- r17-20020adff111000000b00210313a790bmr4970423wro.367.1654198814651; 
- Thu, 02 Jun 2022 12:40:14 -0700 (PDT)
+ bh=l/i4joqQe4Nrt/4Qofvmf5cvZ87wqEYmhoQLV8Tt5QU=;
+ b=GEvhS/DqD5vTAcIojoUrm2YINQCdf+iWRIR6HSW2ae2bxphqMUQo541w/wmjKZiRAn
+ wYHreIbrNShXke6CJ4tdgHKhX1wvcWsohW5UnNFTl5VGjlz3AzLAVpG+i6tEvzH1fpnS
+ gRxboDc5RjivdAFcEkm/oZIH3tjFEuf9osl85QZq3c8JyRT3/NlHstJt8KGLyPvu5DBY
+ HnsGO8WlkvpSSuQA/hywtNTTKiZ/3j4qPiVsbaP/pnrX0pXLr9Q1q60wFJPkfNPtD8oK
+ sZuwTaGlayewKm3sVxEZR4zE1uo1wKRerUoLLPNYmbZGk7Axn5wSt14vulNgfzIM7+/2
+ KLmw==
+X-Gm-Message-State: AOAM531x3AxdqBtl+xK+13YC4BFG590sXqDPjJFkhwXL0QHPStBntUhc
+ LFlK9hODadtPmJNDge9+Aey24ZXv1uTCsC6WdBTa7bAC+u25I4mo3rXcaudpi3CpfpNJkxDyVkl
+ llCRrCW5E9kcxT7l5DXxZyjg/
+X-Received: by 2002:a5d:5084:0:b0:210:3309:2824 with SMTP id
+ a4-20020a5d5084000000b0021033092824mr4950506wrt.110.1654200404653; 
+ Thu, 02 Jun 2022 13:06:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw584iK4yyIe0RYsWscdi21nRw5c3HuoXC63v+ECSkcQc+f1+Xof1Ah/uZ9/K4H7F2/h6zzMw==
+X-Received: by 2002:a5d:5084:0:b0:210:3309:2824 with SMTP id
+ a4-20020a5d5084000000b0021033092824mr4950485wrt.110.1654200404338; 
+ Thu, 02 Jun 2022 13:06:44 -0700 (PDT)
 Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
  ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
  by smtp.gmail.com with ESMTPSA id
- l6-20020a5d4bc6000000b0020e615bab7bsm5301652wrt.7.2022.06.02.12.40.13
+ o10-20020adfeaca000000b0020c5253d8c2sm5292141wrn.14.2022.06.02.13.06.43
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 02 Jun 2022 12:40:14 -0700 (PDT)
-Message-ID: <85f51e59-5a2e-256c-9a1b-e2b336e865f4@redhat.com>
-Date: Thu, 2 Jun 2022 21:40:12 +0200
+ Thu, 02 Jun 2022 13:06:43 -0700 (PDT)
+Message-ID: <168da62b-51c0-b883-0912-15139f24d31f@redhat.com>
+Date: Thu, 2 Jun 2022 22:06:42 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
-Subject: Re: [PATCH 1/3] KVM: arm64: Don't read a HW interrupt pending state
- in user context
+Subject: Re: [PATCH 2/3] KVM: arm64: Replace vgic_v3_uaccess_read_pending with
+ vgic_uaccess_read_pending
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 References: <20220602083025.1110433-1-maz@kernel.org>
- <20220602083025.1110433-2-maz@kernel.org>
+ <20220602083025.1110433-3-maz@kernel.org>
 From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <20220602083025.1110433-2-maz@kernel.org>
+In-Reply-To: <20220602083025.1110433-3-maz@kernel.org>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eauger@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -109,110 +109,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-
-
+Hi Marc,
 On 6/2/22 10:30, Marc Zyngier wrote:
-> Since 5bfa685e62e9 ("KVM: arm64: vgic: Read HW interrupt pending state
-> from the HW"), we're able to source the pending bit for an interrupt
-> that is stored either on the physical distributor or on a device.
+> Now that GICv2 has a proper userspace accessor for the pending state,
+> switch GICv3 over to it, dropping the local version.
 > 
-> However, this state is only available when the vcpu is loaded,
-> and is not intended to be accessed from userspace. Unfortunately,
-> the GICv2 emulation doesn't provide specific userspace accessors,
-> and we fallback with the ones that are intended for the guest,
-> with fatal consequences.
-> 
-> Add a new vgic_uaccess_read_pending() accessor for userspace
-> to use, build on top of the existing vgic_mmio_read_pending().
-> 
-> Reported-by: Eric Auger <eauger@redhat.com>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Fixes: 5bfa685e62e9 ("KVM: arm64: vgic: Read HW interrupt pending state from the HW")
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
 > ---
->  arch/arm64/kvm/vgic/vgic-mmio-v2.c |  4 ++--
->  arch/arm64/kvm/vgic/vgic-mmio.c    | 19 ++++++++++++++++---
->  arch/arm64/kvm/vgic/vgic-mmio.h    |  3 +++
->  3 files changed, 21 insertions(+), 5 deletions(-)
+>  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 40 ++----------------------------
+>  1 file changed, 2 insertions(+), 38 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-> index 77a67e9d3d14..e070cda86e12 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-> @@ -429,11 +429,11 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
->  		vgic_mmio_read_pending, vgic_mmio_write_spending,
-> -		NULL, vgic_uaccess_write_spending, 1,
-> +		vgic_uaccess_read_pending, vgic_uaccess_write_spending, 1,
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR,
->  		vgic_mmio_read_pending, vgic_mmio_write_cpending,
-> -		NULL, vgic_uaccess_write_cpending, 1,
-> +		vgic_uaccess_read_pending, vgic_uaccess_write_cpending, 1,
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
->  		vgic_mmio_read_active, vgic_mmio_write_sactive,
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
-> index 49837d3a3ef5..dc8c52487e47 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
-> @@ -226,8 +226,9 @@ int vgic_uaccess_write_cenable(struct kvm_vcpu *vcpu,
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> index f7aa7bcd6fb8..f15e29cc63ce 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> @@ -353,42 +353,6 @@ static unsigned long vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
 >  	return 0;
 >  }
 >  
-> -unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
-> -				     gpa_t addr, unsigned int len)
-> +static unsigned long __read_pending(struct kvm_vcpu *vcpu,
-> +				    gpa_t addr, unsigned int len,
-> +				    bool is_user)
->  {
->  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
->  	u32 value = 0;
-> @@ -248,7 +249,7 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
->  						    IRQCHIP_STATE_PENDING,
->  						    &val);
->  			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
-> -		} else if (vgic_irq_is_mapped_level(irq)) {
-> +		} else if (!is_user && vgic_irq_is_mapped_level(irq)) {
->  			val = vgic_get_phys_line_level(irq);
->  		} else {
->  			val = irq_is_pending(irq);
-> @@ -263,6 +264,18 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
->  	return value;
->  }
->  
-> +unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
-> +				     gpa_t addr, unsigned int len)
-> +{
-> +	return __read_pending(vcpu, addr, len, false);
-> +}
-> +
-> +unsigned long vgic_uaccess_read_pending(struct kvm_vcpu *vcpu,
-> +					gpa_t addr, unsigned int len)
-> +{
-> +	return __read_pending(vcpu, addr, len, true);
-> +}
-> +
->  static bool is_vgic_v2_sgi(struct kvm_vcpu *vcpu, struct vgic_irq *irq)
->  {
->  	return (vgic_irq_is_sgi(irq->intid) &&
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.h b/arch/arm64/kvm/vgic/vgic-mmio.h
-> index 3fa696f198a3..6082d4b66d39 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio.h
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio.h
-> @@ -149,6 +149,9 @@ int vgic_uaccess_write_cenable(struct kvm_vcpu *vcpu,
->  unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
->  				     gpa_t addr, unsigned int len);
->  
-> +unsigned long vgic_uaccess_read_pending(struct kvm_vcpu *vcpu,
-> +					gpa_t addr, unsigned int len);
-> +
->  void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
->  			      gpa_t addr, unsigned int len,
->  			      unsigned long val);
+> -static unsigned long vgic_v3_uaccess_read_pending(struct kvm_vcpu *vcpu,
+> -						  gpa_t addr, unsigned int len)
+> -{
+> -	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+> -	u32 value = 0;
+> -	int i;
+
+> -
+> -	/*
+> -	 * pending state of interrupt is latched in pending_latch variable.
+> -	 * Userspace will save and restore pending state and line_level
+> -	 * separately.
+> -	 * Refer to Documentation/virt/kvm/devices/arm-vgic-v3.rst
+> -	 * for handling of ISPENDR and ICPENDR.
+Don't know if you want a derivative of this comment in
+vgic_uaccess_read_pending()?
+> -	 */
+> -	for (i = 0; i < len * 8; i++) {
+> -		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> -		bool state = irq->pending_latch;
+> -
+> -		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
+> -			int err;
+> -
+in __read_pending(), irq->irq_lock is hold which looks safer at 1st
+sight. If potentially fixing something this can be documented in the
+commit msg.
+> -			err = irq_get_irqchip_state(irq->host_irq,
+> -						    IRQCHIP_STATE_PENDING,
+> -						    &state);
+> -			WARN_ON(err);
+> -		}
+> -
+in __read_pending(), irq_is_pending(irq) is used instead of
+irq->pending_latch. for level sensitive IRQ this is not identical. This
+may also deserve some comment. The nuance may be related to the above
+comment.
+
+Thanks
+
+Eric
+> -		if (state)
+> -			value |= (1U << i);
+> -
+> -		vgic_put_irq(vcpu->kvm, irq);
+> -	}
+> -
+> -	return value;
+> -}
+> -
+>  static int vgic_v3_uaccess_write_pending(struct kvm_vcpu *vcpu,
+>  					 gpa_t addr, unsigned int len,
+>  					 unsigned long val)
+> @@ -666,7 +630,7 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
+>  		VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISPENDR,
+>  		vgic_mmio_read_pending, vgic_mmio_write_spending,
+> -		vgic_v3_uaccess_read_pending, vgic_v3_uaccess_write_pending, 1,
+> +		vgic_uaccess_read_pending, vgic_v3_uaccess_write_pending, 1,
+>  		VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICPENDR,
+>  		vgic_mmio_read_pending, vgic_mmio_write_cpending,
+> @@ -750,7 +714,7 @@ static const struct vgic_register_region vgic_v3_rd_registers[] = {
+>  		VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ISPENDR0,
+>  		vgic_mmio_read_pending, vgic_mmio_write_spending,
+> -		vgic_v3_uaccess_read_pending, vgic_v3_uaccess_write_pending, 4,
+> +		vgic_uaccess_read_pending, vgic_v3_uaccess_write_pending, 4,
+>  		VGIC_ACCESS_32bit),
+>  	REGISTER_DESC_WITH_LENGTH_UACCESS(SZ_64K + GICR_ICPENDR0,
+>  		vgic_mmio_read_pending, vgic_mmio_write_cpending,
 
 _______________________________________________
 kvmarm mailing list
