@@ -2,73 +2,61 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A650CCA47E
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Jun 2022 05:23:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9A0BCCA473
+	for <kvmarm@archiver.kernel.org>; Fri,  3 Jun 2022 09:10:01 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA45F4B139;
-	Fri,  3 Jun 2022 01:23:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 132434B24A;
+	Fri,  3 Jun 2022 05:10:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id R3bkPkMlVaG0; Fri,  3 Jun 2022 01:23:45 -0400 (EDT)
+	with ESMTP id 2+MznZVCv+kh; Fri,  3 Jun 2022 05:09:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDEDE4B133;
-	Fri,  3 Jun 2022 01:23:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C15124B21A;
+	Fri,  3 Jun 2022 05:09:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C97344B133
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jun 2022 01:23:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7348D4B21A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jun 2022 05:09:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FqSLcaIScImf for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Jun 2022 01:23:42 -0400 (EDT)
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com
- [209.85.167.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AD4C84B105
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jun 2022 01:23:42 -0400 (EDT)
-Received: by mail-oi1-f181.google.com with SMTP id s8so3912123oib.6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Jun 2022 22:23:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WzoFXntAxDsmUFhrpSN0lydvB+GY7yOTwcwlnFeu8rY=;
- b=cDX1z3L55FaZQ0li/2NABGuvZQyvjAqV+mY2GlCyFa5u97/2e33Jq96U0qmoLghctm
- 5GP1pn3Im95P2noRUSsP4jMGfKhVGu/wtPGSZcVLj2kkpTlQuFl5kBNQD/OZ83qAuU6g
- 0itfRy6UbiuNxrzOIdfKQebbdyu07JlOyc4y7Q5kSQRaOgNbU9vc0avrBsuMOkgXQ+S4
- yEA0gyK51HTDVMj/ih70oU7ulvB3yWtlYfg2RRAg7fYWss0yZ3U93FQZKEouD20Zh417
- +UNSKGp7HfokN03K4UEzG7nVgpMjkENcfzRrGddIaKJZ8xAC6DmA9fRLiBh/L+ZPF6ED
- G9gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=WzoFXntAxDsmUFhrpSN0lydvB+GY7yOTwcwlnFeu8rY=;
- b=VR8EzEdI4TN1Tv8QmbyZTO1bEzRzrqf/XNCrqB+UOoypHjO1mSwM/5EDFwvEDJVwqj
- J0Y2t6Ri2worScTKUY2URWgkHXF7TphUD5a2bNDC0q+CvT/lkWKzQfXE1MbB/qY+9mWA
- zTiOP2JfBrF0mUKv9e8I8u701PPEF0YZP+Lf3psT7zG2bg037S5khbGiFwnAS3NnQAej
- YHw2ECKKwScsKktzsNYlA7dj8sgZi58p8ebLEABXwT+w+SSDW8mDAlX3iG0FygCF3HSc
- rdywED7jh9CBTCsscg04DDjyUZ6ipQMefvuXPrQblG2KBvDqvUihO/95B/QxKB9GqCc4
- EQYg==
-X-Gm-Message-State: AOAM532Ghu8ar4rHVbTCRZWw2Y2IrNC7EANnM/khYCF+wcNbRT5h4qCY
- tr3l05StTnO8vKN07nIUop2PLvysDDAA1BY+oxQmvg==
-X-Google-Smtp-Source: ABdhPJzJos2xkVCVqdPnVrVWhwf2C8SCrcNh90O1+X0s17dXtFigyJz4zZMj4J/ZSP/5Utgr5FClDToyr9C7HgI430I=
-X-Received: by 2002:a05:6808:144d:b0:32b:7fbc:943d with SMTP id
- x13-20020a056808144d00b0032b7fbc943dmr20056912oiv.107.1654233821610; Thu, 02
- Jun 2022 22:23:41 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220528113829.1043361-1-maz@kernel.org>
- <20220528113829.1043361-4-maz@kernel.org>
-In-Reply-To: <20220528113829.1043361-4-maz@kernel.org>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Thu, 2 Jun 2022 22:23:25 -0700
-Message-ID: <CAAeT=FxmD4Nsrodr-FCjpNghAormCg4P+R7hF3+g_wfQ5T12Rg@mail.gmail.com>
+ with ESMTP id 4bx-fZ9BzdK8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Jun 2022 05:09:57 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F1F94B1F7
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jun 2022 05:09:57 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id C4796B821BE;
+ Fri,  3 Jun 2022 09:09:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D524C34114;
+ Fri,  3 Jun 2022 09:09:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1654247394;
+ bh=ThbjYz1VPOOCZfSoMHKCJNv4joGtIlV2WQb/q8/byg4=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=Wap4azFylQ7sCs9bHodMhU5wB5uu7VhLym04W5LB2XPgE73S4hLf0udyQbXdbqlEF
+ FilarPxtS83HopuDpZjr+LRLtPdFsx3Czz+heE8chmikDy0xsoqVR9DsmvljYAgCBs
+ l6y6keqAMCLG6oI3LAVD7c+QxFHbwjL3DUef/iQbjo8w2ILNG8qFxo8GZyJzi53Tm5
+ EvSBl3JGsvX5/zuWWOW7dBl6nTtuhy2MzJZ4w+Cqpk7axIPjIny4ce59dFFx7W0ypq
+ fyDNQEV21kiGLwL5OeFy9Zipojo6q/mkzWOKOi0lZEo6PlHtOO5vmYHrok3xVNiAdG
+ C2fb6v2oPKQlQ==
+Date: Fri, 3 Jun 2022 11:09:51 +0200
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [PATCH 03/18] KVM: arm64: Drop FP_FOREIGN_STATE from the
  hypervisor code
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
+Message-ID: <YpnP35rl40rDakgb@sirena.org.uk>
+References: <20220528113829.1043361-1-maz@kernel.org>
+ <20220528113829.1043361-4-maz@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20220528113829.1043361-4-maz@kernel.org>
+X-Cookie: May your camel be as swift as the wind.
+Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,71 +68,55 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============5515562124285146974=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
 
-On Sat, May 28, 2022 at 4:38 AM Marc Zyngier <maz@kernel.org> wrote:
->
+--===============5515562124285146974==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="MU9Z6LR9WcUWlxk3"
+Content-Disposition: inline
+
+
+--MU9Z6LR9WcUWlxk3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Sat, May 28, 2022 at 12:38:13PM +0100, Marc Zyngier wrote:
 > The vcpu KVM_ARM64_FP_FOREIGN_FPSTATE flag tracks the thread's own
 > TIF_FOREIGN_FPSTATE so that we can evaluate just before running
 > the vcpu whether it the FP regs contain something that is owned
 > by the vcpu or not by updating the rest of the FP flags.
->
-> We do this in the hypervisor code in order to make sure we're
-> in a context where we are not interruptible. But we already
-> have a hook in the run loop to generate this flag. We may as
-> well update the FP flags directly and save the pointless flag
-> tracking.
->
-> Whilst we're at it, rename update_fp_enabled() to guest_owns_fp_regs()
-> to indicate what the leftover of this helper actually do.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
+--MU9Z6LR9WcUWlxk3
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> --- a/arch/arm64/kvm/fpsimd.c
-> +++ b/arch/arm64/kvm/fpsimd.c
-> @@ -107,16 +107,19 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
->  }
->
->  /*
-> - * Called just before entering the guest once we are no longer
-> - * preemptable. Syncs the host's TIF_FOREIGN_FPSTATE with the KVM
-> - * mirror of the flag used by the hypervisor.
-> + * Called just before entering the guest once we are no longer preemptable
-> + * and interrupts are disabled. If we have managed to run anything using
-> + * FP while we were preemptible (such as off the back of an interrupt),
-> + * then neither the host nor the guest own the FP hardware (and it was the
-> + * responsibility of the code that used FP to save the existing state).
-> + *
-> + * Note that not supporting FP is basically the same thing as far as the
-> + * hypervisor is concerned (nothing to save).
->   */
->  void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu)
->  {
-> -       if (test_thread_flag(TIF_FOREIGN_FPSTATE))
-> -               vcpu->arch.flags |= KVM_ARM64_FP_FOREIGN_FPSTATE;
-> -       else
-> -               vcpu->arch.flags &= ~KVM_ARM64_FP_FOREIGN_FPSTATE;
-> +       if (!system_supports_fpsimd() || test_thread_flag(TIF_FOREIGN_FPSTATE))
-> +               vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED | KVM_ARM64_FP_HOST);
->  }
+-----BEGIN PGP SIGNATURE-----
 
-Although kvm_arch_vcpu_load_fp() unconditionally sets KVM_ARM64_FP_HOST,
-perhaps having kvm_arch_vcpu_load_fp() set KVM_ARM64_FP_HOST only when
-FP is supported might be more consistent?
-Then, checking system_supports_fpsimd() is unnecessary here.
-(KVM_ARM64_FP_ENABLED is not set when FP is not supported)
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmKZz98ACgkQJNaLcl1U
+h9DAAwgAgtdvhf759AQPe2iS/1hVc6SW/WgwQC00F9zMxyXtlXa85GYzI4HO0P+w
+ndPvA6eGVF3vnN53rzjUdHWhej2h6JOEHFigz5/hLCQrm64n8JpCRH82ijtP9MN+
+Xl6uKP7M17DRCzicD5Gr/lbVPQDIpuyLuiaoWfulT3e5piXWdNoNB3z8FHLMUhMW
++1PAc1xPv7+kZl7W8k6InJCfQT46niP1JJ6YBI3FSJifFZUSV5CuxlyvWsfOsB54
+zqK1wUgbjzV8cbZvlkOIe0d5pIWG2e3YOic4Zumyqak06cwgaayUP9lPep5C35vY
+Kyheo2OW0eqx+5mIlY8y61BFeimR+Q==
+=amiN
+-----END PGP SIGNATURE-----
 
-Thanks,
-Reiji
+--MU9Z6LR9WcUWlxk3--
+
+--===============5515562124285146974==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============5515562124285146974==--
