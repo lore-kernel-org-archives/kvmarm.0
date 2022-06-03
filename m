@@ -2,97 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0CEEC433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Jun 2022 20:08:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A650CCA47E
+	for <kvmarm@archiver.kernel.org>; Fri,  3 Jun 2022 05:23:47 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11A8C4B128;
-	Thu,  2 Jun 2022 16:08:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA45F4B139;
+	Fri,  3 Jun 2022 01:23:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fwGqUlqKktSY; Thu,  2 Jun 2022 16:08:30 -0400 (EDT)
+	with ESMTP id R3bkPkMlVaG0; Fri,  3 Jun 2022 01:23:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6E5B4B205;
-	Thu,  2 Jun 2022 16:08:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDEDE4B133;
+	Fri,  3 Jun 2022 01:23:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 563E14B1FE
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jun 2022 16:08:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C97344B133
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jun 2022 01:23:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6RqsIEBO+mO7 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Jun 2022 16:08:28 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 00BE04B128
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jun 2022 16:08:27 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1654200507;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IB/Vlnp4xtDrg/E/9iId0p0IwjHTTbtc1GZm3Z/63a4=;
- b=gIfciea83AGKQqCzGO9wpWSQKh2JUZ5xEzSHMtqD+9jG2s8OYKIMUCmm1h5nWmIXwmAg+S
- G/6/pTiI3G2BHqfYcdPu2wVh8mG3MR5OwjYpTzX28Rc5Jon+rG9+noJ8oQHLeq1aQpdVy3
- +hM7C9f8MWKnetpEWNRpeKqWIzwo4BU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-331-GQNquY7WNE-Q0EGB-D1JQg-1; Thu, 02 Jun 2022 16:08:26 -0400
-X-MC-Unique: GQNquY7WNE-Q0EGB-D1JQg-1
-Received: by mail-wm1-f70.google.com with SMTP id
- o2-20020a05600c510200b0039747b0216fso5667498wms.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Jun 2022 13:08:26 -0700 (PDT)
+ with ESMTP id FqSLcaIScImf for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Jun 2022 01:23:42 -0400 (EDT)
+Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com
+ [209.85.167.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AD4C84B105
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jun 2022 01:23:42 -0400 (EDT)
+Received: by mail-oi1-f181.google.com with SMTP id s8so3912123oib.6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Jun 2022 22:23:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=WzoFXntAxDsmUFhrpSN0lydvB+GY7yOTwcwlnFeu8rY=;
+ b=cDX1z3L55FaZQ0li/2NABGuvZQyvjAqV+mY2GlCyFa5u97/2e33Jq96U0qmoLghctm
+ 5GP1pn3Im95P2noRUSsP4jMGfKhVGu/wtPGSZcVLj2kkpTlQuFl5kBNQD/OZ83qAuU6g
+ 0itfRy6UbiuNxrzOIdfKQebbdyu07JlOyc4y7Q5kSQRaOgNbU9vc0avrBsuMOkgXQ+S4
+ yEA0gyK51HTDVMj/ih70oU7ulvB3yWtlYfg2RRAg7fYWss0yZ3U93FQZKEouD20Zh417
+ +UNSKGp7HfokN03K4UEzG7nVgpMjkENcfzRrGddIaKJZ8xAC6DmA9fRLiBh/L+ZPF6ED
+ G9gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=IB/Vlnp4xtDrg/E/9iId0p0IwjHTTbtc1GZm3Z/63a4=;
- b=I/vFv9EpTCL8+Zh+H6kps/PqZ69HUegcNz90NSLb1B/Wtt62QtCvuGeYF2dhKDJKo+
- X+FUibvKguloffwvBBaSSbSSyuXuyio+zJwLPRnJiVaOscpOm9/svKG5lbvACdX+a/Ne
- Tb/1GkCdS/12LQe5K5/QGNIl1LehfyzBgWTSTLOx5Jy4jujSQUgfghtlNDopTN75wVYC
- aXEeeeMlsW4IiT3P0gemKKWjDuUokL3TzQ57NQvX0q7zhZy+NBGGW0c2ZXTAYBiu4GOD
- ESVd+pN3PNu9mKJ+0W8Teiwk3bARSObWSQFhW6DAAHPIX+UCkRcjxm/ubCwuvexJOdtr
- PXdg==
-X-Gm-Message-State: AOAM533ltnWcO/LPenR2QHtU8QwsB5GZgylwTWMTwnBDMoSBBPIgsyLg
- pf0Yr9VO7mMCs/9qFA0HLLZDGoHx4VqvHqkxYxlOhGspDLdCx6q1jB18xPDU8MZf4N+CO0NBEZw
- c4WhjlhEa3+iL46sJVr/UAWbK
-X-Received: by 2002:adf:e8cd:0:b0:210:2b10:ab22 with SMTP id
- k13-20020adfe8cd000000b002102b10ab22mr4970818wrn.476.1654200505465; 
- Thu, 02 Jun 2022 13:08:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyM5F6JgsKGDtu6GyHns/lkcUnrlSJd7dUYftOOVGVMQv8KigpKfTOOpmHYrxeyjunNyCekoQ==
-X-Received: by 2002:adf:e8cd:0:b0:210:2b10:ab22 with SMTP id
- k13-20020adfe8cd000000b002102b10ab22mr4970800wrn.476.1654200505241; 
- Thu, 02 Jun 2022 13:08:25 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
- ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id
- bg20-20020a05600c3c9400b0039c15861001sm3796679wmb.21.2022.06.02.13.08.24
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 02 Jun 2022 13:08:24 -0700 (PDT)
-Message-ID: <203411bb-39e5-ea3a-3265-354adf1fb551@redhat.com>
-Date: Thu, 2 Jun 2022 22:08:23 +0200
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=WzoFXntAxDsmUFhrpSN0lydvB+GY7yOTwcwlnFeu8rY=;
+ b=VR8EzEdI4TN1Tv8QmbyZTO1bEzRzrqf/XNCrqB+UOoypHjO1mSwM/5EDFwvEDJVwqj
+ J0Y2t6Ri2worScTKUY2URWgkHXF7TphUD5a2bNDC0q+CvT/lkWKzQfXE1MbB/qY+9mWA
+ zTiOP2JfBrF0mUKv9e8I8u701PPEF0YZP+Lf3psT7zG2bg037S5khbGiFwnAS3NnQAej
+ YHw2ECKKwScsKktzsNYlA7dj8sgZi58p8ebLEABXwT+w+SSDW8mDAlX3iG0FygCF3HSc
+ rdywED7jh9CBTCsscg04DDjyUZ6ipQMefvuXPrQblG2KBvDqvUihO/95B/QxKB9GqCc4
+ EQYg==
+X-Gm-Message-State: AOAM532Ghu8ar4rHVbTCRZWw2Y2IrNC7EANnM/khYCF+wcNbRT5h4qCY
+ tr3l05StTnO8vKN07nIUop2PLvysDDAA1BY+oxQmvg==
+X-Google-Smtp-Source: ABdhPJzJos2xkVCVqdPnVrVWhwf2C8SCrcNh90O1+X0s17dXtFigyJz4zZMj4J/ZSP/5Utgr5FClDToyr9C7HgI430I=
+X-Received: by 2002:a05:6808:144d:b0:32b:7fbc:943d with SMTP id
+ x13-20020a056808144d00b0032b7fbc943dmr20056912oiv.107.1654233821610; Thu, 02
+ Jun 2022 22:23:41 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH 1/3] KVM: arm64: Don't read a HW interrupt pending state
- in user context
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-References: <20220602083025.1110433-1-maz@kernel.org>
- <20220602083025.1110433-2-maz@kernel.org>
-From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <20220602083025.1110433-2-maz@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eauger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kernel-team@android.com
+References: <20220528113829.1043361-1-maz@kernel.org>
+ <20220528113829.1043361-4-maz@kernel.org>
+In-Reply-To: <20220528113829.1043361-4-maz@kernel.org>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Thu, 2 Jun 2022 22:23:25 -0700
+Message-ID: <CAAeT=FxmD4Nsrodr-FCjpNghAormCg4P+R7hF3+g_wfQ5T12Rg@mail.gmail.com>
+Subject: Re: [PATCH 03/18] KVM: arm64: Drop FP_FOREIGN_STATE from the
+ hypervisor code
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kernel-team@android.com,
+ Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -109,114 +85,65 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Marc,
+Hi Marc,
 
-On 6/2/22 10:30, Marc Zyngier wrote:
-> Since 5bfa685e62e9 ("KVM: arm64: vgic: Read HW interrupt pending state
-> from the HW"), we're able to source the pending bit for an interrupt
-> that is stored either on the physical distributor or on a device.
-> 
-> However, this state is only available when the vcpu is loaded,
-> and is not intended to be accessed from userspace. Unfortunately,
-> the GICv2 emulation doesn't provide specific userspace accessors,
-> and we fallback with the ones that are intended for the guest,
-> with fatal consequences.
-> 
-> Add a new vgic_uaccess_read_pending() accessor for userspace
-> to use, build on top of the existing vgic_mmio_read_pending().
-> 
-> Reported-by: Eric Auger <eauger@redhat.com>
+On Sat, May 28, 2022 at 4:38 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> The vcpu KVM_ARM64_FP_FOREIGN_FPSTATE flag tracks the thread's own
+> TIF_FOREIGN_FPSTATE so that we can evaluate just before running
+> the vcpu whether it the FP regs contain something that is owned
+> by the vcpu or not by updating the rest of the FP flags.
+>
+> We do this in the hypervisor code in order to make sure we're
+> in a context where we are not interruptible. But we already
+> have a hook in the run loop to generate this flag. We may as
+> well update the FP flags directly and save the pointless flag
+> tracking.
+>
+> Whilst we're at it, rename update_fp_enabled() to guest_owns_fp_regs()
+> to indicate what the leftover of this helper actually do.
+>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Fixes: 5bfa685e62e9 ("KVM: arm64: vgic: Read HW interrupt pending state from the HW")
-Feel free to add my
-Tested-by: Eric Auger <eric.auger@redhat.com>
 
-Thanks!
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
 
-Eric
-> ---
->  arch/arm64/kvm/vgic/vgic-mmio-v2.c |  4 ++--
->  arch/arm64/kvm/vgic/vgic-mmio.c    | 19 ++++++++++++++++---
->  arch/arm64/kvm/vgic/vgic-mmio.h    |  3 +++
->  3 files changed, 21 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-> index 77a67e9d3d14..e070cda86e12 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-> @@ -429,11 +429,11 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
->  		vgic_mmio_read_pending, vgic_mmio_write_spending,
-> -		NULL, vgic_uaccess_write_spending, 1,
-> +		vgic_uaccess_read_pending, vgic_uaccess_write_spending, 1,
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR,
->  		vgic_mmio_read_pending, vgic_mmio_write_cpending,
-> -		NULL, vgic_uaccess_write_cpending, 1,
-> +		vgic_uaccess_read_pending, vgic_uaccess_write_cpending, 1,
->  		VGIC_ACCESS_32bit),
->  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
->  		vgic_mmio_read_active, vgic_mmio_write_sactive,
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
-> index 49837d3a3ef5..dc8c52487e47 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
-> @@ -226,8 +226,9 @@ int vgic_uaccess_write_cenable(struct kvm_vcpu *vcpu,
->  	return 0;
+
+> --- a/arch/arm64/kvm/fpsimd.c
+> +++ b/arch/arm64/kvm/fpsimd.c
+> @@ -107,16 +107,19 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
 >  }
->  
-> -unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
-> -				     gpa_t addr, unsigned int len)
-> +static unsigned long __read_pending(struct kvm_vcpu *vcpu,
-> +				    gpa_t addr, unsigned int len,
-> +				    bool is_user)
+>
+>  /*
+> - * Called just before entering the guest once we are no longer
+> - * preemptable. Syncs the host's TIF_FOREIGN_FPSTATE with the KVM
+> - * mirror of the flag used by the hypervisor.
+> + * Called just before entering the guest once we are no longer preemptable
+> + * and interrupts are disabled. If we have managed to run anything using
+> + * FP while we were preemptible (such as off the back of an interrupt),
+> + * then neither the host nor the guest own the FP hardware (and it was the
+> + * responsibility of the code that used FP to save the existing state).
+> + *
+> + * Note that not supporting FP is basically the same thing as far as the
+> + * hypervisor is concerned (nothing to save).
+>   */
+>  void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu)
 >  {
->  	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
->  	u32 value = 0;
-> @@ -248,7 +249,7 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
->  						    IRQCHIP_STATE_PENDING,
->  						    &val);
->  			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
-> -		} else if (vgic_irq_is_mapped_level(irq)) {
-> +		} else if (!is_user && vgic_irq_is_mapped_level(irq)) {
->  			val = vgic_get_phys_line_level(irq);
->  		} else {
->  			val = irq_is_pending(irq);
-> @@ -263,6 +264,18 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
->  	return value;
+> -       if (test_thread_flag(TIF_FOREIGN_FPSTATE))
+> -               vcpu->arch.flags |= KVM_ARM64_FP_FOREIGN_FPSTATE;
+> -       else
+> -               vcpu->arch.flags &= ~KVM_ARM64_FP_FOREIGN_FPSTATE;
+> +       if (!system_supports_fpsimd() || test_thread_flag(TIF_FOREIGN_FPSTATE))
+> +               vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED | KVM_ARM64_FP_HOST);
 >  }
->  
-> +unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
-> +				     gpa_t addr, unsigned int len)
-> +{
-> +	return __read_pending(vcpu, addr, len, false);
-> +}
-> +
-> +unsigned long vgic_uaccess_read_pending(struct kvm_vcpu *vcpu,
-> +					gpa_t addr, unsigned int len)
-> +{
-> +	return __read_pending(vcpu, addr, len, true);
-> +}
-> +
->  static bool is_vgic_v2_sgi(struct kvm_vcpu *vcpu, struct vgic_irq *irq)
->  {
->  	return (vgic_irq_is_sgi(irq->intid) &&
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.h b/arch/arm64/kvm/vgic/vgic-mmio.h
-> index 3fa696f198a3..6082d4b66d39 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio.h
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio.h
-> @@ -149,6 +149,9 @@ int vgic_uaccess_write_cenable(struct kvm_vcpu *vcpu,
->  unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
->  				     gpa_t addr, unsigned int len);
->  
-> +unsigned long vgic_uaccess_read_pending(struct kvm_vcpu *vcpu,
-> +					gpa_t addr, unsigned int len);
-> +
->  void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
->  			      gpa_t addr, unsigned int len,
->  			      unsigned long val);
 
+Although kvm_arch_vcpu_load_fp() unconditionally sets KVM_ARM64_FP_HOST,
+perhaps having kvm_arch_vcpu_load_fp() set KVM_ARM64_FP_HOST only when
+FP is supported might be more consistent?
+Then, checking system_supports_fpsimd() is unnecessary here.
+(KVM_ARM64_FP_ENABLED is not set when FP is not supported)
+
+Thanks,
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
