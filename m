@@ -2,65 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F0AC433EF
-	for <kvmarm@archiver.kernel.org>; Sat,  4 Jun 2022 08:06:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 890E0C43334
+	for <kvmarm@archiver.kernel.org>; Sat,  4 Jun 2022 08:10:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 39FD64B2CA;
-	Sat,  4 Jun 2022 04:06:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11F3B4B2CC;
+	Sat,  4 Jun 2022 04:10:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@misterjones.org
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UdJpoNdnNZEC; Sat,  4 Jun 2022 04:06:07 -0400 (EDT)
+	with ESMTP id XLCtcCIeYOqj; Sat,  4 Jun 2022 04:10:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4A2C4B293;
-	Sat,  4 Jun 2022 04:06:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE3344B2D9;
+	Sat,  4 Jun 2022 04:10:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 88BD143399
- for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Jun 2022 04:06:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BDBE49F35
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Jun 2022 04:10:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gIWESpdKQihY for <kvmarm@lists.cs.columbia.edu>;
- Sat,  4 Jun 2022 04:06:04 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD1B64B103
- for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Jun 2022 04:06:04 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=misterjones.org; s=dkim20211231; h=Content-Transfer-Encoding:Content-Type:
- Message-ID:References:In-Reply-To:Subject:Cc:To:From:Date:MIME-Version:Sender
- :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
- Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
- List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=52/5nG/P9nfcpdWEk3UGv2UinfOs9ZZsOf+0nrjVg8A=; b=aKChAJMWawPgflhb8O+Y0WZ9xw
- ThKl0IKQaWcv3CuHUJSHPM2KY8y7N+5qlPaOzDW4+Vrd/ERl0xt86TSdWCq9of39Qd/lhP0jXdTze
- M7wHW5KeeuOoo9xo0Tlr7v/i4F5QTX0WdLgI+TTpB2iBx7oZIV9H3oOQTj6/rcS9MgJu3rXymFh5q
- g2d8o5+69vG+8t9YcCz0WvWJmW80tU6urn6lGjYXe/slurX3GXwGk5OCU4Yr99bVndEaI6Fu0lUrY
- rAoJZgAnVQ9Ohi+PZleUAc/KipyjPCppVYLs5GPBz3tF7rK7/CvK9Y/l4iHgPJ+vksjHsX3c82U9a
- iZERWiuA==;
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ with ESMTP id elxWIL-EX6b5 for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  4 Jun 2022 04:10:05 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B51D4B1E7
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Jun 2022 04:10:05 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 46A8360AD9;
+ Sat,  4 Jun 2022 08:10:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E542C385B8;
+ Sat,  4 Jun 2022 08:10:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1654330203;
+ bh=m8atLHg10uMBvCwOiHa5NmvHe5U3T9fGavEysDs06ig=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Q9nlSQlgUQgHhKqQFNcJP6QyRIINosbrtee16VhRS28GulZOE6Zr5VX3bgY/2WlQX
+ qDnxxS5a8pNadnxIjsd5djKy4ZgLqFEF2Q8ZelmcbXCQoiVsLvWjXqx7mnBvnv/1LP
+ 4hcgzJz6J4Jltq2l84AQXdHTn3Hni3LDvjkDN4PKdgSl5uSdM2ctNE9dHvUzABidzc
+ sRDIBLH6I4QiKl0T3Ji1VGVhrXnwVRDxrspVTV8n9rR6/DwzEYLShSpCRF1tE/iSfg
+ 66YtvfdUsPY5spZnoHFo63QS4ZQoOHFr0+i++7aFpMY+0BviulRytghzdLSLJfWQiv
+ gWLTakk/pwEtQ==
+Received: from host217-45-173-31.in-addr.btopenworld.com ([217.45.173.31]
+ helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@misterjones.org>)
- id 1nxOnK-00FaBy-Kk; Sat, 04 Jun 2022 09:06:02 +0100
-MIME-Version: 1.0
-Date: Sat, 04 Jun 2022 09:06:02 +0100
-From: Marc Zyngier <maz@misterjones.org>
-To: Ivan Masum <heromasum@gmail.com>
-Subject: Re: Need to run kvm/qemu on ARM
-In-Reply-To: <CAEVNJ6vPN1nv1ec2r_SupYaKR6o0prgaO765y2W1Ltf+SMDwBw@mail.gmail.com>
-References: <CAEVNJ6vPN1nv1ec2r_SupYaKR6o0prgaO765y2W1Ltf+SMDwBw@mail.gmail.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <cb0ac8bd782b8672ac6938f563e5a6ba@misterjones.org>
-X-Sender: maz@misterjones.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: heromasum@gmail.com, kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@misterjones.org
+ (envelope-from <maz@kernel.org>)
+ id 1nxOrB-00FaF6-44; Sat, 04 Jun 2022 09:10:01 +0100
+Date: Sat, 04 Jun 2022 09:10:01 +0100
+Message-ID: <87wndwluhy.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH 03/18] KVM: arm64: Drop FP_FOREIGN_STATE from the
+ hypervisor code
+In-Reply-To: <CAAeT=FxmD4Nsrodr-FCjpNghAormCg4P+R7hF3+g_wfQ5T12Rg@mail.gmail.com>
+References: <20220528113829.1043361-1-maz@kernel.org>
+ <20220528113829.1043361-4-maz@kernel.org>
+ <CAAeT=FxmD4Nsrodr-FCjpNghAormCg4P+R7hF3+g_wfQ5T12Rg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 217.45.173.31
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kernel-team@android.com, will@kernel.org, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, kernel-team@android.com,
+ Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,38 +85,83 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2022-06-03 04:41, Ivan Masum wrote:
-> Hello team,
-> I am a new fee in linux. Recently i am using oracle cloud free tier
-> with 4core 24gb ram. I am learning Devops. So i need many virtual
-> machine. How do i easily install kvm or qemu on arm machine while
-> oracle not suppot virtualization?
+On Fri, 03 Jun 2022 06:23:25 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Sat, May 28, 2022 at 4:38 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > The vcpu KVM_ARM64_FP_FOREIGN_FPSTATE flag tracks the thread's own
+> > TIF_FOREIGN_FPSTATE so that we can evaluate just before running
+> > the vcpu whether it the FP regs contain something that is owned
+> > by the vcpu or not by updating the rest of the FP flags.
+> >
+> > We do this in the hypervisor code in order to make sure we're
+> > in a context where we are not interruptible. But we already
+> > have a hook in the run loop to generate this flag. We may as
+> > well update the FP flags directly and save the pointless flag
+> > tracking.
+> >
+> > Whilst we're at it, rename update_fp_enabled() to guest_owns_fp_regs()
+> > to indicate what the leftover of this helper actually do.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> Reviewed-by: Reiji Watanabe <reijiw@google.com>
+> 
+> 
+> > --- a/arch/arm64/kvm/fpsimd.c
+> > +++ b/arch/arm64/kvm/fpsimd.c
+> > @@ -107,16 +107,19 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+> >  }
+> >
+> >  /*
+> > - * Called just before entering the guest once we are no longer
+> > - * preemptable. Syncs the host's TIF_FOREIGN_FPSTATE with the KVM
+> > - * mirror of the flag used by the hypervisor.
+> > + * Called just before entering the guest once we are no longer preemptable
+> > + * and interrupts are disabled. If we have managed to run anything using
+> > + * FP while we were preemptible (such as off the back of an interrupt),
+> > + * then neither the host nor the guest own the FP hardware (and it was the
+> > + * responsibility of the code that used FP to save the existing state).
+> > + *
+> > + * Note that not supporting FP is basically the same thing as far as the
+> > + * hypervisor is concerned (nothing to save).
+> >   */
+> >  void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu)
+> >  {
+> > -       if (test_thread_flag(TIF_FOREIGN_FPSTATE))
+> > -               vcpu->arch.flags |= KVM_ARM64_FP_FOREIGN_FPSTATE;
+> > -       else
+> > -               vcpu->arch.flags &= ~KVM_ARM64_FP_FOREIGN_FPSTATE;
+> > +       if (!system_supports_fpsimd() || test_thread_flag(TIF_FOREIGN_FPSTATE))
+> > +               vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED | KVM_ARM64_FP_HOST);
+> >  }
+> 
+> Although kvm_arch_vcpu_load_fp() unconditionally sets KVM_ARM64_FP_HOST,
+> perhaps having kvm_arch_vcpu_load_fp() set KVM_ARM64_FP_HOST only when
+> FP is supported might be more consistent?
+> Then, checking system_supports_fpsimd() is unnecessary here.
+> (KVM_ARM64_FP_ENABLED is not set when FP is not supported)
 
-I assume that what you get from Oeacle is itself a VM.
+That's indeed a possibility. But I'm trying not to change the logic
+here, only to move it to a place that provides the same semantic
+without the need for an extra flag.
 
-You can't run KVM inside a VM, as neither the HW provided
-by Oracle nor KVM itself support nested virtualisation.
-
-As for running QEMU, that's no different from any other
-architecture, and you may want to have a look at the QEMU
-documentation (which is fairly exhaustive).
-
-> I whould like to hear the solution from you. Morover how do i contact
-> with you in quick chat?
-
-This mailing list is the way to get in touch with people
-working on KVM/arm64.
+I'm happy to stack an extra patch on top of this series though.
 
 Thanks,
 
-         M.
+	M.
+
 -- 
-Who you jivin' with that Cosmik Debris?
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
