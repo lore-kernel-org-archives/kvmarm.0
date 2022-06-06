@@ -2,76 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14BB7C43334
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Jun 2022 11:28:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3DABC433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Jun 2022 12:17:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 65A8349EBC;
-	Mon,  6 Jun 2022 07:28:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 171C849EF6;
+	Mon,  6 Jun 2022 08:17:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7QaUjQaMZ1Ra; Mon,  6 Jun 2022 07:28:40 -0400 (EDT)
+	with ESMTP id MSE3BFnD5gZM; Mon,  6 Jun 2022 08:17:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CD404B0CB;
-	Mon,  6 Jun 2022 07:28:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEE8249F0A;
+	Mon,  6 Jun 2022 08:17:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3147249EBC
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jun 2022 07:28:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C86649F0A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jun 2022 08:17:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5DZwUFE8rkJF for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Jun 2022 07:28:37 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B98B649EBB
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jun 2022 07:28:37 -0400 (EDT)
+ with ESMTP id i35i-NwEH84m for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jun 2022 08:17:03 -0400 (EDT)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8523349EF6
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jun 2022 08:17:02 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 46C03B81808;
- Mon,  6 Jun 2022 11:28:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D41CC3411C;
- Mon,  6 Jun 2022 11:28:35 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 49E82CE1A91;
+ Mon,  6 Jun 2022 12:16:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE360C34119;
+ Mon,  6 Jun 2022 12:16:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1654514915;
- bh=HSh91ZCaHITLmr5CLlS3fmJvhr48sqOQOlQ7C/p/ovo=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=Dvw7wTF9FyzkRSe9OpuincqtO0+GGsyTHD5SbKOeaWsNUQyeZ15YjhoTxtE4AatCq
- L2+C6gDa633fgc7vNN+YB0tIepMpmuhGOYRRyCMahqmUpg8lfuuUjsMeTHFrA6JICu
- OWNLqx1dN2+0fmV5uw4cDRFpQmD1csMI1WXJ+kUTo+2piteHQT1sCfMcAMI+8B7tPU
- oYYazMeoJlXQKF2G5jjj+fA7FSgn37rwXzqEfC72bKimq5zAYmJsua2WwZtFlq22KN
- CYI0iebzkXuRpZ/Wy8RTk368AS72nhWmVIzQL+hiukbdfK8w2WCDQyLtDJaa1hPSep
- G4mWSMNmm99dg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nyAuO-00Fsyh-Ha; Mon, 06 Jun 2022 12:28:32 +0100
-Date: Mon, 06 Jun 2022 12:28:32 +0100
-Message-ID: <87y1ya3uan.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
+ s=k20201202; t=1654517814;
+ bh=DbMgnzFRDeClTcRHZKl9h6of7GFtoGX1BaOdzUKuVpM=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=B7z7FHJhSOsxG0qlrZKrOsoSS0uQvLJlGQZEVqpzl9lgWj/QKHPYxDbBXCkm4m7vN
+ 3UPBWK5UUxcCS9dIdcVwFkn1w66aFkXyQVjUHTJQvU4VRheyvpMZ3yOnNGThcpMCXD
+ CqBoIe+Lg8zvxsW2Zh4v06JNQUgtrdcUQkMlzp9PE6CYNeL5loiRQCMzD2M0isBP7b
+ qbCpIv6eP3tzuJ1LA+citjUdU8c2lAHs98cf30MTjA/hsijoZPHXx3mr9RBMDPU4z2
+ 5QK6wKQkbFOmY9S3XZ2aDkyIA2MUaw+8LLcD8dnpxwN7VIqVHjj73B896O/GS8f9ih
+ l3GfBYwo+i8hQ==
+Date: Mon, 6 Jun 2022 13:16:48 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [PATCH 01/18] KVM: arm64: Always start with clearing SVE flag on
  load
-In-Reply-To: <YpTXsgd1MPpJEjUJ@sirena.org.uk>
+Message-ID: <Yp3wMETNdDWtNhaY@sirena.org.uk>
 References: <20220528113829.1043361-1-maz@kernel.org>
  <20220528113829.1043361-2-maz@kernel.org>
- <YpTXsgd1MPpJEjUJ@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, oupton@google.com,
- will@kernel.org, tabba@google.com, qperret@google.com, kernel-team@android.com,
- stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <YpTXsgd1MPpJEjUJ@sirena.org.uk> <87y1ya3uan.wl-maz@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <87y1ya3uan.wl-maz@kernel.org>
+X-Cookie: Bedfellows make strange politicians.
 Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
  stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
@@ -86,53 +70,85 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============4978007607230260456=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 30 May 2022 15:41:54 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> [1  <text/plain; us-ascii (quoted-printable)>]
-> On Sat, May 28, 2022 at 12:38:11PM +0100, Marc Zyngier wrote:
-> > On each vcpu load, we set the KVM_ARM64_HOST_SVE_ENABLED
-> > flag if SVE is enabled for EL0 on the host. This is used to restore
-> > the correct state on vpcu put.
-> > 
-> > However, it appears that nothing ever clears this flag. Once
-> > set, it will stick until the vcpu is destroyed, which has the
-> > potential to spuriously enable SVE for userspace.
-> 
-> Oh dear.
-> 
-> Reviewed-by: Mark Brown <broonie@kernel.org>
-> 
-> > We probably never saw the issue because no VMM uses SVE, but
-> > that's still pretty bad. Unconditionally clearing the flag
-> > on vcpu load addresses the issue.
-> 
-> Unless I'm missing something since we currently always disable
-> SVE on syscall even if the VMM were using SVE for some reason
-> (SVE memcpy()?) we should already have disabled SVE for EL0 in
-> sve_user_discard() during kernel entry so EL0 access to SVE
-> should be disabled in the system register by the time we get
-> here.
 
-Indeed. And this begs the question: what is this code actually doing?
-Is there any way we can end-up running a guest with any valid host SVE
-state?
+--===============4978007607230260456==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="B+OWqsOhQgqxaqa/"
+Content-Disposition: inline
 
-I remember being >this< close to removing that code some time ago, and
-only stopped because I vaguely remembered Dave Martin convincing me at
-some point that it was necessary. I'm unable to piece the argument
-together again though.
 
-	M.
+--B+OWqsOhQgqxaqa/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
--- 
-Without deviation from the norm, progress is not possible.
+On Mon, Jun 06, 2022 at 12:28:32PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+> > On Sat, May 28, 2022 at 12:38:11PM +0100, Marc Zyngier wrote:
+
+> > > We probably never saw the issue because no VMM uses SVE, but
+> > > that's still pretty bad. Unconditionally clearing the flag
+> > > on vcpu load addresses the issue.
+
+> > Unless I'm missing something since we currently always disable
+> > SVE on syscall even if the VMM were using SVE for some reason
+> > (SVE memcpy()?) we should already have disabled SVE for EL0 in
+> > sve_user_discard() during kernel entry so EL0 access to SVE
+> > should be disabled in the system register by the time we get
+> > here.
+
+> Indeed. And this begs the question: what is this code actually doing?
+> Is there any way we can end-up running a guest with any valid host SVE
+> state?
+
+> I remember being >this< close to removing that code some time ago, and
+> only stopped because I vaguely remembered Dave Martin convincing me at
+> some point that it was necessary. I'm unable to piece the argument
+> together again though.
+
+I've stared at that code a few times as well, I think I'd ended up
+assuming it was some path to do with preempting and context switching
+but in that case I've never been clear why there'd be anything left that
+we'd need to preserve, or if we do why we don't just force a
+fpsimd_save().  It's possible this was from some earlier stage in review
+where the ABI didn't allow us to discard the SVE register state, or that
+it's there as defensive programming so for future work where we don't
+just disable on entry.
+
+Conicidentally I am going to post some patches later today or tomorrow
+which leave SVE enabled on syscall, they still have the hook for
+disabling it when entering KVM though so we'd still not need to save the
+EL0 state and the above should still apply.
+
+--B+OWqsOhQgqxaqa/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmKd8C8ACgkQJNaLcl1U
+h9AuDQf/VtGwAYDRDXwCU0D9tcpQJP64CtZ/QTytBLvoK2LGjER1sF9NO52CsDv2
+LKMCVNLg64qR5K+eB9ruX6ER3XOtEP1ttwQNvNVkZxmx7uHi2zZA/8FVdy+5RHYH
+651Hye9Gxe0Pq/dUj5H0Ij4eauwvOYahcpvoI+XDHNyM5DGjayLuqJX2BOFhfMvp
+bSYpgzr63deaSi/Hm7d+zD/EFupGNoMcKJ2aYFbRx29AUeriEe+q2yR7wAiwXhbG
+ZB6s+YX23A75vW7S1G3ujaPKAVenINEhfg8hGZ2G9GeJUw8iT6ckCm2CYAp6hurz
+b8rnsx2vN0U9BYAo+aQrx24rn8sz0Q==
+=8N3B
+-----END PGP SIGNATURE-----
+
+--B+OWqsOhQgqxaqa/--
+
+--===============4978007607230260456==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============4978007607230260456==--
