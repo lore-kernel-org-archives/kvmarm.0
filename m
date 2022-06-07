@@ -2,77 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B589C43334
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Jun 2022 16:51:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBDBCC43334
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Jun 2022 16:51:43 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 574744B116;
-	Tue,  7 Jun 2022 12:51:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C9854B24C;
+	Tue,  7 Jun 2022 12:51:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id B8k3BNDnrU6h; Tue,  7 Jun 2022 12:51:19 -0400 (EDT)
+	with ESMTP id W+6uxNN2eNET; Tue,  7 Jun 2022 12:51:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBDA84B283;
-	Tue,  7 Jun 2022 12:51:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 203554B2FB;
+	Tue,  7 Jun 2022 12:51:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 65E944B1E1
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 12:51:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DF5854B283
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 12:51:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3kk0JEiRQnJZ for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Jun 2022 12:51:17 -0400 (EDT)
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
- [209.85.128.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E06F04B116
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 12:51:16 -0400 (EDT)
-Received: by mail-yw1-f202.google.com with SMTP id
- 00721157ae682-30c99cb3d4dso151948877b3.6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Jun 2022 09:51:16 -0700 (PDT)
+ with ESMTP id qFa4v69inwyJ for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Jun 2022 12:51:39 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 883ED4B116
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 12:51:39 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ p78-20020a254251000000b006607e0a2965so10647639yba.6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Jun 2022 09:51:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=o0iZsHQ0w1pzGlhdlimhaec4r2w9hzpwWG2GpMn3EMQ=;
- b=OmbO1I14NanBrKt0FdpC2NTCDJpwz34ZNg+udo7ufulw4wzH8+6qdwXmzYiRud8dgl
- H4fGd9ztV7KGrTzVhGt0BfeRhSMqmrEzAXKdjHlXNA8QMGX11NdyFs69PTFZuos98kzq
- UuMzL9aKp3DDEeBnd6ry89HY9wlen6rOWsSYi6ecHKyigI+ITpBGik/BsMoJ4zA2uH2Q
- ZWvpcg89RtVbZ//Dr6NHFj6hkIkOkYWGgZQHoVsMXwslo48H2dhOd6ACZD+Z5TwKkWUh
- fPKaPVoeSC5DDDBZAFB2wHobe264YygSL7/nPsaMEx50lZwXm9Ab0CyQLzyMVVSSqC+7
- sHFA==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=utThYmevKONU/9m2pQGdDHA12doEH9idunElwn0Wp+Y=;
+ b=gUIQMQl0JQzhYd3S4fyRf5XmWfJe5lmGtNGJawPlt9xGCh6iVfChXa73AoojCUrlbl
+ IVXeOtMoTYUHDpAFH3A8brBwPVcti7T1TXiYbRGm9WL+wI2w1S/KEwaSu9WutVR9tygx
+ 84Kvg+VfGwL6M1f0ziUNEjgMhLSuSnn44AbVKJ9wncUs/50JTgmnIHf+wQmtrOV7M8Mt
+ K4uO5mPCKZewDVjZ3Ihsg/rY8/0Ud5jqcoTKOFhCTALO+vhAlMfVTPQqBzexRVTQ5AE6
+ AWpm7eIByU/UruiBwIFFfpmgXXAyJwhbholwIR4cxXKH/anXN/52PMZ9cQYrHOq/XYDw
+ pDWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=o0iZsHQ0w1pzGlhdlimhaec4r2w9hzpwWG2GpMn3EMQ=;
- b=zEIOGsJCud3agvC6UMsd1MGWKvnIk9rWPsH864YKAVTXVeSVeot1tnZx7XGZTUH8vJ
- dTUhtTx5HMjo076G+eh2r5mgLdcXG5zehnPtkfbXCfz5TfeNVhHzF4D2BzL1Ha+GtVM4
- Y5VCXIQ+z0nPqWhOTeh0tamk/oQ1v5UUCCuKMNk0VlMUOZdwy8J77PJC6TRW/W8POuJr
- AW5EiJPs5+RPEZBoZs5hGoIM6BHMEEoiXMZ9guFxKnI3X4gPTAYIyjWuktBzehtssVyh
- x0q6XCzVPWs+NJSIuY9ej3wVFaq7R7o1vfJ5ve3UdioZW8pGqMhzEclr1BBTjthISTSI
- aMgA==
-X-Gm-Message-State: AOAM530vP8qyV8miSCPV0q8Q9ZL+Gan2vQgaYLqvnoEs8jryZ7pi0sfI
- 50bHZIJx0yMTG3ndWL0MgTHWML4IedLHdCKv9w==
-X-Google-Smtp-Source: ABdhPJysQZgWCIBcQcZgbAPodFjVXMmm6FLeZKxkdgidkgdm9q/dWOw/xW0kfcLA9ACqPsqnVIIHO6siNslKHvzWdA==
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=utThYmevKONU/9m2pQGdDHA12doEH9idunElwn0Wp+Y=;
+ b=u1d4NKZ33VFY6Kf6bH6IstRY6tESMeeYsIYGS8y25jLOeTFY/Edt1MFyHYdjZRHlH6
+ RtCyc0TpDRlzCzvd5t4hCCDMwku4O/fnAMZ6uHtDdd0MKst31R2/d0fUcM8geFtKayP/
+ 1QG9ttD5MgdJ2maS+abGAS8wTPxbGNWmw0WKMhTd27Uczr+7nWoaMCNI1/9xMc0u7+sX
+ 1v0bhb307L9HM1n1Fpx3gKpW/JA6KNN0L6kGF8MHypwuPWOKj6Smo+VSIW5FIfrxDAHQ
+ sQn+2yn08F30r3XQBPPJVt2DMn4TsOuV4md1guR2Lchy/TndCYelu6MrcYMobad71vM1
+ fjZg==
+X-Gm-Message-State: AOAM531kMtoI6c+R6Po9Iq9IQVxXaUdSByYBoyZmQa6UC1US7DpfX+dG
+ ZhNxXucmhHlG4NUJGaSusCv5vcnejv0hPNIlNQ==
+X-Google-Smtp-Source: ABdhPJzuHcHlzERjFFs10J5b1VKR548pg9LJge0vp7jHTNhan1WTvDRj/6ZH8ppj3YV0piRTv9xwQbWhp9qkOIWgBQ==
 X-Received: from kaleshsingh.mtv.corp.google.com
  ([2620:15c:211:200:7091:8518:ec1e:93dc])
- (user=kaleshsingh job=sendgmr) by 2002:a81:1615:0:b0:30c:245e:71ff with SMTP
- id 21-20020a811615000000b0030c245e71ffmr33123428yww.406.1654620676147; Tue,
- 07 Jun 2022 09:51:16 -0700 (PDT)
-Date: Tue,  7 Jun 2022 09:50:42 -0700
-Message-Id: <20220607165105.639716-1-kaleshsingh@google.com>
+ (user=kaleshsingh job=sendgmr) by 2002:a81:57d6:0:b0:30c:a234:140d with SMTP
+ id l205-20020a8157d6000000b0030ca234140dmr33093505ywb.269.1654620698862; Tue,
+ 07 Jun 2022 09:51:38 -0700 (PDT)
+Date: Tue,  7 Jun 2022 09:50:43 -0700
+In-Reply-To: <20220607165105.639716-1-kaleshsingh@google.com>
+Message-Id: <20220607165105.639716-2-kaleshsingh@google.com>
 Mime-Version: 1.0
+References: <20220607165105.639716-1-kaleshsingh@google.com>
 X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v3 0/5] KVM nVHE Hypervisor stack unwinder
+Subject: [PATCH v3 1/5] KVM: arm64: Factor out common stack unwinding logic
 From: Kalesh Singh <kaleshsingh@google.com>
 To: mark.rutland@arm.com, broonie@kernel.org, maz@kernel.org
 Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
  Peter Zijlstra <peterz@infradead.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Marco Elver <elver@google.com>,
  will@kernel.org, surenb@google.com, kvmarm@lists.cs.columbia.edu,
  "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- kernel-team@android.com, tjmercier@google.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Masami Hiramatsu <mhiramat@kernel.org>
+ linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+ Alexei Starovoitov <ast@kernel.org>, tjmercier@google.com,
+ linux-kernel@vger.kernel.org, Masami Hiramatsu <mhiramat@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,58 +92,89 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi all,
+Factor out the stack unwinding logic common to both the host kernel and
+the nVHE hypersivor into __unwind_next(). This allows for reuse in the
+nVHE hypervisor stack unwinding (later in this series).
 
-This v3 of the nVHE hypervisor stack unwinder. The previous versions were
-posted at:
-v2: https://lore.kernel.org/r/20220502191222.4192768-1-kaleshsingh@google.com/
-v1: https://lore.kernel.org/r/20220427184716.1949239-1-kaleshsingh@google.com/
+Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+---
 
-The version is rebased on 5.19-rc1 which resolves the previously unmerged
-dependencies, and adds some reviewed tags from Mark Brown.
+Changes in v3:
+  - Add Mark's Reviewed-by tag
 
-The cover letter are copied below for convenience.
+ arch/arm64/kernel/stacktrace.c | 36 +++++++++++++++++++++++-----------
+ 1 file changed, 25 insertions(+), 11 deletions(-)
 
-Thanks,
-Kalesh
-
--------
-
-This new version of the unwinder splits the unwinding and dumping
-of the stack between the hypervisor and host:
-  - The hypervisor unwinds its stack and dumps the address entries
-    into a page shared with the host.
-  - The host then symnolizes and prints the hyp stacktrace from
-    the shared page.
-
-The new approach doesn't depend on CONFIG_NVHE_EL2_DEBUG,
-and allows dumping hyp stacktraces in prodcution environments
-(!CONFIG_NVHE_EL2_DEBUG).
-
-arm64/kernel/stacktrace.c is compiled twice: stacktrace.o for the
-host kernel and stacktrace.nvhe.o for the hypervisor. This allows
-reusing most of the host unwinding logic in the nVHE hypervisor.
-
-Kalesh Singh (5):
-  KVM: arm64: Factor out common stack unwinding logic
-  KVM: arm64: Compile stacktrace.nvhe.o
-  KVM: arm64: Add hypervisor overflow stack
-  KVM: arm64: Allocate shared stacktrace pages
-  KVM: arm64: Unwind and dump nVHE hypervisor stacktrace
-
- arch/arm64/include/asm/kvm_asm.h    |   1 +
- arch/arm64/include/asm/stacktrace.h |  58 +++++++++--
- arch/arm64/kernel/stacktrace.c      | 151 +++++++++++++++++++++++-----
- arch/arm64/kvm/arm.c                |  34 +++++++
- arch/arm64/kvm/handle_exit.c        |   4 +
- arch/arm64/kvm/hyp/nvhe/Makefile    |   3 +-
- arch/arm64/kvm/hyp/nvhe/host.S      |   9 +-
- arch/arm64/kvm/hyp/nvhe/setup.c     |  11 ++
- arch/arm64/kvm/hyp/nvhe/switch.c    |   4 +
- 9 files changed, 231 insertions(+), 44 deletions(-)
-
-
-base-commit: f2906aa863381afb0015a9eb7fefad885d4e5a56
+diff --git a/arch/arm64/kernel/stacktrace.c b/arch/arm64/kernel/stacktrace.c
+index 0467cb79f080..ee60c279511c 100644
+--- a/arch/arm64/kernel/stacktrace.c
++++ b/arch/arm64/kernel/stacktrace.c
+@@ -81,23 +81,19 @@ NOKPROBE_SYMBOL(unwind_init);
+  * records (e.g. a cycle), determined based on the location and fp value of A
+  * and the location (but not the fp value) of B.
+  */
+-static int notrace unwind_next(struct task_struct *tsk,
+-			       struct unwind_state *state)
++static int notrace __unwind_next(struct task_struct *tsk,
++				 struct unwind_state *state,
++				 struct stack_info *info)
+ {
+ 	unsigned long fp = state->fp;
+-	struct stack_info info;
+-
+-	/* Final frame; nothing to unwind */
+-	if (fp == (unsigned long)task_pt_regs(tsk)->stackframe)
+-		return -ENOENT;
+ 
+ 	if (fp & 0x7)
+ 		return -EINVAL;
+ 
+-	if (!on_accessible_stack(tsk, fp, 16, &info))
++	if (!on_accessible_stack(tsk, fp, 16, info))
+ 		return -EINVAL;
+ 
+-	if (test_bit(info.type, state->stacks_done))
++	if (test_bit(info->type, state->stacks_done))
+ 		return -EINVAL;
+ 
+ 	/*
+@@ -113,7 +109,7 @@ static int notrace unwind_next(struct task_struct *tsk,
+ 	 * stack to another, it's never valid to unwind back to that first
+ 	 * stack.
+ 	 */
+-	if (info.type == state->prev_type) {
++	if (info->type == state->prev_type) {
+ 		if (fp <= state->prev_fp)
+ 			return -EINVAL;
+ 	} else {
+@@ -127,7 +123,25 @@ static int notrace unwind_next(struct task_struct *tsk,
+ 	state->fp = READ_ONCE_NOCHECK(*(unsigned long *)(fp));
+ 	state->pc = READ_ONCE_NOCHECK(*(unsigned long *)(fp + 8));
+ 	state->prev_fp = fp;
+-	state->prev_type = info.type;
++	state->prev_type = info->type;
++
++	return 0;
++}
++NOKPROBE_SYMBOL(__unwind_next);
++
++static int notrace unwind_next(struct task_struct *tsk,
++			       struct unwind_state *state)
++{
++	struct stack_info info;
++	int err;
++
++	/* Final frame; nothing to unwind */
++	if (state->fp == (unsigned long)task_pt_regs(tsk)->stackframe)
++		return -ENOENT;
++
++	err = __unwind_next(tsk, state, &info);
++	if (err)
++		return err;
+ 
+ 	state->pc = ptrauth_strip_insn_pac(state->pc);
+ 
 -- 
 2.36.1.255.ge46751e96f-goog
 
