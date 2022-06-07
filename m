@@ -2,75 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA56C43334
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Jun 2022 04:47:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2567C43334
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Jun 2022 11:10:09 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CEA54B315;
-	Tue,  7 Jun 2022 00:47:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B66F4A014;
+	Tue,  7 Jun 2022 07:10:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2znn2Y2KxKFH; Tue,  7 Jun 2022 00:47:35 -0400 (EDT)
+	with ESMTP id blBsDnSrZ2kw; Tue,  7 Jun 2022 07:10:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E154B4B2AE;
-	Tue,  7 Jun 2022 00:47:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 39CF94B323;
+	Tue,  7 Jun 2022 07:10:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B2434B226
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 00:47:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C5614B323
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 07:10:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nK8y7TQ31Gnj for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Jun 2022 00:47:33 -0400 (EDT)
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com
- [209.85.167.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 687704B214
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 00:47:33 -0400 (EDT)
-Received: by mail-oi1-f180.google.com with SMTP id k11so22422889oia.12
- for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Jun 2022 21:47:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=T1Oeoa7n5QDG+gTsiG56VGoP7hbCIGDGBtXMObcL+RI=;
- b=SIZk76Vz626zA8ncZ4xYPOa5eJlc0AzzPErAw21oJSIIGA1id6K3+ztfhxwwms5Fhq
- F+u1W8bakEjgZREX6uhVJ/YMt/diOemeBi0N9+uSsgQKFBYSP7PJn2P6Yonxk0Y1+c/6
- HNPpzV4asEPt9lUEKvFPZMqtO6DXBg4YluZ3qEbn3iG6Al6K7j+vvswIhCSRUuKpGbcv
- J/ko2uVFP8u0cVr0lusbBUmkrq9j0BvAg3JsPZ2UsF3RzhS0/OqOn5Wo/zyf/jGlWnfK
- 1quBbjq2H7+B58i3cSCtYHpHhURdZViDZnuqbdp7E9WJh5e1sWJBIMSq+yxlsyfdGo8e
- CeCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=T1Oeoa7n5QDG+gTsiG56VGoP7hbCIGDGBtXMObcL+RI=;
- b=FZrKJrDBSktUsVpmva5DSgo58BZIh9JL+2CJyRaZ+dr1tUIk8KNJTA1EQW6Hy3kO9P
- SZPlc//AFCRPsTudBHhScTlkzOmL0j2vUnW5JHFuYBr0Em6Uk96hAxbGWj4gy/mMGxYb
- rfW+ubgEZPgMhldFMldGpGHG8cuJHiu5pgUgQ0Ls9fIdJ+lw36qpHpCYrARIFjB1H44m
- 5szyQ2uJ4WIJxfvSGxkyoFutxEgcdo+viupuhodb0gHdaxo5i2UizPoxymPU6MxtIbqg
- bbzQ6uXUVZn1LKxUYa6+1fs1UKQsTJnq3P/XPTbnVwBw2X60cYJ6Tn2gW8ib9Kv6icS5
- M2GA==
-X-Gm-Message-State: AOAM532jaHRCEzLf19/mRWRmquQmQ6wQKzRAma+6f0ZGCI6fT82x9adk
- yBmzeGIRdpuZxlMvJP4eZ7uMeQUuMcVkFoP+DDsYHg==
-X-Google-Smtp-Source: ABdhPJzM/y1Bdi+IWw5eq1YlfditPyyuVf2cLfzRK+X6/I314sxKlnjQR10W7nJpF/C+Qr5u4SPzl6E/ps4EXbjxwIk=
-X-Received: by 2002:a05:6808:3198:b0:32b:a54:1238 with SMTP id
- cd24-20020a056808319800b0032b0a541238mr31223949oib.16.1654577252563; Mon, 06
- Jun 2022 21:47:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220528113829.1043361-1-maz@kernel.org>
- <20220528113829.1043361-4-maz@kernel.org>
- <CAAeT=FxmD4Nsrodr-FCjpNghAormCg4P+R7hF3+g_wfQ5T12Rg@mail.gmail.com>
- <87wndwluhy.wl-maz@kernel.org>
-In-Reply-To: <87wndwluhy.wl-maz@kernel.org>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Mon, 6 Jun 2022 21:47:16 -0700
-Message-ID: <CAAeT=FxcUF-nNhzwSTQm_oueF4Cu_8nDdFfoCi33HOpOZaBjXg@mail.gmail.com>
-Subject: Re: [PATCH 03/18] KVM: arm64: Drop FP_FOREIGN_STATE from the
- hypervisor code
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
+ with ESMTP id NZsbvM3Jng23 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Jun 2022 07:10:05 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 271514A014
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 07:10:05 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 0F68C61673;
+ Tue,  7 Jun 2022 11:10:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78D84C3411E;
+ Tue,  7 Jun 2022 11:10:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1654600203;
+ bh=R2D2hJEP5JgQDMYQbg0Fl0dl1LkzciDzBEY9SRq7c1c=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=THyWb10w1rnF84vWcJNWA1Dbj89EqkODqKBH5FwGgSBcVGxkZA9DP9gJGQT2DKm9m
+ JVBbdlObYEMgyo+pINhd4hMOlfngyEQjyH6BF6QVnQL7AA0jmZNShwZoYwYXY9UwzE
+ gwEFoGRvjrOanwF6T+NEfmoLnKwB1UD9zWfjg6oZ8qQOrh89wJiw55QzfmHbC2oMqs
+ dctHxKq5JxV5AIZChXVDRd+5acZ95VAPYTPSi0oKVHl+FjaAe7XxzycyTN0sPk8vv5
+ /RoUMcFE0PmxGhDw28VLVh64w1ZAp9liuNmlfk6LdXCYnuaJB/ZgqTZRgcZZyosLta
+ 5YyHr9KkWKMOw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nyX61-00G9dT-3P; Tue, 07 Jun 2022 12:10:01 +0100
+Date: Tue, 07 Jun 2022 12:10:00 +0100
+Message-ID: <87mteo4tmf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Eric Auger <eauger@redhat.com>
+Subject: Re: [PATCH 2/3] KVM: arm64: Replace vgic_v3_uaccess_read_pending with
+ vgic_uaccess_read_pending
+In-Reply-To: <168da62b-51c0-b883-0912-15139f24d31f@redhat.com>
+References: <20220602083025.1110433-1-maz@kernel.org>
+ <20220602083025.1110433-3-maz@kernel.org>
+ <168da62b-51c0-b883-0912-15139f24d31f@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eauger@redhat.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, ricarkol@google.com,
+ james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ oupton@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,88 +89,85 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, Jun 4, 2022 at 1:10 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Fri, 03 Jun 2022 06:23:25 +0100,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > On Sat, May 28, 2022 at 4:38 AM Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > The vcpu KVM_ARM64_FP_FOREIGN_FPSTATE flag tracks the thread's own
-> > > TIF_FOREIGN_FPSTATE so that we can evaluate just before running
-> > > the vcpu whether it the FP regs contain something that is owned
-> > > by the vcpu or not by updating the rest of the FP flags.
-> > >
-> > > We do this in the hypervisor code in order to make sure we're
-> > > in a context where we are not interruptible. But we already
-> > > have a hook in the run loop to generate this flag. We may as
-> > > well update the FP flags directly and save the pointless flag
-> > > tracking.
-> > >
-> > > Whilst we're at it, rename update_fp_enabled() to guest_owns_fp_regs()
-> > > to indicate what the leftover of this helper actually do.
-> > >
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> >
-> > Reviewed-by: Reiji Watanabe <reijiw@google.com>
-> >
-> >
-> > > --- a/arch/arm64/kvm/fpsimd.c
-> > > +++ b/arch/arm64/kvm/fpsimd.c
-> > > @@ -107,16 +107,19 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
-> > >  }
-> > >
-> > >  /*
-> > > - * Called just before entering the guest once we are no longer
-> > > - * preemptable. Syncs the host's TIF_FOREIGN_FPSTATE with the KVM
-> > > - * mirror of the flag used by the hypervisor.
-> > > + * Called just before entering the guest once we are no longer preemptable
-> > > + * and interrupts are disabled. If we have managed to run anything using
-> > > + * FP while we were preemptible (such as off the back of an interrupt),
-> > > + * then neither the host nor the guest own the FP hardware (and it was the
-> > > + * responsibility of the code that used FP to save the existing state).
-> > > + *
-> > > + * Note that not supporting FP is basically the same thing as far as the
-> > > + * hypervisor is concerned (nothing to save).
-> > >   */
-> > >  void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu)
-> > >  {
-> > > -       if (test_thread_flag(TIF_FOREIGN_FPSTATE))
-> > > -               vcpu->arch.flags |= KVM_ARM64_FP_FOREIGN_FPSTATE;
-> > > -       else
-> > > -               vcpu->arch.flags &= ~KVM_ARM64_FP_FOREIGN_FPSTATE;
-> > > +       if (!system_supports_fpsimd() || test_thread_flag(TIF_FOREIGN_FPSTATE))
-> > > +               vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED | KVM_ARM64_FP_HOST);
-> > >  }
-> >
-> > Although kvm_arch_vcpu_load_fp() unconditionally sets KVM_ARM64_FP_HOST,
-> > perhaps having kvm_arch_vcpu_load_fp() set KVM_ARM64_FP_HOST only when
-> > FP is supported might be more consistent?
-> > Then, checking system_supports_fpsimd() is unnecessary here.
-> > (KVM_ARM64_FP_ENABLED is not set when FP is not supported)
->
-> That's indeed a possibility. But I'm trying not to change the logic
-> here, only to move it to a place that provides the same semantic
-> without the need for an extra flag.
->
-> I'm happy to stack an extra patch on top of this series though.
+On Thu, 02 Jun 2022 21:06:42 +0100,
+Eric Auger <eauger@redhat.com> wrote:
+> 
+> Hi Marc,
+> On 6/2/22 10:30, Marc Zyngier wrote:
+> > Now that GICv2 has a proper userspace accessor for the pending state,
+> > switch GICv3 over to it, dropping the local version.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 40 ++----------------------------
+> >  1 file changed, 2 insertions(+), 38 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > index f7aa7bcd6fb8..f15e29cc63ce 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > @@ -353,42 +353,6 @@ static unsigned long vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
+> >  	return 0;
+> >  }
+> >  
+> > -static unsigned long vgic_v3_uaccess_read_pending(struct kvm_vcpu *vcpu,
+> > -						  gpa_t addr, unsigned int len)
+> > -{
+> > -	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
+> > -	u32 value = 0;
+> > -	int i;
+> 
+> > -
+> > -	/*
+> > -	 * pending state of interrupt is latched in pending_latch variable.
+> > -	 * Userspace will save and restore pending state and line_level
+> > -	 * separately.
+> > -	 * Refer to Documentation/virt/kvm/devices/arm-vgic-v3.rst
+> > -	 * for handling of ISPENDR and ICPENDR.
+> Don't know if you want a derivative of this comment in
+> vgic_uaccess_read_pending()?
 
-Thank you for your reply. I would prefer that.
+I don't find it specially helpful, but at the same time, it doesn't
+hurt to move it around.
+
+> > -	 */
+> > -	for (i = 0; i < len * 8; i++) {
+> > -		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> > -		bool state = irq->pending_latch;
+> > -
+> > -		if (irq->hw && vgic_irq_is_sgi(irq->intid)) {
+> > -			int err;
+> > -
+> in __read_pending(), irq->irq_lock is hold which looks safer at 1st
+> sight. If potentially fixing something this can be documented in the
+> commit msg.
+
+I don't think it fixes anything. The idea is that if you are
+accessing the state from userspace, you already have stopped the VM,
+and thus there is no concurrent modifications if the state.
+
+> > -			err = irq_get_irqchip_state(irq->host_irq,
+> > -						    IRQCHIP_STATE_PENDING,
+> > -						    &state);
+> > -			WARN_ON(err);
+> > -		}
+> > -
+> in __read_pending(), irq_is_pending(irq) is used instead of
+> irq->pending_latch. for level sensitive IRQ this is not identical. This
+> may also deserve some comment. The nuance may be related to the above
+> comment.
+
+That is a good point, and we should unify the userspace behaviours
+between GICv2 and v3.
+
+I'll respin the series shortly.
 
 Thanks,
-Reiji
 
+	M.
 
-
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
