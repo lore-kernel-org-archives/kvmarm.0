@@ -2,72 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74A1CC43334
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Jun 2022 15:27:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B589C43334
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Jun 2022 16:51:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C59944B323;
-	Tue,  7 Jun 2022 11:27:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 574744B116;
+	Tue,  7 Jun 2022 12:51:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Q7AMN68P21Pt; Tue,  7 Jun 2022 11:27:23 -0400 (EDT)
+	with ESMTP id B8k3BNDnrU6h; Tue,  7 Jun 2022 12:51:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA4684B332;
-	Tue,  7 Jun 2022 11:27:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBDA84B283;
+	Tue,  7 Jun 2022 12:51:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 42C914B308
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 11:27:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 65E944B1E1
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 12:51:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6lptOC3g5wFa for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Jun 2022 11:27:21 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 183F84B2D7
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 11:27:21 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id C0785B8212A;
- Tue,  7 Jun 2022 15:27:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83D23C385A5;
- Tue,  7 Jun 2022 15:27:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1654615638;
- bh=ueyRcXFv7rEb7tdf83066lmJl8gE/lV6HoeLB5Uk8VM=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=QKZ659VVSj3rE2txIcfea6nvbu90HicYGxlDUpKKJtmSZcGmMVt2NkIlC9S8fhddd
- Fj28+BkA2aQd3hIOvxQIELcVqba7Y/CSsfaAXK1CmjGKj7oqmx3I2ZtFamJtvGOvvY
- WZUZOQgkNYLV/5aD5dVkhwQ7TSYtsuhNEP+0shTOkUcDWcVou3GDhw/AKPBCvIv9oh
- KFOEjxkxI0+34PY6qUFXvtnzLanT7PW6Vv/35LWGZ1DnJFhFq7suD3/2cAEW/rR9hc
- yWlxJM0ukla5O1GLb+EWWo9D8faRE1Iyc3cV7e29/dMw11p7vkfBJ979KznEJZWYez
- lVJA95gt+d6ZQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nyb6y-00GDdG-0G; Tue, 07 Jun 2022 16:27:16 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Subject: Re: (subset) [PATCH v2 0/3] KVM: arm64: Fix userspace access to HW
- pending state
-Date: Tue,  7 Jun 2022 16:27:12 +0100
-Message-Id: <165461559010.127313.6746590114309145143.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220607131427.1164881-1-maz@kernel.org>
-References: <20220607131427.1164881-1-maz@kernel.org>
-MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: maz@kernel.org, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com
+ with ESMTP id 3kk0JEiRQnJZ for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Jun 2022 12:51:17 -0400 (EDT)
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
+ [209.85.128.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E06F04B116
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 12:51:16 -0400 (EDT)
+Received: by mail-yw1-f202.google.com with SMTP id
+ 00721157ae682-30c99cb3d4dso151948877b3.6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Jun 2022 09:51:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=o0iZsHQ0w1pzGlhdlimhaec4r2w9hzpwWG2GpMn3EMQ=;
+ b=OmbO1I14NanBrKt0FdpC2NTCDJpwz34ZNg+udo7ufulw4wzH8+6qdwXmzYiRud8dgl
+ H4fGd9ztV7KGrTzVhGt0BfeRhSMqmrEzAXKdjHlXNA8QMGX11NdyFs69PTFZuos98kzq
+ UuMzL9aKp3DDEeBnd6ry89HY9wlen6rOWsSYi6ecHKyigI+ITpBGik/BsMoJ4zA2uH2Q
+ ZWvpcg89RtVbZ//Dr6NHFj6hkIkOkYWGgZQHoVsMXwslo48H2dhOd6ACZD+Z5TwKkWUh
+ fPKaPVoeSC5DDDBZAFB2wHobe264YygSL7/nPsaMEx50lZwXm9Ab0CyQLzyMVVSSqC+7
+ sHFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=o0iZsHQ0w1pzGlhdlimhaec4r2w9hzpwWG2GpMn3EMQ=;
+ b=zEIOGsJCud3agvC6UMsd1MGWKvnIk9rWPsH864YKAVTXVeSVeot1tnZx7XGZTUH8vJ
+ dTUhtTx5HMjo076G+eh2r5mgLdcXG5zehnPtkfbXCfz5TfeNVhHzF4D2BzL1Ha+GtVM4
+ Y5VCXIQ+z0nPqWhOTeh0tamk/oQ1v5UUCCuKMNk0VlMUOZdwy8J77PJC6TRW/W8POuJr
+ AW5EiJPs5+RPEZBoZs5hGoIM6BHMEEoiXMZ9guFxKnI3X4gPTAYIyjWuktBzehtssVyh
+ x0q6XCzVPWs+NJSIuY9ej3wVFaq7R7o1vfJ5ve3UdioZW8pGqMhzEclr1BBTjthISTSI
+ aMgA==
+X-Gm-Message-State: AOAM530vP8qyV8miSCPV0q8Q9ZL+Gan2vQgaYLqvnoEs8jryZ7pi0sfI
+ 50bHZIJx0yMTG3ndWL0MgTHWML4IedLHdCKv9w==
+X-Google-Smtp-Source: ABdhPJysQZgWCIBcQcZgbAPodFjVXMmm6FLeZKxkdgidkgdm9q/dWOw/xW0kfcLA9ACqPsqnVIIHO6siNslKHvzWdA==
+X-Received: from kaleshsingh.mtv.corp.google.com
+ ([2620:15c:211:200:7091:8518:ec1e:93dc])
+ (user=kaleshsingh job=sendgmr) by 2002:a81:1615:0:b0:30c:245e:71ff with SMTP
+ id 21-20020a811615000000b0030c245e71ffmr33123428yww.406.1654620676147; Tue,
+ 07 Jun 2022 09:51:16 -0700 (PDT)
+Date: Tue,  7 Jun 2022 09:50:42 -0700
+Message-Id: <20220607165105.639716-1-kaleshsingh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
+Subject: [PATCH v3 0/5] KVM nVHE Hypervisor stack unwinder
+From: Kalesh Singh <kaleshsingh@google.com>
+To: mark.rutland@arm.com, broonie@kernel.org, maz@kernel.org
+Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
+ Peter Zijlstra <peterz@infradead.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
+ will@kernel.org, surenb@google.com, kvmarm@lists.cs.columbia.edu,
+ "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+ kernel-team@android.com, tjmercier@google.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Masami Hiramatsu <mhiramat@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,26 +89,60 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 7 Jun 2022 14:14:24 +0100, Marc Zyngier wrote:
-> This is a followup from [1], which aims at fixing userspace access to
-> interrupt pending state for HW interrupts.
-> 
-> * From v1 [1]:
->   - Keep some of the GICv3-specifics around to avoid regressing the
->     line vs latch distinction (Eric).
-> 
-> [...]
+Hi all,
 
-Applied to fixes, thanks!
+This v3 of the nVHE hypervisor stack unwinder. The previous versions were
+posted at:
+v2: https://lore.kernel.org/r/20220502191222.4192768-1-kaleshsingh@google.com/
+v1: https://lore.kernel.org/r/20220427184716.1949239-1-kaleshsingh@google.com/
 
-[1/3] KVM: arm64: Don't read a HW interrupt pending state in user context
-      commit: bfb5ed4097c75917da5c8a74ab236b5acc703d08
+The version is rebased on 5.19-rc1 which resolves the previously unmerged
+dependencies, and adds some reviewed tags from Mark Brown.
 
-Cheers,
+The cover letter are copied below for convenience.
 
-	M.
+Thanks,
+Kalesh
+
+-------
+
+This new version of the unwinder splits the unwinding and dumping
+of the stack between the hypervisor and host:
+  - The hypervisor unwinds its stack and dumps the address entries
+    into a page shared with the host.
+  - The host then symnolizes and prints the hyp stacktrace from
+    the shared page.
+
+The new approach doesn't depend on CONFIG_NVHE_EL2_DEBUG,
+and allows dumping hyp stacktraces in prodcution environments
+(!CONFIG_NVHE_EL2_DEBUG).
+
+arm64/kernel/stacktrace.c is compiled twice: stacktrace.o for the
+host kernel and stacktrace.nvhe.o for the hypervisor. This allows
+reusing most of the host unwinding logic in the nVHE hypervisor.
+
+Kalesh Singh (5):
+  KVM: arm64: Factor out common stack unwinding logic
+  KVM: arm64: Compile stacktrace.nvhe.o
+  KVM: arm64: Add hypervisor overflow stack
+  KVM: arm64: Allocate shared stacktrace pages
+  KVM: arm64: Unwind and dump nVHE hypervisor stacktrace
+
+ arch/arm64/include/asm/kvm_asm.h    |   1 +
+ arch/arm64/include/asm/stacktrace.h |  58 +++++++++--
+ arch/arm64/kernel/stacktrace.c      | 151 +++++++++++++++++++++++-----
+ arch/arm64/kvm/arm.c                |  34 +++++++
+ arch/arm64/kvm/handle_exit.c        |   4 +
+ arch/arm64/kvm/hyp/nvhe/Makefile    |   3 +-
+ arch/arm64/kvm/hyp/nvhe/host.S      |   9 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c     |  11 ++
+ arch/arm64/kvm/hyp/nvhe/switch.c    |   4 +
+ 9 files changed, 231 insertions(+), 44 deletions(-)
+
+
+base-commit: f2906aa863381afb0015a9eb7fefad885d4e5a56
 -- 
-Marc Zyngier <maz@kernel.org>
+2.36.1.255.ge46751e96f-goog
 
 _______________________________________________
 kvmarm mailing list
