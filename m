@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1483EC43334
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Jun 2022 13:14:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DEE5CCA47C
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Jun 2022 13:14:42 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8445F4B314;
-	Tue,  7 Jun 2022 09:14:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9ACE4B20D;
+	Tue,  7 Jun 2022 09:14:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QrPTCR6JMAn1; Tue,  7 Jun 2022 09:14:38 -0400 (EDT)
+	with ESMTP id 41BwxVoE-zj6; Tue,  7 Jun 2022 09:14:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 317634B330;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E71B4B377;
 	Tue,  7 Jun 2022 09:14:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E376F4B30A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 09:14:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 179784B352
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 09:14:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id trOqalijh9Z6 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id kzwTsHuOmcYM for <kvmarm@lists.cs.columbia.edu>;
  Tue,  7 Jun 2022 09:14:34 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8710D4B20D
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C1FB54B30C
  for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 09:14:34 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id CABFD61224;
- Tue,  7 Jun 2022 13:14:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37455C34115;
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 3806C6138B;
+ Tue,  7 Jun 2022 13:14:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D1DDC385A5;
  Tue,  7 Jun 2022 13:14:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=k20201202; t=1654607673;
- bh=2ZyRR7tBSN/2EJrlNxB3h2/WkG/0rsIykzhySwBTGsI=;
+ bh=RiFpv4ti8o+54/PIi4uIAl7GNNSk/w0np3Cg3vPA0Gk=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=UR8KJu1PR0JK5SDRg/mgf8pPbAloJt4zJe5lbA6WOWxvKjMCWKjJ3X8RltzNx2L74
- tstWo6d/WZZhhSC6VsU0GJ3gvIESuWXBJDMwQX0dgAzPZXSVd4HnxeFsvpfPXZaVAm
- A9Bd5qTQH8xXJ7xRtOcxKm/HEC3Y902HK6M/srhNKIntrp3KGdRIMZIAyoVppqvA2j
- bVAnhQ6fbxO/P7ohcf5GZ4ED2KF+uBLZ/OfB6KdoZ0ClzSM7CVIfEt91oS4WuiphiE
- 8Cg949e1nQE2f4y+gSwfixnAZcQhpwqtRSPyevMREC1FVzJoJ6Vkb+Vy4plrP31iF0
- XtCF5APJTQjKQ==
+ b=lxcKuQHTPYMDTWg7lUSCrAi28fydKer9Ii4G5fABeknMBwms4mnpvGCQiWM+Kkpgw
+ E6d/cf/8LjwtwyAid5yw2/lc+lVVsF2mLQq0Y8PplgHAm8DHigcd8XzPkvGg3kmDfz
+ HkGH/KML3kErO/OECw9jcCjyTJfxV0TY2d7ErO1JDdS4bCxPr1AZaTG8nkS/Dx5RbK
+ RYxVBviQzvFQTkv5Bp7j5VliniLEdhan2M2ZCebrriO4gpHh+2IkGqmgBr8GMjlaRo
+ BMn8YyaOZOzLxBmY6o4+dU/XX5cA1oKo0M4DSxoF9c0ldH4J4vWINnFEuo4SMS1iND
+ wfXfeAdubhPMw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nyZ2U-00GBUI-SZ; Tue, 07 Jun 2022 14:14:30 +0100
+ id 1nyZ2V-00GBUI-AH; Tue, 07 Jun 2022 14:14:31 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
  kvm@vger.kernel.org
-Subject: [PATCH v2 1/3] KVM: arm64: Don't read a HW interrupt pending state in
- user context
-Date: Tue,  7 Jun 2022 14:14:25 +0100
-Message-Id: <20220607131427.1164881-2-maz@kernel.org>
+Subject: [PATCH v2 3/3] KVM: arm64: Warn if accessing timer pending state
+ outside of vcpu context
+Date: Tue,  7 Jun 2022 14:14:27 +0100
+Message-Id: <20220607131427.1164881-4-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220607131427.1164881-1-maz@kernel.org>
 References: <20220607131427.1164881-1-maz@kernel.org>
@@ -86,106 +86,36 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Since 5bfa685e62e9 ("KVM: arm64: vgic: Read HW interrupt pending state
-from the HW"), we're able to source the pending bit for an interrupt
-that is stored either on the physical distributor or on a device.
+A recurrent bug in the KVM/arm64 code base consists in trying to
+access the timer pending state outside of the vcpu context, which
+makes zero sense (the pending state only exists when the vcpu
+is loaded).
 
-However, this state is only available when the vcpu is loaded,
-and is not intended to be accessed from userspace. Unfortunately,
-the GICv2 emulation doesn't provide specific userspace accessors,
-and we fallback with the ones that are intended for the guest,
-with fatal consequences.
+In order to avoid more embarassing crashes and catch the offenders
+red-handed, add a warning to kvm_arch_timer_get_input_level() and
+return the state as non-pending. This avoids taking the system down,
+and still helps tracking down silly bugs.
 
-Add a new vgic_uaccess_read_pending() accessor for userspace
-to use, build on top of the existing vgic_mmio_read_pending().
-
-Reported-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Tested-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Fixes: 5bfa685e62e9 ("KVM: arm64: vgic: Read HW interrupt pending state from the HW")
 ---
- arch/arm64/kvm/vgic/vgic-mmio-v2.c |  4 ++--
- arch/arm64/kvm/vgic/vgic-mmio.c    | 19 ++++++++++++++++---
- arch/arm64/kvm/vgic/vgic-mmio.h    |  3 +++
- 3 files changed, 21 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/arch_timer.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-index 77a67e9d3d14..e070cda86e12 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-@@ -429,11 +429,11 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
- 		vgic_mmio_read_pending, vgic_mmio_write_spending,
--		NULL, vgic_uaccess_write_spending, 1,
-+		vgic_uaccess_read_pending, vgic_uaccess_write_spending, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR,
- 		vgic_mmio_read_pending, vgic_mmio_write_cpending,
--		NULL, vgic_uaccess_write_cpending, 1,
-+		vgic_uaccess_read_pending, vgic_uaccess_write_cpending, 1,
- 		VGIC_ACCESS_32bit),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
- 		vgic_mmio_read_active, vgic_mmio_write_sactive,
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
-index 49837d3a3ef5..dc8c52487e47 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio.c
-@@ -226,8 +226,9 @@ int vgic_uaccess_write_cenable(struct kvm_vcpu *vcpu,
- 	return 0;
- }
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 4e39ace073af..3b8d062e30ea 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -1230,6 +1230,9 @@ bool kvm_arch_timer_get_input_level(int vintid)
+ 	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+ 	struct arch_timer_context *timer;
  
--unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
--				     gpa_t addr, unsigned int len)
-+static unsigned long __read_pending(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len,
-+				    bool is_user)
- {
- 	u32 intid = VGIC_ADDR_TO_INTID(addr, 1);
- 	u32 value = 0;
-@@ -248,7 +249,7 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
- 						    IRQCHIP_STATE_PENDING,
- 						    &val);
- 			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
--		} else if (vgic_irq_is_mapped_level(irq)) {
-+		} else if (!is_user && vgic_irq_is_mapped_level(irq)) {
- 			val = vgic_get_phys_line_level(irq);
- 		} else {
- 			val = irq_is_pending(irq);
-@@ -263,6 +264,18 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
- 	return value;
- }
- 
-+unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
-+				     gpa_t addr, unsigned int len)
-+{
-+	return __read_pending(vcpu, addr, len, false);
-+}
++	if (WARN(!vcpu, "No vcpu context!\n"))
++		return false;
 +
-+unsigned long vgic_uaccess_read_pending(struct kvm_vcpu *vcpu,
-+					gpa_t addr, unsigned int len)
-+{
-+	return __read_pending(vcpu, addr, len, true);
-+}
-+
- static bool is_vgic_v2_sgi(struct kvm_vcpu *vcpu, struct vgic_irq *irq)
- {
- 	return (vgic_irq_is_sgi(irq->intid) &&
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio.h b/arch/arm64/kvm/vgic/vgic-mmio.h
-index 3fa696f198a3..6082d4b66d39 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio.h
-+++ b/arch/arm64/kvm/vgic/vgic-mmio.h
-@@ -149,6 +149,9 @@ int vgic_uaccess_write_cenable(struct kvm_vcpu *vcpu,
- unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
- 				     gpa_t addr, unsigned int len);
- 
-+unsigned long vgic_uaccess_read_pending(struct kvm_vcpu *vcpu,
-+					gpa_t addr, unsigned int len);
-+
- void vgic_mmio_write_spending(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val);
+ 	if (vintid == vcpu_vtimer(vcpu)->irq.irq)
+ 		timer = vcpu_vtimer(vcpu);
+ 	else if (vintid == vcpu_ptimer(vcpu)->irq.irq)
 -- 
 2.34.1
 
