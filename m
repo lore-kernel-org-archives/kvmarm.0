@@ -2,66 +2,68 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45748C43334
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Jun 2022 13:23:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5225C433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Jun 2022 13:23:33 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CADEF4B2E6;
-	Tue,  7 Jun 2022 09:23:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 37CEF4B2CC;
+	Tue,  7 Jun 2022 09:23:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YOkQg0oiVpmc; Tue,  7 Jun 2022 09:23:30 -0400 (EDT)
+	with ESMTP id 62dlsB+gNbLl; Tue,  7 Jun 2022 09:23:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82D144B303;
-	Tue,  7 Jun 2022 09:23:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A3B234B35B;
+	Tue,  7 Jun 2022 09:23:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F36044B2E6
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 09:23:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CC5CA4B32A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 09:23:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8E-FPZNciY4X for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Jun 2022 09:23:27 -0400 (EDT)
+ with ESMTP id 3J9Qxh7Fgp5R for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Jun 2022 09:23:29 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A081B4B2CC
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 09:23:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 775D94B2E6
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jun 2022 09:23:29 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id DE557B81C97;
- Tue,  7 Jun 2022 13:23:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8860BC385A5;
- Tue,  7 Jun 2022 13:23:22 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 8609CB81FE7;
+ Tue,  7 Jun 2022 13:23:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ECE6C3411E;
+ Tue,  7 Jun 2022 13:23:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1654608204;
- bh=mDDgwCEqh8ziAAvLFOM+TkEO9LiwTF1qN4IOx91PehA=;
- h=From:To:Cc:Subject:Date:From;
- b=R+KE1+Je9/lDpMQzDO7Q9NKxBQ+FODkP9EZ8yrEULAEflzDhFoGdkt956j0OuWXdy
- WAZ48/ytiTuqMdhlyBfCjlV8dyo/FQybo9GJJLN0QMuo/0A/SwdjbkNJyyGE56Yyu+
- Af3O8VuCn042lxW4Uqz/kJARP+kZu4MrCsoYM1EMiZrY/A+HQ4yiHMCZBuGA/5O4Hv
- dL4ZGxZiIwx8+GKK8MuoIaH8aC7MuV/hODR11JrvrJObUil90g24QiPfZpBZJhXqNo
- e8bgrftmeVT0BrqB6xy+YBnoLNXeffwGQlvhVxFYTpwwtB7WdUncip8RwKIQdGUxqH
- w3bmrsZ/EBr4A==
+ s=k20201202; t=1654608207;
+ bh=bimOoYjmJdhL+SLvY7hoAu88jxbXZXY/p50GfhvBwBc=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=OR8kJklB0g/UZE5wglv6VS/Ve1bl53aEl5s0RZbt9SlUyVdq5VqRTOkx49GAzC5Ae
+ suYQELGw32+YaYiPsk0+yRbjO0y2OFhnFXQ5c8FlfFD+XWnOV8QJ4z1/VuImBT52T8
+ HEAdaEILR8ii7lyBYFlkBsMUqT4/Gn+KMDALvwu68k/lfqM1ABGVGgCSY4f0ZJwV4Q
+ TDotl+cP1mxKPOcaVIX/Do4dyktbTTOoeKFKmOqx3qimSezyB8skI4e3Ux0VLkjk9j
+ YlWkKIqVgueBBbXHVY8JRlBHE8tzqWERMu+i34mCfCzNPmQ8hwfeX5AdUkV5+xN+Ac
+ uX6PEn+VOELlg==
 From: Mark Brown <broonie@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH v1 0/7] arm64/sve: Clean up KVM integration and optimise
- syscalls
-Date: Tue,  7 Jun 2022 14:17:28 +0100
-Message-Id: <20220607131735.1300726-1-broonie@kernel.org>
+Subject: [PATCH v1 1/7] KVM: arm64: Discard any SVE state when entering KVM
+ guests
+Date: Tue,  7 Jun 2022 14:17:29 +0100
+Message-Id: <20220607131735.1300726-2-broonie@kernel.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220607131735.1300726-1-broonie@kernel.org>
+References: <20220607131735.1300726-1-broonie@kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3507; h=from:subject;
- bh=mDDgwCEqh8ziAAvLFOM+TkEO9LiwTF1qN4IOx91PehA=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBin0/nHdZwQmTT2Puff1EJCTrKkDZucRYznmA1RzSB
- LEUcHByJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYp9P5wAKCRAk1otyXVSH0LQTB/
- 9fodjpRxbUobuBa0MTKdpFWs+RoVkcbiRsd8eiBfOCfrQpmriio/x09iN536SDKm+4hT2SBCE2EjZg
- UCpL65Oe4eCKREA0BX+XIUIRuErK65I04GvdZQTsj4wyqzqFafqGDJzj5FLbX1S8CL0ttBTXm+yet6
- sUq4A9M+vc1MfaDUqgwx2tI/7436msW7IuxJjJ3yzzmc/Ly/cD7lnevlpFDdm0vdRTup8wsyqRQM3/
- lxrx8Gai7KZ9ctMssEPNn/V1Lz93ykE5eILYz7j23qY2YZRKJjg2tY3uYWJxbFBWUCzK1epMjmIq0m
- eSWRhYkq+W8q6yQ19VRp0m5/bTKuOZ
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2967; h=from:subject;
+ bh=bimOoYjmJdhL+SLvY7hoAu88jxbXZXY/p50GfhvBwBc=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBin0/ooF0zvSyPHvt+ui7shY5GTeivNts42h8gAwbP
+ oNgL50+JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYp9P6AAKCRAk1otyXVSH0NCMB/
+ 0cj9JdFpf/Rszlugqy9Edfzttg5cG5uoXqlfwSQuEhPboesMlXl4OWn7vfX+f7FdrXnxjXoBrIooUU
+ o6ggDc70KnBJ+8aHO3jgtZwZd4CCDuLdAgrhs/3jr29VI1iyV/5rZfpILP6xLF1mosMA8ZQTu6qE+1
+ eK/wJBh1NjEX+zgwceHQUOfZps2d1kgHGPBtVqBuaU711++t08UN/kFhTmKMZFPiCBPFAUYf1u9NGn
+ D1ZuWTXSPfe2n7mG5xgdMsvxbcHJvVbvOcnuMYJ3BhbtsqJGCMSoCb+2hck6STBGBgmLG98LPkJBgQ
+ CJ3qJXm/bsQPj3o4QVCYpfovNVybsH
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 Cc: Marc Zyngier <maz@kernel.org>, Zhang Lei <zhang.lei@jp.fujitsu.com>,
@@ -83,71 +85,83 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This patch series attempts to clarify the tracking of which set of
-floating point registers we save on systems supporting SVE, particularly
-with reference to KVM, and then uses the results of this clarification
-to improve the performance of simple syscalls where we return directly
-to userspace in cases where userspace is using SVE.
+Since 8383741ab2e773a99 (KVM: arm64: Get rid of host SVE tracking/saving)
+KVM has not tracked the host SVE state, relying on the fact that we
+currently disable SVE whenever we perform a syscall. This may not be true
+in future since performance optimisation may result in us keeping SVE
+enabled in order to avoid needing to take access traps to reenable it.
+Handle this by clearing TIF_SVE and converting the stored task state to
+FPSIMD format when preparing to run the guest.  This is done with a new
+call fpsimd_kvm_prepare() to keep the direct state manipulation
+functions internal to fpsimd.c.
 
-At present we track which register state is active by using the TIF_SVE
-flag for the current task which also controls if userspace is able to
-use SVE, this is reasonably straightforward if limiting but for KVM it
-gets a bit hairy since we may have guest state loaded in registers. This
-results in KVM modifying TIF_SVE for the VMM task while the guest is
-running which doesn't entirely help make things easy to follow. To help
-make things clearer the series changes things so that in addition to
-TIF_SVE we explicitly track both the type of registers that are
-currently saved in the task struct and the type of registers that we
-should save when we do so. TIF_SVE then solely controls if userspace
-can use SVE without trapping, it has no function for KVM guests and we
-can remove the code for managing it from KVM.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+ arch/arm64/include/asm/fpsimd.h |  1 +
+ arch/arm64/kernel/fpsimd.c      | 23 +++++++++++++++++++++++
+ arch/arm64/kvm/fpsimd.c         |  3 ++-
+ 3 files changed, 26 insertions(+), 1 deletion(-)
 
-The refactoring to add the separate tracking is initially done by adding
-the new state together with checks that the state corresponds to
-expectations when we look at it before subsequent patches make use of
-the separated state, the goal being to both split out the more repetitive
-bits of tha change and make it easier to debug any problems that might
-arise.
-
-With the state tracked separately we then start to optimise the
-performance of syscalls when the process is using SVE. Currently every
-syscall disables SVE for userspace which means that we need to trap to
-EL1 again on the next SVE instruction, flush the SVE registers, and
-reenable SVE for EL0, creating overhead for tasks that mix SVE and
-syscalls. We build on the above refactoring to eliminate this overhead
-for simple syscalls which return directly to userspace by:
-
- - Keeping SVE enabled.
- - Not flushing the SVE state.
-
-The removal of flushing is within our currently documented ABI but is a
-change in our effective ABI so a sysctl is provided to revert to current
-behaviour in case of problems or to allow testing of userspace.  If we
-don't want to do this I think we should tighten our ABI documentation,
-previously Catalin had indicated that he didn't want to tighten it.
-
-Mark Brown (7):
-  KVM: arm64: Discard any SVE state when entering KVM guests
-  arm64/fpsimd: Track the saved FPSIMD state type separately to TIF_SVE
-  arm64/fpsimd: Have KVM explicitly say which FP registers to save
-  arm64/fpsimd: Stop using TIF_SVE to manage register saving in KVM
-  arm64/fpsimd: Load FP state based on recorded data type
-  arm64/sve: Leave SVE enabled on syscall if we don't context switch
-  arm64/sve: Don't zero non-FPSIMD register state on syscall by default
-
- arch/arm64/include/asm/fpsimd.h    |   4 +-
- arch/arm64/include/asm/kvm_host.h  |   1 +
- arch/arm64/include/asm/processor.h |   7 ++
- arch/arm64/kernel/fpsimd.c         | 136 +++++++++++++++++++++++------
- arch/arm64/kernel/process.c        |   2 +
- arch/arm64/kernel/ptrace.c         |   6 +-
- arch/arm64/kernel/signal.c         |   3 +
- arch/arm64/kernel/syscall.c        |  53 ++++++++---
- arch/arm64/kvm/fpsimd.c            |  16 ++--
- 9 files changed, 180 insertions(+), 48 deletions(-)
-
-
-base-commit: f2906aa863381afb0015a9eb7fefad885d4e5a56
+diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+index 9bb1873f5295..847fd119cdb8 100644
+--- a/arch/arm64/include/asm/fpsimd.h
++++ b/arch/arm64/include/asm/fpsimd.h
+@@ -56,6 +56,7 @@ extern void fpsimd_signal_preserve_current_state(void);
+ extern void fpsimd_preserve_current_state(void);
+ extern void fpsimd_restore_current_state(void);
+ extern void fpsimd_update_current_state(struct user_fpsimd_state const *state);
++extern void fpsimd_kvm_prepare(void);
+ 
+ extern void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *state,
+ 				     void *sve_state, unsigned int sve_vl,
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index 819979398127..3399ebf86b8e 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -1637,6 +1637,29 @@ void fpsimd_signal_preserve_current_state(void)
+ 		sve_to_fpsimd(current);
+ }
+ 
++/*
++ * Called by KVM when entering the guest.
++ */
++void fpsimd_kvm_prepare(void)
++{
++	if (!system_supports_sve())
++		return;
++
++	/*
++	 * KVM does not save host SVE state since we can only enter
++	 * the guest from a syscall so the ABI means that only the
++	 * non-saved SVE state needs to be saved.  If we have left
++	 * SVE enabled for performance reasons then update the task
++	 * state to be FPSIMD only.
++	 */
++	get_cpu_fpsimd_context();
++
++	if (test_and_clear_thread_flag(TIF_SVE))
++		sve_to_fpsimd(current);
++
++	put_cpu_fpsimd_context();
++}
++
+ /*
+  * Associate current's FPSIMD context with this cpu
+  * The caller must have ownership of the cpu FPSIMD context before calling
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index 3d251a4d2cf7..64b37f4b862f 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -75,7 +75,8 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
+ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+ {
+ 	BUG_ON(!current->mm);
+-	BUG_ON(test_thread_flag(TIF_SVE));
++
++	fpsimd_kvm_prepare();
+ 
+ 	vcpu->arch.flags &= ~KVM_ARM64_FP_ENABLED;
+ 	vcpu->arch.flags |= KVM_ARM64_FP_HOST;
 -- 
 2.30.2
 
