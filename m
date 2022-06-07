@@ -2,86 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6766FC43334
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96328CCA47F
 	for <kvmarm@archiver.kernel.org>; Tue,  7 Jun 2022 11:12:52 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 206604B353;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E4534B355;
 	Tue,  7 Jun 2022 07:12:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9nj0BrdYJSWC; Tue,  7 Jun 2022 07:12:48 -0400 (EDT)
+	with ESMTP id XFmpODk6lnC1; Tue,  7 Jun 2022 07:12:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06B2D4B311;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DA164B320;
 	Tue,  7 Jun 2022 07:12:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 94D8149ECC
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jun 2022 18:21:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB17949E5F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jun 2022 20:20:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KcRhFzLSVBPf for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Jun 2022 18:21:13 -0400 (EDT)
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
- [209.85.214.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 65FC749EF3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jun 2022 18:21:13 -0400 (EDT)
-Received: by mail-pl1-f202.google.com with SMTP id
- o16-20020a170902d4d000b00166d7813226so5565101plg.13
- for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Jun 2022 15:21:13 -0700 (PDT)
+ with ESMTP id No691x2sI6AW for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jun 2022 20:20:52 -0400 (EDT)
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com
+ [209.85.221.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A710411BD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jun 2022 20:20:52 -0400 (EDT)
+Received: by mail-wr1-f48.google.com with SMTP id u3so21901475wrg.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Jun 2022 17:20:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=kdA0hdnNlf5Ah+Sdfhrh5/pyHUvKpC5h3K4X0vH9N64=;
- b=Jy0Nvp6l/SeDINdaapKCgsH604PDzAKJu+q61zsdbqS0WgfTf6DKA9ui8w9NOeKXLB
- zV3rFx+mWBMFRAgLdnWnjF2l6fpisaOBqhX3AirSHdup3DSyot579H9rHLD+o6fbmQRk
- FaJKa3uBvvWb/ywHl+G68ob0ojkfCd4KvuSoq0n86mSq7L/FcuboeRh8rpDp78eY8qcZ
- n6nIYlYmcBUcV7QgzCTmqorAtcvEHjNETFQ+4fEEAn2BTJknB6ddaSu7THbAsyUBl7f8
- BE7FECym3Mw5OpxGAbMCVb195W/C84+VufxOQUotNgydoUbVy0Ws+K0ug9KPgynMKrtc
- 1W+g==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=DMGzLGJzBT5T5b9r1J4zZuri0cLPViU0feoULeNGdLY=;
+ b=oKDGVKm9F8zo/W+3dYhfwstlQfxZhRht93GrC1XCeJloml8fDQgLoynuKZfjGe+tse
+ mrQEuAvRAuXVFbvfjbfFXwPCREHvKyfDEsXPxcRDaSIUyEc/5ks90/LxV9p/1f7vTLXN
+ 0qTOOaWD1SVMuLZAYzZbMSjLGylotunMJTEBR82Kzn5QxTi/DkBJ/kuxW5xnOKo295Bf
+ iQ0wGcNuyYi/KtFbmVLnKNyC+hbDsaG5+1Xdp61+UQD43pSFREdTcC9V6mUoooaEuxyo
+ hUx53uwhPBcoBIsK6PEmzc9pxijDzb6xC9qR4cNUsNoV9GtRlKG59ybKoCqgfFyRgPob
+ 6ETg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=kdA0hdnNlf5Ah+Sdfhrh5/pyHUvKpC5h3K4X0vH9N64=;
- b=OnkCR9n9Dqdw3SiHtuUCP7CTi0uPVOlez+kGyVKOrNnN6R04utDq/kGZsQGe/F1F5s
- 1P+j0dLaN20WnGilrN6Ac4sgbz4xGIdUhoDe7IoCqHQ2jbBFxkZQzkiWrCwebaJv0xEt
- AQPapNJdJVgdNWFeXegL5wDlB7BzTI5WfFOF0ElyTq1puEvzSqJ72r1DQ34vyfsvgQOH
- UpIs5RpCoz9Qqji35I1qzd2AiQEzinkJUAuQXsG6zWuGiEAzEuV394MMWezo9GGqF1e4
- cAG5UCsLx11OwRfHpGjQa02+CSiDk2M9Xx3yUw4Fk6AesZqZKh1EWUiXaV4rn+kzeske
- d1Iw==
-X-Gm-Message-State: AOAM531pNp1PG0r0Q2kc55ty0GPRPMeuyGyhwzVkTE2y0ueJKONc7Ivo
- fuqP7bKLyaPgX3OUqhnH2t0PTZccmMKD4Vok
-X-Google-Smtp-Source: ABdhPJy/F+KWMgHvnxrFnjnNsWZmlcg4trdZU2aFBDmcWxfCaapFDM+3Zf8+GdGQEkdAdISq1qm0RKV9vDvadP+C
-X-Received: from yosry.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2327])
- (user=yosryahmed job=sendgmr) by 2002:a63:dd17:0:b0:3fd:695e:8728
- with SMTP
- id t23-20020a63dd17000000b003fd695e8728mr11359137pgg.70.1654554072536; Mon,
- 06 Jun 2022 15:21:12 -0700 (PDT)
-Date: Mon,  6 Jun 2022 22:20:57 +0000
-In-Reply-To: <20220606222058.86688-1-yosryahmed@google.com>
-Message-Id: <20220606222058.86688-4-yosryahmed@google.com>
-Mime-Version: 1.0
-References: <20220606222058.86688-1-yosryahmed@google.com>
-X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v5 3/4] KVM: x86/mmu: count KVM mmu usage in secondary
- pagetable stats.
-From: Yosry Ahmed <yosryahmed@google.com>
-To: Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
- Zefan Li <lizefan.x@bytedance.com>, Marc Zyngier <maz@kernel.org>, 
- James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Wanpeng Li <wanpengli@tencent.com>, Jim Mattson <jmattson@google.com>, 
- Joerg Roedel <joro@8bytes.org>, Andrew Morton <akpm@linux-foundation.org>, 
- Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
- Shakeel Butt <shakeelb@google.com>, Oliver Upton <oupton@google.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=DMGzLGJzBT5T5b9r1J4zZuri0cLPViU0feoULeNGdLY=;
+ b=ZsfYIrG5pn/t8yQX+eF6QvGn9HiEexDSihLafc36urILxLDn0vXXbkBOIUF67XjX0K
+ nnNO6TZ/0pcJODOydhvCY5FZEO5dN2s2Tc9vcbF3MSvBgCa9KU1j0bxMX0EcUah235d0
+ imk3fHLOicLvQCPjZAVidvAIJalrAvnIJNiNcyCsKVUlGOIdWOuI3uEfonknCPT8XafF
+ +zUy0tSxpgFCRLW0bgBAY2hiweQMaX2a81fa3O1he+YaZURrYgYux9VtKimXnNshOMZ6
+ V2oP+9ldgtBTfrclaRqU9YBt0jDI+7hmaDBrQ4VRhYkChm/UmmXtSS38qAfzxrWhfjPK
+ WYvg==
+X-Gm-Message-State: AOAM532n8Blu+c2bmlp7BZJckSpQvMrQA2Op5NqylL3PYblUIxHcDvA3
+ iyoUdtXlh3sHxNZjNo4OCuYHtAkv9P8kqBuQa6Ef3w==
+X-Google-Smtp-Source: ABdhPJx+8X8hTzr3xVfvuroF0RVItmgqlm+YewhrD+ZiGchKPEilEhhxIlhTvdnxLo0na+sWqpTBG04Oqv1fgRtR+aY=
+X-Received: by 2002:a5d:4b10:0:b0:213:5e0:2c6c with SMTP id
+ v16-20020a5d4b10000000b0021305e02c6cmr23716926wrq.126.1654561250805; Mon, 06
+ Jun 2022 17:20:50 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220519134204.5379-1-will@kernel.org>
+ <20220519134204.5379-60-will@kernel.org>
+ <CAMn1gO4_d75_88fg5hcnBqx+tdu-9pG7atzt-qUD1nhUNs5TyQ@mail.gmail.com>
+ <CA+EHjTx328na4FDfKU-cdLX+SV4MmKfMKKrTHo5H0=iB2GTQ+A@mail.gmail.com>
+ <Ypl5TdMN3J/tttNe@google.com> <87v8tgltqy.wl-maz@kernel.org>
+In-Reply-To: <87v8tgltqy.wl-maz@kernel.org>
+From: Peter Collingbourne <pcc@google.com>
+Date: Mon, 6 Jun 2022 17:20:39 -0700
+Message-ID: <CAMn1gO7mP_QTb+fkfvc6qQoN0aU6TwkExU-Wj+VR6rjBsmhs1g@mail.gmail.com>
+Subject: Re: [PATCH 59/89] KVM: arm64: Do not support MTE for protected VMs
+To: Marc Zyngier <maz@kernel.org>
 X-Mailman-Approved-At: Tue, 07 Jun 2022 07:12:43 -0400
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Yosry Ahmed <yosryahmed@google.com>, linux-mm@kvack.org,
- cgroups@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ Michael Roth <michael.roth@amd.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, Andy Lutomirski <luto@amacapital.net>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,95 +90,166 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Count the pages used by KVM mmu on x86 for in secondary pagetable stats.
+On Sat, Jun 4, 2022 at 1:26 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Fri, 03 Jun 2022 04:00:29 +0100,
+> Peter Collingbourne <pcc@google.com> wrote:
+> >
+> > Hi Fuad,
+> >
+> > On Fri, May 27, 2022 at 08:55:42AM +0100, Fuad Tabba wrote:
+> > > Hi Peter,
+> > >
+> > > On Thu, May 26, 2022 at 9:08 PM Peter Collingbourne <pcc@google.com> wrote:
+> > > >
+> > > > On Thu, May 19, 2022 at 7:40 AM Will Deacon <will@kernel.org> wrote:
+> > > > >
+> > > > > From: Fuad Tabba <tabba@google.com>
+> > > > >
+> > > > > Return an error (-EINVAL) if trying to enable MTE on a protected
+> > > > > vm.
+> > > >
+> > > > I think this commit message needs more explanation as to why MTE is
+> > > > not currently supported in protected VMs.
+> > >
+> > > Yes, we need to explain this more. Basically this is an extension of
+> > > restricting features for protected VMs done earlier [*].
+> > >
+> > > Various VM feature configurations are allowed in KVM/arm64, each requiring
+> > > specific handling logic to deal with traps, context-switching and potentially
+> > > emulation. Achieving feature parity in pKVM therefore requires either elevating
+> > > this logic to EL2 (and substantially increasing the TCB) or continuing to trust
+> > > the host handlers at EL1. Since neither of these options are especially
+> > > appealing, pKVM instead limits the CPU features exposed to a guest to a fixed
+> > > configuration based on the underlying hardware and which can mostly be provided
+> > > straightforwardly by EL2.
+> > >
+> > > This of course can change in the future and we can support more
+> > > features for protected VMs as needed. We'll expand on this commit
+> > > message when we respin.
+> > >
+> > > Also note that this only applies to protected VMs. Non-protected VMs
+> > > in protected mode support MTE.
+> >
+> > I see. In this case unless I'm missing something the EL2 side seems
+> > quite trivial though (flipping some bits in HCR_EL2). The patch below
+> > (in place of this one) seems to make MTE work in my test environment
+> > (patched [1] crosvm on Android in MTE-enabled QEMU).
+> >
+> > [1] https://chromium-review.googlesource.com/c/chromiumos/platform/crosvm/+/3689015
+> >
+> > From c87965cd14515586d487872486e7670874209113 Mon Sep 17 00:00:00 2001
+> > From: Peter Collingbourne <pcc@google.com>
+> > Date: Thu, 2 Jun 2022 19:16:02 -0700
+> > Subject: [PATCH] arm64: support MTE in protected VMs
+> >
+> > Enable HCR_EL2.ATA while running a vCPU with MTE enabled.
+> >
+> > To avoid exposing MTE tags from the host to protected VMs, sanitize
+> > tags before donating pages.
+> >
+> > Signed-off-by: Peter Collingbourne <pcc@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_pkvm.h | 4 +++-
+> >  arch/arm64/kvm/hyp/nvhe/pkvm.c    | 6 +++---
+> >  arch/arm64/kvm/mmu.c              | 4 +++-
+> >  3 files changed, 9 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> > index 952e3c3fa32d..9ca9296f2a25 100644
+> > --- a/arch/arm64/include/asm/kvm_pkvm.h
+> > +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> > @@ -73,10 +73,12 @@ void kvm_shadow_destroy(struct kvm *kvm);
+> >   * Allow for protected VMs:
+> >   * - Branch Target Identification
+> >   * - Speculative Store Bypassing
+> > + * - Memory Tagging Extension
+> >   */
+> >  #define PVM_ID_AA64PFR1_ALLOW (\
+> >       ARM64_FEATURE_MASK(ID_AA64PFR1_BT) | \
+> > -     ARM64_FEATURE_MASK(ID_AA64PFR1_SSBS) \
+> > +     ARM64_FEATURE_MASK(ID_AA64PFR1_SSBS) | \
+> > +     ARM64_FEATURE_MASK(ID_AA64PFR1_MTE) \
+> >       )
+> >
+> >  /*
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > index e33ba9067d7b..46ddd9093ac7 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > @@ -88,7 +88,7 @@ static void pvm_init_traps_aa64pfr1(struct kvm_vcpu *vcpu)
+> >       /* Memory Tagging: Trap and Treat as Untagged if not supported. */
+> >       if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_MTE), feature_ids)) {
+> >               hcr_set |= HCR_TID5;
+> > -             hcr_clear |= HCR_DCT | HCR_ATA;
+> > +             hcr_clear |= HCR_ATA;
+> >       }
+> >
+> >       vcpu->arch.hcr_el2 |= hcr_set;
+> > @@ -179,8 +179,8 @@ static void pvm_init_trap_regs(struct kvm_vcpu *vcpu)
+> >        * - Feature id registers: to control features exposed to guests
+> >        * - Implementation-defined features
+> >        */
+> > -     vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS |
+> > -                          HCR_TID3 | HCR_TACR | HCR_TIDCP | HCR_TID1;
+> > +     vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS | HCR_TID3 | HCR_TACR | HCR_TIDCP |
+> > +                          HCR_TID1 | HCR_ATA;
+> >
+> >       if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
+> >               /* route synchronous external abort exceptions to EL2 */
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 392ff7b2362d..f513852357f7 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1206,8 +1206,10 @@ static int pkvm_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >               goto dec_account;
+> >       }
+> >
+> > -     write_lock(&kvm->mmu_lock);
+> >       pfn = page_to_pfn(page);
+> > +     sanitise_mte_tags(kvm, pfn, PAGE_SIZE);
+> > +
+> > +     write_lock(&kvm->mmu_lock);
+>
+> Is it really safe to rely on the host to clear the tags? My guts
+> feeling says that it isn't. If it is required, we cannot leave this
+> responsibility to the host, and this logic must be moved to EL2. And
+> if it isn't, then we should drop it.
 
-Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
----
- arch/x86/kvm/mmu/mmu.c     | 16 ++++++++++++++--
- arch/x86/kvm/mmu/tdp_mmu.c | 12 ++++++++++++
- 2 files changed, 26 insertions(+), 2 deletions(-)
+The goal here isn't to protect the guest. It's already the case that
+whatever the page contents are when the page is donated (from the
+perspective of the KVM client), that's what the guest sees. That
+applies to both data and (in non-protected VMs) tags.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index efe5a3dca1e09..4090d228e1756 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1652,6 +1652,18 @@ static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, long nr)
- 	percpu_counter_add(&kvm_total_used_mmu_pages, nr);
- }
- 
-+static void kvm_account_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
-+{
-+	kvm_mod_used_mmu_pages(kvm, +1);
-+	kvm_account_pgtable_pages((void *)sp->spt, +1);
-+}
-+
-+static void kvm_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
-+{
-+	kvm_mod_used_mmu_pages(kvm, -1);
-+	kvm_account_pgtable_pages((void *)sp->spt, -1);
-+}
-+
- static void kvm_mmu_free_page(struct kvm_mmu_page *sp)
- {
- 	MMU_WARN_ON(!is_empty_shadow_page(sp->spt));
-@@ -1707,7 +1719,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct
- 	 */
- 	sp->mmu_valid_gen = vcpu->kvm->arch.mmu_valid_gen;
- 	list_add(&sp->link, &vcpu->kvm->arch.active_mmu_pages);
--	kvm_mod_used_mmu_pages(vcpu->kvm, +1);
-+	kvm_account_mmu_page(vcpu->kvm, sp);
- 	return sp;
- }
- 
-@@ -2336,7 +2348,7 @@ static bool __kvm_mmu_prepare_zap_page(struct kvm *kvm,
- 			list_add(&sp->link, invalid_list);
- 		else
- 			list_move(&sp->link, invalid_list);
--		kvm_mod_used_mmu_pages(kvm, -1);
-+		kvm_unaccount_mmu_page(kvm, sp);
- 	} else {
- 		/*
- 		 * Remove the active root from the active page list, the root
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 841feaa48be5e..0b70d1a1a3534 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -372,6 +372,16 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
- 	}
- }
- 
-+static void tdp_account_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
-+{
-+	kvm_account_pgtable_pages((void *)sp->spt, +1);
-+}
-+
-+static void tdp_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
-+{
-+	kvm_account_pgtable_pages((void *)sp->spt, -1);
-+}
-+
- /**
-  * tdp_mmu_unlink_sp() - Remove a shadow page from the list of used pages
-  *
-@@ -384,6 +394,7 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
- static void tdp_mmu_unlink_sp(struct kvm *kvm, struct kvm_mmu_page *sp,
- 			      bool shared)
- {
-+	tdp_unaccount_mmu_page(kvm, sp);
- 	if (shared)
- 		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
- 	else
-@@ -1146,6 +1157,7 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
- 	if (account_nx)
- 		account_huge_nx_page(kvm, sp);
- 	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-+	tdp_account_mmu_page(kvm, sp);
- 
- 	return 0;
- }
--- 
-2.36.1.255.ge46751e96f-goog
+The code that I added here is for solving a different problem, which
+is to avoid exposing stale host state to the guest, which the KVM
+client may not even be aware of. We sanitize pages before exposing
+them in non-protected VMs for the same reason.
 
+> >       ret = pkvm_host_map_guest(pfn, fault_ipa >> PAGE_SHIFT);
+> >       if (ret) {
+> >               if (ret == -EAGAIN)
+>
+> But the bigger picture here is what ensures that the host cannot mess
+> with the guest tags? I don't think we have a any mechanism to
+> guarantee that, specially on systems where the tags are only a memory
+> carve-out, which the host could map and change at will.
+
+Right, I forgot about that. We probably only want to expose MTE to
+guests if we have some indication (through the device tree or ACPI) of
+how to protect the guest tag storage.
+
+> In any case, this isn't the time to pile new features on top of
+> pKVM. The current plan is to not support MTE at all, and only do it
+> once we have a definitive story on page donation (which as you may
+> have noticed, is pretty hacky). I don't see any compelling reason to
+> add MTE to the mix until this is solved.
+
+It sounds reasonable to land a basic set of features to begin with and
+add MTE later. I'll develop my MTE-in-pKVM patch series as a followup
+on top of this series.
+
+Peter
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
