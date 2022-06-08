@@ -2,71 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69485C43334
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jun 2022 17:22:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B387C43334
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jun 2022 17:53:09 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D03324B1EC;
-	Wed,  8 Jun 2022 13:22:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A03E64B2A0;
+	Wed,  8 Jun 2022 13:53:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yxSVrf9fp+Vo; Wed,  8 Jun 2022 13:22:32 -0400 (EDT)
+	with ESMTP id ftfiL7boxF98; Wed,  8 Jun 2022 13:53:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90A784B204;
-	Wed,  8 Jun 2022 13:22:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 66DD94B20D;
+	Wed,  8 Jun 2022 13:53:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC6D64B204
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 13:22:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 13C674B20A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 13:53:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id flJFg-hw2Yyk for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jun 2022 13:22:29 -0400 (EDT)
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com
- [209.85.221.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7EF974B1EC
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 13:22:29 -0400 (EDT)
-Received: by mail-wr1-f50.google.com with SMTP id p10so29223769wrg.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Jun 2022 10:22:29 -0700 (PDT)
+ with ESMTP id 8LdwWlP7NSvb for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jun 2022 13:53:05 -0400 (EDT)
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com
+ [209.85.128.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B25F74B204
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 13:53:05 -0400 (EDT)
+Received: by mail-wm1-f46.google.com with SMTP id z9so4516961wmf.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Jun 2022 10:53:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=B+RipUWYNMLeY/oYRMhKJcIyF3eyXnDrThQxLnJtJ/4=;
- b=VbuiN8M4rPEtCsxfAOKq6djZLBP8Z09jLiB5E+50UbeLe1DyRPL04iCxdpUXPFmf4O
- tO2C+3zK3zva4OByvkV7cFUQpVlJNHtXs6cFLVxxp0eQpK5jOg3g1ErYQfw3d/kn1siM
- JqzuOE8Y2Fe0PpMZmKNjqwBN/78WtJ3TzqUBvUvenOup0z3ZN/9kF4Y9ufmY+m+3iLHz
- 4XaGXS6i/2APuVBwkkbgPZH/FaP7oFy0L5wyFaZ20qMPI8O6W5L8wfckA/Cqv9hzlUZv
- 3HRPKHWX7UIAR4D3mQ3fbcyMPfrrg9lPA2e6WWpxYkTGkOXcuRlGBpCS8hlyhhNdXY7b
- +W9w==
+ :cc; bh=YI9Mc2y8PFJNJ6+277vO+Lm0SzBPppWh2ZCOqdRyG6U=;
+ b=T6/f1qoAHYT15Hdc059V8LrdJ4GLuSvSfJhPDPXC+CHKqgTSOEQjMe4N5wpirC9FtU
+ RM1ZClrDDtGGUlsCUAvtRIHYu9T+qgfZPKRBdo1OkSLN/NVYr5H+xiWvptYKDx6wqeny
+ 98WMYiqOFUzT7s9uim5WWfH7PaQ5W60nWnLtQu1OSsqgNpTO7ud2I//C7+LUHkz58v62
+ rsQ/j9znMPtuROLFr+FjZXc0UwWxNvrenPI2c7c0cAxxB5dJ7AiY12fFjqgLSjIZ0nPl
+ 3nYmv2UftqPeTJRZ2lCEraPv7280jJJyl1DnnOuSEjLXO4M22RgXjayoWXjoMjFvWeBv
+ rQ8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=B+RipUWYNMLeY/oYRMhKJcIyF3eyXnDrThQxLnJtJ/4=;
- b=28S2Uq5S43AGQRODMK1ewl1oiNNEB2lzZUvKa9gC217Kmi62bkTXNNBpYgLFIAmWug
- XBERw+2kG1nxxeCBYKg5NCMucjLXzaUZ7vd7iE5hjVHMPGkZG8hqKO7e7I0SWDaUQljb
- yfjI9fkAmXoeRlPFPa+zY6O4HTUh/7tV1yASLzLE5ngDxC6QxRrKU23yb2GIoAoYqXSs
- rY5xk7JrlOG9K3ox52ta1dGcIrymKCRKnVyS2B0G+K6UIojH0NmsHsJNN9HmJe6JAPhg
- SChbzjsjQ+vi8UhlmE1UIMjTTXBiKFlRN+iJ3wEiAom+CVyTvb1IXEQpI9SKG+TRG+EC
- toIw==
-X-Gm-Message-State: AOAM532LqNwvu70GhmILQSBWfmkGgIXM1sqa8ayxKnHT2JRH4AhSPRoD
- wI+0Vfz7EngWYOxmGowbtPzxLHMmEHNue3ydgXm0Vg==
-X-Google-Smtp-Source: ABdhPJzj7HbZLSivmEF68CKctXVCcbUidRcUXxew7OVgd/Q1ovBW9vLIR0DdV0vVzQluBSNqGW6kjayJZlmVfOiV0cY=
-X-Received: by 2002:a05:6000:18a9:b0:218:7791:a9ad with SMTP id
- b9-20020a05600018a900b002187791a9admr3373050wri.116.1654708948112; Wed, 08
- Jun 2022 10:22:28 -0700 (PDT)
+ bh=YI9Mc2y8PFJNJ6+277vO+Lm0SzBPppWh2ZCOqdRyG6U=;
+ b=CiBTy9pX1Eckc3/4LImZeyjwxPlg1A7ym/kd6fkt1iJHXRCbV02LS+a9ffqpj8HDwm
+ vxN098cBRc3rCPPWrsUZ7TraOSyGjPGjMefa0EWZlNnOs2y8DoCV0jyFESBC/RjKmRMD
+ nikszBls2mWx41Zc2xlby2SFx3Ezrmtg7eQCl3+Ad8j7N7FlyTatcAxy8d4LFt5jVODn
+ OhJUm9ZYUDKzgQVnRNn6+YmsjMzYVmTM8DBh4+shXsWdbPmzWe+YA2dEt0aq6wJrzhFh
+ tVbxLaBJsyDkykidyZt4G5TA7LsmJAiU8bK09Yi6tbuAmTQ1n+DMI9pizKN/qQrkGz18
+ Y9/g==
+X-Gm-Message-State: AOAM532Y1X3swCY8L4J1KO3yz/sKdSw4kHh2+IXCABtAZr5G6WYHtDDk
+ edjvf8pALOjQIVJs7NOUjZ5IHTF26JnRS5NaD6L1Pg==
+X-Google-Smtp-Source: ABdhPJxtB5s3HTyhMQ+95dATyPUIRZjpYXUhC4AvkAPE7C5j7bf9s29ofjL8I/77hpbnAS2cfihV8ammb75j3F8npfU=
+X-Received: by 2002:a1c:7901:0:b0:39c:4252:d7f1 with SMTP id
+ l1-20020a1c7901000000b0039c4252d7f1mr380895wme.178.1654710784341; Wed, 08 Jun
+ 2022 10:53:04 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220607165105.639716-1-kaleshsingh@google.com>
- <20220607165105.639716-3-kaleshsingh@google.com>
- <87leu7zk11.wl-maz@kernel.org>
-In-Reply-To: <87leu7zk11.wl-maz@kernel.org>
+ <20220607165105.639716-4-kaleshsingh@google.com>
+ <87k09rzk0o.wl-maz@kernel.org>
+In-Reply-To: <87k09rzk0o.wl-maz@kernel.org>
 From: Kalesh Singh <kaleshsingh@google.com>
-Date: Wed, 8 Jun 2022 10:22:16 -0700
-Message-ID: <CAC_TJvetC5ZEee_x1nUf0ZJRk-eTAzJj4A4o+MOzZLS0tDGVCQ@mail.gmail.com>
-Subject: Re: [PATCH v3 2/5] KVM: arm64: Compile stacktrace.nvhe.o
+Date: Wed, 8 Jun 2022 10:52:53 -0700
+Message-ID: <CAC_TJvdCuGNEJC4M+bV6o48CSJRs_4GEUb3iiP_4ro79q=KesA@mail.gmail.com>
+Subject: Re: [PATCH v3 3/5] KVM: arm64: Add hypervisor overflow stack
 To: Marc Zyngier <maz@kernel.org>
 Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
+ Peter Zijlstra <peterz@infradead.org>,
  Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
  Will Deacon <will@kernel.org>, Suren Baghdasaryan <surenb@google.com>,
  kvmarm <kvmarm@lists.cs.columbia.edu>,
@@ -92,105 +93,84 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jun 8, 2022 at 12:33 AM Marc Zyngier <maz@kernel.org> wrote:
+On Wed, Jun 8, 2022 at 12:34 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> On Tue, 07 Jun 2022 17:50:44 +0100,
+> On Tue, 07 Jun 2022 17:50:45 +0100,
 > Kalesh Singh <kaleshsingh@google.com> wrote:
 > >
-> > Recompile stack unwinding code for use with the nVHE hypervisor. This is
-> > a preparatory patch that will allow reusing most of the kernel unwinding
-> > logic in the nVHE hypervisor.
+> > Allocate and switch to 16-byte aligned secondary stack on overflow. This
+> > provides us stack space to better handle overflows; and is used in
+> > a subsequent patch to dump the hypervisor stacktrace.
 > >
-> > Suggested-by: Mark Rutland <mark.rutland@arm.com>
 > > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
-> > Reviewed-by: Mark Brown <broonie@kernel.org>
 > > ---
+> >  arch/arm64/kernel/stacktrace.c | 3 +++
+> >  arch/arm64/kvm/hyp/nvhe/host.S | 9 ++-------
+> >  2 files changed, 5 insertions(+), 7 deletions(-)
 > >
-> > Changes in v3:
-> >   - Add Mark's Reviewed-by tag
+> > diff --git a/arch/arm64/kernel/stacktrace.c b/arch/arm64/kernel/stacktrace.c
+> > index a84e38d41d38..f346b4c66f1c 100644
+> > --- a/arch/arm64/kernel/stacktrace.c
+> > +++ b/arch/arm64/kernel/stacktrace.c
+> > @@ -242,4 +242,7 @@ noinline notrace void arch_stack_walk(stack_trace_consume_fn consume_entry,
 > >
-> > Changes in v2:
-> >   - Split out refactoring of common unwinding logic into a separate patch,
-> >     per Mark Brown
-> >
-> >  arch/arm64/include/asm/stacktrace.h | 18 +++++++++-----
-> >  arch/arm64/kernel/stacktrace.c      | 37 ++++++++++++++++-------------
-> >  arch/arm64/kvm/hyp/nvhe/Makefile    |  3 ++-
-> >  3 files changed, 35 insertions(+), 23 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/stacktrace.h b/arch/arm64/include/asm/stacktrace.h
-> > index aec9315bf156..f5af9a94c5a6 100644
-> > --- a/arch/arm64/include/asm/stacktrace.h
-> > +++ b/arch/arm64/include/asm/stacktrace.h
-> > @@ -16,12 +16,14 @@
-> >  #include <asm/sdei.h>
-> >
-> >  enum stack_type {
-> > -     STACK_TYPE_UNKNOWN,
-> > +#ifndef __KVM_NVHE_HYPERVISOR__
-> >       STACK_TYPE_TASK,
-> >       STACK_TYPE_IRQ,
-> >       STACK_TYPE_OVERFLOW,
-> >       STACK_TYPE_SDEI_NORMAL,
-> >       STACK_TYPE_SDEI_CRITICAL,
-> > +#endif /* !__KVM_NVHE_HYPERVISOR__ */
-> > +     STACK_TYPE_UNKNOWN,
+> >       unwind(task, &state, consume_entry, cookie);
+> >  }
+> > +#else /* __KVM_NVHE_HYPERVISOR__ */
+> > +DEFINE_PER_CPU(unsigned long [PAGE_SIZE/sizeof(long)], overflow_stack)
+> > +     __aligned(16);
 >
-> What is the reason for this reordering? I have the sinking feeling
-> that this could play badly with the logic that assumes that it is
-> legal to switch from a lesser stack type to a higher one, and could
-> allow switching to a duff stack.
+> Does this need to be a whole page? With 64kB pages, this is
+> potentially a lot of memory for something that will hardly ever be
+> used. The rest of the kernel limits this to 4kB, which seems more
+> reasonable. There is no guard page anyway, so PAGE_SIZE doesn't
+> provide any extra protection.
 
-HI Marc. Thanks for reviewing.
+My oversight on the !4kB page sizes. I think this could be as small as:
 
-I only reordered the enum to group the common types. But I don't have
-a strong opinion on it. The unwinding doesn't depend on the ordering
-in this enum. When we transition form stack 'A'-->'B', we set the
-stack_done bit for stack A so that we never transition back to 'A', as
-it's not valid to transition back to a previous stack. But the order
-of the sequence itself is not something enforced.
+    (STACK_SIZE - 1) / 2 + sizeof(long)
 
->
-> I would at least like to see a justification of why this isn't less
-> safe than the current code.
->
-> [...]
->
-> > index f9fe4dc21b1f..c0ff0d6fc403 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> > +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> > @@ -14,7 +14,8 @@ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
-> >
-> >  obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
-> >        hyp-main.o hyp-smp.o psci-relay.o early_alloc.o page_alloc.o \
-> > -      cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o
-> > +      cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o \
-> > +      ../../../kernel/stacktrace.o
->
-> This, I positively hate. It is only a marginally better than the
-> cross-arch references we used to have with arch/arm/kvm. I'd be much
-> more happy with an include file containing the shared code. It would
-> also allow the removal of some of the #ifdeferry. Note that this is
-> the approach that we ended up adopting for the VHE/nVHE split.
->
+         '/ 2'                        : Min frame size (x29, x30)
+         '+ sizeof(long)'      : To round up
 
-Also thought about moving stuff to some header file, but I thought
-this might be less intrusive. Let me prototype to see how they
-compare.
+since we only save the one address (PC) for each frame. WDYT?
 
 Thanks,
 Kalesh
 
+>
+> >  #endif /* !__KVM_NVHE_HYPERVISOR__ */
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+> > index ea6a397b64a6..4e3032a244e1 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/host.S
+> > +++ b/arch/arm64/kvm/hyp/nvhe/host.S
+> > @@ -177,13 +177,8 @@ SYM_FUNC_END(__host_hvc)
+> >       b       hyp_panic
+> >
+> >  .L__hyp_sp_overflow\@:
+> > -     /*
+> > -      * Reset SP to the top of the stack, to allow handling the hyp_panic.
+> > -      * This corrupts the stack but is ok, since we won't be attempting
+> > -      * any unwinding here.
+> > -      */
+> > -     ldr_this_cpu    x0, kvm_init_params + NVHE_INIT_STACK_HYP_VA, x1
+> > -     mov     sp, x0
+> > +     /* Switch to the overflow stack */
+> > +     adr_this_cpu sp, overflow_stack + PAGE_SIZE, x0
+> >
+> >       b       hyp_panic_bad_stack
+> >       ASM_BUG()
+> > --
+> > 2.36.1.255.ge46751e96f-goog
+> >
+> >
+>
 > Thanks,
 >
 >         M.
 >
 > --
 > Without deviation from the norm, progress is not possible.
->
-> --
-> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
->
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
