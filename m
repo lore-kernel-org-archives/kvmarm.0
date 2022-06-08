@@ -2,76 +2,86 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24231C43334
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jun 2022 07:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B0FBC433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jun 2022 09:02:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90FBF49EB2;
-	Wed,  8 Jun 2022 03:40:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84B1B4B1E1;
+	Wed,  8 Jun 2022 05:02:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xLrbB6rEUz28; Wed,  8 Jun 2022 03:40:53 -0400 (EDT)
+	with ESMTP id 39-ySLAdT7RG; Wed,  8 Jun 2022 05:02:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 659E44B093;
-	Wed,  8 Jun 2022 03:40:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C1F94B216;
+	Wed,  8 Jun 2022 05:02:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7475449ED9
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 03:40:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A03EF4B1D2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 05:02:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id v1axuh9JTd8h for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jun 2022 03:40:51 -0400 (EDT)
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com
- [209.85.160.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7ACDE49EB2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 03:40:51 -0400 (EDT)
-Received: by mail-oa1-f53.google.com with SMTP id
- 586e51a60fabf-f2cbceefb8so26186461fac.11
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Jun 2022 00:40:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=4C+HR3kdGNMQU0VniOy6D2TLr5OZWg8RJ6oE98/dwoc=;
- b=lniF6SLwf2sUXG4L0oxq7Wvjkomm8JSVVcdy9UzJDPuqG9mEJpDr1yJXXD8UEn8ubM
- DP7YyQB0975e/YbQSSGUijeh7xrN31/yqUtCCrcEaxk6ysdAfEnEG42VefCFXo/ua0BH
- CjN+8JiKVCb0pxnVxMjrz4HvhAu28Lujp3EqMXIp+bS6ugnqNVvRhLBpwUrL4M4P4od0
- mow1rtEcXV2IdS5nu9EyuXgjt7u/n2/BqItaCrd9FbYugktvOlRupZv7BJw7MHAv02aS
- dfsm6fuod9FPKaaXXLOjjoPcHvKi1Pft/nRpXH2+T0MqaqVEoMMoHdcT9vSNZn3+FX4D
- SvGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=4C+HR3kdGNMQU0VniOy6D2TLr5OZWg8RJ6oE98/dwoc=;
- b=1ZPSo6BL5Y8JPdOgmUHIP2oO/ipHR1Nc5nSIgCbtwaPTlmtswi14TzaRjsbF9xreOr
- eqRc5BDyQF6il+c3Er+YcgjYrMUGkeHxSLHMpuYvSrQ54kbBlxrVEU30F3ztJGjINXPl
- wD3Y/k0hJzCamwiq7SA28VXZ2/GtHR+iBfUxxP/NA5qMY5x1ziLJ/DunSlEC4iMuH1rY
- EvfKhVKK/zdmAdU8wiL2ppJIrgY0dE92NcmxV4RB2J4SPsdcRUq/fP3rvHr6pv8nq9sl
- udNmb/6aHf1p1S+dzcQRlngWR+AHIXy9CaXpp8lf8jCev8yntmilFNNULLTfx3Z2tmhh
- Rb2w==
-X-Gm-Message-State: AOAM533CTCi46O6zXLGu3CyR6rmOBTTOimcZLQP/sICaC0yhP/Ov5IY2
- SLH+ulgEycMXRnKFJ8Z8Ejs1lOUHELDBuYdz3xsVJA==
-X-Google-Smtp-Source: ABdhPJxJU2tr9O9BGDzNE7cjJh/nBawaDlGq2ZFiX9T3Jx1K4j1sILs6YF386g05D+iAgS/6fcxJ3SXP4KDchr+cHKE=
-X-Received: by 2002:a05:6870:961b:b0:e2:ffb9:f526 with SMTP id
- d27-20020a056870961b00b000e2ffb9f526mr1662882oaq.146.1654674050672; Wed, 08
- Jun 2022 00:40:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220519134204.5379-1-will@kernel.org>
- <20220519134204.5379-60-will@kernel.org>
- <CAMn1gO7Gs8YUEv9Gx8qakedGNwFVgt9i+X+rjw50uc7YGMhpEQ@mail.gmail.com>
-In-Reply-To: <CAMn1gO7Gs8YUEv9Gx8qakedGNwFVgt9i+X+rjw50uc7YGMhpEQ@mail.gmail.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 8 Jun 2022 08:40:14 +0100
-Message-ID: <CA+EHjTxa8mhiEykjTTgB0J6aFpRqDiRzLKOWOd3hFsSrL+d=5g@mail.gmail.com>
-Subject: Re: [PATCH 59/89] KVM: arm64: Do not support MTE for protected VMs
-To: Peter Collingbourne <pcc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com, kvm@vger.kernel.org,
- Andy Lutomirski <luto@amacapital.net>, Michael Roth <michael.roth@amd.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Chao Peng <chao.p.peng@linux.intel.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
+ with ESMTP id x3rbIQZEhR6d for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jun 2022 05:02:09 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3370543C96
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 05:02:09 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 7B8C0B82637;
+ Wed,  8 Jun 2022 09:02:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E63EC34116;
+ Wed,  8 Jun 2022 09:02:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1654678926;
+ bh=ciXs0VBQZ43yarfmvG1TJioFSHjE9QKanTgHkc+TAYw=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=cTuPXMDH7vT+4clVqwyhhvnoVkM7UZ0gAGqvOOGuSdzu506VwaF5d7EL5sazj5+2+
+ VXhCFi5cXRE55HyvpFDpz8mxw0zx5eNnFYBIqJBjor7pvzcM6br/Q1i/WywGAAl2ni
+ uppoiiplt5poiQGwxrlgv5Gtq+DjW2c7tSqSqNTzP1ZOxZAzyZRH2yioVvKGSTEatR
+ t3BR81OdIk9mBzl7MP0ynep7cQ6S4C0RZd5RMexKW+O/2hpvAz5/+ei0RhsmvtQppv
+ sAiaq769m2RBCktfi/UkAKycnpS7vWaPDVnhSn9LRb1PrJ1KK9aNViI3rxpzcEihYT
+ 9SZkrGgJHygfw==
+Received: from [104.132.45.110] (helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nyrZj-00GXzu-HD; Wed, 08 Jun 2022 10:02:03 +0100
+Date: Wed, 08 Jun 2022 10:01:56 +0100
+Message-ID: <8735gfr0jf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kalesh Singh <kaleshsingh@google.com>
+Subject: Re: [PATCH v3 4/5] KVM: arm64: Allocate shared stacktrace pages
+In-Reply-To: <20220607165105.639716-5-kaleshsingh@google.com>
+References: <20220607165105.639716-1-kaleshsingh@google.com>
+ <20220607165105.639716-5-kaleshsingh@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 104.132.45.110
+X-SA-Exim-Rcpt-To: kaleshsingh@google.com, mark.rutland@arm.com,
+ broonie@kernel.org, will@kernel.org, qperret@google.com, tabba@google.com,
+ surenb@google.com, tjmercier@google.com, kernel-team@android.com,
+ james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, mhiramat@kernel.org, ast@kernel.org,
+ madvenka@linux.microsoft.com, peterz@infradead.org, drjones@redhat.com,
+ yuzenghui@huawei.com, keirf@google.com, wangkefeng.wang@huawei.com,
+ ardb@kernel.org, oupton@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
+ Peter Zijlstra <peterz@infradead.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
+ will@kernel.org, surenb@google.com, kvmarm@lists.cs.columbia.edu,
+ "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+ linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+ broonie@kernel.org, tjmercier@google.com, linux-kernel@vger.kernel.org,
+ Masami Hiramatsu <mhiramat@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,45 +98,103 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Peter,
+On Tue, 07 Jun 2022 17:50:46 +0100,
+Kalesh Singh <kaleshsingh@google.com> wrote:
+> 
+> The nVHE hypervisor can use this shared area to dump its stacktrace
+> addresses on hyp_panic(). Symbolization and printing the stacktrace can
+> then be handled by the host in EL1 (done in a later patch in this series).
+> 
+> Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h |  1 +
+>  arch/arm64/kvm/arm.c             | 34 ++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/setup.c  | 11 +++++++++++
+>  3 files changed, 46 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 2e277f2ed671..ad31ac68264f 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -174,6 +174,7 @@ struct kvm_nvhe_init_params {
+>  	unsigned long hcr_el2;
+>  	unsigned long vttbr;
+>  	unsigned long vtcr;
+> +	unsigned long stacktrace_hyp_va;
+>  };
+>  
+>  /* Translate a kernel address @ptr into its equivalent linear mapping */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 400bb0fe2745..c0a936a7623d 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -50,6 +50,7 @@ DEFINE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
+>  DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+>  
+>  static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
+> +DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stacktrace_page);
 
-On Tue, Jun 7, 2022 at 1:42 AM Peter Collingbourne <pcc@google.com> wrote:
->
-> On Thu, May 19, 2022 at 7:40 AM Will Deacon <will@kernel.org> wrote:
-> >
-> > From: Fuad Tabba <tabba@google.com>
-> >
-> > Return an error (-EINVAL) if trying to enable MTE on a protected
-> > vm.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/arm.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 10e036bf06e3..8a1b4ba1dfa7 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -90,7 +90,9 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> >                 break;
-> >         case KVM_CAP_ARM_MTE:
-> >                 mutex_lock(&kvm->lock);
-> > -               if (!system_supports_mte() || kvm->created_vcpus) {
-> > +               if (!system_supports_mte() ||
-> > +                   kvm_vm_is_protected(kvm) ||
->
-> Should this check be added to kvm_vm_ioctl_check_extension() as well?
+Why isn't this static, since the address is passed via the
+kvm_nvhe_init_params block?
 
-No need. kvm_vm_ioctl_check_extension() calls pkvm_check_extension()
-for protected vms, which functions as an allow list rather than a
-block list.
+>  unsigned long kvm_arm_hyp_percpu_base[NR_CPUS];
+>  DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+>  
+> @@ -1554,6 +1555,7 @@ static void cpu_prepare_hyp_mode(int cpu)
+>  	tcr |= (idmap_t0sz & GENMASK(TCR_TxSZ_WIDTH - 1, 0)) << TCR_T0SZ_OFFSET;
+>  	params->tcr_el2 = tcr;
+>  
+> +	params->stacktrace_hyp_va = kern_hyp_va(per_cpu(kvm_arm_hyp_stacktrace_page, cpu));
+>  	params->pgd_pa = kvm_mmu_get_httbr();
+>  	if (is_protected_kvm_enabled())
+>  		params->hcr_el2 = HCR_HOST_NVHE_PROTECTED_FLAGS;
+> @@ -1845,6 +1847,7 @@ static void teardown_hyp_mode(void)
+>  	free_hyp_pgds();
+>  	for_each_possible_cpu(cpu) {
+>  		free_page(per_cpu(kvm_arm_hyp_stack_page, cpu));
+> +		free_page(per_cpu(kvm_arm_hyp_stacktrace_page, cpu));
+>  		free_pages(kvm_arm_hyp_percpu_base[cpu], nvhe_percpu_order());
+>  	}
+>  }
+> @@ -1936,6 +1939,23 @@ static int init_hyp_mode(void)
+>  		per_cpu(kvm_arm_hyp_stack_page, cpu) = stack_page;
+>  	}
+>  
+> +	/*
+> +	 * Allocate stacktrace pages for Hypervisor-mode.
+> +	 * This is used by the hypervisor to share its stacktrace
+> +	 * with the host on a hyp_panic().
+> +	 */
+> +	for_each_possible_cpu(cpu) {
+> +		unsigned long stacktrace_page;
+> +
+> +		stacktrace_page = __get_free_page(GFP_KERNEL);
+> +		if (!stacktrace_page) {
+> +			err = -ENOMEM;
+> +			goto out_err;
+> +		}
+> +
+> +		per_cpu(kvm_arm_hyp_stacktrace_page, cpu) = stacktrace_page;
 
-Cheers,
-/fuad
+I have the same feeling as with the overflow stack. This is
+potentially a huge amount of memory: on my test box, with 64k pages,
+this is a whole 10MB that I give away for something that is only a
+debug facility.
 
+Can this somehow be limited? I don't see it being less than a page as
+a problem, as the memory is always shared back with EL1 in the case of
+pKVM (and normal KVM doesn't have that problem anyway).
 
-> Peter
+Alternatively, this should be restricted to pKVM. With normal nVHE,
+the host should be able to parse the EL2 stack directly with some
+offsetting. Actually, this is probably the best option.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
