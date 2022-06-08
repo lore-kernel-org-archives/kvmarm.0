@@ -2,69 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0325C43334
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jun 2022 15:17:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC54CC43334
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jun 2022 15:24:01 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75C2D4B10B;
-	Wed,  8 Jun 2022 11:17:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4298E4B302;
+	Wed,  8 Jun 2022 11:24:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id e73L-6eeRiwc; Wed,  8 Jun 2022 11:17:35 -0400 (EDT)
+	with ESMTP id g3PggxEPmmMC; Wed,  8 Jun 2022 11:24:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B49E4B25C;
-	Wed,  8 Jun 2022 11:17:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32C1A4B2A0;
+	Wed,  8 Jun 2022 11:24:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C1D424B10B
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 11:17:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B84C14B298
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 11:23:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eHUJ5C2ewPT1 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jun 2022 11:17:32 -0400 (EDT)
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com
- [209.85.167.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9578849F5D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 11:17:32 -0400 (EDT)
-Received: by mail-oi1-f180.google.com with SMTP id w16so18576252oie.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Jun 2022 08:17:32 -0700 (PDT)
+ with ESMTP id g4QcBiveeBiZ for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jun 2022 11:23:58 -0400 (EDT)
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com
+ [209.85.160.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96EFC4B292
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 11:23:58 -0400 (EDT)
+Received: by mail-oa1-f43.google.com with SMTP id
+ 586e51a60fabf-e93bbb54f9so27555697fac.12
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Jun 2022 08:23:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=VlFFsM0vokhDlBPR30yxEKtEVSOVohVHRPtlqVM7p4c=;
- b=NXMtuu4RASXFiLHNwNTM2NV/7eIyypEdCAzOxvmY3JUnnnQJFRDGvSRq/OfW7W8HiL
- xy+WWDZjp9bUHiz/qLV4UEX8zVWjQMhliROaWK27VZ6z1Mxkyr4YvJOPOOt47iKx2Y8a
- mdxMkgIgPfE+B4lVYWo8ltVL0dV8qNGV+3MBhCok1TQabTCpD+mSeZeB/K/n5hctyrlI
- djasKhQNBlnNq1fY3grB/0wQrBYNkGZcYAZn8OE5obUdZAgN47EVlv/Mm85DDi5U82Nc
- ELhJRFzr5PykyL8LEt5IZ6PBKeuzQqsRkN/TNxn+PMb3qQ6CPdFyxf/sN3jg5qUVHJpk
- SDgw==
+ :cc; bh=H6iQ1oiG4jqbRTAVgqyiczhzaZiBR3863cdsPwx94jE=;
+ b=ZAKXSBqjVvyYD1DtUywOeOLaK2m28DXPZEgG+1XMHv4nCFXk9wRZ4biu72jxqhOm2V
+ qTZJVZMpWLHLA7oFHQHqsVjYECEus3IgpInDpaRrPTb7j1wUP83DQSzd1EXj2o3OMnqu
+ It1KIGAuzXgMOJX+IOOYkqXCa7ty/Jt7xW2kThXu+Ko2EniIDv0fylfnsEKFcD3e3Ax6
+ 1r5LlP5HizW0m3xa/eiqTnrEnsuil6ghqC6sZ6/zybBIzsXp2bpx/I5Q8g5FXzd5/svK
+ pZRuqt1zH8i66lqQX9tzqcDCxh+vWpC/JFuPnWKGOWmcRkxKfj5XYmjFfByQOYpCEnDT
+ YB6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=VlFFsM0vokhDlBPR30yxEKtEVSOVohVHRPtlqVM7p4c=;
- b=pL4EG7QokBQILfAOJb3oGsGARiOqVGpIMbPC/Axw931k9GrwRwhkt6eSXg2PO0QCmc
- UFlRwfZiK0WOEERlNPo9Qucoo8GgBRi0Nu6UivOu7SjPs3wMu0ZoQb9D6PeJXBBzCPH1
- 6CH1Gk3i+bKsQ2WQM6w6OYAVULXtcXK9gc40565n1pMAkx6H/19EGaUbOQDfPadAp8O1
- p2ZgX8G6ptLhSbdeB4ib+Q7LWHAATwcLzvXKuOMc4ztSpNSt2a/PP47mqSLFyzQAPOfJ
- I0emCNMRiS11xi4syQrWd5ya+ILBavSaB1eHm3/yf/QLUlATb4ffsnFOgBaiPz81Xdb8
- ltRQ==
-X-Gm-Message-State: AOAM531fu7TGrbaOjC07LhJjUvYuHUPDYit3mYVhZE1ZA22uNDzdHOYb
- ZrTq2EnSpTJJlK8nzRFSeo/Lpoayhh4NmI7Pz/j+CQ==
-X-Google-Smtp-Source: ABdhPJxnpsuzj2vDd3Hr296o3dKVf0rqE6EvPPFUkQ3V1TX/N0nEd0b4JHWjPSVChOaJdBvJ3B1fyhijGVQUOJ2IcoI=
-X-Received: by 2002:a05:6808:19a7:b0:32b:3cef:631 with SMTP id
- bj39-20020a05680819a700b0032b3cef0631mr2749669oib.294.1654701451827; Wed, 08
- Jun 2022 08:17:31 -0700 (PDT)
+ bh=H6iQ1oiG4jqbRTAVgqyiczhzaZiBR3863cdsPwx94jE=;
+ b=brqYqDhgLqVM02xQNFP5QB9UHy08ElaJkz4hHHMQW8YknvwD/7HsCov8ZhkkldWSdL
+ zvDyjcRE0+hv+VRWp2fJghwjgsdjo0I3nC61dgB2KyYMwpZkq5Y/Ai2uqHK+mUYe42ZH
+ I0GjSLITvgOR3PDb1E9aL12lK8Vt6c4pwptX4HA2PT/igyCyPIcRLM35rHnCZWrdY7BY
+ l1QSac/y0ARs0zvk4BZy6qwcQQjZ8V9wu5hsF9XZMotmcDUI7K2DD8bP7Hb04CWMEnCK
+ AzV0TLsjpBfHWxcLjiBBgAq8Txw5Lf3rz9RPlxE582t3+cOkWfbrxt3t5twLdAORWais
+ qbDw==
+X-Gm-Message-State: AOAM532MniDN83W7lHGtGj4e2GHEfILueN9tof2jGi/3TLDxkK6MkOxl
+ 4wkYcEqmrzqemc7TjkVcMavk07bThzm4fN5WqUNrcQ==
+X-Google-Smtp-Source: ABdhPJwWh0t18ojumdlRudXhBLwAtkB8k6FbFwmPSKZgVK0Aco06/t4gPcQUgndn2klBnUFc65KaTHwARgYsZ7pj0Sc=
+X-Received: by 2002:a05:6870:828d:b0:f3:4dd7:5ceb with SMTP id
+ q13-20020a056870828d00b000f34dd75cebmr2758965oae.294.1654701837865; Wed, 08
+ Jun 2022 08:23:57 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220528113829.1043361-1-maz@kernel.org>
- <20220528113829.1043361-16-maz@kernel.org>
-In-Reply-To: <20220528113829.1043361-16-maz@kernel.org>
+ <20220528113829.1043361-7-maz@kernel.org>
+In-Reply-To: <20220528113829.1043361-7-maz@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Wed, 8 Jun 2022 16:16:55 +0100
-Message-ID: <CA+EHjTyW62HaJdH_L1RMBzQpzkNbFBAYpXQ-y_Wg4u1a2eVJwA@mail.gmail.com>
-Subject: Re: [PATCH 15/18] KVM: arm64: Warn when PENDING_EXCEPTION and
- INCREMENT_PC are set together
+Date: Wed, 8 Jun 2022 16:23:21 +0100
+Message-ID: <CA+EHjTw4wOMKxz1sF7L5pDSidV=GrpO6XPnF1sAw0z6QiT7y0A@mail.gmail.com>
+Subject: Re: [PATCH 06/18] KVM: arm64: Add three sets of flags to the vcpu
+ state
 To: Marc Zyngier <maz@kernel.org>
 Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
  Mark Brown <broonie@kernel.org>, kvmarm@lists.cs.columbia.edu,
@@ -87,97 +88,65 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Marc,
 
-On Sat, May 28, 2022 at 12:49 PM Marc Zyngier <maz@kernel.org> wrote:
+On Sat, May 28, 2022 at 12:38 PM Marc Zyngier <maz@kernel.org> wrote:
 >
-> We really don't want PENDING_EXCEPTION and INCREMENT_PC to ever be
-> set at the same time, as they are mutually exclusive. Add checks
-> that will generate a warning should this ever happen.
+> It so appears that each of the vcpu flags is really belonging to
+> one of three categories:
 >
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 1 +
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c   | 2 ++
->  arch/arm64/kvm/inject_fault.c        | 8 ++++++++
->  3 files changed, 11 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 46e631cd8d9e..861fa0b24a7f 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -473,6 +473,7 @@ static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
->
->  static __always_inline void kvm_incr_pc(struct kvm_vcpu *vcpu)
->  {
-> +       WARN_ON(vcpu_get_flag(vcpu, PENDING_EXCEPTION));
->         vcpu_set_flag(vcpu, INCREMENT_PC);
->  }
->
-> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> index 2841a2d447a1..04973984b6db 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> @@ -38,6 +38,8 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
->         *vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
->         *vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
->
-> +       WARN_ON(vcpu_get_flag(vcpu, INCREMENT_PC));
-> +
->         vcpu_set_flag(vcpu, PENDING_EXCEPTION);
->         vcpu_set_flag(vcpu, EXCEPT_AA64_EL1_SYNC);
->
-> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> index a9a7b513f3b0..2f4b9afc16ec 100644
-> --- a/arch/arm64/kvm/inject_fault.c
-> +++ b/arch/arm64/kvm/inject_fault.c
-> @@ -20,6 +20,8 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
->         bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
->         u32 esr = 0;
->
-> +       WARN_ON(vcpu_get_flag(vcpu, INCREMENT_PC));
-> +
+> - a configuration flag, set once and for all
+> - an input flag generated by the kernel for the hypervisor to use
+> - a state flag that is only for the kernel's own bookkeeping
 
-Minor nit: While we're at it, should we just create a helper for
-setting PENDING_EXCEPTION, same as we have for INCREMENT_PC? That
-might make the code clearer and save us from the hassle of having this
-WARN_ON before every instance of setting PENDING_EXCEPTION?
+I think that this division makes sense and simplifies reasoning about
+the state and what needs to be communicated to the hypervisor.
+
+I had a couple of minor nits, which I have already pointed out in the
+relevant patches. With that, patches 6~18:
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
 Cheers,
 /fuad
 
 
 
->         vcpu_set_flag(vcpu, PENDING_EXCEPTION);
->         vcpu_set_flag(vcpu, EXCEPT_AA64_EL1_SYNC);
+
+
 >
-> @@ -51,6 +53,8 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
->  {
->         u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
+> As we are going to split all the existing flags into these three
+> sets, introduce all three in one go.
 >
-> +       WARN_ON(vcpu_get_flag(vcpu, INCREMENT_PC));
+> No functional change other than a bit of bloat...
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 5eb6791df608..c9dd0d4e22f2 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -338,6 +338,15 @@ struct kvm_vcpu_arch {
+>         /* Miscellaneous vcpu state flags */
+>         u64 flags;
+>
+> +       /* Configuration flags */
+> +       u64 cflags;
 > +
->         vcpu_set_flag(vcpu, PENDING_EXCEPTION);
->         vcpu_set_flag(vcpu, EXCEPT_AA64_EL1_SYNC);
->
-> @@ -71,6 +75,8 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
->
->  static void inject_undef32(struct kvm_vcpu *vcpu)
->  {
-> +       WARN_ON(vcpu_get_flag(vcpu, INCREMENT_PC));
+> +       /* Input flags to the hypervisor code */
+> +       u64 iflags;
 > +
->         vcpu_set_flag(vcpu, PENDING_EXCEPTION);
->         vcpu_set_flag(vcpu, EXCEPT_AA32_UND);
->  }
-> @@ -94,6 +100,8 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt, u32 addr)
->
->         far = vcpu_read_sys_reg(vcpu, FAR_EL1);
->
-> +       WARN_ON(vcpu_get_flag(vcpu, INCREMENT_PC));
+> +       /* State flags, unused by the hypervisor code */
+> +       u64 sflags;
 > +
->         if (is_pabt) {
->                 vcpu_set_flag(vcpu, PENDING_EXCEPTION);
->                 vcpu_set_flag(vcpu, EXCEPT_AA32_IABT);
+>         /*
+>          * We maintain more than a single set of debug registers to support
+>          * debugging the guest from the host and to maintain separate host and
 > --
 > 2.34.1
+>
+> --
+> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
 >
 _______________________________________________
 kvmarm mailing list
