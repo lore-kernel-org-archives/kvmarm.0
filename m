@@ -2,71 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC54CC43334
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jun 2022 15:24:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A2AAC43334
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jun 2022 16:01:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4298E4B302;
-	Wed,  8 Jun 2022 11:24:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C068C4B105;
+	Wed,  8 Jun 2022 12:01:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id g3PggxEPmmMC; Wed,  8 Jun 2022 11:24:00 -0400 (EDT)
+	with ESMTP id nsaQBpDnzPbf; Wed,  8 Jun 2022 12:01:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32C1A4B2A0;
-	Wed,  8 Jun 2022 11:24:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D2134B2A0;
+	Wed,  8 Jun 2022 12:01:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B84C14B298
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 11:23:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BF574B105
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 12:01:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id g4QcBiveeBiZ for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jun 2022 11:23:58 -0400 (EDT)
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com
- [209.85.160.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96EFC4B292
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 11:23:58 -0400 (EDT)
-Received: by mail-oa1-f43.google.com with SMTP id
- 586e51a60fabf-e93bbb54f9so27555697fac.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Jun 2022 08:23:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=H6iQ1oiG4jqbRTAVgqyiczhzaZiBR3863cdsPwx94jE=;
- b=ZAKXSBqjVvyYD1DtUywOeOLaK2m28DXPZEgG+1XMHv4nCFXk9wRZ4biu72jxqhOm2V
- qTZJVZMpWLHLA7oFHQHqsVjYECEus3IgpInDpaRrPTb7j1wUP83DQSzd1EXj2o3OMnqu
- It1KIGAuzXgMOJX+IOOYkqXCa7ty/Jt7xW2kThXu+Ko2EniIDv0fylfnsEKFcD3e3Ax6
- 1r5LlP5HizW0m3xa/eiqTnrEnsuil6ghqC6sZ6/zybBIzsXp2bpx/I5Q8g5FXzd5/svK
- pZRuqt1zH8i66lqQX9tzqcDCxh+vWpC/JFuPnWKGOWmcRkxKfj5XYmjFfByQOYpCEnDT
- YB6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=H6iQ1oiG4jqbRTAVgqyiczhzaZiBR3863cdsPwx94jE=;
- b=brqYqDhgLqVM02xQNFP5QB9UHy08ElaJkz4hHHMQW8YknvwD/7HsCov8ZhkkldWSdL
- zvDyjcRE0+hv+VRWp2fJghwjgsdjo0I3nC61dgB2KyYMwpZkq5Y/Ai2uqHK+mUYe42ZH
- I0GjSLITvgOR3PDb1E9aL12lK8Vt6c4pwptX4HA2PT/igyCyPIcRLM35rHnCZWrdY7BY
- l1QSac/y0ARs0zvk4BZy6qwcQQjZ8V9wu5hsF9XZMotmcDUI7K2DD8bP7Hb04CWMEnCK
- AzV0TLsjpBfHWxcLjiBBgAq8Txw5Lf3rz9RPlxE582t3+cOkWfbrxt3t5twLdAORWais
- qbDw==
-X-Gm-Message-State: AOAM532MniDN83W7lHGtGj4e2GHEfILueN9tof2jGi/3TLDxkK6MkOxl
- 4wkYcEqmrzqemc7TjkVcMavk07bThzm4fN5WqUNrcQ==
-X-Google-Smtp-Source: ABdhPJwWh0t18ojumdlRudXhBLwAtkB8k6FbFwmPSKZgVK0Aco06/t4gPcQUgndn2klBnUFc65KaTHwARgYsZ7pj0Sc=
-X-Received: by 2002:a05:6870:828d:b0:f3:4dd7:5ceb with SMTP id
- q13-20020a056870828d00b000f34dd75cebmr2758965oae.294.1654701837865; Wed, 08
- Jun 2022 08:23:57 -0700 (PDT)
-MIME-Version: 1.0
+ with ESMTP id 9pQD2B1Mq47p for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jun 2022 12:01:35 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B552E4B298
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 12:01:35 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id A04B5B8287F;
+ Wed,  8 Jun 2022 16:01:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45F22C34116;
+ Wed,  8 Jun 2022 16:01:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1654704092;
+ bh=ImV1qtmSlQSEWCbDAMmIBcY4fkJG7qnGOynjwaFo1GM=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=EyU2mZRxvm8doByGzp2z1CIA4zm3K7h1+om9FglRi/wdbVxCrcH3lwfTeGncm7NNR
+ JqYxdOqaLOlliZXoCIfYzS3MbKk11XeLYnsTkwStmKfbYdFn2HC5RQe0YEwQK0PV1P
+ gzmvqJQmtJ3+NHtXmU977kHN1OyhGmKNAqUXEiGQw29ZCVjOOzT7pOCpkSG8yTLv0q
+ B4y//jz9aAOsEfCZogoXn0k8eCWsiwubzMNkIZ+75DoPwDfQtahKWJjgUeGudnm+o9
+ KiubcdkoYhZqGtCyzZT8ZM/jksOAIKzAfjpZ9rDfOB2b250BwlTz+leDLI+rALj1kG
+ 2FZM/SPdLpHVA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nyy7d-00GelU-PE; Wed, 08 Jun 2022 17:01:29 +0100
+Date: Wed, 08 Jun 2022 17:01:29 +0100
+Message-ID: <87ilpb4012.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH 09/18] KVM: arm64: Move vcpu debug/SPE/TRBE flags to the
+ input flag set
+In-Reply-To: <CA+EHjTzy99Waj8P48pbzbR2+KfgUzbZX5oj_J+JKo70VOq6yiQ@mail.gmail.com>
 References: <20220528113829.1043361-1-maz@kernel.org>
- <20220528113829.1043361-7-maz@kernel.org>
-In-Reply-To: <20220528113829.1043361-7-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 8 Jun 2022 16:23:21 +0100
-Message-ID: <CA+EHjTw4wOMKxz1sF7L5pDSidV=GrpO6XPnF1sAw0z6QiT7y0A@mail.gmail.com>
-Subject: Re: [PATCH 06/18] KVM: arm64: Add three sets of flags to the vcpu
- state
-To: Marc Zyngier <maz@kernel.org>
+ <20220528113829.1043361-10-maz@kernel.org>
+ <CA+EHjTzy99Waj8P48pbzbR2+KfgUzbZX5oj_J+JKo70VOq6yiQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, oupton@google.com,
+ will@kernel.org, qperret@google.com, broonie@kernel.org,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
  Mark Brown <broonie@kernel.org>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
@@ -86,68 +91,106 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Wed, 08 Jun 2022 16:16:16 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Sat, May 28, 2022 at 12:38 PM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > The three debug flags (which deal with the debug registers, SPE and
+> > TRBE) all are input flags to the hypervisor code.
+> >
+> > Move them into the input set and convert them to the new accessors.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h          |  9 ++++++---
+> >  arch/arm64/kvm/debug.c                     | 22 +++++++++++-----------
+> >  arch/arm64/kvm/hyp/include/hyp/debug-sr.h  |  6 +++---
+> >  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  4 ++--
+> >  arch/arm64/kvm/hyp/nvhe/debug-sr.c         |  8 ++++----
+> >  arch/arm64/kvm/sys_regs.c                  |  8 ++++----
+> >  6 files changed, 30 insertions(+), 27 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 078567f5709c..a426cd3aaa74 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -500,6 +500,12 @@ struct kvm_vcpu_arch {
+> >  #define EXCEPT_AA64_EL2_IRQ    __vcpu_except_flags(5)
+> >  #define EXCEPT_AA64_EL2_FIQ    __vcpu_except_flags(6)
+> >  #define EXCEPT_AA64_EL2_SERR   __vcpu_except_flags(7)
+> > +/* Guest debug is live */
+> > +#define DEBUG_DIRTY            __vcpu_single_flag(iflags, BIT(4))
+> > +/* Save SPE context if active  */
+> > +#define DEBUG_STATE_SAVE_SPE   __vcpu_single_flag(iflags, BIT(5))
+> > +/* Save TRBE context if active  */
+> > +#define DEBUG_STATE_SAVE_TRBE  __vcpu_single_flag(iflags, BIT(6))
+> >
+> >  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> >  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +     \
+> > @@ -522,10 +528,7 @@ struct kvm_vcpu_arch {
+> >  })
+> >
+> >  /* vcpu_arch flags field values: */
+> > -#define KVM_ARM64_DEBUG_DIRTY          (1 << 0)
+> >  #define KVM_ARM64_HOST_SVE_ENABLED     (1 << 4) /* SVE enabled for EL0 */
+> > -#define KVM_ARM64_DEBUG_STATE_SAVE_SPE (1 << 12) /* Save SPE context if active  */
+> > -#define KVM_ARM64_DEBUG_STATE_SAVE_TRBE        (1 << 13) /* Save TRBE context if active  */
+> >  #define KVM_ARM64_ON_UNSUPPORTED_CPU   (1 << 15) /* Physical CPU not in supported_cpus */
+> >  #define KVM_ARM64_HOST_SME_ENABLED     (1 << 16) /* SME enabled for EL0 */
+> >  #define KVM_ARM64_WFIT                 (1 << 17) /* WFIT instruction trapped */
+> > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> > index 4fd5c216c4bb..c5c4c1837bf3 100644
+> > --- a/arch/arm64/kvm/debug.c
+> > +++ b/arch/arm64/kvm/debug.c
+> > @@ -104,11 +104,11 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
+> >          * Trap debug register access when one of the following is true:
+> >          *  - Userspace is using the hardware to debug the guest
+> >          *  (KVM_GUESTDBG_USE_HW is set).
+> > -        *  - The guest is not using debug (KVM_ARM64_DEBUG_DIRTY is clear).
+> > +        *  - The guest is not using debug (DEBUG_DIRTY clear).
+> >          *  - The guest has enabled the OS Lock (debug exceptions are blocked).
+> >          */
+> >         if ((vcpu->guest_debug & KVM_GUESTDBG_USE_HW) ||
+> > -           !(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY) ||
+> > +           !vcpu_get_flag(vcpu, DEBUG_DIRTY) ||
+> >             kvm_vcpu_os_lock_enabled(vcpu))
+> >                 vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
+> >
+> > @@ -147,8 +147,8 @@ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu)
+> >   * debug related registers.
+> >   *
+> >   * Additionally, KVM only traps guest accesses to the debug registers if
+> > - * the guest is not actively using them (see the KVM_ARM64_DEBUG_DIRTY
+> > - * flag on vcpu->arch.flags).  Since the guest must not interfere
+> > + * the guest is not actively using them (see the DEBUG_DIRTY
+> > + * flag on vcpu->arch.iflags).  Since the guest must not interfere
+> >   * with the hardware state when debugging the guest, we must ensure that
+> >   * trapping is enabled whenever we are debugging the guest using the
+> >   * debug registers.
+> > @@ -205,7 +205,7 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+> >                  *
+> >                  * We simply switch the debug_ptr to point to our new
+> >                  * external_debug_state which has been populated by the
+> > -                * debug ioctl. The existing KVM_ARM64_DEBUG_DIRTY
+> > +                * debug ioctl. The existing KVM_ARM64_IFLAG_DEBUG_DIRTY
+> 
+> This should be DEBUG_DIRTY.
 
-On Sat, May 28, 2022 at 12:38 PM Marc Zyngier <maz@kernel.org> wrote:
->
-> It so appears that each of the vcpu flags is really belonging to
-> one of three categories:
->
-> - a configuration flag, set once and for all
-> - an input flag generated by the kernel for the hypervisor to use
-> - a state flag that is only for the kernel's own bookkeeping
+Ah, nice catch. That's a left-over from a previous implementation that
+didn't have the notion of flag-set built-in.
 
-I think that this division makes sense and simplifies reasoning about
-the state and what needs to be communicated to the hypervisor.
+There is also another one of these in kvm_host.h, which I will fix as
+well.
 
-I had a couple of minor nits, which I have already pointed out in the
-relevant patches. With that, patches 6~18:
-Reviewed-by: Fuad Tabba <tabba@google.com>
+Thanks,
 
-Cheers,
-/fuad
+	M.
 
-
-
-
-
->
-> As we are going to split all the existing flags into these three
-> sets, introduce all three in one go.
->
-> No functional change other than a bit of bloat...
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 5eb6791df608..c9dd0d4e22f2 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -338,6 +338,15 @@ struct kvm_vcpu_arch {
->         /* Miscellaneous vcpu state flags */
->         u64 flags;
->
-> +       /* Configuration flags */
-> +       u64 cflags;
-> +
-> +       /* Input flags to the hypervisor code */
-> +       u64 iflags;
-> +
-> +       /* State flags, unused by the hypervisor code */
-> +       u64 sflags;
-> +
->         /*
->          * We maintain more than a single set of debug registers to support
->          * debugging the guest from the host and to maintain separate host and
-> --
-> 2.34.1
->
-> --
-> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
->
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
