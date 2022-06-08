@@ -2,62 +2,62 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31815C43334
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Jun 2022 07:33:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32772C433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Jun 2022 07:34:15 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B4E64B31A;
-	Wed,  8 Jun 2022 03:33:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D823F4B303;
+	Wed,  8 Jun 2022 03:34:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bzwkJ9zB6uJW; Wed,  8 Jun 2022 03:33:57 -0400 (EDT)
+	with ESMTP id K-AkF1foots7; Wed,  8 Jun 2022 03:34:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60B834B300;
-	Wed,  8 Jun 2022 03:33:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AEA54B2FB;
+	Wed,  8 Jun 2022 03:34:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C9AA4B2F5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 03:33:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A9AA64B2F5
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 03:34:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OYjCQ1jgtPcj for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jun 2022 03:33:54 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4D4174B2D7
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 03:33:54 -0400 (EDT)
+ with ESMTP id 6wmfZSzn2VQB for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jun 2022 03:34:06 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6217A4B2D7
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 03:34:06 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id D74A7B823ED;
- Wed,  8 Jun 2022 07:33:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 952D2C34116;
- Wed,  8 Jun 2022 07:33:51 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id B5C1761444;
+ Wed,  8 Jun 2022 07:34:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22DD2C34116;
+ Wed,  8 Jun 2022 07:34:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1654673631;
- bh=J4u1yJKMyuDvUOZQJg3dz2dfNFmf477VCvetOrL2LHc=;
+ s=k20201202; t=1654673645;
+ bh=zUAriSoqt7X75BSYiptDA8HT+jFpatA1VwWFOOuCHJU=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=gORTG5OKjK2s04Q1X7zTZoohTimLRFViQ6Y5faIddZ2lyYxdIUhZub16F4hhMu4NJ
- A8LXy59C+kn2gIF2jHJScRlGiuKIpfdFDVSbsWzdGKZPMJmC+Fuc+UaTUzeU7umHcJ
- bhwl4DWmlvlaLs5ORUw6vrcqL1FKs8i4PVl1yUj4fKGs/vd5anNbF+0SbndVkvnBAH
- PRSZLQgw++Lul1VI2KrwuFqt/HQLwj3wyt5U9eAHvQGHtWi8IocnwAWq6mWaB42XSB
- 6WHjQPzxwpsXMctwKSkmi0c2iCbQjJB0NzRmZdY25iMYbbMvY1rPGnZ37V1sHIVZEJ
- MIxb3vIB0YgtQ==
+ b=qEaE9E6N5v30L8JQ3VERoWqoGcxl8hjBVPm9K5ojoQJfgnnWatnqWxG4DP8/xS08Y
+ owgC1hj6TgQHhVZmWYY07U4Hr4n7znTtDHnqs84R3TKN5D6JAaOti4R2JeDo4yPd86
+ LGx2N9NpwuDbOuk+nao/8IwB8iIyRqwtRG1NSmDkbd7OU9NHPkZV+kM/RMaGs7GksU
+ o5Nvb/O3ljrUr4Y+aY6Z2Ub4n7QZPPuwSFhI+7WsT+gkooyreYBFNJwr9iysfWhfIw
+ lIcr5/Utb29CLYN2QUa/09Zn+YLbk6pfaNGBlRvSY2C1yAReeyCxIEnhV1qnGHK51b
+ pSCFuLuNYzfuQ==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nyqCL-00GWck-45; Wed, 08 Jun 2022 08:33:49 +0100
-Date: Wed, 08 Jun 2022 08:33:46 +0100
-Message-ID: <87leu7zk11.wl-maz@kernel.org>
+ id 1nyqCY-00GWcs-UT; Wed, 08 Jun 2022 08:34:03 +0100
+Date: Wed, 08 Jun 2022 08:33:59 +0100
+Message-ID: <87k09rzk0o.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v3 2/5] KVM: arm64: Compile stacktrace.nvhe.o
-In-Reply-To: <20220607165105.639716-3-kaleshsingh@google.com>
+Subject: Re: [PATCH v3 3/5] KVM: arm64: Add hypervisor overflow stack
+In-Reply-To: <20220607165105.639716-4-kaleshsingh@google.com>
 References: <20220607165105.639716-1-kaleshsingh@google.com>
- <20220607165105.639716-3-kaleshsingh@google.com>
+ <20220607165105.639716-4-kaleshsingh@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -68,14 +68,15 @@ X-SA-Exim-Rcpt-To: kaleshsingh@google.com, mark.rutland@arm.com,
  surenb@google.com, tjmercier@google.com, kernel-team@android.com,
  james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
  catalin.marinas@arm.com, mhiramat@kernel.org, ast@kernel.org,
- madvenka@linux.microsoft.com, drjones@redhat.com, wangkefeng.wang@huawei.com,
- yuzenghui@huawei.com, keirf@google.com, ardb@kernel.org, oupton@google.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org
+ madvenka@linux.microsoft.com, peterz@infradead.org, drjones@redhat.com,
+ yuzenghui@huawei.com, wangkefeng.wang@huawei.com, keirf@google.com,
+ ardb@kernel.org, oupton@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
 Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
+ Peter Zijlstra <peterz@infradead.org>,
  Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
  will@kernel.org, surenb@google.com, kvmarm@lists.cs.columbia.edu,
  "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
@@ -98,74 +99,62 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 07 Jun 2022 17:50:44 +0100,
+On Tue, 07 Jun 2022 17:50:45 +0100,
 Kalesh Singh <kaleshsingh@google.com> wrote:
 > 
-> Recompile stack unwinding code for use with the nVHE hypervisor. This is
-> a preparatory patch that will allow reusing most of the kernel unwinding
-> logic in the nVHE hypervisor.
+> Allocate and switch to 16-byte aligned secondary stack on overflow. This
+> provides us stack space to better handle overflows; and is used in
+> a subsequent patch to dump the hypervisor stacktrace.
 > 
-> Suggested-by: Mark Rutland <mark.rutland@arm.com>
 > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
-> Reviewed-by: Mark Brown <broonie@kernel.org>
 > ---
+>  arch/arm64/kernel/stacktrace.c | 3 +++
+>  arch/arm64/kvm/hyp/nvhe/host.S | 9 ++-------
+>  2 files changed, 5 insertions(+), 7 deletions(-)
 > 
-> Changes in v3:
->   - Add Mark's Reviewed-by tag
-> 
-> Changes in v2:
->   - Split out refactoring of common unwinding logic into a separate patch,
->     per Mark Brown
-> 
->  arch/arm64/include/asm/stacktrace.h | 18 +++++++++-----
->  arch/arm64/kernel/stacktrace.c      | 37 ++++++++++++++++-------------
->  arch/arm64/kvm/hyp/nvhe/Makefile    |  3 ++-
->  3 files changed, 35 insertions(+), 23 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/stacktrace.h b/arch/arm64/include/asm/stacktrace.h
-> index aec9315bf156..f5af9a94c5a6 100644
-> --- a/arch/arm64/include/asm/stacktrace.h
-> +++ b/arch/arm64/include/asm/stacktrace.h
-> @@ -16,12 +16,14 @@
->  #include <asm/sdei.h>
+> diff --git a/arch/arm64/kernel/stacktrace.c b/arch/arm64/kernel/stacktrace.c
+> index a84e38d41d38..f346b4c66f1c 100644
+> --- a/arch/arm64/kernel/stacktrace.c
+> +++ b/arch/arm64/kernel/stacktrace.c
+> @@ -242,4 +242,7 @@ noinline notrace void arch_stack_walk(stack_trace_consume_fn consume_entry,
 >  
->  enum stack_type {
-> -	STACK_TYPE_UNKNOWN,
-> +#ifndef __KVM_NVHE_HYPERVISOR__
->  	STACK_TYPE_TASK,
->  	STACK_TYPE_IRQ,
->  	STACK_TYPE_OVERFLOW,
->  	STACK_TYPE_SDEI_NORMAL,
->  	STACK_TYPE_SDEI_CRITICAL,
-> +#endif /* !__KVM_NVHE_HYPERVISOR__ */
-> +	STACK_TYPE_UNKNOWN,
+>  	unwind(task, &state, consume_entry, cookie);
+>  }
+> +#else /* __KVM_NVHE_HYPERVISOR__ */
+> +DEFINE_PER_CPU(unsigned long [PAGE_SIZE/sizeof(long)], overflow_stack)
+> +	__aligned(16);
 
-What is the reason for this reordering? I have the sinking feeling
-that this could play badly with the logic that assumes that it is
-legal to switch from a lesser stack type to a higher one, and could
-allow switching to a duff stack.
+Does this need to be a whole page? With 64kB pages, this is
+potentially a lot of memory for something that will hardly ever be
+used. The rest of the kernel limits this to 4kB, which seems more
+reasonable. There is no guard page anyway, so PAGE_SIZE doesn't
+provide any extra protection.
 
-I would at least like to see a justification of why this isn't less
-safe than the current code.
-
-[...]
-
-> index f9fe4dc21b1f..c0ff0d6fc403 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -14,7 +14,8 @@ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
+>  #endif /* !__KVM_NVHE_HYPERVISOR__ */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+> index ea6a397b64a6..4e3032a244e1 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/host.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
+> @@ -177,13 +177,8 @@ SYM_FUNC_END(__host_hvc)
+>  	b	hyp_panic
 >  
->  obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
->  	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o page_alloc.o \
-> -	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o
-> +	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o \
-> +	 ../../../kernel/stacktrace.o
-
-This, I positively hate. It is only a marginally better than the
-cross-arch references we used to have with arch/arm/kvm. I'd be much
-more happy with an include file containing the shared code. It would
-also allow the removal of some of the #ifdeferry. Note that this is
-the approach that we ended up adopting for the VHE/nVHE split.
+>  .L__hyp_sp_overflow\@:
+> -	/*
+> -	 * Reset SP to the top of the stack, to allow handling the hyp_panic.
+> -	 * This corrupts the stack but is ok, since we won't be attempting
+> -	 * any unwinding here.
+> -	 */
+> -	ldr_this_cpu	x0, kvm_init_params + NVHE_INIT_STACK_HYP_VA, x1
+> -	mov	sp, x0
+> +	/* Switch to the overflow stack */
+> +	adr_this_cpu sp, overflow_stack + PAGE_SIZE, x0
+>  
+>  	b	hyp_panic_bad_stack
+>  	ASM_BUG()
+> -- 
+> 2.36.1.255.ge46751e96f-goog
+> 
+> 
 
 Thanks,
 
