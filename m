@@ -2,59 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B3F0C43334
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Jun 2022 12:12:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 436F5C43334
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jun 2022 12:19:56 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F3484B397;
-	Thu,  9 Jun 2022 08:12:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C225B4B335;
+	Thu,  9 Jun 2022 08:19:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ohmq7Zg9hbp6; Thu,  9 Jun 2022 08:12:46 -0400 (EDT)
+	with ESMTP id wtKuqz+gX03c; Thu,  9 Jun 2022 08:19:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 248E14B39E;
-	Thu,  9 Jun 2022 08:12:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A803A4B3A3;
+	Thu,  9 Jun 2022 08:19:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6851E4B3A4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jun 2022 08:12:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DAD434B397
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jun 2022 08:19:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BzVqBIGjQrH7 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Jun 2022 08:12:43 -0400 (EDT)
+ with ESMTP id jr87pKipv5TO for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Jun 2022 08:19:52 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B1DE04B3ED
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jun 2022 08:12:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D51234B335
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jun 2022 08:19:52 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id E3F56B82D32;
- Thu,  9 Jun 2022 12:12:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 593E9C3411F;
- Thu,  9 Jun 2022 12:12:39 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 73BE0B82C05;
+ Thu,  9 Jun 2022 12:19:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31D82C34114;
+ Thu,  9 Jun 2022 12:19:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1654776760;
- bh=mF0MZDnz8qQHCl3wYfr445Mxu4221ivldNZ8SHrMvCU=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=FaDVmvOcm/v9Q+F0wG3RtCAL1CvVQyYMFIU19KlSoFOfFIt77LbWOj1rhr6P1BiPT
- 0P9xesgFm12thHY/tmMAPX2E8CXaDc0ieSLDpv1+/2gpK4QTWL/7SCIHsj9AD6gIv8
- 24EcOaFP4wBtA+Ee4o3gme2vh1K+f2Zv5mGPR27+rvrla4fDAPYXdGxHT4D+9AzATu
- h6vSR/VFRSrtbDf/QsKk8oNQRZaFNUitG5CZjmVyI/k2ktQPRmRBhJi6Lf3UUM8hqr
- uAcvXuqzphgiAa80eZSKvv3Kcu7Jc1bjUTAq8AoNCrQlHKZdR5uGlejjx7AIAjTNge
- JDBV3dA/DkQow==
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 6/6] KVM: arm64: Drop stale comment
-Date: Thu,  9 Jun 2022 13:12:23 +0100
-Message-Id: <20220609121223.2551-7-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
+ s=k20201202; t=1654777190;
+ bh=O+L0hBKYinawARFf8Xd2/ReoY3qw9zne/ZpB9w/BURo=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=JJM4nF0Ik10SJzP17tJaBG7kM8W10Zh8esz/tuQ4a1tD+zbvO0jGg+ECtz8Mx9SCi
+ EL31Y8miZnbnh3mWGaLRXY7QdAsQiW4NIoaYu4HoaZul092oFHKUq1GogU2BDClHKN
+ 2o1bB3Yr/9FiX+nV9kGNEhmCdey5ADjQyyCbg6c4eUFFm7m9tWIOHk4YOyQK3m/VLD
+ VrWlyuGtP9NuYDyqgFk6X5cOcGaogaxyCzIKKas6/D2Cn+Nj2bwWa/BXziqIoE3BTH
+ 2K2ilxpF27F0d7u7tAT2c0TGB1WNlKlMeYQ26g8rM4eBYrshJMmYbl4LMS3fzlahyH
+ EII08+ljd5RPw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nzH8d-00Grik-UQ; Thu, 09 Jun 2022 13:19:48 +0100
+Date: Thu, 09 Jun 2022 13:19:47 +0100
+Message-ID: <878rq63u70.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 0/6] KVM/arm64: Minor/trivial fixes from pKVM mega-patch
 In-Reply-To: <20220609121223.2551-1-will@kernel.org>
 References: <20220609121223.2551-1-will@kernel.org>
-MIME-Version: 1.0
-Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
- Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ alexandru.elisei@arm.com, kernel-team@android.com,
+ linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,36 +85,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Marc Zyngier <maz@kernel.org>
+On Thu, 09 Jun 2022 13:12:17 +0100,
+Will Deacon <will@kernel.org> wrote:
+> 
+> Hi folks,
+> 
+> These six KVM/arm64 patches are very minor fixes (including "fixes" to
+> comments) which were previously posted as part of the pKVM mega-patch
+> but which can be merged independently of the rest of that. Marc -- I'm
+> not sure whether it's even worth taking these for 5.19, but here they
+> are so you can have a look and decide yourself.
 
-The layout of 'struct kvm_vcpu_arch' has evolved significantly since
-the initial port of KVM/arm64, so remove the stale comment suggesting
-that a prefix of the structure is used exclusively from assembly code.
+They are all tragically simple, and patch 2 actually qualifies as a
+fix (a legitimate guest would fail to run correctly).
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h | 5 -----
- 1 file changed, 5 deletions(-)
+Also, the pKVM series could do with a bit of diet, so I'm inclined to
+take these in right now.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 47a1e25e25bb..de32152cea04 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -362,11 +362,6 @@ struct kvm_vcpu_arch {
- 	struct arch_timer_cpu timer_cpu;
- 	struct kvm_pmu pmu;
- 
--	/*
--	 * Anything that is not used directly from assembly code goes
--	 * here.
--	 */
--
- 	/*
- 	 * Guest registers we preserve during guest debugging.
- 	 *
+	M.
+
 -- 
-2.36.1.255.ge46751e96f-goog
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
