@@ -2,77 +2,57 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2FBAC433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Jun 2022 12:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE75C433EF
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Jun 2022 12:12:35 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 571314B225;
-	Thu,  9 Jun 2022 08:03:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83E294B374;
+	Thu,  9 Jun 2022 08:12:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TX1-x8B+8MWb; Thu,  9 Jun 2022 08:03:06 -0400 (EDT)
+	with ESMTP id ftc1qAMrijtB; Thu,  9 Jun 2022 08:12:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 18D7C4B280;
-	Thu,  9 Jun 2022 08:03:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 562584B383;
+	Thu,  9 Jun 2022 08:12:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 60EF94B20A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 13:39:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D71AC4B394
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jun 2022 08:12:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PO2N83nsfsI0 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jun 2022 13:39:29 -0400 (EDT)
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com
- [209.85.217.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F9124B1EC
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jun 2022 13:39:29 -0400 (EDT)
-Received: by mail-vs1-f43.google.com with SMTP id g6so2050563vsb.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Jun 2022 10:39:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=YMlVWKWFWg+nhbnd5V57+qJ+IXhci7VV/Jgt/zHgEZ0=;
- b=j3J+tWdGuDnMmzW4G3/e2Yrhr9b9g3Ixir6vg/ocyLbpDgCQnabw633VQz6gVt/Clq
- d6sT+N9Jhqbyc//8NN1Kpz7bE3GnUXthlUddzx6GVNOqAYWs2ys7dH/k52qs6ZR9Rh5N
- wYh0MQPu0tIzB1L3mrF28BVdB1JDjrnssIasa6WvL8hA5ICtUnV+hPkeFOZxF2clN1+g
- xoCjHxrkFFsG5YEHV6qSO9Jky2BqWQKskCRD1Smx6E2RuSggMQBft86f5VfN3oUdvNl+
- dA6IFRBsAkMqdTgjgyDDOAfcNA1oKJk5Gdjt1TQV9Gd5xf/yl6adfEct3gEyArl7EvAU
- PArg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=YMlVWKWFWg+nhbnd5V57+qJ+IXhci7VV/Jgt/zHgEZ0=;
- b=pleTF+KMSax7AzlqXjBgaB2+kdimEVQUeRjfiXjqBzSwQxZn1kHYB9io4mWojGnEdf
- BFrg9SQdRM/mWHkrJIwciF7a4D9pg3c6iOBWgicI0xRrusp+2mvQl/KRssmBRKl9U0lX
- nvRtQJND88tFjFxatgJzuE59gQjCaGmbGFqWLPFghk5ZCqUfuTjQ7zHwFuh7/e8Jxa92
- ukp36M/oycZD7S34B7ElcU6kSUdIWzCyhJ75Bt0ntt7APxBQNe479xTW1Yk9odseL7/S
- HinXYvsPjlGMoUm5y5lcS64Ekw5h4+zxWKAmFFIGPft+7RA6QyD7uPRSMI/tJXROICzC
- J7Kw==
-X-Gm-Message-State: AOAM533TumWRG2WJ/QfyRNwCBnoBVlhZW4OaGf0tXw3i/pS81UjyXmMj
- C9pir53m6MZrVxYYtL2QNvJXV24+ytBHQQHFGaLUVw==
-X-Google-Smtp-Source: ABdhPJwIIsHt0xzWM00HLFl0l6aL+x8xCN7jsifDlcALw0DFomqzVq6S0bhgX6CLu/L4ldhqPBDIwXZNDYBF05IHKrM=
-X-Received: by 2002:a67:d30d:0:b0:34a:8d6c:1be6 with SMTP id
- a13-20020a67d30d000000b0034a8d6c1be6mr14582002vsj.74.1654709968634; Wed, 08
- Jun 2022 10:39:28 -0700 (PDT)
+ with ESMTP id GWNSJPe9dBMP for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Jun 2022 08:12:32 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 986834B36E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jun 2022 08:12:32 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id D79FFB82D50;
+ Thu,  9 Jun 2022 12:12:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EF18C3411D;
+ Thu,  9 Jun 2022 12:12:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1654776749;
+ bh=nkrdzTl27ZX5FsRH9FRkRpM8Q0maYGT0vYT7F3D+ysY=;
+ h=From:To:Cc:Subject:Date:From;
+ b=l5MCbUfVka0iAhpTNF/yDW/bmtdbIbhYZr4QODS/KhOn44H6NTFleyN5DVKzO1deg
+ W1uF5NlLM7FP4RH86nZ7ZX0CkE+U8u+9wvKqCxBdhVvbrRFPE2XYp0tB/opRryfhjR
+ V0IqcBRuiUv94bM9hrObL2uhZj1vXPyq+l6PDoOBgm847eIIAPi0S2czPN0pVb/NSy
+ YQFFApYZHqbHLU0rMk67EoANigbSNmqtqK96wepWphvrIZrUegfGe3gw3SGlEzmx9w
+ 8TwuyDdDpYVO6PFTTCQoaZbxfqlhilNv2Xx8pSzcKyfQzQsf9vP5jd3+5vwEAWTbzo
+ n+QcXnB2wPTjQ==
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH 0/6] KVM/arm64: Minor/trivial fixes from pKVM mega-patch
+Date: Thu,  9 Jun 2022 13:12:17 +0100
+Message-Id: <20220609121223.2551-1-will@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20220519134204.5379-1-will@kernel.org>
- <20220519134204.5379-60-will@kernel.org>
- <CAMn1gO7Gs8YUEv9Gx8qakedGNwFVgt9i+X+rjw50uc7YGMhpEQ@mail.gmail.com>
- <CA+EHjTxa8mhiEykjTTgB0J6aFpRqDiRzLKOWOd3hFsSrL+d=5g@mail.gmail.com>
-In-Reply-To: <CA+EHjTxa8mhiEykjTTgB0J6aFpRqDiRzLKOWOd3hFsSrL+d=5g@mail.gmail.com>
-From: Peter Collingbourne <pcc@google.com>
-Date: Wed, 8 Jun 2022 10:39:14 -0700
-Message-ID: <CAMn1gO5gDiL=HE6H2AhxM2hQZ9fnJCAi8n+1NF7bhZDnS+jOyg@mail.gmail.com>
-Subject: Re: [PATCH 59/89] KVM: arm64: Do not support MTE for protected VMs
-To: Fuad Tabba <tabba@google.com>
-X-Mailman-Approved-At: Thu, 09 Jun 2022 08:03:05 -0400
-Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com, kvm@vger.kernel.org,
- Andy Lutomirski <luto@amacapital.net>, Michael Roth <michael.roth@amd.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Chao Peng <chao.p.peng@linux.intel.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
+Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+ Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,52 +69,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jun 8, 2022 at 12:40 AM Fuad Tabba <tabba@google.com> wrote:
->
-> Hi Peter,
->
-> On Tue, Jun 7, 2022 at 1:42 AM Peter Collingbourne <pcc@google.com> wrote:
-> >
-> > On Thu, May 19, 2022 at 7:40 AM Will Deacon <will@kernel.org> wrote:
-> > >
-> > > From: Fuad Tabba <tabba@google.com>
-> > >
-> > > Return an error (-EINVAL) if trying to enable MTE on a protected
-> > > vm.
-> > >
-> > > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > > ---
-> > >  arch/arm64/kvm/arm.c | 4 +++-
-> > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > index 10e036bf06e3..8a1b4ba1dfa7 100644
-> > > --- a/arch/arm64/kvm/arm.c
-> > > +++ b/arch/arm64/kvm/arm.c
-> > > @@ -90,7 +90,9 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> > >                 break;
-> > >         case KVM_CAP_ARM_MTE:
-> > >                 mutex_lock(&kvm->lock);
-> > > -               if (!system_supports_mte() || kvm->created_vcpus) {
-> > > +               if (!system_supports_mte() ||
-> > > +                   kvm_vm_is_protected(kvm) ||
-> >
-> > Should this check be added to kvm_vm_ioctl_check_extension() as well?
->
-> No need. kvm_vm_ioctl_check_extension() calls pkvm_check_extension()
-> for protected vms, which functions as an allow list rather than a
-> block list.
+Hi folks,
 
-I see. I guess I got confused when reading the code because I saw this
-in kvm_check_extension():
+These six KVM/arm64 patches are very minor fixes (including "fixes" to
+comments) which were previously posted as part of the pKVM mega-patch
+but which can be merged independently of the rest of that. Marc -- I'm
+not sure whether it's even worth taking these for 5.19, but here they
+are so you can have a look and decide yourself.
 
-        case KVM_CAP_ARM_NISV_TO_USER:
-                r = !kvm || !kvm_vm_is_protected(kvm);
-                break;
+Series based on 5.19-rc1.
 
-This can probably be simplified to "r = 1;".
+Cheers,
 
-Peter
+Will
+
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kernel-team@android.com
+Cc: kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org
+
+--->8
+
+Marc Zyngier (2):
+  KVM: arm64: Handle all ID registers trapped for a protected VM
+  KVM: arm64: Drop stale comment
+
+Will Deacon (4):
+  KVM: arm64: Return error from kvm_arch_init_vm() on allocation failure
+  KVM: arm64: Ignore 'kvm-arm.mode=protected' when using VHE
+  KVM: arm64: Extend comment in has_vhe()
+  KVM: arm64: Remove redundant hyp_assert_lock_held() assertions
+
+ .../admin-guide/kernel-parameters.txt         |  1 -
+ arch/arm64/include/asm/kvm_host.h             |  5 ---
+ arch/arm64/include/asm/virt.h                 |  3 ++
+ arch/arm64/kernel/cpufeature.c                | 10 +----
+ arch/arm64/kvm/arm.c                          | 10 ++++-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  4 --
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c            | 42 +++++++++++++++----
+ 7 files changed, 46 insertions(+), 29 deletions(-)
+
+-- 
+2.36.1.255.ge46751e96f-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
