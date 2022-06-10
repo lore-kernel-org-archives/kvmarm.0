@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D9DC433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF94C43334
 	for <kvmarm@archiver.kernel.org>; Fri, 10 Jun 2022 09:29:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3E914B3BF;
-	Fri, 10 Jun 2022 05:29:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DA764B3B2;
+	Fri, 10 Jun 2022 05:29:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IV5GBrMpDHOf; Fri, 10 Jun 2022 05:29:00 -0400 (EDT)
+	with ESMTP id iRF5a1S3V3SN; Fri, 10 Jun 2022 05:29:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8625F4B3C3;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EF5B4B3BD;
 	Fri, 10 Jun 2022 05:29:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 09BE24B3BA
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 219F24B3C2
  for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 05:28:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VHJhGOAptohx for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Jun 2022 05:28:57 -0400 (EDT)
+ with ESMTP id ycyj9CczdBIp for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Jun 2022 05:28:58 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A8CC24B268
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 01CA94B328
  for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 05:28:57 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 977CD61E95;
- Fri, 10 Jun 2022 09:28:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00E83C34114;
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 77DBC61EEA;
+ Fri, 10 Jun 2022 09:28:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0D20C341C4;
  Fri, 10 Jun 2022 09:28:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=k20201202; t=1654853336;
- bh=CLCvHvNlhBAnG9nVL5AUdRdQtVsmAEqYEs6yQeTN8vw=;
+ bh=P3Qxslc70t7szyihyigEdSCT8f++FwiYBUbMe+9p1Js=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=onLBBvMxCXwVIOKoWgH43B6jefHNhaqmvQc5Ml/FbGjq0hDImoE2QJmDk+W1Drjak
- pGCESq8FNnP2qlBtkiRQZo6Cg5l7tkJf1K3lawapBTl09BZ+zxp4xiL2WScmBQiqH4
- 3/R1nUKfU3HE07VSaPhD33QKcfQPJ1JYr8KBIfy4i7Wh0hDhYkfUvFsp7GkgesBzSN
- uHtT4QagDouqh+tLAFhk4P3uy/klznB68XGsVfVN25IMQXSMnPA+pYS+ooIfNO1qlw
- NgwlNuprEPVumV54/AYdbYxU7jjTzVHljPyGPs1b2hSZI0hP2QHqXVkJQ/6pDZAs9v
- dMllYLEm7LsCQ==
+ b=repJdJP+3B+b4bA+4zepxK2ntoRGYJnX4W1cq5592Se+BAcPe+M0tggogGKF/p1FL
+ C8e6G1C8h9VZbNqFiLL/NfbAj42KpntD+4b1kwaHN6TnDChgwtmArV7agqoAnU7CCO
+ RXSvCDxOC24XGlOZD6+4eZ/FyJAnMLHppDC76DoN7NYCF8WmQrrcXpZIkknd5kdJCv
+ pdyl6qIrYEpLmy9lefGhHW5kEbrk+2U5Inf4mo9UDf4AQBeVnZPKd7l/dzZT271HUb
+ MNBMSP/ksmpbT/sLPufrhHyF1FD3cBfsxyakpFL9mEqhsqiFsNxqJq23RjyjbFwsmE
+ chzQLvXz9RfNg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nzawn-00H6Dt-Ud; Fri, 10 Jun 2022 10:28:54 +0100
+ id 1nzawo-00H6Dt-U1; Fri, 10 Jun 2022 10:28:54 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 01/19] KVM: arm64: Always start with clearing SVE flag on
- load
-Date: Fri, 10 Jun 2022 10:28:20 +0100
-Message-Id: <20220610092838.1205755-2-maz@kernel.org>
+Subject: [PATCH v2 05/19] KVM: arm64: Add helpers to manipulate vcpu flags
+ among a set
+Date: Fri, 10 Jun 2022 10:28:24 +0100
+Message-Id: <20220610092838.1205755-6-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220610092838.1205755-1-maz@kernel.org>
 References: <20220610092838.1205755-1-maz@kernel.org>
@@ -65,12 +65,12 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
  suzuki.poulose@arm.com, alexandru.elisei@arm.com, oupton@google.com,
  will@kernel.org, tabba@google.com, qperret@google.com, broonie@kernel.org,
- reijiw@google.com, kernel-team@android.com, stable@vger.kernel.org
+ reijiw@google.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
 Cc: kernel-team@android.com, Will Deacon <will@kernel.org>,
- stable@vger.kernel.org, Mark Brown <broonie@kernel.org>
+ Mark Brown <broonie@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,39 +87,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On each vcpu load, we set the KVM_ARM64_HOST_SVE_ENABLED
-flag if SVE is enabled for EL0 on the host. This is used to restore
-the correct state on vpcu put.
+Careful analysis of the vcpu flags show that this is a mix of
+configuration, communication between the host and the hypervisor,
+as well as anciliary state that has no consistency. It'd be a lot
+better if we could split these flags into consistent categories.
 
-However, it appears that nothing ever clears this flag. Once
-set, it will stick until the vcpu is destroyed, which has the
-potential to spuriously enable SVE for userspace.
+However, even if we split these flags apart, we want to make sure
+that each flag can only be applied to its own set, and not across
+sets.
 
-We probably never saw the issue because no VMM uses SVE, but
-that's still pretty bad. Unconditionally clearing the flag
-on vcpu load addresses the issue.
+To achieve this, use a preprocessor hack so that each flag is always
+associated with:
 
-Fixes: 8383741ab2e7 ("KVM: arm64: Get rid of host SVE tracking/saving")
+- the set that contains it,
+
+- a mask that describe all the bits that contain it (for a simple
+  flag, this is the same thing as the flag itself, but we will
+  eventually have values that cover multiple bits at once).
+
+Each flag is thus a triplet that is not directly usable as a value,
+but used by three helpers that allow the flag to be set, cleared,
+and fetched. By mandating the use of such helper, we can easily
+enforce that a flag can only be used with the set it belongs to.
+
+Finally, one last helper "unpacks" the raw value from the triplet
+that represents a flag, which is useful for multi-bit values that
+need to be enumerated (in a switch statement, for example).
+
+Further patches will start making use of this infrastructure.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Link: https://lore.kernel.org/r/20220528113829.1043361-2-maz@kernel.org
 ---
- arch/arm64/kvm/fpsimd.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/include/asm/kvm_host.h | 44 +++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 3d251a4d2cf7..8267ff4642d3 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -80,6 +80,7 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- 	vcpu->arch.flags &= ~KVM_ARM64_FP_ENABLED;
- 	vcpu->arch.flags |= KVM_ARM64_FP_HOST;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 372c5642cfab..6d30ac7e3164 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -415,6 +415,50 @@ struct kvm_vcpu_arch {
+ 	} steal;
+ };
  
-+	vcpu->arch.flags &= ~KVM_ARM64_HOST_SVE_ENABLED;
- 	if (read_sysreg(cpacr_el1) & CPACR_EL1_ZEN_EL0EN)
- 		vcpu->arch.flags |= KVM_ARM64_HOST_SVE_ENABLED;
- 
++/*
++ * Each 'flag' is composed of a comma-separated triplet:
++ *
++ * - the flag-set it belongs to in the vcpu->arch structure
++ * - the value for that flag
++ * - the mask for that flag
++ *
++ *  __vcpu_single_flag() builds such a triplet for a single-bit flag.
++ * unpack_vcpu_flag() extract the flag value from the triplet for
++ * direct use outside of the flag accessors.
++ */
++#define __vcpu_single_flag(_set, _f)	_set, (_f), (_f)
++
++#define __unpack_flag(_set, _f, _m)	_f
++#define unpack_vcpu_flag(...)		__unpack_flag(__VA_ARGS__)
++
++#define __vcpu_get_flag(v, flagset, f, m)			\
++	({							\
++		v->arch.flagset & (m);				\
++	})
++
++#define __vcpu_set_flag(v, flagset, f, m)			\
++	do {							\
++		typeof(v->arch.flagset) *fset;			\
++								\
++		fset = &v->arch.flagset;			\
++		if (HWEIGHT(m) > 1)				\
++			*fset &= ~(m);				\
++		*fset |= (f);					\
++	} while (0)
++
++#define __vcpu_clear_flag(v, flagset, f, m)			\
++	do {							\
++		typeof(v->arch.flagset) *fset;			\
++								\
++		fset = &v->arch.flagset;			\
++		*fset &= ~(m);					\
++	} while (0)
++
++#define vcpu_get_flag(v, ...)	__vcpu_get_flag((v), __VA_ARGS__)
++#define vcpu_set_flag(v, ...)	__vcpu_set_flag((v), __VA_ARGS__)
++#define vcpu_clear_flag(v, ...)	__vcpu_clear_flag((v), __VA_ARGS__)
++
++
+ /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+ #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
+ 			     sve_ffr_offset((vcpu)->arch.sve_max_vl))
 -- 
 2.34.1
 
