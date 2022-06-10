@@ -2,75 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BDB3C43334
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Jun 2022 09:35:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1AFCCA47C
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Jun 2022 13:06:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EEB814B08B;
-	Fri, 10 Jun 2022 05:35:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CFCA4B2C0;
+	Fri, 10 Jun 2022 09:06:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SXilHIK3OYp7; Fri, 10 Jun 2022 05:35:54 -0400 (EDT)
+	with ESMTP id TCMujOZjmi+B; Fri, 10 Jun 2022 09:06:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B42564B0D9;
-	Fri, 10 Jun 2022 05:35:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 131484B2C6;
+	Fri, 10 Jun 2022 09:06:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B5BA24045D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 05:35:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD6854B2B7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 09:06:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id he7y7dY1-Cff for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Jun 2022 05:35:52 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7EA884B390
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 05:35:51 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 0B05B61ED8;
- Fri, 10 Jun 2022 09:35:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 656D9C34114;
- Fri, 10 Jun 2022 09:35:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1654853750;
- bh=Y9Re+PzleYqLYTAnywwGvif4ouH1rfjI6sgzNtrNb3g=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=a4VfKo1ImapFmBgu6AE+w1VGwXx4h0mE2f5JJkcZ3XZ/2K+ev/zMnhAvfSBPCEBdt
- MtkxlyRCj/PQ0BttsusOfEsUE8VyC0xVutxiOyZOa3JUAk1EP739j0oeWhsuXgWirP
- ojIlpsxWSbuTFCRjrPzm/XvhM3IMI0Xq/wlo/51yyYlD+wFtPI+TqemA0uFdT96QFS
- Id2V0b+oj8IrYaYA6gEqse6TbA+fKocI5ahWc7edEpeSL6ncH95+mG3mNysJB0n60M
- yCmO1AnIlHnwi+GuFli6CQVQmNU4r+q0DJtW1VGaXDxD3wBs+ohACCjlqA1PI6/V33
- 7zIaPLw/zvrIA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nzaws-00H6Dt-EW; Fri, 10 Jun 2022 10:28:58 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 19/19] KVM: arm64: Move the handling of !FP outside of the
- fast path
-Date: Fri, 10 Jun 2022 10:28:38 +0100
-Message-Id: <20220610092838.1205755-20-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220610092838.1205755-1-maz@kernel.org>
-References: <20220610092838.1205755-1-maz@kernel.org>
+ with ESMTP id fN++9fXuGvYe for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Jun 2022 09:06:23 -0400 (EDT)
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com
+ [209.85.210.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 765BD4B2AC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 09:06:23 -0400 (EDT)
+Received: by mail-ot1-f52.google.com with SMTP id
+ q1-20020a056830018100b0060c2bfb668eso2568044ota.8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 06:06:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=3ebXiX+kepLI2Qw0XY13GE4xS0GXBZo65rTV2JEU/MI=;
+ b=r0iXm+ECrwbIGGwW7KlGtF0yJdsBcMHlE4hMJ4SXOUPArR/ih29baGIkqdoRmEseEO
+ kR4ufVtDPBFugWHxlY7YlXTKmBAIoksSW5tPnHjVFjdSh9i2FF9CKThov13NopQrgpWB
+ 19vdsedFXIhd34+lTvRp9X9LsN7xm1M0e039aKwuPwBiRbEh1P2CtC+p94HOxhrJVGkR
+ mfCQ4+IY/l0D5RERjRqFNKVHbwCSHy0SzH95s/OytvEmAQcKC8j3JBnAXSEm70rcX+RU
+ m/meheKnwOW3RgIihgkqS9JFFSHKVIlyDa4QtXlE6LPrzWLG1WOIddzEuKROHlt4qZ8f
+ rDtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=3ebXiX+kepLI2Qw0XY13GE4xS0GXBZo65rTV2JEU/MI=;
+ b=3fFtI78rqWDf2aBFM5Io3wU9ZxJj9IlAv88OsjPpw0p4ePemwEEN8eFDS+wSFa1u0X
+ XPFtjnUa35K1WHjWNa6OvpmehW5EEGXb+zHO5vZTAgjhjLhTk2Go4+QPpnENvr1iVbT/
+ x//7rkeSlf7GzGjq2ODPVR3urjobpRQJKJ8G8JGNCA5dTV6rui3a1OOyd4CQvuZkEXve
+ fUe46J+4xfsSuRDqbRPl38EwYRMuqZ1YF4tyWducqJrLamARZNjj5QXV/OWjr2MA1hSZ
+ 05UxjSaUBFAdwE9gwj3Djj/pUUSiSKwUIGApCfPbctm+csphUCYLMw1r9SiY8Rog6cZ1
+ mwgw==
+X-Gm-Message-State: AOAM533N4pFfx2EfxSiE2Q+EGYdg0nUFtmrncCzRJgJbWrV9byFHFrYd
+ xMc44NpB6P+yxb9kGTTZ2blvQQQ8y2pSUNdawug/Uw==
+X-Google-Smtp-Source: ABdhPJws07QUSYA+aDl5QUraZzBJCoFdEH8iiTu7BE5zOytCnaRv8bQE/ltNd6eD1MjkNjL1RwSMLW116iSLjnB0qJc=
+X-Received: by 2002:a9d:7057:0:b0:60c:406e:1a7 with SMTP id
+ x23-20020a9d7057000000b0060c406e01a7mr206631otj.299.1654866382571; Fri, 10
+ Jun 2022 06:06:22 -0700 (PDT)
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, oupton@google.com,
- will@kernel.org, tabba@google.com, qperret@google.com, broonie@kernel.org,
- reijiw@google.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Will Deacon <will@kernel.org>,
- Mark Brown <broonie@kernel.org>
+References: <20220610092838.1205755-1-maz@kernel.org>
+ <20220610092838.1205755-6-maz@kernel.org>
+In-Reply-To: <20220610092838.1205755-6-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 10 Jun 2022 14:05:46 +0100
+Message-ID: <CA+EHjTw_ZJREm+E2PEqB8etjaDNN7psT9p09WQU=Tp3YvB_bkw@mail.gmail.com>
+Subject: Re: [PATCH v2 05/19] KVM: arm64: Add helpers to manipulate vcpu flags
+ among a set
+To: Marc Zyngier <maz@kernel.org>
+Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Mark Brown <broonie@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,73 +86,112 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We currently start by assuming that the host owns the FP unit
-at load time, then check again whether this is the case as
-we are about to run. Only at this point do we account for the
-fact that there is a (vanishingly small) chance that we're running
-on a system without a FPSIMD unit (yes, this is madness).
+Hi Marc,
 
-We can actually move this FPSIMD check as early as load-time,
-and drop the check at run time.
+On Fri, Jun 10, 2022 at 10:28 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Careful analysis of the vcpu flags show that this is a mix of
+> configuration, communication between the host and the hypervisor,
+> as well as anciliary state that has no consistency. It'd be a lot
+> better if we could split these flags into consistent categories.
+>
+> However, even if we split these flags apart, we want to make sure
+> that each flag can only be applied to its own set, and not across
+> sets.
+>
+> To achieve this, use a preprocessor hack so that each flag is always
+> associated with:
+>
+> - the set that contains it,
+>
+> - a mask that describe all the bits that contain it (for a simple
+>   flag, this is the same thing as the flag itself, but we will
+>   eventually have values that cover multiple bits at once).
+>
+> Each flag is thus a triplet that is not directly usable as a value,
+> but used by three helpers that allow the flag to be set, cleared,
+> and fetched. By mandating the use of such helper, we can easily
+> enforce that a flag can only be used with the set it belongs to.
+>
+> Finally, one last helper "unpacks" the raw value from the triplet
+> that represents a flag, which is useful for multi-bit values that
+> need to be enumerated (in a switch statement, for example).
+>
+> Further patches will start making use of this infrastructure.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 44 +++++++++++++++++++++++++++++++
+>  1 file changed, 44 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 372c5642cfab..6d30ac7e3164 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -415,6 +415,50 @@ struct kvm_vcpu_arch {
+>         } steal;
+>  };
+>
+> +/*
+> + * Each 'flag' is composed of a comma-separated triplet:
+> + *
+> + * - the flag-set it belongs to in the vcpu->arch structure
+> + * - the value for that flag
+> + * - the mask for that flag
+> + *
+> + *  __vcpu_single_flag() builds such a triplet for a single-bit flag.
+> + * unpack_vcpu_flag() extract the flag value from the triplet for
+> + * direct use outside of the flag accessors.
+> + */
+> +#define __vcpu_single_flag(_set, _f)   _set, (_f), (_f)
+> +
+> +#define __unpack_flag(_set, _f, _m)    _f
+> +#define unpack_vcpu_flag(...)          __unpack_flag(__VA_ARGS__)
+> +
+> +#define __vcpu_get_flag(v, flagset, f, m)                      \
+> +       ({                                                      \
+> +               v->arch.flagset & (m);                          \
+> +       })
+> +
+> +#define __vcpu_set_flag(v, flagset, f, m)                      \
+> +       do {                                                    \
+> +               typeof(v->arch.flagset) *fset;                  \
+> +                                                               \
+> +               fset = &v->arch.flagset;                        \
+> +               if (HWEIGHT(m) > 1)                             \
+> +                       *fset &= ~(m);                          \
+> +               *fset |= (f);                                   \
+> +       } while (0)
+> +
+> +#define __vcpu_clear_flag(v, flagset, f, m)                    \
+> +       do {                                                    \
+> +               typeof(v->arch.flagset) *fset;                  \
+> +                                                               \
+> +               fset = &v->arch.flagset;                        \
+> +               *fset &= ~(m);                                  \
+> +       } while (0)
+> +
+> +#define vcpu_get_flag(v, ...)  __vcpu_get_flag((v), __VA_ARGS__)
+> +#define vcpu_set_flag(v, ...)  __vcpu_set_flag((v), __VA_ARGS__)
+> +#define vcpu_clear_flag(v, ...)        __vcpu_clear_flag((v), __VA_ARGS__)
+> +
+> +
+>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+>  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +     \
+>                              sve_ffr_offset((vcpu)->arch.sve_max_vl))
 
-No intended change in behaviour.
+A bit of macro magic going on here, but with some help I think I've
+wrapped my head around it. With that
 
-Suggested-by: Reiji Watanabe <reijiw@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/arm.c    | 6 ++++++
- arch/arm64/kvm/fpsimd.c | 8 ++++----
- 2 files changed, 10 insertions(+), 4 deletions(-)
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 8b9da9d30485..a9dd7ec38f38 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -328,6 +328,12 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 
- 	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
- 
-+	/*
-+	 * Default value for the FP state, will be overloaded at load
-+	 * time if we support FP (pretty likely)
-+	 */
-+	vcpu->arch.fp_state = FP_STATE_FREE;
-+
- 	/* Set up the timer */
- 	kvm_timer_vcpu_init(vcpu);
- 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 557a96f8e06a..ec8e4494873d 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -77,6 +77,9 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
- 	BUG_ON(!current->mm);
- 	BUG_ON(test_thread_flag(TIF_SVE));
- 
-+	if (!system_supports_fpsimd())
-+		return;
-+
- 	vcpu->arch.fp_state = FP_STATE_HOST_OWNED;
- 
- 	vcpu_clear_flag(vcpu, HOST_SVE_ENABLED);
-@@ -110,13 +113,10 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
-  * FP while we were preemptible (such as off the back of an interrupt),
-  * then neither the host nor the guest own the FP hardware (and it was the
-  * responsibility of the code that used FP to save the existing state).
-- *
-- * Note that not supporting FP is basically the same thing as far as the
-- * hypervisor is concerned (nothing to save).
-  */
- void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu)
- {
--	if (!system_supports_fpsimd() || test_thread_flag(TIF_FOREIGN_FPSTATE))
-+	if (test_thread_flag(TIF_FOREIGN_FPSTATE))
- 		vcpu->arch.fp_state = FP_STATE_FREE;
- }
- 
--- 
-2.34.1
+Cheers,
+/fuad
 
+
+> --
+> 2.34.1
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
