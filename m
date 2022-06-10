@@ -2,59 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0EA0C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Jun 2022 09:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E41C0C43334
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Jun 2022 09:35:52 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A8A841174;
-	Fri, 10 Jun 2022 05:35:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CCE141174;
+	Fri, 10 Jun 2022 05:35:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qcl7qttkZ55Q; Fri, 10 Jun 2022 05:35:46 -0400 (EDT)
+	with ESMTP id zYNqC38Govrp; Fri, 10 Jun 2022 05:35:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 46D994B408;
-	Fri, 10 Jun 2022 05:35:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79A0F4B2C0;
+	Fri, 10 Jun 2022 05:35:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 193B54B11F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 05:35:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BA664A0FE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 05:35:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fgKAv9G9vR6z for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Jun 2022 05:35:44 -0400 (EDT)
+ with ESMTP id TRM8po0DocXG for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Jun 2022 05:35:49 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C9F8B4B324
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 05:35:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 166B54B3F8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 05:35:49 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id E2DAEB83353;
- Fri, 10 Jun 2022 09:35:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1C7DC34114;
- Fri, 10 Jun 2022 09:35:41 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 455EBB82CFB;
+ Fri, 10 Jun 2022 09:35:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0240CC3411F;
+ Fri, 10 Jun 2022 09:35:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1654853741;
- bh=Hy44ebNJtdRyimKZ0wHSwqsYAjTWcKc/GaO9BGQt+IA=;
+ s=k20201202; t=1654853747;
+ bh=jbtE45MUd9nV3Z8bCfIwAlBr4MHgnoXHgJYkftSo/C4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=MNRMoinxrv8cCVH6ckQlh6bO6wu08NptrV2+KQU5zwQgQbIaZHTwZ+T2rvno+lQBk
- 7ZrbiVH8zRilig5kXhd8FxZT+LsXLi96I5bRpd0XJ8A6mfxKEPcv7UsNim9eurJmxG
- nOPgtRag4pOeERMnLVwcr8205DMQXpoDGvEBlOpfNFTlunHZjB5fXnxXp1lYreQT2L
- 7hPiFPyYQmZNBKqdvawNGqBOoVlqcJf4+7pr13u6oK1/Zna7Ipg22PP2qRhy7Z3+6L
- AxM9G30f0Vj/tUOWNSZgakU/yNXLAWSvjDDviHUEwCr/qD7Y8IEfDzY1j0vaIFqwaV
- ppdlhgHac4gJA==
+ b=jKAcBUiCi9RuFk/2o3s3Ps+lQakp9/48ct98m/wo+f7BtpDRh68/deXDut0DsYAHO
+ 9CJe/93aiVcWbxISacI0S8Zuod1Pf+XVx2bCIxvh7MrJqg+rVJSV8AZ0MzO4BMqFOv
+ 1qW2lmA5txHwbwnbDKNYLS00Ujzy2CirT/cJrtRF1u9anrKzkTRbNpi/MCG7eQzaWP
+ Z5v/AB1Dr82z2mWg+X8ZZDK8Bhaf7If80m8sczFkBzKt4QK9yX9nYRGahIvH3BoYWg
+ nBn+LEme0jnc/CrSq2tY1xqguPpAUqFZ95O/giK56DDWgSH3IkxGBqOVwi9dNhOTHO
+ 7wKb9DebkwUfg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nzawr-00H6Dt-Nl; Fri, 10 Jun 2022 10:28:57 +0100
+ id 1nzawr-00H6Dt-V4; Fri, 10 Jun 2022 10:28:58 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 16/19] KVM: arm64: Add build-time sanity checks for flags
-Date: Fri, 10 Jun 2022 10:28:35 +0100
-Message-Id: <20220610092838.1205755-17-maz@kernel.org>
+Subject: [PATCH v2 17/19] KVM: arm64: Reduce the size of the vcpu flag members
+Date: Fri, 10 Jun 2022 10:28:36 +0100
+Message-Id: <20220610092838.1205755-18-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220610092838.1205755-1-maz@kernel.org>
 References: <20220610092838.1205755-1-maz@kernel.org>
@@ -86,63 +86,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Flags are great, but flags can also be dangerous: it is easy
-to encode a flag that is bigger than its container (unless the
-container is a u64), and it is easy to construct a flag value
-that doesn't fit in the mask that is associated with it.
+Now that we can detect flags overflowing their container, reduce
+the size of all flag set members in the vcpu struct, turning them
+into 8bit quantities.
 
-Add a couple of build-time sanity checks that ensure we catch
-these two cases.
+Even with the FP state enum occupying 32bit, the whole of the state
+that was represented by flags is smaller by one byte. Profit!
 
 Reviewed-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ffbeb5f5692e..6a37018f40b7 100644
+index 6a37018f40b7..c6975ecf5a5f 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -433,8 +433,20 @@ struct kvm_vcpu_arch {
- #define __unpack_flag(_set, _f, _m)	_f
- #define unpack_vcpu_flag(...)		__unpack_flag(__VA_ARGS__)
+@@ -333,13 +333,13 @@ struct kvm_vcpu_arch {
+ 	} fp_state;
  
-+#define __build_check_flag(v, flagset, f, m)			\
-+	do {							\
-+		typeof(v->arch.flagset) *_fset;			\
-+								\
-+		/* Check that the flags fit in the mask */	\
-+		BUILD_BUG_ON(HWEIGHT(m) != HWEIGHT((f) | (m)));	\
-+		/* Check that the flags fit in the type */	\
-+		BUILD_BUG_ON((sizeof(*_fset) * 8) <= __fls(m));	\
-+	} while (0)
-+
- #define __vcpu_get_flag(v, flagset, f, m)			\
- 	({							\
-+		__build_check_flag(v, flagset, f, m);		\
-+								\
- 		v->arch.flagset & (m);				\
- 	})
+ 	/* Configuration flags, set once and for all before the vcpu can run */
+-	u64 cflags;
++	u8 cflags;
  
-@@ -442,6 +454,8 @@ struct kvm_vcpu_arch {
- 	do {							\
- 		typeof(v->arch.flagset) *fset;			\
- 								\
-+		__build_check_flag(v, flagset, f, m);		\
-+								\
- 		fset = &v->arch.flagset;			\
- 		if (HWEIGHT(m) > 1)				\
- 			*fset &= ~(m);				\
-@@ -452,6 +466,8 @@ struct kvm_vcpu_arch {
- 	do {							\
- 		typeof(v->arch.flagset) *fset;			\
- 								\
-+		__build_check_flag(v, flagset, f, m);		\
-+								\
- 		fset = &v->arch.flagset;			\
- 		*fset &= ~(m);					\
- 	} while (0)
+ 	/* Input flags to the hypervisor code, potentially cleared after use */
+-	u64 iflags;
++	u8 iflags;
+ 
+ 	/* State flags for kernel bookkeeping, unused by the hypervisor code */
+-	u64 sflags;
++	u8 sflags;
+ 
+ 	/*
+ 	 * We maintain more than a single set of debug registers to support
 -- 
 2.34.1
 
