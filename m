@@ -2,70 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D88B2C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Jun 2022 06:13:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53884C43334
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Jun 2022 07:48:36 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B0E64B3B1;
-	Fri, 10 Jun 2022 02:13:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8DF24B3C2;
+	Fri, 10 Jun 2022 03:48:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BpP2xMI4oXUC; Fri, 10 Jun 2022 02:13:40 -0400 (EDT)
+	with ESMTP id cdBgAxvk9Eee; Fri, 10 Jun 2022 03:48:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53A8F4B39E;
-	Fri, 10 Jun 2022 02:13:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 613D54B3BC;
+	Fri, 10 Jun 2022 03:48:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 69DF84B399
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 02:13:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 517304B3BC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 03:48:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wcJRVhiOKTEW for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Jun 2022 02:13:38 -0400 (EDT)
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com
- [209.85.167.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 741944B29D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 02:13:38 -0400 (EDT)
-Received: by mail-oi1-f173.google.com with SMTP id y69so20685233oia.7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Jun 2022 23:13:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=gpIjTUIy/sYUCUxAj7KpvSMIco0OqPienYjZRuLvs/M=;
- b=VAfU23ocUGTYC2vy6DVxgSaoiUC2MRx7bj2MyyD6z+lrcKLSm719EmdaWBW7dwDBjF
- 5mXbB0fh8uPL4ElnsiDw9xOWC7VIQVSmO0IH7CWA7XJb2Te5NrGiNDvqu87pyJBsDCQI
- +CD0jwICLt8uwtntWgx5e/SXA2AvuqNzMHiz3wvYU3AjFpXUGzrdZDAOTpYHFXsnINHR
- qn2hL9eQfopRDxHYzzRzaNUdxChfJMb5ZmdByP+PMOlRsXHM+PQmdsRVDqR/YgHipTI6
- 9+u/0+xd3C8k0gpB7b6qEfuEdcMc423hszvyJmk5S8l4dRzDlpC0ctZR7wd4/u8holCl
- wevg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=gpIjTUIy/sYUCUxAj7KpvSMIco0OqPienYjZRuLvs/M=;
- b=QSgtIhZNpbz3FT4wLIjgQ8wKbDgr8VFshgkQXcMSXeZQbLKSSdX4itqMpbk7fAu6Eb
- K2QLyk5vj5uDovdCgRs63CK+LvDuSGTE0XARbhJHsADfdjVhwZwvgZvEexTzDdCHhUMQ
- zoJcbLANsxPSrLTgu/vGWYjc/H4L44vosqOo7BjXUs+1CPh81jV9U1gmJth8JyajDC2e
- pxFdSjME6qiSY9Ps4HInpk1zbuNWqdujGqeTuyBUW8Obj+/By+ruBYXfsCPytsplz9+m
- 4m7I5AH1pqtJbyMJ7wXY689JveyhNUR4rtPYMxleCLbjWxHsK7ShYmwL0HRXnYXDw0X/
- 7g9w==
-X-Gm-Message-State: AOAM531rOdOTYIHuNjnQjvzY2zZrx1MlPlktzCsWrc7Hq1EU/587ye2f
- dYgR4ih/o0Rhk12aeVWQLKwOnrv1dN6n62qFJxBJHA==
-X-Google-Smtp-Source: ABdhPJxvHBDy+GsUTZeTF2opWbpTgXcsvwdl4BgLSzULzLgn7eCarwu0mJbV3IEMC7FZ98AK5iwyyqEDRasTsWl7QHI=
-X-Received: by 2002:a05:6808:144d:b0:32b:7fbc:943d with SMTP id
- x13-20020a056808144d00b0032b7fbc943dmr3713078oiv.107.1654841617628; Thu, 09
- Jun 2022 23:13:37 -0700 (PDT)
-MIME-Version: 1.0
+ with ESMTP id Rl4v+G18khif for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Jun 2022 03:48:32 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D8094B3B1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jun 2022 03:48:31 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 0924662005;
+ Fri, 10 Jun 2022 07:48:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 689C6C34114;
+ Fri, 10 Jun 2022 07:48:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1654847310;
+ bh=/SSyOqIVFQI+dmFlHOcPAt+HQ7s+mI3SernZbSQfbuo=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=nWG7q2OkeMoWBf8e+DwDHOUXu0j+RKG7K8o2PW9SvvtYI7GPTEgP93O21bROU1/+o
+ A99x1lFOTPdeoeJfRcm07sNn4LVMfFj2LwXv6hfI5ZL2r/dLBRzMyi/50f001dz6a4
+ Fcr32ZDVHGhCx5c5DICeK2mmkHFZdaB6Pwe0zaZ95pTp7okb3n8z9fFmqKcPn47eWg
+ J7VuQoS9HjSMj1tH6Ec6J8IDwLqt2HkLhlRHUczlt6WmNKcy+ndaRgB3Z86vGq+hYl
+ BKIdMxatu3L97ZtpZWFK9ncvsWCruyealYwrIv4aW2fQWBG3lhLUgfNKt8iSITjgRr
+ RekSMnBWKQDyw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nzZNb-00H4OH-Tz; Fri, 10 Jun 2022 08:48:28 +0100
+Date: Fri, 10 Jun 2022 08:48:27 +0100
+Message-ID: <875yl93qno.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH 06/18] KVM: arm64: Add three sets of flags to the vcpu
+ state
+In-Reply-To: <CAAeT=FxH_rK9HT+-QLkbH9hn0LhObwCCTrbdqt0x--BgqtaK_g@mail.gmail.com>
 References: <20220528113829.1043361-1-maz@kernel.org>
- <20220528113829.1043361-9-maz@kernel.org>
-In-Reply-To: <20220528113829.1043361-9-maz@kernel.org>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Thu, 9 Jun 2022 23:13:21 -0700
-Message-ID: <CAAeT=FyfKbubGTFpssRq1KoAs=Fxu2jZjFSbYCm85X9Zk-ZWbA@mail.gmail.com>
-Subject: Re: [PATCH 08/18] KVM: arm64: Move vcpu PC/Exception flags to the
- input flag set
-To: Marc Zyngier <maz@kernel.org>
+ <20220528113829.1043361-7-maz@kernel.org>
+ <CAAeT=FzXWDfkR5ck0vpiRLKi0nU9e5Ua=yg=3Rj--Gq+aBaVUg@mail.gmail.com>
+ <87fske46tp.wl-maz@kernel.org>
+ <CAAeT=FxH_rK9HT+-QLkbH9hn0LhObwCCTrbdqt0x--BgqtaK_g@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kernel-team@android.com, will@kernel.org, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, kernel-team@android.com,
  Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
@@ -85,24 +91,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, May 28, 2022 at 4:38 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> The PC update flags (which also deal with exception injection)
-> is one of the most complicated use of the flag we have. Make it
-> more fool prof by:
->
-> - moving it over to the new accessors and assign it to the
->   input flag set
->
-> - turn the combination of generic ELx flags with another flag
->   indicating the target EL itself into an explicit set of
->   flags for each EL and vector combination
->
-> This is otherwise a pretty straightformward conversion.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On Thu, 09 Jun 2022 18:24:39 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> I've just realized that GUEST_HAS_PTRAUTH (cflags) is used by
+> hypervisor code (kvm_hyp_handle_ptrauth and get_pvm_id_aa64isar{1,2}).
+> Shouldn't GUEST_HAS_PTRAUTH be handled as iflags ?
+> Or, in choosing one of these three for a flag, is immutability (once
+> the vcpu has run) the highest priority, followed by whether or not
+> it is used by hypervisor code ?
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+It can be construed that most configuration flags are also input flags
+to the hypervisor, as they will eventually affect its behaviour. But
+the fact that a flag is immutable once the vcpu has run is a clear
+criterion for a configuration flag.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
