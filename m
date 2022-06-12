@@ -2,71 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6357DC43334
-	for <kvmarm@archiver.kernel.org>; Sat, 11 Jun 2022 18:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FC12CCA473
+	for <kvmarm@archiver.kernel.org>; Sun, 12 Jun 2022 08:59:37 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D84ED4B414;
-	Sat, 11 Jun 2022 14:41:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D13F4B4A5;
+	Sun, 12 Jun 2022 04:59:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dIKceImJH+SJ; Sat, 11 Jun 2022 14:41:55 -0400 (EDT)
+	with ESMTP id Qs2PgP0SIvaD; Sun, 12 Jun 2022 04:59:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6E254B3E4;
-	Sat, 11 Jun 2022 14:41:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 089304B422;
+	Sun, 12 Jun 2022 04:59:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED3FB4B3E4
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Jun 2022 14:41:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 22BDD4B422
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 12 Jun 2022 04:59:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TDXaM0IYuCO6 for <kvmarm@lists.cs.columbia.edu>;
- Sat, 11 Jun 2022 14:41:54 -0400 (EDT)
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com
- [209.85.160.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EBDDF4B3D8
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Jun 2022 14:41:53 -0400 (EDT)
-Received: by mail-oa1-f54.google.com with SMTP id
- 586e51a60fabf-fe4ac3b87fso3317216fac.3
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Jun 2022 11:41:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=aGUj2LVLNGk5sOwR7+tKcU/mD91p7d7Dvbf7YRvu4qg=;
- b=rPFZGQ3gOLwesD2QG9IU7Z5ORHjifYdHd3M3rHmqO3uS3mAECeXs6WSr08jhHalONZ
- 00kH3g/6qwvm7Dxs4OZ+92EBsLjn+o7VUtqj90p3R3wmrgQ2eb8atHHvBtZZBrCW8++X
- kFVuv1Ot4n+8SKCcIx2n/ihi+/dBLMJD8UVXyxR68MluJYDarVW4aa25cfakTZv84r1J
- nn7YN7qw6zWnfq/+xGkexU0DFWnuoSdRk9EyoCt1b05nphByzWoPaWx2BZLAk18WZ0gs
- 5+qCnSeOw0GNdYe6zeodER3hcZKsS8SpAhSeNZnVC6+Hjz3AEQiwhzij2Jsh9TGn5hDx
- +E4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=aGUj2LVLNGk5sOwR7+tKcU/mD91p7d7Dvbf7YRvu4qg=;
- b=iMbARaCJqSGRGmDVq0aXMISmbjpfSFcSlPj0lg5vdf5iwkoFCRhrdIJqSQ4UxZwGT5
- qwuZv1NgzA6XRqlTh40bPhoqcwlxLhQg/hwd+yOH0/HOc0sV/I27mnFMM/LzjzZiA7JR
- jRFcmwGIwJWHU71zhYKVQMMwC9aHzUls/hmAg9F6X2Rmw2gpc4m1Ch203m/jXjeW5MVo
- R2D7BDvOCBnbyG9xG6HYNiiQguy3Z0A7t0onRQprkQYegUyQ9lySXBmbOYihqh/RdVDV
- OIO82oEd7R2RoTtFDNw4j6lG49HCX+GbH/3bYpX/DJVNCq7F82P6M/CY8drGEeQ1HCnn
- HHlg==
-X-Gm-Message-State: AOAM53127Ensq29Nmy6MRhm9g6nxfBvXdxhpbD6/RWW9mbn4VaMY1R+0
- iRPnt6yBXEF+ZHxo3JIjplBpA7Yc3wEGqCgYKRYT1g==
-X-Google-Smtp-Source: ABdhPJwBqvM9uOWilf/hZkJ/qSGvf+HPCw8ZzSqEItH5yaUmYPdRrrdg19+h1EH+Z84nEY0g6QaKN8589eW/COQRu1E=
-X-Received: by 2002:a05:6870:304b:b0:f2:d164:5c85 with SMTP id
- u11-20020a056870304b00b000f2d1645c85mr3138557oau.107.1654972913135; Sat, 11
- Jun 2022 11:41:53 -0700 (PDT)
-MIME-Version: 1.0
+ with ESMTP id kdR3JT9fzUsQ for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 12 Jun 2022 04:59:32 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C9C714B411
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 12 Jun 2022 04:59:32 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id DE5EF60C07;
+ Sun, 12 Jun 2022 08:59:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40D6CC34115;
+ Sun, 12 Jun 2022 08:59:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1655024371;
+ bh=lAZd4om3O/HhLmnjR6wY2GSgGFgCHW1e+OFvSSyBIds=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=tBA2DhCeU+J+TQVwkHA+0m0syzbtrutzouveFNnovfkfbe0tG/RExhAV406Y2kiw0
+ 1GtK06OLvCwuNweJo2nu3xZf7rAT0PgP7KWuIAEt2AZNbQZKJaiUrQ6IbcWwPql/VR
+ C5BcXeACz3JXJwg9ujtbrl4FKnqRoF0CEWXydbtWRiovHIHNqqYQXwnd6yMC9nnl9w
+ O4npE1M3QOAr1s09VQyFzx+OrtcZeSEawgDxlV/72FkmhLryGee1R37WtvoOhw9z6v
+ inxqYzTUdYWnhDUMuxNxfBwJeEeyY1yxP1xPiVSgSINnJz87s7Jz9jKRJF8nvWDqZW
+ rlapsgc4Mg+JA==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1o0JRQ-00HVLI-W9;
+ Sun, 12 Jun 2022 09:59:29 +0100
+Date: Sun, 12 Jun 2022 09:59:03 +0100
+Message-ID: <87zgiip8a0.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v2 05/19] KVM: arm64: Add helpers to manipulate vcpu flags
+ among a set
+In-Reply-To: <CAAeT=Fxu+s7JNYP-U-ov2yqhLVp7Nvf_yox0JaVZh06a=rHwzg@mail.gmail.com>
 References: <20220610092838.1205755-1-maz@kernel.org>
- <20220610092838.1205755-7-maz@kernel.org>
-In-Reply-To: <20220610092838.1205755-7-maz@kernel.org>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Sat, 11 Jun 2022 11:41:37 -0700
-Message-ID: <CAAeT=FxsPKgRbeNKWmRW3BYAnNrf_j6DeNGaCGUVG+_uNUUrFA@mail.gmail.com>
-Subject: Re: [PATCH v2 06/19] KVM: arm64: Add three sets of flags to the vcpu
- state
-To: Marc Zyngier <maz@kernel.org>
+ <20220610092838.1205755-6-maz@kernel.org>
+ <CAAeT=Fxu+s7JNYP-U-ov2yqhLVp7Nvf_yox0JaVZh06a=rHwzg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, oupton@google.com,
+ will@kernel.org, tabba@google.com, qperret@google.com, broonie@kernel.org,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
  Mark Brown <broonie@kernel.org>, kvmarm@lists.cs.columbia.edu,
  Linux ARM <linux-arm-kernel@lists.infradead.org>
@@ -86,58 +92,112 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jun 10, 2022 at 2:29 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> It so appears that each of the vcpu flags is really belonging to
-> one of three categories:
->
-> - a configuration flag, set once and for all
-> - an input flag generated by the kernel for the hypervisor to use
-> - a state flag that is only for the kernel's own bookkeeping
->
-> As we are going to split all the existing flags into these three
-> sets, introduce all three in one go.
->
-> No functional change other than a bit of bloat...
->
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 6d30ac7e3164..af45320f247f 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -335,6 +335,15 @@ struct kvm_vcpu_arch {
->         /* Miscellaneous vcpu state flags */
->         u64 flags;
->
-> +       /* Configuration flags, set once and for all before the vcpu can run */
-> +       u64 cflags;
-> +
-> +       /* Input flags to the hypervisor code, potentially cleared after use */
-> +       u64 iflags;
-> +
-> +       /* State flags for kernel bookkeeping, unused by the hypervisor code */
-> +       u64 sflags;
+On Sat, 11 Jun 2022 19:37:50 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> On Fri, Jun 10, 2022 at 2:28 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Careful analysis of the vcpu flags show that this is a mix of
+> > configuration, communication between the host and the hypervisor,
+> > as well as anciliary state that has no consistency. It'd be a lot
+> > better if we could split these flags into consistent categories.
+> >
+> > However, even if we split these flags apart, we want to make sure
+> > that each flag can only be applied to its own set, and not across
+> > sets.
+> >
+> > To achieve this, use a preprocessor hack so that each flag is always
+> > associated with:
+> >
+> > - the set that contains it,
+> >
+> > - a mask that describe all the bits that contain it (for a simple
+> >   flag, this is the same thing as the flag itself, but we will
+> >   eventually have values that cover multiple bits at once).
+> >
+> > Each flag is thus a triplet that is not directly usable as a value,
+> > but used by three helpers that allow the flag to be set, cleared,
+> > and fetched. By mandating the use of such helper, we can easily
+> > enforce that a flag can only be used with the set it belongs to.
+> >
+> > Finally, one last helper "unpacks" the raw value from the triplet
+> > that represents a flag, which is useful for multi-bit values that
+> > need to be enumerated (in a switch statement, for example).
+> >
+> > Further patches will start making use of this infrastructure.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 44 +++++++++++++++++++++++++++++++
+> >  1 file changed, 44 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 372c5642cfab..6d30ac7e3164 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -415,6 +415,50 @@ struct kvm_vcpu_arch {
+> >         } steal;
+> >  };
+> >
+> > +/*
+> > + * Each 'flag' is composed of a comma-separated triplet:
+> > + *
+> > + * - the flag-set it belongs to in the vcpu->arch structure
+> > + * - the value for that flag
+> > + * - the mask for that flag
+> > + *
+> > + *  __vcpu_single_flag() builds such a triplet for a single-bit flag.
+> > + * unpack_vcpu_flag() extract the flag value from the triplet for
+> > + * direct use outside of the flag accessors.
+> > + */
+> > +#define __vcpu_single_flag(_set, _f)   _set, (_f), (_f)
+> > +
+> > +#define __unpack_flag(_set, _f, _m)    _f
+> > +#define unpack_vcpu_flag(...)          __unpack_flag(__VA_ARGS__)
+> > +
+> > +#define __vcpu_get_flag(v, flagset, f, m)                      \
+> > +       ({                                                      \
+> > +               v->arch.flagset & (m);                          \
+> > +       })
+> > +
+> > +#define __vcpu_set_flag(v, flagset, f, m)                      \
+> > +       do {                                                    \
+> > +               typeof(v->arch.flagset) *fset;                  \
+> > +                                                               \
+> > +               fset = &v->arch.flagset;                        \
+> > +               if (HWEIGHT(m) > 1)                             \
+> > +                       *fset &= ~(m);                          \
+> > +               *fset |= (f);                                   \
+> > +       } while (0)
+> > +
+> > +#define __vcpu_clear_flag(v, flagset, f, m)                    \
+> > +       do {                                                    \
+> > +               typeof(v->arch.flagset) *fset;                  \
+> > +                                                               \
+> > +               fset = &v->arch.flagset;                        \
+> > +               *fset &= ~(m);                                  \
+> > +       } while (0)
+> 
+> Reviewed-by: Reiji Watanabe <reijiw@google.com>
+> 
+> IMHO I would prefer to have 'v' enclosed in parentheses in the
+> implementation of __vcpu_{get,set,clear}_flag rather than in
+> the implementation of vcpu_{get,set,clear}_flag though.
+> (That was what I meant in my comment for v1)
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+I understood what you were asking the first place, but I don't think
+this has any advantage over what is above. __vcpu_{get,set,clear}_flag
+are not meant to be used directly, and adding extra bracketing to
+these only makes them more painful to read.
 
-Thank you, those comments are more clear to me now.
+If you can show a case where it breaks, I'll be happy to revisit this.
 
 Thanks,
-Reiji
 
+	M.
 
-> +
->         /*
->          * We maintain more than a single set of debug registers to support
->          * debugging the guest from the host and to maintain separate host and
-> --
-> 2.34.1
->
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
