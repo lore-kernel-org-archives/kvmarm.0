@@ -2,62 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDDE9C43334
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Jun 2022 08:16:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9986C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Jun 2022 08:16:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DD8A49E5F;
-	Tue, 14 Jun 2022 04:16:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 540AD4B218;
+	Tue, 14 Jun 2022 04:16:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@nifty.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rjcLT1mal+g4; Tue, 14 Jun 2022 04:16:18 -0400 (EDT)
+	with ESMTP id GczkAJdmVKxy; Tue, 14 Jun 2022 04:16:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 55DC04B1C4;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E1984B21A;
 	Tue, 14 Jun 2022 04:16:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB1CC4B388
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jun 2022 05:21:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 236824B288
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jun 2022 13:12:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2bu8Adb+ELvS for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Jun 2022 05:21:11 -0400 (EDT)
-Received: from conuserg-11.nifty.com (conuserg-11.nifty.com [210.131.2.78])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B48B34B0B6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jun 2022 05:21:10 -0400 (EDT)
-Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp
- [133.32.177.133]) (authenticated)
- by conuserg-11.nifty.com with ESMTP id 25D9Kgx7000823;
- Mon, 13 Jun 2022 18:20:42 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 25D9Kgx7000823
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
- s=dec2015msa; t=1655112043;
- bh=sUeQiGOXKyxAl0UcjFY0Rce/KrFiD5fobjE1eCXei3Y=;
- h=From:To:Cc:Subject:Date:From;
- b=tg5xx0WFjhtsWOYFCUHrzxlt1EIpxO7a0yE3L3du7kUgVp1E6TLXPi6gpOO04yr2e
- D7SWOpfowWBJbLp8NGBXeol+tTlojiNCRSaqVW0XzexYzV8LBN19Hu50s+wf82sz6t
- DGTw6LTVPBmGRZ7SLoQaN3EehFvjTU2fu7QS1L1diREfr7VD9gT9s/1wFAE7wcZ44a
- rbxJGz2RA2pn8neAKkszhzUo10+z27U6iRV+E9RB1AgKaTY2WA1N3nmS6wyL5scb1n
- ph9G/7oG8TJZyC1DTUI9mUtu1GVO9UY18PryP5+LxfwP2Lp/vp0Jc4B5vb3loDBmJc
- FmI3ACPNrSOLg==
-X-Nifty-SrcIP: [133.32.177.133]
-From: Masahiro Yamada <masahiroy@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 1/2] KVM: arm64: nvhe: rename confusing obj-y
-Date: Mon, 13 Jun 2022 18:20:25 +0900
-Message-Id: <20220613092026.1705630-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
+ with ESMTP id AMBAV6D-0x6u for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Jun 2022 13:12:02 -0400 (EDT)
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com
+ [209.85.221.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E93484B1BC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jun 2022 13:12:01 -0400 (EDT)
+Received: by mail-wr1-f50.google.com with SMTP id h5so8005784wrb.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jun 2022 10:12:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=BwfpdGVZuLzhMRO0qDkUrzUSE4uGJ0s4izOa+gswkLc=;
+ b=iyoFryyCEMOgC7rXLKu4nOmoJ4Ev3bSJmT6ed09FE5xCAAc5dBkkwtXxpcvvGQ+P+z
+ ETT+TDFbc4w3QEtd0CSTtGopVeE/ROGO0WHkEbyE/LYwiv3H3TW3pyxouKMCLv+KqkYZ
+ yNXDxA5s4wHBPNNleteRDWB0OVGKRy46fxusIatVg7fbsU3f8NuQHDDwXuooOAhihX5c
+ apRzdEm4Qcxw1Vp4x8eHSJ0zk6RBYV1Jvu3JCqD8yM8Yczm4FlFHmh8FmzU3HH+SvYZl
+ N0nY66gFj0te0BB1xSoY4rr990nbGbzyauUa8tb8y8DjQzQQuFKjHb8vPu4IK/5VClaZ
+ mw/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=BwfpdGVZuLzhMRO0qDkUrzUSE4uGJ0s4izOa+gswkLc=;
+ b=Lz83IrCEXvUi45UPL02vQlX8tg8g7EuL9vXywz8yl7YrUKWpt9XoFEldWtzOsVTp4H
+ EgFoCYmqm1tR8Pnyum6ggKF9UENZ08ZbbsLQvDArSpogia6T1eOYrbvpZPiNuvCMOUQQ
+ 1qlM/gZLo5938JqWApf2TzF66EEvPSHZLvgsEjU3edaiu2+O2rDjPVr1MEow/lRQBPei
+ jna5I56/gE80qp68EwxKWf/zelw9p5aVOL/EC8b2DkUEixT4HieGrgUgeL17f7yxHvCM
+ vF87TwuOVuhDXbcN8PbOwsigBM0V1VgJBcMCe65ohlw8FiMePgbGyVQ5ICvwUWl3PwLS
+ 1X+Q==
+X-Gm-Message-State: AJIora8ELNxKO5MHzDrHS6Ni/bpgMQMwnoekdQ6Wr46EimKXEItz46Bi
+ stFHMXLJRkMR7KKOssbLTVqj3sIaPZH2lav9jRq2YA==
+X-Google-Smtp-Source: AGRyM1s6B0qb0T2WacCoWhhkywiiU+ZvFODg5mDtSwgELuEdOO1P7hQRTSX7NI4gasI6mKDBJY57NrqOabVTnciF7VA=
+X-Received: by 2002:adf:f688:0:b0:215:6e4d:4103 with SMTP id
+ v8-20020adff688000000b002156e4d4103mr802713wrp.372.1655140320646; Mon, 13 Jun
+ 2022 10:12:00 -0700 (PDT)
 MIME-Version: 1.0
+References: <20220606222058.86688-1-yosryahmed@google.com>
+ <20220606222058.86688-2-yosryahmed@google.com>
+ <bdfea446-623c-d423-673f-496b3725ec2c@intel.com>
+In-Reply-To: <bdfea446-623c-d423-673f-496b3725ec2c@intel.com>
+From: Yosry Ahmed <yosryahmed@google.com>
+Date: Mon, 13 Jun 2022 10:11:23 -0700
+Message-ID: <CAJD7tkbUXb7qBm1GAMDr29DcsC90_bPzwffkdtAu_Na+inVzVg@mail.gmail.com>
+Subject: Re: [PATCH v5 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
+ page table uses.
+To: "Huang, Shaoqin" <shaoqin.huang@intel.com>
 X-Mailman-Approved-At: Tue, 14 Jun 2022 04:16:17 -0400
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Masahiro Yamada <masahiroy@kernel.org>,
- Kefeng Wang <wangkefeng.wang@huawei.com>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Roman Gushchin <roman.gushchin@linux.dev>, Michal Hocko <mhocko@kernel.org>,
+ Linux-MM <linux-mm@kvack.org>, Zefan Li <lizefan.x@bytedance.com>,
+ kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, Shakeel Butt <shakeelb@google.com>,
+ Cgroups <cgroups@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, Tejun Heo <tj@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,57 +94,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This Makefile appends several objects to obj-y from line 15, but none
-of them is linked to vmlinux in an ordinary way.
+On Sun, Jun 12, 2022 at 8:18 PM Huang, Shaoqin <shaoqin.huang@intel.com> wrote:
+>
+>
+>
+> On 6/7/2022 6:20 AM, Yosry Ahmed wrote:
+> > Add NR_SECONDARY_PAGETABLE stat to count secondary page table uses, e.g.
+> > KVM mmu. This provides more insights on the kernel memory used
+> > by a workload.
+> >
+> > This stat will be used by subsequent patches to count KVM mmu
+> > memory usage.
+> >
+> > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> > ---
+> >   Documentation/admin-guide/cgroup-v2.rst | 5 +++++
+> >   Documentation/filesystems/proc.rst      | 4 ++++
+> >   drivers/base/node.c                     | 2 ++
+> >   fs/proc/meminfo.c                       | 2 ++
+> >   include/linux/mmzone.h                  | 1 +
+> >   mm/memcontrol.c                         | 1 +
+> >   mm/page_alloc.c                         | 6 +++++-
+> >   mm/vmstat.c                             | 1 +
+> >   8 files changed, 21 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
+> > index 69d7a6983f781..307a284b99189 100644
+> > --- a/Documentation/admin-guide/cgroup-v2.rst
+> > +++ b/Documentation/admin-guide/cgroup-v2.rst
+> > @@ -1312,6 +1312,11 @@ PAGE_SIZE multiple when read back.
+> >         pagetables
+> >                   Amount of memory allocated for page tables.
+> >
+> > +       sec_pagetables
+> > +             Amount of memory allocated for secondary page tables,
+> > +             this currently includes KVM mmu allocations on x86
+> > +             and arm64.
+> > +
+> >         percpu (npn)
+> >               Amount of memory used for storing per-cpu kernel
+> >               data structures.
+> > diff --git a/Documentation/filesystems/proc.rst b/Documentation/filesystems/proc.rst
+> > index 061744c436d99..894d6317f3bdc 100644
+> > --- a/Documentation/filesystems/proc.rst
+> > +++ b/Documentation/filesystems/proc.rst
+> > @@ -973,6 +973,7 @@ You may not have all of these fields.
+> >       SReclaimable:   159856 kB
+> >       SUnreclaim:     124508 kB
+> >       PageTables:      24448 kB
+> > +    SecPageTables:    0 kB
+> >       NFS_Unstable:        0 kB
+> >       Bounce:              0 kB
+> >       WritebackTmp:        0 kB
+> > @@ -1067,6 +1068,9 @@ SUnreclaim
+> >   PageTables
+> >                 amount of memory dedicated to the lowest level of page
+> >                 tables.
+> > +SecPageTables
+> > +           amount of memory dedicated to secondary page tables, this
+> > +           currently includes KVM mmu allocations on x86 and arm64.
+>
+> Just a notice. This patch in the latest 5.19.0-rc2+ have a conflict in
+> Documentation/filesystems/proc.rst file. But that's not a problem.
 
-obj-y is overwritten at line 30:
+Thanks for pointing this out. Let me know if a rebase and resend is necessary.
 
-  obj-y := kvm_nvhe.o
-
-So, kvm_nvhe.o is the only object directly linked to vmlinux.
-
-Replace the abused obj-y with hyp-obj-y.
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- arch/arm64/kvm/hyp/nvhe/Makefile | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index f9fe4dc21b1f..3c6d3a18171c 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -12,13 +12,13 @@ HOST_EXTRACFLAGS += -I$(objtree)/include
- lib-objs := clear_page.o copy_page.o memcpy.o memset.o
- lib-objs := $(addprefix ../../../lib/, $(lib-objs))
- 
--obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
-+hyp-obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
- 	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o page_alloc.o \
- 	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o
--obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
-+hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
- 	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
--obj-$(CONFIG_DEBUG_LIST) += list_debug.o
--obj-y += $(lib-objs)
-+hyp-obj-$(CONFIG_DEBUG_LIST) += list_debug.o
-+hyp-obj-y += $(lib-objs)
- 
- ##
- ## Build rules for compiling nVHE hyp code
-@@ -26,7 +26,7 @@ obj-y += $(lib-objs)
- ## file containing all nVHE hyp code and data.
- ##
- 
--hyp-obj := $(patsubst %.o,%.nvhe.o,$(obj-y))
-+hyp-obj := $(patsubst %.o,%.nvhe.o,$(hyp-obj-y))
- obj-y := kvm_nvhe.o
- extra-y := $(hyp-obj) kvm_nvhe.tmp.o kvm_nvhe.rel.o hyp.lds hyp-reloc.S hyp-reloc.o
- 
--- 
-2.32.0
-
+<snip>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
