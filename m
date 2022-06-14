@@ -2,74 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA143C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Jun 2022 04:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B010FC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Jun 2022 05:57:26 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0304E401C6;
-	Tue, 14 Jun 2022 00:15:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E5CB4B224;
+	Tue, 14 Jun 2022 01:57:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IhZ8kTbhh8V2; Tue, 14 Jun 2022 00:15:53 -0400 (EDT)
+	with ESMTP id 3pz4WnKwW25f; Tue, 14 Jun 2022 01:57:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 058C54B204;
-	Tue, 14 Jun 2022 00:15:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EC294B18F;
+	Tue, 14 Jun 2022 01:57:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73AAE4B1FD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Jun 2022 00:15:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C527E4B18F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Jun 2022 01:57:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 984VemZ5LU8O for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Jun 2022 00:15:50 -0400 (EDT)
-Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com
- [209.85.161.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5B9984B1FA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Jun 2022 00:15:50 -0400 (EDT)
-Received: by mail-oo1-f54.google.com with SMTP id
- v33-20020a4a9764000000b0035f814bb06eso1549945ooi.11
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jun 2022 21:15:50 -0700 (PDT)
+ with ESMTP id EPStWJKsUX3A for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Jun 2022 01:57:22 -0400 (EDT)
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com
+ [209.85.167.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D0C3C4B13D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Jun 2022 01:57:22 -0400 (EDT)
+Received: by mail-oi1-f178.google.com with SMTP id u9so5104232oiv.12
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jun 2022 22:57:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=c+Rp2RVEpu3MX7WeOUfPLY5BNmqBN8ySZmPahKyFmPk=;
- b=rwEWc6oeXP3pUzO9Q3sZp88gjVV6FWStAUQOC1b+N2itM3EgGqAcjQo4kdP9KcrnCp
- pqDV8WqpC6AApOglkZ9Sicp9anig7WyqXStHC6b2TFcw9GPvh3xS/MWlGwytIBDBiD8N
- 8ZAIWeEXPPsT8yhbGlA8464ObjRwV/87RgaBtpynhwNZBLz/wpXJ3aVhI2w2wFtIaoCH
- BE55bc6IL4bUjBBiXT6kFZUdExMCHLUh7VsuOMTAjy+Gw28mk1WhwuN/11us7AYFtoaC
- y/4Y8sC90rlObTFXvlZjCa1yQwWKaUEl2DHhzkXBcS2X5mOUNtvLa1C9K7LSoam8idi7
- zaNw==
+ :cc; bh=PEICoB6m3N8YpawGTh+jEFjmtcQM1rLpRCmzV8j/s48=;
+ b=Isq/L32gYEScriGPKZHzE6t9/5yyvvxBpzQYHF8iYlCYkaiWFKtVZIGOMcS8upMT2W
+ 3PrQ+qffbAuptphVGJebmZoA5YWus9Phyt6/flM6SJvdfhGINbn+IcIvOAwlwQPo4ZTq
+ pwO9s7fT6O4aNgVg6ChlkXGLbsw+HbfAocVf3tkeTp9zjUoeeQoIavD2pkA5J8VYzCqK
+ gMbj3ztWwBbjQDWgy+BmmhGWhji0Kniv9WmHnm/xKLFBgaGW1F7DFTLncthVf4mAApQ5
+ eaYw9X7u79s9Gp5UVdF5k6YcbEb2Uf7SxU2OYAuRSGQfgTkkBXg/QFSRgs577m6Ybr26
+ 2rrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=c+Rp2RVEpu3MX7WeOUfPLY5BNmqBN8ySZmPahKyFmPk=;
- b=jj6I3cwPf5asJp0NK4LqzKcu7gsUxez6uc+Pe0uNm7+laCgLh/hsVTZYfZYoMV2ZEf
- MlZLroILpb2KgQtq+hZaXUTV0jcnwUbfxv49bGVZ7K/3sBCQWWrBGeZZQImqHyzXkwhz
- 3CrcR/fgzpfDlB8wSZZ6nRVZoDFsmsCcluwO19ngrZMNQufv6h9zH1GxLtahIlS8eSE9
- K6/s5ehaHlLNtqgBpWB+CBFtSi0JBd/T8hbY/hT/mgiF+89RMqdTTwbdKnthDl/piv1e
- 79cNQ4/8JrSbBzthF9JRQIUOCU3lCcxAo0tn7u64cvxx+0ip07wMagVwG4GNb+0SdplL
- p4/A==
-X-Gm-Message-State: AOAM533/6Am79A+i+Pffa14kaxJybyWB0U1S+mYYbEpMvCBzry8ms8C+
- pFRYa6YMGEqEyMGykJbxjMgakJKs5IprHoyaRZV7mA==
-X-Google-Smtp-Source: ABdhPJypOZtefVLb22hKytzMlPi7WjxrWiezVIH5Yerm2RclFvxbaIinEfvYVAnXqJH/Nlpbh1vodkgn4diJAhYSnjE=
-X-Received: by 2002:a4a:8c48:0:b0:41b:43c3:fa54 with SMTP id
- v8-20020a4a8c48000000b0041b43c3fa54mr1271721ooj.78.1655180149501; Mon, 13 Jun
- 2022 21:15:49 -0700 (PDT)
+ bh=PEICoB6m3N8YpawGTh+jEFjmtcQM1rLpRCmzV8j/s48=;
+ b=6ba8R4LhqgjXwfTlfoA+SqyXjdNPPDXENf9B6KIWkON8OeaIzKSm/Daf/sq9lClNBf
+ SM7E2p7d1NAkPVG4oVvH0DnNbq4lcAB+SPxZyZcF7Id2ZxypHowBjIRFNtGj9yAunOTi
+ pqJ0K0EPq0i3ASrYojnaYeFyFy5FwFaxjvMGUYKhkWW812WZ9EakNCDvm6ATN1ly5XJF
+ 9q6bokVAiC8C7s/+Yl2gy8Vc8nv37FKiiO0Dcxtvimo88QjMGwU0MC8mU3l9u6uxOHi7
+ atjjXLwQ30dVAZ6SjycInubdejaF+2+EgFlyo503XO/RhXbfbHT9nlX9UISUMExKtUtj
+ 28Fw==
+X-Gm-Message-State: AOAM530Edx1M4QpovtniC56DSP+vCIeDltPMqKTdFUlIShVtsWx9MuZy
+ uqbsngDxIX4EWg0ywigip2SyDudjD0/OJJ89tT0b8g==
+X-Google-Smtp-Source: ABdhPJxJXVon1lKUUYKHPFkwSm4YC+/Ph2Shgu5mgsRt7FRK2tIjKM+z36OMLTOLv0CXm8sWVhzyZq/DgJx5Pt3f5ck=
+X-Received: by 2002:aca:ac4c:0:b0:32f:1199:5963 with SMTP id
+ v73-20020acaac4c000000b0032f11995963mr1214175oie.107.1655186241959; Mon, 13
+ Jun 2022 22:57:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220610092838.1205755-1-maz@kernel.org>
- <20220610092838.1205755-20-maz@kernel.org>
-In-Reply-To: <20220610092838.1205755-20-maz@kernel.org>
+References: <20220609121223.2551-1-will@kernel.org>
+ <20220609121223.2551-3-will@kernel.org>
+In-Reply-To: <20220609121223.2551-3-will@kernel.org>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Mon, 13 Jun 2022 21:15:33 -0700
-Message-ID: <CAAeT=FwuUsZSgV-tTBEf-V1vjjhvmFHSDzSMyVjWDQd+jdHf7A@mail.gmail.com>
-Subject: Re: [PATCH v2 19/19] KVM: arm64: Move the handling of !FP outside of
- the fast path
-To: Marc Zyngier <maz@kernel.org>
-Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Mark Brown <broonie@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+Date: Mon, 13 Jun 2022 22:57:06 -0700
+Message-ID: <CAAeT=Fz6ik6bRURKE2mMeQzNZC5jjb9T-wz_6y_7DQ+mmyRbzg@mail.gmail.com>
+Subject: Re: [PATCH 2/6] KVM: arm64: Handle all ID registers trapped for a
+ protected VM
+To: Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,27 +84,21 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jun 10, 2022 at 2:35 AM Marc Zyngier <maz@kernel.org> wrote:
+On Thu, Jun 9, 2022 at 5:12 AM Will Deacon <will@kernel.org> wrote:
 >
-> We currently start by assuming that the host owns the FP unit
-> at load time, then check again whether this is the case as
-> we are about to run. Only at this point do we account for the
-> fact that there is a (vanishingly small) chance that we're running
-> on a system without a FPSIMD unit (yes, this is madness).
+> From: Marc Zyngier <maz@kernel.org>
 >
-> We can actually move this FPSIMD check as early as load-time,
-> and drop the check at run time.
+> A protected VM accessing ID_AA64ISAR2_EL1 gets punished with an UNDEF,
+> while it really should only get a zero back if the register is not
+> handled by the hypervisor emulation (as mandated by the architecture).
 >
-> No intended change in behaviour.
+> Introduce all the missing ID registers (including the unallocated ones),
+> and have them to return 0.
 >
-> Suggested-by: Reiji Watanabe <reijiw@google.com>
+> Reported-by: Will Deacon <will@kernel.org>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-For patches 9~19 in the series,
 Reviewed-by: Reiji Watanabe <reijiw@google.com>
-
-Thanks,
-Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
