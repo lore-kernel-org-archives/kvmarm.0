@@ -2,46 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0F66C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Jun 2022 13:14:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF4B6C43334
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jun 2022 13:23:56 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 12FDA4B2B8;
-	Wed, 15 Jun 2022 09:14:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A38E4B232;
+	Wed, 15 Jun 2022 09:23:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gWeL-nAz75DL; Wed, 15 Jun 2022 09:14:06 -0400 (EDT)
+	with ESMTP id 8s41Z4tL-+oF; Wed, 15 Jun 2022 09:23:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B05174B2C2;
-	Wed, 15 Jun 2022 09:14:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F7F64B2D3;
+	Wed, 15 Jun 2022 09:23:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B723E4B2B8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jun 2022 09:14:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D852A4B232
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jun 2022 09:23:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id f8P7RdZPkslb for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Jun 2022 09:14:03 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41DBD4B28C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jun 2022 09:14:03 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86FF5139F;
- Wed, 15 Jun 2022 06:14:02 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 52E343F66F;
- Wed, 15 Jun 2022 06:14:00 -0700 (PDT)
-Date: Wed, 15 Jun 2022 14:14:19 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 11/19] KVM: arm64: Move vcpu ON_UNSUPPORTED_CPU flag
- to the state flag set
-Message-ID: <YqnbEJ0hgSKyXtxO@monolith.localdoman>
+ with ESMTP id dVZK0SZ2Q8Zx for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Jun 2022 09:23:53 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A2F094B139
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jun 2022 09:23:53 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 961BB61A8E;
+ Wed, 15 Jun 2022 13:23:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1193C34115;
+ Wed, 15 Jun 2022 13:23:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1655299432;
+ bh=Me0HdzSNXhl2tFgsUu9WBEDTzqpzKof+IK8Pccxqen0=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Xb1tjiPm1Y3YyCDXPBYi3jWZ2ZV+5aeGLFzJ6kYuxjpP7h/4m9WB1W6ltukibQgEx
+ NByyYYXIBxzu3kj4Rl/fBBj/OzCb2xkuCfnEORCyGxwgPnlVdrmIJy5F/U56yjTj1Z
+ gpiMSYOOfPBjnMZ/nB9z41AMccyjw6in0d8dIWJ2/urByuj25T5f4DEiHEByj6kse5
+ mkM4k81dy5vyD9HKrL8G9BWsLpU36A8sRg83SO3QlRWXKPNP6Zqlr+8TufRCtOml0t
+ B7ZeQbfj+p/PXk5ZLRLWW4w4m2Q9fHHSSg7yjgfqFsmV1dzbcc53pnXvtydrC9O1jK
+ 9Z8t0RbjrmuhA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1o1Szt-000nMF-Nk;
+ Wed, 15 Jun 2022 14:23:49 +0100
+Date: Wed, 15 Jun 2022 14:23:49 +0100
+Message-ID: <87zgie2h7e.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v2 11/19] KVM: arm64: Move vcpu ON_UNSUPPORTED_CPU flag to
+ the state flag set
+In-Reply-To: <YqnbEJ0hgSKyXtxO@monolith.localdoman>
 References: <20220610092838.1205755-1-maz@kernel.org>
  <20220610092838.1205755-12-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220610092838.1205755-12-maz@kernel.org>
+ <YqnbEJ0hgSKyXtxO@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, oupton@google.com, will@kernel.org, tabba@google.com,
+ qperret@google.com, broonie@kernel.org, reijiw@google.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, kernel-team@android.com,
  Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
@@ -61,76 +91,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
-
-On Fri, Jun 10, 2022 at 10:28:30AM +0100, Marc Zyngier wrote:
-> The ON_UNSUPPORTED_CPU flag is only there to track the sad fact
-> that we have ended-up on a CPU where we cannot really run.
+On Wed, 15 Jun 2022 14:14:19 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Since this is only for the host kernel's use, move it to the state
-> set.
+> Hi,
 > 
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
+> On Fri, Jun 10, 2022 at 10:28:30AM +0100, Marc Zyngier wrote:
+> > The ON_UNSUPPORTED_CPU flag is only there to track the sad fact
+> > that we have ended-up on a CPU where we cannot really run.
+> > 
+> > Since this is only for the host kernel's use, move it to the state
+> > set.
+> > 
+> > Reviewed-by: Fuad Tabba <tabba@google.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 9 +++++----
+> >  1 file changed, 5 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 4f147bdc5ce9..0c22514cb7c7 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -519,6 +519,8 @@ struct kvm_vcpu_arch {
+> >  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+> >  /* SME enabled for EL0 */
+> >  #define HOST_SME_ENABLED	__vcpu_single_flag(sflags, BIT(1))
+> > +/* Physical CPU not in supported_cpus */
+> > +#define ON_UNSUPPORTED_CPU	__vcpu_single_flag(sflags, BIT(2))
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 4f147bdc5ce9..0c22514cb7c7 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -519,6 +519,8 @@ struct kvm_vcpu_arch {
->  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
->  /* SME enabled for EL0 */
->  #define HOST_SME_ENABLED	__vcpu_single_flag(sflags, BIT(1))
-> +/* Physical CPU not in supported_cpus */
-> +#define ON_UNSUPPORTED_CPU	__vcpu_single_flag(sflags, BIT(2))
-
-I'm a bit confused here. The ON_UNSUPPORTED_CPU flag ends up in sflags. The
-comment for sflags says:
-
-+	/* State flags for kernel bookkeeping, unused by the hypervisor code */
-+	u64 sflags;
-
-The ON_UNSUPPORT_CPU flag is used exclusively by KVM (it's only used by the
-file arch/arm64/kvm/arm.c), so why is it part of a set of flags which are
-supposed to be unused by the hypervisor code?
-
-Thanks,
-Alex
-
->  
->  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
->  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
-> @@ -541,7 +543,6 @@ struct kvm_vcpu_arch {
->  })
->  
->  /* vcpu_arch flags field values: */
-> -#define KVM_ARM64_ON_UNSUPPORTED_CPU	(1 << 15) /* Physical CPU not in supported_cpus */
->  #define KVM_ARM64_WFIT			(1 << 17) /* WFIT instruction trapped */
->  #define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE | \
->  				 KVM_GUESTDBG_USE_SW_BP | \
-> @@ -561,13 +562,13 @@ struct kvm_vcpu_arch {
->  #endif
->  
->  #define vcpu_on_unsupported_cpu(vcpu)					\
-> -	((vcpu)->arch.flags & KVM_ARM64_ON_UNSUPPORTED_CPU)
-> +	vcpu_get_flag(vcpu, ON_UNSUPPORTED_CPU)
->  
->  #define vcpu_set_on_unsupported_cpu(vcpu)				\
-> -	((vcpu)->arch.flags |= KVM_ARM64_ON_UNSUPPORTED_CPU)
-> +	vcpu_set_flag(vcpu, ON_UNSUPPORTED_CPU)
->  
->  #define vcpu_clear_on_unsupported_cpu(vcpu)				\
-> -	((vcpu)->arch.flags &= ~KVM_ARM64_ON_UNSUPPORTED_CPU)
-> +	vcpu_clear_flag(vcpu, ON_UNSUPPORTED_CPU)
->  
->  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.regs)
->  
-> -- 
-> 2.34.1
+> I'm a bit confused here. The ON_UNSUPPORTED_CPU flag ends up in sflags. The
+> comment for sflags says:
 > 
+> +	/* State flags for kernel bookkeeping, unused by the hypervisor code */
+> +	u64 sflags;
+> 
+> The ON_UNSUPPORT_CPU flag is used exclusively by KVM (it's only used by the
+> file arch/arm64/kvm/arm.c), so why is it part of a set of flags which are
+> supposed to be unused by the hypervisor code?
+
+Are we going to have the same terminology discussion we had when you
+reviewed the NV patches?
+
+These flags are only used by code that isn't involved in any sort of
+world switching. If you are running nVHE, these flags are not used by
+the EL2 code.
+
+That's what 'hypervisor code' means in this context.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
