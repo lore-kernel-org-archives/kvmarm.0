@@ -2,74 +2,49 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C8FC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Jun 2022 20:10:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0F66C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 15 Jun 2022 13:14:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB8CF4B31A;
-	Tue, 14 Jun 2022 16:10:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 12FDA4B2B8;
+	Wed, 15 Jun 2022 09:14:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@intel.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id X1Yc0cWQcV11; Tue, 14 Jun 2022 16:10:03 -0400 (EDT)
+	with ESMTP id gWeL-nAz75DL; Wed, 15 Jun 2022 09:14:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 39B9A4B303;
-	Tue, 14 Jun 2022 16:10:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B05174B2C2;
+	Wed, 15 Jun 2022 09:14:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C0994B2E2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Jun 2022 16:10:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B723E4B2B8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jun 2022 09:14:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kLibAiG9GbdB for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Jun 2022 16:10:00 -0400 (EDT)
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A19A4B2D7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Jun 2022 16:10:00 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
- t=1655237400; x=1686773400;
- h=date:from:to:cc:subject:message-id:references:
- mime-version:in-reply-to;
- bh=H39qclFsqZbsKF4/6iQ+SjBBp3vw55ZbnY4RJ7gbLBE=;
- b=XGdH0cpq1qb+QhFSIJTJbfsNV21emAy6deHSqNuHWzeK//mHMksz3cIq
- fL20uRSnwAGIuNIsxVZyy5SOm5EYeN5BOJ/v34nAzawHTzMXjXf65EnEf
- 2WvBAiD7k0PA4B3S3o5yDUmVup2SHaYqtpCEdVMeMY9qOTN0I6re/iiyf
- vhqNJjhFlPWAa+de5r/d/IlHnqbK1+cyvABB/T/Ab9dAfn4z7ERgYbH9F
- 2VkC9sdx3pUXI8smkp/Tg8lk90PE+J8qMVpLZIKpSr+CDGfJQAT8PrMYa
- EW6Udl9Xprfd0TIJnQtxr3zhafcph1bCKWviomzcmEgdu+0/bbBLbqQrJ Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10378"; a="259186400"
-X-IronPort-AV: E=Sophos;i="5.91,300,1647327600"; d="scan'208";a="259186400"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
- by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 14 Jun 2022 13:09:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,300,1647327600"; d="scan'208";a="582851874"
-Received: from lkp-server01.sh.intel.com (HELO 60dabacc1df6) ([10.239.97.150])
- by orsmga007.jf.intel.com with ESMTP; 14 Jun 2022 13:09:50 -0700
-Received: from kbuild by 60dabacc1df6 with local (Exim 4.95)
- (envelope-from <lkp@intel.com>) id 1o1CrF-000MGT-Cq;
- Tue, 14 Jun 2022 20:09:49 +0000
-Date: Wed, 15 Jun 2022 04:09:33 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kalesh Singh <kaleshsingh@google.com>, mark.rutland@arm.com,
- broonie@kernel.org, maz@kernel.org
-Subject: Re: [PATCH v3 5/5] KVM: arm64: Unwind and dump nVHE hypervisor
- stacktrace
-Message-ID: <202206150420.KMU4kXzZ-lkp@intel.com>
-References: <20220607165105.639716-6-kaleshsingh@google.com>
+ with ESMTP id f8P7RdZPkslb for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 15 Jun 2022 09:14:03 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 41DBD4B28C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Jun 2022 09:14:03 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86FF5139F;
+ Wed, 15 Jun 2022 06:14:02 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 52E343F66F;
+ Wed, 15 Jun 2022 06:14:00 -0700 (PDT)
+Date: Wed, 15 Jun 2022 14:14:19 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v2 11/19] KVM: arm64: Move vcpu ON_UNSUPPORTED_CPU flag
+ to the state flag set
+Message-ID: <YqnbEJ0hgSKyXtxO@monolith.localdoman>
+References: <20220610092838.1205755-1-maz@kernel.org>
+ <20220610092838.1205755-12-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220607165105.639716-6-kaleshsingh@google.com>
-Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
- Peter Zijlstra <peterz@infradead.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
- will@kernel.org, surenb@google.com, kvmarm@lists.cs.columbia.edu,
- "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
- llvm@lists.linux.dev, tjmercier@google.com, kbuild-all@lists.01.org,
- linux-kernel@vger.kernel.org, Masami Hiramatsu <mhiramat@kernel.org>
+In-Reply-To: <20220610092838.1205755-12-maz@kernel.org>
+Cc: kvm@vger.kernel.org, kernel-team@android.com,
+ Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,43 +61,76 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Kalesh,
+Hi,
 
-Thank you for the patch! Yet something to improve:
+On Fri, Jun 10, 2022 at 10:28:30AM +0100, Marc Zyngier wrote:
+> The ON_UNSUPPORTED_CPU flag is only there to track the sad fact
+> that we have ended-up on a CPU where we cannot really run.
+> 
+> Since this is only for the host kernel's use, move it to the state
+> set.
+> 
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 4f147bdc5ce9..0c22514cb7c7 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -519,6 +519,8 @@ struct kvm_vcpu_arch {
+>  #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+>  /* SME enabled for EL0 */
+>  #define HOST_SME_ENABLED	__vcpu_single_flag(sflags, BIT(1))
+> +/* Physical CPU not in supported_cpus */
+> +#define ON_UNSUPPORTED_CPU	__vcpu_single_flag(sflags, BIT(2))
 
-[auto build test ERROR on f2906aa863381afb0015a9eb7fefad885d4e5a56]
+I'm a bit confused here. The ON_UNSUPPORTED_CPU flag ends up in sflags. The
+comment for sflags says:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kalesh-Singh/KVM-nVHE-Hypervisor-stack-unwinder/20220608-011351
-base:   f2906aa863381afb0015a9eb7fefad885d4e5a56
-config: arm64-buildonly-randconfig-r003-20220613 (https://download.01.org/0day-ci/archive/20220615/202206150420.KMU4kXzZ-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project c97436f8b6e2718286e8496faf53a2c800e281cf)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # install arm64 cross compiling tool for clang build
-        # apt-get install binutils-aarch64-linux-gnu
-        # https://github.com/intel-lab-lkp/linux/commit/ac1ce397ffe5b05df06cdb56a30db4099c7428ec
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Kalesh-Singh/KVM-nVHE-Hypervisor-stack-unwinder/20220608-011351
-        git checkout ac1ce397ffe5b05df06cdb56a30db4099c7428ec
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash
++	/* State flags for kernel bookkeeping, unused by the hypervisor code */
++	u64 sflags;
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+The ON_UNSUPPORT_CPU flag is used exclusively by KVM (it's only used by the
+file arch/arm64/kvm/arm.c), so why is it part of a set of flags which are
+supposed to be unused by the hypervisor code?
 
-All errors (new ones prefixed by >>):
+Thanks,
+Alex
 
->> ld.lld: error: undefined symbol: kvm_arm_hyp_stacktrace_page
-   >>> referenced by stacktrace.c:254 (arch/arm64/kernel/stacktrace.c:254)
-   >>>               kernel/stacktrace.o:(hyp_dump_backtrace) in archive arch/arm64/built-in.a
-   >>> referenced by stacktrace.c:254 (arch/arm64/kernel/stacktrace.c:254)
-   >>>               kernel/stacktrace.o:(hyp_dump_backtrace) in archive arch/arm64/built-in.a
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+>  
+>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+>  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
+> @@ -541,7 +543,6 @@ struct kvm_vcpu_arch {
+>  })
+>  
+>  /* vcpu_arch flags field values: */
+> -#define KVM_ARM64_ON_UNSUPPORTED_CPU	(1 << 15) /* Physical CPU not in supported_cpus */
+>  #define KVM_ARM64_WFIT			(1 << 17) /* WFIT instruction trapped */
+>  #define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE | \
+>  				 KVM_GUESTDBG_USE_SW_BP | \
+> @@ -561,13 +562,13 @@ struct kvm_vcpu_arch {
+>  #endif
+>  
+>  #define vcpu_on_unsupported_cpu(vcpu)					\
+> -	((vcpu)->arch.flags & KVM_ARM64_ON_UNSUPPORTED_CPU)
+> +	vcpu_get_flag(vcpu, ON_UNSUPPORTED_CPU)
+>  
+>  #define vcpu_set_on_unsupported_cpu(vcpu)				\
+> -	((vcpu)->arch.flags |= KVM_ARM64_ON_UNSUPPORTED_CPU)
+> +	vcpu_set_flag(vcpu, ON_UNSUPPORTED_CPU)
+>  
+>  #define vcpu_clear_on_unsupported_cpu(vcpu)				\
+> -	((vcpu)->arch.flags &= ~KVM_ARM64_ON_UNSUPPORTED_CPU)
+> +	vcpu_clear_flag(vcpu, ON_UNSUPPORTED_CPU)
+>  
+>  #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.regs)
+>  
+> -- 
+> 2.34.1
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
