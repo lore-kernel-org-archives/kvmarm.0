@@ -2,64 +2,92 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80DB1CCA47E
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Jun 2022 18:45:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5C9CC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Jun 2022 18:47:20 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCF5C4B1B4;
-	Thu, 16 Jun 2022 14:44:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B15D4B10B;
+	Thu, 16 Jun 2022 14:47:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 66lpezC+ij5U; Thu, 16 Jun 2022 14:44:58 -0400 (EDT)
+	with ESMTP id 9kGjiA4tlves; Thu, 16 Jun 2022 14:47:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C0464B121;
-	Thu, 16 Jun 2022 14:44:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F26ED4B121;
+	Thu, 16 Jun 2022 14:47:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 943404B105
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jun 2022 14:44:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 582054B105
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jun 2022 14:47:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SXSWorBkm3Bp for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Jun 2022 14:44:56 -0400 (EDT)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 42D164B103
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jun 2022 14:44:56 -0400 (EDT)
+ with ESMTP id uvK366ZsgWNN for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Jun 2022 14:47:16 -0400 (EDT)
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com
+ [209.85.216.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D99E4B103
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jun 2022 14:47:16 -0400 (EDT)
+Received: by mail-pj1-f52.google.com with SMTP id
+ v11-20020a17090a4ecb00b001e2c5b837ccso2577348pjl.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jun 2022 11:47:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=uBB/J8bQS3jOMS4YDFQ1IMHL6GxPjjT1BgnhKdTawwA=;
+ b=FAFNRwAXbqbs5kPP9MqWhm2jwLweXrkjXqm+QlkTQJ2uCUEcNluny0v21VXymHvoY9
+ rqjC6bElkKMBNJY/JsTwEd4qcNvDdRtkC879eelmXJHmH2eKgd492mqxLy13i79gDImW
+ DOqBjXdY4Se0V0Sq1AtX+VfzuEtBir5fJ22FJTWtjnzzQpzyEXTxyZ9YXZzrcAInIWbi
+ FrxXKOl74i6O13QWYX99Uu+qHZpHdbzInW9krOeJksYSUzEz1tGq+Gxo6jP7dQ/pC155
+ tZzAWhFKf1Ioj2w6JE+sro4Ml5Ps0nOdpLOntXF9hpPv4dv1mV57qdM4esraWNZv66up
+ 8tIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=uBB/J8bQS3jOMS4YDFQ1IMHL6GxPjjT1BgnhKdTawwA=;
+ b=ldb6m8/hLF+oZ/0746a1B+vICWT/TgLKP8f8sIQauUzCjDEhkLROsWDEI1Y6v1UgY0
+ uA95YCqT1f3kaxg56ULnJCuXz5xa1eIPVmN3jDpsvm2q+midNdQgE50D+cEBDpnfmmd7
+ AsiHq6ERROICmintaldIywYrq//qjVhCoJi0V3slEM//KL+Am1IuJUMbMgJEwBQqWFBU
+ C4rxzMbpLO+Aa4REDrREagcf6QwzOI1Qk/qeWoP/MgiV1Z4rYYFc7VAEnDp2MVjL0Q+M
+ 6qwokTZlc74VHzp/YNQ33BkujctwWfAtBhAnp/VWTo6IEDapr/V3zVIzN42/zS/iVIuq
+ ewpQ==
+X-Gm-Message-State: AJIora8TH0dPPUv56JxpAWw0t887vEVr6+Hk+T0ovAPhwxgRnxXklenL
+ o/OcrsTGsOHOc3mfpNHDxTFFAg==
+X-Google-Smtp-Source: AGRyM1uCJJ2F+oFOq0FLGO6wjzLEHVI9CHwNDtvXiwEJg0G+cL23BDN1LursbHbBFAUeKgpuST6/CA==
+X-Received: by 2002:a17:903:11d2:b0:167:8a0f:8d33 with SMTP id
+ q18-20020a17090311d200b001678a0f8d33mr5744330plh.95.1655405235081; 
+ Thu, 16 Jun 2022 11:47:15 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com.
+ [35.230.65.123]) by smtp.gmail.com with ESMTPSA id
+ v1-20020a62c301000000b0051ba8b742e4sm2117495pfg.69.2022.06.16.11.47.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 16 Jun 2022 11:47:12 -0700 (PDT)
+Date: Thu, 16 Jun 2022 18:47:08 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v6 03/22] KVM: x86/mmu: Stop passing @direct to
+ mmu_alloc_root()
+Message-ID: <Yqt6rBPMxfwAPjp1@google.com>
+References: <20220516232138.1783324-1-dmatlack@google.com>
+ <20220516232138.1783324-4-dmatlack@google.com>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1655405094;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Vyq1QaJNcPGeZXUPChWIIfLLby0vd/A5lJq5m22MfDI=;
- b=F77myjhPBWu0h7ouFKKj0XC9PilN0M7a9ouW2YaFoSXdgN8CVJ+CDau2RV6XCwtnnBluRB
- ayIgk0cX5PRFYRmiToLFeK4mXWHDK2B5vHwt7UBftBK/BrEqJCGKICgjanti1ZbxByX7Lp
- ULHroYgZFgfrGwnb1buKFIR5ktUxAfo=
-Date: Thu, 16 Jun 2022 18:44:53 +0000
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: oliver.upton@linux.dev
-Message-ID: <7b1040c48bc9b2986798322c336660ab@linux.dev>
-Subject: Re: [PATCH] selftests: KVM: Handle compiler optimizations in
- ucall
-To: "David Laight" <David.Laight@aculab.com>
-In-Reply-To: <3e73cb07968d4c92b797781b037c2d45@AcuMS.aculab.com>
-References: <3e73cb07968d4c92b797781b037c2d45@AcuMS.aculab.com>
- <20220615185706.1099208-1-rananta@google.com>
- <20220616120232.ctkekviusrozqpru@gator>
- <33ca91aeb5254831a88e187ff8d9a2c2@AcuMS.aculab.com>
- <20220616162557.55bopzfa6glusuh5@gator>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
- Colton Lewis <coltonlewis@google.com>, linux-kselftest@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20220516232138.1783324-4-dmatlack@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <linux-mips@vger.kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
+ <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ maciej.szmigiero@oracle.com,
+ "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,20 +104,17 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-June 16, 2022 11:48 AM, "David Laight" <David.Laight@aculab.com> wrote:
-> No wonder I was confused.
-> It's not surprising the compiler optimises it all away.
-> 
-> It doesn't seem right to be 'abusing' WRITE_ONCE() here.
-> Just adding barrier() should be enough and much more descriptive.
+On Mon, May 16, 2022, David Matlack wrote:
+> The argument @direct is vcpu->arch.mmu->root_role.direct, so just use
+> that.
 
-I had the same thought, although I do not believe barrier() is sufficient
-on its own. barrier_data() with a pointer to uc passed through
-is required to keep clang from eliminating the dead store.
+It's worth calling out that, unlike non-root page tables, it's impossible to have
+a direct root in an indirect MMU.  I.e. provide a hint as to why there's a need to
+pass @direct in the first place.
 
---
-Thanks,
-Oliver
+> Suggested-by: Lai Jiangshan <jiangshanlai@gmail.com>
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
