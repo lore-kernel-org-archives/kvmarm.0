@@ -2,50 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D46CCC43334
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Jun 2022 17:11:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 321D7C43334
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Jun 2022 17:46:59 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6016C4B329;
-	Thu, 16 Jun 2022 13:11:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D73540AEA;
+	Thu, 16 Jun 2022 13:46:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2wFcJH3vPGPa; Thu, 16 Jun 2022 13:11:03 -0400 (EDT)
+	with ESMTP id 7fjM5P4T6TlO; Thu, 16 Jun 2022 13:46:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 200F74B28C;
-	Thu, 16 Jun 2022 13:11:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B81B40B75;
+	Thu, 16 Jun 2022 13:46:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3206C49F5A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jun 2022 13:11:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 34C3540B75
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jun 2022 13:46:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gamw2Ro4jtwX for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Jun 2022 13:11:00 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 71C3249F55
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jun 2022 13:11:00 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC76F11FB;
- Thu, 16 Jun 2022 10:10:59 -0700 (PDT)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
- [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 73B183F73B;
- Thu, 16 Jun 2022 10:10:58 -0700 (PDT)
-Date: Thu, 16 Jun 2022 18:10:56 +0100
-From: Andre Przywara <andre.przywara@arm.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v4 kvmtool 08/12] builtin_run: Allow standard size
- specifiers for memory
-Message-ID: <20220616181056.5e9c1cc4@donnerap.cambridge.arm.com>
-In-Reply-To: <20220616134828.129006-9-alexandru.elisei@arm.com>
-References: <20220616134828.129006-1-alexandru.elisei@arm.com>
- <20220616134828.129006-9-alexandru.elisei@arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+ with ESMTP id TdLq1pNP6+4T for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Jun 2022 13:46:54 -0400 (EDT)
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com
+ [209.85.214.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC62140AEA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jun 2022 13:46:54 -0400 (EDT)
+Received: by mail-pl1-f175.google.com with SMTP id y6so1861636plg.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jun 2022 10:46:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=fT8Qe/1se5MIxsDXsCMXOWyhFjF0PUaqi+lyXewdZ9U=;
+ b=Z2vqJyIHx4VUaVInZKwpIa4SqqMfsBYINdz0K5crvLskB3jvCQMsftiUhh9qnfoffs
+ 6o1rcJOJhdAquPI4nGX7clzaZSlvhBUdq1CyE7Au+9ytyzOx88LQ8iYTIvjQE7HXDfmy
+ n3dYiQdVZanlP4SwVmlNDrPVhmIPcE3jpjcJx1/2N55A9GPNmoGoMnvCaEbwrAO92UAO
+ RuacUOI63j78Ntx83bU6kk7nVUrM3vic021Mqkvho2xvc21iLaKXFYE7Ts9eKwOI6cRl
+ vSr36O+75YgPXHxGHGgS0DxO1DUuCFY7ToS3IbZn1GzrOEwb+0yxBlpzq2vMZLJLy2N3
+ gzOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=fT8Qe/1se5MIxsDXsCMXOWyhFjF0PUaqi+lyXewdZ9U=;
+ b=2v711qQQiqvF5tHLoC9VFia/kUltcXarGBOcZbG6eWQkkTpuqKbwdvo//IcadhVq7k
+ V7MEzWNNYV0YKDGqpq2qiNlyX0rp4kosBTEPwy9XN+od97PF+iJPirOvl5lxUP6+9kIE
+ aABWvPVBwTkU+BGvhuRcSoRbZL+Z+MVZ9FqxQlkLV36cecB8KCSrM9P8DCm690SrnB4i
+ mCGVQm/ZhOtSh6w/DFE+rSkHWqm0TmTJSf4WchGZSi0PS/qcrB3ZXUgtYSouQm0GWyIw
+ 0sgykSIN8JXazkzFTWAAYF662uW7oNUc4udmQyNpqhvo3q/pWGVQuCAcWwd0p7t+z7Oi
+ 63Jw==
+X-Gm-Message-State: AJIora/5iNiPe/FdkByfu+NrY/+agti1LB6+MlrlumpoZqxIupinH/cf
+ xnInis0YaraMnPNBv8ILqLCrZw==
+X-Google-Smtp-Source: AGRyM1vJW90dKvuKmbfTG/3yItlYqn9Y3J9LlaKlq2PbhgfpZ3NISFzo2PT2a0SbOGiOYl5Kt5Ifmw==
+X-Received: by 2002:a17:902:f687:b0:167:58bb:c43f with SMTP id
+ l7-20020a170902f68700b0016758bbc43fmr5456701plg.136.1655401613425; 
+ Thu, 16 Jun 2022 10:46:53 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com.
+ [35.230.65.123]) by smtp.gmail.com with ESMTPSA id
+ 201-20020a6217d2000000b0050e006279bfsm2177587pfx.137.2022.06.16.10.46.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 16 Jun 2022 10:46:52 -0700 (PDT)
+Date: Thu, 16 Jun 2022 17:46:48 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v2 1/5] KVM: Shove vm stats_id init into kvm_create_vm()
+Message-ID: <YqtsiGOOHSxzbdir@google.com>
+References: <20220518175811.2758661-1-oupton@google.com>
+ <20220518175811.2758661-2-oupton@google.com>
 MIME-Version: 1.0
-Cc: julien@xen.org, maz@kernel.org, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20220518175811.2758661-2-oupton@google.com>
+Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -62,126 +90,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 16 Jun 2022 14:48:24 +0100
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Wed, May 18, 2022, Oliver Upton wrote:
+> Initialize the field alongside the other struct kvm fields. No
 
-> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Restate "stats_id" instead of "the field", it's literally fewer characters and
+having to go read subject/shortlog to grok the change is annoying.  IMO, changelogs
+should be 100% coherent without the shortlog.
+
+Explaining why would also be helpful.  AFAICT there's no actual "need" for this
+in this series, rather that this is futureproofing KVM since there's no reason
+not to fill kvm->stats_id from time zero.
+
+> functional change intended.
 > 
-> Allow the user to use the standard B (bytes), K (kilobytes), M (megabytes),
-> G (gigabytes), T (terabytes) and P (petabytes) suffixes for memory size.
-> When none are specified, the default is megabytes.
-> 
-> Also raise an error if the guest specifies 0 as the memory size, instead
-> of treating it as uninitialized, as kvmtool has done so far.
-> 
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks, looks good now!
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-
-Cheers,
-Andre
-
+> Signed-off-by: Oliver Upton <oupton@google.com>
 > ---
->  builtin-run.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 54 insertions(+), 5 deletions(-)
+>  virt/kvm/kvm_main.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/builtin-run.c b/builtin-run.c
-> index dcd08f739469..8b4e865f0a0e 100644
-> --- a/builtin-run.c
-> +++ b/builtin-run.c
-> @@ -49,9 +49,11 @@
->  #include <ctype.h>
->  #include <stdio.h>
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 6d971fb1b08d..36dc9271d039 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1101,6 +1101,9 @@ static struct kvm *kvm_create_vm(unsigned long type)
+>  	 */
+>  	kvm->debugfs_dentry = ERR_PTR(-ENOENT);
 >  
-> -#define MB_SHIFT		(20)
->  #define KB_SHIFT		(10)
-> +#define MB_SHIFT		(20)
->  #define GB_SHIFT		(30)
-> +#define TB_SHIFT		(40)
-> +#define PB_SHIFT		(50)
+> +	snprintf(kvm->stats_id, sizeof(kvm->stats_id),
+> +			"kvm-%d", task_pid_nr(current));
+> +
+>  	if (init_srcu_struct(&kvm->srcu))
+>  		goto out_err_no_srcu;
+>  	if (init_srcu_struct(&kvm->irq_srcu))
+> @@ -4787,9 +4790,6 @@ static int kvm_dev_ioctl_create_vm(unsigned long type)
+>  	if (r < 0)
+>  		goto put_kvm;
 >  
->  __thread struct kvm_cpu *current_kvm_cpu;
->  
-> @@ -87,6 +89,54 @@ void kvm_run_set_wrapper_sandbox(void)
->  	kvm_run_wrapper = KVM_RUN_SANDBOX;
->  }
->  
-> +static int parse_mem_unit(char **next)
-> +{
-> +	switch (**next) {
-> +	case 'B': case 'b': (*next)++; return 0;
-> +	case 'K': case 'k': (*next)++; return KB_SHIFT;
-> +	case 'M': case 'm': (*next)++; return MB_SHIFT;
-> +	case 'G': case 'g': (*next)++; return GB_SHIFT;
-> +	case 'T': case 't': (*next)++; return TB_SHIFT;
-> +	case 'P': case 'p': (*next)++; return PB_SHIFT;
-> +	}
-> +
-> +	return MB_SHIFT;
-> +}
-> +
-> +static u64 parse_mem_option(const char *nptr, char **next)
-> +{
-> +	u64 shift;
-> +	u64 val;
-> +
-> +	errno = 0;
-> +	val = strtoull(nptr, next, 10);
-> +	if (errno == ERANGE)
-> +		die("Memory too large: %s", nptr);
-> +	if (*next == nptr)
-> +		die("Invalid memory specifier: %s", nptr);
-> +
-> +	shift = parse_mem_unit(next);
-> +	if ((val << shift) < val)
-> +		die("Memory too large: %s", nptr);
-> +
-> +	return val << shift;
-> +}
-> +
-> +static int mem_parser(const struct option *opt, const char *arg, int unset)
-> +{
-> +	struct kvm *kvm = opt->ptr;
-> +	char *next;
-> +
-> +	kvm->cfg.ram_size = parse_mem_option(arg, &next);
-> +	if (kvm->cfg.ram_size == 0)
-> +		die("Invalid RAM size: %s", arg);
-> +
-> +	if (*next != '\0')
-> +		die("Invalid memory specifier: %s", arg);
-> +
-> +	return 0;
-> +}
-> +
->  #ifndef OPT_ARCH_RUN
->  #define OPT_ARCH_RUN(...)
->  #endif
-> @@ -97,8 +147,9 @@ void kvm_run_set_wrapper_sandbox(void)
->  	OPT_STRING('\0', "name", &(cfg)->guest_name, "guest name",	\
->  			"A name for the guest"),			\
->  	OPT_INTEGER('c', "cpus", &(cfg)->nrcpus, "Number of CPUs"),	\
-> -	OPT_U64('m', "mem", &(cfg)->ram_size, "Virtual machine memory"	\
-> -		" size in MB."),					\
-> +	OPT_CALLBACK('m', "mem", NULL, "size[BKMGTP]",			\
-> +		     "Virtual machine memory size, by default measured"	\
-> +		     " in megabytes (M)", mem_parser, kvm),		\
->  	OPT_CALLBACK('d', "disk", kvm, "image or rootfs_dir", "Disk "	\
->  			" image or rootfs directory", img_name_parser,	\
->  			kvm),						\
-> @@ -522,8 +573,6 @@ static void kvm_run_validate_cfg(struct kvm *kvm)
->  		pr_warning("Ignoring initrd file when loading a firmware image");
->  
->  	if (kvm->cfg.ram_size) {
-> -		/* User specifies RAM size in megabytes. */
-> -		kvm->cfg.ram_size <<= MB_SHIFT;
->  		available_ram = host_ram_size();
->  		if (available_ram && kvm->cfg.ram_size > available_ram) {
->  			pr_warning("Guest memory size %lluMB exceeds host physical RAM size %lluMB",
-
+> -	snprintf(kvm->stats_id, sizeof(kvm->stats_id),
+> -			"kvm-%d", task_pid_nr(current));
+> -
+>  	file = anon_inode_getfile("kvm-vm", &kvm_vm_fops, kvm, O_RDWR);
+>  	if (IS_ERR(file)) {
+>  		put_unused_fd(r);
+> -- 
+> 2.36.1.124.g0e6072fb45-goog
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
