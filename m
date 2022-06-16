@@ -2,45 +2,44 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 761D9C43334
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Jun 2022 17:07:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70503C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Jun 2022 17:08:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9F9B4B30A;
-	Thu, 16 Jun 2022 13:07:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A4934B315;
+	Thu, 16 Jun 2022 13:08:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PxoI0J5g6JRo; Thu, 16 Jun 2022 13:07:16 -0400 (EDT)
+	with ESMTP id CM83L5Vbsd0T; Thu, 16 Jun 2022 13:08:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C4674B15C;
-	Thu, 16 Jun 2022 13:07:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A3E4D4B2B7;
+	Thu, 16 Jun 2022 13:08:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C99E4B25D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jun 2022 13:07:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B93A4B297
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jun 2022 13:08:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lvuEwI3w-u9t for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Jun 2022 13:07:13 -0400 (EDT)
+ with ESMTP id guWZFRmmUbTW for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Jun 2022 13:08:01 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DCE6D4B24A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jun 2022 13:07:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DA704B28C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Jun 2022 13:08:01 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F095511FB;
- Thu, 16 Jun 2022 10:07:11 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F23D411FB;
+ Thu, 16 Jun 2022 10:08:00 -0700 (PDT)
 Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
  [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 97A0E3F73B;
- Thu, 16 Jun 2022 10:07:10 -0700 (PDT)
-Date: Thu, 16 Jun 2022 18:07:07 +0100
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A30863F73B;
+ Thu, 16 Jun 2022 10:07:59 -0700 (PDT)
+Date: Thu, 16 Jun 2022 18:07:56 +0100
 From: Andre Przywara <andre.przywara@arm.com>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v4 kvmtool 04/12] builtin-run: Add arch hook to validate
- VM configuration
-Message-ID: <20220616180707.53baeefe@donnerap.cambridge.arm.com>
-In-Reply-To: <20220616134828.129006-5-alexandru.elisei@arm.com>
+Subject: Re: [PATCH v4 kvmtool 02/12] builtin-run: Always use RAM size in bytes
+Message-ID: <20220616180756.6402b88d@donnerap.cambridge.arm.com>
+In-Reply-To: <20220616134828.129006-3-alexandru.elisei@arm.com>
 References: <20220616134828.129006-1-alexandru.elisei@arm.com>
- <20220616134828.129006-5-alexandru.elisei@arm.com>
+ <20220616134828.129006-3-alexandru.elisei@arm.com>
 Organization: ARM
 X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
@@ -62,157 +61,147 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 16 Jun 2022 14:48:20 +0100
+On Thu, 16 Jun 2022 14:48:18 +0100
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-> Architectures are free to set their own command line options. Add an
-> architecture specific hook to validate these options.
+> The user can specify the virtual machine memory size in MB, which is saved
+> in cfg->ram_size. kvmtool validates it against the host memory size,
+> converted from bytes to MB. ram_size is then converted to bytes, and this
+> is how it is used throughout the rest of kvmtool.
 > 
-> For now, the hook does nothing, but it will be used in later patches.
+> To avoid any confusion about the unit of measurement, especially once the
+> user is allowed to specify the unit of measurement, always use ram_size in
+> bytes.
 > 
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+That looks good to me now, many thanks for the changes!
+I ran a few large VMs (up to 1TB guest), also tested on an ARM32 host, it
+all seems to still work fine, and no UBSAN messages.
 
 Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
 Cheers,
 Andre
 
+
 > ---
->  Makefile          | 1 +
->  arm/aarch32/kvm.c | 5 +++++
->  arm/aarch64/kvm.c | 4 ++++
->  builtin-run.c     | 2 ++
->  include/kvm/kvm.h | 1 +
->  mips/kvm.c        | 4 ++++
->  powerpc/kvm.c     | 4 ++++
->  riscv/kvm.c       | 4 ++++
->  x86/kvm.c         | 4 ++++
->  9 files changed, 29 insertions(+)
->  create mode 100644 arm/aarch32/kvm.c
+>  builtin-run.c            | 19 ++++++++++---------
+>  include/kvm/kvm-config.h |  7 ++++---
+>  include/kvm/kvm.h        |  2 +-
+>  3 files changed, 15 insertions(+), 13 deletions(-)
 > 
-> diff --git a/Makefile b/Makefile
-> index 6464446a9f24..64bb9c95b6f6 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -170,6 +170,7 @@ ifeq ($(ARCH), arm)
->  	OBJS		+= $(OBJS_ARM_COMMON)
->  	OBJS		+= arm/aarch32/arm-cpu.o
->  	OBJS		+= arm/aarch32/kvm-cpu.o
-> +	OBJS		+= arm/aarch32/kvm.o
->  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
->  	ARCH_INCLUDE	+= -Iarm/aarch32/include
->  	CFLAGS		+= -march=armv7-a
-> diff --git a/arm/aarch32/kvm.c b/arm/aarch32/kvm.c
-> new file mode 100644
-> index 000000000000..ae33ac92479a
-> --- /dev/null
-> +++ b/arm/aarch32/kvm.c
-> @@ -0,0 +1,5 @@
-> +#include "kvm/kvm.h"
-> +
-> +void kvm__arch_validate_cfg(struct kvm *kvm)
-> +{
-> +}
-> diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-> index f3fe854e0b3f..ca348f118a56 100644
-> --- a/arm/aarch64/kvm.c
-> +++ b/arm/aarch64/kvm.c
-> @@ -37,6 +37,10 @@ int vcpu_affinity_parser(const struct option *opt, const char *arg, int unset)
->  	return 0;
->  }
->  
-> +void kvm__arch_validate_cfg(struct kvm *kvm)
-> +{
-> +}
-> +
->  /*
->   * Return the TEXT_OFFSET value that the guest kernel expects. Note
->   * that pre-3.17 kernels expose this value using the native endianness
 > diff --git a/builtin-run.c b/builtin-run.c
-> index e1770b3c9df2..dcd08f739469 100644
+> index 0126c9fbcba6..2bf93fe13c92 100644
 > --- a/builtin-run.c
 > +++ b/builtin-run.c
-> @@ -531,6 +531,8 @@ static void kvm_run_validate_cfg(struct kvm *kvm)
->  				(unsigned long long)available_ram >> MB_SHIFT);
->  		}
+> @@ -36,6 +36,7 @@
+>  
+>  #include <linux/types.h>
+>  #include <linux/err.h>
+> +#include <linux/sizes.h>
+>  
+>  #include <sys/utsname.h>
+>  #include <sys/types.h>
+> @@ -264,7 +265,7 @@ static u64 host_ram_size(void)
+>  		return 0;
 >  	}
-> +
-> +	kvm__arch_validate_cfg(kvm);
+>  
+> -	return (nr_pages * page_size) >> MB_SHIFT;
+> +	return (u64)nr_pages * page_size;
 >  }
 >  
->  static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
+>  /*
+> @@ -278,11 +279,11 @@ static u64 get_ram_size(int nr_cpus)
+>  	u64 available;
+>  	u64 ram_size;
+>  
+> -	ram_size	= 64 * (nr_cpus + 3);
+> +	ram_size	= (u64)SZ_64M * (nr_cpus + 3);
+>  
+>  	available	= host_ram_size() * RAM_SIZE_RATIO;
+>  	if (!available)
+> -		available = MIN_RAM_SIZE_MB;
+> +		available = MIN_RAM_SIZE;
+>  
+>  	if (ram_size > available)
+>  		ram_size	= available;
+> @@ -595,13 +596,13 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
+>  
+>  	if (!kvm->cfg.ram_size)
+>  		kvm->cfg.ram_size = get_ram_size(kvm->cfg.nrcpus);
+> +	else
+> +		kvm->cfg.ram_size <<= MB_SHIFT;
+>  
+>  	if (kvm->cfg.ram_size > host_ram_size())
+>  		pr_warning("Guest memory size %lluMB exceeds host physical RAM size %lluMB",
+> -			(unsigned long long)kvm->cfg.ram_size,
+> -			(unsigned long long)host_ram_size());
+> -
+> -	kvm->cfg.ram_size <<= MB_SHIFT;
+> +			(unsigned long long)kvm->cfg.ram_size >> MB_SHIFT,
+> +			(unsigned long long)host_ram_size() >> MB_SHIFT);
+>  
+>  	if (!kvm->cfg.dev)
+>  		kvm->cfg.dev = DEFAULT_KVM_DEV;
+> @@ -676,12 +677,12 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
+>  	if (kvm->cfg.kernel_filename) {
+>  		printf("  # %s run -k %s -m %Lu -c %d --name %s\n", KVM_BINARY_NAME,
+>  		       kvm->cfg.kernel_filename,
+> -		       (unsigned long long)kvm->cfg.ram_size / 1024 / 1024,
+> +		       (unsigned long long)kvm->cfg.ram_size >> MB_SHIFT,
+>  		       kvm->cfg.nrcpus, kvm->cfg.guest_name);
+>  	} else if (kvm->cfg.firmware_filename) {
+>  		printf("  # %s run --firmware %s -m %Lu -c %d --name %s\n", KVM_BINARY_NAME,
+>  		       kvm->cfg.firmware_filename,
+> -		       (unsigned long long)kvm->cfg.ram_size / 1024 / 1024,
+> +		       (unsigned long long)kvm->cfg.ram_size >> MB_SHIFT,
+>  		       kvm->cfg.nrcpus, kvm->cfg.guest_name);
+>  	}
+>  
+> diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+> index 6a5720c4c7d4..31bc89520d52 100644
+> --- a/include/kvm/kvm-config.h
+> +++ b/include/kvm/kvm-config.h
+> @@ -5,6 +5,8 @@
+>  #include "kvm/vfio.h"
+>  #include "kvm/kvm-config-arch.h"
+>  
+> +#include <linux/sizes.h>
+> +
+>  #define DEFAULT_KVM_DEV		"/dev/kvm"
+>  #define DEFAULT_CONSOLE		"serial"
+>  #define DEFAULT_NETWORK		"user"
+> @@ -15,14 +17,13 @@
+>  #define DEFAULT_SCRIPT		"none"
+>  #define DEFAULT_SANDBOX_FILENAME "guest/sandbox.sh"
+>  
+> -#define MIN_RAM_SIZE_MB		(64ULL)
+> -#define MIN_RAM_SIZE_BYTE	(MIN_RAM_SIZE_MB << MB_SHIFT)
+> +#define MIN_RAM_SIZE		SZ_64M
+>  
+>  struct kvm_config {
+>  	struct kvm_config_arch arch;
+>  	struct disk_image_params disk_image[MAX_DISK_IMAGES];
+>  	struct vfio_device_params *vfio_devices;
+> -	u64 ram_size;
+> +	u64 ram_size;		/* Guest memory size, in bytes */
+>  	u8 num_net_devices;
+>  	u8 num_vfio_devices;
+>  	u64 vsock_cid;
 > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> index 7b14b33b50ca..9f7b2fb26e95 100644
+> index ad732e56f5ed..7b14b33b50ca 100644
 > --- a/include/kvm/kvm.h
 > +++ b/include/kvm/kvm.h
-> @@ -187,6 +187,7 @@ int kvm__get_sock_by_instance(const char *name);
->  int kvm__enumerate_instances(int (*callback)(const char *name, int pid));
->  void kvm__remove_socket(const char *name);
+> @@ -87,7 +87,7 @@ struct kvm {
+>  	struct kvm_cpu		**cpus;
 >  
-> +void kvm__arch_validate_cfg(struct kvm *kvm);
->  void kvm__arch_set_cmdline(char *cmdline, bool video);
->  void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size);
->  void kvm__arch_delete_ram(struct kvm *kvm);
-> diff --git a/mips/kvm.c b/mips/kvm.c
-> index e668cbbefb25..cebec5ae0178 100644
-> --- a/mips/kvm.c
-> +++ b/mips/kvm.c
-> @@ -13,6 +13,10 @@ struct kvm_ext kvm_req_ext[] = {
->  	{ 0, 0 }
->  };
->  
-> +void kvm__arch_validate_cfg(struct kvm *kvm)
-> +{
-> +}
-> +
->  void kvm__arch_read_term(struct kvm *kvm)
->  {
->  	virtio_console__inject_interrupt(kvm);
-> diff --git a/powerpc/kvm.c b/powerpc/kvm.c
-> index 702d67dca614..3215b579f5dc 100644
-> --- a/powerpc/kvm.c
-> +++ b/powerpc/kvm.c
-> @@ -48,6 +48,10 @@ struct kvm_ext kvm_req_ext[] = {
->  	{ 0, 0 }
->  };
->  
-> +void kvm__arch_validate_cfg(struct kvm *kvm)
-> +{
-> +}
-> +
->  static uint32_t mfpvr(void)
->  {
->  	uint32_t r;
-> diff --git a/riscv/kvm.c b/riscv/kvm.c
-> index 84e02779a91c..7fb496282f4c 100644
-> --- a/riscv/kvm.c
-> +++ b/riscv/kvm.c
-> @@ -13,6 +13,10 @@ struct kvm_ext kvm_req_ext[] = {
->  	{ 0, 0 },
->  };
->  
-> +void kvm__arch_validate_cfg(struct kvm *kvm)
-> +{
-> +}
-> +
->  bool kvm__arch_cpu_supports_vm(void)
->  {
->  	/* The KVM capability check is enough. */
-> diff --git a/x86/kvm.c b/x86/kvm.c
-> index 3e0f0b743f8c..6683a5c81d49 100644
-> --- a/x86/kvm.c
-> +++ b/x86/kvm.c
-> @@ -35,6 +35,10 @@ struct kvm_ext kvm_req_ext[] = {
->  	{ 0, 0 }
->  };
->  
-> +void kvm__arch_validate_cfg(struct kvm *kvm)
-> +{
-> +}
-> +
->  bool kvm__arch_cpu_supports_vm(void)
->  {
->  	struct cpuid_regs regs;
+>  	u32			mem_slots;	/* for KVM_SET_USER_MEMORY_REGION */
+> -	u64			ram_size;
+> +	u64			ram_size;	/* Guest memory size, in bytes */
+>  	void			*ram_start;
+>  	u64			ram_pagesize;
+>  	struct mutex		mem_banks_lock;
 
 _______________________________________________
 kvmarm mailing list
