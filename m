@@ -2,103 +2,61 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E33EBC433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Jun 2022 07:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84444C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Jun 2022 08:20:06 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 480C04B2A1;
-	Fri, 17 Jun 2022 03:28:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8D754B2A9;
+	Fri, 17 Jun 2022 04:20:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id odCJ4MTJO1NN; Fri, 17 Jun 2022 03:28:08 -0400 (EDT)
+	with ESMTP id szRUn14feFzL; Fri, 17 Jun 2022 04:20:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E94F14B229;
-	Fri, 17 Jun 2022 03:28:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D1474B281;
+	Fri, 17 Jun 2022 04:20:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C309E4B21C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 03:28:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CC2B49F0C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 04:20:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GTy0OnjGte9J for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Jun 2022 03:28:06 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 912524B1EF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 03:28:06 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1655450886;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=TfwWmf6pndQ83NMYFfQo/NU9rMgkJupydsAN7k3Ml00=;
- b=LSiar8CXu2oYHQrnojZ7hcehYBDGk3HYjz71o2T13N5OKPR3Xj874agjSLdNISQYIZspBe
- XYdJmOVbG1u7GQlNk23SQPHmfn7AUSg7ugdkujX9mBZMPcLpPuB86OYKCJWNIMS3ToLH1J
- xh8fmJfxuQU1tTeqUY4nzY/FvzH9eoY=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-230-gwOElsPFMmm5Pvw0cidFRw-1; Fri, 17 Jun 2022 03:28:04 -0400
-X-MC-Unique: gwOElsPFMmm5Pvw0cidFRw-1
-Received: by mail-ed1-f71.google.com with SMTP id
- v7-20020a056402348700b004351fb80abaso2729015edc.14
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 00:28:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=TfwWmf6pndQ83NMYFfQo/NU9rMgkJupydsAN7k3Ml00=;
- b=TK5CT7LTrsW5PYAWOO0y5OXHsf13YGGGOjebWWnFuPX+3HeUatId41ZAoYPMKdX+tt
- VzhQONn5Qq61DxnItnTtGPhBRDDlnL8Bq6f6at2UOfBQE++xPhlvg8MoX/zqOve3qBSD
- EQPlxwR0ivh+walIAAQUfjb2PADXiI4HTuXdLHHNPqBPk4Zo2hM34tetvq6XuNJlPTMi
- G0gZyvpYlJ6pDuN9u53mWWlmNv7KOXIVP21ghuWrE4fVVNq9i9RNR+aD6A6IMnxQ0wGH
- SpeVPjEO3GXpPBiX79Kq5OIL6eYud+/V9JLDbJBF14Euw2HRBlIGEWGyKk5IfEOpwhoy
- KJkg==
-X-Gm-Message-State: AJIora/ekP5ZC2Oo61FEkWCA6CAkHza6cqBd22sr0x25/ZuhLrjw20Fb
- LKN12QecZ9O5uTG9hufqH+ucc1y0IL6yhI3PPQL2fO82IzB85KCuwhTbrUyix3kXigDoRpHTxNM
- cMxlHlyreMM0do1l2NWkul6a/
-X-Received: by 2002:aa7:c744:0:b0:42d:f68f:13de with SMTP id
- c4-20020aa7c744000000b0042df68f13demr10725902eds.294.1655450883309; 
- Fri, 17 Jun 2022 00:28:03 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1tKxJhbjxu1gQEDYzXe7aBUKjZhwikhFKlF31X4MiTyfLwkpvElCJYDyCHPMnrvEcQLcQ8oEA==
-X-Received: by 2002:aa7:c744:0:b0:42d:f68f:13de with SMTP id
- c4-20020aa7c744000000b0042df68f13demr10725866eds.294.1655450883047; 
- Fri, 17 Jun 2022 00:28:03 -0700 (PDT)
-Received: from gator (cst2-173-67.cust.vodafone.cz. [31.30.173.67])
- by smtp.gmail.com with ESMTPSA id
- 7-20020a170906328700b006f3ef214db7sm1810644ejw.29.2022.06.17.00.28.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Jun 2022 00:28:02 -0700 (PDT)
-Date: Fri, 17 Jun 2022 09:28:00 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: David Laight <David.Laight@aculab.com>
-Subject: Re: [PATCH] selftests: KVM: Handle compiler optimizations in ucall
-Message-ID: <20220617072800.cvqb4wmafxdi3knq@gator>
-References: <3e73cb07968d4c92b797781b037c2d45@AcuMS.aculab.com>
- <20220615185706.1099208-1-rananta@google.com>
- <20220616120232.ctkekviusrozqpru@gator>
- <33ca91aeb5254831a88e187ff8d9a2c2@AcuMS.aculab.com>
- <20220616162557.55bopzfa6glusuh5@gator>
- <7b1040c48bc9b2986798322c336660ab@linux.dev>
- <2ec9ecbfb13d422ab6cda355ff011c9f@AcuMS.aculab.com>
+ with ESMTP id fd0tBaWMO0id for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Jun 2022 04:20:02 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0561B499F2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 04:20:01 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 83470B827A5;
+ Fri, 17 Jun 2022 08:20:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63FCCC3411B;
+ Fri, 17 Jun 2022 08:19:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1655453999;
+ bh=E98ek2nAdjr2+1dOqswVNwmAjmNqZLUSnkA74Yi2Hdk=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=IoAJ8yqUpL4PW8mFre9W/ARVGh+cjwFG7I4N+Uqj4se+L/2W7RuLg82tkg4wVAoW+
+ EBPh9scg7wsMU0oGmwRBhqfFYxY0vsvP7+9YYecRMEre/4n1r8DTPuEQXT5mym/nbM
+ SHCCOftaMBhC322Lft5RkiqBwdJYswmp0hZrcW298eqjzGMcMe79W1o2qfkq/IkUDU
+ HGQkiSic5QyQcRiXS7Y3U/boS13lyVLRhzEnaEL5cSyKdekE3tr6kCa0ZRCFdpkhXn
+ imwS9iwiwUirlaqrznkZ0SIVMyz8+GLuW61qkY4LFIgZioH8e5jXS+EmH1zliiw9SX
+ JvXkp9UJoVwnQ==
+Date: Fri, 17 Jun 2022 11:19:49 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH] KVM: arm64: Prevent kmemleak from accessing pKVM memory
+Message-ID: <Yqw5JRrUJO73mtIy@kernel.org>
+References: <20220616161135.3997786-1-qperret@google.com>
 MIME-Version: 1.0
-In-Reply-To: <2ec9ecbfb13d422ab6cda355ff011c9f@AcuMS.aculab.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Colton Lewis <coltonlewis@google.com>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <20220616161135.3997786-1-qperret@google.com>
+Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -115,39 +73,114 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jun 16, 2022 at 09:54:16PM +0000, David Laight wrote:
-> From: oliver.upton@linux.dev
-> > Sent: 16 June 2022 19:45
-> 
-> > 
-> > June 16, 2022 11:48 AM, "David Laight" <David.Laight@aculab.com> wrote:
-> > > No wonder I was confused.
-> > > It's not surprising the compiler optimises it all away.
-> > >
-> > > It doesn't seem right to be 'abusing' WRITE_ONCE() here.
-> > > Just adding barrier() should be enough and much more descriptive.
-> > 
-> > I had the same thought, although I do not believe barrier() is sufficient
-> > on its own. barrier_data() with a pointer to uc passed through
-> > is required to keep clang from eliminating the dead store.
-> 
-> A barrier() (full memory clobber) ought to be stronger than
-> the partial one than barrier_data() generates.
-> 
-> I can't quite decide whether you need a barrier() both sides
-> of the 'magic write'.
-> Plausibly the compiler could discard the on-stack data
-> after the barrier() and before the 'magic write'.
-> 
-> Certainly putting the 'magic write' inside a asm block
-> that has a memory clobber is a more correct solution.
+On Thu, Jun 16, 2022 at 04:11:34PM +0000, Quentin Perret wrote:
+> Commit a7259df76702 ("memblock: make memblock_find_in_range method
+> private") changed the API using which memory is reserved for the pKVM
+> hypervisor. However, it seems that memblock_phys_alloc() differs
+> from the original API in terms of kmemleak semantics -- the old one
+> excluded the reserved regions from kmemleak scans when the new one
+> doesn't seem to. Unfortunately, when protected KVM is enabled, all
 
-Indeed, since the magic write is actually a guest MMIO write, then
-it should be using writeq().
+I'd rather say that memblock_find_in_range() didn't inform kmemleak about
+the reserved regions, while memblock_phys_alloc() does.
 
-Thanks,
-drew
+> kernel accesses to pKVM-private memory result in a fatal exception,
+> which can now happen because of kmemleak scans:
+> 
+> $ echo scan > /sys/kernel/debug/kmemleak
+> [   34.991354] kvm [304]: nVHE hyp BUG at: [<ffff800008fa3750>] __kvm_nvhe_handle_host_mem_abort+0x270/0x290!
+> [   34.991580] kvm [304]: Hyp Offset: 0xfffe8be807e00000
+> [   34.991813] Kernel panic - not syncing: HYP panic:
+> [   34.991813] PS:600003c9 PC:0000f418011a3750 ESR:00000000f2000800
+> [   34.991813] FAR:ffff000439200000 HPFAR:0000000004792000 PAR:0000000000000000
+> [   34.991813] VCPU:0000000000000000
+> [   34.993660] CPU: 0 PID: 304 Comm: bash Not tainted 5.19.0-rc2 #102
+> [   34.994059] Hardware name: linux,dummy-virt (DT)
+> [   34.994452] Call trace:
+> [   34.994641]  dump_backtrace.part.0+0xcc/0xe0
+> [   34.994932]  show_stack+0x18/0x6c
+> [   34.995094]  dump_stack_lvl+0x68/0x84
+> [   34.995276]  dump_stack+0x18/0x34
+> [   34.995484]  panic+0x16c/0x354
+> [   34.995673]  __hyp_pgtable_total_pages+0x0/0x60
+> [   34.995933]  scan_block+0x74/0x12c
+> [   34.996129]  scan_gray_list+0xd8/0x19c
+> [   34.996332]  kmemleak_scan+0x2c8/0x580
+> [   34.996535]  kmemleak_write+0x340/0x4a0
+> [   34.996744]  full_proxy_write+0x60/0xbc
+> [   34.996967]  vfs_write+0xc4/0x2b0
+> [   34.997136]  ksys_write+0x68/0xf4
+> [   34.997311]  __arm64_sys_write+0x20/0x2c
+> [   34.997532]  invoke_syscall+0x48/0x114
+> [   34.997779]  el0_svc_common.constprop.0+0x44/0xec
+> [   34.998029]  do_el0_svc+0x2c/0xc0
+> [   34.998205]  el0_svc+0x2c/0x84
+> [   34.998421]  el0t_64_sync_handler+0xf4/0x100
+> [   34.998653]  el0t_64_sync+0x18c/0x190
+> [   34.999252] SMP: stopping secondary CPUs
+> [   35.000034] Kernel Offset: disabled
+> [   35.000261] CPU features: 0x800,00007831,00001086
+> [   35.000642] Memory Limit: none
+> [   35.001329] ---[ end Kernel panic - not syncing: HYP panic:
+> [   35.001329] PS:600003c9 PC:0000f418011a3750 ESR:00000000f2000800
+> [   35.001329] FAR:ffff000439200000 HPFAR:0000000004792000 PAR:0000000000000000
+> [   35.001329] VCPU:0000000000000000 ]---
+> 
+> Fix this by explicitly excluding the hypervisor's memory pool from
+> kmemleak like we already do for the hyp BSS.
+> 
+> Cc: Mike Rapoport <rppt@kernel.org>
+> Fixes: a7259df76702 ("memblock: make memblock_find_in_range method private")
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> ---
+> An alternative could be to actually exclude memory allocated using
+> memblock_phys_alloc_range() from kmemleak scans to revert back to the
+> old behaviour.
 
+This would be wrong because memblock_phys_alloc() does allocate memory and
+unless there is a good reason to exclude it from kmemleak.
+
+> But nobody else has complained about this AFAIK, so I'd be inclined to
+> keep this local to pKVM. No strong opinion.
+
+Yes, please :)
+An alternative to excluding this memory from kmemleak is to allocate it
+using 
+
+	memblock_phys_alloc_range(size, align, 0, MEMBLOCK_ALLOC_NOLEAKTRACE)
+
+then it won't be added to kmemleak at the first place.
+
+> ---
+>  arch/arm64/kvm/arm.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 400bb0fe2745..28765bd22efb 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2110,11 +2110,11 @@ static int finalize_hyp_mode(void)
+>  		return 0;
+>  
+>  	/*
+> -	 * Exclude HYP BSS from kmemleak so that it doesn't get peeked
+> -	 * at, which would end badly once the section is inaccessible.
+> -	 * None of other sections should ever be introspected.
+> +	 * Exclude HYP sections from kmemleak so that they don't get peeked
+> +	 * at, which would end badly once inaccessible.
+>  	 */
+>  	kmemleak_free_part(__hyp_bss_start, __hyp_bss_end - __hyp_bss_start);
+> +	kmemleak_free_part(__va(hyp_mem_base), hyp_mem_size);
+>  	return pkvm_drop_host_privileges();
+>  }
+>  
+> -- 
+> 2.36.1.476.g0c4daa206d-goog
+> 
+
+-- 
+Sincerely yours,
+Mike.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
