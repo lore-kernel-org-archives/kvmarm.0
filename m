@@ -2,80 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 018B5C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Jun 2022 08:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28B9FC43334
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Jun 2022 08:50:54 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 863904B297;
-	Fri, 17 Jun 2022 04:45:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99BAE4B297;
+	Fri, 17 Jun 2022 04:50:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JfzyruePplDQ; Fri, 17 Jun 2022 04:45:55 -0400 (EDT)
+	with ESMTP id pY4Rq8eIv6+B; Fri, 17 Jun 2022 04:50:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79DAD4B1A2;
-	Fri, 17 Jun 2022 04:45:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 599564B249;
+	Fri, 17 Jun 2022 04:50:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 34A3B4B1C6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 04:45:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B8054B1A2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 04:50:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1Rp9w680+tuv for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Jun 2022 04:45:53 -0400 (EDT)
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com
- [209.85.208.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 14FF94A3A5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 04:45:53 -0400 (EDT)
-Received: by mail-ed1-f46.google.com with SMTP id o10so5280522edi.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 01:45:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=KL12GUSIFsOr7y2Ew6vSfP//iAGJZNB8vXdWl9WySdg=;
- b=VKQcrgU1e/BuoJL3/E/5xdtZZtAX+n2mc7kyaVWi3ECp3tVOj0Vfu9FYpaut/duuSz
- 6quk8RAdcinthu3Op0BiyogjCOBrkHsN7yA4pBImVsGaob+usMkV4F2bfriOC70/7j4p
- wXf1+6FMMtVbDDJOqQtwFZdclvB6hK494nGqIqbmuAQ5NmsngkmxOYw5sSdo6GZ0PaCv
- WTdiqDsZoDvqzeHRbs+97VwWR+VjfoYaPbM1zixz13z1OTd/D0m87M1VQe3D5PLkADjA
- OX3MaZP/ie9tSfd5/r6LCVfr/CnVpU71Du8UqovEDC/LUMpUaoI0m2UpLe+5b8tieE9V
- WJ6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=KL12GUSIFsOr7y2Ew6vSfP//iAGJZNB8vXdWl9WySdg=;
- b=oToGoqbZ/SWnG6IFfGiW4X8D+yBwDAhGj8K1+u9r6iAyEFRzSA5zY8winCbx+2llxZ
- YtPuD7To1jVWHMVmzs3qgtwKcIv3SHYeGnaWTwCQhpFaXcUi1y/TsqGhy3nyYC7JYVKs
- mVY0twfKXClf2EP9bkxEmPUeZ9mzIg6UhnQ5YFWbohzG+hT6sT9MFkpo6bdG4tBU84zz
- SMIGEY+rmNIwN/9/DNomDjTjikq7N0XFUdhDAamcYbPno+hx3hCBSbyKsPmfey2vxJ4b
- kmYZyKggs1Hk47iz76dKms6lF1JaBsx587369pyziR6TpGnzhXvrqVxZ2HfjaTJEOMgX
- lfFQ==
-X-Gm-Message-State: AJIora9pFi/M/Nc3vbnDAfWto/reEQvBjIz3JvYbcsR4VdRKLpFk80OB
- 3Ej6kIuCJrnVX3VAfuVzDU6bqw==
-X-Google-Smtp-Source: AGRyM1v74Y86WCSwTs0mbpz8Uzc1XzusOKJp8Iwa3L1KmKQVX66F7ytavdX7JhAvnMDW75wpmw8weA==
-X-Received: by 2002:a05:6402:2687:b0:430:328f:e46b with SMTP id
- w7-20020a056402268700b00430328fe46bmr10949958edd.33.1655455551764; 
- Fri, 17 Jun 2022 01:45:51 -0700 (PDT)
-Received: from google.com (64.227.90.34.bc.googleusercontent.com.
- [34.90.227.64]) by smtp.gmail.com with ESMTPSA id
- g8-20020a170906538800b006ff05d4726esm1888657ejo.50.2022.06.17.01.45.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Jun 2022 01:45:51 -0700 (PDT)
-Date: Fri, 17 Jun 2022 08:45:48 +0000
-From: Quentin Perret <qperret@google.com>
-To: Mike Rapoport <rppt@kernel.org>
+ with ESMTP id 116Ymm2LmZUF for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Jun 2022 04:50:49 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B58B64B133
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 04:50:49 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 2159CB827CB;
+ Fri, 17 Jun 2022 08:50:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDFD8C3411B;
+ Fri, 17 Jun 2022 08:50:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1655455846;
+ bh=c/802ysll8Uki8K7DNXXeYK+6Hshm0ZRzMFKDT/R5y0=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=l34oNkGtiMK10v/6Eb56qZkXkJYA9qFULLpSaVeXUwh77j4GpjR8jNUa1rSyqA6Cs
+ j9BhdySQZ6r1wg5g0HnThfGCOsSoA7lm+5/GlsOA6IKEV/bVhJnMjeKV69XHUasWup
+ 52u5ShSQSjAbQJ8kF1oktqnmI0gmCmAZ9VA+Fbt80XTxNHYdqyAi2blnuObrMOWRRF
+ mvazN7SxrJQLe1g7S6+pKVx5XW4qYoi3kzbXbfernlFx0/nVJprWzuSRMOC0z9CdEv
+ 9bMq8/ek4bi2KSoiEbYSFConEq/8vXB67YSZ9fQGuc978KJGJkitHEgcyrCbzIPuwu
+ UAu9QFZK3Le2Q==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1o27gi-001FiI-VG;
+ Fri, 17 Jun 2022 09:50:45 +0100
+MIME-Version: 1.0
+Date: Fri, 17 Jun 2022 09:50:44 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Quentin Perret <qperret@google.com>
 Subject: Re: [PATCH] KVM: arm64: Prevent kmemleak from accessing pKVM memory
-Message-ID: <Yqw/PI6jF5HZTvxB@google.com>
+In-Reply-To: <Yqw/PI6jF5HZTvxB@google.com>
 References: <20220616161135.3997786-1-qperret@google.com>
  <165545408679.771055.5076080259874437048.b4-ty@kernel.org>
- <Yqw9dou3qgpAKQkZ@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Yqw9dou3qgpAKQkZ@kernel.org>
+ <Yqw9dou3qgpAKQkZ@kernel.org> <Yqw/PI6jF5HZTvxB@google.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <fa3b5bb1caeaaf98b8a754504c3c9be1@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: qperret@google.com, rppt@kernel.org, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org,
+ catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org, james.morse@arm.com, will@kernel.org,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kernel-team@android.com, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Mike Rapoport <rppt@kernel.org>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -88,50 +85,58 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Friday 17 Jun 2022 at 11:38:14 (+0300), Mike Rapoport wrote:
-> On Fri, Jun 17, 2022 at 09:21:31AM +0100, Marc Zyngier wrote:
-> > On Thu, 16 Jun 2022 16:11:34 +0000, Quentin Perret wrote:
-> > > Commit a7259df76702 ("memblock: make memblock_find_in_range method
-> > > private") changed the API using which memory is reserved for the pKVM
-> > > hypervisor. However, it seems that memblock_phys_alloc() differs
-> > > from the original API in terms of kmemleak semantics -- the old one
-> > > excluded the reserved regions from kmemleak scans when the new one
-> > > doesn't seem to. Unfortunately, when protected KVM is enabled, all
-> > > kernel accesses to pKVM-private memory result in a fatal exception,
-> > > which can now happen because of kmemleak scans:
-> > > 
-> > > [...]
-> > 
-> > Applied to fixes, thanks!
-> > 
-> > [1/1] KVM: arm64: Prevent kmemleak from accessing pKVM memory
-> >       commit: 9e5afa8a537f742bccc2cd91bc0bef4b6483ee98
+On 2022-06-17 09:45, Quentin Perret wrote:
+> On Friday 17 Jun 2022 at 11:38:14 (+0300), Mike Rapoport wrote:
+>> On Fri, Jun 17, 2022 at 09:21:31AM +0100, Marc Zyngier wrote:
+>> > On Thu, 16 Jun 2022 16:11:34 +0000, Quentin Perret wrote:
+>> > > Commit a7259df76702 ("memblock: make memblock_find_in_range method
+>> > > private") changed the API using which memory is reserved for the pKVM
+>> > > hypervisor. However, it seems that memblock_phys_alloc() differs
+>> > > from the original API in terms of kmemleak semantics -- the old one
+>> > > excluded the reserved regions from kmemleak scans when the new one
+>> > > doesn't seem to. Unfortunately, when protected KVM is enabled, all
+>> > > kernel accesses to pKVM-private memory result in a fatal exception,
+>> > > which can now happen because of kmemleak scans:
+>> > >
+>> > > [...]
+>> >
+>> > Applied to fixes, thanks!
+>> >
+>> > [1/1] KVM: arm64: Prevent kmemleak from accessing pKVM memory
+>> >       commit: 9e5afa8a537f742bccc2cd91bc0bef4b6483ee98
+>> 
+>> I'd really like to update the changelog to this:
+>> 
+>> Commit a7259df76702 ("memblock: make memblock_find_in_range method
+>> private") changed the API using which memory is reserved for the pKVM
+>> hypervisor. However, memblock_phys_alloc() differs from the original 
+>> API in
+>> terms of kmemleak semantics -- the old one didn't report the reserved
+>> regions to kmemleak while the new one does. Unfortunately, when 
+>> protected
+>> KVM is enabled, all kernel accesses to pKVM-private memory result in a
+>> fatal exception, which can now happen because of kmemleak scans:
+>> 
+>> $ echo scan > /sys/kernel/debug/kmemleak
+>> [   34.991354] kvm [304]: nVHE hyp BUG at: [<ffff800008fa3750>] 
+>> __kvm_nvhe_handle_host_mem_abort+0x270/0x290!
+>> ...
+>> 
+>> Fix this by explicitly excluding the hypervisor's memory pool from
+>> kmemleak like we already do for the hyp BSS.
 > 
-> I'd really like to update the changelog to this:
-> 
-> Commit a7259df76702 ("memblock: make memblock_find_in_range method
-> private") changed the API using which memory is reserved for the pKVM
-> hypervisor. However, memblock_phys_alloc() differs from the original API in
-> terms of kmemleak semantics -- the old one didn't report the reserved
-> regions to kmemleak while the new one does. Unfortunately, when protected
-> KVM is enabled, all kernel accesses to pKVM-private memory result in a
-> fatal exception, which can now happen because of kmemleak scans:
-> 
-> $ echo scan > /sys/kernel/debug/kmemleak
-> [   34.991354] kvm [304]: nVHE hyp BUG at: [<ffff800008fa3750>] __kvm_nvhe_handle_host_mem_abort+0x270/0x290!
-> ...
-> 
-> Fix this by explicitly excluding the hypervisor's memory pool from
-> kmemleak like we already do for the hyp BSS.
+> Looks good to me, thanks.
 
-Looks good to me, thanks.
+Now updated. Thanks,
 
-Quentin
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
