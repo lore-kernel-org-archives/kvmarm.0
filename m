@@ -2,76 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4559AC43334
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Jun 2022 15:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A4C7C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Jun 2022 16:39:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AAEB44B249;
-	Fri, 17 Jun 2022 11:30:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0520D4B381;
+	Fri, 17 Jun 2022 12:39:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id F1ZG7H3aARLr; Fri, 17 Jun 2022 11:30:52 -0400 (EDT)
+	with ESMTP id BKsubglWOxgo; Fri, 17 Jun 2022 12:39:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FA1C4B338;
-	Fri, 17 Jun 2022 11:30:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2BBC4B2B8;
+	Fri, 17 Jun 2022 12:39:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BEA9C4B26D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 11:30:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 78E034B1CB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 12:39:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gCG8-5vbW4yj for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Jun 2022 11:30:50 -0400 (EDT)
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com
- [209.85.214.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A9E404B249
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 11:30:50 -0400 (EDT)
-Received: by mail-pl1-f180.google.com with SMTP id o6so4177867plg.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 08:30:50 -0700 (PDT)
+ with ESMTP id A25JCBgtaoJa for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Jun 2022 12:39:21 -0400 (EDT)
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com
+ [209.85.216.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 41DBC4B1C6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 12:39:21 -0400 (EDT)
+Received: by mail-pj1-f43.google.com with SMTP id
+ h34-20020a17090a29a500b001eb01527d9eso3767925pjd.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 09:39:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=JX9xGdiptLoNDTC4kLICm3LWkZE4wnBomWiv9D2Jt+A=;
- b=FroTbfKQXF4oe57u8/z01s4H2lPuFDNHQSRgJovvAXDxEMhjV6urKT0B8sHR2d8L3n
- ae5hlfF9DTvZ3c4JoenCBYAcFC4Cg8LCcOK2JrDuN6oUMXhIoi9o/mdMIV451aYKFaHM
- hsdOfB+Hs+/CcS7myUfGVKpDlXbB3fjN6geQn+KJQKA17rR8Sm9IHtsMFgdomwiKqeEC
- T71kaL/J/sl8yWloLQdFRdTBTWZOAvcg6ooTQr6dWni9zBgS6eSDRk96BL8uwMhSgZPi
- PQtlmqwUfOUCyJu9V8Rp++e8ZGmSuy0PGyvVrA380adh0l3CDL5Obk4WtrHI/VRK72em
- XaEQ==
+ bh=wrdO5P+XurdaeOgOSQ+5kEyKwT7FiNPp233iypu4ges=;
+ b=GLI0UsmAM2SwCj2zsTHa0oDcnMYgcUb1C8zvkJSBU2UTOlY+q5LsCvt8d+o0gH9deL
+ EJxKuYIJsSURtNXkFUX2typL9jcEhnHUIRDb2fSyphm9SbBxXCf/MxljTwYKChU0WzD6
+ /u1khMJU8yxHRUkSSrcsf2gPV+QsawCwxs6Z7CB1hM4QlTf2EFT/vN36oa28X48YXT+G
+ dUjTHEpcxFF355xRlPkgRYJHYusbuSXE6SVvev0aFEMSpuRmMiYWYOgP6gRhRDvuQUkw
+ f0gwMORKivzLEb67Z570CcSn5DcFYQGhm25keeGm2aqAsRUjtljk6RQGoKz0WIt/+DNi
+ FCsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=JX9xGdiptLoNDTC4kLICm3LWkZE4wnBomWiv9D2Jt+A=;
- b=O5SRK6kkBaMjOys87ZxZWdI+6U8LGmaLqKfkdJxLfSYcOVDikG2zjJ2mRctk1bkpE8
- ppeJSIiKAO6wlbKl3nVAtvOeKbmpNiKSxoJtrQTfTo0egQUAjDNna6DpPWOeyEoTp9bQ
- gZfRKqJF+Rk5B13qZrD+FPi17P6G7y8lx2GKpxUdor3HDMGuSeYbnZ+as4M9T8tV4zUL
- 1VPGqdpvzakLLU0j4cah/4+BSMGWZDdWqQggFTtfJO+61kkZogzIDQgYZRSLQWW5WFVl
- ov7kAsd5l0mdyjG5F/XGXLaMggYU21PtV91U1GwJBany8Xl9RKKYT1B/3r6CSXAPOVyP
- xMgg==
-X-Gm-Message-State: AJIora8N2x9AS/WlnKsDXj8t8VpBNSTXfK1BtrRw4/KEp+xxuq1Xi7qZ
- bJqoaqOGge5aUQbcXFnnj73wwQ==
-X-Google-Smtp-Source: AGRyM1sShni0HcA+wwvElgEG+uhqDvpiuI/Mbz6fR5xrdxpUTVbxDXYkPyaLGZqxKkWHjKOvWmjOaA==
-X-Received: by 2002:a17:903:2ca:b0:156:f1cc:7cb6 with SMTP id
- s10-20020a17090302ca00b00156f1cc7cb6mr10651437plk.174.1655479849528; 
- Fri, 17 Jun 2022 08:30:49 -0700 (PDT)
+ bh=wrdO5P+XurdaeOgOSQ+5kEyKwT7FiNPp233iypu4ges=;
+ b=Qs2gStX+h6Ak/Qhpz0JZx9T2Ge4ZFRmdUMsh1h5j6jyG2BqXLZ/4DQizc2quRiq6GI
+ 6UlY3K8kPQ4jNjJRVkWbeMVn3VaujCLnc5+DW9X+CRq9OoCi5L2TmWTpVrtAeDeUrK8G
+ ceWGCACm/ypgG6eM/bD9ceKnrnbWjM+AuZ1TegpOt79GJAnAkf8FW0TMQpgRoHjqIS72
+ YCyBFGvwro2xL9jLmY2454Biu133hDDukDu0mYL/OTSNC/oETyUk/G90K5fytv6r753f
+ 1faxmiG5DC6Gn3PDvjxMmL60fdlO6wmamPMd2dSjOaqOmBIdXU4EQyI/gX+YepnUJ8/R
+ 5zAw==
+X-Gm-Message-State: AJIora9ARThOLOyzF8FoWyyjzI6P+Gt1ydDAFCVkCBPl2YPyRzpKlbkH
+ vXBdsGkOh6c1mhf5R124Jgd1gA==
+X-Google-Smtp-Source: AGRyM1vVWqfyGPjBRUy89tBJu9kICwdn0HHYHxZToGtJz6hzC1Mdg/1dOrUNNuf4HFLCQTuqX0StEg==
+X-Received: by 2002:a17:902:c407:b0:163:df01:bbbc with SMTP id
+ k7-20020a170902c40700b00163df01bbbcmr10210387plk.4.1655483959855; 
+ Fri, 17 Jun 2022 09:39:19 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com.
  [35.230.65.123]) by smtp.gmail.com with ESMTPSA id
- o4-20020a1709026b0400b00163de9e9342sm3758558plk.17.2022.06.17.08.30.48
+ s10-20020a63af4a000000b003db7de758besm4134739pgo.5.2022.06.17.09.39.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Jun 2022 08:30:48 -0700 (PDT)
-Date: Fri, 17 Jun 2022 15:30:44 +0000
+ Fri, 17 Jun 2022 09:39:19 -0700 (PDT)
+Date: Fri, 17 Jun 2022 16:39:15 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v6 14/22] KVM: x86/mmu: Pass const memslot to rmap_add()
-Message-ID: <YqyeJKMcqkO5zynw@google.com>
+Subject: Re: [PATCH v6 15/22] KVM: x86/mmu: Decouple rmap_add() and
+ link_shadow_page() from kvm_vcpu
+Message-ID: <YqyuM3v0SNPyrOmP@google.com>
 References: <20220516232138.1783324-1-dmatlack@google.com>
- <20220516232138.1783324-15-dmatlack@google.com>
+ <20220516232138.1783324-16-dmatlack@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220516232138.1783324-15-dmatlack@google.com>
+In-Reply-To: <20220516232138.1783324-16-dmatlack@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
  "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
  <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
@@ -103,23 +105,50 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Mon, May 16, 2022, David Matlack wrote:
+> @@ -1592,15 +1589,21 @@ static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
+>  	sp = sptep_to_sp(spte);
+>  	kvm_mmu_page_set_gfn(sp, spte - sp->spt, gfn);
+>  	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
+> -	rmap_count = pte_list_add(vcpu, spte, rmap_head);
+> +	rmap_count = pte_list_add(cache, spte, rmap_head);
+>  
+>  	if (rmap_count > RMAP_RECYCLE_THRESHOLD) {
+> -		kvm_unmap_rmapp(vcpu->kvm, rmap_head, NULL, gfn, sp->role.level, __pte(0));
+> +		kvm_unmap_rmapp(kvm, rmap_head, NULL, gfn, sp->role.level, __pte(0));
 
-Please restate the shortlog in the changelog, it doesn't require much more typing
-and means readers don't have to mentally preserve context across "paragraphs".
+Ewww, the existing code is awful.  This call passes NULL for @slot, but it already
+has a slot!  This could simply be
 
-  Constify rmap_add()'s @slot parameter, the is just passed on to
-  gfn_to_rmap(), which takes a const memslot.
+		pte_list_destroy(vcpu->kvm, rmap_head);
 
-> rmap_add() only uses the slot to call gfn_to_rmap() which takes a const
-> memslot.
-> 
-> No functional change intended.
-> 
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
+but that's undesirable with the current name as it's not remotely obvious that
+pte_list_destroy() actually zaps rmaps.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+I'll send a separate series to clean this up, e.g. rename pte_list_destroy() to
+make it clear that it zaps SPTEs.  That'll also give me a good excuse to kill the
+"p is for pointer" rmapp() naming scheme.  The only conflict with your series is
+this one vcpu->kvm => kvm change, which is easy to note and resolve.
+
+>  		kvm_flush_remote_tlbs_with_address(
+> -				vcpu->kvm, sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
+> +				kvm, sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
+>  	}
+>  }
+>  
+> +static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
+> +		     u64 *spte, gfn_t gfn)
+> +{
+> +	__rmap_add(vcpu->kvm, &vcpu->arch.mmu_pte_list_desc_cache, slot, spte, gfn);
+
+I prefer to grab "cache" locally,
+
+	struct kvm_mmu_memory_cache *cache = &vcpu->arch.mmu_pte_list_desc_cache;
+
+	__rmap_add(vcpu->kvm, cache, slot, spte, gfn);
+
+both to keep the lines shorter in the final form (adding "access" runs yours out
+to 93 chars), and because I find it easier to see read the call without a gigantic
+parameter in the midde.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
