@@ -2,83 +2,84 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19BDBC43334
-	for <kvmarm@archiver.kernel.org>; Sat, 18 Jun 2022 00:09:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC12DC43334
+	for <kvmarm@archiver.kernel.org>; Sat, 18 Jun 2022 00:16:26 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73F8F4B335;
-	Fri, 17 Jun 2022 20:09:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D9F74B332;
+	Fri, 17 Jun 2022 20:16:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wsOzbAN8AYge; Fri, 17 Jun 2022 20:09:19 -0400 (EDT)
+	with ESMTP id t5GcidD1dw0M; Fri, 17 Jun 2022 20:16:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D7384B389;
-	Fri, 17 Jun 2022 20:09:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F1D84B389;
+	Fri, 17 Jun 2022 20:16:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87E434B33D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 20:09:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D1564B2A1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 20:16:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dQkHi8Al2zpG for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Jun 2022 20:09:16 -0400 (EDT)
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com
- [209.85.210.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C4DA4B335
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 20:09:16 -0400 (EDT)
-Received: by mail-pf1-f178.google.com with SMTP id z17so5410206pff.7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 17:09:16 -0700 (PDT)
+ with ESMTP id BehWYhoGc6IP for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Jun 2022 20:16:23 -0400 (EDT)
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
+ [209.85.216.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0CDB94B091
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 20:16:22 -0400 (EDT)
+Received: by mail-pj1-f73.google.com with SMTP id
+ c19-20020a17090abf1300b001ec70183c99so2438576pjs.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jun 2022 17:16:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=rmREuzW95waiA3DDpOBKbzOCl6/bO3/zBUhkj2WSq9I=;
- b=YCP800zP22Elf3Ylaojub23i9i+c4DqKeQkNx5RkzWlB2guxY5lWBKf48hfbmaVQ/N
- eYGU19hBcx/GbITum/oZ8SXf9PmopWlcqw6oN1dmbAxSd/hhTpZFCC15vFDIIj3BGP/0
- qvM1b6rK1d4jcutPEYVdVKRsphQhA0gcmF88AOdPZTKbsVXqN/63OoO/vXbqjvmxClro
- ddQiy7dpqMjtCcF0gkWPyZPF/Y64THzretyJqrXrL6lsiQzDYFKUdgoah4WnyM8iFglV
- VQAodr3sNg5DnUEiK0RF52Xp9/hR8JzLLs9y9rC6Rq2DBo+iYF+YA0KEL/65OkfsoXHs
- zwlQ==
+ h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+ bh=4HlwtKsrcUiP4ezxQu89E9aBkat4STQcCRUlQRJmlM4=;
+ b=cqH7RwM35eUa9gSH23Vyp0IXD8rbHQ6iHBYjzqYB4r/ApR3GiB5irQq91CvaOTU2a/
+ JbiD+lO3mhGF7Q9VF8Z+RL2N3kcJKkwfgbC11BxFaQhlTH5WcSxRdyy/VhMTgegBEuWE
+ m0ICZIKBakq6kG4UrIJM1l7DZgPfrlXNTJzqVOW/b/BDjaQn7NZ1PZDqtivgtVVTA1vf
+ J3LNa6ebna+9KeWC2sraxN7xZP7PZA5oz+Ft9ZxR6ro5zNG2FCSpgajvCr+Yw7sr0lRJ
+ GloAY8IFUzs+m+0goppunIS/0Ln/zHmwSHJByc2TnvMQ/Qh39U6cvZifZQqRqYSCI5Ep
+ Y1SQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=rmREuzW95waiA3DDpOBKbzOCl6/bO3/zBUhkj2WSq9I=;
- b=WIy3XWbroeIsYJSJLfJduVKAok/iSaWNrS2Efd7lGVbWcGP4E8lvESznN5RqmvATeW
- kVrUsZrW9FGqmjA6c8VW7IY2rkNfTr4ybGsAglqYWkgKkHRtyIgiLU/PDUSK6Fn7UBjf
- l4gS1E5AqIqOEGqYhr9bPMsAYnMmoio0VZBImMUbrF8GkBkI6iDgtSn7+Y46p2fCH03k
- 7FBi3SdLzemdERpeMw0uATW2ZsUznrHiCWIZsjuRo5NAIfbRxt5av+eVJ8OGwwButCLN
- 6kHKElLXAr+aDg2brT+kSydGCIpzC66aI6w07EcWZGwUbwLo22QVpTPvsjUf6C0Iqf/V
- iWHQ==
-X-Gm-Message-State: AJIora8giFUZq260YI5DZ3jLTsu7PzWdn+UdQPsT4EjVs7G8YQUNh4re
- ORlJhAxxfAf5gvOK5j1+V1K8WQ==
-X-Google-Smtp-Source: AGRyM1ssehBTb8JKASbU9EaanhSrDN7Ob2S/Adon1xUDXwjcTBHM88tI85Trf31af1LqByg1k8MpIg==
-X-Received: by 2002:a05:6a00:450d:b0:524:d95b:d51d with SMTP id
- cw13-20020a056a00450d00b00524d95bd51dmr6985967pfb.29.1655510955383; 
- Fri, 17 Jun 2022 17:09:15 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com.
- [35.230.65.123]) by smtp.gmail.com with ESMTPSA id
- iw13-20020a170903044d00b0015f4b7a012bsm565537plb.251.2022.06.17.17.09.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 17 Jun 2022 17:09:15 -0700 (PDT)
-Date: Sat, 18 Jun 2022 00:09:11 +0000
+ h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+ :from:to:cc;
+ bh=4HlwtKsrcUiP4ezxQu89E9aBkat4STQcCRUlQRJmlM4=;
+ b=JAUPDKBFf3m4KZzZkxd7odOwzZ3N37knUtY/gVyObS2l5T6lt37jOF6GwEL96/ng4X
+ WktS57N+Y0xe8V/VBbeFwIfGRLHBNRq/vUrXGzxymGOhtPSllGx4dByStqq2b9psiKqs
+ Z5aIskV0si5YDToRy2S0mrcYn+1N3e7WepMse28NCiGbLlGlsD8+XIaOW05ym4RiSMSV
+ C4YaTYVQawiVa0Q7WjKp3r/Y/yGE2ZI3oqmpazBzYrVE49ou3Cf0DSVbVM7+mEgIviAi
+ vgRc/7DjlPHUOxT2jMqHlvtxik5ccjrrVi7dqGwBDTvdJcPxqkPhNP+dYFwXZAlyyWoy
+ Rd9Q==
+X-Gm-Message-State: AJIora+ndYs4m/2nGiCQlA73nAH2d9S37CKCJblvvt/YDZSzWBPGnXkO
+ dPT2nfq2XfzOCECoI0hxFsufweVCR4k=
+X-Google-Smtp-Source: AGRyM1u0GdVPlx+Hq/yK0Jw2vZzxWWQDidlftHCsuvnSZKrmnfBPw9OaOWYf8QzYovkEUkJdLG9nTYZRGxE=
+X-Received: from zagreus.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:16d2:b0:522:81c0:a635 with SMTP id
+ l18-20020a056a0016d200b0052281c0a635mr12877654pfc.0.1655511381838; Fri, 17
+ Jun 2022 17:16:21 -0700 (PDT)
+Date: Sat, 18 Jun 2022 00:16:15 +0000
+Message-Id: <20220618001618.1840806-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.0.rc0.104.g0611611a94-goog
+Subject: [PATCH 0/3] KVM: selftests: Consolidate ucall code
 From: Sean Christopherson <seanjc@google.com>
-To: Colton Lewis <coltonlewis@google.com>
-Subject: Re: [PATCH 2/4] KVM: selftests: Increase UCALL_MAX_ARGS to 7
-Message-ID: <Yq0Xpzk2Wa6wBXw9@google.com>
-References: <20220615193116.806312-1-coltonlewis@google.com>
- <20220615193116.806312-3-coltonlewis@google.com>
- <20220616121006.ch6x7du6ycevjo5m@gator>
- <Yqy0ZhmF8NF4Jzpe@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Yqy0ZhmF8NF4Jzpe@google.com>
-Cc: thuth@redhat.com, kvm@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
- vkuznets@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+ Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, 
+ Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+ linux-kernel@vger.kernel.org, Colton Lewis <coltonlewis@google.com>,
+ kvm-riscv@lists.infradead.org, Atish Patra <atishp@atishpatra.org>,
+ linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Sean Christopherson <seanjc@google.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -92,24 +93,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jun 17, 2022, Colton Lewis wrote:
-> On Thu, Jun 16, 2022 at 02:10:06PM +0200, Andrew Jones wrote:
-> > We probably want to ensure all architectures are good with this. afaict,
-> > riscv only expects 6 args and uses UCALL_MAX_ARGS to cap the ucall inputs,
-> > for example.
-> 
-> All architectures use UCALL_MAX_ARGS for that. Are you saying there
-> might be limitations beyond the value of the macro? If so, who should
-> verify whether this is ok?
+Consolidate the code for making and getting ucalls.  All architectures pass
+the ucall struct via memory, so filling and copying the struct is 100%
+generic.  The only per-arch code is sending and receiving the address of
+said struct.
 
-I thought there were architectural limitations too, but I believe I was thinking
-of vcpu_args_set(), where the number of params is limited by the function call
-ABI, e.g. the number of registers.
+Tested on x86 and arm, compile tested on s390 and RISC-V.
 
-Unless there's something really, really subtle going on, all architectures pass
-the actual ucall struct purely through memory.  Actually, that code is ripe for
-deduplication, and amazingly it doesn't conflict with Colton's series.  Patches
-incoming...
+Sean Christopherson (3):
+  KVM: selftests: Consolidate common code for popuplating ucall struct
+  KVM: selftests: Consolidate boilerplate code in get_ucall()
+  KVM: selftest: Add __weak stubs for ucall_arch_(un)init()
+
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../selftests/kvm/include/ucall_common.h      | 17 ++++++-
+ .../testing/selftests/kvm/lib/aarch64/ucall.c | 36 +++-----------
+ tools/testing/selftests/kvm/lib/riscv/ucall.c | 44 ++---------------
+ tools/testing/selftests/kvm/lib/s390x/ucall.c | 41 ++--------------
+ .../testing/selftests/kvm/lib/ucall_common.c  | 49 +++++++++++++++++++
+ .../testing/selftests/kvm/lib/x86_64/ucall.c  | 41 ++--------------
+ 7 files changed, 87 insertions(+), 142 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/lib/ucall_common.c
+
+
+base-commit: 8baacf67c76c560fed954ac972b63e6e59a6fba0
+-- 
+2.37.0.rc0.104.g0611611a94-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
