@@ -2,68 +2,67 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0B33C43334
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Jun 2022 12:42:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4A08C43334
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Jun 2022 12:42:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B2A34B27B;
-	Mon, 20 Jun 2022 08:42:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BCAC4B2B4;
+	Mon, 20 Jun 2022 08:42:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ol6StNgy6b36; Mon, 20 Jun 2022 08:42:30 -0400 (EDT)
+	with ESMTP id kmqYCYpdTQMd; Mon, 20 Jun 2022 08:42:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C3254B282;
-	Mon, 20 Jun 2022 08:42:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77B644B3A2;
+	Mon, 20 Jun 2022 08:42:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E0A874B4DF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jun 2022 08:42:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E6E34B309
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jun 2022 08:42:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uglfD7IKKPg7 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Jun 2022 08:42:27 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4AB8A4B4E9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jun 2022 08:42:27 -0400 (EDT)
+ with ESMTP id 7kchpmMIqwKP for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Jun 2022 08:42:31 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DEF0C4B4FF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jun 2022 08:42:30 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id CA9AD6149E;
+ by ams.source.kernel.org (Postfix) with ESMTPS id 07DE4B8114D;
+ Mon, 20 Jun 2022 12:42:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD76DC341C5;
  Mon, 20 Jun 2022 12:42:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20C19C3411C;
- Mon, 20 Jun 2022 12:42:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1655728946;
- bh=L6RJvcYmGpyN41lsIb62MkEkWZtrLa0waSWlt5gfaeE=;
+ s=k20201202; t=1655728948;
+ bh=sCLGhjBv8cXl/zBWmTUuMj1EjUf/TBRKwhmY/6vG9jw=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=NmaVZ/rFKq/a7URvwiVint9SqyJhn09Nt5TCTRJ5yrEJkV2sxD1Xl1Ehxt+/wg8pc
- jOEH2FkXUlkIE0PEppeVcCg5nUBUt/ax7L6vVtdWPDSR1xXdi0RjA/UaY7mfLll1k3
- 64QFOtLddeP0kg5UFCvZke+xXA6sAKWwu7GhOPqvPubKX0uYaX/8I6StJQ5isYOGGb
- 7g8x4o6BAEy017oVZXGTVYqpdidaIAnrWcqtidBtVGCRMAD2JFgCFjw1UYbp9QWp/i
- tYp8rYJPJUrfr7Kcsft5NW/3bpT24egABizC2Y4niCWf4sT2+JqeqFQX81PTix4Aet
- JGgW+Djr7feWw==
+ b=oidSXjwQkExCnQCcl6OnTfeCqs5THK+/AATFIwHlGPa+sUeDc0ak9jAb7NpHcQlz8
+ ljPT0eg1PlRAQff0vUKnQkTlGu+lvVaJBzez+qhIjfTCBNTBWiOMmN7Kv65ugqHSyD
+ 8C8sZwkMwBOnyQAN+SxXNl0wVgfPDQusRnLEwGZY7XumUv1QC7ddWSxF1sKEyXaLyA
+ t4wV8DNxLSBC6Ra2zCushYJCT+8QIgc2Suhs7Vmt+pKb5Hljy9B7Kc519ZIum5v29C
+ Ndbh5ciGGJ7iVlDWg+eQPqqBxWFzEHXWl+AgFz009GPU5JTjup6jW+46fHBTtq2ZGn
+ F/pHVnwk3JwYQ==
 From: Mark Brown <broonie@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH v2 4/7] arm64/fpsimd: Stop using TIF_SVE to manage register
- saving in KVM
-Date: Mon, 20 Jun 2022 13:41:55 +0100
-Message-Id: <20220620124158.482039-5-broonie@kernel.org>
+Subject: [PATCH v2 5/7] arm64/fpsimd: Load FP state based on recorded data type
+Date: Mon, 20 Jun 2022 13:41:56 +0100
+Message-Id: <20220620124158.482039-6-broonie@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220620124158.482039-1-broonie@kernel.org>
 References: <20220620124158.482039-1-broonie@kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2656; h=from:subject;
- bh=L6RJvcYmGpyN41lsIb62MkEkWZtrLa0waSWlt5gfaeE=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBisGsQsPwNi5MAdIAtnN/L2q4kj5eOfXLc1owMgq/a
- LuoIFwGJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYrBrEAAKCRAk1otyXVSH0Mm2B/
- oChsEN/CBdHuIEkrm7mS8sjc0MaWDa+VGlviG8sBVmH4nwhQEJcFq2/DLAXL3ezBTznPL+gYTMgEkJ
- DHIp/g8NiSbyH094QNDMwDBeV1fP7BrDh+QfI1jVwjK6XclNi9+ktO5o68bMjdVIVwr0zWij9ha1qW
- w56ySAGzw4AT1tHKIO20r0j9KOmThLBnjsYR2+flK/nYOWWlc4NhSmx1/pVEd2yPXf807sCSuKIjLp
- TMorH8tgf0CY5MFGG2+wE9PuohStqHPuq/xmCwW25/qLTSiALYabRJbwIOCpFuRPNt49tVLfceMv7z
- ga1h3r2LBXWauLT9Pdxd7rFQM05An4
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2343; h=from:subject;
+ bh=sCLGhjBv8cXl/zBWmTUuMj1EjUf/TBRKwhmY/6vG9jw=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBisGsRys7u5U+5Z4oKEo2l05zMCH6Tonoz070LzE0z
+ FzVyVsqJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYrBrEQAKCRAk1otyXVSH0DnVCA
+ CAGUP1etILPKlNvThDPZU6Vfq11K47cnSGYP5ldwxz/mt8mDQsS60ZGoBLME8DMxURhYtwNHf7FfRd
+ XW3PGQPkVhX1qMeA3B3Xvyrp0yOsOv/Y5wGUZ7bvgoK+EgfGCsEhuhkg+/1offU5YpYnDCDOB93dUc
+ 9PjmtbDiakxuk5iAVMN1Qtq70R0ArV+7LPIYW5/Jwowcx4oDNhy/SxCmivtopjqmrOZHMEpgoDIFtK
+ GQmvVDdFnOPKoqnvXCsMK2SPoml1+zXwLZvq906X20rbLNrhMR+bkZ3IEGzspjECwXLs81BKxF1pOx
+ 1i+Z42MsabZgFvpMEocGhS/uTyQeGU
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 Cc: Marc Zyngier <maz@kernel.org>, Zhang Lei <zhang.lei@jp.fujitsu.com>,
@@ -85,83 +84,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Now that we are explicitly telling the host FP code which register state
-it needs to save we can remove the manipulation of TIF_SVE from the KVM
-code, simplifying it and allowing us to optimise our handling of normal
-tasks. Remove the manipulation of TIF_SVE from KVM and instead rely on
-to_save to ensure we save the correct data for it.
+Now that we are recording the type of floating point register state we
+are saving when we save it we can use that information when we load to
+decide which register state is required and bring the TIF_SVE state into
+sync with the loaded register state.
+
+The SME state detauls are already recorded directly in the saved
+SVCR and handled based on the information there.
+
+Since we are not changing any of the save paths there should be no
+functional change from this patch, further patches will make use of this
+to optimise and clarify the code.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/kernel/fpsimd.c | 22 ++++------------------
- arch/arm64/kvm/fpsimd.c    |  3 ---
- 2 files changed, 4 insertions(+), 21 deletions(-)
+ arch/arm64/kernel/fpsimd.c | 37 ++++++++++++++++++++++++++++++++-----
+ 1 file changed, 32 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 95c95411bd42..ebe66d8c66e8 100644
+index ebe66d8c66e8..f14452b7a629 100644
 --- a/arch/arm64/kernel/fpsimd.c
 +++ b/arch/arm64/kernel/fpsimd.c
-@@ -435,8 +435,8 @@ static void task_fpsimd_load(void)
-  * last, if KVM is involved this may be the guest VM context rather
-  * than the host thread for the VM pointed to by current. This means
-  * that we must always reference the state storage via last rather
-- * than via current, other than the TIF_ flags which KVM will
-- * carefully maintain for us.
-+ * than via current, if we are saving KVM state then it will have
-+ * ensured that the type of registers to save is set in last->to_save.
-  */
- static void fpsimd_save(void)
- {
-@@ -453,27 +453,13 @@ static void fpsimd_save(void)
- 	if (test_thread_flag(TIF_FOREIGN_FPSTATE))
- 		return;
+@@ -391,11 +391,38 @@ static void task_fpsimd_load(void)
+ 	WARN_ON(!system_supports_fpsimd());
+ 	WARN_ON(!have_cpu_fpsimd_context());
  
--	if (test_thread_flag(TIF_SVE)) {
-+	if ((last->to_save == FP_STATE_TASK && test_thread_flag(TIF_SVE)) ||
-+	    last->to_save == FP_STATE_SVE) {
- 		save_sve_regs = true;
- 		save_ffr = true;
- 		vl = last->sve_vl;
+-	/* Check if we should restore SVE first */
+-	if (IS_ENABLED(CONFIG_ARM64_SVE) && test_thread_flag(TIF_SVE)) {
+-		sve_set_vq(sve_vq_from_vl(task_get_sve_vl(current)) - 1);
+-		restore_sve_regs = true;
+-		restore_ffr = true;
++	if (system_supports_sve()) {
++		switch (current->thread.fp_type) {
++		case FP_STATE_FPSIMD:
++			/* Stop tracking SVE for this task until next use. */
++			if (test_and_clear_thread_flag(TIF_SVE))
++				sve_user_disable();
++			break;
++		case FP_STATE_SVE:
++			/*
++			 * A thread with SVE state should either be in
++			 * streaming mode or already have SVE enabled.
++			 */
++			if (!thread_sm_enabled(&current->thread) &&
++			    !WARN_ON_ONCE(!test_and_set_thread_flag(TIF_SVE)))
++				sve_user_enable();
++
++			sve_set_vq(sve_vq_from_vl(task_get_sve_vl(current)) - 1);
++			restore_sve_regs = true;
++			restore_ffr = true;
++			break;
++		default:
++			/*
++			 * This should never happen, we should always
++			 * record what we saved when we save. We
++			 * always at least have the memory allocated
++			 * for FPSMID registers so try that and hope
++			 * for the best.
++			 */
++			WARN_ON_ONCE(1);
++			clear_thread_flag(TIF_SVE);
++			break;
++		}
  	}
  
--	/*
--	 * For now we're just validating that the requested state is
--	 * consistent with what we'd otherwise work out.
--	 */
--	switch (last->to_save) {
--	case FP_STATE_TASK:
--		break;
--	case FP_STATE_FPSIMD:
--		WARN_ON_ONCE(save_sve_regs);
--		break;
--	case FP_STATE_SVE:
--		WARN_ON_ONCE(!save_sve_regs);
--		break;
--	}
--
- 	if (system_supports_sme()) {
- 		u64 *svcr = last->svcr;
- 		*svcr = read_sysreg_s(SYS_SVCR);
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 542c71b16451..54131a57130e 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -150,7 +150,6 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
- 					 &vcpu->arch.fp_type, fp_type);
- 
- 		clear_thread_flag(TIF_FOREIGN_FPSTATE);
--		update_thread_flag(TIF_SVE, vcpu_has_sve(vcpu));
- 	}
- }
- 
-@@ -207,7 +206,5 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 			sysreg_clear_set(CPACR_EL1, CPACR_EL1_ZEN_EL0EN, 0);
- 	}
- 
--	update_thread_flag(TIF_SVE, 0);
--
- 	local_irq_restore(flags);
- }
+ 	/* Restore SME, override SVE register configuration if needed */
 -- 
 2.30.2
 
