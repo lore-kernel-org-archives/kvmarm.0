@@ -2,73 +2,95 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43B02C43334
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Jun 2022 12:42:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B97CCA479
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Jun 2022 13:21:01 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EBFFA4B2B4;
-	Mon, 20 Jun 2022 08:42:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 795DC401AF;
+	Mon, 20 Jun 2022 09:21:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 44RTGvjZDhDw; Mon, 20 Jun 2022 08:42:38 -0400 (EDT)
+	with ESMTP id RaFmfQOUKBXN; Mon, 20 Jun 2022 09:20:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B71334B297;
-	Mon, 20 Jun 2022 08:42:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 573854B4C8;
+	Mon, 20 Jun 2022 09:20:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8522A4B309
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jun 2022 08:42:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CAF194B4A6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jun 2022 09:20:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id N9T1gwXHyP2J for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Jun 2022 08:42:36 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DB1E4B2E2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jun 2022 08:42:36 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 6108EB81145;
- Mon, 20 Jun 2022 12:42:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA372C341CA;
- Mon, 20 Jun 2022 12:42:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1655728954;
- bh=Rw9wVvsE2kpCeEUGQn68+uLCTU5z1rcjDq4JHU6LKc8=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=eNeq0kkEYH7TJZ8zLKlj/a2/+Ev28Y6oEcKJ3euNTRIb8jBtI5gbsRAlkotXsQbVo
- gqYf28AmR9C5lkiTBgUgD5Gq6hAsGNBWU87yYKh2KepGg5vlDA4UfcsX6neevSxV53
- RmdX2zXdydbwxr3yMxt3w4LNOAQR4PTNQu9u+juMJnWtuJqrnVXgaXDBnV6sob4HrT
- kQ77mM7xk+b2arYqIAB8hxo7sjqsdlrnJOc4GGsUBUMK17VaX7ZaJe767Y1vLjbpnR
- 2AjMkFqr7ouFkYApJmJMO25SaH0OxnY3weaxv9GM6R5mk4EgwBPhSSwO3lH4qd3dhX
- hxd6nK6H2f9rw==
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: [PATCH v2 7/7] arm64/sve: Don't zero non-FPSIMD register state on
- syscall by default
-Date: Mon, 20 Jun 2022 13:41:58 +0100
-Message-Id: <20220620124158.482039-8-broonie@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220620124158.482039-1-broonie@kernel.org>
-References: <20220620124158.482039-1-broonie@kernel.org>
+ with ESMTP id mHQO2TpRRcMx for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Jun 2022 09:20:56 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 64A1B4B4A5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jun 2022 09:20:56 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1655731256;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=NzIQ07jP7Ucf0c+44ASJDe761bf0uW4WoGXyOYmuq/Y=;
+ b=O82dgzMBpJTpv/iVl/DBIhqGvqss20a8jd56dJDQ+iLwbKA6wJGnMTqDtoBTY8DcLfQgIp
+ eo8terVjGa+n74Rxqa3if2MQVCQZXyB6XBMEJGm5dsHIiu/jhoAR2D1PcUdU7F3QxYVJb3
+ QNvTT+ZppnXcqpY6vcfqrS4J41+GaNM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-552-1s67SVNwO0KvmgOhK455hg-1; Mon, 20 Jun 2022 09:20:52 -0400
+X-MC-Unique: 1s67SVNwO0KvmgOhK455hg-1
+Received: by mail-wm1-f72.google.com with SMTP id
+ i188-20020a1c3bc5000000b0039db971c6d9so5607040wma.7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jun 2022 06:20:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=NzIQ07jP7Ucf0c+44ASJDe761bf0uW4WoGXyOYmuq/Y=;
+ b=peRh/WpF4lAkj1UJtwk5h8ZdZQnhZxSk80Q7umUORLNTfu+OGHDqwp5lnYwZUf8mTE
+ ZhW53KPzXf/oUysWTXNmbQzcZ2+CgycOXqms4dbe4ZsRFPfHV7OKdj44ZYoZNC6kXK/D
+ L6lvjczE56XZ0CEWPqAG9JWIja2W4KYTJ54RY/ORCjhIjeBq5YDAsElHPyMcS0t3vHmB
+ lreMVkyhytKZ62EPo0rDx8dZDhGzDVyqIMO/6IRwxLEvkJq9Y09GKJbBSK6VY1Z5ZXFl
+ W5NjCF4DLUNY50e9WlwUM7ARUyZzKosVLziut6GnW0fpD4BmUaRA1wDwUZZs5xjrLbs5
+ XPhw==
+X-Gm-Message-State: AJIora8UP2Bk9cpy67YBTjiVX6nmItjiFQ08kea7bdCCRILaY8uXlEoj
+ 49lXEGHw9crInLDAWWYhixe+iLiLUX9IVnG1G4NokTmSjX5IyBg2fpXsbqY0/WGv/ckbstnAA7o
+ oUqXvddYjt4O7UOK9M/y4dasQ
+X-Received: by 2002:a05:6000:1887:b0:218:5d15:9a95 with SMTP id
+ a7-20020a056000188700b002185d159a95mr23018016wri.1.1655731251620; 
+ Mon, 20 Jun 2022 06:20:51 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1v6YrcUzZO8F2Fmbea+YPgX0T97b5fSHtTGMMCEGdCHdfnbcGRcWGr1IQ5E9v6jUl3rX0Y8uw==
+X-Received: by 2002:a05:6000:1887:b0:218:5d15:9a95 with SMTP id
+ a7-20020a056000188700b002185d159a95mr23017989wri.1.1655731251385; 
+ Mon, 20 Jun 2022 06:20:51 -0700 (PDT)
+Received: from gator (cst2-173-67.cust.vodafone.cz. [31.30.173.67])
+ by smtp.gmail.com with ESMTPSA id
+ d5-20020a5d4f85000000b0021b862ad439sm9067735wru.9.2022.06.20.06.20.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 20 Jun 2022 06:20:50 -0700 (PDT)
+Date: Mon, 20 Jun 2022 15:20:48 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 2/4] KVM: selftests: Increase UCALL_MAX_ARGS to 7
+Message-ID: <20220620132048.jey6rjbbw7skbupb@gator>
+References: <20220615193116.806312-1-coltonlewis@google.com>
+ <20220615193116.806312-3-coltonlewis@google.com>
+ <20220616121006.ch6x7du6ycevjo5m@gator>
+ <Yqy0ZhmF8NF4Jzpe@google.com> <Yq0Xpzk2Wa6wBXw9@google.com>
+ <20220620072111.ymj2bti6jgw3gsas@gator>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3184; h=from:subject;
- bh=Rw9wVvsE2kpCeEUGQn68+uLCTU5z1rcjDq4JHU6LKc8=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBisGsT4RK6r29PFf8FCFRiWLw1veVNB9BYLpWoPWa/
- TWKTdZGJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYrBrEwAKCRAk1otyXVSH0ESiB/
- 9xeFdwFiH9gRYkxu07cLT5mgKi5ZAtPpi+q4uAq6XruvjbrCOaSbNf52MCX4IeLeUZNjnlgbpw9z39
- 9gj1u99giEY99RxOFs8SCe0owKV0kcb8G8EcXyqDNZXtXJv2SJzuVt49EvpPdXMgwRg+gY29hx2zDe
- JOBZjDx8huAz54mi0vOn8KMyup2jnd5hf3b8SfGmwaMQYYTJSMXMm0R/6Y5bTTJ/5jYijRrFFEs8fQ
- d0zZYj4Jhz72TxmhDi0MtGyMehAbHa295alZzWPqGK524a9mrZPXo4ad62TDC5CPhLK+BpTOd12jun
- 0RVDbs/1LIs1Wdjr/8+L6uKyddM8Pf
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
-Cc: Marc Zyngier <maz@kernel.org>, Zhang Lei <zhang.lei@jp.fujitsu.com>,
- Mark Brown <broonie@kernel.org>, Andre Przywara <andre.przywara@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20220620072111.ymj2bti6jgw3gsas@gator>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: thuth@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
+ Colton Lewis <coltonlewis@google.com>, pbonzini@redhat.com,
+ vkuznets@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,90 +107,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The documented syscall ABI specifies that the SVE state not shared with
-FPSIMD is undefined after a syscall. Currently we implement this by
-always flushing this register state to zero, ensuring consistent
-behaviour but introducing some overhead in the case where we can return
-directly to userspace without otherwise needing to update the register
-state. Take advantage of the flexibility offered by the documented ABI
-and instead leave the SVE registers untouched in the case where can
-return directly to userspace.
+On Mon, Jun 20, 2022 at 09:21:11AM +0200, Andrew Jones wrote:
+> On Sat, Jun 18, 2022 at 12:09:11AM +0000, Sean Christopherson wrote:
+> > On Fri, Jun 17, 2022, Colton Lewis wrote:
+> > > On Thu, Jun 16, 2022 at 02:10:06PM +0200, Andrew Jones wrote:
+> > > > We probably want to ensure all architectures are good with this. afaict,
+> > > > riscv only expects 6 args and uses UCALL_MAX_ARGS to cap the ucall inputs,
+> > > > for example.
+> > > 
+> > > All architectures use UCALL_MAX_ARGS for that. Are you saying there
+> > > might be limitations beyond the value of the macro? If so, who should
+> > > verify whether this is ok?
+> > 
+> > I thought there were architectural limitations too, but I believe I was thinking
+> > of vcpu_args_set(), where the number of params is limited by the function call
+> > ABI, e.g. the number of registers.
+> > 
+> > Unless there's something really, really subtle going on, all architectures pass
+> > the actual ucall struct purely through memory.  Actually, that code is ripe for
+> > deduplication, and amazingly it doesn't conflict with Colton's series.  Patches
+> > incoming...
+> >
+> 
+> RISC-V uses sbi_ecall() for their implementation of ucall(). CC'ing Anup
+> for confirmation, but if I understand the SBI spec correctly, then inputs
+> are limited to registers a0-a5.
 
-Since this is a user visible change a new sysctl abi.sve_syscall_clear_regs
-is provided which will restore the current behaviour of flushing the
-unshared register state unconditionally when enabled. This can be
-enabled for testing or to work around problems with applications that
-have been relying on the current flushing behaviour.
+Ah, never mind... I see SBI is limited to 6 registers, but of course it
+only needs one register to pass the uc address... We can make
+UCALL_MAX_ARGS whatever we want.
 
-The sysctl is disabled by default since it is anticipated that the risk
-of disruption to userspace is low. As well as being within the
-documented ABI this new behaviour mirrors the standard function call ABI
-for SVE in the AAPCS which should mean that compiler generated code is
-unlikely to rely on the current behaviour, the main risk is from hand
-coded assembly which directly invokes syscalls. The new behaviour is
-also what is currently implemented by qemu user mode emulation.
-
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- arch/arm64/kernel/syscall.c | 36 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kernel/syscall.c b/arch/arm64/kernel/syscall.c
-index 69b4c06f2e39..29ef3d65cf12 100644
---- a/arch/arm64/kernel/syscall.c
-+++ b/arch/arm64/kernel/syscall.c
-@@ -158,6 +158,40 @@ static void el0_svc_common(struct pt_regs *regs, int scno, int sc_nr,
- 	syscall_trace_exit(regs);
- }
- 
-+
-+static unsigned int sve_syscall_regs_clear;
-+
-+#ifdef CONFIG_ARM64_SVE
-+/*
-+ * Global sysctl to control if we force the SVE register state not
-+ * shared with FPSIMD to be cleared on every syscall. If this is not
-+ * enabled then we will leave the state unchanged unless we need to
-+ * reload from memory (eg, after a context switch).
-+ */
-+
-+static struct ctl_table sve_syscall_sysctl_table[] = {
-+	{
-+		.procname	= "sve_syscall_clear_regs",
-+		.mode		= 0644,
-+		.data		= &sve_syscall_regs_clear,
-+		.maxlen		= sizeof(int),
-+		.proc_handler	= proc_dointvec_minmax,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_ONE,
-+	},
-+	{ }
-+};
-+
-+static int __init sve_syscall_sysctl_init(void)
-+{
-+	if (!register_sysctl("abi", sve_syscall_sysctl_table))
-+		return -EINVAL;
-+	return 0;
-+}
-+
-+core_initcall(sve_syscall_sysctl_init);
-+#endif	/* CONFIG_ARM64_SVE */
-+
- /*
-  * As per the ABI exit SME streaming mode and clear the SVE state not
-  * shared with FPSIMD on syscall entry.
-@@ -183,7 +217,7 @@ static inline void fp_user_discard(void)
- 	if (!system_supports_sve())
- 		return;
- 
--	if (test_thread_flag(TIF_SVE)) {
-+	if (sve_syscall_regs_clear && test_thread_flag(TIF_SVE)) {
- 		unsigned int sve_vq_minus_one;
- 
- 		sve_vq_minus_one = sve_vq_from_vl(task_get_sve_vl(current)) - 1;
--- 
-2.30.2
+Thanks,
+drew
 
 _______________________________________________
 kvmarm mailing list
