@@ -2,79 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E7AEC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Jun 2022 17:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B7FFC43334
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Jun 2022 17:59:15 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 549994B2BC;
-	Tue, 21 Jun 2022 13:27:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BAAC84B21A;
+	Tue, 21 Jun 2022 13:59:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id J-T-vdJ6y29S; Tue, 21 Jun 2022 13:27:53 -0400 (EDT)
+	with ESMTP id I9xsjmb9T5yY; Tue, 21 Jun 2022 13:59:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31F384B2C2;
-	Tue, 21 Jun 2022 13:27:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B19234B297;
+	Tue, 21 Jun 2022 13:59:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AD694B2DC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 13:27:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 43F444B282
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 13:59:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fKMc40vJyJc6 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Jun 2022 13:27:51 -0400 (EDT)
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com
- [209.85.215.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1113B4B2BC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 13:27:50 -0400 (EDT)
-Received: by mail-pg1-f181.google.com with SMTP id h192so13738154pgc.4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 10:27:50 -0700 (PDT)
+ with ESMTP id j+JvsJSm26hT for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Jun 2022 13:59:12 -0400 (EDT)
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com
+ [209.85.215.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 270584B21A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 13:59:12 -0400 (EDT)
+Received: by mail-pg1-f173.google.com with SMTP id s185so8060580pgs.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 10:59:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=KosiNj3YNLlbRK+vwldOUZcVPdw3Sy1cjQrcoE0ds2g=;
- b=o3FQhCiPU79gM9QSey1nVtIDqruLiydkTG9l+XcF04HDSGQFzIW5YUOvNuq/Mk8Ofz
- vISENPhAsPE86DtG32UwDFoBBA+kPGRDnBUNVp/rJmB48pzsyvqO/+R0r0XXixeR1ZWW
- 98V4gI15W8jDZVSZxqi+XieFmk1N81GqONqQcGBLamJj7UmGE1Uzw+1hJZU3lw/G9EE+
- PDrjfyrA93NJoQqVDFaZrUf9YdMWf30s+uxZ+oZr6z2omBFCarn/dEOuXbEYFSab1yO/
- uTlnFz9DkGJhyo2Btkxd/MykAz4crPCqDUTkNzg0+RAi5F8GAJvhXF6cec7fDMUkffNE
- 51bQ==
+ bh=JbuWAytcUZALQjKHnKlHD39QZVXy3a1bRzVkWDq42KQ=;
+ b=VErgQoB8GWymThL3YgzGl2WrL12ULYe/Cx/wyQRAW01d1/41ggxbQwxVOnzuwICFhG
+ hlA/lrHAMM3uUbioCGYIMB10kT5kJRIxBeHBxMtKnqe8TOc1UA6q8/qtaiFqCan3/IJX
+ zbld0o+9fIhscaxiitkhFrgx3xF2+mm+jDKQcXlVY6HSgbY1WNrPJinLucleTCE+gUAp
+ ZzKcF99tELyFLUKjMPVKMvpACZbdJEki9ptdeMGLcmOKYAiaI8j87t1CGi/1EX4C73n/
+ er1cQQAVMrZvwmWyBge9+Hybfl4bxzFWz1KNBdnXAQ8WoAaTDtPiczPKVjpEk59p0pZZ
+ 80Hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=KosiNj3YNLlbRK+vwldOUZcVPdw3Sy1cjQrcoE0ds2g=;
- b=HA2rBerHGtkAeyd5ci4KhAOf8yxNxdzmmu99AEVR9tGPeHV3aldDoAtSTWHR1U9T7M
- YJMXX2qA3gL6rvZ/V/7JljDwGpVeRE05UszXaZi4wKUqGXk2hsTQN5NXUqcBWPgdzgDB
- zyO8OuRkO2gTc7fjyIKrti2BLqurvZMDgTN9t6SFj7dEd96fQGlr3wK8fCpNQYP6Pcjv
- tZYDUNFavBnav/z7mpX+azB+yU5IadkxVktympDpuTXKaI0WG5HtIH6pCCzifZ+9vFQ4
- lC0fhSx6uLXM4gXsO/+V/STFcA5PDkqvGxKJEFEGVQjpfefx0DC2rCWWJucy/YcOlpXA
- Se6g==
-X-Gm-Message-State: AJIora9CfwxJEpMl1J7JH3rhHpar16hiHtD8UT6nadh+qKmiSI8xSGql
- 40kO9auExr10AyMElHQzePMu9A==
-X-Google-Smtp-Source: AGRyM1sn5aCSMgS5NUyy3XSMR5k1j/lGDPRdso1aw12M5LEPZ/CN//TgTZSfDqmXHmvaNJ3NWGf+lg==
-X-Received: by 2002:a05:6a00:885:b0:510:950f:f787 with SMTP id
- q5-20020a056a00088500b00510950ff787mr30877821pfj.83.1655832469779; 
- Tue, 21 Jun 2022 10:27:49 -0700 (PDT)
+ bh=JbuWAytcUZALQjKHnKlHD39QZVXy3a1bRzVkWDq42KQ=;
+ b=DuuQcrGYulYTC3UWQ+QtKe7jVSh+XP8eC4Y8irDtVTDlsOjRKh0cG6z4bBfKiUuUNh
+ m4ERF8QgFvF+4iWcpVkGvuzNvMkdR4miNtYkovrUNo2a7wkVk1EJ5qaK555Ey6uh7R3j
+ 64ONvTKe3vzTlIPgs3YbG9BU9IZ9rpPxuC8tPup0MAaTxxbiXzdJQVm9kLoPTbpI+VD6
+ 80qKHibWIPVKHYGnbW1rtQviZt3QBv1reEu8iGei7nuLHqX5kYPJ2L7eZPNdlSs0Z3UT
+ tK/hp9o0oq8Fw7huWzbL1TByDH1PO+2tcRLuqNCyMrlNAwxJd80FXMpsR1ldtgF0X5aR
+ 4aAA==
+X-Gm-Message-State: AJIora/XyHjxwPsnqD4ANRxcgeh6XaXTiQeOIpw+IcbXs7WkupK6Yq17
+ mwsnxBU3TEl822cgxK/UGe2z/w==
+X-Google-Smtp-Source: AGRyM1tyKoScvgZ9jUTl9r400vYVAKVYV/qzOYeNUaiQG+sTZs1pyelcoub/qTYVZzhpTV2f2gXgXw==
+X-Received: by 2002:a63:e705:0:b0:3fd:fb59:bd7f with SMTP id
+ b5-20020a63e705000000b003fdfb59bd7fmr27065817pgi.505.1655834350902; 
+ Tue, 21 Jun 2022 10:59:10 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com.
  [35.230.65.123]) by smtp.gmail.com with ESMTPSA id
- x6-20020a1709029a4600b0015e8d4eb1d1sm11008703plv.27.2022.06.21.10.27.49
+ jj4-20020a170903048400b001678898ad06sm5027806plb.47.2022.06.21.10.59.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jun 2022 10:27:49 -0700 (PDT)
-Date: Tue, 21 Jun 2022 17:27:45 +0000
+ Tue, 21 Jun 2022 10:59:10 -0700 (PDT)
+Date: Tue, 21 Jun 2022 17:59:07 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v6 10/22] KVM: x86/mmu: Pass memory caches to allocate
- SPs separately
-Message-ID: <YrH/kd5g08rvZkTt@google.com>
+Subject: Re: [PATCH v6 19/22] KVM: x86/mmu: Zap collapsible SPTEs in shadow
+ MMU at all possible levels
+Message-ID: <YrIG6/dymlPQGwg1@google.com>
 References: <20220516232138.1783324-1-dmatlack@google.com>
- <20220516232138.1783324-11-dmatlack@google.com>
- <YqyXYJsoZGgp7l62@google.com>
- <CALzav=fVzX+GXCdKRwRGofAgKatX206_kBKagT7R-eYO9RnYkA@mail.gmail.com>
+ <20220516232138.1783324-20-dmatlack@google.com>
+ <Yqyzavjp9eS9p4+m@google.com>
+ <CALzav=dG9f2X8GBLjQgR-Lj4yPKX2Adg3C+9_9aC83A7mzmbtw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <CALzav=fVzX+GXCdKRwRGofAgKatX206_kBKagT7R-eYO9RnYkA@mail.gmail.com>
+In-Reply-To: <CALzav=dG9f2X8GBLjQgR-Lj4yPKX2Adg3C+9_9aC83A7mzmbtw@mail.gmail.com>
 Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
  "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
  <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
@@ -106,37 +106,31 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Tue, Jun 21, 2022, David Matlack wrote:
-> On Fri, Jun 17, 2022 at 8:02 AM Sean Christopherson <seanjc@google.com> wrote:
+> On Fri, Jun 17, 2022 at 10:01 AM Sean Christopherson <seanjc@google.com> wrote:
 > >
 > > On Mon, May 16, 2022, David Matlack wrote:
-> > > Refactor kvm_mmu_alloc_shadow_page() to receive the caches from which it
-> > > will allocate the various pieces of memory for shadow pages as a
-> > > parameter, rather than deriving them from the vcpu pointer. This will be
-> > > useful in a future commit where shadow pages are allocated during VM
-> > > ioctls for eager page splitting, and thus will use a different set of
-> > > caches.
-> > >
-> > > Preemptively pull the caches out all the way to
-> > > kvm_mmu_get_shadow_page() since eager page splitting will not be calling
+> > > +static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
+> > > +                                        const struct kvm_memory_slot *slot)
+> > > +{
+> > > +     /*
+> > > +      * Note, use KVM_MAX_HUGEPAGE_LEVEL - 1 since there's no need to zap
+> > > +      * pages that are already mapped at the maximum possible level.
+> > > +      */
+> > > +     if (slot_handle_level(kvm, slot, kvm_mmu_zap_collapsible_spte,
+> > > +                           PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL - 1,
+> > > +                           true))
 > >
-> > Uber nit, "eager hugepage splitting" to provide a mental cue/reminder for why
-> > those pages are direct.
+> > No need to wrap, "true" fits easily on the previous line.  That said, I don't see
+> > any point in adding a helper.  It's highly unlike there will be another caller,
+> > and IMO it's not any more readable since I have to go look at another function
+> > when reading kvm_mmu_zap_collapsible_sptes().
 > 
-> I think it may be too late to move away from the term "eager page
-> splitting" (it is already in commit messages and the module param is
-> called "eager_page_split"). Using a slightly different name here might
-> produce more confusion, or at least cause readers to do a double-take.
+> I could see an argument for readability either way. Putting it in a
+> helper function abstracts away the details, which would aid
+> readability if the reader does not care about the implementation
+> details of the rmap case.
 
-True.  I'm totally fine omitting "huge".
-
-> But naming aside, I don't follow what you mean here. i.e. What does
-> the fact that page splitting uses direct shadow pages have to do with
-> this patch?
-
-I have no idea.  I suspect I was looking at a different patch when replying to
-this one.  I distinctly remember pausing for a few seconds to recall the direct
-aspect, but looking back at this patch I don't see what I could have possibly be
-wondering about.
+I'm ok either way, dealer's choice.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
