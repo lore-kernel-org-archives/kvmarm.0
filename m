@@ -2,86 +2,49 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 614A1C43334
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Jun 2022 14:54:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D510C43334
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Jun 2022 17:03:38 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D26F84B282;
-	Tue, 21 Jun 2022 10:54:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB5A84B250;
+	Tue, 21 Jun 2022 13:03:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id v6KuX4zPCMF2; Tue, 21 Jun 2022 10:54:26 -0400 (EDT)
+	with ESMTP id y3rmJ+TdJPtP; Tue, 21 Jun 2022 13:03:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BEA214B2B1;
-	Tue, 21 Jun 2022 10:54:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F8964B1E0;
+	Tue, 21 Jun 2022 13:03:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB3AA4B283
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 10:54:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 953EE4B19F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 13:03:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jDD5hVDBwjoj for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Jun 2022 10:54:23 -0400 (EDT)
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com
- [209.85.216.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8DF794B248
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 10:54:23 -0400 (EDT)
-Received: by mail-pj1-f41.google.com with SMTP id
- h9-20020a17090a648900b001ecb8596e43so4470132pjj.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 07:54:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=ePpQR91B1wy0uIyvmn3lmteXD4y16fGYbzlfAq99TJo=;
- b=coFv7I5Y78JhXoxS37XR9c+mZYbk7SXPwuO7aREgBr4Q4xY/8nD/BF5WkQBHENLFnR
- M2swZ0YHKkbeZ6TusTYTCyinn24BoObIO+T5wnAXl9f2sGVIP8rG2F0nAbxkmCVGoPfH
- dAA8jbBGQ+fJqAoZJEhloFcXw4ggDv8whrRonPLp5/G9ruQkcs3nglSNUwAkZ1SThAWs
- 1rcmQq3sdA0WobCN3wZET42yLYirfqnABm0YdtxHceX3EHLEBkMtv0LKHMPI3jgadxxF
- dsa+Azc2y1bTS9+0PGwluDhQy+WUsYOcrTtvwmmyLjgGWHBJwb4h86H6/giVMU3D/eNI
- BJew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=ePpQR91B1wy0uIyvmn3lmteXD4y16fGYbzlfAq99TJo=;
- b=XFEgPlqqsoRVpT6fc1endDRc9moGSfyYfPPgMro9rgRR0x2sHH8wDwqR1UhyzexHpD
- 2GsTnFnQ+A3DBwk/gaYqe/hZgqwca+dxBWhSWXA2+R9UFEj/smc7onQUzijzHyJIvXBY
- 7SVSxABHWZ8Yqd9TByjyiPwsiReZkrqn39J4sEMfD0yoZgdn5hq+BZQEedUbDW7GAW8U
- UDiFF9iDe9DhHpd3Dsw/RMB9zrVX1tWSW3JzNmD10EkKmRrUV93VZnPBJ4qWP6uEh9P6
- FKPUo9X9l/4R8DjgcDJlvdc0Wjvwjx2a6EetwGYfX7uInvG+uSJ6s5R1Je3LF5R5/6yK
- gxmg==
-X-Gm-Message-State: AJIora+iIcF/Q+p2arOZDJJvbQHMq3Qs7UoRkFV4SwU1y80xrHkh8I7q
- 0+QcRcBag1tscnB+mZlyFeYk7g==
-X-Google-Smtp-Source: AGRyM1vbuWPmzs8GSCKmhq+oi4jC8RW6CP9GBVkjErftz4qJu7wc14nAXYcvbe2B5lTWXF3n/kUg1Q==
-X-Received: by 2002:a17:90b:4a82:b0:1ec:bb6b:38d0 with SMTP id
- lp2-20020a17090b4a8200b001ecbb6b38d0mr7523665pjb.213.1655823262366; 
- Tue, 21 Jun 2022 07:54:22 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com.
- [35.230.65.123]) by smtp.gmail.com with ESMTPSA id
- b21-20020aa78115000000b00518764d09cdsm11307136pfi.164.2022.06.21.07.54.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jun 2022 07:54:21 -0700 (PDT)
-Date: Tue, 21 Jun 2022 14:54:18 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 0/3] KVM: selftests: Consolidate ucall code
-Message-ID: <YrHbml1HAfDtvMfn@google.com>
-References: <20220618001618.1840806-1-seanjc@google.com>
- <19bba1a0-8fb7-2aae-a65a-1111e29b92d3@redhat.com>
+ with ESMTP id xKpbR8+-DPX8 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Jun 2022 13:03:31 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 456644B0D9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 13:03:31 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A835A165C;
+ Tue, 21 Jun 2022 10:03:30 -0700 (PDT)
+Received: from [10.57.84.82] (unknown [10.57.84.82])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 61A923F792;
+ Tue, 21 Jun 2022 10:03:26 -0700 (PDT)
+Message-ID: <f085b553-da9b-553f-17e2-1f4c43b25271@arm.com>
+Date: Tue, 21 Jun 2022 18:03:22 +0100
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <19bba1a0-8fb7-2aae-a65a-1111e29b92d3@redhat.com>
-Cc: Albert Ou <aou@eecs.berkeley.edu>, Janosch Frank <frankja@linux.ibm.com>,
- kvm@vger.kernel.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>, Atish Patra <atishp@atishpatra.org>,
- David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
- Colton Lewis <coltonlewis@google.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- kvm-riscv@lists.infradead.org, Paul Walmsley <paul.walmsley@sifive.com>,
- linux-riscv@lists.infradead.org,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.10.0
+Subject: Re: [PATCH v4 kvmtool 00/12] arm64: Allow the user to set RAM base
+ address
+To: Alexandru Elisei <alexandru.elisei@arm.com>, will@kernel.org,
+ julien.thierry.kdev@gmail.com, maz@kernel.org, julien@xen.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, andre.przywara@arm.com
+References: <20220616134828.129006-1-alexandru.elisei@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20220616134828.129006-1-alexandru.elisei@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,29 +56,89 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jun 20, 2022, Paolo Bonzini wrote:
-> On 6/18/22 02:16, Sean Christopherson wrote:
-> > Consolidate the code for making and getting ucalls.  All architectures pass
-> > the ucall struct via memory, so filling and copying the struct is 100%
-> > generic.  The only per-arch code is sending and receiving the address of
-> > said struct.
-> > 
-> > Tested on x86 and arm, compile tested on s390 and RISC-V.
+On 16/06/2022 14:48, Alexandru Elisei wrote:
+> The series can be found at [1]. It is loosely based on the patches that
+> allow the user to define the VM memory layout (RAM + MMIO) [2]. I've
+> cherry-picked a handful of patches from that series, the rest I wrote from
+> scratch since there have been several changes to the way guest memory is
+> handled. I've chosen to focus on specifying the RAM layout with only one
+> RAM bank and leave the rest for a later series because this was relatively
+> easy to accomplish, while still being very useful.
 > 
-> I'm not sure about doing this yet.  The SEV tests added multiple
-> implementations of the ucalls in one architecture.  I have rebased those
-> recently (not the SEV part) to get more familiar with the new kvm_vcpu API
-> for selftests, and was going to look at your old review next...
+> What this series does: for arm64, the user can now specify the base address
+> for RAM:
+> 
+> $ ./lkvm run -m1G@2G .. # Equivalent to ./lkvm run -m1024
+> 
+> The memory units are B (bytes), K (kilobytes), M (megabytes), G
+> (gigabytes), T (terrabytes), P (petabytes). Lowercase is also valid.
+> 
+> Want to put RAM at the top of the physical address range? Easy:
+> 
+> $ ./lkvm run -m2G@1022G .. # Assumes the maximum is 40 bits of IPA
+> 
+> There one limitation on the RAM base address: it must not overlap with the
+> MMIO range that kvmtool uses for arm/arm64, which lives below 2GB.
+> 
+> Why this is useful, in my opinion:
+> 
+> 1. Testing how a payload handles different memory layouts without the need
+> to hack kvmtool or find the hardware that implements the desired layout.
+> 
+> 2. It can serve as a development tool for adding support for larger PA
+> ranges for Linux and KVM (currently capped at 48 bits for 4k/16k pages), or
+> other payloads.
+> 
+> Summary of the series
+> ======================
+> 
+> * The series starts with refactoring how kvm->cfg.ram_size is validated
+>    and used, followed by several cleanups in the arm and arm64 code.
+> 
+> * Then patch #8 ("builtin_run: Allow standard size specifiers for memory")
+>    introduced the ability to specify the measurement unit for memory. I
+>    believe that typing the equivalent of 2TB in megabytes isn't appealing
+>    for anyone.
+> 
+> * More cleanups in the arm/arm64 code follow, which are needed for patch
+>    #12 ("arm64: Allow the user to specify the RAM base address"). This is
+>    where the ability to specify the RAM base address is introduced.
+> 
+> Testing
+> =======
+> 
+> Same testing as before:
+> 
+> - Build tested each patch for all architectures.
+> 
+> - Ran an x86 kernel with and without setting the amount of RAM using the
+>    memory specifiers; tested that setting the RAM address results in an
+>    error.
+> 
+> - Ran an arm64 kernel without setting the size, with setting the size and
+>    with setting the size and address; tried different addresses (2G, 3G,
+>    256G); also tested that going below 2G or above the maximum IPA correctly
+>    results in an error.
+> 
+> - Ran all arm64 kvm-unit-test tests with similar combinations of memory
+>    size and address (instead of 256G I used 128G, as that's where I/O lives
+>    for qemu and kvm-unit-tests maps that unconditionally as I/O).
+> 
+> - Ran all 32bit arm tests on an arm64 host with various combinations of
+>    memory size and address (base address at 2G and 2.5G only due to a
+>    limitation in the way the tests are set up).
 
-I had forgotten about that code.  My idea of a per-VM list[*] would fit nicely on
-top, though maybe drop the last patch from this series.
+I have tested this series on arm64 Fast model, with memory placed from
+32bit to 48bit IPA and it works well.
 
-[*] https://lore.kernel.org/all/Yc4gcJdhxthBKUUd@google.com
+For the series:
+
+Reviewed-and-Tested-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
