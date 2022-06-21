@@ -2,48 +2,86 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CF6FC43334
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jun 2022 09:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8661C43334
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jun 2022 13:59:06 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8DA04B39B;
-	Wed, 22 Jun 2022 05:27:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D59E49ED8;
+	Wed, 22 Jun 2022 09:59:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HfCYOC4iDLap; Wed, 22 Jun 2022 05:27:38 -0400 (EDT)
+	with ESMTP id JSqf6Y271bqW; Wed, 22 Jun 2022 09:59:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E0904B332;
-	Wed, 22 Jun 2022 05:27:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 342504B4E1;
+	Wed, 22 Jun 2022 09:59:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ADFE4B27F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 05:27:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BA7F4B278
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 13:07:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hy6IT12A4ogW for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Jun 2022 05:27:35 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 145D84B178
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 05:27:35 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3E1613D5;
- Wed, 22 Jun 2022 02:27:34 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 93E1B3F66F;
- Wed, 22 Jun 2022 02:27:32 -0700 (PDT)
-Date: Wed, 22 Jun 2022 10:27:59 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [PATCH v4 kvmtool 00/12] arm64: Allow the user to set RAM base
- address
-Message-ID: <YrLgn1auBFx0B8l1@monolith.localdoman>
-References: <20220616134828.129006-1-alexandru.elisei@arm.com>
- <f085b553-da9b-553f-17e2-1f4c43b25271@arm.com>
+ with ESMTP id wST7XaIZUWcQ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Jun 2022 13:07:19 -0400 (EDT)
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com
+ [209.85.208.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF9CA4B25D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 13:07:18 -0400 (EDT)
+Received: by mail-lj1-f170.google.com with SMTP id o23so9075839ljg.13
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 10:07:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=FnOmw3gVk8tU+AE3cNeQjrjRVGb6taWwsuCOIfWCWxA=;
+ b=YXKgy8GzJNpXWgsQ+ad6BrqIukKRln0aMHUpAz3ufqwzfs7i7BGubSSuGze4kyE/wN
+ 0vyoLZwVca0S2XXVcnvAoER6/ZyF44XgJGUi2tzkE2Xe6npHx30ng7Nr5M7fVo16rgk6
+ gjIk5DT1zN/pCNT4kwvyq45YRaR5nZ4/Z59ys9rxb1ZKpiyk06/x/sR1xuyYtFmWpk9V
+ Ln78wPfGHhHjaW3LDgPfga0c9htn6Ss8nTnj4aodGmeaoQlI3MWpLz42Y4dpS1D9jwQa
+ 8oKLu/8Fbg6PRfmjj8qzJUo/xsWDGvV5XIV+kyqzRt7lTYz85g2gYnvH4P5+ecQiZWN2
+ H39Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=FnOmw3gVk8tU+AE3cNeQjrjRVGb6taWwsuCOIfWCWxA=;
+ b=aFoyioxclnzy+xcookyLQFXIgGl1cjnxCA6eDmLaG6XYIMGzqU7P5UypqWTp1DTDKl
+ PAF0K1D9YQv3pOT9ewcXT5wr/s5uJ2EpRjbIebrCsG0Mi9o6OVvkfYEMFUdqVFYOghGp
+ gTV1niJW2zaivWrCUgx9MFG5H0dbm512QjLjq+qG6ml70QapWSZO14LsQlI6/3SEyAEd
+ un5sM2v+OwwoZd3IF1wa1lGURJpRns7m4xGAmvjdmjwSkWkGm7dx04wQxpPUy0GgU5oJ
+ UGN2FJi8WMB70qczzYOC8gXNCT5kSqC2oN1Jytn1eRGcmGHPa4enCb2O4cXp5zqG2Sf9
+ 681w==
+X-Gm-Message-State: AJIora8M8pk1lKV/xIu66I1+esJx1n6rGP4h+0Rg3YrlIwHY0jzdB6MH
+ ye3G18ECBAP54+jBA1JiHOieecOLhIPoc1LAbVntgQ==
+X-Google-Smtp-Source: AGRyM1vsnNiJzYI8a4JothArzJ6EPJeG8wTiRAa2dkNSnIZYaQB/MuJ0ERB2pxoUlEJx6kKfxtszHOI0qWmk6ygmp0w=
+X-Received: by 2002:a05:651c:886:b0:258:df66:5040 with SMTP id
+ d6-20020a05651c088600b00258df665040mr15428117ljq.16.1655831237279; Tue, 21
+ Jun 2022 10:07:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <f085b553-da9b-553f-17e2-1f4c43b25271@arm.com>
-Cc: julien@xen.org, maz@kernel.org, andre.przywara@arm.com, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <20220516232138.1783324-1-dmatlack@google.com>
+ <20220516232138.1783324-11-dmatlack@google.com>
+ <YqyXYJsoZGgp7l62@google.com>
+In-Reply-To: <YqyXYJsoZGgp7l62@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Tue, 21 Jun 2022 10:06:50 -0700
+Message-ID: <CALzav=fVzX+GXCdKRwRGofAgKatX206_kBKagT7R-eYO9RnYkA@mail.gmail.com>
+Subject: Re: [PATCH v6 10/22] KVM: x86/mmu: Pass memory caches to allocate SPs
+ separately
+To: Sean Christopherson <seanjc@google.com>
+X-Mailman-Approved-At: Wed, 22 Jun 2022 09:59:03 -0400
+Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <linux-mips@vger.kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
+ <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+ "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -60,95 +98,41 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Suzuki, Will,
+On Fri, Jun 17, 2022 at 8:02 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, May 16, 2022, David Matlack wrote:
+> > Refactor kvm_mmu_alloc_shadow_page() to receive the caches from which it
+> > will allocate the various pieces of memory for shadow pages as a
+> > parameter, rather than deriving them from the vcpu pointer. This will be
+> > useful in a future commit where shadow pages are allocated during VM
+> > ioctls for eager page splitting, and thus will use a different set of
+> > caches.
+> >
+> > Preemptively pull the caches out all the way to
+> > kvm_mmu_get_shadow_page() since eager page splitting will not be calling
+>
+> Uber nit, "eager hugepage splitting" to provide a mental cue/reminder for why
+> those pages are direct.
 
-On Tue, Jun 21, 2022 at 06:03:22PM +0100, Suzuki K Poulose wrote:
-> On 16/06/2022 14:48, Alexandru Elisei wrote:
-> > The series can be found at [1]. It is loosely based on the patches that
-> > allow the user to define the VM memory layout (RAM + MMIO) [2]. I've
-> > cherry-picked a handful of patches from that series, the rest I wrote from
-> > scratch since there have been several changes to the way guest memory is
-> > handled. I've chosen to focus on specifying the RAM layout with only one
-> > RAM bank and leave the rest for a later series because this was relatively
-> > easy to accomplish, while still being very useful.
-> > 
-> > What this series does: for arm64, the user can now specify the base address
-> > for RAM:
-> > 
-> > $ ./lkvm run -m1G@2G .. # Equivalent to ./lkvm run -m1024
-> > 
-> > The memory units are B (bytes), K (kilobytes), M (megabytes), G
-> > (gigabytes), T (terrabytes), P (petabytes). Lowercase is also valid.
-> > 
-> > Want to put RAM at the top of the physical address range? Easy:
-> > 
-> > $ ./lkvm run -m2G@1022G .. # Assumes the maximum is 40 bits of IPA
-> > 
-> > There one limitation on the RAM base address: it must not overlap with the
-> > MMIO range that kvmtool uses for arm/arm64, which lives below 2GB.
-> > 
-> > Why this is useful, in my opinion:
-> > 
-> > 1. Testing how a payload handles different memory layouts without the need
-> > to hack kvmtool or find the hardware that implements the desired layout.
-> > 
-> > 2. It can serve as a development tool for adding support for larger PA
-> > ranges for Linux and KVM (currently capped at 48 bits for 4k/16k pages), or
-> > other payloads.
-> > 
-> > Summary of the series
-> > ======================
-> > 
-> > * The series starts with refactoring how kvm->cfg.ram_size is validated
-> >    and used, followed by several cleanups in the arm and arm64 code.
-> > 
-> > * Then patch #8 ("builtin_run: Allow standard size specifiers for memory")
-> >    introduced the ability to specify the measurement unit for memory. I
-> >    believe that typing the equivalent of 2TB in megabytes isn't appealing
-> >    for anyone.
-> > 
-> > * More cleanups in the arm/arm64 code follow, which are needed for patch
-> >    #12 ("arm64: Allow the user to specify the RAM base address"). This is
-> >    where the ability to specify the RAM base address is introduced.
-> > 
-> > Testing
-> > =======
-> > 
-> > Same testing as before:
-> > 
-> > - Build tested each patch for all architectures.
-> > 
-> > - Ran an x86 kernel with and without setting the amount of RAM using the
-> >    memory specifiers; tested that setting the RAM address results in an
-> >    error.
-> > 
-> > - Ran an arm64 kernel without setting the size, with setting the size and
-> >    with setting the size and address; tried different addresses (2G, 3G,
-> >    256G); also tested that going below 2G or above the maximum IPA correctly
-> >    results in an error.
-> > 
-> > - Ran all arm64 kvm-unit-test tests with similar combinations of memory
-> >    size and address (instead of 256G I used 128G, as that's where I/O lives
-> >    for qemu and kvm-unit-tests maps that unconditionally as I/O).
-> > 
-> > - Ran all 32bit arm tests on an arm64 host with various combinations of
-> >    memory size and address (base address at 2G and 2.5G only due to a
-> >    limitation in the way the tests are set up).
-> 
-> I have tested this series on arm64 Fast model, with memory placed from
-> 32bit to 48bit IPA and it works well.
-> 
-> For the series:
-> 
-> Reviewed-and-Tested-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+I think it may be too late to move away from the term "eager page
+splitting" (it is already in commit messages and the module param is
+called "eager_page_split"). Using a slightly different name here might
+produce more confusion, or at least cause readers to do a double-take.
 
-Thank you for the review and testing!
+But naming aside, I don't follow what you mean here. i.e. What does
+the fact that page splitting uses direct shadow pages have to do with
+this patch?
 
-Will, do you want me to respin the series to gather all the Reviewed-by and
-Tested-by tags?
 
-Thanks,
-Alex
+>
+> > kvm_mmu_alloc_shadow_page() directly.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > ---
+>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
