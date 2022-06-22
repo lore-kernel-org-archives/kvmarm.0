@@ -2,93 +2,48 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B7FFC43334
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Jun 2022 17:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CF6FC43334
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jun 2022 09:27:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BAAC84B21A;
-	Tue, 21 Jun 2022 13:59:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8DA04B39B;
+	Wed, 22 Jun 2022 05:27:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id I9xsjmb9T5yY; Tue, 21 Jun 2022 13:59:13 -0400 (EDT)
+	with ESMTP id HfCYOC4iDLap; Wed, 22 Jun 2022 05:27:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B19234B297;
-	Tue, 21 Jun 2022 13:59:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E0904B332;
+	Wed, 22 Jun 2022 05:27:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 43F444B282
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 13:59:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ADFE4B27F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 05:27:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id j+JvsJSm26hT for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Jun 2022 13:59:12 -0400 (EDT)
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com
- [209.85.215.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 270584B21A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 13:59:12 -0400 (EDT)
-Received: by mail-pg1-f173.google.com with SMTP id s185so8060580pgs.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Jun 2022 10:59:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=JbuWAytcUZALQjKHnKlHD39QZVXy3a1bRzVkWDq42KQ=;
- b=VErgQoB8GWymThL3YgzGl2WrL12ULYe/Cx/wyQRAW01d1/41ggxbQwxVOnzuwICFhG
- hlA/lrHAMM3uUbioCGYIMB10kT5kJRIxBeHBxMtKnqe8TOc1UA6q8/qtaiFqCan3/IJX
- zbld0o+9fIhscaxiitkhFrgx3xF2+mm+jDKQcXlVY6HSgbY1WNrPJinLucleTCE+gUAp
- ZzKcF99tELyFLUKjMPVKMvpACZbdJEki9ptdeMGLcmOKYAiaI8j87t1CGi/1EX4C73n/
- er1cQQAVMrZvwmWyBge9+Hybfl4bxzFWz1KNBdnXAQ8WoAaTDtPiczPKVjpEk59p0pZZ
- 80Hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=JbuWAytcUZALQjKHnKlHD39QZVXy3a1bRzVkWDq42KQ=;
- b=DuuQcrGYulYTC3UWQ+QtKe7jVSh+XP8eC4Y8irDtVTDlsOjRKh0cG6z4bBfKiUuUNh
- m4ERF8QgFvF+4iWcpVkGvuzNvMkdR4miNtYkovrUNo2a7wkVk1EJ5qaK555Ey6uh7R3j
- 64ONvTKe3vzTlIPgs3YbG9BU9IZ9rpPxuC8tPup0MAaTxxbiXzdJQVm9kLoPTbpI+VD6
- 80qKHibWIPVKHYGnbW1rtQviZt3QBv1reEu8iGei7nuLHqX5kYPJ2L7eZPNdlSs0Z3UT
- tK/hp9o0oq8Fw7huWzbL1TByDH1PO+2tcRLuqNCyMrlNAwxJd80FXMpsR1ldtgF0X5aR
- 4aAA==
-X-Gm-Message-State: AJIora/XyHjxwPsnqD4ANRxcgeh6XaXTiQeOIpw+IcbXs7WkupK6Yq17
- mwsnxBU3TEl822cgxK/UGe2z/w==
-X-Google-Smtp-Source: AGRyM1tyKoScvgZ9jUTl9r400vYVAKVYV/qzOYeNUaiQG+sTZs1pyelcoub/qTYVZzhpTV2f2gXgXw==
-X-Received: by 2002:a63:e705:0:b0:3fd:fb59:bd7f with SMTP id
- b5-20020a63e705000000b003fdfb59bd7fmr27065817pgi.505.1655834350902; 
- Tue, 21 Jun 2022 10:59:10 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com.
- [35.230.65.123]) by smtp.gmail.com with ESMTPSA id
- jj4-20020a170903048400b001678898ad06sm5027806plb.47.2022.06.21.10.59.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Jun 2022 10:59:10 -0700 (PDT)
-Date: Tue, 21 Jun 2022 17:59:07 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v6 19/22] KVM: x86/mmu: Zap collapsible SPTEs in shadow
- MMU at all possible levels
-Message-ID: <YrIG6/dymlPQGwg1@google.com>
-References: <20220516232138.1783324-1-dmatlack@google.com>
- <20220516232138.1783324-20-dmatlack@google.com>
- <Yqyzavjp9eS9p4+m@google.com>
- <CALzav=dG9f2X8GBLjQgR-Lj4yPKX2Adg3C+9_9aC83A7mzmbtw@mail.gmail.com>
+ with ESMTP id hy6IT12A4ogW for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Jun 2022 05:27:35 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 145D84B178
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 05:27:35 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3E1613D5;
+ Wed, 22 Jun 2022 02:27:34 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 93E1B3F66F;
+ Wed, 22 Jun 2022 02:27:32 -0700 (PDT)
+Date: Wed, 22 Jun 2022 10:27:59 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: Re: [PATCH v4 kvmtool 00/12] arm64: Allow the user to set RAM base
+ address
+Message-ID: <YrLgn1auBFx0B8l1@monolith.localdoman>
+References: <20220616134828.129006-1-alexandru.elisei@arm.com>
+ <f085b553-da9b-553f-17e2-1f4c43b25271@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <CALzav=dG9f2X8GBLjQgR-Lj4yPKX2Adg3C+9_9aC83A7mzmbtw@mail.gmail.com>
-Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- Lai Jiangshan <jiangshanlai@gmail.com>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <linux-mips@vger.kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
- <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
- "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
+In-Reply-To: <f085b553-da9b-553f-17e2-1f4c43b25271@arm.com>
+Cc: julien@xen.org, maz@kernel.org, andre.przywara@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,32 +60,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jun 21, 2022, David Matlack wrote:
-> On Fri, Jun 17, 2022 at 10:01 AM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Mon, May 16, 2022, David Matlack wrote:
-> > > +static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
-> > > +                                        const struct kvm_memory_slot *slot)
-> > > +{
-> > > +     /*
-> > > +      * Note, use KVM_MAX_HUGEPAGE_LEVEL - 1 since there's no need to zap
-> > > +      * pages that are already mapped at the maximum possible level.
-> > > +      */
-> > > +     if (slot_handle_level(kvm, slot, kvm_mmu_zap_collapsible_spte,
-> > > +                           PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL - 1,
-> > > +                           true))
-> >
-> > No need to wrap, "true" fits easily on the previous line.  That said, I don't see
-> > any point in adding a helper.  It's highly unlike there will be another caller,
-> > and IMO it's not any more readable since I have to go look at another function
-> > when reading kvm_mmu_zap_collapsible_sptes().
-> 
-> I could see an argument for readability either way. Putting it in a
-> helper function abstracts away the details, which would aid
-> readability if the reader does not care about the implementation
-> details of the rmap case.
+Hi Suzuki, Will,
 
-I'm ok either way, dealer's choice.
+On Tue, Jun 21, 2022 at 06:03:22PM +0100, Suzuki K Poulose wrote:
+> On 16/06/2022 14:48, Alexandru Elisei wrote:
+> > The series can be found at [1]. It is loosely based on the patches that
+> > allow the user to define the VM memory layout (RAM + MMIO) [2]. I've
+> > cherry-picked a handful of patches from that series, the rest I wrote from
+> > scratch since there have been several changes to the way guest memory is
+> > handled. I've chosen to focus on specifying the RAM layout with only one
+> > RAM bank and leave the rest for a later series because this was relatively
+> > easy to accomplish, while still being very useful.
+> > 
+> > What this series does: for arm64, the user can now specify the base address
+> > for RAM:
+> > 
+> > $ ./lkvm run -m1G@2G .. # Equivalent to ./lkvm run -m1024
+> > 
+> > The memory units are B (bytes), K (kilobytes), M (megabytes), G
+> > (gigabytes), T (terrabytes), P (petabytes). Lowercase is also valid.
+> > 
+> > Want to put RAM at the top of the physical address range? Easy:
+> > 
+> > $ ./lkvm run -m2G@1022G .. # Assumes the maximum is 40 bits of IPA
+> > 
+> > There one limitation on the RAM base address: it must not overlap with the
+> > MMIO range that kvmtool uses for arm/arm64, which lives below 2GB.
+> > 
+> > Why this is useful, in my opinion:
+> > 
+> > 1. Testing how a payload handles different memory layouts without the need
+> > to hack kvmtool or find the hardware that implements the desired layout.
+> > 
+> > 2. It can serve as a development tool for adding support for larger PA
+> > ranges for Linux and KVM (currently capped at 48 bits for 4k/16k pages), or
+> > other payloads.
+> > 
+> > Summary of the series
+> > ======================
+> > 
+> > * The series starts with refactoring how kvm->cfg.ram_size is validated
+> >    and used, followed by several cleanups in the arm and arm64 code.
+> > 
+> > * Then patch #8 ("builtin_run: Allow standard size specifiers for memory")
+> >    introduced the ability to specify the measurement unit for memory. I
+> >    believe that typing the equivalent of 2TB in megabytes isn't appealing
+> >    for anyone.
+> > 
+> > * More cleanups in the arm/arm64 code follow, which are needed for patch
+> >    #12 ("arm64: Allow the user to specify the RAM base address"). This is
+> >    where the ability to specify the RAM base address is introduced.
+> > 
+> > Testing
+> > =======
+> > 
+> > Same testing as before:
+> > 
+> > - Build tested each patch for all architectures.
+> > 
+> > - Ran an x86 kernel with and without setting the amount of RAM using the
+> >    memory specifiers; tested that setting the RAM address results in an
+> >    error.
+> > 
+> > - Ran an arm64 kernel without setting the size, with setting the size and
+> >    with setting the size and address; tried different addresses (2G, 3G,
+> >    256G); also tested that going below 2G or above the maximum IPA correctly
+> >    results in an error.
+> > 
+> > - Ran all arm64 kvm-unit-test tests with similar combinations of memory
+> >    size and address (instead of 256G I used 128G, as that's where I/O lives
+> >    for qemu and kvm-unit-tests maps that unconditionally as I/O).
+> > 
+> > - Ran all 32bit arm tests on an arm64 host with various combinations of
+> >    memory size and address (base address at 2G and 2.5G only due to a
+> >    limitation in the way the tests are set up).
+> 
+> I have tested this series on arm64 Fast model, with memory placed from
+> 32bit to 48bit IPA and it works well.
+> 
+> For the series:
+> 
+> Reviewed-and-Tested-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+
+Thank you for the review and testing!
+
+Will, do you want me to respin the series to gather all the Reviewed-by and
+Tested-by tags?
+
+Thanks,
+Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
