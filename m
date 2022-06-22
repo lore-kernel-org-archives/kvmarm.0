@@ -2,94 +2,91 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38DC7C43334
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jun 2022 14:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F4CCCA47D
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jun 2022 14:19:54 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AFDD4B2CD;
-	Wed, 22 Jun 2022 10:06:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19F9C4B4C2;
+	Wed, 22 Jun 2022 10:19:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jcVYgkhP7MjK; Wed, 22 Jun 2022 10:06:36 -0400 (EDT)
+	with ESMTP id NKL1RwI5Giqe; Wed, 22 Jun 2022 10:19:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3191D4B2A6;
-	Wed, 22 Jun 2022 10:06:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D68044B4C7;
+	Wed, 22 Jun 2022 10:19:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E8CD4B285
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 10:06:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BFA224B4C5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 10:19:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yqAl6Y5BJ9AO for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Jun 2022 10:06:34 -0400 (EDT)
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com
- [209.85.218.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C4A549ED8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 10:06:34 -0400 (EDT)
-Received: by mail-ej1-f42.google.com with SMTP id g25so34462210ejh.9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 07:06:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
- h=sender:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=WxeHFPlfiSptfkzXY60BBTFs27kl7bS4qonpRA5K3SA=;
- b=T7qphS0ZRa134v/8ItGchQB9bogGth9+5pDqC2hUX7s6C0zH7zYuoVDdPuoEZvVhok
- sE8TcoXHH1m3cDpGrhMwP5aPbvry5T1tenDhgg6s+00ccl+qec9fmsQa3VSHCv85tuUV
- u7Zp9VqC5uvnf5aKFHSQONUqA2SWHhdZc0262grRx6E1iriI55QPfee4SZ9dxFO2hZZX
- NgDmhyM8bS8CvOev8gERKMIpNzrz0dTI+6GxQ7Ds972NKNw2Yia7OrPQkBu6LMBfQVBM
- HBwMWb4dD1DaGqEUDyoDX5Q6LBV8Ni+U5Uc+mtzdqRdJn+mz9XkbrYFYjC1ZQfs3CF/+
- 2pYw==
+ with ESMTP id Sq3fj3Zl4c7C for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Jun 2022 10:19:50 -0400 (EDT)
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com
+ [209.85.216.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC3414B4C2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 10:19:50 -0400 (EDT)
+Received: by mail-pj1-f51.google.com with SMTP id
+ t3-20020a17090a510300b001ea87ef9a3dso16933630pjh.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 07:19:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=BzxAUPe5okJNZee9MSLP9PbTGm5gfg8v2qRMcdUL4+0=;
+ b=O5heBvklZbSxZj/ed0HHu9xg0cdTwcYZ8+1Mjr1qOthOBcuL3F9RzDjiYKE75UUzAP
+ WobpdUABHfVrVHR4WoRgqgX79lY4x9h/QuPsPLqYJExoaBsPkFWX19IOZLZGbQkTHleX
+ mg+UFVEr82lEQV/7FHyoPxYREI10yKRjqDF0+BgNbaGNtjmwGrEUOHfsnV0MdXCsAKDk
+ ZTF0mGNGbdPoDUnH6eMhHUiZCdLcIDDHE3nvqC9Rjgh7OxSxwlT693WnktZnMplJdla6
+ eEOEq3SwN+x7zeTkBSI2ha03O/T2Ch7h4aYsWxOgsb8+k7k2Jf3TbVINN3tzzz/Ji1y6
+ rQiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
- :subject:content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=WxeHFPlfiSptfkzXY60BBTFs27kl7bS4qonpRA5K3SA=;
- b=P07pERHGgq0y2szqbrws6llErPGO0UwoTJA76xJM6Z3bbcwypXO+Dm7GQ56fbjUJNC
- btzjKWHDHP1H14KUXG2HjzQDjd50phMPXPQbeFPmfXEiYQIVd0yeDq4GSYqgTDACxM3E
- 910wl9fQ8mxcJm4HD61uiWudtvmpkT9/i2xh4Xh9xxH5N/mFayH0olXHOts3PaQ4cTcf
- gp+F0b4+TRXA4RcQ9o9tpMinMa2toK2+UeoZbNzmjXzG9reJ2JahglPId1/4XvOVP52w
- AfsDx5ZlCLUGaIvlF6zJ5gd3dLh6Qp4QWc+JqaCz2u5sDw5Eky6KakntmdeeRz1bIowk
- 2yvA==
-X-Gm-Message-State: AJIora8EoqC1c+sp+bOVSmtWomaAPmDeW4yq4CkMb44+Va8poE1HALce
- 8IwpQT7tWIdsbNiCgT+B8Xs=
-X-Google-Smtp-Source: AGRyM1sD+9xzrrmv7BOEV1UN/1LyYHfkX2LTy6aXPGG/mcNyWY8NiWtb+z+dGzKS5l7haVgtNNE0zQ==
-X-Received: by 2002:a17:906:9f26:b0:722:f998:7b2b with SMTP id
- fy38-20020a1709069f2600b00722f9987b2bmr1312998ejc.144.1655906793025; 
- Wed, 22 Jun 2022 07:06:33 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89?
- ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
- by smtp.googlemail.com with ESMTPSA id
- eg40-20020a05640228a800b004356d82b129sm10908572edb.80.2022.06.22.07.06.31
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 22 Jun 2022 07:06:32 -0700 (PDT)
-Message-ID: <bb22c823-f12f-90d8-e8d6-0cddba95f60a@redhat.com>
-Date: Wed, 22 Jun 2022 16:06:31 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=BzxAUPe5okJNZee9MSLP9PbTGm5gfg8v2qRMcdUL4+0=;
+ b=ZXqHwr55QYaG+UvfsxCUcNzFORzfF1n+13iw/+il5K6mVI1NZyx6DYb1FymNyXavnM
+ VvdryA2Vm2xODnCZaVDWJ5tNYMIM0xXsd1nKCw0UnL7f9j/Aa+3kEVS7M5fbuuS2eKV4
+ IU9Up1sJyk/X5XkTiFNPFmrvcu5CCkjIGdCRq6NoZVDhKTNWX39giYYjBO4Ij8JE33qG
+ PvyRHKKbNF2DOzlJ/JsQjU/WPHrwyv6DRT8LepR93Jro3oFjxKvkpcSoYiinDIuBjSDL
+ JjQVD9pPIiUs3XWRC2FO34Sf6EFQvlXM21F/oQhQlrAlCotmcBW9E1jJvG7VU1nNPVxi
+ CwoQ==
+X-Gm-Message-State: AJIora9yhwneYEBHvXvLkJNTjptkbDv+zll9TMSmTfpTeOIaYC124FWZ
+ HUJDQAu5IL4xuhsyl5uhttv3iA==
+X-Google-Smtp-Source: AGRyM1s6BHwkunCCOtr1rJlpNZ/lT0ticChntRH0O/W4Ed8+WafDWpg6DiHb+22bQYkLURbtDY22vg==
+X-Received: by 2002:a17:902:8689:b0:14e:f1a4:d894 with SMTP id
+ g9-20020a170902868900b0014ef1a4d894mr34493773plo.65.1655907589586; 
+ Wed, 22 Jun 2022 07:19:49 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com.
+ [35.230.65.123]) by smtp.gmail.com with ESMTPSA id
+ i6-20020a626d06000000b0051c09cdd71fsm13518188pfc.72.2022.06.22.07.19.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 22 Jun 2022 07:19:47 -0700 (PDT)
+Date: Wed, 22 Jun 2022 14:19:43 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 Subject: Re: [PATCH v6 03/22] KVM: x86/mmu: Stop passing @direct to
  mmu_alloc_root()
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
- David Matlack <dmatlack@google.com>
+Message-ID: <YrMk/z4HCvX0ASPm@google.com>
 References: <20220516232138.1783324-1-dmatlack@google.com>
- <20220516232138.1783324-4-dmatlack@google.com> <Yqt6rBPMxfwAPjp1@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Yqt6rBPMxfwAPjp1@google.com>
+ <20220516232138.1783324-4-dmatlack@google.com>
+ <Yqt6rBPMxfwAPjp1@google.com>
+ <bb22c823-f12f-90d8-e8d6-0cddba95f60a@redhat.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <bb22c823-f12f-90d8-e8d6-0cddba95f60a@redhat.com>
 Cc: Albert Ou <aou@eecs.berkeley.edu>,
  "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
  <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
  Huacai Chen <chenhuacai@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
  "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <linux-mips@vger.kernel.org>,
+ <linux-mips@vger.kernel.org>, Ben Gardon <bgardon@google.com>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  Palmer Dabbelt <palmer@dabbelt.com>,
  "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
  <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Ben Gardon <bgardon@google.com>, maciej.szmigiero@oracle.com,
+ David Matlack <dmatlack@google.com>, maciej.szmigiero@oracle.com,
  "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
  <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -103,30 +100,31 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 6/16/22 20:47, Sean Christopherson wrote:
->> The argument @direct is vcpu->arch.mmu->root_role.direct, so just use
->> that.
-> It's worth calling out that, unlike non-root page tables, it's impossible to have
-> a direct root in an indirect MMU.  I.e. provide a hint as to why there's a need to
-> pass @direct in the first place.
+On Wed, Jun 22, 2022, Paolo Bonzini wrote:
+> On 6/16/22 20:47, Sean Christopherson wrote:
+> > > The argument @direct is vcpu->arch.mmu->root_role.direct, so just use
+> > > that.
+> > It's worth calling out that, unlike non-root page tables, it's impossible to have
+> > a direct root in an indirect MMU.  I.e. provide a hint as to why there's a need to
+> > pass @direct in the first place.
+> > 
 > 
+> I suppose there's *no* need to pass direct?  Also, there's the trivial (but
+> less interesting) justification that kvm_mmu_load does
+> 
+>         if (vcpu->arch.mmu->root_role.direct)
+>                 r = mmu_alloc_direct_roots(vcpu);
+>         else
+>                 r = mmu_alloc_shadow_roots(vcpu);
+> 
+> and those are the only callers of mmu_alloc_root.
 
-I suppose there's *no* need to pass direct?  Also, there's the trivial 
-(but less interesting) justification that kvm_mmu_load does
-
-         if (vcpu->arch.mmu->root_role.direct)
-                 r = mmu_alloc_direct_roots(vcpu);
-         else
-                 r = mmu_alloc_shadow_roots(vcpu);
-
-and those are the only callers of mmu_alloc_root.
-
-Paolo
+Duh, you're right, grabbing root_role.direct in mmu_alloc_root() is much better.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
