@@ -2,64 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC06CC43334
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jun 2022 19:27:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CC9FCCA47F
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jun 2022 19:27:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 739204B357;
-	Wed, 22 Jun 2022 15:27:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C91914B522;
+	Wed, 22 Jun 2022 15:27:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7adTXPHjwRwb; Wed, 22 Jun 2022 15:27:48 -0400 (EDT)
+	with ESMTP id hwWcExqy1dig; Wed, 22 Jun 2022 15:27:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 048184B509;
-	Wed, 22 Jun 2022 15:27:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 21D764B528;
+	Wed, 22 Jun 2022 15:27:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13D334B501
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C24124B509
  for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 15:27:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id L7tf+Z9TFh74 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Jun 2022 15:27:34 -0400 (EDT)
+ with ESMTP id vCc+0s-TdNd5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Jun 2022 15:27:33 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E0854B4C2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 15:27:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CC8524B4C7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 15:27:25 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1655926046;
+ s=mimecast20190719; t=1655926045;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PtZNTZPWfsMWYTlAEBsLU5lpYkmjIuplCyLvnN6roN8=;
- b=J/DxGHI6IwmKiPc2dyAI/DooD+/sPl54IdqwUnp5iySMkPyRuPaZYKjbmEtebh5wk51OO1
- sWt/WKx+vZyuamUA0kWnlj3zWjcMg+wMeXfArP1A+e1lnmN5hQS+79aKzHRjLfOGgN8sq8
- OOTsReB0uurxpGRlGZeoHVDUSbruA0A=
+ bh=XL5TvaCYgfHnPsXIXEP6b8H0e4uXwxl6eHG7sOhlYAE=;
+ b=O9BXxnlUkx5hMOA0ISU5StNWdO3mlacgqUiW+cLA18v+bnyTsd1XMYg9C0RTmZ7GMRysqX
+ Mf1lQWWl+LuGgfm8o3ueVMQm5SUSlm+k+OwhNGI37Th3I7FN6DQjO7C5Ej0j3oxtlsiBV1
+ DXOeDJQk8/30tEGWWqcwgvXPObiYI5g=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-153-p9sVOKGTNd-Hjl1hFwF5Jw-1; Wed, 22 Jun 2022 15:27:21 -0400
-X-MC-Unique: p9sVOKGTNd-Hjl1hFwF5Jw-1
+ us-mta-41-dwIiCJ6LPw64x1HjDYIHng-1; Wed, 22 Jun 2022 15:27:20 -0400
+X-MC-Unique: dwIiCJ6LPw64x1HjDYIHng-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
  [10.11.54.3])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 589571C0518C;
- Wed, 22 Jun 2022 19:27:20 +0000 (UTC)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8F2253810780;
+ Wed, 22 Jun 2022 19:27:19 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 01FD61121314;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 388621121314;
  Wed, 22 Jun 2022 19:27:19 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
-Subject: [PATCH v7 23/23] KVM: x86/mmu: Avoid unnecessary flush on eager page
- split
-Date: Wed, 22 Jun 2022 15:27:10 -0400
-Message-Id: <20220622192710.2547152-24-pbonzini@redhat.com>
+Subject: [PATCH v7 21/23] KVM: Allow for different capacities in
+ kvm_mmu_memory_cache structs
+Date: Wed, 22 Jun 2022 15:27:08 -0400
+Message-Id: <20220622192710.2547152-22-pbonzini@redhat.com>
 In-Reply-To: <20220622192710.2547152-1-pbonzini@redhat.com>
 References: <20220622192710.2547152-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -83,116 +83,171 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The TLB flush before installing the newly-populated lower level
-page table is unnecessary if the lower-level page table maps
-the huge page identically.  KVM knows it is if it did not reuse
-an existing shadow page table, tell drop_large_spte() to skip
-the flush in that case.
+From: David Matlack <dmatlack@google.com>
 
-Extracted from a patch by David Matlack.
+Allow the capacity of the kvm_mmu_memory_cache struct to be chosen at
+declaration time rather than being fixed for all declarations. This will
+be used in a follow-up commit to declare an cache in x86 with a capacity
+of 512+ objects without having to increase the capacity of all caches in
+KVM.
 
+This change requires each cache now specify its capacity at runtime,
+since the cache struct itself no longer has a fixed capacity known at
+compile time. To protect against someone accidentally defining a
+kvm_mmu_memory_cache struct directly (without the extra storage), this
+commit includes a WARN_ON() in kvm_mmu_topup_memory_cache().
+
+In order to support different capacities, this commit changes the
+objects pointer array to be dynamically allocated the first time the
+cache is topped-up.
+
+While here, opportunistically clean up the stack-allocated
+kvm_mmu_memory_cache structs in riscv and arm64 to use designated
+initializers.
+
+No functional change intended.
+
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: David Matlack <dmatlack@google.com>
+Message-Id: <20220516232138.1783324-22-dmatlack@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 32 ++++++++++++++++++++------------
- 1 file changed, 20 insertions(+), 12 deletions(-)
+ arch/arm64/kvm/mmu.c      |  2 +-
+ arch/riscv/kvm/mmu.c      |  5 +----
+ include/linux/kvm_host.h  |  1 +
+ include/linux/kvm_types.h |  6 +++++-
+ virt/kvm/kvm_main.c       | 33 ++++++++++++++++++++++++++++++---
+ 5 files changed, 38 insertions(+), 9 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 22681931921f..79c6a821ea0d 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1135,7 +1135,7 @@ static void drop_spte(struct kvm *kvm, u64 *sptep)
- 		rmap_remove(kvm, sptep);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index f5651a05b6a8..87f1cd0df36e 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -786,7 +786,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ {
+ 	phys_addr_t addr;
+ 	int ret = 0;
+-	struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
++	struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
+ 	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+ 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
+ 				     KVM_PGTABLE_PROT_R |
+diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+index 1c00695ebee7..081f8d2b9cf3 100644
+--- a/arch/riscv/kvm/mmu.c
++++ b/arch/riscv/kvm/mmu.c
+@@ -350,10 +350,7 @@ static int gstage_ioremap(struct kvm *kvm, gpa_t gpa, phys_addr_t hpa,
+ 	int ret = 0;
+ 	unsigned long pfn;
+ 	phys_addr_t addr, end;
+-	struct kvm_mmu_memory_cache pcache;
+-
+-	memset(&pcache, 0, sizeof(pcache));
+-	pcache.gfp_zero = __GFP_ZERO;
++	struct kvm_mmu_memory_cache pcache = { .gfp_zero = __GFP_ZERO };
+ 
+ 	end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
+ 	pfn = __phys_to_pfn(hpa);
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index a2bbdf3ab086..3554e48406e4 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1356,6 +1356,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm);
+ 
+ #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
+ int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min);
++int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min);
+ int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc);
+ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
+ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index f328a01db4fe..4d933518060f 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -85,12 +85,16 @@ struct gfn_to_pfn_cache {
+  * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
+  * holding MMU locks.  Note, these caches act more like prefetch buffers than
+  * classical caches, i.e. objects are not returned to the cache on being freed.
++ *
++ * The @capacity field and @objects array are lazily initialized when the cache
++ * is topped up (__kvm_mmu_topup_memory_cache()).
+  */
+ struct kvm_mmu_memory_cache {
+ 	int nobjs;
+ 	gfp_t gfp_zero;
+ 	struct kmem_cache *kmem_cache;
+-	void *objects[KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE];
++	int capacity;
++	void **objects;
+ };
+ #endif
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 5b8ae83e09d7..45188d11812c 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -396,14 +396,31 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+ 		return (void *)__get_free_page(gfp_flags);
  }
  
--static void drop_large_spte(struct kvm *kvm, u64 *sptep)
-+static void drop_large_spte(struct kvm *kvm, u64 *sptep, bool flush)
+-int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
++int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
  {
- 	struct kvm_mmu_page *sp;
++	gfp_t gfp = GFP_KERNEL_ACCOUNT;
+ 	void *obj;
  
-@@ -1143,7 +1143,9 @@ static void drop_large_spte(struct kvm *kvm, u64 *sptep)
- 	WARN_ON(sp->role.level == PG_LEVEL_4K);
- 
- 	drop_spte(kvm, sptep);
--	kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
+ 	if (mc->nobjs >= min)
+ 		return 0;
+-	while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
+-		obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
 +
-+	if (flush)
-+		kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
- 			KVM_PAGES_PER_HPAGE(sp->role.level));
++	if (unlikely(!mc->objects)) {
++		if (WARN_ON_ONCE(!capacity))
++			return -EIO;
++
++		mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
++		if (!mc->objects)
++			return -ENOMEM;
++
++		mc->capacity = capacity;
++	}
++
++	/* It is illegal to request a different capacity across topups. */
++	if (WARN_ON_ONCE(mc->capacity != capacity))
++		return -EIO;
++
++	while (mc->nobjs < mc->capacity) {
++		obj = mmu_memory_cache_alloc_obj(mc, gfp);
+ 		if (!obj)
+ 			return mc->nobjs >= min ? 0 : -ENOMEM;
+ 		mc->objects[mc->nobjs++] = obj;
+@@ -411,6 +428,11 @@ int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
+ 	return 0;
  }
  
-@@ -2283,7 +2285,7 @@ static void shadow_walk_next(struct kvm_shadow_walk_iterator *iterator)
- 
- static void __link_shadow_page(struct kvm *kvm,
- 			       struct kvm_mmu_memory_cache *cache, u64 *sptep,
--			       struct kvm_mmu_page *sp)
-+			       struct kvm_mmu_page *sp, bool flush)
++int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
++{
++	return __kvm_mmu_topup_memory_cache(mc, KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE, min);
++}
++
+ int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc)
  {
- 	u64 spte;
- 
-@@ -2291,10 +2293,11 @@ static void __link_shadow_page(struct kvm *kvm,
- 
- 	/*
- 	 * If an SPTE is present already, it must be a leaf and therefore
--	 * a large one.  Drop it and flush the TLB before installing sp.
-+	 * a large one.  Drop it, and flush the TLB if needed, before
-+	 * installing sp.
- 	 */
- 	if (is_shadow_present_pte(*sptep))
--		drop_large_spte(kvm, sptep);
-+		drop_large_spte(kvm, sptep, flush);
- 
- 	spte = make_nonleaf_spte(sp->spt, sp_ad_disabled(sp));
- 
-@@ -2309,7 +2312,7 @@ static void __link_shadow_page(struct kvm *kvm,
- static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
- 			     struct kvm_mmu_page *sp)
- {
--	__link_shadow_page(vcpu->kvm, &vcpu->arch.mmu_pte_list_desc_cache, sptep, sp);
-+	__link_shadow_page(vcpu->kvm, &vcpu->arch.mmu_pte_list_desc_cache, sptep, sp, true);
- }
- 
- static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
-@@ -6172,6 +6175,7 @@ static void shadow_mmu_split_huge_page(struct kvm *kvm,
- 	struct kvm_mmu_memory_cache *cache = &kvm->arch.split_desc_cache;
- 	u64 huge_spte = READ_ONCE(*huge_sptep);
- 	struct kvm_mmu_page *sp;
-+	bool flush = false;
- 	u64 *sptep, spte;
- 	gfn_t gfn;
- 	int index;
-@@ -6189,20 +6193,24 @@ static void shadow_mmu_split_huge_page(struct kvm *kvm,
- 		 * gfn-to-pfn translation since the SP is direct, so no need to
- 		 * modify them.
- 		 *
--		 * If a given SPTE points to a lower level page table, installing
--		 * such SPTEs would effectively unmap a potion of the huge page.
--		 * This is not an issue because __link_shadow_page() flushes the TLB
--		 * when the passed sp replaces a large SPTE.
-+		 * However, if a given SPTE points to a lower level page table,
-+		 * that lower level page table may only be partially populated.
-+		 * Installing such SPTEs would effectively unmap a potion of the
-+		 * huge page. Unmapping guest memory always requires a TLB flush
-+		 * since a subsequent operation on the unmapped regions would
-+		 * fail to detect the need to flush.
- 		 */
--		if (is_shadow_present_pte(*sptep))
-+		if (is_shadow_present_pte(*sptep)) {
-+			flush |= !is_last_spte(*sptep, sp->role.level);
- 			continue;
-+		}
- 
- 		spte = make_huge_page_split_spte(kvm, huge_spte, sp->role, index);
- 		mmu_spte_set(sptep, spte);
- 		__rmap_add(kvm, cache, slot, sptep, gfn, sp->role.access);
+ 	return mc->nobjs;
+@@ -424,6 +446,11 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+ 		else
+ 			free_page((unsigned long)mc->objects[--mc->nobjs]);
  	}
- 
--	__link_shadow_page(kvm, cache, huge_sptep, sp);
-+	__link_shadow_page(kvm, cache, huge_sptep, sp, flush);
++
++	kvfree(mc->objects);
++
++	mc->objects = NULL;
++	mc->capacity = 0;
  }
  
- static int shadow_mmu_try_split_huge_page(struct kvm *kvm,
+ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
 -- 
 2.31.1
+
 
 _______________________________________________
 kvmarm mailing list
