@@ -2,64 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E08DAC433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jun 2022 19:27:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03587CCA47F
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jun 2022 19:27:45 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B4B64B520;
-	Wed, 22 Jun 2022 15:27:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A88494B52E;
+	Wed, 22 Jun 2022 15:27:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id orh8i31HhYtf; Wed, 22 Jun 2022 15:27:41 -0400 (EDT)
+	with ESMTP id 6KCdI20lbO7O; Wed, 22 Jun 2022 15:27:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 601524B51A;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F1324B53A;
 	Wed, 22 Jun 2022 15:27:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F4F74B4C6
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD6184B332
  for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 15:27:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xPTvTSTEniyN for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id aN5vGC0-vV7B for <kvmarm@lists.cs.columbia.edu>;
  Wed, 22 Jun 2022 15:27:27 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E12DF4B357
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 15:27:23 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AA3514B19D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 15:27:22 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1655926043;
+ s=mimecast20190719; t=1655926042;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RKFUL486E2CfSNwUsRAg1P2Cyur/2axyukd6UEqggTk=;
- b=YwmMozxP4LnwQAjdZAOiDkr+qf8qtsTX1k7vc2wF0fx+hduyc4ehemblSKCpDy2oqjZOvF
- XjZekf2QNzYiPZx4QX1Mg444hvCBF9rra8UfJFU+4V9zDkDYp0v6UvfF7AfokY4p9UqvBG
- UlS22jUcPGTeuSSVTD1Rhi4l/8bFhNI=
+ bh=VYUzovwXlyWEqHWEr/0eyCJlm/77MGoPfdijVMP4XpY=;
+ b=Zr5K6KM2IGN53qo6LuNpJGv3dibQr/uZXpnvhlw340Z4M2T8IFhV1p3GgiOpLB3qiVo+i8
+ 1u7u6m/qlGgXwaKQrzAs0D6tgUi3XMKhFgS1ga7r5rYo5pc8pjqlPRkqjbDrHTkGYa398Z
+ tDRevZ6MO5CGkHUKscIe2sXFM/EVAsM=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-663-RZaNGeAbNNO7JBKVpYhBIQ-1; Wed, 22 Jun 2022 15:27:18 -0400
-X-MC-Unique: RZaNGeAbNNO7JBKVpYhBIQ-1
+ us-mta-248-4_a3NbfDPa6vyHqb9eMy7w-1; Wed, 22 Jun 2022 15:27:16 -0400
+X-MC-Unique: 4_a3NbfDPa6vyHqb9eMy7w-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com
  [10.11.54.7])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E95E3294EDC5;
- Wed, 22 Jun 2022 19:27:17 +0000 (UTC)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8B7ED3810782;
+ Wed, 22 Jun 2022 19:27:15 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 94D63141510C;
- Wed, 22 Jun 2022 19:27:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 37719141510C;
+ Wed, 22 Jun 2022 19:27:15 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
-Subject: [PATCH v7 17/23] KVM: x86/mmu: Cache the access bits of shadowed
- translations
-Date: Wed, 22 Jun 2022 15:27:04 -0400
-Message-Id: <20220622192710.2547152-18-pbonzini@redhat.com>
+Subject: [PATCH v7 11/23] KVM: x86/mmu: Replace vcpu with kvm in
+ kvm_mmu_alloc_shadow_page()
+Date: Wed, 22 Jun 2022 15:26:58 -0400
+Message-Id: <20220622192710.2547152-12-pbonzini@redhat.com>
 In-Reply-To: <20220622192710.2547152-1-pbonzini@redhat.com>
 References: <20220622192710.2547152-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -85,299 +85,60 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: David Matlack <dmatlack@google.com>
 
-Splitting huge pages requires allocating/finding shadow pages to replace
-the huge page. Shadow pages are keyed, in part, off the guest access
-permissions they are shadowing. For fully direct MMUs, there is no
-shadowing so the access bits in the shadow page role are always ACC_ALL.
-But during shadow paging, the guest can enforce whatever access
-permissions it wants.
+The vcpu pointer in kvm_mmu_alloc_shadow_page() is only used to get the
+kvm pointer. So drop the vcpu pointer and just pass in the kvm pointer.
 
-In particular, eager page splitting needs to know the permissions to use
-for the subpages, but KVM cannot retrieve them from the guest page
-tables because eager page splitting does not have a vCPU.  Fortunately,
-the guest access permissions are easy to cache whenever page faults or
-FNAME(sync_page) update the shadow page tables; this is an extension of
-the existing cache of the shadowed GFNs in the gfns array of the shadow
-page.  The access bits only take up 3 bits, which leaves 61 bits left
-over for gfns, which is more than enough.
-
-Now that the gfns array caches more information than just GFNs, rename
-it to shadowed_translation.
-
-While here, preemptively fix up the WARN_ON() that detects gfn
-mismatches in direct SPs. The WARN_ON() was paired with a
-pr_err_ratelimited(), which means that users could sometimes see the
-WARN without the accompanying error message. Fix this by outputting the
-error message as part of the WARN splat, and opportunistically make
-them WARN_ONCE() because if these ever fire, they are all but guaranteed
-to fire a lot and will bring down the kernel.
+No functional change intended.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
-Message-Id: <20220516232138.1783324-18-dmatlack@google.com>
+Message-Id: <20220516232138.1783324-12-dmatlack@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 +-
- arch/x86/kvm/mmu/mmu.c          | 85 +++++++++++++++++++++++----------
- arch/x86/kvm/mmu/mmu_internal.h | 17 ++++++-
- arch/x86/kvm/mmu/paging_tmpl.h  |  9 +++-
- 4 files changed, 84 insertions(+), 29 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 7e4c31b57a75..64efe8c90c31 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -713,7 +713,7 @@ struct kvm_vcpu_arch {
- 
- 	struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
- 	struct kvm_mmu_memory_cache mmu_shadow_page_cache;
--	struct kvm_mmu_memory_cache mmu_gfn_array_cache;
-+	struct kvm_mmu_memory_cache mmu_shadowed_info_cache;
- 	struct kvm_mmu_memory_cache mmu_page_header_cache;
- 
- 	/*
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 7cca28d89a85..13a059ad5dc7 100644
+index fab417e7bf6c..c5a88e8d1b53 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -656,7 +656,7 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
- 	if (r)
- 		return r;
- 	if (maybe_indirect) {
--		r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_gfn_array_cache,
-+		r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadowed_info_cache,
- 					       PT64_ROOT_MAX_LEVEL);
- 		if (r)
- 			return r;
-@@ -669,7 +669,7 @@ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
- {
- 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
- 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
--	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_gfn_array_cache);
-+	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadowed_info_cache);
- 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
- }
- 
-@@ -678,34 +678,68 @@ static void mmu_free_pte_list_desc(struct pte_list_desc *pte_list_desc)
- 	kmem_cache_free(pte_list_desc_cache, pte_list_desc);
- }
- 
-+static bool sp_has_gptes(struct kvm_mmu_page *sp);
-+
- static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
- {
- 	if (sp->role.passthrough)
- 		return sp->gfn;
- 
- 	if (!sp->role.direct)
--		return sp->gfns[index];
-+		return sp->shadowed_translation[index] >> PAGE_SHIFT;
- 
- 	return sp->gfn + (index << ((sp->role.level - 1) * SPTE_LEVEL_BITS));
- }
- 
--static void kvm_mmu_page_set_gfn(struct kvm_mmu_page *sp, int index, gfn_t gfn)
-+/*
-+ * For leaf SPTEs, fetch the *guest* access permissions being shadowed. Note
-+ * that the SPTE itself may have a more constrained access permissions that
-+ * what the guest enforces. For example, a guest may create an executable
-+ * huge PTE but KVM may disallow execution to mitigate iTLB multihit.
-+ */
-+static u32 kvm_mmu_page_get_access(struct kvm_mmu_page *sp, int index)
- {
--	if (sp->role.passthrough) {
--		WARN_ON_ONCE(gfn != sp->gfn);
--		return;
--	}
-+	if (sp_has_gptes(sp))
-+		return sp->shadowed_translation[index] & ACC_ALL;
- 
--	if (!sp->role.direct) {
--		sp->gfns[index] = gfn;
-+	/*
-+	 * For direct MMUs (e.g. TDP or non-paging guests) or passthrough SPs,
-+	 * KVM is not shadowing any guest page tables, so the "guest access
-+	 * permissions" are just ACC_ALL.
-+	 *
-+	 * For direct SPs in indirect MMUs (shadow paging), i.e. when KVM
-+	 * is shadowing a guest huge page with small pages, the guest access
-+	 * permissions being shadowed are the access permissions of the huge
-+	 * page.
-+	 *
-+	 * In both cases, sp->role.access contains the correct access bits.
-+	 */
-+	return sp->role.access;
-+}
-+
-+static void kvm_mmu_page_set_translation(struct kvm_mmu_page *sp, int index, gfn_t gfn, u32 access)
-+{
-+	if (sp_has_gptes(sp)) {
-+		sp->shadowed_translation[index] = (gfn << PAGE_SHIFT) | access;
- 		return;
- 	}
- 
--	if (WARN_ON(gfn != kvm_mmu_page_get_gfn(sp, index)))
--		pr_err_ratelimited("gfn mismatch under direct page %llx "
--				   "(expected %llx, got %llx)\n",
--				   sp->gfn,
--				   kvm_mmu_page_get_gfn(sp, index), gfn);
-+	WARN_ONCE(access != kvm_mmu_page_get_access(sp, index),
-+	          "access mismatch under %s page %llx (expected %u, got %u)\n",
-+	          sp->role.passthrough ? "passthrough" : "direct",
-+	          sp->gfn, kvm_mmu_page_get_access(sp, index), access);
-+
-+	WARN_ONCE(gfn != kvm_mmu_page_get_gfn(sp, index),
-+	          "gfn mismatch under %s page %llx (expected %llx, got %llx)\n",
-+	          sp->role.passthrough ? "passthrough" : "direct",
-+	          sp->gfn, kvm_mmu_page_get_gfn(sp, index), gfn);
-+}
-+
-+static void kvm_mmu_page_set_access(struct kvm_mmu_page *sp, int index, u32 access)
-+{
-+	gfn_t gfn = kvm_mmu_page_get_gfn(sp, index);
-+
-+	kvm_mmu_page_set_translation(sp, index, gfn, access);
- }
- 
- /*
-@@ -1554,14 +1588,14 @@ static bool kvm_test_age_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- static void __rmap_add(struct kvm *kvm,
- 		       struct kvm_mmu_memory_cache *cache,
- 		       const struct kvm_memory_slot *slot,
--		       u64 *spte, gfn_t gfn)
-+		       u64 *spte, gfn_t gfn, u32 access)
- {
- 	struct kvm_mmu_page *sp;
- 	struct kvm_rmap_head *rmap_head;
- 	int rmap_count;
- 
- 	sp = sptep_to_sp(spte);
--	kvm_mmu_page_set_gfn(sp, spte - sp->spt, gfn);
-+	kvm_mmu_page_set_translation(sp, spte - sp->spt, gfn, access);
- 	kvm_update_page_stats(kvm, sp->role.level, 1);
- 
- 	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
-@@ -1575,11 +1609,11 @@ static void __rmap_add(struct kvm *kvm,
- }
- 
- static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
--		     u64 *spte, gfn_t gfn)
-+		     u64 *spte, gfn_t gfn, u32 access)
- {
- 	struct kvm_mmu_memory_cache *cache = &vcpu->arch.mmu_pte_list_desc_cache;
- 
--	__rmap_add(vcpu->kvm, cache, slot, spte, gfn);
-+	__rmap_add(vcpu->kvm, cache, slot, spte, gfn, access);
- }
- 
- bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
-@@ -1643,7 +1677,7 @@ static void kvm_mmu_free_shadow_page(struct kvm_mmu_page *sp)
- 	list_del(&sp->link);
- 	free_page((unsigned long)sp->spt);
- 	if (!sp->role.direct)
--		free_page((unsigned long)sp->gfns);
-+		free_page((unsigned long)sp->shadowed_translation);
- 	kmem_cache_free(mmu_page_header_cache, sp);
- }
- 
-@@ -2070,7 +2104,7 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
- struct shadow_page_caches {
- 	struct kvm_mmu_memory_cache *page_header_cache;
- 	struct kvm_mmu_memory_cache *shadow_page_cache;
--	struct kvm_mmu_memory_cache *gfn_array_cache;
-+	struct kvm_mmu_memory_cache *shadowed_info_cache;
+@@ -2056,7 +2056,7 @@ struct shadow_page_caches {
+ 	struct kvm_mmu_memory_cache *gfn_array_cache;
  };
  
- static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
-@@ -2084,7 +2118,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
- 	sp = kvm_mmu_memory_cache_alloc(caches->page_header_cache);
- 	sp->spt = kvm_mmu_memory_cache_alloc(caches->shadow_page_cache);
- 	if (!role.direct)
--		sp->gfns = kvm_mmu_memory_cache_alloc(caches->gfn_array_cache);
-+		sp->shadowed_translation = kvm_mmu_memory_cache_alloc(caches->shadowed_info_cache);
+-static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
++static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
+ 						      struct shadow_page_caches *caches,
+ 						      gfn_t gfn,
+ 						      struct hlist_head *sp_list,
+@@ -2076,15 +2076,15 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
+ 	 * depends on valid pages being added to the head of the list.  See
+ 	 * comments in kvm_zap_obsolete_pages().
+ 	 */
+-	sp->mmu_valid_gen = vcpu->kvm->arch.mmu_valid_gen;
+-	list_add(&sp->link, &vcpu->kvm->arch.active_mmu_pages);
+-	kvm_mod_used_mmu_pages(vcpu->kvm, +1);
++	sp->mmu_valid_gen = kvm->arch.mmu_valid_gen;
++	list_add(&sp->link, &kvm->arch.active_mmu_pages);
++	kvm_mod_used_mmu_pages(kvm, +1);
  
- 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+ 	sp->gfn = gfn;
+ 	sp->role = role;
+ 	hlist_add_head(&sp->hash_link, sp_list);
+ 	if (sp_has_gptes(sp))
+-		account_shadowed(vcpu->kvm, sp);
++		account_shadowed(kvm, sp);
  
-@@ -2136,7 +2170,7 @@ static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
- 	struct shadow_page_caches caches = {
- 		.page_header_cache = &vcpu->arch.mmu_page_header_cache,
- 		.shadow_page_cache = &vcpu->arch.mmu_shadow_page_cache,
--		.gfn_array_cache = &vcpu->arch.mmu_gfn_array_cache,
-+		.shadowed_info_cache = &vcpu->arch.mmu_shadowed_info_cache,
- 	};
- 
- 	return __kvm_mmu_get_shadow_page(vcpu->kvm, vcpu, &caches, gfn, role);
-@@ -2785,7 +2819,10 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
- 
- 	if (!was_rmapped) {
- 		WARN_ON_ONCE(ret == RET_PF_SPURIOUS);
--		rmap_add(vcpu, slot, sptep, gfn);
-+		rmap_add(vcpu, slot, sptep, gfn, pte_access);
-+	} else {
-+		/* Already rmapped but the pte_access bits may have changed. */
-+		kvm_mmu_page_set_access(sp, sptep - sp->spt, pte_access);
+ 	return sp;
+ }
+@@ -2103,7 +2103,7 @@ static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
+ 	sp = kvm_mmu_find_shadow_page(vcpu, gfn, sp_list, role);
+ 	if (!sp) {
+ 		created = true;
+-		sp = kvm_mmu_alloc_shadow_page(vcpu, caches, gfn, sp_list, role);
++		sp = kvm_mmu_alloc_shadow_page(vcpu->kvm, caches, gfn, sp_list, role);
  	}
  
- 	return ret;
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index bb9d12ac0db3..ae2d660e2dab 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -67,8 +67,21 @@ struct kvm_mmu_page {
- 	gfn_t gfn;
- 
- 	u64 *spt;
--	/* hold the gfn of each spte inside spt */
--	gfn_t *gfns;
-+
-+	/*
-+	 * Stores the result of the guest translation being shadowed by each
-+	 * SPTE.  KVM shadows two types of guest translations: nGPA -> GPA
-+	 * (shadow EPT/NPT) and GVA -> GPA (traditional shadow paging). In both
-+	 * cases the result of the translation is a GPA and a set of access
-+	 * constraints.
-+	 *
-+	 * The GFN is stored in the upper bits (PAGE_SHIFT) and the shadowed
-+	 * access permissions are stored in the lower bits. Note, for
-+	 * convenience and uniformity across guests, the access permissions are
-+	 * stored in KVM format (e.g.  ACC_EXEC_MASK) not the raw guest format.
-+	 */
-+	u64 *shadowed_translation;
-+
- 	/* Currently serving as active root */
- 	union {
- 		int root_count;
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 6ecdd7a41a82..24f292f3f93f 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -985,7 +985,8 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- }
- 
- /*
-- * Using the cached information from sp->gfns is safe because:
-+ * Using the information in sp->shadowed_translation (kvm_mmu_page_get_gfn()) is
-+ * safe because:
-  * - The spte has a reference to the struct page, so the pfn for a given gfn
-  *   can't change unless all sptes pointing to it are nuked first.
-  *
-@@ -1067,12 +1068,16 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
- 		 * "present" bit, as all other paging modes will create a
- 		 * read-only SPTE if pte_access is zero.
- 		 */
--		if ((!pte_access && !shadow_present_mask) || gfn != sp->gfns[i]) {
-+		if ((!pte_access && !shadow_present_mask) ||
-+		    gfn != kvm_mmu_page_get_gfn(sp, i)) {
- 			drop_spte(vcpu->kvm, &sp->spt[i]);
- 			flush = true;
- 			continue;
- 		}
- 
-+		/* Update the shadowed access bits in case they changed. */
-+		kvm_mmu_page_set_access(sp, i, pte_access);
-+
- 		sptep = &sp->spt[i];
- 		spte = *sptep;
- 		host_writable = spte & shadow_host_writable_mask;
+ 	trace_kvm_mmu_get_page(sp, created);
 -- 
 2.31.1
 
