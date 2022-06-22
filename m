@@ -2,109 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72BF6C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jun 2022 16:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 354D0C43334
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jun 2022 19:27:20 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC6A84B2DF;
-	Wed, 22 Jun 2022 12:50:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82AC84B4C6;
+	Wed, 22 Jun 2022 15:27:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id muNqjysrXSzb; Wed, 22 Jun 2022 12:50:20 -0400 (EDT)
+	with ESMTP id BGMdbYfWgxgT; Wed, 22 Jun 2022 15:27:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 892B64B2D6;
-	Wed, 22 Jun 2022 12:50:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FF854B34E;
+	Wed, 22 Jun 2022 15:27:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA53A4B2A6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 12:50:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 612464B30A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 15:27:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9jTM5oZPizOU for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Jun 2022 12:50:17 -0400 (EDT)
+ with ESMTP id uHi9k853LwAX for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Jun 2022 15:27:16 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 718CD4B28A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 12:50:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 279144B19D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 15:27:16 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1655916617;
+ s=mimecast20190719; t=1655926035;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4XfwMH9ynk+SpvE37AyJRg8bmZJpm/5NDJ42rUcbiSk=;
- b=YRxYAXGa/tNyWH7P0ZJD8p8RK5aLH5r85oF10hYLqpSebsUP2+a3tlbdgxPhL/1QrIZIOB
- 1UcVss8+7G1Wq7AWMeMV/BjxBkCv++33eBGRKgJ+UB30q/d10lxhRh7iQ3m/8kfoE52c0R
- JjnQieOAIHY2GHBB5xtxhXzHgLb6pkA=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=UetEegWFrSI4DxaQkVqPZAaYbNMpqePnjSLMmI2uAtM=;
+ b=KTMEiSQQGbeiPdwYAPtBvHbhAuCH0sqaU/zAzJPHxby7aTRkPr4DzaVF4QbQKiI7r+0aaf
+ GfaFOKxqMEfJMIdRkapXFm44rTwXt1rC6MabmgovNWiW1gbveznQ0NeY9KWcCZDL8dkr0+
+ h+HZyY/Ohz+mGMFiNQw9wWLXfyfRpbk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-668-ODdF87NzMx6s_EvIzkO7DA-1; Wed, 22 Jun 2022 12:50:16 -0400
-X-MC-Unique: ODdF87NzMx6s_EvIzkO7DA-1
-Received: by mail-ed1-f69.google.com with SMTP id
- y15-20020a056402270f00b004356adb2ab3so10197929edd.16
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 09:50:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:from:to:cc:references:in-reply-to
- :content-transfer-encoding;
- bh=4XfwMH9ynk+SpvE37AyJRg8bmZJpm/5NDJ42rUcbiSk=;
- b=sx+anUUl3XNcbA7N+bLSCCxq2CnhgLU35A8iC4AW6c+AupBcgTwXvyl+N3tMBxzeEX
- aOhZlaJgJxgdb5Q+2EpBfajmKr+S+qfrA8eohuIHS/hnCE/keUDyPsGL1XkWiK4ZjHqx
- jArnz+xDY7h9Iryorc2dFpTHOS15w8eJryHmpyfhmQhuxOZj03THk4h9UCmq8aoTOJd5
- Gv2B57Dl4d96At86mPmYoPBjNCgfS3ECoTIlRgsjpTHFDh72PfgDQdEtgEy9dmYvrLdh
- uP9nhqfN09wSEnnL2Gicx+AhnwUJ1rrTXqx6eosc90S4zp5/io/5ioT+3P2BH4VmfTv9
- oTbA==
-X-Gm-Message-State: AJIora/orf6PiMf7RWcjTwK6iXY/WjCOzvdCEIfM/7oVMuEHmNKcYW4P
- YYr7qstY6uj2P57e+qdcbRzZpbc1XZx8KKaPHQvGrEL1uHGtLGbyPsVDb/U2BF6S0M95mUQcFyF
- IKbvflTfaSnkc8XrNAaCNcInz
-X-Received: by 2002:a17:907:6d83:b0:711:e44b:714 with SMTP id
- sb3-20020a1709076d8300b00711e44b0714mr4016405ejc.392.1655916614781; 
- Wed, 22 Jun 2022 09:50:14 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sC/lvr0Tnu4XA3JL6D2PrVVpe51+uh98+vu8rkpMJw7FhS4BWe7E6W+fEXs8AE7M85oBzrWw==
-X-Received: by 2002:a17:907:6d83:b0:711:e44b:714 with SMTP id
- sb3-20020a1709076d8300b00711e44b0714mr4016380ejc.392.1655916614537; 
- Wed, 22 Jun 2022 09:50:14 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89?
- ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
- by smtp.googlemail.com with ESMTPSA id
- g5-20020a50d5c5000000b004356c0d7436sm12212090edj.42.2022.06.22.09.50.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 22 Jun 2022 09:50:12 -0700 (PDT)
-Message-ID: <41f1f405-fa2b-0022-c4ba-58a8d0ff3bad@redhat.com>
-Date: Wed, 22 Jun 2022 18:50:11 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v6 20/22] KVM: x86/mmu: Refactor drop_large_spte()
+ us-mta-464-nl_lej8DNwCY7ROTjZCaaA-1; Wed, 22 Jun 2022 15:27:12 -0400
+X-MC-Unique: nl_lej8DNwCY7ROTjZCaaA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.3])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8D5ED102F0C1;
+ Wed, 22 Jun 2022 19:27:11 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 36C8B1121314;
+ Wed, 22 Jun 2022 19:27:11 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-To: Sean Christopherson <seanjc@google.com>,
- David Matlack <dmatlack@google.com>
-References: <20220516232138.1783324-1-dmatlack@google.com>
- <20220516232138.1783324-21-dmatlack@google.com> <Yqy1v59ZDJ7EkCix@google.com>
- <4665c87b-4983-7e15-9262-290d2969b10f@redhat.com>
-In-Reply-To: <4665c87b-4983-7e15-9262-290d2969b10f@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: Albert Ou <aou@eecs.berkeley.edu>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <linux-mips@vger.kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
- <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Ben Gardon <bgardon@google.com>, maciej.szmigiero@oracle.com,
- "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: [PATCH v7 01/23] KVM: x86/mmu: Optimize MMU page cache lookup for all
+ direct SPs
+Date: Wed, 22 Jun 2022 15:26:48 -0400
+Message-Id: <20220622192710.2547152-2-pbonzini@redhat.com>
+In-Reply-To: <20220622192710.2547152-1-pbonzini@redhat.com>
+References: <20220622192710.2547152-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+Cc: maz@kernel.org, jiangshanlai@gmail.com, linux-mips@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, bgardon@google.com, dmatlack@google.com,
+ maciej.szmigiero@oracle.com, kvmarm@lists.cs.columbia.edu, pfeiner@google.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -116,184 +78,62 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 6/22/22 18:13, Paolo Bonzini wrote:
-> Even better, drop_large_spte() is always called right before 
-> kvm_mmu_get_child_sp(), so:
+From: David Matlack <dmatlack@google.com>
 
-Actually, we can even include the call from eager page splitting if
-__link_shadow_page() is the one that takes care of dropping the large
-SPTE:
+Commit fb58a9c345f6 ("KVM: x86/mmu: Optimize MMU page cache lookup for
+fully direct MMUs") skipped the unsync checks and write flood clearing
+for full direct MMUs. We can extend this further to skip the checks for
+all direct shadow pages. Direct shadow pages in indirect MMUs (i.e.
+shadow paging) are used when shadowing a guest huge page with smaller
+pages. Such direct shadow pages, like their counterparts in fully direct
+MMUs, are never marked unsynced or have a non-zero write-flooding count.
 
- From bea344e409bb8329ca69aca0a63f97537a7ec798 Mon Sep 17 00:00:00 2001
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 22 Jun 2022 12:11:44 -0400
-Subject: [PATCH] KVM: MMU: pull call to drop_large_spte() into
-  __link_shadow_page()
+Checking sp->role.direct also generates better code than checking
+direct_map because, due to register pressure, direct_map has to get
+shoved onto the stack and then pulled back off.
 
-Before allocating a child shadow page table, all callers check
-whether the parent already points to a huge page and, if so, they
-drop that SPTE.  This is done by drop_large_spte().
+No functional change intended.
 
-However, the act that requires dropping the large SPTE is the
-installation of the sp that is returned by kvm_mmu_get_child_sp(),
-which happens in __link_shadow_page().  Move the call there
-instead of having it in each and every caller.
-
-To ensure that the shadow page is not linked twice if it was
-present, do _not_ opportunistically make kvm_mmu_get_child_sp()
-idempotent: instead, return an error value if the shadow page
-already existed.  This is a bit more verbose, but clearer than
-NULL.
-
-Now that the drop_large_spte() name is not taken anymore,
-remove the two underscores in front of __drop_large_spte().
-
+Reviewed-by: Lai Jiangshan <jiangshanlai@gmail.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: David Matlack <dmatlack@google.com>
+Message-Id: <20220516232138.1783324-2-dmatlack@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 36bc49f08d60..64c1191be4ae 100644
+index 27b2a5603496..c0afb4f1c8ae 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1135,26 +1135,16 @@ static void drop_spte(struct kvm *kvm, u64 *sptep)
-  		rmap_remove(kvm, sptep);
-  }
-  
--
--static bool __drop_large_spte(struct kvm *kvm, u64 *sptep)
-+static void drop_large_spte(struct kvm *kvm, u64 *sptep)
-  {
--	if (is_large_pte(*sptep)) {
--		WARN_ON(sptep_to_sp(sptep)->role.level == PG_LEVEL_4K);
--		drop_spte(kvm, sptep);
--		return true;
--	}
--
--	return false;
--}
-+	struct kvm_mmu_page *sp;
-  
--static void drop_large_spte(struct kvm_vcpu *vcpu, u64 *sptep)
--{
--	if (__drop_large_spte(vcpu->kvm, sptep)) {
--		struct kvm_mmu_page *sp = sptep_to_sp(sptep);
-+	sp = sptep_to_sp(sptep);
-+	WARN_ON(sp->role.level == PG_LEVEL_4K);
-  
--		kvm_flush_remote_tlbs_with_address(vcpu->kvm, sp->gfn,
-+	drop_spte(kvm, sptep);
-+	kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
-  			KVM_PAGES_PER_HPAGE(sp->role.level));
--	}
-  }
-  
-  /*
-@@ -2221,6 +2211,9 @@ static struct kvm_mmu_page *kvm_mmu_get_child_sp(struct kvm_vcpu *vcpu,
-  {
-  	union kvm_mmu_page_role role;
-  
-+	if (is_shadow_present_pte(*sptep) && !is_large_pte(*sptep))
-+		return ERR_PTR(-EEXIST);
-+
-  	role = kvm_mmu_child_role(sptep, direct, access);
-  	return kvm_mmu_get_shadow_page(vcpu, gfn, role);
-  }
-@@ -2295,6 +2288,13 @@ static void __link_shadow_page(struct kvm_mmu_memory_cache *cache, u64 *sptep,
-  
-  	BUILD_BUG_ON(VMX_EPT_WRITABLE_MASK != PT_WRITABLE_MASK);
-  
-+	/*
-+	 * If an SPTE is present already, it must be a leaf and therefore
-+	 * a large one.  Drop it and flush the TLB before installing sp.
-+	 */
-+	if (is_shadow_present_pte(*sptep)
-+		drop_large_spte(vcpu->kvm, sptep);
-+
-  	spte = make_nonleaf_spte(sp->spt, sp_ad_disabled(sp));
-  
-  	mmu_spte_set(sptep, spte);
-@@ -3080,11 +3080,9 @@ static int __direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-  		if (it.level == fault->goal_level)
-  			break;
-  
--		drop_large_spte(vcpu, it.sptep);
--		if (is_shadow_present_pte(*it.sptep))
--			continue;
--
-  		sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn, true, ACC_ALL);
-+		if (sp == ERR_PTR(-EEXIST))
-+			continue;
-  
-  		link_shadow_page(vcpu, it.sptep, sp);
-  		if (fault->is_tdp && fault->huge_page_disallowed &&
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 24f292f3f93f..2448fa8d8438 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -648,15 +648,13 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
-  		gfn_t table_gfn;
-  
-  		clear_sp_write_flooding_count(it.sptep);
--		drop_large_spte(vcpu, it.sptep);
-  
--		sp = NULL;
--		if (!is_shadow_present_pte(*it.sptep)) {
--			table_gfn = gw->table_gfn[it.level - 2];
--			access = gw->pt_access[it.level - 2];
--			sp = kvm_mmu_get_child_sp(vcpu, it.sptep, table_gfn,
--						  false, access);
-+		table_gfn = gw->table_gfn[it.level - 2];
-+		access = gw->pt_access[it.level - 2];
-+		sp = kvm_mmu_get_child_sp(vcpu, it.sptep, table_gfn,
-+					  false, access);
-  
-+		if (sp != ERR_PTR(-EEXIST)) {
-  			/*
-  			 * We must synchronize the pagetable before linking it
-  			 * because the guest doesn't need to flush tlb when
-@@ -685,7 +683,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
-  		if (FNAME(gpte_changed)(vcpu, gw, it.level - 1))
-  			goto out_gpte_changed;
-  
--		if (sp)
-+		if (sp != ERR_PTR(-EEXIST))
-  			link_shadow_page(vcpu, it.sptep, sp);
-  	}
-  
-@@ -709,16 +707,15 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
-  
-  		validate_direct_spte(vcpu, it.sptep, direct_access);
-  
--		drop_large_spte(vcpu, it.sptep);
-+		sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn,
-+					  true, direct_access);
-+		if (sp == ERR_PTR(-EEXIST))
-+			continue;
-  
--		if (!is_shadow_present_pte(*it.sptep)) {
--			sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn,
--						  true, direct_access);
--			link_shadow_page(vcpu, it.sptep, sp);
--			if (fault->huge_page_disallowed &&
--			    fault->req_level >= it.level)
--				account_huge_nx_page(vcpu->kvm, sp);
--		}
-+		link_shadow_page(vcpu, it.sptep, sp);
-+		if (fault->huge_page_disallowed &&
-+		    fault->req_level >= it.level)
-+			account_huge_nx_page(vcpu->kvm, sp);
-  	}
-  
-  	if (WARN_ON_ONCE(it.level != fault->goal_level))
+@@ -2000,7 +2000,6 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 					     int direct,
+ 					     unsigned int access)
+ {
+-	bool direct_mmu = vcpu->arch.mmu->root_role.direct;
+ 	union kvm_mmu_page_role role;
+ 	struct hlist_head *sp_list;
+ 	unsigned quadrant;
+@@ -2060,7 +2059,8 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 			continue;
+ 		}
+ 
+-		if (direct_mmu)
++		/* unsync and write-flooding only apply to indirect SPs. */
++		if (sp->role.direct)
+ 			goto trace_get_page;
+ 
+ 		if (sp->unsync) {
+-- 
+2.31.1
 
-
-I'll test the resulting series and then send a v7.
-
-Paolo
 
 _______________________________________________
 kvmarm mailing list
