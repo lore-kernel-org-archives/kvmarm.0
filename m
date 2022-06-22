@@ -2,31 +2,31 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81807CCA479
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Jun 2022 19:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CEB5CCA481
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Jun 2022 19:27:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 357BF4B332;
-	Wed, 22 Jun 2022 15:27:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44E984B50E;
+	Wed, 22 Jun 2022 15:27:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qtj2Ir0BoY85; Wed, 22 Jun 2022 15:27:39 -0400 (EDT)
+	with ESMTP id KqpxVavvtjyN; Wed, 22 Jun 2022 15:27:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2545A4B4F7;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C5004B53B;
 	Wed, 22 Jun 2022 15:27:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AD914B322
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 15:27:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C9394B4AC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 15:27:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9sfXjvJj-ZNP for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id mpmb24RIZ3fc for <kvmarm@lists.cs.columbia.edu>;
  Wed, 22 Jun 2022 15:27:27 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A616D4B523
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 916C94B4F7
  for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 15:27:23 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1655926043;
@@ -34,32 +34,32 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=etp7F+nHZLGC2FUtxJOh/TJ4hbdw8PGhFaNHreYRQAk=;
- b=J+bz9NpQo0KRa0Z1qYxot/gJuZePUeM5dbIxWGBuwxInd95sNiIMoHnu4tQ9CsM2S1rAU4
- cFWALkA3SecOHymBQmdgfEmZ/6SsJ+Kn4GhASy2vCJzeoW6ChESkunussQubGT9h4vnJKQ
- YO65k+7I4NEQyJrPACr7kwFgXRw6Zjo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=Icd2bHm9cV8SV5qyT0h7qP6LKpzoOygbXj7B8SllL4s=;
+ b=RVBhdLdD3a//usvqj2ZEGIGSxekLevU1f9OfI74YTpmGZPqFECcD2UttGUNtiqUENSeeDJ
+ +3IGAqXFBIhST+BLqZip9hLKly5W0cfUL7Hw0LlMVO8dtAFc/ovHTmOAiUeIWPz296hRRH
+ GJ5UJpDyJpNKCw+Du6LrFM1sOmeuPR4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-2-AdnGv48ePD-TYpFwLVRxow-1; Wed, 22 Jun 2022 15:27:19 -0400
-X-MC-Unique: AdnGv48ePD-TYpFwLVRxow-1
+ us-mta-201-vlLOGiXmNVenQCgvNxbWJA-1; Wed, 22 Jun 2022 15:27:19 -0400
+X-MC-Unique: vlLOGiXmNVenQCgvNxbWJA-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com
  [10.11.54.7])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B0548811E80;
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 533E33810784;
  Wed, 22 Jun 2022 19:27:18 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5B3F1141510C;
- Wed, 22 Jun 2022 19:27:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F1B18141510C;
+ Wed, 22 Jun 2022 19:27:17 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
-Subject: [PATCH v7 19/23] KVM: x86/mmu: Zap collapsible SPTEs in shadow MMU at
- all possible levels
-Date: Wed, 22 Jun 2022 15:27:06 -0400
-Message-Id: <20220622192710.2547152-20-pbonzini@redhat.com>
+Subject: [PATCH v7 18/23] KVM: x86/mmu: Extend make_huge_page_split_spte() for
+ the shadow MMU
+Date: Wed, 22 Jun 2022 15:27:05 -0400
+Message-Id: <20220622192710.2547152-19-pbonzini@redhat.com>
 In-Reply-To: <20220622192710.2547152-1-pbonzini@redhat.com>
 References: <20220622192710.2547152-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -85,65 +85,102 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: David Matlack <dmatlack@google.com>
 
-Currently KVM only zaps collapsible 4KiB SPTEs in the shadow MMU. This
-is fine for now since KVM never creates intermediate huge pages during
-dirty logging. In other words, KVM always replaces 1GiB pages directly
-with 4KiB pages, so there is no reason to look for collapsible 2MiB
-pages.
+Currently make_huge_page_split_spte() assumes execute permissions can be
+granted to any 4K SPTE when splitting huge pages. This is true for the
+TDP MMU but is not necessarily true for the shadow MMU, since KVM may be
+shadowing a non-executable huge page.
 
-However, this will stop being true once the shadow MMU participates in
-eager page splitting. During eager page splitting, each 1GiB is first
-split into 2MiB pages and then those are split into 4KiB pages. The
-intermediate 2MiB pages may be left behind if an error condition causes
-eager page splitting to bail early.
+To fix this, pass in the role of the child shadow page where the huge
+page will be split and derive the execution permission from that.  This
+is correct because huge pages are always split with direct shadow page
+and thus the shadow page role contains the correct access permissions.
 
 No functional change intended.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
-Message-Id: <20220516232138.1783324-20-dmatlack@google.com>
+Message-Id: <20220516232138.1783324-19-dmatlack@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+ arch/x86/kvm/mmu/spte.c    | 15 +++++++--------
+ arch/x86/kvm/mmu/spte.h    |  4 ++--
+ arch/x86/kvm/mmu/tdp_mmu.c |  2 +-
+ 3 files changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 13a059ad5dc7..36bc49f08d60 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6154,18 +6154,25 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 	return need_tlb_flush;
- }
- 
-+static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
-+					   const struct kvm_memory_slot *slot)
-+{
-+	/*
-+	 * Note, use KVM_MAX_HUGEPAGE_LEVEL - 1 since there's no need to zap
-+	 * pages that are already mapped at the maximum possible level.
-+	 */
-+	if (slot_handle_level(kvm, slot, kvm_mmu_zap_collapsible_spte,
-+			      PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL - 1,
-+			      true))
-+		kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
-+}
-+
- void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
- 				   const struct kvm_memory_slot *slot)
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index db294c1beea2..fb1f17504138 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -246,11 +246,10 @@ static u64 make_spte_executable(u64 spte)
+  * This is used during huge page splitting to build the SPTEs that make up the
+  * new page table.
+  */
+-u64 make_huge_page_split_spte(struct kvm *kvm, u64 huge_spte, int huge_level,
++u64 make_huge_page_split_spte(struct kvm *kvm, u64 huge_spte, union kvm_mmu_page_role role,
+ 			      int index)
  {
- 	if (kvm_memslots_have_rmaps(kvm)) {
- 		write_lock(&kvm->mmu_lock);
--		/*
--		 * Zap only 4k SPTEs since the legacy MMU only supports dirty
--		 * logging at a 4k granularity and never creates collapsible
--		 * 2m SPTEs during dirty logging.
--		 */
--		if (slot_handle_level_4k(kvm, slot, kvm_mmu_zap_collapsible_spte, true))
--			kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
-+		kvm_rmap_zap_collapsible_sptes(kvm, slot);
- 		write_unlock(&kvm->mmu_lock);
+ 	u64 child_spte;
+-	int child_level;
+ 
+ 	if (WARN_ON_ONCE(!is_shadow_present_pte(huge_spte)))
+ 		return 0;
+@@ -259,23 +258,23 @@ u64 make_huge_page_split_spte(struct kvm *kvm, u64 huge_spte, int huge_level,
+ 		return 0;
+ 
+ 	child_spte = huge_spte;
+-	child_level = huge_level - 1;
+ 
+ 	/*
+ 	 * The child_spte already has the base address of the huge page being
+ 	 * split. So we just have to OR in the offset to the page at the next
+ 	 * lower level for the given index.
+ 	 */
+-	child_spte |= (index * KVM_PAGES_PER_HPAGE(child_level)) << PAGE_SHIFT;
++	child_spte |= (index * KVM_PAGES_PER_HPAGE(role.level)) << PAGE_SHIFT;
+ 
+-	if (child_level == PG_LEVEL_4K) {
++	if (role.level == PG_LEVEL_4K) {
+ 		child_spte &= ~PT_PAGE_SIZE_MASK;
+ 
+ 		/*
+-		 * When splitting to a 4K page, mark the page executable as the
+-		 * NX hugepage mitigation no longer applies.
++		 * When splitting to a 4K page where execution is allowed, mark
++		 * the page executable as the NX hugepage mitigation no longer
++		 * applies.
+ 		 */
+-		if (is_nx_huge_page_enabled(kvm))
++		if ((role.access & ACC_EXEC_MASK) && is_nx_huge_page_enabled(kvm))
+ 			child_spte = make_spte_executable(child_spte);
  	}
  
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index 256f90587e8d..b5c855f5514f 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -421,8 +421,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+ 	       u64 old_spte, bool prefetch, bool can_unsync,
+ 	       bool host_writable, u64 *new_spte);
+-u64 make_huge_page_split_spte(struct kvm *kvm, u64 huge_spte, int huge_level,
+-			      int index);
++u64 make_huge_page_split_spte(struct kvm *kvm, u64 huge_spte,
++		      	      union kvm_mmu_page_role role, int index);
+ u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
+ u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access);
+ u64 mark_spte_for_access_track(u64 spte);
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 522e2532343b..f3a430d64975 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1478,7 +1478,7 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
+ 	 * not been linked in yet and thus is not reachable from any other CPU.
+ 	 */
+ 	for (i = 0; i < SPTE_ENT_PER_PAGE; i++)
+-		sp->spt[i] = make_huge_page_split_spte(kvm, huge_spte, level, i);
++		sp->spt[i] = make_huge_page_split_spte(kvm, huge_spte, sp->role, i);
+ 
+ 	/*
+ 	 * Replace the huge spte with a pointer to the populated lower level
 -- 
 2.31.1
 
