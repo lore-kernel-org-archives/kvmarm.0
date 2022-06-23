@@ -2,68 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1511EC43334
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Jun 2022 07:30:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6975BC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Jun 2022 07:30:31 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 52AE14B34B;
-	Thu, 23 Jun 2022 03:30:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 03B3F4B417;
+	Thu, 23 Jun 2022 03:30:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id f-PY+6tyVT7A; Thu, 23 Jun 2022 03:30:28 -0400 (EDT)
+	with ESMTP id zlwnG-tDaTLn; Thu, 23 Jun 2022 03:30:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 363C14B32C;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78F4B4B3C4;
 	Thu, 23 Jun 2022 03:30:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 06B924B253
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 22:19:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FF8E4B381
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 22:19:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e8tsYGf0dAv4 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Jun 2022 22:19:36 -0400 (EDT)
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com
- [209.85.128.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 91AA64B19F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 22:19:36 -0400 (EDT)
-Received: by mail-yw1-f201.google.com with SMTP id
- 00721157ae682-31838c41186so36748947b3.23
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 19:19:36 -0700 (PDT)
+ with ESMTP id IutsL83V9sEz for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Jun 2022 22:19:40 -0400 (EDT)
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
+ [209.85.219.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D2FD24B278
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 22:19:40 -0400 (EDT)
+Received: by mail-yb1-f202.google.com with SMTP id
+ a8-20020a25a188000000b0066839c45fe8so16027247ybi.17
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Jun 2022 19:19:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=clGwED0aj4iCkpRX962hKSp2BNMhn+u4O4Dfvr+4TFo=;
- b=QIc7ryIuzZq7OzN7qncavyfDB+dbKXmztSbltzJfaHp1hfv5Y5C7ooLKoq0+zPKBFW
- Yb0/BwS6ZEfxF45IEKThJ2MueA04/+OqWzX470xd1LnNts5nGxalTSLvPuyQYFShfxVY
- fr4wYm+DZCv+ppd68WfEA3gHFWzd+l9k/IeA3ejN3UEhM2Mgzid5sCvby/eJdNVuWRpQ
- T0hYRgEzg4XuwmsYlfvFW+IIAB7fjU1loFiyTbwdYIVKiDrgd9GjTDFXVUeSo350hrx5
- PUr8oLhkHA9+OABNIyny8ozoHdOiM1g4AmYdxtdgzxsW7Kh9yYaDEBQC7KQPY5UXS7ff
- SqLg==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=qmRSFVhsEhDBpfnqm4N8Fhb131UT2F+11PJ2keCwIs4=;
+ b=qrU4bfPKoBkwTTiKfPve9s0Kfjp8vuFN1z7yGqlBJDfwPofkgZxH2msgkZnA46WpIg
+ xG8zlJh5lI5v7J36zFE22Nf4NWZoPrVMg2ZGyQAjnuv5G1AZbdvGSHrUyzMRK9Md+7ud
+ 1l+fT1dftAhQYN7yJbaLAe0h/bU/teWnLgJkcRE+HPWctxwxdny1yeGSXwyiJLs2wifH
+ kRrK6R/eCfVs5VOt4N6yOFX7UOnpfqC0hY/mE58OymHm0B7puwmwgCi+WonKm5WK/X0+
+ BSndrmaGkVBWfm99WMNnpXqmrQMZdXDd+7IJAb0CsRMbaBZlDHus7yiwLKlGb0ZGx+r/
+ LX5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=clGwED0aj4iCkpRX962hKSp2BNMhn+u4O4Dfvr+4TFo=;
- b=wnlkbwgNISt/2nkFlQghAx6i39b6wDulwUvtTZVThjnhxZWqzf6HjMoFrgrUIt0C2H
- 2KXD619ynDzbDq98YN8+BqbolFCJdpiJYhbJC/qQX27Dq1zoYameDP3Z8HX/ZzUSbdh7
- v0e3V9izHlYMWebUUSpfsBWwLBCq3yVFyQsKdZfmODslk8g38tD1nZ2KaYFm1K9OPIrj
- uhcpT/BLtL3MTd66v7NtmhQgROk9zDtpVFDv/+r93ejyNoufCnI98e3dKRVaMWt6MLMo
- mPqCBmcbcCpEdH7hnDzKTHtOfwkGmMejYuxOJPbtXrbj4N4j+p2Uz3v0jG5mZt2GM/+I
- d1Mw==
-X-Gm-Message-State: AJIora8j/oZ3/MuPCrNq6p92/b9uxOIHOABgMRXB1DQcwuEFawg13UcH
- Srsj8A8m3AhoREd2st0SxGjybJir+lF+kbObEzpW88fcBdvHCrVZdGs8c+tjh13u6MN5zSFh0cP
- 5koEC2XmtI5VIRzs4uQi3k9AbSMQXOmL97FyNFDB3MAVluaC16dIf4WuvDsth8w==
-X-Google-Smtp-Source: AGRyM1tFAzIf0LizFYNaF+FpbBnP7KTyC21L9xOk3A4wFYiTKAd03Hngi8vpnd587mAKhdzQ+Cp3fcs=
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=qmRSFVhsEhDBpfnqm4N8Fhb131UT2F+11PJ2keCwIs4=;
+ b=sW3OoTwDtJ/LP8Felvqvz3LBpnYxL8Kwurv1IpVOOXxhDt5ZSCMGZCbmf3uF/OQRZu
+ fe9GWt4AjUgPMsvNl9gomcTsPFHtI37rknd6Idugem63z9iZOfnRmGLOSKh4MdVY/h0U
+ pvfZnin34m99zzGFJSAVe1XQCGYKh8j0s/1ubvl9/mcC1s8gceELCO9xOfRObCQuzVoQ
+ B9jeDS5MC+Q3sdbMMffEG5I36GJ5vsvqPODVzSMZbmuT6EOy0QelxqO3WHkQVrIqILMm
+ Wgbm0mSJbzNfR/e/JRN+mlAY62/ScK8RledmqUBPWBt1+O7HEs3lCp7HhZPy/VlP+yfr
+ qzMw==
+X-Gm-Message-State: AJIora+NnF5ILKLB8Vi8eoGRR1vVzrvifJOQjCFN3MgRkCmH74k34O8t
+ a42fsRUjSO2vIVj7pu2pbz+YE9ebffWCSktH8D0R4q3+TBw0kcemHCTeNGhmaEoYonNKV/OhD+p
+ 4/St4s4Tsof7iUzRdShLOxU+qaxeOKrc+I4i5ik93Pc2c7opH2bs+kZp702OEbA==
+X-Google-Smtp-Source: AGRyM1vvw84U2jyg/dWdtxTfS7KweL0nv+g/AhyHvwsGSckCZTqHtjS95hVvHN66mkERZ2IvAJ3TsBk=
 X-Received: from pcc-desktop.svl.corp.google.com
  ([2620:15c:2ce:200:ba6f:123c:d287:a160])
- (user=pcc job=sendgmr) by 2002:a81:9c47:0:b0:313:31e7:dc16 with SMTP id
- n7-20020a819c47000000b0031331e7dc16mr7974663ywa.227.1655950776012; Wed, 22
- Jun 2022 19:19:36 -0700 (PDT)
-Date: Wed, 22 Jun 2022 19:19:23 -0700
-Message-Id: <20220623021926.3443240-1-pcc@google.com>
+ (user=pcc job=sendgmr) by 2002:a25:8887:0:b0:669:97f5:d0b8 with SMTP id
+ d7-20020a258887000000b0066997f5d0b8mr5089027ybl.432.1655950780321; Wed, 22
+ Jun 2022 19:19:40 -0700 (PDT)
+Date: Wed, 22 Jun 2022 19:19:25 -0700
+In-Reply-To: <20220623021926.3443240-1-pcc@google.com>
+Message-Id: <20220623021926.3443240-3-pcc@google.com>
 Mime-Version: 1.0
+References: <20220623021926.3443240-1-pcc@google.com>
 X-Mailer: git-send-email 2.37.0.rc0.104.g0611611a94-goog
-Subject: [PATCH 0/3] KVM: arm64: support MTE in protected VMs
+Subject: [PATCH 2/3] KVM: arm64: disown unused reserved-memory regions
 From: Peter Collingbourne <pcc@google.com>
 To: kvmarm@lists.cs.columbia.edu
 X-Mailman-Approved-At: Thu, 23 Jun 2022 03:30:27 -0400
@@ -88,54 +91,102 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+The meaning of no-map on a reserved-memory node is as follows:
 
-This patch series contains a proposed extension to pKVM that allows MTE
-to be exposed to the protected guests. It is based on the base pKVM
-series previously sent to the list [1] and later rebased to 5.19-rc2
-and uploaded to [2].
+      Indicates the operating system must not create a virtual mapping
+      of the region as part of its standard mapping of system memory,
+      nor permit speculative access to it under any circumstances other
+      than under the control of the device driver using the region.
 
-This series takes precautions against host compromise of the guests
-via direct access to their tag storage, by preventing the host from
-accessing the tag storage via stage 2 page tables. The device tree
-must describe the physical memory address of the tag storage, if any,
-and the memory nodes must declare that the tag storage location is
-described. Otherwise, the MTE feature is disabled in protected guests.
+If there is no compatible property, there is no device driver, so the
+host kernel has no business accessing the reserved-memory region. Since
+these regions may represent a route through which the host kernel
+can gain additional privileges, disown any such memory regions before
+deprivileging ourselves.
 
-Now that we can easily do so, we also prevent the host from accessing
-any unmapped reserved-memory regions without a driver, as the host
-has no business accessing that memory.
+Signed-off-by: Peter Collingbourne <pcc@google.com>
+---
+ arch/arm64/kvm/arm.c | 46 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
-A proposed extension to the devicetree specification is available at
-[3], a patched version of QEMU that produces the required device tree
-nodes is available at [4] and a patched version of the crosvm hypervisor
-that enables MTE is available at [5].
-
-[1] https://lore.kernel.org/all/20220519134204.5379-1-will@kernel.org/
-[2] https://android-kvm.googlesource.com/linux/ for-upstream/pkvm-base-v2
-[3] https://github.com/pcc/devicetree-specification mte-alloc
-[4] https://github.com/pcc/qemu mte-shared-alloc
-[5] https://chromium-review.googlesource.com/c/chromiumos/platform/crosvm/+/3719324
-
-Peter Collingbourne (3):
-  KVM: arm64: add a hypercall for disowning pages
-  KVM: arm64: disown unused reserved-memory regions
-  KVM: arm64: allow MTE in protected VMs if the tag storage is known
-
- arch/arm64/include/asm/kvm_asm.h              |  1 +
- arch/arm64/include/asm/kvm_host.h             |  6 ++
- arch/arm64/include/asm/kvm_pkvm.h             |  4 +-
- arch/arm64/kernel/image-vars.h                |  3 +
- arch/arm64/kvm/arm.c                          | 83 ++++++++++++++++++-
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |  1 +
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  9 ++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 11 +++
- arch/arm64/kvm/hyp/nvhe/pkvm.c                |  8 +-
- arch/arm64/kvm/hyp/pgtable.c                  |  5 +-
- arch/arm64/kvm/mmu.c                          |  4 +-
- 12 files changed, 126 insertions(+), 10 deletions(-)
-
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index db7cbca6ace4..38f0900b7ddb 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -4,6 +4,7 @@
+  * Author: Christoffer Dall <c.dall@virtualopensystems.com>
+  */
+ 
++#include <linux/acpi.h>
+ #include <linux/bug.h>
+ #include <linux/cpu_pm.h>
+ #include <linux/entry-kvm.h>
+@@ -12,6 +13,7 @@
+ #include <linux/kvm_host.h>
+ #include <linux/list.h>
+ #include <linux/module.h>
++#include <linux/of.h>
+ #include <linux/vmalloc.h>
+ #include <linux/fs.h>
+ #include <linux/mman.h>
+@@ -1907,6 +1909,48 @@ static bool init_psci_relay(void)
+ 	return true;
+ }
+ 
++static void disown_reserved_memory(struct device_node *node)
++{
++	int addr_cells = of_n_addr_cells(node);
++	int size_cells = of_n_size_cells(node);
++	const __be32 *reg, *end;
++	int len;
++
++	reg = of_get_property(node, "reg", &len);
++	if (len % (4 * (addr_cells + size_cells)))
++		return;
++
++	end = reg + (len / 4);
++	while (reg != end) {
++		u64 addr, size;
++
++		addr = of_read_number(reg, addr_cells);
++		reg += addr_cells;
++		size = of_read_number(reg, size_cells);
++		reg += size_cells;
++
++		kvm_call_hyp_nvhe(__pkvm_disown_pages, addr, size);
++	}
++}
++
++static void kvm_reserved_memory_init(void)
++{
++	struct device_node *parent, *node;
++
++	if (!acpi_disabled || !is_protected_kvm_enabled())
++		return;
++
++	parent = of_find_node_by_path("/reserved-memory");
++	if (!parent)
++		return;
++
++	for_each_child_of_node(parent, node) {
++		if (!of_get_property(node, "compatible", NULL) &&
++		    of_get_property(node, "no-map", NULL))
++			disown_reserved_memory(node);
++	}
++}
++
+ static int init_subsystems(void)
+ {
+ 	int err = 0;
+@@ -1947,6 +1991,8 @@ static int init_subsystems(void)
+ 
+ 	kvm_register_perf_callbacks(NULL);
+ 
++	kvm_reserved_memory_init();
++
+ out:
+ 	if (err || !is_protected_kvm_enabled())
+ 		on_each_cpu(_kvm_arch_hardware_disable, NULL, 1);
 -- 
 2.37.0.rc0.104.g0611611a94-goog
 
