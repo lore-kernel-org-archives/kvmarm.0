@@ -2,66 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 201F3CCA47E
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Jun 2022 13:10:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 456C1C43334
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Jun 2022 13:12:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 971D24B3B6;
-	Thu, 23 Jun 2022 09:10:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5BBA4B376;
+	Thu, 23 Jun 2022 09:12:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ouPnF6N3u7NQ; Thu, 23 Jun 2022 09:10:29 -0400 (EDT)
+	with ESMTP id HoCB+-EEADwd; Thu, 23 Jun 2022 09:12:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DD284B382;
-	Thu, 23 Jun 2022 09:10:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B22174B37C;
+	Thu, 23 Jun 2022 09:12:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E65724B377
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jun 2022 09:10:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 109684B376
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jun 2022 09:12:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 21c6A-bRm6xL for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Jun 2022 09:10:26 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 626F04B376
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jun 2022 09:10:26 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1655989825;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=rmoM2sqrNH4gB4OMADyCrtt+JYV77lbslouxb07UaD0=;
- b=ZOv9Z+CamERy+09igdSDh8FrfwnlgW7YgEWF3MROYaaIf55Eunupitv3JbbEU+Ow0T+wZx
- St6iimL5PjE+z1fNmxu7NEG+OG3MvC4zgn9y7PiyBg/ZyqY6sLbyZoGeCE3tvc17/B8Jhi
- 5e57xREOPI1ocsIHSKOxDYg1lXSSLUs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-82-l24YVwCaORSxh1PyRf7X7Q-1; Thu, 23 Jun 2022 09:10:22 -0400
-X-MC-Unique: l24YVwCaORSxh1PyRf7X7Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com
- [10.11.54.1])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B9A538032F6;
- Thu, 23 Jun 2022 13:10:21 +0000 (UTC)
-Received: from gator.redhat.com (unknown [10.40.193.109])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 58C5940CF8EE;
- Thu, 23 Jun 2022 13:10:18 +0000 (UTC)
-From: Andrew Jones <drjones@redhat.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH kvm-unit-tests] MAINTAINERS: Change drew's email address
-Date: Thu, 23 Jun 2022 15:10:17 +0200
-Message-Id: <20220623131017.670589-1-drjones@redhat.com>
+ with ESMTP id VobDYOtfOLIO for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Jun 2022 09:11:58 -0400 (EDT)
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com
+ [209.85.218.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9CE154B329
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jun 2022 09:11:58 -0400 (EDT)
+Received: by mail-ej1-f42.google.com with SMTP id ay16so21630803ejb.6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jun 2022 06:11:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=44rAwtd104zTF6dbWV55JEwGL2BlYGz1AUagrivcDtc=;
+ b=piKrs1fQPx5PzIuxBtvL8WJ+ocepEXzMVOvQ+r6cSg5qEzEerxBPDNCRzEFSpmHsSd
+ H/7xc3RxTA72PAXq+GCknvZV+fMuWqC7x/2zMuJYHWRFzUrNfUfJQj6QRyAGBRgSJPMU
+ y1RTLYyMHy1BsEU/SqfTGz0vUcT4mnUhvBOcnhUN7+Rp9ZtTmRb2foY70s71EDNnizvO
+ jr97BogCpA6Ba5P2VFa3WcJjHFkK1y4UrlbIpmKlKXdfZqpWFlK0cmjfVfhL2tOkDPW3
+ Zi8nXg2aPPMmJ8rqlh5eUhhVVv2WciZFnH73jNHTHyPpURR00aUSAQGk4T2XEA2hR/a9
+ I9rQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=44rAwtd104zTF6dbWV55JEwGL2BlYGz1AUagrivcDtc=;
+ b=aM2EtFnIM3BYPTXHiRAIw0wyN9jjtZvjFklasUNzwaSvrsJ5U3Xxe7hL3LM/8Boiz+
+ W3I+DED+kjEixSCbFot63t7Jr8HDleEXDBsoudvxiphrB1EkfKUO+/nkLToUAcu5YAEz
+ g5wHf6uR0zWbQWuHRUnXrNCFyHlTL/r1eGC5fshLA1CShz15SU7N3FnlA5iQ42QrGasV
+ ivD4YsVHvZ/OkWDNVbkSoMOwN9yo8dmFl54q6tZmnBBBwIAXTbpwhjAop/oJyhXdZ4pF
+ 52C1yceQGIONqBKm/dHHQFSwvXi3Mx7aXoK+kOZrhNFM6M0n9Ddh/hFJtzXB7/utwOMq
+ ZbTA==
+X-Gm-Message-State: AJIora+qsWrevnCdZypk4co0TdsuuQP4BdOyz/MlhD1H2rGYxaT7mrtx
+ 4i5N0I09nv1wWWOkez359ZQ2/g==
+X-Google-Smtp-Source: AGRyM1s8IYJ+YI+ZlWvmtnpwUn/+h1WW0BjzOTyTurp9rd8PjvArrkWRTFjF180z3zStfWcrby+HCw==
+X-Received: by 2002:a17:906:5053:b0:70d:a0cc:b3fd with SMTP id
+ e19-20020a170906505300b0070da0ccb3fdmr8007855ejk.162.1655989917478; 
+ Thu, 23 Jun 2022 06:11:57 -0700 (PDT)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com.
+ [34.90.227.64]) by smtp.gmail.com with ESMTPSA id
+ bx25-20020a170906a1d900b006fe8d8c54a7sm10873956ejb.87.2022.06.23.06.11.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 23 Jun 2022 06:11:57 -0700 (PDT)
+Date: Thu, 23 Jun 2022 13:11:54 +0000
+From: Quentin Perret <qperret@google.com>
+To: Peter Collingbourne <pcc@google.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: add a hypercall for disowning pages
+Message-ID: <YrRmmrY24Pv6hyAO@google.com>
+References: <20220623021926.3443240-1-pcc@google.com>
+ <20220623021926.3443240-2-pcc@google.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
-Cc: maz@kernel.org, thuth@redhat.com, qemu-devel@nongnu.org,
- nikos.nikoleris@arm.com, qemu-arm@nongnu.org, andre.przywara@arm.com,
- pbonzini@redhat.com
+Content-Disposition: inline
+In-Reply-To: <20220623021926.3443240-2-pcc@google.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, Andy Lutomirski <luto@amacapital.net>,
+ Evgenii Stepanov <eugenis@google.com>, Michael Roth <michael.roth@amd.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,48 +93,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As a side effect of leaving Red Hat I won't be able to use my Red Hat
-email address anymore. I'm also changing the name of my gitlab group.
+Hi Peter,
 
-Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- MAINTAINERS | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+On Wednesday 22 Jun 2022 at 19:19:24 (-0700), Peter Collingbourne wrote:
+> @@ -677,9 +678,9 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
+>  	/*
+>  	 * The refcount tracks valid entries as well as invalid entries if they
+>  	 * encode ownership of a page to another entity than the page-table
+> -	 * owner, whose id is 0.
+> +	 * owner, whose id is 0, or NOBODY, which does not correspond to a page-table.
+>  	 */
+> -	return !!pte;
+> +	return !!pte && pte != kvm_init_invalid_leaf_owner(PKVM_ID_NOBODY);
+>  }
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index bab08e740332..5e4c7bd70786 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -55,7 +55,7 @@ Maintainers
- -----------
- M: Paolo Bonzini <pbonzini@redhat.com>
- M: Thomas Huth <thuth@redhat.com>
--M: Andrew Jones <drjones@redhat.com>
-+M: Andrew Jones <andrew.jones@linux.dev>
- S: Supported
- L: kvm@vger.kernel.org
- T: https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
-@@ -64,14 +64,14 @@ Architecture Specific Code:
- ---------------------------
- 
- ARM
--M: Andrew Jones <drjones@redhat.com>
-+M: Andrew Jones <andrew.jones@linux.dev>
- S: Supported
- L: kvm@vger.kernel.org
- L: kvmarm@lists.cs.columbia.edu
- F: arm/
- F: lib/arm/
- F: lib/arm64/
--T: https://gitlab.com/rhdrjones/kvm-unit-tests.git
-+T: https://gitlab.com/drew-jones/kvm-unit-tests.git
- 
- POWERPC
- M: Laurent Vivier <lvivier@redhat.com>
--- 
-2.34.3
+I'm not sure to understand this part? By not refcounting the PTEs that
+are annotated with PKVM_ID_NOBODY, the page-table page that contains
+them may be freed at some point. And when that happens, I don't see how
+the hypervisor will remember to block host accesses to the disowned
+pages.
 
+Cheers,
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
