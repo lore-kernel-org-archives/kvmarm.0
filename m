@@ -2,69 +2,93 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 096A2C43334
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Jun 2022 07:42:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA8EDC43334
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Jun 2022 12:16:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71A9D4B3C0;
-	Thu, 23 Jun 2022 03:42:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 347FE4B3B6;
+	Thu, 23 Jun 2022 08:16:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dL63uSgBN9aQ; Thu, 23 Jun 2022 03:42:12 -0400 (EDT)
+	with ESMTP id Lh+YDwNGAhTL; Thu, 23 Jun 2022 08:16:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BA3E4B3EF;
-	Thu, 23 Jun 2022 03:42:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D4EA40B03;
+	Thu, 23 Jun 2022 08:16:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 047DB4B35D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jun 2022 03:42:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E9FE740B03
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jun 2022 08:16:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1MGhpasHWVNm for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Jun 2022 03:42:09 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E7ABA4B2A6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jun 2022 03:42:09 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id BCB05619EC;
- Thu, 23 Jun 2022 07:42:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A6E8C3411B;
- Thu, 23 Jun 2022 07:42:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1655970128;
- bh=WML9r1cd5wF+m6iAIdB7bqD8vB6+5Fw1VRXN0c4B/rg=;
- h=From:To:Cc:Subject:Date:From;
- b=Y4SlPpdJ166I/PwZ//gpYEgSmN23VZGi5nLRncVg1iYd48LBXZW/JIzklAy6pBQvb
- Klmt3aI0DpKlV1j22lKbtNUVLnol6ebXN+BHlF8z/IWlloT5R65Xr1bJbaSpqzOyei
- cSx6WwGJI75qd1WyRgBDwOV8gxGm5b4rME1zcBOeK8qgeSb5SEYtV65uTy0/nougwj
- 5awBF/DPxeSeKfALwwzwl2Czgv9QKQ3lOH+Y68ah6ehJRi/J/wIKH3fzKweaDE97qI
- KnNA3AR/Ao3b50jAgKEuJDss7O1O2xfK62UQyZgH4n9seaiMszp5nAKTEGEUViG6TQ
- m4beyr0ibv6rQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1o4HTY-002WLt-Hu;
- Thu, 23 Jun 2022 08:42:05 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [GIT PULL] KVM/arm64 fixes for 5.19, take #2
-Date: Thu, 23 Jun 2022 08:41:58 +0100
-Message-Id: <20220623074158.1429243-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+ with ESMTP id 5BX5HCZcEi-3 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Jun 2022 08:16:21 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C686E4089E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jun 2022 08:16:21 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1655986581;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=g5bzHytzbyt3LJ4/dxkxeQpreFgNZKacxErPJ4wA59E=;
+ b=B0LfD2kV0x229827MmnrCxoND3KXyjEh8upwnejclhbooyx2BeSUcpFXoYA4SB3TxqUO8N
+ gOvmYPBpMT6H+wG3C0RKvM5/2mmEdg7K6NyTR7NCGm/YUcnF0bZoDIH73+bC7SVTrnKyHa
+ 2Udv29QhVchWNBaPGvT7JExwzm5mhmY=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-201-yK_4-uxJNN2cASOef3wsmw-1; Thu, 23 Jun 2022 08:16:20 -0400
+X-MC-Unique: yK_4-uxJNN2cASOef3wsmw-1
+Received: by mail-ed1-f69.google.com with SMTP id
+ m8-20020a056402430800b00435cfa7c6d1so1312154edc.9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jun 2022 05:16:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+ :content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=g5bzHytzbyt3LJ4/dxkxeQpreFgNZKacxErPJ4wA59E=;
+ b=s4uiRqDHqybRh37WygCkmdMO9W6kWwPjNOfCq7adND6LM+piMOYdU6drJUrezeim+L
+ 39ZV6SmDA2A4cGGFnB3BjB0IVbLCOZKAfvj+aOiAjyCiXZnJLhyxYUWoUhUAo3X/GEJl
+ uJXm1EtKcitHuAB80mrE8mz3XlUQjbiJgYKLVLgZsT5qO3EuEv+S39Suq24c1l+3ACWO
+ 2RHYk7VvrUR2TQ5bDG//N1RwZMqQUwfcSnOhMdgzSncbY9QLeomPyLiKYySjIGXO1Fve
+ ScomJW3gHPtN3FRqpT6xvSn7F3ACbPdW1nun4Tx7jUFeiSjisxJzfaw7TP0M5Y63B1gS
+ VxEA==
+X-Gm-Message-State: AJIora8KZmNO0Fqaop2WAk5WwcMHwrz1P6gU0M787xnI0fOhlAHmlMlN
+ brPqDWhw0uUfHzifSujWz2+JWr5RVO65rim5+QrBJzbX/RuU/NnHXD5nCH9YvHlov18bRtuLxXh
+ kUxl5jyUlrkR2dbRWJs5AdGQe
+X-Received: by 2002:a05:6402:3546:b0:42e:2f58:2c90 with SMTP id
+ f6-20020a056402354600b0042e2f582c90mr10416197edd.84.1655986579146; 
+ Thu, 23 Jun 2022 05:16:19 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1s5GbGLU/i4oYJJek4q+iHhJv6ku0wmJbThXLZyDHJYQGqHKnaW+A0I0asdOmN8xuRbLwQSQA==
+X-Received: by 2002:a05:6402:3546:b0:42e:2f58:2c90 with SMTP id
+ f6-20020a056402354600b0042e2f582c90mr10416167edd.84.1655986578936; 
+ Thu, 23 Jun 2022 05:16:18 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89?
+ ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+ by smtp.googlemail.com with ESMTPSA id
+ d8-20020a056402000800b00435a912358dsm3953372edu.30.2022.06.23.05.16.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 23 Jun 2022 05:16:18 -0700 (PDT)
+Message-ID: <795f73d0-9f88-28c9-9d8f-41e931f51230@redhat.com>
+Date: Thu, 23 Jun 2022 14:16:16 +0200
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, catalin.marinas@arm.com,
- rppt@kernel.org, oupton@google.com, qperret@google.com, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.19, take #2
+To: Marc Zyngier <maz@kernel.org>
+References: <20220623074158.1429243-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220623074158.1429243-1-maz@kernel.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
 Cc: kernel-team@android.com, kvm@vger.kernel.org,
  Catalin Marinas <catalin.marinas@arm.com>,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -80,51 +104,18 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Paolo,
+On 6/23/22 09:41, Marc Zyngier wrote:
+>    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.19-2
 
-Only two minor items this time around: a fix for a kmemleak regression
-courtesy of Quentin, and the addition of Oliver Upton as an official
-reviewer for the arm64 side.
+Pulled, thanks.
 
-Please pull,
+Paolo
 
-	M.
-
-
-The following changes since commit bcbfb588cf323929ac46767dd14e392016bbce04:
-
-  KVM: arm64: Drop stale comment (2022-06-09 13:24:02 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.19-2
-
-for you to fetch changes up to cbc6d44867a24130ee528c20cffcbc28b3e09693:
-
-  KVM: arm64: Add Oliver as a reviewer (2022-06-17 09:49:41 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 5.19, take #2
-
-- Fix a regression with pKVM when kmemleak is enabled
-
-- Add Oliver Upton as an official KVM/arm64 reviewer
-
-----------------------------------------------------------------
-Marc Zyngier (1):
-      KVM: arm64: Add Oliver as a reviewer
-
-Quentin Perret (1):
-      KVM: arm64: Prevent kmemleak from accessing pKVM memory
-
- MAINTAINERS          | 1 +
- arch/arm64/kvm/arm.c | 6 +++---
- 2 files changed, 4 insertions(+), 3 deletions(-)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
