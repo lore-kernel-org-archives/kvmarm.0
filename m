@@ -2,76 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85CADCCA47F
-	for <kvmarm@archiver.kernel.org>; Sat, 25 Jun 2022 08:53:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17135C433EF
+	for <kvmarm@archiver.kernel.org>; Sat, 25 Jun 2022 08:53:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2ECE24B1C4;
-	Sat, 25 Jun 2022 04:53:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6AC44A1D9;
+	Sat, 25 Jun 2022 04:53:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id r7oOZGe32v2u; Sat, 25 Jun 2022 04:53:37 -0400 (EDT)
+	with ESMTP id or5kAJC0KWxe; Sat, 25 Jun 2022 04:53:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 624814B208;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 911A14B231;
 	Sat, 25 Jun 2022 04:53:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CD3B49F0C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jun 2022 19:49:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 32E69413E2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jun 2022 17:51:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SQEPABzzvh8C for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Jun 2022 19:49:55 -0400 (EDT)
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
- [209.85.219.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F397E41175
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jun 2022 19:49:54 -0400 (EDT)
-Received: by mail-yb1-f202.google.com with SMTP id
- o199-20020a25d7d0000000b00668ab46306bso825564ybg.6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Jun 2022 16:49:54 -0700 (PDT)
+ with ESMTP id u7x1-aKGrxpR for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Jun 2022 17:51:06 -0400 (EDT)
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com
+ [209.85.221.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B771440FF0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jun 2022 17:51:06 -0400 (EDT)
+Received: by mail-wr1-f50.google.com with SMTP id v14so4792389wra.5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jun 2022 14:51:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=f7hEYvs16C5Hh3J1bMIu9ameAoVR3D8cHVYfY6s/rfM=;
- b=f61MRM5nJZ2nCc6ENnmYqAlkQCW/lvCe54MAhkLgfnIXLqOGx1cVuNWYSt6xm7ruNy
- BwmO5qYxfwnlT0Do6lQo0Rj7CUBGnF0JqBv72g0V/lTfP6h63KU51rOKbF3dMk/LNJCb
- NR97PTJj8w/+m8wkU9N8+iMqJJ/luIabGpZhcmEyFCtzC/OOphJ1AmQBoIo5hZOyHMA5
- DlFGT8QU/tWtWOgxwBzVfCnfBWqM82wd08KzP3CH3kRDSU7t8WQ0OGthk3Lwhyy0Oyib
- 4fKLXy7r4PI7DfLAETDccjKxHVIllyAMLPuL/FMs9ms/iMLEq6VORHlXmCch472X7u0a
- peeQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ygHo4kCjlplomgaDbLB/O69dvwBvbC5Loc23ldoxb3Y=;
+ b=RsFWPuqWaoLcQtnQjgye0TXSrWqr2gSZP/JqpocE2GMf+HPDFUKs0eQ03fdTXAy25m
+ mAn7ndJzQ5Ot91T0BnJG+wIfYUyXbMDliJ4XSKHWOEnrH2aYdvnWxWHTyWL3hSC7qMRM
+ D+4z+0moSBKDpopAba4+GZrWcIQc0REx9PuZ0WTpskVsqewQAN6+HZOoG+I2UfNsPo35
+ GCrp6xkZQ5Hhf/zCu2+zR0iTPTNgdPOD9lQJsDDwu/683Sn+qQmM26nXGaLzwhN/8Jj9
+ xOKspLeH0Fp/qROPBWylrPNxLoMnTwmXJtKMHMrQsy30GTKTSM++YEegq1m0IhsbybZR
+ hVSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=f7hEYvs16C5Hh3J1bMIu9ameAoVR3D8cHVYfY6s/rfM=;
- b=QRn7lK19rW5OgY7saup2tNy/pFeogyKSA+L3b/U8in7AGJ8mTLPg6H5OVJJ+knvQwV
- 3lxsJk21QH6cx5BZFUMMpJa4gUSnKXw+Yvoamo6aaeHwRePOGoGCAoz43x7bO6pWZQZ8
- koYxJQfcTmUPlci7kXietKay0rWY44DUbY/759kHA7LWFL3wkkyEYLZPKZHKNjStobFW
- ombaIdHk75v9qdtEyjjb/JprFTiDfVYa/5uHRGrm2hxLhmjZT4sSJ4n3DSQ/BrwtY54X
- bnkwIsAU6nnQrbxJWTZ4tZxIQkI5Gw+RfqUI+ECpYLeHoUY1Py4z48qNZScRrH7uJndT
- gwkQ==
-X-Gm-Message-State: AJIora/F0A2ujex93zPNHV+7aX3K4qRkSy/8SOgfZU4/ZFynDdhuB8MY
- kayhX3aoyzy3iYlodtgsTxyuHWOHEfITvSgeAgtBtWNWhfXBFdUawiWHrAgNQJM7FH+Y1xFhflV
- dG9HadkLJjQxb2o9b4rcAgO+S0Z3S7hM5mLJONjyi7Na6tyJ8DMWVGU3Mk2dIZQ==
-X-Google-Smtp-Source: AGRyM1sDSlMwMDDhnNeVvNzGEqMh7ydsscF1uK4qVrjgiAG4OVTtshwcyPQtI86ne6cKMTIlEStdNck=
-X-Received: from pcc-desktop.svl.corp.google.com
- ([2620:15c:2ce:200:5f78:1f61:a153:ae87])
- (user=pcc job=sendgmr) by 2002:a25:8909:0:b0:656:ae08:d91a with SMTP id
- e9-20020a258909000000b00656ae08d91amr12681634ybl.414.1656028194361; Thu, 23
- Jun 2022 16:49:54 -0700 (PDT)
-Date: Thu, 23 Jun 2022 16:49:44 -0700
-Message-Id: <20220623234944.141869-1-pcc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.37.0.rc0.104.g0611611a94-goog
-Subject: [PATCH] KVM: arm64: permit MAP_SHARED mappings with MTE enabled
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ygHo4kCjlplomgaDbLB/O69dvwBvbC5Loc23ldoxb3Y=;
+ b=qx0uH4OZCjkphfZrgRP8hC16xYrRFTpUyRCKj8kWCpStB0OxXcNiOG+ADan6uJGeuj
+ fFrlTT1f/N1G4Ear9SiJIcuQOkD9pvNr2UUALiAFaz2o6oBNWdKS0XsNSecp81CFUiDm
+ tCURF3p3P0dM9HuG+nuxve7UOegwlxviruelu8YVcnpNZ+sWgB7mLSVCUHCJaXyOBCAi
+ H74ZgyeRIvl9qXjfeIpIIRTu/5X1/NSsMRLQTNaoOa675zSraEZw9eHTwsvVZAUIqOoj
+ 3jdnG2tY7bXSLKwNghAEtWhQQPnVwPBEjItOazk4pb/TF3PP7RSwavVHcNLoqgDxxxsx
+ 2pZg==
+X-Gm-Message-State: AJIora8ynCe3kw8ySS8D2j2e7ySsP1IgXmvFw1irURLxxeW23u1pAfUk
+ 7BmEEt3yUhZt1ZrKHXJejJl4L+qhMS02oXn9DHlKIQ==
+X-Google-Smtp-Source: AGRyM1t2jcGW3PeWYunQh6GfpJeg8eVQCrLSWuOvf0glSyRhsk25Df+XOBeTdbLhrqqfHC+TqtbY7gSVXm3SdN2NYKk=
+X-Received: by 2002:a05:6000:54f:b0:21b:944c:c70b with SMTP id
+ b15-20020a056000054f00b0021b944cc70bmr1072670wrf.572.1656107465447; Fri, 24
+ Jun 2022 14:51:05 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220623234944.141869-1-pcc@google.com> <YrXu0Uzi73pUDwye@arm.com>
+In-Reply-To: <YrXu0Uzi73pUDwye@arm.com>
 From: Peter Collingbourne <pcc@google.com>
-To: kvmarm@lists.cs.columbia.edu
+Date: Fri, 24 Jun 2022 14:50:53 -0700
+Message-ID: <CAMn1gO7-qVzZrAt63BJC-M8gKLw4=60iVUo6Eu8T_5y3AZnKcA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: permit MAP_SHARED mappings with MTE enabled
+To: Catalin Marinas <catalin.marinas@arm.com>
 X-Mailman-Approved-At: Sat, 25 Jun 2022 04:53:35 -0400
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, Andy Lutomirski <luto@amacapital.net>,
- Will Deacon <will@kernel.org>, Evgenii Stepanov <eugenis@google.com>,
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Andy Lutomirski <luto@amacapital.net>, Evgenii Stepanov <eugenis@google.com>,
  Michael Roth <michael.roth@amd.com>, Chao Peng <chao.p.peng@linux.intel.com>,
- Peter Collingbourne <pcc@google.com>, linux-arm-kernel@lists.infradead.org
+ Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,203 +86,143 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Certain VMMs such as crosvm have features (e.g. sandboxing, pmem) that
-depend on being able to map guest memory as MAP_SHARED. The current
-restriction on sharing MAP_SHARED pages with the guest is preventing
-the use of those features with MTE. Therefore, remove this restriction.
+On Fri, Jun 24, 2022 at 10:05 AM Catalin Marinas
+<catalin.marinas@arm.com> wrote:
+>
+> + Steven as he added the KVM and swap support for MTE.
+>
+> On Thu, Jun 23, 2022 at 04:49:44PM -0700, Peter Collingbourne wrote:
+> > Certain VMMs such as crosvm have features (e.g. sandboxing, pmem) that
+> > depend on being able to map guest memory as MAP_SHARED. The current
+> > restriction on sharing MAP_SHARED pages with the guest is preventing
+> > the use of those features with MTE. Therefore, remove this restriction.
+>
+> We already have some corner cases where the PG_mte_tagged logic fails
+> even for MAP_PRIVATE (but page shared with CoW). Adding this on top for
+> KVM MAP_SHARED will potentially make things worse (or hard to reason
+> about; for example the VMM sets PROT_MTE as well). I'm more inclined to
+> get rid of PG_mte_tagged altogether, always zero (or restore) the tags
+> on user page allocation, copy them on write. For swap we can scan and if
+> all tags are 0 and just skip saving them.
 
-To avoid races between multiple tasks attempting to clear tags on the
-same page, introduce a new page flag, PG_mte_tag_clearing, and test-set it
-atomically before beginning to clear tags on a page. If the flag was not
-initially set, spin until the other task has finished clearing the tags.
+A problem with this approach is that it would conflict with any
+potential future changes that we might make that would require the
+kernel to avoid modifying the tags for non-PROT_MTE pages.
 
-Link: https://linux-review.googlesource.com/id/I05a57f546f2b4d9b008a08f5f03e9ba3c950fdcc
-Signed-off-by: Peter Collingbourne <pcc@google.com>
----
- arch/arm64/include/asm/mte.h   |  5 +++++
- arch/arm64/kernel/mte.c        | 13 +++++++++++-
- arch/arm64/kvm/mmu.c           | 36 +++++++---------------------------
- include/linux/page-flags.h     |  1 +
- include/trace/events/mmflags.h |  7 ++++---
- 5 files changed, 29 insertions(+), 33 deletions(-)
+Thinking about this some more, another idea that I had was to only
+allow MAP_SHARED mappings in a guest with MTE enabled if the mapping
+is PROT_MTE and there are no non-PROT_MTE aliases. For anonymous
+mappings I don't think it's possible to create a non-PROT_MTE alias in
+another mm (since you can't turn off PROT_MTE with mprotect), and for
+memfd maybe we could introduce a flag that requires PROT_MTE on all
+mappings. That way, we are guaranteed that either the page has been
+tagged prior to fault or we have exclusive access to it so it can be
+tagged on demand without racing. Let me see what effect that has on
+crosvm.
 
-diff --git a/arch/arm64/include/asm/mte.h b/arch/arm64/include/asm/mte.h
-index aa523591a44e..f66f70194c76 100644
---- a/arch/arm64/include/asm/mte.h
-+++ b/arch/arm64/include/asm/mte.h
-@@ -19,6 +19,7 @@
- #include <asm/pgtable-types.h>
- 
- void mte_clear_page_tags(void *addr);
-+void mte_ensure_page_tags_cleared(struct page *page);
- unsigned long mte_copy_tags_from_user(void *to, const void __user *from,
- 				      unsigned long n);
- unsigned long mte_copy_tags_to_user(void __user *to, void *from,
-@@ -37,6 +38,9 @@ void mte_free_tag_storage(char *storage);
- /* track which pages have valid allocation tags */
- #define PG_mte_tagged	PG_arch_2
- 
-+/* the page is or has been in the process of having its tags cleared */
-+#define PG_mte_tag_clearing	PG_arch_3
-+
- void mte_zero_clear_page_tags(void *addr);
- void mte_sync_tags(pte_t old_pte, pte_t pte);
- void mte_copy_page_tags(void *kto, const void *kfrom);
-@@ -53,6 +57,7 @@ size_t mte_probe_user_range(const char __user *uaddr, size_t size);
- 
- /* unused if !CONFIG_ARM64_MTE, silence the compiler */
- #define PG_mte_tagged	0
-+#define PG_mte_tag_clearing	0
- 
- static inline void mte_zero_clear_page_tags(void *addr)
- {
-diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-index f6b00743c399..8f9655053a9f 100644
---- a/arch/arm64/kernel/mte.c
-+++ b/arch/arm64/kernel/mte.c
-@@ -57,7 +57,18 @@ static void mte_sync_page_tags(struct page *page, pte_t old_pte,
- 	 * the new page->flags are visible before the tags were updated.
- 	 */
- 	smp_wmb();
--	mte_clear_page_tags(page_address(page));
-+	mte_ensure_page_tags_cleared(page);
-+}
-+
-+void mte_ensure_page_tags_cleared(struct page *page)
-+{
-+	if (test_and_set_bit(PG_mte_tag_clearing, &page->flags)) {
-+		while (!test_bit(PG_mte_tagged, &page->flags))
-+			;
-+	} else {
-+		mte_clear_page_tags(page_address(page));
-+		set_bit(PG_mte_tagged, &page->flags);
-+	}
- }
- 
- void mte_sync_tags(pte_t old_pte, pte_t pte)
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index f5651a05b6a8..016d14c9d798 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1050,11 +1050,9 @@ static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
-  * able to see the page's tags and therefore they must be initialised first. If
-  * PG_mte_tagged is set, tags have already been initialised.
-  *
-- * The race in the test/set of the PG_mte_tagged flag is handled by:
-- * - preventing VM_SHARED mappings in a memslot with MTE preventing two VMs
-- *   racing to santise the same page
-- * - mmap_lock protects between a VM faulting a page in and the VMM performing
-- *   an mprotect() to add VM_MTE
-+ * The race in the test/set of the PG_mte_tagged flag is handled via the flag
-+ * PG_mte_tag_clearing which is atomically test and set before beginning a tag
-+ * initialization, and spinning on PG_mte_tagged if it was already set.
-  */
- static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
- 			     unsigned long size)
-@@ -1074,12 +1072,9 @@ static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
- 	if (!page)
- 		return -EFAULT;
- 
--	for (i = 0; i < nr_pages; i++, page++) {
--		if (!test_bit(PG_mte_tagged, &page->flags)) {
--			mte_clear_page_tags(page_address(page));
--			set_bit(PG_mte_tagged, &page->flags);
--		}
--	}
-+	for (i = 0; i < nr_pages; i++, page++)
-+		if (!test_bit(PG_mte_tagged, &page->flags))
-+			mte_ensure_page_tags_cleared(page);
- 
- 	return 0;
- }
-@@ -1092,7 +1087,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	bool write_fault, writable, force_pte = false;
- 	bool exec_fault;
- 	bool device = false;
--	bool shared;
- 	unsigned long mmu_seq;
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
-@@ -1142,8 +1136,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		vma_shift = get_vma_page_shift(vma, hva);
- 	}
- 
--	shared = (vma->vm_flags & VM_SHARED);
--
- 	switch (vma_shift) {
- #ifndef __PAGETABLE_PMD_FOLDED
- 	case PUD_SHIFT:
-@@ -1263,11 +1255,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	}
- 
- 	if (fault_status != FSC_PERM && !device && kvm_has_mte(kvm)) {
--		/* Check the VMM hasn't introduced a new VM_SHARED VMA */
--		if (!shared)
--			ret = sanitise_mte_tags(kvm, pfn, vma_pagesize);
--		else
--			ret = -EFAULT;
-+		ret = sanitise_mte_tags(kvm, pfn, vma_pagesize);
- 		if (ret)
- 			goto out_unlock;
- 	}
-@@ -1705,16 +1693,6 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 		if (!vma)
- 			break;
- 
--		/*
--		 * VM_SHARED mappings are not allowed with MTE to avoid races
--		 * when updating the PG_mte_tagged page flag, see
--		 * sanitise_mte_tags for more details.
--		 */
--		if (kvm_has_mte(kvm) && vma->vm_flags & VM_SHARED) {
--			ret = -EINVAL;
--			break;
--		}
--
- 		if (vma->vm_flags & VM_PFNMAP) {
- 			/* IO region dirty page logging not allowed */
- 			if (new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index e66f7aa3191d..447cdd4b1311 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -134,6 +134,7 @@ enum pageflags {
- #endif
- #ifdef CONFIG_64BIT
- 	PG_arch_2,
-+	PG_arch_3,
- #endif
- #ifdef CONFIG_KASAN_HW_TAGS
- 	PG_skip_kasan_poison,
-diff --git a/include/trace/events/mmflags.h b/include/trace/events/mmflags.h
-index e87cb2b80ed3..ecf7ae0de3d8 100644
---- a/include/trace/events/mmflags.h
-+++ b/include/trace/events/mmflags.h
-@@ -92,9 +92,9 @@
- #endif
- 
- #ifdef CONFIG_64BIT
--#define IF_HAVE_PG_ARCH_2(flag,string) ,{1UL << flag, string}
-+#define IF_HAVE_PG_ARCH_2_3(flag,string) ,{1UL << flag, string}
- #else
--#define IF_HAVE_PG_ARCH_2(flag,string)
-+#define IF_HAVE_PG_ARCH_2_3(flag,string)
- #endif
- 
- #ifdef CONFIG_KASAN_HW_TAGS
-@@ -130,7 +130,8 @@ IF_HAVE_PG_UNCACHED(PG_uncached,	"uncached"	)		\
- IF_HAVE_PG_HWPOISON(PG_hwpoison,	"hwpoison"	)		\
- IF_HAVE_PG_IDLE(PG_young,		"young"		)		\
- IF_HAVE_PG_IDLE(PG_idle,		"idle"		)		\
--IF_HAVE_PG_ARCH_2(PG_arch_2,		"arch_2"	)		\
-+IF_HAVE_PG_ARCH_2_3(PG_arch_2,		"arch_2"	)		\
-+IF_HAVE_PG_ARCH_2_3(PG_arch_3,		"arch_3"	)		\
- IF_HAVE_PG_SKIP_KASAN_POISON(PG_skip_kasan_poison, "skip_kasan_poison")
- 
- #define show_page_flags(flags)						\
--- 
-2.37.0.rc0.104.g0611611a94-goog
+> Another aspect is a change in the KVM ABI with this patch. It's probably
+> not that bad since it's rather a relaxation but it has the potential to
+> confuse the VMM, especially as it doesn't know whether it's running on
+> older kernels or not (it would have to probe unless we expose this info
+> to the VMM in some other way).
+>
+> > To avoid races between multiple tasks attempting to clear tags on the
+> > same page, introduce a new page flag, PG_mte_tag_clearing, and test-set it
+> > atomically before beginning to clear tags on a page. If the flag was not
+> > initially set, spin until the other task has finished clearing the tags.
+>
+> TBH, I can't mentally model all the corner cases, so maybe a formal
+> model would help (I can have a go with TLA+, though not sure when I find
+> a bit of time this summer). If we get rid of PG_mte_tagged altogether,
+> this would simplify things (hopefully).
+>
+> As you noticed, the problem is that setting PG_mte_tagged and clearing
+> (or restoring) the tags is not an atomic operation. There are places
+> like mprotect() + CoW where one task can end up with stale tags. Another
+> is shared memfd mappings if more than one mapping sets PROT_MTE and
+> there's the swap restoring on top.
+>
+> > diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
+> > index f6b00743c399..8f9655053a9f 100644
+> > --- a/arch/arm64/kernel/mte.c
+> > +++ b/arch/arm64/kernel/mte.c
+> > @@ -57,7 +57,18 @@ static void mte_sync_page_tags(struct page *page, pte_t old_pte,
+> >        * the new page->flags are visible before the tags were updated.
+> >        */
+> >       smp_wmb();
+> > -     mte_clear_page_tags(page_address(page));
+> > +     mte_ensure_page_tags_cleared(page);
+> > +}
+> > +
+> > +void mte_ensure_page_tags_cleared(struct page *page)
+> > +{
+> > +     if (test_and_set_bit(PG_mte_tag_clearing, &page->flags)) {
+> > +             while (!test_bit(PG_mte_tagged, &page->flags))
+> > +                     ;
+> > +     } else {
+> > +             mte_clear_page_tags(page_address(page));
+> > +             set_bit(PG_mte_tagged, &page->flags);
+> > +     }
+> >  }
+>
+> mte_sync_tags() already sets PG_mte_tagged prior to clearing the page
+> tags. The reason was so that multiple concurrent set_pte_at() would not
+> all rush to clear (or restore) the tags. But we do have the risk of one
+> thread accessing the page with the stale tags (copy_user_highpage() is
+> worse as the tags would be wrong in the destination page). I'd rather be
+> consistent everywhere with how we set the flags.
+>
+> However, I find it easier to reason about if we used the new flag as a
+> lock. IOW, if PG_mte_tagged is set, we know that tags are valid. If not
+> set, take the PG_mte_locked flag, check PG_mte_tagged again and
+> clear/restore the tags followed by PG_mte_tagged (and you can use
+> test_and_set_bit_lock() for the acquire semantics).
 
+Okay, I can look at doing it that way as well.
+
+> It would be interesting to benchmark the cost of always zeroing the tags
+> on allocation and copy when MTE is not in use:
+>
+> diff --git a/arch/arm64/mm/copypage.c b/arch/arm64/mm/copypage.c
+> index 0dea80bf6de4..d31708886bf9 100644
+> --- a/arch/arm64/mm/copypage.c
+> +++ b/arch/arm64/mm/copypage.c
+> @@ -21,7 +21,7 @@ void copy_highpage(struct page *to, struct page *from)
+>
+>         copy_page(kto, kfrom);
+>
+> -       if (system_supports_mte() && test_bit(PG_mte_tagged, &from->flags)) {
+> +       if (system_supports_mte()) {
+>                 set_bit(PG_mte_tagged, &to->flags);
+>                 page_kasan_tag_reset(to);
+>                 /*
+> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+> index c5e11768e5c1..b42cad9b9349 100644
+> --- a/arch/arm64/mm/fault.c
+> +++ b/arch/arm64/mm/fault.c
+> @@ -913,12 +913,7 @@ struct page *alloc_zeroed_user_highpage_movable(struct vm_area_struct *vma,
+>  {
+>         gfp_t flags = GFP_HIGHUSER_MOVABLE | __GFP_ZERO;
+>
+> -       /*
+> -        * If the page is mapped with PROT_MTE, initialise the tags at the
+> -        * point of allocation and page zeroing as this is usually faster than
+> -        * separate DC ZVA and STGM.
+> -        */
+> -       if (vma->vm_flags & VM_MTE)
+> +       if (system_supports_mte())
+>                 flags |= __GFP_ZEROTAGS;
+>
+>         return alloc_page_vma(flags, vma, vaddr);
+>
+> If that's negligible, we can hopefully get rid of PG_mte_tagged. For
+> swap we could move the restoring to arch_do_swap_page() (but move the
+> call one line above set_pte_at() in do_swap_page()).
+
+I could experiment with this but I'm hesistant given the potential to
+cut off potential future changes.
+
+Peter
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
