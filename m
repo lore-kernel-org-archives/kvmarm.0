@@ -2,69 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1192C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Jun 2022 08:55:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5043DC433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Jun 2022 13:12:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22CD4410DA;
-	Fri, 24 Jun 2022 04:55:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 976DD49EF4;
+	Fri, 24 Jun 2022 09:12:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xTWah5mE09aV; Fri, 24 Jun 2022 04:55:15 -0400 (EDT)
+	with ESMTP id Ghv2U32g7MCM; Fri, 24 Jun 2022 09:12:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 009F440FD3;
-	Fri, 24 Jun 2022 04:55:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 350B249E22;
+	Fri, 24 Jun 2022 09:12:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 16F9540C23
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jun 2022 04:55:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4463A40C94
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jun 2022 09:12:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Zn3LDdAkvQX0 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Jun 2022 04:55:13 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DF3340BA3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jun 2022 04:55:12 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1656060912;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
- b=clZcKvLIlaSI0aj01C5lBcQXLk+ikl+B/lRxtrhuDg5wwkqdYF5UPGMlnYSf0lpgXhCWYT
- gls4LxDtou6pAKKKlV+4NFGPA7Of0TZclZCdFuJWDN30JduJvike14IeynA/GPT59zCXzZ
- nLJPAC8DViQwIpulrZlJ8I7gTkkG5jQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-492-8kQPj_gwPha5AfRxe-hGEg-1; Fri, 24 Jun 2022 04:55:08 -0400
-X-MC-Unique: 8kQPj_gwPha5AfRxe-hGEg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com
- [10.11.54.8])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id PJ74nP+TahKy for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Jun 2022 09:12:06 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 98201404FD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jun 2022 09:12:06 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5B6A61C06915;
- Fri, 24 Jun 2022 08:55:07 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E3893C53360;
- Fri, 24 Jun 2022 08:55:06 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH kvm-unit-tests] MAINTAINERS: Change drew's email address
-Date: Fri, 24 Jun 2022 04:55:06 -0400
-Message-Id: <20220624085506.2731362-1-pbonzini@redhat.com>
-In-Reply-To: <20220623131017.670589-1-drjones@redhat.com>
-References: 
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-Cc: maz@kernel.org, thuth@redhat.com, kvm@vger.kernel.org,
- qemu-devel@nongnu.org, nikos.nikoleris@arm.com, qemu-arm@nongnu.org,
- andre.przywara@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+ by ams.source.kernel.org (Postfix) with ESMTPS id 65952B828C8;
+ Fri, 24 Jun 2022 13:12:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FC8BC34114;
+ Fri, 24 Jun 2022 13:12:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1656076324;
+ bh=kxyG6jurb+bHBPNYbOsX3XEShKNeeCWKCv2DtjwMjtg=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=r+dzArFlimCCkaAzmcKIOHFdKD/63XdZblpC6vSVXtYaNiA/kC7Aj3QXATnyZjlM4
+ fOXldcswLQ7DS/xHEPOopvpe68YwTX8tZPcVhgcWuzsbTRPIhFlk7Ja65iybUqtc7+
+ 9GYPEg62JMdgrNJpePMDIOAqI4GsVGg/72wNkxK9bFn67QBzapE+BNu/Cg2zu5k4ZR
+ /G1wOXlPhoRxWO9caMYDkbsmI1yAQDP8ZV24/PG8gImIpUp4JCBer6cKLMrYwiTSFf
+ i+vLPlpssq572Puen4QwPmopdMc7LrKNw4bloz/Ah5QvqFFnkaOY2rMrszfmht/ukA
+ hsP2+VUxLR5uA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1o4j6P-002rUb-Ve;
+ Fri, 24 Jun 2022 14:12:02 +0100
+Date: Fri, 24 Jun 2022 14:12:01 +0100
+Message-ID: <87iloq2oke.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v7 00/22] Support SDEI Virtualization
+In-Reply-To: <6bdb9280-3530-dc1f-d33e-5bc1c5ac927b@redhat.com>
+References: <20220527080253.1562538-1-gshan@redhat.com>
+ <6bdb9280-3530-dc1f-d33e-5bc1c5ac927b@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.cs.columbia.edu,
+ shijie@amperemail.onmicrosoft.com, linux-kernel@vger.kernel.org,
+ eauger@redhat.com, shan.gavin@gmail.com, Jonathan.Cameron@huawei.com,
+ pbonzini@redhat.com, vkuznets@redhat.com, will@kernel.org,
+ oliver.upton@linux.dev, oupton@google.com, james.morse@arm.com,
+ mark.rutland@arm.com, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>, will@kernel.org,
+ linux-kernel@vger.kernel.org, eauger@redhat.com, shan.gavin@gmail.com,
+ Jonathan.Cameron@huawei.com, pbonzini@redhat.com, vkuznets@redhat.com,
+ shijie@amperemail.onmicrosoft.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,11 +91,99 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Queued, thanks.
+Hi Gavin,
 
-Paolo
+On Thu, 23 Jun 2022 07:11:08 +0100,
+Gavin Shan <gshan@redhat.com> wrote:
+> 
+> Hi Oliver,
+> 
+> On 5/27/22 6:02 PM, Gavin Shan wrote:
+> > This series intends to virtualize Software Delegated Exception Interface
+> > (SDEI), which is defined by DEN0054C (v1.1). It allows the hypervisor to
+> > deliver NMI-alike SDEI event to guest and it's needed by Async PF to
+> > deliver page-not-present notification from hypervisor to guest. The code
+> > and the required qemu changes can be found from:
+> > 
+> >     https://developer.arm.com/documentation/den0054/c
+> >     https://github.com/gwshan/linux    ("kvm/arm64_sdei")
+> >     https://github.com/gwshan/qemu     ("kvm/arm64_sdei")
+> > 
+> > The design is quite strightforward by following the specification. The
+> > (SDEI) events are classified into the shared and private ones according
+> > to their scope. The shared event is system or VM scoped, but the private
+> > event is vcpu scoped. This implementation doesn't support the shared
+> > event because all the needed events are private. Besides, the critial
+> > events aren't supported by the implementation either. It means all events
+> > are normal in terms of priority.
+> > 
+> > There are several objects (data structures) introduced to help on the
+> > event registration, enablement, disablement, unregistration, reset,
+> > delivery and handling.
+> > 
+> >    * kvm_sdei_event_handler
+> >      SDEI event handler, which is provided through EVENT_REGISTER
+> >      hypercall, is called when the SDEI event is delivered from
+> >      host to guest.
+> >         * kvm_sdei_event_context
+> >      The saved (preempted) context when SDEI event is delivered
+> >      for handling.
+> >         * kvm_sdei_vcpu
+> >      SDEI events and their states.
+> > 
+> > The patches are organized as below:
+> > 
+> >    PATCH[01-02] Preparatory work to extend smccc_get_argx() and refactor
+> >                 hypercall routing mechanism
+> >    PATCH[03]    Adds SDEI virtualization infrastructure
+> >    PATCH[04-16] Supports various SDEI hypercalls and event handling
+> >    PATCH[17]    Exposes SDEI capability
+> >    PATCH[18-19] Support SDEI migration
+> >    PATCH[20]    Adds document about SDEI
+> >    PATCH[21-22] SDEI related selftest cases
+> > 
+> > The previous revisions can be found:
+> > 
+> >    v6: https://lore.kernel.org/lkml/20220403153911.12332-4-gshan@redhat.com/T/
+> >    v5: https://lore.kernel.org/kvmarm/20220322080710.51727-1-gshan@redhat.com/
+> >    v4: https://lore.kernel.org/kvmarm/20210815001352.81927-1-gshan@redhat.com/
+> >    v3: https://lore.kernel.org/kvmarm/20210507083124.43347-1-gshan@redhat.com/
+> >    v2: https://lore.kernel.org/kvmarm/20210209032733.99996-1-gshan@redhat.com/
+> >    v1: https://lore.kernel.org/kvmarm/20200817100531.83045-1-gshan@redhat.com/
+> > 
+> 
+> Copying Oliver's new email address (oliver.upton@linux.dev).
+> 
+> Please let me know if I need to rebase and repost the series.
 
+My main issue with this series is that it is a solution in search of a
+problem. It is only an enabler for Asynchronous Page Fault support,
+and:
 
+- as far as I know, the core Linux/arm64 maintainers have no plan to
+  support APF. Without it, this is a pointless exercise. And even with
+  it, this introduces a Linux specific behaviour in an otherwise
+  architectural hypervisor (something I'm quite keen on avoiding)
+
+- It gives an incentive to other hypervisor vendors to add random crap
+  to the Linux mm subsystem, which is even worse. At this stage, we
+  might as well go back to the Xen PV days altogether.
+
+- I haven't seen any of the KVM/arm64 users actually asking for the
+  APF horror, and the cloud vendors I directly asked had no plan to
+  use it, and not using it on their x86 systems either
+
+- no performance data nor workloads that could help making an informed
+  decision have been disclosed, and the only argument in its favour
+  seems to be "but x86 has it" (hardly a compelling one)
+
+Given the above, I don't see how to justify this series, as it has no
+purpose on its own, no matter how well written it is.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
