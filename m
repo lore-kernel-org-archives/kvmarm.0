@@ -2,51 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A8C3C43334
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Jun 2022 11:43:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8794AC43334
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Jun 2022 15:55:47 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E937D40FD3;
-	Mon, 27 Jun 2022 07:43:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D97AD4B22C;
+	Mon, 27 Jun 2022 11:55:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uxhRxF4Gi6ip; Mon, 27 Jun 2022 07:43:17 -0400 (EDT)
+	with ESMTP id iMojBhRCLTuC; Mon, 27 Jun 2022 11:55:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A712040BC2;
-	Mon, 27 Jun 2022 07:43:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 725B44B236;
+	Mon, 27 Jun 2022 11:55:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B81640BEE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2022 07:43:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 05F2D4B208
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2022 11:55:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ah3E70edpD6N for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Jun 2022 07:43:15 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DAEB40B92
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2022 07:43:15 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id OviPVndQhOQG for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Jun 2022 11:55:43 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 804874B1ED
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Jun 2022 11:55:43 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1656345343;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=HuLM69wVueZYYIAkbfqpnLdfUqCDZ1pi8iyqjjngfEM=;
+ b=PrhxOpHbxrNBQmQkPNaeO08fkInYZi8CLv7Mg0vb9yUwS3mZMreY09X7XoJgXdzAr6vDFK
+ 8Nt/IKdAqKleM8XnnTp8B0IMcfUz7Wpc5UpBFHkUilYm6xAK9hgWOqKZG0ozqEOlrlcPdY
+ scySTgfLFSE1yJT15VGpWlI8LZS2Tjk=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-296-xBsmTYLoN0ep9wZPhvZvJA-1; Mon, 27 Jun 2022 11:55:36 -0400
+X-MC-Unique: xBsmTYLoN0ep9wZPhvZvJA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.9])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 7F1AD61192;
- Mon, 27 Jun 2022 11:43:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD194C3411D;
- Mon, 27 Jun 2022 11:43:11 +0000 (UTC)
-Date: Mon, 27 Jun 2022 12:43:08 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Peter Collingbourne <pcc@google.com>
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D72CE3C11E6A;
+ Mon, 27 Jun 2022 15:55:35 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.87])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 709C5492CA3;
+ Mon, 27 Jun 2022 15:55:35 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Steven Price <steven.price@arm.com>, Catalin Marinas
+ <catalin.marinas@arm.com>, Peter Collingbourne <pcc@google.com>
 Subject: Re: [PATCH] KVM: arm64: permit MAP_SHARED mappings with MTE enabled
-Message-ID: <YrmXzHXv4babwbNZ@arm.com>
-References: <20220623234944.141869-1-pcc@google.com> <YrXu0Uzi73pUDwye@arm.com>
- <CAMn1gO7-qVzZrAt63BJC-M8gKLw4=60iVUo6Eu8T_5y3AZnKcA@mail.gmail.com>
+In-Reply-To: <14f2a69e-4022-e463-1662-30032655e3d1@arm.com>
+Organization: Red Hat GmbH
+References: <20220623234944.141869-1-pcc@google.com>
+ <YrXu0Uzi73pUDwye@arm.com> <14f2a69e-4022-e463-1662-30032655e3d1@arm.com>
+User-Agent: Notmuch/0.36 (https://notmuchmail.org)
+Date: Mon, 27 Jun 2022 17:55:33 +0200
+Message-ID: <875ykmcd8q.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CAMn1gO7-qVzZrAt63BJC-M8gKLw4=60iVUo6Eu8T_5y3AZnKcA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  Andy Lutomirski <luto@amacapital.net>, Evgenii Stepanov <eugenis@google.com>,
  Michael Roth <michael.roth@amd.com>, Chao Peng <chao.p.peng@linux.intel.com>,
- Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -63,71 +85,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jun 24, 2022 at 02:50:53PM -0700, Peter Collingbourne wrote:
-> On Fri, Jun 24, 2022 at 10:05 AM Catalin Marinas
-> <catalin.marinas@arm.com> wrote:
-> > + Steven as he added the KVM and swap support for MTE.
-> >
-> > On Thu, Jun 23, 2022 at 04:49:44PM -0700, Peter Collingbourne wrote:
-> > > Certain VMMs such as crosvm have features (e.g. sandboxing, pmem) that
-> > > depend on being able to map guest memory as MAP_SHARED. The current
-> > > restriction on sharing MAP_SHARED pages with the guest is preventing
-> > > the use of those features with MTE. Therefore, remove this restriction.
-> >
-> > We already have some corner cases where the PG_mte_tagged logic fails
-> > even for MAP_PRIVATE (but page shared with CoW). Adding this on top for
-> > KVM MAP_SHARED will potentially make things worse (or hard to reason
-> > about; for example the VMM sets PROT_MTE as well). I'm more inclined to
-> > get rid of PG_mte_tagged altogether, always zero (or restore) the tags
-> > on user page allocation, copy them on write. For swap we can scan and if
-> > all tags are 0 and just skip saving them.
-> 
-> A problem with this approach is that it would conflict with any
-> potential future changes that we might make that would require the
-> kernel to avoid modifying the tags for non-PROT_MTE pages.
+[I'm still in the process of trying to grok the issues surrounding
+MTE+KVM, so apologies in advance if I'm muddying the waters]
 
-Not if in all those cases we check VM_MTE_ALLOWED. We seem to have the
-vma available where it matters. We can keep PG_mte_tagged around but
-always set it on page allocation (e.g. when zeroing or CoW) and check
-VM_MTE_ALLOWED rather than VM_MTE.
+On Sat, Jun 25 2022, Steven Price <steven.price@arm.com> wrote:
 
-I'm not sure how Linux can deal with pages that do not support MTE.
-Currently we only handle this at the vm_flags level. Assuming that we
-somehow manage to, we can still use PG_mte_tagged to mark the pages that
-supported tags on allocation (and they have been zeroed or copied). I
-guess if you want to move a page around, you'd need to go through
-something like try_to_unmap() (or set all mappings to PROT_NONE like in
-NUMA migration). Then you can either check whether the page is PROT_MTE
-anywhere and maybe read the tags to see whether all are zero after
-unmapping.
+> On 24/06/2022 18:05, Catalin Marinas wrote:
+>> + Steven as he added the KVM and swap support for MTE.
+>> 
+>> On Thu, Jun 23, 2022 at 04:49:44PM -0700, Peter Collingbourne wrote:
+>>> Certain VMMs such as crosvm have features (e.g. sandboxing, pmem) that
+>>> depend on being able to map guest memory as MAP_SHARED. The current
+>>> restriction on sharing MAP_SHARED pages with the guest is preventing
+>>> the use of those features with MTE. Therefore, remove this restriction.
+>> 
+>> We already have some corner cases where the PG_mte_tagged logic fails
+>> even for MAP_PRIVATE (but page shared with CoW). Adding this on top for
+>> KVM MAP_SHARED will potentially make things worse (or hard to reason
+>> about; for example the VMM sets PROT_MTE as well). I'm more inclined to
+>> get rid of PG_mte_tagged altogether, always zero (or restore) the tags
+>> on user page allocation, copy them on write. For swap we can scan and if
+>> all tags are 0 and just skip saving them.
+>> 
+>> Another aspect is a change in the KVM ABI with this patch. It's probably
+>> not that bad since it's rather a relaxation but it has the potential to
+>> confuse the VMM, especially as it doesn't know whether it's running on
+>> older kernels or not (it would have to probe unless we expose this info
+>> to the VMM in some other way).
 
-Deferring tag zeroing/restoring to set_pte_at() can be racy without a
-lock (or your approach with another flag) but I'm not sure it's worth
-the extra logic if zeroing or copying the tags doesn't have a
-significant overhead for non-PROT_MTE pages.
+Which VMMs support KVM+MTE so far? (I'm looking at adding support in QEMU.)
 
-Another issue with set_pte_at() is that it can write tags on mprotect()
-even if the page is mapped read-only. So far I couldn't find a problem
-with this but it adds to the complexity.
+>> 
+>>> To avoid races between multiple tasks attempting to clear tags on the
+>>> same page, introduce a new page flag, PG_mte_tag_clearing, and test-set it
+>>> atomically before beginning to clear tags on a page. If the flag was not
+>>> initially set, spin until the other task has finished clearing the tags.
+>> 
+>> TBH, I can't mentally model all the corner cases, so maybe a formal
+>> model would help (I can have a go with TLA+, though not sure when I find
+>> a bit of time this summer). If we get rid of PG_mte_tagged altogether,
+>> this would simplify things (hopefully).
+>> 
+>> As you noticed, the problem is that setting PG_mte_tagged and clearing
+>> (or restoring) the tags is not an atomic operation. There are places
+>> like mprotect() + CoW where one task can end up with stale tags. Another
+>> is shared memfd mappings if more than one mapping sets PROT_MTE and
+>> there's the swap restoring on top.
+>> 
+>>> diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
+>>> index f6b00743c399..8f9655053a9f 100644
+>>> --- a/arch/arm64/kernel/mte.c
+>>> +++ b/arch/arm64/kernel/mte.c
+>>> @@ -57,7 +57,18 @@ static void mte_sync_page_tags(struct page *page, pte_t old_pte,
+>>>  	 * the new page->flags are visible before the tags were updated.
+>>>  	 */
+>>>  	smp_wmb();
+>>> -	mte_clear_page_tags(page_address(page));
+>>> +	mte_ensure_page_tags_cleared(page);
+>>> +}
+>>> +
+>>> +void mte_ensure_page_tags_cleared(struct page *page)
+>>> +{
+>>> +	if (test_and_set_bit(PG_mte_tag_clearing, &page->flags)) {
+>>> +		while (!test_bit(PG_mte_tagged, &page->flags))
+>>> +			;
+>>> +	} else {
+>>> +		mte_clear_page_tags(page_address(page));
+>>> +		set_bit(PG_mte_tagged, &page->flags);
+>>> +	}
+>
+> I'm pretty sure we need some form of barrier in here to ensure the tag
+> clearing is visible to the other CPU. Otherwise I can't immediately see
+> any problems with the approach of a second flag (it was something I had
+> considered). But I do also think we should seriously consider Catalin's
+> approach of simply zeroing tags unconditionally - it would certainly
+> simplify the code.
 
-> Thinking about this some more, another idea that I had was to only
-> allow MAP_SHARED mappings in a guest with MTE enabled if the mapping
-> is PROT_MTE and there are no non-PROT_MTE aliases. For anonymous
-> mappings I don't think it's possible to create a non-PROT_MTE alias in
-> another mm (since you can't turn off PROT_MTE with mprotect), and for
-> memfd maybe we could introduce a flag that requires PROT_MTE on all
-> mappings. That way, we are guaranteed that either the page has been
-> tagged prior to fault or we have exclusive access to it so it can be
-> tagged on demand without racing. Let me see what effect that has on
-> crosvm.
+What happens in kvm_vm_ioctl_mte_copy_tags()? I think we would just end
+up copying zeroes?
 
-You could still have all initial shared mappings as !PROT_MTE and some
-mprotect() afterwards setting PG_mte_tagged and clearing the tags and
-this can race. AFAICT, the easiest way to avoid the race is to set
-PG_mte_tagged on allocation before it ends up in set_pte_at().
+That said, do we make any assumptions about when KVM_ARM_MTE_COPY_TAGS
+will be called? I.e. when implementing migration, it should be ok to
+call it while the vm is paused, but you probably won't get a consistent
+state while the vm is running?
 
--- 
-Catalin
+[Postcopy needs a different interface, I guess, so that the migration
+target can atomically place a received page and its metadata. I see
+https://lore.kernel.org/all/CAJc+Z1FZxSYB_zJit4+0uTR-88VqQL+-01XNMSEfua-dXDy6Wg@mail.gmail.com/;
+has there been any follow-up?]
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
