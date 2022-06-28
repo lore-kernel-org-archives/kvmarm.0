@@ -2,58 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD9AC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Jun 2022 18:02:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA910C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Jun 2022 18:02:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BD1C4B228;
-	Tue, 28 Jun 2022 14:02:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F9574B47D;
+	Tue, 28 Jun 2022 14:02:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hzcZjONLxaVT; Tue, 28 Jun 2022 14:02:31 -0400 (EDT)
+	with ESMTP id 0OMhgKHtApHy; Tue, 28 Jun 2022 14:02:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA4424B431;
-	Tue, 28 Jun 2022 14:02:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 077874B400;
+	Tue, 28 Jun 2022 14:02:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EDFDD4B228
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2022 14:02:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 482324B332
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2022 14:02:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bQVw8fG9-R+e for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Jun 2022 14:02:27 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A28EE4B18F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2022 14:02:27 -0400 (EDT)
+ with ESMTP id 0KaUzCjWUYkC for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Jun 2022 14:02:38 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 144A14B1AD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Jun 2022 14:02:38 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id A014161962;
- Tue, 28 Jun 2022 18:02:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C5F9C341CA;
- Tue, 28 Jun 2022 18:02:24 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 589EDB81F59;
+ Tue, 28 Jun 2022 18:02:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4444FC341C8;
+ Tue, 28 Jun 2022 18:02:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1656439346;
+ s=k20201202; t=1656439355;
  bh=Q9TQo1YpqN5c0AN7PcviO9s8yzNZpGDadJSGpTvGND8=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=uKiiaPzf2ZvHFLudRBkGB21dFDVzVaSbQQHMWq0KyyzxdxN871GhxPOoIK0ZjgIaI
- xjGSO0xKxWknDuxYwa0rK0HcYswkrrUUVcHBZ29G5uC3R4vnyKpDpxvXjproBWDJIH
- /L7DuPZE4pWblmD2QiBgnSmfGclV5jQ5NFOKnO0Jrh1dAFcMCwVAYXV35c7fMvgohr
- vFmI74CAVk+Mb2omqoTl83GdIpB+1U1p4dhZo/oeYREiwY5KgQZqvJ5xKWsLeHwpLZ
- gAgAVOufdBYK3UJlKLIERiVA++LWOsinbqwoNuELI4PD6bcDMd4YRrjzgJX71gdXAK
- +h7jenDRStdZA==
+ b=XNpRuCV+U3ebLSUgntzijnXWzfjAmrlPU397uTsm22v32ApYGzmwT31udj7DgIH70
+ WFmyUwMe8oDcicnH6tMHAdjFu7DI43onAD45AtCSoW2IC8vPfx39z7D/BCVqhld2lk
+ JOKLD6UD+FZ/TNZp8uo8/hjR9Gw2HmF7Wk9u06qHspTbAOiyzE0/ZJA6CvCTEdWM96
+ ufBr4E6sGLIH/fdM4LAvYo5sLz/sZTvgYJh0OJDYAlrA7pCf/MCzKp79yBDP1ml0eN
+ yWFqr5Yk28HShv0VHQAqKaR357vvYA7bBXUf6NWLktUiqspWZc+uZKsXbfVKl+o0hi
+ LOOetByChqzGQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH MANUALSEL 5.18 2/3] selftests: KVM: Handle compiler
+Subject: [PATCH MANUALSEL 5.15 2/3] selftests: KVM: Handle compiler
  optimizations in ucall
-Date: Tue, 28 Jun 2022 14:02:16 -0400
-Message-Id: <20220628180220.621172-2-sashal@kernel.org>
+Date: Tue, 28 Jun 2022 14:02:27 -0400
+Message-Id: <20220628180230.621228-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220628180220.621172-1-sashal@kernel.org>
-References: <20220628180220.621172-1-sashal@kernel.org>
+In-Reply-To: <20220628180230.621228-1-sashal@kernel.org>
+References: <20220628180230.621228-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
