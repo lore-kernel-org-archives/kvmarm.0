@@ -2,62 +2,62 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C855CCA480
-	for <kvmarm@archiver.kernel.org>; Wed, 29 Jun 2022 10:30:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F01AC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 29 Jun 2022 10:30:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 873764B5A4;
-	Wed, 29 Jun 2022 06:30:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 054C14B4FF;
+	Wed, 29 Jun 2022 06:30:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oreduyRLk4Jq; Wed, 29 Jun 2022 06:30:17 -0400 (EDT)
+	with ESMTP id 0DHGBSv81Vep; Wed, 29 Jun 2022 06:30:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 666E64B5C9;
-	Wed, 29 Jun 2022 06:30:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A68ED4B5A1;
+	Wed, 29 Jun 2022 06:30:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D17DE4B5CB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2022 06:30:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F2DD4B57B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2022 06:30:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CjqdHRO5P8qW for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Jun 2022 06:30:15 -0400 (EDT)
+ with ESMTP id WGh3Krio93bt for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Jun 2022 06:30:36 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C32E44B5CA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2022 06:30:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 670B44B564
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Jun 2022 06:30:36 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 49D46B82201;
- Wed, 29 Jun 2022 10:30:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DCD3C34114;
- Wed, 29 Jun 2022 10:30:13 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 8AF79B82051;
+ Wed, 29 Jun 2022 10:30:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ADA7C341C8;
+ Wed, 29 Jun 2022 10:30:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1656498613;
- bh=f+r5AD87A2KzRDAwsZTkOVMjV07LTP4CTwRCJZQva5s=;
+ s=k20201202; t=1656498634;
+ bh=FWingHSiicpAR3nuU10lYv4eU+baMLYlpSa5drYSn54=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=YsUnTHzkvp2/drvVhLka9zIWtKrSY9ZgFAcl4J1yb9YwfwFx2FV07LjpSKR2rhSEt
- v8sXw9gJoFZjONHN+tjOulSyKtKPlQ8sx6lF1YvDxSIHw/72YaVvYkbU40fY8Whzjq
- ZdV1l5iaOtb+7RdSzLnuX1PzYckmPmz97AT5RPyPArEJnK1oPtXKr4mo9EBJhx6KCC
- Ve6nnbmTpJ+27B79sMo71q6tmgCRvdz1G+TYFhw5OkMWmNt6EYv6JkjlYaAIDv0u0T
- RD4XUvxWgV8WhokhE2P6WgdNnISAGlkAFHp7AuKG7JWIC3dJz+Gis0QnIK9OFltolk
- U/ajRDsfjVZ3g==
+ b=MoC+YDJ3ltoGd49syVpPFS76B0w4Ai9FjIw+k7zrNavvqWXc9B14SZ/kTf1KbNIdL
+ ZdjpELi4vH8X2q86nonqL0vvy+Mwhx9gOKQicN2pFXoKTlFRVMcdweCJQp3xC41ewU
+ DWNpHzh3/akaC66ltPyjUfUFd/ApRyCibrC4be03PUlkxMTALSCMTGh0ET+eroEBDN
+ foK6cJjRES98IZ+5jFtKn6947tsOrDbDev1WAaKaX54TCPY8xw5OB1SbZ3tVoSgmYW
+ Zv07anQ2bUq4PQ8a2gQ8gSfq6Y71asIa4qNDuGC+ydS+ncnSNpSWYilQwESJsnmul2
+ Q/ecmAo3pNGEw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1o6UxX-0042Se-3o;
- Wed, 29 Jun 2022 11:30:11 +0100
-Date: Wed, 29 Jun 2022 11:30:10 +0100
-Message-ID: <871qv73gp9.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1o6Uxr-0042Tm-Ts;
+ Wed, 29 Jun 2022 11:30:32 +0100
+Date: Wed, 29 Jun 2022 11:30:31 +0100
+Message-ID: <87zghv2248.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Yosry Ahmed <yosryahmed@google.com>
-Subject: Re: [PATCH v6 2/4] KVM: mmu: add a helper to account memory used by
- KVM MMU.
-In-Reply-To: <20220628220938.3657876-3-yosryahmed@google.com>
+Subject: Re: [PATCH v6 4/4] KVM: arm64/mmu: count KVM s2 mmu usage in
+ secondary pagetable stats
+In-Reply-To: <20220628220938.3657876-5-yosryahmed@google.com>
 References: <20220628220938.3657876-1-yosryahmed@google.com>
- <20220628220938.3657876-3-yosryahmed@google.com>
+ <20220628220938.3657876-5-yosryahmed@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -71,7 +71,8 @@ X-SA-Exim-Rcpt-To: yosryahmed@google.com, tj@kernel.org, hannes@cmpxchg.org,
  roman.gushchin@linux.dev, shakeelb@google.com, oupton@google.com,
  Huang@google.com, shaoqin.huang@intel.com, cgroups@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-mm@kvack.org
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-mm@kvack.org,
+ oliver.upton@linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
@@ -101,16 +102,18 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 28 Jun 2022 23:09:36 +0100,
+On Tue, 28 Jun 2022 23:09:38 +0100,
 Yosry Ahmed <yosryahmed@google.com> wrote:
 > 
-> Add a helper to account pages used by KVM for page tables in memory
-> secondary pagetable stats. This function will be used by subsequent
-> patches in different archs.
+> Count the pages used by KVM in arm64 for stage2 mmu in memory stats
+> under secondary pagetable stats (e.g. "SecPageTables" in /proc/meminfo)
+> to give better visibility into the memory consumption of KVM mmu in a
+> similar way to how normal user page tables are accounted.
 > 
 > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
