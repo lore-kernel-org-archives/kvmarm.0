@@ -2,53 +2,53 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 021E8C43334
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Jun 2022 13:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5F41C43334
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Jun 2022 13:58:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87F044B4A7;
-	Thu, 30 Jun 2022 09:58:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E8D84B4C3;
+	Thu, 30 Jun 2022 09:58:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9g-ee7dWmftv; Thu, 30 Jun 2022 09:58:07 -0400 (EDT)
+	with ESMTP id 4uGoYenLBkLV; Thu, 30 Jun 2022 09:58:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0835F4B4B0;
-	Thu, 30 Jun 2022 09:58:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2507F4B4AF;
+	Thu, 30 Jun 2022 09:58:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B6F424B32E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2022 09:58:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 551294B32E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2022 09:58:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RZaXpxYTSTiM for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Jun 2022 09:58:02 -0400 (EDT)
+ with ESMTP id NCISkU1tmysK for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Jun 2022 09:58:08 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 572194B4A2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2022 09:58:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 247D44B4D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2022 09:58:06 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id D57F76218F;
+ by dfw.source.kernel.org (Postfix) with ESMTPS id A2794620E4;
+ Thu, 30 Jun 2022 13:58:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BABA0C341CB;
  Thu, 30 Jun 2022 13:58:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0889C341CC;
- Thu, 30 Jun 2022 13:57:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1656597481;
- bh=C14puFIZ18CG7PnpKVQP1lUNy+y92Os2YQO02ZGN8Kg=;
+ s=k20201202; t=1656597485;
+ bh=CGAYlm140TLjTsKj1pjG8aKb8iu3Aml36A9Qr4wRzmg=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=SFoeQjw+NiH7n3qkSp1otTQZiqe5BRQ6KTuqyNG/4OSaTeYIm5D/JUneLvS9utJ+2
- epiu50SrsjggJD7Go3BhdC6m2tWnNLJeQAptChm5uEQWZpsfeX3UOOOrH8ZZtILDKv
- 08juWQ5HSTwfMLcXEmhvyO0nVFznrIqJS+dsqzOu0/EfROn80gBgwQMzki5k7wz7RO
- IFkAqavuiYjBjVpGp9x80Jv/kzIaXb5FHXYLDrLbWW2cJrocHjKvxR7Ygv5sfBdsP/
- AX0FYiEcozxpjEabNcccgeI+LwDhQDAlVj8YraTpB8C6/QzjYvoch5XQnPbfHE2txB
- 2X13EoRfU1nJA==
+ b=XspaDEvsZuFNNTyleQt8+dPtY3ge5fn5Ul2s8DJXkA3le/YemYo96lThuC7JJZrn2
+ Cv1kViRakFl0XkCxswQdZ1leknhMDEGDD7YMWegfcaQOiRfcB07oa4nJG39avCne5m
+ QNzqEV2Q0jByX6oyeMic32oijHe07wpP72Ug5pqOpBW8Z+EVkt35QrTgGb947oXDji
+ UzeW+3yQ2qEK2Q1Ze7zm4LU/cT5WGJc+oz854b3dP0XIRj/uSVdTixb+iSp6JPJSm0
+ yTu5pIZavoy+2uHLq5MuPfp3mcZtVXxUBLTxudj7utPXFOyTvaJq3iydcbmFzH0XMj
+ hTMu2mRBcAy4g==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 01/24] KVM: arm64: Move hyp refcount manipulation helpers
-Date: Thu, 30 Jun 2022 14:57:24 +0100
-Message-Id: <20220630135747.26983-2-will@kernel.org>
+Subject: [PATCH v2 02/24] KVM: arm64: Allow non-coalescable pages in a hyp_pool
+Date: Thu, 30 Jun 2022 14:57:25 +0100
+Message-Id: <20220630135747.26983-3-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220630135747.26983-1-will@kernel.org>
 References: <20220630135747.26983-1-will@kernel.org>
@@ -75,73 +75,52 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Quentin Perret <qperret@google.com>
 
-We will soon need to manipulate struct hyp_page refcounts from outside
-page_alloc.c, so move the helpers to a header file.
+All the contiguous pages used to initialize a hyp_pool are considered
+coalescable, which means that the hyp page allocator will actively
+try to merge them with their buddies on the hyp_put_page() path.
+However, using hyp_put_page() on a page that is not part of the inital
+memory range given to a hyp_pool() is currently unsupported.
+
+In order to allow dynamically extending hyp pools at run-time, add a
+check to __hyp_attach_page() to allow inserting 'external' pages into
+the free-list of order 0. This will be necessary to allow lazy
+donation of pages from the host to the hypervisor when allocating guest
+stage-2 page-table pages at EL2.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/nvhe/memory.h | 18 ++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/page_alloc.c     | 19 -------------------
- 2 files changed, 18 insertions(+), 19 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-index 592b7edb3edb..418b66a82a50 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-@@ -45,4 +45,22 @@ static inline int hyp_page_count(void *addr)
- 	return p->refcount;
- }
- 
-+static inline void hyp_page_ref_inc(struct hyp_page *p)
-+{
-+	BUG_ON(p->refcount == USHRT_MAX);
-+	p->refcount++;
-+}
-+
-+static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
-+{
-+	BUG_ON(!p->refcount);
-+	p->refcount--;
-+	return (p->refcount == 0);
-+}
-+
-+static inline void hyp_set_page_refcounted(struct hyp_page *p)
-+{
-+	BUG_ON(p->refcount);
-+	p->refcount = 1;
-+}
- #endif /* __KVM_HYP_MEMORY_H */
 diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-index d40f0b30b534..1ded09fc9b10 100644
+index 1ded09fc9b10..0d15227aced8 100644
 --- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
 +++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-@@ -144,25 +144,6 @@ static struct hyp_page *__hyp_extract_page(struct hyp_pool *pool,
- 	return p;
- }
- 
--static inline void hyp_page_ref_inc(struct hyp_page *p)
--{
--	BUG_ON(p->refcount == USHRT_MAX);
--	p->refcount++;
--}
--
--static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
--{
--	BUG_ON(!p->refcount);
--	p->refcount--;
--	return (p->refcount == 0);
--}
--
--static inline void hyp_set_page_refcounted(struct hyp_page *p)
--{
--	BUG_ON(p->refcount);
--	p->refcount = 1;
--}
--
- static void __hyp_put_page(struct hyp_pool *pool, struct hyp_page *p)
+@@ -93,11 +93,15 @@ static inline struct hyp_page *node_to_page(struct list_head *node)
+ static void __hyp_attach_page(struct hyp_pool *pool,
+ 			      struct hyp_page *p)
  {
- 	if (hyp_page_ref_dec_and_test(p))
++	phys_addr_t phys = hyp_page_to_phys(p);
+ 	unsigned short order = p->order;
+ 	struct hyp_page *buddy;
+ 
+ 	memset(hyp_page_to_virt(p), 0, PAGE_SIZE << p->order);
+ 
++	if (phys < pool->range_start || phys >= pool->range_end)
++		goto insert;
++
+ 	/*
+ 	 * Only the first struct hyp_page of a high-order page (otherwise known
+ 	 * as the 'head') should have p->order set. The non-head pages should
+@@ -116,6 +120,7 @@ static void __hyp_attach_page(struct hyp_pool *pool,
+ 		p = min(p, buddy);
+ 	}
+ 
++insert:
+ 	/* Mark the new head, and insert it */
+ 	p->order = order;
+ 	page_add_to_list(p, &pool->free_area[order]);
 -- 
 2.37.0.rc0.161.g10f37bed90-goog
 
