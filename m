@@ -2,53 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7411CC43334
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Jun 2022 13:58:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32569C43334
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Jun 2022 13:58:27 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A2E84B498;
-	Thu, 30 Jun 2022 09:58:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4767411BD;
+	Thu, 30 Jun 2022 09:58:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id H4yyX7Ay3R2S; Thu, 30 Jun 2022 09:58:19 -0400 (EDT)
+	with ESMTP id gwc1muEhqMvE; Thu, 30 Jun 2022 09:58:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74D9749E16;
-	Thu, 30 Jun 2022 09:58:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B79EE4B0C2;
+	Thu, 30 Jun 2022 09:58:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B1F7A40B90
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2022 09:58:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 95B72411BD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2022 09:58:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uG5mFfnkEcOu for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Jun 2022 09:58:16 -0400 (EDT)
+ with ESMTP id cpR-UOBk+QyE for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Jun 2022 09:58:22 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F2204B34C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2022 09:58:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3DF5D4B4A2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2022 09:58:22 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id DE4FDB82AEF;
- Thu, 30 Jun 2022 13:58:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50356C341CD;
- Thu, 30 Jun 2022 13:58:09 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 72687B82AF3;
+ Thu, 30 Jun 2022 13:58:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5287C34115;
+ Thu, 30 Jun 2022 13:58:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1656597492;
- bh=LWPbj07zdr1J5u/vxz1+ial058U/0WpGZVOfRtvuDrs=;
+ s=k20201202; t=1656597500;
+ bh=XvT/NCRTnrJVqvVlVy8yC1jsjzB/S3LNKS9+VwFbCGM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=u8usHZIihd9a312Z0uCw/7sRaSff7f9LYAeqoxQWBjSUwFhsxvcu2Kca/P+GvIn11
- JjfPlRvd+MH8l2sNoaAxTHQGgqvu09z0USPJzyQYscDAbOn1FjPHjLVJ6yuA7JePvg
- qmfY62qmwFGRoc4b3TRr1DgXxBGnrk6YBY0zZMg/WSANMVXHP1n/nyzRvE9UmTu8q9
- p9aH8I7S3LczWk6sYt7sDGQyF/D7z7sGr0ylhISVOmd/afM/Sb8+zx+ziDcyX+4xtM
- WwnnC8kqb+sQHCzesZM8Cw08Ko+gt+hScQLkr/oyzo8H8hh8MBzM+7oLuFjZb6eTKD
- qJf45FF7PsH2w==
+ b=sd+BqIIGQ2bJHAOVyxIMzoXgTEavLc4O9w5bkMyu34ru44TI+oll/hr6TDhenZy6b
+ 5/ZKBL8MANJxBe930B21QriautEF7KzHBzF+dcmA1OqOvUjo1Rq9+dfP0N1M/tPNKZ
+ WceV0ZlIgZX75lYEB9iGzOKob/J2gV5OMh0PFGh54DqltXoLuuk7Oidnq7bL0V/Z+j
+ 4qdPAtCtarkC176cVgL2k2DG5ul1VAaDydxMWeEYEoqsRAyR56u5Fx1QcvvORKORUJ
+ ciWnLHr/wcHuZ3GgJL+m8ati3Qr6wEOuZRmL/hqakRZ2CRv+d+TbqHLzH0FK2WY3/G
+ 7ZxK8xa22GAww==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 04/24] KVM: arm64: Back hyp_vmemmap for all of memory
-Date: Thu, 30 Jun 2022 14:57:27 +0100
-Message-Id: <20220630135747.26983-5-will@kernel.org>
+Subject: [PATCH v2 06/24] KVM: arm64: Unify identifiers used to distinguish
+ host and hypervisor
+Date: Thu, 30 Jun 2022 14:57:29 +0100
+Message-Id: <20220630135747.26983-7-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220630135747.26983-1-will@kernel.org>
 References: <20220630135747.26983-1-will@kernel.org>
@@ -73,221 +74,77 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Quentin Perret <qperret@google.com>
+The 'pkvm_component_id' enum type provides constants to refer to the
+host and the hypervisor, yet this information is duplicated by the
+'pkvm_hyp_id' constant.
 
-The EL2 vmemmap in nVHE Protected mode is currently very sparse: only
-memory pages owned by the hypervisor itself have a matching struct
-hyp_page. But since the size of these structs has been reduced
-significantly, it appears that we can afford backing the vmemmap for all
-of memory.
+Remove the definition of 'pkvm_hyp_id' and move the 'pkvm_component_id'
+type definition to 'mem_protect.h' so that it can be used outside of
+the memory protection code.
 
-This will simplify a lot memory tracking as the hypervisor will have a
-place to store metadata (e.g. refcounts) that wouldn't otherwise fit in
-the 4 SW bits we have in the host stage-2 page-table for instance.
-
-Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_pkvm.h    | 26 +++++++++++++++++++++++
- arch/arm64/kvm/hyp/include/nvhe/mm.h | 14 +------------
- arch/arm64/kvm/hyp/nvhe/mm.c         | 31 ++++++++++++++++++++++++----
- arch/arm64/kvm/hyp/nvhe/page_alloc.c |  4 +---
- arch/arm64/kvm/hyp/nvhe/setup.c      |  7 +++----
- arch/arm64/kvm/pkvm.c                | 18 ++--------------
- 6 files changed, 60 insertions(+), 40 deletions(-)
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 6 +++++-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 8 --------
+ arch/arm64/kvm/hyp/nvhe/setup.c               | 2 +-
+ 3 files changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 9f4ad2a8df59..8f7b8a2314bb 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -14,6 +14,32 @@
- extern struct memblock_region kvm_nvhe_sym(hyp_memory)[];
- extern unsigned int kvm_nvhe_sym(hyp_memblock_nr);
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+index 80e99836eac7..f5705a1e972f 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -51,7 +51,11 @@ struct host_kvm {
+ };
+ extern struct host_kvm host_kvm;
  
-+static inline unsigned long
-+hyp_vmemmap_memblock_size(struct memblock_region *reg, size_t vmemmap_entry_size)
-+{
-+	unsigned long nr_pages = reg->size >> PAGE_SHIFT;
-+	unsigned long start, end;
-+
-+	start = (reg->base >> PAGE_SHIFT) * vmemmap_entry_size;
-+	end = start + nr_pages * vmemmap_entry_size;
-+	start = ALIGN_DOWN(start, PAGE_SIZE);
-+	end = ALIGN(end, PAGE_SIZE);
-+
-+	return end - start;
-+}
-+
-+static inline unsigned long hyp_vmemmap_pages(size_t vmemmap_entry_size)
-+{
-+	unsigned long res = 0, i;
-+
-+	for (i = 0; i < kvm_nvhe_sym(hyp_memblock_nr); i++) {
-+		res += hyp_vmemmap_memblock_size(&kvm_nvhe_sym(hyp_memory)[i],
-+						 vmemmap_entry_size);
-+	}
-+
-+	return res >> PAGE_SHIFT;
-+}
-+
- static inline unsigned long __hyp_pgtable_max_pages(unsigned long nr_pages)
+-extern const u8 pkvm_hyp_id;
++/* This corresponds to page-table locking order */
++enum pkvm_component_id {
++	PKVM_ID_HOST,
++	PKVM_ID_HYP,
++};
+ 
+ int __pkvm_prot_finalize(void);
+ int __pkvm_host_share_hyp(u64 pfn);
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 78edf077fa3b..10390b8dc841 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -26,8 +26,6 @@ struct host_kvm host_kvm;
+ 
+ static struct hyp_pool host_s2_pool;
+ 
+-const u8 pkvm_hyp_id = 1;
+-
+ static void host_lock_component(void)
  {
- 	unsigned long total = 0, i;
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-index 42d8eb9bfe72..b2ee6d5df55b 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-@@ -15,7 +15,7 @@ extern hyp_spinlock_t pkvm_pgd_lock;
- 
- int hyp_create_idmap(u32 hyp_va_bits);
- int hyp_map_vectors(void);
--int hyp_back_vmemmap(phys_addr_t phys, unsigned long size, phys_addr_t back);
-+int hyp_back_vmemmap(phys_addr_t back);
- int pkvm_cpu_set_vector(enum arm64_hyp_spectre_vector slot);
- int pkvm_create_mappings(void *from, void *to, enum kvm_pgtable_prot prot);
- int pkvm_create_mappings_locked(void *from, void *to, enum kvm_pgtable_prot prot);
-@@ -24,16 +24,4 @@ int __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
- 				  unsigned long *haddr);
- int pkvm_alloc_private_va_range(size_t size, unsigned long *haddr);
- 
--static inline void hyp_vmemmap_range(phys_addr_t phys, unsigned long size,
--				     unsigned long *start, unsigned long *end)
--{
--	unsigned long nr_pages = size >> PAGE_SHIFT;
--	struct hyp_page *p = hyp_phys_to_page(phys);
--
--	*start = (unsigned long)p;
--	*end = *start + nr_pages * sizeof(struct hyp_page);
--	*start = ALIGN_DOWN(*start, PAGE_SIZE);
--	*end = ALIGN(*end, PAGE_SIZE);
--}
--
- #endif /* __KVM_HYP_MM_H */
-diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-index 96193cb31a39..d3a3b47181de 100644
---- a/arch/arm64/kvm/hyp/nvhe/mm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-@@ -129,13 +129,36 @@ int pkvm_create_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
- 	return ret;
+ 	hyp_spin_lock(&host_kvm.lock);
+@@ -384,12 +382,6 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
+ 	BUG_ON(ret && ret != -EAGAIN);
  }
  
--int hyp_back_vmemmap(phys_addr_t phys, unsigned long size, phys_addr_t back)
-+int hyp_back_vmemmap(phys_addr_t back)
- {
--	unsigned long start, end;
-+	unsigned long i, start, size, end = 0;
-+	int ret;
+-/* This corresponds to locking order */
+-enum pkvm_component_id {
+-	PKVM_ID_HOST,
+-	PKVM_ID_HYP,
+-};
+-
+ struct pkvm_mem_transition {
+ 	u64				nr_pages;
  
--	hyp_vmemmap_range(phys, size, &start, &end);
-+	for (i = 0; i < hyp_memblock_nr; i++) {
-+		start = hyp_memory[i].base;
-+		start = ALIGN_DOWN((u64)hyp_phys_to_page(start), PAGE_SIZE);
-+		/*
-+		 * The begining of the hyp_vmemmap region for the current
-+		 * memblock may already be backed by the page backing the end
-+		 * the previous region, so avoid mapping it twice.
-+		 */
-+		start = max(start, end);
-+
-+		end = hyp_memory[i].base + hyp_memory[i].size;
-+		end = PAGE_ALIGN((u64)hyp_phys_to_page(end));
-+		if (start >= end)
-+			continue;
-+
-+		size = end - start;
-+		ret = __pkvm_create_mappings(start, size, back, PAGE_HYP);
-+		if (ret)
-+			return ret;
-+
-+		memset(hyp_phys_to_virt(back), 0, size);
-+		back += size;
-+	}
- 
--	return __pkvm_create_mappings(start, end - start, back, PAGE_HYP);
-+	return 0;
- }
- 
- static void *__hyp_bp_vect_base;
-diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-index e6e4b550752b..01976a58d850 100644
---- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-+++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-@@ -235,10 +235,8 @@ int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
- 
- 	/* Init the vmemmap portion */
- 	p = hyp_phys_to_page(phys);
--	for (i = 0; i < nr_pages; i++) {
--		p[i].order = 0;
-+	for (i = 0; i < nr_pages; i++)
- 		hyp_set_page_refcounted(&p[i]);
--	}
- 
- 	/* Attach the unused pages to the buddy tree */
- 	for (i = reserved_pages; i < nr_pages; i++)
 diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index e8d4ea2fcfa0..579eb4f73476 100644
+index 8f2726d7e201..0312c9c74a5a 100644
 --- a/arch/arm64/kvm/hyp/nvhe/setup.c
 +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -31,12 +31,11 @@ static struct hyp_pool hpool;
- 
- static int divide_memory_pool(void *virt, unsigned long size)
- {
--	unsigned long vstart, vend, nr_pages;
-+	unsigned long nr_pages;
- 
- 	hyp_early_alloc_init(virt, size);
- 
--	hyp_vmemmap_range(__hyp_pa(virt), size, &vstart, &vend);
--	nr_pages = (vend - vstart) >> PAGE_SHIFT;
-+	nr_pages = hyp_vmemmap_pages(sizeof(struct hyp_page));
- 	vmemmap_base = hyp_early_alloc_contig(nr_pages);
- 	if (!vmemmap_base)
- 		return -ENOMEM;
-@@ -78,7 +77,7 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
- 	if (ret)
- 		return ret;
- 
--	ret = hyp_back_vmemmap(phys, size, hyp_virt_to_phys(vmemmap_base));
-+	ret = hyp_back_vmemmap(hyp_virt_to_phys(vmemmap_base));
- 	if (ret)
- 		return ret;
- 
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index ebecb7c045f4..34229425b25d 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -53,7 +53,7 @@ static int __init register_memblock_regions(void)
- 
- void __init kvm_hyp_reserve(void)
- {
--	u64 nr_pages, prev, hyp_mem_pages = 0;
-+	u64 hyp_mem_pages = 0;
- 	int ret;
- 
- 	if (!is_hyp_mode_available() || is_kernel_in_hyp_mode())
-@@ -71,21 +71,7 @@ void __init kvm_hyp_reserve(void)
- 
- 	hyp_mem_pages += hyp_s1_pgtable_pages();
- 	hyp_mem_pages += host_s2_pgtable_pages();
--
--	/*
--	 * The hyp_vmemmap needs to be backed by pages, but these pages
--	 * themselves need to be present in the vmemmap, so compute the number
--	 * of pages needed by looking for a fixed point.
--	 */
--	nr_pages = 0;
--	do {
--		prev = nr_pages;
--		nr_pages = hyp_mem_pages + prev;
--		nr_pages = DIV_ROUND_UP(nr_pages * STRUCT_HYP_PAGE_SIZE,
--					PAGE_SIZE);
--		nr_pages += __hyp_pgtable_max_pages(nr_pages);
--	} while (nr_pages != prev);
--	hyp_mem_pages += nr_pages;
-+	hyp_mem_pages += hyp_vmemmap_pages(STRUCT_HYP_PAGE_SIZE);
- 
- 	/*
- 	 * Try to allocate a PMD-aligned region to reduce TLB pressure once
+@@ -212,7 +212,7 @@ static int fix_host_ownership_walker(u64 addr, u64 end, u32 level,
+ 	state = pkvm_getstate(kvm_pgtable_hyp_pte_prot(pte));
+ 	switch (state) {
+ 	case PKVM_PAGE_OWNED:
+-		return host_stage2_set_owner_locked(phys, PAGE_SIZE, pkvm_hyp_id);
++		return host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HYP);
+ 	case PKVM_PAGE_SHARED_OWNED:
+ 		prot = pkvm_mkstate(PKVM_HOST_MEM_PROT, PKVM_PAGE_SHARED_BORROWED);
+ 		break;
 -- 
 2.37.0.rc0.161.g10f37bed90-goog
 
