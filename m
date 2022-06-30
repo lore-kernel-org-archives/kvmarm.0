@@ -2,54 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32569C43334
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Jun 2022 13:58:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61040C43334
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Jun 2022 13:58:32 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4767411BD;
-	Thu, 30 Jun 2022 09:58:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1794A403AD;
+	Thu, 30 Jun 2022 09:58:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gwc1muEhqMvE; Thu, 30 Jun 2022 09:58:24 -0400 (EDT)
+	with ESMTP id p5Pfyg+ry8S4; Thu, 30 Jun 2022 09:58:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B79EE4B0C2;
-	Thu, 30 Jun 2022 09:58:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D51C64B274;
+	Thu, 30 Jun 2022 09:58:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 95B72411BD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2022 09:58:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E49540712
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2022 09:58:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cpR-UOBk+QyE for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Jun 2022 09:58:22 -0400 (EDT)
+ with ESMTP id PgX-LQX6B9T4 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Jun 2022 09:58:26 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3DF5D4B4A2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2022 09:58:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 16B4649AFD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jun 2022 09:58:26 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 72687B82AF3;
- Thu, 30 Jun 2022 13:58:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5287C34115;
- Thu, 30 Jun 2022 13:58:16 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 25349B82AEE;
+ Thu, 30 Jun 2022 13:58:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DA00C341CC;
+ Thu, 30 Jun 2022 13:58:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1656597500;
- bh=XvT/NCRTnrJVqvVlVy8yC1jsjzB/S3LNKS9+VwFbCGM=;
+ s=k20201202; t=1656597503;
+ bh=4jvhAvWd7DlxQP1ElFGB37Cbym7UjvcFAUmt5hM3j/s=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=sd+BqIIGQ2bJHAOVyxIMzoXgTEavLc4O9w5bkMyu34ru44TI+oll/hr6TDhenZy6b
- 5/ZKBL8MANJxBe930B21QriautEF7KzHBzF+dcmA1OqOvUjo1Rq9+dfP0N1M/tPNKZ
- WceV0ZlIgZX75lYEB9iGzOKob/J2gV5OMh0PFGh54DqltXoLuuk7Oidnq7bL0V/Z+j
- 4qdPAtCtarkC176cVgL2k2DG5ul1VAaDydxMWeEYEoqsRAyR56u5Fx1QcvvORKORUJ
- ciWnLHr/wcHuZ3GgJL+m8ati3Qr6wEOuZRmL/hqakRZ2CRv+d+TbqHLzH0FK2WY3/G
- 7ZxK8xa22GAww==
+ b=nwvIw3DhaBmEdok9KfrzFFendkiyXLa4HQDJEFlcDJYBmElIPxFkgiusd4wPocVBL
+ /HWGQGylf7UCCp5WOZoq+ZY0BuWydOEyXccQPWTCTrhuAF9cbjc0TZIVKha2VbNXUT
+ ivm8vZZ+GXRk7JFTLYxQO1pOdtVXut8QCC8i6/cGNI1VicATQsXeuYucShRG7UUZGw
+ QXmY2w0vxTSdpr6F5fhoMmKTJT+G9JerR8jDiT+YWuF5RPBEncHw40NAy1aePrKXXL
+ zUYOKDuTVPfxiutT2tFlG0izrx9r8cTwotpwk52ok1uRf2bHKnRjsEEfKfIELFh+I+
+ rlOJmZ7kITrEg==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 06/24] KVM: arm64: Unify identifiers used to distinguish
- host and hypervisor
-Date: Thu, 30 Jun 2022 14:57:29 +0100
-Message-Id: <20220630135747.26983-7-will@kernel.org>
+Subject: [PATCH v2 07/24] KVM: arm64: Implement do_donate() helper for
+ donating memory
+Date: Thu, 30 Jun 2022 14:57:30 +0100
+Message-Id: <20220630135747.26983-8-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220630135747.26983-1-will@kernel.org>
 References: <20220630135747.26983-1-will@kernel.org>
@@ -74,77 +74,333 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The 'pkvm_component_id' enum type provides constants to refer to the
-host and the hypervisor, yet this information is duplicated by the
-'pkvm_hyp_id' constant.
+From: Quentin Perret <qperret@google.com>
 
-Remove the definition of 'pkvm_hyp_id' and move the 'pkvm_component_id'
-type definition to 'mem_protect.h' so that it can be used outside of
-the memory protection code.
+Transferring ownership information of a memory region from one component
+to another can be achieved using a "donate" operation, which results
+in the previous owner losing access to the underlying pages entirely.
 
+Implement a do_donate() helper, along the same lines as do_{un,}share,
+and provide this functionality for the host-{to,from}-hyp cases as this
+will later be used to donate/reclaim memory pages to store VM metadata
+at EL2.
+
+Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 6 +++++-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 8 --------
- arch/arm64/kvm/hyp/nvhe/setup.c               | 2 +-
- 3 files changed, 6 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   2 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 239 ++++++++++++++++++
+ 2 files changed, 241 insertions(+)
 
 diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index 80e99836eac7..f5705a1e972f 100644
+index f5705a1e972f..c87b19b2d468 100644
 --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
 +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -51,7 +51,11 @@ struct host_kvm {
- };
- extern struct host_kvm host_kvm;
- 
--extern const u8 pkvm_hyp_id;
-+/* This corresponds to page-table locking order */
-+enum pkvm_component_id {
-+	PKVM_ID_HOST,
-+	PKVM_ID_HYP,
-+};
- 
+@@ -60,6 +60,8 @@ enum pkvm_component_id {
  int __pkvm_prot_finalize(void);
  int __pkvm_host_share_hyp(u64 pfn);
+ int __pkvm_host_unshare_hyp(u64 pfn);
++int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
++int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
+ 
+ bool addr_is_memory(phys_addr_t phys);
+ int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
 diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 78edf077fa3b..10390b8dc841 100644
+index 10390b8dc841..f475d554c9fd 100644
 --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -26,8 +26,6 @@ struct host_kvm host_kvm;
+@@ -395,6 +395,9 @@ struct pkvm_mem_transition {
+ 				/* Address in the completer's address space */
+ 				u64	completer_addr;
+ 			} host;
++			struct {
++				u64	completer_addr;
++			} hyp;
+ 		};
+ 	} initiator;
  
- static struct hyp_pool host_s2_pool;
+@@ -408,6 +411,10 @@ struct pkvm_mem_share {
+ 	const enum kvm_pgtable_prot		completer_prot;
+ };
  
--const u8 pkvm_hyp_id = 1;
--
- static void host_lock_component(void)
- {
- 	hyp_spin_lock(&host_kvm.lock);
-@@ -384,12 +382,6 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
- 	BUG_ON(ret && ret != -EAGAIN);
++struct pkvm_mem_donation {
++	const struct pkvm_mem_transition	tx;
++};
++
+ struct check_walk_data {
+ 	enum pkvm_page_state	desired;
+ 	enum pkvm_page_state	(*get_page_state)(kvm_pte_t pte);
+@@ -507,6 +514,46 @@ static int host_initiate_unshare(u64 *completer_addr,
+ 	return __host_set_page_state_range(addr, size, PKVM_PAGE_OWNED);
  }
  
--/* This corresponds to locking order */
--enum pkvm_component_id {
--	PKVM_ID_HOST,
--	PKVM_ID_HYP,
--};
--
- struct pkvm_mem_transition {
- 	u64				nr_pages;
++static int host_initiate_donation(u64 *completer_addr,
++				  const struct pkvm_mem_transition *tx)
++{
++	u8 owner_id = tx->completer.id;
++	u64 size = tx->nr_pages * PAGE_SIZE;
++
++	*completer_addr = tx->initiator.host.completer_addr;
++	return host_stage2_set_owner_locked(tx->initiator.addr, size, owner_id);
++}
++
++static bool __host_ack_skip_pgtable_check(const struct pkvm_mem_transition *tx)
++{
++	return !(IS_ENABLED(CONFIG_NVHE_EL2_DEBUG) ||
++		 tx->initiator.id != PKVM_ID_HYP);
++}
++
++static int __host_ack_transition(u64 addr, const struct pkvm_mem_transition *tx,
++				 enum pkvm_page_state state)
++{
++	u64 size = tx->nr_pages * PAGE_SIZE;
++
++	if (__host_ack_skip_pgtable_check(tx))
++		return 0;
++
++	return __host_check_page_state_range(addr, size, state);
++}
++
++static int host_ack_donation(u64 addr, const struct pkvm_mem_transition *tx)
++{
++	return __host_ack_transition(addr, tx, PKVM_NOPAGE);
++}
++
++static int host_complete_donation(u64 addr, const struct pkvm_mem_transition *tx)
++{
++	u64 size = tx->nr_pages * PAGE_SIZE;
++	u8 host_id = tx->completer.id;
++
++	return host_stage2_set_owner_locked(addr, size, host_id);
++}
++
+ static enum pkvm_page_state hyp_get_page_state(kvm_pte_t pte)
+ {
+ 	if (!kvm_pte_valid(pte))
+@@ -527,6 +574,27 @@ static int __hyp_check_page_state_range(u64 addr, u64 size,
+ 	return check_page_state_range(&pkvm_pgtable, addr, size, &d);
+ }
  
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 8f2726d7e201..0312c9c74a5a 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -212,7 +212,7 @@ static int fix_host_ownership_walker(u64 addr, u64 end, u32 level,
- 	state = pkvm_getstate(kvm_pgtable_hyp_pte_prot(pte));
- 	switch (state) {
- 	case PKVM_PAGE_OWNED:
--		return host_stage2_set_owner_locked(phys, PAGE_SIZE, pkvm_hyp_id);
-+		return host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HYP);
- 	case PKVM_PAGE_SHARED_OWNED:
- 		prot = pkvm_mkstate(PKVM_HOST_MEM_PROT, PKVM_PAGE_SHARED_BORROWED);
- 		break;
++static int hyp_request_donation(u64 *completer_addr,
++				const struct pkvm_mem_transition *tx)
++{
++	u64 size = tx->nr_pages * PAGE_SIZE;
++	u64 addr = tx->initiator.addr;
++
++	*completer_addr = tx->initiator.hyp.completer_addr;
++	return __hyp_check_page_state_range(addr, size, PKVM_PAGE_OWNED);
++}
++
++static int hyp_initiate_donation(u64 *completer_addr,
++				 const struct pkvm_mem_transition *tx)
++{
++	u64 size = tx->nr_pages * PAGE_SIZE;
++	int ret;
++
++	*completer_addr = tx->initiator.hyp.completer_addr;
++	ret = kvm_pgtable_hyp_unmap(&pkvm_pgtable, tx->initiator.addr, size);
++	return (ret != size) ? -EFAULT : 0;
++}
++
+ static bool __hyp_ack_skip_pgtable_check(const struct pkvm_mem_transition *tx)
+ {
+ 	return !(IS_ENABLED(CONFIG_NVHE_EL2_DEBUG) ||
+@@ -558,6 +626,16 @@ static int hyp_ack_unshare(u64 addr, const struct pkvm_mem_transition *tx)
+ 					    PKVM_PAGE_SHARED_BORROWED);
+ }
+ 
++static int hyp_ack_donation(u64 addr, const struct pkvm_mem_transition *tx)
++{
++	u64 size = tx->nr_pages * PAGE_SIZE;
++
++	if (__hyp_ack_skip_pgtable_check(tx))
++		return 0;
++
++	return __hyp_check_page_state_range(addr, size, PKVM_NOPAGE);
++}
++
+ static int hyp_complete_share(u64 addr, const struct pkvm_mem_transition *tx,
+ 			      enum kvm_pgtable_prot perms)
+ {
+@@ -576,6 +654,15 @@ static int hyp_complete_unshare(u64 addr, const struct pkvm_mem_transition *tx)
+ 	return (ret != size) ? -EFAULT : 0;
+ }
+ 
++static int hyp_complete_donation(u64 addr,
++				 const struct pkvm_mem_transition *tx)
++{
++	void *start = (void *)addr, *end = start + (tx->nr_pages * PAGE_SIZE);
++	enum kvm_pgtable_prot prot = pkvm_mkstate(PAGE_HYP, PKVM_PAGE_OWNED);
++
++	return pkvm_create_mappings_locked(start, end, prot);
++}
++
+ static int check_share(struct pkvm_mem_share *share)
+ {
+ 	const struct pkvm_mem_transition *tx = &share->tx;
+@@ -728,6 +815,94 @@ static int do_unshare(struct pkvm_mem_share *share)
+ 	return WARN_ON(__do_unshare(share));
+ }
+ 
++static int check_donation(struct pkvm_mem_donation *donation)
++{
++	const struct pkvm_mem_transition *tx = &donation->tx;
++	u64 completer_addr;
++	int ret;
++
++	switch (tx->initiator.id) {
++	case PKVM_ID_HOST:
++		ret = host_request_owned_transition(&completer_addr, tx);
++		break;
++	case PKVM_ID_HYP:
++		ret = hyp_request_donation(&completer_addr, tx);
++		break;
++	default:
++		ret = -EINVAL;
++	}
++
++	if (ret)
++		return ret;
++
++	switch (tx->completer.id){
++	case PKVM_ID_HOST:
++		ret = host_ack_donation(completer_addr, tx);
++		break;
++	case PKVM_ID_HYP:
++		ret = hyp_ack_donation(completer_addr, tx);
++		break;
++	default:
++		ret = -EINVAL;
++	}
++
++	return ret;
++}
++
++static int __do_donate(struct pkvm_mem_donation *donation)
++{
++	const struct pkvm_mem_transition *tx = &donation->tx;
++	u64 completer_addr;
++	int ret;
++
++	switch (tx->initiator.id) {
++	case PKVM_ID_HOST:
++		ret = host_initiate_donation(&completer_addr, tx);
++		break;
++	case PKVM_ID_HYP:
++		ret = hyp_initiate_donation(&completer_addr, tx);
++		break;
++	default:
++		ret = -EINVAL;
++	}
++
++	if (ret)
++		return ret;
++
++	switch (tx->completer.id){
++	case PKVM_ID_HOST:
++		ret = host_complete_donation(completer_addr, tx);
++		break;
++	case PKVM_ID_HYP:
++		ret = hyp_complete_donation(completer_addr, tx);
++		break;
++	default:
++		ret = -EINVAL;
++	}
++
++	return ret;
++}
++
++/*
++ * do_donate():
++ *
++ * The page owner transfers ownership to another component, losing access
++ * as a consequence.
++ *
++ * Initiator: OWNED	=> NOPAGE
++ * Completer: NOPAGE	=> OWNED
++ */
++static int do_donate(struct pkvm_mem_donation *donation)
++{
++	int ret;
++
++	ret = check_donation(donation);
++	if (ret)
++		return ret;
++
++	return WARN_ON(__do_donate(donation));
++}
++
+ int __pkvm_host_share_hyp(u64 pfn)
+ {
+ 	int ret;
+@@ -793,3 +968,67 @@ int __pkvm_host_unshare_hyp(u64 pfn)
+ 
+ 	return ret;
+ }
++
++int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
++{
++	int ret;
++	u64 host_addr = hyp_pfn_to_phys(pfn);
++	u64 hyp_addr = (u64)__hyp_va(host_addr);
++	struct pkvm_mem_donation donation = {
++		.tx	= {
++			.nr_pages	= nr_pages,
++			.initiator	= {
++				.id	= PKVM_ID_HOST,
++				.addr	= host_addr,
++				.host	= {
++					.completer_addr = hyp_addr,
++				},
++			},
++			.completer	= {
++				.id	= PKVM_ID_HYP,
++			},
++		},
++	};
++
++	host_lock_component();
++	hyp_lock_component();
++
++	ret = do_donate(&donation);
++
++	hyp_unlock_component();
++	host_unlock_component();
++
++	return ret;
++}
++
++int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
++{
++	int ret;
++	u64 host_addr = hyp_pfn_to_phys(pfn);
++	u64 hyp_addr = (u64)__hyp_va(host_addr);
++	struct pkvm_mem_donation donation = {
++		.tx	= {
++			.nr_pages	= nr_pages,
++			.initiator	= {
++				.id	= PKVM_ID_HYP,
++				.addr	= hyp_addr,
++				.hyp	= {
++					.completer_addr = host_addr,
++				},
++			},
++			.completer	= {
++				.id	= PKVM_ID_HOST,
++			},
++		},
++	};
++
++	host_lock_component();
++	hyp_lock_component();
++
++	ret = do_donate(&donation);
++
++	hyp_unlock_component();
++	host_unlock_component();
++
++	return ret;
++}
 -- 
 2.37.0.rc0.161.g10f37bed90-goog
 
