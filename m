@@ -2,56 +2,86 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A786CC433EF
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Jul 2022 15:00:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D02DC43334
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Jul 2022 07:44:37 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E70034BE42;
-	Mon,  4 Jul 2022 11:00:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC57C4BCBC;
+	Tue,  5 Jul 2022 03:44:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id P0OmTQaFLMVH; Mon,  4 Jul 2022 11:00:41 -0400 (EDT)
+	with ESMTP id mmC8E+ABaLBF; Tue,  5 Jul 2022 03:44:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E75454BE54;
-	Mon,  4 Jul 2022 11:00:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6F564BADA;
+	Tue,  5 Jul 2022 03:44:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CCDF54BE42
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jul 2022 11:00:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E0D704BADA
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jul 2022 03:44:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id whs7Gqz4fAtq for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Jul 2022 11:00:38 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C216A4BDA4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jul 2022 11:00:38 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 61FCD150C;
- Mon,  4 Jul 2022 08:00:38 -0700 (PDT)
-Received: from [10.57.41.70] (unknown [10.57.41.70])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 932D23F792;
- Mon,  4 Jul 2022 08:00:35 -0700 (PDT)
-Message-ID: <b91ae197-d191-2204-aab5-21a0aabded69@arm.com>
-Date: Mon, 4 Jul 2022 16:00:34 +0100
+ with ESMTP id wQuyXNzqO89D for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Jul 2022 03:44:29 -0400 (EDT)
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com
+ [209.85.218.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 370224BAC9
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jul 2022 03:44:29 -0400 (EDT)
+Received: by mail-ej1-f45.google.com with SMTP id h23so20099144ejj.12
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Jul 2022 00:44:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ h=sender:message-id:date:mime-version:user-agent:subject
+ :content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=p4WrMxeyT1HLi3JYPDHBaEUMJazd4JiPotMxjccrcOI=;
+ b=CK+VMuXOPY60wZIVnAZQ7xwsWPl4STCGWQlj/Y18ImlheH0kMnUdhDdWi2v4ywwXmq
+ yjHK+NcgnPIhVXFoSX6iSCXcS3A4e/QPb9T0sZ7zoiyIL3pgL9bYaDlU6lN/1OqtNlOv
+ 0dWLVaELMs9oq5gi5ydvR8KrBxRkcYTQKbOlwCtoWK/9EJ5LutESLfPxwzAUbEDK4/g1
+ khxj4shhIg+dAlVTSI3bANq6Q1I9HD/oLluGmKLyk18HiHYla4CkrwemkOOTUjD5qfIE
+ jq97luvgK97KDecXPKhtpjCDAt5X+keNa39ncJyV5CgHNh5c40L3XIs6VxGBo7gfEHeA
+ eWxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+ :subject:content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=p4WrMxeyT1HLi3JYPDHBaEUMJazd4JiPotMxjccrcOI=;
+ b=7NT4LofoPg4hBqbSj4svmQmqB/eHJw/83P7oFBOtRapK8nQ4oCzhi2UjUqlz+eSuyi
+ tU8fdz+Jlb7fjvFUnJ/866pFF4eIJ2Gy5kJEJPiKSifAlb2ifTeg3nCp1BDghT2atDtz
+ gCJ7FzHZZ+l8FpEVSGd65vK3RCES9K8J6o5kZNj9HVFmzD9rlxTbpxdclX0Mz/buPEQ5
+ XNof+kTvLVv8oE/VIUDdMR7I29xvkw1GL/qUfikHOl9O7Wl/EtrVD3lZMWgQJk6+g5T6
+ oNMOXxvQOd0yjjiWIk0+35+0aikRNML9oU7MM8tzDP1GBwXtpYyyyFzI73GjspVmclyZ
+ UWIg==
+X-Gm-Message-State: AJIora/iWdHybD1wps6NsWycrS5kD5YGy2yrPhOH0PB031oKCON3LKn+
+ etMyHkWAIDIFddeCPfRGPlg=
+X-Google-Smtp-Source: AGRyM1ucemoQZ09Gw0/I3mQiuc+mMrI6EyC3S8EzKzn1mq2Vr1UVjIxLl4dhAvYlXIFb38KeVU+UgA==
+X-Received: by 2002:a17:907:9710:b0:726:bdf6:edee with SMTP id
+ jg16-20020a170907971000b00726bdf6edeemr32212369ejc.48.1657007068117; 
+ Tue, 05 Jul 2022 00:44:28 -0700 (PDT)
+Received: from [192.168.89.248] (93-33-54-161.ip43.fastwebnet.it.
+ [93.33.54.161]) by smtp.googlemail.com with ESMTPSA id
+ d1-20020a056402516100b0043a09f6fc24sm6149293ede.47.2022.07.05.00.44.25
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 05 Jul 2022 00:44:27 -0700 (PDT)
+Message-ID: <f719c5fb-3e41-38ac-1b16-fcb603e4911f@redhat.com>
+Date: Tue, 5 Jul 2022 09:44:24 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH] KVM: arm64: permit MAP_SHARED mappings with MTE enabled
-Content-Language: en-GB
-To: Cornelia Huck <cohuck@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>
-References: <20220623234944.141869-1-pcc@google.com>
- <YrXu0Uzi73pUDwye@arm.com> <14f2a69e-4022-e463-1662-30032655e3d1@arm.com>
- <875ykmcd8q.fsf@redhat.com> <YrwRPh1S6qjzkJMm@arm.com>
- <7a32fde7-611d-4649-2d74-f5e434497649@arm.com> <871qv12hqj.fsf@redhat.com>
-From: Steven Price <steven.price@arm.com>
-In-Reply-To: <871qv12hqj.fsf@redhat.com>
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>, kvm@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, Andy Lutomirski <luto@amacapital.net>,
- Will Deacon <will@kernel.org>, Evgenii Stepanov <eugenis@google.com>,
- Michael Roth <michael.roth@amd.com>, Chao Peng <chao.p.peng@linux.intel.com>,
- Peter Collingbourne <pcc@google.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v7 00/22] Support SDEI Virtualization
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>, Gavin Shan <gshan@redhat.com>
+References: <20220527080253.1562538-1-gshan@redhat.com>
+ <6bdb9280-3530-dc1f-d33e-5bc1c5ac927b@redhat.com>
+ <87iloq2oke.wl-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <87iloq2oke.wl-maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ shijie@amperemail.onmicrosoft.com, linux-kernel@vger.kernel.org,
+ eauger@redhat.com, shan.gavin@gmail.com, Jonathan.Cameron@huawei.com,
+ vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -63,135 +93,95 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 04/07/2022 13:19, Cornelia Huck wrote:
-> On Mon, Jul 04 2022, Steven Price <steven.price@arm.com> wrote:
-> 
->> On 29/06/2022 09:45, Catalin Marinas wrote:
->>> On Mon, Jun 27, 2022 at 05:55:33PM +0200, Cornelia Huck wrote:
->>>> [I'm still in the process of trying to grok the issues surrounding
->>>> MTE+KVM, so apologies in advance if I'm muddying the waters]
->>>
->>> No worries, we are not that far ahead either ;).
->>>
->>>> On Sat, Jun 25 2022, Steven Price <steven.price@arm.com> wrote:
->>>>> On 24/06/2022 18:05, Catalin Marinas wrote:
->>>>>> + Steven as he added the KVM and swap support for MTE.
->>>>>>
->>>>>> On Thu, Jun 23, 2022 at 04:49:44PM -0700, Peter Collingbourne wrote:
->>>>>>> Certain VMMs such as crosvm have features (e.g. sandboxing, pmem) that
->>>>>>> depend on being able to map guest memory as MAP_SHARED. The current
->>>>>>> restriction on sharing MAP_SHARED pages with the guest is preventing
->>>>>>> the use of those features with MTE. Therefore, remove this restriction.
->>>>>>
->>>>>> We already have some corner cases where the PG_mte_tagged logic fails
->>>>>> even for MAP_PRIVATE (but page shared with CoW). Adding this on top for
->>>>>> KVM MAP_SHARED will potentially make things worse (or hard to reason
->>>>>> about; for example the VMM sets PROT_MTE as well). I'm more inclined to
->>>>>> get rid of PG_mte_tagged altogether, always zero (or restore) the tags
->>>>>> on user page allocation, copy them on write. For swap we can scan and if
->>>>>> all tags are 0 and just skip saving them.
->>>>>>
->>>>>> Another aspect is a change in the KVM ABI with this patch. It's probably
->>>>>> not that bad since it's rather a relaxation but it has the potential to
->>>>>> confuse the VMM, especially as it doesn't know whether it's running on
->>>>>> older kernels or not (it would have to probe unless we expose this info
->>>>>> to the VMM in some other way).
->>>>
->>>> Which VMMs support KVM+MTE so far? (I'm looking at adding support in QEMU.)
->>>
->>> Steven to confirm but I think he only played with kvmtool. Adding
->>> Jean-Philippe who also had Qemu on his plans at some point.
->>
->> Yes I've only played with kvmtool so far. 'basic support' at the moment
->> is little more than enabling the cap - that allows the guest to access
->> tags. However obviously aspects such as migration need to understand
->> what's going on to correctly save/restore tags - which is mostly only
->> relevant to Qemu.
-> 
-> Yes, simply only enabling the cap seems to work fine in QEMU as well (as
-> in, 'mte selftests work fine'). Migration support is the
-> hard/interesting part.
-> 
->>
->>>> What happens in kvm_vm_ioctl_mte_copy_tags()? I think we would just end
->>>> up copying zeroes?
->>>
->>> Yes. For migration, the VMM could ignore sending over tags that are all
->>> zeros or maybe use some simple compression. We don't have a way to
->>> disable MTE for guests, so all pages mapped into the guest address space
->>> end up with PG_mte_tagged.
->>
->> Architecturally we don't (yet) have a way of describing memory without
->> tags, so indeed you will get all zeros if the guest hasn't populated the
->> tags yet.
-> 
-> Nod.
-> 
->>
->>>> That said, do we make any assumptions about when KVM_ARM_MTE_COPY_TAGS
->>>> will be called? I.e. when implementing migration, it should be ok to
->>>> call it while the vm is paused, but you probably won't get a consistent
->>>> state while the vm is running?
->>>
->>> Wouldn't this be the same as migrating data? The VMM would only copy it
->>> after it was marked read-only. BTW, I think sanitise_mte_tags() needs a
->>> barrier before setting the PG_mte_tagged() flag (unless we end up with
->>> some lock for reading the tags).
->>
->> As Catalin says, tags are no different from data so the VMM needs to
->> either pause the VM or mark the page read-only to protect it from guest
->> updates during the copy.
-> 
-> Yes, that seems reasonable; not sure whether the documentation should
-> call that out explicitly.
-> 
->>
->> The whole test_bit/set_bit dance does seem to be leaving open race
->> conditions. I /think/ that Peter's extra flag as a lock with an added
->> memory barrier is sufficient to mitigate it, but at this stage I'm also
->> thinking some formal modelling would be wise as I don't trust my
->> intuition when it comes to memory barriers.
->>
->>>> [Postcopy needs a different interface, I guess, so that the migration
->>>> target can atomically place a received page and its metadata. I see
->>>> https://lore.kernel.org/all/CAJc+Z1FZxSYB_zJit4+0uTR-88VqQL+-01XNMSEfua-dXDy6Wg@mail.gmail.com/;
->>>> has there been any follow-up?]
->>>
->>> I don't follow the qemu list, so I wasn't even aware of that thread. But
->>> postcopy, the VMM needs to ensure that both the data and tags are up to
->>> date before mapping such page into the guest address space.
->>>
->>
->> I'm not sure I see how atomically updating data+tags is different from
->> the existing issues around atomically updating the data. The VMM needs
->> to ensure that the guest doesn't see the page before all the data+all
->> the tags are written. It does mean lazy setting of the tags isn't
->> possible in the VMM, but I'm not sure that's a worthwhile thing anyway.
->> Perhaps I'm missing something?
-> 
-> For postcopy, we basically want to fault in any not-yet-migrated page
-> via uffd once the guest accesses it. We only get the page data that way,
-> though, not the tag. I'm wondering whether we'd need a 'page+metadata'
-> uffd mode; not sure if that makes sense. Otherwise, we'd need to stop
-> the guest while grabbing the tags for the page as well, and stopping is
-> the thing we want to avoid here.
+On 6/24/22 15:12, Marc Zyngier wrote:
+> - as far as I know, the core Linux/arm64 maintainers have no plan to
+>    support APF. Without it, this is a pointless exercise. And even with
+>    it, this introduces a Linux specific behaviour in an otherwise
+>    architectural hypervisor (something I'm quite keen on avoiding)
 
-Ah, I think I see now. UFFDIO_COPY atomically populates the (data) page
-and ensures that no thread will see the partially populated page. But
-there's currently no way of doing that with tags as well.
+Regarding non-architectural behavior, isn't that the same already for 
+PTP?  I understand that the PTP hypercall is a much smaller 
+implementation than SDEI+APF, but it goes to show that KVM is already 
+not "architectural".
 
-I'd not looked at the implementation of userfaultfd before and I'd
-assumed it avoided the need for an 'atomic' operation like this. But
-apparently not! AFAICT either a new ioctl would be needed (which can
-take a tag buffer) or a new flag to UFFDIO_COPY which would tighten the
-alignment requirements of `src` and would copy the tags along with the data.
+There are other cases where paravirtualized solutions can be useful. 
+PTP is one but there are more where KVM/ARM does not have a solution 
+yet, for example lock holder preemption.  Unless ARM (the company) has a 
+way to receive input from developers and standardize the interface, 
+similar to the RISC-V SIGs, vendor-specific hypercalls are a sad fact of 
+life.  It just happened that until now KVM/ARM hasn't seen much use in 
+some cases (such as desktop virtualization) where overcommitted hosts 
+are more common.
 
-Steve
+Async page faults per se are not KVM specific, in fact Linux supported 
+them for the IBM s390 hypervisor long before KVM added support.  They 
+didn't exist on x86 and ARM, so the developers came up with a new 
+hypercall API and for x86 honestly it wasn't great.  For ARM we learnt 
+from the mistakes and it seems to me that SDEI is a good match for the 
+feature.  If ARM wants to produce a standard interface for APF, whether 
+based on SDEI or something else, we're all ears.
+
+Regarding plans of core arm64 maintainers to support async page fault, 
+can you provide a pointer to the discussion?  I agree that if there's a 
+hard NACK for APF for whatever reason, the whole host-side code is 
+pointless (including SDEI virtualization); but I would like to read more 
+about it.
+
+> - It gives an incentive to other hypervisor vendors to add random crap
+>    to the Linux mm subsystem, which is even worse. At this stage, we
+>    might as well go back to the Xen PV days altogether.
+
+	return -EGREGIOUS;
+
+Since you mention hypervisor vendors and there's only one hypervisor in 
+Linux, I guess you're not talking about the host mm/ subsystem 
+(otherwise yeah, FOLL_NOWAIT is only used by KVM async page faults).
+
+So I suppose you're talking about the guest, and then yeah, it sucks to 
+have multiple hypervisors providing the same functionality in different 
+ways (or multiple hypervisors providing different subsets of PV 
+functionality).  It happens on x86 with Hyper-V and KVM, and to a lesser 
+extent Xen and VMware.
+
+But again, KVM/ARM has already crossed that bridge with PTP support, and 
+the guest needs exactly zero code in the Linux mm subsystem (both 
+generic and arch-specific) to support asynchronous page faults.  There 
+are 20 lines of code in do_notify_resume(), and the rest is just SDEI 
+gunk.  Again, I would be happy to get a pointer to concrete objections 
+from the Linux ARM64 maintainers.  Maybe a different implementation is 
+possible, I don't know.
+
+In any case it's absolutely not comparable to Xen PV, and you know it.
+
+> - I haven't seen any of the KVM/arm64 users actually asking for the
+>    APF horror, and the cloud vendors I directly asked had no plan to
+>    use it, and not using it on their x86 systems either
+
+Please define "horror" in more technical terms.  And since this is the 
+second time I'm calling you out on this, I'm also asking you to avoid 
+hyperboles and similar rhetorical gimmicks in the future.
+
+That said: Peter, Sean, Google uses or used postcopy extensively on GCE 
+(https://dl.acm.org/doi/pdf/10.1145/3296975.3186415).  If it doesn't use 
+it on x86, do you have any insights on why?
+
+> - no performance data nor workloads that could help making an informed
+>    decision have been disclosed, and the only argument in its favour
+>    seems to be "but x86 has it" (hardly a compelling one)
+
+Again this is just false, numbers have been posted 
+(https://lwn.net/ml/linux-kernel/20210209050403.103143-1-gshan@redhat.com/ 
+was the first result that came up from a quick mailing list search).  If 
+they are not enough, please be more specific.
+
+Thanks,
+
+Paolo
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
