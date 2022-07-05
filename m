@@ -2,51 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C55C433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA23CCA473
 	for <kvmarm@archiver.kernel.org>; Wed,  6 Jul 2022 07:21:26 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 581924C074;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BC6D4C07D;
 	Wed,  6 Jul 2022 03:21:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@quicinc.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bOwnH3YrnOi7; Wed,  6 Jul 2022 03:21:24 -0400 (EDT)
+	with ESMTP id zai7iavQ3ZjC; Wed,  6 Jul 2022 03:21:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA81E4C063;
-	Wed,  6 Jul 2022 03:21:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 029FB4C06D;
+	Wed,  6 Jul 2022 03:21:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 846FE4BDCE
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jul 2022 15:10:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C69804BFA5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jul 2022 12:57:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cCpZ7f17CuLs for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Jul 2022 15:10:14 -0400 (EDT)
-Received: from smtp.smtpout.orange.fr (smtp05.smtpout.orange.fr
- [80.12.242.127])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2B2E4BCA9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jul 2022 15:10:13 -0400 (EDT)
-Received: from pop-os.home ([90.11.190.129]) by smtp.orange.fr with ESMTPA
- id 8RSToSo9rZDzU8RSToUB9C; Mon, 04 Jul 2022 21:10:12 +0200
-X-ME-Helo: pop-os.home
-X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
-X-ME-Date: Mon, 04 Jul 2022 21:10:12 +0200
-X-ME-IP: 90.11.190.129
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Subject: [PATCH] KVM: arm64: Use the bitmap API to allocate bitmaps
-Date: Mon,  4 Jul 2022 21:10:08 +0200
-Message-Id: <a93d3e94be2003922c7e9652b57e96261cc47641.1656961792.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.34.1
+ with ESMTP id nplJKHXku7+u for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Jul 2022 12:57:26 -0400 (EDT)
+Received: from alexa-out-sd-02.qualcomm.com (alexa-out-sd-02.qualcomm.com
+ [199.106.114.39])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 860FC4BF97
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Jul 2022 12:57:26 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1657040246; x=1688576246;
+ h=date:from:to:cc:subject:message-id:references:
+ mime-version:in-reply-to;
+ bh=gy7zdpSIRmyfnnx+9IyNxg2E2VUlmif7PnWPjxZ65OU=;
+ b=pGzEfJo0wcm6uhukDdamu6P38ySoUO8zwuDnPkv2wTn75PFrXzV8BJR1
+ gjKE5fK3L2vs3k3ov+lIzYufddsJnziFZQpXmYyIG9wJZOPRI9F5dBdZW
+ +ne22clXED32TPnSHHyunR/RjLSmkgOYRlLH8QYWYGbSI4eUq1cXxKyFr k=;
+Received: from unknown (HELO ironmsg05-sd.qualcomm.com) ([10.53.140.145])
+ by alexa-out-sd-02.qualcomm.com with ESMTP; 05 Jul 2022 09:57:25 -0700
+X-QCInternal: smtphost
+Received: from nasanex01c.na.qualcomm.com ([10.47.97.222])
+ by ironmsg05-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 05 Jul 2022 09:57:25 -0700
+Received: from nalasex01b.na.qualcomm.com (10.47.209.197) by
+ nasanex01c.na.qualcomm.com (10.47.97.222) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.22; Tue, 5 Jul 2022 09:57:24 -0700
+Received: from debian-BULLSEYE-live-builder-AMD64 (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.22; Tue, 5 Jul 2022 09:57:24 -0700
+Date: Tue, 5 Jul 2022 09:57:22 -0700
+From: Calvin Owens <quic_calvinow@quicinc.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [RFC PATCH v5 15/38] perf: arm_spe_pmu: Move struct arm_spe_pmu
+ to a separate header file
+Message-ID: <YsRtcvxyufSCoIE5@debian-BULLSEYE-live-builder-AMD64>
+References: <20211117153842.302159-1-alexandru.elisei@arm.com>
+ <20211117153842.302159-16-alexandru.elisei@arm.com>
 MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20211117153842.302159-16-alexandru.elisei@arm.com>
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
 X-Mailman-Approved-At: Wed, 06 Jul 2022 03:21:23 -0400
-Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: maz@kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -63,51 +84,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Use bitmap_zalloc()/bitmap_free() instead of hand-writing them.
+Hi Alexandru,
 
-It is less verbose and it improves the semantic.
+I've been taking a look at this series, it needs a little tweak to
+build successfully as a module which I've appended below.
 
-While at it, turn a bitmap_clear() into an equivalent bitmap_zero(). It is
-also less verbose.
+Cheers,
+Calvin
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+On Wed, Nov 17, 2021 at 03:38:19PM +0000, Alexandru Elisei wrote:
+> KVM will soon want to make use of struct arm_spe_pmu, move it to a separate
+> header where it will be easily accessible. This is a straightforward move
+> and functionality should not be impacted.
+>
+> CC: Will Deacon <will@kernel.org>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+
+<snip>
+
+> +++ b/include/linux/perf/arm_spe_pmu.h
+> @@ -0,0 +1,49 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Split from from drivers/perf/arm_spe_pmu.c.
+> + *
+> + *  Copyright (C) 2021 ARM Limited
+> + */
+> +
+> +#ifndef __ARM_SPE_PMU_H__
+> +#define __ARM_SPE_PMU_H__
+> +
+> +#include <linux/cpumask.h>
+> +#include <linux/perf_event.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/types.h>
+> +
+> +#ifdef CONFIG_ARM_SPE_PMU
+
+Here, we need to use the IS_ENABLED() macro for the ARM_SPE_PMU=m case.
+
+Signed-off-by: Calvin Owens <calvinow@qti.qualcomm.com>
 ---
- arch/arm64/kvm/vmid.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ include/linux/perf/arm_spe_pmu.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/vmid.c b/arch/arm64/kvm/vmid.c
-index d78ae63d7c15..f4612cdb60ff 100644
---- a/arch/arm64/kvm/vmid.c
-+++ b/arch/arm64/kvm/vmid.c
-@@ -47,7 +47,7 @@ static void flush_context(void)
- 	int cpu;
- 	u64 vmid;
+diff --git a/include/linux/perf/arm_spe_pmu.h b/include/linux/perf/arm_spe_pmu.h
+index 505a8867daad..b643e5e7a766 100644
+--- a/include/linux/perf/arm_spe_pmu.h
++++ b/include/linux/perf/arm_spe_pmu.h
+@@ -13,7 +13,7 @@
+ #include <linux/platform_device.h>
+ #include <linux/types.h>
  
--	bitmap_clear(vmid_map, 0, NUM_USER_VMIDS);
-+	bitmap_zero(vmid_map, NUM_USER_VMIDS);
+-#ifdef CONFIG_ARM_SPE_PMU
++#if IS_ENABLED(CONFIG_ARM_SPE_PMU)
  
- 	for_each_possible_cpu(cpu) {
- 		vmid = atomic64_xchg_relaxed(&per_cpu(active_vmids, cpu), 0);
-@@ -182,8 +182,7 @@ int kvm_arm_vmid_alloc_init(void)
- 	 */
- 	WARN_ON(NUM_USER_VMIDS - 1 <= num_possible_cpus());
- 	atomic64_set(&vmid_generation, VMID_FIRST_VERSION);
--	vmid_map = kcalloc(BITS_TO_LONGS(NUM_USER_VMIDS),
--			   sizeof(*vmid_map), GFP_KERNEL);
-+	vmid_map = bitmap_zalloc(NUM_USER_VMIDS, GFP_KERNEL);
- 	if (!vmid_map)
- 		return -ENOMEM;
+ struct arm_spe_pmu {
+ 	struct pmu				pmu;
+@@ -50,6 +50,6 @@ void kvm_host_spe_init(struct arm_spe_pmu *spe_pmu);
+ #define kvm_host_spe_init(x)	do { } while(0)
+ #endif
  
-@@ -192,5 +191,5 @@ int kvm_arm_vmid_alloc_init(void)
+-#endif /* CONFIG_ARM_SPE_PMU */
++#endif /* IS_ENABLED(CONFIG_ARM_SPE_PMU) */
  
- void kvm_arm_vmid_alloc_free(void)
- {
--	kfree(vmid_map);
-+	bitmap_free(vmid_map);
- }
+ #endif /* __ARM_SPE_PMU_H__ */
 -- 
-2.34.1
-
+2.30.2
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
