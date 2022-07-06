@@ -2,60 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A5FCCA473
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Jul 2022 16:43:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C772CC433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  6 Jul 2022 16:43:19 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CC294BE8D;
-	Wed,  6 Jul 2022 12:43:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A8434BEB7;
+	Wed,  6 Jul 2022 12:43:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eEHlIYMO+xyH; Wed,  6 Jul 2022 12:43:17 -0400 (EDT)
+	with ESMTP id L-RInDYY5QVL; Wed,  6 Jul 2022 12:43:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E7AE24BEC1;
-	Wed,  6 Jul 2022 12:43:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10DF24BECD;
+	Wed,  6 Jul 2022 12:43:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D3AB4BE90
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B720D4BE8B
  for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2022 12:43:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2v6sFyR9TjHR for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id yVG3rMPKg6pK for <kvmarm@lists.cs.columbia.edu>;
  Wed,  6 Jul 2022 12:43:14 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 432194BE8B
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C9E64BE93
  for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2022 12:43:14 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 617B561DA8;
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 0336961DAD;
+ Wed,  6 Jul 2022 16:43:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8838C341D0;
  Wed,  6 Jul 2022 16:43:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3D5EC341CD;
- Wed,  6 Jul 2022 16:43:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1657125792;
- bh=UNgtJW5DG8RhYbDqvxaLJ/hTwlK4WDui2tGquNMVOgo=;
+ s=k20201202; t=1657125793;
+ bh=HMb6ajlQxUTRun7Q6nGlrf2i9bo4p3LjMmMetu9dsjE=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=KR6A7IHscJzVK5Gn1n9JnNcIZsBDBaJ+Htv6HCVi1HNwj4MomClV6KgnyIN74ZIQL
- QcKeS/ct2pyeIhHbT0ks2UGV+dFmzGjsFAQMwquUt/JwWNSgsQGoplEuMRextyc1Yv
- aDRlpK0YtJQHnhaOwTDYp5co7xWcA8BUgyy85cwXRe07gqkyKAuYLIEM8NxGW4c0Ik
- KzdaqSLQYEwuyjL4oTH63GGr7azIWebP0dge14MMlJvM8hYTeGF/W7aVZ/+ycoSYWr
- Wdi4K8jRevQkaZAG0BItwMrYv9mUDLdDlGcqZe70YHMpS1a1zTf9lNq1C5CGW3O5Gw
- eSNAFz7+GzyTw==
+ b=UFg4t11eQeEJZKAnDW1dBLFd9+LP17SdoR2wLx4QqK3TYiZD0wGhsBPNpwA1dprqn
+ Kvm+8B5O7j6nK+KA/jSEHkNVV3Oh6ihlNMJTm/VJstGTt10ITzkQwsTEreJLVGFI6z
+ GMKuJKrmZDMJUaUDJNE8OJf/W/6xyRzR7I4IoCwA8NBHKueJGvzydITn9Af3ZFsoT3
+ CG/BFlpwmD5rqDpoaGfzj3hpvo6qBocxLZ6YdcTpUZqHdKJ2CaK8uMW7Rq/DD0nezF
+ Mjh62XJxyOTY06nUQdSErxAs8lDel8c4ZSiiDYB/0h5Em4TI2u5jI5bMWtDQ5KnnRa
+ JTua+NGyaMa7A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1o987K-005h9i-RU;
- Wed, 06 Jul 2022 17:43:10 +0100
+ (envelope-from <maz@kernel.org>) id 1o987L-005h9i-Tm;
+ Wed, 06 Jul 2022 17:43:11 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 01/19] KVM: arm64: Add get_reg_by_id() as a sys_reg_desc
- retrieving helper
-Date: Wed,  6 Jul 2022 17:42:46 +0100
-Message-Id: <20220706164304.1582687-2-maz@kernel.org>
+Subject: [PATCH 06/19] KVM: arm64: Get rid of reg_from/to_user()
+Date: Wed,  6 Jul 2022 17:42:51 +0100
+Message-Id: <20220706164304.1582687-7-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220706164304.1582687-1-maz@kernel.org>
 References: <20220706164304.1582687-1-maz@kernel.org>
@@ -86,125 +85,86 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-find_reg_by_id() requires a sys_reg_param as input, which most
-users provide as a on-stack variable, but don't make any use of
-the result.
+These helpers are only used by the invariant stuff now, and while
+they pretend to support non-64bit registers, this only serves as
+a way to scare the casual reviewer...
 
-Provide a helper that doesn't have this requirement and simplify
-the callers (all but one).
+Replace these helpers with our good friends get/put_user(), and
+don't look back.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c        | 28 +++++++++++++++++-----------
- arch/arm64/kvm/sys_regs.h        |  4 ++++
- arch/arm64/kvm/vgic-sys-reg-v3.c |  8 ++------
- 3 files changed, 23 insertions(+), 17 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 33 +++++++++------------------------
+ 1 file changed, 9 insertions(+), 24 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c06c0477fab5..1f410283c592 100644
+index 1ce439eed3d8..b66be9df7a02 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2650,21 +2650,29 @@ const struct sys_reg_desc *find_reg_by_id(u64 id,
- 	return find_reg(params, table, num);
+@@ -44,8 +44,6 @@
+  * 64bit interface.
+  */
+ 
+-static int reg_from_user(u64 *val, const void __user *uaddr, u64 id);
+-static int reg_to_user(void __user *uaddr, const u64 *val, u64 id);
+ static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
+ 
+ static bool read_from_write_only(struct kvm_vcpu *vcpu,
+@@ -2661,21 +2659,7 @@ static struct sys_reg_desc invariant_sys_regs[] = {
+ 	{ SYS_DESC(SYS_CTR_EL0), NULL, get_ctr_el0 },
+ };
+ 
+-static int reg_from_user(u64 *val, const void __user *uaddr, u64 id)
+-{
+-	if (copy_from_user(val, uaddr, KVM_REG_SIZE(id)) != 0)
+-		return -EFAULT;
+-	return 0;
+-}
+-
+-static int reg_to_user(void __user *uaddr, const u64 *val, u64 id)
+-{
+-	if (copy_to_user(uaddr, val, KVM_REG_SIZE(id)) != 0)
+-		return -EFAULT;
+-	return 0;
+-}
+-
+-static int get_invariant_sys_reg(u64 id, void __user *uaddr)
++static int get_invariant_sys_reg(u64 id, u64 __user *uaddr)
+ {
+ 	const struct sys_reg_desc *r;
+ 
+@@ -2684,23 +2668,24 @@ static int get_invariant_sys_reg(u64 id, void __user *uaddr)
+ 	if (!r)
+ 		return -ENOENT;
+ 
+-	return reg_to_user(uaddr, &r->val, id);
++	if (put_user(r->val, uaddr))
++		return -EFAULT;
++
++	return 0;
  }
  
-+const struct sys_reg_desc *get_reg_by_id(u64 id,
-+					 const struct sys_reg_desc table[],
-+					 unsigned int num)
-+{
-+	struct sys_reg_params params;
-+
-+	if (!index_to_params(id, &params))
-+		return NULL;
-+
-+	return find_reg(&params, table, num);
-+}
-+
- /* Decode an index value, and find the sys_reg_desc entry. */
- static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
- 						    u64 id)
+-static int set_invariant_sys_reg(u64 id, void __user *uaddr)
++static int set_invariant_sys_reg(u64 id, u64 __user *uaddr)
  {
  	const struct sys_reg_desc *r;
--	struct sys_reg_params params;
+-	int err;
+-	u64 val = 0; /* Make sure high bits are 0 for 32-bit regs */
++	u64 val;
  
- 	/* We only do sys_reg for now. */
- 	if ((id & KVM_REG_ARM_COPROC_MASK) != KVM_REG_ARM64_SYSREG)
- 		return NULL;
- 
--	if (!index_to_params(id, &params))
--		return NULL;
--
--	r = find_reg(&params, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-+	r = get_reg_by_id(id, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
- 
- 	/* Not saved in the sys_reg array and not otherwise accessible? */
- 	if (r && !(r->reg || r->get_user))
-@@ -2723,11 +2731,10 @@ static int reg_to_user(void __user *uaddr, const u64 *val, u64 id)
- 
- static int get_invariant_sys_reg(u64 id, void __user *uaddr)
- {
--	struct sys_reg_params params;
- 	const struct sys_reg_desc *r;
- 
--	r = find_reg_by_id(id, &params, invariant_sys_regs,
--			   ARRAY_SIZE(invariant_sys_regs));
-+	r = get_reg_by_id(id, invariant_sys_regs,
-+			  ARRAY_SIZE(invariant_sys_regs));
+ 	r = get_reg_by_id(id, invariant_sys_regs,
+ 			  ARRAY_SIZE(invariant_sys_regs));
  	if (!r)
  		return -ENOENT;
  
-@@ -2736,13 +2743,12 @@ static int get_invariant_sys_reg(u64 id, void __user *uaddr)
+-	err = reg_from_user(&val, uaddr, id);
+-	if (err)
+-		return err;
++	if (get_user(val, uaddr))
++		return -EFAULT;
  
- static int set_invariant_sys_reg(u64 id, void __user *uaddr)
- {
--	struct sys_reg_params params;
- 	const struct sys_reg_desc *r;
- 	int err;
- 	u64 val = 0; /* Make sure high bits are 0 for 32-bit regs */
- 
--	r = find_reg_by_id(id, &params, invariant_sys_regs,
--			   ARRAY_SIZE(invariant_sys_regs));
-+	r = get_reg_by_id(id, invariant_sys_regs,
-+			  ARRAY_SIZE(invariant_sys_regs));
- 	if (!r)
- 		return -ENOENT;
- 
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index aee8ea054f0d..ce30ed9566ae 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -195,6 +195,10 @@ const struct sys_reg_desc *find_reg_by_id(u64 id,
- 					  const struct sys_reg_desc table[],
- 					  unsigned int num);
- 
-+const struct sys_reg_desc *get_reg_by_id(u64 id,
-+					 const struct sys_reg_desc table[],
-+					 unsigned int num);
-+
- #define AA32(_x)	.aarch32_map = AA32_##_x
- #define Op0(_x) 	.Op0 = _x
- #define Op1(_x) 	.Op1 = _x
-diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
-index 07d5271e9f05..644acda33c7c 100644
---- a/arch/arm64/kvm/vgic-sys-reg-v3.c
-+++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
-@@ -263,14 +263,10 @@ static const struct sys_reg_desc gic_v3_icc_reg_descs[] = {
- int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
- 				u64 *reg)
- {
--	struct sys_reg_params params;
- 	u64 sysreg = (id & KVM_DEV_ARM_VGIC_SYSREG_MASK) | KVM_REG_SIZE_U64;
- 
--	params.regval = *reg;
--	params.is_write = is_write;
--
--	if (find_reg_by_id(sysreg, &params, gic_v3_icc_reg_descs,
--			      ARRAY_SIZE(gic_v3_icc_reg_descs)))
-+	if (get_reg_by_id(sysreg, gic_v3_icc_reg_descs,
-+			  ARRAY_SIZE(gic_v3_icc_reg_descs)))
- 		return 0;
- 
- 	return -ENXIO;
+ 	/* This is what we mean by invariant: you can't change it. */
+ 	if (r->val != val)
 -- 
 2.34.1
 
