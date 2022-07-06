@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE2CCCCA47F
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Jul 2022 16:43:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CA13CCA481
+	for <kvmarm@archiver.kernel.org>; Wed,  6 Jul 2022 16:43:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A70434B89F;
-	Wed,  6 Jul 2022 12:43:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3763E4BEB5;
+	Wed,  6 Jul 2022 12:43:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2J2HWGaFXCZ3; Wed,  6 Jul 2022 12:43:19 -0400 (EDT)
+	with ESMTP id QmGq7Vr6xezY; Wed,  6 Jul 2022 12:43:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 311F44BEAE;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E9A94BED3;
 	Wed,  6 Jul 2022 12:43:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E0FF44BEA1
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2022 12:43:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DC0D4BEA1
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2022 12:43:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aWGWl5h2N9oX for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Jul 2022 12:43:14 -0400 (EDT)
+ with ESMTP id PdqITHiu2zwt for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Jul 2022 12:43:15 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 64C0A4BE8D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2022 12:43:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0CDFE4BE99
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2022 12:43:15 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id C4C7761DB2;
- Wed,  6 Jul 2022 16:43:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2ED85C341CB;
- Wed,  6 Jul 2022 16:43:13 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 96B8161DD6;
+ Wed,  6 Jul 2022 16:43:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67576C341CE;
+ Wed,  6 Jul 2022 16:43:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1657125793;
- bh=zvkQPryqhyVOgAevsdQb5PWNWLx+6RcCLsRBZnS/7j0=;
+ s=k20201202; t=1657125794;
+ bh=C2LHKbJX9HtJY5cAtJJRir+r7abzOZhmmXdipxuYdEA=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Mu6gRHyjlJx84co+Y2cNMRQY4tZAOTXSkyO+0G8whMzwWeUkkquJWSl480KJnzQYV
- ++zJVHSZVq6RZM+ATQMdWQJEapCRBMCj2qKAYLf1vlMegOOLaGytvFifbNNIbFRjQs
- ysJVelbnrCgO+klMzR+cKmZz/rfqSkKyz6UARRdc/yBqbZ1+CRsj9wbungrqbAmIs7
- QMo80yFH43OTGwNbT1uvhMqIElgcHaB3tVHG1FJszTrocRqCLSL+/f5PDCZVnPMtn9
- 2zOc7/ZbwWdc1S5Rll+DGlvWpNShMMBttB82GhiN1An9BZ5pwuWqHdFFTtcLubFhPa
- B180jh2PaSnNQ==
+ b=hWR3KqOLY7gbL8FWsqC9saSKQ/BxzLvs/jDHQLENFaX+BMPJU9yQZKGHZ+X7VrcPa
+ /JIREkc4vlheR7FRZC5iT2xtjNycsxqpccsJM8LYAS289s86C9isj8f/ZqsNzlhsA3
+ t3Sqj2mTP1aa8gChcwL4e/KjUcRqrbujE4KxM9pPCHgpWoQzFVEO0ca4yRUTdwm52D
+ EX2dpkU0sEcqUCTCHzB/07pTItH12sHhm+w1xDxPxkeX8y2UU4h8rweDTZIxDPpBN0
+ or170HhSrXiyZFrDX2loQzcqWQ5m3EEUWsFYHogZ6CN36pTQF9LcBo1n24sncv3lOA
+ /IrdpyM/pHy0g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1o987L-005h9i-9S;
- Wed, 06 Jul 2022 17:43:11 +0100
+ (envelope-from <maz@kernel.org>) id 1o987M-005h9i-BI;
+ Wed, 06 Jul 2022 17:43:12 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 03/19] KVM: arm64: Introduce generic get_user/set_user helpers
- for system registers
-Date: Wed,  6 Jul 2022 17:42:48 +0100
-Message-Id: <20220706164304.1582687-4-maz@kernel.org>
+Subject: [PATCH 08/19] KVM: arm64: vgic-v3: Push user access into
+ vgic_v3_cpu_sysregs_uaccess()
+Date: Wed,  6 Jul 2022 17:42:53 +0100
+Message-Id: <20220706164304.1582687-9-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220706164304.1582687-1-maz@kernel.org>
 References: <20220706164304.1582687-1-maz@kernel.org>
@@ -86,145 +86,136 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The userspace access to the system registers is done using helpers
-that hardcode the table that is looked up. extract some generic
-helpers from this, moving the handling of hidden sysregs into
-the core code.
+In order to start making the vgic sysreg access from userspace
+similar to all the other sysregs, push the userspace memory
+access one level down into vgic_v3_cpu_sysregs_uaccess().
+
+The next step will be to rely on the sysreg infrastructure
+to perform this task.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 60 +++++++++++++++++++++++++--------------
- arch/arm64/kvm/sys_regs.h |  6 ++++
- 2 files changed, 44 insertions(+), 22 deletions(-)
+ arch/arm64/kvm/vgic-sys-reg-v3.c      | 22 +++++++++++++------
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 31 ++++++---------------------
+ arch/arm64/kvm/vgic/vgic.h            |  4 ++--
+ 3 files changed, 23 insertions(+), 34 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 9291cb94c2e4..0fbdb21a3600 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2663,8 +2663,10 @@ const struct sys_reg_desc *get_reg_by_id(u64 id,
+diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
+index 85a5e1d15e9f..8c56e285fde9 100644
+--- a/arch/arm64/kvm/vgic-sys-reg-v3.c
++++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
+@@ -278,15 +278,21 @@ int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *
+ 	return -ENXIO;
  }
  
- /* Decode an index value, and find the sys_reg_desc entry. */
--static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
--						    u64 id)
-+static const struct sys_reg_desc *
-+id_to_sys_reg_desc(struct kvm_vcpu *vcpu, u64 id,
-+		   const struct sys_reg_desc table[], unsigned int num)
-+
+-int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write, u64 id,
+-				u64 *reg)
++int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu,
++				struct kvm_device_attr *attr,
++				bool is_write)
  {
++	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+ 	struct sys_reg_params params;
  	const struct sys_reg_desc *r;
+-	u64 sysreg = (id & KVM_DEV_ARM_VGIC_SYSREG_MASK) | KVM_REG_SIZE_U64;
++	u64 sysreg;
  
-@@ -2672,10 +2674,10 @@ static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
- 	if ((id & KVM_REG_ARM_COPROC_MASK) != KVM_REG_ARM64_SYSREG)
- 		return NULL;
+-	if (is_write)
+-		params.regval = *reg;
++	sysreg = (attr->attr & KVM_DEV_ARM_VGIC_SYSREG_MASK) | KVM_REG_SIZE_U64;
++
++	if (is_write) {
++		if (get_user(params.regval, uaddr))
++			return -EFAULT;
++	}
+ 	params.is_write = is_write;
  
--	r = get_reg_by_id(id, sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-+	r = get_reg_by_id(id, table, num);
+ 	r = find_reg_by_id(sysreg, &params, gic_v3_icc_reg_descs,
+@@ -297,8 +303,10 @@ int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write, u64 id,
+ 	if (!r->access(vcpu, &params, r))
+ 		return -EINVAL;
  
- 	/* Not saved in the sys_reg array and not otherwise accessible? */
--	if (r && !(r->reg || r->get_user))
-+	if (r && (!(r->reg || r->get_user) || sysreg_hidden(vcpu, r)))
- 		r = NULL;
+-	if (!is_write)
+-		*reg = params.regval;
++	if (!is_write) {
++		if (put_user(params.regval, uaddr))
++			return -EFAULT;
++	}
  
- 	return r;
-@@ -2845,9 +2847,24 @@ static int demux_c15_set(u64 id, void __user *uaddr)
+ 	return 0;
+ }
+diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+index c6d52a1fd9c8..d8269300632d 100644
+--- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
++++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+@@ -561,14 +561,9 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 		if (!is_write)
+ 			*reg = tmp32;
+ 		break;
+-	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS: {
+-		u64 regid;
+-
+-		regid = (attr->attr & KVM_DEV_ARM_VGIC_SYSREG_INSTR_MASK);
+-		ret = vgic_v3_cpu_sysregs_uaccess(vcpu, is_write,
+-						  regid, reg);
++	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
++		ret = vgic_v3_cpu_sysregs_uaccess(vcpu, attr, is_write);
+ 		break;
+-	}
+ 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+ 		unsigned int info, intid;
+ 
+@@ -617,15 +612,8 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
+ 		reg = tmp32;
+ 		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
  	}
- }
- 
--int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-+int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
-+			 const struct sys_reg_desc table[], unsigned int num)
- {
-+	void __user *uaddr = (void __user *)(unsigned long)reg->addr;
- 	const struct sys_reg_desc *r;
-+
-+	r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
-+	if (!r)
-+		return -ENOENT;
-+
-+	if (r->get_user)
-+		return (r->get_user)(vcpu, r, reg, uaddr);
-+
-+	return reg_to_user(uaddr, &__vcpu_sys_reg(vcpu, r->reg), reg->id);
-+}
-+
-+int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-+{
- 	void __user *uaddr = (void __user *)(unsigned long)reg->addr;
- 	int err;
- 
-@@ -2861,21 +2878,28 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 	if (err != -ENOENT)
- 		return err;
- 
--	r = index_to_sys_reg_desc(vcpu, reg->id);
-+	return kvm_sys_reg_get_user(vcpu, reg,
-+				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
-+}
- 
--	/* Check for regs disabled by runtime config */
--	if (!r || sysreg_hidden(vcpu, r))
-+int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
-+			 const struct sys_reg_desc table[], unsigned int num)
-+{
-+	void __user *uaddr = (void __user *)(unsigned long)reg->addr;
-+	const struct sys_reg_desc *r;
-+
-+	r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
-+	if (!r)
- 		return -ENOENT;
- 
--	if (r->get_user)
--		return (r->get_user)(vcpu, r, reg, uaddr);
-+	if (r->set_user)
-+		return (r->set_user)(vcpu, r, reg, uaddr);
- 
--	return reg_to_user(uaddr, &__vcpu_sys_reg(vcpu, r->reg), reg->id);
-+	return reg_from_user(&__vcpu_sys_reg(vcpu, r->reg), uaddr, reg->id);
- }
- 
- int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
--	const struct sys_reg_desc *r;
- 	void __user *uaddr = (void __user *)(unsigned long)reg->addr;
- 	int err;
- 
-@@ -2889,16 +2913,8 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 	if (err != -ENOENT)
- 		return err;
- 
--	r = index_to_sys_reg_desc(vcpu, reg->id);
+-	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS: {
+-		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+-		u64 reg;
 -
--	/* Check for regs disabled by runtime config */
--	if (!r || sysreg_hidden(vcpu, r))
--		return -ENOENT;
+-		if (get_user(reg, uaddr))
+-			return -EFAULT;
 -
--	if (r->set_user)
--		return (r->set_user)(vcpu, r, reg, uaddr);
+-		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+-	}
++	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
++		return vgic_v3_attr_regs_access(dev, attr, NULL, true);
+ 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+ 		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+ 		u64 reg;
+@@ -681,15 +669,8 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
+ 		tmp32 = reg;
+ 		return put_user(tmp32, uaddr);
+ 	}
+-	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS: {
+-		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+-		u64 reg;
 -
--	return reg_from_user(&__vcpu_sys_reg(vcpu, r->reg), uaddr, reg->id);
-+	return kvm_sys_reg_set_user(vcpu, reg,
-+				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
- }
- 
- static unsigned int num_demux_regs(void)
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index ce30ed9566ae..4fb6d59e7874 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -199,6 +199,12 @@ const struct sys_reg_desc *get_reg_by_id(u64 id,
- 					 const struct sys_reg_desc table[],
- 					 unsigned int num);
- 
-+int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
-+			 const struct sys_reg_desc table[], unsigned int num);
-+
-+int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
-+			 const struct sys_reg_desc table[], unsigned int num);
-+
- #define AA32(_x)	.aarch32_map = AA32_##_x
- #define Op0(_x) 	.Op0 = _x
- #define Op1(_x) 	.Op1 = _x
+-		ret = vgic_v3_attr_regs_access(dev, attr, &reg, false);
+-		if (ret)
+-			return ret;
+-		return put_user(reg, uaddr);
+-	}
++	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
++		return vgic_v3_attr_regs_access(dev, attr, NULL, false);
+ 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+ 		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+ 		u64 reg;
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index ffc2d3c81b28..c23118467a35 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -245,8 +245,8 @@ int vgic_v3_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+ 			 int offset, u32 *val);
+ int vgic_v3_redist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+ 			 int offset, u32 *val);
+-int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+-			 u64 id, u64 *val);
++int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu,
++				struct kvm_device_attr *attr, bool is_write);
+ int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+ 				    u32 intid, u64 *val);
 -- 
 2.34.1
 
