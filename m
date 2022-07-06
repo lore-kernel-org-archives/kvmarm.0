@@ -2,63 +2,61 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 428ACCCA482
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Jul 2022 16:43:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2753ECCA473
+	for <kvmarm@archiver.kernel.org>; Wed,  6 Jul 2022 16:43:26 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C26D54BEC6;
-	Wed,  6 Jul 2022 12:43:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D32A34BE9F;
+	Wed,  6 Jul 2022 12:43:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1ZPKDgQ01tBx; Wed,  6 Jul 2022 12:43:25 -0400 (EDT)
+	with ESMTP id PtBmK2Q-qSUT; Wed,  6 Jul 2022 12:43:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C81734BED9;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE6DD4BF1B;
 	Wed,  6 Jul 2022 12:43:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F30E4BE94
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FC334BEB9
  for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2022 12:43:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ElQIkMfQ36zv for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Jul 2022 12:43:17 -0400 (EDT)
+ with ESMTP id MrLGohhNEC0g for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Jul 2022 12:43:15 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 397CD4BEC6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2022 12:43:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A660F4BE94
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Jul 2022 12:43:15 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 438D2B81E2E;
- Wed,  6 Jul 2022 16:43:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D80E9C341D2;
- Wed,  6 Jul 2022 16:43:13 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 076C2B81E29;
+ Wed,  6 Jul 2022 16:43:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C164FC341C8;
+ Wed,  6 Jul 2022 16:43:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1657125793;
- bh=RBBqxu1NSDYZHVpiM2LGTPjE/u4AAcLgZGCQcAuS9cI=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=mSGfJfM8Tc/30pU3eORw/u4ImobdGSjsJuSj6YPXnrK4HVAIF67J8J0+hBVU2bLbV
- thqaeu2U2/Tg4+CjlV3ISfnNZXR8gPxtCbYCHyFoDk44bBQwlBCV+bhiTaJF6FlCOE
- 2BrYNNqDclHvuf8+3x33XUGB6hisItXdflQ7a+mpJf94UKkFIFEvG4BF7l0F+u5Eop
- hhkcrbO1hiX0us5HioVER6JscxgMOOck64SDVv2bKMChWCTPJyTPLwD77A/BtyezGm
- edLhxfm33is5ZPB/j3X1OO1NKMqYZh5BlzPGZYlKbG4DVpCeSbGjKdb+vrUdl7srKv
- AdJhFUovDbPvg==
+ s=k20201202; t=1657125792;
+ bh=aX01CebmN3HM3t7ulXW++1CUVElRHCgj3gCrqaBqMM4=;
+ h=From:To:Cc:Subject:Date:From;
+ b=LRgAQHoc8Nsw0X9L5hC/kqK2pet/aEZYVE3bIOjYUf5jcRxvHTlHSEwf79LgcvQm/
+ 33I1Y9T9es18x9W6Vc+qLAwwEmwABLjFGQYK8mPyEFjxphYHeJiQB6IUaXh4xHzfkP
+ x7FYr+7W2H8m53bHClpu55+CQFofYE8j5wCtz5DqmTLvNXvTrvUZLg3H3WPiRHPdOz
+ a++jYNsgUN2pvEd7OXJYhWZnJKriSYUzA0vWRt7oWOdE9rVkYNjEYn1YK4wOX5Bx9X
+ aExRG9+REjd4lYGEOnkzjS6lLJLLQvW0UwXme3MZ/Z5HzesitokwH4K8Ia1FHlZIaX
+ /b0TSxnpttH3w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1o987M-005h9i-3S;
- Wed, 06 Jul 2022 17:43:12 +0100
+ (envelope-from <maz@kernel.org>) id 1o987K-005h9i-Ec;
+ Wed, 06 Jul 2022 17:43:10 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 07/19] KVM: arm64: vgic-v3: Simplify
- vgic_v3_has_cpu_sysregs_attr()
-Date: Wed,  6 Jul 2022 17:42:52 +0100
-Message-Id: <20220706164304.1582687-8-maz@kernel.org>
+Subject: [PATCH 00/19] KVM: arm64: vgic-v3 userspace access consolidation (and
+ other goodies)
+Date: Wed,  6 Jul 2022 17:42:45 +0100
+Message-Id: <20220706164304.1582687-1-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220706164304.1582687-1-maz@kernel.org>
-References: <20220706164304.1582687-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
@@ -86,83 +84,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Finding out whether a sysreg exists has little to do with that
-register being accessed, so drop the is_write parameter.
+Schspa Shi recently reported[1] that some of the vgic code interacting
+with userspace was reading uninitialised stack memory, and although
+that read wasn't used any further, it prompted me to revisit this part
+of the code.
 
-Also, the reg pointer is completely unused, and we're better off
-just passing the attr pointer to the function.
+Needless to say, this area of the kernel is pretty crufty, and shows a
+bunch of issues in other parts of the KVM/arm64 infrastructure. This
+series tries to remedy a bunch of them:
 
-This result in a small cleanup of the calling site, with a new
-helper converting the vGIC view of a sysreg into the canonical
-one (this is purely cosmetic, as the encoding is the same).
+- Sanitise the way we deal with sysregs from userspace: at the moment,
+  each and every .set_user/.get_user callback has to implement its own
+  userspace accesses (directly or indirectly). It'd be much better if
+  that was centralised so that we can reason about it.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/vgic-sys-reg-v3.c   | 14 ++++++++++----
- arch/arm64/kvm/vgic/vgic-mmio-v3.c |  8 ++------
- arch/arm64/kvm/vgic/vgic.h         |  3 +--
- 3 files changed, 13 insertions(+), 12 deletions(-)
+- Enforce that all AArch64 sysregs are 64bit. Always. This was sort of
+  implied by the code, but it took some effort to convince myself that
+  this was actually the case.
 
-diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
-index 644acda33c7c..85a5e1d15e9f 100644
---- a/arch/arm64/kvm/vgic-sys-reg-v3.c
-+++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
-@@ -260,12 +260,18 @@ static const struct sys_reg_desc gic_v3_icc_reg_descs[] = {
- 	{ SYS_DESC(SYS_ICC_IGRPEN1_EL1), access_gic_grpen1 },
- };
- 
--int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
--				u64 *reg)
-+static u64 attr_to_id(u64 attr)
- {
--	u64 sysreg = (id & KVM_DEV_ARM_VGIC_SYSREG_MASK) | KVM_REG_SIZE_U64;
-+	return ARM64_SYS_REG(FIELD_GET(KVM_REG_ARM_VGIC_SYSREG_OP0_MASK, attr),
-+			     FIELD_GET(KVM_REG_ARM_VGIC_SYSREG_OP1_MASK, attr),
-+			     FIELD_GET(KVM_REG_ARM_VGIC_SYSREG_CRN_MASK, attr),
-+			     FIELD_GET(KVM_REG_ARM_VGIC_SYSREG_CRM_MASK, attr),
-+			     FIELD_GET(KVM_REG_ARM_VGIC_SYSREG_OP2_MASK, attr));
-+}
- 
--	if (get_reg_by_id(sysreg, gic_v3_icc_reg_descs,
-+int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+{
-+	if (get_reg_by_id(attr_to_id(attr->attr), gic_v3_icc_reg_descs,
- 			  ARRAY_SIZE(gic_v3_icc_reg_descs)))
- 		return 0;
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index f15e29cc63ce..a2ff73899976 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -986,12 +986,8 @@ int vgic_v3_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr)
- 		iodev.base_addr = 0;
- 		break;
- 	}
--	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS: {
--		u64 reg, id;
--
--		id = (attr->attr & KVM_DEV_ARM_VGIC_SYSREG_INSTR_MASK);
--		return vgic_v3_has_cpu_sysregs_attr(vcpu, 0, id, &reg);
--	}
-+	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
-+		return vgic_v3_has_cpu_sysregs_attr(vcpu, attr);
- 	default:
- 		return -ENXIO;
- 	}
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 4c6bdd321faa..ffc2d3c81b28 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -247,8 +247,7 @@ int vgic_v3_redist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 			 int offset, u32 *val);
- int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 			 u64 id, u64 *val);
--int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, bool is_write, u64 id,
--				u64 *reg);
-+int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
- int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 				    u32 intid, u64 *val);
- int kvm_register_vgic_device(unsigned long type);
+- Move the vgic-v3 sysreg userspace accessors to the userspace
+  callbacks instead of hijacking the vcpu trap callback. This allows
+  us to reuse the sysreg infrastructure.
+
+- Consolidate userspace accesses for both GICv2, GICv3 and common code
+  as much as possible.
+
+- Cleanup a bunch of not-very-useful helpers, tidy up some of the code
+  as we touch it.
+
+Overall, this is essentially a cosmetic exercise, as there is no new
+feature here. But I have the feeling that the result is somehow more
+maintainable. This has been (lightly) tested on my Synquacer, and
+nothing exploded. Yet. YMMV.
+
+[1] https://lore.kernel.org/r/m2h740zz1i.fsf@gmail.com
+
+Marc Zyngier (19):
+  KVM: arm64: Add get_reg_by_id() as a sys_reg_desc retrieving helper
+  KVM: arm64: Reorder handling of invariant sysregs from userspace
+  KVM: arm64: Introduce generic get_user/set_user helpers for system
+    registers
+  KVM: arm64: Push checks for 64bit registers into the low-level
+    accessors
+  KVM: arm64: Consolidate sysreg userspace accesses
+  KVM: arm64: Get rid of reg_from/to_user()
+  KVM: arm64: vgic-v3: Simplify vgic_v3_has_cpu_sysregs_attr()
+  KVM: arm64: vgic-v3: Push user access into
+    vgic_v3_cpu_sysregs_uaccess()
+  KVM: arm64: vgic-v3: Make the userspace accessors use sysreg API
+  KVM: arm64: vgic-v3: Convert userspace accessors over to
+    FIELD_GET/FIELD_PREP
+  KVM: arm64: vgic-v3: Use u32 to manage the line level from userspace
+  KVM: arm64: vgic-v3: Consolidate userspace access for MMIO registers
+  KVM: arm64: vgic-v2: Consolidate userspace access for MMIO registers
+  KVM: arm64: vgic: Use {get,put}_user() instead of copy_{from.to}_user
+  KVM: arm64: vgic-v2: Add helper for legacy dist/cpuif base address
+    setting
+  KVM: arm64: vgic: Consolidate userspace access for base address
+    setting
+  KVM: arm64: Get rid of find_reg_by_id()
+  KVM: arm64: Descope kvm_arm_sys_reg_{get,set}_reg()
+  KVM: arm64: Get rid or outdated comments
+
+ arch/arm64/include/asm/kvm_host.h     |   2 -
+ arch/arm64/kvm/arm.c                  |  11 +-
+ arch/arm64/kvm/sys_regs.c             | 291 +++++++---------
+ arch/arm64/kvm/sys_regs.h             |  18 +-
+ arch/arm64/kvm/vgic-sys-reg-v3.c      | 461 +++++++++++++++-----------
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 269 +++++++--------
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c    |  10 +-
+ arch/arm64/kvm/vgic/vgic-mmio.c       |   6 +-
+ arch/arm64/kvm/vgic/vgic-mmio.h       |   4 +-
+ arch/arm64/kvm/vgic/vgic.h            |   9 +-
+ include/kvm/arm_vgic.h                |   2 +-
+ 11 files changed, 535 insertions(+), 548 deletions(-)
+
 -- 
 2.34.1
 
