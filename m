@@ -2,77 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36908C43334
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Jul 2022 20:59:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 822B9C433EF
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Jul 2022 21:08:46 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AA5B4B83D;
-	Thu,  7 Jul 2022 16:59:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDB624BA5E;
+	Thu,  7 Jul 2022 17:08:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6UJVuaHznfO4; Thu,  7 Jul 2022 16:59:48 -0400 (EDT)
+	with ESMTP id N71ocR776bxt; Thu,  7 Jul 2022 17:08:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F05D4B861;
-	Thu,  7 Jul 2022 16:59:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 930C94B83D;
+	Thu,  7 Jul 2022 17:08:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AE0FA4B861
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jul 2022 16:59:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 635794B83D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jul 2022 17:08:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FXW7RWEe5mFW for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Jul 2022 16:59:46 -0400 (EDT)
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com
- [209.85.215.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 887BE4B83D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jul 2022 16:59:46 -0400 (EDT)
-Received: by mail-pg1-f175.google.com with SMTP id o18so19481529pgu.9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Jul 2022 13:59:46 -0700 (PDT)
+ with ESMTP id kcNlMF35PFHP for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Jul 2022 17:08:42 -0400 (EDT)
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com
+ [209.85.215.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4DD844B81A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jul 2022 17:08:42 -0400 (EDT)
+Received: by mail-pg1-f172.google.com with SMTP id q82so13525304pgq.6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Jul 2022 14:08:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=A5MhBcXf8LVQ9gbV4fE8wcZW4gjzBdDH9411SgBm9nA=;
- b=JZQC6m6xR5sT0Jada7pN2ctPDZoVBgPNmsmVFV9xaOD0K1VcjdaDGI+Dbb9m6z+j0M
- HQZao2MwdnxdUCyFyWlgXqE0vhn5k0x3cFJEqeUSkVEsaLaami6rP5dYbVbdIFtecFK0
- bszrtlQ/BBq6HtrtoG8nU1E+PvhE0lLr6U7Movo+h1ZN1VwhTvdz1ZHCpBxehT1XrGLp
- ldw665ro4GytFHnalr0o9hUTUOKVZe4kPdeCD4oNOEE/cifAyBR7BH7HyjVvjpbMGLv/
- wuBFBMUf1JFMK20mDchKuifuX9NzhPRD+zMlfMD3Uo00M9pihW0RWuo1fPBLXJlg8Qnc
- EHBQ==
+ bh=Z0i/FsEtEYZWQoqmAH7Voc71S2cgw06FoAKusiT8OZ4=;
+ b=WoU0PSQ0Wj5Vhi5VAdOixoxhmqcmoNDkx6vHqBySeC9zqf2nqsQfssDemp0HQ+Ov1B
+ x/J5MxoGXzLdJH5GEyRAbOhWT68fOGc+6rHAXDByBx1OVQfP46gGjK+Mi+BzW6aTzy1J
+ zCmFPJ2SlEc+diWQW3EPCjFu0t4IWIGEdVT9pGCnFTtf0M7aL/JzkavojLQOy4s/UgNF
+ NGApv5Q7B2F5jgchJKAeNIaqUXEoBZLJR5OdL0c5HU9ZNIBlR45kMkufdSbiFomJXlCl
+ /ZAg/DkWLMF98iVndrnP9vxLYNAXMsIgTDVMZU2Ziwpk1aIQXpLAs3/2s4PDhY8kMxbt
+ LAVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=A5MhBcXf8LVQ9gbV4fE8wcZW4gjzBdDH9411SgBm9nA=;
- b=aO9LCGG8YuAcu28M2gRJh1MXeRUjYdxKs2fgAyFecc5oTlnYrnghUu8Vly77xOj2d3
- 2kgAhWMm6kbTQjv6BcP7oRvj8dj9Z4J2JWnostwAPEykLPk0206qeb1KQsZzAkjpR16a
- zmfCEo4/4j6KVygFyfBNknOXrIxlAli9T+pVf35gIss7I56W1PpLctBjnXFSbqtTeGe8
- 9nmd8b7WkXQmLmBdqUvbyzzaql6nZNrcN5Ui34BJUyZvYrWFUhiJOosLC1tSD136jUqh
- cprV7+vwBw+wLBkIo+v69VA5N1IDiM2otES/2tq4OQhHMIik5GI0K9z8cN+rUzbLEjwx
- mDiw==
-X-Gm-Message-State: AJIora9ugwsQHoQKJRxYYpcwBzubfOi90UjG90NemX5P6XlDD93Ajn/4
- Zn2CoB0MyJ6lsKETuFQ3A7PSKQ==
-X-Google-Smtp-Source: AGRyM1sARh3FSc0YJzBOfjfu9tVk8n9I1lJXGq5XAEdqRD+A3gMvMxGVzqr9kHPYDPOxaQ6woa23oA==
-X-Received: by 2002:a63:4756:0:b0:412:88b5:2a23 with SMTP id
- w22-20020a634756000000b0041288b52a23mr11516pgk.442.1657227585430; 
- Thu, 07 Jul 2022 13:59:45 -0700 (PDT)
+ bh=Z0i/FsEtEYZWQoqmAH7Voc71S2cgw06FoAKusiT8OZ4=;
+ b=s8UbbC2oJBICrKtjGyf6x8JXHImw8HuxSj+QdWwkq6UzFg7FrTaa1w/IVHnPE7jLUi
+ 0UwfmmzTWtW4sK7+MPM9aUR0z586QARUI6WhG+lzqPmdLIYJ/Annz+cncj6VcsVNpzo6
+ SlmW6tWD8klBde2ooPgOk73k+u6oi1j8g7cWPWpZmoaxvL3MiNF/iYQ5czXE/m3AvGtv
+ qq/ljh+4N8CYnnjHj90uaXBh/fUGaaV4OJhR4u4q4/xI7qRCrSyabGYWyQTrpiGvswtj
+ WnvxyIc5HqaR9X+zbjfnE5ImCxaZKOHp3IKyiEFaR+y5VQIsS0lDoQd+M3FbzPCzap26
+ 0zYQ==
+X-Gm-Message-State: AJIora+pChlZVplIF8GHl6b7Dm6wN0auW+jm262rrxO+rXnAOmbuIekj
+ pzpORQk6wkYQtO8he+GuFYCxjg==
+X-Google-Smtp-Source: AGRyM1vgBjc1RVmgOpFR/T4l7q4gAYOsF/Sy+FYulOKydzkkokjqIlGLn0bz30DcFIQoLNe6uAKcaA==
+X-Received: by 2002:a05:6a00:13a5:b0:525:1da8:4af4 with SMTP id
+ t37-20020a056a0013a500b005251da84af4mr55191739pfg.43.1657228121170; 
+ Thu, 07 Jul 2022 14:08:41 -0700 (PDT)
 Received: from google.com (123.65.230.35.bc.googleusercontent.com.
  [35.230.65.123]) by smtp.gmail.com with ESMTPSA id
- rt5-20020a17090b508500b001ef8ac4c681sm22733pjb.0.2022.07.07.13.59.44
+ m17-20020a170902db1100b0016a275623c1sm20721984plx.219.2022.07.07.14.08.39
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 07 Jul 2022 13:59:44 -0700 (PDT)
-Date: Thu, 7 Jul 2022 20:59:41 +0000
+ Thu, 07 Jul 2022 14:08:40 -0700 (PDT)
+Date: Thu, 7 Jul 2022 21:08:36 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: Yosry Ahmed <yosryahmed@google.com>
-Subject: Re: [PATCH v6 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
- page table uses.
-Message-ID: <YsdJPeVOqlj4cf2a@google.com>
+Subject: Re: [PATCH v6 2/4] KVM: mmu: add a helper to account memory used by
+ KVM MMU.
+Message-ID: <YsdLVBtl16mx3+Ot@google.com>
 References: <20220628220938.3657876-1-yosryahmed@google.com>
- <20220628220938.3657876-2-yosryahmed@google.com>
+ <20220628220938.3657876-3-yosryahmed@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220628220938.3657876-2-yosryahmed@google.com>
+In-Reply-To: <20220628220938.3657876-3-yosryahmed@google.com>
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  Roman Gushchin <roman.gushchin@linux.dev>, Michal Hocko <mhocko@kernel.org>,
  Shaoqin <shaoqin.huang@intel.com>, linux-mm@kvack.org,
@@ -100,50 +100,46 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Tue, Jun 28, 2022, Yosry Ahmed wrote:
-> We keep track of several kernel memory stats (total kernel memory, page
-> tables, stack, vmalloc, etc) on multiple levels (global, per-node,
-> per-memcg, etc). These stats give insights to users to how much memory
-> is used by the kernel and for what purposes.
+> Add a helper to account pages used by KVM for page tables in memory
+> secondary pagetable stats. This function will be used by subsequent
+> patches in different archs.
 > 
-> Currently, memory used by kvm mmu is not accounted in any of those
+> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> ---
+>  include/linux/kvm_host.h | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 3b40f8d68fbb1..032821d77e920 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2241,6 +2241,16 @@ static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
+>  }
+>  #endif /* CONFIG_KVM_XFER_TO_GUEST_WORK */
+>  
+> +/*
+> + * If more than one page is being (un)accounted, @virt must be the address of
+> + * the first page of a block of pages what were allocated together (i.e
+> + * accounted together).
 
-Nit, capitalize KVM (mainly to be consistent).
+Sorry for the belated thoughts...
 
-> @@ -1085,6 +1086,9 @@ KernelStack
->                Memory consumed by the kernel stacks of all tasks
->  PageTables
->                Memory consumed by userspace page tables
-> +SecPageTables
-> +              Memory consumed by secondary page tables, this currently
-> +	      currently includes KVM mmu allocations on x86 and arm64.
+If you spin a v7, can you add a note to call out that mod_lruvec_page_state() is
+itself thread-safe?  Caught my eye because the TDP MMU usage happens while holding
+mmu_lock for read.
 
-Nit, this line has a tab instead of eight spaces.  Not sure if it actually matters,
-there are plenty of tabs elsewhere in the file, but all the entries in this block
-use only spaces.
-
-> diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
-> index aab70355d64f3..13190d298c986 100644
-> --- a/include/linux/mmzone.h
-> +++ b/include/linux/mmzone.h
-> @@ -216,6 +216,7 @@ enum node_stat_item {
->  	NR_KERNEL_SCS_KB,	/* measured in KiB */
->  #endif
->  	NR_PAGETABLE,		/* used for pagetables */
-> +	NR_SECONDARY_PAGETABLE, /* secondary pagetables, e.g. kvm shadow pagetables */
-
-Nit, s/kvm/KVM, and drop the "shadow", which might be misinterpreted as saying KVM
-pagetables are only accounted when KVM is using shadow paging.  KVM's usage of "shadow"
-is messy, so I totally understand why you included it, but in this case it's unnecessary
-and potentially confusing.
-
-And finally, something that's not a nit.  Should this be wrapped with CONFIG_KVM
-(using IS_ENABLED() because KVM can be built as a module)?  That could be removed
-if another non-KVM secondary MMU user comes along, but until then, #ifdeffery for
-stats the depend on a single feature seems to be the status quo for this code.
-
->  #ifdef CONFIG_SWAP
->  	NR_SWAPCACHE,
->  #endif
+> + */
+> +static inline void kvm_account_pgtable_pages(void *virt, int nr)
+> +{
+> +	mod_lruvec_page_state(virt_to_page(virt), NR_SECONDARY_PAGETABLE, nr);
+> +}
+> +
+>  /*
+>   * This defines how many reserved entries we want to keep before we
+>   * kick the vcpu to the userspace to avoid dirty ring full.  This
+> -- 
+> 2.37.0.rc0.161.g10f37bed90-goog
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
