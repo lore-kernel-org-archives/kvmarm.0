@@ -2,62 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F6D1C433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Jul 2022 07:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60559C433EF
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Jul 2022 17:08:45 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A73054B8EB;
-	Thu,  7 Jul 2022 03:16:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE9F34B84D;
+	Thu,  7 Jul 2022 13:08:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id l783Byi-9FlD; Thu,  7 Jul 2022 03:16:37 -0400 (EDT)
+	with ESMTP id kSgymrmtyhuD; Thu,  7 Jul 2022 13:08:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C1FE4B919;
-	Thu,  7 Jul 2022 03:16:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B33834B9A1;
+	Thu,  7 Jul 2022 13:08:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 298C94B8E9
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jul 2022 02:40:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FFBC4B902
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jul 2022 13:08:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RqYX+q140V41 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Jul 2022 02:40:00 -0400 (EDT)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 13D994B874
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jul 2022 02:40:00 -0400 (EDT)
-Date: Thu, 7 Jul 2022 08:39:57 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1657175998;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=1gBLIZvV+gDvafqhxIKbqt2xCNcdIDwr8ZOsL8htgQA=;
- b=J1nfV9ZQLgClWEZRgvgi6s1oubflxUnDJ+yJNsUBruN8s2bEVo7pk0xF3q3u4ON6yoVV/w
- 0gicrshkBs5h7HLI8nkNaXXT4KGc3JUyNPAkL9+61YqqOcNLZ12p4o+kHxNQ0ki27aqhQG
- Ba8xJFVu9nZWeuxNLoe3CuwiK+lD3dc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Colton Lewis <coltonlewis@google.com>
-Subject: Re: [PATCH 4/4] KVM: selftests: Fix filename reporting in guest
- asserts
-Message-ID: <20220707063957.kl25qgb3bwrobui2@kamzik>
-References: <20220615193116.806312-1-coltonlewis@google.com>
- <20220615193116.806312-5-coltonlewis@google.com>
- <20220616124519.erxasor4b5t7zaks@gator>
- <2fc82066-f092-bc19-ae69-6852820f41ef@redhat.com>
- <YsWqWkl8ymLFqxgY@google.com>
+ with ESMTP id HFWIsUuDqK1L for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Jul 2022 13:08:41 -0400 (EDT)
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com
+ [209.85.210.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 257834B8AC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jul 2022 13:08:41 -0400 (EDT)
+Received: by mail-pf1-f181.google.com with SMTP id l124so10259774pfl.8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Jul 2022 10:08:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=aDwhAz56getKu/7dUfZtUNg+bMQnNfCv/r3Lo81Gt4c=;
+ b=OKld0gkkD90FJcYLX8kyBvnUJUDj9BzEcNLpEOkQeEoIWLEfJ2D+KLUYi5d/Q8PoU7
+ fjQxBXgI1cNDJZYaFxlz5v1fdwQCKeXJkZtFR5RoS/IDTRWL4cuMqkcJ9PjDItMp5wWX
+ cQfcJhh+YhR/nZj1cqhKJ2CtyJIUuzgZP9DjYym+UVyxAz73eOTRQV8nS5lt21HahXSD
+ ECMRqQ+Wtp5dAO9uMSd2eec76gtUdPShhuNbCQQpwn+GeFn/m/DVh17yUhgN6YfG/Awq
+ ASzsGt9WU4hHjobp076NKKcyYMpGP+arYWU6ObtfpOJF/se0lT+3Q5og9NgLxhiDiJft
+ Vr3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=aDwhAz56getKu/7dUfZtUNg+bMQnNfCv/r3Lo81Gt4c=;
+ b=aN5VRsiDdITr132vMnshjiLGF/UnBmzK5YEjux+OE65GgKpr3i1p0eo20VInSRDhtv
+ 41++cXKyqnpTdwuhF/oQTJ8+1DA6GNWMLBFZ/jlD9eIqVUFn8In0Cp2/d3bWaFRmKZgB
+ 0R+tMUQ9ovBJTOcokowY+obP823WQedS/WVMuT4BsUAKedGLngu2WnIc6qvN5tnTRWJI
+ z7clukOKyTn28vb2G6sKBVnJyirxlsEwtgD1eoA4ml0CnK332ccP11RYCnXNBO6LKt6j
+ zz5ycM3OVVOgUubAD2xk8Rwlw6J7xhxf1q3vhUD5jIwYQPu35205qmsSrwN6lrAVz2xp
+ NSqg==
+X-Gm-Message-State: AJIora+ThVNiXWO1zg/lZz9seWsbE+MEKGqgFIGx9HxbHwlxKmcqS45k
+ Js1dLgt1FGaRBBXldJAeLLjgaA==
+X-Google-Smtp-Source: AGRyM1ufPqH2WbJJzRXHiO3zNWh9EqE5AA0H0qB0Szi3BpKm2CLKdbn8dZanOb84ZZc4TKI1GbfHAQ==
+X-Received: by 2002:a17:903:25d6:b0:16b:f5cd:2cc3 with SMTP id
+ jc22-20020a17090325d600b0016bf5cd2cc3mr14214425plb.74.1657213719848; 
+ Thu, 07 Jul 2022 10:08:39 -0700 (PDT)
+Received: from google.com (123.65.230.35.bc.googleusercontent.com.
+ [35.230.65.123]) by smtp.gmail.com with ESMTPSA id
+ r20-20020a170902be1400b0016b68cf6ae5sm23565302pls.226.2022.07.07.10.08.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 07 Jul 2022 10:08:39 -0700 (PDT)
+Date: Thu, 7 Jul 2022 17:08:35 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v7 00/22] Support SDEI Virtualization
+Message-ID: <YscTE/dPQIeiobT1@google.com>
+References: <20220527080253.1562538-1-gshan@redhat.com>
+ <6bdb9280-3530-dc1f-d33e-5bc1c5ac927b@redhat.com>
+ <87iloq2oke.wl-maz@kernel.org>
+ <f719c5fb-3e41-38ac-1b16-fcb603e4911f@redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <YsWqWkl8ymLFqxgY@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Mailman-Approved-At: Thu, 07 Jul 2022 03:16:36 -0400
-Cc: thuth@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, vkuznets@redhat.com,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <f719c5fb-3e41-38ac-1b16-fcb603e4911f@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Jonathan.Cameron@huawei.com,
+ linux-kernel@vger.kernel.org, eauger@redhat.com, shan.gavin@gmail.com,
+ Catalin Marinas <catalin.marinas@arm.com>, vkuznets@redhat.com,
+ shijie@amperemail.onmicrosoft.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,31 +95,14 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jul 06, 2022 at 03:29:30PM +0000, Colton Lewis wrote:
-> On Mon, Jun 20, 2022 at 02:04:43PM +0200, Paolo Bonzini wrote:
-> > On 6/16/22 14:45, Andrew Jones wrote:
-> > > > +#define __GUEST_ASSERT(_condition, _condstr, _nargs, _args...) do {	\
-> > > > +		if (!(_condition))					\
-> > > > +			ucall(UCALL_ABORT, GUEST_ASSERT_BUILTIN_NARGS + _nargs,	\
-> > > > +			      "Failed guest assert: " _condstr,		\
-> > > > +			      __FILE__,					\
-> > > > +			      __LINE__,					\
-> > > > +			      ##_args);					\
-> > > We don't need another level of indentation nor the ## operator on _args.
-> > > 
-> > 
-> > The ## is needed to drop the comma if there are no _args.
-> 
-> I haven't heard anything more about part 4 of this patch in a while,
-> so I'm checking in that I didn't miss something requiring action on my
-> part.
+On Tue, Jul 05, 2022, Paolo Bonzini wrote:
+> That said: Peter, Sean, Google uses or used postcopy extensively on GCE
+> (https://dl.acm.org/doi/pdf/10.1145/3296975.3186415).  If it doesn't use it
+> on x86, do you have any insights on why?
 
-Paolo set me straight on the ## usage, so besides the indentation nit and
-the other comment I had about losing an assert string, then it looks fine
-to me.
-
-Thanks,
-drew
+We still use postcopy, but we don't use async #PF.  Async #PF is disabled (mostly?)
+because the x86 implementation was such a mess prior to switching to IRQ-based
+delivery and AFAIK we haven't re-evaluated it since that update.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
