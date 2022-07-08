@@ -2,70 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FCAC43334
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Jul 2022 06:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6C3DCCA47B
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Jul 2022 08:05:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CBC0A4B77B;
-	Fri,  8 Jul 2022 02:13:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42FE34B6B6;
+	Fri,  8 Jul 2022 04:05:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FB6YHAh-R985; Fri,  8 Jul 2022 02:13:55 -0400 (EDT)
+	with ESMTP id sfQ4C1tjUzpP; Fri,  8 Jul 2022 04:05:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A92394B594;
-	Fri,  8 Jul 2022 02:13:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20BAB4B651;
+	Fri,  8 Jul 2022 04:05:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EA61C4B594
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jul 2022 02:13:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BC4A94B64B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jul 2022 04:05:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oyHG2hfmicyO for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Jul 2022 02:13:52 -0400 (EDT)
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com
- [209.85.217.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D90004B577
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jul 2022 02:13:52 -0400 (EDT)
-Received: by mail-vs1-f43.google.com with SMTP id o13so20420739vsn.4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Jul 2022 23:13:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9kdI7fJ9HKcnF+19AuXCv4R1tDk5TG26VjCxQHvO5u8=;
- b=YhLiZ57UkwJfno4mNVHsQc6j6NYYIB2FeqxM/ysU8y1foQ924puiAmNgczPDV842zx
- ZI8v8WIFjImHN0JgZQOzv7+pz0oqnfk5Ppni33ZKMaf6sKWpWjpWaPffdrUwwWOcjBia
- ZqKgv5zOcZCDbyw6pMHWMreNrWB2il8kUw73FgzugbWWwPYpO355dHFWQ1h+ndhhrvgj
- 45xzhQhJTeJtQNaSXSvLp6sCN5H0QA0+xB1yguLGvuo2hTIdZ2UnCL/OUGjyV2juEWze
- GfmupVO2Ld9FTe8IrXo96KO4G+166D/b63z524NznPZtQp/BidA95aicX43e4Fa0XS9X
- LK9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=9kdI7fJ9HKcnF+19AuXCv4R1tDk5TG26VjCxQHvO5u8=;
- b=WwahqkYaXG76D7HbU0cWAbali7JRu0ZPqyMB+lXFrG7Hzot3fOR37G7p5RJxpuhkqx
- XAAcAQBxJcMjVwz/2/jXfpnH9bIZfVjrPfbTgYkL1jcVITNL0NaZDEE5uJdJR+czMrvM
- T3t+KusXPewUYIcGIGsID8jwIEQPLJlydmChLKoQrqgQKZEkx/Nv4WPdyXpRj40cHFBY
- elKiZXdThGoA/mofDfqbSUm4b4HaDvFjQizcy5w+/VVL+eG46Y5GyqwjwbsRvPjIVO2T
- yTSW/CuWOwCWXG+TXA3o9fnznJ3BGO2HWCD+cQLPtQMQ7HF6JRL1HPDpF7ODtZerNRGw
- W9uw==
-X-Gm-Message-State: AJIora+EusdeWfbrh7m1EyKjBmFFQbVOch3EU3NLORp1KeQqTB3uXDeB
- LkCvG7tlNxpOoBMIjqm+Df9qQmsCJpgov6a8iHrVVw==
-X-Google-Smtp-Source: AGRyM1suSrk/70+H5gMThZ7ls53+MmoXup9DqDwa+knSTDnqvGP4RjQRi4hofApOL600gSPxUjm6/FE2Hp6HIWpzha4=
-X-Received: by 2002:a67:5c41:0:b0:356:20ab:2f29 with SMTP id
- q62-20020a675c41000000b0035620ab2f29mr674569vsb.63.1657260832132; Thu, 07 Jul
- 2022 23:13:52 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220706164304.1582687-1-maz@kernel.org>
- <20220706164304.1582687-5-maz@kernel.org>
-In-Reply-To: <20220706164304.1582687-5-maz@kernel.org>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Thu, 7 Jul 2022 23:13:36 -0700
-Message-ID: <CAAeT=Fz9+1=EV6fwqVMSncOj_9y7eRuuv1+P92MXbP1GOJeZaA@mail.gmail.com>
+ with ESMTP id YaRdxmjww79h for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Jul 2022 04:05:30 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9E1E24B648
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jul 2022 04:05:30 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id B82B062619;
+ Fri,  8 Jul 2022 08:05:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23ADFC341C8;
+ Fri,  8 Jul 2022 08:05:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1657267529;
+ bh=QtAuw959KuTNtR8cxJBTQZYkriCeywcshOCm/oZxxx0=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Beg0f7gbAlHooxeO1KGbh7oDxPWT+OnCe9cSa/R044hKFWZFckT7cIklOCP1QmW/k
+ IbuOO0z69OvMJ55MQAakcflrglXbQlA0b23rY9uGguSClMJzsbfFXxevInYepP/g16
+ ZNW8nJQAMhbQtD8YUoomCj5dSTHS1yNTH939EkrgJAueMblB+c5bH2sM/ThhIW2ouG
+ A8m/dlmkKBtGvOEC4yIaP3jCYlc64dUvhmanOuvGk/uhqIKUI1b/eqeXSv1iHyLkAn
+ eOCXS7XjDNEpEdjj6Uvu6m35ccVMI9hmjSvybStlC6YXqH0zxecySxnIhdqxWt8xwW
+ 7HrI+tjpS7QYg==
+Received: from [213.208.244.172] (helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1o9izO-0065zO-PW;
+ Fri, 08 Jul 2022 09:05:27 +0100
+Date: Fri, 08 Jul 2022 09:05:25 +0100
+Message-ID: <87sfnckp16.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Reiji Watanabe <reijiw@google.com>
 Subject: Re: [PATCH 04/19] KVM: arm64: Push checks for 64bit registers into
  the low-level accessors
-To: Marc Zyngier <maz@kernel.org>
+In-Reply-To: <CAAeT=Fz9+1=EV6fwqVMSncOj_9y7eRuuv1+P92MXbP1GOJeZaA@mail.gmail.com>
+References: <20220706164304.1582687-1-maz@kernel.org>
+ <20220706164304.1582687-5-maz@kernel.org>
+ <CAAeT=Fz9+1=EV6fwqVMSncOj_9y7eRuuv1+P92MXbP1GOJeZaA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 213.208.244.172
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, schspa@gmail.com,
+ kernel-team@android.com, oliver.upton@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, Schspa Shi <schspa@gmail.com>,
  Oliver Upton <oliver.upton@linux.dev>, kernel-team@android.com,
  kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
@@ -85,67 +89,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Fri, 08 Jul 2022 07:13:36 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Wed, Jul 6, 2022 at 9:43 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Make sure the check occurs on every paths where we can pick
+> > a sysreg from userspace, including the GICv3 paths.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 10 ++++------
+> >  1 file changed, 4 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 0fbdb21a3600..89e7eddea937 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -2656,6 +2656,10 @@ const struct sys_reg_desc *get_reg_by_id(u64 id,
+> >  {
+> >         struct sys_reg_params params;
+> >
+> > +       /* 64 bit is the only way */
+> > +       if (KVM_REG_SIZE(id) != sizeof(__u64))
+> > +               return NULL;
+> 
+> This doesn't seem to be necessary since the equivalent check
+> is done by index_to_params().
 
-On Wed, Jul 6, 2022 at 9:43 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Make sure the check occurs on every paths where we can pick
-> a sysreg from userspace, including the GICv3 paths.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 10 ++++------
->  1 file changed, 4 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 0fbdb21a3600..89e7eddea937 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -2656,6 +2656,10 @@ const struct sys_reg_desc *get_reg_by_id(u64 id,
->  {
->         struct sys_reg_params params;
->
-> +       /* 64 bit is the only way */
-> +       if (KVM_REG_SIZE(id) != sizeof(__u64))
-> +               return NULL;
+Ah, well spotted. Amusing how many times we check for the same thing!
 
-This doesn't seem to be necessary since the equivalent check
-is done by index_to_params().
+I'll simplify the patch and amend the commit message.
 
-Thank you,
-Reiji
+Thanks,
 
-> +
->         if (!index_to_params(id, &params))
->                 return NULL;
->
-> @@ -2871,9 +2875,6 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
->         if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
->                 return demux_c15_get(reg->id, uaddr);
->
-> -       if (KVM_REG_SIZE(reg->id) != sizeof(__u64))
-> -               return -ENOENT;
-> -
->         err = get_invariant_sys_reg(reg->id, uaddr);
->         if (err != -ENOENT)
->                 return err;
-> @@ -2906,9 +2907,6 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
->         if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
->                 return demux_c15_set(reg->id, uaddr);
->
-> -       if (KVM_REG_SIZE(reg->id) != sizeof(__u64))
-> -               return -ENOENT;
-> -
->         err = set_invariant_sys_reg(reg->id, uaddr);
->         if (err != -ENOENT)
->                 return err;
-> --
-> 2.34.1
->
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
