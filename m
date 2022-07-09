@@ -2,80 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A1C0C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Jul 2022 09:43:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 687EDC43334
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Jul 2022 09:43:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 306FC4BA9C;
-	Mon, 11 Jul 2022 05:43:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22F224BA95;
+	Mon, 11 Jul 2022 05:43:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id na9ws083ZkJ0; Mon, 11 Jul 2022 05:43:04 -0400 (EDT)
+	with ESMTP id 0mQLrsftD4i9; Mon, 11 Jul 2022 05:43:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74B734BB71;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ADBC4BB74;
 	Mon, 11 Jul 2022 05:42:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 23C774B56C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jul 2022 17:21:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0126F4B425
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jul 2022 21:50:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KRoN1gWNv3ZV for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Jul 2022 17:21:21 -0400 (EDT)
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
- [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BA4924B58D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jul 2022 17:21:21 -0400 (EDT)
-Received: by mail-yb1-f201.google.com with SMTP id
- z9-20020a258689000000b0066e38ab7122so11943422ybk.9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Jul 2022 14:21:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=BncZ+nQY2fXKcGj97BWocHuOMgLnRAIrtoobxQvs+yg=;
- b=CWeilK91Y66KvfDXv80VI1osstHUx7mu0s9JCS9R8rcDcQWS2d6uBrXLe9YHxAl7Cq
- o9TM7VGgNMHiTQYhpsQEJwhCeyD8AefacE6+tKMSRWdTPA/SFuS6WV3nfkecQddJ3UWq
- SsYFRGnUllJcqhTN2lIRFTRHcxOOarrveOZ7476oJF9BPyipsNJNzfVDF6oetllNluez
- Ax00g1m4aTcv7m7elKPKEcLm6y66I0W/gsdePiYiOstKmoatljFIZoDT/OTPwDdmWlT/
- JqsxIsUFCetoSRsIYXdjGDEpKDlrJrZiqAuN9CqPSo5kJw/C/winwNHczgt1dvr9ub3S
- NZow==
+ with ESMTP id oxMFb0qb5lih for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Jul 2022 21:50:45 -0400 (EDT)
+Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com
+ [209.85.160.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 307744B31D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Jul 2022 21:50:45 -0400 (EDT)
+Received: by mail-oa1-f49.google.com with SMTP id
+ 586e51a60fabf-10c0e6dd55eso757679fac.7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Jul 2022 18:50:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=pLrIXHFzpO5mZB8k2eavL3K7Dil3m2ScwawxeudvKdw=;
+ b=BA1+GtDn8BwoXKSiIJaAD8AxgAuh/yNsdUESp/xavAzeSzep8kBNyIXhlQjYWFU/kk
+ Aa/kT5h3KFv3GevQSWM76VuCPtPY6Li2JG/JfRsVib2onz5c7FlYDR+U/rrmLZ2RV8Ub
+ nHYkbw9Hh82/PJAbcOcprRkfu9LbKBvvzWXPScuKem2O89XFZTV5E8uURizJBNQrbIay
+ ZrHmhplPMi56Mz+ah0Sbdx27qSbXJSw8GNZKCUfOrs52bSxCuGp2VOF8uK+yOsIkTIPJ
+ NYoZqrBr/ZIOQH6bt2fBRtwwdUlMgZIzluOee2jiHgFvi3h5j5FiTGNHtZeDlr1diV2u
+ ycNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=BncZ+nQY2fXKcGj97BWocHuOMgLnRAIrtoobxQvs+yg=;
- b=OKSvNyIINHBJsVA8QzvUe7TyUORHkmy1plOZUIcyNvByLCHAT+xV6jRwUYDg0bu1F+
- xxsoj9/v8B2yfLTVTGZHSHR4p3DFvTV8COj0BpbD2bgcD/XMgyezdn5PGzjfyQ5tZY88
- gbElL8sQA0Wge98s1CN/d588NbJyvjWb2nsmIicjL4RW4rUvfeOgbl2IuXqdQCjJPkml
- jTF/JUC/NtLfEx58oZVEV/cSYEPt2L2mUTBGtSzCjJMQJ08NP8AGhWG5Ru1nh0rpIbjX
- SdInUHG4f0W/nXlVOcbIy/Bo9sPzr9XHsB+XmycysvpkOXm7IWfXbGntaqiESO/6WGId
- 0xhQ==
-X-Gm-Message-State: AJIora8bN3PjBx3FS9rbNAsMM48SGD4D/LjAykEX9jqOVWXzInCM15No
- 18iKNVXn8iY9KLhYHSLsZOeKotiecYFzNFlAXP3yKa7Y41gLvIDL3eMgtwYu0cLsRAI2tTO+Lo6
- V6nFUoSpG5UtokAZp8PsRZIMdHLIDi1gxjSWb80DC32Vkv8FWD8J23D/CwkJc1Q==
-X-Google-Smtp-Source: AGRyM1vx7nO49BRSoJ6ckQ8LmFvqQhFRH6xNwGFXgnVWrZVBFW74MN7oiNIzcxG/XrQ842Yj8o1bmgs=
-X-Received: from pcc-desktop.svl.corp.google.com
- ([2620:15c:2ce:200:ff27:d65:6bb8:b084])
- (user=pcc job=sendgmr) by 2002:a25:ccca:0:b0:66e:c109:a884 with SMTP id
- l193-20020a25ccca000000b0066ec109a884mr6026929ybf.161.1657315281268; Fri, 08
- Jul 2022 14:21:21 -0700 (PDT)
-Date: Fri,  8 Jul 2022 14:21:06 -0700
-In-Reply-To: <20220708212106.325260-1-pcc@google.com>
-Message-Id: <20220708212106.325260-4-pcc@google.com>
-Mime-Version: 1.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=pLrIXHFzpO5mZB8k2eavL3K7Dil3m2ScwawxeudvKdw=;
+ b=NFXEg5dsoS0XaCpNBgvAx5+Gr5Ury2fwqWhZxFPMScvL0DmqwKni0LJXTFkCOiIoUb
+ tIsr2w/uhL/smJUJcoWzIwFamaSNuHBiNm2leRqPSubMcC314NMnR4ZFbnwHR5ftJhjC
+ oaNZi/feFGuz5I2JU/l4EcD9R3DYdSRs05cxIw6pY0A7A3lO8gq5A64B7XpW4KZj/pDv
+ T6qaZZQaCIPkeHIVJlsNpZmojmi7blQWyaCIjqMrhbTd3gwqI91y4kCw4rm7WV9vwZNM
+ ACv1Gf+UB5U1V+/s8cAXxPgfkXqcjumCUIiD/ku8eGJRPknyPy30+zKp3p7SOVG7ZYQy
+ UTvA==
+X-Gm-Message-State: AJIora8Nl6gTydGYfgw29GkqTON5ZtxRwUl3M+NxWsY/m6Uw+aA8sjSW
+ wulqiFB/BIZ19EcxmSL3CFjGFK3jA+OMRLIhE/8=
+X-Google-Smtp-Source: AGRyM1tYF65Gndj3Xt/nFn7scwLMXSSDwQXWYXGRmtNZ8FD1W9TMa8mjOc+m344btTB153SXSoeUU/i59ai41G6UZqk=
+X-Received: by 2002:a05:6870:c68a:b0:10b:95e3:3dd3 with SMTP id
+ cv10-20020a056870c68a00b0010b95e33dd3mr1659272oab.248.1657331444203; Fri, 08
+ Jul 2022 18:50:44 -0700 (PDT)
+MIME-Version: 1.0
 References: <20220708212106.325260-1-pcc@google.com>
-X-Mailer: git-send-email 2.37.0.144.g8ac04bfd2-goog
-Subject: [PATCH v2 3/3] KVM: arm64: allow MTE in protected VMs if the tag
- storage is known
-From: Peter Collingbourne <pcc@google.com>
-To: kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20220708212106.325260-1-pcc@google.com>
+From: Itaru Kitayama <itaru.kitayama@gmail.com>
+Date: Sat, 9 Jul 2022 10:50:33 +0900
+Message-ID: <CANW9uysjpAH726c18aR7A2MxRpR49D_cfXBvsQP0Yj_1yP8bhQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] KVM: arm64: support MTE in protected VMs
+To: Peter Collingbourne <pcc@google.com>
 X-Mailman-Approved-At: Mon, 11 Jul 2022 05:42:55 -0400
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, Andy Lutomirski <luto@amacapital.net>,
- Will Deacon <will@kernel.org>, Evgenii Stepanov <eugenis@google.com>,
- Michael Roth <michael.roth@amd.com>, Chao Peng <chao.p.peng@linux.intel.com>,
- Peter Collingbourne <pcc@google.com>, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Andy Lutomirski <luto@amacapital.net>, linux-arm-kernel@lists.infradead.org,
+ Michael Roth <michael.roth@amd.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Evgenii Stepanov <eugenis@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,213 +82,189 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============7391916226010638025=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Because the host may corrupt a protected guest's tag storage unless
-protected by stage 2 page tables, we can't expose MTE to protected guests
-if the location of the tag storage is not known.
+--===============7391916226010638025==
+Content-Type: multipart/alternative; boundary="00000000000001c28805e3558c7d"
 
-Therefore, only allow protected VM guests to use MTE if the location of
-the tag storage is described in the device tree, and only after disowning
-any physical memory accessible tag storage regions.
+--00000000000001c28805e3558c7d
+Content-Type: text/plain; charset="UTF-8"
 
-To avoid exposing MTE tags from the host to protected VMs, sanitize
-tags before donating pages.
+Peter
+Gmail always marks your mail as spam, any ideas?
 
-Signed-off-by: Peter Collingbourne <pcc@google.com>
----
- arch/arm64/include/asm/kvm_host.h |  6 +++++
- arch/arm64/include/asm/kvm_pkvm.h |  4 +++-
- arch/arm64/kernel/image-vars.h    |  3 +++
- arch/arm64/kvm/arm.c              | 37 ++++++++++++++++++++++++++++---
- arch/arm64/kvm/hyp/nvhe/pkvm.c    |  8 ++++---
- arch/arm64/kvm/mmu.c              |  4 +++-
- 6 files changed, 54 insertions(+), 8 deletions(-)
+Itaru.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e54e76afccc0..35cba0408eca 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1037,6 +1037,12 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
- 
- #define kvm_arm_vcpu_sve_finalized(vcpu) vcpu_get_flag(vcpu, VCPU_SVE_FINALIZED)
- 
-+DECLARE_STATIC_KEY_FALSE(pkvm_mte_supported);
-+
-+#define kvm_supports_mte(kvm)                                                  \
-+	(system_supports_mte() &&                                              \
-+	 (!kvm_vm_is_protected(kvm) ||                                         \
-+	  static_branch_unlikely(&pkvm_mte_supported)))
- #define kvm_has_mte(kvm)					\
- 	(system_supports_mte() &&				\
- 	 test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &(kvm)->arch.flags))
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index cd56438a34be..ef5d4870c043 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -73,10 +73,12 @@ void kvm_shadow_destroy(struct kvm *kvm);
-  * Allow for protected VMs:
-  * - Branch Target Identification
-  * - Speculative Store Bypassing
-+ * - Memory Tagging Extension
-  */
- #define PVM_ID_AA64PFR1_ALLOW (\
- 	ARM64_FEATURE_MASK(ID_AA64PFR1_BT) | \
--	ARM64_FEATURE_MASK(ID_AA64PFR1_SSBS) \
-+	ARM64_FEATURE_MASK(ID_AA64PFR1_SSBS) | \
-+	ARM64_FEATURE_MASK(ID_AA64PFR1_MTE) \
- 	)
- 
- /*
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 2d4d6836ff47..26a9b31478aa 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -84,6 +84,9 @@ KVM_NVHE_ALIAS(__hyp_stub_vectors);
- KVM_NVHE_ALIAS(arm64_const_caps_ready);
- KVM_NVHE_ALIAS(cpu_hwcap_keys);
- 
-+/* Kernel symbol needed for kvm_supports_mte() check. */
-+KVM_NVHE_ALIAS(pkvm_mte_supported);
-+
- /* Static keys which are set if a vGIC trap should be handled in hyp. */
- KVM_NVHE_ALIAS(vgic_v2_cpuif_trap);
- KVM_NVHE_ALIAS(vgic_v3_cpuif_trap);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 91ca128e7daa..7c79a1be1e39 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -60,6 +60,7 @@ static bool vgic_present;
- 
- static DEFINE_PER_CPU(unsigned char, kvm_arm_hardware_enabled);
- DEFINE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
-+DEFINE_STATIC_KEY_FALSE(pkvm_mte_supported);
- 
- int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
- {
-@@ -96,9 +97,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- 		break;
- 	case KVM_CAP_ARM_MTE:
- 		mutex_lock(&kvm->lock);
--		if (!system_supports_mte() ||
--		    kvm_vm_is_protected(kvm) ||
--		    kvm->created_vcpus) {
-+		if (!kvm_supports_mte(kvm) || kvm->created_vcpus) {
- 			r = -EINVAL;
- 		} else {
- 			r = 0;
-@@ -334,6 +333,9 @@ static int pkvm_check_extension(struct kvm *kvm, long ext, int kvm_cap)
- 	case KVM_CAP_ARM_VM_IPA_SIZE:
- 		r = kvm_cap;
- 		break;
-+	case KVM_CAP_ARM_MTE:
-+		r = kvm_cap && static_branch_unlikely(&pkvm_mte_supported);
-+		break;
- 	case KVM_CAP_GUEST_DEBUG_HW_BPS:
- 		r = min(kvm_cap, pkvm_get_max_brps());
- 		break;
-@@ -1954,9 +1956,36 @@ static void kvm_reserved_memory_init(void)
- 		if (!of_get_property(node, "compatible", NULL) &&
- 		    of_get_property(node, "no-map", NULL))
- 			disown_reserved_memory(node);
-+
-+		if (of_device_is_compatible(node, "arm,mte-tag-storage"))
-+			disown_reserved_memory(node);
- 	}
- }
- 
-+static void kvm_mte_init(void)
-+{
-+	struct device_node *memory;
-+
-+	if (!system_supports_mte() || !acpi_disabled ||
-+	    !is_protected_kvm_enabled())
-+		return;
-+
-+	/*
-+	 * It is only safe to turn on MTE for protected VMs if we can protect
-+	 * the guests from host accesses to their tag storage. If every memory
-+	 * region has an arm,mte-alloc property we know that all tag storage
-+	 * regions exposed to physical memory, if any, are described by a
-+	 * reserved-memory compatible with arm,mte-tag-storage. We can use these
-+	 * descriptions to unmap these regions from the host's stage 2 page
-+	 * tables (see kvm_reserved_memory_init).
-+	 */
-+	for_each_node_by_type(memory, "memory")
-+		if (!of_get_property(memory, "arm,mte-alloc", NULL))
-+			return;
-+
-+	static_branch_enable(&pkvm_mte_supported);
-+}
-+
- static int init_subsystems(void)
- {
- 	int err = 0;
-@@ -1999,6 +2028,8 @@ static int init_subsystems(void)
- 
- 	kvm_reserved_memory_init();
- 
-+	kvm_mte_init();
-+
- out:
- 	if (err || !is_protected_kvm_enabled())
- 		on_each_cpu(_kvm_arch_hardware_disable, NULL, 1);
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 80260e8e97f2..96538c984858 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -88,7 +88,7 @@ static void pvm_init_traps_aa64pfr1(struct kvm_vcpu *vcpu)
- 	/* Memory Tagging: Trap and Treat as Untagged if not supported. */
- 	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR1_MTE), feature_ids)) {
- 		hcr_set |= HCR_TID5;
--		hcr_clear |= HCR_DCT | HCR_ATA;
-+		hcr_clear |= HCR_ATA;
- 	}
- 
- 	vcpu->arch.hcr_el2 |= hcr_set;
-@@ -179,8 +179,8 @@ static void pvm_init_trap_regs(struct kvm_vcpu *vcpu)
- 	 * - Feature id registers: to control features exposed to guests
- 	 * - Implementation-defined features
- 	 */
--	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS |
--			     HCR_TID3 | HCR_TACR | HCR_TIDCP | HCR_TID1;
-+	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS | HCR_TID3 | HCR_TACR | HCR_TIDCP |
-+			     HCR_TID1 | HCR_ATA;
- 
- 	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN)) {
- 		/* route synchronous external abort exceptions to EL2 */
-@@ -473,6 +473,8 @@ static int init_shadow_structs(struct kvm *kvm, struct kvm_shadow_vm *vm,
- 	vm->host_kvm = kvm;
- 	vm->kvm.created_vcpus = nr_vcpus;
- 	vm->kvm.arch.vtcr = host_kvm.arch.vtcr;
-+	if (kvm_supports_mte(kvm) && test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &kvm->arch.flags))
-+		set_bit(KVM_ARCH_FLAG_MTE_ENABLED, &vm->kvm.arch.flags);
- 	vm->kvm.arch.pkvm.enabled = READ_ONCE(kvm->arch.pkvm.enabled);
- 	vm->kvm.arch.mmu.last_vcpu_ran = last_ran;
- 	vm->last_ran_size = last_ran_size;
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index bca90b7354b9..5e079daf2d8e 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1228,8 +1228,10 @@ static int pkvm_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		goto dec_account;
- 	}
- 
--	write_lock(&kvm->mmu_lock);
- 	pfn = page_to_pfn(page);
-+	sanitise_mte_tags(kvm, pfn, PAGE_SIZE);
-+
-+	write_lock(&kvm->mmu_lock);
- 	ret = pkvm_host_map_guest(pfn, fault_ipa >> PAGE_SHIFT);
- 	if (ret) {
- 		if (ret == -EAGAIN)
--- 
-2.37.0.144.g8ac04bfd2-goog
+On Sat, Jul 9, 2022 at 6:24 Peter Collingbourne <pcc@google.com> wrote:
+
+> Hi,
+>
+> This patch series contains a proposed extension to pKVM that allows MTE
+> to be exposed to the protected guests. It is based on the base pKVM
+> series previously sent to the list [1] and later rebased to 5.19-rc3
+> and uploaded to [2].
+>
+> This series takes precautions against host compromise of the guests
+> via direct access to their tag storage, by preventing the host from
+> accessing the tag storage via stage 2 page tables. The device tree
+> must describe the physical memory address of the tag storage, if any,
+> and the memory nodes must declare that the tag storage location is
+> described. Otherwise, the MTE feature is disabled in protected guests.
+>
+> Now that we can easily do so, we also prevent the host from accessing
+> any unmapped reserved-memory regions without a driver, as the host
+> has no business accessing that memory.
+>
+> A proposed extension to the devicetree specification is available at
+> [3], a patched version of QEMU that produces the required device tree
+> nodes is available at [4] and a patched version of the crosvm hypervisor
+> that enables MTE is available at [5].
+>
+> v2:
+> - refcount the PTEs owned by NOBODY
+>
+> [1] https://lore.kernel.org/all/20220519134204.5379-1-will@kernel.org/
+> [2] https://android-kvm.googlesource.com/linux/ for-upstream/pkvm-base-v2
+> [3] https://github.com/pcc/devicetree-specification mte-alloc
+> [4] https://github.com/pcc/qemu mte-shared-alloc
+> [5]
+> https://chromium-review.googlesource.com/c/chromiumos/platform/crosvm/+/3719324
+>
+> Peter Collingbourne (3):
+>   KVM: arm64: add a hypercall for disowning pages
+>   KVM: arm64: disown unused reserved-memory regions
+>   KVM: arm64: allow MTE in protected VMs if the tag storage is known
+>
+>  arch/arm64/include/asm/kvm_asm.h              |  1 +
+>  arch/arm64/include/asm/kvm_host.h             |  6 ++
+>  arch/arm64/include/asm/kvm_pkvm.h             |  4 +-
+>  arch/arm64/kernel/image-vars.h                |  3 +
+>  arch/arm64/kvm/arm.c                          | 83 ++++++++++++++++++-
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |  1 +
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  9 ++
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 11 +++
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c                |  8 +-
+>  arch/arm64/kvm/mmu.c                          |  4 +-
+>  11 files changed, 123 insertions(+), 8 deletions(-)
+>
+> --
+> 2.37.0.144.g8ac04bfd2-goog
+>
+>
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+>
+
+--00000000000001c28805e3558c7d
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto">Peter=C2=A0</div><div dir=3D"auto">Gmail always marks you=
+r mail as spam, any ideas?</div><div dir=3D"auto"><br></div><div dir=3D"aut=
+o">Itaru.</div><div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=
+=3D"gmail_attr">On Sat, Jul 9, 2022 at 6:24 Peter Collingbourne &lt;<a href=
+=3D"mailto:pcc@google.com">pcc@google.com</a>&gt; wrote:<br></div><blockquo=
+te class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc so=
+lid;padding-left:1ex">Hi,<br>
+<br>
+This patch series contains a proposed extension to pKVM that allows MTE<br>
+to be exposed to the protected guests. It is based on the base pKVM<br>
+series previously sent to the list [1] and later rebased to 5.19-rc3<br>
+and uploaded to [2].<br>
+<br>
+This series takes precautions against host compromise of the guests<br>
+via direct access to their tag storage, by preventing the host from<br>
+accessing the tag storage via stage 2 page tables. The device tree<br>
+must describe the physical memory address of the tag storage, if any,<br>
+and the memory nodes must declare that the tag storage location is<br>
+described. Otherwise, the MTE feature is disabled in protected guests.<br>
+<br>
+Now that we can easily do so, we also prevent the host from accessing<br>
+any unmapped reserved-memory regions without a driver, as the host<br>
+has no business accessing that memory.<br>
+<br>
+A proposed extension to the devicetree specification is available at<br>
+[3], a patched version of QEMU that produces the required device tree<br>
+nodes is available at [4] and a patched version of the crosvm hypervisor<br=
+>
+that enables MTE is available at [5].<br>
+<br>
+v2:<br>
+- refcount the PTEs owned by NOBODY<br>
+<br>
+[1] <a href=3D"https://lore.kernel.org/all/20220519134204.5379-1-will@kerne=
+l.org/" rel=3D"noreferrer" target=3D"_blank">https://lore.kernel.org/all/20=
+220519134204.5379-1-will@kernel.org/</a><br>
+[2] <a href=3D"https://android-kvm.googlesource.com/linux/" rel=3D"noreferr=
+er" target=3D"_blank">https://android-kvm.googlesource.com/linux/</a> for-u=
+pstream/pkvm-base-v2<br>
+[3] <a href=3D"https://github.com/pcc/devicetree-specification" rel=3D"nore=
+ferrer" target=3D"_blank">https://github.com/pcc/devicetree-specification</=
+a> mte-alloc<br>
+[4] <a href=3D"https://github.com/pcc/qemu" rel=3D"noreferrer" target=3D"_b=
+lank">https://github.com/pcc/qemu</a> mte-shared-alloc<br>
+[5] <a href=3D"https://chromium-review.googlesource.com/c/chromiumos/platfo=
+rm/crosvm/+/3719324" rel=3D"noreferrer" target=3D"_blank">https://chromium-=
+review.googlesource.com/c/chromiumos/platform/crosvm/+/3719324</a><br>
+<br>
+Peter Collingbourne (3):<br>
+=C2=A0 KVM: arm64: add a hypercall for disowning pages<br>
+=C2=A0 KVM: arm64: disown unused reserved-memory regions<br>
+=C2=A0 KVM: arm64: allow MTE in protected VMs if the tag storage is known<b=
+r>
+<br>
+=C2=A0arch/arm64/include/asm/kvm_asm.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 |=C2=A0 1 +<br>
+=C2=A0arch/arm64/include/asm/kvm_host.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0|=C2=A0 6 ++<br>
+=C2=A0arch/arm64/include/asm/kvm_pkvm.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0|=C2=A0 4 +-<br>
+=C2=A0arch/arm64/kernel/image-vars.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 |=C2=A0 3 +<br>
+=C2=A0arch/arm64/kvm/arm.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 83 ++++++++++++++++++-<br>
+=C2=A0arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |=C2=A0 1 +<br>
+=C2=A0arch/arm64/kvm/hyp/include/nvhe/pkvm.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 1 +<br>
+=C2=A0arch/arm64/kvm/hyp/nvhe/hyp-main.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 |=C2=A0 9 ++<br>
+=C2=A0arch/arm64/kvm/hyp/nvhe/mem_protect.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0| 11 +++<br>
+=C2=A0arch/arm64/kvm/hyp/nvhe/pkvm.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 |=C2=A0 8 +-<br>
+=C2=A0arch/arm64/kvm/mmu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 4 +-<br>
+=C2=A011 files changed, 123 insertions(+), 8 deletions(-)<br>
+<br>
+-- <br>
+2.37.0.144.g8ac04bfd2-goog<br>
+<br>
+<br>
+_______________________________________________<br>
+linux-arm-kernel mailing list<br>
+<a href=3D"mailto:linux-arm-kernel@lists.infradead.org" target=3D"_blank">l=
+inux-arm-kernel@lists.infradead.org</a><br>
+<a href=3D"http://lists.infradead.org/mailman/listinfo/linux-arm-kernel" re=
+l=3D"noreferrer" target=3D"_blank">http://lists.infradead.org/mailman/listi=
+nfo/linux-arm-kernel</a><br>
+</blockquote></div></div>
+
+--00000000000001c28805e3558c7d--
+
+--===============7391916226010638025==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============7391916226010638025==--
