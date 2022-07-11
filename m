@@ -2,76 +2,61 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 878B8C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Jul 2022 14:34:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC898C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Jul 2022 15:53:53 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6F584BB7E;
-	Mon, 11 Jul 2022 10:34:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 636744B7E2;
+	Mon, 11 Jul 2022 11:53:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oDg8MQQmKxd8; Mon, 11 Jul 2022 10:34:02 -0400 (EDT)
+	with ESMTP id 9oedTzjUV8i7; Mon, 11 Jul 2022 11:53:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB0374BB7A;
-	Mon, 11 Jul 2022 10:34:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4DE74B947;
+	Mon, 11 Jul 2022 11:53:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FA244BB60
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jul 2022 10:34:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C8FAB4B7E2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jul 2022 11:53:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KzNwsnuB50Qx for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Jul 2022 10:33:59 -0400 (EDT)
+ with ESMTP id aY9GAgxwH7sa for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Jul 2022 11:53:49 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C25474BAE0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jul 2022 10:33:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8475C4B655
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jul 2022 11:53:49 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 39B666152A;
- Mon, 11 Jul 2022 14:33:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D38CC34115;
- Mon, 11 Jul 2022 14:33:57 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 7D89A6104F;
+ Mon, 11 Jul 2022 15:53:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60709C34115;
+ Mon, 11 Jul 2022 15:53:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1657550037;
- bh=WH/GSsgDH8mWI7ojC7q2AHv8+SGuAofOvHOySdK3FbQ=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=lxD9E4OF0qQCwDVKXFZYaglqEVb6QfBtGGP6zc3/ow+DnR/Z7nE+amslwyUYsEO1Q
- YsAJ2MYa3DP9nAHKdAe7oRMo72kXxDa93xNl/pOgT5vuUI5rXefqjE0VoiT+A4dtiH
- uMWpeGQ/2dwDVs3isZLhnJZcZ/YEmEXdzkg1/6lYg1MCGTu1nXoWChfGBpxciJzvy3
- 54vMndMHO3yyZfKbpdwEp62OZcyTxVPjaQ6EXcigerWTvAI2wIHRxH1AbCp/Mftjja
- 0YfWhzyV0lv1Twe6KqHNs7KGsIzW8K9Wt3gvkUhDhw9crChqRRyagrfu+33NrdJRkF
- mQCawSlWQewnw==
-Received: from 82-132-215-190.dab.02.net ([82.132.215.190]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oAuTy-006hDZ-9d;
- Mon, 11 Jul 2022 15:33:54 +0100
-Date: Mon, 11 Jul 2022 15:33:51 +0100
-Message-ID: <87h73nlnw0.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
+ s=k20201202; t=1657554828;
+ bh=x/+NZrQLovhCePrLFzt1Pdb82Zb5l1wuMFjM9DHfgmY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=gnInIpun1pwBAmpjyvYNLaw5+bxpNSn7kzGJlBAlSvmjvF2c4PEagn5JscfL7wJBj
+ KNOJ+Jlk7qHDeeor28oAZo2UWcif0mCjqbzWWN9orsgrefbr+JuW/1zAcwOaH98XTV
+ f2gTWapSrLQraD6qP1NIuqVmEj2PJyCuNFnPhhIJs8IIa4NZV31QF2U1a/2ADMdnti
+ pPFAQFXqsvUDajAzaN4+d2uQf3kDZ0b3X6zRcOn6OJXAsnZiMC6RQWtPbJkkvs9+9B
+ heeYY9ARAaSPQn23wBZ7E9ZI9R30AE+316HIXiklV8k6hGeFtxNmruStuk7HerxCO5
+ Xg8v8L/SrQ4gQ==
+Date: Mon, 11 Jul 2022 16:53:43 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [PATCH v2 2/7] arm64/fpsimd: Track the saved FPSIMD state type
  separately to TIF_SVE
-In-Reply-To: <YswMB2v9TqPJHDM1@sirena.org.uk>
+Message-ID: <YsxHhx3PaPRZCLmF@sirena.org.uk>
 References: <20220620124158.482039-1-broonie@kernel.org>
  <20220620124158.482039-3-broonie@kernel.org>
  <87ilo4kmvx.wl-maz@kernel.org> <YswMB2v9TqPJHDM1@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 82.132.215.190
-X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
- zhang.lei@jp.fujitsu.com, james.morse@arm.com, alexandru.elisei@arm.com,
- andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <87h73nlnw0.wl-maz@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <87h73nlnw0.wl-maz@kernel.org>
+X-Cookie: I am NOMAD!
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
  Zhang Lei <zhang.lei@jp.fujitsu.com>, Andre Przywara <andre.przywara@arm.com>,
  Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
@@ -87,79 +72,109 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============2511590477898223236=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 11 Jul 2022 12:39:51 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> [1  <text/plain; us-ascii (7bit)>]
-> On Mon, Jul 11, 2022 at 10:40:50AM +0100, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > > +	enum fp_state *type;
-> 
-> > For consistency: s/type/fp_type/ ?
-> 
-> Sure if nobody else wants a different bikeshed.  It really needs a
-> longer name like fp_state_t or something but that had it's own problems
-> with non-idiomaticness.
 
-I'm not talking about the name of the type, but about the name of the
-member in the struct fpsimd_last_state_struct. I'd like it to be
-homogeneous to the name you use in struct kvm_vcpu_arch. 'type' is way
-too vague a name, and maybe it should be fp_reg_type, as that's what
-it actually indicates.
+--===============2511590477898223236==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="WrRSAYoHS7qTuBgz"
+Content-Disposition: inline
 
-> 
-> > >  	if (test_and_clear_tsk_thread_flag(task, TIF_SVE) ||
-> > > -	    thread_sm_enabled(&task->thread))
-> > > +	    thread_sm_enabled(&task->thread)) {
-> > >  		sve_to_fpsimd(task);
-> > > +		task->thread.fp_type = FP_STATE_FPSIMD;
-> 
-> > Can you move this assignment into the sve_to_fpsimd() helper?
-> 
-> There are cases where we want a FPSIMD version of the state for
-> reading but don't want to affect the actual state of the process
-> (eg, if someone reads the FPSIMD registers via ptrace) so we don't
-> want to change the active register state just because we converted
-> it.  Adding another API that does the convert and update didn't feel
-> like it was helping since you then have to remember which API does
-> what and we already have lots of similarly named functions for
-> slightly different contexts.
 
-I still think the state conversion should be self contained.
-Sprinkling this context tracking is bound to end-up with a bug, while
-documenting what is to be used when, or with a helper named
-explicitly enough ("extract_fp_from_sve()" springs to mind) for
-ptrace.
+--WrRSAYoHS7qTuBgz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> > >  	} else {
-> > >  		fpsimd_to_sve(current);
-> > > +		current->thread.fp_type = FP_STATE_SVE;
-> 
-> > Same thing here.
-> 
-> There's not the same issue with reading FPSIMD state via the SVE APIs
-> but for consistency it seems best to always leave these updates in the
-> callers.
+On Mon, Jul 11, 2022 at 03:33:51PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+> > On Mon, Jul 11, 2022 at 10:40:50AM +0100, Marc Zyngier wrote:
+> > > Mark Brown <broonie@kernel.org> wrote:
 
-I disagree again. I really want these things to be self-contained, and
-be able to reason about what they do from their name and the arguments
-they take (and even some documentation). Relying on some extra updates
-adds complexity to a difficult part of the kernel, and an even more
-difficult part of the architecture.
+> > > > +	enum fp_state *type;
 
-Thanks,
+> > > For consistency: s/type/fp_type/ ?
 
-	M.
+> > Sure if nobody else wants a different bikeshed.  It really needs a
+> > longer name like fp_state_t or something but that had it's own problems
+> > with non-idiomaticness.
 
--- 
-Without deviation from the norm, progress is not possible.
+> I'm not talking about the name of the type, but about the name of the
+> member in the struct fpsimd_last_state_struct. I'd like it to be
+> homogeneous to the name you use in struct kvm_vcpu_arch. 'type' is way
+
+Ah, sure I can do that.  I had thought this being in the FP last state
+structure made things clear here.
+
+> > > > -	    thread_sm_enabled(&task->thread))
+> > > > +	    thread_sm_enabled(&task->thread)) {
+> > > >  		sve_to_fpsimd(task);
+> > > > +		task->thread.fp_type = FP_STATE_FPSIMD;
+
+> > > Can you move this assignment into the sve_to_fpsimd() helper?
+
+> > There are cases where we want a FPSIMD version of the state for
+> > reading but don't want to affect the actual state of the process
+> > (eg, if someone reads the FPSIMD registers via ptrace) so we don't
+> > want to change the active register state just because we converted
+> > it.  Adding another API that does the convert and update didn't feel
+> > like it was helping since you then have to remember which API does
+> > what and we already have lots of similarly named functions for
+> > slightly different contexts.
+
+> I still think the state conversion should be self contained.
+> Sprinkling this context tracking is bound to end-up with a bug, while
+> documenting what is to be used when, or with a helper named
+> explicitly enough ("extract_fp_from_sve()" springs to mind) for
+> ptrace.
+
+My experience trying to follow and update this code has been that
+layering on more helpers just shifts the potential for bugs around -
+it's easy to have the calling context using the wrong helper and looking
+correct, or to spend time cross checking if the helper in a particular
+context is the right one.  Sometimes this happens because something
+about the calling context changed rather than due to writing a new use.
+Yes, someone might forget to update the state type but my experience
+with this code is that it's a lot easier to spot "this is writing new
+state, did it update the state type?" than "this is writing new state,
+did it call the helper that implicitly updates the state type or the
+other one?".
+
+Since these callers are already explicitly peering into the data in one
+form or another (like reading or writing the actual register values, and
+including for some checking the type information) it seems reasonable
+for them to also be doing updates to the type selection explicitly.  It
+does also make the error handling a little neater, if we are switching
+between state types then in the case of error we just leave things using
+the old, unmodified state.
+
+--WrRSAYoHS7qTuBgz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmLMR4YACgkQJNaLcl1U
+h9CaxQf+MF1YRCkg87ipxPvssfDyCksfPEAgFg6Z+wbtMZQjaoxxrGc88Shl6l8f
+3regxSfb4AN34gaZ9N4xbDN5hhkDo9aWHZSdvS/tZZpXutGLDyCjUcWDiui+J+q9
+42HYQ5+0WXew++6U+hLFLW/oHSZfAOX+uWl66O9FaDOVD8jRXh/HlVt6A+0QBSeR
+QGY7eBNNayhrCVUyoKHn3APiyYxWvPDI92ku+2zxoM8UjPVkzkGUn4x6zG9VvUUX
+7AnYkx/BlmbCR4maEjHX6Y2reTzL4Q5nYCyuOaAYPzZfBgiQl+LRrnGs528MeBlU
+GdADUJ6KhrAi4gP0PRnYMzIKzlBh1A==
+=1Z/E
+-----END PGP SIGNATURE-----
+
+--WrRSAYoHS7qTuBgz--
+
+--===============2511590477898223236==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============2511590477898223236==--
