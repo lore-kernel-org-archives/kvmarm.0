@@ -2,69 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D206DC433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 13 Jul 2022 05:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A261C43334
+	for <kvmarm@archiver.kernel.org>; Wed, 13 Jul 2022 06:46:11 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FA894C004;
-	Wed, 13 Jul 2022 01:51:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 870CB4BDFC;
+	Wed, 13 Jul 2022 02:46:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qyLHE022k1Bo; Wed, 13 Jul 2022 01:51:44 -0400 (EDT)
+	with ESMTP id Gb-T9MWWBNM6; Wed, 13 Jul 2022 02:46:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A8054BFE8;
-	Wed, 13 Jul 2022 01:51:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6913D4BE10;
+	Wed, 13 Jul 2022 02:46:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 016954BFE4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jul 2022 01:51:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 075FA4BDF1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jul 2022 02:46:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8SmBoBtqVQuS for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Jul 2022 01:51:41 -0400 (EDT)
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com
- [209.85.217.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D0ACC4BFA6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jul 2022 01:51:41 -0400 (EDT)
-Received: by mail-vs1-f47.google.com with SMTP id l190so9849406vsc.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2022 22:51:41 -0700 (PDT)
+ with ESMTP id Ae1LI5JuNkPS for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Jul 2022 02:46:08 -0400 (EDT)
+Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com
+ [209.85.217.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 08F7C4BDF0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jul 2022 02:46:07 -0400 (EDT)
+Received: by mail-vs1-f45.google.com with SMTP id k2so9907980vsc.5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jul 2022 23:46:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=V6DsLVB1Os/T467zl8XHHfVTC79R6u1QIg76nXthRf0=;
- b=X07y/aH0bERy3yMTWnhLUJfEU4C3NSMDvTZ2dqjIhvWFXrV5dn+isPnxxXf6wkY9EW
- Be45usNE+fO2CyTyVnM+8YL9iTkWOuR1dUeJ7u9M645jE4fgcP3ezP75uR+Jp9LaJ9xv
- P9fQjwoC69dhtrVRWBJHuki2xt6YhU0mQlaeruRXko32UKJfOY7GbC++VP9rhJZ8HMjI
- 9ZHlNheUJu5x92W2EPuum6PxktoSelq/+SKK2NHiDoPsW/MmpM00ePiXQQUsAAmwOwjO
- FuEhU454w2bVLRbpT28sMpGXdmHOR6JAJhrltMOraKg+W41dIRomFpqqpjo8Aanh7z6R
- jK/g==
+ :cc; bh=eVhC/3eC5T+uVY5zCPqJvEHAiZQx991cN+OGRmvdPJ4=;
+ b=R2tlFJo7b92QRtPKgzqkJ7RZkVZ64HxIrmYSKOcn98ummWgwZOep3MNQ0ANWNxgsX4
+ CLmUFuc8SccnfpSjG2SJKnWsNnr+se/++AM4yV37ysq65KpqkBSFtELhmuw4rX0tC8ka
+ HSOX8qtjeirynX7RSruFMax3bZARnKRfpATEDI6W7DTENR7y8mb+lIuh13N8/j59Ip09
+ VvxTSs18jQhoGAcQY5F3N9Sp4gMQLx8d6EzCfLg0JE2brKOUhMFa3I9G6kuIUz2rX69N
+ DMPBxWfgxvGBXL8fbBZnLw9tmjGp+PPM+ReRly+sBKcwoRmqWs3b5Uy5fuCYCtHYD9ne
+ 8PoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=V6DsLVB1Os/T467zl8XHHfVTC79R6u1QIg76nXthRf0=;
- b=Uj5YZzj+XqDLq30EhosfNy3asA8jj2mhZHEevCjTHrJ4n7ZQeyMkfx0vrOiJp7EcBE
- XeHFt8d7LZEGu9yq1SldRTcAQivRVmUJAWY4/yE1PWdJ1P6Klv1u1JtT6b5t9nZyueZ7
- gZRoL3zrZScygwYcWo1l37CY6TsAuXEFhlO7HcDIjQc2VM/jyFVw8DqQjL28+RpmArSq
- SjozmM1ACZ/ICddukNhMKP4Yt4CANOOMFtL7K29WuZru5iNtBY/Rr22+ve9NyJJZBsR0
- ht8tZ2opXUrZqBGpgGYAHHhRMENdsW/Zh1KtlGzsdnrIMtwZw4vXrBRNOJEZn1Oy4lxG
- 5VZg==
-X-Gm-Message-State: AJIora8qqa2V+kmQDqgjV4WKar8XK+V/7qRkf6pHqLrhR03wXBtk7vEx
- tmOgjfveKfMaVIW5V9mfIgce75Pl5KpheSH5jmU1TA==
-X-Google-Smtp-Source: AGRyM1vmw3DqET09DU69NtxLbHGCoiebSBcuxxz9079JWzLSn2pteanGKVgXbkE8PBhG6kBPfsnDc2/g7nxtlqiayyY=
-X-Received: by 2002:a67:5c41:0:b0:356:20ab:2f29 with SMTP id
- q62-20020a675c41000000b0035620ab2f29mr502511vsb.63.1657691501271; Tue, 12 Jul
- 2022 22:51:41 -0700 (PDT)
+ bh=eVhC/3eC5T+uVY5zCPqJvEHAiZQx991cN+OGRmvdPJ4=;
+ b=qOi+QTie9gXiJpZbxSE64S2whf3ddpIfHCWIvOjOe+ohbGHMOTug7D+UfqhWelxXJg
+ 9VAexzXOv361al6qJ4AWYiC0hnee0McanX7deRlxMTTZCjzWwJUj/0L/IaN+e4+zdWMR
+ d5SiDPYkdEDb3YUKugW3SBYU3xFmYpP4wvKU0Bd9PN46ecLy68XEbcWRSRHmDvcaFiOL
+ fVzhiJj0kjrTmj+A3amT8lJWRethq4YoY37xj4utNO08QvXNfOQ24N1ILLIGy5A0NGQj
+ MGbE5SAvIad1x0GPjCZoYFz4OiU2x/zX2z3yHlPeG6+yhLt0kLsafZ2VaXqk1cRgnL0N
+ SHAA==
+X-Gm-Message-State: AJIora9Zh2F+ZZBE0Or0fzwzSAT0jVx2LhgekdgQNOxZ/dMOE6pHXEWZ
+ 5yVHH+L6VzrJzVZIep1GCE/8PhXOfMVvdqQk+cOAMA==
+X-Google-Smtp-Source: AGRyM1vAIc+192gcPmhZ/OUxmzIY9hA9We6tz01rgpw9y2ihdWpQBLwpMt1VyVjBA74EqAPZkTaTemOlXd0RKxVwCxk=
+X-Received: by 2002:a67:b24c:0:b0:356:c997:1cf0 with SMTP id
+ s12-20020a67b24c000000b00356c9971cf0mr522722vsh.9.1657694767428; Tue, 12 Jul
+ 2022 23:46:07 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220706164304.1582687-1-maz@kernel.org>
- <20220706164304.1582687-11-maz@kernel.org>
-In-Reply-To: <20220706164304.1582687-11-maz@kernel.org>
+ <20220706164304.1582687-12-maz@kernel.org>
+In-Reply-To: <20220706164304.1582687-12-maz@kernel.org>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Tue, 12 Jul 2022 22:51:25 -0700
-Message-ID: <CAAeT=FwrHpyhHD3spc_e70uQCHoHwc-n80iMY30ypymgFEQ7QA@mail.gmail.com>
-Subject: Re: [PATCH 10/19] KVM: arm64: vgic-v3: Convert userspace accessors
- over to FIELD_GET/FIELD_PREP
+Date: Tue, 12 Jul 2022 23:45:51 -0700
+Message-ID: <CAAeT=FwQtdDY6RAnjx=gJjghvZwF8ud_dCu+ymcKiHD6fm2-Sg@mail.gmail.com>
+Subject: Re: [PATCH 11/19] KVM: arm64: vgic-v3: Use u32 to manage the line
+ level from userspace
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvm@vger.kernel.org, Schspa Shi <schspa@gmail.com>,
  Oliver Upton <oliver.upton@linux.dev>, kernel-team@android.com,
@@ -87,16 +87,11 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Wed, Jul 6, 2022 at 10:05 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> The GICv3 userspace accessors are all about dealing with conversion
-> between fields from architectural registers and internal representations.
+> Despite the userspace ABI clearly defining the bits dealt with by
+> KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO as a __u32, the kernel uses a u64.
 >
-> However, and owing to the age of this code, the accessors use
-> a combination of shift/mask that is hard to read. It is nonetheless
-> easy to make it better by using the FIELD_{GET,PREP} macros that solely
-> rely on a mask.
->
-> This results in somewhat nicer looking code, and is probably easier
-> to maintain.
+> Use a u32 to match the userspace ABI, which will subsequently lead
+> to some simplifications.
 >
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 
