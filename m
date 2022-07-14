@@ -2,78 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA696C43334
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Jul 2022 07:10:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04374C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Jul 2022 13:31:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B85C4C595;
-	Thu, 14 Jul 2022 03:10:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DA644C5B9;
+	Thu, 14 Jul 2022 09:31:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7h791ZZKLk-r; Thu, 14 Jul 2022 03:10:31 -0400 (EDT)
+	with ESMTP id YWFnHN6-O0BU; Thu, 14 Jul 2022 09:31:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BBA2F4C597;
-	Thu, 14 Jul 2022 03:10:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0E604C563;
+	Thu, 14 Jul 2022 09:31:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0813A4C594
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 03:10:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 552E24C4D7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 09:31:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wytsuRIcz-ap for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Jul 2022 03:10:28 -0400 (EDT)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3086D4C592
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 03:10:28 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id 7361VSISSzV3 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Jul 2022 09:31:02 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DA5F4C4CD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 09:31:02 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1657805461;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=3A2MgQ6BI+ZOeh/AAU41/XCV92zAyr9BTrgNi4g6/m4=;
+ b=iMYkYmwXcXXarM/MU09cnLj279qFG57eqyhNe6PFX77cmYFSq6GRLzBpmxi4AdcesZFoY2
+ /KESRfo9r/MLJFkd7HD3r/Q5TArEoMd/TFb7eu1Svo1SJ9t5HlgdFVG0BatWLSc9VbdRkL
+ 9/5KNgaJX7slneUM6OUJGhzvSYmtC9w=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-349-E8geG59JNpCXsKJ8_zEn6w-1; Thu, 14 Jul 2022 09:30:57 -0400
+X-MC-Unique: E8geG59JNpCXsKJ8_zEn6w-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.9])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id 390F0CE256B;
- Thu, 14 Jul 2022 07:10:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9947BC34114;
- Thu, 14 Jul 2022 07:10:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1657782621;
- bh=OW93xADmWIzkDjXJ3YhYksqVTv8k3OC+JR+fKsAdSus=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=Ob+epD8tkC8LjXI5bnJBB2af7jTHev4W+29rVw34ICgjtHVm2vjijZFoa+YMUiJUw
- +zX2ztSj9yg5u+xdMgXpRCKhf0t7OIezQfrBc4+qHTFy/tEscUu6u1YMwIpAf9oTek
- BaXAWHLfAYD8oe18fv05E4p+1buIVl5t33aq0vA3qaTslUg+/wTROuMo7Ci7x6CLSw
- mnU+43FS4TpiNS/t3imnQljheGTBS4i7CtSJVNkyzzJy3DSoOUZ2YG+qBNBmZNXwME
- bK6XL4YVnCEtQsDfopdxyfcFS9QYWJKYd11FWiYyEmCcPLiphVzC8zHaL1VJ4jfWSP
- p/RRWdr4vaKJA==
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oBszD-007Ndf-LE;
- Thu, 14 Jul 2022 08:10:19 +0100
-Date: Thu, 14 Jul 2022 08:09:32 +0100
-Message-ID: <875yk0yxub.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 13/19] KVM: arm64: vgic-v2: Consolidate userspace access
- for MMIO registers
-In-Reply-To: <CAAeT=Fx9CbiJStMJcQ=-iwoLhAQGcwPbW==b0yHxkd3hmcXjiQ@mail.gmail.com>
-References: <20220706164304.1582687-1-maz@kernel.org>
- <20220706164304.1582687-14-maz@kernel.org>
- <CAAeT=Fx9CbiJStMJcQ=-iwoLhAQGcwPbW==b0yHxkd3hmcXjiQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, schspa@gmail.com,
- kernel-team@android.com, oliver.upton@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Schspa Shi <schspa@gmail.com>,
- Oliver Upton <oliver.upton@linux.dev>, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C4F1F8117B0;
+ Thu, 14 Jul 2022 13:30:56 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F239492C3B;
+ Thu, 14 Jul 2022 13:30:56 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH] KVM: arm64: permit MAP_SHARED mappings with MTE enabled
+In-Reply-To: <Ysg38XZSzPk8tYwK@xz-m1.local>
+Organization: Red Hat GmbH
+References: <20220623234944.141869-1-pcc@google.com>
+ <YrXu0Uzi73pUDwye@arm.com> <14f2a69e-4022-e463-1662-30032655e3d1@arm.com>
+ <875ykmcd8q.fsf@redhat.com> <YrwRPh1S6qjzkJMm@arm.com>
+ <7a32fde7-611d-4649-2d74-f5e434497649@arm.com> <871qv12hqj.fsf@redhat.com>
+ <b91ae197-d191-2204-aab5-21a0aabded69@arm.com> <87bktz7o49.fsf@redhat.com>
+ <Ysg38XZSzPk8tYwK@xz-m1.local>
+User-Agent: Notmuch/0.36 (https://notmuchmail.org)
+Date: Thu, 14 Jul 2022 15:30:54 +0200
+Message-ID: <87edynizxt.fsf@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>, kvm@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Steven Price <steven.price@arm.com>, Will Deacon <will@kernel.org>,
+ Evgenii Stepanov <eugenis@google.com>, Michael Roth <michael.roth@amd.com>,
+ Marc Zyngier <maz@kernel.org>, Chao Peng <chao.p.peng@linux.intel.com>,
+ Andy Lutomirski <luto@amacapital.net>, Peter Collingbourne <pcc@google.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,136 +91,34 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 14 Jul 2022 05:43:27 +0100,
-Reiji Watanabe <reijiw@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Wed, Jul 6, 2022 at 10:05 AM Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > Align the GICv2 MMIO accesses from userspace with the way the GICv3
-> > code is now structured.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic-kvm-device.c | 40 ++++++++++++---------------
-> >  1 file changed, 18 insertions(+), 22 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> > index 925875722027..ddead333c232 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> > @@ -348,17 +348,18 @@ bool lock_all_vcpus(struct kvm *kvm)
-> >   *
-> >   * @dev:      kvm device handle
-> >   * @attr:     kvm device attribute
-> > - * @reg:      address the value is read or written
-> >   * @is_write: true if userspace is writing a register
-> >   */
-> >  static int vgic_v2_attr_regs_access(struct kvm_device *dev,
-> >                                     struct kvm_device_attr *attr,
-> > -                                   u32 *reg, bool is_write)
-> > +                                   bool is_write)
-> >  {
-> > +       u32 __user *uaddr = (u32 __user *)(unsigned long)attr->addr;
-> >         struct vgic_reg_attr reg_attr;
-> >         gpa_t addr;
-> >         struct kvm_vcpu *vcpu;
-> >         int ret;
-> > +       u32 val;
-> >
-> >         ret = vgic_v2_parse_attr(dev, attr, &reg_attr);
-> >         if (ret)
-> > @@ -367,6 +368,10 @@ static int vgic_v2_attr_regs_access(struct kvm_device *dev,
-> >         vcpu = reg_attr.vcpu;
-> >         addr = reg_attr.addr;
-> >
-> > +       if (is_write)
-> > +               if (get_user(val, uaddr))
-> > +                       return -EFAULT;
-> > +
-> >         mutex_lock(&dev->kvm->lock);
-> >
-> >         ret = vgic_init(dev->kvm);
-> > @@ -380,10 +385,10 @@ static int vgic_v2_attr_regs_access(struct kvm_device *dev,
-> >
-> >         switch (attr->group) {
-> >         case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
-> > -               ret = vgic_v2_cpuif_uaccess(vcpu, is_write, addr, reg);
-> > +               ret = vgic_v2_cpuif_uaccess(vcpu, is_write, addr, &val);
-> >                 break;
-> >         case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
-> > -               ret = vgic_v2_dist_uaccess(vcpu, is_write, addr, reg);
-> > +               ret = vgic_v2_dist_uaccess(vcpu, is_write, addr, &val);
-> >                 break;
-> >         default:
-> >                 ret = -EINVAL;
-> > @@ -393,6 +398,11 @@ static int vgic_v2_attr_regs_access(struct kvm_device *dev,
-> >         unlock_all_vcpus(dev->kvm);
-> >  out:
-> >         mutex_unlock(&dev->kvm->lock);
-> > +
-> > +       if (!ret && !is_write)
-> > +               if (put_user(val, uaddr))
-> > +                       ret = -EFAULT;
-> > +
-> >         return ret;
-> >  }
-> >
-> > @@ -407,15 +417,8 @@ static int vgic_v2_set_attr(struct kvm_device *dev,
-> >
-> >         switch (attr->group) {
-> >         case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
-> > -       case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
-> > -               u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-> > -               u32 reg;
-> > -
-> > -               if (get_user(reg, uaddr))
-> > -                       return -EFAULT;
-> > -
-> > -               return vgic_v2_attr_regs_access(dev, attr, &reg, true);
-> > -       }
-> > +       case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
-> > +               return vgic_v2_attr_regs_access(dev, attr, true);
-> >         }
-> >
-> >         return -ENXIO;
-> > @@ -432,15 +435,8 @@ static int vgic_v2_get_attr(struct kvm_device *dev,
-> >
-> >         switch (attr->group) {
-> >         case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
-> > -       case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
-> > -               u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-> > -               u32 reg = 0;
-> > -
-> > -               ret = vgic_v2_attr_regs_access(dev, attr, &reg, false);
-> > -               if (ret)
-> > -                       return ret;
-> > -               return put_user(reg, uaddr);
-> > -       }
-> > +       case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
-> > +               return vgic_v2_attr_regs_access(dev, attr, false);
-> >         }
-> >
-> >         return -ENXIO;
-> 
-> For vgic_v2_{set,get}_attr(), perhaps it might be even simpler
-> to call vgic_{set,get}_common_attr() from the "default" case
-> of "switch (attr->group)".
-> This is not directly related to this patch though:)
+On Fri, Jul 08 2022, Peter Xu <peterx@redhat.com> wrote:
 
-Indeed. This also applies to v3, and there is a couple more cleanups
-that can be added. I'll add that as an extra patch, as the result is
-rather nice.
+> On Fri, Jul 08, 2022 at 03:03:34PM +0200, Cornelia Huck wrote:
 
-> Reviewed-by: Reiji Watanabe <reijiw@google.com>
+>> I was thinking about a new flag that implies "copy metadata"; not sure
+>> how we would get the same atomicity with a separate ioctl. I've only
+>> just started looking at userfaultfd, though, and I might be on a wrong
+>> track... One thing I'd like to avoid is having something that is too
+>> ARM-specific, I think there are other architecture features that might
+>> have similar issues.
+>
+> Agreed, to propose such an interface we'd better make sure it'll be easily
+> applicable to other similar memory protection mechanisms elsewhere.
 
-Thanks,
+There's storage keys on s390, although I believe they are considered
+legacy by now. I dimly recall something in x86 land.
 
-	M.
+>
+>> 
+>> Maybe someone more familiar with uffd and/or postcopy can chime in?
+>
+> Hanving UFFDIO_COPY provide a new flag sounds reasonable to me.  I'm
+> curious what's the maximum possible size of the tags and whether they can
+> be embeded already into struct uffdio_copy somehow.
 
--- 
-Without deviation from the norm, progress is not possible.
+Each tag is four bits and covers 16 bytes (also see the defs in
+arch/arm64/include/asm/mte-def.h).
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
