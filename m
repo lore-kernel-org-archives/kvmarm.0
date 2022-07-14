@@ -2,80 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72BBBC433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Jul 2022 13:52:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D740AC43334
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Jul 2022 14:03:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7F1A4C532;
-	Thu, 14 Jul 2022 09:52:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C6704C553;
+	Thu, 14 Jul 2022 10:03:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cOXi8n3Yu2Wi; Thu, 14 Jul 2022 09:52:13 -0400 (EDT)
+	with ESMTP id o9wfHE0Yq1Du; Thu, 14 Jul 2022 10:03:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AF914C4E4;
-	Thu, 14 Jul 2022 09:52:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E360F4C540;
+	Thu, 14 Jul 2022 10:03:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C0C0A4C4E4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 09:52:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D60214C52E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 10:03:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3jA4Oe2Qjc3e for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Jul 2022 09:52:10 -0400 (EDT)
+ with ESMTP id wynVCGcUfKXd for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Jul 2022 10:03:10 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B3BCB4C4BD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 09:52:10 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B978A4C52D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 10:03:10 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1657806730;
+ s=mimecast20190719; t=1657807390;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/DbMY4fkJWP+PysgOKi02iEpV+7O3rbRErGJbwgQ+eQ=;
- b=ZTLuzZXfaTc3mrwQygEl7utWfb98JcfGP/kIpiq38a+4lZeCLyV1UaEFw5fG/bZsEDey32
- 1H4mjFKeA/t6aLE3+YJyiiBEApSYClDF34LeTCh5g4jOKP7HUn9mSe1b0zpwCbqZSpCQRZ
- fJKxMbS2sLZjNAHxd20dKkKZYSPNVJY=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=7XtdxK0LWmb1Jf+89i4Nsc+LkvKFkGHcgSyZX0xXxyI=;
+ b=aZiKQzDzdkT5eFTdeOVcaf1+2ljWPKw7p67CtXGPhM5qlYLjYny+pSJzcU4QI9A05I5zMG
+ Z9rq98Ye6+6jp019RYqIrDvmYN2YPMAnTgOmS2d+DfJlrG5ZxK3bQ/JW9S+QS2ts+qCsxa
+ 8HNuxIgZgMAcAy8Pp0HMpatjRADiTNk=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-404-qNZA8LMBNKW2jAkXJpECtQ-1; Thu, 14 Jul 2022 09:52:09 -0400
-X-MC-Unique: qNZA8LMBNKW2jAkXJpECtQ-1
-Received: by mail-ej1-f72.google.com with SMTP id
- sa13-20020a1709076d0d00b0072a8791298aso791572ejc.7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 06:52:08 -0700 (PDT)
+ us-mta-299-Gv5N2R4sOOq9Pw1HTuwPyQ-1; Thu, 14 Jul 2022 10:03:08 -0400
+X-MC-Unique: Gv5N2R4sOOq9Pw1HTuwPyQ-1
+Received: by mail-ed1-f70.google.com with SMTP id
+ z20-20020a05640240d400b0043a82d9d65fso1594414edb.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 07:03:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
  :content-language:to:cc:references:from:in-reply-to
  :content-transfer-encoding;
- bh=/DbMY4fkJWP+PysgOKi02iEpV+7O3rbRErGJbwgQ+eQ=;
- b=Lt8Bn/Ufw7Mg9gvYK0hS5tNqi5VhnXRCB4zjzLFyIA5AjKs6mwOZdVkTpJyzT6uGuG
- G3fLq5AhikB2sGgJFY5PDYzilFFMevKGvBQ9LlYWauEnnrtdQfwH//MVYGZbBsjoYaNr
- LZ8ER1TEQRDywEEJ8BVEXZvIMzP61NXjCr8QaTjFbpM8bfJUdUv/Z3+xZ5KF9DwiWM7T
- 0JQZVX1z+hEWt+63STMT7pzsX1spbYyVotRLveEkrxgmaLfpW8hoHXCUxQeX64OlAy4I
- u4b3/IV4dqJzFTEg8D6oOf4Kmt113HvWldDFntG4+qPxF3cN/IULmjKLVQ/L1/iGgQJR
- 2/9g==
-X-Gm-Message-State: AJIora9rMjf+KRZteT52C0s4l0K9YfQCTj2RoFbXc88VOxJq3vy0eGZ0
- ve4xFk5DblwnA7da1wxWQ67aqg8jAabJeI183zpj7d3Em/OxsT1p7esi7Bf5EbEDbjKcx3pJRhV
- CKOkJ/oL+3Xx7o0v6HFjZqmPd
-X-Received: by 2002:a05:6402:5388:b0:435:71b:5d44 with SMTP id
- ew8-20020a056402538800b00435071b5d44mr12127193edb.364.1657806727966; 
- Thu, 14 Jul 2022 06:52:07 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1t9j243sp0KAU90kUpGzuuJ6eriMDQU6VG9uY7+LPoOkHNVc5QAtLQp/FA07g5PE0QNkP3Luw==
-X-Received: by 2002:a05:6402:5388:b0:435:71b:5d44 with SMTP id
- ew8-20020a056402538800b00435071b5d44mr12127159edb.364.1657806727740; 
- Thu, 14 Jul 2022 06:52:07 -0700 (PDT)
+ bh=7XtdxK0LWmb1Jf+89i4Nsc+LkvKFkGHcgSyZX0xXxyI=;
+ b=LpdqzEJT0cIT1D3dh/sO6fSb9Al0c0WOIsD3TTigqJ51DWLuFUmx2Xe+CH10rR6nUV
+ 5OUXshY6ujTRHkx8cmMB+5c2yNOiBsW3EtS4sttC/7EAos8WWBeGow1E34djFun/0a7f
+ eoasauOzC5YKzyclvvh6sdZ8ttp2mDvIuRaQCQMCVG/302Lo139p59I/pqntROhqdYYl
+ 9bxhBcdOUNj1KV6mJ4uH55VReWZY135x+QEVUPJjicyY3vptcckqqGBwRts3KDRWVCgc
+ 3ipDWrh3vh7i3J1R4o8u1X1QETJyXBHu60RbF7d8JxmO5zjd50WalhYJuSBCgQTQCRLG
+ uv5Q==
+X-Gm-Message-State: AJIora/A2Rgab+FCktsEm8xRh6qboFcoSukrIY9WrmpDzPuUVPx0Mapv
+ 0QIWkCrstQIyQzQWdE9kDVmRKfonm4aa6/wRWUwWhd5Fi+DgawBSGbGDcrlOjoX/V7dMsqOo5DS
+ if/qK4GQl7HI6X4QfY8LASb3G
+X-Received: by 2002:a05:6402:40ce:b0:43a:918d:a73f with SMTP id
+ z14-20020a05640240ce00b0043a918da73fmr12619743edb.387.1657807387224; 
+ Thu, 14 Jul 2022 07:03:07 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1t8bK5AXcuJxMiU/pYnK7wAsXNRmsbk7m7pn+eL/yzuEBAI/N/AVsUo8KbNwnQSVLyg0gEIxA==
+X-Received: by 2002:a05:6402:40ce:b0:43a:918d:a73f with SMTP id
+ z14-20020a05640240ce00b0043a918da73fmr12619713edb.387.1657807386962; 
+ Thu, 14 Jul 2022 07:03:06 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89?
  ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
  by smtp.googlemail.com with ESMTPSA id
- s18-20020a170906501200b007121361d54asm734486ejj.25.2022.07.14.06.52.06
+ b10-20020a1709063caa00b0072ee79bb8ebsm228499ejh.126.2022.07.14.07.03.02
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 14 Jul 2022 06:52:07 -0700 (PDT)
-Message-ID: <c5d81d4a-5002-3ffe-e70e-f4238da873c5@redhat.com>
-Date: Thu, 14 Jul 2022 15:52:06 +0200
+ Thu, 14 Jul 2022 07:03:06 -0700 (PDT)
+Message-ID: <cd5d029c-b396-45ef-917b-92e054659623@redhat.com>
+Date: Thu, 14 Jul 2022 16:03:00 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
@@ -120,7 +120,32 @@ On 7/14/22 10:06, Gavin Shan wrote:
 > CPU numbers.
 > 
 > The issue can be reproduced on arm64 system occasionally.
-> 
+
+Hmm, this does not seem a correct patch - the threads are already 
+synchronizing using seq_cnt, like this:
+
+	migration			main
+	----------------------		--------------------------------
+	seq_cnt = 1
+	smp_wmb()
+					snapshot = 0
+					smp_rmb()
+					cpu = sched_getcpu() reads 23
+	sched_setaffinity()
+					rseq_cpu = __rseq.cpuid reads 35
+					smp_rmb()
+					snapshot != seq_cnt -> retry
+	smp_wmb()
+	seq_cnt = 2
+
+sched_setaffinity() is guaranteed to block until the task is enqueued on 
+an allowed CPU.
+
+Can you check that smp_rmb() and smp_wmb() generate correct instructions 
+on arm64?
+
+Paolo
+
 >    host# uname -r
 >    5.19.0-rc6-gavin+
 >    host# # cat /proc/cpuinfo | grep processor | tail -n 1
@@ -180,10 +205,6 @@ On 7/14/22 10:06, Gavin Shan wrote:
 >   
 >   		TEST_ASSERT(rseq_cpu == cpu,
 >   			    "rseq CPU = %d, sched CPU = %d\n", rseq_cpu, cpu);
-
-Queued for -rc, thanks.
-
-Paolo
 
 _______________________________________________
 kvmarm mailing list
