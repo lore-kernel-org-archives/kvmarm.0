@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA640C43334
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Jul 2022 15:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1ACDC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Jul 2022 15:35:39 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B9854C5DC;
-	Thu, 14 Jul 2022 11:35:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACA714C598;
+	Thu, 14 Jul 2022 11:35:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wu9UsRFjr4G6; Thu, 14 Jul 2022 11:35:37 -0400 (EDT)
+	with ESMTP id UdvhNJaFH0cH; Thu, 14 Jul 2022 11:35:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D7EA4C5D3;
-	Thu, 14 Jul 2022 11:35:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B6424C596;
+	Thu, 14 Jul 2022 11:35:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C8F34C5B9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 11:35:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4192D4C5EA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 11:35:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NHMu2MHr-yIQ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Jul 2022 11:35:34 -0400 (EDT)
+ with ESMTP id KV4hAgVPSz2f for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Jul 2022 11:35:36 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 80A7A4C5C0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 11:35:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 159754C5C0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 11:35:36 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id DECE961F32;
- Thu, 14 Jul 2022 15:35:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 472D9C34115;
- Thu, 14 Jul 2022 15:35:31 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 967E261F33;
+ Thu, 14 Jul 2022 15:35:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68483C34115;
+ Thu, 14 Jul 2022 15:35:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1657812931;
- bh=8yV7Y9kOcNA1k+NqDqEyD5lcvHMCVqKOvW0jND4T+Go=;
+ s=k20201202; t=1657812935;
+ bh=ZYt+0ERx294azpe4PSev7OqokFs/fdNlq0xi8F7g1mA=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=CBrfnRXyFVYu8qwT4xyL60uucw+2z3vlLokuLGUn73D7Wg0QR1al9xC52kKwWo0uw
- KtkTSFwpzmeweQzf/tIDNlRPNUmEIFIyq9H7Mcmbma65M8OGsf01glYC1URNVy9fF5
- iN+/V2z193SXkGYw02bcoIS0O0ND3yN1ftpRnMOEOQZ3TILgbR5+GUbwD1ae0l7pAe
- N1t9FqgHzao5XG5REf3FafopWOf7Vh8qajR4aWIMkBrDa3s313j/+ArAzgvYiCuvkN
- k7n6u+arJbx5RRa8J76AJ+wxbc2Xrx+egN9rq8gb0E38Ni+roP5JXet5Jr3kJj03rk
- PSJV0qFkbXy1A==
+ b=o6WxJhOa+asFGqORZ8uu44nBebKWCkVgF9Oshsmt9ZDybYIvjW7xB/uBLSFfUUMKg
+ LzWaBa4p8nQC3/0MDNt4hqbY29IwD0zH7AWwdhk8+3UxjABjv5GoaqladBCH/5eY1P
+ u7wrm/AzTu2ko/O7vHetaPRSqeoilf6Z72fWXJXxTQBTjsxjutedoELHeB+iPDm8b5
+ uD2wnwEPIVDVE8NnxGMDiaGzyOCedTqYcPCZAYkXZdqlLEnnS57ajT648EwFn92e8f
+ sd12/5FOBUT/tc7VqXmnWeDyuDApdP1eczmFt0h0Q2/kGBtKEKRdbCKfx2/MBllgxx
+ 8GOXS2LbuqCNg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oC0dk-007UVL-7H;
- Thu, 14 Jul 2022 16:20:32 +0100
+ (envelope-from <maz@kernel.org>) id 1oC0dj-007UVL-8y;
+ Thu, 14 Jul 2022 16:20:31 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 15/20] KVM: arm64: vgic-v2: Add helper for legacy
- dist/cpuif base address setting
-Date: Thu, 14 Jul 2022 16:20:19 +0100
-Message-Id: <20220714152024.1673368-16-maz@kernel.org>
+Subject: [PATCH v2 11/20] KVM: arm64: vgic-v3: Use u32 to manage the line
+ level from userspace
+Date: Thu, 14 Jul 2022 16:20:15 +0100
+Message-Id: <20220714152024.1673368-12-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220714152024.1673368-1-maz@kernel.org>
 References: <20220714152024.1673368-1-maz@kernel.org>
@@ -86,100 +86,111 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We carry a legacy interface to set the base addresses for GICv2.
-As this is currently plumbed into the same handling code as
-the modern interface, it limits the evolution we can make there.
+Despite the userspace ABI clearly defining the bits dealt with by
+KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO as a __u32, the kernel uses a u64.
 
-Add a helper dedicated to this handling, with a view of maybe
-removing this in the future.
+Use a u32 to match the userspace ABI, which will subsequently lead
+to some simplifications.
 
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c                  | 11 ++-------
- arch/arm64/kvm/vgic/vgic-kvm-device.c | 32 +++++++++++++++++++++++++++
- include/kvm/arm_vgic.h                |  1 +
- 3 files changed, 35 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 6 +++++-
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c    | 2 +-
+ arch/arm64/kvm/vgic/vgic-mmio.c       | 6 +++---
+ arch/arm64/kvm/vgic/vgic-mmio.h       | 4 ++--
+ arch/arm64/kvm/vgic/vgic.h            | 2 +-
+ 5 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 83a7f61354d3..bf39570c0aef 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1414,18 +1414,11 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
- static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
- 					struct kvm_arm_device_addr *dev_addr)
- {
--	unsigned long dev_id, type;
--
--	dev_id = (dev_addr->id & KVM_ARM_DEVICE_ID_MASK) >>
--		KVM_ARM_DEVICE_ID_SHIFT;
--	type = (dev_addr->id & KVM_ARM_DEVICE_TYPE_MASK) >>
--		KVM_ARM_DEVICE_TYPE_SHIFT;
--
--	switch (dev_id) {
-+	switch (FIELD_GET(KVM_ARM_DEVICE_ID_MASK, dev_addr->id)) {
- 	case KVM_ARM_DEVICE_VGIC_V2:
- 		if (!vgic_present)
- 			return -ENXIO;
--		return kvm_vgic_addr(kvm, type, &dev_addr->addr, true);
-+		return kvm_set_legacy_vgic_v2_addr(kvm, dev_addr);
- 	default:
- 		return -ENODEV;
- 	}
 diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index c17e5502c0b3..04175fd55da6 100644
+index bf745c6ab2ea..f02294b9aef1 100644
 --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
 +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -41,6 +41,38 @@ static int vgic_check_type(struct kvm *kvm, int type_needed)
- 		return 0;
+@@ -570,10 +570,14 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 		info = (attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
+ 			KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT;
+ 		if (info == VGIC_LEVEL_INFO_LINE_LEVEL) {
++			if (is_write)
++				tmp32 = *reg;
+ 			intid = attr->attr &
+ 				KVM_DEV_ARM_VGIC_LINE_LEVEL_INTID_MASK;
+ 			ret = vgic_v3_line_level_info_uaccess(vcpu, is_write,
+-							      intid, reg);
++							      intid, &tmp32);
++			if (!is_write)
++				*reg = tmp32;
+ 		} else {
+ 			ret = -EINVAL;
+ 		}
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index a2ff73899976..91201f743033 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -1154,7 +1154,7 @@ int vgic_v3_redist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
  }
  
-+int kvm_set_legacy_vgic_v2_addr(struct kvm *kvm, struct kvm_arm_device_addr *dev_addr)
-+{
-+	struct vgic_dist *vgic = &kvm->arch.vgic;
-+	int r;
-+
-+	mutex_lock(&kvm->lock);
-+	switch (FIELD_GET(KVM_ARM_DEVICE_TYPE_MASK, dev_addr->id)) {
-+	case KVM_VGIC_V2_ADDR_TYPE_DIST:
-+		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
-+		if (!r)
-+			r = vgic_check_iorange(kvm, vgic->vgic_dist_base, dev_addr->addr,
-+					       SZ_4K, KVM_VGIC_V2_DIST_SIZE);
-+		if (!r)
-+			vgic->vgic_dist_base = dev_addr->addr;
-+		break;
-+	case KVM_VGIC_V2_ADDR_TYPE_CPU:
-+		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
-+		if (!r)
-+			r = vgic_check_iorange(kvm, vgic->vgic_cpu_base, dev_addr->addr,
-+					       SZ_4K, KVM_VGIC_V2_CPU_SIZE);
-+		if (!r)
-+			vgic->vgic_cpu_base = dev_addr->addr;
-+		break;
-+	default:
-+		r = -ENODEV;
-+	}
-+
-+	mutex_unlock(&kvm->lock);
-+
-+	return r;
-+}
-+
- /**
-  * kvm_vgic_addr - set or get vgic VM base addresses
-  * @kvm:   pointer to the vm struct
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 2d8f2e90edc2..f79cce67563e 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -365,6 +365,7 @@ extern struct static_key_false vgic_v2_cpuif_trap;
- extern struct static_key_false vgic_v3_cpuif_trap;
+ int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+-				    u32 intid, u64 *val)
++				    u32 intid, u32 *val)
+ {
+ 	if (intid % 32)
+ 		return -EINVAL;
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+index 997d0fce2088..b32d434c1d4a 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+@@ -775,10 +775,10 @@ void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
+ 	}
+ }
  
- int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
-+int kvm_set_legacy_vgic_v2_addr(struct kvm *kvm, struct kvm_arm_device_addr *dev_addr);
- void kvm_vgic_early_init(struct kvm *kvm);
- int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu);
- int kvm_vgic_create(struct kvm *kvm, u32 type);
+-u64 vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid)
++u32 vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid)
+ {
+ 	int i;
+-	u64 val = 0;
++	u32 val = 0;
+ 	int nr_irqs = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
+ 
+ 	for (i = 0; i < 32; i++) {
+@@ -798,7 +798,7 @@ u64 vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid)
+ }
+ 
+ void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
+-				    const u64 val)
++				    const u32 val)
+ {
+ 	int i;
+ 	int nr_irqs = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio.h b/arch/arm64/kvm/vgic/vgic-mmio.h
+index 6082d4b66d39..5b490a4dfa5e 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio.h
++++ b/arch/arm64/kvm/vgic/vgic-mmio.h
+@@ -207,10 +207,10 @@ void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
+ int vgic_uaccess(struct kvm_vcpu *vcpu, struct vgic_io_device *dev,
+ 		 bool is_write, int offset, u32 *val);
+ 
+-u64 vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid);
++u32 vgic_read_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid);
+ 
+ void vgic_write_irq_line_level_info(struct kvm_vcpu *vcpu, u32 intid,
+-				    const u64 val);
++				    const u32 val);
+ 
+ unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
+ 
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index c23118467a35..0c8da72953f0 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -249,7 +249,7 @@ int vgic_v3_cpu_sysregs_uaccess(struct kvm_vcpu *vcpu,
+ 				struct kvm_device_attr *attr, bool is_write);
+ int vgic_v3_has_cpu_sysregs_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ int vgic_v3_line_level_info_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+-				    u32 intid, u64 *val);
++				    u32 intid, u32 *val);
+ int kvm_register_vgic_device(unsigned long type);
+ void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
 -- 
 2.34.1
 
