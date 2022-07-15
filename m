@@ -2,81 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB57CCA47C
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jul 2022 00:22:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57C24C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jul 2022 06:10:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A2364C280;
-	Thu, 14 Jul 2022 20:22:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB4594BBB7;
+	Fri, 15 Jul 2022 02:10:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9BOVJ7j6qNG3; Thu, 14 Jul 2022 20:22:18 -0400 (EDT)
+	with ESMTP id mqQjd0onYerR; Fri, 15 Jul 2022 02:10:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00EF74C296;
-	Thu, 14 Jul 2022 20:22:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A0FF4BBEF;
+	Fri, 15 Jul 2022 02:10:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EA30A4C280
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 20:22:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C8FC24BBB7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 02:10:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KDWoTASViAM5 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Jul 2022 20:22:12 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B8CD94C267
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 20:22:12 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1657844532;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JDKBdO2ynojitcW0UwD3EnMXjp2f1L6/iJQpfcNZFPM=;
- b=V0rsTOYwfC+lrBTcmjq5fWGVd/abXGvATDt3Y+I1GKq3LfFr8ZAe2u9VwoL4uKvROqnLpx
- 009Rxi9OBf6wZXXZlO4EABx7/yu0GOrHDmS05nS6HSeiirht71nhAe0t0jQfjdknmNs3YJ
- WoqMygVxMqjTDiEB6w3LsIM5LGB/47o=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-108-tIbxiXzvM4-kc2o0I5BDCQ-1; Thu, 14 Jul 2022 20:22:08 -0400
-X-MC-Unique: tIbxiXzvM4-kc2o0I5BDCQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com
- [10.11.54.2])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 530FC3C01E15;
- Fri, 15 Jul 2022 00:22:08 +0000 (UTC)
-Received: from [10.64.54.37] (vpn2-54-37.bne.redhat.com [10.64.54.37])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9448D40885A1;
- Fri, 15 Jul 2022 00:22:03 +0000 (UTC)
-Subject: Re: [PATCH] KVM: selftests: Double check on the current CPU in
- rseq_test
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-References: <20220714080642.3376618-1-gshan@redhat.com>
- <cd5d029c-b396-45ef-917b-92e054659623@redhat.com>
- <YtA3s0VRj3x7vO7B@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <be806f9c-861a-8da8-d42e-1d4271c3a326@redhat.com>
-Date: Fri, 15 Jul 2022 12:21:42 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <YtA3s0VRj3x7vO7B@google.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
-Cc: shan.gavin@gmail.com, kvm@vger.kernel.org, maz@kernel.org,
- linux-kernel@vger.kernel.org, oliver.upton@linux.dev,
- mathieu.desnoyers@efficios.com, linux-kselftest@vger.kernel.org,
- shuah@kernel.org, kvmarm@lists.cs.columbia.edu
+ with ESMTP id jPI5GHNnIuW6 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jul 2022 02:10:32 -0400 (EDT)
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
+ [209.85.219.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8602B4BB9F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 02:10:32 -0400 (EDT)
+Received: by mail-yb1-f202.google.com with SMTP id
+ w15-20020a25ac0f000000b0066e50e4a553so3283462ybi.16
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 23:10:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=jMvgrncDh19VLIxOJYgbY+8u9WVXCjUHgvxdJwgA1hU=;
+ b=AU4WA06a1gryKpQZZscV3xyuTAWuOM+1BMyFI07eCKp6M1rjIHwsijdh49eGEWbah7
+ uHNFnCQ7PtLlHHa7gv3uPl1OYjdXyhc9IGjYnrFlQZAgemYxQMFWaXc6DXnpysIHLHnF
+ BNElBsasUCUo+8kTSCQA0ALDa5zIRDDAlLDElnNTyquxTRqnHcFGYtMrnaFszs55XXFV
+ MkjW7pSfYbJdEHWaclwxNgOAtQWJtW2COwyjhsi1U75l+LUe5PYINtBvRDH2qzumYZcy
+ vk9vjH40Xcjc+uTxVi4fEaZX8cH8d4imq5uzvZhshER47yCdsZREZvvX7PAhOWkce+OL
+ JhPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=jMvgrncDh19VLIxOJYgbY+8u9WVXCjUHgvxdJwgA1hU=;
+ b=nVk6DSB1unjHb9afoisFvKtUnEtB02il48PHCDZaY7PUt/5waXyKC8kPKmpJ05aa1H
+ e66ZAuQpxh9jn0iENIYDk1yuUv8lMNy2iW+BsoR9DYiSnRnTNEvuTaiM0lu7CSaZ4gYZ
+ VHsSVBeqm+47PKBYFyKnoLZbmPefP6G8Kxe48aFFusI8BHOabDglVSljG+10Z5dulAJ5
+ aMI6R9gRpY90HjLYizF6+Rf+mU9NZFiKE64nx6Bd6fL4xtKAwRgRBDsjPKftBrRnwNzL
+ aswALNd8Ys/bBewsfoKjSeuuiakD6gMubk6pPcxhsWLU7swjOTp1ZIdCMa1ppMIsANDR
+ /Qqw==
+X-Gm-Message-State: AJIora+WN9Or9MnwBb1euMhBw2AeXM4Z0m2ur88UBFaUkKyNOmwYLtUa
+ Ul8JpkihgjsQ1i2jXVzblQuQ9iaYU5QZ0K3Buw==
+X-Google-Smtp-Source: AGRyM1tElEz+Zdy+T5bPWEvVhzahxJmgjZVoA901DfRk1w0g6Kch4frRfRAQVj/F99KlefyGV3nMDpDuquO5xP0uAA==
+X-Received: from kaleshsingh.mtv.corp.google.com
+ ([2620:15c:211:200:f010:455b:62ce:19e])
+ (user=kaleshsingh job=sendgmr) by 2002:a81:187:0:b0:31d:eebe:16f0 with SMTP
+ id 129-20020a810187000000b0031deebe16f0mr4433403ywb.378.1657865431985; Thu,
+ 14 Jul 2022 23:10:31 -0700 (PDT)
+Date: Thu, 14 Jul 2022 23:10:09 -0700
+Message-Id: <20220715061027.1612149-1-kaleshsingh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
+Subject: [PATCH v4 00/18] KVM nVHE Hypervisor stack unwinder
+From: Kalesh Singh <kaleshsingh@google.com>
+To: maz@kernel.org, mark.rutland@arm.com, broonie@kernel.org, 
+ madvenka@linux.microsoft.com
+Cc: wangkefeng.wang@huawei.com, elver@google.com, catalin.marinas@arm.com,
+ ast@kernel.org, vincenzo.frascino@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, android-mm@google.com, andreyknvl@gmail.com,
+ kernel-team@android.com, drjones@redhat.com,
+ linux-arm-kernel@lists.infradead.org, russell.king@oracle.com,
+ linux-kernel@vger.kernel.org, mhiramat@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -85,218 +83,152 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Paolo and Sean,
+Hi all,
 
-On 7/15/22 1:35 AM, Sean Christopherson wrote:
-> On Thu, Jul 14, 2022, Paolo Bonzini wrote:
->> On 7/14/22 10:06, Gavin Shan wrote:
->>> In rseq_test, there are two threads created. Those two threads are
->>> 'main' and 'migration_thread' separately. We also have the assumption
->>> that non-migration status on 'migration-worker' thread guarantees the
->>> same non-migration status on 'main' thread. Unfortunately, the assumption
->>> isn't true. The 'main' thread can be migrated from one CPU to another
->>> one between the calls to sched_getcpu() and READ_ONCE(__rseq.cpu_id).
->>> The following assert is raised eventually because of the mismatched
->>> CPU numbers.
->>>
->>> The issue can be reproduced on arm64 system occasionally.
->>
->> Hmm, this does not seem a correct patch - the threads are already
->> synchronizing using seq_cnt, like this:
->>
->> 	migration			main
->> 	----------------------		--------------------------------
->> 	seq_cnt = 1
->> 	smp_wmb()
->> 					snapshot = 0
->> 					smp_rmb()
->> 					cpu = sched_getcpu() reads 23
->> 	sched_setaffinity()
->> 					rseq_cpu = __rseq.cpuid reads 35
->> 					smp_rmb()
->> 					snapshot != seq_cnt -> retry
->> 	smp_wmb()
->> 	seq_cnt = 2
->>
->> sched_setaffinity() is guaranteed to block until the task is enqueued on an
->> allowed CPU.
-> 
-> Yes, and retrying could suppress detection of kernel bugs that this test is intended
-> to catch.
-> 
+This is v4 of the series adding support for nVHE hypervisor stacktraces;
+and is based on arm64 for-next/stacktrace.
 
-Well, I don't think migration_worker() does correct thing, if I'm understanding
-correctly. The intention seems to force migration on 'main' thread by 'migration'
-thread?  If that is the case, I don't think the following function call has correct
-parameters.
+Thanks all for your feedback on previous revisions. Mark Brown, I
+appreciate your Reviewed-by on the v3, I have dropped the tags in this
+new verision since I think the series has changed quite a bit.
 
-     r = sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
+The previous versions were posted at:
+v3: https://lore.kernel.org/r/20220607165105.639716-1-kaleshsingh@google.com/
+v2: https://lore.kernel.org/r/20220502191222.4192768-1-kaleshsingh@google.com/
+v1: https://lore.kernel.org/r/20220427184716.1949239-1-kaleshsingh@google.com/
 
-     it should be something like:
-
-     r = sched_setaffinity(getpid(), sizeof(allowed_mask), &allowed_mask);
-
-If we're using sched_setaffinity(0, ...) in the 'migration' thread, the CPU
-affinity of 'main' thread won't be affected. It means 'main' thread can be
-migrated from one CPU to another at any time, even in the following point:
-
-     int main(...)
-     {
-           :
-           /*
-            * migration can happen immediately after sched_getcpu(). If
-            * CPU affinity of 'main' thread is sticky to one particular
-            * CPU, which 'migration' thread supposes to do, then there
-            * should have no migration.
-            */
-           cpu = sched_getcpu();
-           rseq_cpu = READ_ONCE(__rseq.cpu_id);
-           :
-     }
-
-So I think the correct fix is to have sched_setaffinity(getpid(), ...) ?
-Please refer to the manpage.
-
-    https://man7.org/linux/man-pages/man2/sched_setaffinity.2.html
-    'If pid is zero, then the calling thread is used'
-
->> Can you check that smp_rmb() and smp_wmb() generate correct instructions on
->> arm64?
-> 
-> That seems like the most likely scenario (or a kernel bug), I distinctly remember
-> the barriers provided by tools/ being rather bizarre.
-> 
-
-I don't see any problems for smp_rmb() and smp_wmb() in my case. They have
-been translated to correct instructions, as expected.
-
-#define smp_mb()        asm volatile("dmb ish" ::: "memory")
-#define smp_wmb()       asm volatile("dmb ishst" ::: "memory")
-#define smp_rmb()       asm volatile("dmb ishld" ::: "memory")
-
---------------
-
-One more experiment for sched_setaffinity(). I run the following program,
-the CPU affinity of 'main' thread isn't changed, until the correct
-parameter is used, to have sched_setaffinity(getpid(), ...).
-
-sched_setaffinity(0, ...)
--------------------------
-[root@virtlab-arm01 tmp]# ./a
-thread_func: cpu=0
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-thread_func: cpu=1
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-main: mask=0x000000ff
-   :
-
-sched_setaffinity(getpid(), ...)
---------------------------------
-thread_func: cpu=198
-main: mask=0x00000001
-main: mask=0x00000001
-main: mask=0x00000001
-main: mask=0x00000001
-main: mask=0x00000001
-main: mask=0x00000001
-main: mask=0x00000001
-main: mask=0x00000001
-main: mask=0x00000001
-thread_func: cpu=198
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-main: mask=0x00000002
-   :
-
-#define _GNU_SOURCE
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <sched.h>
-
-#define NR_CPUS	8
-static int thread_exit = 0;
-
-static void *thread_func(void *data)
-{
-	cpu_set_t allowed_mask;
-	int ret, i;
-
-	for (i = 0; i < NR_CPUS; i++) {
-		CPU_ZERO(&allowed_mask);
-		CPU_SET(i, &allowed_mask);
-#if 1
-		sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
-#else
-                 sched_setaffinity(getpid(), sizeof(allowed_mask), &allowed_mask);
-#endif
-		fprintf(stdout, "%s: cpu=%d\n", __func__, sched_getcpu());
-
-		sleep(1);
-	}
-
-	thread_exit = 1;
-	return NULL;
-}
-
-int main(int argc, char **argv)
-{
-	pthread_t thread;
-	cpu_set_t allowed_mask;
-	int mask, i, count = 0;
-
-	pthread_create(&thread, NULL, thread_func, NULL);
-
-	while (!thread_exit) {
-		usleep(100000);
-
-		mask = 0;
-		sched_getaffinity(0, sizeof(allowed_mask), &allowed_mask);
-		for (i = 0; i < NR_CPUS; i++) {
-			if (CPU_ISSET(i, &allowed_mask))
-				mask |= (1 << i);
-		}
-
-		fprintf(stdout, "%s: mask=0x%08x\n", __func__, mask);
-	}
-
-	return 0;
-}
-
+The main updates in this version are to address concerens from Marc on the
+memory usage and reusing the common code by refactoring into a shared header.
 
 Thanks,
-Gavin
+Kalesh
 
+============
+
+KVM nVHE Stack unwinding.
+===
+
+nVHE has two modes of operation: protected (pKVM) and unprotected
+(conventional nVHE). Depending on the mode, a slightly different approach
+is used to dump the hyperviosr stacktrace but the core unwinding logic
+remains the same.
+
+Protected nVHE (pKVM) stacktraces
+====
+
+In protected nVHE mode, the host cannot directly access hypervisor memory.
+
+The hypervisor stack unwinding happens in EL2 and is made accessible to
+the host via a shared buffer. Symbolizing and printing the stacktrace
+addresses is delegated to the host and happens in EL1.
+
+Non-protected (Conventional) nVHE stacktraces
+====
+
+In non-protected mode, the host is able to directly access the hypervisor
+stack pages.
+
+The hypervisor stack unwinding and dumping of the stacktrace is performed
+by the host in EL1, as this avoids the memory overhead of setting up
+shared buffers between the host and hypervisor.
+
+Resuing the Core Unwinding Logic
+====
+
+Since the hypervisor cannot link against the kernel code in proteced mode.
+The common stack unwinding code is moved to a shared header to allow reuse
+in the nVHE hypervisor.
+
+Reducing the memory footprint
+====
+
+In this version the below steps were taken to reduce the memory usage of
+nVHE stack unwinding:
+
+    1) The nVHE overflow stack is reduced from PAGE_SIZE to 4KB; benificial
+       for configurations with non 4KB pages (16KB or 64KB pages).
+    2) In protected nVHE mode (pKVM), the shared stacktrace buffers with the
+       host are reduced from PAGE_SIZE to the minimum size required.
+    3) In systems other than Android, conventional nVHE makes up the vast
+       majority of use case. So the pKVM stack tracing is disabled by default
+       (!CONFIG_PROTECTED_NVHE_STACKTRACE), which avoid the memory usage for
+       setting up shared buffers.
+    4) In non-protected nVHE mode (conventional nVHE), the stack unwinding
+       is done directly in EL1 by the host and no shared buffers with the
+       hyperviosr are needed.
+
+Sample Output
+====
+
+The below shows an example output from a simple stack overflow test:
+
+[  126.862960] kvm [371]: nVHE hyp panic at: [<ffff8000090a51d0>] __kvm_nvhe_recursive_death+0x10/0x34!
+[  126.869920] kvm [371]: Protected nVHE HYP call trace:
+[  126.870528] kvm [371]:  [<ffff8000090a5570>] __kvm_nvhe_hyp_panic+0xac/0xf8
+[  126.871342] kvm [371]:  [<ffff8000090a55cc>] __kvm_nvhe_hyp_panic_bad_stack+0x10/0x10
+[  126.872174] kvm [371]:  [<ffff8000090a51e4>] __kvm_nvhe_recursive_death+0x24/0x34
+[  126.872971] kvm [371]:  [<ffff8000090a51e4>] __kvm_nvhe_recursive_death+0x24/0x34
+   . . .
+
+[  126.927314] kvm [371]:  [<ffff8000090a51e4>] __kvm_nvhe_recursive_death+0x24/0x34
+[  126.927727] kvm [371]:  [<ffff8000090a51e4>] __kvm_nvhe_recursive_death+0x24/0x34
+[  126.928137] kvm [371]:  [<ffff8000090a4de4>] __kvm_nvhe___kvm_vcpu_run+0x30/0x40c
+[  126.928561] kvm [371]:  [<ffff8000090a7b64>] __kvm_nvhe_handle___kvm_vcpu_run+0x30/0x48
+[  126.928984] kvm [371]:  [<ffff8000090a78b8>] __kvm_nvhe_handle_trap+0xc4/0x128
+[  126.929385] kvm [371]:  [<ffff8000090a6864>] __kvm_nvhe___host_exit+0x64/0x64
+[  126.929804] kvm [371]: ---- End of Protected nVHE HYP call trace ----
+
+============
+
+
+Kalesh Singh (18):
+  arm64: stacktrace: Add shared header for common stack unwinding code
+  arm64: stacktrace: Factor out on_accessible_stack_common()
+  arm64: stacktrace: Factor out unwind_next_common()
+  arm64: stacktrace: Handle frame pointer from different address spaces
+  arm64: stacktrace: Factor out common unwind()
+  arm64: stacktrace: Add description of stacktrace/common.h
+  KVM: arm64: On stack overflow switch to hyp overflow_stack
+  KVM: arm64: Add PROTECTED_NVHE_STACKTRACE Kconfig
+  KVM: arm64: Allocate shared pKVM hyp stacktrace buffers
+  KVM: arm64: Stub implementation of pKVM HYP stack unwinder
+  KVM: arm64: Stub implementation of non-protected nVHE HYP stack
+    unwinder
+  KVM: arm64: Save protected-nVHE (pKVM) hyp stacktrace
+  KVM: arm64: Prepare non-protected nVHE hypervisor stacktrace
+  KVM: arm64: Implement protected nVHE hyp stack unwinder
+  KVM: arm64: Implement non-protected nVHE hyp stack unwinder
+  KVM: arm64: Introduce pkvm_dump_backtrace()
+  KVM: arm64: Introduce hyp_dump_backtrace()
+  KVM: arm64: Dump nVHE hypervisor stack on panic
+
+ arch/arm64/include/asm/kvm_asm.h           |  16 ++
+ arch/arm64/include/asm/memory.h            |   7 +
+ arch/arm64/include/asm/stacktrace.h        |  92 ++++---
+ arch/arm64/include/asm/stacktrace/common.h | 224 ++++++++++++++++
+ arch/arm64/include/asm/stacktrace/nvhe.h   | 291 +++++++++++++++++++++
+ arch/arm64/kernel/stacktrace.c             | 157 -----------
+ arch/arm64/kvm/Kconfig                     |  15 ++
+ arch/arm64/kvm/arm.c                       |   2 +-
+ arch/arm64/kvm/handle_exit.c               |   4 +
+ arch/arm64/kvm/hyp/nvhe/Makefile           |   2 +-
+ arch/arm64/kvm/hyp/nvhe/host.S             |   9 +-
+ arch/arm64/kvm/hyp/nvhe/stacktrace.c       | 108 ++++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c           |   5 +
+ 13 files changed, 727 insertions(+), 205 deletions(-)
+ create mode 100644 arch/arm64/include/asm/stacktrace/common.h
+ create mode 100644 arch/arm64/include/asm/stacktrace/nvhe.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/stacktrace.c
+
+
+base-commit: 82a592c13b0aeff94d84d54183dae0b26384c95f
+-- 
+2.37.0.170.g444d1eabd0-goog
 
 _______________________________________________
 kvmarm mailing list
