@@ -2,73 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60AC3C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jul 2022 07:08:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C76DC433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jul 2022 10:07:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D50B54BD77;
-	Fri, 15 Jul 2022 03:08:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F129F4BD93;
+	Fri, 15 Jul 2022 06:07:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UE7fbJmq2Ybg; Fri, 15 Jul 2022 03:08:22 -0400 (EDT)
+	with ESMTP id axZTk+uxVjkK; Fri, 15 Jul 2022 06:07:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C72E4BD81;
-	Fri, 15 Jul 2022 03:08:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C02F64BD84;
+	Fri, 15 Jul 2022 06:07:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DDC64BD78
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 03:08:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E28D4BD81
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 06:07:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3KkFMNLbwhjC for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jul 2022 03:08:21 -0400 (EDT)
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com
- [209.85.217.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1BC704BD77
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 03:08:21 -0400 (EDT)
-Received: by mail-vs1-f54.google.com with SMTP id 125so3511470vsx.7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 00:08:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=SKk4fe199tCOLmeDZfxcQNbddbUVsyVisM9qRwohock=;
- b=r0pw304zOECYCgUHXTN6ao3Z1B6PkME/SytPQMFVHrlaV0z+/BfsnZHYXcJQi0Bj/G
- N4HfVKbuXpxgPPtABJBrrqdooOu6fvBwtgd2oinBP7NJPSpWxYuWsobTWRYGJXMdpMiE
- 8dNAtOii6zmmC93BWSONKym+icl6pMBvCh6XxyErAUnOtVhRG6dPEfGXnZII7r3//yox
- dGB4EjXOykrabNDbI6JJNUmdSNboTiWss+1w9Ilj231RuRGvyIuYPSVrm5rTAT8ZdoJA
- sjQxaSF8qKnqDJQihhR++EMaCXWJfSHXVpaBXa25toQ+QTLzA8TR8ZorE0yS1r2lcum5
- zSeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=SKk4fe199tCOLmeDZfxcQNbddbUVsyVisM9qRwohock=;
- b=xMlAeq1+4A89eaM9P5xvdztgUPX8n9tQYk6Kn0nvAyHj7bU8drBfaNd5sYzUy/UWxB
- 9TstNFl2RrSShUFtprFusUf+Ji3bviie/zo7ZEk6asX5tx93GoL3UtUZdN1gWk66wXIE
- U2Xb7gcbqBYDHcRKX7VZVlifgi2W1JsFa0U01Ac6Luh76CPRuzOWMnhwlWisTZR/wssd
- MwlCwZyN1rYcHNdw9sY5p8kd/bgj7uOO8YggxTov0ipSwmDZld2NkOKK/HD7RXhJB1I7
- we2tGui4LBhKK8+kRk2LJxSeHlFBYF97dxi+g2SU9eihdje7PeT5WSWH1jsVsRCaw8aW
- YYaQ==
-X-Gm-Message-State: AJIora8MVQnGoPrcBVRaQocpIc0RZvIpcs8jtWBkWyPfX/Rjudhkdy5f
- MSp0Pw8iC/X5EFusLV7u/lfrcm5cuU2HO98dxgpXsQ==
-X-Google-Smtp-Source: AGRyM1v0EdTtR37dp0R9PYh4/X5Sg5iaWnvVnHvmKNDDpJsX9lLRQ3N0otxNm8E4tbZlaACWVfJeWABJ4mCl5j6GmqU=
-X-Received: by 2002:a67:b24c:0:b0:356:c997:1cf0 with SMTP id
- s12-20020a67b24c000000b00356c9971cf0mr4858211vsh.9.1657868900660; Fri, 15 Jul
- 2022 00:08:20 -0700 (PDT)
+ with ESMTP id Y1-lTkgKyptB for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jul 2022 06:06:59 -0400 (EDT)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 03C204BD7D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 06:06:58 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 35550CE2E8A;
+ Fri, 15 Jul 2022 10:06:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A744C34115;
+ Fri, 15 Jul 2022 10:06:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1657879611;
+ bh=N6XR6hU9xbp0IA+LXBFd/F2FgKNUufttOOOMm1SU3Q4=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=UoNAH789eMR64DTe+ttG2yQlzTFq3gbMozTd8BkU/iLEoU6DysqkPwzEji9ast5bQ
+ +EyNVkNAQuH5VsDSqSgPb66le8PeGAF7gW+OGytvi/C2qevoTGwAOO8zId7FzVCWEB
+ QeFDU68BBgp+QuL/LJ+pBbdJrMoNXTmatnigdGgxZY1ExEJveZMdAEOgaMyGKoa4GL
+ rrDj5GLL1bzu8BD7+m+AqcRK37dZwP/pATBmRYEWo2NY77fr7UtiZZOzGmVkmvHsS4
+ KuTDioF+oeRADMGFOt+qRl+Pqoa/mF1YMH7zZuCBVUgHoKHDWpXOAnZdq7NGoyUFH0
+ QBelhk+NsCh9w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oCIDh-007edL-Bz;
+ Fri, 15 Jul 2022 11:06:49 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: selftests: Add support for GICv2 on v3
+Date: Fri, 15 Jul 2022 11:06:46 +0100
+Message-Id: <165787958336.3532416.361922683569453134.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220714154108.3531213-1-maz@kernel.org>
+References: <20220714154108.3531213-1-maz@kernel.org>
 MIME-Version: 1.0
-References: <20220714152024.1673368-1-maz@kernel.org>
- <20220714152024.1673368-9-maz@kernel.org>
-In-Reply-To: <20220714152024.1673368-9-maz@kernel.org>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Fri, 15 Jul 2022 00:08:04 -0700
-Message-ID: <CAAeT=FyENQ2GqoFi9e80nWQrPpcoBfN_9x0ZMhf6uH8b0NYXZw@mail.gmail.com>
-Subject: Re: [PATCH v2 08/20] KVM: arm64: vgic-v3: Push user access into
- vgic_v3_cpu_sysregs_uaccess()
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kernel-team@android.com, Schspa Shi <schspa@gmail.com>,
- Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: maz@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, oliver.upton@linux.dev, alexandru.elisei@arm.com,
+ ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Oliver Upton <oliver.upton@linux.dev>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,21 +84,25 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jul 14, 2022 at 8:20 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> In order to start making the vgic sysreg access from userspace
-> similar to all the other sysregs, push the userspace memory
-> access one level down into vgic_v3_cpu_sysregs_uaccess().
->
-> The next step will be to rely on the sysreg infrastructure
-> to perform this task.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On Thu, 14 Jul 2022 16:41:08 +0100, Marc Zyngier wrote:
+> The current vgic_init test wrongly assumes that the host cannot
+> multiple versions of the GIC architecture, while v2 emulation
+> on v3 has almost always been supported (it was supported before
+> the standalone v3 emulation).
+> 
+> Tweak the test to support multiple GIC incarnations.
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+Applied to next, thanks!
 
-Thank you for addressing the comments!
-Reiji
+[1/1] KVM: arm64: selftests: Add support for GICv2 on v3
+      commit: 6a4f7fcd750497cb2fa870f799e8b23270bec6e3
+
+Cheers,
+
+	M.
+-- 
+Marc Zyngier <maz@kernel.org>
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
