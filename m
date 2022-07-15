@@ -2,58 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F95AC43334
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jul 2022 16:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B109CC43334
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jul 2022 16:30:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D23A24BF2B;
-	Fri, 15 Jul 2022 12:28:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B5EB4BCDC;
+	Fri, 15 Jul 2022 12:30:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1A6FJaqyvm9k; Fri, 15 Jul 2022 12:28:32 -0400 (EDT)
+	with ESMTP id 8qoJp0kyb3ze; Fri, 15 Jul 2022 12:29:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C978E4BEDE;
-	Fri, 15 Jul 2022 12:28:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EAF374BDED;
+	Fri, 15 Jul 2022 12:29:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73D2B4BE03
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 12:28:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CCC34BCFA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 12:29:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kMZxZNDLCsYL for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jul 2022 12:28:30 -0400 (EDT)
+ with ESMTP id 5V8krfiCafAy for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jul 2022 12:29:56 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6AC9A4BE01
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 12:28:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E7394BCDC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 12:29:56 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 1D271621D2;
- Fri, 15 Jul 2022 16:28:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11F61C34115;
- Fri, 15 Jul 2022 16:28:22 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id B4A61621DA;
+ Fri, 15 Jul 2022 16:29:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDF5BC34115;
+ Fri, 15 Jul 2022 16:29:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1657902508;
- bh=BgkSm8ui6rjbUv6iNSa5punER/Qz+CqOKXdmy3/Q5Xw=;
+ s=k20201202; t=1657902595;
+ bh=b+jtvTOz7oqT34ApAzNVxtGMJmDAMluL+3xOy4XNbdg=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=bS63rWU0NNEq8GgAhPoUTIF4TaSeMLUPtMXX4Q5TcPwIwpcfjJnoGXbTIRH9dvpDo
- ONX1Mi6klhF31IXgT2IpZ4syjjBi5aB2NTgRoLHOEIOd4Pim4WkoEWED70jBBmuPT5
- D860o6Ehy0W6StTs7IzaqiUb/y4AEuHEu4h3Nlaj1DrxKPWeoyin6uZT/kE9nv4Ygs
- etDSueGf5tmYiDu5O3C8byoBKkZrFzy6YGs+YScWCxpW88h/5j8rzeUKMoUZuZgokl
- bdiYOr27R1isPI28rh9Jrn/PBTZmLLkL3WJT2IJBKhJea+gpOXmumgYlbwkWWwdXD6
- 0MC7+081vYyzA==
-Date: Fri, 15 Jul 2022 17:28:19 +0100
+ b=sFQbcqN+aA4ECw0IOGayRM12VcFpMTk3NRc6xGABBJphOhftRClJt4/lLcNWM6JVY
+ oObrPAV6teFFAY/mZBBWOddBr1EbVeOb+8GPLJqoguvW0GvPNc0KS2XTSMqzDiIE5T
+ jUXGcURzf4hzjA1iHiZNZomatQbUDBxE9DMPDvifVJjo0dtfVTPaNub+OElB8dLF8K
+ 2bTNOaNzcvAofgkn7oul+fEo2aaY+rYxYdWrbC6NXGc/fV0MWJJLALBPu1XYuCR/jL
+ pkqz4m5zKehuO/kYOAabRCq180Q6zmVQjpFZmdiv4RhcNdPNYY32yXcMBfhgVg/rkp
+ dm+E8xWsV5mPA==
+Date: Fri, 15 Jul 2022 17:29:46 +0100
 From: Mark Brown <broonie@kernel.org>
 To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v4 02/18] arm64: stacktrace: Factor out
- on_accessible_stack_common()
-Message-ID: <YtGVo8yNHmwdAvnC@sirena.org.uk>
+Subject: Re: [PATCH v4 03/18] arm64: stacktrace: Factor out
+ unwind_next_common()
+Message-ID: <YtGV+uS84iGXiVky@sirena.org.uk>
 References: <20220715061027.1612149-1-kaleshsingh@google.com>
- <20220715061027.1612149-3-kaleshsingh@google.com>
+ <20220715061027.1612149-4-kaleshsingh@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20220715061027.1612149-3-kaleshsingh@google.com>
+In-Reply-To: <20220715061027.1612149-4-kaleshsingh@google.com>
 X-Cookie: You dialed 5483.
 Cc: wangkefeng.wang@huawei.com, elver@google.com, catalin.marinas@arm.com,
  ast@kernel.org, vincenzo.frascino@arm.com, will@kernel.org,
@@ -72,57 +72,46 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============9158194137702163839=="
+Content-Type: multipart/mixed; boundary="===============1594913874745996079=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
---===============9158194137702163839==
+--===============1594913874745996079==
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="jo+NRiUeE5EvKTfv"
+	protocol="application/pgp-signature"; boundary="hQRAZMV6dDRdJcTB"
 Content-Disposition: inline
 
 
---jo+NRiUeE5EvKTfv
+--hQRAZMV6dDRdJcTB
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 14, 2022 at 11:10:11PM -0700, Kalesh Singh wrote:
-
-> @@ -56,7 +56,6 @@ static inline bool on_overflow_stack(unsigned long sp, =
-unsigned long size,
->  			struct stack_info *info) { return false; }
->  #endif
-> =20
-> -
->  /*
->   * We can only safely access per-cpu stacks from current in a non-preemp=
-tible
->   * context.
-
-Random perfectly fine but unrelated whitespace change here.  Otherwise
+On Thu, Jul 14, 2022 at 11:10:12PM -0700, Kalesh Singh wrote:
+> Move common unwind_next logic to stacktrace/common.h. This allows
+> reusing the code in the implementation the nVHE hypervisor stack
+> unwinder, later in this series.
 
 Reviewed-by: Mark Brown <broonie@kernel.org>
 
---jo+NRiUeE5EvKTfv
+--hQRAZMV6dDRdJcTB
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmLRlaMACgkQJNaLcl1U
-h9CDzQf9EKWHL6a0nLbiAdh1O+G742JT9aXWLoDUXGo6+8nJQIAum9G4ur5zJ8KK
-iUdKSLtS+9JOT0VxYqKyDN3wIcTeGSJTFDtVwJcHPZG3gxHHOlC4ab6I2e7jJyVO
-4qK2hnz477HSGecXoIvLTKj6odbzX7u5kgkH7BaAJ7HkB3Mqjw4lK0PpmuC9B79T
-93RlV4yaoo9muDvYXxQJLFCLcSZo9zQhBxZj22jujagqeeQnhMWvHPEt5Nyicqcu
-8S4NQvuCihHUr7azWql8GmkQIwZK7TDG+NjR0qv4Hu6aMqW374I6fm78A8dG3+i5
-Gk8IemJTPZfQeZ6AKfuDq1emsbl4BA==
-=E0Ab
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmLRlfkACgkQJNaLcl1U
+h9BRdgf/WGznLdXBmkPr3BXfleflXq0WsgCfJAyd1GcJyuDPbIM6UHY07F4799px
+Q+6OmFSTkbsc9IbNxNi3Bse6btyrCn6YDytEiNckAybB+71pDwixovWlcV0SigGA
+eG1lzgKp7Xhlte0PdzuIsztVOuKvscn6umieTJxPlkwjZ5Uzxo8ryrJb9tgP3ZE5
+C9pDGBg/1Y6+sNCA2FbhRaBQwnkCaU6kK+IhdLN24M/wLRhuDDlbmeL4zXZmpdXB
+LGSu2Vmvl8XV0rrw0WeUeLsk9sk2zkJ9OAEjOUI2RMCg4A2DeYnyhdMeJF6NtiCS
+9n5x8AkhzEeTXjnfvtHapkHs+hpwAQ==
+=BScg
 -----END PGP SIGNATURE-----
 
---jo+NRiUeE5EvKTfv--
+--hQRAZMV6dDRdJcTB--
 
---===============9158194137702163839==
+--===============1594913874745996079==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -133,4 +122,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---===============9158194137702163839==--
+--===============1594913874745996079==--
