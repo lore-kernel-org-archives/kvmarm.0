@@ -2,71 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5782C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jul 2022 06:10:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A573C43334
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jul 2022 06:11:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F3B84BB9F;
-	Fri, 15 Jul 2022 02:10:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02D204BC0C;
+	Fri, 15 Jul 2022 02:11:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zi-PDaLNBbKg; Fri, 15 Jul 2022 02:10:43 -0400 (EDT)
+	with ESMTP id hicy+U9tI2XT; Fri, 15 Jul 2022 02:11:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98DA24BC80;
-	Fri, 15 Jul 2022 02:10:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC4D14BC20;
+	Fri, 15 Jul 2022 02:11:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5047D4BBE6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 02:10:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59FBA4BBB7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 02:11:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 254i8H4U7iTm for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jul 2022 02:10:36 -0400 (EDT)
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
- [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 182664BBE0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 02:10:36 -0400 (EDT)
-Received: by mail-yb1-f201.google.com with SMTP id
- c7-20020a258807000000b0066d6839741eso3298600ybl.23
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 23:10:36 -0700 (PDT)
+ with ESMTP id OVB8j1QeIlEk for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jul 2022 02:11:00 -0400 (EDT)
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com
+ [209.85.128.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 230204BB9F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 02:11:00 -0400 (EDT)
+Received: by mail-yw1-f201.google.com with SMTP id
+ 00721157ae682-31cdce3ed04so33829197b3.13
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 23:11:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=HwPTm6cmxu9zJXjSHjPz49JaMF8MztZgzIWe/cJ+deE=;
- b=Z3zQjpPDiRsDOnp5dDl1GRJwMvY87HgUwdl0j3CSd+VpRKjoClSRyeMLjaJep5115R
- DBeCAIIkFz6OCl7XTKhwsUTqotNv8xGpbXkoldYm0q//4woWStURAOVbCoj+7WJsjXL9
- /zCQ0od5ZsSU7isO7m3a380zlVBKQ98kJkp1EEubvlQogyBvSds1KHxUuyihgbI4DZFQ
- 7jg+p0Re5JrfdxV3tD1DwB4Dv/sOdelLp5ZxaZHAqrcn5E2G5jbwzfBbd60SM+e2HKuw
- MGOWY6pFUCK2GEIWFI1PcqPGK72EinGGpI7hh0LvcIJ4Fn+Gjx4dYM3Jw1HuIlK0JR8r
- afTw==
+ :cc; bh=ljHAEgANsvWTLcKZTghLQsxafFQVS9WVjokuyjxdCqc=;
+ b=npQk7T0JhUPj5VT7xjkRtVg6CsVxkDj8rBq/BUUyI4Mi+9igHEZ+1DmO7myypfhwxT
+ cw3ncKxhY6jXPVtDsozwj2HOUj/M3EooszZ6TtifjL6+sUis8T+X77PHgZ1e+BuKKtm6
+ ZFhXKSU46ZE+lIRgcQ8sY/2hsNJ8CYO9VvxG4xu3jpHGtK+mBk59HwIGe/xxrVkzfQ6H
+ owbBwOiGVNo7n6i2hwzOmUUwJlrVcVjwzZN07JzLdLOSEckpSrizh3Ga1kefRYD9H75X
+ XOF4FyXw2I5DDCrv8yO5+INrCFE7sPZcJXpG4do24oD8+GKiJ1nf2uKkhEvs4blSyMMu
+ mDPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=HwPTm6cmxu9zJXjSHjPz49JaMF8MztZgzIWe/cJ+deE=;
- b=AB3mloSKEr2CxGMMnarCc/azIe18GHMglzhVzD4xpd1Glp3Wb4NQZX06IwvhTkcplI
- smXbu7FM/ftRukr2Zn5gGfAK2ggucgvdwH94Z1JSjwzs1ZyXrd7o2qdWpVJpbk0OTcb2
- zbjg4D+T7OgUl7bfATkX2+R+sPMv1H4L2kBDhiHMKwyCAJ3bJRNIPNPd2g6H6xt2HlYK
- s+0vrFA+ZifaiNjmHMXUx50efDhrrAC6LZGgadHzlkz1SwrhItfhXUZRHuQeePP+x/Om
- amf+lTN8qx11i8vRZpxR7Esk3nat4fE14CkigqzkdCgNK/n0p8XKVYL9Ja42QoAfqjQM
- L47A==
-X-Gm-Message-State: AJIora8DsOkJLn+s7nspQyHDygYIv28R6JF4dtKZ/fvzIbCmpH+y+lzW
- 3OR0Fk1ILJtMNcb+bPMIPNHP9Vj1Mp27dDH14A==
-X-Google-Smtp-Source: AGRyM1uQsnm9sZo0q5d9K7/udtHT67wBvEUrThfObqq+hDgims8clShXazzHT77SMjEPhS9aYSgaY5BdxHGEM8HEWw==
+ bh=ljHAEgANsvWTLcKZTghLQsxafFQVS9WVjokuyjxdCqc=;
+ b=jf5lAhAsEyNpI2qlBOkSk6NJLI5zM4JpWYQrotU22IQwz3U3Nm7qofoVQpI3Nbe+K9
+ VGI/QrOThKCKTswSnAq5dELzrB0Bwy8yC+x/QyGxFS13wg9iwcQ64xIGpoRLtKJ8M2C6
+ tnaLQHbR0EMMAL5bfBsFGEHWEvi/fMMCKSWJniNNhjuHU1dDzoyrEGmGv8woJay6j9+p
+ nrf6PKRWbLbE4B5jSYssM7M1wgVGiQcWDwm4HENcVXuaLBRsNHjhupQeEcfy4hN1Gb6+
+ f3VCJRvRmqiky3rQtALHG85rmWMH9NIZRhUrI2tr76coBiRJG/INAyhpECQBgRTpB6Ge
+ MlOg==
+X-Gm-Message-State: AJIora8aoL7qKzXCjl5sjjtJyCjoaJ7a9Uee8P5bdqbdZg5s/aiKHAxs
+ hOkjrnqYeJriEdMKlSPXoh8mRRpqNLGxafO7ww==
+X-Google-Smtp-Source: AGRyM1vsLnzedBXRLas9Bpb1/ODNueblglUHt+pB7oPmdXRtm9qObq99zCFBzoa8bIquQbhpT+0pCRDt34Y3LdmTkw==
 X-Received: from kaleshsingh.mtv.corp.google.com
  ([2620:15c:211:200:f010:455b:62ce:19e])
- (user=kaleshsingh job=sendgmr) by 2002:a81:b80c:0:b0:31c:8cfc:cbc0 with SMTP
- id v12-20020a81b80c000000b0031c8cfccbc0mr14308532ywe.157.1657865435586; Thu,
- 14 Jul 2022 23:10:35 -0700 (PDT)
-Date: Thu, 14 Jul 2022 23:10:10 -0700
+ (user=kaleshsingh job=sendgmr) by 2002:a25:7ac6:0:b0:66f:d07e:23f5 with SMTP
+ id v189-20020a257ac6000000b0066fd07e23f5mr5892519ybc.110.1657865459665; Thu,
+ 14 Jul 2022 23:10:59 -0700 (PDT)
+Date: Thu, 14 Jul 2022 23:10:12 -0700
 In-Reply-To: <20220715061027.1612149-1-kaleshsingh@google.com>
-Message-Id: <20220715061027.1612149-2-kaleshsingh@google.com>
+Message-Id: <20220715061027.1612149-4-kaleshsingh@google.com>
 Mime-Version: 1.0
 References: <20220715061027.1612149-1-kaleshsingh@google.com>
 X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
-Subject: [PATCH v4 01/18] arm64: stacktrace: Add shared header for common
- stack unwinding code
+Subject: [PATCH v4 03/18] arm64: stacktrace: Factor out unwind_next_common()
 From: Kalesh Singh <kaleshsingh@google.com>
 To: maz@kernel.org, mark.rutland@arm.com, broonie@kernel.org, 
  madvenka@linux.microsoft.com
@@ -92,259 +91,139 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to reuse the arm64 stack unwinding logic for the nVHE
-hypervisor stack, move the common code to a shared header
-(arch/arm64/include/asm/stacktrace/common.h).
-
-The nVHE hypervisor cannot safely link against kernel code, so we
-make use of the shared header to avoid duplicated logic later in
-this series.
+Move common unwind_next logic to stacktrace/common.h. This allows
+reusing the code in the implementation the nVHE hypervisor stack
+unwinder, later in this series.
 
 Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
 ---
- arch/arm64/include/asm/stacktrace.h        |  35 +------
- arch/arm64/include/asm/stacktrace/common.h | 105 +++++++++++++++++++++
- arch/arm64/kernel/stacktrace.c             |  57 -----------
- 3 files changed, 106 insertions(+), 91 deletions(-)
- create mode 100644 arch/arm64/include/asm/stacktrace/common.h
+ arch/arm64/include/asm/stacktrace/common.h | 50 ++++++++++++++++++++++
+ arch/arm64/kernel/stacktrace.c             | 41 ++----------------
+ 2 files changed, 54 insertions(+), 37 deletions(-)
 
-diff --git a/arch/arm64/include/asm/stacktrace.h b/arch/arm64/include/asm/stacktrace.h
-index aec9315bf156..79f455b37c84 100644
---- a/arch/arm64/include/asm/stacktrace.h
-+++ b/arch/arm64/include/asm/stacktrace.h
-@@ -8,52 +8,19 @@
- #include <linux/percpu.h>
- #include <linux/sched.h>
- #include <linux/sched/task_stack.h>
--#include <linux/types.h>
- #include <linux/llist.h>
- 
- #include <asm/memory.h>
- #include <asm/ptrace.h>
- #include <asm/sdei.h>
- 
--enum stack_type {
--	STACK_TYPE_UNKNOWN,
--	STACK_TYPE_TASK,
--	STACK_TYPE_IRQ,
--	STACK_TYPE_OVERFLOW,
--	STACK_TYPE_SDEI_NORMAL,
--	STACK_TYPE_SDEI_CRITICAL,
--	__NR_STACK_TYPES
--};
--
--struct stack_info {
--	unsigned long low;
--	unsigned long high;
--	enum stack_type type;
--};
-+#include <asm/stacktrace/common.h>
- 
- extern void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk,
- 			   const char *loglvl);
- 
- DECLARE_PER_CPU(unsigned long *, irq_stack_ptr);
- 
--static inline bool on_stack(unsigned long sp, unsigned long size,
--			    unsigned long low, unsigned long high,
--			    enum stack_type type, struct stack_info *info)
--{
--	if (!low)
--		return false;
--
--	if (sp < low || sp + size < sp || sp + size > high)
--		return false;
--
--	if (info) {
--		info->low = low;
--		info->high = high;
--		info->type = type;
--	}
--	return true;
--}
--
- static inline bool on_irq_stack(unsigned long sp, unsigned long size,
- 				struct stack_info *info)
- {
 diff --git a/arch/arm64/include/asm/stacktrace/common.h b/arch/arm64/include/asm/stacktrace/common.h
-new file mode 100644
-index 000000000000..64ae4f6b06fe
---- /dev/null
+index f58b786460d3..0c5cbfdb56b5 100644
+--- a/arch/arm64/include/asm/stacktrace/common.h
 +++ b/arch/arm64/include/asm/stacktrace/common.h
-@@ -0,0 +1,105 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Common arm64 stack unwinder code.
-+ *
-+ * Copyright (C) 2012 ARM Ltd.
-+ */
-+#ifndef __ASM_STACKTRACE_COMMON_H
-+#define __ASM_STACKTRACE_COMMON_H
+@@ -65,6 +65,10 @@ struct unwind_state {
+ static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
+ 				     struct stack_info *info);
+ 
++static inline bool on_accessible_stack(const struct task_struct *tsk,
++				       unsigned long sp, unsigned long size,
++				       struct stack_info *info);
 +
-+#include <linux/bitmap.h>
-+#include <linux/bitops.h>
-+#include <linux/types.h>
-+
-+enum stack_type {
-+	STACK_TYPE_UNKNOWN,
-+	STACK_TYPE_TASK,
-+	STACK_TYPE_IRQ,
-+	STACK_TYPE_OVERFLOW,
-+	STACK_TYPE_SDEI_NORMAL,
-+	STACK_TYPE_SDEI_CRITICAL,
-+	__NR_STACK_TYPES
-+};
-+
-+struct stack_info {
-+	unsigned long low;
-+	unsigned long high;
-+	enum stack_type type;
-+};
-+
-+/*
-+ * A snapshot of a frame record or fp/lr register values, along with some
-+ * accounting information necessary for robust unwinding.
-+ *
-+ * @fp:          The fp value in the frame record (or the real fp)
-+ * @pc:          The lr value in the frame record (or the real lr)
-+ *
-+ * @stacks_done: Stacks which have been entirely unwound, for which it is no
-+ *               longer valid to unwind to.
-+ *
-+ * @prev_fp:     The fp that pointed to this frame record, or a synthetic value
-+ *               of 0. This is used to ensure that within a stack, each
-+ *               subsequent frame record is at an increasing address.
-+ * @prev_type:   The type of stack this frame record was on, or a synthetic
-+ *               value of STACK_TYPE_UNKNOWN. This is used to detect a
-+ *               transition from one stack to another.
-+ *
-+ * @kr_cur:      When KRETPROBES is selected, holds the kretprobe instance
-+ *               associated with the most recently encountered replacement lr
-+ *               value.
-+ *
-+ * @task:        The task being unwound.
-+ */
-+struct unwind_state {
-+	unsigned long fp;
-+	unsigned long pc;
-+	DECLARE_BITMAP(stacks_done, __NR_STACK_TYPES);
-+	unsigned long prev_fp;
-+	enum stack_type prev_type;
-+#ifdef CONFIG_KRETPROBES
-+	struct llist_node *kr_cur;
-+#endif
-+	struct task_struct *task;
-+};
-+
-+static inline bool on_stack(unsigned long sp, unsigned long size,
-+			    unsigned long low, unsigned long high,
-+			    enum stack_type type, struct stack_info *info)
+ static inline bool on_stack(unsigned long sp, unsigned long size,
+ 			    unsigned long low, unsigned long high,
+ 			    enum stack_type type, struct stack_info *info)
+@@ -120,4 +124,50 @@ static inline void unwind_init_common(struct unwind_state *state,
+ 	state->prev_type = STACK_TYPE_UNKNOWN;
+ }
+ 
++static inline int unwind_next_common(struct unwind_state *state,
++				     struct stack_info *info)
 +{
-+	if (!low)
-+		return false;
++	struct task_struct *tsk = state->task;
++	unsigned long fp = state->fp;
 +
-+	if (sp < low || sp + size < sp || sp + size > high)
-+		return false;
++	if (fp & 0x7)
++		return -EINVAL;
 +
-+	if (info) {
-+		info->low = low;
-+		info->high = high;
-+		info->type = type;
-+	}
-+	return true;
-+}
++	if (!on_accessible_stack(tsk, fp, 16, info))
++		return -EINVAL;
 +
-+static inline void unwind_init_common(struct unwind_state *state,
-+				      struct task_struct *task)
-+{
-+	state->task = task;
-+#ifdef CONFIG_KRETPROBES
-+	state->kr_cur = NULL;
-+#endif
++	if (test_bit(info->type, state->stacks_done))
++		return -EINVAL;
 +
 +	/*
-+	 * Prime the first unwind.
++	 * As stacks grow downward, any valid record on the same stack must be
++	 * at a strictly higher address than the prior record.
 +	 *
-+	 * In unwind_next() we'll check that the FP points to a valid stack,
-+	 * which can't be STACK_TYPE_UNKNOWN, and the first unwind will be
-+	 * treated as a transition to whichever stack that happens to be. The
-+	 * prev_fp value won't be used, but we set it to 0 such that it is
-+	 * definitely not an accessible stack address.
++	 * Stacks can nest in several valid orders, e.g.
++	 *
++	 * TASK -> IRQ -> OVERFLOW -> SDEI_NORMAL
++	 * TASK -> SDEI_NORMAL -> SDEI_CRITICAL -> OVERFLOW
++	 *
++	 * ... but the nesting itself is strict. Once we transition from one
++	 * stack to another, it's never valid to unwind back to that first
++	 * stack.
 +	 */
-+	bitmap_zero(state->stacks_done, __NR_STACK_TYPES);
-+	state->prev_fp = 0;
-+	state->prev_type = STACK_TYPE_UNKNOWN;
-+}
++	if (info->type == state->prev_type) {
++		if (fp <= state->prev_fp)
++			return -EINVAL;
++	} else {
++		__set_bit(state->prev_type, state->stacks_done);
++	}
 +
-+#endif	/* __ASM_STACKTRACE_COMMON_H */
++	/*
++	 * Record this frame record's values and location. The prev_fp and
++	 * prev_type are only meaningful to the next unwind_next() invocation.
++	 */
++	state->fp = READ_ONCE(*(unsigned long *)(fp));
++	state->pc = READ_ONCE(*(unsigned long *)(fp + 8));
++	state->prev_fp = fp;
++	state->prev_type = info->type;
++
++	return 0;
++}
+ #endif	/* __ASM_STACKTRACE_COMMON_H */
 diff --git a/arch/arm64/kernel/stacktrace.c b/arch/arm64/kernel/stacktrace.c
-index fcaa151b81f1..94a5dd2ab8fd 100644
+index 94a5dd2ab8fd..834851939364 100644
 --- a/arch/arm64/kernel/stacktrace.c
 +++ b/arch/arm64/kernel/stacktrace.c
-@@ -18,63 +18,6 @@
- #include <asm/stack_pointer.h>
- #include <asm/stacktrace.h>
+@@ -81,48 +81,15 @@ static int notrace unwind_next(struct unwind_state *state)
+ 	struct task_struct *tsk = state->task;
+ 	unsigned long fp = state->fp;
+ 	struct stack_info info;
++	int err;
  
--/*
-- * A snapshot of a frame record or fp/lr register values, along with some
-- * accounting information necessary for robust unwinding.
-- *
-- * @fp:          The fp value in the frame record (or the real fp)
-- * @pc:          The lr value in the frame record (or the real lr)
-- *
-- * @stacks_done: Stacks which have been entirely unwound, for which it is no
-- *               longer valid to unwind to.
-- *
-- * @prev_fp:     The fp that pointed to this frame record, or a synthetic value
-- *               of 0. This is used to ensure that within a stack, each
-- *               subsequent frame record is at an increasing address.
-- * @prev_type:   The type of stack this frame record was on, or a synthetic
-- *               value of STACK_TYPE_UNKNOWN. This is used to detect a
-- *               transition from one stack to another.
-- *
-- * @kr_cur:      When KRETPROBES is selected, holds the kretprobe instance
-- *               associated with the most recently encountered replacement lr
-- *               value.
-- *
-- * @task:        The task being unwound.
-- */
--struct unwind_state {
--	unsigned long fp;
--	unsigned long pc;
--	DECLARE_BITMAP(stacks_done, __NR_STACK_TYPES);
--	unsigned long prev_fp;
--	enum stack_type prev_type;
--#ifdef CONFIG_KRETPROBES
--	struct llist_node *kr_cur;
--#endif
--	struct task_struct *task;
--};
+ 	/* Final frame; nothing to unwind */
+ 	if (fp == (unsigned long)task_pt_regs(tsk)->stackframe)
+ 		return -ENOENT;
+ 
+-	if (fp & 0x7)
+-		return -EINVAL;
 -
--static void unwind_init_common(struct unwind_state *state,
--			       struct task_struct *task)
--{
--	state->task = task;
--#ifdef CONFIG_KRETPROBES
--	state->kr_cur = NULL;
--#endif
+-	if (!on_accessible_stack(tsk, fp, 16, &info))
+-		return -EINVAL;
+-
+-	if (test_bit(info.type, state->stacks_done))
+-		return -EINVAL;
 -
 -	/*
--	 * Prime the first unwind.
+-	 * As stacks grow downward, any valid record on the same stack must be
+-	 * at a strictly higher address than the prior record.
 -	 *
--	 * In unwind_next() we'll check that the FP points to a valid stack,
--	 * which can't be STACK_TYPE_UNKNOWN, and the first unwind will be
--	 * treated as a transition to whichever stack that happens to be. The
--	 * prev_fp value won't be used, but we set it to 0 such that it is
--	 * definitely not an accessible stack address.
+-	 * Stacks can nest in several valid orders, e.g.
+-	 *
+-	 * TASK -> IRQ -> OVERFLOW -> SDEI_NORMAL
+-	 * TASK -> SDEI_NORMAL -> SDEI_CRITICAL -> OVERFLOW
+-	 *
+-	 * ... but the nesting itself is strict. Once we transition from one
+-	 * stack to another, it's never valid to unwind back to that first
+-	 * stack.
 -	 */
--	bitmap_zero(state->stacks_done, __NR_STACK_TYPES);
--	state->prev_fp = 0;
--	state->prev_type = STACK_TYPE_UNKNOWN;
--}
+-	if (info.type == state->prev_type) {
+-		if (fp <= state->prev_fp)
+-			return -EINVAL;
+-	} else {
+-		__set_bit(state->prev_type, state->stacks_done);
+-	}
 -
- /*
-  * Start an unwind from a pt_regs.
-  *
+-	/*
+-	 * Record this frame record's values and location. The prev_fp and
+-	 * prev_type are only meaningful to the next unwind_next() invocation.
+-	 */
+-	state->fp = READ_ONCE(*(unsigned long *)(fp));
+-	state->pc = READ_ONCE(*(unsigned long *)(fp + 8));
+-	state->prev_fp = fp;
+-	state->prev_type = info.type;
++	err = unwind_next_common(state, &info);
++	if (err)
++		return err;
+ 
+ 	state->pc = ptrauth_strip_insn_pac(state->pc);
+ 
 -- 
 2.37.0.170.g444d1eabd0-goog
 
