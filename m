@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8088CCA482
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A213CCA47C
 	for <kvmarm@archiver.kernel.org>; Fri, 15 Jul 2022 06:11:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8456F4BDD7;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 145A64BC48;
 	Fri, 15 Jul 2022 02:11:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id V8CJE22xIaTL; Fri, 15 Jul 2022 02:11:43 -0400 (EDT)
+	with ESMTP id vPoe61SFgpbn; Fri, 15 Jul 2022 02:11:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A7474BDE6;
-	Fri, 15 Jul 2022 02:11:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 278864BDFF;
+	Fri, 15 Jul 2022 02:11:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8ED414BC4C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 02:11:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 133454BC46
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 02:11:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id u+n5vqw9yr+7 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jul 2022 02:11:41 -0400 (EDT)
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
- [209.85.128.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 190584BDD8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 02:11:40 -0400 (EDT)
-Received: by mail-yw1-f202.google.com with SMTP id
- 00721157ae682-31c88e36c0bso34052717b3.20
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 23:11:40 -0700 (PDT)
+ with ESMTP id bBU9UbDpcnvd for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jul 2022 02:11:32 -0400 (EDT)
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
+ [209.85.219.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DEE224BDE2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 02:11:32 -0400 (EDT)
+Received: by mail-yb1-f202.google.com with SMTP id
+ w15-20020a25ac0f000000b0066e50e4a553so3284701ybi.16
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Jul 2022 23:11:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=Aen+FkdIlH4p9Bga5nOuPk26qtzTJbITGhY4IEaQl1E=;
- b=Kl/Wb7az0Dpk964K/t53obqM+aCIu3rAPB8Mi4lFae6KU/yHzI081j9LkXEZvLEs5F
- MPJViYowMIzNBQddAvvw7Po85N97ikHIUNw2aCqDw4i0AXDa82B4v1KEU83z8qseqlST
- HTZXzVTx3cEKvN3jrQAGdDnMKiiAgo4UkwjXsn09TeVUtUfosl4u4YQzK7dAc35q0KiF
- K6rSEFoTr7QPg89dMkQWTWdYZMsZfSwVCROcIJWnD/ArXlt2GsZXHYJeqHpcyX2uz6SL
- H7qz9XZxaBwBvC2Fh/vPGLAMM6u3TCdO9kkrMhmIrKu0QEl1nu32DcC3LA/cIr2Y6+19
- rXmQ==
+ :cc; bh=pdXpYKuqyR2DHzDWiSA/Dd/3H8f/+4y3eqxbGuoz/60=;
+ b=gp6IjzjWFE3s0WtgA0THeafhzeLINBoTb4eGy+4W8aaFNoxZGpirTqTbF7xS7KhCzj
+ OVC8u1Xggk4rJ2ga+Wxi7y0dgfaIeUU+LMQoFu/+H7H+mlWBFwOT27y1BRMRuvtMW5R4
+ pVF8Cx6BwHK6zf2mOwZUcifIN8RN7l4IwyBz+61P/BGjzHPmAB9M3XiuGqYcRBXGdbXH
+ BElQjhQyhxgPGo68MBibokAEwadcmfzTU1Lj/BdgsDBc+DztJoAWW58GWeJ20WqVMh8O
+ rgX5cS9g2fnYvRIvmsWqNAPvhAYBDXXTguTNxYfjxXB/QkGPr3P6VD692wFY19Irjf4t
+ 4ImA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=Aen+FkdIlH4p9Bga5nOuPk26qtzTJbITGhY4IEaQl1E=;
- b=h5MPuSJm3Rv+V7Y6LDaMZCiJ+DJE5zT9CBnASfUpO8oZgiv76nF/6+FWCZK2CYXEJ9
- ArzJlsgppqsBiGyb3XzSWJHMXS9jbRevzC6Fa6L77sQK+0yGrymeliGkSgKQeAn1wsyJ
- L4wqNypAcSphq6AuraUUEQbV/ARp24FERA2rkHwKy/mi7VzcFVR87Cj0n8fh+M4bVUgM
- bt3oCFyZKtrhoqcXnmqsHP1DIxNVqs+xomBmkMIAJoTGe9O3AHj2JWKaYglr0yd1EaT0
- y8+u5CC19FIaL/NkLfi3Bv93N+WAMuIanvkuYBc8RJeLNGt3jcIbB6OXZvCcvT1brbNr
- vfvw==
-X-Gm-Message-State: AJIora8Ag5+iEur9GE/Tv+xmLqCp02aG1i/bhok5kslOqQHQp6mih945
- FWVH+GLCN2fGYJ87Hts2dBTu5F94qbz1Ir3Z1g==
-X-Google-Smtp-Source: AGRyM1u/PT8LdM4OlzT2z2Ts/bIUkpNGqVgHGqY8xhTai+zpsROBqKpKpWbwRpuEkJh/W1ny4LwrRcq2gKzotGoM5Q==
+ bh=pdXpYKuqyR2DHzDWiSA/Dd/3H8f/+4y3eqxbGuoz/60=;
+ b=Hz8SX1CMCi2qc6Hb6thFKD8/R5GTYHNV1fYkRJDD69keAisOH49c6d3m4UiHjYKlV9
+ lHApH3SWVXiAmF6Q75RX3yEdI4zKEGomKrLSukPpWOqHY/Vsx9c7EDG0dbdYqwr9ywCb
+ /gElrsgH/Qq/XBi+CnZ8HiZ6BPFjcTN6wz2QGXqKfb+/0Ee7sYr0Yy0CvayDVlXcWEe4
+ 7tNkEplvVM/vqVO+UcLUsSUqpRKzGPpxnCqmzd6ogyCmIkb3EL8z06ml8OiDsiPywwLW
+ LOifT7Q9r3D9q6wy1h4IuXom9e5Q3T5LW8wEGSt/u8mlbxT+dGb2KOZsdgzjZiZzc4lm
+ wuoQ==
+X-Gm-Message-State: AJIora8Uen+UGaJWq+63lvyou3R+LjdFmLyp3Ink2KcOW9vdXweeCXSk
+ FS3M4AzQpcJS2rDBuMhfZ7MmaMBzOd1yHCq4OA==
+X-Google-Smtp-Source: AGRyM1s2qvo/C+AGMgSJ1bzfSnL2AH2SuaK0GUmYhlafsScdZesEOiN19TLlmgYAcKErdGUxpKCqLcIEPcdbEiO29Q==
 X-Received: from kaleshsingh.mtv.corp.google.com
  ([2620:15c:211:200:f010:455b:62ce:19e])
- (user=kaleshsingh job=sendgmr) by 2002:a5b:849:0:b0:66e:a027:3c with SMTP id
- v9-20020a5b0849000000b0066ea027003cmr11796208ybq.208.1657865499596; Thu, 14
- Jul 2022 23:11:39 -0700 (PDT)
-Date: Thu, 14 Jul 2022 23:10:23 -0700
+ (user=kaleshsingh job=sendgmr) by 2002:a25:2303:0:b0:66f:d3d:45a with SMTP id
+ j3-20020a252303000000b0066f0d3d045amr11516072ybj.606.1657865492453; Thu, 14
+ Jul 2022 23:11:32 -0700 (PDT)
+Date: Thu, 14 Jul 2022 23:10:20 -0700
 In-Reply-To: <20220715061027.1612149-1-kaleshsingh@google.com>
-Message-Id: <20220715061027.1612149-15-kaleshsingh@google.com>
+Message-Id: <20220715061027.1612149-12-kaleshsingh@google.com>
 Mime-Version: 1.0
 References: <20220715061027.1612149-1-kaleshsingh@google.com>
 X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
-Subject: [PATCH v4 14/18] KVM: arm64: Implement protected nVHE hyp stack
- unwinder
+Subject: [PATCH v4 11/18] KVM: arm64: Stub implementation of non-protected
+ nVHE HYP stack unwinder
 From: Kalesh Singh <kaleshsingh@google.com>
 To: maz@kernel.org, mark.rutland@arm.com, broonie@kernel.org, 
  madvenka@linux.microsoft.com
@@ -92,110 +92,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Implements the common framework necessary for unwind() to work in
-the protected nVHE context:
-   - on_accessible_stack()
-   - on_overflow_stack()
-   - unwind_next()
-
-Protected nVHE unwind() is used to unwind and save the hyp stack
-addresses to the shared stacktrace buffer. The host reads the
-entries in this buffer, symbolizes and dumps the stacktrace (later
-patch in the series).
+Add stub implementations of non-protected nVHE stack unwinder, for
+building. These are implemented later in this series.
 
 Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
 ---
- arch/arm64/include/asm/stacktrace/common.h |  2 ++
- arch/arm64/include/asm/stacktrace/nvhe.h   | 34 ++++++++++++++++++++--
- 2 files changed, 34 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/stacktrace/nvhe.h | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/arch/arm64/include/asm/stacktrace/common.h b/arch/arm64/include/asm/stacktrace/common.h
-index b362086f4c70..cf442e67dccd 100644
---- a/arch/arm64/include/asm/stacktrace/common.h
-+++ b/arch/arm64/include/asm/stacktrace/common.h
-@@ -27,6 +27,7 @@ enum stack_type {
- 	STACK_TYPE_OVERFLOW,
- 	STACK_TYPE_SDEI_NORMAL,
- 	STACK_TYPE_SDEI_CRITICAL,
-+	STACK_TYPE_HYP,
- 	__NR_STACK_TYPES
- };
- 
-@@ -171,6 +172,7 @@ static inline int unwind_next_common(struct unwind_state *state,
- 	 *
- 	 * TASK -> IRQ -> OVERFLOW -> SDEI_NORMAL
- 	 * TASK -> SDEI_NORMAL -> SDEI_CRITICAL -> OVERFLOW
-+	 * HYP -> OVERFLOW
- 	 *
- 	 * ... but the nesting itself is strict. Once we transition from one
- 	 * stack to another, it's never valid to unwind back to that first
 diff --git a/arch/arm64/include/asm/stacktrace/nvhe.h b/arch/arm64/include/asm/stacktrace/nvhe.h
-index 1aadfd8d7ac9..c7c8ac889ec1 100644
+index 1eac4e57f2ae..36cf7858ddd8 100644
 --- a/arch/arm64/include/asm/stacktrace/nvhe.h
 +++ b/arch/arm64/include/asm/stacktrace/nvhe.h
-@@ -38,10 +38,19 @@ static __always_inline void kvm_nvhe_unwind_init(struct unwind_state *state,
- 	state->pc = pc;
- }
- 
-+static inline bool on_hyp_stack(unsigned long sp, unsigned long size,
-+				struct stack_info *info);
-+
- static inline bool on_accessible_stack(const struct task_struct *tsk,
- 				       unsigned long sp, unsigned long size,
- 				       struct stack_info *info)
- {
-+	if (on_accessible_stack_common(tsk, sp, size, info))
-+		return true;
-+
-+	if (on_hyp_stack(sp, size, info))
-+		return true;
-+
- 	return false;
- }
- 
-@@ -59,12 +68,27 @@ extern void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc);
- static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
- 				     struct stack_info *info)
- {
--	return false;
-+	unsigned long low = (unsigned long)this_cpu_ptr(overflow_stack);
-+	unsigned long high = low + OVERFLOW_STACK_SIZE;
-+
-+	return on_stack(sp, size, low, high, STACK_TYPE_OVERFLOW, info);
-+}
-+
-+static inline bool on_hyp_stack(unsigned long sp, unsigned long size,
-+				struct stack_info *info)
-+{
-+	struct kvm_nvhe_init_params *params = this_cpu_ptr(&kvm_init_params);
-+	unsigned long high = params->stack_hyp_va;
-+	unsigned long low = high - PAGE_SIZE;
-+
-+	return on_stack(sp, size, low, high, STACK_TYPE_HYP, info);
- }
- 
- static int notrace unwind_next(struct unwind_state *state)
- {
--	return 0;
-+	struct stack_info info;
-+
-+	return unwind_next_common(state, &info, NULL);
- }
+@@ -8,6 +8,12 @@
+  *      the HYP memory. The stack is unwinded in EL2 and dumped to a shared
+  *      buffer where the host can read and print the stacktrace.
+  *
++ *   2) Non-protected nVHE mode - the host can directly access the
++ *      HYP stack pages and unwind the HYP stack in EL1. This saves having
++ *      to allocate shared buffers for the host to read the unwinded
++ *      stacktrace.
++ *
++ *
+  * Copyright (C) 2022 Google LLC
+  */
+ #ifndef __ASM_STACKTRACE_NVHE_H
+@@ -53,5 +59,21 @@ static int notrace unwind_next(struct unwind_state *state)
  NOKPROBE_SYMBOL(unwind_next);
- #else	/* !CONFIG_PROTECTED_NVHE_STACKTRACE */
-@@ -74,6 +98,12 @@ static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
- 	return false;
- }
+ #endif	/* CONFIG_PROTECTED_NVHE_STACKTRACE */
  
-+static inline bool on_hyp_stack(unsigned long sp, unsigned long size,
-+				struct stack_info *info)
++/*
++ * Non-protected nVHE HYP stack unwinder
++ */
++#else	/* !__KVM_NVHE_HYPERVISOR__ */
++static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
++				     struct stack_info *info)
 +{
 +	return false;
 +}
 +
- static int notrace unwind_next(struct unwind_state *state)
- {
- 	return 0;
++static int notrace unwind_next(struct unwind_state *state)
++{
++	return 0;
++}
++NOKPROBE_SYMBOL(unwind_next);
++
+ #endif	/* __KVM_NVHE_HYPERVISOR__ */
+ #endif	/* __ASM_STACKTRACE_NVHE_H */
 -- 
 2.37.0.170.g444d1eabd0-goog
 
