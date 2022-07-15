@@ -2,70 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2AEEC43334
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Jul 2022 13:57:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F33CC433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Jul 2022 13:59:09 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 55B1F4BEAD;
-	Fri, 15 Jul 2022 09:57:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A62D04BEFB;
+	Fri, 15 Jul 2022 09:59:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5laVhUG1-LTn; Fri, 15 Jul 2022 09:57:23 -0400 (EDT)
+	with ESMTP id HDOz8yNkTfgj; Fri, 15 Jul 2022 09:59:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05D3B4BE4E;
-	Fri, 15 Jul 2022 09:57:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F96E4BEAD;
+	Fri, 15 Jul 2022 09:59:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E8BCB4BE4E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 09:57:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 23EC34BE93
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 09:59:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cvcPqOZ1vozk for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jul 2022 09:57:20 -0400 (EDT)
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com
- [209.85.210.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D26C4BE32
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 09:57:20 -0400 (EDT)
-Received: by mail-ot1-f42.google.com with SMTP id
- e1-20020a05683013c100b0061c1a6b8d11so3529458otq.8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 06:57:20 -0700 (PDT)
+ with ESMTP id nLjZLqRvIbpf for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jul 2022 09:59:04 -0400 (EDT)
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com
+ [209.85.167.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BD7894BE90
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 09:59:04 -0400 (EDT)
+Received: by mail-oi1-f173.google.com with SMTP id r191so6148644oie.7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jul 2022 06:59:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2XHahTg74pR+fkQl0PaxFy6RUNnpsVoD/zCOueSWNd8=;
- b=p0HgT3PGyYvztwjwFj8z7NtqUsPnYsp1YPiFfmRvUtVULL4G7D1ndsRl1PS00SN5Ks
- hQjVLUaVDF8R14z7XHQlO+nxs62MkNjaW3YtFcjdM0bxfQmudN7M3ZJOn2qEQXrm7ktr
- bCE2S/3KNkMgMdasia903BH9il6g57PwJmI4afERGUCRlkj+/w8K+NQkap3trsXZ+M2l
- ehO3RXXas0BQ9JA4hyrp2pChEvjnqVx+vS7cYwIVOu+/3lGjmSR4UQettA0MhEa7qSjT
- yCou3YB5b3kbAH5OX8HYMYjQdn5yTWFxj0o2q2ycr+JvFBxs5jegRVI5V2+DSVwbFFhf
- lRjA==
+ :cc; bh=QvY29V/GM0mH1NqPcwS/Tuc0R9fYJIruV6sTb6TXI7Q=;
+ b=TQgLEenxazdws7SAjjHTqasunR2EnCav01e3+lfRmImyX7Zc86iZpGxN3bx0wKUnp1
+ QOeThI79bl1YWoFSH8X87Thc9NYgF2i/BbtuDAexxa0jepJ/VUYg5vmAdiSlm50EJZ9R
+ +9zne5LBxOxEdxi2tgJ4p72cbEUhuiqmLyKz4zeTTm46gi5kywSEMsi0wniUFgmkX3oh
+ n25rRcB/vgjjNNH2jDOnUIbT7vAJGfpgbJnQqE16ZWlZzJgPfKZC91lhhNqxGobbUnFC
+ greNyvFlAviZffzNpY2wxPSPOwsbxoOGjkMc++yBEIa9jD7BINdr4g+2XPLmUvEXXxGd
+ 3E2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=2XHahTg74pR+fkQl0PaxFy6RUNnpsVoD/zCOueSWNd8=;
- b=sXjwuMVGKtnAPxJE6B59g0v44O9A0LN1GWK9tNPD+6PDNJBekU4KiF7P3aCbM4Acjl
- ZlJsRPD9Gfe/TcPHEUKn3WQrcmfW6mwOnYfGsWAUmqXtFSPOxmHfDX8M96X1qKNmLZ/K
- UhWtXp5haGLCs5+lgpUcDCXgUWuC4D1rtx1EU8qFgMAv6mZ8GKb1uU0DJDOdf5gvze+z
- z3yPKcznolxZGvZKy1TzzMlY2tfLq/4LBlUrcjiTRPGzaDOk5lQXcwbyj9QZgofFQKxk
- DUcLw/xO6zlNPWFo0UeVdJDzM2QeCR0NbtIF2BqlQyKjBOFpblH4LboRHuP9omwA2YqS
- Be3w==
-X-Gm-Message-State: AJIora9MT0rkM+Grjb20jb2aoXmDgsHWlzbMAB5kRE3byOZDkoNXpMS4
- jQqKLqsQRp7cxThL2MW0pE6Od5BQJpafGw8K3y8tEQ==
-X-Google-Smtp-Source: AGRyM1ugZdhz9Xe3Y3Svns/5bQ2HVTfV3rH4NMXhH9+Km8OrNBqqEwuj2Jd9a5eYcmQWqrKgUATY9xPEup6CwisER5Q=
-X-Received: by 2002:a9d:5f1a:0:b0:61c:50a1:df3 with SMTP id
- f26-20020a9d5f1a000000b0061c50a10df3mr5414193oti.102.1657893439804; Fri, 15
- Jul 2022 06:57:19 -0700 (PDT)
+ bh=QvY29V/GM0mH1NqPcwS/Tuc0R9fYJIruV6sTb6TXI7Q=;
+ b=T2k0Vra8Lobfxh7nGrhyriBIhJI237M/kaghshD8NoogzKqYsYzG61JW447GRUtHNH
+ kc+1+opv811RvA3KrfyqBPUWppWNdm5tOzPvz8U/P/5HaErFoiFHdPb4WoViMoYkqp9w
+ EdbzwzFfyRM4T6fonwVp7jUUJDCjYdA2eSkWInrxMiT1pcpitFv6WBMMQYITjhKcIjtj
+ q8UnutBhrbPJ69Lk2vobdIzwoszbXlYvUSVVywKAIEsq/CwhggBRzoCRtSOIAm8OyYct
+ H9GbgK7/R6m/Zq6nz+P3H+cw+LZhNarBWTiXJ1sum9Q2sVGX4ouOZlAU+5SdmN+iNmf4
+ prKQ==
+X-Gm-Message-State: AJIora8MlXYYTt61EwFuKcDHvpzjSTWmL6ud0mwYhqoH+wnpVuh+Z1U5
+ SHehTW5L6J2/2WJc9fK3Kt0z6AXf2cAy3e3QF5Chww==
+X-Google-Smtp-Source: AGRyM1vxgZjKkuDI5/wzHx61/ekf3zJdK1KuYe2+bO8Nmwp5DWyBuh0+xl9Yf7quQUx7gopiDiGvDXqpKG8WcMJK8es=
+X-Received: by 2002:a05:6808:1182:b0:32d:a9d3:4e0 with SMTP id
+ j2-20020a056808118200b0032da9d304e0mr9681619oil.146.1657893543854; Fri, 15
+ Jul 2022 06:59:03 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220715061027.1612149-1-kaleshsingh@google.com>
- <20220715061027.1612149-5-kaleshsingh@google.com>
-In-Reply-To: <20220715061027.1612149-5-kaleshsingh@google.com>
+ <20220715061027.1612149-2-kaleshsingh@google.com>
+In-Reply-To: <20220715061027.1612149-2-kaleshsingh@google.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Fri, 15 Jul 2022 14:56:44 +0100
-Message-ID: <CA+EHjTzv9VFnp+6kCw0pMuUxqXtmthujg7ga=Fkexz9jEq29LA@mail.gmail.com>
-Subject: Re: [PATCH v4 04/18] arm64: stacktrace: Handle frame pointer from
- different address spaces
+Date: Fri, 15 Jul 2022 14:58:27 +0100
+Message-ID: <CA+EHjTypfypdE=bf5iH87UpQU+feozd486DAXk02Q9PAMqk0BA@mail.gmail.com>
+Subject: Re: [PATCH v4 01/18] arm64: stacktrace: Add shared header for common
+ stack unwinding code
 To: Kalesh Singh <kaleshsingh@google.com>
 Cc: wangkefeng.wang@huawei.com, elver@google.com, catalin.marinas@arm.com,
  ast@kernel.org, vincenzo.frascino@arm.com, will@kernel.org,
@@ -91,123 +90,270 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Kalesh,
 
-On Fri, Jul 15, 2022 at 7:11 AM 'Kalesh Singh' via kernel-team
-<kernel-team@android.com> wrote:
+On Fri, Jul 15, 2022 at 7:10 AM Kalesh Singh <kaleshsingh@google.com> wrote:
 >
-> The unwinder code is made reusable so that it can be used to
-> unwind various types of stacks. One usecase is unwinding the
-> nVHE hyp stack from the host (EL1) in non-protected mode. This
-> means that the unwinder must be able to tracnslate HYP stack
-
-s/tracnslate/translate
-
-> addresses to kernel addresses.
+> In order to reuse the arm64 stack unwinding logic for the nVHE
+> hypervisor stack, move the common code to a shared header
+> (arch/arm64/include/asm/stacktrace/common.h).
 >
-> Add a callback (stack_trace_translate_fp_fn) to allow specifying
-> the translation function.
+> The nVHE hypervisor cannot safely link against kernel code, so we
+> make use of the shared header to avoid duplicated logic later in
+> this series.
 >
 > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
 > ---
->  arch/arm64/include/asm/stacktrace/common.h | 26 ++++++++++++++++++++--
->  arch/arm64/kernel/stacktrace.c             |  2 +-
->  2 files changed, 25 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/stacktrace/common.h b/arch/arm64/include/asm/stacktrace/common.h
-> index 0c5cbfdb56b5..5f5d74a286f3 100644
-> --- a/arch/arm64/include/asm/stacktrace/common.h
-> +++ b/arch/arm64/include/asm/stacktrace/common.h
-> @@ -123,9 +123,22 @@ static inline void unwind_init_common(struct unwind_state *state,
->         state->prev_fp = 0;
->         state->prev_type = STACK_TYPE_UNKNOWN;
->  }
-> +/**
-> + * stack_trace_translate_fp_fn() - Translates a non-kernel frame pointer to
-> + * a kernel address.
-> + *
-> + * @fp:   the frame pointer to be updated to it's kernel address.
-> + * @type: the stack type associated with frame pointer @fp
-> + *
-> + * Returns true and success and @fp is updated to the corresponding
-> + * kernel virtual address; otherwise returns false.
-> + */
 
-Please add a newline before the new block.
-
-Also, something which you have done in comment blocks in this patch as
-well as future patches (so I won't mention them again) is use the
-opening comment mark /** , which is meant for kernel-doc comments
-(https://www.kernel.org/doc/html/latest/doc-guide/kernel-doc.html).
-However, this block, and many if not most of the others don't seem to
-be conformant (scripts/kernel-doc -v -none
-arch/arm64/include/asm/stacktrace/common.h).
-
-I think the easiest thing to do is to format them as a normal block: /*.
-
-
-> +typedef bool (*stack_trace_translate_fp_fn)(unsigned long *fp,
-> +                                           enum stack_type type);
->
->  static inline int unwind_next_common(struct unwind_state *state,
-> -                                    struct stack_info *info)
-> +                                    struct stack_info *info,
-> +                                    stack_trace_translate_fp_fn translate_fp)
->  {
->         struct task_struct *tsk = state->task;
->         unsigned long fp = state->fp;
-> @@ -159,13 +172,22 @@ static inline int unwind_next_common(struct unwind_state *state,
->                 __set_bit(state->prev_type, state->stacks_done);
->         }
->
-> +       /* Record fp as prev_fp before attempting to get the next fp */
-> +       state->prev_fp = fp;
-> +
-> +       /*
-> +        * If fp is not from the current address space perform the necessary
-> +        * translation before dereferencing it to get the next fp.
-> +        */
-> +       if (translate_fp && !translate_fp(&fp, info->type))
-> +               return -EINVAL;
-> +
-
-A call to unwind_next_common could fail having updated state->prev_fp
-as well as state->stacks_done. I think that it might be better to
-rework it so that there aren't any side effects should a call fail.
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
 Thanks,
 /fuad
 
 
-
-
-
->         /*
->          * Record this frame record's values and location. The prev_fp and
->          * prev_type are only meaningful to the next unwind_next() invocation.
->          */
->         state->fp = READ_ONCE(*(unsigned long *)(fp));
->         state->pc = READ_ONCE(*(unsigned long *)(fp + 8));
-> -       state->prev_fp = fp;
->         state->prev_type = info->type;
+>  arch/arm64/include/asm/stacktrace.h        |  35 +------
+>  arch/arm64/include/asm/stacktrace/common.h | 105 +++++++++++++++++++++
+>  arch/arm64/kernel/stacktrace.c             |  57 -----------
+>  3 files changed, 106 insertions(+), 91 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/stacktrace/common.h
 >
->         return 0;
+> diff --git a/arch/arm64/include/asm/stacktrace.h b/arch/arm64/include/asm/stacktrace.h
+> index aec9315bf156..79f455b37c84 100644
+> --- a/arch/arm64/include/asm/stacktrace.h
+> +++ b/arch/arm64/include/asm/stacktrace.h
+> @@ -8,52 +8,19 @@
+>  #include <linux/percpu.h>
+>  #include <linux/sched.h>
+>  #include <linux/sched/task_stack.h>
+> -#include <linux/types.h>
+>  #include <linux/llist.h>
+>
+>  #include <asm/memory.h>
+>  #include <asm/ptrace.h>
+>  #include <asm/sdei.h>
+>
+> -enum stack_type {
+> -       STACK_TYPE_UNKNOWN,
+> -       STACK_TYPE_TASK,
+> -       STACK_TYPE_IRQ,
+> -       STACK_TYPE_OVERFLOW,
+> -       STACK_TYPE_SDEI_NORMAL,
+> -       STACK_TYPE_SDEI_CRITICAL,
+> -       __NR_STACK_TYPES
+> -};
+> -
+> -struct stack_info {
+> -       unsigned long low;
+> -       unsigned long high;
+> -       enum stack_type type;
+> -};
+> +#include <asm/stacktrace/common.h>
+>
+>  extern void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk,
+>                            const char *loglvl);
+>
+>  DECLARE_PER_CPU(unsigned long *, irq_stack_ptr);
+>
+> -static inline bool on_stack(unsigned long sp, unsigned long size,
+> -                           unsigned long low, unsigned long high,
+> -                           enum stack_type type, struct stack_info *info)
+> -{
+> -       if (!low)
+> -               return false;
+> -
+> -       if (sp < low || sp + size < sp || sp + size > high)
+> -               return false;
+> -
+> -       if (info) {
+> -               info->low = low;
+> -               info->high = high;
+> -               info->type = type;
+> -       }
+> -       return true;
+> -}
+> -
+>  static inline bool on_irq_stack(unsigned long sp, unsigned long size,
+>                                 struct stack_info *info)
+>  {
+> diff --git a/arch/arm64/include/asm/stacktrace/common.h b/arch/arm64/include/asm/stacktrace/common.h
+> new file mode 100644
+> index 000000000000..64ae4f6b06fe
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/stacktrace/common.h
+> @@ -0,0 +1,105 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Common arm64 stack unwinder code.
+> + *
+> + * Copyright (C) 2012 ARM Ltd.
+> + */
+> +#ifndef __ASM_STACKTRACE_COMMON_H
+> +#define __ASM_STACKTRACE_COMMON_H
+> +
+> +#include <linux/bitmap.h>
+> +#include <linux/bitops.h>
+> +#include <linux/types.h>
+> +
+> +enum stack_type {
+> +       STACK_TYPE_UNKNOWN,
+> +       STACK_TYPE_TASK,
+> +       STACK_TYPE_IRQ,
+> +       STACK_TYPE_OVERFLOW,
+> +       STACK_TYPE_SDEI_NORMAL,
+> +       STACK_TYPE_SDEI_CRITICAL,
+> +       __NR_STACK_TYPES
+> +};
+> +
+> +struct stack_info {
+> +       unsigned long low;
+> +       unsigned long high;
+> +       enum stack_type type;
+> +};
+> +
+> +/*
+> + * A snapshot of a frame record or fp/lr register values, along with some
+> + * accounting information necessary for robust unwinding.
+> + *
+> + * @fp:          The fp value in the frame record (or the real fp)
+> + * @pc:          The lr value in the frame record (or the real lr)
+> + *
+> + * @stacks_done: Stacks which have been entirely unwound, for which it is no
+> + *               longer valid to unwind to.
+> + *
+> + * @prev_fp:     The fp that pointed to this frame record, or a synthetic value
+> + *               of 0. This is used to ensure that within a stack, each
+> + *               subsequent frame record is at an increasing address.
+> + * @prev_type:   The type of stack this frame record was on, or a synthetic
+> + *               value of STACK_TYPE_UNKNOWN. This is used to detect a
+> + *               transition from one stack to another.
+> + *
+> + * @kr_cur:      When KRETPROBES is selected, holds the kretprobe instance
+> + *               associated with the most recently encountered replacement lr
+> + *               value.
+> + *
+> + * @task:        The task being unwound.
+> + */
+> +struct unwind_state {
+> +       unsigned long fp;
+> +       unsigned long pc;
+> +       DECLARE_BITMAP(stacks_done, __NR_STACK_TYPES);
+> +       unsigned long prev_fp;
+> +       enum stack_type prev_type;
+> +#ifdef CONFIG_KRETPROBES
+> +       struct llist_node *kr_cur;
+> +#endif
+> +       struct task_struct *task;
+> +};
+> +
+> +static inline bool on_stack(unsigned long sp, unsigned long size,
+> +                           unsigned long low, unsigned long high,
+> +                           enum stack_type type, struct stack_info *info)
+> +{
+> +       if (!low)
+> +               return false;
+> +
+> +       if (sp < low || sp + size < sp || sp + size > high)
+> +               return false;
+> +
+> +       if (info) {
+> +               info->low = low;
+> +               info->high = high;
+> +               info->type = type;
+> +       }
+> +       return true;
+> +}
+> +
+> +static inline void unwind_init_common(struct unwind_state *state,
+> +                                     struct task_struct *task)
+> +{
+> +       state->task = task;
+> +#ifdef CONFIG_KRETPROBES
+> +       state->kr_cur = NULL;
+> +#endif
+> +
+> +       /*
+> +        * Prime the first unwind.
+> +        *
+> +        * In unwind_next() we'll check that the FP points to a valid stack,
+> +        * which can't be STACK_TYPE_UNKNOWN, and the first unwind will be
+> +        * treated as a transition to whichever stack that happens to be. The
+> +        * prev_fp value won't be used, but we set it to 0 such that it is
+> +        * definitely not an accessible stack address.
+> +        */
+> +       bitmap_zero(state->stacks_done, __NR_STACK_TYPES);
+> +       state->prev_fp = 0;
+> +       state->prev_type = STACK_TYPE_UNKNOWN;
+> +}
+> +
+> +#endif /* __ASM_STACKTRACE_COMMON_H */
 > diff --git a/arch/arm64/kernel/stacktrace.c b/arch/arm64/kernel/stacktrace.c
-> index 834851939364..eef3cf6bf2d7 100644
+> index fcaa151b81f1..94a5dd2ab8fd 100644
 > --- a/arch/arm64/kernel/stacktrace.c
 > +++ b/arch/arm64/kernel/stacktrace.c
-> @@ -87,7 +87,7 @@ static int notrace unwind_next(struct unwind_state *state)
->         if (fp == (unsigned long)task_pt_regs(tsk)->stackframe)
->                 return -ENOENT;
+> @@ -18,63 +18,6 @@
+>  #include <asm/stack_pointer.h>
+>  #include <asm/stacktrace.h>
 >
-> -       err = unwind_next_common(state, &info);
-> +       err = unwind_next_common(state, &info, NULL);
->         if (err)
->                 return err;
->
+> -/*
+> - * A snapshot of a frame record or fp/lr register values, along with some
+> - * accounting information necessary for robust unwinding.
+> - *
+> - * @fp:          The fp value in the frame record (or the real fp)
+> - * @pc:          The lr value in the frame record (or the real lr)
+> - *
+> - * @stacks_done: Stacks which have been entirely unwound, for which it is no
+> - *               longer valid to unwind to.
+> - *
+> - * @prev_fp:     The fp that pointed to this frame record, or a synthetic value
+> - *               of 0. This is used to ensure that within a stack, each
+> - *               subsequent frame record is at an increasing address.
+> - * @prev_type:   The type of stack this frame record was on, or a synthetic
+> - *               value of STACK_TYPE_UNKNOWN. This is used to detect a
+> - *               transition from one stack to another.
+> - *
+> - * @kr_cur:      When KRETPROBES is selected, holds the kretprobe instance
+> - *               associated with the most recently encountered replacement lr
+> - *               value.
+> - *
+> - * @task:        The task being unwound.
+> - */
+> -struct unwind_state {
+> -       unsigned long fp;
+> -       unsigned long pc;
+> -       DECLARE_BITMAP(stacks_done, __NR_STACK_TYPES);
+> -       unsigned long prev_fp;
+> -       enum stack_type prev_type;
+> -#ifdef CONFIG_KRETPROBES
+> -       struct llist_node *kr_cur;
+> -#endif
+> -       struct task_struct *task;
+> -};
+> -
+> -static void unwind_init_common(struct unwind_state *state,
+> -                              struct task_struct *task)
+> -{
+> -       state->task = task;
+> -#ifdef CONFIG_KRETPROBES
+> -       state->kr_cur = NULL;
+> -#endif
+> -
+> -       /*
+> -        * Prime the first unwind.
+> -        *
+> -        * In unwind_next() we'll check that the FP points to a valid stack,
+> -        * which can't be STACK_TYPE_UNKNOWN, and the first unwind will be
+> -        * treated as a transition to whichever stack that happens to be. The
+> -        * prev_fp value won't be used, but we set it to 0 such that it is
+> -        * definitely not an accessible stack address.
+> -        */
+> -       bitmap_zero(state->stacks_done, __NR_STACK_TYPES);
+> -       state->prev_fp = 0;
+> -       state->prev_type = STACK_TYPE_UNKNOWN;
+> -}
+> -
+>  /*
+>   * Start an unwind from a pt_regs.
+>   *
 > --
 > 2.37.0.170.g444d1eabd0-goog
->
-> --
-> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
 >
 _______________________________________________
 kvmarm mailing list
