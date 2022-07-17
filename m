@@ -2,88 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D28A3C433EF
-	for <kvmarm@archiver.kernel.org>; Sun, 17 Jul 2022 09:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B64C3C433EF
+	for <kvmarm@archiver.kernel.org>; Sun, 17 Jul 2022 10:43:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 324724C893;
-	Sun, 17 Jul 2022 05:58:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE75B4B2BD;
+	Sun, 17 Jul 2022 06:43:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JGBkj9EeIW2o; Sun, 17 Jul 2022 05:58:01 -0400 (EDT)
+	with ESMTP id I6rM-UqJeqKl; Sun, 17 Jul 2022 06:43:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DFC04C896;
-	Sun, 17 Jul 2022 05:58:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BBE274C8F3;
+	Sun, 17 Jul 2022 06:43:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 96DBD4C893
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Jul 2022 05:58:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 47A934C8EB
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Jul 2022 06:43:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wZTIwfv9HSbG for <kvmarm@lists.cs.columbia.edu>;
- Sun, 17 Jul 2022 05:57:59 -0400 (EDT)
+ with ESMTP id AGqBmVivs3Tj for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 17 Jul 2022 06:43:27 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 522AD4C891
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Jul 2022 05:57:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 06D984C8DB
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Jul 2022 06:43:26 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 088D8B80D96;
- Sun, 17 Jul 2022 09:57:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1C58C3411E;
- Sun, 17 Jul 2022 09:57:56 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 723D4B80CBF;
+ Sun, 17 Jul 2022 10:43:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F299BC3411E;
+ Sun, 17 Jul 2022 10:43:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1658051876;
- bh=SwRUGIYuiONdg7eAHKWwZ3Mujc4biRRS1Cegr1HAD98=;
+ s=k20201202; t=1658054604;
+ bh=iSE5dgUJcHMVav4waBygNS5QidjTiMxbKVsgdaFAqYs=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=RB73boqw53PFFwQhWEcm4uDZQZRLDDG99oqBfxUrQiahGaDWsNCyEj0uzBwbpEHy3
- S8dG0Wk6wrPZXRULMG20yZ+VezW9wpX0G7nEc3trGkJxJfgUCHd1VaN9hRyUtHvcz7
- sfcV9jJ6l7y1aT4/8UwjwF6yYT/AiA8vY2Ha7VwyfPMZi5sBgPv3cUPHU3m1Is27ii
- M3M93p1WFZmvHxF5kzZ81Llz2E6mkFC9EvYM36jSfirEqQAfREYrfIlmKbjwH41Aqr
- xqjBsc/AUYQbZxmX1MA1lTnnWIzn+FOHO/dm2un81WgGo1rilxjocTeI6V06VqEslU
- yNqoL9KNtKQFg==
-Received: from sofa.misterjones.org ([185.219.108.64]
- helo=wait-a-minute.misterjones.org)
+ b=pSDnm/bUaknyQUw4WtskGPATYLxLnKQCfWgTvIyHJgF8uJ1HwYJwGUwYPajhfd8EY
+ vldkMUD69pMh3b4/VLKtDGI3NPX+y21m65HxI4woQSD8kQYIbrpXNee4J0AniDuCTS
+ 1VfZ/eNRglHrZ5Qav54KI0RpKu0tNb4T9pklF7cWdmsQH31XTrFJgMtzOdB9PECj17
+ k27QfWcp5CV1xxm+6OlrG98awCowRoP9FsrFfF+7As3oAFfVd+5jvdsYpbSKllBqLX
+ u/pc9AYjEOugirgq0RP5Hsd0PaWNfE88DoSm5u/v3TqKfEx8FA8EmuH1TZESnqaMTB
+ pAdNh05imlNWg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oD12A-007zXP-4y;
- Sun, 17 Jul 2022 10:57:54 +0100
-Date: Sun, 17 Jul 2022 10:57:47 +0100
-Message-ID: <87k08c3vtw.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oD1k9-007zpX-Tw;
+ Sun, 17 Jul 2022 11:43:22 +0100
+Date: Sun, 17 Jul 2022 11:43:21 +0100
+Message-ID: <87zgh8yq7q.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v4 06/18] arm64: stacktrace: Add description of
- stacktrace/common.h
-In-Reply-To: <20220715061027.1612149-7-kaleshsingh@google.com>
-References: <20220715061027.1612149-1-kaleshsingh@google.com>
- <20220715061027.1612149-7-kaleshsingh@google.com>
+Subject: Re: [PATCH] KVM: arm64: Fix hypervisor address symbolization
+In-Reply-To: <20220715235824.2549012-1-kaleshsingh@google.com>
+References: <20220715235824.2549012-1-kaleshsingh@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kaleshsingh@google.com, mark.rutland@arm.com,
- broonie@kernel.org, madvenka@linux.microsoft.com, will@kernel.org,
- qperret@google.com, tabba@google.com, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
- andreyknvl@gmail.com, russell.king@oracle.com, vincenzo.frascino@arm.com,
- mhiramat@kernel.org, ast@kernel.org, drjones@redhat.com,
- wangkefeng.wang@huawei.com, elver@google.com, keirf@google.com,
- yuzenghui@huawei.com, ardb@kernel.org, oupton@google.com,
+ broonie@kernel.org, madvenka@linux.microsoft.com, tabba@google.com,
+ will@kernel.org, qperret@google.com, android-mm@google.com,
+ kernel-team@android.com, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, catalin.marinas@arm.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org, android-mm@google.com, kernel-team@android.com
+ linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: wangkefeng.wang@huawei.com, elver@google.com, catalin.marinas@arm.com,
- ast@kernel.org, vincenzo.frascino@arm.com, will@kernel.org,
- android-mm@google.com, kvmarm@lists.cs.columbia.edu,
- madvenka@linux.microsoft.com, linux-arm-kernel@lists.infradead.org,
- andreyknvl@gmail.com, kernel-team@android.com, drjones@redhat.com,
- broonie@kernel.org, russell.king@oracle.com, linux-kernel@vger.kernel.org,
- mhiramat@kernel.org
+Cc: android-mm@google.com, kernel-team@android.com,
+ linux-kernel@vger.kernel.org, madvenka@linux.microsoft.com, broonie@kernel.org,
+ linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,35 +92,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 15 Jul 2022 07:10:15 +0100,
+On Sat, 16 Jul 2022 00:58:24 +0100,
 Kalesh Singh <kaleshsingh@google.com> wrote:
 > 
-> Add brief description on how to use stacktrace/common.h to implement
-> a stack unwinder.
+> With CONFIG_RANDOMIZE_BASE=y vmlinux addresses will resolve correctly
+
+I guess you mean *incorrectly* here, right?
+
+> from kallsyms. Fix this by adding the KASLR offset before printing the
+> symbols.
 > 
+> Based on arm64 for-next/stacktrace.
+
+In general, place these remarks after the '---' line, as they don't
+really make sense in the commit itself (which is likely to be merged
+on a different base anyway).
+
+> 
+> Fixes: 6ccf9cb557bd ("KVM: arm64: Symbolize the nVHE HYP addresses")
+> Reported-by: Fuad Tabba <tabba@google.com>
 > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
 > ---
->  arch/arm64/include/asm/stacktrace/common.h | 8 ++++++++
->  1 file changed, 8 insertions(+)
+>  arch/arm64/kvm/handle_exit.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/stacktrace/common.h b/arch/arm64/include/asm/stacktrace/common.h
-> index f86efe71479d..b362086f4c70 100644
-> --- a/arch/arm64/include/asm/stacktrace/common.h
-> +++ b/arch/arm64/include/asm/stacktrace/common.h
-> @@ -2,6 +2,14 @@
->  /*
->   * Common arm64 stack unwinder code.
->   *
-> + * To implement a new arm64 stack unwinder:
-> + *     1) Include this header
-> + *
-> + *     2) Provide implementations for the following functions:
-> + *            - on_overflow_stack()
-> + *            - on_accessible_stack()
-> + *            - unwind_next()
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index f66c0142b335..e43926ef2bc2 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -347,10 +347,10 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
+>  			kvm_err("nVHE hyp BUG at: %s:%u!\n", file, line);
+>  		else
+>  			kvm_err("nVHE hyp BUG at: [<%016llx>] %pB!\n", panic_addr,
+> -					(void *)panic_addr);
+> +					(void *)(panic_addr + kaslr_offset()));
+>  	} else {
+>  		kvm_err("nVHE hyp panic at: [<%016llx>] %pB!\n", panic_addr,
+> -				(void *)panic_addr);
+> +				(void *)(panic_addr + kaslr_offset()));
+>  	}
+>  
+>  	/*
+> 
 
-A short description of what these helpers are supposed to do would
-also be helpful.
+I'll fix the above as I apply the patch, no need to respin.
 
 Thanks,
 
