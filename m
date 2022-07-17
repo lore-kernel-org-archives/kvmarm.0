@@ -2,58 +2,88 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31D65C433EF
-	for <kvmarm@archiver.kernel.org>; Sun, 17 Jul 2022 09:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D28A3C433EF
+	for <kvmarm@archiver.kernel.org>; Sun, 17 Jul 2022 09:58:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8991B4C81B;
-	Sun, 17 Jul 2022 05:28:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 324724C893;
+	Sun, 17 Jul 2022 05:58:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XILMjVftFFJM; Sun, 17 Jul 2022 05:28:42 -0400 (EDT)
+	with ESMTP id JGBkj9EeIW2o; Sun, 17 Jul 2022 05:58:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DBAD4C291;
-	Sun, 17 Jul 2022 05:28:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DFC04C896;
+	Sun, 17 Jul 2022 05:58:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BC9A54C8D9
- for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Jul 2022 17:48:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 96DBD4C893
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Jul 2022 05:58:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mMm4LlDZlJA5 for <kvmarm@lists.cs.columbia.edu>;
- Sat, 16 Jul 2022 17:48:17 -0400 (EDT)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8837E4C8D8
- for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Jul 2022 17:48:17 -0400 (EDT)
-MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1658008095;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=x3HXgQUrco41LDbc708fhSxzFK309rLRf0po+Yszzrw=;
- b=eCdBgF63tI6bMObcpQ2Y+ue1cynT4Jr8YlUT8CmT88+KL0ZW5coTxvgDrWRKX0eWg+R9XG
- pAOeZUmflMafSfx6A4PQQXlBtoyV3SsnNpBSBlNL+gWLnU3/za90g0hILCXV5Yc4rzKB6w
- 8Z2sLk2hjVwpKt6sYGVst9+JhM6176I=
-Date: Sat, 16 Jul 2022 21:48:13 +0000
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: oliver.upton@linux.dev
-Message-ID: <385aa28ad559874da8429c40a68570df@linux.dev>
-Subject: Re: [PATCH v2] KVM: selftests: Fix target thread to be migrated
- in rseq_test
-To: "Gavin Shan" <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu
-In-Reply-To: <20220716144537.3436743-1-gshan@redhat.com>
-References: <20220716144537.3436743-1-gshan@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Mailman-Approved-At: Sun, 17 Jul 2022 05:28:40 -0400
-Cc: shan.gavin@gmail.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
- shuah@kernel.org
+ with ESMTP id wZTIwfv9HSbG for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 17 Jul 2022 05:57:59 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 522AD4C891
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Jul 2022 05:57:59 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 088D8B80D96;
+ Sun, 17 Jul 2022 09:57:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1C58C3411E;
+ Sun, 17 Jul 2022 09:57:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1658051876;
+ bh=SwRUGIYuiONdg7eAHKWwZ3Mujc4biRRS1Cegr1HAD98=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=RB73boqw53PFFwQhWEcm4uDZQZRLDDG99oqBfxUrQiahGaDWsNCyEj0uzBwbpEHy3
+ S8dG0Wk6wrPZXRULMG20yZ+VezW9wpX0G7nEc3trGkJxJfgUCHd1VaN9hRyUtHvcz7
+ sfcV9jJ6l7y1aT4/8UwjwF6yYT/AiA8vY2Ha7VwyfPMZi5sBgPv3cUPHU3m1Is27ii
+ M3M93p1WFZmvHxF5kzZ81Llz2E6mkFC9EvYM36jSfirEqQAfREYrfIlmKbjwH41Aqr
+ xqjBsc/AUYQbZxmX1MA1lTnnWIzn+FOHO/dm2un81WgGo1rilxjocTeI6V06VqEslU
+ yNqoL9KNtKQFg==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oD12A-007zXP-4y;
+ Sun, 17 Jul 2022 10:57:54 +0100
+Date: Sun, 17 Jul 2022 10:57:47 +0100
+Message-ID: <87k08c3vtw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kalesh Singh <kaleshsingh@google.com>
+Subject: Re: [PATCH v4 06/18] arm64: stacktrace: Add description of
+ stacktrace/common.h
+In-Reply-To: <20220715061027.1612149-7-kaleshsingh@google.com>
+References: <20220715061027.1612149-1-kaleshsingh@google.com>
+ <20220715061027.1612149-7-kaleshsingh@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kaleshsingh@google.com, mark.rutland@arm.com,
+ broonie@kernel.org, madvenka@linux.microsoft.com, will@kernel.org,
+ qperret@google.com, tabba@google.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
+ andreyknvl@gmail.com, russell.king@oracle.com, vincenzo.frascino@arm.com,
+ mhiramat@kernel.org, ast@kernel.org, drjones@redhat.com,
+ wangkefeng.wang@huawei.com, elver@google.com, keirf@google.com,
+ yuzenghui@huawei.com, ardb@kernel.org, oupton@google.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org, android-mm@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: wangkefeng.wang@huawei.com, elver@google.com, catalin.marinas@arm.com,
+ ast@kernel.org, vincenzo.frascino@arm.com, will@kernel.org,
+ android-mm@google.com, kvmarm@lists.cs.columbia.edu,
+ madvenka@linux.microsoft.com, linux-arm-kernel@lists.infradead.org,
+ andreyknvl@gmail.com, kernel-team@android.com, drjones@redhat.com,
+ broonie@kernel.org, russell.king@oracle.com, linux-kernel@vger.kernel.org,
+ mhiramat@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,74 +100,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Gavin,
-
-Thanks for cleaning this up.
-
-July 16, 2022 7:45 AM, "Gavin Shan" <gshan@redhat.com> wrote:
-> In rseq_test, there are two threads, which are thread group leader
-> and migration worker. The migration worker relies on sched_setaffinity()
-> to force migration on the thread group leader.
-
-It may be clearer to describe it as a vCPU thread and a migration worker
-thread. The meat of this test is to catch a regression in KVM.
-
-> Unfortunately, we have
-
-s/we have/the test has the/
-
-> wrong parameter (0) passed to sched_getaffinity().
-
-wrong PID
-
-> It's actually
-> forcing migration on the migration worker instead of the thread group
-> leader.
-
-What's missing is _why_ the migration worker is getting moved around by
-the call. Perhaps instead it is better to state what a PID of 0 implies,
-for those of us who haven't read their manpages in a while ;-)
-
-> It also means migration can happen on the thread group leader
-> at any time, which eventually leads to failure as the following logs
-> show.
+On Fri, 15 Jul 2022 07:10:15 +0100,
+Kalesh Singh <kaleshsingh@google.com> wrote:
 > 
-> host# uname -r
-> 5.19.0-rc6-gavin+
-> host# # cat /proc/cpuinfo | grep processor | tail -n 1
-> processor : 223
-> host# pwd
-> /home/gavin/sandbox/linux.main/tools/testing/selftests/kvm
-> host# for i in `seq 1 100`; \
-> do echo "--------> $i"; ./rseq_test; done
-> --------> 1
-> --------> 2
-> --------> 3
-> --------> 4
-> --------> 5
-> --------> 6
-> ==== Test Assertion Failure ====
-> rseq_test.c:265: rseq_cpu == cpu
-> pid=3925 tid=3925 errno=4 - Interrupted system call
-> 1 0x0000000000401963: main at rseq_test.c:265 (discriminator 2)
-> 2 0x0000ffffb044affb: ?? ??:0
-> 3 0x0000ffffb044b0c7: ?? ??:0
-> 4 0x0000000000401a6f: _start at ??:?
-> rseq CPU = 4, sched CPU = 27
+> Add brief description on how to use stacktrace/common.h to implement
+> a stack unwinder.
 > 
-> This fixes the issue by passing correct parameter, tid of the group
-> thread leader, to sched_setaffinity().
+> Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+> ---
+>  arch/arm64/include/asm/stacktrace/common.h | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/stacktrace/common.h b/arch/arm64/include/asm/stacktrace/common.h
+> index f86efe71479d..b362086f4c70 100644
+> --- a/arch/arm64/include/asm/stacktrace/common.h
+> +++ b/arch/arm64/include/asm/stacktrace/common.h
+> @@ -2,6 +2,14 @@
+>  /*
+>   * Common arm64 stack unwinder code.
+>   *
+> + * To implement a new arm64 stack unwinder:
+> + *     1) Include this header
+> + *
+> + *     2) Provide implementations for the following functions:
+> + *            - on_overflow_stack()
+> + *            - on_accessible_stack()
+> + *            - unwind_next()
 
-Kernel commit messages should have an imperative tone:
+A short description of what these helpers are supposed to do would
+also be helpful.
 
-Fix the issue by ...
+Thanks,
 
-> Fixes: 61e52f1630f5 ("KVM: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs")
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
+	M.
 
-With the comments on the commit message addressed:
-
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
