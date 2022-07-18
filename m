@@ -2,78 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88045C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 17:18:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E16DFC433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 17:27:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E42E94D6F9;
-	Mon, 18 Jul 2022 13:18:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 702BE4D739;
+	Mon, 18 Jul 2022 13:27:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dyEpOxq85U04; Mon, 18 Jul 2022 13:18:45 -0400 (EDT)
+	with ESMTP id kBncNnB08t5F; Mon, 18 Jul 2022 13:27:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C462D4D3DB;
-	Mon, 18 Jul 2022 13:18:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32FFD4D746;
+	Mon, 18 Jul 2022 13:27:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 26CAA4D3A0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 13:18:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 370174D739
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 13:27:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xEebd1-0mVY7 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jul 2022 13:18:44 -0400 (EDT)
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com
- [209.85.216.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 03EB74D39B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 13:18:43 -0400 (EDT)
-Received: by mail-pj1-f45.google.com with SMTP id p9so12356302pjd.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 10:18:43 -0700 (PDT)
+ with ESMTP id 8C-XbrDYV5zU for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jul 2022 13:27:20 -0400 (EDT)
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com
+ [209.85.221.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E77D04D71F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 13:27:19 -0400 (EDT)
+Received: by mail-wr1-f51.google.com with SMTP id r14so18114601wrg.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 10:27:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=O+93vwyZCBtIfSzt+zHZDwMtD0oUi0EihMlo7pm6fvc=;
- b=r6OoQJ3en6er/iZYe0wnDU0KNgKRWt+E0a8EaCaViv/9dnMVeDBoImj2fdN8lMKU0Z
- +ODctnO2E+tj3jyYyXR0Q/kctG9PaBcw+yg94KJZ9DIBtc3cUQs15pb87aPaZvRTWGA9
- fc365G0ro09jgrY2VdDJ7/l3PKyOg4VCdMTOE13LoX5TMUuhcGU2rw3T6aJCJP+IVhan
- vv/Z200yFtPdGSUlmAxckM/3xVG+GM+vCc/UDUuyjUda8UbchATNR3sfDPEez7/4y9Uu
- n134Hfah/MxdViGOOkSrtVvXRH0sNRa6VhrhDhkyKmnP5XZzVDfUqL/57mNSCNtz7KD1
- l5KQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=NarkEMjRQJGNapnFE354uoBB/FLZcCCiwC99PqFL5qY=;
+ b=S68ky+N9MIZZqrGTw9WcCJuhoDR9m6g+zzdzjK+mpiGOlOMkgUPViUE0yazvxbTVav
+ Yrq5OCexwM9wOYoRIMSmHKvc1e1P1m2lzlsgZsk2EINVKLs8FbE86MSoh6jbX/64wkKa
+ TmI3gVVD5vqZl8NwUinYueWQFaCGVMMcBymaWzUannVPb7zYVB2aes/zUjEB7Gqvz8oP
+ ckNfx0wCYQeIKHff5noIKIPvpUTw9XiQOQs7/yQitKejqOP2jE8lybHPfHJRsnt3DgcJ
+ F4v8L+of8kaCZh2iyCodYJ8P9j81QmB/E5GcG0DzpcCt6yBrW7SIvBDgrvYpLW7gCO2l
+ PB1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=O+93vwyZCBtIfSzt+zHZDwMtD0oUi0EihMlo7pm6fvc=;
- b=H86oezPiwmcazNdqF5tsgtKwVDmzXl4DbAS8jM2raveG+t+0gRmhUsqSxkBkCZ2/Zo
- dpjDKY5NRqUPbardQQUcdxrvfNpO0qfCc7Qym6AZeYLA7JE+MUqMNnEX0EjByTKYtKeG
- X3ekzGWKRgSDRzXfUkpSNRKkehXQoot6+6cTxpTd4wYLH9Xs7kb3j+0cyS6AkEtrKKXe
- dr0k9PiWJ3sewrtPvyaKl4dVZptzZP2rY/KeqJKkXkRteguAMz/kIrQoW6pSe8WbjWu6
- GMuc3ldSDG9+kuR+xxk4+xrdHI8kgRi/GwEf/Afbvdti4JhW+taXnrXX07qF75+WGEtp
- +zdw==
-X-Gm-Message-State: AJIora/kKi62NmWyuOwedfNhyvZ59fWJTE7nf+cToNod261gJGrhKSgg
- yOdlxe+CtH6LeBvlQ2g+qT2jAg==
-X-Google-Smtp-Source: AGRyM1tvU8nSRHjMbzxG++8pKT3KPkxakjucMRyr+1ZsowRIduO2aS8kjdBQ7saWuuzuAyWaltgE1A==
-X-Received: by 2002:a17:90b:3b4b:b0:1ef:f5b0:ce60 with SMTP id
- ot11-20020a17090b3b4b00b001eff5b0ce60mr40865600pjb.71.1658164722909; 
- Mon, 18 Jul 2022 10:18:42 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150]) by smtp.gmail.com with ESMTPSA id
- w24-20020aa79558000000b0052af2e8bba3sm9556204pfq.37.2022.07.18.10.18.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 Jul 2022 10:18:42 -0700 (PDT)
-Date: Mon, 18 Jul 2022 10:18:37 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH 0/3] arm: pmu: Fixes for bare metal
-Message-ID: <YtWV7fDh9ihufLhM@google.com>
-References: <20220718154910.3923412-1-ricarkol@google.com>
- <YtWNYGuP/Nu1HwDU@monolith.localdoman>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=NarkEMjRQJGNapnFE354uoBB/FLZcCCiwC99PqFL5qY=;
+ b=MD6r9ESrYL0KsJDL+wk7pPJsExEzw9dXR9Ln8r3SCTWcy1WuscFon9boolTyMkpm2+
+ TLemOeEUmQ38XoUukA9lOZq8No4L5gMlWd6JswJAVPFUf/Q1htBSqg9Nacojz5ua5emO
+ Bfma78YowbLHQv98F2MwMNzLjTYyneKdFMIRG0zqqJAgQHu8P/skuR6otx3/VBveNbKJ
+ JGiGwawoEZsypvoiMlm1JfQewwXEd7S+tdt9Puq1RHNHLpnMnZLqDN/FT4VRkZ+4sgWv
+ MfgnzSepm1s9YzONAkXPRb+VgKH7Fsqzw/5g3JqdfeaP2T2JIR7kg2c3/2Il95Gpqy6W
+ o0iQ==
+X-Gm-Message-State: AJIora9ObfBIRPaoIGyqqsJ2pz3GTGWWoilJbJRf84uieXZYo3zNsaaj
+ k63L7f8NzJVcLUYj0K49fQ0VWjVqopnYFTqS8DzSZQ==
+X-Google-Smtp-Source: AGRyM1uwq/757n/imP51CRNLieGFzZptqlZ7Lr0+jvfWuU7btodZ8udc9faDQUfo4/sXOUPE8dWEAhnfKnXpHMNeznk=
+X-Received: by 2002:a05:6000:1e04:b0:21d:7ec3:fe5a with SMTP id
+ bj4-20020a0560001e0400b0021d7ec3fe5amr23991658wrb.116.1658165238673; Mon, 18
+ Jul 2022 10:27:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YtWNYGuP/Nu1HwDU@monolith.localdoman>
-Cc: kvm@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
- andrew.jones@linux.dev, kvmarm@lists.cs.columbia.edu
+References: <20220715061027.1612149-1-kaleshsingh@google.com>
+ <20220715061027.1612149-10-kaleshsingh@google.com>
+ <87bktm51xf.wl-maz@kernel.org>
+In-Reply-To: <87bktm51xf.wl-maz@kernel.org>
+From: Kalesh Singh <kaleshsingh@google.com>
+Date: Mon, 18 Jul 2022 10:27:07 -0700
+Message-ID: <CAC_TJvdP4joAFP0bgfKGbqsXDANGAzUiwijmhvqJsGGEqkwRdA@mail.gmail.com>
+Subject: Re: [PATCH v4 09/18] KVM: arm64: Allocate shared pKVM hyp stacktrace
+ buffers
+To: Marc Zyngier <maz@kernel.org>
+Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
+ vincenzo.frascino@arm.com, Will Deacon <will@kernel.org>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>,
+ "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+ andreyknvl@gmail.com, "Cc: Android Kernel" <kernel-team@android.com>,
+ Marco Elver <elver@google.com>, Mark Brown <broonie@kernel.org>,
+ "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
+ <linux-arm-kernel@lists.infradead.org>, russell.king@oracle.com,
+ LKML <linux-kernel@vger.kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,44 +93,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jul 18, 2022 at 05:42:08PM +0100, Alexandru Elisei wrote:
-> Hi,
-> 
-> I believe you're missing the updated email for the arm maintainer. Added it.
-> 
-> Thanks,
-> Alex
-> 
-> On Mon, Jul 18, 2022 at 08:49:07AM -0700, Ricardo Koller wrote:
-> > There are some tests that fail when running on bare metal (including a
-> > passthrough prototype).  There are three issues with the tests.  The
-> > first one is that there are some missing isb()'s between enabling event
-> > counting and the actual counting. This wasn't an issue on KVM as
-> > trapping on registers served as context synchronization events. The
-> > second issue is that some tests assume that registers reset to 0.  And
-> > finally, the third issue is that overflowing the low counter of a
-> > chained event sets the overflow flag in PMVOS and some tests fail by
-> > checking for it not being set.
-> > 
-> > I believe the third fix also requires a KVM change, but would like to
-> > double check with others first.  The only reference I could find in the
-> > ARM ARM is the AArch64.IncrementEventCounter() pseudocode (DDI 0487H.a,
-> > J1.1.1 "aarch64/debug") that unconditionally sets the PMOVS bit on
-> > overflow.
-> > 
-> > Ricardo Koller (3):
-> >   arm: pmu: Add missing isb()'s after sys register writing
-> >   arm: pmu: Reset the pmu registers before starting some tests
-> >   arm: pmu: Remove checks for !overflow in chained counters tests
-> > 
-> >  arm/pmu.c | 34 +++++++++++++++++++++++-----------
-> >  1 file changed, 23 insertions(+), 11 deletions(-)
-> > 
-> > -- 
-> > 2.37.0.170.g444d1eabd0-goog
-> > 
+On Mon, Jul 18, 2022 at 12:13 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Fri, 15 Jul 2022 07:10:18 +0100,
+> Kalesh Singh <kaleshsingh@google.com> wrote:
+> >
+> > In protected nVHE mode the host cannot directly access
+> > hypervisor memory, so we will dump the hypervisor stacktrace
+> > to a shared buffer with the host.
+> >
+> > The minimum size do the buffer required, assuming the min frame
+>
+> s/do/for/ ?
+Ack
 
-Right, I forgot about the new email. Thanks for the forwarding!
+>
+> > size of [x29, x30] (2 * sizeof(long)), is half the combined size of
+> > the hypervisor and overflow stacks plus an additional entry to
+> > delimit the end of the stacktrace.
+>
+> Let me see if I understand this: the maximum stack size is the
+> combination of the HYP and overflow stacks, and the smallest possible
+> stack frame is 128bit (only FP+LR). The buffer thus needs to provide
+> one 64bit entry per stack frame that fits in the combined stack, plus
+> one entry as an end marker.
+>
+> So the resulting size is half of the combined stack size, plus a
+> single 64bit word. Is this correct?
+
+That understanding is correct. So for the 64 KB pages is slightly more
+than half a page (overflow stack is 4KB).
+
+>
+> >
+> > The stacktrace buffers are used later in the seried to dump the
+> > nVHE hypervisor stacktrace when using protected-mode.
+> >
+> > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+> > ---
+> >  arch/arm64/include/asm/memory.h      | 7 +++++++
+> >  arch/arm64/kvm/hyp/nvhe/stacktrace.c | 4 ++++
+> >  2 files changed, 11 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+> > index 0af70d9abede..28a4893d4b84 100644
+> > --- a/arch/arm64/include/asm/memory.h
+> > +++ b/arch/arm64/include/asm/memory.h
+> > @@ -113,6 +113,13 @@
+> >
+> >  #define OVERFLOW_STACK_SIZE  SZ_4K
+> >
+> > +/*
+> > + * With the minimum frame size of [x29, x30], exactly half the combined
+> > + * sizes of the hyp and overflow stacks is needed to save the unwinded
+> > + * stacktrace; plus an additional entry to delimit the end.
+> > + */
+> > +#define NVHE_STACKTRACE_SIZE ((OVERFLOW_STACK_SIZE + PAGE_SIZE) / 2 + sizeof(long))
+> > +
+> >  /*
+> >   * Alignment of kernel segments (e.g. .text, .data).
+> >   *
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/stacktrace.c b/arch/arm64/kvm/hyp/nvhe/stacktrace.c
+> > index a3d5b34e1249..69e65b457f1c 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/stacktrace.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/stacktrace.c
+> > @@ -9,3 +9,7 @@
+> >
+> >  DEFINE_PER_CPU(unsigned long [OVERFLOW_STACK_SIZE/sizeof(long)], overflow_stack)
+> >       __aligned(16);
+> > +
+> > +#ifdef CONFIG_PROTECTED_NVHE_STACKTRACE
+> > +DEFINE_PER_CPU(unsigned long [NVHE_STACKTRACE_SIZE/sizeof(long)], pkvm_stacktrace);
+> > +#endif /* CONFIG_PROTECTED_NVHE_STACKTRACE */
+>
+> OK, so the allocation exists even if KVM is not running in protected
+> mode. I guess this is OK for now, but definitely reinforces my request
+> that this is only there when compiled for debug mode.
+>
+
+Yes, but in the case you aren't running protected mode you can avoid
+it by setting PROTECTED_NVHE_STACKTRACE=n.
+
+Thanks,
+Kalesh
+
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
