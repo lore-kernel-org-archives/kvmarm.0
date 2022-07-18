@@ -2,77 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA355C43334
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 15:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A28C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 15:49:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F7084D781;
-	Mon, 18 Jul 2022 11:26:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F9204D3DF;
+	Mon, 18 Jul 2022 11:49:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QchoYgG9Pt0p; Mon, 18 Jul 2022 11:26:29 -0400 (EDT)
+	with ESMTP id X7bQ1Ldo2Vuq; Mon, 18 Jul 2022 11:49:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 683514D783;
-	Mon, 18 Jul 2022 11:26:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FB854D465;
+	Mon, 18 Jul 2022 11:49:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73BC04D77F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 11:26:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B37EA4D3AB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 11:49:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nCIQI0Ns4IW9 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jul 2022 11:26:26 -0400 (EDT)
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com
- [209.85.221.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9DCD94D77C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 11:26:26 -0400 (EDT)
-Received: by mail-wr1-f45.google.com with SMTP id e15so12322376wro.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 08:26:26 -0700 (PDT)
+ with ESMTP id WJ3K-Yi6btjh for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jul 2022 11:49:14 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C11F4D3A8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 11:49:14 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ l6-20020a25bf86000000b00668c915a3f2so8911128ybk.4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 08:49:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9BBVisBKsOuFCaWJW8FqdMGsV9Mygag9vrni2gyPgdU=;
- b=CUyuRNfL6dcWl8MLZeFSVk8tNPeTGHtXtUStezWSKnMCMQCNstnVXqZYu5JxnTR7XJ
- MgEdWQe6GIYxOm9d0jUxEMbXZT4QzlhuDtqLAQnNlmOC+xKs4Xob9FYC+fBNTcHUxnsy
- HHcRYuBLWUxSZtpxe60S0/VvOUxudhJXeHOT4xNfRz4zbnJzfaaBMegZLqUlfoJ/sbDP
- 1dlE6XpeeUeaBRCQsaPU1W4T0Nyu7pYANTvJe4gR6Ua3pjAm9Kxk5U+W3v4VP7m+g6em
- pKl61h4thU0W5+v4LUaPCmtWfiTGO1Hssft8jq+dHhj2k/2FhkyImBMazQ2s7EkJw5th
- rTBA==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=8hwXAbTV7Qa4wgHWw/mu6mOGF7/qMo3iMN2FISfVMjY=;
+ b=tDbu/3n2A7sX0LInLF6tQ2mZSs3mTOiAz4QgK4s4r7Fc3GLZoH8VInfZWm7NPNXzMA
+ xSYhoBx7dSyl5/U6tDUfmYKVDVfFwZ20vVWr4oSKwrOXnQl0yxnlK5v5ztb+T3uMxBhC
+ HZc+U45bxGDItNRDTapkcybXZxmfFM4Sn8NPuWszObhLyL5qJGKAhfJAJuBYIOboxE/Q
+ /SXu0XpAgSPU1Zi8fjFZ/p3u2/7h09X+G4MJF7+MfGMLvMpEN5O6/Mv/QSDl6vJ6wGl0
+ e4aukyv6SY+6N/qFj8PJiPPmWFIIW6AvnL9e/VANyuaqFAAxYWWvjf+UQ7V1CYQFZuAP
+ 5Xbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=9BBVisBKsOuFCaWJW8FqdMGsV9Mygag9vrni2gyPgdU=;
- b=SfBKlgbpm5OujcnA2jQLskD9EOu4lHq1/uqAx/c8aJ3x2U656r1QWFkhrlkleTZg4S
- 27jYaPfij7dz9mv6uD0De8pCdgn+gQ81svWabI3L7GypbdCDgkNUn0WLdzgOloc87wq7
- SeFScDqEHGkCEG6LwCZr3wK2PK5IWQXlFWbyG4LVA0ogaHLhiM/1M8rM72iE3qlLvncj
- WJ8WKsfjSWvlcwyL6WQwSV6Ibs6CXALkpo3KVwNeHipNrgwSJsXlSU+xHV3nB0/eG5J+
- R3W7EgGpGckgF4vejedlXL3oKT8pJk4WbEG1JnVel4OJFrnVJzCN9vVRriicrNcB02Wh
- Mp7w==
-X-Gm-Message-State: AJIora8U+xsZ6CO7H+ICXK7raqbanh/IYl8CYsXGuDn3/s0BobnUsaAV
- pK3L1do1eGa/LZocKtvJ7+pboKceVrsYahkAnGNL/A==
-X-Google-Smtp-Source: AGRyM1tfqA8v+n1Iv8tYAEsEUB8q11/C1gFI8FcWWbqI2+1eCRD0k/mPREZSFCgipbsHK41VXaxBHzuGqizqDY8qyP0=
-X-Received: by 2002:a05:6000:1e04:b0:21d:7ec3:fe5a with SMTP id
- bj4-20020a0560001e0400b0021d7ec3fe5amr23615636wrb.116.1658157985222; Mon, 18
- Jul 2022 08:26:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220715061027.1612149-1-kaleshsingh@google.com>
- <20220715061027.1612149-2-kaleshsingh@google.com>
- <YtVXokYGdlq1maQu@shell.armlinux.org.uk>
-In-Reply-To: <YtVXokYGdlq1maQu@shell.armlinux.org.uk>
-From: Kalesh Singh <kaleshsingh@google.com>
-Date: Mon, 18 Jul 2022 08:26:14 -0700
-Message-ID: <CAC_TJvfZG6CQOdSKeiNfVQhmL2TyeEuFbo9qo9yT20Qh49d3ZQ@mail.gmail.com>
-Subject: Re: [PATCH v4 01/18] arm64: stacktrace: Add shared header for common
- stack unwinding code
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: wangkefeng.wang@huawei.com, catalin.marinas@arm.com, elver@google.com,
- vincenzo.frascino@arm.com, will@kernel.org, android-mm@google.com,
- maz@kernel.org, kvmarm@lists.cs.columbia.edu, madvenka@linux.microsoft.com,
- linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
- drjones@redhat.com, ast@kernel.org, broonie@kernel.org, andreyknvl@gmail.com,
- linux-kernel@vger.kernel.org, mhiramat@kernel.org
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=8hwXAbTV7Qa4wgHWw/mu6mOGF7/qMo3iMN2FISfVMjY=;
+ b=te25Szj7UaohZDXNk/Z6lk8yZ05kf6/cNNOQk1sOGYZ3KxuxIvG5AVzHR/k2IwNmj+
+ hF2G4UK2LfNMG5zKagMMz+VyLcYoMrU+gnb4USDo1FTDfm28Pha29Vm41Rpn8qzy1Fpx
+ Q9yI0GYYuGXdLS4pQmrYnVrk4qocwLpgdY7v6z4CB2CCssYLoHW6hEEJUoRVtzamd7yD
+ ZXAAv5xRtInY1HynNe9+WVB6eiRbkoML7EHL1ANKav7NAjhDBsnj0VjEqoVtAbem+MFc
+ yT5uILzFcAtKBS1pgrJCoeQjnv4T7gjC1TexH5F/cm9+6a18EJqx9Wj+1zuHluyOomwf
+ X+Vw==
+X-Gm-Message-State: AJIora+I6JLosfZek9gp/8gKk+n9MnYKKWmQoA5Z1+H3c/cMSaq+FocI
+ JkzBHdKfk2MmbRGNclj1wzphAshP7kxnHA==
+X-Google-Smtp-Source: AGRyM1vYCzHqQ4m9m06B9lipyzRO7s1S5GtcnbcPAzNt/vma4+jdr/NVmOw55dp+b6E8SRtUqkY7rsVys0SByQ==
+X-Received: from ricarkol2.c.googlers.com
+ ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a81:1257:0:b0:31c:97fe:e416 with SMTP id
+ 84-20020a811257000000b0031c97fee416mr31830689yws.34.1658159354110; Mon, 18
+ Jul 2022 08:49:14 -0700 (PDT)
+Date: Mon, 18 Jul 2022 08:49:07 -0700
+Message-Id: <20220718154910.3923412-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
+Subject: [kvm-unit-tests PATCH 0/3] arm: pmu: Fixes for bare metal
+From: Ricardo Koller <ricarkol@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com
+Cc: maz@kernel.org, oliver.upton@linux.dev
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,298 +82,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jul 18, 2022 at 5:52 AM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> Hi,
->
-> Can you please explain why you are targetting my @oracle.com email
-> address with this patch set?
->
-> This causes me problems as I use Outlook's Web interface for that
-> which doesn't appear to cope with the threading, and most certainly
-> is only capable of top-reply only which is against Linux kernel email
-> standards.
+There are some tests that fail when running on bare metal (including a
+passthrough prototype).  There are three issues with the tests.  The
+first one is that there are some missing isb()'s between enabling event
+counting and the actual counting. This wasn't an issue on KVM as
+trapping on registers served as context synchronization events. The
+second issue is that some tests assume that registers reset to 0.  And
+finally, the third issue is that overflowing the low counter of a
+chained event sets the overflow flag in PMVOS and some tests fail by
+checking for it not being set.
 
-Hi Russell,
+I believe the third fix also requires a KVM change, but would like to
+double check with others first.  The only reference I could find in the
+ARM ARM is the AArch64.IncrementEventCounter() pseudocode (DDI 0487H.a,
+J1.1.1 "aarch64/debug") that unconditionally sets the PMOVS bit on
+overflow.
 
-Sorry I wasn't aware of it (I got your oracle email from
-get_maintainer script). Going forward I'll use the one you responded
-from instead.
+Ricardo Koller (3):
+  arm: pmu: Add missing isb()'s after sys register writing
+  arm: pmu: Reset the pmu registers before starting some tests
+  arm: pmu: Remove checks for !overflow in chained counters tests
 
-Thanks,
-Kalesh
+ arm/pmu.c | 34 +++++++++++++++++++++++-----------
+ 1 file changed, 23 insertions(+), 11 deletions(-)
 
->
-> Thanks.
->
-> On Thu, Jul 14, 2022 at 11:10:10PM -0700, Kalesh Singh wrote:
-> > In order to reuse the arm64 stack unwinding logic for the nVHE
-> > hypervisor stack, move the common code to a shared header
-> > (arch/arm64/include/asm/stacktrace/common.h).
-> >
-> > The nVHE hypervisor cannot safely link against kernel code, so we
-> > make use of the shared header to avoid duplicated logic later in
-> > this series.
-> >
-> > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
-> > ---
-> >  arch/arm64/include/asm/stacktrace.h        |  35 +------
-> >  arch/arm64/include/asm/stacktrace/common.h | 105 +++++++++++++++++++++
-> >  arch/arm64/kernel/stacktrace.c             |  57 -----------
-> >  3 files changed, 106 insertions(+), 91 deletions(-)
-> >  create mode 100644 arch/arm64/include/asm/stacktrace/common.h
-> >
-> > diff --git a/arch/arm64/include/asm/stacktrace.h b/arch/arm64/include/asm/stacktrace.h
-> > index aec9315bf156..79f455b37c84 100644
-> > --- a/arch/arm64/include/asm/stacktrace.h
-> > +++ b/arch/arm64/include/asm/stacktrace.h
-> > @@ -8,52 +8,19 @@
-> >  #include <linux/percpu.h>
-> >  #include <linux/sched.h>
-> >  #include <linux/sched/task_stack.h>
-> > -#include <linux/types.h>
-> >  #include <linux/llist.h>
-> >
-> >  #include <asm/memory.h>
-> >  #include <asm/ptrace.h>
-> >  #include <asm/sdei.h>
-> >
-> > -enum stack_type {
-> > -     STACK_TYPE_UNKNOWN,
-> > -     STACK_TYPE_TASK,
-> > -     STACK_TYPE_IRQ,
-> > -     STACK_TYPE_OVERFLOW,
-> > -     STACK_TYPE_SDEI_NORMAL,
-> > -     STACK_TYPE_SDEI_CRITICAL,
-> > -     __NR_STACK_TYPES
-> > -};
-> > -
-> > -struct stack_info {
-> > -     unsigned long low;
-> > -     unsigned long high;
-> > -     enum stack_type type;
-> > -};
-> > +#include <asm/stacktrace/common.h>
-> >
-> >  extern void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk,
-> >                          const char *loglvl);
-> >
-> >  DECLARE_PER_CPU(unsigned long *, irq_stack_ptr);
-> >
-> > -static inline bool on_stack(unsigned long sp, unsigned long size,
-> > -                         unsigned long low, unsigned long high,
-> > -                         enum stack_type type, struct stack_info *info)
-> > -{
-> > -     if (!low)
-> > -             return false;
-> > -
-> > -     if (sp < low || sp + size < sp || sp + size > high)
-> > -             return false;
-> > -
-> > -     if (info) {
-> > -             info->low = low;
-> > -             info->high = high;
-> > -             info->type = type;
-> > -     }
-> > -     return true;
-> > -}
-> > -
-> >  static inline bool on_irq_stack(unsigned long sp, unsigned long size,
-> >                               struct stack_info *info)
-> >  {
-> > diff --git a/arch/arm64/include/asm/stacktrace/common.h b/arch/arm64/include/asm/stacktrace/common.h
-> > new file mode 100644
-> > index 000000000000..64ae4f6b06fe
-> > --- /dev/null
-> > +++ b/arch/arm64/include/asm/stacktrace/common.h
-> > @@ -0,0 +1,105 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +/*
-> > + * Common arm64 stack unwinder code.
-> > + *
-> > + * Copyright (C) 2012 ARM Ltd.
-> > + */
-> > +#ifndef __ASM_STACKTRACE_COMMON_H
-> > +#define __ASM_STACKTRACE_COMMON_H
-> > +
-> > +#include <linux/bitmap.h>
-> > +#include <linux/bitops.h>
-> > +#include <linux/types.h>
-> > +
-> > +enum stack_type {
-> > +     STACK_TYPE_UNKNOWN,
-> > +     STACK_TYPE_TASK,
-> > +     STACK_TYPE_IRQ,
-> > +     STACK_TYPE_OVERFLOW,
-> > +     STACK_TYPE_SDEI_NORMAL,
-> > +     STACK_TYPE_SDEI_CRITICAL,
-> > +     __NR_STACK_TYPES
-> > +};
-> > +
-> > +struct stack_info {
-> > +     unsigned long low;
-> > +     unsigned long high;
-> > +     enum stack_type type;
-> > +};
-> > +
-> > +/*
-> > + * A snapshot of a frame record or fp/lr register values, along with some
-> > + * accounting information necessary for robust unwinding.
-> > + *
-> > + * @fp:          The fp value in the frame record (or the real fp)
-> > + * @pc:          The lr value in the frame record (or the real lr)
-> > + *
-> > + * @stacks_done: Stacks which have been entirely unwound, for which it is no
-> > + *               longer valid to unwind to.
-> > + *
-> > + * @prev_fp:     The fp that pointed to this frame record, or a synthetic value
-> > + *               of 0. This is used to ensure that within a stack, each
-> > + *               subsequent frame record is at an increasing address.
-> > + * @prev_type:   The type of stack this frame record was on, or a synthetic
-> > + *               value of STACK_TYPE_UNKNOWN. This is used to detect a
-> > + *               transition from one stack to another.
-> > + *
-> > + * @kr_cur:      When KRETPROBES is selected, holds the kretprobe instance
-> > + *               associated with the most recently encountered replacement lr
-> > + *               value.
-> > + *
-> > + * @task:        The task being unwound.
-> > + */
-> > +struct unwind_state {
-> > +     unsigned long fp;
-> > +     unsigned long pc;
-> > +     DECLARE_BITMAP(stacks_done, __NR_STACK_TYPES);
-> > +     unsigned long prev_fp;
-> > +     enum stack_type prev_type;
-> > +#ifdef CONFIG_KRETPROBES
-> > +     struct llist_node *kr_cur;
-> > +#endif
-> > +     struct task_struct *task;
-> > +};
-> > +
-> > +static inline bool on_stack(unsigned long sp, unsigned long size,
-> > +                         unsigned long low, unsigned long high,
-> > +                         enum stack_type type, struct stack_info *info)
-> > +{
-> > +     if (!low)
-> > +             return false;
-> > +
-> > +     if (sp < low || sp + size < sp || sp + size > high)
-> > +             return false;
-> > +
-> > +     if (info) {
-> > +             info->low = low;
-> > +             info->high = high;
-> > +             info->type = type;
-> > +     }
-> > +     return true;
-> > +}
-> > +
-> > +static inline void unwind_init_common(struct unwind_state *state,
-> > +                                   struct task_struct *task)
-> > +{
-> > +     state->task = task;
-> > +#ifdef CONFIG_KRETPROBES
-> > +     state->kr_cur = NULL;
-> > +#endif
-> > +
-> > +     /*
-> > +      * Prime the first unwind.
-> > +      *
-> > +      * In unwind_next() we'll check that the FP points to a valid stack,
-> > +      * which can't be STACK_TYPE_UNKNOWN, and the first unwind will be
-> > +      * treated as a transition to whichever stack that happens to be. The
-> > +      * prev_fp value won't be used, but we set it to 0 such that it is
-> > +      * definitely not an accessible stack address.
-> > +      */
-> > +     bitmap_zero(state->stacks_done, __NR_STACK_TYPES);
-> > +     state->prev_fp = 0;
-> > +     state->prev_type = STACK_TYPE_UNKNOWN;
-> > +}
-> > +
-> > +#endif       /* __ASM_STACKTRACE_COMMON_H */
-> > diff --git a/arch/arm64/kernel/stacktrace.c b/arch/arm64/kernel/stacktrace.c
-> > index fcaa151b81f1..94a5dd2ab8fd 100644
-> > --- a/arch/arm64/kernel/stacktrace.c
-> > +++ b/arch/arm64/kernel/stacktrace.c
-> > @@ -18,63 +18,6 @@
-> >  #include <asm/stack_pointer.h>
-> >  #include <asm/stacktrace.h>
-> >
-> > -/*
-> > - * A snapshot of a frame record or fp/lr register values, along with some
-> > - * accounting information necessary for robust unwinding.
-> > - *
-> > - * @fp:          The fp value in the frame record (or the real fp)
-> > - * @pc:          The lr value in the frame record (or the real lr)
-> > - *
-> > - * @stacks_done: Stacks which have been entirely unwound, for which it is no
-> > - *               longer valid to unwind to.
-> > - *
-> > - * @prev_fp:     The fp that pointed to this frame record, or a synthetic value
-> > - *               of 0. This is used to ensure that within a stack, each
-> > - *               subsequent frame record is at an increasing address.
-> > - * @prev_type:   The type of stack this frame record was on, or a synthetic
-> > - *               value of STACK_TYPE_UNKNOWN. This is used to detect a
-> > - *               transition from one stack to another.
-> > - *
-> > - * @kr_cur:      When KRETPROBES is selected, holds the kretprobe instance
-> > - *               associated with the most recently encountered replacement lr
-> > - *               value.
-> > - *
-> > - * @task:        The task being unwound.
-> > - */
-> > -struct unwind_state {
-> > -     unsigned long fp;
-> > -     unsigned long pc;
-> > -     DECLARE_BITMAP(stacks_done, __NR_STACK_TYPES);
-> > -     unsigned long prev_fp;
-> > -     enum stack_type prev_type;
-> > -#ifdef CONFIG_KRETPROBES
-> > -     struct llist_node *kr_cur;
-> > -#endif
-> > -     struct task_struct *task;
-> > -};
-> > -
-> > -static void unwind_init_common(struct unwind_state *state,
-> > -                            struct task_struct *task)
-> > -{
-> > -     state->task = task;
-> > -#ifdef CONFIG_KRETPROBES
-> > -     state->kr_cur = NULL;
-> > -#endif
-> > -
-> > -     /*
-> > -      * Prime the first unwind.
-> > -      *
-> > -      * In unwind_next() we'll check that the FP points to a valid stack,
-> > -      * which can't be STACK_TYPE_UNKNOWN, and the first unwind will be
-> > -      * treated as a transition to whichever stack that happens to be. The
-> > -      * prev_fp value won't be used, but we set it to 0 such that it is
-> > -      * definitely not an accessible stack address.
-> > -      */
-> > -     bitmap_zero(state->stacks_done, __NR_STACK_TYPES);
-> > -     state->prev_fp = 0;
-> > -     state->prev_type = STACK_TYPE_UNKNOWN;
-> > -}
-> > -
-> >  /*
-> >   * Start an unwind from a pt_regs.
-> >   *
-> > --
-> > 2.37.0.170.g444d1eabd0-goog
-> >
-> >
-> > _______________________________________________
-> > linux-arm-kernel mailing list
-> > linux-arm-kernel@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> >
->
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+-- 
+2.37.0.170.g444d1eabd0-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
