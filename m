@@ -2,86 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26CD3C43334
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 07:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CDA5C43334
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 09:08:50 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D9224D2E9;
-	Mon, 18 Jul 2022 03:31:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 960A74D40B;
+	Mon, 18 Jul 2022 05:08:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rgU8qTw5Yxtz; Mon, 18 Jul 2022 03:31:09 -0400 (EDT)
+	with ESMTP id JcvMtfJwKaMI; Mon, 18 Jul 2022 05:08:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83DFB4D2ED;
-	Mon, 18 Jul 2022 03:31:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 58AAF4D405;
+	Mon, 18 Jul 2022 05:08:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F5E14D2E9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 03:31:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F090C4D39F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 05:08:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8IoOVpzI0Jbw for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jul 2022 03:31:06 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D41514D2E8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 03:31:06 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id B13A060FBD;
- Mon, 18 Jul 2022 07:31:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C115C341C0;
- Mon, 18 Jul 2022 07:31:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1658129465;
- bh=DyGORClHzu6C8JR5WaLhDs42Jqg9N7GmhXlXTrbaLhE=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=O1PfYO0HlJ1CpXoE8mak09OaqWh7UJ8uDiPmTck+0ZbZW07RDdC4/lpL/rBgNBwwm
- dfsVfNm57IxV/NdtRLQioQFtM2DQqpsTrY4nYuxcj1WcKVXdBOW5Iz3UfX5TkCm8I4
- RD7BWAi/Y48LFHuoZLjd3NkFPdee1KuO0XYHUiKMpGbGg50eGBdZT/ETl0keuKiRAl
- Xuf5gINglPvszBBLRaxIiIWVlkB6KeNYSwz9YfELWUcz3rOwwbUIFSIAlmjZBU1yg7
- SSa+3g2Ya8eI7MYJ4yo8z1Ipd8OqogqdnOLGMJZubbDW+jW3T2ufPgYx7Vzjgrt6MJ
- Jyg7jzY/UA0pw==
-Received: from 82-132-227-210.dab.02.net ([82.132.227.210]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oDLDa-0088Zv-EP;
- Mon, 18 Jul 2022 08:31:03 +0100
-Date: Mon, 18 Jul 2022 08:30:51 +0100
-Message-ID: <877d4a513o.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+ with ESMTP id ZZVmqnlS+UQx for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jul 2022 05:08:46 -0400 (EDT)
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com
+ [209.85.210.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E8E654D39D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 05:08:45 -0400 (EDT)
+Received: by mail-ot1-f51.google.com with SMTP id
+ r22-20020a056830419600b0061c6edc5dcfso8688428otu.12
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 02:08:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=gyN4R4wxoBxOYspFa5dE/mkU9oa9JodtT8mt47nKD20=;
+ b=ASu0WTSHFZTnJxmWsucJT2xg3U3pJ9JDjAT++73osXtDgaNaPEkLXxKn9fjFQcesZj
+ yuq/KorlL6gF9V0/pWqQYG22JPWrtGnBN2d5mSNRUcFLAbQGia5AUKLBQZcUQTUEe+8f
+ /rgjgMTabag6/QWzBowTZNAEZZ25J1dA5junzkGMbt9uzzpKZYyAVrQpF4VwEeJWXRqv
+ qRUzxeOE1sPEh49iMO/ukNr+EJegIACLVSWu5WgBqAV0C4gP+hn21xpL5D4S0Wq1n+bc
+ PkjrHpQGP1LL7SAVgne+3TtKgXudqRHaX00bbazPD6Iy/45iHIVZfSAbvz6Ij3gi00MZ
+ MViQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=gyN4R4wxoBxOYspFa5dE/mkU9oa9JodtT8mt47nKD20=;
+ b=vRsS9gMJVMMM03Wgfo5pFhS2zTE6zfvVPavukzIhRQIS7GOvs29JFogK52sAswCCBZ
+ 0C4iddgep5KGLna8eKTzog7+J9bKoVmmmohrv3FDS9LSWe8pMDXDfCpW1Y01V801ASBN
+ NLANOlzNqZIIl14z7Em+nHMrNdKPHiw84A8VWeaeLc+GoR9Giu4AdKOzaLdxPfqCVnCO
+ d4JUaJwit1VLZnWZghbk1Y8+3RsUj3RwlEKcNfcHlBZVPM79TD8PWBa0sFirUFe2UtlU
+ /lV3th804DwIUA4uLGfn15cJrbCuJeiuIyf5X0er1QCznuPhE4ppSpUIyU8iLoWDol9J
+ QD2w==
+X-Gm-Message-State: AJIora+I09x63oPGigqnTxJy1WoKq7AoCsdKT+xYkgDckGuVdw1ezXT1
+ nTyrjNl6BLxxYaxZGL1gv2q6FpCm1tdhTdrx+VpseA==
+X-Google-Smtp-Source: AGRyM1trl6Ac86+5L4VHnfQf/LcT7deUAzD+vON1lIJfOtePo+yI0pY7we08AjsL5W7qoPc56zZ6NTGNdM9naMbHcpg=
+X-Received: by 2002:a05:6830:108a:b0:61c:9fb5:6784 with SMTP id
+ y10-20020a056830108a00b0061c9fb56784mr1754550oto.299.1658135325046; Mon, 18
+ Jul 2022 02:08:45 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220715235824.2549012-1-kaleshsingh@google.com>
+In-Reply-To: <20220715235824.2549012-1-kaleshsingh@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 18 Jul 2022 10:08:08 +0100
+Message-ID: <CA+EHjTxXX_d8M9VGCBokoKCCuvOoR_1u4JrSNKPTdN3qp9bQog@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: Fix hypervisor address symbolization
 To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v4 11/18] KVM: arm64: Stub implementation of non-protected
- nVHE HYP stack unwinder
-In-Reply-To: <20220715061027.1612149-12-kaleshsingh@google.com>
-References: <20220715061027.1612149-1-kaleshsingh@google.com>
- <20220715061027.1612149-12-kaleshsingh@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 82.132.227.210
-X-SA-Exim-Rcpt-To: kaleshsingh@google.com, mark.rutland@arm.com,
- broonie@kernel.org, madvenka@linux.microsoft.com, will@kernel.org,
- qperret@google.com, tabba@google.com, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
- andreyknvl@gmail.com, russell.king@oracle.com, vincenzo.frascino@arm.com,
- mhiramat@kernel.org, ast@kernel.org, wangkefeng.wang@huawei.com,
- elver@google.com, keirf@google.com, yuzenghui@huawei.com, ardb@kernel.org,
- oupton@google.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: wangkefeng.wang@huawei.com, catalin.marinas@arm.com, ast@kernel.org,
- vincenzo.frascino@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- madvenka@linux.microsoft.com, andreyknvl@gmail.com, kernel-team@android.com,
- elver@google.com, broonie@kernel.org, linux-arm-kernel@lists.infradead.org,
- russell.king@oracle.com, linux-kernel@vger.kernel.org, mhiramat@kernel.org
+Cc: android-mm@google.com, kernel-team@android.com, maz@kernel.org,
+ linux-kernel@vger.kernel.org, madvenka@linux.microsoft.com, broonie@kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,67 +85,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 15 Jul 2022 07:10:20 +0100,
-Kalesh Singh <kaleshsingh@google.com> wrote:
-> 
-> Add stub implementations of non-protected nVHE stack unwinder, for
-> building. These are implemented later in this series.
-> 
+Hi Kalesh,
+
+On Sat, Jul 16, 2022 at 12:58 AM Kalesh Singh <kaleshsingh@google.com> wrote:
+>
+> With CONFIG_RANDOMIZE_BASE=y vmlinux addresses will resolve correctly
+> from kallsyms. Fix this by adding the KASLR offset before printing the
+> symbols.
+>
+> Based on arm64 for-next/stacktrace.
+>
+> Fixes: 6ccf9cb557bd ("KVM: arm64: Symbolize the nVHE HYP addresses")
+> Reported-by: Fuad Tabba <tabba@google.com>
 > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
 > ---
->  arch/arm64/include/asm/stacktrace/nvhe.h | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/stacktrace/nvhe.h b/arch/arm64/include/asm/stacktrace/nvhe.h
-> index 1eac4e57f2ae..36cf7858ddd8 100644
-> --- a/arch/arm64/include/asm/stacktrace/nvhe.h
-> +++ b/arch/arm64/include/asm/stacktrace/nvhe.h
-> @@ -8,6 +8,12 @@
->   *      the HYP memory. The stack is unwinded in EL2 and dumped to a shared
->   *      buffer where the host can read and print the stacktrace.
->   *
-> + *   2) Non-protected nVHE mode - the host can directly access the
-> + *      HYP stack pages and unwind the HYP stack in EL1. This saves having
-> + *      to allocate shared buffers for the host to read the unwinded
-> + *      stacktrace.
-> + *
-> + *
->   * Copyright (C) 2022 Google LLC
->   */
->  #ifndef __ASM_STACKTRACE_NVHE_H
-> @@ -53,5 +59,21 @@ static int notrace unwind_next(struct unwind_state *state)
->  NOKPROBE_SYMBOL(unwind_next);
->  #endif	/* CONFIG_PROTECTED_NVHE_STACKTRACE */
->  
-> +/*
-> + * Non-protected nVHE HYP stack unwinder
-> + */
-> +#else	/* !__KVM_NVHE_HYPERVISOR__ */
 
-I don't get this path. This either represents the VHE hypervisor or
-the kernel proper. Which one is it?
-
-> +static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
-> +				     struct stack_info *info)
-> +{
-> +	return false;
-> +}
-> +
-> +static int notrace unwind_next(struct unwind_state *state)
-> +{
-> +	return 0;
-> +}
-> +NOKPROBE_SYMBOL(unwind_next);
-> +
->  #endif	/* __KVM_NVHE_HYPERVISOR__ */
->  #endif	/* __ASM_STACKTRACE_NVHE_H */
+Even with this patch applied I still don't get symbolization unless I
+disable randomization, either by setting CONFIG_RANDOMIZE_BASE=n or
+pass nokaslr as a kernel parameter. I tried both and in either case it
+works.
 
 Thanks,
+/fuad
 
-	M.
 
--- 
-Without deviation from the norm, progress is not possible.
+>  arch/arm64/kvm/handle_exit.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index f66c0142b335..e43926ef2bc2 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -347,10 +347,10 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
+>                         kvm_err("nVHE hyp BUG at: %s:%u!\n", file, line);
+>                 else
+>                         kvm_err("nVHE hyp BUG at: [<%016llx>] %pB!\n", panic_addr,
+> -                                       (void *)panic_addr);
+> +                                       (void *)(panic_addr + kaslr_offset()));
+>         } else {
+>                 kvm_err("nVHE hyp panic at: [<%016llx>] %pB!\n", panic_addr,
+> -                               (void *)panic_addr);
+> +                               (void *)(panic_addr + kaslr_offset()));
+>         }
+>
+>         /*
+>
+> base-commit: 82a592c13b0aeff94d84d54183dae0b26384c95f
+> --
+> 2.37.0.170.g444d1eabd0-goog
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
