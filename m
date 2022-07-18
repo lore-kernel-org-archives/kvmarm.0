@@ -2,80 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AB37CCA479
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 16:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D406C43334
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 16:54:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1C924D2CE;
-	Mon, 18 Jul 2022 12:51:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D7E24D47B;
+	Mon, 18 Jul 2022 12:54:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Qvotl2JC6P1k; Mon, 18 Jul 2022 12:51:54 -0400 (EDT)
+	with ESMTP id Nqsws980AuHX; Mon, 18 Jul 2022 12:53:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27B9E4D467;
-	Mon, 18 Jul 2022 12:51:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98BBD4D45B;
+	Mon, 18 Jul 2022 12:53:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F3FA54D44F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 12:51:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 165474D45B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 12:53:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ljKikwpodmZp for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jul 2022 12:51:51 -0400 (EDT)
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com
- [209.85.221.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D203D4D2CE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 12:51:51 -0400 (EDT)
-Received: by mail-wr1-f45.google.com with SMTP id d16so17907096wrv.10
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 09:51:51 -0700 (PDT)
+ with ESMTP id ZyZ9AIZSoewV for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jul 2022 12:53:57 -0400 (EDT)
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com
+ [209.85.128.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F3F1D4D458
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 12:53:56 -0400 (EDT)
+Received: by mail-wm1-f51.google.com with SMTP id
+ p26-20020a1c545a000000b003a2fb7c1274so5654403wmi.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 09:53:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PAbDl1PRM5nJcEKcI6Ytvs7hiGOzTQVF+JIk15dOA88=;
- b=n5udodEAa/PhqseWRA+ZivosTL+aHxlWiMaVXsWsHZeKg72WFl+q1bjcvEIKJGsXbs
- RPtworRU8Nh1Cwv3GXk0n/mYI4XiC1YfEuJnfhNedphfctJ327KC83r8YiDGb/sBkL+E
- XmUeJXLrY9YW/3OUjWA9vNqnCvnqNxrPg15pTeOicsw3EyemCxVJP4y1v7l++F+xEAOJ
- 2su/h+SGAbOfp1TCEcaP+E8bUk2BQFUxLbYPsl3W8zNRYhyNQdQkm6aF1qWD1BxKDxb4
- KvaUN4IuTL+e3uuThg2ACcxOutr+PidsEjVo0kigDgA+GaX5R1S87jJUM6Wdlx4D2tfT
- DnFA==
+ :cc; bh=PFgEFsfl8rKJs7ra2dHHZoS/sWYcHlxBizMiDuSMBHs=;
+ b=mKTwFX9DcjFSbsWZCVza9QbOzZMgaViFHpyhezP8skfw9OhFHOtxe7Coa9eHKiupWf
+ GVN5yHFqjF5RvR4cUnCT5TeYNNGH16qQTQo1324kdB32i+xK1jhd92eVU0UxcAZ1VJl+
+ YCFlHbbXFyJy8vOlddVjkGKOTQ/m/QSiyBzHwmTC5yTtRUwcf7Uvc6jPR9g4q/bJhb7J
+ 0l7QCOPJacqQKytb6294d+jLYTpGkqKCr9Rhiqu6KsMCbZfa8rkADp06Jt0BTjfPbpq6
+ bKh2lRVqkB/XiLnFVspPNZtdu2+PyjKIBF3giMevCtYzSqa8goeqyMShrFPusWEqeYPO
+ hhSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=PAbDl1PRM5nJcEKcI6Ytvs7hiGOzTQVF+JIk15dOA88=;
- b=3A85rV3Q9H6Gp7RWhSkwHBDB0MroYInljT0baV8jgSXY5X5BYfDB1wDSOeD3fffZg7
- VxVd91eIdD/LRLa9byjFZlYOVtvfeYG7IH6djgdLPjT1pCqE+sz9zgPGxzRz696WXs5F
- h9fMG2XE+GLk/TzkU/+0filVVQ3ud1DpM3VUfGpY8MJxBvWhDIfBa7dVPW8jjeU0VmoY
- vIzNbKtMnUT9wtgCtOftxea+BJ6EQDwtNDVAoxuFs7fKKPuyefyRKRVLQZONEnelFtnF
- xwBbe0lqCg9eLh8k5kYp7EhdKa5MMfUBi5NviWO68/rg5RJ/bznUAMDZLl90/c4libMy
- j5iQ==
-X-Gm-Message-State: AJIora8GWdfCfQaRfBSaG0Y5ImD/qKL+7kkoJ0Pzh+mWD/vN3j/SmybN
- 0j0Sd+7awZzeAoySNyOwFa7d8lruHJ+19FFvw7N9Og==
-X-Google-Smtp-Source: AGRyM1uiGKWRYqdXWTkzEYeZ3M32/orW5NzHDsHKznhO1+2vVhPaYRL6sJmL5DodgqnLocvJeqHO6XvZNDEU4APTl4g=
-X-Received: by 2002:a5d:6c65:0:b0:21d:b7c0:9930 with SMTP id
- r5-20020a5d6c65000000b0021db7c09930mr23007398wrz.500.1658163110612; Mon, 18
- Jul 2022 09:51:50 -0700 (PDT)
+ bh=PFgEFsfl8rKJs7ra2dHHZoS/sWYcHlxBizMiDuSMBHs=;
+ b=Gfskyf9AWsYkbqTfWTzjDxV3rTGT7B5+vMiwmdpZggJziLY94L+H3b0ARbkxFtkT56
+ JVcGHzFj8kaMDUMLMWHC9h2+kGgu5PJGVs4P+i1iHraEifviHH36+CoGC3arf7glF95p
+ yjwTQgkX4W1okrXI33icDmGHldtAA9Odv/Vi1z+8mzH7qavbKk3dGEXtNyMZ7PBw248x
+ 8Szukjo6Gl/GmH90eRiej3ua41rKzbPtyevzWfPwyxnJxXZGm/tUJhTXh4OgtyO+7jAQ
+ CgQGbiqWqgU2qVXfd52qhPxLeHhcgUXbv3KxohV3sPADaw3tAQUUGjueOYAvuc3tbDf/
+ +JCQ==
+X-Gm-Message-State: AJIora+y4aOE36Vq7waYZYZRc056q5BzTNo+cLTP1/ERZcLExHDro8uZ
+ DPiNa+6RfMtLKRYjF+8AWYh1bLAFAo+hOd6W6E08MQ==
+X-Google-Smtp-Source: AGRyM1vVZb4Aon6v5ILgG/Iyd1Sfx4G+07cbbi2sRUeRYV96oOPEBR88UX4fRnJ/EZaOzI28tw0KmqafYPKa3sfBzio=
+X-Received: by 2002:a05:600c:a146:b0:3a3:1e79:4446 with SMTP id
+ ib6-20020a05600ca14600b003a31e794446mr3231430wmb.158.1658163235828; Mon, 18
+ Jul 2022 09:53:55 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220715061027.1612149-1-kaleshsingh@google.com>
- <20220715061027.1612149-12-kaleshsingh@google.com>
- <877d4a513o.wl-maz@kernel.org>
-In-Reply-To: <877d4a513o.wl-maz@kernel.org>
+ <20220715061027.1612149-7-kaleshsingh@google.com>
+ <87k08c3vtw.wl-maz@kernel.org>
+In-Reply-To: <87k08c3vtw.wl-maz@kernel.org>
 From: Kalesh Singh <kaleshsingh@google.com>
-Date: Mon, 18 Jul 2022 09:51:39 -0700
-Message-ID: <CAC_TJvewAfGACxwZ57W+fDsXOYBNnjxaKUt3Es9Ou0vDO3H_0w@mail.gmail.com>
-Subject: Re: [PATCH v4 11/18] KVM: arm64: Stub implementation of non-protected
- nVHE HYP stack unwinder
+Date: Mon, 18 Jul 2022 09:53:44 -0700
+Message-ID: <CAC_TJvcxPCWXq_dViN09c5eyd0N_TdfOmOgExaiO+ugfeTuN6g@mail.gmail.com>
+Subject: Re: [PATCH v4 06/18] arm64: stacktrace: Add description of
+ stacktrace/common.h
 To: Marc Zyngier <maz@kernel.org>
 Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Marco Elver <elver@google.com>,
  vincenzo.frascino@arm.com, Will Deacon <will@kernel.org>,
+ android-mm@google.com, "Russell King \(Oracle\)" <linux@armlinux.org.uk>,
  kvmarm <kvmarm@lists.cs.columbia.edu>,
  "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- andreyknvl@gmail.com, "Cc: Android Kernel" <kernel-team@android.com>,
- Marco Elver <elver@google.com>, Mark Brown <broonie@kernel.org>,
+ "Cc: Android Kernel" <kernel-team@android.com>,
+ Andrew Jones <drjones@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Mark Brown <broonie@kernel.org>,
  "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
- <linux-arm-kernel@lists.infradead.org>, russell.king@oracle.com,
+ <linux-arm-kernel@lists.infradead.org>, andreyknvl@gmail.com,
  LKML <linux-kernel@vger.kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -93,67 +96,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jul 18, 2022 at 12:31 AM Marc Zyngier <maz@kernel.org> wrote:
+On Sun, Jul 17, 2022 at 2:58 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> On Fri, 15 Jul 2022 07:10:20 +0100,
+> On Fri, 15 Jul 2022 07:10:15 +0100,
 > Kalesh Singh <kaleshsingh@google.com> wrote:
 > >
-> > Add stub implementations of non-protected nVHE stack unwinder, for
-> > building. These are implemented later in this series.
+> > Add brief description on how to use stacktrace/common.h to implement
+> > a stack unwinder.
 > >
 > > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
 > > ---
-> >  arch/arm64/include/asm/stacktrace/nvhe.h | 22 ++++++++++++++++++++++
-> >  1 file changed, 22 insertions(+)
+> >  arch/arm64/include/asm/stacktrace/common.h | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
 > >
-> > diff --git a/arch/arm64/include/asm/stacktrace/nvhe.h b/arch/arm64/include/asm/stacktrace/nvhe.h
-> > index 1eac4e57f2ae..36cf7858ddd8 100644
-> > --- a/arch/arm64/include/asm/stacktrace/nvhe.h
-> > +++ b/arch/arm64/include/asm/stacktrace/nvhe.h
-> > @@ -8,6 +8,12 @@
-> >   *      the HYP memory. The stack is unwinded in EL2 and dumped to a shared
-> >   *      buffer where the host can read and print the stacktrace.
+> > diff --git a/arch/arm64/include/asm/stacktrace/common.h b/arch/arm64/include/asm/stacktrace/common.h
+> > index f86efe71479d..b362086f4c70 100644
+> > --- a/arch/arm64/include/asm/stacktrace/common.h
+> > +++ b/arch/arm64/include/asm/stacktrace/common.h
+> > @@ -2,6 +2,14 @@
+> >  /*
+> >   * Common arm64 stack unwinder code.
 > >   *
-> > + *   2) Non-protected nVHE mode - the host can directly access the
-> > + *      HYP stack pages and unwind the HYP stack in EL1. This saves having
-> > + *      to allocate shared buffers for the host to read the unwinded
-> > + *      stacktrace.
+> > + * To implement a new arm64 stack unwinder:
+> > + *     1) Include this header
 > > + *
-> > + *
-> >   * Copyright (C) 2022 Google LLC
-> >   */
-> >  #ifndef __ASM_STACKTRACE_NVHE_H
-> > @@ -53,5 +59,21 @@ static int notrace unwind_next(struct unwind_state *state)
-> >  NOKPROBE_SYMBOL(unwind_next);
-> >  #endif       /* CONFIG_PROTECTED_NVHE_STACKTRACE */
-> >
-> > +/*
-> > + * Non-protected nVHE HYP stack unwinder
-> > + */
-> > +#else        /* !__KVM_NVHE_HYPERVISOR__ */
+> > + *     2) Provide implementations for the following functions:
+> > + *            - on_overflow_stack()
+> > + *            - on_accessible_stack()
+> > + *            - unwind_next()
 >
-> I don't get this path. This either represents the VHE hypervisor or
-> the kernel proper. Which one is it?
+> A short description of what these helpers are supposed to do would
+> also be helpful.
 
-Hi Marc. This is run from kernel proper context. And it's the
-unwinding for conventional nVHE (non-protected). The unwinding is done
-from the host kernel in EL1.
+Thanks Fuad, Marc. I'll add descriptions in the next version.
 
->
-> > +static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
-> > +                                  struct stack_info *info)
-> > +{
-> > +     return false;
-> > +}
-> > +
-> > +static int notrace unwind_next(struct unwind_state *state)
-> > +{
-> > +     return 0;
-> > +}
-> > +NOKPROBE_SYMBOL(unwind_next);
-> > +
-> >  #endif       /* __KVM_NVHE_HYPERVISOR__ */
-> >  #endif       /* __ASM_STACKTRACE_NVHE_H */
 >
 > Thanks,
 >
@@ -161,10 +137,6 @@ from the host kernel in EL1.
 >
 > --
 > Without deviation from the norm, progress is not possible.
->
-> --
-> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
->
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
