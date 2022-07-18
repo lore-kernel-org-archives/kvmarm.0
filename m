@@ -2,62 +2,63 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 676ACC43334
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 06:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63FFAC433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 07:13:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B50804D280;
-	Mon, 18 Jul 2022 02:56:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7F764D291;
+	Mon, 18 Jul 2022 03:13:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Dz6O3JhtUkAE; Mon, 18 Jul 2022 02:56:01 -0400 (EDT)
+	with ESMTP id jfX8egewI1l0; Mon, 18 Jul 2022 03:13:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B3864D281;
-	Mon, 18 Jul 2022 02:56:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6012A4D2A9;
+	Mon, 18 Jul 2022 03:13:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 366864D27F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 02:56:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E4024D2A4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 03:13:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CbbYAU519NxU for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jul 2022 02:55:59 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 091F14D27D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 02:55:58 -0400 (EDT)
+ with ESMTP id yyQEh9NvtejL for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jul 2022 03:13:18 -0400 (EDT)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E6F004D291
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 03:13:17 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 5A300B80F1A;
- Mon, 18 Jul 2022 06:55:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FD6CC341C0;
- Mon, 18 Jul 2022 06:55:56 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id AABCACE1283;
+ Mon, 18 Jul 2022 07:13:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBAF3C341C0;
+ Mon, 18 Jul 2022 07:13:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1658127356;
- bh=40HSFVKrievXEEZlinu6PVUqYOcnH5q0Oq33vn9Lwjo=;
+ s=k20201202; t=1658128392;
+ bh=51swZxaHJh3GKTY5TD3dhPc0ycstZoPXVjupMS9JkwQ=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=jCIW4Qgexksy/SJrcSNfrRR68t3p3TVKpL99DlukG154BeFzBHhGrMlWRvC8bqj/G
- kEYF6yh7/OFtFP+bPNQaGBivbBlnyih60DH1v6KIHgk+vhwrUam5ZtUY5eoK4AsB11
- 3CFKef7mF0hvinUab37XGKI7unbYDbeThU9q/KjyPQfW3RcHXyeyxCbaFU3W5MRmuc
- I2u6EEUH9KgiL/8hPx8+5KvSEf7Gsr/4pjOJP+AoyRtbwKp/tY2RDKzf36i2V+kIk1
- LxHJnsvHOQYMQGOqschrCmaMB2ZDdaCJKXNGr5ehISY91UsuUM14dLLDmp722VJpxG
- 7Xqc7Lj/wZldA==
+ b=XXjAueojpHAo+0wnGZa7OPm63c4moRcpozBTtgkbHmnr3e/NLNI3XjD2dma7lRViM
+ ERotw0AL0sBjZokWNZT6AETiiVnRXuxHendgkysRZz5QugwCQtaKbyhVeNXBX618Eg
+ iQmyAgu45qZk5MVMpNDowMS5DconlmISNh0bIIMAL6FMmLJL2J504QunH0ftuSAsTo
+ iz6iR+XuzONiCKAnScyjy815y7n/27b3bU2NokneKx5SciSrUXj0z5IVEIuJs3Judg
+ hIwN8+Eb12/m/N5oTvgqHYXK38v1nxmFMzs7FofdfCmbQZKxsQ98CVFS5BuE+/a/VI
+ j+9VtH1ZDofJA==
 Received: from 82-132-227-210.dab.02.net ([82.132.227.210]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oDKfZ-0088CH-Th;
- Mon, 18 Jul 2022 07:55:54 +0100
-Date: Mon, 18 Jul 2022 07:55:44 +0100
-Message-ID: <87cze252q7.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oDKwI-0088Nz-IW;
+ Mon, 18 Jul 2022 08:13:10 +0100
+Date: Mon, 18 Jul 2022 08:13:00 +0100
+Message-ID: <87bktm51xf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v4 08/18] KVM: arm64: Add PROTECTED_NVHE_STACKTRACE Kconfig
-In-Reply-To: <20220715061027.1612149-9-kaleshsingh@google.com>
+Subject: Re: [PATCH v4 09/18] KVM: arm64: Allocate shared pKVM hyp stacktrace
+ buffers
+In-Reply-To: <20220715061027.1612149-10-kaleshsingh@google.com>
 References: <20220715061027.1612149-1-kaleshsingh@google.com>
- <20220715061027.1612149-9-kaleshsingh@google.com>
+ <20220715061027.1612149-10-kaleshsingh@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -97,53 +98,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-[- Drew and android-mm, as both addresses bounce]
-
-On Fri, 15 Jul 2022 07:10:17 +0100,
+On Fri, 15 Jul 2022 07:10:18 +0100,
 Kalesh Singh <kaleshsingh@google.com> wrote:
 > 
-> This can be used to disable stacktrace for the protected KVM
-> nVHE hypervisor, in order to save on the associated memory usage.
+> In protected nVHE mode the host cannot directly access
+> hypervisor memory, so we will dump the hypervisor stacktrace
+> to a shared buffer with the host.
 > 
-> This option is disabled by default, since protected KVM is not widely
-> used on platforms other than Android currently.
+> The minimum size do the buffer required, assuming the min frame
+
+s/do/for/ ?
+
+> size of [x29, x30] (2 * sizeof(long)), is half the combined size of
+> the hypervisor and overflow stacks plus an additional entry to
+> delimit the end of the stacktrace.
+
+Let me see if I understand this: the maximum stack size is the
+combination of the HYP and overflow stacks, and the smallest possible
+stack frame is 128bit (only FP+LR). The buffer thus needs to provide
+one 64bit entry per stack frame that fits in the combined stack, plus
+one entry as an end marker.
+
+So the resulting size is half of the combined stack size, plus a
+single 64bit word. Is this correct?
+
 > 
+> The stacktrace buffers are used later in the seried to dump the
+> nVHE hypervisor stacktrace when using protected-mode.
+>
 > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
 > ---
->  arch/arm64/kvm/Kconfig | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
+>  arch/arm64/include/asm/memory.h      | 7 +++++++
+>  arch/arm64/kvm/hyp/nvhe/stacktrace.c | 4 ++++
+>  2 files changed, 11 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 8a5fbbf084df..1edab6f8a3b8 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -46,6 +46,21 @@ menuconfig KVM
+> diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+> index 0af70d9abede..28a4893d4b84 100644
+> --- a/arch/arm64/include/asm/memory.h
+> +++ b/arch/arm64/include/asm/memory.h
+> @@ -113,6 +113,13 @@
 >  
->  	  If unsure, say N.
+>  #define OVERFLOW_STACK_SIZE	SZ_4K
 >  
-> +config PROTECTED_NVHE_STACKTRACE
-> +	bool "Protected KVM hypervisor stacktraces"
-> +	depends on KVM
-> +	default n
-> +	help
-> +	  Say Y here to enable pKVM hypervisor stacktraces on hyp_panic()
+> +/*
+> + * With the minimum frame size of [x29, x30], exactly half the combined
+> + * sizes of the hyp and overflow stacks is needed to save the unwinded
+> + * stacktrace; plus an additional entry to delimit the end.
+> + */
+> +#define NVHE_STACKTRACE_SIZE	((OVERFLOW_STACK_SIZE + PAGE_SIZE) / 2 + sizeof(long))
 > +
-> +	  If you are not using protected nVHE (pKVM), say N.
+>  /*
+>   * Alignment of kernel segments (e.g. .text, .data).
+>   *
+> diff --git a/arch/arm64/kvm/hyp/nvhe/stacktrace.c b/arch/arm64/kvm/hyp/nvhe/stacktrace.c
+> index a3d5b34e1249..69e65b457f1c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/stacktrace.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/stacktrace.c
+> @@ -9,3 +9,7 @@
+>  
+>  DEFINE_PER_CPU(unsigned long [OVERFLOW_STACK_SIZE/sizeof(long)], overflow_stack)
+>  	__aligned(16);
 > +
-> +	  If using protected nVHE mode, but cannot afford the associated
-> +	  memory cost (less than 0.75 page per CPU) of pKVM stacktraces,
-> +	  say N.
-> +
-> +	  If unsure, say N.
-> +
+> +#ifdef CONFIG_PROTECTED_NVHE_STACKTRACE
+> +DEFINE_PER_CPU(unsigned long [NVHE_STACKTRACE_SIZE/sizeof(long)], pkvm_stacktrace);
+> +#endif /* CONFIG_PROTECTED_NVHE_STACKTRACE */
 
-Can we make this depend on NVHE_EL2_DEBUG instead? I'd like to keep
-the disclosing of EL2 information in protected mode a strict debug
-feature.
-
->  config NVHE_EL2_DEBUG
->  	bool "Debug mode for non-VHE EL2 object"
->  	depends on KVM
+OK, so the allocation exists even if KVM is not running in protected
+mode. I guess this is OK for now, but definitely reinforces my request
+that this is only there when compiled for debug mode.
 
 Thanks,
 
