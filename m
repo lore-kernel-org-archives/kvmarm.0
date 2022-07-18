@@ -2,46 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D65C43334
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 16:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AB37CCA479
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 16:51:58 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BCE6A4D78C;
-	Mon, 18 Jul 2022 12:41:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1C924D2CE;
+	Mon, 18 Jul 2022 12:51:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id O94K4CVoKHOg; Mon, 18 Jul 2022 12:41:44 -0400 (EDT)
+	with ESMTP id Qvotl2JC6P1k; Mon, 18 Jul 2022 12:51:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1CB94D780;
-	Mon, 18 Jul 2022 12:41:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27B9E4D467;
+	Mon, 18 Jul 2022 12:51:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D7DAD4D772
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 12:41:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F3FA54D44F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 12:51:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZozzEISz9hoc for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jul 2022 12:41:42 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B68524D6A5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 12:41:42 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BB9971042;
- Mon, 18 Jul 2022 09:41:42 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D3F443F73D;
- Mon, 18 Jul 2022 09:41:40 -0700 (PDT)
-Date: Mon, 18 Jul 2022 17:42:08 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [kvm-unit-tests PATCH 0/3] arm: pmu: Fixes for bare metal
-Message-ID: <YtWNYGuP/Nu1HwDU@monolith.localdoman>
-References: <20220718154910.3923412-1-ricarkol@google.com>
+ with ESMTP id ljKikwpodmZp for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jul 2022 12:51:51 -0400 (EDT)
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com
+ [209.85.221.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D203D4D2CE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 12:51:51 -0400 (EDT)
+Received: by mail-wr1-f45.google.com with SMTP id d16so17907096wrv.10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 09:51:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=PAbDl1PRM5nJcEKcI6Ytvs7hiGOzTQVF+JIk15dOA88=;
+ b=n5udodEAa/PhqseWRA+ZivosTL+aHxlWiMaVXsWsHZeKg72WFl+q1bjcvEIKJGsXbs
+ RPtworRU8Nh1Cwv3GXk0n/mYI4XiC1YfEuJnfhNedphfctJ327KC83r8YiDGb/sBkL+E
+ XmUeJXLrY9YW/3OUjWA9vNqnCvnqNxrPg15pTeOicsw3EyemCxVJP4y1v7l++F+xEAOJ
+ 2su/h+SGAbOfp1TCEcaP+E8bUk2BQFUxLbYPsl3W8zNRYhyNQdQkm6aF1qWD1BxKDxb4
+ KvaUN4IuTL+e3uuThg2ACcxOutr+PidsEjVo0kigDgA+GaX5R1S87jJUM6Wdlx4D2tfT
+ DnFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=PAbDl1PRM5nJcEKcI6Ytvs7hiGOzTQVF+JIk15dOA88=;
+ b=3A85rV3Q9H6Gp7RWhSkwHBDB0MroYInljT0baV8jgSXY5X5BYfDB1wDSOeD3fffZg7
+ VxVd91eIdD/LRLa9byjFZlYOVtvfeYG7IH6djgdLPjT1pCqE+sz9zgPGxzRz696WXs5F
+ h9fMG2XE+GLk/TzkU/+0filVVQ3ud1DpM3VUfGpY8MJxBvWhDIfBa7dVPW8jjeU0VmoY
+ vIzNbKtMnUT9wtgCtOftxea+BJ6EQDwtNDVAoxuFs7fKKPuyefyRKRVLQZONEnelFtnF
+ xwBbe0lqCg9eLh8k5kYp7EhdKa5MMfUBi5NviWO68/rg5RJ/bznUAMDZLl90/c4libMy
+ j5iQ==
+X-Gm-Message-State: AJIora8GWdfCfQaRfBSaG0Y5ImD/qKL+7kkoJ0Pzh+mWD/vN3j/SmybN
+ 0j0Sd+7awZzeAoySNyOwFa7d8lruHJ+19FFvw7N9Og==
+X-Google-Smtp-Source: AGRyM1uiGKWRYqdXWTkzEYeZ3M32/orW5NzHDsHKznhO1+2vVhPaYRL6sJmL5DodgqnLocvJeqHO6XvZNDEU4APTl4g=
+X-Received: by 2002:a5d:6c65:0:b0:21d:b7c0:9930 with SMTP id
+ r5-20020a5d6c65000000b0021db7c09930mr23007398wrz.500.1658163110612; Mon, 18
+ Jul 2022 09:51:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220718154910.3923412-1-ricarkol@google.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
- andrew.jones@linux.dev, kvmarm@lists.cs.columbia.edu
+References: <20220715061027.1612149-1-kaleshsingh@google.com>
+ <20220715061027.1612149-12-kaleshsingh@google.com>
+ <877d4a513o.wl-maz@kernel.org>
+In-Reply-To: <877d4a513o.wl-maz@kernel.org>
+From: Kalesh Singh <kaleshsingh@google.com>
+Date: Mon, 18 Jul 2022 09:51:39 -0700
+Message-ID: <CAC_TJvewAfGACxwZ57W+fDsXOYBNnjxaKUt3Es9Ou0vDO3H_0w@mail.gmail.com>
+Subject: Re: [PATCH v4 11/18] KVM: arm64: Stub implementation of non-protected
+ nVHE HYP stack unwinder
+To: Marc Zyngier <maz@kernel.org>
+Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
+ vincenzo.frascino@arm.com, Will Deacon <will@kernel.org>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>,
+ "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+ andreyknvl@gmail.com, "Cc: Android Kernel" <kernel-team@android.com>,
+ Marco Elver <elver@google.com>, Mark Brown <broonie@kernel.org>,
+ "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
+ <linux-arm-kernel@lists.infradead.org>, russell.king@oracle.com,
+ LKML <linux-kernel@vger.kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -58,41 +93,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On Mon, Jul 18, 2022 at 12:31 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Fri, 15 Jul 2022 07:10:20 +0100,
+> Kalesh Singh <kaleshsingh@google.com> wrote:
+> >
+> > Add stub implementations of non-protected nVHE stack unwinder, for
+> > building. These are implemented later in this series.
+> >
+> > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+> > ---
+> >  arch/arm64/include/asm/stacktrace/nvhe.h | 22 ++++++++++++++++++++++
+> >  1 file changed, 22 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/stacktrace/nvhe.h b/arch/arm64/include/asm/stacktrace/nvhe.h
+> > index 1eac4e57f2ae..36cf7858ddd8 100644
+> > --- a/arch/arm64/include/asm/stacktrace/nvhe.h
+> > +++ b/arch/arm64/include/asm/stacktrace/nvhe.h
+> > @@ -8,6 +8,12 @@
+> >   *      the HYP memory. The stack is unwinded in EL2 and dumped to a shared
+> >   *      buffer where the host can read and print the stacktrace.
+> >   *
+> > + *   2) Non-protected nVHE mode - the host can directly access the
+> > + *      HYP stack pages and unwind the HYP stack in EL1. This saves having
+> > + *      to allocate shared buffers for the host to read the unwinded
+> > + *      stacktrace.
+> > + *
+> > + *
+> >   * Copyright (C) 2022 Google LLC
+> >   */
+> >  #ifndef __ASM_STACKTRACE_NVHE_H
+> > @@ -53,5 +59,21 @@ static int notrace unwind_next(struct unwind_state *state)
+> >  NOKPROBE_SYMBOL(unwind_next);
+> >  #endif       /* CONFIG_PROTECTED_NVHE_STACKTRACE */
+> >
+> > +/*
+> > + * Non-protected nVHE HYP stack unwinder
+> > + */
+> > +#else        /* !__KVM_NVHE_HYPERVISOR__ */
+>
+> I don't get this path. This either represents the VHE hypervisor or
+> the kernel proper. Which one is it?
 
-I believe you're missing the updated email for the arm maintainer. Added it.
+Hi Marc. This is run from kernel proper context. And it's the
+unwinding for conventional nVHE (non-protected). The unwinding is done
+from the host kernel in EL1.
 
-Thanks,
-Alex
-
-On Mon, Jul 18, 2022 at 08:49:07AM -0700, Ricardo Koller wrote:
-> There are some tests that fail when running on bare metal (including a
-> passthrough prototype).  There are three issues with the tests.  The
-> first one is that there are some missing isb()'s between enabling event
-> counting and the actual counting. This wasn't an issue on KVM as
-> trapping on registers served as context synchronization events. The
-> second issue is that some tests assume that registers reset to 0.  And
-> finally, the third issue is that overflowing the low counter of a
-> chained event sets the overflow flag in PMVOS and some tests fail by
-> checking for it not being set.
-> 
-> I believe the third fix also requires a KVM change, but would like to
-> double check with others first.  The only reference I could find in the
-> ARM ARM is the AArch64.IncrementEventCounter() pseudocode (DDI 0487H.a,
-> J1.1.1 "aarch64/debug") that unconditionally sets the PMOVS bit on
-> overflow.
-> 
-> Ricardo Koller (3):
->   arm: pmu: Add missing isb()'s after sys register writing
->   arm: pmu: Reset the pmu registers before starting some tests
->   arm: pmu: Remove checks for !overflow in chained counters tests
-> 
->  arm/pmu.c | 34 +++++++++++++++++++++++-----------
->  1 file changed, 23 insertions(+), 11 deletions(-)
-> 
-> -- 
-> 2.37.0.170.g444d1eabd0-goog
-> 
+>
+> > +static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
+> > +                                  struct stack_info *info)
+> > +{
+> > +     return false;
+> > +}
+> > +
+> > +static int notrace unwind_next(struct unwind_state *state)
+> > +{
+> > +     return 0;
+> > +}
+> > +NOKPROBE_SYMBOL(unwind_next);
+> > +
+> >  #endif       /* __KVM_NVHE_HYPERVISOR__ */
+> >  #endif       /* __ASM_STACKTRACE_NVHE_H */
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
+>
+> --
+> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
