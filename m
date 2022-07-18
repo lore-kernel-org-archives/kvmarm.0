@@ -2,71 +2,48 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE9FEC433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 16:00:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31C08C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 16:38:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BE7D4D784;
-	Mon, 18 Jul 2022 12:00:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 820FC4D772;
+	Mon, 18 Jul 2022 12:38:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@armlinux.org.uk
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JH1KgL3CPRoU; Mon, 18 Jul 2022 12:00:36 -0400 (EDT)
+	with ESMTP id 3kpLnAo-n3do; Mon, 18 Jul 2022 12:38:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B280C4D769;
-	Mon, 18 Jul 2022 12:00:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AEB54D6A4;
+	Mon, 18 Jul 2022 12:38:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F2904D769
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 12:00:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A7C6B4D69F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 12:37:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5ffPyiuTFvPk for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jul 2022 12:00:33 -0400 (EDT)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6DC3E4D756
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 12:00:33 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
- MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
- Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
- Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
- List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=mtkzJ8gYIfVJHGmdttrnhSApebA9lu35Rql+jSin4as=; b=qLZBllo2beUcZ4h47K6T14QkxU
- PEU68ddXgkJWQ+kM5WeuQpEmri4NJrW6H8GNwBeH0CNDG/5bbP4s1bund9sceoaQtfCOOnDBjfT/n
- y/TheW5S9/VKWrIxWSgqhSy6DpE8oj3dZ/ppNSioe0JBXOerhepdc4S7TTKLioz2AqnQogl6AF+fX
- wXiNOPPFR0MqrH6gY5byXYfnj3EJpEt98S7229giNLCVc8Rg0GL2ibbusUo648XNZqOua/Dl8yrWG
- jeuALN/KLuSYKCMyRzbvBH8/t5N2STz6cSW0jf2FKYXXn43iI8YAp0tH/DGQgMFquY5T34zjHHkAz
- C9vGxqYg==;
-Received: from shell.armlinux.org.uk
- ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33414)
- by pandora.armlinux.org.uk with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <linux@armlinux.org.uk>)
- id 1oDTAG-0001mC-9n; Mon, 18 Jul 2022 17:00:08 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
- (envelope-from <linux@shell.armlinux.org.uk>)
- id 1oDTAD-00024v-7W; Mon, 18 Jul 2022 17:00:05 +0100
-Date: Mon, 18 Jul 2022 17:00:05 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v4 01/18] arm64: stacktrace: Add shared header for common
- stack unwinding code
-Message-ID: <YtWDhV4PPtTrYbMH@shell.armlinux.org.uk>
-References: <20220715061027.1612149-1-kaleshsingh@google.com>
- <20220715061027.1612149-2-kaleshsingh@google.com>
- <YtVXokYGdlq1maQu@shell.armlinux.org.uk>
- <CAC_TJvfZG6CQOdSKeiNfVQhmL2TyeEuFbo9qo9yT20Qh49d3ZQ@mail.gmail.com>
+ with ESMTP id GHglXkfxdu2U for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jul 2022 12:37:58 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E753A4D694
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 12:37:57 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B3F491042;
+ Mon, 18 Jul 2022 09:37:57 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CF3103F73D;
+ Mon, 18 Jul 2022 09:37:55 -0700 (PDT)
+Date: Mon, 18 Jul 2022 17:38:23 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [kvm-unit-tests PATCH 1/3] arm: pmu: Add missing isb()'s after
+ sys register writing
+Message-ID: <YtWMXYyrEvZDFrAb@monolith.localdoman>
+References: <20220718154910.3923412-1-ricarkol@google.com>
+ <20220718154910.3923412-2-ricarkol@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <CAC_TJvfZG6CQOdSKeiNfVQhmL2TyeEuFbo9qo9yT20Qh49d3ZQ@mail.gmail.com>
-Cc: wangkefeng.wang@huawei.com, catalin.marinas@arm.com, elver@google.com,
- vincenzo.frascino@arm.com, will@kernel.org, android-mm@google.com,
- maz@kernel.org, kvmarm@lists.cs.columbia.edu, madvenka@linux.microsoft.com,
- linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
- drjones@redhat.com, ast@kernel.org, broonie@kernel.org, andreyknvl@gmail.com,
- linux-kernel@vger.kernel.org, mhiramat@kernel.org
+In-Reply-To: <20220718154910.3923412-2-ricarkol@google.com>
+Cc: drjones@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
+ oliver.upton@linux.dev, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,42 +60,138 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jul 18, 2022 at 08:26:14AM -0700, Kalesh Singh wrote:
-> On Mon, Jul 18, 2022 at 5:52 AM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> >
-> > Hi,
-> >
-> > Can you please explain why you are targetting my @oracle.com email
-> > address with this patch set?
-> >
-> > This causes me problems as I use Outlook's Web interface for that
-> > which doesn't appear to cope with the threading, and most certainly
-> > is only capable of top-reply only which is against Linux kernel email
-> > standards.
+Hi,
+
+On Mon, Jul 18, 2022 at 08:49:08AM -0700, Ricardo Koller wrote:
+> There are various pmu tests that require an isb() between enabling
+> counting and the actual counting. This can lead to count registers
+> reporting less events than expected; the actual enabling happens after
+> some events have happened.  For example, some missing isb()'s in the
+> pmu-sw-incr test lead to the following errors on bare-metal:
 > 
-> Hi Russell,
+> 	INFO: pmu: pmu-sw-incr: SW_INCR counter #0 has value 4294967280
+>         PASS: pmu: pmu-sw-incr: PWSYNC does not increment if PMCR.E is unset
+>         FAIL: pmu: pmu-sw-incr: counter #1 after + 100 SW_INCR
+>         FAIL: pmu: pmu-sw-incr: counter #0 after + 100 SW_INCR
+>         INFO: pmu: pmu-sw-incr: counter values after 100 SW_INCR #0=82 #1=98
+>         PASS: pmu: pmu-sw-incr: overflow on counter #0 after 100 SW_INCR
+>         SUMMARY: 4 tests, 2 unexpected failures
 > 
-> Sorry I wasn't aware of it (I got your oracle email from
-> get_maintainer script). Going forward I'll use the one you responded
-> from instead.
+> Add the missing isb()'s on all failing tests, plus some others that are
+> not currently required but might in the future (like an isb() after
+> clearing the overflow signal in the IRQ handler).
 
-Oh, this is the very annoying behaviour of get_maintainer.pl default
-mode to think that if someone touches a file, they're interested in
-future changes to it. In this case, it's because we both touched
-arch/arm64/include/asm/memory.h back in November 2021, and this
-silly script thinks I'll still be interested.
+That's rather cryptic. What might require those hypothetical ISBs and why? Why
+should a test add code for some hypothetical requirement that might, or might
+not, be implemented?
 
-b89ddf4cca43 arm64/bpf: Remove 128MB limit for BPF JIT programs
+This is pure speculation on my part, were you seeing spurious interrupts that
+went away after adding the ISB in irq_handler()?
 
-(The patch was originally developed for Oracle's UEK kernels, hence
-why it's got my @oracle.com address, but was later merged upstream.
-Interestingly, no one spotted that Alan Maguire's s-o-b should've
-been on it, as he was involved in the submission path to mainline.)
+A couple of comments below.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  arm/pmu.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index 15c542a2..fd838392 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -307,6 +307,7 @@ static void irq_handler(struct pt_regs *regs)
+>  			}
+>  		}
+>  		write_sysreg(ALL_SET, pmovsclr_el0);
+> +		isb();
+>  	} else {
+>  		pmu_stats.unexpected = true;
+>  	}
+> @@ -534,6 +535,7 @@ static void test_sw_incr(void)
+>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>  
+>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> +	isb();
+>  
+>  	for (i = 0; i < 100; i++)
+>  		write_sysreg(0x1, pmswinc_el0);
+
+Since your patch adds needed synchronization, from ARM DDI 0487H.a, page
+D13-5237:
+
+"Where a direct write to one register causes a bit or field in a different
+register [..] to be updated as a side-effect of that direct write [..], the
+change to the different register [..] is defined to be an indirect write. In
+this case, the indirect write is only guaranteed to be visible to subsequent
+direct or indirect reads or writes if synchronization is performed after the
+direct write and before the subsequent direct or indirect reads or writes."
+
+I think that says that you need an ISB after the direct writes to PMSWINC_EL0
+for software to read the correct value for PMEVNCTR0_EL0.
+
+> @@ -547,6 +549,7 @@ static void test_sw_incr(void)
+>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
+> +	isb();
+>  
+>  	for (i = 0; i < 100; i++)
+>  		write_sysreg(0x3, pmswinc_el0);
+
+Same as above, might be worth checking in other places.
+
+Will come back with more review comments.
+
+Thanks,
+Alex
+
+> @@ -618,6 +621,8 @@ static void test_chained_sw_incr(void)
+>  
+>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+>  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
+> +	isb();
+> +
+>  	for (i = 0; i < 100; i++)
+>  		write_sysreg(0x1, pmswinc_el0);
+>  
+> @@ -634,6 +639,8 @@ static void test_chained_sw_incr(void)
+>  	write_regn_el0(pmevcntr, 1, ALL_SET);
+>  	write_sysreg_s(0x3, PMCNTENSET_EL0);
+>  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
+> +	isb();
+> +
+>  	for (i = 0; i < 100; i++)
+>  		write_sysreg(0x1, pmswinc_el0);
+>  
+> @@ -821,6 +828,8 @@ static void test_overflow_interrupt(void)
+>  	report(expect_interrupts(0), "no overflow interrupt after preset");
+>  
+>  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
+> +	isb();
+> +
+>  	for (i = 0; i < 100; i++)
+>  		write_sysreg(0x2, pmswinc_el0);
+>  
+> @@ -879,6 +888,7 @@ static bool check_cycles_increase(void)
+>  	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
+>  
+>  	set_pmcr(get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
+> +	isb();
+>  
+>  	for (int i = 0; i < NR_SAMPLES; i++) {
+>  		uint64_t a, b;
+> @@ -894,6 +904,7 @@ static bool check_cycles_increase(void)
+>  	}
+>  
+>  	set_pmcr(get_pmcr() & ~PMU_PMCR_E);
+> +	isb();
+>  
+>  	return success;
+>  }
+> -- 
+> 2.37.0.170.g444d1eabd0-goog
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
