@@ -2,80 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37343C43334
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 17:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0521AC433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 18:40:17 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A7A604CC4D;
-	Mon, 18 Jul 2022 13:48:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 447EF4D01E;
+	Mon, 18 Jul 2022 14:40:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pcuRCOClOhzK; Mon, 18 Jul 2022 13:48:38 -0400 (EDT)
+	with ESMTP id I6D9shDNXHvK; Mon, 18 Jul 2022 14:40:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 666CA4CCA1;
-	Mon, 18 Jul 2022 13:48:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80BA84D016;
+	Mon, 18 Jul 2022 14:40:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A5DA14C6D6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 13:48:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C9844D011
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 14:40:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cGHDgARRGfa4 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jul 2022 13:48:35 -0400 (EDT)
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com
- [209.85.215.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 51AE04C6D4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 13:48:35 -0400 (EDT)
-Received: by mail-pg1-f173.google.com with SMTP id q16so8143595pgq.6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 10:48:35 -0700 (PDT)
+ with ESMTP id xpO4Tfc7Lkt4 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jul 2022 14:40:11 -0400 (EDT)
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com
+ [209.85.221.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9BD5A4D010
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 14:40:11 -0400 (EDT)
+Received: by mail-wr1-f41.google.com with SMTP id bk26so18319311wrb.11
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 11:40:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=oOsKh/rIhzMX0TySwIVedxK3T/oFogHZu9Zo5Njg4nY=;
- b=iI/EuXMT3hnfS/KXhKpU2+UUram/irufsKD+JzL1ddlwduIbJlgnERbf5Xmd+GEVF+
- /XMBIqp7S2IUzYRjV+EIR5WtKp71bM7REnjxbD83DTV6sPd7ebKra89kCQGMamb12MAC
- yG9rpxXHw0kt68OtiRCJ6RbRjxzNpaiG5sBk1CfpW8w8Lw/efEzfpV/FdwwK3CTDrSH0
- 2yOpdUOAVWWnTsIykRfbCFdZoM7Qw8VLy5PCzDPOixx+l75AI/lxvDdPrdfx2nAyRHd7
- ddXbM90BnyACrzrWKQDNRhvehCl+u5B1cqlWPEorVoV4lo+d/KroQBG2UKRLcY00ZCTm
- w2ag==
+ bh=vOTJ/lOx9mo2l0Gz+DyY71rr5IPjlKh/vGfexlPa874=;
+ b=aAUR32Vi33B2hsq115RzuvLz/D7BjNUvxtVUSii/FBxfRLg9mPQlqH9J/50pGs78cH
+ ZTb0xdBzMzYsUotLjxMs3x9/2xroeTmLJP8jxDcFlQLHW0bY6FCMgkU0e6NTqfWAZbgA
+ qY6iZQUJRazqJe1QD5BpUzFkJqdKS28BzeLdFCDp4yuOTPx87VISpNrVJGfKOJ7yGux9
+ CGOXRrJ/KfFPBCyBtDb+3APpoNYOBoMwTqb/JPLmS14Lmk7d87FZGlr8JSHhirPHMvvk
+ 5zHBcR/+T8xebXco7mLZGlUGu26l4rALZVHOu+X0NDcE3N6NOx/00nwBjDZISKyklI6o
+ JhSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=oOsKh/rIhzMX0TySwIVedxK3T/oFogHZu9Zo5Njg4nY=;
- b=IXjhW6qN0r0a505OOgFyG8mc42ZH3YZARV038wuIUi8O4Nqerb7ZnoAszGnyTh1Ly0
- DRx6MR9nmCnF6M3GYCoyGLCtuhy75+wHd2stu45RtATTsOWvZdpsCftxahIq28jkhE2o
- lTlWI8nXGHYqe/JXT56Dsu2wmU/TE+6Vrp0BFcCjV3hjPw+2Ac7JOUD3gC5fLKbH5fef
- L02MBoZ9E+1cwyUGSL5vwcWiB6GGABErXIWwH3bJ9qAtfNG/m/nIzaONfQEi4bsSneAt
- yj60vYNQLsNhJVY6Q2Tb8+on/OGaRrurMTTwldPaYgrjRHeMEkRxlQw81fcDujrl5cqX
- s62g==
-X-Gm-Message-State: AJIora/0vwm/8087eue6Kb0k9YyPpc+f3k2sazFqD7U7Hl2N9n2SqWU0
- UJz1baOLs5M6HidLriK1hQkxrw==
-X-Google-Smtp-Source: AGRyM1sM+5CRpTbQiBX5p0a/c1Za6phiAHgbGxxqgGPFpFpn0lDH9mHEuzIfTx6X7ASHTSkNMpj0Sg==
-X-Received: by 2002:a05:6a00:2481:b0:52a:d50e:e75e with SMTP id
- c1-20020a056a00248100b0052ad50ee75emr29606011pfv.43.1658166514122; 
- Mon, 18 Jul 2022 10:48:34 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150]) by smtp.gmail.com with ESMTPSA id
- q11-20020a170902dacb00b001640aad2f71sm9844100plx.180.2022.07.18.10.48.32
+ bh=vOTJ/lOx9mo2l0Gz+DyY71rr5IPjlKh/vGfexlPa874=;
+ b=nYGUjMBl3DrN0yWErzw1SQpcG3WTt3Eau9Sz3R2ES+o+UK6PQGTzhBSpOi3nbt6irV
+ 0ryPyXqjcWtSG1orOj9nQ7yENlUfezKDKpL+jE5fjPaj01wPk6imS/38Xt1QIOWL0tGy
+ XQeVIs0YO67BS61J3AdeEHjHy9PIF0zo0Hgrx4xyr7v6muVKxAe39PZOMhmCn421sDy2
+ 6vlxkRi7xnaPPcIdYyzaISM8Y+UwPCG2X15W9hCg0LX8JG04gPe+SyDX1ebK8xKWyogT
+ OLnYjD78wjT8VRhdGDd4I2TwOqWXhylgpfd6WXXo79RpjKjr8pcvlaiX3Y6cgZzAhFGd
+ 6xvQ==
+X-Gm-Message-State: AJIora+BXxJbqLLXReJ33gXZjHIltJM61CxkDomuoLwbUoFQBTi5BNdP
+ uuulJdVfFzFbw3WrOI4ZJ6UCiA==
+X-Google-Smtp-Source: AGRyM1u0er/ihy9AUSKP+mIbbum/WRRNpoD31ruQt0QF6/la8uKPSIA+5jiz0p3FIioRmUsfqeY6hg==
+X-Received: by 2002:a5d:6c6b:0:b0:1ea:77ea:dde8 with SMTP id
+ r11-20020a5d6c6b000000b001ea77eadde8mr24293592wrz.690.1658169610335; 
+ Mon, 18 Jul 2022 11:40:10 -0700 (PDT)
+Received: from google.com (109.36.187.35.bc.googleusercontent.com.
+ [35.187.36.109]) by smtp.gmail.com with ESMTPSA id
+ y11-20020adfc7cb000000b0021d6924b777sm11977778wrg.115.2022.07.18.11.40.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 Jul 2022 10:48:33 -0700 (PDT)
-Date: Mon, 18 Jul 2022 10:48:29 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH 1/3] arm: pmu: Add missing isb()'s after
- sys register writing
-Message-ID: <YtWc7YbR2d9uEZmX@google.com>
-References: <20220718154910.3923412-1-ricarkol@google.com>
- <20220718154910.3923412-2-ricarkol@google.com>
- <YtWMXYyrEvZDFrAb@monolith.localdoman>
+ Mon, 18 Jul 2022 11:40:09 -0700 (PDT)
+Date: Mon, 18 Jul 2022 19:40:05 +0100
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 12/24] KVM: arm64: Introduce shadow VM state at EL2
+Message-ID: <YtWpBYPrBcdyp9r6@google.com>
+References: <20220630135747.26983-1-will@kernel.org>
+ <20220630135747.26983-13-will@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <YtWMXYyrEvZDFrAb@monolith.localdoman>
-Cc: drjones@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
- oliver.upton@linux.dev, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20220630135747.26983-13-will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com, kvm@vger.kernel.org,
+ Oliver Upton <oliver.upton@linux.dev>, Andy Lutomirski <luto@amacapital.net>,
+ linux-arm-kernel@lists.infradead.org, Michael Roth <michael.roth@amd.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,149 +93,454 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Jul 18, 2022 at 05:38:23PM +0100, Alexandru Elisei wrote:
-> Hi,
-> 
-> On Mon, Jul 18, 2022 at 08:49:08AM -0700, Ricardo Koller wrote:
-> > There are various pmu tests that require an isb() between enabling
-> > counting and the actual counting. This can lead to count registers
-> > reporting less events than expected; the actual enabling happens after
-> > some events have happened.  For example, some missing isb()'s in the
-> > pmu-sw-incr test lead to the following errors on bare-metal:
-> > 
-> > 	INFO: pmu: pmu-sw-incr: SW_INCR counter #0 has value 4294967280
-> >         PASS: pmu: pmu-sw-incr: PWSYNC does not increment if PMCR.E is unset
-> >         FAIL: pmu: pmu-sw-incr: counter #1 after + 100 SW_INCR
-> >         FAIL: pmu: pmu-sw-incr: counter #0 after + 100 SW_INCR
-> >         INFO: pmu: pmu-sw-incr: counter values after 100 SW_INCR #0=82 #1=98
-> >         PASS: pmu: pmu-sw-incr: overflow on counter #0 after 100 SW_INCR
-> >         SUMMARY: 4 tests, 2 unexpected failures
-> > 
-> > Add the missing isb()'s on all failing tests, plus some others that are
-> > not currently required but might in the future (like an isb() after
-> > clearing the overflow signal in the IRQ handler).
-> 
-> That's rather cryptic. What might require those hypothetical ISBs and why? Why
-> should a test add code for some hypothetical requirement that might, or might
-> not, be implemented?
+[...]
 
-Good point, this wasn't very clear. Will add something more specific.
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 9f339dffbc1a..2d6b5058f7d3 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -288,6 +288,14 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
+>   */
+>  u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift);
+>  
+> +/*
 
-> 
-> This is pure speculation on my part, were you seeing spurious interrupts that
-> went away after adding the ISB in irq_handler()?
+/** ?
 
-I didn't see any. But I think it could happen: multiple spurious
-interrupts until the line finally gets cleared.
+> + * kvm_pgtable_stage2_pgd_size() - Helper to compute size of a stage-2 PGD
+> + * @vtcr:	Content of the VTCR register.
+> + *
+> + * Return: the size (in bytes) of the stage-2 PGD
+> + */
+> +size_t kvm_pgtable_stage2_pgd_size(u64 vtcr);
+> +
+>  /**
+>   * __kvm_pgtable_stage2_init() - Initialise a guest stage-2 page-table.
+>   * @pgt:	Uninitialised page-table structure to initialise.
+> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> index 8f7b8a2314bb..11526e89fe5c 100644
+> --- a/arch/arm64/include/asm/kvm_pkvm.h
+> +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> @@ -9,6 +9,9 @@
+>  #include <linux/memblock.h>
+>  #include <asm/kvm_pgtable.h>
+>  
+> +/* Maximum number of protected VMs that can be created. */
+> +#define KVM_MAX_PVMS 255
+> +
+>  #define HYP_MEMBLOCK_REGIONS 128
+>  
+>  extern struct memblock_region kvm_nvhe_sym(hyp_memory)[];
+> @@ -40,6 +43,11 @@ static inline unsigned long hyp_vmemmap_pages(size_t vmemmap_entry_size)
+>  	return res >> PAGE_SHIFT;
+>  }
+>  
+> +static inline unsigned long hyp_shadow_table_pages(void)
+> +{
+> +	return PAGE_ALIGN(KVM_MAX_PVMS * sizeof(void *)) >> PAGE_SHIFT;
+> +}
+> +
+>  static inline unsigned long __hyp_pgtable_max_pages(unsigned long nr_pages)
+>  {
+>  	unsigned long total = 0, i;
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> index 3bea816296dc..3a0817b5c739 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -11,6 +11,7 @@
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/kvm_pgtable.h>
+>  #include <asm/virt.h>
+> +#include <nvhe/pkvm.h>
+>  #include <nvhe/spinlock.h>
+>  
+>  /*
+> @@ -68,10 +69,12 @@ bool addr_is_memory(phys_addr_t phys);
+>  int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
+>  int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id);
+>  int kvm_host_prepare_stage2(void *pgt_pool_base);
+> +int kvm_guest_prepare_stage2(struct kvm_shadow_vm *vm, void *pgd);
+>  void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt);
+>  
+>  int hyp_pin_shared_mem(void *from, void *to);
+>  void hyp_unpin_shared_mem(void *from, void *to);
+> +void reclaim_guest_pages(struct kvm_shadow_vm *vm);
+>  
+>  static __always_inline void __load_host_stage2(void)
+>  {
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> new file mode 100644
+> index 000000000000..1d0a33f70879
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> @@ -0,0 +1,60 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2021 Google LLC
+> + * Author: Fuad Tabba <tabba@google.com>
+> + */
+> +
+> +#ifndef __ARM64_KVM_NVHE_PKVM_H__
+> +#define __ARM64_KVM_NVHE_PKVM_H__
+> +
+> +#include <asm/kvm_pkvm.h>
+> +
+> +/*
+> + * Holds the relevant data for maintaining the vcpu state completely at hyp.
+> + */
+> +struct kvm_shadow_vcpu_state {
+> +	/* The data for the shadow vcpu. */
+> +	struct kvm_vcpu shadow_vcpu;
+> +
+> +	/* A pointer to the host's vcpu. */
+> +	struct kvm_vcpu *host_vcpu;
+> +
+> +	/* A pointer to the shadow vm. */
+> +	struct kvm_shadow_vm *shadow_vm;
 
-> 
-> A couple of comments below.
-> 
-> > 
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  arm/pmu.c | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> > 
-> > diff --git a/arm/pmu.c b/arm/pmu.c
-> > index 15c542a2..fd838392 100644
-> > --- a/arm/pmu.c
-> > +++ b/arm/pmu.c
-> > @@ -307,6 +307,7 @@ static void irq_handler(struct pt_regs *regs)
-> >  			}
-> >  		}
-> >  		write_sysreg(ALL_SET, pmovsclr_el0);
-> > +		isb();
-> >  	} else {
-> >  		pmu_stats.unexpected = true;
-> >  	}
-> > @@ -534,6 +535,7 @@ static void test_sw_incr(void)
-> >  	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> >  
-> >  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> > +	isb();
-> >  
-> >  	for (i = 0; i < 100; i++)
-> >  		write_sysreg(0x1, pmswinc_el0);
-> 
-> Since your patch adds needed synchronization, from ARM DDI 0487H.a, page
-> D13-5237:
-> 
-> "Where a direct write to one register causes a bit or field in a different
-> register [..] to be updated as a side-effect of that direct write [..], the
-> change to the different register [..] is defined to be an indirect write. In
-> this case, the indirect write is only guaranteed to be visible to subsequent
-> direct or indirect reads or writes if synchronization is performed after the
-> direct write and before the subsequent direct or indirect reads or writes."
-> 
-> I think that says that you need an ISB after the direct writes to PMSWINC_EL0
-> for software to read the correct value for PMEVNCTR0_EL0.
-> 
-> > @@ -547,6 +549,7 @@ static void test_sw_incr(void)
-> >  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> >  	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> >  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> > +	isb();
-> >  
-> >  	for (i = 0; i < 100; i++)
-> >  		write_sysreg(0x3, pmswinc_el0);
-> 
-> Same as above, might be worth checking in other places.
-> 
-> Will come back with more review comments.
-> 
-> Thanks,
-> Alex
-> 
-> > @@ -618,6 +621,8 @@ static void test_chained_sw_incr(void)
-> >  
-> >  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> >  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> > +	isb();
-> > +
-> >  	for (i = 0; i < 100; i++)
-> >  		write_sysreg(0x1, pmswinc_el0);
-> >  
-> > @@ -634,6 +639,8 @@ static void test_chained_sw_incr(void)
-> >  	write_regn_el0(pmevcntr, 1, ALL_SET);
-> >  	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> >  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> > +	isb();
-> > +
-> >  	for (i = 0; i < 100; i++)
-> >  		write_sysreg(0x1, pmswinc_el0);
-> >  
-> > @@ -821,6 +828,8 @@ static void test_overflow_interrupt(void)
-> >  	report(expect_interrupts(0), "no overflow interrupt after preset");
-> >  
-> >  	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> > +	isb();
-> > +
-> >  	for (i = 0; i < 100; i++)
-> >  		write_sysreg(0x2, pmswinc_el0);
-> >  
-> > @@ -879,6 +888,7 @@ static bool check_cycles_increase(void)
-> >  	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-> >  
-> >  	set_pmcr(get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
-> > +	isb();
-> >  
-> >  	for (int i = 0; i < NR_SAMPLES; i++) {
-> >  		uint64_t a, b;
-> > @@ -894,6 +904,7 @@ static bool check_cycles_increase(void)
-> >  	}
-> >  
-> >  	set_pmcr(get_pmcr() & ~PMU_PMCR_E);
-> > +	isb();
-> >  
-> >  	return success;
-> >  }
-> > -- 
-> > 2.37.0.170.g444d1eabd0-goog
-> > 
+IMHO, those declarations are already self-explanatory. The comments above don't
+bring much.
 
-Thanks!
-Ricardo
+> +};
+> +
+> +/*
+> + * Holds the relevant data for running a protected vm.
+> + */
+> +struct kvm_shadow_vm {
+> +	/* The data for the shadow kvm. */
+> +	struct kvm kvm;
+> +
+> +	/* The host's kvm structure. */
+> +	struct kvm *host_kvm;
+> +
+> +	/* The total size of the donated shadow area. */
+> +	size_t shadow_area_size;
+> +
+> +	struct kvm_pgtable pgt;
+> +
+> +	/* Array of the shadow state per vcpu. */
+> +	struct kvm_shadow_vcpu_state shadow_vcpu_states[0];
+> +};
+> +
+> +static inline struct kvm_shadow_vcpu_state *get_shadow_state(struct kvm_vcpu *shadow_vcpu)
+> +{
+> +	return container_of(shadow_vcpu, struct kvm_shadow_vcpu_state, shadow_vcpu);
+> +}
+> +
+> +static inline struct kvm_shadow_vm *get_shadow_vm(struct kvm_vcpu *shadow_vcpu)
+> +{
+> +	return get_shadow_state(shadow_vcpu)->shadow_vm;
+> +}
+> +
+> +void hyp_shadow_table_init(void *tbl);
+> +int __pkvm_init_shadow(struct kvm *kvm, unsigned long shadow_hva,
+> +		       size_t shadow_size, unsigned long pgd_hva);
+> +int __pkvm_teardown_shadow(unsigned int shadow_handle);
+> +
+> +#endif /* __ARM64_KVM_NVHE_PKVM_H__ */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 3cea4b6ac23e..a1fbd11c8041 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -15,6 +15,7 @@
+>  
+>  #include <nvhe/mem_protect.h>
+>  #include <nvhe/mm.h>
+> +#include <nvhe/pkvm.h>
+>  #include <nvhe/trap_handler.h>
+>  
+>  DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+> @@ -191,6 +192,24 @@ static void handle___pkvm_vcpu_init_traps(struct kvm_cpu_context *host_ctxt)
+>  	__pkvm_vcpu_init_traps(kern_hyp_va(vcpu));
+>  }
+>  
+> +static void handle___pkvm_init_shadow(struct kvm_cpu_context *host_ctxt)
+> +{
+> +	DECLARE_REG(struct kvm *, host_kvm, host_ctxt, 1);
+> +	DECLARE_REG(unsigned long, host_shadow_va, host_ctxt, 2);
+> +	DECLARE_REG(size_t, shadow_size, host_ctxt, 3);
+> +	DECLARE_REG(unsigned long, pgd, host_ctxt, 4);
+> +
+> +	cpu_reg(host_ctxt, 1) = __pkvm_init_shadow(host_kvm, host_shadow_va,
+> +						   shadow_size, pgd);
+> +}
+> +
+> +static void handle___pkvm_teardown_shadow(struct kvm_cpu_context *host_ctxt)
+> +{
+> +	DECLARE_REG(unsigned int, shadow_handle, host_ctxt, 1);
+> +
+> +	cpu_reg(host_ctxt, 1) = __pkvm_teardown_shadow(shadow_handle);
+> +}
+> +
+>  typedef void (*hcall_t)(struct kvm_cpu_context *);
+>  
+>  #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
+> @@ -220,6 +239,8 @@ static const hcall_t host_hcall[] = {
+>  	HANDLE_FUNC(__vgic_v3_save_aprs),
+>  	HANDLE_FUNC(__vgic_v3_restore_aprs),
+>  	HANDLE_FUNC(__pkvm_vcpu_init_traps),
+> +	HANDLE_FUNC(__pkvm_init_shadow),
+> +	HANDLE_FUNC(__pkvm_teardown_shadow),
+>  };
+>  
+>  static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index e2e3b30b072e..9baf731736be 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -141,6 +141,20 @@ int kvm_host_prepare_stage2(void *pgt_pool_base)
+>  	return 0;
+>  }
+>  
+> +int kvm_guest_prepare_stage2(struct kvm_shadow_vm *vm, void *pgd)
+> +{
+> +	vm->pgt.pgd = pgd;
+> +	return 0;
+> +}
+> +
+> +void reclaim_guest_pages(struct kvm_shadow_vm *vm)
+> +{
+> +	unsigned long nr_pages;
+> +
+> +	nr_pages = kvm_pgtable_stage2_pgd_size(vm->kvm.arch.vtcr) >> PAGE_SHIFT;
+> +	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(vm->pgt.pgd), nr_pages));
+> +}
+> +
+>  int __pkvm_prot_finalize(void)
+>  {
+>  	struct kvm_s2_mmu *mmu = &host_kvm.arch.mmu;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index 99c8d8b73e70..77aeb787670b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -7,6 +7,9 @@
+>  #include <linux/kvm_host.h>
+>  #include <linux/mm.h>
+>  #include <nvhe/fixed_config.h>
+> +#include <nvhe/mem_protect.h>
+> +#include <nvhe/memory.h>
+
+I don't think this one is necessary, it is already included in mm.h.
+
+> +#include <nvhe/pkvm.h>
+>  #include <nvhe/trap_handler.h>
+>  
+>  /*
+> @@ -183,3 +186,398 @@ void __pkvm_vcpu_init_traps(struct kvm_vcpu *vcpu)
+>  	pvm_init_traps_aa64mmfr0(vcpu);
+>  	pvm_init_traps_aa64mmfr1(vcpu);
+>  }
+> +
+> +/*
+> + * Start the shadow table handle at the offset defined instead of at 0.
+> + * Mainly for sanity checking and debugging.
+> + */
+> +#define HANDLE_OFFSET 0x1000
+> +
+> +static unsigned int shadow_handle_to_idx(unsigned int shadow_handle)
+> +{
+> +	return shadow_handle - HANDLE_OFFSET;
+> +}
+> +
+> +static unsigned int idx_to_shadow_handle(unsigned int idx)
+> +{
+> +	return idx + HANDLE_OFFSET;
+> +}
+> +
+> +/*
+> + * Spinlock for protecting the shadow table related state.
+> + * Protects writes to shadow_table, nr_shadow_entries, and next_shadow_alloc,
+> + * as well as reads and writes to last_shadow_vcpu_lookup.
+> + */
+> +static DEFINE_HYP_SPINLOCK(shadow_lock);
+> +
+> +/*
+> + * The table of shadow entries for protected VMs in hyp.
+> + * Allocated at hyp initialization and setup.
+> + */
+> +static struct kvm_shadow_vm **shadow_table;
+> +
+> +/* Current number of vms in the shadow table. */
+> +static unsigned int nr_shadow_entries;
+> +
+> +/* The next entry index to try to allocate from. */
+> +static unsigned int next_shadow_alloc;
+> +
+> +void hyp_shadow_table_init(void *tbl)
+> +{
+> +	WARN_ON(shadow_table);
+> +	shadow_table = tbl;
+> +}
+> +
+> +/*
+> + * Return the shadow vm corresponding to the handle.
+> + */
+> +static struct kvm_shadow_vm *find_shadow_by_handle(unsigned int shadow_handle)
+> +{
+> +	unsigned int shadow_idx = shadow_handle_to_idx(shadow_handle);
+> +
+> +	if (unlikely(shadow_idx >= KVM_MAX_PVMS))
+> +		return NULL;
+> +
+> +	return shadow_table[shadow_idx];
+> +}
+> +
+> +static void unpin_host_vcpus(struct kvm_shadow_vcpu_state *shadow_vcpu_states,
+> +			     unsigned int nr_vcpus)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < nr_vcpus; i++) {
+> +		struct kvm_vcpu *host_vcpu = shadow_vcpu_states[i].host_vcpu;
+
+IIRC, checkpatch likes an empty line after declarations.
+
+> +		hyp_unpin_shared_mem(host_vcpu, host_vcpu + 1);
+> +	}
+> +}
+> +
+> +static int set_host_vcpus(struct kvm_shadow_vcpu_state *shadow_vcpu_states,
+> +			  unsigned int nr_vcpus,
+> +			  struct kvm_vcpu **vcpu_array,
+> +			  size_t vcpu_array_size)
+> +{
+> +	int i;
+> +
+> +	if (vcpu_array_size < sizeof(*vcpu_array) * nr_vcpus)
+> +		return -EINVAL;
+> +
+> +	for (i = 0; i < nr_vcpus; i++) {
+> +		struct kvm_vcpu *host_vcpu = kern_hyp_va(vcpu_array[i]);
+> +
+> +		if (hyp_pin_shared_mem(host_vcpu, host_vcpu + 1)) {
+> +			unpin_host_vcpus(shadow_vcpu_states, i);
+> +			return -EBUSY;
+> +		}
+> +
+> +		shadow_vcpu_states[i].host_vcpu = host_vcpu;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int init_shadow_structs(struct kvm *kvm, struct kvm_shadow_vm *vm,
+> +			       struct kvm_vcpu **vcpu_array,
+> +			       unsigned int nr_vcpus)
+> +{
+> +	int i;
+> +
+> +	vm->host_kvm = kvm;
+> +	vm->kvm.created_vcpus = nr_vcpus;
+> +	vm->kvm.arch.vtcr = host_kvm.arch.vtcr;
+> +
+> +	for (i = 0; i < nr_vcpus; i++) {
+> +		struct kvm_shadow_vcpu_state *shadow_vcpu_state = &vm->shadow_vcpu_states[i];
+> +		struct kvm_vcpu *shadow_vcpu = &shadow_vcpu_state->shadow_vcpu;
+> +		struct kvm_vcpu *host_vcpu = shadow_vcpu_state->host_vcpu;
+> +
+> +		shadow_vcpu_state->shadow_vm = vm;
+> +
+> +		shadow_vcpu->kvm = &vm->kvm;
+> +		shadow_vcpu->vcpu_id = READ_ONCE(host_vcpu->vcpu_id);
+> +		shadow_vcpu->vcpu_idx = i;
+> +
+> +		shadow_vcpu->arch.hw_mmu = &vm->kvm.arch.mmu;
+
+In the end, we don't seem to use much from the struct kvm_cpu. Is it for
+convinience that a smaller struct kvm_shadow_cpu hasn't been created, or we do
+anticipate a later wider usage?
+
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static bool __exists_shadow(struct kvm *host_kvm)
+> +{
+> +	int i;
+> +	unsigned int nr_checked = 0;
+> +
+> +	for (i = 0; i < KVM_MAX_PVMS && nr_checked < nr_shadow_entries; i++) {
+> +		if (!shadow_table[i])
+> +			continue;
+> +
+> +		if (unlikely(shadow_table[i]->host_kvm == host_kvm))
+> +			return true;
+> +
+> +		nr_checked++;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +/*
+> + * Allocate a shadow table entry and insert a pointer to the shadow vm.
+> + *
+> + * Return a unique handle to the protected VM on success,
+> + * negative error code on failure.
+> + */
+> +static unsigned int insert_shadow_table(struct kvm *kvm,
+> +					struct kvm_shadow_vm *vm,
+> +					size_t shadow_size)
+> +{
+> +	struct kvm_s2_mmu *mmu = &vm->kvm.arch.mmu;
+> +	unsigned int shadow_handle;
+> +	unsigned int vmid;
+> +
+> +	hyp_assert_lock_held(&shadow_lock);
+> +
+> +	if (unlikely(nr_shadow_entries >= KVM_MAX_PVMS))
+> +		return -ENOMEM;
+> +
+> +	/*
+> +	 * Initializing protected state might have failed, yet a malicious host
+> +	 * could trigger this function. Thus, ensure that shadow_table exists.
+> +	 */
+> +	if (unlikely(!shadow_table))
+> +		return -EINVAL;
+> +
+> +	/* Check that a shadow hasn't been created before for this host KVM. */
+> +	if (unlikely(__exists_shadow(kvm)))
+> +		return -EEXIST;
+> +
+> +	/* Find the next free entry in the shadow table. */
+> +	while (shadow_table[next_shadow_alloc])
+> +		next_shadow_alloc = (next_shadow_alloc + 1) % KVM_MAX_PVMS;
+
+Couldn't it be merged with __exists_shadow which already knows the first free
+shadow_table idx?
+
+> +	shadow_handle = idx_to_shadow_handle(next_shadow_alloc);
+> +
+> +	vm->kvm.arch.pkvm.shadow_handle = shadow_handle;
+> +	vm->shadow_area_size = shadow_size;
+> +
+> +	/* VMID 0 is reserved for the host */
+> +	vmid = next_shadow_alloc + 1;
+> +	if (vmid > 0xff)
+
+Couldn't the 0xff be found with get_vmid_bits() or even from host_kvm.arch.vtcr?
+Or does that depends on something completely different?
+
+Also, appologies if this has been discussed already and I missed it, maybe
+KVM_MAX_PVMS could be changed for that value - 1. Unless we think that archs
+supporting 16 bits would waste way too much memory for that?
+
+> +		return -ENOMEM;
+> +
+> +	atomic64_set(&mmu->vmid.id, vmid);
+> +	mmu->arch = &vm->kvm.arch;
+> +	mmu->pgt = &vm->pgt;
+> +
+> +	shadow_table[next_shadow_alloc] = vm;
+> +	next_shadow_alloc = (next_shadow_alloc + 1) % KVM_MAX_PVMS;
+> +	nr_shadow_entries++;
+> +
+> +	return shadow_handle;
+> +}
+> +
+
+[...]
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
