@@ -2,50 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88B3AC43334
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Jul 2022 11:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E09B4C43334
+	for <kvmarm@archiver.kernel.org>; Tue, 19 Jul 2022 11:34:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F17FE4C976;
-	Tue, 19 Jul 2022 07:26:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57E814C947;
+	Tue, 19 Jul 2022 07:34:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wzp70WlHlnk1; Tue, 19 Jul 2022 07:26:29 -0400 (EDT)
+	with ESMTP id rM-8cE1ZMJFF; Tue, 19 Jul 2022 07:34:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A98444C919;
-	Tue, 19 Jul 2022 07:26:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 319BD4C957;
+	Tue, 19 Jul 2022 07:34:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B1704C919
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 07:26:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F24624C934
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 07:34:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bIFZLzbGO3Hg for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Jul 2022 07:26:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A0DB64C904
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 07:26:27 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 35C02153B;
- Tue, 19 Jul 2022 04:26:27 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 480323F766;
- Tue, 19 Jul 2022 04:26:25 -0700 (PDT)
-Date: Tue, 19 Jul 2022 12:26:54 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+ with ESMTP id re+eYPdkVXLZ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Jul 2022 07:34:10 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C9A5B4C93B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 07:34:10 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 11476B81B07;
+ Tue, 19 Jul 2022 11:34:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A896C341C6;
+ Tue, 19 Jul 2022 11:34:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1658230447;
+ bh=Krnblg1tNNxdY0yWwiDNFGuDPPtegPeqARuHP9+f4g0=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=GlvOiOoyjy4/huoTXZWupXi4ABhVJBAdeY96eKfGUl2LGC90eIGWJAWm0HAf4bUFx
+ YG6sE2JV7WhkUYOZTb5h0j12kO5jOu23WVDzLN7jr4Te4iy7jjcXW6mZYAuF8Sh5tN
+ CZgUE/1nvzy56ZBazwS1DatDNV71+J0QdBePiolHNFToQgieTrKVqZSCdImvNmFUdU
+ XBYAD7tSFH6lsbUkQ+isO3Z6UUOa6RYE8PmFYDn8w/67uKbnMKnExG00+aThdCG692
+ PO99EeWsTleCO5vteCTi7NH7FeGEV145Vltl/Nrs/maZGyW6axOnTDvSsWq9bVmA/H
+ g4LPIj/ppQcDA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oDlUL-008Syz-Ff;
+ Tue, 19 Jul 2022 12:34:05 +0100
+Date: Tue, 19 Jul 2022 12:34:05 +0100
+Message-ID: <87edyhz68i.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [kvm-unit-tests PATCH 1/3] arm: pmu: Add missing isb()'s after
- sys register writing
-Message-ID: <YtaU/oSBWaBhjKYP@monolith.localdoman>
+Subject: Re: [kvm-unit-tests PATCH 3/3] arm: pmu: Remove checks for !overflow
+ in chained counters tests
+In-Reply-To: <20220718154910.3923412-4-ricarkol@google.com>
 References: <20220718154910.3923412-1-ricarkol@google.com>
- <20220718154910.3923412-2-ricarkol@google.com>
- <YtWMXYyrEvZDFrAb@monolith.localdoman>
- <YtWc7YbR2d9uEZmX@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YtWc7YbR2d9uEZmX@google.com>
-Cc: drjones@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
- oliver.upton@linux.dev, kvmarm@lists.cs.columbia.edu
+ <20220718154910.3923412-4-ricarkol@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ricarkol@google.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, drjones@redhat.com, alexandru.elisei@arm.com,
+ eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: drjones@redhat.com, kvm@vger.kernel.org, oliver.upton@linux.dev,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -62,57 +87,36 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
-
-On Mon, Jul 18, 2022 at 10:48:29AM -0700, Ricardo Koller wrote:
-> On Mon, Jul 18, 2022 at 05:38:23PM +0100, Alexandru Elisei wrote:
-> > Hi,
-> > 
-> > On Mon, Jul 18, 2022 at 08:49:08AM -0700, Ricardo Koller wrote:
-> > > There are various pmu tests that require an isb() between enabling
-> > > counting and the actual counting. This can lead to count registers
-> > > reporting less events than expected; the actual enabling happens after
-> > > some events have happened.  For example, some missing isb()'s in the
-> > > pmu-sw-incr test lead to the following errors on bare-metal:
-> > > 
-> > > 	INFO: pmu: pmu-sw-incr: SW_INCR counter #0 has value 4294967280
-> > >         PASS: pmu: pmu-sw-incr: PWSYNC does not increment if PMCR.E is unset
-> > >         FAIL: pmu: pmu-sw-incr: counter #1 after + 100 SW_INCR
-> > >         FAIL: pmu: pmu-sw-incr: counter #0 after + 100 SW_INCR
-> > >         INFO: pmu: pmu-sw-incr: counter values after 100 SW_INCR #0=82 #1=98
-> > >         PASS: pmu: pmu-sw-incr: overflow on counter #0 after 100 SW_INCR
-> > >         SUMMARY: 4 tests, 2 unexpected failures
-> > > 
-> > > Add the missing isb()'s on all failing tests, plus some others that are
-> > > not currently required but might in the future (like an isb() after
-> > > clearing the overflow signal in the IRQ handler).
-> > 
-> > That's rather cryptic. What might require those hypothetical ISBs and why? Why
-> > should a test add code for some hypothetical requirement that might, or might
-> > not, be implemented?
+On Mon, 18 Jul 2022 16:49:10 +0100,
+Ricardo Koller <ricarkol@google.com> wrote:
 > 
-> Good point, this wasn't very clear. Will add something more specific.
-> 
-> > 
-> > This is pure speculation on my part, were you seeing spurious interrupts that
-> > went away after adding the ISB in irq_handler()?
-> 
-> I didn't see any. But I think it could happen: multiple spurious
-> interrupts until the line finally gets cleared.
+> A chained event overflowing on the low counter can set the overflow flag
+> in PMOVS.  KVM does not set it, but real HW and the fast-model seem to.
+> Moreover, the AArch64.IncrementEventCounter() pseudocode in the ARM ARM
+> (DDI 0487H.a, J1.1.1 "aarch64/debug") also sets the PMOVS bit on
+> overflow.
 
-I agree with you, it takes a finite time for any interrupt controller (in
-our case, the GIC) to deassert the interrupt line to the CPU after a device
-has deasserted the interrupt line to the interrupt controller. That's why
-device drivers are usually robust in dealing with spurious interrupts.
+Isn't this indicative of a bug in the KVM emulation? To be honest, the
+pseudocode looks odd. It says:
 
-It looks to me that the way irq_handler() treats spurious interrupts might
-lead to tests being incorrectly treated as failed, which is going to be a
-pain to reproduce and diagnose.
+<quote>
+	if old_value<64:ovflw> != new_value<64:ovflw> then
+	    PMOVSSET_EL0<idx> = '1';
+	    PMOVSCLR_EL0<idx> = '1';
+</quote>
 
-@Eric, was there a particular reason for this approach?
+which I find remarkably ambiguous. Is this setting and clearing the
+overflow bit? Or setting it in the single register that backs the two
+accessors in whatever way it can?
 
-Thanks,
-Alex
+If it is the second interpretation that is correct, then KVM
+definitely needs fixing (though this looks pretty involved for
+anything that isn't a SWINC event).
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
