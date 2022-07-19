@@ -2,80 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12E76C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Jul 2022 14:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB34C43334
+	for <kvmarm@archiver.kernel.org>; Tue, 19 Jul 2022 14:50:24 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 839924CE2D;
-	Tue, 19 Jul 2022 10:24:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2848C4CF4C;
+	Tue, 19 Jul 2022 10:50:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fLLRh5nwd9Cx; Tue, 19 Jul 2022 10:24:23 -0400 (EDT)
+	with ESMTP id VwGTnOjjG0Pj; Tue, 19 Jul 2022 10:50:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 659744CE51;
-	Tue, 19 Jul 2022 10:24:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB8664CF3C;
+	Tue, 19 Jul 2022 10:50:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F5AB4CE2F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 10:24:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB1B44CE57
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 10:50:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id P8TtM+Be8jak for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Jul 2022 10:24:20 -0400 (EDT)
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com
- [209.85.221.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C7B0C4CE2D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 10:24:20 -0400 (EDT)
-Received: by mail-wr1-f44.google.com with SMTP id bu1so21827195wrb.9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 07:24:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=WNzGE1u5XBqK6Mb53sKBN5FU4Tw9+8CwrSdfuz5XdPs=;
- b=bfJEy/cnbMf7Dd+3HUkkFGC74hUVFhvhiX6RtKyPK1wNJDjzvZWDt9+QS+wz40FrTN
- HztEGcPqJAgSYKG5Ud5mP6WUgE5Vsy1Ey8x4vwxGGzkErc+F/f4zZMXKV0W4AoLMIYlK
- rdK+I8odxO/LtKbwOdwbk6RtcEFXy0MMU564JRUEqezINa/PYfR4wFoBfsx6h291tdla
- 2u52mftckZzlk3NyzHKaePzs+dBYbx4O1KOBoQc6OldLHSFib9f4w0hUX9pjQsZ2PO21
- 3eHZvRyOltIeXzszeKsuuBmjOvDQD9I5sMAE3gYJJv6Epw3/x+G4XvUt9Ds5GsvWij9u
- 3y9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=WNzGE1u5XBqK6Mb53sKBN5FU4Tw9+8CwrSdfuz5XdPs=;
- b=KuIPZ7Lu2ZN3fyAnx8dFHNKvgdNVyc3SyVqy/KXqnbWX/vLpDAsnhrAB0BVFu6W6xW
- Svy4bCWFvtJeVv+UhD/Fj2hPiPxfBAH2MHXtlpoYB5jR8ZfvAxwh0bT5s8X05rkK/4im
- DvS0bdwkJhYZaXKvx/dy0dsxReoW5VUSymKBCezZkMtpDMFDZ0VKL9gQteREiKitiS3j
- nk9fdAUxX1HjE/et8AU20lQppoA3GmBo2Z7gyddUVCs+Cn41jSy4NzUP9KQto/Ask+9k
- 5DyAEHuZ7loP9pnAX5nCmZDGVn8hHg9z8KsdXpj++p3upoEs2hv7ijmeL0IXwfllX5S0
- IrnQ==
-X-Gm-Message-State: AJIora+pPZ3e2QjGrmmbH8NKQYw60KLgI3cnf3dvLpBJQJfSY/9nnO5z
- 5+stgB/HjVlQxUl/EV874YpywA==
-X-Google-Smtp-Source: AGRyM1u/zzb8ihXo42fNXAW1OoFznD0EcxAfeIq6ZlSo4Z+it7CYm8RtVz9+EnpyHMxpc1irG479Bw==
-X-Received: by 2002:a5d:6d8f:0:b0:21d:b7d0:a913 with SMTP id
- l15-20020a5d6d8f000000b0021db7d0a913mr26582401wrs.462.1658240659597; 
- Tue, 19 Jul 2022 07:24:19 -0700 (PDT)
-Received: from google.com (109.36.187.35.bc.googleusercontent.com.
- [35.187.36.109]) by smtp.gmail.com with ESMTPSA id
- e9-20020a05600c4e4900b0039c811077d3sm19310285wmq.22.2022.07.19.07.24.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 19 Jul 2022 07:24:19 -0700 (PDT)
-Date: Tue, 19 Jul 2022 15:24:15 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 00/24] KVM: arm64: Introduce pKVM shadow state at EL2
-Message-ID: <Yta+jyw9MfYQPC+e@google.com>
-References: <20220630135747.26983-1-will@kernel.org>
+ with ESMTP id AEJuCDqIQOJp for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Jul 2022 10:50:20 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 35FBA4CE52
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 10:50:20 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1658242219;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=jctjcs10cXLC6Fgs+ejM2KhG7RRpw0OENqiwSYLGZwM=;
+ b=igz/bprdn0EGgw4vEzeXhl++PB2FmMwsYyqRSGFmlIKn/JmLNJ9qXP/VR7YYXrHw1CN6vf
+ CKJ6eaCU2jt2EqcY8t0IeeQIR4ND/pAVHaRs/WbFVX+e4poPC+8/k+JflJuCl98mCDC6mA
+ d2BW/Up+/tmF9bIhHJcC8q6LUMp20po=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-534-kkwaFwbkMtGGia0WGtTbbg-1; Tue, 19 Jul 2022 10:50:10 -0400
+X-MC-Unique: kkwaFwbkMtGGia0WGtTbbg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.1])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D5D11811E76;
+ Tue, 19 Jul 2022 14:50:09 +0000 (UTC)
+Received: from localhost (unknown [10.39.195.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 63DF040CFD0A;
+ Tue, 19 Jul 2022 14:50:09 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Collingbourne <pcc@google.com>, kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v2 0/3] KVM: arm64: support MTE in protected VMs
+In-Reply-To: <20220708212106.325260-1-pcc@google.com>
+Organization: Red Hat GmbH
+References: <20220708212106.325260-1-pcc@google.com>
+User-Agent: Notmuch/0.36 (https://notmuchmail.org)
+Date: Tue, 19 Jul 2022 16:50:08 +0200
+Message-ID: <877d49p36n.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220630135747.26983-1-will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com, kvm@vger.kernel.org,
- Oliver Upton <oliver.upton@linux.dev>, Andy Lutomirski <luto@amacapital.net>,
- linux-arm-kernel@lists.infradead.org, Michael Roth <michael.roth@amd.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Chao Peng <chao.p.peng@linux.intel.com>, kvmarm@lists.cs.columbia.edu
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, Andy Lutomirski <luto@amacapital.net>,
+ Will Deacon <will@kernel.org>, Evgenii Stepanov <eugenis@google.com>,
+ Michael Roth <michael.roth@amd.com>, Chao Peng <chao.p.peng@linux.intel.com>,
+ Peter Collingbourne <pcc@google.com>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,46 +83,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jun 30, 2022 at 02:57:23PM +0100, Will Deacon wrote:
-> Hi everyone,
-> 
-> This series has been extracted from the pKVM base support series (aka
-> "pKVM mega-patch") previously posted here:
-> 
->   https://lore.kernel.org/kvmarm/20220519134204.5379-1-will@kernel.org/
-> 
-> Unlike that more comprehensive series, this one is fairly fundamental
-> and does not introduce any new ABI commitments, leaving questions
-> involving the management of guest private memory and the creation of
-> protected VMs for future work. Instead, this series extends the pKVM EL2
-> code so that it can dynamically instantiate and manage VM shadow
-> structures without the host being able to access them directly. These
-> shadow structures consist of a shadow VM, a set of shadow vCPUs and the
-> stage-2 page-table and the pages used to hold them are returned to the
-> host when the VM is destroyed.
-> 
-> The last patch is marked as RFC because, although it plumbs in the
-> shadow state, it is woefully inefficient and copies to/from the host
-> state on every vCPU run. Without the last patch, the new structures are
-> unused but we move considerably closer to isolating guests from the
-> host.
-> 
-> The series is based on Marc's rework of the flags
-> (kvm-arm64/burn-the-flags).
-> 
-> Feedback welcome.
-> 
-> Cheers,
+On Fri, Jul 08 2022, Peter Collingbourne <pcc@google.com> wrote:
 
-Only had few nitpicks
+> Hi,
+>
+> This patch series contains a proposed extension to pKVM that allows MTE
+> to be exposed to the protected guests. It is based on the base pKVM
+> series previously sent to the list [1] and later rebased to 5.19-rc3
+> and uploaded to [2].
+>
+> This series takes precautions against host compromise of the guests
+> via direct access to their tag storage, by preventing the host from
+> accessing the tag storage via stage 2 page tables. The device tree
+> must describe the physical memory address of the tag storage, if any,
+> and the memory nodes must declare that the tag storage location is
+> described. Otherwise, the MTE feature is disabled in protected guests.
+>
+> Now that we can easily do so, we also prevent the host from accessing
+> any unmapped reserved-memory regions without a driver, as the host
+> has no business accessing that memory.
+>
+> A proposed extension to the devicetree specification is available at
+> [3], a patched version of QEMU that produces the required device tree
+> nodes is available at [4] and a patched version of the crosvm hypervisor
+> that enables MTE is available at [5].
 
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+I'm unsure how this is supposed to work with QEMU + KVM, as your QEMU
+patch adds mte-alloc properties to regions that are exposed as a
+separate address space (which will not work with KVM). Is the magic in
+that new shared section?
 
-Also, I've been using this patchset for quite a while now.
+>
+> v2:
+> - refcount the PTEs owned by NOBODY
+>
+> [1] https://lore.kernel.org/all/20220519134204.5379-1-will@kernel.org/
+> [2] https://android-kvm.googlesource.com/linux/ for-upstream/pkvm-base-v2
+> [3] https://github.com/pcc/devicetree-specification mte-alloc
+> [4] https://github.com/pcc/qemu mte-shared-alloc
+> [5] https://chromium-review.googlesource.com/c/chromiumos/platform/crosvm/+/3719324
+>
+> Peter Collingbourne (3):
+>   KVM: arm64: add a hypercall for disowning pages
+>   KVM: arm64: disown unused reserved-memory regions
+>   KVM: arm64: allow MTE in protected VMs if the tag storage is known
+>
+>  arch/arm64/include/asm/kvm_asm.h              |  1 +
+>  arch/arm64/include/asm/kvm_host.h             |  6 ++
+>  arch/arm64/include/asm/kvm_pkvm.h             |  4 +-
+>  arch/arm64/kernel/image-vars.h                |  3 +
+>  arch/arm64/kvm/arm.c                          | 83 ++++++++++++++++++-
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |  1 +
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  9 ++
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 11 +++
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c                |  8 +-
+>  arch/arm64/kvm/mmu.c                          |  4 +-
+>  11 files changed, 123 insertions(+), 8 deletions(-)
 
-Tested-by: Vincent Donnefort <vdonnefort@google.com>
-
-[...]
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
