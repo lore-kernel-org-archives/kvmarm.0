@@ -2,84 +2,90 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B00EC43334
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Jul 2022 10:26:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE33C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 19 Jul 2022 10:35:26 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C157F4C844;
-	Tue, 19 Jul 2022 06:26:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 215554C566;
+	Tue, 19 Jul 2022 06:35:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ObrimGaAf9qc; Tue, 19 Jul 2022 06:26:10 -0400 (EDT)
+	with ESMTP id 2fBtQjc4Uwix; Tue, 19 Jul 2022 06:35:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A6AF94C846;
-	Tue, 19 Jul 2022 06:26:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06E0C4C556;
+	Tue, 19 Jul 2022 06:35:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D50854CEF7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 14:26:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 558B14C556
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 06:35:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mikGMdOkmatP for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jul 2022 14:26:38 -0400 (EDT)
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com
- [209.85.221.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A1B9C4CEF3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 14:26:38 -0400 (EDT)
-Received: by mail-wr1-f48.google.com with SMTP id bk26so18272448wrb.11
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 11:26:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WVvDU2AL8s0vVVLudVvrgZ7AYHAWM81ym6o0jyabuV4=;
- b=NQ0Qe4cWnPa0u8OvVOwy8y1gQzlLdYgCBimHOn9YHa4Latcfsm8LyZWdrE80LvfLNc
- tXy9exDSQ3Y8+XgnPNrfrHKHIK7WHqJjLLs4ZKL3zqZf6W5Xlj4yqoBEvXm+WpLrm0JK
- nc+V6DOQP5AGz2bXTOdUzCzQ1YAp4XOyOvKRo9GvABDJSc2/Y2J3ShxELHCOlHxEUJpo
- ti2ZhHov/v/Po0RulIPBMJvjoIktisJSzAOhmFKMTwaSDEisYz9bQgmq4q0t8npT63yx
- Y3MItMbE+E1nY/7Zk0F2qpNd3Q0ouCIublcith4nRKDQch7WB3I3FYuxo2LIS7fvtbtL
- 9RXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=WVvDU2AL8s0vVVLudVvrgZ7AYHAWM81ym6o0jyabuV4=;
- b=SQdWr1nBYtSpna5V4V507JuIbFhHhpXgTgE2vO22E2oB8pLvRA2UBT5UERlZlExAgl
- k+MxEWwDTaLdM/RpCbMRnhl9rz5NKn8t8iOfLVrTDM+XT3wku+UwEqwUneCZ0ANPuTrW
- XtS0Pu38uBHkcH448ESimH4BxNQFbOEtOfzhREJthzlaJ5A8WquwYYFX3hAY0RnbDejE
- CukhHEo0X6+M7di6XZ3ivn83wlnG49Nlmxbq13nwjn0OwW2kmKHING1elv0Pz7NFnBTk
- a53IaGqTm43TbtP5qmpdMnv0NMfgh6vVnwgybZnAOQTn8jZ8aK0EB0EZ7pQJPBDxod9+
- 7huQ==
-X-Gm-Message-State: AJIora/3XeCeUNsPZ1nLiUiFVxRF1hJarBX8d8F6ZZ6owJZrFQdxU7ax
- sUJfOtzy3YneZqzsk95cRl7FYr9kLopaV9UptHboPQ==
-X-Google-Smtp-Source: AGRyM1vritCRy15xhjiGgheVI5ODnh3bq50PA2xHbfPtyQKW+GDSprNhKc2C1SNuU6IDGLnp3HBkT8HTXtmuIDMx9I4=
-X-Received: by 2002:a5d:588b:0:b0:21d:a918:65a5 with SMTP id
- n11-20020a5d588b000000b0021da91865a5mr24265604wrf.210.1658168797460; Mon, 18
- Jul 2022 11:26:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220628220938.3657876-1-yosryahmed@google.com>
- <20220628220938.3657876-2-yosryahmed@google.com> <YsdJPeVOqlj4cf2a@google.com>
- <CAJD7tkYE+pZdk=-psEP_Rq_1CmDjY7Go+s1LXm-ctryWvUdgLA@mail.gmail.com>
- <Ys3+UTTC4Qgbm7pQ@google.com>
-In-Reply-To: <Ys3+UTTC4Qgbm7pQ@google.com>
-From: Yosry Ahmed <yosryahmed@google.com>
-Date: Mon, 18 Jul 2022 11:26:01 -0700
-Message-ID: <CAJD7tkY91oiDWTj5FY2Upc5vabsjLk+CBMNzAepXLUdF_GS11w@mail.gmail.com>
-Subject: Re: [PATCH v6 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
- page table uses.
-To: Sean Christopherson <seanjc@google.com>
-X-Mailman-Approved-At: Tue, 19 Jul 2022 06:26:09 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Roman Gushchin <roman.gushchin@linux.dev>, Michal Hocko <mhocko@kernel.org>,
- Shaoqin <shaoqin.huang@intel.com>, Linux-MM <linux-mm@kvack.org>,
- Zefan Li <lizefan.x@bytedance.com>, kvmarm@lists.cs.columbia.edu,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Shakeel Butt <shakeelb@google.com>, Cgroups <cgroups@vger.kernel.org>,
- Huang@google.com, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, Andrew Morton <akpm@linux-foundation.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, Tejun Heo <tj@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+ with ESMTP id iHWQRG1cZNY5 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Jul 2022 06:35:23 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1EA8D4C516
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 06:35:23 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id CF90261380;
+ Tue, 19 Jul 2022 10:35:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BF2BC341C6;
+ Tue, 19 Jul 2022 10:35:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1658226921;
+ bh=LTURouQObNXUgAv2oCPXsD0v06f27q4kyC2HWGX13xc=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=mY7eMT5c56IEXPSXLZERVV7aqyLE4Iwd6q98HbdNg6DXgerRgumOkhqhVk8t/I6kG
+ hcS/VeuVR6eb0NMHiQHIeaKlgpUpVfeu0CgnbwabpszMP2ltpmwCQ1g+HN3iZsoW16
+ j0F+0kNvx+2vPUbfQhloXxPPG1u2rCWTNcR2SAD68wgK5r0UBKSX1t0KWncYhVSiB0
+ r67q+h1eykeW4zqsI9ebvzwgv3HCpmimDp2k1YYSFcZmkdqryccDD7a8HVt836K3Na
+ o5VKznU8E1oQAyqYCGIEPBtv1XWBsSX+FyHUFU/Tqq8Z/ciPbIW9cm/VbVOxDwZLYi
+ U7ZVMsIbjPN0A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oDkZS-008SGg-U8;
+ Tue, 19 Jul 2022 11:35:19 +0100
+Date: Tue, 19 Jul 2022 11:35:18 +0100
+Message-ID: <87ilntz8yh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kalesh Singh <kaleshsingh@google.com>
+Subject: Re: [PATCH v4 08/18] KVM: arm64: Add PROTECTED_NVHE_STACKTRACE Kconfig
+In-Reply-To: <CAC_TJvcyb6xQhvuoSHpC6+LmeSAqbDk9Fnb=x-bB7UxxMek3EA@mail.gmail.com>
+References: <20220715061027.1612149-1-kaleshsingh@google.com>
+ <20220715061027.1612149-9-kaleshsingh@google.com>
+ <87cze252q7.wl-maz@kernel.org>
+ <CAC_TJvcyb6xQhvuoSHpC6+LmeSAqbDk9Fnb=x-bB7UxxMek3EA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kaleshsingh@google.com, mark.rutland@arm.com,
+ broonie@kernel.org, madvenka@linux.microsoft.com, will@kernel.org,
+ qperret@google.com, tabba@google.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
+ andreyknvl@gmail.com, vincenzo.frascino@arm.com, mhiramat@kernel.org,
+ ast@kernel.org, wangkefeng.wang@huawei.com, elver@google.com, keirf@google.com,
+ yuzenghui@huawei.com, ardb@kernel.org, oupton@google.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
+ vincenzo.frascino@arm.com, Will Deacon <will@kernel.org>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>,
+ "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+ "Cc: Android Kernel" <kernel-team@android.com>, Marco Elver <elver@google.com>,
+ Mark Brown <broonie@kernel.org>,
+ "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
+ <linux-arm-kernel@lists.infradead.org>, andreyknvl@gmail.com,
+ LKML <linux-kernel@vger.kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,49 +102,75 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jul 12, 2022 at 4:06 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Jul 12, 2022, Yosry Ahmed wrote:
-> > Thanks for taking another look at this!
+On Mon, 18 Jul 2022 18:03:30 +0100,
+Kalesh Singh <kaleshsingh@google.com> wrote:
+> 
+> On Sun, Jul 17, 2022 at 11:56 PM Marc Zyngier <maz@kernel.org> wrote:
 > >
-> > On Thu, Jul 7, 2022 at 1:59 PM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Tue, Jun 28, 2022, Yosry Ahmed wrote:
-> > > > diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
-> > > > index aab70355d64f3..13190d298c986 100644
-> > > > --- a/include/linux/mmzone.h
-> > > > +++ b/include/linux/mmzone.h
-> > > > @@ -216,6 +216,7 @@ enum node_stat_item {
-> > > >       NR_KERNEL_SCS_KB,       /* measured in KiB */
-> > > >  #endif
-> > > >       NR_PAGETABLE,           /* used for pagetables */
-> > > > +     NR_SECONDARY_PAGETABLE, /* secondary pagetables, e.g. kvm shadow pagetables */
-> > >
-> > > Nit, s/kvm/KVM, and drop the "shadow", which might be misinterpreted as saying KVM
-> > > pagetables are only accounted when KVM is using shadow paging.  KVM's usage of "shadow"
-> > > is messy, so I totally understand why you included it, but in this case it's unnecessary
-> > > and potentially confusing.
-> > >
-> > > And finally, something that's not a nit.  Should this be wrapped with CONFIG_KVM
-> > > (using IS_ENABLED() because KVM can be built as a module)?  That could be removed
-> > > if another non-KVM secondary MMU user comes along, but until then, #ifdeffery for
-> > > stats the depend on a single feature seems to be the status quo for this code.
-> > >
+> > [- Drew and android-mm, as both addresses bounce]
 > >
-> > I will #ifdef the stat, but I will emphasize in the docs that is
-> > currently *only* used for KVM so that it makes sense if users without
-> > KVM don't see the stat at all. I will also remove the stat from
-> > show_free_areas() in mm/page_alloc.c as it seems like none of the
-> > #ifdefed stats show up there.
->
-> It's might be worth getting someone from mm/ to weigh in before going through the
-> trouble, my suggestion/question is based purely on the existing code.
+> > On Fri, 15 Jul 2022 07:10:17 +0100,
+> > Kalesh Singh <kaleshsingh@google.com> wrote:
+> > >
+> > > This can be used to disable stacktrace for the protected KVM
+> > > nVHE hypervisor, in order to save on the associated memory usage.
+> > >
+> > > This option is disabled by default, since protected KVM is not widely
+> > > used on platforms other than Android currently.
+> > >
+> > > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+> > > ---
+> > >  arch/arm64/kvm/Kconfig | 15 +++++++++++++++
+> > >  1 file changed, 15 insertions(+)
+> > >
+> > > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> > > index 8a5fbbf084df..1edab6f8a3b8 100644
+> > > --- a/arch/arm64/kvm/Kconfig
+> > > +++ b/arch/arm64/kvm/Kconfig
+> > > @@ -46,6 +46,21 @@ menuconfig KVM
+> > >
+> > >         If unsure, say N.
+> > >
+> > > +config PROTECTED_NVHE_STACKTRACE
+> > > +     bool "Protected KVM hypervisor stacktraces"
+> > > +     depends on KVM
+> > > +     default n
+> > > +     help
+> > > +       Say Y here to enable pKVM hypervisor stacktraces on hyp_panic()
+> > > +
+> > > +       If you are not using protected nVHE (pKVM), say N.
+> > > +
+> > > +       If using protected nVHE mode, but cannot afford the associated
+> > > +       memory cost (less than 0.75 page per CPU) of pKVM stacktraces,
+> > > +       say N.
+> > > +
+> > > +       If unsure, say N.
+> > > +
+> >
+> > Can we make this depend on NVHE_EL2_DEBUG instead? I'd like to keep
+> > the disclosing of EL2 information in protected mode a strict debug
+> > feature.
+> 
+> Hi Marc,
+> 
+> An earlier version was similar to what you propose. The unwinding
+> depended on NVHE_EL2_DEBUG and all unwinding was done from EL1 with
+> host stage 2 being disabled. The reason the design was changed is
+> because Android expressed the need for pKVM hyp stacktraces in
+> production environments. [1]
 
-Any mm folks with an opinion about this?
+I think that's an Android-specific requirement that doesn't apply to
+upstream. If Android wants to enable this in production (and
+potentially leak details of the hypervisor address space), that's
+Android's business, and they can carry a patch for that.  Upstream
+shouldn't have to cater for such a thing.
 
-Any preference on whether we should wrap NR_SECONDARY_PAGETABLE stats
-with #ifdef CONFIG_KVM for now as it is currently the only source for
-this stat?
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
