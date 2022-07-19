@@ -2,81 +2,66 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0521AC433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 18:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D638C43334
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Jul 2022 23:36:46 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 447EF4D01E;
-	Mon, 18 Jul 2022 14:40:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE5084C8E6;
+	Mon, 18 Jul 2022 19:36:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id I6D9shDNXHvK; Mon, 18 Jul 2022 14:40:15 -0400 (EDT)
+	with ESMTP id nAVvbjhDzsQn; Mon, 18 Jul 2022 19:36:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80BA84D016;
-	Mon, 18 Jul 2022 14:40:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7655C4C6A6;
+	Mon, 18 Jul 2022 19:36:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C9844D011
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 14:40:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 620204C6A6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 19:36:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xpO4Tfc7Lkt4 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Jul 2022 14:40:11 -0400 (EDT)
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com
- [209.85.221.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9BD5A4D010
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 14:40:11 -0400 (EDT)
-Received: by mail-wr1-f41.google.com with SMTP id bk26so18319311wrb.11
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 11:40:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=vOTJ/lOx9mo2l0Gz+DyY71rr5IPjlKh/vGfexlPa874=;
- b=aAUR32Vi33B2hsq115RzuvLz/D7BjNUvxtVUSii/FBxfRLg9mPQlqH9J/50pGs78cH
- ZTb0xdBzMzYsUotLjxMs3x9/2xroeTmLJP8jxDcFlQLHW0bY6FCMgkU0e6NTqfWAZbgA
- qY6iZQUJRazqJe1QD5BpUzFkJqdKS28BzeLdFCDp4yuOTPx87VISpNrVJGfKOJ7yGux9
- CGOXRrJ/KfFPBCyBtDb+3APpoNYOBoMwTqb/JPLmS14Lmk7d87FZGlr8JSHhirPHMvvk
- 5zHBcR/+T8xebXco7mLZGlUGu26l4rALZVHOu+X0NDcE3N6NOx/00nwBjDZISKyklI6o
- JhSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=vOTJ/lOx9mo2l0Gz+DyY71rr5IPjlKh/vGfexlPa874=;
- b=nYGUjMBl3DrN0yWErzw1SQpcG3WTt3Eau9Sz3R2ES+o+UK6PQGTzhBSpOi3nbt6irV
- 0ryPyXqjcWtSG1orOj9nQ7yENlUfezKDKpL+jE5fjPaj01wPk6imS/38Xt1QIOWL0tGy
- XQeVIs0YO67BS61J3AdeEHjHy9PIF0zo0Hgrx4xyr7v6muVKxAe39PZOMhmCn421sDy2
- 6vlxkRi7xnaPPcIdYyzaISM8Y+UwPCG2X15W9hCg0LX8JG04gPe+SyDX1ebK8xKWyogT
- OLnYjD78wjT8VRhdGDd4I2TwOqWXhylgpfd6WXXo79RpjKjr8pcvlaiX3Y6cgZzAhFGd
- 6xvQ==
-X-Gm-Message-State: AJIora+BXxJbqLLXReJ33gXZjHIltJM61CxkDomuoLwbUoFQBTi5BNdP
- uuulJdVfFzFbw3WrOI4ZJ6UCiA==
-X-Google-Smtp-Source: AGRyM1u0er/ihy9AUSKP+mIbbum/WRRNpoD31ruQt0QF6/la8uKPSIA+5jiz0p3FIioRmUsfqeY6hg==
-X-Received: by 2002:a5d:6c6b:0:b0:1ea:77ea:dde8 with SMTP id
- r11-20020a5d6c6b000000b001ea77eadde8mr24293592wrz.690.1658169610335; 
- Mon, 18 Jul 2022 11:40:10 -0700 (PDT)
-Received: from google.com (109.36.187.35.bc.googleusercontent.com.
- [35.187.36.109]) by smtp.gmail.com with ESMTPSA id
- y11-20020adfc7cb000000b0021d6924b777sm11977778wrg.115.2022.07.18.11.40.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 Jul 2022 11:40:09 -0700 (PDT)
-Date: Mon, 18 Jul 2022 19:40:05 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 12/24] KVM: arm64: Introduce shadow VM state at EL2
-Message-ID: <YtWpBYPrBcdyp9r6@google.com>
-References: <20220630135747.26983-1-will@kernel.org>
- <20220630135747.26983-13-will@kernel.org>
+ with ESMTP id 3dfnnHZpi+F5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Jul 2022 19:36:42 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EE0594C687
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Jul 2022 19:36:41 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1658187401;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ySr8hj/EGMal5qilyWO6bDnZTTU7RUMAMj596WRLWVE=;
+ b=IVrqWuBUFHaAMABxAzRyWePh3M3Bo4a2sPx+7A9G+Hvl46ubB3CSiITYdgHCZzU2JAazDF
+ 8hv7NHL0Au72vgisnT2NOUhEgyoP2w6zJPtFgXZ/AgrZGTXscXh6OI3ZfnZMxEyUpXtVGu
+ AdWBgIow1Ay+6dgzmw+weyBW6fQir5Q=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-561-1Y1_456WPV-DPT80BDCaTA-1; Mon, 18 Jul 2022 19:36:35 -0400
+X-MC-Unique: 1Y1_456WPV-DPT80BDCaTA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.5])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 15CB0801585;
+ Mon, 18 Jul 2022 23:36:35 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-37.bne.redhat.com [10.64.54.37])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C08718EB7;
+ Mon, 18 Jul 2022 23:36:31 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v3] KVM: selftests: Fix target thread to be migrated in
+ rseq_test
+Date: Tue, 19 Jul 2022 09:35:40 +0800
+Message-Id: <20220719013540.3477946-1-gshan@redhat.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220630135747.26983-13-will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com, kvm@vger.kernel.org,
- Oliver Upton <oliver.upton@linux.dev>, Andy Lutomirski <luto@amacapital.net>,
- linux-arm-kernel@lists.infradead.org, Michael Roth <michael.roth@amd.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Chao Peng <chao.p.peng@linux.intel.com>, kvmarm@lists.cs.columbia.edu
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+Cc: shan.gavin@gmail.com, maz@kernel.org, linux-kernel@vger.kernel.org,
+ oliver.upton@linux.dev, linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+ shuah@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,454 +78,82 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-[...]
+In rseq_test, there are two threads, which are vCPU thread and migration
+worker separately. Unfortunately, the test has the wrong PID passed to
+sched_setaffinity() in the migration worker. It forces migration on the
+migration worker because zeroed PID represents the calling thread, which
+is the migration worker itself. It means the vCPU thread is never enforced
+to migration and it can migrate at any time, which eventually leads to
+failure as the following logs show.
 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 9f339dffbc1a..2d6b5058f7d3 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -288,6 +288,14 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
->   */
->  u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift);
->  
-> +/*
+  host# uname -r
+  5.19.0-rc6-gavin+
+  host# # cat /proc/cpuinfo | grep processor | tail -n 1
+  processor    : 223
+  host# pwd
+  /home/gavin/sandbox/linux.main/tools/testing/selftests/kvm
+  host# for i in `seq 1 100`; do \
+        echo "--------> $i"; ./rseq_test; done
+  --------> 1
+  --------> 2
+  --------> 3
+  --------> 4
+  --------> 5
+  --------> 6
+  ==== Test Assertion Failure ====
+    rseq_test.c:265: rseq_cpu == cpu
+    pid=3925 tid=3925 errno=4 - Interrupted system call
+       1  0x0000000000401963: main at rseq_test.c:265 (discriminator 2)
+       2  0x0000ffffb044affb: ?? ??:0
+       3  0x0000ffffb044b0c7: ?? ??:0
+       4  0x0000000000401a6f: _start at ??:?
+    rseq CPU = 4, sched CPU = 27
 
-/** ?
+Fix the issue by passing correct parameter, TID of the vCPU thread, to
+sched_setaffinity() in the migration worker.
 
-> + * kvm_pgtable_stage2_pgd_size() - Helper to compute size of a stage-2 PGD
-> + * @vtcr:	Content of the VTCR register.
-> + *
-> + * Return: the size (in bytes) of the stage-2 PGD
-> + */
-> +size_t kvm_pgtable_stage2_pgd_size(u64 vtcr);
-> +
->  /**
->   * __kvm_pgtable_stage2_init() - Initialise a guest stage-2 page-table.
->   * @pgt:	Uninitialised page-table structure to initialise.
-> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-> index 8f7b8a2314bb..11526e89fe5c 100644
-> --- a/arch/arm64/include/asm/kvm_pkvm.h
-> +++ b/arch/arm64/include/asm/kvm_pkvm.h
-> @@ -9,6 +9,9 @@
->  #include <linux/memblock.h>
->  #include <asm/kvm_pgtable.h>
->  
-> +/* Maximum number of protected VMs that can be created. */
-> +#define KVM_MAX_PVMS 255
-> +
->  #define HYP_MEMBLOCK_REGIONS 128
->  
->  extern struct memblock_region kvm_nvhe_sym(hyp_memory)[];
-> @@ -40,6 +43,11 @@ static inline unsigned long hyp_vmemmap_pages(size_t vmemmap_entry_size)
->  	return res >> PAGE_SHIFT;
->  }
->  
-> +static inline unsigned long hyp_shadow_table_pages(void)
-> +{
-> +	return PAGE_ALIGN(KVM_MAX_PVMS * sizeof(void *)) >> PAGE_SHIFT;
-> +}
-> +
->  static inline unsigned long __hyp_pgtable_max_pages(unsigned long nr_pages)
->  {
->  	unsigned long total = 0, i;
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index 3bea816296dc..3a0817b5c739 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -11,6 +11,7 @@
->  #include <asm/kvm_mmu.h>
->  #include <asm/kvm_pgtable.h>
->  #include <asm/virt.h>
-> +#include <nvhe/pkvm.h>
->  #include <nvhe/spinlock.h>
->  
->  /*
-> @@ -68,10 +69,12 @@ bool addr_is_memory(phys_addr_t phys);
->  int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
->  int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id);
->  int kvm_host_prepare_stage2(void *pgt_pool_base);
-> +int kvm_guest_prepare_stage2(struct kvm_shadow_vm *vm, void *pgd);
->  void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt);
->  
->  int hyp_pin_shared_mem(void *from, void *to);
->  void hyp_unpin_shared_mem(void *from, void *to);
-> +void reclaim_guest_pages(struct kvm_shadow_vm *vm);
->  
->  static __always_inline void __load_host_stage2(void)
->  {
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> new file mode 100644
-> index 000000000000..1d0a33f70879
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> @@ -0,0 +1,60 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2021 Google LLC
-> + * Author: Fuad Tabba <tabba@google.com>
-> + */
-> +
-> +#ifndef __ARM64_KVM_NVHE_PKVM_H__
-> +#define __ARM64_KVM_NVHE_PKVM_H__
-> +
-> +#include <asm/kvm_pkvm.h>
-> +
-> +/*
-> + * Holds the relevant data for maintaining the vcpu state completely at hyp.
-> + */
-> +struct kvm_shadow_vcpu_state {
-> +	/* The data for the shadow vcpu. */
-> +	struct kvm_vcpu shadow_vcpu;
-> +
-> +	/* A pointer to the host's vcpu. */
-> +	struct kvm_vcpu *host_vcpu;
-> +
-> +	/* A pointer to the shadow vm. */
-> +	struct kvm_shadow_vm *shadow_vm;
+Fixes: 61e52f1630f5 ("KVM: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs")
+Signed-off-by: Gavin Shan <gshan@redhat.com>
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+---
+v3: Improved changelog (Oliver Upon)
+---
+ tools/testing/selftests/kvm/rseq_test.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-IMHO, those declarations are already self-explanatory. The comments above don't
-bring much.
+diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+index 4158da0da2bb..c83ac7b467f8 100644
+--- a/tools/testing/selftests/kvm/rseq_test.c
++++ b/tools/testing/selftests/kvm/rseq_test.c
+@@ -38,6 +38,7 @@ static __thread volatile struct rseq __rseq = {
+  */
+ #define NR_TASK_MIGRATIONS 100000
+ 
++static pid_t rseq_tid;
+ static pthread_t migration_thread;
+ static cpu_set_t possible_mask;
+ static int min_cpu, max_cpu;
+@@ -106,7 +107,8 @@ static void *migration_worker(void *ign)
+ 		 * stable, i.e. while changing affinity is in-progress.
+ 		 */
+ 		smp_wmb();
+-		r = sched_setaffinity(0, sizeof(allowed_mask), &allowed_mask);
++		r = sched_setaffinity(rseq_tid, sizeof(allowed_mask),
++				      &allowed_mask);
+ 		TEST_ASSERT(!r, "sched_setaffinity failed, errno = %d (%s)",
+ 			    errno, strerror(errno));
+ 		smp_wmb();
+@@ -231,6 +233,7 @@ int main(int argc, char *argv[])
+ 	vm = vm_create_default(VCPU_ID, 0, guest_code);
+ 	ucall_init(vm, NULL);
+ 
++	rseq_tid = gettid();
+ 	pthread_create(&migration_thread, NULL, migration_worker, 0);
+ 
+ 	for (i = 0; !done; i++) {
+-- 
+2.23.0
 
-> +};
-> +
-> +/*
-> + * Holds the relevant data for running a protected vm.
-> + */
-> +struct kvm_shadow_vm {
-> +	/* The data for the shadow kvm. */
-> +	struct kvm kvm;
-> +
-> +	/* The host's kvm structure. */
-> +	struct kvm *host_kvm;
-> +
-> +	/* The total size of the donated shadow area. */
-> +	size_t shadow_area_size;
-> +
-> +	struct kvm_pgtable pgt;
-> +
-> +	/* Array of the shadow state per vcpu. */
-> +	struct kvm_shadow_vcpu_state shadow_vcpu_states[0];
-> +};
-> +
-> +static inline struct kvm_shadow_vcpu_state *get_shadow_state(struct kvm_vcpu *shadow_vcpu)
-> +{
-> +	return container_of(shadow_vcpu, struct kvm_shadow_vcpu_state, shadow_vcpu);
-> +}
-> +
-> +static inline struct kvm_shadow_vm *get_shadow_vm(struct kvm_vcpu *shadow_vcpu)
-> +{
-> +	return get_shadow_state(shadow_vcpu)->shadow_vm;
-> +}
-> +
-> +void hyp_shadow_table_init(void *tbl);
-> +int __pkvm_init_shadow(struct kvm *kvm, unsigned long shadow_hva,
-> +		       size_t shadow_size, unsigned long pgd_hva);
-> +int __pkvm_teardown_shadow(unsigned int shadow_handle);
-> +
-> +#endif /* __ARM64_KVM_NVHE_PKVM_H__ */
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 3cea4b6ac23e..a1fbd11c8041 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -15,6 +15,7 @@
->  
->  #include <nvhe/mem_protect.h>
->  #include <nvhe/mm.h>
-> +#include <nvhe/pkvm.h>
->  #include <nvhe/trap_handler.h>
->  
->  DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
-> @@ -191,6 +192,24 @@ static void handle___pkvm_vcpu_init_traps(struct kvm_cpu_context *host_ctxt)
->  	__pkvm_vcpu_init_traps(kern_hyp_va(vcpu));
->  }
->  
-> +static void handle___pkvm_init_shadow(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct kvm *, host_kvm, host_ctxt, 1);
-> +	DECLARE_REG(unsigned long, host_shadow_va, host_ctxt, 2);
-> +	DECLARE_REG(size_t, shadow_size, host_ctxt, 3);
-> +	DECLARE_REG(unsigned long, pgd, host_ctxt, 4);
-> +
-> +	cpu_reg(host_ctxt, 1) = __pkvm_init_shadow(host_kvm, host_shadow_va,
-> +						   shadow_size, pgd);
-> +}
-> +
-> +static void handle___pkvm_teardown_shadow(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(unsigned int, shadow_handle, host_ctxt, 1);
-> +
-> +	cpu_reg(host_ctxt, 1) = __pkvm_teardown_shadow(shadow_handle);
-> +}
-> +
->  typedef void (*hcall_t)(struct kvm_cpu_context *);
->  
->  #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
-> @@ -220,6 +239,8 @@ static const hcall_t host_hcall[] = {
->  	HANDLE_FUNC(__vgic_v3_save_aprs),
->  	HANDLE_FUNC(__vgic_v3_restore_aprs),
->  	HANDLE_FUNC(__pkvm_vcpu_init_traps),
-> +	HANDLE_FUNC(__pkvm_init_shadow),
-> +	HANDLE_FUNC(__pkvm_teardown_shadow),
->  };
->  
->  static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index e2e3b30b072e..9baf731736be 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -141,6 +141,20 @@ int kvm_host_prepare_stage2(void *pgt_pool_base)
->  	return 0;
->  }
->  
-> +int kvm_guest_prepare_stage2(struct kvm_shadow_vm *vm, void *pgd)
-> +{
-> +	vm->pgt.pgd = pgd;
-> +	return 0;
-> +}
-> +
-> +void reclaim_guest_pages(struct kvm_shadow_vm *vm)
-> +{
-> +	unsigned long nr_pages;
-> +
-> +	nr_pages = kvm_pgtable_stage2_pgd_size(vm->kvm.arch.vtcr) >> PAGE_SHIFT;
-> +	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(vm->pgt.pgd), nr_pages));
-> +}
-> +
->  int __pkvm_prot_finalize(void)
->  {
->  	struct kvm_s2_mmu *mmu = &host_kvm.arch.mmu;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 99c8d8b73e70..77aeb787670b 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -7,6 +7,9 @@
->  #include <linux/kvm_host.h>
->  #include <linux/mm.h>
->  #include <nvhe/fixed_config.h>
-> +#include <nvhe/mem_protect.h>
-> +#include <nvhe/memory.h>
-
-I don't think this one is necessary, it is already included in mm.h.
-
-> +#include <nvhe/pkvm.h>
->  #include <nvhe/trap_handler.h>
->  
->  /*
-> @@ -183,3 +186,398 @@ void __pkvm_vcpu_init_traps(struct kvm_vcpu *vcpu)
->  	pvm_init_traps_aa64mmfr0(vcpu);
->  	pvm_init_traps_aa64mmfr1(vcpu);
->  }
-> +
-> +/*
-> + * Start the shadow table handle at the offset defined instead of at 0.
-> + * Mainly for sanity checking and debugging.
-> + */
-> +#define HANDLE_OFFSET 0x1000
-> +
-> +static unsigned int shadow_handle_to_idx(unsigned int shadow_handle)
-> +{
-> +	return shadow_handle - HANDLE_OFFSET;
-> +}
-> +
-> +static unsigned int idx_to_shadow_handle(unsigned int idx)
-> +{
-> +	return idx + HANDLE_OFFSET;
-> +}
-> +
-> +/*
-> + * Spinlock for protecting the shadow table related state.
-> + * Protects writes to shadow_table, nr_shadow_entries, and next_shadow_alloc,
-> + * as well as reads and writes to last_shadow_vcpu_lookup.
-> + */
-> +static DEFINE_HYP_SPINLOCK(shadow_lock);
-> +
-> +/*
-> + * The table of shadow entries for protected VMs in hyp.
-> + * Allocated at hyp initialization and setup.
-> + */
-> +static struct kvm_shadow_vm **shadow_table;
-> +
-> +/* Current number of vms in the shadow table. */
-> +static unsigned int nr_shadow_entries;
-> +
-> +/* The next entry index to try to allocate from. */
-> +static unsigned int next_shadow_alloc;
-> +
-> +void hyp_shadow_table_init(void *tbl)
-> +{
-> +	WARN_ON(shadow_table);
-> +	shadow_table = tbl;
-> +}
-> +
-> +/*
-> + * Return the shadow vm corresponding to the handle.
-> + */
-> +static struct kvm_shadow_vm *find_shadow_by_handle(unsigned int shadow_handle)
-> +{
-> +	unsigned int shadow_idx = shadow_handle_to_idx(shadow_handle);
-> +
-> +	if (unlikely(shadow_idx >= KVM_MAX_PVMS))
-> +		return NULL;
-> +
-> +	return shadow_table[shadow_idx];
-> +}
-> +
-> +static void unpin_host_vcpus(struct kvm_shadow_vcpu_state *shadow_vcpu_states,
-> +			     unsigned int nr_vcpus)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < nr_vcpus; i++) {
-> +		struct kvm_vcpu *host_vcpu = shadow_vcpu_states[i].host_vcpu;
-
-IIRC, checkpatch likes an empty line after declarations.
-
-> +		hyp_unpin_shared_mem(host_vcpu, host_vcpu + 1);
-> +	}
-> +}
-> +
-> +static int set_host_vcpus(struct kvm_shadow_vcpu_state *shadow_vcpu_states,
-> +			  unsigned int nr_vcpus,
-> +			  struct kvm_vcpu **vcpu_array,
-> +			  size_t vcpu_array_size)
-> +{
-> +	int i;
-> +
-> +	if (vcpu_array_size < sizeof(*vcpu_array) * nr_vcpus)
-> +		return -EINVAL;
-> +
-> +	for (i = 0; i < nr_vcpus; i++) {
-> +		struct kvm_vcpu *host_vcpu = kern_hyp_va(vcpu_array[i]);
-> +
-> +		if (hyp_pin_shared_mem(host_vcpu, host_vcpu + 1)) {
-> +			unpin_host_vcpus(shadow_vcpu_states, i);
-> +			return -EBUSY;
-> +		}
-> +
-> +		shadow_vcpu_states[i].host_vcpu = host_vcpu;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int init_shadow_structs(struct kvm *kvm, struct kvm_shadow_vm *vm,
-> +			       struct kvm_vcpu **vcpu_array,
-> +			       unsigned int nr_vcpus)
-> +{
-> +	int i;
-> +
-> +	vm->host_kvm = kvm;
-> +	vm->kvm.created_vcpus = nr_vcpus;
-> +	vm->kvm.arch.vtcr = host_kvm.arch.vtcr;
-> +
-> +	for (i = 0; i < nr_vcpus; i++) {
-> +		struct kvm_shadow_vcpu_state *shadow_vcpu_state = &vm->shadow_vcpu_states[i];
-> +		struct kvm_vcpu *shadow_vcpu = &shadow_vcpu_state->shadow_vcpu;
-> +		struct kvm_vcpu *host_vcpu = shadow_vcpu_state->host_vcpu;
-> +
-> +		shadow_vcpu_state->shadow_vm = vm;
-> +
-> +		shadow_vcpu->kvm = &vm->kvm;
-> +		shadow_vcpu->vcpu_id = READ_ONCE(host_vcpu->vcpu_id);
-> +		shadow_vcpu->vcpu_idx = i;
-> +
-> +		shadow_vcpu->arch.hw_mmu = &vm->kvm.arch.mmu;
-
-In the end, we don't seem to use much from the struct kvm_cpu. Is it for
-convinience that a smaller struct kvm_shadow_cpu hasn't been created, or we do
-anticipate a later wider usage?
-
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static bool __exists_shadow(struct kvm *host_kvm)
-> +{
-> +	int i;
-> +	unsigned int nr_checked = 0;
-> +
-> +	for (i = 0; i < KVM_MAX_PVMS && nr_checked < nr_shadow_entries; i++) {
-> +		if (!shadow_table[i])
-> +			continue;
-> +
-> +		if (unlikely(shadow_table[i]->host_kvm == host_kvm))
-> +			return true;
-> +
-> +		nr_checked++;
-> +	}
-> +
-> +	return false;
-> +}
-> +
-> +/*
-> + * Allocate a shadow table entry and insert a pointer to the shadow vm.
-> + *
-> + * Return a unique handle to the protected VM on success,
-> + * negative error code on failure.
-> + */
-> +static unsigned int insert_shadow_table(struct kvm *kvm,
-> +					struct kvm_shadow_vm *vm,
-> +					size_t shadow_size)
-> +{
-> +	struct kvm_s2_mmu *mmu = &vm->kvm.arch.mmu;
-> +	unsigned int shadow_handle;
-> +	unsigned int vmid;
-> +
-> +	hyp_assert_lock_held(&shadow_lock);
-> +
-> +	if (unlikely(nr_shadow_entries >= KVM_MAX_PVMS))
-> +		return -ENOMEM;
-> +
-> +	/*
-> +	 * Initializing protected state might have failed, yet a malicious host
-> +	 * could trigger this function. Thus, ensure that shadow_table exists.
-> +	 */
-> +	if (unlikely(!shadow_table))
-> +		return -EINVAL;
-> +
-> +	/* Check that a shadow hasn't been created before for this host KVM. */
-> +	if (unlikely(__exists_shadow(kvm)))
-> +		return -EEXIST;
-> +
-> +	/* Find the next free entry in the shadow table. */
-> +	while (shadow_table[next_shadow_alloc])
-> +		next_shadow_alloc = (next_shadow_alloc + 1) % KVM_MAX_PVMS;
-
-Couldn't it be merged with __exists_shadow which already knows the first free
-shadow_table idx?
-
-> +	shadow_handle = idx_to_shadow_handle(next_shadow_alloc);
-> +
-> +	vm->kvm.arch.pkvm.shadow_handle = shadow_handle;
-> +	vm->shadow_area_size = shadow_size;
-> +
-> +	/* VMID 0 is reserved for the host */
-> +	vmid = next_shadow_alloc + 1;
-> +	if (vmid > 0xff)
-
-Couldn't the 0xff be found with get_vmid_bits() or even from host_kvm.arch.vtcr?
-Or does that depends on something completely different?
-
-Also, appologies if this has been discussed already and I missed it, maybe
-KVM_MAX_PVMS could be changed for that value - 1. Unless we think that archs
-supporting 16 bits would waste way too much memory for that?
-
-> +		return -ENOMEM;
-> +
-> +	atomic64_set(&mmu->vmid.id, vmid);
-> +	mmu->arch = &vm->kvm.arch;
-> +	mmu->pgt = &vm->pgt;
-> +
-> +	shadow_table[next_shadow_alloc] = vm;
-> +	next_shadow_alloc = (next_shadow_alloc + 1) % KVM_MAX_PVMS;
-> +	nr_shadow_entries++;
-> +
-> +	return shadow_handle;
-> +}
-> +
-
-[...]
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
