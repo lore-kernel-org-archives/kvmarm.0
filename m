@@ -2,63 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE33C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Jul 2022 10:35:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5ABAC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 19 Jul 2022 10:43:48 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 215554C566;
-	Tue, 19 Jul 2022 06:35:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E0064C57B;
+	Tue, 19 Jul 2022 06:43:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2fBtQjc4Uwix; Tue, 19 Jul 2022 06:35:25 -0400 (EDT)
+	with ESMTP id sN7X+pU0lCzJ; Tue, 19 Jul 2022 06:43:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06E0C4C556;
-	Tue, 19 Jul 2022 06:35:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5ECAB4C59A;
+	Tue, 19 Jul 2022 06:43:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 558B14C556
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 06:35:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A9A34C517
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 06:43:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iHWQRG1cZNY5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Jul 2022 06:35:23 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1EA8D4C516
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 06:35:23 -0400 (EDT)
+ with ESMTP id G3TvEWMbGg93 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Jul 2022 06:43:40 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96F604C507
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Jul 2022 06:43:40 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id CF90261380;
- Tue, 19 Jul 2022 10:35:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BF2BC341C6;
- Tue, 19 Jul 2022 10:35:21 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 29970B81A01;
+ Tue, 19 Jul 2022 10:43:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD602C341C6;
+ Tue, 19 Jul 2022 10:43:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1658226921;
- bh=LTURouQObNXUgAv2oCPXsD0v06f27q4kyC2HWGX13xc=;
+ s=k20201202; t=1658227417;
+ bh=iJd6H+8fNSRJuv3eLl/eVHLOrWTWORA02tiW58EpTso=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=mY7eMT5c56IEXPSXLZERVV7aqyLE4Iwd6q98HbdNg6DXgerRgumOkhqhVk8t/I6kG
- hcS/VeuVR6eb0NMHiQHIeaKlgpUpVfeu0CgnbwabpszMP2ltpmwCQ1g+HN3iZsoW16
- j0F+0kNvx+2vPUbfQhloXxPPG1u2rCWTNcR2SAD68wgK5r0UBKSX1t0KWncYhVSiB0
- r67q+h1eykeW4zqsI9ebvzwgv3HCpmimDp2k1YYSFcZmkdqryccDD7a8HVt836K3Na
- o5VKznU8E1oQAyqYCGIEPBtv1XWBsSX+FyHUFU/Tqq8Z/ciPbIW9cm/VbVOxDwZLYi
- U7ZVMsIbjPN0A==
+ b=fje14KJooK8UuF4Le+blz2qqb7gLZxwhUWCPYiMz0VjkO7XukgdkV97LDlC+S2TKK
+ cJAppN6LXLIffITBVHWgaUk/Jj3pBGPGb4ZJaWxRX0slNJGYYCruvRO5sFuG0HD4wj
+ rXSuISjUP4TGZ5ExzNmYyW/NXq4iFVm7Hl2/r0yyw4UpNpDVdt/R3mkcYLNAI1a11Y
+ BI2KBINAUudc6dbQZ2tbNB1nngRs6kAnZkfVQU98x7yCGfp4XzTI6TwpEj57PS8G7V
+ Q449jcdy3TA4h5OTSaQmdHolJDKoX8SuIjJPcuz08ALGWngurwliqo91u/3mNKsPCy
+ 1STaWrOCUZqsg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oDkZS-008SGg-U8;
- Tue, 19 Jul 2022 11:35:19 +0100
-Date: Tue, 19 Jul 2022 11:35:18 +0100
-Message-ID: <87ilntz8yh.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oDkhT-008SNC-T0;
+ Tue, 19 Jul 2022 11:43:35 +0100
+Date: Tue, 19 Jul 2022 11:43:35 +0100
+Message-ID: <87h73dz8ko.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v4 08/18] KVM: arm64: Add PROTECTED_NVHE_STACKTRACE Kconfig
-In-Reply-To: <CAC_TJvcyb6xQhvuoSHpC6+LmeSAqbDk9Fnb=x-bB7UxxMek3EA@mail.gmail.com>
+Subject: Re: [PATCH v4 00/18] KVM nVHE Hypervisor stack unwinder
+In-Reply-To: <20220715061027.1612149-1-kaleshsingh@google.com>
 References: <20220715061027.1612149-1-kaleshsingh@google.com>
- <20220715061027.1612149-9-kaleshsingh@google.com>
- <87cze252q7.wl-maz@kernel.org>
- <CAC_TJvcyb6xQhvuoSHpC6+LmeSAqbDk9Fnb=x-bB7UxxMek3EA@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -68,24 +65,22 @@ X-SA-Exim-Rcpt-To: kaleshsingh@google.com, mark.rutland@arm.com,
  broonie@kernel.org, madvenka@linux.microsoft.com, will@kernel.org,
  qperret@google.com, tabba@google.com, james.morse@arm.com,
  alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
- andreyknvl@gmail.com, vincenzo.frascino@arm.com, mhiramat@kernel.org,
- ast@kernel.org, wangkefeng.wang@huawei.com, elver@google.com, keirf@google.com,
+ andreyknvl@gmail.com, russell.king@oracle.com, vincenzo.frascino@arm.com,
+ mhiramat@kernel.org, ast@kernel.org, drjones@redhat.com,
+ wangkefeng.wang@huawei.com, elver@google.com, keirf@google.com,
  yuzenghui@huawei.com, ardb@kernel.org, oupton@google.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org, kernel-team@android.com
+ linux-kernel@vger.kernel.org, android-mm@google.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
- vincenzo.frascino@arm.com, Will Deacon <will@kernel.org>,
- kvmarm <kvmarm@lists.cs.columbia.edu>,
- "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- "Cc: Android Kernel" <kernel-team@android.com>, Marco Elver <elver@google.com>,
- Mark Brown <broonie@kernel.org>,
- "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
- <linux-arm-kernel@lists.infradead.org>, andreyknvl@gmail.com,
- LKML <linux-kernel@vger.kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>
+Cc: wangkefeng.wang@huawei.com, elver@google.com, catalin.marinas@arm.com,
+ ast@kernel.org, vincenzo.frascino@arm.com, will@kernel.org,
+ android-mm@google.com, kvmarm@lists.cs.columbia.edu,
+ madvenka@linux.microsoft.com, linux-arm-kernel@lists.infradead.org,
+ andreyknvl@gmail.com, kernel-team@android.com, drjones@redhat.com,
+ broonie@kernel.org, russell.king@oracle.com, linux-kernel@vger.kernel.org,
+ mhiramat@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,68 +97,34 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 18 Jul 2022 18:03:30 +0100,
+On Fri, 15 Jul 2022 07:10:09 +0100,
 Kalesh Singh <kaleshsingh@google.com> wrote:
 > 
-> On Sun, Jul 17, 2022 at 11:56 PM Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > [- Drew and android-mm, as both addresses bounce]
-> >
-> > On Fri, 15 Jul 2022 07:10:17 +0100,
-> > Kalesh Singh <kaleshsingh@google.com> wrote:
-> > >
-> > > This can be used to disable stacktrace for the protected KVM
-> > > nVHE hypervisor, in order to save on the associated memory usage.
-> > >
-> > > This option is disabled by default, since protected KVM is not widely
-> > > used on platforms other than Android currently.
-> > >
-> > > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
-> > > ---
-> > >  arch/arm64/kvm/Kconfig | 15 +++++++++++++++
-> > >  1 file changed, 15 insertions(+)
-> > >
-> > > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> > > index 8a5fbbf084df..1edab6f8a3b8 100644
-> > > --- a/arch/arm64/kvm/Kconfig
-> > > +++ b/arch/arm64/kvm/Kconfig
-> > > @@ -46,6 +46,21 @@ menuconfig KVM
-> > >
-> > >         If unsure, say N.
-> > >
-> > > +config PROTECTED_NVHE_STACKTRACE
-> > > +     bool "Protected KVM hypervisor stacktraces"
-> > > +     depends on KVM
-> > > +     default n
-> > > +     help
-> > > +       Say Y here to enable pKVM hypervisor stacktraces on hyp_panic()
-> > > +
-> > > +       If you are not using protected nVHE (pKVM), say N.
-> > > +
-> > > +       If using protected nVHE mode, but cannot afford the associated
-> > > +       memory cost (less than 0.75 page per CPU) of pKVM stacktraces,
-> > > +       say N.
-> > > +
-> > > +       If unsure, say N.
-> > > +
-> >
-> > Can we make this depend on NVHE_EL2_DEBUG instead? I'd like to keep
-> > the disclosing of EL2 information in protected mode a strict debug
-> > feature.
+> Hi all,
 > 
-> Hi Marc,
+> This is v4 of the series adding support for nVHE hypervisor stacktraces;
+> and is based on arm64 for-next/stacktrace.
 > 
-> An earlier version was similar to what you propose. The unwinding
-> depended on NVHE_EL2_DEBUG and all unwinding was done from EL1 with
-> host stage 2 being disabled. The reason the design was changed is
-> because Android expressed the need for pKVM hyp stacktraces in
-> production environments. [1]
+> Thanks all for your feedback on previous revisions. Mark Brown, I
+> appreciate your Reviewed-by on the v3, I have dropped the tags in this
+> new verision since I think the series has changed quite a bit.
+> 
+> The previous versions were posted at:
+> v3: https://lore.kernel.org/r/20220607165105.639716-1-kaleshsingh@google.com/
+> v2: https://lore.kernel.org/r/20220502191222.4192768-1-kaleshsingh@google.com/
+> v1: https://lore.kernel.org/r/20220427184716.1949239-1-kaleshsingh@google.com/
+> 
+> The main updates in this version are to address concerens from Marc on the
+> memory usage and reusing the common code by refactoring into a shared header.
 
-I think that's an Android-specific requirement that doesn't apply to
-upstream. If Android wants to enable this in production (and
-potentially leak details of the hypervisor address space), that's
-Android's business, and they can carry a patch for that.  Upstream
-shouldn't have to cater for such a thing.
+Overall, the series looks better. I've pointed out a few things that
+need changing, but my overall gripe is around the abuse the
+stacktrace/nvhe.h as a dumping ground. A lot of the code there could
+be pushed to handle_exit.c (or some other compilation unit).
+
+I've pushed an example of a 10 minutes refactor in my tree
+(kvm-arm64/nvhe-stacktrace), and I'm sure these are the lowest hanging
+fruits.
 
 Thanks,
 
