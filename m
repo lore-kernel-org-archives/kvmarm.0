@@ -2,59 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC0FFCCA483
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Jul 2022 15:11:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1874CC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Jul 2022 16:22:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AD8B4D7FF;
-	Wed, 20 Jul 2022 11:11:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EABD4D83E;
+	Wed, 20 Jul 2022 12:22:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tvbyakmR5JaF; Wed, 20 Jul 2022 11:11:13 -0400 (EDT)
+	with ESMTP id p7SyjLG9aBkT; Wed, 20 Jul 2022 12:21:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2CFD4D7D4;
-	Wed, 20 Jul 2022 11:11:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 479464D845;
+	Wed, 20 Jul 2022 12:21:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2666D4D771
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 11:11:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 075BB4D839
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 12:21:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UfEiHRFAj9Zl for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Jul 2022 11:11:11 -0400 (EDT)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 183534D770
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 11:11:11 -0400 (EDT)
-Date: Wed, 20 Jul 2022 15:11:04 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1658329869;
+ with ESMTP id i+NERp14i0qC for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Jul 2022 12:21:56 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B3F694D831
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 12:21:56 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1658334115;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=vFnDRJW8SXwUP1HZqonS92uu/YoL0Hk0zC9PiQKiK7Y=;
- b=t8HCSRCOircfKNTjXQPibLbkf3dGU8b1N/fhA1M+gEhIcEuOgZmaGt+wpUGulo4ywjeCfR
- CfOExbN2WW4kIQqeSx1m9WLPXSJyiTTWXFPeiJDwqnDhmqqqYIY4XZt7ATi+kssHAlQbJN
- uqeHqdXLh54XRJ759q3mn8x7G1ih978=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 06/24] KVM: arm64: Unify identifiers used to
- distinguish host and hypervisor
-Message-ID: <YtgbCEOMze8N4TPW@google.com>
-References: <20220630135747.26983-1-will@kernel.org>
- <20220630135747.26983-7-will@kernel.org>
+ bh=RNk6IAipo4mh8LBH8MtO8K18i9SdfeqIGL3OSdVhBzg=;
+ b=baJ5f2YOzwaFeqAvuQVYhAM+XQp9IG21OiA7wLswgsgEgySmmtBMoBcrN3cNF9ksYII6zL
+ 6IIEkr/p06anJU+I4IxvdQDxZ8RU8IsUg4EKjnz+C5nIOsgYAkl69JxYEUG9jlEcgBVvFo
+ 72H2gOUjpHVUyqHT77fetn0tsGTEalQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-120-RHYrurhEO5S1XqoXofI7Cw-1; Wed, 20 Jul 2022 12:21:49 -0400
+X-MC-Unique: RHYrurhEO5S1XqoXofI7Cw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.4])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1877A8037AF;
+ Wed, 20 Jul 2022 16:21:49 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.129])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B2D4E2026614;
+ Wed, 20 Jul 2022 16:21:48 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Collingbourne <pcc@google.com>
+Subject: Re: [PATCH v2 0/3] KVM: arm64: support MTE in protected VMs
+In-Reply-To: <CAMn1gO65DJs8QyMs4YTmq7_b01qjLgBRhM3OLZ7aKaobEGMXDw@mail.gmail.com>
+Organization: Red Hat GmbH
+References: <20220708212106.325260-1-pcc@google.com>
+ <877d49p36n.fsf@redhat.com>
+ <CAMn1gO65DJs8QyMs4YTmq7_b01qjLgBRhM3OLZ7aKaobEGMXDw@mail.gmail.com>
+User-Agent: Notmuch/0.36 (https://notmuchmail.org)
+Date: Wed, 20 Jul 2022 18:21:47 +0200
+Message-ID: <87k087oiuc.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220630135747.26983-7-will@kernel.org>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com, kvm@vger.kernel.org,
- Andy Lutomirski <luto@amacapital.net>, linux-arm-kernel@lists.infradead.org,
- Michael Roth <michael.roth@amd.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Chao Peng <chao.p.peng@linux.intel.com>, kvmarm@lists.cs.columbia.edu
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, Andy Lutomirski <luto@amacapital.net>,
+ Evgenii Stepanov <eugenis@google.com>, Michael Roth <michael.roth@amd.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,46 +85,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Will,
+On Tue, Jul 19 2022, Peter Collingbourne <pcc@google.com> wrote:
 
-On Thu, Jun 30, 2022 at 02:57:29PM +0100, Will Deacon wrote:
-> The 'pkvm_component_id' enum type provides constants to refer to the
-> host and the hypervisor, yet this information is duplicated by the
-> 'pkvm_hyp_id' constant.
-> 
-> Remove the definition of 'pkvm_hyp_id' and move the 'pkvm_component_id'
-> type definition to 'mem_protect.h' so that it can be used outside of
-> the memory protection code.
-> 
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 6 +++++-
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 8 --------
->  arch/arm64/kvm/hyp/nvhe/setup.c               | 2 +-
->  3 files changed, 6 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index 80e99836eac7..f5705a1e972f 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -51,7 +51,11 @@ struct host_kvm {
->  };
->  extern struct host_kvm host_kvm;
->  
-> -extern const u8 pkvm_hyp_id;
-> +/* This corresponds to page-table locking order */
-> +enum pkvm_component_id {
-> +	PKVM_ID_HOST,
-> +	PKVM_ID_HYP,
-> +};
+> On Tue, Jul 19, 2022 at 7:50 AM Cornelia Huck <cohuck@redhat.com> wrote:
+>>
+>> On Fri, Jul 08 2022, Peter Collingbourne <pcc@google.com> wrote:
+>>
+>> > Hi,
+>> >
+>> > This patch series contains a proposed extension to pKVM that allows MTE
+>> > to be exposed to the protected guests. It is based on the base pKVM
+>> > series previously sent to the list [1] and later rebased to 5.19-rc3
+>> > and uploaded to [2].
+>> >
+>> > This series takes precautions against host compromise of the guests
+>> > via direct access to their tag storage, by preventing the host from
+>> > accessing the tag storage via stage 2 page tables. The device tree
+>> > must describe the physical memory address of the tag storage, if any,
+>> > and the memory nodes must declare that the tag storage location is
+>> > described. Otherwise, the MTE feature is disabled in protected guests.
+>> >
+>> > Now that we can easily do so, we also prevent the host from accessing
+>> > any unmapped reserved-memory regions without a driver, as the host
+>> > has no business accessing that memory.
+>> >
+>> > A proposed extension to the devicetree specification is available at
+>> > [3], a patched version of QEMU that produces the required device tree
+>> > nodes is available at [4] and a patched version of the crosvm hypervisor
+>> > that enables MTE is available at [5].
+>>
+>> I'm unsure how this is supposed to work with QEMU + KVM, as your QEMU
+>> patch adds mte-alloc properties to regions that are exposed as a
+>> separate address space (which will not work with KVM). Is the magic in
+>> that new shared section?
+>
+> Hi Cornelia,
+>
+> The intent is that the mte-alloc property may be set on memory whose
+> allocation tag storage is not directly accessible via physical memory,
+> since in this case there is no need for the hypervisor to do anything
+> to protect allocation tag storage before exposing MTE to guests. In
+> the case of QEMU + KVM, I would expect the emulated system to not
+> expose the allocation tag storage directly, in which case it would be
+> able to set mte-alloc on all memory nodes without further action,
+> exactly as my patch implements for TCG. With the interface as
+> proposed, QEMU would need to reject the mte-shared-alloc option when
+> KVM is enabled, as there is currently no mechanism for KVM-accelerated
+> virtualized tag storage.
 
-Since we have the concept of PTE ownership in pgtable.c, WDYT about
-moving the owner ID enumeration there? KVM_MAX_OWNER_ID should be
-incorporated in the enum too.
+Ok, that makes sense.
 
---
-Thanks,
-Oliver
+>
+> Note that these properties are only relevant for guest kernels running
+> under an emulated EL2 in which pKVM could conceivably run, which means
+> that the host would need to implement FEAT_NV2. As far as I know there
+> is currently no support for NV2 neither in QEMU TCG nor in the Linux
+> kernel, and I'm unaware of any available hardware that supports both
+> NV2 and MTE, so it'll be a while before any of this becomes relevant.
+
+Nod.
+
+I'm mostly interested because I wanted to figure out how this feature
+might interact with enabling MTE for QEMU+KVM. I'll keep it in mind.
+
+Thanks!
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
