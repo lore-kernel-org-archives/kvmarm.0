@@ -2,63 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8457CC43334
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Jul 2022 09:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72813C43334
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Jul 2022 09:40:11 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00C9D4CF9E;
-	Wed, 20 Jul 2022 05:30:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 026F44CF98;
+	Wed, 20 Jul 2022 05:40:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kLWc77TXwRSK; Wed, 20 Jul 2022 05:30:03 -0400 (EDT)
+	with ESMTP id 5iG5B1MhzbsU; Wed, 20 Jul 2022 05:40:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFB634CF8D;
-	Wed, 20 Jul 2022 05:30:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B20114CFA8;
+	Wed, 20 Jul 2022 05:40:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC5C84CF8D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 05:30:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BED0B4CF91
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 05:40:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UgMu9MppDdIU for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Jul 2022 05:30:01 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 80BF64CF8B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 05:30:01 -0400 (EDT)
+ with ESMTP id 6IhI263qlfBh for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Jul 2022 05:40:07 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 841544CF8E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 05:40:07 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 43C54B81EB3;
- Wed, 20 Jul 2022 09:30:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D3E4C3411E;
- Wed, 20 Jul 2022 09:29:59 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 3E6806126A;
+ Wed, 20 Jul 2022 09:40:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A128EC3411E;
+ Wed, 20 Jul 2022 09:40:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1658309399;
- bh=Phz+YWd+DcqweUutFdlcYiu3GURZNE1BaXMUzpsP+74=;
+ s=k20201202; t=1658310005;
+ bh=uYi+PMhnThD8EyyCoIPSbOJSDFHGdViWegxE4PAv+8Q=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=GXJCNyOPQLAzSoS3NXnj8av0Q9BvY1KhKY+mnyoV1ncVf3R5oHWET9FTHBeCWX7uQ
- gIgG8n3ztdb/1+gUFZegJ3P7J6gVspoTGoA5bje41Nr1XrxmDExDZGYmZ7zf5oRwSp
- wwGlTqiaJVGQdC6/lmOPx0xt0XE3NR1VOjXd9dLHQvL4vL5o3K3jX8CKCisjp5NnhP
- FlimlLFF/wBkcJZv86vylNbgj9/kTosY16/gNL4p4Dt2zZWn3S/HKMALxwHUA1slSY
- cY4jMwysMwc4qdcypCfEnCbbqyqAq0ZpTKgwZChu127RRd5Dly3VM25Vlv7kaMWLEF
- hNnvDcD3VvSqQ==
+ b=JnINEN9w9SZScAT4cLV6//dnnokhYjdlMiskXwfjm6l0RSn/PC5g46V84GohO/WlF
+ b6bocDgpqAI3RuQU/jRn4BRTaJDLR5gIzj4PnE885nmFb/sSTujjblSMnx6aA+ssGx
+ hLr4fk4ATnGmvQ2iylxJjq1IKNPHnqQ2vuUsIqiUC2HkY8JaViYfX9fXDrPLSSIls4
+ p45VHi6VF8D0T5ndaxTQi6ONgTTm0hgAaZXp/JUtaTHUn/uRwgmrmGoI8lZXB6S3Lk
+ QRRSs2g/3G7kxPjDqR9tmvQ5fVpqO4mbjO/A3L7Xj2LvlKXAWexciuaQFw7TwXdp0I
+ zc6lEtZUW88bQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oE61k-008jwx-Ms;
- Wed, 20 Jul 2022 10:29:56 +0100
-Date: Wed, 20 Jul 2022 10:29:56 +0100
-Message-ID: <878rooyvvv.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oE6BX-008kAo-Ey;
+ Wed, 20 Jul 2022 10:40:03 +0100
+Date: Wed, 20 Jul 2022 10:40:03 +0100
+Message-ID: <877d48yvf0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v2 7/7] arm64/sve: Don't zero non-FPSIMD register state on
- syscall by default
-In-Reply-To: <YtcHkkwiDZTEpWrZ@sirena.org.uk>
+Subject: Re: [PATCH v2 2/7] arm64/fpsimd: Track the saved FPSIMD state type
+ separately to TIF_SVE
+In-Reply-To: <YsxHhx3PaPRZCLmF@sirena.org.uk>
 References: <20220620124158.482039-1-broonie@kernel.org>
- <20220620124158.482039-8-broonie@kernel.org>
- <YtbraaDE0eJhRHkx@arm.com> <YtcHkkwiDZTEpWrZ@sirena.org.uk>
+ <20220620124158.482039-3-broonie@kernel.org>
+ <87ilo4kmvx.wl-maz@kernel.org> <YswMB2v9TqPJHDM1@sirena.org.uk>
+ <87h73nlnw0.wl-maz@kernel.org> <YsxHhx3PaPRZCLmF@sirena.org.uk>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,7 +68,7 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
  zhang.lei@jp.fujitsu.com, james.morse@arm.com, alexandru.elisei@arm.com,
  andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com
+ linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
@@ -91,24 +92,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 19 Jul 2022 20:35:46 +0100,
+On Mon, 11 Jul 2022 16:53:43 +0100,
 Mark Brown <broonie@kernel.org> wrote:
 > 
-> On Tue, Jul 19, 2022 at 06:35:37PM +0100, Catalin Marinas wrote:
-> > IIRC both Will and Mark R commented in the past that they'd like the
-> > current de-facto ABI to become the official one. I'll let them comment.
+> On Mon, Jul 11, 2022 at 03:33:51PM +0100, Marc Zyngier wrote:
+> > Mark Brown <broonie@kernel.org> wrote:
+> > > On Mon, Jul 11, 2022 at 10:40:50AM +0100, Marc Zyngier wrote:
+> > > > Mark Brown <broonie@kernel.org> wrote:
 > 
-> That would be good.  I've not heard anything from Will either directly
-> or indirectly.  Mark R has indicated privately directly to me that he
-> originally pushed for the currently implemented behaviour and prefers
-> it.  Marc Zyngier has previously noted publicly the current behaviour
-> being a consideration in the context of discusion of optimisation ideas
-> like this one, I was a bit surprised that he commented on an earlier
-> patch in the series but not this one.
+> > > > > +	enum fp_state *type;
+> 
+> > > > For consistency: s/type/fp_type/ ?
+> 
+> > > Sure if nobody else wants a different bikeshed.  It really needs a
+> > > longer name like fp_state_t or something but that had it's own problems
+> > > with non-idiomaticness.
+> 
+> > I'm not talking about the name of the type, but about the name of the
+> > member in the struct fpsimd_last_state_struct. I'd like it to be
+> > homogeneous to the name you use in struct kvm_vcpu_arch. 'type' is way
+> 
+> Ah, sure I can do that.  I had thought this being in the FP last state
+> structure made things clear here.
+> 
+> > > > > -	    thread_sm_enabled(&task->thread))
+> > > > > +	    thread_sm_enabled(&task->thread)) {
+> > > > >  		sve_to_fpsimd(task);
+> > > > > +		task->thread.fp_type = FP_STATE_FPSIMD;
+> 
+> > > > Can you move this assignment into the sve_to_fpsimd() helper?
+> 
+> > > There are cases where we want a FPSIMD version of the state for
+> > > reading but don't want to affect the actual state of the process
+> > > (eg, if someone reads the FPSIMD registers via ptrace) so we don't
+> > > want to change the active register state just because we converted
+> > > it.  Adding another API that does the convert and update didn't feel
+> > > like it was helping since you then have to remember which API does
+> > > what and we already have lots of similarly named functions for
+> > > slightly different contexts.
+> 
+> > I still think the state conversion should be self contained.
+> > Sprinkling this context tracking is bound to end-up with a bug, while
+> > documenting what is to be used when, or with a helper named
+> > explicitly enough ("extract_fp_from_sve()" springs to mind) for
+> > ptrace.
+> 
+> My experience trying to follow and update this code has been that
+> layering on more helpers just shifts the potential for bugs around -
+> it's easy to have the calling context using the wrong helper and looking
+> correct, or to spend time cross checking if the helper in a particular
+> context is the right one.  Sometimes this happens because something
+> about the calling context changed rather than due to writing a new use.
+> Yes, someone might forget to update the state type but my experience
+> with this code is that it's a lot easier to spot "this is writing new
+> state, did it update the state type?" than "this is writing new state,
+> did it call the helper that implicitly updates the state type or the
+> other one?".
 
-Just because I don't repeat myself doesn't mean I changed my mind. I
-still don't buy the ABI change, as there is already a large(-ish) body
-of SW that assumes the current semantics.
+My experience in maintaining the KVM code is that the least state
+leaks outside of this sort of helpers, the least problematic they
+are. I'd rather have multiple helpers that have different *documented*
+behaviours than expecting the random hacker to know (or in this case,
+*guess*) when or not to add some extra state-twiddling. It also makes
+the code far more readable because it is self-contained.
+
+If this series is supposed to help making things more maintainable,
+then this is one way to do it.
 
 	M.
 
