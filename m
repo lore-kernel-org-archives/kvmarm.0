@@ -2,77 +2,65 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D4CC43334
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Jul 2022 17:43:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 585CCC43334
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Jul 2022 18:14:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CEA94D722;
-	Wed, 20 Jul 2022 13:43:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C58494CAD5;
+	Wed, 20 Jul 2022 14:14:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id q84h07Erjjad; Wed, 20 Jul 2022 13:42:59 -0400 (EDT)
+	with ESMTP id Sj-yL1v-i3Cu; Wed, 20 Jul 2022 14:14:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CE994D7C7;
-	Wed, 20 Jul 2022 13:42:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D2FF4CB70;
+	Wed, 20 Jul 2022 14:14:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AE2744D6B0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 13:42:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E6844CB70
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 14:14:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id onP7z+yr-vQU for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Jul 2022 13:42:57 -0400 (EDT)
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com
- [209.85.210.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BD6954D6A4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 13:42:57 -0400 (EDT)
-Received: by mail-pf1-f170.google.com with SMTP id y9so17084619pff.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 10:42:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=DfEX4zoB1CUktXM16Ag23RFGvAYk/58RpJGt7MGAocE=;
- b=k8rKBnr7aZjsE0e238dfyBRXFOKEu15TVKWwxkiMzRfMOeXtH2u+tOPYXl8NhgaWkI
- mpr3M14vF3hibRu5Jz4rLaRk2G1sYTVNUItbwqR+NkFcFn+AZS0tiagegsLQrmWpvw5y
- LtrHvVGmcrV+4XSfSzWQyqGB1pBoKwumJSgiVa46KuYsSDdaYOq8NSh3Ji24DEAsLQuz
- ilyr7fqgq9ngkwvMahO19rpODEIfxg0Oq0TOhZYRnd6h9q5ueaSMJwK5eiYaBtuFbBPp
- bszWvnoLROSimM0IIIYTN3/21asLHLA/wWYt7TZp8V8BA8SKK7KsBD02I8McKu3QDRtQ
- bM4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=DfEX4zoB1CUktXM16Ag23RFGvAYk/58RpJGt7MGAocE=;
- b=gDmfwaEoe2BqVApQeeWEYPUProLaTm7zE7S3I64/GZR3+r9Hm/XNZ85/Ly2oWWWCUb
- 1QcFEk+R7KGctsoJxh+bbcDGH64hfBxNr5FGHFcS0ZwDBCBz4YBxia2PYRwRfFLimvNt
- YUZIZjrc0E/W2/HD/e89ISLxJcbZ8jkhUIkRxFtV3NQ7FhgSK2PAXHErX2U+AMxPe6es
- rwYVL/DgIZWrpGErxxjD1kxbcDpSoCW14yYgeE+EwRYdARa47tLnHKHfhJCr8ULHiwbo
- SQLx5NKCsIeLv+6Qj1hUsZAvaRAZ/SmuaxU98Y2qVeJkyyvkbHhhjNVmL4Dyth759mQI
- ruHg==
-X-Gm-Message-State: AJIora+/kVdoO5MZ5YrQHbJN8u+vW5/Dwc3vIo7XrgnCno/6jmZRsphP
- s0WATedkyFV1Sf9SLBNW5BHb+w==
-X-Google-Smtp-Source: AGRyM1sF5IvK8I6QJM2ULGYuEYt4O7oHWje74vqLLTLxm1FXIws0PWEywVUK0mjlJqEYf5boKjSyvg==
-X-Received: by 2002:a65:62d1:0:b0:41a:69b2:91f with SMTP id
- m17-20020a6562d1000000b0041a69b2091fmr2782576pgv.283.1658338976399; 
- Wed, 20 Jul 2022 10:42:56 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com.
- [35.230.65.123]) by smtp.gmail.com with ESMTPSA id
- mp16-20020a17090b191000b001ef863193f4sm1967177pjb.33.2022.07.20.10.42.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 20 Jul 2022 10:42:56 -0700 (PDT)
-Date: Wed, 20 Jul 2022 17:42:52 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Colton Lewis <coltonlewis@google.com>
-Subject: Re: [PATCH 0/4] Fix filename reporting in guest asserts
-Message-ID: <Ytg+nOmnSj4JaS9J@google.com>
-References: <20220615193116.806312-1-coltonlewis@google.com>
+ with ESMTP id 0WisMxc1I4FL for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Jul 2022 14:14:17 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 978754CAD5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 14:14:17 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id C2503B8217E;
+ Wed, 20 Jul 2022 18:14:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC421C3411E;
+ Wed, 20 Jul 2022 18:14:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1658340854;
+ bh=Zy3j8P3splX48YJkjCqikBQJuhtL387mwjUOqWwhZyg=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=f1bSc0Yj3ibRsagQc+g6SlYtxYklYtOgYuELU4/xH6eumhIXFB0mvrGzjq7Cq2/rx
+ 1L+jEMH8/N2dpUzOYhcT6ku+7sO7tjKA+JPJXSBFXDeSA2yZFC6QwIbS7zo3GYVAli
+ X+jZ3ubhnXd/DVyN5CD4O+BCW+nIOcvoL7qy9OAZFm79QI9eNd6pX1vbdxD2cA/OSD
+ rNMfyoqxx9j+72gIYM95fnrXCTYoTdrlP8UFHxmN70WwsgreKeJW6Ae32G+hX+rraQ
+ hqOBKq+TCkoU+034Kv4E36/ZCl+EgW2RUjseeClMBew0i29/Id0e7HycMOhUA6upY6
+ Q3tXZDv1WY/oA==
+Date: Wed, 20 Jul 2022 19:14:07 +0100
+From: Will Deacon <will@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 06/24] KVM: arm64: Unify identifiers used to
+ distinguish host and hypervisor
+Message-ID: <20220720181406.GA16603@willie-the-truck>
+References: <20220630135747.26983-1-will@kernel.org>
+ <20220630135747.26983-7-will@kernel.org>
+ <YtgbCEOMze8N4TPW@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220615193116.806312-1-coltonlewis@google.com>
-Cc: thuth@redhat.com, kvm@vger.kernel.org, maz@kernel.org, drjones@redhat.com,
- pbonzini@redhat.com, vkuznets@redhat.com, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <YtgbCEOMze8N4TPW@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com, kvm@vger.kernel.org,
+ Andy Lutomirski <luto@amacapital.net>, linux-arm-kernel@lists.infradead.org,
+ Michael Roth <michael.roth@amd.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,12 +77,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jun 15, 2022, Colton Lewis wrote:
-> Fix filename reporting in guest asserts by way of abstracting out
-> magic numbers and introducing new reporting macros to report
-> consistently with less duplication.
+Hi Oliver,
 
-FYI, this is queued up for 5.20.
+Thanks for having a look.
+
+On Wed, Jul 20, 2022 at 03:11:04PM +0000, Oliver Upton wrote:
+> On Thu, Jun 30, 2022 at 02:57:29PM +0100, Will Deacon wrote:
+> > The 'pkvm_component_id' enum type provides constants to refer to the
+> > host and the hypervisor, yet this information is duplicated by the
+> > 'pkvm_hyp_id' constant.
+> > 
+> > Remove the definition of 'pkvm_hyp_id' and move the 'pkvm_component_id'
+> > type definition to 'mem_protect.h' so that it can be used outside of
+> > the memory protection code.
+> > 
+> > Signed-off-by: Will Deacon <will@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 6 +++++-
+> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 8 --------
+> >  arch/arm64/kvm/hyp/nvhe/setup.c               | 2 +-
+> >  3 files changed, 6 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > index 80e99836eac7..f5705a1e972f 100644
+> > --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > @@ -51,7 +51,11 @@ struct host_kvm {
+> >  };
+> >  extern struct host_kvm host_kvm;
+> >  
+> > -extern const u8 pkvm_hyp_id;
+> > +/* This corresponds to page-table locking order */
+> > +enum pkvm_component_id {
+> > +	PKVM_ID_HOST,
+> > +	PKVM_ID_HYP,
+> > +};
+> 
+> Since we have the concept of PTE ownership in pgtable.c, WDYT about
+> moving the owner ID enumeration there? KVM_MAX_OWNER_ID should be
+> incorporated in the enum too.
+
+Interesting idea... I think we need the definition in a header file so that
+it can be used by mem_protect.c, so I'm not entirely sure where you'd like
+to see it moved.
+
+The main worry I have is that if we ever need to distinguish e.g. one guest
+instance from another, which is likely needed for sharing of memory
+between more than just two components, then the pgtable code really cares
+about the number of instances ("which guest is it?") whilst the mem_protect
+cares about the component type ("is it a guest?").
+
+Finally, the pgtable code is also used outside of pKVM so, although the
+concept of ownership doesn't yet apply elsewhere, keeping the concept
+available without dictacting the different types of owners makes sense to
+me.
+
+Does that make sense?
+
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
