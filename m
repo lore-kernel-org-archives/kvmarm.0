@@ -2,64 +2,66 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1030C43334
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Jul 2022 12:32:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA1D0C43334
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Jul 2022 13:51:49 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 258F24CC54;
-	Wed, 20 Jul 2022 08:32:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 23AAA4D0D8;
+	Wed, 20 Jul 2022 09:51:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dTR-JfhDTB02; Wed, 20 Jul 2022 08:32:12 -0400 (EDT)
+	with ESMTP id QJcwbatT0uJ0; Wed, 20 Jul 2022 09:51:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5E894D484;
-	Wed, 20 Jul 2022 08:32:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D11934D26D;
+	Wed, 20 Jul 2022 09:51:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A9EEB4D403
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 08:32:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6E084D0D8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 09:51:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Yg--TSMv0sPk for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Jul 2022 08:32:10 -0400 (EDT)
+ with ESMTP id Pjqgo1d4E+p8 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Jul 2022 09:51:45 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7A2EA4D3ED
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 08:32:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7DF904CEDD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 09:51:45 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id A6FFB61789;
- Wed, 20 Jul 2022 12:32:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 746DCC3411E;
- Wed, 20 Jul 2022 12:32:06 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 96F48617BF;
+ Wed, 20 Jul 2022 13:51:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1576C3411E;
+ Wed, 20 Jul 2022 13:51:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1658320329;
- bh=BuZmmB4yLTGdRIt2ncTmYybwoVvnL6pinwz3NzIQra4=;
+ s=k20201202; t=1658325102;
+ bh=WLNAEsodR7iIYDpdG8QWDR/PrwilJK3XeSpXkZTDY2w=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=qtqxpwZJc/jHRDfGkag3EA+OXfM1+I5Ph5uPB5uNILthUn6xURsiwznbdsqBFJ0He
- EPh4Q5jaAsN5r4TwSAgu/BUv1svS7aUyaFwTX8s4A9HuaSL8+KhwzxgXBq1yKs/q21
- WNjBt9ArGqZxSp6ybCvOOy7Tz1T/COD/A0nsj879Hz1kuidnfupPatQK/fKlISTTx8
- XqXsiUjb+MXpRNyz0LWY8FvaNd3ybhrYgkd0rj1Hbx5ju7v22sAphFZoHO9Jz0bZbq
- eidlU/TfI9uRqOCxiqi5BAwSP2aNXimR5YG8rQz1MdMSS6v6XeUOZjMHr5SD8Gvc7S
- f2WsM/8BI2k2w==
-Date: Wed, 20 Jul 2022 13:32:02 +0100
+ b=ac/DoCuZDd9e1rdKDAoKxup1cp2zTq6UeyPH4bCVgAoHj4a/LYWmus1sjCA7fg6TE
+ By/JC0zpdlqLNhtD1sfcZ8kuzgrjgpcz34PHt1IY4Uk4sClwjPzvLRTZC0jTylvWRi
+ +zIn67yYowzDYJMAay5MH5z7okF9FJtwlnLfKynnzykrJ3zRcAmdweS4F9Km/69gJI
+ vU7hnp7xx90YfeD8T38yMa6N3GLCF8Wwll4CRZ1KJxaNeNba3k7lnY5bZdVCRlnZzp
+ Tn1IBcy/xHUYnFozv6SyKgc1LDt5/CZz7ZKtvEmMRj7MrsCCcnwhG3cYA1Na/NdsAP
+ ismHnzROZzzRQ==
+Date: Wed, 20 Jul 2022 14:51:36 +0100
 From: Mark Brown <broonie@kernel.org>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 7/7] arm64/sve: Don't zero non-FPSIMD register state
- on syscall by default
-Message-ID: <Ytf1wo1PLZyhxNg2@sirena.org.uk>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v2 2/7] arm64/fpsimd: Track the saved FPSIMD state type
+ separately to TIF_SVE
+Message-ID: <YtgIaElkAUBopyj5@sirena.org.uk>
 References: <20220620124158.482039-1-broonie@kernel.org>
- <20220620124158.482039-8-broonie@kernel.org>
- <YtbraaDE0eJhRHkx@arm.com> <YtcHkkwiDZTEpWrZ@sirena.org.uk>
- <20220720092022.GB15752@willie-the-truck>
+ <20220620124158.482039-3-broonie@kernel.org>
+ <87ilo4kmvx.wl-maz@kernel.org> <YswMB2v9TqPJHDM1@sirena.org.uk>
+ <87h73nlnw0.wl-maz@kernel.org> <YsxHhx3PaPRZCLmF@sirena.org.uk>
+ <877d48yvf0.wl-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20220720092022.GB15752@willie-the-truck>
+In-Reply-To: <877d48yvf0.wl-maz@kernel.org>
 X-Cookie: I exist, therefore I am paid.
-Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
  Zhang Lei <zhang.lei@jp.fujitsu.com>, Andre Przywara <andre.przywara@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,78 +73,66 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============4669394735169014188=="
+Content-Type: multipart/mixed; boundary="===============1792218300727437766=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
---===============4669394735169014188==
+--===============1792218300727437766==
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="1HLM6S7c58QHSSqD"
+	protocol="application/pgp-signature"; boundary="mL4PpyHqG5JSlilg"
 Content-Disposition: inline
 
 
---1HLM6S7c58QHSSqD
+--mL4PpyHqG5JSlilg
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Wed, Jul 20, 2022 at 10:20:23AM +0100, Will Deacon wrote:
-> On Tue, Jul 19, 2022 at 08:35:46PM +0100, Mark Brown wrote:
-> > On Tue, Jul 19, 2022 at 06:35:37PM +0100, Catalin Marinas wrote:
+On Wed, Jul 20, 2022 at 10:40:03AM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-> > > > The sysctl is disabled by default since it is anticipated that the risk
-> > > > of disruption to userspace is low. As well as being within the
-> > > > documented ABI this new behaviour mirrors the standard function call ABI
-> > > > for SVE in the AAPCS which should mean that compiler generated code is
-> > > > unlikely to rely on the current behaviour, the main risk is from hand
-> > > > coded assembly which directly invokes syscalls. The new behaviour is
-> > > > also what is currently implemented by qemu user mode emulation.
+> > Yes, someone might forget to update the state type but my experience
+> > with this code is that it's a lot easier to spot "this is writing new
+> > state, did it update the state type?" than "this is writing new state,
+> > did it call the helper that implicitly updates the state type or the
+> > other one?".
 
-> > > IIRC both Will and Mark R commented in the past that they'd like the
-> > > current de-facto ABI to become the official one. I'll let them comment.
+> My experience in maintaining the KVM code is that the least state
+> leaks outside of this sort of helpers, the least problematic they
+> are. I'd rather have multiple helpers that have different *documented*
+> behaviours than expecting the random hacker to know (or in this case,
+> *guess*) when or not to add some extra state-twiddling. It also makes
+> the code far more readable because it is self-contained.
 
-> > That would be good.  I've not heard anything from Will either directly
-> > or indirectly.  Mark R has indicated privately directly to me that he
-> > originally pushed for the currently implemented behaviour and prefers
-> > it.  Marc Zyngier has previously noted publicly the current behaviour
-> > being a consideration in the context of discusion of optimisation ideas
-> > like this one, I was a bit surprised that he commented on an earlier
-> > patch in the series but not this one.  You have previously pushed back
-> > on an attempt to document the current ABI, that was the main motivation
-> > for writing this patch.
+> If this series is supposed to help making things more maintainable,
+> then this is one way to do it.
 
-> I remember discussing this somewhere at some point with somebody, but that's
-> not a tonne of use!
+There's nothing self contained going on, and based on what the users are
+doing it isn't at all obvious to me that taking a copy of the data in
+another format should be part of the same operation as deciding which
+format should be the live data.  I'm all for helpers but between that
+and the direct awareness the users already need to have of what's going
+on I'm just not seeing that a combined convert and make active operation
+is jumping out as something that should be a helper.
 
-> My opinion is that the observable behaviour is what matters. So if we
-> documented that the register state is "undefined" but it is in fact always
-> zero, then we should fix the documentation.
-
-It's always zero with Linux, never zeroed by qemu user.
-
-> Does that help?
-
-Yes, that's clear thanks though it does differ from what Catalin has
-said about keeping the flexibility in the documentation - Catalin?
-
---1HLM6S7c58QHSSqD
+--mL4PpyHqG5JSlilg
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmLX9cEACgkQJNaLcl1U
-h9CuqggAgfcODdULzHaAIeGpEUqgg6vEuPj7Oqq5P3fKj3Rx1T7yh0q09XRur+OY
-tGUn9Xsiv0UyspLSYSm4vHWOsTIBxyr8YWn1eQGT/xGsjV4bw4Bd//0TMjeCN5zI
-0GWbHpYGKWbnHkdiFpA99PmQh8Uegu60eofmAZQjG8wn+qwHGTpvj5ITNGphkVrZ
-iGnJHPj6JuJiO57NOZIfVvRrltQfeZRnX8cDRBuUTFg8TZ89Tti775WKoRauh5lV
-lb+8wRpJ4TzXtduAU1zuPuqH86l3gZpVpucO6W/RjiG87m/q1N/d/4QbMjZWxSpd
-og6y1FJ0U7A32m/H35LoAriu7rIIHg==
-=rzTC
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmLYCGcACgkQJNaLcl1U
+h9A9lAf+KsshpVtFMfCIPQ7YfV9FJ/8TNdhqstSBm+LsLSxem/9fwjNsHmIezqN7
+QHwffeXB5DF8x2uajj6p4c2x/Zi0zpCdj8mXELDHXKiNb5LlK2Ow5TEOYPEAnnoE
+ctw41Zm5Uzyq4ZDlAkS/4Zs17zqYJLAlUdbnGEAjWyuUeUxBzcHHNYs1WAQ0MS4w
+gOmSao6CsvXCUvPQbbPe6FMeygkHFYeHv/JjFsJneOR8KeC2ajEJ7RMZVup/DfC1
+BeqC282+NRvXbp11B/rVjeDLw2xDWXWXcqgOCR8WcuWvgUNMr0VC36DF2Aunzma0
+AWPC9NvbDN+vKLiu+m+79BsOFiWxVQ==
+=XQmM
 -----END PGP SIGNATURE-----
 
---1HLM6S7c58QHSSqD--
+--mL4PpyHqG5JSlilg--
 
---===============4669394735169014188==
+--===============1792218300727437766==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -153,4 +143,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---===============4669394735169014188==--
+--===============1792218300727437766==--
