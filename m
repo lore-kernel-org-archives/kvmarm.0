@@ -2,80 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72813C43334
-	for <kvmarm@archiver.kernel.org>; Wed, 20 Jul 2022 09:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6811AC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Jul 2022 09:45:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 026F44CF98;
-	Wed, 20 Jul 2022 05:40:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 090074CFD8;
+	Wed, 20 Jul 2022 05:45:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5iG5B1MhzbsU; Wed, 20 Jul 2022 05:40:09 -0400 (EDT)
+	with ESMTP id JpZA49HvmYGH; Wed, 20 Jul 2022 05:45:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B20114CFA8;
-	Wed, 20 Jul 2022 05:40:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB7394CFD1;
+	Wed, 20 Jul 2022 05:45:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BED0B4CF91
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 05:40:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 604E74CFCB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 05:45:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6IhI263qlfBh for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Jul 2022 05:40:07 -0400 (EDT)
+ with ESMTP id 4AagLv06Cdor for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Jul 2022 05:45:24 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 841544CF8E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 05:40:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4AA284CE54
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 05:45:24 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 3E6806126A;
- Wed, 20 Jul 2022 09:40:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A128EC3411E;
- Wed, 20 Jul 2022 09:40:05 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 582A76126A;
+ Wed, 20 Jul 2022 09:45:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7478C3411E;
+ Wed, 20 Jul 2022 09:45:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1658310005;
- bh=uYi+PMhnThD8EyyCoIPSbOJSDFHGdViWegxE4PAv+8Q=;
+ s=k20201202; t=1658310322;
+ bh=aehb2vEzH/4KGB23P72fH2CEhv2w4wOGRXR9VC4eeK0=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=JnINEN9w9SZScAT4cLV6//dnnokhYjdlMiskXwfjm6l0RSn/PC5g46V84GohO/WlF
- b6bocDgpqAI3RuQU/jRn4BRTaJDLR5gIzj4PnE885nmFb/sSTujjblSMnx6aA+ssGx
- hLr4fk4ATnGmvQ2iylxJjq1IKNPHnqQ2vuUsIqiUC2HkY8JaViYfX9fXDrPLSSIls4
- p45VHi6VF8D0T5ndaxTQi6ONgTTm0hgAaZXp/JUtaTHUn/uRwgmrmGoI8lZXB6S3Lk
- QRRSs2g/3G7kxPjDqR9tmvQ5fVpqO4mbjO/A3L7Xj2LvlKXAWexciuaQFw7TwXdp0I
- zc6lEtZUW88bQ==
+ b=Ru2iataoS3WnwRehXdua9jcZvHJl0s8DaF0ubF2NhYN1ObmcZaFKaVfBGCbGDQ6sg
+ HJ/FnXB43kJbrWv+EdBKlsPUi0zDlzTP3FcCSOr0N1Q/ppQf7agefnGOGqpv+CjUMT
+ u+fO0qGny1ljnlBjA0G/wlDo+ETS91yLd5Thc9n4JYxxq7PehDnqCTyiJcm1+0Rbc5
+ MYId4iT8D4/hgKKMQRO+M9QpgRsP/cnUE58Rbm4waJLznqu1VwaTufAz4nmY4kVYNn
+ oUOoxTkcXrGo9nl5mUkjI5O5c6AuXrmsGNqE1YD4LHUEvACvrRL3Ppul2icWTY0YeA
+ z3Z+vvsn5CSBw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oE6BX-008kAo-Ey;
- Wed, 20 Jul 2022 10:40:03 +0100
-Date: Wed, 20 Jul 2022 10:40:03 +0100
-Message-ID: <877d48yvf0.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oE6Ge-008kEn-KB;
+ Wed, 20 Jul 2022 10:45:20 +0100
+Date: Wed, 20 Jul 2022 10:45:20 +0100
+Message-ID: <875yjsyv67.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v2 2/7] arm64/fpsimd: Track the saved FPSIMD state type
- separately to TIF_SVE
-In-Reply-To: <YsxHhx3PaPRZCLmF@sirena.org.uk>
-References: <20220620124158.482039-1-broonie@kernel.org>
- <20220620124158.482039-3-broonie@kernel.org>
- <87ilo4kmvx.wl-maz@kernel.org> <YswMB2v9TqPJHDM1@sirena.org.uk>
- <87h73nlnw0.wl-maz@kernel.org> <YsxHhx3PaPRZCLmF@sirena.org.uk>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [kvm-unit-tests PATCH 3/3] arm: pmu: Remove checks for !overflow
+ in chained counters tests
+In-Reply-To: <Yte/YXWYSikyQcqh@google.com>
+References: <20220718154910.3923412-1-ricarkol@google.com>
+ <20220718154910.3923412-4-ricarkol@google.com>
+ <87edyhz68i.wl-maz@kernel.org> <Yte/YXWYSikyQcqh@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
- zhang.lei@jp.fujitsu.com, james.morse@arm.com, alexandru.elisei@arm.com,
- andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Rcpt-To: ricarkol@google.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, drjones@redhat.com, alexandru.elisei@arm.com,
+ eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Zhang Lei <zhang.lei@jp.fujitsu.com>, Andre Przywara <andre.przywara@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: drjones@redhat.com, kvm@vger.kernel.org, oliver.upton@linux.dev,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,72 +88,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 11 Jul 2022 16:53:43 +0100,
-Mark Brown <broonie@kernel.org> wrote:
+On Wed, 20 Jul 2022 09:40:01 +0100,
+Ricardo Koller <ricarkol@google.com> wrote:
 > 
-> On Mon, Jul 11, 2022 at 03:33:51PM +0100, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> > > On Mon, Jul 11, 2022 at 10:40:50AM +0100, Marc Zyngier wrote:
-> > > > Mark Brown <broonie@kernel.org> wrote:
+> On Tue, Jul 19, 2022 at 12:34:05PM +0100, Marc Zyngier wrote:
+> > On Mon, 18 Jul 2022 16:49:10 +0100,
+> > Ricardo Koller <ricarkol@google.com> wrote:
+> > > 
+> > > A chained event overflowing on the low counter can set the overflow flag
+> > > in PMOVS.  KVM does not set it, but real HW and the fast-model seem to.
+> > > Moreover, the AArch64.IncrementEventCounter() pseudocode in the ARM ARM
+> > > (DDI 0487H.a, J1.1.1 "aarch64/debug") also sets the PMOVS bit on
+> > > overflow.
+> > 
+> > Isn't this indicative of a bug in the KVM emulation? To be honest, the
+> > pseudocode looks odd. It says:
+> > 
+> > <quote>
+> > 	if old_value<64:ovflw> != new_value<64:ovflw> then
+> > 	    PMOVSSET_EL0<idx> = '1';
+> > 	    PMOVSCLR_EL0<idx> = '1';
+> > </quote>
+> > 
+> > which I find remarkably ambiguous. Is this setting and clearing the
+> > overflow bit? Or setting it in the single register that backs the two
+> > accessors in whatever way it can?
+> > 
+> > If it is the second interpretation that is correct, then KVM
+> > definitely needs fixing
 > 
-> > > > > +	enum fp_state *type;
+> I think it's the second, as those two "= '1'" apply to the non-chained
+> counters case as well, which should definitely set the bit in PMOVSSET.
 > 
-> > > > For consistency: s/type/fp_type/ ?
+> > (though this looks pretty involved for
+> > anything that isn't a SWINC event).
 > 
-> > > Sure if nobody else wants a different bikeshed.  It really needs a
-> > > longer name like fp_state_t or something but that had it's own problems
-> > > with non-idiomaticness.
-> 
-> > I'm not talking about the name of the type, but about the name of the
-> > member in the struct fpsimd_last_state_struct. I'd like it to be
-> > homogeneous to the name you use in struct kvm_vcpu_arch. 'type' is way
-> 
-> Ah, sure I can do that.  I had thought this being in the FP last state
-> structure made things clear here.
-> 
-> > > > > -	    thread_sm_enabled(&task->thread))
-> > > > > +	    thread_sm_enabled(&task->thread)) {
-> > > > >  		sve_to_fpsimd(task);
-> > > > > +		task->thread.fp_type = FP_STATE_FPSIMD;
-> 
-> > > > Can you move this assignment into the sve_to_fpsimd() helper?
-> 
-> > > There are cases where we want a FPSIMD version of the state for
-> > > reading but don't want to affect the actual state of the process
-> > > (eg, if someone reads the FPSIMD registers via ptrace) so we don't
-> > > want to change the active register state just because we converted
-> > > it.  Adding another API that does the convert and update didn't feel
-> > > like it was helping since you then have to remember which API does
-> > > what and we already have lots of similarly named functions for
-> > > slightly different contexts.
-> 
-> > I still think the state conversion should be self contained.
-> > Sprinkling this context tracking is bound to end-up with a bug, while
-> > documenting what is to be used when, or with a helper named
-> > explicitly enough ("extract_fp_from_sve()" springs to mind) for
-> > ptrace.
-> 
-> My experience trying to follow and update this code has been that
-> layering on more helpers just shifts the potential for bugs around -
-> it's easy to have the calling context using the wrong helper and looking
-> correct, or to spend time cross checking if the helper in a particular
-> context is the right one.  Sometimes this happens because something
-> about the calling context changed rather than due to writing a new use.
-> Yes, someone might forget to update the state type but my experience
-> with this code is that it's a lot easier to spot "this is writing new
-> state, did it update the state type?" than "this is writing new state,
-> did it call the helper that implicitly updates the state type or the
-> other one?".
+> Ah, I see, there's a pretty convenient kvm_pmu_software_increment() for
+> SWINC, but a non-SWINC event is implemented as a single 64-bit perf
+> event.
 
-My experience in maintaining the KVM code is that the least state
-leaks outside of this sort of helpers, the least problematic they
-are. I'd rather have multiple helpers that have different *documented*
-behaviours than expecting the random hacker to know (or in this case,
-*guess*) when or not to add some extra state-twiddling. It also makes
-the code far more readable because it is self-contained.
+Indeed. Which means we need to de-optimise chained counters to being
+32bit events, which is pretty annoying (for rapidly firing events, the
+interrupt rate is going to be significantly higher).
 
-If this series is supposed to help making things more maintainable,
-then this is one way to do it.
+I guess we should also investigate the support for FEAT_PMUv3p5 and
+native 64bit counters. Someone is bound to build it at some point.
+
+Thanks,
 
 	M.
 
