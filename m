@@ -2,81 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FBB4CCA483
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Jul 2022 01:29:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8024CCA479
+	for <kvmarm@archiver.kernel.org>; Thu, 21 Jul 2022 05:57:38 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C522A4D9C6;
-	Wed, 20 Jul 2022 21:29:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DD064D821;
+	Thu, 21 Jul 2022 01:57:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YZRyBLVsBBUb; Wed, 20 Jul 2022 21:29:41 -0400 (EDT)
+	with ESMTP id 5+6dHl38rNpG; Thu, 21 Jul 2022 01:57:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EC054D9CB;
-	Wed, 20 Jul 2022 21:29:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B98464D1C2;
+	Thu, 21 Jul 2022 01:57:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5139D4D9C5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 21:29:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 18A514CFCD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jul 2022 01:57:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QSB1feeDuCzj for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Jul 2022 21:29:40 -0400 (EDT)
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com
- [209.85.216.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 05E984D9BF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 21:29:39 -0400 (EDT)
-Received: by mail-pj1-f52.google.com with SMTP id
- bk6-20020a17090b080600b001f2138a2a7bso3349581pjb.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 18:29:39 -0700 (PDT)
+ with ESMTP id fxUT41bIP8G1 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Jul 2022 01:57:33 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E0DD4CB66
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jul 2022 01:57:33 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ t10-20020a5b07ca000000b0066ec1bb6e2cso576137ybq.14
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Jul 2022 22:57:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=5i7pD9uxt5RO2G3WkfWU+AZkFUM1gKsxzTq2h03Rwm8=;
- b=UeKlj77E4BCKTx4d0a+/5nPInsQYeGAlr99yHD+tb9CgkaZP6cqHzjrIJ3sCjYI9/2
- flpAT5PTfRw0AbNAJcfgs4a5j6TlGOPj+D//HskpzTdLV1i/l3DsBtGAuFF1bw6g2zhh
- t8yp9Vksu4sOXTv42OF/tMYx0jEUJ/dkGNtE38dbyCtT4Wkhr1Xc/X3P+w/BwDojT8Wn
- 6+sMCdYwZ5jSzLWJIz9+PswFtFUVQ0gb+eispCeQNyBgJDAr3/EEANSE+52qxVtHf3Hn
- 6ZDYzIZODyYTh+kute1q9+WjGVmFX34l0ZQ7IMY2u/7fnlt82h7dVuI95qATVy13/e2Z
- Hz5A==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=BPi3qwuzd4uNNwfj2R89YHgRbeVMrSv9BZ2KBqzg268=;
+ b=tG2AiAzk/hBl2O6tmEa9KXqrG32m8BukA+9pPC0PoHo350s5LZXw91AZQWgYaGiK9S
+ 9a3SrwIHBduydbnYPJSwdU/i1OqNblGiEjN+MXpN0Yr6O2vE71gfcYzMtmheQkIJUadB
+ Dn83bf59xPnIuvwHeH28SoE/o8CdTn3rOTdpkEOIgr5xmkdoIiQLqCZ/8vd862qLhYNH
+ b5/rAXwx7z+nFzYqg6gQRCU5VYpsAN8+JTY5fQcnCNX924hGVF5HfzVtZYPo6pQGOdSG
+ x3svkpuHtDvgGOb14n5Lwq5DbOQK1qKF1s/IS9orcdtrckCIjFyzbRP4ZB/1x1Ud318R
+ LyFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=5i7pD9uxt5RO2G3WkfWU+AZkFUM1gKsxzTq2h03Rwm8=;
- b=XcUentga9Fqo8fpkmOwmTIqQ4j/kXlWy1+Jbi6ze+y5C7FOX+QbITsa8hJ3uYG4/+e
- EqToilBUfcySvM2ioRdPyVe1RRObop+Q+mhfKGV8+oQ78nWrEcdbtc5/d77h+qmnXmL3
- vhDTS+nzp68bhcE8mkPXXRwsDMYPiyqS+vAOnydKPtEoDq6xwd9qHtZBNHH3Jzs6Ztov
- sWbhpdf2K2+z8Iaj1ddWdSqjRWDcTaJgnVlK+UgV7CGWIOC4uZAjLGQKmorRk5z+PzzW
- S3ItoayHriJ3gm/hU/cLafhca+wNS8uRW1FGDazneMJXgl8dRcu3vBCAf+0RUgur30lb
- wBLw==
-X-Gm-Message-State: AJIora+DqsfpRYGPCG0WbPxpFsXY4fdwoFEspoKzUuXf9LAjU1q1oB03
- lXgwSeF8VdnvmBUUQGx2dRSDXA==
-X-Google-Smtp-Source: AGRyM1tJ8ImKxlP/BBnxd82Ef5VdSnGALxojQY8p0KS3YXSkLBe8Jd9Fqs/mrjinEPSYxm1dK3lNGg==
-X-Received: by 2002:a17:90a:db0b:b0:1f2:25c3:9faf with SMTP id
- g11-20020a17090adb0b00b001f225c39fafmr3991006pjv.105.1658366978689; 
- Wed, 20 Jul 2022 18:29:38 -0700 (PDT)
-Received: from google.com (123.65.230.35.bc.googleusercontent.com.
- [35.230.65.123]) by smtp.gmail.com with ESMTPSA id
- u15-20020a170902e5cf00b0016c40f8cb58sm215888plf.81.2022.07.20.18.29.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 20 Jul 2022 18:29:38 -0700 (PDT)
-Date: Thu, 21 Jul 2022 01:29:34 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v4 09/13] KVM: selftests: aarch64: Add
- aarch64/page_fault_test
-Message-ID: <Ytir/hbU9neBaYqb@google.com>
-References: <20220624213257.1504783-1-ricarkol@google.com>
- <20220624213257.1504783-10-ricarkol@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220624213257.1504783-10-ricarkol@google.com>
-Cc: drjones@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
- axelrasmussen@google.com, bgardon@google.com, dmatlack@google.com,
- pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=BPi3qwuzd4uNNwfj2R89YHgRbeVMrSv9BZ2KBqzg268=;
+ b=kEGSQggGqV1LxnNLn765x9gHAukrlMybXFBaa822HG49mlrx6/d4VnOtMrs41wglbX
+ eBzhQjNRolpsZmaGWfAJ+tMGBbQTMrl9KQwzenIjiAph3AkFhQ2dxpdQKPN2fXfmGkSr
+ YtYnujcyYKqCm1Fa599F4dVE4Bcb8p2oH5CoiWTjOcnRN6eJo9GaZnPwAPIeUiWKxS4E
+ S+r5sEgVlQzuJDwnXvzOVgz4hR7kTgauzcuilMRCiQDPRqRNwrGM8SzPz7r9NkKAQ5Cn
+ 4hiHYocST9uE3gyyeSZwqmmPzgYhz8OLlSmuiKS29tP4wiNDUuZwC67zC7W4cnVciw5A
+ aQIQ==
+X-Gm-Message-State: AJIora+hDfszkbOu1hTsKqkQSskp+tAgJQnJfk6WrAVLCU+aRgw1PQ7C
+ WCAsbnb0e+UyZK1gl6WCbLd2e57ShDAvTLVNFw==
+X-Google-Smtp-Source: AGRyM1ugD/Bixs0rFCRjcHLoj52ZlDFliAzUFihzsKdSwFhIYUosVFoGEBcJCZTwlPY+7/o1AzYOe539+3NQqJLo2g==
+X-Received: from kaleshsingh.mtv.corp.google.com
+ ([2620:15c:211:200:5a87:b61e:76b5:d1e0])
+ (user=kaleshsingh job=sendgmr) by 2002:a05:6902:1107:b0:670:b5f2:2214 with
+ SMTP id o7-20020a056902110700b00670b5f22214mr1578472ybu.565.1658383053036;
+ Wed, 20 Jul 2022 22:57:33 -0700 (PDT)
+Date: Wed, 20 Jul 2022 22:57:11 -0700
+Message-Id: <20220721055728.718573-1-kaleshsingh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
+Subject: [PATCH v5 00/17] KVM nVHE Hypervisor stack unwinder
+From: Kalesh Singh <kaleshsingh@google.com>
+To: maz@kernel.org, mark.rutland@arm.com, broonie@kernel.org, 
+ madvenka@linux.microsoft.com, tabba@google.com
+Cc: wangkefeng.wang@huawei.com, catalin.marinas@arm.com, elver@google.com,
+ vincenzo.frascino@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ android-mm@google.com, kernel-team@android.com, drjones@redhat.com,
+ ast@kernel.org, linux-arm-kernel@lists.infradead.org, andreyknvl@gmail.com,
+ linux-kernel@vger.kernel.org, mhiramat@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,129 +87,151 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jun 24, 2022, Ricardo Koller wrote:
-> Add a new test for stage 2 faults when using different combinations of
-> guest accesses (e.g., write, S1PTW), backing source type (e.g., anon)
-> and types of faults (e.g., read on hugetlbfs with a hole). The next
-> commits will add different handling methods and more faults (e.g., uffd
-> and dirty logging). This first commit starts by adding two sanity checks
-> for all types of accesses: AF setting by the hw, and accessing memslots
-> with holes.
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
+Hi all,
 
-...
+This is v5 of nVHE hypervisor stacktraces support. The series is based on
+arm64 for-next/stacktrace.
 
-> +/*
-> + * Create a memslot for test data (memslot[TEST]) and another one for PT
-> + * tables (memslot[PT]). This diagram show the resulting guest virtual and
-> + * physical address space when using 4K backing pages for the memslots, and
-> + * 4K guest pages.
-> + *
-> + *                   Guest physical            Guest virtual
-> + *
-> + *                  |              |          |             |
-> + *                  |              |          |             |
-> + *                  +--------------+          +-------------+
-> + * max_gfn - 0x1000 | TEST memslot |<---------+  test data  | 0xc0000000
-> + *                  +--------------+          +-------------+
-> + * max_gfn - 0x2000 |     gap      |<---------+     gap     | 0xbffff000
-> + *                  +--------------+          +-------------+
-> + *                  |              |          |             |
-> + *                  |              |          |             |
-> + *                  |  PT memslot  |          |             |
-> + *                  |              |          +-------------+
-> + * max_gfn - 0x6000 |              |<----+    |             |
-> + *                  +--------------+     |    |             |
-> + *                  |              |     |    | PTE for the |
-> + *                  |              |     |    | test data   |
-> + *                  |              |     +----+ page        | 0xb0000000
-> + *                  |              |          +-------------+
-> + *                  |              |          |             |
-> + *                  |              |          |             |
-> + *
-> + * Using different guest page sizes or backing pages will result in the
-> + * same layout but at different addresses. In particular, the memslot
-> + * sizes need to be multiple of the backing page sizes (e.g., 2MB).
-> + */
-> +static void setup_memslots(struct kvm_vm *vm, enum vm_guest_mode mode,
-> +		struct test_params *p)
-> +{
-> +	uint64_t backing_page_size = get_backing_src_pagesz(p->src_type);
-> +	uint64_t guest_page_size = vm_guest_mode_params[mode].page_size;
-> +	struct test_desc *test = p->test_desc;
-> +	uint64_t gap_gpa;
-> +	uint64_t alignment;
-> +	int i;
-> +
-> +	memslot[TEST].size = align_up(guest_page_size, backing_page_size);
-> +	/*
-> +	 * We need one guest page for the PT table containing the PTE (for
-> +	 * TEST_GVA), but might need more in case the higher level PT tables
-> +	 * were not allocated yet.
-> +	 */
-> +	memslot[PT].size = align_up(4 * guest_page_size, backing_page_size);
-> +
-> +	for (i = 0; i < NR_MEMSLOTS; i++) {
-> +		memslot[i].guest_pages = memslot[i].size / guest_page_size;
-> +		memslot[i].src_type = p->src_type;
-> +	}
-> +
-> +	/* Place the memslots GPAs at the end of physical memory */
-> +	alignment = max(backing_page_size, guest_page_size);
-> +	memslot[TEST].gpa = (vm->max_gfn - memslot[TEST].guest_pages) *
-> +		guest_page_size;
-> +	memslot[TEST].gpa = align_down(memslot[TEST].gpa, alignment);
-> +
-> +	/* Add a 1-guest_page gap between the two memslots */
-> +	gap_gpa = memslot[TEST].gpa - guest_page_size;
-> +	/* Map the gap so it's still adressable from the guest.  */
-> +	virt_pg_map(vm, TEST_GVA - guest_page_size, gap_gpa);
-> +
-> +	memslot[PT].gpa = gap_gpa - memslot[PT].size;
-> +	memslot[PT].gpa = align_down(memslot[PT].gpa, alignment);
-> +
-> +	vm_userspace_mem_region_add(vm, p->src_type, memslot[PT].gpa,
-> +			memslot[PT].idx, memslot[PT].guest_pages,
-> +			test->pt_memslot_flags);
-> +	vm_userspace_mem_region_add(vm, p->src_type, memslot[TEST].gpa,
-> +			memslot[TEST].idx, memslot[TEST].guest_pages,
-> +			test->test_memslot_flags);
-> +
-> +	for (i = 0; i < NR_MEMSLOTS; i++)
-> +		memslot[i].hva = addr_gpa2hva(vm, memslot[i].gpa);
-> +
-> +	/* Map the test TEST_GVA using the PT memslot. */
-> +	_virt_pg_map(vm, TEST_GVA, memslot[TEST].gpa, MT_NORMAL,
-> +			TEST_PT_SLOT_INDEX);
+The previous versions were posted at:
+v4: https://lore.kernel.org/r/20220715061027.1612149-1-kaleshsingh@google.com/
+v3: https://lore.kernel.org/r/20220607165105.639716-1-kaleshsingh@google.com/
+v2: https://lore.kernel.org/r/20220502191222.4192768-1-kaleshsingh@google.com/
+v1: https://lore.kernel.org/r/20220427184716.1949239-1-kaleshsingh@google.com/
 
-Use memslot[TEST].idx instead of TEST_PT_SLOT_INDEX to be consistent, though my
-preference would be to avoid this API.
+The main updates in this version are some refactoring to move stuff out of
+stacktrace/nvhe.h (leaving only the unwinder implementation in the header);
+and fixing the symbolization of the hyp stacktrace when KASLR is enabled;
+along with the addressing the other minor comments.
 
-IIUC, the goal is to test different backing stores for the memory the guest uses
-for it's page tables.  But do we care about testing that a single guest's page
-tables are backed with different types concurrently?  If we don't care, and maybe
-even if we do, then my preference would be to enhance the __vm_create family of
-helpers to allow for specifying what backing type should be used for page tables,
-i.e. associate the info the VM instead of passing it around the stack.
+Patch 18 (KVM: arm64: Dump nVHE hypervisor stack on panic) was also squashed
+into earlier patches.
 
-One idea would be to do something like David Matlack suggested a while back and
-replace extra_mem_pages with a struct, e.g. struct kvm_vm_mem_params  That struct
-can then provide the necessary knobs to control how memory is allocated.  And then
-the lib can provide a global
+The previous cover letter is copied below for convenience.
 
-	struct kvm_vm_mem_params kvm_default_vm_mem_params;
+Thanks all for your feedback.
 
-or whatever (probably a shorter name) for the tests that don't care.  And then
-down the road, if someone wants to control the backing type for code vs. data,
-we could and those flags to kvm_vm_mem_params and add vm_vaddr_alloc() wrappers
-to alloc code vs. data (with a default to data?).
+--Kalesh
 
-I don't like the param approach because it bleeds implementation details that
-really shouldn't matter, e.g. which memslot is the default, into tests.  And it's
-not very easy to use, e.g. if a different test wants to do something similar,
-it would have to create its own memslot, populate the tables, etc...
+============
+
+KVM nVHE Stack unwinding.
+===
+
+nVHE has two modes of operation: protected (pKVM) and unprotected
+(conventional nVHE). Depending on the mode, a slightly different approach
+is used to dump the hypervisor stacktrace but the core unwinding logic
+remains the same.
+
+Protected nVHE (pKVM) stacktraces
+====
+
+In protected nVHE mode, the host cannot directly access hypervisor memory.
+
+The hypervisor stack unwinding happens in EL2 and is made accessible to
+the host via a shared buffer. Symbolizing and printing the stacktrace
+addresses is delegated to the host and happens in EL1.
+
+Non-protected (Conventional) nVHE stacktraces
+====
+
+In non-protected mode, the host is able to directly access the hypervisor
+stack pages.
+
+The hypervisor stack unwinding and dumping of the stacktrace is performed
+by the host in EL1, as this avoids the memory overhead of setting up
+shared buffers between the host and hypervisor.
+
+Resuing the Core Unwinding Logic
+====
+
+Since the hypervisor cannot link against the kernel code in proteced mode.
+The common stack unwinding code is moved to a shared header to allow reuse
+in the nVHE hypervisor.
+
+Reducing the memory footprint
+====
+
+In this version the below steps were taken to reduce the memory usage of
+nVHE stack unwinding:
+
+    1) The nVHE overflow stack is reduced from PAGE_SIZE to 4KB; benificial
+       for configurations with non 4KB pages (16KB or 64KB pages).
+    2) In protected nVHE mode (pKVM), the shared stacktrace buffers with the
+       host are reduced from PAGE_SIZE to the minimum size required.
+    3) In systems other than Android, conventional nVHE makes up the vast
+       majority of use case. So the pKVM stack tracing is disabled by default
+       (!CONFIG_PROTECTED_NVHE_STACKTRACE), which avoid the memory usage for
+       setting up shared buffers.
+    4) In non-protected nVHE mode (conventional nVHE), the stack unwinding
+       is done directly in EL1 by the host and no shared buffers with the
+       hypervisor are needed.
+
+Sample Output
+====
+
+The below shows an example output from a simple stack overflow test:
+
+[  126.862960] kvm [371]: nVHE hyp panic at: [<ffff8000090a51d0>] __kvm_nvhe_recursive_death+0x10/0x34!
+[  126.869920] kvm [371]: Protected nVHE HYP call trace:
+[  126.870528] kvm [371]:  [<ffff8000090a5570>] __kvm_nvhe_hyp_panic+0xac/0xf8
+[  126.871342] kvm [371]:  [<ffff8000090a55cc>] __kvm_nvhe_hyp_panic_bad_stack+0x10/0x10
+[  126.872174] kvm [371]:  [<ffff8000090a51e4>] __kvm_nvhe_recursive_death+0x24/0x34
+[  126.872971] kvm [371]:  [<ffff8000090a51e4>] __kvm_nvhe_recursive_death+0x24/0x34
+   . . .
+
+[  126.927314] kvm [371]:  [<ffff8000090a51e4>] __kvm_nvhe_recursive_death+0x24/0x34
+[  126.927727] kvm [371]:  [<ffff8000090a51e4>] __kvm_nvhe_recursive_death+0x24/0x34
+[  126.928137] kvm [371]:  [<ffff8000090a4de4>] __kvm_nvhe___kvm_vcpu_run+0x30/0x40c
+[  126.928561] kvm [371]:  [<ffff8000090a7b64>] __kvm_nvhe_handle___kvm_vcpu_run+0x30/0x48
+[  126.928984] kvm [371]:  [<ffff8000090a78b8>] __kvm_nvhe_handle_trap+0xc4/0x128
+[  126.929385] kvm [371]:  [<ffff8000090a6864>] __kvm_nvhe___host_exit+0x64/0x64
+[  126.929804] kvm [371]: ---- End of Protected nVHE HYP call trace ----
+
+============
+
+Kalesh Singh (17):
+  arm64: stacktrace: Add shared header for common stack unwinding code
+  arm64: stacktrace: Factor out on_accessible_stack_common()
+  arm64: stacktrace: Factor out unwind_next_common()
+  arm64: stacktrace: Handle frame pointer from different address spaces
+  arm64: stacktrace: Factor out common unwind()
+  arm64: stacktrace: Add description of stacktrace/common.h
+  KVM: arm64: On stack overflow switch to hyp overflow_stack
+  KVM: arm64: Add PROTECTED_NVHE_STACKTRACE Kconfig
+  KVM: arm64: Allocate shared pKVM hyp stacktrace buffers
+  KVM: arm64: Stub implementation of pKVM HYP stack unwinder
+  KVM: arm64: Stub implementation of non-protected nVHE HYP stack
+    unwinder
+  KVM: arm64: Save protected-nVHE (pKVM) hyp stacktrace
+  KVM: arm64: Prepare non-protected nVHE hypervisor stacktrace
+  KVM: arm64: Implement protected nVHE hyp stack unwinder
+  KVM: arm64: Implement non-protected nVHE hyp stack unwinder
+  KVM: arm64: Introduce pkvm_dump_backtrace()
+  KVM: arm64: Introduce hyp_dump_backtrace()
+
+ arch/arm64/include/asm/kvm_asm.h           |  16 ++
+ arch/arm64/include/asm/memory.h            |   8 +
+ arch/arm64/include/asm/stacktrace.h        |  92 +++++----
+ arch/arm64/include/asm/stacktrace/common.h | 230 +++++++++++++++++++++
+ arch/arm64/include/asm/stacktrace/nvhe.h   | 199 ++++++++++++++++++
+ arch/arm64/kernel/stacktrace.c             | 157 --------------
+ arch/arm64/kvm/Kconfig                     |  15 ++
+ arch/arm64/kvm/arm.c                       |   2 +-
+ arch/arm64/kvm/handle_exit.c               | 101 +++++++++
+ arch/arm64/kvm/hyp/nvhe/Makefile           |   2 +-
+ arch/arm64/kvm/hyp/nvhe/host.S             |   9 +-
+ arch/arm64/kvm/hyp/nvhe/stacktrace.c       | 116 +++++++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c           |   6 +
+ 13 files changed, 749 insertions(+), 204 deletions(-)
+ create mode 100644 arch/arm64/include/asm/stacktrace/common.h
+ create mode 100644 arch/arm64/include/asm/stacktrace/nvhe.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/stacktrace.c
+
+
+base-commit: 82a592c13b0aeff94d84d54183dae0b26384c95f
+-- 
+2.37.0.170.g444d1eabd0-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
