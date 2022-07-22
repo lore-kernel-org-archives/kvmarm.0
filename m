@@ -2,69 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71BD3C43334
-	for <kvmarm@archiver.kernel.org>; Fri, 22 Jul 2022 17:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DA86C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 22 Jul 2022 17:28:35 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A75FF4D1D4;
-	Fri, 22 Jul 2022 13:25:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 94F214CCFD;
+	Fri, 22 Jul 2022 13:28:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sXnphQSc50iO; Fri, 22 Jul 2022 13:25:32 -0400 (EDT)
+	with ESMTP id 37gk1ViTXWia; Fri, 22 Jul 2022 13:28:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 908084D1D8;
-	Fri, 22 Jul 2022 13:25:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A36F4CB98;
+	Fri, 22 Jul 2022 13:28:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E12564D1C5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 13:25:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E071C4D229
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 13:28:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eDkqaTmN+mzR for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Jul 2022 13:25:25 -0400 (EDT)
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com
- [209.85.221.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AE2D24D1C1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 13:25:25 -0400 (EDT)
-Received: by mail-wr1-f52.google.com with SMTP id u5so7421859wrm.4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 10:25:25 -0700 (PDT)
+ with ESMTP id Q2V7FqApyeSW for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Jul 2022 13:28:31 -0400 (EDT)
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com
+ [209.85.221.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 93FC14D213
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 13:28:31 -0400 (EDT)
+Received: by mail-wr1-f44.google.com with SMTP id a5so7395069wrx.12
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 10:28:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=qo8WtVG4n0zTyMgzLgHF96/1qxYxV8ri3HK7ykqwnO8=;
- b=IK7V1IOiUtkzMNlZe+LF+whif65Ho4BnHQgQT5ZqfEnJBdOdhx+lcnsEqWnONdEIj5
- 37zG5sDarPhLTl8WkWOedv9TArm8RDXVASNCbomlxOJZVtSYWcSdjX/2pK+YEaabocSO
- vHG5ODih6QIppMO3JhyTpBsN+rCbddhFRKimz/zgyqwR1EnLH1QxtEIvX5/kYonlKosk
- 2BxCBvjDosLoJIIRjCMzRvruT384mua/wXVI+I2tkETcS4K8ZUtaZ57+L+go0dpvv1Pp
- L0WZjgtsSjEI/qBKh8D7LLxMRKJLuLObV4Ml3SUEGNA59aYtWV92hmkMEOFDlWPgM0w5
- 34Iw==
+ :cc; bh=iwlo3BqFTDCGoeQJZWI9pHBVdatv5K3XsvNJ8Oj1ml0=;
+ b=EvrScfvXzo/TRQoNEGgStFwBfwgOXLAWI14neyWBoektfW3yQaQaUzJpfRCq2CSE8W
+ eC7GoUHSUfnidEnJkSl+J3F7RZOYOHW9MPCzeQrlMWCCjPuIftWDJhS6Gvr8jFiP6A28
+ A1eJ0Ccw5PjBaXUFVN7egE0wEozabHciz42onTJgCN4386Td3elkdLV1HpAqyCAx2lFH
+ pKEvmNRV6gplzqZXvBW+DxTxSHVoaul2LwwHR0ZjmJb7+A8EuTLZ7snpMVJa35SE+alg
+ QEtEfxm4xbQXV08ULk1GvbAjnrVS2cttW+/TOmIYJXmhQ5GIHmfYnLns3gfCcIHOUynn
+ nIiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=qo8WtVG4n0zTyMgzLgHF96/1qxYxV8ri3HK7ykqwnO8=;
- b=LqtjnV4boi2wOrfbJtGRi6unDq8AjQ0QqCxaSJz9FVDL4vsx36CKujIUPbOI1ZpNS3
- XQqM6/blNmIAIJooT14piR8Bb/JnwfWNTp5j8IsC+l4Q16oEvpXwn3zzWx5EX4MUyMLT
- pY2mLwqi9ua94eh3GzIPDqa4aUCHw5zR/xifj0hsZaT/Sx3ItLZ+e8YYvxQW1J1AX9c2
- GOeJSq1+NWxc2wL8Lyr4gbiFppxUty/Dzg0fQrxYncoWHcNtvUM2+UePdbH0Oy6BbnSA
- QzqYK/glApRfIIaIbrLJIVDPtox2w7UT1HY0mEfrPx4PptOi7u5Fc0LTEex/bAeywMJL
- GB5g==
-X-Gm-Message-State: AJIora/DbKmk4jII5WaoKVRc5dLl89Cd0or3SuiR0uulMhP1lTfrnrBb
- syqLYWnj0KJ1xAfzsfbAKjtnxyn9CfyV7b/kweX/PA==
-X-Google-Smtp-Source: AGRyM1tMBRELkdIUB+WahUZ3HbBB7VpSn07XisByEgMH3WLYDxJwtXXySPT1I4TW5C1OKkrxltUynrrqfqmbgcKRLcA=
-X-Received: by 2002:a5d:6c65:0:b0:21d:b7c0:9930 with SMTP id
- r5-20020a5d6c65000000b0021db7c09930mr626692wrz.500.1658510724540; Fri, 22 Jul
- 2022 10:25:24 -0700 (PDT)
+ bh=iwlo3BqFTDCGoeQJZWI9pHBVdatv5K3XsvNJ8Oj1ml0=;
+ b=gwdjZdEzARKoJzQXgiGtEIXqfRVFhd/JTLDX4rUn4c7PF6hY4dP0G0K/xRoIa+tAVX
+ jUCvzVj3+861xqYnGNqEN0eF1lNLEoRQUxs29BlbZ7RMfjD5U7pEyKnecR3XXR4J/sIB
+ tzXRUMnKfXrGFtq98E5o2wWt9l10NE0dkmkSy40vxH8QqT9DVrpPDtfWT6l0QoAnxzus
+ Niqrb3kAkgjm2IFBvvkeZo9vUJfSjpqyrXc6vQctzIUi+dMHgz7gCYtppj4ZWaHuiWAw
+ aphqYE3DwEJEOvfyZnVU7TDcCQtODBu+Jt+dnE7kXM49YceFnPZOzIG+9CGj4Yq3UP7F
+ gCGg==
+X-Gm-Message-State: AJIora9IOR6U8Yae+t4rLqifm12WnZJ14fELn79U1ZQpfmT8KW2Rk4Fd
+ rvEeSdQe6FD8zTS+z6R8YcRxpSdxp1pFVzY78UINuA==
+X-Google-Smtp-Source: AGRyM1u4ikPl/LtayDssTs6DxZSbbt9+bh3MqXwxRj6V6FITNQSGqxV7Y7eunshdDHKNYuaCM56/nHqbH6WDzqJYZxs=
+X-Received: by 2002:a05:6000:1e04:b0:21d:7ec3:fe5a with SMTP id
+ bj4-20020a0560001e0400b0021d7ec3fe5amr693779wrb.116.1658510910254; Fri, 22
+ Jul 2022 10:28:30 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220721055728.718573-1-kaleshsingh@google.com>
- <20220721055728.718573-17-kaleshsingh@google.com>
- <YtqHDTpnn376Qb7u@google.com>
-In-Reply-To: <YtqHDTpnn376Qb7u@google.com>
+ <20220721055728.718573-13-kaleshsingh@google.com>
+ <YtrDU9TRjNWCTPVg@google.com>
+In-Reply-To: <YtrDU9TRjNWCTPVg@google.com>
 From: Kalesh Singh <kaleshsingh@google.com>
-Date: Fri, 22 Jul 2022 10:25:13 -0700
-Message-ID: <CAC_TJvdAa0PnTSiNa4W0QusQYJ7bEGeWD2+i4EsuZL94LjB15Q@mail.gmail.com>
-Subject: Re: [PATCH v5 16/17] KVM: arm64: Introduce pkvm_dump_backtrace()
+Date: Fri, 22 Jul 2022 10:28:19 -0700
+Message-ID: <CAC_TJvcdc=gRG5fYr16gQikHLedtH=RyasXvgNsMufUNtBEXRg@mail.gmail.com>
+Subject: Re: [PATCH v5 12/17] KVM: arm64: Save protected-nVHE (pKVM) hyp
+ stacktrace
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
  Catalin Marinas <catalin.marinas@arm.com>, Marco Elver <elver@google.com>,
@@ -94,60 +95,170 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jul 22, 2022 at 4:16 AM Oliver Upton <oliver.upton@linux.dev> wrote:
+On Fri, Jul 22, 2022 at 8:33 AM Oliver Upton <oliver.upton@linux.dev> wrote:
 >
 > Hi Kalesh,
 >
-> On Wed, Jul 20, 2022 at 10:57:27PM -0700, Kalesh Singh wrote:
+> On Wed, Jul 20, 2022 at 10:57:23PM -0700, Kalesh Singh wrote:
+> > In protected nVHE mode, the host cannot access private owned hypervisor
+> > memory. Also the hypervisor aims to remains simple to reduce the attack
+> > surface and does not provide any printk support.
+> >
+> > For the above reasons, the approach taken to provide hypervisor stacktraces
+> > in protected mode is:
+> >    1) Unwind and save the hyp stack addresses in EL2 to a shared buffer
+> >       with the host (done in this patch).
+> >    2) Delegate the dumping and symbolization of the addresses to the
+> >       host in EL1 (later patch in the series).
+> >
+> > On hyp_panic(), the hypervisor prepares the stacktrace before returning to
+> > the host.
+> >
+> > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+> > ---
 >
-> [...]
->
-> > +/*
-> > + * pkvm_dump_backtrace - Dump the protected nVHE HYP backtrace.
-> > + *
-> > + * @hyp_offset: hypervisor offset, used for address translation.
-> > + *
-> > + * Dumping of the pKVM HYP backtrace is done by reading the
-> > + * stack addresses from the shared stacktrace buffer, since the
-> > + * host cannot direclty access hyperviosr memory in protected
-> > + * mode.
-> > + */
-> > +static void pkvm_dump_backtrace(unsigned long hyp_offset)
-> > +{
-> > +     unsigned long *stacktrace_entry
-> > +             = (unsigned long *)this_cpu_ptr_nvhe_sym(pkvm_stacktrace);
-> > +     unsigned long va_mask, pc;
-> > +
-> > +     va_mask = GENMASK_ULL(vabits_actual - 1, 0);
-> > +
-> > +     kvm_err("Protected nVHE HYP call trace:\n");
->
-> This and the footer printks should be put in respective helpers to share
-> between pKVM and non-pKVM backtrace implementations. I imagine users
-> will invariably bake some pattern matching to scrape traces, and it
-> should be consistent between both flavors.
+> Tried reworking this a bit and here is what I arrived at, WDYT?
+> Untested, of course :)
 
 Hi Oliver,
 
-Ok will split these out into helpers.
-
->
-> > +     /* The stack trace is terminated by a null entry */
-> > +     for (; *stacktrace_entry; stacktrace_entry++) {
->
-> At the point we're dumping the backtrace we know that EL2 has already
-> soiled itself, so we shouldn't explicitly depend on it providing NULL
-> terminators. I believe this loop should have an explicit range && NULL
-> check.
-
-Good point, I'll add the additional checks in the next version,
+I think what you have is a lot cleaner. :) I'll incorporate it for the
+next spin.
 
 Thanks,
 Kalesh
+
 >
 > --
 > Thanks,
 > Oliver
+>
+> diff --git a/arch/arm64/include/asm/stacktrace/nvhe.h b/arch/arm64/include/asm/stacktrace/nvhe.h
+> index 3078501f8e22..05d7e03e0a8c 100644
+> --- a/arch/arm64/include/asm/stacktrace/nvhe.h
+> +++ b/arch/arm64/include/asm/stacktrace/nvhe.h
+> @@ -21,6 +21,23 @@
+>
+>  #include <asm/stacktrace/common.h>
+>
+> +/*
+> + * kvm_nvhe_unwind_init - Start an unwind from the given nVHE HYP fp and pc
+> + *
+> + * @state : unwind_state to initialize
+> + * @fp    : frame pointer at which to start the unwinding.
+> + * @pc    : program counter at which to start the unwinding.
+> + */
+> +static inline void kvm_nvhe_unwind_init(struct unwind_state *state,
+> +                                       unsigned long fp,
+> +                                       unsigned long pc)
+> +{
+> +       unwind_init_common(state, NULL);
+> +
+> +       state->fp = fp;
+> +       state->pc = pc;
+> +}
+> +
+>  static inline bool on_accessible_stack(const struct task_struct *tsk,
+>                                        unsigned long sp, unsigned long size,
+>                                        struct stack_info *info)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/stacktrace.c b/arch/arm64/kvm/hyp/nvhe/stacktrace.c
+> index 96c8b93320eb..644276fb02af 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/stacktrace.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/stacktrace.c
+> @@ -11,4 +11,69 @@ DEFINE_PER_CPU(unsigned long [OVERFLOW_STACK_SIZE/sizeof(long)], overflow_stack)
+>
+>  #ifdef CONFIG_PROTECTED_NVHE_STACKTRACE
+>  DEFINE_PER_CPU(unsigned long [NVHE_STACKTRACE_SIZE/sizeof(long)], pkvm_stacktrace);
+> +
+> +/*
+> + * pkvm_save_backtrace_entry - Saves a protected nVHE HYP stacktrace entry
+> + *
+> + * @arg    : the index of the entry in the stacktrace buffer
+> + * @where  : the program counter corresponding to the stack frame
+> + *
+> + * Save the return address of a stack frame to the shared stacktrace buffer.
+> + * The host can access this shared buffer from EL1 to dump the backtrace.
+> + */
+> +static bool pkvm_save_backtrace_entry(void *arg, unsigned long where)
+> +{
+> +       unsigned long *stacktrace = this_cpu_ptr(pkvm_stacktrace);
+> +       int *idx = (int *)arg;
+> +
+> +       /*
+> +        * Need 2 free slots: 1 for current entry and 1 for the
+> +        * delimiter.
+> +        */
+> +       if (*idx > ARRAY_SIZE(pkvm_stacktrace) - 2)
+> +               return false;
+> +
+> +       stacktrace[*idx] = where;
+> +       stacktrace[++*idx] = 0UL;
+> +
+> +       return true;
+> +}
+> +
+> +/*
+> + * pkvm_save_backtrace - Saves the protected nVHE HYP stacktrace
+> + *
+> + * @fp : frame pointer at which to start the unwinding.
+> + * @pc : program counter at which to start the unwinding.
+> + *
+> + * Save the unwinded stack addresses to the shared stacktrace buffer.
+> + * The host can access this shared buffer from EL1 to dump the backtrace.
+> + */
+> +static void pkvm_save_backtrace(unsigned long fp, unsigned long pc)
+> +{
+> +       struct unwind_state state;
+> +       int idx = 0;
+> +
+> +       kvm_nvhe_unwind_init(&state, fp, pc);
+> +
+> +       unwind(&state, pkvm_save_backtrace_entry, &idx);
+> +}
+> +#else /* !CONFIG_PROTECTED_NVHE_STACKTRACE */
+> +static void pkvm_save_backtrace(unsigned long fp, unsigned long pc)
+> +{
+> +}
+>  #endif /* CONFIG_PROTECTED_NVHE_STACKTRACE */
+> +
+> +/*
+> + * kvm_nvhe_prepare_backtrace - prepare to dump the nVHE backtrace
+> + *
+> + * @fp : frame pointer at which to start the unwinding.
+> + * @pc : program counter at which to start the unwinding.
+> + *
+> + * Saves the information needed by the host to dump the nVHE hypervisor
+> + * backtrace.
+> + */
+> +void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc)
+> +{
+> +       if (is_protected_kvm_enabled())
+> +               pkvm_save_backtrace(fp, pc);
+> +}
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index 6db801db8f27..64e13445d0d9 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -34,6 +34,8 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
+>  DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+>  DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+>
+> +extern void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc);
+> +
+>  static void __activate_traps(struct kvm_vcpu *vcpu)
+>  {
+>         u64 val;
+> @@ -375,6 +377,10 @@ asmlinkage void __noreturn hyp_panic(void)
+>                 __sysreg_restore_state_nvhe(host_ctxt);
+>         }
+>
+> +       /* Prepare to dump kvm nvhe hyp stacktrace */
+> +       kvm_nvhe_prepare_backtrace((unsigned long)__builtin_frame_address(0),
+> +                                  _THIS_IP_);
+> +
+>         __hyp_do_panic(host_ctxt, spsr, elr, par);
+>         unreachable();
+>  }
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
