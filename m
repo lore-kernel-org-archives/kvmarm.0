@@ -2,61 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E0CEC433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 22 Jul 2022 15:33:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC67C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 22 Jul 2022 17:05:16 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B04DE4CD87;
-	Fri, 22 Jul 2022 11:33:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE5314D1A1;
+	Fri, 22 Jul 2022 13:05:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id a3hvhN78ISWO; Fri, 22 Jul 2022 11:33:50 -0400 (EDT)
+	with ESMTP id UHf1I5q9XAfh; Fri, 22 Jul 2022 13:05:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 247E14CCA0;
-	Fri, 22 Jul 2022 11:33:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B2EDE4D156;
+	Fri, 22 Jul 2022 13:05:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D9FC14CC65
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 11:33:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD7644D133
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 13:05:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UgrjdcypvWx8 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Jul 2022 11:33:47 -0400 (EDT)
-Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 52A334B58D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 11:33:47 -0400 (EDT)
-Date: Fri, 22 Jul 2022 15:33:39 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1658504025;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=EHcXZ82EpsdLm7shozmycgnQXph3h61HLeaQXOxGK0A=;
- b=dN2nMS2MSke1JsnwdAqJhx64uCLm2GafTrgEywkEP32v5hJNrJnFBPr1srSb3hE6CEdEtD
- V5iuD/i20uj6VyBa4BPd97UdnMTWKCZMmB8Mn3mYdITs0C8XpzGKtE9w99eizMHaIu7d7g
- z0OsIHvDTbFK7neIPUQnKWmhLSbFZJ8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v5 12/17] KVM: arm64: Save protected-nVHE (pKVM) hyp
- stacktrace
-Message-ID: <YtrDU9TRjNWCTPVg@google.com>
-References: <20220721055728.718573-1-kaleshsingh@google.com>
- <20220721055728.718573-13-kaleshsingh@google.com>
+ with ESMTP id mDkOFQKs1CbU for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Jul 2022 13:05:12 -0400 (EDT)
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com
+ [209.85.216.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5C02F4D03B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 13:05:12 -0400 (EDT)
+Received: by mail-pj1-f48.google.com with SMTP id
+ v16-20020a17090abb9000b001f25244c65dso1318011pjr.2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 10:05:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=EIQBR56/tJcNBR6OGH/TjjSrDbmF7UtKhywW9Hj0CUY=;
+ b=ll/TN7RHrz3zet8Hb5kr/a0vsvXTl01rS1ijTZRx2gc/6AX7XZlUe25dJ6dyifZAkn
+ Vf+suc2mp2Mo7OU49OfAsxW+vzt+VLB/Lhh9jZPHlIOKu6rw5SPMA7lwqcPFOSix23E3
+ xidaleqnYRsuyCOp0BBfofLrx0Wp2Js/csk6eMH+TEQ6i1btJRgPyQnM/sYt9CtFFiX0
+ 9evjlfYud7iuG5e94WVg8HHecjPuvNJTUmjMIxGyFSb6Inhmlbfw5D9ZoAvyRw8qTdiN
+ yv0FzfY0EXkrrnsH4/IYTex0Y7BMikYCyw6oHvxJX4k1BdSI043dkl2mssfj9SP1XxAZ
+ TP/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=EIQBR56/tJcNBR6OGH/TjjSrDbmF7UtKhywW9Hj0CUY=;
+ b=g5iJPmOtULun8MATzdisEyGr3253CyyonsfrL5v32qHWJFfIIC61AEjUvq/FsS24Wj
+ bdvN6NnztHGkd8Em9K+4WcYAvpkyYsYty2sMcnEAd6luPMJZi/xoPJjAMqAu7nVHtx4a
+ rullAh5wXa3S5WnTrNFFkqxBVnKB5jpRXRxk8tImbxVOd9pq3xMMp6iyvYhjScMxk+WB
+ TH/wIe1zOh4Xls5fQnZ/p9Egez7L2PVAtrAbexgY5DTKeWY5VQniFPTax6DeGk1Gb5O7
+ 0Ajau6Y/50sJ3A/g3p589vZQ0Dnw33ZP/CjKdDII4XEjgc3jVuIwth1cpirXbrXF3fRq
+ WtVQ==
+X-Gm-Message-State: AJIora9fooZPDl+LJY/AJ9WqiZIDkL8/CtPOCGMmXp7ebtOT2eWN7pb6
+ KF9VFQNmWTk3hnU8e5rqeHS02A==
+X-Google-Smtp-Source: AGRyM1vFlk9DkZd9UBK770fSURYjd+N7HQh0/nEt16WDmaIMu9aOsXfJxkshzokJ7v3u6ERX5w/m5A==
+X-Received: by 2002:a17:902:da85:b0:16c:bf2e:fac7 with SMTP id
+ j5-20020a170902da8500b0016cbf2efac7mr784455plx.166.1658509510994; 
+ Fri, 22 Jul 2022 10:05:10 -0700 (PDT)
+Received: from google.com ([2620:15c:2ce:200:2571:bd04:907d:d32f])
+ by smtp.gmail.com with ESMTPSA id
+ f26-20020a631f1a000000b00415320bc31dsm3632484pgf.32.2022.07.22.10.05.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 22 Jul 2022 10:05:10 -0700 (PDT)
+Date: Fri, 22 Jul 2022 10:04:59 -0700
+From: Peter Collingbourne <pcc@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v2 3/7] mm: Add PG_arch_3 page flag
+Message-ID: <YtrYu54WBHJa4YMP@google.com>
+References: <20220722015034.809663-1-pcc@google.com>
+ <20220722015034.809663-4-pcc@google.com>
+ <87leslxmf1.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220721055728.718573-13-kaleshsingh@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: wangkefeng.wang@huawei.com, catalin.marinas@arm.com, elver@google.com,
- vincenzo.frascino@arm.com, will@kernel.org, android-mm@google.com,
- maz@kernel.org, kvmarm@lists.cs.columbia.edu, madvenka@linux.microsoft.com,
- kernel-team@android.com, drjones@redhat.com, ast@kernel.org,
- broonie@kernel.org, linux-arm-kernel@lists.infradead.org, andreyknvl@gmail.com,
- linux-kernel@vger.kernel.org, mhiramat@kernel.org
+In-Reply-To: <87leslxmf1.wl-maz@kernel.org>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Cornelia Huck <cohuck@redhat.com>, Steven Price <steven.price@arm.com>,
+ linux-arm-kernel@lists.infradead.org,
+ Vincenzo Frascino <vincenzo.frascino@arm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Evgenii Stepanov <eugenis@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,159 +95,89 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Kalesh,
-
-On Wed, Jul 20, 2022 at 10:57:23PM -0700, Kalesh Singh wrote:
-> In protected nVHE mode, the host cannot access private owned hypervisor
-> memory. Also the hypervisor aims to remains simple to reduce the attack
-> surface and does not provide any printk support.
+On Fri, Jul 22, 2022 at 03:16:34PM +0100, Marc Zyngier wrote:
+> On Fri, 22 Jul 2022 02:50:29 +0100,
+> Peter Collingbourne <pcc@google.com> wrote:
+> > 
+> > As with PG_arch_2, this flag is only allowed on 64-bit architectures due
+> > to the shortage of bits available. It will be used by the arm64 MTE code
+> > in subsequent patches.
+> > 
+> > Signed-off-by: Peter Collingbourne <pcc@google.com>
+> > Cc: Will Deacon <will@kernel.org>
+> > Cc: Marc Zyngier <maz@kernel.org>
+> > Cc: Steven Price <steven.price@arm.com>
+> > [catalin.marinas@arm.com: added flag preserving in __split_huge_page_tail()]
+> > Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
+> > ---
+> >  fs/proc/page.c                 | 1 +
+> >  include/linux/page-flags.h     | 1 +
+> >  include/trace/events/mmflags.h | 7 ++++---
+> >  mm/huge_memory.c               | 1 +
+> >  4 files changed, 7 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/fs/proc/page.c b/fs/proc/page.c
+> > index a2873a617ae8..438b8aa7249d 100644
+> > --- a/fs/proc/page.c
+> > +++ b/fs/proc/page.c
+> > @@ -220,6 +220,7 @@ u64 stable_page_flags(struct page *page)
+> >  	u |= kpf_copy_bit(k, KPF_ARCH,		PG_arch_1);
+> >  #ifdef CONFIG_64BIT
+> >  	u |= kpf_copy_bit(k, KPF_ARCH_2,	PG_arch_2);
+> > +	u |= kpf_copy_bit(k, KPF_ARCH_2,	PG_arch_3);
 > 
-> For the above reasons, the approach taken to provide hypervisor stacktraces
-> in protected mode is:
->    1) Unwind and save the hyp stack addresses in EL2 to a shared buffer
->       with the host (done in this patch).
->    2) Delegate the dumping and symbolization of the addresses to the
->       host in EL1 (later patch in the series).
-> 
-> On hyp_panic(), the hypervisor prepares the stacktrace before returning to
-> the host.
-> 
-> Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
-> ---
+> Are PG_arch_2 and PG_arch_3 supposed to share the same user bit in
+> /proc/kpageflags? This seems odd.
 
-Tried reworking this a bit and here is what I arrived at, WDYT?
-Untested, of course :)
+No, that was an oversight, thanks for the catch. I will fix it up like
+so in v3.
 
---
-Thanks,
-Oliver
+Peter
 
-diff --git a/arch/arm64/include/asm/stacktrace/nvhe.h b/arch/arm64/include/asm/stacktrace/nvhe.h
-index 3078501f8e22..05d7e03e0a8c 100644
---- a/arch/arm64/include/asm/stacktrace/nvhe.h
-+++ b/arch/arm64/include/asm/stacktrace/nvhe.h
-@@ -21,6 +21,23 @@
+diff --git a/fs/proc/page.c b/fs/proc/page.c
+index 438b8aa7249d..0129aa3cfb7a 100644
+--- a/fs/proc/page.c
++++ b/fs/proc/page.c
+@@ -220,7 +220,7 @@ u64 stable_page_flags(struct page *page)
+ 	u |= kpf_copy_bit(k, KPF_ARCH,		PG_arch_1);
+ #ifdef CONFIG_64BIT
+ 	u |= kpf_copy_bit(k, KPF_ARCH_2,	PG_arch_2);
+-	u |= kpf_copy_bit(k, KPF_ARCH_2,	PG_arch_3);
++	u |= kpf_copy_bit(k, KPF_ARCH_3,	PG_arch_3);
+ #endif
  
- #include <asm/stacktrace/common.h>
+ 	return u;
+diff --git a/include/linux/kernel-page-flags.h b/include/linux/kernel-page-flags.h
+index eee1877a354e..859f4b0c1b2b 100644
+--- a/include/linux/kernel-page-flags.h
++++ b/include/linux/kernel-page-flags.h
+@@ -18,5 +18,6 @@
+ #define KPF_UNCACHED		39
+ #define KPF_SOFTDIRTY		40
+ #define KPF_ARCH_2		41
++#define KPF_ARCH_3		42
  
-+/*
-+ * kvm_nvhe_unwind_init - Start an unwind from the given nVHE HYP fp and pc
-+ *
-+ * @state : unwind_state to initialize
-+ * @fp    : frame pointer at which to start the unwinding.
-+ * @pc    : program counter at which to start the unwinding.
-+ */
-+static inline void kvm_nvhe_unwind_init(struct unwind_state *state,
-+					unsigned long fp,
-+					unsigned long pc)
-+{
-+	unwind_init_common(state, NULL);
-+
-+	state->fp = fp;
-+	state->pc = pc;
-+}
-+
- static inline bool on_accessible_stack(const struct task_struct *tsk,
- 				       unsigned long sp, unsigned long size,
- 				       struct stack_info *info)
-diff --git a/arch/arm64/kvm/hyp/nvhe/stacktrace.c b/arch/arm64/kvm/hyp/nvhe/stacktrace.c
-index 96c8b93320eb..644276fb02af 100644
---- a/arch/arm64/kvm/hyp/nvhe/stacktrace.c
-+++ b/arch/arm64/kvm/hyp/nvhe/stacktrace.c
-@@ -11,4 +11,69 @@ DEFINE_PER_CPU(unsigned long [OVERFLOW_STACK_SIZE/sizeof(long)], overflow_stack)
+ #endif /* LINUX_KERNEL_PAGE_FLAGS_H */
+diff --git a/tools/vm/page-types.c b/tools/vm/page-types.c
+index 381dcc00cb62..364373f5bba0 100644
+--- a/tools/vm/page-types.c
++++ b/tools/vm/page-types.c
+@@ -79,6 +79,7 @@
+ #define KPF_UNCACHED		39
+ #define KPF_SOFTDIRTY		40
+ #define KPF_ARCH_2		41
++#define KPF_ARCH_3		42
  
- #ifdef CONFIG_PROTECTED_NVHE_STACKTRACE
- DEFINE_PER_CPU(unsigned long [NVHE_STACKTRACE_SIZE/sizeof(long)], pkvm_stacktrace);
-+
-+/*
-+ * pkvm_save_backtrace_entry - Saves a protected nVHE HYP stacktrace entry
-+ *
-+ * @arg    : the index of the entry in the stacktrace buffer
-+ * @where  : the program counter corresponding to the stack frame
-+ *
-+ * Save the return address of a stack frame to the shared stacktrace buffer.
-+ * The host can access this shared buffer from EL1 to dump the backtrace.
-+ */
-+static bool pkvm_save_backtrace_entry(void *arg, unsigned long where)
-+{
-+	unsigned long *stacktrace = this_cpu_ptr(pkvm_stacktrace);
-+	int *idx = (int *)arg;
-+
-+	/*
-+	 * Need 2 free slots: 1 for current entry and 1 for the
-+	 * delimiter.
-+	 */
-+	if (*idx > ARRAY_SIZE(pkvm_stacktrace) - 2)
-+		return false;
-+
-+	stacktrace[*idx] = where;
-+	stacktrace[++*idx] = 0UL;
-+
-+	return true;
-+}
-+
-+/*
-+ * pkvm_save_backtrace - Saves the protected nVHE HYP stacktrace
-+ *
-+ * @fp : frame pointer at which to start the unwinding.
-+ * @pc : program counter at which to start the unwinding.
-+ *
-+ * Save the unwinded stack addresses to the shared stacktrace buffer.
-+ * The host can access this shared buffer from EL1 to dump the backtrace.
-+ */
-+static void pkvm_save_backtrace(unsigned long fp, unsigned long pc)
-+{
-+	struct unwind_state state;
-+	int idx = 0;
-+
-+	kvm_nvhe_unwind_init(&state, fp, pc);
-+
-+	unwind(&state, pkvm_save_backtrace_entry, &idx);
-+}
-+#else /* !CONFIG_PROTECTED_NVHE_STACKTRACE */
-+static void pkvm_save_backtrace(unsigned long fp, unsigned long pc)
-+{
-+}
- #endif /* CONFIG_PROTECTED_NVHE_STACKTRACE */
-+
-+/*
-+ * kvm_nvhe_prepare_backtrace - prepare to dump the nVHE backtrace
-+ *
-+ * @fp : frame pointer at which to start the unwinding.
-+ * @pc : program counter at which to start the unwinding.
-+ *
-+ * Saves the information needed by the host to dump the nVHE hypervisor
-+ * backtrace.
-+ */
-+void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc)
-+{
-+	if (is_protected_kvm_enabled())
-+		pkvm_save_backtrace(fp, pc);
-+}
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 6db801db8f27..64e13445d0d9 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -34,6 +34,8 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
- DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+ /* [47-] take some arbitrary free slots for expanding overloaded flags
+  * not part of kernel API
+@@ -138,6 +139,7 @@ static const char * const page_flag_names[] = {
+ 	[KPF_UNCACHED]		= "c:uncached",
+ 	[KPF_SOFTDIRTY]		= "f:softdirty",
+ 	[KPF_ARCH_2]		= "H:arch_2",
++	[KPF_ARCH_3]		= "H:arch_3",
  
-+extern void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc);
-+
- static void __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
-@@ -375,6 +377,10 @@ asmlinkage void __noreturn hyp_panic(void)
- 		__sysreg_restore_state_nvhe(host_ctxt);
- 	}
- 
-+	/* Prepare to dump kvm nvhe hyp stacktrace */
-+	kvm_nvhe_prepare_backtrace((unsigned long)__builtin_frame_address(0),
-+				   _THIS_IP_);
-+
- 	__hyp_do_panic(host_ctxt, spsr, elr, par);
- 	unreachable();
- }
+ 	[KPF_ANON_EXCLUSIVE]	= "d:anon_exclusive",
+ 	[KPF_READAHEAD]		= "I:readahead",
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
