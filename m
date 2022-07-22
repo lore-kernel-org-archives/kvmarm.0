@@ -2,78 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 812A2C43334
-	for <kvmarm@archiver.kernel.org>; Fri, 22 Jul 2022 01:51:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF8FDC43334
+	for <kvmarm@archiver.kernel.org>; Fri, 22 Jul 2022 10:48:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 409B74C6CD;
-	Thu, 21 Jul 2022 21:51:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A85E4C8DC;
+	Fri, 22 Jul 2022 06:48:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xKZeAp9ZXwB5; Thu, 21 Jul 2022 21:51:17 -0400 (EDT)
+	with ESMTP id 6jCZhqtlqziW; Fri, 22 Jul 2022 06:48:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C727E4C8A8;
-	Thu, 21 Jul 2022 21:51:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 079204C797;
+	Fri, 22 Jul 2022 06:48:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E00F4C6EF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jul 2022 21:51:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56DF54C797
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 06:48:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4oaS+Q8-M6az for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Jul 2022 21:51:13 -0400 (EDT)
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
- [209.85.219.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 336814C8A8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jul 2022 21:51:13 -0400 (EDT)
-Received: by mail-yb1-f202.google.com with SMTP id
- b129-20020a25e487000000b0066e1c52ac55so2611721ybh.11
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Jul 2022 18:51:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=h8uEQ9pObe4PCZBHvRMWu04/OqsxiUE5izQACc/t1qA=;
- b=Ukex56V06NQTMwxsfTfflZTIhlPAb6x0ltdKx1zBysm7RfXqd7wFZZQRKyH0VzOFQr
- Y+L4jMyhTpQ+5w62O8ljEcGyetRTzpXeuJgVDGx43FYmUqMCaazs1z2HBznVt+e4xRTq
- 8BTFjP0UISkfuw1zjrGHTk4NeN9Gui7Aq8k3JLm7lnIxA8ow7cBGdHuEknVOeG4Zq2jJ
- J9377HHBqBU/OmUz2MYbyVym3D1J4ix3ONzdHWHv+cgfaKXYyjSk51Fxzzm8xDa3ZIuJ
- bPVIvVXhJSKu35qiAyGNuqhVJ+94oMqsxGmrvFTR76HbL2jMIv5z7gCGfkLNOmC1jMDe
- iMpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=h8uEQ9pObe4PCZBHvRMWu04/OqsxiUE5izQACc/t1qA=;
- b=K2W6ITg0b9WJ4jduKmoIa65Rncwvpe8djPNFxCZsNnVSUiRSQ5w0HwsDk64kZjLyYg
- CP4AvwTszQBnl4THLURFSULRu4hB/QYnujBiGmGOzi+7oGcxrQc3WKcXZ0MeLo3+osCN
- 5EYUMVix5bJlB+31FPbCLoLT2A84eeszw4LrEXvgoctELHuRIV3HI4wSa8xWhTPbfQr5
- NZ3Wu6NS5qO0zhNW2s25LidQ6UfClH5WOc2YQOHnA4Gq1/pxokq1InfqWTwlU2LATNZe
- 1RYJAs9vfyv6DQxqGMuw2Kg55wK9pVazMCIYHCq2Ox5qzXFIz7KevZnEC1OIDaSgV90C
- Hu4Q==
-X-Gm-Message-State: AJIora9YtcILVHEl9wQ8RbD8VctQ2NoD9h69BIswh9DRg3xj/CTDkzdt
- 5oPW62oJh71w+RpGNm8Mmdqc3O4=
-X-Google-Smtp-Source: AGRyM1vtD7rOxtriQj5Ecvofp6SqMq07c0PbfEhxrYPq2ZOkp7UkUbp02IAcwvO8QMo59HdQ9f5IQn4=
-X-Received: from pcc-desktop.svl.corp.google.com
- ([2620:15c:2ce:200:7ed4:5864:d5e1:ffe1])
- (user=pcc job=sendgmr) by 2002:a25:5ec5:0:b0:66f:b76a:c5e9 with SMTP id
- s188-20020a255ec5000000b0066fb76ac5e9mr1185482ybb.334.1658454672828; Thu, 21
- Jul 2022 18:51:12 -0700 (PDT)
-Date: Thu, 21 Jul 2022 18:50:33 -0700
-In-Reply-To: <20220722015034.809663-1-pcc@google.com>
-Message-Id: <20220722015034.809663-8-pcc@google.com>
-Mime-Version: 1.0
-References: <20220722015034.809663-1-pcc@google.com>
-X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
-Subject: [PATCH v2 7/7] Documentation: document the ABI changes for
- KVM_CAP_ARM_MTE
-From: Peter Collingbourne <pcc@google.com>
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Cornelia Huck <cohuck@redhat.com>,
- Steven Price <steven.price@arm.com>, Marc Zyngier <maz@kernel.org>,
- Vincenzo Frascino <vincenzo.frascino@arm.com>,
- Peter Collingbourne <pcc@google.com>, Evgenii Stepanov <eugenis@google.com>
+ with ESMTP id pi-VxlhrCgWR for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Jul 2022 06:48:36 -0400 (EDT)
+Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2396C4C3C1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 06:48:36 -0400 (EDT)
+Date: Fri, 22 Jul 2022 11:48:31 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1658486914;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=0AyQqMWkq3QK3cl0AVPhmS1VRFhKVJORRDR1qEdQa2E=;
+ b=xicOKB6Owxf662WLaEHk73CJEtDiVVJlzZYlCwcm2/Diwz0HTpzvGaebKIShQmRpj0iZR1
+ G0JoITMh43Aju/9To6bjbUkmSVnwtTN0+CxPKbszZa19YuGHmQBj+QkAqOzApPVL6H6VZH
+ n38wfKDStIPrL8+wxF39Kgji85DhFrU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Kalesh Singh <kaleshsingh@google.com>
+Subject: Re: [PATCH v5 00/17] KVM nVHE Hypervisor stack unwinder
+Message-ID: <YtqAf0e7Tc7qu5/c@google.com>
+References: <20220721055728.718573-1-kaleshsingh@google.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20220721055728.718573-1-kaleshsingh@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+Cc: wangkefeng.wang@huawei.com, catalin.marinas@arm.com, elver@google.com,
+ vincenzo.frascino@arm.com, will@kernel.org, android-mm@google.com,
+ maz@kernel.org, kvmarm@lists.cs.columbia.edu, madvenka@linux.microsoft.com,
+ kernel-team@android.com, drjones@redhat.com, ast@kernel.org,
+ broonie@kernel.org, linux-arm-kernel@lists.infradead.org, andreyknvl@gmail.com,
+ linux-kernel@vger.kernel.org, mhiramat@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,33 +71,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Document both the restriction on VM_MTE_ALLOWED mappings and
-the relaxation for shared mappings.
+Hi Kalesh,
 
-Signed-off-by: Peter Collingbourne <pcc@google.com>
----
- Documentation/virt/kvm/api.rst | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+On Wed, Jul 20, 2022 at 10:57:11PM -0700, Kalesh Singh wrote:
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index ebc5a519574f..5bb74b73bff3 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7486,8 +7486,9 @@ hibernation of the host; however the VMM needs to manually save/restore the
- tags as appropriate if the VM is migrated.
- 
- When this capability is enabled all memory in memslots must be mapped as
--not-shareable (no MAP_SHARED), attempts to create a memslot with a
--MAP_SHARED mmap will result in an -EINVAL return.
-+``MAP_ANONYMOUS`` or with a RAM-based file mapping (``tmpfs``, ``memfd``),
-+attempts to create a memslot with an invalid mmap will result in an
-+-EINVAL return.
- 
- When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl to
- perform a bulk copy of tags to/from the guest.
--- 
-2.37.1.359.gd136c6c3e2-goog
+[...]
 
+> Kalesh Singh (17):
+>   arm64: stacktrace: Add shared header for common stack unwinding code
+>   arm64: stacktrace: Factor out on_accessible_stack_common()
+>   arm64: stacktrace: Factor out unwind_next_common()
+>   arm64: stacktrace: Handle frame pointer from different address spaces
+>   arm64: stacktrace: Factor out common unwind()
+>   arm64: stacktrace: Add description of stacktrace/common.h
+>   KVM: arm64: On stack overflow switch to hyp overflow_stack
+>   KVM: arm64: Add PROTECTED_NVHE_STACKTRACE Kconfig
+>   KVM: arm64: Allocate shared pKVM hyp stacktrace buffers
+>   KVM: arm64: Stub implementation of pKVM HYP stack unwinder
+>   KVM: arm64: Stub implementation of non-protected nVHE HYP stack
+>     unwinder
+>   KVM: arm64: Save protected-nVHE (pKVM) hyp stacktrace
+>   KVM: arm64: Prepare non-protected nVHE hypervisor stacktrace
+>   KVM: arm64: Implement protected nVHE hyp stack unwinder
+>   KVM: arm64: Implement non-protected nVHE hyp stack unwinder
+>   KVM: arm64: Introduce pkvm_dump_backtrace()
+>   KVM: arm64: Introduce hyp_dump_backtrace()
+
+Adding a general comment on the organization of the series. I think for
+the next spin it'd be good to organize the entire non-pKVM
+implementation first, followed by the pKVM implementation. Otherwise,
+reviewers need to jump around the series a lot in order to page in the
+appropriate context.
+
+I had mentioned this about the last two patches earlier, but after
+grokking the stack I see the comment applies to the entire KVM portion
+of the series.
+
+--
+Thanks,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
