@@ -2,60 +2,45 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 195CEC433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 22 Jul 2022 11:16:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB2AC43334
+	for <kvmarm@archiver.kernel.org>; Fri, 22 Jul 2022 14:14:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F4874CA10;
-	Fri, 22 Jul 2022 07:16:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16AD44CCA8;
+	Fri, 22 Jul 2022 10:14:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id f5Jc0uZRVRxu; Fri, 22 Jul 2022 07:16:39 -0400 (EDT)
+	with ESMTP id xfb1zXBd+TJw; Fri, 22 Jul 2022 10:14:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 46A244CA13;
-	Fri, 22 Jul 2022 07:16:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56C974CCCB;
+	Fri, 22 Jul 2022 10:14:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AA1C4CA10
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 07:16:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F7594CCA0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 10:14:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UXUquVNKZODs for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Jul 2022 07:16:37 -0400 (EDT)
-Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 391604CA11
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 07:16:37 -0400 (EDT)
-Date: Fri, 22 Jul 2022 12:16:29 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1658488596;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=bWMt6DrO+QpBB8jeoqRLaRrtD7zLY5M5syjYMGmYEtY=;
- b=Lhtr/basSfJ7soT0J6Z9kSRdSByaPWd/Q/wvSTsFIqpuD2HM2bD7yOHAHq26QrBiiVP69r
- iXiApSpbGWW7FcvvN/pp5eKGKPxWRgh8WoSWcG0oS+vH7yzNvYkzLxzEsMHuxwj9Y7J7hg
- s15kMJaK4m3UqyuT0c4Phm9u+xPLcDY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v5 16/17] KVM: arm64: Introduce pkvm_dump_backtrace()
-Message-ID: <YtqHDTpnn376Qb7u@google.com>
-References: <20220721055728.718573-1-kaleshsingh@google.com>
- <20220721055728.718573-17-kaleshsingh@google.com>
+ with ESMTP id SUaaIM9q3VAi for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Jul 2022 10:14:18 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 89B394CC83
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Jul 2022 10:14:18 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4BD6D1063;
+ Fri, 22 Jul 2022 07:14:18 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 15AFF3F70D;
+ Fri, 22 Jul 2022 07:14:15 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
+ andre.przywara@arm.com, suzuki.poulose@arm.com, james.morse@arm.com,
+ vladimir.murzin@arm.com, anup@brainfault.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Subject: [PATCH kvmtool 0/1] Introduce LIBFDT_DIR
+Date: Fri, 22 Jul 2022 15:14:47 +0100
+Message-Id: <20220722141448.168252-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.37.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220721055728.718573-17-kaleshsingh@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: wangkefeng.wang@huawei.com, catalin.marinas@arm.com, elver@google.com,
- vincenzo.frascino@arm.com, will@kernel.org, android-mm@google.com,
- maz@kernel.org, kvmarm@lists.cs.columbia.edu, madvenka@linux.microsoft.com,
- kernel-team@android.com, drjones@redhat.com, ast@kernel.org,
- broonie@kernel.org, linux-arm-kernel@lists.infradead.org, andreyknvl@gmail.com,
- linux-kernel@vger.kernel.org, mhiramat@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,48 +57,69 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Kalesh,
+This is based on the series that added the libfdt source files to the
+kvmtool tree [1]. I've reconsidered the feedback I got from Andre and Will,
+and so I came up with a different approach: the user can opt to compile
+libdt without installing it system-wide and use LIBFDT_DIR to point kvmtool
+to the static version of the library.
 
-On Wed, Jul 20, 2022 at 10:57:27PM -0700, Kalesh Singh wrote:
+For example, to cross-compile for arm64:
 
-[...]
+$ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- LIBFDT_DIR=libfdt-arm64
 
-> +/*
-> + * pkvm_dump_backtrace - Dump the protected nVHE HYP backtrace.
-> + *
-> + * @hyp_offset: hypervisor offset, used for address translation.
-> + *
-> + * Dumping of the pKVM HYP backtrace is done by reading the
-> + * stack addresses from the shared stacktrace buffer, since the
-> + * host cannot direclty access hyperviosr memory in protected
-> + * mode.
-> + */
-> +static void pkvm_dump_backtrace(unsigned long hyp_offset)
-> +{
-> +	unsigned long *stacktrace_entry
-> +		= (unsigned long *)this_cpu_ptr_nvhe_sym(pkvm_stacktrace);
-> +	unsigned long va_mask, pc;
-> +
-> +	va_mask = GENMASK_ULL(vabits_actual - 1, 0);
-> +
-> +	kvm_err("Protected nVHE HYP call trace:\n");
+For riscv:
 
-This and the footer printks should be put in respective helpers to share
-between pKVM and non-pKVM backtrace implementations. I imagine users
-will invariably bake some pattern matching to scrape traces, and it
-should be consistent between both flavors.
+$ make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- LIBFDT_DIR=libfdt-riscv
 
-> +	/* The stack trace is terminated by a null entry */
-> +	for (; *stacktrace_entry; stacktrace_entry++) {
+where libfdt-arm64 and libfdt-riscv are the patch to libfdt compiled for
+the arm64 and, respectively, the riscv architectures.
 
-At the point we're dumping the backtrace we know that EL2 has already
-soiled itself, so we shouldn't explicitly depend on it providing NULL
-terminators. I believe this loop should have an explicit range && NULL
-check.
+This approach is complementary to using the system libraries, it does not
+replace them entirely like the previous approach.
 
---
-Thanks,
-Oliver
+Why is introducing LIBFDT_DIR a good idea? One might rightly argue that
+installing the library requires only three extra instructions. The obvious
+answer is that the user doesn't have the necessary permissions to install
+the library.
+
+And then is the fact that on my x86 machine I tried to install the shared
+library for powerpc with two different compilers and I failed. When using
+the bootlin stable compiler [2] (gcc-10.3.0) I got this error after
+following the instructions in INSTALL:
+
+         [..]
+	 LD fdtget
+/usr/bin/ld: libfdt/libfdt-1.6.1.so: error adding symbols: file in wrong format
+collect2: error: ld returned 1 exit status
+make: *** [Makefile:346: fdtget] Error 1
+
+When using the powerpc64 crosscompiled from kernel.org [3], I wasn't even
+able to compile libfdt because the cross-compiler is missing libc:
+
+         [..]
+	 CC libfdt/fdt.o
+In file included from libfdt/libfdt_env.h:12,
+                 from libfdt/fdt.c:6:
+/home/alex/data/cross-compilers/x86-host/powerpc64-gcc-12.1.0-nolibc/powerpc64-linux/lib/gcc/powerpc64-linux/12.1.0/include/stdint.h:9:16: fatal error: stdint.h: No such file or directory
+    9 | # include_next <stdint.h>
+      |                ^~~~~~~~~~
+compilation terminated.
+make: *** [Makefile:350: libfdt/fdt.o] Error 1
+
+[1] https://lore.kernel.org/linux-arm-kernel/20220526171955.145563-1-alexandru.elisei@arm.com/
+[2] https://toolchains.bootlin.com/
+[3] https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/x86_64/12.1.0/
+
+Alexandru Elisei (1):
+  Makefile: Introduce LIBFDT_DIR to specify libfdt location
+
+ INSTALL  | 12 +++++++++++-
+ Makefile | 29 ++++++++++++++++++++++-------
+ 2 files changed, 33 insertions(+), 8 deletions(-)
+
+-- 
+2.37.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
