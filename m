@@ -2,81 +2,86 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A63C0C00144
-	for <kvmarm@archiver.kernel.org>; Tue, 26 Jul 2022 15:33:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D41D3C00140
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Jul 2022 16:01:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 23C8C4C730;
-	Tue, 26 Jul 2022 11:33:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D8624C7B7;
+	Tue, 26 Jul 2022 12:01:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BGzSbaFle6Mb; Tue, 26 Jul 2022 11:33:35 -0400 (EDT)
+	with ESMTP id k6UHnojwCDNe; Tue, 26 Jul 2022 12:01:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 173184C739;
-	Tue, 26 Jul 2022 11:33:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F39CE4C790;
+	Tue, 26 Jul 2022 12:01:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A4894C730
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 11:33:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 653204C794
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 12:01:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tKFuxEDRYzm9 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Jul 2022 11:33:33 -0400 (EDT)
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com
- [209.85.221.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 523AD4C72E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 11:33:33 -0400 (EDT)
-Received: by mail-wr1-f47.google.com with SMTP id k11so20228950wrx.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 08:33:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=IdrmtKsVwJ8Ilm8fXdlZo1ojDSarLxj4cwD1+3jZZEk=;
- b=OqCNg3Evlo5tkojw6+O9gMzqKRS/81Ng74vt1BFuMXIRVoj+ueOPnewIymEDcvNbsA
- GrTelS4phLivi2uHD1PHTtXKp55HSg8TUI748XhWMdrJm28oIfHDx/WkiAjZW46k57+x
- 6YmtHrQsq3VmBUk04cYdjOmWJ8j7Sn6Ug1slr8XmG3pngkPHXku6peewmEPuAuktdRnZ
- b5R+MxAoh0AnJ92YiuB+1nQKotCBa3cjPKqGeivWHwO8U9tBjdLyahbAc+YDhK91MBD2
- pcMCrC+ezfRpRQBGbbQejnVCyDmZ601SYHCW9NZAVK7zw5uy7vtWyqttX0N4761Z8Bkx
- bkfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=IdrmtKsVwJ8Ilm8fXdlZo1ojDSarLxj4cwD1+3jZZEk=;
- b=vRh8ZoKP1ICTpKLeck36M5sbmq94CK6FnAUhaR+J1zYgCy+bq814O07CCpEpxztjQQ
- f/3Ri8upeBnm+nDwG+m+pAy6ygspvY0kAFolRGvXFN2cROcI/qGB+8OavpKi0ElV4mPf
- b/1r13aNtD5Dkq7LmKLQbh4kzTd7y6DkPhYJ6RZXUaeWgKQYlqwa29wn7ovlt/phfuxK
- jq4Gc3O/9WkhGVMmncP9spsJQJOmk7R96BHcUhR2twaz4YHDIDvGnzk7wgE2NZh9Y3GB
- PYIDUoJGqop4IlwahyY+h02CX8IVqNBie3UglprbqLMPrvI8Jz9+zbG0pztAwfbIvIOC
- Yi7g==
-X-Gm-Message-State: AJIora+yVFBWLJRqYLdptdwd4AMVGCWsr3zFksFW6FUwbtuc3kaLL4Gb
- j7Q8kI8MIhqxqXjjnzF+tHZ+uY2knHL1hzjCgdIBkA==
-X-Google-Smtp-Source: AGRyM1sEa6iMPu3EBWOW+qgWlSZBYXUn6OljA5SeoAQuOFG/BP2IVZ12GTJ9KaYjd799UK0R/24QNFygZopnAgNFRrY=
-X-Received: by 2002:a5d:4583:0:b0:21e:3b0e:2bc9 with SMTP id
- p3-20020a5d4583000000b0021e3b0e2bc9mr11226482wrq.649.1658849612164; Tue, 26
- Jul 2022 08:33:32 -0700 (PDT)
-MIME-Version: 1.0
+ with ESMTP id BeBQH35-5UAm for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Jul 2022 12:01:14 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0BAB84C78B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 12:01:13 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 6472060D3E;
+ Tue, 26 Jul 2022 16:01:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBD2BC433D6;
+ Tue, 26 Jul 2022 16:01:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1658851272;
+ bh=DHUG3G6oDdbExivbTRSmCxGZxYcDFTMMnotqPESDqzc=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=t9ReExPnzY/gdMw/kXnJlrqdiYV51tB+2NdOr5fIHN6zhEtqWLTU9phWCgOaKw5AQ
+ tRqE2ceotgUs9grXCm6pOLQ8I0zYRJJBFlUmr2OukTnl/JtZ95NQeWyxn4eebjL1cA
+ H97XU93PcxZEn10IkSiYE/vHCSc/dq2muruf9NxYbLUTJuSPC/UrL+rofn7NzG/v3s
+ 7gRiUgO+B+bTgaFY7oEVijyyfdpCXHpoTdaNZIiSV+M8FNVJd1m6yRie2xoq4AtEOG
+ zG7GnXz7WEYcfh9+mnxC2BGd9rgG66cCwt+rj5N4jJiUn6p1yFP9vH7AQTAE03QHtl
+ 9ASVGc/LiMQ3g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oGMze-00ABgg-I7;
+ Tue, 26 Jul 2022 17:01:10 +0100
+Date: Tue, 26 Jul 2022 17:01:09 +0100
+Message-ID: <878rofyibe.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kalesh Singh <kaleshsingh@google.com>
+Subject: Re: [PATCH v6 02/17] arm64: stacktrace: Factor out
+ on_accessible_stack_common()
+In-Reply-To: <20220726073750.3219117-3-kaleshsingh@google.com>
 References: <20220726073750.3219117-1-kaleshsingh@google.com>
- <20220726073750.3219117-13-kaleshsingh@google.com>
- <87a68wxkga.wl-maz@kernel.org>
-In-Reply-To: <87a68wxkga.wl-maz@kernel.org>
-From: Kalesh Singh <kaleshsingh@google.com>
-Date: Tue, 26 Jul 2022 08:33:20 -0700
-Message-ID: <CAC_TJve+33nTGNVZrsnrEJGPGMvCNARougeSmXWDdjiq_Daeig@mail.gmail.com>
-Subject: Re: [PATCH v6 12/17] KVM: arm64: Add PROTECTED_NVHE_STACKTRACE Kconfig
-To: Marc Zyngier <maz@kernel.org>
-Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
- vincenzo.frascino@arm.com, Will Deacon <will@kernel.org>,
- android-mm@google.com, kvmarm <kvmarm@lists.cs.columbia.edu>,
- "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- "Cc: Android Kernel" <kernel-team@android.com>, Marco Elver <elver@google.com>,
- Mark Brown <broonie@kernel.org>,
- "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
- <linux-arm-kernel@lists.infradead.org>, andreyknvl@gmail.com,
- LKML <linux-kernel@vger.kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>
+ <20220726073750.3219117-3-kaleshsingh@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kaleshsingh@google.com, mark.rutland@arm.com,
+ broonie@kernel.org, madvenka@linux.microsoft.com, tabba@google.com,
+ oliver.upton@linux.dev, will@kernel.org, qperret@google.com,
+ james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, andreyknvl@gmail.com, vincenzo.frascino@arm.com,
+ mhiramat@kernel.org, ast@kernel.org, wangkefeng.wang@huawei.com,
+ elver@google.com, keirf@google.com, yuzenghui@huawei.com, ardb@kernel.org,
+ oupton@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ android-mm@google.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: wangkefeng.wang@huawei.com, catalin.marinas@arm.com, ast@kernel.org,
+ vincenzo.frascino@arm.com, will@kernel.org, android-mm@google.com,
+ kvmarm@lists.cs.columbia.edu, madvenka@linux.microsoft.com,
+ kernel-team@android.com, elver@google.com, broonie@kernel.org,
+ linux-arm-kernel@lists.infradead.org, andreyknvl@gmail.com,
+ linux-kernel@vger.kernel.org, mhiramat@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,48 +93,119 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gVHVlLCBKdWwgMjYsIDIwMjIgYXQgMzowMCBBTSBNYXJjIFp5bmdpZXIgPG1hekBrZXJuZWwu
-b3JnPiB3cm90ZToKPgo+IE9uIFR1ZSwgMjYgSnVsIDIwMjIgMDg6Mzc6NDUgKzAxMDAsCj4gS2Fs
-ZXNoIFNpbmdoIDxrYWxlc2hzaW5naEBnb29nbGUuY29tPiB3cm90ZToKPiA+Cj4gPiBUaGlzIGNh
-biBiZSB1c2VkIHRvIGRpc2FibGUgc3RhY2t0cmFjZSBmb3IgdGhlIHByb3RlY3RlZCBLVk0KPiA+
-IG5WSEUgaHlwZXJ2aXNvciwgaW4gb3JkZXIgdG8gc2F2ZSBvbiB0aGUgYXNzb2NpYXRlZCBtZW1v
-cnkgdXNhZ2UuCj4gPgo+ID4gVGhpcyBvcHRpb24gaXMgZGlzYWJsZWQgYnkgZGVmYXVsdCwgc2lu
-Y2UgcHJvdGVjdGVkIEtWTSBpcyBub3Qgd2lkZWx5Cj4gPiB1c2VkIG9uIHBsYXRmb3JtcyBvdGhl
-ciB0aGFuIEFuZHJvaWQgY3VycmVudGx5Lgo+ID4KPiA+IFNpZ25lZC1vZmYtYnk6IEthbGVzaCBT
-aW5naCA8a2FsZXNoc2luZ2hAZ29vZ2xlLmNvbT4KPiA+IFJldmlld2VkLWJ5OiBGdWFkIFRhYmJh
-IDx0YWJiYUBnb29nbGUuY29tPgo+ID4gVGVzdGVkLWJ5OiBGdWFkIFRhYmJhIDx0YWJiYUBnb29n
-bGUuY29tPgo+ID4gLS0tCj4gPgo+ID4gQ2hhbmdlcyBpbiB2NjoKPiA+ICAgLSBBZGQgRnVhZOKA
-mXMgUmV2aWV3ZWQtYnkgYW5kIFRlc3RlZC1ieSB0YWdzCj4gPgoKPiA+IENoYW5nZXMgaW4gdjU6
-Cj4gPiAgIC0gTWFrZSBQUk9URUNURURfTlZIRV9TVEFDS1RSQUNFIGRlcGVuZCBvbiBOVkhFX0VM
-Ml9ERUJVRywgcGVyIE1hcmMKPiA+Cj4gPiAgYXJjaC9hcm02NC9rdm0vS2NvbmZpZyB8IDE1ICsr
-KysrKysrKysrKysrKwo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAxNSBpbnNlcnRpb25zKCspCj4gPgo+
-ID4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL0tjb25maWcgYi9hcmNoL2FybTY0L2t2bS9L
-Y29uZmlnCj4gPiBpbmRleCA4YTVmYmJmMDg0ZGYuLjA5Yzk5NTg2OTkxNiAxMDA2NDQKPiA+IC0t
-LSBhL2FyY2gvYXJtNjQva3ZtL0tjb25maWcKPiA+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL0tjb25m
-aWcKPiA+IEBAIC00Niw2ICs0NiwyMSBAQCBtZW51Y29uZmlnIEtWTQo+ID4KPiA+ICAgICAgICAg
-SWYgdW5zdXJlLCBzYXkgTi4KPiA+Cj4gPiArY29uZmlnIFBST1RFQ1RFRF9OVkhFX1NUQUNLVFJB
-Q0UKPiA+ICsgICAgIGJvb2wgIlByb3RlY3RlZCBLVk0gaHlwZXJ2aXNvciBzdGFja3RyYWNlcyIK
-PiA+ICsgICAgIGRlcGVuZHMgb24gTlZIRV9FTDJfREVCVUcKPiA+ICsgICAgIGRlZmF1bHQgbgo+
-ID4gKyAgICAgaGVscAo+ID4gKyAgICAgICBTYXkgWSBoZXJlIHRvIGVuYWJsZSBwS1ZNIGh5cGVy
-dmlzb3Igc3RhY2t0cmFjZXMgb24gaHlwX3BhbmljKCkKPiA+ICsKPiA+ICsgICAgICAgSWYgeW91
-IGFyZSBub3QgdXNpbmcgcHJvdGVjdGVkIG5WSEUgKHBLVk0pLCBzYXkgTi4KPiA+ICsKPiA+ICsg
-ICAgICAgSWYgdXNpbmcgcHJvdGVjdGVkIG5WSEUgbW9kZSwgYnV0IGNhbm5vdCBhZmZvcmQgdGhl
-IGFzc29jaWF0ZWQKPiA+ICsgICAgICAgbWVtb3J5IGNvc3QgKGxlc3MgdGhhbiAwLjc1IHBhZ2Ug
-cGVyIENQVSkgb2YgcEtWTSBzdGFja3RyYWNlcywKPiA+ICsgICAgICAgc2F5IE4uCj4gPiArCj4g
-PiArICAgICAgIElmIHVuc3VyZSwgc2F5IE4uCj4gPiArCj4gPiAgY29uZmlnIE5WSEVfRUwyX0RF
-QlVHCj4gPiAgICAgICBib29sICJEZWJ1ZyBtb2RlIGZvciBub24tVkhFIEVMMiBvYmplY3QiCj4g
-PiAgICAgICBkZXBlbmRzIG9uIEtWTQo+Cj4gSGF2aW5nIE5WSEVfRUwyX0RFQlVHIGFmdGVyIFBS
-T1RFQ1RFRF9OVkhFX1NUQUNLVFJBQ0UgaXMgcHJldHR5IG9kZAo+IHdoZW4geW91IHVzZSAnbWFr
-ZSBtZW51Y29uZmlnJywgYXMgdGhlIG5ldyBvcHRpb24gYXBwZWFycyBvdXQgb2YKPiBzZXF1ZW5j
-ZS4KCkFoaCBnb29kIGNhdGNoLiBTaG91bGQgaGF2ZSBtb3ZlZCBpdCB3aGVuIHRoZSBkZXBlbmRl
-bmN5IGdvdCBjaGFuZ2VkLgoKPgo+IEknbGwgbW92ZSBpdCBhcm91bmQsIG5vIG5lZWQgdG8gcmVz
-cGluIGZvciB0aGlzLgo+CgpUaGFua3MgTWFyYy4KCgo+IFRoYW5rcywKPgo+ICAgICAgICAgTS4K
-Pgo+IC0tCj4gV2l0aG91dCBkZXZpYXRpb24gZnJvbSB0aGUgbm9ybSwgcHJvZ3Jlc3MgaXMgbm90
-IHBvc3NpYmxlLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Xwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6
-Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On Tue, 26 Jul 2022 08:37:35 +0100,
+Kalesh Singh <kaleshsingh@google.com> wrote:
+> 
+> Move common on_accessible_stack checks to stacktrace/common.h. This is
+> used in the implementation of the nVHE hypervisor unwinder later in
+> this series.
+> 
+> Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> Reviewed-by: Mark Brown <broonie@kernel.org>
+> Tested-by: Fuad Tabba <tabba@google.com>
+> ---
+> 
+> Changes in v6:
+>   - Add Fuad's Tested-by tag
+> 
+> Changes in v5:
+>   - Add Reviewed-by tags from Mark Brown and Fuad
+>   - Remove random whitespace change, per Mark Brown
+> 
+>  arch/arm64/include/asm/stacktrace.h        |  6 ++----
+>  arch/arm64/include/asm/stacktrace/common.h | 18 ++++++++++++++++++
+>  2 files changed, 20 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/stacktrace.h b/arch/arm64/include/asm/stacktrace.h
+> index 79f455b37c84..43f4b4a6d383 100644
+> --- a/arch/arm64/include/asm/stacktrace.h
+> +++ b/arch/arm64/include/asm/stacktrace.h
+> @@ -65,8 +65,8 @@ static inline bool on_accessible_stack(const struct task_struct *tsk,
+>  				       unsigned long sp, unsigned long size,
+>  				       struct stack_info *info)
+>  {
+> -	if (info)
+> -		info->type = STACK_TYPE_UNKNOWN;
+> +	if (on_accessible_stack_common(tsk, sp, size, info))
+> +		return true;
+>  
+>  	if (on_task_stack(tsk, sp, size, info))
+>  		return true;
+> @@ -74,8 +74,6 @@ static inline bool on_accessible_stack(const struct task_struct *tsk,
+>  		return false;
+>  	if (on_irq_stack(sp, size, info))
+>  		return true;
+> -	if (on_overflow_stack(sp, size, info))
+> -		return true;
+>  	if (on_sdei_stack(sp, size, info))
+>  		return true;
+>  
+> diff --git a/arch/arm64/include/asm/stacktrace/common.h b/arch/arm64/include/asm/stacktrace/common.h
+> index 64ae4f6b06fe..f58b786460d3 100644
+> --- a/arch/arm64/include/asm/stacktrace/common.h
+> +++ b/arch/arm64/include/asm/stacktrace/common.h
+> @@ -62,6 +62,9 @@ struct unwind_state {
+>  	struct task_struct *task;
+>  };
+>  
+> +static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
+> +				     struct stack_info *info);
+> +
+>  static inline bool on_stack(unsigned long sp, unsigned long size,
+>  			    unsigned long low, unsigned long high,
+>  			    enum stack_type type, struct stack_info *info)
+> @@ -80,6 +83,21 @@ static inline bool on_stack(unsigned long sp, unsigned long size,
+>  	return true;
+>  }
+>  
+> +static inline bool on_accessible_stack_common(const struct task_struct *tsk,
+> +					      unsigned long sp,
+> +					      unsigned long size,
+> +					      struct stack_info *info)
+> +{
+> +	if (info)
+> +		info->type = STACK_TYPE_UNKNOWN;
+> +
+> +	/*
+> +	 * Both the kernel and nvhe hypervisor make use of
+> +	 * an overflow_stack
+> +	 */
+> +	return on_overflow_stack(sp, size, info);
+> +}
+
+on_accessible_stack has the following comment:
+
+/*
+ * We can only safely access per-cpu stacks from current in a non-preemptible
+ * context.
+ */
+
+With this change, I don't think we satisfy this requirement anymore,
+as we're checking the overflow stack *before* the preemptible check,
+which is a big change in behaviour.
+
+The hypervisor doesn't have this requirement: the unwinding is either
+done out of context (nVHE, where EL1 unwinds EL2) or in a
+non-preemptible section (pKVM, where the whole thing is
+non-preemptible). But the kernel is usually preemptible, so this patch
+needs fixing.
+
+I'll see if I can address it locally (I'm currently moving things
+around, stay tuned).
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
