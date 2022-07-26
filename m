@@ -2,70 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C764EC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 26 Jul 2022 07:38:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A675DC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Jul 2022 07:38:38 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83D394C547;
-	Tue, 26 Jul 2022 03:38:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 665944BBDA;
+	Tue, 26 Jul 2022 03:38:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ckcGm8uwiDwb; Tue, 26 Jul 2022 03:38:35 -0400 (EDT)
+	with ESMTP id bfydnL17fsSU; Tue, 26 Jul 2022 03:38:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F05B24C562;
-	Tue, 26 Jul 2022 03:38:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A5494C567;
+	Tue, 26 Jul 2022 03:38:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD2E44C53A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 03:38:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F1A14C536
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 03:38:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1NfBTEpRoynh for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Jul 2022 03:38:32 -0400 (EDT)
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
- [209.85.219.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5DD8F4C54E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 03:38:32 -0400 (EDT)
-Received: by mail-yb1-f202.google.com with SMTP id
- m5-20020a2598c5000000b0066faab590c5so10337410ybo.7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 00:38:32 -0700 (PDT)
+ with ESMTP id J0lxRZoGYnNo for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Jul 2022 03:38:35 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ED00A4C54C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 03:38:34 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ t10-20020a5b07ca000000b0066ec1bb6e2cso10435989ybq.14
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 00:38:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=xzH/6M+SU0X5hOX4FZRvYLC0KzgDSzoTGm2ET8Rq+o0=;
- b=DETaP7rF9wWbO6Msex1IjbIPOs5qcFopnknde2KDuKfQtGfBHQQZeSttvtn1M31WnG
- YP9SmoTcjSiBVkQMa36IbuQEGimRV0R+nOmXct3SY4oULsKy7C54mnSHLgxbuyhdBcn5
- kc9VIPOtYstVwH+wHBNdY1bHzvfVqak5AfqO5t5aHq6xwBNPcc5ZWHhSUSXM+E5dhfkf
- Ig+GVFWSBaY3UZVU8Po82d30sbS/TuoWAuUoCDKCXCNT+IUA8CjzhJO0oTyEwNNyc6RG
- MBN6CwskgCB1Yhqk5Ni52rnn47r/JS90lh+HxJt3TannLGJVTmQaK1SXj7Iua9xSEMdz
- Suzg==
+ :cc:content-transfer-encoding;
+ bh=4z4Kz5jKP4bI+UOP9DxU3eg2/YP+oU3Smm0rFqPcsng=;
+ b=Z1P1ClfItoh79aQ1b/7uN6+YG8sXdaRGbHmm2Km3lpRCBNERxYfC45wuUnV22xDrKr
+ C7P7sOnzNuqntBLF3F+6jM28iGWBmjuZh/onAiogWA6nkl+pQMh/hkru3m8yOoDZtCiz
+ YUeV/q7yT+eI6gJO0z3Jk1qzCMVZ8PnFyCNSgqN/dWdmju6ronRybvKXvcqMM82Etntz
+ YLHXZQ84XUWvCivtFflxyQq6fJhEpglvw3cFqVdjfvpGM1UsagOmmxxMaKcMmpN6dr59
+ S8axA/CrLXVHIAUBmzb2I9dpWg+mkbpuBU7UpOLEQXfqv2pHnmn4tY3D3DSea9NPICrl
+ o61w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=xzH/6M+SU0X5hOX4FZRvYLC0KzgDSzoTGm2ET8Rq+o0=;
- b=23UUnKBF62cc4oBPR38eblT/pB63TPPMxqkPRazJdt8E8mDg5eotwFDKXt0IHbJwBo
- qHD8F5O5CfNNszlamrbISalOR8aJmBDXVF6gFvKue+aK3EUoSvHVQWk67TKVuH8KrmeW
- qIuwyKV0H5bMf0hY/zt1cQnwi3jlVQQa1Q+/ciosi4thbLW+KmRhhKLKKQXfGhXnPU1B
- tTRm5yGGK0nhXtCSQ6rRxhUGftAMm53ryQBviygzI0vWYE5llBQorOwKfC8cqLrB5F/9
- AZypyCIwTCQsSJ29bJwsNpEKxdVcRMj75jwkQNkwfRhfqraKVP4BN3q2EvBoavAnxdYt
- GO1Q==
-X-Gm-Message-State: AJIora/QZE+rRWWztPWYW3tus9e/t56AScy8sS5As1bZCo4m+756P/nE
- RIUvyirW8I1/CrUIVtKvcDIOHXvDxlW3IhLBkQ==
-X-Google-Smtp-Source: AGRyM1s9MRRJnFJpaGAtK6mRh1YvUHLp08b9Vp1bPDczimM0hZ7elFoj8DoT6FWrVuc+bm+K4KVS8zylnMHhGD9GeQ==
+ :references:subject:from:to:cc:content-transfer-encoding;
+ bh=4z4Kz5jKP4bI+UOP9DxU3eg2/YP+oU3Smm0rFqPcsng=;
+ b=O52WbzyeEMmUE6pSAKGvds15iqfNPYlvr4GPWz4DKqcHiiTdZ2RKvjxZtUqqniFAN6
+ JLNlh6t4Tz26GOQK2lNkdd+PSC7+xRRUPLigKhlquaJ9Al5QU5bP80wn4/VIJqkX93N0
+ i2qBLu0DrSs2F/YH6vbOcJ+E2W9AYzgIgkkAmy3f8GIL+VFhjipQTMaIPg9Y6UArraF9
+ bHNATcQkCB3zKrhuiQyZX7MSspuNCVDxQ7RDDiU4mpMkDE+r0myoB5ae04GZOwv5tKlF
+ F6qyq/xSyOZSgjBojd6uQyMEaGbltC6Fc2jk5N/VcIA6alimK5kM1laL8BVP4HgoKY1f
+ oBxw==
+X-Gm-Message-State: AJIora/GjJrmWIi7lGC+aNZ3VXbZwLIME98IRykb2+6iv23qcw5Inq/l
+ 9GvYsB8+PLqcEO1cF1UnLd2ti8FGxIcdQLGGmw==
+X-Google-Smtp-Source: AGRyM1s+nZYFqneaUWZhKYAd3zQF7L0Cwai3ur8Rv5PlGmwq+xCSduNXnxJSHkCKOQUTBjw9Sv3BBmCbw3HEDJGUpA==
 X-Received: from kaleshsingh.mtv.corp.google.com
  ([2620:15c:211:200:4f77:3b64:736a:394e])
- (user=kaleshsingh job=sendgmr) by 2002:a5b:f41:0:b0:671:6ce6:f71 with SMTP id
- y1-20020a5b0f41000000b006716ce60f71mr2391473ybr.506.1658821112045; Tue, 26
- Jul 2022 00:38:32 -0700 (PDT)
-Date: Tue, 26 Jul 2022 00:37:48 -0700
+ (user=kaleshsingh job=sendgmr) by 2002:a81:1e49:0:b0:31e:5b13:a187 with SMTP
+ id e70-20020a811e49000000b0031e5b13a187mr13741284ywe.129.1658821114535; Tue,
+ 26 Jul 2022 00:38:34 -0700 (PDT)
+Date: Tue, 26 Jul 2022 00:37:49 -0700
 In-Reply-To: <20220726073750.3219117-1-kaleshsingh@google.com>
-Message-Id: <20220726073750.3219117-16-kaleshsingh@google.com>
+Message-Id: <20220726073750.3219117-17-kaleshsingh@google.com>
 Mime-Version: 1.0
 References: <20220726073750.3219117-1-kaleshsingh@google.com>
 X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
-Subject: [PATCH v6 15/17] KVM: arm64: Save protected-nVHE (pKVM) hyp stacktrace
+Subject: [PATCH v6 16/17] KVM: arm64: Implement protected nVHE hyp stack
+ unwinder
 From: Kalesh Singh <kaleshsingh@google.com>
 To: maz@kernel.org, mark.rutland@arm.com, broonie@kernel.org, 
  madvenka@linux.microsoft.com, tabba@google.com, oliver.upton@linux.dev
@@ -85,119 +87,46 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In protected nVHE mode, the host cannot access private owned hypervisor
-memory. Also the hypervisor aims to remains simple to reduce the attack
-surface and does not provide any printk support.
-
-For the above reasons, the approach taken to provide hypervisor stacktraces
-in protected mode is:
-   1) Unwind and save the hyp stack addresses in EL2 to a shared buffer
-      with the host (done in this patch).
-   2) Delegate the dumping and symbolization of the addresses to the
-      host in EL1 (later patch in the series).
-
-On hyp_panic(), the hypervisor prepares the stacktrace before returning to
-the host.
-
-Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
----
-
-Changes in v6:
-  - Simplify pkvm_save_backtrace_entry() using array semantics instead
-    of the pointer arithmetic, per Oliver.
-
-Changes in v5:
-  - Comment/clarify pkvm_save_backtrace_entry(), per Fuad
-  - kvm_nvhe_unwind_init(), doesn't need to be always inline, make it
-    inline instead to avoid linking issues, per Marc
-  - Use regular comments instead of doc comments, per Fuad
-
- arch/arm64/kvm/hyp/nvhe/stacktrace.c | 55 +++++++++++++++++++++++++++-
- 1 file changed, 54 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/stacktrace.c b/arch/arm64/kvm/hyp/nvhe/stacktrace.c
-index e2edda92a108..900324b7a08f 100644
---- a/arch/arm64/kvm/hyp/nvhe/stacktrace.c
-+++ b/arch/arm64/kvm/hyp/nvhe/stacktrace.c
-@@ -35,7 +35,60 @@ static void hyp_prepare_backtrace(unsigned long fp, unsigned long pc)
- }
- 
- #ifdef CONFIG_PROTECTED_NVHE_STACKTRACE
-+#include <asm/stacktrace/nvhe.h>
-+
- DEFINE_PER_CPU(unsigned long [NVHE_STACKTRACE_SIZE/sizeof(long)], pkvm_stacktrace);
-+
-+/*
-+ * pkvm_save_backtrace_entry - Saves a protected nVHE HYP stacktrace entry
-+ *
-+ * @arg    : index of the entry in the stacktrace buffer
-+ * @where  : the program counter corresponding to the stack frame
-+ *
-+ * Save the return address of a stack frame to the shared stacktrace buffer.
-+ * The host can access this shared buffer from EL1 to dump the backtrace.
-+ */
-+static bool pkvm_save_backtrace_entry(void *arg, unsigned long where)
-+{
-+	unsigned long *stacktrace = this_cpu_ptr(pkvm_stacktrace);
-+	int size = NVHE_STACKTRACE_SIZE / sizeof(long);
-+	int *idx = (int *)arg;
-+
-+	/*
-+	 * Need 2 free slots: 1 for current entry and 1 for the
-+	 * delimiter.
-+	 */
-+	if (*idx > size - 2)
-+		return false;
-+
-+	stacktrace[*idx] = where;
-+	stacktrace[++*idx] = 0UL;
-+
-+	return true;
-+}
-+
-+/*
-+ * pkvm_save_backtrace - Saves the protected nVHE HYP stacktrace
-+ *
-+ * @fp : frame pointer at which to start the unwinding.
-+ * @pc : program counter at which to start the unwinding.
-+ *
-+ * Save the unwinded stack addresses to the shared stacktrace buffer.
-+ * The host can access this shared buffer from EL1 to dump the backtrace.
-+ */
-+static void pkvm_save_backtrace(unsigned long fp, unsigned long pc)
-+{
-+	struct unwind_state state;
-+	int idx = 0;
-+
-+	kvm_nvhe_unwind_init(&state, fp, pc);
-+
-+	unwind(&state, pkvm_save_backtrace_entry, &idx);
-+}
-+#else /* !CONFIG_PROTECTED_NVHE_STACKTRACE */
-+static void pkvm_save_backtrace(unsigned long fp, unsigned long pc)
-+{
-+}
- #endif /* CONFIG_PROTECTED_NVHE_STACKTRACE */
- 
- /*
-@@ -50,7 +103,7 @@ DEFINE_PER_CPU(unsigned long [NVHE_STACKTRACE_SIZE/sizeof(long)], pkvm_stacktrac
- void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc)
- {
- 	if (is_protected_kvm_enabled())
--		return;
-+		pkvm_save_backtrace(fp, pc);
- 	else
- 		hyp_prepare_backtrace(fp, pc);
- }
--- 
-2.37.1.359.gd136c6c3e2-goog
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SW1wbGVtZW50cyB0aGUgY29tbW9uIGZyYW1ld29yayBuZWNlc3NhcnkgZm9yIHVud2luZCgpIHRv
+IHdvcmsgaW4KdGhlIHByb3RlY3RlZCBuVkhFIGNvbnRleHQ6CiAgIC0gb25fYWNjZXNzaWJsZV9z
+dGFjaygpCiAgIC0gb25fb3ZlcmZsb3dfc3RhY2soKQogICAtIHVud2luZF9uZXh0KCkKClByb3Rl
+Y3RlZCBuVkhFIHVud2luZCgpIGlzIHVzZWQgdG8gdW53aW5kIGFuZCBzYXZlIHRoZSBoeXAgc3Rh
+Y2sKYWRkcmVzc2VzIHRvIHRoZSBzaGFyZWQgc3RhY2t0cmFjZSBidWZmZXIuIFRoZSBob3N0IHJl
+YWRzIHRoZQplbnRyaWVzIGluIHRoaXMgYnVmZmVyLCBzeW1ib2xpemVzIGFuZCBkdW1wcyB0aGUg
+c3RhY2t0cmFjZSAobGF0ZXIKcGF0Y2ggaW4gdGhlIHNlcmllcykuCgpTaWduZWQtb2ZmLWJ5OiBL
+YWxlc2ggU2luZ2ggPGthbGVzaHNpbmdoQGdvb2dsZS5jb20+ClJldmlld2VkLWJ5OiBGdWFkIFRh
+YmJhIDx0YWJiYUBnb29nbGUuY29tPgpUZXN0ZWQtYnk6IEZ1YWQgVGFiYmEgPHRhYmJhQGdvb2ds
+ZS5jb20+Ci0tLQoKQ2hhbmdlcyBpbiB2NjoKICAtIEFkZCBGdWFk4oCZcyBSZXZpZXdlZC1ieSBh
+bmQgVGVzdGVkLWJ5IHRhZ3MKCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL3N0YWNrdHJhY2UvbnZo
+ZS5oIHwgMTUgKysrKysrKysrKysrLS0tCiAxIGZpbGUgY2hhbmdlZCwgMTIgaW5zZXJ0aW9ucygr
+KSwgMyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL3N0
+YWNrdHJhY2UvbnZoZS5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9zdGFja3RyYWNlL252aGUu
+aAppbmRleCAyY2U1OWMwNTg4MDYuLjYwMGRiYzIyMjBiNiAxMDA2NDQKLS0tIGEvYXJjaC9hcm02
+NC9pbmNsdWRlL2FzbS9zdGFja3RyYWNlL252aGUuaAorKysgYi9hcmNoL2FybTY0L2luY2x1ZGUv
+YXNtL3N0YWNrdHJhY2UvbnZoZS5oCkBAIC02NCwxOCArNjQsMjcgQEAgc3RhdGljIGlubGluZSBi
+b29sIG9uX2FjY2Vzc2libGVfc3RhY2soY29uc3Qgc3RydWN0IHRhc2tfc3RydWN0ICp0c2ssCiBz
+dGF0aWMgaW5saW5lIGJvb2wgb25fb3ZlcmZsb3dfc3RhY2sodW5zaWduZWQgbG9uZyBzcCwgdW5z
+aWduZWQgbG9uZyBzaXplLAogCQkJCSAgICAgc3RydWN0IHN0YWNrX2luZm8gKmluZm8pCiB7Ci0J
+cmV0dXJuIGZhbHNlOworCXVuc2lnbmVkIGxvbmcgbG93ID0gKHVuc2lnbmVkIGxvbmcpdGhpc19j
+cHVfcHRyKG92ZXJmbG93X3N0YWNrKTsKKwl1bnNpZ25lZCBsb25nIGhpZ2ggPSBsb3cgKyBPVkVS
+RkxPV19TVEFDS19TSVpFOworCisJcmV0dXJuIG9uX3N0YWNrKHNwLCBzaXplLCBsb3csIGhpZ2gs
+IFNUQUNLX1RZUEVfT1ZFUkZMT1csIGluZm8pOwogfQogCiBzdGF0aWMgaW5saW5lIGJvb2wgb25f
+aHlwX3N0YWNrKHVuc2lnbmVkIGxvbmcgc3AsIHVuc2lnbmVkIGxvbmcgc2l6ZSwKIAkJCQlzdHJ1
+Y3Qgc3RhY2tfaW5mbyAqaW5mbykKIHsKLQlyZXR1cm4gZmFsc2U7CisJc3RydWN0IGt2bV9udmhl
+X2luaXRfcGFyYW1zICpwYXJhbXMgPSB0aGlzX2NwdV9wdHIoJmt2bV9pbml0X3BhcmFtcyk7CisJ
+dW5zaWduZWQgbG9uZyBoaWdoID0gcGFyYW1zLT5zdGFja19oeXBfdmE7CisJdW5zaWduZWQgbG9u
+ZyBsb3cgPSBoaWdoIC0gUEFHRV9TSVpFOworCisJcmV0dXJuIG9uX3N0YWNrKHNwLCBzaXplLCBs
+b3csIGhpZ2gsIFNUQUNLX1RZUEVfSFlQLCBpbmZvKTsKIH0KIAogc3RhdGljIGlubGluZSBpbnQg
+bm90cmFjZSB1bndpbmRfbmV4dChzdHJ1Y3QgdW53aW5kX3N0YXRlICpzdGF0ZSkKIHsKLQlyZXR1
+cm4gMDsKKwlzdHJ1Y3Qgc3RhY2tfaW5mbyBpbmZvOworCisJcmV0dXJuIHVud2luZF9uZXh0X2Nv
+bW1vbihzdGF0ZSwgJmluZm8sIE5VTEwpOwogfQogTk9LUFJPQkVfU1lNQk9MKHVud2luZF9uZXh0
+KTsKICNlbmRpZgkvKiBDT05GSUdfUFJPVEVDVEVEX05WSEVfU1RBQ0tUUkFDRSAqLwotLSAKMi4z
+Ny4xLjM1OS5nZDEzNmM2YzNlMi1nb29nCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1
+bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9r
+dm1hcm0K
