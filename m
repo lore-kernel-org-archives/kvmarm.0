@@ -2,70 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14288C43334
-	for <kvmarm@archiver.kernel.org>; Tue, 26 Jul 2022 07:38:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE370C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Jul 2022 07:38:11 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4C724C536;
-	Tue, 26 Jul 2022 03:38:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 993184C54C;
+	Tue, 26 Jul 2022 03:38:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Q1iWyp1+fPlB; Tue, 26 Jul 2022 03:38:08 -0400 (EDT)
+	with ESMTP id qkk0usQtXaYz; Tue, 26 Jul 2022 03:38:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CBEB4C538;
-	Tue, 26 Jul 2022 03:38:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 45BDF4C545;
+	Tue, 26 Jul 2022 03:38:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FE684C548
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 03:38:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 85F054C437
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 03:38:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OCY4e-hmfMxX for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Jul 2022 03:38:03 -0400 (EDT)
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
- [209.85.219.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 19A624C536
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 03:38:03 -0400 (EDT)
-Received: by mail-yb1-f202.google.com with SMTP id
- s186-20020a255ec3000000b0067162ed1bd3so2183686ybb.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 00:38:03 -0700 (PDT)
+ with ESMTP id TXyQQbukKRh5 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Jul 2022 03:38:07 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2D804C508
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 03:38:05 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ f85-20020a253858000000b00670a44473e2so10394940yba.9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 00:38:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=5LzygoxYBmX52V1I8A5Hvt/OcxOdlEMYc0Y930yUiBQ=;
- b=lxba6zPS8bNj3T4SQ4NgtR3spXvbVhLqKPcx1Hc782Lm9/xnxi+CiSSlzu4yrB+6Ob
- +nmlTtMJekStORm3jx3MPu7T8RpB2I3EFhmAMg67K2+TOyWtvgD8ceXd2DZEz98cp+tB
- AHbCkifdg/jPtMKpNDl63zHG7jkWkO4I6Mrp++lQyYGmqJhbb8+2J+8O3jJTXddAXJze
- hzHbAAZxokWC+22wtYsQGG0iXfr3iYegpLoWC3Za44kxt61yZtjlHL5W74mLLRp4HBVo
- 2PURIJR3vLCK3lvSW66LOdSgAoZIvwAkopq9F1Qr9I8F1VaYKVLQYLvCnqkmvISyVhlB
- 8OpA==
+ :cc:content-transfer-encoding;
+ bh=KintJzFkc3fGk0PZThBnEs9+mVIkzS8MGNi7+4hHocM=;
+ b=F99U/GyUMm86I5hhUPAEh3i37Efs41f+NjVsXrba2/WKPQPyfrqe2tZkqcM8WLdn4N
+ tjoyQVaWZBceiGc+IiYE68nlfbCinUJe03/UFDa39xJ3UpbZdD9kbzr1fXgF94y52jEV
+ rS8Lbe7khCJnAGE3uuqPQYZcwfmKGiiahXSgT5hnhAxspgLgUZwx2XcFjsYvNHIlG4TO
+ Kz3pafuhE8xSvKeQKTkBbd6h7vha4xx8mVypWM60J3ynB/E+WPGvUVSThWgp4tikyd+6
+ meIxa9eGPMfqTbQzFurHAAv657oZE/ifKVL3Y5P3LVWtokWYf79sEL7M95vb7JRmvBTK
+ wWkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=5LzygoxYBmX52V1I8A5Hvt/OcxOdlEMYc0Y930yUiBQ=;
- b=D4yiwez8BcVdTj/G1W+EmPCyJKk44lUvfM8JavolHV4XbX+LBi1DQVjgiziZQECm5h
- qsmQ3BIdrjPSteJXkDiBfcqgvNubaptyXJGXOkaZaRiIE7MN53ywtL5u+Bdhh0zkDKqq
- HRS77Srpd3wy3FEj0lXIteDRi28bAfp7ptmbUxYvvt+YwFPewh6VbvP+LoCu4PSmFYSW
- s4rc+qk1LErGtIpjPoYYMVouEX7yfPiTx0wkZFQrJ51nZA0raibL70HSEYH2+ee0gNRL
- BGLDOzs3iUSchwnzcLEJRjlzDWmkcBw+6RlkpA+6OsFjOdrdq3Gs4YSVitLlJzANcd9W
- 5YbA==
-X-Gm-Message-State: AJIora+heG3JruiiQ0Ad8d3cNqlNWxECfmSASt+ocsietiV/cTtrHG6s
- oeQBCDvqWjIqGWq7hX7hokTVzICTCCoLG/EptA==
-X-Google-Smtp-Source: AGRyM1vLCGxSpACfvit1h9qHAotszBcN5RiBC0/VBQZAO/C3DHxhNjsQIs2RUsZ7LNGl/jujBDMD9xrWPH2wZ/0Q7A==
+ :references:subject:from:to:cc:content-transfer-encoding;
+ bh=KintJzFkc3fGk0PZThBnEs9+mVIkzS8MGNi7+4hHocM=;
+ b=MmdcvogkwaWZfkxut6UwYLtCMFAh0lF90UrpBGzidRKEZGbKuLuUJVBFn5A0XHc//5
+ s25BKQsp+iII2lOX3Dd/tU2meXMQD3/QTP6WMW5e+/2+xJb4NGEJ3I/ibe++qTbG0T3c
+ ylexzPUJIi/bmvvDHzq1ab3jl//SSnO4XbsMQbfyjn9rb4C5F2OATEx++Nyqr8ldVlMc
+ RdG02kbHoL/Bzs/WqfScC/W8jhnoC9gNs/vEkmMFcXjS9uTE/DbFKpK4YT90pABy70KW
+ ksOb6BivFWRyHnoVGrdswJCN/oA3vP4eD7jNOU92sWqGryf+0PE6wBiZlnXE1Eh85itv
+ bAUA==
+X-Gm-Message-State: AJIora9lXqq2s8pkkjGvlVh8p+w/3HRx/OvyVjqp8DiHV7Pr3DM6Enn8
+ DcPbIcmzJTi9nWwZrwM421cn+dT9livGfXpCxA==
+X-Google-Smtp-Source: AGRyM1tViIgbjsnsd0F2wwzY/mHFi+V+awQaQAAf7taOX+okajo7NRVMTiuzJzRWy3+FHjR02RHuf/ccxOBvmI+klQ==
 X-Received: from kaleshsingh.mtv.corp.google.com
  ([2620:15c:211:200:4f77:3b64:736a:394e])
- (user=kaleshsingh job=sendgmr) by 2002:a25:4c9:0:b0:671:6f60:eed8 with SMTP
- id 192-20020a2504c9000000b006716f60eed8mr1683033ybe.243.1658821082719; Tue,
- 26 Jul 2022 00:38:02 -0700 (PDT)
-Date: Tue, 26 Jul 2022 00:37:36 -0700
+ (user=kaleshsingh job=sendgmr) by 2002:a25:d796:0:b0:671:6696:d824 with SMTP
+ id o144-20020a25d796000000b006716696d824mr3624037ybg.52.1658821085312; Tue,
+ 26 Jul 2022 00:38:05 -0700 (PDT)
+Date: Tue, 26 Jul 2022 00:37:37 -0700
 In-Reply-To: <20220726073750.3219117-1-kaleshsingh@google.com>
-Message-Id: <20220726073750.3219117-4-kaleshsingh@google.com>
+Message-Id: <20220726073750.3219117-5-kaleshsingh@google.com>
 Mime-Version: 1.0
 References: <20220726073750.3219117-1-kaleshsingh@google.com>
 X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
-Subject: [PATCH v6 03/17] arm64: stacktrace: Factor out unwind_next_common()
+Subject: [PATCH v6 04/17] arm64: stacktrace: Handle frame pointer from
+ different address spaces
 From: Kalesh Singh <kaleshsingh@google.com>
 To: maz@kernel.org, mark.rutland@arm.com, broonie@kernel.org, 
  madvenka@linux.microsoft.com, tabba@google.com, oliver.upton@linux.dev
@@ -85,158 +87,76 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Move common unwind_next logic to stacktrace/common.h. This allows
-reusing the code in the implementation the nVHE hypervisor stack
-unwinder, later in this series.
-
-Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
-Reviewed-by: Fuad Tabba <tabba@google.com>
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Tested-by: Fuad Tabba <tabba@google.com>
----
-
-Changes in v6:
-  - Add Fuad's Tested-by tag
-
-Changes in v5:
-  - Add Reviewed-by tags from Mark Brown and Fuad
-
- arch/arm64/include/asm/stacktrace/common.h | 50 ++++++++++++++++++++++
- arch/arm64/kernel/stacktrace.c             | 41 ++----------------
- 2 files changed, 54 insertions(+), 37 deletions(-)
-
-diff --git a/arch/arm64/include/asm/stacktrace/common.h b/arch/arm64/include/asm/stacktrace/common.h
-index f58b786460d3..0c5cbfdb56b5 100644
---- a/arch/arm64/include/asm/stacktrace/common.h
-+++ b/arch/arm64/include/asm/stacktrace/common.h
-@@ -65,6 +65,10 @@ struct unwind_state {
- static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
- 				     struct stack_info *info);
- 
-+static inline bool on_accessible_stack(const struct task_struct *tsk,
-+				       unsigned long sp, unsigned long size,
-+				       struct stack_info *info);
-+
- static inline bool on_stack(unsigned long sp, unsigned long size,
- 			    unsigned long low, unsigned long high,
- 			    enum stack_type type, struct stack_info *info)
-@@ -120,4 +124,50 @@ static inline void unwind_init_common(struct unwind_state *state,
- 	state->prev_type = STACK_TYPE_UNKNOWN;
- }
- 
-+static inline int unwind_next_common(struct unwind_state *state,
-+				     struct stack_info *info)
-+{
-+	struct task_struct *tsk = state->task;
-+	unsigned long fp = state->fp;
-+
-+	if (fp & 0x7)
-+		return -EINVAL;
-+
-+	if (!on_accessible_stack(tsk, fp, 16, info))
-+		return -EINVAL;
-+
-+	if (test_bit(info->type, state->stacks_done))
-+		return -EINVAL;
-+
-+	/*
-+	 * As stacks grow downward, any valid record on the same stack must be
-+	 * at a strictly higher address than the prior record.
-+	 *
-+	 * Stacks can nest in several valid orders, e.g.
-+	 *
-+	 * TASK -> IRQ -> OVERFLOW -> SDEI_NORMAL
-+	 * TASK -> SDEI_NORMAL -> SDEI_CRITICAL -> OVERFLOW
-+	 *
-+	 * ... but the nesting itself is strict. Once we transition from one
-+	 * stack to another, it's never valid to unwind back to that first
-+	 * stack.
-+	 */
-+	if (info->type == state->prev_type) {
-+		if (fp <= state->prev_fp)
-+			return -EINVAL;
-+	} else {
-+		__set_bit(state->prev_type, state->stacks_done);
-+	}
-+
-+	/*
-+	 * Record this frame record's values and location. The prev_fp and
-+	 * prev_type are only meaningful to the next unwind_next() invocation.
-+	 */
-+	state->fp = READ_ONCE(*(unsigned long *)(fp));
-+	state->pc = READ_ONCE(*(unsigned long *)(fp + 8));
-+	state->prev_fp = fp;
-+	state->prev_type = info->type;
-+
-+	return 0;
-+}
- #endif	/* __ASM_STACKTRACE_COMMON_H */
-diff --git a/arch/arm64/kernel/stacktrace.c b/arch/arm64/kernel/stacktrace.c
-index 94a5dd2ab8fd..834851939364 100644
---- a/arch/arm64/kernel/stacktrace.c
-+++ b/arch/arm64/kernel/stacktrace.c
-@@ -81,48 +81,15 @@ static int notrace unwind_next(struct unwind_state *state)
- 	struct task_struct *tsk = state->task;
- 	unsigned long fp = state->fp;
- 	struct stack_info info;
-+	int err;
- 
- 	/* Final frame; nothing to unwind */
- 	if (fp == (unsigned long)task_pt_regs(tsk)->stackframe)
- 		return -ENOENT;
- 
--	if (fp & 0x7)
--		return -EINVAL;
--
--	if (!on_accessible_stack(tsk, fp, 16, &info))
--		return -EINVAL;
--
--	if (test_bit(info.type, state->stacks_done))
--		return -EINVAL;
--
--	/*
--	 * As stacks grow downward, any valid record on the same stack must be
--	 * at a strictly higher address than the prior record.
--	 *
--	 * Stacks can nest in several valid orders, e.g.
--	 *
--	 * TASK -> IRQ -> OVERFLOW -> SDEI_NORMAL
--	 * TASK -> SDEI_NORMAL -> SDEI_CRITICAL -> OVERFLOW
--	 *
--	 * ... but the nesting itself is strict. Once we transition from one
--	 * stack to another, it's never valid to unwind back to that first
--	 * stack.
--	 */
--	if (info.type == state->prev_type) {
--		if (fp <= state->prev_fp)
--			return -EINVAL;
--	} else {
--		__set_bit(state->prev_type, state->stacks_done);
--	}
--
--	/*
--	 * Record this frame record's values and location. The prev_fp and
--	 * prev_type are only meaningful to the next unwind_next() invocation.
--	 */
--	state->fp = READ_ONCE(*(unsigned long *)(fp));
--	state->pc = READ_ONCE(*(unsigned long *)(fp + 8));
--	state->prev_fp = fp;
--	state->prev_type = info.type;
-+	err = unwind_next_common(state, &info);
-+	if (err)
-+		return err;
- 
- 	state->pc = ptrauth_strip_insn_pac(state->pc);
- 
--- 
-2.37.1.359.gd136c6c3e2-goog
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+VGhlIHVud2luZGVyIGNvZGUgaXMgbWFkZSByZXVzYWJsZSBzbyB0aGF0IGl0IGNhbiBiZSB1c2Vk
+IHRvCnVud2luZCB2YXJpb3VzIHR5cGVzIG9mIHN0YWNrcy4gT25lIHVzZWNhc2UgaXMgdW53aW5k
+aW5nIHRoZQpuVkhFIGh5cCBzdGFjayBmcm9tIHRoZSBob3N0IChFTDEpIGluIG5vbi1wcm90ZWN0
+ZWQgbW9kZS4gVGhpcwptZWFucyB0aGF0IHRoZSB1bndpbmRlciBtdXN0IGJlIGFibGUgdG8gdHJh
+bnNsYXRlIEhZUCBzdGFjawphZGRyZXNzZXMgdG8ga2VybmVsIGFkZHJlc3Nlcy4KCkFkZCBhIGNh
+bGxiYWNrIChzdGFja190cmFjZV90cmFuc2xhdGVfZnBfZm4pIHRvIGFsbG93IHNwZWNpZnlpbmcK
+dGhlIHRyYW5zbGF0aW9uIGZ1bmN0aW9uLgoKU2lnbmVkLW9mZi1ieTogS2FsZXNoIFNpbmdoIDxr
+YWxlc2hzaW5naEBnb29nbGUuY29tPgpSZXZpZXdlZC1ieTogRnVhZCBUYWJiYSA8dGFiYmFAZ29v
+Z2xlLmNvbT4KVGVzdGVkLWJ5OiBGdWFkIFRhYmJhIDx0YWJiYUBnb29nbGUuY29tPgotLS0KCkNo
+YW5nZXMgaW4gdjY6CiAgLSBGaXggdHlwbyBpbiBjb21tZW50LCBwZXIgRnVhZAogIC0gQWRkIEZ1
+YWTigJlzIFJldmlld2VkLWJ5IHRhZyBhbmQgVGVzdGVkLWJ5IHRhZ3MKCkNoYW5nZXMgaW4gdjU6
+CiAgLSBGaXggdHlwbyBpbiBjb21taXQgdGV4dCwgcGVyIEZ1YWQKICAtIFVwZGF0ZSB1bndpbmRf
+bmV4dF9jb21tb24oKSB0byBub3QgaGF2ZSBzaWRlIGVmZmVjdHMgb24gZmFpbHVyZSwgcGVyIEZ1
+YWQKICAtIFVzZSByZWd1bGFyIGNvbW1lbnQgaW5zdGVhZCBvZiBkb2MgY29tbWVudHMsIHBlciBG
+dWFkCgogYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9zdGFja3RyYWNlL2NvbW1vbi5oIHwgMjkgKysr
+KysrKysrKysrKysrKysrKy0tLQogYXJjaC9hcm02NC9rZXJuZWwvc3RhY2t0cmFjZS5jICAgICAg
+ICAgICAgIHwgIDIgKy0KIDIgZmlsZXMgY2hhbmdlZCwgMjYgaW5zZXJ0aW9ucygrKSwgNSBkZWxl
+dGlvbnMoLSkKCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL3N0YWNrdHJhY2Uv
+Y29tbW9uLmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL3N0YWNrdHJhY2UvY29tbW9uLmgKaW5k
+ZXggMGM1Y2JmZGI1NmI1Li5iMjQxZWRiYTVjNzYgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQvaW5j
+bHVkZS9hc20vc3RhY2t0cmFjZS9jb21tb24uaAorKysgYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNt
+L3N0YWNrdHJhY2UvY29tbW9uLmgKQEAgLTEyNCwxMSArMTI0LDI1IEBAIHN0YXRpYyBpbmxpbmUg
+dm9pZCB1bndpbmRfaW5pdF9jb21tb24oc3RydWN0IHVud2luZF9zdGF0ZSAqc3RhdGUsCiAJc3Rh
+dGUtPnByZXZfdHlwZSA9IFNUQUNLX1RZUEVfVU5LTk9XTjsKIH0KIAorLyoKKyAqIHN0YWNrX3Ry
+YWNlX3RyYW5zbGF0ZV9mcF9mbigpIC0gVHJhbnNsYXRlcyBhIG5vbi1rZXJuZWwgZnJhbWUgcG9p
+bnRlciB0bworICogYSBrZXJuZWwgYWRkcmVzcy4KKyAqCisgKiBAZnA6ICAgdGhlIGZyYW1lIHBv
+aW50ZXIgdG8gYmUgdXBkYXRlZCB0byBpdHMga2VybmVsIGFkZHJlc3MuCisgKiBAdHlwZTogdGhl
+IHN0YWNrIHR5cGUgYXNzb2NpYXRlZCB3aXRoIGZyYW1lIHBvaW50ZXIgQGZwCisgKgorICogUmV0
+dXJucyB0cnVlIGFuZCBzdWNjZXNzIGFuZCBAZnAgaXMgdXBkYXRlZCB0byB0aGUgY29ycmVzcG9u
+ZGluZworICoga2VybmVsIHZpcnR1YWwgYWRkcmVzczsgb3RoZXJ3aXNlIHJldHVybnMgZmFsc2Uu
+CisgKi8KK3R5cGVkZWYgYm9vbCAoKnN0YWNrX3RyYWNlX3RyYW5zbGF0ZV9mcF9mbikodW5zaWdu
+ZWQgbG9uZyAqZnAsCisJCQkJCSAgICBlbnVtIHN0YWNrX3R5cGUgdHlwZSk7CisKIHN0YXRpYyBp
+bmxpbmUgaW50IHVud2luZF9uZXh0X2NvbW1vbihzdHJ1Y3QgdW53aW5kX3N0YXRlICpzdGF0ZSwK
+LQkJCQkgICAgIHN0cnVjdCBzdGFja19pbmZvICppbmZvKQorCQkJCSAgICAgc3RydWN0IHN0YWNr
+X2luZm8gKmluZm8sCisJCQkJICAgICBzdGFja190cmFjZV90cmFuc2xhdGVfZnBfZm4gdHJhbnNs
+YXRlX2ZwKQogeworCXVuc2lnbmVkIGxvbmcgZnAgPSBzdGF0ZS0+ZnAsIGtlcm5fZnAgPSBmcDsK
+IAlzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRzayA9IHN0YXRlLT50YXNrOwotCXVuc2lnbmVkIGxvbmcg
+ZnAgPSBzdGF0ZS0+ZnA7CiAKIAlpZiAoZnAgJiAweDcpCiAJCXJldHVybiAtRUlOVkFMOwpAQCAt
+MTM5LDYgKzE1MywxMyBAQCBzdGF0aWMgaW5saW5lIGludCB1bndpbmRfbmV4dF9jb21tb24oc3Ry
+dWN0IHVud2luZF9zdGF0ZSAqc3RhdGUsCiAJaWYgKHRlc3RfYml0KGluZm8tPnR5cGUsIHN0YXRl
+LT5zdGFja3NfZG9uZSkpCiAJCXJldHVybiAtRUlOVkFMOwogCisJLyoKKwkgKiBJZiBmcCBpcyBu
+b3QgZnJvbSB0aGUgY3VycmVudCBhZGRyZXNzIHNwYWNlIHBlcmZvcm0gdGhlIG5lY2Vzc2FyeQor
+CSAqIHRyYW5zbGF0aW9uIGJlZm9yZSBkZXJlZmVyZW5jaW5nIGl0IHRvIGdldCB0aGUgbmV4dCBm
+cC4KKwkgKi8KKwlpZiAodHJhbnNsYXRlX2ZwICYmICF0cmFuc2xhdGVfZnAoJmtlcm5fZnAsIGlu
+Zm8tPnR5cGUpKQorCQlyZXR1cm4gLUVJTlZBTDsKKwogCS8qCiAJICogQXMgc3RhY2tzIGdyb3cg
+ZG93bndhcmQsIGFueSB2YWxpZCByZWNvcmQgb24gdGhlIHNhbWUgc3RhY2sgbXVzdCBiZQogCSAq
+IGF0IGEgc3RyaWN0bHkgaGlnaGVyIGFkZHJlc3MgdGhhbiB0aGUgcHJpb3IgcmVjb3JkLgpAQCAt
+MTYzLDggKzE4NCw4IEBAIHN0YXRpYyBpbmxpbmUgaW50IHVud2luZF9uZXh0X2NvbW1vbihzdHJ1
+Y3QgdW53aW5kX3N0YXRlICpzdGF0ZSwKIAkgKiBSZWNvcmQgdGhpcyBmcmFtZSByZWNvcmQncyB2
+YWx1ZXMgYW5kIGxvY2F0aW9uLiBUaGUgcHJldl9mcCBhbmQKIAkgKiBwcmV2X3R5cGUgYXJlIG9u
+bHkgbWVhbmluZ2Z1bCB0byB0aGUgbmV4dCB1bndpbmRfbmV4dCgpIGludm9jYXRpb24uCiAJICov
+Ci0Jc3RhdGUtPmZwID0gUkVBRF9PTkNFKCoodW5zaWduZWQgbG9uZyAqKShmcCkpOwotCXN0YXRl
+LT5wYyA9IFJFQURfT05DRSgqKHVuc2lnbmVkIGxvbmcgKikoZnAgKyA4KSk7CisJc3RhdGUtPmZw
+ID0gUkVBRF9PTkNFKCoodW5zaWduZWQgbG9uZyAqKShrZXJuX2ZwKSk7CisJc3RhdGUtPnBjID0g
+UkVBRF9PTkNFKCoodW5zaWduZWQgbG9uZyAqKShrZXJuX2ZwICsgOCkpOwogCXN0YXRlLT5wcmV2
+X2ZwID0gZnA7CiAJc3RhdGUtPnByZXZfdHlwZSA9IGluZm8tPnR5cGU7CiAKZGlmZiAtLWdpdCBh
+L2FyY2gvYXJtNjQva2VybmVsL3N0YWNrdHJhY2UuYyBiL2FyY2gvYXJtNjQva2VybmVsL3N0YWNr
+dHJhY2UuYwppbmRleCA4MzQ4NTE5MzkzNjQuLmVlZjNjZjZiZjJkNyAxMDA2NDQKLS0tIGEvYXJj
+aC9hcm02NC9rZXJuZWwvc3RhY2t0cmFjZS5jCisrKyBiL2FyY2gvYXJtNjQva2VybmVsL3N0YWNr
+dHJhY2UuYwpAQCAtODcsNyArODcsNyBAQCBzdGF0aWMgaW50IG5vdHJhY2UgdW53aW5kX25leHQo
+c3RydWN0IHVud2luZF9zdGF0ZSAqc3RhdGUpCiAJaWYgKGZwID09ICh1bnNpZ25lZCBsb25nKXRh
+c2tfcHRfcmVncyh0c2spLT5zdGFja2ZyYW1lKQogCQlyZXR1cm4gLUVOT0VOVDsKIAotCWVyciA9
+IHVud2luZF9uZXh0X2NvbW1vbihzdGF0ZSwgJmluZm8pOworCWVyciA9IHVud2luZF9uZXh0X2Nv
+bW1vbihzdGF0ZSwgJmluZm8sIE5VTEwpOwogCWlmIChlcnIpCiAJCXJldHVybiBlcnI7CiAKLS0g
+CjIuMzcuMS4zNTkuZ2QxMzZjNmMzZTItZ29vZwoKX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3Mu
+Y29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGlu
+Zm8va3ZtYXJtCg==
