@@ -2,72 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C027C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 26 Jul 2022 07:38:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41F4AC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Jul 2022 07:38:27 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEF844C559;
-	Tue, 26 Jul 2022 03:38:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0B034C54D;
+	Tue, 26 Jul 2022 03:38:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id q8ZecU2NvOhl; Tue, 26 Jul 2022 03:38:23 -0400 (EDT)
+	with ESMTP id P6i8IhV1oPCB; Tue, 26 Jul 2022 03:38:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35C384C54E;
-	Tue, 26 Jul 2022 03:38:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6943F4C569;
+	Tue, 26 Jul 2022 03:38:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E4FD4C536
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 03:38:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 330124C540
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 03:38:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yoNlLP3vSmhC for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Jul 2022 03:38:19 -0400 (EDT)
+ with ESMTP id MC28glNPhKN1 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Jul 2022 03:38:22 -0400 (EDT)
 Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
  [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E02614C55E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 03:38:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B950B4C553
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 03:38:22 -0400 (EDT)
 Received: by mail-yb1-f201.google.com with SMTP id
- f85-20020a253858000000b00670a44473e2so10395304yba.9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 00:38:19 -0700 (PDT)
+ z6-20020a056902054600b00670e3c8b43fso8389020ybs.23
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jul 2022 00:38:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc:content-transfer-encoding;
- bh=C05IvefY3yHCSicvywO05OO7/p0cJlxJJw9NBtAG/BI=;
- b=ob0fpBg8on7i2VT4Z634POHg6172v4VbWQBgZgfbUIfl3zaaqjd2K1fDRy9359PVjb
- 4x4V7vuhKpQ2qxl2xXXTkZqOksr1K6xehND+jYxPnqLLL4sGxuAYqcaGIzzLq/EQSV32
- 4XNIGl6pZxohnm3t8lNmwRsOcAm+H3FZRMvxLWyeW3uMAZF7pf3Q9GP2Fa1ueJk0x2Ux
- tpQPP6PzohSzZi9bbBhmNzb8WpHg8N43FnQ4ZwhcEcbQtltUBDAKI3HhFKP5hQT3YEVu
- PlAzKvYGDWLsYcb3P4TPbRyvpZgZMXxlQitgwIycWRd++/l8WatzmXjknkpPNNNxUIfh
- JyEg==
+ :cc; bh=kL7jS2TEgfQABS/KABalQqubKEd+bS4PTw3OsgUmZrg=;
+ b=J9LlcMs4kVl5Jw7qgJTzTVfwP5zRI1SRtnFCZ3KUg847ET+lDBzps4QPRrt7QF7/Ks
+ xKq7LVs7tkEhFsKhBHqbpvefr6T7tgS96BykDlhtcK2A654oU74O77GoXM85LKr2zv7L
+ BvGEAiGlvkxvl7cCjh/9fvLea6FoUmnPKuR/JoLvKMPSe+Tjr4avfVymE3VSL2Rgpy+E
+ KDH/TPvXhSmO5fPs8LEiUE2W6ShIs6W5zYRVei7zZB5A7wh6165l6SX9QLewO0iT+iww
+ 9QLYk9i77CFCRiaAW71AInn6lyy+wNhBpEcxgvjKVY+YfZuk19SXuheN4itHR3CuRIzk
+ rO2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc:content-transfer-encoding;
- bh=C05IvefY3yHCSicvywO05OO7/p0cJlxJJw9NBtAG/BI=;
- b=oNh5O25HEA0MeXaa3ZrEkI4j1qNk30tF4ThxzFkyFaJ+JkJX+t2A4FOyVQYi2cA4Z1
- TMkPSqRssdyhzf93awqY0IcqY0e1ZOcDk7h/+AC0bnG2kf7vtGCqB9x49ea5jIjThTHG
- u0jn7jsllLZGhJ85NYTbmm01oqH1WvtXDSvx8GtRLgA/NXF2OQQMZAiGq0Iv5HVPZn0y
- w1xnv8R5l8kRR7aoo2HObftBOpXAGTyPAncNveqiOXzMpLRwvjLqBHVlBW5WqJ7TUmri
- ucAjyRKhHyDQGEyqI/CgchUSCtZk8C0o2/rx6L+pZdMTnLtM7Z7LA7xZSEKvfFVStO8R
- 4VBQ==
-X-Gm-Message-State: AJIora/NQP7u0noJWFlK3V6tpPouy91XqUSIx/48zXwotTAHZSYDg4A9
- PJ1O0T8zX/4aSBqRFQNnZWdtpkV8thr4NzfIMQ==
-X-Google-Smtp-Source: AGRyM1s6pLQ/wRx5BpTGjEP9aAkuHSQDACPu3UJRYg3QKP09PzT9y5R0O/ZIhB0UfRXFksJMnzxnUqHKNhS8Z1k5qQ==
+ :references:subject:from:to:cc;
+ bh=kL7jS2TEgfQABS/KABalQqubKEd+bS4PTw3OsgUmZrg=;
+ b=ZFGqNryjHOSzNQFu38jNiyrPa3FhqnrKTDBRK2GnR9+uXzzvgcTGT4000zjBW5rBLt
+ H5EDEtOUSEujI5mXXEXKHp3FK0ZJYUGXuZg5SH0PvzGc84uFtlirKsP0NK/Km/mDzWa2
+ bB/jj1C2L+9hsdk1e+XWPqwZk7lgScMG1BtkwtoWUuEqv9F48MxhXviFwcT9VxvJeDM1
+ O5fTf62NCyj1ZY9OtIJTPAgzxlm9WnrBIXdFg1ZzBGTi4/LRRSuYKyA19U9eEZ0PDN/s
+ xQgNFlo1tv12D/j3EdtZ4zsXvb4G1074CjlqtPVGA6V3P3KdOZSDpxpZAO1mt93mFj4t
+ 2kaA==
+X-Gm-Message-State: AJIora9Ay+LHlnEKpSCyLD1ROWT85MwtS8FjSF9WYSwlPY/GOdeogvND
+ 6VpuNWNDVCMkbjrq4pN88YRtOwdCEYnGL2arZw==
+X-Google-Smtp-Source: AGRyM1saaVsEuZn7ZnRBCM6GpPqB26BLjzUSPJbF2c+S3D5RHjCzUgbqIv/13TpNkFfjwqhEHzjPbXseN9GPJLOPcQ==
 X-Received: from kaleshsingh.mtv.corp.google.com
  ([2620:15c:211:200:4f77:3b64:736a:394e])
- (user=kaleshsingh job=sendgmr) by 2002:a25:50c5:0:b0:670:394a:a2a with SMTP
- id e188-20020a2550c5000000b00670394a0a2amr12895264ybb.294.1658821099711; Tue,
- 26 Jul 2022 00:38:19 -0700 (PDT)
-Date: Tue, 26 Jul 2022 00:37:43 -0700
+ (user=kaleshsingh job=sendgmr) by 2002:a25:264b:0:b0:66e:cc95:50e with SMTP
+ id m72-20020a25264b000000b0066ecc95050emr12499491ybm.173.1658821102498; Tue,
+ 26 Jul 2022 00:38:22 -0700 (PDT)
+Date: Tue, 26 Jul 2022 00:37:44 -0700
 In-Reply-To: <20220726073750.3219117-1-kaleshsingh@google.com>
-Message-Id: <20220726073750.3219117-11-kaleshsingh@google.com>
+Message-Id: <20220726073750.3219117-12-kaleshsingh@google.com>
 Mime-Version: 1.0
 References: <20220726073750.3219117-1-kaleshsingh@google.com>
 X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
-Subject: [PATCH v6 10/17] KVM: arm64: Implement non-protected nVHE hyp stack
- unwinder
+Subject: [PATCH v6 11/17] KVM: arm64: Introduce hyp_dump_backtrace()
 From: Kalesh Singh <kaleshsingh@google.com>
 To: maz@kernel.org, mark.rutland@arm.com, broonie@kernel.org, 
  madvenka@linux.microsoft.com, tabba@google.com, oliver.upton@linux.dev
@@ -87,106 +85,177 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SW1wbGVtZW50cyB0aGUgY29tbW9uIGZyYW1ld29yayBuZWNlc3NhcnkgZm9yIHVud2luZCgpIHRv
-IHdvcmsKZm9yIG5vbi1wcm90ZWN0ZWQgblZIRSBtb2RlOgogICAgLSBvbl9hY2Nlc3NpYmxlX3N0
-YWNrKCkKICAgIC0gb25fb3ZlcmZsb3dfc3RhY2soKQogICAgLSB1bndpbmRfbmV4dCgpCgpOb24t
-cHJvdGVjdGVkIG5WSEUgdW53aW5kKCkgaXMgdXNlZCB0byB1bndpbmQgYW5kIGR1bXAgdGhlIGh5
-cGVydmlzb3IKc3RhY2t0cmFjZSBieSB0aGUgaG9zdCBpbiBFTDEKClNpZ25lZC1vZmYtYnk6IEth
-bGVzaCBTaW5naCA8a2FsZXNoc2luZ2hAZ29vZ2xlLmNvbT4KUmV2aWV3ZWQtYnk6IEZ1YWQgVGFi
-YmEgPHRhYmJhQGdvb2dsZS5jb20+ClRlc3RlZC1ieTogRnVhZCBUYWJiYSA8dGFiYmFAZ29vZ2xl
-LmNvbT4KLS0tCgpDaGFuZ2VzIGluIHY2OgogIC0gQWRkIEZ1YWTigJlzIFJldmlld2VkLWJ5IGFu
-ZCBUZXN0ZWQtYnkgdGFncwoKQ2hhbmdlcyBpbiB2NToKICAtIFVzZSByZWd1bGFyIGNvbW1lbnRz
-IGluc3RlYWQgb2YgZG9jIGNvbW1lbnRzLCBwZXIgRnVhZAoKIGFyY2gvYXJtNjQvaW5jbHVkZS9h
-c20vc3RhY2t0cmFjZS9jb21tb24uaCB8ICAyICsKIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20vc3Rh
-Y2t0cmFjZS9udmhlLmggICB8IDc2ICsrKysrKysrKysrKysrKysrKysrKy0KIGFyY2gvYXJtNjQv
-a3ZtL2FybS5jICAgICAgICAgICAgICAgICAgICAgICB8ICAyICstCiAzIGZpbGVzIGNoYW5nZWQs
-IDc3IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02
-NC9pbmNsdWRlL2FzbS9zdGFja3RyYWNlL2NvbW1vbi5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2Fz
-bS9zdGFja3RyYWNlL2NvbW1vbi5oCmluZGV4IDQ1NDc0YjM4MzYzMC4uM2ViYjY5ZWEzNzRhIDEw
-MDY0NAotLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL3N0YWNrdHJhY2UvY29tbW9uLmgKKysr
-IGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9zdGFja3RyYWNlL2NvbW1vbi5oCkBAIC0zNCw2ICsz
-NCw3IEBAIGVudW0gc3RhY2tfdHlwZSB7CiAJU1RBQ0tfVFlQRV9PVkVSRkxPVywKIAlTVEFDS19U
-WVBFX1NERUlfTk9STUFMLAogCVNUQUNLX1RZUEVfU0RFSV9DUklUSUNBTCwKKwlTVEFDS19UWVBF
-X0hZUCwKIAlfX05SX1NUQUNLX1RZUEVTCiB9OwogCkBAIC0xODYsNiArMTg3LDcgQEAgc3RhdGlj
-IGlubGluZSBpbnQgdW53aW5kX25leHRfY29tbW9uKHN0cnVjdCB1bndpbmRfc3RhdGUgKnN0YXRl
-LAogCSAqCiAJICogVEFTSyAtPiBJUlEgLT4gT1ZFUkZMT1cgLT4gU0RFSV9OT1JNQUwKIAkgKiBU
-QVNLIC0+IFNERUlfTk9STUFMIC0+IFNERUlfQ1JJVElDQUwgLT4gT1ZFUkZMT1cKKwkgKiBIWVAg
-LT4gT1ZFUkZMT1cKIAkgKgogCSAqIC4uLiBidXQgdGhlIG5lc3RpbmcgaXRzZWxmIGlzIHN0cmlj
-dC4gT25jZSB3ZSB0cmFuc2l0aW9uIGZyb20gb25lCiAJICogc3RhY2sgdG8gYW5vdGhlciwgaXQn
-cyBuZXZlciB2YWxpZCB0byB1bndpbmQgYmFjayB0byB0aGF0IGZpcnN0CmRpZmYgLS1naXQgYS9h
-cmNoL2FybTY0L2luY2x1ZGUvYXNtL3N0YWNrdHJhY2UvbnZoZS5oIGIvYXJjaC9hcm02NC9pbmNs
-dWRlL2FzbS9zdGFja3RyYWNlL252aGUuaAppbmRleCAxMTkyYWUwZjgwYzEuLjIxMDgyZmQ0YTBi
-NyAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9zdGFja3RyYWNlL252aGUuaAor
-KysgYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL3N0YWNrdHJhY2UvbnZoZS5oCkBAIC0xNiwxMCAr
-MTYsMTkgQEAKIAogI2luY2x1ZGUgPGFzbS9zdGFja3RyYWNlL2NvbW1vbi5oPgogCitzdGF0aWMg
-aW5saW5lIGJvb2wgb25faHlwX3N0YWNrKHVuc2lnbmVkIGxvbmcgc3AsIHVuc2lnbmVkIGxvbmcg
-c2l6ZSwKKwkJCQlzdHJ1Y3Qgc3RhY2tfaW5mbyAqaW5mbyk7CisKIHN0YXRpYyBpbmxpbmUgYm9v
-bCBvbl9hY2Nlc3NpYmxlX3N0YWNrKGNvbnN0IHN0cnVjdCB0YXNrX3N0cnVjdCAqdHNrLAogCQkJ
-CSAgICAgICB1bnNpZ25lZCBsb25nIHNwLCB1bnNpZ25lZCBsb25nIHNpemUsCiAJCQkJICAgICAg
-IHN0cnVjdCBzdGFja19pbmZvICppbmZvKQogeworCWlmIChvbl9hY2Nlc3NpYmxlX3N0YWNrX2Nv
-bW1vbih0c2ssIHNwLCBzaXplLCBpbmZvKSkKKwkJcmV0dXJuIHRydWU7CisKKwlpZiAob25faHlw
-X3N0YWNrKHNwLCBzaXplLCBpbmZvKSkKKwkJcmV0dXJuIHRydWU7CisKIAlyZXR1cm4gZmFsc2U7
-CiB9CiAKQEAgLTMxLDE1ICs0MCw3OCBAQCBzdGF0aWMgaW5saW5lIGJvb2wgb25fYWNjZXNzaWJs
-ZV9zdGFjayhjb25zdCBzdHJ1Y3QgdGFza19zdHJ1Y3QgKnRzaywKICAqIChieSB0aGUgaG9zdCBp
-biBFTDEpLgogICovCiAKK0RFQ0xBUkVfS1ZNX05WSEVfUEVSX0NQVSh1bnNpZ25lZCBsb25nIFtP
-VkVSRkxPV19TVEFDS19TSVpFL3NpemVvZihsb25nKV0sIG92ZXJmbG93X3N0YWNrKTsKK0RFQ0xB
-UkVfS1ZNX05WSEVfUEVSX0NQVShzdHJ1Y3Qga3ZtX252aGVfc3RhY2t0cmFjZV9pbmZvLCBrdm1f
-c3RhY2t0cmFjZV9pbmZvKTsKK0RFQ0xBUkVfUEVSX0NQVSh1bnNpZ25lZCBsb25nLCBrdm1fYXJt
-X2h5cF9zdGFja19wYWdlKTsKKworLyoKKyAqIGt2bV9udmhlX3N0YWNrX2tlcm5fdmEgLSBDb252
-ZXJ0IEtWTSBuVkhFIEhZUCBzdGFjayBhZGRyZXNzZXMgdG8gYSBrZXJuZWwgVkFzCisgKgorICog
-VGhlIG5WSEUgaHlwZXJ2aXNvciBzdGFjayBpcyBtYXBwZWQgaW4gdGhlIGZsZXhpYmxlICdwcml2
-YXRlJyBWQSByYW5nZSwgdG8KKyAqIGFsbG93IGZvciBndWFyZCBwYWdlcyBiZWxvdyB0aGUgc3Rh
-Y2suIENvbnNlcXVlbnRseSwgdGhlIGZpeGVkIG9mZnNldCBhZGRyZXNzCisgKiB0cmFuc2xhdGlv
-biBtYWNyb3Mgd29uJ3Qgd29yayBoZXJlLgorICoKKyAqIFRoZSBrZXJuZWwgVkEgaXMgY2FsY3Vs
-YXRlZCBhcyBhbiBvZmZzZXQgZnJvbSB0aGUga2VybmVsIFZBIG9mIHRoZSBoeXBlcnZpc29yCisg
-KiBzdGFjayBiYXNlLgorICoKKyAqIFJldHVybnMgdHJ1ZSBvbiBzdWNjZXNzIGFuZCB1cGRhdGVz
-IEBhZGRyIHRvIGl0cyBjb3JyZXNwb25kaW5nIGtlcm5lbCBWQTsKKyAqIG90aGVyd2lzZSByZXR1
-cm5zIGZhbHNlLgorICovCitzdGF0aWMgaW5saW5lIGJvb2wga3ZtX252aGVfc3RhY2tfa2Vybl92
-YSh1bnNpZ25lZCBsb25nICphZGRyLAorCQkJCQkgIGVudW0gc3RhY2tfdHlwZSB0eXBlKQorewor
-CXN0cnVjdCBrdm1fbnZoZV9zdGFja3RyYWNlX2luZm8gKnN0YWNrdHJhY2VfaW5mbzsKKwl1bnNp
-Z25lZCBsb25nIGh5cF9iYXNlLCBrZXJuX2Jhc2UsIGh5cF9vZmZzZXQ7CisKKwlzdGFja3RyYWNl
-X2luZm8gPSB0aGlzX2NwdV9wdHJfbnZoZV9zeW0oa3ZtX3N0YWNrdHJhY2VfaW5mbyk7CisKKwlz
-d2l0Y2ggKHR5cGUpIHsKKwljYXNlIFNUQUNLX1RZUEVfSFlQOgorCQlrZXJuX2Jhc2UgPSAodW5z
-aWduZWQgbG9uZykqdGhpc19jcHVfcHRyKCZrdm1fYXJtX2h5cF9zdGFja19wYWdlKTsKKwkJaHlw
-X2Jhc2UgPSAodW5zaWduZWQgbG9uZylzdGFja3RyYWNlX2luZm8tPnN0YWNrX2Jhc2U7CisJCWJy
-ZWFrOworCWNhc2UgU1RBQ0tfVFlQRV9PVkVSRkxPVzoKKwkJa2Vybl9iYXNlID0gKHVuc2lnbmVk
-IGxvbmcpdGhpc19jcHVfcHRyX252aGVfc3ltKG92ZXJmbG93X3N0YWNrKTsKKwkJaHlwX2Jhc2Ug
-PSAodW5zaWduZWQgbG9uZylzdGFja3RyYWNlX2luZm8tPm92ZXJmbG93X3N0YWNrX2Jhc2U7CisJ
-CWJyZWFrOworCWRlZmF1bHQ6CisJCXJldHVybiBmYWxzZTsKKwl9CisKKwloeXBfb2Zmc2V0ID0g
-KmFkZHIgLSBoeXBfYmFzZTsKKworCSphZGRyID0ga2Vybl9iYXNlICsgaHlwX29mZnNldDsKKwor
-CXJldHVybiB0cnVlOworfQorCiBzdGF0aWMgaW5saW5lIGJvb2wgb25fb3ZlcmZsb3dfc3RhY2so
-dW5zaWduZWQgbG9uZyBzcCwgdW5zaWduZWQgbG9uZyBzaXplLAogCQkJCSAgICAgc3RydWN0IHN0
-YWNrX2luZm8gKmluZm8pCiB7Ci0JcmV0dXJuIGZhbHNlOworCXN0cnVjdCBrdm1fbnZoZV9zdGFj
-a3RyYWNlX2luZm8gKnN0YWNrdHJhY2VfaW5mbworCQkJCT0gdGhpc19jcHVfcHRyX252aGVfc3lt
-KGt2bV9zdGFja3RyYWNlX2luZm8pOworCXVuc2lnbmVkIGxvbmcgbG93ID0gKHVuc2lnbmVkIGxv
-bmcpc3RhY2t0cmFjZV9pbmZvLT5vdmVyZmxvd19zdGFja19iYXNlOworCXVuc2lnbmVkIGxvbmcg
-aGlnaCA9IGxvdyArIE9WRVJGTE9XX1NUQUNLX1NJWkU7CisKKwlyZXR1cm4gb25fc3RhY2soc3As
-IHNpemUsIGxvdywgaGlnaCwgU1RBQ0tfVFlQRV9PVkVSRkxPVywgaW5mbyk7Cit9CisKK3N0YXRp
-YyBpbmxpbmUgYm9vbCBvbl9oeXBfc3RhY2sodW5zaWduZWQgbG9uZyBzcCwgdW5zaWduZWQgbG9u
-ZyBzaXplLAorCQkJCXN0cnVjdCBzdGFja19pbmZvICppbmZvKQoreworCXN0cnVjdCBrdm1fbnZo
-ZV9zdGFja3RyYWNlX2luZm8gKnN0YWNrdHJhY2VfaW5mbworCQkJCT0gdGhpc19jcHVfcHRyX252
-aGVfc3ltKGt2bV9zdGFja3RyYWNlX2luZm8pOworCXVuc2lnbmVkIGxvbmcgbG93ID0gKHVuc2ln
-bmVkIGxvbmcpc3RhY2t0cmFjZV9pbmZvLT5zdGFja19iYXNlOworCXVuc2lnbmVkIGxvbmcgaGln
-aCA9IGxvdyArIFBBR0VfU0laRTsKKworCXJldHVybiBvbl9zdGFjayhzcCwgc2l6ZSwgbG93LCBo
-aWdoLCBTVEFDS19UWVBFX0hZUCwgaW5mbyk7CiB9CiAKIHN0YXRpYyBpbmxpbmUgaW50IG5vdHJh
-Y2UgdW53aW5kX25leHQoc3RydWN0IHVud2luZF9zdGF0ZSAqc3RhdGUpCiB7Ci0JcmV0dXJuIDA7
-CisJc3RydWN0IHN0YWNrX2luZm8gaW5mbzsKKworCXJldHVybiB1bndpbmRfbmV4dF9jb21tb24o
-c3RhdGUsICZpbmZvLCBrdm1fbnZoZV9zdGFja19rZXJuX3ZhKTsKIH0KIE5PS1BST0JFX1NZTUJP
-TCh1bndpbmRfbmV4dCk7CiAKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2FybS5jIGIvYXJj
-aC9hcm02NC9rdm0vYXJtLmMKaW5kZXggYTAxODgxNDRhMTIyLi42YTY0MjkzMTA4YzUgMTAwNjQ0
-Ci0tLSBhL2FyY2gvYXJtNjQva3ZtL2FybS5jCisrKyBiL2FyY2gvYXJtNjQva3ZtL2FybS5jCkBA
-IC00OSw3ICs0OSw3IEBAIERFRklORV9TVEFUSUNfS0VZX0ZBTFNFKGt2bV9wcm90ZWN0ZWRfbW9k
-ZV9pbml0aWFsaXplZCk7CiAKIERFQ0xBUkVfS1ZNX0hZUF9QRVJfQ1BVKHVuc2lnbmVkIGxvbmcs
-IGt2bV9oeXBfdmVjdG9yKTsKIAotc3RhdGljIERFRklORV9QRVJfQ1BVKHVuc2lnbmVkIGxvbmcs
-IGt2bV9hcm1faHlwX3N0YWNrX3BhZ2UpOworREVGSU5FX1BFUl9DUFUodW5zaWduZWQgbG9uZywg
-a3ZtX2FybV9oeXBfc3RhY2tfcGFnZSk7CiB1bnNpZ25lZCBsb25nIGt2bV9hcm1faHlwX3BlcmNw
-dV9iYXNlW05SX0NQVVNdOwogREVDTEFSRV9LVk1fTlZIRV9QRVJfQ1BVKHN0cnVjdCBrdm1fbnZo
-ZV9pbml0X3BhcmFtcywga3ZtX2luaXRfcGFyYW1zKTsKIAotLSAKMi4zNy4xLjM1OS5nZDEzNmM2
-YzNlMi1nb29nCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-Xwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6
-Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+In non-protected nVHE mode, unwinds and dumps the hypervisor backtrace
+from EL1. This is possible beacause the host can directly access the
+hypervisor stack pages in non-protected mode.
+
+The nVHE backtrace is dumped on hyp_panic(), before panicking the host.
+
+[  101.498183] kvm [377]: nVHE call trace:
+[  101.498363] kvm [377]:  [<ffff8000090a6570>] __kvm_nvhe_hyp_panic+0xac/0xf8
+[  101.499045] kvm [377]:  [<ffff8000090a65cc>] __kvm_nvhe_hyp_panic_bad_stack+0x10/0x10
+[  101.499498] kvm [377]:  [<ffff8000090a61e4>] __kvm_nvhe_recursive_death+0x24/0x34
+. . .
+[  101.524929] kvm [377]:  [<ffff8000090a61e4>] __kvm_nvhe_recursive_death+0x24/0x34
+[  101.525062] kvm [377]:  [<ffff8000090a61e4>] __kvm_nvhe_recursive_death+0x24/0x34
+[  101.525195] kvm [377]:  [<ffff8000090a5de4>] __kvm_nvhe___kvm_vcpu_run+0x30/0x40c
+[  101.525333] kvm [377]:  [<ffff8000090a8b64>] __kvm_nvhe_handle___kvm_vcpu_run+0x30/0x48
+[  101.525468] kvm [377]:  [<ffff8000090a88b8>] __kvm_nvhe_handle_trap+0xc4/0x128
+[  101.525602] kvm [377]:  [<ffff8000090a7864>] __kvm_nvhe___host_exit+0x64/0x64
+[  101.525745] kvm [377]: ---[ end nVHE call trace ]---
+
+Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+---
+
+Changes in v6:
+  - Fix some typos in commit text and comments, per Fuad
+  - Remove kvm_nvhe_print_backtrace_entry(), per Oliver
+  - To make nVHE call trace delimiters consistent between protected and
+    non-protected mode, factor it out into helpers, per Oliver
+  - Change end delimiter to more match that of arm64 stacktrace
+    (---[ end nVHE call trace ]---), per Oliver
+
+Changes in v5:
+  - Move code out from nvhe.h header to handle_exit.c, per Marc
+  - Fix stacktrace symbolization when CONFIG_RAMDOMIZE_BASE is enabled,
+    per Fuad
+  - Use regular comments instead of doc comments, per Fuad
+
+ arch/arm64/include/asm/stacktrace/nvhe.h | 17 ++++++
+ arch/arm64/kvm/handle_exit.c             | 69 ++++++++++++++++++++++++
+ 2 files changed, 86 insertions(+)
+
+diff --git a/arch/arm64/include/asm/stacktrace/nvhe.h b/arch/arm64/include/asm/stacktrace/nvhe.h
+index 21082fd4a0b7..170fe7459f7c 100644
+--- a/arch/arm64/include/asm/stacktrace/nvhe.h
++++ b/arch/arm64/include/asm/stacktrace/nvhe.h
+@@ -16,6 +16,23 @@
+ 
+ #include <asm/stacktrace/common.h>
+ 
++/*
++ * kvm_nvhe_unwind_init - Start an unwind from the given nVHE HYP fp and pc
++ *
++ * @state : unwind_state to initialize
++ * @fp    : frame pointer at which to start the unwinding.
++ * @pc    : program counter at which to start the unwinding.
++ */
++static inline void kvm_nvhe_unwind_init(struct unwind_state *state,
++					unsigned long fp,
++					unsigned long pc)
++{
++	unwind_init_common(state, NULL);
++
++	state->fp = fp;
++	state->pc = pc;
++}
++
+ static inline bool on_hyp_stack(unsigned long sp, unsigned long size,
+ 				struct stack_info *info);
+ 
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index f66c0142b335..e83e6f735100 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -17,6 +17,7 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/debug-monitors.h>
++#include <asm/stacktrace/nvhe.h>
+ #include <asm/traps.h>
+ 
+ #include <kvm/arm_hypercalls.h>
+@@ -318,6 +319,71 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
+ 		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_esr(vcpu));
+ }
+ 
++/*
++ * kvm_nvhe_dump_backtrace_entry - Symbolize and print an nVHE backtrace entry
++ *
++ * @arg    : the hypervisor offset, used for address translation
++ * @where  : the program counter corresponding to the stack frame
++ */
++static bool kvm_nvhe_dump_backtrace_entry(void *arg, unsigned long where)
++{
++	unsigned long va_mask = GENMASK_ULL(vabits_actual - 1, 0);
++	unsigned long hyp_offset = (unsigned long)arg;
++
++	/* Mask tags and convert to kern addr */
++	where = (where & va_mask) + hyp_offset;
++	kvm_err(" [<%016lx>] %pB\n", where, (void *)(where + kaslr_offset()));
++
++	return true;
++}
++
++static inline void kvm_nvhe_dump_backtrace_start(void)
++{
++	kvm_err("nVHE call trace:\n");
++}
++
++static inline void kvm_nvhe_dump_backtrace_end(void)
++{
++	kvm_err("---[ end nVHE call trace ]---\n");
++}
++
++/*
++ * hyp_dump_backtrace - Dump the non-protected nVHE backtrace.
++ *
++ * @hyp_offset: hypervisor offset, used for address translation.
++ *
++ * The host can directly access HYP stack pages in non-protected
++ * mode, so the unwinding is done directly from EL1. This removes
++ * the need for shared buffers between host and hypervisor for
++ * the stacktrace.
++ */
++static void hyp_dump_backtrace(unsigned long hyp_offset)
++{
++	struct kvm_nvhe_stacktrace_info *stacktrace_info;
++	struct unwind_state state;
++
++	stacktrace_info = this_cpu_ptr_nvhe_sym(kvm_stacktrace_info);
++
++	kvm_nvhe_unwind_init(&state, stacktrace_info->fp, stacktrace_info->pc);
++
++	kvm_nvhe_dump_backtrace_start();
++	unwind(&state, kvm_nvhe_dump_backtrace_entry, (void *)hyp_offset);
++	kvm_nvhe_dump_backtrace_end();
++}
++
++/*
++ * kvm_nvhe_dump_backtrace - Dump KVM nVHE hypervisor backtrace.
++ *
++ * @hyp_offset: hypervisor offset, used for address translation.
++ */
++static void kvm_nvhe_dump_backtrace(unsigned long hyp_offset)
++{
++	if (is_protected_kvm_enabled())
++		return;
++	else
++		hyp_dump_backtrace(hyp_offset);
++}
++
+ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
+ 					      u64 elr_virt, u64 elr_phys,
+ 					      u64 par, uintptr_t vcpu,
+@@ -353,6 +419,9 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
+ 				(void *)panic_addr);
+ 	}
+ 
++	/* Dump the nVHE hypervisor backtrace */
++	kvm_nvhe_dump_backtrace(hyp_offset);
++
+ 	/*
+ 	 * Hyp has panicked and we're going to handle that by panicking the
+ 	 * kernel. The kernel offset will be revealed in the panic so we're
+-- 
+2.37.1.359.gd136c6c3e2-goog
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
