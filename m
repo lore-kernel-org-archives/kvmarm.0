@@ -2,64 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F60AC04A68
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Jul 2022 15:15:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36796C19F2B
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Jul 2022 15:56:54 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4F054C86C;
-	Wed, 27 Jul 2022 11:15:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93D674C900;
+	Wed, 27 Jul 2022 11:56:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BTTs7rH20iGQ; Wed, 27 Jul 2022 11:15:31 -0400 (EDT)
+	with ESMTP id wPnrXSd+QkyI; Wed, 27 Jul 2022 11:56:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 781EA4C870;
-	Wed, 27 Jul 2022 11:15:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F3484C8F5;
+	Wed, 27 Jul 2022 11:56:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BCFB94C866
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 11:15:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A5D4E4C8D3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 11:56:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yq7-how6evAv for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Jul 2022 11:15:29 -0400 (EDT)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 429564C86A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 11:15:29 -0400 (EDT)
-Date: Wed, 27 Jul 2022 15:15:24 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1658934927;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=eTFBBzy3zFLMXchXyWWwnL7LL8lRFXc0KZ1uZEaoQdc=;
- b=tGUEzhzFMPq6h1cj66qOQTSeQe+u8PgEf87LSBG21IVs74u2z6PFZtabf04Ikjc8fCfLDq
- S+9pYH8afSrzBFnjznkEjG2DBN8PKKaOJC6ZnMbTGdDe1Kyr3RcDNOgV6cOptGxFG3hI0m
- cUvnHOSNc9tFHlUi+j/qX5/3CUj36EM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: KVM/arm64: SPE: Translate VA to IPA on a stage 2 fault instead
- of pinning VM memory
-Message-ID: <YuFWjH0x+570kd/0@google.com>
-References: <Yl6+JWaP+mq2Nc0b@monolith.localdoman>
- <20220419141012.GB6143@willie-the-truck>
- <Yt5nFAscgrRGNGoH@monolith.localdoman>
- <YuApmZFdZzTi5ROu@google.com>
- <YuERKEjJh1qsZf8x@monolith.localdoman>
- <04dea801e298374fb783bf0760b15241@kernel.org>
- <YuEW/zEjnddcRFad@monolith.localdoman>
- <2d1f87576ce17b8c72bfac522e2aa101@kernel.org>
- <YuEoCw/EBceUv2c4@monolith.localdoman>
+ with ESMTP id pLduBmB8Dlly for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Jul 2022 11:56:50 -0400 (EDT)
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com
+ [209.85.221.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F3924C7F1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 11:56:50 -0400 (EDT)
+Received: by mail-wr1-f54.google.com with SMTP id j7so3162241wrh.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 08:56:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=R+iHvXmGgVaJk0aTh2lYJmpaG/4QQy4FTMp2abmiQFI=;
+ b=ou6drcieFoAL/2jVRHRvVPeGXUiZrIcxmlxj02X4BKD5PU9TSwkz5pldwQqFmKeq28
+ eSpeM8YdOdCwYCYQjPbCBCiULep9PWCMgm2bEKsLlP0o7m4kRO1BT5H3HWDmuBLBbrah
+ UP1y2wk3TbO9ap4H0rQtVvsxiyvc87i5GehoQAkgmH+l9YSRdFLM2BaaI9PmitoBT+x4
+ 9ihGde66eQDgfwbdvT7Jgiv86rHIPRC7VXlvzS3w4ZD6nCUgj+OkmDNirdiX8a0+11tq
+ PrL2RL7QVhmD/hi/cVS09E78jmRv/Zl/dQ12esYwyhLqT7+0jnanJx2d2cZTKB5ClqMT
+ W1kA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=R+iHvXmGgVaJk0aTh2lYJmpaG/4QQy4FTMp2abmiQFI=;
+ b=UbYbtEzbmqj3xtDd5tC4pZa/GKO3seNxG0ZHc+PWXgCQKNZ3fUO2fIq33QcIe2Mmdz
+ eUx61j8Br5BYS9QGVGJGqDBRUu7e2/nOkzEIX3On/mJITqsHcfrOoKhWSmBrVv1zU6Ay
+ sZ09EFwelL0F1rnp+WxrxLPLzKCyS0CBz6Z3MVObV1dB4tmRygBIeNZA+9OK+cNeSOuz
+ C/MMG4iI++RF65gpFwxiKmUja7o5h8M3Yu09KIcaX2mMrzLbuOizLTPfv4oPAaIdh9p5
+ NgkcDfhe/A/LJBMPUMYA5zP103bu+VilcXq0MExGdTfamieufbzBOxmfghihGaIlnshC
+ t4kQ==
+X-Gm-Message-State: AJIora9Dj5x3tWvn0w4HhDNEo7Xjr2aV1gyVy4bsjtq5Z7TFB2VAHL1R
+ bEvOFU1GKXMZuJiH3l0sUOSnTMI38H8UL+1XA/PJkA==
+X-Google-Smtp-Source: AGRyM1stHHn7Piw8GeQ+7b5ehtj7eu1dtqVUc5aek0kwLB+Q7n1iOV/shAexJBJLvMhuZfljNNCjn5b56S32LIlqvvM=
+X-Received: by 2002:a05:6000:508:b0:21d:4105:caf9 with SMTP id
+ a8-20020a056000050800b0021d4105caf9mr15132968wrf.699.1658937408834; Wed, 27
+ Jul 2022 08:56:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YuEoCw/EBceUv2c4@monolith.localdoman>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <20220726073750.3219117-18-kaleshsingh@google.com>
+ <20220727142906.1856759-1-maz@kernel.org>
+In-Reply-To: <20220727142906.1856759-1-maz@kernel.org>
+From: Kalesh Singh <kaleshsingh@google.com>
+Date: Wed, 27 Jul 2022 08:56:37 -0700
+Message-ID: <CAC_TJvc6TPin-B-pQ7g-doMUUH5Eywo5GF5crGBmWoD=G2yBxA@mail.gmail.com>
+Subject: Re: [PATCH 0/6] KVM: arm64: nVHE stack unwinder rework
+To: Marc Zyngier <maz@kernel.org>
+Cc: Kefeng Wang <wangkefeng.wang@huawei.com>, kvm@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
+ vincenzo.frascino@arm.com, kvmarm <kvmarm@lists.cs.columbia.edu>,
+ "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+ "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
+ <linux-arm-kernel@lists.infradead.org>,
+ "Cc: Android Kernel" <kernel-team@android.com>, Marco Elver <elver@google.com>,
+ Mark Brown <broonie@kernel.org>, andreyknvl@gmail.com,
+ Masami Hiramatsu <mhiramat@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,99 +90,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jul 27, 2022 at 12:57:16PM +0100, Alexandru Elisei wrote:
-> Hi,
-> 
-> On Wed, Jul 27, 2022 at 12:08:11PM +0100, Marc Zyngier wrote:
-> > On 2022-07-27 11:44, Alexandru Elisei wrote:
-> > > On Wed, Jul 27, 2022 at 11:29:03AM +0100, Marc Zyngier wrote:
-> > > > On 2022-07-27 11:19, Alexandru Elisei wrote:
-> > > > > Hi Oliver,
-> > > > >
-> > > > > Thank you for the help, replies below.
-> > > > >
-> > > > > On Tue, Jul 26, 2022 at 10:51:21AM -0700, Oliver Upton wrote:
-> > > > > > Hi Alex,
-> > > > > >
-> > > > > > On Mon, Jul 25, 2022 at 11:06:24AM +0100, Alexandru Elisei wrote:
-> > > > > >
-> > > > > > [...]
-> > > > > >
-> > > > > > > > A funkier approach might be to defer pinning of the buffer until the SPE is
-> > > > > > > > enabled and avoid pinning all of VM memory that way, although I can't
-> > > > > > > > immediately tell how flexible the architecture is in allowing you to cache
-> > > > > > > > the base/limit values.
-> > > > > > >
-> > > > > > > I was investigating this approach, and Mark raised a concern that I think
-> > > > > > > might be a showstopper.
-> > > > > > >
-> > > > > > > Let's consider this scenario:
-> > > > > > >
-> > > > > > > Initial conditions: guest at EL1, profiling disabled (PMBLIMITR_EL1.E = 0,
-> > > > > > > PMBSR_EL1.S = 0, PMSCR_EL1.{E0SPE,E1SPE} = {0,0}).
-> > > > > > >
-> > > > > > > 1. Guest programs the buffer and enables it (PMBLIMITR_EL1.E = 1).
-> > > > > > > 2. Guest programs SPE to enable profiling at **EL0**
-> > > > > > > (PMSCR_EL1.{E0SPE,E1SPE} = {1,0}).
-> > > > > > > 3. Guest changes the translation table entries for the buffer. The
-> > > > > > > architecture allows this.
-> > > > > > > 4. Guest does an ERET to EL0, thus enabling profiling.
-> > > > > > >
-> > > > > > > Since KVM cannot trap the ERET to EL0, it will be impossible for KVM to pin
-> > > > > > > the buffer at stage 2 when profiling gets enabled at EL0.
-> > > > > >
-> > > > > > Not saying we necessarily should, but this is possible with FGT no?
-> > > > >
-> > > > > It doesn't look to me like FEAT_FGT offers any knobs to trap ERET from
-> > > > > EL1.
-> > > > 
-> > > > See HFGITR.ERET.
-> > > 
-> > > Ah, so that's the register, thanks!
-> > > 
-> > > I stil am not sure that having FEAT_SPE, an Armv8.3 extension, depend on
-> > > FEAT_FGT, an Armv8.6 extension, is the best idea. Do you know of any
-> > > machines
-> > > that have FEAT_SPE and FEAT_FGT?
-> > 
-> > None. Both are pretty niche, and the combination is nowhere
-> > to be seen at the moment.
-> 
-> That was also my impression.
-> 
-> > 
-> > > On the plus side, KVM could enable the trap only in the case above, and
-> > > disable
-> > > it after the ERET is trapped, so it should be relatively cheap to use.
-> > 
-> > This feels pretty horrible. Nothing says *when* will EL1
-> > alter the PTs. It could take tons of EL1->EL1 exceptions
-> > before returning to EL0. And the change could happen after
-> > an EL1->EL0->EL1 transition. At which point do you stop?
-> 
-> ERET trapping is enabled When PMBLIMITR_EL1.E = 1, PMSCR_EL1.{E0SPE,E1SPE}
-> = {1,0}. The first guest ERET from EL1 to EL0 enables profiling, at which
-> point the buffer is pinned and ERET trapping is disabled.
-> 
-> Guest messing with the translation tables while profiling is enabled is the
-> guest's problem because that's not permitted by the architecture. Any stage
-> 2 dabt taken when the buffer is pinned would be injected back into the
-> guest as an SPE external abort (or something equivalent). Stage 1 dabts are
-> entirely the guest's problem to solve and would be injected back regardless
-> of the status of the buffer.
-> 
-> Yes, I agree, there could be a lot of ERETs from EL1 to EL1 before the ERET
-> to EL0; those ERETs would be uselessly trapped.
-> 
-> The above is a moot point anyway, because I believe we both agree that
-> having SPE emulation depend on FEAT_FGT is best to be avoided.
+On Wed, Jul 27, 2022 at 7:29 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi all,
+>
+> As Kalesh's series[1] already went through quite a few rounds and that
+> it has proved to be an extremely useful debugging help, I'd like to
+> queue it for 5.20.
+>
+> However, there is a couple of nits that I'd like to address:
+>
+> - the code is extremely hard to follow, due to the include maze and
+>   the various levels of inline functions that have forward
+>   declarations...
+>
+> - there is a subtle bug in the way the kernel on_accessible_stack()
+>   helper has been rewritten
+>
+> - the config symbol for the protected unwinder is oddly placed
 
-LOL, I probably shouldn't have even mentioned it :) Completely agree
-with you both, trapping ERET is bordering on mad.
+Hi Marc,
 
---
+Thanks for doing this rework.
+
+For the series:
+Reviewed-by: Kalesh Singh <kaleshsingh@google.com>
+Tested-by: Kalesh Singh <kaleshsingh@google.com>
+
 Thanks,
-Oliver
+Kalesh
+
+>
+> Instead of going for another round and missing the merge window, I
+> propose to stash the following patches on top, which IMHO result in
+> something much more readable.
+>
+> This series directly applies on top of Kalesh's.
+>
+> [1] https://lore.kernel.org/r/20220726073750.3219117-1-kaleshsingh@google.com
+>
+> Marc Zyngier (5):
+>   KVM: arm64: Move PROTECTED_NVHE_STACKTRACE around
+>   KVM: arm64: Move nVHE stacktrace unwinding into its own compilation
+>     unit
+>   KVM: arm64: Make unwind()/on_accessible_stack() per-unwinder functions
+>   KVM: arm64: Move nVHE-only helpers into kvm/stacktrace.c
+>   arm64: Update 'unwinder howto'
+>
+> Oliver Upton (1):
+>   KVM: arm64: Don't open code ARRAY_SIZE()
+>
+>  arch/arm64/include/asm/stacktrace.h        |  74 -------
+>  arch/arm64/include/asm/stacktrace/common.h |  69 ++-----
+>  arch/arm64/include/asm/stacktrace/nvhe.h   | 125 +-----------
+>  arch/arm64/kernel/stacktrace.c             |  90 +++++++++
+>  arch/arm64/kvm/Kconfig                     |  24 ++-
+>  arch/arm64/kvm/Makefile                    |   2 +-
+>  arch/arm64/kvm/handle_exit.c               |  98 ---------
+>  arch/arm64/kvm/hyp/nvhe/stacktrace.c       |  55 +++++-
+>  arch/arm64/kvm/stacktrace.c                | 218 +++++++++++++++++++++
+>  9 files changed, 394 insertions(+), 361 deletions(-)
+>  create mode 100644 arch/arm64/kvm/stacktrace.c
+>
+> --
+> 2.34.1
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
