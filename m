@@ -2,80 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D2BC04A68
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Jul 2022 17:45:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54510C04A68
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Jul 2022 17:45:19 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B7F604CA22;
-	Wed, 27 Jul 2022 13:45:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1B414CA01;
+	Wed, 27 Jul 2022 13:45:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2mvXefICm9fo; Wed, 27 Jul 2022 13:45:01 -0400 (EDT)
+	with ESMTP id dPXhSVPBucYh; Wed, 27 Jul 2022 13:45:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 941914CA24;
-	Wed, 27 Jul 2022 13:45:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C9A424CA1F;
+	Wed, 27 Jul 2022 13:45:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 271444CA1F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 13:45:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ADF204CA00
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 13:45:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id j0JedYZZfduf for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Jul 2022 13:44:59 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B3DB44CA21
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 13:44:59 -0400 (EDT)
+ with ESMTP id WlW8+-8t0inP for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Jul 2022 13:45:15 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C5AB4C9FD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 13:45:15 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id B9FBA61884;
- Wed, 27 Jul 2022 17:44:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81A19C433C1;
- Wed, 27 Jul 2022 17:44:58 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id F0807B821F3;
+ Wed, 27 Jul 2022 17:45:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94A45C433C1;
+ Wed, 27 Jul 2022 17:45:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1658943898;
- bh=AWPi2RklWEjJYdEzBQpvRo0y/4ESXyMm2zfHiG6ND9g=;
+ s=k20201202; t=1658943912;
+ bh=cUE9CRxllo0mAyhfZj87hNPzjkFEW5l5CpfwcwuijM4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=etgrUijw96ihMWnWUPv3FzrcFwxEpRCLr+oOGWV72DLbEwxwtQoDFJM2MeWFySaPz
- VOKAb1tMManT0QS58XVOGXyj9H0HwmLcEWPFE0ZEhzvjaSYj+yuU0h6DIGWD/wdTUY
- QohUfPXgUiTr4YYnUsJ8JZ6f0CDJkba73puBdNfNaYBF3QRpvNbQ6SULjYluTHjVw9
- PCOgvcY43jreB4bOKDQRGIRcGzD0xcub70nrEW6QcXwulyfR8oghe+BEMQs3fZM9rz
- GupPSX/fAsMDZKY6sD2oyk3LG3L7A//Q4t8iqRIM5W+iXv/s8UU2Oo7/u9gXWVVYmJ
- 97ORi+2uluY0Q==
+ b=t+2d+BDDNIP45fdghekyfrC4W9j//nbaPkr0uJNp/ScxjFUg4izLnUKlagQHBJ1el
+ Y9pSTvw3Gbi/dtrq6UxluR8oj3IimTJWe6p155MFOtx5pepq13yTti22fuAQVR8AIK
+ uPbBt0UO5m/6Vcl5zDqXX1q7Nq899+LsyZKFLcKY58AlNFRk752midVvrwUttjbamM
+ VuW4wb1F/0KQ1dXRpNqRgQsAUSkgeI2T5mCFOm5YcDQzJSWytI18H2lX7VVWX4NUUE
+ Vr9Rp/RURneTSMVv3ou5eq0id/EGm6eo8GyIbiWxlW9zAyvvYsmiaR5tUMWNHQpzvl
+ XVpyysylvnRkw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oGl5c-00ATqn-6O;
- Wed, 27 Jul 2022 18:44:56 +0100
+ (envelope-from <maz@kernel.org>) id 1oGl5q-00ATrj-1O;
+ Wed, 27 Jul 2022 18:45:10 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: tabba@google.com, oliver.upton@linux.dev, broonie@kernel.org,
- Kalesh Singh <kaleshsingh@google.com>, mark.rutland@arm.com,
- madvenka@linux.microsoft.com
-Subject: Re: [PATCH v6 00/17] KVM nVHE Hypervisor stack unwinder
-Date: Wed, 27 Jul 2022 18:44:53 +0100
-Message-Id: <165894387426.1300284.3994289980983137161.b4-ty@kernel.org>
+To: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 0/6] KVM: arm64: nVHE stack unwinder rework
+Date: Wed, 27 Jul 2022 18:45:05 +0100
+Message-Id: <165894387426.1300284.16409854849904872790.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220726073750.3219117-1-kaleshsingh@google.com>
-References: <20220726073750.3219117-1-kaleshsingh@google.com>
+In-Reply-To: <20220727142906.1856759-1-maz@kernel.org>
+References: <20220726073750.3219117-18-kaleshsingh@google.com>
+ <20220727142906.1856759-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, oliver.upton@linux.dev, broonie@kernel.org,
- kaleshsingh@google.com, mark.rutland@arm.com, madvenka@linux.microsoft.com,
- andreyknvl@gmail.com, kvmarm@lists.cs.columbia.edu, will@kernel.org,
- wangkefeng.wang@huawei.com, catalin.marinas@arm.com, vincenzo.frascino@arm.com,
- ast@kernel.org, kernel-team@android.com, elver@google.com, mhiramat@kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- android-mm@google.com
+X-SA-Exim-Rcpt-To: maz@kernel.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ keirf@google.com, kaleshsingh@google.com, catalin.marinas@arm.com,
+ broonie@kernel.org, madvenka@linux.microsoft.com, qperret@google.com,
+ wangkefeng.wang@huawei.com, tabba@google.com, ast@kernel.org,
+ vincenzo.frascino@arm.com, elver@google.com, mark.rutland@arm.com,
+ mhiramat@kernel.org, oupton@google.com, james.morse@arm.com,
+ oliver.upton@linux.dev, suzuki.poulose@arm.com, kernel-team@android.com,
+ alexandru.elisei@arm.com, ardb@kernel.org, andreyknvl@gmail.com,
+ yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: android-mm@google.com, wangkefeng.wang@huawei.com, kernel-team@android.com,
- catalin.marinas@arm.com, elver@google.com, ast@kernel.org,
- linux-kernel@vger.kernel.org, mhiramat@kernel.org, vincenzo.frascino@arm.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, andreyknvl@gmail.com
+Cc: wangkefeng.wang@huawei.com, catalin.marinas@arm.com, ast@kernel.org,
+ vincenzo.frascino@arm.com, madvenka@linux.microsoft.com,
+ kernel-team@android.com, elver@google.com, broonie@kernel.org,
+ andreyknvl@gmail.com, mhiramat@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,55 +94,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 26 Jul 2022 00:37:33 -0700, Kalesh Singh wrote:
-> This is v6 of nVHE stacktrace support. The series is based on
-> arm64 for-next/stacktrace.
+On Wed, 27 Jul 2022 15:29:00 +0100, Marc Zyngier wrote:
+> As Kalesh's series[1] already went through quite a few rounds and that
+> it has proved to be an extremely useful debugging help, I'd like to
+> queue it for 5.20.
 > 
-> The previous versions were posted at:
-> v5: https://lore.kernel.org/r/20220721055728.718573-1-kaleshsingh@google.com/
-> v4: https://lore.kernel.org/r/20220715061027.1612149-1-kaleshsingh@google.com/
-> v3: https://lore.kernel.org/r/20220607165105.639716-1-kaleshsingh@google.com/
-> v2: https://lore.kernel.org/r/20220502191222.4192768-1-kaleshsingh@google.com/
-> v1: https://lore.kernel.org/r/20220427184716.1949239-1-kaleshsingh@google.com/
+> However, there is a couple of nits that I'd like to address:
+> 
+> - the code is extremely hard to follow, due to the include maze and
+>   the various levels of inline functions that have forward
+>   declarations...
 > 
 > [...]
 
 Applied to next, thanks!
 
-[01/17] arm64: stacktrace: Add shared header for common stack unwinding code
-        commit: 6bf212c89c48458d8deef1c973678c62528dab04
-[02/17] arm64: stacktrace: Factor out on_accessible_stack_common()
-        commit: 15a59f19a015185bff90a68f601caec151dea4b4
-[03/17] arm64: stacktrace: Factor out unwind_next_common()
-        commit: be63c647fd28d25484257f5f36a008db7d99991d
-[04/17] arm64: stacktrace: Handle frame pointer from different address spaces
-        commit: 5b1b08619f50422c3e43d1fd7af257595a9e4a67
-[05/17] arm64: stacktrace: Factor out common unwind()
-        commit: f51e7146740514347d6c5526a2c393e224a19c0d
-[06/17] arm64: stacktrace: Add description of stacktrace/common.h
-        commit: 051ece6758cc10c2a6f1700ffe86d23fbb0b2553
-[07/17] KVM: arm64: On stack overflow switch to hyp overflow_stack
-        commit: 548ec3336f323db56260b312c232ab37285f0284
-[08/17] KVM: arm64: Stub implementation of non-protected nVHE HYP stack unwinder
-        commit: 573e1e8275f7167ddd533c6e4e0f500f8be4d974
-[09/17] KVM: arm64: Prepare non-protected nVHE hypervisor stacktrace
-        commit: 879e5ac7b2e4db05799a905b5a07fc9e5dedf651
-[10/17] KVM: arm64: Implement non-protected nVHE hyp stack unwinder
-        commit: db129d486ebdf4e3168282236f9d9008b42cac7e
-[11/17] KVM: arm64: Introduce hyp_dump_backtrace()
-        commit: 314a61dc31845c233e47c53db3fe6f34284034f4
-[12/17] KVM: arm64: Add PROTECTED_NVHE_STACKTRACE Kconfig
-        commit: 72adac1bd234002a65cef738e0eebfd6c2ce2e30
-[13/17] KVM: arm64: Allocate shared pKVM hyp stacktrace buffers
-        commit: 6928bcc84bc4bd9a24a1cb1986418c3de76e1d99
-[14/17] KVM: arm64: Stub implementation of pKVM HYP stack unwinder
-        commit: 25aa73b6db1831527cd4f14bf0ddf8dceadec802
-[15/17] KVM: arm64: Save protected-nVHE (pKVM) hyp stacktrace
-        commit: 871c5d931417d3c0e1aa32c9e04da1dc74703843
-[16/17] KVM: arm64: Implement protected nVHE hyp stack unwinder
-        commit: 75e9459e48d4867caf549e388bd4faabe1dbcbd3
-[17/17] KVM: arm64: Introduce pkvm_dump_backtrace()
-        commit: 3a7e1b55aad45c0cf86bd4e2f212bb9a61905142
+[1/6] KVM: arm64: Move PROTECTED_NVHE_STACKTRACE around
+      commit: 03fe9cd05b9f38353208c23bd791dac47c912054
+[2/6] KVM: arm64: Move nVHE stacktrace unwinding into its own compilation unit
+      commit: 9f5fee05f6897d0fe0e3a44ade71bb85cd97b2ef
+[3/6] KVM: arm64: Make unwind()/on_accessible_stack() per-unwinder functions
+      commit: 4e00532f37365967e9896966b1fe61888e659259
+[4/6] KVM: arm64: Move nVHE-only helpers into kvm/stacktrace.c
+      commit: 0e773da1e688a1425ef7deae58fa11c5c7e09533
+[5/6] KVM: arm64: Don't open code ARRAY_SIZE()
+      commit: 62ae21627aa96f6ef361981dd181c74dc7aa314c
+[6/6] arm64: Update 'unwinder howto'
+      commit: a4c750e2328a117dc9b19a2a61db0d4347902029
 
 Cheers,
 
