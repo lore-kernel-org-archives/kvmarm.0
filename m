@@ -2,64 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C61FEC04A68
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Jul 2022 09:31:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A085C04A68
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Jul 2022 09:52:43 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27F204C1AF;
-	Wed, 27 Jul 2022 05:31:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBFC24C213;
+	Wed, 27 Jul 2022 05:52:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YEuFxhN7EYqt; Wed, 27 Jul 2022 05:31:07 -0400 (EDT)
+	with ESMTP id LoC6lJwXM6tG; Wed, 27 Jul 2022 05:52:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A325D4C1AA;
-	Wed, 27 Jul 2022 05:31:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C76CD4C20B;
+	Wed, 27 Jul 2022 05:52:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D19D64C1A4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 05:31:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E7EC4C209
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 05:52:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kfuGcGqXMwIQ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Jul 2022 05:31:05 -0400 (EDT)
+ with ESMTP id ud1csTqORU6L for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Jul 2022 05:52:39 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 468A74C1A2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 05:31:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 730FE4C207
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 05:52:39 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 8947CB81FE6;
- Wed, 27 Jul 2022 09:31:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31881C433D7;
- Wed, 27 Jul 2022 09:31:02 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 2AD2DB82002;
+ Wed, 27 Jul 2022 09:52:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5E51C433C1;
+ Wed, 27 Jul 2022 09:52:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1658914262;
- bh=PkHb1DM8vXvpVLmvJSlFXsUnPp4eGuwbj7RNz0C00xI=;
+ s=k20201202; t=1658915556;
+ bh=WlfdeBH2nRApJqfKrf6htjEeKQ/nfMxGUy6uucXQpZI=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=doijYuP3YnxugBGemLPsVBkb2Q/396gZvBgNBzk8iN/7uG81SUBYeuG3ZwljVA8Yo
- EyIzL9dllNl828IkPWhrVz03hW5T9ZcHeye08AS4/A1gvAE7Rnd9KFciMMg9ouCUAO
- Tl6f+B8UL6R3/naX+fDuv2/+oZhC4i/COBMGncZ0T4mxTRIzVKEGem3Mp8Km4/zl6a
- TFOCCG+baiRU2DuwHs6Le7Z1GpN97kPttgx1F2dj5IotDZEqPlfk9y5QzGCJ8azz/D
- NCvDarM/BkSeXMk0w3+Nx70uHWgPZgfyXbcCvoKZLGH0ppgvacPGWV+vl5Ze8iZlZ7
- H2RjBortEvIow==
+ b=QCaIcrQdhtgsZq+W5Tc1IDvIb7BdSb4E+34f2HkhM7FKY6msZ9jGo3XMf6+usWCVE
+ ThN4dnB7OqXbdOS+ljvcsn4opxTti46bcjxZqKGWiIIfDZFYWGrfW5kIK1yLaY0foo
+ Heg6QvdEhTff9oHSHk/q+CM4XAS2o11cqt0A+4lHqlaxCq21eqD4x07xj1F1uvnF5F
+ SBA5wpiHZ8QMA8prJR+Dp/4vWiD7HkVz3TwxvQPUVn9s2S3cc1F18m7WoHNMjA/UDg
+ J6DwAPXoR5e/mMDkIRsPn6T5/aIDjD8jfyE7tGLmHQiZ6BC/6csuYKDwH1i6ch6rjw
+ KrdC99paHddOg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oGdNb-00AMQV-VK;
- Wed, 27 Jul 2022 10:31:00 +0100
-Date: Wed, 27 Jul 2022 10:30:59 +0100
-Message-ID: <875yjiyka4.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oGdiU-00AMhP-Ps;
+ Wed, 27 Jul 2022 10:52:34 +0100
+Date: Wed, 27 Jul 2022 10:52:34 +0100
+Message-ID: <874jz2yja5.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Subject: Re: KVM/arm64: SPE: Translate VA to IPA on a stage 2 fault instead of
  pinning VM memory
-In-Reply-To: <YuApmZFdZzTi5ROu@google.com>
+In-Reply-To: <875yjiyka4.wl-maz@kernel.org>
 References: <Yl6+JWaP+mq2Nc0b@monolith.localdoman>
  <20220419141012.GB6143@willie-the-truck>
  <Yt5nFAscgrRGNGoH@monolith.localdoman>
- <YuApmZFdZzTi5ROu@google.com>
+ <YuApmZFdZzTi5ROu@google.com> <875yjiyka4.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -89,119 +89,29 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 26 Jul 2022 18:51:21 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Wed, 27 Jul 2022 10:30:59 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> Hi Alex,
-> 
-> On Mon, Jul 25, 2022 at 11:06:24AM +0100, Alexandru Elisei wrote:
-> 
-> [...]
-> 
-> > > A funkier approach might be to defer pinning of the buffer until the SPE is
-> > > enabled and avoid pinning all of VM memory that way, although I can't
-> > > immediately tell how flexible the architecture is in allowing you to cache
-> > > the base/limit values.
+> On Tue, 26 Jul 2022 18:51:21 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
 > > 
-> > I was investigating this approach, and Mark raised a concern that I think
-> > might be a showstopper.
-> > 
-> > Let's consider this scenario:
-> > 
-> > Initial conditions: guest at EL1, profiling disabled (PMBLIMITR_EL1.E = 0,
-> > PMBSR_EL1.S = 0, PMSCR_EL1.{E0SPE,E1SPE} = {0,0}).
-> > 
-> > 1. Guest programs the buffer and enables it (PMBLIMITR_EL1.E = 1).
-> > 2. Guest programs SPE to enable profiling at **EL0**
-> > (PMSCR_EL1.{E0SPE,E1SPE} = {1,0}).
-> > 3. Guest changes the translation table entries for the buffer. The
-> > architecture allows this.
-> > 4. Guest does an ERET to EL0, thus enabling profiling.
-> > 
-> > Since KVM cannot trap the ERET to EL0, it will be impossible for KVM to pin
-> > the buffer at stage 2 when profiling gets enabled at EL0.
-> 
-> Not saying we necessarily should, but this is possible with FGT no?
+> > Doesn't pinning the buffer also imply pinning the stage 1 tables
+> > responsible for its translation as well? I agree that pinning the buffer
+> > is likely the best way forward as pinning the whole of guest memory is
+> > entirely impractical.
 
-Given how often ERET is used at EL1, I'd really refrain from doing
-so. NV uses the same mechanism to multiplex vEL2 and vEL1 on the real
-EL1, and this comes at a serious cost (even an exception return that
-stays at the same EL gets trapped). Once EL1 runs, we disengage this
-trap because it is otherwise way too costly.
+Huh, I just realised that you were talking about S1. I don't think we
+need to do this. As long as the translation falls into a mapped
+region (pinned or not), we don't need to worry.
 
->
-> > I can see two solutions here:
-> > 
-> > a. Accept the limitation (and advertise it in the documentation) that if
-> > someone wants to use SPE when running as a Linux guest, the kernel used by
-> > the guest must not change the buffer translation table entries after the
-> > buffer has been enabled (PMBLIMITR_EL1.E = 1). Linux already does that, so
-> > running a Linux guest should not be a problem. I don't know how other OSes
-> > do it (but I can find out). We could also phrase it that the buffer
-> > translation table entries can be changed after enabling the buffer, but
-> > only if profiling happens at EL1. But that sounds very arbitrary.
-> > 
-> > b. Pin the buffer after the stage 2 DABT that SPE will report in the
-> > situation above. This means that there is a blackout window, but will
-> > happen only once after each time the guest reprograms the buffer. I don't
-> > know if this is acceptable. We could say that this if this blackout window
-> > is not acceptable, then the guest kernel shouldn't change the translation
-> > table entries after enabling the buffer.
-> > 
-> > Or drop the approach of pinning the buffer and go back to pinning the
-> > entire memory of the VM.
-> > 
-> > Any thoughts on this? I would very much prefer to try to pin only the
-> > buffer.
-> 
-> Doesn't pinning the buffer also imply pinning the stage 1 tables
-> responsible for its translation as well? I agree that pinning the buffer
-> is likely the best way forward as pinning the whole of guest memory is
-> entirely impractical.
+If we get a S2 translation fault from SPE, we just go and map it. And
+TBH the pinning here is just a optimisation against things like swap,
+KSM and similar things. The only thing we need to make sure is that
+the fault is handled in the context of the vcpu that owns this SPU.
 
-How different is this from device assignment, which also relies on
-full page pinning? The way I look at it, SPE is a device directly
-assigned to the guest, and isn't capable of generating synchronous
-exception. Not that I'm madly in love with the approach, but this is
-at least consistent. There was also some concerns around buggy HW that
-would blow itself up on S2 faults, but I think these implementations
-are confidential enough that we don't need to worry about them.
-
-> I'm also a bit confused on how we would manage to un-pin memory on the
-> way out with this. The guest is free to muck with the stage 1 and could
-> cause the SPU to spew a bunch of stage 2 aborts if it wanted to be
-> annoying. One way to tackle it would be to only allow a single
-> root-to-target walk to be pinned by a vCPU at a time. Any time a new
-> stage 2 abort comes from the SPU, we un-pin the old walk and pin the new
-> one instead.
-
-This sounds like a reasonable option. Only one IPA range covering the
-SPE buffer (as described by the translation of PMBPTR_EL1) is pinned
-at any given time. Generate a SPE S2 fault outside of this range, and
-we unpin the region before mapping in the next one. Yes, the guest can
-play tricks on us and exploit the latency of the interrupt. But at the
-end of the day, this is its own problem.
-
-Of course, this results in larger blind windows. Ideally, we should be
-able to report these to the guest, either as sideband data or in the
-actual profiling buffer (but I have no idea whether this is possible).
-
-> Live migration also throws a wrench in this. IOW, there are still potential
-> sources of blackout unattributable to guest manipulation of the SPU.
-
-Can you chime some light on this? I appreciate that you can't play the
-R/O trick on the SPE buffer as it invalidates the above discussion,
-but it should be relatively easy to track these pages and never reset
-them as clean until the vcpu is stopped. Unless you foresee other
-issues?
-
-To be clear, I don't worry too much about these blind windows. The
-architecture doesn't really give us the right tools to make it work
-reliably, making this a best effort only. Unless we pin the whole
-guest and forego migration and other fault-driven mechanisms.
-
-Maybe that is a choice we need to give to the user: cheap, fast,
-reliable. Pick two.
+Alex, can you think of anything that would cause a problem (other than
+performance and possible blackout windows) if we didn't do any pinning
+at all and just handled the SPE interrupts as normal page faults?
 
 Thanks,
 
