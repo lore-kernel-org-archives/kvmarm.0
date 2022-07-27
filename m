@@ -2,49 +2,50 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70202C04A68
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Jul 2022 10:38:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB8B4C04A68
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Jul 2022 10:43:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB2A74C354;
-	Wed, 27 Jul 2022 06:38:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F3634BB41;
+	Wed, 27 Jul 2022 06:43:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gIxY8FnKTRJZ; Wed, 27 Jul 2022 06:38:22 -0400 (EDT)
+	with ESMTP id fpi-01szQ+Qe; Wed, 27 Jul 2022 06:43:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93C304C339;
-	Wed, 27 Jul 2022 06:38:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E15F24C366;
+	Wed, 27 Jul 2022 06:43:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A01814C339
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 06:38:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E2FC4C2EC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 06:43:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XaCbMpHTLslY for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Jul 2022 06:38:19 -0400 (EDT)
+ with ESMTP id 8spYQgvpW+g7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Jul 2022 06:43:36 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C88A4C336
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 06:38:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A23CB4C23E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 06:43:36 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 03925D6E;
- Wed, 27 Jul 2022 03:38:19 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8ADA215BF;
+ Wed, 27 Jul 2022 03:43:36 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 67E743F70D;
- Wed, 27 Jul 2022 03:38:17 -0700 (PDT)
-Date: Wed, 27 Jul 2022 11:38:53 +0100
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EE9C93F70D;
+ Wed, 27 Jul 2022 03:43:34 -0700 (PDT)
+Date: Wed, 27 Jul 2022 11:44:15 +0100
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: Marc Zyngier <maz@kernel.org>
 Subject: Re: KVM/arm64: SPE: Translate VA to IPA on a stage 2 fault instead
  of pinning VM memory
-Message-ID: <YuEVq8Au7YsDLOdI@monolith.localdoman>
+Message-ID: <YuEW/zEjnddcRFad@monolith.localdoman>
 References: <Yl6+JWaP+mq2Nc0b@monolith.localdoman>
  <20220419141012.GB6143@willie-the-truck>
  <Yt5nFAscgrRGNGoH@monolith.localdoman>
- <YuApmZFdZzTi5ROu@google.com> <875yjiyka4.wl-maz@kernel.org>
- <874jz2yja5.wl-maz@kernel.org>
+ <YuApmZFdZzTi5ROu@google.com>
+ <YuERKEjJh1qsZf8x@monolith.localdoman>
+ <04dea801e298374fb783bf0760b15241@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <874jz2yja5.wl-maz@kernel.org>
+In-Reply-To: <04dea801e298374fb783bf0760b15241@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -63,60 +64,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On Wed, Jul 27, 2022 at 10:52:34AM +0100, Marc Zyngier wrote:
-> On Wed, 27 Jul 2022 10:30:59 +0100,
-> Marc Zyngier <maz@kernel.org> wrote:
+On Wed, Jul 27, 2022 at 11:29:03AM +0100, Marc Zyngier wrote:
+> On 2022-07-27 11:19, Alexandru Elisei wrote:
+> > Hi Oliver,
 > > 
-> > On Tue, 26 Jul 2022 18:51:21 +0100,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > Thank you for the help, replies below.
+> > 
+> > On Tue, Jul 26, 2022 at 10:51:21AM -0700, Oliver Upton wrote:
+> > > Hi Alex,
 > > > 
-> > > Doesn't pinning the buffer also imply pinning the stage 1 tables
-> > > responsible for its translation as well? I agree that pinning the buffer
-> > > is likely the best way forward as pinning the whole of guest memory is
-> > > entirely impractical.
+> > > On Mon, Jul 25, 2022 at 11:06:24AM +0100, Alexandru Elisei wrote:
+> > > 
+> > > [...]
+> > > 
+> > > > > A funkier approach might be to defer pinning of the buffer until the SPE is
+> > > > > enabled and avoid pinning all of VM memory that way, although I can't
+> > > > > immediately tell how flexible the architecture is in allowing you to cache
+> > > > > the base/limit values.
+> > > >
+> > > > I was investigating this approach, and Mark raised a concern that I think
+> > > > might be a showstopper.
+> > > >
+> > > > Let's consider this scenario:
+> > > >
+> > > > Initial conditions: guest at EL1, profiling disabled (PMBLIMITR_EL1.E = 0,
+> > > > PMBSR_EL1.S = 0, PMSCR_EL1.{E0SPE,E1SPE} = {0,0}).
+> > > >
+> > > > 1. Guest programs the buffer and enables it (PMBLIMITR_EL1.E = 1).
+> > > > 2. Guest programs SPE to enable profiling at **EL0**
+> > > > (PMSCR_EL1.{E0SPE,E1SPE} = {1,0}).
+> > > > 3. Guest changes the translation table entries for the buffer. The
+> > > > architecture allows this.
+> > > > 4. Guest does an ERET to EL0, thus enabling profiling.
+> > > >
+> > > > Since KVM cannot trap the ERET to EL0, it will be impossible for KVM to pin
+> > > > the buffer at stage 2 when profiling gets enabled at EL0.
+> > > 
+> > > Not saying we necessarily should, but this is possible with FGT no?
+> > 
+> > It doesn't look to me like FEAT_FGT offers any knobs to trap ERET from
+> > EL1.
 > 
-> Huh, I just realised that you were talking about S1. I don't think we
-> need to do this. As long as the translation falls into a mapped
-> region (pinned or not), we don't need to worry.
-> 
-> If we get a S2 translation fault from SPE, we just go and map it. And
-> TBH the pinning here is just a optimisation against things like swap,
-> KSM and similar things. The only thing we need to make sure is that
-> the fault is handled in the context of the vcpu that owns this SPU.
-> 
-> Alex, can you think of anything that would cause a problem (other than
-> performance and possible blackout windows) if we didn't do any pinning
-> at all and just handled the SPE interrupts as normal page faults?
+> See HFGITR.ERET.
 
-PMBSR_EL1.DL might be set 1 as a result of stage 2 fault reported by SPE,
-which means the last record written is incomplete. Records have a variable
-size, so it's impossible for KVM to revert to the end of the last known
-good record without parsing the buffer (references here [1]). And even if
-KVM would know the size of a record, there's this bit in the Arm ARM which
-worries me (ARM DDI 0487H.a, page D10-5177):
+Ah, so that's the register, thanks!
 
-"The architecture does not require that a sample record is written
-sequentially by the SPU, only that:
-[..]
-- On a Profiling Buffer management interrupt, PMBSR_EL1.DL indicates
-  whether PMBPTR_EL1 points to the first byte after the last complete
-  sample record."
+I stil am not sure that having FEAT_SPE, an Armv8.3 extension, depend on
+FEAT_FGT, an Armv8.6 extension, is the best idea. Do you know of any machines
+that have FEAT_SPE and FEAT_FGT?
 
-So there might be gaps in the buffer, meaning that the entire buffer would
-have to be discarded if DL is set as a result of a stage 2 fault.
-
-Also, I'm not sure if you're aware of this, but SPE reports the guest VA in
-PMBPTR_EL1 (not the IPA) on a fault, so KVM would have to walk the guest's
-stage 1 tables to service the faults, which would add to the overhead of
-servicing the fault. Don't know if that makes a difference, just thought I
-should mention it as another peculiarity of SPE.
-
-[1] https://lore.kernel.org/all/Yl7KewpTj+7NSonf@monolith.localdoman/
+On the plus side, KVM could enable the trap only in the case above, and disable
+it after the ERET is trapped, so it should be relatively cheap to use.
 
 Thanks,
 Alex
+
+> 
+> Thanks,
+> 
+>         M.
+> -- 
+> Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
