@@ -2,74 +2,49 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57AD9C04A68
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Jul 2022 10:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70202C04A68
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Jul 2022 10:38:24 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C55D54C234;
-	Wed, 27 Jul 2022 06:29:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB2A74C354;
+	Wed, 27 Jul 2022 06:38:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id peqPwBaXTRnq; Wed, 27 Jul 2022 06:29:08 -0400 (EDT)
+	with ESMTP id gIxY8FnKTRJZ; Wed, 27 Jul 2022 06:38:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8E994C23D;
-	Wed, 27 Jul 2022 06:29:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93C304C339;
+	Wed, 27 Jul 2022 06:38:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 07CB84C16A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 06:29:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A01814C339
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 06:38:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YNXBL+UevAC9 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Jul 2022 06:29:07 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F35624C134
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 06:29:06 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 021BD61890;
- Wed, 27 Jul 2022 10:29:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C5EFC433C1;
- Wed, 27 Jul 2022 10:29:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1658917745;
- bh=k7tkDxaVldkgNY6v5HDU0WVJ3P6FzrFX1cTrwhCaA0c=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=C3IUlHDrNiHD/YTAP3Lbvcl8S+yH10qcS34z2WTpVdZBpvKBsAShSb5yvCg/usTJc
- BiRfZeUwcBI0PD6RwR7e1KmkHSl6rqrCUvwcNFHnNDDbGEMmNRp8nwES4MOOOOfwhL
- uU7u1vbnPeVPKWSYNVmqNUmi9UInJGl0E8xFliU/x/1hs48/Vi1tb+t0BGGl/Srh0x
- IP3MsLHgFHGSKeT0WxQSciM15ePW2oJZtDRE2fHlfscgUfz1PB0iRF2tGf1l6DQ3Wi
- ZncXUN9xH5vrGIKfiLm5UuZSYt+ceke6ucYfSyhe9FLh3Fra7PFhE0gFBLeXaY7kkw
- IEyESZJwB55FA==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oGeHn-00AN7S-6E;
- Wed, 27 Jul 2022 11:29:03 +0100
-MIME-Version: 1.0
-Date: Wed, 27 Jul 2022 11:29:03 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: KVM/arm64: SPE: Translate VA to IPA on a stage 2 fault instead of
- pinning VM memory
-In-Reply-To: <YuERKEjJh1qsZf8x@monolith.localdoman>
+ with ESMTP id XaCbMpHTLslY for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Jul 2022 06:38:19 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C88A4C336
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 06:38:18 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 03925D6E;
+ Wed, 27 Jul 2022 03:38:19 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 67E743F70D;
+ Wed, 27 Jul 2022 03:38:17 -0700 (PDT)
+Date: Wed, 27 Jul 2022 11:38:53 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: KVM/arm64: SPE: Translate VA to IPA on a stage 2 fault instead
+ of pinning VM memory
+Message-ID: <YuEVq8Au7YsDLOdI@monolith.localdoman>
 References: <Yl6+JWaP+mq2Nc0b@monolith.localdoman>
  <20220419141012.GB6143@willie-the-truck>
- <Yt5nFAscgrRGNGoH@monolith.localdoman> <YuApmZFdZzTi5ROu@google.com>
- <YuERKEjJh1qsZf8x@monolith.localdoman>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <04dea801e298374fb783bf0760b15241@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oliver.upton@linux.dev,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <Yt5nFAscgrRGNGoH@monolith.localdoman>
+ <YuApmZFdZzTi5ROu@google.com> <875yjiyka4.wl-maz@kernel.org>
+ <874jz2yja5.wl-maz@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <874jz2yja5.wl-maz@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -83,58 +58,65 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2022-07-27 11:19, Alexandru Elisei wrote:
-> Hi Oliver,
-> 
-> Thank you for the help, replies below.
-> 
-> On Tue, Jul 26, 2022 at 10:51:21AM -0700, Oliver Upton wrote:
->> Hi Alex,
->> 
->> On Mon, Jul 25, 2022 at 11:06:24AM +0100, Alexandru Elisei wrote:
->> 
->> [...]
->> 
->> > > A funkier approach might be to defer pinning of the buffer until the SPE is
->> > > enabled and avoid pinning all of VM memory that way, although I can't
->> > > immediately tell how flexible the architecture is in allowing you to cache
->> > > the base/limit values.
->> >
->> > I was investigating this approach, and Mark raised a concern that I think
->> > might be a showstopper.
->> >
->> > Let's consider this scenario:
->> >
->> > Initial conditions: guest at EL1, profiling disabled (PMBLIMITR_EL1.E = 0,
->> > PMBSR_EL1.S = 0, PMSCR_EL1.{E0SPE,E1SPE} = {0,0}).
->> >
->> > 1. Guest programs the buffer and enables it (PMBLIMITR_EL1.E = 1).
->> > 2. Guest programs SPE to enable profiling at **EL0**
->> > (PMSCR_EL1.{E0SPE,E1SPE} = {1,0}).
->> > 3. Guest changes the translation table entries for the buffer. The
->> > architecture allows this.
->> > 4. Guest does an ERET to EL0, thus enabling profiling.
->> >
->> > Since KVM cannot trap the ERET to EL0, it will be impossible for KVM to pin
->> > the buffer at stage 2 when profiling gets enabled at EL0.
->> 
->> Not saying we necessarily should, but this is possible with FGT no?
-> 
-> It doesn't look to me like FEAT_FGT offers any knobs to trap ERET from 
-> EL1.
+Hi Marc,
 
-See HFGITR.ERET.
+On Wed, Jul 27, 2022 at 10:52:34AM +0100, Marc Zyngier wrote:
+> On Wed, 27 Jul 2022 10:30:59 +0100,
+> Marc Zyngier <maz@kernel.org> wrote:
+> > 
+> > On Tue, 26 Jul 2022 18:51:21 +0100,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > 
+> > > Doesn't pinning the buffer also imply pinning the stage 1 tables
+> > > responsible for its translation as well? I agree that pinning the buffer
+> > > is likely the best way forward as pinning the whole of guest memory is
+> > > entirely impractical.
+> 
+> Huh, I just realised that you were talking about S1. I don't think we
+> need to do this. As long as the translation falls into a mapped
+> region (pinned or not), we don't need to worry.
+> 
+> If we get a S2 translation fault from SPE, we just go and map it. And
+> TBH the pinning here is just a optimisation against things like swap,
+> KSM and similar things. The only thing we need to make sure is that
+> the fault is handled in the context of the vcpu that owns this SPU.
+> 
+> Alex, can you think of anything that would cause a problem (other than
+> performance and possible blackout windows) if we didn't do any pinning
+> at all and just handled the SPE interrupts as normal page faults?
+
+PMBSR_EL1.DL might be set 1 as a result of stage 2 fault reported by SPE,
+which means the last record written is incomplete. Records have a variable
+size, so it's impossible for KVM to revert to the end of the last known
+good record without parsing the buffer (references here [1]). And even if
+KVM would know the size of a record, there's this bit in the Arm ARM which
+worries me (ARM DDI 0487H.a, page D10-5177):
+
+"The architecture does not require that a sample record is written
+sequentially by the SPU, only that:
+[..]
+- On a Profiling Buffer management interrupt, PMBSR_EL1.DL indicates
+  whether PMBPTR_EL1 points to the first byte after the last complete
+  sample record."
+
+So there might be gaps in the buffer, meaning that the entire buffer would
+have to be discarded if DL is set as a result of a stage 2 fault.
+
+Also, I'm not sure if you're aware of this, but SPE reports the guest VA in
+PMBPTR_EL1 (not the IPA) on a fault, so KVM would have to walk the guest's
+stage 1 tables to service the faults, which would add to the overhead of
+servicing the fault. Don't know if that makes a difference, just thought I
+should mention it as another peculiarity of SPE.
+
+[1] https://lore.kernel.org/all/Yl7KewpTj+7NSonf@monolith.localdoman/
 
 Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
