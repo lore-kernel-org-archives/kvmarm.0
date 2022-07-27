@@ -2,61 +2,65 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A123BC04A68
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Jul 2022 16:06:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C06BC04A68
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Jul 2022 17:32:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B6314C915;
-	Wed, 27 Jul 2022 12:06:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 017D54C9D5;
+	Wed, 27 Jul 2022 13:32:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GRrfYp8XuLz0; Wed, 27 Jul 2022 12:06:36 -0400 (EDT)
+	with ESMTP id xmHaK3CZ3iKN; Wed, 27 Jul 2022 13:32:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F28F54C918;
-	Wed, 27 Jul 2022 12:06:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F12844CA1A;
+	Wed, 27 Jul 2022 13:32:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 549654C915
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 12:06:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E212B4CA17
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 13:32:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bcAkdTGFn6ZM for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Jul 2022 12:06:34 -0400 (EDT)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 03C7E4C913
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 12:06:33 -0400 (EDT)
-Date: Wed, 27 Jul 2022 16:06:30 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1658937993;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=jn9jHV/s0Q+BX5nI+AoGuNqFTdhYxUJgGjXqeiORd9k=;
- b=jpGfgkrYyGqdsd+Ginq9okV0U8BWrOTA0KenuB+AyMw/dScNca0W1WDwB6BO0FArfy27PS
- hAgSmZRVGx0JifP1hgTbaHdutRghnEEBS4Zf3zUZ6myaeph0QDo1xYaC3Xd/j52vPlhM+h
- HPbgHMNkXXRLgGUBLfutyhQ1EiirmX4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: KVM/arm64: SPE: Translate VA to IPA on a stage 2 fault instead
- of pinning VM memory
-Message-ID: <YuFihl0AQvb5w/M3@google.com>
-References: <Yl6+JWaP+mq2Nc0b@monolith.localdoman>
- <20220419141012.GB6143@willie-the-truck>
- <Yt5nFAscgrRGNGoH@monolith.localdoman>
- <YuApmZFdZzTi5ROu@google.com> <875yjiyka4.wl-maz@kernel.org>
- <874jz2yja5.wl-maz@kernel.org>
- <YuEVq8Au7YsDLOdI@monolith.localdoman>
+ with ESMTP id N0JBpDrg5tS1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Jul 2022 13:32:40 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BE3164C9D5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jul 2022 13:32:40 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 36048B821E9;
+ Wed, 27 Jul 2022 17:32:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12F3AC433C1;
+ Wed, 27 Jul 2022 17:32:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1658943157;
+ bh=q47QgoXCm1d+pbl6jIqi2IRTu7bwzcZuMzbuDfSeIRo=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=tHtY/iIkrpMF/Uv7EFlWhixNyJBu2K9QHZz+9n431yeiYJNvpwKwRYlHpssWbZTyd
+ uxBnpxL5+VyORGuHopD8TijpL+aGXyD5fr7vA70GrSIaqxk13toS5uVO6o4oFWz1H0
+ uYPGNYIknDmwI/NqDN5EJWxhQ3Cog3q4g7/4huHVtFTz5oteRS0TDLasiwCrYjRtK9
+ SiNFVXeY5rgS+aUBiR0YdOx4K5osShIlptdmg2gztTLWCXUERRa/eh+ScC7bMsZnpa
+ 7VG5knWzWxZEi0H5CJrmOH0CIPw294RLxCYc4AjP1UOtmoAUQoPPyFGuSshJacgG5Y
+ V052/lig31PCA==
+Date: Wed, 27 Jul 2022 18:32:29 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 3/6] KVM: arm64: Make unwind()/on_accessible_stack()
+ per-unwinder functions
+Message-ID: <YuF2rfXvhPM60GkC@sirena.org.uk>
+References: <20220726073750.3219117-18-kaleshsingh@google.com>
+ <20220727142906.1856759-1-maz@kernel.org>
+ <20220727142906.1856759-4-maz@kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YuEVq8Au7YsDLOdI@monolith.localdoman>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20220727142906.1856759-4-maz@kernel.org>
+X-Cookie: No motorized vehicles allowed.
+Cc: wangkefeng.wang@huawei.com, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ ast@kernel.org, vincenzo.frascino@arm.com, kvmarm@lists.cs.columbia.edu,
+ madvenka@linux.microsoft.com, kernel-team@android.com, elver@google.com,
+ linux-arm-kernel@lists.infradead.org, andreyknvl@gmail.com,
+ mhiramat@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,87 +72,68 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============0974867909078320838=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jul 27, 2022 at 11:38:53AM +0100, Alexandru Elisei wrote:
-> Hi Marc,
-> 
-> On Wed, Jul 27, 2022 at 10:52:34AM +0100, Marc Zyngier wrote:
-> > On Wed, 27 Jul 2022 10:30:59 +0100,
-> > Marc Zyngier <maz@kernel.org> wrote:
-> > > 
-> > > On Tue, 26 Jul 2022 18:51:21 +0100,
-> > > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > > 
-> > > > Doesn't pinning the buffer also imply pinning the stage 1 tables
-> > > > responsible for its translation as well? I agree that pinning the buffer
-> > > > is likely the best way forward as pinning the whole of guest memory is
-> > > > entirely impractical.
-> > 
-> > Huh, I just realised that you were talking about S1. I don't think we
-> > need to do this. As long as the translation falls into a mapped
-> > region (pinned or not), we don't need to worry.
 
-Right, but my issue is what happens when a fragment of the S1 becomes
-unmapped at S2. We were discussing the idea of faulting once on the
-buffer at the beginning of profiling, seems to me that it could just as
-easily happen at runtime and get tripped up by what Alex points out
-below:
+--===============0974867909078320838==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="hbdw/Jodnr/WTir2"
+Content-Disposition: inline
 
-> PMBSR_EL1.DL might be set 1 as a result of stage 2 fault reported by SPE,
-> which means the last record written is incomplete. Records have a variable
-> size, so it's impossible for KVM to revert to the end of the last known
-> good record without parsing the buffer (references here [1]). And even if
-> KVM would know the size of a record, there's this bit in the Arm ARM which
-> worries me (ARM DDI 0487H.a, page D10-5177):
-> 
-> "The architecture does not require that a sample record is written
-> sequentially by the SPU, only that:
-> [..]
-> - On a Profiling Buffer management interrupt, PMBSR_EL1.DL indicates
->   whether PMBPTR_EL1 points to the first byte after the last complete
->   sample record."
-> 
-> So there might be gaps in the buffer, meaning that the entire buffer would
-> have to be discarded if DL is set as a result of a stage 2 fault.
 
-Attempting to avoid thrashing with more threads so I'm going to summon back
-some context from your original reply, Marc:
+--hbdw/Jodnr/WTir2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > > > Live migration also throws a wrench in this. IOW, there are still potential
-> > > > sources of blackout unattributable to guest manipulation of the SPU.
-> > >
-> > > Can you chime some light on this? I appreciate that you can't play the
-> > > R/O trick on the SPE buffer as it invalidates the above discussion,
-> > > but it should be relatively easy to track these pages and never reset
-> > > them as clean until the vcpu is stopped. Unless you foresee other
-> > > issues?
+On Wed, Jul 27, 2022 at 03:29:03PM +0100, Marc Zyngier wrote:
+> Having multiple versions of on_accessible_stack() (one per unwinder)
+> makes it very hard to reason about what is used where due to the
+> complexity of the various includes, the forward declarations, and
+> the reliance on everything being 'inline'.
+>=20
+> Instead, move the code back where it should be. Each unwinder
+> implements:
+>=20
+> - on_accessible_stack() as well as the helpers it depends on,
+>=20
+> - unwind()/unwind_next(), as they pass on_accessible_stack as
+>   a parameter to unwind_next_common() (which is the only common
+>   code here)
 
-Right, we can play tricks on pre-copy to avoid write protecting the SPE
-buffer. My concern was more around post-copy, where userspace could've
-decided to leave the buffer behind and demand it back on the resulting
-S2 fault.
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
-> > > To be clear, I don't worry too much about these blind windows. The
-> > > architecture doesn't really give us the right tools to make it work
-> > > reliably, making this a best effort only. Unless we pin the whole
-> > > guest and forego migration and other fault-driven mechanisms.
-> > >
-> > > Maybe that is a choice we need to give to the user: cheap, fast,
-> > > reliable. Pick two.
+It feels like more of the accessibility stuff *should* be sharable, but
+yeah.
 
-As long as we crisply document the errata in KVM's virtualized SPE (and
-inform the guest), that sounds reasonable. I'm just uneasy about
-proceeding with an implementation w/ so many gotchas unless all parties
-involved are aware of the quirks.
+--hbdw/Jodnr/WTir2
+Content-Type: application/pgp-signature; name="signature.asc"
 
---
-Thanks,
-Oliver
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmLhdqwACgkQJNaLcl1U
+h9Drtwf+K7Q5M0yDprpbWSTZ0Syqie6HYKfELQLgEhMb2bOBWuV0OqB/qxlHp4IA
+gjP6FYZ1zifSN71xa4FkRiDDSFVEoJt7nCGUMZ9pI7OtRBS2kfYpADm4PqNgPehO
+0Jc/GLnGVpjElbcT5GWIw4u+B5/MiV5WHXg+Oh9cc+XsJ0IDkUQEzEYe6r8fjJ4Y
+a9bkkJkJDPXbzsWjQyOEwaJb180/oNnZ11M82yKceTA04WVX0kkE07wi8mcu+3zj
+uX3ZmhBEBzzorRIFsDbWr/ae/gNZD8+m8HVilhX4XguihkQVJSa4eUKinsEok0ck
+fNLlqdAjhoFixn0YXu7iJAIq1OaZEg==
+=ejhR
+-----END PGP SIGNATURE-----
+
+--hbdw/Jodnr/WTir2--
+
+--===============0974867909078320838==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============0974867909078320838==--
