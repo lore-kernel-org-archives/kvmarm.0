@@ -2,172 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B71D5C04A68
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Jul 2022 07:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6209C00144
+	for <kvmarm@archiver.kernel.org>; Fri, 29 Jul 2022 08:43:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 251914D1A5;
-	Thu, 28 Jul 2022 03:06:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 051C14C52D;
+	Fri, 29 Jul 2022 04:43:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@intel.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id f0MfphLO4kGr; Thu, 28 Jul 2022 03:06:50 -0400 (EDT)
+	with ESMTP id fumj+3Y2QOiU; Fri, 29 Jul 2022 04:43:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8531F4D179;
-	Thu, 28 Jul 2022 03:06:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 785FE4C52E;
+	Fri, 29 Jul 2022 04:43:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 869884D17F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jul 2022 02:50:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A6964C528
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jul 2022 04:43:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hUySJ7A8qNAQ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Jul 2022 02:50:45 -0400 (EDT)
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B07AE4D179
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jul 2022 02:50:44 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
- t=1658991044; x=1690527044;
- h=message-id:date:subject:to:cc:references:from:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=Ap0EH449E2Gh/GXN99zOXEkIh9I6h0Uljs5nRhyd6Sk=;
- b=Suo5yTYrPDZeQzBFpXsN5pM7wn9+acAp5JqTFixI8tfCLO4RXoYEC9+F
- dtvVjR/qfu8rkrfLHs+0UbG4HIjuGyPKuKs+8b2FnseSa6HxyUzVdYtBY
- dcIvK0ST5OHud+YFlOeSLTt8wlTX1nNeyN4o89uU1PRR/9Q3vKoNpGaWi
- ixzkl/J8lGaRfEQflFfQQ8z5EAIBi771PDIbjEhrLyETWbQZpe9PbMOeg
- bCM9jgHrTo84iYbri3i6BZNJB0VV+ojjFg4E/vgpvz1P4VPdEaY0vRnJW
- yPRGPE8bNxVCaGrVBttzRBNQL1l+vjnAbcbSsbipH9aPoVbm+XMMZjUrm w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10421"; a="287191313"
-X-IronPort-AV: E=Sophos;i="5.93,196,1654585200"; d="scan'208";a="287191313"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
- by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 27 Jul 2022 23:50:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,196,1654585200"; d="scan'208";a="576326307"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
- by orsmga006.jf.intel.com with ESMTP; 27 Jul 2022 23:50:34 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Wed, 27 Jul 2022 23:50:34 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28 via Frontend Transport; Wed, 27 Jul 2022 23:50:34 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.103)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.28; Wed, 27 Jul 2022 23:50:34 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DC9YN9c9MZFFdcSWNnmGmoBGJt9wDH6xrdsBIdFElO5VctFSOAu2BcUiwbgywAbYkMTDwSaK1iEdYV73+M/+W+pG2pfCWPEBRmxjxIqGFj5buo3NbICI+cBLSvmlgPocsQi57aYvA+upFeR9yat0RaR5uzCl8VRhFQAgpbLbFrSmUK8kcrTTlYvtLUqoGxQYXxv6JpCpW3MNlZcMZBkiLvjZstGfueeq9QgAdyxNVBFvIvp4pfDG5WWSz+HPCElGZhxw/AYyci00v8cxNesjnqJ3Ti+cteTC3qf4LvGqyf/9aIzI7ZPkovghCjH9GLR5JUg1JJCeqHnZHCraRCRZEg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IbHfpkIKFtr7diGTtQKTQF1oDnXP2OjLx0TFKVUa9Wk=;
- b=VA4xXwGv8GVeOqfrM+SvOZOv9xyun4TTPl1eL/2hvLaW+yg08qSMO9p9Lfe9PdCtcsq3PA4N3pH61uySBO1eOkvy1cWuWkbxb2080tPFZYyFWQKHtEYQrRhQAN8nD5bZQvLOtPZbQB5qNFd+8npnduoCBMJ70Ow9wprn0NfqivXl5ZkZi+5g3e25MNhEDgVi8b+lvSjVfSPmqLj1HgGvd8nLX4lverbKPlLCcID45AKKagF+MsaAPAyVwFfI6GW0qEVRGQWAWjalAW0ukSGvTcb7Pirvygrfh8RSt/9dd7yjWyilH2iZkuRojOny5x6Wuqo+hLqQKd9IkkQZsuXkqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN2PR11MB3870.namprd11.prod.outlook.com (2603:10b6:208:152::11)
- by BN6PR11MB1907.namprd11.prod.outlook.com (2603:10b6:404:105::17)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5482.6; Thu, 28 Jul
- 2022 06:50:31 +0000
-Received: from MN2PR11MB3870.namprd11.prod.outlook.com
- ([fe80::dd55:c9f5:fbc7:8a74]) by MN2PR11MB3870.namprd11.prod.outlook.com
- ([fe80::dd55:c9f5:fbc7:8a74%3]) with mapi id 15.20.5458.025; Thu, 28 Jul 2022
- 06:50:31 +0000
-Message-ID: <f191e472-1fc8-6577-af77-412a73c59a97@intel.com>
-Date: Thu, 28 Jul 2022 14:50:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.11.0
-Subject: Re: [PATCH 33/89] KVM: arm64: Handle guest stage-2 page-tables
- entirely at EL2
-Content-Language: en-US
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-References: <20220519134204.5379-1-will@kernel.org>
- <20220519134204.5379-34-will@kernel.org>
- <Yoe70WC0wJg0Vcon@monolith.localdoman>
- <20220531164550.GA25631@willie-the-truck>
- <bf7dffb8-55d2-22cb-2944-b90e6117e810@intel.com>
- <YuEMkKY2RU/2KiZW@monolith.localdoman>
-From: "Huang, Shaoqin" <shaoqin.huang@intel.com>
-In-Reply-To: <YuEMkKY2RU/2KiZW@monolith.localdoman>
-X-ClientProxiedBy: SG2PR04CA0183.apcprd04.prod.outlook.com
- (2603:1096:4:14::21) To MN2PR11MB3870.namprd11.prod.outlook.com
- (2603:10b6:208:152::11)
+ with ESMTP id raJPC1QPiPUS for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Jul 2022 04:43:16 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7DFBA4C50E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jul 2022 04:43:16 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id DB2CDB826E4;
+ Fri, 29 Jul 2022 08:43:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68ED6C433C1;
+ Fri, 29 Jul 2022 08:43:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1659084193;
+ bh=jPbZkgYa9GkfB5ysi5xuqeGsMQ+Nwk3bXeJINmKXVbo=;
+ h=From:To:Cc:Subject:Date:From;
+ b=gdbFf70kwmxvgW/y1pRVmGXUStAjirfsr27k/irKK9kn6YqUvY5rRh9ys82+w5mIe
+ sqGK6d188hAH75Iprr77vyP8O6Io3IsZb7srnzTiF80T3UL1CrIZLUL3Pi7JJggH/h
+ LBVFOguIDvnbHmHoyCwHu7tOg3fZe6Q5fWcRxTmTT1vQU9dLYFIj8tDbA6kCIL+Bfk
+ HW723Hd9d+Mh/LhaqNWLxcCyBAwl4ep7RSDEgC11q+HBMi9OePS8Om+A4Nm9xHRsbS
+ tKaCzjBfPiH03GlbtfRLieocJCipYYUHoNyvWMBNAons9ZiWofYcr341apwcEDwzZQ
+ 3Np9N82ZbI/0g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oHLaQ-00Aq9G-Ul;
+ Fri, 29 Jul 2022 09:43:11 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [GIT PULL] KVM/arm64 updates for 5.20
+Date: Fri, 29 Jul 2022 09:43:08 +0100
+Message-Id: <20220729084308.1881661-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7d806bf2-9ad1-44fd-5bc5-08da70657645
-X-MS-TrafficTypeDiagnostic: BN6PR11MB1907:EE_
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cogrrHGWTCMvSdJKnGAVaScgdOUBA7Kta0boQLT6Uwoe5pmmKxFlmtD2HFt4gtPv5wGZSDvTGFY46F1JXBuka7jMclIIwT1tDSga3GlwcEpHz4OVyQpSg5lodtIylFL1dkmRTrZJQlrFL2uP8x5vJkilb0A3FUmS3pxiIDCtrQRQ3FNHPumT6AT4G0smGaUpCbZViO8nsPFCOBH0+S/pGwexUEwflb7L/ktZUahvDiaaVRX3q6oACzVvIA2JMUUFZFOEotFPPkPMjf3HoMpEB3qte+e5yP7f0jTQwnwezNJKJ7K+ydtSD5vOrqMoxi+ke8zazzXGZ+9bd3fRHjbsVlAD3BD7Wlbfp8KDQEiRaeeM+ryybVWtsqs/9CqwHxrFPce8QOJh5zqePhKe2mzuA9bU/WyCqZUL2HQXEzvJBOw0NpVL9LIwtdUBdd4Z+Ug2ToVLmz2F+MrbUkrm5/MPODAGt+sE8EoCHAYAILlXMZubHRpBD6ggHsMJAldBduf3YLNBOyOsocAJEyq/VQVap+C3Dmg/iYHzdYubCiw07KqcNgTXB4Yw45Qm3zzGSUvh2vGAOdwJBdnHcMXYp3O7Xz6gBarge+I9eZsS6FIdQlu6XUfVRAxOL9HwdiiTa9ixA4Dzx2XgyO/ku95asj8Q+HLQE/DMeT689c2elBvXP/thg9AIpas013c9L/9fsGl/kd0Tr2wLtmCThICZEYqA0M4mqgQEN+uzyfG7Wq95qgvWnCpGHgwAKYYAT7S4euDJopyt9gJAKiorYzeaNMT2vdR1fOywdHnLChKcHTHO6vqiSzEyKu1PnRngpmYkYhByxlsEJRqNqv8L+4KrwODNJA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MN2PR11MB3870.namprd11.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(13230016)(39860400002)(376002)(136003)(366004)(396003)(346002)(316002)(6486002)(38100700002)(86362001)(36756003)(82960400001)(31696002)(41300700001)(478600001)(6666004)(31686004)(6506007)(53546011)(54906003)(26005)(6512007)(6916009)(2616005)(4326008)(8676002)(2906002)(8936002)(66946007)(7416002)(186003)(66556008)(66476007)(83380400001)(5660300002)(45980500001)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NTRUSSt0dE5DSGVCKzYzWThWN2dodFNCdkVhZE9pcVMrUUdXTmVOME10S0Fq?=
- =?utf-8?B?S2ZkNG1CRi9GV1Z0Vi9lbFArRDhTTXpDZE1LRWhGZ0JDSFM4bkE5SGV4M0tC?=
- =?utf-8?B?bGhVZ1pFRXpBd21pUi90ajVLaHBQL0xvbEZ6Und2cFNBek51aXdTR0ZSRG1q?=
- =?utf-8?B?cW5YeHBvRGorZU1sOXVoT0dVSnhaaE1QaFVrNXFvcGZmT2syZ25mbHpEQy9R?=
- =?utf-8?B?dlE1ajlxTm8xUktZYU51NVBsQUFDdFFZMkZmYmFTSzRzR0RFcDE0V3dHVXVE?=
- =?utf-8?B?YSszWU05TDlWUGUrUDloU1JLSXRiWlk1ZWUzUmFESXliYWVmS1dQZjc2S2hO?=
- =?utf-8?B?YmZmYms1RzJtR01OVmJldU16b1BWeFA3Rk94Q1oxVVlWc2lPSGJneERmd29T?=
- =?utf-8?B?UU5vd0pMZTlZMzZjdWFZOVc5cFNhbjdlRnRvZDdLSkI3SEZDYXBvQ000Umtv?=
- =?utf-8?B?L2J5dmpJVk5rMkdjUTluT2twOFQ3L0hYN25GV3JDMEgrWGZOUG1MSStkcm1R?=
- =?utf-8?B?U2doUmhLOWlWNmxpWDhFNjlIRXhMMVFNVGxacHdVUVlBT2h0bDVvM3ZIV0Ro?=
- =?utf-8?B?SXpsTUQwRGYzeXZ0NzNwNm1pSDQ0dEZQK0pUOVQzd2hhT0RNYlJpK1lMVVN4?=
- =?utf-8?B?cElaUU9CbmFuSmRsUEJpS3VQM2tncXMwb3F4VTQydmFWR3NWSE1kQUNXRHd3?=
- =?utf-8?B?WDIrZ3ZoeklnemRieXdsUENDTVJaTG5WWDlWbWp2MVdtWHZQd21oL2JocjNG?=
- =?utf-8?B?ZkRpOGI3VTRwS0F4MDA3dWpxZ2JNNTlVZkJQQ2pUM1JKYi9ZbWVkQUV1Qnc3?=
- =?utf-8?B?WnJ3NUZ1ZnA1WFVkV2xjUnp3ZU9XcnpjcG8vdEVJUFkwQ25rMWdXVUd2Y0JZ?=
- =?utf-8?B?cXZtdmQ3b2JoK0RNOVBkS0R3WEpoaFAwaHB5MVV0aWhuK0ljWDM4YTJsd2VY?=
- =?utf-8?B?OVNta2o2dzk1aWZSTU5kYzhBR1RaTG8vckVtSXNPbmJ1bkJpY2VLWUVJOGNt?=
- =?utf-8?B?bkE2WFF3eVJGOHRhNVh6OGxpWjkzanVERTdoQU5pUFhaVEZjMTJZMDR3a1Qr?=
- =?utf-8?B?UUt0OTNNRjBLQndESUljRitUV3hMTTJvanFpNjBVaERaTGhHR3ZnUWhSWnJ6?=
- =?utf-8?B?VyswSWIxUHRGbHhaa3NheHR4MjNnSTVIYlBuTm50akhPMzMwdkFmTTdidFpZ?=
- =?utf-8?B?L3BLcmk3YnRLdys5cHYxT3NhQlBkdWV4ZHhpaDBxMUtZaFloQm95RnhUZ1E4?=
- =?utf-8?B?WTgrSjNKbHBDUldoZHlIV1F4MTJDUWp0ZGV4TlNTN1Fqd0hhN0FFUldSTCsx?=
- =?utf-8?B?NEVoSHVCK2kxcFQybFpmYzA3cFRlMWRjQmcrMFQrWlVFT0llQ1cwbjRDcmRn?=
- =?utf-8?B?TkZVd2xLZW5sU1FZTzRUaHJQQyt6STZlM3hhQXIxbmQrTmlXSlIwQ2Uxd3F5?=
- =?utf-8?B?dE1rMVF0SEF6a2RPNmg0eGc5eVVjWXFiUzh3QXdjQVhtMTlLS0JWQUJlRmpZ?=
- =?utf-8?B?V2QxMFIyUE1uVXlHcnpGdldFUHlQSDFsK0gwTW1JemFMVHZvL01WRm9Fekkr?=
- =?utf-8?B?Y3VFWlJzcEtzbTNHQ2ZDUWZRS25kWVp0RUdMYmJabnlMUkcwVlF4RFZ4djNj?=
- =?utf-8?B?L3k3cmoraTBvRDREbjl1MlRQSVdLM3JRMGl0OGF4dVRhcjFyVXd3dVZuT3Ny?=
- =?utf-8?B?UC9LdUNEUnlhTjdBd1BtNDNCQmtBTnZZU21BMHhieUE5UDBFSlBZeUtsLzdv?=
- =?utf-8?B?ZS9qaVV3UVB1VWhVeTlBVjhjNi9GekN0a1BHekJORzZNNk5haTNibFBMbnJr?=
- =?utf-8?B?bWtoVWdmR1JheTZ0SERLK01GRENuWHRIem43UFRYRWFkbS9USks3TjFFYlJL?=
- =?utf-8?B?eWdzb1VZd2doOG1RNExQalM2ZWFqUjFYRzZzdTd5NlNHR2hmTGE4T3Bzd1Jp?=
- =?utf-8?B?LzlQV2RSVW9Ebm5qUVhRaS9FbjM0TEVUeUhMMEtjdW52UGtqdE9DYWhjZ0VI?=
- =?utf-8?B?eXptUFdXS2IxVkpHbnlCNFNKVDNXM0VObzljeG42Z21ZaXFjeGJxN0gvSXY1?=
- =?utf-8?B?N2Z0Q0FtdEFvQ1V6YmYxbHo2LzFrLzBzT1ZvM2NZR1ZqeEg4a1g2TGsvMzF4?=
- =?utf-8?B?Unh6eE9nODZ5Q0VtTkJnVTBiK00vNExUazVHUHpHdFBlc3puRjd0dEg4c0Zh?=
- =?utf-8?B?Tmc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d806bf2-9ad1-44fd-5bc5-08da70657645
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR11MB3870.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jul 2022 06:50:30.8986 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yP2OU3Ma9COZwVqYSeenpVTx/uKTlJcCHv0oEkAhA7xxudeWlC5fUh34UGDWwgaAs1yEZRVudojxTM8m8E9G+A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR11MB1907
-X-OriginatorOrg: intel.com
-X-Mailman-Approved-At: Thu, 28 Jul 2022 03:06:49 -0400
-Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com, kvm@vger.kernel.org,
- Andy
- Lutomirski <luto@amacapital.net>, linux-arm-kernel@lists.infradead.org,
- Michael Roth <michael.roth@amd.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Chao Peng <chao.p.peng@linux.intel.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, andreyknvl@google.com, tabba@google.com,
+ kaleshsingh@google.com, madvenka@linux.microsoft.com, broonie@kernel.org,
+ mark.rutland@arm.com, masahiroy@kernel.org, oliver.upton@linux.dev,
+ qperret@google.com, reijiw@google.com, ricarkol@google.com, will@kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Andrey Konovalov <andreyknvl@google.com>,
+ Masahiro Yamada <masahiroy@kernel.org>,
+ "Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>,
+ Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -179,127 +84,190 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Paolo,
 
+Here's the bulk of the KVM/arm64 updates for 5.20. Major feature is
+the new unwinder for the nVHE modes. The rest is mostly rewriting some
+unloved aspects of the arm64 port (sysregs, flags). Further details in
+the tag description.
 
-On 7/27/2022 5:59 PM, Alexandru Elisei wrote:
-> Hi,
-> 
-> On Wed, Jun 08, 2022 at 09:16:56AM +0800, Huang, Shaoqin wrote:
->>
->> On 6/1/2022 12:45 AM, Will Deacon wrote:
->>> On Fri, May 20, 2022 at 05:03:29PM +0100, Alexandru Elisei wrote:
->>>> On Thu, May 19, 2022 at 02:41:08PM +0100, Will Deacon wrote:
->>>>> Now that EL2 is able to manage guest stage-2 page-tables, avoid
->>>>> allocating a separate MMU structure in the host and instead introduce a
->>>>> new fault handler which responds to guest stage-2 faults by sharing
->>>>> GUP-pinned pages with the guest via a hypercall. These pages are
->>>>> recovered (and unpinned) on guest teardown via the page reclaim
->>>>> hypercall.
->>>>>
->>>>> Signed-off-by: Will Deacon <will@kernel.org>
->>>>> ---
->>>> [..]
->>>>> +static int pkvm_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>>>> +			  unsigned long hva)
->>>>> +{
->>>>> +	struct kvm_hyp_memcache *hyp_memcache = &vcpu->arch.pkvm_memcache;
->>>>> +	struct mm_struct *mm = current->mm;
->>>>> +	unsigned int flags = FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE;
->>>>> +	struct kvm_pinned_page *ppage;
->>>>> +	struct kvm *kvm = vcpu->kvm;
->>>>> +	struct page *page;
->>>>> +	u64 pfn;
->>>>> +	int ret;
->>>>> +
->>>>> +	ret = topup_hyp_memcache(hyp_memcache, kvm_mmu_cache_min_pages(kvm));
->>>>> +	if (ret)
->>>>> +		return -ENOMEM;
->>>>> +
->>>>> +	ppage = kmalloc(sizeof(*ppage), GFP_KERNEL_ACCOUNT);
->>>>> +	if (!ppage)
->>>>> +		return -ENOMEM;
->>>>> +
->>>>> +	ret = account_locked_vm(mm, 1, true);
->>>>> +	if (ret)
->>>>> +		goto free_ppage;
->>>>> +
->>>>> +	mmap_read_lock(mm);
->>>>> +	ret = pin_user_pages(hva, 1, flags, &page, NULL);
->>>>
->>>> When I implemented memory pinning via GUP for the KVM SPE series, I
->>>> discovered that the pages were regularly unmapped at stage 2 because of
->>>> automatic numa balancing, as change_prot_numa() ends up calling
->>>> mmu_notifier_invalidate_range_start().
->>>>
->>>> I was curious how you managed to avoid that, I don't know my way around
->>>> pKVM and can't seem to find where that's implemented.
->>>
->>> With this series, we don't take any notice of the MMU notifiers at EL2
->>> so the stage-2 remains intact. The GUP pin will prevent the page from
->>> being migrated as the rmap walker won't be able to drop the mapcount.
->>>
->>> It's functional, but we'd definitely like to do better in the long term.
->>> The fd-based approach that I mentioned in the cover letter gets us some of
->>> the way there for protected guests ("private memory"), but non-protected
->>> guests running under pKVM are proving to be pretty challenging (we need to
->>> deal with things like sharing the zero page...).
->>>
->>> Will
->>
->> My understanding is that with the pin_user_pages, the page that used by
->> guests (both protected and non-protected) will stay for a long time, and the
->> page will not be swapped or migrated. So no need to care about the MMU
->> notifiers. Is it right?
-> 
-> There are two things here.
-> 
-> First, pinning a page means making the data persistent in memory. From
-> Documentation/core-api/pin_user_pages.rst:
-> 
-> "FOLL_PIN is a *replacement* for FOLL_GET, and is for short term pins on
-> pages whose data *will* get accessed. As such, FOLL_PIN is a "more severe"
-> form of pinning. And finally, FOLL_LONGTERM is an even more restrictive
-> case that has FOLL_PIN as a prerequisite: this is for pages that will be
-> pinned longterm, and whose data will be accessed."
-> 
-> It does not mean that the translation table entry for the page is not
-> modified for as long as the pin exists. In the example I gave, automatic
-> NUMA balancing changes the protection of translation table entries to
-> PAGE_NONE, which will invoke the MMU notifers to unmap the corresponding
-> stage 2 entries, regardless of the fact that the pinned pages will not get
-> migrated the next time they are accessed.
-> 
-> There are other mechanisms in the kernel that do that, for example
-> split_huge_pmd(), which must always succeed, even if the THP is pinned (it
-> transfers the refcounts among the pages): "Note that split_huge_pmd()
-> doesn't have any limitations on refcounting: pmd can be split at any point
-> and never fails" (Documentation/vm/transhuge.rst, also see
-> __split_huge_pmd() from mm/huge_memory.c).
-> 
-> KSM also does that: it invokes the invalidate_range_start MMU notifier
-> before backing out of the merge because of the refcount (see mm/ksm.c::
-> try_to_merge_one_page -> write_protect_page).
-> 
-> This brings me to my second point: one might rightfully ask themselves (I
-> did!), why not invoke the MMU notifiers *after* checking that the page is
-> not pinned? It turns out that that is not reliable, because the refcount is
-> increased by GUP with the page lock held (which is a spinlock), but by
-> their design the invalidate_range_start MMU notifiers must be called from
-> interruptible + preemptible context. The only way to avoid races would be
-> to call the MMU notifier while holding the page table lock, which is
-> impossible.
-> 
-> Hope my explanation has been adequate.
-> 
-> Thanks,
-> Alex
+Note that this PR contains a shared branch with the arm64 tree
+containing some of the stacktrace updates. There is also a minor
+conflict with your tree in one of the selftests, already resolved in
+-next.
 
-Thanks for your clear explanation.
+Please pull,
+
+	M.
+
+The following changes since commit a111daf0c53ae91e71fd2bfe7497862d14132e3e:
+
+  Linux 5.19-rc3 (2022-06-19 15:06:47 -0500)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.20
+
+for you to fetch changes up to 0982c8d859f8f7022b9fd44d421c7ec721bb41f9:
+
+  Merge branch kvm-arm64/nvhe-stacktrace into kvmarm-master/next (2022-07-27 18:33:27 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 updates for 5.20:
+
+- Unwinder implementations for both nVHE modes (classic and
+  protected), complete with an overflow stack
+
+- Rework of the sysreg access from userspace, with a complete
+  rewrite of the vgic-v3 view to allign with the rest of the
+  infrastructure
+
+- Disagregation of the vcpu flags in separate sets to better track
+  their use model.
+
+- A fix for the GICv2-on-v3 selftest
+
+- A small set of cosmetic fixes
+
+----------------------------------------------------------------
+Andrey Konovalov (2):
+      arm64: kasan: do not instrument stacktrace.c
+      arm64: stacktrace: use non-atomic __set_bit
+
+Kalesh Singh (18):
+      KVM: arm64: Fix hypervisor address symbolization
+      arm64: stacktrace: Add shared header for common stack unwinding code
+      arm64: stacktrace: Factor out on_accessible_stack_common()
+      arm64: stacktrace: Factor out unwind_next_common()
+      arm64: stacktrace: Handle frame pointer from different address spaces
+      arm64: stacktrace: Factor out common unwind()
+      arm64: stacktrace: Add description of stacktrace/common.h
+      KVM: arm64: On stack overflow switch to hyp overflow_stack
+      KVM: arm64: Stub implementation of non-protected nVHE HYP stack unwinder
+      KVM: arm64: Prepare non-protected nVHE hypervisor stacktrace
+      KVM: arm64: Implement non-protected nVHE hyp stack unwinder
+      KVM: arm64: Introduce hyp_dump_backtrace()
+      KVM: arm64: Add PROTECTED_NVHE_STACKTRACE Kconfig
+      KVM: arm64: Allocate shared pKVM hyp stacktrace buffers
+      KVM: arm64: Stub implementation of pKVM HYP stack unwinder
+      KVM: arm64: Save protected-nVHE (pKVM) hyp stacktrace
+      KVM: arm64: Implement protected nVHE hyp stack unwinder
+      KVM: arm64: Introduce pkvm_dump_backtrace()
+
+Madhavan T. Venkataraman (2):
+      arm64: Split unwind_init()
+      arm64: Copy the task argument to unwind_state
+
+Marc Zyngier (47):
+      KVM: arm64: Drop FP_FOREIGN_STATE from the hypervisor code
+      KVM: arm64: Move FP state ownership from flag to a tristate
+      KVM: arm64: Add helpers to manipulate vcpu flags among a set
+      KVM: arm64: Add three sets of flags to the vcpu state
+      KVM: arm64: Move vcpu configuration flags into their own set
+      KVM: arm64: Move vcpu PC/Exception flags to the input flag set
+      KVM: arm64: Move vcpu debug/SPE/TRBE flags to the input flag set
+      KVM: arm64: Move vcpu SVE/SME flags to the state flag set
+      KVM: arm64: Move vcpu ON_UNSUPPORTED_CPU flag to the state flag set
+      KVM: arm64: Move vcpu WFIT flag to the state flag set
+      KVM: arm64: Kill unused vcpu flags field
+      KVM: arm64: Convert vcpu sysregs_loaded_on_cpu to a state flag
+      KVM: arm64: Warn when PENDING_EXCEPTION and INCREMENT_PC are set together
+      KVM: arm64: Add build-time sanity checks for flags
+      KVM: arm64: Reduce the size of the vcpu flag members
+      KVM: arm64: Document why pause cannot be turned into a flag
+      KVM: arm64: Move the handling of !FP outside of the fast path
+      Merge branch kvm-arm64/burn-the-flags into kvmarm-master/next
+      KVM: arm64: selftests: Add support for GICv2 on v3
+      Merge branch kvm-arm64/misc-5.20 into kvmarm-master/next
+      KVM: arm64: Add get_reg_by_id() as a sys_reg_desc retrieving helper
+      KVM: arm64: Reorder handling of invariant sysregs from userspace
+      KVM: arm64: Introduce generic get_user/set_user helpers for system registers
+      KVM: arm64: Rely on index_to_param() for size checks on userspace access
+      KVM: arm64: Consolidate sysreg userspace accesses
+      KVM: arm64: Get rid of reg_from/to_user()
+      KVM: arm64: vgic-v3: Simplify vgic_v3_has_cpu_sysregs_attr()
+      KVM: arm64: vgic-v3: Push user access into vgic_v3_cpu_sysregs_uaccess()
+      KVM: arm64: vgic-v3: Make the userspace accessors use sysreg API
+      KVM: arm64: vgic-v3: Convert userspace accessors over to FIELD_GET/FIELD_PREP
+      KVM: arm64: vgic-v3: Use u32 to manage the line level from userspace
+      KVM: arm64: vgic-v3: Consolidate userspace access for MMIO registers
+      KVM: arm64: vgic-v2: Consolidate userspace access for MMIO registers
+      KVM: arm64: vgic: Use {get,put}_user() instead of copy_{from.to}_user
+      KVM: arm64: vgic-v2: Add helper for legacy dist/cpuif base address setting
+      KVM: arm64: vgic: Consolidate userspace access for base address setting
+      KVM: arm64: vgic: Tidy-up calls to vgic_{get,set}_common_attr()
+      KVM: arm64: Get rid of find_reg_by_id()
+      KVM: arm64: Descope kvm_arm_sys_reg_{get,set}_reg()
+      KVM: arm64: Get rid or outdated comments
+      Merge branch kvm-arm64/sysreg-cleanup-5.20 into kvmarm-master/next
+      KVM: arm64: Move PROTECTED_NVHE_STACKTRACE around
+      KVM: arm64: Move nVHE stacktrace unwinding into its own compilation unit
+      KVM: arm64: Make unwind()/on_accessible_stack() per-unwinder functions
+      KVM: arm64: Move nVHE-only helpers into kvm/stacktrace.c
+      arm64: Update 'unwinder howto'
+      Merge branch kvm-arm64/nvhe-stacktrace into kvmarm-master/next
+
+Masahiro Yamada (2):
+      KVM: arm64: nvhe: Rename confusing obj-y
+      KVM: arm64: nvhe: Add intermediates to 'targets' instead of extra-y
+
+Oliver Upton (1):
+      KVM: arm64: Don't open code ARRAY_SIZE()
+
+Quentin Perret (1):
+      KVM: arm64: Don't return from void function
+
+ arch/arm64/include/asm/kvm_asm.h                |  16 +
+ arch/arm64/include/asm/kvm_emulate.h            |  11 +-
+ arch/arm64/include/asm/kvm_host.h               | 205 ++++++++---
+ arch/arm64/include/asm/memory.h                 |   8 +
+ arch/arm64/include/asm/stacktrace.h             |  62 +---
+ arch/arm64/include/asm/stacktrace/common.h      | 199 ++++++++++
+ arch/arm64/include/asm/stacktrace/nvhe.h        |  55 +++
+ arch/arm64/kernel/Makefile                      |   5 +
+ arch/arm64/kernel/stacktrace.c                  | 184 +++++-----
+ arch/arm64/kvm/Kconfig                          |  13 +
+ arch/arm64/kvm/Makefile                         |   2 +-
+ arch/arm64/kvm/arch_timer.c                     |   2 +-
+ arch/arm64/kvm/arm.c                            |  25 +-
+ arch/arm64/kvm/debug.c                          |  25 +-
+ arch/arm64/kvm/fpsimd.c                         |  39 +-
+ arch/arm64/kvm/handle_exit.c                    |  10 +-
+ arch/arm64/kvm/hyp/exception.c                  |  23 +-
+ arch/arm64/kvm/hyp/include/hyp/debug-sr.h       |   6 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h         |  24 +-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h      |   4 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile                |  14 +-
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c              |   8 +-
+ arch/arm64/kvm/hyp/nvhe/host.S                  |   9 +-
+ arch/arm64/kvm/hyp/nvhe/stacktrace.c            | 160 ++++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c                |  14 +-
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c              |   4 +-
+ arch/arm64/kvm/hyp/vhe/switch.c                 |   6 +-
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c              |   4 +-
+ arch/arm64/kvm/inject_fault.c                   |  17 +-
+ arch/arm64/kvm/reset.c                          |   6 +-
+ arch/arm64/kvm/stacktrace.c                     | 218 +++++++++++
+ arch/arm64/kvm/sys_regs.c                       | 294 ++++++---------
+ arch/arm64/kvm/sys_regs.h                       |  18 +-
+ arch/arm64/kvm/vgic-sys-reg-v3.c                | 462 ++++++++++++++----------
+ arch/arm64/kvm/vgic/vgic-kvm-device.c           | 342 ++++++++----------
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c              |  10 +-
+ arch/arm64/kvm/vgic/vgic-mmio.c                 |   6 +-
+ arch/arm64/kvm/vgic/vgic-mmio.h                 |   4 +-
+ arch/arm64/kvm/vgic/vgic.h                      |   9 +-
+ include/kvm/arm_vgic.h                          |   2 +-
+ tools/testing/selftests/kvm/aarch64/vgic_init.c |  13 +-
+ 41 files changed, 1588 insertions(+), 950 deletions(-)
+ create mode 100644 arch/arm64/include/asm/stacktrace/common.h
+ create mode 100644 arch/arm64/include/asm/stacktrace/nvhe.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/stacktrace.c
+ create mode 100644 arch/arm64/kvm/stacktrace.c
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
