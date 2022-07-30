@@ -2,61 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F330EC00144
-	for <kvmarm@archiver.kernel.org>; Fri, 29 Jul 2022 19:28:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 388F2C04A68
+	for <kvmarm@archiver.kernel.org>; Sat, 30 Jul 2022 12:47:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5784D4C1AF;
-	Fri, 29 Jul 2022 15:28:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A19F94D3CA;
+	Sat, 30 Jul 2022 08:47:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UUL3j4FRDq26; Fri, 29 Jul 2022 15:28:19 -0400 (EDT)
+	with ESMTP id SKF3sF1pxT4D; Sat, 30 Jul 2022 08:47:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B941A4C18F;
-	Fri, 29 Jul 2022 15:28:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ED6E4D3D4;
+	Sat, 30 Jul 2022 08:47:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EAD2E4C18F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jul 2022 15:28:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A9BFC4D3CA
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 30 Jul 2022 08:47:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GftFzQpfYDyx for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 Jul 2022 15:28:17 -0400 (EDT)
-Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 703F24C029
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jul 2022 15:28:17 -0400 (EDT)
-Date: Fri, 29 Jul 2022 19:28:10 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1659122895;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=hGAAQQims/x+aVkjeXh2pO3zuX49eGIs7h2PdGd4m9k=;
- b=rQXuzbUlhy1H2pl2MLh/fFzXumhLDJ1JmxPLp9XsRjxgk5EM2up8wOI94Wy6GEXKWBDCOu
- uqX9RQF/oULzk6hI2zFHjlgwyY+Yl6wrh35P6gVDjBNPYihBnycuHu99Gdw2aX1LmHSHiE
- Q6O8rTbFdMTQpb4uya6GSPgXVbjxsEA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 06/24] KVM: arm64: Unify identifiers used to
- distinguish host and hypervisor
-Message-ID: <YuQ0ypCVgfMjJOew@google.com>
-References: <20220630135747.26983-1-will@kernel.org>
- <20220630135747.26983-7-will@kernel.org>
- <YtgbCEOMze8N4TPW@google.com>
- <20220720181406.GA16603@willie-the-truck>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220720181406.GA16603@willie-the-truck>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com, kvm@vger.kernel.org,
- Andy Lutomirski <luto@amacapital.net>, linux-arm-kernel@lists.infradead.org,
- Michael Roth <michael.roth@amd.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Chao Peng <chao.p.peng@linux.intel.com>, kvmarm@lists.cs.columbia.edu
+ with ESMTP id boNs-hCDq12v for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 30 Jul 2022 08:47:20 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1ACA24D3C8
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 30 Jul 2022 08:47:20 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 7B01BB80A0A;
+ Sat, 30 Jul 2022 12:47:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 182F5C433C1;
+ Sat, 30 Jul 2022 12:47:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1659185237;
+ bh=kZTc5twSzrccS0agfAec2OpOomKSTPQRxT/mVPO60wA=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Kb43IOBhoKvOWa9jWpAyIecz1GLZIl5jXa9pJ40ioImlCZEA2sEoWbS7y4u6Kd+wA
+ 2Ydz1ytvau8wqxktgkb4mWYHD5Mre9NeUUvC2C1H4z42sQGPXxH/d/1qDsN4Bh6viZ
+ 9u5eJSo8AAk8zW/UFlgLQVFHTH5EkXmmyRQSIdSz4DukE4mSQfjVocyAqxn7FFjZLI
+ wN/C3f2MfdRmKGfv9XSH5a7EHRIDDC/5VYaxfxkGxFbs4ICJw84297biVElhKSNr/H
+ NTEuKPNHXwmPG6lrSv7Xf89O4vSMSexyirnN5jlJJWviLywbqJgD2pWNe/hxlTt4p1
+ uE3GkhBd1M4gw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oHlsA-00B2Nm-FG;
+ Sat, 30 Jul 2022 13:47:14 +0100
+Date: Sat, 30 Jul 2022 13:47:14 +0100
+Message-ID: <87sfmiwywd.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [kvm-unit-tests PATCH 3/3] arm: pmu: Remove checks for !overflow
+ in chained counters tests
+In-Reply-To: <20220718154910.3923412-4-ricarkol@google.com>
+References: <20220718154910.3923412-1-ricarkol@google.com>
+ <20220718154910.3923412-4-ricarkol@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ricarkol@google.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, drjones@redhat.com, alexandru.elisei@arm.com,
+ eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: drjones@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,82 +86,159 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Will,
+Hi Ricardo,
 
-Sorry, I didn't see your reply til now.
-
-On Wed, Jul 20, 2022 at 07:14:07PM +0100, Will Deacon wrote:
-> Hi Oliver,
+On Mon, 18 Jul 2022 16:49:10 +0100,
+Ricardo Koller <ricarkol@google.com> wrote:
 > 
-> Thanks for having a look.
+> A chained event overflowing on the low counter can set the overflow flag
+> in PMOVS.  KVM does not set it, but real HW and the fast-model seem to.
+> Moreover, the AArch64.IncrementEventCounter() pseudocode in the ARM ARM
+> (DDI 0487H.a, J1.1.1 "aarch64/debug") also sets the PMOVS bit on
+> overflow.
 > 
-> On Wed, Jul 20, 2022 at 03:11:04PM +0000, Oliver Upton wrote:
-> > On Thu, Jun 30, 2022 at 02:57:29PM +0100, Will Deacon wrote:
-> > > The 'pkvm_component_id' enum type provides constants to refer to the
-> > > host and the hypervisor, yet this information is duplicated by the
-> > > 'pkvm_hyp_id' constant.
-> > > 
-> > > Remove the definition of 'pkvm_hyp_id' and move the 'pkvm_component_id'
-> > > type definition to 'mem_protect.h' so that it can be used outside of
-> > > the memory protection code.
-> > > 
-> > > Signed-off-by: Will Deacon <will@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 6 +++++-
-> > >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 8 --------
-> > >  arch/arm64/kvm/hyp/nvhe/setup.c               | 2 +-
-> > >  3 files changed, 6 insertions(+), 10 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > > index 80e99836eac7..f5705a1e972f 100644
-> > > --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > > +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > > @@ -51,7 +51,11 @@ struct host_kvm {
-> > >  };
-> > >  extern struct host_kvm host_kvm;
-> > >  
-> > > -extern const u8 pkvm_hyp_id;
-> > > +/* This corresponds to page-table locking order */
-> > > +enum pkvm_component_id {
-> > > +	PKVM_ID_HOST,
-> > > +	PKVM_ID_HYP,
-> > > +};
-> > 
-> > Since we have the concept of PTE ownership in pgtable.c, WDYT about
-> > moving the owner ID enumeration there? KVM_MAX_OWNER_ID should be
-> > incorporated in the enum too.
+> The pmu chain tests fail on bare metal when checking the overflow flag
+> of the low counter _not_ being set on overflow.  Fix by removing the
+> checks.
 > 
-> Interesting idea... I think we need the definition in a header file so that
-> it can be used by mem_protect.c, so I'm not entirely sure where you'd like
-> to see it moved.
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  arm/pmu.c | 21 ++++++++++-----------
+>  1 file changed, 10 insertions(+), 11 deletions(-)
 > 
-> The main worry I have is that if we ever need to distinguish e.g. one guest
-> instance from another, which is likely needed for sharing of memory
-> between more than just two components, then the pgtable code really cares
-> about the number of instances ("which guest is it?") whilst the mem_protect
-> cares about the component type ("is it a guest?").
-> 
-> Finally, the pgtable code is also used outside of pKVM so, although the
-> concept of ownership doesn't yet apply elsewhere, keeping the concept
-> available without dictacting the different types of owners makes sense to
-> me.
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index a7899c3c..4f2c5096 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -581,7 +581,6 @@ static void test_chained_counters(void)
+>  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+>  
+>  	report(read_regn_el0(pmevcntr, 1) == 1, "CHAIN counter #1 incremented");
+> -	report(!read_sysreg(pmovsclr_el0), "no overflow recorded for chained incr #1");
+>  
+>  	/* test 64b overflow */
+>  
+> @@ -593,7 +592,7 @@ static void test_chained_counters(void)
+>  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+>  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+>  	report(read_regn_el0(pmevcntr, 1) == 2, "CHAIN counter #1 set to 2");
+> -	report(!read_sysreg(pmovsclr_el0), "no overflow recorded for chained incr #2");
+> +	report((read_sysreg(pmovsclr_el0) & 0x2) == 0, "no overflow recorded for chained incr #2");
+>  
+>  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+>  	write_regn_el0(pmevcntr, 1, ALL_SET);
+> @@ -601,7 +600,7 @@ static void test_chained_counters(void)
+>  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+>  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+>  	report(!read_regn_el0(pmevcntr, 1), "CHAIN counter #1 wrapped");
+> -	report(read_sysreg(pmovsclr_el0) == 0x2, "overflow on chain counter");
+> +	report(read_sysreg(pmovsclr_el0) & 0x2, "overflow on chain counter");
+>  }
+>  
+>  static void test_chained_sw_incr(void)
+> @@ -626,10 +625,10 @@ static void test_chained_sw_incr(void)
+>  	for (i = 0; i < 100; i++)
+>  		write_sysreg(0x1, pmswinc_el0);
+>  
+> -	report(!read_sysreg(pmovsclr_el0) && (read_regn_el0(pmevcntr, 1) == 1),
+> -		"no overflow and chain counter incremented after 100 SW_INCR/CHAIN");
+> +	report(read_regn_el0(pmevcntr, 1) == 1,
+> +			"no chain counter incremented after 100 SW_INCR/CHAIN");
+>  	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
+> -		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+> +			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+>  
+>  	/* 64b SW_INCR and overflow on CHAIN counter*/
+>  	pmu_reset();
+> @@ -644,7 +643,7 @@ static void test_chained_sw_incr(void)
+>  	for (i = 0; i < 100; i++)
+>  		write_sysreg(0x1, pmswinc_el0);
+>  
+> -	report((read_sysreg(pmovsclr_el0) == 0x2) &&
+> +	report((read_sysreg(pmovsclr_el0) & 0x2) &&
+>  		(read_regn_el0(pmevcntr, 1) == 0) &&
+>  		(read_regn_el0(pmevcntr, 0) == 84),
+>  		"overflow on chain counter and expected values after 100 SW_INCR/CHAIN");
+> @@ -727,8 +726,8 @@ static void test_chain_promotion(void)
+>  	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+>  		    read_regn_el0(pmevcntr, 0));
+>  
+> -	report((read_regn_el0(pmevcntr, 1) == 1) && !read_sysreg(pmovsclr_el0),
+> -		"CHAIN counter enabled: CHAIN counter was incremented and no overflow");
+> +	report((read_regn_el0(pmevcntr, 1) == 1),
+> +		"CHAIN counter enabled: CHAIN counter was incremented");
+>  
+>  	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
+>  		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
+> @@ -755,8 +754,8 @@ static void test_chain_promotion(void)
+>  	report_info("MEM_ACCESS counter #0 has value 0x%lx",
+>  		    read_regn_el0(pmevcntr, 0));
+>  
+> -	report((read_regn_el0(pmevcntr, 1) == 1) && !read_sysreg(pmovsclr_el0),
+> -		"32b->64b: CHAIN counter incremented and no overflow");
+> +	report((read_regn_el0(pmevcntr, 1) == 1),
+> +		"32b->64b: CHAIN counter incremented");
+>  
+>  	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
+>  		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
 
-Sorry, it was a silly suggestion to wedge the enum there. I don't think
-it matters too much where it winds up, but something like:
+I'm looking at fixing KVM to match this (see the binch of hacks at
+[1]), and still getting a couple of failures in the PMU overflow tests
+despite my best effort to fix the code:
 
-  enum kvm_pgtable_owner_id {
-  	OWNER_ID_PKVM_HOST,
-	OWNER_ID_PKVM_HYP,
-	NR_PGTABLE_OWNER_IDS,
-  }
+$ ./arm-run  arm/pmu.flat --append pmu-overflow-interrupt
+/usr/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat --append pmu-overflow-interrupt # -initrd /tmp/tmp.RQ6FmkvXay
+INFO: PMU version: 0x1
+INFO: PMU implementer/ID code: 0x41("A")/0x3
+INFO: Implements 6 event counters
+PASS: pmu: pmu-overflow-interrupt: no overflow interrupt after preset
+PASS: pmu: pmu-overflow-interrupt: no overflow interrupt after counting
+INFO: pmu: pmu-overflow-interrupt: overflow=0x0
+PASS: pmu: pmu-overflow-interrupt: overflow interrupts expected on #0 and #1
+FAIL: pmu: pmu-overflow-interrupt: no overflow interrupt expected on 32b boundary
+FAIL: pmu: pmu-overflow-interrupt: expect overflow interrupt on odd counter
+SUMMARY: 5 tests, 2 unexpected failures
 
-And put it somewhere that both pgtable.c and mem_protect.c can get at
-it. That way bound checks (like in kvm_pgtable_stage2_set_owner())
-organically work as new IDs are added.
+Looking at the kut code, I'm wondering whether you're still missing a
+couple of extra fixes such as:
 
---
+diff --git a/arm/pmu.c b/arm/pmu.c
+index 4f2c5096..e0b9f71a 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -861,8 +861,8 @@ static void test_overflow_interrupt(void)
+ 	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+ 	isb();
+ 	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
+-	report(expect_interrupts(0),
+-		"no overflow interrupt expected on 32b boundary");
++	report(expect_interrupts(1),
++		"expect overflow interrupt on 32b counter");
+ 
+ 	/* overflow on odd counter */
+ 	pmu_reset_stats();
+@@ -870,8 +870,8 @@ static void test_overflow_interrupt(void)
+ 	write_regn_el0(pmevcntr, 1, ALL_SET);
+ 	isb();
+ 	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E);
+-	report(expect_interrupts(0x2),
+-		"expect overflow interrupt on odd counter");
++	report(expect_interrupts(0x3),
++		"expect overflow interrupt on even+odd counters");
+ }
+ #endif
+ 
+With that, all PMU tests pass. Am I missing something? Did you notice
+these failing on HW?
+
 Thanks,
-Oliver
+
+	M.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pmu-chained
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
