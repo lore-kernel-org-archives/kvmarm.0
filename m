@@ -2,68 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4537C19F28
-	for <kvmarm@archiver.kernel.org>; Wed,  3 Aug 2022 18:23:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 364C2C19F2C
+	for <kvmarm@archiver.kernel.org>; Wed,  3 Aug 2022 18:23:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D8E94FB09;
-	Wed,  3 Aug 2022 14:23:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B75374D189;
+	Wed,  3 Aug 2022 14:23:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ENdasDyyICFm; Wed,  3 Aug 2022 14:23:34 -0400 (EDT)
+	with ESMTP id QVNc2ZyTSgHX; Wed,  3 Aug 2022 14:23:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E303B4FB03;
-	Wed,  3 Aug 2022 14:23:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33F8A4FB20;
+	Wed,  3 Aug 2022 14:23:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 715D54FAFC
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Aug 2022 14:23:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D62814FAFC
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Aug 2022 14:23:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0L-NjgHUh32o for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Aug 2022 14:23:33 -0400 (EDT)
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
- [209.85.215.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D99874FAE5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Aug 2022 14:23:32 -0400 (EDT)
-Received: by mail-pg1-f201.google.com with SMTP id
- q82-20020a632a55000000b0041bafd16728so4885821pgq.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 03 Aug 2022 11:23:32 -0700 (PDT)
+ with ESMTP id bIfsGtru-F4K for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Aug 2022 14:23:36 -0400 (EDT)
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
+ [209.85.216.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E3DF4FB19
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Aug 2022 14:23:36 -0400 (EDT)
+Received: by mail-pj1-f74.google.com with SMTP id
+ o18-20020a17090aac1200b001f3252af009so1469680pjq.7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 03 Aug 2022 11:23:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:from:subject:mime-version:message-id:date:from:to:cc;
- bh=YQIObxgEKoiOHzKfKo2AOIGfQ9Eupxnu81toWwxoZR4=;
- b=QeMfWWZncT1VWOX8Gvcg1x8qqYdPHVwfF2K5uiXxur+fewrj/KVIsLcAxh8mMB+IH2
- DxXBrmpwbAXNhoGQ4KhITnOjleIbwpvfPmRng4XexmbU9Of4oQ1vWFdHT+cl7KtDqvu2
- GK7opw+mxhaYJxS4CmtiMTkmZItZoNLl2MNDYCCmt3qVg1qRNpM12fi6h57SJVUhRiYb
- 2EsjGEmEFdKRaFfCdoxnq39ob05gSGCqzg55xwoCSevdUuVC/4P1BWu/H+ZWxMuzT4cq
- SeX99TTrEEBFtsd1Qtg8FhLIY6P0rtCgmrQjlaQH9PzVaYtQwuc8FVLbvvOzdf3y1rIv
- 7QCA==
+ h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
+ :date:from:to:cc;
+ bh=NCd9pZ1nHReYqpUxat1aRffhr9vnDsLXOgqhJFAxey4=;
+ b=llw0yKtpNQpehkZ+QVXavGRSEMpGWCvk1V9rOY5p84zXQGCRh6aQK15QyIrz5fRQYV
+ ksahlTxNw7rqH0KRxKGXwXS96EGD+yah7tZeI/ct+R/DdMRNGSg+FdmU7E5sYsy+JG83
+ 9mcTe5poTVEoB0PKjZePir/IDp8WBUPJJNmIZpzLeGA214xtAefmg8ZZenL+cI3KEgar
+ ASOnLz344uqMuVY9bfA6e+s8b5I1QHmff5jNqpeShQMXEr3jprDSfi4gbDqk50KvPNqM
+ BRwue+UlTPA1Z5h2X1RlWRJRThjGTPo+sHGsWYZOtk2iGvPk72aQcADalmF45dBqk2HK
+ Zmtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
- :from:to:cc;
- bh=YQIObxgEKoiOHzKfKo2AOIGfQ9Eupxnu81toWwxoZR4=;
- b=dapt6ng5aqeh9ztOj3jPHdQR8Wq5P0KSyc8raMtG4IF410alT9lFYI2AAUhYQgaZpx
- PnuQEK1EAHMC7UnZkuJ7nZ4d1vnqL7ljl0vutTp4A3g3SAU6GK0xrBbc+qHAlb8hwUYV
- 3c9S0nQ1PoyYaSOHc3x1JKdWISE/yKhXNlQRSqS3RkNGqiYAlqGeSoQtJRm89bTUDv2e
- +KmAlm8oYikUmuQ8D/QdsASAHaoJ/G9WZmxNon8sRklAWhoRyy+mvhEw13W/7EXBMsJs
- xTqBRwoVWpcgXg8nMatnqBUdHR4I9BEcE4xOpmDr+GqI3uJ20oqXQLpzpZcNrUsU6WSs
- 8x/Q==
-X-Gm-Message-State: ACgBeo2woqWLwubte/94r9Ecmv+j51X0hs9i7zHcl5QvY8DwHnof8TvW
- PYgVjn+DU7YwKAXPUiFU3wYIMQdS8YZDtQ==
-X-Google-Smtp-Source: AA6agR4FwE9hS4KohCiAsjYwbvYrx4JkPYgmajmF2QzZT1bykc75fpeD1HwhmcfUtOiW9J97fyaVFCpay2hpxQ==
+ h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
+ :date:x-gm-message-state:from:to:cc;
+ bh=NCd9pZ1nHReYqpUxat1aRffhr9vnDsLXOgqhJFAxey4=;
+ b=HyJmgDUIT3Sg02X0At3zuKEgkucWDWv0lzkMBF3HLl8U0Py5P+YUQoVG15D3H2BGHG
+ cY/u/hS31X6b8pNP2eDBt8TtJvDnoU8Hdep9ZG/dICfWGfaZHtJG7VT0wxlO1af51I7m
+ fdLCWu70JgwGJY3fMh5OxwbyvsQGz8nxzxlCQfanpmMvUtUsm+iIa8dszpuhuZLnsHh/
+ wni7hmJO6goH7ePx4jNclJtb003bHUvMRwzDidBgWdh0zEsihEaYLkvjo7Q9LIAFIfTz
+ j+eFxG4eXUbgF4cjWE9cxiXUN9p93WXMIQM5NGjPMRVhNxzDKhhFsZeUB8R1Ry/y9YMh
+ xHNg==
+X-Gm-Message-State: ACgBeo2B51+4ALWMI57aWKi54i9KTZHghdbELhPF/MZOn6sI8cPQfWS2
+ S9c/C5r0Pn2fUO0rKgZNb40N1Gn4SGxnBQ==
+X-Google-Smtp-Source: AA6agR46+fS5xqb633nq44y0Z/Fa4yZf37XU33PssxOX+2ZsgstmTBevMRPV9uxYjBsBsCd1m35M1FfY2MCy0g==
 X-Received: from ricarkol2.c.googlers.com
  ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:902:7e47:b0:16c:7115:84d6 with SMTP
- id a7-20020a1709027e4700b0016c711584d6mr27971478pln.93.1659551011679; Wed, 03
- Aug 2022 11:23:31 -0700 (PDT)
-Date: Wed,  3 Aug 2022 11:23:25 -0700
-Message-Id: <20220803182328.2438598-1-ricarkol@google.com>
+ (user=ricarkol job=sendgmr) by 2002:a17:90a:df03:b0:1f3:396c:dd94 with SMTP
+ id gp3-20020a17090adf0300b001f3396cdd94mr435102pjb.1.1659551015065; Wed, 03
+ Aug 2022 11:23:35 -0700 (PDT)
+Date: Wed,  3 Aug 2022 11:23:27 -0700
+In-Reply-To: <20220803182328.2438598-1-ricarkol@google.com>
+Message-Id: <20220803182328.2438598-3-ricarkol@google.com>
 Mime-Version: 1.0
+References: <20220803182328.2438598-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.37.1.455.g008518b4e5-goog
-Subject: [kvm-unit-tests PATCH v2 0/3] arm: pmu: Fixes for bare metal
+Subject: [kvm-unit-tests PATCH v2 2/3] arm: pmu: Reset the pmu registers
+ before starting some tests
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev
 Cc: maz@kernel.org
@@ -83,33 +87,56 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-There are some tests that fail when running on bare metal (including a
-passthrough prototype).  There are three issues with the tests.  The
-first one is that there are some missing isb()'s between enabling event
-counting and the actual counting. This wasn't an issue on KVM as
-trapping on registers served as context synchronization events. The
-second issue is that some tests assume that registers reset to 0.  And
-finally, the third issue is that overflowing the low counter of a
-chained event sets the overflow flag in PMVOS and some tests fail by
-checking for it not being set.
+Some registers like the PMOVS reset to an architecturally UNKNOWN value.
+Most tests expect them to be reset (mostly zeroed) using pmu_reset().
+Add a pmu_reset() on all the tests that need one.
 
-Addressed all comments from the previous version:
-- added some isb()'s as suggested by Alexandru.
-- fixed a couple of confusing comments (Alexandru).
-- check for overflow in the low counter in the interrupt_overflow test (Marc).
+As a bonus, fix a couple of comments related to the register state
+before a sub-test.
 
-Thanks!
-Ricardo
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ arm/pmu.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Ricardo Koller (3):
-  arm: pmu: Add missing isb()'s after sys register writing
-  arm: pmu: Reset the pmu registers before starting some tests
-  arm: pmu: Check for overflow in the low counter in chained counters
-    tests
-
- arm/pmu.c | 55 ++++++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 38 insertions(+), 17 deletions(-)
-
+diff --git a/arm/pmu.c b/arm/pmu.c
+index 76156f78..7c5bc259 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -826,7 +826,7 @@ static void test_overflow_interrupt(void)
+ 	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
+ 	isb();
+ 
+-	/* interrupts are disabled */
++	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
+ 
+ 	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
+ 	report(expect_interrupts(0), "no overflow interrupt after preset");
+@@ -841,7 +841,7 @@ static void test_overflow_interrupt(void)
+ 	isb();
+ 	report(expect_interrupts(0), "no overflow interrupt after counting");
+ 
+-	/* enable interrupts */
++	/* enable interrupts (PMINTENSET_EL1 <= ALL_SET) */
+ 
+ 	pmu_reset_stats();
+ 
+@@ -889,6 +889,7 @@ static bool check_cycles_increase(void)
+ 	bool success = true;
+ 
+ 	/* init before event access, this test only cares about cycle count */
++	pmu_reset();
+ 	set_pmcntenset(1 << PMU_CYCLE_IDX);
+ 	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
+ 
+@@ -943,6 +944,7 @@ static bool check_cpi(int cpi)
+ 	uint32_t pmcr = get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
+ 
+ 	/* init before event access, this test only cares about cycle count */
++	pmu_reset();
+ 	set_pmcntenset(1 << PMU_CYCLE_IDX);
+ 	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
+ 
 -- 
 2.37.1.455.g008518b4e5-goog
 
