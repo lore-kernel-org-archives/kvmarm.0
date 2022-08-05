@@ -2,60 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B74C00140
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Aug 2022 13:58:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DA43C25B08
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Aug 2022 13:58:42 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BDD24E9A1;
-	Fri,  5 Aug 2022 09:58:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36C414D0D0;
+	Fri,  5 Aug 2022 09:58:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xNVXXbNaQRFh; Fri,  5 Aug 2022 09:58:39 -0400 (EDT)
+	with ESMTP id JcrdzXrjiQTq; Fri,  5 Aug 2022 09:58:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B852D4EA93;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CCFAB4EAA9;
 	Fri,  5 Aug 2022 09:58:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D1344E90C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Aug 2022 09:58:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2837B4E9AB
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Aug 2022 09:58:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GJO+njYXAx9k for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id y3BDMXd+E0f1 for <kvmarm@lists.cs.columbia.edu>;
  Fri,  5 Aug 2022 09:58:23 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 162C54E8F3
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 55E254E901
  for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Aug 2022 09:58:23 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 8D82B60D37;
+ by dfw.source.kernel.org (Postfix) with ESMTPS id CC37C60D38;
  Fri,  5 Aug 2022 13:58:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AED9C43140;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98CD4C43142;
  Fri,  5 Aug 2022 13:58:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=k20201202; t=1659707902;
- bh=zoR8xUqf5VOpW4qpOygOpmFjWKp1aJaDtJXBxFC1+0k=;
+ bh=FX8KHe9gh8du9g8SR8sMvTMXuTpe7PJm5fL6a0/3oiU=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ED80D3RkUlUESHwGpRjYKKC8p5LFdFBTlDElxX3AH/JkD52Z2FnXrxMikZfk5zArF
- fF9dPQxJn8i91ZdWRiyjt5JZShvr4V9LIC4rj9Jllm52yaiEkwKGvHUPjXPIl7iakJ
- tB4PSJ7D42w0TCKAMHORLkmOFqwKPgKmUpIk1mAjZq/yCsc3IThOTg/wfcradgiUEJ
- YcVqnMHcX5Z2II8F8GY/X4GDcurdXvJ38Ja/a9qKzcIG+i9l1Md9Gd65a5Ja5401K0
- QZmXISxlpwWcdHwSH7/DOYwFtADu6xlAql4vDMTUSiYcZgq62s2bJcUkQgXlUJuprw
- /u5M59oJ8bv2A==
+ b=l/In9iXTPjegCFxTKSpYKCwbd9tEqJoqqpOKDZnua4sgR8oKqWv/QV0jXBwbTGwov
+ UQiLldbOGUGMEnlqw35wjRcvjMI3rO/Z7nUpEzhGVgvQ1h4KC/OYUqk7ZTAMdR59g/
+ hqs1/ryfJVr/0T9fi2iGAZ+jCQFT3VsFUHT/86BYY5EqNIvFchMgGYYnVgkB/97R54
+ V/yFG0goSCL99nScaOwMIhxfMgpVKdzNquCqEY+cBbgeP9BwL9nEZmNF/uxvrszlFD
+ VyENyEl/fTeBe7X52S4emABSH1+doqi9kiAuYSsCwznlR37baO/hL5BbxfEPjWu63F
+ He4uGRgVCH1vw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oJxqG-001AeL-FK;
+ (envelope-from <maz@kernel.org>) id 1oJxqG-001AeL-Ss;
  Fri, 05 Aug 2022 14:58:20 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 6/9] KVM: arm64: PMU: Move the ID_AA64DFR0_EL1.PMUver limit to
- VM creation
-Date: Fri,  5 Aug 2022 14:58:10 +0100
-Message-Id: <20220805135813.2102034-7-maz@kernel.org>
+Subject: [PATCH 8/9] KVM: arm64: PMU: Implement PMUv3p5 long counter support
+Date: Fri,  5 Aug 2022 14:58:12 +0100
+Message-Id: <20220805135813.2102034-9-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220805135813.2102034-1-maz@kernel.org>
 References: <20220805135813.2102034-1-maz@kernel.org>
@@ -85,145 +84,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As further patches will enable the selection of a PMU revision
-from userspace, sample the supported PMU revision at VM creation
-time, rather than building each time the ID_AA64DFR0_EL1 register
-is accessed.
+PMUv3p5 (which is mandatory with ARMv8.5) comes with some extra
+features:
 
-This shouldn't result in any change in behaviour.
+- All counters are 64bit
+
+- The overflow point is controlled by the PMCR_EL0.LP bit
+
+Add the required checks in the helpers that control counter
+width and overflow, as well as the sysreg handling for the LP
+bit. A new kvm_pmu_is_3p5() helper makes it easy to spot the
+PMUv3p5 specific handling.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kvm/arm.c              |  6 ++++++
- arch/arm64/kvm/pmu-emul.c         | 11 +++++++++++
- arch/arm64/kvm/sys_regs.c         | 26 +++++++++++++++++++++-----
- include/kvm/arm_pmu.h             |  6 ++++++
- 5 files changed, 45 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/pmu-emul.c | 8 +++++---
+ arch/arm64/kvm/sys_regs.c | 4 ++++
+ include/kvm/arm_pmu.h     | 8 ++++++++
+ 3 files changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f38ef299f13b..411114510634 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -163,6 +163,7 @@ struct kvm_arch {
- 
- 	u8 pfr0_csv2;
- 	u8 pfr0_csv3;
-+	u8 dfr0_pmuver;
- 
- 	/* Hypercall features firmware registers' descriptor */
- 	struct kvm_smccc_features smccc_feat;
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 8fe73ee5fa84..e4f80f0c1e97 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -164,6 +164,12 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	set_default_spectre(kvm);
- 	kvm_arm_init_hypercalls(kvm);
- 
-+	/*
-+	 * Initialise the default PMUver before there is a chance to
-+	 * create an actual PMU.
-+	 */
-+	kvm->arch.dfr0_pmuver = kvm_arm_pmu_get_host_pmuver();
-+
- 	return ret;
- out_free_stage2_pgd:
- 	kvm_free_stage2_pgd(&kvm->arch.mmu);
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index ddd79b64b38a..33a88ca7b7fd 100644
+index 33a88ca7b7fd..b33a2953cbf6 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -1021,3 +1021,14 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 
- 	return -ENXIO;
+@@ -50,13 +50,15 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
+  */
+ static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
+ {
+-	return (select_idx == ARMV8_PMU_CYCLE_IDX);
++	return (select_idx == ARMV8_PMU_CYCLE_IDX || kvm_pmu_is_3p5(vcpu));
  }
+ 
+ static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 select_idx)
+ {
+-	return (select_idx == ARMV8_PMU_CYCLE_IDX &&
+-		__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
++	u64 val = __vcpu_sys_reg(vcpu, PMCR_EL0);
 +
-+u8 kvm_arm_pmu_get_host_pmuver(void)
-+{
-+	u64 tmp;
-+
-+	tmp = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-+	tmp = cpuid_feature_cap_perfmon_field(tmp,
-+					      ID_AA64DFR0_PMUVER_SHIFT,
-+					      ID_AA64DFR0_PMUVER_8_4);
-+	return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER), tmp);
-+}
++	return (select_idx < ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LP)) ||
++	       (select_idx == ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LC));
+ }
+ 
+ static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 333efddb1e27..55451f49017c 100644
+index c0595f31dab8..2b5e0ec5c100 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1062,6 +1062,22 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
- 	return true;
+@@ -654,6 +654,8 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	       | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
+ 	if (!system_supports_32bit_el0())
+ 		val |= ARMV8_PMU_PMCR_LC;
++	if (!kvm_pmu_is_3p5(vcpu))
++		val &= ~ARMV8_PMU_PMCR_LP;
+ 	__vcpu_sys_reg(vcpu, r->reg) = val;
  }
  
-+static u8 pmuver_to_perfmon(const struct kvm_vcpu *vcpu)
-+{
-+	if (!kvm_vcpu_has_pmu(vcpu))
-+		return 0;
-+
-+	switch (vcpu->kvm->arch.dfr0_pmuver) {
-+	case ID_AA64DFR0_PMUVER_8_0:
-+		return ID_DFR0_PERFMON_8_0;
-+	case ID_AA64DFR0_PMUVER_IMP_DEF:
-+		return 0;
-+	default:
-+		/* Anything ARMv8.4+ has the same value. For now. */
-+		return vcpu->kvm->arch.dfr0_pmuver;
-+	}
-+}
-+
- /* Read a sanitised cpufeature ID register by sys_reg_desc */
- static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 		struct sys_reg_desc const *r, bool raz)
-@@ -1112,10 +1128,10 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 		/* Limit debug to ARMv8.0 */
- 		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER);
- 		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 6);
--		/* Limit guests to PMUv3 for ARMv8.4 */
--		val = cpuid_feature_cap_perfmon_field(val,
--						      ID_AA64DFR0_PMUVER_SHIFT,
--						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
-+		/* Set PMUver to the required version */
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER);
-+		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER),
-+				  kvm_vcpu_has_pmu(vcpu) ? vcpu->kvm->arch.dfr0_pmuver : 0);
- 		/* Hide SPE from guests */
- 		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_PMSVER);
- 		break;
-@@ -1123,7 +1139,7 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 		/* Limit guests to PMUv3 for ARMv8.4 */
- 		val = cpuid_feature_cap_perfmon_field(val,
- 						      ID_DFR0_PERFMON_SHIFT,
--						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
-+						      pmuver_to_perfmon(vcpu));
- 		break;
- 	}
- 
+@@ -703,6 +705,8 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 		val |= p->regval & ARMV8_PMU_PMCR_MASK;
+ 		if (!system_supports_32bit_el0())
+ 			val |= ARMV8_PMU_PMCR_LC;
++		if (!kvm_pmu_is_3p5(vcpu))
++			val &= ~ARMV8_PMU_PMCR_LP;
+ 		__vcpu_sys_reg(vcpu, PMCR_EL0) = val;
+ 		kvm_pmu_handle_pmcr(vcpu, val);
+ 		kvm_vcpu_pmu_restore_guest(vcpu);
 diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 96b192139a23..6bda9b071084 100644
+index 6bda9b071084..846502251923 100644
 --- a/include/kvm/arm_pmu.h
 +++ b/include/kvm/arm_pmu.h
-@@ -89,6 +89,8 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+@@ -89,6 +89,13 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
  			vcpu->arch.pmu.events = *kvm_get_pmu_events();	\
  	} while (0)
  
-+u8 kvm_arm_pmu_get_host_pmuver(void);
++/*
++ * Evaluates as true when emulating PMUv3p5, and false otherwise.
++ */
++#define kvm_pmu_is_3p5(vcpu)						\
++	(vcpu->kvm->arch.dfr0_pmuver >= ID_AA64DFR0_PMUVER_8_5 &&	\
++	 vcpu->kvm->arch.dfr0_pmuver != ID_AA64DFR0_PMUVER_IMP_DEF)
 +
+ u8 kvm_arm_pmu_get_host_pmuver(void);
+ 
  #else
- struct kvm_pmu {
- };
-@@ -154,6 +156,10 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+@@ -153,6 +160,7 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+ }
+ 
+ #define kvm_vcpu_has_pmu(vcpu)		({ false; })
++#define kvm_pmu_is_3p5(vcpu)		({ false; })
  static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
  static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
  static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
-+static inline u8 kvm_arm_pmu_get_host_pmuver(void)
-+{
-+	return 0;
-+}
- 
- #endif
- 
 -- 
 2.34.1
 
