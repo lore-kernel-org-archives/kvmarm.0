@@ -2,67 +2,68 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF75FC19F2D
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 10:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0618BC25B07
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 10:28:53 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 491CE4C38A;
-	Tue,  9 Aug 2022 06:28:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8337A4CB86;
+	Tue,  9 Aug 2022 06:28:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id agUNg1fUkq2X; Tue,  9 Aug 2022 06:28:51 -0400 (EDT)
+	with ESMTP id uJhwmYdwtHwV; Tue,  9 Aug 2022 06:28:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 144764C45F;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 360024C484;
 	Tue,  9 Aug 2022 06:28:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B0EA4CFB5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 02:33:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E82F4CC7E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 02:35:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Op0BAsWF39DW for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Aug 2022 02:33:42 -0400 (EDT)
+ with ESMTP id HzRdb7RQwfcy for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Aug 2022 02:35:30 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 478134CF6F
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 02:33:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 50ABE4CC79
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 02:35:30 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1660026821;
+ s=mimecast20190719; t=1660026930;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=wDEFUEUXWfV3mOjw64c6fomBw3vcWdz+3Pw9Zm2DtUE=;
- b=h1H1fffLQpCfVQQ2kB3+jm+gGuQoHKK5Rrf/SquEGczXegSNy8zZai+p1YdaLRJTfRn0mx
- YIuuVdbLqK5zuy4XACxvCr41I5oUedy6+AzuK6yNOD1/vzQgprq5AfTjZ8pZ2aOH77Qba/
- bFtl6I8gZ6PHMpt0kAIS3vqS/v0EEJI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=q2eAM1/hYw4jzhc9gj4LD1tO4qXa+Z9mYKQuildX4rA=;
+ b=Mtyz6qgQRy7qBrFIFqwim3Jrntp0K5Imga7sH7pBgDHUeBsaF7k5xvUmnm1O7ONCqE8dx3
+ 5V43jroPoN2sa/JeWcYRumXv/SsHGuoKWQ1bMw79joy1r6DTVj5ktwJz6saOMzcy1hUhSU
+ duCXGJ4wxtBto3BJtYLdYf4E7CDMmkA=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-363-4-ft3tWvNVOUZxhcd6aQLg-1; Tue, 09 Aug 2022 02:33:36 -0400
-X-MC-Unique: 4-ft3tWvNVOUZxhcd6aQLg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
- [10.11.54.3])
+ us-mta-651-4bi-5j_ePrmKV_eqokFj0A-1; Tue, 09 Aug 2022 02:35:19 -0400
+X-MC-Unique: 4bi-5j_ePrmKV_eqokFj0A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.5])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D77EC805B9A;
- Tue,  9 Aug 2022 06:33:35 +0000 (UTC)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DC68F3C0E20D;
+ Tue,  9 Aug 2022 06:35:18 +0000 (UTC)
 Received: from oldenburg.str.redhat.com (unknown [10.39.193.65])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F41A51121315;
- Tue,  9 Aug 2022 06:33:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CA20318EB5;
+ Tue,  9 Aug 2022 06:35:15 +0000 (UTC)
 From: Florian Weimer <fweimer@redhat.com>
 To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: selftests: Make rseq compatible with glibc-2.35
+Subject: Re: [PATCH 2/2] KVM: selftests: Use getcpu() instead of
+ sched_getcpu() in rseq_test
 References: <20220809060627.115847-1-gshan@redhat.com>
- <20220809060627.115847-2-gshan@redhat.com>
-Date: Tue, 09 Aug 2022 08:33:31 +0200
-In-Reply-To: <20220809060627.115847-2-gshan@redhat.com> (Gavin Shan's message
- of "Tue, 9 Aug 2022 14:06:26 +0800")
-Message-ID: <8735e6ncxw.fsf@oldenburg.str.redhat.com>
+ <20220809060627.115847-3-gshan@redhat.com>
+Date: Tue, 09 Aug 2022 08:35:14 +0200
+In-Reply-To: <20220809060627.115847-3-gshan@redhat.com> (Gavin Shan's message
+ of "Tue, 9 Aug 2022 14:06:27 +0800")
+Message-ID: <87y1vxncv1.fsf@oldenburg.str.redhat.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
 X-Mailman-Approved-At: Tue, 09 Aug 2022 06:28:50 -0400
 Cc: shan.gavin@gmail.com, kvm@vger.kernel.org, maz@kernel.org,
  linux-kernel@vger.kernel.org, andrew.jones@linux.dev,
@@ -87,51 +88,16 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 * Gavin Shan:
 
-> diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
-> index a54d4d05a058..acb1bf1f06b3 100644
-> --- a/tools/testing/selftests/kvm/rseq_test.c
-> +++ b/tools/testing/selftests/kvm/rseq_test.c
-> @@ -9,6 +9,7 @@
->  #include <string.h>
->  #include <signal.h>
->  #include <syscall.h>
-> +#include <dlfcn.h>
->  #include <sys/ioctl.h>
->  #include <sys/sysinfo.h>
->  #include <asm/barrier.h>
+> sched_getcpu() is glibc dependent and it can simply return the CPU
+> ID from the registered rseq information, as Florian Weimer pointed.
+> In this case, it's pointless to compare the return value from
+> sched_getcpu() and that fetched from the registered rseq information.
+>
+> Fix the issue by replacing sched_getcpu() with getcpu(), as Florian
+> suggested. The comments are modified accordingly.
 
-I'm surprised that there isn't a Makefile update to link with -ldl
-(still required for glibc 2.33 and earlier).
-
-> @@ -36,6 +37,8 @@ static __thread volatile struct rseq __rseq = {
->   */
->  #define NR_TASK_MIGRATIONS 100000
->  
-> +static bool __rseq_ownership;
-> +static volatile struct rseq *__rseq_info;
->  static pthread_t migration_thread;
->  static cpu_set_t possible_mask;
->  static int min_cpu, max_cpu;
-> @@ -49,11 +52,33 @@ static void guest_code(void)
->  		GUEST_SYNC(0);
->  }
->  
-> +static void sys_rseq_ownership(void)
-> +{
-> +	long *offset;
-> +	unsigned int *size, *flags;
-> +
-> +	offset = dlsym(RTLD_NEXT, "__rseq_offset");
-> +	size = dlsym(RTLD_NEXT, "__rseq_size");
-> +	flags = dlsym(RTLD_NEXT, "__rseq_flags");
-> +
-> +	if (offset && size && *size && flags) {
-> +		__rseq_ownership = false;
-> +		__rseq_info = (struct rseq *)((uintptr_t)__builtin_thread_pointer() +
-> +					      *offset);
-
-__builtin_thread_pointer doesn't work on all architectures/GCC versions.
-Is this a problem for selftests?
+Note that getcpu was added in glibc 2.29, so perhaps you need to perform
+a direct system call?
 
 Thanks,
 Florian
