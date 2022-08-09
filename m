@@ -2,50 +2,50 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49204C25B0C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A33C3F6B0
 	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 13:24:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C91DB4CAF3;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF86D4CAE0;
 	Tue,  9 Aug 2022 09:24:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EruJTNkrkS-Z; Tue,  9 Aug 2022 09:24:01 -0400 (EDT)
+	with ESMTP id zKtiqoC0LVYm; Tue,  9 Aug 2022 09:24:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 124C54CAD9;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BBC04CADE;
 	Tue,  9 Aug 2022 09:24:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 001E24C28B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 08:56:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 998B04C254
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 09:01:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WfC4w26KjM6d for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Aug 2022 08:56:17 -0400 (EDT)
+ with ESMTP id KZip4pLJSpWP for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Aug 2022 09:01:07 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FC804C259
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 08:56:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F1C6C4C240
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 09:01:06 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6B42423A;
- Tue,  9 Aug 2022 05:56:17 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1E0B823A;
+ Tue,  9 Aug 2022 06:01:07 -0700 (PDT)
 Received: from [192.168.12.23] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 591933F5A1;
- Tue,  9 Aug 2022 05:56:15 -0700 (PDT)
-Message-ID: <38ec5559-7c2a-9820-724d-6a192ea83ecb@arm.com>
-Date: Tue, 9 Aug 2022 13:56:13 +0100
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E351F3F5A1;
+ Tue,  9 Aug 2022 06:01:04 -0700 (PDT)
+Message-ID: <af820fb3-cbf3-b4f6-5642-ebb5eb4f5b1d@arm.com>
+Date: Tue, 9 Aug 2022 14:01:02 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.12.0
-Subject: Re: [kvm-unit-tests RFC PATCH 09/19] arm/arm64: Zero secondary CPUs'
- stack
+Subject: Re: [kvm-unit-tests RFC PATCH 12/19] arm/arm64: assembler.h: Replace
+ size with end address for dcache_by_line_op
 Content-Language: en-GB
 To: Alexandru Elisei <alexandru.elisei@arm.com>, pbonzini@redhat.com,
  thuth@redhat.com, andrew.jones@linux.dev, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu
 References: <20220809091558.14379-1-alexandru.elisei@arm.com>
- <20220809091558.14379-10-alexandru.elisei@arm.com>
+ <20220809091558.14379-13-alexandru.elisei@arm.com>
 From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <20220809091558.14379-10-alexandru.elisei@arm.com>
+In-Reply-To: <20220809091558.14379-13-alexandru.elisei@arm.com>
 X-Mailman-Approved-At: Tue, 09 Aug 2022 09:23:58 -0400
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -64,93 +64,140 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 09/08/2022 10:15, Alexandru Elisei wrote:
-> For the boot CPU, the entire stack is zeroed in the entry code. For the
-> secondaries, only struct thread_info, which lives at the bottom of the
-> stack, is zeroed in thread_info_init().
->
+> Commit b5f659be4775 ("arm/arm64: Remove dcache_line_size global
+> variable") moved the dcache_by_line_op macro to assembler.h and changed
+> it to take the size of the regions instead of the end address as
+> parameter. This was done to keep the file in sync with the upstream
+> Linux kernel implementation at the time.
+> 
+> But in both places where the macro is used, the code has the start and
+> end address of the region, and it has to compute the size to pass it to
+> dcache_by_line_op. Then the macro itsef computes the end by adding size
+> to start.
+> 
+> Get rid of this massaging of parameters and change the macro to the end
+> address as parameter directly.
+> 
+> Besides slightly simplyfing the code by remove two unneeded arithmetic
+> operations, this makes the macro compatible with the current upstream
+> version of Linux (which was similarly changed to take the end address in
+> commit 163d3f80695e ("arm64: dcache_by_line_op to take end parameter
+> instead of size")), which will allow us to reuse (part of) the Linux C
+> wrappers over the assembly macro.
+> 
+> The change has been tested with the same snippet of code used to test
+> commit 410b3bf09e76 ("arm/arm64: Perform dcache clean + invalidate after
+> turning MMU off").
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-That's a good point.
-
-> Be consistent and zero the entire stack for the secondaries. This should
-> also improve reproducibility of the testsuite, as all the stacks now start
-> with the same contents, which is zero. And now that all the stacks are
-> zeroed in the entry code, there is no need to explicitely zero struct
-> thread_info in thread_info_init().
->
-
-Wouldn't it make more sense to call memset(sp, 0, THREAD_SIZE); from 
-thread_stack_alloc() instead and avoid doing this in assembly? Do we 
-expect anyone to jump to secondary_entry without calling 
-thread_stack_alloc() first?
+Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 
 Thanks,
 
 Nikos
 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->   arm/cstart.S          | 6 ++++++
->   arm/cstart64.S        | 3 +++
->   lib/arm/processor.c   | 1 -
->   lib/arm64/processor.c | 1 -
->   4 files changed, 9 insertions(+), 2 deletions(-)
+>   arm/cstart.S              |  1 -
+>   arm/cstart64.S            |  1 -
+>   lib/arm/asm/assembler.h   | 11 +++++------
+>   lib/arm64/asm/assembler.h | 11 +++++------
+>   4 files changed, 10 insertions(+), 14 deletions(-)
 > 
 > diff --git a/arm/cstart.S b/arm/cstart.S
-> index 39260e0fa470..39e70f40986a 100644
+> index 39e70f40986a..096a77c454f4 100644
 > --- a/arm/cstart.S
 > +++ b/arm/cstart.S
-> @@ -151,7 +151,13 @@ secondary_entry:
->   	 */
->   	ldr	r1, =secondary_data
->   	ldr	r0, [r1]
-> +	mov	r2, r0
-> +	lsr	r2, #THREAD_SHIFT
-> +	lsl	r2, #THREAD_SHIFT
-> +	add	r3, r2, #THREAD_SIZE
-> +	zero_range r2, r3, r4, r5
->   	mov	sp, r0
-> +
->   	bl	exceptions_init
->   	bl	enable_vfp
+> @@ -226,7 +226,6 @@ asm_mmu_disable:
+>   	ldr	r0, [r0]
+>   	ldr	r1, =__phys_end
+>   	ldr	r1, [r1]
+> -	sub	r1, r1, r0
+>   	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
 >   
+>   	mov     pc, lr
 > diff --git a/arm/cstart64.S b/arm/cstart64.S
-> index d62360cf3859..54773676d1d5 100644
+> index 54773676d1d5..7cc90a9fa13f 100644
 > --- a/arm/cstart64.S
 > +++ b/arm/cstart64.S
-> @@ -156,6 +156,9 @@ secondary_entry:
->   	/* set the stack */
->   	adrp	x0, secondary_data
->   	ldr	x0, [x0, :lo12:secondary_data]
-> +	and	x1, x0, #THREAD_MASK
-> +	add	x2, x1, #THREAD_SIZE
-> +	zero_range x1, x2
->   	mov	sp, x0
+> @@ -258,7 +258,6 @@ asm_mmu_disable:
+>   	ldr	x0, [x0, :lo12:__phys_offset]
+>   	adrp	x1, __phys_end
+>   	ldr	x1, [x1, :lo12:__phys_end]
+> -	sub	x1, x1, x0
+>   	dcache_by_line_op civac, sy, x0, x1, x2, x3
 >   
->   	/* finish init in C code */
-> diff --git a/lib/arm/processor.c b/lib/arm/processor.c
-> index 9d5759686b73..ceff1c0a1bd2 100644
-> --- a/lib/arm/processor.c
-> +++ b/lib/arm/processor.c
-> @@ -117,7 +117,6 @@ void do_handle_exception(enum vector v, struct pt_regs *regs)
+>   	ret
+> diff --git a/lib/arm/asm/assembler.h b/lib/arm/asm/assembler.h
+> index 4200252dd14d..db5f0f55027c 100644
+> --- a/lib/arm/asm/assembler.h
+> +++ b/lib/arm/asm/assembler.h
+> @@ -25,17 +25,16 @@
 >   
->   void thread_info_init(struct thread_info *ti, unsigned int flags)
->   {
-> -	memset(ti, 0, sizeof(struct thread_info));
->   	ti->cpu = mpidr_to_cpu(get_mpidr());
->   	ti->flags = flags;
->   }
-> diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
-> index 831207c16587..268b2858f0be 100644
-> --- a/lib/arm64/processor.c
-> +++ b/lib/arm64/processor.c
-> @@ -232,7 +232,6 @@ void install_vector_handler(enum vector v, vector_fn fn)
+>   /*
+>    * Macro to perform a data cache maintenance for the interval
+> - * [addr, addr + size).
+> + * [addr, end).
+>    *
+>    * 	op:		operation to execute
+>    * 	domain		domain used in the dsb instruction
+>    * 	addr:		starting virtual address of the region
+> - * 	size:		size of the region
+> - * 	Corrupts:	addr, size, tmp1, tmp2
+> + * 	end:		the end of the region (non-inclusive)
+> + * 	Corrupts:	addr, tmp1, tmp2
+>    */
+> -	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
+> +	.macro dcache_by_line_op op, domain, addr, end, tmp1, tmp2
+>   	dcache_line_size \tmp1, \tmp2
+> -	add	\size, \addr, \size
+>   	sub	\tmp2, \tmp1, #1
+>   	bic	\addr, \addr, \tmp2
+>   9998:
+> @@ -45,7 +44,7 @@
+>   	.err
+>   	.endif
+>   	add	\addr, \addr, \tmp1
+> -	cmp	\addr, \size
+> +	cmp	\addr, \end
+>   	blo	9998b
+>   	dsb	\domain
+>   	.endm
+> diff --git a/lib/arm64/asm/assembler.h b/lib/arm64/asm/assembler.h
+> index aa8c65a2bb4a..1e09d65af4a7 100644
+> --- a/lib/arm64/asm/assembler.h
+> +++ b/lib/arm64/asm/assembler.h
+> @@ -28,25 +28,24 @@
 >   
->   static void __thread_info_init(struct thread_info *ti, unsigned int flags)
->   {
-> -	memset(ti, 0, sizeof(struct thread_info));
->   	ti->cpu = mpidr_to_cpu(get_mpidr());
->   	ti->flags = flags;
->   }
+>   /*
+>    * Macro to perform a data cache maintenance for the interval
+> - * [addr, addr + size). Use the raw value for the dcache line size because
+> + * [addr, end). Use the raw value for the dcache line size because
+>    * kvm-unit-tests has no concept of scheduling.
+>    *
+>    * 	op:		operation passed to dc instruction
+>    * 	domain:		domain used in dsb instruction
+>    * 	addr:		starting virtual address of the region
+> - * 	size:		size of the region
+> - * 	Corrupts:	addr, size, tmp1, tmp2
+> + * 	end:		the end of the region (non-inclusive)
+> + * 	Corrupts:	addr, tmp1, tmp2
+>    */
+>   
+> -	.macro dcache_by_line_op op, domain, addr, size, tmp1, tmp2
+> +	.macro dcache_by_line_op op, domain, addr, end, tmp1, tmp2
+>   	raw_dcache_line_size \tmp1, \tmp2
+> -	add	\size, \addr, \size
+>   	sub	\tmp2, \tmp1, #1
+>   	bic	\addr, \addr, \tmp2
+>   9998:
+>   	dc	\op, \addr
+>   	add	\addr, \addr, \tmp1
+> -	cmp	\addr, \size
+> +	cmp	\addr, \end
+>   	b.lo	9998b
+>   	dsb	\domain
+>   	.endm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
