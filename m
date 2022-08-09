@@ -2,42 +2,41 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51851C25B06
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 09:15:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 560F2C19F2D
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 09:15:48 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A7904C982;
-	Tue,  9 Aug 2022 05:15:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1301B4C918;
+	Tue,  9 Aug 2022 05:15:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 496S9LC196Qj; Tue,  9 Aug 2022 05:15:45 -0400 (EDT)
+	with ESMTP id tl0bqC2FR0JC; Tue,  9 Aug 2022 05:15:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 315FC4C4CB;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CD644CB6D;
 	Tue,  9 Aug 2022 05:15:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D644C4C4E2
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 05:15:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AA874C982
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 05:15:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lq+2YS5McLiS for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Aug 2022 05:15:40 -0400 (EDT)
+ with ESMTP id 4AYawX18GB10 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Aug 2022 05:15:41 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CCAE4C53B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 05:15:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 221154C491
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 05:15:40 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 25EA723A;
- Tue,  9 Aug 2022 02:15:39 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 861FF15BF;
+ Tue,  9 Aug 2022 02:15:40 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 460433F67D;
- Tue,  9 Aug 2022 02:15:37 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A5E803F67D;
+ Tue,  9 Aug 2022 02:15:38 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: pbonzini@redhat.com, thuth@redhat.com, andrew.jones@linux.dev,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, nikos.nikoleris@arm.com
-Subject: [kvm-unit-tests RFC PATCH 08/19] arm/arm64: Use pgd_alloc() to
- allocate mmu_idmap
-Date: Tue,  9 Aug 2022 10:15:47 +0100
-Message-Id: <20220809091558.14379-9-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests RFC PATCH 09/19] arm/arm64: Zero secondary CPUs' stack
+Date: Tue,  9 Aug 2022 10:15:48 +0100
+Message-Id: <20220809091558.14379-10-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20220809091558.14379-1-alexandru.elisei@arm.com>
 References: <20220809091558.14379-1-alexandru.elisei@arm.com>
@@ -58,82 +57,80 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Until commit 031755dbfefb ("arm: enable vmalloc"), the idmap was allocated
-using pgd_alloc(). After that commit, all the page table allocator
-functions were switched to using the page allocator, but pgd_alloc() was
-left unchanged and became unused, with the idmap now being allocated with
-alloc_page().
+For the boot CPU, the entire stack is zeroed in the entry code. For the
+secondaries, only struct thread_info, which lives at the bottom of the
+stack, is zeroed in thread_info_init().
 
-For arm64, the pgd table size varies based on the page size, which is
-configured by the user. For arm, it will always contain 4 entries (it
-translates bits 31:30 of the input address). To keep things simple and
-consistent with the other functions and across both architectures, modify
-pgd_alloc() to use alloc_page() instead of memalign like the rest of the
-page table allocator functions and use it to allocate the idmap.
-
-Note that when the idmap is created, alloc_ops->memalign is
-memalign_pages() which allocates memory with page granularity. Using
-memalign() as before would still have allocated a full page.
+Be consistent and zero the entire stack for the secondaries. This should
+also improve reproducibility of the testsuite, as all the stacks now start
+with the same contents, which is zero. And now that all the stacks are
+zeroed in the entry code, there is no need to explicitely zero struct
+thread_info in thread_info_init().
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- lib/arm/asm/pgtable.h   | 4 ++--
- lib/arm/mmu.c           | 4 ++--
- lib/arm64/asm/pgtable.h | 4 ++--
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ arm/cstart.S          | 6 ++++++
+ arm/cstart64.S        | 3 +++
+ lib/arm/processor.c   | 1 -
+ lib/arm64/processor.c | 1 -
+ 4 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/lib/arm/asm/pgtable.h b/lib/arm/asm/pgtable.h
-index d7c73906ba5e..a35f42965df9 100644
---- a/lib/arm/asm/pgtable.h
-+++ b/lib/arm/asm/pgtable.h
-@@ -43,8 +43,8 @@
- #define pgd_free(pgd) free(pgd)
- static inline pgd_t *pgd_alloc(void)
+diff --git a/arm/cstart.S b/arm/cstart.S
+index 39260e0fa470..39e70f40986a 100644
+--- a/arm/cstart.S
++++ b/arm/cstart.S
+@@ -151,7 +151,13 @@ secondary_entry:
+ 	 */
+ 	ldr	r1, =secondary_data
+ 	ldr	r0, [r1]
++	mov	r2, r0
++	lsr	r2, #THREAD_SHIFT
++	lsl	r2, #THREAD_SHIFT
++	add	r3, r2, #THREAD_SIZE
++	zero_range r2, r3, r4, r5
+ 	mov	sp, r0
++
+ 	bl	exceptions_init
+ 	bl	enable_vfp
+ 
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index d62360cf3859..54773676d1d5 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -156,6 +156,9 @@ secondary_entry:
+ 	/* set the stack */
+ 	adrp	x0, secondary_data
+ 	ldr	x0, [x0, :lo12:secondary_data]
++	and	x1, x0, #THREAD_MASK
++	add	x2, x1, #THREAD_SIZE
++	zero_range x1, x2
+ 	mov	sp, x0
+ 
+ 	/* finish init in C code */
+diff --git a/lib/arm/processor.c b/lib/arm/processor.c
+index 9d5759686b73..ceff1c0a1bd2 100644
+--- a/lib/arm/processor.c
++++ b/lib/arm/processor.c
+@@ -117,7 +117,6 @@ void do_handle_exception(enum vector v, struct pt_regs *regs)
+ 
+ void thread_info_init(struct thread_info *ti, unsigned int flags)
  {
--	pgd_t *pgd = memalign(L1_CACHE_BYTES, PTRS_PER_PGD * sizeof(pgd_t));
--	memset(pgd, 0, PTRS_PER_PGD * sizeof(pgd_t));
-+	assert(PTRS_PER_PGD * sizeof(pgd_t) <= PAGE_SIZE);
-+	pgd_t *pgd = alloc_page();
- 	return pgd;
+-	memset(ti, 0, sizeof(struct thread_info));
+ 	ti->cpu = mpidr_to_cpu(get_mpidr());
+ 	ti->flags = flags;
  }
+diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
+index 831207c16587..268b2858f0be 100644
+--- a/lib/arm64/processor.c
++++ b/lib/arm64/processor.c
+@@ -232,7 +232,6 @@ void install_vector_handler(enum vector v, vector_fn fn)
  
-diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-index 8f936acafe8b..2b7405d0274f 100644
---- a/lib/arm/mmu.c
-+++ b/lib/arm/mmu.c
-@@ -165,7 +165,7 @@ void *setup_mmu(phys_addr_t unused0, void *unused1)
- #endif
- 
- 	if (!mmu_idmap)
--		mmu_idmap = alloc_page();
-+		mmu_idmap = pgd_alloc();
- 
- 	for (r = mem_regions; r->end; ++r) {
- 		if (r->flags & MR_F_IO) {
-@@ -197,7 +197,7 @@ void __iomem *__ioremap(phys_addr_t phys_addr, size_t size)
- 		pgtable = current_thread_info()->pgtable;
- 	} else {
- 		if (!mmu_idmap)
--			mmu_idmap = alloc_page();
-+			mmu_idmap = pgd_alloc();
- 		pgtable = mmu_idmap;
- 	}
- 
-diff --git a/lib/arm64/asm/pgtable.h b/lib/arm64/asm/pgtable.h
-index bfb8a993e112..06357920aa74 100644
---- a/lib/arm64/asm/pgtable.h
-+++ b/lib/arm64/asm/pgtable.h
-@@ -49,8 +49,8 @@
- #define pgd_free(pgd) free(pgd)
- static inline pgd_t *pgd_alloc(void)
+ static void __thread_info_init(struct thread_info *ti, unsigned int flags)
  {
--	pgd_t *pgd = memalign(PAGE_SIZE, PTRS_PER_PGD * sizeof(pgd_t));
--	memset(pgd, 0, PTRS_PER_PGD * sizeof(pgd_t));
-+	assert(PTRS_PER_PGD * sizeof(pgd_t) <= PAGE_SIZE);
-+	pgd_t *pgd = alloc_page();
- 	return pgd;
+-	memset(ti, 0, sizeof(struct thread_info));
+ 	ti->cpu = mpidr_to_cpu(get_mpidr());
+ 	ti->flags = flags;
  }
- 
 -- 
 2.37.1
 
