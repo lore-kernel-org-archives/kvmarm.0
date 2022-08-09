@@ -2,75 +2,66 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B480EC00140
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Aug 2022 10:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC08C19F2D
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 04:06:24 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13D564D276;
-	Mon,  8 Aug 2022 06:40:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 134364C471;
+	Tue,  9 Aug 2022 00:06:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id T+KyWQd6fUrs; Mon,  8 Aug 2022 06:40:09 -0400 (EDT)
+	with ESMTP id Peq7pwD-7e5X; Tue,  9 Aug 2022 00:06:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED9A74D25C;
-	Mon,  8 Aug 2022 06:40:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F6454CFA9;
+	Tue,  9 Aug 2022 00:06:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 309604D25C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Aug 2022 06:40:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F3A44CF9F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 00:06:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xbyipNlsAg-J for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Aug 2022 06:40:06 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C7DC14D25B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Aug 2022 06:40:06 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id 1C5QmSzZdkb0 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Aug 2022 00:06:16 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 457E64C511
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 00:06:16 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1660017975;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ZjK0GuZ2alM35iqhgJkEaVdZNKEdFOR/rEWuzOn8N5o=;
+ b=dD5ogBdxZkzzzou3cIkyOZ5M/sxwQg+EUeaVg3ByktjkC5ePqwtmWnf0W5+Xz6JlQt+DIw
+ pwEkasP499K1eBgSsidZiZtXBh1hMJqZM4y6amQ8AkuNHi8UAnvYtwPlcARHfafAPDLRcU
+ SjXbdJMg0qVqrZLheC+vw6KNMwSQE6U=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-449-HpMhBOelPCOEFVO_l6NS2w-1; Tue, 09 Aug 2022 00:06:11 -0400
+X-MC-Unique: HpMhBOelPCOEFVO_l6NS2w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.6])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 2A283B80DD6;
- Mon,  8 Aug 2022 10:40:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9B9AC433C1;
- Mon,  8 Aug 2022 10:40:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1659955203;
- bh=8T4tJN0mEWGMZDnn9v3qiuDFgGhyI8V1fDSNzDI/SAc=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=XA/GanuY6m4drh+sZleZ+GuIi6F//tU6AYQ7sORf52taxwP/c+0mwXEzAVOOHgMEW
- 9OHZRfpzOYZ5jasj2lYkveY0MjpUFG9nq8+qD9J72jYY40eY9Tg7ReDYz3FFT4Pq5+
- OJQgN0lkwqKaTj7AG9EvwzLHPJO0622pc+TKIwsywp5qleMbDcfi1lZ6DXjMCefZKn
- LtImiA4OZLPbkFB5uxe6Ut75vJk8brbNhb7J6NErjNWf1Cn2e/whfQE4fwEoDxhfcD
- 9kjttohPigrSoblsncXScomGonhv/3fvSY+gACbVYLiimkVI8rBbFmWNJToOfE6hSv
- CnQCFIpczWG4w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oL0Az-001dfr-JL;
- Mon, 08 Aug 2022 11:40:01 +0100
-Date: Mon, 08 Aug 2022 11:40:01 +0100
-Message-ID: <87czdbvx1a.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 3/3] arm: pmu: Check for overflow in the
- low counter in chained counters tests
-In-Reply-To: <289609de-ca61-2257-caf0-daedaf6c9bc3@redhat.com>
-References: <20220803182328.2438598-1-ricarkol@google.com>
- <20220803182328.2438598-4-ricarkol@google.com>
- <289609de-ca61-2257-caf0-daedaf6c9bc3@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, ricarkol@google.com,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
- alexandru.elisei@arm.com, oliver.upton@linux.dev, reijiw@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, andrew.jones@linux.dev, kvmarm@lists.cs.columbia.edu
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 46DF080391B;
+ Tue,  9 Aug 2022 04:06:10 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-20.bne.redhat.com [10.64.54.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D19482166B26;
+ Tue,  9 Aug 2022 04:06:05 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH 0/2] kvm/selftests: Two rseq_test fixes
+Date: Tue,  9 Aug 2022 14:06:25 +0800
+Message-Id: <20220809060627.115847-1-gshan@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+Cc: fweimer@redhat.com, shan.gavin@gmail.com, kvm@vger.kernel.org,
+ maz@kernel.org, linux-kernel@vger.kernel.org, andrew.jones@linux.dev,
+ mathieu.desnoyers@efficios.com, yihyu@redhat.com,
+ linux-kselftest@vger.kernel.org, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,28 +78,29 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 04 Aug 2022 19:21:49 +0100,
-Eric Auger <eric.auger@redhat.com> wrote:
->
-> I definitively missed that spec detail when originally writing the test,
-> thank you for fixing.
+There are two issues in current rseq_test implementation and the
+series intends to fix them:
 
-To be fair, it is only in a very recent version of the ARM ARM that
-this detail came to light, and we collectively misunderstood the spec
-for a few years, resulting in a over-complicated KVM infrastructure
-(the new emulation code is so much simpler).
+- From glibc-2.35, rseq information is registered by TLS. It means
+  rseq_test is unable to register its own rseq information. PATCH[01]
+  fixes the issue by reuse TLS's rseq information if needed.
 
-BTW, I think I forgot to Cc you and Andrew on the KVM rework at [1],
-sorry about that.
+- sched_getcpu() relies on glibc's implementation and it can simply
+  returns the CPU ID cached in the rseq information. In this case,
+  it's pointless to compare the return value from sched_getcpu()
+  and that fetched from rseq information. PATCH[02] fixes the issue
+  by replacing sched_getcpu() with getcpu().
 
-Thanks,
+Gavin Shan (2):
+  KVM: selftests: Make rseq compatible with glibc-2.35
+  KVM: selftests: Use getcpu() instead of sched_getcpu() in rseq_test
 
-	M.
-
-[1] https://lore.kernel.org/kvm/20220805135813.2102034-1-maz@kernel.org
+ tools/testing/selftests/kvm/rseq_test.c | 62 ++++++++++++++++++-------
+ 1 file changed, 44 insertions(+), 18 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.23.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
