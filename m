@@ -2,42 +2,42 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D3F2C25B07
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 09:15:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51851C25B06
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 09:15:47 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BB144C497;
-	Tue,  9 Aug 2022 05:15:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A7904C982;
+	Tue,  9 Aug 2022 05:15:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nKDxtkhCgkAv; Tue,  9 Aug 2022 05:15:42 -0400 (EDT)
+	with ESMTP id 496S9LC196Qj; Tue,  9 Aug 2022 05:15:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E75DC4C4FF;
-	Tue,  9 Aug 2022 05:15:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 315FC4C4CB;
+	Tue,  9 Aug 2022 05:15:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB9994C918
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 05:15:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D644C4C4E2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 05:15:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id caTncDCcty8A for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Aug 2022 05:15:38 -0400 (EDT)
+ with ESMTP id lq+2YS5McLiS for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Aug 2022 05:15:40 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E429B4C4A1
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 05:15:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CCAE4C53B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 05:15:38 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5A8CF23A;
- Tue,  9 Aug 2022 02:15:36 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 25EA723A;
+ Tue,  9 Aug 2022 02:15:39 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7886E3F67D;
- Tue,  9 Aug 2022 02:15:34 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 460433F67D;
+ Tue,  9 Aug 2022 02:15:37 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: pbonzini@redhat.com, thuth@redhat.com, andrew.jones@linux.dev,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, nikos.nikoleris@arm.com
-Subject: [kvm-unit-tests RFC PATCH 06/19] lib/alloc_phys: Remove allocation
- accounting
-Date: Tue,  9 Aug 2022 10:15:45 +0100
-Message-Id: <20220809091558.14379-7-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests RFC PATCH 08/19] arm/arm64: Use pgd_alloc() to
+ allocate mmu_idmap
+Date: Tue,  9 Aug 2022 10:15:47 +0100
+Message-Id: <20220809091558.14379-9-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20220809091558.14379-1-alexandru.elisei@arm.com>
 References: <20220809091558.14379-1-alexandru.elisei@arm.com>
@@ -58,169 +58,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The page allocator has better allocation tracking and is used by all
-architectures, while the physical allocator is now never used for
-allocating memory.
+Until commit 031755dbfefb ("arm: enable vmalloc"), the idmap was allocated
+using pgd_alloc(). After that commit, all the page table allocator
+functions were switched to using the page allocator, but pgd_alloc() was
+left unchanged and became unused, with the idmap now being allocated with
+alloc_page().
 
-Simplify the physical allocator by removing allocation accounting. This
-accomplishes two things:
+For arm64, the pgd table size varies based on the page size, which is
+configured by the user. For arm, it will always contain 4 entries (it
+translates bits 31:30 of the input address). To keep things simple and
+consistent with the other functions and across both architectures, modify
+pgd_alloc() to use alloc_page() instead of memalign like the rest of the
+page table allocator functions and use it to allocate the idmap.
 
-1. It makes the allocator more useful, as the warning that was displayed
-each allocation after the 256th is removed.
-
-2. Together with the lock removal, the physical allocator becomes more
-appealing as a very early allocator, when using the page allocator might
-not be desirable or feasible.
-
-Also, phys_alloc_show() has received a slight change in the way it displays
-the use and free regions: the end of the region is now non-inclusive, to
-allow phys_alloc_show() to express that no memory has been used, or no
-memory is free, in which case the start and the end adresses are equal.
+Note that when the idmap is created, alloc_ops->memalign is
+memalign_pages() which allocates memory with page granularity. Using
+memalign() as before would still have allocated a full page.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- lib/alloc_phys.c | 65 ++++++++++++++----------------------------------
- lib/alloc_phys.h |  5 ++--
- 2 files changed, 21 insertions(+), 49 deletions(-)
+ lib/arm/asm/pgtable.h   | 4 ++--
+ lib/arm/mmu.c           | 4 ++--
+ lib/arm64/asm/pgtable.h | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/lib/alloc_phys.c b/lib/alloc_phys.c
-index 2e0b9c079d1d..1e1fc179f108 100644
---- a/lib/alloc_phys.c
-+++ b/lib/alloc_phys.c
-@@ -11,17 +11,11 @@
- #include "asm/io.h"
- #include "alloc_phys.h"
- 
--#define PHYS_ALLOC_NR_REGIONS	256
--
--struct phys_alloc_region {
--	phys_addr_t base;
--	phys_addr_t size;
--};
--
--static struct phys_alloc_region regions[PHYS_ALLOC_NR_REGIONS];
--static int nr_regions;
--
--static phys_addr_t base, top;
-+/*
-+ * used is the end address of the currently allocated memory, non-inclusive.
-+ * used equals top means that all memory has been allocated.
-+ */
-+static phys_addr_t base, used, top;
- 
- #define DEFAULT_MINIMUM_ALIGNMENT	32
- static size_t align_min = DEFAULT_MINIMUM_ALIGNMENT;
-@@ -34,23 +28,15 @@ struct alloc_ops *alloc_ops = &early_alloc_ops;
- 
- void phys_alloc_show(void)
+diff --git a/lib/arm/asm/pgtable.h b/lib/arm/asm/pgtable.h
+index d7c73906ba5e..a35f42965df9 100644
+--- a/lib/arm/asm/pgtable.h
++++ b/lib/arm/asm/pgtable.h
+@@ -43,8 +43,8 @@
+ #define pgd_free(pgd) free(pgd)
+ static inline pgd_t *pgd_alloc(void)
  {
--	int i;
--
- 	printf("phys_alloc minimum alignment: %#" PRIx64 "\n", (u64)align_min);
--	for (i = 0; i < nr_regions; ++i)
--		printf("%016" PRIx64 "-%016" PRIx64 " [%s]\n",
--			(u64)regions[i].base,
--			(u64)(regions[i].base + regions[i].size - 1),
--			"USED");
--	printf("%016" PRIx64 "-%016" PRIx64 " [%s]\n",
--		(u64)base, (u64)(top - 1), "FREE");
-+	printf("%016" PRIx64 "-%016" PRIx64 " [USED]\n", (u64)base, (u64)used);
-+	printf("%016" PRIx64 "-%016" PRIx64 " [FREE]\n", (u64)used, (u64)top);
+-	pgd_t *pgd = memalign(L1_CACHE_BYTES, PTRS_PER_PGD * sizeof(pgd_t));
+-	memset(pgd, 0, PTRS_PER_PGD * sizeof(pgd_t));
++	assert(PTRS_PER_PGD * sizeof(pgd_t) <= PAGE_SIZE);
++	pgd_t *pgd = alloc_page();
+ 	return pgd;
  }
  
- void phys_alloc_init(phys_addr_t base_addr, phys_addr_t size)
- {
--	base = base_addr;
-+	used = base = base_addr;
- 	top = base + size;
--	nr_regions = 0;
- }
+diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+index 8f936acafe8b..2b7405d0274f 100644
+--- a/lib/arm/mmu.c
++++ b/lib/arm/mmu.c
+@@ -165,7 +165,7 @@ void *setup_mmu(phys_addr_t unused0, void *unused1)
+ #endif
  
- void phys_alloc_set_minimum_alignment(phys_addr_t align)
-@@ -61,7 +47,6 @@ void phys_alloc_set_minimum_alignment(phys_addr_t align)
+ 	if (!mmu_idmap)
+-		mmu_idmap = alloc_page();
++		mmu_idmap = pgd_alloc();
  
- static void *memalign_early(size_t alignment, size_t sz)
- {
--	static bool warned = false;
- 	phys_addr_t align = (phys_addr_t)alignment;
- 	phys_addr_t size = (phys_addr_t)sz;
- 	phys_addr_t size_orig = size;
-@@ -70,50 +55,36 @@ static void *memalign_early(size_t alignment, size_t sz)
- 	assert(align && !(align & (align - 1)));
- 
- 	top_safe = top;
--
- 	if (sizeof(long) == 4)
- 		top_safe = MIN(top_safe, 1ULL << 32);
-+	assert(used < top_safe);
- 
--	assert(base < top_safe);
- 	if (align < align_min)
- 		align = align_min;
- 
--	addr = ALIGN(base, align);
--	size += addr - base;
-+	addr = ALIGN(used, align);
-+	size += addr - used;
- 
--	if ((top_safe - base) < size) {
-+	if (size > top_safe - used) {
- 		printf("phys_alloc: requested=%#" PRIx64
- 		       " (align=%#" PRIx64 "), "
- 		       "need=%#" PRIx64 ", but free=%#" PRIx64 ". "
- 		       "top=%#" PRIx64 ", top_safe=%#" PRIx64 "\n",
- 		       (u64)size_orig, (u64)align, (u64)size,
--		       (u64)(top_safe - base), (u64)top, (u64)top_safe);
-+		       (u64)(top_safe - used), (u64)top, (u64)top_safe);
- 		return NULL;
+ 	for (r = mem_regions; r->end; ++r) {
+ 		if (r->flags & MR_F_IO) {
+@@ -197,7 +197,7 @@ void __iomem *__ioremap(phys_addr_t phys_addr, size_t size)
+ 		pgtable = current_thread_info()->pgtable;
+ 	} else {
+ 		if (!mmu_idmap)
+-			mmu_idmap = alloc_page();
++			mmu_idmap = pgd_alloc();
+ 		pgtable = mmu_idmap;
  	}
  
--	base += size;
--
--	if (nr_regions < PHYS_ALLOC_NR_REGIONS) {
--		regions[nr_regions].base = addr;
--		regions[nr_regions].size = size_orig;
--		++nr_regions;
--	} else if (!warned) {
--		printf("WARNING: phys_alloc: No free log entries, "
--		       "can no longer log allocations...\n");
--		warned = true;
--	}
-+	used += size;
- 
- 	return phys_to_virt(addr);
- }
- 
- void phys_alloc_get_unused(phys_addr_t *p_base, phys_addr_t *p_top)
+diff --git a/lib/arm64/asm/pgtable.h b/lib/arm64/asm/pgtable.h
+index bfb8a993e112..06357920aa74 100644
+--- a/lib/arm64/asm/pgtable.h
++++ b/lib/arm64/asm/pgtable.h
+@@ -49,8 +49,8 @@
+ #define pgd_free(pgd) free(pgd)
+ static inline pgd_t *pgd_alloc(void)
  {
--	*p_base = base;
-+	*p_base = used;
- 	*p_top = top;
--	if (base == top)
--		return;
--	regions[nr_regions].base = base;
--	regions[nr_regions].size = top - base;
--	++nr_regions;
--	base = top;
-+
-+	/* Empty allocator. */
-+	used = top;
+-	pgd_t *pgd = memalign(PAGE_SIZE, PTRS_PER_PGD * sizeof(pgd_t));
+-	memset(pgd, 0, PTRS_PER_PGD * sizeof(pgd_t));
++	assert(PTRS_PER_PGD * sizeof(pgd_t) <= PAGE_SIZE);
++	pgd_t *pgd = alloc_page();
+ 	return pgd;
  }
-diff --git a/lib/alloc_phys.h b/lib/alloc_phys.h
-index 8049c340818d..4d350f010031 100644
---- a/lib/alloc_phys.h
-+++ b/lib/alloc_phys.h
-@@ -29,8 +29,9 @@ extern void phys_alloc_set_minimum_alignment(phys_addr_t align);
- 
- /*
-  * phys_alloc_show outputs all currently allocated regions with the
-- * following format
-- *   <start_addr>-<end_addr> [<USED|FREE>]
-+ * following format, where <end_addr> is non-inclusive:
-+ *
-+ * <start_addr>-<end_addr> [<USED|FREE>]
-  */
- extern void phys_alloc_show(void);
  
 -- 
 2.37.1
