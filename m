@@ -2,52 +2,49 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E27F8C19F2D
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 14:01:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3AD1C3F6B0
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 14:22:20 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 407764CD6C;
-	Tue,  9 Aug 2022 10:01:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 615CB4CE2C;
+	Tue,  9 Aug 2022 10:22:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QA4mGsSFzevu; Tue,  9 Aug 2022 10:01:00 -0400 (EDT)
+	with ESMTP id FZ-CP+8cVfh2; Tue,  9 Aug 2022 10:22:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 928774CD57;
-	Tue,  9 Aug 2022 10:01:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E85434CCE6;
+	Tue,  9 Aug 2022 10:22:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 061304CD55
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 10:00:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 756154CCE6
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 10:22:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Q1HngSw-9Q3j for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Aug 2022 10:00:53 -0400 (EDT)
+ with ESMTP id 7vHUtoqxyvmV for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Aug 2022 10:22:14 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 36EC44CD5A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 10:00:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D9BB4CAD1
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 10:22:14 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4C5E423A;
- Tue,  9 Aug 2022 07:00:53 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CDBA823A;
+ Tue,  9 Aug 2022 07:22:14 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 82AD83F5A1;
- Tue,  9 Aug 2022 07:00:51 -0700 (PDT)
-Date: Tue, 9 Aug 2022 15:01:36 +0100
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EDE7F3F5A1;
+ Tue,  9 Aug 2022 07:22:12 -0700 (PDT)
+Date: Tue, 9 Aug 2022 15:22:57 +0100
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: KVM/arm64: SPE: Translate VA to IPA on a stage 2 fault instead
- of pinning VM memory
-Message-ID: <YvJowFt+U/qCqNVV@monolith.localdoman>
-References: <Yl6+JWaP+mq2Nc0b@monolith.localdoman>
- <20220419141012.GB6143@willie-the-truck>
- <Yt5nFAscgrRGNGoH@monolith.localdoman>
- <20220801170055.GB26471@willie-the-truck>
- <YujzE33aPSD22wvY@monolith.localdoman>
- <Yul8UBoDcy6GQddq@google.com>
+To: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Subject: Re: [kvm-unit-tests RFC PATCH 19/19] arm/arm64: Rework the cache
+ maintenance in asm_mmu_disable
+Message-ID: <YvJtwWcKkcxLUVif@monolith.localdoman>
+References: <20220809091558.14379-1-alexandru.elisei@arm.com>
+ <20220809091558.14379-20-alexandru.elisei@arm.com>
+ <3fba260d-bfca-14ea-7bdd-3e55f3d1e276@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <Yul8UBoDcy6GQddq@google.com>
-Cc: maz@kernel.org, Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <3fba260d-bfca-14ea-7bdd-3e55f3d1e276@arm.com>
+Cc: pbonzini@redhat.com, thuth@redhat.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, andrew.jones@linux.dev
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -64,159 +61,158 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On Tue, Aug 09, 2022 at 02:53:34PM +0100, Nikos Nikoleris wrote:
+> Hi Alex,
+> 
+> On 09/08/2022 10:15, Alexandru Elisei wrote:
+> > asm_mmu_disable is overly ambitious and provably incorrect:
+> > 
+> > 1. It tries to clean and invalidate the data caches for the *entire*
+> > memory, which is highly unnecessary, as it's very unlikely that a test
+> > will write to the entire memory, and even more unlikely that a test will
+> > modify the text section of the test image.
+> > 
+> 
+> While it appears that we don't modify the text section, there is some
+> loading happening before we start executing a test. Are you sure that the
+> loader doesn't leave the memory dirty?
 
-On Tue, Aug 02, 2022 at 12:34:40PM -0700, Oliver Upton wrote:
-> Hi folks,
-> 
-> On Tue, Aug 02, 2022 at 10:49:07AM +0100, Alexandru Elisei wrote:
-> > > > > A funkier approach might be to defer pinning of the buffer until the SPE is
-> > > > > enabled and avoid pinning all of VM memory that way, although I can't
-> > > > > immediately tell how flexible the architecture is in allowing you to cache
-> > > > > the base/limit values.
-> > > > 
-> > > > I was investigating this approach, and Mark raised a concern that I think
-> > > > might be a showstopper.
-> > > > 
-> > > > Let's consider this scenario:
-> > > > 
-> > > > Initial conditions: guest at EL1, profiling disabled (PMBLIMITR_EL1.E = 0,
-> > > > PMBSR_EL1.S = 0, PMSCR_EL1.{E0SPE,E1SPE} = {0,0}).
-> > > > 
-> > > > 1. Guest programs the buffer and enables it (PMBLIMITR_EL1.E = 1).
-> > > > 2. Guest programs SPE to enable profiling at **EL0**
-> > > > (PMSCR_EL1.{E0SPE,E1SPE} = {1,0}).
-> > > > 3. Guest changes the translation table entries for the buffer. The
-> > > > architecture allows this.
-> > > 
-> > > The architecture also allows MMIO accesses to use writeback addressing
-> > > modes, but it doesn't provide a mechanism to virtualise them sensibly.
-> > > 
-> > > So I'd prefer that we don't pin all of guest memory just to satisfy a corner
-> > > case -- as long as the impact of a guest doing this funny sequence is
-> > > constrained to the guest, then I think pinning only what is required is
-> > > probably the most pragmatic approach.
-> > > 
-> > > Is it ideal? No, of course not, and we should probably try to get the debug
-> > > architecture extended to be properly virtualisable, but in the meantime
-> > > having major operating systems as guests and being able to use SPE without
-> > > pinning seems like a major design goal to me.
-> > > 
-> > > In any case, that's just my thinking on this and I defer to Oliver and
-> > > Marc on the ultimate decision.
-> 
-> Thanks for chiming in Will, very much agree that pragmatism is likely
-> the best route forward. While fun to poke at all the pitfalls of
-> virtualizing SPE, pulling tricks in KVM probably has marginal return
-> over a simpler approach.
-> 
-> > Thank you for the input.
-> > 
-> > To summarize the approaches we've discussed so far:
-> > 
-> > 1. Pinning the entire guest memory
-> > - Heavy handed and not ideal.
-> > - Tried this approach in v5 of the SPE series [1], patches #2-#12.
-> > 
-> > 2. Mapping the guest SPE buffer on demand, page by page, as a result of stage 2
-> > faults reported by SPE.
-> > - Not feasible, because the entire contents of the buffer must be discarded is
-> >   PMBSR_EL1.DL is set to 1 when taking the fault.
-> > - Requires KVM to walk the guest's stage 1 tables, because SPE reports the VA,
-> >   not the IPA.
-> > 
-> > 3. Pinning the guest SPE buffer when profiling becomes enabled*:
-> > - There is the corner case described above, when profiling becomes enabled as a
-> >   result of an ERET to EL0. This can happen when the buffer is enabled and
-> >   PMSCR_EL1.{E0SPE,E1SPE} = {1,0};
-> > - The previous buffer is unpinned when a new buffer is pinned, to avoid SPE
-> >   stage 2 faults when draining the buffer, which is performed with profiling
-> >   disabled.
-> > - Also requires KVM to walk the guest's stage 1 tables.
-> > 
-> > 4. Pin the entire guest SPE buffer after the first stage 2 fault reported by
-> > SPE.
-> > - Gets rid of the corner case at 3.
-> > - Same approach to buffer unpinning as 3.
-> > - Introduces a blackout window before the first record is written.
-> > - Also requires KVM to walk the guest's stage 1 tables.
-> > 
-> > As for the corner case at 3, I proposed either:
-> > 
-> > a) Mandate that guest operating systems must never modify the buffer
-> > translation entries if the buffer is enabled and
-> > PMSCR_EL1.{E0SPE,E1SPE} = {1,0}.
-> > 
-> > b) Pin the entire buffer as a result of the first stage 2 fault reported by SPE,
-> > but **only** for this corner case. For all other cases, the buffer is pinned
-> > when profiling becomes enabled, to eliminate the blackout window. Guest
-> > operating systems can be modified to not change the translation entries for the
-> > buffer if this blackout window is not desirable.
-> > 
-> > Pinning as a result of the **first** stage 2 fault should work, because there
-> > are no prior records that would have to be discarded if PMSBR_EL1.DL = 1.
-> > 
-> > I hope I haven't missed anything. Thoughts and suggestions more than welcome.
-> 
-> Thanks Alex for pulling together all of the context here.
-> 
-> Unless there's any other strong opinions on the topic, it seems to me
-> that option #4 (pin on S2 fault) is probably the best approach for
-> the initial implementation. No amount of tricks in KVM can work around
-> the fact that SPE has some serious issues w.r.t. virtualization. With
-> that, we should probably document the behavior of SPE as a known erratum
-> of KVM.
-> 
-> If folks complain about EL1 profile blackout, eagerly pinning when
-> profiling is enabled could layer on top quite easily by treating it as
-> a synthetic S2 fault and triggering the implementation of #4. Having
+Yes, it's in the boot protocol for Linux [1]. I also mentioned this in the
+commit message for the previous patch.
 
-I'm not sure I follow, I understand what you mean by "treating it as a
-synthetic S2 fault", would you mind elaborating?
+[1] https://elixir.bootlin.com/linux/v5.19/source/Documentation/arm64/booting.rst#L180
 
-> said that I don't believe it is a hard requirement for enabling some
-> flavor of SPE for guests.
 > 
-> Walking guest S1 in KVM doesn't sound too exciting although it'll need to
-> be done eventually.
+> > 2. There is no corresponding dcache invalidate command for the entire
+> > memory in asm_mmu_enable, leaving it up to the test that disabled the
+> > MMU to do the cache maintenance in an asymmetrical fashion: only for
+> > re-enabling the MMU, but not for disabling it.
+> > 
+> > 3. It's missing the DMB SY memory barrier to ensure that the dcache
+> > maintenance is performed after the last store executed in program order
+> > before calling asm_mmu_disable.
+> > 
 > 
-> Do you feel like this is an OK route forward, or have I missed
-> something?
+> I am not sure why this is needed. In general, iiuc, a store to location x
+> followed by a DC CVAC to x in program order don't need an barrier (see Arm
+> ARM ARM DDI 0487G.b "Data cache maintenance instructions" at K11.5.1 and
 
-I've been giving this some thought, and I prefer approach #3 because with
-#4, pinning the buffer as a result of a stage 2 fault reported by SPE, it
-will be impossible to distinguish between a valid stage 2 fault (a fault
-caused by the guest reprogramming the buffer and enabling profiling) and
-KVM messing something up when pinning the buffer. I believe this to be
-important, as experience has shown me that pinning the buffer at stage 2 is
-not trivial and there isn't a mechanism today in Linux to do that
-(explanation and examples here [1]).
+Just a note, the latest public version is H.a.
 
-With approach #4, it would be impossible to figure out if the results of a
-profiling operations inside a guest are representative of the workload or
-not, because those SPE stage 2 faults triggered by a bug in KVM can happen
-multiple times per profiling session, introducing multiple blackout windows
-that can skew the results.
+K11.5.1 looks to me like it deals with ordering of the cache maintenance
+operations with regards to memory accesses that are *after* the CMO in
+program order, this patch is about memory accesses that are *before* the
+CMO in program order.
 
-If you're proposing that the blackout window when the first record is
-written be documented as an erratum for KVM, then why no got a step further
-and document as an erratum that changing the buffer translation tables
-after the buffer has been enabled will lead to an SPE Serror? That will
-allow us to always pin the buffer when profiling is enabled.
+> "Ordering and completion of data and instruction cache instructions" at
+> D4-2656). It doesn't hurt to have it but I think it's unnecessary.
 
-[1] https://lore.kernel.org/all/YuEMkKY2RU%2F2KiZW@monolith.localdoman/
+D4-2656 is about PAC, I assume you meant D4-2636 judging from the section
+name (please correct me if I'm wrong):
+
+"All data cache instructions, other than DC ZVA, that specify an address:
+[..]
+Can execute in any order relative to loads or stores that access any
+address with the Device memory attribute, or with Normal memory with Inner
+Non-cacheable attribute unless a DMB or DSB is executed between the
+instructions."
+
+Since the maintenance is performed with the MMU off, I think the DMB SY is
+required as per the architecture.
+
+I prefer to keep the maintenance after the MMU is disabled, to allow for
+any kind of translation table setups that a test might conjure up (a test
+in theory can create and install its own translation tables).
 
 Thanks,
 Alex
 
 > 
-> --
 > Thanks,
-> Oliver
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
+> Nikos
+> 
+> > Fix all of the issues in one go, by doing the cache maintenance only for
+> > the stack, as that is out of the control of the C code, and add the missing
+> > memory barrier.
+> > 
+> > The code used to test that mmu_disable works correctly is similar to the
+> > code used to test commit 410b3bf09e76 ("arm/arm64: Perform dcache clean
+> > + invalidate after turning MMU off"), with extra cache maintenance
+> > added:
+> > 
+> > +#include <alloc_page.h>
+> > +#include <asm/cacheflush.h>
+> > +#include <asm/mmu.h>
+> >   int main(int argc, char **argv)
+> >   {
+> > +       int *x = alloc_page();
+> > +       bool pass = true;
+> > +       int i;
+> > +
+> > +       for  (i = 0; i < 1000000; i++) {
+> > +               *x = 0x42;
+> > +               dcache_clean_addr_poc((unsigned long)x);
+> > +               mmu_disable();
+> > +               if (*x != 0x42) {
+> > +                       pass = false;
+> > +                       break;
+> > +               }
+> > +               *x = 0x50;
+> > +               /* Needed for the invalidation only. */
+> > +               dcache_clean_inval_addr_poc((unsigned long)x);
+> > +               mmu_enable(current_thread_info()->pgtable);
+> > +               if (*x != 0x50) {
+> > +                       pass = false;
+> > +                       break;
+> > +               }
+> > +       }
+> > +       report(pass, "MMU disable cache maintenance");
+> > 
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >   arm/cstart.S   | 11 ++++++-----
+> >   arm/cstart64.S | 11 +++++------
+> >   2 files changed, 11 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/arm/cstart.S b/arm/cstart.S
+> > index fc7c558802f1..b27de44f30a6 100644
+> > --- a/arm/cstart.S
+> > +++ b/arm/cstart.S
+> > @@ -242,11 +242,12 @@ asm_mmu_disable:
+> >   	mcr	p15, 0, r0, c1, c0, 0
+> >   	isb
+> > -	ldr	r0, =__phys_offset
+> > -	ldr	r0, [r0]
+> > -	ldr	r1, =__phys_end
+> > -	ldr	r1, [r1]
+> > -	dcache_by_line_op dccimvac, sy, r0, r1, r2, r3
+> > +	dmb	sy
+> > +	mov	r0, sp
+> > +	lsr	r0, #THREAD_SHIFT
+> > +	lsl	r0, #THREAD_SHIFT
+> > +	add	r1, r0, #THREAD_SIZE
+> > +	dcache_by_line_op dccmvac, sy, r0, r1, r3, r4
+> >   	mov     pc, lr
+> > diff --git a/arm/cstart64.S b/arm/cstart64.S
+> > index 1ce6b9e14d23..af4970775298 100644
+> > --- a/arm/cstart64.S
+> > +++ b/arm/cstart64.S
+> > @@ -283,12 +283,11 @@ asm_mmu_disable:
+> >   	msr	sctlr_el1, x0
+> >   	isb
+> > -	/* Clean + invalidate the entire memory */
+> > -	adrp	x0, __phys_offset
+> > -	ldr	x0, [x0, :lo12:__phys_offset]
+> > -	adrp	x1, __phys_end
+> > -	ldr	x1, [x1, :lo12:__phys_end]
+> > -	dcache_by_line_op civac, sy, x0, x1, x2, x3
+> > +	dmb	sy
+> > +	mov	x9, sp
+> > +	and	x9, x9, #THREAD_MASK
+> > +	add	x10, x9, #THREAD_SIZE
+> > +	dcache_by_line_op cvac, sy, x9, x10, x11, x12
+> >   	ret
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
