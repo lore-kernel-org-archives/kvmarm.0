@@ -2,62 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AD76C19F2D
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 18:44:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 252B8C19F2D
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 19:49:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BD2C4CB00;
-	Tue,  9 Aug 2022 14:44:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68CFB4CAAF;
+	Tue,  9 Aug 2022 15:49:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id grhmzbawb8i5; Tue,  9 Aug 2022 14:44:29 -0400 (EDT)
+	with ESMTP id zekZfQFAtffl; Tue,  9 Aug 2022 15:49:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 790E04CAF3;
-	Tue,  9 Aug 2022 14:44:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81F3A4CA6B;
+	Tue,  9 Aug 2022 15:49:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C4F24CAF3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 14:44:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 20DF34C98A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 15:48:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VW8KFGoenMT5 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Aug 2022 14:44:26 -0400 (EDT)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A074B4CAD9
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 14:44:26 -0400 (EDT)
-Date: Tue, 9 Aug 2022 13:43:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1660070665;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=+401aRRlxdNPmc7JT1r6yfCUVKOWpta+WEQhHbjPeGY=;
- b=CGOg/lXkILaS03pHyWoWnpeWRziCG3WdcoHPt50JH4/m3vDCffbiEZS5EBsvwQEc07aPYw
- Yicrs+OPJdiYwYGcLnnwxTDNn3ZwTLGynD5xPyJ/Rvvn4GH4LYvCVZbHbsqeeRLTlAl4zA
- dMKp1ndbN9SC2ShF5oWnK91cyLMwwgE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: KVM/arm64: SPE: Translate VA to IPA on a stage 2 fault instead
- of pinning VM memory
-Message-ID: <YvKq1IK7T/nGSKpt@google.com>
-References: <Yl6+JWaP+mq2Nc0b@monolith.localdoman>
- <20220419141012.GB6143@willie-the-truck>
- <Yt5nFAscgrRGNGoH@monolith.localdoman>
- <20220801170055.GB26471@willie-the-truck>
- <YujzE33aPSD22wvY@monolith.localdoman>
- <Yul8UBoDcy6GQddq@google.com>
- <YvJowFt+U/qCqNVV@monolith.localdoman>
+ with ESMTP id mqcPPOO7JK5F for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Aug 2022 15:48:57 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F1BC74C963
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 15:48:56 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F34B81FB;
+ Tue,  9 Aug 2022 12:48:56 -0700 (PDT)
+Received: from [192.168.12.23] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DCE933F67D;
+ Tue,  9 Aug 2022 12:48:54 -0700 (PDT)
+Message-ID: <9e9f4b5d-7ba9-e76c-14ec-0efe6c6b9411@arm.com>
+Date: Tue, 9 Aug 2022 20:48:40 +0100
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YvJowFt+U/qCqNVV@monolith.localdoman>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: maz@kernel.org, Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.12.0
+Subject: Re: [kvm-unit-tests RFC PATCH 19/19] arm/arm64: Rework the cache
+ maintenance in asm_mmu_disable
+Content-Language: en-GB
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+References: <20220809091558.14379-1-alexandru.elisei@arm.com>
+ <20220809091558.14379-20-alexandru.elisei@arm.com>
+ <3fba260d-bfca-14ea-7bdd-3e55f3d1e276@arm.com>
+ <YvJtwWcKkcxLUVif@monolith.localdoman>
+ <3ff46ed4-4c83-2f00-90b0-4407b9c331d5@arm.com>
+ <YvKQ+VfMHR1XytJK@monolith.localdoman>
+From: Nikos Nikoleris <nikos.nikoleris@arm.com>
+In-Reply-To: <YvKQ+VfMHR1XytJK@monolith.localdoman>
+Cc: pbonzini@redhat.com, thuth@redhat.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, andrew.jones@linux.dev
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,145 +61,208 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
-
-On Tue, Aug 09, 2022 at 03:01:36PM +0100, Alexandru Elisei wrote:
-
-[...]
-
-> > > To summarize the approaches we've discussed so far:
-> > > 
-> > > 1. Pinning the entire guest memory
-> > > - Heavy handed and not ideal.
-> > > - Tried this approach in v5 of the SPE series [1], patches #2-#12.
-> > > 
-> > > 2. Mapping the guest SPE buffer on demand, page by page, as a result of stage 2
-> > > faults reported by SPE.
-> > > - Not feasible, because the entire contents of the buffer must be discarded is
-> > >   PMBSR_EL1.DL is set to 1 when taking the fault.
-> > > - Requires KVM to walk the guest's stage 1 tables, because SPE reports the VA,
-> > >   not the IPA.
-> > > 
-> > > 3. Pinning the guest SPE buffer when profiling becomes enabled*:
-> > > - There is the corner case described above, when profiling becomes enabled as a
-> > >   result of an ERET to EL0. This can happen when the buffer is enabled and
-> > >   PMSCR_EL1.{E0SPE,E1SPE} = {1,0};
-> > > - The previous buffer is unpinned when a new buffer is pinned, to avoid SPE
-> > >   stage 2 faults when draining the buffer, which is performed with profiling
-> > >   disabled.
-> > > - Also requires KVM to walk the guest's stage 1 tables.
-> > > 
-> > > 4. Pin the entire guest SPE buffer after the first stage 2 fault reported by
-> > > SPE.
-> > > - Gets rid of the corner case at 3.
-> > > - Same approach to buffer unpinning as 3.
-> > > - Introduces a blackout window before the first record is written.
-> > > - Also requires KVM to walk the guest's stage 1 tables.
-> > > 
-> > > As for the corner case at 3, I proposed either:
-> > > 
-> > > a) Mandate that guest operating systems must never modify the buffer
-> > > translation entries if the buffer is enabled and
-> > > PMSCR_EL1.{E0SPE,E1SPE} = {1,0}.
-> > > 
-> > > b) Pin the entire buffer as a result of the first stage 2 fault reported by SPE,
-> > > but **only** for this corner case. For all other cases, the buffer is pinned
-> > > when profiling becomes enabled, to eliminate the blackout window. Guest
-> > > operating systems can be modified to not change the translation entries for the
-> > > buffer if this blackout window is not desirable.
-> > > 
-> > > Pinning as a result of the **first** stage 2 fault should work, because there
-> > > are no prior records that would have to be discarded if PMSBR_EL1.DL = 1.
-> > > 
-> > > I hope I haven't missed anything. Thoughts and suggestions more than welcome.
-> > 
-> > Thanks Alex for pulling together all of the context here.
-> > 
-> > Unless there's any other strong opinions on the topic, it seems to me
-> > that option #4 (pin on S2 fault) is probably the best approach for
-> > the initial implementation. No amount of tricks in KVM can work around
-> > the fact that SPE has some serious issues w.r.t. virtualization. With
-> > that, we should probably document the behavior of SPE as a known erratum
-> > of KVM.
-> > 
-> > If folks complain about EL1 profile blackout, eagerly pinning when
-> > profiling is enabled could layer on top quite easily by treating it as
-> > a synthetic S2 fault and triggering the implementation of #4. Having
-> 
-> I'm not sure I follow, I understand what you mean by "treating it as a
-> synthetic S2 fault", would you mind elaborating?
-
-Assuming approach #4 is implemented, we will already have an SPE fault
-handler that walks stage-1 and pins the buffer. At that point,
-implementing approach #3 would be relatively easy. When EL1 sets
-PMSCR_EL1.E1SPE, call the SPE fault handler on the GVA of the buffer.
-
-> > said that I don't believe it is a hard requirement for enabling some
-> > flavor of SPE for guests.
-> > 
-> > Walking guest S1 in KVM doesn't sound too exciting although it'll need to
-> > be done eventually.
-> > 
-> > Do you feel like this is an OK route forward, or have I missed
-> > something?
-> 
-> I've been giving this some thought, and I prefer approach #3 because with
-> #4, pinning the buffer as a result of a stage 2 fault reported by SPE, it
-> will be impossible to distinguish between a valid stage 2 fault (a fault
-> caused by the guest reprogramming the buffer and enabling profiling) and
-> KVM messing something up when pinning the buffer. I believe this to be
-> important, as experience has shown me that pinning the buffer at stage 2 is
-> not trivial and there isn't a mechanism today in Linux to do that
-> (explanation and examples here [1]).
-
-How does eagerly pinning avoid stage-2 aborts, though? As you note in
-[1], page pinning does not avoid the possibility of the MMU notifiers
-being called on a given range. Want to make sure I'm following, what
-is your suggestion for approach #3 to handle the profile buffer when
-only enabled at EL0?
-
-> With approach #4, it would be impossible to figure out if the results of a
-> profiling operations inside a guest are representative of the workload or
-> not, because those SPE stage 2 faults triggered by a bug in KVM can happen
-> multiple times per profiling session, introducing multiple blackout windows
-> that can skew the results.
-> 
-> If you're proposing that the blackout window when the first record is
-> written be documented as an erratum for KVM, then why no got a step further
-> and document as an erratum that changing the buffer translation tables
-> after the buffer has been enabled will lead to an SPE Serror? That will
-> allow us to always pin the buffer when profiling is enabled.
-
-Ah, there are certainly more errata in virtualizing SPE beyond what I
-had said :) Preserving the stage-1 translations while profiling is
-active is a good recommendation, although I'm not sure that we've
-completely eliminated the risk of stage-2 faults. 
-
-It seems impossible to blame the guest for all stage-2 faults that happen
-in the middle of a profiling session. In addition to host mm driven changes
-to stage-2, live migration is a busted as well. You'd need to build out
-stage-2 on the target before resuming the guest and guarantee that the
-appropriate pages have been demanded from the source (in case of post-copy).
-
-So, are we going to inject an SError for stage-2 faults outside of guest
-control as well? An external abort reported as an SPE buffer management
-event seems to be gracefully handled by the Linux driver, but that behavior
-is disallowed by SPEv1p3.
-
-To sum up the point I'm getting at: I agree that there are ways to
-reduce the risk of stage-2 faults in the middle of profiling, but I
-don't believe the current architecture allows KVM to virtualize the
-feature to the letter of the specification.
-
---
-Thanks,
-Oliver
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMDkvMDgvMjAyMiAxNzo1MywgQWxleGFuZHJ1IEVsaXNlaSB3cm90ZToKPiBIaSwKPiAKPiBP
+biBUdWUsIEF1ZyAwOSwgMjAyMiBhdCAwNDo1MzoxOFBNICswMTAwLCBOaWtvcyBOaWtvbGVyaXMg
+d3JvdGU6Cj4+IE9uIDA5LzA4LzIwMjIgMTU6MjIsIEFsZXhhbmRydSBFbGlzZWkgd3JvdGU6Cj4+
+PiBPbiBUdWUsIEF1ZyAwOSwgMjAyMiBhdCAwMjo1MzozNFBNICswMTAwLCBOaWtvcyBOaWtvbGVy
+aXMgd3JvdGU6Cj4+Pj4gSGkgQWxleCwKPj4+Pgo+Pj4+IE9uIDA5LzA4LzIwMjIgMTA6MTUsIEFs
+ZXhhbmRydSBFbGlzZWkgd3JvdGU6Cj4+Pj4+IGFzbV9tbXVfZGlzYWJsZSBpcyBvdmVybHkgYW1i
+aXRpb3VzIGFuZCBwcm92YWJseSBpbmNvcnJlY3Q6Cj4+Pj4+Cj4+Pj4+IDEuIEl0IHRyaWVzIHRv
+IGNsZWFuIGFuZCBpbnZhbGlkYXRlIHRoZSBkYXRhIGNhY2hlcyBmb3IgdGhlICplbnRpcmUqCj4+
+Pj4+IG1lbW9yeSwgd2hpY2ggaXMgaGlnaGx5IHVubmVjZXNzYXJ5LCBhcyBpdCdzIHZlcnkgdW5s
+aWtlbHkgdGhhdCBhIHRlc3QKPj4+Pj4gd2lsbCB3cml0ZSB0byB0aGUgZW50aXJlIG1lbW9yeSwg
+YW5kIGV2ZW4gbW9yZSB1bmxpa2VseSB0aGF0IGEgdGVzdCB3aWxsCj4+Pj4+IG1vZGlmeSB0aGUg
+dGV4dCBzZWN0aW9uIG9mIHRoZSB0ZXN0IGltYWdlLgo+Pj4+Pgo+Pj4+Cj4+Pj4gV2hpbGUgaXQg
+YXBwZWFycyB0aGF0IHdlIGRvbid0IG1vZGlmeSB0aGUgdGV4dCBzZWN0aW9uLCB0aGVyZSBpcyBz
+b21lCj4+Pj4gbG9hZGluZyBoYXBwZW5pbmcgYmVmb3JlIHdlIHN0YXJ0IGV4ZWN1dGluZyBhIHRl
+c3QuIEFyZSB5b3Ugc3VyZSB0aGF0IHRoZQo+Pj4+IGxvYWRlciBkb2Vzbid0IGxlYXZlIHRoZSBt
+ZW1vcnkgZGlydHk/Cj4+Pgo+Pj4gWWVzLCBpdCdzIGluIHRoZSBib290IHByb3RvY29sIGZvciBM
+aW51eCBbMV0uIEkgYWxzbyBtZW50aW9uZWQgdGhpcyBpbiB0aGUKPj4+IGNvbW1pdCBtZXNzYWdl
+IGZvciB0aGUgcHJldmlvdXMgcGF0Y2guCj4+Pgo+Pj4gWzFdIGh0dHBzOi8vZWxpeGlyLmJvb3Rs
+aW4uY29tL2xpbnV4L3Y1LjE5L3NvdXJjZS9Eb2N1bWVudGF0aW9uL2FybTY0L2Jvb3RpbmcucnN0
+I0wxODAKPj4+Cj4+Cj4+IEkgc2VlLCB0aGFua3MhCj4+Cj4+IFJpZ2h0IG5vdyB7YXNtXyx9bW11
+X2Rpc2FibGUoKSBpcyBub3QgdXNlZCBhbnl3aGVyZS4gU28gdGhpcyBwYXRjaCB3aWxsCj4+IGlu
+dHJvZHVjZSB0aGUgYXNzdW1wdGlvbiB0aGF0IG1tdV9kaXNhYmxlKCkgY2FuIGJlIHNhZmVseSBj
+YWxsZWQgb25seSBpZiB3ZQo+PiBkaWRuJ3QgcGVyZm9ybSBhbnkgd3JpdGVzLCBvdXRzaWRlIHRo
+ZSB0ZXN0J3Mgc3RhY2ssIGRvZXNuJ3QgaXQ/Cj4gCj4gVGhpcyBwYXRjaCBpbnRyb2R1Y2VzIHRo
+ZSBhc3N1bXB0aW9uIHRoYXQgdGhlIGNvZGUgdGhhdCBkaXNhYmxlcyB0aGUgTU1VCj4gd2lsbCBk
+byB0aGUgbmVjZXNzYXJ5IGNhY2hlIG1haW50ZW5hbmNlLiBJIHNob3VsZCByZXdvcmQgdGhlIGNv
+bW1pdAo+IG1lc3NhZ2UgdG8gbWFrZSBpdCBjbGVhcmVyLgo+IAo+Pgo+PiBXaGVuIHdlIGFkZCBz
+dXBwb3J0IGZvciBFRkksIHRoZXJlIGlzIGEgbG90IGhhcHBlbmluZyBmcm9tIGVmaV9tYWluKCkg
+dW50aWwKPj4gd2UgZ2V0IHRvIHRoZSBwb2ludCB3aGVyZSB3ZSBjYW4gbW11X2Rpc2FibGUoKSwg
+Y2xlYW5pbmcganVzdCB0aGUgKG5ldykKPj4gc3RhY2sgb2YgdGhlIHRlc3Qgc2VlbXMgcmlza3ku
+Cj4gCj4gV2VsbCwgdGhhdCdzIGFuIHVuZGVyc3RhdGVtZW50LCB0aGUgY29kZSBkaXNhYmxpbmcg
+dGhlIE1NVSBkZWZpbml0bHkgbmVlZHMKPiB0byBkbyB0aGUgbmVjZXNzYXJ5IGNhY2hlIG1haW50
+ZW5hbmNlISBhc21fbW11X2Rpc2FibGUoKSBpcyBub3QgYSBzaWx2ZXIKPiBidWxsZXQgdGhhdCBy
+ZW1vdmVzIHRoZSBuZWVkIHRvIGRvIGFueSBjYWNoZSBtYWludGVuYWNlLCB0aGUgcHJldmlvdXMg
+cGF0Y2gKPiBleHBsYWlucyB3aGF0IG5lZWRzIHRvIGJlIGRvbmUgYW5kIHdoeS4gSWYgeW91J3Jl
+IGxvb2tpbmcgZm9yIGluc3BpcmF0aW9uCj4gYWJvdXQgd2hhdCBtYWludGVuYW5jZSB0byBiZSBk
+b25lIGZvciBVRUZJLCBJIHN1Z2dlc3QgeW91IGxvb2sgdGhlcmUuIE9yCj4gZXZlbiBiZXR0ZXIs
+IHlvdSBjYW4gcmV1c2UgdGhhdCBjb2RlLCB3aGljaCBJIHRoaW5rIGlzIHRoZSBiZXR0ZXIgYXBw
+cm9hY2gKPiBmb3IgdGhlIFVFRkkgc2VyaWVzIGdvaW5nIGZvcndhcmQsIGJ1dCB0aGF0J3MgYSBk
+aXNjdXNzaW9uIGZvciB0aGUgVUVGSQo+IHRocmVhZC4KPiAKCkkgd291bGQgYXJndWUgdGhhdCBh
+c21fbW11X2Rpc2FibGUoKSB3YXMgImEgc2lsdmVyIGJ1bGxldCIgYW5kIHlvdXIgCnBhdGNoIGlz
+IGNoYW5naW5nIGl0LiBIb3cgZG8geW91IGNob29zZSB3aGF0IGlzIHJlYXNvbmFibGUgZm9yIAph
+c21fbW11X2Rpc2FibGUgdG8gY2xlYW4/IFdoeSBzaG91bGQgaXQgY2xlYW4gdGhlIHN0YWNrPwoK
+Pj4KPj4+Pgo+Pj4+PiAyLiBUaGVyZSBpcyBubyBjb3JyZXNwb25kaW5nIGRjYWNoZSBpbnZhbGlk
+YXRlIGNvbW1hbmQgZm9yIHRoZSBlbnRpcmUKPj4+Pj4gbWVtb3J5IGluIGFzbV9tbXVfZW5hYmxl
+LCBsZWF2aW5nIGl0IHVwIHRvIHRoZSB0ZXN0IHRoYXQgZGlzYWJsZWQgdGhlCj4+Pj4+IE1NVSB0
+byBkbyB0aGUgY2FjaGUgbWFpbnRlbmFuY2UgaW4gYW4gYXN5bW1ldHJpY2FsIGZhc2hpb246IG9u
+bHkgZm9yCj4+Pj4+IHJlLWVuYWJsaW5nIHRoZSBNTVUsIGJ1dCBub3QgZm9yIGRpc2FibGluZyBp
+dC4KPj4+Pj4KPj4+Pj4gMy4gSXQncyBtaXNzaW5nIHRoZSBETUIgU1kgbWVtb3J5IGJhcnJpZXIg
+dG8gZW5zdXJlIHRoYXQgdGhlIGRjYWNoZQo+Pj4+PiBtYWludGVuYW5jZSBpcyBwZXJmb3JtZWQg
+YWZ0ZXIgdGhlIGxhc3Qgc3RvcmUgZXhlY3V0ZWQgaW4gcHJvZ3JhbSBvcmRlcgo+Pj4+PiBiZWZv
+cmUgY2FsbGluZyBhc21fbW11X2Rpc2FibGUuCj4+Pj4+Cj4+Pj4KPj4+PiBJIGFtIG5vdCBzdXJl
+IHdoeSB0aGlzIGlzIG5lZWRlZC4gSW4gZ2VuZXJhbCwgaWl1YywgYSBzdG9yZSB0byBsb2NhdGlv
+biB4Cj4+Pj4gZm9sbG93ZWQgYnkgYSBEQyBDVkFDIHRvIHggaW4gcHJvZ3JhbSBvcmRlciBkb24n
+dCBuZWVkIGFuIGJhcnJpZXIgKHNlZSBBcm0KPj4+PiBBUk0gQVJNIERESSAwNDg3Ry5iICJEYXRh
+IGNhY2hlIG1haW50ZW5hbmNlIGluc3RydWN0aW9ucyIgYXQgSzExLjUuMSBhbmQKPj4+Cj4+PiBK
+dXN0IGEgbm90ZSwgdGhlIGxhdGVzdCBwdWJsaWMgdmVyc2lvbiBpcyBILmEuCj4+Pgo+Pj4gSzEx
+LjUuMSBsb29rcyB0byBtZSBsaWtlIGl0IGRlYWxzIHdpdGggb3JkZXJpbmcgb2YgdGhlIGNhY2hl
+IG1haW50ZW5hbmNlCj4+PiBvcGVyYXRpb25zIHdpdGggcmVnYXJkcyB0byBtZW1vcnkgYWNjZXNz
+ZXMgdGhhdCBhcmUgKmFmdGVyKiB0aGUgQ01PIGluCj4+PiBwcm9ncmFtIG9yZGVyLCB0aGlzIHBh
+dGNoIGlzIGFib3V0IG1lbW9yeSBhY2Nlc3NlcyB0aGF0IGFyZSAqYmVmb3JlKiB0aGUKPj4+IENN
+TyBpbiBwcm9ncmFtIG9yZGVyLgo+Pj4KPj4KPj4gVGhlIEFBcmNoNjQgZXhhbXBsZSBpbiBLMTEu
+NS4xIGhhcyBhIG1lbW9yeSBpbnN0cnVjdGlvbiBiZWZvcmUgYW5kIGFmdGVyIHRoZQo+PiBDTU86
+Cj4+Cj4+IFNUUiBXNSwgW1gxXQo+PiBEQyBDVkFDLCBYMQo+PiBETUIgSVNICj4+IFNUUiBXMCwg
+W1g0XQo+Pgo+PiBUaGUgZmlyc3Qgc3RvcmUgYW5kIHRoZSBEQyBDVkFDIGFjY2VzcyB0aGUgc2Ft
+ZSBjYWNoZSBsaW5lIGFuZCB0aGVyZSBpcyBubwo+PiBuZWVkIGZvciBhIG1lbW9yeSBiYXJyaWVy
+IGluIGJldHdlZW4uIFRoZSBzZWNvbmQgc3RvcmUgaXMgYXNzdW1lZCB0byBiZSB0byBhCj4+IGRp
+ZmZlcmVudCBsb2NhdGlvbiBhbmQgdGhhdCdzIHdoeSB3ZSBuZWVkIGEgYmFycmllciB0byBvcmRl
+ciBpdCB3aXRoIHJlc3BlY3QKPj4gdG8gdGhlIERDIENWQUMuCj4gCj4gSXQncyBleHBsYWluZWQg
+d2h5IHRoZSBETUIgaXMgbm90IG5lY2Vzc2FyeSBpbiB0aGUgc2VjdGlvbiB0aGF0IHlvdSd2ZQo+
+IHJlZmVyZW5jZWQuIEknbGwgcmVwcm9kdWNlIHRoZSBwYXJhZ3JhcGg6Cj4gCj4gIkFsbCBkYXRh
+IGNhY2hlIGluc3RydWN0aW9ucywgb3RoZXIgdGhhbiBEQyBaVkEsIHRoYXQgc3BlY2lmeSBhbiBh
+ZGRyZXNzOgo+IAo+IEV4ZWN1dGUgaW4gcHJvZ3JhbSBvcmRlciByZWxhdGl2ZSB0byBsb2FkcyBv
+ciBzdG9yZXMgdGhhdCBoYXZlIGFsbCBvZiB0aGUKPiBmb2xsb3dpbmcgcHJvcGVydGllczoKPiAK
+PiDigJRBY2Nlc3MgYW4gYWRkcmVzcyBpbiBOb3JtYWwgbWVtb3J5IHdpdGggZWl0aGVyIElubmVy
+IFdyaXRlIFRocm91Z2ggb3IKPiBJbm5lciBXcml0ZSBCYWNrIGF0dHJpYnV0ZXMgd2l0aGluIHRo
+ZSBzYW1lIGNhY2hlIGxpbmUgb2YgbWluaW11bSBzaXplLCBhcwo+IGluZGljYXRlZCBieSBDVFJf
+RUwwLkRNaW5MaW5lLgo+IAo+IOKAlFVzZSBhbiBhZGRyZXNzIHdpdGggdGhlIHNhbWUgY2FjaGVh
+YmlsaXR5IGF0dHJpYnV0ZXMgYXMgdGhlIGFkZHJlc3MgcGFzc2VkCj4gdG8gdGhlIGRhdGEgY2Fj
+aGUgaW5zdHJ1Y3Rpb24uIgo+IAo+IEJvdGggdGhlIHN0b3JlIGFuZCB0aGUgZGNhY2hlIGNsZWFu
+IGFjY2VzcyB0aGUgc2FtZSBjYWNoZSBsaW5lLCBpbmRleGVkIGJ5Cj4gdGhlIGFkcmVzcyBpbiBy
+ZWdpc3RlciBYMS4gRG9lcyB0aGF0IG1ha2Ugc2Vuc2UgdG8geW91Pwo+IAo+Pgo+Pj4+ICJPcmRl
+cmluZyBhbmQgY29tcGxldGlvbiBvZiBkYXRhIGFuZCBpbnN0cnVjdGlvbiBjYWNoZSBpbnN0cnVj
+dGlvbnMiIGF0Cj4+Pj4gRDQtMjY1NikuIEl0IGRvZXNuJ3QgaHVydCB0byBoYXZlIGl0IGJ1dCBJ
+IHRoaW5rIGl0J3MgdW5uZWNlc3NhcnkuCj4+Pgo+Pj4gRDQtMjY1NiBpcyBhYm91dCBQQUMsIEkg
+YXNzdW1lIHlvdSBtZWFudCBENC0yNjM2IGp1ZGdpbmcgZnJvbSB0aGUgc2VjdGlvbgo+Pj4gbmFt
+ZSAocGxlYXNlIGNvcnJlY3QgbWUgaWYgSSdtIHdyb25nKTogPgo+Pj4gIkFsbCBkYXRhIGNhY2hl
+IGluc3RydWN0aW9ucywgb3RoZXIgdGhhbiBEQyBaVkEsIHRoYXQgc3BlY2lmeSBhbiBhZGRyZXNz
+Ogo+Pj4gWy4uXQo+Pj4gQ2FuIGV4ZWN1dGUgaW4gYW55IG9yZGVyIHJlbGF0aXZlIHRvIGxvYWRz
+IG9yIHN0b3JlcyB0aGF0IGFjY2VzcyBhbnkKPj4+IGFkZHJlc3Mgd2l0aCB0aGUgRGV2aWNlIG1l
+bW9yeSBhdHRyaWJ1dGUsIG9yIHdpdGggTm9ybWFsIG1lbW9yeSB3aXRoIElubmVyCj4+PiBOb24t
+Y2FjaGVhYmxlIGF0dHJpYnV0ZSB1bmxlc3MgYSBETUIgb3IgRFNCIGlzIGV4ZWN1dGVkIGJldHdl
+ZW4gdGhlCj4+PiBpbnN0cnVjdGlvbnMuIgo+Pj4KPj4+IFNpbmNlIHRoZSBtYWludGVuYW5jZSBp
+cyBwZXJmb3JtZWQgd2l0aCB0aGUgTU1VIG9mZiwgSSB0aGluayB0aGUgRE1CIFNZIGlzCj4+PiBy
+ZXF1aXJlZCBhcyBwZXIgdGhlIGFyY2hpdGVjdHVyZS4KPj4+Cj4+PiBJIHByZWZlciB0byBrZWVw
+IHRoZSBtYWludGVuYW5jZSBhZnRlciB0aGUgTU1VIGlzIGRpc2FibGVkLCB0byBhbGxvdyBmb3IK
+Pj4+IGFueSBraW5kIG9mIHRyYW5zbGF0aW9uIHRhYmxlIHNldHVwcyB0aGF0IGEgdGVzdCBtaWdo
+dCBjb25qdXJlIHVwIChhIHRlc3QKPj4+IGluIHRoZW9yeSBjYW4gY3JlYXRlIGFuZCBpbnN0YWxs
+IGl0cyBvd24gdHJhbnNsYXRpb24gdGFibGVzKS4KPj4+Cj4+Cj4+IFJpZ2h0LCBzbyBiZXR3ZWVu
+IHRoZSBzdG9yZXMgYW5kIHRoZSBEQyBDVkFDLCB3ZSd2ZSBzd2l0Y2hlZCB0aGUgTU1VIG9mZiwg
+aW4KPj4gd2hpY2ggY2FzZSB0aGUgRE1CIFNZIG1pZ2h0IGJlIG5lY2Vzc2FyeS4gSSB3YXMgbWlz
+c2luZyB0aGlzIHBhcnQuCj4gICAgICAgICAgICAgICAgICAgICAgICAgXl5eXl5eXl5eXl5eXl5e
+Xl5eXgo+IAkJICAgICAgIG1pZ2h0IGJlIG5lY2Vzc2FyeSBvciBtaWdodCBiZSAqKnVubmVjZXNz
+YXJ5Kio/Cj4gCj4gSSB3b3VsZCBzYXkgdGhhdCBpdCdzIGRlZmluaXRlbHkgdW5lY2Vzc2FyeSBh
+Y2NvcmRpbmcgdG8gdGhlCj4gYXJjaGl0ZWN0dXJlLCBub3QgIm1pZ2h0IGJlIi4KPiAKCldlbGwg
+eW91IGhhZCBzdWNjZXNzZnVsbHkgY29udmluY2VkIG1lIHRoYXQgc2luY2Ugd2UncmUgc3dpdGNo
+aW5nIHRoZSAKTU1VIG9mZiwgdGhlcmUgbmVlZHMgdG8gYmUgYSBiYXJyaWVyIHRvIGVuc3VyZSB0
+aGF0IHRoZSBkYyBjdmFjIGlzIApvcmRlcmVkIHdpdGggcmVzcGVjdCB0byBwcmlvciBzdG9yZXMu
+IFN3aXRjaGluZyB0aGUgTU1VIG9mZiBtZWFucyB0aGF0IApzdG9yZXMgY291bGQgYmUgZXhlY3V0
+ZWQgd2l0aCBkaWZmZXJlbnQgbWVtb3J5IGF0dHJpYnV0ZXMgKGUuZy4sIE5vcm1hbCwgCklubmVy
+LVNoYXJlYWJsZSwgV3JpdGViYWNrKSB0aGFuIHRoZSBEQyBDVkFDIChEZXZpY2UtbkduUm5FKS4g
+U29tZSB0eXBlIApvZiBiYXJyaWVyIG1pZ2h0IGJlIG5lZWRlZC4gVGhpcyBpcyB3aGF0IHlvdXIg
+cGF0Y2ggaXMgZG9pbmcuCgo+Pgo+PiBUaGUgYmVuZWZpdHMgb2YgdGhpcyBkZXNpZ24gY2hvaWNl
+IChzd2l0Y2ggdGhlIE1NVSBvZmYgdGhlbiBjbGVhbiBkYXRhKSBhcmUKPj4gc3RpbGwgdW5jbGVh
+ciB0byBtZS4gVGhpcyBwYXRjaCBpcyBtb2RpZnlpbmcgdGhlIENNTyBvcGVyYXRpb24gdG8gcGVy
+Zm9ybQo+PiBvbmx5IGEgY2xlYW4uIFdoeSBjYW4ndCB3ZSBjbGVhbiB0aGUgZGF0YSBjYWNoZSBi
+ZWZvcmUgd2Ugc3dpdGNoIG9mZiB0aGUgTU1VCj4+IGFuZCB1c2UgdGhlIHNhbWUgdHJhbnNsYXRp
+b24gd2UgdXNlZCB0byB3cml0ZSB0byBpdC4KPiAKPiBXaGF0IGRvIHlvdSBtZWFuIGJ5ICJ0cmFu
+c2xhdGlvbiI/IFNhbWUgVkEgdG8gUEEgbWFwcGluZz8gT3Igc2FtZSBhZGRyZXNzCj4gYXR0cmli
+dXRlcz8gSWYgaXQncyB0aGUgbGF0dGVyLCB0aGUgYXJjaGl0ZWN0dXJlIGlzIHByZXR0eSBjbGVh
+ciB0aGF0IHRoaXMKPiBpcyBjb3JyZWN0IGFuZCBleHBlY3RlZC4KCkJvdGguCgo+IAo+IElmIGl0
+J3MgdGhlIFZBIHRvIFBBIG1hcHBpbmcsIGFzbV9tbXVfZGlzYWJsZSBpcyBjYWxsZWQgd2l0aCBh
+biBpZGVudGlmeQo+IG1hcHBlZCBzdGFjaywgb3RoZXJ3aXNlIGZvbGxvd2luZyB0aGUgcmV0IGF0
+IHRoZSBlbmQgb2YgdGhlIGZ1bmN0aW9uLAo+IGFzbV9tbXVfZGlzYWJsZSB3b3VsZCBub3QgcmV0
+dXJuIHRvIHRoZSBjYWxsaW5nIGZ1bmN0aW9uICh3aGVuIHRoZSBNTVUgaXMKPiBkaXNhYmxlZCwg
+YWxsIGFkZHJlc3NlcyBhcmUgZmxhdCBtYXBwZWQsIGFuZCB4MzAvbHIgd2lsbCBwb2ludCB0byBz
+b21lCj4gYm9ndXMgYWRkcmVzcykuIG1tdV9kaXNhYmxlKCkgZXZlbiBoYXMgYW4gYXNzZXJ0IHRv
+IGNoZWNrIHRoYXQgdGhlIHN0YWNrIGlzCj4gaWRlbnRpZnkgbWFwcGVkLgo+IAo+IFNvIEkgcmVh
+bGx5IGRvIHRoaW5rIHRoYXQgdGhlIG9yZGVyIG9mIHRoZSBvcGVyYXRpb25zIGlzIGNvcnJlY3Qu
+IFVubGVzcwo+IHlvdSBjYW4gcHJvdmUgb3RoZXJ3aXNlLgo+IAo+IFdoeSBpcyBpdCBzbyBpbXBv
+cnRhbnQgdG8geW91IHRoYXQgdGhlIGRjYWNoZSBpcyBjbGVhbmVkIHdpdGggdGhlIE1NVSBvbj8K
+PiBJdCdzIGNvcnJlY3QgZWl0aGVyIHdheSwgc28gSSdtIGludGVyZXN0ZWQgdG8ga25vdyB3aHkg
+eW91IGFyZSBzbyBrZWVuIG9uCj4gZG9pbmcgaXQgd2l0aCB0aGUgTU1VIGVuYWJsZWQuIEkndmUg
+YWxyZWFkeSB0b2xkIHlvdSBteSByZWFzb24gZm9yIGRvaW5nIGl0Cj4gd2l0aCB0aGUgTU1VIGRp
+c2FibGVkLCBJJ20gd2FpdGluZyB0byBoZWFyIHlvdXJzLgoKU29ycnksIG1heWJlIEkgYW0gbWlz
+c2luZyBzb21ldGhpbmcuIEFzIGZhciBhcyBJIHJlbWVtYmVyLCB5b3VyIGFyZ3VtZW50IAp3YXMg
+dGhhdCBpbnZhbGlkYXRpbmcgdGhlIGNhY2hlIGJlZm9yZSBzd2l0Y2hpbmcgdGhlIE1NVSBvZmYg
+d2FzIApwb2ludGxlc3MsIGZvciBOb3JtYWwgTWVtb3J5IGFueSBraW5kIG9mIHNwZWN1bGF0aW9u
+IG1pZ2h0IHJlc3VsdCBpbiAKZmV0Y2hpbmcgZGF0YSB0byB0aGUgY2FjaGUuIEkgYWdyZWUuIEJ1
+dCB0aGlzIHBhdGNoIGNoYW5nZXMgdGhlIENNTyB3ZSAKdXNlIGFuZCBpdCBkb2Vzbid0IGludmFs
+aWRhdGUgYW55IG1vcmUuIFdoYXQgd2FzIHRoZSBhcmd1bWVudCBmb3IgCmNsZWFuaW5nIHRoZSBj
+YWNoZSBhZnRlciBzd2l0Y2hpbmcgdGhlIE1NVSBvZmY/CgpJIGFtIGhhcHB5IGVpdGhlciB3YXks
+IEkgYW0ganVzdCB0cnlpbmcgdG8gdW5kZXJzdGFuZCA6KQoKVGhhbmtzLAoKTmlrb3MKCj4gCj4g
+VGhhbmtzLAo+IEFsZXgKPiAKPj4KPj4gVGhhbmtzLAo+Pgo+PiBOaWtvcwo+Pgo+Pj4gVGhhbmtz
+LAo+Pj4gQWxleAo+Pj4KPj4+Pgo+Pj4+IFRoYW5rcywKPj4+Pgo+Pj4+IE5pa29zCj4+Pj4KPj4+
+Pj4gRml4IGFsbCBvZiB0aGUgaXNzdWVzIGluIG9uZSBnbywgYnkgZG9pbmcgdGhlIGNhY2hlIG1h
+aW50ZW5hbmNlIG9ubHkgZm9yCj4+Pj4+IHRoZSBzdGFjaywgYXMgdGhhdCBpcyBvdXQgb2YgdGhl
+IGNvbnRyb2wgb2YgdGhlIEMgY29kZSwgYW5kIGFkZCB0aGUgbWlzc2luZwo+Pj4+PiBtZW1vcnkg
+YmFycmllci4KPj4+Pj4KPj4+Pj4gVGhlIGNvZGUgdXNlZCB0byB0ZXN0IHRoYXQgbW11X2Rpc2Fi
+bGUgd29ya3MgY29ycmVjdGx5IGlzIHNpbWlsYXIgdG8gdGhlCj4+Pj4+IGNvZGUgdXNlZCB0byB0
+ZXN0IGNvbW1pdCA0MTBiM2JmMDllNzYgKCJhcm0vYXJtNjQ6IFBlcmZvcm0gZGNhY2hlIGNsZWFu
+Cj4+Pj4+ICsgaW52YWxpZGF0ZSBhZnRlciB0dXJuaW5nIE1NVSBvZmYiKSwgd2l0aCBleHRyYSBj
+YWNoZSBtYWludGVuYW5jZQo+Pj4+PiBhZGRlZDoKPj4+Pj4KPj4+Pj4gKyNpbmNsdWRlIDxhbGxv
+Y19wYWdlLmg+Cj4+Pj4+ICsjaW5jbHVkZSA8YXNtL2NhY2hlZmx1c2guaD4KPj4+Pj4gKyNpbmNs
+dWRlIDxhc20vbW11Lmg+Cj4+Pj4+ICAgICBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3Yp
+Cj4+Pj4+ICAgICB7Cj4+Pj4+ICsgICAgICAgaW50ICp4ID0gYWxsb2NfcGFnZSgpOwo+Pj4+PiAr
+ICAgICAgIGJvb2wgcGFzcyA9IHRydWU7Cj4+Pj4+ICsgICAgICAgaW50IGk7Cj4+Pj4+ICsKPj4+
+Pj4gKyAgICAgICBmb3IgIChpID0gMDsgaSA8IDEwMDAwMDA7IGkrKykgewo+Pj4+PiArICAgICAg
+ICAgICAgICAgKnggPSAweDQyOwo+Pj4+PiArICAgICAgICAgICAgICAgZGNhY2hlX2NsZWFuX2Fk
+ZHJfcG9jKCh1bnNpZ25lZCBsb25nKXgpOwo+Pj4+PiArICAgICAgICAgICAgICAgbW11X2Rpc2Fi
+bGUoKTsKPj4+Pj4gKyAgICAgICAgICAgICAgIGlmICgqeCAhPSAweDQyKSB7Cj4+Pj4+ICsgICAg
+ICAgICAgICAgICAgICAgICAgIHBhc3MgPSBmYWxzZTsKPj4+Pj4gKyAgICAgICAgICAgICAgICAg
+ICAgICAgYnJlYWs7Cj4+Pj4+ICsgICAgICAgICAgICAgICB9Cj4+Pj4+ICsgICAgICAgICAgICAg
+ICAqeCA9IDB4NTA7Cj4+Pj4+ICsgICAgICAgICAgICAgICAvKiBOZWVkZWQgZm9yIHRoZSBpbnZh
+bGlkYXRpb24gb25seS4gKi8KPj4+Pj4gKyAgICAgICAgICAgICAgIGRjYWNoZV9jbGVhbl9pbnZh
+bF9hZGRyX3BvYygodW5zaWduZWQgbG9uZyl4KTsKPj4+Pj4gKyAgICAgICAgICAgICAgIG1tdV9l
+bmFibGUoY3VycmVudF90aHJlYWRfaW5mbygpLT5wZ3RhYmxlKTsKPj4+Pj4gKyAgICAgICAgICAg
+ICAgIGlmICgqeCAhPSAweDUwKSB7Cj4+Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgIHBhc3Mg
+PSBmYWxzZTsKPj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgYnJlYWs7Cj4+Pj4+ICsgICAg
+ICAgICAgICAgICB9Cj4+Pj4+ICsgICAgICAgfQo+Pj4+PiArICAgICAgIHJlcG9ydChwYXNzLCAi
+TU1VIGRpc2FibGUgY2FjaGUgbWFpbnRlbmFuY2UiKTsKPj4+Pj4KPj4+Pj4gU2lnbmVkLW9mZi1i
+eTogQWxleGFuZHJ1IEVsaXNlaSA8YWxleGFuZHJ1LmVsaXNlaUBhcm0uY29tPgo+Pj4+PiAtLS0K
+Pj4+Pj4gICAgIGFybS9jc3RhcnQuUyAgIHwgMTEgKysrKysrLS0tLS0KPj4+Pj4gICAgIGFybS9j
+c3RhcnQ2NC5TIHwgMTEgKysrKystLS0tLS0KPj4+Pj4gICAgIDIgZmlsZXMgY2hhbmdlZCwgMTEg
+aW5zZXJ0aW9ucygrKSwgMTEgZGVsZXRpb25zKC0pCj4+Pj4+Cj4+Pj4+IGRpZmYgLS1naXQgYS9h
+cm0vY3N0YXJ0LlMgYi9hcm0vY3N0YXJ0LlMKPj4+Pj4gaW5kZXggZmM3YzU1ODgwMmYxLi5iMjdk
+ZTQ0ZjMwYTYgMTAwNjQ0Cj4+Pj4+IC0tLSBhL2FybS9jc3RhcnQuUwo+Pj4+PiArKysgYi9hcm0v
+Y3N0YXJ0LlMKPj4+Pj4gQEAgLTI0MiwxMSArMjQyLDEyIEBAIGFzbV9tbXVfZGlzYWJsZToKPj4+
+Pj4gICAgIAltY3IJcDE1LCAwLCByMCwgYzEsIGMwLCAwCj4+Pj4+ICAgICAJaXNiCj4+Pj4+IC0J
+bGRyCXIwLCA9X19waHlzX29mZnNldAo+Pj4+PiAtCWxkcglyMCwgW3IwXQo+Pj4+PiAtCWxkcgly
+MSwgPV9fcGh5c19lbmQKPj4+Pj4gLQlsZHIJcjEsIFtyMV0KPj4+Pj4gLQlkY2FjaGVfYnlfbGlu
+ZV9vcCBkY2NpbXZhYywgc3ksIHIwLCByMSwgcjIsIHIzCj4+Pj4+ICsJZG1iCXN5Cj4+Pj4+ICsJ
+bW92CXIwLCBzcAo+Pj4+PiArCWxzcglyMCwgI1RIUkVBRF9TSElGVAo+Pj4+PiArCWxzbAlyMCwg
+I1RIUkVBRF9TSElGVAo+Pj4+PiArCWFkZAlyMSwgcjAsICNUSFJFQURfU0laRQo+Pj4+PiArCWRj
+YWNoZV9ieV9saW5lX29wIGRjY212YWMsIHN5LCByMCwgcjEsIHIzLCByNAo+Pj4+PiAgICAgCW1v
+diAgICAgcGMsIGxyCj4+Pj4+IGRpZmYgLS1naXQgYS9hcm0vY3N0YXJ0NjQuUyBiL2FybS9jc3Rh
+cnQ2NC5TCj4+Pj4+IGluZGV4IDFjZTZiOWUxNGQyMy4uYWY0OTcwNzc1Mjk4IDEwMDY0NAo+Pj4+
+PiAtLS0gYS9hcm0vY3N0YXJ0NjQuUwo+Pj4+PiArKysgYi9hcm0vY3N0YXJ0NjQuUwo+Pj4+PiBA
+QCAtMjgzLDEyICsyODMsMTEgQEAgYXNtX21tdV9kaXNhYmxlOgo+Pj4+PiAgICAgCW1zcglzY3Rs
+cl9lbDEsIHgwCj4+Pj4+ICAgICAJaXNiCj4+Pj4+IC0JLyogQ2xlYW4gKyBpbnZhbGlkYXRlIHRo
+ZSBlbnRpcmUgbWVtb3J5ICovCj4+Pj4+IC0JYWRycAl4MCwgX19waHlzX29mZnNldAo+Pj4+PiAt
+CWxkcgl4MCwgW3gwLCA6bG8xMjpfX3BoeXNfb2Zmc2V0XQo+Pj4+PiAtCWFkcnAJeDEsIF9fcGh5
+c19lbmQKPj4+Pj4gLQlsZHIJeDEsIFt4MSwgOmxvMTI6X19waHlzX2VuZF0KPj4+Pj4gLQlkY2Fj
+aGVfYnlfbGluZV9vcCBjaXZhYywgc3ksIHgwLCB4MSwgeDIsIHgzCj4+Pj4+ICsJZG1iCXN5Cj4+
+Pj4+ICsJbW92CXg5LCBzcAo+Pj4+PiArCWFuZAl4OSwgeDksICNUSFJFQURfTUFTSwo+Pj4+PiAr
+CWFkZAl4MTAsIHg5LCAjVEhSRUFEX1NJWkUKPj4+Pj4gKwlkY2FjaGVfYnlfbGluZV9vcCBjdmFj
+LCBzeSwgeDksIHgxMCwgeDExLCB4MTIKPj4+Pj4gICAgIAlyZXQKX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
+bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
+YW4vbGlzdGluZm8va3ZtYXJtCg==
