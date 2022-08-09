@@ -2,69 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ADAEC25B06
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE6DC25B0D
 	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 10:28:55 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 910E84C2A5;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB0474CC23;
 	Tue,  9 Aug 2022 06:28:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UG3gtDqIkZeN; Tue,  9 Aug 2022 06:28:53 -0400 (EDT)
+	with ESMTP id jvmahXP1YNvM; Tue,  9 Aug 2022 06:28:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 50DE44C4B5;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69E8B4C606;
 	Tue,  9 Aug 2022 06:28:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B1BE4CD33
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 03:16:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 332CB4C3BA
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 03:17:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zriowWCdzOWf for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Aug 2022 03:16:42 -0400 (EDT)
+ with ESMTP id 6CMGRkzcS7e4 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Aug 2022 03:17:10 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D31E4CB96
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 03:16:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BFF14CD3C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 03:17:09 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1660029401;
+ s=mimecast20190719; t=1660029429;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=pFDs6xidhpbw1qYaUFr1MfUDhoMVpVETbRmiPl3tRsM=;
- b=Khza/dN1QoNhC0Ta2bpD7qkDZuz1OyCI0xm9ynaHUH6d0wtVYh4Msr2s8n9qVjNWkjVZEd
- UMbKZtyKZdcZ391G92A/oJRB6lT6pz+bN7HAW8xs4uLN4WfnwitlV8D8p2piYXiLTUxXUs
- DmlzWo53/8c3XrA8MdAtgXuhQKQ0F4I=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=guDnNs6GIE6VYYfJC3LF3y7xxWcKYPW4yEpvV6OunCc=;
+ b=Uzge/ge+X0ejmtO2lCx2cXDzyYvS6yDyRoS2otdWKsQ6J9gi6ypMnD2ukpD8IU/cOFAgS5
+ JliaVV+OMn7TO9ALpq8QDYiQVH0UhOyu3IAvoAOL42X36CgR3LrPqwYSQSz3H0ra2Gb39U
+ DCsLUpQc3fseFjwCWWG+z/HNlSGbmNM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-607-wVvB783QNq-aMoXaZIWmxA-1; Tue, 09 Aug 2022 03:16:38 -0400
-X-MC-Unique: wVvB783QNq-aMoXaZIWmxA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com
- [10.11.54.7])
+ us-mta-135-I1YrsPXbNI-JfbNgRuspjg-1; Tue, 09 Aug 2022 03:17:06 -0400
+X-MC-Unique: I1YrsPXbNI-JfbNgRuspjg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.5])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 37B753801FE4;
- Tue,  9 Aug 2022 07:16:38 +0000 (UTC)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EE1AA1019C8E;
+ Tue,  9 Aug 2022 07:17:05 +0000 (UTC)
 Received: from oldenburg.str.redhat.com (unknown [10.39.193.65])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2DC411415125;
- Tue,  9 Aug 2022 07:16:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D89D9945D0;
+ Tue,  9 Aug 2022 07:17:02 +0000 (UTC)
 From: Florian Weimer <fweimer@redhat.com>
 To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: selftests: Make rseq compatible with glibc-2.35
+Subject: Re: [PATCH 2/2] KVM: selftests: Use getcpu() instead of
+ sched_getcpu() in rseq_test
 References: <20220809060627.115847-1-gshan@redhat.com>
- <20220809060627.115847-2-gshan@redhat.com>
- <8735e6ncxw.fsf@oldenburg.str.redhat.com>
- <7844e3fa-e49e-de75-e424-e82d3a023dd6@redhat.com>
-Date: Tue, 09 Aug 2022 09:16:33 +0200
-In-Reply-To: <7844e3fa-e49e-de75-e424-e82d3a023dd6@redhat.com> (Gavin Shan's
- message of "Tue, 9 Aug 2022 18:45:26 +1000")
-Message-ID: <87o7wtnay6.fsf@oldenburg.str.redhat.com>
+ <20220809060627.115847-3-gshan@redhat.com>
+ <87y1vxncv1.fsf@oldenburg.str.redhat.com>
+Date: Tue, 09 Aug 2022 09:17:01 +0200
+In-Reply-To: <87y1vxncv1.fsf@oldenburg.str.redhat.com> (Florian Weimer's
+ message of "Tue, 09 Aug 2022 08:35:14 +0200")
+Message-ID: <87mtcdnaxe.fsf@oldenburg.str.redhat.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
 X-Mailman-Approved-At: Tue, 09 Aug 2022 06:28:50 -0400
 Cc: shan.gavin@gmail.com, kvm@vger.kernel.org, maz@kernel.org,
  linux-kernel@vger.kernel.org, andrew.jones@linux.dev,
@@ -87,24 +87,24 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-* Gavin Shan:
+* Florian Weimer:
 
->> __builtin_thread_pointer doesn't work on all architectures/GCC
->> versions.
->> Is this a problem for selftests?
->> 
+> * Gavin Shan:
 >
-> It's a problem as the test case is running on all architectures. I think I
-> need introduce our own __builtin_thread_pointer() for where it's not
-> supported: (1) PowerPC  (2) x86 without GCC 11
+>> sched_getcpu() is glibc dependent and it can simply return the CPU
+>> ID from the registered rseq information, as Florian Weimer pointed.
+>> In this case, it's pointless to compare the return value from
+>> sched_getcpu() and that fetched from the registered rseq information.
+>>
+>> Fix the issue by replacing sched_getcpu() with getcpu(), as Florian
+>> suggested. The comments are modified accordingly.
 >
-> Please let me know if I still have missed cases where
-> __buitin_thread_pointer() isn't supported?
+> Note that getcpu was added in glibc 2.29, so perhaps you need to perform
+> a direct system call?
 
-As far as I know, these are the two outliers that also have rseq
-support.  The list is a bit longer if we also consider non-rseq
-architectures (csky, hppa, ia64, m68k, microblaze, sparc, don't know
-about the Linux architectures without glibc support).
+One more thing: syscall(__NR_getcpu) also has the advantage that it
+wouldn't have to be changed again if node IDs become available via rseq
+and getcpu is implemented using that.
 
 Thanks,
 Florian
