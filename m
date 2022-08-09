@@ -2,42 +2,42 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DD0EC19F2D
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 09:16:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25A90C25B06
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 09:16:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDCD04C9FA;
-	Tue,  9 Aug 2022 05:16:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C88E04C4EE;
+	Tue,  9 Aug 2022 05:16:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id I+Bco2980JtV; Tue,  9 Aug 2022 05:16:02 -0400 (EDT)
+	with ESMTP id lGa5w1mZxN9M; Tue,  9 Aug 2022 05:16:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D1AB4CB00;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 329394CC40;
 	Tue,  9 Aug 2022 05:15:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5567C4C974
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EEF084C974
  for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 05:15:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lcWqI68EaDKr for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id J+ZF7AsAShXC for <kvmarm@lists.cs.columbia.edu>;
  Tue,  9 Aug 2022 05:15:54 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AFAC04CA0A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 05:15:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F281A4C994
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 05:15:49 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 128E623A;
- Tue,  9 Aug 2022 02:15:49 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 72131143D;
+ Tue,  9 Aug 2022 02:15:50 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 319B03F67D;
- Tue,  9 Aug 2022 02:15:47 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 925CF3F67D;
+ Tue,  9 Aug 2022 02:15:48 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: pbonzini@redhat.com, thuth@redhat.com, andrew.jones@linux.dev,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, nikos.nikoleris@arm.com
-Subject: [kvm-unit-tests RFC PATCH 15/19] lib/alloc_phys: Add callback to
- perform cache maintenance
-Date: Tue,  9 Aug 2022 10:15:54 +0100
-Message-Id: <20220809091558.14379-16-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests RFC PATCH 16/19] arm/arm64: Allocate secondaries'
+ stack using the page allocator
+Date: Tue,  9 Aug 2022 10:15:55 +0100
+Message-Id: <20220809091558.14379-17-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20220809091558.14379-1-alexandru.elisei@arm.com>
 References: <20220809091558.14379-1-alexandru.elisei@arm.com>
@@ -58,62 +58,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Some architectures, like arm and arm64, require explicit cache
-maintenance to maintain the caches in sync with memory when toggling the
-caches. Add the function to do the required maintenance on the internal
-structures that the allocator maintains.
+The vmalloc allocator returns non-id mapped addresses, where the virtual
+address is different than the physical address. This makes it impossible
+to access the stack of the secondary CPUs while the MMU is disabled.
+
+On arm, THREAD_SIZE is 16K and PAGE_SIZE is 4K, which makes THREAD_SIZE
+a power of two multiple of PAGE_SIZE. On arm64, THREAD_SIZE is 16 when
+PAGE_SIZE is 4K or 16K, and 64K when PAGE_SIZE is 64K. In all cases,
+THREAD_SIZE is a power of two multiple of PAGE_SIZE. As a result, using
+memalign_pages() for the stack won't lead to wasted memory.
+
+memalign_pages() allocates memory in chunks of power of two number of
+pages, aligned to the allocation size, which makes it a drop-in
+replacement for vm_memalign (which is the value for alloc_ops->memalign
+when the stack is allocated).
+
+Using memalign_pages() has two distinct benefits:
+
+1. The secondary CPUs' stack can be used with the MMU off.
+
+2. The secondary CPUs' stack is identify mapped similar to the stack for
+the primary CPU, which makes the configuration of the CPUs consistent.
+
+memalign_pages_flags() has been used instead of memalign_pages() to
+instruct the allocator not to zero the stack, as it's already zeroed in the
+entry code.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- lib/alloc_phys.c | 8 ++++++++
- lib/alloc_phys.h | 8 ++++++++
- 2 files changed, 16 insertions(+)
+ lib/arm/asm/thread_info.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/lib/alloc_phys.c b/lib/alloc_phys.c
-index 1e1fc179f108..5872d2c6e38f 100644
---- a/lib/alloc_phys.c
-+++ b/lib/alloc_phys.c
-@@ -45,6 +45,14 @@ void phys_alloc_set_minimum_alignment(phys_addr_t align)
- 	align_min = align;
+diff --git a/lib/arm/asm/thread_info.h b/lib/arm/asm/thread_info.h
+index eaa72582af86..190e082cbba0 100644
+--- a/lib/arm/asm/thread_info.h
++++ b/lib/arm/asm/thread_info.h
+@@ -25,6 +25,7 @@
+ #ifndef __ASSEMBLY__
+ #include <asm/processor.h>
+ #include <alloc.h>
++#include <alloc_page.h>
+ 
+ #ifdef __arm__
+ #include <asm/ptrace.h>
+@@ -40,7 +41,7 @@
+ 
+ static inline void *thread_stack_alloc(void)
+ {
+-	void *sp = memalign(THREAD_ALIGNMENT, THREAD_SIZE);
++	void *sp = memalign_pages_flags(THREAD_ALIGNMENT, THREAD_SIZE, FLAG_DONTZERO);
+ 	return sp + THREAD_START_SP;
  }
  
-+void phys_alloc_perform_cache_maintenance(cache_maint_fn maint_fn)
-+{
-+	maint_fn((unsigned long)&base);
-+	maint_fn((unsigned long)&used);
-+	maint_fn((unsigned long)&top);
-+	maint_fn((unsigned long)&align_min);
-+}
-+
- static void *memalign_early(size_t alignment, size_t sz)
- {
- 	phys_addr_t align = (phys_addr_t)alignment;
-diff --git a/lib/alloc_phys.h b/lib/alloc_phys.h
-index 4d350f010031..86b3d0215d49 100644
---- a/lib/alloc_phys.h
-+++ b/lib/alloc_phys.h
-@@ -15,6 +15,8 @@
-  */
- #include "libcflat.h"
- 
-+typedef void (*cache_maint_fn)(unsigned long addr);
-+
- /*
-  * phys_alloc_init creates the initial free memory region of size @size
-  * at @base. The minimum alignment is set to DEFAULT_MINIMUM_ALIGNMENT.
-@@ -27,6 +29,12 @@ extern void phys_alloc_init(phys_addr_t base, phys_addr_t size);
-  */
- extern void phys_alloc_set_minimum_alignment(phys_addr_t align);
- 
-+/*
-+ * Perform cache maintenance on the internal structures that the physical
-+ * allocator maintains.
-+ */
-+extern void phys_alloc_perform_cache_maintenance(cache_maint_fn maint_fn);
-+
- /*
-  * phys_alloc_show outputs all currently allocated regions with the
-  * following format, where <end_addr> is non-inclusive:
 -- 
 2.37.1
 
