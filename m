@@ -2,75 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE6DC25B0D
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 10:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B849AC19F2D
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Aug 2022 10:28:56 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB0474CC23;
-	Tue,  9 Aug 2022 06:28:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 747EB4C514;
+	Tue,  9 Aug 2022 06:28:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jvmahXP1YNvM; Tue,  9 Aug 2022 06:28:53 -0400 (EDT)
+	with ESMTP id z6u8m6tQGXHm; Tue,  9 Aug 2022 06:28:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69E8B4C606;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 844FE4C967;
 	Tue,  9 Aug 2022 06:28:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 332CB4C3BA
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 03:17:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 757364C5B9
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 05:33:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6CMGRkzcS7e4 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Aug 2022 03:17:10 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BFF14CD3C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 03:17:09 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1660029429;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=guDnNs6GIE6VYYfJC3LF3y7xxWcKYPW4yEpvV6OunCc=;
- b=Uzge/ge+X0ejmtO2lCx2cXDzyYvS6yDyRoS2otdWKsQ6J9gi6ypMnD2ukpD8IU/cOFAgS5
- JliaVV+OMn7TO9ALpq8QDYiQVH0UhOyu3IAvoAOL42X36CgR3LrPqwYSQSz3H0ra2Gb39U
- DCsLUpQc3fseFjwCWWG+z/HNlSGbmNM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-135-I1YrsPXbNI-JfbNgRuspjg-1; Tue, 09 Aug 2022 03:17:06 -0400
-X-MC-Unique: I1YrsPXbNI-JfbNgRuspjg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
- [10.11.54.5])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EE1AA1019C8E;
- Tue,  9 Aug 2022 07:17:05 +0000 (UTC)
-Received: from oldenburg.str.redhat.com (unknown [10.39.193.65])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D89D9945D0;
- Tue,  9 Aug 2022 07:17:02 +0000 (UTC)
-From: Florian Weimer <fweimer@redhat.com>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 2/2] KVM: selftests: Use getcpu() instead of
- sched_getcpu() in rseq_test
-References: <20220809060627.115847-1-gshan@redhat.com>
- <20220809060627.115847-3-gshan@redhat.com>
- <87y1vxncv1.fsf@oldenburg.str.redhat.com>
-Date: Tue, 09 Aug 2022 09:17:01 +0200
-In-Reply-To: <87y1vxncv1.fsf@oldenburg.str.redhat.com> (Florian Weimer's
- message of "Tue, 09 Aug 2022 08:35:14 +0200")
-Message-ID: <87mtcdnaxe.fsf@oldenburg.str.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+ with ESMTP id f1kptq1kt9qs for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Aug 2022 05:33:34 -0400 (EDT)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3EAE04C3F8
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 05:33:34 -0400 (EDT)
+Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.55])
+ by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4M278W3cP5zjXWx;
+ Tue,  9 Aug 2022 17:30:19 +0800 (CST)
+Received: from dggpemm500007.china.huawei.com (7.185.36.183) by
+ dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 9 Aug 2022 17:33:29 +0800
+Received: from huawei.com (10.175.103.91) by dggpemm500007.china.huawei.com
+ (7.185.36.183) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 9 Aug
+ 2022 17:33:29 +0800
+From: Yang Yingliang <yangyingliang@huawei.com>
+To: <linux-kernel@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
+ <linux-arm-kernel@lists.infradead.org>
+Subject: [PATCH] KVM: arm64: fix compile error because of shift overflow
+Date: Tue, 9 Aug 2022 17:41:58 +0800
+Message-ID: <20220809094158.4080636-1-yangyingliang@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500007.china.huawei.com (7.185.36.183)
+X-CFilter-Loop: Reflected
 X-Mailman-Approved-At: Tue, 09 Aug 2022 06:28:50 -0400
-Cc: shan.gavin@gmail.com, kvm@vger.kernel.org, maz@kernel.org,
- linux-kernel@vger.kernel.org, andrew.jones@linux.dev,
- mathieu.desnoyers@efficios.com, yihyu@redhat.com,
- linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
- kvmarm@lists.cs.columbia.edu
+Cc: maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,34 +61,35 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-* Florian Weimer:
-
-> * Gavin Shan:
->
->> sched_getcpu() is glibc dependent and it can simply return the CPU
->> ID from the registered rseq information, as Florian Weimer pointed.
->> In this case, it's pointless to compare the return value from
->> sched_getcpu() and that fetched from the registered rseq information.
->>
->> Fix the issue by replacing sched_getcpu() with getcpu(), as Florian
->> suggested. The comments are modified accordingly.
->
-> Note that getcpu was added in glibc 2.29, so perhaps you need to perform
-> a direct system call?
-
-One more thing: syscall(__NR_getcpu) also has the advantage that it
-wouldn't have to be changed again if node IDs become available via rseq
-and getcpu is implemented using that.
-
-Thanks,
-Florian
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Q2hhbmdlIHRoZSBtYXNrIHRvIHVuc2lnbmVkIHRvIGZpeCB0aGUgZm9sbG93aW5nIGZpeCBjb21w
+aWxlIGVycm9yCmJlY2F1c2Ugb2Ygc2hpZnQgb3ZlcmZsb3cgd2hlbiB1c2luZyBsb3cgdmVyaXNv
+biBnY2MobWluZSB2ZXJzaW9uIGlzIDcuNSk6CgpJbiBmdW5jdGlvbiDigJhrdm1fdm1faW9jdGxf
+c2V0X2RldmljZV9hZGRyLmlzcmEuMzjigJksCiAgICBpbmxpbmVkIGZyb20g4oCYa3ZtX2FyY2hf
+dm1faW9jdGzigJkgYXQgYXJjaC9hcm02NC9rdm0vYXJtLmM6MTQ1NDoxMDoKLi8uL2luY2x1ZGUv
+bGludXgvY29tcGlsZXJfdHlwZXMuaDozNTQ6Mzg6IGVycm9yOiBjYWxsIHRvIOKAmF9fY29tcGls
+ZXRpbWVfYXNzZXJ0XzU5OeKAmSBcCmRlY2xhcmVkIHdpdGggYXR0cmlidXRlIGVycm9yOiBGSUVM
+RF9HRVQ6IG1hc2sgaXMgbm90IGNvbnN0YW50CiAgX2NvbXBpbGV0aW1lX2Fzc2VydChjb25kaXRp
+b24sIG1zZywgX19jb21waWxldGltZV9hc3NlcnRfLCBfX0NPVU5URVJfXykKCkZpeGVzOiA5Zjk2
+OGM5MjY2YWEgKCJLVk06IGFybTY0OiB2Z2ljLXYyOiBBZGQgaGVscGVyIGZvciBsZWdhY3kgZGlz
+dC9jcHVpZiBiYXNlIGFkZHJlc3Mgc2V0dGluZyIpClNpZ25lZC1vZmYtYnk6IFlhbmcgWWluZ2xp
+YW5nIDx5YW5neWluZ2xpYW5nQGh1YXdlaS5jb20+Ci0tLQogYXJjaC9hcm02NC9pbmNsdWRlL3Vh
+cGkvYXNtL2t2bS5oIHwgMiArLQogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRl
+bGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5o
+IGIvYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCmluZGV4IDNiYjEzNDM1NTg3NC4u
+MDRmZmExM2Q1ZTBhIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvdWFwaS9hc20va3Zt
+LmgKKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCkBAIC03Nyw3ICs3Nyw3
+IEBAIHN0cnVjdCBrdm1fcmVncyB7CiAjZGVmaW5lIEtWTV9BUk1fREVWSUNFX1RZUEVfU0hJRlQJ
+MAogI2RlZmluZSBLVk1fQVJNX0RFVklDRV9UWVBFX01BU0sJKDB4ZmZmZiA8PCBLVk1fQVJNX0RF
+VklDRV9UWVBFX1NISUZUKQogI2RlZmluZSBLVk1fQVJNX0RFVklDRV9JRF9TSElGVAkJMTYKLSNk
+ZWZpbmUgS1ZNX0FSTV9ERVZJQ0VfSURfTUFTSwkJKDB4ZmZmZiA8PCBLVk1fQVJNX0RFVklDRV9J
+RF9TSElGVCkKKyNkZWZpbmUgS1ZNX0FSTV9ERVZJQ0VfSURfTUFTSwkJKDB4ZmZmZnUgPDwgS1ZN
+X0FSTV9ERVZJQ0VfSURfU0hJRlQpCiAKIC8qIFN1cHBvcnRlZCBkZXZpY2UgSURzICovCiAjZGVm
+aW5lIEtWTV9BUk1fREVWSUNFX1ZHSUNfVjIJCTAKLS0gCjIuMjUuMQoKX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1h
+cm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21h
+aWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
