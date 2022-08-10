@@ -2,72 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE124C25B06
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 19:30:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1F5DC00140
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 19:30:57 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 565C64DA58;
-	Wed, 10 Aug 2022 15:30:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A9844DA88;
+	Wed, 10 Aug 2022 15:30:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HXce12e9qA5H; Wed, 10 Aug 2022 15:30:55 -0400 (EDT)
+	with ESMTP id wECHsM7Mgro9; Wed, 10 Aug 2022 15:30:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 113124DA7E;
-	Wed, 10 Aug 2022 15:30:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 429DE4DA94;
+	Wed, 10 Aug 2022 15:30:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 753FC4DA59
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 15:30:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D7A74DA63
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 15:30:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id o25shrmn9vWE for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Aug 2022 15:30:52 -0400 (EDT)
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
- [209.85.216.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 413FB4DA70
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 15:30:51 -0400 (EDT)
-Received: by mail-pj1-f74.google.com with SMTP id
- w12-20020a17090a780c00b001f76ed0a1easo3495590pjk.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 12:30:51 -0700 (PDT)
+ with ESMTP id cz1QZMaWXy8X for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Aug 2022 15:30:53 -0400 (EDT)
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com
+ [209.85.128.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 491A44DA7E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 15:30:53 -0400 (EDT)
+Received: by mail-yw1-f201.google.com with SMTP id
+ 00721157ae682-31f46b4759bso132564357b3.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 12:30:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
  :date:from:to:cc;
- bh=ISyf//eKqE0iV9Jad3fzzOnB3Q21JHgqLZOFoVPjKMI=;
- b=Rpt4p2M0H/10ExEF5hENxTIqXeEe2mpTkCUkrm5mtB5m2DgJTHM9DgTYaYdVWE1t70
- Ibz1PyMQMU+JQzBpHh8y77NSSLzNoDgdyNwu4bKW/LeONh1O27Fnef3UG+NqKSxvPOuI
- 7K5fxKaOkDXvsux3jkaLsMXNVuVmWuNRkWnfsR63ijxZRE5cHQ/nyYoJ1XnGvlI58xWk
- kt3Niw42xbj0USCsk5HkRyo8Ah6LIVH1L+LqjR6TfQ2sF15B6Vu3JZpCDOCHmf3+oBSB
- JHz7f6lZgjxsPK+fZKVWj/4jKrUcP23UzygWOTRSqFOKGgDwvFbc7eOYYLCGaghgxPf+
- gcsQ==
+ bh=+yNPE0YtwokNPZdowqkCFFxMTcHqUO1hXxky5MuupRY=;
+ b=oZ5EETOvVLFNFJcFvJs5CUWFZV2YZx1lZtCVYg3Xpam3/6hJePg2ArdHUJxsspg7R5
+ kYnk9btdizwNCjiWTgj6vhaG+Ln/haQoW/pUsdjAvXGRUtwyTKhYaNbVGIqa4N0knmX5
+ Y6Bf8Sp0myosiRXqgzgjzzrxNgMTvUamymRKjYhHFjm5HuDY7N2HLKT82K2ZR3tI6a2I
+ TkfL2xlNiTx9SHZbWxe0/jGZ8EVR0bP+e7g+tySRt7UNKn82GSElS85ZLEZQitwkkwIT
+ z43wgykSu9Orgytw+Yk5q/JCadYNjdaFTKqRIDXR1Haw0of7kw8Io57Gij0cmraUd7F0
+ vpZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
  :date:x-gm-message-state:from:to:cc;
- bh=ISyf//eKqE0iV9Jad3fzzOnB3Q21JHgqLZOFoVPjKMI=;
- b=JS8/BYqYNO6BLrpn2CvkEcXfKwMPx87O4Pl3aUG3xyEr6JwCfMd3NzEnZpZAEs+0Pu
- cHDzAcqhq3gxrnwirUcL+1bwbWXtvX8E3qnaFWjL17Mfqll3+Moa0NsPSdqTTGcEKTgE
- D0Ah9ezktmV8nngQXEiRpd4+Dz2wwly4Onn+u50zhbmIpgblmymfq/lqUyn1B+AR7kph
- UPMYloo9Fjh69YY3VLqtqEXm9HOTvIhiY15ucL31qEQJkz7FfNLlKfxTuUrnokt/CeoM
- C+PIRg8PSin1OAnOe8Lg9qFALUeR2AH4bGNxTDuatlhCUf262af3IPMSloPqtTne8d/O
- bNUw==
-X-Gm-Message-State: ACgBeo1SOsWa63/ZpYTcchYGipeUrDfGhDzFx09RgcO5nkVJqLLzckZa
- +plTNoKIUXIXysQo2TXAjWEA4Jo=
-X-Google-Smtp-Source: AA6agR4gQa4UYbSdbQyWQV6Bwq7wnb+1/ubEBVorjvVta/rIBUuFcRv4Qi6HBrOfdJr722FFyo+zG5I=
+ bh=+yNPE0YtwokNPZdowqkCFFxMTcHqUO1hXxky5MuupRY=;
+ b=bdYW+e1y2vrCFzj5mOxYUTGRLuH8kErbhVvZrLiGSwyR2nbtcduKwPq7JutdzTbbTN
+ 5VYJOX9FM680qyk3qG7CXQjlDLjqWGGNhmaI9dNcwXMQY8ARNqSgY9ij/xW46LlwSh9K
+ P5lN7n+unzzga2xRelxb5T7NQX6o0ratE+TPSkMzAapwrbXWnyZLafjUa5RlMWfwtKHm
+ AYU4uKLEWFzUsziA+ZDZHA0NIP+KOGgKoMzUsgZ9dSyYVYvkFxltRGB4W2ZWMwSKx8/7
+ sQBwQb5BT5EM3p1Cf3wZqQBAkYV4RwilTlWM/pRyWlgI4XgWbSUzI1OfTaa3k+TpfgNf
+ TnpA==
+X-Gm-Message-State: ACgBeo1608DCMdlf5BObjwdbxvC6m46Nxi2Rl+2S1fZBPOGnAK1V0z7Z
+ Q17LSlu+2wBl20Im/stR27D9Gbs=
+X-Google-Smtp-Source: AA6agR6moG62zPERwU4Dk26hNOp5DcD21DJAex4OmPFxWG3fnAGG1z1V+i1T2gQ2yJV0LxVv859Fqu0=
 X-Received: from pcc-desktop.svl.corp.google.com
  ([2620:15c:2ce:200:4d8b:fb2a:2ecb:c2bb])
- (user=pcc job=sendgmr) by 2002:a17:902:d54c:b0:170:9ba1:f38f with SMTP id
- z12-20020a170902d54c00b001709ba1f38fmr17494564plf.32.1660159850191; Wed, 10
- Aug 2022 12:30:50 -0700 (PDT)
-Date: Wed, 10 Aug 2022 12:30:31 -0700
+ (user=pcc job=sendgmr) by 2002:a25:b951:0:b0:67b:93e9:1ff9 with SMTP id
+ s17-20020a25b951000000b0067b93e91ff9mr21338230ybm.101.1660159852914; Wed, 10
+ Aug 2022 12:30:52 -0700 (PDT)
+Date: Wed, 10 Aug 2022 12:30:32 -0700
 In-Reply-To: <20220810193033.1090251-1-pcc@google.com>
-Message-Id: <20220810193033.1090251-6-pcc@google.com>
+Message-Id: <20220810193033.1090251-7-pcc@google.com>
 Mime-Version: 1.0
 References: <20220810193033.1090251-1-pcc@google.com>
 X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
-Subject: [PATCH v3 5/7] KVM: arm64: unify the tests for VMAs in memslots when
- MTE is enabled
+Subject: [PATCH v3 6/7] KVM: arm64: permit all VM_MTE_ALLOWED mappings with
+ MTE enabled
 From: Peter Collingbourne <pcc@google.com>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
@@ -91,70 +91,36 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Previously we allowed creating a memslot containing a private mapping that
-was not VM_MTE_ALLOWED, but would later reject KVM_RUN with -EFAULT. Now
-we reject the memory region at memslot creation time.
-
-Since this is a minor tweak to the ABI (a VMM that created one of
-these memslots would fail later anyway), no VMM to my knowledge has
-MTE support yet, and the hardware with the necessary features is not
-generally available, we can probably make this ABI change at this point.
+Certain VMMs such as crosvm have features (e.g. sandboxing) that depend
+on being able to map guest memory as MAP_SHARED. The current restriction
+on sharing MAP_SHARED pages with the guest is preventing the use of
+those features with MTE. Now that the races between tasks concurrently
+clearing tags on the same page have been fixed, remove this restriction.
 
 Signed-off-by: Peter Collingbourne <pcc@google.com>
 ---
- arch/arm64/kvm/mmu.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/mmu.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 750a69a97994..d54be80e31dd 100644
+index d54be80e31dd..fc65dc20655d 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1073,6 +1073,19 @@ static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
- 	}
+@@ -1075,14 +1075,6 @@ static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+ 
+ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+ {
+-	/*
+-	 * VM_SHARED mappings are not allowed with MTE to avoid races
+-	 * when updating the PG_mte_tagged page flag, see
+-	 * sanitise_mte_tags for more details.
+-	 */
+-	if (vma->vm_flags & VM_SHARED)
+-		return false;
+-
+ 	return vma->vm_flags & VM_MTE_ALLOWED;
  }
  
-+static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
-+{
-+	/*
-+	 * VM_SHARED mappings are not allowed with MTE to avoid races
-+	 * when updating the PG_mte_tagged page flag, see
-+	 * sanitise_mte_tags for more details.
-+	 */
-+	if (vma->vm_flags & VM_SHARED)
-+		return false;
-+
-+	return vma->vm_flags & VM_MTE_ALLOWED;
-+}
-+
- static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			  struct kvm_memory_slot *memslot, unsigned long hva,
- 			  unsigned long fault_status)
-@@ -1249,9 +1262,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	}
- 
- 	if (fault_status != FSC_PERM && !device && kvm_has_mte(kvm)) {
--		/* Check the VMM hasn't introduced a new VM_SHARED VMA */
--		if ((vma->vm_flags & VM_MTE_ALLOWED) &&
--		    !(vma->vm_flags & VM_SHARED)) {
-+		/* Check the VMM hasn't introduced a new disallowed VMA */
-+		if (kvm_vma_mte_allowed(vma)) {
- 			sanitise_mte_tags(kvm, pfn, vma_pagesize);
- 		} else {
- 			ret = -EFAULT;
-@@ -1695,12 +1707,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 		if (!vma)
- 			break;
- 
--		/*
--		 * VM_SHARED mappings are not allowed with MTE to avoid races
--		 * when updating the PG_mte_tagged page flag, see
--		 * sanitise_mte_tags for more details.
--		 */
--		if (kvm_has_mte(kvm) && vma->vm_flags & VM_SHARED) {
-+		if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
- 			ret = -EINVAL;
- 			break;
- 		}
 -- 
 2.37.1.559.g78731f0fdb-goog
 
