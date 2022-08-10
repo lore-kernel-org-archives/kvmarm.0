@@ -2,79 +2,101 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A500EC25B06
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 12:22:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C59D8C25B08
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 12:29:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3ED424D8D5;
-	Wed, 10 Aug 2022 08:22:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4051D4D8E4;
+	Wed, 10 Aug 2022 08:29:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@efficios.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aY3Gia8S+WCv; Wed, 10 Aug 2022 08:22:40 -0400 (EDT)
+	with ESMTP id 6JVgHqJOqDN1; Wed, 10 Aug 2022 08:29:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5B5E4D8D8;
-	Wed, 10 Aug 2022 08:22:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 046134D8D3;
+	Wed, 10 Aug 2022 08:29:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 948754D8D4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 08:22:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DD8CC4D8D0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 08:29:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Fb+lZUzKfFXE for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Aug 2022 08:22:38 -0400 (EDT)
-Received: from mail.efficios.com (mail.efficios.com [167.114.26.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF1004D8CA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 08:22:37 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
- by mail.efficios.com (Postfix) with ESMTP id 8CD7643EA2C;
- Wed, 10 Aug 2022 08:22:37 -0400 (EDT)
-Received: from mail.efficios.com ([127.0.0.1])
- by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10032)
- with ESMTP id macRiZ503hEg; Wed, 10 Aug 2022 08:22:37 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
- by mail.efficios.com (Postfix) with ESMTP id 1862A43EC11;
- Wed, 10 Aug 2022 08:22:37 -0400 (EDT)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.efficios.com 1862A43EC11
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=efficios.com;
- s=default; t=1660134157;
- bh=sfAauo/mWpg8zOIkCNkUX/HMbO4wG21Si6g++dnvoyE=;
- h=Date:From:To:Message-ID:MIME-Version;
- b=nZdbRT4AvSFpu8TzhuYZxIHHOAeTCCeHwddyfuBKZ1bmiJDKmNy9as3q6La1j3OfM
- YVPperUtSSs4kRCThx1MGYQbi/kzkwT94oHNkCqB0UvliKkhsoFQ2yLqAEzV1AmZqm
- vfw+Qp3Mo9VVmQCpvm/rJ3Zp99aKBrJ7dufoCiOMGld4ZRXr7kcskGL3n63moV63rL
- jC+XE6JA5OhDAudAGBr+NBVb592c+ZPm9JAQaZOHnhDBpKKTp1gnuo2G80FAWedMLT
- AsLVLBUrYatb4KKixttIkRUlnfot42FgWXu1HfsICe4e8aksGtRArF7e0KsLEHZShn
- jxrtT1VdGkoIw==
-X-Virus-Scanned: amavisd-new at efficios.com
-Received: from mail.efficios.com ([127.0.0.1])
- by localhost (mail03.efficios.com [127.0.0.1]) (amavisd-new, port 10026)
- with ESMTP id pk8I3S8vxJQb; Wed, 10 Aug 2022 08:22:37 -0400 (EDT)
-Received: from mail03.efficios.com (mail03.efficios.com [167.114.26.124])
- by mail.efficios.com (Postfix) with ESMTP id 03E2C43E9B8;
- Wed, 10 Aug 2022 08:22:37 -0400 (EDT)
-Date: Wed, 10 Aug 2022 08:22:36 -0400 (EDT)
-From: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-To: Gavin Shan <gshan@redhat.com>
-Message-ID: <876568572.367.1660134156963.JavaMail.zimbra@efficios.com>
-In-Reply-To: <20220810104114.6838-2-gshan@redhat.com>
-References: <20220810104114.6838-1-gshan@redhat.com>
- <20220810104114.6838-2-gshan@redhat.com>
+ with ESMTP id 7-Am3HX7jNKO for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Aug 2022 08:29:07 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE4A54D8D5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 08:29:07 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1660134547;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ur0S3vxzmpV2P3Rj1K4ZEdqLq25lb9Wh81DhfR65pxA=;
+ b=B7SMe3hznbmMRpZ6xrr0o7tKdLp25tE9UZBmE6Hh74rk9iFYY5XD7Abm1zGDV6udr8B4xh
+ 1Xo3rzaNaAJuWqNszyjqpZf0cI8NgvdXaaOlD4TYfd/zUsPipcMMFacI/obxXRz1poexhS
+ JqhDHovgiQSlykC6nd/diP713Uz1vrA=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-636-6q6O1np3OCm_n9la1xrKoQ-1; Wed, 10 Aug 2022 08:29:06 -0400
+X-MC-Unique: 6q6O1np3OCm_n9la1xrKoQ-1
+Received: by mail-ed1-f72.google.com with SMTP id
+ b6-20020a056402278600b0043e686058feso9092673ede.10
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 05:29:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=content-transfer-encoding:in-reply-to:from:references:cc:to
+ :content-language:subject:user-agent:mime-version:date:message-id
+ :x-gm-message-state:from:to:cc;
+ bh=Ur0S3vxzmpV2P3Rj1K4ZEdqLq25lb9Wh81DhfR65pxA=;
+ b=Qzvtz3OrZPHWsgwOThk1emrRUR2jhz+m2iLOvd8FmZIPdoK2JEk9k8hSOXDBhJ6USz
+ BxuTwk+Cfa41ED1ISxQz1511FBq0qMzW20oTd5GrtLMbVfpHxw6hw4nCYhCJ0sz32QBz
+ 07aHkyr2ecavoFJHwhRCHgG5+L4KmumeDQ9HhlF7NZY5uvTJUYe6jAX/+jVHwGQbJeAc
+ cG4IagDA/dnWFosgi5p4Iq86itIZA3iAtdfv13YbetfyU8Qot84lG/m/90Yie24fX1PB
+ YsloZ1SEZvNOyChQOimFSTKlpz/lE/lxYq7696+ZPXxRV3TAtHyE8WwqKFHndhzbr6Ll
+ I/4Q==
+X-Gm-Message-State: ACgBeo3eP02cdRto3vimcR2F6iQH/TnNrQtwv4jBxYLp/Yd+hgt5ES3k
+ RKaFphfbkOWQFmbv8r8ry3uvx8zC9RPy3qDE8f5hzg2v0PmU78JpBVhoze+yxPjjAGhCgzwytar
+ 3XZxHDp6njvYJtE95yNCUk/Wu
+X-Received: by 2002:a05:6402:35c3:b0:43d:f5d9:b65d with SMTP id
+ z3-20020a05640235c300b0043df5d9b65dmr26615872edc.149.1660134545255; 
+ Wed, 10 Aug 2022 05:29:05 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7s6VXCgxCV5nTHcb8Km+7rgGPW/D/i9ZJCl/KMbRISRjqKSsbjTlBqkKW6TQEEF4LuJCo/9g==
+X-Received: by 2002:a05:6402:35c3:b0:43d:f5d9:b65d with SMTP id
+ z3-20020a05640235c300b0043df5d9b65dmr26615846edc.149.1660134545002; 
+ Wed, 10 Aug 2022 05:29:05 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89?
+ ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+ by smtp.googlemail.com with ESMTPSA id
+ f15-20020a50ee8f000000b0043bc4b28464sm7671006edr.34.2022.08.10.05.29.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 10 Aug 2022 05:29:04 -0700 (PDT)
+Message-ID: <1e41a634-0419-e0a8-364c-2e30ed2dbe4d@redhat.com>
+Date: Wed, 10 Aug 2022 14:29:02 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
 Subject: Re: [PATCH v2 1/2] KVM: selftests: Make rseq compatible with
  glibc-2.35
-MIME-Version: 1.0
-X-Originating-IP: [167.114.26.124]
-X-Mailer: Zimbra 8.8.15_GA_4372 (ZimbraWebClient - FF103
- (Linux)/8.8.15_GA_4372)
-Thread-Topic: selftests: Make rseq compatible with glibc-2.35
-Thread-Index: Hk36Kh5rkKAuYYVYbwiYIwpCd68vFA==
+To: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Gavin Shan <gshan@redhat.com>
+References: <20220810104114.6838-1-gshan@redhat.com>
+ <20220810104114.6838-2-gshan@redhat.com>
+ <876568572.367.1660134156963.JavaMail.zimbra@efficios.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <876568572.367.1660134156963.JavaMail.zimbra@efficios.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
 Cc: Florian Weimer <fweimer@redhat.com>, shan gavin <shan.gavin@gmail.com>,
  KVM list <kvm@vger.kernel.org>, maz <maz@kernel.org>,
  linux-kernel <linux-kernel@vger.kernel.org>,
  andrew jones <andrew.jones@linux.dev>, yihyu <yihyu@redhat.com>,
  linux-kselftest <linux-kselftest@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm <kvmarm@lists.cs.columbia.edu>
+ kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,166 +108,62 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
------ On Aug 10, 2022, at 6:41 AM, Gavin Shan gshan@redhat.com wrote:
+On 8/10/22 14:22, Mathieu Desnoyers wrote:
+>>
+>> 	/*
+>> 	 * Create and run a dummy VM that immediately exits to userspace via
+>> @@ -256,7 +244,7 @@ int main(int argc, char *argv[])
+>> 			 */
+>> 			smp_rmb();
+>> 			cpu = sched_getcpu();
+>> -			rseq_cpu = READ_ONCE(__rseq.cpu_id);
+>> +			rseq_cpu = READ_ONCE(__rseq->cpu_id);
+> #include <rseq.h>
+> 
+> and use
+> 
+> rseq_current_cpu_raw().
 
-> The rseq information is registered by TLS, starting from glibc-2.35.
-> In this case, the test always fails due to syscall(__NR_rseq). For
-> example, on RHEL9.1 where upstream glibc-2.35 features are enabled
-> on downstream glibc-2.34, the test fails like below.
-> 
->  # ./rseq_test
->  ==== Test Assertion Failure ====
->    rseq_test.c:60: !r
->    pid=112043 tid=112043 errno=22 - Invalid argument
->       1        0x0000000000401973: main at rseq_test.c:226
->       2        0x0000ffff84b6c79b: ?? ??:0
->       3        0x0000ffff84b6c86b: ?? ??:0
->       4        0x0000000000401b6f: _start at ??:?
->    rseq failed, errno = 22 (Invalid argument)
->  # rpm -aq | grep glibc-2
->  glibc-2.34-39.el9.aarch64
-> 
-> Fix the issue by using "../rseq/rseq.c" to fetch the rseq information,
-> registred by TLS if it exists. Otherwise, we're going to register our
-> own rseq information as before.
-> 
-> Reported-by: Yihuang Yu <yihyu@redhat.com>
-> Suggested-by: Florian Weimer <fweimer@redhat.com>
-> Suggested-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> ---
-> tools/testing/selftests/kvm/Makefile    |  5 +++--
-> tools/testing/selftests/kvm/rseq_test.c | 28 +++++++------------------
-> 2 files changed, 11 insertions(+), 22 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile
-> b/tools/testing/selftests/kvm/Makefile
-> index c7f47429d6cd..89c9a8c52c5f 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -197,7 +197,8 @@ endif
-> CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
-> 	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
-> 	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
-> -	-I$(<D) -Iinclude/$(UNAME_M) -I.. $(EXTRA_CFLAGS) $(KHDR_INCLUDES)
-> +	-I$(<D) -Iinclude/$(UNAME_M) -I ../rseq -I.. $(EXTRA_CFLAGS) \
-> +	$(KHDR_INCLUDES)
-> 
-> no-pie-option := $(call try-run, echo 'int main() { return 0; }' | \
->         $(CC) -Werror -no-pie -x c - -o "$$TMP", -no-pie)
-> @@ -206,7 +207,7 @@ no-pie-option := $(call try-run, echo 'int main() { return
-> 0; }' | \
-> pgste-option = $(call try-run, echo 'int main() { return 0; }' | \
-> 	$(CC) -Werror -Wl$(comma)--s390-pgste -x c - -o "$$TMP",-Wl$(comma)--s390-pgste)
-> 
-> -
-> +LDLIBS += -ldl
-> LDFLAGS += -pthread $(no-pie-option) $(pgste-option)
-> 
-> # After inclusion, $(OUTPUT) is defined and
-> diff --git a/tools/testing/selftests/kvm/rseq_test.c
-> b/tools/testing/selftests/kvm/rseq_test.c
-> index a54d4d05a058..2cd5fe49ac8b 100644
-> --- a/tools/testing/selftests/kvm/rseq_test.c
-> +++ b/tools/testing/selftests/kvm/rseq_test.c
-> @@ -20,15 +20,7 @@
-> #include "processor.h"
-> #include "test_util.h"
-> 
-> -static __thread volatile struct rseq __rseq = {
-> -	.cpu_id = RSEQ_CPU_ID_UNINITIALIZED,
-> -};
-> -
-> -/*
-> - * Use an arbitrary, bogus signature for configuring rseq, this test does not
-> - * actually enter an rseq critical section.
-> - */
-> -#define RSEQ_SIG 0xdeadbeef
-> +#include "../rseq/rseq.c"
-> 
-> /*
->  * Any bug related to task migration is likely to be timing-dependent; perform
-> @@ -37,6 +29,7 @@ static __thread volatile struct rseq __rseq = {
-> #define NR_TASK_MIGRATIONS 100000
-> 
-> static pthread_t migration_thread;
-> +static struct rseq_abi *__rseq;
+Thanks, I squashed it and queued it for -rc1 (tested on both
+glibc 2.34 and 2.35).
 
-What is this ?
+diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+index 84e8425edc2c..987a76674f4f 100644
+--- a/tools/testing/selftests/kvm/rseq_test.c
++++ b/tools/testing/selftests/kvm/rseq_test.c
+@@ -29,7 +29,6 @@
+  #define NR_TASK_MIGRATIONS 100000
+  
+  static pthread_t migration_thread;
+-static struct rseq_abi *__rseq;
+  static cpu_set_t possible_mask;
+  static int min_cpu, max_cpu;
+  static bool done;
+@@ -218,7 +217,6 @@ int main(int argc, char *argv[])
+  	r = rseq_register_current_thread();
+  	TEST_ASSERT(!r, "rseq_register_current_thread failed, errno = %d (%s)",
+  		    errno, strerror(errno));
+-	__rseq = rseq_get_abi();
+  
+  	/*
+  	 * Create and run a dummy VM that immediately exits to userspace via
+@@ -256,7 +254,7 @@ int main(int argc, char *argv[])
+  			 */
+  			smp_rmb();
+  			cpu = sched_getcpu();
+-			rseq_cpu = READ_ONCE(__rseq->cpu_id);
++			rseq_cpu = rseq_current_cpu_raw();
+  			smp_rmb();
+  		} while (snapshot != atomic_read(&seq_cnt));
+  
 
-> static cpu_set_t possible_mask;
-> static int min_cpu, max_cpu;
-> static bool done;
-> @@ -49,14 +42,6 @@ static void guest_code(void)
-> 		GUEST_SYNC(0);
-> }
-> 
-> -static void sys_rseq(int flags)
-> -{
-> -	int r;
-> -
-> -	r = syscall(__NR_rseq, &__rseq, sizeof(__rseq), flags, RSEQ_SIG);
-> -	TEST_ASSERT(!r, "rseq failed, errno = %d (%s)", errno, strerror(errno));
-> -}
-> -
-> static int next_cpu(int cpu)
-> {
-> 	/*
-> @@ -218,7 +203,10 @@ int main(int argc, char *argv[])
-> 
-> 	calc_min_max_cpu();
-> 
-> -	sys_rseq(0);
-> +	r = rseq_register_current_thread();
-> +	TEST_ASSERT(!r, "rseq_register_current_thread failed, errno = %d (%s)",
-> +		    errno, strerror(errno));
-> +	__rseq = rseq_get_abi();
-> 
-> 	/*
-> 	 * Create and run a dummy VM that immediately exits to userspace via
-> @@ -256,7 +244,7 @@ int main(int argc, char *argv[])
-> 			 */
-> 			smp_rmb();
-> 			cpu = sched_getcpu();
-> -			rseq_cpu = READ_ONCE(__rseq.cpu_id);
-> +			rseq_cpu = READ_ONCE(__rseq->cpu_id);
+Paolo
 
-#include <rseq.h>
-
-and use
-
-rseq_current_cpu_raw().
-
-Thanks,
-
-Mathieu
-
-
-> 			smp_rmb();
-> 		} while (snapshot != atomic_read(&seq_cnt));
-> 
-> @@ -278,7 +266,7 @@ int main(int argc, char *argv[])
-> 
-> 	kvm_vm_free(vm);
-> 
-> -	sys_rseq(RSEQ_FLAG_UNREGISTER);
-> +	rseq_unregister_current_thread();
-> 
-> 	return 0;
-> }
-> --
-> 2.23.0
-
--- 
-Mathieu Desnoyers
-EfficiOS Inc.
-http://www.efficios.com
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
