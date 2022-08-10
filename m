@@ -2,52 +2,66 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86786C00140
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 10:01:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 347A2C00140
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 10:42:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DA904D76F;
-	Wed, 10 Aug 2022 06:01:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A5F224D7CD;
+	Wed, 10 Aug 2022 06:42:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sYTtVy1BBtLV; Wed, 10 Aug 2022 06:01:08 -0400 (EDT)
+	with ESMTP id zHeCHkgKlQzZ; Wed, 10 Aug 2022 06:42:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E4384D76C;
-	Wed, 10 Aug 2022 06:01:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F5354D7CE;
+	Wed, 10 Aug 2022 06:42:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E9734D768
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 06:01:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DF4A64D7CB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 06:42:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jw0yv6eUATpB for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Aug 2022 06:01:01 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 830874D766
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 06:01:01 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 82C711FB;
- Wed, 10 Aug 2022 03:01:01 -0700 (PDT)
-Received: from [192.168.12.23] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6295B3F70D;
- Wed, 10 Aug 2022 03:00:59 -0700 (PDT)
-Message-ID: <976c1d7b-a95d-cb5f-3602-55573e40289a@arm.com>
-Date: Wed, 10 Aug 2022 11:00:47 +0100
+ with ESMTP id dbVqL8ypi8oX for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Aug 2022 06:41:59 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A6B614D7B4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 06:41:59 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1660128119;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=9bKhNJI7G6HPFM7ZC8g4f1RPMl031HWjaKYN/Cgan+A=;
+ b=ML+f51WisLewEtDCWmEjfOlO0WnX+/45UlwFj0LlpBTxortgMkcmCG3PwS4ZJnsgF12jxD
+ 4LbCFoenv615SP9tFhFOhjgh+CUVmIxYXVL3ZpTppYCkiOj6sbZM2GusZgxeNc2efcZSdL
+ ZMNrMBG96jYjNEdlYKFsZXecHf9+cL4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-187-vNqntwxVNh6f0s2lJnO8VQ-1; Wed, 10 Aug 2022 06:41:58 -0400
+X-MC-Unique: vNqntwxVNh6f0s2lJnO8VQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.2])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 91AFC2999B2D;
+ Wed, 10 Aug 2022 10:41:57 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-77.bne.redhat.com [10.64.54.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F1D304050067;
+ Wed, 10 Aug 2022 10:41:52 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v2 0/2] kvm/selftests: Two rseq_test fixes
+Date: Wed, 10 Aug 2022 18:41:12 +0800
+Message-Id: <20220810104114.6838-1-gshan@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.12.0
-Subject: Re: [kvm-unit-tests RFC PATCH 09/19] arm/arm64: Zero secondary CPUs'
- stack
-Content-Language: en-GB
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-References: <20220809091558.14379-1-alexandru.elisei@arm.com>
- <20220809091558.14379-10-alexandru.elisei@arm.com>
- <38ec5559-7c2a-9820-724d-6a192ea83ecb@arm.com>
- <YvN9oLwmCESQoFun@monolith.localdoman>
-From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <YvN9oLwmCESQoFun@monolith.localdoman>
-Cc: pbonzini@redhat.com, thuth@redhat.com, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, andrew.jones@linux.dev
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+Cc: fweimer@redhat.com, shan.gavin@gmail.com, kvm@vger.kernel.org,
+ maz@kernel.org, linux-kernel@vger.kernel.org, andrew.jones@linux.dev,
+ mathieu.desnoyers@efficios.com, yihyu@redhat.com,
+ linux-kselftest@vger.kernel.org, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -59,127 +73,45 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 10/08/2022 10:42, Alexandru Elisei wrote:
-> Hi Nikos,
-> 
-> On Tue, Aug 09, 2022 at 01:56:13PM +0100, Nikos Nikoleris wrote:
->> On 09/08/2022 10:15, Alexandru Elisei wrote:
->>> For the boot CPU, the entire stack is zeroed in the entry code. For the
->>> secondaries, only struct thread_info, which lives at the bottom of the
->>> stack, is zeroed in thread_info_init().
->>>
->>
->> That's a good point.
->>
->>> Be consistent and zero the entire stack for the secondaries. This should
->>> also improve reproducibility of the testsuite, as all the stacks now start
->>> with the same contents, which is zero. And now that all the stacks are
->>> zeroed in the entry code, there is no need to explicitely zero struct
->>> thread_info in thread_info_init().
->>>
->>
->> Wouldn't it make more sense to call memset(sp, 0, THREAD_SIZE); from
->> thread_stack_alloc() instead and avoid doing this in assembly? Do we expect
-> 
-> I prefer to do the zero'ing in assembly because:
-> 
-> 1. For consistency, which is one of the main reasons this patch exists.
-> 
-> 2. I don't want to deal with all the cache maintenance that is required for
-> inter-CPU communication. Let's keep it simple.
-> 
+There are two issues in current rseq_test implementation and the
+series intends to fix them:
 
-I see that's a very good point. For this reason, I agree initializing to 
-0 is better done locally.
+- From glibc-2.35, rseq information is registered by TLS. It means
+  rseq_test is unable to register its own rseq information. PATCH[01]
+  fixes the issue by reusing "../rseq/rseq.c" to fetch TLS's rseq
+  information if possible.
 
-Since you brought this up, we might have to worry about the thread_info 
-fields we initialize in __thread_info_init(). But this is a problem for 
-another patch.
+- sched_getcpu() relies on glibc's implementation and it can simply
+  returns the CPU ID cached in the rseq information. In this case,
+  it's pointless to compare the return value from sched_getcpu()
+  and that fetched from rseq information. PATCH[02] fixes the issue
+  by replacing sched_getcpu() with getcpu().
 
-Reviewed-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+v1: https://lore.kernel.org/lkml/8c1f33b4-a5a1-fcfa-4521-36253ffa22c8@redhat.com/T/
 
-Thanks,
+Changelog
+=========
+v2:
+  * Add "-ldl" to LDLIBS as Florian suggested.
+  * Reuse "../rseq/rseq.c" as Paolo/Mathieu/Sean suggested.
+  * Add comments to sys_getcpu() as Sean suggested.
 
-Nikos
+Gavin Shan (2):
+  KVM: selftests: Make rseq compatible with glibc-2.35
+  KVM: selftests: Use getcpu() instead of sched_getcpu() in rseq_test
 
->> anyone to jump to secondary_entry without calling thread_stack_alloc()
->> first?
-> 
-> It's impossible to jump to secondary_data.entry without allocating the
-> stack first, because it's impossible to run C code without a valid stack.
->  > Thanks,
-> Alex
-> 
->>
->> Thanks,
->>
->> Nikos
->>
->>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>> ---
->>>    arm/cstart.S          | 6 ++++++
->>>    arm/cstart64.S        | 3 +++
->>>    lib/arm/processor.c   | 1 -
->>>    lib/arm64/processor.c | 1 -
->>>    4 files changed, 9 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/arm/cstart.S b/arm/cstart.S
->>> index 39260e0fa470..39e70f40986a 100644
->>> --- a/arm/cstart.S
->>> +++ b/arm/cstart.S
->>> @@ -151,7 +151,13 @@ secondary_entry:
->>>    	 */
->>>    	ldr	r1, =secondary_data
->>>    	ldr	r0, [r1]
->>> +	mov	r2, r0
->>> +	lsr	r2, #THREAD_SHIFT
->>> +	lsl	r2, #THREAD_SHIFT
->>> +	add	r3, r2, #THREAD_SIZE
->>> +	zero_range r2, r3, r4, r5
->>>    	mov	sp, r0
->>> +
->>>    	bl	exceptions_init
->>>    	bl	enable_vfp
->>> diff --git a/arm/cstart64.S b/arm/cstart64.S
->>> index d62360cf3859..54773676d1d5 100644
->>> --- a/arm/cstart64.S
->>> +++ b/arm/cstart64.S
->>> @@ -156,6 +156,9 @@ secondary_entry:
->>>    	/* set the stack */
->>>    	adrp	x0, secondary_data
->>>    	ldr	x0, [x0, :lo12:secondary_data]
->>> +	and	x1, x0, #THREAD_MASK
->>> +	add	x2, x1, #THREAD_SIZE
->>> +	zero_range x1, x2
->>>    	mov	sp, x0
->>>    	/* finish init in C code */
->>> diff --git a/lib/arm/processor.c b/lib/arm/processor.c
->>> index 9d5759686b73..ceff1c0a1bd2 100644
->>> --- a/lib/arm/processor.c
->>> +++ b/lib/arm/processor.c
->>> @@ -117,7 +117,6 @@ void do_handle_exception(enum vector v, struct pt_regs *regs)
->>>    void thread_info_init(struct thread_info *ti, unsigned int flags)
->>>    {
->>> -	memset(ti, 0, sizeof(struct thread_info));
->>>    	ti->cpu = mpidr_to_cpu(get_mpidr());
->>>    	ti->flags = flags;
->>>    }
->>> diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
->>> index 831207c16587..268b2858f0be 100644
->>> --- a/lib/arm64/processor.c
->>> +++ b/lib/arm64/processor.c
->>> @@ -232,7 +232,6 @@ void install_vector_handler(enum vector v, vector_fn fn)
->>>    static void __thread_info_init(struct thread_info *ti, unsigned int flags)
->>>    {
->>> -	memset(ti, 0, sizeof(struct thread_info));
->>>    	ti->cpu = mpidr_to_cpu(get_mpidr());
->>>    	ti->flags = flags;
->>>    }
+ tools/testing/selftests/kvm/Makefile    |  5 ++-
+ tools/testing/selftests/kvm/rseq_test.c | 60 ++++++++++++-------------
+ 2 files changed, 33 insertions(+), 32 deletions(-)
+
+-- 
+2.23.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
