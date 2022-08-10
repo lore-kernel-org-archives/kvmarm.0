@@ -2,53 +2,57 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE2C7C19F2D
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 01:26:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DEC0C00140
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 07:08:16 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64EF44D184;
-	Tue,  9 Aug 2022 21:26:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 769104D593;
+	Wed, 10 Aug 2022 03:08:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id k3SRs88WFEHC; Tue,  9 Aug 2022 21:26:15 -0400 (EDT)
+	with ESMTP id wThFZFLG4sZR; Wed, 10 Aug 2022 03:08:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14CFF4D187;
-	Tue,  9 Aug 2022 21:26:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E0984D595;
+	Wed, 10 Aug 2022 03:08:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 98D0E4D184
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 21:26:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B38CA4D590
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 03:08:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lrwprsct10Z9 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Aug 2022 21:26:11 -0400 (EDT)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 48AC94D183
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Aug 2022 21:26:11 -0400 (EDT)
-Received: from dggpemm500022.china.huawei.com (unknown [172.30.72.55])
- by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4M2XJz3RDFzmVcn;
- Wed, 10 Aug 2022 09:24:03 +0800 (CST)
-Received: from dggpemm500007.china.huawei.com (7.185.36.183) by
- dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 10 Aug 2022 09:26:07 +0800
-Received: from huawei.com (10.175.103.91) by dggpemm500007.china.huawei.com
- (7.185.36.183) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Wed, 10 Aug
- 2022 09:26:06 +0800
-From: Yang Yingliang <yangyingliang@huawei.com>
-To: <linux-kernel@vger.kernel.org>, <kvmarm@lists.cs.columbia.edu>,
- <linux-arm-kernel@lists.infradead.org>
-Subject: [PATCH v3] KVM: arm64: fix compile error because of shift overflow
-Date: Wed, 10 Aug 2022 09:34:35 +0800
-Message-ID: <20220810013435.1525363-1-yangyingliang@huawei.com>
-X-Mailer: git-send-email 2.25.1
+ with ESMTP id dOYkr-zsZ-BZ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Aug 2022 03:08:13 -0400 (EDT)
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8639F4D58F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 03:08:13 -0400 (EDT)
+Date: Wed, 10 Aug 2022 02:08:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1660115292;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=16kqUglr1ishQgrJKlQFjUeIG4svmPIXYRWssIj916w=;
+ b=kmhhSxS7uIccs/nrYdSWL3WpY7iLLfb086IQ2OPHv80z6GP87fiwDAqu5MhMZPTcJEhJFn
+ IKWWEQTe2cyuaZo3J7bEjF7I+lJDWX/zwfntne4Qxoox02rZ2x4/mnYnYTdq7PegQzGnGB
+ ylFovYXelsIAn9sU0BqHBUbbCHl/j4M=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 7/9] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to be
+ set from userspace
+Message-ID: <YvNZVgMmFxrY4Nka@google.com>
+References: <20220805135813.2102034-1-maz@kernel.org>
+ <20220805135813.2102034-8-maz@kernel.org>
 MIME-Version: 1.0
-X-Originating-IP: [10.175.103.91]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500007.china.huawei.com (7.185.36.183)
-X-CFilter-Loop: Reflected
-Cc: maz@kernel.org
+Content-Disposition: inline
+In-Reply-To: <20220805135813.2102034-8-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -60,42 +64,65 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-VXNpbmcgR0VOTUFTSygpIHRvIGdlbmVyYXRlIHRoZSBtYXNrcyBvZiBkZXZpY2UgdHlwZSBhbmQg
-ZGV2aWNlIGlkLCBpdCBtYWtlcwpjb2RlIHVuYW1iaWd1b3VzLCBhbHNvIGl0IGNhbiBmaXggdGhl
-IGZvbGxvd2luZyBmaXggY29tcGlsZSBlcnJvciBiZWNhdXNlIG9mCnNoaWZ0IG92ZXJmbG93IHdo
-ZW4gdXNpbmcgbG93IHZlcmlzb24gZ2NjKG1pbmUgdmVyc2lvbiBpcyA3LjUpOgoKSW4gZnVuY3Rp
-b24g4oCYa3ZtX3ZtX2lvY3RsX3NldF9kZXZpY2VfYWRkci5pc3JhLjM44oCZLAogICAgaW5saW5l
-ZCBmcm9tIOKAmGt2bV9hcmNoX3ZtX2lvY3Rs4oCZIGF0IGFyY2gvYXJtNjQva3ZtL2FybS5jOjE0
-NTQ6MTA6Ci4vLi9pbmNsdWRlL2xpbnV4L2NvbXBpbGVyX3R5cGVzLmg6MzU0OjM4OiBlcnJvcjog
-Y2FsbCB0byDigJhfX2NvbXBpbGV0aW1lX2Fzc2VydF81OTnigJkgXApkZWNsYXJlZCB3aXRoIGF0
-dHJpYnV0ZSBlcnJvcjogRklFTERfR0VUOiBtYXNrIGlzIG5vdCBjb25zdGFudAogIF9jb21waWxl
-dGltZV9hc3NlcnQoY29uZGl0aW9uLCBtc2csIF9fY29tcGlsZXRpbWVfYXNzZXJ0XywgX19DT1VO
-VEVSX18pCgpGaXhlczogOWY5NjhjOTI2NmFhICgiS1ZNOiBhcm02NDogdmdpYy12MjogQWRkIGhl
-bHBlciBmb3IgbGVnYWN5IGRpc3QvY3B1aWYgYmFzZSBhZGRyZXNzIHNldHRpbmciKQpTaWduZWQt
-b2ZmLWJ5OiBZYW5nIFlpbmdsaWFuZyA8eWFuZ3lpbmdsaWFuZ0BodWF3ZWkuY29tPgotLS0KdjM6
-CiByZXBsYWNlICcxNS8zMScgd2l0aCAnU0hJRlQgKyAxNScgdG8gbWFrZSBpdCBtb3JlIHJlYWRh
-YmxlLgp2MjoKICBVc2luZyBHRU5NQVNLKCkgdG8gZ2VuZXJhdGUgdGhlIG1hc2tzLgotLS0KIGFy
-Y2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaCB8IDYgKysrKy0tCiAxIGZpbGUgY2hhbmdl
-ZCwgNCBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJt
-NjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9r
-dm0uaAppbmRleCAzYmIxMzQzNTU4NzQuLjMxNjkxN2I5ODcwNyAxMDA2NDQKLS0tIGEvYXJjaC9h
-cm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCisrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS91YXBp
-L2FzbS9rdm0uaApAQCAtNzUsOSArNzUsMTEgQEAgc3RydWN0IGt2bV9yZWdzIHsKIAogLyogS1ZN
-X0FSTV9TRVRfREVWSUNFX0FERFIgaW9jdGwgaWQgZW5jb2RpbmcgKi8KICNkZWZpbmUgS1ZNX0FS
-TV9ERVZJQ0VfVFlQRV9TSElGVAkwCi0jZGVmaW5lIEtWTV9BUk1fREVWSUNFX1RZUEVfTUFTSwko
-MHhmZmZmIDw8IEtWTV9BUk1fREVWSUNFX1RZUEVfU0hJRlQpCisjZGVmaW5lIEtWTV9BUk1fREVW
-SUNFX1RZUEVfTUFTSwlHRU5NQVNLKEtWTV9BUk1fREVWSUNFX1RZUEVfU0hJRlQgKyAxNSwgXAor
-CQkJCQkJS1ZNX0FSTV9ERVZJQ0VfVFlQRV9TSElGVCkKICNkZWZpbmUgS1ZNX0FSTV9ERVZJQ0Vf
-SURfU0hJRlQJCTE2Ci0jZGVmaW5lIEtWTV9BUk1fREVWSUNFX0lEX01BU0sJCSgweGZmZmYgPDwg
-S1ZNX0FSTV9ERVZJQ0VfSURfU0hJRlQpCisjZGVmaW5lIEtWTV9BUk1fREVWSUNFX0lEX01BU0sJ
-CUdFTk1BU0soS1ZNX0FSTV9ERVZJQ0VfSURfU0hJRlQgKyAxNSwgXAorCQkJCQkJS1ZNX0FSTV9E
-RVZJQ0VfSURfU0hJRlQpCiAKIC8qIFN1cHBvcnRlZCBkZXZpY2UgSURzICovCiAjZGVmaW5lIEtW
-TV9BUk1fREVWSUNFX1ZHSUNfVjIJCTAKLS0gCjIuMjUuMQoKX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlz
-dHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4v
-bGlzdGluZm8va3ZtYXJtCg==
+Hi Marc,
+
+On Fri, Aug 05, 2022 at 02:58:11PM +0100, Marc Zyngier wrote:
+> Allow userspace to write ID_AA64DFR0_EL1, on the condition that only
+> the PMUver field can be altered and be at most the one that was
+> initially computed for the guest.
+
+As DFR0_EL1 is exposed to userspace, isn't a ->set_user() hook required
+for it as well?
+
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 35 ++++++++++++++++++++++++++++++++++-
+>  1 file changed, 34 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 55451f49017c..c0595f31dab8 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1236,6 +1236,38 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+>  	return 0;
+>  }
+>  
+> +static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+> +			       const struct sys_reg_desc *rd,
+> +			       u64 val)
+> +{
+> +	u8 pmuver, host_pmuver;
+> +
+> +	host_pmuver = kvm_arm_pmu_get_host_pmuver();
+> +
+> +	/*
+> +	 * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
+> +	 * as it doesn't promise more than what the HW gives us. We
+> +	 * don't allow an IMPDEF PMU though.
+> +	 */
+> +	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER), val);
+> +	if (pmuver == ID_AA64DFR0_PMUVER_IMP_DEF || pmuver > host_pmuver)
+> +		return -EINVAL;
+> +
+> +	/* We already have a PMU, don't try to disable it... */
+> +	if (kvm_vcpu_has_pmu(vcpu) && pmuver == 0)
+> +		return -EINVAL;
+> +
+> +	/* We can only differ with PMUver, and anything else is an error */
+> +	val ^= read_id_reg(vcpu, rd, false);
+> +	val &= ~(0xFUL << ID_AA64DFR0_PMUVER_SHIFT);
+
+nit: ~ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER)
+
+--
+Thanks,
+Oliver
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
