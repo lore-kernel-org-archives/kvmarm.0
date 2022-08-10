@@ -2,82 +2,90 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E19C00140
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 23:33:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6485DC00140
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 23:35:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E1944DDC4;
-	Wed, 10 Aug 2022 19:33:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDEA94DDAB;
+	Wed, 10 Aug 2022 19:35:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(invalid, public key: DNS query timeout for
+	mimecast20190719._domainkey.redhat.com) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CT4h5ozUXnnL; Wed, 10 Aug 2022 19:33:35 -0400 (EDT)
+	with ESMTP id K4BS5Sa4jSYU; Wed, 10 Aug 2022 19:35:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 528A44DDBA;
-	Wed, 10 Aug 2022 19:33:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B20FB4DDAE;
+	Wed, 10 Aug 2022 19:35:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 33B3C4DDB8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 19:33:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 78FC84DDA9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 19:35:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Fo2f9tFtqzrA for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Aug 2022 19:33:32 -0400 (EDT)
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com
- [209.85.215.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B72B4DDB7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 19:33:32 -0400 (EDT)
-Received: by mail-pg1-f178.google.com with SMTP id r22so13285982pgm.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 16:33:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc;
- bh=KboTvwgUFUJZZgdLSyM30lTXnrslAqe3eOSw/sVDlUY=;
- b=jM6njugBVrh9WNTJQOr6gE5k45aeD/aB+ULFzWYMorDQhSH8zrpJNCjyFiWB34SbY7
- WrnyyGxzRlMhfroh8aQ737/XyEaYQpiBOOqoRSZnWPMuBT+nx1NiNcTIQyf8DFkWD1zf
- 9wLEzWuB9v3Xgg9qJW1ptkKyd1BRRs47MabRONrogQjvNn0ZozusgLcRGTWRpYlHNk39
- WpwUFsKxAnqsrgMT5premRn33serrhdKBLJRhP+dYdoskAzny7eySKhtcc/C0yi+HpoH
- elCYpIACP4H2F6AmMaaul8Yx5pQdJj5SejLLeyrx2olqFCjH5qaM+167ZXvZ5LAicER8
- IfUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
- bh=KboTvwgUFUJZZgdLSyM30lTXnrslAqe3eOSw/sVDlUY=;
- b=RVBr+wXkD63ni3lWHmr73V2IEp7jc6yAelVFAbCmVLiCjeo9LFS+yQy2mT4bf4S6cm
- 7PPbUXDA2uZcVtbdFuGDqs/SsCR+6T35Na6+/ow1tK3sERKajptmAzyki3gTA67qZxQO
- 65q1Sg478Upoi8LbLRuH6Rnu/6B9Bk8GeWZH7EQk5jkX3KMahxZRhjsf2rhdAlK6jG45
- D709eJkKkyrYetdDWC3u2c/Arh4zHlEwLvA7WUXJajug2lvdn5QKjBErIRWNydJh20Xw
- X1iEvipx9iEM4GeAkaYDY14M7D3habR7cxLYAlzL/0Yr+K0X8fFk/FtYJsUVKL1c7/PB
- vJrg==
-X-Gm-Message-State: ACgBeo0J1V5l1UFVscFB0j43rIOHUI16761ZPspnspzYxkugbKHrfD+s
- pJ33FKgmmBJqAh/l4R+8p2nB5Q==
-X-Google-Smtp-Source: AA6agR7L/RXaWNWjaSPyN9BUFzkksyrI4OgzKqR2iz1PyEsp2uz10foTn2uB8rPwHVCSuh3R9Obibw==
-X-Received: by 2002:a05:6a00:1821:b0:52e:3c7c:9297 with SMTP id
- y33-20020a056a00182100b0052e3c7c9297mr29474982pfa.54.1660174410908; 
- Wed, 10 Aug 2022 16:33:30 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com.
- [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
- i126-20020a628784000000b0052d33bf14d6sm2603501pfe.63.2022.08.10.16.33.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 10 Aug 2022 16:33:30 -0700 (PDT)
-Date: Wed, 10 Aug 2022 16:33:26 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v3 2/3] arm: pmu: Reset the pmu registers
- before starting some tests
-Message-ID: <YvRARgEDkSI1ken5@google.com>
-References: <20220805004139.990531-1-ricarkol@google.com>
- <20220805004139.990531-3-ricarkol@google.com>
- <20220810190216.hqt3wyzufyvhhpkf@kamzik>
+ with ESMTP id 89uh+dycYm8a for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Aug 2022 19:35:07 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE7144DDA8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 19:35:07 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1660174507;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=p4aqIasYhaSzV49q+EWgbsENRoxcrDk8IPfuEQBuSyc=;
+ b=AmysuECMBK366zTUC8ssSB0JeSkJWhT5I7CmYMhQLDKW0+PT3K0XnqucWERJcm1KtuqZln
+ y46rk+6e16k8kQ2ILPhkJjApg38pCgt6KqO2bRaqKb63n74l2dkblXEsVPCJiSDARVwY1B
+ pZmwTS+TifKJrptqgqBkfXzXpiF4H7Y=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-13-BD_3TpmPM_y3UTMOCkcRrg-1; Wed, 10 Aug 2022 19:35:04 -0400
+X-MC-Unique: BD_3TpmPM_y3UTMOCkcRrg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.10])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6A52D29DD9A3;
+ Wed, 10 Aug 2022 23:35:03 +0000 (UTC)
+Received: from [10.64.54.77] (vpn2-54-77.bne.redhat.com [10.64.54.77])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 798FF492C3B;
+ Wed, 10 Aug 2022 23:34:59 +0000 (UTC)
+Subject: Re: [PATCH 1/2] KVM: selftests: Make rseq compatible with glibc-2.35
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+References: <20220809060627.115847-1-gshan@redhat.com>
+ <20220809060627.115847-2-gshan@redhat.com>
+ <8735e6ncxw.fsf@oldenburg.str.redhat.com>
+ <7844e3fa-e49e-de75-e424-e82d3a023dd6@redhat.com>
+ <87o7wtnay6.fsf@oldenburg.str.redhat.com>
+ <616d4de6-81f6-9d14-4e57-4a79fec45690@redhat.com>
+ <797306043.114963.1660047714774.JavaMail.zimbra@efficios.com>
+ <bb97efaf-4f58-c192-a489-e71ebbebce8c@redhat.com>
+ <392275844.358.1660133856396.JavaMail.zimbra@efficios.com>
+ <ae135a39-4190-041b-93dd-be2610125631@redhat.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <49d8b8fb-4053-cdd2-4d3c-9bf693c23a47@redhat.com>
+Date: Thu, 11 Aug 2022 09:34:57 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220810190216.hqt3wyzufyvhhpkf@kamzik>
-Cc: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <ae135a39-4190-041b-93dd-be2610125631@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+Cc: Florian Weimer <fweimer@redhat.com>, shan gavin <shan.gavin@gmail.com>,
+ KVM list <kvm@vger.kernel.org>, maz <maz@kernel.org>,
+ linux-kernel <linux-kernel@vger.kernel.org>,
+ andrew jones <andrew.jones@linux.dev>, yihyu <yihyu@redhat.com>,
+ linux-kselftest <linux-kselftest@vger.kernel.org>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -86,84 +94,45 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Aug 10, 2022 at 09:02:16PM +0200, Andrew Jones wrote:
-> On Thu, Aug 04, 2022 at 05:41:38PM -0700, Ricardo Koller wrote:
-> > Some registers like the PMOVS reset to an architecturally UNKNOWN value.
-> > Most tests expect them to be reset (mostly zeroed) using pmu_reset().
-> > Add a pmu_reset() on all the tests that need one.
-> > 
-> > As a bonus, fix a couple of comments related to the register state
-> > before a sub-test.
-> > 
-> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  arm/pmu.c | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arm/pmu.c b/arm/pmu.c
-> > index 4c601b05..12e7d84e 100644
-> > --- a/arm/pmu.c
-> > +++ b/arm/pmu.c
-> > @@ -826,7 +826,7 @@ static void test_overflow_interrupt(void)
-> >  	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> >  	isb();
-> >  
-> > -	/* interrupts are disabled */
-> > +	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
-> >  
-> >  	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-> >  	report(expect_interrupts(0), "no overflow interrupt after preset");
-> > @@ -842,7 +842,7 @@ static void test_overflow_interrupt(void)
-> >  	isb();
-> >  	report(expect_interrupts(0), "no overflow interrupt after counting");
-> >  
-> > -	/* enable interrupts */
-> > +	/* enable interrupts (PMINTENSET_EL1 <= ALL_SET) */
-> >  
-> >  	pmu_reset_stats();
-> >  
-> > @@ -890,6 +890,7 @@ static bool check_cycles_increase(void)
-> >  	bool success = true;
-> >  
-> >  	/* init before event access, this test only cares about cycle count */
-> > +	pmu_reset();
-> 
-> This and the other pmu_reset() call below break compilation on 32-bit arm,
-> because there's no pmu_reset() defined for it.
-I completely missed the 32-bit arm case. Thanks!
-
-> It'd probably be best if
-> we actually implemented some sort of reset for arm, considering it's being
-> called in common tests.
-
-Mind if I start by creating a pmu_reset() for 32-bit arm, which can
-later be used by a general arm_reset()?
-
-> 
-> Thanks,
-> drew
-> 
-> >  	set_pmcntenset(1 << PMU_CYCLE_IDX);
-> >  	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-> >  
-> > @@ -944,6 +945,7 @@ static bool check_cpi(int cpi)
-> >  	uint32_t pmcr = get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
-> >  
-> >  	/* init before event access, this test only cares about cycle count */
-> > +	pmu_reset();
-> >  	set_pmcntenset(1 << PMU_CYCLE_IDX);
-> >  	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-> >  
-> > -- 
-> > 2.37.1.559.g78731f0fdb-goog
-> > 
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgUGFvbG8gYW5kIE1hdGhpZXUsCgpPbiA4LzEwLzIyIDEwOjE5IFBNLCBQYW9sbyBCb256aW5p
+IHdyb3RlOgo+IE9uIDgvMTAvMjIgMTQ6MTcsIE1hdGhpZXUgRGVzbm95ZXJzIHdyb3RlOgo+PiBJ
+bmRlZWQsIHRoaXMgaGFjayBzZWVtcyB0byBiZSBhIGdvb2QgYXBwcm9hY2ggdG8gaW1tZWRpYXRl
+bHkgZml4IHRoaW5ncyB3aXRob3V0Cj4+IG1vdmluZyBhcm91bmQgYWxsIHNvdXJjZSBmaWxlcyBh
+bmQgaGVhZGVycy4gSW4gdGhlIGxvbmdlciB0ZXJtLCBJJ2QgcHJlZmVyIFNlYW4ncwo+PiBwcm9w
+b3NhbCB0byBtb3ZlIHJzZXEuYyB0byB0b29scy9saWIvIChhbmQgdG8gbW92ZSByc2VxIGhlYWRl
+cnMgdG8gdG9vbHMvaW5jbHVkZS9yc2VxLykuCj4+IFRoaXMgY2FuIGJlIGRvbmUgaW4gYSBmb2xs
+b3cgdXAgcGhhc2UgdGhvdWdoLiBJJ2xsIHB1dCBhIG5vdGUgb24gbXkgdG9kbyBsaXN0Cj4+IGZv
+ciBhZnRlciBJIGNvbWUgYmFjayBmcm9tIHZhY2F0aW9uLgo+IAo+IEdyZWF0LCBHYXZpbiwgYXJl
+IHlvdSBnb2luZyB0byByZXBvc3QgdXNpbmcgbGlicnNlcT8KPiAKCkl0IHNlZW1zIHlvdSd2ZSBt
+ZXJnZWQgdjIuIEkgd2lsbCBwb3N0IGFkZGl0aW9uYWwgcGF0Y2hlcyB0bwp1c2UgdG9vbHMvbGli
+L2xpYnJzZXEuc28sIGRlcGVuZGluZyBvbiB3aGF0IE1hdGhpZXUgd2lsbCBoYXZlLgoKTWF0aGll
+dSwgUGxlYXNlIGxldCBtZSBrbm93IGlmIHRoZXJlIGFyZSBhbnl0aGluZyBJIGNhbiBoZWxwLgoK
+Pj4+IFllYWgsIHJzZXFfdGVzdCBzaG91bGQgcmV1c2UgbGlicnNlcSBjb2RlLsKgIFRoZSBzaW1w
+bGVzdCB3YXksCj4+PiBpZiBzbGlnaHRseSBoYWNraXNoLCBpcyB0byBkbyBzb21ldGhpbmcgbGlr
+ZQo+Pj4KPj4+IGRpZmYgLS1naXQgYS90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vTWFrZWZp
+bGUKPj4+IGIvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL01ha2VmaWxlCj4+PiBpbmRleCA2
+OTBiNDk5YzM0NzEuLjZjMTkyYjBlYzMwNCAxMDA2NDQKPj4+IC0tLSBhL3Rvb2xzL3Rlc3Rpbmcv
+c2VsZnRlc3RzL2t2bS9NYWtlZmlsZQo+Pj4gKysrIGIvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMv
+a3ZtL01ha2VmaWxlCj4+PiBAQCAtMzcsNiArMzcsNyBAQCBpZmVxICgkKEFSQ0gpLHJpc2N2KQo+
+Pj4gwqDCoMKgwqAgVU5BTUVfTSA6PSByaXNjdgo+Pj4gwqBlbmRpZgo+Pj4KPj4+IMKgTElCS1ZN
+ICs9IGxpYi9hc3NlcnQuYwo+Pj4gwqBMSUJLVk0gKz0gbGliL2VsZi5jCj4+PiDCoExJQktWTSAr
+PSBsaWIvZ3Vlc3RfbW9kZXMuYwo+Pj4gQEAgLTE5OCw3ICsxOTksNyBAQCBlbmRpZgo+Pj4gwqBD
+RkxBR1MgKz0gLVdhbGwgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3VuaW5pdGlhbGl6ZWQgLU8yIC1n
+IC1zdGQ9Z251OTkgXAo+Pj4gwqDCoMKgwqAgLWZuby1zdGFjay1wcm90ZWN0b3IgLWZuby1QSUUg
+LUkkKExJTlVYX1RPT0xfSU5DTFVERSkgXAo+Pj4gwqDCoMKgwqAgLUkkKExJTlVYX1RPT0xfQVJD
+SF9JTkNMVURFKSAtSSQoTElOVVhfSERSX1BBVEgpIC1JaW5jbHVkZSBcCj4+PiAtwqDCoMKgIC1J
+JCg8RCkgLUlpbmNsdWRlLyQoVU5BTUVfTSkgLUkuLiAkKEVYVFJBX0NGTEFHUykgJChLSERSX0lO
+Q0xVREVTKQo+Pj4gK8KgwqDCoCAtSSQoPEQpIC1JaW5jbHVkZS8kKFVOQU1FX00pIC1JLi4gJChF
+WFRSQV9DRkxBR1MpICQoS0hEUl9JTkNMVURFUykgLUkuLi9yc2VxCj4+Pgo+Pj4gwqBuby1waWUt
+b3B0aW9uIDo9ICQoY2FsbCB0cnktcnVuLCBlY2hvICdpbnQgbWFpbigpIHsgcmV0dXJuIDA7IH0n
+IHwgXAo+Pj4gwqDCoMKgwqDCoMKgwqDCoCAkKENDKSAtV2Vycm9yIC1uby1waWUgLXggYyAtIC1v
+ICIkJFRNUCIsIC1uby1waWUpCj4+Pgo+Pj4KPj4+IGFuZCBqdXN0ICNpbmNsdWRlICIuLi9yc2Vx
+L3JzZXEuYyIgaW4gcnNlcV90ZXN0LmMuCgpUaGFua3MsCkdhdmluCgpfX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFy
+bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFp
+bG1hbi9saXN0aW5mby9rdm1hcm0K
