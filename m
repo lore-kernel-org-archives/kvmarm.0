@@ -2,57 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35E3BC25B07
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 18:29:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 793F6C25B07
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 18:46:33 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 97F954D900;
-	Wed, 10 Aug 2022 14:29:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00B084D9C9;
+	Wed, 10 Aug 2022 14:46:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OWu6ozPrSzri; Wed, 10 Aug 2022 14:28:59 -0400 (EDT)
+	with ESMTP id U9hoKCzAlrns; Wed, 10 Aug 2022 14:46:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C4734D8D4;
-	Wed, 10 Aug 2022 14:28:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6A1A4D9CD;
+	Wed, 10 Aug 2022 14:46:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD8834D8AE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 14:28:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF0C04D9C9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 14:46:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T53pr2YX0DvS for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Aug 2022 14:28:56 -0400 (EDT)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1DCAC4D850
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 14:28:56 -0400 (EDT)
-Date: Wed, 10 Aug 2022 20:28:50 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1660156135;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=jC9+zzRpG9jGa7Z38m4jyPIwEIqPCOKTMO3d7gOb51Q=;
- b=PsT3rFdq4TXBx6oWprCKpewsOyw3wG4C3uYeND6dhVYv4WaCPev0D5l23GS1dDrzKeRNtr
- Lp3IiNgktHARn0FTvziSIMUuy7Bv63L1oDpRdkr+UpONcoSg7jKqyMuKEHG+I5y9aLdBXp
- UdTzn/dRCE3FdU0tsvNiddhkJjiBDMU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v3 3/3] arm: pmu: Check for overflow in
- the low counter in chained counters tests
-Message-ID: <20220810182850.crt7rvaxfjuzmrej@kamzik>
-References: <20220805004139.990531-1-ricarkol@google.com>
- <20220805004139.990531-4-ricarkol@google.com>
- <YvPrMtKkrVc8HhOA@google.com>
+ with ESMTP id fHybYNKziOKK for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Aug 2022 14:46:29 -0400 (EDT)
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com
+ [209.85.214.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 89E364D9C7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 14:46:29 -0400 (EDT)
+Received: by mail-pl1-f173.google.com with SMTP id d16so14981388pll.11
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 11:46:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc;
+ bh=w7tKdaFpkXOHqmzRmN3TS17bbMv5aY9ZVRa8viTMmRA=;
+ b=mryMQKfp8NuK+lcMB/v4C/eZQvysrNsacXRGGU+ns1YlKLYZ4an1sak74CP/9uOQwj
+ vmTcazpGmj0QSeEzqJhEMQVGuQEY4cRda9cnUkwjM2oTVfhDrEZ1zauUSDY729M/zK3M
+ 8V441nXBXcjEh3O3pgwmUOIaj7407tX8vatsx0kc1be4BjvdwVliuYvLxN8cVFLxzS09
+ uwj4XXDR3c3DAaI1nZYnE2FeAV8KXK0Dc5w5a+wmkq0lH2/bDu8gx8nwPTQghoSTx5qj
+ lDx10dGGr6P0NGcyC3JXUEoEB7QTime/O3F3q+NKlIu4W/FiWEkKW3cmFhhiYiuvGX4q
+ TW6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+ bh=w7tKdaFpkXOHqmzRmN3TS17bbMv5aY9ZVRa8viTMmRA=;
+ b=WfD7koefeGoeQeXjm1Yez6ZRGbBtITjAa0C2t3Sw318RWvCXy3M9uEDDrXQXXu3e2V
+ g2MHiU4nCwpM/7PotKEXVbsCXo6sTCFeg5V/C6VOke8/CH10KOcaAUCK9nG20DtIWHAt
+ Tryi9goFxhIwa+XQONJIMKtVYx84LWUYHe4JhD5US4clpJoQBxNB/8y/1EHrUgUfaKZ8
+ dM4tXkzgeUMLeujJ1g5KHndNoqh2A/6A/uG8xftAkUwmDdLtuJ0DRc8hZTJYffvqfcbK
+ eA1VV3OniqSlzg6m5YP4diM8FjRS7RhfrgBio0hWsq3sSlX4AaJRqWRrE/VH8WeRtLCM
+ 4PBA==
+X-Gm-Message-State: ACgBeo2787Y66RMCwXzbVUIyqRS3ar25ciCxBJg8o1Q8vRHH9BIl5dZE
+ bn1oq6l4V9RcVB4AeH/TyZE36Q==
+X-Google-Smtp-Source: AA6agR5YxgHA27P0ktUotSKJbRJ8qV0IwK9/mACrXmCnkz/YNaR7XQoDc+CBbP8mCvVE8aYBRlYVHA==
+X-Received: by 2002:a17:903:1cd:b0:171:3543:6b13 with SMTP id
+ e13-20020a17090301cd00b0017135436b13mr4703078plh.96.1660157188397; 
+ Wed, 10 Aug 2022 11:46:28 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com.
+ [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
+ w18-20020a1709027b9200b0016dbb878f8asm13157232pll.82.2022.08.10.11.46.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 10 Aug 2022 11:46:27 -0700 (PDT)
+Date: Wed, 10 Aug 2022 11:46:22 -0700
+From: Ricardo Koller <ricarkol@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 0/9] KVM: arm64: PMU: Fixing chained events, and PMUv3p5
+ support
+Message-ID: <YvP8/m9uDI2PcyoP@google.com>
+References: <20220805135813.2102034-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <YvPrMtKkrVc8HhOA@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20220805135813.2102034-1-maz@kernel.org>
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,145 +90,85 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Aug 10, 2022 at 12:30:26PM -0500, Oliver Upton wrote:
-> On Thu, Aug 04, 2022 at 05:41:39PM -0700, Ricardo Koller wrote:
-> > A chained event overflowing on the low counter can set the overflow flag
-> > in PMOVS.  KVM does not set it, but real HW and the fast-model seem to.
-> > Moreover, the AArch64.IncrementEventCounter() pseudocode in the ARM ARM
-> > (DDI 0487H.a, J1.1.1 "aarch64/debug") also sets the PMOVS bit on
-> > overflow.
-> > 
-> > The pmu chain tests fail on bare metal when checking the overflow flag
-> > of the low counter _not_ being set on overflow.  Fix by checking for
-> > overflow. Note that this test fails in KVM without the respective fix.
-> > 
+On Fri, Aug 05, 2022 at 02:58:04PM +0100, Marc Zyngier wrote:
+> Ricardo recently reported[1] that our PMU emulation was busted when it
+> comes to chained events, as we cannot expose the overflow on a 32bit
+> boundary (which the architecture requires).
 > 
-> It'd be good to link out to the respective KVM fix, either by commit or
-> lore link if this patch lands before the kernel patches:
+> This series aims at fixing this (by deleting a lot of code), and as a
+> bonus adds support for PMUv3p5, as this requires us to fix a few more
+> things.
 > 
-> Link: http://lore.kernel.org/r/20220805135813.2102034-1-maz@kernel.org
+> Tested on A53 (PMUv3) and FVP (PMUv3p5).
+> 
+> [1] https://lore.kernel.org/r/20220805004139.990531-1-ricarkol@google.com
+> 
+> Marc Zyngier (9):
+>   KVM: arm64: PMU: Align chained counter implementation with
+>     architecture pseudocode
+>   KVM: arm64: PMU: Distinguish between 64bit counter and 64bit overflow
+>   KVM: arm64: PMU: Only narrow counters that are not 64bit wide
+>   KVM: arm64: PMU: Add counter_index_to_*reg() helpers
+>   KVM: arm64: PMU: Simplify setting a counter to a specific value
+>   KVM: arm64: PMU: Move the ID_AA64DFR0_EL1.PMUver limit to VM creation
+>   KVM: arm64: PMU: Aleven ID_AA64DFR0_EL1.PMUver to be set from userspace
+>   KVM: arm64: PMU: Implement PMUv3p5 long counter support
+>   KVM: arm64: PMU: Aleven PMUv3p5 to be exposed to the guest
+> 
+>  arch/arm64/include/asm/kvm_host.h |   1 +
+>  arch/arm64/kvm/arm.c              |   6 +
+>  arch/arm64/kvm/pmu-emul.c         | 372 ++++++++++--------------------
+>  arch/arm64/kvm/sys_regs.c         |  65 +++++-
+>  include/kvm/arm_pmu.h             |  16 +-
+>  5 files changed, 208 insertions(+), 252 deletions(-)
+> 
+> -- 
+> 2.34.1
+> 
 
-I'll pick that up with the tags when preparing to push.
+Hi Marc,
+
+There is one extra potential issue with exposing PMUv3p5. I see this
+weird behavior when doing passthrough ("bare metal") on the fast-model
+configured to emulate PMUv3p5: the [63:32] half of the counters
+overflowing at 32-bits is still incremented.
+
+  Fast model - ARMv8.5:
+   
+	Assuming the initial state is even=0xFFFFFFFF and odd=0x0,
+	incrementing the even counter leads to:
+
+	0x00000001_00000000	0x00000000_00000001		0x1
+	even counter		odd counter			PMOVSET
+
+	Assuming the initial state is even=0xFFFFFFFF and odd=0xFFFFFFFF,
+	incrementing the even counter leads to:
+
+	0x00000001_00000000	0x00000001_00000000		0x3
+	even counter		odd counter			PMOVSET
+
+More specifically, the pmu-chained-sw-incr kvm-unit-test fails when
+doing passthrough of PMUv3p5 (fast model - ARMv8.5):
+
+  INFO: PMU version: 0x5
+  INFO: PMU implementer/ID code: 0x41("A")/0
+  INFO: Implements 8 event counters
+  PASS: pmu: pmu-chained-sw-incr: overflow and chain counter incremented after 100 SW_INCR/CHAIN
+  INFO: pmu: pmu-chained-sw-incr: overflow=0x1, #0=4294967380 #1=1
+                                                ^^^^^^^^^^^^^
+                                                #0=0x00000001_00000054
+                                                #1=0x00000000_00000001
+  FAIL: pmu: pmu-chained-sw-incr: expected overflows and values after 100 SW_INCR/CHAIN
+  INFO: pmu: pmu-chained-sw-incr: overflow=0x3, #0=4294967380 #1=4294967296
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                                  #0=0x00000001_00000054
+                                                  #1=0x00000001_00000000
+
+There's really no good use for this behavior, and not sure if it's worth
+emulating it. Can't find any reference in the ARM ARM.
 
 Thanks,
-drew
-
-> 
-> --
-> Thanks,
-> Oliver
-> 
-> > Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  arm/pmu.c | 33 ++++++++++++++++++---------------
-> >  1 file changed, 18 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/arm/pmu.c b/arm/pmu.c
-> > index 12e7d84e..0a7e12f8 100644
-> > --- a/arm/pmu.c
-> > +++ b/arm/pmu.c
-> > @@ -583,7 +583,7 @@ static void test_chained_counters(void)
-> >  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
-> >  
-> >  	report(read_regn_el0(pmevcntr, 1) == 1, "CHAIN counter #1 incremented");
-> > -	report(!read_sysreg(pmovsclr_el0), "no overflow recorded for chained incr #1");
-> > +	report(read_sysreg(pmovsclr_el0) == 0x1, "overflow recorded for chained incr #1");
-> >  
-> >  	/* test 64b overflow */
-> >  
-> > @@ -595,7 +595,7 @@ static void test_chained_counters(void)
-> >  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
-> >  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-> >  	report(read_regn_el0(pmevcntr, 1) == 2, "CHAIN counter #1 set to 2");
-> > -	report(!read_sysreg(pmovsclr_el0), "no overflow recorded for chained incr #2");
-> > +	report(read_sysreg(pmovsclr_el0) == 0x1, "overflow recorded for chained incr #2");
-> >  
-> >  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> >  	write_regn_el0(pmevcntr, 1, ALL_SET);
-> > @@ -603,7 +603,7 @@ static void test_chained_counters(void)
-> >  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
-> >  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-> >  	report(!read_regn_el0(pmevcntr, 1), "CHAIN counter #1 wrapped");
-> > -	report(read_sysreg(pmovsclr_el0) == 0x2, "overflow on chain counter");
-> > +	report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
-> >  }
-> >  
-> >  static void test_chained_sw_incr(void)
-> > @@ -629,8 +629,9 @@ static void test_chained_sw_incr(void)
-> >  		write_sysreg(0x1, pmswinc_el0);
-> >  
-> >  	isb();
-> > -	report(!read_sysreg(pmovsclr_el0) && (read_regn_el0(pmevcntr, 1) == 1),
-> > -		"no overflow and chain counter incremented after 100 SW_INCR/CHAIN");
-> > +	report((read_sysreg(pmovsclr_el0) == 0x1) &&
-> > +		(read_regn_el0(pmevcntr, 1) == 1),
-> > +		"overflow and chain counter incremented after 100 SW_INCR/CHAIN");
-> >  	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
-> >  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
-> >  
-> > @@ -648,10 +649,10 @@ static void test_chained_sw_incr(void)
-> >  		write_sysreg(0x1, pmswinc_el0);
-> >  
-> >  	isb();
-> > -	report((read_sysreg(pmovsclr_el0) == 0x2) &&
-> > +	report((read_sysreg(pmovsclr_el0) == 0x3) &&
-> >  		(read_regn_el0(pmevcntr, 1) == 0) &&
-> >  		(read_regn_el0(pmevcntr, 0) == 84),
-> > -		"overflow on chain counter and expected values after 100 SW_INCR/CHAIN");
-> > +		"expected overflows and values after 100 SW_INCR/CHAIN");
-> >  	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
-> >  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
-> >  }
-> > @@ -731,8 +732,9 @@ static void test_chain_promotion(void)
-> >  	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-> >  		    read_regn_el0(pmevcntr, 0));
-> >  
-> > -	report((read_regn_el0(pmevcntr, 1) == 1) && !read_sysreg(pmovsclr_el0),
-> > -		"CHAIN counter enabled: CHAIN counter was incremented and no overflow");
-> > +	report((read_regn_el0(pmevcntr, 1) == 1) &&
-> > +		(read_sysreg(pmovsclr_el0) == 0x1),
-> > +		"CHAIN counter enabled: CHAIN counter was incremented and overflow");
-> >  
-> >  	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
-> >  		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
-> > @@ -759,8 +761,9 @@ static void test_chain_promotion(void)
-> >  	report_info("MEM_ACCESS counter #0 has value 0x%lx",
-> >  		    read_regn_el0(pmevcntr, 0));
-> >  
-> > -	report((read_regn_el0(pmevcntr, 1) == 1) && !read_sysreg(pmovsclr_el0),
-> > -		"32b->64b: CHAIN counter incremented and no overflow");
-> > +	report((read_regn_el0(pmevcntr, 1) == 1) &&
-> > +		(read_sysreg(pmovsclr_el0) == 0x1),
-> > +		"32b->64b: CHAIN counter incremented and overflow");
-> >  
-> >  	report_info("CHAIN counter #1 = 0x%lx, overflow=0x%lx",
-> >  		read_regn_el0(pmevcntr, 1), read_sysreg(pmovsclr_el0));
-> > @@ -868,8 +871,8 @@ static void test_overflow_interrupt(void)
-> >  	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> >  	isb();
-> >  	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-> > -	report(expect_interrupts(0),
-> > -		"no overflow interrupt expected on 32b boundary");
-> > +	report(expect_interrupts(0x1),
-> > +		"expect overflow interrupt on 32b boundary");
-> >  
-> >  	/* overflow on odd counter */
-> >  	pmu_reset_stats();
-> > @@ -877,8 +880,8 @@ static void test_overflow_interrupt(void)
-> >  	write_regn_el0(pmevcntr, 1, ALL_SET);
-> >  	isb();
-> >  	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E);
-> > -	report(expect_interrupts(0x2),
-> > -		"expect overflow interrupt on odd counter");
-> > +	report(expect_interrupts(0x3),
-> > +		"expect overflow interrupt on even and odd counter");
-> >  }
-> >  #endif
-> >  
-> > -- 
-> > 2.37.1.559.g78731f0fdb-goog
-> > 
+Ricardo
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
