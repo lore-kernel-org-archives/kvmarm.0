@@ -2,105 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5002BC00140
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 12:36:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BECDC00140
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 15:26:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6B834D8CA;
-	Wed, 10 Aug 2022 08:36:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8785F4DAB9;
+	Wed, 10 Aug 2022 11:26:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KNa+hiPfPbRb; Wed, 10 Aug 2022 08:36:06 -0400 (EDT)
+	with ESMTP id pyZPBKw0OBY7; Wed, 10 Aug 2022 11:26:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 96B914D87E;
-	Wed, 10 Aug 2022 08:36:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C22764DABD;
+	Wed, 10 Aug 2022 11:26:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FEC54D87E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 08:36:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 522F54DAB6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 11:26:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RKvGgPmnfXIt for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Aug 2022 08:36:04 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F197C4D870
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 08:36:03 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1660134963;
+ with ESMTP id z4jolmfLp22I for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Aug 2022 11:26:02 -0400 (EDT)
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8BFFA4DAB5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 11:26:02 -0400 (EDT)
+Date: Wed, 10 Aug 2022 10:25:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1660145161;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=87CTfpJXv+5cfHg/lnngjOgN/RrqyzIAd1Oqc8i/xvY=;
- b=CPXV9rH9TmF+bA0oEZ3dkiTztZ+QFJFIC3rkvagF9+7CP3bDT0/ptWLhmXg3unsCcS+0A5
- 592QCzXJ+jgBYWkdu0yolfSVQDzg5N623UV9JDU+1B5xhe7sRrNxqczh0VQOZfuAvDVavr
- fVJ+aCi1FTt5wCVR1AJWOfIsS37Rm90=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-102-dJi7oxlMM3u982YHV6q42g-1; Wed, 10 Aug 2022 08:36:00 -0400
-X-MC-Unique: dJi7oxlMM3u982YHV6q42g-1
-Received: by mail-ej1-f71.google.com with SMTP id
- qb27-20020a1709077e9b00b0073160a55fd7so2543880ejc.17
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 05:36:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :x-gm-message-state:from:to:cc;
- bh=87CTfpJXv+5cfHg/lnngjOgN/RrqyzIAd1Oqc8i/xvY=;
- b=AMFcvP5V2HWtOlQ1Agy6BX80AcMOfXGoVGX9JoqOBHhLEjRTK2oICOqzLY5tmGdXYo
- y+gECXojKP0udkgq1hwBtGOaAq41ydnkkkfmRZ8b9LKMhZkDjzLI+gQJqr/s6BV6DzgX
- 0tED6OYhAei4w8dbCJy2DFek4U8oCSqnu0wsNS/j1Pg0JItJ4dC+O5mbwz6Z93dkQklD
- HRumPzWYTWDS0Pdw/UW6taabprQzh7NX3XdjphLmuXyXbdCDrgUBuThBD+zgTmNycHBR
- S5u426xEbV6w2a1F4wxWZQYK1qUF+qHm1GEvquUnbICCeSOKk7b3tFUCI1lvZaTZuVyB
- fy/A==
-X-Gm-Message-State: ACgBeo3iQXeIwJGs5p1iP6KHjYtv6bbLH78mJPvh+nO4VVuj0dDFcksR
- vG47hYxanQEUJi1bLfK37sRD8YPeVF3rRsbokKjEBSzfaQNcjtyY8BO3jqxutDw11tFrt0KmZbK
- XcRJZR8ZFZzkVYkK1+AVety32
-X-Received: by 2002:a17:907:7f9f:b0:733:76c:44c9 with SMTP id
- qk31-20020a1709077f9f00b00733076c44c9mr2231306ejc.642.1660134959425; 
- Wed, 10 Aug 2022 05:35:59 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR4VclOIWxDOiejEyzXNHWLBzTYbNnvJLzw2rnHm34/ZQmU9fDQpff2RJbtcZ+lFjHCJIwCYxQ==
-X-Received: by 2002:a17:907:7f9f:b0:733:76c:44c9 with SMTP id
- qk31-20020a1709077f9f00b00733076c44c9mr2231285ejc.642.1660134959206; 
- Wed, 10 Aug 2022 05:35:59 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89?
- ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
- by smtp.googlemail.com with ESMTPSA id
- ky16-20020a170907779000b00730a73cbe08sm2246142ejc.169.2022.08.10.05.35.56
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 10 Aug 2022 05:35:58 -0700 (PDT)
-Message-ID: <c95aec97-6fbd-dca5-6aa6-b8242d5a379a@redhat.com>
-Date: Wed, 10 Aug 2022 14:35:55 +0200
+ bh=crgVp9NsCb0L7kNNYBvx2bNXUBSIsZMhWwhI7LZsPBI=;
+ b=ku/7SXkeVEh09MrmbC2RQi4olqOTqH+SUijKnoNarWUxYgP4yf72cyXRmLh0rLrGTP/A4/
+ oTBRIDa1oxNAv59702KMnci4dB6B2d6QjcRc2w6wD6mKO7+ilsRspGsoXS2hN3L9/kNKUX
+ A8H92ZtCKRe3jL9kYuvC8KPZ2lcEqlI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: KVM/arm64: SPE: Translate VA to IPA on a stage 2 fault instead
+ of pinning VM memory
+Message-ID: <YvPOBPZa2/cHombZ@google.com>
+References: <Yl6+JWaP+mq2Nc0b@monolith.localdoman>
+ <20220419141012.GB6143@willie-the-truck>
+ <Yt5nFAscgrRGNGoH@monolith.localdoman>
+ <20220801170055.GB26471@willie-the-truck>
+ <YujzE33aPSD22wvY@monolith.localdoman>
+ <Yul8UBoDcy6GQddq@google.com>
+ <YvJowFt+U/qCqNVV@monolith.localdoman>
+ <YvKq1IK7T/nGSKpt@google.com>
+ <YvN8VvqvutZ4ti8g@monolith.localdoman>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Subject: Re: [PATCH 1/2] KVM: selftests: Make rseq compatible with glibc-2.35
-To: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Gavin Shan <gshan@redhat.com>
-References: <20220809060627.115847-1-gshan@redhat.com>
- <7844e3fa-e49e-de75-e424-e82d3a023dd6@redhat.com>
- <87o7wtnay6.fsf@oldenburg.str.redhat.com>
- <616d4de6-81f6-9d14-4e57-4a79fec45690@redhat.com>
- <797306043.114963.1660047714774.JavaMail.zimbra@efficios.com>
- <1014177394.115022.1660052656961.JavaMail.zimbra@efficios.com>
- <YvLT1fd8ddybF5Uw@google.com>
- <8c1f33b4-a5a1-fcfa-4521-36253ffa22c8@redhat.com>
- <1316061904.375.1660134559269.JavaMail.zimbra@efficios.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <1316061904.375.1660134559269.JavaMail.zimbra@efficios.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: Florian Weimer <fweimer@redhat.com>, shan gavin <shan.gavin@gmail.com>,
- KVM list <kvm@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>,
- andrew jones <andrew.jones@linux.dev>, yihyu <yihyu@redhat.com>,
- linux-kselftest <linux-kselftest@vger.kernel.org>, maz <maz@kernel.org>,
- shuah <shuah@kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>
+Content-Disposition: inline
+In-Reply-To: <YvN8VvqvutZ4ti8g@monolith.localdoman>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+Cc: maz@kernel.org, Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -112,45 +71,205 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 8/10/22 14:29, Mathieu Desnoyers wrote:
->> - By design, selftests/rseq and selftests/kvm are parallel. It's going to
->> introduce
->>    unnecessary dependency for selftests/kvm to use selftests/rseq/librseq.so. To
->>    me,
->>    it makes the maintainability even harder.
-> In terms of build system, yes, selftests/rseq and selftests/kvm are side-by-side,
-> and I agree it is odd to have a cross-dependency.
+On Wed, Aug 10, 2022 at 10:37:26AM +0100, Alexandru Elisei wrote:
+> Hi,
 > 
-> That's where moving rseq.c to tools/lib/ makes sense.
+> On Tue, Aug 09, 2022 at 01:43:32PM -0500, Oliver Upton wrote:
+> > Hi Alex,
+> > 
+> > On Tue, Aug 09, 2022 at 03:01:36PM +0100, Alexandru Elisei wrote:
+> > 
+> > [...]
+> > 
+> > > > > To summarize the approaches we've discussed so far:
+> > > > > 
+> > > > > 1. Pinning the entire guest memory
+> > > > > - Heavy handed and not ideal.
+> > > > > - Tried this approach in v5 of the SPE series [1], patches #2-#12.
+> > > > > 
+> > > > > 2. Mapping the guest SPE buffer on demand, page by page, as a result of stage 2
+> > > > > faults reported by SPE.
+> > > > > - Not feasible, because the entire contents of the buffer must be discarded is
+> > > > >   PMBSR_EL1.DL is set to 1 when taking the fault.
+> > > > > - Requires KVM to walk the guest's stage 1 tables, because SPE reports the VA,
+> > > > >   not the IPA.
+> > > > > 
+> > > > > 3. Pinning the guest SPE buffer when profiling becomes enabled*:
+> > > > > - There is the corner case described above, when profiling becomes enabled as a
+> > > > >   result of an ERET to EL0. This can happen when the buffer is enabled and
+> > > > >   PMSCR_EL1.{E0SPE,E1SPE} = {1,0};
+> > > > > - The previous buffer is unpinned when a new buffer is pinned, to avoid SPE
+> > > > >   stage 2 faults when draining the buffer, which is performed with profiling
+> > > > >   disabled.
+> > > > > - Also requires KVM to walk the guest's stage 1 tables.
+> > > > > 
+> > > > > 4. Pin the entire guest SPE buffer after the first stage 2 fault reported by
+> > > > > SPE.
+> > > > > - Gets rid of the corner case at 3.
+> > > > > - Same approach to buffer unpinning as 3.
+> > > > > - Introduces a blackout window before the first record is written.
+> > > > > - Also requires KVM to walk the guest's stage 1 tables.
+> > > > > 
+> > > > > As for the corner case at 3, I proposed either:
+> > > > > 
+> > > > > a) Mandate that guest operating systems must never modify the buffer
+> > > > > translation entries if the buffer is enabled and
+> > > > > PMSCR_EL1.{E0SPE,E1SPE} = {1,0}.
+> > > > > 
+> > > > > b) Pin the entire buffer as a result of the first stage 2 fault reported by SPE,
+> > > > > but **only** for this corner case. For all other cases, the buffer is pinned
+> > > > > when profiling becomes enabled, to eliminate the blackout window. Guest
+> > > > > operating systems can be modified to not change the translation entries for the
+> > > > > buffer if this blackout window is not desirable.
+> > > > > 
+> > > > > Pinning as a result of the **first** stage 2 fault should work, because there
+> > > > > are no prior records that would have to be discarded if PMSBR_EL1.DL = 1.
+> > > > > 
+> > > > > I hope I haven't missed anything. Thoughts and suggestions more than welcome.
+> > > > 
+> > > > Thanks Alex for pulling together all of the context here.
+> > > > 
+> > > > Unless there's any other strong opinions on the topic, it seems to me
+> > > > that option #4 (pin on S2 fault) is probably the best approach for
+> > > > the initial implementation. No amount of tricks in KVM can work around
+> > > > the fact that SPE has some serious issues w.r.t. virtualization. With
+> > > > that, we should probably document the behavior of SPE as a known erratum
+> > > > of KVM.
+> > > > 
+> > > > If folks complain about EL1 profile blackout, eagerly pinning when
+> > > > profiling is enabled could layer on top quite easily by treating it as
+> > > > a synthetic S2 fault and triggering the implementation of #4. Having
+> > > 
+> > > I'm not sure I follow, I understand what you mean by "treating it as a
+> > > synthetic S2 fault", would you mind elaborating?
+> > 
+> > Assuming approach #4 is implemented, we will already have an SPE fault
+> > handler that walks stage-1 and pins the buffer. At that point,
+> > implementing approach #3 would be relatively easy. When EL1 sets
+> > PMSCR_EL1.E1SPE, call the SPE fault handler on the GVA of the buffer.
 > 
->> - What selftests/kvm needs is rseq-thread-pointer.h, which accounts for ~5% of
->>    functionalities, provided by selftests/rseq/librseq.so.
-> I've never seen this type of argument used to prevent using a library before, except
-> on extremely memory-constrained devices, which is not our target here.
+> I see, that makes sense, thanks,
+> 
+> > 
+> > > > said that I don't believe it is a hard requirement for enabling some
+> > > > flavor of SPE for guests.
+> > > > 
+> > > > Walking guest S1 in KVM doesn't sound too exciting although it'll need to
+> > > > be done eventually.
+> > > > 
+> > > > Do you feel like this is an OK route forward, or have I missed
+> > > > something?
+> > > 
+> > > I've been giving this some thought, and I prefer approach #3 because with
+> > > #4, pinning the buffer as a result of a stage 2 fault reported by SPE, it
+> > > will be impossible to distinguish between a valid stage 2 fault (a fault
+> > > caused by the guest reprogramming the buffer and enabling profiling) and
+> > > KVM messing something up when pinning the buffer. I believe this to be
+> > > important, as experience has shown me that pinning the buffer at stage 2 is
+> > > not trivial and there isn't a mechanism today in Linux to do that
+> > > (explanation and examples here [1]).
+> > 
+> > How does eagerly pinning avoid stage-2 aborts, though? As you note in
+> > [1], page pinning does not avoid the possibility of the MMU notifiers
+> > being called on a given range. Want to make sure I'm following, what
+> > is your suggestion for approach #3 to handle the profile buffer when
+> > only enabled at EL0?
+> > 
+> > > With approach #4, it would be impossible to figure out if the results of a
+> > > profiling operations inside a guest are representative of the workload or
+> > > not, because those SPE stage 2 faults triggered by a bug in KVM can happen
+> > > multiple times per profiling session, introducing multiple blackout windows
+> > > that can skew the results.
+> > > 
+> > > If you're proposing that the blackout window when the first record is
+> > > written be documented as an erratum for KVM, then why no got a step further
+> > > and document as an erratum that changing the buffer translation tables
+> > > after the buffer has been enabled will lead to an SPE Serror? That will
+> > > allow us to always pin the buffer when profiling is enabled.
+> > 
+> > Ah, there are certainly more errata in virtualizing SPE beyond what I
+> > had said :) Preserving the stage-1 translations while profiling is
+> > active is a good recommendation, although I'm not sure that we've
+> > completely eliminated the risk of stage-2 faults. 
+> > 
+> > It seems impossible to blame the guest for all stage-2 faults that happen
+> > in the middle of a profiling session. In addition to host mm driven changes
+> > to stage-2, live migration is a busted as well. You'd need to build out
+> > stage-2 on the target before resuming the guest and guarantee that the
+> > appropriate pages have been demanded from the source (in case of post-copy).
+> > 
+> > So, are we going to inject an SError for stage-2 faults outside of guest
+> > control as well? An external abort reported as an SPE buffer management
+> > event seems to be gracefully handled by the Linux driver, but that behavior
+> > is disallowed by SPEv1p3.
+> > 
+> > To sum up the point I'm getting at: I agree that there are ways to
+> > reduce the risk of stage-2 faults in the middle of profiling, but I
+> > don't believe the current architecture allows KVM to virtualize the
+> > feature to the letter of the specification.
+> 
+> I believe there's some confusion here: emulating SPE **does not work** if
+> stage 2 faults are triggered in the middle of a profiling session. Being
+> able to have a memory range never unmapped from stage 2 is a
+> **prerequisite** and is **required** for SPE emulation, it's not a nice to
+> have.
+> 
+> A stage 2 fault before the first record is written is acceptable because
+> there are no other records already written which need to be thrown away.
+> Stage 2 faults after at least one record has been written are unacceptable
+> because it means that the contents of the buffer needs to thrown away.
+> 
+> Does that make sense to you?
+> 
+> I believe it is doable to have addresses always mapped at stage 2 with some
+> changes to KVM, but that's not what this thread is about. This thread is
+> about how and when to pin the buffer.
 
-I agree.
+Sorry if I've been forcing a tangent, but I believe there is a lot of
+value in discussing what is to be done for keeping the stage-2 mapping
+alive. I've been whining about it out of the very concern you highlight:
+a stage-2 fault in the middle of the profile is game over. Otherwise,
+optimizations in *when* we pin the buffer seem meaningless as stage-2
+faults appear unavoidable.
 
-To me, the main argument against moving librseq to tools/lib is a 
-variant of the build-system argument, namely that recursive Make 
-sucks[1] and selftests/kvm right now does not use tools/lib.  So, for a 
-single-file library, it may be simply not worth the hassle.
+Nonetheless, back to your proposal. Injecting some context from earlier:
 
-On the other hand, if "somebody else" does the work, I would have no 
-problem with having selftests/kvm depend on tools/lib, not at all.
+> 3. Pinning the guest SPE buffer when profiling becomes enabled*:
 
+So we are only doing this when enabled for EL1, right?
+(PMSCR_EL1.{E0SPE,E1SPE} = {x, 1})
+
+> - There is the corner case described above, when profiling becomes enabled as a
+>   result of an ERET to EL0. This can happen when the buffer is enabled and
+>   PMSCR_EL1.{E0SPE,E1SPE} = {1,0};
+
+Is your proposal for the EL0 case to pin on fault or pin when E0SPE is set
+(outside of the architectures definition of when profiling is enabled)?
+
+> - The previous buffer is unpinned when a new buffer is pinned, to avoid SPE
+>   stage 2 faults when draining the buffer, which is performed with profiling
+>   disabled.
+
+Sounds reasonable.
+
+> As long as we're all agreed that buffer memory needs "pinning" (as in the
+> IPA are never unmapped from stage 2 until KVM decides otherwise as part of
+> SPE emulation), I believe that live migration is tangential to figuring out
+> how and when the buffer should be "pinned". I'm more than happy to start a
+> separate thread about live migration after we figure out how we should go
+> about "pinning" the buffer, I think your insight would be most helpful :)
+
+Fair enough, let's see how this all shakes out and then figure out LM
+thereafter :)
+
+--
 Thanks,
-
-Paolo
-
-[1] Kbuild is a marvel that makes it work, but it works because there 
-are no such cross-subdirectory dependencies and anyway 
-tools/testing/selftests does not use Kbuild.
-
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
