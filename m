@@ -2,54 +2,49 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A304C00140
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 09:36:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 969E5C00140
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Aug 2022 09:42:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC74A4D744;
-	Wed, 10 Aug 2022 05:36:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0921D4D73A;
+	Wed, 10 Aug 2022 05:42:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id o3CE+ldmXHRt; Wed, 10 Aug 2022 05:36:53 -0400 (EDT)
+	with ESMTP id mfWoelmrJVpq; Wed, 10 Aug 2022 05:42:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EE2C4D73D;
-	Wed, 10 Aug 2022 05:36:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8A4C4D74D;
+	Wed, 10 Aug 2022 05:42:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 033C84D73A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 05:36:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CDC64D74B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 05:42:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7QhcJ9JBTa4q for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Aug 2022 05:36:46 -0400 (EDT)
+ with ESMTP id zv1Q0byo-bHE for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Aug 2022 05:42:16 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C08FD4D738
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 05:36:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE6104D73A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Aug 2022 05:42:16 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 046241FB;
- Wed, 10 Aug 2022 02:36:47 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B4451FB;
+ Wed, 10 Aug 2022 02:42:16 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2EBED3F70D;
- Wed, 10 Aug 2022 02:36:45 -0700 (PDT)
-Date: Wed, 10 Aug 2022 10:37:26 +0100
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A247B3F70D;
+ Wed, 10 Aug 2022 02:42:14 -0700 (PDT)
+Date: Wed, 10 Aug 2022 10:42:56 +0100
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: KVM/arm64: SPE: Translate VA to IPA on a stage 2 fault instead
- of pinning VM memory
-Message-ID: <YvN8VvqvutZ4ti8g@monolith.localdoman>
-References: <Yl6+JWaP+mq2Nc0b@monolith.localdoman>
- <20220419141012.GB6143@willie-the-truck>
- <Yt5nFAscgrRGNGoH@monolith.localdoman>
- <20220801170055.GB26471@willie-the-truck>
- <YujzE33aPSD22wvY@monolith.localdoman>
- <Yul8UBoDcy6GQddq@google.com>
- <YvJowFt+U/qCqNVV@monolith.localdoman>
- <YvKq1IK7T/nGSKpt@google.com>
+To: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Subject: Re: [kvm-unit-tests RFC PATCH 09/19] arm/arm64: Zero secondary CPUs'
+ stack
+Message-ID: <YvN9oLwmCESQoFun@monolith.localdoman>
+References: <20220809091558.14379-1-alexandru.elisei@arm.com>
+ <20220809091558.14379-10-alexandru.elisei@arm.com>
+ <38ec5559-7c2a-9820-724d-6a192ea83ecb@arm.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <YvKq1IK7T/nGSKpt@google.com>
-Cc: maz@kernel.org, Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <38ec5559-7c2a-9820-724d-6a192ea83ecb@arm.com>
+Cc: pbonzini@redhat.com, thuth@redhat.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, andrew.jones@linux.dev
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,173 +61,108 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+Hi Nikos,
 
-On Tue, Aug 09, 2022 at 01:43:32PM -0500, Oliver Upton wrote:
-> Hi Alex,
-> 
-> On Tue, Aug 09, 2022 at 03:01:36PM +0100, Alexandru Elisei wrote:
-> 
-> [...]
-> 
-> > > > To summarize the approaches we've discussed so far:
-> > > > 
-> > > > 1. Pinning the entire guest memory
-> > > > - Heavy handed and not ideal.
-> > > > - Tried this approach in v5 of the SPE series [1], patches #2-#12.
-> > > > 
-> > > > 2. Mapping the guest SPE buffer on demand, page by page, as a result of stage 2
-> > > > faults reported by SPE.
-> > > > - Not feasible, because the entire contents of the buffer must be discarded is
-> > > >   PMBSR_EL1.DL is set to 1 when taking the fault.
-> > > > - Requires KVM to walk the guest's stage 1 tables, because SPE reports the VA,
-> > > >   not the IPA.
-> > > > 
-> > > > 3. Pinning the guest SPE buffer when profiling becomes enabled*:
-> > > > - There is the corner case described above, when profiling becomes enabled as a
-> > > >   result of an ERET to EL0. This can happen when the buffer is enabled and
-> > > >   PMSCR_EL1.{E0SPE,E1SPE} = {1,0};
-> > > > - The previous buffer is unpinned when a new buffer is pinned, to avoid SPE
-> > > >   stage 2 faults when draining the buffer, which is performed with profiling
-> > > >   disabled.
-> > > > - Also requires KVM to walk the guest's stage 1 tables.
-> > > > 
-> > > > 4. Pin the entire guest SPE buffer after the first stage 2 fault reported by
-> > > > SPE.
-> > > > - Gets rid of the corner case at 3.
-> > > > - Same approach to buffer unpinning as 3.
-> > > > - Introduces a blackout window before the first record is written.
-> > > > - Also requires KVM to walk the guest's stage 1 tables.
-> > > > 
-> > > > As for the corner case at 3, I proposed either:
-> > > > 
-> > > > a) Mandate that guest operating systems must never modify the buffer
-> > > > translation entries if the buffer is enabled and
-> > > > PMSCR_EL1.{E0SPE,E1SPE} = {1,0}.
-> > > > 
-> > > > b) Pin the entire buffer as a result of the first stage 2 fault reported by SPE,
-> > > > but **only** for this corner case. For all other cases, the buffer is pinned
-> > > > when profiling becomes enabled, to eliminate the blackout window. Guest
-> > > > operating systems can be modified to not change the translation entries for the
-> > > > buffer if this blackout window is not desirable.
-> > > > 
-> > > > Pinning as a result of the **first** stage 2 fault should work, because there
-> > > > are no prior records that would have to be discarded if PMSBR_EL1.DL = 1.
-> > > > 
-> > > > I hope I haven't missed anything. Thoughts and suggestions more than welcome.
-> > > 
-> > > Thanks Alex for pulling together all of the context here.
-> > > 
-> > > Unless there's any other strong opinions on the topic, it seems to me
-> > > that option #4 (pin on S2 fault) is probably the best approach for
-> > > the initial implementation. No amount of tricks in KVM can work around
-> > > the fact that SPE has some serious issues w.r.t. virtualization. With
-> > > that, we should probably document the behavior of SPE as a known erratum
-> > > of KVM.
-> > > 
-> > > If folks complain about EL1 profile blackout, eagerly pinning when
-> > > profiling is enabled could layer on top quite easily by treating it as
-> > > a synthetic S2 fault and triggering the implementation of #4. Having
+On Tue, Aug 09, 2022 at 01:56:13PM +0100, Nikos Nikoleris wrote:
+> On 09/08/2022 10:15, Alexandru Elisei wrote:
+> > For the boot CPU, the entire stack is zeroed in the entry code. For the
+> > secondaries, only struct thread_info, which lives at the bottom of the
+> > stack, is zeroed in thread_info_init().
 > > 
-> > I'm not sure I follow, I understand what you mean by "treating it as a
-> > synthetic S2 fault", would you mind elaborating?
 > 
-> Assuming approach #4 is implemented, we will already have an SPE fault
-> handler that walks stage-1 and pins the buffer. At that point,
-> implementing approach #3 would be relatively easy. When EL1 sets
-> PMSCR_EL1.E1SPE, call the SPE fault handler on the GVA of the buffer.
-
-I see, that makes sense, thanks,
-
+> That's a good point.
 > 
-> > > said that I don't believe it is a hard requirement for enabling some
-> > > flavor of SPE for guests.
-> > > 
-> > > Walking guest S1 in KVM doesn't sound too exciting although it'll need to
-> > > be done eventually.
-> > > 
-> > > Do you feel like this is an OK route forward, or have I missed
-> > > something?
+> > Be consistent and zero the entire stack for the secondaries. This should
+> > also improve reproducibility of the testsuite, as all the stacks now start
+> > with the same contents, which is zero. And now that all the stacks are
+> > zeroed in the entry code, there is no need to explicitely zero struct
+> > thread_info in thread_info_init().
 > > 
-> > I've been giving this some thought, and I prefer approach #3 because with
-> > #4, pinning the buffer as a result of a stage 2 fault reported by SPE, it
-> > will be impossible to distinguish between a valid stage 2 fault (a fault
-> > caused by the guest reprogramming the buffer and enabling profiling) and
-> > KVM messing something up when pinning the buffer. I believe this to be
-> > important, as experience has shown me that pinning the buffer at stage 2 is
-> > not trivial and there isn't a mechanism today in Linux to do that
-> > (explanation and examples here [1]).
 > 
-> How does eagerly pinning avoid stage-2 aborts, though? As you note in
-> [1], page pinning does not avoid the possibility of the MMU notifiers
-> being called on a given range. Want to make sure I'm following, what
-> is your suggestion for approach #3 to handle the profile buffer when
-> only enabled at EL0?
-> 
-> > With approach #4, it would be impossible to figure out if the results of a
-> > profiling operations inside a guest are representative of the workload or
-> > not, because those SPE stage 2 faults triggered by a bug in KVM can happen
-> > multiple times per profiling session, introducing multiple blackout windows
-> > that can skew the results.
-> > 
-> > If you're proposing that the blackout window when the first record is
-> > written be documented as an erratum for KVM, then why no got a step further
-> > and document as an erratum that changing the buffer translation tables
-> > after the buffer has been enabled will lead to an SPE Serror? That will
-> > allow us to always pin the buffer when profiling is enabled.
-> 
-> Ah, there are certainly more errata in virtualizing SPE beyond what I
-> had said :) Preserving the stage-1 translations while profiling is
-> active is a good recommendation, although I'm not sure that we've
-> completely eliminated the risk of stage-2 faults. 
-> 
-> It seems impossible to blame the guest for all stage-2 faults that happen
-> in the middle of a profiling session. In addition to host mm driven changes
-> to stage-2, live migration is a busted as well. You'd need to build out
-> stage-2 on the target before resuming the guest and guarantee that the
-> appropriate pages have been demanded from the source (in case of post-copy).
-> 
-> So, are we going to inject an SError for stage-2 faults outside of guest
-> control as well? An external abort reported as an SPE buffer management
-> event seems to be gracefully handled by the Linux driver, but that behavior
-> is disallowed by SPEv1p3.
-> 
-> To sum up the point I'm getting at: I agree that there are ways to
-> reduce the risk of stage-2 faults in the middle of profiling, but I
-> don't believe the current architecture allows KVM to virtualize the
-> feature to the letter of the specification.
+> Wouldn't it make more sense to call memset(sp, 0, THREAD_SIZE); from
+> thread_stack_alloc() instead and avoid doing this in assembly? Do we expect
 
-I believe there's some confusion here: emulating SPE **does not work** if
-stage 2 faults are triggered in the middle of a profiling session. Being
-able to have a memory range never unmapped from stage 2 is a
-**prerequisite** and is **required** for SPE emulation, it's not a nice to
-have.
+I prefer to do the zero'ing in assembly because:
 
-A stage 2 fault before the first record is written is acceptable because
-there are no other records already written which need to be thrown away.
-Stage 2 faults after at least one record has been written are unacceptable
-because it means that the contents of the buffer needs to thrown away.
+1. For consistency, which is one of the main reasons this patch exists.
 
-Does that make sense to you?
+2. I don't want to deal with all the cache maintenance that is required for
+inter-CPU communication. Let's keep it simple.
 
-I believe it is doable to have addresses always mapped at stage 2 with some
-changes to KVM, but that's not what this thread is about. This thread is
-about how and when to pin the buffer.
+> anyone to jump to secondary_entry without calling thread_stack_alloc()
+> first?
 
-As long as we're all agreed that buffer memory needs "pinning" (as in the
-IPA are never unmapped from stage 2 until KVM decides otherwise as part of
-SPE emulation), I believe that live migration is tangential to figuring out
-how and when the buffer should be "pinned". I'm more than happy to start a
-separate thread about live migration after we figure out how we should go
-about "pinning" the buffer, I think your insight would be most helpful :)
+It's impossible to jump to secondary_data.entry without allocating the
+stack first, because it's impossible to run C code without a valid stack.
 
 Thanks,
 Alex
 
 > 
-> --
 > Thanks,
-> Oliver
+> 
+> Nikos
+> 
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >   arm/cstart.S          | 6 ++++++
+> >   arm/cstart64.S        | 3 +++
+> >   lib/arm/processor.c   | 1 -
+> >   lib/arm64/processor.c | 1 -
+> >   4 files changed, 9 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arm/cstart.S b/arm/cstart.S
+> > index 39260e0fa470..39e70f40986a 100644
+> > --- a/arm/cstart.S
+> > +++ b/arm/cstart.S
+> > @@ -151,7 +151,13 @@ secondary_entry:
+> >   	 */
+> >   	ldr	r1, =secondary_data
+> >   	ldr	r0, [r1]
+> > +	mov	r2, r0
+> > +	lsr	r2, #THREAD_SHIFT
+> > +	lsl	r2, #THREAD_SHIFT
+> > +	add	r3, r2, #THREAD_SIZE
+> > +	zero_range r2, r3, r4, r5
+> >   	mov	sp, r0
+> > +
+> >   	bl	exceptions_init
+> >   	bl	enable_vfp
+> > diff --git a/arm/cstart64.S b/arm/cstart64.S
+> > index d62360cf3859..54773676d1d5 100644
+> > --- a/arm/cstart64.S
+> > +++ b/arm/cstart64.S
+> > @@ -156,6 +156,9 @@ secondary_entry:
+> >   	/* set the stack */
+> >   	adrp	x0, secondary_data
+> >   	ldr	x0, [x0, :lo12:secondary_data]
+> > +	and	x1, x0, #THREAD_MASK
+> > +	add	x2, x1, #THREAD_SIZE
+> > +	zero_range x1, x2
+> >   	mov	sp, x0
+> >   	/* finish init in C code */
+> > diff --git a/lib/arm/processor.c b/lib/arm/processor.c
+> > index 9d5759686b73..ceff1c0a1bd2 100644
+> > --- a/lib/arm/processor.c
+> > +++ b/lib/arm/processor.c
+> > @@ -117,7 +117,6 @@ void do_handle_exception(enum vector v, struct pt_regs *regs)
+> >   void thread_info_init(struct thread_info *ti, unsigned int flags)
+> >   {
+> > -	memset(ti, 0, sizeof(struct thread_info));
+> >   	ti->cpu = mpidr_to_cpu(get_mpidr());
+> >   	ti->flags = flags;
+> >   }
+> > diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
+> > index 831207c16587..268b2858f0be 100644
+> > --- a/lib/arm64/processor.c
+> > +++ b/lib/arm64/processor.c
+> > @@ -232,7 +232,6 @@ void install_vector_handler(enum vector v, vector_fn fn)
+> >   static void __thread_info_init(struct thread_info *ti, unsigned int flags)
+> >   {
+> > -	memset(ti, 0, sizeof(struct thread_info));
+> >   	ti->cpu = mpidr_to_cpu(get_mpidr());
+> >   	ti->flags = flags;
+> >   }
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
