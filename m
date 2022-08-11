@@ -2,58 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75601C19F2D
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Aug 2022 07:04:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FB7C19F2D
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Aug 2022 07:17:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA35F4E15B;
-	Thu, 11 Aug 2022 03:04:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F5154E1F8;
+	Thu, 11 Aug 2022 03:17:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@intel.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id f7yBfXH7ehCo; Thu, 11 Aug 2022 03:04:10 -0400 (EDT)
+	with ESMTP id kbRDRqpKOGa5; Thu, 11 Aug 2022 03:17:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A8BD4E160;
-	Thu, 11 Aug 2022 03:04:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB0ED4E1F4;
+	Thu, 11 Aug 2022 03:17:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CAED24E134
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Aug 2022 03:04:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 57C6F4E1E4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Aug 2022 03:17:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3BUCeOEiwqS5 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Aug 2022 03:04:08 -0400 (EDT)
-Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 58A094E12F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Aug 2022 03:04:08 -0400 (EDT)
-Date: Thu, 11 Aug 2022 09:04:05 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1660201446;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=TTaS2Wl4s+FHjKmL6fx39BEFrM00eO4qJqKwdGgGK7I=;
- b=w8b/zs5SmUNurS05xL67OGF8+skjQ1DyAZlcyLcQYzhCIi2446ekacCLSZ9eixKZOoQ44B
- okD9LuUqOgENU5sxRyi1cLrqtSpxkySgm4pG2PQTb2iVnCLheqRGT/o0znjI+/lnR0uAsQ
- hCmNaYbIx7w+6uKmVtL0w30DX9jyBGw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [kvm-unit-tests PATCH v3 2/3] arm: pmu: Reset the pmu registers
- before starting some tests
-Message-ID: <20220811070405.ivo5w2mliwi4cpqk@kamzik>
-References: <20220805004139.990531-1-ricarkol@google.com>
- <20220805004139.990531-3-ricarkol@google.com>
- <20220810190216.hqt3wyzufyvhhpkf@kamzik>
- <YvRARgEDkSI1ken5@google.com>
+ with ESMTP id W88PUlJgJAR1 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Aug 2022 03:17:00 -0400 (EDT)
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC71E4E1EB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Aug 2022 03:16:59 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+ t=1660202219; x=1691738219;
+ h=date:from:to:cc:subject:message-id:references:
+ mime-version:in-reply-to;
+ bh=3KYvpST+bKbnrxkz5t5MctHL3D3UTy9lSqp411H2Tmk=;
+ b=GMkmv8Nq49Ea7nl5rGHD1iZY+f6CQbDW0zrVYng/dAZMD/k6itmrpB8q
+ Aj5Mc2u+QFU56L2X4mOdTSncyYO/dtS/6lXHHr4F52+PnOtAm1mi9aMr+
+ Rs+alSfE9tamfT01UFKDjLXU78k5y1M6BXVzvLm45rbD1NipyzhZrjiGf
+ yGBpkcW1JMVAv880adFtZskS++Y9jS9FrO6qMtwuDvw9Yt8PZ/oZHczqU
+ axanUO5Jkj+xSIHZ/0eDIS7RuEf1HAwEA2FjU+RV7C/zFAucPfFGc+i0x
+ JDSH79ju/eAXsmOMrXuLm14HnUR8DxV5OD1KPegoMRcxb4vcq77ffyGd8 w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10435"; a="271056332"
+X-IronPort-AV: E=Sophos;i="5.93,228,1654585200"; d="scan'208";a="271056332"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 11 Aug 2022 00:16:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,228,1654585200"; d="scan'208";a="556029924"
+Received: from lkp-server02.sh.intel.com (HELO d10ab0927833) ([10.239.97.151])
+ by orsmga003.jf.intel.com with ESMTP; 11 Aug 2022 00:16:55 -0700
+Received: from kbuild by d10ab0927833 with local (Exim 4.96)
+ (envelope-from <lkp@intel.com>) id 1oM2R4-00005F-1n;
+ Thu, 11 Aug 2022 07:16:54 +0000
+Date: Thu, 11 Aug 2022 15:16:08 +0800
+From: kernel test robot <lkp@intel.com>
+To: Peter Collingbourne <pcc@google.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v3 3/7] mm: Add PG_arch_3 page flag
+Message-ID: <202208111500.62e0Bl2l-lkp@intel.com>
+References: <20220810193033.1090251-4-pcc@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <YvRARgEDkSI1ken5@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20220810193033.1090251-4-pcc@google.com>
+Cc: kbuild-all@lists.01.org, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+ Steven Price <steven.price@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Vincenzo Frascino <vincenzo.frascino@arm.com>,
+ Peter Collingbourne <pcc@google.com>, Evgenii Stepanov <eugenis@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,86 +82,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Aug 10, 2022 at 04:33:26PM -0700, Ricardo Koller wrote:
-> On Wed, Aug 10, 2022 at 09:02:16PM +0200, Andrew Jones wrote:
-> > On Thu, Aug 04, 2022 at 05:41:38PM -0700, Ricardo Koller wrote:
-> > > Some registers like the PMOVS reset to an architecturally UNKNOWN value.
-> > > Most tests expect them to be reset (mostly zeroed) using pmu_reset().
-> > > Add a pmu_reset() on all the tests that need one.
-> > > 
-> > > As a bonus, fix a couple of comments related to the register state
-> > > before a sub-test.
-> > > 
-> > > Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > > ---
-> > >  arm/pmu.c | 6 ++++--
-> > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/arm/pmu.c b/arm/pmu.c
-> > > index 4c601b05..12e7d84e 100644
-> > > --- a/arm/pmu.c
-> > > +++ b/arm/pmu.c
-> > > @@ -826,7 +826,7 @@ static void test_overflow_interrupt(void)
-> > >  	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> > >  	isb();
-> > >  
-> > > -	/* interrupts are disabled */
-> > > +	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
-> > >  
-> > >  	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-> > >  	report(expect_interrupts(0), "no overflow interrupt after preset");
-> > > @@ -842,7 +842,7 @@ static void test_overflow_interrupt(void)
-> > >  	isb();
-> > >  	report(expect_interrupts(0), "no overflow interrupt after counting");
-> > >  
-> > > -	/* enable interrupts */
-> > > +	/* enable interrupts (PMINTENSET_EL1 <= ALL_SET) */
-> > >  
-> > >  	pmu_reset_stats();
-> > >  
-> > > @@ -890,6 +890,7 @@ static bool check_cycles_increase(void)
-> > >  	bool success = true;
-> > >  
-> > >  	/* init before event access, this test only cares about cycle count */
-> > > +	pmu_reset();
-> > 
-> > This and the other pmu_reset() call below break compilation on 32-bit arm,
-> > because there's no pmu_reset() defined for it.
-> I completely missed the 32-bit arm case. Thanks!
-> 
-> > It'd probably be best if
-> > we actually implemented some sort of reset for arm, considering it's being
-> > called in common tests.
-> 
-> Mind if I start by creating a pmu_reset() for 32-bit arm, which can
-> later be used by a general arm_reset()?
+Hi Peter,
 
-No need to worry about a general one. We just need a pmu_reset implemented
-for 32-bit arm up in its #ifdef __arm__ section.
+Thank you for the patch! Perhaps something to improve:
 
-Thanks,
-drew
+[auto build test WARNING on arm64/for-next/core]
+[also build test WARNING on linus/master next-20220811]
+[cannot apply to kvmarm/next arm/for-next soc/for-next xilinx-xlnx/master v5.19]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> 
-> > 
-> > Thanks,
-> > drew
-> > 
-> > >  	set_pmcntenset(1 << PMU_CYCLE_IDX);
-> > >  	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-> > >  
-> > > @@ -944,6 +945,7 @@ static bool check_cpi(int cpi)
-> > >  	uint32_t pmcr = get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E;
-> > >  
-> > >  	/* init before event access, this test only cares about cycle count */
-> > > +	pmu_reset();
-> > >  	set_pmcntenset(1 << PMU_CYCLE_IDX);
-> > >  	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-> > >  
-> > > -- 
-> > > 2.37.1.559.g78731f0fdb-goog
-> > > 
+url:    https://github.com/intel-lab-lkp/linux/commits/Peter-Collingbourne/KVM-arm64-permit-MAP_SHARED-mappings-with-MTE-enabled/20220811-033310
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/core
+config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20220811/202208111500.62e0Bl2l-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/1a400517d8428df0ec9f86f8d303b2227ee9702f
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Peter-Collingbourne/KVM-arm64-permit-MAP_SHARED-mappings-with-MTE-enabled/20220811-033310
+        git checkout 1a400517d8428df0ec9f86f8d303b2227ee9702f
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+>> mm/memory.c:92:2: warning: #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid. [-Wcpp]
+      92 | #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid.
+         |  ^~~~~~~
+
+
+vim +92 mm/memory.c
+
+42b7772812d15b Jan Beulich    2008-07-23  90  
+af27d9403f5b80 Arnd Bergmann  2018-02-16  91  #if defined(LAST_CPUPID_NOT_IN_PAGE_FLAGS) && !defined(CONFIG_COMPILE_TEST)
+90572890d20252 Peter Zijlstra 2013-10-07 @92  #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid.
+75980e97daccfc Peter Zijlstra 2013-02-22  93  #endif
+75980e97daccfc Peter Zijlstra 2013-02-22  94  
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
