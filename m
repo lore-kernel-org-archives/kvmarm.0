@@ -2,57 +2,57 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64D4DC00140
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Aug 2022 15:02:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 217DEC25B0E
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Aug 2022 15:11:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE74B4EDC3;
-	Fri, 12 Aug 2022 11:02:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F3A24EF9A;
+	Fri, 12 Aug 2022 11:11:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qoGkbjB+ACTY; Fri, 12 Aug 2022 11:02:47 -0400 (EDT)
+	with ESMTP id hp3a1e17zUtV; Fri, 12 Aug 2022 11:11:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CF8F4EC43;
-	Fri, 12 Aug 2022 11:02:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6378B4EF9C;
+	Fri, 12 Aug 2022 11:11:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 466AF4EBE9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Aug 2022 11:02:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CC474EF95
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Aug 2022 11:11:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 32-9+1tuZQ5N for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Aug 2022 11:02:44 -0400 (EDT)
+ with ESMTP id 565eRMO+2mpD for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Aug 2022 11:11:00 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C640F4EBB1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Aug 2022 11:02:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A3A84EF92
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Aug 2022 11:11:00 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 60EB6B82447;
- Fri, 12 Aug 2022 15:02:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 181E8C433C1;
- Fri, 12 Aug 2022 15:02:42 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id BB5F5B8233E;
+ Fri, 12 Aug 2022 15:10:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EB24C433C1;
+ Fri, 12 Aug 2022 15:10:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1660316562;
- bh=0WIPonzh8UP/C2DNgLQtcEkMTLeNrhVRs4GOGjQm2xI=;
+ s=k20201202; t=1660317057;
+ bh=PsoT4xVGMOMcLIqFv2j2CLNKwBnJLaQIjJLfrLW8DBI=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=ToW1FfDkfFCNGCU4s7rW5Ojr1KjM+w4+tCEyf4NBpF0WYsRe8N0Qt0sqTRoBXNfU4
- SfMBc7YwQcuUA5yuTv1OxjhgCtihnaqU1G5JwNUmbaY75Yt2FyrKMEveNjdYrvmuKw
- LfAA7rO1BfpaPGImC2mOu1MaUTfPYsQiosCNEtZgup2uAroza54siTKVJN03bUBAPY
- JOa9p/C7XAURwIt/XLiIPfty0OQIxEQE5OXX7zpbFv5lc5wwZscntxdphQZMGH+FVI
- 8FhH5APNCANCQtmS0lAiO1/YYz5c5YJHOupvIwKCaXHpBScV2vBA9ZpznGyzPG6CFw
- DB04JG9dt9Y2Q==
+ b=Jymxm8QGs9bQuLVwrym+yXvnehCDOidxbqc0uOYubSF3f9XeEVWwwReTpbgmQ1XgC
+ hx85Y1CZ6WEeOF5gu/+DR2PAKqeSLlcJiZu/WFaZaj0GEOp5YpDArDu8lT6HDFuIef
+ eJlx1frgFSdWYFdhMkjq+APGm2R3vwqDNYojvu5DLVVHUjxoMEKOQIJ8YAsKHXpHrT
+ C/elUM8Evrha/EynJ2QG7dgsMoFXgwqhmeajgkGghKqsFLnoEY3E0P+vpwaWSqD45P
+ OGnQ5DuCI1cSMr9NNlxniJCr1wdwzTFOuzh3/IxdBMy6f/Aer6kOS/LvGGAnA/mYdf
+ UZ1T+J34KcdUg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oMWBM-002ZnC-1E;
- Fri, 12 Aug 2022 16:02:40 +0100
-Date: Fri, 12 Aug 2022 16:02:37 +0100
-Message-ID: <87h72hv71u.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oMWJL-002Zt7-67;
+ Fri, 12 Aug 2022 16:10:55 +0100
+Date: Fri, 12 Aug 2022 16:10:54 +0100
+Message-ID: <87fsi1v6o1.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Peter Maydell <peter.maydell@linaro.org>, Vitaly Chikunov <vt@altlinux.org>
+To: Peter Maydell <peter.maydell@linaro.org>
 Subject: Re: qemu-system-aarch64: Failed to retrieve host CPU features
 In-Reply-To: <CAFEAcA9BuSe4SwpoWTALURaxoj-8U2y83k=und7oKrZBggLarQ@mail.gmail.com>
 References: <20220812021427.cwenhciuftgtaj64@altlinux.org>
@@ -69,8 +69,9 @@ X-SA-Exim-Rcpt-To: peter.maydell@linaro.org, vt@altlinux.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: qemu-arm@nongnu.org, "Dmitry V. Levin" <ldv@altlinux.org>,
- kvmarm <kvmarm@lists.cs.columbia.edu>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Vitaly Chikunov <vt@altlinux.org>, qemu-arm@nongnu.org,
+ "Dmitry V. Levin" <ldv@altlinux.org>, kvmarm <kvmarm@lists.cs.columbia.edu>,
+ QEMU Developers <qemu-devel@nongnu.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,8 +87,6 @@ Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-
-Hi Peter,
 
 On Fri, 12 Aug 2022 10:25:55 +0100,
 Peter Maydell <peter.maydell@linaro.org> wrote:
@@ -137,20 +136,18 @@ Peter Maydell <peter.maydell@linaro.org> wrote:
 > 
 > KVM folks: should we expect that KVM_CREATE_VM might fail EINTR
 > and need retrying?
+> 
+> (I suspect the answer is "yes", given we do this in the generic
+> code in kvm-all.c.)
 
-In general, yes. But for this particular one, this is pretty odd.
+Interestingly, this has cropped up in the (distant) past:
 
-The only path I can so far see that would match this behaviour is if
-mm_take_all_locks() (called from __mmu_notifier_register()) was
-getting interrupted by a signal (I'm looking at a 5.19-ish kernel,
-which may slightly differ from the 5.15 mentioned above).
+https://lists.gnu.org/archive/html/qemu-devel/2014-01/msg01031.html
 
-But as Vitaly points out, it doesn't seem to be a signal delivered
-here.
+and seems to point at the path I was mentioning earlier (the code
+hasn't changed too much since, apparently).
 
-Vitaly: could you please share your exact test case (full qemu command
-line), and instrument your kernel to see if mm_take_all_locks() is the
-one failing?
+I'd still like to understand the underlying reason though.
 
 Thanks,
 
