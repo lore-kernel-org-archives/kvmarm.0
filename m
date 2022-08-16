@@ -2,73 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97946C25B08
-	for <kvmarm@archiver.kernel.org>; Mon, 15 Aug 2022 22:58:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 667F8C25B0E
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Aug 2022 12:32:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 535F84D870;
-	Mon, 15 Aug 2022 18:58:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CBFE54D595;
+	Tue, 16 Aug 2022 08:32:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NdzA1+6YFucj; Mon, 15 Aug 2022 18:58:30 -0400 (EDT)
+	with ESMTP id iMqzHQDZF-W7; Tue, 16 Aug 2022 08:32:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AD674D89F;
-	Mon, 15 Aug 2022 18:58:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 841F74D589;
+	Tue, 16 Aug 2022 08:32:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D9A94D89F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Aug 2022 18:58:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3171B4D586
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2022 08:32:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id h7qnzs2FRwLJ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 15 Aug 2022 18:58:27 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E90884D884
- for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Aug 2022 18:58:24 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 8448B612D7;
- Mon, 15 Aug 2022 22:58:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C17B5C433D7;
- Mon, 15 Aug 2022 22:58:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1660604303;
- bh=uDCegzGXOGYpczHO7Ec5Pb6XL4/FQxD18k2p2ayhRbs=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=GSG6uMyUDTLj5lLs8vbbZoGApeTI559Id1TTj2rHGHokir6X6RYAeyA3DHe27lQkB
- nE7uhT7p/VNxRZ03cPevJrGO9uF1yY9h5fpxAVruPj9LyzCcuvqrbZfcLJWBNXRzJo
- ZiPPTueDN0iDshZ0I+TzWbEsvBOnTMvtJWOHwkW2ztNhFInM0pdUM34f89wgpuzo3B
- xB/ezAT5OAOUZkS4K81QZD+/xVoJgDJjpgWllvEEPrdFGv/zFeTRHbcX9/4nULGBhq
- zYbVMMywkyGTAP8kjNikeRJorBxyHjgm9IJ1MYmtDxTazA81Mg7mypv0IpOK+QPuew
- KxQ0ZNJlDy8rA==
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: [PATCH v3 7/7] arm64/sve: Leave SVE enabled on syscall if we don't
- context switch
-Date: Mon, 15 Aug 2022 23:55:29 +0100
-Message-Id: <20220815225529.930315-8-broonie@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220815225529.930315-1-broonie@kernel.org>
-References: <20220815225529.930315-1-broonie@kernel.org>
+ with ESMTP id eJggl4X4wFge for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Aug 2022 08:32:00 -0400 (EDT)
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com
+ [209.85.128.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 244864D585
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2022 08:32:00 -0400 (EDT)
+Received: by mail-yw1-f177.google.com with SMTP id
+ 00721157ae682-33365a01f29so48799027b3.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2022 05:32:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:from:to:cc;
+ bh=v+DRertAfOhDVcUnuGx9lEwhV6sbeQ2CQXMPmOp/Nvs=;
+ b=Uas8zK7axSC01+TrTA/wNZ1xP2S+vma9C5mERK33X9vd/7Qf/yP3c8zuk8m0kAiPX5
+ bke4r+RjlXW89b9dkta4W3qO67/+havYt9AsG9MiIZi+72DYSae059SVy1V1rxmBZznq
+ TOWDpQyJVnUR+NNORwT+gx4EHHUCg198Xsg4H0m5tNXAMLxGu51X6d5ET49oz6xGBuVN
+ BdnbJ9q2WVCg79oU97HxKgFiZR+fNSd6B8MrGilYQSN+/p+gwjo4nrO9DZ4JX6ipr9E4
+ bH9SzVzzwOTj4VLjDb7WsEkzMmI1vP6GsYXkVmOgNiPqbrncLQyrRuvJi3+cduWpUHnD
+ RE1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:x-gm-message-state:from:to:cc;
+ bh=v+DRertAfOhDVcUnuGx9lEwhV6sbeQ2CQXMPmOp/Nvs=;
+ b=1nepVTCubPJsMB5UMXEZ/ai+OCNtqWcCq9EnM2biW2HCynyB6FKMTeLapiAKenwRxD
+ qAGhjjY1/HlcfAZkJ7LONO+mMgsNz1hBZTTAtRRFcBIGp9Ec2ep8htHV2QP4WY4A8xlW
+ Gv81zHpYMMF4LvtMahR7T//fZOkUqlrmDiZv0KUoAcNfcHaIieae3BNMhGUGG/zfrrkH
+ sQs7nJEVM5zfExTs8zJqSAw/Pfzm8e4o22D9msIwy2ZS0l9SKvLQvVeAKvSrUBfz0yY4
+ QLgnsVDAsMBVgfp1Fl2GKKLkWOzcrHOoeIfy4l7iuFkEYyWBBStu4+kd1ABjt+Nm3pYr
+ 025w==
+X-Gm-Message-State: ACgBeo183fSvjfL52TqFWfcf3K7VaaVhdRx/PGgiPqgmdIbYPxGnotau
+ ZMigvw2TG/8tewxmaRILG95vxMQgeGWuUfQB9NqdzQ==
+X-Google-Smtp-Source: AA6agR7dLeAK+sEftuM6C/QD8QaZZa6Q6wVpEdYhAmp7wiXSmHCU3DXOfxjo+q4REmQwIjLVEXSvtxqafi7EWETpIK8=
+X-Received: by 2002:a25:3d0:0:b0:67c:2231:65e with SMTP id
+ 199-20020a2503d0000000b0067c2231065emr14218893ybd.67.1660653119619; 
+ Tue, 16 Aug 2022 05:31:59 -0700 (PDT)
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3722; i=broonie@kernel.org;
- h=from:subject; bh=uDCegzGXOGYpczHO7Ec5Pb6XL4/FQxD18k2p2ayhRbs=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBi+s7gceyWaznPJ0EQowjvWfeY/YMiA80SMqUa9tc5
- 6jf6yEyJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYvrO4AAKCRAk1otyXVSH0BKIB/
- 9pdSMbY3xq3qMLhTMfmgLwQEMDylHXywqZGJUAgy2BtYVx2nX6/joeCugpuM11nRGf0g9z+dGpmp9U
- Ae+vtz99fQ6gaKPSNIYfLnMOl0KIVC1+jxcrVq5HABErQpQU2Uhv7eUvZAlW7u7dxxqGHmeHXacyFg
- KjOuu90ezDwfPgspKYLN4FnFXQcxhdo+O39C95OXClAcmDZe2K7odtOKcqxfBCiK0xaLIoo94c7uCU
- irXKydOaSbep+NVOnwlTrvEBC5aY1PQstTJ6zMXEYzRKF2lT/49UT8UZXL1vHSF1aHjwIYktciawia
- AIq8UQvEnRXDNGgF5RJyY+rbRzm8xy
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
-Cc: Marc Zyngier <maz@kernel.org>, Zhang Lei <zhang.lei@jp.fujitsu.com>,
- Mark Brown <broonie@kernel.org>, Andre Przywara <andre.przywara@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <20220812021427.cwenhciuftgtaj64@altlinux.org>
+ <20220812084529.ur5qcyws5qvoyvuc@altlinux.org>
+ <CAFEAcA9BuSe4SwpoWTALURaxoj-8U2y83k=und7oKrZBggLarQ@mail.gmail.com>
+ <87h72hv71u.wl-maz@kernel.org> <20220813111137.5plgwrfnosolj2bp@altlinux.org>
+ <8735e0s1zw.wl-maz@kernel.org>
+In-Reply-To: <8735e0s1zw.wl-maz@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Aug 2022 13:31:18 +0100
+Message-ID: <CAFEAcA__6WaoFwTHH1FhAU1xpvGpA2YvZTo1BTjbKw2GqS5q+w@mail.gmail.com>
+Subject: Re: qemu-system-aarch64: Failed to retrieve host CPU features
+To: Marc Zyngier <maz@kernel.org>
+Cc: Vitaly Chikunov <vt@altlinux.org>, qemu-arm@nongnu.org,
+ "Dmitry V. Levin" <ldv@altlinux.org>, kvmarm <kvmarm@lists.cs.columbia.edu>,
+ QEMU Developers <qemu-devel@nongnu.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,92 +89,17 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The syscall ABI says that the SVE register state not shared with FPSIMD
-may not be preserved on syscall, and this is the only mechanism we have
-in the ABI to stop tracking the extra SVE state for a process. Currently
-we do this unconditionally by means of disabling SVE for the process on
-syscall, causing userspace to take a trap to EL1 if it uses SVE again.
-These extra traps result in a noticeable overhead for using SVE instead
-of FPSIMD in some workloads, especially for simple syscalls where we can
-return directly to userspace and would not otherwise need to update the
-floating point registers. Tests with fp-pidbench show an approximately
-70% overhead on a range of implementations when SVE is in use - while
-this is an extreme and entirely artificial benchmark it is clear that
-there is some useful room for improvement here.
+On Sat, 13 Aug 2022 at 14:32, Marc Zyngier <maz@kernel.org> wrote:
+> But we probably need to handle EINTR when creating the mini VM.
 
-Now that we have the ability to track the decision about what to save
-seprately to TIF_SVE we can improve things by leaving TIF_SVE enabled on
-syscall but only saving the FPSIMD registers if we are in a syscall.
-This means that if we need to restore the register state from memory
-(eg, after a context switch or kernel mode NEON) we will drop TIF_SVE
-and reenable traps for userspace but if we can just return to userspace
-then traps will remain disabled.
+It's easy enough to add a retry-on-EINTR loop to the KVM_CREATE_VM
+ioctl in the target/arm/ code. But do we need to do that more
+widely ? At the moment QEMU seems to assume that KVM ioctls
+will never fail EINTR except for the one special-cased
+KVM_CREATE_VM, plus (more obviously) KVM_RUN...
 
-Since our current implementation has the effect of zeroing all the SVE
-register state not shared with FPSIMD on syscall we replace the
-disabling of TIF_SVE with a flush of the non-shared register state, this
-means that there is still some overhead for syscalls when SVE is in use
-but it is much reduced.
-
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- arch/arm64/kernel/fpsimd.c  |  8 +++++++-
- arch/arm64/kernel/syscall.c | 19 +++++--------------
- 2 files changed, 12 insertions(+), 15 deletions(-)
-
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 46bc65b6bd81..8295acafe243 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -477,7 +477,13 @@ static void fpsimd_save(void)
- 	if (test_thread_flag(TIF_FOREIGN_FPSTATE))
- 		return;
- 
--	if ((last->to_save == FP_STATE_TASK && test_thread_flag(TIF_SVE)) ||
-+	/*
-+	 * If a task is in a syscall the ABI allows us to only
-+	 * preserve the state shared with FPSIMD so don't bother
-+	 * saving the full SVE state in that case.
-+	 */
-+	if ((last->to_save == FP_STATE_TASK && test_thread_flag(TIF_SVE) &&
-+	     !in_syscall(current_pt_regs())) ||
- 	    last->to_save == FP_STATE_SVE) {
- 		save_sve_regs = true;
- 		save_ffr = true;
-diff --git a/arch/arm64/kernel/syscall.c b/arch/arm64/kernel/syscall.c
-index 733451fe7e41..69b4c06f2e39 100644
---- a/arch/arm64/kernel/syscall.c
-+++ b/arch/arm64/kernel/syscall.c
-@@ -183,21 +183,12 @@ static inline void fp_user_discard(void)
- 	if (!system_supports_sve())
- 		return;
- 
--	/*
--	 * If SME is not active then disable SVE, the registers will
--	 * be cleared when userspace next attempts to access them and
--	 * we do not need to track the SVE register state until then.
--	 */
--	clear_thread_flag(TIF_SVE);
-+	if (test_thread_flag(TIF_SVE)) {
-+		unsigned int sve_vq_minus_one;
- 
--	/*
--	 * task_fpsimd_load() won't be called to update CPACR_EL1 in
--	 * ret_to_user unless TIF_FOREIGN_FPSTATE is still set, which only
--	 * happens if a context switch or kernel_neon_begin() or context
--	 * modification (sigreturn, ptrace) intervenes.
--	 * So, ensure that CPACR_EL1 is already correct for the fast-path case.
--	 */
--	sve_user_disable();
-+		sve_vq_minus_one = sve_vq_from_vl(task_get_sve_vl(current)) - 1;
-+		sve_flush_live(true, sve_vq_minus_one);
-+	}
- }
- 
- void do_el0_svc(struct pt_regs *regs)
--- 
-2.30.2
-
+thanks
+-- PMM
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
