@@ -2,77 +2,53 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 667F8C25B0E
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Aug 2022 12:32:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79CD6C32772
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Aug 2022 19:26:13 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CBFE54D595;
-	Tue, 16 Aug 2022 08:32:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BBC004D40D;
+	Tue, 16 Aug 2022 15:26:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iMqzHQDZF-W7; Tue, 16 Aug 2022 08:32:02 -0400 (EDT)
+	with ESMTP id NGVh-Fb2uaGl; Tue, 16 Aug 2022 15:26:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 841F74D589;
-	Tue, 16 Aug 2022 08:32:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F9DC4D401;
+	Tue, 16 Aug 2022 15:26:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3171B4D586
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2022 08:32:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2118B4D3F0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2022 15:26:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eJggl4X4wFge for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Aug 2022 08:32:00 -0400 (EDT)
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com
- [209.85.128.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 244864D585
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2022 08:32:00 -0400 (EDT)
-Received: by mail-yw1-f177.google.com with SMTP id
- 00721157ae682-33365a01f29so48799027b3.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2022 05:32:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:from:to:cc;
- bh=v+DRertAfOhDVcUnuGx9lEwhV6sbeQ2CQXMPmOp/Nvs=;
- b=Uas8zK7axSC01+TrTA/wNZ1xP2S+vma9C5mERK33X9vd/7Qf/yP3c8zuk8m0kAiPX5
- bke4r+RjlXW89b9dkta4W3qO67/+havYt9AsG9MiIZi+72DYSae059SVy1V1rxmBZznq
- TOWDpQyJVnUR+NNORwT+gx4EHHUCg198Xsg4H0m5tNXAMLxGu51X6d5ET49oz6xGBuVN
- BdnbJ9q2WVCg79oU97HxKgFiZR+fNSd6B8MrGilYQSN+/p+gwjo4nrO9DZ4JX6ipr9E4
- bH9SzVzzwOTj4VLjDb7WsEkzMmI1vP6GsYXkVmOgNiPqbrncLQyrRuvJi3+cduWpUHnD
- RE1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:x-gm-message-state:from:to:cc;
- bh=v+DRertAfOhDVcUnuGx9lEwhV6sbeQ2CQXMPmOp/Nvs=;
- b=1nepVTCubPJsMB5UMXEZ/ai+OCNtqWcCq9EnM2biW2HCynyB6FKMTeLapiAKenwRxD
- qAGhjjY1/HlcfAZkJ7LONO+mMgsNz1hBZTTAtRRFcBIGp9Ec2ep8htHV2QP4WY4A8xlW
- Gv81zHpYMMF4LvtMahR7T//fZOkUqlrmDiZv0KUoAcNfcHaIieae3BNMhGUGG/zfrrkH
- sQs7nJEVM5zfExTs8zJqSAw/Pfzm8e4o22D9msIwy2ZS0l9SKvLQvVeAKvSrUBfz0yY4
- QLgnsVDAsMBVgfp1Fl2GKKLkWOzcrHOoeIfy4l7iuFkEYyWBBStu4+kd1ABjt+Nm3pYr
- 025w==
-X-Gm-Message-State: ACgBeo183fSvjfL52TqFWfcf3K7VaaVhdRx/PGgiPqgmdIbYPxGnotau
- ZMigvw2TG/8tewxmaRILG95vxMQgeGWuUfQB9NqdzQ==
-X-Google-Smtp-Source: AA6agR7dLeAK+sEftuM6C/QD8QaZZa6Q6wVpEdYhAmp7wiXSmHCU3DXOfxjo+q4REmQwIjLVEXSvtxqafi7EWETpIK8=
-X-Received: by 2002:a25:3d0:0:b0:67c:2231:65e with SMTP id
- 199-20020a2503d0000000b0067c2231065emr14218893ybd.67.1660653119619; 
- Tue, 16 Aug 2022 05:31:59 -0700 (PDT)
+ with ESMTP id OzJGQK7m8bL0 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Aug 2022 15:26:08 -0400 (EDT)
+Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA2BB4D3F1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Aug 2022 15:26:08 -0400 (EDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1660677967;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Qyb4P3aeu3kcSplqFQPf6DeNYTbLexPY2NVEpp1YSig=;
+ b=LCbCsDpds/zG+Va7xHgoChxHXHa8DjiiGRazo1QLBulYW9xQfLToPoGcarurdlrzvJgTpt
+ 46OVyxAzuFiZBknosWlujn1sSL+OHdDKo3a1+m4GN5y54cxK5BSYjhHdakflruS7SQHXU+
+ +VPuithtmqBASaYDnrJkRq+e6+PwX28=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v2 0/2] KVM: arm64: Uphold 64bit-only behavior on asymmetric
+ systems
+Date: Tue, 16 Aug 2022 19:25:52 +0000
+Message-Id: <20220816192554.1455559-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-References: <20220812021427.cwenhciuftgtaj64@altlinux.org>
- <20220812084529.ur5qcyws5qvoyvuc@altlinux.org>
- <CAFEAcA9BuSe4SwpoWTALURaxoj-8U2y83k=und7oKrZBggLarQ@mail.gmail.com>
- <87h72hv71u.wl-maz@kernel.org> <20220813111137.5plgwrfnosolj2bp@altlinux.org>
- <8735e0s1zw.wl-maz@kernel.org>
-In-Reply-To: <8735e0s1zw.wl-maz@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 16 Aug 2022 13:31:18 +0100
-Message-ID: <CAFEAcA__6WaoFwTHH1FhAU1xpvGpA2YvZTo1BTjbKw2GqS5q+w@mail.gmail.com>
-Subject: Re: qemu-system-aarch64: Failed to retrieve host CPU features
-To: Marc Zyngier <maz@kernel.org>
-Cc: Vitaly Chikunov <vt@altlinux.org>, qemu-arm@nongnu.org,
- "Dmitry V. Levin" <ldv@altlinux.org>, kvmarm <kvmarm@lists.cs.columbia.edu>,
- QEMU Developers <qemu-devel@nongnu.org>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+Cc: kvm@vger.kernel.org, maz@kernel.org, will@kernel.org,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,17 +65,36 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, 13 Aug 2022 at 14:32, Marc Zyngier <maz@kernel.org> wrote:
-> But we probably need to handle EINTR when creating the mini VM.
+Small series to fix a couple issues around when 64bit-only behavior is
+applied. As KVM is more restrictive than the kernel in terms of 32bit
+support (no asymmetry), we really needed our own predicate when the
+meaning of system_supports_32bit_el0() changed in commit 2122a833316f
+("arm64: Allow mismatched 32-bit EL0 support").
 
-It's easy enough to add a retry-on-EINTR loop to the KVM_CREATE_VM
-ioctl in the target/arm/ code. But do we need to do that more
-widely ? At the moment QEMU seems to assume that KVM ioctls
-will never fail EINTR except for the one special-cased
-KVM_CREATE_VM, plus (more obviously) KVM_RUN...
+Lightly tested as I do not have any asymmetric systems on hand at the
+moment. Attention on patch 2 would be appreciated as it affects ABI.
 
-thanks
--- PMM
+Applies to 6.0-rc1.
+
+v1 -> v2:
+ - Fix a silly logic inversion in vcpu_mode_is_bad_32bit()
+ - Rebase to 6.0-rc1
+
+Oliver Upton (2):
+  KVM: arm64: Treat PMCR_EL1.LC as RES1 on asymmetric systems
+  KVM: arm64: Reject 32bit user PSTATE on asymmetric systems
+
+ arch/arm64/include/asm/kvm_host.h | 4 ++++
+ arch/arm64/kvm/arm.c              | 3 +--
+ arch/arm64/kvm/guest.c            | 2 +-
+ arch/arm64/kvm/sys_regs.c         | 4 ++--
+ 4 files changed, 8 insertions(+), 5 deletions(-)
+
+
+base-commit: 568035b01cfb107af8d2e4bd2fb9aea22cf5b868
+-- 
+2.37.1.595.g718a3a8f04-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
