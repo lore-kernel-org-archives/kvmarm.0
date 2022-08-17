@@ -2,58 +2,52 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85262C32771
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Aug 2022 15:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C572C25B08
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Aug 2022 21:48:43 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D43054CF71;
-	Wed, 17 Aug 2022 11:14:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 002F34D235;
+	Wed, 17 Aug 2022 17:48:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oo3csl-E4lXJ; Wed, 17 Aug 2022 11:14:08 -0400 (EDT)
+	with ESMTP id 2iNzExoj0srm; Wed, 17 Aug 2022 17:48:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 890654CF70;
-	Wed, 17 Aug 2022 11:14:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDD3B4D237;
+	Wed, 17 Aug 2022 17:48:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DB7B4CF70
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Aug 2022 11:14:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D6CE4D232
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Aug 2022 17:48:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c4vbiUdJ-FKm for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Aug 2022 11:14:04 -0400 (EDT)
-Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A86384CF6A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Aug 2022 11:14:04 -0400 (EDT)
-Date: Wed, 17 Aug 2022 10:13:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1660749243;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=0KoI88G6WAT+dF0R8d2w0z0ihjudvGquq4fyy5BlDxA=;
- b=bC7pAGwUhbwJREU6OOPWUXVPcGn4K1p31sgeWCKmiRFXP/z/Kke3Uz9btvJQ3pdSG4NgID
- b9CDN9fVg71X61ZML1rPm7X052YgxwC5xl3hT8Ybd312An8Z/KOad3BQurFBiiO5yN7t6R
- KYe+W7X7Lquo479RaPgZUy9zGdrNlRM=
+ with ESMTP id fUqUIux-xqVx for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Aug 2022 17:48:39 -0400 (EDT)
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3512C4D231
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Aug 2022 17:48:39 -0400 (EDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1660772917;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=cDVlBOelWFV15LvLWa+pCIh5Az2QchuTMm2O7H0MfZk=;
+ b=puD8I3PkQRNayksEy0wOfU5b0YzxoKZaMjrXlFl+3KOT9ZugR1UJ41zWBQ4rIUp7WgJmYP
+ zer8g0/Qivf8EkqpyOrgj/kSI9u4kcW+RqBS5h0Sw26FxOJKXuml5SvL9BIxtorjjBp7Ck
+ 3/FsLgpUpC7mZFkmblRFxfhBznj563c=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 0/2] KVM: arm64: Uphold 64bit-only behavior on
- asymmetric systems
-Message-ID: <Yv0Ft0yGVr5H4NVE@google.com>
-References: <20220816192554.1455559-1-oliver.upton@linux.dev>
- <87tu6bw5dd.wl-maz@kernel.org>
- <YvzIVo5H21upnaPt@monolith.localdoman>
- <87sflvw32l.wl-maz@kernel.org>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH 0/6] KVM: arm64: Treat 32bit ID registers as RAZ/WI on
+ 64bit-only system
+Date: Wed, 17 Aug 2022 21:48:12 +0000
+Message-Id: <20220817214818.3243383-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87sflvw32l.wl-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 X-Migadu-Auth-User: linux.dev
-Cc: kvm@vger.kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+Cc: kvm@vger.kernel.org, maz@kernel.org, will@kernel.org,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -71,46 +65,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Aug 17, 2022 at 11:56:50AM +0100, Marc Zyngier wrote:
-> On Wed, 17 Aug 2022 11:52:06 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi,
-> > 
-> > On Wed, Aug 17, 2022 at 11:07:10AM +0100, Marc Zyngier wrote:
-> > > On Tue, 16 Aug 2022 20:25:52 +0100,
-> > > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > > 
-> > > > Small series to fix a couple issues around when 64bit-only behavior is
-> > > > applied. As KVM is more restrictive than the kernel in terms of 32bit
-> > > > support (no asymmetry), we really needed our own predicate when the
-> > > > meaning of system_supports_32bit_el0() changed in commit 2122a833316f
-> > > > ("arm64: Allow mismatched 32-bit EL0 support").
-> > > > 
-> > > > Lightly tested as I do not have any asymmetric systems on hand at the
-> > > > moment. Attention on patch 2 would be appreciated as it affects ABI.
-> > > 
-> > > I don't think this significantly affect the ABI, as it is pretty
-> > > unlikely that you'd have been able to execute the result, at least on
-> > > VM creation (set PSTATE.M=USR, start executing, get the page fault on
-> > > the first instruction... bang).
-> > > 
-> > > You could have tricked it in other ways, but at the end of the day
-> > > you're running a broken hypervisor on an even more broken system...
+For reasons unknown, the Arm architecture defines the 64-bit views of
+the 32-bit ID registers as UNKNOWN [1]. This combines poorly with the
+fact that KVM unconditionally exposes these registers to userspace,
+which could throw a wrench in migration between 64-bit only systems.
 
-Lol, fair enough. Just wanted to make sure we're all happy with how we
-turn the guest into rubble on the other end :)
+This series reworks KVM's definition of these registers to RAZ/WI with
+the goal of providing consistent register values across 64-bit machines.
 
-> > Just FYI, you can create such a system on models, by running two clusters
-> > and setting clusterX.max_32bit_el=-1. Or you can have even crazier
-> > configurations, where AArch32 support is present on only one cluster, and
-> > only for EL0.
+Patches 1-2 clean up some of the ID register accessors, taking advantage
+of the fact that the generic ones already know how to handle RAZ
+registers.
 
-Doh! Forgot about the fast model.
+Patches 3-4 wire in a new visibility bit to indicate a register ignores
+writes from userspace.
 
---
-Thanks,
-Oliver
+Patch 5 moves all exposed 32-bit ID registers to have RAZ/WI behavior on
+64-bit only systems. Note that hidden 32-bit registers continue to have
+RAZ behavior and carry the additional requirement of invariance.
+
+Lastly, patch 6 tests that userspace and guest indeed see the registers
+as RAZ/WI.
+
+Applies to 6.0-rc1 + the mismatched system fixes [2] picked up earlier
+today. Tested on the fast model, both with mismatched AArch32 support
+and no AArch32 support whatoever.
+
+[1]: DDI0487H.a Table D12-2 'Instruction encodings for non-Debug System Register accesses'
+[2]: https://lore.kernel.org/kvmarm/20220816192554.1455559-1-oliver.upton@linux.dev/
+
+Oliver Upton (6):
+  KVM: arm64: Use visibility hook to treat ID regs as RAZ
+  KVM: arm64: Remove internal accessor helpers for id regs
+  KVM: arm64: Spin off helper for calling visibility hook
+  KVM: arm64: Add a visibility bit to ignore user writes
+  KVM: arm64: Treat 32bit ID registers as RAZ/WI on 64bit-only system
+  KVM: selftests: Add test for RAZ/WI AArch32 ID registers
+
+ arch/arm64/kvm/sys_regs.c                     | 137 +++++++++---------
+ arch/arm64/kvm/sys_regs.h                     |  24 ++-
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/aarch64/aarch64_only_id_regs.c        | 135 +++++++++++++++++
+ 5 files changed, 222 insertions(+), 76 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/aarch64_only_id_regs.c
+
+-- 
+2.37.1.595.g718a3a8f04-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
