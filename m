@@ -2,58 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E0B6C25B0E
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Aug 2022 05:28:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 335F7C28B2B
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Aug 2022 08:00:32 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CA134E052;
-	Fri, 19 Aug 2022 01:28:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 926AD4C8B9;
+	Fri, 19 Aug 2022 04:00:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nJl5xMLmXLhs; Fri, 19 Aug 2022 01:28:12 -0400 (EDT)
+	with ESMTP id eaGQ3inPxegz; Fri, 19 Aug 2022 04:00:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4541D4E090;
-	Fri, 19 Aug 2022 01:28:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F0744C8BC;
+	Fri, 19 Aug 2022 04:00:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BFEDB4E090
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Aug 2022 01:28:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82E2C4C8BA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Aug 2022 04:00:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YkwX+mkRLOrH for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Aug 2022 01:28:09 -0400 (EDT)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 822B94E052
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Aug 2022 01:28:09 -0400 (EDT)
-Date: Fri, 19 Aug 2022 07:28:05 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1660886888;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=EVozTVP3R6alT//Ll18ulj/6MH8/qR/TwWtAnvBrzdU=;
- b=PMVRFKEZeKyE8EKMtXnLtfOneiT2O4Md6EbjoDnjs8TZwCMnre2cYE8B5wXoyUp7+VZUDi
- rkPY43Q9UBf2HkEAX370IebDwbZrbovf2i8dqr69md/ZWSGw8MNtVegMBEMuMBZcYbryyw
- X9xABLnKrnUYYniQPyUqfhwsay43Jlk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
+ with ESMTP id 9BfDjyn27Ggt for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Aug 2022 04:00:23 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2F5214C8B9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Aug 2022 04:00:23 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 5E3BD616C7;
+ Fri, 19 Aug 2022 08:00:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6791C433B5;
+ Fri, 19 Aug 2022 08:00:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1660896021;
+ bh=dXB7Dmr6Olnqm8i/ag5x25/j/xOuKOYp7Zqy3xYbF1k=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=bPzGRNloxET7jCjbmwuPekfurJU+YIanGSes6+FQxRyOaXDN7NleDvVk0kCSGm+mj
+ Nvy+u3VuCbER8OL+RbU4KnLqA6HRIfjiQ7u8R5gsfEHDNpnzogYoaC5TjC7KhI9nGl
+ 3u6j0LMPpZx/z/OYomSHy1cBWXgHYDxR1vDcP0ZfPUIOgSJjWLT9uKP94QaW4rEyq0
+ Uw510IEA5cxLKQKuP025ixhomp3R0zWPbgu8jqG/fWOoVRppxVNpkOQSMy+fdBPeIl
+ fYw4MU6pTlU+kolvweUV5rWvIr/LtPt8krly8NS3/oMs0OxtW71SdawKlOlX4geM01
+ EzczQKfP6wZiA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oOwvT-004D7a-Dh;
+ Fri, 19 Aug 2022 09:00:19 +0100
+Date: Fri, 19 Aug 2022 09:00:18 +0100
+Message-ID: <87lerkwtm5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v1 3/5] KVM: selftests: Dirty host pages in dirty_log_test
-Message-ID: <20220819052805.qnhw2d3arxixzvhl@kamzik>
+Subject: Re: [PATCH v1 1/5] KVM: arm64: Enable ring-based dirty memory tracking
+In-Reply-To: <20220819005601.198436-2-gshan@redhat.com>
 References: <20220819005601.198436-1-gshan@redhat.com>
- <20220819005601.198436-4-gshan@redhat.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220819005601.198436-4-gshan@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
+ <20220819005601.198436-2-gshan@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, peterx@redhat.com, pbonzini@redhat.com,
+ corbet@lwn.net, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, oliver.upton@linux.dev, catalin.marinas@arm.com,
+ will@kernel.org, shuah@kernel.org, seanjc@google.com, drjones@redhat.com,
+ dmatlack@google.com, bgardon@google.com, ricarkol@google.com,
+ zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
  linux-kselftest@vger.kernel.org, bgardon@google.com, shuah@kernel.org,
- kvmarm@lists.cs.columbia.edu, corbet@lwn.net, maz@kernel.org,
- shan.gavin@gmail.com, drjones@redhat.com, will@kernel.org, zhenyzha@redhat.com,
+ kvmarm@lists.cs.columbia.edu, corbet@lwn.net, will@kernel.org,
+ shan.gavin@gmail.com, drjones@redhat.com, zhenyzha@redhat.com,
  dmatlack@google.com, linux-arm-kernel@lists.infradead.org,
  linux-kernel@vger.kernel.org, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -72,25 +96,111 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Aug 19, 2022 at 08:55:59AM +0800, Gavin Shan wrote:
-> It's assumed that 1024 host pages, instead of guest pages, are dirtied
-> in each iteration in guest_code(). The current implementation misses
-> the case of mismatched page sizes in host and guest. For example,
-> ARM64 could have 64KB page size in guest, but 4KB page size in host.
-> (TEST_PAGES_PER_LOOP / 16), instead of TEST_PAGES_PER_LOOP, host pages
-> are dirtied in every iteration.
+On Fri, 19 Aug 2022 01:55:57 +0100,
+Gavin Shan <gshan@redhat.com> wrote:
 > 
-> Fix the issue by touching all sub-pages when we have mismatched
-> page sizes in host and guest.
+> The ring-based dirty memory tracking has been available and enabled
+> on x86 for a while. The feature is beneficial when the number of
+> dirty pages is small in a checkpointing system or live migration
+> scenario. More details can be found from fb04a1eddb1a ("KVM: X86:
+> Implement ring-based dirty memory tracking").
+> 
+> This enables the ring-based dirty memory tracking on ARM64. It's
+> notable that no extra reserved ring entries are needed on ARM64
+> because the huge pages are always split into base pages when page
+> dirty tracking is enabled.
 
-I'll let the dirty-log test authors decide what's best to do for this
-test, but I'd think we should let the guest continue dirtying its
-pages without knowledge of the host pages. Then, adjust the host test
-code to assert all sub-pages, other than the ones it expects the guest
-to have written, remain untouched.
+Can you please elaborate on this? Adding a per-CPU ring of course
+results in extra memory allocation, so there must be a subtle
+x86-specific detail that I'm not aware of...
+
+> 
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> ---
+>  Documentation/virt/kvm/api.rst    | 2 +-
+>  arch/arm64/include/uapi/asm/kvm.h | 1 +
+>  arch/arm64/kvm/Kconfig            | 1 +
+>  arch/arm64/kvm/arm.c              | 8 ++++++++
+>  4 files changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index abd7c32126ce..19fa1ac017ed 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8022,7 +8022,7 @@ regardless of what has actually been exposed through the CPUID leaf.
+>  8.29 KVM_CAP_DIRTY_LOG_RING
+>  ---------------------------
+>  
+> -:Architectures: x86
+> +:Architectures: x86, arm64
+>  :Parameters: args[0] - size of the dirty log ring
+>  
+>  KVM is capable of tracking dirty memory using ring buffers that are
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 3bb134355874..7e04b0b8d2b2 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -43,6 +43,7 @@
+>  #define __KVM_HAVE_VCPU_EVENTS
+>  
+>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+> +#define KVM_DIRTY_LOG_PAGE_OFFSET 64
+
+For context, the documentation says:
+
+<quote>
+- if KVM_CAP_DIRTY_LOG_RING is available, a number of pages at
+  KVM_DIRTY_LOG_PAGE_OFFSET * PAGE_SIZE. [...]
+</quote>
+
+What is the reason for picking this particular value?
+
+
+>  
+>  #define KVM_REG_SIZE(id)						\
+>  	(1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 815cc118c675..0309b2d0f2da 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -32,6 +32,7 @@ menuconfig KVM
+>  	select KVM_VFIO
+>  	select HAVE_KVM_EVENTFD
+>  	select HAVE_KVM_IRQFD
+> +	select HAVE_KVM_DIRTY_RING
+>  	select HAVE_KVM_MSI
+>  	select HAVE_KVM_IRQCHIP
+>  	select HAVE_KVM_IRQ_ROUTING
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 986cee6fbc7f..3de6b9b39db7 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -866,6 +866,14 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  		if (!ret)
+>  			ret = 1;
+>  
+> +		/* Force vcpu exit if its dirty ring is soft-full */
+> +		if (unlikely(vcpu->kvm->dirty_ring_size &&
+> +			     kvm_dirty_ring_soft_full(&vcpu->dirty_ring))) {
+> +			vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+> +			trace_kvm_dirty_ring_exit(vcpu);
+> +			ret = 0;
+> +		}
+> +
+
+Why can't this be moved to kvm_vcpu_exit_request() instead? I would
+also very much like the check to be made a common helper with x86.
+
+A seemingly approach would be to make this a request on dirty log
+insertion, and avoid the whole "check the log size" on every run,
+which adds pointless overhead to unsuspecting users (aka everyone).
 
 Thanks,
-drew
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
