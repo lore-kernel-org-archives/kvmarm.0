@@ -2,92 +2,90 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF65C00140
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Aug 2022 14:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C2DC00140
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Aug 2022 14:45:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D740A4CFB7;
-	Wed, 24 Aug 2022 10:25:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A75064D100;
+	Wed, 24 Aug 2022 10:45:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zp+6CChK5-kY; Wed, 24 Aug 2022 10:25:13 -0400 (EDT)
+	with ESMTP id BD9VI9aAgZjo; Wed, 24 Aug 2022 10:45:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DDCA4D049;
-	Wed, 24 Aug 2022 10:25:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 049DB4D0DE;
+	Wed, 24 Aug 2022 10:45:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E162D4CFAB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 10:25:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 297D04D0D7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 10:45:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DYO69ZUByhGm for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Aug 2022 10:25:11 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A04B64CFA3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 10:25:11 -0400 (EDT)
+ with ESMTP id 9dNCZ60Jvw3i for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Aug 2022 10:45:23 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 743904D0D5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 10:45:23 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 216FFB8254D;
- Wed, 24 Aug 2022 14:25:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B45EEC433C1;
- Wed, 24 Aug 2022 14:25:08 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 5A65861873;
+ Wed, 24 Aug 2022 14:45:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E537C433D6;
+ Wed, 24 Aug 2022 14:45:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1661351108;
- bh=GlyJJ9dV5dcNN4e8F/+zW4aKoVpKrRpQG5FduS6xj60=;
+ s=k20201202; t=1661352321;
+ bh=qY2vG3+Z/E0B6oHoQ9h18OUyySDy00/TSuXF4/r7CPk=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=RlOFCFyOYvgDsmtvh7bI4fnzpALdN2M/t7Sdx3OBkKjuNIOEGaxCSeasH5M/MQcVu
- 39MlyXzAx5P4sTw6vHcANvoZt5XNpo4DlF7c3sYHlUc18EhnOJ+Nx/MvsFzgmvBHY4
- mnjdD22AawdV/zG7YInQPGZCdQ59QpasRPsWlEDIns2MvGoYCbBB1Zlc8Zx17VlJKx
- WlpiSr2SvuWNUu+CiU1aCrccEOnvIj7LHy6SiOm7h2HB/+9dhcnJIKX7ihFSu2bagl
- 8lmZ+3PVbzSvTHGsjmudsOHkifF0MknUFCc1OryZ69NDWLBrFdNJWFGyy08RVV1UqF
- GXox+Ellgocog==
+ b=TQhxtmzdMQK0FrBoBHBL1Dc/y4bbiR9u+9GD+uVbzvd3vD7+nQdzeDZiOkDTNR3fa
+ odWVOcLiopRH6Fi9Qo1oWtX28M3GC6BPOw4+Ami2R1lCFbHmsgx9ul52R31X8Mgz+j
+ VUBvgsLsLR3oJ44Lsg07vFrX+6glVLohc21uiMfaU/eEA2AjTWGDNmtggmTfxY5UTs
+ 8SDRb9Mq4LwhAaiddXwUGVu5vnCO+9xaOO4/DYlhnqcqKmTThT4orqC89/VPL9lJrm
+ cY2QKR6HqNwqVCN8rasyFLM5+kkAtM0eGv5r+xUIlCCHC1MsrIvv/tnJLi0KPZJJSV
+ GZWjF9zrDrFjQ==
 Received: from [12.191.126.171] (helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oQrJa-005SYH-2A;
- Wed, 24 Aug 2022 15:25:06 +0100
-Date: Wed, 24 Aug 2022 15:24:57 +0100
-Message-ID: <87zgftra6e.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oQrd9-005Smi-0D;
+ Wed, 24 Aug 2022 15:45:19 +0100
+Date: Wed, 24 Aug 2022 15:45:11 +0100
+Message-ID: <87y1vdr98o.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Subject: Re: [PATCH v7 4/4] KVM: arm64/mmu: count KVM s2 mmu usage in
- secondary pagetable stats
-In-Reply-To: <319904e0-3722-8ab1-cf74-491b9c32e23b@arm.com>
-References: <20220823004639.2387269-1-yosryahmed@google.com>
- <20220823004639.2387269-5-yosryahmed@google.com>
- <319904e0-3722-8ab1-cf74-491b9c32e23b@arm.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v1 1/5] KVM: arm64: Enable ring-based dirty memory tracking
+In-Reply-To: <YwVgaGp3HOGzC8k2@xz-m1.local>
+References: <20220819005601.198436-1-gshan@redhat.com>
+ <20220819005601.198436-2-gshan@redhat.com>
+ <87lerkwtm5.wl-maz@kernel.org>
+ <41fb5a1f-29a9-e6bb-9fab-4c83a2a8fce5@redhat.com>
+ <87fshovtu0.wl-maz@kernel.org>
+ <171d0159-4698-354b-8b2f-49d920d03b1b@redhat.com>
+ <YwTc++Lz6lh3aR4F@xz-m1.local> <87bksawz0w.wl-maz@kernel.org>
+ <YwVEoM1pj2MPCELp@xz-m1.local> <878rnewpaw.wl-maz@kernel.org>
+ <YwVgaGp3HOGzC8k2@xz-m1.local>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 12.191.126.171
-X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, yosryahmed@google.com, tj@kernel.org,
- hannes@cmpxchg.org, lizefan.x@bytedance.com, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com,
- seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
- jmattson@google.com, joro@8bytes.org, akpm@linux-foundation.org,
- mhocko@kernel.org, roman.gushchin@linux.dev, shakeelb@google.com,
- oupton@google.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Huang@google.com, shaoqin.huang@intel.com, linux-mm@kvack.org,
- cgroups@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, nd@arm.com
+X-SA-Exim-Rcpt-To: peterx@redhat.com, gshan@redhat.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
+ james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org,
+ shuah@kernel.org, seanjc@google.com, dmatlack@google.com, bgardon@google.com,
+ ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Roman Gushchin <roman.gushchin@linux.dev>, Michal Hocko <mhocko@kernel.org>,
- Shaoqin <shaoqin.huang@intel.com>, linux-mm@kvack.org,
- Zefan Li <lizefan.x@bytedance.com>, kvmarm@lists.cs.columbia.edu,
- Joerg Roedel <joro@8bytes.org>, Shakeel Butt <shakeelb@google.com>,
- cgroups@vger.kernel.org, nd@arm.com, Huang@google.com,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Yosry Ahmed <yosryahmed@google.com>, Andrew Morton <akpm@linux-foundation.org>,
- linux-kernel@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>,
- Tejun Heo <tj@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
+ linux-kselftest@vger.kernel.org, bgardon@google.com, shuah@kernel.org,
+ kvmarm@lists.cs.columbia.edu, corbet@lwn.net, will@kernel.org,
+ shan.gavin@gmail.com, zhenyzha@redhat.com, dmatlack@google.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -104,32 +102,152 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 24 Aug 2022 14:43:43 +0100,
-Ryan Roberts <ryan.roberts@arm.com> wrote:
+On Wed, 24 Aug 2022 00:19:04 +0100,
+Peter Xu <peterx@redhat.com> wrote:
 > 
-> > Count the pages used by KVM in arm64 for stage2 mmu in memory stats
-> > under secondary pagetable stats (e.g. "SecPageTables" in /proc/meminfo)
-> > to give better visibility into the memory consumption of KVM mmu in a
-> > similar way to how normal user page tables are accounted.
+> On Tue, Aug 23, 2022 at 11:47:03PM +0100, Marc Zyngier wrote:
+> > On Tue, 23 Aug 2022 22:20:32 +0100,
+> > Peter Xu <peterx@redhat.com> wrote:
+> > > 
+> > > On Tue, Aug 23, 2022 at 08:17:03PM +0100, Marc Zyngier wrote:
+> > > > I don't think we really need this check on the hot path. All we need
+> > > > is to make the request sticky until userspace gets their act together
+> > > > and consumes elements in the ring. Something like:
+> > > > 
+> > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > > index 986cee6fbc7f..e8ed5e1af159 100644
+> > > > --- a/arch/arm64/kvm/arm.c
+> > > > +++ b/arch/arm64/kvm/arm.c
+> > > > @@ -747,6 +747,14 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+> > > >  
+> > > >  		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+> > > >  			return kvm_vcpu_suspend(vcpu);
+> > > > +
+> > > > +		if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
+> > > > +		    kvm_dirty_ring_soft_full(vcpu)) {
+> > > > +			kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
+> > > > +			vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+> > > > +			trace_kvm_dirty_ring_exit(vcpu);
+> > > > +			return 0;
+> > > > +		}
+> > > >  	}
+> > > >  
+> > > >  	return 1;
+> > > 
+> > > Right, this seems working.  We can also use kvm_test_request() here.
+> > > 
+> > > > 
+> > > > 
+> > > > However, I'm a bit concerned by the reset side of things. It iterates
+> > > > over the vcpus and expects the view of each ring to be consistent,
+> > > > even if userspace is hacking at it from another CPU. For example, I
+> > > > can't see what guarantees that the kernel observes the writes from
+> > > > userspace in the order they are being performed (the documentation
+> > > > provides no requirements other than "it must collect the dirty GFNs in
+> > > > sequence", which doesn't mean much from an ordering perspective).
+> > > > 
+> > > > I can see that working on a strongly ordered architecture, but on
+> > > > something as relaxed as ARM, the CPUs may^Wwill aggressively reorder
+> > > > stuff that isn't explicitly ordered. I have the feeling that a CAS
+> > > > operation on both sides would be enough, but someone who actually
+> > > > understands how this works should have a look...
+> > > 
+> > > I definitely don't think I 100% understand all the ordering things since
+> > > they're complicated.. but my understanding is that the reset procedure
+> > > didn't need memory barrier (unlike pushing, where we have explicit wmb),
+> > > because we assumed the userapp is not hostile so logically it should only
+> > > modify the flags which is a 32bit field, assuming atomicity guaranteed.
 > > 
-> > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
-> > Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-> > Reviewed-by: Marc Zyngier <maz@kernel.org>
-> > ---
+> > Atomicity doesn't guarantee ordering, unfortunately.
 > 
-> I see that you are not including the memory reserved for the host
-> stage2 table when using protected KVM. Is this something worth adding?
-> (See arch/arm64/kvm/pkvm.c:kvm_hyp_reserve()).
+> Right, sorry to be misleading.  The "atomicity" part I was trying to say
+> the kernel will always see consistent update on the fields.
+>
+> The ordering should also be guaranteed, because things must happen with
+> below sequence:
 > 
-> This reservation is done pretty early on in bootmem_init() so not sure
-> if this could cause some init ordering issues that might be tricky to
-> solve though.
+>   (1) kernel publish dirty GFN data (slot, offset)
+>   (2) kernel publish dirty GFN flag (set to DIRTY)
+>   (3) user sees DIRTY, collects (slots, offset)
+>   (4) user sets it to RESET
+>   (5) kernel reads RESET
 
-I also don't see what this buys us. This memory can't be reclaimed,
-and is not part of KVM's job for the purpose of running guests, which
-is what this series is about.
+Maybe. Maybe not. The reset could well be sitting in the CPU write
+buffer for as long as it wants and not be seen by the kernel if the
+read occurs on another CPU. And that's the crucial bit: single-CPU is
+fine, but cross CPU isn't. Unfortunately, the userspace API is per-CPU
+on collection, and global on reset (this seems like a bad decision,
+but it is too late to fix this).
 
-If anything, it should be accounted separately.
+> 
+> So the ordering of single-entry is guaranteed in that when (5) happens it
+> must be after stablized (1+2).
+> 
+> > Take the
+> > following example: CPU0 is changing a bunch of flags for GFNs A, B, C,
+> > D that exist in the ring in that order, and CPU1 performs an ioctl to
+> > reset the page state.
+> > 
+> > CPU0:
+> >     write_flag(A, KVM_DIRTY_GFN_F_RESET)
+> >     write_flag(B, KVM_DIRTY_GFN_F_RESET)
+> >     write_flag(C, KVM_DIRTY_GFN_F_RESET)
+> >     write_flag(D, KVM_DIRTY_GFN_F_RESET)
+> >     [...]
+> > 
+> > CPU1:
+> >    ioctl(KVM_RESET_DIRTY_RINGS)
+> > 
+> > Since CPU0 writes do not have any ordering, CPU1 can observe the
+> > writes in a sequence that have nothing to do with program order, and
+> > could for example observe that GFN A and D have been reset, but not B
+> > and C. This in turn breaks the logic in the reset code (B, C, and D
+> > don't get reset), despite userspace having followed the spec to the
+> > letter. If each was a store-release (which is the case on x86), it
+> > wouldn't be a problem, but nothing calls it in the documentation.
+> > 
+> > Maybe that's not a big deal if it is expected that each CPU will issue
+> > a KVM_RESET_DIRTY_RINGS itself, ensuring that it observe its own
+> > writes. But expecting this to work across CPUs without any barrier is
+> > wishful thinking.
+> 
+> I see what you meant...
+> 
+> Firstly I'm actually curious whether that'll really happen if the gfns are
+> collected in something like a for loop:
+> 
+>   for(i = 0; i < N; i++)
+>     collect_dirty_gfn(ring, i);
+> 
+> Because since all the gfps to be read will depend on variable "i", IIUC no
+> reordering should happen, but I'm not really sure, so more of a pure
+> question.
+
+'i' has no influence on the write ordering. Each write targets a
+different address, there is no inter-write dependencies (this concept
+doesn't exist other than for writes to the same address), so they can
+be reordered at will.
+
+If you want a proof of this, head to http://diy.inria.fr/www/ and run
+the MP.litmus test (which conveniently gives you a reduction of this
+problem) on both the x86 and AArch64 models. You will see that the
+reordering isn't allowed on x86, but definitely allowed on arm64.
+
+> Besides, the other thing to mention is that I think it is fine the RESET
+> ioctl didn't recycle all the gfns got set to reset state.  Taking above
+> example of GFNs A-D, if when reaching the RESET ioctl only A & D's flags
+> are updated, the ioctl will recycle gfn A but stop at gfn B assuming B-D
+> are not reset.  But IMHO it's okay because it means we reset partial of the
+> gfns not all of them, and it's safe to do so.  It means the next ring full
+> event can come earlier because we recycled less, but that's functionally
+> safe to me.
+
+It may be safe, but it isn't what the userspace API promises. In other
+words, without further straightening of the API, this doesn't work as
+expected on relaxed memory architectures. So before this gets enabled
+on arm64, this whole ordering issue must be addressed.
+
+Thanks,
 
 	M.
 
