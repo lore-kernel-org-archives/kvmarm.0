@@ -2,91 +2,126 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37D97C32793
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Aug 2022 15:32:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C117C38145
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Aug 2022 15:52:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D3974D28B;
-	Wed, 24 Aug 2022 11:32:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9807E4D304;
+	Wed, 24 Aug 2022 11:52:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@os.amperecomputing.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9COcPCCOhcmB; Wed, 24 Aug 2022 11:32:14 -0400 (EDT)
+	with ESMTP id lVUXNFPVNEbn; Wed, 24 Aug 2022 11:52:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A5274D281;
-	Wed, 24 Aug 2022 11:32:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 256214D2FA;
+	Wed, 24 Aug 2022 11:52:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EAA6E4D27C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 11:32:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FBFD4C01E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 02:03:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZPR-puxyOvQ3 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Aug 2022 11:32:12 -0400 (EDT)
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com
- [209.85.215.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CD7754D277
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 11:32:12 -0400 (EDT)
-Received: by mail-pg1-f177.google.com with SMTP id w13so10262161pgq.7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 08:32:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc;
- bh=UZnSHBhLdMOKtTsvoHUMcnhpm7mRfzt47Yx1rwe6TYo=;
- b=ZLLZ1sQgjDCQZCR6iPbiV+dqJNVFlqF98MJZe+fMBspnKcQ1UNH5o3QOOx9DF7zBKA
- 4NTZQU8BcU6LZoqrr74W5W2rChziUMwFRSTTGrC513hiwIJ39DS6AjzTbmueQdO2STE0
- t09KkGjDmYbiMqWw8kicU5n4mAAvwqsvfR4L8kRTE4YxLV1mXG0u1f2lpXeh4xy6gdFe
- Wv/tpw2JwZvjKVZthEj5z4x1vSTS+evVhLMdntp8ICLZ2wM3nwRTCYJP9MatbCfSirsX
- fcVMxPNOyrjAZQmeXvPefg+H+k8Jj7MzekfI//odudIng7UsH3Qp7cbIUqf69180zIUj
- AbYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
- bh=UZnSHBhLdMOKtTsvoHUMcnhpm7mRfzt47Yx1rwe6TYo=;
- b=UlzKobW4D2RCkPw69wgkZDQciW6JsnuYFMBMrhFuXmmPCID/iVCKVGYBxVPOaaz2pH
- 2uD2oqKuSM7G3IH58k0yEwFZp2udu0y6mZFQzC1oqEDPBO9HAB1N+Y8DWMNWVBbSZgtk
- CiqiUW3z3yzKmDtkGSSqP9cKlhxUJ0ghj2vuOjGXXzFQgRFLEaK8GHjTVZA6H88jWNXm
- S5zYsX1rN6gqyQZoEDAZXKhjwZYkWcDnrDRxmKOGdBKF2zPTIYsWkVi6ZSvbQkE9gSip
- V2b6idXmvwFATnVX+Z8DEm/9BazKFZ8wO2gnJ/nvjlC/O+WmOtiYh+Qp9fDi878lk4yr
- XH3w==
-X-Gm-Message-State: ACgBeo0W171g3/TX4yLvg+UCVRqKOHSuSpAZiDgJiE42r72+3/NVDV6H
- DbzDGcA4GJbUAqQi0Zcl0RXCpw==
-X-Google-Smtp-Source: AA6agR5QWDXsHQ6VWlCNVAAXtH2sA1tM24WXPqXY0c9+lwwnmRBfulv0M4b7+RjikXl1y2MhtN3W7Q==
-X-Received: by 2002:a63:8343:0:b0:42b:3b1a:89f6 with SMTP id
- h64-20020a638343000000b0042b3b1a89f6mr859171pge.26.1661355131607; 
- Wed, 24 Aug 2022 08:32:11 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com.
- [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
- d5-20020a17090ad3c500b001f53705ee92sm1567101pjw.6.2022.08.24.08.32.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 24 Aug 2022 08:32:11 -0700 (PDT)
-Date: Wed, 24 Aug 2022 15:32:07 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v4 5/6] KVM: selftests: Make arm64's MMIO ucall multi-VM
- friendly
-Message-ID: <YwZEdzHtWEfCpr7B@google.com>
-References: <20220824032115.3563686-1-seanjc@google.com>
- <20220824032115.3563686-6-seanjc@google.com>
- <YwY9BYDUeiT87/Vs@google.com>
+ with ESMTP id 3K6KsMO+3MJe for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Aug 2022 02:03:21 -0400 (EDT)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com
+ (mail-dm6nam10on2112.outbound.protection.outlook.com [40.107.93.112])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 345974C00C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 02:03:21 -0400 (EDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oLpNID4YkxvTB3t9/CIX8S/4tbMYgq6mJ7SpH9u36BTYGW8coI4BeVHGWTroiDiiW0TypQ0ImYobTM2yhap/ODOwqTM9/iq1ART3pwzGjrMhX71H/21Tu59g/AchcysCbI5upthrtARby8grZahovcoQzkP6PiRF4gqZsvp34BivX/QclTCLekT65nzue7uh5QmVr2mReIlTZutaayaoFeCkQYHX06lMi0dhRtaFKpHwnztuVLQqDnHXg2+CfiC5uacr26vTa2KJpppUQsrKlbP/E1JIKCP1RXCfqecWteI8flzoVIo7ZqgLhSxOmOKPsRSS9mugFql+vZLjvzvfMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VrFHdmlh/0Ys+L38kDhMFewTignwonVRVzXZQinc6Rg=;
+ b=XPOJhwLdDJnhA9nFHAiesFBHjmKON1stEt6VtPESWbpAEUTznDkqc6YBMeuVPv3WdQeoJ5dgdgU3C2Yyt87rTtFHPq/MwwtPT6jWZRSXP20XlxMIn0cOZ/OzI2r0pKU/Y9ezmsTR6i2h16Z3IdZ3kpMsua1jhgtnPrrqpUlEhDyXBrpvjS7EdeynjZYqbuO4eUwKcJ8+xWX7lmZC6zGsBipyX8oPMezjL4GqWV/AJT5Re6beab5x3PR0oT+OqO8409W5qrrYDQ6ocZQyo9S/YFxSCfXjwq8lifkW0IN/PI1/1cIpkoKVOvmp/iDbv+b3TlbU+djGFUTtGw6xUMMliQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VrFHdmlh/0Ys+L38kDhMFewTignwonVRVzXZQinc6Rg=;
+ b=fbsAANdJiVj85myP5T65tS2S9emBxgXQUOBi1c4I35TX+TQsTrcx2sOxCGGZsWfSQ6PXJC5NqScqTuL12t0VDdk0j2R/7Wq9jbZbGjn6v+IXkRFzjHEDA5fVIoUg0Rg3NHLkxOmrZI1MviVeFnyksEyX7Abj93IEUUzGBOLrJO4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
+ DM6PR01MB5914.prod.exchangelabs.com (2603:10b6:5:14f::31) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5546.21; Wed, 24 Aug 2022 06:03:19 +0000
+Received: from DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::7058:9dd4:aa01:614a]) by DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::7058:9dd4:aa01:614a%4]) with mapi id 15.20.5546.022; Wed, 24 Aug 2022
+ 06:03:19 +0000
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+To: maz@kernel.org
+Subject: [PATCH 1/3] KVM: arm64: nv: only emulate timers that have not yet
+ fired
+Date: Tue, 23 Aug 2022 23:03:02 -0700
+Message-Id: <20220824060304.21128-2-gankulkarni@os.amperecomputing.com>
+X-Mailer: git-send-email 2.30.1
+In-Reply-To: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
+References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
+X-ClientProxiedBy: CH0P220CA0030.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:610:ef::28) To DM8PR01MB6824.prod.exchangelabs.com
+ (2603:10b6:8:23::24)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YwY9BYDUeiT87/Vs@google.com>
-Cc: kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- Tom Rix <trix@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>,
- llvm@lists.linux.dev, Colton Lewis <coltonlewis@google.com>,
- linux-riscv@lists.infradead.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- kvmarm@lists.cs.columbia.edu, Janosch Frank <frankja@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>, Peter Gonda <pgonda@google.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Nathan Chancellor <nathan@kernel.org>,
- Atish Patra <atishp@atishpatra.org>, Andrew Jones <andrew.jones@linux.dev>,
- linux-arm-kernel@lists.infradead.org,
- Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
- Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
- Paolo Bonzini <pbonzini@redhat.com>
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 9eca2283-afac-4ca0-fff6-08da859657bf
+X-MS-TrafficTypeDiagnostic: DM6PR01MB5914:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: x4PpEvLFvN5FTEPCYCQiGlqPYu/7VxYZH3svGLkLcGTQ9SrYSMWnZkXK5eW2U3Q9eIYY3dm8wYhdLgJrxtVmuD+eUpplPJHtvO8EUgf7A7ta9GQ9M7LWtA2Eddy/Ua7/IgFv58R/CVT34Xr0arO5lxS1bQpbX8d29rL76Fe8qqLmiqQfYXyE6+2xMryJsccWFGs21Y8PTwpTrHloCaOtEqdCUideVkDArgDFWhstWrLV4+D8ezCkAFlbvUj/5KgB6PDmEPkDbcWZrhQJeASaRGdiFqkjarqVDNzT9VsS7Q/kZhHkgyRRQvT1ABqppnXCZQ1E10LE7kjooPW6dRCgEgX7kr7l4TTlwyOX9iD/TnqTRCySrYJQv/w1F2fpzmxh+hXDJ4BCP/5n5/j3Dw52FZv5oAOYE3kawN9jnMd780liJIAJ8cbHpVwUkQFF0VC7USv6AnbNZiupWYQYZoNh3kgP2LohIZdn4kLWXIfuUej8xr+QNubcWrtrA+lmfl2gaQ2shKjEwIopvzVRLTeBF6hlu0t5bX7oryX2sBc2JiYose2TRm6x6nk6DOcobOMvX2IDL5FUbObgOT1AGI0K1rj9XW3UW+xC5AvePyd99GRV5nhRDIIXkWoXG3WtM7uQImkT33tm6UcyeE23kEsxu32O1hWOy+NnKzvxbha6sbeQPywfR4sMyxf8Jfx1y7j4WF2khGPPS1Ddnz9YQzexOnNqZImDKYt/0m8hCwlmB/+D1ip+r8Y5nz3NLi6PzEX1jLLKLH6nk0rnWajem/5Vdg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:DM8PR01MB6824.prod.exchangelabs.com; PTR:; CAT:NONE;
+ SFS:(13230016)(4636009)(366004)(39850400004)(396003)(376002)(136003)(346002)(86362001)(38100700002)(38350700002)(6916009)(316002)(2906002)(8676002)(4326008)(66946007)(66556008)(8936002)(66476007)(5660300002)(2616005)(1076003)(41300700001)(478600001)(6512007)(186003)(26005)(107886003)(6666004)(52116002)(6506007)(6486002)(83380400001);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?O/ya8Pz/VwmzUfcz7EyiwSYqj0pjjlgM3eyX7hDMEJ8uLUa3JXwSOM4nRaz4?=
+ =?us-ascii?Q?gpOOK+NC8+h38mq/h3xKrSETnJYUB6WqVbdtr1GnvNVuHGkht2NyBkJe6929?=
+ =?us-ascii?Q?HNqs9pk8Cvt3FhLvNi++UsRZBinTpTA5QSEKgHa6LUPRkvvu12KKDg2dTwvA?=
+ =?us-ascii?Q?l/pbUibOMjVx/6ETRha53sCCb/NoD86ftOBUu8nekLmQgLljwlDzjHvK/klV?=
+ =?us-ascii?Q?hBaErSL3mB0dM7BL4r15EviEvv/f3HPqTyg+n4GJJ1wgc44XSU0sDTTWzm3W?=
+ =?us-ascii?Q?ZWILysXs+O8phCQfP/IX3r2/4DfGLdE3Ql05fbncJ+CbrTvjJeAw3YPVfWbv?=
+ =?us-ascii?Q?nx3PiPrPTXoB/W/GDwSa0srBIbia2TkYmykBoBPqfkY98Y2VPMQp9VJLTU2I?=
+ =?us-ascii?Q?LM4Hq5jFIPmWqiYHwNg3o0nRUxDChz1VozfNglmgPiVFekDyXRl008mZ2z9s?=
+ =?us-ascii?Q?nS5r6J6nT8PWGaT8BZ2Whk2vmuVaB4McTaXqrwE0Hq+Vu5iur3Q7IkQGe/aZ?=
+ =?us-ascii?Q?dlMHB2gQo6KG9ez1v0vA7GOWEaufhZStbkaH++dU6r2mAqbJal/ILDOJgW5X?=
+ =?us-ascii?Q?H6mkUf8mOruFlSwkg0fN4byF2xzQB2JgQbBjnjG2oI5gSxmTe8ffwwO52H7w?=
+ =?us-ascii?Q?W187gfTbTtlH7ifARa5Mc6cEFMsZmnGc0Tb8ZhSjcBax0X9hhY0WnXyF3ZwU?=
+ =?us-ascii?Q?s9xLQskaoPbYV7vXeG2GWmiYV5+9hrCEpmHZlyUZvcmRhte5uAqywSKRZMqc?=
+ =?us-ascii?Q?4FUTDA5c9+EVSrbjgT3WtA0+M4TKY+KCq0W0nJyr51f8T0DR2GJutMeL4eeq?=
+ =?us-ascii?Q?ydAPf0Yu1bX2LFXprlfCDAEtqEigMbAfwzrTCsoWb+EV2JoX4ui18OmGu/4Q?=
+ =?us-ascii?Q?xyrEeIC3Y0jY7ewfpFca8qBfLytjPl77KQKC5V3/RQlcCZGMGSEB46dHwv4x?=
+ =?us-ascii?Q?uHuvlKyLCoybMjjMPQrgxyFEV3XEZfzoCgKxv53SDzbJ9Xk7AYG39R1jue0f?=
+ =?us-ascii?Q?kb5yow8e/6Vf/QFlFGWBLxPMymwx8rge/gBnbggBkH9gmRfF+dRJGqm8eQ2y?=
+ =?us-ascii?Q?uFYQhq07jUjMOY4zGmjjT3ISeZT5st83MFzKXmXMpbJ3jOyjw4gE9nc1A9Zt?=
+ =?us-ascii?Q?5AAE+vPfRGRdvlcMKrZtMH3OkREJdALXetTEC4ZaKbZLhqYTMb68eYF2aEZ9?=
+ =?us-ascii?Q?zvPvctQgys560w2TdDJvPa8ZnrkvdeMkKZiF9xGXfBuIgVYP6TcvwIpkWKiE?=
+ =?us-ascii?Q?VrcY8EZCIMCnQZJIX4AmJcUWVvAqy0o4o1PTOPjaVkL14ucdXJq3vUpJ4432?=
+ =?us-ascii?Q?Si7Ia1LBxz3jffkSYj/XKN5V1k0RujA/0U885mKVrGf1/WPbGXxPwuSIt+y/?=
+ =?us-ascii?Q?98C/0C5JOOicNUEr1wT+ot0Xc+10zF89g3FC+w7z0yUxQc4Mad4c1Hk2FTUx?=
+ =?us-ascii?Q?BYkhHgwTwWVNTEU+n7X55N8SqdmAmQoyNwNveq050ib+PeEwEUadZnclUtzX?=
+ =?us-ascii?Q?8S0WvVOS3GxTvw0tcCnS7W4PAXrFHomqNRKOz8/gqh4taXdfp1YcfGKwIr6u?=
+ =?us-ascii?Q?mldcYfxnIj5U7tc+BpagkAh8VvmLdFRt+3LoezKbdyyQ2vzIDEMvL9BxN6Mt?=
+ =?us-ascii?Q?uVgPkF+nBzU8n7vSiYn5JwY=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9eca2283-afac-4ca0-fff6-08da859657bf
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2022 06:03:19.2323 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VeH9axaXcvJ3XdIjzehy6d9bjNezPSHzGr4kSUoqReWWjT+DYFSBbBtRBlhLKpvYoujtyLZkHzzThrD7tW2fUbzvI8OBHhCXVzo0kQ8RRJHLN9+uiXOlU0TaeGpfFzQP
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB5914
+X-Mailman-Approved-At: Wed, 24 Aug 2022 11:52:40 -0400
+Cc: scott@os.amperecomputing.com, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ keyur@os.amperecomputing.com, gankulkarni@os.amperecomputing.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,37 +138,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Aug 24, 2022, Oliver Upton wrote:
-> Hi Sean,
-> 
-> On Wed, Aug 24, 2022 at 03:21:14AM +0000, Sean Christopherson wrote:
-> > +/*
-> > + * Sync a global pointer to the guest that has a per-VM value, in which case
-> > + * writes to the host copy of the "global" must be serialized (in case a test
-> > + * is being truly crazy and spawning multiple VMs concurrently).
-> > + */
-> 
-> Do we even care about writes to the host's copy of the global pointer?
-> I don't see how the host pointer is used beyond serializing writes into
-> a guest.
-> 
-> IOW, it looks as though we could skip the whole global illusion
-> altogether and write straight into guest memory.
+From: D Scott Phillips <scott@os.amperecomputing.com>
 
-*sigh*
+The timer emulation logic goes into an infinite loop when the NestedVM(L2)
+timer is being emulated.
 
-This exact thought crossed my mind when I first looked at this code, but somehow
-I couldn't come up with the obvious solution of using a temporary on-stack variable
-to hold the desired value.
+While the CPU is executing in L1 context, the L2 timers are emulated using
+host hrtimer. When the delta of cval and current time reaches zero, the
+vtimer interrupt is fired/forwarded to L2, however the emulation function
+in Host-Hypervisor(L0) is still restarting the hrtimer with an expiry time
+set to now, triggering hrtimer to fire immediately and resulting in a
+continuous trigger of hrtimer and endless looping in the timer emulation.
 
-Something like this should work.
+Adding a fix to avoid restarting of the hrtimer if the interrupt is
+already fired.
 
-#define write_guest_global(vm, g, val) ({			\
-	typeof(g) *_p = addr_gva2hva(vm, (vm_vaddr_t)&(g));	\
-	typeof(g) _val = val;					\
-								\
-	memcpy(_p, &(_val), sizeof(g));				\
-})
+Signed-off-by: D Scott Phillips <scott@os.amperecomputing.com>
+Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+---
+ arch/arm64/kvm/arch_timer.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 2371796b1ab5..27a6ec46803a 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -472,7 +472,8 @@ static void timer_emulate(struct arch_timer_context *ctx)
+ 		return;
+ 	}
+ 
+-	soft_timer_start(&ctx->hrtimer, kvm_timer_compute_delta(ctx));
++	if (!ctx->irq.level)
++		soft_timer_start(&ctx->hrtimer, kvm_timer_compute_delta(ctx));
+ }
+ 
+ static void timer_save_state(struct arch_timer_context *ctx)
+-- 
+2.33.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
