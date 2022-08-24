@@ -2,179 +2,89 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C60EC00140
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Aug 2022 17:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A520C3F6B0
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Aug 2022 20:57:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75A434D60C;
-	Wed, 24 Aug 2022 13:40:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 756E14D9C7;
+	Wed, 24 Aug 2022 16:57:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@armh.onmicrosoft.com
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@armh.onmicrosoft.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9KFHjh6nHPEA; Wed, 24 Aug 2022 13:40:42 -0400 (EDT)
+	with ESMTP id 77902nX4xWVJ; Wed, 24 Aug 2022 16:57:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30A484D610;
-	Wed, 24 Aug 2022 13:40:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 116084D9CB;
+	Wed, 24 Aug 2022 16:57:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E90A34D609
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 13:40:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A89E64D9C4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 16:57:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qdfJaNfl6nw7 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Aug 2022 13:40:39 -0400 (EDT)
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com
- (mail-eopbgr70058.outbound.protection.outlook.com [40.107.7.58])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 399ED4D60E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 13:40:39 -0400 (EDT)
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=pass;
- b=d2kiUOhrEHVnMnt91fUntzZyC2tcR92Sk0yAF4U04a5/6B7b9ykC3bHgNR9PeIzsD9c16XMJ6oIK5mP2NF943c+46fkTjqUAMV5gbgs8nMZ3Y7D8sQrAMojq5HJ+bAOkrVDSl3jqU9BMiDaQVM8ymBFKiblkLmCm4ZRubcngfYOmezn8MDzNiEv4gTBUzuChkSG7uiwY6Ot+EHnKbYKSwDGQ3PNNFrAFklaC8K2mkdy44+fPlwV+yPRFQduwb0HmuOUPgY/7H/BAcRRQ9HCQMQFFDer3HMOKhZaSoss7BuJgOPiHnFB0Nl9b08eBoDyjMqc750UnY7iiUve73eemZw==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+bM3NU/bL0nZHlk4kwrx+1jlhPFQOsK2oGf5febQz9M=;
- b=Oc8TZQyFzHMRX94uU2UMDFSsB0J7bUir4S4yFsiRM3ToO4j7wNMsIr52OhcLg5oQZC5VTC+HITDiqKUA6gifjdHxNTg0KY7zdLKRSb/+Unza/giash3/5uksr5E22JcJv2G8Ybjhke3aSvLQYxtyons1twJmJOoXTWINDthy7nPpttOJHHBNaeFtO6XFx15fbcd8BOrRiByZGuCxWUuLBdkVTV7Y0OO0AyPU7oPtUJL8RF55smPKTRkLhQ3xp13taj7zgQKx6plSiQlatulw/Q6tx1W/8bTW0o62MG9Yne9KczL4qKnZQZKSy1yEvZC1VXkR1TdBS0u1ahb2LND0Iw==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 63.35.35.123) smtp.rcpttodomain=lists.cs.columbia.edu smtp.mailfrom=arm.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
- dkim=pass (signature was verified) header.d=armh.onmicrosoft.com; arc=pass (0
- oda=1 ltdi=1 spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+bM3NU/bL0nZHlk4kwrx+1jlhPFQOsK2oGf5febQz9M=;
- b=E8K3tfgYR16XXoMvgyl8eGf1mu6pJ2Vz9SP6C7nWdksjoSj7j732oqSL2Vj4CEU+rU+th9Ur/xboM3IftsX6vKHQKzNHZixk97Ndw3fPO+DBSRHe3gDhYXjaTWStxU+gZKMfmN51iZwyFrd8RetdBk7zmPObkn3sX7IDczlzJLM=
-Received: from AM6P192CA0093.EURP192.PROD.OUTLOOK.COM (2603:10a6:209:8d::34)
- by HE1PR0802MB2300.eurprd08.prod.outlook.com (2603:10a6:3:c5::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5546.18; Wed, 24 Aug
- 2022 17:40:34 +0000
-Received: from VE1EUR03FT032.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:209:8d:cafe::60) by AM6P192CA0093.outlook.office365.com
- (2603:10a6:209:8d::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15 via Frontend
- Transport; Wed, 24 Aug 2022 17:40:33 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
- pr=C
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- VE1EUR03FT032.mail.protection.outlook.com (10.152.18.121) with
- Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5566.15 via Frontend Transport; Wed, 24 Aug 2022 17:40:32 +0000
-Received: ("Tessian outbound fa99bf31ee7d:v123");
- Wed, 24 Aug 2022 17:40:31 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: 02f4580d91b07a39
-X-CR-MTA-TID: 64aa7808
-Received: from f1ec42e7c881.2
- by 64aa7808-outbound-1.mta.getcheckrecipient.com id
- 3F56B78B-D386-4307-B5DF-E9B104D80ED6.1; 
- Wed, 24 Aug 2022 17:40:20 +0000
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com
- by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id f1ec42e7c881.2
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
- Wed, 24 Aug 2022 17:40:20 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lRBOlOmDwH3O7fbFwOcMejMebPsCsh4rDBsyhg1z+X7oXGu07BA9cHk/JQcj2WdJ5nDhKhX+ivXnztT7aX1xy2Q6mWYgwwFg/UOfsBKeeyWvetS+c1Vww3gJ4yqrzbB2HJHIO359JkayWA+Wya7q1mFx3ryzAH9tsCbOUyxlMCU8bet3zmL0Tk7hfY8JHn90CPG5wvtskxrdG3U7nScoKmhkoFq8uQjnnIKVA4hyZtbM+MCPLaD3qoNWk5HEujoutlXy49JNdozlkPjDCiBT5aEtsJc8qrXY4WmQpfx9cL9KlrfFmyEgPDeJnZyZ+6X/hFDUTe+duG++W+81rpky0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+bM3NU/bL0nZHlk4kwrx+1jlhPFQOsK2oGf5febQz9M=;
- b=YqaKnTu6Q0CONrNktIpGGi/fKlIxeFj5SMvWhR0Neyk97oFjmZRKrRqPJfZY0Gzf+OIz6ErL1lAgkE9Dsa+Vut7HG9TO7kror2SAAJoShPzFDmyau1HESKQVztK0BQq8jTZRR4hEGvytzPtye7XDJ2BKDOGlUhcmxhOABnuFKiJWAD9KDvin90c+LMFfkt0NSvrZ9nTPzADR+ca7o48/YhAtDjXPxpjlGOkhdysEXZpQqoISx1FFesRTY9k4BTqt0cUHKMB8KT80Xg4Ul+LhVXSmZjN5i4FlQsgfjg9NMSZ6GS3FC160S4wJDznWXbhPLtev6m+JXnTfoa2Kx2EhpA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+bM3NU/bL0nZHlk4kwrx+1jlhPFQOsK2oGf5febQz9M=;
- b=E8K3tfgYR16XXoMvgyl8eGf1mu6pJ2Vz9SP6C7nWdksjoSj7j732oqSL2Vj4CEU+rU+th9Ur/xboM3IftsX6vKHQKzNHZixk97Ndw3fPO+DBSRHe3gDhYXjaTWStxU+gZKMfmN51iZwyFrd8RetdBk7zmPObkn3sX7IDczlzJLM=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from AS8PR08MB6995.eurprd08.prod.outlook.com (2603:10a6:20b:34d::13)
- by AM9PR08MB6997.eurprd08.prod.outlook.com (2603:10a6:20b:418::17)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15; Wed, 24 Aug
- 2022 17:40:17 +0000
-Received: from AS8PR08MB6995.eurprd08.prod.outlook.com
- ([fe80::bc0f:339f:d2d4:e559]) by AS8PR08MB6995.eurprd08.prod.outlook.com
- ([fe80::bc0f:339f:d2d4:e559%4]) with mapi id 15.20.5546.024; Wed, 24 Aug 2022
- 17:40:17 +0000
-Message-ID: <69b50235-b77d-5310-2cc6-040f936b8864@arm.com>
-Date: Wed, 24 Aug 2022 18:40:13 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.1.2
-Subject: Re: [PATCH v7 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
- page table uses.
-Content-Language: en-US
-To: Yosry Ahmed <yosryahmed@google.com>
-References: <20220823004639.2387269-1-yosryahmed@google.com>
- <20220823004639.2387269-2-yosryahmed@google.com>
- <5ac13c91-0e42-533b-42d0-c78573c7aef3@arm.com>
- <CAJD7tkbn7mFvf0oiUKPZtu92GtuMht-s5iPBRfEuUfTxXC_j8Q@mail.gmail.com>
-From: Ryan Roberts <ryan.roberts@arm.com>
-In-Reply-To: <CAJD7tkbn7mFvf0oiUKPZtu92GtuMht-s5iPBRfEuUfTxXC_j8Q@mail.gmail.com>
-X-ClientProxiedBy: LO6P265CA0022.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2ff::17) To AS8PR08MB6995.eurprd08.prod.outlook.com
- (2603:10a6:20b:34d::13)
-MIME-Version: 1.0
-X-MS-Office365-Filtering-Correlation-Id: c148d09b-d9d7-4c47-db8a-08da85f7bed0
-X-MS-TrafficTypeDiagnostic: AM9PR08MB6997:EE_|VE1EUR03FT032:EE_|HE1PR0802MB2300:EE_
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original: 7G6m6EeEYKRlZaosUmCJht9vP9OlW5WbdQ3sai/Bhhh1YH0P8E4JGYPVm0ogJom5ZuaHPLXsWtcZ0mdsswl8IwV1awGTP5KzORs3kz4T2C8/E3lsjFQmvYD8o0ksdQAO7kNWMb4U9ayGEBdg6aAklUUtPza2plHxn2IRoLU03vYdXgHYHY8mLuFy/E31pew0WGBDtOo1phOhh/LjD5Otkc7Hv0IiLccWcAfQCQeFuTTyUSn0Pjvl1BmNT+PwibmzXdY5mZLD8q9Rpk+EsOw4QwBLqxcex813xEUWb4B0KU4eF8KJtO9bsC12v8sg99sv/tMhMt7kTBXjxVzupd8llzr39orYVLHta/65/nAE1fisDADLlzpn90lWaXLdRwHcA9OSV8mEcR0oSgaZ0aF6XrvWDpJbDCgpL2AMds3Ynrs0JQLHVU/TWr8ujLRO/wmtMYsOc3APLbv6hrEilHJH7H/4lA28bFUacOlFwt10R0gzfcmdmppjsUQgOTvwOV/3FG7X6HT9OyKK7EMFefd7IPmwPLrddaPtnJW7wgLVWVhwJ8FIrCdu+d7NO7vWgLZxlRAMWCl1bKh1YbXsGr8zmb25Z8wS0/5LTyPN+v2D7djlgNmIKthAvE+gJeQcAkfK6ZEHQUaOvqOmjxvUJFp8HKH3qpu/+6VWgLICF17SCN0O9w9II+fQDXdZ0aPvTDYdvJmbS+u09NOpl04ORJ1j3lvNb5kOFR6oCfDj6gOHInb0K0K8Jj9bwkG6dI8NiukgUDcM20wOp2FYot3INvSYK+qdByoLZM/M771XsA+F3r0=
-X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255; CTRY:; LANG:en;
- SCL:1; SRV:; IPV:NLI; SFV:NSPM; H:AS8PR08MB6995.eurprd08.prod.outlook.com;
- PTR:; CAT:NONE;
- SFS:(13230016)(4636009)(39860400002)(396003)(346002)(366004)(136003)(376002)(8936002)(6916009)(2616005)(316002)(41300700001)(83380400001)(44832011)(36756003)(38100700002)(31686004)(186003)(54906003)(8676002)(66556008)(66946007)(4326008)(478600001)(6506007)(6666004)(53546011)(31696002)(2906002)(7416002)(5660300002)(66476007)(6512007)(6486002)(26005)(86362001)(43740500002)(45980500001);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR08MB6997
-Original-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped: VE1EUR03FT032.eop-EUR03.prod.protection.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs: b1ae2a65-6c02-492f-cec1-08da85f7b489
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hilBFbK8XmZlN8bKt7FcqYqYBJNNLtSXkrf6nRlXg8MSgH8rHKUlae+CdZrZe6A9MAXTk1xdVPqQMlgHfgEYJst5LJ/cDBw8ymFy64o4u8s6rkJoGOKx0jJZEmE/b53jSxUKqZhWkAFpsRD/o3JuXPnzghCNI4ICkq6zMnjMGNdsRrltNFPsAbteYYW/9h4OnoXo2JMzFz+Uq79iHvdYoVRFTzWvO1zKxltLBgXTWtZ1sBT1lGn76BsfRamYrgeTbj8WoGi2Z+Dt6sGBY+r91xp5j3P4ojQU3lfknZ9e4+gLQAHIyS8gXfCrN6+EH+Y8p8XAKvMxDpV4hAdsBZLxQEBnRVnxXoaevSfIlAR8XzIdxX6MXGnaHhIvfT/gnFeOTrnohqeVF3Qzd1TbYnuBmdGtntIDGir1DXtBIxVP8rCadunqM2DA1tK3ew9kr57TuR6YsVxn5+Cci+asAtmGCFfMVCGxOid9s7iklQD6F7SuQ1CpCPux9b4imEMIiHXaBvqYypQilMrzDMtWPpRpyL4KuAAn561Hg+GlJ7fW2O0M7SGrDkS6dPIkCVGTrEQCBuVEcRXo64fW2f1sXkbRzY1pMY2zGNWkRd6OfYinpMqmeeUxz3ZrEpUk8gIXDjOR1zr7aIwp/u/7WxfPe7keRsbKuw904L8Nno/T/AUMfjuI8Ho8ZbfIse8h4qB2QGo21PMhG5HtbU4Mo2kdVAQT2MltvT9ehNV2Uy7t4g70goVSpJKdV+5BQs8okL9rCC5nAWgntFZzTXT3KMiuFOBCyKEvfNlq77D0lqwXl6zBevJDszwxJKepoA87rwvAE9sC
-X-Forefront-Antispam-Report: CIP:63.35.35.123; CTRY:IE; LANG:en; SCL:1; SRV:;
- IPV:CAL; SFV:NSPM; H:64aa7808-outbound-1.mta.getcheckrecipient.com;
- PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com; CAT:NONE;
- SFS:(13230016)(4636009)(376002)(346002)(39860400002)(396003)(136003)(40470700004)(36840700001)(46966006)(36860700001)(36756003)(82740400003)(316002)(4326008)(70206006)(8676002)(70586007)(81166007)(31696002)(356005)(86362001)(31686004)(53546011)(6486002)(83380400001)(2616005)(41300700001)(186003)(336012)(26005)(6506007)(6512007)(478600001)(6666004)(40460700003)(54906003)(40480700001)(82310400005)(2906002)(5660300002)(47076005)(8936002)(44832011)(6862004)(43740500002);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2022 17:40:32.9993 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c148d09b-d9d7-4c47-db8a-08da85f7bed0
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d; Ip=[63.35.35.123];
- Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource: VE1EUR03FT032.eop-EUR03.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2300
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Roman Gushchin <roman.gushchin@linux.dev>, Michal Hocko <mhocko@kernel.org>,
- Shaoqin <shaoqin.huang@intel.com>, Linux-MM <linux-mm@kvack.org>,
- Zefan Li <lizefan.x@bytedance.com>, kvmarm@lists.cs.columbia.edu,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Shakeel Butt <shakeelb@google.com>, Cgroups <cgroups@vger.kernel.org>,
- nd@arm.com, Huang@google.com, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, Andrew Morton <akpm@linux-foundation.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, Tejun Heo <tj@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+ with ESMTP id df+0tZ91c-lP for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Aug 2022 16:57:19 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 451B04D9C5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 16:57:19 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id C0249B826B7;
+ Wed, 24 Aug 2022 20:57:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E7E5C433D6;
+ Wed, 24 Aug 2022 20:57:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1661374636;
+ bh=qM0hODjskpwb8x7NIPhJ6OvYS94mu8gyRtyJsdL5qbc=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=WKWbhn9ebHbZ2iDprTkgAxT0HGOGVyijsRF2LE8IUHP7lZK/KRbPBixXcC6IMyQ/o
+ IiWahFF8wh+Of+babvKKdHCxBt/nrCu30JKP94TZkTDUprcFCLN1dYa3XtehR+fmHA
+ /S4DR1i/6njbLlr/PyQRJ1eiA/dkz6Z808gZSZyGwoMyWwm42hAnE1rhEEl1NP9CIL
+ Tnou1IeIhBIzmu3HtFyRuEvTbxEg1PIaM6UzVthy3jp6ROfmJRpTSFQHGS7aDEYA3k
+ gEVg14UNCy9692EJv7aPsTsvuPiawl/cUTzj46qSd6xFAT71gXhD8QGNy9tXKAgTJd
+ zVlmsMZSUyZwg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oQxR4-005Wpl-4q;
+ Wed, 24 Aug 2022 21:57:14 +0100
+Date: Wed, 24 Aug 2022 21:57:13 +0100
+Message-ID: <877d2xweae.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v1 1/5] KVM: arm64: Enable ring-based dirty memory tracking
+In-Reply-To: <YwZQHqS5DZBloYPZ@xz-m1.local>
+References: <87lerkwtm5.wl-maz@kernel.org>
+ <41fb5a1f-29a9-e6bb-9fab-4c83a2a8fce5@redhat.com>
+ <87fshovtu0.wl-maz@kernel.org>
+ <171d0159-4698-354b-8b2f-49d920d03b1b@redhat.com>
+ <YwTc++Lz6lh3aR4F@xz-m1.local> <87bksawz0w.wl-maz@kernel.org>
+ <YwVEoM1pj2MPCELp@xz-m1.local> <878rnewpaw.wl-maz@kernel.org>
+ <YwVgaGp3HOGzC8k2@xz-m1.local> <87y1vdr98o.wl-maz@kernel.org>
+ <YwZQHqS5DZBloYPZ@xz-m1.local>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: peterx@redhat.com, gshan@redhat.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
+ james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org,
+ shuah@kernel.org, seanjc@google.com, dmatlack@google.com, bgardon@google.com,
+ ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
+ linux-kselftest@vger.kernel.org, bgardon@google.com, shuah@kernel.org,
+ kvmarm@lists.cs.columbia.edu, corbet@lwn.net, will@kernel.org,
+ shan.gavin@gmail.com, zhenyzha@redhat.com, dmatlack@google.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -186,58 +96,135 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 24/08/2022 18:25, Yosry Ahmed wrote:
-> On Wed, Aug 24, 2022 at 6:42 AM Ryan Roberts <ryan.roberts@arm.com> wrote:
->>
->>> diff --git a/Documentation/filesystems/proc.rst b/Documentation/filesystems/proc.rst
->>> index e7aafc82be99..898c99eae8e4 100644
->>> --- a/Documentation/filesystems/proc.rst
->>> +++ b/Documentation/filesystems/proc.rst
->>> @@ -982,6 +982,7 @@ Example output. You may not have all of these fields.
->>>        SUnreclaim:       142336 kB
->>>        KernelStack:       11168 kB
->>>        PageTables:        20540 kB
->>> +    SecPageTables:         0 kB
->>>        NFS_Unstable:          0 kB
->>>        Bounce:                0 kB
->>>        WritebackTmp:          0 kB
->>> @@ -1090,6 +1091,9 @@ KernelStack
->>>                  Memory consumed by the kernel stacks of all tasks
->>>    PageTables
->>>                  Memory consumed by userspace page tables
->>> +SecPageTables
->>> +              Memory consumed by secondary page tables, this currently
->>> +              currently includes KVM mmu allocations on x86 and arm64.
->>
->> nit: I think you have a typo here: "currently currently".
+On Wed, 24 Aug 2022 17:21:50 +0100,
+Peter Xu <peterx@redhat.com> wrote:
 > 
-> Sorry I missed this, thanks for catching it. The below diff fixes it
-> (let me know if I need to send v8 for this, hopefully not).
+> On Wed, Aug 24, 2022 at 03:45:11PM +0100, Marc Zyngier wrote:
+> > On Wed, 24 Aug 2022 00:19:04 +0100,
+> > Peter Xu <peterx@redhat.com> wrote:
+> > > 
+> > > On Tue, Aug 23, 2022 at 11:47:03PM +0100, Marc Zyngier wrote:
+> > > > Atomicity doesn't guarantee ordering, unfortunately.
+> > > 
+> > > Right, sorry to be misleading.  The "atomicity" part I was trying to say
+> > > the kernel will always see consistent update on the fields.
+> > >
+> > > The ordering should also be guaranteed, because things must happen with
+> > > below sequence:
+> > > 
+> > >   (1) kernel publish dirty GFN data (slot, offset)
+> > >   (2) kernel publish dirty GFN flag (set to DIRTY)
+> > >   (3) user sees DIRTY, collects (slots, offset)
+> > >   (4) user sets it to RESET
+> > >   (5) kernel reads RESET
+> > 
+> > Maybe. Maybe not. The reset could well be sitting in the CPU write
+> > buffer for as long as it wants and not be seen by the kernel if the
+> > read occurs on another CPU. And that's the crucial bit: single-CPU is
+> > fine, but cross CPU isn't. Unfortunately, the userspace API is per-CPU
+> > on collection, and global on reset (this seems like a bad decision,
+> > but it is too late to fix this).
 > 
-> diff --git a/Documentation/filesystems/proc.rst
-> b/Documentation/filesystems/proc.rst
-> index 898c99eae8e4..0b3778ec12e1 100644
-> --- a/Documentation/filesystems/proc.rst
-> +++ b/Documentation/filesystems/proc.rst
-> @@ -1093,7 +1093,7 @@ PageTables
->                 Memory consumed by userspace page tables
->   SecPageTables
->                 Memory consumed by secondary page tables, this currently
-> -              currently includes KVM mmu allocations on x86 and arm64.
-> +              includes KVM mmu allocations on x86 and arm64.
->   NFS_Unstable
->                 Always zero. Previous counted pages which had been written to
->                 the server, but has not been committed to stable storage.
+> Regarding the last statement, that's something I had question too and
+> discussed with Paolo, even though at that time it's not a outcome of
+> discussing memory ordering issues.
 > 
+> IIUC the initial design was trying to avoid tlb flush flood when vcpu
+> number is large (each RESET per ring even for one page will need all vcpus
+> to flush, so O(N^2) flushing needed). With global RESET it's O(N).  So
+> it's kind of a trade-off, and indeed until now I'm not sure which one is
+> better.  E.g., with per-ring reset, we can have locality too in userspace,
+> e.g. the vcpu thread might be able to recycle without holding global locks.
 
-Looks good to me!
+I don't get that. On x86, each CPU must perform the TLB invalidation
+(there is an IPI for that). So whether you do a per-CPU scan of the
+ring or a global scan is irrelevant: each entry you find in any of the
+rings must result in a global invalidation, since you've updated the
+PTE to make the page RO.
 
+The same is true on ARM, except that the broadcast is done in HW
+instead of being tracked in SW.
 
+Buy anyway, this is all moot. The API is what it is, and it isn't
+going to change any time soon. All we can do is add some
+clarifications to the API for the more relaxed architectures, and make
+sure the kernel behaves accordingly.
+
+[...]
+
+> > It may be safe, but it isn't what the userspace API promises.
+> 
+> The document says:
+> 
+>   After processing one or more entries in the ring buffer, userspace calls
+>   the VM ioctl KVM_RESET_DIRTY_RINGS to notify the kernel about it, so that
+>   the kernel will reprotect those collected GFNs.  Therefore, the ioctl
+>   must be called *before* reading the content of the dirty pages.
+> 
+> I'd say it's not an explicit promise, but I think I agree with you that at
+> least it's unclear on the behavior.
+
+This is the least problematic part of the documentation. The bit I
+literally choke on is this:
+
+<quote>
+It's not necessary for userspace to harvest the all dirty GFNs at once.
+However it must collect the dirty GFNs in sequence, i.e., the userspace
+program cannot skip one dirty GFN to collect the one next to it.
+</quote>
+
+This is the core of the issue. Without ordering rules, the consumer on
+the other side cannot observe the updates correctly, even if userspace
+follows the above to the letter. Of course, the kernel itself must do
+the right thing (I guess it amounts to the kernel doing a
+load-acquire, and userspace doing a store-release -- effectively
+emulating x86...).
+
+> Since we have a global recycle mechanism, most likely the app (e.g. current
+> qemu impl) will use the same thread to collect/reset dirty GFNs, and
+> trigger the RESET ioctl().  In that case it's safe, IIUC, because no
+> cross-core ops.
+> 
+> QEMU even guarantees this by checking it (kvm_dirty_ring_reap_locked):
+> 
+>     if (total) {
+>         ret = kvm_vm_ioctl(s, KVM_RESET_DIRTY_RINGS);
+>         assert(ret == total);
+>     }
+> 
+> I think the assert() should never trigger as mentioned above.  But ideally
+> maybe it should just be a loop until cleared gfns match total.
+
+Right. If userspace calls the ioctl on every vcpu, then things should
+work correctly. It is only that the overhead is higher than what it
+should be if multiple vcpus perform a reset at the same time.
+
+>
+> > In other words, without further straightening of the API, this doesn't
+> > work as expected on relaxed memory architectures. So before this gets
+> > enabled on arm64, this whole ordering issue must be addressed.
+> 
+> How about adding some more documentation for KVM_RESET_DIRTY_RINGS on the
+> possibility of recycling partial of the pages, especially when collection
+> and the ioctl() aren't done from the same thread?
+
+I'd rather tell people about the ordering rules. That will come at
+zero cost on x86.
+
+> Any suggestions will be greatly welcomed.
+
+I'll write a couple of patch when I get the time, most likely next
+week. Gavin will hopefully be able to take them as part of his series.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
