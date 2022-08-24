@@ -2,126 +2,99 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAD25C32793
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Aug 2022 15:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB7EC3F6B0
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Aug 2022 16:22:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 582214D324;
-	Wed, 24 Aug 2022 11:52:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2034E4D385;
+	Wed, 24 Aug 2022 12:22:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@os.amperecomputing.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SYbYyB4locjv; Wed, 24 Aug 2022 11:52:45 -0400 (EDT)
+	with ESMTP id gA9ZHXxkOm4j; Wed, 24 Aug 2022 12:21:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CE734D30B;
-	Wed, 24 Aug 2022 11:52:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B9B24D389;
+	Wed, 24 Aug 2022 12:21:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2252A4C013
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 02:03:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BCA014D386
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 12:21:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aE0OqH2CFfEl for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Aug 2022 02:03:22 -0400 (EDT)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com
- (mail-dm6nam10on2119.outbound.protection.outlook.com [40.107.93.119])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E3EFC4C01B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 02:03:22 -0400 (EDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WGln9/1HLdh9uEIyJLUUiNmtoVxiluhWXep8oGnfy67jOQgvGqB801OEPYeMtmaTN54nWhoZ1Ro9VBb+Qb+LY3PRQ/uwg1e4LjuYkNVyIOrw2IAeTGJSvVItSdX32pmN5j19fJSHcWoieOEiyZd2BZeXKwsE7ZprjeTq9ErxWLqgWCtjjpT3egc4Hql3KhZNi717C5XXsiwzp3/OL1R7G9wusM/jDN/PuEVmmANt9amP3io+VrRvRhKafvS1UYJMRQPq/Bwd8kH3f9ga3pJkVn+u2LJWpFhQMTbjiQrFiwcQESkOZZvD4OTgC5CT1QEPbKG5+ej8NQlGSslBRBn/7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hMNZhh3Q+Q0iINSFvyTaXjao3sluRWLjEuNBAJmNGF8=;
- b=mqpf562uEujZ49T1lQN82f9lydOR8ZVuf7kSyYMt1K3aACF4wfZqwkOak8hmKB6iTNJ9bjTd9QWviLlFeANGerE8Min1V3hXxDCn24RuWwQ6soHzamkOqmsDTLGPgUNh2NPS/GGZw6kqurQ6DwRVIan8XYS/jcLo4zPVqAjTGGbGMR/DtG4dNwdNBkMXK7lhAC0z7qsHXAMAcPSbd3aK4cwJdGlDPSB2gQbCgR22ngWoq3oKUYe3CpX+3Q9r9MCF1GP6AeAooqxp8m+TSkOLZBIGv7MwQTt6Ka6SG2WHYMDo0TQD22BJL5MfS6kG5Yifcrjda+V5DFZApCfMWeyxRg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hMNZhh3Q+Q0iINSFvyTaXjao3sluRWLjEuNBAJmNGF8=;
- b=SwWpCuZQ/pctoRy56Pez600kX6AHkJud5rnRVMzjt1KQkjBRCLsB+HQYo00FPDYgcxn5juL76rWl7TVcZh6upWZRMq7v+mRKjUxyu917xzLkwqR/qhthI2XtWjUy9qssOCSzM1HklUQzen4YroLOBnqjTlRYaND1Zb1DqS8/Bzg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- DM6PR01MB5914.prod.exchangelabs.com (2603:10b6:5:14f::31) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5546.21; Wed, 24 Aug 2022 06:03:21 +0000
-Received: from DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::7058:9dd4:aa01:614a]) by DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::7058:9dd4:aa01:614a%4]) with mapi id 15.20.5546.022; Wed, 24 Aug 2022
- 06:03:21 +0000
-From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-To: maz@kernel.org
-Subject: [PATCH 3/3] KVM: arm64: nv: Avoid block mapping if max_map_size is
- smaller than block size.
-Date: Tue, 23 Aug 2022 23:03:04 -0700
-Message-Id: <20220824060304.21128-4-gankulkarni@os.amperecomputing.com>
-X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
-References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
-X-ClientProxiedBy: CH0P220CA0030.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:610:ef::28) To DM8PR01MB6824.prod.exchangelabs.com
- (2603:10b6:8:23::24)
+ with ESMTP id IC6hlTMSjCYZ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Aug 2022 12:21:55 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 27B8E4D37E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 12:21:55 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1661358114;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=wANo/GHMzT757gDMJMmO8LCL5UwXYQqWDiktVytCe74=;
+ b=RepuPA19xx/FYFN2icnJu86XH+5zf8pEUw5T9OhIDmtUGwJk6NLZ0RkAIfvLbKmmZqr6Iq
+ ntfQpGlrN3lF1vOgF9+/0IWp87z7C6ghDaVe1IuC5Toyi9DOjbQ9J4BxHe9EbpHhSzTXMi
+ EnzDKWiQj5pjVt8roLBIx6zcGw+PvT0=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-70-cKWaWAW7OaafWu-n1AryGA-1; Wed, 24 Aug 2022 12:21:53 -0400
+X-MC-Unique: cKWaWAW7OaafWu-n1AryGA-1
+Received: by mail-qv1-f69.google.com with SMTP id
+ n17-20020ad444b1000000b00496d5b41d37so6276562qvt.6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Aug 2022 09:21:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+ bh=wANo/GHMzT757gDMJMmO8LCL5UwXYQqWDiktVytCe74=;
+ b=k7I+wQuMg1oPtFEJdGHRhB8ArbQemQOMq5HteTctC/ouNJAJ5ddC6+4fpd/E9iay6n
+ V65joNVA3nQGCioMO9ize1YbdcNNjmnFZQlVEV0DXF8dP2S1ABGXLKNbujcm8kchNe6R
+ aFu6Tp+4xrwvtHKYSxlB2Kh2I/RYQEP2815N039vSBQLe8axwHgendbDRE0IPOw9/2BT
+ 1jQqR2Dv3lTqRvG3AFYn1UPfLUiSAr69DHRokphrvQueN4+SrO/k6f4W2kMDX9KtBotP
+ pGQr507eL14lZWy/DrYvEIOB+Xf1LGP+RweAc28pMQjibtPA+zHW5cyQTjwyuVyrfe7r
+ 8kRw==
+X-Gm-Message-State: ACgBeo1081ap0xaPOaeiC5+hnMCiiEZZ7wtjcVbncLfhdb1rUJKWT6On
+ 7nbzgKdQz7RXPPm+i0v8CEE5sUHBXk1afn1isJ9LI6/JBXRHYwKz6Pjgzs2tFcHPcZclxROKiWd
+ LcLJ5sTm2nJUvGP4cIPHBQfIQ
+X-Received: by 2002:a05:6214:d86:b0:496:e991:c4a9 with SMTP id
+ e6-20020a0562140d8600b00496e991c4a9mr12630953qve.129.1661358113253; 
+ Wed, 24 Aug 2022 09:21:53 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6Qvk99CLgme2nXiMZvw3XJHeABpevFZgbSFRX695IhCdFipklBVIAy26zO9TEdi8UNpCj9Zg==
+X-Received: by 2002:a05:6214:d86:b0:496:e991:c4a9 with SMTP id
+ e6-20020a0562140d8600b00496e991c4a9mr12630908qve.129.1661358112949; 
+ Wed, 24 Aug 2022 09:21:52 -0700 (PDT)
+Received: from xz-m1.local
+ (bras-base-aurron9127w-grc-35-70-27-3-10.dsl.bell.ca. [70.27.3.10])
+ by smtp.gmail.com with ESMTPSA id
+ j4-20020a05620a0a4400b006b905e003a4sm15116119qka.135.2022.08.24.09.21.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 24 Aug 2022 09:21:52 -0700 (PDT)
+Date: Wed, 24 Aug 2022 12:21:50 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v1 1/5] KVM: arm64: Enable ring-based dirty memory tracking
+Message-ID: <YwZQHqS5DZBloYPZ@xz-m1.local>
+References: <87lerkwtm5.wl-maz@kernel.org>
+ <41fb5a1f-29a9-e6bb-9fab-4c83a2a8fce5@redhat.com>
+ <87fshovtu0.wl-maz@kernel.org>
+ <171d0159-4698-354b-8b2f-49d920d03b1b@redhat.com>
+ <YwTc++Lz6lh3aR4F@xz-m1.local> <87bksawz0w.wl-maz@kernel.org>
+ <YwVEoM1pj2MPCELp@xz-m1.local> <878rnewpaw.wl-maz@kernel.org>
+ <YwVgaGp3HOGzC8k2@xz-m1.local> <87y1vdr98o.wl-maz@kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: dbd58d47-72c3-40da-9b9f-08da85965930
-X-MS-TrafficTypeDiagnostic: DM6PR01MB5914:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 67r2G2I86q1d6W+od5N1MJSw7uNSyD0kfrKxU81lC9HCVj/W7oJ87d4BeAcuWXD/lEcpVp9NpUdNHx/tXswpG6S9WgBHYp0DixIT2/ornRqPP2Z7cmH31J+TJg25TaKeNoNJ1QLb+HUAnNCFOmafNkBulta2x5JehEM+hv4MUMQIFG1L00Bexi6MU/GN34331kCD4tL0TK2Plt6SxwKriTk0qUhhLfqvpjTr5pPrWTgXLCfH7RjjfOoqs/8ysUavGZ80Bzgx9dcG1El2K4I3CQ6fK5BRqLcFLX5kQDA6c2n+3GqvJtKZzDjIoALC20lNnS9KRjP11XpAIUqO7feObqyHMm593pWu+A1IfYBryflGOnLLyZ2pGCrX7NCjwHPjYwkEVIbbcMLfaGXEllTaenqP2PknxHXnymtbp+tdJVjHy9l6/YsF3eK6ZQvnNjIERM6LKS0SD2h1w9UXsXRRcJreWgDITH/auL2aDxx8AgspUhTM1P8UtaA5M6KtJV+e37iSC3ajhOTeX4PDxfLtom8739FCxFtRFz6qfFgeVWnKUt9EY3QBzZjobFAAVIIBGLC7CqHl+yBpLB3HtxDPgRyoCpqjREhTu7NIcQG6nabuOfPAfi0qzCu1FTR6pZYe2AVzYwdkK9JtlAHHBHCGm4NiPybNoFepbD1FVsTQ8ZOnumxjBeLPDdWT1jKrMkNAzYgltUJxsTskDbTJinLAQwbMoIP460fdlSFGyvNnmTG0Lw6rPPGws3witbKaovYKNwi8x1d/Fq/fnxCh4laCuA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DM8PR01MB6824.prod.exchangelabs.com; PTR:; CAT:NONE;
- SFS:(13230016)(4636009)(366004)(39850400004)(396003)(376002)(136003)(346002)(86362001)(38100700002)(38350700002)(6916009)(316002)(2906002)(8676002)(4326008)(66946007)(66556008)(8936002)(66476007)(5660300002)(2616005)(1076003)(41300700001)(478600001)(6512007)(186003)(26005)(107886003)(6666004)(52116002)(6506007)(6486002)(83380400001);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?JFXaUH0xGB98h60Qgs24NDf871Q6jUUiRgKLYBBoaeF5SoDVShjhcC6J7RqE?=
- =?us-ascii?Q?JDcm8Ci8jPF2q2fY7jbDdUPfrrlrfSkBcXC2D6EozfCIzMbpW+mA/A8GqeVt?=
- =?us-ascii?Q?tKfgR29OEAjsUhyf5djm7gZe7FUzSXl9HvVDJ06LQXZCu4qmxKiKViCm+N75?=
- =?us-ascii?Q?DzQ5HJOheGhU4bu151ljq1wLZIX4d4P6Dy8UjIu7dwaqHgJ0M7tOa8zevkB3?=
- =?us-ascii?Q?kw4nSlj7Iob/J6qbVgKcUDdqjvOAKPWxJBIL/Fy3kZ/NJJn1MwtXEGE7huWr?=
- =?us-ascii?Q?yrV14H/sTdUOyS7sY039kYb8bJA0waf4Vr5CDTPBeez4rdmY6F97v8bkzJOo?=
- =?us-ascii?Q?Ix48/77BhcSd1inEp32/4FgqegvYfochQylPYNGc5JNfZU3RXFKpIeKDAHHU?=
- =?us-ascii?Q?26GW+EAKyumerJj72K361AWk6rt/AHlBYh7A4QzTvxg0gqI/v0IafXeYIcyR?=
- =?us-ascii?Q?8bGawRDUFqoetQ6siFMGG9ZSC4jygIwZ5/CciQd1gQUgNuGNfiVsYbaaUByO?=
- =?us-ascii?Q?cwjmAmVW+dTCQkZ4IQUVIAGITE6kBIRD3yTsccSIL3DLdceDEGbgujk3nWFA?=
- =?us-ascii?Q?GGWOGBvWaog98jOvyqk5TFtNL2RkOx2u8zZ01mw3bwqnWjdoqoY4NdBLKCsv?=
- =?us-ascii?Q?EiUoQJe5TVDl3nTexP6oRHqg3YTVCRpOduKkoVQWvaAC1SkXsK4fnvkgTs8W?=
- =?us-ascii?Q?TKE85K2WwlD8IOy2ZXZElWnG54uJ5G6MO35mN7GYpL+XpMvwQkXc+u0Ihv4k?=
- =?us-ascii?Q?mCfsRnssGeK4YqFaSsjXneG8SPRQpQKJ4Uxt5AqIa1anxCYMtvG986ADJuxm?=
- =?us-ascii?Q?TSQ2hRkT0XnoDQ7Y0/NhY2bKaXKOVhMrLyDiQ+UuIiEtxDZ+ZfU/rfi1KQoc?=
- =?us-ascii?Q?fzhfG0SflW9/R7WT+6nGiLKlEBZd73jwHPxKh/jNKJdyXqw8VmbZHanPlvIW?=
- =?us-ascii?Q?GC4IaH1jHuB3KCdRqf1lxiFdONigDvK6yhUdKuQKtRTuXRMwzYcTALlCHEbr?=
- =?us-ascii?Q?8LaEUrNKoTb0qLbQjw9lC9q2rNgpKrtQA8GRtmA+YfY3H+T9FrR/0PkX7QzB?=
- =?us-ascii?Q?+UoKUOKmReoQIvJOhKbKvpx1wjP74/RzxZe3bziOQBkCyNYtY6KPDy4n8/0k?=
- =?us-ascii?Q?TCJgbMOUbq/lqxJJsj0SEPZ4ta7U7PukQt0hwzNQ8siWtLygoBvSZ9ghMu0s?=
- =?us-ascii?Q?FZEQtdyPsV2Gpvnv7pCQJn44pX1983fn5aPcieBhu99orQgEe/FU7HrJHRIK?=
- =?us-ascii?Q?nZmq38AQMUQyzc1Fjm+9+gyz5lzdu1cboKHRtk11O3bgYJ2qQRiqAjcAc/Ak?=
- =?us-ascii?Q?94RgT9XoL0WjAAzGmFqqymHqUPLtu28eI7iTxt8wFbun5G0uV9WZqv8lZymw?=
- =?us-ascii?Q?bP2bNx25/DtSUq11uCy0jR6kHM0ejqQ7Imd6wEVFb7B2tnuFOsiy4Ur9twnr?=
- =?us-ascii?Q?2QDRpqoMd+INVCPXSJdGyukmBabsfaLSeg5WVloeAGKFEYkXjDF0iYXSJp8h?=
- =?us-ascii?Q?N0NsfEZW49pJJ6wmO1/LPs900DtHFywEwQJBvqPwUQn649gPmfeTYIhZNtkT?=
- =?us-ascii?Q?VU2B8ViEk7GBmU8Av/CJZeCPnLSGkQQM77Gaxruzj7vr2Lg7Kz7JY3q5SfJ7?=
- =?us-ascii?Q?YA+ye9rsPt3S3yeOpcfF/XE=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dbd58d47-72c3-40da-9b9f-08da85965930
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2022 06:03:21.5386 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: riBuPikBVx9Qkrpes0FCPxANvte0s90Li4F4F0dO8r4hKKsiLwig+jfo4oIcIaQKs4Fs7RaV5ouadys83ly7UtSnOTCtfShfxVKcFvy9U1boOdjBurh85KlDDf/HR/P2
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB5914
-X-Mailman-Approved-At: Wed, 24 Aug 2022 11:52:40 -0400
-Cc: scott@os.amperecomputing.com, kvm@vger.kernel.org, catalin.marinas@arm.com,
- keyur@os.amperecomputing.com, gankulkarni@os.amperecomputing.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <87y1vdr98o.wl-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
+ linux-kselftest@vger.kernel.org, bgardon@google.com, shuah@kernel.org,
+ kvmarm@lists.cs.columbia.edu, corbet@lwn.net, will@kernel.org,
+ shan.gavin@gmail.com, zhenyzha@redhat.com, dmatlack@google.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -138,36 +111,202 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In NV case, Shadow stage 2 page table is created using host hypervisor
-page table configuration like page size, block size etc. Also, the shadow
-stage 2 table uses block level mapping if the Guest Hypervisor IPA is
-backed by the THP pages. However, this is resulting in illegal mapping of
-NestedVM IPA to Host Hypervisor PA, when Guest Hypervisor and Host
-hypervisor are configured with different pagesize.
+On Wed, Aug 24, 2022 at 03:45:11PM +0100, Marc Zyngier wrote:
+> On Wed, 24 Aug 2022 00:19:04 +0100,
+> Peter Xu <peterx@redhat.com> wrote:
+> > 
+> > On Tue, Aug 23, 2022 at 11:47:03PM +0100, Marc Zyngier wrote:
+> > > On Tue, 23 Aug 2022 22:20:32 +0100,
+> > > Peter Xu <peterx@redhat.com> wrote:
+> > > > 
+> > > > On Tue, Aug 23, 2022 at 08:17:03PM +0100, Marc Zyngier wrote:
+> > > > > I don't think we really need this check on the hot path. All we need
+> > > > > is to make the request sticky until userspace gets their act together
+> > > > > and consumes elements in the ring. Something like:
+> > > > > 
+> > > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > > > index 986cee6fbc7f..e8ed5e1af159 100644
+> > > > > --- a/arch/arm64/kvm/arm.c
+> > > > > +++ b/arch/arm64/kvm/arm.c
+> > > > > @@ -747,6 +747,14 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+> > > > >  
+> > > > >  		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+> > > > >  			return kvm_vcpu_suspend(vcpu);
+> > > > > +
+> > > > > +		if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
+> > > > > +		    kvm_dirty_ring_soft_full(vcpu)) {
+> > > > > +			kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
+> > > > > +			vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+> > > > > +			trace_kvm_dirty_ring_exit(vcpu);
+> > > > > +			return 0;
+> > > > > +		}
+> > > > >  	}
+> > > > >  
+> > > > >  	return 1;
+> > > > 
+> > > > Right, this seems working.  We can also use kvm_test_request() here.
+> > > > 
+> > > > > 
+> > > > > 
+> > > > > However, I'm a bit concerned by the reset side of things. It iterates
+> > > > > over the vcpus and expects the view of each ring to be consistent,
+> > > > > even if userspace is hacking at it from another CPU. For example, I
+> > > > > can't see what guarantees that the kernel observes the writes from
+> > > > > userspace in the order they are being performed (the documentation
+> > > > > provides no requirements other than "it must collect the dirty GFNs in
+> > > > > sequence", which doesn't mean much from an ordering perspective).
+> > > > > 
+> > > > > I can see that working on a strongly ordered architecture, but on
+> > > > > something as relaxed as ARM, the CPUs may^Wwill aggressively reorder
+> > > > > stuff that isn't explicitly ordered. I have the feeling that a CAS
+> > > > > operation on both sides would be enough, but someone who actually
+> > > > > understands how this works should have a look...
+> > > > 
+> > > > I definitely don't think I 100% understand all the ordering things since
+> > > > they're complicated.. but my understanding is that the reset procedure
+> > > > didn't need memory barrier (unlike pushing, where we have explicit wmb),
+> > > > because we assumed the userapp is not hostile so logically it should only
+> > > > modify the flags which is a 32bit field, assuming atomicity guaranteed.
+> > > 
+> > > Atomicity doesn't guarantee ordering, unfortunately.
+> > 
+> > Right, sorry to be misleading.  The "atomicity" part I was trying to say
+> > the kernel will always see consistent update on the fields.
+> >
+> > The ordering should also be guaranteed, because things must happen with
+> > below sequence:
+> > 
+> >   (1) kernel publish dirty GFN data (slot, offset)
+> >   (2) kernel publish dirty GFN flag (set to DIRTY)
+> >   (3) user sees DIRTY, collects (slots, offset)
+> >   (4) user sets it to RESET
+> >   (5) kernel reads RESET
+> 
+> Maybe. Maybe not. The reset could well be sitting in the CPU write
+> buffer for as long as it wants and not be seen by the kernel if the
+> read occurs on another CPU. And that's the crucial bit: single-CPU is
+> fine, but cross CPU isn't. Unfortunately, the userspace API is per-CPU
+> on collection, and global on reset (this seems like a bad decision,
+> but it is too late to fix this).
 
-Adding fix to avoid block level mapping in stage 2 mapping if
-max_map_size is smaller than the block size.
+Regarding the last statement, that's something I had question too and
+discussed with Paolo, even though at that time it's not a outcome of
+discussing memory ordering issues.
 
-Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
----
- arch/arm64/kvm/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+IIUC the initial design was trying to avoid tlb flush flood when vcpu
+number is large (each RESET per ring even for one page will need all vcpus
+to flush, so O(N^2) flushing needed).  With global RESET it's O(N).  So
+it's kind of a trade-off, and indeed until now I'm not sure which one is
+better.  E.g., with per-ring reset, we can have locality too in userspace,
+e.g. the vcpu thread might be able to recycle without holding global locks.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 6caa48da1b2e..3d4b53f153a1 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1304,7 +1304,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * backed by a THP and thus use block mapping if possible.
- 	 */
- 	if (vma_pagesize == PAGE_SIZE &&
--	    !(max_map_size == PAGE_SIZE || device)) {
-+	    !(max_map_size < PMD_SIZE || device)) {
- 		if (fault_status == FSC_PERM && fault_granule > PAGE_SIZE)
- 			vma_pagesize = fault_granule;
- 		else
+Regarding safety I hope I covered that below in previous reply.
+
+> 
+> > 
+> > So the ordering of single-entry is guaranteed in that when (5) happens it
+> > must be after stablized (1+2).
+> > 
+> > > Take the
+> > > following example: CPU0 is changing a bunch of flags for GFNs A, B, C,
+> > > D that exist in the ring in that order, and CPU1 performs an ioctl to
+> > > reset the page state.
+> > > 
+> > > CPU0:
+> > >     write_flag(A, KVM_DIRTY_GFN_F_RESET)
+> > >     write_flag(B, KVM_DIRTY_GFN_F_RESET)
+> > >     write_flag(C, KVM_DIRTY_GFN_F_RESET)
+> > >     write_flag(D, KVM_DIRTY_GFN_F_RESET)
+> > >     [...]
+> > > 
+> > > CPU1:
+> > >    ioctl(KVM_RESET_DIRTY_RINGS)
+> > > 
+> > > Since CPU0 writes do not have any ordering, CPU1 can observe the
+> > > writes in a sequence that have nothing to do with program order, and
+> > > could for example observe that GFN A and D have been reset, but not B
+> > > and C. This in turn breaks the logic in the reset code (B, C, and D
+> > > don't get reset), despite userspace having followed the spec to the
+> > > letter. If each was a store-release (which is the case on x86), it
+> > > wouldn't be a problem, but nothing calls it in the documentation.
+> > > 
+> > > Maybe that's not a big deal if it is expected that each CPU will issue
+> > > a KVM_RESET_DIRTY_RINGS itself, ensuring that it observe its own
+> > > writes. But expecting this to work across CPUs without any barrier is
+> > > wishful thinking.
+> > 
+> > I see what you meant...
+> > 
+> > Firstly I'm actually curious whether that'll really happen if the gfns are
+> > collected in something like a for loop:
+> > 
+> >   for(i = 0; i < N; i++)
+> >     collect_dirty_gfn(ring, i);
+> > 
+> > Because since all the gfps to be read will depend on variable "i", IIUC no
+> > reordering should happen, but I'm not really sure, so more of a pure
+> > question.
+> 
+> 'i' has no influence on the write ordering. Each write targets a
+> different address, there is no inter-write dependencies (this concept
+> doesn't exist other than for writes to the same address), so they can
+> be reordered at will.
+> 
+> If you want a proof of this, head to http://diy.inria.fr/www/ and run
+> the MP.litmus test (which conveniently gives you a reduction of this
+> problem) on both the x86 and AArch64 models. You will see that the
+> reordering isn't allowed on x86, but definitely allowed on arm64.
+> 
+> > Besides, the other thing to mention is that I think it is fine the RESET
+> > ioctl didn't recycle all the gfns got set to reset state.  Taking above
+> > example of GFNs A-D, if when reaching the RESET ioctl only A & D's flags
+> > are updated, the ioctl will recycle gfn A but stop at gfn B assuming B-D
+> > are not reset.  But IMHO it's okay because it means we reset partial of the
+> > gfns not all of them, and it's safe to do so.  It means the next ring full
+> > event can come earlier because we recycled less, but that's functionally
+> > safe to me.
+> 
+> It may be safe, but it isn't what the userspace API promises.
+
+The document says:
+
+  After processing one or more entries in the ring buffer, userspace calls
+  the VM ioctl KVM_RESET_DIRTY_RINGS to notify the kernel about it, so that
+  the kernel will reprotect those collected GFNs.  Therefore, the ioctl
+  must be called *before* reading the content of the dirty pages.
+
+I'd say it's not an explicit promise, but I think I agree with you that at
+least it's unclear on the behavior.
+
+Since we have a global recycle mechanism, most likely the app (e.g. current
+qemu impl) will use the same thread to collect/reset dirty GFNs, and
+trigger the RESET ioctl().  In that case it's safe, IIUC, because no
+cross-core ops.
+
+QEMU even guarantees this by checking it (kvm_dirty_ring_reap_locked):
+
+    if (total) {
+        ret = kvm_vm_ioctl(s, KVM_RESET_DIRTY_RINGS);
+        assert(ret == total);
+    }
+
+I think the assert() should never trigger as mentioned above.  But ideally
+maybe it should just be a loop until cleared gfns match total.
+
+> In other words, without further straightening of the API, this doesn't
+> work as expected on relaxed memory architectures. So before this gets
+> enabled on arm64, this whole ordering issue must be addressed.
+
+How about adding some more documentation for KVM_RESET_DIRTY_RINGS on the
+possibility of recycling partial of the pages, especially when collection
+and the ioctl() aren't done from the same thread?
+
+Any suggestions will be greatly welcomed.
+
+Thanks,
+
 -- 
-2.33.1
+Peter Xu
 
 _______________________________________________
 kvmarm mailing list
