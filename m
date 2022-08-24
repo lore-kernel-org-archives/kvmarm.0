@@ -2,79 +2,87 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ECADC32796
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Aug 2022 23:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 818D7C32792
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Aug 2022 03:21:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD7804C621;
-	Tue, 23 Aug 2022 19:48:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1D614C25B;
+	Tue, 23 Aug 2022 23:21:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ozbWj2MHubcN; Tue, 23 Aug 2022 19:48:06 -0400 (EDT)
+	with ESMTP id 9G5iZxbWVlub; Tue, 23 Aug 2022 23:21:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 266744C570;
-	Tue, 23 Aug 2022 19:48:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 85F144C282;
+	Tue, 23 Aug 2022 23:21:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BC774C56D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Aug 2022 19:48:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 295F34C25B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Aug 2022 23:21:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 93-5U0-Uq+YY for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Aug 2022 19:47:56 -0400 (EDT)
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com
- [209.85.128.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EA4014C5C9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Aug 2022 19:47:54 -0400 (EDT)
-Received: by mail-yw1-f201.google.com with SMTP id
- 00721157ae682-334228502a8so266756527b3.20
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Aug 2022 16:47:54 -0700 (PDT)
+ with ESMTP id AnUVrDlCB1u3 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Aug 2022 23:21:19 -0400 (EDT)
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
+ [209.85.210.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 01A9D4C259
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Aug 2022 23:21:18 -0400 (EDT)
+Received: by mail-pf1-f201.google.com with SMTP id
+ ay17-20020a056a00301100b00536546075b3so3862065pfb.19
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Aug 2022 20:21:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
- :date:from:to:cc;
- bh=C3mw9TC4ccUp9ylGFVORw6Xc1IPwCBImXAp0s1FQtvY=;
- b=ptgB4pRaV5V8SPuqWv1fddbrucjPZdH+/qJ/NGfyNpKFi24MsqzzVKhnp9OhTo/SIF
- dQ3eQpEO44nbMTCpPuwNNwGxPV24l20eqt3eROiH+TrCCHh64gxMhOQjZcwOM+702JpH
- JPieDZkYr63mazSwOXWbn288NK1YQrWEF8hKTEChN8oUiO/43tAixHbvO8g2l8Wt6L0n
- OILmLpCkvNZL1ovNb53wLRI7IqeiBnWVcb8NOyCFvDCBgySWeojoIezjAVDHB6Go7rLD
- pFdRCc6qfN+KvHyv/qjwn6595FWrUUUYU+uiJJv2X/r5GqlmrHwDNajC7crsknI39mBP
- bFGQ==
+ h=cc:to:from:subject:mime-version:message-id:date:reply-to:from:to:cc;
+ bh=0PgRhcNFQ7wUH/xHyENNgGO5Y68ff82pBwc9ifNEyXw=;
+ b=cqHjEyrC8/5Ptg3s0VemFx6Afe05DyCrV8I1WrMH2BuvEwwsDY1YsrbGXctw65VldG
+ fAmhyiPz7pkRXrbwBZ38vyCPLv5QBCP4oH+/gu1mKhgYTPOR+Ya+5b3VA+2WH98XQmBq
+ 1FOvFOP3tIyLS9BehwIqIBtCj8lM/BvWhTdiI/ce9pRiN9eKP9sHPyAITpNwOJ3sO+2N
+ 4YCabFxHGqjIDcC9CP17NKHtJTtA5CdGAUad7ynG0wNtC4Vfe2QJX6PECaOymuHUk10t
+ PuRSnM35P9sTAO+sSnGlTY4exlZjjiMPgXiy+eydM2ZxalQexAZSKP4RIGtkmpgCQfsB
+ 7euw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
- :date:x-gm-message-state:from:to:cc;
- bh=C3mw9TC4ccUp9ylGFVORw6Xc1IPwCBImXAp0s1FQtvY=;
- b=jnOJESseXqqY7YB9tuSTwluWZ8T4F7ak4zZptnFdk+iv3X1K9QkiYjciZ8MTQzN6oV
- O20NE4dfB+300t3b0DXw0dhieUtLmfIVCmu5WNuFJlJ3VpX/dIKocUpAaVk3UYuB4tYz
- lRN6jArVWXE9L7SbVb7ncfhk+pvT5LD0o2g4hFeNXGy5W7SgMgNvrrbxqsLxBnIagKf9
- 4kDUeqPVbuRH3xkY6Z1uaaDq1FcQ3Cy/f8fKqau9bMuTYZ4lBQo1kJ91WtSC6TL/M6mX
- mCHL4tF2pAfvzmc0vwxMo5Cr1tzC7CbyT3szdyc73n84ndD52rjorhdhgiMLKOstjb3J
- q8Fg==
-X-Gm-Message-State: ACgBeo3SBedI3ENn/pXLOHt+TD6Ax5MbIPyUyaMYisB1EOB75GTUEpRD
- ZiPRhLH5QIcJheMQPNOXr2PXATn0prI2+A==
-X-Google-Smtp-Source: AA6agR6G72/926ISlJ/T1Xd3tCIya4UiNSonqcQsOzvgHaEd+gMfDs1/m9zN4VnySbDFGR+cPw/61agxR066zQ==
-X-Received: from ricarkol4.c.googlers.com
- ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a81:4941:0:b0:33d:778:3bbe with SMTP id
- w62-20020a814941000000b0033d07783bbemr10451318ywa.459.1661298474796; Tue, 23
- Aug 2022 16:47:54 -0700 (PDT)
-Date: Tue, 23 Aug 2022 23:47:25 +0000
-In-Reply-To: <20220823234727.621535-1-ricarkol@google.com>
-Message-Id: <20220823234727.621535-12-ricarkol@google.com>
+ h=cc:to:from:subject:mime-version:message-id:date:reply-to
+ :x-gm-message-state:from:to:cc;
+ bh=0PgRhcNFQ7wUH/xHyENNgGO5Y68ff82pBwc9ifNEyXw=;
+ b=EedHtFfXYfJp8zy0wHeUGk1zXFETiqkOkNNCO7JSpL5R3jzuHHadG7BUifOorYIdY3
+ Gc8QloJBQK96ZqF/G9PXbbimYRidqanKfAL1C1CvygI+OrBv6rD/5YRQ69DzE9LlRM9t
+ q+5cCC9wTd/No/Dk59UTCVu5T8z8c2+ofbL0TPTZ54EDxPsQpBqFtPTOoUswt0pPwPaK
+ jA34AztyVUsjODxRfnxKByzjDOYui7oq3V5oxiHvJNz3p1G4sIZNykmEkHbbbDro2mkb
+ IkbcSio0EQ9Bq7s9wFJ04MgIahGb4UqEdQ6yQyqskAMdkhBfSRVIS+RA92AauJX2JTmV
+ Gc5g==
+X-Gm-Message-State: ACgBeo33JEthqNPl5PT3qvxAG6/qYY0k/G0AH9a9m+ncg4g6BzJhttoP
+ AsXPywY8fuovZlFisVDzlXBietnCYYM=
+X-Google-Smtp-Source: AA6agR63ilrlfg+EIittKBqsUyfiZ4SJp+plrm1tSJz8p5Jon3Gzg8eg5LcSRgWaSK1dHMSOxMnJUkNlhh0=
+X-Received: from zagreus.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:ba8e:b0:172:ddb9:fe45 with SMTP id
+ k14-20020a170902ba8e00b00172ddb9fe45mr14718860pls.86.1661311277642; Tue, 23
+ Aug 2022 20:21:17 -0700 (PDT)
+Date: Wed, 24 Aug 2022 03:21:09 +0000
+Message-Id: <20220824032115.3563686-1-seanjc@google.com>
 Mime-Version: 1.0
-References: <20220823234727.621535-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.37.1.595.g718a3a8f04-goog
-Subject: [PATCH v5 11/13] KVM: selftests: aarch64: Add dirty logging tests
- into page_fault_test
-From: Ricardo Koller <ricarkol@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev
-Cc: dmatclack@google.com, maz@kernel.org, bgardon@google.com,
- pbonzini@redhat.com, axelrasmussen@google.com
+Subject: [PATCH v4 0/6] KVM: selftests: Implement ucall "pool" (for SEV)
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+ Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, 
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Nathan Chancellor <nathan@kernel.org>, 
+ Nick Desaulniers <ndesaulniers@google.com>
+Cc: llvm@lists.linux.dev, Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Tom Rix <trix@redhat.com>,
+ linux-kernel@vger.kernel.org, Colton Lewis <coltonlewis@google.com>,
+ kvm-riscv@lists.infradead.org, Atish Patra <atishp@atishpatra.org>,
+ linux-riscv@lists.infradead.org, Andrew Jones <andrew.jones@linux.dev>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Sean Christopherson <seanjc@google.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -88,136 +96,62 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add some dirty logging tests into page_fault_test. Mark the data and/or
-page-table memslots for dirty logging, perform some accesses, and check
-that the dirty log bits are set or clean when expected.
+This is "v4" of Peter's SEV series, minus the actual SEV tests.  My plan
+is to get this queued sooner than later so that Peter can build on top.
 
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- .../selftests/kvm/aarch64/page_fault_test.c   | 75 +++++++++++++++++++
- 1 file changed, 75 insertions(+)
+Non-KVM folks, y'all got pulled in because of the atomic_test_and_set_bit()
+patch.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-index 27b8b50fd4c4..50117a070be0 100644
---- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-@@ -31,6 +31,11 @@ static uint64_t *guest_test_memory = (uint64_t *)TEST_GVA;
- #define CMD_SKIP_TEST				(1ULL << 1)
- #define CMD_HOLE_PT				(1ULL << 2)
- #define CMD_HOLE_DATA				(1ULL << 3)
-+#define CMD_CHECK_WRITE_IN_DIRTY_LOG		(1ULL << 4)
-+#define CMD_CHECK_S1PTW_WR_IN_DIRTY_LOG		(1ULL << 5)
-+#define CMD_CHECK_NO_WRITE_IN_DIRTY_LOG		(1ULL << 6)
-+#define CMD_CHECK_NO_S1PTW_WR_IN_DIRTY_LOG	(1ULL << 7)
-+#define CMD_SET_PTE_AF				(1ULL << 8)
- 
- #define PREPARE_FN_NR				10
- #define CHECK_FN_NR				10
-@@ -213,6 +218,21 @@ static void guest_check_pte_af(void)
- 	GUEST_ASSERT_EQ(*((uint64_t *)TEST_PTE_GVA) & PTE_AF, PTE_AF);
- }
- 
-+static void guest_check_write_in_dirty_log(void)
-+{
-+	GUEST_SYNC(CMD_CHECK_WRITE_IN_DIRTY_LOG);
-+}
-+
-+static void guest_check_no_write_in_dirty_log(void)
-+{
-+	GUEST_SYNC(CMD_CHECK_NO_WRITE_IN_DIRTY_LOG);
-+}
-+
-+static void guest_check_s1ptw_wr_in_dirty_log(void)
-+{
-+	GUEST_SYNC(CMD_CHECK_S1PTW_WR_IN_DIRTY_LOG);
-+}
-+
- static void guest_exec(void)
- {
- 	int (*code)(void) = (int (*)(void))TEST_EXEC_GVA;
-@@ -398,6 +418,21 @@ static bool punch_hole_in_memslot(struct kvm_vm *vm,
- 	return true;
- }
- 
-+static bool check_write_in_dirty_log(struct kvm_vm *vm,
-+		struct userspace_mem_region *region, uint64_t host_pg_nr)
-+{
-+	unsigned long *bmap;
-+	bool first_page_dirty;
-+	uint64_t size = region->region.memory_size;
-+
-+	/* getpage_size() is not always equal to vm->page_size */
-+	bmap = bitmap_zalloc(size / getpagesize());
-+	kvm_vm_get_dirty_log(vm, region->region.slot, bmap);
-+	first_page_dirty = test_bit(host_pg_nr, bmap);
-+	free(bmap);
-+	return first_page_dirty;
-+}
-+
- /* Returns true to continue the test, and false if it should be skipped. */
- static bool handle_cmd(struct kvm_vm *vm, int cmd)
- {
-@@ -414,6 +449,18 @@ static bool handle_cmd(struct kvm_vm *vm, int cmd)
- 		continue_test = punch_hole_in_memslot(vm, pt_region);
- 	if (cmd & CMD_HOLE_DATA)
- 		continue_test = punch_hole_in_memslot(vm, data_region);
-+	if (cmd & CMD_CHECK_WRITE_IN_DIRTY_LOG)
-+		TEST_ASSERT(check_write_in_dirty_log(vm, data_region, 0),
-+				"Missing write in dirty log");
-+	if (cmd & CMD_CHECK_S1PTW_WR_IN_DIRTY_LOG)
-+		TEST_ASSERT(check_write_in_dirty_log(vm, pt_region, 0),
-+				"Missing s1ptw write in dirty log");
-+	if (cmd & CMD_CHECK_NO_WRITE_IN_DIRTY_LOG)
-+		TEST_ASSERT(!check_write_in_dirty_log(vm, data_region, 0),
-+				"Unexpected write in dirty log");
-+	if (cmd & CMD_CHECK_NO_S1PTW_WR_IN_DIRTY_LOG)
-+		TEST_ASSERT(!check_write_in_dirty_log(vm, pt_region, 0),
-+				"Unexpected s1ptw write in dirty log");
- 
- 	return continue_test;
- }
-@@ -700,6 +747,19 @@ static void help(char *name)
- 	.expected_events	= { .uffd_faults = _uffd_faults, },		\
- }
- 
-+#define TEST_DIRTY_LOG(_access, _with_af, _test_check)				\
-+{										\
-+	.name			= SCAT3(dirty_log, _access, _with_af),		\
-+	.data_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
-+	.pt_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
-+	.guest_prepare		= { _PREPARE(_with_af),				\
-+				    _PREPARE(_access) },			\
-+	.guest_test		= _access,					\
-+	.guest_test_check	= { _CHECK(_with_af), _test_check,		\
-+				    guest_check_s1ptw_wr_in_dirty_log},		\
-+	.expected_events	= { 0 },					\
-+}
-+
- static struct test_desc tests[] = {
- 
- 	/* Check that HW is setting the Access Flag (AF) (sanity checks). */
-@@ -753,6 +813,21 @@ static struct test_desc tests[] = {
- 	TEST_UFFD(guest_exec, with_af, CMD_HOLE_DATA | CMD_HOLE_PT,
- 			uffd_data_read_handler, uffd_pt_write_handler, 2),
- 
-+	/*
-+	 * Try accesses when the data and PT memslots are both tracked for
-+	 * dirty logging.
-+	 */
-+	TEST_DIRTY_LOG(guest_read64, with_af, guest_check_no_write_in_dirty_log),
-+	/* no_af should also lead to a PT write. */
-+	TEST_DIRTY_LOG(guest_read64, no_af, guest_check_no_write_in_dirty_log),
-+	TEST_DIRTY_LOG(guest_ld_preidx, with_af, guest_check_no_write_in_dirty_log),
-+	TEST_DIRTY_LOG(guest_at, no_af, guest_check_no_write_in_dirty_log),
-+	TEST_DIRTY_LOG(guest_exec, with_af, guest_check_no_write_in_dirty_log),
-+	TEST_DIRTY_LOG(guest_write64, with_af, guest_check_write_in_dirty_log),
-+	TEST_DIRTY_LOG(guest_cas, with_af, guest_check_write_in_dirty_log),
-+	TEST_DIRTY_LOG(guest_dc_zva, with_af, guest_check_write_in_dirty_log),
-+	TEST_DIRTY_LOG(guest_st_preidx, with_af, guest_check_write_in_dirty_log),
-+
- 	{ 0 }
- };
- 
+Rework the ucall infrastructure to use a pool of ucall structs to pass
+memory instead of using the guest's stack.  For confidential VMs with
+encrypted memory, e.g. SEV, the guest's stack "needs" to be private memory
+and so can't be used to communicate with the host.
+
+Convert all implementations to the pool as all of the complexity is hidden
+in common code, and supporting multiple interfaces adds its own kind of
+complexity. 
+
+Tested on x86 and ARM, compile tested on s390 and RISC-V.
+
+Peter Gonda (2):
+  tools: Add atomic_test_and_set_bit()
+  KVM: selftests: Add ucall pool based implementation
+
+Sean Christopherson (4):
+  KVM: selftests: Consolidate common code for populating ucall struct
+  KVM: selftests: Consolidate boilerplate code in get_ucall()
+  KVM: selftests: Automatically do init_ucall() for non-barebones VMs
+  KVM: selftests: Make arm64's MMIO ucall multi-VM friendly
+
+ tools/arch/x86/include/asm/atomic.h           |   7 ++
+ tools/include/asm-generic/atomic-gcc.h        |  12 ++
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/arch_timer.c        |   1 -
+ .../selftests/kvm/aarch64/debug-exceptions.c  |   1 -
+ .../selftests/kvm/aarch64/hypercalls.c        |   1 -
+ .../testing/selftests/kvm/aarch64/psci_test.c |   1 -
+ .../testing/selftests/kvm/aarch64/vgic_init.c |   2 -
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  |   1 -
+ tools/testing/selftests/kvm/dirty_log_test.c  |   2 -
+ .../selftests/kvm/include/kvm_util_base.h     |  16 +++
+ .../selftests/kvm/include/ucall_common.h      |  13 +-
+ .../selftests/kvm/kvm_page_table_test.c       |   1 -
+ .../testing/selftests/kvm/lib/aarch64/ucall.c | 101 +++-------------
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  11 ++
+ .../selftests/kvm/lib/perf_test_util.c        |   2 -
+ tools/testing/selftests/kvm/lib/riscv/ucall.c |  40 ++----
+ tools/testing/selftests/kvm/lib/s390x/ucall.c |  37 ++----
+ .../testing/selftests/kvm/lib/ucall_common.c  | 114 ++++++++++++++++++
+ .../testing/selftests/kvm/lib/x86_64/ucall.c  |  37 ++----
+ .../testing/selftests/kvm/memslot_perf_test.c |   1 -
+ tools/testing/selftests/kvm/rseq_test.c       |   1 -
+ tools/testing/selftests/kvm/steal_time.c      |   1 -
+ .../kvm/system_counter_offset_test.c          |   1 -
+ 24 files changed, 213 insertions(+), 192 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/lib/ucall_common.c
+
+
+base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
 -- 
 2.37.1.595.g718a3a8f04-goog
 
