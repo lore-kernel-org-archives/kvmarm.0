@@ -2,74 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99BE4ECAAA3
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Aug 2022 01:29:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C338ECAAA3
+	for <kvmarm@archiver.kernel.org>; Fri, 26 Aug 2022 04:34:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1643C4E45F;
-	Thu, 25 Aug 2022 21:29:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D10794E4E3;
+	Fri, 26 Aug 2022 00:34:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id H0KUuR91YJeI; Thu, 25 Aug 2022 21:29:52 -0400 (EDT)
+	with ESMTP id NZhlgZtnDii8; Fri, 26 Aug 2022 00:34:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D1B094E462;
-	Thu, 25 Aug 2022 21:29:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 894294E4E5;
+	Fri, 26 Aug 2022 00:34:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C7B3F4E45D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2022 21:29:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D17C84E4D7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Aug 2022 00:34:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 40nYjuGBo3tO for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Aug 2022 21:29:50 -0400 (EDT)
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com
- [209.85.217.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D95A4E45C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2022 21:29:50 -0400 (EDT)
-Received: by mail-vs1-f46.google.com with SMTP id o123so356519vsc.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2022 18:29:50 -0700 (PDT)
+ with ESMTP id o2MJfAtP4YT6 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Aug 2022 00:34:17 -0400 (EDT)
+Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com
+ [209.85.222.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 925ED4E2A6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Aug 2022 00:34:17 -0400 (EDT)
+Received: by mail-ua1-f52.google.com with SMTP id i11so163327ual.7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2022 21:34:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:from:to:cc;
- bh=2ekbr1AY/0ro4MNsPt6q1bT/kwZa5YwXe1eeOkdzbj0=;
- b=iJzbBaWobA+v3Fls9FBR9ulJyS7gOTa+okT0Roe5/N6j2Bx1N2gDa6soWJJPYFB6Gn
- aZwQDFZEQ2UM68o7CDyooH2S5Fz+O0zTMNpOc0LA1KKRK8z5OxwjFAiMg8MobnmQFVUk
- nUboIue5892TXpYUzj2DYfN3eKyvTbpEOXIllxEXOCUuskKt1da3tEPU4U/Jim6sVp8Z
- DmkPRjIGd9dHEPIrzJyAuD2bWoR4gpO5nPj5LkPD2WDrgyORNdLp9L/OZ2V/zGZfcHdy
- rUy92i2aKowkYOSLF3s3jBfv1MIX9U+WHBQOPgjFcXUYZrgtaCL0UMClF/MWLnIVs9TG
- j8FA==
+ bh=4Hu0rO8zG72NHJho0aO6SAbm6Tq2VbIsxhqXb5H0q+o=;
+ b=jX/fbSZgb102YlcVtGLQfgdzgGnMYamLbssIUN/GEPTAszBrleoBMFtyL240p5mHv0
+ h2xxtWr8VA45O2ritPAxrh9MfAMooSJESzldSjhPJ2mu6s17jyuTRjwvWikq+p9uKXt7
+ nyY/uVy4Dau4rwCkxnQSEtfdySr+pdT2ktasBzYTYYPbx9/kuMBPCBWidRaojMuZ3iaU
+ u/hbIqBQdJHJ7hzXv3BzauJYGQgJPpdAuOE0fKOrdMe6VlOg2SlopZzODgy9epMordPY
+ eqNFcW8Lkjb00Xc/6drZAeIV13aclpnoewJ9+qOnT6QlJCXSJ9iRmuYKQx+yRRfpY9G6
+ AKEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:x-gm-message-state:from:to:cc;
- bh=2ekbr1AY/0ro4MNsPt6q1bT/kwZa5YwXe1eeOkdzbj0=;
- b=8I6VsG+a5k1dDtH+dvKcKYXeGmzkYa5d6TaB9P34qxS1PjWScu02IN7GJP5BaLXLDQ
- p6R/VzdN5/NOh3vG7R3Aw6+BEyhmsxIP3tkYQ1rjTolxx6KoZV0/iQvskq0F/LBAHbAE
- iFdMS9WLHl+v1F2xAGkp0R8AdbIgLlOv2CpXseSXUh0Q4RYVfaivEwsZ9fYKqFOFz19o
- BIjGgr4jWTSR7XqIr2O4Eom2x5cW85Dxkr5Ugq/mtWE3YEsshH+/fUl+3I2PI4TBAICr
- YVd8kovge1ZgLYE1c3S45MLKUBSYIDToI+sWMlDBXmzQQo+2M8BY/XgkSpzNajRaykQP
- Aysg==
-X-Gm-Message-State: ACgBeo0KsL/kLu3o1mqDvhkf3orzlDR0gWPgB0xt1KWh3pLa87HPtud9
- pDyA1mdbxBx4Rx/eDCs4ZxMZZdSK7QT+qs2dfwMntQ==
-X-Google-Smtp-Source: AA6agR6j2m3pmhhwkF7FdZcEb6pXGIIfBXTP7oUuiKmKJ3N+tfbsKBjRFCuYLuBTifiWUHMFhO1pQNsYSmty1yTeE0s=
-X-Received: by 2002:a67:de11:0:b0:390:4ef6:6a5f with SMTP id
- q17-20020a67de11000000b003904ef66a5fmr2605311vsk.58.1661477390064; Thu, 25
- Aug 2022 18:29:50 -0700 (PDT)
+ bh=4Hu0rO8zG72NHJho0aO6SAbm6Tq2VbIsxhqXb5H0q+o=;
+ b=GaDFc4B+uHG03ngSmlaMi0b7dGGOXEe34UZBC6ZlXAj49kz2NmnL/F/RzUAXsho8Aj
+ DBoLyN5D6w8CNqXqx1DphsIWiCwDK8pXFfbeQdvgANDYpe6Masr+l44ymtU2yPPnNY1C
+ ysvrN7Pk3C2/A34HqSsGRNAPoNt+JRwqTtjuUuJ3DVlRFKFIgUpR4js3ooi1R0wyO+dr
+ WoPNNeY7zI88xwUOfBtw8TNFfclfm/7xVGZWE8d4eRhcWqR9ATChy37r+WOA2+IL94K7
+ y8Py7lcanQbpSdIoo5n2EadGuhxv2O1AP+O7AWh8RyXQhHWTcTnH9njm9jK/lPOVhuif
+ ry5w==
+X-Gm-Message-State: ACgBeo1AWTc482FNphqktHQ9Q5yv85yimtfQ6j2xkSYtBgqsTa2IJWRl
+ gMVn7kTQevAK+/0aBx//6gT75hPIoWQ5A98GMrfthg==
+X-Google-Smtp-Source: AA6agR7/RKAs0E6jrT0i52j7V9NOIYq3DwZJIFlTOaz7LTbxucLEE9/EHM8ghuH4Cw5QLQ1j5sI/C979ZNVWpAI0/c0=
+X-Received: by 2002:ab0:13ed:0:b0:39a:2447:e4ae with SMTP id
+ n42-20020ab013ed000000b0039a2447e4aemr2567135uae.37.1661488456875; Thu, 25
+ Aug 2022 21:34:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220825050846.3418868-1-reijiw@google.com>
- <20220825050846.3418868-8-reijiw@google.com>
-In-Reply-To: <20220825050846.3418868-8-reijiw@google.com>
+References: <20220805135813.2102034-1-maz@kernel.org>
+ <20220805135813.2102034-7-maz@kernel.org>
+In-Reply-To: <20220805135813.2102034-7-maz@kernel.org>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Thu, 25 Aug 2022 18:29:34 -0700
-Message-ID: <CAAeT=FxJLykbrgKSC6DNFr+hWr-=TOq60ODFZ7r+jGOV3a=KWg@mail.gmail.com>
-Subject: Re: [PATCH 7/9] KVM: arm64: selftests: Add a test case for a linked
- breakpoint
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+Date: Thu, 25 Aug 2022 21:34:01 -0700
+Message-ID: <CAAeT=FzXyr7D24QCcwGckgnPFuo8QtN3GrPg9h+s+3uGETE9Dw@mail.gmail.com>
+Subject: Re: [PATCH 6/9] KVM: arm64: PMU: Move the ID_AA64DFR0_EL1.PMUver
+ limit to VM creation
+To: Marc Zyngier <maz@kernel.org>
+Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,153 +85,172 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Aug 24, 2022 at 10:10 PM Reiji Watanabe <reijiw@google.com> wrote:
+Hi Marc,
+
+On Fri, Aug 5, 2022 at 6:58 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Currently, the debug-exceptions test doesn't have a test case for
-> a linked breakpoint. Add a test case for the linked breakpoint to
-> the test.
+> As further patches will enable the selection of a PMU revision
+> from userspace, sample the supported PMU revision at VM creation
+> time, rather than building each time the ID_AA64DFR0_EL1 register
+> is accessed.
 >
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> This shouldn't result in any change in behaviour.
 >
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  .../selftests/kvm/aarch64/debug-exceptions.c  | 59 +++++++++++++++++--
->  1 file changed, 55 insertions(+), 4 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/kvm/arm.c              |  6 ++++++
+>  arch/arm64/kvm/pmu-emul.c         | 11 +++++++++++
+>  arch/arm64/kvm/sys_regs.c         | 26 +++++++++++++++++++++-----
+>  include/kvm/arm_pmu.h             |  6 ++++++
+>  5 files changed, 45 insertions(+), 5 deletions(-)
 >
-> diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> index ab8860e3a9fa..9fccfeebccd3 100644
-> --- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> +++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> @@ -11,6 +11,10 @@
->  #define DBGBCR_EXEC    (0x0 << 3)
->  #define DBGBCR_EL1     (0x1 << 1)
->  #define DBGBCR_E       (0x1 << 0)
-> +#define DBGBCR_LBN_SHIFT       16
-> +#define DBGBCR_BT_SHIFT                20
-> +#define DBGBCR_BT_ADDR_LINK_CTX        (0x1 << DBGBCR_BT_SHIFT)
-> +#define DBGBCR_BT_CTX_LINK     (0x3 << DBGBCR_BT_SHIFT)
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index f38ef299f13b..411114510634 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -163,6 +163,7 @@ struct kvm_arch {
 >
->  #define DBGWCR_LEN8    (0xff << 5)
->  #define DBGWCR_RD      (0x1 << 3)
-> @@ -21,7 +25,7 @@
->  #define SPSR_D         (1 << 9)
->  #define SPSR_SS                (1 << 21)
+>         u8 pfr0_csv2;
+>         u8 pfr0_csv3;
+> +       u8 dfr0_pmuver;
 >
-> -extern unsigned char sw_bp, sw_bp2, hw_bp, hw_bp2, bp_svc, bp_brk, hw_wp, ss_start;
-> +extern unsigned char sw_bp, sw_bp2, hw_bp, hw_bp2, bp_svc, bp_brk, hw_wp, ss_start, hw_bp_ctx;
->  static volatile uint64_t sw_bp_addr, hw_bp_addr;
->  static volatile uint64_t wp_addr, wp_data_addr;
->  static volatile uint64_t svc_addr;
-> @@ -103,6 +107,7 @@ static void reset_debug_state(void)
->         isb();
+>         /* Hypercall features firmware registers' descriptor */
+>         struct kvm_smccc_features smccc_feat;
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 8fe73ee5fa84..e4f80f0c1e97 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -164,6 +164,12 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>         set_default_spectre(kvm);
+>         kvm_arm_init_hypercalls(kvm);
 >
->         write_sysreg(0, mdscr_el1);
-> +       write_sysreg(0, contextidr_el1);
+> +       /*
+> +        * Initialise the default PMUver before there is a chance to
+> +        * create an actual PMU.
+> +        */
+> +       kvm->arch.dfr0_pmuver = kvm_arm_pmu_get_host_pmuver();
+> +
+>         return ret;
+>  out_free_stage2_pgd:
+>         kvm_free_stage2_pgd(&kvm->arch.mmu);
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index ddd79b64b38a..33a88ca7b7fd 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -1021,3 +1021,14 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
 >
->         /* Reset all bcr/bvr/wcr/wvr registers */
->         dfr0 = read_sysreg(id_aa64dfr0_el1);
-> @@ -164,6 +169,28 @@ static void install_hw_bp(uint8_t bpn, uint64_t addr)
->         enable_debug_bwp_exception();
+>         return -ENXIO;
+>  }
+> +
+> +u8 kvm_arm_pmu_get_host_pmuver(void)
+
+Nit: Since this function doesn't simply return the host's pmuver, but the
+pmuver limit for guests, perhaps "kvm_arm_pmu_get_guest_pmuver_limit"
+might be more clear (closer to what it does) ?
+
+> +{
+> +       u64 tmp;
+> +
+> +       tmp = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+> +       tmp = cpuid_feature_cap_perfmon_field(tmp,
+> +                                             ID_AA64DFR0_PMUVER_SHIFT,
+> +                                             ID_AA64DFR0_PMUVER_8_4);
+> +       return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER), tmp);
+> +}
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 333efddb1e27..55451f49017c 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1062,6 +1062,22 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+>         return true;
 >  }
 >
-> +void install_hw_bp_ctx(uint8_t addr_bp, uint8_t ctx_bp, uint64_t addr,
-> +                      uint64_t ctx)
+> +static u8 pmuver_to_perfmon(const struct kvm_vcpu *vcpu)
 > +{
-> +       uint32_t addr_bcr, ctx_bcr;
+> +       if (!kvm_vcpu_has_pmu(vcpu))
+> +               return 0;
 > +
-> +       /* Setup a context-aware breakpoint */
-> +       ctx_bcr = DBGBCR_LEN8 | DBGBCR_EXEC | DBGBCR_EL1 | DBGBCR_E |
-> +                 DBGBCR_BT_CTX_LINK;
-> +       write_dbgbcr(ctx_bp, ctx_bcr);
-> +       write_dbgbvr(ctx_bp, ctx);
-> +
-> +       /* Setup a linked breakpoint (linked to the context-aware breakpoint) */
-> +       addr_bcr = DBGBCR_LEN8 | DBGBCR_EXEC | DBGBCR_EL1 | DBGBCR_E |
-> +                  DBGBCR_BT_ADDR_LINK_CTX |
-> +                  ((uint32_t)ctx_bp << DBGBCR_LBN_SHIFT);
-> +       write_dbgbcr(addr_bp, addr_bcr);
-> +       write_dbgbvr(addr_bp, addr);
-> +       isb();
-> +
-> +       enable_debug_bwp_exception();
+> +       switch (vcpu->kvm->arch.dfr0_pmuver) {
+> +       case ID_AA64DFR0_PMUVER_8_0:
+> +               return ID_DFR0_PERFMON_8_0;
+> +       case ID_AA64DFR0_PMUVER_IMP_DEF:
+> +               return 0;
+> +       default:
+> +               /* Anything ARMv8.4+ has the same value. For now. */
+> +               return vcpu->kvm->arch.dfr0_pmuver;
+> +       }
 > +}
 > +
->  static void install_ss(void)
->  {
->         uint32_t mdscr;
-> @@ -177,8 +204,10 @@ static void install_ss(void)
->
->  static volatile char write_data;
->
-> -static void guest_code(uint8_t bpn, uint8_t wpn)
-> +static void guest_code(uint8_t bpn, uint8_t wpn, uint8_t ctx_bpn)
->  {
-> +       uint64_t ctx = 0x1;     /* a random context number */
-> +
->         GUEST_SYNC(0);
->
->         /* Software-breakpoint */
-> @@ -281,6 +310,19 @@ static void guest_code(uint8_t bpn, uint8_t wpn)
->                      : : : "x0");
->         GUEST_ASSERT_EQ(ss_addr[0], 0);
->
+>  /* Read a sanitised cpufeature ID register by sys_reg_desc */
+>  static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>                 struct sys_reg_desc const *r, bool raz)
+> @@ -1112,10 +1128,10 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>                 /* Limit debug to ARMv8.0 */
+>                 val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER);
+>                 val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 6);
+> -               /* Limit guests to PMUv3 for ARMv8.4 */
+> -               val = cpuid_feature_cap_perfmon_field(val,
+> -                                                     ID_AA64DFR0_PMUVER_SHIFT,
+> -                                                     kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
+> +               /* Set PMUver to the required version */
+> +               val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER);
+> +               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER),
+> +                                 kvm_vcpu_has_pmu(vcpu) ? vcpu->kvm->arch.dfr0_pmuver : 0);
+>                 /* Hide SPE from guests */
+>                 val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_PMSVER);
+>                 break;
+> @@ -1123,7 +1139,7 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>                 /* Limit guests to PMUv3 for ARMv8.4 */
 
-I've just noticed that I should add GUEST_SYNC(10) here, use
-GUEST_SYNC(11) for the following test case, and update the
-stage limit value in the loop in userspace code.
+Nit: I think the comment above should be removed like you did for
+ID_AA64DFR0_EL1 (or move it to kvm_arm_pmu_get_host_pmuver()?).
 
-Or I might consider removing the stage management code itself.
-It doesn't appear to be very useful to me, and I would think
-we could easily forget to update it :-)
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
 
 Thank you,
 Reiji
 
-> +       /* Linked hardware-breakpoint */
-> +       hw_bp_addr = 0;
-> +       reset_debug_state();
-> +       install_hw_bp_ctx(bpn, ctx_bpn, PC(hw_bp_ctx), ctx);
-> +       /* Set context id */
-> +       write_sysreg(ctx, contextidr_el1);
-> +       isb();
-> +       asm volatile("hw_bp_ctx: nop");
-> +       write_sysreg(0, contextidr_el1);
-> +       GUEST_ASSERT_EQ(hw_bp_addr, PC(hw_bp_ctx));
-> +
-> +       GUEST_SYNC(10);
-> +
->         GUEST_DONE();
->  }
+
+
+>                 val = cpuid_feature_cap_perfmon_field(val,
+>                                                       ID_DFR0_PERFMON_SHIFT,
+> -                                                     kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
+> +                                                     pmuver_to_perfmon(vcpu));
+>                 break;
+>         }
 >
-> @@ -327,6 +369,7 @@ int main(int argc, char *argv[])
->         struct ucall uc;
->         int stage;
->         uint64_t aa64dfr0;
-> +       uint8_t brps;
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 96b192139a23..6bda9b071084 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -89,6 +89,8 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+>                         vcpu->arch.pmu.events = *kvm_get_pmu_events();  \
+>         } while (0)
 >
->         vm = vm_create_with_one_vcpu(&vcpu, guest_code);
->         ucall_init(vm, NULL);
-> @@ -349,8 +392,16 @@ int main(int argc, char *argv[])
->         vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
->                                 ESR_EC_SVC64, guest_svc_handler);
+> +u8 kvm_arm_pmu_get_host_pmuver(void);
+> +
+>  #else
+>  struct kvm_pmu {
+>  };
+> @@ -154,6 +156,10 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
+>  static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
+> +static inline u8 kvm_arm_pmu_get_host_pmuver(void)
+> +{
+> +       return 0;
+> +}
 >
-> -       /* Run tests with breakpoint#0 and watchpoint#0. */
-> -       vcpu_args_set(vcpu, 2, 0, 0);
-> +       /* Number of breakpoints, minus 1 */
-> +       brps = cpuid_get_ufield(aa64dfr0, ID_AA64DFR0_BRPS_SHIFT);
-> +       __TEST_REQUIRE(brps > 0, "At least two breakpoints are required");
-> +
-> +       /*
-> +        * Run tests with breakpoint#0 and watchpoint#0, and the higiest
-> +        * numbered (context-aware) breakpoint.
-> +        */
-> +       vcpu_args_set(vcpu, 3, 0, 0, brps);
-> +
->         for (stage = 0; stage < 11; stage++) {
->                 vcpu_run(vcpu);
+>  #endif
 >
 > --
-> 2.37.1.595.g718a3a8f04-goog
+> 2.34.1
 >
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
