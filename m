@@ -2,90 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40BDFECAAD4
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Aug 2022 23:25:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D18ECAAA2
+	for <kvmarm@archiver.kernel.org>; Fri, 26 Aug 2022 00:51:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E40244E238;
-	Thu, 25 Aug 2022 19:25:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27C244E394;
+	Thu, 25 Aug 2022 20:51:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BzGedD1s3Gl4; Thu, 25 Aug 2022 19:25:42 -0400 (EDT)
+	with ESMTP id pRwXd6XWeymn; Thu, 25 Aug 2022 20:51:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C20914E256;
-	Thu, 25 Aug 2022 19:25:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 041AF4E38C;
+	Thu, 25 Aug 2022 20:51:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 81A004E257
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2022 19:25:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 12A9C4E388
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2022 20:51:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BDtd3HUnKLz1 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Aug 2022 19:25:39 -0400 (EDT)
-Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com
- [209.85.210.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC08F4E23C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2022 19:25:37 -0400 (EDT)
-Received: by mail-ot1-f73.google.com with SMTP id
- h3-20020a9d6f83000000b00638d0574905so7478185otq.4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2022 16:25:37 -0700 (PDT)
+ with ESMTP id HjZ-Fkk4hQMG for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Aug 2022 20:51:05 -0400 (EDT)
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com
+ [209.85.217.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ED4CA4E38E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2022 20:51:04 -0400 (EDT)
+Received: by mail-vs1-f43.google.com with SMTP id h67so268273vsc.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Aug 2022 17:51:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
- :date:reply-to:from:to:cc;
- bh=P2RgcF+gBHFPYTEvaTfo6AUsgguGiX9tPlCot3RYgGs=;
- b=SQlk6JoM9pPHFnCVZCc0ePWkuMHGeijaVL83mtpLkCr48WVn0+0gDXr/NuYB1zXSVO
- GPRiPy85aSM+mIC3yV0GAUcA/pDxT4NHPXYB+k8l/pDyY0rcK6NFayKYt+lmzF4+YMLK
- txAL8zPFasMqUjJqK1GnvSpPbY5DfVcxLT3ZUUYd8NRiael/0olsW4RcRdZBwGGB8x21
- L/R24+VZiiccgoc/C5RvauNC9ujJknNlbnB+rtYvuJrj6wYuk/wD6iCQWgJ0FMpLLkdK
- HG8TrVwe7K0xOMjVu9uiaeNiHKTm3rTfJGVakSCdj8sRZn7o4jm3P8cc3mUCDNSs8gWr
- UdKw==
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:from:to:cc;
+ bh=0JrpajtekJvh71Rso/3aI0o/Auj8HCuqh9lk53mDmoI=;
+ b=entdwi6GP0iJd2AnCMO31AfWW8zOCmhAS9at2OdNy6E92caHUoaGQEKydCUbCoIoxg
+ VN8DdyPa3fJ9cQjlyP2409JiQZMLSHkb+vM4xQPNFItu/TO3tt1+apfdL1po2fwkT0W0
+ GRg1Xzt4AY8pxjquXh4caIjjTdFpwMWGk688lRpI3bi7tCV7OpeSzysZQJFx7tjHni7C
+ HGHW8vXzi6SSvBDNiAUcThQ/PpHRqZWerF/4uxfUJ4gixuTyi3zoJTicZ28c/rp1WYp7
+ r5RIRgvrdd0EB/AFhGlvD2G3odBSIebVpAgZX2FluJOoJBdHn1R1UQI8pUk35ycqiy2Q
+ JrWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
- :date:reply-to:x-gm-message-state:from:to:cc;
- bh=P2RgcF+gBHFPYTEvaTfo6AUsgguGiX9tPlCot3RYgGs=;
- b=QhKT9Bxmx9ePqefY/6auQglud2sq5qt/RePGj1OP+ns3PB38jfxpG8AMU6h6/VkcPr
- Zimh2L8N26qFoHNkxcTIA5v6nrWliH/VrzxS99aWxuAzSitCdjSoY9xB2jxWOJhADAUC
- 142ThduyPUhbCWGEvXp7ax8caKOdkgGl5xOdgxjYaeUNdUolTowBLwAZUPlvPAc3uZHa
- XIeVqeTM00ors4KCBe2nL6ptmvwEo1tdabk2tNLAx3eZ9O7S/csINVKbdXctUcaV3hv+
- VA2Z6WcdJ8xw/28mfzBSL+YgAzr4e5xNFTugloVQZ6uONyx96EK6q9C6E5PJFjEMB8Kr
- KpcQ==
-X-Gm-Message-State: ACgBeo3cpMCmjAGksO94Kmon7yIihzd4mCuiDuHzC7trf8s79/w18KCp
- Az86xZtZg6ZaW/JnKO6HGqm7PuGTYko=
-X-Google-Smtp-Source: AA6agR6pzAdCDgmgO0oso/HoE5WH7WCkL3PKyA8KRrEe2RCrD5ZThqMcZM2sOfAjsU0cXCoGFEqZmqOEaDw=
-X-Received: from zagreus.c.googlers.com
- ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6870:a90f:b0:11e:5773:84c5 with SMTP id
- eq15-20020a056870a90f00b0011e577384c5mr448463oab.75.1661469936767; Thu, 25
- Aug 2022 16:25:36 -0700 (PDT)
-Date: Thu, 25 Aug 2022 23:25:22 +0000
-In-Reply-To: <20220825232522.3997340-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20220825232522.3997340-1-seanjc@google.com>
-X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
-Message-ID: <20220825232522.3997340-8-seanjc@google.com>
-Subject: [PATCH v5 7/7] KVM: selftests: Add ucall pool based implementation
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>, 
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Nathan Chancellor <nathan@kernel.org>, 
- Nick Desaulniers <ndesaulniers@google.com>
-Cc: llvm@lists.linux.dev, Peter Gonda <pgonda@google.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, Tom Rix <trix@redhat.com>,
- linux-kernel@vger.kernel.org, Colton Lewis <coltonlewis@google.com>,
- kvm-riscv@lists.infradead.org, Atish Patra <atishp@atishpatra.org>,
- linux-riscv@lists.infradead.org, Andrew Jones <andrew.jones@linux.dev>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:x-gm-message-state:from:to:cc;
+ bh=0JrpajtekJvh71Rso/3aI0o/Auj8HCuqh9lk53mDmoI=;
+ b=Ft7Lm18oggQt3vcpiMpQlW63oq08nDS8KWgTBWQOlExdmyOf9WzqOF1No4pMywlfRw
+ vp2E4SynQH4+c9q/vIAAixpH1FwD7S2K/u6go2v3Bq5962MN9VWfrrBoduwPbUUQ9RJH
+ kek9uweqtPwDxjJYjrbnMoiWI3VPicuVBTFwRu/W00kdl+DPhcBAobOZpaSo65LULcmB
+ /R+nS1l6qes3gI5KTbskmMxZT5xIMWZxCGuDXv69MYDbcI//BD9h/1gFLf1H4OZ4WfOn
+ Yev03iF5J0RG3WyL3Rw0yF3h3QO+BwDrUOj4Eobs0hIpBozWxh4MfJighPfBD5WfINhJ
+ JfAA==
+X-Gm-Message-State: ACgBeo3+NZ1dtYYv8YwCwImC2VUoZCj5jXoZMMbq5y3mnD24I0mt7rQD
+ QaYQOnSIp2s3YMX/3/AvUwNegq70cBXWAFEICRSpsQ==
+X-Google-Smtp-Source: AA6agR7p7Dit2ezx7YKW+encSK4TFrVerFoY/6em0zK1bdoztUQVx0haLRefCWKzReFCSOzdWGd2pyDhRpM+ThjkMxU=
+X-Received: by 2002:a67:b009:0:b0:38a:e0f2:4108 with SMTP id
+ z9-20020a67b009000000b0038ae0f24108mr2723225vse.9.1661475064402; Thu, 25 Aug
+ 2022 17:51:04 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220825050846.3418868-1-reijiw@google.com>
+ <20220825050846.3418868-2-reijiw@google.com>
+ <Ywen44OKe8gGcOcW@google.com> <Yweo5cmA6D0pxwmJ@google.com>
+ <YweqIefFbP107fe+@google.com>
+In-Reply-To: <YweqIefFbP107fe+@google.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Thu, 25 Aug 2022 17:50:48 -0700
+Message-ID: <CAAeT=Fxza9hdqDNDDeHqXKwLW_K2aj-3E7Z5FL9eXH0Wpa3YcA@mail.gmail.com>
+Subject: Re: [PATCH 1/9] KVM: arm64: selftests: Add helpers to extract a field
+ of an ID register
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Andrew Jones <andrew.jones@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Sean Christopherson <seanjc@google.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -99,220 +88,88 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Peter Gonda <pgonda@google.com>
+Hi Oliver, Ricardo,
 
-To play nice with guests whose stack memory is encrypted, e.g. AMD SEV,
-introduce a new "ucall pool" implementation that passes the ucall struct
-via dedicated memory (which can be mapped shared, a.k.a. as plain text).
+On Thu, Aug 25, 2022 at 9:58 AM Oliver Upton <oliver.upton@linux.dev> wrote:
+>
+> On Thu, Aug 25, 2022 at 09:52:53AM -0700, Ricardo Koller wrote:
+> > On Thu, Aug 25, 2022 at 09:48:35AM -0700, Oliver Upton wrote:
+> > > Hi Reiji,
+> > >
+> > > On Wed, Aug 24, 2022 at 10:08:38PM -0700, Reiji Watanabe wrote:
+> > > > Introduce helpers to extract a field of an ID register.
+> > > > Subsequent patches will use those helpers.
+> > > >
+> > > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > > ---
+> > > >  .../selftests/kvm/include/aarch64/processor.h     |  2 ++
+> > > >  .../testing/selftests/kvm/lib/aarch64/processor.c | 15 +++++++++++++++
+> > > >  2 files changed, 17 insertions(+)
+> > > >
+> > > > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > > > index a8124f9dd68a..a9b4b4e0e592 100644
+> > > > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > > > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > > > @@ -193,4 +193,6 @@ void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
+> > > >
+> > > >  uint32_t guest_get_vcpuid(void);
+> > > >
+> > > > +int cpuid_get_sfield(uint64_t val, int field_shift);
+> > > > +unsigned int cpuid_get_ufield(uint64_t val, int field_shift);
+> > > >  #endif /* SELFTEST_KVM_PROCESSOR_H */
+> > > > diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> > > > index 6f5551368944..0b2ad46e7ff5 100644
+> > > > --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> > > > +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> > > > @@ -528,3 +528,18 @@ void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
+> > > >                  [arg4] "r"(arg4), [arg5] "r"(arg5), [arg6] "r"(arg6)
+> > > >                : "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7");
+> > > >  }
+> > > > +
+> > > > +/* Helpers to get a signed/unsigned feature field from ID register value */
+> > > > +int cpuid_get_sfield(uint64_t val, int field_shift)
+> > > > +{
+> > > > + int width = 4;
+> > > > +
+> > > > + return (int64_t)(val << (64 - width - field_shift)) >> (64 - width);
+> > > > +}
+> > >
+> > > I don't believe this helper is ever used.
 
-Because not all architectures have access to the vCPU index in the guest,
-use a bitmap with atomic accesses to track which entries in the pool are
-free/used.  A list+lock could also work in theory, but synchronizing the
-individual pointers to the guest would be a mess.
+I thought I was going to use this in the selftest for my ID register series.
+(So, I originally would like to have similar helpers in cpufeture.h)
+But, you are right. That test only extracts unsigned fields...
 
-Note, there's no need to rewalk the bitmap to ensure success.  If all
-vCPUs are simply allocating, success is guaranteed because there are
-enough entries for all vCPUs.  If one or more vCPUs are freeing and then
-reallocating, success is guaranteed because vCPUs _always_ walk the
-bitmap from 0=>N; if vCPU frees an entry and then wins a race to
-re-allocate, then either it will consume the entry it just freed (bit is
-the first free bit), or the losing vCPU is guaranteed to see the freed
-bit (winner consumes an earlier bit, which the loser hasn't yet visited).
+> > >
+> > > > +unsigned int cpuid_get_ufield(uint64_t val, int field_shift)
+> > > > +{
+> > > > + int width = 4;
+> > > > +
+> > > > + return (uint64_t)(val << (64 - width - field_shift)) >> (64 - width);
+> > > > +}
+> > >
+> > > I would recommend not open-coding this and instead make use of
+> > > ARM64_FEATURE_MASK(). You could pull in linux/bitfield.h to tools, or do
+> > > something like this:
+> > >
+> > >   #define ARM64_FEATURE_GET(ftr, val)                                       \
+> > >               ((ARM64_FEATURE_MASK(ftr) & val) >> ftr##_SHIFT)
+> > >
+> > > Slight preference for FIELD_{GET,SET}() as it matches the field
+> > > extraction in the kernel as well.
+> >
+> > Was doing that with this commit:
+> >
+> >       [PATCH v5 05/13] tools: Copy bitfield.h from the kernel sources
+> >
+> > Maybe you could just use it given that it's already reviewed.
+>
+> Oops, thanks for the reminder Ricardo! Yeah, let's go that route then.
 
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Co-developed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../selftests/kvm/include/ucall_common.h      |  9 ++-
- .../testing/selftests/kvm/lib/aarch64/ucall.c |  7 +-
- tools/testing/selftests/kvm/lib/riscv/ucall.c |  2 +-
- tools/testing/selftests/kvm/lib/s390x/ucall.c |  2 +-
- .../testing/selftests/kvm/lib/ucall_common.c  | 71 +++++++++++++++++--
- .../testing/selftests/kvm/lib/x86_64/ucall.c  |  2 +-
- 6 files changed, 76 insertions(+), 17 deletions(-)
+Thank you for the information. I will use that instead.
 
-diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
-index 2662a4352a8c..bdd373189a77 100644
---- a/tools/testing/selftests/kvm/include/ucall_common.h
-+++ b/tools/testing/selftests/kvm/include/ucall_common.h
-@@ -22,6 +22,9 @@ enum {
- struct ucall {
- 	uint64_t cmd;
- 	uint64_t args[UCALL_MAX_ARGS];
-+
-+	/* Host virtual address of this struct. */
-+	struct ucall *hva;
- };
- 
- void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
-@@ -30,11 +33,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu);
- 
- void ucall(uint64_t cmd, int nargs, ...);
- uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
--
--static inline void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
--{
--	ucall_arch_init(vm, mmio_gpa);
--}
-+void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
- 
- #define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
- 				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-index 21d73afcb14f..562c16dfbb00 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-@@ -32,12 +32,9 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- 
- 	if (run->exit_reason == KVM_EXIT_MMIO &&
- 	    run->mmio.phys_addr == vcpu->vm->ucall_mmio_addr) {
--		vm_vaddr_t gva;
--
--		TEST_ASSERT(run->mmio.is_write && run->mmio.len == 8,
-+		TEST_ASSERT(run->mmio.is_write && run->mmio.len == sizeof(uint64_t),
- 			    "Unexpected ucall exit mmio address access");
--		memcpy(&gva, run->mmio.data, sizeof(gva));
--		return addr_gva2hva(vcpu->vm, gva);
-+		return (void *)(*((uint64_t *)run->mmio.data));
- 	}
- 
- 	return NULL;
-diff --git a/tools/testing/selftests/kvm/lib/riscv/ucall.c b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-index 78acdb084ab0..9a3476a2dfca 100644
---- a/tools/testing/selftests/kvm/lib/riscv/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-@@ -55,7 +55,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- 	    run->riscv_sbi.extension_id == KVM_RISCV_SELFTESTS_SBI_EXT) {
- 		switch (run->riscv_sbi.function_id) {
- 		case KVM_RISCV_SELFTESTS_SBI_UCALL:
--			return addr_gva2hva(vcpu->vm, run->riscv_sbi.args[0]);
-+			return (void *)run->riscv_sbi.args[0];
- 		case KVM_RISCV_SELFTESTS_SBI_UNEXP:
- 			vcpu_dump(stderr, vcpu, 2);
- 			TEST_ASSERT(0, "Unexpected trap taken by guest");
-diff --git a/tools/testing/selftests/kvm/lib/s390x/ucall.c b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-index cbee520a26f2..a7f02dc372cf 100644
---- a/tools/testing/selftests/kvm/lib/s390x/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-@@ -26,7 +26,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- 	    (run->s390_sieic.ipb >> 16) == 0x501) {
- 		int reg = run->s390_sieic.ipa & 0xf;
- 
--		return addr_gva2hva(vcpu->vm, run->s.regs.gprs[reg]);
-+		return (void *)run->s.regs.gprs[reg];
- 	}
- 	return NULL;
- }
-diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
-index ced480860746..cc79d497b6b4 100644
---- a/tools/testing/selftests/kvm/lib/ucall_common.c
-+++ b/tools/testing/selftests/kvm/lib/ucall_common.c
-@@ -1,22 +1,85 @@
- // SPDX-License-Identifier: GPL-2.0-only
- #include "kvm_util.h"
-+#include "linux/types.h"
-+#include "linux/bitmap.h"
-+#include "linux/atomic.h"
-+
-+struct ucall_header {
-+	DECLARE_BITMAP(in_use, KVM_MAX_VCPUS);
-+	struct ucall ucalls[KVM_MAX_VCPUS];
-+};
-+
-+/*
-+ * ucall_pool holds per-VM values (global data is duplicated by each VM), it
-+ * must not be accessed from host code.
-+ */
-+static struct ucall_header *ucall_pool;
-+
-+void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
-+{
-+	struct ucall_header *hdr;
-+	struct ucall *uc;
-+	vm_vaddr_t vaddr;
-+	int i;
-+
-+	vaddr = vm_vaddr_alloc(vm, sizeof(*hdr), KVM_UTIL_MIN_VADDR);
-+	hdr = (struct ucall_header *)addr_gva2hva(vm, vaddr);
-+	memset(hdr, 0, sizeof(*hdr));
-+
-+	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
-+		uc = &hdr->ucalls[i];
-+		uc->hva = uc;
-+	}
-+
-+	write_guest_global(vm, ucall_pool, (struct ucall_header *)vaddr);
-+
-+	ucall_arch_init(vm, mmio_gpa);
-+}
-+
-+static struct ucall *ucall_alloc(void)
-+{
-+	struct ucall *uc;
-+	int i;
-+
-+	GUEST_ASSERT(ucall_pool && ucall_pool->in_use);
-+
-+	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
-+		if (!atomic_test_and_set_bit(i, ucall_pool->in_use)) {
-+			uc = &ucall_pool->ucalls[i];
-+			memset(uc->args, 0, sizeof(uc->args));
-+			return uc;
-+		}
-+	}
-+	GUEST_ASSERT(0);
-+	return NULL;
-+}
-+
-+static void ucall_free(struct ucall *uc)
-+{
-+	/* Beware, here be pointer arithmetic.  */
-+	clear_bit(uc - ucall_pool->ucalls, ucall_pool->in_use);
-+}
- 
- void ucall(uint64_t cmd, int nargs, ...)
- {
--	struct ucall uc = {};
-+	struct ucall *uc;
- 	va_list va;
- 	int i;
- 
--	WRITE_ONCE(uc.cmd, cmd);
-+	uc = ucall_alloc();
-+
-+	WRITE_ONCE(uc->cmd, cmd);
- 
- 	nargs = min(nargs, UCALL_MAX_ARGS);
- 
- 	va_start(va, nargs);
- 	for (i = 0; i < nargs; ++i)
--		WRITE_ONCE(uc.args[i], va_arg(va, uint64_t));
-+		WRITE_ONCE(uc->args[i], va_arg(va, uint64_t));
- 	va_end(va);
- 
--	ucall_arch_do_ucall((vm_vaddr_t)&uc);
-+	ucall_arch_do_ucall((vm_vaddr_t)uc->hva);
-+
-+	ucall_free(uc);
- }
- 
- uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-index eb8bf55b359a..4d41dc63cc9e 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-@@ -26,7 +26,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- 		struct kvm_regs regs;
- 
- 		vcpu_regs_get(vcpu, &regs);
--		return addr_gva2hva(vcpu->vm, regs.rdi);
-+		return (void *)regs.rdi;
- 	}
- 	return NULL;
- }
--- 
-2.37.2.672.g94769d06f0-goog
-
+Thank you,
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
