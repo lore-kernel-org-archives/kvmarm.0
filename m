@@ -2,83 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C529ECAAD8
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Aug 2022 21:38:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB4A3C0502C
+	for <kvmarm@archiver.kernel.org>; Sat, 27 Aug 2022 07:09:49 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BAFEA4D9D9;
-	Fri, 26 Aug 2022 17:38:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1511B4DAE5;
+	Sat, 27 Aug 2022 03:09:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qQnleAZQh2rN; Fri, 26 Aug 2022 17:38:29 -0400 (EDT)
+	with ESMTP id bWWSv+Ehs45R; Sat, 27 Aug 2022 03:09:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82E944D9CF;
-	Fri, 26 Aug 2022 17:38:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C9F674DAF3;
+	Sat, 27 Aug 2022 03:09:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 755844A0FE
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Aug 2022 17:32:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F5694DAB5
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Aug 2022 03:09:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZZg-KUREZOtc for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Aug 2022 17:32:44 -0400 (EDT)
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com
- [209.85.167.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 12EDD4D93B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Aug 2022 17:32:44 -0400 (EDT)
-Received: by mail-lf1-f44.google.com with SMTP id q7so3575776lfu.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Aug 2022 14:32:43 -0700 (PDT)
+ with ESMTP id cA1Y+a4hxMcL for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 27 Aug 2022 03:09:44 -0400 (EDT)
+Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com
+ [209.85.222.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF9104DAA9
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Aug 2022 03:09:44 -0400 (EDT)
+Received: by mail-ua1-f52.google.com with SMTP id i5so1292249uat.6
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Aug 2022 00:09:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:from:to:cc;
- bh=fGX1OPYHOyAdnf6z71dmW2DwOr7H4Y5wRyKl79aJ7R0=;
- b=ZC1efQqpG/Yl12c9Sf0lbSneIvuydmkz6lD+4KwRibO24kQUatXopq6xrBTE+YeeyR
- q7A0vfCIleUquEfbTOnSyFHAwePTyBPeqv2/ma8GgFea/Ixx3aLVwoY9Fes1qIrjLDr1
- Nd6jCOOn88THmF7GLR+a8EWPAuq3Zz3zn1PzhUigNoDANZ/JbADf29mivcvkYSmlIyPY
- Mljmir8oMpLOPvbS8ez1m+7uKdlmCp6LGxmF12PPwjzauVS8cA/Z9xWvqjCO8f0T0wuz
- kyy+4B1CYpyEZxjTV7uWkKZFEeBcp8NRBYb+60p59rhCoYViV4f4TSJ6kjl/TbfqRvpL
- g1TA==
+ bh=hOP43ttmkQC9HNoIqURH8XQ98joZKhQ/WbmApXVIzDI=;
+ b=cc+De/pHnnseJwJ1fzFU/Jo0du7DszIyB4BPIb3YqH+GyvN57Vn7KVJHwIPHpdIrde
+ YIj3FMJCKey9bHezR33TLtCqi5U8+C/5E8VNNd4gHMO8iwtrotv4DIuI07Bp5RBMqLrL
+ hA2gVVYsfKxn0zu6nBempwFGWgJbV/kulmHv0WPguyM8pC6Cw7pXWn4ro4riXkh66R7n
+ j5AA+dF4oaUa7YVXw3DwY26//92ToWPjIJLD1pi7pTzlcTxD24N4w5DGgWw4vS0eNtIV
+ Dtfe1DhquPeJgWvdg5keb3MFDY3h/LRyzdl8jahYO89woRQNBSzAQo/EbXoUQPtQZR2C
+ 7GdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:x-gm-message-state:from:to:cc;
- bh=fGX1OPYHOyAdnf6z71dmW2DwOr7H4Y5wRyKl79aJ7R0=;
- b=qa9nHpvl/uLLdoAvQH93ok0iybvpCzZesb5WX2q5fIysIzs0aA+l6U4TZp8QhBMSes
- yDKPz6TtxcKD1RxTuCIDcw8GiUNThZDd+h6ph9Ng/dxpoUAZwqBu2TqlEkbOB12VNAq0
- FQnKwsmtPARJxJT5V+pXWrgvR9hNdVWzWjlY4APiZO++DmFdIagwID4qGCJ4RMS/HLbE
- 6lWSnI2J0sNEpw7JxccTSyNf+jxuWJNjHUx/mew+lgJD161NVAouyd0zTlpC9l8gaD5e
- RjIIAp4PN2eCvGcKLbH2SV17e8hqwj6nD8IzKc9CQnq82vliCe2zIBM/RMZ9gZqN8ZMd
- CmbA==
-X-Gm-Message-State: ACgBeo3XY3oCe7GPqkgVpnynT9RBHCO0MdESrWIvLgwkGE5uD4IiXJBE
- /tcSww6qtdyHHi/If3vmWE91YtmTGJQxnTt9A3t/sg==
-X-Google-Smtp-Source: AA6agR4p8yZHknOzoft/51CAneJ1hrsnJGIMJ3qvD2H+dBtk7IsckDNc/Agfws5rxxUjM+VYCG98DW+qqx4b3NOZuyc=
-X-Received: by 2002:ac2:4e15:0:b0:48b:3ad2:42c8 with SMTP id
- e21-20020ac24e15000000b0048b3ad242c8mr3415436lfr.391.1661549562159; Fri, 26
- Aug 2022 14:32:42 -0700 (PDT)
+ bh=hOP43ttmkQC9HNoIqURH8XQ98joZKhQ/WbmApXVIzDI=;
+ b=A5AcnMnSswbzc4H4Jbou2HNr+1Kqkpjx6nyL8REglvDE0ODYlPMuIa3BxJePgGOp5C
+ 1SgBX3fek1ReAGhKf3vj4Hyp7b3cfxFMEMxrAx2hAIl0TWSn68PKeazJOgfRwB0R4E4G
+ xTKY9jk0pnGmQCMGDEdYAyLBOpAZW3rKOWX9v5lZIpO9UGT8G0DHbHNJMFWpXVJUu8Br
+ 2iQH4V1jsLJytlneTq0ah32eZjgp/OCgZn3TzCxmhyuJObp9dhuTzMngSroMqLN9WO8/
+ gOebjoh86z3uago+7Ev8V5Ox2lrIkj0bzeo/UsQgyforN/zjnjdrXaZw2d1oePJwjucD
+ dgqA==
+X-Gm-Message-State: ACgBeo1AMRuJgWiG64ofThxK//0Jp8H5ZnWDvpIQw/7jzECx/U4JDt++
+ ROjuarr+5+RSsZt34q5/seVB+jtTweQrUMpFx7bWNw==
+X-Google-Smtp-Source: AA6agR4P7MaQO2fX5+HZrXvJcV+khsr2kac7vbPBefszN5df6rtRUpFHJZo9PakcpOptZ5eF33X4f6YvH9J8sEeOvEU=
+X-Received: by 2002:ab0:32da:0:b0:39f:61f6:ef6a with SMTP id
+ f26-20020ab032da000000b0039f61f6ef6amr1019646uao.106.1661584184002; Sat, 27
+ Aug 2022 00:09:44 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220825232522.3997340-1-seanjc@google.com>
-In-Reply-To: <20220825232522.3997340-1-seanjc@google.com>
-From: Peter Gonda <pgonda@google.com>
-Date: Fri, 26 Aug 2022 15:32:30 -0600
-Message-ID: <CAMkAt6ryLh-gQYvmUYfxS3+CRwCLfK3Fby1W5NxxFLSK7M_v0w@mail.gmail.com>
-Subject: Re: [PATCH v5 0/7] KVM: selftests: Implement ucall "pool" (for SEV)
-To: Sean Christopherson <seanjc@google.com>
-X-Mailman-Approved-At: Fri, 26 Aug 2022 17:38:28 -0400
-Cc: kvm list <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
- Tom Rix <trix@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>,
- llvm@lists.linux.dev, Colton Lewis <coltonlewis@google.com>,
- linux-riscv@lists.infradead.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- kvmarm@lists.cs.columbia.edu, Janosch Frank <frankja@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Nathan Chancellor <nathan@kernel.org>,
- Atish Patra <atishp@atishpatra.org>, Andrew Jones <andrew.jones@linux.dev>,
- linux-arm-kernel@lists.infradead.org,
- Nick Desaulniers <ndesaulniers@google.com>,
- LKML <linux-kernel@vger.kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- kvm-riscv@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>
+References: <20220805135813.2102034-1-maz@kernel.org>
+ <20220805135813.2102034-9-maz@kernel.org>
+ <YvNbPm7WAhUCRkx/@google.com> <87sfm4v45i.wl-maz@kernel.org>
+In-Reply-To: <87sfm4v45i.wl-maz@kernel.org>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Sat, 27 Aug 2022 00:09:28 -0700
+Message-ID: <CAAeT=FxfWO0b8qRPc9kzjJfN1yKxXA=7VuGhWwnizZzC=BrnNA@mail.gmail.com>
+Subject: Re: [PATCH 8/9] KVM: arm64: PMU: Implement PMUv3p5 long counter
+ support
+To: Marc Zyngier <maz@kernel.org>
+Cc: Linux ARM <linux-arm-kernel@lists.infradead.org>, kernel-team@android.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,28 +86,110 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Aug 25, 2022 at 5:25 PM Sean Christopherson <seanjc@google.com> wrote:
+On Wed, Aug 10, 2022 at 2:28 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Non-KVM folks, y'all got pulled in because of the atomic_test_and_set_bit()
-> patch.
->
-> Rework the ucall infrastructure to use a pool of ucall structs to pass
-> memory instead of using the guest's stack.  For confidential VMs with
-> encrypted memory, e.g. SEV, the guest's stack "needs" to be private memory
-> and so can't be used to communicate with the host.
->
-> Convert all implementations to the pool as all of the complexity is hidden
-> in common code, and supporting multiple interfaces adds its own kind of
-> complexity.
->
-> Tested on x86 and ARM, compile tested on s390 and RISC-V.
->
+> On Wed, 10 Aug 2022 08:16:14 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > Hi Marc,
+> >
+> > On Fri, Aug 05, 2022 at 02:58:12PM +0100, Marc Zyngier wrote:
+> > > PMUv3p5 (which is mandatory with ARMv8.5) comes with some extra
+> > > features:
+> > >
+> > > - All counters are 64bit
+> > >
+> > > - The overflow point is controlled by the PMCR_EL0.LP bit
+> > >
+> > > Add the required checks in the helpers that control counter
+> > > width and overflow, as well as the sysreg handling for the LP
+> > > bit. A new kvm_pmu_is_3p5() helper makes it easy to spot the
+> > > PMUv3p5 specific handling.
+> > >
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/pmu-emul.c | 8 +++++---
+> > >  arch/arm64/kvm/sys_regs.c | 4 ++++
+> > >  include/kvm/arm_pmu.h     | 8 ++++++++
+> > >  3 files changed, 17 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > > index 33a88ca7b7fd..b33a2953cbf6 100644
+> > > --- a/arch/arm64/kvm/pmu-emul.c
+> > > +++ b/arch/arm64/kvm/pmu-emul.c
+> > > @@ -50,13 +50,15 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
+> > >   */
+> > >  static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
+> > >  {
+> > > -   return (select_idx == ARMV8_PMU_CYCLE_IDX);
+> > > +   return (select_idx == ARMV8_PMU_CYCLE_IDX || kvm_pmu_is_3p5(vcpu));
+> > >  }
+> > >
+> > >  static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 select_idx)
+> > >  {
+> > > -   return (select_idx == ARMV8_PMU_CYCLE_IDX &&
+> > > -           __vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
+> > > +   u64 val = __vcpu_sys_reg(vcpu, PMCR_EL0);
+> > > +
+> > > +   return (select_idx < ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LP)) ||
+> > > +          (select_idx == ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LC));
+> > >  }
+> > >
+> > >  static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index c0595f31dab8..2b5e0ec5c100 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -654,6 +654,8 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> > >            | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
 
-Thanks for the help on the ucall-pool Sean!
+Not directly related to this series, but using 0xdecafbad above
+appears to be odd. I think that would lead the bit 3 and 5 to be
+unconditionally set in the register's reset value that the guest will
+initially see even on the configuration where those should be RES0.
 
-I rebased the SEV selftests on these and everything works as before
+> > >     if (!system_supports_32bit_el0())
+> > >             val |= ARMV8_PMU_PMCR_LC;
+> > > +   if (!kvm_pmu_is_3p5(vcpu))
+> > > +           val &= ~ARMV8_PMU_PMCR_LP;
+> > >     __vcpu_sys_reg(vcpu, r->reg) = val;
+> > >  }
+> > >
+> > > @@ -703,6 +705,8 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> > >             val |= p->regval & ARMV8_PMU_PMCR_MASK;
+> > >             if (!system_supports_32bit_el0())
+> > >                     val |= ARMV8_PMU_PMCR_LC;
+> > > +           if (!kvm_pmu_is_3p5(vcpu))
+> > > +                   val &= ~ARMV8_PMU_PMCR_LP;
+> > >             __vcpu_sys_reg(vcpu, PMCR_EL0) = val;
+> > >             kvm_pmu_handle_pmcr(vcpu, val);
+> > >             kvm_vcpu_pmu_restore_guest(vcpu);
+> > > diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> > > index 6bda9b071084..846502251923 100644
+> > > --- a/include/kvm/arm_pmu.h
+> > > +++ b/include/kvm/arm_pmu.h
+> > > @@ -89,6 +89,13 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+> > >                     vcpu->arch.pmu.events = *kvm_get_pmu_events();  \
+> > >     } while (0)
+> > >
+> > > +/*
+> > > + * Evaluates as true when emulating PMUv3p5, and false otherwise.
+> > > + */
+> > > +#define kvm_pmu_is_3p5(vcpu)                                               \
+> > > +   (vcpu->kvm->arch.dfr0_pmuver >= ID_AA64DFR0_PMUVER_8_5 &&       \
+> > > +    vcpu->kvm->arch.dfr0_pmuver != ID_AA64DFR0_PMUVER_IMP_DEF)
+> >
+> > I don't believe the IMP_DEF condition will ever evaluate to false as
+> > dfr0_pmuver is sanitized at initialization and writes from userspace.
+>
+> Good point. That's a leftover from a previous version. I'll fix that.
 
-TESTED-BY: Peter Gonda <pgonda@google.com>
+With the current series, I think the dfr0_pmuver could be IMP_DEF
+due to the same bug that I mentioned for the patch-6.
+(https://lore.kernel.org/all/20220214065746.1230608-11-reijiw@google.com/)
+
+Thank you,
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
