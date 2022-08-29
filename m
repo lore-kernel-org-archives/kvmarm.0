@@ -2,66 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95111ECAAD2
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Aug 2022 16:36:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CB9AECAAA1
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Aug 2022 17:25:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F2EDA4B88E;
-	Mon, 29 Aug 2022 12:36:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BBAEA4BFD4;
+	Mon, 29 Aug 2022 13:25:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id d5z+jRcQA4+Y; Mon, 29 Aug 2022 12:36:36 -0400 (EDT)
+	with ESMTP id WzoTx1vanNTK; Mon, 29 Aug 2022 13:25:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FA044B879;
-	Mon, 29 Aug 2022 12:36:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 324714BFC8;
+	Mon, 29 Aug 2022 13:25:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF6234B874
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Aug 2022 12:36:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C0624BFC0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Aug 2022 13:25:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rosh1qvxSJaw for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Aug 2022 12:36:33 -0400 (EDT)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15CFF4B86D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Aug 2022 12:36:33 -0400 (EDT)
-Date: Mon, 29 Aug 2022 18:36:27 +0200
+ with ESMTP id JI-zjMpugUy0 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Aug 2022 13:25:17 -0400 (EDT)
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8BD7F4BFBF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Aug 2022 13:25:17 -0400 (EDT)
+Date: Mon, 29 Aug 2022 19:25:08 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1661790992;
+ t=1661793916;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=jeqfda5hacfguvxdxE/9MUFoXxfI35ya4rVvOsObN+s=;
- b=a7yF5LJQxTxV6xD2oelvbldJ9iRYG7Y71UfZJyea19oubR2bw0hYhCuFl80rNrX8+4i/uE
- YugZvPHEnaBxwns8abNs2t53yD/rtCJIQO9jVOhUjFbY1EIyxEltK0rsau2midnNwGagoS
- fmA4gqivlrX2V5eoCWdwVXs3ZLs/XuA=
+ bh=SY3qaOTb2VJb+wLuf/E+vyY5qSaIIyhVKf+yCSPeXAI=;
+ b=rSOBzKUgQDoEc8aNdwhRmKFlA1doBbu+4jtJjCD8BJEGRKzeay1ijiek4S6cV+YNHE9AhJ
+ ewI51PQ9ZH65CX78gTRu7EmULuFq8fCghb+k7yA8q1+p1o9JZQeY1FxJ8Jj4kf/h7GJSIr
+ ekQ5fAwlzRf2Flt6y1BbNgoqZUF/+kU=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v5 7/7] KVM: selftests: Add ucall pool based implementation
-Message-ID: <20220829163627.qbafyl4qz5cxxue5@kamzik>
-References: <20220825232522.3997340-1-seanjc@google.com>
- <20220825232522.3997340-8-seanjc@google.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v5 07/13] KVM: selftests: Change ____vm_create() to take
+ struct kvm_vm_mem_params
+Message-ID: <20220829172508.oc3rr44q2irwudi5@kamzik>
+References: <20220823234727.621535-1-ricarkol@google.com>
+ <20220823234727.621535-8-ricarkol@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220825232522.3997340-8-seanjc@google.com>
+In-Reply-To: <20220823234727.621535-8-ricarkol@google.com>
 X-Migadu-Flow: FLOW_OUT
 X-Migadu-Auth-User: linux.dev
-Cc: kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- Tom Rix <trix@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>,
- llvm@lists.linux.dev, Colton Lewis <coltonlewis@google.com>,
- linux-riscv@lists.infradead.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- kvmarm@lists.cs.columbia.edu, Janosch Frank <frankja@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>, Peter Gonda <pgonda@google.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Nathan Chancellor <nathan@kernel.org>,
- Atish Patra <atishp@atishpatra.org>, linux-arm-kernel@lists.infradead.org,
- Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
- Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, dmatclack@google.com, maz@kernel.org,
+ bgardon@google.com, pbonzini@redhat.com, axelrasmussen@google.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,230 +70,289 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Aug 25, 2022 at 11:25:22PM +0000, Sean Christopherson wrote:
-> From: Peter Gonda <pgonda@google.com>
+On Tue, Aug 23, 2022 at 11:47:21PM +0000, Ricardo Koller wrote:
+> The vm_create() helpers are hardcoded to place most page types (code,
+> page-tables, stacks, etc) in the same memslot #0, and always backed with
+> anonymous 4K.  There are a couple of issues with that.  First, tests willing to
+> differ a bit, like placing page-tables in a different backing source type must
+> replicate much of what's already done by the vm_create() functions.  Second,
+> the hardcoded assumption of memslot #0 holding most things is spreaded
+> everywhere; this makes it very hard to change.
 > 
-> To play nice with guests whose stack memory is encrypted, e.g. AMD SEV,
-> introduce a new "ucall pool" implementation that passes the ucall struct
-> via dedicated memory (which can be mapped shared, a.k.a. as plain text).
+> Fix the above issues by having selftests specify how they want memory to be
+> laid out: define the memory regions to use for code, pt (page-tables), and
+> data. Introduce a new structure, struct kvm_vm_mem_params, that defines: guest
+> mode, a list of memory region descriptions, and some fields specifying what
+> regions to use for code, pt, and data.
 > 
-> Because not all architectures have access to the vCPU index in the guest,
-> use a bitmap with atomic accesses to track which entries in the pool are
-> free/used.  A list+lock could also work in theory, but synchronizing the
-> individual pointers to the guest would be a mess.
+> There is no functional change intended. The current commit adds a default
+> struct kvm_vm_mem_params that lays out memory exactly as before. The next
+> commit will change the allocators to get the region they should be using,
+> e.g.,: like the page table allocators using the pt memslot.
 > 
-> Note, there's no need to rewalk the bitmap to ensure success.  If all
-> vCPUs are simply allocating, success is guaranteed because there are
-> enough entries for all vCPUs.  If one or more vCPUs are freeing and then
-> reallocating, success is guaranteed because vCPUs _always_ walk the
-> bitmap from 0=>N; if vCPU frees an entry and then wins a race to
-> re-allocate, then either it will consume the entry it just freed (bit is
-> the first free bit), or the losing vCPU is guaranteed to see the freed
-> bit (winner consumes an earlier bit, which the loser hasn't yet visited).
-> 
-> Signed-off-by: Peter Gonda <pgonda@google.com>
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Andrew Jones <andrew.jones@linux.dev>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > ---
->  .../selftests/kvm/include/ucall_common.h      |  9 ++-
->  .../testing/selftests/kvm/lib/aarch64/ucall.c |  7 +-
->  tools/testing/selftests/kvm/lib/riscv/ucall.c |  2 +-
->  tools/testing/selftests/kvm/lib/s390x/ucall.c |  2 +-
->  .../testing/selftests/kvm/lib/ucall_common.c  | 71 +++++++++++++++++--
->  .../testing/selftests/kvm/lib/x86_64/ucall.c  |  2 +-
->  6 files changed, 76 insertions(+), 17 deletions(-)
+>  .../selftests/kvm/include/kvm_util_base.h     | 61 ++++++++++++++++-
+>  .../selftests/kvm/lib/aarch64/processor.c     |  3 +-
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 65 +++++++++++++++++--
+>  3 files changed, 119 insertions(+), 10 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
-> index 2662a4352a8c..bdd373189a77 100644
-> --- a/tools/testing/selftests/kvm/include/ucall_common.h
-> +++ b/tools/testing/selftests/kvm/include/ucall_common.h
-> @@ -22,6 +22,9 @@ enum {
->  struct ucall {
->  	uint64_t cmd;
->  	uint64_t args[UCALL_MAX_ARGS];
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index b2dbe253d4d0..abe6c4e390ff 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -93,6 +93,16 @@ struct kvm_vm {
+>  	int stats_fd;
+>  	struct kvm_stats_header stats_header;
+>  	struct kvm_stats_desc *stats_desc;
 > +
-> +	/* Host virtual address of this struct. */
-> +	struct ucall *hva;
+> +	/*
+> +	 * KVM region slots. These are the default memslots used by page
+> +	 * allocators, e.g., lib/elf uses the code memslot.
+> +	 */
+> +	struct {
+> +		uint32_t code;
+> +		uint32_t pt;
+> +		uint32_t data;
+> +	} memslot;
 >  };
 >  
->  void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
-> @@ -30,11 +33,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu);
 >  
->  void ucall(uint64_t cmd, int nargs, ...);
->  uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
-> -
-> -static inline void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
-> -{
-> -	ucall_arch_init(vm, mmio_gpa);
-> -}
-> +void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
+> @@ -105,6 +115,21 @@ struct kvm_vm {
+>  struct userspace_mem_region *
+>  memslot2region(struct kvm_vm *vm, uint32_t memslot);
 >  
->  #define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
->  				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> index 21d73afcb14f..562c16dfbb00 100644
-> --- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-> @@ -32,12 +32,9 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
->  
->  	if (run->exit_reason == KVM_EXIT_MMIO &&
->  	    run->mmio.phys_addr == vcpu->vm->ucall_mmio_addr) {
-> -		vm_vaddr_t gva;
-> -
-> -		TEST_ASSERT(run->mmio.is_write && run->mmio.len == 8,
-> +		TEST_ASSERT(run->mmio.is_write && run->mmio.len == sizeof(uint64_t),
->  			    "Unexpected ucall exit mmio address access");
-> -		memcpy(&gva, run->mmio.data, sizeof(gva));
-> -		return addr_gva2hva(vcpu->vm, gva);
-> +		return (void *)(*((uint64_t *)run->mmio.data));
->  	}
->  
->  	return NULL;
-> diff --git a/tools/testing/selftests/kvm/lib/riscv/ucall.c b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-> index 78acdb084ab0..9a3476a2dfca 100644
-> --- a/tools/testing/selftests/kvm/lib/riscv/ucall.c
-> +++ b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-> @@ -55,7 +55,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
->  	    run->riscv_sbi.extension_id == KVM_RISCV_SELFTESTS_SBI_EXT) {
->  		switch (run->riscv_sbi.function_id) {
->  		case KVM_RISCV_SELFTESTS_SBI_UCALL:
-> -			return addr_gva2hva(vcpu->vm, run->riscv_sbi.args[0]);
-> +			return (void *)run->riscv_sbi.args[0];
->  		case KVM_RISCV_SELFTESTS_SBI_UNEXP:
->  			vcpu_dump(stderr, vcpu, 2);
->  			TEST_ASSERT(0, "Unexpected trap taken by guest");
-> diff --git a/tools/testing/selftests/kvm/lib/s390x/ucall.c b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-> index cbee520a26f2..a7f02dc372cf 100644
-> --- a/tools/testing/selftests/kvm/lib/s390x/ucall.c
-> +++ b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-> @@ -26,7 +26,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
->  	    (run->s390_sieic.ipb >> 16) == 0x501) {
->  		int reg = run->s390_sieic.ipa & 0xf;
->  
-> -		return addr_gva2hva(vcpu->vm, run->s.regs.gprs[reg]);
-> +		return (void *)run->s.regs.gprs[reg];
->  	}
->  	return NULL;
->  }
-> diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
-> index ced480860746..cc79d497b6b4 100644
-> --- a/tools/testing/selftests/kvm/lib/ucall_common.c
-> +++ b/tools/testing/selftests/kvm/lib/ucall_common.c
-> @@ -1,22 +1,85 @@
->  // SPDX-License-Identifier: GPL-2.0-only
->  #include "kvm_util.h"
-> +#include "linux/types.h"
-> +#include "linux/bitmap.h"
-> +#include "linux/atomic.h"
+> +inline struct userspace_mem_region *vm_get_code_region(struct kvm_vm *vm)
+> +{
+> +	return memslot2region(vm, vm->memslot.code);
+> +}
 > +
-> +struct ucall_header {
-> +	DECLARE_BITMAP(in_use, KVM_MAX_VCPUS);
-> +	struct ucall ucalls[KVM_MAX_VCPUS];
+> +inline struct userspace_mem_region *vm_get_pt_region(struct kvm_vm *vm)
+> +{
+> +	return memslot2region(vm, vm->memslot.pt);
+> +}
+> +
+> +inline struct userspace_mem_region *vm_get_data_region(struct kvm_vm *vm)
+> +{
+> +	return memslot2region(vm, vm->memslot.data);
+> +}
+
+I feel we'll be revisiting this frequently when more and more region types
+are desired. For example, Sean wants a read-only memory region for ucall
+exits. How about putting a mem slot array in struct kvm_vm, defining an
+enum to index it (which will expand), and then single helper function,
+something like
+
+ inline struct userspace_mem_region *
+ vm_get_mem_region(struct kvm_vm *vm, enum memslot_type mst)
+ {
+    return memslot2region(vm, vm->memslots[mst]);
+ }
+
+> +
+>  /* Minimum allocated guest virtual and physical addresses */
+>  #define KVM_UTIL_MIN_VADDR		0x2000
+>  #define KVM_GUEST_PAGE_TABLE_MIN_PADDR	0x180000
+> @@ -637,19 +662,51 @@ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+>  			      vm_paddr_t paddr_min, uint32_t memslot);
+>  vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
+>  
+> +#define MEM_PARAMS_MAX_MEMSLOTS 3
+
+And this becomes MEMSLOT_MAX of the enum proposed above
+
+ enum memslot_type {
+     MEMSLOT_CODE,
+     MEMSLOT_PT,
+     MEMSLOT_DATA,
+     MEMSLOT_MAX,
+ };
+
+> +
+> +struct kvm_vm_mem_params {
+> +	enum vm_guest_mode mode;
+> +
+> +	struct {
+> +		enum vm_mem_backing_src_type src_type;
+> +		uint64_t guest_paddr;
+> +		/*
+> +		 * KVM region slot (same meaning as in struct
+> +		 * kvm_userspace_memory_region).
+> +		 */
+> +		uint32_t slot;
+> +		uint64_t npages;
+> +		uint32_t flags;
+> +		bool enabled;
+> +	} region[MEM_PARAMS_MAX_MEMSLOTS];
+> +
+> +	/* Indexes into the above array. */
+> +	struct {
+> +		uint16_t code;
+> +		uint16_t pt;
+> +		uint16_t data;
+> +	} region_idx;
+
+And this changes to another array of memslots also indexed with
+enum memslot_type.
+
 > +};
 > +
-> +/*
-> + * ucall_pool holds per-VM values (global data is duplicated by each VM), it
-> + * must not be accessed from host code.
-> + */
-> +static struct ucall_header *ucall_pool;
+> +extern struct kvm_vm_mem_params kvm_vm_mem_default;
 > +
-> +void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
-> +{
-> +	struct ucall_header *hdr;
-> +	struct ucall *uc;
-> +	vm_vaddr_t vaddr;
-> +	int i;
-> +
-> +	vaddr = vm_vaddr_alloc(vm, sizeof(*hdr), KVM_UTIL_MIN_VADDR);
-> +	hdr = (struct ucall_header *)addr_gva2hva(vm, vaddr);
-> +	memset(hdr, 0, sizeof(*hdr));
-> +
-> +	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
-> +		uc = &hdr->ucalls[i];
-> +		uc->hva = uc;
-> +	}
-> +
-> +	write_guest_global(vm, ucall_pool, (struct ucall_header *)vaddr);
-> +
-> +	ucall_arch_init(vm, mmio_gpa);
-> +}
-> +
-> +static struct ucall *ucall_alloc(void)
-> +{
-> +	struct ucall *uc;
-> +	int i;
-> +
-> +	GUEST_ASSERT(ucall_pool && ucall_pool->in_use);
-
-ucall_pool->in_use will never be null.
-
-> +
-> +	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
-> +		if (!atomic_test_and_set_bit(i, ucall_pool->in_use)) {
-> +			uc = &ucall_pool->ucalls[i];
-> +			memset(uc->args, 0, sizeof(uc->args));
-> +			return uc;
-> +		}
-> +	}
-
-nit: blank line
-
-> +	GUEST_ASSERT(0);
-> +	return NULL;
-> +}
-> +
-> +static void ucall_free(struct ucall *uc)
-> +{
-> +	/* Beware, here be pointer arithmetic.  */
-> +	clear_bit(uc - ucall_pool->ucalls, ucall_pool->in_use);
-> +}
+>  /*
+>   * ____vm_create() does KVM_CREATE_VM and little else.  __vm_create() also
+>   * loads the test binary into guest memory and creates an IRQ chip (x86 only).
+>   * __vm_create() does NOT create vCPUs, @nr_runnable_vcpus is used purely to
+>   * calculate the amount of memory needed for per-vCPU data, e.g. stacks.
+>   */
+> -struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages);
+> +struct kvm_vm *____vm_create(struct kvm_vm_mem_params *mem_params);
+>  struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
+>  			   uint64_t nr_extra_pages);
 >  
->  void ucall(uint64_t cmd, int nargs, ...)
+>  static inline struct kvm_vm *vm_create_barebones(void)
 >  {
-> -	struct ucall uc = {};
-> +	struct ucall *uc;
->  	va_list va;
->  	int i;
->  
-> -	WRITE_ONCE(uc.cmd, cmd);
-> +	uc = ucall_alloc();
+> -	return ____vm_create(VM_MODE_DEFAULT, 0);
+> +	struct kvm_vm_mem_params params_wo_memslots = {
+> +		.mode = kvm_vm_mem_default.mode,
+> +	};
 > +
-> +	WRITE_ONCE(uc->cmd, cmd);
->  
->  	nargs = min(nargs, UCALL_MAX_ARGS);
->  
->  	va_start(va, nargs);
->  	for (i = 0; i < nargs; ++i)
-> -		WRITE_ONCE(uc.args[i], va_arg(va, uint64_t));
-> +		WRITE_ONCE(uc->args[i], va_arg(va, uint64_t));
->  	va_end(va);
->  
-> -	ucall_arch_do_ucall((vm_vaddr_t)&uc);
-> +	ucall_arch_do_ucall((vm_vaddr_t)uc->hva);
-> +
-> +	ucall_free(uc);
+> +	return ____vm_create(&params_wo_memslots);
 >  }
 >  
->  uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-> index eb8bf55b359a..4d41dc63cc9e 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-> @@ -26,7 +26,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
->  		struct kvm_regs regs;
->  
->  		vcpu_regs_get(vcpu, &regs);
-> -		return addr_gva2hva(vcpu->vm, regs.rdi);
-> +		return (void *)regs.rdi;
->  	}
->  	return NULL;
+>  static inline struct kvm_vm *vm_create(uint32_t nr_runnable_vcpus)
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index 26f0eccff6fe..5a31dc85d054 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -508,7 +508,8 @@ void aarch64_get_supported_page_sizes(uint32_t ipa,
+>   */
+>  void __attribute__((constructor)) init_guest_modes(void)
+>  {
+> -       guest_modes_append_default();
+> +	guest_modes_append_default();
+> +	kvm_vm_mem_default.mode = VM_MODE_DEFAULT;
 >  }
+>  
+>  void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 5a9f080ff888..91b42d6b726b 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -143,12 +143,41 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+>  _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
+>  	       "Missing new mode params?");
+>  
+> -struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages)
+> +/* A single memslot #0 for code, data, and page tables. */
+> +struct kvm_vm_mem_params kvm_vm_mem_default = {
+> +#if defined(__aarch64__)
+> +	/* arm64 is the only arch without a true default mode. */
+> +	.mode = NUM_VM_MODES,
+
+How about
+
+ #ifndef __arch64__
+   /* arm64 kvm_vm_mem_default.mode set in init_guest_modes() */
+   .mode = VM_MODE_DEFAULT,
+ #endif
+
+> +#else
+> +	.mode = VM_MODE_DEFAULT,
+> +#endif
+> +	.region[0] = {
+> +		.src_type = VM_MEM_SRC_ANONYMOUS,
+> +		.guest_paddr = 0,
+> +		.slot = 0,
+> +		/*
+> +		 * 4mb when page size is 4kb. Note that vm_nr_pages_required(),
+> +		 * the function used by most tests to calculate guest memory
+> +		 * requirements uses around ~520 pages for more tests.
+
+...requirements, currently returns ~520 pages for the majority of tests.
+
+> +		 */
+> +		.npages = 1024,
+
+And here we double it, but it's still fragile. I see we override this
+in __vm_create() below though, so now I wonder why we set it at all.
+
+> +		.flags = 0,
+> +		.enabled = true,
+> +	},
+> +	.region_idx = {
+> +		.code = 0,
+> +		.pt = 0,
+> +		.data = 0,
+> +	},
+> +};
+> +
+> +struct kvm_vm *____vm_create(struct kvm_vm_mem_params *mem_params)
+>  {
+> +	enum vm_guest_mode mode = mem_params->mode;
+>  	struct kvm_vm *vm;
+> +	int idx;
+>  
+> -	pr_debug("%s: mode='%s' pages='%ld'\n", __func__,
+> -		 vm_guest_mode_string(mode), nr_pages);
+> +	pr_debug("%s: mode='%s'\n", __func__, vm_guest_mode_string(mode));
+>  
+>  	vm = calloc(1, sizeof(*vm));
+>  	TEST_ASSERT(vm != NULL, "Insufficient Memory");
+> @@ -245,9 +274,28 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages)
+>  
+>  	/* Allocate and setup memory for guest. */
+>  	vm->vpages_mapped = sparsebit_alloc();
+> -	if (nr_pages != 0)
+> -		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+> -					    0, 0, nr_pages, 0);
+> +
+> +	/* Setup the code, pt, and data memslots according to the spec */
+> +	for (idx = 0; idx < MEM_PARAMS_MAX_MEMSLOTS; idx++) {
+> +		if (!mem_params->region[idx].enabled)
+> +			continue;
+> +
+> +		vm_userspace_mem_region_add(vm,
+> +			mem_params->region[idx].src_type,
+> +			mem_params->region[idx].guest_paddr,
+> +			mem_params->region[idx].slot,
+> +			mem_params->region[idx].npages,
+> +			mem_params->region[idx].flags);
+> +	}
+> +
+> +	TEST_ASSERT(mem_params->region_idx.code < MEM_PARAMS_MAX_MEMSLOTS &&
+> +		    mem_params->region_idx.pt < MEM_PARAMS_MAX_MEMSLOTS &&
+> +		    mem_params->region_idx.data < MEM_PARAMS_MAX_MEMSLOTS,
+> +		    "region_idx should be valid indexes\n");
+> +
+> +	vm->memslot.code = mem_params->region[mem_params->region_idx.code].slot;
+> +	vm->memslot.pt = mem_params->region[mem_params->region_idx.pt].slot;
+> +	vm->memslot.data = mem_params->region[mem_params->region_idx.data].slot;
+>  
+>  	return vm;
+>  }
+> @@ -292,9 +340,12 @@ struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
+>  {
+>  	uint64_t nr_pages = vm_nr_pages_required(mode, nr_runnable_vcpus,
+>  						 nr_extra_pages);
+> +	struct kvm_vm_mem_params mem_params = kvm_vm_mem_default;
+>  	struct kvm_vm *vm;
+>  
+> -	vm = ____vm_create(mode, nr_pages);
+> +	mem_params.region[0].npages = nr_pages;
+> +	mem_params.mode = mode;
+> +	vm = ____vm_create(&mem_params);
+>  
+>  	kvm_vm_elf_load(vm, program_invocation_name);
+>  
 > -- 
-> 2.37.2.672.g94769d06f0-goog
+> 2.37.1.595.g718a3a8f04-goog
+>
 
-Otherwise,
-
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Thanks,
+drew
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
