@@ -2,53 +2,52 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B445ECAAD2
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Aug 2022 16:19:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5381AECAAD5
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Aug 2022 16:21:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BF3B4C157;
-	Mon, 29 Aug 2022 12:19:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4BED4C151;
+	Mon, 29 Aug 2022 12:21:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zRv+1bSLhPlB; Mon, 29 Aug 2022 12:19:49 -0400 (EDT)
+	with ESMTP id 3rgm4fu0826l; Mon, 29 Aug 2022 12:21:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 846B44C14D;
-	Mon, 29 Aug 2022 12:19:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C9DC04C14E;
+	Mon, 29 Aug 2022 12:21:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 95F0E4C127
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Aug 2022 12:19:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C0534C127
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Aug 2022 12:21:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2bm3ON-3RZtw for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Aug 2022 12:19:46 -0400 (EDT)
+ with ESMTP id c9oqfEEHuChT for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Aug 2022 12:21:14 -0400 (EDT)
 Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 742184BAC3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Aug 2022 12:19:46 -0400 (EDT)
-Date: Mon, 29 Aug 2022 18:19:41 +0200
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 214204BAC3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Aug 2022 12:21:14 -0400 (EDT)
+Date: Mon, 29 Aug 2022 18:21:11 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1661789984;
+ t=1661790073;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=URd452JoMFM9JD7pYWX5aoZrRYft8Gac0hRTpx4CpB4=;
- b=cmAaq27a2rEDvaFF7eIf/c+iEhVwMjmtSQo0G1Xqa4rr5PmoDkzJisJPTaorWXIbYYuMsN
- +N8RcRi9Mq5LOv6cPDYQyYshMhIlPtfYGzLct3XwxIvDIbi8Tvjjnjp38np47QcYF+a9Up
- 7KTvlcfUB1wBgeGX6fRshWbeb0i2X2I=
+ bh=V84lDEZ16EblHvtM8fgyVev0owrVHxHzScy/ND3jaaQ=;
+ b=CaPKCCVzoPf4bcbSMTSpQx2lOZ5yESWOlPHBTiOGHy4YQpHkCtql8IPuRRpSByvC5hO8de
+ 6xl8kO3jvz+Vdxt6cwkLhNUnQ9HU+hkqAyGXbfk+QrVReKpiqR0UixIQTF6rHD9/2AuqXA
+ G+ANmKWFLtjqyg/LGkmx1D+5lFNxgSE=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v5 5/7] KVM: selftests: Make arm64's MMIO ucall multi-VM
- friendly
-Message-ID: <20220829161941.c5bd6azxv7jzpwq2@kamzik>
+Subject: Re: [PATCH v5 6/7] KVM: selftest: Drop now-unnecessary ucall_uninit()
+Message-ID: <20220829162111.wl65dxexk5qtrssf@kamzik>
 References: <20220825232522.3997340-1-seanjc@google.com>
- <20220825232522.3997340-6-seanjc@google.com>
+ <20220825232522.3997340-7-seanjc@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220825232522.3997340-6-seanjc@google.com>
+In-Reply-To: <20220825232522.3997340-7-seanjc@google.com>
 X-Migadu-Flow: FLOW_OUT
 X-Migadu-Auth-User: linux.dev
 Cc: kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
@@ -79,25 +78,25 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Aug 25, 2022 at 11:25:20PM +0000, Sean Christopherson wrote:
-> Fix a mostly-theoretical bug where ARM's ucall MMIO setup could result in
-> different VMs stomping on each other by cloberring the global pointer.
-> 
-> Fix the most obvious issue by saving the MMIO gpa into the VM.
-> 
-> A more subtle bug is that creating VMs in parallel (on multiple tasks)
-> could result in a VM using the wrong address.  Synchronizing a global to
-> a guest effectively snapshots the value on a per-VM basis, i.e. the
-> "global" is already prepped to work with multiple VMs, but setting the
-> global in the host is not thread-safe.  To fix that bug, add
-> write_guest_global() to allow stuffing a VM's copy of a "global" without
-> modifying the host value.
+On Thu, Aug 25, 2022 at 11:25:21PM +0000, Sean Christopherson wrote:
+> Drop ucall_uninit() and ucall_arch_uninit() now that ARM doesn't modify
+> the host's copy of ucall_exit_mmio_addr, i.e. now that there's no need to
+> reset the pointer before potentially creating a new VM.  The few calls to
+> ucall_uninit() are all immediately followed by kvm_vm_free(), and that is
+> likely always going to hold true, i.e. it's extremely unlikely a test
+> will want to effectively disable ucall in the middle of a test.
 > 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  .../selftests/kvm/include/kvm_util_base.h     | 15 +++++++++++++++
->  .../testing/selftests/kvm/lib/aarch64/ucall.c | 19 ++++++++++++++-----
->  2 files changed, 29 insertions(+), 5 deletions(-)
+>  tools/testing/selftests/kvm/dirty_log_test.c       |  1 -
+>  tools/testing/selftests/kvm/include/ucall_common.h |  6 ------
+>  tools/testing/selftests/kvm/kvm_page_table_test.c  |  1 -
+>  tools/testing/selftests/kvm/lib/aarch64/ucall.c    | 14 ++------------
+>  tools/testing/selftests/kvm/lib/perf_test_util.c   |  1 -
+>  tools/testing/selftests/kvm/lib/riscv/ucall.c      |  4 ----
+>  tools/testing/selftests/kvm/lib/s390x/ucall.c      |  4 ----
+>  tools/testing/selftests/kvm/lib/x86_64/ucall.c     |  4 ----
+>  8 files changed, 2 insertions(+), 33 deletions(-)
 >
 
 Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
