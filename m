@@ -2,61 +2,88 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD936ECAAA1
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Aug 2022 19:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E972ECAAA1
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Aug 2022 21:52:43 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7974C4B97A;
-	Tue, 30 Aug 2022 15:52:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 555BA4B931;
+	Tue, 30 Aug 2022 17:52:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 26PfmWyTx7xO; Tue, 30 Aug 2022 15:52:31 -0400 (EDT)
+	with ESMTP id tAaBSPQ1p92t; Tue, 30 Aug 2022 17:52:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 155F74B97B;
-	Tue, 30 Aug 2022 15:52:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A0D24B8B7;
+	Tue, 30 Aug 2022 17:52:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C915B4B865
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Aug 2022 15:52:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9732D4B8B5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Aug 2022 17:52:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id a4GGEkGbJ388 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Aug 2022 15:52:28 -0400 (EDT)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3DD0F4B971
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Aug 2022 15:52:28 -0400 (EDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1661889147;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Aaj6aduqJg0qPG7z7QEPBrvjXDSrf093O5MldGzyJW0=;
- b=GETBblIBmkxAJ4C0aV0FyXIWdykr0NSb97rmSxC7cm9TB+hS6KWX4O93m4eZGwVKCKxaa/
- H8m7yaCmeOAuKCdirUXCROdaWetwUGunlab4cdY927z1X2UYORkwuny0Nhby80fYNaW11D
- 3zsdb9kIDVw4nAvyUC9po0SNDjNSkJU=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Subject: [PATCH 14/14] KVM: arm64: Handle stage-2 faults in parallel
-Date: Tue, 30 Aug 2022 19:52:15 +0000
-Message-Id: <20220830195216.964988-1-oliver.upton@linux.dev>
-In-Reply-To: <20220830194132.962932-1-oliver.upton@linux.dev>
-References: <20220830194132.962932-1-oliver.upton@linux.dev>
+ with ESMTP id G+Hu6S-Gw7f3 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 30 Aug 2022 17:52:39 -0400 (EDT)
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com
+ [209.85.215.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1FC984B8AE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Aug 2022 17:52:39 -0400 (EDT)
+Received: by mail-pg1-f171.google.com with SMTP id r22so11843474pgm.5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Aug 2022 14:52:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc;
+ bh=kmi765rhdWrzQirlOzDuA6v2AsLs7icy29dLcvjyZaY=;
+ b=hWJ7zNlkecdEXTrVZ6wmkEknTN/2exZUrz57/hU7W4XRQNtZqa+j7DxnleUp3IhKBb
+ sPjQfJCIpekxST95aTOvA6LRmjGl/9uM3t36fhzVjmgsHhFGbG/O8T0o1vgEyeLA5C0I
+ EFGHin0OUfFk0fiXENOHWlBqiA7nVmwWjwoJSedO1iB8vWSr7VHZW2nPJIXqSCBO/+pl
+ sOwVvJuTcV0RbXyJlpScwEsj8aMQTbBVhWXan+gXoZK5KecfX5JTb9nvfZqtbC+UjDPf
+ k0jWJ+//LY8Te/xXhINDpZFf2p1eG1WkkfXxk1m7qr7C9e/izZw1Pye0n6Us513YUn22
+ Sv0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+ bh=kmi765rhdWrzQirlOzDuA6v2AsLs7icy29dLcvjyZaY=;
+ b=k2Q62d2pfHx5EQ07JjYhAuxm+1/5I/rLyzGm4XmtOD+C7hPXIUc+mQr7UdQgEqYRjo
+ Y+YqHm0Rs+gLEpUMvAIUuRoAqj59bXnbleRVPJSc3G9TrpwHeVn+cZDJYAl0G4tPMjcI
+ le/VYoeSS5ZP3rDIZWYTq4uwjI1q7w2PgyDNVFLDwzLEMW6/L8iYiW4vnacDVmuKLCVI
+ 1Qme64vTa9IYUiVb+WyOP9CoEeZxVUsadCwHLlj/F79cdCN3wn9YvecEUrRNlzuNqlFD
+ wN5zLhyF5WXAGmIVdg29I+AMmcBs7IDPBXc/K6yAx4Wb5T6Z4HkvokxsMPiBqh5h8CLz
+ Vykg==
+X-Gm-Message-State: ACgBeo2YtaPfsfV3vKefJ8dVGskia5lDanMMThdqU0E/9m0z3ASQ3Gfx
+ zHKnHYIQuojtgCawVkTCtyHRMQ==
+X-Google-Smtp-Source: AA6agR6asL5tWEMD9qdeUkMoP6zzYNAqZvPkbIyCF6qv1uEQUKWXuBujKh4awFSCPYR/F9Y2M19nxA==
+X-Received: by 2002:aa7:8742:0:b0:537:ee75:601a with SMTP id
+ g2-20020aa78742000000b00537ee75601amr17381844pfo.37.1661896357847; 
+ Tue, 30 Aug 2022 14:52:37 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ k6-20020a170902ce0600b0015e8d4eb1dbsm10181118plg.37.2022.08.30.14.52.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 30 Aug 2022 14:52:37 -0700 (PDT)
+Date: Tue, 30 Aug 2022 21:52:33 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Yosry Ahmed <yosryahmed@google.com>
+Subject: Re: [PATCH v7 3/4] KVM: x86/mmu: count KVM mmu usage in secondary
+ pagetable stats.
+Message-ID: <Yw6GoWY411PrIRMx@google.com>
+References: <20220823004639.2387269-1-yosryahmed@google.com>
+ <20220823004639.2387269-4-yosryahmed@google.com>
+ <Ywkq8HYyTI1eStSO@google.com>
 MIME-Version: 1.0
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Ben Gardon <bgardon@google.com>, David Matlack <dmatlack@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <Ywkq8HYyTI1eStSO@google.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Roman Gushchin <roman.gushchin@linux.dev>, Michal Hocko <mhocko@kernel.org>,
+ Shaoqin <shaoqin.huang@intel.com>, linux-mm@kvack.org,
+ Zefan Li <lizefan.x@bytedance.com>, kvmarm@lists.cs.columbia.edu,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ Shakeel Butt <shakeelb@google.com>, cgroups@vger.kernel.org, Huang@google.com,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
+ Johannes Weiner <hannes@cmpxchg.org>, Tejun Heo <tj@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,166 +100,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The stage-2 map walker has been made parallel-aware, and as such can be
-called while only holding the read side of the MMU lock. Rip out the
-conditional locking in user_mem_abort() and instead grab the read lock.
-Continue to take the write lock from other callsites to
-kvm_pgtable_stage2_map().
+On Fri, Aug 26, 2022, Sean Christopherson wrote:
+> On Tue, Aug 23, 2022, Yosry Ahmed wrote:
+> > Count the pages used by KVM mmu on x86 in memory stats under secondary
+> > pagetable stats (e.g. "SecPageTables" in /proc/meminfo) to give better
+> > visibility into the memory consumption of KVM mmu in a similar way to
+> > how normal user page tables are accounted.
+> > 
+> > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> > Reviewed-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c     | 16 ++++++++++++++--
+> >  arch/x86/kvm/mmu/tdp_mmu.c | 12 ++++++++++++
+> >  2 files changed, 26 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index e418ef3ecfcb..4d38e4eba772 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -1665,6 +1665,18 @@ static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, long nr)
+> >  	percpu_counter_add(&kvm_total_used_mmu_pages, nr);
+> >  }
+> >  
+> > +static void kvm_account_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+> > +{
+> > +	kvm_mod_used_mmu_pages(kvm, +1);
+> > +	kvm_account_pgtable_pages((void *)sp->spt, +1);
+> > +}
+> > +
+> > +static void kvm_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+> > +{
+> > +	kvm_mod_used_mmu_pages(kvm, -1);
+> > +	kvm_account_pgtable_pages((void *)sp->spt, -1);
+> > +}
+> 
+> Hrm, this is causing build on x86 issues for me.  AFAICT, modpost doesn't detect
+> that this creates a new module dependency on __mod_lruvec_page_state() and so doesn't
+> refresh vmlinux.symvers.
+> 
+>   ERROR: modpost: "__mod_lruvec_page_state" [arch/x86/kvm/kvm.ko] undefined!
+>   make[2]: *** [scripts/Makefile.modpost:128: modules-only.symvers] Error 1
+>   make[1]: *** [Makefile:1769: modules] Error 2
+>   make[1]: *** Waiting for unfinished jobs....
+>   Kernel: arch/x86/boot/bzImage is ready  (#128)
+>   make[1]: Leaving directory '/usr/local/google/home/seanjc/build/kernel/vm'
+>   make: *** [Makefile:222: __sub-make] Error 2
+> 
+> Both gcc and clang yield the same behavior, so I doubt it's the compiler doing
+> something odd.  Cleaning the build makes the problem go away, but that's a poor
+> band-aid.
+> 
+> If I squash this with the prior patch that adds kvm_account_pgtable_pages() to
+> kvm_host.h, modpost detects the need to refresh and all is well.
+> 
+> Given that ARM doesn't support building KVM as a module, i.e. can't run afoul
+> of whatever modpost weirdness I'm hitting, I'm inclined to squash this with the
+> previous patch and punt on the modpost issue so that we can get this merged.
+> 
+> Any objections?  Or thoughts on what's going wrong?
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/kvm_pgtable.h  |  4 +++-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c |  2 +-
- arch/arm64/kvm/hyp/pgtable.c          |  3 ++-
- arch/arm64/kvm/mmu.c                  | 31 ++++++---------------------
- 4 files changed, 13 insertions(+), 27 deletions(-)
+Pushed the series with the squash to branch `for_paolo/6.1` at:
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 7d2de0a98ccb..dc839db86a1a 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -355,6 +355,8 @@ void kvm_pgtable_stage2_free_removed(void *pgtable, u32 level, void *arg);
-  * @prot:	Permissions and attributes for the mapping.
-  * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-  *		page-table pages.
-+ * @shared:	true if multiple software walkers could be traversing the tables
-+ *		in parallel
-  *
-  * The offset of @addr within a page is ignored, @size is rounded-up to
-  * the next page boundary and @phys is rounded-down to the previous page
-@@ -376,7 +378,7 @@ void kvm_pgtable_stage2_free_removed(void *pgtable, u32 level, void *arg);
-  */
- int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   u64 phys, enum kvm_pgtable_prot prot,
--			   void *mc);
-+			   void *mc, bool shared);
- 
- /**
-  * kvm_pgtable_stage2_set_owner() - Unmap and annotate pages in the IPA space to
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 61cf223e0796..924d028af447 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -252,7 +252,7 @@ static inline int __host_stage2_idmap(u64 start, u64 end,
- 				      enum kvm_pgtable_prot prot)
- {
- 	return kvm_pgtable_stage2_map(&host_kvm.pgt, start, end - start, start,
--				      prot, &host_s2_pool);
-+				      prot, &host_s2_pool, false);
- }
- 
- /*
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 92e230e7bf3a..52ecaaa84b22 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -944,7 +944,7 @@ static int stage2_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep, kvm_
- 
- int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   u64 phys, enum kvm_pgtable_prot prot,
--			   void *mc)
-+			   void *mc, bool shared)
- {
- 	int ret;
- 	struct stage2_map_data map_data = {
-@@ -953,6 +953,7 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 		.memcache	= mc,
- 		.mm_ops		= pgt->mm_ops,
- 		.force_pte	= pgt->force_pte_cb && pgt->force_pte_cb(addr, addr + size, prot),
-+		.shared		= shared,
- 	};
- 	struct kvm_pgtable_walker walker = {
- 		.cb		= stage2_map_walker,
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 265951c05879..a73adc35cf41 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -840,7 +840,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 
- 		write_lock(&kvm->mmu_lock);
- 		ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
--					     &cache);
-+					     &cache, false);
- 		write_unlock(&kvm->mmu_lock);
- 		if (ret)
- 			break;
-@@ -1135,7 +1135,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	gfn_t gfn;
- 	kvm_pfn_t pfn;
- 	bool logging_active = memslot_is_logging(memslot);
--	bool use_read_lock = false;
- 	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
- 	unsigned long vma_pagesize, fault_granule;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-@@ -1170,8 +1169,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (logging_active) {
- 		force_pte = true;
- 		vma_shift = PAGE_SHIFT;
--		use_read_lock = (fault_status == FSC_PERM && write_fault &&
--				 fault_granule == PAGE_SIZE);
- 	} else {
- 		vma_shift = get_vma_page_shift(vma, hva);
- 	}
-@@ -1270,15 +1267,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (exec_fault && device)
- 		return -ENOEXEC;
- 
--	/*
--	 * To reduce MMU contentions and enhance concurrency during dirty
--	 * logging dirty logging, only acquire read lock for permission
--	 * relaxation.
--	 */
--	if (use_read_lock)
--		read_lock(&kvm->mmu_lock);
--	else
--		write_lock(&kvm->mmu_lock);
-+	read_lock(&kvm->mmu_lock);
- 	pgt = vcpu->arch.hw_mmu->pgt;
- 	if (mmu_invalidate_retry(kvm, mmu_seq))
- 		goto out_unlock;
-@@ -1322,15 +1311,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
- 	 * kvm_pgtable_stage2_map() should be called to change block size.
- 	 */
--	if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
-+	if (fault_status == FSC_PERM && vma_pagesize == fault_granule)
- 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
--	} else {
--		WARN_ONCE(use_read_lock, "Attempted stage-2 map outside of write lock\n");
--
-+	else
- 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
- 					     __pfn_to_phys(pfn), prot,
--					     memcache);
--	}
-+					     memcache, true);
- 
- 	/* Mark the page dirty only if the fault is handled successfully */
- 	if (writable && !ret) {
-@@ -1339,10 +1325,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	}
- 
- out_unlock:
--	if (use_read_lock)
--		read_unlock(&kvm->mmu_lock);
--	else
--		write_unlock(&kvm->mmu_lock);
-+	read_unlock(&kvm->mmu_lock);
- 	kvm_set_pfn_accessed(pfn);
- 	kvm_release_pfn_clean(pfn);
- 	return ret != -EAGAIN ? ret : 0;
-@@ -1548,7 +1531,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- 	 */
- 	kvm_pgtable_stage2_map(kvm->arch.mmu.pgt, range->start << PAGE_SHIFT,
- 			       PAGE_SIZE, __pfn_to_phys(pfn),
--			       KVM_PGTABLE_PROT_R, NULL);
-+			       KVM_PGTABLE_PROT_R, NULL, false);
- 
- 	return false;
- }
--- 
-2.37.2.672.g94769d06f0-goog
+    https://github.com/sean-jc/linux.git
 
+Unless you hear otherwise, it will make its way to kvm/queue "soon".
+
+Please yell if there are objections.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
