@@ -2,55 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD30CECAAD1
-	for <kvmarm@archiver.kernel.org>; Wed, 31 Aug 2022 10:23:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13219ECAAD1
+	for <kvmarm@archiver.kernel.org>; Wed, 31 Aug 2022 14:42:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E62E34BA00;
-	Wed, 31 Aug 2022 06:23:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F1254BA13;
+	Wed, 31 Aug 2022 10:42:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Y8O+xqPTo8yP; Wed, 31 Aug 2022 06:23:52 -0400 (EDT)
+	with ESMTP id 5Imy4r1ItivZ; Wed, 31 Aug 2022 10:42:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 238EC4B9FC;
-	Wed, 31 Aug 2022 06:23:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13A024B9CD;
+	Wed, 31 Aug 2022 10:42:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B002B4B4C4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Aug 2022 20:53:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C7E744B89C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Aug 2022 10:42:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xqLlGtUV8x4s for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Aug 2022 20:53:08 -0400 (EDT)
-Received: from bg4.exmail.qq.com (bg4.exmail.qq.com [43.154.221.58])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A6FC4B497
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Aug 2022 20:53:07 -0400 (EDT)
-X-QQ-mid: bizesmtp76t1661907179tg3l23sq
-Received: from localhost.localdomain ( [182.148.13.26])
- by bizesmtp.qq.com (ESMTP) with 
- id ; Wed, 31 Aug 2022 08:52:58 +0800 (CST)
-X-QQ-SSF: 01000000000000D0E000000A0000000
-X-QQ-FEAT: xqT8U4SkSpgzoaMTZ/E4s2zF0bg8XhCWtigOgoAz5Gm4Sy/x5vzrFa8GnrgmG
- Pw8m4EqlHz4NA/RDsu+nxMgzRjyTJd2mfSaVWqu7sgjSK5BYKpKbXW/2tZQMKQYWoYyCyXt
- 8RcTDyR3uBQPZQn2495sleIAY5f1oTUNPfxZvca6p8HXdxMqFsNRT5y247H6GCK1fSBHL1c
- Tmp8nGl4Il/Dhf2hvK/NjdtCNlnbnWSJqhcBnkVO9gLeJsF2nVwi9yKB4n+0v4+BPumEiKR
- QAXNnfxSRCZfsJI4e7+LZ7GQ+eikynCFmw7A6xBYs/sEUq6MsxuuL9jcTozhhyDtRB+T/HK
- Sz8z56n20rMVg2Abx0Kd3a/DDy+RhnJ4MQhPqc1j/WkUKvJz6M=
-X-QQ-GoodBg: 0
-From: Jilin Yuan <yuanjilin@cdjrlc.com>
-To: maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
- suzuki.poulose@arm.com, oliver.upton@linux.dev, catalin.marinas@arm.com,
- will@kernel.org
-Subject: [PATCH] KVM: arm64: fix repeated words in comments
-Date: Wed, 31 Aug 2022 08:52:51 +0800
-Message-Id: <20220831005251.39427-1-yuanjilin@cdjrlc.com>
-X-Mailer: git-send-email 2.36.1
+ with ESMTP id xEV5tUBtjeVv for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 31 Aug 2022 10:42:14 -0400 (EDT)
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 964C34B85E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 31 Aug 2022 10:42:14 -0400 (EDT)
+Date: Wed, 31 Aug 2022 14:42:09 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1661956933;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=g3Lk2N97Zy8lF4iHLvNol66vmP95kccpVgysVRZVMDY=;
+ b=DxmKFJZH3WcdiTOix4wPJ2jevhfZDpQLQRr0E8RzgtFAbrFUiWjnuCRIo4VdA7V9wVB0aY
+ nWDczGJ5u3d9PShBrqVRrwBKRN7UnFn1ALppULQ+QijhEhPJQJBI8d/ZQnjpzcA8VAbo0Z
+ aVVG2TWEZflbOHWlnKVif5jTQZzY8E4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH 4/6] KVM: arm64: Add a visibility bit to ignore user writes
+Message-ID: <Yw9zQaxuSFlVsf5O@google.com>
+References: <20220817214818.3243383-1-oliver.upton@linux.dev>
+ <20220817214818.3243383-5-oliver.upton@linux.dev>
+ <CAAeT=FzQkgf7g3yXP++u_2zio1XL9mRSzPZ6hxmanwVk4QUNbQ@mail.gmail.com>
 MIME-Version: 1.0
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:cdjrlc.com:qybglogicsvr:qybglogicsvr4
-X-Mailman-Approved-At: Wed, 31 Aug 2022 06:23:50 -0400
-Cc: Jilin Yuan <yuanjilin@cdjrlc.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Disposition: inline
+In-Reply-To: <CAAeT=FzQkgf7g3yXP++u_2zio1XL9mRSzPZ6hxmanwVk4QUNbQ@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+Cc: Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,29 +70,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Delete the redundant word 'to'.
+On Tue, Aug 30, 2022 at 08:29:37PM -0700, Reiji Watanabe wrote:
+> Hi Oliver,
+> 
+> On Wed, Aug 17, 2022 at 2:48 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > We're about to ignore writes to AArch32 ID registers on AArch64-only
+> > systems. Add a bit to indicate a register is handled as write ignore
+> > when accessed from userspace.
+> >
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 3 +++
+> >  arch/arm64/kvm/sys_regs.h | 7 +++++++
+> >  2 files changed, 10 insertions(+)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 26210f3a0b27..9f06c85f26b8 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1232,6 +1232,9 @@ static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> >  {
+> >         bool raz = sysreg_visible_as_raz(vcpu, rd);
+> >
+> > +       if (sysreg_user_write_ignore(vcpu, rd))
+> > +               return 0;
+> 
+> Since the visibility flags are not ID register specific,
+> have you considered checking REG_USER_WI from kvm_sys_reg_set_user()
+> rather than the ID register specific function ?
 
-Signed-off-by: Jilin Yuan <yuanjilin@cdjrlc.com>
----
- arch/arm64/kvm/inject_fault.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yeah, that's definitely a better place to wire it in.
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index f32f4a2a347f..92de0f817be4 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -155,7 +155,7 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
- 	 * Size Fault at level 0, as if exceeding PARange.
- 	 *
- 	 * Non-LPAE guests will only get the external abort, as there
--	 * is no way to to describe the ASF.
-+	 * is no way to describe the ASF.
- 	 */
- 	if (vcpu_el1_is_32bit(vcpu) &&
- 	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
--- 
-2.36.1
+> This patch made me reconsider my comment for the patch-2.
+> Perhaps it might be more appropriate to check RAZ visibility from
+> kvm_sys_reg_get_user() rather than the ID register specific function ?
 
+REG_RAZ hides the register value from the guest as well as userspace, so it
+might be better to leave it in place. REG_RAZ also has implications for
+writing a register from userspace, as we still apply the expectation of
+invariance to ID registers that set this flag.
+
+It all 'just works' right now with the check buried in the ID register
+accessors. Going the other way around would require sprinkling the check
+in several locations.
+
+--
+Thanks,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
