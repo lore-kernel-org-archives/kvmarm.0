@@ -2,53 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67E49C001B5
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Sep 2022 16:58:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41243ECAAD4
+	for <kvmarm@archiver.kernel.org>; Sat,  3 Sep 2022 08:46:57 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D381D41173;
-	Fri,  2 Sep 2022 12:58:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95B8E40E62;
+	Sat,  3 Sep 2022 04:46:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DrFxuG1hdBBg; Fri,  2 Sep 2022 12:58:30 -0400 (EDT)
+	with ESMTP id HjmniduA48ir; Sat,  3 Sep 2022 04:46:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84FA640C1F;
-	Fri,  2 Sep 2022 12:58:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 748354B2AE;
+	Sat,  3 Sep 2022 04:46:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 277D140C1F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Sep 2022 12:58:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E8F654BAD2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Sep 2022 03:46:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id L+P3YfwrO0AN for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Sep 2022 12:58:27 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ADF3040719
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Sep 2022 12:58:27 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 14194B82CCA;
- Fri,  2 Sep 2022 16:58:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDA65C433D7;
- Fri,  2 Sep 2022 16:58:22 +0000 (UTC)
-Date: Fri, 2 Sep 2022 17:58:19 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v3 4/7] arm64: mte: Lock a page for MTE tag initialisation
-Message-ID: <YxI2KzTxnCP2vKDo@arm.com>
-References: <20220810193033.1090251-1-pcc@google.com>
- <20220810193033.1090251-5-pcc@google.com>
- <e72fee25-5ece-76f5-db53-dafa1fef6054@arm.com>
- <YxIvP+a2P0DGIUrA@arm.com>
+ with ESMTP id kaup5O8IrYiQ for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Sep 2022 03:46:49 -0400 (EDT)
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com
+ [209.85.215.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C474A4BA16
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Sep 2022 03:46:49 -0400 (EDT)
+Received: by mail-pg1-f179.google.com with SMTP id q63so15622826pga.9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Sep 2022 00:46:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+ :to:from:from:to:cc:subject:date;
+ bh=v+aLW6XSZxp9QimTfsr5QzeEYxLaT3pFWzo7n2FYHsg=;
+ b=Sjc4P9vtTICGifkH/YlHUrvW6OqfseM+FUoA8uWncagd1YTJp0Kgr4uTUIbN9ylss7
+ eQXw9QMRS0E2AWBdLonQ9moT7U9gFzLZBm++KmQZ37P904d7Sp+eQVaVaFQ8BZRNBaDT
+ krAmrWoTEI0qUA5b/WAN9ijYM1xXjw7uDvrlP+PGqJ9cRZ7X1IWM6K3dtNuWFRs2AThH
+ MNu0s2f3t2XwprPZcROE56ggj7q3uSI2f2rjvBVmc5Xs8234YsqLnV+9y9yun4j3bklv
+ e2zygYkUqqE9JmxutNE0rTL5r8/HzvRl0CELOu2JKlWBskZIydTaXZ6rGaUxpEWTilHo
+ b6Rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+ :to:from:x-gm-message-state:from:to:cc:subject:date;
+ bh=v+aLW6XSZxp9QimTfsr5QzeEYxLaT3pFWzo7n2FYHsg=;
+ b=YcQc4IjZf1RT69M0fTRALZaZn69nE7yM8qzEowZ+ZBJiU0JN+f6Lex5uAVkNITOGnF
+ 6gaCCFcgrbM+UGzZuioeL6tpQFm4g9GCWts66R1rSJszKJlVnrg5h+7dV83uVnxxURxG
+ R+fgr0L4wQmdRoxIQts1UZfQc0kHzU4wo9qU9DbUnkwbPvOqoINZi5l03GBG7m4KCm+6
+ D610lm97zMf/xwhr+Afq6ieD5vJQ6obEyD7gsmSFNnVJ8zG9cg1AOA3CeF4MyD2UuQWR
+ ZSB+LEWjAx7hpify3C0JwYeQXLs2IlY9OcVL0FF7HVYEecgzU9RKKiKQLsaDryBzPoFE
+ DldQ==
+X-Gm-Message-State: ACgBeo1tGLVA7gVN8xh9wO0vfFUbdv6r5M/u8pNqYxYMf3kln5RBd4mY
+ RJqKKGuIF02o5GrYjn/DVCk=
+X-Google-Smtp-Source: AA6agR610XS+pdZVYOD8grBauRiJL+ULVLoy8BvDYGZJcvsyMHlC68ot6TWwzHzgvhHPp0QvhAfWFw==
+X-Received: by 2002:a65:6bc4:0:b0:3c2:2f7c:cc74 with SMTP id
+ e4-20020a656bc4000000b003c22f7ccc74mr24864261pgw.307.1662018408485; 
+ Thu, 01 Sep 2022 00:46:48 -0700 (PDT)
+Received: from localhost.localdomain ([193.203.214.57])
+ by smtp.gmail.com with ESMTPSA id
+ w18-20020a1709027b9200b001728ac8af94sm12920079pll.248.2022.09.01.00.46.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 01 Sep 2022 00:46:48 -0700 (PDT)
+From: cgel.zte@gmail.com
+X-Google-Original-From: ye.xingchen@zte.com.cn
+To: maz@kernel.org
+Subject: [PATCH linux-next] KVM: arm64: Remove the unneeded result variable
+Date: Thu,  1 Sep 2022 07:46:43 +0000
+Message-Id: <20220901074643.313329-1-ye.xingchen@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YxIvP+a2P0DGIUrA@arm.com>
-Cc: kvm@vger.kernel.org, Peter Collingbourne <pcc@google.com>,
- Cornelia Huck <cohuck@redhat.com>, Evgenii Stepanov <eugenis@google.com>,
- Marc Zyngier <maz@kernel.org>, Vincenzo Frascino <vincenzo.frascino@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-Mailman-Approved-At: Sat, 03 Sep 2022 04:46:54 -0400
+Cc: will@kernel.org, Zeal Robot <zealci@zte.com.cn>,
+ linux-kernel@vger.kernel.org, ye xingchen <ye.xingchen@zte.com.cn>,
+ catalin.marinas@arm.com, gankulkarni@os.amperecomputing.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,107 +91,41 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Sep 02, 2022 at 05:28:47PM +0100, Catalin Marinas wrote:
-> On Fri, Sep 02, 2022 at 03:47:33PM +0100, Steven Price wrote:
-> > On 10/08/2022 20:30, Peter Collingbourne wrote:
-> > > diff --git a/arch/arm64/mm/mteswap.c b/arch/arm64/mm/mteswap.c
-> > > index a78c1db23c68..cd5ad0936e16 100644
-> > > --- a/arch/arm64/mm/mteswap.c
-> > > +++ b/arch/arm64/mm/mteswap.c
-> > > @@ -53,6 +53,9 @@ bool mte_restore_tags(swp_entry_t entry, struct page *page)
-> > >  	if (!tags)
-> > >  		return false;
-> > >  
-> > > +	/* racing tag restoring? */
-> > > +	if (!try_page_mte_tagging(page))
-> > > +		return false;
-> > >  	mte_restore_page_tags(page_address(page), tags);
-> > 
-> > I feel like adding a "set_page_mte_tagged(page);" in here would avoid
-> > the need for the comments about mte_restore_tags() taking the lock.
-> 
-> Good point. I think I blindly followed the set_bit() places but it makes
-> sense to move the bit setting to mte_restore_tags().
+From: ye xingchen <ye.xingchen@zte.com.cn>
 
-Something like this (and I need to do some more testing):
+Return the value kvm_pgtable_walk() directly instead of storing it in
+another redundant variable.
 
-diff --git a/arch/arm64/include/asm/mte.h b/arch/arm64/include/asm/mte.h
-index b956899467f0..be6560e1ff2b 100644
---- a/arch/arm64/include/asm/mte.h
-+++ b/arch/arm64/include/asm/mte.h
-@@ -25,7 +25,7 @@ unsigned long mte_copy_tags_to_user(void __user *to, void *from,
- 				    unsigned long n);
- int mte_save_tags(struct page *page);
- void mte_save_page_tags(const void *page_addr, void *tag_storage);
--bool mte_restore_tags(swp_entry_t entry, struct page *page);
-+void mte_restore_tags(swp_entry_t entry, struct page *page);
- void mte_restore_page_tags(void *page_addr, const void *tag_storage);
- void mte_invalidate_tags(int type, pgoff_t offset);
- void mte_invalidate_tags_area(int type);
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index e6b82ad1e9e6..7d91379382fd 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -1049,9 +1049,8 @@ static inline void arch_swap_invalidate_area(int type)
- #define __HAVE_ARCH_SWAP_RESTORE
- static inline void arch_swap_restore(swp_entry_t entry, struct folio *folio)
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+---
+ arch/arm64/kvm/hyp/pgtable.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 2cb3867eb7c2..a5fa05e34de9 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -925,7 +925,6 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 				 void *mc, u8 owner_id)
  {
--	/* mte_restore_tags() takes the PG_mte_lock */
--	if (system_supports_mte() && mte_restore_tags(entry, &folio->page))
--		set_page_mte_tagged(&folio->page);
-+	if (system_supports_mte())
-+		mte_restore_tags(entry, &folio->page);
+-	int ret;
+ 	struct stage2_map_data map_data = {
+ 		.phys		= KVM_PHYS_INVALID,
+ 		.mmu		= pgt->mmu,
+@@ -945,8 +944,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 	if (owner_id > KVM_MAX_OWNER_ID)
+ 		return -EINVAL;
+ 
+-	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
+-	return ret;
++	return kvm_pgtable_walk(pgt, addr, size, &walker);
  }
  
- #endif /* CONFIG_ARM64_MTE */
-diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-index 634e089b5933..54ab6c4741db 100644
---- a/arch/arm64/kernel/mte.c
-+++ b/arch/arm64/kernel/mte.c
-@@ -41,11 +41,8 @@ static void mte_sync_page_tags(struct page *page, pte_t old_pte,
- 	if (check_swap && is_swap_pte(old_pte)) {
- 		swp_entry_t entry = pte_to_swp_entry(old_pte);
- 
--		/* mte_restore_tags() takes the PG_mte_lock */
--		if (!non_swap_entry(entry) && mte_restore_tags(entry, page)) {
--			set_page_mte_tagged(page);
--			return;
--		}
-+		if (!non_swap_entry(entry))
-+			mte_restore_tags(entry, page);
- 	}
- 
- 	if (!pte_is_tagged)
-diff --git a/arch/arm64/mm/mteswap.c b/arch/arm64/mm/mteswap.c
-index cd5ad0936e16..cd508ba80ab1 100644
---- a/arch/arm64/mm/mteswap.c
-+++ b/arch/arm64/mm/mteswap.c
-@@ -46,19 +46,17 @@ int mte_save_tags(struct page *page)
- 	return 0;
- }
- 
--bool mte_restore_tags(swp_entry_t entry, struct page *page)
-+void mte_restore_tags(swp_entry_t entry, struct page *page)
- {
- 	void *tags = xa_load(&mte_pages, entry.val);
- 
- 	if (!tags)
--		return false;
-+		return;
- 
--	/* racing tag restoring? */
--	if (!try_page_mte_tagging(page))
--		return false;
--	mte_restore_page_tags(page_address(page), tags);
--
--	return true;
-+	if (try_page_mte_tagging(page)) {
-+		mte_restore_page_tags(page_address(page), tags);
-+		set_page_mte_tagged(page);
-+	}
- }
- 
- void mte_invalidate_tags(int type, pgoff_t offset)
+ static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+-- 
+2.25.1
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
