@@ -2,53 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84057C001B5
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Sep 2022 15:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B67CC001B5
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Sep 2022 15:48:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D056D40B6C;
-	Fri,  2 Sep 2022 11:48:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0747440C52;
+	Fri,  2 Sep 2022 11:48:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YFTvAKMNWGlV; Fri,  2 Sep 2022 11:48:18 -0400 (EDT)
+	with ESMTP id uWQkZrEOJesB; Fri,  2 Sep 2022 11:48:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A75240C31;
-	Fri,  2 Sep 2022 11:48:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEDEF40C58;
+	Fri,  2 Sep 2022 11:48:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B04040B6C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Sep 2022 11:48:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FB0140E06
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Sep 2022 11:48:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TMlZXHVyFUit for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Sep 2022 11:48:16 -0400 (EDT)
+ with ESMTP id Bxe8YsjKXpN8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Sep 2022 11:48:18 -0400 (EDT)
 Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 562C740B62
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Sep 2022 11:48:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E72E40B62
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Sep 2022 11:48:18 -0400 (EDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1662133694;
+ t=1662133697;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding;
- bh=IFb0nw1kmQc9o54dv6z8DN+QQpTAUMEEVUEkFaEPX18=;
- b=ZVELD/JOd3tkB4ZVOrh91thYGAv273RtRfM8U4a1xvnsTh8fg82X/hhVR/juYQQSlvTpht
- sHzc4GMiwRdicxUlACT2dFnkTzr+GbNdx7TDyw5qtjuyspFVxP0cxEKJY3cudO5gkFm5xc
- KHcAuJnhNzbqg8eyUCm+6ENTCD8SZwE=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=X3uLK2B33Vs/uryalTDkiauADuUaETuEfrZIlg4V3Ns=;
+ b=Yk6Sb4XwCG9CU+f3BT3LbXi0D76Zsp6/FjzwDgiQfw4npSYYYR2n8nyR9Em2I2CvfprTj3
+ xrYdP0DciLxNTtMnbm09cD95Md2ecBGjtITQfevZ+wldGVXDw/tv9+BDcijqPrrj7tyGpz
+ nbsaz4MomVpOltLahS22jNzlERlm9Ng=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH v2 0/7] KVM: arm64: Use visibility hook to treat ID regs as RAZ
-Date: Fri,  2 Sep 2022 15:47:56 +0000
-Message-Id: <20220902154804.1939819-1-oliver.upton@linux.dev>
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Subject: [PATCH v2 1/7] KVM: arm64: Use visibility hook to treat ID regs as RAZ
+Date: Fri,  2 Sep 2022 15:47:57 +0000
+Message-Id: <20220902154804.1939819-2-oliver.upton@linux.dev>
+In-Reply-To: <20220902154804.1939819-1-oliver.upton@linux.dev>
+References: <20220902154804.1939819-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
 X-Migadu-Flow: FLOW_OUT
 X-Migadu-Auth-User: linux.dev
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,52 +71,88 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-For reasons unknown, the Arm architecture defines the 64-bit views of
-the 32-bit ID registers as UNKNOWN [1]. This combines poorly with the
-fact that KVM unconditionally exposes these registers to userspace,
-which could throw a wrench in migration between 64-bit only systems.
+The generic id reg accessors already handle RAZ registers by way of the
+visibility hook. Add a visibility hook that returns REG_RAZ
+unconditionally and throw out the RAZ specific accessors.
 
-This series reworks KVM's definition of these registers to RAZ/WI with
-the goal of providing consistent register values across 64-bit machines.
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/sys_regs.c | 33 ++++++++++++++-------------------
+ 1 file changed, 14 insertions(+), 19 deletions(-)
 
-Patches 1-3 clean up the ID register accessors, taking advantage of the
-fact that the generic accessors know how to handle RAZ.
-
-Patches 4-6 start switch the handling of potentially nonzero AArch32 ID
-registers to RAZ/WI. RAZ covers up the architecturally UNKNOWN values,
-and WI allows for migration off of kernels that may provide garbage.
-Note that hidden AArch32 ID registers continue to have RAZ behavior with
-the additional expectation of invariance.
-
-Lastly, patch 7 includes a small test for the issue.
-
-Applies to 6.0-rc3. Tested with KVM selftests under the fast model w/
-asymmetric 32 bit support and no 32 bit support whatsoever.
-
-v1 -> v2:
- - Collect Reiji's r-b tags (thanks!)
- - Call sysreg_visible_as_raz() from read_id_reg() (Reiji)
- - Hoist sysreg_user_write_ignore() into kvm_sys_reg_set_user() (Reiji)
-
-Oliver Upton (7):
-  KVM: arm64: Use visibility hook to treat ID regs as RAZ
-  KVM: arm64: Remove internal accessor helpers for id regs
-  KVM: arm64: Drop raz parameter from read_id_reg()
-  KVM: arm64: Spin off helper for calling visibility hook
-  KVM: arm64: Add a visibility bit to ignore user writes
-  KVM: arm64: Treat 32bit ID registers as RAZ/WI on 64bit-only system
-  KVM: selftests: Add test for RAZ/WI AArch32 ID registers
-
- arch/arm64/kvm/sys_regs.c                     | 150 +++++++++---------
- arch/arm64/kvm/sys_regs.h                     |  24 ++-
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/aarch64/aarch64_only_id_regs.c        | 135 ++++++++++++++++
- 5 files changed, 225 insertions(+), 86 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/aarch64/aarch64_only_id_regs.c
-
-
-base-commit: b90cb1053190353cc30f0fef0ef1f378ccc063c5
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 3234f50b8c4b..e18efb9211f0 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1145,6 +1145,12 @@ static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
++static unsigned int raz_visibility(const struct kvm_vcpu *vcpu,
++				   const struct sys_reg_desc *r)
++{
++	return REG_RAZ;
++}
++
+ /* cpufeature ID register access trap handlers */
+ 
+ static bool __access_id_reg(struct kvm_vcpu *vcpu,
+@@ -1168,13 +1174,6 @@ static bool access_id_reg(struct kvm_vcpu *vcpu,
+ 	return __access_id_reg(vcpu, p, r, raz);
+ }
+ 
+-static bool access_raz_id_reg(struct kvm_vcpu *vcpu,
+-			      struct sys_reg_params *p,
+-			      const struct sys_reg_desc *r)
+-{
+-	return __access_id_reg(vcpu, p, r, true);
+-}
+-
+ /* Visibility overrides for SVE-specific control registers */
+ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+ 				   const struct sys_reg_desc *rd)
+@@ -1262,12 +1261,6 @@ static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 	return __set_id_reg(vcpu, rd, val, raz);
+ }
+ 
+-static int set_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+-			  u64 val)
+-{
+-	return __set_id_reg(vcpu, rd, val, true);
+-}
+-
+ static int get_raz_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		       u64 *val)
+ {
+@@ -1374,9 +1367,10 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
+  */
+ #define ID_UNALLOCATED(crm, op2) {			\
+ 	Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),	\
+-	.access = access_raz_id_reg,			\
+-	.get_user = get_raz_reg,			\
+-	.set_user = set_raz_id_reg,			\
++	.access = access_id_reg,			\
++	.get_user = get_id_reg,				\
++	.set_user = set_id_reg,				\
++	.visibility = raz_visibility			\
+ }
+ 
+ /*
+@@ -1386,9 +1380,10 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
+  */
+ #define ID_HIDDEN(name) {			\
+ 	SYS_DESC(SYS_##name),			\
+-	.access = access_raz_id_reg,		\
+-	.get_user = get_raz_reg,		\
+-	.set_user = set_raz_id_reg,		\
++	.access = access_id_reg,		\
++	.get_user = get_id_reg,			\
++	.set_user = set_id_reg,			\
++	.visibility = raz_visibility,		\
+ }
+ 
+ /*
 -- 
 2.37.2.789.g6183377224-goog
 
