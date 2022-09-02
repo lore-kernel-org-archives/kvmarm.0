@@ -2,72 +2,52 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 024AAC38145
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Sep 2022 10:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFAFC54EE9
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Sep 2022 13:41:59 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 516DD4B2A3;
-	Fri,  2 Sep 2022 06:26:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6CAE4B28C;
+	Fri,  2 Sep 2022 09:41:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5jwoUuzQ21tk; Fri,  2 Sep 2022 06:26:35 -0400 (EDT)
+	with ESMTP id C+X7lXPlYJRM; Fri,  2 Sep 2022 09:41:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11E544B274;
-	Fri,  2 Sep 2022 06:26:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E2514B2AA;
+	Fri,  2 Sep 2022 09:41:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 40A494B242
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Sep 2022 06:26:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E7B7F4B21C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Sep 2022 09:41:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aksZLrkHk0mc for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Sep 2022 06:26:33 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EAFF401AF
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Sep 2022 06:26:33 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1662114392;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=/3Op2YuEkkBOG1RJWqT1GBeAbr2w0wiiubsVaWhZ/YI=;
- b=i5RqvA4pWZLyipplRlBJKRnWnpaiDJt+FZN/f9q+NZdtvm6MmJMymhUo8vx40RETykslN7
- xUbknSTN69sbzR2iQwbxPKW93t5/5cT4aVdHFZa6DwgWBmx4lfm1r4gX41MlGJ+4xtbLtp
- 7Zdq+8iuQQviMDLbkCW1kZMBeobmMrM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-607-hZDcB34nPOuFTpVlcDXXzg-1; Fri, 02 Sep 2022 06:26:28 -0400
-X-MC-Unique: hZDcB34nPOuFTpVlcDXXzg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com
- [10.11.54.8])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id uOe6B0MOalJy for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Sep 2022 09:41:55 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9A5DB4B19D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Sep 2022 09:41:55 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6DA41811130;
- Fri,  2 Sep 2022 10:26:27 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.7])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 121CCC15BC0;
- Fri,  2 Sep 2022 10:26:26 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Collingbourne <pcc@google.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH v3 1/7] arm64: mte: Fix/clarify the PG_mte_tagged semantics
-In-Reply-To: <20220810193033.1090251-2-pcc@google.com>
-Organization: Red Hat GmbH
+ by ams.source.kernel.org (Postfix) with ESMTPS id 4C80DB82A96;
+ Fri,  2 Sep 2022 13:41:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31C0EC433C1;
+ Fri,  2 Sep 2022 13:41:51 +0000 (UTC)
+Date: Fri, 2 Sep 2022 14:41:47 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Peter Collingbourne <pcc@google.com>
+Subject: Re: [PATCH v3 5/7] KVM: arm64: unify the tests for VMAs in memslots
+ when MTE is enabled
+Message-ID: <YxIIG4SNfiqT38kS@arm.com>
 References: <20220810193033.1090251-1-pcc@google.com>
- <20220810193033.1090251-2-pcc@google.com>
-User-Agent: Notmuch/0.36 (https://notmuchmail.org)
-Date: Fri, 02 Sep 2022 12:26:25 +0200
-Message-ID: <87k06mdqcu.fsf@redhat.com>
+ <20220810193033.1090251-6-pcc@google.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-Cc: kvm@vger.kernel.org, Peter Collingbourne <pcc@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Steven Price <steven.price@arm.com>,
- Marc Zyngier <maz@kernel.org>, Vincenzo Frascino <vincenzo.frascino@arm.com>,
- Will Deacon <will@kernel.org>, Evgenii Stepanov <eugenis@google.com>
+Content-Disposition: inline
+In-Reply-To: <20220810193033.1090251-6-pcc@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Cornelia Huck <cohuck@redhat.com>, Steven Price <steven.price@arm.com>,
+ linux-arm-kernel@lists.infradead.org,
+ Vincenzo Frascino <vincenzo.frascino@arm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Evgenii Stepanov <eugenis@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,55 +64,20 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Aug 10 2022, Peter Collingbourne <pcc@google.com> wrote:
+On Wed, Aug 10, 2022 at 12:30:31PM -0700, Peter Collingbourne wrote:
+> Previously we allowed creating a memslot containing a private mapping that
+> was not VM_MTE_ALLOWED, but would later reject KVM_RUN with -EFAULT. Now
+> we reject the memory region at memslot creation time.
+> 
+> Since this is a minor tweak to the ABI (a VMM that created one of
+> these memslots would fail later anyway), no VMM to my knowledge has
+> MTE support yet, and the hardware with the necessary features is not
+> generally available, we can probably make this ABI change at this point.
 
-> From: Catalin Marinas <catalin.marinas@arm.com>
->
-> Currently the PG_mte_tagged page flag mostly means the page contains
-> valid tags and it should be set after the tags have been cleared or
-> restored. However, in mte_sync_tags() it is set before setting the tags
-> to avoid, in theory, a race with concurrent mprotect(PROT_MTE) for
-> shared pages. However, a concurrent mprotect(PROT_MTE) with a copy on
-> write in another thread can cause the new page to have stale tags.
-> Similarly, tag reading via ptrace() can read stale tags of the
+I don't think that's a noticeable ABI change. As you said, such VMs
+would fail later anyway when trying to access such page.
 
-s/of/if/
-
-> PG_mte_tagged flag is set before actually clearing/restoring the tags.
->
-> Fix the PG_mte_tagged semantics so that it is only set after the tags
-> have been cleared or restored. This is safe for swap restoring into a
-> MAP_SHARED or CoW page since the core code takes the page lock. Add two
-> functions to test and set the PG_mte_tagged flag with acquire and
-> release semantics. The downside is that concurrent mprotect(PROT_MTE) on
-> a MAP_SHARED page may cause tag loss. This is already the case for KVM
-> guests if a VMM changes the page protection while the guest triggers a
-> user_mem_abort().
->
-> Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will@kernel.org>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Steven Price <steven.price@arm.com>
-> Cc: Peter Collingbourne <pcc@google.com>
-> ---
-> v3:
-> - fix build with CONFIG_ARM64_MTE disabled
->
->  arch/arm64/include/asm/mte.h     | 30 ++++++++++++++++++++++++++++++
->  arch/arm64/include/asm/pgtable.h |  2 +-
->  arch/arm64/kernel/cpufeature.c   |  4 +++-
->  arch/arm64/kernel/elfcore.c      |  2 +-
->  arch/arm64/kernel/hibernate.c    |  2 +-
->  arch/arm64/kernel/mte.c          | 12 +++++++-----
->  arch/arm64/kvm/guest.c           |  4 ++--
->  arch/arm64/kvm/mmu.c             |  4 ++--
->  arch/arm64/mm/copypage.c         |  4 ++--
->  arch/arm64/mm/fault.c            |  2 +-
->  arch/arm64/mm/mteswap.c          |  2 +-
->  11 files changed, 51 insertions(+), 17 deletions(-)
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
