@@ -2,103 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23CDAC38145
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Sep 2022 00:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 024AAC38145
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Sep 2022 10:26:36 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86EEA4B242;
-	Thu,  1 Sep 2022 20:19:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 516DD4B2A3;
+	Fri,  2 Sep 2022 06:26:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LxDkKo+AcUJ8; Thu,  1 Sep 2022 20:19:56 -0400 (EDT)
+	with ESMTP id 5jwoUuzQ21tk; Fri,  2 Sep 2022 06:26:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A7F349EC3;
-	Thu,  1 Sep 2022 20:19:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11E544B274;
+	Fri,  2 Sep 2022 06:26:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C355549EC3
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Sep 2022 20:19:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 40A494B242
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Sep 2022 06:26:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UkQ+iYKIS1S9 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Sep 2022 20:19:53 -0400 (EDT)
+ with ESMTP id aksZLrkHk0mc for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Sep 2022 06:26:33 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9118F49EBC
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Sep 2022 20:19:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EAFF401AF
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Sep 2022 06:26:33 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1662077993;
+ s=mimecast20190719; t=1662114392;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dO2Mn5n5WZ/MoIF+K7eeDvmnGSBHo08xkcQ+P3b4bKQ=;
- b=PR97N8GBIP3oRjUE0ZmzIrDPsFYxWnOd+tAGOuuQiuvMg/Xfu7a5HWblUeRL/RnO9a9MoY
- nopCXMF0kzJkgaN9z8crbSCOlHdkkBpXDcBkPIuHQCcQmVNq+Z9Y3LbC9KttYzdp+SkUuj
- rAIp8mm8XRI9A3VFSNJOH0bMlFDvPB8=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-1-MnUEqDsfPiewPi_I8PDK-w-1; Thu, 01 Sep 2022 20:19:50 -0400
-X-MC-Unique: MnUEqDsfPiewPi_I8PDK-w-1
-Received: by mail-ej1-f70.google.com with SMTP id
- qf22-20020a1709077f1600b00741638c5f3cso157235ejc.23
- for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Sep 2022 17:19:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
- :content-language:user-agent:mime-version:date:message-id
- :x-gm-message-state:from:to:cc:subject:date;
- bh=dO2Mn5n5WZ/MoIF+K7eeDvmnGSBHo08xkcQ+P3b4bKQ=;
- b=oqAEfCijKXg0222thY+wMFrd1kg3Vd1d4BGRrcC2tsAavHlYh6XuJysxvyEXJ7/fVS
- 0zGZtE9qtDrDHiN4NAVAY7U4wc7qiflQGAHon7M92iGhPrMf6Fvv5OgEj68u9pFfZrJT
- wn7QaV9gbRZE0deeFl0NJ5fq+NBS6/FbvsMUYHzMSNblEdkjUTvRRJttc0/gPPcXnNDr
- CKu7QFoyuSIUkG1uBHKvHl7n5ENRQQydKK9Cyn4MQFj/yTQ4hQhUnFEz8oQjq6BJaBwA
- a6VSAIE9XcIJY1cuJBNm4tFoiHaJDnTXz4soqH/bBvU6ZhW85aOpHSKIuXU4Xw26s0GS
- fGEQ==
-X-Gm-Message-State: ACgBeo1mCXU3dJ9iyIR4aeuoN43D7jpTUGlcC0ZJiU24R15Fo7qclwno
- u36DikQR3ksb9VNKLTQdO12avmBGog4ypbLcd5UbQD4KdMwQinjeH6xUC2Yqhi+D0nneRtgFC5i
- 3jSYQC5jvvshIRk3+eRvwT9w3
-X-Received: by 2002:a17:906:4795:b0:73d:d6e8:52a7 with SMTP id
- cw21-20020a170906479500b0073dd6e852a7mr23729566ejc.59.1662077988841; 
- Thu, 01 Sep 2022 17:19:48 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR71etqoXM4HGXVz/MwtlqW3T8BbNkFPT5a/e9qOoDZWnrG77GI6lD81PpRdFOR9EqVhGDa/oA==
-X-Received: by 2002:a17:906:4795:b0:73d:d6e8:52a7 with SMTP id
- cw21-20020a170906479500b0073dd6e852a7mr23729550ejc.59.1662077988617; 
- Thu, 01 Sep 2022 17:19:48 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89?
- ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
- by smtp.googlemail.com with ESMTPSA id
- lb14-20020a170907784e00b00741a0c3f4cdsm352041ejc.189.2022.09.01.17.19.47
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 01 Sep 2022 17:19:48 -0700 (PDT)
-Message-ID: <44a42d03-4dd1-3f1c-3a60-7c2a6a7d417a@redhat.com>
-Date: Fri, 2 Sep 2022 02:19:46 +0200
+ bh=/3Op2YuEkkBOG1RJWqT1GBeAbr2w0wiiubsVaWhZ/YI=;
+ b=i5RqvA4pWZLyipplRlBJKRnWnpaiDJt+FZN/f9q+NZdtvm6MmJMymhUo8vx40RETykslN7
+ xUbknSTN69sbzR2iQwbxPKW93t5/5cT4aVdHFZa6DwgWBmx4lfm1r4gX41MlGJ+4xtbLtp
+ 7Zdq+8iuQQviMDLbkCW1kZMBeobmMrM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-607-hZDcB34nPOuFTpVlcDXXzg-1; Fri, 02 Sep 2022 06:26:28 -0400
+X-MC-Unique: hZDcB34nPOuFTpVlcDXXzg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.8])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6DA41811130;
+ Fri,  2 Sep 2022 10:26:27 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 121CCC15BC0;
+ Fri,  2 Sep 2022 10:26:26 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Collingbourne <pcc@google.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v3 1/7] arm64: mte: Fix/clarify the PG_mte_tagged semantics
+In-Reply-To: <20220810193033.1090251-2-pcc@google.com>
+Organization: Red Hat GmbH
+References: <20220810193033.1090251-1-pcc@google.com>
+ <20220810193033.1090251-2-pcc@google.com>
+User-Agent: Notmuch/0.36 (https://notmuchmail.org)
+Date: Fri, 02 Sep 2022 12:26:25 +0200
+Message-ID: <87k06mdqcu.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-To: Peter Xu <peterx@redhat.com>, Marc Zyngier <maz@kernel.org>
-References: <20220819005601.198436-1-gshan@redhat.com>
- <20220819005601.198436-2-gshan@redhat.com> <87lerkwtm5.wl-maz@kernel.org>
- <41fb5a1f-29a9-e6bb-9fab-4c83a2a8fce5@redhat.com>
- <87fshovtu0.wl-maz@kernel.org> <YwTn2r6FLCx9mAU7@google.com>
- <87a67uwve8.wl-maz@kernel.org>
- <99364855-b4e9-8a69-e1ca-ed09d103e4c8@redhat.com>
- <874jxzvxak.wl-maz@kernel.org> <Yw4hyEAyivKT35vQ@xz-m1.local>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v1 1/5] KVM: arm64: Enable ring-based dirty memory tracking
-In-Reply-To: <Yw4hyEAyivKT35vQ@xz-m1.local>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
- linux-kselftest@vger.kernel.org, bgardon@google.com, shuah@kernel.org,
- kvmarm@lists.cs.columbia.edu, corbet@lwn.net, will@kernel.org,
- shan.gavin@gmail.com, drjones@redhat.com, zhenyzha@redhat.com,
- dmatlack@google.com, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+Cc: kvm@vger.kernel.org, Peter Collingbourne <pcc@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Steven Price <steven.price@arm.com>,
+ Marc Zyngier <maz@kernel.org>, Vincenzo Frascino <vincenzo.frascino@arm.com>,
+ Will Deacon <will@kernel.org>, Evgenii Stepanov <eugenis@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -110,92 +79,59 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 8/30/22 16:42, Peter Xu wrote:
-> Marc,
-> 
-> I thought we won't hit this as long as we properly take care of other
-> orderings of (a) gfn push, and (b) gfn collect, but after a second thought
-> I think it's indeed logically possible that with a reversed ordering here
-> we can be reading some garbage gfn before (a) happens butt also read the
-> valid flag after (b).
-> 
-> It seems we must have all the barriers correctly applied always.  If that's
-> correct, do you perhaps mean something like this to just add the last piece
-> of barrier?
+On Wed, Aug 10 2022, Peter Collingbourne <pcc@google.com> wrote:
 
-Okay, so I thought about it some more and it's quite tricky.
+> From: Catalin Marinas <catalin.marinas@arm.com>
+>
+> Currently the PG_mte_tagged page flag mostly means the page contains
+> valid tags and it should be set after the tags have been cleared or
+> restored. However, in mte_sync_tags() it is set before setting the tags
+> to avoid, in theory, a race with concurrent mprotect(PROT_MTE) for
+> shared pages. However, a concurrent mprotect(PROT_MTE) with a copy on
+> write in another thread can cause the new page to have stale tags.
+> Similarly, tag reading via ptrace() can read stale tags of the
 
-Strictly speaking, the synchronization is just between userspace and 
-kernel. The fact that the actual producer of dirty pages is in another 
-CPU is a red herring, because reset only cares about harvested pages.
+s/of/if/
 
-In other words, the dirty page ring is essentially two ring buffers in 
-one and we only care about the "harvested ring", not the "produced ring".
+> PG_mte_tagged flag is set before actually clearing/restoring the tags.
+>
+> Fix the PG_mte_tagged semantics so that it is only set after the tags
+> have been cleared or restored. This is safe for swap restoring into a
+> MAP_SHARED or CoW page since the core code takes the page lock. Add two
+> functions to test and set the PG_mte_tagged flag with acquire and
+> release semantics. The downside is that concurrent mprotect(PROT_MTE) on
+> a MAP_SHARED page may cause tag loss. This is already the case for KVM
+> guests if a VMM changes the page protection while the guest triggers a
+> user_mem_abort().
+>
+> Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Steven Price <steven.price@arm.com>
+> Cc: Peter Collingbourne <pcc@google.com>
+> ---
+> v3:
+> - fix build with CONFIG_ARM64_MTE disabled
+>
+>  arch/arm64/include/asm/mte.h     | 30 ++++++++++++++++++++++++++++++
+>  arch/arm64/include/asm/pgtable.h |  2 +-
+>  arch/arm64/kernel/cpufeature.c   |  4 +++-
+>  arch/arm64/kernel/elfcore.c      |  2 +-
+>  arch/arm64/kernel/hibernate.c    |  2 +-
+>  arch/arm64/kernel/mte.c          | 12 +++++++-----
+>  arch/arm64/kvm/guest.c           |  4 ++--
+>  arch/arm64/kvm/mmu.c             |  4 ++--
+>  arch/arm64/mm/copypage.c         |  4 ++--
+>  arch/arm64/mm/fault.c            |  2 +-
+>  arch/arm64/mm/mteswap.c          |  2 +-
+>  11 files changed, 51 insertions(+), 17 deletions(-)
 
-On the other hand, it may happen that userspace has set more RESET flags 
-while the ioctl is ongoing:
-
-
-     CPU0                     CPU1               CPU2
-                                                 fill gfn0
-                                                 store-rel flags for gfn0
-                                                 fill gfn1
-                                                 store-rel flags for gfn1
-     load-acq flags for gfn0
-     set RESET for gfn0
-     load-acq flags for gfn1
-     set RESET for gfn1
-     do ioctl! ----------->
-                              ioctl(RESET_RINGS)
-                                                 fill gfn2
-                                                 store-rel flags for gfn2
-     load-acq flags for gfn2
-     set RESET for gfn2
-                              process gfn0
-                              process gfn1
-                              process gfn2
-     do ioctl!
-     etc.
-
-The three load-acquire in CPU0 synchronize with the three store-release 
-in CPU2, but CPU0 and CPU1 are only synchronized up to gfn1 and CPU1 may 
-miss gfn2's fields other than flags.
-
-The kernel must be able to cope with invalid values of the fields, and 
-userspace will invoke the ioctl once more.  However, once the RESET flag 
-is cleared on gfn2, it is lost forever, therefore in the above scenario 
-CPU1 must read the correct value of gfn2's fields.
-
-Therefore RESET must be set with a store-release, that will synchronize 
-with a load-acquire in CPU1 as you suggested.
-
-Paolo
-
-> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-> index f4c2a6eb1666..ea620bfb012d 100644
-> --- a/virt/kvm/dirty_ring.c
-> +++ b/virt/kvm/dirty_ring.c
-> @@ -84,7 +84,7 @@ static inline void kvm_dirty_gfn_set_dirtied(struct kvm_dirty_gfn *gfn)
->  
->  static inline bool kvm_dirty_gfn_harvested(struct kvm_dirty_gfn *gfn)
->  {
-> -       return gfn->flags & KVM_DIRTY_GFN_F_RESET;
-> +       return smp_load_acquire(&gfn->flags) & KVM_DIRTY_GFN_F_RESET;
->  }
->  
->  int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
-> ===8<===
-> 
-> Thanks,
-> 
-> -- 
-> Peter Xu
-> 
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
 _______________________________________________
 kvmarm mailing list
