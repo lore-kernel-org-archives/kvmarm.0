@@ -2,76 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D779C6FA8B
-	for <kvmarm@archiver.kernel.org>; Tue,  6 Sep 2022 18:09:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEE35ECAAD5
+	for <kvmarm@archiver.kernel.org>; Tue,  6 Sep 2022 18:09:49 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 384C34BC55;
-	Tue,  6 Sep 2022 14:09:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 72EE74BB43;
+	Tue,  6 Sep 2022 14:09:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SBOAMKtmFSSe; Tue,  6 Sep 2022 14:09:45 -0400 (EDT)
+	with ESMTP id n6UQFA5Mb-4i; Tue,  6 Sep 2022 14:09:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3ECF4BCCE;
-	Tue,  6 Sep 2022 14:09:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F0574BBAE;
+	Tue,  6 Sep 2022 14:09:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D603C4BBB5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2022 14:09:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 53ACC4BCAF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2022 14:09:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JYtkiUcEJJCR for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2022 14:09:42 -0400 (EDT)
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
- [209.85.128.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BE8CE4BBF1
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2022 14:09:42 -0400 (EDT)
-Received: by mail-yw1-f202.google.com with SMTP id
- 00721157ae682-3452b545544so51180397b3.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Sep 2022 11:09:42 -0700 (PDT)
+ with ESMTP id KgN6K7x53pkp for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Sep 2022 14:09:45 -0400 (EDT)
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com
+ [209.85.128.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A311B4BC37
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2022 14:09:44 -0400 (EDT)
+Received: by mail-yw1-f201.google.com with SMTP id
+ 00721157ae682-34551013674so39282677b3.10
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Sep 2022 11:09:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:from:to:cc:subject:date;
- bh=WT2R6z6Lj/wGUMYzxUUXh6/WyMLsyb+mHF2mn3pQS0A=;
- b=Hpd5SISjcMrCHf9JGChu9s9F77ftmvQgJ0eeVwHgoh+jmH8F1saN/GiAHzrJkOyH4a
- iN6WTYT7UVvEuvarYM60NPIkdylI6USs8tojmkKw77K+FzJsBDpeS6tRdMmQaJ90Yqj0
- ZJptnNxxyoNksHntqPxpLUfqAYcJyBFpG+lpFu5PKIHClFsH9axeaw3Irj+zAzHR1Wfo
- 7Rp+ZrH8BINtd+Ovld090w5P713yDfv9HryiEhwngEjv8zWXNGhM2yH+RuBBofiX+EhY
- flQGGu0JTrWNMppeNXJADO1ooRWl7S4HeZJmmlUGmaEgOGwDpImEYqEqW8UOFK/Rk65u
- aT+w==
+ bh=R+Euj9vqpXKM4xMXDZgxG8oUZJt3JErW32vmwZVdvtY=;
+ b=sffeB/mWDpzSHoIDUqd/TgjCxUpSAKEVyBhiHDwZZ6p+h4u2CDddK6nTN+UxpD2Vu+
+ FuAYxva2/kiut0pVKP2T/k8f8peZncp2p/tBszoRlZIA0y6Rs6x5J2PmpiIGGkN6SJMk
+ 58Yw1iR9s205FkYUafIDgpLZjqD4cmbQPGo/MovuvnbA1+I/xS28nAzvZlYR8TVY2dgD
+ rpn8WDDKO0PwoyoUYnmVcWuZaHIqDGQ88/ICMGOLHDvtX2YhWJsm/tF7B3Z9xS1qlj2q
+ NyAjyE8uW28MwLleZVLxn3RaNTpp1t26H09/3A/4ufiQKNDmWjz2pKg8H/xmbxRB/A+0
+ zTQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:x-gm-message-state:from:to:cc:subject:date;
- bh=WT2R6z6Lj/wGUMYzxUUXh6/WyMLsyb+mHF2mn3pQS0A=;
- b=SpnMMqkYpnFqTs7wvy9MrOZQfMpnUz8gZ81nhH2bn+t8/fdNuH9I4HEkKDBSvWg82/
- IrnMdMoCRm5U6cjOgsqR/vWTfk1osFeB8atXOcKyKtzuh1Wd6FOjGHNu9IiAwyqO3kqq
- H+lu0DG+fAbY6Rw74oIqj7/CAxtCUbubx+crV+3rmlIf0Iieu6PfwrJp1iCzLhPYo5o5
- zw60VuTMqiz8azGIaZolK6tEph25dEwZ8XcBq/vfMMPVr7VwP+22GfGoKXOXiqCFN7Lx
- aHLNXCxpYbToItY9IfrmDIFCO5tn5MrRu1y+FzL3d2/AnnM1SbgmnVUPNBqAqUYtlMtO
- OoJQ==
-X-Gm-Message-State: ACgBeo1kOgDZZfztkZADtbc9rdT3C4X7VIiGMZO28X0sBelE/fAhVOxx
- XgTojgRRWZVtn+7fsHGuQavHq2pAs3wT6g==
-X-Google-Smtp-Source: AA6agR5HZOlR46dlOCLVnDPm04bTiVUX60QtegJVypIVw2VNqy4drQBeKd/JOH3/A4EZV6bHfN4lbEVmHNvhtg==
+ bh=R+Euj9vqpXKM4xMXDZgxG8oUZJt3JErW32vmwZVdvtY=;
+ b=vhGR5A7y93NWQa2LbjzP+VnTxQh1NrRzqLchmkvqNHkIT8QORQmqUeb5aP3022q9lE
+ PfXdNH/ZijP8I77ZcjUWtgzoOthsJYUccF+49X1zJULF3o7PLQftl+JG2Igfwgz6Zw7S
+ DEtvQm7KbybSqq1503yk5mMoZ/L9xEX2BgurZE/lZdhVcJNYmqjglp0JrfOpawvuYEvN
+ 3B90c8jGtChxUloFmJ1/FZG0Ms2o2uSzt8kXGq1Ydkb3cc+Qo/nXz4aeaDhBjwe11pYW
+ rUjGryiuEEsJq6hWToqyCRWdbYbuiD3GddtBb56fi5xxfJal2aDxoGzu+CepTyB8zx9h
+ lFjA==
+X-Gm-Message-State: ACgBeo1OdbuPac0NdjR4na2p1EnKOqz7OVa3C5hooKMx/hF+NzThETSX
+ BZQaZEGVgIrQ3z2ZaYqkLOs+4nuFQlnKwA==
+X-Google-Smtp-Source: AA6agR4ASjfrO6AOrVhpLFb2OAYw49XfM61U36AYbh+bPCYPuwxfnMdgjnaTJ6Aw8gtYE0FshwAT/jfMczz76w==
 X-Received: from ricarkol4.c.googlers.com
  ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a05:6902:10c5:b0:671:7158:cf2c with SMTP
- id w5-20020a05690210c500b006717158cf2cmr39837170ybu.314.1662487782395; Tue,
- 06 Sep 2022 11:09:42 -0700 (PDT)
-Date: Tue,  6 Sep 2022 18:09:21 +0000
+ (user=ricarkol job=sendgmr) by 2002:a81:5343:0:b0:332:d998:4c61 with SMTP id
+ h64-20020a815343000000b00332d9984c61mr44295265ywb.125.1662487784189; Tue, 06
+ Sep 2022 11:09:44 -0700 (PDT)
+Date: Tue,  6 Sep 2022 18:09:22 +0000
 In-Reply-To: <20220906180930.230218-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220906180930.230218-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
-Message-ID: <20220906180930.230218-5-ricarkol@google.com>
-Subject: [PATCH v6 04/13] KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1
- using sysreg.h macros
+Message-ID: <20220906180930.230218-6-ricarkol@google.com>
+Subject: [PATCH v6 05/13] tools: Copy bitfield.h from the kernel sources
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev
-Cc: maz@kernel.org, bgardon@google.com, pbonzini@redhat.com,
- axelrasmussen@google.com, dmatlack@google.com
+Cc: Arnaldo Carvalho de Melo <acme@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, maz@kernel.org, bgardon@google.com,
+ pbonzini@redhat.com, axelrasmussen@google.com, dmatlack@google.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,67 +88,202 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Define macros for memory type indexes and construct DEFAULT_MAIR_EL1
-with macros from asm/sysreg.h.  The index macros can then be used when
-constructing PTEs (instead of using raw numbers).
+Copy bitfield.h from include/linux/bitfield.h.  A subsequent change will
+make use of some FIELD_{GET,PREP} macros defined in this header.
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+The header was copied as-is, no changes needed.
+
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Arnaldo Carvalho de Melo <acme@redhat.com>
 Reviewed-by: Oliver Upton <oupton@google.com>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- .../selftests/kvm/include/aarch64/processor.h | 25 ++++++++++++++-----
- .../selftests/kvm/lib/aarch64/processor.c     |  2 +-
- 2 files changed, 20 insertions(+), 7 deletions(-)
+ tools/include/linux/bitfield.h | 176 +++++++++++++++++++++++++++++++++
+ 1 file changed, 176 insertions(+)
+ create mode 100644 tools/include/linux/bitfield.h
 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index df4bfac69551..c1ddca8db225 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -38,12 +38,25 @@
-  * NORMAL             4     1111:1111
-  * NORMAL_WT          5     1011:1011
-  */
--#define DEFAULT_MAIR_EL1 ((0x00ul << (0 * 8)) | \
--			  (0x04ul << (1 * 8)) | \
--			  (0x0cul << (2 * 8)) | \
--			  (0x44ul << (3 * 8)) | \
--			  (0xfful << (4 * 8)) | \
--			  (0xbbul << (5 * 8)))
+diff --git a/tools/include/linux/bitfield.h b/tools/include/linux/bitfield.h
+new file mode 100644
+index 000000000000..6093fa6db260
+--- /dev/null
++++ b/tools/include/linux/bitfield.h
+@@ -0,0 +1,176 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2014 Felix Fietkau <nbd@nbd.name>
++ * Copyright (C) 2004 - 2009 Ivo van Doorn <IvDoorn@gmail.com>
++ */
 +
-+/* Linux doesn't use these memory types, so let's define them. */
-+#define MAIR_ATTR_DEVICE_GRE	UL(0x0c)
-+#define MAIR_ATTR_NORMAL_WT	UL(0xbb)
++#ifndef _LINUX_BITFIELD_H
++#define _LINUX_BITFIELD_H
 +
-+#define MT_DEVICE_nGnRnE	0
-+#define MT_DEVICE_nGnRE		1
-+#define MT_DEVICE_GRE		2
-+#define MT_NORMAL_NC		3
-+#define MT_NORMAL		4
-+#define MT_NORMAL_WT		5
++#include <linux/build_bug.h>
++#include <asm/byteorder.h>
 +
-+#define DEFAULT_MAIR_EL1							\
-+	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |		\
-+	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |		\
-+	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |			\
-+	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |			\
-+	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |				\
-+	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT))
- 
- #define MPIDR_HWID_BITMASK (0xff00fffffful)
- 
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 63ef3c78e55e..26f0eccff6fe 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -133,7 +133,7 @@ static void _virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
- 
- void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
- {
--	uint64_t attr_idx = 4; /* NORMAL (See DEFAULT_MAIR_EL1) */
-+	uint64_t attr_idx = MT_NORMAL;
- 
- 	_virt_pg_map(vm, vaddr, paddr, attr_idx);
- }
++/*
++ * Bitfield access macros
++ *
++ * FIELD_{GET,PREP} macros take as first parameter shifted mask
++ * from which they extract the base mask and shift amount.
++ * Mask must be a compilation time constant.
++ *
++ * Example:
++ *
++ *  #define REG_FIELD_A  GENMASK(6, 0)
++ *  #define REG_FIELD_B  BIT(7)
++ *  #define REG_FIELD_C  GENMASK(15, 8)
++ *  #define REG_FIELD_D  GENMASK(31, 16)
++ *
++ * Get:
++ *  a = FIELD_GET(REG_FIELD_A, reg);
++ *  b = FIELD_GET(REG_FIELD_B, reg);
++ *
++ * Set:
++ *  reg = FIELD_PREP(REG_FIELD_A, 1) |
++ *	  FIELD_PREP(REG_FIELD_B, 0) |
++ *	  FIELD_PREP(REG_FIELD_C, c) |
++ *	  FIELD_PREP(REG_FIELD_D, 0x40);
++ *
++ * Modify:
++ *  reg &= ~REG_FIELD_C;
++ *  reg |= FIELD_PREP(REG_FIELD_C, c);
++ */
++
++#define __bf_shf(x) (__builtin_ffsll(x) - 1)
++
++#define __scalar_type_to_unsigned_cases(type)				\
++		unsigned type:	(unsigned type)0,			\
++		signed type:	(unsigned type)0
++
++#define __unsigned_scalar_typeof(x) typeof(				\
++		_Generic((x),						\
++			char:	(unsigned char)0,			\
++			__scalar_type_to_unsigned_cases(char),		\
++			__scalar_type_to_unsigned_cases(short),		\
++			__scalar_type_to_unsigned_cases(int),		\
++			__scalar_type_to_unsigned_cases(long),		\
++			__scalar_type_to_unsigned_cases(long long),	\
++			default: (x)))
++
++#define __bf_cast_unsigned(type, x)	((__unsigned_scalar_typeof(type))(x))
++
++#define __BF_FIELD_CHECK(_mask, _reg, _val, _pfx)			\
++	({								\
++		BUILD_BUG_ON_MSG(!__builtin_constant_p(_mask),		\
++				 _pfx "mask is not constant");		\
++		BUILD_BUG_ON_MSG((_mask) == 0, _pfx "mask is zero");	\
++		BUILD_BUG_ON_MSG(__builtin_constant_p(_val) ?		\
++				 ~((_mask) >> __bf_shf(_mask)) & (_val) : 0, \
++				 _pfx "value too large for the field"); \
++		BUILD_BUG_ON_MSG(__bf_cast_unsigned(_mask, _mask) >	\
++				 __bf_cast_unsigned(_reg, ~0ull),	\
++				 _pfx "type of reg too small for mask"); \
++		__BUILD_BUG_ON_NOT_POWER_OF_2((_mask) +			\
++					      (1ULL << __bf_shf(_mask))); \
++	})
++
++/**
++ * FIELD_MAX() - produce the maximum value representable by a field
++ * @_mask: shifted mask defining the field's length and position
++ *
++ * FIELD_MAX() returns the maximum value that can be held in the field
++ * specified by @_mask.
++ */
++#define FIELD_MAX(_mask)						\
++	({								\
++		__BF_FIELD_CHECK(_mask, 0ULL, 0ULL, "FIELD_MAX: ");	\
++		(typeof(_mask))((_mask) >> __bf_shf(_mask));		\
++	})
++
++/**
++ * FIELD_FIT() - check if value fits in the field
++ * @_mask: shifted mask defining the field's length and position
++ * @_val:  value to test against the field
++ *
++ * Return: true if @_val can fit inside @_mask, false if @_val is too big.
++ */
++#define FIELD_FIT(_mask, _val)						\
++	({								\
++		__BF_FIELD_CHECK(_mask, 0ULL, 0ULL, "FIELD_FIT: ");	\
++		!((((typeof(_mask))_val) << __bf_shf(_mask)) & ~(_mask)); \
++	})
++
++/**
++ * FIELD_PREP() - prepare a bitfield element
++ * @_mask: shifted mask defining the field's length and position
++ * @_val:  value to put in the field
++ *
++ * FIELD_PREP() masks and shifts up the value.  The result should
++ * be combined with other fields of the bitfield using logical OR.
++ */
++#define FIELD_PREP(_mask, _val)						\
++	({								\
++		__BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP: ");	\
++		((typeof(_mask))(_val) << __bf_shf(_mask)) & (_mask);	\
++	})
++
++/**
++ * FIELD_GET() - extract a bitfield element
++ * @_mask: shifted mask defining the field's length and position
++ * @_reg:  value of entire bitfield
++ *
++ * FIELD_GET() extracts the field specified by @_mask from the
++ * bitfield passed in as @_reg by masking and shifting it down.
++ */
++#define FIELD_GET(_mask, _reg)						\
++	({								\
++		__BF_FIELD_CHECK(_mask, _reg, 0U, "FIELD_GET: ");	\
++		(typeof(_mask))(((_reg) & (_mask)) >> __bf_shf(_mask));	\
++	})
++
++extern void __compiletime_error("value doesn't fit into mask")
++__field_overflow(void);
++extern void __compiletime_error("bad bitfield mask")
++__bad_mask(void);
++static __always_inline u64 field_multiplier(u64 field)
++{
++	if ((field | (field - 1)) & ((field | (field - 1)) + 1))
++		__bad_mask();
++	return field & -field;
++}
++static __always_inline u64 field_mask(u64 field)
++{
++	return field / field_multiplier(field);
++}
++#define field_max(field)	((typeof(field))field_mask(field))
++#define ____MAKE_OP(type,base,to,from)					\
++static __always_inline __##type type##_encode_bits(base v, base field)	\
++{									\
++	if (__builtin_constant_p(v) && (v & ~field_mask(field)))	\
++		__field_overflow();					\
++	return to((v & field_mask(field)) * field_multiplier(field));	\
++}									\
++static __always_inline __##type type##_replace_bits(__##type old,	\
++					base val, base field)		\
++{									\
++	return (old & ~to(field)) | type##_encode_bits(val, field);	\
++}									\
++static __always_inline void type##p_replace_bits(__##type *p,		\
++					base val, base field)		\
++{									\
++	*p = (*p & ~to(field)) | type##_encode_bits(val, field);	\
++}									\
++static __always_inline base type##_get_bits(__##type v, base field)	\
++{									\
++	return (from(v) & field)/field_multiplier(field);		\
++}
++#define __MAKE_OP(size)							\
++	____MAKE_OP(le##size,u##size,cpu_to_le##size,le##size##_to_cpu)	\
++	____MAKE_OP(be##size,u##size,cpu_to_be##size,be##size##_to_cpu)	\
++	____MAKE_OP(u##size,u##size,,)
++____MAKE_OP(u8,u8,,)
++__MAKE_OP(16)
++__MAKE_OP(32)
++__MAKE_OP(64)
++#undef __MAKE_OP
++#undef ____MAKE_OP
++
++#endif
 -- 
 2.37.2.789.g6183377224-goog
 
