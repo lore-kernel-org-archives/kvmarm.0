@@ -2,69 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D397C38145
-	for <kvmarm@archiver.kernel.org>; Wed,  7 Sep 2022 02:27:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D44A1ECAAA1
+	for <kvmarm@archiver.kernel.org>; Wed,  7 Sep 2022 02:40:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D9C94BE4C;
-	Tue,  6 Sep 2022 22:27:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F7474BDE9;
+	Tue,  6 Sep 2022 22:40:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wD9QJAapfT06; Tue,  6 Sep 2022 22:27:04 -0400 (EDT)
+	with ESMTP id 9aV353HEyeSG; Tue,  6 Sep 2022 22:40:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13A374BE3D;
-	Tue,  6 Sep 2022 22:27:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B06B4BDF2;
+	Tue,  6 Sep 2022 22:40:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 293EF4BD99
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2022 22:27:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E19004BDE2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2022 22:40:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pZRvSPl2GCfK for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Sep 2022 22:27:01 -0400 (EDT)
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com
- [209.85.222.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4605F4BD98
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2022 22:27:01 -0400 (EDT)
-Received: by mail-ua1-f45.google.com with SMTP id s5so5021395uar.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Sep 2022 19:27:01 -0700 (PDT)
+ with ESMTP id jqmFtFUEhI-s for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Sep 2022 22:40:27 -0400 (EDT)
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com
+ [209.85.217.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0426D4BD77
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Sep 2022 22:40:26 -0400 (EDT)
+Received: by mail-vs1-f46.google.com with SMTP id m65so3190132vsc.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Sep 2022 19:40:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:from:to:cc:subject:date;
- bh=pwFmJDralQuPsmi85jLOaYYTf896GNyoxThIcLObtQo=;
- b=S8+67QypVVGymC9ftQWRJdOke7mKZuzJ7mL7uh7aQwMhTkXAEdk9XP41Xtc/TMPvZ2
- 2lMCGni0hc6PcLRnNJGshXz5QTRCHY0LGATJ/zkPG/BvszgifXhkL2bqvXkQm1BjGy/n
- z11SvT+yVZVhdHwSO7WwieIIv4JgwBZKLzvm7nf3bxdwmuCgJDTPnI0pimU3VEgbBhID
- xEooM2SKmB1yR2MkNHAQn9mT10e/ZNfUs0Ssp3iwhMgRsLM3OgX829fUlyiQFN0/su+/
- UOojUS1V0RAJOFg2SIMKBeVzAA8syDcJTUlzcMBEfBMDEw1rQICNYgWYI0vTDUkQ53+d
- kKvw==
+ bh=nRLryB5Xf6lBklSjFILLPLap9evfM0qCWn2PvmAqML0=;
+ b=UJVC3Gng8U3UmQUkRK7cXsWmmJL7WkoCXMlUIomBRYjM86jMhNimaEYMGH9NI5etdf
+ 9dXdbKNrB3zpNZCcS5BDKaFI2z6VCPAUJI2fvx+yODlYzfl7JF4X78Lw2bXsJ110PQBE
+ gWjQBfPs2Xv7o7gKddMwPZNmftTqOvcoK3U987SWDvW1PaCsLcXTWJEZgE4dEimJSWOQ
+ iNX8zcjUof8AGeIgkZ8aP4qrAr7mK7cOlGo5XemApDnmELEDIjjUxbsKhUc7WCKCKAWB
+ 5l1qhf/8q+kZvglYXBSvov+hUlZtTqxzGRm1TqvtPO7gsLSZeq93rx1+qAmg3OjPCivG
+ JmFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:x-gm-message-state:from:to:cc:subject:date;
- bh=pwFmJDralQuPsmi85jLOaYYTf896GNyoxThIcLObtQo=;
- b=V5FYJcZ73viLOMTgFf1g1yGYun+tAtBaTP3WDS/zay6dYeNgP+n/vgX3nsrE1okChR
- NLCRUFZUnK4HwtCJgBPEdXWKiaUEbZBFd5xkFswhEL9FRrSYhXJGR02Ytg/Pebo0ytIl
- DXiz2w3snNIjUBJ3p9mtos/nQUl+Bk2AuQQDhPBYaF451D63bT5TpCVMUg6uEbcFoHVd
- ByFiz9Cd/Q3wXmVMaw8CqgN+rAFSN9/XmTK6K8/xl5GoIlQxJklvwJCaUA7d7KuRScAc
- hihTRkku5zdmA8h5n5LZZf/SdSlbwHZP3bNV4+iKj2w/KajFxCyXc0WlIPJrFG+lpga4
- qG4Q==
-X-Gm-Message-State: ACgBeo1d1j/40Kh3sADR49drTVrxgOb5LO26EPoRpL/vVwuEk6F6+L/s
- b//wrV7tVOrG50vGxORPo5d5OMue7xtSjUoWD0HCEg==
-X-Google-Smtp-Source: AA6agR4L/Ysf4UGfyY06Bl3A9WStVJxvIZauMf63xBjr99mNZgT82Ya7oDQb9CC3wQhnwu5zpxtEQTfvTq/gCnw1GMs=
-X-Received: by 2002:ab0:13ed:0:b0:39a:2447:e4ae with SMTP id
- n42-20020ab013ed000000b0039a2447e4aemr462462uae.37.1662517620579; Tue, 06 Sep
- 2022 19:27:00 -0700 (PDT)
+ bh=nRLryB5Xf6lBklSjFILLPLap9evfM0qCWn2PvmAqML0=;
+ b=lm5X6p7OQTHet9y8JAoHWoBkORTCQzUzq5kMo8cahdNfaCfl2WYQHFHxBdot2jj8P6
+ O75JsHfYlGCPiZl0qhro1Z3pIEQT0k8SroMpXwtyEqV77UAsIylvmtOsVTmh9vQe/J4i
+ ARZrJ+UkLDDpvYLZEyiVnfqt0VhmbbJIMoqh9LMMZh0gn73jxodx5VUhU0lRH/IGw5rH
+ 2ArXoXZsMPtxzKqdv+noR8609DAnNZO8K8FD6UKBgtATJZ16Q2M0owReq1IrJv+J7VJm
+ LcsQYtq1+qXpPJyzk35F9XTq080Ncs3NpjOuNtjX04QMjrrk6DTs+bZl5ELhvHXfrp1I
+ GW4g==
+X-Gm-Message-State: ACgBeo1mBCi5KX3MK6cgKwplXobXMEpuz4s4hQC5Q/S1SxAUuGqB8XWi
+ ZaUIwZ6RD17INFiKehpGDXtt1weW7c8BKbiomLK66g==
+X-Google-Smtp-Source: AA6agR44iTfe4vWGY8NVG62qnMuNdo07u4WWB0Hq3elNrucYrkLoB5SpIfHwPyNFT59Q2eNPmDt6Pc0Rc8oKHU/TE/A=
+X-Received: by 2002:a67:fdd0:0:b0:397:c028:db6a with SMTP id
+ l16-20020a67fdd0000000b00397c028db6amr477394vsq.58.1662518426470; Tue, 06 Sep
+ 2022 19:40:26 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220902154804.1939819-1-oliver.upton@linux.dev>
- <20220902154804.1939819-4-oliver.upton@linux.dev>
-In-Reply-To: <20220902154804.1939819-4-oliver.upton@linux.dev>
+ <20220902154804.1939819-6-oliver.upton@linux.dev>
+In-Reply-To: <20220902154804.1939819-6-oliver.upton@linux.dev>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Tue, 6 Sep 2022 19:26:44 -0700
-Message-ID: <CAAeT=Fz6mFGB5kT18Z3B2YXuCY41DdCOQOTJcdRzp-zgj=rOfQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/7] KVM: arm64: Drop raz parameter from read_id_reg()
+Date: Tue, 6 Sep 2022 19:40:10 -0700
+Message-ID: <CAAeT=FwZ28XRgAkUH_aTxZfSPHRRrEUSy8-R-dj6rs6fmOnv0g@mail.gmail.com>
+Subject: Re: [PATCH v2 5/7] KVM: arm64: Add a visibility bit to ignore user
+ writes
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
@@ -88,13 +89,10 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Fri, Sep 2, 2022 at 8:48 AM Oliver Upton <oliver.upton@linux.dev> wrote:
 >
-> There is no longer a need for caller-specified RAZ visibility. Hoist the
-> call to sysreg_visible_as_raz() into read_id_reg() and drop the
-> parameter.
+> We're about to ignore writes to AArch32 ID registers on AArch64-only
+> systems. Add a bit to indicate a register is handled as write ignore
+> when accessed from userspace.
 >
-> No functional change intended.
->
-> Suggested-by: Reiji Watanabe <reijiw@google.com>
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 
 Reviewed-by: Reiji Watanabe <reijiw@google.com>
