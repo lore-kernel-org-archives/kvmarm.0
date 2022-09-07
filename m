@@ -2,75 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37CA1C38145
-	for <kvmarm@archiver.kernel.org>; Wed,  7 Sep 2022 04:53:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35F59ECAAD5
+	for <kvmarm@archiver.kernel.org>; Thu,  8 Sep 2022 08:34:32 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 92BEC4C08E;
-	Wed,  7 Sep 2022 00:53:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A09C54CD05;
+	Thu,  8 Sep 2022 04:34:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4p5az3Bv7-8M; Wed,  7 Sep 2022 00:53:12 -0400 (EDT)
+	with ESMTP id faoe6kgWHtMG; Thu,  8 Sep 2022 04:34:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 540A34C1EE;
-	Wed,  7 Sep 2022 00:53:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BF9C4CCFA;
+	Thu,  8 Sep 2022 04:34:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 02CD74C08E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Sep 2022 00:53:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F15F4CB21
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Sep 2022 16:57:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mXmPcs7-Z057 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Sep 2022 00:53:09 -0400 (EDT)
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com
- [209.85.217.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D87034BBE1
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Sep 2022 00:53:09 -0400 (EDT)
-Received: by mail-vs1-f46.google.com with SMTP id c3so13745671vsc.6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Sep 2022 21:53:09 -0700 (PDT)
+ with ESMTP id UfpMFEajl48X for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Sep 2022 16:57:25 -0400 (EDT)
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com
+ [209.85.216.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A37984CB1E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Sep 2022 16:57:25 -0400 (EDT)
+Received: by mail-pj1-f50.google.com with SMTP id fv3so9609617pjb.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 07 Sep 2022 13:57:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:from:to:cc:subject:date;
- bh=IB8D7t/VEzk35ELr98MItPXiflxE6OsuKH8uCTmfVu0=;
- b=N1hXa/JWneN7X9IKmS2ao6iy9YLDaictBmMhbFg9cxBE0NkduKrzAFcYl/y/xmoyzt
- 3xH52+Rrdxv1/XQHNpBESXIuZb04hiO8kTyT5HpGbf32y40cBBgBt72l7BapgBjNFcx4
- zS/Ng4Kpxj1EsZ9Umceh5gRXPh2dfwTZ3IN3pc46taHI4yt8KPpEz3UMHC8sFRmcJ4XB
- LaWRtRKHYlXpNuRfvtU8CSlYXws1Yfxg9QQxhizldcDJgXvUC00ImExcNMF6UMhuHW1B
- adGT/aC3XvK7X45UkNBLfAM5f6lPc59hCxPJh/Li/4DwqzGSDk9ihVf/C0ZcVmCBFcAp
- Y8GQ==
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date;
+ bh=D3RjQ0ycHa7B/7TKXUqNYyCf5lxoaaHEC6kuhsk3puQ=;
+ b=idXPP15TJ7IS7iOdTlcgO/fcRqVHkI5cBChgxzLuZESpPUM6XsRZaDDRlyZt5BL5jA
+ NnDWTztN/R3V3J5Z1YZuFWvgmRdivTwGx7C0YTX8U3GFYFDSyYNpSXVfEvPcf6DA88z9
+ 8kLgdpa7Q4m7CU2vRCW6SLTrKfYckFsVNWOY2H42ZOxS7KeLUcJ7gnpWeG5GGIX+7+U1
+ TFWxa2aATU45JtkYWSOrYquLa9hMQdzhjn7oTetBNz+hF31OaKxN3BgxaWlaxzW2WqmT
+ wPPWvIoyABeiowfiSdUX1HROmgtTeBq4Kjy6fIipWcmDCYtgsG9s9yt5yytaexuEMaX1
+ PSJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:x-gm-message-state:from:to:cc:subject:date;
- bh=IB8D7t/VEzk35ELr98MItPXiflxE6OsuKH8uCTmfVu0=;
- b=dbAjo+R9pN/qQCNmkTHeRrYse+b0JcndxVWa52un1b80gpwYULJ+LmKKPE8Xb1PgrX
- r8Aijn1EpJ1V8V5sozeH6oIOdtq8Vz5yQk8nzY0FP8eT7j8/hwsyEbcHQ8c+BcFNgk54
- yvndKSxvAainFomAxJWCkIjQgW5fNsqYGWXHXW0u05lOU00KN0iYfT34cOrEe0UWEi49
- PxtkBJarSAV2bpY6t38qEa9dbaLYQPqO3AhxPrd728mvPUtUUDemF9bjgiGpeN5+Oz0C
- WvmsJhUSp62nJpZC5FMP/SinGXAMQbUYWiOaUnDEp1KWfpy6gyM1ZBfP5SBZBzQT8Qrd
- TN9A==
-X-Gm-Message-State: ACgBeo1EXkyCPDYQjcDzUzVYbLgkoizWQ/kJ8FGul0qt9xXS8uV3csyw
- PtSM3fZjbrQolCLGf8RHhWpxi4BkAQ4WQVAlvdCZ5A==
-X-Google-Smtp-Source: AA6agR4rCcd4O9978QvJHzO0pfaEsiyK7hjVqXjHxCjrcSZ0IqTMgr7I9V1ZuIniIvotAbRsX7V2bCI8HVlzNIUociw=
-X-Received: by 2002:a67:b009:0:b0:38a:e0f2:4108 with SMTP id
- z9-20020a67b009000000b0038ae0f24108mr514173vse.9.1662526389280; Tue, 06 Sep
- 2022 21:53:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220902154804.1939819-1-oliver.upton@linux.dev>
- <20220902154804.1939819-7-oliver.upton@linux.dev>
-In-Reply-To: <20220902154804.1939819-7-oliver.upton@linux.dev>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Tue, 6 Sep 2022 21:52:53 -0700
-Message-ID: <CAAeT=FxARdyXJyDgh_E4L-w0azuCY+47WgoM9MheBwyS8SdX1Q@mail.gmail.com>
-Subject: Re: [PATCH v2 6/7] KVM: arm64: Treat 32bit ID registers as RAZ/WI on
- 64bit-only system
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+ bh=D3RjQ0ycHa7B/7TKXUqNYyCf5lxoaaHEC6kuhsk3puQ=;
+ b=mZI7lGWOHsU8eKdgUjIv4MAM0hqch5AV0UMNW1LnbkuBui9cDTsmOi3eNCRO8Vdo2m
+ B6+oUu8xtj/xFppnkWEYR8hDNg81GvnxCbjphAo7nGHY41D8F7pD5NptfQB/RtCh6kzl
+ jjijubkIWmY95yWv9VVoFm5Cwr6donfEoNDvRBTbi2AI6oPGvwPQI/wChNTwJJ4RlfTw
+ 5Tbg5Q7qXwuRHkIEfeHWrMlSAGSY1ioTYGupf0nGxD7xC4BGOLlmqiCnFv2WAbnk/KyP
+ 7RwdRHflWe+ndgkECm4TRI4QBWP+rzy+n9lj4EIxDInDE4a58p+3ONyKJ+kp3KH/nriY
+ 8smw==
+X-Gm-Message-State: ACgBeo1CeBX/BE5Qui4yen8Be/BNh5VwGJrVCHZtB1k6kGu+vR0Km1zM
+ 2+UML9damJbcB397Obd1bNCZFg==
+X-Google-Smtp-Source: AA6agR4y0YI6Do787IPnCmL86e80gRfI6CK4dTypbO17kG+PMFuHSAWq0jEGksDH17TMqhJ3tnUYKg==
+X-Received: by 2002:a17:90b:33c9:b0:200:a0ca:e6c8 with SMTP id
+ lk9-20020a17090b33c900b00200a0cae6c8mr357636pjb.147.1662584244248; 
+ Wed, 07 Sep 2022 13:57:24 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com.
+ [34.125.103.223]) by smtp.gmail.com with ESMTPSA id
+ v6-20020a1709029a0600b00176a47e5840sm8258330plp.298.2022.09.07.13.57.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 07 Sep 2022 13:57:22 -0700 (PDT)
+Date: Wed, 7 Sep 2022 13:57:17 -0700
+From: David Matlack <dmatlack@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 02/14] KVM: arm64: Tear down unlinked stage-2 subtree
+ after break-before-make
+Message-ID: <YxkFrSmSKdBFEoZp@google.com>
+References: <20220830194132.962932-1-oliver.upton@linux.dev>
+ <20220830194132.962932-3-oliver.upton@linux.dev>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20220830194132.962932-3-oliver.upton@linux.dev>
+X-Mailman-Approved-At: Thu, 08 Sep 2022 04:34:28 -0400
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,132 +95,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Oliver,
-
-On Fri, Sep 2, 2022 at 8:48 AM Oliver Upton <oliver.upton@linux.dev> wrote:
->
-> One of the oddities of the architecture is that the AArch64 views of the
-> AArch32 ID registers are UNKNOWN if AArch32 isn't implemented at any EL.
-> Nonetheless, KVM exposes these registers to userspace for the sake of
-> save/restore. It is possible that the UNKNOWN value could differ between
-> systems, leading to a rejected write from userspace.
->
-> Avoid the issue altogether by handling the AArch32 ID registers as
-> RAZ/WI when on an AArch64-only system.
->
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/sys_regs.c | 63 ++++++++++++++++++++++++++-------------
->  1 file changed, 43 insertions(+), 20 deletions(-)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 6d0511247df4..9569772cf09a 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1144,6 +1144,20 @@ static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
->         return 0;
->  }
->
-> +static unsigned int aa32_id_visibility(const struct kvm_vcpu *vcpu,
-> +                                      const struct sys_reg_desc *r)
-> +{
-> +       /*
-> +        * AArch32 ID registers are UNKNOWN if AArch32 isn't implemented at any
-> +        * EL. Promote to RAZ/WI in order to guarantee consistency between
-> +        * systems.
-> +        */
-> +       if (!kvm_supports_32bit_el0())
-> +               return REG_RAZ | REG_USER_WI;
+On Tue, Aug 30, 2022 at 07:41:20PM +0000, Oliver Upton wrote:
+[...]
+>  
+> +static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> +				struct stage2_map_data *data);
 > +
-> +       return id_visibility(vcpu, r);
-> +}
-> +
->  static unsigned int raz_visibility(const struct kvm_vcpu *vcpu,
->                                    const struct sys_reg_desc *r)
+>  static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
+>  				     kvm_pte_t *ptep,
+>  				     struct stage2_map_data *data)
 >  {
-> @@ -1331,6 +1345,15 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
->         .visibility = id_visibility,            \
->  }
->
-> +/* sys_reg_desc initialiser for known cpufeature ID registers */
-> +#define AA32_ID_SANITISED(name) {              \
-> +       SYS_DESC(SYS_##name),                   \
-> +       .access = access_id_reg,                \
-> +       .get_user = get_id_reg,                 \
-> +       .set_user = set_id_reg,                 \
-> +       .visibility = aa32_id_visibility,       \
-> +}
-> +
->  /*
->   * sys_reg_desc initialiser for architecturally unallocated cpufeature ID
->   * register with encoding Op0=3, Op1=0, CRn=0, CRm=crm, Op2=op2
-> @@ -1418,33 +1441,33 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->
->         /* AArch64 mappings of the AArch32 ID registers */
->         /* CRm=1 */
-> -       ID_SANITISED(ID_PFR0_EL1),
-> -       ID_SANITISED(ID_PFR1_EL1),
-> -       ID_SANITISED(ID_DFR0_EL1),
-> +       AA32_ID_SANITISED(ID_PFR0_EL1),
-> +       AA32_ID_SANITISED(ID_PFR1_EL1),
-> +       AA32_ID_SANITISED(ID_DFR0_EL1),
->         ID_HIDDEN(ID_AFR0_EL1),
-> -       ID_SANITISED(ID_MMFR0_EL1),
-> -       ID_SANITISED(ID_MMFR1_EL1),
-> -       ID_SANITISED(ID_MMFR2_EL1),
-> -       ID_SANITISED(ID_MMFR3_EL1),
-> +       AA32_ID_SANITISED(ID_MMFR0_EL1),
-> +       AA32_ID_SANITISED(ID_MMFR1_EL1),
-> +       AA32_ID_SANITISED(ID_MMFR2_EL1),
-> +       AA32_ID_SANITISED(ID_MMFR3_EL1),
->
->         /* CRm=2 */
-> -       ID_SANITISED(ID_ISAR0_EL1),
-> -       ID_SANITISED(ID_ISAR1_EL1),
-> -       ID_SANITISED(ID_ISAR2_EL1),
-> -       ID_SANITISED(ID_ISAR3_EL1),
-> -       ID_SANITISED(ID_ISAR4_EL1),
-> -       ID_SANITISED(ID_ISAR5_EL1),
-> -       ID_SANITISED(ID_MMFR4_EL1),
-> -       ID_SANITISED(ID_ISAR6_EL1),
-> +       AA32_ID_SANITISED(ID_ISAR0_EL1),
-> +       AA32_ID_SANITISED(ID_ISAR1_EL1),
-> +       AA32_ID_SANITISED(ID_ISAR2_EL1),
-> +       AA32_ID_SANITISED(ID_ISAR3_EL1),
-> +       AA32_ID_SANITISED(ID_ISAR4_EL1),
-> +       AA32_ID_SANITISED(ID_ISAR5_EL1),
-> +       AA32_ID_SANITISED(ID_MMFR4_EL1),
-> +       AA32_ID_SANITISED(ID_ISAR6_EL1),
->
->         /* CRm=3 */
-> -       ID_SANITISED(MVFR0_EL1),
-> -       ID_SANITISED(MVFR1_EL1),
-> -       ID_SANITISED(MVFR2_EL1),
-> +       AA32_ID_SANITISED(MVFR0_EL1),
-> +       AA32_ID_SANITISED(MVFR1_EL1),
-> +       AA32_ID_SANITISED(MVFR2_EL1),
->         ID_UNALLOCATED(3,3),
-> -       ID_SANITISED(ID_PFR2_EL1),
-> +       AA32_ID_SANITISED(ID_PFR2_EL1),
->         ID_HIDDEN(ID_DFR1_EL1),
+> -	if (data->anchor)
 
-Perhaps it might be better to handle ID_AFR0_EL1 and ID_DFR1_EL1
-in the same way as the other AArch32 ID registers for consistency ?
-(i.e. treat them RAZ/USER_WI instead of RAZ if kvm_supports_32bit_el0()
- is false instead of RAZ)
+Should @anchor and @childp be removed from struct stage2_map_data? This
+commit removes the only remaining references to them.
 
-Thank you,
-Reiji
+> -		return 0;
+> +	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
+> +	kvm_pte_t *childp = kvm_pte_follow(*ptep, mm_ops);
+> +	struct kvm_pgtable *pgt = data->mmu->pgt;
+> +	int ret;
+>  
+>  	if (!stage2_leaf_mapping_allowed(addr, end, level, data))
+>  		return 0;
+>  
+> -	data->childp = kvm_pte_follow(*ptep, data->mm_ops);
+>  	kvm_clear_pte(ptep);
+>  
+>  	/*
+[...]
+>  static int stage2_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  			     enum kvm_pgtable_walk_flags flag, void * const arg)
+> @@ -883,11 +849,9 @@ static int stage2_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  		return stage2_map_walk_table_pre(addr, end, level, ptep, data);
+>  	case KVM_PGTABLE_WALK_LEAF:
+>  		return stage2_map_walk_leaf(addr, end, level, ptep, data);
+> -	case KVM_PGTABLE_WALK_TABLE_POST:
+> -		return stage2_map_walk_table_post(addr, end, level, ptep, data);
 
-
-> -       ID_SANITISED(ID_MMFR5_EL1),
-> +       AA32_ID_SANITISED(ID_MMFR5_EL1),
->         ID_UNALLOCATED(3,7),
->
->         /* AArch64 ID registers */
-> --
-> 2.37.2.789.g6183377224-goog
->
+kvm_pgtable_stage2_set_owner() still uses stage2_map_walker() with
+KVM_PGTABLE_WALK_TABLE_POST.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
