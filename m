@@ -2,60 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 209EAECAAA1
-	for <kvmarm@archiver.kernel.org>; Fri,  9 Sep 2022 10:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B04BECAAD3
+	for <kvmarm@archiver.kernel.org>; Fri,  9 Sep 2022 12:41:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 990594C91B;
-	Fri,  9 Sep 2022 06:15:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A4264C639;
+	Fri,  9 Sep 2022 08:41:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZZEV1spiI32w; Fri,  9 Sep 2022 06:15:57 -0400 (EDT)
+	with ESMTP id PCtIh2jKZCwr; Fri,  9 Sep 2022 08:41:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 510C94C9F7;
-	Fri,  9 Sep 2022 06:15:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5C7D4C64A;
+	Fri,  9 Sep 2022 08:41:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 937504C917
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Sep 2022 06:15:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A33354C639
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Sep 2022 08:41:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id n2eADROV-RCY for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Sep 2022 06:15:55 -0400 (EDT)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 44A054C912
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Sep 2022 06:15:55 -0400 (EDT)
-Date: Fri, 9 Sep 2022 11:15:47 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1662718554;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=UWf75u93hFnHokSkmXHPMg8FKyuqd4msKp/yEz7C7Ao=;
- b=MTo2cIazKhJL+OTHp3ysffg8vodSCAed8X2h3DOACc71oK2aqbBLC8NVrUh6Y96fLISHKg
- RHr3qPWaAmutt9oyx7mVi3or4pcgVp1Ros6ZN4U6x/7bf6jP/xluVrOBnUw1XFK9aJt0ce
- 1VVctsUI4WfaWLRjrfom8jZgC+S/zdk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
+ with ESMTP id XrhlOmV1Gzu2 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  9 Sep 2022 08:41:30 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 274764C5B5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Sep 2022 08:41:30 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id BF117B82244;
+ Fri,  9 Sep 2022 12:41:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BB0EC433D6;
+ Fri,  9 Sep 2022 12:41:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1662727287;
+ bh=CLH7ZAjFywwJOIlljcX2EP88lBse8oQ2fMjAzTCF1yk=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=LZ3wjBZRidQBor81kcrDhinncaY29SFDVDQ3PzjIlLQ6mFWpYjSJF+5qWZL+Qhy7w
+ ugcS9lxO866hiuPdRIUH+zI7+C9d1hOZM0AAzGCMNBZuwgSK5r+OjJbRZ8ilX7jQdM
+ /3grJNdunCYsCKsMA6NgsxkQna9EB3b580gEgv05Fx3UwLB2SVSvcA50PvMM7LSNIs
+ GC6gyBHwev7AbzyslXk6zn3U6Qx0fM85kjI0b6nEEkbXuvHFZxCW8D+UVrPjJ5iL+P
+ sWOQGG2+wSv7ScPcPW7WcWGrp5IKgwXAXw2DLZNmTFDV1KlN6iZ0qU7BgJjKXYwW1Y
+ Wa6f+sj20S3sw==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oWdK1-009BPp-AH;
+ Fri, 09 Sep 2022 13:41:25 +0100
+Date: Fri, 09 Sep 2022 13:41:24 +0100
+Message-ID: <87bkrora8b.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH v2 6/7] KVM: arm64: Treat 32bit ID registers as RAZ/WI on
- 64bit-only system
-Message-ID: <YxsSU2Rwdc2sO3IJ@google.com>
-References: <20220902154804.1939819-1-oliver.upton@linux.dev>
- <20220902154804.1939819-7-oliver.upton@linux.dev>
- <CAAeT=FxARdyXJyDgh_E4L-w0azuCY+47WgoM9MheBwyS8SdX1Q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CAAeT=FxARdyXJyDgh_E4L-w0azuCY+47WgoM9MheBwyS8SdX1Q@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH 1/3] KVM: arm64: Don't set PSTATE.SS when Software Step
+ state is Active-pending
+In-Reply-To: <20220909044636.1997755-2-reijiw@google.com>
+References: <20220909044636.1997755-1-reijiw@google.com>
+ <20220909044636.1997755-2-reijiw@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com,
+ ricarkol@google.com, oliver.upton@linux.dev, jingzhangos@google.com,
+ rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,38 +92,98 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Reiji,
 
-On Tue, Sep 06, 2022 at 09:52:53PM -0700, Reiji Watanabe wrote:
-
-[...]
-
-> >         /* CRm=3 */
-> > -       ID_SANITISED(MVFR0_EL1),
-> > -       ID_SANITISED(MVFR1_EL1),
-> > -       ID_SANITISED(MVFR2_EL1),
-> > +       AA32_ID_SANITISED(MVFR0_EL1),
-> > +       AA32_ID_SANITISED(MVFR1_EL1),
-> > +       AA32_ID_SANITISED(MVFR2_EL1),
-> >         ID_UNALLOCATED(3,3),
-> > -       ID_SANITISED(ID_PFR2_EL1),
-> > +       AA32_ID_SANITISED(ID_PFR2_EL1),
-> >         ID_HIDDEN(ID_DFR1_EL1),
+On Fri, 09 Sep 2022 05:46:34 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> Perhaps it might be better to handle ID_AFR0_EL1 and ID_DFR1_EL1
-> in the same way as the other AArch32 ID registers for consistency ?
-> (i.e. treat them RAZ/USER_WI instead of RAZ if kvm_supports_32bit_el0()
->  is false instead of RAZ)
+> Currently, PSTATE.SS is set on every guest entry if single-step is
+> enabled for the vCPU by userspace.  However, it could cause extra
+> single-step execution without returning to userspace, which shouldn't
+> be performed, if the Software Step state at the last guest exit was
+> Active-pending (i.e. the last exit was not triggered by Software Step
+> exception, but by an asynchronous exception after the single-step
+> execution is performed).
 
-Thanks for having a look. I stopped short of treating these registers as
-RAZ/USER_WI since an attempted nonzero write to either of these
-registers is a userspace bug (KVM always advertised 0).
+For my own enlightenment, could you describe a sequence of events that
+leads to this issue?
 
-As the ABI isn't busted for these registers I'd prefer to leave it in
-place. Having said that, I'm not too strongly motivated in either
-direction.
+> 
+> Fix this by not setting PSTATE.SS on guest entry if the Software
+> Step state at the last exit was Active-pending.
+> 
+> Fixes: 337b99bf7edf ("KVM: arm64: guest debug, add support for single-step")
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  3 +++
+>  arch/arm64/kvm/debug.c            | 19 ++++++++++++++++++-
+>  arch/arm64/kvm/guest.c            |  1 +
+>  arch/arm64/kvm/handle_exit.c      |  2 ++
+>  4 files changed, 24 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e9c9388ccc02..4cf6eef02565 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -535,6 +535,9 @@ struct kvm_vcpu_arch {
+>  #define IN_WFIT			__vcpu_single_flag(sflags, BIT(3))
+>  /* vcpu system registers loaded on physical CPU */
+>  #define SYSREGS_ON_CPU		__vcpu_single_flag(sflags, BIT(4))
+> +/* Software step state is Active-pending */
+> +#define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(5))
+> +
+>  
+>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+>  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index 0b28d7db7c76..125cfb94b4ad 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -188,7 +188,16 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  		 * debugging the system.
+>  		 */
+>  		if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+> -			*vcpu_cpsr(vcpu) |=  DBG_SPSR_SS;
+> +			/*
+> +			 * If the software step state at the last guest exit
+> +			 * was Active-pending, we don't set DBG_SPSR_SS so
+> +			 * that the state is maintained (to not run another
+> +			 * single-step until the pending Software Step
+> +			 * exception is taken).
+> +			 */
+> +			if (!vcpu_get_flag(vcpu, DBG_SS_ACTIVE_PENDING))
+> +				*vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
 
---
+I guess my confusion stems from my (probably wrong) interpretation if
+the SS state is A+P, there is no harm in making it pending again
+(setting the SS bit in PSTATE).
+
+> +
+>  			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+>  			mdscr |= DBG_MDSCR_SS;
+
+But it looks like the *pending* state is actually stored in MDSCR
+instead? The spec only mentions this for the A+P state, so this is
+quite likely a bug indeed.
+
+Now, where does the asynchronous exception comes into play? I found
+this intriguing remark in the ARM ARM:
+
+<quote>
+The Software Step exception has higher priority than all other types
+of synchronous exception. However, the prioritization of this
+exception with respect to any unmasked pending asynchronous exception
+is not defined by the architecture.
+</quote>
+
+Is this what you were referring to in the commit message? I think you
+need to spell it out for us, as I don't fully understand what you are
+fixing nor do I understand the gory details of single-stepping...
+
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
