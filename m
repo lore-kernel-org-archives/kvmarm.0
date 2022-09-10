@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F85AC6FA83
-	for <kvmarm@archiver.kernel.org>; Sat, 10 Sep 2022 04:15:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E9EDC6FA82
+	for <kvmarm@archiver.kernel.org>; Sat, 10 Sep 2022 05:20:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 253974C0BC;
-	Sat, 10 Sep 2022 00:15:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D50404C162;
+	Sat, 10 Sep 2022 01:20:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id euIvG7lBQJmy; Sat, 10 Sep 2022 00:15:56 -0400 (EDT)
+	with ESMTP id e0hukZUfm5Fv; Sat, 10 Sep 2022 01:20:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 177AF4BFBB;
-	Sat, 10 Sep 2022 00:15:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74F084BE55;
+	Sat, 10 Sep 2022 01:20:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A668D4BF5F
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2022 00:15:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 49AAE4BE61
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2022 01:19:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8uJh941ourzY for <kvmarm@lists.cs.columbia.edu>;
- Sat, 10 Sep 2022 00:15:53 -0400 (EDT)
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com
- [209.85.217.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9F0A74BF19
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2022 00:15:53 -0400 (EDT)
-Received: by mail-vs1-f54.google.com with SMTP id k2so3644120vsk.8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 09 Sep 2022 21:15:53 -0700 (PDT)
+ with ESMTP id sPI+-kwRq7uY for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 10 Sep 2022 01:19:57 -0400 (EDT)
+Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com
+ [209.85.217.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E53664BDFF
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2022 01:19:57 -0400 (EDT)
+Received: by mail-vs1-f45.google.com with SMTP id d126so3700498vsd.13
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 09 Sep 2022 22:19:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:from:to:cc:subject:date;
- bh=otYREk8t2WdG/NJ+ZPtuIVmKtO1jI4mWCWtGovgZifs=;
- b=P1/zZ7bOsUX2MawfFHJAH9LBegb1zhmBN9uR6JsmYDcDZCVq8AuQpbgnXpW8iPb4GB
- TP6FJIUZzb+d8XBBIush3ABrXqtl7/wyjLv6aKCkBCFR96Ej72dJpIhO3ezgUn/9MLYM
- Ot0IJEUCvIDFNlMv3Wifnjb5gdhNMEn+PqszUyRDnRilMi6VdoTYkUYAP1HLkux/qd9Y
- UO5gRN03fRRoRjEsJjH3k0g6kxnyy5bX9GYetj2MPWsi7zzaCdyN8RQiN08gM2Z+YRKJ
- tDUvQVqiH5TC9GSDcVbekxwRALeE1CoXehCkEdesZkbbLnE7g0v+5edVCZzDIjWZtRsT
- sK2w==
+ bh=1Q8xez3ltSahYUjHDy9HC9ApI6Tf5mJxjUk7SUwH3gE=;
+ b=bxbtWmDBjSqoviCB7dbG1jM6t6nVv1LH9lO11ejN7Onu9V8LweLKGCMcQIZGrc5Zxp
+ u/kzslzr7tQ1ehp19pSsev4LN+QDWOntIyqr9bSsj01px352X1psd1cfEtHEoX1UfD88
+ 8AGKpzzWU+WihgK6kGVRbbtX+vjtFdJU5AfSUq/tiJwlrzefhMAuY1yJzOhlDIKZmTkg
+ u8ndKmR48jgZIxmSw7/Z/cZJE7rgnGiPTpRRHn+nfD/BMcDbjDiXj+9UOiTO1ivLjjrJ
+ U87WTZHN+7HTApMBAKebLuMhrNtiRfgWDrBBj4RgvpbCwJuL1J9QMg81DV+gN7tBZnx/
+ bkZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:x-gm-message-state:from:to:cc:subject:date;
- bh=otYREk8t2WdG/NJ+ZPtuIVmKtO1jI4mWCWtGovgZifs=;
- b=hAHJXR8y0iiFTe9DcvQm8WovtWKtZf9/Y7Iuwfw+2N+RkQ98c49xT7HvExFCKRmeHI
- SLfssW7gcbibGMDCDXCy7rRpdwi6T2L3ecHBuRSD+Taz8ihM2OAP6vejz8BLR7Fycc8V
- rdfxjkk7DlM0eRyH+W0g+2mXI573TTxGgs7uET2JBVjcLhmsr1+77dji3b6QFn92Xk58
- iAG3rRI7Yj06D088ecSIoKzC+0F4beg1Wu0It+0Q5WYhcKFHKrezAA0BpNeVqBE1sMaN
- cpL50FR0oGet2r7cQX06jnrfVjDOeLiueqhxqznH8RqTItdF9MRNfi7/STmzEPFORmwD
- f6ow==
-X-Gm-Message-State: ACgBeo2CbnxdtLB0QTn67i2x+aUr96zaM5yKsYGyV5nquLX07khYeGBG
- YvD0BrXK/R6hZ9qozKD8OYVAESu62g0b0BuU+UcabA==
-X-Google-Smtp-Source: AA6agR4VUM5bZTnLtDGODi754vdxpwLgswug4ZoSrk/lFyazp+e82v69j928eFB59oIJrBArMmqhtHgMHx/zOs6vvnc=
-X-Received: by 2002:a67:ea58:0:b0:38f:d89a:e4b3 with SMTP id
- r24-20020a67ea58000000b0038fd89ae4b3mr5967895vso.51.1662783353013; Fri, 09
- Sep 2022 21:15:53 -0700 (PDT)
+ bh=1Q8xez3ltSahYUjHDy9HC9ApI6Tf5mJxjUk7SUwH3gE=;
+ b=giM/bHThiGDIytuUnCnK+tInbFyFYjXH7b8ernnMtn7v+GNjPxKpiLBCk2ICyuH+IG
+ gVtsRJxCpjW5CYUtLfR77pJz5y0xX5g2L6D3GWDN7KWUeeXVWrvSZpzlvy8t0R5D8AX2
+ C/rg1AnC7+d/uiJEx90z5CC1JvOvbutQG6K+Q86o8bb5Tlter58Equw1oJfSXLVqUzps
+ 3gXF7poHix6eboU4QoqxuydSLqbGJY6c3L3r/3bYGLka3aV1HkooGwtFHiPT8kmSRlS2
+ WJ2cmKqw+x+pzEyz9i5rRnYgcMR7OIZmJ2kQUN9C5wMXH9WBdSuKCypzjwOVWky4KGhg
+ tHKQ==
+X-Gm-Message-State: ACgBeo0ofTe2B7ARtKL8+053uO3BYp8RZydm+sRR2KhpPAIlFQYJIcsm
+ 7UydFJuLZV/OgUiEciYk/mveU9HnpTBRDy+wBVxzQw==
+X-Google-Smtp-Source: AA6agR44nfldY7tAzzaAQ1D6EFpSHsZyYKTtetNc0RGMnsJpeLOtNcS5qH1aKDOYzQY1oDIO9Iycm2Zy4vjSUED6iPo=
+X-Received: by 2002:a67:c00b:0:b0:390:8e1f:594a with SMTP id
+ v11-20020a67c00b000000b003908e1f594amr6242068vsi.80.1662787197272; Fri, 09
+ Sep 2022 22:19:57 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220825050846.3418868-1-reijiw@google.com>
- <20220825050846.3418868-4-reijiw@google.com>
- <YxuX+ztKm/rPetql@google.com>
-In-Reply-To: <YxuX+ztKm/rPetql@google.com>
+ <20220825050846.3418868-8-reijiw@google.com>
+ <YxupmpFFPOVx95w+@google.com>
+In-Reply-To: <YxupmpFFPOVx95w+@google.com>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Fri, 9 Sep 2022 21:15:37 -0700
-Message-ID: <CAAeT=Fx38tW+XkfWBvs+dgB4JU4SpVHOVzu4w-BMkAbe21+W5g@mail.gmail.com>
-Subject: Re: [PATCH 3/9] KVM: arm64: selftests: Remove the hard-coded
- {b,w}pn#0 from debug-exceptions
+Date: Fri, 9 Sep 2022 22:19:41 -0700
+Message-ID: <CAAeT=FxPn3xtPcg2_1EHGghZwHZ972cCXzNqJn+Jej2nsC7Y4A@mail.gmail.com>
+Subject: Re: [PATCH 7/9] KVM: arm64: selftests: Add a test case for a linked
+ breakpoint
 To: Ricardo Koller <ricarkol@google.com>
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  Andrew Jones <andrew.jones@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -89,57 +89,189 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Ricardo,
 
-On Fri, Sep 9, 2022 at 12:46 PM Ricardo Koller <ricarkol@google.com> wrote:
+Thank you for the review!
+
+On Fri, Sep 9, 2022 at 2:01 PM Ricardo Koller <ricarkol@google.com> wrote:
 >
-> On Wed, Aug 24, 2022 at 10:08:40PM -0700, Reiji Watanabe wrote:
-> > Remove the hard-coded {break,watch}point #0 from the guest_code()
-> > in debug-exceptions to allow {break,watch}point number to be
-> > specified.  Subsequent patches will add test cases for non-zero
-> > {break,watch}points.
+> On Wed, Aug 24, 2022 at 10:08:44PM -0700, Reiji Watanabe wrote:
+> > Currently, the debug-exceptions test doesn't have a test case for
+> > a linked breakpoint. Add a test case for the linked breakpoint to
+> > the test.
+>
+> I would add some more detail, like the fact that this is a pair of
+> breakpoints: one is a context-aware breakpoint, and the other one
+> is an address breakpoint linked to the first one.
+
+Sure, I would add more detail.
+
+>
 > >
 > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> >
 > > ---
-> >  .../selftests/kvm/aarch64/debug-exceptions.c  | 50 ++++++++++++-------
-> >  1 file changed, 32 insertions(+), 18 deletions(-)
+> >  .../selftests/kvm/aarch64/debug-exceptions.c  | 59 +++++++++++++++++--
+> >  1 file changed, 55 insertions(+), 4 deletions(-)
 > >
 > > diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> > index 51047e6b8db3..183ee16acb7d 100644
+> > index ab8860e3a9fa..9fccfeebccd3 100644
 > > --- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
 > > +++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> > @@ -93,6 +93,9 @@ GEN_DEBUG_WRITE_REG(dbgwvr)
+> > @@ -11,6 +11,10 @@
+> >  #define DBGBCR_EXEC  (0x0 << 3)
+> >  #define DBGBCR_EL1   (0x1 << 1)
+> >  #define DBGBCR_E     (0x1 << 0)
+> > +#define DBGBCR_LBN_SHIFT     16
+> > +#define DBGBCR_BT_SHIFT              20
+> > +#define DBGBCR_BT_ADDR_LINK_CTX      (0x1 << DBGBCR_BT_SHIFT)
+> > +#define DBGBCR_BT_CTX_LINK   (0x3 << DBGBCR_BT_SHIFT)
 > >
-> >  static void reset_debug_state(void)
-> >  {
-> > +     uint8_t brps, wrps, i;
-> > +     uint64_t dfr0;
-> > +
-> >       asm volatile("msr daifset, #8");
+> >  #define DBGWCR_LEN8  (0xff << 5)
+> >  #define DBGWCR_RD    (0x1 << 3)
+> > @@ -21,7 +25,7 @@
+> >  #define SPSR_D               (1 << 9)
+> >  #define SPSR_SS              (1 << 21)
 > >
-> >       write_sysreg(0, osdlr_el1);
-> > @@ -100,11 +103,20 @@ static void reset_debug_state(void)
+> > -extern unsigned char sw_bp, sw_bp2, hw_bp, hw_bp2, bp_svc, bp_brk, hw_wp, ss_start;
+> > +extern unsigned char sw_bp, sw_bp2, hw_bp, hw_bp2, bp_svc, bp_brk, hw_wp, ss_start, hw_bp_ctx;
+> >  static volatile uint64_t sw_bp_addr, hw_bp_addr;
+> >  static volatile uint64_t wp_addr, wp_data_addr;
+> >  static volatile uint64_t svc_addr;
+> > @@ -103,6 +107,7 @@ static void reset_debug_state(void)
 > >       isb();
 > >
 > >       write_sysreg(0, mdscr_el1);
-> > -     /* This test only uses the first bp and wp slot. */
-> > -     write_sysreg(0, dbgbvr0_el1);
-> > -     write_sysreg(0, dbgbcr0_el1);
-> > -     write_sysreg(0, dbgwcr0_el1);
-> > -     write_sysreg(0, dbgwvr0_el1);
+> > +     write_sysreg(0, contextidr_el1);
+> >
+> >       /* Reset all bcr/bvr/wcr/wvr registers */
+> >       dfr0 = read_sysreg(id_aa64dfr0_el1);
+> > @@ -164,6 +169,28 @@ static void install_hw_bp(uint8_t bpn, uint64_t addr)
+> >       enable_debug_bwp_exception();
+> >  }
+> >
+> > +void install_hw_bp_ctx(uint8_t addr_bp, uint8_t ctx_bp, uint64_t addr,
+> > +                    uint64_t ctx)
+> > +{
+> > +     uint32_t addr_bcr, ctx_bcr;
 > > +
-> > +     /* Reset all bcr/bvr/wcr/wvr registers */
-> > +     dfr0 = read_sysreg(id_aa64dfr0_el1);
-> > +     brps = cpuid_get_ufield(dfr0, ID_AA64DFR0_BRPS_SHIFT);
->
-> I guess this might have to change to ARM64_FEATURE_GET(). In any case:
->
-> Reviewed-by: Ricardo Koller <ricarkol@google.com>
->
-> (also assuming it includes the commit message clarification about reset
-> clearing all registers).
+> > +     /* Setup a context-aware breakpoint */
+> > +     ctx_bcr = DBGBCR_LEN8 | DBGBCR_EXEC | DBGBCR_EL1 | DBGBCR_E |
+> > +               DBGBCR_BT_CTX_LINK;
+>                                ^^^^^
+>                           isn't this a regular context-aware breakpoint?
+>                           the other one is the linked one.
 
-Yes, I will fix those in V2.
+That is one of the types that we could use only for context-aware
+breakpoints (Linked Context ID Match breakpoint).  I should probably
+have stated we use Linked Context ID Match breakpoint for the
+context-aware breakpoint ?
 
-Thank you for the review!
+
+>
+> > +     write_dbgbcr(ctx_bp, ctx_bcr);
+> > +     write_dbgbvr(ctx_bp, ctx);
+> > +
+> > +     /* Setup a linked breakpoint (linked to the context-aware breakpoint) */
+> > +     addr_bcr = DBGBCR_LEN8 | DBGBCR_EXEC | DBGBCR_EL1 | DBGBCR_E |
+> > +                DBGBCR_BT_ADDR_LINK_CTX |
+> > +                ((uint32_t)ctx_bp << DBGBCR_LBN_SHIFT);
+>
+> Just a curiosity, can the context-aware one link to this one?
+
+No, it can't (LBN field for the Context breakpoint is ignored).
+
+>
+> > +     write_dbgbcr(addr_bp, addr_bcr);
+> > +     write_dbgbvr(addr_bp, addr);
+> > +     isb();
+> > +
+> > +     enable_debug_bwp_exception();
+> > +}
+> > +
+> >  static void install_ss(void)
+> >  {
+> >       uint32_t mdscr;
+> > @@ -177,8 +204,10 @@ static void install_ss(void)
+> >
+> >  static volatile char write_data;
+> >
+> > -static void guest_code(uint8_t bpn, uint8_t wpn)
+> > +static void guest_code(uint8_t bpn, uint8_t wpn, uint8_t ctx_bpn)
+> >  {
+> > +     uint64_t ctx = 0x1;     /* a random context number */
+>
+> nit: make this number a bit more unlikely to happen by mistake.
+> I guess you could use all available 32 bits.
+
+Sure, I could change it to some different number.
+
+
+>
+> > +
+> >       GUEST_SYNC(0);
+> >
+> >       /* Software-breakpoint */
+> > @@ -281,6 +310,19 @@ static void guest_code(uint8_t bpn, uint8_t wpn)
+> >                    : : : "x0");
+> >       GUEST_ASSERT_EQ(ss_addr[0], 0);
+> >
+> > +     /* Linked hardware-breakpoint */
+> > +     hw_bp_addr = 0;
+> > +     reset_debug_state();
+> > +     install_hw_bp_ctx(bpn, ctx_bpn, PC(hw_bp_ctx), ctx);
+> > +     /* Set context id */
+> > +     write_sysreg(ctx, contextidr_el1);
+> > +     isb();
+> > +     asm volatile("hw_bp_ctx: nop");
+> > +     write_sysreg(0, contextidr_el1);
+> > +     GUEST_ASSERT_EQ(hw_bp_addr, PC(hw_bp_ctx));
+> > +
+> > +     GUEST_SYNC(10);
+> > +
+> >       GUEST_DONE();
+> >  }
+> >
+> > @@ -327,6 +369,7 @@ int main(int argc, char *argv[])
+> >       struct ucall uc;
+> >       int stage;
+> >       uint64_t aa64dfr0;
+> > +     uint8_t brps;
+> >
+> >       vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+> >       ucall_init(vm, NULL);
+> > @@ -349,8 +392,16 @@ int main(int argc, char *argv[])
+> >       vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+> >                               ESR_EC_SVC64, guest_svc_handler);
+> >
+> > -     /* Run tests with breakpoint#0 and watchpoint#0. */
+> > -     vcpu_args_set(vcpu, 2, 0, 0);
+> > +     /* Number of breakpoints, minus 1 */
+> > +     brps = cpuid_get_ufield(aa64dfr0, ID_AA64DFR0_BRPS_SHIFT);
+>
+> If brps is "number of breakpoints", then there should be a "+ 1" above.
+> Otherwise brps is really "last breakpoint" (last_brp).
+>
+> > +     __TEST_REQUIRE(brps > 0, "At least two breakpoints are required");
+>
+> Yes, based on this test, brps is really "last breakpoint". I would
+> suggest changing the name to "last_brp" (or something similar).
+
+The 'brps' I meant is simply 'BRPS' field value of ID_AA64DFR0_EL1.
+I agree that it could be misleading.
+
+The following patches use xxx_num for the number of watch/break points.
+So, I am thinking of changing it brp_num to indicate the number of
+breakpoints (and add 1).
+
+
+> > +
+> > +     /*
+> > +      * Run tests with breakpoint#0 and watchpoint#0, and the higiest
+>
+>          * Run tests with breakpoint#0, watchpoint#0, and the highest
+
+Will fix this.
+
+Thank you,
 Reiji
 _______________________________________________
 kvmarm mailing list
