@@ -2,76 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9782BC6FA83
-	for <kvmarm@archiver.kernel.org>; Sat, 10 Sep 2022 05:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0A7ECAAD5
+	for <kvmarm@archiver.kernel.org>; Sat, 10 Sep 2022 09:09:29 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F23F4BEB7;
-	Sat, 10 Sep 2022 01:23:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F6EC4BF89;
+	Sat, 10 Sep 2022 05:09:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jYcw8iigvIsA; Sat, 10 Sep 2022 01:23:13 -0400 (EDT)
+	with ESMTP id wcQK3qKNprhL; Sat, 10 Sep 2022 05:09:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 052794BF0B;
-	Sat, 10 Sep 2022 01:23:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 451474BF94;
+	Sat, 10 Sep 2022 05:09:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F5F14BE98
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2022 01:23:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DEDB4BF8A
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2022 05:09:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AKfg+mTpfnPX for <kvmarm@lists.cs.columbia.edu>;
- Sat, 10 Sep 2022 01:23:11 -0400 (EDT)
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com
- [209.85.217.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 320EA4BE8E
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2022 01:23:11 -0400 (EDT)
-Received: by mail-vs1-f47.google.com with SMTP id m65so3743574vsc.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 09 Sep 2022 22:23:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:from:to:cc:subject:date;
- bh=m3/TehbQGopN0M9TyC9OJc2nnGFxBuSLpVkEhsafx4k=;
- b=BupYcGJg9AgPWkfyysBwwMLg4S4djndS4b8GNGkuCLJJ18z25OJ2w+frXS7k4fBl4G
- aPvUrfbdQ6VdMEmPhE/0agab9DcDmlHIis6nZJ71sNgWyPfG7fPrgtxEa5j0D2aRaVP1
- yhzoRbYAdFEJQ13hQZ6Hg3kKiSNzhVsSyLr9YTM0iqwivIOMftowbZCozbMEy0Pqh6tj
- yJZLL47OgGmE0h2sK+SC+l6HgviJ0nFjlChUQSN45auJlO9t51yheC917e4yFRFCkh98
- U8iOUdEaLjhbWckM0UdWSzSBn57oIaVaTuVWq2kUBf3wL88j+1CdehSP+/ya1uhAkfkZ
- Hj4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:x-gm-message-state:from:to:cc:subject:date;
- bh=m3/TehbQGopN0M9TyC9OJc2nnGFxBuSLpVkEhsafx4k=;
- b=LLyxi1MXEFoh/bYcWnoPGhLG7DXbLGznQqW9UYIcXYgQw2MWkwvZ2/3AjkpanI8UM1
- IlfRAdEvEzyxnxS/LRWTvdGsIrc8YxLqpwzm7fBvTImQhXf+tP7CQ5hhljfm7IvJu5ng
- /SFFJaTClCtKylHj+I6BDqJQ6sGZoQ7YF75Al3p3gI/EyS1OoNErr1UcU2cUJ3sUaHIQ
- nyGlvJb9bJHSG+aRviqy/ISMwGFTuZ2uOJ4FLMMTRxDyxVM2/HPbWdl72cCTIYJMjt4M
- 8Ih/PIoKWJn/aoW+F8ueMQjd9HIPwLwF1yHTCx7YnsTCypXC3KQ/oiMnPg9RyaPewac7
- tlSQ==
-X-Gm-Message-State: ACgBeo0iVQlZBvxi3FtCwSi2A2NsZbUYUjc55a3rtsogwrIHrqr0K+7B
- Wi/pDBW8qEiAy/t2fg5OzwsKjjUSKRYEQOht46eVJQ==
-X-Google-Smtp-Source: AA6agR4DtbZYwWcmEOuomvY/UVjB1Qrj8H1jJ1/4wFImXOy8qch167gdgjlubbth+u7yjOIg+R1jIwbAIfws9wKDpNg=
-X-Received: by 2002:a05:6102:3fa0:b0:392:b32a:2a99 with SMTP id
- o32-20020a0561023fa000b00392b32a2a99mr6404945vsv.63.1662787390687; Fri, 09
- Sep 2022 22:23:10 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220825050846.3418868-1-reijiw@google.com>
- <20220825050846.3418868-8-reijiw@google.com>
- <CAAeT=FxJLykbrgKSC6DNFr+hWr-=TOq60ODFZ7r+jGOV3a=KWg@mail.gmail.com>
- <YxuflDM6utJbdZa1@google.com> <YxuhkvMh5cAtONKe@google.com>
-In-Reply-To: <YxuhkvMh5cAtONKe@google.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Fri, 9 Sep 2022 22:22:54 -0700
-Message-ID: <CAAeT=Fw774cEEPwQ7Brb0x2jhMxn625ms_814cNaGoXY29A9hw@mail.gmail.com>
-Subject: Re: [PATCH 7/9] KVM: arm64: selftests: Add a test case for a linked
- breakpoint
-To: Ricardo Koller <ricarkol@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Andrew Jones <andrew.jones@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
+ with ESMTP id 6KHEg9Q5X40A for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 10 Sep 2022 05:09:26 -0400 (EDT)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E21A94BF89
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2022 05:09:25 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 98046CE08D0;
+ Sat, 10 Sep 2022 09:09:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2596C433C1;
+ Sat, 10 Sep 2022 09:09:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1662800960;
+ bh=RBTEOuGRLzNZfi5Rv1YAEAy4+shLaNRM/hNJR+C8rVc=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=MSVfrspXN74VRKeCbl/TKK3UBdgCUkDzyvp05cX+CrkWoT1JZwfv0Yxoww6x9lcTf
+ 2ZebxrmfFmK5l4yDemqiOtdRH30Gjbx2bmj1NCCBzY/NBP1AURPMAVGL6+ZxE6Vk/a
+ u2MB/j+PHPMu4tGRr+y/2DXBE13HsVobL5uW3yOilcMaO+T+n0wFUzYbO6SZJaFD/X
+ +I4MB9FSg5DQOl91Hq0xv68StTNgkuUb1rK/Z++xqy7O5HIT2xiLm3c+frRup5gjTJ
+ KbYwXaYNgTwePuU06t29YO+kbplCQz9MFB/rvHfKCqzp5T5p2zfFnymTDV+TeI3jDO
+ 0sARXOMFDsndg==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oWwUI-009Nkm-Ir;
+ Sat, 10 Sep 2022 10:09:18 +0100
+Date: Sat, 10 Sep 2022 10:09:31 +0100
+Message-ID: <878rmrr3xw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Elliot Berman <quic_eberman@quicinc.com>
+Subject: Re: [PATCH v2] KVM: arm64: Only set KVM_MODE_PROTECTED if
+ is_hyp_mode_available()
+In-Reply-To: <05057e2a-1a85-69ba-ffcd-584d4090467a@quicinc.com>
+References: <20220909144552.3000716-1-quic_eberman@quicinc.com>
+ <Yxt3wmXYYbWraXrd@arm.com>
+ <05057e2a-1a85-69ba-ffcd-584d4090467a@quicinc.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: quic_eberman@quicinc.com, catalin.marinas@arm.com,
+ will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,46 +91,48 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Ricardo,
+On Fri, 09 Sep 2022 18:55:18 +0100,
+Elliot Berman <quic_eberman@quicinc.com> wrote:
+> 
+> 
+> 
+> On 9/9/2022 10:28 AM, Catalin Marinas wrote:
+> > On Fri, Sep 09, 2022 at 07:45:52AM -0700, Elliot Berman wrote:
+> >> Do not switch kvm_mode to KVM_MODE_PROTECTED if hypervisor mode is not
+> >> available. This prevents "Protected KVM" cpu capability being reported
+> >> when Linux is booting in EL1 and would not have KVM enabled.
+> >> 
+> >> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
+> >> ---
+> >>   arch/arm64/kvm/arm.c | 4 +++-
+> >>   1 file changed, 3 insertions(+), 1 deletion(-)
+> >> 
+> >> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> >> index 8fe73ee5fa84..861f4b388879 100644
+> >> --- a/arch/arm64/kvm/arm.c
+> >> +++ b/arch/arm64/kvm/arm.c
+> >> @@ -2272,7 +2272,9 @@ static int __init early_kvm_mode_cfg(char *arg)
+> >>   		return -EINVAL;
+> >>     	if (strcmp(arg, "protected") == 0) {
+> >> -		if (!is_kernel_in_hyp_mode())
+> >> +		if (!is_hyp_mode_available())
+> >> +			kvm_mode = KVM_MODE_DEFAULT;
+> > 
+> > I think kvm_mode is already KVM_MODE_DEFAULT at this point. You may want
+> > to print a warning instead.
+> > 
+> 
+> Does it make sense to print warning for kvm-arm.mode=nvhe as well?
 
-> > > > -static void guest_code(uint8_t bpn, uint8_t wpn)
-> > > > +static void guest_code(uint8_t bpn, uint8_t wpn, uint8_t ctx_bpn)
-> > > >  {
-> > > > +       uint64_t ctx = 0x1;     /* a random context number */
-> > > > +
-> > > >         GUEST_SYNC(0);
-> > > >
-> > > >         /* Software-breakpoint */
-> > > > @@ -281,6 +310,19 @@ static void guest_code(uint8_t bpn, uint8_t wpn)
-> > > >                      : : : "x0");
-> > > >         GUEST_ASSERT_EQ(ss_addr[0], 0);
-> > > >
-> > >
-> > > I've just noticed that I should add GUEST_SYNC(10) here, use
-> > > GUEST_SYNC(11) for the following test case, and update the
-> > > stage limit value in the loop in userspace code.
-> > >
-> > > Or I might consider removing the stage management code itself.
-> > > It doesn't appear to be very useful to me, and I would think
-> > > we could easily forget to update it :-)
-> > >
-> > > Thank you,
-> > > Reiji
-> > >
-> >
-> > Yes, it's better to remove it. The intention was to make sure the guest
-> > generates the expected sequence of exits. In this case for example,
-> > "1, .., 11, DONE" would be correct, but "1, .., 11, 12, DONE" would not.
->
-> Sorry, the correct sequence should be "1, .., 10, DONE". And also, what
-> I meant to say is that *original* intention was to check that, which
-> wasn't actually completed as the incorrect sequence would also succeed.
+In general, specifying a kvm-arm.mode when no hypervisor mode is
+available should be reported as a warning.
 
-Thank you for the comments and explaining the original intention.
-I will remove that.
+Thanks,
 
-Thank you,
-Reiji
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
