@@ -2,79 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0A7ECAAD5
-	for <kvmarm@archiver.kernel.org>; Sat, 10 Sep 2022 09:09:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E359C6FA82
+	for <kvmarm@archiver.kernel.org>; Sat, 10 Sep 2022 09:59:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F6EC4BF89;
-	Sat, 10 Sep 2022 05:09:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 856F54BFCF;
+	Sat, 10 Sep 2022 05:59:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wcQK3qKNprhL; Sat, 10 Sep 2022 05:09:28 -0400 (EDT)
+	with ESMTP id 1ol87Y9bXkQ1; Sat, 10 Sep 2022 05:59:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 451474BF94;
-	Sat, 10 Sep 2022 05:09:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C5A14BFD5;
+	Sat, 10 Sep 2022 05:59:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DEDB4BF8A
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2022 05:09:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 360B94BF5F
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2022 05:59:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6KHEg9Q5X40A for <kvmarm@lists.cs.columbia.edu>;
- Sat, 10 Sep 2022 05:09:26 -0400 (EDT)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E21A94BF89
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2022 05:09:25 -0400 (EDT)
+ with ESMTP id O-5DTfy6V3eZ for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 10 Sep 2022 05:59:00 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE1604BEA9
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2022 05:59:00 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id 98046CE08D0;
- Sat, 10 Sep 2022 09:09:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2596C433C1;
- Sat, 10 Sep 2022 09:09:20 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id B8269608D4;
+ Sat, 10 Sep 2022 09:58:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 280BFC433D6;
+ Sat, 10 Sep 2022 09:58:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1662800960;
- bh=RBTEOuGRLzNZfi5Rv1YAEAy4+shLaNRM/hNJR+C8rVc=;
+ s=k20201202; t=1662803939;
+ bh=hXKRPt6Bl9LEQ7baOPFH3GB30UfeFbckby2U0muaeQA=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=MSVfrspXN74VRKeCbl/TKK3UBdgCUkDzyvp05cX+CrkWoT1JZwfv0Yxoww6x9lcTf
- 2ZebxrmfFmK5l4yDemqiOtdRH30Gjbx2bmj1NCCBzY/NBP1AURPMAVGL6+ZxE6Vk/a
- u2MB/j+PHPMu4tGRr+y/2DXBE13HsVobL5uW3yOilcMaO+T+n0wFUzYbO6SZJaFD/X
- +I4MB9FSg5DQOl91Hq0xv68StTNgkuUb1rK/Z++xqy7O5HIT2xiLm3c+frRup5gjTJ
- KbYwXaYNgTwePuU06t29YO+kbplCQz9MFB/rvHfKCqzp5T5p2zfFnymTDV+TeI3jDO
- 0sARXOMFDsndg==
+ b=i0Du6sPDtqkY0OJacqT2yH3qRZHeE/+bD06pjNBSl6jJ03FdROXmpI800clbi2Ynz
+ wHXCtmr9FoU6+vXu3TLXTpBstIB4WQupHTIpjcHp7jnM628G5MynrcDx0ydM7FK71b
+ hHgzxkhzAgfGf6JvnMS6BUQdFh9PXeigkGzL/kBdKbv1H/no6c0VXCkVM1/FXpi+I7
+ jI+0YkQeWEPpGlU0G5NhXPrZ/DwU8z12xGguuXvYz3Fikr+rgfMVAg87Zaoa6LiqVy
+ J3QJv7CQfattOe9nLVX8AXfwyRKCN6vN/wU0iP3c6M8/v8Sr0+ehL05rFB8vHEx/5e
+ wQZmrsqX9imwA==
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oWwUI-009Nkm-Ir;
- Sat, 10 Sep 2022 10:09:18 +0100
-Date: Sat, 10 Sep 2022 10:09:31 +0100
-Message-ID: <878rmrr3xw.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oWxGL-009O8U-34;
+ Sat, 10 Sep 2022 10:58:57 +0100
+Date: Sat, 10 Sep 2022 10:58:51 +0100
+Message-ID: <877d2br1no.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Elliot Berman <quic_eberman@quicinc.com>
-Subject: Re: [PATCH v2] KVM: arm64: Only set KVM_MODE_PROTECTED if
- is_hyp_mode_available()
-In-Reply-To: <05057e2a-1a85-69ba-ffcd-584d4090467a@quicinc.com>
-References: <20220909144552.3000716-1-quic_eberman@quicinc.com>
- <Yxt3wmXYYbWraXrd@arm.com>
- <05057e2a-1a85-69ba-ffcd-584d4090467a@quicinc.com>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: Don't set PSTATE.SS when Software Step
+ state is Active-pending
+In-Reply-To: <CAAeT=Fz2hU8V8kYZsirjxr01ZH-Q2abkFOHteOac1LfRWus6Rg@mail.gmail.com>
+References: <20220909044636.1997755-1-reijiw@google.com>
+ <20220909044636.1997755-2-reijiw@google.com>
+ <87bkrora8b.wl-maz@kernel.org>
+ <CAAeT=Fz2hU8V8kYZsirjxr01ZH-Q2abkFOHteOac1LfRWus6Rg@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: quic_eberman@quicinc.com, catalin.marinas@arm.com,
- will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
- suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com,
+ ricarkol@google.com, oliver.upton@linux.dev, jingzhangos@google.com,
+ rananta@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,43 +92,145 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 09 Sep 2022 18:55:18 +0100,
-Elliot Berman <quic_eberman@quicinc.com> wrote:
-> 
-> 
-> 
-> On 9/9/2022 10:28 AM, Catalin Marinas wrote:
-> > On Fri, Sep 09, 2022 at 07:45:52AM -0700, Elliot Berman wrote:
-> >> Do not switch kvm_mode to KVM_MODE_PROTECTED if hypervisor mode is not
-> >> available. This prevents "Protected KVM" cpu capability being reported
-> >> when Linux is booting in EL1 and would not have KVM enabled.
-> >> 
-> >> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
-> >> ---
-> >>   arch/arm64/kvm/arm.c | 4 +++-
-> >>   1 file changed, 3 insertions(+), 1 deletion(-)
-> >> 
-> >> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> >> index 8fe73ee5fa84..861f4b388879 100644
-> >> --- a/arch/arm64/kvm/arm.c
-> >> +++ b/arch/arm64/kvm/arm.c
-> >> @@ -2272,7 +2272,9 @@ static int __init early_kvm_mode_cfg(char *arg)
-> >>   		return -EINVAL;
-> >>     	if (strcmp(arg, "protected") == 0) {
-> >> -		if (!is_kernel_in_hyp_mode())
-> >> +		if (!is_hyp_mode_available())
-> >> +			kvm_mode = KVM_MODE_DEFAULT;
-> > 
-> > I think kvm_mode is already KVM_MODE_DEFAULT at this point. You may want
-> > to print a warning instead.
-> > 
-> 
-> Does it make sense to print warning for kvm-arm.mode=nvhe as well?
+Hi Reiji,
 
-In general, specifying a kvm-arm.mode when no hypervisor mode is
-available should be reported as a warning.
+On Sat, 10 Sep 2022 05:12:57 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+> > > Currently, PSTATE.SS is set on every guest entry if single-step is
+> > > enabled for the vCPU by userspace.  However, it could cause extra
+> > > single-step execution without returning to userspace, which shouldn't
+> > > be performed, if the Software Step state at the last guest exit was
+> > > Active-pending (i.e. the last exit was not triggered by Software Step
+> > > exception, but by an asynchronous exception after the single-step
+> > > execution is performed).
+> >
+> > For my own enlightenment, could you describe a sequence of events that
+> > leads to this issue?
+> 
+> Here is an example of the sequences.
+> 
+>  [Usersace]
+>   | - ioctl(SET_GUEST_DEBUG)
+>   | - ioctl(KVM_RUN) (vCPU PC==X)
+>   v
+>  [KVM]
+>   | - *vcpu_cpsr(vcpu) |= SPSR_SS;
+>   | - mdscr |= DBG_MDSCR_SS;
+>   | - VM Entry
+>   v
+>  [Guest] vCPU PC==X
+>   | - Execute an instruction at PC==X.
+>   |   PC is updated with X+4, and PSTATE.SS is cleared.
+>   |
+>   | !! Asynchronous exception !!
+>   v
+>  [KVM] vCPU PC==X+4
+>   | - The kernel processes the async exception.
+>   | - handle_exit() returns 1 (don't return to userspace)
+>   | - *vcpu_cpsr(vcpu) |= SPSR_SS;
+>   | - mdscr |= DBG_MDSCR_SS;
+>   | - VM Entry
+>   v
+>  [Guest] vCPU PC==X+4
+>   | - Execute an instruction at PC==X+4.
+>   |   PC is updated with X+8, PSTATE.SS is cleared.
+>   |
+>   | !! Software Step Exception !!
+>   v
+>  [KVM] vCPU PC==X+8
+>   | - run->exit_reason = KVM_EXIT_DEBUG;
+>   | - Return to userspace
+>   v
+>  [Userspace]
+>     - Userspace sees PC==X+8 (Userspace didn't see PC==X+4).
+>
 
-Thanks,
+OK, I think I get it now, and I got confused because of the naming
+which is similar to what we use for interrupts, but the semantics are
+very different (let's pretend that this is the cause of most of my
+stupid questions earlier...).
+
+The states are described as such:
+
+Active+non-Pending: MDSCR.SS=1, PSTATE.SS=1
+Active+Pending:     MDSCR.SS=1, PSTATE.SS=0
+
+and it is the inversion of PSTATE.SS that got me.
+
+The pending state describe the state of the *exception*. Before
+executing the instruction, no exception is pending. Once executed, an
+exception is pending.
+
+Of course, if we get an interrupt right after a single step (and that
+the implementation prioritises them over synchronous exceptions), we
+exit because of the interrupt, and the bug you uncovered sends us back
+to Active+non-Pending, losing the SS exception. Boo.
+
+Your fix is to not set PSTATE.SS=1 until we have actually handled a
+debug exception. In the above example, this would result in:
+
+ [Guest] vCPU PC==X
+  | - Execute an instruction at PC==X.
+  |   PC is updated with X+4, and PSTATE.SS is cleared.
+  |
+  | !! Asynchronous exception !!
+  v
+ [KVM] vCPU PC==X+4
+  | - The kernel processes the async exception.
+  | - handle_exit() returns 1 (don't return to userspace)
+  | - vcpu_set_flag(vcpu, DBG_SS_ACTIVE_PENDING);
+  | - mdscr |= DBG_MDSCR_SS;
+  | - VM Entry
+  v
+ [Guest] vCPU PC==X+4
+  | - Pending SS exception
+  |
+  | !! Software Step Exception !!
+  v
+ [KVM] vCPU PC==X+4
+  | - run->exit_reason = KVM_EXIT_DEBUG;
+  | - vcpu_clear_flag(vcpu, DBG_SS_ACTIVE_PENDING);
+  | - Return to userspace
+  v
+ [Userspace]
+    - Userspace sees PC==X+4
+
+It is amusing that we never saw that one before, but I guess the
+IMPDEF nature of the exception prioritisation caught us here. Also,
+VM debugging is a relatively rare use case.
+
+> > Now, where does the asynchronous exception comes into play? I found
+> > this intriguing remark in the ARM ARM:
+> >
+> > <quote>
+> > The Software Step exception has higher priority than all other types
+> > of synchronous exception. However, the prioritization of this
+> > exception with respect to any unmasked pending asynchronous exception
+> > is not defined by the architecture.
+> > </quote>
+> >
+> > Is this what you were referring to in the commit message? I think you
+> > need to spell it out for us, as I don't fully understand what you are
+> > fixing nor do I understand the gory details of single-stepping...
+> 
+> Yes, that is what I was referring to.
+> In "Figure D2-3 Software step state machine" in Arm ARM (DDI 0487I.a),
+> since KVM currently sets PSTATE.SS to 1 on every Guest Entry (when
+> single-step is enabled by userspace), KVM always has the CPU in
+> "Inactive" (the second inactive state from the top) transition to
+> "Active-not-pending" on the Guest Entry.  With this patch, KVM
+> have the CPU transitions to "Active-pending" if the state before
+> "Inactive" was "Active-pending", which indicates the step completed
+> but Software Step exception is not taken yet, so that Software
+> Step exception is taken before further single-step is executed.
+> 
+> I'm sorry for the unclear explanation, and
+> I hope my comments clarify the problem I'm trying to fix.
+
+Please do not apologise! This is excellent work, and I'm really glad
+you got to the bottom of this. It'd be good to capture some of this
+discussion in the commit message though, as I'm pretty we will all
+blissfully forget all about it shortly!
 
 	M.
 
