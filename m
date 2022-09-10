@@ -2,81 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99B44ECAAD3
-	for <kvmarm@archiver.kernel.org>; Fri,  9 Sep 2022 21:01:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D6FAC6FA82
+	for <kvmarm@archiver.kernel.org>; Sat, 10 Sep 2022 04:13:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08F604C218;
-	Fri,  9 Sep 2022 17:01:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06AC34C1E8;
+	Sat, 10 Sep 2022 00:13:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FoNIgr82UxZT; Fri,  9 Sep 2022 17:01:22 -0400 (EDT)
+	with ESMTP id yf0mKyPJiptR; Sat, 10 Sep 2022 00:13:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF64E4C3DC;
-	Fri,  9 Sep 2022 17:01:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F0594BF54;
+	Sat, 10 Sep 2022 00:13:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 467A44C3D2
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Sep 2022 17:01:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A0E1D4BF14
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2022 00:13:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yujva2UZAlaK for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Sep 2022 17:01:20 -0400 (EDT)
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com
- [209.85.216.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF4E74C23F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Sep 2022 17:01:19 -0400 (EDT)
-Received: by mail-pj1-f49.google.com with SMTP id
- s14-20020a17090a6e4e00b0020057c70943so6496883pjm.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 09 Sep 2022 14:01:19 -0700 (PDT)
+ with ESMTP id uQkkBOSn2fFA for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 10 Sep 2022 00:13:14 -0400 (EDT)
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com
+ [209.85.217.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C2214BF0E
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Sep 2022 00:13:14 -0400 (EDT)
+Received: by mail-vs1-f47.google.com with SMTP id 190so3648042vsz.7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 09 Sep 2022 21:13:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date;
- bh=FkpmzbsfY+8dxCCfG0r9Ww9nyX3eXTahuSH1WMin7Dc=;
- b=d5SnEJ8gC7pL2uOB5VnHcz1gzpA9mqyytaDJg38QpmLUFP3SqeBZ4G6gv4Ekl5zreb
- dqQRaA17IzX5Hulxm1H5ysIn1+ihGbZuKRUQGWGAqiaYKD9OHLWwf/JpOrNQJzCNsAJt
- 9Ywo5rmZV/pG3JUCueBORLmxIs6GKPkanIAXowk9UFKuDgK3LnYbs1TDLQ1sKWm0AabR
- o377kXjrykojNVyDvy826fNQw9ljZTnC/JbaIeBqJi+u3gwFiNzkzr6TycoY/Fz+Agwl
- iQnZnxBLLZn936IoxoZq5ZTYCaSWPA7pliJJDReLgJ0KEoiqpzuLQ1Y7GVuq7ANVhJDH
- C9Ng==
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:from:to:cc:subject:date;
+ bh=bT+lvXkm6Qe6+nTGGZtBv81BtvgBawrDwZvucM+h94M=;
+ b=Yys0KwKHTO+vzTZHw3AkKTcwnUZvMyJM+/WUxQmJjsT87vwqfEWFuN3IyPDJ8gPx3a
+ NqQi0USCw1ZfeJkzhhFJqaxYFKW8KP5mvIMwBxp3xs0Ax/mlVLTnW74LrtYjlISyP6Nu
+ Qmdv71WFERQ9fnzJbq4556HnCJkVvBESHXxXk9W7J+iVMSukzqttWwGjnwoEpQ8ThYAt
+ WGwU0sCuMBPWjPYQ8EL8Ldn12lXjDxgA7dQ4g8pmMM8zi8rBiCk5PAS/RnTseO3ggzMD
+ ICjcHCnGCHRLdFBfhynEOmkL76h+RA0CoSV3nSLQ88rdhD6P/GMybofb2ADNE6Ehkpmz
+ V/GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
- bh=FkpmzbsfY+8dxCCfG0r9Ww9nyX3eXTahuSH1WMin7Dc=;
- b=j+4sTWamoSloW2NOujXexJ4uY3RINZU1yHE77Sg1OYaUFNlcoAAoGgkzUJM5LpIZmM
- Bn8CMUML3KaDybfeMYNor9ralAm8iniE+tK63Ty95hEqcLRAOHLsPspIx77lkP17mT1e
- 9DfZntqE1V8BYndhE7qG/cwzvRLlrVFVuCsLvFARr+Fe6fx5jf0DITd9aLO6nmPaQXsN
- kZfMINgfL8MPzUTrAfCSxq9EnwyZiAkHx5cgfAgUSt1E7iYWkBTjBbCYWzp+oI5xIlbC
- HeBJECWD+EjeqwqbqG10Db/cVsFJvDkfXrVvM7Lc3edrcs2XjZPuYmrYE66DwGpjSBS/
- 7GHw==
-X-Gm-Message-State: ACgBeo1MKE8KDgHxf7xobqca2Oui0BE/doFxYLWNhDyIPBgKomkVfMMq
- torfaLaO9g4a4h8M1+1machmTQ==
-X-Google-Smtp-Source: AA6agR4GfLI2cDpWfESCM+hb1zOWhkcucKf0rKEpCNGuY+dxhJLCIqR+2m5zVrHL5Rai3U4Hr1+Fzg==
-X-Received: by 2002:a17:903:291:b0:172:f018:cdce with SMTP id
- j17-20020a170903029100b00172f018cdcemr15341834plr.91.1662757278540; 
- Fri, 09 Sep 2022 14:01:18 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com.
- [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
- r71-20020a632b4a000000b0042254fce5e7sm957692pgr.50.2022.09.09.14.01.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 09 Sep 2022 14:01:17 -0700 (PDT)
-Date: Fri, 9 Sep 2022 14:01:14 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 7/9] KVM: arm64: selftests: Add a test case for a linked
- breakpoint
-Message-ID: <YxupmpFFPOVx95w+@google.com>
-References: <20220825050846.3418868-1-reijiw@google.com>
- <20220825050846.3418868-8-reijiw@google.com>
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:x-gm-message-state:from:to:cc:subject:date;
+ bh=bT+lvXkm6Qe6+nTGGZtBv81BtvgBawrDwZvucM+h94M=;
+ b=GuRDkupUuRTDE+mHSZ/FVrryfxnyJs2TYXsNDbAkF0s0fMwJ9JXhsyJJuzrvrM49Jg
+ CnaLkbk63mAmVPAR9sXWybdcuXxMeJKHj654SCnkbEHISiHj2uv81HPftYZQ3yI7ZK6f
+ XrIPRZBiMeTDiG8zf+MHH+jYw3lGvlwfhtKvc8dQ/hjjESKlTfufHZ3Vp2+FG+eMG/aO
+ B9cOgVYqtKdWRAWn0Fn8kf0P8iCGIWel237aOCoH+8ABGfxSsIAd8pnODVfJyUpw21Bg
+ G+Pnz/krjeNl4MJXUCMg38PwU8ugGUBgU0XZ8yOvrrLtGlug45JkIaitgiJr5fEhQz41
+ xevw==
+X-Gm-Message-State: ACgBeo1r+lD2rvkn8w5YUDRGRaocqL+oNR6Qzr7b0XaF/ULw2YCXA66R
+ Nbj3Na2aJcscg8D3kLS0a9PQgNcoCizQ8YGBUJIVxA==
+X-Google-Smtp-Source: AA6agR5RrXixyzKCzUB/EJrVm8Zhg8tpR3LDBgWYAO15rG9c2TCzDy3dx942O9xqMNTbp/kZRLU6ckHffxtUmgIfS6w=
+X-Received: by 2002:a67:c00b:0:b0:390:8e1f:594a with SMTP id
+ v11-20020a67c00b000000b003908e1f594amr6206352vsi.80.1662783193547; Fri, 09
+ Sep 2022 21:13:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220825050846.3418868-8-reijiw@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Andrew Jones <andrew.jones@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <20220909044636.1997755-1-reijiw@google.com>
+ <20220909044636.1997755-2-reijiw@google.com>
+ <87bkrora8b.wl-maz@kernel.org>
+In-Reply-To: <87bkrora8b.wl-maz@kernel.org>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Fri, 9 Sep 2022 21:12:57 -0700
+Message-ID: <CAAeT=Fz2hU8V8kYZsirjxr01ZH-Q2abkFOHteOac1LfRWus6Rg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: Don't set PSTATE.SS when Software Step
+ state is Active-pending
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,167 +86,160 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Aug 24, 2022 at 10:08:44PM -0700, Reiji Watanabe wrote:
-> Currently, the debug-exceptions test doesn't have a test case for
-> a linked breakpoint. Add a test case for the linked breakpoint to
-> the test.
+Hi Marc,
 
-I would add some more detail, like the fact that this is a pair of
-breakpoints: one is a context-aware breakpoint, and the other one
-is an address breakpoint linked to the first one.
+On Fri, Sep 9, 2022 at 5:41 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi Reiji,
+>
+> On Fri, 09 Sep 2022 05:46:34 +0100,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > Currently, PSTATE.SS is set on every guest entry if single-step is
+> > enabled for the vCPU by userspace.  However, it could cause extra
+> > single-step execution without returning to userspace, which shouldn't
+> > be performed, if the Software Step state at the last guest exit was
+> > Active-pending (i.e. the last exit was not triggered by Software Step
+> > exception, but by an asynchronous exception after the single-step
+> > execution is performed).
+>
+> For my own enlightenment, could you describe a sequence of events that
+> leads to this issue?
 
-> 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> 
-> ---
->  .../selftests/kvm/aarch64/debug-exceptions.c  | 59 +++++++++++++++++--
->  1 file changed, 55 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> index ab8860e3a9fa..9fccfeebccd3 100644
-> --- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> +++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> @@ -11,6 +11,10 @@
->  #define DBGBCR_EXEC	(0x0 << 3)
->  #define DBGBCR_EL1	(0x1 << 1)
->  #define DBGBCR_E	(0x1 << 0)
-> +#define DBGBCR_LBN_SHIFT	16
-> +#define DBGBCR_BT_SHIFT		20
-> +#define DBGBCR_BT_ADDR_LINK_CTX	(0x1 << DBGBCR_BT_SHIFT)
-> +#define DBGBCR_BT_CTX_LINK	(0x3 << DBGBCR_BT_SHIFT)
->  
->  #define DBGWCR_LEN8	(0xff << 5)
->  #define DBGWCR_RD	(0x1 << 3)
-> @@ -21,7 +25,7 @@
->  #define SPSR_D		(1 << 9)
->  #define SPSR_SS		(1 << 21)
->  
-> -extern unsigned char sw_bp, sw_bp2, hw_bp, hw_bp2, bp_svc, bp_brk, hw_wp, ss_start;
-> +extern unsigned char sw_bp, sw_bp2, hw_bp, hw_bp2, bp_svc, bp_brk, hw_wp, ss_start, hw_bp_ctx;
->  static volatile uint64_t sw_bp_addr, hw_bp_addr;
->  static volatile uint64_t wp_addr, wp_data_addr;
->  static volatile uint64_t svc_addr;
-> @@ -103,6 +107,7 @@ static void reset_debug_state(void)
->  	isb();
->  
->  	write_sysreg(0, mdscr_el1);
-> +	write_sysreg(0, contextidr_el1);
->  
->  	/* Reset all bcr/bvr/wcr/wvr registers */
->  	dfr0 = read_sysreg(id_aa64dfr0_el1);
-> @@ -164,6 +169,28 @@ static void install_hw_bp(uint8_t bpn, uint64_t addr)
->  	enable_debug_bwp_exception();
->  }
->  
-> +void install_hw_bp_ctx(uint8_t addr_bp, uint8_t ctx_bp, uint64_t addr,
-> +		       uint64_t ctx)
-> +{
-> +	uint32_t addr_bcr, ctx_bcr;
-> +
-> +	/* Setup a context-aware breakpoint */
-> +	ctx_bcr = DBGBCR_LEN8 | DBGBCR_EXEC | DBGBCR_EL1 | DBGBCR_E |
-> +		  DBGBCR_BT_CTX_LINK;
-                               ^^^^^
-                          isn't this a regular context-aware breakpoint?
-			  the other one is the linked one.
+Here is an example of the sequences.
 
-> +	write_dbgbcr(ctx_bp, ctx_bcr);
-> +	write_dbgbvr(ctx_bp, ctx);
-> +
-> +	/* Setup a linked breakpoint (linked to the context-aware breakpoint) */
-> +	addr_bcr = DBGBCR_LEN8 | DBGBCR_EXEC | DBGBCR_EL1 | DBGBCR_E |
-> +		   DBGBCR_BT_ADDR_LINK_CTX |
-> +		   ((uint32_t)ctx_bp << DBGBCR_LBN_SHIFT);
+ [Usersace]
+  | - ioctl(SET_GUEST_DEBUG)
+  | - ioctl(KVM_RUN) (vCPU PC==X)
+  v
+ [KVM]
+  | - *vcpu_cpsr(vcpu) |= SPSR_SS;
+  | - mdscr |= DBG_MDSCR_SS;
+  | - VM Entry
+  v
+ [Guest] vCPU PC==X
+  | - Execute an instruction at PC==X.
+  |   PC is updated with X+4, and PSTATE.SS is cleared.
+  |
+  | !! Asynchronous exception !!
+  v
+ [KVM] vCPU PC==X+4
+  | - The kernel processes the async exception.
+  | - handle_exit() returns 1 (don't return to userspace)
+  | - *vcpu_cpsr(vcpu) |= SPSR_SS;
+  | - mdscr |= DBG_MDSCR_SS;
+  | - VM Entry
+  v
+ [Guest] vCPU PC==X+4
+  | - Execute an instruction at PC==X+4.
+  |   PC is updated with X+8, PSTATE.SS is cleared.
+  |
+  | !! Software Step Exception !!
+  v
+ [KVM] vCPU PC==X+8
+  | - run->exit_reason = KVM_EXIT_DEBUG;
+  | - Return to userspace
+  v
+ [Userspace]
+    - Userspace sees PC==X+8 (Userspace didn't see PC==X+4).
 
-Just a curiosity, can the context-aware one link to this one?
 
-> +	write_dbgbcr(addr_bp, addr_bcr);
-> +	write_dbgbvr(addr_bp, addr);
-> +	isb();
-> +
-> +	enable_debug_bwp_exception();
-> +}
-> +
->  static void install_ss(void)
->  {
->  	uint32_t mdscr;
-> @@ -177,8 +204,10 @@ static void install_ss(void)
->  
->  static volatile char write_data;
->  
-> -static void guest_code(uint8_t bpn, uint8_t wpn)
-> +static void guest_code(uint8_t bpn, uint8_t wpn, uint8_t ctx_bpn)
->  {
-> +	uint64_t ctx = 0x1;	/* a random context number */
+> > Fix this by not setting PSTATE.SS on guest entry if the Software
+> > Step state at the last exit was Active-pending.
+> >
+> > Fixes: 337b99bf7edf ("KVM: arm64: guest debug, add support for single-step")
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h |  3 +++
+> >  arch/arm64/kvm/debug.c            | 19 ++++++++++++++++++-
+> >  arch/arm64/kvm/guest.c            |  1 +
+> >  arch/arm64/kvm/handle_exit.c      |  2 ++
+> >  4 files changed, 24 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index e9c9388ccc02..4cf6eef02565 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -535,6 +535,9 @@ struct kvm_vcpu_arch {
+> >  #define IN_WFIT                      __vcpu_single_flag(sflags, BIT(3))
+> >  /* vcpu system registers loaded on physical CPU */
+> >  #define SYSREGS_ON_CPU               __vcpu_single_flag(sflags, BIT(4))
+> > +/* Software step state is Active-pending */
+> > +#define DBG_SS_ACTIVE_PENDING        __vcpu_single_flag(sflags, BIT(5))
+> > +
+> >
+> >  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> >  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +   \
+> > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> > index 0b28d7db7c76..125cfb94b4ad 100644
+> > --- a/arch/arm64/kvm/debug.c
+> > +++ b/arch/arm64/kvm/debug.c
+> > @@ -188,7 +188,16 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+> >                * debugging the system.
+> >                */
+> >               if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+> > -                     *vcpu_cpsr(vcpu) |=  DBG_SPSR_SS;
+> > +                     /*
+> > +                      * If the software step state at the last guest exit
+> > +                      * was Active-pending, we don't set DBG_SPSR_SS so
+> > +                      * that the state is maintained (to not run another
+> > +                      * single-step until the pending Software Step
+> > +                      * exception is taken).
+> > +                      */
+> > +                     if (!vcpu_get_flag(vcpu, DBG_SS_ACTIVE_PENDING))
+> > +                             *vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
+>
+> I guess my confusion stems from my (probably wrong) interpretation if
+> the SS state is A+P, there is no harm in making it pending again
+> (setting the SS bit in PSTATE).
 
-nit: make this number a bit more unlikely to happen by mistake.
-I guess you could use all available 32 bits.
+Setting the SS bit in PSTATE (with MDSCR_EL1.SS=1) makes the state
+Active-not-pending (not Active-pending) if my interpretation of
+the spec is correct.
 
-> +
->  	GUEST_SYNC(0);
->  
->  	/* Software-breakpoint */
-> @@ -281,6 +310,19 @@ static void guest_code(uint8_t bpn, uint8_t wpn)
->  		     : : : "x0");
->  	GUEST_ASSERT_EQ(ss_addr[0], 0);
->  
-> +	/* Linked hardware-breakpoint */
-> +	hw_bp_addr = 0;
-> +	reset_debug_state();
-> +	install_hw_bp_ctx(bpn, ctx_bpn, PC(hw_bp_ctx), ctx);
-> +	/* Set context id */
-> +	write_sysreg(ctx, contextidr_el1);
-> +	isb();
-> +	asm volatile("hw_bp_ctx: nop");
-> +	write_sysreg(0, contextidr_el1);
-> +	GUEST_ASSERT_EQ(hw_bp_addr, PC(hw_bp_ctx));
-> +
-> +	GUEST_SYNC(10);
-> +
->  	GUEST_DONE();
->  }
->  
-> @@ -327,6 +369,7 @@ int main(int argc, char *argv[])
->  	struct ucall uc;
->  	int stage;
->  	uint64_t aa64dfr0;
-> +	uint8_t brps;
->  
->  	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
->  	ucall_init(vm, NULL);
-> @@ -349,8 +392,16 @@ int main(int argc, char *argv[])
->  	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
->  				ESR_EC_SVC64, guest_svc_handler);
->  
-> -	/* Run tests with breakpoint#0 and watchpoint#0. */
-> -	vcpu_args_set(vcpu, 2, 0, 0);
-> +	/* Number of breakpoints, minus 1 */
-> +	brps = cpuid_get_ufield(aa64dfr0, ID_AA64DFR0_BRPS_SHIFT);
+> > +
+> >                       mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+> >                       mdscr |= DBG_MDSCR_SS;
+>
+> But it looks like the *pending* state is actually stored in MDSCR
+> instead? The spec only mentions this for the A+P state, so this is
+> quite likely a bug indeed.
 
-If brps is "number of breakpoints", then there should be a "+ 1" above.
-Otherwise brps is really "last breakpoint" (last_brp).
+MDSCR_EL1.SS is set even in Active-not-pending state (not just
+Active-pending state).  (Or do you mean the state is stored in
+some other field in MDSCR ??)
 
-> +	__TEST_REQUIRE(brps > 0, "At least two breakpoints are required");
 
-Yes, based on this test, brps is really "last breakpoint". I would
-suggest changing the name to "last_brp" (or something similar).
+> Now, where does the asynchronous exception comes into play? I found
+> this intriguing remark in the ARM ARM:
+>
+> <quote>
+> The Software Step exception has higher priority than all other types
+> of synchronous exception. However, the prioritization of this
+> exception with respect to any unmasked pending asynchronous exception
+> is not defined by the architecture.
+> </quote>
+>
+> Is this what you were referring to in the commit message? I think you
+> need to spell it out for us, as I don't fully understand what you are
+> fixing nor do I understand the gory details of single-stepping...
 
-> +
-> +	/*
-> +	 * Run tests with breakpoint#0 and watchpoint#0, and the higiest
+Yes, that is what I was referring to.
+In "Figure D2-3 Software step state machine" in Arm ARM (DDI 0487I.a),
+since KVM currently sets PSTATE.SS to 1 on every Guest Entry (when
+single-step is enabled by userspace), KVM always has the CPU in
+"Inactive" (the second inactive state from the top) transition to
+"Active-not-pending" on the Guest Entry.  With this patch, KVM
+have the CPU transitions to "Active-pending" if the state before
+"Inactive" was "Active-pending", which indicates the step completed
+but Software Step exception is not taken yet, so that Software
+Step exception is taken before further single-step is executed.
 
-	 * Run tests with breakpoint#0, watchpoint#0, and the highest
-	
-> +	 * numbered (context-aware) breakpoint.
-> +	 */
-> +	vcpu_args_set(vcpu, 3, 0, 0, brps);
-> +
->  	for (stage = 0; stage < 11; stage++) {
->  		vcpu_run(vcpu);
->  
-> -- 
-> 2.37.1.595.g718a3a8f04-goog
-> 
+I'm sorry for the unclear explanation, and
+I hope my comments clarify the problem I'm trying to fix.
+
+Thank you,
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
