@@ -2,88 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DF8BC6FA83
-	for <kvmarm@archiver.kernel.org>; Sun, 11 Sep 2022 21:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DF3CECAAD3
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Sep 2022 00:45:29 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C07414C354;
-	Sun, 11 Sep 2022 17:41:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04A7D4C543;
+	Sun, 11 Sep 2022 20:45:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@quicinc.com
+	(fail, message has been altered) header.i=@intel.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lLq1tSkbWf8E; Sun, 11 Sep 2022 17:41:23 -0400 (EDT)
+	with ESMTP id APoSVeRVZhPS; Sun, 11 Sep 2022 20:45:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EDD14C328;
-	Sun, 11 Sep 2022 17:41:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 66DEE4C4A1;
+	Sun, 11 Sep 2022 20:45:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 935134C328
- for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Sep 2022 17:41:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DBCA4C4A1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Sep 2022 20:45:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eLd83eK6Vn1E for <kvmarm@lists.cs.columbia.edu>;
- Sun, 11 Sep 2022 17:41:21 -0400 (EDT)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com
- [205.220.168.131])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 638D24C306
- for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Sep 2022 17:41:21 -0400 (EDT)
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
- by mx0a-0031df01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28BLfACZ012463;
- Sun, 11 Sep 2022 21:41:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com;
- h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=qcppdkim1;
- bh=172gqBHdWTQsPiaT/19OqMVWgqe3jX8FYL5YY4LecWU=;
- b=iO7OZl1YeSX35Wr6OiLm5BQ6Msub0d37eTaouQSKMx2M96EWXBbR3kvuHmCf9evzR6+t
- kGWqKBv850ASNqix5c2qSieY08VeXI0kJGZBs18+SZ4x+0b0HwIgeEdojL2AggZcHEhS
- MzAtrC6ArV8hihSxSPpSr3NGLCJOqF9qWEwPNbw0m3jJEbLQZhqtB5DmFUm1DWEGaLsP
- U8fMXwbn4D0tmjVpAbtwPcSv0RR9iX/9aWyND/kL1dCIuu4gGChK7jibpXb3bciNglH9
- amYkzgZ8UuILaMBReIdg5P/TVJ00GhhyFVUuOwe20D1djOLRy7o6QGMa6PN4myJ4a9ME pA== 
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com
- [199.106.103.254])
- by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3jgk43jp9t-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Sun, 11 Sep 2022 21:41:10 +0000
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com
- [10.46.141.250])
- by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 28BLf9DA028608
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Sun, 11 Sep 2022 21:41:09 GMT
-Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.29; Sun, 11 Sep 2022 14:41:09 -0700
-From: Elliot Berman <quic_eberman@quicinc.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- "Alexandru Elisei" <alexandru.elisei@arm.com>,
+ with ESMTP id ckk9uAOOaBae for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 11 Sep 2022 20:45:24 -0400 (EDT)
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 18A5A4C3AA
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 11 Sep 2022 20:45:23 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+ t=1662943524; x=1694479524;
+ h=date:from:to:cc:subject:message-id:references:
+ mime-version:in-reply-to;
+ bh=viX+brJTpExQFsglg2LwYvr+BZipezfWZc8sCHKwFqc=;
+ b=n6+u/XajVsNgryRAyi144zHSCI2XEwMAarfjfCCuiMsKePINQRTVicrF
+ TeyDtlJy/AXaNTGQQRzp+gLvH6cuwr3uwasV9F2sQTsWeSMTvUV/huZOF
+ nAB8juXTZ1yXeDw8F+Mfs4aNMrnBfbA3QRFlGOnaM4EYWlSr2gk7/UhaA
+ weghoZnMQcoR7naF3klrn3lkbY5sfd7xlPoHxXcXoLkhzRjuekAB8YHgj
+ q1vcpOC4b7aMv41fMCCMirN1Y0+67q/iTyjFRqWVqmTIT2yRlvuqSRFoP
+ D6/lwWkgNE4AtIBCbm6R6UgayfnQepX/0m3MOiyThjCOEgM+e8gEAOa3u w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10467"; a="296499921"
+X-IronPort-AV: E=Sophos;i="5.93,308,1654585200"; d="scan'208";a="296499921"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 11 Sep 2022 17:45:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,308,1654585200"; d="scan'208";a="566988592"
+Received: from lkp-server02.sh.intel.com (HELO 4011df4f4fd3) ([10.239.97.151])
+ by orsmga003.jf.intel.com with ESMTP; 11 Sep 2022 17:45:19 -0700
+Received: from kbuild by 4011df4f4fd3 with local (Exim 4.96)
+ (envelope-from <lkp@intel.com>) id 1oXXZe-000229-29;
+ Mon, 12 Sep 2022 00:45:18 +0000
+Date: Mon, 12 Sep 2022 08:44:36 +0800
+From: kernel test robot <lkp@intel.com>
+To: Elliot Berman <quic_eberman@quicinc.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ James Morse <james.morse@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
  Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v3] KVM: arm64: Ignore kvm-arm.mode if !is_hyp_mode_available()
-Date: Sun, 11 Sep 2022 14:40:59 -0700
-Message-ID: <20220911214059.2767620-1-quic_eberman@quicinc.com>
-X-Mailer: git-send-email 2.25.1
+Subject: Re: [PATCH v3] KVM: arm64: Ignore kvm-arm.mode if
+ !is_hyp_mode_available()
+Message-ID: <202209120812.lW9MTQPf-lkp@intel.com>
+References: <20220911214059.2767620-1-quic_eberman@quicinc.com>
 MIME-Version: 1.0
-X-Originating-IP: [10.49.16.6]
-X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800
- signatures=585085
-X-Proofpoint-GUID: O96vbLzBZ1LFAsrLFd_xeOhMc_hcdqfA
-X-Proofpoint-ORIG-GUID: O96vbLzBZ1LFAsrLFd_xeOhMc_hcdqfA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-11_12,2022-09-09_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=861 clxscore=1015
- mlxscore=0 priorityscore=1501 impostorscore=0 phishscore=0 bulkscore=0
- malwarescore=0 adultscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
- definitions=main-2209110084
-Cc: Elliot Berman <quic_eberman@quicinc.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Disposition: inline
+In-Reply-To: <20220911214059.2767620-1-quic_eberman@quicinc.com>
+Cc: Elliot Berman <quic_eberman@quicinc.com>, kbuild-all@lists.01.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,57 +85,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Ignore kvm-arm.mode if !is_hyp_mode_available(). Specifically, we want
-to avoid switching kvm_mode to KVM_MODE_PROTECTED if hypervisor mode is
-not available. This prevents "Protected KVM" cpu capability being
-reported when Linux is booting in EL1 and would not have KVM enabled.
-Reasonably though, we should warn if the command line is requesting a
-KVM mode at all if KVM isn't actually available. Don't emit warning for
-"kvm-arm.mode=none" since this would disable KVM anyway.
+Hi Elliot,
 
-Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
----
- arch/arm64/kvm/arm.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+Thank you for the patch! Yet something to improve:
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 8fe73ee5fa84..8e5d1c8502f5 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2271,6 +2271,16 @@ static int __init early_kvm_mode_cfg(char *arg)
- 	if (!arg)
- 		return -EINVAL;
- 
-+	if (strcmp(arg, "none") == 0) {
-+		kvm_mode = KVM_MODE_NONE;
-+		return 0;
-+	}
-+
-+	if (!is_hyp_mode_available()) {
-+		pr_warn_once("KVM is not available. Ignoring kvm-arm.mode\n")
-+		return 0;
-+	}
-+
- 	if (strcmp(arg, "protected") == 0) {
- 		if (!is_kernel_in_hyp_mode())
- 			kvm_mode = KVM_MODE_PROTECTED;
-@@ -2285,11 +2295,6 @@ static int __init early_kvm_mode_cfg(char *arg)
- 		return 0;
- 	}
- 
--	if (strcmp(arg, "none") == 0) {
--		kvm_mode = KVM_MODE_NONE;
--		return 0;
--	}
--
- 	return -EINVAL;
- }
- early_param("kvm-arm.mode", early_kvm_mode_cfg);
+[auto build test ERROR on 0982c8d859f8f7022b9fd44d421c7ec721bb41f9]
 
-base-commit: 0982c8d859f8f7022b9fd44d421c7ec721bb41f9
+url:    https://github.com/intel-lab-lkp/linux/commits/Elliot-Berman/KVM-arm64-Ignore-kvm-arm-mode-if-is_hyp_mode_available/20220912-054253
+base:   0982c8d859f8f7022b9fd44d421c7ec721bb41f9
+config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20220912/202209120812.lW9MTQPf-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/2266c3455ccaa7b42a9a0be751e15a15899d99b8
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Elliot-Berman/KVM-arm64-Ignore-kvm-arm-mode-if-is_hyp_mode_available/20220912-054253
+        git checkout 2266c3455ccaa7b42a9a0be751e15a15899d99b8
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash arch/arm64/
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+   arch/arm64/kvm/arm.c: In function 'early_kvm_mode_cfg':
+>> arch/arm64/kvm/arm.c:2281:17: error: expected ';' before 'return'
+    2281 |                 return 0;
+         |                 ^~~~~~
+
+
+vim +2281 arch/arm64/kvm/arm.c
+
+  2268	
+  2269	static int __init early_kvm_mode_cfg(char *arg)
+  2270	{
+  2271		if (!arg)
+  2272			return -EINVAL;
+  2273	
+  2274		if (strcmp(arg, "none") == 0) {
+  2275			kvm_mode = KVM_MODE_NONE;
+  2276			return 0;
+  2277		}
+  2278	
+  2279		if (!is_hyp_mode_available()) {
+  2280			pr_warn_once("KVM is not available. Ignoring kvm-arm.mode\n")
+> 2281			return 0;
+  2282		}
+  2283	
+  2284		if (strcmp(arg, "protected") == 0) {
+  2285			if (!is_kernel_in_hyp_mode())
+  2286				kvm_mode = KVM_MODE_PROTECTED;
+  2287			else
+  2288				pr_warn_once("Protected KVM not available with VHE\n");
+  2289	
+  2290			return 0;
+  2291		}
+  2292	
+  2293		if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
+  2294			kvm_mode = KVM_MODE_DEFAULT;
+  2295			return 0;
+  2296		}
+  2297	
+  2298		return -EINVAL;
+  2299	}
+  2300	early_param("kvm-arm.mode", early_kvm_mode_cfg);
+  2301	
+
 -- 
-2.25.1
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
