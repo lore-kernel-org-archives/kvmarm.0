@@ -2,60 +2,65 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2B11C54EE9
-	for <kvmarm@archiver.kernel.org>; Tue, 13 Sep 2022 09:45:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9012CC54EE9
+	for <kvmarm@archiver.kernel.org>; Tue, 13 Sep 2022 10:58:56 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F1D94BC1A;
-	Tue, 13 Sep 2022 05:45:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F13104BC2B;
+	Tue, 13 Sep 2022 06:58:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0RR9qa+7ERno; Tue, 13 Sep 2022 05:45:18 -0400 (EDT)
+	with ESMTP id IgXiEoyNY0h6; Tue, 13 Sep 2022 06:58:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 41C8E4BBFE;
-	Tue, 13 Sep 2022 05:45:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A74C94BC2D;
+	Tue, 13 Sep 2022 06:58:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 61DDD4BBAF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2022 05:45:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 434F64BC0D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2022 06:58:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SaHcIr3ntUor for <kvmarm@lists.cs.columbia.edu>;
- Tue, 13 Sep 2022 05:45:14 -0400 (EDT)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B08514BBFB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2022 05:45:13 -0400 (EDT)
+ with ESMTP id tDfJUfW7OA47 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 13 Sep 2022 06:58:52 -0400 (EDT)
+Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E9CA24BC0A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2022 06:58:51 -0400 (EDT)
+Date: Tue, 13 Sep 2022 11:58:47 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1663066730;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=DyTAIvEIR2Z4eQarHxWKcYP+j8wuMA7QgeATWgvnfbA=;
+ b=tyGXm8tfSdscTpM+3PWqmGoMd2aeNKxA2m5r4w9U3PDCcV/G6dYsKRLQnmbt4AGp4qugOb
+ 5JyHgF6QHNT8B+pmUTxaNTauyQAf+K4QdSLGidEzWgXq/TEog5yu2jyWIvJ8FFd40W3x8N
+ rVbapwWUjS32EcREG7mwKkI59Pd1Fno=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1663062313;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YOjups9NRVdYtH3FR6ndzAXai/VkiaDVOKLfEygwd4Y=;
- b=I7SEbxrKkh2QTMe+IlI/FvnqEGkIOhAENLkuL04djvNaL4zGDvZKG6cqbpVsDt/EibulHT
- VIG+EIAsR4T/UIOXFmxsCq7gAYq5xAK7q11ONBLdchup52n9bN0YMeqBg8NwWG/0CtmoV2
- kmLNVyHV2UaWI4U3UKhp803plkePxkI=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 7/7] KVM: selftests: Add test for AArch32 ID registers
-Date: Tue, 13 Sep 2022 09:44:40 +0000
-Message-Id: <20220913094441.3957645-8-oliver.upton@linux.dev>
-In-Reply-To: <20220913094441.3957645-1-oliver.upton@linux.dev>
-References: <20220913094441.3957645-1-oliver.upton@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: KVM/arm64: SPE: Translate VA to IPA on a stage 2 fault instead
+ of pinning VM memory
+Message-ID: <YyBiZ4WXL+qn9w3d@google.com>
+References: <20220801170055.GB26471@willie-the-truck>
+ <YujzE33aPSD22wvY@monolith.localdoman>
+ <Yul8UBoDcy6GQddq@google.com>
+ <YvJowFt+U/qCqNVV@monolith.localdoman>
+ <YvKq1IK7T/nGSKpt@google.com>
+ <YvN8VvqvutZ4ti8g@monolith.localdoman>
+ <YvPOBPZa2/cHombZ@google.com>
+ <YvZQKXtRpptpaWAI@monolith.localdoman>
+ <Yv0Dzy4sbGLWvHuZ@google.com>
+ <Yx9HRqZluagQtVCJ@monolith.localdoman>
 MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <Yx9HRqZluagQtVCJ@monolith.localdoman>
 X-Migadu-Flow: FLOW_OUT
 X-Migadu-Auth-User: linux.dev
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Andrew Jones <andrew.jones@linux.dev>, linux-kselftest@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,219 +77,62 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a test to assert that KVM handles the AArch64 views of the AArch32
-ID registers as RAZ/WI (writable only from userspace). For registers
-that were already hidden or unallocated, expect RAZ + invariant
-behavior.
+Hey Alex,
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/aarch64/aarch32_id_regs.c   | 169 ++++++++++++++++++
- 3 files changed, 171 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c
+On Mon, Sep 12, 2022 at 03:50:46PM +0100, Alexandru Elisei wrote:
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index d625a3f83780..87d1a0b1bae0 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -1,4 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+/aarch64/aarch32_id_regs
- /aarch64/arch_timer
- /aarch64/debug-exceptions
- /aarch64/get-reg-list
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 4c122f1b1737..784abe7f0962 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -144,6 +144,7 @@ TEST_GEN_PROGS_x86_64 += system_counter_offset_test
- # Compiled outputs used by test targets
- TEST_GEN_PROGS_EXTENDED_x86_64 += x86_64/nx_huge_pages_test
- 
-+TEST_GEN_PROGS_aarch64 += aarch64/aarch32_id_regs
- TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
- TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-diff --git a/tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c b/tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c
-new file mode 100644
-index 000000000000..6f9c1f19c7f6
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c
-@@ -0,0 +1,169 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * aarch32_id_regs - Test for ID register behavior on AArch64-only systems
-+ *
-+ * Copyright (c) 2022 Google LLC.
-+ *
-+ * Test that KVM handles the AArch64 views of the AArch32 ID registers as RAZ
-+ * and WI from userspace.
-+ */
-+
-+#include <stdint.h>
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+#define BAD_ID_REG_VAL	0x1badc0deul
-+
-+#define GUEST_ASSERT_REG_RAZ(reg)	GUEST_ASSERT_EQ(read_sysreg_s(reg), 0)
-+
-+static void guest_main(void)
-+{
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_PFR0_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_PFR1_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_DFR0_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_AFR0_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_MMFR0_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_MMFR1_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_MMFR2_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_MMFR3_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_ISAR0_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_ISAR1_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_ISAR2_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_ISAR3_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_ISAR4_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_ISAR5_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_MMFR4_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_ISAR6_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_MVFR0_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_MVFR1_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_MVFR2_EL1);
-+	GUEST_ASSERT_REG_RAZ(sys_reg(3, 0, 0, 3, 3));
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_PFR2_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_DFR1_EL1);
-+	GUEST_ASSERT_REG_RAZ(SYS_ID_MMFR5_EL1);
-+	GUEST_ASSERT_REG_RAZ(sys_reg(3, 0, 0, 3, 7));
-+
-+	GUEST_DONE();
-+}
-+
-+static void test_guest_raz(struct kvm_vcpu *vcpu)
-+{
-+	struct ucall uc;
-+
-+	vcpu_run(vcpu);
-+
-+	switch (get_ucall(vcpu, &uc)) {
-+	case UCALL_ABORT:
-+		REPORT_GUEST_ASSERT(uc);
-+		break;
-+	case UCALL_DONE:
-+		break;
-+	default:
-+		TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
-+	}
-+}
-+
-+static uint64_t raz_wi_reg_ids[] = {
-+	KVM_ARM64_SYS_REG(SYS_ID_PFR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_PFR1_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_DFR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_MMFR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_MMFR1_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_MMFR2_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_MMFR3_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_ISAR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_ISAR1_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_ISAR2_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_ISAR3_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_ISAR4_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_ISAR5_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_MMFR4_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_ISAR6_EL1),
-+	KVM_ARM64_SYS_REG(SYS_MVFR0_EL1),
-+	KVM_ARM64_SYS_REG(SYS_MVFR1_EL1),
-+	KVM_ARM64_SYS_REG(SYS_MVFR2_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_PFR2_EL1),
-+	KVM_ARM64_SYS_REG(SYS_ID_MMFR5_EL1),
-+};
-+
-+static void test_user_raz_wi(struct kvm_vcpu *vcpu)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(raz_wi_reg_ids); i++) {
-+		uint64_t reg_id = raz_wi_reg_ids[i];
-+		uint64_t val;
-+
-+		vcpu_get_reg(vcpu, reg_id, &val);
-+		ASSERT_EQ(val, 0);
-+
-+		/*
-+		 * Expect the ioctl to succeed with no effect on the register
-+		 * value.
-+		 */
-+		vcpu_set_reg(vcpu, reg_id, BAD_ID_REG_VAL);
-+
-+		vcpu_get_reg(vcpu, reg_id, &val);
-+		ASSERT_EQ(val, 0);
-+	}
-+}
-+
-+static uint64_t raz_invariant_reg_ids[] = {
-+	KVM_ARM64_SYS_REG(SYS_ID_AFR0_EL1),
-+	KVM_ARM64_SYS_REG(sys_reg(3, 0, 0, 3, 3)),
-+	KVM_ARM64_SYS_REG(SYS_ID_DFR1_EL1),
-+	KVM_ARM64_SYS_REG(sys_reg(3, 0, 0, 3, 7)),
-+};
-+
-+static void test_user_raz_invariant(struct kvm_vcpu *vcpu)
-+{
-+	int i, r;
-+
-+	for (i = 0; i < ARRAY_SIZE(raz_invariant_reg_ids); i++) {
-+		uint64_t reg_id = raz_invariant_reg_ids[i];
-+		uint64_t val;
-+
-+		vcpu_get_reg(vcpu, reg_id, &val);
-+		ASSERT_EQ(val, 0);
-+
-+		r = __vcpu_set_reg(vcpu, reg_id, BAD_ID_REG_VAL);
-+		TEST_ASSERT(r < 0 && errno == EINVAL,
-+			    "unexpected KVM_SET_ONE_REG error: r=%d, errno=%d", r, errno);
-+
-+		vcpu_get_reg(vcpu, reg_id, &val);
-+		ASSERT_EQ(val, 0);
-+	}
-+}
-+
-+
-+
-+static bool vcpu_aarch64_only(struct kvm_vcpu *vcpu)
-+{
-+	uint64_t val, el0;
-+
-+	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), &val);
-+
-+	el0 = (val & ARM64_FEATURE_MASK(ID_AA64PFR0_EL0)) >> ID_AA64PFR0_EL0_SHIFT;
-+	return el0 == ID_AA64PFR0_ELx_64BIT_ONLY;
-+}
-+
-+int main(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_main);
-+
-+	TEST_REQUIRE(vcpu_aarch64_only(vcpu));
-+
-+	ucall_init(vm, NULL);
-+
-+	test_user_raz_wi(vcpu);
-+	test_user_raz_invariant(vcpu);
-+	test_guest_raz(vcpu);
-+
-+	ucall_uninit(vm);
-+	kvm_vm_free(vm);
-+}
--- 
-2.37.2.789.g6183377224-goog
+[...]
 
+> > Yeah, that would be good to follow up on what other OSes are doing.
+> 
+> FreeBSD doesn't have a SPE driver.
+> 
+> Currently in the process of finding out how/if Windows implements the
+> driver.
+> 
+> > You'll still have a nondestructive S2 fault handler for the SPE, right?
+> > IOW, if PMBSR_EL1.DL=0 KVM will just unpin the old buffer and repin the
+> > new one.
+> 
+> This is how I think about it: a S2 DABT where DL == 0 can happen because of
+> something that the VMM, KVM or the guest has done:
+> 
+> 1. If it's because of something that the host's userspace did (memslot was
+> changed while the VM was running, memory was munmap'ed, etc). In this case,
+> there's no way for KVM to handle the SPE fault, so I would say that the
+> sensible approach would be to inject an SPE external abort.
+> 
+> 2. If it's because of something that KVM did, that can only be because of a
+> bug in SPE emulation. In this case, it can happen again, which means
+> arbitrary blackout windows which can skew the profiling results. I would
+> much rather inject an SPE external abort then let the guest rely on
+> potentially bad profiling information.
+> 
+> 3. The guest changes the mapping for the buffer when it shouldn't have: A.
+> when the architecture does allow it, but KVM doesn't support, or B. when
+> the architecture doesn't allow it. For both cases, I would much rather
+> inject an SPE external abort for the reasons above. Furthermore, for B, I
+> think it would be better to let the guest know as soon as possible that
+> it's not following the architecture.
+> 
+> In conclusion, I would prefer to treat all SPE S2 faults as errors.
+
+My main concern with treating S2 faults as a synthetic external abort is
+how this behavior progresses in later versions of the architecture.
+SPEv1p3 disallows implementations from reporting external aborts via the
+SPU, instead allowing only for an SError to be delivered to the core.
+
+I caught up with Will on this for a little bit:
+
+Instead of an external abort, how about reporting an IMP DEF buffer
+management event to the guest? At least for the Linux driver it should
+have the same effect of killing the session but the VM will stay
+running. This way there's no architectural requirement to promote to an
+SError.
+
+--
+Thanks,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
