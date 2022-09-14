@@ -2,65 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B83C54EE9
-	for <kvmarm@archiver.kernel.org>; Tue, 13 Sep 2022 14:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF86C6FA86
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Sep 2022 00:20:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42B054BC2D;
-	Tue, 13 Sep 2022 10:14:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 073414BC57;
+	Tue, 13 Sep 2022 20:20:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kik0rm-rjmrv; Tue, 13 Sep 2022 10:14:09 -0400 (EDT)
+	with ESMTP id Bj2NZoa34Ot3; Tue, 13 Sep 2022 20:20:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1F514BC09;
-	Tue, 13 Sep 2022 10:14:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B6A14BC51;
+	Tue, 13 Sep 2022 20:20:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 788A24BBFB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2022 10:14:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6741D4BC51
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2022 20:20:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RKuEZ78AJ0Ae for <kvmarm@lists.cs.columbia.edu>;
- Tue, 13 Sep 2022 10:14:07 -0400 (EDT)
-Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 189854BBCE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2022 10:14:07 -0400 (EDT)
-Date: Tue, 13 Sep 2022 15:13:31 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1663078445;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=ZPFqLXQVtTos2SUte3DUDBgyf6YiS7tm7cKDDgA0N3w=;
- b=STciCipNkB4of3Fnd53nVFMwkjhKPj5RNhREZST/rW7Zndkz9Q1rgPOII2bhl4Dn7ECkRw
- gH0J8LzcdhkWOzdz5QYahgKrbSniFilG2qsRAyogTYkSaHOA167CvMCzKaZ5My9JITDjq5
- E5u/pzAgvEpJdi98hrWzuauhEODfbtA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: KVM/arm64: SPE: Translate VA to IPA on a stage 2 fault instead
- of pinning VM memory
-Message-ID: <YyCPYLVayX+NwR4K@google.com>
-References: <Yul8UBoDcy6GQddq@google.com>
- <YvJowFt+U/qCqNVV@monolith.localdoman>
- <YvKq1IK7T/nGSKpt@google.com>
- <YvN8VvqvutZ4ti8g@monolith.localdoman>
- <YvPOBPZa2/cHombZ@google.com>
- <YvZQKXtRpptpaWAI@monolith.localdoman>
- <Yv0Dzy4sbGLWvHuZ@google.com>
- <Yx9HRqZluagQtVCJ@monolith.localdoman>
- <YyBiZ4WXL+qn9w3d@google.com>
- <YyB6MAv5UZkiY66a@monolith.localdoman>
+ with ESMTP id J-SQCb7JZXaN for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 13 Sep 2022 20:20:17 -0400 (EDT)
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com
+ [209.85.214.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BFA8F4BC4B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2022 20:20:17 -0400 (EDT)
+Received: by mail-pl1-f173.google.com with SMTP id f24so13479293plr.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2022 17:20:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date;
+ bh=Qh1/s6M70qDgDeLcah8lIOeqDjJuG7SFaXNSDeF85IM=;
+ b=hmnbcNQ3+hkMCTGJ/nShNJrdUAPB537RhF9GVtG4p8/BI7EYdGHrjC8Ug8ZuSsUqhU
+ KKUGItY5hPPLm7tuQ2mDcJHY+oVu1uBXZ0KRYHntZfJouOy5Q92ITkK5R9/X9pK1ZY75
+ fB/1O2HLHO9O3OnrzT5NZNDDdnia6qOX09dKbg3L9mga6duqANJSHD1ctAgzmNAuz24I
+ giVgi0yddUf7+Eytcs2FOlC+N+Q3NXTI8zMXv8RlrZa1uueVgQNKq2sEaf4ujLvt/S9Q
+ REXYQ+tJq4Rew4a6vmc7qt740OPm1E59FU1BKW1Sxgo/Pm5KTi4YyoDfu9z7MBM93sn5
+ /yEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+ bh=Qh1/s6M70qDgDeLcah8lIOeqDjJuG7SFaXNSDeF85IM=;
+ b=2auGxvhGquumjx+zpOg71f1omxk9MRRt2ue0LQrgPER+14NyTlv8yRW/qk1OrslwIR
+ P5mYhgpzldwoCeXn5NqiQpvNK44fScM3igbFSlyDOIjswTA7dLncc/4HrznlN0iPZFul
+ 38sNhiwTsrfwzuc21arVG5/3XSW7vCJfoxF2vMesqXNE5I0/2NUvTuzvLw2qqpPVMEjp
+ mcDkuPKAkajr2iI9kKdRa7tJsgDKYUbCzJHLlDgng6iD/PpneQFr9dWKABL/zllwvg72
+ b0p5GeBDFwXrcl6SztKvKiWqVxqOHUxdyLE76FVEfEAG14KgtInOpSQ6DgPhnnZkT/u2
+ uUbA==
+X-Gm-Message-State: ACgBeo0dy6LVsGutNN9agAQF3WxTvo8sjADGA48RTJtTzPEwJ8oMgkDq
+ a/qdyXCCUpLN2edecwLaCKvLSQ==
+X-Google-Smtp-Source: AA6agR7JzRXYj4TvqMraV3xRI34hOtrIB2Jvj+p8BtFP0beIxXKZJTeBBYUFIxpu7QYTqmzydycRAg==
+X-Received: by 2002:a17:903:234c:b0:178:1a7c:28a5 with SMTP id
+ c12-20020a170903234c00b001781a7c28a5mr18615900plh.32.1663114816299; 
+ Tue, 13 Sep 2022 17:20:16 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com.
+ [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
+ k8-20020a170902c40800b00176a715653dsm9251820plk.145.2022.09.13.17.20.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 13 Sep 2022 17:20:15 -0700 (PDT)
+Date: Tue, 13 Sep 2022 17:20:11 -0700
+From: Ricardo Koller <ricarkol@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 02/14] KVM: arm64: Tear down unlinked stage-2 subtree
+ after break-before-make
+Message-ID: <YyEeOxDndbEVHuxE@google.com>
+References: <20220830194132.962932-1-oliver.upton@linux.dev>
+ <20220830194132.962932-3-oliver.upton@linux.dev>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <YyB6MAv5UZkiY66a@monolith.localdoman>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: maz@kernel.org, Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20220830194132.962932-3-oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,95 +94,238 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 13, 2022 at 01:41:56PM +0100, Alexandru Elisei wrote:
-> Hi Oliver,
-> 
-> On Tue, Sep 13, 2022 at 11:58:47AM +0100, Oliver Upton wrote:
-> > Hey Alex,
-> > 
-> > On Mon, Sep 12, 2022 at 03:50:46PM +0100, Alexandru Elisei wrote:
-> > 
-> > [...]
-> > 
-> > > > Yeah, that would be good to follow up on what other OSes are doing.
-> > > 
-> > > FreeBSD doesn't have a SPE driver.
-> > > 
-> > > Currently in the process of finding out how/if Windows implements the
-> > > driver.
-> > > 
-> > > > You'll still have a nondestructive S2 fault handler for the SPE, right?
-> > > > IOW, if PMBSR_EL1.DL=0 KVM will just unpin the old buffer and repin the
-> > > > new one.
-> > > 
-> > > This is how I think about it: a S2 DABT where DL == 0 can happen because of
-> > > something that the VMM, KVM or the guest has done:
-> > > 
-> > > 1. If it's because of something that the host's userspace did (memslot was
-> > > changed while the VM was running, memory was munmap'ed, etc). In this case,
-> > > there's no way for KVM to handle the SPE fault, so I would say that the
-> > > sensible approach would be to inject an SPE external abort.
-> > > 
-> > > 2. If it's because of something that KVM did, that can only be because of a
-> > > bug in SPE emulation. In this case, it can happen again, which means
-> > > arbitrary blackout windows which can skew the profiling results. I would
-> > > much rather inject an SPE external abort then let the guest rely on
-> > > potentially bad profiling information.
-> > > 
-> > > 3. The guest changes the mapping for the buffer when it shouldn't have: A.
-> > > when the architecture does allow it, but KVM doesn't support, or B. when
-> > > the architecture doesn't allow it. For both cases, I would much rather
-> > > inject an SPE external abort for the reasons above. Furthermore, for B, I
-> > > think it would be better to let the guest know as soon as possible that
-> > > it's not following the architecture.
-> > > 
-> > > In conclusion, I would prefer to treat all SPE S2 faults as errors.
-> > 
-> > My main concern with treating S2 faults as a synthetic external abort is
-> > how this behavior progresses in later versions of the architecture.
-> > SPEv1p3 disallows implementations from reporting external aborts via the
-> > SPU, instead allowing only for an SError to be delivered to the core.
-> 
-> Ah, yes, missed that bit for SPEv1p3 (ARM DDI 0487H.a, page D10-5180).
-> 
-> > 
-> > I caught up with Will on this for a little bit:
-> > 
-> > Instead of an external abort, how about reporting an IMP DEF buffer
-> > management event to the guest? At least for the Linux driver it should
-> > have the same effect of killing the session but the VM will stay
-> > running. This way there's no architectural requirement to promote to an
-> > SError.
-> 
-> The only reason I proposed to inject an external abort is because KVM needs
-> a way to tell the guest that something outside of the guest's control went
-> wrong and it should drop the contents of the current profiling session. An
-> external abort reported by the SPU seemed to fit the bit.
-> 
-> By IMP DEF buffer management event I assume you mean PMBSR_EL1.EC=0b011111
-> (Buffer management event for an IMPLEMENTATION DEFINED reason).
+Hi Oliver,
 
-Yup, that's it. You also get two whole bytes of room in PMBSR_EL1.MSS
-which is also IMP DEF, so we could even stick some ASCII in there to
-tell the guest how we really feel! :-P
+On Tue, Aug 30, 2022 at 07:41:20PM +0000, Oliver Upton wrote:
+> The break-before-make sequence is a bit annoying as it opens a window
+> wherein memory is unmapped from the guest. KVM should replace the PTE
+> as quickly as possible and avoid unnecessary work in between.
+> 
+> Presently, the stage-2 map walker tears down a removed table before
+> installing a block mapping when coalescing a table into a block. As the
+> removed table is no longer visible to hardware walkers after the
+> DSB+TLBI, it is possible to move the remaining cleanup to happen after
+> installing the new PTE.
+> 
+> Reshuffle the stage-2 map walker to install the new block entry in
+> the pre-order callback. Unwire all of the teardown logic and replace
+> it with a call to kvm_pgtable_stage2_free_removed() after fixing
+> the PTE. The post-order visitor is now completely unnecessary, so drop
+> it. Finally, touch up the comments to better represent the now
+> simplified map walker.
+> 
+> Note that the call to tear down the unlinked stage-2 is indirected
+> as a subsequent change will use an RCU callback to trigger tear down.
+> RCU is not available to pKVM, so there is a need to use different
+> implementations on pKVM and non-pKVM VMs.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h  |  3 +
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c |  1 +
+>  arch/arm64/kvm/hyp/pgtable.c          | 83 ++++++++-------------------
+>  arch/arm64/kvm/mmu.c                  |  1 +
+>  4 files changed, 28 insertions(+), 60 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index d71fb92dc913..c25633f53b2b 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -77,6 +77,8 @@ static inline bool kvm_level_supports_block_mapping(u32 level)
+>   *				allocation is physically contiguous.
+>   * @free_pages_exact:		Free an exact number of memory pages previously
+>   *				allocated by zalloc_pages_exact.
+> + * @free_removed_table:		Free a removed paging structure by unlinking and
+> + *				dropping references.
+>   * @get_page:			Increment the refcount on a page.
+>   * @put_page:			Decrement the refcount on a page. When the
+>   *				refcount reaches 0 the page is automatically
+> @@ -95,6 +97,7 @@ struct kvm_pgtable_mm_ops {
+>  	void*		(*zalloc_page)(void *arg);
+>  	void*		(*zalloc_pages_exact)(size_t size);
+>  	void		(*free_pages_exact)(void *addr, size_t size);
+> +	void		(*free_removed_table)(void *addr, u32 level, void *arg);
+>  	void		(*get_page)(void *addr);
+>  	void		(*put_page)(void *addr);
+>  	int		(*page_count)(void *addr);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 1e78acf9662e..a930fdee6fce 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -93,6 +93,7 @@ static int prepare_s2_pool(void *pgt_pool_base)
+>  	host_kvm.mm_ops = (struct kvm_pgtable_mm_ops) {
+>  		.zalloc_pages_exact = host_s2_zalloc_pages_exact,
+>  		.zalloc_page = host_s2_zalloc_page,
+> +		.free_removed_table = kvm_pgtable_stage2_free_removed,
+>  		.phys_to_virt = hyp_phys_to_virt,
+>  		.virt_to_phys = hyp_virt_to_phys,
+>  		.page_count = hyp_page_count,
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index d8127c25424c..5c0c8028d71c 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -763,17 +763,21 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+>  	return 0;
+>  }
+>  
+> +static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> +				struct stage2_map_data *data);
+> +
+>  static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
+>  				     kvm_pte_t *ptep,
+>  				     struct stage2_map_data *data)
+>  {
+> -	if (data->anchor)
+> -		return 0;
+> +	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
+> +	kvm_pte_t *childp = kvm_pte_follow(*ptep, mm_ops);
+> +	struct kvm_pgtable *pgt = data->mmu->pgt;
+> +	int ret;
+>  
+>  	if (!stage2_leaf_mapping_allowed(addr, end, level, data))
+>  		return 0;
+>  
+> -	data->childp = kvm_pte_follow(*ptep, data->mm_ops);
+>  	kvm_clear_pte(ptep);
+>  
+>  	/*
+> @@ -782,8 +786,13 @@ static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
+>  	 * individually.
+>  	 */
+>  	kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
+> -	data->anchor = ptep;
+> -	return 0;
+> +
+> +	ret = stage2_map_walk_leaf(addr, end, level, ptep, data);
 
-> I'm thinking that someone might run a custom kernel in a VM, like a vendor
-> downstream kernel, with patches that actually handle this exception class,
-> and injecting such an exception might not have the effects that KVM
-> expects. Am I overthinking things? Is that something that KVM should take
-> into consideration? I suppose KVM can and should also set
-> PMBSR_EL1.DL = 1, as that means per the architecture that the buffer
-> contents should be discarded.
+I think this always ends up calling stage2_map_walker_try_leaf() (at
+least it should). In that case, I think it might be clearer to do so, as
+the intention is to just install a block.
 
-I agree with you that PMBSR_EL1.DL=1 is the right call for this. With
-that, I'd be surprised if there was a guest that tried to pull some
-tricks other than blowing away the profile. The other option that I
-find funny is if we plainly report the S2 abort to the guest, but that
-wont work well when nested comes into the picture.
+> +
+> +	mm_ops->put_page(ptep);
+> +	mm_ops->free_removed_table(childp, level + 1, pgt);
 
---
-Thanks,
-Oliver
+*old = *ptep;
+
+> +
+> +	return ret;
+>  }
+>  
+>  static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> @@ -793,13 +802,6 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  	kvm_pte_t *childp, pte = *ptep;
+>  	int ret;
+>  
+> -	if (data->anchor) {
+> -		if (stage2_pte_is_counted(pte))
+> -			mm_ops->put_page(ptep);
+> -
+> -		return 0;
+> -	}
+> -
+>  	ret = stage2_map_walker_try_leaf(addr, end, level, ptep, data);
+>  	if (ret != -E2BIG)
+>  		return ret;
+> @@ -828,50 +830,14 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  	return 0;
+>  }
+>  
+> -static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
+> -				      kvm_pte_t *ptep,
+> -				      struct stage2_map_data *data)
+> -{
+> -	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
+> -	kvm_pte_t *childp;
+> -	int ret = 0;
+> -
+> -	if (!data->anchor)
+> -		return 0;
+> -
+> -	if (data->anchor == ptep) {
+> -		childp = data->childp;
+> -		data->anchor = NULL;
+> -		data->childp = NULL;
+> -		ret = stage2_map_walk_leaf(addr, end, level, ptep, data);
+> -	} else {
+> -		childp = kvm_pte_follow(*ptep, mm_ops);
+> -	}
+> -
+> -	mm_ops->put_page(childp);
+> -	mm_ops->put_page(ptep);
+> -
+> -	return ret;
+> -}
+> -
+>  /*
+> - * This is a little fiddly, as we use all three of the walk flags. The idea
+> - * is that the TABLE_PRE callback runs for table entries on the way down,
+> - * looking for table entries which we could conceivably replace with a
+> - * block entry for this mapping. If it finds one, then it sets the 'anchor'
+> - * field in 'struct stage2_map_data' to point at the table entry, before
+> - * clearing the entry to zero and descending into the now detached table.
+> - *
+> - * The behaviour of the LEAF callback then depends on whether or not the
+> - * anchor has been set. If not, then we're not using a block mapping higher
+> - * up the table and we perform the mapping at the existing leaves instead.
+> - * If, on the other hand, the anchor _is_ set, then we drop references to
+> - * all valid leaves so that the pages beneath the anchor can be freed.
+> + * The TABLE_PRE callback runs for table entries on the way down, looking
+> + * for table entries which we could conceivably replace with a block entry
+> + * for this mapping. If it finds one it replaces the entry and calls
+> + * kvm_pgtable_mm_ops::free_removed_table() to tear down the detached table.
+>   *
+> - * Finally, the TABLE_POST callback does nothing if the anchor has not
+> - * been set, but otherwise frees the page-table pages while walking back up
+> - * the page-table, installing the block entry when it revisits the anchor
+> - * pointer and clearing the anchor to NULL.
+> + * Otherwise, the LEAF callback performs the mapping at the existing leaves
+> + * instead.
+>   */
+>  static int stage2_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  			     enum kvm_pgtable_walk_flags flag, void * const arg)
+> @@ -883,11 +849,9 @@ static int stage2_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  		return stage2_map_walk_table_pre(addr, end, level, ptep, data);
+>  	case KVM_PGTABLE_WALK_LEAF:
+>  		return stage2_map_walk_leaf(addr, end, level, ptep, data);
+> -	case KVM_PGTABLE_WALK_TABLE_POST:
+> -		return stage2_map_walk_table_post(addr, end, level, ptep, data);
+> +	default:
+> +		return -EINVAL;
+
+nice!
+
+>  	}
+> -
+> -	return -EINVAL;
+>  }
+>  
+>  int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> @@ -905,8 +869,7 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  	struct kvm_pgtable_walker walker = {
+>  		.cb		= stage2_map_walker,
+>  		.flags		= KVM_PGTABLE_WALK_TABLE_PRE |
+> -				  KVM_PGTABLE_WALK_LEAF |
+> -				  KVM_PGTABLE_WALK_TABLE_POST,
+> +				  KVM_PGTABLE_WALK_LEAF,
+>  		.arg		= &map_data,
+>  	};
+>  
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index c9a13e487187..91521f4aab97 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -627,6 +627,7 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+>  	.zalloc_page		= stage2_memcache_zalloc_page,
+>  	.zalloc_pages_exact	= kvm_host_zalloc_pages_exact,
+>  	.free_pages_exact	= free_pages_exact,
+> +	.free_removed_table	= kvm_pgtable_stage2_free_removed,
+>  	.get_page		= kvm_host_get_page,
+>  	.put_page		= kvm_host_put_page,
+>  	.page_count		= kvm_host_page_count,
+> -- 
+> 2.37.2.672.g94769d06f0-goog
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
