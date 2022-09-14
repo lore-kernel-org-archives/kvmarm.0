@@ -2,83 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C658AC54EE9
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Sep 2022 00:53:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C65AEECAAD8
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Sep 2022 06:13:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E7024BBF8;
-	Tue, 13 Sep 2022 20:53:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E9AF4BB31;
+	Wed, 14 Sep 2022 02:13:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lqoeZkwtte0w; Tue, 13 Sep 2022 20:53:25 -0400 (EDT)
+	with ESMTP id uTDEAAjcOv1K; Wed, 14 Sep 2022 02:13:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F21654BBCC;
-	Tue, 13 Sep 2022 20:53:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BAFF14BBA2;
+	Wed, 14 Sep 2022 02:13:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3418E4BBA8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2022 20:53:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 57B634BB3C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Sep 2022 02:13:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s0IJvICVxRaP for <kvmarm@lists.cs.columbia.edu>;
- Tue, 13 Sep 2022 20:53:22 -0400 (EDT)
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com
- [209.85.214.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D0C904BBA4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2022 20:53:22 -0400 (EDT)
-Received: by mail-pl1-f178.google.com with SMTP id b21so13531283plz.7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2022 17:53:22 -0700 (PDT)
+ with ESMTP id 0IsGOz5xfFuF for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Sep 2022 02:13:20 -0400 (EDT)
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com
+ [209.85.217.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E33794BB31
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Sep 2022 02:13:20 -0400 (EDT)
+Received: by mail-vs1-f52.google.com with SMTP id 67so14798243vsv.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Sep 2022 23:13:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date;
- bh=s7D2/n8L9/xlIj+hVN8GIcFvSkrDNM1KPpmGzxvTo/g=;
- b=MjaKzwDN2gr+IBBkEtU4oKISjvr8IhyssXGGoZPdWL2vQ+Kc+kf4lIHFyxRCWZxe/6
- tPIKyV/waFHwFtUW/s0IxrR+yzMbZxhaCYWJUbDrsoCjVHcCT8QPKI5L2jMpyVKpqoLr
- C+lgLIDjYk2a/JgjpmDcGPYLaDXheZQ/5h1PjIB5ZCKPvMRzfJ8fo/CVu5Fhg2mDsWUR
- UX3ZA5bX0+YXd0G5eaOP85mFoLnXoI/CIQvXLbCSUCqTxwx4dyJ1Ml2KvZqi7Zryg82w
- ONSiaucCEFXmPb67TjV6JShvU2ZWb80s5L/8+SL7vNTx5v4zxFiLIiEZ48eG+5CvZ1Ka
- 0Kwg==
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:from:to:cc:subject:date;
+ bh=3Nj3leCSwB1mG6UETzR179fDDWSWD2vq8HNpdWGZN90=;
+ b=ehy0egZci05ylvswS7cjrgJ+nSu4gnTHEY52CE6r0WR26HvYVCShI1KLxYsxcCOvaM
+ mQ4Y0FZkqwO/CZd4uOUlj0Uw7kwq8aTs+uBuFlzkT5z+yJRa9AoQ3XsDIY4LU5mlYQCM
+ BJfDwTg7LM8gNIF5oKe0+i4yYsLMjQRhohqmpyo3uIMelUdRN3/yjRX9fLhfQcqX9DSa
+ Eqi6Te0GXWqE7MWkVFigDDcc7GHxGAv4IwSyMQN0JjsAiUuK0TlJVLDChulWHEiEE+vE
+ dpxR3XCiaVe4Uo8DhusWpZRVkPPvDSnzgBfPQ43Pf5nrv8X4CiGyLlAhl+cBw5U0vAGT
+ wDjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
- bh=s7D2/n8L9/xlIj+hVN8GIcFvSkrDNM1KPpmGzxvTo/g=;
- b=zhD+AU7Z2pL9ESrC4yaCDQ17QF857XrJMbSNtUe8YgsaWhE2hXlMG/b8dutV/E1WHN
- 4/4B0U9JmW20BLxpzylTcp5XRIuRRq0nb9amEAHnxWNvP6D+pZmUfTUz9nE1yxOgk4x7
- DqNhtKoF0T2pntVdKsN8p9vcWNfdcx30e7Wi7dOIi+jg2DMLIEHQWKurPRvv6YX/ADGn
- YBRCtfN7/m77eyy/0QJSkRxyF3Neeb2hAn4n+UNn5rA6Uzfy8Yp91lRfVygDZs+xGlgS
- /ToOOWWCAYLDaDPgGAC7KwUWpfOSj4abqkhkk7is6knRdJB5ap+gpZo28Lymj4r4dmEp
- jj/g==
-X-Gm-Message-State: ACgBeo2Hbq8WwRKkMqm/U1Ps5hnTtptVbOMIfvAF0g/y5FVOUHcP/R7r
- +6mXhFmqjq2GNvNT3pu+hK9LKQ==
-X-Google-Smtp-Source: AA6agR4y+7kaPNq1wJxvL/FXkrUH4iSFTMmdqNsD7Bn0tcQWSLnAZOkP8N3MaRfk0obT8kJGNMdoFA==
-X-Received: by 2002:a17:902:b616:b0:178:2321:8dbb with SMTP id
- b22-20020a170902b61600b0017823218dbbmr17687773pls.47.1663116801745; 
- Tue, 13 Sep 2022 17:53:21 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com.
- [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
- 8-20020a621408000000b0053e85a4a2ccsm8532407pfu.26.2022.09.13.17.53.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 13 Sep 2022 17:53:21 -0700 (PDT)
-Date: Tue, 13 Sep 2022 17:53:17 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH 11/14] KVM: arm64: Make changes block->table to leaf PTEs
- parallel-aware
-Message-ID: <YyEl/UILu+OAP5zA@google.com>
-References: <20220830194132.962932-1-oliver.upton@linux.dev>
- <20220830195102.964724-1-oliver.upton@linux.dev>
- <YyElq0c6WD1zh7Lu@google.com>
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:x-gm-message-state:from:to:cc:subject:date;
+ bh=3Nj3leCSwB1mG6UETzR179fDDWSWD2vq8HNpdWGZN90=;
+ b=q6C9hcaL8ai/UNWy540+8xqamf653T9h3+EvM2b0SRM6bNu1ARsSJFlFFPObvCvK3I
+ sNDImEa4LsyxBHhtqbSq1WLcZgp4d4oNBjw03GWaGKGW376qW1OtszULgAuMvn//Qmg6
+ C0IraAYYqGFEk69ZQEyccvlJp8W4K60swQJnjreY4GvjXqqN59GYNwwFLNt0kaeEdhNi
+ /QLaxCwYEXCjWL1HfejXKvlWRYr4G64XMWqMsMpggXuWg6xBxuUeRz6LV5AOuSGmjbuI
+ AYvLLKXszUUDybvrpH4ytJ8sratwg32x7fIHLqC5ZqjqCBXQ2PQX2Q7sxmkHNn1pWTQI
+ 3mBQ==
+X-Gm-Message-State: ACgBeo2CYqfYKe5PUoR7Y4YAGYk0tRLENKXdknftOcBEo0nXMOYmTh5m
+ f9DW3S3ta7R/T56qvteLgt7R+X/LzwguCGjgw1HdgA==
+X-Google-Smtp-Source: AA6agR4JUNqOVng4uk2DdELeIypGajswDTkl+EO+sfZtKXSS7J9di0ND1TC1heExvdipyjW4oYwqFodRgI+LKKfiEgM=
+X-Received: by 2002:a67:fdd0:0:b0:397:c028:db6a with SMTP id
+ l16-20020a67fdd0000000b00397c028db6amr11548134vsq.58.1663136000321; Tue, 13
+ Sep 2022 23:13:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YyElq0c6WD1zh7Lu@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <20220909044636.1997755-1-reijiw@google.com>
+ <20220909044636.1997755-2-reijiw@google.com>
+ <875yhvqzxn.wl-maz@kernel.org>
+In-Reply-To: <875yhvqzxn.wl-maz@kernel.org>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Tue, 13 Sep 2022 23:13:04 -0700
+Message-ID: <CAAeT=Fx5nLCqoNG+gnAZSbWvc9FotWOaQepNLqBZ2Xx_hxcxsw@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: Don't set PSTATE.SS when Software Step
+ state is Active-pending
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,171 +86,186 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 13, 2022 at 05:51:55PM -0700, Ricardo Koller wrote:
-> On Tue, Aug 30, 2022 at 07:51:01PM +0000, Oliver Upton wrote:
-> > In order to service stage-2 faults in parallel, stage-2 table walkers
-> > must take exclusive ownership of the PTE being worked on. An additional
-> > requirement of the architecture is that software must perform a
-> > 'break-before-make' operation when changing the block size used for
-> > mapping memory.
-> > 
-> > Roll these two concepts together into helpers for performing a
-> > 'break-before-make' sequence. Use a special PTE value to indicate a PTE
-> > has been locked by a software walker. Additionally, use an atomic
-> > compare-exchange to 'break' the PTE when the stage-2 page tables are
-> > possibly shared with another software walker. Elide the DSB + TLBI if
-> > the evicted PTE was invalid (and thus not subject to break-before-make).
-> > 
-> > All of the atomics do nothing for now, as the stage-2 walker isn't fully
-> > ready to perform parallel walks.
-> > 
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+Hi Marc,
+
+Thank you for the review!
+
+On Sat, Sep 10, 2022 at 3:36 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Fri, 09 Sep 2022 05:46:34 +0100,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > Currently, PSTATE.SS is set on every guest entry if single-step is
+> > enabled for the vCPU by userspace.  However, it could cause extra
+> > single-step execution without returning to userspace, which shouldn't
+> > be performed, if the Software Step state at the last guest exit was
+> > Active-pending (i.e. the last exit was not triggered by Software Step
+> > exception, but by an asynchronous exception after the single-step
+> > execution is performed).
+> >
+> > Fix this by not setting PSTATE.SS on guest entry if the Software
+> > Step state at the last exit was Active-pending.
+> >
+> > Fixes: 337b99bf7edf ("KVM: arm64: guest debug, add support for single-step")
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+>
+> Now that I'm a bit more clued about what the architecture actually
+> mandates, I can try and review this patch.
+>
 > > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 87 +++++++++++++++++++++++++++++++++---
-> >  1 file changed, 82 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 61a4437c8c16..71ae96608752 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -49,6 +49,12 @@
-> >  #define KVM_INVALID_PTE_OWNER_MASK	GENMASK(9, 2)
-> >  #define KVM_MAX_OWNER_ID		1
-> >  
-> > +/*
-> > + * Used to indicate a pte for which a 'break-before-make' sequence is in
-> > + * progress.
-> > + */
-> > +#define KVM_INVALID_PTE_LOCKED		BIT(10)
+> >  arch/arm64/include/asm/kvm_host.h |  3 +++
+> >  arch/arm64/kvm/debug.c            | 19 ++++++++++++++++++-
+> >  arch/arm64/kvm/guest.c            |  1 +
+> >  arch/arm64/kvm/handle_exit.c      |  2 ++
+> >  4 files changed, 24 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index e9c9388ccc02..4cf6eef02565 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -535,6 +535,9 @@ struct kvm_vcpu_arch {
+> >  #define IN_WFIT                      __vcpu_single_flag(sflags, BIT(3))
+> >  /* vcpu system registers loaded on physical CPU */
+> >  #define SYSREGS_ON_CPU               __vcpu_single_flag(sflags, BIT(4))
+> > +/* Software step state is Active-pending */
+> > +#define DBG_SS_ACTIVE_PENDING        __vcpu_single_flag(sflags, BIT(5))
 > > +
-> >  struct kvm_pgtable_walk_data {
-> >  	struct kvm_pgtable		*pgt;
-> >  	struct kvm_pgtable_walker	*walker;
-> > @@ -586,6 +592,8 @@ struct stage2_map_data {
-> >  
-> >  	/* Force mappings to page granularity */
-> >  	bool				force_pte;
+> >
+> >  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> >  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +   \
+> > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> > index 0b28d7db7c76..125cfb94b4ad 100644
+> > --- a/arch/arm64/kvm/debug.c
+> > +++ b/arch/arm64/kvm/debug.c
+> > @@ -188,7 +188,16 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+> >                * debugging the system.
+> >                */
+> >               if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+> > -                     *vcpu_cpsr(vcpu) |=  DBG_SPSR_SS;
+> > +                     /*
+> > +                      * If the software step state at the last guest exit
+> > +                      * was Active-pending, we don't set DBG_SPSR_SS so
+> > +                      * that the state is maintained (to not run another
+> > +                      * single-step until the pending Software Step
+> > +                      * exception is taken).
+> > +                      */
+> > +                     if (!vcpu_get_flag(vcpu, DBG_SS_ACTIVE_PENDING))
+> > +                             *vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
 > > +
-> > +	bool				shared;
-> >  };
-> >  
-> >  u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
-> > @@ -691,6 +699,11 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
-> >  	return kvm_pte_valid(pte) || kvm_invalid_pte_owner(pte);
-> >  }
-> >  
-> > +static bool stage2_pte_is_locked(kvm_pte_t pte)
-> > +{
-> > +	return !kvm_pte_valid(pte) && (pte & KVM_INVALID_PTE_LOCKED);
-> > +}
+> >                       mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+> >                       mdscr |= DBG_MDSCR_SS;
+> >                       vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
+> > @@ -279,6 +288,14 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+> >                                               &vcpu->arch.debug_ptr->dbg_wcr[0],
+> >                                               &vcpu->arch.debug_ptr->dbg_wvr[0]);
+> >               }
 > > +
-> >  static bool stage2_try_set_pte(kvm_pte_t *ptep, kvm_pte_t old, kvm_pte_t new, bool shared)
-> >  {
-> >  	if (!shared) {
-> > @@ -701,6 +714,69 @@ static bool stage2_try_set_pte(kvm_pte_t *ptep, kvm_pte_t old, kvm_pte_t new, bo
-> >  	return cmpxchg(ptep, old, new) == old;
-> >  }
-> >  
-> > +/**
-> > + * stage2_try_break_pte() - Invalidates a pte according to the
-> > + *			    'break-before-make' requirements of the
-> > + *			    architecture.
-> > + *
-> > + * @ptep: Pointer to the pte to break
-> > + * @old: The previously observed value of the pte
-> > + * @addr: IPA corresponding to the pte
-> > + * @level: Table level of the pte
-> > + * @shared: true if the stage-2 page tables could be shared by multiple software
-> > + *	    walkers
-> > + *
-> > + * Returns: true if the pte was successfully broken.
-> > + *
-> > + * If the removed pte was valid, performs the necessary serialization and TLB
-> > + * invalidation for the old value. For counted ptes, drops the reference count
-> > + * on the containing table page.
-> > + */
-> > +static bool stage2_try_break_pte(kvm_pte_t *ptep, kvm_pte_t old, u64 addr, u32 level,
-> > +				 struct stage2_map_data *data)
-> > +{
-> > +	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
-> > +
-> > +	if (stage2_pte_is_locked(old)) {
-> > +		/*
-> > +		 * Should never occur if this walker has exclusive access to the
-> > +		 * page tables.
-> > +		 */
-> > +		WARN_ON(!data->shared);
-> > +		return false;
-> > +	}
-> 
-> The above check is not needed as the cmpxchg() will return false if the
-> old pte is equal to "new" (KVM_INVALID_PTE_LOCKED).
-> 
-> > +
-> > +	if (!stage2_try_set_pte(ptep, old, KVM_INVALID_PTE_LOCKED, data->shared))
-> > +		return false;
-> > +
-> > +	/*
-> > +	 * Perform the appropriate TLB invalidation based on the evicted pte
-> > +	 * value (if any).
-> > +	 */
-> > +	if (kvm_pte_table(old, level))
-> > +		kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
-> > +	else if (kvm_pte_valid(old))
-> > +		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, data->mmu, addr, level);
-> > +
-> > +	if (stage2_pte_is_counted(old))
-> > +		mm_ops->put_page(ptep);
-> > +
-> > +	return true;
-> > +}
-> > +
-> > +static void stage2_make_pte(kvm_pte_t *ptep, kvm_pte_t old, kvm_pte_t new,
-> > +			    struct stage2_map_data *data)
-> > +{
+> > +             if ((vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) &&
+> > +                 !(*vcpu_cpsr(vcpu) & DBG_SPSR_SS))
+> > +                     /*
+> > +                      * Mark the vcpu as ACTIVE_PENDING
+> > +                      * until Software Step exception is confirmed.
+>
+> s/confirmed/taken/? This would match the comment in the previous hunk.
 
-nit: old is not used
+Yes, I will fix that.
 
-> > +	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
-> > +
-> > +	WARN_ON(!stage2_pte_is_locked(*ptep));
-> > +
-> > +	if (stage2_pte_is_counted(new))
-> > +		mm_ops->get_page(ptep);
-> > +
-> > +	smp_store_release(ptep, new);
-> > +}
-> > +
-> >  static void stage2_put_pte(kvm_pte_t *ptep, struct kvm_s2_mmu *mmu, u64 addr,
-> >  			   u32 level, struct kvm_pgtable_mm_ops *mm_ops)
-> >  {
-> > @@ -836,17 +912,18 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> >  	if (!childp)
-> >  		return -ENOMEM;
-> >  
-> > +	if (!stage2_try_break_pte(ptep, *old, addr, level, data)) {
-> > +		mm_ops->put_page(childp);
-> > +		return -EAGAIN;
-> > +	}
-> > +
-> >  	/*
-> >  	 * If we've run into an existing block mapping then replace it with
-> >  	 * a table. Accesses beyond 'end' that fall within the new table
-> >  	 * will be mapped lazily.
-> >  	 */
-> > -	if (stage2_pte_is_counted(pte))
-> > -		stage2_put_pte(ptep, data->mmu, addr, level, mm_ops);
-> > -
-> >  	new = kvm_init_table_pte(childp, mm_ops);
-> > -	mm_ops->get_page(ptep);
-> > -	smp_store_release(ptep, new);
-> > +	stage2_make_pte(ptep, *old, new, data);
-> >  	*old = new;
-> >  
-> >  	return 0;
-> > -- 
-> > 2.37.2.672.g94769d06f0-goog
-> > 
+>
+> > +                      */
+> > +                     vcpu_set_flag(vcpu, DBG_SS_ACTIVE_PENDING);
+> >       }
+> >  }
+> >
+> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > index f802a3b3f8db..2ff13a3f8479 100644
+> > --- a/arch/arm64/kvm/guest.c
+> > +++ b/arch/arm64/kvm/guest.c
+> > @@ -937,6 +937,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+> >       } else {
+> >               /* If not enabled clear all flags */
+> >               vcpu->guest_debug = 0;
+> > +             vcpu_clear_flag(vcpu, DBG_SS_ACTIVE_PENDING);
+> >       }
+> >
+> >  out:
+> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> > index bbe5b393d689..8e43b2668d67 100644
+> > --- a/arch/arm64/kvm/handle_exit.c
+> > +++ b/arch/arm64/kvm/handle_exit.c
+> > @@ -154,6 +154,8 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
+> >
+> >       if (ESR_ELx_EC(esr) == ESR_ELx_EC_WATCHPT_LOW)
+> >               run->debug.arch.far = vcpu->arch.fault.far_el2;
+> > +     else if (ESR_ELx_EC(esr) == ESR_ELx_EC_SOFTSTP_LOW)
+> > +             vcpu_clear_flag(vcpu, DBG_SS_ACTIVE_PENDING);
+>
+> Can we write this as a switch/case statement?
+
+Sure, I will change this to switch/case statement.
+
+
+>
+> >
+> >       return 0;
+> >  }
+>
+> I think we also need to do something if userspace decides to write to
+> PSTATE as a result of a non-debug exit (such as a signal) when this
+> DBG_SS_ACTIVE_PENDING is set. I came up with the following
+> complicated, but not impossible scenario:
+>
+> - guest single step, PSTATE.SS=0
+> - exit due to interrupt
+> - DBG_SS_ACTIVE_PENDING set
+> - reenter guest
+> - exit again due to another interrupt
+> - exit to userspace due to signal pending
+> - userspace writes PSTATE.SS=1 for no good reason
+> - we now have an inconsistent state between PSTATE.SS and the vcpu flags
+>
+> My gut feeling is that we need something like the vcpu flag being set
+> to !PSTATE.SS if written while debug is enabled.
+>
+> Thoughts?
+
+Ah, that's a good point.
+Values that KVM is going to set in debug registers (e.g. MDSCR_EL1,
+dbg_bcr, etc) at guest-entry cannot be changed by userspace via
+SET_ONE_REG when debug is enabled.  I'm inclined to apply the same
+for PSTATE.SS (clear PSTATE.SS if the vcpu flag is set on guest entry,
+and set PSTATE.SS to 1 otherwise). Since  MDSCR_EL1 value that KVM is
+going to set is not visible from userspace, changing Software-step
+state when userspace updates PSTATE.SS might be a bit odd IMHO
+(something odd anyway though).
+
+Related to the above scenario, I found another bug (I think).
+After guest exits with Active-not-pending (PSTATE.SS==1) due to an
+interrupt, and then KVM exits to userspace due to signal pending,
+if userspace disables single-step, PSTATE.SS will remain 1 on
+subsequent guest entries (or it might have been originally 1, and
+KVM might clear it.  Most of the time it doesn't matter, and when the
+guest is also using single-step, things will go wrong anyway though).
+
+Considering those, I am thinking of changing the patch as follows,
+ - Change kvm_arm_setup_debug() to clear PSTATE.SS if the vcpu flag
+   (DBG_SS_ACTIVE_PENDING) is set, and set PSTATE.SS to 1 otherwise.
+ - Change save_guest_debug_regs()/restore_guest_debug_regs() to
+   save/restore the guest value of PSTATE.SS
+   (Add a new field in kvm_vcpu_arch.guest_debug_preserved to save
+    the guest value of PSTATE.SS)
+keeping the other changes in the patch below.
+ - Clear DBG_SS_ACTIVE_PENDING in kvm_handle_guest_debug()
+ - Clear DBG_SS_ACTIVE_PENDING when userspace disables single-step
+
+With this, PSTATE.SS value that KVM is going to set on guest-entry
+won't be exposed to userspace, and PSTATE.SS value that is set by
+userspace will not be used for the guest until single-step is
+disabled (similar to MDSCR_EL1).
+
+What do you think ?
+
+Thank you,
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
