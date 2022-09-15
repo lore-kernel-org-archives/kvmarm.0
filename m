@@ -2,56 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2C5EECAAD8
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Sep 2022 11:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F41D0ECAAD3
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Sep 2022 08:36:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08C694BB5B;
-	Wed, 14 Sep 2022 07:08:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75D824BC7C;
+	Thu, 15 Sep 2022 04:36:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IfrDPx9bK1zv; Wed, 14 Sep 2022 07:08:21 -0400 (EDT)
+	with ESMTP id 3UbG5JJKyZOp; Thu, 15 Sep 2022 04:36:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C01284BB98;
-	Wed, 14 Sep 2022 07:08:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 324B74BC68;
+	Thu, 15 Sep 2022 04:36:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B5E524BB28
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Sep 2022 07:08:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EDEB4BC57
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Sep 2022 04:36:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DufJYWN7CIw0 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Sep 2022 07:08:19 -0400 (EDT)
-Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5EC5B4B9A6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Sep 2022 07:08:19 -0400 (EDT)
-Date: Wed, 14 Sep 2022 12:08:15 +0100
+ with ESMTP id P11go3RSPMmP for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Sep 2022 04:36:00 -0400 (EDT)
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C48704BBD4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Sep 2022 04:36:00 -0400 (EDT)
+Date: Thu, 15 Sep 2022 09:35:55 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1663153697;
+ t=1663230959;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=4icdTTwMOEDl/FiFqEWnD1meNX7EE2LU8zEMLkINvBI=;
- b=W6EdHTzE6hL8xf2xCXTgPfAWhGW726ekqZCMjg7k35lyEBz7Tt3ZmzHp0iwg7+fHlaXFD6
- dahkLcn8Jn4N+5PEv8i7exrmNXbsNqkC/YGp9Dh5q1LGzRfEanP4LFGy9xYjWbimwNLn43
- LcJIWApPaRoNmrdDX3GsRJLYLkQNYHs=
+ bh=os9IwzMucLgvaJoFDfZwUuHXyNMsYUbmD+UZT0aPk50=;
+ b=E/tahtjhO+Blv3iPVh0DxXR5+zb1T97qHYNma9aXxibWOSflrt9ii0ORnnylzqS95STLGn
+ Gh7oKiN3KOeCQIoh0ZfJlrIdL1p5P1FHPH7PfI8p5/7KX7mI3kzN0fevcLDPdQo2cm/wYR
+ YUqtx80pvv6k24UTJFIyckf3Eb1J3Qw=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Use kmemleak_free_part_phys() to unregister
- hyp_mem_base
-Message-ID: <YyG2H8PbJjehAwch@google.com>
-References: <20220908130659.2021-1-yuzenghui@huawei.com>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v3 01/25] KVM: arm64: Move hyp refcount manipulation
+ helpers to common header file
+Message-ID: <YyLj69OheXbXZLRw@google.com>
+References: <20220914083500.5118-1-will@kernel.org>
+ <20220914083500.5118-2-will@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220908130659.2021-1-yuzenghui@huawei.com>
+In-Reply-To: <20220914083500.5118-2-will@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 X-Migadu-Auth-User: linux.dev
-Cc: will@kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
- pbonzini@redhat.com, catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu,
+Cc: Marc Zyngier <maz@kernel.org>, kernel-team@android.com, kvm@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -69,24 +71,56 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 08, 2022 at 09:06:59PM +0800, Zenghui Yu wrote:
-> With commit 0c24e061196c ("mm: kmemleak: add rbtree and store physical
-> address for objects allocated with PA"), kmemleak started to put the
-> objects allocated with physical address onto object_phys_tree_root tree.
-> The kmemleak_free_part() therefore no longer worked as expected on
-> physically allocated objects (hyp_mem_base in this case) as it attempted to
-> search and remove things in object_tree_root tree.
+Hi Will,
+
+On Wed, Sep 14, 2022 at 09:34:36AM +0100, Will Deacon wrote:
+> From: Quentin Perret <qperret@google.com>
 > 
-> Fix it by using kmemleak_free_part_phys() to unregister hyp_mem_base. This
-> fixes an immediate crash when booting a KVM host in protected mode with
-> kmemleak enabled.
+> We will soon need to manipulate 'struct hyp_page' refcounts from outside
+> page_alloc.c, so move the helpers to a common header file to allow them
+> to be reused easily.
 > 
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/include/nvhe/memory.h | 18 ++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/page_alloc.c     | 19 -------------------
+>  2 files changed, 18 insertions(+), 19 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> index 592b7edb3edb..418b66a82a50 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> @@ -45,4 +45,22 @@ static inline int hyp_page_count(void *addr)
+>  	return p->refcount;
+>  }
+>  
+> +static inline void hyp_page_ref_inc(struct hyp_page *p)
+> +{
+> +	BUG_ON(p->refcount == USHRT_MAX);
+> +	p->refcount++;
+> +}
+> +
+> +static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
+> +{
+> +	BUG_ON(!p->refcount);
+> +	p->refcount--;
+> +	return (p->refcount == 0);
+> +}
+> +
+> +static inline void hyp_set_page_refcounted(struct hyp_page *p)
+> +{
+> +	BUG_ON(p->refcount);
+> +	p->refcount = 1;
+> +}
+
+It might be good to add a comment mentioning the hyp_pool::lock must
+be held to update refcounts, as that part is slightly less clear when
+the helpers are hoisted out of page_alloc.c
+
+With that:
 
 Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-
-Marc or Paolo, do one of you want to pick this patch up? Looks like a
-good fix.
 
 --
 Thanks,
