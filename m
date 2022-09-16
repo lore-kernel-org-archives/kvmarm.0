@@ -2,72 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54AF3C54EE9
-	for <kvmarm@archiver.kernel.org>; Fri, 16 Sep 2022 04:52:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D79ECAAD8
+	for <kvmarm@archiver.kernel.org>; Fri, 16 Sep 2022 05:08:10 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F28164BC86;
-	Fri, 16 Sep 2022 00:52:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBECE4BC5D;
+	Fri, 16 Sep 2022 01:08:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered)
+	header.i=@brainfault-org.20210112.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jE0oUOUoVl7T; Fri, 16 Sep 2022 00:52:33 -0400 (EDT)
+	with ESMTP id ZG5UVAApxSD8; Fri, 16 Sep 2022 01:08:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D74AF4BC91;
-	Fri, 16 Sep 2022 00:52:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93B444BC7F;
+	Fri, 16 Sep 2022 01:08:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A6994BBDD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2022 00:52:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D0E7F4BC5D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2022 01:08:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6i7SsjMrPIIT for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Sep 2022 00:52:31 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DD7E4BC86
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2022 00:52:31 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1663303951;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dsE8NdyhX5qef8QVsrNnndpCLaTRMlO/gHKVyL+LIsw=;
- b=WyHAxwI5wTJmQ2ZMIjeCcmBzH/f6MbEGBC7Re+PCnDE+apDob+ZOYegbdSsYnJqsnv35+P
- uFDmlPW5M99NcRGNs1qx07lxlNhVliPux/cbsmBynT0W+L26C0Pqps+nPq6vpFyL4Y0mEY
- 1qVphPG1vopie5zgMqlEf1rnQuvWhq8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-475-OvCHZnSlO5Ct-YwtnDc50w-1; Fri, 16 Sep 2022 00:52:25 -0400
-X-MC-Unique: OvCHZnSlO5Ct-YwtnDc50w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com
- [10.11.54.7])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B7CED85A59D;
- Fri, 16 Sep 2022 04:52:24 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-126.bne.redhat.com [10.64.54.126])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 903BE140EBF3;
- Fri, 16 Sep 2022 04:52:18 +0000 (UTC)
-From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 5/5] KVM: selftests: Automate choosing dirty ring size in
- dirty_log_test
-Date: Fri, 16 Sep 2022 12:51:35 +0800
-Message-Id: <20220916045135.154505-6-gshan@redhat.com>
-In-Reply-To: <20220916045135.154505-1-gshan@redhat.com>
-References: <20220916045135.154505-1-gshan@redhat.com>
+ with ESMTP id YD1JS7YpPJaN for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Sep 2022 01:08:06 -0400 (EDT)
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com
+ [209.85.166.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9339B4BC59
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2022 01:08:06 -0400 (EDT)
+Received: by mail-il1-f172.google.com with SMTP id v15so10810297iln.6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Sep 2022 22:08:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:from:to:cc:subject:date;
+ bh=yP5XHXLcK+UX9e2N5YzbTl9a4h8ihKkfwEUan36DPrg=;
+ b=yAWumhzewMa3eEP3CnaMNUvAKmgC8eanQ3L4jWiwdGCcIzPkhFrQzQw0wwV9+O9C/s
+ pWA8px3RR32jSQRkZ724RUliMw1N1pJV7uypHBZtXw/s45KvAkUFFBkjDay0fezO6Q1H
+ n/OjWEaMaEvHTgl1WjFIQhvNgjxtHZeYZXfVlqejl77Y0na9OV31a8qO4TRydLDh9b1J
+ NF1Fubd/swhKTWFgEXpw3HK96R4pCPPNOYmiQOe7Bp9RLaM6/LZ/umsF8xY1IvG5Kb40
+ CBEv7FTQftTVcumiWuAZRwOn7ym/68hjz6J2lRqkwYLZ2FbLbPgjYRH/Tm0ZHhOzbqfn
+ INxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:x-gm-message-state:from:to:cc:subject:date;
+ bh=yP5XHXLcK+UX9e2N5YzbTl9a4h8ihKkfwEUan36DPrg=;
+ b=5xZNntDlgMfVNO1f2Cbj8/qlipWxJ0JKKsjUsEpltEE3hrToFlG7Y0sOf1OcqEBqd0
+ rYCazFrD+PDobAaFrCHNBhTm12BMCgwPNsAopMj3dl+aE4Mq631S2JuXBj7Jn+mJk+2g
+ enwJeOjvR3YOVGk+uVp44k56pvbpbIJYADZBiixSlBMZRDU/suG/0vbM41qDbBVQMmNW
+ rxkUuAwe4h7WFaCr1eDD0HOME+Ds38OU2Cy5ssPq3tlrR4JMk8us1vUJLsdCuzJ+FA56
+ gO5ZP8rPRoVnr1Xk7plb1t3SP2MWlGJIdqJWmqlBbJXT389CZ9qSiGfTDI80bb1YORDQ
+ 1ALg==
+X-Gm-Message-State: ACrzQf0cS3cV8Qd2PMbHa0b6dQRZQbZtASltc0CfaFerLVrAMgoHWZib
+ +HqSa4ow8Q6m2eLdPLuf+26dknQQvE12rGrnLyXI/g==
+X-Google-Smtp-Source: AMsMyM5GqgO04FmX/wur2Jt+8ypcoEU8eotcYd1jKm89jw9hQAj1ZhLfSUj5pD6zTUMTtw3xNbjyMSejcFd/JFYW8jo=
+X-Received: by 2002:a05:6e02:164d:b0:2f1:869c:c45b with SMTP id
+ v13-20020a056e02164d00b002f1869cc45bmr1488365ilu.212.1663304885797; Thu, 15
+ Sep 2022 22:08:05 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-Cc: maz@kernel.org, drjones@redhat.com, shan.gavin@gmail.com,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
- corbet@lwn.net, linux-kernel@vger.kernel.org, zhenyzha@redhat.com,
- will@kernel.org, linux-kselftest@vger.kernel.org, bgardon@google.com,
- dmatlack@google.com, pbonzini@redhat.com, shuah@kernel.org,
- linux-arm-kernel@lists.infradead.org
+References: <20220504074807.3616813-1-aik@ozlabs.ru>
+In-Reply-To: <20220504074807.3616813-1-aik@ozlabs.ru>
+From: Anup Patel <anup@brainfault.org>
+Date: Fri, 16 Sep 2022 10:37:53 +0530
+Message-ID: <CAAhSdy0hxHjQkVj8TLPh4j=vBrX1QoZcJXNeRBPtf5ozdjQaTQ@mail.gmail.com>
+Subject: Re: [PATCH kernel] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE platform
+ dependent
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+ Fabiano Rosas <farosas@linux.ibm.com>, x86@kernel.org,
+ linux-mips@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
+ kvm-riscv@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,95 +91,141 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In the dirty ring case, we rely on vcpu exit due to full dirty ring
-state. On ARM64 system, there are 4096 host pages when the host
-page size is 64KB. In this case, the vcpu never exits due to the
-full dirty ring state. The similar case is 4KB page size on host
-and 64KB page size on guest. The vcpu corrupts same set of host
-pages, but the dirty page information isn't collected in the main
-thread. This leads to infinite loop as the following log shows.
+On Wed, May 4, 2022 at 1:18 PM Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>
+> When introduced, IRQFD resampling worked on POWER8 with XICS. However
+> KVM on POWER9 has never implemented it - the compatibility mode code
+> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
+> XIVE mode does not handle INTx in KVM at all.
+>
+> This moved the capability support advertising to platforms and stops
+> advertising it on XIVE, i.e. POWER9 and later.
+>
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+>
+>
+> Or I could move this one together with KVM_CAP_IRQFD. Thoughts?
 
-  # ./dirty_log_test -M dirty-ring -c 65536 -m 5
-  Setting log mode to: 'dirty-ring'
-  Test iterations: 32, interval: 10 (ms)
-  Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
-  guest physical test memory offset: 0xffbffe0000
-  vcpu stops because vcpu is kicked out...
-  Notifying vcpu to continue
-  vcpu continues now.
-  Iteration 1 collected 576 pages
-  <No more output afterwards>
+For KVM RISC-V:
+Acked-by: Anup Patel <anup@brainfault.org>
 
-Fix the issue by automatically choosing the best dirty ring size,
-to ensure vcpu exit due to full dirty ring state. The option '-c'
-becomes a hint to the dirty ring count, instead of the value of it.
+Thanks,
+Anup
 
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 26 +++++++++++++++++---
- 1 file changed, 22 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 7d91df7e036f..47ac2c719ade 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -23,6 +23,9 @@
- #include "guest_modes.h"
- #include "processor.h"
- 
-+#define DIRTY_MEM_BITS 30 /* 1G */
-+#define PAGE_SHIFT_4K  12
-+
- /* The memory slot index to track dirty pages */
- #define TEST_MEM_SLOT_INDEX		1
- 
-@@ -271,6 +274,24 @@ static bool dirty_ring_supported(void)
- 
- static void dirty_ring_create_vm_done(struct kvm_vm *vm)
- {
-+	uint64_t pages;
-+	uint32_t limit;
-+
-+	/*
-+	 * We rely on vcpu exit due to full dirty ring state. Adjust
-+	 * the ring buffer size to ensure we're able to reach the
-+	 * full dirty ring state.
-+	 */
-+	pages = (1ul << (DIRTY_MEM_BITS - vm->page_shift)) + 3;
-+	pages = vm_adjust_num_guest_pages(vm->mode, pages);
-+	if (vm->page_size < getpagesize())
-+		pages = vm_num_host_pages(vm->mode, pages);
-+
-+	limit = 1 << (31 - __builtin_clz(pages));
-+	test_dirty_ring_count = 1 << (31 - __builtin_clz(test_dirty_ring_count));
-+	test_dirty_ring_count = min(limit, test_dirty_ring_count);
-+	pr_info("dirty ring count: 0x%x\n", test_dirty_ring_count);
-+
- 	/*
- 	 * Switch to dirty ring mode after VM creation but before any
- 	 * of the vcpu creation.
-@@ -683,9 +704,6 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, struct kvm_vcpu **vcpu,
- 	return vm;
- }
- 
--#define DIRTY_MEM_BITS 30 /* 1G */
--#define PAGE_SHIFT_4K  12
--
- struct test_params {
- 	unsigned long iterations;
- 	unsigned long interval;
-@@ -828,7 +846,7 @@ static void help(char *name)
- 	printf("usage: %s [-h] [-i iterations] [-I interval] "
- 	       "[-p offset] [-m mode]\n", name);
- 	puts("");
--	printf(" -c: specify dirty ring size, in number of entries\n");
-+	printf(" -c: hint to dirty ring size, in number of entries\n");
- 	printf("     (only useful for dirty-ring test; default: %"PRIu32")\n",
- 	       TEST_DIRTY_RING_COUNT);
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
--- 
-2.23.0
-
+>
+> ---
+>  arch/arm64/kvm/arm.c       | 3 +++
+>  arch/mips/kvm/mips.c       | 3 +++
+>  arch/powerpc/kvm/powerpc.c | 6 ++++++
+>  arch/riscv/kvm/vm.c        | 3 +++
+>  arch/s390/kvm/kvm-s390.c   | 3 +++
+>  arch/x86/kvm/x86.c         | 3 +++
+>  virt/kvm/kvm_main.c        | 1 -
+>  7 files changed, 21 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 523bc934fe2f..092f0614bae3 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -210,6 +210,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>         case KVM_CAP_SET_GUEST_DEBUG:
+>         case KVM_CAP_VCPU_ATTRIBUTES:
+>         case KVM_CAP_PTP_KVM:
+> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> +       case KVM_CAP_IRQFD_RESAMPLE:
+> +#endif
+>                 r = 1;
+>                 break;
+>         case KVM_CAP_SET_GUEST_DEBUG2:
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index a25e0b73ee70..0f3de470a73e 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -1071,6 +1071,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>         case KVM_CAP_READONLY_MEM:
+>         case KVM_CAP_SYNC_MMU:
+>         case KVM_CAP_IMMEDIATE_EXIT:
+> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> +       case KVM_CAP_IRQFD_RESAMPLE:
+> +#endif
+>                 r = 1;
+>                 break;
+>         case KVM_CAP_NR_VCPUS:
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index 875c30c12db0..87698ffef3be 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -591,6 +591,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>                 break;
+>  #endif
+>
+> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> +       case KVM_CAP_IRQFD_RESAMPLE:
+> +               r = !xive_enabled();
+> +               break;
+> +#endif
+> +
+>         case KVM_CAP_PPC_ALLOC_HTAB:
+>                 r = hv_enabled;
+>                 break;
+> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+> index c768f75279ef..b58579b386bb 100644
+> --- a/arch/riscv/kvm/vm.c
+> +++ b/arch/riscv/kvm/vm.c
+> @@ -63,6 +63,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>         case KVM_CAP_READONLY_MEM:
+>         case KVM_CAP_MP_STATE:
+>         case KVM_CAP_IMMEDIATE_EXIT:
+> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> +       case KVM_CAP_IRQFD_RESAMPLE:
+> +#endif
+>                 r = 1;
+>                 break;
+>         case KVM_CAP_NR_VCPUS:
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 156d1c25a3c1..85e093fc8d13 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -564,6 +564,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>         case KVM_CAP_SET_GUEST_DEBUG:
+>         case KVM_CAP_S390_DIAG318:
+>         case KVM_CAP_S390_MEM_OP_EXTENSION:
+> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> +       case KVM_CAP_IRQFD_RESAMPLE:
+> +#endif
+>                 r = 1;
+>                 break;
+>         case KVM_CAP_SET_GUEST_DEBUG2:
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 0c0ca599a353..a0a7b769483d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4273,6 +4273,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>         case KVM_CAP_SYS_ATTRIBUTES:
+>         case KVM_CAP_VAPIC:
+>         case KVM_CAP_ENABLE_CAP:
+> +#ifdef CONFIG_HAVE_KVM_IRQFD
+> +       case KVM_CAP_IRQFD_RESAMPLE:
+> +#endif
+>                 r = 1;
+>                 break;
+>         case KVM_CAP_EXIT_HYPERCALL:
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 70e05af5ebea..885e72e668a5 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4293,7 +4293,6 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>  #endif
+>  #ifdef CONFIG_HAVE_KVM_IRQFD
+>         case KVM_CAP_IRQFD:
+> -       case KVM_CAP_IRQFD_RESAMPLE:
+>  #endif
+>         case KVM_CAP_IOEVENTFD_ANY_LENGTH:
+>         case KVM_CAP_CHECK_EXTENSION_VM:
+> --
+> 2.30.2
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
