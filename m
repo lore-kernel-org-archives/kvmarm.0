@@ -2,94 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 417F6ECAAA1
-	for <kvmarm@archiver.kernel.org>; Fri, 16 Sep 2022 18:10:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7863EC54EE9
+	for <kvmarm@archiver.kernel.org>; Sat, 17 Sep 2022 01:06:15 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ADCF64BBD8;
-	Fri, 16 Sep 2022 14:10:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEC454BD22;
+	Fri, 16 Sep 2022 21:06:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id apbJUz7fTptp; Fri, 16 Sep 2022 14:09:59 -0400 (EDT)
+	with ESMTP id 1tmbcjhSt+mG; Fri, 16 Sep 2022 21:06:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 72FD94BCB2;
-	Fri, 16 Sep 2022 14:09:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B04114BD2B;
+	Fri, 16 Sep 2022 21:06:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 285884BCB2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2022 14:09:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 915804BD23
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2022 21:06:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wMTLyvSPpUbD for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Sep 2022 14:09:58 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F31F84BCAB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2022 14:09:57 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1663351797;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=dGo9IIHnzVXPXPzRwNLgG2J2p1J5QcMOec8HOITKZNg=;
- b=WJwTwtrTw9Rh96kTdmSRUY7AZclZN2Dg56fVltfr5XtzmXcRcjvOgkcMQijXla8Lm3gKFJ
- mpfDn5gISn/1B4XcsUCHzrgaO0/EviZ3PQr/v7PnlEb9gw3avhUFevcoFoAmMSGCcnannN
- 6DcK0M82RlOr+ZjJelw9FPbypuEBvkw=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-640-8-RBgJHkPWOM6PWpK06oSQ-1; Fri, 16 Sep 2022 14:09:55 -0400
-X-MC-Unique: 8-RBgJHkPWOM6PWpK06oSQ-1
-Received: by mail-qv1-f72.google.com with SMTP id
- n15-20020ad444af000000b004a2a341ad71so15413869qvt.15
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2022 11:09:55 -0700 (PDT)
+ with ESMTP id WabydsyiLn-K for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Sep 2022 21:06:11 -0400 (EDT)
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com
+ [209.85.128.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6CAC34BD22
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2022 21:06:11 -0400 (EDT)
+Received: by mail-yw1-f201.google.com with SMTP id
+ 00721157ae682-345482ec6adso204519067b3.18
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Sep 2022 18:06:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+ :date; bh=FPmIZ20vcTUeBFUMKdaLzmUVq8vMch7/heQIwOJWf6I=;
+ b=tAFTWGiHh8oW2k7UJWEM5Y3bG6bkwLfnpOBuOdCuxk+rZNbmhhM1l8IU4cBn4WFKrb
+ f+bB///QmF1d/7+xnOluIe6aNNzsU/lygE9MKZ4u5pHcwCw01d1aCJb/eoO1IAQizUT1
+ 6U32afXpbaY8kj719kzrUygp/nfRYIjZ49AaIQimpwnLpBydSoAhrYNGHWF7BDK+beNY
+ 3wc+w1VqMEwZgog2px86mTYdBFIMt91uyhZLoqfnUawrlKGjR6xLgPAUPmuK2glEmm3u
+ zEij4qYIZUMQyO+6hI7HsBWaQ/MSXHMgD1vc6NGkoxA3wz4TLKzIJUoeMbADXFusTCs1
+ u5lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
- bh=dGo9IIHnzVXPXPzRwNLgG2J2p1J5QcMOec8HOITKZNg=;
- b=DyjMOnMNGidvuQ2z5jzHRL03EoeDllQILZrILpZb5NDt3EtOaNjkQCV7FwFJ03UzEh
- CMEEYBOvp3uF5CNpFl5mRK/kVPxgZV7hCZoe6cIGD0UsOrnc/9vNRts9suFkwtwoSPN8
- yP6xPWexa/CV2Tzc+wpgJ+oKKpTRFcGCx9HNzdf7pORXAtPl/QExOifOHCRq2mNvN0m8
- uYZgXm2tXo7BVN//LC6O5TLQkyxlUKLmAzv/UtYvXaALF4j/QgE/6Hk7yHmpI6wXVg0Q
- hJmKtMnfeE4U+XV9nv7MK2EpxUSl4jpXq//WHEtG7SSCHy0QRIIyTDwzbkAlDlUwCRQ3
- /0ow==
-X-Gm-Message-State: ACrzQf2fBmXvFGoiKyb4Xvt9cRiYABHSEqn4MmI81VrjgjnRW96nvO6o
- 0YVDpHyCTP/jXKU3puZQz8WNAmeDnUC0+BLUg0KjnsT4y1XlRPFuy1nhu3Yyshh2NLAxj763nKV
- gKmPTZN0ZMzgctNvOLIloowxQ
-X-Received: by 2002:ac8:5f4d:0:b0:35b:ba2e:ce1 with SMTP id
- y13-20020ac85f4d000000b0035bba2e0ce1mr5516867qta.26.1663351795091; 
- Fri, 16 Sep 2022 11:09:55 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5Eq8nutd1y8SgkrtcXFUsUl9UMHM0MnxQbGXx8ngkMtdvW9XgFJl7Id6By2Z5c1AZ7GoPT7w==
-X-Received: by 2002:ac8:5f4d:0:b0:35b:ba2e:ce1 with SMTP id
- y13-20020ac85f4d000000b0035bba2e0ce1mr5516842qta.26.1663351794880; 
- Fri, 16 Sep 2022 11:09:54 -0700 (PDT)
-Received: from xz-m1.local
- (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
- by smtp.gmail.com with ESMTPSA id
- l19-20020a05620a28d300b006b60d5a7205sm7398453qkp.51.2022.09.16.11.09.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 16 Sep 2022 11:09:54 -0700 (PDT)
-Date: Fri, 16 Sep 2022 14:09:52 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v2 1/5] KVM: x86: Introduce KVM_REQ_RING_SOFT_FULL
-Message-ID: <YyS78BqsQxKkLOiW@xz-m1.local>
-References: <20220916045135.154505-1-gshan@redhat.com>
- <20220916045135.154505-2-gshan@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <20220916045135.154505-2-gshan@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: maz@kernel.org, drjones@redhat.com, shan.gavin@gmail.com,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
- corbet@lwn.net, linux-kernel@vger.kernel.org, zhenyzha@redhat.com,
- will@kernel.org, linux-kselftest@vger.kernel.org, bgardon@google.com,
- dmatlack@google.com, pbonzini@redhat.com, shuah@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+ :from:to:cc:subject:date;
+ bh=FPmIZ20vcTUeBFUMKdaLzmUVq8vMch7/heQIwOJWf6I=;
+ b=XNl8304Sk8A1zVklXo1afIgT2a1VTB2hLBcDhNWoWzZp4KHO3MJWZWnuu+1W0OhcWu
+ JN/UirBKmxsMN87l+U1K7fdNVzP1WVKGHCwa3gAFtl/Q+RJai8y4s83ZOU4aLaDrXBso
+ 7RmKxYNkI2yNCcyyo3Os2JsMw2qhQJ+glHqZdZf0GeRtiQFqnMcxJsFlZWXsV6SKbTWY
+ KIs4wA187GaTxnGNhJOhOLSVTfjY65/8X5mrW2YXD8WJEnbjusoev80+qESloyJ6fO7a
+ WPubmY+aeJSOxLNTeZh+vAWV9jvsP6o7H5mAz2T9ragAvItosiIDyJTQaXE1KwqbodmQ
+ /vtg==
+X-Gm-Message-State: ACrzQf0YwHuW7caQPhPx0NguCHmcQI3Zt9cRF77Mf+kziyL0hqLxAStq
+ A2kpCwL0k4Ty+CKFptvxR0RFOac0fxI=
+X-Google-Smtp-Source: AMsMyM7+y1N9+gTgvFSbs1C1oHCJr2OfSIB0qnRQXA92Ps+jtzT3rtMrAlli+ZateJjndneNoW56QwXzWzI=
+X-Received: from reijiw-west4.c.googlers.com
+ ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
+ (user=reijiw job=sendgmr) by 2002:a25:8c07:0:b0:6af:ef09:be31 with SMTP id
+ k7-20020a258c07000000b006afef09be31mr6435316ybl.285.1663376770905; Fri, 16
+ Sep 2022 18:06:10 -0700 (PDT)
+Date: Fri, 16 Sep 2022 18:05:56 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
+Message-ID: <20220917010600.532642-1-reijiw@google.com>
+Subject: [PATCH v2 0/4] KVM: arm64: Fix bugs of single-step execution enabled
+ by userspace
+From: Reiji Watanabe <reijiw@google.com>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -106,66 +85,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Sep 16, 2022 at 12:51:31PM +0800, Gavin Shan wrote:
-> This adds KVM_REQ_RING_SOFT_FULL, which is raised when the dirty
-> ring of the specific VCPU becomes softly full in kvm_dirty_ring_push().
-> The VCPU is enforced to exit when the request is raised and its
-> dirty ring is softly full on its entrance.
-> 
-> Suggested-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> ---
->  arch/x86/kvm/x86.c       | 5 +++--
->  include/linux/kvm_host.h | 1 +
->  virt/kvm/dirty_ring.c    | 4 ++++
->  3 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 43a6a7efc6ec..7f368f59f033 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10265,8 +10265,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  	bool req_immediate_exit = false;
->  
->  	/* Forbid vmenter if vcpu dirty ring is soft-full */
-> -	if (unlikely(vcpu->kvm->dirty_ring_size &&
-> -		     kvm_dirty_ring_soft_full(&vcpu->dirty_ring))) {
-> +	if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
-> +	    kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
-> +		kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
->  		vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
->  		trace_kvm_dirty_ring_exit(vcpu);
->  		r = 0;
+This series fixes two bugs of single-step execution enabled by
+userspace, and add a test case for KVM_GUESTDBG_SINGLESTEP to
+the debug-exception test to verify the single-step behavior.
 
-As commented previously - can we use kvm_test_request() instead? because we
-don't want to unconditionally clear the bit.  Instead of making the request
-again, we can clear request only if !full.
+Patch 1 fixes a bug that KVM might unintentionally change PSTATE.SS
+for the guest when single-step execution is enabled for the vCPU by
+userspace.
 
-We can also safely move this into the block of below kvm_request_pending()
-as Marc used to suggest.
+Patch 2 fixes a bug that KVM could erroneously perform an extra
+single step (without returning to userspace) due to setting PSTATE.SS
+to 1 on every guest entry, when single-step execution is enabled for
+the vCPU by userspace.
 
-To explicitly use kvm_clear_request(), we may need to be careful on the
-memory barriers.  I'm wondering whether we should have moved
-smp_mb__after_atomic() into kvm_clear_request() because kvm_clear_request()
-is used outside kvm_check_request() and IIUC all the call sites should
-better have that barrier too to be safe.
+Patch 3-4 adds a test for KVM_GUESTDBG_SINGLESTEP to the
+debug-exception test to verify the single-step behavior.
 
-Side note: when I read the code around I also see some mis-use of clear
-request where it can be omitted, e.g.:
+The series is based on 6.0-rc5.
 
-		if (kvm_check_request(KVM_REQ_UNHALT, vcpu)) {
-			kvm_clear_request(KVM_REQ_UNHALT, vcpu);
-			vcpu->run->exit_reason = KVM_EXIT_IRQ_WINDOW_OPEN;
-		}
+v2:
+ - Change kvm_handle_guest_debug() to use switch/case statement [Marc]
+ - Clear PSTATE.SS on guest entry if the Software step state at the
+   last guest exit was "Active-pending" to make DBG_SS_ACTIVE_PENDING
+   and PSTATE.SS consistent [Marc]
+ - Add a fix to preserve PSTATE.SS for the guest.
 
-Maybe it's a sign of bad naming, so we should renamed kvm_check_request()
-to kvm_test_clear_request() too to show that clearing after that is not
-needed?
+v1: https://lore.kernel.org/all/20220909044636.1997755-1-reijiw@google.com/
 
-Thanks,
+Reiji Watanabe (4):
+  KVM: arm64: Preserve PSTATE.SS for the guest while single-step is
+    enabled
+  KVM: arm64: Clear PSTATE.SS when the Software Step state was
+    Active-pending
+  KVM: arm64: selftests: Refactor debug-exceptions to make it amenable
+    to new test cases
+  KVM: arm64: selftests: Add a test case for KVM_GUESTDBG_SINGLESTEP
 
+ arch/arm64/include/asm/kvm_host.h             |   4 +
+ arch/arm64/kvm/debug.c                        |  34 +++-
+ arch/arm64/kvm/guest.c                        |   1 +
+ arch/arm64/kvm/handle_exit.c                  |   8 +-
+ .../selftests/kvm/aarch64/debug-exceptions.c  | 149 +++++++++++++++++-
+ 5 files changed, 190 insertions(+), 6 deletions(-)
+
+
+base-commit: 80e78fcce86de0288793a0ef0f6acf37656ee4cf
 -- 
-Peter Xu
+2.37.3.968.ga6b4b080e4-goog
 
 _______________________________________________
 kvmarm mailing list
