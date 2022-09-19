@@ -2,76 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A80FAC54EE9
-	for <kvmarm@archiver.kernel.org>; Sun, 18 Sep 2022 23:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0568BC54EE9
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Sep 2022 01:27:59 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 199DB4B628;
-	Sun, 18 Sep 2022 19:58:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 478554B839;
+	Sun, 18 Sep 2022 21:27:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2wV0+fmpmD6v; Sun, 18 Sep 2022 19:58:33 -0400 (EDT)
+	with ESMTP id x1L3FQ-N3Q7m; Sun, 18 Sep 2022 21:27:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2A294B5F4;
-	Sun, 18 Sep 2022 19:58:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0DA74B836;
+	Sun, 18 Sep 2022 21:27:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 92CDB4B5F4
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Sep 2022 19:58:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 373654B7FA
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Sep 2022 21:27:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id h+qbrJTcbUfz for <kvmarm@lists.cs.columbia.edu>;
- Sun, 18 Sep 2022 19:58:31 -0400 (EDT)
+ with ESMTP id 9kjod9dfassz for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 18 Sep 2022 21:27:54 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 219C34B2A5
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Sep 2022 19:58:31 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CDDB74B836
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Sep 2022 21:27:54 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1663545510;
+ s=mimecast20190719; t=1663550874;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ud14KPmofNeyFdYS8YyOBxzic/NSH3aF62bCDlpoP+Q=;
- b=LKYOwjVOpE+B7UYJ/V7JtNuQNFpkX+Og9ZeaVSl+7K1xiVdWp1PzrK+eT+1rcaH9r6nnxl
- yaLZ0oPomTkjgczoJ2ET8QqlqIpNuWVaMHfqSkaSyPY40h7wUHn+qx01pO23Hx4NkcUaMm
- m0cu5bBJQr1wodHrvsWNAvyuXSwSLj0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=mTlHJkSe2zwoVsxiCcbcUXVRXRosTOKrm+znhbWqwWI=;
+ b=jEltpuvKknpBGp2cG2u1cMyzrj1eg8rsEbnPgeJTzymA+xbTg4qpVQzwSDC8k1GqfwwpHV
+ EVDA875PpEGOdw3uImdznLxY5NikTzuCor4FOAi2MfF1hecXUISC+AsfZe43vtfjPREsDJ
+ zyzH/Ezs6zBMHF1v+FuEBZoqEpTAe+A=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-455--_Ff72U0OI2N8p1iuC-k6A-1; Sun, 18 Sep 2022 19:58:24 -0400
-X-MC-Unique: -_Ff72U0OI2N8p1iuC-k6A-1
+ us-mta-464-Iy3PoTvROFe09ARVEqroCA-1; Sun, 18 Sep 2022 21:27:51 -0400
+X-MC-Unique: Iy3PoTvROFe09ARVEqroCA-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com
  [10.11.54.2])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CCEFA380673A;
- Sun, 18 Sep 2022 23:58:23 +0000 (UTC)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 568FE85A583;
+ Mon, 19 Sep 2022 01:27:50 +0000 (UTC)
 Received: from [10.64.54.126] (vpn2-54-126.bne.redhat.com [10.64.54.126])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 90F7C40C6EC3;
- Sun, 18 Sep 2022 23:58:14 +0000 (UTC)
-Subject: Re: [PATCH v2 1/5] KVM: x86: Introduce KVM_REQ_RING_SOFT_FULL
-To: Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>
-References: <20220916045135.154505-1-gshan@redhat.com>
- <20220916045135.154505-2-gshan@redhat.com> <YyS78BqsQxKkLOiW@xz-m1.local>
- <87illlkqfu.wl-maz@kernel.org>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A6E5A40C6EC2;
+ Mon, 19 Sep 2022 01:27:42 +0000 (UTC)
+Subject: Re: [PATCH v2 2/5] KVM: arm64: Enable ring-based dirty memory tracking
+To: kernel test robot <lkp@intel.com>, kvmarm@lists.cs.columbia.edu
+References: <20220916045135.154505-3-gshan@redhat.com>
+ <202209180726.FLL69aKA-lkp@intel.com>
 From: Gavin Shan <gshan@redhat.com>
-Message-ID: <a2e0b9bc-2c67-8683-d722-7298bd65058c@redhat.com>
-Date: Mon, 19 Sep 2022 09:58:10 +1000
+Message-ID: <fbf2bbe6-06d7-8e06-3f7f-04ca01d604c0@redhat.com>
+Date: Mon, 19 Sep 2022 11:27:40 +1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <87illlkqfu.wl-maz@kernel.org>
+In-Reply-To: <202209180726.FLL69aKA-lkp@intel.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-Cc: drjones@redhat.com, shan.gavin@gmail.com, kvm@vger.kernel.org,
- linux-doc@vger.kernel.org, catalin.marinas@arm.com, corbet@lwn.net,
- linux-kernel@vger.kernel.org, zhenyzha@redhat.com, will@kernel.org,
- linux-kselftest@vger.kernel.org, bgardon@google.com, dmatlack@google.com,
- pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
+Cc: maz@kernel.org, drjones@redhat.com, kbuild-all@lists.01.org,
+ shan.gavin@gmail.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ catalin.marinas@arm.com, corbet@lwn.net, linux-kernel@vger.kernel.org,
+ zhenyzha@redhat.com, will@kernel.org, linux-kselftest@vger.kernel.org,
+ bgardon@google.com, dmatlack@google.com, pbonzini@redhat.com, shuah@kernel.org,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -90,109 +89,50 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 9/18/22 7:00 PM, Marc Zyngier wrote:
-> On Fri, 16 Sep 2022 19:09:52 +0100,
-> Peter Xu <peterx@redhat.com> wrote:
->>
->> On Fri, Sep 16, 2022 at 12:51:31PM +0800, Gavin Shan wrote:
->>> This adds KVM_REQ_RING_SOFT_FULL, which is raised when the dirty
->>> ring of the specific VCPU becomes softly full in kvm_dirty_ring_push().
->>> The VCPU is enforced to exit when the request is raised and its
->>> dirty ring is softly full on its entrance.
->>>
->>> Suggested-by: Marc Zyngier <maz@kernel.org>
->>> Signed-off-by: Gavin Shan <gshan@redhat.com>
->>> ---
->>>   arch/x86/kvm/x86.c       | 5 +++--
->>>   include/linux/kvm_host.h | 1 +
->>>   virt/kvm/dirty_ring.c    | 4 ++++
->>>   3 files changed, 8 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>> index 43a6a7efc6ec..7f368f59f033 100644
->>> --- a/arch/x86/kvm/x86.c
->>> +++ b/arch/x86/kvm/x86.c
->>> @@ -10265,8 +10265,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->>>   	bool req_immediate_exit = false;
->>>   
->>>   	/* Forbid vmenter if vcpu dirty ring is soft-full */
->>> -	if (unlikely(vcpu->kvm->dirty_ring_size &&
->>> -		     kvm_dirty_ring_soft_full(&vcpu->dirty_ring))) {
->>> +	if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
->>> +	    kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
->>> +		kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
->>>   		vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
->>>   		trace_kvm_dirty_ring_exit(vcpu);
->>>   		r = 0;
->>
->> As commented previously - can we use kvm_test_request() instead? because we
->> don't want to unconditionally clear the bit.  Instead of making the request
->> again, we can clear request only if !full.
+On 9/18/22 1:10 AM, kernel test robot wrote:
+> Thank you for the patch! Perhaps something to improve:
 > 
-> I have the feeling that this is a micro-optimisation that won't lead
-> to much benefit in practice. You already have the cache line, just not
-> in exclusive mode, and given that this is per-vcpu, you'd only see the
-> cost if someone else is setting a request to this vcpu while
-> evaluating the local requests.
+> [auto build test WARNING on kvm/queue]
+> [also build test WARNING on kvmarm/next linus/master v6.0-rc5 next-20220916]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
 > 
-> And now you need extra barriers...
+> url:    https://github.com/intel-lab-lkp/linux/commits/Gavin-Shan/KVM-arm64-Enable-ring-based-dirty-memory-tracking/20220916-125417
+> base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+> config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20220918/202209180726.FLL69aKA-lkp@intel.com/config)
+> compiler: aarch64-linux-gcc (GCC) 12.1.0
+> reproduce (this is a W=1 build):
+>          wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>          chmod +x ~/bin/make.cross
+>          # https://github.com/intel-lab-lkp/linux/commit/a1a4cd8f6a5e8927f800baff7d965870a1b7d7ba
+>          git remote add linux-review https://github.com/intel-lab-lkp/linux
+>          git fetch --no-tags linux-review Gavin-Shan/KVM-arm64-Enable-ring-based-dirty-memory-tracking/20220916-125417
+>          git checkout a1a4cd8f6a5e8927f800baff7d965870a1b7d7ba
+>          # save the config file
+>          mkdir build_dir && cp config build_dir/.config
+>          COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash
 > 
-> Also, can we please refrain from changing things without data showing
-> that this actually is worse than what we had before? The point below
-> makes me think that this is actually beneficial as is.
+> If you fix the issue, kindly add following tag where applicable
+> Reported-by: kernel test robot <lkp@intel.com>
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>>> arch/arm64/kvm/../../../virt/kvm/dirty_ring.c:14:12: warning: no previous prototype for 'kvm_cpu_dirty_log_size' [-Wmissing-prototypes]
+>        14 | int __weak kvm_cpu_dirty_log_size(void)
+>           |            ^~~~~~~~~~~~~~~~~~~~~~
+> 
 > 
 
-I think Marc's explanation makes sense. It won't make difference in terms
-of performance. We need to explicitly handle barrier when kvm_test_request()
-is used. So I prefer to keep the code if Peter agrees.
+[...]
 
->> We can also safely move this into the block of below kvm_request_pending()
->> as Marc used to suggest.
-> 
-> This, on the other hand, makes sure that we share the cost across all
-> requests. Requests should be extremely rare anyway (and if they
-> aren't, you have a whole lot of performance issues on your hands
-> anyway).
-> 
-
-Yeah, We shouldn't have too much requests. I missed the comment from Marc
-to move this chunk to kvm_request_pending(). I will fix it in v3.
-
->>
->> To explicitly use kvm_clear_request(), we may need to be careful on the
->> memory barriers.  I'm wondering whether we should have moved
->> smp_mb__after_atomic() into kvm_clear_request() because kvm_clear_request()
->> is used outside kvm_check_request() and IIUC all the call sites should
->> better have that barrier too to be safe.
->>
->> Side note: when I read the code around I also see some mis-use of clear
->> request where it can be omitted, e.g.:
->>
->> 		if (kvm_check_request(KVM_REQ_UNHALT, vcpu)) {
->> 			kvm_clear_request(KVM_REQ_UNHALT, vcpu);
->> 			vcpu->run->exit_reason = KVM_EXIT_IRQ_WINDOW_OPEN;
->> 		}
->>
->> Maybe it's a sign of bad naming, so we should renamed kvm_check_request()
->> to kvm_test_clear_request() too to show that clearing after that is not
->> needed?
-> 
-> Yeah, this kvm_clear_request() is superfluous. But this is rather well
-> documented, for once, and I don't think we should repaint it based on
-> a sample of one.
-> 
-
-Yeah, I think Peter is correct that smp_mb__after_atomic() would be
-part of kvm_clear_request(). Otherwise, the following two cases aren't
-in same order:
-
-       // kvm_check_request()             // test and clear
-       kvm_test_request()                 kvm_test_request()
-       kvm_clear_request()                kvm_clear_request()
-       smp_mb__after_atomic()
+Thanks for reporting the issue. The weak function needn't to be overrided by
+ARM64. In v3, I will have a separate patch to fix the issue by moving its
+declaration to kvm_dirty_ring.h.
 
 Thanks,
 Gavin
+
 
 _______________________________________________
 kvmarm mailing list
