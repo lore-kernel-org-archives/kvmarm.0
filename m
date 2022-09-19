@@ -2,74 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F35A9C54EE9
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Sep 2022 10:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8CE1ECAAD3
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Sep 2022 14:30:15 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D86140B7D;
-	Mon, 19 Sep 2022 06:38:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4603D4B71F;
+	Mon, 19 Sep 2022 10:30:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Bc2J3waGkx3y; Mon, 19 Sep 2022 06:38:25 -0400 (EDT)
+	with ESMTP id ZxmHMhVAm0eC; Mon, 19 Sep 2022 10:30:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3540F4B703;
-	Mon, 19 Sep 2022 06:38:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD4324B647;
+	Mon, 19 Sep 2022 10:30:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C946C4B6F0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 06:38:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 693BE4B63F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 10:30:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WagXZtN5Rv0T for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Sep 2022 06:38:23 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9507A4B62A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 06:38:23 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id A139860F47;
- Mon, 19 Sep 2022 10:38:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C13FC433C1;
- Mon, 19 Sep 2022 10:38:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1663583902;
- bh=j39Tp6VEuKTc+/AErRW9+NoKA7wEq5qplZoA/aOI984=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=slWmdQiMz1SGG8Du5GM9EVagfY+ZyQK6DBE6JAeeZt6F5bM9WjFGBbnn+iGubwDS6
- X+9uqOVMyvZYNdsXEGKkZTS486moQ0safhy2x67peNtApnpf+i5o7my3/Y3t2/3vKE
- GDoxXcRtwQRIGwBzzUGk6x1eStGV8g7SmzpFJvtjThgvDUx2aI/DzyqZqcA4DISd2v
- ++jE5lRiUbLf91O2V9oAJXgCf4HcOE3JqDM2ojrxOs2HI7WfRw2cZfRIo1zEu7fJVR
- KECLSvllYvbFsMmHKBoSJMSDuoAR+1932VEiYxvnd6QomW48DBF4I79KCjjQ8jPJp1
- Mdl9rgUfFKDyA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oaEAO-00B4ku-48;
- Mon, 19 Sep 2022 11:38:20 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvm@vger.kernel.org, Ricardo Koller <ricarkol@google.com>,
- kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev
-Subject: Re: [PATCH v6 00/13] KVM: selftests: Add aarch64/page_fault_test
-Date: Mon, 19 Sep 2022 11:38:17 +0100
-Message-Id: <166358370892.2832387.8903539023908338224.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220906180930.230218-1-ricarkol@google.com>
-References: <20220906180930.230218-1-ricarkol@google.com>
+ with ESMTP id 6Ld0Mc1DwlbD for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Sep 2022 10:30:10 -0400 (EDT)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 988C94B601
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 10:30:09 -0400 (EDT)
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.57])
+ by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MWRm40twvzMn0m;
+ Mon, 19 Sep 2022 22:25:24 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (7.193.23.208) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 19 Sep 2022 22:30:04 +0800
+Received: from [10.174.185.179] (10.174.185.179) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 19 Sep 2022 22:30:03 +0800
+Subject: Re: [kvm-unit-tests PATCH v4 07/12] arm: pmu: Basic event counter
+ Tests
+To: Eric Auger <eric.auger@redhat.com>
+References: <20200403071326.29932-1-eric.auger@redhat.com>
+ <20200403071326.29932-8-eric.auger@redhat.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <8fa32eeb-f629-6c27-3b5f-a9a81656a679@huawei.com>
+Date: Mon, 19 Sep 2022 22:30:01 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, ricarkol@google.com,
- kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev, seanjc@google.com,
- pbonzini@redhat.com, rananta@google.com, dmatlack@google.com,
- bgardon@google.com, reijiw@google.com, axelrasmussen@google.com,
- oupton@google.com, alexandru.elisei@arm.com, eric.auger@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: bgardon@google.com, axelrasmussen@google.com, dmatlack@google.com,
- pbonzini@redhat.com
+In-Reply-To: <20200403071326.29932-8-eric.auger@redhat.com>
+Content-Language: en-US
+X-Originating-IP: [10.174.185.179]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
+X-CFilter-Loop: Reflected
+Cc: kvm@vger.kernel.org, maz@kernel.org, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, andre.przywara@arm.com, andrew.murray@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,56 +67,176 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 6 Sep 2022 18:09:17 +0000, Ricardo Koller wrote:
-> This series adds a new aarch64 selftest for testing stage 2 fault handling for
-> various combinations of guest accesses (e.g., write, S1PTW), backing sources
-> (e.g., anon), and types of faults (e.g., read on hugetlbfs with a hole, write
-> on a readonly memslot). Each test tries a different combination and then checks
-> that the access results in the right behavior (e.g., uffd faults with the right
-> address and write/read flag). Some interesting combinations are:
+Hi Eric,
+
+A few comments when looking through the PMU test code (2 years after
+the series was merged).
+
+On 2020/4/3 15:13, Eric Auger wrote:
+> Adds the following tests:
+> - event-counter-config: test event counter configuration
+> - basic-event-count:
+>   - programs counters #0 and #1 to count 2 required events
+>   (resp. CPU_CYCLES and INST_RETIRED). Counter #0 is preset
+>   to a value close enough to the 32b
+>   overflow limit so that we check the overflow bit is set
+>   after the execution of the asm loop.
+> - mem-access: counts MEM_ACCESS event on counters #0 and #1
+>   with and without 32-bit overflow.
 > 
-> [...]
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
-Given how long this has been around, I've picked this series up, applying
-Oliver's fixes in the process. Any additional fixes will be added on top.
+[...]
 
-Applied to next, thanks!
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index 8c49e50..45dccf7 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -38,6 +43,7 @@
+>  #define SW_INCR			0x0
+>  #define INST_RETIRED		0x8
+>  #define CPU_CYCLES		0x11
+> +#define MEM_ACCESS		0x13
+>  #define INST_PREC		0x1B
 
-[01/13] KVM: selftests: Add a userfaultfd library
-        commit: b9e9f0060d69ace412846b3dda318189e74d80ea
-[02/13] KVM: selftests: aarch64: Add virt_get_pte_hva() library function
-        commit: b3e02786e384d83637fc29dca2af9604a6314e62
-[03/13] KVM: selftests: Add missing close and munmap in __vm_mem_region_delete()
-        commit: 77c071a5376c9fdc0c510138d081af5e6ead754d
-[04/13] KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1 using sysreg.h macros
-        commit: a68c2b6545af95729eb57fe39f173557d1f22649
-[05/13] tools: Copy bitfield.h from the kernel sources
-        commit: 8998ed5834af0a9cc3de8d5bd485576c654620fc
-[06/13] KVM: selftests: Stash backing_src_type in struct userspace_mem_region
-        commit: 20a8d07c0828592d72c756c98f2708e905bfabd3
-[07/13] KVM: selftests: Change ____vm_create() to take struct kvm_vm_mem_params
-        commit: cb7f9c457b94b2ad71eaf9621a9e7f3e9c3832db
-[08/13] KVM: selftests: Use the right memslot for code, page-tables, and data allocations
-        commit: 72ad71ddb5fae4dc26a2fa7e885213598baab9ad
-[09/13] KVM: selftests: aarch64: Add aarch64/page_fault_test
-        commit: fa7b86adf85be5de36a797df7b1509542af1f119
-[10/13] KVM: selftests: aarch64: Add userfaultfd tests into page_fault_test
-        commit: 596fcc0f6888241b0b2f02577a2b608f274b299d
-[11/13] KVM: selftests: aarch64: Add dirty logging tests into page_fault_test
-        commit: 0740d435146f69be9950df5dd45a31fbaec943ba
-[12/13] KVM: selftests: aarch64: Add readonly memslot tests into page_fault_test
-        commit: a9246644455d51faa4063749bb17aa7e060adc70
-[13/13] KVM: selftests: aarch64: Add mix of tests into page_fault_test
-        commit: 383d48a1442ca477732ea77d6231b3cc73b9d7f8
+The spec spells event 0x001B as INST_SPEC.
 
-Cheers,
+>  #define STALL_FRONTEND		0x23
+>  #define STALL_BACKEND		0x24
 
-	M.
+[...]
+
+> @@ -175,6 +188,11 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>  }
+>  
+>  #define PMCEID1_EL0 sys_reg(3, 3, 9, 12, 7)
+> +#define PMCNTENSET_EL0 sys_reg(3, 3, 9, 12, 1)
+> +#define PMCNTENCLR_EL0 sys_reg(3, 3, 9, 12, 2)
+> +
+> +#define PMEVTYPER_EXCLUDE_EL1 BIT(31)
+
+Unused macro.
+
+> +#define PMEVTYPER_EXCLUDE_EL0 BIT(30)
+>  
+>  static bool is_event_supported(uint32_t n, bool warn)
+>  {
+> @@ -228,6 +246,224 @@ static void test_event_introspection(void)
+>  	report(required_events, "Check required events are implemented");
+>  }
+>  
+> +/*
+> + * Extra instructions inserted by the compiler would be difficult to compensate
+> + * for, so hand assemble everything between, and including, the PMCR accesses
+> + * to start and stop counting. isb instructions are inserted to make sure
+> + * pmccntr read after this function returns the exact instructions executed
+> + * in the controlled block. Loads @loop times the data at @address into x9.
+> + */
+> +static void mem_access_loop(void *addr, int loop, uint32_t pmcr)
+> +{
+> +asm volatile(
+> +	"       msr     pmcr_el0, %[pmcr]\n"
+> +	"       isb\n"
+> +	"       mov     x10, %[loop]\n"
+> +	"1:     sub     x10, x10, #1\n"
+> +	"       ldr	x9, [%[addr]]\n"
+> +	"       cmp     x10, #0x0\n"
+> +	"       b.gt    1b\n"
+> +	"       msr     pmcr_el0, xzr\n"
+> +	"       isb\n"
+> +	:
+> +	: [addr] "r" (addr), [pmcr] "r" (pmcr), [loop] "r" (loop)
+> +	: "x9", "x10", "cc");
+> +}
+> +
+> +static void pmu_reset(void)
+> +{
+> +	/* reset all counters, counting disabled at PMCR level*/
+> +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
+> +	/* Disable all counters */
+> +	write_sysreg_s(ALL_SET, PMCNTENCLR_EL0);
+> +	/* clear overflow reg */
+> +	write_sysreg(ALL_SET, pmovsclr_el0);
+> +	/* disable overflow interrupts on all counters */
+> +	write_sysreg(ALL_SET, pmintenclr_el1);
+> +	isb();
+> +}
+> +
+> +static void test_event_counter_config(void)
+> +{
+> +	int i;
+> +
+> +	if (!pmu.nb_implemented_counters) {
+> +		report_skip("No event counter, skip ...");
+> +		return;
+> +	}
+> +
+> +	pmu_reset();
+> +
+> +	/*
+> +	 * Test setting through PMESELR/PMXEVTYPER and PMEVTYPERn read,
+
+s/PMESELR/PMSELR/ ?
+
+> +	 * select counter 0
+> +	 */
+> +	write_sysreg(1, PMSELR_EL0);
+> +	/* program this counter to count unsupported event */
+> +	write_sysreg(0xEA, PMXEVTYPER_EL0);
+> +	write_sysreg(0xdeadbeef, PMXEVCNTR_EL0);
+> +	report((read_regn_el0(pmevtyper, 1) & 0xFFF) == 0xEA,
+> +		"PMESELR/PMXEVTYPER/PMEVTYPERn");
+
+Ditto
+
+> +	report((read_regn_el0(pmevcntr, 1) == 0xdeadbeef),
+> +		"PMESELR/PMXEVCNTR/PMEVCNTRn");
+
+Ditto
+
+> +
+> +	/* try to configure an unsupported event within the range [0x0, 0x3F] */
+> +	for (i = 0; i <= 0x3F; i++) {
+> +		if (!is_event_supported(i, false))
+> +			break;
+> +	}
+> +	if (i > 0x3F) {
+> +		report_skip("pmevtyper: all events within [0x0, 0x3F] are supported");
+> +		return;
+> +	}
+> +
+> +	/* select counter 0 */
+> +	write_sysreg(0, PMSELR_EL0);
+> +	/* program this counter to count unsupported event */
+
+We get the unsupported event number *i* but don't program it into
+PMXEVTYPER_EL0 (or PMEVTYPER0_EL0). Is it intentional?
+
+> +	write_sysreg(i, PMXEVCNTR_EL0);
+> +	/* read the counter value */
+> +	read_sysreg(PMXEVCNTR_EL0);
+> +	report(read_sysreg(PMXEVCNTR_EL0) == i,
+> +		"read of a counter programmed with unsupported event");
+> +
+> +}
+
+[...]
+
+> +
+> +static void test_mem_access(void)
+> +{
+> +	void *addr = malloc(PAGE_SIZE);
+
+*addr* isn't freed at the end of test_mem_access(). The same in
+test_chain_promotion() and test_overflow_interrupt().
+
+Zenghui
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
