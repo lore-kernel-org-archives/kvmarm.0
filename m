@@ -2,81 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E38ACECAAA1
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Sep 2022 19:21:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85BCAC6FA82
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Sep 2022 19:29:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36B8D4B6B2;
-	Mon, 19 Sep 2022 15:21:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EEAB849F3B;
+	Mon, 19 Sep 2022 15:29:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FFGwQQqc9BEi; Mon, 19 Sep 2022 15:21:28 -0400 (EDT)
+	with ESMTP id SEXxc30q+8Zh; Mon, 19 Sep 2022 15:29:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 985104B649;
-	Mon, 19 Sep 2022 15:21:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D0334B649;
+	Mon, 19 Sep 2022 15:29:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ABE3C4B642
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 15:21:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 358774B646
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 15:29:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kIWnwSWDQkUi for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Sep 2022 15:21:25 -0400 (EDT)
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com
- [209.85.215.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0E56B4B62F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 15:21:24 -0400 (EDT)
-Received: by mail-pg1-f178.google.com with SMTP id t70so258061pgc.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 12:21:24 -0700 (PDT)
+ with ESMTP id kI66YzMKGSvx for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Sep 2022 15:29:19 -0400 (EDT)
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com
+ [209.85.214.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB55249F3B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 15:29:18 -0400 (EDT)
+Received: by mail-pl1-f174.google.com with SMTP id w13so173504plp.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 12:29:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date;
- bh=+zKTufCzCk2dGKk9eVRPtRirzPeAiEqvG0llJqEDUAE=;
- b=skU2BCmPbpEXLeou3qOCOdVl/Zxw8ziKV078rXYWNID4opIQvO2RYdgLFCE/b3c05M
- rkF8MSULZw0QZiqV6shXe5rr+xfcSVWXwfUevacwb9kFob6vUPzGGQvxIp6kiMQ08xFi
- R6QFHgHzPu2KRwq16uFytHj4Mu070U8gyAlWDN0BTA4FQx2743G9/tLnAM/V83DqYjRy
- dtjYSCVORPVNC4AMnnL+fT4YNTIS4in7LZONv+ULB09/HVnpNk4HDDv4SY6c4qKGc8a3
- rm8FIG2Q4zfbYCxhGTweBW7LAKTomPDkvyrL0JsgGQlj5HkvQOcwJ8EOf2zvrH9Iv4us
- W0Mg==
+ h=in-reply-to:content-transfer-encoding:content-disposition
+ :mime-version:references:message-id:subject:cc:to:from:date:from:to
+ :cc:subject:date;
+ bh=Dmji6WgZ7xPVoBunBQhcBqAmOM/CFg7OpLk7cNx+uc8=;
+ b=d46SJWkeiDSnWutSydUXgew9qteyyKBJCMX7dT5wUkhHj4yXZv4QSaRTIP4boV4OZS
+ mqqvUXpLbkFGFkEiK9eCv8NFZWCoTAo9PrUSCWWjDS0J9ObVikPpB8KA8INU02Fx2geN
+ 4gv66dh4SsimsRuPojY+fAYWWpG3lwY4HG58utPl9/e/tqA0+l/CHvTfGY0IZc0DysFu
+ VbKS1pLZ81rhkZy7gjWxVsgKyRcU9kksvq7WFw14UIMaVQOsLb0ysekH4z9BDrzhYOZG
+ 3vgc7MuKNxAdMSb9tcc1X3lI4BIDOJkleeXpa1nQdnQOctRTynfDks7LaEow+Swb+fNm
+ /NSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
- bh=+zKTufCzCk2dGKk9eVRPtRirzPeAiEqvG0llJqEDUAE=;
- b=pOHVrxivZkUtctu1jYArLXRK39wlEpME/5jg6Ek1k6W/hV7TO+OWe8HKufhfDxZqXS
- fEohvT7ZJ2KkIB5vzQxBF3l3qvGewQCcMgmjBiYTBejIHi/tHrZaIPKCvmSdEZ0mXOdm
- 6Qe+T1UBt/KzjrucAiV2cNjka+GitOTQi5W1kSJpJJNEDpodchwJyEToBNoI3YLd5d1u
- 10ArU4yYEhIeMRqBLXVqqAYaYyTFJueCvLz8wFXzpyig0cFcA4PjMaOSqp22qbe178so
- 42yKoDTEMMbgM/s3VfmDyClMTAO2xNBrgl28Q37jzzJh2BFRxWLp9oMwqHqgRQLUcj+6
- BExQ==
-X-Gm-Message-State: ACrzQf1ijxwXlLm12IWDH2ur5KkQEBYlPlSiKWpPjHkGcABOpCfMhngE
- xUG3dJOIQWib0cvKyadkSJjZtw==
-X-Google-Smtp-Source: AMsMyM6fhlg0EO/LevOrUAKUlsIv6YoQ5Sw5acnMyMW6J9CaGWOqAfwa7gXvoHZpMZrWWc1vqU4Arw==
-X-Received: by 2002:a62:d403:0:b0:54b:a7e4:909c with SMTP id
- a3-20020a62d403000000b0054ba7e4909cmr15583864pfh.61.1663615283696; 
- Mon, 19 Sep 2022 12:21:23 -0700 (PDT)
+ h=in-reply-to:content-transfer-encoding:content-disposition
+ :mime-version:references:message-id:subject:cc:to:from:date
+ :x-gm-message-state:from:to:cc:subject:date;
+ bh=Dmji6WgZ7xPVoBunBQhcBqAmOM/CFg7OpLk7cNx+uc8=;
+ b=vZ8U0xNBPo0w7gUEoie67rOW/lZMOD/xxQIFs0wt1LHCEM6jOxRTHwFA24VcP3SmU4
+ gTUtcTrRyZT0AZdqZsGrd/1CK4OghB2+UZc8X/EXc/5SRWHyZFyr6FjRzxl/m8i1sxNR
+ wf4rpXhGmb+DUZHML18ZJw3Nr0oG9a2App21kPtWJ/v1B4eacYikf8WkV9+K5AmDKnKP
+ 0sMMPGyeLuQmOY1git/WzNd/in3RGCp2oO7v3UHHXrJvjNcgmIJOfPnleydZ0BJl8g0m
+ Stoc4124Mzks0vyOv2oDc6zzZm92RqFQlN0sb2urJOwQ7wpvYCY6lLbPQ5soKX+whCF/
+ 3O9w==
+X-Gm-Message-State: ACrzQf10RNsFMb5yv2NLKCfpZ/MQx5B0MHGCS9DscMJiAHRF1rDZPr8l
+ 6+vYB0rX5MbTJ1WwuilGMTE06A==
+X-Google-Smtp-Source: AMsMyM5Oqrj1KGICJ2V8qLt8Rn5ylazcb1hHMnzGoS7sR/Pu1B8N4zBf1uOM+cWrKxXEfgatHaqV0g==
+X-Received: by 2002:a17:90b:1e49:b0:203:38c:365a with SMTP id
+ pi9-20020a17090b1e4900b00203038c365amr33037441pjb.133.1663615757758; 
+ Mon, 19 Sep 2022 12:29:17 -0700 (PDT)
 Received: from google.com (220.181.82.34.bc.googleusercontent.com.
  [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
- l63-20020a622542000000b0054b5239f7fesm7365636pfl.210.2022.09.19.12.21.22
+ c199-20020a624ed0000000b0053ea0e5556esm20738942pfb.186.2022.09.19.12.29.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Sep 2022 12:21:22 -0700 (PDT)
-Date: Mon, 19 Sep 2022 12:21:19 -0700
+ Mon, 19 Sep 2022 12:29:17 -0700 (PDT)
+Date: Mon, 19 Sep 2022 12:29:13 -0700
 From: Ricardo Koller <ricarkol@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v6 07/13] KVM: selftests: Change ____vm_create() to take
- struct kvm_vm_mem_params
-Message-ID: <YyjBL+t1SXdRfij1@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH v6 09/13] KVM: selftests: aarch64: Add
+ aarch64/page_fault_test
+Message-ID: <YyjDCWCJ5j8c6T2h@google.com>
 References: <20220906180930.230218-1-ricarkol@google.com>
- <20220906180930.230218-8-ricarkol@google.com>
- <YyiYqjjhlB8LUVB/@google.com>
+ <20220906180930.230218-10-ricarkol@google.com>
+ <YyZDBIQsux1g97zl@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <YyiYqjjhlB8LUVB/@google.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
- andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com,
- axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <YyZDBIQsux1g97zl@google.com>
+Cc: kvm@vger.kernel.org, andrew.jones@linux.dev, maz@kernel.org,
+ bgardon@google.com, pbonzini@redhat.com, axelrasmussen@google.com,
+ kvmarm@lists.cs.columbia.edu, dmatlack@google.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,331 +90,75 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Sep 19, 2022 at 04:28:26PM +0000, Sean Christopherson wrote:
-> On Tue, Sep 06, 2022, Ricardo Koller wrote:
-> > @@ -637,19 +658,45 @@ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
-> >  			      vm_paddr_t paddr_min, uint32_t memslot);
-> >  vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
-> >  
-> > +struct kvm_vm_mem_params {
-> > +	enum vm_guest_mode mode;
-> > +
-> > +	struct {
-> > +		enum vm_mem_backing_src_type src_type;
-> > +		uint64_t guest_paddr;
-> > +		/*
-> > +		 * KVM region slot (same meaning as in struct
-> > +		 * kvm_userspace_memory_region).
-> > +		 */
-> > +		uint32_t slot;
-> > +		uint64_t npages;
-> > +		uint32_t flags;
-> > +		bool enabled;
-> 
-> "enabled" is unnecessary, just have ____vm_create() skip over regions with npages=0.
-> Likely ends up being a moot point though.
-> 
-> > +	} region[NR_MEM_REGIONS];
-> > +
-> > +	/* Each region type points to a region in the above array. */
-> > +	uint16_t region_idx[NR_MEM_REGIONS];
-> 
-> Eww.  This is going to be super confusing and it's one more thing for tests to
-> screw up.  And open coding the indices for region[] is beyond gross.
-> 
-> > +};
-> > +
-> > +extern struct kvm_vm_mem_params kvm_vm_mem_default;
-> > +
-> >  /*
-> >   * ____vm_create() does KVM_CREATE_VM and little else.  __vm_create() also
-> >   * loads the test binary into guest memory and creates an IRQ chip (x86 only).
-> >   * __vm_create() does NOT create vCPUs, @nr_runnable_vcpus is used purely to
-> >   * calculate the amount of memory needed for per-vCPU data, e.g. stacks.
-> >   */
-> > -struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages);
-> > +struct kvm_vm *____vm_create(struct kvm_vm_mem_params *mem_params);
-> >  struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
-> >  			   uint64_t nr_extra_pages);
-> >  
-> >  static inline struct kvm_vm *vm_create_barebones(void)
-> >  {
-> > -	return ____vm_create(VM_MODE_DEFAULT, 0);
-> > +	struct kvm_vm_mem_params params_wo_memslots = {
-> > +		.mode = kvm_vm_mem_default.mode,
-> > +	};
-> > +
-> > +	return ____vm_create(&params_wo_memslots);
-> 
-> Very related to the above complaints, this is rather ugly.  I liked the idea of
-> passing a struct to __vm_create(), but passing it to ____vm_create() feels extremely
-> forced.
-> 
-> In an ideal world, my preference would still be to modify __vm_create() to take the
-> struct so that a test that wants to utilize different memslots doesn't need to
-> manually duplicate all the other stuff in __vm_create(), but that might end up
-> being too forced as well.  For now, I'm ok punting on that so the page_fault_test
-> can get merged.
-> 
-> Looking at this with fresh eyes, there's simply no reason ____vm_create() should be
-> creating memslots.  If this series first moves the memslot creation into __vm_create()
-> where it belongs (patch below), then there's no need to force ____vm_create() to take
-> a struct.  And if we punt on refactoring __vm_create(), then there's no need to
-> add kvm_vm_mem_default and no real need to add struct kvm_vm_mem_params either.
-
-I think I prefer option A below. And I will take the offer of punting on
-refactoring __vm_create() for after page_fault_test.
-
-Having a struct would be nice, as that will allow tests to do things
-like: run with all these combinations of (backing_src, regions, ...).
-
-Thanks for the review,
-Ricardo
-
-> 
-> If/when there's a second test that wants fine-grained control over memslots then
-> we can figure out a proper API to share between page_fault_test and whatever the
-> new test is, but for now if page_fault_test is going to call ____vm_create()
-> directly, then I think it's easier to forego the common API and just have page_fault_test
-> and __vm_create() open code setting vm->memslots.
-> 
-> Alternatively, if we really want a common API right away, then we can add a helper
-> to populate the memory region + vm->memslots.
-> 
-> Option A (open code):
-> 
-> struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
-> 			   uint64_t nr_extra_pages)
-> {
-> 	uint64_t nr_pages = vm_nr_pages_required(mode, nr_runnable_vcpus,
-> 						 nr_extra_pages);
-> 	struct kvm_vm *vm;
-> 	int i;
-> 
-> 	vm = ____vm_create(mode);
-> 
-> 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, nr_pages, 0);
-> 
-> 	for (i = 0; i < NR_MEM_REGIONS; i++)
-> 		vm->memslots[i] = 0;
-> 
-> 	kvm_vm_elf_load(vm, program_invocation_name);
-> 
-> #ifdef __x86_64__
-> 	vm_create_irqchip(vm);
-> #endif
-> 	return vm;
-> }
-> 
-> ...
-> 
-> enum pf_test_memslots {
-> 	CODE_MEMSLOT,
-> 	PAGE_TABLE_MEMSLOT,
-> 	DATA_MEMSLOT,
-> }
-> 
-> /* Create a code memslot at pfn=0, and data and PT ones at max_gfn. */
-> static void setup_memslots(struct kvm_vm *vm, struct test_params *p)
-> {
-> 	uint64_t backing_src_pagesz = get_backing_src_pagesz(p->src_type);
-> 	uint64_t guest_page_size = vm_guest_mode_params[mode].page_size;
-> 	uint64_t max_gfn = get_max_gfn(mode);
-> 	/* Enough for 2M of code when using 4K guest pages. */
-> 	uint64_t code_npages = 512;
-> 	uint64_t pt_size, data_size, data_gpa;
-> 
-> 	/*
-> 	 * This test requires 1 pgd, 2 pud, 4 pmd, and 6 pte pages when using
-> 	 * VM_MODE_P48V48_4K. Note that the .text takes ~1.6MBs.  That's 13
-> 	 * pages. VM_MODE_P48V48_4K is the mode with most PT pages; let's use
-> 	 * twice that just in case.
-> 	 */
-> 	pt_size = 26 * guest_page_size;
-> 
-> 	/* memslot sizes and gpa's must be aligned to the backing page size */
-> 	pt_size = align_up(pt_size, backing_src_pagesz);
-> 	data_size = align_up(guest_page_size, backing_src_pagesz);
-> 	data_gpa = (max_gfn * guest_page_size) - data_size;
-> 	data_gpa = align_down(data_gpa, backing_src_pagesz);
-> 
-> 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, CODE_MEMSLOT,
-> 				    code_npages, 0);
-> 	vm->memslots[MEM_REGION_CODE] = CODE_MEMSLOT;
-> 
-> 	vm_userspace_mem_region_add(vm, p->src_type, data_gpa - pt_size,
-> 				    PAGE_TABLE_MEMSLOT, pt_size / guest_page_size,
-> 				    p->test_desc->pt_memslot_flags);
-> 	vm->memslots[MEM_REGION_PT] = PAGE_TABLE_MEMSLOT;
-> 
-> 	vm_userspace_mem_region_add(vm, p->src_type, data_gpa, DATA_MEMSLOT,
-> 				    data_size / guest_page_size,
-> 				    p->test_desc->data_memslot_flags);
-> 	vm->memslots[MEM_REGION_PT] = DATA_MEMSLOT;
-> }
-> 
-> 
-> static void run_test(enum vm_guest_mode mode, void *arg)
-> {
-> 	struct test_params *p = (struct test_params *)arg;
-> 	struct test_desc *test = p->test_desc;
-> 	struct kvm_vm *vm;
-> 	struct kvm_vcpu *vcpu;
-> 	struct uffd_desc *pt_uffd, *data_uffd;
-> 
-> 	print_test_banner(mode, p);
-> 
-> 	vm = ____vm_create(mode);
-> 	setup_memslots(vm, p);
-> 	kvm_vm_elf_load(vm, program_invocation_name);
-> 	vcpu = vm_vcpu_add(vm, 0, guest_code);
-> 
-> 	...
-> }
-> 
-> Option B (helper):
-> 
-> enum kvm_mem_region_mask {
-> 	MEM_REGION_CODE_MASK	= BIT(MEM_REGION_CODE),
-> 	MEM_REGION_PT_MASK	= BIT(MEM_REGION_PT),
-> 	MEM_REGION_DATA_MASK	= BIT(MEM_REGION_DATA),
-> 
-> 	MEM_REGION_ALL_MASK	= MEM_REGION_CODE_MASK |
-> 				  MEM_REGION_PT_MASK |
-> 				  MEM_REGION_DATA_MASK,
-> };
-> 
-> void kvm_vm_add_mem_region(struct kvm_vm *vm, enum kvm_mem_region_mask type_mask,
-> 			   enum vm_mem_backing_src_type src_type, uint32_t slot,
-> 			   uint64_t guest_paddr, uint64_t nr_pages, uint32_t flags)
-> {
-> 	int i;
-> 
-> 	vm_userspace_mem_region_add(vm, src_type, guest_paddr, slot, nr_pages, 0);
-> 
-> 	for (i = 0; i < NR_MEM_REGIONS; i++) {
-> 		if (BIT(i) & type_mask)
-> 			vm->memslots[i] = slot;
-> 	}
-> }
-> 
-> struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
-> 			   uint64_t nr_extra_pages)
-> {
-> 	uint64_t nr_pages = vm_nr_pages_required(mode, nr_runnable_vcpus,
-> 						 nr_extra_pages);
-> 	struct kvm_vm *vm;
-> 	int i;
-> 
-> 	vm = ____vm_create(mode);
-> 
-> 	kvm_vm_add_mem_region(vm, MEM_REGION_ALL_MASK, VM_MEM_SRC_ANONYMOUS, 0,
-> 			      0, nr_pages, 0);
-> 
-> 	kvm_vm_elf_load(vm, program_invocation_name);
-> 
-> #ifdef __x86_64__
-> 	vm_create_irqchip(vm);
-> #endif
-> 	return vm;
-> }
-> 
-> static void setup_memslots(struct kvm_vm *vm, struct test_params *p)
-> {
-> 	...
-> 
-> 	kvm_vm_add_mem_region(vm, MEM_REGION_CODE_MASK, VM_MEM_SRC_ANONYMOUS,
-> 			      CODE_MEMSLOT, 0, code_npages, 0);
-> 
-> 	kvm_vm_add_mem_region(vm, MEM_REGION_PT_MASK p->src_type,
-> 			      PAGE_TABLE_MEMSLOT, data_gpa - pt_size,
-> 			      pt_size / guest_page_size,
-> 			      p->test_desc->pt_memslot_flags);
-> 
-> 	kvm_vm_add_mem_region(vm, MEM_REGION_DATA_MASK, p->src_type,
-> 			      DATA_MEMSLOT, data_gpa,
-> 			      data_size / guest_page_size,
-> 			      p->test_desc->data_memslot_flags);
-> }
-> 
-> ---
->  .../testing/selftests/kvm/include/kvm_util_base.h |  4 ++--
->  tools/testing/selftests/kvm/lib/kvm_util.c        | 15 +++++++--------
->  2 files changed, 9 insertions(+), 10 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index 24fde97f6121..107cb87908f8 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -642,13 +642,13 @@ vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
->   * __vm_create() does NOT create vCPUs, @nr_runnable_vcpus is used purely to
->   * calculate the amount of memory needed for per-vCPU data, e.g. stacks.
->   */
-> -struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages);
-> +struct kvm_vm *____vm_create(enum vm_guest_mode mode);
->  struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
->  			   uint64_t nr_extra_pages);
->  
->  static inline struct kvm_vm *vm_create_barebones(void)
->  {
-> -	return ____vm_create(VM_MODE_DEFAULT, 0);
-> +	return ____vm_create(VM_MODE_DEFAULT);
->  }
->  
->  static inline struct kvm_vm *vm_create(uint32_t nr_runnable_vcpus)
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 9889fe0d8919..c761422faa17 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -143,13 +143,10 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
->  _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
->  	       "Missing new mode params?");
->  
-> -struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages)
-> +struct kvm_vm *____vm_create(enum vm_guest_mode mode)
->  {
->  	struct kvm_vm *vm;
->  
-> -	pr_debug("%s: mode='%s' pages='%ld'\n", __func__,
-> -		 vm_guest_mode_string(mode), nr_pages);
-> -
->  	vm = calloc(1, sizeof(*vm));
->  	TEST_ASSERT(vm != NULL, "Insufficient Memory");
->  
-> @@ -245,9 +242,6 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages)
->  
->  	/* Allocate and setup memory for guest. */
->  	vm->vpages_mapped = sparsebit_alloc();
-> -	if (nr_pages != 0)
-> -		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> -					    0, 0, nr_pages, 0);
->  
->  	return vm;
->  }
-> @@ -294,7 +288,12 @@ struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
->  						 nr_extra_pages);
->  	struct kvm_vm *vm;
->  
-> -	vm = ____vm_create(mode, nr_pages);
-> +	pr_debug("%s: mode='%s' pages='%ld'\n", __func__,
-> +		 vm_guest_mode_string(mode), nr_pages);
-> +
-> +	vm = ____vm_create(mode);
-> +
-> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, nr_pages, 0);
->  
->  	kvm_vm_elf_load(vm, program_invocation_name);
->  
-> 
-> base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
-> -- 
-> 
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gU2F0LCBTZXAgMTcsIDIwMjIgYXQgMDk6NTg6MjhQTSArMDAwMCwgT2xpdmVyIFVwdG9uIHdy
+b3RlOgo+IE9uIFR1ZSwgU2VwIDA2LCAyMDIyIGF0IDA2OjA5OjI2UE0gKzAwMDAsIFJpY2FyZG8g
+S29sbGVyIHdyb3RlOgo+ID4gQWRkIGEgbmV3IHRlc3QgZm9yIHN0YWdlIDIgZmF1bHRzIHdoZW4g
+dXNpbmcgZGlmZmVyZW50IGNvbWJpbmF0aW9ucyBvZgo+ID4gZ3Vlc3QgYWNjZXNzZXMgKGUuZy4s
+IHdyaXRlLCBTMVBUVyksIGJhY2tpbmcgc291cmNlIHR5cGUgKGUuZy4sIGFub24pCj4gPiBhbmQg
+dHlwZXMgb2YgZmF1bHRzIChlLmcuLCByZWFkIG9uIGh1Z2V0bGJmcyB3aXRoIGEgaG9sZSkuIFRo
+ZSBuZXh0Cj4gPiBjb21taXRzIHdpbGwgYWRkIGRpZmZlcmVudCBoYW5kbGluZyBtZXRob2RzIGFu
+ZCBtb3JlIGZhdWx0cyAoZS5nLiwgdWZmZAo+ID4gYW5kIGRpcnR5IGxvZ2dpbmcpLiBUaGlzIGZp
+cnN0IGNvbW1pdCBzdGFydHMgYnkgYWRkaW5nIHR3byBzYW5pdHkgY2hlY2tzCj4gPiBmb3IgYWxs
+IHR5cGVzIG9mIGFjY2Vzc2VzOiBBRiBzZXR0aW5nIGJ5IHRoZSBodywgYW5kIGFjY2Vzc2luZyBt
+ZW1zbG90cwo+ID4gd2l0aCBob2xlcy4KPiA+IAo+ID4gU2lnbmVkLW9mZi1ieTogUmljYXJkbyBL
+b2xsZXIgPHJpY2Fya29sQGdvb2dsZS5jb20+Cj4gCj4gSGV5IFJpY2FyZG8sCj4gCj4gWW91J2xs
+IG5lZWQgdG8gdXBkYXRlIC5naXRpZ25vcmUgZm9yIHRoaXMgcGF0Y2guIEFkZGl0aW9uYWxseSwg
+YnVpbGRpbmcKPiB0aGlzIHRlc3QgdGhyb3dzIHRoZSBmb2xsb3dpbmcgY29tcGlsZXIgd2Fybmlu
+ZzoKPiAKPiBJbiBmdW5jdGlvbiDigJhsb2FkX2V4ZWNfY29kZV9mb3JfdGVzdOKAmSwKPiAgICAg
+aW5saW5lZCBmcm9tIOKAmHJ1bl90ZXN04oCZIGF0IGFhcmNoNjQvcGFnZV9mYXVsdF90ZXN0LmM6
+NzQ1OjI6Cj4gYWFyY2g2NC9wYWdlX2ZhdWx0X3Rlc3QuYzo1NDU6OTogd2FybmluZzogYXJyYXkg
+c3Vic2NyaXB0IOKAmGxvbmcgdW5zaWduZWQgaW50WzBd4oCZIGlzIHBhcnRseSBvdXRzaWRlIGFy
+cmF5IGJvdW5kcyBvZiDigJh1bnNpZ25lZCBjaGFyWzFd4oCZIFstV2FycmF5LWJvdW5kc10KPiAg
+IDU0NSB8ICAgICAgICAgbWVtY3B5KGNvZGUsIGMsIDgpOwo+ICAgICAgIHwgICAgICAgICBefn5+
+fn5+fn5+fn5+fn5+fn4KPiAKPiBJJ3ZlIGZpeGVkIGJvdGggb2YgdGhlc2UgaW4gdGhlIGFwcGVu
+ZGVkIGRpZmYsIGZlZWwgZnJlZSB0byBzcXVhc2guCgpUaGFua3MsIHdpbGwgZG8gdGhhdC4KCj4g
+Cj4gLS0KPiBUaGFua3MsCj4gT2xpdmVyCj4gCj4gRnJvbSAwYTVkMzcxMGI5MDQzYWU4ZmU1YTlk
+N2NjNDhlYjg1NGQxYjdiNzQ2IE1vbiBTZXAgMTcgMDA6MDA6MDAgMjAwMQo+IEZyb206IE9saXZl
+ciBVcHRvbiA8b2xpdmVyLnVwdG9uQGxpbnV4LmRldj4KPiBEYXRlOiBTYXQsIDE3IFNlcCAyMDIy
+IDIxOjM4OjExICswMDAwCj4gU3ViamVjdDogW1BBVENIXSBmaXh1cCEgS1ZNOiBzZWxmdGVzdHM6
+IGFhcmNoNjQ6IEFkZCBhYXJjaDY0L3BhZ2VfZmF1bHRfdGVzdAo+IAo+IC0tLQo+ICB0b29scy90
+ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vLmdpdGlnbm9yZSAgICAgICAgICAgICAgIHwgIDEgKwo+ICAu
+Li4vdGVzdGluZy9zZWxmdGVzdHMva3ZtL2FhcmNoNjQvcGFnZV9mYXVsdF90ZXN0LmMgIHwgMTIg
+KysrLS0tLS0tLS0tCj4gIDIgZmlsZXMgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspLCA5IGRlbGV0
+aW9ucygtKQo+IAo+IGRpZmYgLS1naXQgYS90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vLmdp
+dGlnbm9yZSBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS8uZ2l0aWdub3JlCj4gaW5kZXgg
+ZDYyNWEzZjgzNzgwLi43YTkwMjJjZmEwMzMgMTAwNjQ0Cj4gLS0tIGEvdG9vbHMvdGVzdGluZy9z
+ZWxmdGVzdHMva3ZtLy5naXRpZ25vcmUKPiArKysgYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9r
+dm0vLmdpdGlnbm9yZQo+IEBAIC0zLDYgKzMsNyBAQAo+ICAvYWFyY2g2NC9kZWJ1Zy1leGNlcHRp
+b25zCj4gIC9hYXJjaDY0L2dldC1yZWctbGlzdAo+ICAvYWFyY2g2NC9oeXBlcmNhbGxzCj4gKy9h
+YXJjaDY0L3BhZ2VfZmF1bHRfdGVzdAo+ICAvYWFyY2g2NC9wc2NpX3Rlc3QKPiAgL2FhcmNoNjQv
+dmNwdV93aWR0aF9jb25maWcKPiAgL2FhcmNoNjQvdmdpY19pbml0Cj4gZGlmZiAtLWdpdCBhL3Rv
+b2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9hYXJjaDY0L3BhZ2VfZmF1bHRfdGVzdC5jIGIvdG9v
+bHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL2FhcmNoNjQvcGFnZV9mYXVsdF90ZXN0LmMKPiBpbmRl
+eCA2MGE2YThhNDVmYTQuLjVlZjJhN2I5NDFlYyAxMDA2NDQKPiAtLS0gYS90b29scy90ZXN0aW5n
+L3NlbGZ0ZXN0cy9rdm0vYWFyY2g2NC9wYWdlX2ZhdWx0X3Rlc3QuYwo+ICsrKyBiL3Rvb2xzL3Rl
+c3Rpbmcvc2VsZnRlc3RzL2t2bS9hYXJjaDY0L3BhZ2VfZmF1bHRfdGVzdC5jCj4gQEAgLTUxMiw3
+ICs1MTIsNyBAQCB2b2lkIGZhaWxfdmNwdV9ydW5fbW1pb19ub19zeW5kcm9tZV9oYW5kbGVyKGlu
+dCByZXQpCj4gIAlldmVudHMuZmFpbF92Y3B1X3J1bnMgKz0gMTsKPiAgfQo+ICAKPiAtZXh0ZXJu
+IHVuc2lnbmVkIGNoYXIgX19leGVjX3Rlc3Q7Cj4gK2V4dGVybiB1aW50NjRfdCBfX2V4ZWNfdGVz
+dDsKPiAgCj4gIHZvaWQgbm9pbmxpbmUgX19yZXR1cm5fMHg3Nyh2b2lkKQo+ICB7Cj4gQEAgLTUy
+Niw3ICs1MjYsNyBAQCB2b2lkIG5vaW5saW5lIF9fcmV0dXJuXzB4Nzcodm9pZCkKPiAgICovCj4g
+IHN0YXRpYyB2b2lkIGxvYWRfZXhlY19jb2RlX2Zvcl90ZXN0KHN0cnVjdCBrdm1fdm0gKnZtKQo+
+ICB7Cj4gLQl1aW50NjRfdCAqY29kZSwgKmM7Cj4gKwl1aW50NjRfdCAqY29kZTsKPiAgCXN0cnVj
+dCB1c2Vyc3BhY2VfbWVtX3JlZ2lvbiAqcmVnaW9uOwo+ICAJdm9pZCAqaHZhOwo+ICAKPiBAQCAt
+NTM2LDEzICs1MzYsNyBAQCBzdGF0aWMgdm9pZCBsb2FkX2V4ZWNfY29kZV9mb3JfdGVzdChzdHJ1
+Y3Qga3ZtX3ZtICp2bSkKPiAgCWFzc2VydChURVNUX0VYRUNfR1ZBIC0gVEVTVF9HVkEpOwo+ICAJ
+Y29kZSA9IGh2YSArIDg7Cj4gIAo+IC0JLyoKPiAtCSAqIFdlIG5lZWQgdGhlIGNhc3QgdG8gYmUg
+c2VwYXJhdGUgaW4gb3JkZXIgZm9yIHRoZSBjb21waWxlciB0byBub3QKPiAtCSAqIGNvbXBsYWlu
+IHdpdGg6ICLigJhtZW1jcHnigJkgZm9ybWluZyBvZmZzZXQgWzEsIDddIGlzIG91dCBvZiB0aGUg
+Ym91bmRzCj4gLQkgKiBbMCwgMV0gb2Ygb2JqZWN0IOKAmF9fZXhlY190ZXN04oCZIHdpdGggdHlw
+ZSDigJh1bnNpZ25lZCBjaGFy4oCZIgo+IC0JICovCj4gLQljID0gKHVpbnQ2NF90ICopJl9fZXhl
+Y190ZXN0Owo+IC0JbWVtY3B5KGNvZGUsIGMsIDgpOwo+ICsJKmNvZGUgPSBfX2V4ZWNfdGVzdDsK
+CkkgcmVtZW1iZXIgdHJ5aW5nIG1hbnkgd2F5cyBvZiBnZXR0aW5nIHRoZSBjb21waWxlciB0byBu
+b3QgY29tcGxhaW4sIEkKbXVzdCBoYXZlIHRyaWVkIHRoaXMgKHdvbmRlciB3aGF0IGhhcHBlbmVk
+KS4gQW55d2F5LCBnY2MgYW5kIGNsYW5nIGFyZQpoYXBweSB3aXRoIGl0LgoKPiAgfQo+ICAKPiAg
+c3RhdGljIHZvaWQgc2V0dXBfYWJvcnRfaGFuZGxlcnMoc3RydWN0IGt2bV92bSAqdm0sIHN0cnVj
+dCBrdm1fdmNwdSAqdmNwdSwKPiAtLSAKPiAyLjM3LjMuOTY4LmdhNmI0YjA4MGU0LWdvb2cKPiAK
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1h
+aWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3Mu
+Y29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
