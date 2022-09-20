@@ -2,84 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E976EECAAD3
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Sep 2022 20:01:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1524EC54EE9
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 02:13:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 578A64B64F;
-	Mon, 19 Sep 2022 16:01:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6219E4B658;
+	Mon, 19 Sep 2022 22:13:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GSZU-FBWNl-j; Mon, 19 Sep 2022 16:01:22 -0400 (EDT)
+	with ESMTP id UpaI4C9vBsr0; Mon, 19 Sep 2022 22:13:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DBD84B651;
-	Mon, 19 Sep 2022 16:01:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C9CF4B62F;
+	Mon, 19 Sep 2022 22:13:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 44FE84B64F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 16:01:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 355744B615
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 22:13:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0yWPLGjot9nN for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Sep 2022 16:01:20 -0400 (EDT)
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com
- [209.85.216.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EC0554B64E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 16:01:19 -0400 (EDT)
-Received: by mail-pj1-f46.google.com with SMTP id
- o99-20020a17090a0a6c00b002039c4fce53so3022324pjo.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 13:01:19 -0700 (PDT)
+ with ESMTP id 3eM2A1uXWsVu for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Sep 2022 22:13:25 -0400 (EDT)
+Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com
+ [209.85.217.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 527BE4B2A5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 22:13:25 -0400 (EDT)
+Received: by mail-vs1-f45.google.com with SMTP id q26so1563167vsr.7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 19:13:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-transfer-encoding:content-disposition
- :mime-version:references:message-id:subject:cc:to:from:date:from:to
- :cc:subject:date;
- bh=d2mOaXqBJ/J1NiBq+p9zZqqA3x7aa90eBHG5Ll0Tfso=;
- b=fdaJHOO3a2pIOR/89fIgJSQloU9jbVrOA5QbPQYMMYhLs8KoKEqyaQOH63NzdC0BW5
- +xcbWp6DgPQyD8KWK1F+0hqGEOAMaJii6EDQQ+46c4Vd6yCQMokwDddgQ8ZRmNmB2qCs
- ulnhQ8DScLVB8wgMjAj1Ot2sozJegDbvU71kckRVcEkytQ86MIyC0t93pWLCWTc0/+FT
- Fr2cnmgIKc5F13hwz8ScnRXqeavbLJ/pD7MdUlOTgYtEbfeVqq21kIsvObKkjYsZcA/h
- kAWquL8pPjpQSqAdLOxChyzTrLQxPuxT1NG9TyizytbwW9o8YN5N9fj5PtmjQ/KPwAiL
- dwTQ==
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:from:to:cc:subject:date;
+ bh=LhprL2QVbzky7ZAXaXmKaCG2fZ/bG0UYXk9tOS7aXnY=;
+ b=PGCJcjWLr4SHxMv8ivTAMamCPU/lkKK0dFqBEfZy+Xoh/g4UvHR8Tjalko7fnj29cf
+ ECXwL9kH/aqs1iN4dEjp98ccsT9UZFvlEjmNb1ZOmBEMuslU7MeQ+dvTUeavKDHKQWkT
+ Q4sdG5mzJs1M66f2/yOjLYV7Mr23g9I1tPE7KgDV5IWqbQPWUM6r7hi+cwY1VQ4e6HAG
+ iYFfrDkQCOw8EuUPf0ygxePt4Cp2eXiDyNWgfI/4cE1WmmdejsR0gyunDCIeYe34a7rH
+ /0OIP5YArMqkI2DI5zSGm4n52uKi+aoQYTAKw2OM/X8C/CcDvnsTdize+LSbiPaahbN2
+ sv7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=in-reply-to:content-transfer-encoding:content-disposition
- :mime-version:references:message-id:subject:cc:to:from:date
- :x-gm-message-state:from:to:cc:subject:date;
- bh=d2mOaXqBJ/J1NiBq+p9zZqqA3x7aa90eBHG5Ll0Tfso=;
- b=Qv6oZwU79W2Ya/RdS9ALcXTR5JlDiFM28R4HCaGQAkVNSGpTU7yJVxrCyG1uMBp6sC
- Y/ZQmV83wXfiW/zne6Bhbd++tHnRZufSGo2wErLM7TNePxxrVMLy9vWQ0yKapM5Znw5S
- 5OfYBpV7kKId3E37PovHLXqHhDdKGx/AIqpuR3S7fPvcSHM1yv450gdmtMmaY2eoBtKl
- OkI4lqP+mOIon3rrSQFCgQ5tL6+ugtan8aVPtTFB4zAU+qfoEydEQte2BkESJyTSv8sI
- mgd9VdYiT2odrUFWEpKQWhykiFemxAGNWjvnQSDlc3BCVidjSOI3MyPJAjOLqq8QiQq2
- zfxw==
-X-Gm-Message-State: ACrzQf0VH/yqrBo0vYUQhvK3o5LowLzVuB5StwHnnkttsvQK1o8E6tac
- hIF6xbCK0ERnvCg/HpOiMQYwjw==
-X-Google-Smtp-Source: AMsMyM7ekM/QpjauHVnjWvyDT4Y/ZpvdxNLs+apfRnU6iIqW4hyA8I00zbHqV8xMsYofHJnxlgrT4Q==
-X-Received: by 2002:a17:902:cec9:b0:178:1da5:1075 with SMTP id
- d9-20020a170902cec900b001781da51075mr1403934plg.136.1663617678958; 
- Mon, 19 Sep 2022 13:01:18 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com.
- [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
- w1-20020a1709026f0100b00178650510f9sm10750215plk.160.2022.09.19.13.01.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Sep 2022 13:01:18 -0700 (PDT)
-Date: Mon, 19 Sep 2022 20:01:14 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v6 09/13] KVM: selftests: aarch64: Add
- aarch64/page_fault_test
-Message-ID: <YyjKir3OGCfFvAsy@google.com>
-References: <20220906180930.230218-1-ricarkol@google.com>
- <20220906180930.230218-10-ricarkol@google.com>
- <YyZDBIQsux1g97zl@google.com> <YyjDCWCJ5j8c6T2h@google.com>
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:x-gm-message-state:from:to:cc:subject:date;
+ bh=LhprL2QVbzky7ZAXaXmKaCG2fZ/bG0UYXk9tOS7aXnY=;
+ b=ToIIVlVnR+e69HR7QAN9124QbOROJY2l0NFDJ3uYqbz/3wdPpHQdkFkk+EMbKEF5Pa
+ OVpWSTrQGfrl/Eq/IJJ6Mshpwh0/eRENxJyXlyfEr/1s1cbus3RBLbDMBo0pikJfQTmp
+ B79bT3CCo3w+SUMxKU/wIEOKC4kEqHAoaEWOSkrL3c45Q9HntdbpgBluxp+63DURE0n0
+ XaWvgiyPze5u/R/oyMqF+02mXUZLUgzJGh/3B6hhSHQFDGYclp/tZjqleqFTscwH6n/y
+ rczWbQODxq+y8asjScdkE8AKEWxpOItUwj3anmvVjy/AnrGwVFr3DTVNIyUoX/XzdpWw
+ 79yQ==
+X-Gm-Message-State: ACrzQf04ai6bhHNYRNDpQQrUZfjLPth5wmm/OjXp+Ye7mkltLMjWGgVA
+ PUxRunOKvFGtKhcGvmxQAKfB+EHKkq23Y5LFxkATAw==
+X-Google-Smtp-Source: AMsMyM7wgUY6E8j/4SMw+/72+ih55ve9ug7EcEf9GLIsdD3MXqyNwHc4oK+hZoFAn5gEb/6kdxZ6GEWk15PY0d04huI=
+X-Received: by 2002:a67:ea58:0:b0:38f:d89a:e4b3 with SMTP id
+ r24-20020a67ea58000000b0038fd89ae4b3mr7517244vso.51.1663640004802; Mon, 19
+ Sep 2022 19:13:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YyjDCWCJ5j8c6T2h@google.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
- andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com,
- axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu
+References: <20220917010600.532642-1-reijiw@google.com>
+ <20220917010600.532642-5-reijiw@google.com>
+ <87bkrbln84.wl-maz@kernel.org>
+In-Reply-To: <87bkrbln84.wl-maz@kernel.org>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Mon, 19 Sep 2022 19:13:08 -0700
+Message-ID: <CAAeT=FwN+5=1SjaHqpE2PCaa0H4_pkdz-OsTiRfd-WOzYaCNpw@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] KVM: arm64: selftests: Add a test case for
+ KVM_GUESTDBG_SINGLESTEP
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,32 +81,36 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gTW9uLCBTZXAgMTksIDIwMjIsIFJpY2FyZG8gS29sbGVyIHdyb3RlOgo+IE9uIFNhdCwgU2Vw
-IDE3LCAyMDIyIGF0IDA5OjU4OjI4UE0gKzAwMDAsIE9saXZlciBVcHRvbiB3cm90ZToKPiA+IEBA
-IC01MzYsMTMgKzUzNiw3IEBAIHN0YXRpYyB2b2lkIGxvYWRfZXhlY19jb2RlX2Zvcl90ZXN0KHN0
-cnVjdCBrdm1fdm0gKnZtKQo+ID4gIAlhc3NlcnQoVEVTVF9FWEVDX0dWQSAtIFRFU1RfR1ZBKTsK
-PiA+ICAJY29kZSA9IGh2YSArIDg7Cj4gPiAgCj4gPiAtCS8qCj4gPiAtCSAqIFdlIG5lZWQgdGhl
-IGNhc3QgdG8gYmUgc2VwYXJhdGUgaW4gb3JkZXIgZm9yIHRoZSBjb21waWxlciB0byBub3QKPiA+
-IC0JICogY29tcGxhaW4gd2l0aDogIuKAmG1lbWNweeKAmSBmb3JtaW5nIG9mZnNldCBbMSwgN10g
-aXMgb3V0IG9mIHRoZSBib3VuZHMKPiA+IC0JICogWzAsIDFdIG9mIG9iamVjdCDigJhfX2V4ZWNf
-dGVzdOKAmSB3aXRoIHR5cGUg4oCYdW5zaWduZWQgY2hhcuKAmSIKPiA+IC0JICovCj4gPiAtCWMg
-PSAodWludDY0X3QgKikmX19leGVjX3Rlc3Q7Cj4gPiAtCW1lbWNweShjb2RlLCBjLCA4KTsKPiA+
-ICsJKmNvZGUgPSBfX2V4ZWNfdGVzdDsKPiAKPiBJIHJlbWVtYmVyIHRyeWluZyBtYW55IHdheXMg
-b2YgZ2V0dGluZyB0aGUgY29tcGlsZXIgdG8gbm90IGNvbXBsYWluLCBJCj4gbXVzdCBoYXZlIHRy
-aWVkIHRoaXMgKHdvbmRlciB3aGF0IGhhcHBlbmVkKS4gQW55d2F5LCBnY2MgYW5kIGNsYW5nIGFy
-ZQo+IGhhcHB5IHdpdGggaXQuCgpBbHRlcm5hdGl2ZWx5LCBmcm9tIGEgY29kZSBkb2N1bWVudGF0
-aW9uIHBlcnNwZWN0aXZlIGl0IHdvdWxkIGJlIG5pY2UgdG8gY2FwdHVyZQp0aGF0IHRoZSBzaXpl
-IGlzbid0IGFyYml0cmFyeS4gIEUuZy4KCiAgdHlwZWRlZiB1aW50MzJfdCBhYXJjaDY0X2luc25f
-dDsKCiAgZXh0ZXJuIGFhcmNoNjRfaW5zbl90IF9fZXhlY190ZXN0WzJdOwoKICB7Cgl2b2lkICpj
-b2RlOwoKCW1lbWNweShjb2RlLCBfX2V4ZWNfdGVzdCwgc2l6ZW9mKF9fZXhlY190ZXN0KSk7CiAg
-fQoKTm90ZSwgbWVtY3B5KCkgaXMgY3VycmVudGx5IGRhbmdlcm91cywgYnV0IGhvcGVmdWxseSB0
-aGF0IHdpbGwgYmUgcmVtZWRpZWQgc29vbmlzaFsqXQoKWypdIGh0dHBzOi8vbG9yZS5rZXJuZWwu
-b3JnL2FsbC8yMDIyMDkwODIzMzEzNC4zNTIzMzM5LTEtc2VhbmpjQGdvb2dsZS5jb20KX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcg
-bGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1i
-aWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Hi Marc,
+
+On Mon, Sep 19, 2022 at 2:36 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Sat, 17 Sep 2022 02:06:00 +0100,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > Add a test case for KVM_GUESTDBG_SINGLESTEP to the debug-exceptions test.
+> > The test enables single-step execution from userspace, and check if the
+> > exit to userspace occurs for each instruction that is stepped.
+> > Set the default number of the test iterations to a number of iterations
+> > sufficient to always reproduce the problem that the previous patch fixes
+> > on an Ampere Altra machine.
+>
+> A possibly more aggressive version of this test would be to force a
+> (short lived) timer to fire on the same CPU, forcing an exit. This
+> should hopefully result in a more predictable way to trigger the
+> issue. But that's a reasonable test as a start.
+
+Yes, that could result in a more predictable way to cause the specific case!
+I will consider this at a future opportunity.
+
+Thank you,
+Reiji
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
