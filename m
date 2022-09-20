@@ -2,63 +2,63 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B97ABC54EE9
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 17:53:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B526C54EE9
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 18:04:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A9CD4B278;
-	Tue, 20 Sep 2022 13:53:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79A0E4B62C;
+	Tue, 20 Sep 2022 14:04:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8auui+XPmE2u; Tue, 20 Sep 2022 13:53:06 -0400 (EDT)
+	with ESMTP id 6Ojkfc76enaY; Tue, 20 Sep 2022 14:04:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF6624B62A;
-	Tue, 20 Sep 2022 13:53:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D3F04B62E;
+	Tue, 20 Sep 2022 14:04:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A6654B278
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 13:53:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 519B54B62C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:04:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ar5N3x6LMds8 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 13:53:05 -0400 (EDT)
+ with ESMTP id UC66CF+c-8j9 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 14:04:31 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E9F214B20D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 13:53:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D1EA34B600
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:04:30 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 505F2B82BE2;
- Tue, 20 Sep 2022 17:53:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11510C433D6;
- Tue, 20 Sep 2022 17:53:02 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 652A5B82B95;
+ Tue, 20 Sep 2022 18:04:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 189E9C433D6;
+ Tue, 20 Sep 2022 18:04:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1663696382;
- bh=xCgnmcH/2uSfbXCIRvneJfblf9LGApKKzOsPR5tudKQ=;
+ s=k20201202; t=1663697068;
+ bh=q0Q77G3eESlaWUElAJg3qfMcJbtPpE343+qLMFXLRYg=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=GsYCJPx2EPsFucIbphD0n1yrj4L5Yp3g/xSLupD3a5ArD7P4kN5nNyYTCZNELJdyA
- CLS1r7tRo5eS9/v76kv+Vn7GnxtAix5s8nSM1g47gQoQInKPEKnAE+JXyInGROHuDi
- nQ5PlZoGwbHyiIbfF0/srSg2gJosqXPPer9Aa0Q+wDAEkNZbbGLw/O+fnzADG8vgYB
- yP4NwXaVENjye+zos2/bP7/+fZx3j2oGfkOc16eebDxQYpQ2iHEEjhX2QD0m983Yhh
- ljzV/HioroOvfpGa52vF3WTK/+lEdr5OENcZJpBJ/znIB/FVPcvAmt5o/vMuidL9Qq
- V0LtnulNJkytQ==
+ b=F7O+fgu2nRycaAsrdjS8eXohA5/ul9yGibfrLiYjGtkM7k5aUBwdifwnharo8L6jR
+ JqNcr/Yz0XbM8e9mTD7cTijA9XOVKuEmNZLS3HvdeqxuwmUoJOfO2cOpx427YkU+n5
+ Z7xKXest+zwEM1+WuDky5AGlmeZeGJdH0UIn/1wYcVtWjvNwWRK/kmK1O+Idadrgu4
+ pfGcBOmf4PCne3lZU4hcKgpPV73IOfMXm2ckllUrMaT6EzJIg4k6Qes1GLg5WN8kvU
+ meW4DMNX5VTflla37bBhubckWJLZz/nkF8w85TcRll37D3+3PFLd22dyzpdqHpcvND
+ 8pzG/0uqMNUDQ==
 Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oahQZ-00BSvr-Ru;
- Tue, 20 Sep 2022 18:53:00 +0100
-Date: Tue, 20 Sep 2022 18:52:59 +0100
-Message-ID: <87wn9yj5l0.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oahbd-00BT1L-Pi;
+ Tue, 20 Sep 2022 19:04:25 +0100
+Date: Tue, 20 Sep 2022 19:04:24 +0100
+Message-ID: <87v8phkjmf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 3/7] arm64/fpsimd: Have KVM explicitly say which FP
- registers to save
-In-Reply-To: <20220815225529.930315-4-broonie@kernel.org>
+Subject: Re: [PATCH v3 4/7] arm64/fpsimd: Stop using TIF_SVE to manage
+ register saving in KVM
+In-Reply-To: <20220815225529.930315-5-broonie@kernel.org>
 References: <20220815225529.930315-1-broonie@kernel.org>
- <20220815225529.930315-4-broonie@kernel.org>
+ <20220815225529.930315-5-broonie@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -91,156 +91,91 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 15 Aug 2022 23:55:25 +0100,
+On Mon, 15 Aug 2022 23:55:26 +0100,
 Mark Brown <broonie@kernel.org> wrote:
 > 
-> In order to avoid needlessly saving and restoring the guest registers KVM
-> relies on the host FPSMID code to save the guest registers when we context
-> switch away from the guest. This is done by binding the KVM guest state to
-> the CPU on top of the task state that was originally there, then carefully
-> managing the TIF_SVE flag for the task to cause the host to save the full
-> SVE state when needed regardless of the needs of the host task. This works
-> well enough but isn't terribly direct about what is going on and makes it
-> much more complicated to try to optimise what we're doing with the SVE
-> register state.
-> 
-> Let's instead have KVM pass in the register state it wants saving when it
-> binds to the CPU. We introduce a new FP_TYPE_TASK for use during normal
-> task binding to indicate that we should base our decisions on the current
-> task. In order to ease any future debugging that might be required this
-> patch does not actually update any of the decision making about what to
-> save, it merely starts tracking the new information and warns if the
-> requested state is not what we would otherwise have decided to save.
+> Now that we are explicitly telling the host FP code which register state
+> it needs to save we can remove the manipulation of TIF_SVE from the KVM
+> code, simplifying it and allowing us to optimise our handling of normal
+> tasks. Remove the manipulation of TIF_SVE from KVM and instead rely on
+> to_save to ensure we save the correct data for it.
 > 
 > Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  arch/arm64/include/asm/fpsimd.h    |  3 ++-
->  arch/arm64/include/asm/processor.h |  1 +
->  arch/arm64/kernel/fpsimd.c         | 20 +++++++++++++++++++-
->  arch/arm64/kvm/fpsimd.c            |  9 ++++++++-
->  4 files changed, 30 insertions(+), 3 deletions(-)
+>  arch/arm64/kernel/fpsimd.c | 22 ++++------------------
+>  arch/arm64/kvm/fpsimd.c    |  3 ---
+>  2 files changed, 4 insertions(+), 21 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-> index b74103a79052..21a1dd320ca5 100644
-> --- a/arch/arm64/include/asm/fpsimd.h
-> +++ b/arch/arm64/include/asm/fpsimd.h
-> @@ -61,7 +61,8 @@ extern void fpsimd_kvm_prepare(void);
->  extern void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *state,
->  				     void *sve_state, unsigned int sve_vl,
->  				     void *za_state, unsigned int sme_vl,
-> -				     u64 *svcr, enum fp_state *type);
-> +				     u64 *svcr, enum fp_state *type,
-> +				     enum fp_state to_save);
->  
->  extern void fpsimd_flush_task_state(struct task_struct *target);
->  extern void fpsimd_save_and_flush_cpu_state(void);
-> diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
-> index 4818a6b77f39..89c248b8d4ba 100644
-> --- a/arch/arm64/include/asm/processor.h
-> +++ b/arch/arm64/include/asm/processor.h
-> @@ -123,6 +123,7 @@ enum vec_type {
->  };
->  
->  enum fp_state {
-> +	FP_STATE_TASK,		/* Save based on current, invalid as fp_type */
-
-How is that related to the FP_TYPE_TASK in the commit message? What
-does this 'invalid as fp_type' mean?
-
->  	FP_STATE_FPSIMD,
->  	FP_STATE_SVE,
->  };
 > diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-> index 6544ae00230f..7be20ced2c45 100644
+> index 7be20ced2c45..aaea2dc02cbd 100644
 > --- a/arch/arm64/kernel/fpsimd.c
 > +++ b/arch/arm64/kernel/fpsimd.c
-> @@ -126,6 +126,7 @@ struct fpsimd_last_state_struct {
->  	unsigned int sve_vl;
->  	unsigned int sme_vl;
->  	enum fp_state *fp_type;
-> +	enum fp_state to_save;
->  };
+> @@ -436,8 +436,8 @@ static void task_fpsimd_load(void)
+>   * last, if KVM is involved this may be the guest VM context rather
+>   * than the host thread for the VM pointed to by current. This means
+>   * that we must always reference the state storage via last rather
+> - * than via current, other than the TIF_ flags which KVM will
+> - * carefully maintain for us.
+> + * than via current, if we are saving KVM state then it will have
+> + * ensured that the type of registers to save is set in last->to_save.
+>   */
+>  static void fpsimd_save(void)
+>  {
+> @@ -454,27 +454,13 @@ static void fpsimd_save(void)
+>  	if (test_thread_flag(TIF_FOREIGN_FPSTATE))
+>  		return;
 >  
->  static DEFINE_PER_CPU(struct fpsimd_last_state_struct, fpsimd_last_state);
-> @@ -459,6 +460,21 @@ static void fpsimd_save(void)
+> -	if (test_thread_flag(TIF_SVE)) {
+> +	if ((last->to_save == FP_STATE_TASK && test_thread_flag(TIF_SVE)) ||
+> +	    last->to_save == FP_STATE_SVE) {
+>  		save_sve_regs = true;
+>  		save_ffr = true;
 >  		vl = last->sve_vl;
 >  	}
 >  
-> +	/*
-> +	 * For now we're just validating that the requested state is
-> +	 * consistent with what we'd otherwise work out.
+> -	/*
+> -	 * For now we're just validating that the requested state is
+> -	 * consistent with what we'd otherwise work out.
+> -	 */
+> -	switch (last->to_save) {
+> -	case FP_STATE_TASK:
+> -		break;
+> -	case FP_STATE_FPSIMD:
+> -		WARN_ON_ONCE(save_sve_regs);
+> -		break;
+> -	case FP_STATE_SVE:
+> -		WARN_ON_ONCE(!save_sve_regs);
+> -		break;
+> -	}
+> -
 
-Nit: work out? or worked out? the "we'd" doesn't help disambiguate it
-for a non-native speaker.
+Given how short-lived this code is, consider dropping it altogether.
+Actually, the previous patch would make a lot more sense if it was
+merged with this one.
 
-> +	 */
-> +	switch (last->to_save) {
-> +	case FP_STATE_TASK:
-> +		break;
-> +	case FP_STATE_FPSIMD:
-> +		WARN_ON_ONCE(save_sve_regs);
-> +		break;
-> +	case FP_STATE_SVE:
-> +		WARN_ON_ONCE(!save_sve_regs);
-> +		break;
-> +	}
-> +
 >  	if (system_supports_sme()) {
 >  		u64 *svcr = last->svcr;
 >  
-> @@ -1693,6 +1709,7 @@ static void fpsimd_bind_task_to_cpu(void)
->  	last->sme_vl = task_get_sme_vl(current);
->  	last->svcr = &current->thread.svcr;
->  	last->fp_type = &current->thread.fp_type;
-> +	last->to_save = FP_STATE_TASK;
->  	current->thread.fpsimd_cpu = smp_processor_id();
->  
->  	/*
-> @@ -1717,7 +1734,7 @@ static void fpsimd_bind_task_to_cpu(void)
->  void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
->  			      unsigned int sve_vl, void *za_state,
->  			      unsigned int sme_vl, u64 *svcr,
-> -			      enum fp_state *type)
-> +			      enum fp_state *type, enum fp_state to_save)
-
-OK, how many discrete arguments are we going to pass to this function,
-which most of them are part the vcpu structure? It really feels like
-what you want is a getter for the per-cpu structure, and let the KVM
-code do the actual business. If this function was supposed to provide
-some level of abstraction, well, it's a fail.
-
->  {
->  	struct fpsimd_last_state_struct *last =
->  		this_cpu_ptr(&fpsimd_last_state);
-> @@ -1732,6 +1749,7 @@ void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
->  	last->sve_vl = sve_vl;
->  	last->sme_vl = sme_vl;
->  	last->fp_type = type;
-> +	last->to_save = to_save;
->  }
->  
->  /*
 > diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-> index a92977759f8d..db0b2bacaeb8 100644
+> index db0b2bacaeb8..8a79823fce68 100644
 > --- a/arch/arm64/kvm/fpsimd.c
 > +++ b/arch/arm64/kvm/fpsimd.c
-> @@ -130,9 +130,16 @@ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu)
->   */
->  void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
->  {
-> +	enum fp_state fp_type;
-> +
->  	WARN_ON_ONCE(!irqs_disabled());
+> @@ -151,7 +151,6 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
+>  					 &vcpu->arch.fp_type, fp_type);
 >  
->  	if (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED) {
-> +		if (vcpu_has_sve(vcpu))
-> +			fp_type = FP_STATE_SVE;
-
-Eventually, I'd like to relax this, and start tracking the actual use
-of the guest rather than assuming that SVE guest use SVE at all times
-(odds are they won't).
-
-I hope this series still leaves us with this option.
+>  		clear_thread_flag(TIF_FOREIGN_FPSTATE);
+> -		update_thread_flag(TIF_SVE, vcpu_has_sve(vcpu));
+>  	}
+>  }
+>  
+> @@ -208,7 +207,5 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+>  			sysreg_clear_set(CPACR_EL1, CPACR_EL1_ZEN_EL0EN, 0);
+>  	}
+>  
+> -	update_thread_flag(TIF_SVE, 0);
+> -
+>  	local_irq_restore(flags);
+>  }
 
 Thanks,
 
