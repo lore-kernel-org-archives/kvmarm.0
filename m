@@ -2,58 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F857C6FA8E
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 14:59:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 330E0ECAAD8
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 15:39:59 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1CA94B2A5;
-	Tue, 20 Sep 2022 10:59:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 97C3D4B24D;
+	Tue, 20 Sep 2022 11:39:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3XXWnIMAvq98; Tue, 20 Sep 2022 10:59:57 -0400 (EDT)
+	with ESMTP id 67iOHs64NeXk; Tue, 20 Sep 2022 11:39:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB11B4B62C;
-	Tue, 20 Sep 2022 10:59:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 788424B637;
+	Tue, 20 Sep 2022 11:39:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 69BE74B2A5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 10:59:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 20AE74B62E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 11:39:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TX6bxRZEw6av for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 10:59:55 -0400 (EDT)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0F5E24B282
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 10:59:54 -0400 (EDT)
-Date: Tue, 20 Sep 2022 16:59:52 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1663685993;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=2LwbccH/O2V4VvsUvgVZRkPVC+fe/T2RtwTwDrP6Vno=;
- b=SA5a86HzBByQmS+k27ykaLjjUyf1t7gTOZXvPVagDdcsTcYJLjues4zqhV6WyMvVrcU0B8
- G31GRl7N5MgKeT8xDVjzIDzY+9KWSZfPnMtcgO0Syqx9tsQ5x6apg9vUPfgPo4SZP814XE
- I4MZMsJQ+JYylrWDMkRTu//hFZgI43k=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests RFC PATCH 05/19] lib/alloc_phys: Remove locking
-Message-ID: <20220920145952.fnftt2v46daigtdt@kamzik>
-References: <20220809091558.14379-1-alexandru.elisei@arm.com>
- <20220809091558.14379-6-alexandru.elisei@arm.com>
- <20220920084553.734jvkqpognzgfpr@kamzik>
- <Yym+MOMK68K7abiQ@e121798.cambridge.arm.com>
+ with ESMTP id A0kO6tPztNBH for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 11:39:54 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E8FB34B24D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 11:39:54 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id D9A6C624D1;
+ Tue, 20 Sep 2022 15:39:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 253E9C433D7;
+ Tue, 20 Sep 2022 15:39:50 +0000 (UTC)
+Date: Tue, 20 Sep 2022 16:39:47 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v3 3/7] mm: Add PG_arch_3 page flag
+Message-ID: <Yynewxzc6Zy8ls0N@arm.com>
+References: <20220810193033.1090251-4-pcc@google.com>
+ <202208111500.62e0Bl2l-lkp@intel.com> <YxDy+zFasbAP7Yrq@arm.com>
+ <YxYrgyybBMUqFswq@arm.com> <878rmfkzbu.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <Yym+MOMK68K7abiQ@e121798.cambridge.arm.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: nikos.nikoleris@arm.com, pbonzini@redhat.com, thuth@redhat.com,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+In-Reply-To: <878rmfkzbu.wl-maz@kernel.org>
+Cc: kbuild-all@lists.01.org, kernel test robot <lkp@intel.com>,
+ kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Cornelia Huck <cohuck@redhat.com>, Steven Price <steven.price@arm.com>,
+ Evgenii Stepanov <eugenis@google.com>,
+ Vincenzo Frascino <vincenzo.frascino@arm.com>,
+ Peter Collingbourne <pcc@google.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,58 +66,26 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 20, 2022 at 02:20:48PM +0100, Alexandru Elisei wrote:
-> Hi,
+On Mon, Sep 19, 2022 at 07:12:53PM +0100, Marc Zyngier wrote:
+> On Mon, 05 Sep 2022 18:01:55 +0100,
+> Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > Peter, please let me know if you want to pick this series up together
+> > with your other KVM patches. Otherwise I can post it separately, it's
+> > worth merging it on its own as it clarifies the page flag vs tag setting
+> > ordering.
 > 
-> On Tue, Sep 20, 2022 at 10:45:53AM +0200, Andrew Jones wrote:
-> > On Tue, Aug 09, 2022 at 10:15:44AM +0100, Alexandru Elisei wrote:
-> > > With powerpc moving the page allocator, there are no architectures left
-> > > which use the physical allocator after the boot setup:  arm, arm64,
-> > > s390x and powerpc drain the physical allocator to initialize the page
-> > > allocator; and x86 calls setup_vm() to drain the allocator for each of
-> > > the tests that allocate memory.
-> > 
-> > Please put the motivation for this change in the commit message. I looked
-> > ahead at the next patch to find it, but I'm not sure I agree with it. We
-> > should be able to keep the locking even when used early, since we probably
-> > need our locking to be something we can use early elsewhere anyway.
-> 
-> You are correct, the commit message doesn't explain why locking is removed,
-> which makes the commit confusing. I will try to do a better job for the
-> next iteration (if we decide to keep this patch).
-> 
-> I removed locking because the physical allocator by the end of the series
-> will end up being used only by arm64 to create the idmap, which is done on
+> I'm looking at queuing this, but I'm confused by this comment. Do I
+> need to pick this as part of the series? Or is this an independent
+> thing (my hunch is that it is actually required not to break other
+> architectures...).
 
-If only arm, and no unit tests, needs the phys allocator, then it can be
-integrated with whatever arm is using it for and removed from the general
-lib.
+This series series (at least the first patches) won't apply cleanly on
+top of 6.0-rc1 and, of course, we shouldn't break other architectures. I
+can repost the whole series but I don't have the setup to test the
+MAP_SHARED KVM option (unless Peter plans to post it soon).
 
-> the boot CPU and with the MMU off. After that, the translation table
-> allocator functions will use the page allocator, which can be used
-> concurrently.
-> 
-> Looking at the spinlock implementation, spin_lock() doesn't protect from
-> the concurrent accesses when the MMU is disabled (lock->v is
-> unconditionally set to 1). Which means that spin_lock() does not work (in
-> the sense that it doesn't protect against concurrent accesses) on the boot
-> path, which doesn't need a spinlock anyway, because no secondaries are
-> online secondaries. It also means that spinlocks don't work when
-> AUXINFO_MMU_OFF is set. So for the purpose of simplicity I preferred to
-> drop it entirely.
-
-If other architectures or unit tests have / could have uses for the
-phys allocator then we should either document that it doesn't have
-locks or keep the locks, and arm will just know that they don't work,
-but also that they don't need to for its purposes.
-
-Finally, if we drop the locks and arm doesn't have any other places where
-we use locks without the MMU enabled, then we can change the lock
-implementation to not have the no-mmu fallback - maybe by switching to the
-generic implementation as the other architectures have done.
-
-Thanks,
-drew
+-- 
+Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
