@@ -2,81 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3CA8C54EE9
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 17:49:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B97ABC54EE9
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 17:53:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 48B774B640;
-	Tue, 20 Sep 2022 13:49:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A9CD4B278;
+	Tue, 20 Sep 2022 13:53:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id M1sE6FiwKwSn; Tue, 20 Sep 2022 13:49:47 -0400 (EDT)
+	with ESMTP id 8auui+XPmE2u; Tue, 20 Sep 2022 13:53:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 286634B62A;
-	Tue, 20 Sep 2022 13:49:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF6624B62A;
+	Tue, 20 Sep 2022 13:53:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B36E64B25E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 13:49:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A6654B278
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 13:53:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FGQho9Bn7Pk8 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 13:49:44 -0400 (EDT)
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com
- [209.85.216.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F19740DAE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 13:49:44 -0400 (EDT)
-Received: by mail-pj1-f49.google.com with SMTP id fv3so3923292pjb.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 10:49:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date;
- bh=a2oYsLQ3PVWHBh7aJPcuMHK0Eov6Y7MY3uJqzL8zsI0=;
- b=DfDVeMnWujZV+9FFOGgmWOKii3IfaaLDv7GDK1T6JqVPGewlcolYuGYSA9r9P6FyYW
- DRN/YLG/z/OvwAwvtuS+5R4HufEmGGgIEy7tRyafgCZiRqGIuByRFRS7uvIi3v05BPSM
- YvR+y264eP+9AKSGOFnmCG4IYsMdEK/umaSMij4xuJKdqCL7VTEvdg5tnMMNEH/usxBF
- bUAtjGd+S2ujjr/NHPRKXQyhc+BSi/Ljb1+BhmVLAJnySXmRyq7+Se+DPepri72Hu53p
- 9i84x2JY2Dvc+DJkiJuGzoNr+/PDGZwyX/shalJxVrep6XBp7j7fqFsI8vZWV9sCIrL+
- +b+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
- bh=a2oYsLQ3PVWHBh7aJPcuMHK0Eov6Y7MY3uJqzL8zsI0=;
- b=32GZwiQZrNm1Lc2pkoA0dNx6y5OFT8gvnpqPYS4qr8yIU1ASfdKkLfHPsytv3x14+6
- h1fF1EeoWBOMQkyWopEPZIxyofW0hmZx3qbZoSpuSMEs5UD9hOXPZGqVeN1RooIM+Bq6
- tZzXt9X+ys4OBkpkYyiYFH8fUpou+bhSmzV7fimW1pGa2LDWNauMq+BAVmO/pnUIqyZZ
- Ye19RLGkf/1Ncz/m8xED+IwvKBt/rJTRGA6RU4dlepFW8vRh6dzzql50haEPtLlVDyOk
- LtKG3trmMrrYL49pnsEfZ+YryStw3OsMa8o9fvToGKNECV+VNhkRz02IR2j3rxKWbGFj
- FXYg==
-X-Gm-Message-State: ACrzQf2yJhrEcNyj2C+ib2yMpq8qE9B9AgTaM0ElVwSaaJTMm/WbUOEQ
- ToLdo6K4JB/TC76qQUsB3U5CHQ==
-X-Google-Smtp-Source: AMsMyM4OMIqPdmgjX4n9vxLmpMRKJZmYnaVXN+rH/Ma3Oj4UcUc4AdAUZuNnrasjaczhxUEXXMVx3w==
-X-Received: by 2002:a17:902:c189:b0:176:b871:8a1 with SMTP id
- d9-20020a170902c18900b00176b87108a1mr799560pld.30.1663696183470; 
- Tue, 20 Sep 2022 10:49:43 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com.
- [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
- z16-20020aa79e50000000b00537d7cc774bsm164533pfq.139.2022.09.20.10.49.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Sep 2022 10:49:42 -0700 (PDT)
-Date: Tue, 20 Sep 2022 10:49:38 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v7 07/13] KVM: selftests: Add vm->memslots[] and enum
- kvm_mem_region_type
-Message-ID: <Yyn9Mny/EJS3ffQ8@google.com>
-References: <20220920042551.3154283-1-ricarkol@google.com>
- <20220920042551.3154283-8-ricarkol@google.com>
- <Yyn6x6Y8wlMgSrgZ@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Yyn6x6Y8wlMgSrgZ@google.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
- andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com,
- axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu
+ with ESMTP id ar5N3x6LMds8 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 13:53:05 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E9F214B20D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 13:53:04 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 505F2B82BE2;
+ Tue, 20 Sep 2022 17:53:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11510C433D6;
+ Tue, 20 Sep 2022 17:53:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1663696382;
+ bh=xCgnmcH/2uSfbXCIRvneJfblf9LGApKKzOsPR5tudKQ=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=GsYCJPx2EPsFucIbphD0n1yrj4L5Yp3g/xSLupD3a5ArD7P4kN5nNyYTCZNELJdyA
+ CLS1r7tRo5eS9/v76kv+Vn7GnxtAix5s8nSM1g47gQoQInKPEKnAE+JXyInGROHuDi
+ nQ5PlZoGwbHyiIbfF0/srSg2gJosqXPPer9Aa0Q+wDAEkNZbbGLw/O+fnzADG8vgYB
+ yP4NwXaVENjye+zos2/bP7/+fZx3j2oGfkOc16eebDxQYpQ2iHEEjhX2QD0m983Yhh
+ ljzV/HioroOvfpGa52vF3WTK/+lEdr5OENcZJpBJ/znIB/FVPcvAmt5o/vMuidL9Qq
+ V0LtnulNJkytQ==
+Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oahQZ-00BSvr-Ru;
+ Tue, 20 Sep 2022 18:53:00 +0100
+Date: Tue, 20 Sep 2022 18:52:59 +0100
+Message-ID: <87wn9yj5l0.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v3 3/7] arm64/fpsimd: Have KVM explicitly say which FP
+ registers to save
+In-Reply-To: <20220815225529.930315-4-broonie@kernel.org>
+References: <20220815225529.930315-1-broonie@kernel.org>
+ <20220815225529.930315-4-broonie@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.176.101.241
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+ zhang.lei@jp.fujitsu.com, james.morse@arm.com, alexandru.elisei@arm.com,
+ andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Zhang Lei <zhang.lei@jp.fujitsu.com>, Andre Przywara <andre.przywara@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,108 +91,163 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 20, 2022 at 05:39:19PM +0000, Sean Christopherson wrote:
-> On Tue, Sep 20, 2022, Ricardo Koller wrote:
-> > The vm_create() helpers are hardcoded to place most page types (code,
-> > page-tables, stacks, etc) in the same memslot #0, and always backed with
-> > anonymous 4K.  There are a couple of issues with that.  First, tests willing to
+On Mon, 15 Aug 2022 23:55:25 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Preferred kernel style is to wrap changelogs at ~75 chars, e.g. so that `git show`
-> stays under 80 chars.
+> In order to avoid needlessly saving and restoring the guest registers KVM
+> relies on the host FPSMID code to save the guest registers when we context
+> switch away from the guest. This is done by binding the KVM guest state to
+> the CPU on top of the task state that was originally there, then carefully
+> managing the TIF_SVE flag for the task to cause the host to save the full
+> SVE state when needed regardless of the needs of the host task. This works
+> well enough but isn't terribly direct about what is going on and makes it
+> much more complicated to try to optimise what we're doing with the SVE
+> register state.
 > 
-> And in general, please incorporate checkpatch into your workflow, e.g. there's
-> also a spelling mistake below.
+> Let's instead have KVM pass in the register state it wants saving when it
+> binds to the CPU. We introduce a new FP_TYPE_TASK for use during normal
+> task binding to indicate that we should base our decisions on the current
+> task. In order to ease any future debugging that might be required this
+> patch does not actually update any of the decision making about what to
+> save, it merely starts tracking the new information and warns if the
+> requested state is not what we would otherwise have decided to save.
 > 
->   WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
->   #9: 
->   anonymous 4K.  There are a couple of issues with that.  First, tests willing to
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/fpsimd.h    |  3 ++-
+>  arch/arm64/include/asm/processor.h |  1 +
+>  arch/arm64/kernel/fpsimd.c         | 20 +++++++++++++++++++-
+>  arch/arm64/kvm/fpsimd.c            |  9 ++++++++-
+>  4 files changed, 30 insertions(+), 3 deletions(-)
 > 
->   WARNING: 'spreaded' may be misspelled - perhaps 'spread'?
->   #12: 
->   the hardcoded assumption of memslot #0 holding most things is spreaded
->                                                               ^^^^^^^^
-> 
->   total: 0 errors, 2 warnings, 94 lines checked
-> 
-> > differ a bit, like placing page-tables in a different backing source type must
-> > replicate much of what's already done by the vm_create() functions.  Second,
-> > the hardcoded assumption of memslot #0 holding most things is spreaded
-> > everywhere; this makes it very hard to change.
-> 
-> ...
-> 
-> > @@ -105,6 +119,13 @@ struct kvm_vm {
-> >  struct userspace_mem_region *
-> >  memslot2region(struct kvm_vm *vm, uint32_t memslot);
-> >  
-> > +inline struct userspace_mem_region *
-> 
-> Should be static inline.
-> 
-> > +vm_get_mem_region
-> 
-> Please don't insert newlines before the function name, it makes searching painful.
-> Ignore existing patterns in KVM selfetsts, they're wrong.  ;-)  Linus has a nice
-> explanation/rant on this[*].
-> 
-> The resulting declaration will run long, but at least for me, I'll take that any
-> day over putting the function name on a new line.
-> 
-> [*] https://lore.kernel.org/all/CAHk-=wjoLAYG446ZNHfg=GhjSY6nFmuB_wA8fYd5iLBNXjo9Bw@mail.gmail.com
-> 
-> 
-> > (struct kvm_vm *vm, enum kvm_mem_region_type mrt)
-> 
-> One last nit, what about "region" or "type" instead of "mrt"?  The acronym made me
-> briefly pause to figure out what "mrt" meant, which is silly because the name really
-> doesn't have much meaning.
-> 
-> > +{
-> > +	assert(mrt < NR_MEM_REGIONS);
-> > +	return memslot2region(vm, vm->memslots[mrt]);
-> > +}
-> 
-> ...
-> 
-> > @@ -293,8 +287,16 @@ struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
-> >  	uint64_t nr_pages = vm_nr_pages_required(mode, nr_runnable_vcpus,
-> >  						 nr_extra_pages);
-> >  	struct kvm_vm *vm;
-> > +	int i;
-> > +
-> > +	pr_debug("%s: mode='%s' pages='%ld'\n", __func__,
-> > +		 vm_guest_mode_string(mode), nr_pages);
-> > +
-> > +	vm = ____vm_create(mode);
-> > +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, nr_pages, 0);
-> 
-> The spacing is weird here.  Adding the region and stuffing vm->memslots are what
-> should be bundled together, not creating the VM and adding the common region.  I.e.
-> 
-> 	pr_debug("%s: mode='%s' pages='%ld'\n", __func__,
-> 		 vm_guest_mode_string(mode), nr_pages);
-> 
-> 	vm = ____vm_create(mode);
-> 
-> 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, nr_pages, 0);
-> 	for (i = 0; i < NR_MEM_REGIONS; i++)
-> 		vm->memslots[i] = 0;
-> 
-> >  
-> > -	vm = ____vm_create(mode, nr_pages);
-> > +	for (i = 0; i < NR_MEM_REGIONS; i++)
-> > +		vm->memslots[i] = 0;
-> >  
-> >  	kvm_vm_elf_load(vm, program_invocation_name);
-> >  
-> > -- 
-> > 2.37.3.968.ga6b4b080e4-goog
-> > 
+> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+> index b74103a79052..21a1dd320ca5 100644
+> --- a/arch/arm64/include/asm/fpsimd.h
+> +++ b/arch/arm64/include/asm/fpsimd.h
+> @@ -61,7 +61,8 @@ extern void fpsimd_kvm_prepare(void);
+>  extern void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *state,
+>  				     void *sve_state, unsigned int sve_vl,
+>  				     void *za_state, unsigned int sme_vl,
+> -				     u64 *svcr, enum fp_state *type);
+> +				     u64 *svcr, enum fp_state *type,
+> +				     enum fp_state to_save);
+>  
+>  extern void fpsimd_flush_task_state(struct task_struct *target);
+>  extern void fpsimd_save_and_flush_cpu_state(void);
+> diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+> index 4818a6b77f39..89c248b8d4ba 100644
+> --- a/arch/arm64/include/asm/processor.h
+> +++ b/arch/arm64/include/asm/processor.h
+> @@ -123,6 +123,7 @@ enum vec_type {
+>  };
+>  
+>  enum fp_state {
+> +	FP_STATE_TASK,		/* Save based on current, invalid as fp_type */
 
-Ack on all the above. Will send a v8 later today.
+How is that related to the FP_TYPE_TASK in the commit message? What
+does this 'invalid as fp_type' mean?
 
-Thanks!
-Ricardo
+>  	FP_STATE_FPSIMD,
+>  	FP_STATE_SVE,
+>  };
+> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> index 6544ae00230f..7be20ced2c45 100644
+> --- a/arch/arm64/kernel/fpsimd.c
+> +++ b/arch/arm64/kernel/fpsimd.c
+> @@ -126,6 +126,7 @@ struct fpsimd_last_state_struct {
+>  	unsigned int sve_vl;
+>  	unsigned int sme_vl;
+>  	enum fp_state *fp_type;
+> +	enum fp_state to_save;
+>  };
+>  
+>  static DEFINE_PER_CPU(struct fpsimd_last_state_struct, fpsimd_last_state);
+> @@ -459,6 +460,21 @@ static void fpsimd_save(void)
+>  		vl = last->sve_vl;
+>  	}
+>  
+> +	/*
+> +	 * For now we're just validating that the requested state is
+> +	 * consistent with what we'd otherwise work out.
+
+Nit: work out? or worked out? the "we'd" doesn't help disambiguate it
+for a non-native speaker.
+
+> +	 */
+> +	switch (last->to_save) {
+> +	case FP_STATE_TASK:
+> +		break;
+> +	case FP_STATE_FPSIMD:
+> +		WARN_ON_ONCE(save_sve_regs);
+> +		break;
+> +	case FP_STATE_SVE:
+> +		WARN_ON_ONCE(!save_sve_regs);
+> +		break;
+> +	}
+> +
+>  	if (system_supports_sme()) {
+>  		u64 *svcr = last->svcr;
+>  
+> @@ -1693,6 +1709,7 @@ static void fpsimd_bind_task_to_cpu(void)
+>  	last->sme_vl = task_get_sme_vl(current);
+>  	last->svcr = &current->thread.svcr;
+>  	last->fp_type = &current->thread.fp_type;
+> +	last->to_save = FP_STATE_TASK;
+>  	current->thread.fpsimd_cpu = smp_processor_id();
+>  
+>  	/*
+> @@ -1717,7 +1734,7 @@ static void fpsimd_bind_task_to_cpu(void)
+>  void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
+>  			      unsigned int sve_vl, void *za_state,
+>  			      unsigned int sme_vl, u64 *svcr,
+> -			      enum fp_state *type)
+> +			      enum fp_state *type, enum fp_state to_save)
+
+OK, how many discrete arguments are we going to pass to this function,
+which most of them are part the vcpu structure? It really feels like
+what you want is a getter for the per-cpu structure, and let the KVM
+code do the actual business. If this function was supposed to provide
+some level of abstraction, well, it's a fail.
+
+>  {
+>  	struct fpsimd_last_state_struct *last =
+>  		this_cpu_ptr(&fpsimd_last_state);
+> @@ -1732,6 +1749,7 @@ void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
+>  	last->sve_vl = sve_vl;
+>  	last->sme_vl = sme_vl;
+>  	last->fp_type = type;
+> +	last->to_save = to_save;
+>  }
+>  
+>  /*
+> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> index a92977759f8d..db0b2bacaeb8 100644
+> --- a/arch/arm64/kvm/fpsimd.c
+> +++ b/arch/arm64/kvm/fpsimd.c
+> @@ -130,9 +130,16 @@ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu)
+>   */
+>  void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
+>  {
+> +	enum fp_state fp_type;
+> +
+>  	WARN_ON_ONCE(!irqs_disabled());
+>  
+>  	if (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED) {
+> +		if (vcpu_has_sve(vcpu))
+> +			fp_type = FP_STATE_SVE;
+
+Eventually, I'd like to relax this, and start tracking the actual use
+of the guest rather than assuming that SVE guest use SVE at all times
+(odds are they won't).
+
+I hope this series still leaves us with this option.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
