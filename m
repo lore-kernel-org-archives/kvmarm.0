@@ -2,72 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE9D2C6FA82
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DADD7C6FA90
 	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 04:15:33 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 799954B634;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98DDD4B70F;
 	Tue, 20 Sep 2022 00:15:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ooUsh2fPitqS; Tue, 20 Sep 2022 00:15:29 -0400 (EDT)
+	with ESMTP id 46f1yX4UGEzw; Tue, 20 Sep 2022 00:15:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A84DF4B6C8;
-	Tue, 20 Sep 2022 00:15:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5DDD4B6F9;
+	Tue, 20 Sep 2022 00:15:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E93CF4B6F9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 00:15:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8068B4B69D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 00:15:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BlRaawohVB3d for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 00:15:25 -0400 (EDT)
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com
- [209.85.128.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B7EF4B629
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 00:15:25 -0400 (EDT)
-Received: by mail-yw1-f201.google.com with SMTP id
- 00721157ae682-345482ec6adso10854577b3.18
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 21:15:25 -0700 (PDT)
+ with ESMTP id zmCtGOPXyI8H for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 00:15:29 -0400 (EDT)
+Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com
+ [209.85.210.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 81C434B6B2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 00:15:28 -0400 (EDT)
+Received: by mail-ot1-f74.google.com with SMTP id
+ p4-20020a9d4544000000b0065952fed1aeso743143oti.6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 21:15:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:from:to:cc:subject:date;
- bh=wivmK/gfHu/pusmWBSBH27kAT59CpYV7JfPbqS5mvEI=;
- b=aUMmU3oWTPQWPeyddslf4lpS4PXBkd2psbBGsRXlC0NO8uNF7qo1ri5ZcscDfCligx
- 1LRzR8GpYE99gB2QNea0IA6P7RuepbIKx0WqVv1qCb4ZxthOR20yOEGkiKumYUelxKql
- 3yazs3YPGYv5PovA6FvOt8IuMoOTjbDIVTrO1PBpBLfUCrl7P8qF1V9utCx/tR5MV9w6
- R4Kt748LGgrFAC4k8VR6NltDUL372YKGJ0yDWBHUdJaTPT7H4yqcrkFdZmNcvYhNUcFI
- cGq6ep2xEaLX0nOaO+PeKow6dQ5QaJ0sEjUOYOAXLOhjaKEZNLfEzta+pReIlLiNuSlf
- hkOw==
+ bh=dPrDEiMrF90+KqH+TnpUvHdKmNrnwclyo7CCTZA5p5g=;
+ b=qI6w0zoM3xU+cLFnTY54Ap7hlH92xtA948aGj2D0nS9rOUQXQz+U5i2VMcN0dygEe9
+ b2GbNNpu26LdUBOtGYPsdX1dm0PrFjK51swC+JFhKMuwQutx6UHSCLx7rMIOFnLqTyVc
+ 9wtsAKJMuMshqak7n8M0pwmJXcl20KDpALPD3IKVIVCXwCxmyew7/SY/Wq2lwEIqkZ9R
+ efK0KbdctRP038PIUW54LVzE6VvHwAoiTVSPugDWTckt02o5NFOQfrwj0m419Ri3De60
+ pNhhTxNVm/2QoZeq0/wf7yraP79KtgB9x7RbrvcegJm/F9vWgt6PucxWjzQYwrtfPJbB
+ XxJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:x-gm-message-state:from:to:cc:subject:date;
- bh=wivmK/gfHu/pusmWBSBH27kAT59CpYV7JfPbqS5mvEI=;
- b=JI86+nxm++LZi9ryiAVNN8PUFr++il0rbNexfJdK6t2gOJNlGAbAP1fVBall4Bd336
- m+BddODEHdPafQDjHWIKTViiYiSDrF6KVVFGEYR1JjjKjJPZADo3xhOz0w311KmdQXuV
- R/V94CMHr9M8wL6uP/wxCKoB9Voj2kWqYvy5zQ8JDCKrac1G4/NF7BUnIJJfHslpuLei
- 7DTveOrMR1qG7Nw0GrBosS8o74Pk65p5X7OpRx5mZ32N6o0c+Six2M6FgckzE5yegNP4
- KVnxiJfq0Fow8arr3+4YeJ9ivmyKN6zBFGDF92a0imGtiwx4+wcxtPKbXrWMUNKkg6lI
- uWxw==
-X-Gm-Message-State: ACrzQf1fJFDWa8h20amGisgvQpXw6mfRgFEOdFvxXt4c50QSNlBJaAUh
- kdRV0LttUb6bnBdRoWqNOZ32ThNqrzbm6A==
-X-Google-Smtp-Source: AMsMyM5kq2TF0Kv+dlvBuQQyJFPhFkK35yRxrbXSY1UyY7f+wucztXF3JHHuxsyJ3YV/M6isVJvrQLG1WsLxsg==
+ bh=dPrDEiMrF90+KqH+TnpUvHdKmNrnwclyo7CCTZA5p5g=;
+ b=srt7X/eFDw/tLdg02tLDrNLviUHvIZpzl29vA1Cw34V0fg/Lb9I7Nu/bQpX6fv1Xl7
+ GD64M5pjFzle4SBsTNT3vOxUcCSvLPWOhWaW+X8Li/ZhN6AVEYNTBNBrC+7jJBRa9rTT
+ 5tjzt7GpnMbWUGiYQxyHwsu2YyX0xA5mAL64ZP3Ld7BiKnimo2Wu1T4Ps02eRFr3vPve
+ 5DEYtn4nO6PsJNb6TAYDbum/vFxBUzrLEneJq607QvuhSt6dqNLBSmd/zxhqWdDtc8Zh
+ qWqK89RyNCWkhS3NljqsapUZhEtTitkn5lE0velEgz7y5xLfpo4c9xXfxFiT6q97U7XY
+ LO5w==
+X-Gm-Message-State: ACrzQf2V2mIVDdDafn6vRMdrPMrYkdg5oURw7+yHcFaOXsqZSu405qCa
+ HOTkg51PBnCdFqdzHCtsYi7nbIc5k3C11Q==
+X-Google-Smtp-Source: AMsMyM6YrbXd+PdoipZL2YzC9aRyCe2KxcWs8w72uy8bsY8goN8Hsu1lj9GgiXXBYJcQBgOG9ZqsW86DHLDVpA==
 X-Received: from ricarkol4.c.googlers.com
  ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a25:8d0c:0:b0:6af:d486:dd61 with SMTP id
- n12-20020a258d0c000000b006afd486dd61mr17596182ybl.402.1663647324806; Mon, 19
- Sep 2022 21:15:24 -0700 (PDT)
-Date: Tue, 20 Sep 2022 04:15:04 +0000
+ (user=ricarkol job=sendgmr) by 2002:a05:6871:709:b0:128:3cd:f71b with SMTP id
+ f9-20020a056871070900b0012803cdf71bmr903662oap.195.1663647327972; Mon, 19 Sep
+ 2022 21:15:27 -0700 (PDT)
+Date: Tue, 20 Sep 2022 04:15:06 +0000
 In-Reply-To: <20220920041509.3131141-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220920041509.3131141-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Message-ID: <20220920041509.3131141-9-ricarkol@google.com>
-Subject: [PATCH v6 08/13] KVM: selftests: Use the right memslot for code,
- page-tables, and data allocations
+Message-ID: <20220920041509.3131141-11-ricarkol@google.com>
+Subject: [PATCH v6 10/13] KVM: selftests: aarch64: Add userfaultfd tests into
+ page_fault_test
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev
 Cc: maz@kernel.org, bgardon@google.com, pbonzini@redhat.com,
@@ -88,284 +88,305 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The previous commit added support for callers of ____vm_create() to specify
-what memslots to use for code, page-tables, and data allocations. Change
-them accordingly:
+Add some userfaultfd tests into page_fault_test. Punch holes into the
+data and/or page-table memslots, perform some accesses, and check that
+the faults are taken (or not taken) when expected.
 
-- stacks, code, and exception tables use the code memslot
-- page tables and the pgd use the pt memslot
-- data (anything allocated with vm_vaddr_alloc()) uses the data memslot
-
-No functional change intended. All allocators keep using memslot #0.
-
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Andrew Jones <andrew.jones@linux.dev>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- .../selftests/kvm/include/kvm_util_base.h     |  3 +
- .../selftests/kvm/lib/aarch64/processor.c     | 11 ++--
- tools/testing/selftests/kvm/lib/elf.c         |  3 +-
- tools/testing/selftests/kvm/lib/kvm_util.c    | 57 ++++++++++++-------
- .../selftests/kvm/lib/riscv/processor.c       |  7 ++-
- .../selftests/kvm/lib/s390x/processor.c       |  7 ++-
- .../selftests/kvm/lib/x86_64/processor.c      | 13 +++--
- 7 files changed, 61 insertions(+), 40 deletions(-)
+ .../selftests/kvm/aarch64/page_fault_test.c   | 190 +++++++++++++++++-
+ 1 file changed, 188 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 26187b8a66c6..59a33000903e 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -402,7 +402,10 @@ void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
- void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
- struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id);
- vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
-+vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz,
-+			    vm_vaddr_t vaddr_min, enum kvm_mem_region_type mr);
- vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages);
-+vm_vaddr_t __vm_vaddr_alloc_page(struct kvm_vm *vm, enum kvm_mem_region_type mr);
- vm_vaddr_t vm_vaddr_alloc_page(struct kvm_vm *vm);
+diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+index 98f12e7af14b..f0cdd4e99dd0 100644
+--- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
++++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+@@ -35,6 +35,12 @@ static uint64_t *guest_test_memory = (uint64_t *)TEST_GVA;
+ #define PREPARE_FN_NR				10
+ #define CHECK_FN_NR				10
  
- void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 26f0eccff6fe..3d4bb11bbd85 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -79,7 +79,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
- 	if (!vm->pgd_created) {
- 		vm_paddr_t paddr = vm_phy_pages_alloc(vm,
- 			page_align(vm, ptrs_per_pgd(vm) * 8) / vm->page_size,
--			KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
-+			KVM_GUEST_PAGE_TABLE_MIN_PADDR, vm->memslots[MEM_REGION_PT]);
- 		vm->pgd = paddr;
- 		vm->pgd_created = true;
- 	}
-@@ -328,8 +328,9 @@ struct kvm_vcpu *aarch64_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 	size_t stack_size = vm->page_size == 4096 ?
- 					DEFAULT_STACK_PGS * vm->page_size :
- 					vm->page_size;
--	uint64_t stack_vaddr = vm_vaddr_alloc(vm, stack_size,
--					      DEFAULT_ARM64_GUEST_STACK_VADDR_MIN);
-+	uint64_t stack_vaddr = __vm_vaddr_alloc(vm, stack_size,
-+						DEFAULT_ARM64_GUEST_STACK_VADDR_MIN,
-+						MEM_REGION_CODE);
- 	struct kvm_vcpu *vcpu = __vm_vcpu_add(vm, vcpu_id);
++static struct event_cnt {
++	int uffd_faults;
++	/* uffd_faults is incremented from multiple threads. */
++	pthread_mutex_t uffd_faults_mutex;
++} events;
++
+ struct test_desc {
+ 	const char *name;
+ 	uint64_t mem_mark_cmd;
+@@ -42,11 +48,14 @@ struct test_desc {
+ 	bool (*guest_prepare[PREPARE_FN_NR])(void);
+ 	void (*guest_test)(void);
+ 	void (*guest_test_check[CHECK_FN_NR])(void);
++	uffd_handler_t uffd_pt_handler;
++	uffd_handler_t uffd_data_handler;
+ 	void (*dabt_handler)(struct ex_regs *regs);
+ 	void (*iabt_handler)(struct ex_regs *regs);
+ 	uint32_t pt_memslot_flags;
+ 	uint32_t data_memslot_flags;
+ 	bool skip;
++	struct event_cnt expected_events;
+ };
  
- 	aarch64_vcpu_setup(vcpu, init);
-@@ -435,8 +436,8 @@ void route_exception(struct ex_regs *regs, int vector)
- 
- void vm_init_descriptor_tables(struct kvm_vm *vm)
- {
--	vm->handlers = vm_vaddr_alloc(vm, sizeof(struct handlers),
--			vm->page_size);
-+	vm->handlers = __vm_vaddr_alloc(vm, sizeof(struct handlers),
-+					vm->page_size, MEM_REGION_CODE);
- 
- 	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
- }
-diff --git a/tools/testing/selftests/kvm/lib/elf.c b/tools/testing/selftests/kvm/lib/elf.c
-index 9f54c098d9d0..51f280c412ba 100644
---- a/tools/testing/selftests/kvm/lib/elf.c
-+++ b/tools/testing/selftests/kvm/lib/elf.c
-@@ -161,7 +161,8 @@ void kvm_vm_elf_load(struct kvm_vm *vm, const char *filename)
- 		seg_vend |= vm->page_size - 1;
- 		size_t seg_size = seg_vend - seg_vstart + 1;
- 
--		vm_vaddr_t vaddr = vm_vaddr_alloc(vm, seg_size, seg_vstart);
-+		vm_vaddr_t vaddr = __vm_vaddr_alloc(vm, seg_size, seg_vstart,
-+						    MEM_REGION_CODE);
- 		TEST_ASSERT(vaddr == seg_vstart, "Unable to allocate "
- 			"virtual memory for segment at requested min addr,\n"
- 			"  segment idx: %u\n"
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 2e36d6323518..7e5d565f9b8c 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1184,32 +1184,15 @@ static vm_vaddr_t vm_vaddr_unused_gap(struct kvm_vm *vm, size_t sz,
- 	return pgidx_start * vm->page_size;
+ struct test_params {
+@@ -263,7 +272,110 @@ static void no_iabt_handler(struct ex_regs *regs)
+ 	GUEST_ASSERT_1(false, regs->pc);
  }
  
--/*
-- * VM Virtual Address Allocate
-- *
-- * Input Args:
-- *   vm - Virtual Machine
-- *   sz - Size in bytes
-- *   vaddr_min - Minimum starting virtual address
-- *
-- * Output Args: None
-- *
-- * Return:
-- *   Starting guest virtual address
-- *
-- * Allocates at least sz bytes within the virtual address space of the vm
-- * given by vm.  The allocated bytes are mapped to a virtual address >=
-- * the address given by vaddr_min.  Note that each allocation uses a
-- * a unique set of pages, with the minimum real allocation being at least
-- * a page.
-- */
--vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
-+vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz,
-+			    vm_vaddr_t vaddr_min, enum kvm_mem_region_type mrt)
- {
- 	uint64_t pages = (sz >> vm->page_shift) + ((sz % vm->page_size) != 0);
- 
- 	virt_pgd_alloc(vm);
- 	vm_paddr_t paddr = vm_phy_pages_alloc(vm, pages,
--					      KVM_UTIL_MIN_PFN * vm->page_size, 0);
-+				KVM_UTIL_MIN_PFN * vm->page_size,
-+				vm->memslots[mrt]);
- 
- 	/*
- 	 * Find an unused range of virtual page addresses of at least
-@@ -1230,6 +1213,30 @@ vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
- 	return vaddr_start;
- }
- 
-+/*
-+ * VM Virtual Address Allocate
-+ *
-+ * Input Args:
-+ *   vm - Virtual Machine
-+ *   sz - Size in bytes
-+ *   vaddr_min - Minimum starting virtual address
-+ *
-+ * Output Args: None
-+ *
-+ * Return:
-+ *   Starting guest virtual address
-+ *
-+ * Allocates at least sz bytes within the virtual address space of the vm
-+ * given by vm.  The allocated bytes are mapped to a virtual address >=
-+ * the address given by vaddr_min.  Note that each allocation uses a
-+ * a unique set of pages, with the minimum real allocation being at least
-+ * a page. The allocated physical space comes from the data memory region.
-+ */
-+vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
++static struct uffd_args {
++	char *copy;
++	void *hva;
++	uint64_t paging_size;
++} pt_args, data_args;
++
+ /* Returns true to continue the test, and false if it should be skipped. */
++static int uffd_generic_handler(int uffd_mode, int uffd,
++		struct uffd_msg *msg, struct uffd_args *args,
++		bool expect_write)
 +{
-+	return __vm_vaddr_alloc(vm, sz, vaddr_min, MEM_REGION_DATA);
++	uint64_t addr = msg->arg.pagefault.address;
++	uint64_t flags = msg->arg.pagefault.flags;
++	struct uffdio_copy copy;
++	int ret;
++
++	TEST_ASSERT(uffd_mode == UFFDIO_REGISTER_MODE_MISSING,
++			"The only expected UFFD mode is MISSING");
++	ASSERT_EQ(!!(flags & UFFD_PAGEFAULT_FLAG_WRITE), expect_write);
++	ASSERT_EQ(addr, (uint64_t)args->hva);
++
++	pr_debug("uffd fault: addr=%p write=%d\n",
++			(void *)addr, !!(flags & UFFD_PAGEFAULT_FLAG_WRITE));
++
++	copy.src = (uint64_t)args->copy;
++	copy.dst = addr;
++	copy.len = args->paging_size;
++	copy.mode = 0;
++
++	ret = ioctl(uffd, UFFDIO_COPY, &copy);
++	if (ret == -1) {
++		pr_info("Failed UFFDIO_COPY in 0x%lx with errno: %d\n",
++				addr, errno);
++		return ret;
++	}
++
++	pthread_mutex_lock(&events.uffd_faults_mutex);
++	events.uffd_faults += 1;
++	pthread_mutex_unlock(&events.uffd_faults_mutex);
++	return 0;
++}
++
++static int uffd_pt_write_handler(int mode, int uffd, struct uffd_msg *msg)
++{
++	return uffd_generic_handler(mode, uffd, msg, &pt_args, true);
++}
++
++static int uffd_data_write_handler(int mode, int uffd, struct uffd_msg *msg)
++{
++	return uffd_generic_handler(mode, uffd, msg, &data_args, true);
++}
++
++static int uffd_data_read_handler(int mode, int uffd, struct uffd_msg *msg)
++{
++	return uffd_generic_handler(mode, uffd, msg, &data_args, false);
++}
++
++static void setup_uffd_args(struct userspace_mem_region *region,
++				struct uffd_args *args)
++{
++	args->hva = (void *)region->region.userspace_addr;
++	args->paging_size = region->region.memory_size;
++
++	args->copy = malloc(args->paging_size);
++	TEST_ASSERT(args->copy, "Failed to allocate data copy.");
++	memcpy(args->copy, args->hva, args->paging_size);
++}
++
++static void setup_uffd(struct kvm_vm *vm, struct test_params *p,
++		struct uffd_desc **pt_uffd, struct uffd_desc **data_uffd)
++{
++	struct test_desc *test = p->test_desc;
++
++	setup_uffd_args(vm_get_mem_region(vm, MEM_REGION_PT), &pt_args);
++	setup_uffd_args(vm_get_mem_region(vm, MEM_REGION_DATA), &data_args);
++
++	*pt_uffd = NULL;
++	if (test->uffd_pt_handler)
++		*pt_uffd = uffd_setup_demand_paging(
++				UFFDIO_REGISTER_MODE_MISSING, 0,
++				pt_args.hva, pt_args.paging_size,
++				test->uffd_pt_handler);
++
++	*data_uffd = NULL;
++	if (test->uffd_data_handler)
++		*data_uffd = uffd_setup_demand_paging(
++				UFFDIO_REGISTER_MODE_MISSING, 0,
++				data_args.hva, data_args.paging_size,
++				test->uffd_data_handler);
++}
++
++static void free_uffd(struct test_desc *test, struct uffd_desc *pt_uffd,
++			struct uffd_desc *data_uffd)
++{
++	if (test->uffd_pt_handler)
++		uffd_stop_demand_paging(pt_uffd);
++	if (test->uffd_data_handler)
++		uffd_stop_demand_paging(data_uffd);
++
++	free(pt_args.copy);
++	free(data_args.copy);
++}
++
++/* Returns false if the test should be skipped. */
+ static bool punch_hole_in_memslot(struct kvm_vm *vm,
+ 				  struct userspace_mem_region *region)
+ {
+@@ -411,6 +523,11 @@ static void setup_memslots(struct kvm_vm *vm, struct test_params *p)
+ 	vm->memslots[MEM_REGION_DATA] = DATA_MEMSLOT;
+ }
+ 
++static void check_event_counts(struct test_desc *test)
++{
++	ASSERT_EQ(test->expected_events.uffd_faults, events.uffd_faults);
++}
++
+ static void print_test_banner(enum vm_guest_mode mode, struct test_params *p)
+ {
+ 	struct test_desc *test = p->test_desc;
+@@ -421,12 +538,17 @@ static void print_test_banner(enum vm_guest_mode mode, struct test_params *p)
+ 			vm_mem_backing_src_alias(p->src_type)->name);
+ }
+ 
++static void reset_event_counts(void)
++{
++	memset(&events, 0, sizeof(events));
 +}
 +
  /*
-  * VM Virtual Address Allocate Pages
-  *
-@@ -1249,6 +1256,11 @@ vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages)
- 	return vm_vaddr_alloc(vm, nr_pages * getpagesize(), KVM_UTIL_MIN_VADDR);
+  * This function either succeeds, skips the test (after setting test->skip), or
+  * fails with a TEST_FAIL that aborts all tests.
+  */
+ static void vcpu_run_loop(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
+-			  struct test_desc *test)
++		struct test_desc *test)
+ {
+ 	struct ucall uc;
+ 
+@@ -461,6 +583,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	struct test_desc *test = p->test_desc;
+ 	struct kvm_vm *vm;
+ 	struct kvm_vcpu *vcpu;
++	struct uffd_desc *pt_uffd, *data_uffd;
+ 
+ 	print_test_banner(mode, p);
+ 
+@@ -473,7 +596,16 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 
+ 	ucall_init(vm, NULL);
+ 
++	reset_event_counts();
++
++	/*
++	 * Set some code in the data memslot for the guest to execute (only
++	 * applicable to the EXEC tests). This has to be done before
++	 * setup_uffd() as that function copies the memslot data for the uffd
++	 * handler.
++	 */
+ 	load_exec_code_for_test(vm);
++	setup_uffd(vm, p, &pt_uffd, &data_uffd);
+ 	setup_abort_handlers(vm, vcpu, test);
+ 	vcpu_args_set(vcpu, 1, test);
+ 
+@@ -481,6 +613,14 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 
+ 	ucall_uninit(vm);
+ 	kvm_vm_free(vm);
++	free_uffd(test, pt_uffd, data_uffd);
++
++	/*
++	 * Make sure we check the events after the uffd threads have exited,
++	 * which means they updated their respective event counters.
++	 */
++	if (!test->skip)
++		check_event_counts(test);
  }
  
-+vm_vaddr_t __vm_vaddr_alloc_page(struct kvm_vm *vm, enum kvm_mem_region_type mrt)
-+{
-+	return __vm_vaddr_alloc(vm, getpagesize(), KVM_UTIL_MIN_VADDR, mrt);
+ static void help(char *name)
+@@ -496,6 +636,7 @@ static void help(char *name)
+ #define SNAME(s)			#s
+ #define SCAT2(a, b)			SNAME(a ## _ ## b)
+ #define SCAT3(a, b, c)			SCAT2(a, SCAT2(b, c))
++#define SCAT4(a, b, c, d)		SCAT2(a, SCAT3(b, c, d))
+ 
+ #define _CHECK(_test)			_CHECK_##_test
+ #define _PREPARE(_test)			_PREPARE_##_test
+@@ -514,7 +655,7 @@ static void help(char *name)
+ #define _CHECK_with_af			guest_check_pte_af
+ #define _CHECK_no_af			NULL
+ 
+-/* Performs an access and checks that no faults were triggered. */
++/* Performs an access and checks that no faults (no events) were triggered. */
+ #define TEST_ACCESS(_access, _with_af, _mark_cmd)				\
+ {										\
+ 	.name			= SCAT3(_access, _with_af, #_mark_cmd),		\
+@@ -523,6 +664,21 @@ static void help(char *name)
+ 	.mem_mark_cmd		= _mark_cmd,					\
+ 	.guest_test		= _access,					\
+ 	.guest_test_check	= { _CHECK(_with_af) },				\
++	.expected_events	= { 0 },					\
 +}
 +
- /*
-  * VM Virtual Address Allocate Page
-  *
-@@ -1814,7 +1826,8 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
- 
- vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
- {
--	return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
-+	return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-+				 vm->memslots[MEM_REGION_PT]);
++#define TEST_UFFD(_access, _with_af, _mark_cmd,					\
++		  _uffd_data_handler, _uffd_pt_handler, _uffd_faults)		\
++{										\
++	.name			= SCAT4(uffd, _access, _with_af, #_mark_cmd),	\
++	.guest_prepare		= { _PREPARE(_with_af),				\
++				    _PREPARE(_access) },			\
++	.guest_test		= _access,					\
++	.mem_mark_cmd		= _mark_cmd,					\
++	.guest_test_check	= { _CHECK(_with_af) },				\
++	.uffd_data_handler	= _uffd_data_handler,				\
++	.uffd_pt_handler	= _uffd_pt_handler,				\
++	.expected_events	= { .uffd_faults = _uffd_faults, },		\
  }
  
- /*
-diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
-index 604478151212..26c8d3dffb9a 100644
---- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-+++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-@@ -58,7 +58,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
- 	if (!vm->pgd_created) {
- 		vm_paddr_t paddr = vm_phy_pages_alloc(vm,
- 			page_align(vm, ptrs_per_pte(vm) * 8) / vm->page_size,
--			KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
-+			KVM_GUEST_PAGE_TABLE_MIN_PADDR, vm->memslots[MEM_REGION_PT]);
- 		vm->pgd = paddr;
- 		vm->pgd_created = true;
- 	}
-@@ -282,8 +282,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 	size_t stack_size = vm->page_size == 4096 ?
- 					DEFAULT_STACK_PGS * vm->page_size :
- 					vm->page_size;
--	unsigned long stack_vaddr = vm_vaddr_alloc(vm, stack_size,
--					DEFAULT_RISCV_GUEST_STACK_VADDR_MIN);
-+	unsigned long stack_vaddr = __vm_vaddr_alloc(vm, stack_size,
-+					DEFAULT_RISCV_GUEST_STACK_VADDR_MIN,
-+					MEM_REGION_CODE);
- 	unsigned long current_gp = 0;
- 	struct kvm_mp_state mps;
- 	struct kvm_vcpu *vcpu;
-diff --git a/tools/testing/selftests/kvm/lib/s390x/processor.c b/tools/testing/selftests/kvm/lib/s390x/processor.c
-index 89d7340d9cbd..410ae2b59847 100644
---- a/tools/testing/selftests/kvm/lib/s390x/processor.c
-+++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
-@@ -21,7 +21,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
- 		return;
+ static struct test_desc tests[] = {
+@@ -548,6 +704,36 @@ static struct test_desc tests[] = {
+ 	TEST_ACCESS(guest_at, no_af, CMD_HOLE_DATA),
+ 	TEST_ACCESS(guest_dc_zva, no_af, CMD_HOLE_DATA),
  
- 	paddr = vm_phy_pages_alloc(vm, PAGES_PER_REGION,
--				   KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
-+			KVM_GUEST_PAGE_TABLE_MIN_PADDR, vm->memslots[MEM_REGION_PT]);
- 	memset(addr_gpa2hva(vm, paddr), 0xff, PAGES_PER_REGION * vm->page_size);
++	/*
++	 * Punch holes in the test and PT memslots and mark them for
++	 * userfaultfd handling. This should result in 2 faults: the test
++	 * access and its respective S1 page table walk (S1PTW).
++	 */
++	TEST_UFFD(guest_read64, with_af, CMD_HOLE_DATA | CMD_HOLE_PT,
++			uffd_data_read_handler, uffd_pt_write_handler, 2),
++	/* no_af should also lead to a PT write. */
++	TEST_UFFD(guest_read64, no_af, CMD_HOLE_DATA | CMD_HOLE_PT,
++			uffd_data_read_handler, uffd_pt_write_handler, 2),
++	/* Note how that cas invokes the read handler. */
++	TEST_UFFD(guest_cas, with_af, CMD_HOLE_DATA | CMD_HOLE_PT,
++			uffd_data_read_handler, uffd_pt_write_handler, 2),
++	/*
++	 * Can't test guest_at with_af as it's IMPDEF whether the AF is set.
++	 * The S1PTW fault should still be marked as a write.
++	 */
++	TEST_UFFD(guest_at, no_af, CMD_HOLE_DATA | CMD_HOLE_PT,
++			uffd_data_read_handler, uffd_pt_write_handler, 1),
++	TEST_UFFD(guest_ld_preidx, with_af, CMD_HOLE_DATA | CMD_HOLE_PT,
++			uffd_data_read_handler, uffd_pt_write_handler, 2),
++	TEST_UFFD(guest_write64, with_af, CMD_HOLE_DATA | CMD_HOLE_PT,
++			uffd_data_write_handler, uffd_pt_write_handler, 2),
++	TEST_UFFD(guest_dc_zva, with_af, CMD_HOLE_DATA | CMD_HOLE_PT,
++			uffd_data_write_handler, uffd_pt_write_handler, 2),
++	TEST_UFFD(guest_st_preidx, with_af, CMD_HOLE_DATA | CMD_HOLE_PT,
++			uffd_data_write_handler, uffd_pt_write_handler, 2),
++	TEST_UFFD(guest_exec, with_af, CMD_HOLE_DATA | CMD_HOLE_PT,
++			uffd_data_read_handler, uffd_pt_write_handler, 2),
++
+ 	{ 0 }
+ };
  
- 	vm->pgd = paddr;
-@@ -167,8 +167,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 	TEST_ASSERT(vm->page_size == 4096, "Unsupported page size: 0x%x",
- 		    vm->page_size);
- 
--	stack_vaddr = vm_vaddr_alloc(vm, stack_size,
--				     DEFAULT_GUEST_STACK_VADDR_MIN);
-+	stack_vaddr = __vm_vaddr_alloc(vm, stack_size,
-+				       DEFAULT_GUEST_STACK_VADDR_MIN,
-+				       MEM_REGION_CODE);
- 
- 	vcpu = __vm_vcpu_add(vm, vcpu_id);
- 
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 2e6e61bbe81b..f7b90a6c7d19 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -525,7 +525,7 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
- static void kvm_setup_gdt(struct kvm_vm *vm, struct kvm_dtable *dt)
- {
- 	if (!vm->gdt)
--		vm->gdt = vm_vaddr_alloc_page(vm);
-+		vm->gdt = __vm_vaddr_alloc_page(vm, MEM_REGION_CODE);
- 
- 	dt->base = vm->gdt;
- 	dt->limit = getpagesize();
-@@ -535,7 +535,7 @@ static void kvm_setup_tss_64bit(struct kvm_vm *vm, struct kvm_segment *segp,
- 				int selector)
- {
- 	if (!vm->tss)
--		vm->tss = vm_vaddr_alloc_page(vm);
-+		vm->tss = __vm_vaddr_alloc_page(vm, MEM_REGION_CODE);
- 
- 	memset(segp, 0, sizeof(*segp));
- 	segp->base = vm->tss;
-@@ -620,8 +620,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 	vm_vaddr_t stack_vaddr;
- 	struct kvm_vcpu *vcpu;
- 
--	stack_vaddr = vm_vaddr_alloc(vm, DEFAULT_STACK_PGS * getpagesize(),
--				     DEFAULT_GUEST_STACK_VADDR_MIN);
-+	stack_vaddr = __vm_vaddr_alloc(vm, DEFAULT_STACK_PGS * getpagesize(),
-+				       DEFAULT_GUEST_STACK_VADDR_MIN,
-+				       MEM_REGION_CODE);
- 
- 	vcpu = __vm_vcpu_add(vm, vcpu_id);
- 	vcpu_init_cpuid(vcpu, kvm_get_supported_cpuid());
-@@ -1118,8 +1119,8 @@ void vm_init_descriptor_tables(struct kvm_vm *vm)
- 	extern void *idt_handlers;
- 	int i;
- 
--	vm->idt = vm_vaddr_alloc_page(vm);
--	vm->handlers = vm_vaddr_alloc_page(vm);
-+	vm->idt = __vm_vaddr_alloc_page(vm, MEM_REGION_CODE);
-+	vm->handlers = __vm_vaddr_alloc_page(vm, MEM_REGION_CODE);
- 	/* Handlers have the same address in both address spaces.*/
- 	for (i = 0; i < NUM_INTERRUPTS; i++)
- 		set_idt_entry(vm, i, (unsigned long)(&idt_handlers)[i], 0,
 -- 
 2.37.3.968.ga6b4b080e4-goog
 
