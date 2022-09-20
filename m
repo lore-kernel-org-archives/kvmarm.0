@@ -2,74 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 294A4C6FA90
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 04:15:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADAAEC54EE9
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 04:18:43 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAC464B6B9;
-	Tue, 20 Sep 2022 00:15:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 246A64B086;
+	Tue, 20 Sep 2022 00:18:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id arsDHr0ca-7H; Tue, 20 Sep 2022 00:15:39 -0400 (EDT)
+	with ESMTP id 6nBKuKc8MXhq; Tue, 20 Sep 2022 00:18:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EE054B79B;
-	Tue, 20 Sep 2022 00:15:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1E8C4B62A;
+	Tue, 20 Sep 2022 00:18:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E59BE4B62F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 00:15:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C1B44B2A1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 00:18:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0MUQ4dhn9MGX for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 00:15:35 -0400 (EDT)
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
- [209.85.219.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C28004B629
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 00:15:33 -0400 (EDT)
-Received: by mail-yb1-f202.google.com with SMTP id
- i201-20020a253bd2000000b006b28b887dbaso1095801yba.13
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 21:15:33 -0700 (PDT)
+ with ESMTP id DpSMz14wBJyq for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 00:18:38 -0400 (EDT)
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com
+ [209.85.210.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A5C64B086
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 00:18:38 -0400 (EDT)
+Received: by mail-pf1-f182.google.com with SMTP id a29so1591677pfk.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 21:18:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
- :date:from:to:cc:subject:date;
- bh=MX8S263yqB0ICFX8DuXOastxTXECyhjpvmbnjSusPbc=;
- b=UFj0AJeAXls+oRTlOQGufBmkTEZ0I5JQmRHaiwJUB6oZidvhXKImGKrkqG5pIMR4tX
- C747UkceKIssGpuzIah+anFS90urYqVztR0zqcws6xIiydr2n7lp8LaUQYjdsUElzIal
- OUmXOS4p449n3xrTYKsNJoIRYL/hvypcqBoqeUzZ3Mrlb41QJdkgMI+oA5WaJmwwg9GC
- yvv4Ncx+RBlnq/oq5WRH9SCvRtEVPN2+daMEtgpup9iM7ghUMwB8yNPawkfee7ntwceI
- ezJ83DXS0MV4jkqd0ZF9ZpMrWG33Js3TZZXLIrIICU5OvQha93ULUezLFk/dZwUn3xPt
- J4hw==
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date;
+ bh=sT85PPJDMIUQ7R7Q3NusZpxdWq+tkTiSajuOq6lWzrQ=;
+ b=drfXNgOm5vJyFtMrwuUGv3mI5+wvhMaHzZTpadCRE7uBFMEgI6pWpJWsUahDX6ma6l
+ oQeEZXvfEq8yRLzm7jGXaSUCdaZ74t0KBDukB81bHrzXwmnkFJefXfU/sSh+yKadNyjU
+ KhAgetH0IA3paE/Tidn6Dqh9aFrGM7BQ0I96tDxuF8cAVqop6I8v95haTo3HaScdlQAm
+ WU8fZoIcv3vf3RQsvIDKYUtO3LvR09MBzrbiFCtb6LmVaqCAlOpEoRd4YW6lg1V0mXwG
+ eeA9jo1apw5umdBVVvgG7+jiOP+EPm8ftrVfNxqyyahjkBBabKT1vHUAKrKXdtQlfNNf
+ t/4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
- :date:x-gm-message-state:from:to:cc:subject:date;
- bh=MX8S263yqB0ICFX8DuXOastxTXECyhjpvmbnjSusPbc=;
- b=uyl95vAByW953J/iIVetRX/6s2wy3ylzz/I7bjfdfZ4MWwpKEFrQ/s1l0+0iJu8Tri
- ydGgrDeqmFZPXs+AYMywA/FmNf5JbTG6GXWssksevt4BEABg2wTsGBCR886/IAUOTZMd
- Y/f9ecU6AXVoVEJOGR6GxrRSfbeHhWrmhNDMXKzilUilsShOorxjY09AU6UKiLp9IZt1
- o6EA57yEIzzUCs1SCz1zLn8v2yB8/KkRNJP5YlX3kcbU5HpZhiKH36CeuYnYCr7HU4cv
- gHzwJ7r1SoOI3NH7I8/nMJKqhtxobEeO4wBVRL11y3YCC5JJymCJJzT4dM/R1t1oyFk+
- 0wVg==
-X-Gm-Message-State: ACrzQf18uaBHw14xGY0u0dwsgQRrBPWySwfra+U04++OSfKbkbJODY1S
- xBgiXdIEWB8XY7bVlVFXtjZjMgE7cDHX/Q==
-X-Google-Smtp-Source: AMsMyM5JE06YIrMSfk8gOD5uy72FbiJ/dLHkpinChQcxvaCx3t6RX4zUTUTAbwn3kHxvYKo5Xny58cJELHeRiA==
-X-Received: from ricarkol4.c.googlers.com
- ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a5b:ccf:0:b0:6b3:ae46:1646 with SMTP id
- e15-20020a5b0ccf000000b006b3ae461646mr10767357ybr.74.1663647333429; Mon, 19
- Sep 2022 21:15:33 -0700 (PDT)
-Date: Tue, 20 Sep 2022 04:15:09 +0000
-In-Reply-To: <20220920041509.3131141-1-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20220920041509.3131141-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Message-ID: <20220920041509.3131141-14-ricarkol@google.com>
-Subject: [PATCH v6 13/13] KVM: selftests: aarch64: Add mix of tests into
- page_fault_test
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+ bh=sT85PPJDMIUQ7R7Q3NusZpxdWq+tkTiSajuOq6lWzrQ=;
+ b=FjL3gVCODPaJGRfKN56GPnXubjUK+h1FrMNaWRxpnwXif+2w2BQ87ceoWFMu6KGXRd
+ FQn2aDfkCxYFszcgEtkDjxuYlMauSPCs0OclF3Tr5l5CHMQDssokZjLeewL1UE2tkCoQ
+ kV4wYDtN3JlMwjkRv9j85+vol3PNK1CQCGvUlnM1ext6A5E058x7NlqweEgkkIWF2Aiw
+ FOIiREzlp67KuYNOO3dLgz0JD8Y/yLr/YJshSAzujgOZ4zAeC0YG92yY1E5rmK4FyHC7
+ sLf955EBW3Rfez9xWwy9gnbuldHa2XlwgdWQcUnwjPAKyROIxIqtcbw+6ZSdfcn1Luxn
+ 46xw==
+X-Gm-Message-State: ACrzQf33hF8nyCV/cmEtibzPZry9YtYlBB6qhd4w3+6z/csG53C23zbm
+ AoAs1CAf/u3y9GXEdgPnqyzRdA==
+X-Google-Smtp-Source: AMsMyM4911c/ymRrYD6nzN0rUl26tXxXOt0Dg98Xf7Um5/AWf2Jgf2EqCjhnw7lh8+PE+DGOz14Hcw==
+X-Received: by 2002:aa7:9851:0:b0:53e:87eb:1ffa with SMTP id
+ n17-20020aa79851000000b0053e87eb1ffamr21978311pfq.35.1663647517057; 
+ Mon, 19 Sep 2022 21:18:37 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com.
+ [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
+ b124-20020a62cf82000000b0053e6bda08e0sm252170pfg.219.2022.09.19.21.18.36
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 19 Sep 2022 21:18:36 -0700 (PDT)
+Date: Mon, 19 Sep 2022 21:18:32 -0700
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev
+Subject: Re: [PATCH v6 00/13] KVM: selftests: Add aarch64/page_fault_test
+Message-ID: <Yyk/GMtOpprLR/zo@google.com>
+References: <20220920041509.3131141-1-ricarkol@google.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20220920041509.3131141-1-ricarkol@google.com>
 Cc: maz@kernel.org, bgardon@google.com, pbonzini@redhat.com,
  axelrasmussen@google.com, dmatlack@google.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -88,213 +89,108 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add some mix of tests into page_fault_test: memslots with all the
-pairwise combinations of read-only, userfaultfd, and dirty-logging.  For
-example, writing into a read-only memslot which has a hole handled with
-userfaultfd.
+On Tue, Sep 20, 2022 at 04:14:56AM +0000, Ricardo Koller wrote:
+> This series adds a new aarch64 selftest for testing stage 2 fault handling for
+> various combinations of guest accesses (e.g., write, S1PTW), backing sources
+> (e.g., anon), and types of faults (e.g., read on hugetlbfs with a hole, write
+> on a readonly memslot). Each test tries a different combination and then checks
+> that the access results in the right behavior (e.g., uffd faults with the right
+> address and write/read flag). Some interesting combinations are:
+> 
+> - loading an instruction leads to a stage 1 page-table-walk that misses on
+>   stage 2 because the backing memslot for the page table it not in host memory
+>   (a hole was punched right there) and the fault is handled using userfaultfd.
+>   The expected behavior is that this leads to a userfaultfd fault marked as a
+>   write. See commit c4ad98e4b72c ("KVM: arm64: Assume write fault on S1PTW
+>   permission fault on instruction fetch") for why that's a write.
+> - a cas (compare-and-swap) on a readonly memslot leads to a failed vcpu run.
+> - write-faulting on a memslot that's marked for userfaultfd handling and dirty
+>   logging should result in a uffd fault and having the respective bit set in
+>   the dirty log.
+> 
+> The first 8 commits of this series add library support. The first one adds a
+> new userfaultfd library. Commits 2-5 add some misc library changes that will be
+> used by the new test, like a library function to get the GPA of a PTE. Commits
+> 6-8 breaks the implicit assumption that code and page tables live in memslot
+> memslots should allocators use. This is then used by the new test to place the
+> page tables in a specific memslot.  The last 5 commits add the new selftest,
+> one type of test at a time. It first adds core tests, then uffd, then dirty
+> logging, then readonly memslots tests, and finally combinations of the previous
+> ones (like uffd and dirty logging at the same time).
+> 
+> v6 -> v7: https://lore.kernel.org/kvmarm/Yyi03sX5hx36M%2FZr@google.com/
+> - removed struct kvm_vm_mem_params. Changed page_fault_test.c accordingly. [Sean]
+> - applied Oliver's patch to fix page_fault_test compilation warnings. [Oliver]
+> - added R-b's from Oliver and Andrew. Didn't Andrew's R-b on 6/13 as the commit
+>   changed afterwards.
+> 
+> v5 -> v6: https://lore.kernel.org/kvmarm/20220823234727.621535-1-ricarkol@google.com/
+> - added "enum memslot_type" and all the related cleanups due to it [Andrew]
+> - default kvm_vm_mem_default with size=0 [Andrew,Sean]
+> - __vm_vaddr_alloc() taking "enum memslot_type" and all the related cleanups
+>   due to this change [Andrew]
+> 
+> v4 -> v5: https://lore.kernel.org/kvmarm/20220624213257.1504783-1-ricarkol@google.com/
+> - biggest change: followed suggestion from Sean and Andrew regarding a new
+>   arg for vm_create() to specify the guest memory layout. That's taken care
+>   of with these two new commits:
+> 	KVM: selftests: Use the right memslot for code, page-tables, and data allocations
+> 	KVM: selftests: Change ____vm_create() to take struct kvm_vm_mem_params
+>   plus the respective changes in the page_fault_test itself (mostly code reduction).
+> - dropped some commits that are not needed after the above change:
+> 	KVM: selftests: aarch64: Export _virt_pg_map with a pt_memslot arg
+> 	KVM: selftests: Add vm_alloc_page_table_in_memslot library function
+> 	KVM: selftests: Add vm_mem_region_get_src_fd library function
+> - addressed Oliver comments in commit "KVM: selftests: aarch64: Add
+>   aarch64/page_fault_test"
+> - collect r-b's from Andrew
+> 
+> Ricardo Koller (13):
+>   KVM: selftests: Add a userfaultfd library
+>   KVM: selftests: aarch64: Add virt_get_pte_hva() library function
+>   KVM: selftests: Add missing close and munmap in
+>     __vm_mem_region_delete()
+>   KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1 using sysreg.h
+>     macros
+>   tools: Copy bitfield.h from the kernel sources
+>   KVM: selftests: Stash backing_src_type in struct userspace_mem_region
+>   KVM: selftests: Add vm->memslots[] and enum kvm_mem_region_type
+>   KVM: selftests: Use the right memslot for code, page-tables, and data
+>     allocations
+>   KVM: selftests: aarch64: Add aarch64/page_fault_test
+>   KVM: selftests: aarch64: Add userfaultfd tests into page_fault_test
+>   KVM: selftests: aarch64: Add dirty logging tests into page_fault_test
+>   KVM: selftests: aarch64: Add readonly memslot tests into
+>     page_fault_test
+>   KVM: selftests: aarch64: Add mix of tests into page_fault_test
+> 
+>  tools/include/linux/bitfield.h                |  176 +++
+>  tools/testing/selftests/kvm/.gitignore        |    1 +
+>  tools/testing/selftests/kvm/Makefile          |    2 +
+>  .../selftests/kvm/aarch64/page_fault_test.c   | 1116 +++++++++++++++++
+>  .../selftests/kvm/demand_paging_test.c        |  228 +---
+>  .../selftests/kvm/include/aarch64/processor.h |   35 +-
+>  .../selftests/kvm/include/kvm_util_base.h     |   29 +-
+>  .../selftests/kvm/include/userfaultfd_util.h  |   45 +
+>  .../selftests/kvm/lib/aarch64/processor.c     |   26 +-
+>  tools/testing/selftests/kvm/lib/elf.c         |    3 +-
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |   82 +-
+>  .../selftests/kvm/lib/riscv/processor.c       |    7 +-
+>  .../selftests/kvm/lib/s390x/processor.c       |    7 +-
+>  .../selftests/kvm/lib/userfaultfd_util.c      |  186 +++
+>  .../selftests/kvm/lib/x86_64/processor.c      |   13 +-
+>  15 files changed, 1698 insertions(+), 258 deletions(-)
+>  create mode 100644 tools/include/linux/bitfield.h
+>  create mode 100644 tools/testing/selftests/kvm/aarch64/page_fault_test.c
+>  create mode 100644 tools/testing/selftests/kvm/include/userfaultfd_util.h
+>  create mode 100644 tools/testing/selftests/kvm/lib/userfaultfd_util.c
+> 
+> -- 
+> 2.37.3.968.ga6b4b080e4-goog
+> 
 
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- .../selftests/kvm/aarch64/page_fault_test.c   | 155 ++++++++++++++++++
- 1 file changed, 155 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-index 386c20b47723..cf72edbd42ef 100644
---- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-@@ -399,6 +399,12 @@ static void free_uffd(struct test_desc *test, struct uffd_desc *pt_uffd,
- 	free(data_args.copy);
- }
- 
-+static int uffd_no_handler(int mode, int uffd, struct uffd_msg *msg)
-+{
-+	TEST_FAIL("There was no UFFD fault expected.");
-+	return -1;
-+}
-+
- /* Returns false if the test should be skipped. */
- static bool punch_hole_in_memslot(struct kvm_vm *vm,
- 				  struct userspace_mem_region *region)
-@@ -806,6 +812,22 @@ static void help(char *name)
- 	.expected_events	= { 0 },					\
- }
- 
-+#define TEST_UFFD_AND_DIRTY_LOG(_access, _with_af, _uffd_data_handler,		\
-+				_uffd_faults, _test_check)			\
-+{										\
-+	.name			= SCAT3(uffd_and_dirty_log, _access, _with_af),	\
-+	.data_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
-+	.pt_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
-+	.guest_prepare		= { _PREPARE(_with_af),				\
-+				    _PREPARE(_access) },			\
-+	.guest_test		= _access,					\
-+	.mem_mark_cmd		= CMD_HOLE_DATA | CMD_HOLE_PT,			\
-+	.guest_test_check	= { _CHECK(_with_af), _test_check },		\
-+	.uffd_data_handler	= _uffd_data_handler,				\
-+	.uffd_pt_handler	= uffd_pt_write_handler,			\
-+	.expected_events	= { .uffd_faults = _uffd_faults, },		\
-+}
-+
- #define TEST_RO_MEMSLOT(_access, _mmio_handler, _mmio_exits)			\
- {										\
- 	.name			= SCAT3(ro_memslot, _access, _with_af),		\
-@@ -825,6 +847,59 @@ static void help(char *name)
- 	.expected_events	= { .fail_vcpu_runs = 1 },			\
- }
- 
-+#define TEST_RO_MEMSLOT_AND_DIRTY_LOG(_access, _mmio_handler, _mmio_exits,	\
-+				      _test_check)				\
-+{										\
-+	.name			= SCAT3(ro_memslot, _access, _with_af),		\
-+	.data_memslot_flags	= KVM_MEM_READONLY | KVM_MEM_LOG_DIRTY_PAGES,	\
-+	.pt_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
-+	.guest_prepare		= { _PREPARE(_access) },			\
-+	.guest_test		= _access,					\
-+	.guest_test_check	= { _test_check },				\
-+	.mmio_handler		= _mmio_handler,				\
-+	.expected_events	= { .mmio_exits = _mmio_exits},			\
-+}
-+
-+#define TEST_RO_MEMSLOT_NO_SYNDROME_AND_DIRTY_LOG(_access, _test_check)		\
-+{										\
-+	.name			= SCAT2(ro_memslot_no_syn_and_dlog, _access),	\
-+	.data_memslot_flags	= KVM_MEM_READONLY | KVM_MEM_LOG_DIRTY_PAGES,	\
-+	.pt_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
-+	.guest_test		= _access,					\
-+	.guest_test_check	= { _test_check },				\
-+	.fail_vcpu_run_handler	= fail_vcpu_run_mmio_no_syndrome_handler,	\
-+	.expected_events	= { .fail_vcpu_runs = 1 },			\
-+}
-+
-+#define TEST_RO_MEMSLOT_AND_UFFD(_access, _mmio_handler, _mmio_exits,		\
-+				 _uffd_data_handler, _uffd_faults)		\
-+{										\
-+	.name			= SCAT2(ro_memslot_uffd, _access),		\
-+	.data_memslot_flags	= KVM_MEM_READONLY,				\
-+	.mem_mark_cmd		= CMD_HOLE_DATA | CMD_HOLE_PT,			\
-+	.guest_prepare		= { _PREPARE(_access) },			\
-+	.guest_test		= _access,					\
-+	.uffd_data_handler	= _uffd_data_handler,				\
-+	.uffd_pt_handler	= uffd_pt_write_handler,			\
-+	.mmio_handler		= _mmio_handler,				\
-+	.expected_events	= { .mmio_exits = _mmio_exits,			\
-+				    .uffd_faults = _uffd_faults },		\
-+}
-+
-+#define TEST_RO_MEMSLOT_NO_SYNDROME_AND_UFFD(_access, _uffd_data_handler,	\
-+					     _uffd_faults)			\
-+{										\
-+	.name			= SCAT2(ro_memslot_no_syndrome, _access),	\
-+	.data_memslot_flags	= KVM_MEM_READONLY,				\
-+	.mem_mark_cmd		= CMD_HOLE_DATA | CMD_HOLE_PT,			\
-+	.guest_test		= _access,					\
-+	.uffd_data_handler	= _uffd_data_handler,				\
-+	.uffd_pt_handler	= uffd_pt_write_handler,			\
-+	.fail_vcpu_run_handler	= fail_vcpu_run_mmio_no_syndrome_handler,	\
-+	.expected_events	= { .fail_vcpu_runs = 1,			\
-+				    .uffd_faults = _uffd_faults },		\
-+}
-+
- static struct test_desc tests[] = {
- 
- 	/* Check that HW is setting the Access Flag (AF) (sanity checks). */
-@@ -893,6 +968,35 @@ static struct test_desc tests[] = {
- 	TEST_DIRTY_LOG(guest_dc_zva, with_af, guest_check_write_in_dirty_log),
- 	TEST_DIRTY_LOG(guest_st_preidx, with_af, guest_check_write_in_dirty_log),
- 
-+	/*
-+	 * Access when the data and PT memslots are both marked for dirty
-+	 * logging and UFFD at the same time. The expected result is that
-+	 * writes should mark the dirty log and trigger a userfaultfd write
-+	 * fault.  Reads/execs should result in a read userfaultfd fault, and
-+	 * nothing in the dirty log.  Any S1PTW should result in a write in the
-+	 * dirty log and a userfaultfd write.
-+	 */
-+	TEST_UFFD_AND_DIRTY_LOG(guest_read64, with_af, uffd_data_read_handler, 2,
-+			guest_check_no_write_in_dirty_log),
-+	/* no_af should also lead to a PT write. */
-+	TEST_UFFD_AND_DIRTY_LOG(guest_read64, no_af, uffd_data_read_handler, 2,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_UFFD_AND_DIRTY_LOG(guest_ld_preidx, with_af, uffd_data_read_handler,
-+			2, guest_check_no_write_in_dirty_log),
-+	TEST_UFFD_AND_DIRTY_LOG(guest_at, with_af, 0, 1,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_UFFD_AND_DIRTY_LOG(guest_exec, with_af, uffd_data_read_handler, 2,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_UFFD_AND_DIRTY_LOG(guest_write64, with_af, uffd_data_write_handler,
-+			2, guest_check_write_in_dirty_log),
-+	TEST_UFFD_AND_DIRTY_LOG(guest_cas, with_af, uffd_data_read_handler, 2,
-+			guest_check_write_in_dirty_log),
-+	TEST_UFFD_AND_DIRTY_LOG(guest_dc_zva, with_af, uffd_data_write_handler,
-+			2, guest_check_write_in_dirty_log),
-+	TEST_UFFD_AND_DIRTY_LOG(guest_st_preidx, with_af,
-+			uffd_data_write_handler, 2,
-+			guest_check_write_in_dirty_log),
-+
- 	/*
- 	 * Try accesses when the data memslot is marked read-only (with
- 	 * KVM_MEM_READONLY). Writes with a syndrome result in an MMIO exit,
-@@ -908,6 +1012,57 @@ static struct test_desc tests[] = {
- 	TEST_RO_MEMSLOT_NO_SYNDROME(guest_cas),
- 	TEST_RO_MEMSLOT_NO_SYNDROME(guest_st_preidx),
- 
-+	/*
-+	 * Access when both the data memslot is both read-only and marked for
-+	 * dirty logging at the same time. The expected result is that for
-+	 * writes there should be no write in the dirty log. The readonly
-+	 * handling is the same as if the memslot was not marked for dirty
-+	 * logging: writes with a syndrome result in an MMIO exit, and writes
-+	 * with no syndrome result in a failed vcpu run.
-+	 */
-+	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_read64, 0, 0,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_ld_preidx, 0, 0,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_at, 0, 0,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_exec, 0, 0,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_write64, mmio_on_test_gpa_handler,
-+			1, guest_check_no_write_in_dirty_log),
-+	TEST_RO_MEMSLOT_NO_SYNDROME_AND_DIRTY_LOG(guest_dc_zva,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_RO_MEMSLOT_NO_SYNDROME_AND_DIRTY_LOG(guest_cas,
-+			guest_check_no_write_in_dirty_log),
-+	TEST_RO_MEMSLOT_NO_SYNDROME_AND_DIRTY_LOG(guest_st_preidx,
-+			guest_check_no_write_in_dirty_log),
-+
-+	/*
-+	 * Access when the data memslot is both read-only and punched with
-+	 * holes tracked with userfaultfd.  The expected result is the union of
-+	 * both userfaultfd and read-only behaviors. For example, write
-+	 * accesses result in a userfaultfd write fault and an MMIO exit.
-+	 * Writes with no syndrome result in a failed vcpu run and no
-+	 * userfaultfd write fault. Reads result in userfaultfd getting
-+	 * triggered.
-+	 */
-+	TEST_RO_MEMSLOT_AND_UFFD(guest_read64, 0, 0,
-+			uffd_data_read_handler, 2),
-+	TEST_RO_MEMSLOT_AND_UFFD(guest_ld_preidx, 0, 0,
-+			uffd_data_read_handler, 2),
-+	TEST_RO_MEMSLOT_AND_UFFD(guest_at, 0, 0,
-+			uffd_no_handler, 1),
-+	TEST_RO_MEMSLOT_AND_UFFD(guest_exec, 0, 0,
-+			uffd_data_read_handler, 2),
-+	TEST_RO_MEMSLOT_AND_UFFD(guest_write64, mmio_on_test_gpa_handler, 1,
-+			uffd_data_write_handler, 2),
-+	TEST_RO_MEMSLOT_NO_SYNDROME_AND_UFFD(guest_cas,
-+			uffd_data_read_handler, 2),
-+	TEST_RO_MEMSLOT_NO_SYNDROME_AND_UFFD(guest_dc_zva,
-+			uffd_no_handler, 1),
-+	TEST_RO_MEMSLOT_NO_SYNDROME_AND_UFFD(guest_st_preidx,
-+			uffd_no_handler, 1),
-+
- 	{ 0 }
- };
- 
--- 
-2.37.3.968.ga6b4b080e4-goog
-
+Please ignore this v6 series (It should have been v7). Sending the real
+v7 in a bit. Thanks and sorry for the mess!
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
