@@ -2,77 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FBFFC54EE9
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 16:08:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1569ECAAD8
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 16:33:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1564F4B62C;
-	Tue, 20 Sep 2022 12:08:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D19549EC2;
+	Tue, 20 Sep 2022 12:33:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rcOb6oy5DNHh; Tue, 20 Sep 2022 12:08:24 -0400 (EDT)
+	with ESMTP id i7czcKRKY3Xp; Tue, 20 Sep 2022 12:33:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 768254B24D;
-	Tue, 20 Sep 2022 12:08:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 393EE49F3B;
+	Tue, 20 Sep 2022 12:33:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E0384B24D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 12:08:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9284449EC2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 12:33:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pplmwQUCxswb for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 12:08:21 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DAD094B210
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 12:08:21 -0400 (EDT)
+ with ESMTP id qLsHLyeyv++f for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 12:33:48 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 58CC849DE3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 12:33:48 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 6B14B61CE1;
- Tue, 20 Sep 2022 16:08:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF2E9C433D6;
- Tue, 20 Sep 2022 16:08:19 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id C3BA7B820A9;
+ Tue, 20 Sep 2022 16:33:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C0A7C433D6;
+ Tue, 20 Sep 2022 16:33:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1663690099;
- bh=GBl1obNqYWAGzVEi2bHUxfF1zOhV7ve3V8otgRy3yd8=;
+ s=k20201202; t=1663691625;
+ bh=8jHMNALAElMkh3GttD9BKJMCY2IIH5mnzRc5BmUBolM=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=md1NJ6KK2nMgnyTDB+RcjhYntKlY8hfCT7K/lmEyxgnXUbbpE8DqS0X8p3DZG50At
- FMYZt6xEWYXqTrzBweIqPBuJUF8aUh6WrxqaHri20TSoJNUfALUgfgHgb4LE9bnfhW
- QIsXBDj8zb2avrw0WpSZGEgttsURyyf850KWfxMCCaMKbFtO54uHHuRcbpUADd9gvM
- FQuMYJHLeR2eUHymaySlF6hp5vAbZxu/osiqkZtZiHHEFXKjbkqdc+rHfWeXtVny+l
- nkDN3a8LoPgbMZ8jHc1X4BjJFl7Gk/5iXZwWKZEGQ2Cp1WWYzH0s2wJIrafovk+6pp
- pQ4Osy7xdXjwA==
+ b=n4UrolppoPViB3Jz8XXUWTHwiS8BlDgEi9oiaGAol9yPGHwxajpMfKMl1lTX3MRDC
+ ymmz4AmY93ZMjBVKaTBnAcY+big+cwVixRVCWQOJdK9JByjtKnVOEhP2muSo42G+cs
+ oY0GB0IBeiRmd8+nFCiONOh7laM/kNq1KlZUGAoKCPJl0yHJio20pqxMRsIplhAKas
+ udvgf+O8/Du01R9P5LCAm5ZvyNdHc40850T7+5bvdgXyiSKWr72bRDmKiHb1g2Rre/
+ asKOMvi+ynAYYR4ABPjt8lndRzUINuymDG0/ZRcIT2/3zSKpinjwhxkd5qVgJv1mNr
+ e+2vB8vJ4tjtg==
 Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oafnF-00BRoi-Ez;
- Tue, 20 Sep 2022 17:08:17 +0100
-Date: Tue, 20 Sep 2022 17:08:13 +0100
-Message-ID: <874jx2kp02.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oagBr-00BS4W-EH;
+ Tue, 20 Sep 2022 17:33:43 +0100
+Date: Tue, 20 Sep 2022 17:33:42 +0100
+Message-ID: <871qs6kntl.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: Re: [PATCH kernel v2] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support
- platform dependent
-In-Reply-To: <20220920125143.28009-1-aik@ozlabs.ru>
-References: <20220920125143.28009-1-aik@ozlabs.ru>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 3/7] mm: Add PG_arch_3 page flag
+In-Reply-To: <Yynewxzc6Zy8ls0N@arm.com>
+References: <20220810193033.1090251-4-pcc@google.com>
+ <202208111500.62e0Bl2l-lkp@intel.com> <YxDy+zFasbAP7Yrq@arm.com>
+ <YxYrgyybBMUqFswq@arm.com> <878rmfkzbu.wl-maz@kernel.org>
+ <Yynewxzc6Zy8ls0N@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.176.101.241
-X-SA-Exim-Rcpt-To: aik@ozlabs.ru, kvm@vger.kernel.org,
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, lkp@intel.com, pcc@google.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm-riscv@lists.infradead.org, pbonzini@redhat.com, anup@brainfault.org,
- kvm-ppc@vger.kernel.org, npiggin@gmail.com
+ kbuild-all@lists.01.org, cohuck@redhat.com, will@kernel.org,
+ eugenis@google.com, kvm@vger.kernel.org, steven.price@arm.com,
+ vincenzo.frascino@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
- Nicholas Piggin <npiggin@gmail.com>, kvm-riscv@lists.infradead.org,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+Cc: kbuild-all@lists.01.org, kernel test robot <lkp@intel.com>,
+ kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Cornelia Huck <cohuck@redhat.com>, Steven Price <steven.price@arm.com>,
+ Evgenii Stepanov <eugenis@google.com>,
+ Vincenzo Frascino <vincenzo.frascino@arm.com>,
+ Peter Collingbourne <pcc@google.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -90,39 +96,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 20 Sep 2022 13:51:43 +0100,
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On Tue, 20 Sep 2022 16:39:47 +0100,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
 > 
-> When introduced, IRQFD resampling worked on POWER8 with XICS. However
-> KVM on POWER9 has never implemented it - the compatibility mode code
-> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
-> XIVE mode does not handle INTx in KVM at all.
+> On Mon, Sep 19, 2022 at 07:12:53PM +0100, Marc Zyngier wrote:
+> > On Mon, 05 Sep 2022 18:01:55 +0100,
+> > Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > > Peter, please let me know if you want to pick this series up together
+> > > with your other KVM patches. Otherwise I can post it separately, it's
+> > > worth merging it on its own as it clarifies the page flag vs tag setting
+> > > ordering.
+> > 
+> > I'm looking at queuing this, but I'm confused by this comment. Do I
+> > need to pick this as part of the series? Or is this an independent
+> > thing (my hunch is that it is actually required not to break other
+> > architectures...).
 > 
-> This moved the capability support advertising to platforms and stops
-> advertising it on XIVE, i.e. POWER9 and later.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Acked-by: Nicholas Piggin <npiggin@gmail.com>
-> [For KVM RISC-V]
-> Acked-by: Anup Patel <anup@brainfault.org>
-> ---
-> Changes:
-> v2:
-> * removed ifdef for ARM64.
+> This series series (at least the first patches) won't apply cleanly on
+> top of 6.0-rc1 and, of course, we shouldn't break other architectures. I
+> can repost the whole series but I don't have the setup to test the
+> MAP_SHARED KVM option (unless Peter plans to post it soon).
 
-The same argument applies to both x86 and s390, which do select
-HAVE_KVM_IRQFD from the KVM config option. Only power allows this
-option to be selected depending on the underlying interrupt controller
-emulation.
+I don't feel brave enough to take a series affecting all architectures
+so late in the game, and the whole thing had very little arm64
+exposure. The latest QEMU doesn't seem to work anymore, so I don't
+have any MTE-capable emulation (and using the FVP remotely is a pain
+in the proverbial neck).
 
-As for riscv and mips, they don't select HAVE_KVM_IRQFD, and this
-isn't a user-selectable option. So why do they get patched at all?
-
-My conclusion is that:
-
-- only power needs the #ifdefery in the arch-specific code
-- arm64, s390 and x86 can use KVM_CAP_IRQFD_RESAMPLE without a #ifdef
-- mips and riscv should be left alone
+I'll come back to this after the merge window, should Peter decide to
+respin the series.
 
 Thanks,
 
