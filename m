@@ -2,44 +2,50 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E82B0ECAAD8
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 12:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 890B1C54EE9
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 13:19:36 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 40E274B632;
-	Tue, 20 Sep 2022 08:51:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 005334B637;
+	Tue, 20 Sep 2022 09:19:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gBYVwpmrdGN0; Tue, 20 Sep 2022 08:51:57 -0400 (EDT)
+	with ESMTP id nXET1htVjFMi; Tue, 20 Sep 2022 09:19:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C6A44B492;
-	Tue, 20 Sep 2022 08:51:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2EC94B0BA;
+	Tue, 20 Sep 2022 09:19:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 320274B282
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 08:51:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 560FB4B092
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 09:19:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DNO5SrTMpKLu for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 08:51:52 -0400 (EDT)
-Received: from ozlabs.ru (ozlabs.ru [107.174.27.60])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DEAFB4B248
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 08:51:52 -0400 (EDT)
-Received: from ole.1.ozlabs.ru (localhost [IPv6:::1])
- by ozlabs.ru (Postfix) with ESMTP id 2ABC782ECC;
- Tue, 20 Sep 2022 08:51:48 -0400 (EDT)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: kvm@vger.kernel.org
-Subject: [PATCH kernel v2] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support
- platform dependent
-Date: Tue, 20 Sep 2022 22:51:43 +1000
-Message-Id: <20220920125143.28009-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.37.3
+ with ESMTP id fQgqBYgEdOND for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 09:19:32 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F47F4A105
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 09:19:31 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E9B031042;
+ Tue, 20 Sep 2022 06:19:37 -0700 (PDT)
+Received: from e121798.cambridge.arm.com (e121798.cambridge.arm.com
+ [10.1.196.158])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 88F0B3F73D;
+ Tue, 20 Sep 2022 06:19:30 -0700 (PDT)
+Date: Tue, 20 Sep 2022 14:19:28 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Subject: Re: [kvm-unit-tests RFC PATCH 06/19] lib/alloc_phys: Remove
+ allocation accounting
+Message-ID: <Yym94MMavW1T33XM@e121798.cambridge.arm.com>
+References: <20220809091558.14379-1-alexandru.elisei@arm.com>
+ <20220809091558.14379-7-alexandru.elisei@arm.com>
+ <20220920084047.gblxkhedbugl7giz@kamzik>
 MIME-Version: 1.0
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Marc Zyngier <maz@kernel.org>,
- kvm-ppc@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>,
- kvm-riscv@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20220920084047.gblxkhedbugl7giz@kamzik>
+Cc: nikos.nikoleris@arm.com, pbonzini@redhat.com, thuth@redhat.com,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -56,132 +62,62 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When introduced, IRQFD resampling worked on POWER8 with XICS. However
-KVM on POWER9 has never implemented it - the compatibility mode code
-("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
-XIVE mode does not handle INTx in KVM at all.
+Hi,
 
-This moved the capability support advertising to platforms and stops
-advertising it on XIVE, i.e. POWER9 and later.
+On Tue, Sep 20, 2022 at 10:40:47AM +0200, Andrew Jones wrote:
+> On Tue, Aug 09, 2022 at 10:15:45AM +0100, Alexandru Elisei wrote:
+> > The page allocator has better allocation tracking and is used by all
+> > architectures, while the physical allocator is now never used for
+> > allocating memory.
+> > 
+> > Simplify the physical allocator by removing allocation accounting. This
+> > accomplishes two things:
+> > 
+> > 1. It makes the allocator more useful, as the warning that was displayed
+> > each allocation after the 256th is removed.
+> > 
+> > 2. Together with the lock removal, the physical allocator becomes more
+> > appealing as a very early allocator, when using the page allocator might
+> > not be desirable or feasible.
+> 
+> How does the locking cause problems when used in an early allocator?
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Acked-by: Nicholas Piggin <npiggin@gmail.com>
-[For KVM RISC-V]
-Acked-by: Anup Patel <anup@brainfault.org>
----
-Changes:
-v2:
-* removed ifdef for ARM64.
----
- arch/arm64/kvm/arm.c       | 1 +
- arch/mips/kvm/mips.c       | 3 +++
- arch/powerpc/kvm/powerpc.c | 6 ++++++
- arch/riscv/kvm/vm.c        | 3 +++
- arch/s390/kvm/kvm-s390.c   | 3 +++
- arch/x86/kvm/x86.c         | 3 +++
- virt/kvm/kvm_main.c        | 1 -
- 7 files changed, 19 insertions(+), 1 deletion(-)
+By "early allocator" I mean here an allocator that can be used with the MMU
+off.
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 2ff0ef62abad..d2daa4d375b5 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -218,6 +218,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VCPU_ATTRIBUTES:
- 	case KVM_CAP_PTP_KVM:
- 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
-+	case KVM_CAP_IRQFD_RESAMPLE:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index a25e0b73ee70..0f3de470a73e 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -1071,6 +1071,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_READONLY_MEM:
- 	case KVM_CAP_SYNC_MMU:
- 	case KVM_CAP_IMMEDIATE_EXIT:
-+#ifdef CONFIG_HAVE_KVM_IRQFD
-+	case KVM_CAP_IRQFD_RESAMPLE:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_NR_VCPUS:
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index fb1490761c87..908ce8bd91c9 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -593,6 +593,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		break;
- #endif
- 
-+#ifdef CONFIG_HAVE_KVM_IRQFD
-+	case KVM_CAP_IRQFD_RESAMPLE:
-+		r = !xive_enabled();
-+		break;
-+#endif
-+
- 	case KVM_CAP_PPC_ALLOC_HTAB:
- 		r = hv_enabled;
- 		break;
-diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-index 65a964d7e70d..0ef7a6168018 100644
---- a/arch/riscv/kvm/vm.c
-+++ b/arch/riscv/kvm/vm.c
-@@ -65,6 +65,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_READONLY_MEM:
- 	case KVM_CAP_MP_STATE:
- 	case KVM_CAP_IMMEDIATE_EXIT:
-+#ifdef CONFIG_HAVE_KVM_IRQFD
-+	case KVM_CAP_IRQFD_RESAMPLE:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_NR_VCPUS:
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index edfd4bbd0cba..03037b0d1cc8 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -577,6 +577,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_S390_DIAG318:
- 	case KVM_CAP_S390_MEM_OP_EXTENSION:
-+#ifdef CONFIG_HAVE_KVM_IRQFD
-+	case KVM_CAP_IRQFD_RESAMPLE:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 43a6a7efc6ec..efcc02230226 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4395,6 +4395,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VAPIC:
- 	case KVM_CAP_ENABLE_CAP:
- 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
-+#ifdef CONFIG_HAVE_KVM_IRQFD
-+	case KVM_CAP_IRQFD_RESAMPLE:
-+#endif
- 		r = 1;
- 		break;
- 	case KVM_CAP_EXIT_HYPERCALL:
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 584a5bab3af3..05cf94013f02 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4447,7 +4447,6 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- #endif
- #ifdef CONFIG_HAVE_KVM_IRQFD
- 	case KVM_CAP_IRQFD:
--	case KVM_CAP_IRQFD_RESAMPLE:
- #endif
- 	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
- 	case KVM_CAP_CHECK_EXTENSION_VM:
--- 
-2.37.3
+The "desirable or feasible" part refers to the fact that the page allocator
+cannot be used an early allocator (when the MMU is off) because 1. It
+doesn't do the necessary cache maintenance operations and 2. It would be
+hard to do add them, as the internal structures that the page allocator
+maintains are significantly more complex than what the physical allocator
+uses.
 
+With this part: "together with the lock removal, the physical allocator
+becomes more appealing as a very early allocator [..]" I was trying to say
+that the physical allocator has now become as simple as it can possibly be
+(well, align_min could also be removed and leave it up to the calling code
+to request correctly aligned allocations but it's debatable if users of the
+allocator should know about how it's implemented). I can reword or remove
+this part if you feel it's confusing.
+
+Thanks,
+Alex
+
+> 
+> > 
+> > Also, phys_alloc_show() has received a slight change in the way it displays
+> > the use and free regions: the end of the region is now non-inclusive, to
+> > allow phys_alloc_show() to express that no memory has been used, or no
+> > memory is free, in which case the start and the end adresses are equal.
+> > 
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >  lib/alloc_phys.c | 65 ++++++++++++++----------------------------------
+> >  lib/alloc_phys.h |  5 ++--
+> >  2 files changed, 21 insertions(+), 49 deletions(-)
+> >
+> 
+> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
