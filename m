@@ -2,57 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D7C1C54EE9
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 19:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BDA5C54EE9
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 20:21:42 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B3A24B228;
-	Tue, 20 Sep 2022 15:25:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E5774B73D;
+	Tue, 20 Sep 2022 16:21:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gAwoco+G3ldb; Tue, 20 Sep 2022 15:25:36 -0400 (EDT)
+	with ESMTP id 81w40hFUzTVv; Tue, 20 Sep 2022 16:21:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9725C4B20F;
-	Tue, 20 Sep 2022 15:25:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7812E4B6B2;
+	Tue, 20 Sep 2022 16:21:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6134D4B20F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 15:25:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 801334B634
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 16:21:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jmQhTFMZ+JPW for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 15:25:34 -0400 (EDT)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E715B4B177
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 15:25:33 -0400 (EDT)
-Date: Tue, 20 Sep 2022 19:25:28 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1663701932;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=opjBQT+KUUTUTOINtMinmfnFqSJMY1GahFg1/kUGeAQ=;
- b=R21ULCIb311qSFCfDr6wErlsTHVHAB0eXPvclfG1/epL5qC4oF8QKCtX3CI1DTr86tDaJW
- HWHbLoG8BoGmlcy5rYCDunGvsNpoaIyd/5GvGCEimXQBSmE3EJyDPDJDOok+Fy2vGhrlMh
- 659+CXY4N53i1wz/JZVxZSQZcP9yJuc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH] KVM: arm64: Limit stage2_apply_range() batch size to 1GB
-Message-ID: <YyoTqNcI6mE/+wAi@google.com>
-References: <20220920183630.3376939-1-oliver.upton@linux.dev>
- <YyoOMOJxPJkxALtL@google.com>
+ with ESMTP id KpJfleEROUx2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 16:21:39 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1D3BE4B24C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 16:21:39 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 2664B62163;
+ Tue, 20 Sep 2022 20:21:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6CB2C433C1;
+ Tue, 20 Sep 2022 20:21:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1663705297;
+ bh=l1GLTJA/m1XVU3ZjU0vCVTqDe9aGlD0ORTBZbGJFTqk=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=B7Pc/7AJAACBcTX/ZhN+U6+D7NdIdYaRuZtAd1n38z1woZ/kmfQNYSsB10x8ly+uF
+ /sqNI/kJ+x2ivzyZGB/xtl+nmm5eCxciT5aKXZOduVI8c5tYp80x8GjbRnnkcvF8+C
+ dXB2aCTgyMQdLcXtm6hgnC9pDpUOO/+qsxpRvjzjyR7dED0Ujpnu/Ob/UX/DWHaAZZ
+ p5e6+eUZdbOYSakpR4aRGzLr4rymQ6rKN/oW2zv/Q1vGC6LS9Leh/Z74HNsSZiH1t4
+ mbC9rZ9i6u+9GxJVhyMi6+nyOWXkItpcCk1otpkd6qh5lavQ1mjeDE7OEBEtgS5RfL
+ v9Pcf7kG90IRQ==
+Date: Tue, 20 Sep 2022 21:21:33 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v3 1/7] KVM: arm64: Discard any SVE state when entering
+ KVM guests
+Message-ID: <YyogzYzVbb3mvZWM@sirena.org.uk>
+References: <20220815225529.930315-1-broonie@kernel.org>
+ <20220815225529.930315-2-broonie@kernel.org>
+ <87zgeuj8ry.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YyoOMOJxPJkxALtL@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <87zgeuj8ry.wl-maz@kernel.org>
+X-Cookie: One FISHWICH coming up!!
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Zhang Lei <zhang.lei@jp.fujitsu.com>, Andre Przywara <andre.przywara@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -64,155 +71,66 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============1090233814087965391=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hey Ricardo,
 
-On Tue, Sep 20, 2022 at 12:02:08PM -0700, Ricardo Koller wrote:
-> On Tue, Sep 20, 2022 at 06:36:29PM +0000, Oliver Upton wrote:
-> > Presently stage2_apply_range() works on a batch of memory addressed by a
-> > stage 2 root table entry for the VM. Depending on the IPA limit of the
-> > VM and PAGE_SIZE of the host, this could address a massive range of
-> > memory. Some examples:
-> > 
-> >   4 level, 4K paging -> 512 GB batch size
-> > 
-> >   3 level, 64K paging -> 4TB batch size
-> > 
-> > Unsurprisingly, working on such a large range of memory can lead to soft
-> > lockups. When running dirty_log_perf_test:
-> > 
-> >   ./dirty_log_perf_test -m -2 -s anonymous_thp -b 4G -v 48
-> > 
-> >   watchdog: BUG: soft lockup - CPU#0 stuck for 45s! [dirty_log_perf_:16703]
-> >   Modules linked in: vfat fat cdc_ether usbnet mii xhci_pci xhci_hcd sha3_generic gq(O)
-> >   CPU: 0 PID: 16703 Comm: dirty_log_perf_ Tainted: G           O       6.0.0-smp-DEV #1
-> >   pstate: 80400009 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> >   pc : dcache_clean_inval_poc+0x24/0x38
-> >   lr : clean_dcache_guest_page+0x28/0x4c
-> >   sp : ffff800021763990
-> >   pmr_save: 000000e0
-> >   x29: ffff800021763990 x28: 0000000000000005 x27: 0000000000000de0
-> >   x26: 0000000000000001 x25: 00400830b13bc77f x24: ffffad4f91ead9c0
-> >   x23: 0000000000000000 x22: ffff8000082ad9c8 x21: 0000fffafa7bc000
-> >   x20: ffffad4f9066ce50 x19: 0000000000000003 x18: ffffad4f92402000
-> >   x17: 000000000000011b x16: 000000000000011b x15: 0000000000000124
-> >   x14: ffff07ff8301d280 x13: 0000000000000000 x12: 00000000ffffffff
-> >   x11: 0000000000010001 x10: fffffc0000000000 x9 : ffffad4f9069e580
-> >   x8 : 000000000000000c x7 : 0000000000000000 x6 : 000000000000003f
-> >   x5 : ffff07ffa2076980 x4 : 0000000000000001 x3 : 000000000000003f
-> >   x2 : 0000000000000040 x1 : ffff0830313bd000 x0 : ffff0830313bcc40
-> >   Call trace:
-> >    dcache_clean_inval_poc+0x24/0x38
-> >    stage2_unmap_walker+0x138/0x1ec
-> >    __kvm_pgtable_walk+0x130/0x1d4
-> >    __kvm_pgtable_walk+0x170/0x1d4
-> >    __kvm_pgtable_walk+0x170/0x1d4
-> >    __kvm_pgtable_walk+0x170/0x1d4
-> >    kvm_pgtable_stage2_unmap+0xc4/0xf8
-> >    kvm_arch_flush_shadow_memslot+0xa4/0x10c
-> >    kvm_set_memslot+0xb8/0x454
-> >    __kvm_set_memory_region+0x194/0x244
-> >    kvm_vm_ioctl_set_memory_region+0x58/0x7c
-> >    kvm_vm_ioctl+0x49c/0x560
-> >    __arm64_sys_ioctl+0x9c/0xd4
-> >    invoke_syscall+0x4c/0x124
-> >    el0_svc_common+0xc8/0x194
-> >    do_el0_svc+0x38/0xc0
-> >    el0_svc+0x2c/0xa4
-> >    el0t_64_sync_handler+0x84/0xf0
-> >    el0t_64_sync+0x1a0/0x1a4
-> > 
-> > Given the various paging configurations used by KVM at stage 2 there
-> > isn't a sensible page table level to use as the batch size. Use 1GB as
-> > the batch size instead, as it is evenly divisible by all supported
-> > hugepage sizes across 4K, 16K, and 64K paging.
-> > 
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > ---
-> > 
-> > Applies to 6.0-rc3. Tested with 4K and 64K pages with the above
-> > dirty_log_perf_test command and noticed no more soft lockups. I don't
-> > have a 16K system to test with.
-> > 
-> > Marc, we spoke about this a while ago and agreed to go for some page
-> > table level based batching scheme. However, I decided against that
-> > because it doesn't really solve the problem for non-4K kernels.
-> > 
-> >  arch/arm64/include/asm/stage2_pgtable.h | 20 --------------------
-> >  arch/arm64/kvm/mmu.c                    |  8 +++++++-
-> >  2 files changed, 7 insertions(+), 21 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-> > index fe341a6578c3..c8dca8ae359c 100644
-> > --- a/arch/arm64/include/asm/stage2_pgtable.h
-> > +++ b/arch/arm64/include/asm/stage2_pgtable.h
-> > @@ -10,13 +10,6 @@
-> >  
-> >  #include <linux/pgtable.h>
-> >  
-> > -/*
-> > - * PGDIR_SHIFT determines the size a top-level page table entry can map
-> > - * and depends on the number of levels in the page table. Compute the
-> > - * PGDIR_SHIFT for a given number of levels.
-> > - */
-> > -#define pt_levels_pgdir_shift(lvls)	ARM64_HW_PGTABLE_LEVEL_SHIFT(4 - (lvls))
-> > -
-> >  /*
-> >   * The hardware supports concatenation of up to 16 tables at stage2 entry
-> >   * level and we use the feature whenever possible, which means we resolve 4
-> > @@ -30,11 +23,6 @@
-> >  #define stage2_pgtable_levels(ipa)	ARM64_HW_PGTABLE_LEVELS((ipa) - 4)
-> >  #define kvm_stage2_levels(kvm)		VTCR_EL2_LVLS(kvm->arch.vtcr)
-> >  
-> > -/* stage2_pgdir_shift() is the size mapped by top-level stage2 entry for the VM */
-> > -#define stage2_pgdir_shift(kvm)		pt_levels_pgdir_shift(kvm_stage2_levels(kvm))
-> > -#define stage2_pgdir_size(kvm)		(1ULL << stage2_pgdir_shift(kvm))
-> > -#define stage2_pgdir_mask(kvm)		~(stage2_pgdir_size(kvm) - 1)
-> > -
-> >  /*
-> >   * kvm_mmmu_cache_min_pages() is the number of pages required to install
-> >   * a stage-2 translation. We pre-allocate the entry level page table at
-> > @@ -42,12 +30,4 @@
-> >   */
-> >  #define kvm_mmu_cache_min_pages(kvm)	(kvm_stage2_levels(kvm) - 1)
-> >  
-> > -static inline phys_addr_t
-> > -stage2_pgd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
-> > -{
-> > -	phys_addr_t boundary = (addr + stage2_pgdir_size(kvm)) & stage2_pgdir_mask(kvm);
-> > -
-> > -	return (boundary - 1 < end - 1) ? boundary : end;
-> > -}
-> > -
-> >  #endif	/* __ARM64_S2_PGTABLE_H_ */
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index c9a13e487187..d64032b9fbb6 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -31,6 +31,12 @@ static phys_addr_t hyp_idmap_vector;
-> >  
-> >  static unsigned long io_map_base;
-> >  
-> > +static inline phys_addr_t stage2_apply_range_next(phys_addr_t addr, phys_addr_t end)
-> > +{
-> > +	phys_addr_t boundary = addr + SZ_1G;
-> 
-> I think you want this to be aligned-down to 1G as well. At least
-> stage2_pgd_addr_end() was doing so, plus it reduces the number of
-> operations (e.g., when splitting a 1GB huge page when the address is
-> unaligned).
+--===============1090233814087965391==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="L1LA5iGPjhkxC+4F"
+Content-Disposition: inline
 
-Doh! Yeah, we'll want to preserve the alignment that was being done. I'll
-post v2 here in a few days but I'll include your suggestion.
 
---
-Thanks,
-Oliver
+--L1LA5iGPjhkxC+4F
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Sep 20, 2022 at 05:44:01PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+
+> >  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+> >  {
+> >  	BUG_ON(!current->mm);
+> > -	BUG_ON(test_thread_flag(TIF_SVE));
+> > +
+> > +	fpsimd_kvm_prepare();
+>=20
+> Why is this *before* the check against system_supports_fpsimd()? I
+> don't think the architecture allows SVE without FP, for obvious
+> reasons...
+
+Good point, though now that I think about it I can't think of a
+requirement for FP when implementing SME (there's certainly not
+one for SVE).  There's no use for that hook now though.
+
+--L1LA5iGPjhkxC+4F
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmMqIMwACgkQJNaLcl1U
+h9B3NAf/T8qpVcPV98O2cYJ+RYHrFGjL6ALzKAuvy82ZYqwwBrZEqlznTVx2opUU
+xegwtZjPU8W/oN74tefc3yvd31E0ILH6AmWr6Blchzoy0wG75KEZvTJcVJsYycK3
+qC2DA2OnMIn9ZtjwDhk5OB21PoQL+V+4U6osCdCSqEsUWv9hq3nxMyUrepsTKRrn
+U3Lj7LyASjM/rYFY8guvzsk/NlYvIUAbZmyYGxWPd7kcsT+mAD3URPn1+IyTYQWv
+wf0f1g5aVXKQmHH0ALboh05bG4YOeyFT9qBfq1Q1P3EQ2I7ckJQUEmwQPTd6B5FK
+xYktRByXTG7pgjeAxhQ9CaJ3nm0J8w==
+=IUNe
+-----END PGP SIGNATURE-----
+
+--L1LA5iGPjhkxC+4F--
+
+--===============1090233814087965391==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============1090233814087965391==--
