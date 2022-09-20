@@ -2,53 +2,53 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCA35C54EE9
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 07:50:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6E10ECAAD8
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 07:51:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36CBE4B64A;
-	Tue, 20 Sep 2022 03:50:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4876D4B63F;
+	Tue, 20 Sep 2022 03:51:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dummBotR9o6B; Tue, 20 Sep 2022 03:50:27 -0400 (EDT)
+	with ESMTP id sAvll2FucOpH; Tue, 20 Sep 2022 03:51:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1002E4B632;
-	Tue, 20 Sep 2022 03:50:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 47DDF4B640;
+	Tue, 20 Sep 2022 03:51:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1442B4B5F6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 03:50:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B2084B632
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 03:51:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RKwcL0Sb24jM for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 03:50:24 -0400 (EDT)
+ with ESMTP id Jk26KE5htlhU for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 03:51:05 -0400 (EDT)
 Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D61444B4D7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 03:50:24 -0400 (EDT)
-Date: Tue, 20 Sep 2022 09:50:21 +0200
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 12CC24B5F6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 03:51:05 -0400 (EDT)
+Date: Tue, 20 Sep 2022 09:51:03 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1663660223;
+ t=1663660264;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=eyekJFWfNIBvBg+mrV6tG+YS/YFf06nK3qzW8KeFdXI=;
- b=lOr0A2/i2dYj8lPydFJEwzKN4fPQpYAywx/Az35MPE7I3Tl0LwAdIdn/clZvjgqtFTr2qZ
- QI4Gbb7R+wMladb51rJDBp5Sf4hQoafJnaMl+K7j8USDO16cfyF1yJaO55yuy30xOSELAL
- PeQofwnivPkm+hg1c/DMX26apTWcdyc=
+ bh=adQjsppu4f1Y67G2a4MebDdYXgGJe2ubXNkO3qZkbwo=;
+ b=xk1eBGaKG1NcZUEjlbXiaufZBSA5rBzaGdToMJpTFdtE6QoaX7b9OKy2t4MRc0qCHgflFL
+ sPXSkp4aca37XBWhSwmRBA3DvYxIY6dOAj+R0Isg/8CojlQbdmveE/zizsDqAKoG/l3vCT
+ ySiKgR08XMLNxy+GBzmmwkcT0LSULNQ=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
 To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v7 07/13] KVM: selftests: Add vm->memslots[] and enum
- kvm_mem_region_type
-Message-ID: <20220920075021.rbzo2wkypbj2gjie@kamzik>
+Subject: Re: [PATCH v7 08/13] KVM: selftests: Use the right memslot for code, 
+ page-tables, and data allocations
+Message-ID: <20220920075103.34qzxqxhu3puq72r@kamzik>
 References: <20220920042551.3154283-1-ricarkol@google.com>
- <20220920042551.3154283-8-ricarkol@google.com>
+ <20220920042551.3154283-9-ricarkol@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220920042551.3154283-8-ricarkol@google.com>
+In-Reply-To: <20220920042551.3154283-9-ricarkol@google.com>
 X-Migadu-Flow: FLOW_OUT
 X-Migadu-Auth-User: linux.dev
 Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
@@ -70,35 +70,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 20, 2022 at 04:25:45AM +0000, Ricardo Koller wrote:
-> The vm_create() helpers are hardcoded to place most page types (code,
-> page-tables, stacks, etc) in the same memslot #0, and always backed with
-> anonymous 4K.  There are a couple of issues with that.  First, tests willing to
-> differ a bit, like placing page-tables in a different backing source type must
-> replicate much of what's already done by the vm_create() functions.  Second,
-> the hardcoded assumption of memslot #0 holding most things is spreaded
-> everywhere; this makes it very hard to change.
+On Tue, Sep 20, 2022 at 04:25:46AM +0000, Ricardo Koller wrote:
+> The previous commit added support for callers of ____vm_create() to specify
+> what memslots to use for code, page-tables, and data allocations. Change
+> them accordingly:
 > 
-> Fix the above issues by having selftests specify how they want memory to be
-> laid out. Start by changing ____vm_create() to not create memslot #0; a future
-> commit will add test that specifies all memslots used by the VM.  Then, add the
-> vm->memslots[] array to specify the right memslot for different memory
-> allocators, e.g.,: lib/elf should use the vm->[MEM_REGION_CODE] memslot.  This
-> will be used as a way to specify the page-tables memslots (to be backed by huge
-> pages for example).
+> - stacks, code, and exception tables use the code memslot
+> - page tables and the pgd use the pt memslot
+> - data (anything allocated with vm_vaddr_alloc()) uses the data memslot
 > 
-> There is no functional change intended. The current commit lays out memory
-> exactly as before. The next commit will change the allocators to get the region
-> they should be using, e.g.,: like the page table allocators using the pt
-> memslot.
+> No functional change intended. All allocators keep using memslot #0.
 > 
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 > Cc: Sean Christopherson <seanjc@google.com>
 > Cc: Andrew Jones <andrew.jones@linux.dev>
 > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > ---
->  .../selftests/kvm/include/kvm_util_base.h     | 25 +++++++++++++++++--
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 18 +++++++------
->  2 files changed, 33 insertions(+), 10 deletions(-)
+>  .../selftests/kvm/include/kvm_util_base.h     |  3 +
+>  .../selftests/kvm/lib/aarch64/processor.c     | 11 ++--
+>  tools/testing/selftests/kvm/lib/elf.c         |  3 +-
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 57 ++++++++++++-------
+>  .../selftests/kvm/lib/riscv/processor.c       |  7 ++-
+>  .../selftests/kvm/lib/s390x/processor.c       |  7 ++-
+>  .../selftests/kvm/lib/x86_64/processor.c      | 13 +++--
+>  7 files changed, 61 insertions(+), 40 deletions(-)
 >
 
 Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
