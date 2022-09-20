@@ -2,80 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D996EC6FA82
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 18:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7714C54EE9
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 18:09:24 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A78A4B293;
-	Tue, 20 Sep 2022 14:07:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 561E94B600;
+	Tue, 20 Sep 2022 14:09:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lMosiK8F3R06; Tue, 20 Sep 2022 14:07:21 -0400 (EDT)
+	with ESMTP id dY3wPFw-bC7i; Tue, 20 Sep 2022 14:09:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D27794B62C;
-	Tue, 20 Sep 2022 14:07:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 490F34B630;
+	Tue, 20 Sep 2022 14:09:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ACF24B293
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:07:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1578D4B600
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:09:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lONbB0X9FwJ5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 14:07:19 -0400 (EDT)
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com
- [209.85.214.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 230B549EFA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:07:19 -0400 (EDT)
-Received: by mail-pl1-f173.google.com with SMTP id x1so3203327plv.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 11:07:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date;
- bh=LQlW6UOkhRZTHD6MttbLwFYAPie8UK4aYfFA+NrIqeA=;
- b=UeRwiyZtGGRCxSBKGeQxjPgOG7vJZ9Q7IGjNm070agx+UMJVhhMNTo46yE9EU3bNiU
- VD9g6g2yUijnrfmSqUTkcU+JrPEBnBNeEiT8cbMY8RF7mbzhe7Jm+BxABvuEcWlN8rBi
- YoJizy2tGWyP2bTAuGgEFPTt08ecKFRMd0+3kt/9EYmEJKsl3YK6OQIL1puLeiwYGdA+
- ZlZOVSW3iK8oc/aIk95sX1PllQIGiBTpsadtOzvuABZGRSrdk0XfpKoNMK3GYcITx1uV
- CLkzdwY1tvYeX7MPk8lTnnNH63ybli4YC1HTKLIsWQfxraEZ8z41MkiRP4Kgy8XyX2YX
- FbMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
- bh=LQlW6UOkhRZTHD6MttbLwFYAPie8UK4aYfFA+NrIqeA=;
- b=0xno8lkPVhnIjIdKIhH2z6x1aVBtu3QjSkDNQB8fMw7KYoFFKH4iIR3YwHWh9Qaa/l
- Yshq/S7U8UNLMd0y2bBL85Ksl06YNqY2XhtkzAg7ufPpZfxolGsHbnzMMb6YkHxGq9fB
- JHImRC8GPRPNFR1e3yzEWppIEfZnzmCESOsuWIGfDgsZ5/hFepRvgf5CBpFiQXdJD7cQ
- 9D7oWzjJCqCUSNrRte/QIextbBeWKjmZglbO6qhVVB3w0XkPBFujdbaO7lc94+Cvf2XL
- h+Z0mPGhO3NLVbyjOb5z8Sk3L0MVJCLz6JgKzvr292F7xdRwT0dkwJNeMwhaa8RSk7uz
- nWmA==
-X-Gm-Message-State: ACrzQf0HZfO3XcSyWj13m7p5qt7T8o6080/cmbgIElQooluGv40DINRa
- m0TZ9Xa9D379YjrPeUhF3/hdZQ==
-X-Google-Smtp-Source: AMsMyM7h7UVlDhq8fLg6l0hlljwN4NHT67iRz3Wu1y/Vv8fGKttuwGw8oRjQRGooqwmQJFg0IZ6uAA==
-X-Received: by 2002:a17:90a:a25:b0:202:d174:d7bd with SMTP id
- o34-20020a17090a0a2500b00202d174d7bdmr5308240pjo.134.1663697237990; 
- Tue, 20 Sep 2022 11:07:17 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com.
- [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
- n123-20020a622781000000b0054cbad1cd21sm176413pfn.180.2022.09.20.11.07.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Sep 2022 11:07:17 -0700 (PDT)
-Date: Tue, 20 Sep 2022 18:07:13 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v7 08/13] KVM: selftests: Use the right memslot for code, 
- page-tables, and data allocations
-Message-ID: <YyoBUcSD6ZyxKxza@google.com>
-References: <20220920042551.3154283-1-ricarkol@google.com>
- <20220920042551.3154283-9-ricarkol@google.com>
+ with ESMTP id rczGh18v80J1 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 14:09:21 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DCCD14B24C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:09:20 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 9F980B82BDE;
+ Tue, 20 Sep 2022 18:09:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6ABFC433D6;
+ Tue, 20 Sep 2022 18:09:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1663697358;
+ bh=IIE2Zez7/a1Qc1VfKvs+5cgbTBSAcI81MQ0uNGej81k=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=pMCbSfXW0auMJ8qdBUOJUWWMcdlqjby77wNDSZrfbtznHTzJrnkXJ7mVuJpWMKdoE
+ X6r3WHJkLHyB0R4AL6RNcgP/DxYgyHsrRRYn/7LbQzIhYi2gcVxGaKAj7xKI1L79Xe
+ fVzEJ5uMMx3wlV6fcEOie4HC7o+aT3kyBidHfIzDsKrwxLti++kAl/FoJTbzRSBjm6
+ DsL1h/QBIc97Xu8S63i4vZZJ5YZ8cO8byyPcsP1UWgwUYMtgSFdezOr8mHSTI6jFqd
+ VDnLxBQykRWIBdW0UKjtOd3pTOryhACTeZbYChUdhuqAJ+VUqcyNSfSTZCiI0lVyQ8
+ YKSoAJjFqVtxw==
+Date: Tue, 20 Sep 2022 19:09:15 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v3 2/7] arm64/fpsimd: Track the saved FPSIMD state type
+ separately to TIF_SVE
+Message-ID: <YyoBy+HuHj5XRXKG@sirena.org.uk>
+References: <20220815225529.930315-1-broonie@kernel.org>
+ <20220815225529.930315-3-broonie@kernel.org>
+ <87y1uej7dm.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220920042551.3154283-9-ricarkol@google.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
- andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com,
- axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <87y1uej7dm.wl-maz@kernel.org>
+X-Cookie: One FISHWICH coming up!!
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Zhang Lei <zhang.lei@jp.fujitsu.com>, Andre Przywara <andre.przywara@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,247 +71,82 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============1899766398920930825=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 20, 2022, Ricardo Koller wrote:
-> The previous commit added support for callers of ____vm_create() to specify
 
-Changelog is stale, ____vm_create() no longer takes the struct.
-
-Side topic, it's usually a good idea to use "strong" terminology when referencing
-past/future changes, e.g. if patches get shuffled around for whatever reason,
-then "previous commit" may become stale/misleading.
-
-It's fairly easy to convey the same info ("something happened recently" or
-"something is going to happen soon") without being so explicit, e.g.
-
-  Wire up common code to use the appropriate code, page table, and data
-  memmslots that were recently added instead of hardcoding '0' for the
-  memslot.
-
-or
-
-  Now that kvm_vm allows specifying different memslots for code, page
-  tables, and data, use the appropriate memslot when making allocations
-  in common/libraty code.
-
-> what memslots to use for code, page-tables, and data allocations. Change
-> them accordingly:
-> 
-> - stacks, code, and exception tables use the code memslot
-
-Huh?  Stacks and exceptions are very much data, not code.
-
-> - page tables and the pgd use the pt memslot
-> - data (anything allocated with vm_vaddr_alloc()) uses the data memslot
-> 
-> No functional change intended. All allocators keep using memslot #0.
-
-...
-
-> -vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
-> +vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz,
-> +			    vm_vaddr_t vaddr_min, enum kvm_mem_region_type mrt)
-
-Similar to other feedback, I'd prefer "type" over "mrt".
-
->  {
->  	uint64_t pages = (sz >> vm->page_shift) + ((sz % vm->page_size) != 0);
->  
->  	virt_pgd_alloc(vm);
->  	vm_paddr_t paddr = vm_phy_pages_alloc(vm, pages,
-> -					      KVM_UTIL_MIN_PFN * vm->page_size, 0);
-> +				KVM_UTIL_MIN_PFN * vm->page_size,
-> +				vm->memslots[mrt]);
-
-Please align parameters.
-
->  
->  	/*
->  	 * Find an unused range of virtual page addresses of at least
-> @@ -1230,6 +1213,30 @@ vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
->  	return vaddr_start;
->  }
-
-...
-
-> +vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
-> +{
-> +	return __vm_vaddr_alloc(vm, sz, vaddr_min, MEM_REGION_DATA);
-
-I like the vm_alloc_page_table() wrapper, what about adding vm_alloc_code() and
-vm_alloc_data() too?  Feel free to ignore if it's not much of a benefit.
-
-> +}
-> +
->  /*
->   * VM Virtual Address Allocate Pages
->   *
-> @@ -1249,6 +1256,11 @@ vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages)
->  	return vm_vaddr_alloc(vm, nr_pages * getpagesize(), KVM_UTIL_MIN_VADDR);
->  }
->  
-> +vm_vaddr_t __vm_vaddr_alloc_page(struct kvm_vm *vm, enum kvm_mem_region_type mrt)
-> +{
-> +	return __vm_vaddr_alloc(vm, getpagesize(), KVM_UTIL_MIN_VADDR, mrt);
-> +}
-> +
->  /*
->   * VM Virtual Address Allocate Page
->   *
-> @@ -1814,7 +1826,8 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
->  
->  vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
->  {
-> -	return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
-> +	return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-> +				 vm->memslots[MEM_REGION_PT]);
->  }
->  
->  /*
-> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> index 604478151212..26c8d3dffb9a 100644
-> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> @@ -58,7 +58,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
->  	if (!vm->pgd_created) {
->  		vm_paddr_t paddr = vm_phy_pages_alloc(vm,
->  			page_align(vm, ptrs_per_pte(vm) * 8) / vm->page_size,
-> -			KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
-> +			KVM_GUEST_PAGE_TABLE_MIN_PADDR, vm->memslots[MEM_REGION_PT]);
+--===============1899766398920930825==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="F2TYRAB+02knW1Ru"
+Content-Disposition: inline
 
 
-Ah, more copy-paste from aarch64.  Not your code (though the s390x change below is
-new badness), but align params please.  Similar to newlines before function names,
-running over the 80 char soft limit is preferrable to weird alignment.  And for
-the soft limit, it's often easy to stay under the soft limit by refactoring,
-e.g. in a separate prep patch for RISC-V and aarch64, do:
+--F2TYRAB+02knW1Ru
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-	size_t nr_pages = page_align(vm, ptrs_per_pgd(vm) * 8) / vm->page_size;
+On Tue, Sep 20, 2022 at 06:14:13PM +0100, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-	if (vm->pgd_created)
-		return;
-	
-	vm->pgd = vm_phy_pages_alloc(vm, nr_pages,
-				     KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-				     vm->memslots[MEM_REGION_PT]);
-	vm->pgd_created = true;
+> > When we save the state for the floating point registers this can be done
+> > in the form visible through either the FPSIMD V registers or the SVE Z and
+> > P registers. At present we track which format is currently used based on
+> > TIF_SVE and the SME streaming mode state but particularly in the SVE case
+> > this limits our options for optimising things, especially around syscalls.
+> > Introduce a new enum in thread_struct which explicitly states which format
+> > is active and keep it up to date when we change it.
 
->  		vm->pgd = paddr;
->  		vm->pgd_created = true;
->  	}
-> @@ -282,8 +282,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
->  	size_t stack_size = vm->page_size == 4096 ?
->  					DEFAULT_STACK_PGS * vm->page_size :
->  					vm->page_size;
-> -	unsigned long stack_vaddr = vm_vaddr_alloc(vm, stack_size,
-> -					DEFAULT_RISCV_GUEST_STACK_VADDR_MIN);
-> +	unsigned long stack_vaddr = __vm_vaddr_alloc(vm, stack_size,
-> +					DEFAULT_RISCV_GUEST_STACK_VADDR_MIN,
-> +					MEM_REGION_CODE);
+> > At present we do not use this state except to verify that it has the
+> > expected value when loading the state, future patches will introduce
+> > functional changes.
 
-Stack is data, not code.
+> > +	enum fp_state fp_type;
 
->  	unsigned long current_gp = 0;
->  	struct kvm_mp_state mps;
->  	struct kvm_vcpu *vcpu;
-> diff --git a/tools/testing/selftests/kvm/lib/s390x/processor.c b/tools/testing/selftests/kvm/lib/s390x/processor.c
-> index 89d7340d9cbd..410ae2b59847 100644
-> --- a/tools/testing/selftests/kvm/lib/s390x/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
-> @@ -21,7 +21,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
->  		return;
->  
->  	paddr = vm_phy_pages_alloc(vm, PAGES_PER_REGION,
-> -				   KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
-> +			KVM_GUEST_PAGE_TABLE_MIN_PADDR, vm->memslots[MEM_REGION_PT]);
+> Is it a state or a type? Some consistency would help. Also, what does
 
-Please align.
+We can bikeshed this either way - the state currently stored is
+of a particular type.  I'll probably go for type.
 
-	paddr = vm_phy_pages_alloc(vm, PAGES_PER_REGION,
-				   KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-				   vm->memslots[MEM_REGION_PT]);
+> this represent? Your commit message keeps talking about the FP/SVE
+> state for the host, but this is obviously a guest-related structure.
+> How do the two relate?
 
->  	memset(addr_gpa2hva(vm, paddr), 0xff, PAGES_PER_REGION * vm->page_size);
->  
->  	vm->pgd = paddr;
-> @@ -167,8 +167,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
->  	TEST_ASSERT(vm->page_size == 4096, "Unsupported page size: 0x%x",
->  		    vm->page_size);
->  
-> -	stack_vaddr = vm_vaddr_alloc(vm, stack_size,
-> -				     DEFAULT_GUEST_STACK_VADDR_MIN);
-> +	stack_vaddr = __vm_vaddr_alloc(vm, stack_size,
-> +				       DEFAULT_GUEST_STACK_VADDR_MIN,
-> +				       MEM_REGION_CODE);
+The commit message talks about saving the floating point state in
+general which is something we do for both the host and the guest.
+The optimisation cases I am focusing on right now are more on
+host usage but the complexity with tracking that currently blocks
+them crosses both host and guest, indeed the biggest improvement
+overall is probably that tracking the guest state stops requiring
+us to fiddle with the host task's state which to me at least
+makes things clearer.
 
-Same bug here.
+--F2TYRAB+02knW1Ru
+Content-Type: application/pgp-signature; name="signature.asc"
 
->  
->  	vcpu = __vm_vcpu_add(vm, vcpu_id);
->  
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index 2e6e61bbe81b..f7b90a6c7d19 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -525,7 +525,7 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
->  static void kvm_setup_gdt(struct kvm_vm *vm, struct kvm_dtable *dt)
->  {
->  	if (!vm->gdt)
-> -		vm->gdt = vm_vaddr_alloc_page(vm);
-> +		vm->gdt = __vm_vaddr_alloc_page(vm, MEM_REGION_CODE);
+-----BEGIN PGP SIGNATURE-----
 
-GDT is data, not code.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmMqAcoACgkQJNaLcl1U
+h9Dyfgf8DqcSgSpIMFm7ghAZD34enLc6Td4USGjfJ5GqsGTZZvbo9m32uPxEnjDp
+mmDbT0uo7d1BG2QR1GiHgPQGW6UwgMf1RjG4T1lFi83JknKpUkaOUsDR4PPejUok
+aQjLxK2rr6FJku55sbPpOo7u4oidNjJDNRlNnLvdVCE1gZmj+nBD+FY77tDw5Y3e
+2n8NBwqU6T1B6kEgwgm0siCB19IrZhXfGn1M0u6HLm4IL2h2BGgb8P9dC2yJkteE
+ZeD/KvVziahNq8ZFb9mqyGEKl9fZzaXEzwSAK5VnPXhEoaWs8vT7jDS1TZEiMG19
+hQN9AZJW2bYsKpHx0tEHnfeiDhzaNw==
+=uRBY
+-----END PGP SIGNATURE-----
 
->  	dt->base = vm->gdt;
->  	dt->limit = getpagesize();
-> @@ -535,7 +535,7 @@ static void kvm_setup_tss_64bit(struct kvm_vm *vm, struct kvm_segment *segp,
->  				int selector)
->  {
->  	if (!vm->tss)
-> -		vm->tss = vm_vaddr_alloc_page(vm);
-> +		vm->tss = __vm_vaddr_alloc_page(vm, MEM_REGION_CODE);
+--F2TYRAB+02knW1Ru--
 
-TSS is data, not code.
+--===============1899766398920930825==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
->  
->  	memset(segp, 0, sizeof(*segp));
->  	segp->base = vm->tss;
-> @@ -620,8 +620,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
->  	vm_vaddr_t stack_vaddr;
->  	struct kvm_vcpu *vcpu;
->  
-> -	stack_vaddr = vm_vaddr_alloc(vm, DEFAULT_STACK_PGS * getpagesize(),
-> -				     DEFAULT_GUEST_STACK_VADDR_MIN);
-> +	stack_vaddr = __vm_vaddr_alloc(vm, DEFAULT_STACK_PGS * getpagesize(),
-> +				       DEFAULT_GUEST_STACK_VADDR_MIN,
-> +				       MEM_REGION_CODE);
-
-Stack is data, not code.
-
->  	vcpu = __vm_vcpu_add(vm, vcpu_id);
->  	vcpu_init_cpuid(vcpu, kvm_get_supported_cpuid());
-> @@ -1118,8 +1119,8 @@ void vm_init_descriptor_tables(struct kvm_vm *vm)
->  	extern void *idt_handlers;
->  	int i;
->  
-> -	vm->idt = vm_vaddr_alloc_page(vm);
-> -	vm->handlers = vm_vaddr_alloc_page(vm);
-> +	vm->idt = __vm_vaddr_alloc_page(vm, MEM_REGION_CODE);
-
-IDT is data, not code.
-
-> +	vm->handlers = __vm_vaddr_alloc_page(vm, MEM_REGION_CODE);
->  	/* Handlers have the same address in both address spaces.*/
->  	for (i = 0; i < NUM_INTERRUPTS; i++)
->  		set_idt_entry(vm, i, (unsigned long)(&idt_handlers)[i], 0,
-> -- 
-> 2.37.3.968.ga6b4b080e4-goog
-> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============1899766398920930825==--
