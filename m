@@ -2,57 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E37B7ECAAD8
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 09:25:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53FA3ECAAD8
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 09:34:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DF574B629;
-	Tue, 20 Sep 2022 05:25:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B998A4B092;
+	Tue, 20 Sep 2022 05:34:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4+WoTEGQ84Jo; Tue, 20 Sep 2022 05:25:03 -0400 (EDT)
+	with ESMTP id T0z+EGM0S6-B; Tue, 20 Sep 2022 05:34:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C8184B63B;
-	Tue, 20 Sep 2022 05:25:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 723F84B642;
+	Tue, 20 Sep 2022 05:34:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2030A4B629
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 05:25:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C78164B62E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 05:34:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rq4UiZL-MztH for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 05:25:00 -0400 (EDT)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C1AA640B59
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 05:25:00 -0400 (EDT)
-Date: Tue, 20 Sep 2022 11:24:59 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1663665899;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=9zrLhW6+j/sbUQdXwNAlZMyILSK9/uM8auDZkZ2Ibrg=;
- b=a63720QQS8maY/E/11LPxMihWSMsik+ISeTPBLj8yb/ScHEdkXiaGBbFqZ5zE2NkTV5ztj
- CmWTcZFDhm2JznDf4irbevFWtS1Iff5d+/fFNcqIh+uQrV6e488cJYY7khdkgtgCx50bce
- UZoLu1waKnHrJSlJt6bl2oTzqYUy7Wo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests RFC PATCH 09/19] arm/arm64: Zero secondary CPUs'
- stack
-Message-ID: <20220920092459.ptiwfll5cxo76bah@kamzik>
-References: <20220809091558.14379-1-alexandru.elisei@arm.com>
- <20220809091558.14379-10-alexandru.elisei@arm.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220809091558.14379-10-alexandru.elisei@arm.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: nikos.nikoleris@arm.com, pbonzini@redhat.com, thuth@redhat.com,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+ with ESMTP id DoYnD4RKYHYw for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 05:34:04 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5129F4B092
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 05:34:04 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 11BDAB822B2;
+ Tue, 20 Sep 2022 09:34:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9AA6C433C1;
+ Tue, 20 Sep 2022 09:34:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1663666441;
+ bh=ivTr2OWvzIQQQO9NkJ0FAL1UtGQNafvVOL27lxo0xrA=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=keLXcHwfR31TRqkmv7TlfaBoTFVBCebY6qNkI6YrvDrWIF/WOQcTC/KGfswoEKlR+
+ 7SD8osmHwzgO5tBAf+/hga19oEnP4aIeGy8U6nPEpwhdCQ7Zn9STsc/cFGhrg5GOx8
+ j3BFlXztiU1utWrcU6GM3/EfyjTF9cUyGJJh79kuhF2bn9tYYPjAQekmqhOGdeKUh5
+ a8fnT6S/bvddhsVSG9/3L+56EaLMath2YxXSZbxMo7vOVYulAzMCEfSMb4GmcEp0E7
+ OtBpyj0/PgJAMWpjr8MsBFbITJ6vkPAR5sIBU+av+ua9JxABXU8MlGwKugX9AVn4f9
+ zQZzZ+GW54+6A==
+Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oaZdf-00BMPj-Dx;
+ Tue, 20 Sep 2022 10:33:59 +0100
+Date: Tue, 20 Sep 2022 10:33:56 +0100
+Message-ID: <877d1yl797.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Denis Nikitin <denik@chromium.org>
+Subject: Re: [PATCH] KVM: arm64: nvhe: Disable profile optimization
+In-Reply-To: <20220920082005.2459826-1-denik@chromium.org>
+References: <20220920082005.2459826-1-denik@chromium.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.176.101.241
+X-SA-Exim-Rcpt-To: denik@chromium.org, catalin.marinas@arm.com, will@kernel.org,
+ james.morse@arm.com, alexandru.elisei@arm.com, ndesaulniers@google.com,
+ manojgupta@google.com, dbrazdil@google.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
+ Manoj Gupta <manojgupta@google.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,27 +90,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Aug 09, 2022 at 10:15:48AM +0100, Alexandru Elisei wrote:
-> For the boot CPU, the entire stack is zeroed in the entry code. For the
-> secondaries, only struct thread_info, which lives at the bottom of the
-> stack, is zeroed in thread_info_init().
-> 
-> Be consistent and zero the entire stack for the secondaries. This should
-> also improve reproducibility of the testsuite, as all the stacks now start
-> with the same contents, which is zero. And now that all the stacks are
-> zeroed in the entry code, there is no need to explicitely zero struct
-> thread_info in thread_info_init().
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arm/cstart.S          | 6 ++++++
->  arm/cstart64.S        | 3 +++
->  lib/arm/processor.c   | 1 -
->  lib/arm64/processor.c | 1 -
->  4 files changed, 9 insertions(+), 2 deletions(-)
->
+Hi Denis,
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+On Tue, 20 Sep 2022 09:20:05 +0100,
+Denis Nikitin <denik@chromium.org> wrote:
+> 
+> Kernel build with -fprofile-sample-use raises the following failure:
+> 
+> error: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.tmp.o: Unexpected SHT_REL
+> section ".rel.llvm.call-graph-profile"
+
+How is this flag provided? I don't see any occurrence of it in the
+kernel so far.
+
+> 
+> SHT_REL is generated by the latest lld, see
+> https://reviews.llvm.org/rGca3bdb57fa1ac98b711a735de048c12b5fdd8086.
+
+Is this part of a released toolchain? If so, can you spell out the
+first version where this occurs?
+
+> Disable profile optimization in kvm/nvhe to fix the build with
+> AutoFDO.
+
+It'd be good to at least mention how AutoFDO and -fprofile-sample-use
+relate to each other.
+
+> 
+> Signed-off-by: Denis Nikitin <denik@chromium.org>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/Makefile | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index b5c5119c7396..6a6188374a52 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -89,6 +89,9 @@ quiet_cmd_hypcopy = HYPCOPY $@
+>  # Remove ftrace, Shadow Call Stack, and CFI CFLAGS.
+>  # This is equivalent to the 'notrace', '__noscs', and '__nocfi' annotations.
+>  KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI), $(KBUILD_CFLAGS))
+> +# Profile optimization creates SHT_REL section '.llvm.call-graph-profile' for
+> +# the hot code. SHT_REL is currently not supported by the KVM tools.
+
+'KVM tools' seems vague. Maybe call out the actual helper that
+processes the relocations?
+
+> +KBUILD_CFLAGS += $(call cc-option,-fno-profile-sample-use,-fno-profile-use)
+
+Why adding these options instead of filtering out the offending option
+as it is done just above?
+
+Also, is this the only place the kernel fails to compile? The EFI stub
+does similar things AFAIR, and could potentially fail the same way.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
