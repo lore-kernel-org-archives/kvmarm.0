@@ -2,64 +2,56 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CD8CC6FA82
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 18:32:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6613C54EE9
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 18:37:06 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E35B4B10B;
-	Tue, 20 Sep 2022 14:32:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FBF34B24D;
+	Tue, 20 Sep 2022 14:37:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id msO57RY9iPkT; Tue, 20 Sep 2022 14:32:56 -0400 (EDT)
+	with ESMTP id Hy7cPgThhGAU; Tue, 20 Sep 2022 14:37:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 48F134B601;
-	Tue, 20 Sep 2022 14:32:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 015394B256;
+	Tue, 20 Sep 2022 14:37:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 991FD4B125
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:32:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6828A4B62A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:37:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8mwPVqvaqfrt for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 14:32:54 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 25E414B10B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:32:54 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 2C02362C30;
- Tue, 20 Sep 2022 18:32:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E67F3C433C1;
- Tue, 20 Sep 2022 18:32:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1663698772;
- bh=4gCGGvNVdHn884SylM/GIo6Xl70CZg4dLv1Oi0fNSqs=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=tNSNRjSV/3lKfWA4qvWuaxIDQNgWyBGrJ0HodVDgZyv+ixzmixAGJLa4JprHcl1Xj
- z41cFgCQFapvAW2lUqDnB3OfsQzqz8KbuBPVI/IMBt+bbNyvTYTY4XDJsrkdyNWaiz
- 02t21ydPfuZALGVyBEGnAPEE7gVAuCcEE0P0YaJOIukTmcJJlrQUR7Qn5yeH51Rz8O
- h5ZMQsrzjsiVTFDwcuxZSTe0DjnLnNtY/KcszzvqIw5/8p3VdhBuuwoOc+34kO4RT2
- f6IhuKVqGoPcBx3uk2Ku+fEWTINDqjgsXI24+JXjjGaz78jnlvr8mdNzj2s3StWfq9
- O4e7rXr1tWypg==
-Date: Tue, 20 Sep 2022 19:32:49 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 3/7] arm64/fpsimd: Have KVM explicitly say which FP
- registers to save
-Message-ID: <YyoHUS0ZPQvvjrte@sirena.org.uk>
-References: <20220815225529.930315-1-broonie@kernel.org>
- <20220815225529.930315-4-broonie@kernel.org>
- <87wn9yj5l0.wl-maz@kernel.org>
+ with ESMTP id QLZoRjG1qMGx for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 14:37:03 -0400 (EDT)
+Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D77704B121
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:37:02 -0400 (EDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1663699021;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ynddefVUagX/tXNDv+AoUivs7Y85IZzVEROwWQiJyV8=;
+ b=kN0uwchTL+afAy7BdBHt44hNXLQhD5FeJ4M77n7gBsuJ4IwoxxyxCnwK5OZY0FHXeVjSN6
+ 8JTz5+XhrbeQLdkBdvglAld8hAjgAaK5Vpt50cNFO79HdFrZgyWld+IijXby/EeBS5vQnw
+ LZ5zti/fTalOt1nGRi4GLEOqf4neFhE=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH] KVM: arm64: Limit stage2_apply_range() batch size to 1GB
+Date: Tue, 20 Sep 2022 18:36:29 +0000
+Message-Id: <20220920183630.3376939-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <87wn9yj5l0.wl-maz@kernel.org>
-X-Cookie: One FISHWICH coming up!!
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Zhang Lei <zhang.lei@jp.fujitsu.com>, Andre Przywara <andre.przywara@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,123 +63,159 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============6906169315830240854=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Presently stage2_apply_range() works on a batch of memory addressed by a
+stage 2 root table entry for the VM. Depending on the IPA limit of the
+VM and PAGE_SIZE of the host, this could address a massive range of
+memory. Some examples:
 
---===============6906169315830240854==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Kau3HDJ3G1WN9QYn"
-Content-Disposition: inline
+  4 level, 4K paging -> 512 GB batch size
 
+  3 level, 64K paging -> 4TB batch size
 
---Kau3HDJ3G1WN9QYn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Unsurprisingly, working on such a large range of memory can lead to soft
+lockups. When running dirty_log_perf_test:
 
-On Tue, Sep 20, 2022 at 06:52:59PM +0100, Marc Zyngier wrote:
-> On Mon, 15 Aug 2022 23:55:25 +0100,
-> Mark Brown <broonie@kernel.org> wrote:
+  ./dirty_log_perf_test -m -2 -s anonymous_thp -b 4G -v 48
 
-> >  enum fp_state {
-> > +	FP_STATE_TASK,		/* Save based on current, invalid as fp_type */
+  watchdog: BUG: soft lockup - CPU#0 stuck for 45s! [dirty_log_perf_:16703]
+  Modules linked in: vfat fat cdc_ether usbnet mii xhci_pci xhci_hcd sha3_generic gq(O)
+  CPU: 0 PID: 16703 Comm: dirty_log_perf_ Tainted: G           O       6.0.0-smp-DEV #1
+  pstate: 80400009 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+  pc : dcache_clean_inval_poc+0x24/0x38
+  lr : clean_dcache_guest_page+0x28/0x4c
+  sp : ffff800021763990
+  pmr_save: 000000e0
+  x29: ffff800021763990 x28: 0000000000000005 x27: 0000000000000de0
+  x26: 0000000000000001 x25: 00400830b13bc77f x24: ffffad4f91ead9c0
+  x23: 0000000000000000 x22: ffff8000082ad9c8 x21: 0000fffafa7bc000
+  x20: ffffad4f9066ce50 x19: 0000000000000003 x18: ffffad4f92402000
+  x17: 000000000000011b x16: 000000000000011b x15: 0000000000000124
+  x14: ffff07ff8301d280 x13: 0000000000000000 x12: 00000000ffffffff
+  x11: 0000000000010001 x10: fffffc0000000000 x9 : ffffad4f9069e580
+  x8 : 000000000000000c x7 : 0000000000000000 x6 : 000000000000003f
+  x5 : ffff07ffa2076980 x4 : 0000000000000001 x3 : 000000000000003f
+  x2 : 0000000000000040 x1 : ffff0830313bd000 x0 : ffff0830313bcc40
+  Call trace:
+   dcache_clean_inval_poc+0x24/0x38
+   stage2_unmap_walker+0x138/0x1ec
+   __kvm_pgtable_walk+0x130/0x1d4
+   __kvm_pgtable_walk+0x170/0x1d4
+   __kvm_pgtable_walk+0x170/0x1d4
+   __kvm_pgtable_walk+0x170/0x1d4
+   kvm_pgtable_stage2_unmap+0xc4/0xf8
+   kvm_arch_flush_shadow_memslot+0xa4/0x10c
+   kvm_set_memslot+0xb8/0x454
+   __kvm_set_memory_region+0x194/0x244
+   kvm_vm_ioctl_set_memory_region+0x58/0x7c
+   kvm_vm_ioctl+0x49c/0x560
+   __arm64_sys_ioctl+0x9c/0xd4
+   invoke_syscall+0x4c/0x124
+   el0_svc_common+0xc8/0x194
+   do_el0_svc+0x38/0xc0
+   el0_svc+0x2c/0xa4
+   el0t_64_sync_handler+0x84/0xf0
+   el0t_64_sync+0x1a0/0x1a4
 
-> How is that related to the FP_TYPE_TASK in the commit message? What
+Given the various paging configurations used by KVM at stage 2 there
+isn't a sensible page table level to use as the batch size. Use 1GB as
+the batch size instead, as it is evenly divisible by all supported
+hugepage sizes across 4K, 16K, and 64K paging.
 
-TYPE in the commit message should be STATE.
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
 
-> does this 'invalid as fp_type' mean?
+Applies to 6.0-rc3. Tested with 4K and 64K pages with the above
+dirty_log_perf_test command and noticed no more soft lockups. I don't
+have a 16K system to test with.
 
-It means that using FP_STATE_TASK as a value for the fp_type
-member of the task struck recording what type of state is
-currently stored for the task is not valid, one of the other two
-values representing what was actually saved must be chosen.
+Marc, we spoke about this a while ago and agreed to go for some page
+table level based batching scheme. However, I decided against that
+because it doesn't really solve the problem for non-4K kernels.
 
-> > +	/*
-> > +	 * For now we're just validating that the requested state is
-> > +	 * consistent with what we'd otherwise work out.
+ arch/arm64/include/asm/stage2_pgtable.h | 20 --------------------
+ arch/arm64/kvm/mmu.c                    |  8 +++++++-
+ 2 files changed, 7 insertions(+), 21 deletions(-)
 
-> Nit: work out? or worked out? the "we'd" doesn't help disambiguate it
-> for a non-native speaker.
+diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
+index fe341a6578c3..c8dca8ae359c 100644
+--- a/arch/arm64/include/asm/stage2_pgtable.h
++++ b/arch/arm64/include/asm/stage2_pgtable.h
+@@ -10,13 +10,6 @@
+ 
+ #include <linux/pgtable.h>
+ 
+-/*
+- * PGDIR_SHIFT determines the size a top-level page table entry can map
+- * and depends on the number of levels in the page table. Compute the
+- * PGDIR_SHIFT for a given number of levels.
+- */
+-#define pt_levels_pgdir_shift(lvls)	ARM64_HW_PGTABLE_LEVEL_SHIFT(4 - (lvls))
+-
+ /*
+  * The hardware supports concatenation of up to 16 tables at stage2 entry
+  * level and we use the feature whenever possible, which means we resolve 4
+@@ -30,11 +23,6 @@
+ #define stage2_pgtable_levels(ipa)	ARM64_HW_PGTABLE_LEVELS((ipa) - 4)
+ #define kvm_stage2_levels(kvm)		VTCR_EL2_LVLS(kvm->arch.vtcr)
+ 
+-/* stage2_pgdir_shift() is the size mapped by top-level stage2 entry for the VM */
+-#define stage2_pgdir_shift(kvm)		pt_levels_pgdir_shift(kvm_stage2_levels(kvm))
+-#define stage2_pgdir_size(kvm)		(1ULL << stage2_pgdir_shift(kvm))
+-#define stage2_pgdir_mask(kvm)		~(stage2_pgdir_size(kvm) - 1)
+-
+ /*
+  * kvm_mmmu_cache_min_pages() is the number of pages required to install
+  * a stage-2 translation. We pre-allocate the entry level page table at
+@@ -42,12 +30,4 @@
+  */
+ #define kvm_mmu_cache_min_pages(kvm)	(kvm_stage2_levels(kvm) - 1)
+ 
+-static inline phys_addr_t
+-stage2_pgd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+-{
+-	phys_addr_t boundary = (addr + stage2_pgdir_size(kvm)) & stage2_pgdir_mask(kvm);
+-
+-	return (boundary - 1 < end - 1) ? boundary : end;
+-}
+-
+ #endif	/* __ARM64_S2_PGTABLE_H_ */
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index c9a13e487187..d64032b9fbb6 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -31,6 +31,12 @@ static phys_addr_t hyp_idmap_vector;
+ 
+ static unsigned long io_map_base;
+ 
++static inline phys_addr_t stage2_apply_range_next(phys_addr_t addr, phys_addr_t end)
++{
++	phys_addr_t boundary = addr + SZ_1G;
++
++	return (boundary - 1 < end - 1) ? boundary : end;
++}
+ 
+ /*
+  * Release kvm_mmu_lock periodically if the memory region is large. Otherwise,
+@@ -52,7 +58,7 @@ static int stage2_apply_range(struct kvm *kvm, phys_addr_t addr,
+ 		if (!pgt)
+ 			return -EINVAL;
+ 
+-		next = stage2_pgd_addr_end(kvm, addr, end);
++		next = stage2_apply_range_next(addr, end);
+ 		ret = fn(pgt, addr, next - addr);
+ 		if (ret)
+ 			break;
 
-we'd =3D=3D we would so work out to match the tense.
-
-> >  void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_=
-state,
-> >  			      unsigned int sve_vl, void *za_state,
-> >  			      unsigned int sme_vl, u64 *svcr,
-> > -			      enum fp_state *type)
-> > +			      enum fp_state *type, enum fp_state to_save)
-
-> OK, how many discrete arguments are we going to pass to this function,
-> which most of them are part the vcpu structure? It really feels like
-> what you want is a getter for the per-cpu structure, and let the KVM
-> code do the actual business. If this function was supposed to provide
-> some level of abstraction, well, it's a fail.
-
-I agree that this is not an ideal interface, I am merely
-following the previously chosen idiom since I haven't been able
-to figure out why we were doing it in the first place and with a
-lot of these things it turns out that there's some actual reason.
-
-It's not even like fpsimd_bind_task_to_cpu() has ever been
-written in terms of this function, there's two parallel
-implementations.  My best guess was that it was some combination
-of not peering at KVM internals and keeping struct
-fpsimd_last_state_struct internal to fpsimd.c (since we're
-effectively just passing one of those in in a more verbose form)
-but never anything solid enough to be sure.
-
-> >  void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
-> >  {
-> > +	enum fp_state fp_type;
-> > +
-> >  	WARN_ON_ONCE(!irqs_disabled());
-> > =20
-> >  	if (vcpu->arch.fp_state =3D=3D FP_STATE_GUEST_OWNED) {
-> > +		if (vcpu_has_sve(vcpu))
-> > +			fp_type =3D FP_STATE_SVE;
-
-> Eventually, I'd like to relax this, and start tracking the actual use
-> of the guest rather than assuming that SVE guest use SVE at all times
-> (odds are they won't).
-
-> I hope this series still leaves us with this option.
-
-Yes, it probably makes it more tractable with KVM being able to
-just say what type of state it wants to save so there's less to
-take care of syncing with the host task so the code is a lot more
-direct - it will just be a case of setting the desired fp_type
-whenever a decision is made about what state type to save.
-
---Kau3HDJ3G1WN9QYn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmMqB1AACgkQJNaLcl1U
-h9AhPAf/RmK2od7fqUEd5u8ml4vpFinVTkXdN8NTxJ5vRCRaDzyn1/yt8SHlz8tA
-92DIlNoIRVN0S69lBbjITuzS8r2NKEM5wIoq+zKpRS6RaKQJyQK8Uk9mW8UAtk6i
-pADL23UuCpBYkjSF0krvFnHQsGc9p/wGZRIQ8IYbc+n+VzOi53+UxPorWIMQehEu
-+MDpfbZxB5fJE4AGIxAwdbAgTTDIwosKMUqJHnwkXaB9Kq+p3BAI7T7k82Ad2cwc
-cKM/1OJTFYYrah0WRu7mA9v2MShjXgSDbIqc7qSWBPuUifkmSVfoAWgrXQZE/BJl
-Cw5Hlf4SiFcRKdaIha8OIu31mMIFJA==
-=/4PY
------END PGP SIGNATURE-----
-
---Kau3HDJ3G1WN9QYn--
-
---===============6906169315830240854==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+base-commit: b90cb1053190353cc30f0fef0ef1f378ccc063c5
+-- 
+2.37.3.968.ga6b4b080e4-goog
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============6906169315830240854==--
