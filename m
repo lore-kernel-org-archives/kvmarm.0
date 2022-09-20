@@ -2,60 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7714C54EE9
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 18:09:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7719CC54EE9
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 18:20:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 561E94B600;
-	Tue, 20 Sep 2022 14:09:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 126414B637;
+	Tue, 20 Sep 2022 14:20:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dY3wPFw-bC7i; Tue, 20 Sep 2022 14:09:23 -0400 (EDT)
+	with ESMTP id BK-tj7Kv3P4v; Tue, 20 Sep 2022 14:20:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 490F34B630;
-	Tue, 20 Sep 2022 14:09:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E25A54B62E;
+	Tue, 20 Sep 2022 14:20:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1578D4B600
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:09:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3B274B62C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:20:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rczGh18v80J1 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 14:09:21 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DCCD14B24C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:09:20 -0400 (EDT)
+ with ESMTP id pwwXwRD0g97l for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 14:20:02 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8B1BC4B2A5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:20:02 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 9F980B82BDE;
- Tue, 20 Sep 2022 18:09:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6ABFC433D6;
- Tue, 20 Sep 2022 18:09:17 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 91FB562BFB;
+ Tue, 20 Sep 2022 18:20:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFFBDC433D6;
+ Tue, 20 Sep 2022 18:20:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1663697358;
- bh=IIE2Zez7/a1Qc1VfKvs+5cgbTBSAcI81MQ0uNGej81k=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=pMCbSfXW0auMJ8qdBUOJUWWMcdlqjby77wNDSZrfbtznHTzJrnkXJ7mVuJpWMKdoE
- X6r3WHJkLHyB0R4AL6RNcgP/DxYgyHsrRRYn/7LbQzIhYi2gcVxGaKAj7xKI1L79Xe
- fVzEJ5uMMx3wlV6fcEOie4HC7o+aT3kyBidHfIzDsKrwxLti++kAl/FoJTbzRSBjm6
- DsL1h/QBIc97Xu8S63i4vZZJ5YZ8cO8byyPcsP1UWgwUYMtgSFdezOr8mHSTI6jFqd
- VDnLxBQykRWIBdW0UKjtOd3pTOryhACTeZbYChUdhuqAJ+VUqcyNSfSTZCiI0lVyQ8
- YKSoAJjFqVtxw==
-Date: Tue, 20 Sep 2022 19:09:15 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 2/7] arm64/fpsimd: Track the saved FPSIMD state type
- separately to TIF_SVE
-Message-ID: <YyoBy+HuHj5XRXKG@sirena.org.uk>
+ s=k20201202; t=1663698001;
+ bh=3IuOSASXp6ftLoghtz8EBhswlJ3tQxqpUPcErhsnsoo=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=fVMAJJwU4SbA4tqHpOTcwDTMfvR7Vh8wbgNH1qDj2vK65GvKM0kRAITmWf+KzJJQR
+ Z/25SyOjDoZw2M08Iykeo96N0I0z+yy38ly5he0Gx6j8q8cFYM6D0gbykekcvJjcYN
+ 6Nwm003HdZ/pL/gPIkntYiO05oa37KQWqxmjxRnBwswpgfl0wgPVPW8VXDo50esa1Z
+ Jibk8tIFN3Ul/6iLfHDOAKa5Rvm2CzznSeZi7zUb1fAFOKDGpcNvDpsM1I2QxNHgVa
+ fq39qf/BOhj7uSoRXMD6BM2EVDV69s/l3c3a3pjY6FJX22Y3TFdQ7TuQ6cXT+xpCvb
+ ehLXpYZ/4iuRg==
+Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oahqg-00BTFc-O6;
+ Tue, 20 Sep 2022 19:19:58 +0100
+Date: Tue, 20 Sep 2022 19:19:57 +0100
+Message-ID: <87tu51kiwi.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v3 5/7] arm64/fpsimd: Load FP state based on recorded data
+ type
+In-Reply-To: <20220815225529.930315-6-broonie@kernel.org>
 References: <20220815225529.930315-1-broonie@kernel.org>
- <20220815225529.930315-3-broonie@kernel.org>
- <87y1uej7dm.wl-maz@kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <87y1uej7dm.wl-maz@kernel.org>
-X-Cookie: One FISHWICH coming up!!
+ <20220815225529.930315-6-broonie@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.176.101.241
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+ zhang.lei@jp.fujitsu.com, james.morse@arm.com, alexandru.elisei@arm.com,
+ andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
  Zhang Lei <zhang.lei@jp.fujitsu.com>, Andre Przywara <andre.przywara@arm.com>,
  Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
@@ -71,82 +86,106 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1899766398920930825=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Mon, 15 Aug 2022 23:55:27 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> Now that we are recording the type of floating point register state we
+> are saving when we save it we can use that information when we load to
+> decide which register state is required and bring the TIF_SVE state into
+> sync with the loaded register state.
 
---===============1899766398920930825==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="F2TYRAB+02knW1Ru"
-Content-Disposition: inline
+Really, this sentence makes zero sense to me. Please at least add some
+punctuation, because the only words that spring to mind here are "DOES
+NOT COMPUTE".
 
+> 
+> The SME state detauls are already recorded directly in the saved
+> SVCR and handled based on the information there.
+> 
+> Since we are not changing any of the save paths there should be no
+> functional change from this patch, further patches will make use of this
+> to optimise and clarify the code.
+> 
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/kernel/fpsimd.c | 39 ++++++++++++++++++++++++++++++--------
+>  1 file changed, 31 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> index aaea2dc02cbd..4096530dd4c6 100644
+> --- a/arch/arm64/kernel/fpsimd.c
+> +++ b/arch/arm64/kernel/fpsimd.c
+> @@ -392,11 +392,36 @@ static void task_fpsimd_load(void)
+>  	WARN_ON(!system_supports_fpsimd());
+>  	WARN_ON(!have_cpu_fpsimd_context());
+>  
+> -	/* Check if we should restore SVE first */
+> -	if (IS_ENABLED(CONFIG_ARM64_SVE) && test_thread_flag(TIF_SVE)) {
+> -		sve_set_vq(sve_vq_from_vl(task_get_sve_vl(current)) - 1);
+> -		restore_sve_regs = true;
+> -		restore_ffr = true;
+> +	if (system_supports_sve()) {
+> +		switch (current->thread.fp_type) {
+> +		case FP_STATE_FPSIMD:
+> +			/* Stop tracking SVE for this task until next use. */
+> +			if (test_and_clear_thread_flag(TIF_SVE))
+> +				sve_user_disable();
+> +			break;
+> +		case FP_STATE_SVE:
+> +			if (!thread_sm_enabled(&current->thread) &&
+> +			    !WARN_ON_ONCE(!test_and_set_thread_flag(TIF_SVE)))
+> +				sve_user_enable();
+> +
+> +			if (test_thread_flag(TIF_SVE))
+> +				sve_set_vq(sve_vq_from_vl(task_get_sve_vl(current)) - 1);
+> +
+> +			restore_sve_regs = true;
+> +			restore_ffr = true;
+> +			break;
+> +		default:
+> +			/*
+> +			 * This should never happen, we should always
+> +			 * record what we saved when we save. We
+> +			 * always at least have the memory allocated
+> +			 * for FPSMID registers so try that and hope
+> +			 * for the best.
+> +			 */
+> +			WARN_ON_ONCE(1);
+> +			clear_thread_flag(TIF_SVE);
+> +			break;
 
---F2TYRAB+02knW1Ru
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+What makes it impossible for FP_STATE_TASK to reach this point? If
+that's indeed an impossible case, please document it.
 
-On Tue, Sep 20, 2022 at 06:14:13PM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
+> +		}
+>  	}
+>  
+>  	/* Restore SME, override SVE register configuration if needed */
+> @@ -412,10 +437,8 @@ static void task_fpsimd_load(void)
+>  		if (thread_za_enabled(&current->thread))
+>  			za_load_state(current->thread.za_state);
+>  
+> -		if (thread_sm_enabled(&current->thread)) {
+> -			restore_sve_regs = true;
+> +		if (thread_sm_enabled(&current->thread))
+>  			restore_ffr = system_supports_fa64();
+> -		}
+>  	}
+>  
+>  	if (restore_sve_regs) {
 
-> > When we save the state for the floating point registers this can be done
-> > in the form visible through either the FPSIMD V registers or the SVE Z and
-> > P registers. At present we track which format is currently used based on
-> > TIF_SVE and the SME streaming mode state but particularly in the SVE case
-> > this limits our options for optimising things, especially around syscalls.
-> > Introduce a new enum in thread_struct which explicitly states which format
-> > is active and keep it up to date when we change it.
+Thanks,
 
-> > At present we do not use this state except to verify that it has the
-> > expected value when loading the state, future patches will introduce
-> > functional changes.
+	M.
 
-> > +	enum fp_state fp_type;
-
-> Is it a state or a type? Some consistency would help. Also, what does
-
-We can bikeshed this either way - the state currently stored is
-of a particular type.  I'll probably go for type.
-
-> this represent? Your commit message keeps talking about the FP/SVE
-> state for the host, but this is obviously a guest-related structure.
-> How do the two relate?
-
-The commit message talks about saving the floating point state in
-general which is something we do for both the host and the guest.
-The optimisation cases I am focusing on right now are more on
-host usage but the complexity with tracking that currently blocks
-them crosses both host and guest, indeed the biggest improvement
-overall is probably that tracking the guest state stops requiring
-us to fiddle with the host task's state which to me at least
-makes things clearer.
-
---F2TYRAB+02knW1Ru
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmMqAcoACgkQJNaLcl1U
-h9Dyfgf8DqcSgSpIMFm7ghAZD34enLc6Td4USGjfJ5GqsGTZZvbo9m32uPxEnjDp
-mmDbT0uo7d1BG2QR1GiHgPQGW6UwgMf1RjG4T1lFi83JknKpUkaOUsDR4PPejUok
-aQjLxK2rr6FJku55sbPpOo7u4oidNjJDNRlNnLvdVCE1gZmj+nBD+FY77tDw5Y3e
-2n8NBwqU6T1B6kEgwgm0siCB19IrZhXfGn1M0u6HLm4IL2h2BGgb8P9dC2yJkteE
-ZeD/KvVziahNq8ZFb9mqyGEKl9fZzaXEzwSAK5VnPXhEoaWs8vT7jDS1TZEiMG19
-hQN9AZJW2bYsKpHx0tEHnfeiDhzaNw==
-=uRBY
------END PGP SIGNATURE-----
-
---F2TYRAB+02knW1Ru--
-
---===============1899766398920930825==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============1899766398920930825==--
