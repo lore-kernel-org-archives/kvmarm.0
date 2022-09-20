@@ -2,81 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C94DC54EE9
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 17:13:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D2B9C6FA82
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 17:14:26 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B4004B62D;
-	Tue, 20 Sep 2022 13:13:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF74C4B630;
+	Tue, 20 Sep 2022 13:14:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vOKW6Esb8J+h; Tue, 20 Sep 2022 13:13:36 -0400 (EDT)
+	with ESMTP id zIFN+mGtyi03; Tue, 20 Sep 2022 13:14:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A48974B293;
-	Tue, 20 Sep 2022 13:13:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC4E94B3C0;
+	Tue, 20 Sep 2022 13:14:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 703FD4B1B4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 13:13:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EB3074B256
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 13:14:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QXENlX+Z2Ax6 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 13:13:33 -0400 (EDT)
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com
- [209.85.215.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F9F949EFA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 13:13:33 -0400 (EDT)
-Received: by mail-pg1-f179.google.com with SMTP id q9so3292991pgq.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 10:13:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date;
- bh=k1+JwUUeFps2IAG9Yf8Q8zF/zikZD8EBeZo9NXzpX2o=;
- b=h+EQW2hTgKR+7SyU4+Z08mHlpQEda7EpHXmzKDANEJAjj0ZyD57YxIWOGXSC1mA1FU
- DBufrJwo4wHYe8ZxcfkxiCWy8IBM8JFMwL8ObFf4ImIZIEqA7tKt3SpjEMatrvTrAbEG
- QYEXewFIQX+JBcCVbJU9rT5YfMwYLct5muCENvzN7of74eIbg3W24p013RgjXGuP6HvO
- uUt73GJEyMw6Z+XnoCmG3Rfgq+b9ZRhd18UV8S9EXwKzANhd0zf4iJOeuxG0FYtTIId1
- SYCnkarGu/xje+BpTKNpDMnlCElNuqOrr5mPY0OJVZq5kimJ1WiZvaWsOiXyLxEU9zrl
- 4pmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
- bh=k1+JwUUeFps2IAG9Yf8Q8zF/zikZD8EBeZo9NXzpX2o=;
- b=szN6DAxaoZeyE1PedLO2JxCMI6Kr6L81teFhWiRGnyXScbfAUO/9nAe3bbeaPsDKj/
- bUTSjjbMP9tZQMrI4X6jM8dyOUuInU5gFZnGfk68DvdGcAMAh8jPceekFQqrdDS8lb2T
- Hn3QNf2A5vG9XGOMFaHsZE9xCGs4huYRgjoIsWuT0K9rIfZ7/kZuj/7dmwQ1Np0dNim2
- UBx4V5HP4not6zWPYafB8oNpul/a/ZYNErifClsF+KrnbYrVhBSPypdILgpdwoMIoi5D
- 20QrK/ABu3tnRQcza7Pm2iqveenviiiXzbTaNTs5zQ6pjSTvFkXkJi7nCDJxtaF1ZwAJ
- ji+Q==
-X-Gm-Message-State: ACrzQf3VD1xUA64q+FLcH9NFAKAbRDh+XzpgSSwuwsPKbe94VQJ50wQo
- D74I7JKk9BfWQ6BXfaTsp90y5w==
-X-Google-Smtp-Source: AMsMyM5TSQ4aI9eqxv8vKz94ktDxBtiGT8mo5+zWBQ7Vg2tDgMY9ZCsfjV28CrbZJjaA78IZuEK07Q==
-X-Received: by 2002:a05:6a00:2387:b0:550:bd29:7d7 with SMTP id
- f7-20020a056a00238700b00550bd2907d7mr6096394pfc.17.1663694012020; 
- Tue, 20 Sep 2022 10:13:32 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com.
- [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
- u16-20020a632350000000b004277f43b736sm128375pgm.92.2022.09.20.10.13.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Sep 2022 10:13:31 -0700 (PDT)
-Date: Tue, 20 Sep 2022 10:13:27 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Subject: Re: [PATCH v7 09/13] KVM: selftests: aarch64: Add
- aarch64/page_fault_test
-Message-ID: <Yyn0t7pu8bFdkb8D@google.com>
-References: <20220920042551.3154283-1-ricarkol@google.com>
- <20220920042551.3154283-10-ricarkol@google.com>
- <20220920080515.x3v4gjvgtfatt55c@kamzik>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220920080515.x3v4gjvgtfatt55c@kamzik>
-Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
- pbonzini@redhat.com, axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu,
- dmatlack@google.com
+ with ESMTP id J77kf1aPM0fU for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 13:14:21 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 13CA44B24D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 13:14:21 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 47E9BB82B8F;
+ Tue, 20 Sep 2022 17:14:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3BA5C433C1;
+ Tue, 20 Sep 2022 17:14:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1663694058;
+ bh=tRhOXS3ube9jTnu/lSM1nLRtUPprE1CMaVmeZuzv/HM=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=ooX3BPPFmADTfHWqRweLu3uNJzNSPij2epO72Z8ix9cxnU8hArXsM2lv/kPNqHjdJ
+ cBBNHyqVB9VIEg3dhngHnG/75WuWzx+GWPtrBxL5Ga7non7/fv8WEq+Isd9dyKTLXE
+ Z9v9RPdCLa/fY9fWP7IJbv+MULlmIcT+0aEVkRsUFt5zHQQaRheaK0wk+a0u6sqSGc
+ wZL5iM/k4uLJRU1zN9AkE9eriJmsJkR3oXTtCU5EDZA3nVti/l/m8O1uZxDr3ZyNBa
+ TBFl/I5i0a+PM/1ia8cI3nkGnAsV7BZh+2fW3kT+BgK4758+gbGDJfpQ/OgNvnmxgO
+ BwFxqAo1MJVVQ==
+Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oagp5-00BSTX-6t;
+ Tue, 20 Sep 2022 18:14:15 +0100
+Date: Tue, 20 Sep 2022 18:14:13 +0100
+Message-ID: <87y1uej7dm.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v3 2/7] arm64/fpsimd: Track the saved FPSIMD state type
+ separately to TIF_SVE
+In-Reply-To: <20220815225529.930315-3-broonie@kernel.org>
+References: <20220815225529.930315-1-broonie@kernel.org>
+ <20220815225529.930315-3-broonie@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.176.101.241
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+ zhang.lei@jp.fujitsu.com, james.morse@arm.com, alexandru.elisei@arm.com,
+ andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Zhang Lei <zhang.lei@jp.fujitsu.com>, Andre Przywara <andre.przywara@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,702 +91,396 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 20, 2022 at 10:05:15AM +0200, Andrew Jones wrote:
-> On Tue, Sep 20, 2022 at 04:25:47AM +0000, Ricardo Koller wrote:
-> > Add a new test for stage 2 faults when using different combinations of
-> > guest accesses (e.g., write, S1PTW), backing source type (e.g., anon)
-> > and types of faults (e.g., read on hugetlbfs with a hole). The next
-> > commits will add different handling methods and more faults (e.g., uffd
-> > and dirty logging). This first commit starts by adding two sanity checks
-> > for all types of accesses: AF setting by the hw, and accessing memslots
-> > with holes.
-> > 
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  tools/testing/selftests/kvm/.gitignore        |   1 +
-> >  tools/testing/selftests/kvm/Makefile          |   1 +
-> >  .../selftests/kvm/aarch64/page_fault_test.c   | 601 ++++++++++++++++++
-> >  .../selftests/kvm/include/aarch64/processor.h |   8 +
-> >  4 files changed, 611 insertions(+)
-> >  create mode 100644 tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> > 
-> > diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> > index d625a3f83780..7a9022cfa033 100644
-> > --- a/tools/testing/selftests/kvm/.gitignore
-> > +++ b/tools/testing/selftests/kvm/.gitignore
-> > @@ -3,6 +3,7 @@
-> >  /aarch64/debug-exceptions
-> >  /aarch64/get-reg-list
-> >  /aarch64/hypercalls
-> > +/aarch64/page_fault_test
-> >  /aarch64/psci_test
-> >  /aarch64/vcpu_width_config
-> >  /aarch64/vgic_init
-> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> > index 1bb471aeb103..850e317b9e82 100644
-> > --- a/tools/testing/selftests/kvm/Makefile
-> > +++ b/tools/testing/selftests/kvm/Makefile
-> > @@ -149,6 +149,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
-> >  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
-> >  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-> >  TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
-> > +TEST_GEN_PROGS_aarch64 += aarch64/page_fault_test
-> >  TEST_GEN_PROGS_aarch64 += aarch64/psci_test
-> >  TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
-> >  TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
-> > diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> > new file mode 100644
-> > index 000000000000..98f12e7af14b
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> > @@ -0,0 +1,601 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * page_fault_test.c - Test stage 2 faults.
-> > + *
-> > + * This test tries different combinations of guest accesses (e.g., write,
-> > + * S1PTW), backing source type (e.g., anon) and types of faults (e.g., read on
-> > + * hugetlbfs with a hole). It checks that the expected handling method is
-> > + * called (e.g., uffd faults with the right address and write/read flag).
-> > + */
-> > +
-> > +#define _GNU_SOURCE
-> > +#include <linux/bitmap.h>
-> > +#include <fcntl.h>
-> > +#include <test_util.h>
-> > +#include <kvm_util.h>
-> > +#include <processor.h>
-> > +#include <asm/sysreg.h>
-> > +#include <linux/bitfield.h>
-> > +#include "guest_modes.h"
-> > +#include "userfaultfd_util.h"
-> > +
-> > +/* Guest virtual addresses that point to the test page and its PTE. */
-> > +#define TEST_GVA				0xc0000000
-> > +#define TEST_EXEC_GVA				(TEST_GVA + 0x8)
-> > +#define TEST_PTE_GVA				0xb0000000
-> > +#define TEST_DATA				0x0123456789ABCDEF
-> > +
-> > +static uint64_t *guest_test_memory = (uint64_t *)TEST_GVA;
-> > +
-> > +#define CMD_NONE				(0)
-> > +#define CMD_SKIP_TEST				(1ULL << 1)
-> > +#define CMD_HOLE_PT				(1ULL << 2)
-> > +#define CMD_HOLE_DATA				(1ULL << 3)
-> > +
-> > +#define PREPARE_FN_NR				10
-> > +#define CHECK_FN_NR				10
-> > +
-> > +struct test_desc {
-> > +	const char *name;
-> > +	uint64_t mem_mark_cmd;
-> > +	/* Skip the test if any prepare function returns false */
-> > +	bool (*guest_prepare[PREPARE_FN_NR])(void);
-> > +	void (*guest_test)(void);
-> > +	void (*guest_test_check[CHECK_FN_NR])(void);
-> > +	void (*dabt_handler)(struct ex_regs *regs);
-> > +	void (*iabt_handler)(struct ex_regs *regs);
-> > +	uint32_t pt_memslot_flags;
-> > +	uint32_t data_memslot_flags;
-> > +	bool skip;
-> > +};
-> > +
-> > +struct test_params {
-> > +	enum vm_mem_backing_src_type src_type;
-> > +	struct test_desc *test_desc;
-> > +};
-> > +
-> > +static inline void flush_tlb_page(uint64_t vaddr)
-> > +{
-> > +	uint64_t page = vaddr >> 12;
-> > +
-> > +	dsb(ishst);
-> > +	asm volatile("tlbi vaae1is, %0" :: "r" (page));
-> > +	dsb(ish);
-> > +	isb();
-> > +}
-> > +
-> > +static void guest_write64(void)
-> > +{
-> > +	uint64_t val;
-> > +
-> > +	WRITE_ONCE(*guest_test_memory, TEST_DATA);
-> > +	val = READ_ONCE(*guest_test_memory);
-> > +	GUEST_ASSERT_EQ(val, TEST_DATA);
-> > +}
-> > +
-> > +/* Check the system for atomic instructions. */
-> > +static bool guest_check_lse(void)
-> > +{
-> > +	uint64_t isar0 = read_sysreg(id_aa64isar0_el1);
-> > +	uint64_t atomic;
-> > +
-> > +	atomic = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR0_ATOMICS), isar0);
-> > +	return atomic >= 2;
-> > +}
-> > +
-> > +static bool guest_check_dc_zva(void)
-> > +{
-> > +	uint64_t dczid = read_sysreg(dczid_el0);
-> > +	uint64_t dzp = FIELD_GET(ARM64_FEATURE_MASK(DCZID_DZP), dczid);
-> > +
-> > +	return dzp == 0;
-> > +}
-> > +
-> > +/* Compare and swap instruction. */
-> > +static void guest_cas(void)
-> > +{
-> > +	uint64_t val;
-> > +
-> > +	GUEST_ASSERT(guest_check_lse());
-> > +	asm volatile(".arch_extension lse\n"
-> > +		     "casal %0, %1, [%2]\n"
-> > +			:: "r" (0), "r" (TEST_DATA), "r" (guest_test_memory));
-> > +	val = READ_ONCE(*guest_test_memory);
-> > +	GUEST_ASSERT_EQ(val, TEST_DATA);
-> > +}
-> > +
-> > +static void guest_read64(void)
-> > +{
-> > +	uint64_t val;
-> > +
-> > +	val = READ_ONCE(*guest_test_memory);
-> > +	GUEST_ASSERT_EQ(val, 0);
-> > +}
-> > +
-> > +/* Address translation instruction */
-> > +static void guest_at(void)
-> > +{
-> > +	uint64_t par;
-> > +
-> > +	asm volatile("at s1e1r, %0" :: "r" (guest_test_memory));
-> > +	par = read_sysreg(par_el1);
-> > +	isb();
-> > +
-> > +	/* Bit 1 indicates whether the AT was successful */
-> > +	GUEST_ASSERT_EQ(par & 1, 0);
-> > +}
-> > +
-> > +/*
-> > + * The size of the block written by "dc zva" is guaranteed to be between (2 <<
-> > + * 0) and (2 << 9), which is safe in our case as we need the write to happen
-> > + * for at least a word, and not more than a page.
-> > + */
-> > +static void guest_dc_zva(void)
-> > +{
-> > +	uint16_t val;
-> > +
-> > +	asm volatile("dc zva, %0" :: "r" (guest_test_memory));
-> > +	dsb(ish);
-> > +	val = READ_ONCE(*guest_test_memory);
-> > +	GUEST_ASSERT_EQ(val, 0);
-> > +}
-> > +
-> > +/*
-> > + * Pre-indexing loads and stores don't have a valid syndrome (ESR_EL2.ISV==0).
-> > + * And that's special because KVM must take special care with those: they
-> > + * should still count as accesses for dirty logging or user-faulting, but
-> > + * should be handled differently on mmio.
-> > + */
-> > +static void guest_ld_preidx(void)
-> > +{
-> > +	uint64_t val;
-> > +	uint64_t addr = TEST_GVA - 8;
-> > +
-> > +	/*
-> > +	 * This ends up accessing "TEST_GVA + 8 - 8", where "TEST_GVA - 8" is
-> > +	 * in a gap between memslots not backing by anything.
-> > +	 */
-> > +	asm volatile("ldr %0, [%1, #8]!"
-> > +			: "=r" (val), "+r" (addr));
-> > +	GUEST_ASSERT_EQ(val, 0);
-> > +	GUEST_ASSERT_EQ(addr, TEST_GVA);
-> > +}
-> > +
-> > +static void guest_st_preidx(void)
-> > +{
-> > +	uint64_t val = TEST_DATA;
-> > +	uint64_t addr = TEST_GVA - 8;
-> > +
-> > +	asm volatile("str %0, [%1, #8]!"
-> > +			: "+r" (val), "+r" (addr));
-> > +
-> > +	GUEST_ASSERT_EQ(addr, TEST_GVA);
-> > +	val = READ_ONCE(*guest_test_memory);
-> > +}
-> > +
-> > +static bool guest_set_ha(void)
-> > +{
-> > +	uint64_t mmfr1 = read_sysreg(id_aa64mmfr1_el1);
-> > +	uint64_t hadbs, tcr;
-> > +
-> > +	/* Skip if HA is not supported. */
-> > +	hadbs = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR1_HADBS), mmfr1);
-> > +	if (hadbs == 0)
-> > +		return false;
-> > +
-> > +	tcr = read_sysreg(tcr_el1) | TCR_EL1_HA;
-> > +	write_sysreg(tcr, tcr_el1);
-> > +	isb();
-> > +
-> > +	return true;
-> > +}
-> > +
-> > +static bool guest_clear_pte_af(void)
-> > +{
-> > +	*((uint64_t *)TEST_PTE_GVA) &= ~PTE_AF;
-> > +	flush_tlb_page(TEST_GVA);
-> > +
-> > +	return true;
-> > +}
-> > +
-> > +static void guest_check_pte_af(void)
-> > +{
-> > +	dsb(ish);
-> > +	GUEST_ASSERT_EQ(*((uint64_t *)TEST_PTE_GVA) & PTE_AF, PTE_AF);
-> > +}
-> > +
-> > +static void guest_exec(void)
-> > +{
-> > +	int (*code)(void) = (int (*)(void))TEST_EXEC_GVA;
-> > +	int ret;
-> > +
-> > +	ret = code();
-> > +	GUEST_ASSERT_EQ(ret, 0x77);
-> > +}
-> > +
-> > +static bool guest_prepare(struct test_desc *test)
-> > +{
-> > +	bool (*prepare_fn)(void);
-> > +	int i;
-> > +
-> > +	for (i = 0; i < PREPARE_FN_NR; i++) {
-> > +		prepare_fn = test->guest_prepare[i];
-> > +		if (prepare_fn && !prepare_fn())
-> > +			return false;
-> > +	}
-> > +
-> > +	return true;
-> > +}
-> > +
-> > +static void guest_test_check(struct test_desc *test)
-> > +{
-> > +	void (*check_fn)(void);
-> > +	int i;
-> > +
-> > +	for (i = 0; i < CHECK_FN_NR; i++) {
-> > +		check_fn = test->guest_test_check[i];
-> > +		if (check_fn)
-> > +			check_fn();
-> > +	}
-> > +}
-> > +
-> > +static void guest_code(struct test_desc *test)
-> > +{
-> > +	if (!guest_prepare(test))
-> > +		GUEST_SYNC(CMD_SKIP_TEST);
-> > +
-> > +	GUEST_SYNC(test->mem_mark_cmd);
-> > +
-> > +	if (test->guest_test)
-> > +		test->guest_test();
-> > +
-> > +	guest_test_check(test);
-> > +	GUEST_DONE();
-> > +}
-> > +
-> > +static void no_dabt_handler(struct ex_regs *regs)
-> > +{
-> > +	GUEST_ASSERT_1(false, read_sysreg(far_el1));
-> > +}
-> > +
-> > +static void no_iabt_handler(struct ex_regs *regs)
-> > +{
-> > +	GUEST_ASSERT_1(false, regs->pc);
-> > +}
-> > +
-> > +/* Returns true to continue the test, and false if it should be skipped. */
-> > +static bool punch_hole_in_memslot(struct kvm_vm *vm,
-> > +				  struct userspace_mem_region *region)
-> > +{
-> > +	void *hva = (void *)region->region.userspace_addr;
-> > +	uint64_t paging_size = region->region.memory_size;
-> > +	int ret, fd = region->fd;
-> > +
-> > +	if (fd != -1) {
-> > +		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-> > +				0, paging_size);
-> > +		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
-> > +	} else {
-> > +		if (is_backing_src_hugetlb(region->backing_src_type))
-> > +			return false;
-> > +
-> > +		ret = madvise(hva, paging_size, MADV_DONTNEED);
-> > +		TEST_ASSERT(ret == 0, "madvise failed, errno: %d\n", errno);
-> > +	}
-> > +
-> > +	return true;
-> > +}
-> > +
-> > +/* Returns true to continue the test, and false if it should be skipped. */
-> > +static bool handle_cmd(struct kvm_vm *vm, int cmd)
-> > +{
-> > +	struct userspace_mem_region *data_region, *pt_region;
-> > +	bool continue_test = true;
-> > +
-> > +	data_region = vm_get_mem_region(vm, MEM_REGION_DATA);
-> > +	pt_region = vm_get_mem_region(vm, MEM_REGION_PT);
-> > +
-> > +	if (cmd == CMD_SKIP_TEST)
-> > +		continue_test = false;
-> > +
-> > +	if (cmd & CMD_HOLE_PT)
-> > +		continue_test = punch_hole_in_memslot(vm, pt_region);
-> > +	if (cmd & CMD_HOLE_DATA)
-> > +		continue_test = punch_hole_in_memslot(vm, data_region);
-> > +
-> > +	return continue_test;
-> > +}
-> > +
-> > +typedef uint32_t aarch64_insn_t;
-> > +extern aarch64_insn_t __exec_test[2];
-> > +
-> > +void noinline __return_0x77(void)
-> > +{
-> > +	asm volatile("__exec_test: mov x0, #0x77\n"
-> > +			"ret\n");
-> > +}
-> > +
-> > +/*
-> > + * Note that this function runs on the host before the test VM starts: there's
-> > + * no need to sync the D$ and I$ caches.
-> > + */
-> > +static void load_exec_code_for_test(struct kvm_vm *vm)
-> > +{
-> > +	uint64_t *code;
-> > +	struct userspace_mem_region *region;
-> > +	void *hva;
-> > +
-> > +	region = vm_get_mem_region(vm, MEM_REGION_DATA);
-> > +	hva = (void *)region->region.userspace_addr;
-> > +
-> > +	assert(TEST_EXEC_GVA > TEST_GVA);
-> > +	code = hva + TEST_EXEC_GVA - TEST_GVA;
-> > +	memcpy(code, __exec_test, sizeof(__exec_test));
-> > +}
-> > +
-> > +static void setup_abort_handlers(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
-> > +		struct test_desc *test)
-> > +{
-> > +	vm_init_descriptor_tables(vm);
-> > +	vcpu_init_descriptor_tables(vcpu);
-> > +
-> > +	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-> > +			ESR_EC_DABT, no_dabt_handler);
-> > +	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
-> > +			ESR_EC_IABT, no_iabt_handler);
-> > +}
-> > +
-> > +static void setup_gva_maps(struct kvm_vm *vm)
-> > +{
-> > +	struct userspace_mem_region *region;
-> > +	uint64_t pte_gpa;
-> > +
-> > +	region = vm_get_mem_region(vm, MEM_REGION_DATA);
-> > +	/* Map TEST_GVA first. This will install a new PTE. */
-> > +	virt_pg_map(vm, TEST_GVA, region->region.guest_phys_addr);
-> > +	/* Then map TEST_PTE_GVA to the above PTE. */
-> > +	pte_gpa = addr_hva2gpa(vm, virt_get_pte_hva(vm, TEST_GVA));
-> > +	virt_pg_map(vm, TEST_PTE_GVA, pte_gpa);
-> > +}
-> > +
-> > +unsigned long get_max_gfn(enum vm_guest_mode mode)
-> > +{
-> > +	unsigned int pa_bits = vm_guest_mode_params[mode].pa_bits;
-> > +	unsigned int page_shift = vm_guest_mode_params[mode].page_shift;
-> > +
-> > +	return ((1ULL << pa_bits) >> page_shift) - 1;
-> > +}
+On Mon, 15 Aug 2022 23:55:24 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> The above function should be deleted.
->
-
-Ack. Removing in v8.
-
-> > +
-> > +enum pf_test_memslots {
-> > +	CODE_MEMSLOT,
-> > +	PAGE_TABLE_MEMSLOT,
-> > +	DATA_MEMSLOT,
-> > +};
-> > +
-> > +/* Create a code memslot at pfn=0, and data and PT ones at max_gfn. */
-> > +static void setup_memslots(struct kvm_vm *vm, struct test_params *p)
-> > +{
-> > +	uint64_t backing_src_pagesz = get_backing_src_pagesz(p->src_type);
-> > +	uint64_t guest_page_size = vm->page_size;
-> > +	uint64_t max_gfn = vm_compute_max_gfn(vm);
-> > +	/* Enough for 2M of code when using 4K guest pages. */
-> > +	uint64_t code_npages = 512;
-> > +	uint64_t pt_size, data_size, data_gpa;
-> > +
-> > +	/*
-> > +	 * This test requires 1 pgd, 2 pud, 4 pmd, and 6 pte pages when using
-> > +	 * VM_MODE_P48V48_4K. Note that the .text takes ~1.6MBs.  That's 13
-> > +	 * pages. VM_MODE_P48V48_4K is the mode with most PT pages; let's use
-> > +	 * twice that just in case.
-> > +	 */
-> > +	pt_size = 26 * guest_page_size;
-> > +
-> > +	/* memslot sizes and gpa's must be aligned to the backing page size */
-> > +	pt_size = align_up(pt_size, backing_src_pagesz);
-> > +	data_size = align_up(guest_page_size, backing_src_pagesz);
-> > +	data_gpa = (max_gfn * guest_page_size) - data_size;
-> > +	data_gpa = align_down(data_gpa, backing_src_pagesz);
-> > +
-> > +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, CODE_MEMSLOT,
-> > +				    code_npages, 0);
-> > +	vm->memslots[MEM_REGION_CODE] = CODE_MEMSLOT;
-> > +
-> > +	vm_userspace_mem_region_add(vm, p->src_type, data_gpa - pt_size,
-> > +				    PAGE_TABLE_MEMSLOT, pt_size / guest_page_size,
-> > +				    p->test_desc->pt_memslot_flags);
-> > +	vm->memslots[MEM_REGION_PT] = PAGE_TABLE_MEMSLOT;
-> > +
-> > +	vm_userspace_mem_region_add(vm, p->src_type, data_gpa, DATA_MEMSLOT,
-> > +				    data_size / guest_page_size,
-> > +				    p->test_desc->data_memslot_flags);
-> > +	vm->memslots[MEM_REGION_DATA] = DATA_MEMSLOT;
-> > +}
-> > +
-> > +static void print_test_banner(enum vm_guest_mode mode, struct test_params *p)
-> > +{
-> > +	struct test_desc *test = p->test_desc;
-> > +
-> > +	pr_debug("Test: %s\n", test->name);
-> > +	pr_debug("Testing guest mode: %s\n", vm_guest_mode_string(mode));
-> > +	pr_debug("Testing memory backing src type: %s\n",
-> > +			vm_mem_backing_src_alias(p->src_type)->name);
-> > +}
-> > +
-> > +/*
-> > + * This function either succeeds, skips the test (after setting test->skip), or
-> > + * fails with a TEST_FAIL that aborts all tests.
-> > + */
-> > +static void vcpu_run_loop(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
-> > +			  struct test_desc *test)
-> > +{
-> > +	struct ucall uc;
-> > +
-> > +	for (;;) {
-> > +		vcpu_run(vcpu);
-> > +
-> > +		switch (get_ucall(vcpu, &uc)) {
-> > +		case UCALL_SYNC:
-> > +			if (!handle_cmd(vm, uc.args[1])) {
-> > +				test->skip = true;
-> > +				goto done;
-> > +			}
-> > +			break;
-> > +		case UCALL_ABORT:
-> > +			REPORT_GUEST_ASSERT_2(uc, "values: %#lx, %#lx");
-> > +			break;
-> > +		case UCALL_DONE:
-> > +			goto done;
-> > +		default:
-> > +			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-> > +		}
-> > +	}
-> > +
-> > +done:
-> > +	pr_debug(test->skip ? "Skipped.\n" : "Done.\n");
-> > +	return;
-> > +}
-> > +
-> > +static void run_test(enum vm_guest_mode mode, void *arg)
-> > +{
-> > +	struct test_params *p = (struct test_params *)arg;
-> > +	struct test_desc *test = p->test_desc;
-> > +	struct kvm_vm *vm;
-> > +	struct kvm_vcpu *vcpu;
-> > +
-> > +	print_test_banner(mode, p);
-> > +
-> > +	vm = ____vm_create(mode);
-> > +	setup_memslots(vm, p);
-> > +	kvm_vm_elf_load(vm, program_invocation_name);
-> > +	vcpu = vm_vcpu_add(vm, 0, guest_code);
-> > +
-> > +	setup_gva_maps(vm);
-> > +
-> > +	ucall_init(vm, NULL);
-> > +
-> > +	load_exec_code_for_test(vm);
-> > +	setup_abort_handlers(vm, vcpu, test);
-> > +	vcpu_args_set(vcpu, 1, test);
-> > +
-> > +	vcpu_run_loop(vm, vcpu, test);
-> > +
-> > +	ucall_uninit(vm);
-> > +	kvm_vm_free(vm);
-> > +}
-> > +
-> > +static void help(char *name)
-> > +{
-> > +	puts("");
-> > +	printf("usage: %s [-h] [-s mem-type]\n", name);
-> > +	puts("");
-> > +	guest_modes_help();
-> > +	backing_src_help("-s");
-> > +	puts("");
-> > +}
-> > +
-> > +#define SNAME(s)			#s
-> > +#define SCAT2(a, b)			SNAME(a ## _ ## b)
-> > +#define SCAT3(a, b, c)			SCAT2(a, SCAT2(b, c))
-> > +
-> > +#define _CHECK(_test)			_CHECK_##_test
-> > +#define _PREPARE(_test)			_PREPARE_##_test
-> > +#define _PREPARE_guest_read64		NULL
-> > +#define _PREPARE_guest_ld_preidx	NULL
-> > +#define _PREPARE_guest_write64		NULL
-> > +#define _PREPARE_guest_st_preidx	NULL
-> > +#define _PREPARE_guest_exec		NULL
-> > +#define _PREPARE_guest_at		NULL
-> > +#define _PREPARE_guest_dc_zva		guest_check_dc_zva
-> > +#define _PREPARE_guest_cas		guest_check_lse
-> > +
-> > +/* With or without access flag checks */
-> > +#define _PREPARE_with_af		guest_set_ha, guest_clear_pte_af
-> > +#define _PREPARE_no_af			NULL
-> > +#define _CHECK_with_af			guest_check_pte_af
-> > +#define _CHECK_no_af			NULL
-> > +
-> > +/* Performs an access and checks that no faults were triggered. */
-> > +#define TEST_ACCESS(_access, _with_af, _mark_cmd)				\
-> > +{										\
-> > +	.name			= SCAT3(_access, _with_af, #_mark_cmd),		\
-> > +	.guest_prepare		= { _PREPARE(_with_af),				\
-> > +				    _PREPARE(_access) },			\
-> > +	.mem_mark_cmd		= _mark_cmd,					\
-> > +	.guest_test		= _access,					\
-> > +	.guest_test_check	= { _CHECK(_with_af) },				\
-> > +}
-> > +
-> > +static struct test_desc tests[] = {
-> > +
-> > +	/* Check that HW is setting the Access Flag (AF) (sanity checks). */
-> > +	TEST_ACCESS(guest_read64, with_af, CMD_NONE),
-> > +	TEST_ACCESS(guest_ld_preidx, with_af, CMD_NONE),
-> > +	TEST_ACCESS(guest_cas, with_af, CMD_NONE),
-> > +	TEST_ACCESS(guest_write64, with_af, CMD_NONE),
-> > +	TEST_ACCESS(guest_st_preidx, with_af, CMD_NONE),
-> > +	TEST_ACCESS(guest_dc_zva, with_af, CMD_NONE),
-> > +	TEST_ACCESS(guest_exec, with_af, CMD_NONE),
-> > +
-> > +	/*
-> > +	 * Accessing a hole in the data memslot (punched with fallocate or
-> > +	 * madvise) shouldn't fault (more sanity checks).
-> > +	 */
-> > +	TEST_ACCESS(guest_read64, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_cas, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_ld_preidx, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_write64, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_st_preidx, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_at, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_dc_zva, no_af, CMD_HOLE_DATA),
-> > +
-> > +	{ 0 }
-> > +};
-> > +
-> > +static void for_each_test_and_guest_mode(
-> > +		void (*func)(enum vm_guest_mode m, void *a),
-> > +		enum vm_mem_backing_src_type src_type)
-> > +{
-> > +	struct test_desc *t;
-> > +
-> > +	for (t = &tests[0]; t->name; t++) {
-> > +		if (t->skip)
-> > +			continue;
-> > +
-> > +		struct test_params p = {
-> > +			.src_type = src_type,
-> > +			.test_desc = t,
-> > +		};
-> > +
-> > +		for_each_guest_mode(run_test, &p);
-> > +	}
-> > +}
-> > +
-> > +int main(int argc, char *argv[])
-> > +{
-> > +	enum vm_mem_backing_src_type src_type;
-> > +	int opt;
-> > +
-> > +	setbuf(stdout, NULL);
-> > +
-> > +	src_type = DEFAULT_VM_MEM_SRC;
-> > +
-> > +	guest_modes_append_default();
+> When we save the state for the floating point registers this can be done
+> in the form visible through either the FPSIMD V registers or the SVE Z and
+> P registers. At present we track which format is currently used based on
+> TIF_SVE and the SME streaming mode state but particularly in the SVE case
+> this limits our options for optimising things, especially around syscalls.
+> Introduce a new enum in thread_struct which explicitly states which format
+> is active and keep it up to date when we change it.
 > 
-> This guest mode append call is redundant with the one already done in the
-> constructor function, so it isn't necessary for aarch64-only tests.
+> At present we do not use this state except to verify that it has the
+> expected value when loading the state, future patches will introduce
+> functional changes.
 > 
-
-Good point, will remove it in v8.
-
-> > +
-> > +	while ((opt = getopt(argc, argv, "hm:s:")) != -1) {
-> > +		switch (opt) {
-> > +		case 'm':
-> > +			guest_modes_cmdline(optarg);
-> > +			break;
-> > +		case 's':
-> > +			src_type = parse_backing_src_type(optarg);
-> > +			break;
-> > +		case 'h':
-> > +		default:
-> > +			help(argv[0]);
-> > +			exit(0);
-> > +		}
-> > +	}
-> > +
-> > +	for_each_test_and_guest_mode(run_test, src_type);
-> > +	return 0;
-> > +}
-> > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > index c1ddca8db225..5f977528e09c 100644
-> > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > @@ -105,11 +105,19 @@ enum {
-> >  #define ESR_EC_MASK		(ESR_EC_NUM - 1)
-> >  
-> >  #define ESR_EC_SVC64		0x15
-> > +#define ESR_EC_IABT		0x21
-> > +#define ESR_EC_DABT		0x25
-> >  #define ESR_EC_HW_BP_CURRENT	0x31
-> >  #define ESR_EC_SSTEP_CURRENT	0x33
-> >  #define ESR_EC_WP_CURRENT	0x35
-> >  #define ESR_EC_BRK_INS		0x3c
-> >  
-> > +/* Access flag */
-> > +#define PTE_AF			(1ULL << 10)
-> > +
-> > +/* Access flag update enable/disable */
-> > +#define TCR_EL1_HA		(1ULL << 39)
-> > +
-> >  void aarch64_get_supported_page_sizes(uint32_t ipa,
-> >  				      bool *ps4k, bool *ps16k, bool *ps64k);
-> >  
-> > -- 
-> > 2.37.3.968.ga6b4b080e4-goog
-> >
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/fpsimd.h    |  2 +-
+>  arch/arm64/include/asm/kvm_host.h  |  1 +
+>  arch/arm64/include/asm/processor.h |  6 ++++
+>  arch/arm64/kernel/fpsimd.c         | 58 ++++++++++++++++++++++--------
+>  arch/arm64/kernel/process.c        |  2 ++
+>  arch/arm64/kernel/ptrace.c         |  3 ++
+>  arch/arm64/kernel/signal.c         |  7 +++-
+>  arch/arm64/kvm/fpsimd.c            |  3 +-
+>  8 files changed, 64 insertions(+), 18 deletions(-)
 > 
-> Thanks,
-> drew
+> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+> index c07e4abaca3d..b74103a79052 100644
+> --- a/arch/arm64/include/asm/fpsimd.h
+> +++ b/arch/arm64/include/asm/fpsimd.h
+> @@ -61,7 +61,7 @@ extern void fpsimd_kvm_prepare(void);
+>  extern void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *state,
+>  				     void *sve_state, unsigned int sve_vl,
+>  				     void *za_state, unsigned int sme_vl,
+> -				     u64 *svcr);
+> +				     u64 *svcr, enum fp_state *type);
+>  
+>  extern void fpsimd_flush_task_state(struct task_struct *target);
+>  extern void fpsimd_save_and_flush_cpu_state(void);
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index f38ef299f13b..ebd37f97aeb4 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -310,6 +310,7 @@ struct kvm_vcpu_arch {
+>  	void *sve_state;
+>  	unsigned int sve_max_vl;
+>  	u64 svcr;
+> +	enum fp_state fp_type;
+
+Is it a state or a type? Some consistency would help. Also, what does
+this represent? Your commit message keeps talking about the FP/SVE
+state for the host, but this is obviously a guest-related structure.
+How do the two relate?
+
+Finally, before this patch, pahole shows this:
+
+struct kvm_vcpu_arch {
+	struct kvm_cpu_context     ctxt;                 /*     0  1824 */
+	/* --- cacheline 28 boundary (1792 bytes) was 32 bytes ago --- */
+	void *                     sve_state;            /*  1824     8 */
+	unsigned int               sve_max_vl;           /*  1832     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	u64                        svcr;                 /*  1840     8 */
+	struct kvm_s2_mmu *        hw_mmu;               /*  1848     8 */
+	[...]
+};
+
+After it, we gain an extra hole:
+
+struct kvm_vcpu_arch {
+	struct kvm_cpu_context     ctxt;                 /*     0  1824 */
+	/* --- cacheline 28 boundary (1792 bytes) was 32 bytes ago --- */
+	void *                     sve_state;            /*  1824     8 */
+	unsigned int               sve_max_vl;           /*  1832     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	u64                        svcr;                 /*  1840     8 */
+	enum fp_state              fp_type;              /*  1848     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	/* --- cacheline 29 boundary (1856 bytes) --- */
+	struct kvm_s2_mmu *        hw_mmu;               /*  1856     8 */
+	[...]
+};
+
+Packing things wouldn't hurt.
+
+>  
+>  	/* Stage 2 paging state used by the hardware on next switch */
+>  	struct kvm_s2_mmu *hw_mmu;
+> diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+> index 86eb0bfe3b38..4818a6b77f39 100644
+> --- a/arch/arm64/include/asm/processor.h
+> +++ b/arch/arm64/include/asm/processor.h
+> @@ -122,6 +122,11 @@ enum vec_type {
+>  	ARM64_VEC_MAX,
+>  };
+>  
+> +enum fp_state {
+> +	FP_STATE_FPSIMD,
+> +	FP_STATE_SVE,
+> +};
+> +
+>  struct cpu_context {
+>  	unsigned long x19;
+>  	unsigned long x20;
+> @@ -152,6 +157,7 @@ struct thread_struct {
+>  		struct user_fpsimd_state fpsimd_state;
+>  	} uw;
+>  
+> +	enum fp_state		fp_type;	/* registers FPSIMD or SVE? */
+
+Same comment about the state vs type.
+
+>  	unsigned int		fpsimd_cpu;
+>  	void			*sve_state;	/* SVE registers, if any */
+>  	void			*za_state;	/* ZA register, if any */
+> diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+> index 549e11645e0f..6544ae00230f 100644
+> --- a/arch/arm64/kernel/fpsimd.c
+> +++ b/arch/arm64/kernel/fpsimd.c
+> @@ -125,6 +125,7 @@ struct fpsimd_last_state_struct {
+>  	u64 *svcr;
+>  	unsigned int sve_vl;
+>  	unsigned int sme_vl;
+> +	enum fp_state *fp_type;
+
+Same thing. Grouping the pointer together would probably help
+readability as well.
+
+>  };
+>  
+>  static DEFINE_PER_CPU(struct fpsimd_last_state_struct, fpsimd_last_state);
+> @@ -330,15 +331,6 @@ void task_set_vl_onexec(struct task_struct *task, enum vec_type type,
+>   *    The task can execute SVE instructions while in userspace without
+>   *    trapping to the kernel.
+>   *
+> - *    When stored, Z0-Z31 (incorporating Vn in bits[127:0] or the
+> - *    corresponding Zn), P0-P15 and FFR are encoded in
+> - *    task->thread.sve_state, formatted appropriately for vector
+> - *    length task->thread.sve_vl or, if SVCR.SM is set,
+> - *    task->thread.sme_vl.
+> - *
+> - *    task->thread.sve_state must point to a valid buffer at least
+> - *    sve_state_size(task) bytes in size.
+> - *
+>   *    During any syscall, the kernel may optionally clear TIF_SVE and
+>   *    discard the vector state except for the FPSIMD subset.
+>   *
+> @@ -348,7 +340,15 @@ void task_set_vl_onexec(struct task_struct *task, enum vec_type type,
+>   *    do_sve_acc() to be called, which does some preparation and then
+>   *    sets TIF_SVE.
+>   *
+> - *    When stored, FPSIMD registers V0-V31 are encoded in
+> + * During any syscall, the kernel may optionally clear TIF_SVE and
+> + * discard the vector state except for the FPSIMD subset.
+> + *
+> + * The data will be stored in one of two formats:
+> + *
+> + *  * FPSIMD only - FP_STATE_FPSIMD:
+> + *
+> + *    When the FPSIMD only state stored task->thread.fp_type is set to
+> + *    FP_STATE_FPSIMD, the FPSIMD registers V0-V31 are encoded in
+>   *    task->thread.uw.fpsimd_state; bits [max : 128] for each of Z0-Z31 are
+>   *    logically zero but not stored anywhere; P0-P15 and FFR are not
+>   *    stored and have unspecified values from userspace's point of
+> @@ -358,6 +358,19 @@ void task_set_vl_onexec(struct task_struct *task, enum vec_type type,
+>   *    task->thread.sve_state does not need to be non-NULL, valid or any
+>   *    particular size: it must not be dereferenced.
+>   *
+> + *  * SVE state - FP_STATE_SVE:
+> + *
+> + *    When the full SVE state is stored task->thread.fp_type is set to
+> + *    FP_STATE_SVE and Z0-Z31 (incorporating Vn in bits[127:0] or the
+> + *    corresponding Zn), P0-P15 and FFR are encoded in in
+> + *    task->thread.sve_state, formatted appropriately for vector
+> + *    length task->thread.sve_vl or, if SVCR.SM is set,
+> + *    task->thread.sme_vl. The storage for the vector registers in
+> + *    task->thread.uw.fpsimd_state should be ignored.
+> + *
+> + *    task->thread.sve_state must point to a valid buffer at least
+> + *    sve_state_size(task) bytes in size.
+> + *
+>   *  * FPSR and FPCR are always stored in task->thread.uw.fpsimd_state
+>   *    irrespective of whether TIF_SVE is clear or set, since these are
+>   *    not vector length dependent.
+> @@ -404,12 +417,15 @@ static void task_fpsimd_load(void)
+>  		}
+>  	}
+>  
+> -	if (restore_sve_regs)
+> +	if (restore_sve_regs) {
+> +		WARN_ON_ONCE(current->thread.fp_type != FP_STATE_SVE);
+>  		sve_load_state(sve_pffr(&current->thread),
+>  			       &current->thread.uw.fpsimd_state.fpsr,
+>  			       restore_ffr);
+> -	else
+> +	} else {
+> +		WARN_ON_ONCE(current->thread.fp_type != FP_STATE_FPSIMD);
+>  		fpsimd_load_state(&current->thread.uw.fpsimd_state);
+> +	}
+>  }
+>  
+>  /*
+> @@ -474,8 +490,10 @@ static void fpsimd_save(void)
+>  		sve_save_state((char *)last->sve_state +
+>  					sve_ffr_offset(vl),
+>  			       &last->st->fpsr, save_ffr);
+> +		*last->fp_type = FP_STATE_SVE;
+>  	} else {
+>  		fpsimd_save_state(last->st);
+> +		*last->fp_type = FP_STATE_FPSIMD;
+>  	}
+>  }
+>  
+> @@ -848,8 +866,10 @@ int vec_set_vector_length(struct task_struct *task, enum vec_type type,
+>  
+>  	fpsimd_flush_task_state(task);
+>  	if (test_and_clear_tsk_thread_flag(task, TIF_SVE) ||
+> -	    thread_sm_enabled(&task->thread))
+> +	    thread_sm_enabled(&task->thread)) {
+>  		sve_to_fpsimd(task);
+> +		task->thread.fp_type = FP_STATE_FPSIMD;
+> +	}
+>  
+>  	if (system_supports_sme() && type == ARM64_VEC_SME) {
+>  		task->thread.svcr &= ~(SVCR_SM_MASK |
+> @@ -1368,6 +1388,7 @@ static void sve_init_regs(void)
+>  		fpsimd_bind_task_to_cpu();
+>  	} else {
+>  		fpsimd_to_sve(current);
+> +		current->thread.fp_type = FP_STATE_SVE;
+>  	}
+>  }
+>  
+> @@ -1596,6 +1617,8 @@ void fpsimd_flush_thread(void)
+>  		current->thread.svcr = 0;
+>  	}
+>  
+> +	current->thread.fp_type = FP_STATE_FPSIMD;
+> +
+>  	put_cpu_fpsimd_context();
+>  	kfree(sve_state);
+>  	kfree(za_state);
+> @@ -1644,8 +1667,10 @@ void fpsimd_kvm_prepare(void)
+>  	 */
+>  	get_cpu_fpsimd_context();
+>  
+> -	if (test_and_clear_thread_flag(TIF_SVE))
+> +	if (test_and_clear_thread_flag(TIF_SVE)) {
+>  		sve_to_fpsimd(current);
+> +		current->thread.fp_type = FP_STATE_FPSIMD;
+> +	}
+>  
+>  	put_cpu_fpsimd_context();
+>  }
+> @@ -1667,6 +1692,7 @@ static void fpsimd_bind_task_to_cpu(void)
+>  	last->sve_vl = task_get_sve_vl(current);
+>  	last->sme_vl = task_get_sme_vl(current);
+>  	last->svcr = &current->thread.svcr;
+> +	last->fp_type = &current->thread.fp_type;
+>  	current->thread.fpsimd_cpu = smp_processor_id();
+>  
+>  	/*
+> @@ -1690,7 +1716,8 @@ static void fpsimd_bind_task_to_cpu(void)
+>  
+>  void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
+>  			      unsigned int sve_vl, void *za_state,
+> -			      unsigned int sme_vl, u64 *svcr)
+> +			      unsigned int sme_vl, u64 *svcr,
+> +			      enum fp_state *type)
+>  {
+>  	struct fpsimd_last_state_struct *last =
+>  		this_cpu_ptr(&fpsimd_last_state);
+> @@ -1704,6 +1731,7 @@ void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
+>  	last->za_state = za_state;
+>  	last->sve_vl = sve_vl;
+>  	last->sme_vl = sme_vl;
+> +	last->fp_type = type;
+>  }
+>  
+>  /*
+> diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
+> index 92bcc1768f0b..944d782d581b 100644
+> --- a/arch/arm64/kernel/process.c
+> +++ b/arch/arm64/kernel/process.c
+> @@ -335,6 +335,8 @@ int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
+>  		clear_tsk_thread_flag(dst, TIF_SME);
+>  	}
+>  
+> +	dst->thread.fp_type = FP_STATE_FPSIMD;
+> +
+>  	/* clear any pending asynchronous tag fault raised by the parent */
+>  	clear_tsk_thread_flag(dst, TIF_MTE_ASYNC_FAULT);
+>  
+> diff --git a/arch/arm64/kernel/ptrace.c b/arch/arm64/kernel/ptrace.c
+> index eb7c08dfb834..fb6189bc45c9 100644
+> --- a/arch/arm64/kernel/ptrace.c
+> +++ b/arch/arm64/kernel/ptrace.c
+> @@ -894,6 +894,7 @@ static int sve_set_common(struct task_struct *target,
+>  		clear_tsk_thread_flag(target, TIF_SVE);
+>  		if (type == ARM64_VEC_SME)
+>  			fpsimd_force_sync_to_sve(target);
+> +		target->thread.fp_type = FP_STATE_FPSIMD;
+>  		goto out;
+>  	}
+>  
+> @@ -916,6 +917,7 @@ static int sve_set_common(struct task_struct *target,
+>  	if (!target->thread.sve_state) {
+>  		ret = -ENOMEM;
+>  		clear_tsk_thread_flag(target, TIF_SVE);
+> +		target->thread.fp_type = FP_STATE_FPSIMD;
+>  		goto out;
+>  	}
+>  
+> @@ -927,6 +929,7 @@ static int sve_set_common(struct task_struct *target,
+>  	 */
+>  	fpsimd_sync_to_sve(target);
+>  	set_tsk_thread_flag(target, TIF_SVE);
+> +	target->thread.fp_type = FP_STATE_SVE;
+>  
+>  	BUILD_BUG_ON(SVE_PT_SVE_OFFSET != sizeof(header));
+>  	start = SVE_PT_SVE_OFFSET;
+> diff --git a/arch/arm64/kernel/signal.c b/arch/arm64/kernel/signal.c
+> index f00e8b33170a..804cc00befc3 100644
+> --- a/arch/arm64/kernel/signal.c
+> +++ b/arch/arm64/kernel/signal.c
+> @@ -207,6 +207,7 @@ static int restore_fpsimd_context(struct fpsimd_context __user *ctx)
+>  	__get_user_error(fpsimd.fpcr, &ctx->fpcr, err);
+>  
+>  	clear_thread_flag(TIF_SVE);
+> +	current->thread.fp_type = FP_STATE_FPSIMD;
+>  
+>  	/* load the hardware registers from the fpsimd_state structure */
+>  	if (!err)
+> @@ -292,6 +293,7 @@ static int restore_sve_fpsimd_context(struct user_ctxs *user)
+>  	if (sve.head.size <= sizeof(*user->sve)) {
+>  		clear_thread_flag(TIF_SVE);
+>  		current->thread.svcr &= ~SVCR_SM_MASK;
+> +		current->thread.fp_type = FP_STATE_FPSIMD;
+>  		goto fpsimd_only;
+>  	}
+>  
+> @@ -327,6 +329,7 @@ static int restore_sve_fpsimd_context(struct user_ctxs *user)
+>  		current->thread.svcr |= SVCR_SM_MASK;
+>  	else
+>  		set_thread_flag(TIF_SVE);
+> +	current->thread.fp_type = FP_STATE_SVE;
+>  
+>  fpsimd_only:
+>  	/* copy the FP and status/control registers */
+> @@ -932,9 +935,11 @@ static void setup_return(struct pt_regs *regs, struct k_sigaction *ka,
+>  		 * FPSIMD register state - flush the saved FPSIMD
+>  		 * register state in case it gets loaded.
+>  		 */
+> -		if (current->thread.svcr & SVCR_SM_MASK)
+> +		if (current->thread.svcr & SVCR_SM_MASK) {
+>  			memset(&current->thread.uw.fpsimd_state, 0,
+>  			       sizeof(current->thread.uw.fpsimd_state));
+> +			current->thread.fp_type = FP_STATE_FPSIMD;
+> +		}
+>  
+>  		current->thread.svcr &= ~(SVCR_ZA_MASK |
+>  					  SVCR_SM_MASK);
+> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> index 1c1b309ef420..a92977759f8d 100644
+> --- a/arch/arm64/kvm/fpsimd.c
+> +++ b/arch/arm64/kvm/fpsimd.c
+> @@ -140,7 +140,8 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
+>  		fpsimd_bind_state_to_cpu(&vcpu->arch.ctxt.fp_regs,
+>  					 vcpu->arch.sve_state,
+>  					 vcpu->arch.sve_max_vl,
+> -					 NULL, 0, &vcpu->arch.svcr);
+> +					 NULL, 0, &vcpu->arch.svcr,
+> +					 &vcpu->arch.fp_type);
+>  
+>  		clear_thread_flag(TIF_FOREIGN_FPSTATE);
+>  		update_thread_flag(TIF_SVE, vcpu_has_sve(vcpu));
 
 Thanks,
-Ricardo
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
