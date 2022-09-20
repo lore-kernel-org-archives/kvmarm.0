@@ -2,72 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17032C6FA91
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 04:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E73C54EE9
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 04:26:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4A654B765;
-	Tue, 20 Sep 2022 00:26:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC79A4B658;
+	Tue, 20 Sep 2022 00:26:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KMo75fC1rxNB; Tue, 20 Sep 2022 00:26:01 -0400 (EDT)
+	with ESMTP id NsSZP0o-tCkT; Tue, 20 Sep 2022 00:26:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA26A4B69D;
-	Tue, 20 Sep 2022 00:26:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD83E4B649;
+	Tue, 20 Sep 2022 00:25:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CDB2B4B653
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 00:25:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D64804B70F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 00:25:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jPQaNxs1eOF5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 00:25:58 -0400 (EDT)
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com
- [209.85.128.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D32FB4B6B2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 00:25:58 -0400 (EDT)
-Received: by mail-yw1-f201.google.com with SMTP id
- 00721157ae682-34546b03773so11203617b3.9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 21:25:58 -0700 (PDT)
+ with ESMTP id ktMmie3BPjJV for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 00:25:57 -0400 (EDT)
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
+ [209.85.216.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C95734B69D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 00:25:57 -0400 (EDT)
+Received: by mail-pj1-f73.google.com with SMTP id
+ f15-20020a17090a664f00b002038154eb4bso683716pjm.9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Sep 2022 21:25:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:from:to:cc:subject:date;
- bh=qjLjZKvyeIeRGOesNjjS3cTK/aOXc6uRAWIPLUpvrd8=;
- b=p9b3BJlyK/xx0kc1n4jrz4NOkmP/E44tN2jGWvb5s0PcagXYBrHqp0hWXeENhXfgwJ
- 2hbCkK/TEEJDrE9cLerHKEy4bJxHMyYnD4TcoDDebSFEJGmrkiN1G1VXU2zl1i3EVR7P
- R3gBxmTbKpOCI1llN214a5jPPu38guQZsHPYSaC7UJOIBW+VMHLh9262hNPVm0OpYoj1
- VvfP6S0GIX0iVCv4kGuPKN3sHF/xyJqI6OHsm13M3IcEbtQCEhBJRfdqJ4ZL93wAvD6B
- jaslgqZv8c8XtqOymwE7B8d6jkXFFRG7o8UuSjylhM4xAk9ZbReA//imiAYOjoWvDp+c
- btzQ==
+ bh=1dmLlVfV3XQMim7N9LUhMLTI6KxQVUDvbYGTx2lRbg8=;
+ b=aosHoqT9RThNoe6VamtssuE/g/+U6tbcYt4qPFtB37IY5Pgq7TvkXhvZv/Tezmsibt
+ nSdcxRl4TC+EiTYicXiUdRHl1wryv+m7B3oiFNzlXQB1dr1YydmpWzPT22bgb1FSkLw+
+ vZ6GRmU7kkq/HnJMkoksoRE/hpVZAsbYyo4tjvmMxg6EQGSmbD2mTrR/ZZoMUyD6UNks
+ HWaC+pW/10LVg+IUOFJiY1YX7airz6RJcruSMQvWWidXq9iP7J3sfZ4FVXG46EvoNe0J
+ Av+4QD0GXwrUmEEo4sDDMFa/zLgy4nd0hEVD5XTgYMU/i1kBrih/O2V5MRI0/mjtFV7u
+ RlUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:x-gm-message-state:from:to:cc:subject:date;
- bh=qjLjZKvyeIeRGOesNjjS3cTK/aOXc6uRAWIPLUpvrd8=;
- b=APdlCQh7sxlvMH5VatJH0KYBxCa+C0vdWCYVizmoNW7uiHakAgnAYJtFFT2HpP+RT2
- 2DZTrfp6UV8t5uebfl1Df36/RxDBuc+Ri+SRUroAaBRk9GHgVH0s6Tfc7WRtJjBYs2TO
- 1RRwnE5ZatnKbloXH2u2VeurkT6GZczn3KGTuhRa/ORHA3bNtaAxXgHUJcW5D7P7POjN
- eGO4LDbly2koXoIru2hR6ZEk286l+NNQLLV4us/uQeFX8nXVZM/vv4WLRaRpnD6ZdcKy
- g/KZQiYu5fdESbC0LK+dfWplduRfz7MRJ8vIhiAIEjzehrPe1jadHLOsLsyH+pLtZ486
- h8zw==
-X-Gm-Message-State: ACrzQf3yKnmVb29l+iZgGg1LhzJh4A4/9bnO9TliNiQ/y6lRBdUqVW82
- JL5v3Ci/mDOfZUXCEzXMe2O+dbMJa0JM1w==
-X-Google-Smtp-Source: AMsMyM5NeIBoSbQIjYC9IGSltG/CyuMY5IR1gm9/YeISFgoG3OEz5dIPhdCQjt7X8rjyq48WA6JhTpOFQwfzqQ==
+ bh=1dmLlVfV3XQMim7N9LUhMLTI6KxQVUDvbYGTx2lRbg8=;
+ b=istjSOPIzMgYg7dnpgubyqlCdxEZGIc9UyRVlsLmKo1PJu5Syn1dYL4Zz708Mw6leK
+ xwfrLib2DWvRyZbQP7W1zRVGn14dFSyTPZh4lQAfLoMiXg1ZJSwA0ORHVtAKL1AgUPof
+ gUNJcfdY7+2yytl5sa0j6R+kFKjg7jt8fS1cRaA6snLEYoVBT8uSZ7FI54tRZ1KMIy+g
+ BT2YtqR+m6a2IcYitMAWikbj68cgkSYYYB/2jDUnhvwRBIOaw1oKq8i0BkX4juhBLZC3
+ 1AzSaIAkc7/EP2zGMurR6WGO1cLjWWusDDfZxGzRnVGXW8WvrZMDI1nsqc06AGz3UD+O
+ vV/g==
+X-Gm-Message-State: ACrzQf1JruT/s47y7oAwLtEs16t/cHPYkiwSC0iCWSOY0HQRCSS1Mm3W
+ F/Fg2hew2g8RSmFEITz8E4mQsMKr40QFJg==
+X-Google-Smtp-Source: AMsMyM7tML0kfhsb91m2QQGv5wnNsCscQ9UrJdt1ChXynxWjvefJ75VFez66KA01gGb+cl8htzwVZcmyoW/2yQ==
 X-Received: from ricarkol4.c.googlers.com
  ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a5b:848:0:b0:683:58d:ea95 with SMTP id
- v8-20020a5b0848000000b00683058dea95mr16671577ybq.565.1663647958467; Mon, 19
- Sep 2022 21:25:58 -0700 (PDT)
-Date: Tue, 20 Sep 2022 04:25:41 +0000
+ (user=ricarkol job=sendgmr) by 2002:a63:e709:0:b0:438:98e8:d1c with SMTP id
+ b9-20020a63e709000000b0043898e80d1cmr18586866pgi.403.1663647956879; Mon, 19
+ Sep 2022 21:25:56 -0700 (PDT)
+Date: Tue, 20 Sep 2022 04:25:40 +0000
 In-Reply-To: <20220920042551.3154283-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220920042551.3154283-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Message-ID: <20220920042551.3154283-4-ricarkol@google.com>
-Subject: [PATCH v7 03/13] KVM: selftests: Add missing close and munmap in
- __vm_mem_region_delete()
+Message-ID: <20220920042551.3154283-3-ricarkol@google.com>
+Subject: [PATCH v7 02/13] KVM: selftests: aarch64: Add virt_get_pte_hva()
+ library function
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev
 Cc: maz@kernel.org, bgardon@google.com, pbonzini@redhat.com,
@@ -88,35 +88,65 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Deleting a memslot (when freeing a VM) is not closing the backing fd,
-nor it's unmapping the alias mapping. Fix by adding the missing close
-and munmap.
+Add a library function to get the PTE (a host virtual address) of a
+given GVA.  This will be used in a future commit by a test to clear and
+check the access flag of a particular page.
 
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-Reviewed-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- tools/testing/selftests/kvm/lib/kvm_util.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ .../selftests/kvm/include/aarch64/processor.h       |  2 ++
+ tools/testing/selftests/kvm/lib/aarch64/processor.c | 13 ++++++++++---
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 9889fe0d8919..9dd03eda2eb9 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -544,6 +544,12 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
- 	sparsebit_free(&region->unused_phy_pages);
- 	ret = munmap(region->mmap_start, region->mmap_size);
- 	TEST_ASSERT(!ret, __KVM_SYSCALL_ERROR("munmap()", ret));
-+	if (region->fd >= 0) {
-+		/* There's an extra map when using shared memory. */
-+		ret = munmap(region->mmap_alias, region->mmap_size);
-+		TEST_ASSERT(!ret, __KVM_SYSCALL_ERROR("munmap()", ret));
-+		close(region->fd);
-+	}
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index a8124f9dd68a..df4bfac69551 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -109,6 +109,8 @@ void vm_install_exception_handler(struct kvm_vm *vm,
+ void vm_install_sync_handler(struct kvm_vm *vm,
+ 		int vector, int ec, handler_fn handler);
  
- 	free(region);
++uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva);
++
+ static inline void cpu_relax(void)
+ {
+ 	asm volatile("yield" ::: "memory");
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+index 6f5551368944..63ef3c78e55e 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -138,7 +138,7 @@ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+ 	_virt_pg_map(vm, vaddr, paddr, attr_idx);
  }
+ 
+-vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
++uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
+ {
+ 	uint64_t *ptep;
+ 
+@@ -169,11 +169,18 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+ 		TEST_FAIL("Page table levels must be 2, 3, or 4");
+ 	}
+ 
+-	return pte_addr(vm, *ptep) + (gva & (vm->page_size - 1));
++	return ptep;
+ 
+ unmapped_gva:
+ 	TEST_FAIL("No mapping for vm virtual address, gva: 0x%lx", gva);
+-	exit(1);
++	exit(EXIT_FAILURE);
++}
++
++vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
++{
++	uint64_t *ptep = virt_get_pte_hva(vm, gva);
++
++	return pte_addr(vm, *ptep) + (gva & (vm->page_size - 1));
+ }
+ 
+ static void pte_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent, uint64_t page, int level)
 -- 
 2.37.3.968.ga6b4b080e4-goog
 
