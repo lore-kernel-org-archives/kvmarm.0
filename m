@@ -2,56 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6613C54EE9
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 18:37:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B161C54EE9
+	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 18:40:13 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FBF34B24D;
-	Tue, 20 Sep 2022 14:37:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0659D4B18F;
+	Tue, 20 Sep 2022 14:40:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Hy7cPgThhGAU; Tue, 20 Sep 2022 14:37:05 -0400 (EDT)
+	with ESMTP id llxSz+6C1vm9; Tue, 20 Sep 2022 14:40:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 015394B256;
-	Tue, 20 Sep 2022 14:37:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE62D4B17D;
+	Tue, 20 Sep 2022 14:40:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6828A4B62A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:37:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3193B4B17D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:40:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QLZoRjG1qMGx for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 14:37:03 -0400 (EDT)
-Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D77704B121
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:37:02 -0400 (EDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1663699021;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding;
- bh=ynddefVUagX/tXNDv+AoUivs7Y85IZzVEROwWQiJyV8=;
- b=kN0uwchTL+afAy7BdBHt44hNXLQhD5FeJ4M77n7gBsuJ4IwoxxyxCnwK5OZY0FHXeVjSN6
- 8JTz5+XhrbeQLdkBdvglAld8hAjgAaK5Vpt50cNFO79HdFrZgyWld+IijXby/EeBS5vQnw
- LZ5zti/fTalOt1nGRi4GLEOqf4neFhE=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH] KVM: arm64: Limit stage2_apply_range() batch size to 1GB
-Date: Tue, 20 Sep 2022 18:36:29 +0000
-Message-Id: <20220920183630.3376939-1-oliver.upton@linux.dev>
+ with ESMTP id zR8WLNb4VOX1 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 14:40:08 -0400 (EDT)
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com
+ [209.85.216.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BCAF44B166
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:40:08 -0400 (EDT)
+Received: by mail-pj1-f50.google.com with SMTP id
+ s90-20020a17090a2f6300b00203a685a1aaso3357274pjd.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 11:40:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date;
+ bh=/DiWjb7VNp6NnqMqVkeacIID4EanwXZiP2GVnIDjepM=;
+ b=dbSEoOGoBjfbP5cORYRAanCs0nsf0IlcEyje9M1XjryCAxb1CuUpoGTEkZG2isfiU7
+ bGwknEWhQWqvl4BGW1ZykUulb1V0/fjHGtV/gAaW/a3NNpC7PqA+MtZYjzF87+auY1dQ
+ dUeswiSUcMcwsDXpj6g1eofmzh5HnW4tAPRAjgUJl0/mnvh4XkwM/noIwLcP1wSQUeHv
+ 1w5P78p5KEu2q604OATMyObCOTjNg/qxy/0Uj+93QrLSRY8vxWwjixbe/B1cwVrPQ/3l
+ 4OqL5oRTLs2z+K2JggQ/llFODQxzrBL9X44GH9pWCBw+bUxQSqP8QcFg3o4iTkd1tFrf
+ yrvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+ bh=/DiWjb7VNp6NnqMqVkeacIID4EanwXZiP2GVnIDjepM=;
+ b=O/gp2FZazVbOlZbvcFGN5xZzoixbqFWbAQjWoB6k8jZzi36fFVBG3l1ahBbF1FOMQN
+ vvHcEa/2dNB3dP1YYfs96VD9uQDlKyVzVNwFBSgHXdop0T7T7oCaiYEZ/5JvXbxQ5f79
+ xNlaFzQuMaDEVuR1aTcH2k1h7tNQcr13ueQH8q97Qe/zSKTionsNyggs+zfWQ31aahwN
+ 7LpCwjckHzTM7toOR9k3nDS+VhmdNItSOEDzRi1540vr71FDUNzshP8EPmRHYZUuNUMC
+ yNm8jNyrcVXrVQq2m36K99AMjsxbAU9Ptmt5vfW4S5A57cE41zo/YogP8Z0knk8FdXXN
+ HS8A==
+X-Gm-Message-State: ACrzQf3cHqTZQ8O9czO5xuw3PhYp+/NW5Dfk4Soi3ZZ1LocSoffyCnAx
+ +D4A3BieGXNPOuX+4D7TNqo2bw==
+X-Google-Smtp-Source: AMsMyM60ARJVl3WTxhTkeVBFE7UvvwIfglRK/e87tP+10Q6XQNwL6778c8fIBfL5nvZYJI71KmdOpA==
+X-Received: by 2002:a17:902:cccc:b0:178:a9b3:43e6 with SMTP id
+ z12-20020a170902cccc00b00178a9b343e6mr949541ple.92.1663699207698; 
+ Tue, 20 Sep 2022 11:40:07 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ 9-20020a621409000000b0053e6eae9668sm257638pfu.2.2022.09.20.11.40.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 20 Sep 2022 11:40:07 -0700 (PDT)
+Date: Tue, 20 Sep 2022 18:40:03 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v7 08/13] KVM: selftests: Use the right memslot for code, 
+ page-tables, and data allocations
+Message-ID: <YyoJA7gjEaSiGwFi@google.com>
+References: <20220920042551.3154283-1-ricarkol@google.com>
+ <20220920042551.3154283-9-ricarkol@google.com>
+ <YyoBUcSD6ZyxKxza@google.com> <YyoFBBn9uevAkIHT@google.com>
 MIME-Version: 1.0
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+Content-Disposition: inline
+In-Reply-To: <YyoFBBn9uevAkIHT@google.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
+ andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com,
+ axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,153 +94,69 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Presently stage2_apply_range() works on a batch of memory addressed by a
-stage 2 root table entry for the VM. Depending on the IPA limit of the
-VM and PAGE_SIZE of the host, this could address a massive range of
-memory. Some examples:
+On Tue, Sep 20, 2022, Ricardo Koller wrote:
+> On Tue, Sep 20, 2022 at 06:07:13PM +0000, Sean Christopherson wrote:
+> > On Tue, Sep 20, 2022, Ricardo Koller wrote:
+> > > The previous commit added support for callers of ____vm_create() to specify
+> > 
+> > Changelog is stale, ____vm_create() no longer takes the struct.
+> > 
+> > Side topic, it's usually a good idea to use "strong" terminology when referencing
+> > past/future changes, e.g. if patches get shuffled around for whatever reason,
+> > then "previous commit" may become stale/misleading.
+> > 
+> > It's fairly easy to convey the same info ("something happened recently" or
+> > "something is going to happen soon") without being so explicit, e.g.
+> > 
+> >   Wire up common code to use the appropriate code, page table, and data
+> >   memmslots that were recently added instead of hardcoding '0' for the
+> >   memslot.
+> > 
+> > or
+> > 
+> >   Now that kvm_vm allows specifying different memslots for code, page
+> >   tables, and data, use the appropriate memslot when making allocations
+> >   in common/libraty code.
+> > 
+> > > what memslots to use for code, page-tables, and data allocations. Change
+> > > them accordingly:
+> > > 
+> > > - stacks, code, and exception tables use the code memslot
+> > 
+> > Huh?  Stacks and exceptions are very much data, not code.
+> >
+> 
+> I would *really* like to have the data region only store test data. It
+> makes things easier for the test implementation, like owning the whole
+> region.
 
-  4 level, 4K paging -> 512 GB batch size
+That's fine, but allocating stack as "code" is super confusing.
 
-  3 level, 64K paging -> 4TB batch size
+> At the same I wanted to have a single region for all the "core pages" like
+> code, descriptors, exception tables, stacks, etc. Not sure what to call it
+> though.
 
-Unsurprisingly, working on such a large range of memory can lead to soft
-lockups. When running dirty_log_perf_test:
+Why?  Code is very different than all those other things.  E.g. the main reason
+KVM doesn't provide "not-executable" or "execute-only" memslots is because there's
+never been a compelling use case, not because it's difficult to implement.  If KVM
+were to ever add such functionality, then we'd want/need selftests to have a
+dedicated code memslot.
 
-  ./dirty_log_perf_test -m -2 -s anonymous_thp -b 4G -v 48
+> So, what about one of these 2 options:
+> 
+> Option A: 3 regions, where we call the "code" region something else, like
+> "core".
+> Option B: 4 regions: code, page-tables, core-data (stacks, exception tables, etc),
+> test-data.
 
-  watchdog: BUG: soft lockup - CPU#0 stuck for 45s! [dirty_log_perf_:16703]
-  Modules linked in: vfat fat cdc_ether usbnet mii xhci_pci xhci_hcd sha3_generic gq(O)
-  CPU: 0 PID: 16703 Comm: dirty_log_perf_ Tainted: G           O       6.0.0-smp-DEV #1
-  pstate: 80400009 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-  pc : dcache_clean_inval_poc+0x24/0x38
-  lr : clean_dcache_guest_page+0x28/0x4c
-  sp : ffff800021763990
-  pmr_save: 000000e0
-  x29: ffff800021763990 x28: 0000000000000005 x27: 0000000000000de0
-  x26: 0000000000000001 x25: 00400830b13bc77f x24: ffffad4f91ead9c0
-  x23: 0000000000000000 x22: ffff8000082ad9c8 x21: 0000fffafa7bc000
-  x20: ffffad4f9066ce50 x19: 0000000000000003 x18: ffffad4f92402000
-  x17: 000000000000011b x16: 000000000000011b x15: 0000000000000124
-  x14: ffff07ff8301d280 x13: 0000000000000000 x12: 00000000ffffffff
-  x11: 0000000000010001 x10: fffffc0000000000 x9 : ffffad4f9069e580
-  x8 : 000000000000000c x7 : 0000000000000000 x6 : 000000000000003f
-  x5 : ffff07ffa2076980 x4 : 0000000000000001 x3 : 000000000000003f
-  x2 : 0000000000000040 x1 : ffff0830313bd000 x0 : ffff0830313bcc40
-  Call trace:
-   dcache_clean_inval_poc+0x24/0x38
-   stage2_unmap_walker+0x138/0x1ec
-   __kvm_pgtable_walk+0x130/0x1d4
-   __kvm_pgtable_walk+0x170/0x1d4
-   __kvm_pgtable_walk+0x170/0x1d4
-   __kvm_pgtable_walk+0x170/0x1d4
-   kvm_pgtable_stage2_unmap+0xc4/0xf8
-   kvm_arch_flush_shadow_memslot+0xa4/0x10c
-   kvm_set_memslot+0xb8/0x454
-   __kvm_set_memory_region+0x194/0x244
-   kvm_vm_ioctl_set_memory_region+0x58/0x7c
-   kvm_vm_ioctl+0x49c/0x560
-   __arm64_sys_ioctl+0x9c/0xd4
-   invoke_syscall+0x4c/0x124
-   el0_svc_common+0xc8/0x194
-   do_el0_svc+0x38/0xc0
-   el0_svc+0x2c/0xa4
-   el0t_64_sync_handler+0x84/0xf0
-   el0t_64_sync+0x1a0/0x1a4
+I like (B), though I'd just call 'em "DATA" and "TEST_DATA".  IIUC, TEST_DATA is
+the one you want to be special, i.e. it's ok if something that's not "core" allocates
+in DATA, but it's not ok if "core" allocates in TEST_DATA.  That yields an easy
+to understand "never use TEST_DATA" rule for library/common/core functionality,
+with the code vs. page tables vs. data decision (hopefully) being fairly obvious.
 
-Given the various paging configurations used by KVM at stage 2 there
-isn't a sensible page table level to use as the batch size. Use 1GB as
-the batch size instead, as it is evenly divisible by all supported
-hugepage sizes across 4K, 16K, and 64K paging.
-
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
-
-Applies to 6.0-rc3. Tested with 4K and 64K pages with the above
-dirty_log_perf_test command and noticed no more soft lockups. I don't
-have a 16K system to test with.
-
-Marc, we spoke about this a while ago and agreed to go for some page
-table level based batching scheme. However, I decided against that
-because it doesn't really solve the problem for non-4K kernels.
-
- arch/arm64/include/asm/stage2_pgtable.h | 20 --------------------
- arch/arm64/kvm/mmu.c                    |  8 +++++++-
- 2 files changed, 7 insertions(+), 21 deletions(-)
-
-diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-index fe341a6578c3..c8dca8ae359c 100644
---- a/arch/arm64/include/asm/stage2_pgtable.h
-+++ b/arch/arm64/include/asm/stage2_pgtable.h
-@@ -10,13 +10,6 @@
- 
- #include <linux/pgtable.h>
- 
--/*
-- * PGDIR_SHIFT determines the size a top-level page table entry can map
-- * and depends on the number of levels in the page table. Compute the
-- * PGDIR_SHIFT for a given number of levels.
-- */
--#define pt_levels_pgdir_shift(lvls)	ARM64_HW_PGTABLE_LEVEL_SHIFT(4 - (lvls))
--
- /*
-  * The hardware supports concatenation of up to 16 tables at stage2 entry
-  * level and we use the feature whenever possible, which means we resolve 4
-@@ -30,11 +23,6 @@
- #define stage2_pgtable_levels(ipa)	ARM64_HW_PGTABLE_LEVELS((ipa) - 4)
- #define kvm_stage2_levels(kvm)		VTCR_EL2_LVLS(kvm->arch.vtcr)
- 
--/* stage2_pgdir_shift() is the size mapped by top-level stage2 entry for the VM */
--#define stage2_pgdir_shift(kvm)		pt_levels_pgdir_shift(kvm_stage2_levels(kvm))
--#define stage2_pgdir_size(kvm)		(1ULL << stage2_pgdir_shift(kvm))
--#define stage2_pgdir_mask(kvm)		~(stage2_pgdir_size(kvm) - 1)
--
- /*
-  * kvm_mmmu_cache_min_pages() is the number of pages required to install
-  * a stage-2 translation. We pre-allocate the entry level page table at
-@@ -42,12 +30,4 @@
-  */
- #define kvm_mmu_cache_min_pages(kvm)	(kvm_stage2_levels(kvm) - 1)
- 
--static inline phys_addr_t
--stage2_pgd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
--{
--	phys_addr_t boundary = (addr + stage2_pgdir_size(kvm)) & stage2_pgdir_mask(kvm);
--
--	return (boundary - 1 < end - 1) ? boundary : end;
--}
--
- #endif	/* __ARM64_S2_PGTABLE_H_ */
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index c9a13e487187..d64032b9fbb6 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -31,6 +31,12 @@ static phys_addr_t hyp_idmap_vector;
- 
- static unsigned long io_map_base;
- 
-+static inline phys_addr_t stage2_apply_range_next(phys_addr_t addr, phys_addr_t end)
-+{
-+	phys_addr_t boundary = addr + SZ_1G;
-+
-+	return (boundary - 1 < end - 1) ? boundary : end;
-+}
- 
- /*
-  * Release kvm_mmu_lock periodically if the memory region is large. Otherwise,
-@@ -52,7 +58,7 @@ static int stage2_apply_range(struct kvm *kvm, phys_addr_t addr,
- 		if (!pgt)
- 			return -EINVAL;
- 
--		next = stage2_pgd_addr_end(kvm, addr, end);
-+		next = stage2_apply_range_next(addr, end);
- 		ret = fn(pgt, addr, next - addr);
- 		if (ret)
- 			break;
-
-base-commit: b90cb1053190353cc30f0fef0ef1f378ccc063c5
--- 
-2.37.3.968.ga6b4b080e4-goog
-
+Defining CORE_DATA will force developers to make judgement calls and probably
+lead to bikeshedding over whether something is considered "core" code.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
