@@ -2,81 +2,44 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C1DC6FA8B
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Sep 2022 03:53:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 684D1C6FA82
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Sep 2022 04:49:36 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F0064B79B;
-	Tue, 20 Sep 2022 23:53:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B31544B7F0;
+	Wed, 21 Sep 2022 00:49:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Z61bVWPZQvEC; Tue, 20 Sep 2022 23:53:31 -0400 (EDT)
+	with ESMTP id 11KBnPl6APY5; Wed, 21 Sep 2022 00:49:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F82A40FAA;
-	Tue, 20 Sep 2022 23:53:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 110014B782;
+	Wed, 21 Sep 2022 00:49:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E0004B269
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 23:53:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C6F54B75E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 00:49:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JfE6VRnDZQb2 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 23:53:28 -0400 (EDT)
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com
- [209.85.128.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E90894B630
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 23:53:27 -0400 (EDT)
-Received: by mail-wm1-f45.google.com with SMTP id
- n35-20020a05600c502300b003b4924c6868so1677267wmr.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 20:53:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:from:to:cc:subject:date;
- bh=YjNJwrSGGsmqwkos7/v8yu+we95EXK5+N0CYYMWfM9Q=;
- b=VN/89PxJc45yG4lc8yqdX46Pa4D79Mh+lXq0MdwtCoqk6H+vPb0LYEGHxXxS0OAM1+
- 7RmnF/LUaYOBG1W3DFvw8Lkn5MpRYPZwJLvhEs7ruA2GSOv3b2YvH7hUZOHrdR2zbEiA
- yTfU1+O3beASWzV4c0GeNLj05YiKbgIKYNkV+PJcuPE4wxVo2TXv9YZLiaatDHLgtpmQ
- GON/Vu3+5/D77WWTrzPWPFcpgy4Ornyxr7/HX/qmrufG41d4inNUeDdtVhrlLoQr110w
- hcvpstlAuApR4OeGLmxuVIaGhkDR6bTDnFFtUPIHaLmqLZtxkutVbKpmn2u0NjMB7wPB
- vOug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:x-gm-message-state:from:to:cc:subject:date;
- bh=YjNJwrSGGsmqwkos7/v8yu+we95EXK5+N0CYYMWfM9Q=;
- b=UyaPVn06G3/DAssFqp6tteGsgg6HPiSXx9Hx2tKW8jDXYVsSEoAO2yS1wBtRgBBS+B
- BJX+5pA0iheKKjmKkcXrujAzPDNWnwgomZkIpUtNf27wSgoC2fX/oRIs2r/NG9L69lp9
- GycJlyMi6Py/CIIvo1W7NkLXRcoehwhzknnMljtOHV0HRK5ZBf1wdv3D0aLAzwI6coFY
- 3pN+OhmCxMgbvCxikTQQwfikFlsFoMWE+r++WI0qm6MwDvGddsfiU+9vOm6cASZQ+/4e
- RzWH+XhRjUgJjDxPUWk74gWtQmvO6+bPi/wGMK0HkGiPMC3G6iiUBN6ICf8vy/JEJNrK
- LkzQ==
-X-Gm-Message-State: ACrzQf0TNVtMlfq8vhTodNjnkD58e89UN9gIaveQ9jmlqUwAmMz0EGY/
- 4pJoH4dJHvC4YrWOgu/Tand1ian3RmxoXVSmlwQDYQ==
-X-Google-Smtp-Source: AMsMyM4SOMzNPoEP4Br6h1r2CJRQYNKipv9r9MWilIR/DuJ8W+mBmmO97KOemPkCF+KRZPoaDKwtz/8KvAWwatKO7qo=
-X-Received: by 2002:a05:600c:2202:b0:3b4:6189:fc6a with SMTP id
- z2-20020a05600c220200b003b46189fc6amr4451007wml.171.1663732406891; Tue, 20
- Sep 2022 20:53:26 -0700 (PDT)
+ with ESMTP id hQJ05DFR2cO7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Sep 2022 00:49:31 -0400 (EDT)
+Received: from ozlabs.ru (ozlabs.ru [107.174.27.60])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 232FF4B282
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 00:49:31 -0400 (EDT)
+Received: from ole.1.ozlabs.ru (localhost [IPv6:::1])
+ by ozlabs.ru (Postfix) with ESMTP id 45AAB82EFA;
+ Wed, 21 Sep 2022 00:49:27 -0400 (EDT)
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: kvm@vger.kernel.org
+Subject: [PATCH kernel v3] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support
+ platform dependent
+Date: Wed, 21 Sep 2022 14:49:25 +1000
+Message-Id: <20220921044925.101802-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-References: <20220810193033.1090251-4-pcc@google.com>
- <202208111500.62e0Bl2l-lkp@intel.com>
- <YxDy+zFasbAP7Yrq@arm.com> <YxYrgyybBMUqFswq@arm.com>
- <878rmfkzbu.wl-maz@kernel.org>
- <Yynewxzc6Zy8ls0N@arm.com> <871qs6kntl.wl-maz@kernel.org>
- <YynxJYrd15aUJsmp@arm.com>
-In-Reply-To: <YynxJYrd15aUJsmp@arm.com>
-From: Peter Collingbourne <pcc@google.com>
-Date: Tue, 20 Sep 2022 20:53:15 -0700
-Message-ID: <CAMn1gO6vhf=xaHreysfwrunAAmV8OwxxtA9qOP0Bq+TkjrJQJg@mail.gmail.com>
-Subject: Re: [PATCH v3 3/7] mm: Add PG_arch_3 page flag
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: kbuild-all@lists.01.org, kernel test robot <lkp@intel.com>,
- kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Cornelia Huck <cohuck@redhat.com>, Steven Price <steven.price@arm.com>,
- Evgenii Stepanov <eugenis@google.com>,
- Vincenzo Frascino <vincenzo.frascino@arm.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Marc Zyngier <maz@kernel.org>,
+ kvm-ppc@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>,
+ kvm-riscv@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,51 +56,105 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 20, 2022 at 9:58 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
->
-> On Tue, Sep 20, 2022 at 05:33:42PM +0100, Marc Zyngier wrote:
-> > On Tue, 20 Sep 2022 16:39:47 +0100,
-> > Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > > On Mon, Sep 19, 2022 at 07:12:53PM +0100, Marc Zyngier wrote:
-> > > > On Mon, 05 Sep 2022 18:01:55 +0100,
-> > > > Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > > > > Peter, please let me know if you want to pick this series up together
-> > > > > with your other KVM patches. Otherwise I can post it separately, it's
-> > > > > worth merging it on its own as it clarifies the page flag vs tag setting
-> > > > > ordering.
-> > > >
-> > > > I'm looking at queuing this, but I'm confused by this comment. Do I
-> > > > need to pick this as part of the series? Or is this an independent
-> > > > thing (my hunch is that it is actually required not to break other
-> > > > architectures...).
-> > >
-> > > This series series (at least the first patches) won't apply cleanly on
-> > > top of 6.0-rc1 and, of course, we shouldn't break other architectures. I
-> > > can repost the whole series but I don't have the setup to test the
-> > > MAP_SHARED KVM option (unless Peter plans to post it soon).
-> >
-> > I don't feel brave enough to take a series affecting all architectures
->
-> It shouldn't affect the others, the only change is that PG_arch_2 is now
-> only defined for arm64 but no other architecture is using it. The
-> problem with loongarch is that it doesn't have enough spare bits in
-> page->flags and even without any patches I think it's broken with the
-> right value for NR_CPUS.
->
-> > so late in the game, and the whole thing had very little arm64
-> > exposure. The latest QEMU doesn't seem to work anymore, so I don't
-> > have any MTE-capable emulation (and using the FVP remotely is a pain
-> > in the proverbial neck).
-> >
-> > I'll come back to this after the merge window, should Peter decide to
-> > respin the series.
->
-> It makes sense.
+When introduced, IRQFD resampling worked on POWER8 with XICS. However
+KVM on POWER9 has never implemented it - the compatibility mode code
+("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
+XIVE mode does not handle INTx in KVM at all.
 
-Apologies for the delay, I've now sent out v4 of this series which
-includes the patches on your branch.
+This moved the capability support advertising to platforms and stops
+advertising it on XIVE, i.e. POWER9 and later.
 
-Peter
+This stops advertising the capability on MIPS and RISC-V as these
+do not select HAVE_KVM_IRQFD and do not implement IRQFD resampling
+anyway.
+
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Acked-by: Nicholas Piggin <npiggin@gmail.com>
+---
+Changes:
+v3:
+* removed all ifdeferry
+* removed the capability for MIPS and RISCV
+* adjusted the commit log about MIPS and RISCV
+
+v2:
+* removed ifdef for ARM64.
+---
+ arch/arm64/kvm/arm.c       | 1 +
+ arch/powerpc/kvm/powerpc.c | 6 ++++++
+ arch/s390/kvm/kvm-s390.c   | 1 +
+ arch/x86/kvm/x86.c         | 1 +
+ virt/kvm/kvm_main.c        | 1 -
+ 5 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 2ff0ef62abad..d2daa4d375b5 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -218,6 +218,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
+ 	case KVM_CAP_PTP_KVM:
+ 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
++	case KVM_CAP_IRQFD_RESAMPLE:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index fb1490761c87..908ce8bd91c9 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -593,6 +593,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		break;
+ #endif
+ 
++#ifdef CONFIG_HAVE_KVM_IRQFD
++	case KVM_CAP_IRQFD_RESAMPLE:
++		r = !xive_enabled();
++		break;
++#endif
++
+ 	case KVM_CAP_PPC_ALLOC_HTAB:
+ 		r = hv_enabled;
+ 		break;
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index edfd4bbd0cba..7521adadb81b 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -577,6 +577,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_S390_DIAG318:
+ 	case KVM_CAP_S390_MEM_OP_EXTENSION:
++	case KVM_CAP_IRQFD_RESAMPLE:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 43a6a7efc6ec..2d6c5a8fdf14 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4395,6 +4395,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_VAPIC:
+ 	case KVM_CAP_ENABLE_CAP:
+ 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
++	case KVM_CAP_IRQFD_RESAMPLE:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_EXIT_HYPERCALL:
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 584a5bab3af3..05cf94013f02 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4447,7 +4447,6 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ #endif
+ #ifdef CONFIG_HAVE_KVM_IRQFD
+ 	case KVM_CAP_IRQFD:
+-	case KVM_CAP_IRQFD_RESAMPLE:
+ #endif
+ 	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
+ 	case KVM_CAP_CHECK_EXTENSION_VM:
+-- 
+2.37.3
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
