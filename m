@@ -2,64 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4572C6FA82
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Sep 2022 17:31:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C0BECAAD8
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Sep 2022 17:47:33 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29CBC4B25E;
-	Wed, 21 Sep 2022 13:31:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3AF54B77F;
+	Wed, 21 Sep 2022 13:47:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fw9-aLyrtnG1; Wed, 21 Sep 2022 13:31:36 -0400 (EDT)
+	with ESMTP id eWX7FRTTv9Cs; Wed, 21 Sep 2022 13:47:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E66A84B64F;
-	Wed, 21 Sep 2022 13:31:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73EFD4B752;
+	Wed, 21 Sep 2022 13:47:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87F054B278
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 13:31:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E4FF4B64F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 13:47:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id f3nNo4q7p2L7 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Sep 2022 13:31:34 -0400 (EDT)
+ with ESMTP id xKOGhPpANCDX for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Sep 2022 13:47:28 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 66A114B25E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 13:31:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 111A14B2B4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 13:47:28 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id EA026B82889;
- Wed, 21 Sep 2022 17:31:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC6ACC433C1;
- Wed, 21 Sep 2022 17:31:31 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 854DEB82892;
+ Wed, 21 Sep 2022 17:47:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2841CC433D6;
+ Wed, 21 Sep 2022 17:47:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1663781491;
- bh=OEpDSs8Idj+f6sm81NSd/vFypq2q+42hxd0d/9RHaU8=;
+ s=k20201202; t=1663782445;
+ bh=PA8aNMshIO9eu3SX73FrQHs+BvNP8ZcEiOhWgbPWNyU=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=pKSIt8StaUsJiY8qnVFQ8+XS/CU2701FmYS11ZOu2HGTxM0KwGrcIc+loxxqzHi63
- yvA/FkYQ6bCHZW1y4CkIGuJ7HFf1IPoZGjEx4it7mTYQ6j6hquMJ3SdxByS9Y8Hk+6
- 0OKwpaBBKviuafOrZkpZEnipnk4viaT8n7xZiJ8ofAlpvCgYxX/Kq9GPGJWC4QJJrk
- yWoPTAhM4A7r0wg7oU42vSb1IMJSsHnItm+U9uY8+EZVktZlOP5z/uOEKKpGxT5YpY
- PQYINpuGHOrWKa5p6JRIXBaIpSzixPuQOreayHeMKMuVDqF9WG6Z9BmmlLTTetGy6C
- pt1/jC8iDKWWw==
+ b=fO83c5LGV3Vi/Laur8vGFBAhClwTILYXi8npuCsfy0XPxyFkgAfFviJgH1q6nHx0f
+ Bgz64sWHvwZCy6GHD+rtBxSFfUzfSkCEiKC6xKTVzmKikPCR/0FYpxbS+HFW2aGFTH
+ hBAkK5zxZWyk3m9FObM4SCCsO8MjsJUYgwPEHVtubv/gDxW6OAGlDXyTCeW363s17Z
+ GvZoLlANi8+SnCrdjoTbP+3Y5/0rWzXmp0o776BK/X2pqkZsUelN87l4kfKj+v8E5D
+ s0UTvbEnP+KerT+mOD2ICK3002lAQrEJXFt90X5JdApRsOSboE+xe3w+BRi/MW02v8
+ VqZXNJPezr6Dw==
 Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1ob3ZJ-00BjKY-D0;
- Wed, 21 Sep 2022 18:31:29 +0100
-Date: Wed, 21 Sep 2022 18:31:28 +0100
-Message-ID: <87mtask51r.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1ob3og-00BjUP-VW;
+ Wed, 21 Sep 2022 18:47:23 +0100
+Date: Wed, 21 Sep 2022 18:47:21 +0100
+Message-ID: <87leqck4ba.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 1/7] KVM: arm64: Discard any SVE state when entering
- KVM guests
-In-Reply-To: <YyogzYzVbb3mvZWM@sirena.org.uk>
+Subject: Re: [PATCH v3 3/7] arm64/fpsimd: Have KVM explicitly say which FP
+ registers to save
+In-Reply-To: <YyoHUS0ZPQvvjrte@sirena.org.uk>
 References: <20220815225529.930315-1-broonie@kernel.org>
- <20220815225529.930315-2-broonie@kernel.org>
- <87zgeuj8ry.wl-maz@kernel.org> <YyogzYzVbb3mvZWM@sirena.org.uk>
+ <20220815225529.930315-4-broonie@kernel.org>
+ <87wn9yj5l0.wl-maz@kernel.org> <YyoHUS0ZPQvvjrte@sirena.org.uk>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -92,34 +92,75 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 20 Sep 2022 21:21:33 +0100,
+On Tue, 20 Sep 2022 19:32:49 +0100,
 Mark Brown <broonie@kernel.org> wrote:
 > 
 > [1  <text/plain; us-ascii (quoted-printable)>]
-> On Tue, Sep 20, 2022 at 05:44:01PM +0100, Marc Zyngier wrote:
+> On Tue, Sep 20, 2022 at 06:52:59PM +0100, Marc Zyngier wrote:
+> > On Mon, 15 Aug 2022 23:55:25 +0100,
 > > Mark Brown <broonie@kernel.org> wrote:
 > 
-> > >  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
-> > >  {
-> > >  	BUG_ON(!current->mm);
-> > > -	BUG_ON(test_thread_flag(TIF_SVE));
-> > > +
-> > > +	fpsimd_kvm_prepare();
-> > 
-> > Why is this *before* the check against system_supports_fpsimd()? I
-> > don't think the architecture allows SVE without FP, for obvious
-> > reasons...
+> > >  enum fp_state {
+> > > +	FP_STATE_TASK,		/* Save based on current, invalid as fp_type */
 > 
-> Good point, though now that I think about it I can't think of a
-> requirement for FP when implementing SME (there's certainly not
-> one for SVE).
+> > How is that related to the FP_TYPE_TASK in the commit message? What
+> 
+> TYPE in the commit message should be STATE.
+> 
+> > does this 'invalid as fp_type' mean?
+> 
+> It means that using FP_STATE_TASK as a value for the fp_type
+> member of the task struck recording what type of state is
+> currently stored for the task is not valid, one of the other two
+> values representing what was actually saved must be chosen.
 
-Even if the architecture was allowing this madness, KVM doesn't allow
-SVE if FP is not available, just like the rest of the kernel.
+Then this definitely represents something else, and shouldn't be a
+state or a type, whatever you decide to call it in the end. There is
+the state of the FP/SVE unit, and what some piece of SW wants to
+save. They match in some cases, and differ in other (the TASK
+value). I'd rather you encode them as them as different types to lift
+the ambiguity.
 
-> There's no use for that hook now though.
+> 
+> > > +	/*
+> > > +	 * For now we're just validating that the requested state is
+> > > +	 * consistent with what we'd otherwise work out.
+> 
+> > Nit: work out? or worked out? the "we'd" doesn't help disambiguate it
+> > for a non-native speaker.
+> 
+> we'd == we would so work out to match the tense.
+> 
+> > >  void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
+> > >  			      unsigned int sve_vl, void *za_state,
+> > >  			      unsigned int sme_vl, u64 *svcr,
+> > > -			      enum fp_state *type)
+> > > +			      enum fp_state *type, enum fp_state to_save)
+> 
+> > OK, how many discrete arguments are we going to pass to this function,
+> > which most of them are part the vcpu structure? It really feels like
+> > what you want is a getter for the per-cpu structure, and let the KVM
+> > code do the actual business. If this function was supposed to provide
+> > some level of abstraction, well, it's a fail.
+> 
+> I agree that this is not an ideal interface, I am merely
+> following the previously chosen idiom since I haven't been able
+> to figure out why we were doing it in the first place and with a
+> lot of these things it turns out that there's some actual reason.
 
-Care to clarify?
+Huh. If we're changing anything around this code, we'd better
+understand what we are doing...
+
+> It's not even like fpsimd_bind_task_to_cpu() has ever been
+> written in terms of this function, there's two parallel
+> implementations.  My best guess was that it was some combination
+> of not peering at KVM internals and keeping struct
+> fpsimd_last_state_struct internal to fpsimd.c (since we're
+> effectively just passing one of those in in a more verbose form)
+> but never anything solid enough to be sure.
+
+Up to you, but adding extra parameters to this function really feels
+like the wrong thing to do.
 
 	M.
 
