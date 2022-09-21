@@ -2,81 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D50ECAAD8
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Sep 2022 17:25:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4572C6FA82
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Sep 2022 17:31:38 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 70F024B739;
-	Wed, 21 Sep 2022 13:25:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29CBC4B25E;
+	Wed, 21 Sep 2022 13:31:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id S8ZKSv+pg5ip; Wed, 21 Sep 2022 13:25:14 -0400 (EDT)
+	with ESMTP id fw9-aLyrtnG1; Wed, 21 Sep 2022 13:31:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 094EE4B641;
-	Wed, 21 Sep 2022 13:25:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E66A84B64F;
+	Wed, 21 Sep 2022 13:31:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE8C04B25E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 13:25:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 87F054B278
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 13:31:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0CF8ljXQIMkz for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Sep 2022 13:25:11 -0400 (EDT)
+ with ESMTP id f3nNo4q7p2L7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Sep 2022 13:31:34 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D8684B24C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 13:25:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 66A114B25E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 13:31:34 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id DC1F4B822EB;
- Wed, 21 Sep 2022 17:25:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F949C433C1;
- Wed, 21 Sep 2022 17:25:08 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id EA026B82889;
+ Wed, 21 Sep 2022 17:31:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC6ACC433C1;
+ Wed, 21 Sep 2022 17:31:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1663781108;
- bh=wKJthoQT0tsR8fGFfaCS09xqQkAr5tvsQxNAnhR8RFU=;
+ s=k20201202; t=1663781491;
+ bh=OEpDSs8Idj+f6sm81NSd/vFypq2q+42hxd0d/9RHaU8=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=eH3mhQXPUz2GfmoUsDDY2HRV2RPhz0t+JgXI6vYPdsU9TTLIWbFuqncPkhLoA+Kjg
- UrVB5KXqAN4/rHMGT4PyHMXxiTx5S+o9lr8rHONUK+7rTsNYnNh0dxKcl5uIdaiP5v
- uswXymCWTM0j/n1DbJ0kkEZ4wWL7w17MdEjQlN3+eqgaajgeizVxAbK2MbI0xcSdgi
- UBDnIx2J0Cv1C30fIPP8b7Ci3HSIgp1/E/VMz/OBlRoauyWXlEW9kXh6HTLw6nZw06
- V+z03qa6u+f4PXIhE7JnF2cDKDksQdgPuqlD36zPfnm57CyGFjC+T7AF54YyHIEl/l
- +0zKigVQGTkvA==
+ b=pKSIt8StaUsJiY8qnVFQ8+XS/CU2701FmYS11ZOu2HGTxM0KwGrcIc+loxxqzHi63
+ yvA/FkYQ6bCHZW1y4CkIGuJ7HFf1IPoZGjEx4it7mTYQ6j6hquMJ3SdxByS9Y8Hk+6
+ 0OKwpaBBKviuafOrZkpZEnipnk4viaT8n7xZiJ8ofAlpvCgYxX/Kq9GPGJWC4QJJrk
+ yWoPTAhM4A7r0wg7oU42vSb1IMJSsHnItm+U9uY8+EZVktZlOP5z/uOEKKpGxT5YpY
+ PQYINpuGHOrWKa5p6JRIXBaIpSzixPuQOreayHeMKMuVDqF9WG6Z9BmmlLTTetGy6C
+ pt1/jC8iDKWWw==
 Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1ob3T8-00BjHQ-7T;
- Wed, 21 Sep 2022 18:25:06 +0100
-Date: Wed, 21 Sep 2022 18:25:04 +0100
-Message-ID: <87o7v8k5cf.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1ob3ZJ-00BjKY-D0;
+ Wed, 21 Sep 2022 18:31:29 +0100
+Date: Wed, 21 Sep 2022 18:31:28 +0100
+Message-ID: <87mtask51r.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Denis Nikitin <denik@chromium.org>
-Subject: Re: [PATCH] KVM: arm64: nvhe: Disable profile optimization
-In-Reply-To: <CADDJ8CW5MV3vUPdm4iwjwS4VyeV9rCAMZZpJbNFtNLFD-wThVA@mail.gmail.com>
-References: <20220920082005.2459826-1-denik@chromium.org>
- <877d1yl797.wl-maz@kernel.org>
- <CAOYpmdHMbDdssEJJwXktEj1SDLncHTeL7x7aKxVe6j1vzSMgtw@mail.gmail.com>
- <CADDJ8CW5MV3vUPdm4iwjwS4VyeV9rCAMZZpJbNFtNLFD-wThVA@mail.gmail.com>
+To: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v3 1/7] KVM: arm64: Discard any SVE state when entering
+ KVM guests
+In-Reply-To: <YyogzYzVbb3mvZWM@sirena.org.uk>
+References: <20220815225529.930315-1-broonie@kernel.org>
+ <20220815225529.930315-2-broonie@kernel.org>
+ <87zgeuj8ry.wl-maz@kernel.org> <YyogzYzVbb3mvZWM@sirena.org.uk>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.176.101.241
-X-SA-Exim-Rcpt-To: denik@chromium.org, catalin.marinas@arm.com, will@kernel.org,
- james.morse@arm.com, alexandru.elisei@arm.com, ndesaulniers@google.com,
- manojgupta@google.com, dbrazdil@google.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+ zhang.lei@jp.fujitsu.com, james.morse@arm.com, alexandru.elisei@arm.com,
+ andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
- Manoj Gupta <manojgupta@google.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ Zhang Lei <zhang.lei@jp.fujitsu.com>, Andre Przywara <andre.przywara@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,113 +92,34 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 21 Sep 2022 07:02:50 +0100,
-Denis Nikitin <denik@chromium.org> wrote:
+On Tue, 20 Sep 2022 21:21:33 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Adding a few more comments...
+> [1  <text/plain; us-ascii (quoted-printable)>]
+> On Tue, Sep 20, 2022 at 05:44:01PM +0100, Marc Zyngier wrote:
+> > Mark Brown <broonie@kernel.org> wrote:
 > 
-> On Tue, Sep 20, 2022 at 5:08 PM Denis Nikitin <denik@google.com> wrote:
-> >
-> > Hi Mark,
-> >
-> > Thank you for a quick response.
-> >
-> > On Tue, Sep 20, 2022 at 2:34 AM Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > Hi Denis,
-> > >
-> > > On Tue, 20 Sep 2022 09:20:05 +0100,
-> > > Denis Nikitin <denik@chromium.org> wrote:
-> > > >
-> > > > Kernel build with -fprofile-sample-use raises the following failure:
-> > > >
-> > > > error: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.tmp.o: Unexpected SHT_REL
-> > > > section ".rel.llvm.call-graph-profile"
-> > >
-> > > How is this flag provided? I don't see any occurrence of it in the
-> > > kernel so far.
-> >
-> > On ChromeOS we build the kernel with sample profiles by adding
-> > -fprofile-sample-use=/path/to/gcov.profile to KCFLAGS.
-> >
-> > >
-> > > >
-> > > > SHT_REL is generated by the latest lld, see
-> > > > https://reviews.llvm.org/rGca3bdb57fa1ac98b711a735de048c12b5fdd8086.
-> > >
-> > > Is this part of a released toolchain? If so, can you spell out the
-> > > first version where this occurs?
-> >
-> > Yes, it was added in llvm-13. I will update the patch.
-> >
-> > >
-> > > > Disable profile optimization in kvm/nvhe to fix the build with
-> > > > AutoFDO.
-> > >
-> > > It'd be good to at least mention how AutoFDO and -fprofile-sample-use
-> > > relate to each other.
-> >
-> > Good point. AutoFDO is an example of sample profiles.
-> > It's not actually relevant for the bug. I will better remove it.
-> >
-> > >
-> > > >
-> > > > Signed-off-by: Denis Nikitin <denik@chromium.org>
-> > > > ---
-> > > >  arch/arm64/kvm/hyp/nvhe/Makefile | 3 +++
-> > > >  1 file changed, 3 insertions(+)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> > > > index b5c5119c7396..6a6188374a52 100644
-> > > > --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> > > > +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> > > > @@ -89,6 +89,9 @@ quiet_cmd_hypcopy = HYPCOPY $@
-> > > >  # Remove ftrace, Shadow Call Stack, and CFI CFLAGS.
-> > > >  # This is equivalent to the 'notrace', '__noscs', and '__nocfi' annotations.
-> > > >  KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI), $(KBUILD_CFLAGS))
-> > > > +# Profile optimization creates SHT_REL section '.llvm.call-graph-profile' for
-> > > > +# the hot code. SHT_REL is currently not supported by the KVM tools.
-> > >
-> > > 'KVM tools' seems vague. Maybe call out the actual helper that
-> > > processes the relocations?
-> >
-> > Agreed.
-> >
-> > >
-> > > > +KBUILD_CFLAGS += $(call cc-option,-fno-profile-sample-use,-fno-profile-use)
-> > >
-> > > Why adding these options instead of filtering out the offending option
-> > > as it is done just above?
-> >
-> > That was actually the alternative solution and it worked as well.
-> > Let me double check if profile optimization doesn't mess up with other
-> > sections and if it doesn't I will remove the '.llvm.call-graph-profile'
-> > section instead.
+> > >  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+> > >  {
+> > >  	BUG_ON(!current->mm);
+> > > -	BUG_ON(test_thread_flag(TIF_SVE));
+> > > +
+> > > +	fpsimd_kvm_prepare();
+> > 
+> > Why is this *before* the check against system_supports_fpsimd()? I
+> > don't think the architecture allows SVE without FP, for obvious
+> > reasons...
 > 
-> When I remove the '.llvm.call-graph-profile' section the layout of other
-> sections slightly changes (offsets and sizes) compared to
-> `-fno-profile-sample-use`. But the list of sections remains the same.
+> Good point, though now that I think about it I can't think of a
+> requirement for FP when implementing SME (there's certainly not
+> one for SVE).
 
-If this method works well enough, I'd rather we stick to it, instead
-of having two ways to disable this sort of things.
+Even if the architecture was allowing this madness, KVM doesn't allow
+SVE if FP is not available, just like the rest of the kernel.
 
-> > > Also, is this the only place the kernel fails to compile? The EFI stub
-> > > does similar things AFAIR, and could potentially fail the same way.
-> >
-> > This was the only place in 5.15 where we tested it.
-> > Let me see if EFI has this section.
-> 
-> EFI code is not marked as hot in the profile.
-> 
-> Regarding "could potentially fail", I don't see any explicit manipulations
-> with code sections in EFI.
-> The hardcoded EFI stub entries should not be affected.
+> There's no use for that hook now though.
 
-I was more worried by the runtime relocation that the EFI stub
-performs for the kernel, but if you've checked that already, that
-works for me.
-
-Thanks,
+Care to clarify?
 
 	M.
 
