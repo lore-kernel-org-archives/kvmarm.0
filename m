@@ -2,78 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB3DC6FA8B
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Sep 2022 17:08:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D50ECAAD8
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Sep 2022 17:25:15 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C3004B75D;
-	Wed, 21 Sep 2022 13:08:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 70F024B739;
+	Wed, 21 Sep 2022 13:25:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Vv23OAqtGWM5; Wed, 21 Sep 2022 13:08:51 -0400 (EDT)
+	with ESMTP id S8ZKSv+pg5ip; Wed, 21 Sep 2022 13:25:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C7AD4B24C;
-	Wed, 21 Sep 2022 13:08:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 094EE4B641;
+	Wed, 21 Sep 2022 13:25:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B07A4410FF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 13:08:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE8C04B25E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 13:25:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lFifRNUIOi2w for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Sep 2022 13:08:48 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 47CDB40D0B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 13:08:48 -0400 (EDT)
+ with ESMTP id 0CF8ljXQIMkz for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Sep 2022 13:25:11 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D8684B24C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 13:25:11 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 3D51A63233;
- Wed, 21 Sep 2022 17:08:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99E3EC433D7;
- Wed, 21 Sep 2022 17:08:46 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id DC1F4B822EB;
+ Wed, 21 Sep 2022 17:25:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F949C433C1;
+ Wed, 21 Sep 2022 17:25:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1663780126;
- bh=hmdaMiCh0a1EdCGVaIUfBSrF9U1MEodOCxozbMGyCWA=;
+ s=k20201202; t=1663781108;
+ bh=wKJthoQT0tsR8fGFfaCS09xqQkAr5tvsQxNAnhR8RFU=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=cofs2GNz67wZZiPk6X8Rx/ZzWH2AgmMTgYH5tDoYzv+0gYZL0L2CobGr0+oFxHIGw
- hBtiU2P1Ig0AScO44/L0Sn+75JiU/D0MIGjxnlvlDB1Mom1wLDpUgKnu7Y0mpqQHKY
- UUmT5bpoO/fFTB3S4NoMkMMqIXPWp99CgB5Cii78shnE29L7mK9LebpiX9AnQyfgtb
- V572fc+OEX4hXOA/gxfQXuKiXZg2cObVbXr2Sckm5plMrw1TBLs2d8kQmplGI3BLkh
- PHHkg4q5aCjB061jQnGR+6z0p9a+gsNcRtQbqJ9MncTxgVSg+HmkKCOXFTNMo00lPj
- v8H9LYR3bHpzg==
+ b=eH3mhQXPUz2GfmoUsDDY2HRV2RPhz0t+JgXI6vYPdsU9TTLIWbFuqncPkhLoA+Kjg
+ UrVB5KXqAN4/rHMGT4PyHMXxiTx5S+o9lr8rHONUK+7rTsNYnNh0dxKcl5uIdaiP5v
+ uswXymCWTM0j/n1DbJ0kkEZ4wWL7w17MdEjQlN3+eqgaajgeizVxAbK2MbI0xcSdgi
+ UBDnIx2J0Cv1C30fIPP8b7Ci3HSIgp1/E/VMz/OBlRoauyWXlEW9kXh6HTLw6nZw06
+ V+z03qa6u+f4PXIhE7JnF2cDKDksQdgPuqlD36zPfnm57CyGFjC+T7AF54YyHIEl/l
+ +0zKigVQGTkvA==
 Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1ob3DI-00Bj7t-0J;
- Wed, 21 Sep 2022 18:08:44 +0100
-Date: Wed, 21 Sep 2022 18:08:41 +0100
-Message-ID: <87pmfok63q.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1ob3T8-00BjHQ-7T;
+ Wed, 21 Sep 2022 18:25:06 +0100
+Date: Wed, 21 Sep 2022 18:25:04 +0100
+Message-ID: <87o7v8k5cf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: Re: [PATCH kernel v3] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support
- platform dependent
-In-Reply-To: <20220921044925.101802-1-aik@ozlabs.ru>
-References: <20220921044925.101802-1-aik@ozlabs.ru>
+To: Denis Nikitin <denik@chromium.org>
+Subject: Re: [PATCH] KVM: arm64: nvhe: Disable profile optimization
+In-Reply-To: <CADDJ8CW5MV3vUPdm4iwjwS4VyeV9rCAMZZpJbNFtNLFD-wThVA@mail.gmail.com>
+References: <20220920082005.2459826-1-denik@chromium.org>
+ <877d1yl797.wl-maz@kernel.org>
+ <CAOYpmdHMbDdssEJJwXktEj1SDLncHTeL7x7aKxVe6j1vzSMgtw@mail.gmail.com>
+ <CADDJ8CW5MV3vUPdm4iwjwS4VyeV9rCAMZZpJbNFtNLFD-wThVA@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.176.101.241
-X-SA-Exim-Rcpt-To: aik@ozlabs.ru, kvm@vger.kernel.org,
+X-SA-Exim-Rcpt-To: denik@chromium.org, catalin.marinas@arm.com, will@kernel.org,
+ james.morse@arm.com, alexandru.elisei@arm.com, ndesaulniers@google.com,
+ manojgupta@google.com, dbrazdil@google.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm-riscv@lists.infradead.org, pbonzini@redhat.com, anup@brainfault.org,
- kvm-ppc@vger.kernel.org, npiggin@gmail.com
+ linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
- Nicholas Piggin <npiggin@gmail.com>, kvm-riscv@lists.infradead.org,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
+ Manoj Gupta <manojgupta@google.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,117 +93,113 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 21 Sep 2022 05:49:25 +0100,
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+On Wed, 21 Sep 2022 07:02:50 +0100,
+Denis Nikitin <denik@chromium.org> wrote:
 > 
-> When introduced, IRQFD resampling worked on POWER8 with XICS. However
-> KVM on POWER9 has never implemented it - the compatibility mode code
-> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
-> XIVE mode does not handle INTx in KVM at all.
+> Adding a few more comments...
 > 
-> This moved the capability support advertising to platforms and stops
-> advertising it on XIVE, i.e. POWER9 and later.
+> On Tue, Sep 20, 2022 at 5:08 PM Denis Nikitin <denik@google.com> wrote:
+> >
+> > Hi Mark,
+> >
+> > Thank you for a quick response.
+> >
+> > On Tue, Sep 20, 2022 at 2:34 AM Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > Hi Denis,
+> > >
+> > > On Tue, 20 Sep 2022 09:20:05 +0100,
+> > > Denis Nikitin <denik@chromium.org> wrote:
+> > > >
+> > > > Kernel build with -fprofile-sample-use raises the following failure:
+> > > >
+> > > > error: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.tmp.o: Unexpected SHT_REL
+> > > > section ".rel.llvm.call-graph-profile"
+> > >
+> > > How is this flag provided? I don't see any occurrence of it in the
+> > > kernel so far.
+> >
+> > On ChromeOS we build the kernel with sample profiles by adding
+> > -fprofile-sample-use=/path/to/gcov.profile to KCFLAGS.
+> >
+> > >
+> > > >
+> > > > SHT_REL is generated by the latest lld, see
+> > > > https://reviews.llvm.org/rGca3bdb57fa1ac98b711a735de048c12b5fdd8086.
+> > >
+> > > Is this part of a released toolchain? If so, can you spell out the
+> > > first version where this occurs?
+> >
+> > Yes, it was added in llvm-13. I will update the patch.
+> >
+> > >
+> > > > Disable profile optimization in kvm/nvhe to fix the build with
+> > > > AutoFDO.
+> > >
+> > > It'd be good to at least mention how AutoFDO and -fprofile-sample-use
+> > > relate to each other.
+> >
+> > Good point. AutoFDO is an example of sample profiles.
+> > It's not actually relevant for the bug. I will better remove it.
+> >
+> > >
+> > > >
+> > > > Signed-off-by: Denis Nikitin <denik@chromium.org>
+> > > > ---
+> > > >  arch/arm64/kvm/hyp/nvhe/Makefile | 3 +++
+> > > >  1 file changed, 3 insertions(+)
+> > > >
+> > > > diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> > > > index b5c5119c7396..6a6188374a52 100644
+> > > > --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> > > > +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> > > > @@ -89,6 +89,9 @@ quiet_cmd_hypcopy = HYPCOPY $@
+> > > >  # Remove ftrace, Shadow Call Stack, and CFI CFLAGS.
+> > > >  # This is equivalent to the 'notrace', '__noscs', and '__nocfi' annotations.
+> > > >  KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI), $(KBUILD_CFLAGS))
+> > > > +# Profile optimization creates SHT_REL section '.llvm.call-graph-profile' for
+> > > > +# the hot code. SHT_REL is currently not supported by the KVM tools.
+> > >
+> > > 'KVM tools' seems vague. Maybe call out the actual helper that
+> > > processes the relocations?
+> >
+> > Agreed.
+> >
+> > >
+> > > > +KBUILD_CFLAGS += $(call cc-option,-fno-profile-sample-use,-fno-profile-use)
+> > >
+> > > Why adding these options instead of filtering out the offending option
+> > > as it is done just above?
+> >
+> > That was actually the alternative solution and it worked as well.
+> > Let me double check if profile optimization doesn't mess up with other
+> > sections and if it doesn't I will remove the '.llvm.call-graph-profile'
+> > section instead.
 > 
-> This stops advertising the capability on MIPS and RISC-V as these
-> do not select HAVE_KVM_IRQFD and do not implement IRQFD resampling
-> anyway.
+> When I remove the '.llvm.call-graph-profile' section the layout of other
+> sections slightly changes (offsets and sizes) compared to
+> `-fno-profile-sample-use`. But the list of sections remains the same.
 
-This paragraph makes no sense. Not selecting HAVE_KVM_IRQFD, by
-definition, prevents the advertising of the capability. Hell, you are
-even removing it from a block guarded by "#ifdef CONFIG_HAVE_KVM_IRQFD".
+If this method works well enough, I'd rather we stick to it, instead
+of having two ways to disable this sort of things.
 
+> > > Also, is this the only place the kernel fails to compile? The EFI stub
+> > > does similar things AFAIR, and could potentially fail the same way.
+> >
+> > This was the only place in 5.15 where we tested it.
+> > Let me see if EFI has this section.
 > 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Acked-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
-> Changes:
-> v3:
-> * removed all ifdeferry
-> * removed the capability for MIPS and RISCV
-> * adjusted the commit log about MIPS and RISCV
+> EFI code is not marked as hot in the profile.
 > 
-> v2:
-> * removed ifdef for ARM64.
-> ---
->  arch/arm64/kvm/arm.c       | 1 +
->  arch/powerpc/kvm/powerpc.c | 6 ++++++
->  arch/s390/kvm/kvm-s390.c   | 1 +
->  arch/x86/kvm/x86.c         | 1 +
->  virt/kvm/kvm_main.c        | 1 -
->  5 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 2ff0ef62abad..d2daa4d375b5 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -218,6 +218,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_VCPU_ATTRIBUTES:
->  	case KVM_CAP_PTP_KVM:
->  	case KVM_CAP_ARM_SYSTEM_SUSPEND:
-> +	case KVM_CAP_IRQFD_RESAMPLE:
->  		r = 1;
->  		break;
->  	case KVM_CAP_SET_GUEST_DEBUG2:
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index fb1490761c87..908ce8bd91c9 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -593,6 +593,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		break;
->  #endif
->  
-> +#ifdef CONFIG_HAVE_KVM_IRQFD
-> +	case KVM_CAP_IRQFD_RESAMPLE:
-> +		r = !xive_enabled();
-> +		break;
-> +#endif
-> +
->  	case KVM_CAP_PPC_ALLOC_HTAB:
->  		r = hv_enabled;
->  		break;
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index edfd4bbd0cba..7521adadb81b 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -577,6 +577,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_SET_GUEST_DEBUG:
->  	case KVM_CAP_S390_DIAG318:
->  	case KVM_CAP_S390_MEM_OP_EXTENSION:
-> +	case KVM_CAP_IRQFD_RESAMPLE:
->  		r = 1;
->  		break;
->  	case KVM_CAP_SET_GUEST_DEBUG2:
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 43a6a7efc6ec..2d6c5a8fdf14 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4395,6 +4395,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_VAPIC:
->  	case KVM_CAP_ENABLE_CAP:
->  	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
-> +	case KVM_CAP_IRQFD_RESAMPLE:
->  		r = 1;
->  		break;
->  	case KVM_CAP_EXIT_HYPERCALL:
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 584a5bab3af3..05cf94013f02 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4447,7 +4447,6 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
->  #endif
->  #ifdef CONFIG_HAVE_KVM_IRQFD
->  	case KVM_CAP_IRQFD:
-> -	case KVM_CAP_IRQFD_RESAMPLE:
->  #endif
+> Regarding "could potentially fail", I don't see any explicit manipulations
+> with code sections in EFI.
+> The hardcoded EFI stub entries should not be affected.
 
-Do you see what I mean?
+I was more worried by the runtime relocation that the EFI stub
+performs for the kernel, but if you've checked that already, that
+works for me.
 
->  	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
->  	case KVM_CAP_CHECK_EXTENSION_VM:
-
-So, with the nonsensical paragraph removed from the commit log:
-
-Acked-by: Marc Zyngier <maz@kernel.org>
+Thanks,
 
 	M.
 
