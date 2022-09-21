@@ -2,91 +2,90 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1046C54EE9
-	for <kvmarm@archiver.kernel.org>; Tue, 20 Sep 2022 21:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF816C6FA8E
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Sep 2022 00:32:53 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 366E84B645;
-	Tue, 20 Sep 2022 17:46:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B5BB4B77F;
+	Tue, 20 Sep 2022 20:32:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered)
-	header.i=@ozlabs-ru.20210112.gappssmtp.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KyBvpNISnQ-w; Tue, 20 Sep 2022 17:46:33 -0400 (EDT)
+	with ESMTP id cHbipSBg0wlw; Tue, 20 Sep 2022 20:32:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A9C64B64F;
-	Tue, 20 Sep 2022 17:46:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3A704B743;
+	Tue, 20 Sep 2022 20:32:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 383F54B3C0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 17:46:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF4AB4B712
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 20:32:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FHfIc5i6NPgQ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Sep 2022 17:46:29 -0400 (EDT)
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com
- [209.85.214.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9570B49EFA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 17:46:29 -0400 (EDT)
-Received: by mail-pl1-f181.google.com with SMTP id p18so3733378plr.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 14:46:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:content-language
- :references:cc:to:subject:user-agent:mime-version:date:message-id
- :from:to:cc:subject:date;
- bh=7l/du9tda2XXL7FC7D3+ws6V56vBPTifJOsgn5Df51U=;
- b=gOwSfOBbOr0MQjW5J+UipqgY2Yw0uaNGsdreNLLUTDAa9oJvasIrAg0xIqNd6JiCJa
- /lgGQS7Q7nYv6b+T6ZiQMMEBH/BgMj/HFdvRGGgH3smBNXbNaXSmFnTYFomPlG0Z0NGS
- 2cenws1/5V21PiPBEdeHsWTCSLNfKNhlCdt/MAYtvkn9gp6c/7PG4lN9X16+DcF5/ij6
- e5f5cdzMkb9SYgvYUAkvx/e+KHrZ57z10+mRwcube170/DdHCki9xJNAnreu6apEm/HG
- zlrEnBZu26IHdG0QI6woc6awnSbNFJ7vtkmuhh2eW8WmicHnxp3rSI+lOebJnCfq36Z3
- sISg==
+ with ESMTP id zVaUIeV3x6pn for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Sep 2022 20:32:48 -0400 (EDT)
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
+ [209.85.214.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DA5834B5F5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 20:32:47 -0400 (EDT)
+Received: by mail-pl1-f202.google.com with SMTP id
+ o1-20020a170902d4c100b00177f59a9889so2718698plg.13
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Sep 2022 17:32:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+ :subject:date; bh=YVTX41DvvKxI+UwJXy7clPsFGJGlirwL5Ozkg5cZ92g=;
+ b=jsAJOmaw4PgLCggNnx5/TYjU6cPknBULwo8y0CP8EG2Sw1Ww/Zrcrj6rGqXRDdQXIy
+ EWBMc+N0YIPVg9+2uIB4J+yKk6tMlcVTEVpV4JuWamxfv2EHt8Ej3zHy+5oNaS33lDfN
+ vH0m6DcsIZmg5DI1FTeFfpS1f4mHkStL+K18cPVuWZt5XpaSJGD13ON+coD8QTFYFBT0
+ 2meYcKf8yaGiX/cOLkiucS7uLGTg/lFhOnl9Bpa7jzJMpOV+XF1YoiuyQSMhVGmgnyon
+ QYw+h9rG1jod+1d+oEBVHjsWVAsFeTGvZgaCNWH4jrGOsY16rCNYJVCAAf8mzBIPZVXO
+ 9sQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:content-language
- :references:cc:to:subject:user-agent:mime-version:date:message-id
+ h=cc:to:from:subject:message-id:mime-version:date:reply-to
  :x-gm-message-state:from:to:cc:subject:date;
- bh=7l/du9tda2XXL7FC7D3+ws6V56vBPTifJOsgn5Df51U=;
- b=lHhHCL7NZav+DYdCzXiI/PzJ9AtD60KFO8vVsbHlDkxgMYjwWMpq1A0dCd5OCqGx9m
- AorvdFt/Wj1LFUrlxN1EUlP4FW48Q7qKtKBJKuWIbG8Bh7ib17R4rzro+pQiPb5X1xQl
- QqEVLFViJxWOvULVtBKqJDI/gnI+ZXWe9yr5cPS0K7Yf1/K+RJFkE87mpHXBvrA57NDr
- EmfgwsVF+eWwaHZuVUSjI23NuPLyhKZcxRhe4AVhEadZr5yarQFex9Sc14JrYPmOr2iv
- 2sj2IZyrvN5F+4Z615hAY0I6dh0IWrXYcHXBJ3vlknsgSjW0vF9IqvScT6Tq8VbIVh2/
- 9k3w==
-X-Gm-Message-State: ACrzQf1eXrZ+gTywJHpAUwd45pX3ycGjh3Lnf4PdaEewPF7Vcq2H/ufg
- qiI2DG7nGexYBDHDyYvASMNv1Q==
-X-Google-Smtp-Source: AMsMyM4SuFzhjRKjEs3+Aoh19U+sLXTWgvCFX2DZggzYsKqwvyHbVXt9oLg9ZfwFqHhT7+94CUlpUg==
-X-Received: by 2002:a17:902:aa8b:b0:178:8f1d:6936 with SMTP id
- d11-20020a170902aa8b00b001788f1d6936mr1595515plr.168.1663710388674; 
- Tue, 20 Sep 2022 14:46:28 -0700 (PDT)
-Received: from [192.168.10.153]
- (ppp121-45-204-168.cbr-trn-nor-bras38.tpg.internode.on.net. [121.45.204.168])
- by smtp.gmail.com with ESMTPSA id
- i2-20020a17090332c200b0017834a6966csm367205plr.176.2022.09.20.14.46.24
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 20 Sep 2022 14:46:27 -0700 (PDT)
-Message-ID: <02490d2a-5e89-f342-f5b3-386406ffb2ea@ozlabs.ru>
-Date: Wed, 21 Sep 2022 07:46:21 +1000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:104.0) Gecko/20100101
- Thunderbird/104.0
-Subject: Re: [PATCH kernel v2] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support
- platform dependent
-To: Marc Zyngier <maz@kernel.org>
-References: <20220920125143.28009-1-aik@ozlabs.ru>
- <874jx2kp02.wl-maz@kernel.org>
-Content-Language: en-US
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <874jx2kp02.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
- Nicholas Piggin <npiggin@gmail.com>, kvm-riscv@lists.infradead.org,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ bh=YVTX41DvvKxI+UwJXy7clPsFGJGlirwL5Ozkg5cZ92g=;
+ b=RdmNDSZOeUsa8m6UnipvFhxGdvROHmXnEXMuKzt9Rv3bdKh1p3cC3Y9qZiSVcXvm1G
+ HqigmbQ/imYKDa0vmtsw9N1rDWQoYR21DNnty4xgyb3w+i3Slv8vwhbvYFOBG2I+IaGw
+ vgaMLJMCVW7ft6q2Exsg5olBLUS/kx6RfgpBs7tdorIVvfOu48eVytmyuyU5pki9ROrt
+ 92+HmxIXEdWWEbjyh+N7R3C0O5yAsU8ZX7sy8phYpLgAOlHjutREbAMJAN8/pgtmzwAS
+ dPvR7k+34fzd283T2bW/Ap6Z9XAx8DGPZZ6nWLj8dirvmsqbNlLdySk4qPGDnaw97KuH
+ lcPQ==
+X-Gm-Message-State: ACrzQf0XRmIshYP5QFHc+GXDjafkDshMJb0J22pr6+qEMQlHERsURKgx
+ VQbxw2wJVx/pLh+yCw4zlVma5S7wMs8=
+X-Google-Smtp-Source: AMsMyM5IXBzO0Z3bLf7U4Nl4fzPxWQVIxnXG7eLk3nZYDV6O9qarsIgEDf3VrL/1WyPiWF5/ev4wovLKs6Q=
+X-Received: from zagreus.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:854:b0:542:4254:17f6 with SMTP id
+ q20-20020a056a00085400b00542425417f6mr25988846pfk.47.1663720366656; Tue, 20
+ Sep 2022 17:32:46 -0700 (PDT)
+Date: Wed, 21 Sep 2022 00:31:49 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
+Message-ID: <20220921003201.1441511-1-seanjc@google.com>
+Subject: [PATCH v4 00/12] KVM: x86: never write to memory from
+ kvm_vcpu_check_block
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+ Huacai Chen <chenhuacai@kernel.org>, 
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Anup Patel <anup@brainfault.org>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+ Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>, 
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+ Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+ linuxppc-dev@lists.ozlabs.org, linux-mips@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ Atish Patra <atishp@atishpatra.org>, linux-riscv@lists.infradead.org,
+ Maxim Levitsky <mlevitsk@redhat.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Sean Christopherson <seanjc@google.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -95,64 +94,127 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Non-x86 folks, there's nothing interesting to see here, y'all got pulled
+in because removing KVM_REQ_UNHALT requires deleting kvm_clear_request()
+from arch code.
+
+Note, this based on:
+
+	https://github.com/sean-jc/linux.git tags/kvm-x86-6.1-1
+
+to pre-resolve conflicts with the event/exception cleanups in there.
 
 
-On 21/09/2022 02:08, Marc Zyngier wr
-ote:
-> On Tue, 20 Sep 2022 13:51:43 +0100,
-> Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
->>
->> When introduced, IRQFD resampling worked on POWER8 with XICS. However
->> KVM on POWER9 has never implemented it - the compatibility mode code
->> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
->> XIVE mode does not handle INTx in KVM at all.
->>
->> This moved the capability support advertising to platforms and stops
->> advertising it on XIVE, i.e. POWER9 and later.
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> Acked-by: Nicholas Piggin <npiggin@gmail.com>
->> [For KVM RISC-V]
->> Acked-by: Anup Patel <anup@brainfault.org>
->> ---
->> Changes:
->> v2:
->> * removed ifdef for ARM64.
-> 
-> The same argument applies to both x86 and s390, which do select
-> HAVE_KVM_IRQFD from the KVM config option. Only power allows this
-> option to be selected depending on the underlying interrupt controller
-> emulation.
-> 
-> As for riscv and mips, they don't select HAVE_KVM_IRQFD, and this
-> isn't a user-selectable option. So why do they get patched at all?
+In Paolo's words...
 
-Before the patch, the capability was advertised on those, with your 
-proposal it will stop. Which is a change in behavior which some may say 
-requires a separate patch (like, one per platform). I am definitely 
-overthinking it though and you are right.
+The following backtrace:
 
-> My conclusion is that:
-> 
-> - only power needs the #ifdefery in the arch-specific code
-> - arm64, s390 and x86 can use KVM_CAP_IRQFD_RESAMPLE without a #ifdef
-> - mips and riscv should be left alone
+[ 1355.807187]  kvm_vcpu_map+0x159/0x190 [kvm]
+[ 1355.807628]  nested_svm_vmexit+0x4c/0x7f0 [kvm_amd]
+[ 1355.808036]  ? kvm_vcpu_block+0x54/0xa0 [kvm]
+[ 1355.808450]  svm_check_nested_events+0x97/0x390 [kvm_amd]
+[ 1355.808920]  kvm_check_nested_events+0x1c/0x40 [kvm] 
+[ 1355.809396]  kvm_arch_vcpu_runnable+0x4e/0x190 [kvm]
+[ 1355.809892]  kvm_vcpu_check_block+0x4f/0x100 [kvm]
+[ 1355.811259]  kvm_vcpu_block+0x6b/0xa0 [kvm] 
 
-Fair enough, thanks for the review! I'll post v3 shortly.
+can occur due to kmap being called in non-sleepable (!TASK_RUNNING) context.
+The fix is to extend kvm_x86_ops->nested_ops.hv_timer_pending() to cover
+all events not already checked in kvm_arch_vcpu_is_runnable(), and then
+get rid of the annoying (and wrong) call to kvm_check_nested_events()
+from kvm_vcpu_check_block().
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
+Beware, this is not a complete fix, because kvm_guest_apic_has_interrupt()
+might still _read_ memory from non-sleepable context.  The fix here is
+probably to make kvm_arch_vcpu_is_runnable() return -EAGAIN, and in that
+case do a round of kvm_vcpu_check_block() polling in sleepable context.
+Nevertheless, it is a good start as it pushes the vmexit into vcpu_block().
 
+The series also does a small cleanup pass on kvm_vcpu_check_block(),
+removing KVM_REQ_UNHALT in favor of simply calling kvm_arch_vcpu_runnable()
+again.  Now that kvm_check_nested_events() is not called anymore by
+kvm_arch_vcpu_runnable(), it is much easier to see that KVM will never
+consume the event that caused kvm_vcpu_has_events() to return true,
+and therefore it is safe to evaluate it again.
+
+The alternative of propagating the return value of
+kvm_arch_vcpu_runnable() up to kvm_vcpu_{block,halt}() is inferior
+because it does not quite get right the edge cases where the vCPU becomes
+runnable right before schedule() or right after kvm_vcpu_check_block().
+While these edge cases are unlikely to truly matter in practice, it is
+also pointless to get them "wrong".
+
+v4:
+  - Make event request if INIT/SIPI is pending when GIF=>1 (SVM) and
+    on nested VM-Enter (VMX).
+  - Make an event request at VMXOFF iff it's necessary.
+  - Keep the INIT/SIPI pending vs. blocked checks separate (for the
+    above nSVM/nVMX fixes).
+  - Check the result of kvm_check_nested_events() in vcpu_block().
+  - Rename INIT/SIPI helpers (hopefully we'll eventually rename all of
+    the related collateral, e.g. "pending_events" is so misleading).
+  - Drop pending INIT/SIPI snaphsot to avoid creating weird, conflicting
+    code when kvm_check_nested_events() is called by vcpu_block().
+
+v3:
+  - https://lore.kernel.org/all/20220822170659.2527086-1-pbonzini@redhat.com
+  - do not propagate the return value of  kvm_arch_vcpu_runnable() up to
+    kvm_vcpu_{block,halt}()
+  - move and reformat the comment in vcpu_block()
+
+    move KVM_REQ_UNHALT removal last
+
+Paolo Bonzini (5):
+  KVM: x86: make vendor code check for all nested events
+  KVM: x86: lapic does not have to process INIT if it is blocked
+  KVM: x86: never write to memory from kvm_vcpu_check_block()
+  KVM: mips, x86: do not rely on KVM_REQ_UNHALT
+  KVM: remove KVM_REQ_UNHALT
+
+Sean Christopherson (7):
+  KVM: nVMX: Make an event request when pending an MTF nested VM-Exit
+  KVM: x86: Rename and expose helper to detect if INIT/SIPI are allowed
+  KVM: x86: Rename kvm_apic_has_events() to make it INIT/SIPI specific
+  KVM: SVM: Make an event request if INIT or SIPI is pending when GIF is
+    set
+  KVM: nVMX: Make an event request if INIT or SIPI is pending on
+    VM-Enter
+  KVM: nVMX: Make event request on VMXOFF iff INIT/SIPI is pending
+  KVM: x86: Don't snapshot pending INIT/SIPI prior to checking nested
+    events
+
+ Documentation/virt/kvm/vcpu-requests.rst | 28 +--------------
+ arch/arm64/kvm/arm.c                     |  1 -
+ arch/mips/kvm/emulate.c                  |  6 ++--
+ arch/powerpc/kvm/book3s_pr.c             |  1 -
+ arch/powerpc/kvm/book3s_pr_papr.c        |  1 -
+ arch/powerpc/kvm/booke.c                 |  1 -
+ arch/powerpc/kvm/powerpc.c               |  1 -
+ arch/riscv/kvm/vcpu_insn.c               |  1 -
+ arch/s390/kvm/kvm-s390.c                 |  2 --
+ arch/x86/include/asm/kvm_host.h          |  2 +-
+ arch/x86/kvm/lapic.c                     | 38 ++++++--------------
+ arch/x86/kvm/lapic.h                     |  9 ++++-
+ arch/x86/kvm/svm/svm.c                   |  3 +-
+ arch/x86/kvm/vmx/nested.c                | 33 +++++++++--------
+ arch/x86/kvm/vmx/vmx.c                   |  6 ++--
+ arch/x86/kvm/x86.c                       | 46 +++++++++++++++---------
+ arch/x86/kvm/x86.h                       |  5 ---
+ arch/x86/kvm/xen.c                       |  1 -
+ include/linux/kvm_host.h                 |  3 +-
+ virt/kvm/kvm_main.c                      |  4 +--
+ 20 files changed, 79 insertions(+), 113 deletions(-)
+
+
+base-commit: 5df50a4a9b60afba4dd2be76d0f0fb8ae8c9beab
 -- 
-Alexey
+2.37.3.968.ga6b4b080e4-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
