@@ -2,61 +2,62 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3709EC6FA90
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Sep 2022 00:32:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E08ECAAD8
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Sep 2022 00:33:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8CA04B7A7;
-	Wed, 21 Sep 2022 20:32:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 124CE4B6C5;
+	Wed, 21 Sep 2022 20:33:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SvxSPKzX+fnu; Wed, 21 Sep 2022 20:32:56 -0400 (EDT)
+	with ESMTP id ui1SXACHjVS4; Wed, 21 Sep 2022 20:33:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E7A24B655;
-	Wed, 21 Sep 2022 20:32:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E0EB4A105;
+	Wed, 21 Sep 2022 20:33:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 80FED4B27F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 20:32:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 242014B0B4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 20:33:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SAKBtn3hujCR for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Sep 2022 20:32:49 -0400 (EDT)
+ with ESMTP id LAz5FW2LNqdN for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Sep 2022 20:32:59 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 773B54B2B4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 20:32:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B45B74B712
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 20:32:59 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1663806769;
+ s=mimecast20190719; t=1663806779;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HvScjfkKuSDrLb00oYmoSVUq1hJaUCKKGbiWFg0bV0E=;
- b=Yc+753XlOnjmgHN7VNwrRmG6NVAc0xEWeEFjZX4UX+E5VgTa0a/kioF/Mb88jo6tohixys
- fY+7/dMTxfJyOvZAmcT5g4khuav+tE8MGEwZA6EQbq3FNobNNOWdRlyAqezxO1aKpWM39t
- hs4y6PvWuNeVAroHx3W7hHmlB1KipNE=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=4hBSESNIRTX2l3ycxY+A1LVUqR6O1lHB2wRbQ2GxcqA=;
+ b=Xm/M1Ys706n6WUMK1tINhv/m5q8hr4HCgd8Bc/4z7L46xrRWahtmPdi0SUkmXmi9RpKvOo
+ JDADYHGq1foZmUfrNJHOsSa/mOgqqRLhL9z0pGjvagnU2QnyS3LX1Rnhvg3lBUQRV6o9PE
+ de1HRI3Q2Y6Z0BiXQnPM56+/xk2w3U4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-522-P5m3G0UpMhWxIGxgITatpA-1; Wed, 21 Sep 2022 20:32:43 -0400
-X-MC-Unique: P5m3G0UpMhWxIGxgITatpA-1
+ us-mta-394-ZDDdQTb8NKCMN4Yg8wl7KA-1; Wed, 21 Sep 2022 20:32:54 -0400
+X-MC-Unique: ZDDdQTb8NKCMN4Yg8wl7KA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
  [10.11.54.6])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8F88F1C14B68;
- Thu, 22 Sep 2022 00:32:42 +0000 (UTC)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C351F811E87;
+ Thu, 22 Sep 2022 00:32:53 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-126.bne.redhat.com [10.64.54.126])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F3162166B26;
- Thu, 22 Sep 2022 00:32:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 05E482166B26;
+ Thu, 22 Sep 2022 00:32:48 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v3 3/6] KVM: arm64: Enable ring-based dirty memory tracking
-Date: Thu, 22 Sep 2022 08:32:11 +0800
-Message-Id: <20220922003214.276736-4-gshan@redhat.com>
+Subject: [PATCH v3 5/6] KVM: selftests: Clear dirty ring states between two
+ modes in dirty_log_test
+Date: Thu, 22 Sep 2022 08:32:13 +0800
+Message-Id: <20220922003214.276736-6-gshan@redhat.com>
 In-Reply-To: <20220922003214.276736-1-gshan@redhat.com>
 References: <20220922003214.276736-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -81,83 +82,159 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This enables the ring-based dirty memory tracking on ARM64. The
-feature is configured by CONFIG_HAVE_KVM_DIRTY_RING, detected and
-enabled by KVM_CAP_DIRTY_LOG_RING. A ring buffer is created on every
-VCPU when the feature is enabled. Each entry in the ring buffer is
-described by 'struct kvm_dirty_gfn'.
+There are two states, which need to be cleared before next mode
+is executed. Otherwise, we will hit failure as the following messages
+indicate.
 
-A ring buffer entry is pushed when a page becomes dirty on host,
-and pulled by userspace after the ring buffer is mapped at physical
-page offset KVM_DIRTY_LOG_PAGE_OFFSET. The specific VCPU is enforced
-to exit if its ring buffer becomes softly full. Besides, the ring
-buffer can be reset by ioctl command KVM_RESET_DIRTY_RINGS to release
-those pulled ring buffer entries.
+- The variable 'dirty_ring_vcpu_ring_full' shared by main and vcpu
+  thread. It's indicating if the vcpu exit due to full ring buffer.
+  The value can be carried from previous mode (VM_MODE_P40V48_4K) to
+  current one (VM_MODE_P40V48_64K) when VM_MODE_P40V48_16K isn't
+  supported.
+
+- The current ring buffer index needs to be reset before next mode
+  (VM_MODE_P40V48_64K) is executed. Otherwise, the stale value is
+  carried from previous mode (VM_MODE_P40V48_4K).
+
+  # ./dirty_log_test -M dirty-ring
+  Setting log mode to: 'dirty-ring'
+  Test iterations: 32, interval: 10 (ms)
+  Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
+  guest physical test memory offset: 0xffbfffc000
+    :
+  Dirtied 995328 pages
+  Total bits checked: dirty (1012434), clear (7114123), track_next (966700)
+  Testing guest mode: PA-bits:40,  VA-bits:48, 64K pages
+  guest physical test memory offset: 0xffbffc0000
+  vcpu stops because vcpu is kicked out...
+  vcpu continues now.
+  Notifying vcpu to continue
+  Iteration 1 collected 0 pages
+  vcpu stops because dirty ring is full...
+  vcpu continues now.
+  vcpu stops because dirty ring is full...
+  vcpu continues now.
+  vcpu stops because dirty ring is full...
+  ==== Test Assertion Failure ====
+  dirty_log_test.c:369: cleared == count
+  pid=10541 tid=10541 errno=22 - Invalid argument
+     1	0x0000000000403087: dirty_ring_collect_dirty_pages at dirty_log_test.c:369
+     2	0x0000000000402a0b: log_mode_collect_dirty_pages at dirty_log_test.c:492
+     3	 (inlined by) run_test at dirty_log_test.c:795
+     4	 (inlined by) run_test at dirty_log_test.c:705
+     5	0x0000000000403a37: for_each_guest_mode at guest_modes.c:100
+     6	0x0000000000401ccf: main at dirty_log_test.c:938
+     7	0x0000ffff9ecd279b: ?? ??:0
+     8	0x0000ffff9ecd286b: ?? ??:0
+     9	0x0000000000401def: _start at ??:?
+  Reset dirty pages (0) mismatch with collected (35566)
+
+Fix the issues by clearing 'dirty_ring_vcpu_ring_full' and the ring
+buffer index before next new mode is to be executed.
 
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- Documentation/virt/kvm/api.rst    | 2 +-
- arch/arm64/include/uapi/asm/kvm.h | 1 +
- arch/arm64/kvm/Kconfig            | 1 +
- arch/arm64/kvm/arm.c              | 8 ++++++++
- 4 files changed, 11 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/dirty_log_test.c | 27 ++++++++++++--------
+ 1 file changed, 17 insertions(+), 10 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index abd7c32126ce..19fa1ac017ed 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8022,7 +8022,7 @@ regardless of what has actually been exposed through the CPUID leaf.
- 8.29 KVM_CAP_DIRTY_LOG_RING
- ---------------------------
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index 9c883c94d478..7d91df7e036f 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -225,13 +225,15 @@ static void clear_log_create_vm_done(struct kvm_vm *vm)
+ }
  
--:Architectures: x86
-+:Architectures: x86, arm64
- :Parameters: args[0] - size of the dirty log ring
+ static void dirty_log_collect_dirty_pages(struct kvm_vcpu *vcpu, int slot,
+-					  void *bitmap, uint32_t num_pages)
++					  void *bitmap, uint32_t num_pages,
++					  uint32_t *unused)
+ {
+ 	kvm_vm_get_dirty_log(vcpu->vm, slot, bitmap);
+ }
  
- KVM is capable of tracking dirty memory using ring buffers that are
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 316917b98707..a7a857f1784d 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -43,6 +43,7 @@
- #define __KVM_HAVE_VCPU_EVENTS
+ static void clear_log_collect_dirty_pages(struct kvm_vcpu *vcpu, int slot,
+-					  void *bitmap, uint32_t num_pages)
++					  void *bitmap, uint32_t num_pages,
++					  uint32_t *unused)
+ {
+ 	kvm_vm_get_dirty_log(vcpu->vm, slot, bitmap);
+ 	kvm_vm_clear_dirty_log(vcpu->vm, slot, bitmap, 0, num_pages);
+@@ -327,10 +329,9 @@ static void dirty_ring_continue_vcpu(void)
+ }
  
- #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
-+#define KVM_DIRTY_LOG_PAGE_OFFSET 64
+ static void dirty_ring_collect_dirty_pages(struct kvm_vcpu *vcpu, int slot,
+-					   void *bitmap, uint32_t num_pages)
++					   void *bitmap, uint32_t num_pages,
++					   uint32_t *ring_buf_idx)
+ {
+-	/* We only have one vcpu */
+-	static uint32_t fetch_index = 0;
+ 	uint32_t count = 0, cleared;
+ 	bool continued_vcpu = false;
  
- #define KVM_REG_SIZE(id)						\
- 	(1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 815cc118c675..0309b2d0f2da 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -32,6 +32,7 @@ menuconfig KVM
- 	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
-+	select HAVE_KVM_DIRTY_RING
- 	select HAVE_KVM_MSI
- 	select HAVE_KVM_IRQCHIP
- 	select HAVE_KVM_IRQ_ROUTING
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 2ff0ef62abad..76816f8e082b 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -747,6 +747,14 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+@@ -347,7 +348,8 @@ static void dirty_ring_collect_dirty_pages(struct kvm_vcpu *vcpu, int slot,
  
- 		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
- 			return kvm_vcpu_suspend(vcpu);
-+
-+		if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
-+		    kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
-+			kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
-+			vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
-+			trace_kvm_dirty_ring_exit(vcpu);
-+			return 0;
-+		}
- 	}
+ 	/* Only have one vcpu */
+ 	count = dirty_ring_collect_one(vcpu_map_dirty_ring(vcpu),
+-				       slot, bitmap, num_pages, &fetch_index);
++				       slot, bitmap, num_pages,
++				       ring_buf_idx);
  
- 	return 1;
+ 	cleared = kvm_vm_reset_dirty_ring(vcpu->vm);
+ 
+@@ -404,7 +406,8 @@ struct log_mode {
+ 	void (*create_vm_done)(struct kvm_vm *vm);
+ 	/* Hook to collect the dirty pages into the bitmap provided */
+ 	void (*collect_dirty_pages) (struct kvm_vcpu *vcpu, int slot,
+-				     void *bitmap, uint32_t num_pages);
++				     void *bitmap, uint32_t num_pages,
++				     uint32_t *ring_buf_idx);
+ 	/* Hook to call when after each vcpu run */
+ 	void (*after_vcpu_run)(struct kvm_vcpu *vcpu, int ret, int err);
+ 	void (*before_vcpu_join) (void);
+@@ -469,13 +472,14 @@ static void log_mode_create_vm_done(struct kvm_vm *vm)
+ }
+ 
+ static void log_mode_collect_dirty_pages(struct kvm_vcpu *vcpu, int slot,
+-					 void *bitmap, uint32_t num_pages)
++					 void *bitmap, uint32_t num_pages,
++					 uint32_t *ring_buf_idx)
+ {
+ 	struct log_mode *mode = &log_modes[host_log_mode];
+ 
+ 	TEST_ASSERT(mode->collect_dirty_pages != NULL,
+ 		    "collect_dirty_pages() is required for any log mode!");
+-	mode->collect_dirty_pages(vcpu, slot, bitmap, num_pages);
++	mode->collect_dirty_pages(vcpu, slot, bitmap, num_pages, ring_buf_idx);
+ }
+ 
+ static void log_mode_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
+@@ -694,6 +698,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	struct kvm_vcpu *vcpu;
+ 	struct kvm_vm *vm;
+ 	unsigned long *bmap;
++	uint32_t ring_buf_idx = 0;
+ 
+ 	if (!log_mode_supported()) {
+ 		print_skip("Log mode '%s' not supported",
+@@ -769,6 +774,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	host_dirty_count = 0;
+ 	host_clear_count = 0;
+ 	host_track_next_count = 0;
++	WRITE_ONCE(dirty_ring_vcpu_ring_full, false);
+ 
+ 	pthread_create(&vcpu_thread, NULL, vcpu_worker, vcpu);
+ 
+@@ -776,7 +782,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 		/* Give the vcpu thread some time to dirty some pages */
+ 		usleep(p->interval * 1000);
+ 		log_mode_collect_dirty_pages(vcpu, TEST_MEM_SLOT_INDEX,
+-					     bmap, host_num_pages);
++					     bmap, host_num_pages,
++					     &ring_buf_idx);
+ 
+ 		/*
+ 		 * See vcpu_sync_stop_requested definition for details on why
 -- 
 2.23.0
 
