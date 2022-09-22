@@ -2,65 +2,92 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0C0AC54EE9
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Sep 2022 12:18:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76C71C6FA82
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Sep 2022 14:52:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D3D2408AB;
-	Thu, 22 Sep 2022 08:18:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E63684B133;
+	Thu, 22 Sep 2022 10:52:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0zmzPhiq47VE; Thu, 22 Sep 2022 08:18:37 -0400 (EDT)
+	with ESMTP id uGTX5qHAaMcN; Thu, 22 Sep 2022 10:52:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CCF69410FF;
-	Thu, 22 Sep 2022 08:18:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4423410DA;
+	Thu, 22 Sep 2022 10:52:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED670404CD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 08:18:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D46640E00
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 10:52:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Lg1oXVqRKxUx for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Sep 2022 08:18:35 -0400 (EDT)
+ with ESMTP id hu88XfGfaIe0 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Sep 2022 10:52:18 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9EC8B402A9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 08:18:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E3C440D05
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 10:52:18 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id ED2A260BBE;
- Thu, 22 Sep 2022 12:18:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF931C433D6;
- Thu, 22 Sep 2022 12:18:33 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 7331E611B6;
+ Thu, 22 Sep 2022 14:52:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9AAFC433C1;
+ Thu, 22 Sep 2022 14:52:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1663849114;
- bh=hBJ1HPUqhMSz2ZLzOLvEDQZTDuUwhJ1yHQTFU2MtdkE=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=ey5/yqCA/Obq8UW1iMxX0mTx1fQ1T1i6LQx696s14gNvD4Gh11nAVNOHNSmYdbe0C
- fO28jPXuELpnPy+oJ1UjORnwyS5FNUsLCfoXCGHs7TQUuJijAepSLu0Z/U0NtZl9Pw
- dOWBEOZ83Q72oA82EtRKkQNFdbyWZ6U6SozwMxXfwgu2D8OEolmxPyutjaqS48c/Ls
- Q7ymzVuzWucih5WybLK4ZNhAWxw6w4ete8e5UdXSTGAPGP0CZk1AVh3xM4+SxuKB9n
- vJL0YsPFeI8WHsgsEyEE4LOyplDr/R/NViJKIlHTWaLNAQoLJEGKFWTDKpmrmzlwt8
- rGUIulJwxwRyw==
-Date: Thu, 22 Sep 2022 13:18:30 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 3/7] arm64/fpsimd: Have KVM explicitly say which FP
- registers to save
-Message-ID: <YyxSloe6PBV1EuI1@sirena.org.uk>
-References: <20220815225529.930315-1-broonie@kernel.org>
- <20220815225529.930315-4-broonie@kernel.org>
- <87wn9yj5l0.wl-maz@kernel.org> <YyoHUS0ZPQvvjrte@sirena.org.uk>
- <87leqck4ba.wl-maz@kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <87leqck4ba.wl-maz@kernel.org>
-X-Cookie: One FISHWICH coming up!!
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Zhang Lei <zhang.lei@jp.fujitsu.com>, Andre Przywara <andre.przywara@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ s=k20201202; t=1663858336;
+ bh=tkVhQS5r5tVWh16xu4W/ZGrYTjLV+TqBvfWmPvEnTF4=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=e9AaOObvyNNj/cdfSr42I/rhwcDAbQOqFESDYbOhzkFgwlBi4DMpqTpdvC3Hk7eSG
+ 8JtCNFIcxy+P5g8Vi5K5802VFHv1GK5QvEAwgXWrvOFIZYGB6qm/Ll3PbGaEKLr6qf
+ t0sJMeEOdwdp139kVunkNJwmx6+LlwMpQUez6rF4YJnlVQaZOEgjGSuXYa+aWI5xtU
+ C5t+2gCTWIB01NrfVUX6F/6t5aeEPcyNz2ypinshWU7uVJyxysyCjA5nZ9JVHB7G2n
+ L12MEXCShINf0EkFa2x6XCIOd6Ebs1W0F5Ro1Znx5PVWUqsQqu+FgPWHifG5255ZUD
+ zH6XNvcQk3Bww==
+Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1obNYk-00BvuF-Gf;
+ Thu, 22 Sep 2022 15:52:14 +0100
+Date: Thu, 22 Sep 2022 15:52:12 +0100
+Message-ID: <87fsgjjwbn.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v4 12/12] KVM: remove KVM_REQ_UNHALT
+In-Reply-To: <20220921003201.1441511-13-seanjc@google.com>
+References: <20220921003201.1441511-1-seanjc@google.com>
+ <20220921003201.1441511-13-seanjc@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.176.101.241
+X-SA-Exim-Rcpt-To: seanjc@google.com, pbonzini@redhat.com,
+ chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org,
+ paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+ borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
+ james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ oliver.upton@linux.dev, atishp@atishpatra.org, david@redhat.com,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ mlevitsk@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, linux-kernel@vger.kernel.org,
+ linux-riscv@lists.infradead.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ kvmarm@lists.cs.columbia.edu, Janosch Frank <frankja@linux.ibm.com>,
+ Huacai Chen <chenhuacai@kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Atish Patra <atishp@atishpatra.org>,
+ linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
+ Paolo Bonzini <pbonzini@redhat.com>, linuxppc-dev@lists.ozlabs.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,102 +99,31 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============8267725324392040735=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Wed, 21 Sep 2022 01:32:01 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> From: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> KVM_REQ_UNHALT is now unnecessary because it is replaced by the return
+> value of kvm_vcpu_block/kvm_vcpu_halt.  Remove it.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
---===============8267725324392040735==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="wyErPB4wFLKJM+lG"
-Content-Disposition: inline
+Acked-by: Marc Zyngier <maz@kernel.org>
 
+	M.
 
---wyErPB4wFLKJM+lG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Wed, Sep 21, 2022 at 06:47:21PM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
-
-> > It means that using FP_STATE_TASK as a value for the fp_type
-> > member of the task struck recording what type of state is
-> > currently stored for the task is not valid, one of the other two
-> > values representing what was actually saved must be chosen.
-
-> Then this definitely represents something else, and shouldn't be a
-> state or a type, whatever you decide to call it in the end. There is
-> the state of the FP/SVE unit, and what some piece of SW wants to
-> save. They match in some cases, and differ in other (the TASK
-> value). I'd rather you encode them as them as different types to lift
-> the ambiguity.
-
-I did try the other way as well and found it was creating it's
-own problems - you end up with two almost identical enums which
-need to be separately named in some meaningful yet not
-excessively verbose fashion and have to remember which one to use
-in which context.
-
-> > > OK, how many discrete arguments are we going to pass to this function,
-> > > which most of them are part the vcpu structure? It really feels like
-> > > what you want is a getter for the per-cpu structure, and let the KVM
-> > > code do the actual business. If this function was supposed to provide
-> > > some level of abstraction, well, it's a fail.
-
-> > I agree that this is not an ideal interface, I am merely
-> > following the previously chosen idiom since I haven't been able
-> > to figure out why we were doing it in the first place and with a
-> > lot of these things it turns out that there's some actual reason.
-
-> Huh. If we're changing anything around this code, we'd better
-> understand what we are doing...
-
-I'm confident I understand well enough what it's doing, I'm just
-really unclear on why it's written the way it is.
-
-> > It's not even like fpsimd_bind_task_to_cpu() has ever been
-> > written in terms of this function, there's two parallel
-> > implementations.  My best guess was that it was some combination
-> > of not peering at KVM internals and keeping struct
-> > fpsimd_last_state_struct internal to fpsimd.c (since we're
-> > effectively just passing one of those in in a more verbose form)
-> > but never anything solid enough to be sure.
-
-> Up to you, but adding extra parameters to this function really feels
-> like the wrong thing to do.
-
-Indeed, I'm not a big fan myself.  I also don't want to get this
-and some other work I'm doing tied up on stylistic improvements
-to what's already there which seem likely introduce additional
-iterations - I'd rather loop back on this as a separate thing
-later.
-
---wyErPB4wFLKJM+lG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmMsUpMACgkQJNaLcl1U
-h9Dn8gf/VXKjeCwKtmtAjAoJnje8QrNnDTHn4XyuLl38b5Lf/pTDzFgxT6GsPJ8j
-OZh+t/1oF/KZ+aPm+wjK7P40Kw8b52KfrFAQuASp7rvjgTm0lqdLEgpcEz0pzeAX
-L4F+vLnvA3e9OCoH+4vUyxEm/1xkY4TECVya3x1Wx9Q04pC9rOKnstUUNkJgpIdP
-Wm3J62WcPYP6gJjgJM+78ylGfTo4c6Vle7MBzmykP4eo7RMpC4rMPP/bqoK+M6KS
-/OXmJm7Ob2j5prCDZt0AQJAqQX/BUHN8z2uqC8+p7m0VOHNXpKwngh5UkIk4k214
-AWZABBMTJSObu1JeBHW8x89OoFiw5Q==
-=VaNg
------END PGP SIGNATURE-----
-
---wyErPB4wFLKJM+lG--
-
---===============8267725324392040735==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============8267725324392040735==--
