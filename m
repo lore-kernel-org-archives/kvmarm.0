@@ -2,80 +2,66 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C0BECAAD8
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Sep 2022 17:47:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C437AECAAD8
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Sep 2022 00:32:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3AF54B77F;
-	Wed, 21 Sep 2022 13:47:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B5694B601;
+	Wed, 21 Sep 2022 20:32:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eWX7FRTTv9Cs; Wed, 21 Sep 2022 13:47:30 -0400 (EDT)
+	with ESMTP id njQX9aXT6VID; Wed, 21 Sep 2022 20:32:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73EFD4B752;
-	Wed, 21 Sep 2022 13:47:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B20494B105;
+	Wed, 21 Sep 2022 20:32:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E4FF4B64F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 13:47:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8A8C4B105
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 20:32:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xKOGhPpANCDX for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Sep 2022 13:47:28 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 111A14B2B4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 13:47:28 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id 4f0eTjmEnAN1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Sep 2022 20:32:29 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DFFC4B0B4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 20:32:29 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1663806749;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ccbp8BD4kcBiFdBToxQRh5neaOCPlEmQcd7egl4H6S4=;
+ b=E0RK1mm0+9AozkXhWJceX4js5h2voxPnDCMRPxTtR4gdrgrNmwqfwfXmDUsPsh1ilFOiEO
+ 2jz0dJv6JWslAOVFWPnhdfCPzU5QzTvFJRgwRgnvPLADHnDI0++4DF2Pez++JhoUN3vAET
+ j0e3k2KOQmTTmHRi1WuRn4MqvBAPeN0=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-534-HcF3MiBoNYefjnk5N_Icpw-1; Wed, 21 Sep 2022 20:32:25 -0400
+X-MC-Unique: HcF3MiBoNYefjnk5N_Icpw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.6])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 854DEB82892;
- Wed, 21 Sep 2022 17:47:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2841CC433D6;
- Wed, 21 Sep 2022 17:47:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1663782445;
- bh=PA8aNMshIO9eu3SX73FrQHs+BvNP8ZcEiOhWgbPWNyU=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=fO83c5LGV3Vi/Laur8vGFBAhClwTILYXi8npuCsfy0XPxyFkgAfFviJgH1q6nHx0f
- Bgz64sWHvwZCy6GHD+rtBxSFfUzfSkCEiKC6xKTVzmKikPCR/0FYpxbS+HFW2aGFTH
- hBAkK5zxZWyk3m9FObM4SCCsO8MjsJUYgwPEHVtubv/gDxW6OAGlDXyTCeW363s17Z
- GvZoLlANi8+SnCrdjoTbP+3Y5/0rWzXmp0o776BK/X2pqkZsUelN87l4kfKj+v8E5D
- s0UTvbEnP+KerT+mOD2ICK3002lAQrEJXFt90X5JdApRsOSboE+xe3w+BRi/MW02v8
- VqZXNJPezr6Dw==
-Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1ob3og-00BjUP-VW;
- Wed, 21 Sep 2022 18:47:23 +0100
-Date: Wed, 21 Sep 2022 18:47:21 +0100
-Message-ID: <87leqck4ba.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 3/7] arm64/fpsimd: Have KVM explicitly say which FP
- registers to save
-In-Reply-To: <YyoHUS0ZPQvvjrte@sirena.org.uk>
-References: <20220815225529.930315-1-broonie@kernel.org>
- <20220815225529.930315-4-broonie@kernel.org>
- <87wn9yj5l0.wl-maz@kernel.org> <YyoHUS0ZPQvvjrte@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.176.101.241
-X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
- zhang.lei@jp.fujitsu.com, james.morse@arm.com, alexandru.elisei@arm.com,
- andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Zhang Lei <zhang.lei@jp.fujitsu.com>, Andre Przywara <andre.przywara@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C388C1C14B65;
+ Thu, 22 Sep 2022 00:32:24 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-126.bne.redhat.com [10.64.54.126])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 61FEF2166B26;
+ Thu, 22 Sep 2022 00:32:18 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v3 0/6] KVM: arm64: Enable ring-based dirty memory tracking
+Date: Thu, 22 Sep 2022 08:32:08 +0800
+Message-Id: <20220922003214.276736-1-gshan@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
+ andrew.jones@linux.dev, will@kernel.org, shan.gavin@gmail.com,
+ catalin.marinas@arm.com, dmatlack@google.com, pbonzini@redhat.com,
+ zhenyzha@redhat.com, shuah@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,80 +78,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 20 Sep 2022 19:32:49 +0100,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> [1  <text/plain; us-ascii (quoted-printable)>]
-> On Tue, Sep 20, 2022 at 06:52:59PM +0100, Marc Zyngier wrote:
-> > On Mon, 15 Aug 2022 23:55:25 +0100,
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > >  enum fp_state {
-> > > +	FP_STATE_TASK,		/* Save based on current, invalid as fp_type */
-> 
-> > How is that related to the FP_TYPE_TASK in the commit message? What
-> 
-> TYPE in the commit message should be STATE.
-> 
-> > does this 'invalid as fp_type' mean?
-> 
-> It means that using FP_STATE_TASK as a value for the fp_type
-> member of the task struck recording what type of state is
-> currently stored for the task is not valid, one of the other two
-> values representing what was actually saved must be chosen.
+This series enables the ring-based dirty memory tracking for ARM64.
+The feature has been available and enabled on x86 for a while. It
+is beneficial when the number of dirty pages is small in a checkpointing
+system or live migration scenario. More details can be found from
+fb04a1eddb1a ("KVM: X86: Implement ring-based dirty memory tracking").
 
-Then this definitely represents something else, and shouldn't be a
-state or a type, whatever you decide to call it in the end. There is
-the state of the FP/SVE unit, and what some piece of SW wants to
-save. They match in some cases, and differ in other (the TASK
-value). I'd rather you encode them as them as different types to lift
-the ambiguity.
+The generic part has been comprehensive, meaning there isn't too much
+work, needed to extend it to ARM64.
 
-> 
-> > > +	/*
-> > > +	 * For now we're just validating that the requested state is
-> > > +	 * consistent with what we'd otherwise work out.
-> 
-> > Nit: work out? or worked out? the "we'd" doesn't help disambiguate it
-> > for a non-native speaker.
-> 
-> we'd == we would so work out to match the tense.
-> 
-> > >  void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
-> > >  			      unsigned int sve_vl, void *za_state,
-> > >  			      unsigned int sme_vl, u64 *svcr,
-> > > -			      enum fp_state *type)
-> > > +			      enum fp_state *type, enum fp_state to_save)
-> 
-> > OK, how many discrete arguments are we going to pass to this function,
-> > which most of them are part the vcpu structure? It really feels like
-> > what you want is a getter for the per-cpu structure, and let the KVM
-> > code do the actual business. If this function was supposed to provide
-> > some level of abstraction, well, it's a fail.
-> 
-> I agree that this is not an ideal interface, I am merely
-> following the previously chosen idiom since I haven't been able
-> to figure out why we were doing it in the first place and with a
-> lot of these things it turns out that there's some actual reason.
+  PATCH[1]   introduces KVM_REQ_RING_SOFT_FULL for x86
+  PATCH[2]   moves declaration of kvm_cpu_dirty_log_size()
+  PATCH[3]   enables the feature on ARM64
+  PATCH[4-6] improves kvm/selftests/dirty_log_test
 
-Huh. If we're changing anything around this code, we'd better
-understand what we are doing...
+v2: https://lore.kernel.org/lkml/YyiV%2Fl7O23aw5aaO@xz-m1.local/T/
+v1: https://lore.kernel.org/lkml/20220819005601.198436-1-gshan@redhat.com
 
-> It's not even like fpsimd_bind_task_to_cpu() has ever been
-> written in terms of this function, there's two parallel
-> implementations.  My best guess was that it was some combination
-> of not peering at KVM internals and keeping struct
-> fpsimd_last_state_struct internal to fpsimd.c (since we're
-> effectively just passing one of those in in a more verbose form)
-> but never anything solid enough to be sure.
+Testing
+=======
+(1) kvm/selftests/dirty_log_test
+(2) Live migration by QEMU
 
-Up to you, but adding extra parameters to this function really feels
-like the wrong thing to do.
+Changelog
+=========
+v3:
+  * Check KVM_REQ_RING_SOFT_RULL inside kvm_request_pending()  (Peter)
+  * Move declaration of kvm_cpu_dirty_log_size()               (test-robot)
+v2:
+  * Introduce KVM_REQ_RING_SOFT_FULL                           (Marc)
+  * Changelog improvement                                      (Marc)
+  * Fix dirty_log_test without knowing host page size          (Drew)
 
-	M.
+Gavin Shan (6):
+  KVM: x86: Introduce KVM_REQ_RING_SOFT_FULL
+  KVM: x86: Move declaration of kvm_cpu_dirty_log_size() to
+    kvm_dirty_ring.h
+  KVM: arm64: Enable ring-based dirty memory tracking
+  KVM: selftests: Use host page size to map ring buffer in
+    dirty_log_test
+  KVM: selftests: Clear dirty ring states between two modes in
+    dirty_log_test
+  KVM: selftests: Automate choosing dirty ring size in dirty_log_test
+
+ Documentation/virt/kvm/api.rst               |  2 +-
+ arch/arm64/include/uapi/asm/kvm.h            |  1 +
+ arch/arm64/kvm/Kconfig                       |  1 +
+ arch/arm64/kvm/arm.c                         |  8 +++
+ arch/x86/include/asm/kvm_host.h              |  2 -
+ arch/x86/kvm/mmu/mmu.c                       |  2 +
+ arch/x86/kvm/x86.c                           | 19 +++----
+ include/linux/kvm_dirty_ring.h               |  1 +
+ include/linux/kvm_host.h                     |  1 +
+ tools/testing/selftests/kvm/dirty_log_test.c | 53 ++++++++++++++------
+ tools/testing/selftests/kvm/lib/kvm_util.c   |  2 +-
+ virt/kvm/dirty_ring.c                        |  4 ++
+ 12 files changed, 69 insertions(+), 27 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.23.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
