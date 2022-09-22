@@ -2,79 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 883EBC6FA91
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Sep 2022 09:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED6AC6FA8B
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Sep 2022 10:38:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1402E40DAE;
-	Thu, 22 Sep 2022 05:53:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19C8D41294;
+	Thu, 22 Sep 2022 06:38:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@chromium.org
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3nHsDc9JXMtS; Thu, 22 Sep 2022 05:53:09 -0400 (EDT)
+	with ESMTP id 0zHDjfy2csaL; Thu, 22 Sep 2022 06:38:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A26143C8C;
-	Thu, 22 Sep 2022 05:53:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FFB6412AF;
+	Thu, 22 Sep 2022 06:38:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DB61410F3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 01:32:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 335654120D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 06:38:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9X3lzmC0zQvs for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Sep 2022 01:32:55 -0400 (EDT)
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com
- [209.85.216.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A459440AF2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 01:32:55 -0400 (EDT)
-Received: by mail-pj1-f42.google.com with SMTP id go6so8681136pjb.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Sep 2022 22:32:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=content-transfer-encoding:mime-version:references:in-reply-to
- :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
- bh=eaz6ZZzobVs4ZGOrwYHQM/Kk9ITDhPdxEg8Bt1PkbOo=;
- b=gp1syXD960EDwksWcE/cXsJC6FBR/7T41asUdURa6KbF0WHbYvX/7JgyZkJnR31xSW
- R2QN4ser1APqmuvLWX5c8pdcbH/HbZE40zup5CLKwRM9kbiBNW5PyqcUthnYUF2uQzro
- 3+082TC7dgU7d9QVdJdjgUL9PoeIRL0iJy1x0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=content-transfer-encoding:mime-version:references:in-reply-to
- :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
- :subject:date;
- bh=eaz6ZZzobVs4ZGOrwYHQM/Kk9ITDhPdxEg8Bt1PkbOo=;
- b=lrhyv2DsSsKeTp2aak3OxTtSp/3XoGS002cVpMFcBfjZbU0gzFM0rvmPDOPmPvl+Us
- +KLhdEnPsjoNlBrMRQUvIyGBhBJTdDcCwpiWT45t/MO61qrc0LNBuDAWP0Q9YSKQcVTd
- XXNCCMFKT9GNaYyxbu94XgT6SK3LZka5LvVOUmMHyKWWt5nsZzdQTzl0GhHFETfz5zzo
- liUGushpsQGeLFRIpg54ybkQb/OQUhcsnFTkhPzkRe5RVOgnzUL3t0SdMscPBpmTJ1iE
- f5vFAk/RmNNqj019PSj/kGFtu2uyYyGz0V5qgn7LfXeTFsD9Slcvx+qqqu2uQCI/bjsv
- vewg==
-X-Gm-Message-State: ACrzQf343TQ+NYtmUxPdXBZxRhAdgxIDQjvArNOBZiiaV0JNn/vwHANz
- JN0+ztakDTMnU7txC5QfX9N+cQ==
-X-Google-Smtp-Source: AMsMyM7HqZ7Z3byol1GnlGc5Fi7MDzpmzIZjyH6g+1U93zDQm5u+l5l7g/ZrmPjsCSBhDGWebRc+FQ==
-X-Received: by 2002:a17:903:41cb:b0:178:36c2:a98 with SMTP id
- u11-20020a17090341cb00b0017836c20a98mr1553573ple.47.1663824774600; 
- Wed, 21 Sep 2022 22:32:54 -0700 (PDT)
-Received: from localhost ([2620:15c:2ce:200:5e9f:5b94:af12:8e6d])
- by smtp.gmail.com with UTF8SMTPSA id
- m1-20020a170902bb8100b0016d5b7fb02esm2984746pls.60.2022.09.21.22.32.53
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 21 Sep 2022 22:32:54 -0700 (PDT)
-From: Denis Nikitin <denik@chromium.org>
-To: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>
-Subject: [PATCH v2] KVM: arm64: nvhe: Fix build with profile optimization
-Date: Wed, 21 Sep 2022 22:31:45 -0700
-Message-Id: <20220922053145.944786-1-denik@chromium.org>
-X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-In-Reply-To: <20220920082005.2459826-1-denik@chromium.org>
+ with ESMTP id VY6uJUZzLF+z for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Sep 2022 06:38:02 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 663CE40D86
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 06:38:02 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id A5A23B835BC;
+ Thu, 22 Sep 2022 10:38:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DF09C433D6;
+ Thu, 22 Sep 2022 10:37:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1663843079;
+ bh=xgmLw7d4PE2k0XeJU9Rnum0/i9pq4y604yrZhPEmnuk=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=QeHYxLtVg98xO9Y+iSy4BPTafwdVMe0uKgoanxKK/iwKumJ+bh9zB8QDyNmQMnwJ/
+ otXRniCKuGbasENbzAYabZLD1/T0Wi1lf6LK5yA6e9ff4T8iA5GB6Q5Pmm8kFRtoxF
+ VRf04HcGjyyGER3VdOSa8TjqjX8XbrCxFYj9X1NkldLFSyJrz0rDqg1dOGfW2GIc3D
+ EGhmWg4IzA4IOo8iLID2pqd6GQgGpoyf0CNbQoNogzoiMab8cPtujyxAhA3XPey+C9
+ MJo5EfLEmLVYC09hOKBGHsvqGYMQIIFCdxG7BwWvZc23+z8y98PUMJNpycLOt1G5z9
+ n6/Lajas+8W+g==
+Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1obJae-00BsHQ-W9;
+ Thu, 22 Sep 2022 11:37:57 +0100
+Date: Thu, 22 Sep 2022 11:37:55 +0100
+Message-ID: <87h70zk83g.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Denis Nikitin <denik@chromium.org>
+Subject: Re: [PATCH v2] KVM: arm64: nvhe: Fix build with profile optimization
+In-Reply-To: <20220922053145.944786-1-denik@chromium.org>
 References: <20220920082005.2459826-1-denik@chromium.org>
-MIME-Version: 1.0
-X-Mailman-Approved-At: Thu, 22 Sep 2022 05:53:07 -0400
-Cc: Denis Nikitin <denik@chromium.org>,
+ <20220922053145.944786-1-denik@chromium.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.176.101.241
+X-SA-Exim-Rcpt-To: denik@chromium.org, catalin.marinas@arm.com, will@kernel.org,
+ james.morse@arm.com, alexandru.elisei@arm.com, ndesaulniers@google.com,
+ manojgupta@google.com, dbrazdil@google.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
  Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
- Manoj Gupta <manojgupta@google.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ Manoj Gupta <manojgupta@google.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,44 +91,108 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Kernel build with clang and KCFLAGS=-fprofile-sample-use fails with:
+On Thu, 22 Sep 2022 06:31:45 +0100,
+Denis Nikitin <denik@chromium.org> wrote:
+> 
+> Kernel build with clang and KCFLAGS=-fprofile-sample-use fails with:
+> 
+> error: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.tmp.o: Unexpected SHT_REL
+> section ".rel.llvm.call-graph-profile"
+> 
+> Starting from 13.0.0 llvm can generate SHT_REL section, see
+> https://reviews.llvm.org/rGca3bdb57fa1ac98b711a735de048c12b5fdd8086.
+> gen-hyprel does not support SHT_REL relocation section.
+> 
+> Remove ".llvm.call-graph-profile" SHT_REL relocation from kvm_nvhe
+> to fix the build.
+> 
+> Signed-off-by: Denis Nikitin <denik@chromium.org>
+> ---
+> V1 -> V2: Remove the relocation instead of disabling the profile-use flags.
+> ---
+>  arch/arm64/kvm/hyp/nvhe/Makefile | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index b5c5119c7396..49ec950ac57b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -78,8 +78,10 @@ $(obj)/kvm_nvhe.o: $(obj)/kvm_nvhe.rel.o FORCE
+>  
+>  # The HYPREL command calls `gen-hyprel` to generate an assembly file with
+>  # a list of relocations targeting hyp code/data.
+> +# Starting from 13.0.0 llvm emits SHT_REL section '.llvm.call-graph-profile'
+> +# when profile optimization is applied. gen-hyprel does not support SHT_REL.
+>  quiet_cmd_hyprel = HYPREL  $@
+> -      cmd_hyprel = $(obj)/gen-hyprel $< > $@
+> +	cmd_hyprel = $(OBJCOPY) -R .llvm.call-graph-profile $<; $(obj)/gen-hyprel $< > $@
 
-error: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.tmp.o: Unexpected SHT_REL
-section ".rel.llvm.call-graph-profile"
-
-Starting from 13.0.0 llvm can generate SHT_REL section, see
-https://reviews.llvm.org/rGca3bdb57fa1ac98b711a735de048c12b5fdd8086.
-gen-hyprel does not support SHT_REL relocation section.
-
-Remove ".llvm.call-graph-profile" SHT_REL relocation from kvm_nvhe
-to fix the build.
-
-Signed-off-by: Denis Nikitin <denik@chromium.org>
----
-V1 -> V2: Remove the relocation instead of disabling the profile-use flags.
----
- arch/arm64/kvm/hyp/nvhe/Makefile | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+I was really hoping that you'd just drop the flags from the CFLAGS
+instead of removing the generated section. Something like:
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index b5c5119c7396..49ec950ac57b 100644
+index b5c5119c7396..e5b2d43925b4 100644
 --- a/arch/arm64/kvm/hyp/nvhe/Makefile
 +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -78,8 +78,10 @@ $(obj)/kvm_nvhe.o: $(obj)/kvm_nvhe.rel.o FORCE
+@@ -88,7 +88,7 @@ quiet_cmd_hypcopy = HYPCOPY $@
  
- # The HYPREL command calls `gen-hyprel` to generate an assembly file with
- # a list of relocations targeting hyp code/data.
-+# Starting from 13.0.0 llvm emits SHT_REL section '.llvm.call-graph-profile'
-+# when profile optimization is applied. gen-hyprel does not support SHT_REL.
- quiet_cmd_hyprel = HYPREL  $@
--      cmd_hyprel = $(obj)/gen-hyprel $< > $@
-+	cmd_hyprel = $(OBJCOPY) -R .llvm.call-graph-profile $<; $(obj)/gen-hyprel $< > $@
+ # Remove ftrace, Shadow Call Stack, and CFI CFLAGS.
+ # This is equivalent to the 'notrace', '__noscs', and '__nocfi' annotations.
+-KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI), $(KBUILD_CFLAGS))
++KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI) -fprofile-sample-use, $(KBUILD_CFLAGS))
  
- # The HYPCOPY command uses `objcopy` to prefix all ELF symbol names
- # to avoid clashes with VHE code/data.
--- 
-2.37.3.968.ga6b4b080e4-goog
+ # KVM nVHE code is run at a different exception code with a different map, so
+ # compiler instrumentation that inserts callbacks or checks into the code may
 
+However, I even failed to reproduce your problem using LLVM 14 as
+packaged by Debian (if that matters, I'm using an arm64 build
+machine). I build the kernel with:
+
+$ make LLVM=1 KCFLAGS=-fprofile-sample-use -j8 vmlinux
+
+and the offending object only contains the following sections:
+
+arch/arm64/kvm/hyp/nvhe/kvm_nvhe.tmp.o:     file format elf64-littleaarch64
+
+Sections:
+Idx Name          Size      VMA               LMA               File off  Algn
+  0 .hyp.idmap.text 00000ae4  0000000000000000  0000000000000000  00000800  2**11
+                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, CODE
+  1 .hyp.text     0000e988  0000000000000000  0000000000000000  00001800  2**11
+                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, CODE
+  2 .hyp.data..ro_after_init 00000820  0000000000000000  0000000000000000  00010188  2**3
+                  CONTENTS, ALLOC, LOAD, DATA
+  3 .hyp.rodata   00002e70  0000000000000000  0000000000000000  000109a8  2**3
+                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, DATA
+  4 .hyp.data..percpu 00001ee0  0000000000000000  0000000000000000  00013820  2**4
+                  CONTENTS, ALLOC, LOAD, DATA
+  5 .hyp.bss      00001158  0000000000000000  0000000000000000  00015700  2**3
+                  ALLOC
+  6 .comment      0000001f  0000000000000000  0000000000000000  00017830  2**0
+                  CONTENTS, READONLY
+  7 .llvm_addrsig 000000b8  0000000000000000  0000000000000000  0001784f  2**0
+                  CONTENTS, READONLY, EXCLUDE
+  8 .altinstructions 00001284  0000000000000000  0000000000000000  00015700  2**0
+                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, DATA
+  9 __jump_table  00000960  0000000000000000  0000000000000000  00016988  2**3
+                  CONTENTS, ALLOC, LOAD, RELOC, DATA
+ 10 __bug_table   0000051c  0000000000000000  0000000000000000  000172e8  2**2
+                  CONTENTS, ALLOC, LOAD, RELOC, DATA
+ 11 __kvm_ex_table 00000028  0000000000000000  0000000000000000  00017808  2**3
+                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, DATA
+ 12 .note.GNU-stack 00000000  0000000000000000  0000000000000000  00027370  2**0
+                  CONTENTS, READONLY
+
+So what am I missing to trigger this issue? Does it rely on something
+like PGO, which is not upstream yet? A bit of handholding would be
+much appreciated.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
