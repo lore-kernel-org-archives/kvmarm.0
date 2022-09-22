@@ -2,85 +2,93 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E2CECAAD8
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Sep 2022 21:39:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EC48C54EE9
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Sep 2022 21:48:27 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76C5D4B2B7;
-	Thu, 22 Sep 2022 17:39:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF3034B5FE;
+	Thu, 22 Sep 2022 17:48:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ygtdgjz91YIO; Thu, 22 Sep 2022 17:39:14 -0400 (EDT)
+	with ESMTP id 1Szqg7m9sUEc; Thu, 22 Sep 2022 17:48:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 287414B282;
-	Thu, 22 Sep 2022 17:39:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64C9C40D05;
+	Thu, 22 Sep 2022 17:48:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D6804B282
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 17:39:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AD7C40D05
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 17:48:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OjuWGf-3++29 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Sep 2022 17:39:12 -0400 (EDT)
+ with ESMTP id 947i-r43DYXe for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Sep 2022 17:48:23 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 048E943479
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 17:39:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 816AE40C94
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 17:48:23 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1663882751;
+ s=mimecast20190719; t=1663883303;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=oggKyBrtLm+rbie47pghj85Ta1UvbEqK5VovLbBRoGo=;
- b=EFve9zOb3Y+B3eeOuv3BGvpHPi82afI8nOTKL2CRosWdhAHfmbBi2h45/fPmjbAMZuojbH
- r3raFinAY4Qccm9BXiaO7HL7LZzf21SweNAVy/Lkp2wgPVXUjYLUt49abVDEaggdxTlEop
- V9AxCsIiTSvZP4ODaEygvso2U0QOSxQ=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=eClHEiaGY+V73ww0FsJUa6mh3+Y82NAzO9R+KDs/BPU=;
+ b=fVfc/v+Npkll3fvesXY5If9pePJ+2xO8V3ABHt+lx6SoNisqOvLU09toHPsjVwR8/CWGs0
+ Je9J61BSLaRmZt1yRXfMvehhyAryqmYcKPBu3kf8i8td3djLsH04wEjWHkK84l7LErdGqf
+ rWXKwPe0GrngQc4KJiGY3eiK0vblZbY=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-621-Y2TYNpImMnC74qVuMNYWlg-1; Thu, 22 Sep 2022 17:39:10 -0400
-X-MC-Unique: Y2TYNpImMnC74qVuMNYWlg-1
-Received: by mail-qv1-f72.google.com with SMTP id
- f9-20020ad442c9000000b004ac7f4fde18so7348010qvr.14
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 14:39:10 -0700 (PDT)
+ us-mta-605-Q1OLN6_gPMme1qliKUkpNg-1; Thu, 22 Sep 2022 17:48:22 -0400
+X-MC-Unique: Q1OLN6_gPMme1qliKUkpNg-1
+Received: by mail-qk1-f198.google.com with SMTP id
+ r14-20020a05620a298e00b006be796b6164so7593846qkp.19
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 14:48:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:x-gm-message-state:from:to:cc:subject:date;
- bh=oggKyBrtLm+rbie47pghj85Ta1UvbEqK5VovLbBRoGo=;
- b=5xONftWrg0f3x9bL8/VUeQYv4KXj7fmauyl+kzW54vvL5FJooUDEfUZ5ZBp5pVbaHZ
- GRfZA27H4Jgsf7ewW6rNpP+wWqI+nhwGdVopW430ffL2EQSYK6fQoR9QEAXcRIjiFhEi
- 4C5FjayB5w3FDStQanMuqO1uck2foaj3NccBk1n6OxXDBTAGl8+Jmg9u+Yf805n4HE0/
- UH0BchCi4e/uUOj2X+W9LX02DkKVykzodRjWBBFPOIGI4kdR9lU3IZd2OD9gtuU1hNTa
- WGjp9xnSVgANVt8zXhZZBQ+I/4piD1UJaYWVH2bqIf9aAsXVu1GYl7g4Lg2gaq9WIaxq
- ZqxA==
-X-Gm-Message-State: ACrzQf0SFCD/O/o5cYzXM2VOeo4QQVCk1oB5jZrzY19hU4gN0+S+cBrZ
- VxDYfsWOg6lMFqxso1e6fJSZB5kIDfHY27kqpgvvNcJcXI7C6Eg1kJguqp/sPII4oEtx+OJH7F3
- hR011LaZs5xNP8325dbpcaggfGR1Qxr/wlUgLk5ri
-X-Received: by 2002:a05:620a:3725:b0:6ce:e7b3:d8e4 with SMTP id
- de37-20020a05620a372500b006cee7b3d8e4mr3683713qkb.144.1663882750100; 
- Thu, 22 Sep 2022 14:39:10 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5odouBoqKR/EFtNQzxBQaOSq4hKEp3fsEc1XCoKzSGpvsyUKt27I1oSmXbqRykom5IjyysB3VvrBo9iRJBy2s=
-X-Received: by 2002:a05:620a:3725:b0:6ce:e7b3:d8e4 with SMTP id
- de37-20020a05620a372500b006cee7b3d8e4mr3683680qkb.144.1663882749867; Thu, 22
- Sep 2022 14:39:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220922170133.2617189-1-maz@kernel.org>
- <20220922170133.2617189-6-maz@kernel.org>
-In-Reply-To: <20220922170133.2617189-6-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 22 Sep 2022 23:38:58 +0200
-Message-ID: <CABgObfbtVAM3t2WC6-8-fLdQZTs6B5Xf2-CZ4oWdJMzXNFWy_g@mail.gmail.com>
-Subject: Re: [PATCH 5/6] KVM: selftests: dirty-log: Upgrade
- dirty_gfn_set_collected() to store-release
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+ bh=eClHEiaGY+V73ww0FsJUa6mh3+Y82NAzO9R+KDs/BPU=;
+ b=mEfJuRuEztf/pVqcKCvxr72AhgsguOO6AoI7ZqO1ccq0Gpv86vkhTffVAs6iXW34zp
+ /h/cCY1jNYSAAtpY+A2R/K9MDTfumYvH1A3Blmd24Bmq25ua5HV9N86LrNxat3NKE/9w
+ up6rTfgJ3Ca2voXpExj/M7IS7yndws3WQfBrdyWGkYE+1k6UK/Jj7rLbWgqImYKryjdK
+ Rc+BKbny1q2CLg0JFhVjCb/D6KUL0SzgjYYxdWVmzVwcJj0Msncgl0qIR2eKNyRzWj5V
+ wXjCwHe9kd/cTzSjZuF/UmIfikj5p5Xsn17hIMA64YZtJuzx5/k5ipEuV/nC2CVpBAva
+ /dXw==
+X-Gm-Message-State: ACrzQf3osv9qfjt3RPr/VJ9WpXgBGH7z1f85ipvKadPT9AqofTspYsoq
+ iJCcSDfga7D1zDNXtAHsZTLwFwbJGDghJr8JZH/iuj3K0vzTTbCCh16iYpLrhiN2253XcNkEflF
+ 0FnENE45sFzb/qpwu6e3BMP0l
+X-Received: by 2002:a05:620a:4e3:b0:6cf:427b:c20b with SMTP id
+ b3-20020a05620a04e300b006cf427bc20bmr3680512qkh.164.1663883301758; 
+ Thu, 22 Sep 2022 14:48:21 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6JiazJoJ7P1B2iQiBzeghsaJe7Quv/mrNWuNPqUxoRHJU/QK2FCPX/n64KpWw2fHGBa9Wv3w==
+X-Received: by 2002:a05:620a:4e3:b0:6cf:427b:c20b with SMTP id
+ b3-20020a05620a04e300b006cf427bc20bmr3680488qkh.164.1663883301544; 
+ Thu, 22 Sep 2022 14:48:21 -0700 (PDT)
+Received: from xz-m1.local
+ (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
+ by smtp.gmail.com with ESMTPSA id
+ r13-20020ac8794d000000b003438a8e842fsm4137374qtt.44.2022.09.22.14.48.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 22 Sep 2022 14:48:21 -0700 (PDT)
+Date: Thu, 22 Sep 2022 17:48:19 -0400
+From: Peter Xu <peterx@redhat.com>
 To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 2/6] KVM: Add KVM_CAP_DIRTY_LOG_RING_ORDERED capability
+ and config option
+Message-ID: <YyzYI/bvp/JnbcxS@xz-m1.local>
+References: <20220922170133.2617189-1-maz@kernel.org>
+ <20220922170133.2617189-3-maz@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20220922170133.2617189-3-maz@kernel.org>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
 Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
  will@kernel.org, shan.gavin@gmail.com, bgardon@google.com, dmatlack@google.com,
- zhenyzha@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu
+ pbonzini@redhat.com, zhenyzha@redhat.com, shuah@kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,47 +105,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 22, 2022 at 7:02 PM Marc Zyngier <maz@kernel.org> wrote:
-> To make sure that all the writes to the log marking the entries
-> as being in need of reset are observed in order, use a
-> smp_store_release() when updating the log entry flags.
->
+On Thu, Sep 22, 2022 at 06:01:29PM +0100, Marc Zyngier wrote:
+> In order to differenciate between architectures that require no extra
+> synchronisation when accessing the dirty ring and those who do,
+> add a new capability (KVM_CAP_DIRTY_LOG_RING_ORDERED) that identify
+> the latter sort. TSO architectures can obviously advertise both, while
+> relaxed architectures most only advertise the ORDERED version.
+> 
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
-
-You also need a load-acquire on the load of gfn->flags in
-dirty_gfn_is_dirtied. Otherwise reading cur->slot or cur->offset might
-see a stale value.
-
-Paolo
-
 > ---
->  tools/testing/selftests/kvm/dirty_log_test.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-> index 9c883c94d478..3d29f4bf4f9c 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-> @@ -17,6 +17,7 @@
->  #include <linux/bitmap.h>
->  #include <linux/bitops.h>
->  #include <linux/atomic.h>
-> +#include <asm/barrier.h>
->
->  #include "kvm_util.h"
->  #include "test_util.h"
-> @@ -284,7 +285,7 @@ static inline bool dirty_gfn_is_dirtied(struct kvm_dirty_gfn *gfn)
->
->  static inline void dirty_gfn_set_collected(struct kvm_dirty_gfn *gfn)
->  {
-> -       gfn->flags = KVM_DIRTY_GFN_F_RESET;
-> +       smp_store_release(&gfn->flags, KVM_DIRTY_GFN_F_RESET);
->  }
->
->  static uint32_t dirty_ring_collect_one(struct kvm_dirty_gfn *dirty_gfns,
-> --
-> 2.34.1
->
+>  include/linux/kvm_dirty_ring.h |  6 +++---
+>  include/uapi/linux/kvm.h       |  1 +
+>  virt/kvm/Kconfig               | 14 ++++++++++++++
+>  virt/kvm/Makefile.kvm          |  2 +-
+>  virt/kvm/kvm_main.c            | 11 +++++++++--
+>  5 files changed, 28 insertions(+), 6 deletions(-)
+> 
+> diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
+> index 906f899813dc..7a0c90ae9a3f 100644
+> --- a/include/linux/kvm_dirty_ring.h
+> +++ b/include/linux/kvm_dirty_ring.h
+> @@ -27,7 +27,7 @@ struct kvm_dirty_ring {
+>  	int index;
+>  };
+>  
+> -#ifndef CONFIG_HAVE_KVM_DIRTY_RING
+> +#ifndef CONFIG_HAVE_KVM_DIRTY_LOG
+
+s/LOG/LOG_RING/ according to the commit message? Or the name seems too
+generic.
+
+Pure question to ask: is it required to have a new cap just for the
+ordering?  IIUC if x86 was the only supported anyway before, it means all
+released old kvm binaries are always safe even without the strict
+orderings.  As long as we rework all the memory ordering bits before
+declaring support of yet another arch, we're good.  Or am I wrong?
+
+Thanks,
+
+-- 
+Peter Xu
 
 _______________________________________________
 kvmarm mailing list
