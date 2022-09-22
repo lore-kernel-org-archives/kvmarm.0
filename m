@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70C5CC6FA8B
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Sep 2022 17:01:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96ED8C54EE9
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Sep 2022 17:02:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D944B4B62B;
-	Thu, 22 Sep 2022 13:01:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E3464B092;
+	Thu, 22 Sep 2022 13:02:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id djonEN40jbcv; Thu, 22 Sep 2022 13:01:57 -0400 (EDT)
+	with ESMTP id YH5AGuLoGElN; Thu, 22 Sep 2022 13:01:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B98354B1AD;
-	Thu, 22 Sep 2022 13:01:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7D544B62A;
+	Thu, 22 Sep 2022 13:01:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 631A74B256
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FE7441071
  for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 13:01:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id v7zMsheT9Prr for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id TKuZ8uJCOoB1 for <kvmarm@lists.cs.columbia.edu>;
  Thu, 22 Sep 2022 13:01:56 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 33B8741071
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35898410DA
  for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Sep 2022 13:01:56 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 822D9636B9;
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 90F11636C0;
  Thu, 22 Sep 2022 17:01:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 463CEC433C1;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5311AC4347C;
  Thu, 22 Sep 2022 17:01:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=k20201202; t=1663866115;
- bh=k79Y4hLlE6C9zOK8ak9v3sdPQfDZmueRgBsCVRUicak=;
+ bh=wMvNENW6f5nK/iO1hpFEs/1OY3scyEbFHH9QYgtMDNc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=rurnMhTfLjVG27gPLBTEYM2BqHtNZldocEHOIvbzyh0jOnr1rcY7QgbNVqUCgRxIb
- J2Cp97nXtPNMGyA40It4ALqwi4PwZFPQr5vdLATbNQ/K1cFuROqHELn8OVgkXg7Pmx
- 0OQf5EksnCDucYGidMzs5blTKLfT4t8PCWFTtcOC4lFonC+GOC10mOU8QqYESt7tS5
- tEr3n8Rd7mgompykfLZ8IoTLKxb9HmdN4FlccjCCPzLcedDskIZim8sKBzleaLrW1x
- VitlUxSLTtOuLy8Pn1hDcvIlKXkRuwa9KlONGSQarx4wNvR5L2pIo7vNbZKRKGt0Kk
- K5LzB0yXPY9/A==
+ b=J7PN7PklhBFJmd5sd8qMYqN8++7B0BeiO6VDWoV2UkGxDuXeGFODuVgxvUbDuOmcj
+ N/fCgHBOSrceS9NICQhLmq0kdO5kGvUg6fh00yuQeCCsex9Sewpu58ECc1F4isAUxN
+ hrXs04Dxr/0mO1I7ynC+90Jp4KkFcB7GtcYsq9rnba/MG/S4h9CNSBXD7RuXEfwche
+ iEUxjlv4VAXf2SWWoxmIm0x+nvG6MrLv0G/LL5oabP1F2uJHGPwojzqov275hGnta6
+ MmV+5jT7FDaqkITIdqp7Po+stlMxa9hkc95jpOjpfpGzPwievnj01bPS8IApOrs0yu
+ QlyBTpEIiMAOA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1obPaD-00Bxdo-6C;
+ (envelope-from <maz@kernel.org>) id 1obPaD-00Bxdo-G2;
  Thu, 22 Sep 2022 18:01:53 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu,
 	kvm@vger.kernel.org
-Subject: [PATCH 1/6] KVM: Use acquire/release semantics when accessing dirty
- ring GFN state
-Date: Thu, 22 Sep 2022 18:01:28 +0100
-Message-Id: <20220922170133.2617189-2-maz@kernel.org>
+Subject: [PATCH 2/6] KVM: Add KVM_CAP_DIRTY_LOG_RING_ORDERED capability and
+ config option
+Date: Thu, 22 Sep 2022 18:01:29 +0100
+Message-Id: <20220922170133.2617189-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220922170133.2617189-1-maz@kernel.org>
 References: <20220922170133.2617189-1-maz@kernel.org>
@@ -89,56 +89,145 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The current implementation of the dirty ring has an implicit requirement
-that stores to the dirty ring from userspace must be:
+In order to differenciate between architectures that require no extra
+synchronisation when accessing the dirty ring and those who do,
+add a new capability (KVM_CAP_DIRTY_LOG_RING_ORDERED) that identify
+the latter sort. TSO architectures can obviously advertise both, while
+relaxed architectures most only advertise the ORDERED version.
 
-- be ordered with one another
-
-- visible from another CPU executing a ring reset
-
-While these implicit requirements work well for x86 (and any other
-TSO-like architecture), they do not work for more relaxed architectures
-such as arm64 where stores to different addresses can be freely
-reordered, and loads from these addresses not observing writes from
-another CPU unless the required barriers (or acquire/release semantics)
-are used.
-
-In order to start fixing this, upgrade the ring reset accesses:
-
-- the kvm_dirty_gfn_harvested() helper now uses acquire semantics
-  so it is ordered after all previous writes, including that from
-  userspace
-
-- the kvm_dirty_gfn_set_invalid() helper now uses release semantics
-  so that the next_slot and next_offset reads don't drift past
-  the entry invalidation
-
-This is only a partial fix as the userspace side also need upgrading.
-
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- virt/kvm/dirty_ring.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/linux/kvm_dirty_ring.h |  6 +++---
+ include/uapi/linux/kvm.h       |  1 +
+ virt/kvm/Kconfig               | 14 ++++++++++++++
+ virt/kvm/Makefile.kvm          |  2 +-
+ virt/kvm/kvm_main.c            | 11 +++++++++--
+ 5 files changed, 28 insertions(+), 6 deletions(-)
 
-diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-index f4c2a6eb1666..784bed80221d 100644
---- a/virt/kvm/dirty_ring.c
-+++ b/virt/kvm/dirty_ring.c
-@@ -79,12 +79,12 @@ static inline void kvm_dirty_gfn_set_invalid(struct kvm_dirty_gfn *gfn)
+diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
+index 906f899813dc..7a0c90ae9a3f 100644
+--- a/include/linux/kvm_dirty_ring.h
++++ b/include/linux/kvm_dirty_ring.h
+@@ -27,7 +27,7 @@ struct kvm_dirty_ring {
+ 	int index;
+ };
  
- static inline void kvm_dirty_gfn_set_dirtied(struct kvm_dirty_gfn *gfn)
- {
--	gfn->flags = KVM_DIRTY_GFN_F_DIRTY;
-+	smp_store_release(&gfn->flags, KVM_DIRTY_GFN_F_DIRTY);
+-#ifndef CONFIG_HAVE_KVM_DIRTY_RING
++#ifndef CONFIG_HAVE_KVM_DIRTY_LOG
+ /*
+  * If CONFIG_HAVE_HVM_DIRTY_RING not defined, kvm_dirty_ring.o should
+  * not be included as well, so define these nop functions for the arch.
+@@ -69,7 +69,7 @@ static inline bool kvm_dirty_ring_soft_full(struct kvm_dirty_ring *ring)
+ 	return true;
  }
  
- static inline bool kvm_dirty_gfn_harvested(struct kvm_dirty_gfn *gfn)
- {
--	return gfn->flags & KVM_DIRTY_GFN_F_RESET;
-+	return smp_load_acquire(&gfn->flags) & KVM_DIRTY_GFN_F_RESET;
- }
+-#else /* CONFIG_HAVE_KVM_DIRTY_RING */
++#else /* CONFIG_HAVE_KVM_DIRTY_LOG */
  
- int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
+ u32 kvm_dirty_ring_get_rsvd_entries(void);
+ int kvm_dirty_ring_alloc(struct kvm_dirty_ring *ring, int index, u32 size);
+@@ -92,6 +92,6 @@ struct page *kvm_dirty_ring_get_page(struct kvm_dirty_ring *ring, u32 offset);
+ void kvm_dirty_ring_free(struct kvm_dirty_ring *ring);
+ bool kvm_dirty_ring_soft_full(struct kvm_dirty_ring *ring);
+ 
+-#endif /* CONFIG_HAVE_KVM_DIRTY_RING */
++#endif /* CONFIG_HAVE_KVM_DIRTY_LOG */
+ 
+ #endif	/* KVM_DIRTY_RING_H */
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index eed0315a77a6..c1c9c0c8be5c 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1177,6 +1177,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_VM_DISABLE_NX_HUGE_PAGES 220
+ #define KVM_CAP_S390_ZPCI_OP 221
+ #define KVM_CAP_S390_CPU_TOPOLOGY 222
++#define KVM_CAP_DIRTY_LOG_RING_ORDERED 223
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index a8c5c9f06b3c..1023426bf7dd 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -16,8 +16,22 @@ config HAVE_KVM_IRQFD
+ config HAVE_KVM_IRQ_ROUTING
+        bool
+ 
++config HAVE_KVM_DIRTY_LOG
++       bool
++
++# Only strongly ordered architectures can select this, as it doesn't
++# put any constraint on userspace ordering. They also can select the
++# _ORDERED version.
+ config HAVE_KVM_DIRTY_RING
+        bool
++       select HAVE_KVM_DIRTY_LOG
++       depends on X86
++
++# Weakly ordered architectures can only select this, advertising
++# to userspace the additional ordering requirements.
++config HAVE_KVM_DIRTY_RING_ORDERED
++       bool
++       select HAVE_KVM_DIRTY_LOG
+ 
+ config HAVE_KVM_EVENTFD
+        bool
+diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
+index 2c27d5d0c367..2bc6d0bb5e5c 100644
+--- a/virt/kvm/Makefile.kvm
++++ b/virt/kvm/Makefile.kvm
+@@ -10,5 +10,5 @@ kvm-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
+ kvm-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
+ kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
+ kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
+-kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
++kvm-$(CONFIG_HAVE_KVM_DIRTY_LOG) += $(KVM)/dirty_ring.o
+ kvm-$(CONFIG_HAVE_KVM_PFNCACHE) += $(KVM)/pfncache.o
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 584a5bab3af3..cb1c103e2018 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3304,7 +3304,7 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+ {
+ 	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+ 
+-#ifdef CONFIG_HAVE_KVM_DIRTY_RING
++#ifdef CONFIG_HAVE_KVM_DIRTY_LOG
+ 	if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
+ 		return;
+ #endif
+@@ -3758,7 +3758,7 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_on_spin);
+ 
+ static bool kvm_page_in_dirty_ring(struct kvm *kvm, unsigned long pgoff)
+ {
+-#ifdef CONFIG_HAVE_KVM_DIRTY_RING
++#ifdef CONFIG_HAVE_KVM_DIRTY_LOG
+ 	return (pgoff >= KVM_DIRTY_LOG_PAGE_OFFSET) &&
+ 	    (pgoff < KVM_DIRTY_LOG_PAGE_OFFSET +
+ 	     kvm->dirty_ring_size / PAGE_SIZE);
+@@ -4479,6 +4479,12 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ 		return KVM_DIRTY_RING_MAX_ENTRIES * sizeof(struct kvm_dirty_gfn);
+ #else
+ 		return 0;
++#endif
++	case KVM_CAP_DIRTY_LOG_RING_ORDERED:
++#ifdef CONFIG_HAVE_KVM_DIRTY_RING_ORDERED
++		return KVM_DIRTY_RING_MAX_ENTRIES * sizeof(struct kvm_dirty_gfn);
++#else
++		return 0;
+ #endif
+ 	case KVM_CAP_BINARY_STATS_FD:
+ 	case KVM_CAP_SYSTEM_EVENT_DATA:
+@@ -4580,6 +4586,7 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+ 		return 0;
+ 	}
+ 	case KVM_CAP_DIRTY_LOG_RING:
++	case KVM_CAP_DIRTY_LOG_RING_ORDERED:
+ 		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
+ 	default:
+ 		return kvm_vm_ioctl_enable_cap(kvm, cap);
 -- 
 2.34.1
 
