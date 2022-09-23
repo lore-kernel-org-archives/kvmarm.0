@@ -2,65 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2BC9ECAAD8
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Sep 2022 06:55:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E9F4C6FA82
+	for <kvmarm@archiver.kernel.org>; Fri, 23 Sep 2022 14:20:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C317410F1;
-	Fri, 23 Sep 2022 02:55:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C99F040E62;
+	Fri, 23 Sep 2022 10:20:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wCa4cn8HYDVf; Fri, 23 Sep 2022 02:55:50 -0400 (EDT)
+	with ESMTP id YtpivKpKEbUk; Fri, 23 Sep 2022 10:20:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1262343399;
-	Fri, 23 Sep 2022 02:55:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4F6240B59;
+	Fri, 23 Sep 2022 10:20:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 32418410F1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2022 02:55:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 48EC440B59
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2022 10:20:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 06ID53c9BN84 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Sep 2022 02:55:48 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3667B40D01
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2022 02:55:48 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1663916147;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=TyI3/pitfwr7G0vT4ywoa+PCxkCwg5DwusKh6v7dH8I=;
- b=Sh1uLe2b1dMfQx1u23MqR8lAMyqH31zQkZSGkxIyxXqYkg0s5M0yHhMIGrlHkPA4aDBMyo
- FXtr9X9iq7DvSr23pCsfWkr7oUOiGZQSaYmekhhktKoTMPp5i6Pvu5lB0iyD26rsJYo3a4
- KPF1SZv2Lrtzv3IuJrGk3aGbtTaFFb4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-517-ZcEpPXmLM_6_z8LyNu0njg-1; Fri, 23 Sep 2022 02:55:44 -0400
-X-MC-Unique: ZcEpPXmLM_6_z8LyNu0njg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com
- [10.11.54.8])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id oWvacfLQhM+y for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Sep 2022 10:20:07 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D33D840AFA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2022 10:20:07 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D9B1038041C5;
- Fri, 23 Sep 2022 06:55:43 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-126.bne.redhat.com [10.64.54.126])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 254AAC15BA5;
- Fri, 23 Sep 2022 06:55:39 +0000 (UTC)
-From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm64: vgic: Remove duplicate check in
- update_affinity_collection()
-Date: Fri, 23 Sep 2022 14:54:47 +0800
-Message-Id: <20220923065447.323445-1-gshan@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-Cc: yuzhe@nfschina.com, maz@kernel.org, linux-kernel@vger.kernel.org,
- shan.gavin@gmail.com, will@kernel.org
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 14D1D620FA;
+ Fri, 23 Sep 2022 14:20:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D06BC433C1;
+ Fri, 23 Sep 2022 14:20:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1663942806;
+ bh=Kq7emLhwvdneoJtvmozd3OskIe6mAMMxre7Z0MxN+rM=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=iHoB0JQ3Wn3YayXCXt9oZO83b52P+7kufQ1Slo7/Je6Ne/JeorY48wL9gg7iEqfL6
+ OHYafCnErG69xotp3dZpZcLYoYpVBKCKusAAsmEBklpnyDAIMYpS+JQm6nQoGCmIph
+ 6+v/BEgPQO20dwfLMwT6TXJy08ZStnxCRRKurMwRpHHRd3CesCOGSx+kqheLOAPgYz
+ 9xJuA/kNd9Nb6N6VIuKgUhAibwROS5ozSepzFY8pFHbIJgZ/yZ7e9iR4SIQB37rJyx
+ gQObLZw7NRpUzTMJasFeCfc2Fto+MGLGXsiGtsNlJogVG5zyzoJgNCtxJkIOuJk8ta
+ gePTQk7N4Pb8A==
+Received: from [82.141.251.28] (helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1objXA-00CAht-2K;
+ Fri, 23 Sep 2022 15:20:04 +0100
+Date: Fri, 23 Sep 2022 15:19:56 +0100
+Message-ID: <87edw2jhpv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH 1/6] KVM: Use acquire/release semantics when accessing
+ dirty ring GFN state
+In-Reply-To: <YyzV2Q/PZHPFMD6y@xz-m1.local>
+References: <20220922170133.2617189-1-maz@kernel.org>
+ <20220922170133.2617189-2-maz@kernel.org>
+ <YyzV2Q/PZHPFMD6y@xz-m1.local>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 82.141.251.28
+X-SA-Exim-Rcpt-To: peterx@redhat.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+ shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
+ pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com,
+ gshan@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, oliver.upton@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
+ will@kernel.org, shan.gavin@gmail.com, bgardon@google.com, dmatlack@google.com,
+ pbonzini@redhat.com, zhenyzha@redhat.com, shuah@kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,33 +93,85 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The ITS collection is guranteed to be !NULL when update_affinity_collection()
-is called. So we needn't check ITE's collection with NULL because the
-check has been included to the later one.
+On Thu, 22 Sep 2022 22:38:33 +0100,
+Peter Xu <peterx@redhat.com> wrote:
+> 
+> Marc,
+> 
+> On Thu, Sep 22, 2022 at 06:01:28PM +0100, Marc Zyngier wrote:
+> > The current implementation of the dirty ring has an implicit requirement
+> > that stores to the dirty ring from userspace must be:
+> > 
+> > - be ordered with one another
+> > 
+> > - visible from another CPU executing a ring reset
+> > 
+> > While these implicit requirements work well for x86 (and any other
+> > TSO-like architecture), they do not work for more relaxed architectures
+> > such as arm64 where stores to different addresses can be freely
+> > reordered, and loads from these addresses not observing writes from
+> > another CPU unless the required barriers (or acquire/release semantics)
+> > are used.
+> > 
+> > In order to start fixing this, upgrade the ring reset accesses:
+> > 
+> > - the kvm_dirty_gfn_harvested() helper now uses acquire semantics
+> >   so it is ordered after all previous writes, including that from
+> >   userspace
+> > 
+> > - the kvm_dirty_gfn_set_invalid() helper now uses release semantics
+> >   so that the next_slot and next_offset reads don't drift past
+> >   the entry invalidation
+> > 
+> > This is only a partial fix as the userspace side also need upgrading.
+> 
+> Paolo has one fix 4802bf910e ("KVM: dirty ring: add missing memory
+> barrier", 2022-09-01) which has already landed.
 
-Remove the duplicate check in update_affinity_collection().
+What is this commit? It doesn't exist in the kernel as far as I can see.
 
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- arch/arm64/kvm/vgic/vgic-its.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> I think the other one to reset it was lost too.  I just posted a patch.
+> 
+> https://lore.kernel.org/qemu-devel/20220922213522.68861-1-peterx@redhat.com/
+> (link still not yet available so far, but should be)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 9d3299a70242..24d7778d1ce6 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -406,7 +406,7 @@ static void update_affinity_collection(struct kvm *kvm, struct vgic_its *its,
- 	struct its_ite *ite;
- 
- 	for_each_lpi_its(device, ite, its) {
--		if (!ite->collection || coll != ite->collection)
-+		if (ite->collection != coll)
- 			continue;
- 
- 		update_affinity_ite(kvm, ite);
+That's a QEMU patch, right?
+
+> 
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  virt/kvm/dirty_ring.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+> > index f4c2a6eb1666..784bed80221d 100644
+> > --- a/virt/kvm/dirty_ring.c
+> > +++ b/virt/kvm/dirty_ring.c
+> > @@ -79,12 +79,12 @@ static inline void kvm_dirty_gfn_set_invalid(struct kvm_dirty_gfn *gfn)
+> >  
+> >  static inline void kvm_dirty_gfn_set_dirtied(struct kvm_dirty_gfn *gfn)
+> >  {
+> > -	gfn->flags = KVM_DIRTY_GFN_F_DIRTY;
+> > +	smp_store_release(&gfn->flags, KVM_DIRTY_GFN_F_DIRTY);
+> 
+> IIUC you meant kvm_dirty_gfn_set_invalid as the comment says?
+
+Gah, you're right, I redid the patch at the last minute and messed it
+up....
+
+> kvm_dirty_gfn_set_dirtied() has been guarded by smp_wmb() and AFAICT that's
+> already safe.  Otherwise looks good to me.
+
+Indeed. Let me fix this.
+
+Thanks,
+
+	M.
+
 -- 
-2.23.0
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
