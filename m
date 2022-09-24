@@ -2,87 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8FACC07E9D
-	for <kvmarm@archiver.kernel.org>; Fri, 23 Sep 2022 22:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03158C32771
+	for <kvmarm@archiver.kernel.org>; Sat, 24 Sep 2022 08:48:10 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A60F411BD;
-	Fri, 23 Sep 2022 18:46:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DD4840BEF;
+	Sat, 24 Sep 2022 04:48:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tR4kCCaRUrw6; Fri, 23 Sep 2022 18:46:46 -0400 (EDT)
+	with ESMTP id i8R406AkTIEk; Sat, 24 Sep 2022 04:48:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE81740E25;
-	Fri, 23 Sep 2022 18:46:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4100340C1B;
+	Sat, 24 Sep 2022 04:48:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED7C340BA3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2022 18:46:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC3D540B91
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Sep 2022 04:48:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6b2ryHtWl-Xe for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Sep 2022 18:46:44 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E7DD740B91
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2022 18:46:44 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1663973204;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=TbpJrmGSZ/Fcv2wT55HywsC5o8heQwVobd1UKBeGb7k=;
- b=Jkl3/yo65ghvkfIX/VNCxxFV+ztbk+xiPle2jmk7ao1VZJzXi1ZK+EErwptM+cPKY8umkZ
- sZMIDcTb6SYuUIJzH9D9rGRkQNPecZfELczHd9rFQGL1pMLs7J6IY6IsFKn4Iv2/QZhhed
- VDE636F25U8OI3ea7pUBoqAaApIKTwk=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-37-ELjViRh-O3uGtuxk8rFuBQ-1; Fri, 23 Sep 2022 18:46:43 -0400
-X-MC-Unique: ELjViRh-O3uGtuxk8rFuBQ-1
-Received: by mail-qv1-f72.google.com with SMTP id
- f9-20020ad442c9000000b004ac7f4fde18so804873qvr.14
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Sep 2022 15:46:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
- bh=TbpJrmGSZ/Fcv2wT55HywsC5o8heQwVobd1UKBeGb7k=;
- b=BTWyVwkqdoi00Js03e5hMZzBuuSMkp98jfk5+2s0tWlBC70AyuxksSpdrQd5qTQcbz
- 8hzEaQBGR3C8dYp/4bEDnDKWkMTMP5rsVv/ZmR069JEK89IJ4mz5VizZyBidzEfI92oQ
- WFzrQr+aOMAR7QF+4lyH235YxD3Ixtx1Co8wIUsFv4tYxjTk8SrmJmhOiOTAt7cdFLSK
- 6kteFG7LQRrTspRxgoCJy5CAPHLPT8Vbjhfcu1FNnzEh9qa6cRVsmJbguwuBQCD51Q54
- RlRiGWQ9KFURqBFfOXsoCet18Bof1Gklr0IkmUyCU0mPTolHf+ZYOF263qqdrb+ekND3
- ztvg==
-X-Gm-Message-State: ACrzQf27qILdufgQk44VqBHC+J6MvOgXAx70kO3nGnH2PzSBvMLGfYqM
- KwxHras+IrVRoTqrjt0idSZw3gY++JYEyCZJqAYDmAlmYySRVdXQgrHdZuThyaFTzz5LVR+Fo70
- Wi3ocQ6SAABIzJwJxusFx8TaK
-X-Received: by 2002:a0c:a951:0:b0:4a2:acf0:1554 with SMTP id
- z17-20020a0ca951000000b004a2acf01554mr8702030qva.115.1663973202842; 
- Fri, 23 Sep 2022 15:46:42 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4knnqsS3j7k/xo7xq7uc5YnqAb2QAyUrPOQPVgzzeIt5MtETEWirytZ1XgcutqajbAvYbzng==
-X-Received: by 2002:a0c:a951:0:b0:4a2:acf0:1554 with SMTP id
- z17-20020a0ca951000000b004a2acf01554mr8702015qva.115.1663973202687; 
- Fri, 23 Sep 2022 15:46:42 -0700 (PDT)
-Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca.
- [70.31.27.79]) by smtp.gmail.com with ESMTPSA id
- bp30-20020a05620a459e00b006c479acd82fsm7643222qkb.7.2022.09.23.15.46.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 23 Sep 2022 15:46:42 -0700 (PDT)
-Date: Fri, 23 Sep 2022 18:46:40 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
+ with ESMTP id mpfJ1DmTj2Sb for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 24 Sep 2022 04:48:06 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 92AA240BEF
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Sep 2022 04:48:06 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id A56B761133;
+ Sat, 24 Sep 2022 08:48:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16992C433C1;
+ Sat, 24 Sep 2022 08:48:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1664009285;
+ bh=YOpODT4va0VloCZOBnvQvpP8J5R28QS/wmKHIPcpRE4=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Z/o2gU2p8Urtm0xeFGOkNZE62b7hAAJaRgGLqXhpavIfWjQIvVL+8bR6WL4otUCFW
+ +pdMiJ/O2NaLus1f+lA35EU4Xh0AXjXpp/bniJ6nbu8x/o0ylwhqYit1OKMkPVVBiv
+ IwYw3V28nwUjT2vEf8ibe7gCKw5HpCX3GHCUVyxDcdv44Gpkb6lZiA1t0ASF+jPo4V
+ T06FQ4O7a+TjgkJMjnIEoIHP6LvuvnmJxJ4M4QmCtAb9PYfz0A14aKKoy4L1M93+f4
+ Q1xlOofZBtC5nZGoXQMn+T09A+GtYifkgFjMcg1LkqMRibnZ5544yDJDiMk251QM5z
+ zomhXXj0WxSRg==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oc0pO-00CJg2-Ui;
+ Sat, 24 Sep 2022 09:48:03 +0100
+Date: Sat, 24 Sep 2022 09:47:59 +0100
+Message-ID: <87fsghi2f4.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Peter Xu <peterx@redhat.com>
 Subject: Re: [PATCH 3/6] KVM: x86: Select CONFIG_HAVE_KVM_DIRTY_RING_ORDERED
-Message-ID: <Yy43UM/+qTxc+/qt@x1n>
-References: <20220922170133.2617189-1-maz@kernel.org>
- <20220922170133.2617189-4-maz@kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20220922170133.2617189-4-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
+In-Reply-To: <Yy43UM/+qTxc+/qt@x1n>
+References: <20220922170133.2617189-1-maz@kernel.org>	<20220922170133.2617189-4-maz@kernel.org>	<Yy43UM/+qTxc+/qt@x1n>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: peterx@redhat.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+ shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
+ pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com,
+ gshan@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, oliver.upton@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
  will@kernel.org, shan.gavin@gmail.com, bgardon@google.com, dmatlack@google.com,
  pbonzini@redhat.com, zhenyzha@redhat.com, shuah@kernel.org,
@@ -103,50 +91,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 22, 2022 at 06:01:30PM +0100, Marc Zyngier wrote:
-> Since x86 is TSO (give or take), allow it to advertise the new
-> ORDERED version of the dirty ring capability. No other change is
-> required for it.
+On Fri, 23 Sep 2022 23:46:40 +0100,
+Peter Xu <peterx@redhat.com> wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/x86/kvm/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
+> On Thu, Sep 22, 2022 at 06:01:30PM +0100, Marc Zyngier wrote:
+> > Since x86 is TSO (give or take), allow it to advertise the new
+> > ORDERED version of the dirty ring capability. No other change is
+> > required for it.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/x86/kvm/Kconfig | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> > index e3cbd7706136..eb63bc31ed1d 100644
+> > --- a/arch/x86/kvm/Kconfig
+> > +++ b/arch/x86/kvm/Kconfig
+> > @@ -29,6 +29,7 @@ config KVM
+> >  	select HAVE_KVM_PFNCACHE
+> >  	select HAVE_KVM_IRQFD
+> >  	select HAVE_KVM_DIRTY_RING
+> > +	select HAVE_KVM_DIRTY_RING_ORDERED
+> >  	select IRQ_BYPASS_MANAGER
+> >  	select HAVE_KVM_IRQ_BYPASS
+> >  	select HAVE_KVM_IRQ_ROUTING
 > 
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index e3cbd7706136..eb63bc31ed1d 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -29,6 +29,7 @@ config KVM
->  	select HAVE_KVM_PFNCACHE
->  	select HAVE_KVM_IRQFD
->  	select HAVE_KVM_DIRTY_RING
-> +	select HAVE_KVM_DIRTY_RING_ORDERED
->  	select IRQ_BYPASS_MANAGER
->  	select HAVE_KVM_IRQ_BYPASS
->  	select HAVE_KVM_IRQ_ROUTING
+> Before patch 2-3, we only have HAVE_KVM_DIRTY_RING.
+> 
+> After that, we'll have:
+> 
+> HAVE_KVM_DIRTY_LOG
+> HAVE_KVM_DIRTY_RING
+> HAVE_KVM_DIRTY_RING_ORDERED
+> 
+> I'm wondering whether we can just keep using the old HAVE_KVM_DIRTY_RING,
+> but just declare a new KVM_CAP_DIRTY_LOG_RING_ORDERED only after all memory
+> barrier patches merged (after patch 1).
 
-Before patch 2-3, we only have HAVE_KVM_DIRTY_RING.
+The problem is to decide, on a per architecture basis, how to expose
+the old property. I'm happy to key it on being x86 specific, but that
+feels pretty gross, and totally unnecessary for strongly ordered
+architectures (s390?).
 
-After that, we'll have:
+> IIUC it's a matter of whether any of the arch would like to support
+> !ORDERED version of dirty ring at all, but then IIUC we'll need to have the
+> memory barriers conditional too or not sure how it'll help.
 
-HAVE_KVM_DIRTY_LOG
-HAVE_KVM_DIRTY_RING
-HAVE_KVM_DIRTY_RING_ORDERED
+Memory barriers do not affect the semantics of the userspace, while
+the lack thereof do. On strongly ordered architectures,
+acquire/release is usually "free", because that's implied by their
+memory model. If it thus free for these to implement both versions of
+the API.
 
-I'm wondering whether we can just keep using the old HAVE_KVM_DIRTY_RING,
-but just declare a new KVM_CAP_DIRTY_LOG_RING_ORDERED only after all memory
-barrier patches merged (after patch 1).
+So are we discussing the cost of couple of (mostly invisible) config
+options?
 
-IIUC it's a matter of whether any of the arch would like to support
-!ORDERED version of dirty ring at all, but then IIUC we'll need to have the
-memory barriers conditional too or not sure how it'll help.
-
-Thanks,
+	M.
 
 -- 
-Peter Xu
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
