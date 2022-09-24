@@ -2,70 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4CF2C32771
-	for <kvmarm@archiver.kernel.org>; Sat, 24 Sep 2022 08:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6336C07E9D
+	for <kvmarm@archiver.kernel.org>; Sat, 24 Sep 2022 11:27:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A8AB40B91;
-	Sat, 24 Sep 2022 04:51:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D49F4B24D;
+	Sat, 24 Sep 2022 07:27:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id K-+cRatqvP3T; Sat, 24 Sep 2022 04:51:45 -0400 (EDT)
+	with ESMTP id DYpb8JSA35UW; Sat, 24 Sep 2022 07:27:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C60A140C1B;
-	Sat, 24 Sep 2022 04:51:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15B924B08F;
+	Sat, 24 Sep 2022 07:27:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E215940BA9
- for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Sep 2022 04:51:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 03E2340E00
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Sep 2022 07:27:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RVPZoBBpmVE0 for <kvmarm@lists.cs.columbia.edu>;
- Sat, 24 Sep 2022 04:51:43 -0400 (EDT)
+ with ESMTP id ApHtv13SpK7O for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 24 Sep 2022 07:26:59 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B944140B91
- for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Sep 2022 04:51:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B1B7E40B6C
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Sep 2022 07:26:59 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id A897F611A7;
- Sat, 24 Sep 2022 08:51:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11E81C433D7;
- Sat, 24 Sep 2022 08:51:42 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 0A92460686;
+ Sat, 24 Sep 2022 11:26:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6117CC433D6;
+ Sat, 24 Sep 2022 11:26:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1664009502;
- bh=sQu4rY26atOOmUOcr/UZfhpKLw2nqwuD8y4ts7N3Xq0=;
+ s=k20201202; t=1664018818;
+ bh=WfkAx7u8hwKwgvWqPmmn81X86LOQd0NsRmAbmX/NoEY=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=PiyTCrM2xF8ErVB2yED85XFj/4tDY3E88aPmH5y3W2wUTaKNtbXN5cYHylLyxBqe3
- Yo7xEMMwMlk5ozGWNTQ8cFGcIr7ZC5syNJUw0nz/kTVZZft0NGFjaTrJIxdpMn5m0U
- MAGMQhZhr1R/cnId1GnW6dy+LF3IJ7AFS9B7NWBKGfYV8e9Bfh6qy204x+NLBp22vA
- bV4ii57bzUiiCa8vbWbenac8eoxdcI1TFB58antGyZrYILHubsrylc6PrEror27Nk9
- yq5uwf5M64kmt3+Fu/RBF0gOBJOAbK3eojTowF4/UL3Lhrb2uMKaeAiOuIQXwN/OB9
- AcFI7BFKpxsrQ==
-Received: from sofa.misterjones.org ([185.219.108.64]
+ b=chabNmOGj7rMquWy/9D0NuDL7CYTqW2x6TkP020z0Rp5UtLJz+WKxjrN0NwkEz5Tq
+ svYYGySzotmo4X1hYuf2z1xWPRmEntE9tHahZ4QyB7OYne9e9SqcI5KGG7xcuSOaRE
+ vNAIOAvJE2gREy0Z0xR182iep6faMJ5wjZhKdYmKj97izf/Z8ggNALB1zamRFy/M9n
+ cBoNP5CXPpsNsIALuyHJC7C/39jyrI2LuSMUlgziPf4wfI0ekW9hZy1/4TMak99K/V
+ +MymSxI3c+r//lFiRAU0TtZfxjc9yKQNMZKf0S7Qw6Iwi/7h+/jszha09ivQ1znttk
+ xmqFVNcuB/HJg==
+Received: from 82-132-214-225.dab.02.net ([82.132.214.225]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oc0st-00CJhn-Td;
- Sat, 24 Sep 2022 09:51:40 +0100
-Date: Sat, 24 Sep 2022 09:51:39 +0100
-Message-ID: <87edw1i290.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oc3JA-00CKhm-4t;
+ Sat, 24 Sep 2022 12:26:56 +0100
+Date: Sat, 24 Sep 2022 12:26:53 +0100
+Message-ID: <87czblhv2a.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Peter Xu <peterx@redhat.com>
 Subject: Re: [PATCH 2/6] KVM: Add KVM_CAP_DIRTY_LOG_RING_ORDERED capability
  and config option
-In-Reply-To: <Yy36Stppz4tYBPiP@x1n>
+In-Reply-To: <87edw1i290.wl-maz@kernel.org>
 References: <20220922170133.2617189-1-maz@kernel.org>
  <20220922170133.2617189-3-maz@kernel.org>
  <YyzYI/bvp/JnbcxS@xz-m1.local> <87czbmjhbh.wl-maz@kernel.org>
- <Yy36Stppz4tYBPiP@x1n>
+ <Yy36Stppz4tYBPiP@x1n> <87edw1i290.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Connect-IP: 82.132.214.225
 X-SA-Exim-Rcpt-To: peterx@redhat.com, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
  shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
@@ -95,60 +95,97 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 23 Sep 2022 19:26:18 +0100,
-Peter Xu <peterx@redhat.com> wrote:
+On Sat, 24 Sep 2022 09:51:39 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> On Fri, Sep 23, 2022 at 03:28:34PM +0100, Marc Zyngier wrote:
-> > On Thu, 22 Sep 2022 22:48:19 +0100,
-> > Peter Xu <peterx@redhat.com> wrote:
-> > > 
-> > > On Thu, Sep 22, 2022 at 06:01:29PM +0100, Marc Zyngier wrote:
-> > > > In order to differenciate between architectures that require no extra
-> > > > synchronisation when accessing the dirty ring and those who do,
-> > > > add a new capability (KVM_CAP_DIRTY_LOG_RING_ORDERED) that identify
-> > > > the latter sort. TSO architectures can obviously advertise both, while
-> > > > relaxed architectures most only advertise the ORDERED version.
-> > > > 
-> > > > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > ---
-> > > >  include/linux/kvm_dirty_ring.h |  6 +++---
-> > > >  include/uapi/linux/kvm.h       |  1 +
-> > > >  virt/kvm/Kconfig               | 14 ++++++++++++++
-> > > >  virt/kvm/Makefile.kvm          |  2 +-
-> > > >  virt/kvm/kvm_main.c            | 11 +++++++++--
-> > > >  5 files changed, 28 insertions(+), 6 deletions(-)
-> > > > 
-> > > > diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
-> > > > index 906f899813dc..7a0c90ae9a3f 100644
-> > > > --- a/include/linux/kvm_dirty_ring.h
-> > > > +++ b/include/linux/kvm_dirty_ring.h
-> > > > @@ -27,7 +27,7 @@ struct kvm_dirty_ring {
-> > > >  	int index;
-> > > >  };
-> > > >  
-> > > > -#ifndef CONFIG_HAVE_KVM_DIRTY_RING
-> > > > +#ifndef CONFIG_HAVE_KVM_DIRTY_LOG
-> > > 
-> > > s/LOG/LOG_RING/ according to the commit message? Or the name seems too
-> > > generic.
+> On Fri, 23 Sep 2022 19:26:18 +0100,
+> Peter Xu <peterx@redhat.com> wrote:
 > > 
-> > The commit message talks about the capability, while the above is the
-> > config option. If you find the names inappropriate, feel free to
-> > suggest alternatives (for all I care, they could be called FOO, BAR
-> > and BAZ).
+> > On Fri, Sep 23, 2022 at 03:28:34PM +0100, Marc Zyngier wrote:
+> > > On Thu, 22 Sep 2022 22:48:19 +0100,
+> > > Peter Xu <peterx@redhat.com> wrote:
+> > > > 
+> > > > On Thu, Sep 22, 2022 at 06:01:29PM +0100, Marc Zyngier wrote:
+> > > > > In order to differenciate between architectures that require no extra
+> > > > > synchronisation when accessing the dirty ring and those who do,
+> > > > > add a new capability (KVM_CAP_DIRTY_LOG_RING_ORDERED) that identify
+> > > > > the latter sort. TSO architectures can obviously advertise both, while
+> > > > > relaxed architectures most only advertise the ORDERED version.
+> > > > > 
+> > > > > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > > > ---
+> > > > >  include/linux/kvm_dirty_ring.h |  6 +++---
+> > > > >  include/uapi/linux/kvm.h       |  1 +
+> > > > >  virt/kvm/Kconfig               | 14 ++++++++++++++
+> > > > >  virt/kvm/Makefile.kvm          |  2 +-
+> > > > >  virt/kvm/kvm_main.c            | 11 +++++++++--
+> > > > >  5 files changed, 28 insertions(+), 6 deletions(-)
+> > > > > 
+> > > > > diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
+> > > > > index 906f899813dc..7a0c90ae9a3f 100644
+> > > > > --- a/include/linux/kvm_dirty_ring.h
+> > > > > +++ b/include/linux/kvm_dirty_ring.h
+> > > > > @@ -27,7 +27,7 @@ struct kvm_dirty_ring {
+> > > > >  	int index;
+> > > > >  };
+> > > > >  
+> > > > > -#ifndef CONFIG_HAVE_KVM_DIRTY_RING
+> > > > > +#ifndef CONFIG_HAVE_KVM_DIRTY_LOG
+> > > > 
+> > > > s/LOG/LOG_RING/ according to the commit message? Or the name seems too
+> > > > generic.
+> > > 
+> > > The commit message talks about the capability, while the above is the
+> > > config option. If you find the names inappropriate, feel free to
+> > > suggest alternatives (for all I care, they could be called FOO, BAR
+> > > and BAZ).
+> > 
+> > The existing name from David looks better than the new one.. to me.
 > 
-> The existing name from David looks better than the new one.. to me.
+> I'm happy to bikeshed, but please spell it out for me. If we follow
+> the current scheme, we need 3 configuration symbols (of which we
+> already have one), and 2 capabilities (of which we already have one).
+> 
+> Do you have any concrete proposal for those?
 
-I'm happy to bikeshed, but please spell it out for me. If we follow
-the current scheme, we need 3 configuration symbols (of which we
-already have one), and 2 capabilities (of which we already have one).
+In order to make some forward progress, I've reworked the series[1]
+with another proposal for those:
 
-Do you have any concrete proposal for those?
+Config symbols:
 
-Thanks,
+- HAVE_KVM_DIRTY_RING:
+  * mostly the same meaning as today
+  * not directly selected by any architecture
+  * doesn't expose any capability on its own
+
+- HAVE_KVM_DIRTY_RING_TSO:
+  * only for strongly ordered architectures
+  * selects HAVE_KVM_DIRTY_RING
+  * exposes KVM_CAP_DIRTY_LOG_RING
+  * selected by x86
+
+- HAVE_KVM_DIRTY_RING_ACQ_REL:
+  * selects HAVE_KVM_DIRTY_RING
+  * exposes KVM_CAP_DIRTY_LOG_RING_ACQ_REL
+  * selected by arm64 and x86
+
+Capabilities:
+
+- KVM_CAP_DIRTY_LOG_RING: the good old x86-specific stuff, advertised
+  when HAVE_KVM_DIRTY_RING_TSO is selected
+
+- KVM_CAP_DIRTY_LOG_RING_ACQ_REL: the new acquire/release semantics,
+  advertised when HAVE_KVM_DIRTY_RING_ACQ_REL is selected
+
+This significantly reduces the churn and makes things slightly more
+explicit.
+
+Thoughts?
 
 	M.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/dirty-log-ordered-bikeshed
 
 -- 
 Without deviation from the norm, progress is not possible.
