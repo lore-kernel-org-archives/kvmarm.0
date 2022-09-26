@@ -2,77 +2,49 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E3CAC32771
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Sep 2022 09:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C164C32771
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Sep 2022 11:00:39 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C18C4B08F;
-	Mon, 26 Sep 2022 05:59:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74DFC4B822;
+	Mon, 26 Sep 2022 07:00:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2x6g-NHV39WR; Mon, 26 Sep 2022 05:59:53 -0400 (EDT)
+	with ESMTP id EmZxVOm+XAi7; Mon, 26 Sep 2022 07:00:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EEC484B77A;
-	Mon, 26 Sep 2022 05:59:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27FC24B824;
+	Mon, 26 Sep 2022 07:00:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E69854B08F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 05:59:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 88CE04B822
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 07:00:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VQUXBZ52OJIH for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Sep 2022 05:59:51 -0400 (EDT)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E88F408F4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 05:59:51 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id 7EDF2CE10D9;
- Mon, 26 Sep 2022 09:59:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7643CC433D6;
- Mon, 26 Sep 2022 09:59:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1664186384;
- bh=JkqwGO41jubzZ7FENPY93uExAipCGViKwp9CWUpcYec=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=oQZ8GcxQRwTvaC9P7g6BCyFH/8e7160/hRnWMTBbxuq3tCdNYKdHF907yaJKkL6Kw
- ZTJWJc1wz8KkgDcuFr/czYUsGeb2W2YmosFwu2B/Cxor4DH7nG4Rk9ohqbc5Zp1vvs
- SnB9453ofpP6KyOV/UZfcaNb/DRMGhz9XUloVr2UYg1njQbC9mA/J5V0vBsERzwKX4
- swIPOxfDQVKyb6eu1cBujSicjfWn7vz2T+901VzOqop0RpF40KAl5ueZDDvQ8oaj/F
- K3sIFHN6ZeqN/wct/3mv1rmq8zRdp6LS+/k79gfiCVZO2TmBb2JtQWQJZSa5vPc7Px
- S0HXlAFCru6gQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1ocktq-00CcjO-82;
- Mon, 26 Sep 2022 10:59:42 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Elliot Berman <quic_eberman@quicinc.com>
-Subject: Re: [PATCH v5] KVM: arm64: Ignore kvm-arm.mode if
- !is_hyp_mode_available()
-Date: Mon, 26 Sep 2022 10:59:39 +0100
-Message-Id: <166418635574.3586576.7130049081458859826.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220920190658.2880184-1-quic_eberman@quicinc.com>
-References: <20220920190658.2880184-1-quic_eberman@quicinc.com>
+ with ESMTP id prOFt1rSomi7 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Sep 2022 07:00:35 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 04ACF4B813
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 07:00:34 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7A961ED1;
+ Mon, 26 Sep 2022 04:00:40 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC7BC3F66F;
+ Mon, 26 Sep 2022 04:00:32 -0700 (PDT)
+Date: Mon, 26 Sep 2022 12:01:28 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Subject: Re: [kvm-unit-tests RFC PATCH 07/19] arm/arm64: Mark the phys_end
+ parameter as unused in setup_mmu()
+Message-ID: <YzGGiDBtJ4z/sLS7@monolith.localdoman>
+References: <20220809091558.14379-1-alexandru.elisei@arm.com>
+ <20220809091558.14379-8-alexandru.elisei@arm.com>
+ <20220920085815.qk6js67qjvken2kt@kamzik>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: james.morse@arm.com, alexandru.elisei@arm.com,
- catalin.marinas@arm.com, will@kernel.org, suzuki.poulose@arm.com,
- quic_eberman@quicinc.com, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
+Content-Disposition: inline
+In-Reply-To: <20220920085815.qk6js67qjvken2kt@kamzik>
+Cc: nikos.nikoleris@arm.com, pbonzini@redhat.com, thuth@redhat.com,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,28 +61,69 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 20 Sep 2022 12:06:58 -0700, Elliot Berman wrote:
-> Ignore kvm-arm.mode if !is_hyp_mode_available(). Specifically, we want
-> to avoid switching kvm_mode to KVM_MODE_PROTECTED if hypervisor mode is
-> not available. This prevents "Protected KVM" cpu capability being
-> reported when Linux is booting in EL1 and would not have KVM enabled.
-> Reasonably though, we should warn if the command line is requesting a
-> KVM mode at all if KVM isn't actually available. Allow
-> "kvm-arm.mode=none" to skip the warning since this would disable KVM
-> anyway.
+Hi,
 
-Applied to next, thanks!
+On Tue, Sep 20, 2022 at 10:58:15AM +0200, Andrew Jones wrote:
+> On Tue, Aug 09, 2022 at 10:15:46AM +0100, Alexandru Elisei wrote:
+> > phys_end was used to cap the linearly mapped memory to 3G to allow 1G of
+> > room for the vmalloc area to grown down. This was made useless in commit
+> > c1cd1a2bed69 ("arm/arm64: mmu: Remove memory layout assumptions"), when
+> > setup_mmu() was changed to map all the detected memory regions without
+> > changing their limits.
+> 
+> c1cd1a2bed69 was a start, but as that commit says, the 3G-4G region was
+> still necessary due to assumptions in the virtual memory allocator. This
+> patch needs to point out a vmalloc commit which removes that assumption
+> as well for its justification.
 
-[1/1] KVM: arm64: Ignore kvm-arm.mode if !is_hyp_mode_available()
-      commit: b2a4d007c347b4cb4c60f7512733c3f8300a129c
+By "made useless" I mean that after that commit phys_end has no influence
+on the way setup_mmu() creates the translation tables.
 
-Cheers,
+Yes, it's a problem because on real hardware or with kvmtool, which allows
+the user to specify where RAM starts, the test can be loaded at the same
+address from where vmalloc() will start allocating memory. But I think that
+should be fixed separately from this series, maybe as part of the main
+UEFI series, or as a separate patch(es).
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+I'll drop this patch, and leave any cleanups for when the vmalloc area
+change is implemented.
 
+Thanks,
+Alex
 
+> 
+> Thanks,
+> drew
+> 
+> > 
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >  lib/arm/mmu.c | 6 +-----
+> >  1 file changed, 1 insertion(+), 5 deletions(-)
+> > 
+> > diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+> > index e1a72fe4941f..8f936acafe8b 100644
+> > --- a/lib/arm/mmu.c
+> > +++ b/lib/arm/mmu.c
+> > @@ -153,14 +153,10 @@ void mmu_set_range_sect(pgd_t *pgtable, uintptr_t virt_offset,
+> >  	}
+> >  }
+> >  
+> > -void *setup_mmu(phys_addr_t phys_end, void *unused)
+> > +void *setup_mmu(phys_addr_t unused0, void *unused1)
+> >  {
+> >  	struct mem_region *r;
+> >  
+> > -	/* 3G-4G region is reserved for vmalloc, cap phys_end at 3G */
+> > -	if (phys_end > (3ul << 30))
+> > -		phys_end = 3ul << 30;
+> > -
+> >  #ifdef __aarch64__
+> >  	init_alloc_vpage((void*)(4ul << 30));
+> >  
+> > -- 
+> > 2.37.1
+> > 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
