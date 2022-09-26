@@ -2,81 +2,56 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C201CC6FA8E
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Sep 2022 17:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BCE2C32771
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Sep 2022 22:22:01 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B5FC4B798;
-	Mon, 26 Sep 2022 13:22:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA9834B74F;
+	Mon, 26 Sep 2022 18:22:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id e7rK1I-ZnYgG; Mon, 26 Sep 2022 13:22:19 -0400 (EDT)
+	with ESMTP id PWATD1obt442; Mon, 26 Sep 2022 18:21:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE90F4B648;
-	Mon, 26 Sep 2022 13:22:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ABC04B2AE;
+	Mon, 26 Sep 2022 18:21:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A6004B62A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 13:22:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F7D54141A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 18:21:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tty47+6f3Ujk for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Sep 2022 13:22:17 -0400 (EDT)
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com
- [209.85.216.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D016D40E25
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 13:22:17 -0400 (EDT)
-Received: by mail-pj1-f53.google.com with SMTP id go6so6942411pjb.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 10:22:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date;
- bh=R7X1SDUffa2GKX/qHcqI1vL/oFJyVJgl0377su/y5wk=;
- b=Qpfjt7EqVpZbXAqTXvGvWggL9tZUa0qMg71aM1Jb7QpbfZaITj2obDXSlTBfj4mwp2
- 87Jc5cpM2MvCRGMJOPQO3KEeMTjPC/XSVzeDGiU62gEJqTDMuneeDpmSWCFXkrJW6alo
- HLi0xSGTU5pzLh0FPhicsB9f5EoHT20TRKTos1nzXyrpdewdqPAwAl54tMz7PzFLCCQX
- y/RYOBfpxmGeTJirxXOcmCcRkWK0Xn6xljPfc0sc4MuP5E4jN1SBjhHuOHBgMMSxlX4j
- M4Onfp6lVFVjnp+ocVITbFA5/hdLjs0/ukGXHrgF3OcbPFrSpDg0iBClQ+ARa8bNgw7Y
- tx5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
- bh=R7X1SDUffa2GKX/qHcqI1vL/oFJyVJgl0377su/y5wk=;
- b=NGKPrrLQIfn997wVm0N0xNIFwMspGwSjrnIczT9KUPpvUNsw2NsLePn9RORhh5vLtt
- hI9qlAOhbOGiQu16vwkzw6IYJ3kDkBE5SGU5AoMc4KDCz/DGs3+RwWt6/M+ftahN34I1
- knnvWyLMZJ9Iaoz+EzgmIH0M0ofl63qMaQuw+/Hvk4CH27THAatrnRN2v+cUsZPp6GiV
- zz/bp4ytyQp5XH4CDlB9/Ki5T4wdZlTFlVYSG6Wfk9JS89Nfvw/yhp/sEAgzzIabknRS
- T6SHLs3aOFxwzsgQRQVMrQboz7D2b4dxLU4eYFNmJBIzHmAYOq2rFkbXD3iQgxUZBRqr
- Twbg==
-X-Gm-Message-State: ACrzQf3RRD/1FduXBnyCBYObX1ggDbVNuxeqK8rAKyHuChc9aqlUkgCD
- EBBk9xrRnEVUa7AMs3i53Lp0Ag==
-X-Google-Smtp-Source: AMsMyM4tRK4K8+B/i1JkGhoUP0+VnP30Y+iCzcZKtmgRw/orO54avzYF9KCU8PiCryAaHOJ2FTT2ig==
-X-Received: by 2002:a17:902:da8a:b0:179:e022:5f6 with SMTP id
- j10-20020a170902da8a00b00179e02205f6mr2308882plx.80.1664212936586; 
- Mon, 26 Sep 2022 10:22:16 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com.
- [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
- a124-20020a636682000000b00439103a6c3bsm10929187pgc.94.2022.09.26.10.22.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 26 Sep 2022 10:22:14 -0700 (PDT)
-Date: Mon, 26 Sep 2022 10:22:10 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v8 10/14] KVM: selftests: aarch64: Add
- aarch64/page_fault_test
-Message-ID: <YzHfwmZqMQ9xXaNa@google.com>
-References: <20220922031857.2588688-1-ricarkol@google.com>
- <20220922031857.2588688-11-ricarkol@google.com>
- <Yyy4WjEmuSH1tSZb@google.com>
+ with ESMTP id zvnoWnaudBvP for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Sep 2022 18:21:56 -0400 (EDT)
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B186A41021
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 18:21:56 -0400 (EDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1664230915;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=2zTaRaQiMuXpNWiLI5P1IeYGL513pIeEKQLlnmeiEaw=;
+ b=kuI2NXKJrIV7Ky1EnDY4se/He8yCxvqChb9ZEgdUs7eyc4bUArKXYAX2RYghoVZvP05Ar0
+ WL66veVAWiFjKsRPwVsqR/qgfdxlihduvbvHOpp3bZGxUL79IGgMLHh3CkFn/WH94fCZ3A
+ ccLj7EQrb17DPrnxfezdL/Lfz8DXQlQ=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v2] KVM: arm64: Limit stage2_apply_range() batch size to 1GB
+Date: Mon, 26 Sep 2022 22:21:45 +0000
+Message-Id: <20220926222146.661633-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Yyy4WjEmuSH1tSZb@google.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
- andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com,
- axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,108 +68,153 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 22, 2022 at 07:32:42PM +0000, Sean Christopherson wrote:
-> On Thu, Sep 22, 2022, Ricardo Koller wrote:
-> > +/* Returns true to continue the test, and false if it should be skipped. */
-> > +static bool punch_hole_in_memslot(struct kvm_vm *vm,
-> 
-> This is a very misleading name, and IMO is flat out wrong.  The helper isn't
-> punching a hole in the memslot, it's punching a hole in the backing store, and
-> those are two very different things.  Encountering a hole in a _memslot_ yields
-> emualted MMIO semantics, not CoW zero page semantics.
+Presently stage2_apply_range() works on a batch of memory addressed by a
+stage 2 root table entry for the VM. Depending on the IPA limit of the
+VM and PAGE_SIZE of the host, this could address a massive range of
+memory. Some examples:
 
-Interestingly, we used to refer those as "gaps", as in "gaps between memslots".
-But I get the point.
+  4 level, 4K paging -> 512 GB batch size
 
-> 
-> Ideally, if we can come up with a not awful name, I'd also prefer to avoid "punch
-> hole" in the function name.  I can't think of a better alternative, so it's not
-> the end of the world if we're stuck with e.g punch_hole_in_backing_store(), but I
+  3 level, 64K paging -> 4TB batch size
 
-Ack.
+Unsurprisingly, working on such a large range of memory can lead to soft
+lockups. When running dirty_log_perf_test:
 
-> think the "punch_hole" name will be confusing for readers that are unfamiliar with
-> PUNCH_HOLE, especially for anonymous memory as "punching a hole" in anonymous
-> memory is more likely to be interpreted as "munmap()".
-> 
-> > +				  struct userspace_mem_region *region)
-> > +{
-> > +	void *hva = (void *)region->region.userspace_addr;
-> > +	uint64_t paging_size = region->region.memory_size;
-> > +	int ret, fd = region->fd;
-> > +
-> > +	if (fd != -1) {
-> > +		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-> > +				0, paging_size);
-> > +		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
-> > +	} else {
-> > +		if (is_backing_src_hugetlb(region->backing_src_type))
-> > +			return false;
-> 
-> Why is hugetlb disallowed?  I thought anon hugetlb supports MADV_DONTNEED?
-> 
+  ./dirty_log_perf_test -m -2 -s anonymous_thp -b 4G -v 48
 
-It fails with EINVAL (only tried on arm) for both the PAGE_SIZE and the huge
-page size. And note that the address is aligned as well.
+  watchdog: BUG: soft lockup - CPU#0 stuck for 45s! [dirty_log_perf_:16703]
+  Modules linked in: vfat fat cdc_ether usbnet mii xhci_pci xhci_hcd sha3_generic gq(O)
+  CPU: 0 PID: 16703 Comm: dirty_log_perf_ Tainted: G           O       6.0.0-smp-DEV #1
+  pstate: 80400009 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+  pc : dcache_clean_inval_poc+0x24/0x38
+  lr : clean_dcache_guest_page+0x28/0x4c
+  sp : ffff800021763990
+  pmr_save: 000000e0
+  x29: ffff800021763990 x28: 0000000000000005 x27: 0000000000000de0
+  x26: 0000000000000001 x25: 00400830b13bc77f x24: ffffad4f91ead9c0
+  x23: 0000000000000000 x22: ffff8000082ad9c8 x21: 0000fffafa7bc000
+  x20: ffffad4f9066ce50 x19: 0000000000000003 x18: ffffad4f92402000
+  x17: 000000000000011b x16: 000000000000011b x15: 0000000000000124
+  x14: ffff07ff8301d280 x13: 0000000000000000 x12: 00000000ffffffff
+  x11: 0000000000010001 x10: fffffc0000000000 x9 : ffffad4f9069e580
+  x8 : 000000000000000c x7 : 0000000000000000 x6 : 000000000000003f
+  x5 : ffff07ffa2076980 x4 : 0000000000000001 x3 : 000000000000003f
+  x2 : 0000000000000040 x1 : ffff0830313bd000 x0 : ffff0830313bcc40
+  Call trace:
+   dcache_clean_inval_poc+0x24/0x38
+   stage2_unmap_walker+0x138/0x1ec
+   __kvm_pgtable_walk+0x130/0x1d4
+   __kvm_pgtable_walk+0x170/0x1d4
+   __kvm_pgtable_walk+0x170/0x1d4
+   __kvm_pgtable_walk+0x170/0x1d4
+   kvm_pgtable_stage2_unmap+0xc4/0xf8
+   kvm_arch_flush_shadow_memslot+0xa4/0x10c
+   kvm_set_memslot+0xb8/0x454
+   __kvm_set_memory_region+0x194/0x244
+   kvm_vm_ioctl_set_memory_region+0x58/0x7c
+   kvm_vm_ioctl+0x49c/0x560
+   __arm64_sys_ioctl+0x9c/0xd4
+   invoke_syscall+0x4c/0x124
+   el0_svc_common+0xc8/0x194
+   do_el0_svc+0x38/0xc0
+   el0_svc+0x2c/0xa4
+   el0t_64_sync_handler+0x84/0xf0
+   el0t_64_sync+0x1a0/0x1a4
 
-madvise(0xffffb7c00000, 2097152, MADV_DONTNEED) = -1 EINVAL (Invalid argument)
-	^^^^^^^^^^^^^^	^^^^^^^
-	2M aligned	2M (hugepage size)
-			
-madvise(0xffff9e800000, 4096, MADV_DONTNEED) = -1 EINVAL (Invalid argument)   
-			^^^^
-			PAGE_SIZE
+Given the various paging configurations used by KVM at stage 2 there
+isn't a sensible page table level to use as the batch size. Use 1GB as
+the batch size instead, as it is evenly divisible by all supported
+hugepage sizes across 4K, 16K, and 64K paging.
 
-> > +
-> > +		ret = madvise(hva, paging_size, MADV_DONTNEED);
-> > +		TEST_ASSERT(ret == 0, "madvise failed, errno: %d\n", errno);
-> > +	}
-> > +
-> > +	return true;
-> > +}
-> 
-> ...
-> 
-> > +	/*
-> > +	 * Accessing a hole in the data memslot (punched with fallocate or
-> 
-> s/memslot/backing store
-> 
-> > +	 * madvise) shouldn't fault (more sanity checks).
-> 
-> 
-> Naming aside, please provide more detail as to why this is the correct KVM
-> behavior.  This is quite subtle and relies on gory implementation details that a
-> lot of KVM developers will be unaware of.
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
 
-Ack.
+Applies to 6.0-rc3. Tested with 4K, 16K, and 64K pages with the above
+dirty_log_perf_test command and noticed no more soft lockups.
 
-> 
-> Specifically, from an accessibility perspective, PUNCH_HOLE doesn't actually create
-> a hole in the file.  The "hole" can still be read and written; the "expect '0'"
-> checks are correct specifically because those are the semantics of PUNCH_HOLE.
-> 
-> In other words, it's not just that the accesses shouldn't fault, reads _must_
-> return zeros and writes _must_ re-populate the page.
+v1: https://lore.kernel.org/kvmarm/20220920183630.3376939-1-oliver.upton@linux.dev/
 
-Moreover, the behavior from the guest POV should be the same as userspace
-reading/writing on a hole (with PUNCH_HOLE). Will describe this as well.
+v1 -> v2:
+ - Align down to the next 1GB boundary (Ricardo)
 
-> 
-> Compare that with e.g. ftruncate() that makes the size of the file smaller, in
-> which case an access should result in KVM exiting to userspace with -EFAULT.
-> 
-> > +	 */
-> > +	TEST_ACCESS(guest_read64, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_cas, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_ld_preidx, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_write64, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_st_preidx, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_at, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_dc_zva, no_af, CMD_HOLE_DATA),
-> > +
-> > +	{ 0 }
-> > +};
+ arch/arm64/include/asm/stage2_pgtable.h | 20 --------------------
+ arch/arm64/kvm/mmu.c                    |  8 +++++++-
+ 2 files changed, 7 insertions(+), 21 deletions(-)
+
+diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
+index fe341a6578c3..c8dca8ae359c 100644
+--- a/arch/arm64/include/asm/stage2_pgtable.h
++++ b/arch/arm64/include/asm/stage2_pgtable.h
+@@ -10,13 +10,6 @@
+ 
+ #include <linux/pgtable.h>
+ 
+-/*
+- * PGDIR_SHIFT determines the size a top-level page table entry can map
+- * and depends on the number of levels in the page table. Compute the
+- * PGDIR_SHIFT for a given number of levels.
+- */
+-#define pt_levels_pgdir_shift(lvls)	ARM64_HW_PGTABLE_LEVEL_SHIFT(4 - (lvls))
+-
+ /*
+  * The hardware supports concatenation of up to 16 tables at stage2 entry
+  * level and we use the feature whenever possible, which means we resolve 4
+@@ -30,11 +23,6 @@
+ #define stage2_pgtable_levels(ipa)	ARM64_HW_PGTABLE_LEVELS((ipa) - 4)
+ #define kvm_stage2_levels(kvm)		VTCR_EL2_LVLS(kvm->arch.vtcr)
+ 
+-/* stage2_pgdir_shift() is the size mapped by top-level stage2 entry for the VM */
+-#define stage2_pgdir_shift(kvm)		pt_levels_pgdir_shift(kvm_stage2_levels(kvm))
+-#define stage2_pgdir_size(kvm)		(1ULL << stage2_pgdir_shift(kvm))
+-#define stage2_pgdir_mask(kvm)		~(stage2_pgdir_size(kvm) - 1)
+-
+ /*
+  * kvm_mmmu_cache_min_pages() is the number of pages required to install
+  * a stage-2 translation. We pre-allocate the entry level page table at
+@@ -42,12 +30,4 @@
+  */
+ #define kvm_mmu_cache_min_pages(kvm)	(kvm_stage2_levels(kvm) - 1)
+ 
+-static inline phys_addr_t
+-stage2_pgd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+-{
+-	phys_addr_t boundary = (addr + stage2_pgdir_size(kvm)) & stage2_pgdir_mask(kvm);
+-
+-	return (boundary - 1 < end - 1) ? boundary : end;
+-}
+-
+ #endif	/* __ARM64_S2_PGTABLE_H_ */
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index c9a13e487187..5d05bb92e129 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -31,6 +31,12 @@ static phys_addr_t hyp_idmap_vector;
+ 
+ static unsigned long io_map_base;
+ 
++static inline phys_addr_t stage2_apply_range_next(phys_addr_t addr, phys_addr_t end)
++{
++	phys_addr_t boundary = round_down(addr + SZ_1G, SZ_1G);
++
++	return (boundary - 1 < end - 1) ? boundary : end;
++}
+ 
+ /*
+  * Release kvm_mmu_lock periodically if the memory region is large. Otherwise,
+@@ -52,7 +58,7 @@ static int stage2_apply_range(struct kvm *kvm, phys_addr_t addr,
+ 		if (!pgt)
+ 			return -EINVAL;
+ 
+-		next = stage2_pgd_addr_end(kvm, addr, end);
++		next = stage2_apply_range_next(addr, end);
+ 		ret = fn(pgt, addr, next - addr);
+ 		if (ret)
+ 			break;
+
+base-commit: b90cb1053190353cc30f0fef0ef1f378ccc063c5
+-- 
+2.37.3.998.g577e59143f-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
