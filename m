@@ -2,47 +2,47 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C164C32771
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Sep 2022 11:00:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E073C07E9D
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Sep 2022 11:02:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74DFC4B822;
-	Mon, 26 Sep 2022 07:00:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C20BD40E62;
+	Mon, 26 Sep 2022 07:02:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EmZxVOm+XAi7; Mon, 26 Sep 2022 07:00:38 -0400 (EDT)
+	with ESMTP id pBE+1ttOvW0B; Mon, 26 Sep 2022 07:02:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27FC24B824;
-	Mon, 26 Sep 2022 07:00:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E1104B7FD;
+	Mon, 26 Sep 2022 07:02:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 88CE04B822
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 07:00:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0644E4B7ED
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 07:02:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id prOFt1rSomi7 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Sep 2022 07:00:35 -0400 (EDT)
+ with ESMTP id ZBdd0yTNftBa for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Sep 2022 07:02:00 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 04ACF4B813
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 07:00:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2C0C40E62
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 07:02:00 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7A961ED1;
- Mon, 26 Sep 2022 04:00:40 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CCF7C1063;
+ Mon, 26 Sep 2022 04:02:06 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC7BC3F66F;
- Mon, 26 Sep 2022 04:00:32 -0700 (PDT)
-Date: Mon, 26 Sep 2022 12:01:28 +0100
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0DA563F66F;
+ Mon, 26 Sep 2022 04:01:58 -0700 (PDT)
+Date: Mon, 26 Sep 2022 12:02:54 +0100
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: Andrew Jones <andrew.jones@linux.dev>
-Subject: Re: [kvm-unit-tests RFC PATCH 07/19] arm/arm64: Mark the phys_end
- parameter as unused in setup_mmu()
-Message-ID: <YzGGiDBtJ4z/sLS7@monolith.localdoman>
+Subject: Re: [kvm-unit-tests RFC PATCH 13/19] arm: page.h: Add missing
+ libcflat.h include
+Message-ID: <YzGGuxP9schoXL1C@monolith.localdoman>
 References: <20220809091558.14379-1-alexandru.elisei@arm.com>
- <20220809091558.14379-8-alexandru.elisei@arm.com>
- <20220920085815.qk6js67qjvken2kt@kamzik>
+ <20220809091558.14379-14-alexandru.elisei@arm.com>
+ <20220920093956.sh4lunjssia376gf@kamzik>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220920085815.qk6js67qjvken2kt@kamzik>
+In-Reply-To: <20220920093956.sh4lunjssia376gf@kamzik>
 Cc: nikos.nikoleris@arm.com, pbonzini@redhat.com, thuth@redhat.com,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -56,75 +56,41 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
-
-On Tue, Sep 20, 2022 at 10:58:15AM +0200, Andrew Jones wrote:
-> On Tue, Aug 09, 2022 at 10:15:46AM +0100, Alexandru Elisei wrote:
-> > phys_end was used to cap the linearly mapped memory to 3G to allow 1G of
-> > room for the vmalloc area to grown down. This was made useless in commit
-> > c1cd1a2bed69 ("arm/arm64: mmu: Remove memory layout assumptions"), when
-> > setup_mmu() was changed to map all the detected memory regions without
-> > changing their limits.
-> 
-> c1cd1a2bed69 was a start, but as that commit says, the 3G-4G region was
-> still necessary due to assumptions in the virtual memory allocator. This
-> patch needs to point out a vmalloc commit which removes that assumption
-> as well for its justification.
-
-By "made useless" I mean that after that commit phys_end has no influence
-on the way setup_mmu() creates the translation tables.
-
-Yes, it's a problem because on real hardware or with kvmtool, which allows
-the user to specify where RAM starts, the test can be loaded at the same
-address from where vmalloc() will start allocating memory. But I think that
-should be fixed separately from this series, maybe as part of the main
-UEFI series, or as a separate patch(es).
-
-I'll drop this patch, and leave any cleanups for when the vmalloc area
-change is implemented.
-
-Thanks,
-Alex
-
-> 
-> Thanks,
-> drew
-> 
-> > 
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> >  lib/arm/mmu.c | 6 +-----
-> >  1 file changed, 1 insertion(+), 5 deletions(-)
-> > 
-> > diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-> > index e1a72fe4941f..8f936acafe8b 100644
-> > --- a/lib/arm/mmu.c
-> > +++ b/lib/arm/mmu.c
-> > @@ -153,14 +153,10 @@ void mmu_set_range_sect(pgd_t *pgtable, uintptr_t virt_offset,
-> >  	}
-> >  }
-> >  
-> > -void *setup_mmu(phys_addr_t phys_end, void *unused)
-> > +void *setup_mmu(phys_addr_t unused0, void *unused1)
-> >  {
-> >  	struct mem_region *r;
-> >  
-> > -	/* 3G-4G region is reserved for vmalloc, cap phys_end at 3G */
-> > -	if (phys_end > (3ul << 30))
-> > -		phys_end = 3ul << 30;
-> > -
-> >  #ifdef __aarch64__
-> >  	init_alloc_vpage((void*)(4ul << 30));
-> >  
-> > -- 
-> > 2.37.1
-> > 
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGksCgpPbiBUdWUsIFNlcCAyMCwgMjAyMiBhdCAxMTozOTo1NkFNICswMjAwLCBBbmRyZXcgSm9u
+ZXMgd3JvdGU6Cj4gCj4gSSBndWVzcyB0aGlzIHNob3VsZCBiZSBzcXVhc2hlZCBpbnRvIG9uZSBv
+ZiB0aGUgZWFybHkgcGF0Y2hlcyBpbiB0aGlzCj4gc2VyaWVzIHNpbmNlIHdlIGRvbid0IGhhdmUg
+dGhpcyBpc3N1ZSB3aXRoIHRoZSBjdXJyZW50IGNvZGUuCgpXaWxsIGRvLCB0aGFua3MgZm9yIHRo
+ZSBzdWdnZXN0aW9uIQoKQWxleAoKPiAKPiBUaGFua3MsCj4gZHJldwo+IAo+IAo+IE9uIFR1ZSwg
+QXVnIDA5LCAyMDIyIGF0IDEwOjE1OjUyQU0gKzAxMDAsIEFsZXhhbmRydSBFbGlzZWkgd3JvdGU6
+Cj4gPiBJbmNsdWRlIGxpYmNmbGF0IGZyb20gcGFnZS5oIHRvIGF2b2lkIGVycm9yIGxpa2UgdGhp
+cyBvbmU6Cj4gPiAKPiA+IC9wYXRoL3RvL2t2bS11bml0LXRlc3RzL2xpYi9hc20vcGFnZS5oOjE5
+Ojk6IGVycm9yOiB1bmtub3duIHR5cGUgbmFtZSDigJh1NjTigJkKPiA+ICAgIDE5IHwgdHlwZWRl
+ZiB1NjQgcHRldmFsX3Q7Cj4gPiAgICAgICB8ICAgICAgICAgXn5+Cj4gPiBbLi5dCj4gPiAvcGF0
+aC90by9rdm0tdW5pdC10ZXN0cy9saWIvYXNtL3BhZ2UuaDo0Nzo4OiBlcnJvcjogdW5rbm93biB0
+eXBlIG5hbWUg4oCYcGh5c19hZGRyX3TigJkKPiA+ICAgIDQ3IHwgZXh0ZXJuIHBoeXNfYWRkcl90
+IF9fdmlydF90b19waHlzKHVuc2lnbmVkIGxvbmcgYWRkcik7Cj4gPiAgICAgICB8ICAgICAgICBe
+fn5+fn5+fn5+fgo+ID4gICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBefn5+fn5+fn5+fgo+ID4gWy4uXQo+ID4gL3BhdGgvdG8va3ZtLXVuaXQtdGVzdHMvbGliL2Fz
+bS9wYWdlLmg6NTA6NDc6IGVycm9yOiB1bmtub3duIHR5cGUgbmFtZSDigJhzaXplX3TigJkKPiA+
+ICAgIDUwIHwgZXh0ZXJuIHZvaWQgKl9faW9yZW1hcChwaHlzX2FkZHJfdCBwaHlzX2FkZHIsIHNp
+emVfdCBzaXplKTsKPiA+IAo+ID4gVGhlIGFybTY0IHZlcnNpb24gb2YgdGhlIGhlYWRlciBhbHJl
+YWR5IGluY2x1ZGVzIGxpYmNmbGF0IHNpbmNlIGNvbW1pdAo+ID4gYTJkMDY4NTJmZTU5ICgiYXJt
+NjQ6IEFkZCBzdXBwb3J0IGZvciBjb25maWd1cmluZyB0aGUgdHJhbnNsYXRpb24KPiA+IGdyYW51
+bGUiKS4KPiA+IAo+ID4gU2lnbmVkLW9mZi1ieTogQWxleGFuZHJ1IEVsaXNlaSA8YWxleGFuZHJ1
+LmVsaXNlaUBhcm0uY29tPgo+ID4gLS0tCj4gPiAgbGliL2FybS9hc20vcGFnZS5oIHwgMiArKwo+
+ID4gIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKykKPiA+IAo+ID4gZGlmZiAtLWdpdCBh
+L2xpYi9hcm0vYXNtL3BhZ2UuaCBiL2xpYi9hcm0vYXNtL3BhZ2UuaAo+ID4gaW5kZXggOGViNGE4
+ODM4MDhlLi4wYTQ2YmRhMDE4YzcgMTAwNjQ0Cj4gPiAtLS0gYS9saWIvYXJtL2FzbS9wYWdlLmgK
+PiA+ICsrKyBiL2xpYi9hcm0vYXNtL3BhZ2UuaAo+ID4gQEAgLTgsNiArOCw4IEBACj4gPiAgCj4g
+PiAgI2luY2x1ZGUgPGxpbnV4L2NvbnN0Lmg+Cj4gPiAgCj4gPiArI2luY2x1ZGUgPGxpYmNmbGF0
+Lmg+Cj4gPiArCj4gPiAgI2RlZmluZSBQQUdFX1NISUZUCQkxMgo+ID4gICNkZWZpbmUgUEFHRV9T
+SVpFCQkoX0FDKDEsVUwpIDw8IFBBR0VfU0hJRlQpCj4gPiAgI2RlZmluZSBQQUdFX01BU0sJCSh+
+KFBBR0VfU0laRS0xKSkKPiA+IC0tIAo+ID4gMi4zNy4xCj4gPiAKX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
+bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
+YW4vbGlzdGluZm8va3ZtYXJtCg==
