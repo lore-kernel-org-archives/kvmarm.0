@@ -2,50 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B53C32771
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Sep 2022 15:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C201CC6FA8E
+	for <kvmarm@archiver.kernel.org>; Mon, 26 Sep 2022 17:22:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E9574B782;
-	Mon, 26 Sep 2022 11:03:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B5FC4B798;
+	Mon, 26 Sep 2022 13:22:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5pQY0zxU89YC; Mon, 26 Sep 2022 11:03:45 -0400 (EDT)
+	with ESMTP id e7rK1I-ZnYgG; Mon, 26 Sep 2022 13:22:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB0584B742;
-	Mon, 26 Sep 2022 11:03:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE90F4B648;
+	Mon, 26 Sep 2022 13:22:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 75F4F4B6F9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 11:03:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A6004B62A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 13:22:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1xbq2VF1l67g for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Sep 2022 11:03:43 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D84DA4B6EB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 11:03:43 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E9A6F1042;
- Mon, 26 Sep 2022 08:03:49 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B42D93F66F;
- Mon, 26 Sep 2022 08:03:41 -0700 (PDT)
-Date: Mon, 26 Sep 2022 16:04:36 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Subject: Re: [kvm-unit-tests RFC PATCH 05/19] lib/alloc_phys: Remove locking
-Message-ID: <YzG/ZPLRsH4qwfnJ@monolith.localdoman>
-References: <20220809091558.14379-1-alexandru.elisei@arm.com>
- <20220809091558.14379-6-alexandru.elisei@arm.com>
- <20220920084553.734jvkqpognzgfpr@kamzik>
- <Yym+MOMK68K7abiQ@e121798.cambridge.arm.com>
- <20220920145952.fnftt2v46daigtdt@kamzik>
+ with ESMTP id tty47+6f3Ujk for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Sep 2022 13:22:17 -0400 (EDT)
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com
+ [209.85.216.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D016D40E25
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 13:22:17 -0400 (EDT)
+Received: by mail-pj1-f53.google.com with SMTP id go6so6942411pjb.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 10:22:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date;
+ bh=R7X1SDUffa2GKX/qHcqI1vL/oFJyVJgl0377su/y5wk=;
+ b=Qpfjt7EqVpZbXAqTXvGvWggL9tZUa0qMg71aM1Jb7QpbfZaITj2obDXSlTBfj4mwp2
+ 87Jc5cpM2MvCRGMJOPQO3KEeMTjPC/XSVzeDGiU62gEJqTDMuneeDpmSWCFXkrJW6alo
+ HLi0xSGTU5pzLh0FPhicsB9f5EoHT20TRKTos1nzXyrpdewdqPAwAl54tMz7PzFLCCQX
+ y/RYOBfpxmGeTJirxXOcmCcRkWK0Xn6xljPfc0sc4MuP5E4jN1SBjhHuOHBgMMSxlX4j
+ M4Onfp6lVFVjnp+ocVITbFA5/hdLjs0/ukGXHrgF3OcbPFrSpDg0iBClQ+ARa8bNgw7Y
+ tx5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+ bh=R7X1SDUffa2GKX/qHcqI1vL/oFJyVJgl0377su/y5wk=;
+ b=NGKPrrLQIfn997wVm0N0xNIFwMspGwSjrnIczT9KUPpvUNsw2NsLePn9RORhh5vLtt
+ hI9qlAOhbOGiQu16vwkzw6IYJ3kDkBE5SGU5AoMc4KDCz/DGs3+RwWt6/M+ftahN34I1
+ knnvWyLMZJ9Iaoz+EzgmIH0M0ofl63qMaQuw+/Hvk4CH27THAatrnRN2v+cUsZPp6GiV
+ zz/bp4ytyQp5XH4CDlB9/Ki5T4wdZlTFlVYSG6Wfk9JS89Nfvw/yhp/sEAgzzIabknRS
+ T6SHLs3aOFxwzsgQRQVMrQboz7D2b4dxLU4eYFNmJBIzHmAYOq2rFkbXD3iQgxUZBRqr
+ Twbg==
+X-Gm-Message-State: ACrzQf3RRD/1FduXBnyCBYObX1ggDbVNuxeqK8rAKyHuChc9aqlUkgCD
+ EBBk9xrRnEVUa7AMs3i53Lp0Ag==
+X-Google-Smtp-Source: AMsMyM4tRK4K8+B/i1JkGhoUP0+VnP30Y+iCzcZKtmgRw/orO54avzYF9KCU8PiCryAaHOJ2FTT2ig==
+X-Received: by 2002:a17:902:da8a:b0:179:e022:5f6 with SMTP id
+ j10-20020a170902da8a00b00179e02205f6mr2308882plx.80.1664212936586; 
+ Mon, 26 Sep 2022 10:22:16 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com.
+ [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
+ a124-20020a636682000000b00439103a6c3bsm10929187pgc.94.2022.09.26.10.22.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 26 Sep 2022 10:22:14 -0700 (PDT)
+Date: Mon, 26 Sep 2022 10:22:10 -0700
+From: Ricardo Koller <ricarkol@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v8 10/14] KVM: selftests: aarch64: Add
+ aarch64/page_fault_test
+Message-ID: <YzHfwmZqMQ9xXaNa@google.com>
+References: <20220922031857.2588688-1-ricarkol@google.com>
+ <20220922031857.2588688-11-ricarkol@google.com>
+ <Yyy4WjEmuSH1tSZb@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220920145952.fnftt2v46daigtdt@kamzik>
-Cc: nikos.nikoleris@arm.com, pbonzini@redhat.com, thuth@redhat.com,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+In-Reply-To: <Yyy4WjEmuSH1tSZb@google.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
+ andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com,
+ axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -57,113 +88,114 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGksCgpPbiBUdWUsIFNlcCAyMCwgMjAyMiBhdCAwNDo1OTo1MlBNICswMjAwLCBBbmRyZXcgSm9u
-ZXMgd3JvdGU6Cj4gT24gVHVlLCBTZXAgMjAsIDIwMjIgYXQgMDI6MjA6NDhQTSArMDEwMCwgQWxl
-eGFuZHJ1IEVsaXNlaSB3cm90ZToKPiA+IEhpLAo+ID4gCj4gPiBPbiBUdWUsIFNlcCAyMCwgMjAy
-MiBhdCAxMDo0NTo1M0FNICswMjAwLCBBbmRyZXcgSm9uZXMgd3JvdGU6Cj4gPiA+IE9uIFR1ZSwg
-QXVnIDA5LCAyMDIyIGF0IDEwOjE1OjQ0QU0gKzAxMDAsIEFsZXhhbmRydSBFbGlzZWkgd3JvdGU6
-Cj4gPiA+ID4gV2l0aCBwb3dlcnBjIG1vdmluZyB0aGUgcGFnZSBhbGxvY2F0b3IsIHRoZXJlIGFy
-ZSBubyBhcmNoaXRlY3R1cmVzIGxlZnQKPiA+ID4gPiB3aGljaCB1c2UgdGhlIHBoeXNpY2FsIGFs
-bG9jYXRvciBhZnRlciB0aGUgYm9vdCBzZXR1cDogIGFybSwgYXJtNjQsCj4gPiA+ID4gczM5MHgg
-YW5kIHBvd2VycGMgZHJhaW4gdGhlIHBoeXNpY2FsIGFsbG9jYXRvciB0byBpbml0aWFsaXplIHRo
-ZSBwYWdlCj4gPiA+ID4gYWxsb2NhdG9yOyBhbmQgeDg2IGNhbGxzIHNldHVwX3ZtKCkgdG8gZHJh
-aW4gdGhlIGFsbG9jYXRvciBmb3IgZWFjaCBvZgo+ID4gPiA+IHRoZSB0ZXN0cyB0aGF0IGFsbG9j
-YXRlIG1lbW9yeS4KPiA+ID4gCj4gPiA+IFBsZWFzZSBwdXQgdGhlIG1vdGl2YXRpb24gZm9yIHRo
-aXMgY2hhbmdlIGluIHRoZSBjb21taXQgbWVzc2FnZS4gSSBsb29rZWQKPiA+ID4gYWhlYWQgYXQg
-dGhlIG5leHQgcGF0Y2ggdG8gZmluZCBpdCwgYnV0IEknbSBub3Qgc3VyZSBJIGFncmVlIHdpdGgg
-aXQuIFdlCj4gPiA+IHNob3VsZCBiZSBhYmxlIHRvIGtlZXAgdGhlIGxvY2tpbmcgZXZlbiB3aGVu
-IHVzZWQgZWFybHksIHNpbmNlIHdlIHByb2JhYmx5Cj4gPiA+IG5lZWQgb3VyIGxvY2tpbmcgdG8g
-YmUgc29tZXRoaW5nIHdlIGNhbiB1c2UgZWFybHkgZWxzZXdoZXJlIGFueXdheS4KPiA+IAo+ID4g
-WW91IGFyZSBjb3JyZWN0LCB0aGUgY29tbWl0IG1lc3NhZ2UgZG9lc24ndCBleHBsYWluIHdoeSBs
-b2NraW5nIGlzIHJlbW92ZWQsCj4gPiB3aGljaCBtYWtlcyB0aGUgY29tbWl0IGNvbmZ1c2luZy4g
-SSB3aWxsIHRyeSB0byBkbyBhIGJldHRlciBqb2IgZm9yIHRoZQo+ID4gbmV4dCBpdGVyYXRpb24g
-KGlmIHdlIGRlY2lkZSB0byBrZWVwIHRoaXMgcGF0Y2gpLgo+ID4gCj4gPiBJIHJlbW92ZWQgbG9j
-a2luZyBiZWNhdXNlIHRoZSBwaHlzaWNhbCBhbGxvY2F0b3IgYnkgdGhlIGVuZCBvZiB0aGUgc2Vy
-aWVzCj4gPiB3aWxsIGVuZCB1cCBiZWluZyB1c2VkIG9ubHkgYnkgYXJtNjQgdG8gY3JlYXRlIHRo
-ZSBpZG1hcCwgd2hpY2ggaXMgZG9uZSBvbgo+IAo+IElmIG9ubHkgYXJtLCBhbmQgbm8gdW5pdCB0
-ZXN0cywgbmVlZHMgdGhlIHBoeXMgYWxsb2NhdG9yLCB0aGVuIGl0IGNhbiBiZQo+IGludGVncmF0
-ZWQgd2l0aCB3aGF0ZXZlciBhcm0gaXMgdXNpbmcgaXQgZm9yIGFuZCByZW1vdmVkIGZyb20gdGhl
-IGdlbmVyYWwKPiBsaWIuCgpJIGtlcHQgdGhlIGFsbG9jYXRvciBpbiBsaWIgYmVjYXVzZSBJIHRo
-b3VnaHQgdGhhdCBSSVNDLVYgbWlnaHQgaGF2ZSBhbiB1c2UKZm9yIGl0LiBTaW5jZSBpdCdzIGEg
-UklTQyBhcmNoaXRlY3R1cmUsIEkgd2FzIHRoaW5raW5nIHRoYXQgaXQgYWxzbyBtaWdodApyZXF1
-aXJlIHNvZnR3YXJlIGNhY2hlIG1hbmFnZW1lbnQgYXJvdW5kIGVuYWJsaW5nL2Rpc2FibGluZyB0
-aGUgTU1VLiBCdXQgaW4KdGhlIGVuZCBpdCdzIHVwIHRvIHlvdSwgaXQgd291bGQgYmUgZWFzeSB0
-byBtb3ZlIHRoZSBwaHlzaWNhbCBhbGxvY2F0b3IgdG8KbGliL2FybSBpZiB5b3UgdGhpbmsgdGhh
-dCBpcyBiZXN0LgoKPiAKPiA+IHRoZSBib290IENQVSBhbmQgd2l0aCB0aGUgTU1VIG9mZi4gQWZ0
-ZXIgdGhhdCwgdGhlIHRyYW5zbGF0aW9uIHRhYmxlCj4gPiBhbGxvY2F0b3IgZnVuY3Rpb25zIHdp
-bGwgdXNlIHRoZSBwYWdlIGFsbG9jYXRvciwgd2hpY2ggY2FuIGJlIHVzZWQKPiA+IGNvbmN1cnJl
-bnRseS4KPiA+IAo+ID4gTG9va2luZyBhdCB0aGUgc3BpbmxvY2sgaW1wbGVtZW50YXRpb24sIHNw
-aW5fbG9jaygpIGRvZXNuJ3QgcHJvdGVjdCBmcm9tCj4gPiB0aGUgY29uY3VycmVudCBhY2Nlc3Nl
-cyB3aGVuIHRoZSBNTVUgaXMgZGlzYWJsZWQgKGxvY2stPnYgaXMKPiA+IHVuY29uZGl0aW9uYWxs
-eSBzZXQgdG8gMSkuIFdoaWNoIG1lYW5zIHRoYXQgc3Bpbl9sb2NrKCkgZG9lcyBub3Qgd29yayAo
-aW4KPiA+IHRoZSBzZW5zZSB0aGF0IGl0IGRvZXNuJ3QgcHJvdGVjdCBhZ2FpbnN0IGNvbmN1cnJl
-bnQgYWNjZXNzZXMpIG9uIHRoZSBib290Cj4gPiBwYXRoLCB3aGljaCBkb2Vzbid0IG5lZWQgYSBz
-cGlubG9jayBhbnl3YXksIGJlY2F1c2Ugbm8gc2Vjb25kYXJpZXMgYXJlCj4gPiBvbmxpbmUgc2Vj
-b25kYXJpZXMuIEl0IGFsc28gbWVhbnMgdGhhdCBzcGlubG9ja3MgZG9uJ3Qgd29yayB3aGVuCj4g
-PiBBVVhJTkZPX01NVV9PRkYgaXMgc2V0LiBTbyBmb3IgdGhlIHB1cnBvc2Ugb2Ygc2ltcGxpY2l0
-eSBJIHByZWZlcnJlZCB0bwo+ID4gZHJvcCBpdCBlbnRpcmVseS4KPiAKPiBJZiBvdGhlciBhcmNo
-aXRlY3R1cmVzIG9yIHVuaXQgdGVzdHMgaGF2ZSAvIGNvdWxkIGhhdmUgdXNlcyBmb3IgdGhlCj4g
-cGh5cyBhbGxvY2F0b3IgdGhlbiB3ZSBzaG91bGQgZWl0aGVyIGRvY3VtZW50IHRoYXQgaXQgZG9l
-c24ndCBoYXZlCj4gbG9ja3Mgb3Iga2VlcCB0aGUgbG9ja3MsIGFuZCBhcm0gd2lsbCBqdXN0IGtu
-b3cgdGhhdCB0aGV5IGRvbid0IHdvcmssCj4gYnV0IGFsc28gdGhhdCB0aGV5IGRvbid0IG5lZWQg
-dG8gZm9yIGl0cyBwdXJwb3Nlcy4KCkkgd2lsbCB3cml0ZSBhIGNvbW1lbnQgZXhwbGFpbmluZyB0
-aGUgYmFrZWQgaW4gYXNzdW1wdGlvbnMgZm9yIHRoZQphbGxvY2F0b3IuCgo+IAo+IEZpbmFsbHks
-IGlmIHdlIGRyb3AgdGhlIGxvY2tzIGFuZCBhcm0gZG9lc24ndCBoYXZlIGFueSBvdGhlciBwbGFj
-ZXMgd2hlcmUKPiB3ZSB1c2UgbG9ja3Mgd2l0aG91dCB0aGUgTU1VIGVuYWJsZWQsIHRoZW4gd2Ug
-Y2FuIGNoYW5nZSB0aGUgbG9jawo+IGltcGxlbWVudGF0aW9uIHRvIG5vdCBoYXZlIHRoZSBuby1t
-bXUgZmFsbGJhY2sgLSBtYXliZSBieSBzd2l0Y2hpbmcgdG8gdGhlCj4gZ2VuZXJpYyBpbXBsZW1l
-bnRhdGlvbiBhcyB0aGUgb3RoZXIgYXJjaGl0ZWN0dXJlcyBoYXZlIGRvbmUuCgpUaGUgYXJjaGl0
-ZWN0dXJlIG1hbmRhdGVzIHRoYXQgbG9hZC1hY3F1aXJlL3N0b3JlLXJlbGVhc2UgaW5zdHJ1Y3Rp
-b25zIGFyZQpzdXBwb3J0ZWQgb25seSBvbiBOb3JtYWwgbWVtb3J5ICh0byBiZSBtb3JlIHByZWNp
-c2UsIElubmVyIFNoYXJlYWJsZSwgSW5uZXIKV3JpdGUtQmFjaywgT3V0ZXIgV3JpdGUtQmFjayBO
-b3JtYWwgbWVtb3J5IHdpdGggUmVhZCBhbGxvY2F0aW9uIGhpbnRzIGFuZApXcml0ZSBhbGxvY2F0
-aW9uIGhpbnRzIGFuZCBub3QgdHJhbnNpZW50IGFuZCBPdXRlciBTaGFyZWFibGUsIElubmVyCldy
-aXRlLUJhY2ssIE91dGVyIFdyaXRlLUJhY2sgTm9ybWFsIG1lbW9yeSB3aXRoIFJlYWQgYWxsb2Nh
-dGlvbiBoaW50cyBhbmQKV3JpdGUgYWxsb2NhdGlvbiBoaW50cyBhbmQgbm90IHRyYW5zaWVudCwg
-QVJNIERESSAwNDg3SC5hLCBwYWdlcyBCMi0yMTEgYW5kCkIyLTIxMikuCgpJZiB0aGUgQVVYSU5G
-T19NTVVfT0ZGIGZsYWcgaXMgc2V0LCBrdm0tdW5pdC10ZXN0cyBkb2Vzbid0IGVuYWJsZSB0aGUg
-TU1VCmF0IGJvb3QsIHdoaWNoIG1lYW5zIHRoYXQgYWxsIHRlc3RzIGNhbiBiZSBydW4gd2l0aCB0
-aGUgTU1VIGRpc2FibGVkLiBJbgp0aGlzIGNhc2UsIGFsbCBtZW1vcnkgaXMgRGV2aWNlLW5HblJu
-RSAoaW5zdGVhZCBvZiBOb3JtYWwpLiBCeSB1c2luZyBhbgppbXBsZW1lbnRhdGlvbiB0aGF0IGRv
-ZXNuJ3QgdGFrZSBpbnRvIGFjY291bnQgdGhhdCBzcGluX2xvY2soKSBtaWdodCBiZQpjYWxsZWQg
-d2l0aCB0aGUgTU1VIGRpc2FibGVkLCBrdm0tdW5pdC10ZXN0cyB3aWxsIGVuZCB1cCB1c2luZyBl
-eGNsdXNpdmUKYWNjZXNzIGluc3RydWN0aW9ucyBvbiBtZW1vcnkgd2hpY2ggZG9lc24ndCBzdXBw
-b3J0IGl0LiBUaGlzIGNhbiBoYXZlCnZhcmlvdXMgZWZmZWN0cywgYWxsIHJhdGhlciB1bnBsZWFz
-YW50LCBsaWtlIGNhdXNpbmcgYW4gZXh0ZXJuYWwgYWJvcnQgb3IKdHJlYXRpbmcgdGhlIGV4Y2x1
-c2l2ZSBhY2Nlc3MgaW5zdHJ1Y3Rpb24gYXMgYSBOT1AgKEFSTSBEREkgMDQ4N0guYSwgcGFnZQpC
-Mi0yMTIpLgoKVGVzdGVkIHRoaXMgb24gbXkgcm9ja3BybzY0IGJvYXJkLCBrdm0tdW5pdC10ZXN0
-cyBidWlsdCBmcm9tIGN1cnJlbnQKbWFzdGVyLCB3aXRoIHRoZSBtbXVfZGlzYWJsZWQoKSBwYXRo
-IHJlbW92ZWQgZnJvbSBzcGluX2xvY2soKSAoYW5kCkFVWElORk9fTU1VX09GRiBmbGFnIHNldCks
-IGFsbCB0ZXN0cyBoYW5nIGluZGVmaW5pdGVseSwgdGhhdCdzIGJlY2F1c2UKcGh5c19hbGxvY19p
-bml0KCkgdXNlcyBhIHNwaW5sb2NrLiBJdCBpcyBjb25jZWl2YWJsZSB0aGF0IHdlIGNvdWxkIHJl
-d29yawp0aGUgc2V0dXAgY29kZSB0byByZW1vdmUgdGhlIHVzYWdlIG9mIHNwaW5sb2NrcywgYnV0
-IGl0J3Mgc3RpbGwgdGhlIG1hdHRlcgpvZiB0ZXN0cyBuZWVkaW5nIG9uZSBmb3Igc3luY2hyb25p
-emF0aW9uLiBJdCdzIGFsc28gdGhlIG1hdHRlciBvZiB0aGUgdWFydApuZWVkaW5nIG9uZSBmb3Ig
-cHV0cy4gQW5kIHJlcG9ydC4gQW5kIHByb2JhYmx5IG90aGVyIHBsYWNlcy4KCk91dCBvZiBjdXJp
-b3NpdHksIHdpdGhvdXQgc2V0dGluZyB0aGUgQVVYSU5GT19NTVVfT0ZGIGZsYWcsIEkgdHJpZWQg
-dXNpbmcKdGhlIGdlbmVyaWMgdmVyc2lvbiBvZiB0aGUgc3BpbmxvY2sgKEkgYXNzdW1lIHlvdSBt
-ZWFuIHRoZSBvbmUgZnJvbQpsaWIvYXNtLWdlbmVyaWMvc3BpbmxvY2suaCwgY2hhbmdlZCBsaWIv
-YXJtNjQvYXNtL3NwaW5sb2NrLmggdG8gaW5jbHVkZSB0aGUKYWJvdmUgaGVhZGVyKSwgc2VsZnRl
-c3Qtc2V0dXAgaGFuZ3Mgd2l0aG91dCBkaXNwbGF5aW5nIGFueXRoaW5nIGJlZm9yZQpwaHlzX2Fs
-bG9jX2luaXQoKSwgSSBoYXZlIG5vIGlkZWEgd2h5IHRoYXQgaXMuCgpJbiB0aGUgY3VycmVudCBp
-bXBsZW1lbnRhdGlvbiwgd2hlbiBBVVhJTkZPX01NVV9PRkYgaXMgc2V0LCB0ZXN0cyB0aGF0CmFj
-dHVhbGx5IHVzZSBtb3JlIHRoYW4gb25lIHRocmVhZCBtaWdodCBlbmQgdXAgYmVpbmcgaW5jb3Jy
-ZWN0IHNvbWUgb2YgdGhlCnRpbWUgYmVjYXVzZSBzcGluX2xvY2soKSBkb2Vzbid0IHByb3RlY3Qg
-YWdhaW5zdCBjb25jdXJyZW50IGFjY2Vzc2VzLgpUaGF0J3MgcHJldHR5IGJhZCwgYnV0IEkgdGhp
-bmsgdGhlIGFsdGVybmF0aXZlIG9mZiBhbGwgdGVzdHMgaGFuZ2luZwppbmRlZmluaXRlbHkgaXMg
-d29yc2UuCgpJbiBteSBvcGluaW9uLCB0aGUgY3VycmVudCBzcGlubG9jayBpbXBsZW1lbnRhdGlv
-biBpcyBpbmNvcnJlY3Qgd2hlbiB0aGUKTU1VIGlzIGRpc2FibGVkLCBidXQgdXNpbmcgYSBnZW5l
-cmljIGltcGxlbWVudGF0aW9uIGlzIHdvcnNlLiBJIGd1ZXNzCmFub3RoZXIgdGhpbmcgdG8gcHV0
-IG9uIHRoZSBUT0RPIGxpc3QuICBBcm0gQVJNIHJlY29tbWVuZHMgTGFtcG9ydOKAmXMgQmFrZXJ5
-CmFsZ29yaXRobSBmb3IgbXV0dWFsIGV4Y2x1c2lvbiBhbmQgd2UgY291bGQgdHJ5IHRvIGltcGxl
-bWVudCB0aGF0IGZvciB0aGUKTU1VIGRpc2FibGVkIGNhc2UsIGJ1dCBJIGRvbid0IHNlZSBtdWNo
-IGludGVyZXN0IGF0IHRoZSBtb21lbnQgaW4gcnVubmluZwp0ZXN0cyB3aXRoIHRoZSBNTVUgZGlz
-YWJsZWQuCgpUaGFua3MsCkFsZXgKCj4gCj4gVGhhbmtzLAo+IGRyZXcKX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1h
-cm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21h
-aWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Thu, Sep 22, 2022 at 07:32:42PM +0000, Sean Christopherson wrote:
+> On Thu, Sep 22, 2022, Ricardo Koller wrote:
+> > +/* Returns true to continue the test, and false if it should be skipped. */
+> > +static bool punch_hole_in_memslot(struct kvm_vm *vm,
+> 
+> This is a very misleading name, and IMO is flat out wrong.  The helper isn't
+> punching a hole in the memslot, it's punching a hole in the backing store, and
+> those are two very different things.  Encountering a hole in a _memslot_ yields
+> emualted MMIO semantics, not CoW zero page semantics.
+
+Interestingly, we used to refer those as "gaps", as in "gaps between memslots".
+But I get the point.
+
+> 
+> Ideally, if we can come up with a not awful name, I'd also prefer to avoid "punch
+> hole" in the function name.  I can't think of a better alternative, so it's not
+> the end of the world if we're stuck with e.g punch_hole_in_backing_store(), but I
+
+Ack.
+
+> think the "punch_hole" name will be confusing for readers that are unfamiliar with
+> PUNCH_HOLE, especially for anonymous memory as "punching a hole" in anonymous
+> memory is more likely to be interpreted as "munmap()".
+> 
+> > +				  struct userspace_mem_region *region)
+> > +{
+> > +	void *hva = (void *)region->region.userspace_addr;
+> > +	uint64_t paging_size = region->region.memory_size;
+> > +	int ret, fd = region->fd;
+> > +
+> > +	if (fd != -1) {
+> > +		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+> > +				0, paging_size);
+> > +		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
+> > +	} else {
+> > +		if (is_backing_src_hugetlb(region->backing_src_type))
+> > +			return false;
+> 
+> Why is hugetlb disallowed?  I thought anon hugetlb supports MADV_DONTNEED?
+> 
+
+It fails with EINVAL (only tried on arm) for both the PAGE_SIZE and the huge
+page size. And note that the address is aligned as well.
+
+madvise(0xffffb7c00000, 2097152, MADV_DONTNEED) = -1 EINVAL (Invalid argument)
+	^^^^^^^^^^^^^^	^^^^^^^
+	2M aligned	2M (hugepage size)
+			
+madvise(0xffff9e800000, 4096, MADV_DONTNEED) = -1 EINVAL (Invalid argument)   
+			^^^^
+			PAGE_SIZE
+
+> > +
+> > +		ret = madvise(hva, paging_size, MADV_DONTNEED);
+> > +		TEST_ASSERT(ret == 0, "madvise failed, errno: %d\n", errno);
+> > +	}
+> > +
+> > +	return true;
+> > +}
+> 
+> ...
+> 
+> > +	/*
+> > +	 * Accessing a hole in the data memslot (punched with fallocate or
+> 
+> s/memslot/backing store
+> 
+> > +	 * madvise) shouldn't fault (more sanity checks).
+> 
+> 
+> Naming aside, please provide more detail as to why this is the correct KVM
+> behavior.  This is quite subtle and relies on gory implementation details that a
+> lot of KVM developers will be unaware of.
+
+Ack.
+
+> 
+> Specifically, from an accessibility perspective, PUNCH_HOLE doesn't actually create
+> a hole in the file.  The "hole" can still be read and written; the "expect '0'"
+> checks are correct specifically because those are the semantics of PUNCH_HOLE.
+> 
+> In other words, it's not just that the accesses shouldn't fault, reads _must_
+> return zeros and writes _must_ re-populate the page.
+
+Moreover, the behavior from the guest POV should be the same as userspace
+reading/writing on a hole (with PUNCH_HOLE). Will describe this as well.
+
+> 
+> Compare that with e.g. ftruncate() that makes the size of the file smaller, in
+> which case an access should result in KVM exiting to userspace with -EFAULT.
+> 
+> > +	 */
+> > +	TEST_ACCESS(guest_read64, no_af, CMD_HOLE_DATA),
+> > +	TEST_ACCESS(guest_cas, no_af, CMD_HOLE_DATA),
+> > +	TEST_ACCESS(guest_ld_preidx, no_af, CMD_HOLE_DATA),
+> > +	TEST_ACCESS(guest_write64, no_af, CMD_HOLE_DATA),
+> > +	TEST_ACCESS(guest_st_preidx, no_af, CMD_HOLE_DATA),
+> > +	TEST_ACCESS(guest_at, no_af, CMD_HOLE_DATA),
+> > +	TEST_ACCESS(guest_dc_zva, no_af, CMD_HOLE_DATA),
+> > +
+> > +	{ 0 }
+> > +};
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
