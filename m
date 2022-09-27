@@ -2,62 +2,61 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A7AC07E9D
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Sep 2022 10:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C84C54EE9
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Sep 2022 10:30:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B3D44B6E9;
-	Tue, 27 Sep 2022 06:26:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 96E334B62D;
+	Tue, 27 Sep 2022 06:30:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hHUf1hMzhspr; Tue, 27 Sep 2022 06:26:49 -0400 (EDT)
+	with ESMTP id iSsBP91M5Mfs; Tue, 27 Sep 2022 06:30:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C9E774B1B4;
-	Tue, 27 Sep 2022 06:26:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 736D34B632;
+	Tue, 27 Sep 2022 06:30:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D16A241021
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 06:26:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 850A44B62D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 06:30:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yO4hurzrQLts for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Sep 2022 06:26:47 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61F0C40453
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 06:26:47 -0400 (EDT)
+ with ESMTP id Uv+kc9y4QTBL for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Sep 2022 06:30:19 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 322084B600
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 06:30:19 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id BB22DB81A0D;
- Tue, 27 Sep 2022 10:26:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7451DC433C1;
- Tue, 27 Sep 2022 10:26:44 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id C69F661786;
+ Tue, 27 Sep 2022 10:30:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B80AC433C1;
+ Tue, 27 Sep 2022 10:30:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1664274404;
- bh=KxrG3GdAPTXX5UgJlFpv6XebpNTC28FHX8kOfcjrrLw=;
+ s=k20201202; t=1664274617;
+ bh=noLfpBznClPHMdqAPG/zfUiiDoQtXSGh5jj+GB+3a2A=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=cGoOuNjNrYgKtdJM560T0PLXCEccOfMMIB6bWFTiGdsZgKoxBOoKezsdufqL34UoO
- K+MRhI21awA+HRYczLhwAWAfQBanjkZpFhcedN3uhnRQhAimib8DzLxS/uvdI8vUh+
- TOXSTBzkFZsVajTvyJKw5iIILXZT9v3IdYHDwWnTFUzlAp6wPsGwCtCSJuW4dUoMZF
- Lov///sRzJU98L+9XNsDfVGquHZGCwA8UWHCSOqAu6aO80+KqLc+o2DVmv5y2u9SyM
- qXxqPKR6PNG9Yxps68zpH3fk5wuaTkOf/AnCcZxH6cZ/QyYs+iE1e/6XachOrrkqs3
- IkdqYvLUmN2mg==
+ b=kP/zIhDCpN9GeuCa86YPBy6ZUyvmmh0KwWwhSanPXaMnbbovb9bcWur8Vx1b0vHLr
+ NLrtqGlymkT+SyT19palenEEtIlkWoZnhGYkPxInVwIHI28TuqtM7uA6/5abnAsz8d
+ FUylvbaKA/D87LsBVCQZTbbfANi10YlVGtY+rERgQK++bd6LLOSc7v4A1bZOI3gqOJ
+ q9gDFJ9I3IFMY7TO0tbP3vEtT1Cq+zEbymAs54gaXBx4fExwNe1xmec5IfC0WAicDj
+ aEqEMKLCrgg/KC5crU0a+CnmOvF/70RqHfXpEQE/9+qkiKA3M4Vit/NjFWKVmtqG3X
+ 90IpeKWNK6Gwg==
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=goblin-girl.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1od7nW-00CwoI-8X;
- Tue, 27 Sep 2022 11:26:42 +0100
-Date: Tue, 27 Sep 2022 06:26:41 -0400
-Message-ID: <86y1u56rku.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1od7qw-00CwrO-Hq;
+ Tue, 27 Sep 2022 11:30:14 +0100
+Date: Tue, 27 Sep 2022 06:30:14 -0400
+Message-ID: <86wn9p6rex.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v4 1/6] KVM: x86: Introduce KVM_REQ_RING_SOFT_FULL
-In-Reply-To: <20220927005439.21130-2-gshan@redhat.com>
+Subject: Re: [PATCH v4 0/6] KVM: arm64: Enable ring-based dirty memory tracking
+In-Reply-To: <20220927005439.21130-1-gshan@redhat.com>
 References: <20220927005439.21130-1-gshan@redhat.com>
- <20220927005439.21130-2-gshan@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -68,7 +67,7 @@ X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.cs.columbia.edu,
  shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
  peterx@redhat.com, pbonzini@redhat.com, zhenyzha@redhat.com,
  shan.gavin@gmail.com, james.morse@arm.com, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, oliver.upton@linux.dev
+ alexandru.elisei@arm.com, oliver.upton@linux.dev, seanjc@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
@@ -92,78 +91,29 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 26 Sep 2022 20:54:34 -0400,
++ Sean
+
+On Mon, 26 Sep 2022 20:54:33 -0400,
 Gavin Shan <gshan@redhat.com> wrote:
 > 
-> This adds KVM_REQ_RING_SOFT_FULL, which is raised when the dirty
-> ring of the specific VCPU becomes softly full in kvm_dirty_ring_push().
-> The VCPU is enforced to exit when the request is raised and its
-> dirty ring is softly full on its entrance.
+> This series enables the ring-based dirty memory tracking for ARM64.
+> The feature has been available and enabled on x86 for a while. It
+> is beneficial when the number of dirty pages is small in a checkpointing
+> system or live migration scenario. More details can be found from
+> fb04a1eddb1a ("KVM: X86: Implement ring-based dirty memory tracking").
 > 
-> The event is checked and handled in the newly introduced helper
-> kvm_dirty_ring_check_request(). With this, kvm_dirty_ring_soft_full()
-> becomes a private function.
-> 
-> Suggested-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> ---
->  arch/x86/kvm/x86.c             | 15 ++++++---------
->  include/linux/kvm_dirty_ring.h | 13 +++++++------
->  include/linux/kvm_host.h       |  1 +
->  virt/kvm/dirty_ring.c          | 19 ++++++++++++++++++-
->  4 files changed, 32 insertions(+), 16 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index b0c47b41c264..0dd0d32073e7 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10260,16 +10260,13 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  
->  	bool req_immediate_exit = false;
->  
-> -	/* Forbid vmenter if vcpu dirty ring is soft-full */
-> -	if (unlikely(vcpu->kvm->dirty_ring_size &&
-> -		     kvm_dirty_ring_soft_full(&vcpu->dirty_ring))) {
-> -		vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
-> -		trace_kvm_dirty_ring_exit(vcpu);
-> -		r = 0;
-> -		goto out;
-> -	}
-> -
->  	if (kvm_request_pending(vcpu)) {
-> +		/* Forbid vmenter if vcpu dirty ring is soft-full */
-> +		if (kvm_dirty_ring_check_request(vcpu)) {
-> +			r = 0;
-> +			goto out;
-> +		}
-> +
->  		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
->  			r = -EIO;
->  			goto out;
-> diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
-> index 906f899813dc..b188bfcf3a09 100644
-> --- a/include/linux/kvm_dirty_ring.h
-> +++ b/include/linux/kvm_dirty_ring.h
-> @@ -54,6 +54,11 @@ static inline void kvm_dirty_ring_push(struct kvm_dirty_ring *ring,
->  {
->  }
->  
-> +static inline bool kvm_dirty_ring_check_request(struct kvm_vcpu *vcpu)
-> +{
-> +	return false;
-> +}
-> +
+> This series is applied on top of Marc's v2 series [0], fixing dirty-ring
+> ordering issue.
 
-nit: I don't think this is needed at all. The dirty ring feature is
-not user-selectable, and this is always called from arch code that is
-fully aware of that option.
-
-This can be fixed when applying the patch though, no need to resend
-for this.
+This looks good to me as it stands. If someone on the x86 side of
+things is willing to ack the x86 changes (both here and in my
+series[0]), I'm happy to queue the whole thing.
 
 Thanks,
 
 	M.
+
+[0] https://lore.kernel.org/kvmarm/20220926145120.27974-1-maz@kernel.org
 
 -- 
 Without deviation from the norm, progress is not possible.
