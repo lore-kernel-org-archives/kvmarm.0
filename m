@@ -2,85 +2,84 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C63A6C54EE9
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Sep 2022 16:01:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA36C6FA82
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Sep 2022 16:03:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35C5F4B647;
-	Tue, 27 Sep 2022 12:01:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 563B44B6DD;
+	Tue, 27 Sep 2022 12:03:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DEM2WmSCkZrm; Tue, 27 Sep 2022 12:01:03 -0400 (EDT)
+	with ESMTP id 6p3vfLraJnVM; Tue, 27 Sep 2022 12:02:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EDACB4B633;
-	Tue, 27 Sep 2022 12:01:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FC944B647;
+	Tue, 27 Sep 2022 12:02:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 38EB040C23
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 12:01:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E4C04B633
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 12:02:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dVpevNr7hrKR for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Sep 2022 12:01:01 -0400 (EDT)
+ with ESMTP id d0Lml4Y8v+JQ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Sep 2022 12:02:57 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 325C94B647
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 12:01:01 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 65E944B647
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 12:02:57 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1664294460;
+ s=mimecast20190719; t=1664294577;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=OBR4xNQEpKsKlU6oEB+jHo2f2aRGU/mGD6dagUtmSrA=;
- b=DCcmvCGBefDrvyBPrjZErFy1Bpq8uKjTwskdC9a23bJho80Qg1SlDPCX8nUDG/mhMJVv9e
- LajF/6vG40VjEtZCLwlXxEpyD4+uqGuxBnZRtgFG1KzYs84GxsCv03okOrdFUqDm43IyVT
- n9FSNdGCyoqs//64b/aPc+dL/76Q+JY=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=WtpRxtCZltp/63OXQYG8Mzy798EcRnh/IHqJ0/4DV1E=;
+ b=RomP5WKJlIC+jfzLBLDvrYpCf8AtoWNS648VFn2aCne7pY4VWfla0OvvhMBbAUk9xSwnrU
+ 2RyRZT1kLcVXeSbRj5yZiA18avqP7KR11uE/qSXfTQV/blSzucrUda3O7MpMKDWPaHpi62
+ uHBQJL1J/SKmAdVmZW5A4AdDITikgjA=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-490-8hsmTE4aMCSKlTJxlxT7IQ-1; Tue, 27 Sep 2022 12:00:59 -0400
-X-MC-Unique: 8hsmTE4aMCSKlTJxlxT7IQ-1
-Received: by mail-qv1-f71.google.com with SMTP id
- nn9-20020a056214358900b004ac7136c9a3so6076007qvb.16
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 09:00:59 -0700 (PDT)
+ us-mta-375-gbV8PPPPN0S-ZtGOVQqR1w-1; Tue, 27 Sep 2022 12:02:56 -0400
+X-MC-Unique: gbV8PPPPN0S-ZtGOVQqR1w-1
+Received: by mail-qk1-f198.google.com with SMTP id
+ d18-20020a05620a241200b006ce80a4d74aso7584952qkn.6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 09:02:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
- bh=OBR4xNQEpKsKlU6oEB+jHo2f2aRGU/mGD6dagUtmSrA=;
- b=wsub0rY8gw69I/uCUwP3JRIff3Oo4rAA8EVW5soO6+HOgYRjLiWBEyudJe25eGFp2j
- W1MEO9alTcW3IqjCpLtupp83w9xuS0Gjk5MCzPIVu+g4x9sDUM2VO42mdvVrzLu0bFwL
- mw+50NObwD6W26VCpKx2Cw47KjzbXJgSohqbE4v2Ka06e0Ori5kgBMxQsivECICjdJ9j
- VymOAvLxbkd/eFVVrQrlCIyyXC42zvWexjTpKf6IfmEFjMTTrkFzhOoQblUFE9pLfP9T
- Q4bRoiKtqGMJKgD4i6XMV6rwPkXvay41gVfPQQ8H7evzEosiaHPJnRrcNIo0KuzsNP8L
- MafA==
-X-Gm-Message-State: ACrzQf2n9YJJVVLzJ2t0UCEuSFXAFldB/p8k8Sfxi5lxROjgWWoNVJtA
- cNa4SfZn61hNSwnehHMtINe/bP69HPw/jNl7zcDRIvTa2r4ucG7cNdEeH6JWUayBMPiVh1R+tZ2
- DyQVcM2a7BGPx+kts1JfCOtYi
-X-Received: by 2002:a37:691:0:b0:6cf:532a:6f4c with SMTP id
- 139-20020a370691000000b006cf532a6f4cmr18552034qkg.89.1664294459073; 
- Tue, 27 Sep 2022 09:00:59 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4vaVTukQ9Ej/20po7f9wxzUqLefkMYhEbvAtlgYl1WVQCZHpehWvF+WtqAEIp2CmBVHJb3hg==
-X-Received: by 2002:a37:691:0:b0:6cf:532a:6f4c with SMTP id
- 139-20020a370691000000b006cf532a6f4cmr18552006qkg.89.1664294458793; 
- Tue, 27 Sep 2022 09:00:58 -0700 (PDT)
+ bh=WtpRxtCZltp/63OXQYG8Mzy798EcRnh/IHqJ0/4DV1E=;
+ b=pgXhLz+uIz2LMiIAQCKTfUfzk3Bm3705R7u+rvZfplvpdjRf8Fyg8c1+sUAB1zCSRm
+ Naq1wmcmWNs6X6j5be+w38R4Nl7JXhfAf8QntkUwsltM8n/A2/8QMeJTXq0wFF5UU6Zs
+ V0qjCrdYk736Ztdls+jzS3TZL1VoTa+M6Nzwzo5qw84U+f/ps/QWTye2LsZldk/klXlI
+ 4/OsjjYsvbjtc8L8k8unaJriURfCVo4p8HnMEJnYyWdqsxf0rpARFTToABBUdcDKfn0H
+ XI+gJepWw7My+Hg+Qxp+bVYypHQFFchSM+WOMbPaeMooi60Ply1GSKDQ9fYriXU5HQiy
+ v9Yw==
+X-Gm-Message-State: ACrzQf3MJhKplt98QFuKUmOnHleug0KJx1deANNt+mZ7qH9yuQyFW4fN
+ mbky+KE7fnpTOkKN3PxOcpsu93bubuUjF256kqvy28BO6sjVG3TmBZjff+3BMb14R2lBLXGqNKG
+ lxakVhP1oP14DOOhCAc47EjEJ
+X-Received: by 2002:a05:6214:21cb:b0:4aa:b039:35c7 with SMTP id
+ d11-20020a05621421cb00b004aab03935c7mr21789005qvh.60.1664294575442; 
+ Tue, 27 Sep 2022 09:02:55 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6lmFS0nvurnTtO5d5O/P/pgdsV3Q8A7e7qy/mOBjQiXB4CjUnTlFBCMrFl3cnsQiwSWkf9+w==
+X-Received: by 2002:a05:6214:21cb:b0:4aa:b039:35c7 with SMTP id
+ d11-20020a05621421cb00b004aab03935c7mr21788957qvh.60.1664294575072; 
+ Tue, 27 Sep 2022 09:02:55 -0700 (PDT)
 Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca.
  [70.31.27.79]) by smtp.gmail.com with ESMTPSA id
- f1-20020a05620a280100b006b95b0a714esm1295626qkp.17.2022.09.27.09.00.57
+ n19-20020a05622a041300b003434f7483a1sm1083235qtx.32.2022.09.27.09.02.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Sep 2022 09:00:58 -0700 (PDT)
-Date: Tue, 27 Sep 2022 12:00:55 -0400
+ Tue, 27 Sep 2022 09:02:54 -0700 (PDT)
+Date: Tue, 27 Sep 2022 12:02:52 -0400
 From: Peter Xu <peterx@redhat.com>
 To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v4 2/6] KVM: x86: Move declaration of
- kvm_cpu_dirty_log_size() to kvm_dirty_ring.h
-Message-ID: <YzMeN6ZFjyoT+Rz2@x1n>
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Enable ring-based dirty memory tracking
+Message-ID: <YzMerD8ZvhvnprEN@x1n>
 References: <20220927005439.21130-1-gshan@redhat.com>
- <20220927005439.21130-3-gshan@redhat.com>
+ <20220927005439.21130-4-gshan@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20220927005439.21130-3-gshan@redhat.com>
+In-Reply-To: <20220927005439.21130-4-gshan@redhat.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
@@ -104,20 +103,18 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 27, 2022 at 08:54:35AM +0800, Gavin Shan wrote:
-> Not all architectures like ARM64 need to override the function. Move
-> its declaration to kvm_dirty_ring.h to avoid the following compiling
-> warning on ARM64 when the feature is enabled.
+On Tue, Sep 27, 2022 at 08:54:36AM +0800, Gavin Shan wrote:
+> Enable ring-based dirty memory tracking on arm64 by selecting
+> CONFIG_HAVE_KVM_DIRTY_RING_ACQ_REL and providing the ring buffer's
+> physical page offset (KVM_DIRTY_LOG_PAGE_OFFSET).
 > 
->   arch/arm64/kvm/../../../virt/kvm/dirty_ring.c:14:12:        \
->   warning: no previous prototype for 'kvm_cpu_dirty_log_size' \
->   [-Wmissing-prototypes]                                      \
->   int __weak kvm_cpu_dirty_log_size(void)
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
 > Signed-off-by: Gavin Shan <gshan@redhat.com>
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Gavin,
+
+Any decision made on how to tackle with the GIC status dirty bits?
+
+Thanks,
 
 -- 
 Peter Xu
