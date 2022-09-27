@@ -2,79 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98AAEC6FA90
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Sep 2022 10:18:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A7AC07E9D
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Sep 2022 10:26:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3BC84B6C7;
-	Tue, 27 Sep 2022 06:18:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B3D44B6E9;
+	Tue, 27 Sep 2022 06:26:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NxzazADcT5Im; Tue, 27 Sep 2022 06:18:12 -0400 (EDT)
+	with ESMTP id hHUf1hMzhspr; Tue, 27 Sep 2022 06:26:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EE174B6C8;
-	Tue, 27 Sep 2022 06:18:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C9E774B1B4;
+	Tue, 27 Sep 2022 06:26:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D0E34B6C7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 06:18:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D16A241021
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 06:26:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 71KLEygBsxtB for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Sep 2022 06:18:09 -0400 (EDT)
+ with ESMTP id yO4hurzrQLts for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Sep 2022 06:26:47 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D40F44B1B4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 06:18:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61F0C40453
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 06:26:47 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 2D509B81A0D;
- Tue, 27 Sep 2022 10:18:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6F1EC433D6;
- Tue, 27 Sep 2022 10:18:06 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id BB22DB81A0D;
+ Tue, 27 Sep 2022 10:26:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7451DC433C1;
+ Tue, 27 Sep 2022 10:26:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1664273886;
- bh=H/HZ+8Yn/BiaXmw/8d1VR0gleRQhWzamBner0vTDoWc=;
+ s=k20201202; t=1664274404;
+ bh=KxrG3GdAPTXX5UgJlFpv6XebpNTC28FHX8kOfcjrrLw=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=DGpqE+yyCTkC0ISYppAy954jrFGx++xsqBqQX6E48GFXhLByX9Xck+RIWjTLzztn5
- gkGZBxgjzCcQibYUQGHjRLx1InlistGkQ8hzAjifhoDmnlKgokqQXWSsbu8lFLx4CN
- Oock7os8ojEAXXh35ySF3E1ow4QQqTkS6ZiheYjv8ZykFFCjoF10S6xI/ef6Sz2Jb6
- JM1N6zkjX0+F4Ge2ycxMKSF+DQcFe/5DdX++1Kga9HWUI3TgdmiV7mn/JA7Yk1H7vP
- zrnHIvEOTjOXJsKR34mvW5y0HVrhtwiSW5pqtUfmFoNzu9S+0r8/WI5ud5h7F4RA8v
- VrkokeQGxfTLg==
+ b=cGoOuNjNrYgKtdJM560T0PLXCEccOfMMIB6bWFTiGdsZgKoxBOoKezsdufqL34UoO
+ K+MRhI21awA+HRYczLhwAWAfQBanjkZpFhcedN3uhnRQhAimib8DzLxS/uvdI8vUh+
+ TOXSTBzkFZsVajTvyJKw5iIILXZT9v3IdYHDwWnTFUzlAp6wPsGwCtCSJuW4dUoMZF
+ Lov///sRzJU98L+9XNsDfVGquHZGCwA8UWHCSOqAu6aO80+KqLc+o2DVmv5y2u9SyM
+ qXxqPKR6PNG9Yxps68zpH3fk5wuaTkOf/AnCcZxH6cZ/QyYs+iE1e/6XachOrrkqs3
+ IkdqYvLUmN2mg==
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=goblin-girl.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1od7fA-00Cwgn-IO;
- Tue, 27 Sep 2022 11:18:04 +0100
-Date: Tue, 27 Sep 2022 06:18:03 -0400
-Message-ID: <86zgel6rz8.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1od7nW-00CwoI-8X;
+ Tue, 27 Sep 2022 11:26:42 +0100
+Date: Tue, 27 Sep 2022 06:26:41 -0400
+Message-ID: <86y1u56rku.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Mingwei Zhang <mizhang@google.com>, Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH] KVM: arm64: Cleanup the __get_fault_info() to take out
- the code that validates HPFAR
-In-Reply-To: <YzKGqLzjv0I/gkMi@google.com>
-References: <20220927002715.2142353-1-mizhang@google.com>
- <YzKGqLzjv0I/gkMi@google.com>
+To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v4 1/6] KVM: x86: Introduce KVM_REQ_RING_SOFT_FULL
+In-Reply-To: <20220927005439.21130-2-gshan@redhat.com>
+References: <20220927005439.21130-1-gshan@redhat.com>
+ <20220927005439.21130-2-gshan@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mizhang@google.com, oliver.upton@linux.dev,
- catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+ shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
+ peterx@redhat.com, pbonzini@redhat.com, zhenyzha@redhat.com,
+ shan.gavin@gmail.com, james.morse@arm.com, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, oliver.upton@linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
+ will@kernel.org, shan.gavin@gmail.com, bgardon@google.com, dmatlack@google.com,
+ pbonzini@redhat.com, zhenyzha@redhat.com, shuah@kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,34 +92,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 27 Sep 2022 01:14:16 -0400,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Mon, 26 Sep 2022 20:54:34 -0400,
+Gavin Shan <gshan@redhat.com> wrote:
 > 
-> Hi Mingwei,
+> This adds KVM_REQ_RING_SOFT_FULL, which is raised when the dirty
+> ring of the specific VCPU becomes softly full in kvm_dirty_ring_push().
+> The VCPU is enforced to exit when the request is raised and its
+> dirty ring is softly full on its entrance.
 > 
-> On Tue, Sep 27, 2022 at 12:27:15AM +0000, Mingwei Zhang wrote:
-> > Cleanup __get_fault_info() to take out the code that checks HPFAR. The
-> > conditions in __get_fault_info() that checks if HPFAR contains a valid IPA
-> > is slightly messy in that several conditions are written within one IF
-> > statement acrossing multiple lines and are connected with different logical
-> > operators. Among them, some conditions come from ARM Spec, while others
-> 						   ^~~~~~~~
+> The event is checked and handled in the newly introduced helper
+> kvm_dirty_ring_check_request(). With this, kvm_dirty_ring_soft_full()
+> becomes a private function.
 > 
-> Call it the ARM ARM or Arm ARM, depending on what stylization you
-> subscribe to :)
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> ---
+>  arch/x86/kvm/x86.c             | 15 ++++++---------
+>  include/linux/kvm_dirty_ring.h | 13 +++++++------
+>  include/linux/kvm_host.h       |  1 +
+>  virt/kvm/dirty_ring.c          | 19 ++++++++++++++++++-
+>  4 files changed, 32 insertions(+), 16 deletions(-)
 > 
-> > come from CPU erratum. This makes the code hard to read and
-> > difficult to extend.
-> 
-> I'd recommend you avoid alluding to future changes unless they're posted
-> on the mailing list.
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index b0c47b41c264..0dd0d32073e7 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10260,16 +10260,13 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  
+>  	bool req_immediate_exit = false;
+>  
+> -	/* Forbid vmenter if vcpu dirty ring is soft-full */
+> -	if (unlikely(vcpu->kvm->dirty_ring_size &&
+> -		     kvm_dirty_ring_soft_full(&vcpu->dirty_ring))) {
+> -		vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+> -		trace_kvm_dirty_ring_exit(vcpu);
+> -		r = 0;
+> -		goto out;
+> -	}
+> -
+>  	if (kvm_request_pending(vcpu)) {
+> +		/* Forbid vmenter if vcpu dirty ring is soft-full */
+> +		if (kvm_dirty_ring_check_request(vcpu)) {
+> +			r = 0;
+> +			goto out;
+> +		}
+> +
+>  		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
+>  			r = -EIO;
+>  			goto out;
+> diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
+> index 906f899813dc..b188bfcf3a09 100644
+> --- a/include/linux/kvm_dirty_ring.h
+> +++ b/include/linux/kvm_dirty_ring.h
+> @@ -54,6 +54,11 @@ static inline void kvm_dirty_ring_push(struct kvm_dirty_ring *ring,
+>  {
+>  }
+>  
+> +static inline bool kvm_dirty_ring_check_request(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +
 
-Honestly, I'd refrain from such changes *unless* they enable something
-else. The current code is well understood by people hacking on it, and
-although I don't mind revamping it, it has to be for a good reason.
+nit: I don't think this is needed at all. The dirty ring feature is
+not user-selectable, and this is always called from arch code that is
+fully aware of that option.
 
-I'd be much more receptive to such a change if it was a prefix to
-something that actually made a significant change.
+This can be fixed when applying the patch though, no need to resend
+for this.
 
 Thanks,
 
