@@ -2,73 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D0BCC54EE9
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Sep 2022 17:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4342EC54EE9
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Sep 2022 17:49:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A70974B6B6;
-	Tue, 27 Sep 2022 13:38:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C59774B69D;
+	Tue, 27 Sep 2022 13:49:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YA-Z24FYHpcU; Tue, 27 Sep 2022 13:38:37 -0400 (EDT)
+	with ESMTP id 8z+Gf1JKIch6; Tue, 27 Sep 2022 13:49:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E7654B63E;
-	Tue, 27 Sep 2022 13:38:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA3264B6C8;
+	Tue, 27 Sep 2022 13:49:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4695F4B0CB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 13:38:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FD404B650
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 13:49:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZO0dKLB4UKPd for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Sep 2022 13:38:35 -0400 (EDT)
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com
- [209.85.166.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 31DE4408A7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 13:38:35 -0400 (EDT)
-Received: by mail-io1-f43.google.com with SMTP id z191so8298414iof.10
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 10:38:35 -0700 (PDT)
+ with ESMTP id spqsDCy+shaf for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Sep 2022 13:49:04 -0400 (EDT)
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com
+ [209.85.166.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F1BA4B64E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 13:49:04 -0400 (EDT)
+Received: by mail-il1-f174.google.com with SMTP id v1so5495815ilq.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 10:49:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:from:to:cc:subject:date;
- bh=zwWYKbkkIMXnui5gCfkJ00LzKXpPlaBP/wjajc/qT2s=;
- b=syVso9JR6664/0/8mv5Q0ETYytR/HniKXmKiH3T1jW5szdgBIeR6jrNwGL0FX2LiCm
- F4PGCPVRtW9j/nghuwf+gEtj2HzOLg+ajhiadpCHFepcUySHBDw2v1zsD7VzKKvJxyo4
- CL0j58elRqrDEmDWTSJecNQ6lX5TKYckWqFOa9PxrRmeg0dSBR+rT2vYjCYMUkI4txut
- M0c/TqRHQG+mjav8eL5QgGwTx/qw47Uz3bLYSGQHC8RyeTK0oJq1VjBWksj3kJx9zPFL
- IIt160iugt34uDrqxE1tX48P9LKN3c+EWbH/SIMBl1Vc4zDimqX1nWXB3R5IU8y84mDc
- Gymg==
+ bh=aH5zY6y4AfoLNMJw/j/1E8ilTfiC2ZGSCFZ+mICKnl8=;
+ b=hjD82U6QZ7vWgB3aKUqxIHx7uLRDY+PcY/enPg2cqnqmZKGLg4UhLPDXuZUQ6qwhZW
+ qfLu5LSwOMwVVD2uSOk7Iswfy6MJfHCd7IUHXvNmD2astnQzod0kSvrvsjszWrJQIiUn
+ 8HEuA9jyZX/DB95xq2FOExGaCSjljxjNeIaeOgq6mOXTq5guJsCvo0+B82B/AmO3BWG/
+ HxeuIWKqNAsMmoDcjS9ER3j0EZkomrD0ZSPKVGqo3V8Q4PG41UGwDovBo7hIYwstXQyH
+ MVnEN9crkiX4tRX4a4lekaK9IXHW7M4I9z/UQIt0JaCZz2qtANOK2mfmenzAjWc/i6xO
+ BcOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:x-gm-message-state:from:to:cc:subject:date;
- bh=zwWYKbkkIMXnui5gCfkJ00LzKXpPlaBP/wjajc/qT2s=;
- b=ygLcMLHFnOeu7g2sEaXVGyWXYZ9ty39omzA+gFsBX1+EXzi4RxyNfxsbI2Z9M6zzcC
- zYAxy0O7SNTH8aKLF9Z0JXhakSZOU2JzubXS35p1y3HuC/pA7aJu1vDbRko/EATRTU5X
- 86J9s/A8zKWugfuTPwmP/oqY7eDsgHL0W/GocNgqKh09kk7PXkQmRehuD1G2pxsiFUY7
- sjrIVQOrcfGuYnmoIk/WoiWdv5GLpr2F+aMO3tYgqGT1mRbzZmwKKjA8ITudzKRNHbS7
- XzV91lLFX4oX6BlA9lEpH5el7tA19mpz0cyC/rZAz24Djb6bORHAEaMbe/FDNOFFttLk
- RrxA==
-X-Gm-Message-State: ACrzQf2ibbU76qjh6q0JogdQqtZ6CCDwgC+UqY9OJqiBAsRRVlL6dw+v
- urAWfs+eMJKNOoewWsLAu1OkaN01oLxDM0Gyg0xCyA==
-X-Google-Smtp-Source: AMsMyM5MfXlfh9YEbgA+gtNnYv11bP83Vk62ySUseMBdKK5z9jeJJNAuT70mC5cTy94LiccSQm6HTh24Cbmndz+QGlU=
-X-Received: by 2002:a05:6638:4184:b0:35a:3eb4:f932 with SMTP id
- az4-20020a056638418400b0035a3eb4f932mr15108246jab.216.1664300314532; Tue, 27
- Sep 2022 10:38:34 -0700 (PDT)
+ bh=aH5zY6y4AfoLNMJw/j/1E8ilTfiC2ZGSCFZ+mICKnl8=;
+ b=os2+s0pVDcgMPG+hnBYt/xNw6rAjg+G0e54x4BmYyy+2nQnekR70nD5Hw/qYF85W5r
+ W6wizRXl7V+Iv2G1M84P8jFXZQqmsNRDgQVlg0hA8dCHXHU8nbDjkJRok/bETzatQ2xj
+ z6ItEahNNfbtVMIkGnX3BVYWLIgwTBiWYAzha1QrL0B1O8iwK4bnZjLs35OquWLbLHLh
+ 7XiABgOKNUjGty/gYWTjc1J2SGqVF2tNCBIaPoAqEDCZHRHzWOPapM6c7j+F9nL2V8jX
+ KfDUMn8VpFdHNDWmaO2M57V1H6crYnXIFklxG13636ExzgwIWNwT81AT4GWrStmq5IXX
+ MB1g==
+X-Gm-Message-State: ACrzQf3Hj+8EkvZ8H5AMpvIEb8RX9Qt4g9DkxOx5cNRHvxOh6tFQOpH9
+ 0sXZo2osTQTcoSuV03Ck7vLcQdQ39hvV2izFTra/mA==
+X-Google-Smtp-Source: AMsMyM4WSdgcs3053+4q6G+gKJ/OL8h98odCYYex/ySfuvKuvzP9K3W1FYm+E0hfdBtdE3gYPJCBVhXItsWGJJe5ZGg=
+X-Received: by 2002:a05:6e02:1bcc:b0:2f7:2d36:36b1 with SMTP id
+ x12-20020a056e021bcc00b002f72d3636b1mr10950913ilv.240.1664300943591; Tue, 27
+ Sep 2022 10:49:03 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220927002715.2142353-1-mizhang@google.com>
- <CAAeT=FwqWkbhFLHvr12A2rYdzZuDJWBti=jKQRargvAb6bKtaA@mail.gmail.com>
-In-Reply-To: <CAAeT=FwqWkbhFLHvr12A2rYdzZuDJWBti=jKQRargvAb6bKtaA@mail.gmail.com>
+ <YzKGqLzjv0I/gkMi@google.com> <86zgel6rz8.wl-maz@kernel.org>
+In-Reply-To: <86zgel6rz8.wl-maz@kernel.org>
 From: Mingwei Zhang <mizhang@google.com>
-Date: Tue, 27 Sep 2022 10:38:22 -0700
-Message-ID: <CAL715WJsp7zJ-p++TzjxAv5b0cWRKFH-2Tqws1SV34EO16Xp-g@mail.gmail.com>
+Date: Tue, 27 Sep 2022 10:48:52 -0700
+Message-ID: <CAL715W+gJKH+3xgFzUjPs6SAMwZCzkF5NNOTDpa4ov2qZ3r_iA@mail.gmail.com>
 Subject: Re: [PATCH] KVM: arm64: Cleanup the __get_fault_info() to take out
  the code that validates HPFAR
-To: Reiji Watanabe <reijiw@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ LKML <linux-kernel@vger.kernel.org>, Will Deacon <will@kernel.org>,
  "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
  <kvmarm@lists.cs.columbia.edu>,
  Linux ARM <linux-arm-kernel@lists.infradead.org>
@@ -88,22 +88,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-> > +static inline bool __hpfar_is_valid(u64 esr)
 >
-> Unlike what the name implies, this function returns true for some
-> cases that HPFAR is not valid (i.e. SEA).  I think the function
-> returns true when KVM doesn't need HPFAR, or when HPFAR is valid.
-> IMHO the name might be a bit misleading, although I don't have
-> a good name for this.  It would be nice to state that in the
-> comment at least.
+> Honestly, I'd refrain from such changes *unless* they enable something
+> else. The current code is well understood by people hacking on it, and
+> although I don't mind revamping it, it has to be for a good reason.
 >
-> Thank you,
-> Reiji
+> I'd be much more receptive to such a change if it was a prefix to
+> something that actually made a significant change.
 >
+> Thanks,
+>
+>         M.
+>
+Hi Marc,
 
-Yeah, I agree with you Reiji that the name does not reflect the
-meaning of the function. So I was thinking about other names like
-__translate_hpfar_to_far_needed().
+Thanks for the feedback.  I am not sure about the style of the KVM ARM
+side. But in general I think mixing the generic code for ARM and
+specific CPU errata handling is misleading. For instance, in this
+case:
+
++     if ((esr & ESR_ELx_FSC_TYPE) == FSC_PERM)
++             return false;
++
++     if (cpus_have_final_cap(ARM64_WORKAROUND_834220))
++             return false;
+
+As shown it would be much cleaner to separate the two cases as the
+former case is suggested in ARMv8 Spec D13.2.55. The latter case would
+definitely come from a different source.
+
+But I also don't have a strong opinion pushing this one. So, let me
+pull it back then :)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
