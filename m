@@ -2,59 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BCE2C32771
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Sep 2022 22:22:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 832BEC07E9D
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Sep 2022 00:27:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA9834B74F;
-	Mon, 26 Sep 2022 18:22:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF08840B8D;
+	Mon, 26 Sep 2022 20:27:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PWATD1obt442; Mon, 26 Sep 2022 18:21:59 -0400 (EDT)
+	with ESMTP id R8aWUkXXyhJp; Mon, 26 Sep 2022 20:27:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ABC04B2AE;
-	Mon, 26 Sep 2022 18:21:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C471B40FAA;
+	Mon, 26 Sep 2022 20:27:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F7D54141A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 18:21:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD76940BC2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 20:27:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zvnoWnaudBvP for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Sep 2022 18:21:56 -0400 (EDT)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B186A41021
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 18:21:56 -0400 (EDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1664230915;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding;
- bh=2zTaRaQiMuXpNWiLI5P1IeYGL513pIeEKQLlnmeiEaw=;
- b=kuI2NXKJrIV7Ky1EnDY4se/He8yCxvqChb9ZEgdUs7eyc4bUArKXYAX2RYghoVZvP05Ar0
- WL66veVAWiFjKsRPwVsqR/qgfdxlihduvbvHOpp3bZGxUL79IGgMLHh3CkFn/WH94fCZ3A
- ccLj7EQrb17DPrnxfezdL/Lfz8DXQlQ=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2] KVM: arm64: Limit stage2_apply_range() batch size to 1GB
-Date: Mon, 26 Sep 2022 22:21:45 +0000
-Message-Id: <20220926222146.661633-1-oliver.upton@linux.dev>
-MIME-Version: 1.0
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id Qc+O81dBoKCt for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Sep 2022 20:27:21 -0400 (EDT)
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
+ [209.85.210.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8D7ED40B8D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 20:27:21 -0400 (EDT)
+Received: by mail-pf1-f201.google.com with SMTP id
+ g24-20020a056a00079800b0054b1a110543so4830076pfu.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 17:27:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+ :subject:date; bh=9LlUllMuSCCNuvy8nXr0WUw6cjOfzqrjmVjCju9k9xE=;
+ b=ib28nrR8JpjsrppII6G9v/dkNoieDbqAEGPjxFDDXpZ6X2dzYHAQgGQAGNeZsoN0E+
+ QivbBd1z3z72bEgc4ZrqGDiqM5n8tCaBCejTC384XUmG+MXYCSNsPSCMPasXavv9I9ju
+ 7UxNYQXgwEHcdbOixKGvEN8J1at2ARMARli6/3VS5Vquhqwyf0HYlB/5vJ784LvBoNBt
+ r0Ue8vNvTZXN6cpds0UdPc0Wjh7tN2e6knqL4lQQjuPByoh94Hfrp/pylM5QAgzvOgMi
+ uPw2vyCKgVaO1z0v7Ynf3hRhgS3OJcG5bElgEhT0Y4BPuktbEk4Rdt7sJcnwJBSLPTZl
+ VxLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=cc:to:from:subject:message-id:mime-version:date:reply-to
+ :x-gm-message-state:from:to:cc:subject:date;
+ bh=9LlUllMuSCCNuvy8nXr0WUw6cjOfzqrjmVjCju9k9xE=;
+ b=Qa36glf813I37hIDsXjpRj5TTt6BtyCjwTolpVr35dchGQrfvsMtR13bUmAV3jB0I7
+ GtDZqE6vpFdQxyv2hPwmTHHSXg+dDeDpshACJ3N7VNoVLegw//NaV9e2eeVIvH9IWPFA
+ WE48OpUEXemSsWBFp3KEcsMSur+bhBLmKToSueRTv+9Lw6uzOC82H2/u5++4j3HkjEAz
+ +6yBQsTi40lfljb0qzHJFoUU4LK6dcgRjdgb8cKJcPIlmq8A7CXZeCVLB/UoWepXbjtI
+ 2o9ywRCI/U0Mlk8Rmn2fSwHXG+wnFEZBPVkHnQiBc0TunxfK5LfW48D1E4Vrul8KFW0D
+ 759w==
+X-Gm-Message-State: ACrzQf11R1oGkifKAhTQf/sX5YCxEMAFnzOdyRrJrTulSjjK3BCMGJPs
+ qU8Lnl2yVcSHfEo5LNFdZFH8goiJG+HI
+X-Google-Smtp-Source: AMsMyM7beut503w2dGOmNLcBHb2fmbJhHsJKZpriWBWPTuRptWckWaynxJFBeEmIGXr7bX7q5SvnLReY33W1
+X-Received: from mizhang-super.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
+ (user=mizhang job=sendgmr) by 2002:a05:6a00:1342:b0:545:4d30:eecb with SMTP
+ id k2-20020a056a00134200b005454d30eecbmr25908814pfu.69.1664238440461; Mon, 26
+ Sep 2022 17:27:20 -0700 (PDT)
+Date: Tue, 27 Sep 2022 00:27:15 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.3.998.g577e59143f-goog
+Message-ID: <20220927002715.2142353-1-mizhang@google.com>
+Subject: [PATCH] KVM: arm64: Cleanup the __get_fault_info() to take out the
+ code that validates HPFAR
+From: Mingwei Zhang <mizhang@google.com>
+To: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Mingwei Zhang <mizhang@google.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Mingwei Zhang <mizhang@google.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -68,150 +87,83 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Presently stage2_apply_range() works on a batch of memory addressed by a
-stage 2 root table entry for the VM. Depending on the IPA limit of the
-VM and PAGE_SIZE of the host, this could address a massive range of
-memory. Some examples:
+Cleanup __get_fault_info() to take out the code that checks HPFAR. The
+conditions in __get_fault_info() that checks if HPFAR contains a valid IPA
+is slightly messy in that several conditions are written within one IF
+statement acrossing multiple lines and are connected with different logical
+operators. Among them, some conditions come from ARM Spec, while others
+come from CPU erratum. This makes the code hard to read and difficult to
+extend.
 
-  4 level, 4K paging -> 512 GB batch size
+So, cleanup the function to improve the readability. In particular,
+explicitly specify each condition separately within a newly created inline
+function.
 
-  3 level, 64K paging -> 4TB batch size
+No functional changes are intended.
 
-Unsurprisingly, working on such a large range of memory can lead to soft
-lockups. When running dirty_log_perf_test:
-
-  ./dirty_log_perf_test -m -2 -s anonymous_thp -b 4G -v 48
-
-  watchdog: BUG: soft lockup - CPU#0 stuck for 45s! [dirty_log_perf_:16703]
-  Modules linked in: vfat fat cdc_ether usbnet mii xhci_pci xhci_hcd sha3_generic gq(O)
-  CPU: 0 PID: 16703 Comm: dirty_log_perf_ Tainted: G           O       6.0.0-smp-DEV #1
-  pstate: 80400009 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-  pc : dcache_clean_inval_poc+0x24/0x38
-  lr : clean_dcache_guest_page+0x28/0x4c
-  sp : ffff800021763990
-  pmr_save: 000000e0
-  x29: ffff800021763990 x28: 0000000000000005 x27: 0000000000000de0
-  x26: 0000000000000001 x25: 00400830b13bc77f x24: ffffad4f91ead9c0
-  x23: 0000000000000000 x22: ffff8000082ad9c8 x21: 0000fffafa7bc000
-  x20: ffffad4f9066ce50 x19: 0000000000000003 x18: ffffad4f92402000
-  x17: 000000000000011b x16: 000000000000011b x15: 0000000000000124
-  x14: ffff07ff8301d280 x13: 0000000000000000 x12: 00000000ffffffff
-  x11: 0000000000010001 x10: fffffc0000000000 x9 : ffffad4f9069e580
-  x8 : 000000000000000c x7 : 0000000000000000 x6 : 000000000000003f
-  x5 : ffff07ffa2076980 x4 : 0000000000000001 x3 : 000000000000003f
-  x2 : 0000000000000040 x1 : ffff0830313bd000 x0 : ffff0830313bcc40
-  Call trace:
-   dcache_clean_inval_poc+0x24/0x38
-   stage2_unmap_walker+0x138/0x1ec
-   __kvm_pgtable_walk+0x130/0x1d4
-   __kvm_pgtable_walk+0x170/0x1d4
-   __kvm_pgtable_walk+0x170/0x1d4
-   __kvm_pgtable_walk+0x170/0x1d4
-   kvm_pgtable_stage2_unmap+0xc4/0xf8
-   kvm_arch_flush_shadow_memslot+0xa4/0x10c
-   kvm_set_memslot+0xb8/0x454
-   __kvm_set_memory_region+0x194/0x244
-   kvm_vm_ioctl_set_memory_region+0x58/0x7c
-   kvm_vm_ioctl+0x49c/0x560
-   __arm64_sys_ioctl+0x9c/0xd4
-   invoke_syscall+0x4c/0x124
-   el0_svc_common+0xc8/0x194
-   do_el0_svc+0x38/0xc0
-   el0_svc+0x2c/0xa4
-   el0t_64_sync_handler+0x84/0xf0
-   el0t_64_sync+0x1a0/0x1a4
-
-Given the various paging configurations used by KVM at stage 2 there
-isn't a sensible page table level to use as the batch size. Use 1GB as
-the batch size instead, as it is evenly divisible by all supported
-hugepage sizes across 4K, 16K, and 64K paging.
-
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+Suggested-by: Oliver Upton <oupton@google.com>
+Signed-off-by: Mingwei Zhang <mizhang@google.com>
 ---
+ arch/arm64/kvm/hyp/include/hyp/fault.h | 36 ++++++++++++++++----------
+ 1 file changed, 23 insertions(+), 13 deletions(-)
 
-Applies to 6.0-rc3. Tested with 4K, 16K, and 64K pages with the above
-dirty_log_perf_test command and noticed no more soft lockups.
-
-v1: https://lore.kernel.org/kvmarm/20220920183630.3376939-1-oliver.upton@linux.dev/
-
-v1 -> v2:
- - Align down to the next 1GB boundary (Ricardo)
-
- arch/arm64/include/asm/stage2_pgtable.h | 20 --------------------
- arch/arm64/kvm/mmu.c                    |  8 +++++++-
- 2 files changed, 7 insertions(+), 21 deletions(-)
-
-diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-index fe341a6578c3..c8dca8ae359c 100644
---- a/arch/arm64/include/asm/stage2_pgtable.h
-+++ b/arch/arm64/include/asm/stage2_pgtable.h
-@@ -10,13 +10,6 @@
+diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
+index 1b8a2dcd712f..4575500d26ff 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/fault.h
++++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
+@@ -41,12 +41,6 @@ static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
+ 	return true;
+ }
  
- #include <linux/pgtable.h>
- 
--/*
-- * PGDIR_SHIFT determines the size a top-level page table entry can map
-- * and depends on the number of levels in the page table. Compute the
-- * PGDIR_SHIFT for a given number of levels.
-- */
--#define pt_levels_pgdir_shift(lvls)	ARM64_HW_PGTABLE_LEVEL_SHIFT(4 - (lvls))
--
- /*
-  * The hardware supports concatenation of up to 16 tables at stage2 entry
-  * level and we use the feature whenever possible, which means we resolve 4
-@@ -30,11 +23,6 @@
- #define stage2_pgtable_levels(ipa)	ARM64_HW_PGTABLE_LEVELS((ipa) - 4)
- #define kvm_stage2_levels(kvm)		VTCR_EL2_LVLS(kvm->arch.vtcr)
- 
--/* stage2_pgdir_shift() is the size mapped by top-level stage2 entry for the VM */
--#define stage2_pgdir_shift(kvm)		pt_levels_pgdir_shift(kvm_stage2_levels(kvm))
--#define stage2_pgdir_size(kvm)		(1ULL << stage2_pgdir_shift(kvm))
--#define stage2_pgdir_mask(kvm)		~(stage2_pgdir_size(kvm) - 1)
--
- /*
-  * kvm_mmmu_cache_min_pages() is the number of pages required to install
-  * a stage-2 translation. We pre-allocate the entry level page table at
-@@ -42,12 +30,4 @@
-  */
- #define kvm_mmu_cache_min_pages(kvm)	(kvm_stage2_levels(kvm) - 1)
- 
--static inline phys_addr_t
--stage2_pgd_addr_end(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+-static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
 -{
--	phys_addr_t boundary = (addr + stage2_pgdir_size(kvm)) & stage2_pgdir_mask(kvm);
+-	u64 hpfar, far;
 -
--	return (boundary - 1 < end - 1) ? boundary : end;
--}
+-	far = read_sysreg_el2(SYS_FAR);
 -
- #endif	/* __ARM64_S2_PGTABLE_H_ */
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index c9a13e487187..5d05bb92e129 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -31,6 +31,12 @@ static phys_addr_t hyp_idmap_vector;
- 
- static unsigned long io_map_base;
- 
-+static inline phys_addr_t stage2_apply_range_next(phys_addr_t addr, phys_addr_t end)
+ 	/*
+ 	 * The HPFAR can be invalid if the stage 2 fault did not
+ 	 * happen during a stage 1 page table walk (the ESR_EL2.S1PTW
+@@ -58,14 +52,30 @@ static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
+ 	 * permission fault or the errata workaround is enabled, we
+ 	 * resolve the IPA using the AT instruction.
+ 	 */
+-	if (!(esr & ESR_ELx_S1PTW) &&
+-	    (cpus_have_final_cap(ARM64_WORKAROUND_834220) ||
+-	     (esr & ESR_ELx_FSC_TYPE) == FSC_PERM)) {
+-		if (!__translate_far_to_hpfar(far, &hpfar))
+-			return false;
+-	} else {
++static inline bool __hpfar_is_valid(u64 esr)
 +{
-+	phys_addr_t boundary = round_down(addr + SZ_1G, SZ_1G);
++	if (esr & ESR_ELx_S1PTW)
++		return true;
 +
-+	return (boundary - 1 < end - 1) ? boundary : end;
++	if ((esr & ESR_ELx_FSC_TYPE) == FSC_PERM)
++		return false;
++
++	if (cpus_have_final_cap(ARM64_WORKAROUND_834220))
++		return false;
++
++	return true;
 +}
++
++static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
++{
++	u64 hpfar, far;
++
++	far = read_sysreg_el2(SYS_FAR);
++
++	if (!__hpfar_is_valid(esr) && !__translate_far_to_hpfar(far, &hpfar))
++		return false;
++	else
+ 		hpfar = read_sysreg(hpfar_el2);
+-	}
  
- /*
-  * Release kvm_mmu_lock periodically if the memory region is large. Otherwise,
-@@ -52,7 +58,7 @@ static int stage2_apply_range(struct kvm *kvm, phys_addr_t addr,
- 		if (!pgt)
- 			return -EINVAL;
- 
--		next = stage2_pgd_addr_end(kvm, addr, end);
-+		next = stage2_apply_range_next(addr, end);
- 		ret = fn(pgt, addr, next - addr);
- 		if (ret)
- 			break;
+ 	fault->far_el2 = far;
+ 	fault->hpfar_el2 = hpfar;
 
-base-commit: b90cb1053190353cc30f0fef0ef1f378ccc063c5
+base-commit: c59fb127583869350256656b7ed848c398bef879
 -- 
 2.37.3.998.g577e59143f-goog
 
