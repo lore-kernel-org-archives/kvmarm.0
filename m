@@ -2,73 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E91C3C54EE9
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Sep 2022 07:01:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98AAEC6FA90
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Sep 2022 10:18:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64E5B4B658;
-	Tue, 27 Sep 2022 03:01:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3BC84B6C7;
+	Tue, 27 Sep 2022 06:18:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XeHtXdeYo4wS; Tue, 27 Sep 2022 03:01:42 -0400 (EDT)
+	with ESMTP id NxzazADcT5Im; Tue, 27 Sep 2022 06:18:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F04E40BE7;
-	Tue, 27 Sep 2022 03:01:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EE174B6C8;
+	Tue, 27 Sep 2022 06:18:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 097D4408F4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 03:01:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D0E34B6C7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 06:18:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lstJ0-3KTZj5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Sep 2022 03:01:39 -0400 (EDT)
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com
- [209.85.167.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B47534089C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 03:01:39 -0400 (EDT)
-Received: by mail-oi1-f175.google.com with SMTP id r125so10915397oia.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 00:01:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:from:to:cc:subject:date;
- bh=E70VKyNLfpMrN2tn7yjuSAsildf4GsIvIX1OrG9E27A=;
- b=UlhRPDv8KPSw5JAfrPJnfDIOW8t6C5FofP5Prw+qe8oCdExQfzbSkHqYw9dhGZqdwY
- 9O/IcEBXe3TKQL4qDnAsBzgM4NGT1vjK0WfFzvwwKwvrVEb73lQXEYeJB4BV8YMNHntj
- 9QS96gOTmOaCEe4qBkSttmdlT2ayErfE17jzU4rCx4G7ZlDsOk0MAUmUh4yBe7qYsDUf
- ROAPNwj73sQMg1AuvDqz+IoEL3Dz1I/oraIzDUM/GIkaeWhwTTwTHCf32VZfviV32XwI
- 039lsOHpsSVKQsysW5ZkkaXmw0008PIh5c3R5G3PO7tgE3ujDL3PbQQKkpaE7UkLDi11
- X5SQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:x-gm-message-state:from:to:cc:subject:date;
- bh=E70VKyNLfpMrN2tn7yjuSAsildf4GsIvIX1OrG9E27A=;
- b=oebxFC/3ZJUimiC3NKeq2hTJIKbY6S0HgeU3qKtKbEBJBc73pUQfpEAfhhRB01j9Ce
- TC9FzErxqp9XA2Wr6N0eTjH/g2mascb07FuangZzpre/MOa4REqp+Wjet7VFaSOHfni4
- m2fTBJngHMEJ1rf31sZfoBtyUudDLps0hutIEep59V9govH16eJs2HBbQzx518MA7zCF
- JYfTCcPv+5//twWw1zdsTKx8tD6dksnam9qcTs2Zj6zIIStDhUuy1h/ypxK8SsS3AcRF
- d3KokjeGDzmmgTSFO8FKhKBnNBbWklnEb1UbbkPtwLkgp70fbA6Co1E5bJpBKrhi8aYD
- mQ2Q==
-X-Gm-Message-State: ACrzQf0w216rIrUKtiZP4iVNiC6aiMajfhWvkur6Tm7/jegavRoXiV0y
- TgcfdD0JAeX4AufCJO6BCK4FpDLiiZMNctZz1l3N7w==
-X-Google-Smtp-Source: AMsMyM48X52ODBTPeaSHNnAoqOvvgHXVb73r8V2XWVzzxofRB/Dj3lT4BzwCNHtWbEXNso+iipBKIqOGxW4X/1wJlWo=
-X-Received: by 2002:aca:4286:0:b0:350:a3fd:f6df with SMTP id
- p128-20020aca4286000000b00350a3fdf6dfmr1140069oia.61.1664262098931; Tue, 27
- Sep 2022 00:01:38 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220927002715.2142353-1-mizhang@google.com>
-In-Reply-To: <20220927002715.2142353-1-mizhang@google.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Tue, 27 Sep 2022 00:01:22 -0700
-Message-ID: <CAAeT=FwqWkbhFLHvr12A2rYdzZuDJWBti=jKQRargvAb6bKtaA@mail.gmail.com>
+ with ESMTP id 71KLEygBsxtB for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Sep 2022 06:18:09 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D40F44B1B4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 06:18:09 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 2D509B81A0D;
+ Tue, 27 Sep 2022 10:18:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6F1EC433D6;
+ Tue, 27 Sep 2022 10:18:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1664273886;
+ bh=H/HZ+8Yn/BiaXmw/8d1VR0gleRQhWzamBner0vTDoWc=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=DGpqE+yyCTkC0ISYppAy954jrFGx++xsqBqQX6E48GFXhLByX9Xck+RIWjTLzztn5
+ gkGZBxgjzCcQibYUQGHjRLx1InlistGkQ8hzAjifhoDmnlKgokqQXWSsbu8lFLx4CN
+ Oock7os8ojEAXXh35ySF3E1ow4QQqTkS6ZiheYjv8ZykFFCjoF10S6xI/ef6Sz2Jb6
+ JM1N6zkjX0+F4Ge2ycxMKSF+DQcFe/5DdX++1Kga9HWUI3TgdmiV7mn/JA7Yk1H7vP
+ zrnHIvEOTjOXJsKR34mvW5y0HVrhtwiSW5pqtUfmFoNzu9S+0r8/WI5ud5h7F4RA8v
+ VrkokeQGxfTLg==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1od7fA-00Cwgn-IO;
+ Tue, 27 Sep 2022 11:18:04 +0100
+Date: Tue, 27 Sep 2022 06:18:03 -0400
+Message-ID: <86zgel6rz8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mingwei Zhang <mizhang@google.com>, Oliver Upton <oliver.upton@linux.dev>
 Subject: Re: [PATCH] KVM: arm64: Cleanup the __get_fault_info() to take out
  the code that validates HPFAR
-To: Mingwei Zhang <mizhang@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <YzKGqLzjv0I/gkMi@google.com>
+References: <20220927002715.2142353-1-mizhang@google.com>
+ <YzKGqLzjv0I/gkMi@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mizhang@google.com, oliver.upton@linux.dev,
+ catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,106 +91,41 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Mingwei,
+On Tue, 27 Sep 2022 01:14:16 -0400,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Hi Mingwei,
+> 
+> On Tue, Sep 27, 2022 at 12:27:15AM +0000, Mingwei Zhang wrote:
+> > Cleanup __get_fault_info() to take out the code that checks HPFAR. The
+> > conditions in __get_fault_info() that checks if HPFAR contains a valid IPA
+> > is slightly messy in that several conditions are written within one IF
+> > statement acrossing multiple lines and are connected with different logical
+> > operators. Among them, some conditions come from ARM Spec, while others
+> 						   ^~~~~~~~
+> 
+> Call it the ARM ARM or Arm ARM, depending on what stylization you
+> subscribe to :)
+> 
+> > come from CPU erratum. This makes the code hard to read and
+> > difficult to extend.
+> 
+> I'd recommend you avoid alluding to future changes unless they're posted
+> on the mailing list.
 
-On Mon, Sep 26, 2022 at 5:27 PM Mingwei Zhang <mizhang@google.com> wrote:
->
-> Cleanup __get_fault_info() to take out the code that checks HPFAR. The
-> conditions in __get_fault_info() that checks if HPFAR contains a valid IPA
-> is slightly messy in that several conditions are written within one IF
-> statement acrossing multiple lines and are connected with different logical
-> operators. Among them, some conditions come from ARM Spec, while others
-> come from CPU erratum. This makes the code hard to read and difficult to
-> extend.
->
-> So, cleanup the function to improve the readability. In particular,
-> explicitly specify each condition separately within a newly created inline
-> function.
->
-> No functional changes are intended.
->
-> Suggested-by: Oliver Upton <oupton@google.com>
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> ---
->  arch/arm64/kvm/hyp/include/hyp/fault.h | 36 ++++++++++++++++----------
->  1 file changed, 23 insertions(+), 13 deletions(-)
->
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
-> index 1b8a2dcd712f..4575500d26ff 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/fault.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
-> @@ -41,12 +41,6 @@ static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
->         return true;
->  }
->
-> -static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
-> -{
-> -       u64 hpfar, far;
-> -
-> -       far = read_sysreg_el2(SYS_FAR);
-> -
->         /*
->          * The HPFAR can be invalid if the stage 2 fault did not
->          * happen during a stage 1 page table walk (the ESR_EL2.S1PTW
-> @@ -58,14 +52,30 @@ static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
->          * permission fault or the errata workaround is enabled, we
->          * resolve the IPA using the AT instruction.
->          */
-> -       if (!(esr & ESR_ELx_S1PTW) &&
-> -           (cpus_have_final_cap(ARM64_WORKAROUND_834220) ||
-> -            (esr & ESR_ELx_FSC_TYPE) == FSC_PERM)) {
-> -               if (!__translate_far_to_hpfar(far, &hpfar))
-> -                       return false;
-> -       } else {
-> +static inline bool __hpfar_is_valid(u64 esr)
+Honestly, I'd refrain from such changes *unless* they enable something
+else. The current code is well understood by people hacking on it, and
+although I don't mind revamping it, it has to be for a good reason.
 
-Unlike what the name implies, this function returns true for some
-cases that HPFAR is not valid (i.e. SEA).  I think the function
-returns true when KVM doesn't need HPFAR, or when HPFAR is valid.
-IMHO the name might be a bit misleading, although I don't have
-a good name for this.  It would be nice to state that in the
-comment at least.
+I'd be much more receptive to such a change if it was a prefix to
+something that actually made a significant change.
 
-Thank you,
-Reiji
+Thanks,
 
+	M.
 
-> +{
-> +       if (esr & ESR_ELx_S1PTW)
-> +               return true;
-> +
-> +       if ((esr & ESR_ELx_FSC_TYPE) == FSC_PERM)
-> +               return false;
-> +
-> +       if (cpus_have_final_cap(ARM64_WORKAROUND_834220))
-> +               return false;
-> +
-> +       return true;
-> +}
-> +
-> +static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
-> +{
-> +       u64 hpfar, far;
-> +
-> +       far = read_sysreg_el2(SYS_FAR);
-> +
-> +       if (!__hpfar_is_valid(esr) && !__translate_far_to_hpfar(far, &hpfar))
-> +               return false;
-> +       else
->                 hpfar = read_sysreg(hpfar_el2);
-> -       }
->
->         fault->far_el2 = far;
->         fault->hpfar_el2 = hpfar;
->
-> base-commit: c59fb127583869350256656b7ed848c398bef879
-> --
-> 2.37.3.998.g577e59143f-goog
->
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
