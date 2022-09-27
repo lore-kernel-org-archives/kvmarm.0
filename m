@@ -2,78 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 832BEC07E9D
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Sep 2022 00:27:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C00AC32771
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Sep 2022 00:55:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF08840B8D;
-	Mon, 26 Sep 2022 20:27:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6EDE4B750;
+	Mon, 26 Sep 2022 20:54:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id R8aWUkXXyhJp; Mon, 26 Sep 2022 20:27:23 -0400 (EDT)
+	with ESMTP id odsoZFEI1d+U; Mon, 26 Sep 2022 20:54:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C471B40FAA;
-	Mon, 26 Sep 2022 20:27:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 802414B64E;
+	Mon, 26 Sep 2022 20:54:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD76940BC2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 20:27:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BDA74B64E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 20:54:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Qc+O81dBoKCt for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Sep 2022 20:27:21 -0400 (EDT)
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
- [209.85.210.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8D7ED40B8D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 20:27:21 -0400 (EDT)
-Received: by mail-pf1-f201.google.com with SMTP id
- g24-20020a056a00079800b0054b1a110543so4830076pfu.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 17:27:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
- :subject:date; bh=9LlUllMuSCCNuvy8nXr0WUw6cjOfzqrjmVjCju9k9xE=;
- b=ib28nrR8JpjsrppII6G9v/dkNoieDbqAEGPjxFDDXpZ6X2dzYHAQgGQAGNeZsoN0E+
- QivbBd1z3z72bEgc4ZrqGDiqM5n8tCaBCejTC384XUmG+MXYCSNsPSCMPasXavv9I9ju
- 7UxNYQXgwEHcdbOixKGvEN8J1at2ARMARli6/3VS5Vquhqwyf0HYlB/5vJ784LvBoNBt
- r0Ue8vNvTZXN6cpds0UdPc0Wjh7tN2e6knqL4lQQjuPByoh94Hfrp/pylM5QAgzvOgMi
- uPw2vyCKgVaO1z0v7Ynf3hRhgS3OJcG5bElgEhT0Y4BPuktbEk4Rdt7sJcnwJBSLPTZl
- VxLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=cc:to:from:subject:message-id:mime-version:date:reply-to
- :x-gm-message-state:from:to:cc:subject:date;
- bh=9LlUllMuSCCNuvy8nXr0WUw6cjOfzqrjmVjCju9k9xE=;
- b=Qa36glf813I37hIDsXjpRj5TTt6BtyCjwTolpVr35dchGQrfvsMtR13bUmAV3jB0I7
- GtDZqE6vpFdQxyv2hPwmTHHSXg+dDeDpshACJ3N7VNoVLegw//NaV9e2eeVIvH9IWPFA
- WE48OpUEXemSsWBFp3KEcsMSur+bhBLmKToSueRTv+9Lw6uzOC82H2/u5++4j3HkjEAz
- +6yBQsTi40lfljb0qzHJFoUU4LK6dcgRjdgb8cKJcPIlmq8A7CXZeCVLB/UoWepXbjtI
- 2o9ywRCI/U0Mlk8Rmn2fSwHXG+wnFEZBPVkHnQiBc0TunxfK5LfW48D1E4Vrul8KFW0D
- 759w==
-X-Gm-Message-State: ACrzQf11R1oGkifKAhTQf/sX5YCxEMAFnzOdyRrJrTulSjjK3BCMGJPs
- qU8Lnl2yVcSHfEo5LNFdZFH8goiJG+HI
-X-Google-Smtp-Source: AMsMyM7beut503w2dGOmNLcBHb2fmbJhHsJKZpriWBWPTuRptWckWaynxJFBeEmIGXr7bX7q5SvnLReY33W1
-X-Received: from mizhang-super.c.googlers.com
- ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
- (user=mizhang job=sendgmr) by 2002:a05:6a00:1342:b0:545:4d30:eecb with SMTP
- id k2-20020a056a00134200b005454d30eecbmr25908814pfu.69.1664238440461; Mon, 26
- Sep 2022 17:27:20 -0700 (PDT)
-Date: Tue, 27 Sep 2022 00:27:15 +0000
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.37.3.998.g577e59143f-goog
-Message-ID: <20220927002715.2142353-1-mizhang@google.com>
-Subject: [PATCH] KVM: arm64: Cleanup the __get_fault_info() to take out the
- code that validates HPFAR
-From: Mingwei Zhang <mizhang@google.com>
-To: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
- Will Deacon <will@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Mingwei Zhang <mizhang@google.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ with ESMTP id arLGLfgUfUEU for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Sep 2022 20:54:55 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 49A3C4B64C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Sep 2022 20:54:55 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1664240095;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ws7zU+gISAyBx1MgpyOG4IHg2lyJCsLl3GGmjikN0Kg=;
+ b=TMNG9eLF4GxG5XgNTPpQS2FnZTQ7CiuCUNWGVoiymjvB1VHreK63MpQDXafQHgQUl8FECs
+ qR/AMPlym3iH6KsYYYohBN8fxJaJVSsdqRhgXhy9Sj2+dbDdZyRtyTAp06k8gpS+C+v9ca
+ MhsNjVIOFJ6foge5+wx7zllm02p0ZzY=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-29-KD41FZ54NZyUq83xkWEe2A-1; Mon, 26 Sep 2022 20:54:51 -0400
+X-MC-Unique: KD41FZ54NZyUq83xkWEe2A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.1])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A1BB03C02B7C;
+ Tue, 27 Sep 2022 00:54:50 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-143.bne.redhat.com [10.64.54.143])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6523B40C2064;
+ Tue, 27 Sep 2022 00:54:44 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v4 0/6] KVM: arm64: Enable ring-based dirty memory tracking
+Date: Tue, 27 Sep 2022 08:54:33 +0800
+Message-Id: <20220927005439.21130-1-gshan@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+Cc: maz@kernel.org, shuah@kernel.org, kvm@vger.kernel.org,
+ catalin.marinas@arm.com, andrew.jones@linux.dev, shan.gavin@gmail.com,
+ bgardon@google.com, dmatlack@google.com, pbonzini@redhat.com,
+ zhenyzha@redhat.com, will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Mingwei Zhang <mizhang@google.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -87,85 +78,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Cleanup __get_fault_info() to take out the code that checks HPFAR. The
-conditions in __get_fault_info() that checks if HPFAR contains a valid IPA
-is slightly messy in that several conditions are written within one IF
-statement acrossing multiple lines and are connected with different logical
-operators. Among them, some conditions come from ARM Spec, while others
-come from CPU erratum. This makes the code hard to read and difficult to
-extend.
+This series enables the ring-based dirty memory tracking for ARM64.
+The feature has been available and enabled on x86 for a while. It
+is beneficial when the number of dirty pages is small in a checkpointing
+system or live migration scenario. More details can be found from
+fb04a1eddb1a ("KVM: X86: Implement ring-based dirty memory tracking").
 
-So, cleanup the function to improve the readability. In particular,
-explicitly specify each condition separately within a newly created inline
-function.
+This series is applied on top of Marc's v2 series [0], fixing dirty-ring
+ordering issue.
 
-No functional changes are intended.
+[0] https://lore.kernel.org/kvmarm/20220926145120.27974-1-maz@kernel.org
 
-Suggested-by: Oliver Upton <oupton@google.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- arch/arm64/kvm/hyp/include/hyp/fault.h | 36 ++++++++++++++++----------
- 1 file changed, 23 insertions(+), 13 deletions(-)
+v3: https://lore.kernel.org/r/20220922003214.276736-1-gshan@redhat.com
+v2: https://lore.kernel.org/lkml/YyiV%2Fl7O23aw5aaO@xz-m1.local/T/
+v1: https://lore.kernel.org/lkml/20220819005601.198436-1-gshan@redhat.com
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
-index 1b8a2dcd712f..4575500d26ff 100644
---- a/arch/arm64/kvm/hyp/include/hyp/fault.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
-@@ -41,12 +41,6 @@ static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
- 	return true;
- }
- 
--static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
--{
--	u64 hpfar, far;
--
--	far = read_sysreg_el2(SYS_FAR);
--
- 	/*
- 	 * The HPFAR can be invalid if the stage 2 fault did not
- 	 * happen during a stage 1 page table walk (the ESR_EL2.S1PTW
-@@ -58,14 +52,30 @@ static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
- 	 * permission fault or the errata workaround is enabled, we
- 	 * resolve the IPA using the AT instruction.
- 	 */
--	if (!(esr & ESR_ELx_S1PTW) &&
--	    (cpus_have_final_cap(ARM64_WORKAROUND_834220) ||
--	     (esr & ESR_ELx_FSC_TYPE) == FSC_PERM)) {
--		if (!__translate_far_to_hpfar(far, &hpfar))
--			return false;
--	} else {
-+static inline bool __hpfar_is_valid(u64 esr)
-+{
-+	if (esr & ESR_ELx_S1PTW)
-+		return true;
-+
-+	if ((esr & ESR_ELx_FSC_TYPE) == FSC_PERM)
-+		return false;
-+
-+	if (cpus_have_final_cap(ARM64_WORKAROUND_834220))
-+		return false;
-+
-+	return true;
-+}
-+
-+static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
-+{
-+	u64 hpfar, far;
-+
-+	far = read_sysreg_el2(SYS_FAR);
-+
-+	if (!__hpfar_is_valid(esr) && !__translate_far_to_hpfar(far, &hpfar))
-+		return false;
-+	else
- 		hpfar = read_sysreg(hpfar_el2);
--	}
- 
- 	fault->far_el2 = far;
- 	fault->hpfar_el2 = hpfar;
+Testing
+=======
+(1) kvm/selftests/dirty_log_test
+(2) Live migration by QEMU
 
-base-commit: c59fb127583869350256656b7ed848c398bef879
+Changelog
+=========
+v4:
+  * Commit log improvement                                     (Marc)
+  * Add helper kvm_dirty_ring_check_request()                  (Marc)
+  * Drop ifdef for kvm_cpu_dirty_log_size()                    (Marc)
+v3:
+  * Check KVM_REQ_RING_SOFT_RULL inside kvm_request_pending()  (Peter)
+  * Move declaration of kvm_cpu_dirty_log_size()               (test-robot)
+v2:
+  * Introduce KVM_REQ_RING_SOFT_FULL                           (Marc)
+  * Changelog improvement                                      (Marc)
+  * Fix dirty_log_test without knowing host page size          (Drew)
+
+Gavin Shan (6):
+  KVM: x86: Introduce KVM_REQ_RING_SOFT_FULL
+  KVM: x86: Move declaration of kvm_cpu_dirty_log_size() to
+    kvm_dirty_ring.h
+  KVM: arm64: Enable ring-based dirty memory tracking
+  KVM: selftests: Use host page size to map ring buffer in
+    dirty_log_test
+  KVM: selftests: Clear dirty ring states between two modes in
+    dirty_log_test
+  KVM: selftests: Automate choosing dirty ring size in dirty_log_test
+
+ Documentation/virt/kvm/api.rst               |  2 +-
+ arch/arm64/include/uapi/asm/kvm.h            |  1 +
+ arch/arm64/kvm/Kconfig                       |  1 +
+ arch/arm64/kvm/arm.c                         |  3 ++
+ arch/x86/include/asm/kvm_host.h              |  2 -
+ arch/x86/kvm/x86.c                           | 15 +++---
+ include/linux/kvm_dirty_ring.h               | 14 +++---
+ include/linux/kvm_host.h                     |  1 +
+ tools/testing/selftests/kvm/dirty_log_test.c | 53 ++++++++++++++------
+ tools/testing/selftests/kvm/lib/kvm_util.c   |  2 +-
+ virt/kvm/dirty_ring.c                        | 19 ++++++-
+ 11 files changed, 79 insertions(+), 34 deletions(-)
+
 -- 
-2.37.3.998.g577e59143f-goog
+2.23.0
 
 _______________________________________________
 kvmarm mailing list
