@@ -2,79 +2,86 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB1F9C07E9D
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Sep 2022 23:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0D2C04A95
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Sep 2022 04:24:19 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5039E4B630;
-	Tue, 27 Sep 2022 19:48:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EBA824B62E;
+	Wed, 28 Sep 2022 00:24:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0yK6H9YUhGnn; Tue, 27 Sep 2022 19:47:58 -0400 (EDT)
+	with ESMTP id b8OP-zfh8lOo; Wed, 28 Sep 2022 00:24:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7E894B633;
-	Tue, 27 Sep 2022 19:47:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AE4F4B636;
+	Wed, 28 Sep 2022 00:24:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41D504B25E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 19:47:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E24D24B62E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Sep 2022 00:24:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZYRO5UoafDHC for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Sep 2022 19:47:56 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C8BAA4B177
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 19:47:56 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1664322476;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=i0BKLfn5B7UzJtj+8D3KQv1ZOgyYXogau2GtF6aG8EE=;
- b=Ud3aQd5SrZezSD3n7rc20c+QSXDL9fp3O32u8Zf7pydyzPL0kURtwrWKMyEvbFzKJnkaOp
- 84uEXrNdL+EqMWlbPPqf72k0ZC5i8nAWibQBReNEksrnVAeSkfjal64lnRr9S0OO9KLtTM
- A7ke8AqzjL36wSE/LsfhnSzamNUrUyY=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-644-kFXFsxtZPZGpRiWLb-rIhw-1; Tue, 27 Sep 2022 19:47:53 -0400
-X-MC-Unique: kFXFsxtZPZGpRiWLb-rIhw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com
- [10.11.54.2])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 645E91C0896D;
- Tue, 27 Sep 2022 23:47:52 +0000 (UTC)
-Received: from [10.64.54.143] (vpn2-54-143.bne.redhat.com [10.64.54.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2058740C6EC2;
- Tue, 27 Sep 2022 23:47:45 +0000 (UTC)
-Subject: Re: [PATCH v4 3/6] KVM: arm64: Enable ring-based dirty memory tracking
-To: Peter Xu <peterx@redhat.com>, Marc Zyngier <maz@kernel.org>
-References: <20220927005439.21130-1-gshan@redhat.com>
- <20220927005439.21130-4-gshan@redhat.com> <YzMerD8ZvhvnprEN@x1n>
- <86sfkc7mg8.wl-maz@kernel.org> <YzM/DFV1TgtyRfCA@x1n>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <320005d1-fe88-fd6a-be91-ddb56f1aa80f@redhat.com>
-Date: Wed, 28 Sep 2022 09:47:43 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id ueEKeUWbVYu8 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Sep 2022 00:24:14 -0400 (EDT)
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com
+ [209.85.216.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2BF54B177
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Sep 2022 00:24:14 -0400 (EDT)
+Received: by mail-pj1-f49.google.com with SMTP id
+ q35-20020a17090a752600b002038d8a68fbso798324pjk.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Sep 2022 21:24:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date;
+ bh=84y5cVFPqn7JdmKlB0INiH26jqZn3FwsuFj1nkhevE0=;
+ b=leb1DMlrdBQlXituY1fllABDc1rX2Y/sfj5EjhSd00SHDHjY5TrDzEGj+vKXQmmONs
+ /xdw+DFqbet7/tgeJWT7Wf81yXRJkVgXTFjIBPgI0ZWU+0t3w8H+c5ReVPeXVur5oWFM
+ qjTMbUzJN0dl1dexQVQ/BS5ADe3iPO7v2sXw16iby8v0YuMsTQDBY51CVwTl2sTg/Ww6
+ POyz1gvu3l4/31WwpFY/47fP3kmynWQYWaRB5QvAatYQ6kD8f7Eu0KVs1v8FPEEOCNFU
+ tjXv0EGR4KHOUkPX86yeDOeFBXLQVtWeFdVMyeW9omz70tnYH9hLS3GQY4b5wlnpUFOZ
+ hMBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+ bh=84y5cVFPqn7JdmKlB0INiH26jqZn3FwsuFj1nkhevE0=;
+ b=3SFgxv0rx54pN1rh9mGTpBjzIVr+lWwtIRAks02DayYJZxeip/YSIv+xUC9zHZjmaI
+ OCDyMJl0pc8vUxlbp0YHVTv/6dwKKW1MMFLiUBMt7oJ+9AUXco8KRCbuQ/R/yxwd+jAL
+ pquzilgGmGtRKfSi3hMt6/fqb9bUKPZtEiuSHbnR6Iu5mMrIrhNJwMNIEAi75NdPtnEK
+ GpNtdmueSqjAWU0w2Sz1GprKG7ZaEssmpqppbBdhYMrBRWGv7V/sYUtkvvCj5zjIGYob
+ Dk5kXlt6bEunF0HdUSJKqd+XpZqm8gLQ7lmLHSihlkBO12kNyoNVhgjArGZ+S4ydYS8k
+ dKhg==
+X-Gm-Message-State: ACrzQf2k9cT66OvzoSxh8sm6FZN4qFS+7ChLCmNB7xg7uIKZTpTk8CVK
+ bbQpzZw20V3gFuL6gBTVx3q5dQ==
+X-Google-Smtp-Source: AMsMyM6O7dOJoGrGACvEl/k7n7NYRr028Nsgp4sVYpO6c9B/6uiJJ83uMjNC1TjMMFAEKfz6blk6Rw==
+X-Received: by 2002:a17:902:e807:b0:179:fc64:7288 with SMTP id
+ u7-20020a170902e80700b00179fc647288mr3586121plg.137.1664339053509; 
+ Tue, 27 Sep 2022 21:24:13 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com.
+ [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
+ y15-20020a17090a2b4f00b002005fcd2cb4sm412541pjc.2.2022.09.27.21.24.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 27 Sep 2022 21:24:12 -0700 (PDT)
+Date: Tue, 27 Sep 2022 21:24:08 -0700
+From: Ricardo Koller <ricarkol@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v8 10/14] KVM: selftests: aarch64: Add
+ aarch64/page_fault_test
+Message-ID: <YzPMaEPBtaXguJaT@google.com>
+References: <20220922031857.2588688-1-ricarkol@google.com>
+ <20220922031857.2588688-11-ricarkol@google.com>
+ <Yyy4WjEmuSH1tSZb@google.com> <YzHfwmZqMQ9xXaNa@google.com>
+ <YzNz36gZqrse9GzT@google.com>
 MIME-Version: 1.0
-In-Reply-To: <YzM/DFV1TgtyRfCA@x1n>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
- will@kernel.org, shan.gavin@gmail.com, bgardon@google.com, dmatlack@google.com,
- pbonzini@redhat.com, zhenyzha@redhat.com, shuah@kernel.org,
- kvmarm@lists.cs.columbia.edu
+Content-Disposition: inline
+In-Reply-To: <YzNz36gZqrse9GzT@google.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
+ andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com,
+ axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -83,113 +90,80 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Peter and Marc,
-
-On 9/28/22 4:21 AM, Peter Xu wrote:
-> On Tue, Sep 27, 2022 at 01:32:07PM -0400, Marc Zyngier wrote:
->> On Tue, 27 Sep 2022 12:02:52 -0400,
->> Peter Xu <peterx@redhat.com> wrote:
-
-[...]
-
->>>
->>> Any decision made on how to tackle with the GIC status dirty bits?
->>
->> Which dirty bits? Are you talking of the per-RD pending bits?
+On Tue, Sep 27, 2022 at 10:06:23PM +0000, Sean Christopherson wrote:
+> On Mon, Sep 26, 2022, Ricardo Koller wrote:
+> > On Thu, Sep 22, 2022 at 07:32:42PM +0000, Sean Christopherson wrote:
+> > > On Thu, Sep 22, 2022, Ricardo Koller wrote:
+> > > > +	void *hva = (void *)region->region.userspace_addr;
+> > > > +	uint64_t paging_size = region->region.memory_size;
+> > > > +	int ret, fd = region->fd;
+> > > > +
+> > > > +	if (fd != -1) {
+> > > > +		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+> > > > +				0, paging_size);
+> > > > +		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
+> > > > +	} else {
+> > > > +		if (is_backing_src_hugetlb(region->backing_src_type))
+> > > > +			return false;
+> > > 
+> > > Why is hugetlb disallowed?  I thought anon hugetlb supports MADV_DONTNEED?
+> > > 
+> > 
+> > It fails with EINVAL (only tried on arm) for both the PAGE_SIZE and the huge
+> > page size. And note that the address is aligned as well.
+> > 
+> > madvise(0xffffb7c00000, 2097152, MADV_DONTNEED) = -1 EINVAL (Invalid argument)
+> > 	^^^^^^^^^^^^^^	^^^^^^^
+> > 	2M aligned	2M (hugepage size)
+> > 			
+> > madvise(0xffff9e800000, 4096, MADV_DONTNEED) = -1 EINVAL (Invalid argument)   
+> > 			^^^^
+> > 			PAGE_SIZE
 > 
-> Gavin found that some dirty pfn path may not have vcpu context for aarch64
-> offlist.
-> 
-> Borrowing Gavin's trace dump:
-> 
->    el0t_64_sync
->    el0t_64_sync_handler
->    el0_svc
->    do_el0_svc
->    __arm64_sys_ioctl
->    kvm_device_ioctl
->    vgic_its_set_attr
->    vgic_its_save_tables_v0
->    kvm_write_guest
->    __kvm_write_guest_page
->    mark_page_dirty_in_slot
-> 
-> With current code it'll trigger the warning in mark_page_dirty_in_slot.
-> 
-> An userspace approach is doable by setting these pages as always dirty in
-> userspace (QEMU), but even if so IIUC we'll need to drop the warning
-> message in mark_page_dirty_in_slot() then we take no-vcpu dirty as no-op
-> and expected.
-> 
-> I'll leave the details to Gavin.
-> 
+> I think this needs to be root caused before merging.  Unless I'm getting turned
+> around, MADV_DONTEED should work, i.e. there is a test bug lurking somewhere.
 
-Thanks to Peter for bringing the issue to here for further discussion. I'm
-slowly approaching the idea/design to resolve the issue. If Marc agrees, It
-wouldn't stop us to merge the series since the newly introduced capability
-is only used by kvm/selftests/dirty_log_test. It means more changes are needed
-by QEMU in order to enable the feature there through KVM_CAP_DIRTY_LOG_RING_ACQ_REL.
-I can post follow-up patches to fix the VGIC/ITS issue.
+Turns out that the failure is documented. Found this in the madvise manpage:
 
-We had some internal discussion about the mentioned issue. It's all about the
-various VGIC/ITS tables, listed as below. In QEMU, those tables are requested
-to be saved to memory for migration or shutdown. Unfortunately, there is no
-running vcpu in this particular path and the corresponding dirty bits are
-dropped with warning messages in mark_page_dirty_in_slot().
+  MADV_DONTNEED cannot be applied to locked pages, Huge TLB pages, or VM_PFNMAP pages.
 
-    ---> Command to save VGIC/ITS tables
-         group: KVM_DEV_ARM_VGIC_GRP_CTRL
-         attr : KVM_DEV_ARM_ITS_SAVE_TABLES
+Was also playing with the following non-selftest program (before checking the
+manpage, and I now remember that I actually read the above sentence before).
 
-    ---> VGIC/ITS tables to be saved
-         Device Table                     // REG_GITS_BASER_0
-         Interrupt Translation Tables     // GITS_CMD_MAPD
-         Collection Table                 // REG_GITS_BASER_1
+This fails on both x86 and arm:
 
-    ---> QEMU's backtraces, triggering the issue
+	#include <stdio.h>
+	#include <stddef.h>
+	#include <sys/mman.h>
+	#include <linux/mman.h>
+	#include <assert.h>
 
-         main                                thread_start
-         qemu_main                           start_thread
-         qemu_cleanup                        qemu_thread_start
-         vm_shutdown                         migration_thread
-         do_vm_stop                          migration_iteration_run
-         vm_state_notify                     migration_completion
-         vm_change_state_handler             vm_stop_force_state
-                                             do_vm_stop
-                                             vm_state_notify
-                                             vm_change_state_handler          // In hw/intc/arm_gicv3_its_kvm.c
+	#define SZ_2M (1 << 21)
 
-I have rough idea as below. It's appreciated if you can comment before I'm
-going a head for the prototype. The overall idea is to introduce another
-dirty ring for KVM (kvm-dirty-ring). It's updated and visited separately
-to dirty ring for vcpu (vcpu-dirty-ring).
+	int main()
+	{
+		void *p = mmap(NULL, SZ_2M, PROT_READ | PROT_WRITE,
+			       MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB | MAP_HUGE_2MB,
+			       -1, 0);
+		assert(p != MAP_FAILED);
+		assert(madvise(p, 4096, MADV_DONTNEED) == 0); // this fails
+		assert(madvise(p, SZ_2M, MADV_DONTNEED) == 0); // this fails
+	}
 
-    - When the various VGIC/ITS table base addresses are specified, kvm-dirty-ring
-      entries are added to mark those pages as 'always-dirty'. In mark_page_dirty_in_slot(),
-      those 'always-dirty' pages will be skipped, no entries pushed to vcpu-dirty-ring.
+And for completeness, this passes on both:
 
-    - Similar to vcpu-dirty-ring, kvm-dirty-ring is accessed from userspace through
-      mmap(kvm->fd). However, there won't have similar reset interface. It means
-      'struct kvm_dirty_gfn::flags' won't track any information as we do for
-      vcpu-dirty-ring. In this regard, kvm-dirty-ring is purely shared buffer to
-      advertise 'always-dirty' pages from host to userspace.
-      
-    - For QEMU, shutdown/suspend/resume cases won't be concerning us any more. The
-      only concerned case is migration. When the migration is about to complete,
-      kvm-dirty-ring entries are fetched and the dirty bits are updated to global
-      dirty page bitmap and RAMBlock's dirty page bitmap. For this, I'm still reading
-      the code to find the best spot to do it.
-
-Thanks,
-Gavin
-
-
-
+	int main()
+	{
+		void *p = mmap(NULL, SZ_2M, PROT_READ | PROT_WRITE,
+			       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+		assert(p != MAP_FAILED);
+		assert(madvise(p, SZ_2M, MADV_DONTNEED) == 0);
+	}
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
