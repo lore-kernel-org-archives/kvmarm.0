@@ -2,78 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86EE0C32771
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Sep 2022 15:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20682C54EE9
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Sep 2022 16:59:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCD574B630;
-	Wed, 28 Sep 2022 11:53:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B3084B63F;
+	Wed, 28 Sep 2022 12:59:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id osQj6tc-epAe; Wed, 28 Sep 2022 11:53:56 -0400 (EDT)
+	with ESMTP id StQR5USMh2pe; Wed, 28 Sep 2022 12:59:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6E0D4B638;
-	Wed, 28 Sep 2022 11:53:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 649714B645;
+	Wed, 28 Sep 2022 12:59:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 110F94B62F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Sep 2022 11:53:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DEE14B62E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Sep 2022 12:59:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6OveWR7NJDyb for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Sep 2022 11:53:54 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF6074B629
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Sep 2022 11:53:53 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 15D5961F0C;
- Wed, 28 Sep 2022 15:53:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FBAFC433C1;
- Wed, 28 Sep 2022 15:53:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1664380432;
- bh=nBPunl5TlQZD8jgaoQw53yxRscbk/pyS0FZr8ut3NwU=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=BkP2ThbW79wrrZlsNPqDWK6C5y0ON+cYFY7t1veHGr+vAuwHnB2g5G2fM0ur9yVma
- TNyzihtbiLsBAdUAPDNvmf5Qe7IVktW+eqecxOIkhGnjrlMu1632Hu5qB4UQBP/xVk
- h91daEoeyxbLJKDBU6BcYTqPUtYRnJSJ9yKawAFi6F7d31AkRyInHo2nWtaonYhfHo
- Cq2i9WqXVDeuZwG19toxnPU7xbZxFE3voxOcDOOSMeMBbGmjEMLNcOqpYndfT6TXrQ
- 9O9q85rkhlv/W9ry9/maKNZDzGtcIGylq2cCYTwErBs766kPdBUJxAAv1b45K6pJtI
- CH6BY1C7LqMeQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1odZNe-00DK8u-4K;
- Wed, 28 Sep 2022 16:53:50 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>, Shuah Khan <shuah@kernel.org>
-Subject: Re: [RESEND PATCH] KVM: selftests: Update top-of-file comment in
- psci_test
-Date: Wed, 28 Sep 2022 16:53:46 +0100
-Message-Id: <166438042059.3795682.3522181061739798083.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220819162100.213854-1-oliver.upton@linux.dev>
-References: <20220819162100.213854-1-oliver.upton@linux.dev>
+ with ESMTP id WgDKOzThM+5S for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Sep 2022 12:59:00 -0400 (EDT)
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com
+ [209.85.214.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 454D54B63F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Sep 2022 12:59:00 -0400 (EDT)
+Received: by mail-pl1-f174.google.com with SMTP id w20so12227549ply.12
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Sep 2022 09:59:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date;
+ bh=JPHVsQZph796quobJWecE9d8WYuQzTyeUzZ9fJLJCt0=;
+ b=YoST0dNL+tr2MxBQPBb3gEUaaq2rchEwRpYCm/C4/zvdm9UbKh4weE6f9Rse5smcva
+ 0ahnHpBHQGqD6xuD07bwTCdT6qGIDSf9F6/AboMMdLNCblGFmx69YPL/461ja3bispRg
+ k153DDi1J/ci/zwEhY4ofIjbRC0HhlW960PgWUe/WeFDrYHoLQ39lc8uF/VM7e5pQVuz
+ 2eTDb0AMqf01PjFToZsmQF4Fj0BS16kv5rz2+m7xcKElBgh8RAV574fvfcPkJMbQVVgU
+ 43/eaF6HCiqUcc3OI8Dv6vd+rxicq1Qoydc+AH/IWaov28Ka3KoT6aBdmKLOjV3965OP
+ xnjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+ bh=JPHVsQZph796quobJWecE9d8WYuQzTyeUzZ9fJLJCt0=;
+ b=Xdr96rbwJAsL/Z5Nw1eaW/tLopSsNDSvCwqFOyDydFmgsOK5tx+m0S+cF0MuMkXMxH
+ 6JybScRJSRzqvEkDptXNwsUMBfwBRAwHfdhobzdUH0vwtjjsRMj7lOOsDn+kk+hVpgRt
+ x1fgUos3JFRuDj6HZFjLDwXdlgACgr2lpGfvhgdFEGFrMkkMDrCj54iyeG/Ov9CzLCLD
+ Z+/dVTHjLW3VeY9FDDknryXJuXfjF5gIsIZdWcWI6aROb0j8EswZrAvt1kEKGVvT6C4O
+ L/ClKkQ9NC4PFr4ztGlwDjaaZ7aCIQsVsGXTJAoVg8hBiBJSRuqoUl/wLsl2lYaXYKMn
+ W1zQ==
+X-Gm-Message-State: ACrzQf2O1KophBNVhZGyb1bkjnLUrDRPZyA5UyeeTjGcLa+RGNXHhJ0Y
+ d+BU+gzWSlWGad2oCNhQRuH7UQ==
+X-Google-Smtp-Source: AMsMyM6PrX/MsmRBqg1sXs0jHHhg5Yrxul40DjOGHB7X7ofNSd1KnKk+KnOzfR/QXB8u3pbAG0zRAQ==
+X-Received: by 2002:a17:90a:4e8a:b0:203:9556:1b7d with SMTP id
+ o10-20020a17090a4e8a00b0020395561b7dmr11605672pjh.0.1664384338687; 
+ Wed, 28 Sep 2022 09:58:58 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ e8-20020a056a0000c800b005361f6a0573sm4218372pfj.44.2022.09.28.09.58.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 28 Sep 2022 09:58:58 -0700 (PDT)
+Date: Wed, 28 Sep 2022 16:58:53 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v8 10/14] KVM: selftests: aarch64: Add
+ aarch64/page_fault_test
+Message-ID: <YzR9TRjVFi+P7UOp@google.com>
+References: <20220922031857.2588688-1-ricarkol@google.com>
+ <20220922031857.2588688-11-ricarkol@google.com>
+ <Yyy4WjEmuSH1tSZb@google.com> <YzHfwmZqMQ9xXaNa@google.com>
+ <YzNz36gZqrse9GzT@google.com> <YzPMaEPBtaXguJaT@google.com>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, james.morse@arm.com,
- suzuki.poulose@arm.com, pbonzini@redhat.com, alexandru.elisei@arm.com,
- shuah@kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+Content-Disposition: inline
+In-Reply-To: <YzPMaEPBtaXguJaT@google.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
+ andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com,
+ axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,27 +94,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 19 Aug 2022 16:21:00 +0000, Oliver Upton wrote:
-> Fix the comment to accurately describe the test and recently added
-> SYSTEM_SUSPEND test case.
+On Tue, Sep 27, 2022, Ricardo Koller wrote:
+> On Tue, Sep 27, 2022 at 10:06:23PM +0000, Sean Christopherson wrote:
+> > On Mon, Sep 26, 2022, Ricardo Koller wrote:
+> > > On Thu, Sep 22, 2022 at 07:32:42PM +0000, Sean Christopherson wrote:
+> > > > On Thu, Sep 22, 2022, Ricardo Koller wrote:
+> > > > > +	void *hva = (void *)region->region.userspace_addr;
+> > > > > +	uint64_t paging_size = region->region.memory_size;
+> > > > > +	int ret, fd = region->fd;
+> > > > > +
+> > > > > +	if (fd != -1) {
+> > > > > +		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+> > > > > +				0, paging_size);
+> > > > > +		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
+> > > > > +	} else {
+> > > > > +		if (is_backing_src_hugetlb(region->backing_src_type))
+> > > > > +			return false;
+> > > > 
+> > > > Why is hugetlb disallowed?  I thought anon hugetlb supports MADV_DONTNEED?
+> > > > 
+> > > 
+> > > It fails with EINVAL (only tried on arm) for both the PAGE_SIZE and the huge
+> > > page size. And note that the address is aligned as well.
+> > > 
+> > > madvise(0xffffb7c00000, 2097152, MADV_DONTNEED) = -1 EINVAL (Invalid argument)
+> > > 	^^^^^^^^^^^^^^	^^^^^^^
+> > > 	2M aligned	2M (hugepage size)
+> > > 			
+> > > madvise(0xffff9e800000, 4096, MADV_DONTNEED) = -1 EINVAL (Invalid argument)   
+> > > 			^^^^
+> > > 			PAGE_SIZE
+> > 
+> > I think this needs to be root caused before merging.  Unless I'm getting turned
+> > around, MADV_DONTEED should work, i.e. there is a test bug lurking somewhere.
 > 
-> What was once psci_cpu_on_test was renamed and extended to squeeze in a
-> test case for PSCI SYSTEM_SUSPEND. Nonetheless, the author of those
-> changes (whoever they may be...) failed to update the file comment to
-> reflect what had changed.
+> Turns out that the failure is documented. Found this in the madvise manpage:
+> 
+>   MADV_DONTNEED cannot be applied to locked pages, Huge TLB pages, or VM_PFNMAP pages.
 
-Applied to next, thanks!
+The manpages are stale:
 
-[1/1] KVM: selftests: Update top-of-file comment in psci_test
-      commit: 448e711693e48d03f7933ab3673334701b0c3f41
+   c4b6cb884011 ("selftests/vm: add hugetlb madvise MADV_DONTNEED MADV_REMOVE test")
+   90e7e7f5ef3f ("mm: enable MADV_DONTNEED for hugetlb mappings")
 
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+The tools/testing/selftests/vm/hugetlb-madvise.c selftest effectively tests what
+is being done here, so _something_ is broken.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
