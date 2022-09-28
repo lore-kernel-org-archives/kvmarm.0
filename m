@@ -2,82 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 482BAC04A95
-	for <kvmarm@archiver.kernel.org>; Wed, 28 Sep 2022 10:40:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02CF4C32771
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Sep 2022 11:06:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CDD84B62E;
-	Wed, 28 Sep 2022 06:40:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CC5F4B5F4;
+	Wed, 28 Sep 2022 07:06:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SKQ2jEsZQV8T; Wed, 28 Sep 2022 06:40:11 -0400 (EDT)
+	with ESMTP id TIPAEtF9LBgP; Wed, 28 Sep 2022 07:05:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 626634B5DB;
-	Wed, 28 Sep 2022 06:40:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1963C4B5FE;
+	Wed, 28 Sep 2022 07:05:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9184E40FB2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Sep 2022 06:40:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ABA954B5DB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Sep 2022 07:05:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Z15XX4o3An8Y for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Sep 2022 06:40:09 -0400 (EDT)
+ with ESMTP id YJfSMr84flsT for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Sep 2022 07:05:56 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5270E40DE6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Sep 2022 06:40:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A56C411D3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Sep 2022 07:05:56 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 98A66B82023;
- Wed, 28 Sep 2022 10:40:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57F45C433C1;
- Wed, 28 Sep 2022 10:40:06 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id A8BB3B82032;
+ Wed, 28 Sep 2022 11:05:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CE21C433C1;
+ Wed, 28 Sep 2022 11:05:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1664361606;
- bh=3OlAOaBEucQdk6L8MDDnhqGqP1Abnek8vfO+0TZSSqM=;
+ s=k20201202; t=1664363153;
+ bh=pIU8qt0C40AybVJ4/l4q1RuU2q+j8+ZhzCYxB17+NoI=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=o/aX5kL6a1a7qgG9wFBeAX7p0tkKi3ubcDkLHi+moH4yxN9TfMTEuD/9eDq08aqs7
- url400grUoEe4eyQOHVIy+FiB7dAmab8EwRShiQ+M8nYDqXokCTnBZX2sKWjLsR2h7
- r/b8wyMc0PvCr2gu/zQtGc+SbN6Uh7rPhOmvBIVMV2vObrtxbCo/8jiEul9GOcMbRc
- Fts+ysARw97B8+jichqAu/n1FLjLe8dWiVZnK/QJT9ddcCaLiUcLo77hK2Y8cojU2v
- ntKcOUbiU87sFovAD5VuMq7/plLoY0jyaYcAm18feTDwQWhmvS0QD2l51SyMJrG/mM
- Eg189wdkfu3qg==
+ b=aJQOP2MPYOsRcmrdpv18CgcCOgoZoCovHWakOuJ4yCA9S5yb/DH6xhWPX314g1u5D
+ anxmcEFVqvqnSvSKDS5GgxVH2goj7hY/ngTCsMVIbZhaqYh1gXCSlc0R2ccN53y7sR
+ bz8uJU4u4uGPUDhx0pvY9m1/SRkIypqxAqiGa9zWK1I5KCILZDU2pQqHchHaaajM7L
+ nXt3BcVnaPVPGfgXknlajSjqdnFLVFXUKj6XVyMpkZzPWb90b70x33rvwEL69L/EwM
+ jU/DYu1Ufcl8DQv1b8uSMyIP0dMblNzqe266I1pY/gyB9a5tFI3tS1d7P6nmOFkKxI
+ MJtL1Ys0sDd1Q==
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=goblin-girl.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1odUU0-00DFSl-5o;
- Wed, 28 Sep 2022 11:40:04 +0100
-Date: Wed, 28 Sep 2022 06:40:03 -0400
-Message-ID: <86pmff7pfg.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1odUsx-00DFzW-4r;
+ Wed, 28 Sep 2022 12:05:51 +0100
+Date: Wed, 28 Sep 2022 07:05:50 -0400
+Message-ID: <86o7uz7o8h.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Mingwei Zhang <mizhang@google.com>
-Subject: Re: [PATCH] KVM: arm64: Cleanup the __get_fault_info() to take out
- the code that validates HPFAR
-In-Reply-To: <CAL715W+gJKH+3xgFzUjPs6SAMwZCzkF5NNOTDpa4ov2qZ3r_iA@mail.gmail.com>
-References: <20220927002715.2142353-1-mizhang@google.com>
- <YzKGqLzjv0I/gkMi@google.com> <86zgel6rz8.wl-maz@kernel.org>
- <CAL715W+gJKH+3xgFzUjPs6SAMwZCzkF5NNOTDpa4ov2qZ3r_iA@mail.gmail.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH v2] KVM: arm64: Limit stage2_apply_range() batch size to
+ 1GB
+In-Reply-To: <YzNSToqnQidglUg9@google.com>
+References: <20220926222146.661633-1-oliver.upton@linux.dev>
+ <86v8p96og1.wl-maz@kernel.org> <YzNSToqnQidglUg9@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mizhang@google.com, oliver.upton@linux.dev,
- catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, catalin.marinas@arm.com,
+ will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, ricarkol@google.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, qperret@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- LKML <linux-kernel@vger.kernel.org>, Will Deacon <will@kernel.org>,
- "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,48 +91,124 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Mingwei,
-
-On Tue, 27 Sep 2022 13:48:52 -0400,
-Mingwei Zhang <mizhang@google.com> wrote:
+On Tue, 27 Sep 2022 15:43:10 -0400,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> >
-> > Honestly, I'd refrain from such changes *unless* they enable something
-> > else. The current code is well understood by people hacking on it, and
-> > although I don't mind revamping it, it has to be for a good reason.
-> >
-> > I'd be much more receptive to such a change if it was a prefix to
-> > something that actually made a significant change.
-> >
-> > Thanks,
-> >
-> >         M.
-> >
 > Hi Marc,
 > 
-> Thanks for the feedback.  I am not sure about the style of the KVM ARM
-> side. But in general I think mixing the generic code for ARM and
-> specific CPU errata handling is misleading. For instance, in this
-> case:
+> On Tue, Sep 27, 2022 at 07:34:22AM -0400, Marc Zyngier wrote:
 > 
-> +     if ((esr & ESR_ELx_FSC_TYPE) == FSC_PERM)
-> +             return false;
-> +
-> +     if (cpus_have_final_cap(ARM64_WORKAROUND_834220))
-> +             return false;
+> [...]
 > 
-> As shown it would be much cleaner to separate the two cases as the
-> former case is suggested in ARMv8 Spec D13.2.55. The latter case would
-> definitely come from a different source.
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index c9a13e487187..5d05bb92e129 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -31,6 +31,12 @@ static phys_addr_t hyp_idmap_vector;
+> > >  
+> > >  static unsigned long io_map_base;
+> > >  
+> > > +static inline phys_addr_t stage2_apply_range_next(phys_addr_t addr, phys_addr_t end)
+> > 
+> > Please drop the inline. I'm sure the compiler will perform its
+> > magic.
+> > 
+> > Can I also bikeshed a bit about the name? This doesn't "apply"
+> > anything, nor does it return the next range. It really computes the
+> > end of the current one.
+> > 
+> > Something like stage2_range_addr_end() would at least be consistent
+> > with the rest of the arm64 code (grep for _addr_end ...).
+> 
+> Bikeshed all you want :) But yeah, I like your suggestion.
+> 
+> > > +{
+> > > +	phys_addr_t boundary = round_down(addr + SZ_1G, SZ_1G);
+> > 
+> > nit: the rest of the code is using ALIGN_DOWN(). Any reason why this
+> > can't be used here?
+> 
+> Nope!
+> 
+> > > +
+> > > +	return (boundary - 1 < end - 1) ? boundary : end;
+> > > +}
+> > >  
+> > >  /*
+> > >   * Release kvm_mmu_lock periodically if the memory region is large. Otherwise,
+> > > @@ -52,7 +58,7 @@ static int stage2_apply_range(struct kvm *kvm, phys_addr_t addr,
+> > >  		if (!pgt)
+> > >  			return -EINVAL;
+> > >  
+> > > -		next = stage2_pgd_addr_end(kvm, addr, end);
+> > > +		next = stage2_apply_range_next(addr, end);
+> > >  		ret = fn(pgt, addr, next - addr);
+> > >  		if (ret)
+> > >  			break;
+> > > 
+> > 
+> > The main problem I see with this is that some entries now get visited
+> > multiple times if they cover more than a single 1GB entry (like a
+> > 512GB level-0 entry with 4k pages and 48bit IPA) . As long as this
+> > isn't destructive (CMOs, for example), this is probably OK. For
+> > operations that are not idempotent (such as stage2_unmap_walker), this
+> > is a significant change in behaviour.
+> > 
+> > My concern is that we have on one side a walker that is strictly
+> > driven by the page-table sizes, and we now get an arbitrary value that
+> > doesn't necessarily a multiple of block sizes. Yes, this works right
+> > now because you can't create a block mapping larger than 1GB with any
+> > of the supported page size.
+> > 
+> > But with 52bit VA/PA support, this changes: we can have 512GB (4k),
+> > 64GB (16k) and 4TB (64k) block mappings at S2. We don't support this
+> > yet at S2, but when this hits, we'll be in potential trouble.
+> 
+> Ah, I didn't fully capture the reasoning about the batch size. I had
+> thought about batching by operating on at most 1 block of the largest
+> supported granularity, but that felt like an inefficient walk restarting
+> from root every 32M (for 16K paging).
+> 
+> OTOH, if/when we add support for larger blocks in S2 we will run into
+> the same exact problem if we batch on the largest block size. If
+> dirty logging caused the large blocks to be shattered down to leaf
+> granularity then we will visit a crazy amount of PTEs before releasing
+> the lock.
+> 
+> I guess what I'm getting at is we need to detect lock contention and the
+> need to reschedule in the middle of the walk instead of at some
+> predetermined boundary, though that ventures into the territory of 'TDP
+> MMU' features...
+> 
+> So, seems to me we can crack this a few ways:
+> 
+>   1.Batch at the arbitrary 1GB since it works currently and produces a
+>     more efficient walk for all page sizes. I can rework some of the
+>     logic in kvm_level_supports_block_mapping() such that we can
+>     BUILD_BUG_ON() if the largest block size exceeds 1GB. Kicks the can
+>     down the road on a better implementation.
+> 
+>   2.Batch by the largest supported block mapping size. This will result
+>     in less efficient walks for !4K page sizes and likely produce soft
+>     lockups when we support even larger blocks. Nonetheless, the
+>     implementation will remain correct regardless of block size.
+> 
+>   3.Test for lock contention and need_resched() in the middle of the
+>     walk, rewalking from wherever we left off when scheduled again. TDP
+>     MMU already does this, so it could be a wasted effort adding support
+>     for it to the ARM MMU if we are to switch over at some point.
+> 
+> WDYT?
 
-I think we're talking at cross purposes. I don't object to the change
-per se. I simply question its value *in isolation*. One of the many
-things that makes the kernel hard to maintain is churn. Refactoring
-just for the sake of it *is* churn. In this case, cosmetic churn.
+[+ Quentin, who is looking at this as well]
 
-But if you make this is part of something touching this area and
-improving things from a functional perspective, then I'll happily
-merge it.
+At this stage, I'm more keen on option (2). It solves your immediate
+issue, and while it doesn't improve the humongous block mapping case,
+it doesn't change the behaviour of the existing walkers (you are
+guaranteed to visit a leaf only once per traversal).
+
+Option (3) is more of a long term goal, and I'd rather we improve
+things in now.
 
 Thanks,
 
