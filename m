@@ -2,76 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB2FC433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Sep 2022 09:58:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B401C433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Sep 2022 09:59:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BFFE41049;
-	Thu, 29 Sep 2022 05:58:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B458E4B62F;
+	Thu, 29 Sep 2022 05:59:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6fLHKFkZW7BE; Thu, 29 Sep 2022 05:58:49 -0400 (EDT)
+	with ESMTP id Jl7WNPjjohVQ; Thu, 29 Sep 2022 05:59:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E8F04B10B;
-	Thu, 29 Sep 2022 05:58:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90BFA49EEE;
+	Thu, 29 Sep 2022 05:59:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 79F5641174
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Sep 2022 05:58:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 61D6141174
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Sep 2022 05:59:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ls+BSJl0HHRF for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Sep 2022 05:58:47 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 68CE341049
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Sep 2022 05:58:47 -0400 (EDT)
+ with ESMTP id FuEo6vRgnhTc for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Sep 2022 05:59:03 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5EB7D41049
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Sep 2022 05:59:03 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id ED2EDB82209;
- Thu, 29 Sep 2022 09:58:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFF62C433D6;
- Thu, 29 Sep 2022 09:58:44 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 45FE860B3E;
+ Thu, 29 Sep 2022 09:59:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E110C433D6;
+ Thu, 29 Sep 2022 09:59:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1664445524;
- bh=eSMwBKa9imsr6TaLmSDnLEatSh53XGbj9jMl67t/9vc=;
+ s=k20201202; t=1664445541;
+ bh=BXkonWJgpsbuy/26LAupm79T+HxrsMlPk/4p4uUXRTo=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=IY4IgaY4MKlkwWYDiOCrp8cVtrr18gRGx7Yky3IbBs+4xmxgOrZk/IsBVd8XNxld9
- Q3AcpGyfvasdn8ZiCdOTbrxjOLMlP7vidyO3z+iQkrnOiqAocBlGTMFXfZUMnnGr8t
- u/TatetA3VYzb3CtEAIQ5ky9fiESUO57t0P8zmgtk3w8pQqvCOwPcWi6E0uEe0tp9G
- 9fb9jPSTR4OU26+mHjvHckds8bfakaH1+4CaVR0IaVbRWrQn0j9OY9N3ZyornVOoPs
- XHo5mzLfY0Jwyzm580m19MTyuU5O+e50RQztuApkiCz2pJ6L7ZhQvGwhqzxCGgOsod
- vSlqx3r5soA2Q==
+ b=aDBlj/G1IOsJkXqyjv5qcv8M0tQMVA1T5LA3b982kglWFJKx32bLwWZor7TM5g2jj
+ LCxrU+pWJhOnzu+D9qYb5CiMvudNJCq0RgHEH+LG18h5Krbpb5CIdOiYzPE0rjURu8
+ T5SVhOUprLS1B9vXJKLGL4tKK7ywC08WCAMQ2bqwXwk3eLozc8L7J0lMBNz3KptdTg
+ PxA1UhIlxz4m9ON8UCWuwHfl7z3ePkDcXcXBdUqbvkxvdIpQ35bviMj8R284OUgj32
+ M8vVSHnIa63L8EF6HbWqqsBRWBAkKp3SWqLzkfnK8K4FNGZnIsurU/KyTdLdM0eXPT
+ B1ncciPJQ2D5g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1odqJW-00DVUy-Ag;
- Thu, 29 Sep 2022 10:58:42 +0100
+ (envelope-from <maz@kernel.org>) id 1odqJn-00DVVu-IG;
+ Thu, 29 Sep 2022 10:58:59 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH v2 0/6] KVM: Fix dirty-ring ordering on weakly ordered
- architectures
-Date: Thu, 29 Sep 2022 10:58:39 +0100
-Message-Id: <166444538478.3798115.5401520250620155536.b4-ty@kernel.org>
+To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Subject: Re: [PATCH] KVM: arm64: Fix comment typo in nvhe/switch.c
+Date: Thu, 29 Sep 2022 10:58:57 +0100
+Message-Id: <166444538478.3798115.11069322305925080874.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220926145120.27974-1-maz@kernel.org>
-References: <20220926145120.27974-1-maz@kernel.org>
+In-Reply-To: <20220929042839.24277-1-r09922117@csie.ntu.edu.tw>
+References: <20220929042839.24277-1-r09922117@csie.ntu.edu.tw>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: maz@kernel.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, will@kernel.org,
- dmatlack@google.com, zhenyzha@redhat.com, shuah@kernel.org,
- pbonzini@redhat.com, shan.gavin@gmail.com, bgardon@google.com,
- andrew.jones@linux.dev
+X-SA-Exim-Rcpt-To: r09922117@csie.ntu.edu.tw, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, oliver.upton@linux.dev, linux-kernel@vger.kernel.org,
+ alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: will@kernel.org, catalin.marinas@arm.com, zhenyzha@redhat.com,
- shan.gavin@gmail.com, bgardon@google.com, dmatlack@google.com,
- pbonzini@redhat.com, andrew.jones@linux.dev, shuah@kernel.org
+Cc: catalin.marinas@arm.com, linux-kernel@vger.kernel.org, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,32 +84,15 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 26 Sep 2022 15:51:14 +0100, Marc Zyngier wrote:
-> [Same distribution list as Gavin's dirty-ring on arm64 series]
-> 
-> This is an update on the initial series posted as [0].
-> 
-> As Gavin started posting patches enabling the dirty-ring infrastructure
-> on arm64 [1], it quickly became apparent that the API was never intended
-> to work on relaxed memory ordering architectures (owing to its x86
-> origins).
-> 
-> [...]
+On Thu, 29 Sep 2022 12:28:39 +0800, Wei-Lin Chang wrote:
+> Fix the comment of __hyp_vgic_restore_state() from saying VEH to VHE,
+> also change the underscore to a dash to match the comment
+> above __hyp_vgic_save_state().
 
 Applied to next, thanks!
 
-[1/6] KVM: Use acquire/release semantics when accessing dirty ring GFN state
-      commit: 8929bc9659640f35dd2ef8373263cbd885b4a072
-[2/6] KVM: Add KVM_CAP_DIRTY_LOG_RING_ACQ_REL capability and config option
-      commit: 17601bfed909fa080fcfd227b57da2bd4dc2d2a6
-[3/6] KVM: x86: Select CONFIG_HAVE_KVM_DIRTY_RING_ACQ_REL
-      commit: fc0693d4e5afe3c110503c3afa9f60600f9e964b
-[4/6] KVM: Document weakly ordered architecture requirements for dirty ring
-      commit: 671c8c7f9f2349d8b2176ad810f1406794011f63
-[5/6] KVM: selftests: dirty-log: Upgrade flag accesses to acquire/release semantics
-      commit: 4eb6486cb43c93382c27a2659ba978c660e98498
-[6/6] KVM: selftests: dirty-log: Use KVM_CAP_DIRTY_LOG_RING_ACQ_REL if available
-      commit: 4b3402f1f4d9860301d6d5cd7aff3b67f678d577
+[1/1] KVM: arm64: Fix comment typo in nvhe/switch.c
+      commit: 43b233b1582de501e441deb7c4ed1f944e60b1f9
 
 Cheers,
 
