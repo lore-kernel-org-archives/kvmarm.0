@@ -2,81 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A022BC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Sep 2022 09:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB2FC433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Sep 2022 09:58:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 171FB40FAC;
-	Thu, 29 Sep 2022 05:50:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BFFE41049;
+	Thu, 29 Sep 2022 05:58:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id x884VqJCSg0D; Thu, 29 Sep 2022 05:50:33 -0400 (EDT)
+	with ESMTP id 6fLHKFkZW7BE; Thu, 29 Sep 2022 05:58:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CBB543C96;
-	Thu, 29 Sep 2022 05:50:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E8F04B10B;
+	Thu, 29 Sep 2022 05:58:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3ECD040FB2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Sep 2022 05:50:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79F5641174
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Sep 2022 05:58:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LlyTwJ1srebm for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Sep 2022 05:50:29 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C55AA40FAC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Sep 2022 05:50:29 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1664445029;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+dNLXcSvFDZXpBKIjAw/C/YuRDnqa0+D0ZtCUfC0HwY=;
- b=DKL2RVX1uD3qD07fUiQh94fWD8rZ/FxTVfo403KRiDtpXfb8sJtHrPNadH1DEGEzoIW3ON
- 66xJr+uPmjdbN9Y6SXAUV7I8naSmbsADV+kt1iRFayP3dyjWp/TJ7IipdazVpMwNXyLJlc
- PDVXBtJ2S28z0HWgA3k8dCjUqgorR8Y=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-651-FUfO9rtCOoKZIZaJKvl4Lw-1; Thu, 29 Sep 2022 05:50:23 -0400
-X-MC-Unique: FUfO9rtCOoKZIZaJKvl4Lw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
- [10.11.54.5])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id Ls+BSJl0HHRF for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Sep 2022 05:58:47 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 68CE341049
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Sep 2022 05:58:47 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 73F9A293248B;
- Thu, 29 Sep 2022 09:50:22 +0000 (UTC)
-Received: from [10.64.54.143] (vpn2-54-143.bne.redhat.com [10.64.54.143])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 011A039D7C;
- Thu, 29 Sep 2022 09:50:14 +0000 (UTC)
-Subject: Re: [PATCH v4 3/6] KVM: arm64: Enable ring-based dirty memory tracking
-To: Peter Xu <peterx@redhat.com>, Marc Zyngier <maz@kernel.org>
-References: <20220927005439.21130-1-gshan@redhat.com>
- <20220927005439.21130-4-gshan@redhat.com> <YzMerD8ZvhvnprEN@x1n>
- <86sfkc7mg8.wl-maz@kernel.org> <YzM/DFV1TgtyRfCA@x1n>
- <320005d1-fe88-fd6a-be91-ddb56f1aa80f@redhat.com>
- <87y1u3hpmp.wl-maz@kernel.org> <YzRfkBWepX2CD88h@x1n>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <d0beb9bd-5295-adb6-a473-c131d6102947@redhat.com>
-Date: Thu, 29 Sep 2022 19:50:12 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <YzRfkBWepX2CD88h@x1n>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
- will@kernel.org, shan.gavin@gmail.com, bgardon@google.com, dmatlack@google.com,
- pbonzini@redhat.com, zhenyzha@redhat.com, shuah@kernel.org,
+ by ams.source.kernel.org (Postfix) with ESMTPS id ED2EDB82209;
+ Thu, 29 Sep 2022 09:58:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFF62C433D6;
+ Thu, 29 Sep 2022 09:58:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1664445524;
+ bh=eSMwBKa9imsr6TaLmSDnLEatSh53XGbj9jMl67t/9vc=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=IY4IgaY4MKlkwWYDiOCrp8cVtrr18gRGx7Yky3IbBs+4xmxgOrZk/IsBVd8XNxld9
+ Q3AcpGyfvasdn8ZiCdOTbrxjOLMlP7vidyO3z+iQkrnOiqAocBlGTMFXfZUMnnGr8t
+ u/TatetA3VYzb3CtEAIQ5ky9fiESUO57t0P8zmgtk3w8pQqvCOwPcWi6E0uEe0tp9G
+ 9fb9jPSTR4OU26+mHjvHckds8bfakaH1+4CaVR0IaVbRWrQn0j9OY9N3ZyornVOoPs
+ XHo5mzLfY0Jwyzm580m19MTyuU5O+e50RQztuApkiCz2pJ6L7ZhQvGwhqzxCGgOsod
+ vSlqx3r5soA2Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1odqJW-00DVUy-Ag;
+ Thu, 29 Sep 2022 10:58:42 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v2 0/6] KVM: Fix dirty-ring ordering on weakly ordered
+ architectures
+Date: Thu, 29 Sep 2022 10:58:39 +0100
+Message-Id: <166444538478.3798115.5401520250620155536.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220926145120.27974-1-maz@kernel.org>
+References: <20220926145120.27974-1-maz@kernel.org>
+MIME-Version: 1.0
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: maz@kernel.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, catalin.marinas@arm.com, will@kernel.org,
+ dmatlack@google.com, zhenyzha@redhat.com, shuah@kernel.org,
+ pbonzini@redhat.com, shan.gavin@gmail.com, bgardon@google.com,
+ andrew.jones@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: will@kernel.org, catalin.marinas@arm.com, zhenyzha@redhat.com,
+ shan.gavin@gmail.com, bgardon@google.com, dmatlack@google.com,
+ pbonzini@redhat.com, andrew.jones@linux.dev, shuah@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -85,137 +83,44 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc and Peter,
-
-On 9/29/22 12:52 AM, Peter Xu wrote:
-> On Wed, Sep 28, 2022 at 09:25:34AM +0100, Marc Zyngier wrote:
->> On Wed, 28 Sep 2022 00:47:43 +0100,
->> Gavin Shan <gshan@redhat.com> wrote:
->>
->>> I have rough idea as below. It's appreciated if you can comment before I'm
->>> going a head for the prototype. The overall idea is to introduce another
->>> dirty ring for KVM (kvm-dirty-ring). It's updated and visited separately
->>> to dirty ring for vcpu (vcpu-dirty-ring).
->>>
->>>     - When the various VGIC/ITS table base addresses are specified, kvm-dirty-ring
->>>       entries are added to mark those pages as 'always-dirty'. In mark_page_dirty_in_slot(),
->>>       those 'always-dirty' pages will be skipped, no entries pushed to vcpu-dirty-ring.
->>>
->>>     - Similar to vcpu-dirty-ring, kvm-dirty-ring is accessed from userspace through
->>>       mmap(kvm->fd). However, there won't have similar reset interface. It means
->>>       'struct kvm_dirty_gfn::flags' won't track any information as we do for
->>>       vcpu-dirty-ring. In this regard, kvm-dirty-ring is purely shared buffer to
->>>       advertise 'always-dirty' pages from host to userspace.
->>>          - For QEMU, shutdown/suspend/resume cases won't be concerning
->>> us any more. The
->>>       only concerned case is migration. When the migration is about to complete,
->>>       kvm-dirty-ring entries are fetched and the dirty bits are updated to global
->>>       dirty page bitmap and RAMBlock's dirty page bitmap. For this, I'm still reading
->>>       the code to find the best spot to do it.
->>
->> I think it makes a lot of sense to have a way to log writes that are
->> not generated by a vpcu, such as the GIC and maybe other things in the
->> future, such as DMA traffic (some SMMUs are able to track dirty pages
->> as well).
->>
->> However, I don't really see the point in inventing a new mechanism for
->> that. Why don't we simply allow non-vpcu dirty pages to be tracked in
->> the dirty *bitmap*?
->>
->>  From a kernel perspective, this is dead easy:
->>
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index 5b064dbadaf4..ae9138f29d51 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -3305,7 +3305,7 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->>   	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
->>   
->>   #ifdef CONFIG_HAVE_KVM_DIRTY_RING
->> -	if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
->> +	if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
->>   		return;
->>   #endif
->>   
->> @@ -3313,10 +3313,11 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->>   		unsigned long rel_gfn = gfn - memslot->base_gfn;
->>   		u32 slot = (memslot->as_id << 16) | memslot->id;
->>   
->> -		if (kvm->dirty_ring_size)
->> +		if (vpcu && kvm->dirty_ring_size)
->>   			kvm_dirty_ring_push(&vcpu->dirty_ring,
->>   					    slot, rel_gfn);
->> -		else
->> +		/* non-vpcu dirtying ends up in the global bitmap */
->> +		if (!vcpu && memslot->dirty_bitmap)
->>   			set_bit_le(rel_gfn, memslot->dirty_bitmap);
->>   	}
->>   }
->>
->> though I'm sure there is a few more things to it.
+On Mon, 26 Sep 2022 15:51:14 +0100, Marc Zyngier wrote:
+> [Same distribution list as Gavin's dirty-ring on arm64 series]
 > 
-> Yes, currently the bitmaps are not created when rings are enabled.
-> kvm_prepare_memory_region() has:
+> This is an update on the initial series posted as [0].
 > 
-> 		else if (!kvm->dirty_ring_size) {
-> 			r = kvm_alloc_dirty_bitmap(new);
+> As Gavin started posting patches enabling the dirty-ring infrastructure
+> on arm64 [1], it quickly became apparent that the API was never intended
+> to work on relaxed memory ordering architectures (owing to its x86
+> origins).
 > 
-> But I think maybe that's a solution worth considering.  Using the rings
-> have a major challenge on the limitation of ring size, so that for e.g. an
-> ioctl we need to make sure the pages to dirty within an ioctl procedure
-> will not be more than the ring can take.  Using dirty bitmap for a last
-> phase sync of constant (but still very small amount of) dirty pages does
-> sound reasonable and can avoid that complexity.  The payoff is we'll need
-> to allocate both the rings and the bitmaps.
-> 
+> [...]
 
-Ok. I was thinking of using the bitmap to convey the dirty pages for
-this particular case, where we don't have running vcpu. The concern I had
-is the natural difference between a ring and bitmap. The ring-buffer is
-discrete, comparing to bitmap. Besides, it sounds a little strange to
-have two different sets of meta-data to track the data (dirty pages).
+Applied to next, thanks!
 
-However, bitmap is easier way than per-vm ring. The constrains with
-per-vm ring is just as Peter pointed. So lets reuse the bitmap to
-convey the dirty pages for this particular case. I think the payoff,
-extra bitmap, is acceptable. For this, we need another capability
-(KVM_CAP_DIRTY_LOG_RING_BITMAP?) so that QEMU can collects the dirty
-bitmap in the last phase of migration.
+[1/6] KVM: Use acquire/release semantics when accessing dirty ring GFN state
+      commit: 8929bc9659640f35dd2ef8373263cbd885b4a072
+[2/6] KVM: Add KVM_CAP_DIRTY_LOG_RING_ACQ_REL capability and config option
+      commit: 17601bfed909fa080fcfd227b57da2bd4dc2d2a6
+[3/6] KVM: x86: Select CONFIG_HAVE_KVM_DIRTY_RING_ACQ_REL
+      commit: fc0693d4e5afe3c110503c3afa9f60600f9e964b
+[4/6] KVM: Document weakly ordered architecture requirements for dirty ring
+      commit: 671c8c7f9f2349d8b2176ad810f1406794011f63
+[5/6] KVM: selftests: dirty-log: Upgrade flag accesses to acquire/release semantics
+      commit: 4eb6486cb43c93382c27a2659ba978c660e98498
+[6/6] KVM: selftests: dirty-log: Use KVM_CAP_DIRTY_LOG_RING_ACQ_REL if available
+      commit: 4b3402f1f4d9860301d6d5cd7aff3b67f678d577
 
-If all of us agree on this, I can send another kernel patch to address
-this. QEMU still need more patches so that the feature can be supported.
+Cheers,
 
->>
->> To me, this is just a relaxation of an arbitrary limitation, as the
->> current assumption that only vcpus can dirty memory doesn't hold at
->> all.
-> 
-> The initial dirty ring proposal has a per-vm ring, but after we
-> investigated x86 we found that all legal dirty paths are with a vcpu
-> context (except one outlier on kvmgt which fixed within itself), so we
-> dropped the per-vm ring.
-> 
-> One thing to mention is that DMAs should not count in this case because
-> that's from device perspective, IOW either IOMMU or SMMU dirty tracking
-> should be reported to the device driver that interacts with the userspace
-> not from KVM interfaces (e.g. vfio with VFIO_IOMMU_DIRTY_PAGES).  That even
-> includes emulated DMA like vhost (VHOST_SET_LOG_BASE).
-> 
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
-Thanks to Peter for mentioning the per-vm ring's history. As I said above,
-lets use bitmap instead if all of us agree.
-
-If I'm correct, Marc may be talking about SMMU, which is emulated in host
-instead of QEMU. In this case, the DMA target pages are similar to those
-pages for vgic/its tables. Both sets of pages are invisible from QEMU.
-
-Thanks,
-Gavin
 
 _______________________________________________
 kvmarm mailing list
