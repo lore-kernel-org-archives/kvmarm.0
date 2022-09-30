@@ -1,117 +1,77 @@
-Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
-X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
-	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1FFAC3DA7A
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Jan 2023 20:48:34 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71C0E4B3E8;
-	Thu,  5 Jan 2023 15:48:34 -0500 (EST)
-X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
-	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HPVubBF+b6fu; Thu,  5 Jan 2023 15:48:33 -0500 (EST)
-Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5105C4B3D7;
-	Thu,  5 Jan 2023 15:48:33 -0500 (EST)
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B95B54B3F5
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Jan 2023 15:48:31 -0500 (EST)
-X-Virus-Scanned: at lists.cs.columbia.edu
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id L-Li2Zv2UMaG for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Jan 2023 15:48:30 -0500 (EST)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96BAA4B3F3
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Jan 2023 15:48:30 -0500 (EST)
-Date: Thu, 5 Jan 2023 20:48:25 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1672951709;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=aYVWC4sBVgWrlftRY/Wjwf7HrIxSM4JPLvpreSFfkAc=;
- b=LgjU7AxU13CeHxxXWLLpwOOH5ZSC/3yZk+Yl//JoD5VDml1Sy6Yh3KLVvULVDKlvJXIKb/
- tmKISIzCGNty273PY3SF6qOSJCq9HRNTKXvytFIAPNgHG5U4XiQXojMUv9cwj5/CyyOoN2
- bGdRhh/FGQo/Uo6dCrNYdHW1xt1nOSQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: Re: [PATCH v4 6/7] KVM: arm64: Mask FEAT_CCIDX
-Message-ID: <Y7c3mQS1zqw0UATF@google.com>
-References: <20221221204016.658874-1-akihiko.odaki@daynix.com>
- <20221221204016.658874-7-akihiko.odaki@daynix.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20221221204016.658874-7-akihiko.odaki@daynix.com>
-X-Migadu-Flow: FLOW_OUT
-Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
- Mathieu Poirier <mathieu.poirier@linaro.org>, Marc Zyngier <maz@kernel.org>,
- Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
- asahi@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
-X-BeenThere: kvmarm@lists.cs.columbia.edu
-X-Mailman-Version: 2.1.14
-Precedence: list
-List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6924C6C
+	for <kvmarm@lists.linux.dev>; Fri, 30 Sep 2022 14:54:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61446C433C1;
+	Fri, 30 Sep 2022 14:54:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1664549665;
+	bh=1Iv9bg3QgUQwjRBfP/WroUvtZxbDKtcoddgd9bxGwU8=;
+	h=Date:From:To:Subject:From;
+	b=kA9OJKZc48/iig5sMIgc2FPz1tjQdx7YoZE6UoCObhn4NLk22ZV2VAFwMmf8oDmad
+	 HFr6A12LsvMchbBzetL7ay7RxGZ9xElr+d8IUU73vV0+TVJICtMMPkJwGZkajPUaYX
+	 tg6MkgtsOXBwJilqNM3nEz4l1fAnCogiD3yWKy3faYX3F2SVC8DSgz75YC+ROh9WQk
+	 OrIe3ZHeGCY1nG+48Y+K7Ti48mqwPjA1R61XFhFJLMq0NLOkQe4xMFfM6Ss6OYj7wi
+	 mprc7+HoPxJvOrXsKHhY8HBI+/qyaLhUJ5Jc8Ud06nYMmKjg2KCeHlD9FgaYGMUc08
+	 HMXynh3s9Xykg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1oeHPC-00DnU9-T7;
+	Fri, 30 Sep 2022 15:54:23 +0100
+Date: Fri, 30 Sep 2022 15:54:22 +0100
+Message-ID: <86a66gc3q9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm <kvmarm@lists.cs.columbia.edu>, kvmarm@lists.linux.dev,
+   Konstantin Ryabitsev <mricon@kernel.org>,
+   Christoffer Dall <cdall@kernel.org>
+Subject: [URGENT] kvmarm mailing list migration
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Precedence: bulk
+X-Mailing-List: kvmarm@lists.linux.dev
+List-Id: <kvmarm.lists.linux.dev>
+List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
+List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, mricon@kernel.org, cdall@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20220930145422.HSbj6KNMdTXtTGfHNVgCJcOGh4h51iRXlqS92004D2o@z>
 
-Hi Akihiko,
+Hi all,
 
-On Thu, Dec 22, 2022 at 05:40:15AM +0900, Akihiko Odaki wrote:
-> The CCSIDR access handler masks the associativity bits according to the
-> bit layout for processors without FEAT_CCIDX. KVM also assumes CCSIDR is
-> 32-bit where it will be 64-bit if FEAT_CCIDX is enabled. Mask FEAT_CCIDX
-> so that these assumptions hold.
-> 
-> Suggested-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index f4a7c5abcbca..aeabf1f3370b 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1124,6 +1124,12 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
->  						      ID_DFR0_PERFMON_SHIFT,
->  						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
->  		break;
-> +	case SYS_ID_AA64MMFR2_EL1:
-> +		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
-> +		break;
-> +	case SYS_ID_MMFR4_EL1:
-> +		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_CCIDX);
-> +		break;
+As you probably all know, the kvmarm mailing has been hosted on
+Columbia's machines for as long as the project existed (over 13
+years). After all this time, the university has decided to retire the
+list infrastructure and asked us to find a new hosting.
 
-Not that it is necessarily worth addressing, but I wanted to point
-something out.
+A new mailing list has been created on lists.linux.dev[1], and I'm
+kindly asking everyone interested in following the KVM/arm64
+developments to start subscribing to it (and start posting your
+patches there). I hope that people will move over to it quickly enough
+that we can soon give Columbia the green light to turn their systems
+off.
 
-This change breaks migration from older kernels on implementations w/
-FEAT_CCIDX. There is most likely exactly 0 of those in the wild, but
-we need to be careful changing user-visible stuff like this.
+Note that the new list will only get archived automatically once we
+fully switch over, but I'll make sure we fill any gap and not lose any
+message. In the meantime, please Cc both lists.
 
---
+I would like to thank Columbia University for their long lasting
+support and willingness to help during this transition, as well as
+Konstantin (and the kernel.org crew) for quickly stepping up to the
+challenge and giving us a new home!
+
 Thanks,
-Oliver
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+	M.
+
+[1] https://subspace.kernel.org/lists.linux.dev.html
+
+-- 
+Without deviation from the norm, progress is not possible.
