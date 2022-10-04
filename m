@@ -2,97 +2,86 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B33D5C4332F
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Oct 2022 13:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22B93C433FE
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Oct 2022 15:45:26 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BD9C49F3B;
-	Tue,  4 Oct 2022 09:26:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5245B40177;
+	Tue,  4 Oct 2022 11:45:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WTt7HU3escdG; Tue,  4 Oct 2022 09:26:18 -0400 (EDT)
+	with ESMTP id szaVcGUyxvwE; Tue,  4 Oct 2022 11:45:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E93BB407BA;
-	Tue,  4 Oct 2022 09:26:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE98D40D0B;
+	Tue,  4 Oct 2022 11:45:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EDA9406E7
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Oct 2022 09:26:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FA9140797
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Oct 2022 11:45:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8iFfzsCm4hsN for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Oct 2022 09:26:16 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D843D40162
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Oct 2022 09:26:16 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1664889976;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=1a5fI7ggkfQfFR1kPFxspjmxx+2AyvDZdYuODjfSZ6k=;
- b=gNN0pSgsFSJTJUS6afguIL1NrdDUvhvBUYfoF4msb0QXAHRJlhclVVAIVLqE6xgZ4sxMCm
- Kcuz55FBj7vCEIWpr7i6USNtdri4LZ6WXgUbWqsC+1Fyqf9EJOS9YSxdJ6vCQ1wMjP1aaF
- NTXogz23VHTloAKfv2mIR+qs9H+y5dE=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-341-64VILa2UPw-xohniueFjYw-1; Tue, 04 Oct 2022 09:26:15 -0400
-X-MC-Unique: 64VILa2UPw-xohniueFjYw-1
-Received: by mail-qt1-f200.google.com with SMTP id
- e22-20020ac84b56000000b0035bb64ad562so9323152qts.17
- for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Oct 2022 06:26:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
- bh=1a5fI7ggkfQfFR1kPFxspjmxx+2AyvDZdYuODjfSZ6k=;
- b=1fHLfTZoQpHI52rqqzWFrJJ+p2t2PPg7p9Nxh8puuKEwSB0e0Ta/6SbyyyG4zbf0ei
- o7SkeD9lqdC4iQRcXjolBgA3n8TwLspJocMkSpPtTHCxL5auoFepfOti9nsOJzxjzy2Y
- duypOKjhcu1F39nbU/X73RuRsa2BkXAzti+v0GZVKZlZy9udl1XTpA3N4QcF4QNMfIOD
- Vg7In9El6CKXtiVVaZ4YvHSs7anA1aAXu2tIaMLPFrVZxU5Btov3ZNYQ02Q1ALkaaRNd
- PRFmYXo9GdR7O4s8FYRTQ9rbD6bOWK4IZucz+M1h1Isjb+GLPw/wYQXBM9hgVQWGKSaM
- al8Q==
-X-Gm-Message-State: ACrzQf3wqY+X2sotR/tF4D/6SnfatZcmxLpy9xshs9Vzk+6A1qT1aRZn
- FDDqbdM47AGijxLiGCmI6Y9xYmD5M8MhR1ukIfXDpMJjVDdtHAShEEw7VYvVtr05UnmZUV4L5co
- u+UZo1V7fUtXVYEDOPCM+AKE4
-X-Received: by 2002:a05:622a:390:b0:35d:44ab:c615 with SMTP id
- j16-20020a05622a039000b0035d44abc615mr19888384qtx.594.1664889974662; 
- Tue, 04 Oct 2022 06:26:14 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6M0PX+ipcJM7x33PxLdL7QLzw6bN4v+B38ziDmyGUyWyjBElmxYO5+ApuqF1XR0sZTmHhR3A==
-X-Received: by 2002:a05:622a:390:b0:35d:44ab:c615 with SMTP id
- j16-20020a05622a039000b0035d44abc615mr19888354qtx.594.1664889974443; 
- Tue, 04 Oct 2022 06:26:14 -0700 (PDT)
-Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca.
- [70.31.27.79]) by smtp.gmail.com with ESMTPSA id
- i10-20020ac8764a000000b0031f41ea94easm12512816qtr.28.2022.10.04.06.26.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 04 Oct 2022 06:26:13 -0700 (PDT)
-Date: Tue, 4 Oct 2022 09:26:11 -0400
-From: Peter Xu <peterx@redhat.com>
+ with ESMTP id GGdS2UEULhQe for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Oct 2022 11:45:23 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1511040177
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Oct 2022 11:45:23 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 722FAB81B3A;
+ Tue,  4 Oct 2022 15:45:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3524EC433C1;
+ Tue,  4 Oct 2022 15:45:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1664898320;
+ bh=szltahFtxgx70dilYvsantPzWsHzGkD38vlL2Jwwhfk=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=hTWlv3jU047FiUEf6bCg7HZ98uBPmytp0O7fsRTdGHf5gYRoYnXVWR5qTzGA3tZHP
+ Mxpz1KUb8Pm/O9PBW9Bn2dovKX5UX5ECbKeBv4ojoEm14yWgQZNSt6trGfBsKt1wtO
+ x+bqaMvxTtZfIt1+4wgobXNl2mX4BFKpQryq0Y9KJY9YS+vDntrgaZMY/UWcZsRg1b
+ KFoGpmhMBd5j9nWI8EPTOu2QZCQWVcbcoxOue13qO3Qdfls/VN6lG/IhghqG3Pzo04
+ /G9cyhT3eXYEpwIvutc/remWw4agw+lLGt/G661gKp5pIhcSLYLDQTw8L2+uVjl2pa
+ qp9rJVkH5mujA==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1ofk6e-00EYdV-0w;
+ Tue, 04 Oct 2022 16:45:17 +0100
+Date: Tue, 04 Oct 2022 16:45:09 +0100
+Message-ID: <86czb78uey.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Gavin Shan <gshan@redhat.com>
 Subject: Re: [PATCH v4 3/6] KVM: arm64: Enable ring-based dirty memory tracking
-Message-ID: <Yzw0c5tD28W8L7wP@x1n>
-References: <20220927005439.21130-4-gshan@redhat.com> <YzMerD8ZvhvnprEN@x1n>
+In-Reply-To: <8b82ef3d-16ab-0aee-b464-8ad9b3718028@redhat.com>
+References: <20220927005439.21130-1-gshan@redhat.com>
+ <20220927005439.21130-4-gshan@redhat.com> <YzMerD8ZvhvnprEN@x1n>
  <86sfkc7mg8.wl-maz@kernel.org> <YzM/DFV1TgtyRfCA@x1n>
  <320005d1-fe88-fd6a-be91-ddb56f1aa80f@redhat.com>
  <87y1u3hpmp.wl-maz@kernel.org> <YzRfkBWepX2CD88h@x1n>
  <d0beb9bd-5295-adb6-a473-c131d6102947@redhat.com>
  <86fsga6y40.wl-maz@kernel.org>
  <8b82ef3d-16ab-0aee-b464-8ad9b3718028@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <8b82ef3d-16ab-0aee-b464-8ad9b3718028@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: catalin.marinas@arm.com, kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- andrew.jones@linux.dev, kvmarm@lists.linux.dev, will@kernel.org,
- shan.gavin@gmail.com, bgardon@google.com, dmatlack@google.com,
- pbonzini@redhat.com, zhenyzha@redhat.com, shuah@kernel.org,
- kvmarm@lists.cs.columbia.edu
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gshan@redhat.com, peterx@redhat.com,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org,
+ dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
+ shan.gavin@gmail.com, james.morse@arm.com, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
+ kvmarm@lists.linux.dev, will@kernel.org, shan.gavin@gmail.com,
+ bgardon@google.com, dmatlack@google.com, pbonzini@redhat.com,
+ zhenyzha@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -109,17 +98,120 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Oct 04, 2022 at 12:26:23PM +0800, Gavin Shan wrote:
+On Tue, 04 Oct 2022 05:26:23 +0100,
+Gavin Shan <gshan@redhat.com> wrote:
+
+[...]
+
+> > Why another capability? Just allowing dirty logging to be enabled
+> > before we saving the GIC state should be enough, shouldn't it?
+> > 
+> 
+> The GIC state would be just one case where no vcpu can be used to push
+> dirty page information. As you mentioned, SMMMU HTTU feature could possibly
+> be another case to ARM64. It's uncertain about other architectures where
+> dirty-ring will be supported. In QEMU, the dirty (bitmap) logging is enabled
+> at the beginning of migration and the bitmap is synchronized to global
+> dirty bitmap and RAMBlock's dirty bitmap gradually, as the following
+> backtrace shows. What we need to do for QEMU is probably retrieve the
+> bitmap at point (A).
+> 
+> Without the new capability, we will have to rely on the return value
+> from ioctls KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG to detect the
+> capability. For example, -ENXIO is returned on old kernels.
+
+Huh. Fair enough.
+
+KVM_CAP_ALLOW_DIRTY_LOG_AND_DIRTY_RING_TOGETHER_UNTIL_THE_NEXT_TIME...
+
+
+> 
+>    migration_thread
+>      qemu_savevm_state_setup
+>        ram_save_setup
+>          ram_init_all
+>            ram_init_bitmaps
+>              memory_global_dirty_log_start(GLOBAL_DIRTY_MIGRATION)   // dirty logging enabled
+>              migration_bitmap_sync_precopy(rs)
+>        :
+>      migration_iteration_run                                         // iteration 0
+>        qemu_savevm_state_pending
+>          migration_bitmap_sync_precopy
+>        qemu_savevm_state_iterate
+>          ram_save_iterate
+>      migration_iteration_run                                        // iteration 1
+>        qemu_savevm_state_pending
+>          migration_bitmap_sync_precopy
+>        qemu_savevm_state_iterate
+>          ram_save_iterate
+>      migration_iteration_run                                        // iteration 2
+>        qemu_savevm_state_pending
+>          migration_bitmap_sync_precopy
+>        qemu_savevm_state_iterate
+>          ram_save_iterate
+>        :
+>      migration_iteration_run                                       // iteration N
+>        qemu_savevm_state_pending
+>          migration_bitmap_sync_precopy
+>        migration_completion
+>          qemu_savevm_state_complete_precopy
+>            qemu_savevm_state_complete_precopy_iterable
+>              ram_save_complete
+>                migration_bitmap_sync_precopy                      // A
+>                <send all dirty pages>
+> 
 > Note: for post-copy and snapshot, I assume we need to save the dirty bitmap
 >       in the last synchronization, right after the VM is stopped.
 
-Agreed on postcopy.  Note that snapshot doesn't use kvm dirty logging
-because it requires synchronous events (userfaultfd), so that's not
-affected by this work.  Thanks,
+Not only the VM stopped, but also the devices made quiescent.
+
+> >> If all of us agree on this, I can send another kernel patch to address
+> >> this. QEMU still need more patches so that the feature can be supported.
+> > 
+> > Yes, this will also need some work.
+> > 
+> >>>> 
+> >>>> To me, this is just a relaxation of an arbitrary limitation, as the
+> >>>> current assumption that only vcpus can dirty memory doesn't hold at
+> >>>> all.
+> >>> 
+> >>> The initial dirty ring proposal has a per-vm ring, but after we
+> >>> investigated x86 we found that all legal dirty paths are with a vcpu
+> >>> context (except one outlier on kvmgt which fixed within itself), so we
+> >>> dropped the per-vm ring.
+> >>> 
+> >>> One thing to mention is that DMAs should not count in this case because
+> >>> that's from device perspective, IOW either IOMMU or SMMU dirty tracking
+> >>> should be reported to the device driver that interacts with the userspace
+> >>> not from KVM interfaces (e.g. vfio with VFIO_IOMMU_DIRTY_PAGES).  That even
+> >>> includes emulated DMA like vhost (VHOST_SET_LOG_BASE).
+> >>> 
+> >> 
+> >> Thanks to Peter for mentioning the per-vm ring's history. As I said above,
+> >> lets use bitmap instead if all of us agree.
+> >> 
+> >> If I'm correct, Marc may be talking about SMMU, which is emulated in host
+> >> instead of QEMU. In this case, the DMA target pages are similar to those
+> >> pages for vgic/its tables. Both sets of pages are invisible from QEMU.
+> > 
+> > No, I'm talking about an actual HW SMMU using the HTTU feature that
+> > set the Dirty bit in the PTEs. And people have been working on sharing
+> > SMMU and CPU PTs for some time, which would give us the one true
+> > source of dirty page.
+> > 
+> > In this configuration, the dirty ring mechanism will be pretty useless.
+> > 
+> 
+> Ok. I don't know the details. Marc, the dirty bitmap is helpful in this case?
+
+Yes, the dirty bitmap is useful if the source of dirty bits is
+obtained from the page tables. The cost of collecting/resetting the
+bits is pretty high though.
+
+	M.
 
 -- 
-Peter Xu
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
