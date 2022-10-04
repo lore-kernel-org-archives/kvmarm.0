@@ -2,50 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8200C433FE
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Oct 2022 21:02:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 355DEC433FE
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Oct 2022 22:33:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C193410AD;
-	Tue,  4 Oct 2022 17:02:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A588E40A84;
+	Tue,  4 Oct 2022 18:33:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YjUKSDxPaYFs; Tue,  4 Oct 2022 17:02:53 -0400 (EDT)
+	with ESMTP id FasRNMzmp-7y; Tue,  4 Oct 2022 18:33:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2231E4120D;
-	Tue,  4 Oct 2022 17:02:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7589340D23;
+	Tue,  4 Oct 2022 18:33:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 04A1B43479
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Oct 2022 17:02:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 02A9F40D23
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Oct 2022 18:33:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cltmLFecNt31 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Oct 2022 17:02:50 -0400 (EDT)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 982A24040B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Oct 2022 17:02:50 -0400 (EDT)
-Date: Tue, 4 Oct 2022 21:02:40 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1664917369;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type;
- bh=ZZPNPYzSVNBZuhnGB7CrCaQRRGaAvl+BMTJQ2z40OX0=;
- b=lNRjK2gvnV2+LQrnimaTqv2eY7/OBYwVSyLWUrjWNP6Ezl1kVhSJW1hOjl72cjEngiHhx4
- R1YdpsVkyvRMGPH1j6jssUyE0XuHysQ7bNmcA76PJFjJXCSAOuGVX6Vuo8JigZagfYRwN/
- 5/CjJHfZqneXs66O33qwXrMToAJnw+g=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: pbonzini@redhat.com
-Subject: arm64 build failure on kvm/next
-Message-ID: <YzyfcIyudmSzTKx/@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
-Cc: kvmarm@lists.linux.dev, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
+ with ESMTP id Bd1lA229+sEC for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Oct 2022 18:33:02 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D2A1740A84
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Oct 2022 18:33:02 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 07F06B81B49;
+ Tue,  4 Oct 2022 22:33:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2C00C433D6;
+ Tue,  4 Oct 2022 22:32:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1664922779;
+ bh=VkpEv2u4iw64ObTY4SdzHAjx0ijCfNtGMJedAccaAF0=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=WQF2kTJ9ZpEWmj+/e3RtnoP4gK+6EImSH9p/TVHBK3qks9xDcugCgwfbwqZXReMiF
+ rGr1tpfjlfVYh+XHa+DfLblrlQX0WWnLLBCgb+9XRR/A3VKrtr2vfqjx/FeXUZ5q8p
+ xoB16xYRbS8Y9HJvw56mIZKFMs8tZbHxJ9str6B5WLJU+wfXuYBbKH1JQzJey75uYh
+ gaFDZFMVzYOamqD6kAN7Eg8+FVHtn7qtJVJw0YzsN6hNDcCx14HtppfVdTWrp7+VLF
+ oy6wXt+2MeLI4U/eu1939R6HO17g5vxhB+6RB1sP7p7tx93B69odP5nDUYnCCgo4Ul
+ zoIKXk1Pspbcw==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1ofqTB-00EcHU-Fq;
+ Tue, 04 Oct 2022 23:32:57 +0100
+Date: Tue, 04 Oct 2022 23:32:57 +0100
+Message-ID: <867d1f8bja.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: arm64 build failure on kvm/next
+In-Reply-To: <YzyfcIyudmSzTKx/@google.com>
+References: <YzyfcIyudmSzTKx/@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, pbonzini@redhat.com,
+ seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvmarm@lists.linux.dev, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -63,29 +86,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hey Paolo,
+On Tue, 04 Oct 2022 22:02:40 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Hey Paolo,
+> 
+> Just wanted to give you a heads up about a build failure on kvm/next.
+> Marc pulled some of the sysreg refactoring updates from core arm64 to
+> resolve a conflict, which resulted in:
+> 
+> drivers/perf/arm_spe_pmu.c:677:7: error: use of undeclared identifier 'ID_AA64DFR0_PMSVER_8_2'
+>         case ID_AA64DFR0_PMSVER_8_2:
+>              ^
+> drivers/perf/arm_spe_pmu.c:679:7: error: use of undeclared identifier 'ID_AA64DFR0_PMSVER_8_3'
+>         case ID_AA64DFR0_PMSVER_8_3:
+>              ^
+> drivers/perf/arm_spe_pmu.c:961:10: error: use of undeclared identifier 'ID_AA64DFR0_PMSVER_SHIFT'
+>                                                    ID_AA64DFR0_PMSVER_SHIFT);
+> 
+> The fix has since gone in on the arm64 side [1], in case you want to
+> mention in your pull request.
+> 
+> [1]: https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/commit/?h=for-next/sysreg&id=db74cd6337d2691ea932e36b84683090f0712ec1
 
-Just wanted to give you a heads up about a build failure on kvm/next.
-Marc pulled some of the sysreg refactoring updates from core arm64 to
-resolve a conflict, which resulted in:
+Also worth noting that the SPE driver is not part of defconfig, which
+is probably why it wasn't spotted the first place. Anyway, odds are
+that the arm64 pull-request will get in before the KVM one, making
+this pretty much invisible...
 
-drivers/perf/arm_spe_pmu.c:677:7: error: use of undeclared identifier 'ID_AA64DFR0_PMSVER_8_2'
-        case ID_AA64DFR0_PMSVER_8_2:
-             ^
-drivers/perf/arm_spe_pmu.c:679:7: error: use of undeclared identifier 'ID_AA64DFR0_PMSVER_8_3'
-        case ID_AA64DFR0_PMSVER_8_3:
-             ^
-drivers/perf/arm_spe_pmu.c:961:10: error: use of undeclared identifier 'ID_AA64DFR0_PMSVER_SHIFT'
-                                                   ID_AA64DFR0_PMSVER_SHIFT);
+	M.
 
-The fix has since gone in on the arm64 side [1], in case you want to
-mention in your pull request.
-
-[1]: https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/commit/?h=for-next/sysreg&id=db74cd6337d2691ea932e36b84683090f0712ec1
-
---
-Thanks,
-Oliver
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
