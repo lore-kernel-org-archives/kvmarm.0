@@ -1,92 +1,187 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45883D8A
-	for <kvmarm@lists.linux.dev>; Tue,  4 Oct 2022 15:42:42 +0000 (UTC)
-Received: by mail-wm1-f73.google.com with SMTP id y15-20020a1c4b0f000000b003b47578405aso3688375wma.5
-        for <kvmarm@lists.linux.dev>; Tue, 04 Oct 2022 08:42:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date;
-        bh=WWVFqgTWQ8azi8GP+rBbYb12Qu9xWjqzGv+CBZNgnNI=;
-        b=oBoEqzDio3nthQUeORwSc9WqF78dq3gSRCADIdTK4NdWKqLEsBPU2JwA1vCmZkUVuv
-         el5KvOgAJcF9TjbnNc12of/1cAuIoS5HEabUiOkhoq8H2DyBgBA1dElxP47hVaDV+nE2
-         /9cDFIXxTw8pptszy5hWYfNZh7lWhc5pFIZfQl3IHXOZsCAt/KoCjFJIlmOFcmkC3dZn
-         svG465k/9ngQ4cJ2OQ3tu6AwbprWZJMycIG8OJ1LZAV3uqSKeLQeGzpGkJEB5eHAnVd1
-         MX/Ah6RV4u4WVfQGqRHdsT08gTri7KH8HXnAqN3FCMOKlFVFFULAEuijckgcHhAUeI3E
-         pr1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=WWVFqgTWQ8azi8GP+rBbYb12Qu9xWjqzGv+CBZNgnNI=;
-        b=6aIe/hsL71UglbGyYN+mX4olAII6lenT5VCT6lW5mIoUG0b1uiv+CETjzIltxcxvn0
-         m5d9Rh/uTRx0Q6olK9tlrZABs9ILrPT1pG3csOhR9Wsq0yUewNxLCk9u/z4CUIJtIqIs
-         WU8wA0MIZrWYJAsEgbnBM3V280TlcDuRTpt/Md5XxG/HEWlrK3UnVgRFsNh90lGIJurG
-         bKmGIIoKVlRDvUXBeZmKww9PwYWrf/gBc5kuBFSEnQz8V27AOpFE0QlYxz/xrTC9QG5w
-         ZD6Sk7mkqJ0anVYXgpZVlW1WG4iwM9yhMKyz1O6bVdmCun/kAeR1cmq4pSx1MZolSHva
-         nehw==
-X-Gm-Message-State: ACrzQf2DG6YElsAuLceMaMOURCd2MpxNolPgHZK7p1AXw/uL3VOYsOSP
-	kGW5VFZjI1ztpLOLwLnMkUNOQyGVaEkDa1zF
-X-Google-Smtp-Source: AMsMyM4Ksa4T0ArbfPMDLZVlL5cHxR1tviks7FEOUK08OSlqKrb5KWwNP7bKMDffZ41Q+zvTqKilvIy1hcZ2MllU
-X-Received: from vdonnefort.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:2eea])
- (user=vdonnefort job=sendgmr) by 2002:a05:600c:3483:b0:3b4:99f4:1191 with
- SMTP id a3-20020a05600c348300b003b499f41191mr251856wmq.147.1664898160929;
- Tue, 04 Oct 2022 08:42:40 -0700 (PDT)
-Date: Tue,  4 Oct 2022 16:42:16 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907403D8A
+	for <kvmarm@lists.linux.dev>; Tue,  4 Oct 2022 15:45:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3524EC433C1;
+	Tue,  4 Oct 2022 15:45:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1664898320;
+	bh=szltahFtxgx70dilYvsantPzWsHzGkD38vlL2Jwwhfk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hTWlv3jU047FiUEf6bCg7HZ98uBPmytp0O7fsRTdGHf5gYRoYnXVWR5qTzGA3tZHP
+	 Mxpz1KUb8Pm/O9PBW9Bn2dovKX5UX5ECbKeBv4ojoEm14yWgQZNSt6trGfBsKt1wtO
+	 x+bqaMvxTtZfIt1+4wgobXNl2mX4BFKpQryq0Y9KJY9YS+vDntrgaZMY/UWcZsRg1b
+	 KFoGpmhMBd5j9nWI8EPTOu2QZCQWVcbcoxOue13qO3Qdfls/VN6lG/IhghqG3Pzo04
+	 /G9cyhT3eXYEpwIvutc/remWw4agw+lLGt/G661gKp5pIhcSLYLDQTw8L2+uVjl2pa
+	 qp9rJVkH5mujA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ofk6e-00EYdV-0w;
+	Tue, 04 Oct 2022 16:45:17 +0100
+Date: Tue, 04 Oct 2022 16:45:09 +0100
+Message-ID: <86czb78uey.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Gavin Shan <gshan@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>,
+	kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org,
+	catalin.marinas@arm.com,
+	bgardon@google.com,
+	shuah@kernel.org,
+	andrew.jones@linux.dev,
+	will@kernel.org,
+	dmatlack@google.com,
+	pbonzini@redhat.com,
+	zhenyzha@redhat.com,
+	shan.gavin@gmail.com,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	alexandru.elisei@arm.com,
+	oliver.upton@linux.dev,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Enable ring-based dirty memory tracking
+In-Reply-To: <8b82ef3d-16ab-0aee-b464-8ad9b3718028@redhat.com>
+References: <20220927005439.21130-1-gshan@redhat.com>
+	<20220927005439.21130-4-gshan@redhat.com>
+	<YzMerD8ZvhvnprEN@x1n>
+	<86sfkc7mg8.wl-maz@kernel.org>
+	<YzM/DFV1TgtyRfCA@x1n>
+	<320005d1-fe88-fd6a-be91-ddb56f1aa80f@redhat.com>
+	<87y1u3hpmp.wl-maz@kernel.org>
+	<YzRfkBWepX2CD88h@x1n>
+	<d0beb9bd-5295-adb6-a473-c131d6102947@redhat.com>
+	<86fsga6y40.wl-maz@kernel.org>
+	<8b82ef3d-16ab-0aee-b464-8ad9b3718028@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20221004154216.2833636-1-vdonnefort@google.com>
-Subject: [PATCH] KVM: arm64: Enable stack protection and branch profiling for VHE
-From: Vincent Donnefort <vdonnefort@google.com>
-To: maz@kernel.org, oliver.upton@linux.dev
-Cc: james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, 
-	will@kernel.org, catalin.marinas@arm.com, qperret@google.com, 
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Vincent Donnefort <vdonnefort@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gshan@redhat.com, peterx@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221004154509.KN79kO9YSNzaJQ3j-zQ5xGYoGnK8lonDrJXC1urpVJ8@z>
 
-For historical reasons, the VHE code inherited the build configuration from
-nVHE. Now those two parts have their own folder and makefile, we can
-enable stack protection and branch profiling for VHE.
+On Tue, 04 Oct 2022 05:26:23 +0100,
+Gavin Shan <gshan@redhat.com> wrote:
 
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+[...]
 
-diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index 687598e41b21..a38dea6186c9 100644
---- a/arch/arm64/kvm/hyp/Makefile
-+++ b/arch/arm64/kvm/hyp/Makefile
-@@ -5,9 +5,6 @@
- 
- incdir := $(srctree)/$(src)/include
- subdir-asflags-y := -I$(incdir)
--subdir-ccflags-y := -I$(incdir)				\
--		    -fno-stack-protector		\
--		    -DDISABLE_BRANCH_PROFILING		\
--		    $(DISABLE_STACKLEAK_PLUGIN)
-+subdir-ccflags-y := -I$(incdir)
- 
- obj-$(CONFIG_KVM) += vhe/ nvhe/ pgtable.o
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index b5c5119c7396..48f6ae7cc6e6 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -10,6 +10,9 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS
- # will explode instantly (Words of Marc Zyngier). So introduce a generic flag
- # __DISABLE_TRACE_MMIO__ to disable MMIO tracing for nVHE KVM.
- ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS -D__DISABLE_TRACE_MMIO__
-+ccflags-y += -fno-stack-protector	\
-+	     -DDISABLE_BRANCH_PROFILING	\
-+	     $(DISABLE_STACKLEAK_PLUGIN)
- 
- hostprogs := gen-hyprel
- HOST_EXTRACFLAGS += -I$(objtree)/include
+> > Why another capability? Just allowing dirty logging to be enabled
+> > before we saving the GIC state should be enough, shouldn't it?
+> > 
+> 
+> The GIC state would be just one case where no vcpu can be used to push
+> dirty page information. As you mentioned, SMMMU HTTU feature could possibly
+> be another case to ARM64. It's uncertain about other architectures where
+> dirty-ring will be supported. In QEMU, the dirty (bitmap) logging is enabled
+> at the beginning of migration and the bitmap is synchronized to global
+> dirty bitmap and RAMBlock's dirty bitmap gradually, as the following
+> backtrace shows. What we need to do for QEMU is probably retrieve the
+> bitmap at point (A).
+> 
+> Without the new capability, we will have to rely on the return value
+> from ioctls KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG to detect the
+> capability. For example, -ENXIO is returned on old kernels.
+
+Huh. Fair enough.
+
+KVM_CAP_ALLOW_DIRTY_LOG_AND_DIRTY_RING_TOGETHER_UNTIL_THE_NEXT_TIME...
+
+
+> 
+>    migration_thread
+>      qemu_savevm_state_setup
+>        ram_save_setup
+>          ram_init_all
+>            ram_init_bitmaps
+>              memory_global_dirty_log_start(GLOBAL_DIRTY_MIGRATION)   // dirty logging enabled
+>              migration_bitmap_sync_precopy(rs)
+>        :
+>      migration_iteration_run                                         // iteration 0
+>        qemu_savevm_state_pending
+>          migration_bitmap_sync_precopy
+>        qemu_savevm_state_iterate
+>          ram_save_iterate
+>      migration_iteration_run                                        // iteration 1
+>        qemu_savevm_state_pending
+>          migration_bitmap_sync_precopy
+>        qemu_savevm_state_iterate
+>          ram_save_iterate
+>      migration_iteration_run                                        // iteration 2
+>        qemu_savevm_state_pending
+>          migration_bitmap_sync_precopy
+>        qemu_savevm_state_iterate
+>          ram_save_iterate
+>        :
+>      migration_iteration_run                                       // iteration N
+>        qemu_savevm_state_pending
+>          migration_bitmap_sync_precopy
+>        migration_completion
+>          qemu_savevm_state_complete_precopy
+>            qemu_savevm_state_complete_precopy_iterable
+>              ram_save_complete
+>                migration_bitmap_sync_precopy                      // A
+>                <send all dirty pages>
+> 
+> Note: for post-copy and snapshot, I assume we need to save the dirty bitmap
+>       in the last synchronization, right after the VM is stopped.
+
+Not only the VM stopped, but also the devices made quiescent.
+
+> >> If all of us agree on this, I can send another kernel patch to address
+> >> this. QEMU still need more patches so that the feature can be supported.
+> > 
+> > Yes, this will also need some work.
+> > 
+> >>>> 
+> >>>> To me, this is just a relaxation of an arbitrary limitation, as the
+> >>>> current assumption that only vcpus can dirty memory doesn't hold at
+> >>>> all.
+> >>> 
+> >>> The initial dirty ring proposal has a per-vm ring, but after we
+> >>> investigated x86 we found that all legal dirty paths are with a vcpu
+> >>> context (except one outlier on kvmgt which fixed within itself), so we
+> >>> dropped the per-vm ring.
+> >>> 
+> >>> One thing to mention is that DMAs should not count in this case because
+> >>> that's from device perspective, IOW either IOMMU or SMMU dirty tracking
+> >>> should be reported to the device driver that interacts with the userspace
+> >>> not from KVM interfaces (e.g. vfio with VFIO_IOMMU_DIRTY_PAGES).  That even
+> >>> includes emulated DMA like vhost (VHOST_SET_LOG_BASE).
+> >>> 
+> >> 
+> >> Thanks to Peter for mentioning the per-vm ring's history. As I said above,
+> >> lets use bitmap instead if all of us agree.
+> >> 
+> >> If I'm correct, Marc may be talking about SMMU, which is emulated in host
+> >> instead of QEMU. In this case, the DMA target pages are similar to those
+> >> pages for vgic/its tables. Both sets of pages are invisible from QEMU.
+> > 
+> > No, I'm talking about an actual HW SMMU using the HTTU feature that
+> > set the Dirty bit in the PTEs. And people have been working on sharing
+> > SMMU and CPU PTs for some time, which would give us the one true
+> > source of dirty page.
+> > 
+> > In this configuration, the dirty ring mechanism will be pretty useless.
+> > 
+> 
+> Ok. I don't know the details. Marc, the dirty bitmap is helpful in this case?
+
+Yes, the dirty bitmap is useful if the source of dirty bits is
+obtained from the page tables. The cost of collecting/resetting the
+bits is pretty high though.
+
+	M.
+
 -- 
-2.38.0.rc1.362.ged0d419d3c-goog
-
+Without deviation from the norm, progress is not possible.
