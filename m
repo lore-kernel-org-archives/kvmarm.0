@@ -2,98 +2,50 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB6BC433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Oct 2022 16:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F30CC433FE
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Oct 2022 16:57:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2179D4B08A;
-	Tue,  4 Oct 2022 12:20:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3C64404FD;
+	Tue,  4 Oct 2022 12:57:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9E2Mcg4VUsh7; Tue,  4 Oct 2022 12:20:33 -0400 (EDT)
+	with ESMTP id qdh7jJF0XsDr; Tue,  4 Oct 2022 12:57:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CF7148FA4;
-	Tue,  4 Oct 2022 12:20:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63882406E7;
+	Tue,  4 Oct 2022 12:57:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E3CC249F0F
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Oct 2022 12:20:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E32740465
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Oct 2022 12:57:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rC25-gbauUtV for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Oct 2022 12:20:30 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BC1D40C52
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Oct 2022 12:20:30 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1664900430;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WIVlQm/eJCK+Dkb+zIV3zL4TzRL4MQMkAUsBE4hUHzo=;
- b=XZs1F6khmqNzeurTA0oY+9YqZZ4wvZgMKNf8gXKLK1lSjeWV9xi2dw1XoFdLVx+XXsZOL0
- /Os+06PKsDY/l08HZuxsQLPn/MAJmZstIkNJvPGeEGrj0RPbMnEIAiCOSmCj5XiMbGrGXt
- w7HenKjbhgjw8a5c5MZRJ/mOj0KoDFQ=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-627-ACGx8_wgOX2AU-O2833fOg-1; Tue, 04 Oct 2022 12:20:28 -0400
-X-MC-Unique: ACGx8_wgOX2AU-O2833fOg-1
-Received: by mail-qk1-f200.google.com with SMTP id
- az15-20020a05620a170f00b006cece4cd0beso12170372qkb.22
- for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Oct 2022 09:20:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:reply-to:user-agent:mime-version:date
- :message-id:x-gm-message-state:from:to:cc:subject:date;
- bh=WIVlQm/eJCK+Dkb+zIV3zL4TzRL4MQMkAUsBE4hUHzo=;
- b=fnbHQ1sAPDCT2lmzmsxk3PACW2aUxy8GpcyaYB2ebZQPF7DRcVb2Dh4UpT3oD+G8gY
- 5VlD1JS5rZfJDh38eZQdk5nhME1SeLXqIxdFenrEn7kiTyYi8kUsktF/Ylb8F8saclau
- xanII0QRA6EmJNjOx0ppmhdQFCBI/0WCwtQOQAM9Qi7FQLnO+SKeAK8zIZbAUNhr9QWP
- sla6iNbumZqr7BNdTc/42cU6R+fDGq3aJ++NnADmleSqx6YqiQak0bsZjE0G0m7YU+lA
- 7JcQXeYuTZdKpzx0G6ARnDxDorOKUFL+W20jJYYRTWXRD6jhbxQ7pFhWQzUPKUE3/i1d
- d84w==
-X-Gm-Message-State: ACrzQf3CR8vv9uZ9QFRL069TNshESSB2CCEy3+WWmxqKj7ug5Z9EOHC/
- fy+UU2p14KJCLvlFDUMq85wF72htCAsuuPImVVrXO4Y+RCIz9mSNikEbgVMWSTprYLiJmH8rrBh
- KHtYBxOFnW/WhuFawQ5ayJ39g
-X-Received: by 2002:a05:6214:250c:b0:4b1:a1e7:1d89 with SMTP id
- gf12-20020a056214250c00b004b1a1e71d89mr5522046qvb.1.1664900428098; 
- Tue, 04 Oct 2022 09:20:28 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7+nPWaq060lSF2LRYxAqI+BNzr2KIZuva9V6DU3zsjrZjyusvZrLO0SYMelN6m2LvYkgbBxA==
-X-Received: by 2002:a05:6214:250c:b0:4b1:a1e7:1d89 with SMTP id
- gf12-20020a056214250c00b004b1a1e71d89mr5522019qvb.1.1664900427766; 
- Tue, 04 Oct 2022 09:20:27 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
- ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id
- bx8-20020a05622a090800b0038e24268c29sm381869qtb.79.2022.10.04.09.20.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 04 Oct 2022 09:20:26 -0700 (PDT)
-Message-ID: <89c93f1e-6e78-f679-aecb-7e506fa0cea3@redhat.com>
-Date: Tue, 4 Oct 2022 18:20:23 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
+ with ESMTP id mkXBm81KW2D6 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Oct 2022 12:57:02 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 752594045D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Oct 2022 12:57:02 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 693F5113E;
+ Tue,  4 Oct 2022 09:57:08 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3DEF73F792;
+ Tue,  4 Oct 2022 09:57:00 -0700 (PDT)
+Date: Tue, 4 Oct 2022 17:58:06 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Eric Auger <eric.auger@redhat.com>
 Subject: Re: [kvm-unit-tests PATCH v3 0/3] arm: pmu: Fixes for bare metal
-To: Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev
+Message-ID: <YzxmHpV2rpfaUdWi@monolith.localdoman>
 References: <20220805004139.990531-1-ricarkol@google.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20220805004139.990531-1-ricarkol@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: maz@kernel.org
+ <89c93f1e-6e78-f679-aecb-7e506fa0cea3@redhat.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <89c93f1e-6e78-f679-aecb-7e506fa0cea3@redhat.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, andrew.jones@linux.dev,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: eric.auger@redhat.com
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -102,170 +54,118 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgUmljYXJkbywgTWFyYywKCk9uIDgvNS8yMiAwMjo0MSwgUmljYXJkbyBLb2xsZXIgd3JvdGU6
-Cj4gVGhlcmUgYXJlIHNvbWUgdGVzdHMgdGhhdCBmYWlsIHdoZW4gcnVubmluZyBvbiBiYXJlIG1l
-dGFsIChpbmNsdWRpbmcgYQo+IHBhc3N0aHJvdWdoIHByb3RvdHlwZSkuICBUaGVyZSBhcmUgdGhy
-ZWUgaXNzdWVzIHdpdGggdGhlIHRlc3RzLiAgVGhlCj4gZmlyc3Qgb25lIGlzIHRoYXQgdGhlcmUg
-YXJlIHNvbWUgbWlzc2luZyBpc2IoKSdzIGJldHdlZW4gZW5hYmxpbmcgZXZlbnQKPiBjb3VudGlu
-ZyBhbmQgdGhlIGFjdHVhbCBjb3VudGluZy4gVGhpcyB3YXNuJ3QgYW4gaXNzdWUgb24gS1ZNIGFz
-Cj4gdHJhcHBpbmcgb24gcmVnaXN0ZXJzIHNlcnZlZCBhcyBjb250ZXh0IHN5bmNocm9uaXphdGlv
-biBldmVudHMuIFRoZQo+IHNlY29uZCBpc3N1ZSBpcyB0aGF0IHNvbWUgdGVzdHMgYXNzdW1lIHRo
-YXQgcmVnaXN0ZXJzIHJlc2V0IHRvIDAuICBBbmQKPiBmaW5hbGx5LCB0aGUgdGhpcmQgaXNzdWUg
-aXMgdGhhdCBvdmVyZmxvd2luZyB0aGUgbG93IGNvdW50ZXIgb2YgYQo+IGNoYWluZWQgZXZlbnQg
-c2V0cyB0aGUgb3ZlcmZsb3cgZmxhZyBpbiBQTVZPUyBhbmQgc29tZSB0ZXN0cyBmYWlsIGJ5Cj4g
-Y2hlY2tpbmcgZm9yIGl0IG5vdCBiZWluZyBzZXQuCj4KPiBBZGRyZXNzZWQgYWxsIGNvbW1lbnRz
-IGZyb20gdGhlIHByZXZpb3VzIHZlcnNpb246Cj4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcva3Zt
-YXJtLzIwMjIwODAzMTgyMzI4LjI0Mzg1OTgtMS1yaWNhcmtvbEBnb29nbGUuY29tL1QvI3QKPiAt
-IGFkZGluZyBtaXNzaW5nIGlzYigpIGFuZCBmaXhlZCB0aGUgY29tbWl0IG1lc3NhZ2UgKEFsZXhh
-bmRydSkuCj4gLSBmaXhlZCB3b3JkaW5nIG9mIGEgcmVwb3J0KCkgY2hlY2sgKEFuZHJldykuCj4K
-PiBUaGFua3MhCj4gUmljYXJkbwo+Cj4gUmljYXJkbyBLb2xsZXIgKDMpOgo+ICAgYXJtOiBwbXU6
-IEFkZCBtaXNzaW5nIGlzYigpJ3MgYWZ0ZXIgc3lzIHJlZ2lzdGVyIHdyaXRpbmcKPiAgIGFybTog
-cG11OiBSZXNldCB0aGUgcG11IHJlZ2lzdGVycyBiZWZvcmUgc3RhcnRpbmcgc29tZSB0ZXN0cwo+
-ICAgYXJtOiBwbXU6IENoZWNrIGZvciBvdmVyZmxvdyBpbiB0aGUgbG93IGNvdW50ZXIgaW4gY2hh
-aW5lZCBjb3VudGVycwo+ICAgICB0ZXN0cwo+Cj4gIGFybS9wbXUuYyB8IDU2ICsrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0KPiAgMSBmaWxlIGNo
-YW5nZWQsIDM5IGluc2VydGlvbnMoKyksIDE3IGRlbGV0aW9ucygtKQo+CldoaWxlIHRlc3Rpbmcg
-dGhpcyBzZXJpZXMgYW5kIHRoZSByZWxhdGVkICdbUEFUQ0ggMC85XSBLVk06IGFybTY0OiBQTVU6
-CkZpeGluZyBjaGFpbmVkIGV2ZW50cywgYW5kIFBNVXYzcDUgc3VwcG9ydCcgSSBub3RpY2VkIEkg
-aGF2ZSBrdm0gdW5pdAp0ZXN0IGZhaWx1cmVzIG9uIHNvbWUgbWFjaGluZXMuIFRoaXMgZG9lcyBu
-b3Qgc2VlbSByZWxhdGVkIHRvIHRob3NlCnNlcmllcyB0aG91Z2ggc2luY2UgSSB3YXMgYWJsZSB0
-byBnZXQgdGhlbSB3aXRob3V0LiBUaGUgZmFpbHVyZXMgaGFwcGVuCm9uIEFtYmVyd2luZyBtYWNo
-aW5lIGZvciBpbnN0YW5jZSB3aXRoIHRoZSBwbXUtY2hhaW4tcHJvbW90aW9uLgoKV2hpbGUgZnVy
-dGhlciBpbnZlc3RpZ2F0aW5nIEkgbm90aWNlZCB0aGVyZSBpcyBhIGxvdCBvZiB2YXJpYWJpbGl0
-eSBvbgp0aGUga3ZtIHVuaXQgdGVzdCBtZW1fYWNjZXNzX2xvb3AoKSBjb3VudC4gSSBjYW4gZ2V0
-IHRoZSBjb3VudGVyID0gMHgxRgpvbiB0aGUgZmlyc3QgaXRlcmF0aW9uIGFuZCAweDk2IG9uIHRo
-ZSBzdWJzZXF1ZW50IG9uZXMgZm9yIGluc3RhbmNlLgpXaGlsZSBydW5uaW5nIG1lbV9hY2Nlc3Nf
-bG9vcChhZGRyLCAyMCwgcG11LnBtY3Jfcm8gfCBQTVVfUE1DUl9FKSBJIHdhcwpleHBlY3Rpbmcg
-dGhlIGNvdW50ZXIgdG8gYmUgY2xvc2UgdG8gMjAuIEl0IGlzIG9uIHNvbWUgSFcuCgrCoMKgwqDC
-oMKgwqDCoCBmb3IgKGludCBpID0gMDsgaSA8IDIwOyBpKyspIHsKwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIHdyaXRlX3JlZ25fZWwwKHBtZXZ0eXBlciwgMCwgTUVNX0FDQ0VTUyB8ClBN
-RVZUWVBFUl9FWENMVURFX0VMMCk7CsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB3cml0
-ZV9zeXNyZWdfcygweDEsIFBNQ05URU5TRVRfRUwwKTsKwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIHdyaXRlX3JlZ25fZWwwKHBtZXZjbnRyLCAwLCAwKTsKwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIGlzYigpOwrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbWVtX2Fj
-Y2Vzc19sb29wKGFkZHIsIDIwLCBwbXUucG1jcl9ybyB8IFBNVV9QTUNSX0UpOwrCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgaXNiKCk7CsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCByZXBvcnRfaW5mbygiaXRlciAlZCwgTUVNX0FDQ0VTUyBjb3VudGVyICMwIGhhcyB2YWx1ZQow
-eCVseCIsCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCBpLCByZWFkX3JlZ25fZWwwKHBtZXZjbnRyLCAwKSk7CsKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCB3cml0ZV9zeXNyZWdfcygweDAsIFBNQ05URU5DTFJfRUwwKTsKwqDCoMKgwqDC
-oMKgwqAgfQoKW0kga25vdyB0aGVyZSBhcmUgc29tZSB1c2VsZXNzIGlzYidzIGJ5IHRoZSB3YXkg
-YnV0IHRoYXQncyBqdXN0IGRlYnVnIGNvZGUuXQoKZ2l2ZXMKCklORk86IFBNVSB2ZXJzaW9uOiAw
-eDEKSU5GTzogUE1VIGltcGxlbWVudGVyL0lEIGNvZGU6IDB4NTEoIlEiKS8wCklORk86IEltcGxl
-bWVudHMgOCBldmVudCBjb3VudGVycwpJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0
-ZXIgMCwgTUVNX0FDQ0VTUyBjb3VudGVyICMwIGhhcyB2YWx1ZQoweDFmCklORk86IHBtdTogcG11
-LWNoYWluLXByb21vdGlvbjogaXRlciAxLCBNRU1fQUNDRVNTIGNvdW50ZXIgIzAgaGFzIHZhbHVl
-CjB4OTYgPC0tLSA/CklORk86IHBtdTogcG11LWNoYWluLXByb21vdGlvbjogaXRlciAyLCBNRU1f
-QUNDRVNTIGNvdW50ZXIgIzAgaGFzIHZhbHVlIDB4OTYKSU5GTzogcG11OiBwbXUtY2hhaW4tcHJv
-bW90aW9uOiBpdGVyIDMsIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUgMHg5NgpJTkZP
-OiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgNCwgTUVNX0FDQ0VTUyBjb3VudGVyICMw
-IGhhcyB2YWx1ZSAweDk2CklORk86IHBtdTogcG11LWNoYWluLXByb21vdGlvbjogaXRlciA1LCBN
-RU1fQUNDRVNTIGNvdW50ZXIgIzAgaGFzIHZhbHVlIDB4OTYKSU5GTzogcG11OiBwbXUtY2hhaW4t
-cHJvbW90aW9uOiBpdGVyIDYsIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUgMHg5NgpJ
-TkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgNywgTUVNX0FDQ0VTUyBjb3VudGVy
-ICMwIGhhcyB2YWx1ZSAweDk2CklORk86IHBtdTogcG11LWNoYWluLXByb21vdGlvbjogaXRlciA4
-LCBNRU1fQUNDRVNTIGNvdW50ZXIgIzAgaGFzIHZhbHVlIDB4OTYKSU5GTzogcG11OiBwbXUtY2hh
-aW4tcHJvbW90aW9uOiBpdGVyIDksIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUgMHg5
-NgpJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgMTAsIE1FTV9BQ0NFU1MgY291
-bnRlciAjMCBoYXMgdmFsdWUKMHg5NgpJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0
-ZXIgMTEsIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUKMHg5NgpJTkZPOiBwbXU6IHBt
-dS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgMTIsIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFs
-dWUKMHg5NgpJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgMTMsIE1FTV9BQ0NF
-U1MgY291bnRlciAjMCBoYXMgdmFsdWUKMHg5NgpJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rp
-b246IGl0ZXIgMTQsIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUKMHg5NgpJTkZPOiBw
-bXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgMTUsIE1FTV9BQ0NFU1MgY291bnRlciAjMCBo
-YXMgdmFsdWUKMHg5NgpJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgMTYsIE1F
-TV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUKMHg5NgpJTkZPOiBwbXU6IHBtdS1jaGFpbi1w
-cm9tb3Rpb246IGl0ZXIgMTcsIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUKMHg5NgpJ
-TkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgMTgsIE1FTV9BQ0NFU1MgY291bnRl
-ciAjMCBoYXMgdmFsdWUKMHg5NgpJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIg
-MTksIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUKMHg5NgoKSWYgSSBydW4gdGhlIGZv
-bGxvd2luZyBzZXF1ZW5jZSBiZWZvcmUgdGhlIHByZXZpb3VzIG9uZToKwqDCoMKgwqDCoMKgwqAg
-Zm9yIChpbnQgaSA9IDA7IGkgPCAyMDsgaSsrKSB7CsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCB3cml0ZV9yZWduX2VsMChwbWV2dHlwZXIsIDAsIFNXX0lOQ1IgfApQTUVWVFlQRVJfRVhD
-TFVERV9FTDApOwrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgd3JpdGVfc3lzcmVnX3Mo
-MHgxLCBQTUNOVEVOU0VUX0VMMCk7CsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB3cml0
-ZV9yZWduX2VsMChwbWV2Y250ciwgMCwgMCk7CgrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgc2V0X3BtY3IocG11LnBtY3Jfcm8gfCBQTVVfUE1DUl9FKTsKwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIGZvciAoaW50IGogPSAwOyBqIDwgMjA7IGorKykKwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB3cml0ZV9zeXNyZWcoMHgxLCBwbXN3aW5j
-X2VsMCk7CsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzZXRfcG1jcihwbXUucG1jcl9y
-byk7CgrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmVwb3J0X2luZm8oIml0ZXIgJWQs
-IDIwIHggU1dfSU5DUnMgY291bnRlciAjMCBoYXMgdmFsdWUKMHglbHgiLArCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaSwgcmVhZF9yZWduX2Vs
-MChwbWV2Y250ciwgMCkpOwrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgd3JpdGVfc3lz
-cmVnX3MoMHgwLCBQTUNOVEVOQ0xSX0VMMCk7CsKgwqDCoMKgwqDCoMKgIH0KCkkgZ2V0CgpJTkZP
-OiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgMCwgMjAgeCBTV19JTkNScyBjb3VudGVy
-ICMwIGhhcwp2YWx1ZSAweDE0CklORk86IHBtdTogcG11LWNoYWluLXByb21vdGlvbjogaXRlciAx
-LCAyMCB4IFNXX0lOQ1JzIGNvdW50ZXIgIzAgaGFzCnZhbHVlIDB4MTQKSU5GTzogcG11OiBwbXUt
-Y2hhaW4tcHJvbW90aW9uOiBpdGVyIDIsIDIwIHggU1dfSU5DUnMgY291bnRlciAjMCBoYXMKdmFs
-dWUgMHgxNApJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgMywgMjAgeCBTV19J
-TkNScyBjb3VudGVyICMwIGhhcwp2YWx1ZSAweDE0CklORk86IHBtdTogcG11LWNoYWluLXByb21v
-dGlvbjogaXRlciA0LCAyMCB4IFNXX0lOQ1JzIGNvdW50ZXIgIzAgaGFzCnZhbHVlIDB4MTQKSU5G
-TzogcG11OiBwbXUtY2hhaW4tcHJvbW90aW9uOiBpdGVyIDUsIDIwIHggU1dfSU5DUnMgY291bnRl
-ciAjMCBoYXMKdmFsdWUgMHgxNApJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIg
-NiwgMjAgeCBTV19JTkNScyBjb3VudGVyICMwIGhhcwp2YWx1ZSAweDE0CklORk86IHBtdTogcG11
-LWNoYWluLXByb21vdGlvbjogaXRlciA3LCAyMCB4IFNXX0lOQ1JzIGNvdW50ZXIgIzAgaGFzCnZh
-bHVlIDB4MTQKSU5GTzogcG11OiBwbXUtY2hhaW4tcHJvbW90aW9uOiBpdGVyIDgsIDIwIHggU1df
-SU5DUnMgY291bnRlciAjMCBoYXMKdmFsdWUgMHgxNApJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9t
-b3Rpb246IGl0ZXIgOSwgMjAgeCBTV19JTkNScyBjb3VudGVyICMwIGhhcwp2YWx1ZSAweDE0CklO
-Rk86IHBtdTogcG11LWNoYWluLXByb21vdGlvbjogaXRlciAxMCwgMjAgeCBTV19JTkNScyBjb3Vu
-dGVyICMwIGhhcwp2YWx1ZSAweDE0CklORk86IHBtdTogcG11LWNoYWluLXByb21vdGlvbjogaXRl
-ciAxMSwgMjAgeCBTV19JTkNScyBjb3VudGVyICMwIGhhcwp2YWx1ZSAweDE0CklORk86IHBtdTog
-cG11LWNoYWluLXByb21vdGlvbjogaXRlciAxMiwgMjAgeCBTV19JTkNScyBjb3VudGVyICMwIGhh
-cwp2YWx1ZSAweDE0CklORk86IHBtdTogcG11LWNoYWluLXByb21vdGlvbjogaXRlciAxMywgMjAg
-eCBTV19JTkNScyBjb3VudGVyICMwIGhhcwp2YWx1ZSAweDE0CklORk86IHBtdTogcG11LWNoYWlu
-LXByb21vdGlvbjogaXRlciAxNCwgMjAgeCBTV19JTkNScyBjb3VudGVyICMwIGhhcwp2YWx1ZSAw
-eDE0CklORk86IHBtdTogcG11LWNoYWluLXByb21vdGlvbjogaXRlciAxNSwgMjAgeCBTV19JTkNS
-cyBjb3VudGVyICMwIGhhcwp2YWx1ZSAweDE0CklORk86IHBtdTogcG11LWNoYWluLXByb21vdGlv
-bjogaXRlciAxNiwgMjAgeCBTV19JTkNScyBjb3VudGVyICMwIGhhcwp2YWx1ZSAweDE0CklORk86
-IHBtdTogcG11LWNoYWluLXByb21vdGlvbjogaXRlciAxNywgMjAgeCBTV19JTkNScyBjb3VudGVy
-ICMwIGhhcwp2YWx1ZSAweDE0CklORk86IHBtdTogcG11LWNoYWluLXByb21vdGlvbjogaXRlciAx
-OCwgMjAgeCBTV19JTkNScyBjb3VudGVyICMwIGhhcwp2YWx1ZSAweDE0CklORk86IHBtdTogcG11
-LWNoYWluLXByb21vdGlvbjogaXRlciAxOSwgMjAgeCBTV19JTkNScyBjb3VudGVyICMwIGhhcwp2
-YWx1ZSAweDE0CklORk86IHBtdTogcG11LWNoYWluLXByb21vdGlvbjogaXRlciAwLCBNRU1fQUND
-RVNTIGNvdW50ZXIgIzAgaGFzIHZhbHVlCjB4OTYgPC0tLQpJTkZPOiBwbXU6IHBtdS1jaGFpbi1w
-cm9tb3Rpb246IGl0ZXIgMSwgTUVNX0FDQ0VTUyBjb3VudGVyICMwIGhhcyB2YWx1ZSAweDk2CklO
-Rk86IHBtdTogcG11LWNoYWluLXByb21vdGlvbjogaXRlciAyLCBNRU1fQUNDRVNTIGNvdW50ZXIg
-IzAgaGFzIHZhbHVlIDB4OTYKSU5GTzogcG11OiBwbXUtY2hhaW4tcHJvbW90aW9uOiBpdGVyIDMs
-IE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUgMHg5NgpJTkZPOiBwbXU6IHBtdS1jaGFp
-bi1wcm9tb3Rpb246IGl0ZXIgNCwgTUVNX0FDQ0VTUyBjb3VudGVyICMwIGhhcyB2YWx1ZSAweDk2
-CklORk86IHBtdTogcG11LWNoYWluLXByb21vdGlvbjogaXRlciA1LCBNRU1fQUNDRVNTIGNvdW50
-ZXIgIzAgaGFzIHZhbHVlIDB4OTYKSU5GTzogcG11OiBwbXUtY2hhaW4tcHJvbW90aW9uOiBpdGVy
-IDYsIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUgMHg5NgpJTkZPOiBwbXU6IHBtdS1j
-aGFpbi1wcm9tb3Rpb246IGl0ZXIgNywgTUVNX0FDQ0VTUyBjb3VudGVyICMwIGhhcyB2YWx1ZSAw
-eDk2CklORk86IHBtdTogcG11LWNoYWluLXByb21vdGlvbjogaXRlciA4LCBNRU1fQUNDRVNTIGNv
-dW50ZXIgIzAgaGFzIHZhbHVlIDB4OTYKSU5GTzogcG11OiBwbXUtY2hhaW4tcHJvbW90aW9uOiBp
-dGVyIDksIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUgMHg5NgpJTkZPOiBwbXU6IHBt
-dS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgMTAsIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFs
-dWUKMHg5NgpJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgMTEsIE1FTV9BQ0NF
-U1MgY291bnRlciAjMCBoYXMgdmFsdWUKMHg5NgpJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rp
-b246IGl0ZXIgMTIsIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUKMHg5NgpJTkZPOiBw
-bXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgMTMsIE1FTV9BQ0NFU1MgY291bnRlciAjMCBo
-YXMgdmFsdWUKMHg5NgpJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgMTQsIE1F
-TV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUKMHg5NgpJTkZPOiBwbXU6IHBtdS1jaGFpbi1w
-cm9tb3Rpb246IGl0ZXIgMTUsIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUKMHg5NgpJ
-TkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgMTYsIE1FTV9BQ0NFU1MgY291bnRl
-ciAjMCBoYXMgdmFsdWUKMHg5NgpJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIg
-MTcsIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUKMHg5NgpJTkZPOiBwbXU6IHBtdS1j
-aGFpbi1wcm9tb3Rpb246IGl0ZXIgMTgsIE1FTV9BQ0NFU1MgY291bnRlciAjMCBoYXMgdmFsdWUK
-MHg5NgpJTkZPOiBwbXU6IHBtdS1jaGFpbi1wcm9tb3Rpb246IGl0ZXIgMTksIE1FTV9BQ0NFU1Mg
-Y291bnRlciAjMCBoYXMgdmFsdWUKMHg5NgoKU28gSSBjb21lIHRvIHRoZSBhY3R1YWwgcXVlc3Rp
-b24uIENhbiB3ZSBkbyBhbnkgYXNzdW1wdGlvbiBvbiB0aGUKKHZpcnR1YWwpIFBNVSBxdWFsaXR5
-L3ByZWNpc2lvbj8gSWYgbm90LCB0aGUgdGVzdHMgSSBvcmlnaW5hbGx5IHdyb3RlCmFyZSBkYW1u
-ZWQgdG8gZmFpbCBvbiBzb21lIEhXIChvbiBzb21lIG90aGVyIHRoZXkgYWx3YXlzIHBhc3MpIGFu
-ZCBJCm5lZWQgdG8gbWFrZSBhIGRlY2lzaW9uIHdydCByZS13cml0aW5nIHBhcnQgb2YgdGhlbSwg
-ZXhwZWNpYWxseSB0aG9zZQp3aGljaCBleHBlY3Qgb3ZlcmZsb3cgYWZ0ZXIgYSBnaXZlbiBhbW91
-bnQgb2Ygb3BzLiBPdGhlcndpc2UsIHRoZXJlIGlzCmVpdGhlciBzb21ldGhpbmcgd3JvbmcgaW4g
-dGhlIHRlc3QgKGFzbT8pIG9yIGluIEtWTSBQTVUgZW11bGF0aW9uLgoKSSB0cmllZCB0byBiaXNl
-Y3QgYmVjYXVzZSBJIGRpZCBvYnNlcnZlIHRoZSBzYW1lIGJlaGF2aW9yIG9uIHNvbWUgb2xkZXIK
-a2VybmVscyBidXQgdGhlIGJpc2VjdCB3YXMgbm90IHN1Y2Nlc3NmdWwgYXMgdGhlIGlzc3VlIGRv
-ZXMgbm90IGhhcHBlbgphbHdheXMuCgpUaG91Z2h0cz8KCkVyaWMKCgoKCgoKCgpfX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0
-Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5l
-ZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Hi Eric,
+
+On Tue, Oct 04, 2022 at 06:20:23PM +0200, Eric Auger wrote:
+> Hi Ricardo, Marc,
+> 
+> On 8/5/22 02:41, Ricardo Koller wrote:
+> > There are some tests that fail when running on bare metal (including a
+> > passthrough prototype).  There are three issues with the tests.  The
+> > first one is that there are some missing isb()'s between enabling event
+> > counting and the actual counting. This wasn't an issue on KVM as
+> > trapping on registers served as context synchronization events. The
+> > second issue is that some tests assume that registers reset to 0.  And
+> > finally, the third issue is that overflowing the low counter of a
+> > chained event sets the overflow flag in PMVOS and some tests fail by
+> > checking for it not being set.
+> >
+> > Addressed all comments from the previous version:
+> > https://lore.kernel.org/kvmarm/20220803182328.2438598-1-ricarkol@google.com/T/#t
+> > - adding missing isb() and fixed the commit message (Alexandru).
+> > - fixed wording of a report() check (Andrew).
+> >
+> > Thanks!
+> > Ricardo
+> >
+> > Ricardo Koller (3):
+> >   arm: pmu: Add missing isb()'s after sys register writing
+> >   arm: pmu: Reset the pmu registers before starting some tests
+> >   arm: pmu: Check for overflow in the low counter in chained counters
+> >     tests
+> >
+> >  arm/pmu.c | 56 ++++++++++++++++++++++++++++++++++++++-----------------
+> >  1 file changed, 39 insertions(+), 17 deletions(-)
+> >
+> While testing this series and the related '[PATCH 0/9] KVM: arm64: PMU:
+> Fixing chained events, and PMUv3p5 support' I noticed I have kvm unit
+> test failures on some machines. This does not seem related to those
+> series though since I was able to get them without. The failures happen
+> on Amberwing machine for instance with the pmu-chain-promotion.
+> 
+> While further investigating I noticed there is a lot of variability on
+> the kvm unit test mem_access_loop() count. I can get the counter = 0x1F
+> on the first iteration and 0x96 on the subsequent ones for instance.
+> While running mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E) I was
+> expecting the counter to be close to 20. It is on some HW.
+> 
+> [..]
+> 
+> So I come to the actual question. Can we do any assumption on the
+> (virtual) PMU quality/precision? If not, the tests I originally wrote
+> are damned to fail on some HW (on some other they always pass) and I
+> need to make a decision wrt re-writing part of them, expecially those
+> which expect overflow after a given amount of ops. Otherwise, there is
+> either something wrong in the test (asm?) or in KVM PMU emulation.
+> 
+> I tried to bisect because I did observe the same behavior on some older
+> kernels but the bisect was not successful as the issue does not happen
+> always.
+> 
+> Thoughts?
+
+Looking at mem_access_loop(), the first thing that jumps out is the fact
+that is missing a DSB barrier. ISB affects only instructions, not memory
+accesses and without a DSB, the PE can reorder memory accesses however it
+sees fit.
+
+I also believe precise_instrs_loop() to be in the same situation, as the
+architecture doesn't guarantee that the cycle counter increments after
+every CPU cycle (ARM DDI 0487I.a, page D11-5246):
+
+"Although the architecture requires that direct reads of PMCCNTR_EL0 or
+PMCCNTR occur in program order, there is no requirement that the count
+increments between two such reads. Even when the counter is incrementing on
+every clock cycle, software might need check that the difference between
+two reads of the counter is nonzero."
+
+There's also an entire section in ARM DDI 0487I.a dedicated to this, titled
+"A reasonable degree of inaccuracy" (page D11-5248). I'll post some
+snippets that I found interesting, but there are more examples and
+explanations to be found in that chapter.
+
+"In exceptional circumstances, such as a change in Security state or other
+boundary condition, it is acceptable for the count to be inaccurate."
+
+PMCR writes are trapped by KVM. Is a change in exception level an
+"exception circumstance"? Could be, but couldn't find anything definitive.
+For example, the architecture allows an implementation to drop an event in
+the case of an interrupt:
+
+"However, dropping a single branch count as the result of a rare
+interaction with an interrupt is acceptable."
+
+So events could definitely be dropped because of an interrupt for the host.
+
+And there's also this:
+
+"The imprecision means that the counter might have counted an event around
+the time the counter was disabled, but does not allow the event to be
+observed as counted after the counter was disabled."
+
+If you want my opinion, if it is necessary to count the number of events
+for a test instead, I would define a margin of error on the number of
+events counted. Or the test could be changed to check that at least one
+such event was observed.
+
+Thanks,
+Alex
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
