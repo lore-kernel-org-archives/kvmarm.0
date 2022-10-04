@@ -1,252 +1,264 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A8828E1
-	for <kvmarm@lists.linux.dev>; Mon,  3 Oct 2022 19:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AC37B
+	for <kvmarm@lists.linux.dev>; Tue,  4 Oct 2022 04:26:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1664825957;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=mimecast20190719; t=1664857596;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sQIFh9E1moB39O9uswnxNRAhNBaWxumvBbogR1iYCAU=;
-	b=ESwqhdz8k9bkCE1O1hMhT4xBUVgjTkKB8DO4LoTT2w7JlrMttWn8oFDtzjewoID4xpBxA9
-	bcW8yXYgV0NCR35kncwSMKGSPZlbf/E+k5fUUpb0+39DbHbkPskNp1EPYeyXuDumJWn7bJ
-	hMN1IzLk9H5mhREXOfnR5ykmMpgn4eA=
-Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com
- [209.85.221.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-536-lGb-8jtoPXClPR4oXlj_Gg-1; Mon, 03 Oct 2022 15:39:16 -0400
-X-MC-Unique: lGb-8jtoPXClPR4oXlj_Gg-1
-Received: by mail-vk1-f200.google.com with SMTP id w6-20020a1f9406000000b00388997b8d31so2556668vkd.3
-        for <kvmarm@lists.linux.dev>; Mon, 03 Oct 2022 12:39:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=sQIFh9E1moB39O9uswnxNRAhNBaWxumvBbogR1iYCAU=;
-        b=DRbh3r2bLTQJmYH/ThEDXJboLbc0l5PSEcvKnBwthjj3FGBiaHwo63ORIGqYXZ6vcI
-         0W6VmIdRBVCZra8ilVFSMKwu8KQ0vEJh6xpd6ku5TNvff/3ivG8b4uKYdUgnhUzhqtT5
-         fca6iGwb0h2usdkrV4NK8cLK/ZvziwbMUMTk+9j00udJY9yYVNr5DqBsaqtpPG0ERp5Y
-         kjJWbxHWBU3QbXWhZx9+b3IBBKcr/s5nl8at0R+/cYeqE6EnWBJsa3WyLMd0s8MtTL4j
-         SJOrr6K6av0y8YFLDSU31OdgRJ9s/uaDZc3aVL51pjqCRdpLYQd9VEniCEUFz7KUsyyg
-         VeeA==
-X-Gm-Message-State: ACrzQf0/qzzubCih3cFpLlwl2g05fWYeCe/yagBj3hUvINC193srpXKA
-	ADTJR6F7UDGoG6yeqDx2Q3TpcKWbwCRr6W/uuVAGGVjMQUkaBiKV4OLF6VyZUtALQiuXNXWaQ2C
-	ajcaT4ZLQ+lolrrOXwtCNTQjspV80Z7du
-X-Received: by 2002:a05:6102:348:b0:3a6:4240:6d3e with SMTP id e8-20020a056102034800b003a642406d3emr4087675vsa.16.1664825955775;
-        Mon, 03 Oct 2022 12:39:15 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7jQI2r9QR9nix+Dwc7/OqcC7ZH5vng9wtOftG5PhvwZ9SzH/GR8GdWmLrB4C9LUHkfdIn7rWyXRjButK0bUFY=
-X-Received: by 2002:a05:6102:348:b0:3a6:4240:6d3e with SMTP id
- e8-20020a056102034800b003a642406d3emr4087660vsa.16.1664825955481; Mon, 03 Oct
- 2022 12:39:15 -0700 (PDT)
+	bh=05h8B9w2V62qixWboLULG6QdqKZmIu7qdfGd+YVJUtQ=;
+	b=alEZz8pwo5AoQ3mh4ZhwwAQfIpZ4/WiKtMHYjP7kGew8GPCCNd8tNL/IhjJe4sxe7vwy9K
+	+QUBK7drAH4Ebzp0dYXKPdo7tNK39VqOsV5rbPK+PHDyJccfl6X75pC/EI3lY7idwTI947
+	frdo1y5xw40ukVSAtSQMRVZ4NIPSMGY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-147-mt-LICemPEejFtyt_9QPdQ-1; Tue, 04 Oct 2022 00:26:33 -0400
+X-MC-Unique: mt-LICemPEejFtyt_9QPdQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 41784811E67;
+	Tue,  4 Oct 2022 04:26:32 +0000 (UTC)
+Received: from [10.64.54.56] (vpn2-54-56.bne.redhat.com [10.64.54.56])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DB24B40C6EC2;
+	Tue,  4 Oct 2022 04:26:25 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Enable ring-based dirty memory
+ tracking
+To: Marc Zyngier <maz@kernel.org>
+Cc: Peter Xu <peterx@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+ shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org,
+ dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
+ shan.gavin@gmail.com, james.morse@arm.com, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev
+References: <20220927005439.21130-1-gshan@redhat.com>
+ <20220927005439.21130-4-gshan@redhat.com> <YzMerD8ZvhvnprEN@x1n>
+ <86sfkc7mg8.wl-maz@kernel.org> <YzM/DFV1TgtyRfCA@x1n>
+ <320005d1-fe88-fd6a-be91-ddb56f1aa80f@redhat.com>
+ <87y1u3hpmp.wl-maz@kernel.org> <YzRfkBWepX2CD88h@x1n>
+ <d0beb9bd-5295-adb6-a473-c131d6102947@redhat.com>
+ <86fsga6y40.wl-maz@kernel.org>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <8b82ef3d-16ab-0aee-b464-8ad9b3718028@redhat.com>
+Date: Tue, 4 Oct 2022 12:26:23 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20221002124219.3902661-1-maz@kernel.org>
-In-Reply-To: <20221002124219.3902661-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 3 Oct 2022 21:39:04 +0200
-Message-ID: <CABgObfZzD-2yiu67RAzNDH6UieCihoc5_e1OVTeUsXRFBMQ+0Q@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 updates for 6.1
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Elliot Berman <quic_eberman@quicinc.com>, 
-	Gavin Shan <gshan@redhat.com>, Kristina Martsenko <kristina.martsenko@arm.com>, 
-	Mark Brown <broonie@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Peter Xu <peterx@redhat.com>, Reiji Watanabe <reijiw@google.com>, 
-	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>, Will Deacon <will@kernel.org>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, kvmarm@lists.cs.columbia.edu, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221003193904.HAScOCxz4Ub2VoU5WaTb9GeamK2UQjCVxsQb-KQue6E@z>
+In-Reply-To: <86fsga6y40.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Message-ID: <20221004042623.pT-s-GPH7Xt347iF38uf8Xlau8qUVLBIJV8Tuxs7uIs@z>
 
-Pulled, thanks!
+Hi Marc,
 
-Paolo
+On 9/29/22 10:42 PM, Marc Zyngier wrote:
+> On Thu, 29 Sep 2022 10:50:12 +0100,
+> Gavin Shan <gshan@redhat.com> wrote:
+>> On 9/29/22 12:52 AM, Peter Xu wrote:
+>>> On Wed, Sep 28, 2022 at 09:25:34AM +0100, Marc Zyngier wrote:
+>>>> On Wed, 28 Sep 2022 00:47:43 +0100,
+>>>> Gavin Shan <gshan@redhat.com> wrote:
+>>>>
+>>>>> I have rough idea as below. It's appreciated if you can comment before I'm
+>>>>> going a head for the prototype. The overall idea is to introduce another
+>>>>> dirty ring for KVM (kvm-dirty-ring). It's updated and visited separately
+>>>>> to dirty ring for vcpu (vcpu-dirty-ring).
+>>>>>
+>>>>>      - When the various VGIC/ITS table base addresses are specified, kvm-dirty-ring
+>>>>>        entries are added to mark those pages as 'always-dirty'. In mark_page_dirty_in_slot(),
+>>>>>        those 'always-dirty' pages will be skipped, no entries pushed to vcpu-dirty-ring.
+>>>>>
+>>>>>      - Similar to vcpu-dirty-ring, kvm-dirty-ring is accessed from userspace through
+>>>>>        mmap(kvm->fd). However, there won't have similar reset interface. It means
+>>>>>        'struct kvm_dirty_gfn::flags' won't track any information as we do for
+>>>>>        vcpu-dirty-ring. In this regard, kvm-dirty-ring is purely shared buffer to
+>>>>>        advertise 'always-dirty' pages from host to userspace.
+>>>>>           - For QEMU, shutdown/suspend/resume cases won't be concerning
+>>>>> us any more. The
+>>>>>        only concerned case is migration. When the migration is about to complete,
+>>>>>        kvm-dirty-ring entries are fetched and the dirty bits are updated to global
+>>>>>        dirty page bitmap and RAMBlock's dirty page bitmap. For this, I'm still reading
+>>>>>        the code to find the best spot to do it.
+>>>>
+>>>> I think it makes a lot of sense to have a way to log writes that are
+>>>> not generated by a vpcu, such as the GIC and maybe other things in the
+>>>> future, such as DMA traffic (some SMMUs are able to track dirty pages
+>>>> as well).
+>>>>
+>>>> However, I don't really see the point in inventing a new mechanism for
+>>>> that. Why don't we simply allow non-vpcu dirty pages to be tracked in
+>>>> the dirty *bitmap*?
+>>>>
+>>>>   From a kernel perspective, this is dead easy:
+>>>>
+>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>>>> index 5b064dbadaf4..ae9138f29d51 100644
+>>>> --- a/virt/kvm/kvm_main.c
+>>>> +++ b/virt/kvm/kvm_main.c
+>>>> @@ -3305,7 +3305,7 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>>>>    	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+>>>>      #ifdef CONFIG_HAVE_KVM_DIRTY_RING
+>>>> -	if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
+>>>> +	if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
+>>>>    		return;
+>>>>    #endif
+>>>>    @@ -3313,10 +3313,11 @@ void mark_page_dirty_in_slot(struct kvm
+>>>> *kvm,
+>>>>    		unsigned long rel_gfn = gfn - memslot->base_gfn;
+>>>>    		u32 slot = (memslot->as_id << 16) | memslot->id;
+>>>>    -		if (kvm->dirty_ring_size)
+>>>> +		if (vpcu && kvm->dirty_ring_size)
+>>>>    			kvm_dirty_ring_push(&vcpu->dirty_ring,
+>>>>    					    slot, rel_gfn);
+>>>> -		else
+>>>> +		/* non-vpcu dirtying ends up in the global bitmap */
+>>>> +		if (!vcpu && memslot->dirty_bitmap)
+>>>>    			set_bit_le(rel_gfn, memslot->dirty_bitmap);
+>>>>    	}
+>>>>    }
+>>>>
+>>>> though I'm sure there is a few more things to it.
+>>>
+>>> Yes, currently the bitmaps are not created when rings are enabled.
+>>> kvm_prepare_memory_region() has:
+>>>
+>>> 		else if (!kvm->dirty_ring_size) {
+>>> 			r = kvm_alloc_dirty_bitmap(new);
+>>>
+>>> But I think maybe that's a solution worth considering.  Using the rings
+>>> have a major challenge on the limitation of ring size, so that for e.g. an
+>>> ioctl we need to make sure the pages to dirty within an ioctl procedure
+>>> will not be more than the ring can take.  Using dirty bitmap for a last
+>>> phase sync of constant (but still very small amount of) dirty pages does
+>>> sound reasonable and can avoid that complexity.  The payoff is we'll need
+>>> to allocate both the rings and the bitmaps.
+>>>
+>>
+>> Ok. I was thinking of using the bitmap to convey the dirty pages for
+>> this particular case, where we don't have running vcpu. The concern I had
+>> is the natural difference between a ring and bitmap. The ring-buffer is
+>> discrete, comparing to bitmap. Besides, it sounds a little strange to
+>> have two different sets of meta-data to track the data (dirty pages).
+> 
+> The problem is that the dirty ring mechanism is a bit blinkered, and
+> cannot consider a source of dirty pages other than from the vcpus.
+> 
 
-On Sun, Oct 2, 2022 at 2:42 PM Marc Zyngier <maz@kernel.org> wrote:
->
-> Paolo,
->
-> Please find below the rather small set of KVM/arm64 updates
-> for 6.1. This is mostly a set of fixes for existing features,
-> the most interesting one being Reiji's really good work tracking
-> an annoying set of bugs in our single-stepping implementation.
-> Also, I've included the changes making it possible to enable
-> the dirty-ring tracking on arm64. Full details in the tag.
->
-> Note that this pull-request comes with a branch shared with the
-> arm64 tree, in order to avoid some bad conflicts due to the
-> ongoing repainting of all the system registers.
->
-> Please pull,
->
->         M.
->
-> The following changes since commit b90cb1053190353cc30f0fef0ef1f378ccc063c5:
->
->   Linux 6.0-rc3 (2022-08-28 15:05:29 -0700)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-6.1
->
-> for you to fetch changes up to b302ca52ba8235ff0e18c0fa1fa92b51784aef6a:
->
->   Merge branch kvm-arm64/misc-6.1 into kvmarm-master/next (2022-10-01 10:19:36 +0100)
->
-> ----------------------------------------------------------------
-> KVM/arm64 updates for v6.1
->
-> - Fixes for single-stepping in the presence of an async
->   exception as well as the preservation of PSTATE.SS
->
-> - Better handling of AArch32 ID registers on AArch64-only
->   systems
->
-> - Fixes for the dirty-ring API, allowing it to work on
->   architectures with relaxed memory ordering
->
-> - Advertise the new kvmarm mailing list
->
-> - Various minor cleanups and spelling fixes
->
-> ----------------------------------------------------------------
-> Elliot Berman (1):
->       KVM: arm64: Ignore kvm-arm.mode if !is_hyp_mode_available()
->
-> Gavin Shan (1):
->       KVM: arm64: vgic: Remove duplicate check in update_affinity_collection()
->
-> Kristina Martsenko (3):
->       arm64: cache: Remove unused CTR_CACHE_MINLINE_MASK
->       arm64/sysreg: Standardise naming for ID_AA64MMFR1_EL1 fields
->       arm64/sysreg: Convert ID_AA64MMFR1_EL1 to automatic generation
->
-> Marc Zyngier (12):
->       Merge branch kvm-arm64/aarch32-raz-idregs into kvmarm-master/next
->       Merge remote-tracking branch 'arm64/for-next/sysreg' into kvmarm-master/next
->       Merge branch kvm-arm64/single-step-async-exception into kvmarm-master/next
->       KVM: Use acquire/release semantics when accessing dirty ring GFN state
->       KVM: Add KVM_CAP_DIRTY_LOG_RING_ACQ_REL capability and config option
->       KVM: x86: Select CONFIG_HAVE_KVM_DIRTY_RING_ACQ_REL
->       KVM: Document weakly ordered architecture requirements for dirty ring
->       KVM: selftests: dirty-log: Upgrade flag accesses to acquire/release semantics
->       KVM: selftests: dirty-log: Use KVM_CAP_DIRTY_LOG_RING_ACQ_REL if available
->       KVM: arm64: Advertise new kvmarm mailing list
->       Merge branch kvm-arm64/dirty-log-ordered into kvmarm-master/next
->       Merge branch kvm-arm64/misc-6.1 into kvmarm-master/next
->
-> Mark Brown (31):
->       arm64/sysreg: Remove stray SMIDR_EL1 defines
->       arm64/sysreg: Describe ID_AA64SMFR0_EL1.SMEVer as an enumeration
->       arm64/sysreg: Add _EL1 into ID_AA64MMFR0_EL1 definition names
->       arm64/sysreg: Add _EL1 into ID_AA64MMFR2_EL1 definition names
->       arm64/sysreg: Add _EL1 into ID_AA64PFR0_EL1 definition names
->       arm64/sysreg: Add _EL1 into ID_AA64PFR1_EL1 constant names
->       arm64/sysreg: Standardise naming of ID_AA64MMFR0_EL1.BigEnd
->       arm64/sysreg: Standardise naming of ID_AA64MMFR0_EL1.ASIDBits
->       arm64/sysreg: Standardise naming for ID_AA64MMFR2_EL1.VARange
->       arm64/sysreg: Standardise naming for ID_AA64MMFR2_EL1.CnP
->       arm64/sysreg: Standardise naming for ID_AA64PFR0_EL1 constants
->       arm64/sysreg: Standardise naming for ID_AA64PFR0_EL1.AdvSIMD constants
->       arm64/sysreg: Standardise naming for SSBS feature enumeration
->       arm64/sysreg: Standardise naming for MTE feature enumeration
->       arm64/sysreg: Standardise naming of ID_AA64PFR1_EL1 fractional version fields
->       arm64/sysreg: Standardise naming of ID_AA64PFR1_EL1 BTI enumeration
->       arm64/sysreg: Standardise naming of ID_AA64PFR1_EL1 SME enumeration
->       arm64/sysreg: Convert HCRX_EL2 to automatic generation
->       arm64/sysreg: Convert ID_AA64MMFR0_EL1 to automatic generation
->       arm64/sysreg: Convert ID_AA64MMFR2_EL1 to automatic generation
->       arm64/sysreg: Convert ID_AA64PFR0_EL1 to automatic generation
->       arm64/sysreg: Convert ID_AA64PFR1_EL1 to automatic generation
->       arm64/sysreg: Convert TIPDR_EL1 to automatic generation
->       arm64/sysreg: Convert SCXTNUM_EL1 to automatic generation
->       arm64/sysreg: Add defintion for ALLINT
->       arm64/sysreg: Align field names in ID_AA64DFR0_EL1 with architecture
->       arm64/sysreg: Add _EL1 into ID_AA64DFR0_EL1 definition names
->       arm64/sysreg: Use feature numbering for PMU and SPE revisions
->       arm64/sysreg: Convert ID_AA64FDR0_EL1 to automatic generation
->       arm64/sysreg: Convert ID_AA64DFR1_EL1 to automatic generation
->       arm64/sysreg: Convert ID_AA64AFRn_EL1 to automatic generation
->
-> Oliver Upton (8):
->       KVM: arm64: Use visibility hook to treat ID regs as RAZ
->       KVM: arm64: Remove internal accessor helpers for id regs
->       KVM: arm64: Drop raz parameter from read_id_reg()
->       KVM: arm64: Spin off helper for calling visibility hook
->       KVM: arm64: Add a visibility bit to ignore user writes
->       KVM: arm64: Treat 32bit ID registers as RAZ/WI on 64bit-only system
->       KVM: selftests: Add test for AArch32 ID registers
->       KVM: selftests: Update top-of-file comment in psci_test
->
-> Reiji Watanabe (4):
->       KVM: arm64: Preserve PSTATE.SS for the guest while single-step is enabled
->       KVM: arm64: Clear PSTATE.SS when the Software Step state was Active-pending
->       KVM: arm64: selftests: Refactor debug-exceptions to make it amenable to new test cases
->       KVM: arm64: selftests: Add a test case for KVM_GUESTDBG_SINGLESTEP
->
-> Wei-Lin Chang (1):
->       KVM: arm64: Fix comment typo in nvhe/switch.c
->
->  Documentation/virt/kvm/api.rst                     |  17 +-
->  MAINTAINERS                                        |   3 +-
->  arch/arm64/include/asm/assembler.h                 |  10 +-
->  arch/arm64/include/asm/cache.h                     |   4 -
->  arch/arm64/include/asm/cpufeature.h                |  66 +--
->  arch/arm64/include/asm/el2_setup.h                 |  18 +-
->  arch/arm64/include/asm/hw_breakpoint.h             |   4 +-
->  arch/arm64/include/asm/kvm_host.h                  |   4 +
->  arch/arm64/include/asm/kvm_pgtable.h               |   6 +-
->  arch/arm64/include/asm/sysreg.h                    | 211 ++--------
->  arch/arm64/kernel/cpufeature.c                     | 238 +++++------
->  arch/arm64/kernel/debug-monitors.c                 |   2 +-
->  arch/arm64/kernel/head.S                           |  10 +-
->  arch/arm64/kernel/hyp-stub.S                       |   8 +-
->  arch/arm64/kernel/idreg-override.c                 |  10 +-
->  arch/arm64/kernel/perf_event.c                     |   8 +-
->  arch/arm64/kernel/proton-pack.c                    |   4 +-
->  arch/arm64/kvm/arm.c                               |  15 +-
->  arch/arm64/kvm/debug.c                             |  38 +-
->  arch/arm64/kvm/guest.c                             |   1 +
->  arch/arm64/kvm/handle_exit.c                       |   8 +-
->  arch/arm64/kvm/hyp/include/nvhe/fixed_config.h     |  60 +--
->  arch/arm64/kvm/hyp/nvhe/pkvm.c                     |  38 +-
->  arch/arm64/kvm/hyp/nvhe/switch.c                   |   2 +-
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c                 |  10 +-
->  arch/arm64/kvm/hyp/pgtable.c                       |   2 +-
->  arch/arm64/kvm/pmu-emul.c                          |  16 +-
->  arch/arm64/kvm/reset.c                             |  12 +-
->  arch/arm64/kvm/sys_regs.c                          | 198 +++++----
->  arch/arm64/kvm/sys_regs.h                          |  24 +-
->  arch/arm64/kvm/vgic/vgic-its.c                     |   2 +-
->  arch/arm64/mm/context.c                            |   6 +-
->  arch/arm64/mm/init.c                               |   2 +-
->  arch/arm64/mm/mmu.c                                |   2 +-
->  arch/arm64/mm/proc.S                               |   4 +-
->  arch/arm64/tools/sysreg                            | 449 ++++++++++++++++++++-
->  arch/x86/kvm/Kconfig                               |   3 +-
->  drivers/firmware/efi/libstub/arm64-stub.c          |   4 +-
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c    |   6 +-
->  drivers/irqchip/irq-gic-v4.c                       |   2 +-
->  include/uapi/linux/kvm.h                           |   1 +
->  tools/testing/selftests/kvm/.gitignore             |   1 +
->  tools/testing/selftests/kvm/Makefile               |   1 +
->  .../selftests/kvm/aarch64/aarch32_id_regs.c        | 169 ++++++++
->  .../selftests/kvm/aarch64/debug-exceptions.c       | 149 ++++++-
->  tools/testing/selftests/kvm/aarch64/psci_test.c    |  10 +-
->  tools/testing/selftests/kvm/dirty_log_test.c       |   8 +-
->  tools/testing/selftests/kvm/lib/kvm_util.c         |   5 +-
->  virt/kvm/Kconfig                                   |  14 +
->  virt/kvm/dirty_ring.c                              |   4 +-
->  virt/kvm/kvm_main.c                                |   9 +-
->  51 files changed, 1294 insertions(+), 604 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c
->
+Ok.
+
+>> However, bitmap is easier way than per-vm ring. The constrains with
+>> per-vm ring is just as Peter pointed. So lets reuse the bitmap to
+>> convey the dirty pages for this particular case. I think the payoff,
+>> extra bitmap, is acceptable. For this, we need another capability
+>> (KVM_CAP_DIRTY_LOG_RING_BITMAP?) so that QEMU can collects the dirty
+>> bitmap in the last phase of migration.
+> 
+> Why another capability? Just allowing dirty logging to be enabled
+> before we saving the GIC state should be enough, shouldn't it?
+> 
+
+The GIC state would be just one case where no vcpu can be used to push
+dirty page information. As you mentioned, SMMMU HTTU feature could possibly
+be another case to ARM64. It's uncertain about other architectures where
+dirty-ring will be supported. In QEMU, the dirty (bitmap) logging is enabled
+at the beginning of migration and the bitmap is synchronized to global
+dirty bitmap and RAMBlock's dirty bitmap gradually, as the following
+backtrace shows. What we need to do for QEMU is probably retrieve the
+bitmap at point (A).
+
+Without the new capability, we will have to rely on the return value
+from ioctls KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG to detect the
+capability. For example, -ENXIO is returned on old kernels.
+
+    migration_thread
+      qemu_savevm_state_setup
+        ram_save_setup
+          ram_init_all
+            ram_init_bitmaps
+              memory_global_dirty_log_start(GLOBAL_DIRTY_MIGRATION)   // dirty logging enabled
+              migration_bitmap_sync_precopy(rs)
+        :
+      migration_iteration_run                                         // iteration 0
+        qemu_savevm_state_pending
+          migration_bitmap_sync_precopy
+        qemu_savevm_state_iterate
+          ram_save_iterate
+      migration_iteration_run                                        // iteration 1
+        qemu_savevm_state_pending
+          migration_bitmap_sync_precopy
+        qemu_savevm_state_iterate
+          ram_save_iterate
+      migration_iteration_run                                        // iteration 2
+        qemu_savevm_state_pending
+          migration_bitmap_sync_precopy
+        qemu_savevm_state_iterate
+          ram_save_iterate
+        :
+      migration_iteration_run                                       // iteration N
+        qemu_savevm_state_pending
+          migration_bitmap_sync_precopy
+        migration_completion
+          qemu_savevm_state_complete_precopy
+            qemu_savevm_state_complete_precopy_iterable
+              ram_save_complete
+                migration_bitmap_sync_precopy                      // A
+                <send all dirty pages>
+
+Note: for post-copy and snapshot, I assume we need to save the dirty bitmap
+       in the last synchronization, right after the VM is stopped.
+
+>> If all of us agree on this, I can send another kernel patch to address
+>> this. QEMU still need more patches so that the feature can be supported.
+> 
+> Yes, this will also need some work.
+> 
+>>>>
+>>>> To me, this is just a relaxation of an arbitrary limitation, as the
+>>>> current assumption that only vcpus can dirty memory doesn't hold at
+>>>> all.
+>>>
+>>> The initial dirty ring proposal has a per-vm ring, but after we
+>>> investigated x86 we found that all legal dirty paths are with a vcpu
+>>> context (except one outlier on kvmgt which fixed within itself), so we
+>>> dropped the per-vm ring.
+>>>
+>>> One thing to mention is that DMAs should not count in this case because
+>>> that's from device perspective, IOW either IOMMU or SMMU dirty tracking
+>>> should be reported to the device driver that interacts with the userspace
+>>> not from KVM interfaces (e.g. vfio with VFIO_IOMMU_DIRTY_PAGES).  That even
+>>> includes emulated DMA like vhost (VHOST_SET_LOG_BASE).
+>>>
+>>
+>> Thanks to Peter for mentioning the per-vm ring's history. As I said above,
+>> lets use bitmap instead if all of us agree.
+>>
+>> If I'm correct, Marc may be talking about SMMU, which is emulated in host
+>> instead of QEMU. In this case, the DMA target pages are similar to those
+>> pages for vgic/its tables. Both sets of pages are invisible from QEMU.
+> 
+> No, I'm talking about an actual HW SMMU using the HTTU feature that
+> set the Dirty bit in the PTEs. And people have been working on sharing
+> SMMU and CPU PTs for some time, which would give us the one true
+> source of dirty page.
+> 
+> In this configuration, the dirty ring mechanism will be pretty useless.
+> 
+
+Ok. I don't know the details. Marc, the dirty bitmap is helpful in this case?
+
+Thanks,
+Gavin
 
