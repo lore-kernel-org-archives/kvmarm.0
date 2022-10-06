@@ -1,152 +1,129 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6829C375
-	for <kvmarm@lists.linux.dev>; Wed,  5 Oct 2022 00:44:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1664930663;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UeYV9gtrEMC/f2NfGupIKl3UhHTgEqpO1AGhP6jS8dg=;
-	b=AEda/OXWDjmI2LqLK6UY75XPI+UNsQfRV9hVNPpZY2ovUP9D60l5TfIYMa5JdLM2/14ctw
-	Y4zJtACVaoZDVlktVFy717dWQxZgoQYbQP687xJaMTTZqx/ukpa3hlYWx9YnFOjGc3lROm
-	iLtiTzWrrylS+6W900rIjUDfx5ZpRO4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-92-E1np8Rw4NKGL2lyAI9-9ZA-1; Tue, 04 Oct 2022 20:44:20 -0400
-X-MC-Unique: E1np8Rw4NKGL2lyAI9-9ZA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B4003882821;
-	Wed,  5 Oct 2022 00:44:19 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-56.bne.redhat.com [10.64.54.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BAE617583;
-	Wed,  5 Oct 2022 00:44:12 +0000 (UTC)
-From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.linux.dev
-Cc: kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org,
-	peterx@redhat.com,
-	catalin.marinas@arm.com,
-	bgardon@google.com,
-	shuah@kernel.org,
-	andrew.jones@linux.dev,
-	will@kernel.org,
-	dmatlack@google.com,
-	pbonzini@redhat.com,
-	zhenyzha@redhat.com,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	alexandru.elisei@arm.com,
-	oliver.upton@linux.dev,
-	seanjc@google.com,
-	shan.gavin@gmail.com
-Subject: [PATCH v5 7/7] KVM: selftests: Automate choosing dirty ring size in dirty_log_test
-Date: Wed,  5 Oct 2022 08:41:54 +0800
-Message-ID: <20221005004154.83502-8-gshan@redhat.com>
-In-Reply-To: <20221005004154.83502-1-gshan@redhat.com>
-References: <20221005004154.83502-1-gshan@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D504368
+	for <kvmarm@lists.linux.dev>; Thu,  6 Oct 2022 00:34:15 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-3562f0fb5a7so4287047b3.1
+        for <kvmarm@lists.linux.dev>; Wed, 05 Oct 2022 17:34:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aS/Wdb92KUsn+dSQWf+yYhnYTdFnVqHuKhKCKXyH9JU=;
+        b=F2g4wdl3c+W55IiNBL1XgO+YOlTtL/Cjx1CGVdwkn3nnZikiuEYRXFu5+yxq8XvD8Q
+         UnKjxO/Ihl2o7nKCs3Fyoj+597+kBPoBQydqP9spHLrAFp/AZkuV37eBUc24VeghkL8e
+         haVbAgTXMwnfUeqSyaf7Qwgnc7VBxGWvMqqr4+HraCL4gw0nLFgfcM8h2qRhivdOmTbl
+         xQjAAvTL/Xx+nRVqFB2hx/oPVgCumgax0xpgJ8zPH4AnDa+A0Era8LoseKjRTriNUs2+
+         2sp1R3eQ6bZssw7ySWObtNTOd4+HTkPE6I6ZntqOMrN6qr4SUaYKMJUhxZG0gWES5RFm
+         M2Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aS/Wdb92KUsn+dSQWf+yYhnYTdFnVqHuKhKCKXyH9JU=;
+        b=Fvae+RaEoTJVTpjYQe//5ZIQ7nOCReBGNZfptk7LlztVQbXbWzda10a0bAFEqVmbnY
+         SxIUD8yfxA9/8pqau1YkWKUd1upXuTJVdl5nei8N6clTrXteUAhbLcjCSXCQ6By959EZ
+         +DJ3VaDhvr+vxADSDXxXzHYhX8G9gMpDMhrrvroGVtfMygexxzc3FtIBE2nHl08R7Ekb
+         +xGKb/yjUOw4pSW1YM2WA0wI9MGI1bj3e09y7MuHtCbYvTlcZ5vQDcrwSy7IBNYguF9O
+         dqEy7DDjunjMuJD+6x1JIltDcNF8/c5gtdljriP8ApTuwbIz0xim0eOi6QjKjJ8+53vW
+         uG+Q==
+X-Gm-Message-State: ACrzQf1a0ahhLW6y8NdK07uMRBVEIroGPUpsE59GlIe1WFLWkxgad2ci
+	3udjhuQgk5qSPoEYgT+keVckZTRx+5E=
+X-Google-Smtp-Source: AMsMyM5GoF0VwOlSnE1/Af4DhxMzGTCQS3omOdlhLBZkXBmerEM6VVh7882ZBLcBagfLbnLAIrgnQoTB6v4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ad13:0:b0:6bd:9745:a428 with SMTP id
+ y19-20020a25ad13000000b006bd9745a428mr2331326ybi.563.1665016454054; Wed, 05
+ Oct 2022 17:34:14 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu,  6 Oct 2022 00:34:02 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-Message-ID: <20221005004154.kCaqdX4JnDFMBc7-u1lR_Zi4Y1ngYfujwrzL7ANANiA@z>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
+Message-ID: <20221006003409.649993-1-seanjc@google.com>
+Subject: [PATCH v6 0/7] KVM: selftests: Implement ucall "pool" (for SEV)
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>
+Cc: James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Atish Patra <atishp@atishpatra.org>, David Hildenbrand <david@redhat.com>, Tom Rix <trix@redhat.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	llvm@lists.linux.dev, Colton Lewis <coltonlewis@google.com>, 
+	Andrew Jones <andrew.jones@linux.dev>, Peter Gonda <pgonda@google.com>, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20221006003402.Eoz7comrJxtxlKWR7v2bTTkaNNP5Umi3Tb0Uje-AS-E@z>
 
-In the dirty ring case, we rely on vcpu exit due to full dirty ring
-state. On ARM64 system, there are 4096 host pages when the host
-page size is 64KB. In this case, the vcpu never exits due to the
-full dirty ring state. The similar case is 4KB page size on host
-and 64KB page size on guest. The vcpu corrupts same set of host
-pages, but the dirty page information isn't collected in the main
-thread. This leads to infinite loop as the following log shows.
+Rework the ucall infrastructure to use a pool of ucall structs to pass
+memory instead of using the guest's stack.  For confidential VMs with
+encrypted memory, e.g. SEV, the guest's stack "needs" to be private memory
+and so can't be used to communicate with the host.
 
-  # ./dirty_log_test -M dirty-ring -c 65536 -m 5
-  Setting log mode to: 'dirty-ring'
-  Test iterations: 32, interval: 10 (ms)
-  Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
-  guest physical test memory offset: 0xffbffe0000
-  vcpu stops because vcpu is kicked out...
-  Notifying vcpu to continue
-  vcpu continues now.
-  Iteration 1 collected 576 pages
-  <No more output afterwards>
+Convert all implementations to the pool as all of the complexity is hidden
+in common code, and supporting multiple interfaces adds its own kind of
+complexity. 
 
-Fix the issue by automatically choosing the best dirty ring size,
-to ensure vcpu exit due to full dirty ring state. The option '-c'
-becomes a hint to the dirty ring count, instead of the value of it.
+v6:
+ - Collect tags. [Andrew, Peter]
+ - Drop an unnecessary NULL check on in_use. [Andrew]
 
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 26 +++++++++++++++++---
- 1 file changed, 22 insertions(+), 4 deletions(-)
+v5:
+ - Use less convoluted method of writing per-VM "globals". [Oliver]
+ - Add patch to drop ucall_uninit().
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 8758c10ec850..a87e5f78ebf1 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -24,6 +24,9 @@
- #include "guest_modes.h"
- #include "processor.h"
- 
-+#define DIRTY_MEM_BITS 30 /* 1G */
-+#define PAGE_SHIFT_4K  12
-+
- /* The memory slot index to track dirty pages */
- #define TEST_MEM_SLOT_INDEX		1
- 
-@@ -273,6 +276,24 @@ static bool dirty_ring_supported(void)
- 
- static void dirty_ring_create_vm_done(struct kvm_vm *vm)
- {
-+	uint64_t pages;
-+	uint32_t limit;
-+
-+	/*
-+	 * We rely on vcpu exit due to full dirty ring state. Adjust
-+	 * the ring buffer size to ensure we're able to reach the
-+	 * full dirty ring state.
-+	 */
-+	pages = (1ul << (DIRTY_MEM_BITS - vm->page_shift)) + 3;
-+	pages = vm_adjust_num_guest_pages(vm->mode, pages);
-+	if (vm->page_size < getpagesize())
-+		pages = vm_num_host_pages(vm->mode, pages);
-+
-+	limit = 1 << (31 - __builtin_clz(pages));
-+	test_dirty_ring_count = 1 << (31 - __builtin_clz(test_dirty_ring_count));
-+	test_dirty_ring_count = min(limit, test_dirty_ring_count);
-+	pr_info("dirty ring count: 0x%x\n", test_dirty_ring_count);
-+
- 	/*
- 	 * Switch to dirty ring mode after VM creation but before any
- 	 * of the vcpu creation.
-@@ -685,9 +706,6 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, struct kvm_vcpu **vcpu,
- 	return vm;
- }
- 
--#define DIRTY_MEM_BITS 30 /* 1G */
--#define PAGE_SHIFT_4K  12
--
- struct test_params {
- 	unsigned long iterations;
- 	unsigned long interval;
-@@ -830,7 +848,7 @@ static void help(char *name)
- 	printf("usage: %s [-h] [-i iterations] [-I interval] "
- 	       "[-p offset] [-m mode]\n", name);
- 	puts("");
--	printf(" -c: specify dirty ring size, in number of entries\n");
-+	printf(" -c: hint to dirty ring size, in number of entries\n");
- 	printf("     (only useful for dirty-ring test; default: %"PRIu32")\n",
- 	       TEST_DIRTY_RING_COUNT);
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
+v4: https://lore.kernel.org/all/20220824032115.3563686-1-seanjc@google.com
+
+Peter Gonda (2):
+  tools: Add atomic_test_and_set_bit()
+  KVM: selftests: Add ucall pool based implementation
+
+Sean Christopherson (5):
+  KVM: selftests: Consolidate common code for populating ucall struct
+  KVM: selftests: Consolidate boilerplate code in get_ucall()
+  KVM: selftests: Automatically do init_ucall() for non-barebones VMs
+  KVM: selftests: Make arm64's MMIO ucall multi-VM friendly
+  KVM: selftest: Drop now-unnecessary ucall_uninit()
+
+ tools/arch/x86/include/asm/atomic.h           |   7 ++
+ tools/include/asm-generic/atomic-gcc.h        |  12 ++
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/arch_timer.c        |   1 -
+ .../selftests/kvm/aarch64/debug-exceptions.c  |   1 -
+ .../selftests/kvm/aarch64/hypercalls.c        |   1 -
+ .../testing/selftests/kvm/aarch64/psci_test.c |   1 -
+ .../testing/selftests/kvm/aarch64/vgic_init.c |   2 -
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  |   1 -
+ tools/testing/selftests/kvm/dirty_log_test.c  |   3 -
+ .../selftests/kvm/include/kvm_util_base.h     |  15 +++
+ .../selftests/kvm/include/ucall_common.h      |  10 +-
+ .../selftests/kvm/kvm_page_table_test.c       |   2 -
+ .../testing/selftests/kvm/lib/aarch64/ucall.c | 102 +++--------------
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  11 ++
+ .../selftests/kvm/lib/perf_test_util.c        |   3 -
+ tools/testing/selftests/kvm/lib/riscv/ucall.c |  42 +------
+ tools/testing/selftests/kvm/lib/s390x/ucall.c |  39 +------
+ .../testing/selftests/kvm/lib/ucall_common.c  | 103 ++++++++++++++++++
+ .../testing/selftests/kvm/lib/x86_64/ucall.c  |  39 +------
+ .../testing/selftests/kvm/memslot_perf_test.c |   1 -
+ tools/testing/selftests/kvm/rseq_test.c       |   1 -
+ tools/testing/selftests/kvm/steal_time.c      |   1 -
+ .../kvm/system_counter_offset_test.c          |   1 -
+ 24 files changed, 190 insertions(+), 210 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/lib/ucall_common.c
+
+
+base-commit: e18d6152ff0f41b7f01f9817372022df04e0d354
 -- 
-2.23.0
+2.38.0.rc1.362.ged0d419d3c-goog
 
