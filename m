@@ -1,42 +1,42 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493B6627
-	for <kvmarm@lists.linux.dev>; Thu,  6 Oct 2022 00:34:22 +0000 (UTC)
-Received: by mail-pf1-f202.google.com with SMTP id s2-20020aa78282000000b00561ba8f77b4so248890pfm.1
-        for <kvmarm@lists.linux.dev>; Wed, 05 Oct 2022 17:34:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6443624
+	for <kvmarm@lists.linux.dev>; Thu,  6 Oct 2022 00:34:23 +0000 (UTC)
+Received: by mail-pj1-f74.google.com with SMTP id pj13-20020a17090b4f4d00b0020b0a13cba4so103077pjb.0
+        for <kvmarm@lists.linux.dev>; Wed, 05 Oct 2022 17:34:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=9KMeIXPq6GpOVcN55NK7DLftKaRG2/H9/8QOpBzCftA=;
-        b=mEbovaZUu6KW+QLA8E55+qeFjie4ez91koDXMg/9jrSIxWWEn7uEXQSfyV6u9Rbj0q
-         au+eMV2cQU3MEP1qaqbhmLXZQ22xX+sXG6ruwTxeU1jSpEp6tgybSt375ZJjx+bepNLM
-         ShKht/UF9CsHv4HlbDU1Rt5Aheu1FTSX309sP2UUTedYtoOrW+vfR9f+Rms2jv0qL311
-         xhlrOVJUHNxdYz4Uf6SXwcR5JfRoPwVhg+kAqr6R6aeYjuIwiPye2GNCzJ2FMX2W/GIu
-         ZBZjpz3Kikj1neTh8F0SJ5mQd3pQSFV0yDiAcIjnkYV9DVRUgpC7CVc4TxECrfjAs5Jp
-         /dpA==
+        bh=eUXWhUifdFgPJT3sQ8fpiBb9+qu4qBNF8BnbaeQdQUo=;
+        b=p2BatyqMgXXkXbOjvLhV7fxp0EF7XWicDzfoMUNR41CezxoLYz18bZIGEDY2zV8hYn
+         JJg6vZyzvDWSfJtlIHvDh3gA14Cefb/4Gpkm51svaI2lZ37gv5+aR5MinucRDoTw6MdO
+         YUb9zARhBKxZe4Dz0TIb5chOmV9/7eHayMK0DSYMsbM44+4KauUiOJwG2P5IDMmCHswp
+         pxqTs2lVNBzva+uy8Ftf8XHoHzWP9ri+2hOnO9vmijy2lTqWpgs5w/CTQcbU2UnKdDmJ
+         UjUApQiqkhvk/9DkTlJKAutOFtZuaYi9VyIJZkMo0cl/zBHBYVOnsfHkhbXD+2CiWszM
+         xksA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=9KMeIXPq6GpOVcN55NK7DLftKaRG2/H9/8QOpBzCftA=;
-        b=wybtsOkC4aP9I1mNzOBAa6z0bx6ygA1WUcVJfHu6EAXvDHH5dmUNyALhnaTid4vHV3
-         p20wtueW/owxYM/wKUSkeOOfeaiXhiakkekfRzrJI2TCPazwLta4IhTiXAsmOcLuVcos
-         kPoOffUfeHN4GGLB7PGywU5+riElu8Btg+Nspki4R7+iWH9p72mf8DzHPYrmIXiHuNsJ
-         ZKXmMvZGpHenPUBABd9URaBHupRmjyYM2MhD+w+F9GFKHewdKqEU3SpPulRnTCqPsoef
-         3VH8WY8VcZqc+HMrcseldR2hVI/CaYIijr7Ngc/JIb5cM3vyLEHlzTI1w7ZUhoBF9Jq1
-         1VkQ==
-X-Gm-Message-State: ACrzQf3UuzK6BelZYwmOaxeJWjrXw6l1SDQi6yPzI5MfkFSSWitsLd4u
-	7Os6ZME4OPWyYHdkYX4RGtc3OfOtYd0=
-X-Google-Smtp-Source: AMsMyM45qnrI9G6azK6iw6bHSpADVc1CoVnhaNByhJReWqWjXc5QYOLtqbmuu2pzhK5ymOSC9YZe69vGWgs=
+        bh=eUXWhUifdFgPJT3sQ8fpiBb9+qu4qBNF8BnbaeQdQUo=;
+        b=MJ58lo/JOCXvvxrzcx8k0kZS+QUV2WO1HKqHL+KdQY2rtiW2Wm2xRH67FBNSW4RHBI
+         /Dx0kWfQGScJMHb2J3brso8l+Q3NglmD3L0V2tK/7+DRD/YDYoEUcflLZFk27/QnrJdn
+         lcyUM3K1Cr/fDQOUeJypczMn/i/Eyz966ZRVNgLWa8lapf/eGyA76o4mfHUm9YWKaskB
+         MPIkIjHHm9B8vJP5z87WXMCTVug7SijjKd1HlPGuPqW66v3LrHUmny78Tr7g5+sERRR4
+         4gf8+TtzcHC5FgoJnFC+/9/wxMSd9xmAAARuN6ArXqIdI2H/qR2i13v17Q/rT57ghBLt
+         lbNQ==
+X-Gm-Message-State: ACrzQf0W6s2M5w2Cr4/EIQMgGM/wk7stWCxF0fWAoYRscfJTxx33EB2E
+	Nd9Dljav40Pjk/RkVnHWXbnIswT5BsE=
+X-Google-Smtp-Source: AMsMyM7UAoMVSHijtFGDsOKK4XAARFhwG5lyokCvp6D5lkB3pZXlx5dzYqQY7QntGmdGYLz1xS0Sr9AZvPs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:f0f:b0:562:3169:eba1 with SMTP id
- cr15-20020a056a000f0f00b005623169eba1mr2284230pfb.59.1665016461754; Wed, 05
- Oct 2022 17:34:21 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:8bc5:b0:17f:79f2:21e8 with SMTP id
+ r5-20020a1709028bc500b0017f79f221e8mr2202413plo.63.1665016463355; Wed, 05 Oct
+ 2022 17:34:23 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  6 Oct 2022 00:34:07 +0000
+Date: Thu,  6 Oct 2022 00:34:08 +0000
 In-Reply-To: <20221006003409.649993-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -46,8 +46,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20221006003409.649993-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20221006003409.649993-6-seanjc@google.com>
-Subject: [PATCH v6 5/7] KVM: selftests: Make arm64's MMIO ucall multi-VM friendly
+Message-ID: <20221006003409.649993-7-seanjc@google.com>
+Subject: [PATCH v6 6/7] KVM: selftest: Drop now-unnecessary ucall_uninit()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
 	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -66,116 +66,164 @@ Cc: James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.co
 	Andrew Jones <andrew.jones@linux.dev>, Peter Gonda <pgonda@google.com>, 
 	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221006003407.gcym7OXoegfOtH3tUqBtvHnSmJtWCW13ukmhodnkutg@z>
+Message-ID: <20221006003408.fiubmtGcjO7a4FA28eJv10u3sOBsXFZfMiXcUi-H10Y@z>
 
-Fix a mostly-theoretical bug where ARM's ucall MMIO setup could result in
-different VMs stomping on each other by cloberring the global pointer.
-
-Fix the most obvious issue by saving the MMIO gpa into the VM.
-
-A more subtle bug is that creating VMs in parallel (on multiple tasks)
-could result in a VM using the wrong address.  Synchronizing a global to
-a guest effectively snapshots the value on a per-VM basis, i.e. the
-"global" is already prepped to work with multiple VMs, but setting the
-global in the host is not thread-safe.  To fix that bug, add
-write_guest_global() to allow stuffing a VM's copy of a "global" without
-modifying the host value.
+Drop ucall_uninit() and ucall_arch_uninit() now that ARM doesn't modify
+the host's copy of ucall_exit_mmio_addr, i.e. now that there's no need to
+reset the pointer before potentially creating a new VM.  The few calls to
+ucall_uninit() are all immediately followed by kvm_vm_free(), and that is
+likely always going to hold true, i.e. it's extremely unlikely a test
+will want to effectively disable ucall in the middle of a test.
 
 Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 Tested-by: Peter Gonda <pgonda@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/kvm_util_base.h     | 15 +++++++++++++++
- .../testing/selftests/kvm/lib/aarch64/ucall.c | 19 ++++++++++++++-----
- 2 files changed, 29 insertions(+), 5 deletions(-)
+ tools/testing/selftests/kvm/dirty_log_test.c       |  1 -
+ tools/testing/selftests/kvm/include/ucall_common.h |  6 ------
+ tools/testing/selftests/kvm/kvm_page_table_test.c  |  1 -
+ tools/testing/selftests/kvm/lib/aarch64/ucall.c    | 14 ++------------
+ tools/testing/selftests/kvm/lib/perf_test_util.c   |  1 -
+ tools/testing/selftests/kvm/lib/riscv/ucall.c      |  4 ----
+ tools/testing/selftests/kvm/lib/s390x/ucall.c      |  4 ----
+ tools/testing/selftests/kvm/lib/x86_64/ucall.c     |  4 ----
+ 8 files changed, 2 insertions(+), 33 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index e42a09cd24a0..c14d531a942a 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -16,6 +16,7 @@
- #include <linux/kvm.h>
- #include "linux/rbtree.h"
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index b458a2701634..a38c4369fb8e 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -811,7 +811,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
  
-+#include <asm/atomic.h>
+ 	free(bmap);
+ 	free(host_bmap_track);
+-	ucall_uninit(vm);
+ 	kvm_vm_free(vm);
+ }
  
- #include <sys/ioctl.h>
+diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
+index 8077a6d8b1ba..2662a4352a8c 100644
+--- a/tools/testing/selftests/kvm/include/ucall_common.h
++++ b/tools/testing/selftests/kvm/include/ucall_common.h
+@@ -25,7 +25,6 @@ struct ucall {
+ };
  
-@@ -81,6 +82,7 @@ struct kvm_vm {
- 	struct sparsebit *vpages_mapped;
- 	bool has_irqchip;
- 	bool pgd_created;
-+	vm_paddr_t ucall_mmio_addr;
- 	vm_paddr_t pgd;
- 	vm_vaddr_t gdt;
- 	vm_vaddr_t tss;
-@@ -718,6 +720,19 @@ kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
- 	memcpy(&(g), _p, sizeof(g));				\
- })
+ void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
+-void ucall_arch_uninit(struct kvm_vm *vm);
+ void ucall_arch_do_ucall(vm_vaddr_t uc);
+ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu);
  
-+/*
-+ * Write a global value, but only in the VM's (guest's) domain.  Primarily used
-+ * for "globals" that hold per-VM values (VMs always duplicate code and global
-+ * data into their own region of physical memory), but can be used anytime it's
-+ * undesirable to change the host's copy of the global.
-+ */
-+#define write_guest_global(vm, g, val) ({			\
-+	typeof(g) *_p = addr_gva2hva(vm, (vm_vaddr_t)&(g));	\
-+	typeof(g) _val = val;					\
-+								\
-+	memcpy(_p, &(_val), sizeof(g));				\
-+})
-+
- void assert_on_unhandled_exception(struct kvm_vcpu *vcpu);
+@@ -37,11 +36,6 @@ static inline void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
+ 	ucall_arch_init(vm, mmio_gpa);
+ }
  
- void vcpu_arch_dump(FILE *stream, struct kvm_vcpu *vcpu,
+-static inline void ucall_uninit(struct kvm_vm *vm)
+-{
+-	ucall_arch_uninit(vm);
+-}
+-
+ #define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
+ 				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
+ #define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
+diff --git a/tools/testing/selftests/kvm/kvm_page_table_test.c b/tools/testing/selftests/kvm/kvm_page_table_test.c
+index 20533c48ba3d..d77b1f634f29 100644
+--- a/tools/testing/selftests/kvm/kvm_page_table_test.c
++++ b/tools/testing/selftests/kvm/kvm_page_table_test.c
+@@ -416,7 +416,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	TEST_ASSERT(ret == 0, "Error in sem_destroy");
+ 
+ 	free(vcpu_threads);
+-	ucall_uninit(vm);
+ 	kvm_vm_free(vm);
+ }
+ 
 diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-index f02ae27c3e43..1c38bd260f90 100644
+index 1c38bd260f90..21d73afcb14f 100644
 --- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
 +++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-@@ -6,20 +6,29 @@
+@@ -12,23 +12,13 @@
   */
- #include "kvm_util.h"
- 
-+/*
-+ * ucall_exit_mmio_addr holds per-VM values (global data is duplicated by each
-+ * VM), it must not be accessed from host code.
-+ */
  static vm_vaddr_t *ucall_exit_mmio_addr;
  
-+static void ucall_set_mmio_addr(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
-+{
-+	vm->ucall_mmio_addr = mmio_gpa;
-+
-+	write_guest_global(vm, ucall_exit_mmio_addr, (vm_vaddr_t *)mmio_gpa);
-+}
-+
+-static void ucall_set_mmio_addr(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
+-{
+-	vm->ucall_mmio_addr = mmio_gpa;
+-
+-	write_guest_global(vm, ucall_exit_mmio_addr, (vm_vaddr_t *)mmio_gpa);
+-}
+-
  void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
  {
  	virt_pg_map(vm, mmio_gpa, mmio_gpa);
  
--	ucall_exit_mmio_addr = (vm_vaddr_t *)mmio_gpa;
--	sync_global_to_guest(vm, ucall_exit_mmio_addr);
-+	ucall_set_mmio_addr(vm, mmio_gpa);
- }
+-	ucall_set_mmio_addr(vm, mmio_gpa);
+-}
++	vm->ucall_mmio_addr = mmio_gpa;
  
- void ucall_arch_uninit(struct kvm_vm *vm)
- {
--	ucall_exit_mmio_addr = 0;
--	sync_global_to_guest(vm, ucall_exit_mmio_addr);
-+	ucall_set_mmio_addr(vm, (vm_paddr_t)NULL);
+-void ucall_arch_uninit(struct kvm_vm *vm)
+-{
+-	ucall_set_mmio_addr(vm, (vm_paddr_t)NULL);
++	write_guest_global(vm, ucall_exit_mmio_addr, (vm_vaddr_t *)mmio_gpa);
  }
  
  void ucall_arch_do_ucall(vm_vaddr_t uc)
-@@ -32,7 +41,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- 	struct kvm_run *run = vcpu->run;
+diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+index 5161fa68cdf3..78e5be2c7f1a 100644
+--- a/tools/testing/selftests/kvm/lib/perf_test_util.c
++++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+@@ -217,7 +217,6 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int nr_vcpus,
  
- 	if (run->exit_reason == KVM_EXIT_MMIO &&
--	    run->mmio.phys_addr == (uint64_t)ucall_exit_mmio_addr) {
-+	    run->mmio.phys_addr == vcpu->vm->ucall_mmio_addr) {
- 		vm_vaddr_t gva;
+ void perf_test_destroy_vm(struct kvm_vm *vm)
+ {
+-	ucall_uninit(vm);
+ 	kvm_vm_free(vm);
+ }
  
- 		TEST_ASSERT(run->mmio.is_write && run->mmio.len == 8,
+diff --git a/tools/testing/selftests/kvm/lib/riscv/ucall.c b/tools/testing/selftests/kvm/lib/riscv/ucall.c
+index c58ecb8a0981..78acdb084ab0 100644
+--- a/tools/testing/selftests/kvm/lib/riscv/ucall.c
++++ b/tools/testing/selftests/kvm/lib/riscv/ucall.c
+@@ -14,10 +14,6 @@ void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
+ {
+ }
+ 
+-void ucall_arch_uninit(struct kvm_vm *vm)
+-{
+-}
+-
+ struct sbiret sbi_ecall(int ext, int fid, unsigned long arg0,
+ 			unsigned long arg1, unsigned long arg2,
+ 			unsigned long arg3, unsigned long arg4,
+diff --git a/tools/testing/selftests/kvm/lib/s390x/ucall.c b/tools/testing/selftests/kvm/lib/s390x/ucall.c
+index 208f0f04299b..cbee520a26f2 100644
+--- a/tools/testing/selftests/kvm/lib/s390x/ucall.c
++++ b/tools/testing/selftests/kvm/lib/s390x/ucall.c
+@@ -10,10 +10,6 @@ void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
+ {
+ }
+ 
+-void ucall_arch_uninit(struct kvm_vm *vm)
+-{
+-}
+-
+ void ucall_arch_do_ucall(vm_vaddr_t uc)
+ {
+ 	/* Exit via DIAGNOSE 0x501 (normally used for breakpoints) */
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+index 016a0487cf72..eb8bf55b359a 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+@@ -12,10 +12,6 @@ void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
+ {
+ }
+ 
+-void ucall_arch_uninit(struct kvm_vm *vm)
+-{
+-}
+-
+ void ucall_arch_do_ucall(vm_vaddr_t uc)
+ {
+ 	asm volatile("in %[port], %%al"
 -- 
 2.38.0.rc1.362.ged0d419d3c-goog
 
