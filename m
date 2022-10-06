@@ -1,286 +1,104 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06D3623
-	for <kvmarm@lists.linux.dev>; Thu,  6 Oct 2022 00:34:25 +0000 (UTC)
-Received: by mail-pl1-f201.google.com with SMTP id m3-20020a170902bb8300b0017f7e7e4385so147683pls.20
-        for <kvmarm@lists.linux.dev>; Wed, 05 Oct 2022 17:34:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC87E654
+	for <kvmarm@lists.linux.dev>; Thu,  6 Oct 2022 07:18:02 +0000 (UTC)
+Received: by mail-ej1-f47.google.com with SMTP id bj12so2457163ejb.13
+        for <kvmarm@lists.linux.dev>; Thu, 06 Oct 2022 00:18:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=xX8uG7SUYg5pdixpO8XUZnQg2hng+veRMQibKkyiaZI=;
-        b=fP1ryi98o179n93GMiv0EoLb1mN2viyG2IzwW68Vr4eTwDeUdsGpCVIrlW4utQC1Ma
-         2Oxih7QtSnTZT3TnBg8Jn4eqsvEUGd2nK1QPoxmiY60Qgm6BymroY8s0ccb/BhdLMPk9
-         IEPhooFAkorod/TItmjH6ZduDkCBN5e5du7Sy8ayuogr0XB9sDHN4GXG1j28pOZFreHM
-         bdGsCH7pJIId62KmvtM7UVZzBXE4dWBYHS/a0ehBTCja1PVtEbubd/iLVhlzWxkdnAiW
-         IFt+IFSn528cs56k2NBC62wakCtUI6OvIhw7gkQSuumjxqTxoe7cyUDZfINXLJt81gVm
-         R/yw==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+ea93jPPPZUnNy1Db3wnhBZbPV56tR39Nal7oJ+XayI=;
+        b=UAJDcoJhpsghahkmAGx14PoMD9XcbO7WhjPd+i1Zej2Aj661aE4tHAFg5ttXFPt3Oc
+         Y6SG4FtF2XBaet5/nCGIfKm1kqriCM91VCQBZsW5hyZ8fxfiBxmjAxEwKyQyIXYwMWgk
+         O2f0bgRufWmhdo4BaM2AS4URY30Ab2delyWullS21rqLT9nFj1dKyCKTEf+ZAPKDVv13
+         +UQrPkH+RiWHGkfuBZfzy4Uy3VfqfrXGQkcGN5s6eq1cZqqbdOiduD8TG5QHXRzSXNTP
+         /iCpAZBTm53eGMUCDjTEhO7OA/UBYgnw3EC0vsXXrLr4ETpC2A+ay0MypOEJlKnKwnEN
+         SZZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xX8uG7SUYg5pdixpO8XUZnQg2hng+veRMQibKkyiaZI=;
-        b=MImtS2DhTk/uxJn40k/EWAokuRFRmyHxT1zKzcgsLhjkiUteNdNN3re7FLJlzql9i6
-         eftGEQgxHrbAK2T5ni/oxPKvO+D2/k73oVOBbJl00ZVFnMicz68eKexbTVxfEWSxnO8C
-         ymVU2CwbMq8U/RNGfD3BA759mpyriiVE45PtWDS1MdCuGTVpNpZX/lV4j9ijYIqSMfse
-         0zRf+Ezi5pSZuLt/o3Qz8f0x+2Au/aDndf98zpZuKsG6BBGcsgC0lMJx1IlTnJy1TKsM
-         8L1BrsAW38GEt2Paly0W/nuyFateWNub5GvLYmp6eevQZ8EanAs5epgTJSq9GuVJApim
-         PjUw==
-X-Gm-Message-State: ACrzQf3kq49I6IGXKjxEal9SK3VuhPlHXhYCqWGVx7N4kmM0venf5y8/
-	4MbsJswAsTUbvJ2DUVlr6LTXsafxd0c=
-X-Google-Smtp-Source: AMsMyM61Rswnni6B0rnAAeLaPaUNYNDgjRmTAANkWM3BTrYnMkG4glUe+fu2YvtLP2GsuvLSnHd5dlMUWuE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2918:b0:535:ea9:791a with SMTP id
- cg24-20020a056a00291800b005350ea9791amr2061782pfb.54.1665016465171; Wed, 05
- Oct 2022 17:34:25 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  6 Oct 2022 00:34:09 +0000
-In-Reply-To: <20221006003409.649993-1-seanjc@google.com>
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+ea93jPPPZUnNy1Db3wnhBZbPV56tR39Nal7oJ+XayI=;
+        b=aDM9Vsz/Zb8Z6MFVYBheLTcj2kFNLv1HpvFCj8KN3XrDW8aaWxr4SgqclYirJU7ZrW
+         QlD4DbNtSK1mjE0cXh7WFnVC6g5NL/Y7HU4aN5kgw94Im4Eth3by7dc4FaN9Nm4zMeuT
+         Y3Kukp01sqFrDr28RE+FPzN0zcCtzT0y5uwQhemZlCq9brDMiiWTa+6Z41uAf/SU/0NH
+         EqGhj2OcBrgRBiG+qj2msDtR/PMLQReZXWq4/10E9XIgV5e0Y0V5sJq9KYQZ1t6WnA7p
+         DkY32XGOJySC4iON9c/aBkzv16IqBDdUy7oeFA0/jN6howZh6bDFKOyzMd4ZQfibQtAg
+         DD5w==
+X-Gm-Message-State: ACrzQf04HHQuO7OSCQtV1GCdErUS5da787nD4bvGiNs3tBlmukCg3U5t
+	DEDbCqV4AkH8aRcDQtIRtq9SIg==
+X-Google-Smtp-Source: AMsMyM5lMgBe+83HYsui965SYgP5BGoba5FSPC8HBc7sSZbBkowS+puYBdElrvbWbkpoDXaLhR7jVg==
+X-Received: by 2002:a17:907:6ea8:b0:78d:36d9:b9ef with SMTP id sh40-20020a1709076ea800b0078d36d9b9efmr2919954ejc.408.1665040680691;
+        Thu, 06 Oct 2022 00:18:00 -0700 (PDT)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
+        by smtp.gmail.com with ESMTPSA id c9-20020a17090618a900b0077b2b0563f4sm10017756ejf.173.2022.10.06.00.17.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Oct 2022 00:17:59 -0700 (PDT)
+Date: Thu, 6 Oct 2022 07:17:56 +0000
+From: Quentin Perret <qperret@google.com>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, james.morse@arm.com,
+	alexandru.elisei@arm.com, suzuki.poulose@arm.com, will@kernel.org,
+	catalin.marinas@arm.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, dbrazdil@google.com
+Subject: Re: [PATCH] KVM: arm64: Enable stack protection and branch profiling
+ for VHE
+Message-ID: <Yz6BJJIadPqiktfO@google.com>
+References: <20221004154216.2833636-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20221006003409.649993-1-seanjc@google.com>
-X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20221006003409.649993-8-seanjc@google.com>
-Subject: [PATCH v6 7/7] KVM: selftests: Add ucall pool based implementation
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>
-Cc: James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Atish Patra <atishp@atishpatra.org>, David Hildenbrand <david@redhat.com>, Tom Rix <trix@redhat.com>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	llvm@lists.linux.dev, Colton Lewis <coltonlewis@google.com>, 
-	Andrew Jones <andrew.jones@linux.dev>, Peter Gonda <pgonda@google.com>, 
-	Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221006003409.si-ZkXgFSrISvPYlO5mCRo5VxPg4dkLrHAPt98P42iw@z>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221004154216.2833636-1-vdonnefort@google.com>
 
-From: Peter Gonda <pgonda@google.com>
+On Tuesday 04 Oct 2022 at 16:42:16 (+0100), Vincent Donnefort wrote:
+> For historical reasons, the VHE code inherited the build configuration from
+> nVHE. Now those two parts have their own folder and makefile, we can
+> enable stack protection and branch profiling for VHE.
 
-To play nice with guests whose stack memory is encrypted, e.g. AMD SEV,
-introduce a new "ucall pool" implementation that passes the ucall struct
-via dedicated memory (which can be mapped shared, a.k.a. as plain text).
++CC David who has been messing with these Makefiles in the past to
+confirm, but this makes sense to me.
 
-Because not all architectures have access to the vCPU index in the guest,
-use a bitmap with atomic accesses to track which entries in the pool are
-free/used.  A list+lock could also work in theory, but synchronizing the
-individual pointers to the guest would be a mess.
+Reviewed-by: Quentin Perret <qperret@google.com>
 
-Note, there's no need to rewalk the bitmap to ensure success.  If all
-vCPUs are simply allocating, success is guaranteed because there are
-enough entries for all vCPUs.  If one or more vCPUs are freeing and then
-reallocating, success is guaranteed because vCPUs _always_ walk the
-bitmap from 0=>N; if vCPU frees an entry and then wins a race to
-re-allocate, then either it will consume the entry it just freed (bit is
-the first free bit), or the losing vCPU is guaranteed to see the freed
-bit (winner consumes an earlier bit, which the loser hasn't yet visited).
-
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Co-developed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- .../selftests/kvm/include/ucall_common.h      |  9 ++-
- .../testing/selftests/kvm/lib/aarch64/ucall.c |  7 +-
- tools/testing/selftests/kvm/lib/riscv/ucall.c |  2 +-
- tools/testing/selftests/kvm/lib/s390x/ucall.c |  2 +-
- .../testing/selftests/kvm/lib/ucall_common.c  | 72 +++++++++++++++++--
- .../testing/selftests/kvm/lib/x86_64/ucall.c  |  2 +-
- 6 files changed, 77 insertions(+), 17 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
-index 2662a4352a8c..bdd373189a77 100644
---- a/tools/testing/selftests/kvm/include/ucall_common.h
-+++ b/tools/testing/selftests/kvm/include/ucall_common.h
-@@ -22,6 +22,9 @@ enum {
- struct ucall {
- 	uint64_t cmd;
- 	uint64_t args[UCALL_MAX_ARGS];
-+
-+	/* Host virtual address of this struct. */
-+	struct ucall *hva;
- };
- 
- void ucall_arch_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
-@@ -30,11 +33,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu);
- 
- void ucall(uint64_t cmd, int nargs, ...);
- uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
--
--static inline void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
--{
--	ucall_arch_init(vm, mmio_gpa);
--}
-+void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
- 
- #define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
- 				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-index 21d73afcb14f..562c16dfbb00 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-@@ -32,12 +32,9 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- 
- 	if (run->exit_reason == KVM_EXIT_MMIO &&
- 	    run->mmio.phys_addr == vcpu->vm->ucall_mmio_addr) {
--		vm_vaddr_t gva;
--
--		TEST_ASSERT(run->mmio.is_write && run->mmio.len == 8,
-+		TEST_ASSERT(run->mmio.is_write && run->mmio.len == sizeof(uint64_t),
- 			    "Unexpected ucall exit mmio address access");
--		memcpy(&gva, run->mmio.data, sizeof(gva));
--		return addr_gva2hva(vcpu->vm, gva);
-+		return (void *)(*((uint64_t *)run->mmio.data));
- 	}
- 
- 	return NULL;
-diff --git a/tools/testing/selftests/kvm/lib/riscv/ucall.c b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-index 78acdb084ab0..9a3476a2dfca 100644
---- a/tools/testing/selftests/kvm/lib/riscv/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-@@ -55,7 +55,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- 	    run->riscv_sbi.extension_id == KVM_RISCV_SELFTESTS_SBI_EXT) {
- 		switch (run->riscv_sbi.function_id) {
- 		case KVM_RISCV_SELFTESTS_SBI_UCALL:
--			return addr_gva2hva(vcpu->vm, run->riscv_sbi.args[0]);
-+			return (void *)run->riscv_sbi.args[0];
- 		case KVM_RISCV_SELFTESTS_SBI_UNEXP:
- 			vcpu_dump(stderr, vcpu, 2);
- 			TEST_ASSERT(0, "Unexpected trap taken by guest");
-diff --git a/tools/testing/selftests/kvm/lib/s390x/ucall.c b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-index cbee520a26f2..a7f02dc372cf 100644
---- a/tools/testing/selftests/kvm/lib/s390x/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-@@ -26,7 +26,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- 	    (run->s390_sieic.ipb >> 16) == 0x501) {
- 		int reg = run->s390_sieic.ipa & 0xf;
- 
--		return addr_gva2hva(vcpu->vm, run->s.regs.gprs[reg]);
-+		return (void *)run->s.regs.gprs[reg];
- 	}
- 	return NULL;
- }
-diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
-index ced480860746..fcae96461e46 100644
---- a/tools/testing/selftests/kvm/lib/ucall_common.c
-+++ b/tools/testing/selftests/kvm/lib/ucall_common.c
-@@ -1,22 +1,86 @@
- // SPDX-License-Identifier: GPL-2.0-only
- #include "kvm_util.h"
-+#include "linux/types.h"
-+#include "linux/bitmap.h"
-+#include "linux/atomic.h"
-+
-+struct ucall_header {
-+	DECLARE_BITMAP(in_use, KVM_MAX_VCPUS);
-+	struct ucall ucalls[KVM_MAX_VCPUS];
-+};
-+
-+/*
-+ * ucall_pool holds per-VM values (global data is duplicated by each VM), it
-+ * must not be accessed from host code.
-+ */
-+static struct ucall_header *ucall_pool;
-+
-+void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
-+{
-+	struct ucall_header *hdr;
-+	struct ucall *uc;
-+	vm_vaddr_t vaddr;
-+	int i;
-+
-+	vaddr = vm_vaddr_alloc(vm, sizeof(*hdr), KVM_UTIL_MIN_VADDR);
-+	hdr = (struct ucall_header *)addr_gva2hva(vm, vaddr);
-+	memset(hdr, 0, sizeof(*hdr));
-+
-+	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
-+		uc = &hdr->ucalls[i];
-+		uc->hva = uc;
-+	}
-+
-+	write_guest_global(vm, ucall_pool, (struct ucall_header *)vaddr);
-+
-+	ucall_arch_init(vm, mmio_gpa);
-+}
-+
-+static struct ucall *ucall_alloc(void)
-+{
-+	struct ucall *uc;
-+	int i;
-+
-+	GUEST_ASSERT(ucall_pool);
-+
-+	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
-+		if (!atomic_test_and_set_bit(i, ucall_pool->in_use)) {
-+			uc = &ucall_pool->ucalls[i];
-+			memset(uc->args, 0, sizeof(uc->args));
-+			return uc;
-+		}
-+	}
-+
-+	GUEST_ASSERT(0);
-+	return NULL;
-+}
-+
-+static void ucall_free(struct ucall *uc)
-+{
-+	/* Beware, here be pointer arithmetic.  */
-+	clear_bit(uc - ucall_pool->ucalls, ucall_pool->in_use);
-+}
- 
- void ucall(uint64_t cmd, int nargs, ...)
- {
--	struct ucall uc = {};
-+	struct ucall *uc;
- 	va_list va;
- 	int i;
- 
--	WRITE_ONCE(uc.cmd, cmd);
-+	uc = ucall_alloc();
-+
-+	WRITE_ONCE(uc->cmd, cmd);
- 
- 	nargs = min(nargs, UCALL_MAX_ARGS);
- 
- 	va_start(va, nargs);
- 	for (i = 0; i < nargs; ++i)
--		WRITE_ONCE(uc.args[i], va_arg(va, uint64_t));
-+		WRITE_ONCE(uc->args[i], va_arg(va, uint64_t));
- 	va_end(va);
- 
--	ucall_arch_do_ucall((vm_vaddr_t)&uc);
-+	ucall_arch_do_ucall((vm_vaddr_t)uc->hva);
-+
-+	ucall_free(uc);
- }
- 
- uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-index eb8bf55b359a..4d41dc63cc9e 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-@@ -26,7 +26,7 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- 		struct kvm_regs regs;
- 
- 		vcpu_regs_get(vcpu, &regs);
--		return addr_gva2hva(vcpu->vm, regs.rdi);
-+		return (void *)regs.rdi;
- 	}
- 	return NULL;
- }
--- 
-2.38.0.rc1.362.ged0d419d3c-goog
-
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> 
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> index 687598e41b21..a38dea6186c9 100644
+> --- a/arch/arm64/kvm/hyp/Makefile
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -5,9 +5,6 @@
+>  
+>  incdir := $(srctree)/$(src)/include
+>  subdir-asflags-y := -I$(incdir)
+> -subdir-ccflags-y := -I$(incdir)				\
+> -		    -fno-stack-protector		\
+> -		    -DDISABLE_BRANCH_PROFILING		\
+> -		    $(DISABLE_STACKLEAK_PLUGIN)
+> +subdir-ccflags-y := -I$(incdir)
+>  
+>  obj-$(CONFIG_KVM) += vhe/ nvhe/ pgtable.o
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index b5c5119c7396..48f6ae7cc6e6 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -10,6 +10,9 @@ asflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS
+>  # will explode instantly (Words of Marc Zyngier). So introduce a generic flag
+>  # __DISABLE_TRACE_MMIO__ to disable MMIO tracing for nVHE KVM.
+>  ccflags-y := -D__KVM_NVHE_HYPERVISOR__ -D__DISABLE_EXPORTS -D__DISABLE_TRACE_MMIO__
+> +ccflags-y += -fno-stack-protector	\
+> +	     -DDISABLE_BRANCH_PROFILING	\
+> +	     $(DISABLE_STACKLEAK_PLUGIN)
+>  
+>  hostprogs := gen-hyprel
+>  HOST_EXTRACFLAGS += -I$(objtree)/include
+> -- 
+> 2.38.0.rc1.362.ged0d419d3c-goog
+> 
