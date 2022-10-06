@@ -1,42 +1,42 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4245624
-	for <kvmarm@lists.linux.dev>; Thu,  6 Oct 2022 00:34:17 +0000 (UTC)
-Received: by mail-pl1-f202.google.com with SMTP id y16-20020a17090322d000b0017848b6f556so147324plg.19
-        for <kvmarm@lists.linux.dev>; Wed, 05 Oct 2022 17:34:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A58627
+	for <kvmarm@lists.linux.dev>; Thu,  6 Oct 2022 00:34:20 +0000 (UTC)
+Received: by mail-pl1-f201.google.com with SMTP id o1-20020a170902d4c100b00177f59a9889so155112plg.13
+        for <kvmarm@lists.linux.dev>; Wed, 05 Oct 2022 17:34:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uyz+ls9SzvDB0IvQmenZjlUIosIc2LDHAdTvYwIgnJ8=;
-        b=kHeHb1YMAO78AphiKKV5QPgfcpCxJabS7hQX9eymBKfV1NmRhoFW5qLcwdu/aXjwMQ
-         eab9kr5t8HNGzMR2yJtIi3E1tbxBq3l2iCu0ZRJBQUC/J6AwVkjvAvEu9+jWLPGCkHFm
-         GyumDVwqL5t3OfsCQh4FOdIhcfeUoKDrNLMZBoEmAdoAWRkC9wx4wH0ym4X3HIKQ4wwK
-         zTAhKBJQae/KJJ5tGeRzWIQTURQuEX255Kpg9kUYPeEmm9iEfVakYxDArg+pSR02zFRm
-         4Fo6PpSpv6rvTgNKkWvnt/01xsstUS5AbVeMT9OQkSTWN+PGGrPYPWXayeJnkV1C78FE
-         GUkQ==
+        bh=7AAoDxmpWj5x2ybL8wTFIqTszjzQUzGU8O6A4pyjNfw=;
+        b=MzoY3wJKC57f6HTHbwXp6BEc6x2nX+LXz+Q4fY+52r2dxYepv1/ChNsHSUVGDlRlTL
+         RgolXGHav8Nl9WQqJZZqodeVkTUXBRIvNR9SJOYaqM1at1r0JIbLyvNZuu65WM80y+Vo
+         4yofkc62Zbz8ziQT9XblbhDw7URnRjsrN5GH0Kci5x1v+P4tT7x4hS1hFUMIs6dQwTkN
+         yC3WsTSOrsdIcNJ8pWyzEUkIhKne2l+XqVRwJkun8zNFPccsDtByYqBQ6WwA3sXOYzfV
+         icPZ7hHokXQzhV9sxYuTQUMQEkoqEhzEDTnNb/JoNHY/8DPAGGYwputUmXnchRV0CMhI
+         ozGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Uyz+ls9SzvDB0IvQmenZjlUIosIc2LDHAdTvYwIgnJ8=;
-        b=n9PUcRQbFrnuz4YkQWte2K7/RSd7+63JIzwdRhl3hI1Vn6mumKEvUoiFAkcQy6EXs+
-         WO4mbHWCb3P8H8EQ19rclx/x+d5508ipg3JEPOGVS1FjvjdMNL3ofXi2NMlBRJjl1PLY
-         Zt+XL+Q/dXtMErbkO571hk7r+P8F+9FZnRwmh1/Z39GnuMBdRUo8zuHKPEIy1AG7GJNY
-         oI9VvYo5QjaJlD1+33nm76Rx4tKMJxKPRS1A3FQo6AHevEM5PnEXaxDE4cTlo/aucMWd
-         mtjcdo8xF8dSHcECwKR6qtdg+HhiO+sB6gBpBc6QrXsXGB1nsC4ToeHgs94Mri1laWVd
-         mOUA==
-X-Gm-Message-State: ACrzQf2JCp3wmYnME2XAzNnxS+DUPZ1viQ3Do6i4Wk1h0QxzCSezNTRa
-	AevFqp7eSvHgFRxJUIYP/dj/dKVRXU8=
-X-Google-Smtp-Source: AMsMyM6/nTsMR7mog9QNPYiNKe4XQJEjVHCqrl0WxSqAaPPxmAm8kr9I2iQTFbpiOIqXqQMJ8t3sFBomyjA=
+        bh=7AAoDxmpWj5x2ybL8wTFIqTszjzQUzGU8O6A4pyjNfw=;
+        b=jehmeauQ3AD6HUw73krhy4PtkXlHDobPfGOZdxyCC3fN1x1mEm4p13cen3q300mzZX
+         Ly11gChTp+QqnfE30jEZac8AkTogLpUv+pgPT6FMZKXIjyd9LpAYiJ+N2iIjV38L0WT8
+         4wFBCgkn98FMgLgEYQajBMa+vVXaQL7tSAx8EZjsHsXgFkjNFhOagTEx3hIsmsnqf5gH
+         NxAr/1Sv9aTpOrrGWEiDTGtKHOngx3Ek+CrPVG0RQtHkxDVbtLqdyy5t1amC0ynb+gOG
+         XX+4G38elFEw9o7W5+Xok0TDSO3GrACiou6w87Szp3gSjZIaw7WXKVpMsQW1Y23CxIxF
+         wf1w==
+X-Gm-Message-State: ACrzQf0c/RjZoRgisabdhGCY3xbtxM2ZJ5OK337i1/X0CZip1om6dmKN
+	z3yXs0Y9NgngrQMgBiZF6VLPSKxdcjo=
+X-Google-Smtp-Source: AMsMyM6q13frsoAZ4xAqZiCG4Xm5nEWira6ZJ9vVe6YG5C1/Mh75aGy9vekeidUwoeirPKMuKeImmGnRF6s=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2a4:b0:561:b88f:e723 with SMTP id
- q4-20020a056a0002a400b00561b88fe723mr2405162pfs.48.1665016457245; Wed, 05 Oct
- 2022 17:34:17 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:b4d:b0:561:b974:94b9 with SMTP id
+ p13-20020a056a000b4d00b00561b97494b9mr2300869pfo.26.1665016460299; Wed, 05
+ Oct 2022 17:34:20 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  6 Oct 2022 00:34:04 +0000
+Date: Thu,  6 Oct 2022 00:34:06 +0000
 In-Reply-To: <20221006003409.649993-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -46,8 +46,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20221006003409.649993-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20221006003409.649993-3-seanjc@google.com>
-Subject: [PATCH v6 2/7] KVM: selftests: Consolidate boilerplate code in get_ucall()
+Message-ID: <20221006003409.649993-5-seanjc@google.com>
+Subject: [PATCH v6 4/7] tools: Add atomic_test_and_set_bit()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>, 
 	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
@@ -66,229 +66,76 @@ Cc: James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.co
 	Andrew Jones <andrew.jones@linux.dev>, Peter Gonda <pgonda@google.com>, 
 	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221006003404.Xp_XGnE5igEenMzs3o7E_rvazZqhFtiZPASGXaMSeas@z>
+Message-ID: <20221006003406.C6RvKs2VwesihlI5UnT48lzlJGocTKNY5u2M5f64qoE@z>
 
-Consolidate the actual copying of a ucall struct from guest=>host into
-the common get_ucall().  Return a host virtual address instead of a guest
-virtual address even though the addr_gva2hva() part could be moved to
-get_ucall() too.  Conceptually, get_ucall() is invoked from the host and
-should return a host virtual address (and returning NULL for "nothing to
-see here" is far superior to returning 0).
+From: Peter Gonda <pgonda@google.com>
 
-Use pointer shenanigans instead of an unnecessary bounce buffer when the
-caller of get_ucall() provides a valid pointer.
+Add x86 and generic implementations of atomic_test_and_set_bit() to allow
+KVM selftests to atomically manage bitmaps.
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-Tested-by: Peter Gonda <pgonda@google.com>
+Note, the generic version is taken from arch_test_and_set_bit() as of
+commit 415d83249709 ("locking/atomic: Make test_and_*_bit() ordered on
+failure").
+
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/ucall_common.h      |  8 ++------
- .../testing/selftests/kvm/lib/aarch64/ucall.c | 14 +++-----------
- tools/testing/selftests/kvm/lib/riscv/ucall.c | 19 +++----------------
- tools/testing/selftests/kvm/lib/s390x/ucall.c | 16 +++-------------
- .../testing/selftests/kvm/lib/ucall_common.c  | 19 +++++++++++++++++++
- .../testing/selftests/kvm/lib/x86_64/ucall.c  | 16 +++-------------
- 6 files changed, 33 insertions(+), 59 deletions(-)
+ tools/arch/x86/include/asm/atomic.h    |  7 +++++++
+ tools/include/asm-generic/atomic-gcc.h | 12 ++++++++++++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
-index 5a85f5318bbe..63bfc60be995 100644
---- a/tools/testing/selftests/kvm/include/ucall_common.h
-+++ b/tools/testing/selftests/kvm/include/ucall_common.h
-@@ -27,9 +27,10 @@ struct ucall {
- void ucall_arch_init(struct kvm_vm *vm, void *arg);
- void ucall_arch_uninit(struct kvm_vm *vm);
- void ucall_arch_do_ucall(vm_vaddr_t uc);
--uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
-+void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu);
+diff --git a/tools/arch/x86/include/asm/atomic.h b/tools/arch/x86/include/asm/atomic.h
+index 1f5e26aae9fc..01cc27ec4520 100644
+--- a/tools/arch/x86/include/asm/atomic.h
++++ b/tools/arch/x86/include/asm/atomic.h
+@@ -8,6 +8,7 @@
  
- void ucall(uint64_t cmd, int nargs, ...);
-+uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc);
+ #define LOCK_PREFIX "\n\tlock; "
  
- static inline void ucall_init(struct kvm_vm *vm, void *arg)
- {
-@@ -41,11 +42,6 @@ static inline void ucall_uninit(struct kvm_vm *vm)
- 	ucall_arch_uninit(vm);
++#include <asm/asm.h>
+ #include <asm/cmpxchg.h>
+ 
+ /*
+@@ -70,4 +71,10 @@ static __always_inline int atomic_cmpxchg(atomic_t *v, int old, int new)
+ 	return cmpxchg(&v->counter, old, new);
  }
  
--static inline uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
--{
--	return ucall_arch_get_ucall(vcpu, uc);
--}
--
- #define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
- 				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
- #define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/ucall.c b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-index 3630708c32d6..f214f5cc53d3 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/ucall.c
-@@ -75,13 +75,9 @@ void ucall_arch_do_ucall(vm_vaddr_t uc)
- 	WRITE_ONCE(*ucall_exit_mmio_addr, uc);
- }
- 
--uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-+void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_run *run = vcpu->run;
--	struct ucall ucall = {};
--
--	if (uc)
--		memset(uc, 0, sizeof(*uc));
- 
- 	if (run->exit_reason == KVM_EXIT_MMIO &&
- 	    run->mmio.phys_addr == (uint64_t)ucall_exit_mmio_addr) {
-@@ -90,12 +86,8 @@ uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
- 		TEST_ASSERT(run->mmio.is_write && run->mmio.len == 8,
- 			    "Unexpected ucall exit mmio address access");
- 		memcpy(&gva, run->mmio.data, sizeof(gva));
--		memcpy(&ucall, addr_gva2hva(vcpu->vm, gva), sizeof(ucall));
--
--		vcpu_run_complete_io(vcpu);
--		if (uc)
--			memcpy(uc, &ucall, sizeof(ucall));
-+		return addr_gva2hva(vcpu->vm, gva);
- 	}
- 
--	return ucall.cmd;
-+	return NULL;
- }
-diff --git a/tools/testing/selftests/kvm/lib/riscv/ucall.c b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-index b1598f418c1f..37e091d4366e 100644
---- a/tools/testing/selftests/kvm/lib/riscv/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-@@ -51,27 +51,15 @@ void ucall_arch_do_ucall(vm_vaddr_t uc)
- 		  uc, 0, 0, 0, 0, 0);
- }
- 
--uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-+void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_run *run = vcpu->run;
--	struct ucall ucall = {};
--
--	if (uc)
--		memset(uc, 0, sizeof(*uc));
- 
- 	if (run->exit_reason == KVM_EXIT_RISCV_SBI &&
- 	    run->riscv_sbi.extension_id == KVM_RISCV_SELFTESTS_SBI_EXT) {
- 		switch (run->riscv_sbi.function_id) {
- 		case KVM_RISCV_SELFTESTS_SBI_UCALL:
--			memcpy(&ucall,
--			       addr_gva2hva(vcpu->vm, run->riscv_sbi.args[0]),
--			       sizeof(ucall));
--
--			vcpu_run_complete_io(vcpu);
--			if (uc)
--				memcpy(uc, &ucall, sizeof(ucall));
--
--			break;
-+			return addr_gva2hva(vcpu->vm, run->riscv_sbi.args[0]);
- 		case KVM_RISCV_SELFTESTS_SBI_UNEXP:
- 			vcpu_dump(stderr, vcpu, 2);
- 			TEST_ASSERT(0, "Unexpected trap taken by guest");
-@@ -80,6 +68,5 @@ uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
- 			break;
- 		}
- 	}
--
--	return ucall.cmd;
-+	return NULL;
- }
-diff --git a/tools/testing/selftests/kvm/lib/s390x/ucall.c b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-index 114cb4af295f..0f695a031d35 100644
---- a/tools/testing/selftests/kvm/lib/s390x/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/s390x/ucall.c
-@@ -20,13 +20,9 @@ void ucall_arch_do_ucall(vm_vaddr_t uc)
- 	asm volatile ("diag 0,%0,0x501" : : "a"(uc) : "memory");
- }
- 
--uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-+void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_run *run = vcpu->run;
--	struct ucall ucall = {};
--
--	if (uc)
--		memset(uc, 0, sizeof(*uc));
- 
- 	if (run->exit_reason == KVM_EXIT_S390_SIEIC &&
- 	    run->s390_sieic.icptcode == 4 &&
-@@ -34,13 +30,7 @@ uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
- 	    (run->s390_sieic.ipb >> 16) == 0x501) {
- 		int reg = run->s390_sieic.ipa & 0xf;
- 
--		memcpy(&ucall, addr_gva2hva(vcpu->vm, run->s.regs.gprs[reg]),
--		       sizeof(ucall));
--
--		vcpu_run_complete_io(vcpu);
--		if (uc)
--			memcpy(uc, &ucall, sizeof(ucall));
-+		return addr_gva2hva(vcpu->vm, run->s.regs.gprs[reg]);
- 	}
--
--	return ucall.cmd;
-+	return NULL;
- }
-diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
-index 2395c7f1d543..ced480860746 100644
---- a/tools/testing/selftests/kvm/lib/ucall_common.c
-+++ b/tools/testing/selftests/kvm/lib/ucall_common.c
-@@ -18,3 +18,22 @@ void ucall(uint64_t cmd, int nargs, ...)
- 
- 	ucall_arch_do_ucall((vm_vaddr_t)&uc);
- }
-+
-+uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
++static inline int atomic_test_and_set_bit(long nr, unsigned long *addr)
 +{
-+	struct ucall ucall;
-+	void *addr;
++	GEN_BINARY_RMWcc(LOCK_PREFIX __ASM_SIZE(bts), *addr, "Ir", nr, "%0", "c");
 +
-+	if (!uc)
-+		uc = &ucall;
-+
-+	addr = ucall_arch_get_ucall(vcpu);
-+	if (addr) {
-+		memcpy(uc, addr, sizeof(*uc));
-+		vcpu_run_complete_io(vcpu);
-+	} else {
-+		memset(uc, 0, sizeof(*uc));
-+	}
-+
-+	return uc->cmd;
 +}
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-index 9f532dba1003..ead9946399ab 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-@@ -22,25 +22,15 @@ void ucall_arch_do_ucall(vm_vaddr_t uc)
- 		: : [port] "d" (UCALL_PIO_PORT), "D" (uc) : "rax", "memory");
++
+ #endif /* _TOOLS_LINUX_ASM_X86_ATOMIC_H */
+diff --git a/tools/include/asm-generic/atomic-gcc.h b/tools/include/asm-generic/atomic-gcc.h
+index 4c1966f7c77a..6daa68bf5b9e 100644
+--- a/tools/include/asm-generic/atomic-gcc.h
++++ b/tools/include/asm-generic/atomic-gcc.h
+@@ -4,6 +4,7 @@
+ 
+ #include <linux/compiler.h>
+ #include <linux/types.h>
++#include <linux/bitops.h>
+ 
+ /*
+  * Atomic operations that C can't guarantee us.  Useful for
+@@ -69,4 +70,15 @@ static inline int atomic_cmpxchg(atomic_t *v, int oldval, int newval)
+ 	return cmpxchg(&(v)->counter, oldval, newval);
  }
  
--uint64_t ucall_arch_get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
-+void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_run *run = vcpu->run;
--	struct ucall ucall = {};
--
--	if (uc)
--		memset(uc, 0, sizeof(*uc));
- 
- 	if (run->exit_reason == KVM_EXIT_IO && run->io.port == UCALL_PIO_PORT) {
- 		struct kvm_regs regs;
- 
- 		vcpu_regs_get(vcpu, &regs);
--		memcpy(&ucall, addr_gva2hva(vcpu->vm, (vm_vaddr_t)regs.rdi),
--		       sizeof(ucall));
--
--		vcpu_run_complete_io(vcpu);
--		if (uc)
--			memcpy(uc, &ucall, sizeof(ucall));
-+		return addr_gva2hva(vcpu->vm, regs.rdi);
- 	}
--
--	return ucall.cmd;
-+	return NULL;
- }
++static inline int atomic_test_and_set_bit(long nr, unsigned long *addr)
++{
++	unsigned long mask = BIT_MASK(nr);
++	long old;
++
++	addr += BIT_WORD(nr);
++
++	old = __sync_fetch_and_or(addr, mask);
++	return !!(old & mask);
++}
++
+ #endif /* __TOOLS_ASM_GENERIC_ATOMIC_H */
 -- 
 2.38.0.rc1.362.ged0d419d3c-goog
 
