@@ -2,110 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90C76C4332F
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Oct 2022 18:45:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95DDCC433FE
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Oct 2022 23:28:59 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 24C5B4A49C;
-	Fri,  7 Oct 2022 14:45:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F8D34A49C;
+	Fri,  7 Oct 2022 19:28:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@ibm.com
+	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xZ9W7xjW8hX6; Fri,  7 Oct 2022 14:45:17 -0400 (EDT)
+	with ESMTP id 40zazY3lsO-7; Fri,  7 Oct 2022 19:28:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5D8B49F55;
-	Fri,  7 Oct 2022 14:45:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 881C94B08F;
+	Fri,  7 Oct 2022 19:28:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 220D441174
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Oct 2022 10:50:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 675294A1D9
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Oct 2022 19:28:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qIuvdFD9Pm2k for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Oct 2022 10:50:51 -0400 (EDT)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com
- [148.163.158.5])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C1B2D410DA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Oct 2022 10:50:51 -0400 (EDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 296EJI81028174;
- Thu, 6 Oct 2022 14:50:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=eBJPRGNF7Ffk/bTbBddIIeltiy/OQZSCWjz+FFs3SAA=;
- b=b7MFNZpp6NBtWshWsia0CLVW87K5y+w866KiJrTUXyHCaMv/sN7FPDpkW52ZMmv447zc
- ky6YAFFweRt9AzbDx+P0LHqtauOU4bnkrlpJmQoo5pBjqia7cnaP/VjaU0if9RAHk4on
- lxp8dVOItSyqD3ARvOr1DznXQ7+YstojVLu2tMHOj/2Wy1gBLQwvAamthnA/jEpqT2ud
- p9sxydJTRPCQggrOsK1soqQKr8aeK9kvYJcNr9uliIavXD15cBhp/TCX3M4K9uHEt4gl
- SE6kb4aO6lrSXzqBYts7T63I3e+wFqpK3/EW6rpA/+mYuN1qIAcG0sRha7cV+2m3XA/L Sw== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k20p80y1u-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 06 Oct 2022 14:50:44 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
- by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 296ENxIL021223;
- Thu, 6 Oct 2022 14:50:44 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.107])
- by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k20p80y0k-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 06 Oct 2022 14:50:44 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
- by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 296EZE3m021232;
- Thu, 6 Oct 2022 14:50:42 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com
- (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
- by ppma03fra.de.ibm.com with ESMTP id 3jxd68wbe8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 06 Oct 2022 14:50:42 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 296EoeSQ54788436
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 6 Oct 2022 14:50:40 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3BFCF11C052;
- Thu,  6 Oct 2022 14:50:40 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E582111C04A;
- Thu,  6 Oct 2022 14:50:39 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.242])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu,  6 Oct 2022 14:50:39 +0000 (GMT)
-Date: Thu, 6 Oct 2022 16:50:37 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH 1/3] lib/vmalloc: Treat
- virt_to_pte_phys() as returning a physical address
-Message-ID: <20221006165037.19b9488f@p-imbrenda>
-In-Reply-To: <Yz7FZPWAsFV9Cwpv@monolith.localdoman>
-References: <20221006111241.15083-1-alexandru.elisei@arm.com>
- <20221006111241.15083-2-alexandru.elisei@arm.com>
- <20221006133552.091bb41b@p-imbrenda>
- <Yz7FZPWAsFV9Cwpv@monolith.localdoman>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+ with ESMTP id CnrbvGbLe6lR for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Oct 2022 19:28:54 -0400 (EDT)
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ABB7C49F41
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Oct 2022 19:28:54 -0400 (EDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1665185333;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=IqVEPYz9+Fk1DulCf4KAHqaS32S3zy4XGu1z8gZcQ94=;
+ b=pYQp11XQNriZ+v/ARcUhe8A+GQ7yNuy9LrtksDb6vpIQTg1hwnvAxhc7q08mU+Y3BzX8ep
+ B7OPKEmXmAzzaf5ykrO5MTYT+f0JieJM8+b+ErEYI19fDngXuTl6cgefHXovVKeL88rMKt
+ i78ucXL/xIeCh/gWu/NZitqkjuewKKE=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: [PATCH v2 00/15] KVM: arm64: Parallel stage-2 fault handling
+Date: Fri,  7 Oct 2022 23:28:03 +0000
+Message-Id: <20221007232818.459650-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: S0daTmbDFxw4NvXwpfHRHmKDMNKlXnzO
-X-Proofpoint-ORIG-GUID: 7oVn2xScM_2GcXOrVT_v4aI-kQqvqcTU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-10-06_02,2022-10-06_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- adultscore=0 clxscore=1015 priorityscore=1501 bulkscore=0 phishscore=0
- suspectscore=0 malwarescore=0 mlxlogscore=999 impostorscore=0 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210060085
-X-Mailman-Approved-At: Fri, 07 Oct 2022 14:45:15 -0400
-Cc: Laurent Vivier <lvivier@redhat.com>, thuth@redhat.com,
- Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
- andrew.jones@linux.dev, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+X-Migadu-Flow: FLOW_OUT
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Ben Gardon <bgardon@google.com>, David Matlack <dmatlack@google.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -122,119 +66,127 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 6 Oct 2022 13:09:08 +0100
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+Presently KVM only takes a read lock for stage 2 faults if it believes
+the fault can be fixed by relaxing permissions on a PTE (write unprotect
+for dirty logging). Otherwise, stage 2 faults grab the write lock, which
+predictably can pile up all the vCPUs in a sufficiently large VM.
 
-> Hi,
-> 
-> On Thu, Oct 06, 2022 at 01:35:52PM +0200, Claudio Imbrenda wrote:
-> > On Thu,  6 Oct 2022 12:12:39 +0100
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> >   
-> > > All architectures that implements virt_to_pte_phys() (s390x, x86,
-> > > arm and arm64) return a physical address from the function. Teach
-> > > vmalloc to treat it as such, instead of confusing the return
-> > > value with a page table entry.  
-> > 
-> > I'm not sure I understand what you mean  
-> 
-> I thought that vmalloc uses PAGE_MASK because it expects
-> virt_to_pte_phys() to return a pteval (because of the "pte' part in
-> the virt_to_pte_phys()
+Like the TDP MMU for x86, this series loosens the locking around
+manipulations of the stage 2 page tables to allow parallel faults. RCU
+and atomics are exploited to safely build/destroy the stage 2 page
+tables in light of multiple software observers.
 
-I agree that the name of the function is confusing; there are comments
-in lib/vmalloc.h and for virt_to_pte_phys it says:
+Patches 1-4 clean up the context associated with a page table walk / PTE
+visit. This is helpful for:
+ - Extending the context passed through for a visit
+ - Building page table walkers that operate outside of a kvm_pgtable
+   context (e.g. RCU callback)
 
-/* Walk the page table and resolve the virtual address to a physical
-address */
+Patches 5-6 clean up the stage-2 map walkers by calling a helper to tear
+down removed tables. There is a small improvement here in that a broken
+PTE is replaced more quickly, as page table teardown happens afterwards.
 
-> function name), which might have the [PAGE_SHIFT-1:0] bits used to store
-> page metadata by an architecture (like permissions), but like you've
-> explained below it uses PAGE_MASK to align the page address (which is
-> identically mapped) before passing it to the page allocator to be freed.
-> 
-> >   
-> > > Changing things the other way around (having the function return a page
-> > > table entry instead) is not feasible, because it is possible for an
-> > > architecture to use the upper bits of the table entry to store metadata
-> > > about the page.
-> > > 
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Cc: Thomas Huth <thuth@redhat.com>
-> > > Cc: Andrew Jones <andrew.jones@linux.dev>
-> > > Cc: Laurent Vivier <lvivier@redhat.com>
-> > > Cc: Janosch Frank <frankja@linux.ibm.com>
-> > > Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > ---
-> > >  lib/vmalloc.c | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/lib/vmalloc.c b/lib/vmalloc.c
-> > > index 572682576cc3..0696b5da8190 100644
-> > > --- a/lib/vmalloc.c
-> > > +++ b/lib/vmalloc.c
-> > > @@ -169,7 +169,7 @@ static void vm_free(void *mem)
-> > >  	/* the pointer is not page-aligned, it was a single-page allocation */
-> > >  	if (!IS_ALIGNED((uintptr_t)mem, PAGE_SIZE)) {
-> > >  		assert(GET_MAGIC(mem) == VM_MAGIC);
-> > > -		page = virt_to_pte_phys(page_root, mem) & PAGE_MASK;
-> > > +		page = virt_to_pte_phys(page_root, mem);  
-> > 
-> > this will break things for small allocations, though. if the pointer is
-> > not aligned, then the result of virt_to_pte_phys will also not be
-> > aligned....  
-> 
-> I agree, I missed that part. Would be nice if it were written using
-> PAGE_ALIGN to avoid mistakes like mine in the future, but that's
+Patches 7-9 sprinkle in RCU to the page table walkers, punting the
+teardown of removed tables to an RCU callback.
 
-PAGE_ALIGN rounds UP, though, and we need to round down.
+Patches 10-14 implement the meat of this series, extending the
+'break-before-make' sequence with atomics to realize locking on PTEs.
+Effectively a cmpxchg() is used to 'break' a PTE, thereby serializing
+changes to a given PTE.
 
-I think it's easier and more readable to & PAGE_MASK, instead of a more
-cumbersome ALIGN_DOWN((thing), PAGE_SIZE)
+Finally, patch 15 flips the switch on all the new code and starts
+grabbing the read side of the MMU lock for stage 2 faults.
 
-> unimportant.
-> 
-> >   
-> > >  		assert(page);
-> > >  		free_page(phys_to_virt(page));  
-> > 
-> > ...and phys_to_virt will also return an unaligned address, and
-> > free_page will complain about it.
-> >   
-> > >  		return;
-> > > @@ -183,7 +183,7 @@ static void vm_free(void *mem)
-> > >  	/* free all the pages including the metadata page */
-> > >  	ptr = (uintptr_t)m & PAGE_MASK;  
-> > 
-> > ptr gets page aligned here
-> >   
-> > >  	for (i = 0 ; i < m->npages + 1; i++, ptr += PAGE_SIZE) {
-> > > -		page = virt_to_pte_phys(page_root, (void *)ptr) & PAGE_MASK;
-> > > +		page = virt_to_pte_phys(page_root, (void *)ptr);  
-> > 
-> > so virt_to_pte_phys will also return an aligned address;
-> > I agree that & PAGE_MASK is redundant here  
-> 
-> You are correct, if we've ended up here it means that the pointer is
-> already page aligned, and it will be incremented by PAGE_SIZE each
-> iteration, hence the virt_to_pte_phys() will also be paged aligned.
-> 
-> I don't see much point in writing a patch just to remove the unnecessary
-> alignment here, so I'll drop this patch entirely.
-> 
-> Thank you for the prompt explanation!
+Applies to kvmarm-6.1. Tested with KVM selftests, kvm-unit-tests, and
+Google's internal VMM (Vanadium). Also tested with lockdep enabled and
+saw no puke for RCU. Planning on following up testing migration with
+QEMU. Got frustrated with my cross-building environment and I wanted to
+get the patches out before the weekend :)
 
-I'm glad things have been clarified :)
+benchmarked with dirty_log_perf_test, scaling from 1 to 48 vCPUs with
+4GB of memory per vCPU backed by THP.
 
-> 
-> Alex
-> 
-> >   
-> > >  		assert(page);
-> > >  		free_page(phys_to_virt(page));
-> > >  	}  
-> >   
+  ./dirty_log_perf_test -s anonymous_thp -m 2 -b 4G -v ${NR_VCPUS}
+
+Time to dirty memory:
+
+        +-------+---------+------------------+
+        | vCPUs | kvmarm  | kvmarm + series  |
+        +-------+---------+------------------+
+        |     1 | 0.87s   | 0.93s            |
+        |     2 | 1.11s   | 1.16s            |
+        |     4 | 2.39s   | 1.27s            |
+        |     8 | 5.01s   | 1.39s            |
+        |    16 | 8.89s   | 2.07s            |
+        |    32 | 19.90s  | 4.45s            |
+        |    48 | 32.10s  | 6.23s            |
+        +-------+---------+------------------+
+
+It is also worth mentioning that the time to populate memory has
+improved:
+
+        +-------+---------+------------------+
+        | vCPUs | kvmarm  | kvmarm + series  |
+        +-------+---------+------------------+
+        |     1 | 0.21s   | 0.17s            |
+        |     2 | 0.26s   | 0.23s            |
+        |     4 | 0.39s   | 0.31s            |
+        |     8 | 0.68s   | 0.39s            |
+        |    16 | 1.26s   | 0.53s            |
+        |    32 | 2.51s   | 1.04s            |
+        |    48 | 3.94s   | 1.55s            |
+        +-------+---------+------------------+
+
+v1 -> v2:
+ - It builds! :-)
+ - Roll all of the context associated with PTE visit into a
+   stack-allocated structure
+ - Clean up the oddball handling of PTE values, avoiding a UAF along the
+   way (Quentin)
+ - Leave the re-reading of the PTE after WALK_LEAF in place instead of
+   attempting to return the installed PTE value (David)
+ - Mention why RCU is stubbed out for hyp page table walkers (David)
+ - Ensure that all reads of page table memory pass through an
+   RCU-protected pointer. The lifetime of the dereference is contained
+   within __kvm_pgtable_visit() (David).
+ - Ensure that no user of stage2_map_walker() passes TABLE_POST (David)
+ - Unwire the page table walkers from relying on struct kvm_pgtable,
+   simplifying the passed context to RCU callbacks.
+ - Key rcu_dereference() off of a page table flag indicating a shared
+   walk. This is clear when either (1) the write lock is held or (2)
+   called from an RCU callback.
+
+v1: https://lore.kernel.org/kvmarm/20220830194132.962932-1-oliver.upton@linux.dev/
+
+Oliver Upton (15):
+  KVM: arm64: Combine visitor arguments into a context structure
+  KVM: arm64: Stash observed pte value in visitor context
+  KVM: arm64: Pass mm_ops through the visitor context
+  KVM: arm64: Don't pass kvm_pgtable through kvm_pgtable_walk_data
+  KVM: arm64: Add a helper to tear down unlinked stage-2 subtrees
+  KVM: arm64: Tear down unlinked stage-2 subtree after break-before-make
+  KVM: arm64: Use an opaque type for pteps
+  KVM: arm64: Protect stage-2 traversal with RCU
+  KVM: arm64: Free removed stage-2 tables in RCU callback
+  KVM: arm64: Atomically update stage 2 leaf attributes in parallel
+    walks
+  KVM: arm64: Split init and set for table PTE
+  KVM: arm64: Make block->table PTE changes parallel-aware
+  KVM: arm64: Make leaf->leaf PTE changes parallel-aware
+  KVM: arm64: Make table->block changes parallel-aware
+  KVM: arm64: Handle stage-2 faults in parallel
+
+ arch/arm64/include/asm/kvm_pgtable.h  |  85 +++-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |  21 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c       |  22 +-
+ arch/arm64/kvm/hyp/pgtable.c          | 624 ++++++++++++++------------
+ arch/arm64/kvm/mmu.c                  |  51 ++-
+ 5 files changed, 456 insertions(+), 347 deletions(-)
+
+
+base-commit: b302ca52ba8235ff0e18c0fa1fa92b51784aef6a
+-- 
+2.38.0.rc1.362.ged0d419d3c-goog
 
 _______________________________________________
 kvmarm mailing list
