@@ -1,19 +1,19 @@
 Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2AD5380
-	for <kvmarm@lists.linux.dev>; Fri,  7 Oct 2022 23:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677475380
+	for <kvmarm@lists.linux.dev>; Fri,  7 Oct 2022 23:29:24 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1665185359;
+	t=1665185362;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jR0mg6F8PD1PCyPLvjPpIf4XFeLVY65l9bZKLjv3zhU=;
-	b=HxSTwqdNf+XmR5qSybbUP8Ecxwyc7kP0pm7o5Ek+YMj4MJPcXStljuG4RX1rxw9HlWqgi6
-	riIlw0EqXa83Dq8JW7YoP9dul5GB4Yb5W4R63kew8lZfuXtG9zUjVpyuEhYMTavMloU26L
-	qTEBMJZlwc7zhGX4j1hovumn4WtPHcg=
+	bh=VSPfpEbpaF1HVCxRtymHK1iFw2Ndlq59kfZN9gAzh+o=;
+	b=cNg6oTFgzO6GY0L1TSYs7VSjRhECOO45tRYmyHyGTLCGVfbUe1OMQZDUhlHB5r2lpF6zDS
+	2D+3RKe920GacKOattZz33WA70jNktLYMN/nLuxTOfrgoBEWrnF636GWOmA8Torc/pEFPj
+	QL2sulno3gIzHRFCHhAZJcOqkha0/VA=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	James Morse <james.morse@arm.com>,
@@ -32,9 +32,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Sean Christopherson <seanjc@google.com>,
 	kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 08/15] KVM: arm64: Protect stage-2 traversal with RCU
-Date: Fri,  7 Oct 2022 23:28:11 +0000
-Message-ID: <20221007232818.459650-9-oliver.upton@linux.dev>
+Subject: [PATCH v2 09/15] KVM: arm64: Free removed stage-2 tables in RCU callback
+Date: Fri,  7 Oct 2022 23:28:12 +0000
+Message-ID: <20221007232818.459650-10-oliver.upton@linux.dev>
 In-Reply-To: <20221007232818.459650-1-oliver.upton@linux.dev>
 References: <20221007232818.459650-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -45,93 +45,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221007232811.VwR-sPTj3oJrtcvX3kd-skg74pJn6kwg6QTkVugBtf8@z>
+Message-ID: <20221007232812.0N2sUBkYjJUdHDSmIpn6dn1lNSHGGJZCaq0l5AuQj2g@z>
 
-The use of RCU is necessary to safely change the stage-2 page tables in
-parallel. Acquire and release the RCU read lock when traversing the page
-tables.
+There is no real urgency to free a stage-2 subtree that was pruned.
+Nonetheless, KVM does the tear down in the stage-2 fault path while
+holding the MMU lock.
 
-Use the _raw() flavor of rcu_dereference when changes to the page tables
-are otherwise protected from parallel software walkers (e.g. holding the
-write lock).
+Free removed stage-2 subtrees after an RCU grace period. To guarantee
+all stage-2 table pages are freed before killing a VM, add an
+rcu_barrier() to the flush path.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 34 ++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/pgtable.c         |  7 +++++-
- 2 files changed, 40 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/mmu.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index beb89eac155c..60c37e5e77dd 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -25,6 +25,13 @@ static inline u64 kvm_get_parange(u64 mmfr0)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 04a25319abb0..66eede0fbb36 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -104,9 +104,21 @@ static void *kvm_host_zalloc_pages_exact(size_t size)
  
- typedef u64 kvm_pte_t;
+ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops;
  
-+/*
-+ * RCU cannot be used in a non-kernel context such as the hyp. As such, page
-+ * table walkers used in hyp do not call into RCU and instead use other
-+ * synchronization mechanisms (such as a spinlock).
-+ */
-+#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
++static void stage2_free_removed_table_rcu_cb(struct rcu_head *head)
++{
++	struct page *page = container_of(head, struct page, rcu_head);
++	void *pgtable = page_to_virt(page);
++	u32 level = page_private(page);
 +
- typedef kvm_pte_t *kvm_pteref_t;
- 
- static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
-@@ -32,6 +39,33 @@ static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared
- 	return pteref;
++	kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, pgtable, level);
++}
++
+ static void stage2_free_removed_table(void *addr, u32 level)
+ {
+-	kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, addr, level);
++	struct page *page = virt_to_page(addr);
++
++	set_page_private(page, (unsigned long)level);
++	call_rcu(&page->rcu_head, stage2_free_removed_table_rcu_cb);
  }
  
-+static inline void kvm_pgtable_walk_begin(void) {}
-+static inline void kvm_pgtable_walk_end(void) {}
-+
-+#else
-+
-+typedef kvm_pte_t __rcu *kvm_pteref_t;
-+
-+static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
-+{
-+	if (shared)
-+		return rcu_dereference(pteref);
-+
-+	return rcu_dereference_raw(pteref);
-+}
-+
-+static inline void kvm_pgtable_walk_begin(void)
-+{
-+	rcu_read_lock();
-+}
-+
-+static inline void kvm_pgtable_walk_end(void)
-+{
-+	rcu_read_unlock();
-+}
-+
-+#endif
-+
- #define KVM_PTE_VALID			BIT(0)
- 
- #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 6b6e1ed7ee2f..c2be15850497 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -281,8 +281,13 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 		.end	= PAGE_ALIGN(walk_data.addr + size),
- 		.walker	= walker,
- 	};
-+	int r;
- 
--	return _kvm_pgtable_walk(pgt, &walk_data);
-+	kvm_pgtable_walk_begin();
-+	r = _kvm_pgtable_walk(pgt, &walk_data);
-+	kvm_pgtable_walk_end();
-+
-+	return r;
- }
- 
- struct leaf_walk_data {
+ static void kvm_host_get_page(void *addr)
 -- 
 2.38.0.rc1.362.ged0d419d3c-goog
 
