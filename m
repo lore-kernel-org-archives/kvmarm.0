@@ -2,75 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1312C433FE
-	for <kvmarm@archiver.kernel.org>; Sun,  9 Oct 2022 01:37:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0F3C433FE
+	for <kvmarm@archiver.kernel.org>; Sun,  9 Oct 2022 02:22:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C35449F55;
-	Sat,  8 Oct 2022 21:37:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 49EE54B0C2;
+	Sat,  8 Oct 2022 22:22:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cTC7I-cTtjcp; Sat,  8 Oct 2022 21:37:03 -0400 (EDT)
+	with ESMTP id U7sx-8EwKl+g; Sat,  8 Oct 2022 22:22:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 639404A49C;
-	Sat,  8 Oct 2022 21:37:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28E4749EBE;
+	Sat,  8 Oct 2022 22:22:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 92FE94A1D9
- for <kvmarm@lists.cs.columbia.edu>; Sat,  8 Oct 2022 21:37:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E7C549EBE
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  8 Oct 2022 22:22:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zwhOCKYGKGAP for <kvmarm@lists.cs.columbia.edu>;
- Sat,  8 Oct 2022 21:37:00 -0400 (EDT)
+ with ESMTP id si8efbp1hJwy for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  8 Oct 2022 22:22:03 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 45EC540159
- for <kvmarm@lists.cs.columbia.edu>; Sat,  8 Oct 2022 21:37:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63FCD40171
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  8 Oct 2022 22:22:03 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id C35D2B80C72;
- Sun,  9 Oct 2022 01:36:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C74EC433C1;
- Sun,  9 Oct 2022 01:36:57 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 2B6B1B80C70;
+ Sun,  9 Oct 2022 02:22:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1A13C43470;
+ Sun,  9 Oct 2022 02:22:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1665279417;
- bh=HGJvbxw2MJ35hMazorht+KBKpy2FAeCse4OJqWityt8=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=aR30/763frgO+vBid7LTGeYm+ND9XQJkz46/DA51ViZ4gXaDskcjfFLltR5iHNtw/
- bgv6FWRxBLkcJpk4GitRRpVzpJwiXDTO6CAWe1mDlpz+zxFZ8jPPIWHbg0DfmJGjSL
- /fR3dPxfAP6f/mo7IAsXpSmtvQZMvbeaTzsh9+5VgwnQXTQgp/R/VrGETsL3caoxBk
- 1Vje6eWjnV3est3j0AByvLHVNwjrYwCKvEVZNfbPmnBKRb2oT3a9H8QVUyz2Q4kUtL
- 0zg3LhkBXaxpNeXpZo9x8AJrOFXY0R7W9SbNe07fFMaOlqVNoyouONMPdS+IzG5Tdo
- t/HrXEOu2wpeg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+ s=k20201202; t=1665282120;
+ bh=+YAJ9im5jpLBIDI48YO9FH7HB0iS//5wbxzqT1fIHgw=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=KfrPxUGkXs6iSspzMj77T6b5X58ICJ3GQmKwY2mLezp1NuJiJFaxVgRydxR1bCI5l
+ pOgZVuHMU8iesU/sdVZFsYtLvrnMOOOHWd8dNeZBBjkf+zC/G50BrpMlYnx0Bv7YkQ
+ NeUcI3GFBkVJJpClIhjOM2CMzHpoMQfVsslRK/7+LhfpBe/uJw49T4Il4j/uKU2uKg
+ O/bBci/cHrtU4HFlSMcn0SboNFNvGsFq8hnt3V7brEAYGnUUTOgoDznLRbgWUQvrXb
+ 95+uDgOIJ6VcnUtsRkf7Cb0RYfQy5v8kp24Hy1zSOXI1LjeD9vRA1iLNq+Bn9Gl8ft
+ FpRQFjXrttu5A==
+Received: from [156.39.10.100] (helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1ohLFP-00FKtd-98;
- Sun, 09 Oct 2022 02:36:55 +0100
+ (envelope-from <maz@kernel.org>) id 1ohLx0-00FLAW-A0;
+ Sun, 09 Oct 2022 03:21:58 +0100
+Date: Sun, 09 Oct 2022 03:20:59 +0100
+Message-ID: <87sfjxhh4k.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v3 0/2] KVM: arm64: Limit stage2_apply_range() batch size
- to largest block
-Date: Sun,  9 Oct 2022 02:36:43 +0100
-Message-Id: <166527939508.254377.2666573949746347209.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221007234151.461779-1-oliver.upton@linux.dev>
-References: <20221007234151.461779-1-oliver.upton@linux.dev>
-MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, james.morse@arm.com,
- oliver.upton@linux.dev, kvm@vger.kernel.org, ricarkol@google.com,
- dmatlack@google.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, qperret@google.com
+To: Denis Nikitin <denik@chromium.org>
+Subject: Re: [PATCH v2] KVM: arm64: nvhe: Fix build with profile optimization
+In-Reply-To: <CADDJ8CV83d4tYeLnQH-hHjzBfED6EBo4Z70q5A=9cwO+Lp1sNQ@mail.gmail.com>
+References: <20220920082005.2459826-1-denik@chromium.org>
+ <20220922053145.944786-1-denik@chromium.org>
+ <87h70zk83g.wl-maz@kernel.org>
+ <CADDJ8CW0QgHtp1rwk=ZqrcuWZ4_L8KQh26VaEfcBQS0Tx9+ZYg@mail.gmail.com>
+ <CAH=Qcsi3aQ51AsAE0WmAH9VmpqjOaQQt=ru5Nav4+d8F3fMPwQ@mail.gmail.com>
+ <CADDJ8CXObkhMvOx+L29awjtt7tiaTWxFrRxOmhUqvzku1wswHw@mail.gmail.com>
+ <CADDJ8CV83d4tYeLnQH-hHjzBfED6EBo4Z70q5A=9cwO+Lp1sNQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 156.39.10.100
+X-SA-Exim-Rcpt-To: denik@chromium.org, catalin.marinas@arm.com, will@kernel.org,
+ james.morse@arm.com, alexandru.elisei@arm.com, ndesaulniers@google.com,
+ dbrazdil@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ manojgupta@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- David Matlack <dmatlack@google.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
+ Manoj Gupta <manojgupta@google.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,32 +95,29 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 7 Oct 2022 23:41:49 +0000, Oliver Upton wrote:
-> Continuing with MMU patches to post, a small series fixing some soft
-> lockups caused by stage2_apply_range(). Depending on the paging setup,
-> we could walk a very large amount of memory before dropping the lock and
-> rescheduling.
+On Thu, 06 Oct 2022 17:28:17 +0100,
+Denis Nikitin <denik@chromium.org> wrote:
 > 
-> Applies to kvmarm-6.1. Tested with KVM selftests and kvm-unit-tests with
-> all supported page sizes (4K, 16K, 64K). Additionally, I no longer saw
-> soft lockups with the following:
+> Hi Mark,
+
+s/k/c/
+
 > 
-> [...]
+> This problem currently blocks the PGO roll on the ChromeOS kernel and
+> we need some kind of a solution.
 
-Applied to fixes, thanks!
+I'm sorry, but I don't feel constrained by your internal deadlines. I
+have my own...
 
-[1/2] KVM: arm64: Work out supported block level at compile time
-      commit: 3b5c082bbfa20d9a57924edd655bbe63fe98ab06
-[2/2] KVM: arm64: Limit stage2_apply_range() batch size to largest block
-      commit: 5994bc9e05c2f8811f233aa434e391cd2783f0f5
+> Could you please take a look?
 
-Cheers,
+I have asked for a reproducer. All I got for an answer is "this is
+hard". Providing a profiling file would help, for example.
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
