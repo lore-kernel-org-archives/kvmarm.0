@@ -1,29 +1,45 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFDF1FB2
-	for <kvmarm@lists.linux.dev>; Mon, 10 Oct 2022 04:10:35 +0000 (UTC)
-Date: Mon, 10 Oct 2022 04:10:23 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1665375028;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cmx7UC5ERbZvs6NltikBKO+6xKGttyQo1AEh/wBpODM=;
-	b=mWnNl9esZ4y1R7iZLuV38Ia7gZTlaSRQxos7LCRu9JrUofDzcFj4pgoUkfZa9sSZtDlTEx
-	u1tilWLnPq16Hnl1a0BT5mPphvQ9yAzQe3k7kzjl1eNBcFcSqnXYXeDgFNYSa0RM55JLGO
-	RHyqL7uUKo6dN+egY/xOYyt/ETSk4GY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, maz@kernel.org,
-	andrew.jones@linux.dev, james.morse@arm.com,
-	alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-	pbonzini@redhat.com, seanjc@google.com, wanghaibin.wang@huawei.com
-Subject: Re: [PATCH] KVM: arm64: selftests: Fix multiple versions of GIC
- creation
-Message-ID: <Y0ObL7C7/93Q8d5T@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B5E1FAB
+	for <kvmarm@lists.linux.dev>; Mon, 10 Oct 2022 08:43:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1483C433D6;
+	Mon, 10 Oct 2022 08:43:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1665391428;
+	bh=TpTFBaVpcpiipRfNA/wPYZumGbWrDPFoKZ4zg95sX2U=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=bLD4p6KyiC8H+vTEJd2NqrviY1Lf+ftSXPWJj3Emh0FLcCLGnNyqi2PzGNhqjfdFw
+	 eumzzstin/gMueyI62tUqsBu/zOrNiZtrvAfV5JyiU44V3uvhph1FZDWRLqNvh9Xot
+	 WRqNcBls1LRbhtiiv1rpQeJNuiH9+HLtUZjwnaeERiURJOLDqOz/lOsSAyWWpSF5mI
+	 1xW/g8kplrW/fyrptykPq/KiRoBAFPXvpJblpXoeFsHSfAoed0/OvlZi5KVVm+HSwI
+	 OXN2W9Q/EGkX7gDj1H8WWsFVW4P8sJ7uYg9tJ6eDtYMs6kBS3Mmy3A/iR9SM6B4Bli
+	 9U3qlAcoKToqA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ohoO2-00FYgY-GI;
+	Mon, 10 Oct 2022 09:43:46 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Zenghui Yu <yuzenghui@huawei.com>
+Cc: alexandru.elisei@arm.com,
+	seanjc@google.com,
+	oliver.upton@linux.dev,
+	pbonzini@redhat.com,
+	james.morse@arm.com,
+	andrew.jones@linux.dev,
+	wanghaibin.wang@huawei.com,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH] KVM: arm64: selftests: Fix multiple versions of GIC creation
+Date: Mon, 10 Oct 2022 09:43:43 +0100
+Message-ID: <166539141624.256352.10322774978905917521.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221009033131.365-1-yuzenghui@huawei.com>
 References: <20221009033131.365-1-yuzenghui@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -31,47 +47,29 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221009033131.365-1-yuzenghui@huawei.com>
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221010041023.AMSt5fEmyQzmWM8pJJ_vxZ5wa1BZ-lKpWtMg9Yi92co@z>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com, seanjc@google.com, oliver.upton@linux.dev, pbonzini@redhat.com, james.morse@arm.com, andrew.jones@linux.dev, wanghaibin.wang@huawei.com, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221010084343.QJrWxwuPtKjXLfryV-wda4Uzmzvgz0U26s1tm_haJtk@z>
 
-On Sun, Oct 09, 2022 at 11:31:31AM +0800, Zenghui Yu wrote:
+On Sun, 9 Oct 2022 11:31:31 +0800, Zenghui Yu wrote:
 > Commit 98f94ce42ac6 ("KVM: selftests: Move KVM_CREATE_DEVICE_TEST code to
 > separate helper") wrongly converted a "real" GIC device creation to
 > __kvm_test_create_device() and caused the test failure on my D05 (which
 > supports v2 emulation). Fix it.
-> 
-> Fixes: 98f94ce42ac6 ("KVM: selftests: Move KVM_CREATE_DEVICE_TEST code to separate helper")
-> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+Applied to fixes, thanks!
 
---
-Thanks,
-Oliver
+[1/1] KVM: arm64: selftests: Fix multiple versions of GIC creation
+      commit: 8a6ffcbe26fd14d58075dcf3cbdf1b5b69b20402
 
-> ---
->  tools/testing/selftests/kvm/aarch64/vgic_init.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-> index e05ecb31823f..9c131d977a1b 100644
-> --- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
-> +++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-> @@ -662,8 +662,8 @@ int test_kvm_device(uint32_t gic_dev_type)
->  					     : KVM_DEV_TYPE_ARM_VGIC_V2;
->  
->  	if (!__kvm_test_create_device(v.vm, other)) {
-> -		ret = __kvm_test_create_device(v.vm, other);
-> -		TEST_ASSERT(ret && (errno == EINVAL || errno == EEXIST),
-> +		ret = __kvm_create_device(v.vm, other);
-> +		TEST_ASSERT(ret < 0 && (errno == EINVAL || errno == EEXIST),
->  				"create GIC device while other version exists");
->  	}
->  
-> -- 
-> 2.33.0
-> 
-> 
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
