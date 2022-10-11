@@ -2,84 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F695C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Oct 2022 06:31:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB9FC433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Oct 2022 16:54:13 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95CB8410F3;
-	Tue, 11 Oct 2022 02:31:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7491C4B241;
+	Tue, 11 Oct 2022 12:54:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Bp0WrWViOXvV; Tue, 11 Oct 2022 02:31:34 -0400 (EDT)
+	with ESMTP id eaodetw0vBvt; Tue, 11 Oct 2022 12:54:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 421A849EC2;
-	Tue, 11 Oct 2022 02:31:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 34A644B176;
+	Tue, 11 Oct 2022 12:54:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DCEE410F3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Oct 2022 02:31:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14B574B166
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Oct 2022 12:54:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FDHm58R0gfNT for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Oct 2022 02:31:31 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D638A410F1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Oct 2022 02:31:31 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1665469891;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=nrubDcGdHvNZYlCcmRCk0edxWxc9QH/CwRyNjKbhWUU=;
- b=DuJC2JF7NW78+5XfqJ1f3R1NSN/gPeII0e/w6WA8jNAunS84jjUcd9ikln28llmgRfOL/A
- WPZMkB6AMyfgMaWev+N9T99RkHrKzKauZW4H9VhHG/1lkj8i/xmZWpGE+a00VRFpBxN9OU
- 8HG08v2X/xMSpQFDXr01te0NV8pe/mE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-320-P2hewL7VMHCiMyOvNg3dFA-1; Tue, 11 Oct 2022 02:31:26 -0400
-X-MC-Unique: P2hewL7VMHCiMyOvNg3dFA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
- [10.11.54.4])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id siqqipjiwooQ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Oct 2022 12:54:09 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 04F5D4B13D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Oct 2022 12:54:08 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0F2B5185A79C;
- Tue, 11 Oct 2022 06:31:26 +0000 (UTC)
-Received: from [10.64.54.52] (vpn2-54-52.bne.redhat.com [10.64.54.52])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D235D207B372;
- Tue, 11 Oct 2022 06:31:19 +0000 (UTC)
-Subject: Re: [PATCH v5 3/7] KVM: x86: Allow to use bitmap in ring-based dirty
- page tracking
-From: Gavin Shan <gshan@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>, Peter Xu <peterx@redhat.com>
-References: <20221005004154.83502-1-gshan@redhat.com>
- <20221005004154.83502-4-gshan@redhat.com> <Yz86gEbNflDpC8As@x1n>
- <a5e291b9-e862-7c71-3617-1620d5a7d407@redhat.com> <Y0A4VaSwllsSrVxT@x1n>
- <Y0SoX2/E828mbxuf@google.com> <Y0SvexjbHN78XVcq@xz-m1.local>
- <Y0SxnoT5u7+1TCT+@google.com> <Y0S2zY4G7jBxVgpu@xz-m1.local>
- <Y0TDCxfVVme8uPGU@google.com>
- <6440b74c-9ebc-12f4-dd4e-469376a434f2@redhat.com>
-Message-ID: <53ac3666-46b3-8134-2e23-2840a16d333e@redhat.com>
-Date: Tue, 11 Oct 2022 14:31:17 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ by dfw.source.kernel.org (Postfix) with ESMTPS id A38C461229;
+ Tue, 11 Oct 2022 16:54:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04CC6C433C1;
+ Tue, 11 Oct 2022 16:54:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1665507247;
+ bh=xlwuYvosoE0BbYbq9HHwAmrNUGKKZ8giCfeDw0SQPDU=;
+ h=From:To:Cc:Subject:Date:From;
+ b=OnGUroGoqo+A2kb/uGY64G53Fuk5sMBo5h9SoFlhYzk/VBfgV5Vd9PhsTSAX+Vup2
+ 3iNn2Nay8RoSDYsGIZJ1xo53eezwfbGo7Cdb3uLP2GGOQzf6zCa5HfpThOrvZl5P2c
+ aZJIN5Sd2Be4LktxeptQd6DI4x2YzdvZoCpWvQeP4QVj1wuz4YIUwuhPYdah/8YUFU
+ Q2R3mfjTwucFLJfuwR/g8q+id3EhBkvC1s4XRfIyGupcL45efn1egi5VR07wSXIBHY
+ 2irXOapsRRpUV5fAf43q6piwhvSPctRqBvojE1UqKYVHlU862Kp1N4AWkBhI/udih9
+ ccyI02eoLUtlQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oiIW4-00Fs7W-Oh;
+ Tue, 11 Oct 2022 17:54:04 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: <kvmarm@lists.cs.columbia.edu>, <kvmarm@lists.linux.dev>,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH] KVM: arm64: pkvm: Fixup boot mode to reflect that the kernel
+ resumes from EL1
+Date: Tue, 11 Oct 2022 17:54:00 +0100
+Message-Id: <20221011165400.1241729-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-In-Reply-To: <6440b74c-9ebc-12f4-dd4e-469376a434f2@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
- dmatlack@google.com, will@kernel.org, shan.gavin@gmail.com, bgardon@google.com,
- kvmarm@lists.linux.dev, pbonzini@redhat.com, zhenyzha@redhat.com,
- shuah@kernel.org, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev,
+ qperret@google.com, will@kernel.org, vdonnefort@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -88,129 +78,65 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="windows-1252"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Peter/Oliver,
+The kernel has an awfully complicated boot sequence in order to cope
+with the various EL2 configurations, including those that "enhanced"
+the architecture. We go from EL2 to EL1, then back to EL2, staying
+at EL2 if VHE capable and otherwise go back to EL1.
 
-On 10/11/22 11:56 AM, Gavin Shan wrote:
-> On 10/11/22 9:12 AM, Oliver Upton wrote:
->> On Mon, Oct 10, 2022 at 08:20:29PM -0400, Peter Xu wrote:
->>> On Mon, Oct 10, 2022 at 11:58:22PM +0000, Oliver Upton wrote:
->>>> I think this further drives the point home -- there's zero need for the
->>>> bitmap with dirty ring on x86, so why even support it? The proposal of
->>>> ALLOW_BITMAP && DIRTY_RING should be arm64-specific. Any other arch th=
-at
->>>> needs to dirty memory outside of a vCPU context can opt-in to the
->>>> behavior.
->>>
->>> Yeah that sounds working too, but it'll be slightly hackish as then the
->>> user app will need some "#ifdef ARM64" blocks for e.g. sync dirty bitma=
-p.
->>> With the new cap the user app can implement the whole ring with generic
->>> code.
->>
->> Isn't the current route of exposing ALLOW_BITMAP on other arches for no
->> reason headed in exactly that direction? Userspace would need to know if
->> it _really_ needs the dirty bitmap in addition to the dirty ring, which
->> could take the form of architecture ifdeffery.
->>
->> OTOH, if the cap is only exposed when it is absolutely necessary, an
->> arch-generic live migration implementation could enable the cap whenever
->> it is advertized and scan the bitmap accordingly.
->>
->> The VMM must know something about the architecture it is running on, as
->> it calls KVM_DEV_ARM_ITS_SAVE_TABLES after all...
->>
-> =
+Here's a paracetamol tablet for you.
 
-> It looks good to me by using CONFIG_HAVE_KVM_DIRTY_RING_USE_BITMAP to
-> opt-in KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP. The most important point is
-> to ensure 'kvm->dirty_ring_with_bitmap =3D=3D true' when dirty ring capab=
-ility
-> is enabled. In this way, we can fail early when KVM_CAP_DIRTY_LOG_RING_WI=
-TH_BITMAP
-> isn't enabled on attempt to enable dirty ring capability.
-> =
+The cpu_resume path follows the same logic, because coming up with
+two versions of a square wheel is hard.
 
-> If both of you agree, I will integrate the suggested code changes in
-> next respin, with necessary tweak.
-> =
+However, things aren't this straightforward with pKVM, as the host
+resume path is always proxied by the hypervisor, which means that
+the kernel is always entered at EL1. Which contradicts what the
+__boot_cpu_mode[] array contains (it obviously says EL2).
 
-> - In kvm_vm_ioctl_enable_cap_generic(), 'kvm->dirty_ring_with_bitmap' is
->  =A0 updated to 'true' unconditionally.
-> =
+This thus triggers a HVC call from EL1 to EL2 in a vain attempt
+to upgrade from EL1 to EL2 VHE, which we are, funnily enough,
+reluctant to grant to the host kernel. This is also completely
+unexpected, and puzzles your average EL2 hacker.
 
->  =A0 static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
->  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 struct kvm_ena=
-ble_cap *cap)
->  =A0 {
->  =A0=A0=A0=A0=A0 :
->  =A0=A0=A0=A0=A0 case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP:
->  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 kvm->dirty_ring_with_bitmap =3D true;
->  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return 0;
->  =A0 }
-> =
+Address it by fixing up the boot mode at the point the host gets
+deprivileged. is_hyp_mode_available() and co already have a static
+branch to deal with this, making it pretty safe.
 
-> - In mark_page_dirty_in_slot(), we need comprehensive checks like below.
-> =
+Reported-by: Vincent Donnefort <vdonnefort@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/arm.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
->  =A0 void mark_page_dirty_in_slot(struct kvm *kvm,
->  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0 const struct kvm_memory_slot *memslot,
->  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0 gfn_t gfn)
->  =A0 {
-> #ifdef CONFIG_HAVE_KVM_DIRTY_RING
->  =A0=A0=A0=A0=A0 if (WARN_ON_ONCE(vcpu && vcpu->kvm !=3D kvm))
->  =A0=A0=A0=A0=A0=A0=A0=A0=A0 return;
-> =
-
-> #ifndef CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP
->  =A0=A0=A0=A0=A0 if (WARN_ON_ONCE(!vcpu))
->  =A0=A0=A0=A0=A0=A0=A0=A0=A0 return;
-> #endif
-> #endif
-> =
-
->  =A0 }
-> =
-
-> - Use kvm_dirty_ring_exclusive(), which was suggested by Peter before.
->  =A0 The function is used in various spots to allow the dirty bitmap is
->  =A0 created and accessed.
-> =
-
->  =A0 bool kvm_dirty_ring_exclusive(struct kvm *kvm)
->  =A0 {
->  =A0=A0=A0=A0=A0 return kvm->dirty_ring_size && !kvm->dirty_ring_with_bit=
-map;
->  =A0 }
-> =
-
-> =
-
-
-I've included Oliver's suggested changes into v6, which was just posted:
-
-https://lore.kernel.org/kvmarm/3123a04f-a674-782b-9e9b-0baf3db49ebc@redhat.=
-com/
-
-Please find your time to review v6 directly, thanks!
-
->>> Also more flexible to expose it as generic cap? E.g., one day x86 can
->>> enable this too for whatever reason (even though I don't think so..).
->>
->> I had imagined something like this patch where the arch opts-in to some
->> generic construct if it *requires* the use of both the ring and bitmap
->> (very rough sketch).
->>
-
-Thanks,
-Gavin
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index b6c9bfa8492f..cf075c9b9ab1 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2107,6 +2107,17 @@ static int pkvm_drop_host_privileges(void)
+ 	 * once the host stage 2 is installed.
+ 	 */
+ 	static_branch_enable(&kvm_protected_mode_initialized);
++
++	/*
++	 * Fixup the boot mode so that we don't take spurious round
++	 * trips via EL2 on cpu_resume. Flush to the PoC for a good
++	 * measure, so that it can be observed by a CPU coming out of
++	 * suspend with the MMU off.
++	 */
++	__boot_cpu_mode[0] = __boot_cpu_mode[1] = BOOT_CPU_MODE_EL1;
++	dcache_clean_poc((unsigned long)__boot_cpu_mode,
++			 (unsigned long)(__boot_cpu_mode + 2));
++
+ 	on_each_cpu(_kvm_host_prot_finalize, &ret, 1);
+ 	return ret;
+ }
+-- 
+2.34.1
 
 _______________________________________________
 kvmarm mailing list
