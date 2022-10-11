@@ -1,97 +1,150 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0331F15A3
-	for <kvmarm@lists.linux.dev>; Tue, 11 Oct 2022 00:20:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1665447633;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rVV+6Wph3bAh4tPNroZhezVIi89kwJLdBTdHtGxU0T0=;
-	b=X9pd+nfJ4z8HeQCd9NglpvtpnYtifFz9QxbJEQXKtMKC6WEj1WhSOIWmmoIShAv7E6JRfr
-	n6phZ346qfzn+T2USCfumHuwkHNAp8fQZmNKI7qDRVf6CGSxNJ7/eulMxTpdHinc0IkCfV
-	AifG+d6Mh+xpYs1Mit7Aq41MWgL/pKc=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-269-tQYN6aGNMje3iA3cISNyag-1; Mon, 10 Oct 2022 20:20:32 -0400
-X-MC-Unique: tQYN6aGNMje3iA3cISNyag-1
-Received: by mail-qt1-f199.google.com with SMTP id b12-20020a05622a020c00b003983950639bso4102735qtx.16
-        for <kvmarm@lists.linux.dev>; Mon, 10 Oct 2022 17:20:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4780F15AC
+	for <kvmarm@lists.linux.dev>; Tue, 11 Oct 2022 01:06:33 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-3584be56efbso119043467b3.8
+        for <kvmarm@lists.linux.dev>; Mon, 10 Oct 2022 18:06:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=FNBTg3BpPEb0OgrkQKPKL1pOsmjvOVCnCRK1VPggMUU=;
+        b=pIc9IBbL09VEE88pBhXk95Bc+jQL/pOcQu9j+3FWJwfmwpjeuKP6gi26wSbmQ2aoxW
+         PN+BSGxhfHVGTO5/JcTXkhferlBjvpzLZWUVnrU68grC2+ayjYZWWVni1+m/i+aqQAf6
+         3qC00DtyN3Kdcl2p/XNNS9aPJNAjeZgu4SQaCKmv5RZjmza6UcLXuEFW0CVKIUVvwJJ5
+         hmBEXlD9jdr6pT4YOtRyg1LzGGiYAPRqq0Qfl+mijrf/Q56kehckp9CrmO0TF1qJRLTB
+         xaLuii0yw2bgx3cWMDbHOOKiIkXAgB3PW+izSPFhchyhPIdGmQHg3Mj3bSAkHhqy1HdC
+         VB+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rVV+6Wph3bAh4tPNroZhezVIi89kwJLdBTdHtGxU0T0=;
-        b=vG2q/fq5LQp0RgvaeCVheZDDhUzkqwAu4kCPN2iN5KIQpK7yQnR0PBhb5lscEF8IHn
-         KO7t2bqLkM0gI7GYPrOfH92CYXsdp3aGf652qLKS9ZAPCtMYmD7L0ZiQU1PS/8XqZkfo
-         DW9eHLwhjkgX6gJBlc5uSIAu+rSdig02qUViuhPjcE68C3MYz01BF6I0ICKtpSN6mmEI
-         EYXRWNOa2A50UEbU66RbAAJd4OShwGUhhOEK2qvphWsjOEcfv6DJyJyYNyqHWcaFJsIb
-         fTA5FXQodFKxy5TOKjsJ7GEZYuN+UGyi2xG5zN7m+VPl+ubxukQXFF/bqrMrc9PXGE8T
-         vg2A==
-X-Gm-Message-State: ACrzQf0WQ3fPHYIFFYDE/4QPYUS6wyKpba9e7WLW2u2a3zeyMhSmcTNu
-	ZZiZBDliQhln0fV7OhfbIHxKZbzz3OV0uPu09h0aRSqe7GOI30uJMXYWTDFMlw4bRVIb/cHJaHW
-	+eUhkOzWgQuTvp8SR
-X-Received: by 2002:ad4:5c85:0:b0:4b3:cac2:d5c1 with SMTP id o5-20020ad45c85000000b004b3cac2d5c1mr13650811qvh.116.1665447632107;
-        Mon, 10 Oct 2022 17:20:32 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4APqlKaeubLmKzZv8PniURDxG3Aan94kqA3Nfb19HmD+OXgHG0Yf2LeCneMPb1rOCBmvdDWg==
-X-Received: by 2002:ad4:5c85:0:b0:4b3:cac2:d5c1 with SMTP id o5-20020ad45c85000000b004b3cac2d5c1mr13650793qvh.116.1665447631931;
-        Mon, 10 Oct 2022 17:20:31 -0700 (PDT)
-Received: from xz-m1.local (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
-        by smtp.gmail.com with ESMTPSA id d12-20020a05620a240c00b006cf8fc6e922sm11430594qkn.119.2022.10.10.17.20.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Oct 2022 17:20:31 -0700 (PDT)
-Date: Mon, 10 Oct 2022 20:20:29 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-	catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
-	andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
-	pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com,
-	suzuki.poulose@arm.com, alexandru.elisei@arm.com, seanjc@google.com,
-	shan.gavin@gmail.com
-Subject: Re: [PATCH v5 3/7] KVM: x86: Allow to use bitmap in ring-based dirty
- page tracking
-Message-ID: <Y0S2zY4G7jBxVgpu@xz-m1.local>
-References: <20221005004154.83502-1-gshan@redhat.com>
- <20221005004154.83502-4-gshan@redhat.com>
- <Yz86gEbNflDpC8As@x1n>
- <a5e291b9-e862-7c71-3617-1620d5a7d407@redhat.com>
- <Y0A4VaSwllsSrVxT@x1n>
- <Y0SoX2/E828mbxuf@google.com>
- <Y0SvexjbHN78XVcq@xz-m1.local>
- <Y0SxnoT5u7+1TCT+@google.com>
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FNBTg3BpPEb0OgrkQKPKL1pOsmjvOVCnCRK1VPggMUU=;
+        b=3jf7uDnu2QN3Awwdyn8GA0kPq32k0rETH8D9TiJpDzs9vX4qZNd5dMtKU7E0q6Xfak
+         +p/kQujtHPTCqAnliyb+T1LsdKORyOcwm2uvm+JOrTH3KU6QtvATkgRdbi17rcqPz92e
+         B0XlsmH3tMPpGYoACvnDuaD89rC2+Ev793wdFTg++Qgv2xADhpHwhdEKIM45qC4DaHdM
+         PPRjjUkw9nbnFSzfBgQZDOEoyk1qEtRzb4YDeu7q/QJHLbjYNkYkvsDxwzPPVIz1aE0b
+         OhpCm6Js178NJQ6fOOIV7bHSgan2wspV9pU8qz8ojkpJF2cd206HUj425jE9xt84SIuu
+         k3FA==
+X-Gm-Message-State: ACrzQf377r2z298YqZItBotN6ZFdP4ub2Yzc2AMTDW705EzeRp2ALFCE
+	Wy3Pl+nzie8aHGuVFhryh95UeKhBRjXPYg==
+X-Google-Smtp-Source: AMsMyM6mol4ixOaGufGagkDKS4eeWNPMt8ucYchUQKAqct86h6zznF1MLBU2o6E6/ljWxccFasZKQl/YotSzFg==
+X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
+ (user=ricarkol job=sendgmr) by 2002:a05:6902:124e:b0:668:222c:e8da with SMTP
+ id t14-20020a056902124e00b00668222ce8damr19975091ybu.383.1665450392200; Mon,
+ 10 Oct 2022 18:06:32 -0700 (PDT)
+Date: Tue, 11 Oct 2022 01:06:14 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <Y0SxnoT5u7+1TCT+@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Message-ID: <20221011002029.nyAlXCg8EgV9jKEQBPfFc4NwD2boPEgJDhtuBuUSm74@z>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
+Message-ID: <20221011010628.1734342-1-ricarkol@google.com>
+Subject: [PATCH v9 00/14] KVM: selftests: Add aarch64/page_fault_test
+From: Ricardo Koller <ricarkol@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
+	andrew.jones@linux.dev
+Cc: pbonzini@redhat.com, maz@kernel.org, seanjc@google.com, 
+	alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com, 
+	reijiw@google.com, rananta@google.com, bgardon@google.com, 
+	dmatlack@google.com, axelrasmussen@google.com, 
+	Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20221011010614.whyMV8QX5S5mYp86IoBKeUevj3g8HgQ226KB92vJ128@z>
 
-On Mon, Oct 10, 2022 at 11:58:22PM +0000, Oliver Upton wrote:
-> I think this further drives the point home -- there's zero need for the
-> bitmap with dirty ring on x86, so why even support it? The proposal of
-> ALLOW_BITMAP && DIRTY_RING should be arm64-specific. Any other arch that
-> needs to dirty memory outside of a vCPU context can opt-in to the
-> behavior.
+This series adds a new aarch64 selftest for testing stage 2 fault handling
+for various combinations of guest accesses (e.g., write, S1PTW), backing
+sources (e.g., anon), and types of faults (e.g., read on hugetlbfs with a
+hole, write on a readonly memslot). Each test tries a different combination
+and then checks that the access results in the right behavior (e.g., uffd
+faults with the right address and write/read flag). Some interesting
+combinations are:
 
-Yeah that sounds working too, but it'll be slightly hackish as then the
-user app will need some "#ifdef ARM64" blocks for e.g. sync dirty bitmap.
-With the new cap the user app can implement the whole ring with generic
-code.
+- loading an instruction leads to a stage 1 page-table-walk that misses on
+  stage 2 because the backing memslot for the page table it not in host
+  memory (a hole was punched right there) and the fault is handled using
+  userfaultfd.  The expected behavior is that this leads to a userfaultfd
+  fault marked as a write. See commit c4ad98e4b72c ("KVM: arm64: Assume
+  write fault on S1PTW permission fault on instruction fetch") for why
+  that's a write.
+- a cas (compare-and-swap) on a readonly memslot leads to a failed vcpu
+  run.
+- write-faulting on a memslot that's marked for userfaultfd handling and
+  dirty logging should result in a uffd fault and having the respective bit
+  set in the dirty log.
 
-Also more flexible to expose it as generic cap? E.g., one day x86 can
-enable this too for whatever reason (even though I don't think so..).
+The first 8 commits of this series add library support. The first one adds
+a new userfaultfd library. Commits 2-5 add some misc library changes that
+will be used by the new test, like a library function to get the GPA of a
+PTE.  Commits 6-8 breaks the implicit assumption that code and page tables
+live in memslot memslots should allocators use. This is then used by the
+new test to place the page tables in a specific memslot.  The last 5
+commits add the new selftest, one type of test at a time. It first adds
+core tests, then uffd, then dirty logging, then readonly memslots tests,
+and finally combinations of the previous ones (like uffd and dirty logging
+at the same time).
+
+v8 -> v9: https://lore.kernel.org/kvmarm/20220922031857.2588688-1-ricarkol@google.com/
+- removed check before trying madvise(MADV_DONTNEED) on anon hugetlb. [Sean]
+- renamed punch_hole_in_memslot() [Sean]
+- changed the comment describing the accesses on "holes" [Sean]
+- collectd r-b's from Sean
+
+v7 -> v8: https://lore.kernel.org/kvmarm/20220920042551.3154283-1-ricarkol@google.com/
+- applied Sean's suggestion of adding a fourth region: DATA, and renamed
+  the old DATA one to DATA_TEST. [Sean]
+- removed some unneeded code in page_fault_test.c. [Andrew]
+- removed r-b's from Andrew and Oliver in commit "KVM: selftests: Use the
+  right memslot for code, page-tables, and data allocations", as the commit
+  changed quite a bit (again). Thanks for the reviews! would it have been OK
+  to keep it? not sure how strict we all are about collecting r-b's on a
+  commit that changed.
+
+Ricardo Koller (14):
+  KVM: selftests: Add a userfaultfd library
+  KVM: selftests: aarch64: Add virt_get_pte_hva() library function
+  KVM: selftests: Add missing close and munmap in
+    __vm_mem_region_delete()
+  KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1 using sysreg.h
+    macros
+  tools: Copy bitfield.h from the kernel sources
+  KVM: selftests: Stash backing_src_type in struct userspace_mem_region
+  KVM: selftests: Add vm->memslots[] and enum kvm_mem_region_type
+  KVM: selftests: Fix alignment in virt_arch_pgd_alloc() and
+    vm_vaddr_alloc()
+  KVM: selftests: Use the right memslot for code, page-tables, and data
+    allocations
+  KVM: selftests: aarch64: Add aarch64/page_fault_test
+  KVM: selftests: aarch64: Add userfaultfd tests into page_fault_test
+  KVM: selftests: aarch64: Add dirty logging tests into page_fault_test
+  KVM: selftests: aarch64: Add readonly memslot tests into
+    page_fault_test
+  KVM: selftests: aarch64: Add mix of tests into page_fault_test
+
+ tools/include/linux/bitfield.h                |  176 +++
+ tools/testing/selftests/kvm/.gitignore        |    1 +
+ tools/testing/selftests/kvm/Makefile          |    2 +
+ .../selftests/kvm/aarch64/page_fault_test.c   | 1113 +++++++++++++++++
+ .../selftests/kvm/demand_paging_test.c        |  228 +---
+ .../selftests/kvm/include/aarch64/processor.h |   35 +-
+ .../selftests/kvm/include/kvm_util_base.h     |   31 +-
+ .../selftests/kvm/include/userfaultfd_util.h  |   45 +
+ .../selftests/kvm/lib/aarch64/processor.c     |   48 +-
+ tools/testing/selftests/kvm/lib/elf.c         |    3 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   82 +-
+ .../selftests/kvm/lib/riscv/processor.c       |   29 +-
+ .../selftests/kvm/lib/s390x/processor.c       |    8 +-
+ .../selftests/kvm/lib/userfaultfd_util.c      |  186 +++
+ .../selftests/kvm/lib/x86_64/processor.c      |   13 +-
+ 15 files changed, 1724 insertions(+), 276 deletions(-)
+ create mode 100644 tools/include/linux/bitfield.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/page_fault_test.c
+ create mode 100644 tools/testing/selftests/kvm/include/userfaultfd_util.h
+ create mode 100644 tools/testing/selftests/kvm/lib/userfaultfd_util.c
 
 -- 
-Peter Xu
+2.38.0.rc1.362.ged0d419d3c-goog
 
