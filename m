@@ -2,101 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E8CC4332F
-	for <kvmarm@archiver.kernel.org>; Wed, 12 Oct 2022 20:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 050E8C4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 13 Oct 2022 06:30:45 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DD204B239;
-	Wed, 12 Oct 2022 16:15:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AADD43479;
+	Thu, 13 Oct 2022 02:30:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ncv8t1Jr8uB6; Wed, 12 Oct 2022 16:15:00 -0400 (EDT)
+	with ESMTP id u1HMxhTllh6c; Thu, 13 Oct 2022 02:30:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A01B40C67;
-	Wed, 12 Oct 2022 16:15:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A93BF4B20D;
+	Thu, 13 Oct 2022 02:30:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E9F440C67
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Oct 2022 16:14:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A3C849F55
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 02:30:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id u3qCiKVxmisG for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Oct 2022 16:14:57 -0400 (EDT)
+ with ESMTP id 2ClUe4M4q5d4 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 Oct 2022 02:30:41 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A8F740C23
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Oct 2022 16:14:56 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 30F5B43479
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 02:30:41 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1665605696;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5EB/DMRCnjFi7ZgYNILnixPMhGaL5v8DVftfiPTripc=;
- b=GwNWHJtvZPTpluI647X8KveJgq/yeT3iJhQzR6v105n+f2Jl+IWZDMG7IpIgFG1Zvt54dP
- MeXZeBcVunAKvIT+fds1McUcch/gV1YB41yAUdXNjN/1/BAcLWPkg5s1kyQLibOk92q74W
- iM0df+Ww67MuDO8qixMXHjedo84M5VM=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-73-reJWS8u8MmCRyLDN4rpqhw-1; Wed, 12 Oct 2022 16:14:55 -0400
-X-MC-Unique: reJWS8u8MmCRyLDN4rpqhw-1
-Received: by mail-qt1-f199.google.com with SMTP id
- b12-20020a05622a020c00b003983950639bso7961256qtx.16
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Oct 2022 13:14:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:reply-to:user-agent:mime-version:date
- :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
- :reply-to;
- bh=5EB/DMRCnjFi7ZgYNILnixPMhGaL5v8DVftfiPTripc=;
- b=bZu3PTxxF3RyqfrS47aQAv6uux7GUHCwDMU1IPL44z/2nfx5w2665LAbgV6urM5le1
- z7jih/6Yepnl08BZl0HZoABdJL3Zo6Dxf0hxZ76yvfKXCRYkrF4P+9giKkv2cfmHNo+3
- S/0bLlf50bO8Lui5aWvRRTze8IEZYoTFyeMm6OJ/pkzGCusYKeaJ2+RWvytiEWfjxM4G
- zQ3A+g2x+vBh3N6kwTfT5KLFQdE5mSVkTnvtsf45xrC+8HZNB6lYqNt6KkS1CHFqd2K1
- rQm2rEd8LV9P1OCwi254JA0vlKD0iKL6S6q5Hoq/40ThuS5KcSEt207rUZjotnjmskHk
- rCZw==
-X-Gm-Message-State: ACrzQf3JyEwQQpvjEW32Eir+eO3MqT1IlWHwk0GXiRKyBakLwEm9zfYL
- qPfofeLglpFdkS3g2wS3GZddParFQzrTU2vra8X1l6J+Eq85IT5R+SB1z4DD9emDVsZ45a7Z9lo
- iAIOhIX/5bAQksdDjhT9cXxIE
-X-Received: by 2002:ad4:5765:0:b0:4b1:bf78:83cd with SMTP id
- r5-20020ad45765000000b004b1bf7883cdmr24119206qvx.81.1665605695062; 
- Wed, 12 Oct 2022 13:14:55 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5hELiNb2iAcZbm+u2knphj7pDvXbYgBc89xcAg9YPNU6/ZOz6A+P6uasXPuS2tZ9FVOuJUjg==
-X-Received: by 2002:ad4:5765:0:b0:4b1:bf78:83cd with SMTP id
- r5-20020ad45765000000b004b1bf7883cdmr24119193qvx.81.1665605694868; 
- Wed, 12 Oct 2022 13:14:54 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
- ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id
- br7-20020a05620a460700b006e9b3096482sm14514681qkb.64.2022.10.12.13.14.53
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 12 Oct 2022 13:14:54 -0700 (PDT)
-Message-ID: <30e5d940-8964-1ca8-1f40-45e0d8c62724@redhat.com>
-Date: Wed, 12 Oct 2022 22:14:51 +0200
+ s=mimecast20190719; t=1665642640;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=I39cZ3LRJVOkJAwJsydduYsdnQpl71cDmGrmMmwlFkQ=;
+ b=XLg7iIzIKvANKIgPw4nXpBEmJLEdO1eu6KbCfFOTg5quTmtNCbL5K47C6UmvmPFDFMx1YS
+ MPuR5w3D6482pdYI+b4zExCWVGb4EpCSdszG6Z6W/GmPnH7RZiEH2e8ENnG5u5ORW8sbdC
+ HmDZJJ0+RwJznVtNqplwct58EmVA34A=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-106-hwQ87wOKN_eioJhbGOgOBw-1; Thu, 13 Oct 2022 02:30:34 -0400
+X-MC-Unique: hwQ87wOKN_eioJhbGOgOBw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.8])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3EDD83C0D84A;
+ Thu, 13 Oct 2022 06:30:34 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-52.bne.redhat.com [10.64.54.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4FF87C15BB5;
+ Thu, 13 Oct 2022 06:30:29 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: kvmarm@lists.linux.dev
+Subject: [PATCH] KVM: selftests: Fix number of pages for memory slot in
+ memslot_modification_stress_test
+Date: Thu, 13 Oct 2022 14:30:20 +0800
+Message-Id: <20221013063020.201856-1-gshan@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] KVM: arm64: vgic: fix wrong loop condition in
- scan_its_table()
-To: Eric Ren <renzhengeek@gmail.com>, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
-References: <acd9f1643980fbd27cd22523d2d84ca7c9add84a.1665592448.git.renzhengeek@gmail.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <acd9f1643980fbd27cd22523d2d84ca7c9add84a.1665592448.git.renzhengeek@gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: Marc Zyngier <maz@kernel.org>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Cc: venkateshs@chromium.org, kvm@vger.kernel.org, maz@kernel.org,
+ linux-kernel@vger.kernel.org, shan.gavin@gmail.com, dmatlack@google.com,
+ pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
+ ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: eric.auger@redhat.com
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -110,59 +79,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+It's required by vm_userspace_mem_region_add() that memory size
+should be aligned to host page size. However, one guest page is
+provided by memslot_modification_stress_test. It triggers failure
+in the scenario of 64KB-page-size-host and 4KB-page-size-guest,
+as the following messages indicate.
 
-On 10/12/22 18:59, Eric Ren wrote:
-> Reproducer hints:
-> 1. Create ARM virt VM with pxb-pcie bus which adds
->    extra host bridges, with qemu command like:
->
-> ```
->   -device pxb-pcie,bus_nr=8,id=pci.x,numa_node=0,bus=pcie.0 \
->   -device pcie-root-port,..,bus=pci.x \
->   ...
->   -device pxb-pcie,bus_nr=37,id=pci.y,numa_node=1,bus=pcie.0 \
->   -device pcie-root-port,..,bus=pci.y \
->   ...
->
-> ```
-> 2. Perform VM migration which calls save/restore device tables.
->
-> In that setup, we get a big "offset" between 2 device_ids (
-> one is small, another is big), which makes unsigned "len" round
-> up a big positive number, causing loop to continue exceptionally.
->
-> Signed-off-by: Eric Ren <renzhengeek@gmail.com>
+ # ./memslot_modification_stress_test
+ Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
+ guest physical test memory: [0xffbfff0000, 0xffffff0000)
+ Finished creating vCPUs
+ Started all vCPUs
+ ==== Test Assertion Failure ====
+   lib/kvm_util.c:824: vm_adjust_num_guest_pages(vm->mode, npages) == npages
+   pid=5712 tid=5712 errno=0 - Success
+      1	0x0000000000404eeb: vm_userspace_mem_region_add at kvm_util.c:822
+      2	0x0000000000401a5b: add_remove_memslot at memslot_modification_stress_test.c:82
+      3	 (inlined by) run_test at memslot_modification_stress_test.c:110
+      4	0x0000000000402417: for_each_guest_mode at guest_modes.c:100
+      5	0x00000000004016a7: main at memslot_modification_stress_test.c:187
+      6	0x0000ffffb8cd4383: ?? ??:0
+      7	0x0000000000401827: _start at :?
+   Number of guest pages is not compatible with the host. Try npages=16
 
-I fixed Marc's address and removed Christoffer's one. Please use the
-scripts/get_maintainer.pl to identify the right email addresses.
+Fix the issue by providing 16 guest pages to the memory slot for this
+particular combination of 64KB-page-size-host and 4KB-page-size-guest
+on aarch64.
 
-Just to make sure I correctly understand, you mean len -= byte_offset
-becomes negative and that is not properly reflected due to the unsigned
-type. I agree we should be robust against that but doesn't it also mean
-that the saved table has an issue in the first place (the offset points
-to a location outside of the max size of the table)?
+Fixes: ef4c9f4f65462 ("KVM: selftests: Fix 32-bit truncation of vm_get_max_gfn()")
+Signed-off-by: Gavin Shan <gshan@redhat.com>
+---
+ tools/testing/selftests/kvm/memslot_modification_stress_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks
-
-Eric
-> ---
->  arch/arm64/kvm/vgic/vgic-its.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> index 24d7778d1ce6..673554ef02f9 100644
-> --- a/arch/arm64/kvm/vgic/vgic-its.c
-> +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> @@ -2141,7 +2141,7 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
->  			  int start_id, entry_fn_t fn, void *opaque)
->  {
->  	struct kvm *kvm = its->dev->kvm;
-> -	unsigned long len = size;
-> +	ssize_t len = size;
->  	int id = start_id;
->  	gpa_t gpa = base;
->  	char entry[ESZ_MAX];
+diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+index 6ee7e1dde404..bb1d17a1171b 100644
+--- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
++++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+@@ -67,7 +67,7 @@ struct memslot_antagonist_args {
+ static void add_remove_memslot(struct kvm_vm *vm, useconds_t delay,
+ 			       uint64_t nr_modifications)
+ {
+-	const uint64_t pages = 1;
++	uint64_t pages = max_t(int, vm->page_size, getpagesize()) / vm->page_size;
+ 	uint64_t gpa;
+ 	int i;
+ 
+-- 
+2.23.0
 
 _______________________________________________
 kvmarm mailing list
