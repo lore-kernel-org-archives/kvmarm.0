@@ -1,105 +1,96 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A9E17E
-	for <kvmarm@lists.linux.dev>; Thu, 13 Oct 2022 06:30:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1665642640;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=I39cZ3LRJVOkJAwJsydduYsdnQpl71cDmGrmMmwlFkQ=;
-	b=XLg7iIzIKvANKIgPw4nXpBEmJLEdO1eu6KbCfFOTg5quTmtNCbL5K47C6UmvmPFDFMx1YS
-	MPuR5w3D6482pdYI+b4zExCWVGb4EpCSdszG6Z6W/GmPnH7RZiEH2e8ENnG5u5ORW8sbdC
-	HmDZJJ0+RwJznVtNqplwct58EmVA34A=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-106-hwQ87wOKN_eioJhbGOgOBw-1; Thu, 13 Oct 2022 02:30:34 -0400
-X-MC-Unique: hwQ87wOKN_eioJhbGOgOBw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3EDD83C0D84A;
-	Thu, 13 Oct 2022 06:30:34 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-52.bne.redhat.com [10.64.54.52])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4FF87C15BB5;
-	Thu, 13 Oct 2022 06:30:29 +0000 (UTC)
-From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.linux.dev
-Cc: kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE85629A2
+	for <kvmarm@lists.linux.dev>; Thu, 13 Oct 2022 11:35:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 748D4C433C1;
+	Thu, 13 Oct 2022 11:35:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1665660937;
+	bh=TycQmVJ6jXUOyk9ucIX1dRffGw6LVYgXTvtb6cNlgZQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=gRinFqH1c2Qd0p3WjDwRlXc2NX091fbWECJol5jdbNJoBs0WmVFStREnwn+3c39eJ
+	 5osZwwPej6SepvpGUt7GUMq7/SGLOa3SRNATok21IfM3Bt7fO4oCC38R3t0/6oYlYo
+	 DPXH8J9JGSwl2hndm2hQTpyEeHFHnJWoVIoVx3pRbAPy8CoXFn1qpTfdQrVMyjGn5l
+	 6ryyCoGQh+xnSJBlpzmWi5LQN+kD5vm41qBqpACJCeJdxkKFe8jOfT6fwOgC6EHEFx
+	 cxTaplsoq906pTwl5EZOpOFJL+tns4VFtxRXg98/1YSn4E9paguhUMhn/KZQEAEFHa
+	 qwSQVkLgqHg8A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1oiwUx-00GI0Y-7d;
+	Thu, 13 Oct 2022 12:35:35 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	Gavin Shan <gshan@redhat.com>
+Cc: oliver.upton@linux.dev,
 	linux-kernel@vger.kernel.org,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	pbonzini@redhat.com,
-	shuah@kernel.org,
-	dmatlack@google.com,
-	peterx@redhat.com,
-	venkateshs@chromium.org,
+	ajones@ventanamicro.com,
+	kvm@vger.kernel.org,
 	seanjc@google.com,
+	kvmarm@lists.cs.columbia.edu,
+	dmatlack@google.com,
+	pbonzini@redhat.com,
+	venkateshs@chromium.org,
+	peterx@redhat.com,
 	shan.gavin@gmail.com,
-	ajones@ventanamicro.com
-Subject: [PATCH] KVM: selftests: Fix number of pages for memory slot in memslot_modification_stress_test
-Date: Thu, 13 Oct 2022 14:30:20 +0800
-Message-ID: <20221013063020.201856-1-gshan@redhat.com>
+	shuah@kernel.org
+Subject: Re: [PATCH] KVM: selftests: Fix number of pages for memory slot in memslot_modification_stress_test
+Date: Thu, 13 Oct 2022 12:35:31 +0100
+Message-ID: <166566092380.1304242.1787049894105591539.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221013063020.201856-1-gshan@redhat.com>
+References: <20221013063020.201856-1-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-Message-ID: <20221013063020.r-8eHy6hxJ_xTPhEahdGwxiagsjhwsTjiUtk9UuXvDc@z>
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, gshan@redhat.com, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, ajones@ventanamicro.com, kvm@vger.kernel.org, seanjc@google.com, kvmarm@lists.cs.columbia.edu, dmatlack@google.com, pbonzini@redhat.com, venkateshs@chromium.org, peterx@redhat.com, shan.gavin@gmail.com, shuah@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221013113531.qqMm_sBJH_ZPmEy5y9RIgD66fhii2H00m_SFbF3RyZc@z>
 
-It's required by vm_userspace_mem_region_add() that memory size
-should be aligned to host page size. However, one guest page is
-provided by memslot_modification_stress_test. It triggers failure
-in the scenario of 64KB-page-size-host and 4KB-page-size-guest,
-as the following messages indicate.
+On Thu, 13 Oct 2022 14:30:20 +0800, Gavin Shan wrote:
+> It's required by vm_userspace_mem_region_add() that memory size
+> should be aligned to host page size. However, one guest page is
+> provided by memslot_modification_stress_test. It triggers failure
+> in the scenario of 64KB-page-size-host and 4KB-page-size-guest,
+> as the following messages indicate.
+> 
+>  # ./memslot_modification_stress_test
+>  Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
+>  guest physical test memory: [0xffbfff0000, 0xffffff0000)
+>  Finished creating vCPUs
+>  Started all vCPUs
+>  ==== Test Assertion Failure ====
+>    lib/kvm_util.c:824: vm_adjust_num_guest_pages(vm->mode, npages) == npages
+>    pid=5712 tid=5712 errno=0 - Success
+>       1	0x0000000000404eeb: vm_userspace_mem_region_add at kvm_util.c:822
+>       2	0x0000000000401a5b: add_remove_memslot at memslot_modification_stress_test.c:82
+>       3	 (inlined by) run_test at memslot_modification_stress_test.c:110
+>       4	0x0000000000402417: for_each_guest_mode at guest_modes.c:100
+>       5	0x00000000004016a7: main at memslot_modification_stress_test.c:187
+>       6	0x0000ffffb8cd4383: ?? ??:0
+>       7	0x0000000000401827: _start at :?
+>    Number of guest pages is not compatible with the host. Try npages=16
+> 
+> [...]
 
- # ./memslot_modification_stress_test
- Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
- guest physical test memory: [0xffbfff0000, 0xffffff0000)
- Finished creating vCPUs
- Started all vCPUs
- ==== Test Assertion Failure ====
-   lib/kvm_util.c:824: vm_adjust_num_guest_pages(vm->mode, npages) == npages
-   pid=5712 tid=5712 errno=0 - Success
-      1	0x0000000000404eeb: vm_userspace_mem_region_add at kvm_util.c:822
-      2	0x0000000000401a5b: add_remove_memslot at memslot_modification_stress_test.c:82
-      3	 (inlined by) run_test at memslot_modification_stress_test.c:110
-      4	0x0000000000402417: for_each_guest_mode at guest_modes.c:100
-      5	0x00000000004016a7: main at memslot_modification_stress_test.c:187
-      6	0x0000ffffb8cd4383: ?? ??:0
-      7	0x0000000000401827: _start at :?
-   Number of guest pages is not compatible with the host. Try npages=16
+Applied to fixes, thanks!
 
-Fix the issue by providing 16 guest pages to the memory slot for this
-particular combination of 64KB-page-size-host and 4KB-page-size-guest
-on aarch64.
+[1/1] KVM: selftests: Fix number of pages for memory slot in memslot_modification_stress_test
+      commit: 05c2224d4b049406b0545a10be05280ff4b8ba0a
 
-Fixes: ef4c9f4f65462 ("KVM: selftests: Fix 32-bit truncation of vm_get_max_gfn()")
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- tools/testing/selftests/kvm/memslot_modification_stress_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Cheers,
 
-diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-index 6ee7e1dde404..bb1d17a1171b 100644
---- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-+++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-@@ -67,7 +67,7 @@ struct memslot_antagonist_args {
- static void add_remove_memslot(struct kvm_vm *vm, useconds_t delay,
- 			       uint64_t nr_modifications)
- {
--	const uint64_t pages = 1;
-+	uint64_t pages = max_t(int, vm->page_size, getpagesize()) / vm->page_size;
- 	uint64_t gpa;
- 	int i;
- 
+	M.
 -- 
-2.23.0
+Without deviation from the norm, progress is not possible.
+
 
