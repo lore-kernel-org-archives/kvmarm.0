@@ -2,57 +2,68 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E615FC4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 13 Oct 2022 14:14:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF9F7C4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 13 Oct 2022 15:09:29 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44E0E410AD;
-	Thu, 13 Oct 2022 10:14:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 422DD43482;
+	Thu, 13 Oct 2022 11:09:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, body has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IaSYBZWEjA0O; Thu, 13 Oct 2022 10:14:43 -0400 (EDT)
+	with ESMTP id GSNeoJN9l4vw; Thu, 13 Oct 2022 11:09:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19377410DE;
-	Thu, 13 Oct 2022 10:14:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36CD24B16F;
+	Thu, 13 Oct 2022 11:09:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC4A5410DE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 10:14:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D50F4291D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 11:09:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 542BTd2KYg9f for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Oct 2022 10:14:40 -0400 (EDT)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 902A0410AD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 10:14:40 -0400 (EDT)
-Date: Thu, 13 Oct 2022 16:14:31 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1665670479;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=YTnR3sTpueMD1WOCKjn13lgOyfXnFgP1FGLusy0IRdQ=;
- b=o8iWPUfoQGziwzej5BerN5CcyiIwIgIJX1BIPhpwk1A3iUth1ltoEDYJ5RgytnN8fxDsFE
- 09J30ihjCMewpdUEKnz7/NFKmvIhtCq9EUwJd3uexhjD1ECAFaFNPxcaBIzPTV7p96Oxaz
- 1WNityOODlONHfzCXCTeiTbpZu7U+44=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v9 09/14] KVM: selftests: Use the right memslot for code, 
- page-tables, and data allocations
-Message-ID: <20221013141431.datybmwzfdeqxobv@kamzik>
-References: <20221011010628.1734342-1-ricarkol@google.com>
- <20221011010628.1734342-10-ricarkol@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20221011010628.1734342-10-ricarkol@google.com>
-X-Migadu-Flow: FLOW_OUT
-Cc: kvm@vger.kernel.org, bgardon@google.com, maz@kernel.org,
- kvmarm@lists.linux.dev, pbonzini@redhat.com, axelrasmussen@google.com,
- kvmarm@lists.cs.columbia.edu, dmatlack@google.com
+ with ESMTP id 9rUaymvc6JHI for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 Oct 2022 11:09:26 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 65E13413E2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 11:09:26 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id DF461B81E92
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 15:09:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABA40C433D6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 15:09:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1665673763;
+ bh=xapZ4ZhCewIyzvxrXXvXD74ijcW1MlkDdWnjohCVqKQ=;
+ h=Date:From:To:Subject:From;
+ b=HQLCF45tNkN1IwFkAqv17C4IS3ivvNBtWiJCX+fMbJr68lU0zMVmzRocBONjeMA+2
+ m90zjtJ78sJRGBwm9UIMv8Oy2Qj6k24woRbFcJ3v43Qe8FsnnSWkpPcCIf0gKBGDOc
+ lyPH/W+es37P7aVZfzg0CVJew5Tw61Lrw2ew+F0Bgiv8y09SrRo97rQxWlZ3UysFTQ
+ Rn5KSv4Cao37wsVmZK5Vsxwy4JMaRRLZzIOt4OdwWfle2ljcIzv4bvhrK0hrKkO4Pt
+ 0hze/PVnPm7A5IrAwjKWnaPZVsmEKy8vJW75yzrqvZXGKhEMUE0K5KOVDGrHq2Cp24
+ ImJWgFPcEPs5A==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oizpo-00GKYk-OE
+ for kvmarm@lists.cs.columbia.edu; Thu, 13 Oct 2022 16:09:21 +0100
+Date: Thu, 13 Oct 2022 16:09:20 +0100
+Message-ID: <86edvbg3q7.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm <kvmarm@lists.cs.columbia.edu>
+Subject: [REPOST][URGENT] kvmarm mailing list migration
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,36 +80,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Oct 11, 2022 at 01:06:23AM +0000, Ricardo Koller wrote:
-> Now that kvm_vm allows specifying different memslots for code, page tables,
-> and data, use the appropriate memslot when making allocations in
-> common/libraty code. Change them accordingly:
-> 
-> - code (allocated by lib/elf) use the CODE memslot
-> - stacks, exception tables, and other core data pages (like the TSS in x86)
->   use the DATA memslot
-> - page tables and the PGD use the PT memslot
-> - test data (anything allocated with vm_vaddr_alloc()) uses the TEST_DATA
->   memslot
-> 
-> No functional change intended. All allocators keep using memslot #0.
-> 
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Andrew Jones <andrew.jones@linux.dev>
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
-> ---
->  .../selftests/kvm/include/kvm_util_base.h     |  4 ++
->  .../selftests/kvm/lib/aarch64/processor.c     | 12 ++--
->  tools/testing/selftests/kvm/lib/elf.c         |  3 +-
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 57 ++++++++++++-------
->  .../selftests/kvm/lib/riscv/processor.c       |  8 ++-
->  .../selftests/kvm/lib/s390x/processor.c       |  8 ++-
->  .../selftests/kvm/lib/x86_64/processor.c      | 13 +++--
->  7 files changed, 65 insertions(+), 40 deletions(-)
->
+[Reposting this, as it has been almost two weeks since the initial
+ announcement and we're still at sub-10% of the users having
+ subscribed to the new list]
+ 
+Hi all,
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+As you probably all know, the kvmarm mailing has been hosted on
+Columbia's machines for as long as the project existed (over 13
+years). After all this time, the university has decided to retire the
+list infrastructure and asked us to find a new hosting.
+
+A new mailing list has been created on lists.linux.dev[1], and I'm
+kindly asking everyone interested in following the KVM/arm64
+developments to start subscribing to it (and start posting your
+patches there). I hope that people will move over to it quickly enough
+that we can soon give Columbia the green light to turn their systems
+off.
+
+Note that the new list will only get archived automatically once we
+fully switch over, but I'll make sure we fill any gap and not lose any
+message. In the meantime, please Cc both lists.
+
+I would like to thank Columbia University for their long lasting
+support and willingness to help during this transition, as well as
+Konstantin (and the kernel.org crew) for quickly stepping up to the
+challenge and giving us a new home!
+
+Thanks,
+
+	M.
+
+[1] https://subspace.kernel.org/lists.linux.dev.html
+
+-- 
+Without deviation from the norm, progress is not possible.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
