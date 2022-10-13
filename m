@@ -2,67 +2,86 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 050E8C4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 13 Oct 2022 06:30:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC4F0C4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 13 Oct 2022 11:09:11 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AADD43479;
-	Thu, 13 Oct 2022 02:30:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E3B734B27C;
+	Thu, 13 Oct 2022 07:09:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id u1HMxhTllh6c; Thu, 13 Oct 2022 02:30:43 -0400 (EDT)
+	with ESMTP id QrHEudO89k45; Thu, 13 Oct 2022 07:09:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A93BF4B20D;
-	Thu, 13 Oct 2022 02:30:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86E5149F55;
+	Thu, 13 Oct 2022 07:09:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A3C849F55
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 02:30:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C34DB40FAC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 07:09:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2ClUe4M4q5d4 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Oct 2022 02:30:41 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 30F5B43479
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 02:30:41 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1665642640;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=I39cZ3LRJVOkJAwJsydduYsdnQpl71cDmGrmMmwlFkQ=;
- b=XLg7iIzIKvANKIgPw4nXpBEmJLEdO1eu6KbCfFOTg5quTmtNCbL5K47C6UmvmPFDFMx1YS
- MPuR5w3D6482pdYI+b4zExCWVGb4EpCSdszG6Z6W/GmPnH7RZiEH2e8ENnG5u5ORW8sbdC
- HmDZJJ0+RwJznVtNqplwct58EmVA34A=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-106-hwQ87wOKN_eioJhbGOgOBw-1; Thu, 13 Oct 2022 02:30:34 -0400
-X-MC-Unique: hwQ87wOKN_eioJhbGOgOBw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com
- [10.11.54.8])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id 9jWRmNo-SC6p for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 Oct 2022 07:09:06 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8225D40C1F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 07:09:06 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3EDD83C0D84A;
- Thu, 13 Oct 2022 06:30:34 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-52.bne.redhat.com [10.64.54.52])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4FF87C15BB5;
- Thu, 13 Oct 2022 06:30:29 +0000 (UTC)
-From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.linux.dev
-Subject: [PATCH] KVM: selftests: Fix number of pages for memory slot in
- memslot_modification_stress_test
-Date: Thu, 13 Oct 2022 14:30:20 +0800
-Message-Id: <20221013063020.201856-1-gshan@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-Cc: venkateshs@chromium.org, kvm@vger.kernel.org, maz@kernel.org,
- linux-kernel@vger.kernel.org, shan.gavin@gmail.com, dmatlack@google.com,
- pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
- ajones@ventanamicro.com
+ by ams.source.kernel.org (Postfix) with ESMTPS id 93E96B8162C;
+ Thu, 13 Oct 2022 11:09:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A66EC433C1;
+ Thu, 13 Oct 2022 11:09:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1665659343;
+ bh=mJSG3Ydey0D8JU11fE/SlVcGP6owZzI1lHl/NbqcfTo=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=je2mEfiKTkOYfvV0MhUFOdagygdELrWt1GjDnOiWcenKEQ8XqOMCovkIG88IO+vYi
+ HcOakqRS0q8ILHHQrBqi/+hZ0LHgP+sgmXFSqqg7mcIppwSw16vyQ725u8YVH0jH//
+ GqHZLEHJSWYMFgNU6jN2M1xd0htll1Xry/lkRqUoTNDLIDR8M6DiNeAJtoZFqvN32j
+ 51PszE1f0DxJnYeRyZ88CQSrfCesVlhcDPMOwivHfeywoXJXLivrEcxhqLojCfLcvj
+ RGkC51wFcwVyAxiaWLhabUvvHuTjOLr93siCuuz+3oyJEPCtV4wvHe97SX/Wf3ttGm
+ z5yw8AJkTXhoQ==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oiw5F-00GHc3-0t;
+ Thu, 13 Oct 2022 12:09:01 +0100
+Date: Thu, 13 Oct 2022 12:09:00 +0100
+Message-ID: <86fsfsf0ab.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Denis Nikitin <denik@chromium.org>
+Subject: Re: [PATCH v2] KVM: arm64: nvhe: Fix build with profile optimization
+In-Reply-To: <CADDJ8CVX5tZU9jL4FvTnvQxxVohhS76TVOoZAyy3k_Uit1efmA@mail.gmail.com>
+References: <20220920082005.2459826-1-denik@chromium.org>
+ <20220922053145.944786-1-denik@chromium.org>
+ <87h70zk83g.wl-maz@kernel.org>
+ <CADDJ8CW0QgHtp1rwk=ZqrcuWZ4_L8KQh26VaEfcBQS0Tx9+ZYg@mail.gmail.com>
+ <CAH=Qcsi3aQ51AsAE0WmAH9VmpqjOaQQt=ru5Nav4+d8F3fMPwQ@mail.gmail.com>
+ <CADDJ8CXObkhMvOx+L29awjtt7tiaTWxFrRxOmhUqvzku1wswHw@mail.gmail.com>
+ <CADDJ8CV83d4tYeLnQH-hHjzBfED6EBo4Z70q5A=9cwO+Lp1sNQ@mail.gmail.com>
+ <87sfjxhh4k.wl-maz@kernel.org>
+ <CADDJ8CVX5tZU9jL4FvTnvQxxVohhS76TVOoZAyy3k_Uit1efmA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: denik@chromium.org, catalin.marinas@arm.com, will@kernel.org,
+ james.morse@arm.com, alexandru.elisei@arm.com, ndesaulniers@google.com,
+ dbrazdil@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ manojgupta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
+ Manoj Gupta <manojgupta@google.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,55 +98,86 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-It's required by vm_userspace_mem_region_add() that memory size
-should be aligned to host page size. However, one guest page is
-provided by memslot_modification_stress_test. It triggers failure
-in the scenario of 64KB-page-size-host and 4KB-page-size-guest,
-as the following messages indicate.
+On Tue, 11 Oct 2022 03:15:36 +0100,
+Denis Nikitin <denik@chromium.org> wrote:
+> 
+> On Sat, Oct 8, 2022 at 7:22 PM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Thu, 06 Oct 2022 17:28:17 +0100,
+> > Denis Nikitin <denik@chromium.org> wrote:
+> > >
+> > > Hi Mark,
+> >
+> > s/k/c/
+> >
+> > >
+> > > This problem currently blocks the PGO roll on the ChromeOS kernel and
+> > > we need some kind of a solution.
+> >
+> > I'm sorry, but I don't feel constrained by your internal deadlines. I
+> > have my own...
+> >
+> > > Could you please take a look?
+> >
+> > I have asked for a reproducer. All I got for an answer is "this is
+> > hard". Providing a profiling file would help, for example.
+> 
+> Could you please try the following profile on the 5.15 branch?
+> 
+> $ cat <<EOF > prof.txt
+> kvm_pgtable_walk:100:10
+>  2: 5
+>  3: 5
+>  5: 5
+>  6: 5
+>  10: 5
+>  10: _kvm_pgtable_walk:50
+>   5: 5
+>   7: 5
+>   10: 5
+>   13.2: 5
+>   14: 5
+>   16: 5 __kvm_pgtable_walk:5
+>   13: kvm_pgd_page_idx:30
+>    2: __kvm_pgd_page_idx:30
+>     2: 5
+>     3: 5
+>     5: 5
+>     2: kvm_granule_shift:5
+>      3: 5
+> EOF
+> 
+> $ make LLVM=1 ARCH=arm64 KCFLAGS=-fprofile-sample-use=prof.txt -j8 vmlinux
 
- # ./memslot_modification_stress_test
- Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
- guest physical test memory: [0xffbfff0000, 0xffffff0000)
- Finished creating vCPUs
- Started all vCPUs
- ==== Test Assertion Failure ====
-   lib/kvm_util.c:824: vm_adjust_num_guest_pages(vm->mode, npages) == npages
-   pid=5712 tid=5712 errno=0 - Success
-      1	0x0000000000404eeb: vm_userspace_mem_region_add at kvm_util.c:822
-      2	0x0000000000401a5b: add_remove_memslot at memslot_modification_stress_test.c:82
-      3	 (inlined by) run_test at memslot_modification_stress_test.c:110
-      4	0x0000000000402417: for_each_guest_mode at guest_modes.c:100
-      5	0x00000000004016a7: main at memslot_modification_stress_test.c:187
-      6	0x0000ffffb8cd4383: ?? ??:0
-      7	0x0000000000401827: _start at :?
-   Number of guest pages is not compatible with the host. Try npages=16
+Thanks, this was helpful, as I was able to reproduce the build failure.
 
-Fix the issue by providing 16 guest pages to the memory slot for this
-particular combination of 64KB-page-size-host and 4KB-page-size-guest
-on aarch64.
+FWIW, it seems pretty easy to work around by filtering out the
+offending option, making it consistent with the mechanism we already
+use for tracing and the like.
 
-Fixes: ef4c9f4f65462 ("KVM: selftests: Fix 32-bit truncation of vm_get_max_gfn()")
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- tools/testing/selftests/kvm/memslot_modification_stress_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I came up with the hack below, which does the trick and is IMHO better
+than dropping the section (extra work) or adding the negation of this
+option (which depends on the compiler option evaluation order).
 
-diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-index 6ee7e1dde404..bb1d17a1171b 100644
---- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-+++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-@@ -67,7 +67,7 @@ struct memslot_antagonist_args {
- static void add_remove_memslot(struct kvm_vm *vm, useconds_t delay,
- 			       uint64_t nr_modifications)
- {
--	const uint64_t pages = 1;
-+	uint64_t pages = max_t(int, vm->page_size, getpagesize()) / vm->page_size;
- 	uint64_t gpa;
- 	int i;
+	M.
+
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index 48f6ae7cc6e6..7df1b6afca7f 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -91,7 +91,7 @@ quiet_cmd_hypcopy = HYPCOPY $@
  
--- 
-2.23.0
+ # Remove ftrace, Shadow Call Stack, and CFI CFLAGS.
+ # This is equivalent to the 'notrace', '__noscs', and '__nocfi' annotations.
+-KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI), $(KBUILD_CFLAGS))
++KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI) -fprofile-sample-use=%, $(KBUILD_CFLAGS))
+ 
+ # KVM nVHE code is run at a different exception code with a different map, so
+ # compiler instrumentation that inserts callbacks or checks into the code may
 
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
