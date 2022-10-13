@@ -2,94 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B68CFC433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 13 Oct 2022 16:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2CFFC433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 13 Oct 2022 19:03:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27BA949DE3;
-	Thu, 13 Oct 2022 12:42:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 24D874B1C6;
+	Thu, 13 Oct 2022 15:03:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@chromium.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id L-oIRJ0cjM0h; Thu, 13 Oct 2022 12:42:41 -0400 (EDT)
+	with ESMTP id 99x2UUAf13Nx; Thu, 13 Oct 2022 15:03:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C153B401AF;
-	Thu, 13 Oct 2022 12:42:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B62AD49DE3;
+	Thu, 13 Oct 2022 15:03:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6ABBD401AF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 12:42:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E437401AF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 15:02:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H9wk2pfUE5zk for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Oct 2022 12:42:39 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1168340159
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 12:42:39 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1665679358;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YBQyFVBuF/SKjPazJHlLgOwvTK+5LZv1rrMgf1acIpo=;
- b=UNh3qgWB0WuuTanztXND36jQumAVSFvJ10YaDwWQL+QxqSRI5zJ74YDtWVGeRMdGy+IFIV
- r9pbi25m+zt2xI306TlKicbWijDIwgiW7Y1xgQqHKHg7YHHOZIk7HU7Q11k/NZijfU9a8B
- kYH/scNUWkyTvMNgvD/f7F7gY0wNzg0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-564-b2nqHJPjMFKFAYfHoWm2bA-1; Thu, 13 Oct 2022 12:42:36 -0400
-X-MC-Unique: b2nqHJPjMFKFAYfHoWm2bA-1
-Received: by mail-wm1-f70.google.com with SMTP id
- k38-20020a05600c1ca600b003b49a809168so3171223wms.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 09:42:36 -0700 (PDT)
+ with ESMTP id uTc7PEXsyoBu for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 Oct 2022 15:02:57 -0400 (EDT)
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com
+ [209.85.166.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DBB8540159
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 15:02:57 -0400 (EDT)
+Received: by mail-io1-f42.google.com with SMTP id r142so2143395iod.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Oct 2022 12:02:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:from:to:cc:subject:date:message-id:reply-to;
+ bh=MP3T/XHtvB7T2dvq2BFDW4i0+SNmM+iMnWNu4Hti2BA=;
+ b=ZMTofWbJPh9OXpNDn+89bEexPttxGkSAoMgTKgcO7a58oNNx9ffMYPcw0jPVik8bNf
+ /OdbkHy01qlffZiisapq3bbG4+XMS09MNjZl1h/9ALwM8RGjlmHPsvgrdPX9IVmEJ2JB
+ EKKjB5RiaxA9mNnPMfFShHlMbHQOtBYCMrVMI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=YBQyFVBuF/SKjPazJHlLgOwvTK+5LZv1rrMgf1acIpo=;
- b=ih/PctIQMSp/lCWTy8ppMsXJNsK9/Hn5sVoDFX2E9Gxvz+bh1+Z3TIOHRjYY73/ap2
- 5t7qRxbeSF4HPhXPr+ut54/PY6oSJTzBLopMI3BcqdicVKtzAAhBDAaIhCNRvqpCNcfq
- x6ULGJawborZ+JFpeN0zsVU5oekKsDNW1Yw/aNvWlV4bdwd9aodFy3iCKSLHVz43HIOU
- cD2xU5abe1Pl530hOYlM1lCNpayu+uUJwJIAvflX673X5/eBqFOo/GgS4aIcU/s04cSG
- a/sFen5YUpjSYcqdR6exEhfsfhdB+MnPPMOmUPdqnE4hOlXmNlayjv2mChz2CiRcOAt2
- ACCw==
-X-Gm-Message-State: ACrzQf25AsHK3vLThF+ZuQVKO/9wVmMpm7nudu+973sIhLMdaDiqg36L
- 46bNOOE/2KIy7QNUMvmSPZCfU3N0eSAaZw/eHgKkypxv6t/ZnNjWBpxi0sID2O3+wBqbToZ+ZLn
- GcOLtt7vnz3N4Bv/FFkcfPtzN
-X-Received: by 2002:a05:600c:1912:b0:3c6:e3cf:4335 with SMTP id
- j18-20020a05600c191200b003c6e3cf4335mr740381wmq.81.1665679354001; 
- Thu, 13 Oct 2022 09:42:34 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM63OJlvg+GZtxl6mLYfE9Y5CCeBv34c5qID7pyf4ZqxFTU/m9Khf2eRtYMqinx72PY+/mPmQQ==
-X-Received: by 2002:a05:600c:1912:b0:3c6:e3cf:4335 with SMTP id
- j18-20020a05600c191200b003c6e3cf4335mr740365wmq.81.1665679353762; 
- Thu, 13 Oct 2022 09:42:33 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
- ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id
- h5-20020adfe985000000b002322bff5b3bsm52198wrm.54.2022.10.13.09.42.31
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 13 Oct 2022 09:42:32 -0700 (PDT)
-Message-ID: <7f071249-b402-9534-c127-40af9379756d@redhat.com>
-Date: Thu, 13 Oct 2022 18:42:31 +0200
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+ :reply-to;
+ bh=MP3T/XHtvB7T2dvq2BFDW4i0+SNmM+iMnWNu4Hti2BA=;
+ b=MyIXRZSqEXDess86bvXrIh/z028WerFlvySMJP7G5jdNdf+ACPGN/4ovYZzJ9IWrdz
+ z+y2ZbfTXiIZaYJZsR5Oy9tAaPAXEmqCkfhGS6PhgLIT7hG189HF1BRn9hULI5x13403
+ /6sEuD/hd5rAVFxYZAr33QEDuINCrakMqOX29z0v1+VICGooY17BHDKFelROEOurviCb
+ BrauVR3XnoXxvsntniAbx9XeV7lPVVayYYSrdu0xbPKqvj1l5UFLv4wQ9fYBAxsVb65v
+ /F0fi6DpTW0REoo5FiNxkt8w88z+QgPN9kZ+jvYKaWuNIMsvh1iEZL4SgCcOofEcDaED
+ wHNA==
+X-Gm-Message-State: ACrzQf1pg2s3pLow4bsIgJLVdCY82i0AQLvnlMwGWrX3nMCqbNGeWbwZ
+ gIk7FHVsCS+hJ70a8xsSw1nePeq7xIeskgoDIU+Hhw==
+X-Google-Smtp-Source: AMsMyM4RzYGiidFH0NDYt44AzYf9H4jcVkGDqcI3RF9uszlKftMcbPM4u6lpy8mLxwLYCdzS763ghbAVi0/zMgolec8=
+X-Received: by 2002:a02:290e:0:b0:35a:d680:7aad with SMTP id
+ p14-20020a02290e000000b0035ad6807aadmr807425jap.62.1665687777109; Thu, 13 Oct
+ 2022 12:02:57 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] KVM: arm64: vgic: fix wrong loop condition in
- scan_its_table()
-To: Marc Zyngier <maz@kernel.org>, Eric Ren <renzhengeek@gmail.com>
-References: <acd9f1643980fbd27cd22523d2d84ca7c9add84a.1665592448.git.renzhengeek@gmail.com>
- <87o7ughoyf.wl-maz@kernel.org>
-From: Eric Auger <eauger@redhat.com>
-In-Reply-To: <87o7ughoyf.wl-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, kvmarm <kvmarm@lists.cs.columbia.edu>
+References: <20220920082005.2459826-1-denik@chromium.org>
+ <20220922053145.944786-1-denik@chromium.org>
+ <87h70zk83g.wl-maz@kernel.org>
+ <CADDJ8CW0QgHtp1rwk=ZqrcuWZ4_L8KQh26VaEfcBQS0Tx9+ZYg@mail.gmail.com>
+ <CAH=Qcsi3aQ51AsAE0WmAH9VmpqjOaQQt=ru5Nav4+d8F3fMPwQ@mail.gmail.com>
+ <CADDJ8CXObkhMvOx+L29awjtt7tiaTWxFrRxOmhUqvzku1wswHw@mail.gmail.com>
+ <CADDJ8CV83d4tYeLnQH-hHjzBfED6EBo4Z70q5A=9cwO+Lp1sNQ@mail.gmail.com>
+ <87sfjxhh4k.wl-maz@kernel.org>
+ <CADDJ8CVX5tZU9jL4FvTnvQxxVohhS76TVOoZAyy3k_Uit1efmA@mail.gmail.com>
+ <86fsfsf0ab.wl-maz@kernel.org>
+In-Reply-To: <86fsfsf0ab.wl-maz@kernel.org>
+From: Denis Nikitin <denik@chromium.org>
+Date: Thu, 13 Oct 2022 12:02:46 -0700
+Message-ID: <CADDJ8CVP0f99e6v0F==5Qo6LePb0DCkF1KatTEHx24W8aWcXWw@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: arm64: nvhe: Fix build with profile optimization
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
+ Manoj Gupta <manojgupta@google.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -106,102 +92,97 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
+Thank you Marc for figuring out the filtering-out solution!
+It fixed the build on ChromeOS.
 
-On 10/12/22 20:33, Marc Zyngier wrote:
-> Hi Eric,
-> 
-> Before I comment on this patch, a couple of things that need
-> addressing:
-> 
->> "Cc: marc.zyngier@arm.com, cdall@linaro.org"
-> 
-> None of these two addresses are valid anymore, and haven't been for
-> several years.
-> 
-> Please consult the MAINTAINERS file for up-to-date addresses for
-> current maintainers and reviewers, all of whom should be Cc'd on this
-> email. I've now added them as well as Eric Auger who has written most
-> of the ITS migration code, and the new mailing list (the Columbia list
-> is about to be killed).
-> 
-> On Wed, 12 Oct 2022 17:59:25 +0100,
-> Eric Ren <renzhengeek@gmail.com> wrote:
->>
->> Reproducer hints:
->> 1. Create ARM virt VM with pxb-pcie bus which adds
->>    extra host bridges, with qemu command like:
->>
->> ```
->>   -device pxb-pcie,bus_nr=8,id=pci.x,numa_node=0,bus=pcie.0 \
->>   -device pcie-root-port,..,bus=pci.x \
->>   ...
->>   -device pxb-pcie,bus_nr=37,id=pci.y,numa_node=1,bus=pcie.0 \
->>   -device pcie-root-port,..,bus=pci.y \
->>   ...
->>
->> ```
->> 2. Perform VM migration which calls save/restore device tables.
->>
->> In that setup, we get a big "offset" between 2 device_ids (
->> one is small, another is big), which makes unsigned "len" round
->> up a big positive number, causing loop to continue exceptionally.
-> 
-> You'll have to spell it out for me here. If you have a very sparse
-> device ID and you are only using a single level device table, you are
-> bound to have a large len. Now, is the issue that 'size' is so large
-> that it is negative as an 'int'? Describing the exact situation you're
-> in would help a lot.
-> 
->>
->> Signed-off-by: Eric Ren <renzhengeek@gmail.com>
->> ---
->>  arch/arm64/kvm/vgic/vgic-its.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
->> index 24d7778d1ce6..673554ef02f9 100644
->> --- a/arch/arm64/kvm/vgic/vgic-its.c
->> +++ b/arch/arm64/kvm/vgic/vgic-its.c
->> @@ -2141,7 +2141,7 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
->>  			  int start_id, entry_fn_t fn, void *opaque)
->>  {
->>  	struct kvm *kvm = its->dev->kvm;
->> -	unsigned long len = size;
->> +	ssize_t len = size;
-> 
-> This feels wrong, really. If anything, all these types should be
-> unsigned, not signed. Signed types in this context make very little
-> sense...
+I will update the patch and also filter out `-fprofile-use` which will avoid
+a similar problem with the instrumented PGO in the future.
 
-After digging into the code back again, I realized I told you something
-wrong. The next_offset is the delta between the current device id and
-the next one. The next device can perfectly be in a different L1 device
-table, - it is your case actually- , in which case the code is
-definitely broken.
+Thanks,
+Denis
 
-So I guess we should rather have a
-while (true) {
-	../..
-	if (byte_offset >= len)
-		break;
-	len -= byte_offset;
-}
-
-You can add a Fixes tag too:
-Fixes: 920a7a8fa92a ("KVM: arm64: vgic-its: Add infrastructure for table
-lookup")
-and cc stable@vger.kernel.org
-
-Thanks
-
-Eric
-> 
-> Thanks,
-> 
-> 	M.
-> 
-
+On Thu, Oct 13, 2022 at 4:09 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Tue, 11 Oct 2022 03:15:36 +0100,
+> Denis Nikitin <denik@chromium.org> wrote:
+> >
+> > On Sat, Oct 8, 2022 at 7:22 PM Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > On Thu, 06 Oct 2022 17:28:17 +0100,
+> > > Denis Nikitin <denik@chromium.org> wrote:
+> > > >
+> > > > Hi Mark,
+> > >
+> > > s/k/c/
+> > >
+> > > >
+> > > > This problem currently blocks the PGO roll on the ChromeOS kernel and
+> > > > we need some kind of a solution.
+> > >
+> > > I'm sorry, but I don't feel constrained by your internal deadlines. I
+> > > have my own...
+> > >
+> > > > Could you please take a look?
+> > >
+> > > I have asked for a reproducer. All I got for an answer is "this is
+> > > hard". Providing a profiling file would help, for example.
+> >
+> > Could you please try the following profile on the 5.15 branch?
+> >
+> > $ cat <<EOF > prof.txt
+> > kvm_pgtable_walk:100:10
+> >  2: 5
+> >  3: 5
+> >  5: 5
+> >  6: 5
+> >  10: 5
+> >  10: _kvm_pgtable_walk:50
+> >   5: 5
+> >   7: 5
+> >   10: 5
+> >   13.2: 5
+> >   14: 5
+> >   16: 5 __kvm_pgtable_walk:5
+> >   13: kvm_pgd_page_idx:30
+> >    2: __kvm_pgd_page_idx:30
+> >     2: 5
+> >     3: 5
+> >     5: 5
+> >     2: kvm_granule_shift:5
+> >      3: 5
+> > EOF
+> >
+> > $ make LLVM=1 ARCH=arm64 KCFLAGS=-fprofile-sample-use=prof.txt -j8 vmlinux
+>
+> Thanks, this was helpful, as I was able to reproduce the build failure.
+>
+> FWIW, it seems pretty easy to work around by filtering out the
+> offending option, making it consistent with the mechanism we already
+> use for tracing and the like.
+>
+> I came up with the hack below, which does the trick and is IMHO better
+> than dropping the section (extra work) or adding the negation of this
+> option (which depends on the compiler option evaluation order).
+>
+>         M.
+>
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index 48f6ae7cc6e6..7df1b6afca7f 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -91,7 +91,7 @@ quiet_cmd_hypcopy = HYPCOPY $@
+>
+>  # Remove ftrace, Shadow Call Stack, and CFI CFLAGS.
+>  # This is equivalent to the 'notrace', '__noscs', and '__nocfi' annotations.
+> -KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI), $(KBUILD_CFLAGS))
+> +KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI) -fprofile-sample-use=%, $(KBUILD_CFLAGS))
+>
+>  # KVM nVHE code is run at a different exception code with a different map, so
+>  # compiler instrumentation that inserts callbacks or checks into the code may
+>
+>
+> --
+> Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
