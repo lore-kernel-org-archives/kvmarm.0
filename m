@@ -1,31 +1,31 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38E77B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA52626
 	for <kvmarm@lists.linux.dev>; Fri, 14 Oct 2022 07:21:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1665732071;
+	s=mimecast20190719; t=1665732072;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=DdHs0tIGZs6Hd5dMAbgHdexs9jDtMkST+MADKDSgxqM=;
-	b=as9BqTSWqng7mobUeUjwKK2LPHGo15/KchleXMVJYqlFE3blFjUz6K55/8zCZ3k0dENeib
-	HknrQHUQT8EA0I05SYNISAVd6NIA8NzzSJt9oZWBhcavTELpHTeqdBy41qZbTGg70dpTpp
-	EDA9NOEWLMAZLcTNjfFRfD/1Sa7HhE4=
+	bh=pr7VHnuYR01/Gc5/jPxyHFPhwmvdOLksQ25lnmxgeCs=;
+	b=d0jdDZIC1x+jmRHG8HHWCz2WBpF9dOttI0orh3vg1blZWCPnRVKD3OV5/yPzQbhld0xDqZ
+	RtKVw0l7U45li70D44eYbU/yP1Yd2YiesVIBVbkixrrnFUjPj6CDZAKTiJmpjKarScSOxt
+	bJ1IMuTXJYQA5vwRzjTpBPDPl9sJloM=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-297-V9TD_DjrPUuoIF-FNHa4xw-1; Fri, 14 Oct 2022 03:21:08 -0400
-X-MC-Unique: V9TD_DjrPUuoIF-FNHa4xw-1
+ us-mta-204-rtiAg9aKM9azsTkhDxYPzQ-1; Fri, 14 Oct 2022 03:21:08 -0400
+X-MC-Unique: rtiAg9aKM9azsTkhDxYPzQ-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A88133C0F446;
-	Fri, 14 Oct 2022 07:20:12 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 972B51C05ED2;
+	Fri, 14 Oct 2022 07:20:52 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-52.bne.redhat.com [10.64.54.52])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 60002C47DEC;
-	Fri, 14 Oct 2022 07:19:54 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FAF2C3343C;
+	Fri, 14 Oct 2022 07:20:23 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.linux.dev
 Cc: kvmarm@lists.cs.columbia.edu,
@@ -42,9 +42,9 @@ Cc: kvmarm@lists.cs.columbia.edu,
 	ricarkol@google.com,
 	zhenyzha@redhat.com,
 	shan.gavin@gmail.com
-Subject: [PATCH 3/6] KVM: selftests: memslot_perf_test: Probe memory slots for once
-Date: Fri, 14 Oct 2022 15:19:11 +0800
-Message-ID: <20221014071914.227134-4-gshan@redhat.com>
+Subject: [PATCH 5/6] KVM: selftests: memslot_perf_test: Consolidate memory sizes
+Date: Fri, 14 Oct 2022 15:19:13 +0800
+Message-ID: <20221014071914.227134-6-gshan@redhat.com>
 In-Reply-To: <20221014071914.227134-1-gshan@redhat.com>
 References: <20221014071914.227134-1-gshan@redhat.com>
 Precedence: bulk
@@ -56,86 +56,73 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-Message-ID: <20221014071911.h_nRwWYiJ8Ta0WRAEEphEALFGqzDsd3qPpVg7fVElWs@z>
+Message-ID: <20221014071913.We6pjS8Sxen5Lqj5hEX4fpk0qaFAofIV2q_cTBoSQGE@z>
 
-prepare_vm() is called in every iteration and run. The allowed memory
-slots (KVM_CAP_NR_MEMSLOTS) are probed for multiple times. It's not
-free and unnecessary.
+The addresses and sizes passed to madvise() and vm_userspace_mem_region_add()
+should be aligned to host page size, which can be 64KB on aarch64. So it's
+wrong by passing additional fixed 4KB memory area to various tests.
 
-Move the probing logic for the allowed memory slots to parse_args()
-for once, which is upper layer of prepare_vm().
+Fix it by passing additional fixed 64KB memory area to various tests. After
+it's applied, the following command works fine on 64KB-page-size-host and
+4KB-page-size-guest.
 
-No functional change intended.
+  # ./memslot_perf_test -v -s 512
 
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- .../testing/selftests/kvm/memslot_perf_test.c | 29 ++++++++++---------
- 1 file changed, 16 insertions(+), 13 deletions(-)
+ .../testing/selftests/kvm/memslot_perf_test.c  | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
-index dcb492b3f27b..d5aa9148f96f 100644
+index d587bd952ff9..e6d34744b45d 100644
 --- a/tools/testing/selftests/kvm/memslot_perf_test.c
 +++ b/tools/testing/selftests/kvm/memslot_perf_test.c
-@@ -245,27 +245,17 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 		       void *guest_code, uint64_t mempages,
- 		       struct timespec *slot_runtime)
- {
--	uint32_t max_mem_slots;
- 	uint64_t rempages;
- 	uint64_t guest_addr;
- 	uint32_t slot;
- 	struct timespec tstart;
- 	struct sync_area *sync;
+@@ -25,12 +25,14 @@
+ #include <kvm_util.h>
+ #include <processor.h>
  
--	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
--	TEST_ASSERT(max_mem_slots > 1,
--		    "KVM_CAP_NR_MEMSLOTS should be greater than 1");
--	TEST_ASSERT(nslots > 1 || nslots == -1,
--		    "Slot count cap should be greater than 1");
--	if (nslots != -1)
--		max_mem_slots = min(max_mem_slots, (uint32_t)nslots);
--	pr_info_v("Allowed number of memory slots: %"PRIu32"\n", max_mem_slots);
--
- 	TEST_ASSERT(mempages > 1,
- 		    "Can't test without any memory");
- 
- 	data->npages = mempages;
--	data->nslots = max_mem_slots - 1;
-+	data->nslots = nslots;
- 	data->pages_per_slot = mempages / data->nslots;
- 	if (!data->pages_per_slot) {
- 		*maxslots = mempages + 1;
-@@ -885,8 +875,8 @@ static bool parse_args(int argc, char *argv[],
- 			break;
- 		case 's':
- 			targs->nslots = atoi(optarg);
--			if (targs->nslots <= 0 && targs->nslots != -1) {
--				pr_info("Slot count cap has to be positive or -1 for no cap\n");
-+			if (targs->nslots <= 1 && targs->nslots != -1) {
-+				pr_info("Slot count cap must be larger than 1 or -1 for no cap\n");
- 				return false;
- 			}
- 			break;
-@@ -932,6 +922,19 @@ static bool parse_args(int argc, char *argv[],
- 		return false;
- 	}
- 
-+	/* Memory slot 0 is reserved */
-+	if (targs->nslots == -1) {
-+		targs->nslots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS) - 1;
-+		if (targs->nslots < 1) {
-+			pr_info("KVM_CAP_NR_MEMSLOTS should be greater than 1\n");
-+			return false;
-+		}
-+	} else {
-+		targs->nslots--;
-+	}
+-#define MEM_SIZE		((512U << 20) + 4096)
+-#define MEM_GPA		0x10000000UL
++#define MEM_EXTRA_SIZE		0x10000
 +
-+	pr_info_v("Number of memory slots: %d\n", targs->nslots);
-+
- 	return true;
- }
++#define MEM_SIZE		((512U << 20) + MEM_EXTRA_SIZE)
++#define MEM_GPA			0x10000000UL
+ #define MEM_AUX_GPA		MEM_GPA
+ #define MEM_SYNC_GPA		MEM_AUX_GPA
+-#define MEM_TEST_GPA		(MEM_AUX_GPA + 4096)
+-#define MEM_TEST_SIZE		(MEM_SIZE - 4096)
++#define MEM_TEST_GPA		(MEM_AUX_GPA + MEM_EXTRA_SIZE)
++#define MEM_TEST_SIZE		(MEM_SIZE - MEM_EXTRA_SIZE)
  
+ /*
+  * 32 MiB is max size that gets well over 100 iterations on 509 slots.
+@@ -38,8 +40,8 @@
+  * 8194 slots in use can then be tested (although with slightly
+  * limited resolution).
+  */
+-#define MEM_SIZE_MAP		((32U << 20) + 4096)
+-#define MEM_TEST_MAP_SIZE	(MEM_SIZE_MAP - 4096)
++#define MEM_SIZE_MAP		((32U << 20) + MEM_EXTRA_SIZE)
++#define MEM_TEST_MAP_SIZE	(MEM_SIZE_MAP - MEM_EXTRA_SIZE)
+ 
+ /*
+  * 128 MiB is min size that fills 32k slots with at least one page in each
+@@ -799,13 +801,13 @@ static const struct test_data tests[] = {
+ 	},
+ 	{
+ 		.name = "unmap",
+-		.mem_size = MEM_TEST_UNMAP_SIZE + 4096,
++		.mem_size = MEM_TEST_UNMAP_SIZE + MEM_EXTRA_SIZE,
+ 		.guest_code = guest_code_test_memslot_unmap,
+ 		.loop = test_memslot_unmap_loop,
+ 	},
+ 	{
+ 		.name = "unmap chunked",
+-		.mem_size = MEM_TEST_UNMAP_SIZE + 4096,
++		.mem_size = MEM_TEST_UNMAP_SIZE + MEM_EXTRA_SIZE,
+ 		.guest_code = guest_code_test_memslot_unmap,
+ 		.loop = test_memslot_unmap_loop_chunked,
+ 	},
 -- 
 2.23.0
 
