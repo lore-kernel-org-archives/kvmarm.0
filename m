@@ -2,45 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A03FAC433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Oct 2022 10:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA4E8C4332F
+	for <kvmarm@archiver.kernel.org>; Fri, 14 Oct 2022 14:28:59 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 21CAD40E62;
-	Fri, 14 Oct 2022 06:41:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F8C44B5DB;
+	Fri, 14 Oct 2022 10:28:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iqobjV8Re4z0; Fri, 14 Oct 2022 06:41:09 -0400 (EDT)
+	with ESMTP id xROYjJCzhEjS; Fri, 14 Oct 2022 10:28:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77C934B0D7;
-	Fri, 14 Oct 2022 06:41:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1BC64B248;
+	Fri, 14 Oct 2022 10:28:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73CD84B0D7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 06:41:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 852384B199
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 10:28:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hlmv+5EeSZcn for <kvmarm@lists.cs.columbia.edu>;
- Fri, 14 Oct 2022 06:41:06 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 24D9C410DE
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 06:41:05 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 939F913D5;
- Fri, 14 Oct 2022 03:41:11 -0700 (PDT)
-Received: from FVFF77S0Q05N (unknown [10.57.1.42])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EEDF33F792;
- Fri, 14 Oct 2022 03:41:03 -0700 (PDT)
-Date: Fri, 14 Oct 2022 11:41:01 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [REPOST][URGENT] kvmarm mailing list migration
-Message-ID: <Y0k8vdn5kmIuvDIq@FVFF77S0Q05N>
-References: <86edvbg3q7.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <86edvbg3q7.wl-maz@kernel.org>
-Cc: kvmarm <kvmarm@lists.cs.columbia.edu>
+ with ESMTP id YB-LUul+7BlR for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Oct 2022 10:28:55 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E5864B17C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 10:28:55 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 3A83C61B6D;
+ Fri, 14 Oct 2022 14:28:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B7E1C433C1;
+ Fri, 14 Oct 2022 14:28:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1665757733;
+ bh=zX+pORsQkCidDg3PgRpxsrmwbtK10x2AqJSPcWF7yOQ=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=eJRrmiIO5y6iBCFj3Nzue5WtBxR5hRJOeEPRlBK7WujHLGCDe60dhiSFD3iAcWPXl
+ pAUmGYDAAzZUh5QGWjze2NL2By7DOf5s2PDJcwA7UIUPVvmDBurbln9GZNklhMMEAc
+ fKEiVt2kivL1sxNLWftppp3jTGUAy+dvsuxnlbgtr8CW6qCegmQWzTDrYlHlhkqT/B
+ uAS+vrI3MNTN7QC5PdVaLx5GrnRWNRPM63PdDtdwBgZY/No11xmZ8Ybg3bqhFN1P4P
+ CXwiMY767ktu9NFBGx7OtCpkfwgO5YrzWGjIXPZmHuECEe/yNB95mwqlMmHy8mN//I
+ SCi15/Z0bD8hQ==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1ojLgB-00GXzh-9F;
+ Fri, 14 Oct 2022 15:28:51 +0100
+Date: Fri, 14 Oct 2022 15:28:02 +0100
+Message-ID: <87mt9yh43x.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Eric Auger <eauger@redhat.com>, Eric Ren <renzhengeek@gmail.com>
+Subject: Re: [PATCH] KVM: arm64: vgic: fix wrong loop condition in
+ scan_its_table()
+In-Reply-To: <7f071249-b402-9534-c127-40af9379756d@redhat.com>
+References: <acd9f1643980fbd27cd22523d2d84ca7c9add84a.1665592448.git.renzhengeek@gmail.com>
+ <87o7ughoyf.wl-maz@kernel.org>
+ <7f071249-b402-9534-c127-40af9379756d@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eauger@redhat.com, renzhengeek@gmail.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, suzuki.poulose@arm.com,
+ james.morse@arm.com, Alexandru.Elisei@arm.com, oliver.upton@linux.dev,
+ kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -57,62 +90,130 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Oct 13, 2022 at 04:09:20PM +0100, Marc Zyngier wrote:
-> [Reposting this, as it has been almost two weeks since the initial
->  announcement and we're still at sub-10% of the users having
->  subscribed to the new list]
+On Thu, 13 Oct 2022 17:42:31 +0100,
+Eric Auger <eauger@redhat.com> wrote:
+> 
+> Hi Eric,
+> 
+> On 10/12/22 20:33, Marc Zyngier wrote:
+> > Hi Eric,
+> > 
+> > Before I comment on this patch, a couple of things that need
+> > addressing:
+> > 
+> >> "Cc: marc.zyngier@arm.com, cdall@linaro.org"
+> > 
+> > None of these two addresses are valid anymore, and haven't been for
+> > several years.
+> > 
+> > Please consult the MAINTAINERS file for up-to-date addresses for
+> > current maintainers and reviewers, all of whom should be Cc'd on this
+> > email. I've now added them as well as Eric Auger who has written most
+> > of the ITS migration code, and the new mailing list (the Columbia list
+> > is about to be killed).
 
-FWIW, I didn't subscribe until just now because there weren't clear
-instructions on the linked page. For everyone else's benefit, to subscribe you
-need to send a mail to:
+Duh, I never CC'd the new list... Now hopefully done.
 
-  kvmarm+subscribe@lists.linux.dev
+> > 
+> > On Wed, 12 Oct 2022 17:59:25 +0100,
+> > Eric Ren <renzhengeek@gmail.com> wrote:
+> >>
+> >> Reproducer hints:
+> >> 1. Create ARM virt VM with pxb-pcie bus which adds
+> >>    extra host bridges, with qemu command like:
+> >>
+> >> ```
+> >>   -device pxb-pcie,bus_nr=8,id=pci.x,numa_node=0,bus=pcie.0 \
+> >>   -device pcie-root-port,..,bus=pci.x \
+> >>   ...
+> >>   -device pxb-pcie,bus_nr=37,id=pci.y,numa_node=1,bus=pcie.0 \
+> >>   -device pcie-root-port,..,bus=pci.y \
+> >>   ...
+> >>
+> >> ```
+> >> 2. Perform VM migration which calls save/restore device tables.
+> >>
+> >> In that setup, we get a big "offset" between 2 device_ids (
+> >> one is small, another is big), which makes unsigned "len" round
+> >> up a big positive number, causing loop to continue exceptionally.
+> > 
+> > You'll have to spell it out for me here. If you have a very sparse
+> > device ID and you are only using a single level device table, you are
+> > bound to have a large len. Now, is the issue that 'size' is so large
+> > that it is negative as an 'int'? Describing the exact situation you're
+> > in would help a lot.
+> > 
+> >>
+> >> Signed-off-by: Eric Ren <renzhengeek@gmail.com>
+> >> ---
+> >>  arch/arm64/kvm/vgic/vgic-its.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> >> index 24d7778d1ce6..673554ef02f9 100644
+> >> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> >> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> >> @@ -2141,7 +2141,7 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
+> >>  			  int start_id, entry_fn_t fn, void *opaque)
+> >>  {
+> >>  	struct kvm *kvm = its->dev->kvm;
+> >> -	unsigned long len = size;
+> >> +	ssize_t len = size;
+> > 
+> > This feels wrong, really. If anything, all these types should be
+> > unsigned, not signed. Signed types in this context make very little
+> > sense...
+> 
+> After digging into the code back again, I realized I told you something
+> wrong. The next_offset is the delta between the current device id and
+> the next one. The next device can perfectly be in a different L1 device
 
-... with any subject and body. You'll then get a confirmation email that you
-need to reply to.
+A different L2 table, surely? By definition, we only have a single L1
+table.
+
+> table, - it is your case actually- , in which case the code is
+> definitely broken.
+> 
+> So I guess we should rather have a
+> while (true) {
+> 	../..
+> 	if (byte_offset >= len)
+> 		break;
+> 	len -= byte_offset;
+> }
+> 
+> You can add a Fixes tag too:
+> Fixes: 920a7a8fa92a ("KVM: arm64: vgic-its: Add infrastructure for table
+> lookup")
+> and cc stable@vger.kernel.org
+
+Just to make it clear, do you mean this:
+
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 9d3299a70242..e722cafdff60 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -2162,6 +2162,9 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
+ 			return next_offset;
+ 
+ 		byte_offset = next_offset * esz;
++		if (byte_offset >= len)
++			break;
++
+ 		id += next_offset;
+ 		gpa += byte_offset;
+ 		len -= byte_offset;
+
+
+If so, then I agree that this is a sensible fix. EricR, do you mind
+respinning this ASAP so that I can get it merged and backported?
 
 Thanks,
-Mark.
 
->  
-> Hi all,
-> 
-> As you probably all know, the kvmarm mailing has been hosted on
-> Columbia's machines for as long as the project existed (over 13
-> years). After all this time, the university has decided to retire the
-> list infrastructure and asked us to find a new hosting.
-> 
-> A new mailing list has been created on lists.linux.dev[1], and I'm
-> kindly asking everyone interested in following the KVM/arm64
-> developments to start subscribing to it (and start posting your
-> patches there). I hope that people will move over to it quickly enough
-> that we can soon give Columbia the green light to turn their systems
-> off.
-> 
-> Note that the new list will only get archived automatically once we
-> fully switch over, but I'll make sure we fill any gap and not lose any
-> message. In the meantime, please Cc both lists.
-> 
-> I would like to thank Columbia University for their long lasting
-> support and willingness to help during this transition, as well as
-> Konstantin (and the kernel.org crew) for quickly stepping up to the
-> challenge and giving us a new home!
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> [1] https://subspace.kernel.org/lists.linux.dev.html
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
