@@ -1,100 +1,75 @@
-Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com [209.85.215.194])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71EF2F5B
-	for <kvmarm@lists.linux.dev>; Fri, 14 Oct 2022 18:46:36 +0000 (UTC)
-Received: by mail-pg1-f194.google.com with SMTP id 128so5075240pga.1
-        for <kvmarm@lists.linux.dev>; Fri, 14 Oct 2022 11:46:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF924433
+	for <kvmarm@lists.linux.dev>; Fri, 14 Oct 2022 21:15:06 +0000 (UTC)
+Received: by mail-pg1-f181.google.com with SMTP id s196so4067446pgs.3
+        for <kvmarm@lists.linux.dev>; Fri, 14 Oct 2022 14:15:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=r9b1WxYCtQHAvJQbAPYaXXw5JIstR8dPjphyBTVotDg=;
-        b=C9ChpAljNx+6EX+b7MIXOhJ/DxR1oEgil1ZdehQzrOHu0htP0Wb4hihn7cdKw7kusB
-         unlXoi0fYM8ckb4UqUThqiouQ/fgrebyEJmB7iEik2j7ocpYju1X+GtQNb/e2THXGyfu
-         pdn2pYHgdd7SXL+E5NiLfpnCE8W4Xn9DguZTY=
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PZCd+YWp6Rkdf8GaAemTwPAfWHSubBGbIoqG74NI1ms=;
+        b=cRoXvbDvQMwnmouYRU9bA6BnbMqIjlR+t9dwtgHTh24hpPv7uk3XmVXIJbgw6P8Eg9
+         uU3QY2KRaVJK0F92yWi4lVW7keg0Y9Lful81loNULOo4P9SHVXeJSgQyrCaLfy3IHwIO
+         Obc5PDktwXnmgO12NR7VgdJPy/2idgNnHwyMniFZgxK7Es52QbzYDil5VIddOwZ9ycLV
+         /tsBIK0Z4qWqa44E/uQID8GzRzZNBvLyhcV8n6p+8JmNYRddayZJ+2GJDUnWEp21MPsQ
+         FphmiTX70hT3biWGoKJmjEUTUTIpadx1/5gtx6nTy/QFCJcUIglQuje8g1WsugdjDiHx
+         c6Jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=r9b1WxYCtQHAvJQbAPYaXXw5JIstR8dPjphyBTVotDg=;
-        b=cU/plCQfrQmANqInm2IqBeflaOtUKxBcRSLomVEFRcPx1ZlBw8l8nt/tcopD/nFNrS
-         HnFFoDyBZMD+cikYnYkcQo4gLG6keARNd9KUbqDG1IUVo0FC6hmEFSkthUcKNO1w4S4p
-         NRMPr+zy/1qJY2GsM+Tk2uUZbsgspiTj5ZF+mfzpt6cpoI3IpKvmNC019RRaSN6u/2Xx
-         Z2EPN51ppP2BHaZPrL7X/k/TeqdLZt7T4N3SJ6q9giNF/2hzPb3O/QXqknZ3MQmw5s8h
-         wqj2mpoSJa42pkRC2LN25U08nd3371fK6MJ+t4El2RsxLEvcKoHeTtE85oxI6SpoIQ9N
-         y/CA==
-X-Gm-Message-State: ACrzQf2Hjjme6HaV2G3+pdGn+eeCEMpgjeuuN/tt5AiRETfBngFrlH4M
-	GogBGC2kW+W/Rg3RYWSAWcVXSg==
-X-Google-Smtp-Source: AMsMyM4KxZFUnZ3+JVUZbSV1KdBMKe5N17ONrn6zYeMpUbJ+0CiKCyk427n5W/she7eWjJeNE5SITA==
-X-Received: by 2002:a05:6a00:1707:b0:562:e790:dfc3 with SMTP id h7-20020a056a00170700b00562e790dfc3mr6609803pfc.59.1665773196248;
-        Fri, 14 Oct 2022 11:46:36 -0700 (PDT)
-Received: from localhost ([2620:15c:2ce:200:e8c9:5029:f577:f6ca])
-        by smtp.gmail.com with UTF8SMTPSA id 203-20020a6217d4000000b0053653c6b9f9sm2047145pfx.204.2022.10.14.11.46.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Oct 2022 11:46:35 -0700 (PDT)
-From: Denis Nikitin <denik@chromium.org>
-To: Marc Zyngier <maz@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Cc: James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Manoj Gupta <manojgupta@google.com>,
-	David Brazdil <dbrazdil@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu,
-	linux-kernel@vger.kernel.org,
-	Denis Nikitin <denik@chromium.org>
-Subject: [PATCH v3] KVM: arm64: nvhe: Fix build with profile optimization
-Date: Fri, 14 Oct 2022 11:45:32 -0700
-Message-ID: <20221014184532.3153551-1-denik@chromium.org>
-X-Mailer: git-send-email 2.38.0.413.g74048e4d9e-goog
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PZCd+YWp6Rkdf8GaAemTwPAfWHSubBGbIoqG74NI1ms=;
+        b=qSMlqjTG3n9gFHIfdTA7mnBmvHLd0o12lqErzvT+1E6P0YgezzdOVTqTnPibSlyWTT
+         yPBCEis1Lbv9Dl3UBtgsNTzens8o7miEzzhZNLAEsFfZjZYKUHmcybfaPQGJaRdGxKDY
+         Rzy510qnK9pzdvCuqzlDRtWvFCtkB+bC6ZPPLbp1l1f7ldQoV5x81fXTNz/1wYpdk9fO
+         djNt1Rqh+x8lxx0TgifYYqirpGQmxrIELCgya4RqvpiAMVJHEU2eOPaEjwnNBCDHKEcV
+         6GzDwPP2kdl7JMf0Qmg9+7Em90VFO1XD1rp3Rtoq6h2b86cnUCcyWrIRU9Mf8SZsTNHl
+         +rpg==
+X-Gm-Message-State: ACrzQf2xA5BgI9EgofCGK4hO2aHKaelumvC0EsurH9QHyFNM4tioXxt/
+	6G3D1hfpmvA2suaOdyqnaYoZAg==
+X-Google-Smtp-Source: AMsMyM6RmjeHSSzE4pJtJXoG7Eo99Kdim1xVs2z0jB4XgAle1pf8E0nfbUcXkYLxxP7MtTx96ZTsyw==
+X-Received: by 2002:aa7:8d17:0:b0:560:485a:e242 with SMTP id j23-20020aa78d17000000b00560485ae242mr7099026pfe.31.1665782106003;
+        Fri, 14 Oct 2022 14:15:06 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id u2-20020a17090341c200b0017f7bef8cfasm2127464ple.281.2022.10.14.14.15.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Oct 2022 14:15:05 -0700 (PDT)
+Date: Fri, 14 Oct 2022 21:15:01 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Ricardo Koller <ricarkol@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
+	pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com,
+	eric.auger@redhat.com, oupton@google.com, reijiw@google.com,
+	rananta@google.com, bgardon@google.com, dmatlack@google.com,
+	axelrasmussen@google.com, Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH v9 01/14] KVM: selftests: Add a userfaultfd library
+Message-ID: <Y0nRVTcWGybRAw+q@google.com>
+References: <20221011010628.1734342-1-ricarkol@google.com>
+ <20221011010628.1734342-2-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Message-ID: <20221014184532.S8Ifb132E-f6whDlGWYp_nUpBJ1BifTmr6jeLJAwy0A@z>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221011010628.1734342-2-ricarkol@google.com>
+Message-ID: <20221014211501.xSP9yqcKHew56YiFZP96MMRdykp9-4LhVRtXF7Je8d8@z>
 
-Kernel build with clang and KCFLAGS=-fprofile-sample-use=<profile> fails with:
+On Tue, Oct 11, 2022, Ricardo Koller wrote:
+> +struct uffd_desc *uffd_setup_demand_paging(int uffd_mode,
+> +		useconds_t uffd_delay, void *hva, uint64_t len,
+> +		uffd_handler_t handler)
 
-error: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.tmp.o: Unexpected SHT_REL
-section ".rel.llvm.call-graph-profile"
+s/uffd_delay/delay, and then this prototype is easier to align.  Keeping the
+uffd_ prefix for "mode" makes sense since that might be ambiguous, but like
+"handler", I don't see much value in prefixing "delay".
 
-Starting from 13.0.0 llvm can generate SHT_REL section, see
-https://reviews.llvm.org/rGca3bdb57fa1ac98b711a735de048c12b5fdd8086.
-gen-hyprel does not support SHT_REL relocation section.
-
-Filter out profile use flags to fix the build with profile optimization.
-
-Signed-off-by: Denis Nikitin <denik@chromium.org>
----
-V2 -> V3: Filter out the profile-use flags.
-V1 -> V2: Remove the relocation instead of disabling the profile-use flags.
----
- arch/arm64/kvm/hyp/nvhe/Makefile | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index b5c5119c7396..16c6abdda494 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -89,6 +89,10 @@ quiet_cmd_hypcopy = HYPCOPY $@
- # Remove ftrace, Shadow Call Stack, and CFI CFLAGS.
- # This is equivalent to the 'notrace', '__noscs', and '__nocfi' annotations.
- KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI), $(KBUILD_CFLAGS))
-+# Starting from 13.0.0 llvm emits SHT_REL section '.llvm.call-graph-profile'
-+# when profile optimization is applied. gen-hyprel does not support SHT_REL and
-+# causes a build failure. Remove profile optimization flags.
-+KBUILD_CFLAGS := $(filter-out -fprofile-sample-use=% -fprofile-use=%, $(KBUILD_CFLAGS))
- 
- # KVM nVHE code is run at a different exception code with a different map, so
- # compiler instrumentation that inserts callbacks or checks into the code may
--- 
-2.38.0.413.g74048e4d9e-goog
-
+struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
+					   void *hva, uint64_t len,
+					   uffd_handler_t handler)
