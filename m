@@ -1,43 +1,43 @@
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF924433
-	for <kvmarm@lists.linux.dev>; Fri, 14 Oct 2022 21:15:06 +0000 (UTC)
-Received: by mail-pg1-f181.google.com with SMTP id s196so4067446pgs.3
-        for <kvmarm@lists.linux.dev>; Fri, 14 Oct 2022 14:15:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F104680
+	for <kvmarm@lists.linux.dev>; Fri, 14 Oct 2022 21:23:34 +0000 (UTC)
+Received: by mail-pl1-f182.google.com with SMTP id h10so5895622plb.2
+        for <kvmarm@lists.linux.dev>; Fri, 14 Oct 2022 14:23:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PZCd+YWp6Rkdf8GaAemTwPAfWHSubBGbIoqG74NI1ms=;
-        b=cRoXvbDvQMwnmouYRU9bA6BnbMqIjlR+t9dwtgHTh24hpPv7uk3XmVXIJbgw6P8Eg9
-         uU3QY2KRaVJK0F92yWi4lVW7keg0Y9Lful81loNULOo4P9SHVXeJSgQyrCaLfy3IHwIO
-         Obc5PDktwXnmgO12NR7VgdJPy/2idgNnHwyMniFZgxK7Es52QbzYDil5VIddOwZ9ycLV
-         /tsBIK0Z4qWqa44E/uQID8GzRzZNBvLyhcV8n6p+8JmNYRddayZJ+2GJDUnWEp21MPsQ
-         FphmiTX70hT3biWGoKJmjEUTUTIpadx1/5gtx6nTy/QFCJcUIglQuje8g1WsugdjDiHx
-         c6Jg==
+        bh=xCLcgM5p0Xi25bsK6RWh7QvQp7XU1CO69/w1Ar3c+II=;
+        b=gmGiZE77o04w3Lo/ylaRSpsaJ6T0ylACDyfKIIQbAZfJj51AKsMwVt8b5o9OAJWtli
+         xeXFhWam3d/geNCFfveD8OaOu0/uny3xfFLlm8HOVq+u3TlQhtZ6Gwn13Fs0xdsGHtet
+         T8PknKGOZBLm8Y9bojwtyArKrCCV4obDDexbhMXkMz1fKY4EOEB70m1o6PnQcNfp1iXv
+         ejURaySDblSheuAfo1aSFyStmfYzNbFZIIo0anrx7aisz0dZq8T4sFgLwBsXCrYIp7FP
+         VtzarBoMc82CBTOOr+jGSyo171CJ+2BZBGMKPeCFYmoXUVatiHxa4jFlzod+LGMm2Euv
+         n/Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PZCd+YWp6Rkdf8GaAemTwPAfWHSubBGbIoqG74NI1ms=;
-        b=qSMlqjTG3n9gFHIfdTA7mnBmvHLd0o12lqErzvT+1E6P0YgezzdOVTqTnPibSlyWTT
-         yPBCEis1Lbv9Dl3UBtgsNTzens8o7miEzzhZNLAEsFfZjZYKUHmcybfaPQGJaRdGxKDY
-         Rzy510qnK9pzdvCuqzlDRtWvFCtkB+bC6ZPPLbp1l1f7ldQoV5x81fXTNz/1wYpdk9fO
-         djNt1Rqh+x8lxx0TgifYYqirpGQmxrIELCgya4RqvpiAMVJHEU2eOPaEjwnNBCDHKEcV
-         6GzDwPP2kdl7JMf0Qmg9+7Em90VFO1XD1rp3Rtoq6h2b86cnUCcyWrIRU9Mf8SZsTNHl
-         +rpg==
-X-Gm-Message-State: ACrzQf2xA5BgI9EgofCGK4hO2aHKaelumvC0EsurH9QHyFNM4tioXxt/
-	6G3D1hfpmvA2suaOdyqnaYoZAg==
-X-Google-Smtp-Source: AMsMyM6RmjeHSSzE4pJtJXoG7Eo99Kdim1xVs2z0jB4XgAle1pf8E0nfbUcXkYLxxP7MtTx96ZTsyw==
-X-Received: by 2002:aa7:8d17:0:b0:560:485a:e242 with SMTP id j23-20020aa78d17000000b00560485ae242mr7099026pfe.31.1665782106003;
-        Fri, 14 Oct 2022 14:15:06 -0700 (PDT)
+        bh=xCLcgM5p0Xi25bsK6RWh7QvQp7XU1CO69/w1Ar3c+II=;
+        b=2ifTCbkK0Jt448BuNsDBlgelrjB/X8sqa2CsBSGOJOmA6+SHnhSvY66Fgh4gbmmPmz
+         kYqmXlL8jGV5OEGl7rlOgw231shAt0yhYYV1KGJMBjBNpf/QWHKRKKeCXLWtCQlFQZjV
+         XQKzY6NQ0h+/JGtzGswg04fVyo20tfh2+C8/UiHfA1aDZavDJ0nddaRiwtISX74TIkdx
+         Mqs47qli7A6soPLw4EOI48DZdrCypUYp+v2NwxcJY3PhTDWlJ7hnF4MLARzCEmsxOPqS
+         X0o13aBPhYGECjWRA5JapUkL2POJuoyETkKK4ERau6omqnWcpG7wxeQkDgZ1pGInHdNa
+         GDKQ==
+X-Gm-Message-State: ACrzQf0hdjbqSH+e8BhO4Du6St0T3//TbTLM5/sMQk77OUkBpfmN2xh8
+	7O2FsogsytPLl75x+IIlmeUAMw==
+X-Google-Smtp-Source: AMsMyM4T7f/zchI8yBfJsjb1QMLlCXvQLmbJzBWG/hENTAl0t/BseKUlwkTlh7t6m2TxyxfQCYJ0xQ==
+X-Received: by 2002:a17:90a:ba90:b0:20d:3434:7f56 with SMTP id t16-20020a17090aba9000b0020d34347f56mr7960241pjr.105.1665782614370;
+        Fri, 14 Oct 2022 14:23:34 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u2-20020a17090341c200b0017f7bef8cfasm2127464ple.281.2022.10.14.14.15.05
+        by smtp.gmail.com with ESMTPSA id b10-20020a170902650a00b001752216ca51sm2161326plk.39.2022.10.14.14.23.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Oct 2022 14:15:05 -0700 (PDT)
-Date: Fri, 14 Oct 2022 21:15:01 +0000
+        Fri, 14 Oct 2022 14:23:34 -0700 (PDT)
+Date: Fri, 14 Oct 2022 21:23:30 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: Ricardo Koller <ricarkol@google.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -45,11 +45,12 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 	pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com,
 	eric.auger@redhat.com, oupton@google.com, reijiw@google.com,
 	rananta@google.com, bgardon@google.com, dmatlack@google.com,
-	axelrasmussen@google.com, Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v9 01/14] KVM: selftests: Add a userfaultfd library
-Message-ID: <Y0nRVTcWGybRAw+q@google.com>
+	axelrasmussen@google.com
+Subject: Re: [PATCH v9 10/14] KVM: selftests: aarch64: Add
+ aarch64/page_fault_test
+Message-ID: <Y0nTUmsC7YGTQery@google.com>
 References: <20221011010628.1734342-1-ricarkol@google.com>
- <20221011010628.1734342-2-ricarkol@google.com>
+ <20221011010628.1734342-11-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,18 +59,158 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221011010628.1734342-2-ricarkol@google.com>
-Message-ID: <20221014211501.xSP9yqcKHew56YiFZP96MMRdykp9-4LhVRtXF7Je8d8@z>
+In-Reply-To: <20221011010628.1734342-11-ricarkol@google.com>
+Message-ID: <20221014212330.YkUBblKWNFi1Om_YQcp6n51LKGcMi5BilqsawnDf8fw@z>
 
 On Tue, Oct 11, 2022, Ricardo Koller wrote:
-> +struct uffd_desc *uffd_setup_demand_paging(int uffd_mode,
-> +		useconds_t uffd_delay, void *hva, uint64_t len,
-> +		uffd_handler_t handler)
+> +/* Returns true to continue the test, and false if it should be skipped. */
+> +static bool punch_hole_in_backing_store(struct kvm_vm *vm,
+> +					struct userspace_mem_region *region)
+> +{
+> +	void *hva = (void *)region->region.userspace_addr;
+> +	uint64_t paging_size = region->region.memory_size;
+> +	int ret, fd = region->fd;
+> +
+> +	if (fd != -1) {
+> +		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+> +				0, paging_size);
+> +		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
+> +	} else {
+> +		ret = madvise(hva, paging_size, MADV_DONTNEED);
+> +		TEST_ASSERT(ret == 0, "madvise failed, errno: %d\n", errno);
+> +	}
 
-s/uffd_delay/delay, and then this prototype is easier to align.  Keeping the
-uffd_ prefix for "mode" makes sense since that might be ambiguous, but like
-"handler", I don't see much value in prefixing "delay".
+Uber nit, no need to manually print the errno, TEST_ASSERT() does that automatically
+and pretty prints the string too.  I know this because I keep forgetting myself :-).
 
-struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
-					   void *hva, uint64_t len,
-					   uffd_handler_t handler)
+> +/* Returns true to continue the test, and false if it should be skipped. */
+> +static bool handle_cmd(struct kvm_vm *vm, int cmd)
+> +{
+> +	struct userspace_mem_region *data_region, *pt_region;
+> +	bool continue_test = true;
+> +
+> +	data_region = vm_get_mem_region(vm, MEM_REGION_TEST_DATA);
+> +	pt_region = vm_get_mem_region(vm, MEM_REGION_PT);
+> +
+> +	if (cmd == CMD_SKIP_TEST)
+> +		continue_test = false;
+> +
+> +	if (cmd & CMD_HOLE_PT)
+> +		continue_test = punch_hole_in_backing_store(vm, pt_region);
+> +	if (cmd & CMD_HOLE_DATA)
+> +		continue_test = punch_hole_in_backing_store(vm, data_region);
+> +
+> +	return continue_test;
+> +}
+
+...
+
+> +static void setup_abort_handlers(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
+> +		struct test_desc *test)
+
+Align params.
+
+static void setup_abort_handlers(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
+				 struct test_desc *test)
+
+> +static void for_each_test_and_guest_mode(
+> +		void (*func)(enum vm_guest_mode m, void *a),
+
+If you spin a new version, can you put together a patch or mini-series to add a
+typedef for this function pointer?  Then this function doesn't need a funky wrap.
+Or alternatively, as follow-up to avoid delaying this series even longer.
+
+E.g.
+
+static void for_each_test_and_guest_mode(guest_mode_test_t func,
+					 enum vm_mem_backing_src_type src_type)
+
+diff --git a/tools/testing/selftests/kvm/include/guest_modes.h b/tools/testing/selftests/kvm/include/guest_modes.h
+index b691df33e64e..ee7c5c271eb2 100644
+--- a/tools/testing/selftests/kvm/include/guest_modes.h
++++ b/tools/testing/selftests/kvm/include/guest_modes.h
+@@ -15,7 +15,9 @@ extern struct guest_mode guest_modes[NUM_VM_MODES];
+        guest_modes[mode] = (struct guest_mode){ supported, enabled }; \
+ })
+ 
++typedef void (*guest_mode_test_t)(enum vm_guest_mode, void *);
++
+ void guest_modes_append_default(void);
+-void for_each_guest_mode(void (*func)(enum vm_guest_mode, void *), void *arg);
++void for_each_guest_mode(guest_mode_test_t func, void *arg);
+ void guest_modes_help(void);
+ void guest_modes_cmdline(const char *arg);
+
+
+
+> +		enum vm_mem_backing_src_type src_type)
+> +{
+> +	struct test_desc *t;
+> +
+> +	for (t = &tests[0]; t->name; t++) {
+> +		if (t->skip)
+> +			continue;
+> +
+> +		struct test_params p = {
+> +			.src_type = src_type,
+> +			.test_desc = t,
+> +		};
+> +
+> +		for_each_guest_mode(run_test, &p);
+> +	}
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	enum vm_mem_backing_src_type src_type;
+> +	int opt;
+> +
+> +	setbuf(stdout, NULL);
+> +
+> +	src_type = DEFAULT_VM_MEM_SRC;
+> +
+> +	while ((opt = getopt(argc, argv, "hm:s:")) != -1) {
+> +		switch (opt) {
+> +		case 'm':
+> +			guest_modes_cmdline(optarg);
+> +			break;
+> +		case 's':
+> +			src_type = parse_backing_src_type(optarg);
+> +			break;
+> +		case 'h':
+> +		default:
+> +			help(argv[0]);
+> +			exit(0);
+> +		}
+> +	}
+> +
+> +	for_each_test_and_guest_mode(run_test, src_type);
+> +	return 0;
+> +}
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> index c1ddca8db225..5f977528e09c 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> @@ -105,11 +105,19 @@ enum {
+>  #define ESR_EC_MASK		(ESR_EC_NUM - 1)
+>  
+>  #define ESR_EC_SVC64		0x15
+> +#define ESR_EC_IABT		0x21
+> +#define ESR_EC_DABT		0x25
+>  #define ESR_EC_HW_BP_CURRENT	0x31
+>  #define ESR_EC_SSTEP_CURRENT	0x33
+>  #define ESR_EC_WP_CURRENT	0x35
+>  #define ESR_EC_BRK_INS		0x3c
+>  
+> +/* Access flag */
+> +#define PTE_AF			(1ULL << 10)
+> +
+> +/* Access flag update enable/disable */
+> +#define TCR_EL1_HA		(1ULL << 39)
+> +
+>  void aarch64_get_supported_page_sizes(uint32_t ipa,
+>  				      bool *ps4k, bool *ps16k, bool *ps64k);
+>  
+> -- 
+> 2.38.0.rc1.362.ged0d419d3c-goog
+> 
