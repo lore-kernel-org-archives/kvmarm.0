@@ -2,70 +2,45 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0537EC4332F
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Oct 2022 07:27:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A03FAC433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 14 Oct 2022 10:41:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6344B4018D;
-	Fri, 14 Oct 2022 03:27:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 21CAD40E62;
+	Fri, 14 Oct 2022 06:41:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9uJUMMIPHZKi; Fri, 14 Oct 2022 03:27:37 -0400 (EDT)
+	with ESMTP id iqobjV8Re4z0; Fri, 14 Oct 2022 06:41:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0593940A84;
-	Fri, 14 Oct 2022 03:27:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77C934B0D7;
+	Fri, 14 Oct 2022 06:41:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A586440A84
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 03:27:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 73CD84B0D7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 06:41:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0lwXcXu8iz-G for <kvmarm@lists.cs.columbia.edu>;
- Fri, 14 Oct 2022 03:27:34 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 764D54018D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 03:27:34 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1665732454;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1HO6ItwplxcowXlIKdJH2SQbuhYvBFkPnC0M8MrxP0E=;
- b=Rmjx5On1H9a8hHJ9v7I37BOMox6PV9DnW3GIAyVRYtQAcQaCWsvOYq7ZS1aDpCDWHWF9W1
- xjpOAPX+9L9OCIAtMdcyGWJElB3eFhXI6lq2ajE8NLGwHQBaepploYK8c0RQFw/6L1wq7t
- p70Z0PQ3nwcasdu2o3e62/4UY2uzdQs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-193-l_Q2vU7YPHS0w63Vld1mlw-1; Fri, 14 Oct 2022 03:27:30 -0400
-X-MC-Unique: l_Q2vU7YPHS0w63Vld1mlw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com
- [10.11.54.8])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 50BD518029D2;
- Fri, 14 Oct 2022 07:27:09 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-52.bne.redhat.com [10.64.54.52])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 180DEC56621;
- Fri, 14 Oct 2022 07:20:40 +0000 (UTC)
-From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.linux.dev
-Subject: [PATCH 6/6] KVM: selftests: memslot_perf_test: Report optimal memory
- slots
-Date: Fri, 14 Oct 2022 15:19:14 +0800
-Message-Id: <20221014071914.227134-7-gshan@redhat.com>
-In-Reply-To: <20221014071914.227134-1-gshan@redhat.com>
-References: <20221014071914.227134-1-gshan@redhat.com>
+ with ESMTP id hlmv+5EeSZcn for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Oct 2022 06:41:06 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 24D9C410DE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 06:41:05 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 939F913D5;
+ Fri, 14 Oct 2022 03:41:11 -0700 (PDT)
+Received: from FVFF77S0Q05N (unknown [10.57.1.42])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EEDF33F792;
+ Fri, 14 Oct 2022 03:41:03 -0700 (PDT)
+Date: Fri, 14 Oct 2022 11:41:01 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [REPOST][URGENT] kvmarm mailing list migration
+Message-ID: <Y0k8vdn5kmIuvDIq@FVFF77S0Q05N>
+References: <86edvbg3q7.wl-maz@kernel.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
- zhenyzha@redhat.com, shan.gavin@gmail.com, pbonzini@redhat.com,
- maciej.szmigiero@oracle.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
- ajones@ventanamicro.com
+Content-Disposition: inline
+In-Reply-To: <86edvbg3q7.wl-maz@kernel.org>
+Cc: kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,121 +57,62 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The memory area in each slot should be aligned to host page size.
-Otherwise, the test will failure. For example, the following command
-fails with the following messages with 64KB-page-size-host and
-4KB-pae-size-guest. It's not user friendly. Lets do something to report
-the optimal memory slots, instead of failing the test.
+On Thu, Oct 13, 2022 at 04:09:20PM +0100, Marc Zyngier wrote:
+> [Reposting this, as it has been almost two weeks since the initial
+>  announcement and we're still at sub-10% of the users having
+>  subscribed to the new list]
 
-  # ./memslot_perf_test -v -s 1000
-  Number of memory slots: 999
-  Testing map performance with 1 runs, 5 seconds each
-  Adding slots 1..999, each slot with 8 pages + 216 extra pages last
-  ==== Test Assertion Failure ====
-    lib/kvm_util.c:824: vm_adjust_num_guest_pages(vm->mode, npages) == npages
-    pid=19872 tid=19872 errno=0 - Success
-       1  0x00000000004065b3: vm_userspace_mem_region_add at kvm_util.c:822
-       2  0x0000000000401d6b: prepare_vm at memslot_perf_test.c:273
-       3  (inlined by) test_execute at memslot_perf_test.c:756
-       4  (inlined by) test_loop at memslot_perf_test.c:994
-       5  (inlined by) main at memslot_perf_test.c:1073
-       6  0x0000ffff7ebb4383: ?? ??:0
-       7  0x00000000004021ff: _start at :?
-    Number of guest pages is not compatible with the host. Try npages=16
+FWIW, I didn't subscribe until just now because there weren't clear
+instructions on the linked page. For everyone else's benefit, to subscribe you
+need to send a mail to:
 
-Report the optimal memory slots instead of failing the test when
-the memory area in each slot isn't aligned to host page size. With
-this applied, the optimal memory slots is reported.
+  kvmarm+subscribe@lists.linux.dev
 
-  # ./memslot_perf_test -v -s 1000
-  # ./memslot_perf_test -v -s 1000
-  Number of memory slots: 999
-  Testing map performance with 1 runs, 5 seconds each
-  Memslot count too high for this test, decrease the cap (max is 514)
+... with any subject and body. You'll then get a confirmation email that you
+need to reply to.
 
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- .../testing/selftests/kvm/memslot_perf_test.c | 45 +++++++++++++++++--
- 1 file changed, 41 insertions(+), 4 deletions(-)
+Thanks,
+Mark.
 
-diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
-index e6d34744b45d..bec65803f220 100644
---- a/tools/testing/selftests/kvm/memslot_perf_test.c
-+++ b/tools/testing/selftests/kvm/memslot_perf_test.c
-@@ -230,16 +230,52 @@ static struct vm_data *alloc_vm(void)
- 	return data;
- }
- 
-+static bool check_slot_pages(uint32_t host_page_size, uint32_t guest_page_size,
-+			     uint64_t pages_per_slot, uint64_t rempages)
-+{
-+	if (!pages_per_slot)
-+		return false;
-+
-+	if ((pages_per_slot * guest_page_size) % host_page_size)
-+		return false;
-+
-+	if ((rempages * guest_page_size) % host_page_size)
-+		return false;
-+
-+	return true;
-+}
-+
-+
-+static uint64_t get_max_slots(struct vm_data *data, uint32_t host_page_size)
-+{
-+	uint32_t guest_page_size = data->vm->page_size;
-+	uint64_t mempages, pages_per_slot, rempages;
-+	uint64_t slots;
-+
-+	mempages = data->npages;
-+	slots = data->nslots;
-+	while (--slots > 1) {
-+		pages_per_slot = mempages / slots;
-+		rempages = mempages % pages_per_slot;
-+		if (check_slot_pages(host_page_size, guest_page_size,
-+				     pages_per_slot, rempages))
-+			return slots + 1;	/* slot 0 is reserved */
-+	}
-+
-+	return 0;
-+}
-+
- static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 		       void *guest_code, uint64_t mem_size,
- 		       struct timespec *slot_runtime)
- {
- 	uint64_t mempages, rempages;
- 	uint64_t guest_addr;
--	uint32_t slot, guest_page_size;
-+	uint32_t slot, host_page_size, guest_page_size;
- 	struct timespec tstart;
- 	struct sync_area *sync;
- 
-+	host_page_size = getpagesize();
- 	guest_page_size = vm_guest_mode_params[VM_MODE_DEFAULT].page_size;
- 	mempages = mem_size / guest_page_size;
- 
-@@ -250,12 +286,13 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 	TEST_ASSERT(data->npages > 1, "Can't test without any memory");
- 	data->nslots = nslots;
- 	data->pages_per_slot = data->npages / data->nslots;
--	if (!data->pages_per_slot) {
--		*maxslots = data->npages + 1;
-+	rempages = data->npages % data->nslots;
-+	if (!check_slot_pages(host_page_size, guest_page_size,
-+			      data->pages_per_slot, rempages)) {
-+		*maxslots = get_max_slots(data, host_page_size);
- 		return false;
- 	}
- 
--	rempages = data->npages % data->nslots;
- 	data->hva_slots = malloc(sizeof(*data->hva_slots) * data->nslots);
- 	TEST_ASSERT(data->hva_slots, "malloc() fail");
- 
--- 
-2.23.0
-
+>  
+> Hi all,
+> 
+> As you probably all know, the kvmarm mailing has been hosted on
+> Columbia's machines for as long as the project existed (over 13
+> years). After all this time, the university has decided to retire the
+> list infrastructure and asked us to find a new hosting.
+> 
+> A new mailing list has been created on lists.linux.dev[1], and I'm
+> kindly asking everyone interested in following the KVM/arm64
+> developments to start subscribing to it (and start posting your
+> patches there). I hope that people will move over to it quickly enough
+> that we can soon give Columbia the green light to turn their systems
+> off.
+> 
+> Note that the new list will only get archived automatically once we
+> fully switch over, but I'll make sure we fill any gap and not lose any
+> message. In the meantime, please Cc both lists.
+> 
+> I would like to thank Columbia University for their long lasting
+> support and willingness to help during this transition, as well as
+> Konstantin (and the kernel.org crew) for quickly stepping up to the
+> challenge and giving us a new home!
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> [1] https://subspace.kernel.org/lists.linux.dev.html
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
