@@ -2,78 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB7DC4332F
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Oct 2022 21:28:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D013C433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 14 Oct 2022 21:30:20 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4885840762;
-	Fri, 14 Oct 2022 17:28:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E62F84B355;
+	Fri, 14 Oct 2022 17:30:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6VqygR2-srvI; Fri, 14 Oct 2022 17:28:13 -0400 (EDT)
+	with ESMTP id dO-TkS62h9zM; Fri, 14 Oct 2022 17:30:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51BE44B0D0;
-	Fri, 14 Oct 2022 17:28:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1E4D40762;
+	Fri, 14 Oct 2022 17:30:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FC8D40762
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 17:28:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E0C0740762
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 17:30:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V0pB3DKmpSPD for <kvmarm@lists.cs.columbia.edu>;
- Fri, 14 Oct 2022 17:28:11 -0400 (EDT)
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com
- [209.85.215.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 362EB40159
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 17:28:11 -0400 (EDT)
-Received: by mail-pg1-f170.google.com with SMTP id u71so5409977pgd.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 14:28:11 -0700 (PDT)
+ with ESMTP id AV+3n49EuGe8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Oct 2022 17:30:15 -0400 (EDT)
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com
+ [209.85.214.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CBD1840755
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 17:30:15 -0400 (EDT)
+Received: by mail-pl1-f177.google.com with SMTP id k9so5456829pll.11
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 14:30:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=TUL+SkC7/koWX+CyJ2/PD9/CBLbq2G9cpQ2gXTLP9mQ=;
- b=FJYhKHLLUm8mE2yX5H3zXOKYKhzcfIgAAI3C4FwOqjzD20sYlqciVAS8RJXmxiA9qW
- kJp1PhxazDMYSVxpUukm6au9DxjlqdYP6whWFEfbgIf77SwMmddhg/CqZuGs98m0hMCG
- 52W2g/gteeV0i+2OswtkKH13tGy0Mba6L0JUuwwIAg9mFQVs1iMatpv15wJ43T16ycoV
- Lx2qBbAEDz7K+c8Qqf0Ika5zgaROXj26MSIwKp4jihHI2OXLZT9aO6mnet0aiUfWCzSf
- oejKV/39Uc76CV9VlOVngnUQ9XTvIZD8itnKt5lXysuPjQs0RWTBFj8uxUzfBvAecfdO
- V6QQ==
+ bh=UaGZO5Hv6UO255nOsoKhnllnauSBkcqiuPiJxTDzjd0=;
+ b=eLxbHnR+/Z0k38LQnsiu5GDDZYfLK1u8OX6UY90/yfUgW+27vqBsqXb8bCgtxbI5fh
+ lgsWlvg8UEl9D+vdBm8p0JHe8QTEZLpD9uidBNQHB1UJ6Iutl7Ei5BQN38KSXT3r0Hrc
+ wdL4oJQTCUk8iJfzvh+hsIEWpknOq9iY0mc6ekYsF4KfWLdersIn4WMWo3/te0V0V464
+ OYXHMKslBz0+Ic1+K+93oHYnvp4U1RoegOTolMGhZ7PHNn4VH93CoXE2fwEgmXh97yrG
+ rCeuvLu6YqMN4iTW47LO4DgBthdQ6Idt0LUJyRn3L/0Kl5tglDnwJVMuQO9ngGn+Ae7H
+ Ld0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
  :message-id:reply-to;
- bh=TUL+SkC7/koWX+CyJ2/PD9/CBLbq2G9cpQ2gXTLP9mQ=;
- b=fHU5QU8y5FMl5JLvjKvDs1nr67CQgkpjFq7m3TI7ul3ezIAOdhkkn0kFm3VhVdL7Qu
- e3E5s2cC6UeaO4LGcnDha6y/2zTklwT5WrZ+mDeIEI4uS1En9qkkV5VknvKrXflSi84F
- ZVA6lPcYAaXw6tKfW+CQN3kOEhmsYS0qo4hi8iNZTM4WsBsAXyOioGJtHubnVpi9MUNe
- 1xjwAEgRD7zaQ9Mln0jkYlLkgLGIarU5EohL13USJa6wl9HVOhbxL4YZHngkM92L3zVK
- z3EZ/97pkgQJNjFfHr4xqlGS8S87MdX48J01jmZQ44kPBV6Sxo6f3656K6h8FVFqC/c1
- EUDw==
-X-Gm-Message-State: ACrzQf1kI2U3HL2ceaNjVYr40Tx6i4+rwqlxJHXeKJhr+Tx/zaxl7ZHG
- +CCmeq2MEl69y9adioLNnukgdg==
-X-Google-Smtp-Source: AMsMyM7DX2VY33DbNCRga+aaC9tQU3wY2Pnt5YZgE/m67b//0sp7Yz2kcSc6xw7BXLbNRSRIGls7RQ==
-X-Received: by 2002:a63:8b44:0:b0:45f:952f:c426 with SMTP id
- j65-20020a638b44000000b0045f952fc426mr6083058pge.623.1665782890167; 
- Fri, 14 Oct 2022 14:28:10 -0700 (PDT)
+ bh=UaGZO5Hv6UO255nOsoKhnllnauSBkcqiuPiJxTDzjd0=;
+ b=QGi0Vwe4XVfCKnEn8Yp+c90DTAK2fTVYoQJ19tDWO8uSSQnKJQZ4aq34Vss7MNXlBc
+ q8ur6pCNJaqdtHx7rKrI+yT5Qd3HdtEYM8faCMN2yONpCEkPvdewGsKeHAlQMiCrlQjz
+ MP8FhuMcOf5h/a5ejMGSNrFgnO1aeDwsVp3KQoikPk6iEQoN5TNcLDQeDf+5Ho+bJfWw
+ bSv63zWU9LsGy34Hw25ZB3/f2vHLXqMjfyROLX4huJnAdBuSfXB9K5WEwLcvV7f/b1w6
+ Wqiy295UoqZxfGIa7KxhxpbFNrUwA2vGB4oJTD7W7h5T+PiUZxbqw5cvOJ7rFx2nwfr8
+ LXHA==
+X-Gm-Message-State: ACrzQf0hAMbDAPvP6+j2Z6bWVdr7HvLPRIAs2hs8gVXMiOLGQxjI/x2A
+ ZqwGo86HZcY6bPA/1fMHW/Dbaw==
+X-Google-Smtp-Source: AMsMyM5ZZxiVnrK/NpY/bh0FFNLfQybRi6b93cxVHKJ5G5do04wwSqHxuNRfRJ2HCeiRqZMhzu3VWg==
+X-Received: by 2002:a17:902:8e84:b0:178:71f2:113c with SMTP id
+ bg4-20020a1709028e8400b0017871f2113cmr6994097plb.79.1665783014700; 
+ Fri, 14 Oct 2022 14:30:14 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com.
  [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
- c16-20020a17090a109000b0020d39ffe987sm1893977pja.50.2022.10.14.14.28.09
+ r27-20020a63205b000000b00412a708f38asm1828522pgm.35.2022.10.14.14.30.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 14 Oct 2022 14:28:09 -0700 (PDT)
-Date: Fri, 14 Oct 2022 21:28:06 +0000
+ Fri, 14 Oct 2022 14:30:14 -0700 (PDT)
+Date: Fri, 14 Oct 2022 21:30:10 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v9 12/14] KVM: selftests: aarch64: Add dirty logging
- tests into page_fault_test
-Message-ID: <Y0nUZuiRJh/WUnVd@google.com>
+Subject: Re: [PATCH v9 00/14] KVM: selftests: Add aarch64/page_fault_test
+Message-ID: <Y0nU4vIIyjfQuQGV@google.com>
 References: <20221011010628.1734342-1-ricarkol@google.com>
- <20221011010628.1734342-13-ricarkol@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20221011010628.1734342-13-ricarkol@google.com>
+In-Reply-To: <20221011010628.1734342-1-ricarkol@google.com>
 Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
  andrew.jones@linux.dev, kvmarm@lists.linux.dev, pbonzini@redhat.com,
  axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu, dmatlack@google.com
@@ -94,16 +92,30 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Tue, Oct 11, 2022, Ricardo Koller wrote:
-> @@ -395,6 +415,21 @@ static bool punch_hole_in_backing_store(struct kvm_vm *vm,
->  	return true;
->  }
->  
-> +static bool check_write_in_dirty_log(struct kvm_vm *vm,
-> +		struct userspace_mem_region *region, uint64_t host_pg_nr)
+> Ricardo Koller (14):
+>   KVM: selftests: Add a userfaultfd library
+>   KVM: selftests: aarch64: Add virt_get_pte_hva() library function
+>   KVM: selftests: Add missing close and munmap in
+>     __vm_mem_region_delete()
+>   KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1 using sysreg.h
+>     macros
+>   tools: Copy bitfield.h from the kernel sources
+>   KVM: selftests: Stash backing_src_type in struct userspace_mem_region
+>   KVM: selftests: Add vm->memslots[] and enum kvm_mem_region_type
+>   KVM: selftests: Fix alignment in virt_arch_pgd_alloc() and
+>     vm_vaddr_alloc()
+>   KVM: selftests: Use the right memslot for code, page-tables, and data
+>     allocations
+>   KVM: selftests: aarch64: Add aarch64/page_fault_test
+>   KVM: selftests: aarch64: Add userfaultfd tests into page_fault_test
+>   KVM: selftests: aarch64: Add dirty logging tests into page_fault_test
+>   KVM: selftests: aarch64: Add readonly memslot tests into
+>     page_fault_test
+>   KVM: selftests: aarch64: Add mix of tests into page_fault_test
 
-static bool check_write_in_dirty_log(struct kvm_vm *vm,
-				     struct userspace_mem_region *region,
-				     uint64_t host_pg_nr)
+A bunch of nits, mostly about alignment/indentation, but otherwise no more whining
+on my end.  A v10 would probably be nice to avoid churn?  But I'm also ok if y'all
+want to merge this asap and do the cleanup on top.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
