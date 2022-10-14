@@ -1,175 +1,180 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A587B
-	for <kvmarm@lists.linux.dev>; Fri, 14 Oct 2022 07:27:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1665732454;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1HO6ItwplxcowXlIKdJH2SQbuhYvBFkPnC0M8MrxP0E=;
-	b=Rmjx5On1H9a8hHJ9v7I37BOMox6PV9DnW3GIAyVRYtQAcQaCWsvOYq7ZS1aDpCDWHWF9W1
-	xjpOAPX+9L9OCIAtMdcyGWJElB3eFhXI6lq2ajE8NLGwHQBaepploYK8c0RQFw/6L1wq7t
-	p70Z0PQ3nwcasdu2o3e62/4UY2uzdQs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-193-l_Q2vU7YPHS0w63Vld1mlw-1; Fri, 14 Oct 2022 03:27:30 -0400
-X-MC-Unique: l_Q2vU7YPHS0w63Vld1mlw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 50BD518029D2;
-	Fri, 14 Oct 2022 07:27:09 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-52.bne.redhat.com [10.64.54.52])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 180DEC56621;
-	Fri, 14 Oct 2022 07:20:40 +0000 (UTC)
-From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.linux.dev
-Cc: kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ajones@ventanamicro.com,
-	pbonzini@redhat.com,
-	maz@kernel.org,
-	shuah@kernel.org,
-	oliver.upton@linux.dev,
-	seanjc@google.com,
-	peterx@redhat.com,
-	maciej.szmigiero@oracle.com,
-	ricarkol@google.com,
-	zhenyzha@redhat.com,
-	shan.gavin@gmail.com
-Subject: [PATCH 6/6] KVM: selftests: memslot_perf_test: Report optimal memory slots
-Date: Fri, 14 Oct 2022 15:19:14 +0800
-Message-ID: <20221014071914.227134-7-gshan@redhat.com>
-In-Reply-To: <20221014071914.227134-1-gshan@redhat.com>
-References: <20221014071914.227134-1-gshan@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29A220F8
+	for <kvmarm@lists.linux.dev>; Fri, 14 Oct 2022 14:28:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B7E1C433C1;
+	Fri, 14 Oct 2022 14:28:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1665757733;
+	bh=zX+pORsQkCidDg3PgRpxsrmwbtK10x2AqJSPcWF7yOQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eJRrmiIO5y6iBCFj3Nzue5WtBxR5hRJOeEPRlBK7WujHLGCDe60dhiSFD3iAcWPXl
+	 pAUmGYDAAzZUh5QGWjze2NL2By7DOf5s2PDJcwA7UIUPVvmDBurbln9GZNklhMMEAc
+	 fKEiVt2kivL1sxNLWftppp3jTGUAy+dvsuxnlbgtr8CW6qCegmQWzTDrYlHlhkqT/B
+	 uAS+vrI3MNTN7QC5PdVaLx5GrnRWNRPM63PdDtdwBgZY/No11xmZ8Ybg3bqhFN1P4P
+	 CXwiMY767ktu9NFBGx7OtCpkfwgO5YrzWGjIXPZmHuECEe/yNB95mwqlMmHy8mN//I
+	 SCi15/Z0bD8hQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ojLgB-00GXzh-9F;
+	Fri, 14 Oct 2022 15:28:51 +0100
+Date: Fri, 14 Oct 2022 15:28:02 +0100
+Message-ID: <87mt9yh43x.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Eric Auger <eauger@redhat.com>, Eric Ren <renzhengeek@gmail.com>
+Cc: 	kvm@vger.kernel.org,
+	kvmarm <kvmarm@lists.cs.columbia.edu>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	James Morse
+ <james.morse@arm.com>,
+	Alexandru Elisei <Alexandru.Elisei@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH] KVM: arm64: vgic: fix wrong loop condition in scan_its_table()
+In-Reply-To: <7f071249-b402-9534-c127-40af9379756d@redhat.com>
+References: <acd9f1643980fbd27cd22523d2d84ca7c9add84a.1665592448.git.renzhengeek@gmail.com>
+	<87o7ughoyf.wl-maz@kernel.org>
+	<7f071249-b402-9534-c127-40af9379756d@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-Message-ID: <20221014071914.17PmQeGC1Nn8_FMPoIgkdnVBFcs4-2jLF1AAQqndgpE@z>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eauger@redhat.com, renzhengeek@gmail.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, suzuki.poulose@arm.com, james.morse@arm.com, Alexandru.Elisei@arm.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221014142802.EBrW5R6ooxdf6LDmQRutW9e3YzTxP5nYT2QwZPoWrEU@z>
 
-The memory area in each slot should be aligned to host page size.
-Otherwise, the test will failure. For example, the following command
-fails with the following messages with 64KB-page-size-host and
-4KB-pae-size-guest. It's not user friendly. Lets do something to report
-the optimal memory slots, instead of failing the test.
+On Thu, 13 Oct 2022 17:42:31 +0100,
+Eric Auger <eauger@redhat.com> wrote:
+> 
+> Hi Eric,
+> 
+> On 10/12/22 20:33, Marc Zyngier wrote:
+> > Hi Eric,
+> > 
+> > Before I comment on this patch, a couple of things that need
+> > addressing:
+> > 
+> >> "Cc: marc.zyngier@arm.com, cdall@linaro.org"
+> > 
+> > None of these two addresses are valid anymore, and haven't been for
+> > several years.
+> > 
+> > Please consult the MAINTAINERS file for up-to-date addresses for
+> > current maintainers and reviewers, all of whom should be Cc'd on this
+> > email. I've now added them as well as Eric Auger who has written most
+> > of the ITS migration code, and the new mailing list (the Columbia list
+> > is about to be killed).
 
-  # ./memslot_perf_test -v -s 1000
-  Number of memory slots: 999
-  Testing map performance with 1 runs, 5 seconds each
-  Adding slots 1..999, each slot with 8 pages + 216 extra pages last
-  ==== Test Assertion Failure ====
-    lib/kvm_util.c:824: vm_adjust_num_guest_pages(vm->mode, npages) == npages
-    pid=19872 tid=19872 errno=0 - Success
-       1  0x00000000004065b3: vm_userspace_mem_region_add at kvm_util.c:822
-       2  0x0000000000401d6b: prepare_vm at memslot_perf_test.c:273
-       3  (inlined by) test_execute at memslot_perf_test.c:756
-       4  (inlined by) test_loop at memslot_perf_test.c:994
-       5  (inlined by) main at memslot_perf_test.c:1073
-       6  0x0000ffff7ebb4383: ?? ??:0
-       7  0x00000000004021ff: _start at :?
-    Number of guest pages is not compatible with the host. Try npages=16
+Duh, I never CC'd the new list... Now hopefully done.
 
-Report the optimal memory slots instead of failing the test when
-the memory area in each slot isn't aligned to host page size. With
-this applied, the optimal memory slots is reported.
+> > 
+> > On Wed, 12 Oct 2022 17:59:25 +0100,
+> > Eric Ren <renzhengeek@gmail.com> wrote:
+> >>
+> >> Reproducer hints:
+> >> 1. Create ARM virt VM with pxb-pcie bus which adds
+> >>    extra host bridges, with qemu command like:
+> >>
+> >> ```
+> >>   -device pxb-pcie,bus_nr=8,id=pci.x,numa_node=0,bus=pcie.0 \
+> >>   -device pcie-root-port,..,bus=pci.x \
+> >>   ...
+> >>   -device pxb-pcie,bus_nr=37,id=pci.y,numa_node=1,bus=pcie.0 \
+> >>   -device pcie-root-port,..,bus=pci.y \
+> >>   ...
+> >>
+> >> ```
+> >> 2. Perform VM migration which calls save/restore device tables.
+> >>
+> >> In that setup, we get a big "offset" between 2 device_ids (
+> >> one is small, another is big), which makes unsigned "len" round
+> >> up a big positive number, causing loop to continue exceptionally.
+> > 
+> > You'll have to spell it out for me here. If you have a very sparse
+> > device ID and you are only using a single level device table, you are
+> > bound to have a large len. Now, is the issue that 'size' is so large
+> > that it is negative as an 'int'? Describing the exact situation you're
+> > in would help a lot.
+> > 
+> >>
+> >> Signed-off-by: Eric Ren <renzhengeek@gmail.com>
+> >> ---
+> >>  arch/arm64/kvm/vgic/vgic-its.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> >> index 24d7778d1ce6..673554ef02f9 100644
+> >> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> >> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> >> @@ -2141,7 +2141,7 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
+> >>  			  int start_id, entry_fn_t fn, void *opaque)
+> >>  {
+> >>  	struct kvm *kvm = its->dev->kvm;
+> >> -	unsigned long len = size;
+> >> +	ssize_t len = size;
+> > 
+> > This feels wrong, really. If anything, all these types should be
+> > unsigned, not signed. Signed types in this context make very little
+> > sense...
+> 
+> After digging into the code back again, I realized I told you something
+> wrong. The next_offset is the delta between the current device id and
+> the next one. The next device can perfectly be in a different L1 device
 
-  # ./memslot_perf_test -v -s 1000
-  # ./memslot_perf_test -v -s 1000
-  Number of memory slots: 999
-  Testing map performance with 1 runs, 5 seconds each
-  Memslot count too high for this test, decrease the cap (max is 514)
+A different L2 table, surely? By definition, we only have a single L1
+table.
 
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- .../testing/selftests/kvm/memslot_perf_test.c | 45 +++++++++++++++++--
- 1 file changed, 41 insertions(+), 4 deletions(-)
+> table, - it is your case actually- , in which case the code is
+> definitely broken.
+> 
+> So I guess we should rather have a
+> while (true) {
+> 	../..
+> 	if (byte_offset >= len)
+> 		break;
+> 	len -= byte_offset;
+> }
+> 
+> You can add a Fixes tag too:
+> Fixes: 920a7a8fa92a ("KVM: arm64: vgic-its: Add infrastructure for table
+> lookup")
+> and cc stable@vger.kernel.org
 
-diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
-index e6d34744b45d..bec65803f220 100644
---- a/tools/testing/selftests/kvm/memslot_perf_test.c
-+++ b/tools/testing/selftests/kvm/memslot_perf_test.c
-@@ -230,16 +230,52 @@ static struct vm_data *alloc_vm(void)
- 	return data;
- }
+Just to make it clear, do you mean this:
+
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 9d3299a70242..e722cafdff60 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -2162,6 +2162,9 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
+ 			return next_offset;
  
-+static bool check_slot_pages(uint32_t host_page_size, uint32_t guest_page_size,
-+			     uint64_t pages_per_slot, uint64_t rempages)
-+{
-+	if (!pages_per_slot)
-+		return false;
+ 		byte_offset = next_offset * esz;
++		if (byte_offset >= len)
++			break;
 +
-+	if ((pages_per_slot * guest_page_size) % host_page_size)
-+		return false;
-+
-+	if ((rempages * guest_page_size) % host_page_size)
-+		return false;
-+
-+	return true;
-+}
-+
-+
-+static uint64_t get_max_slots(struct vm_data *data, uint32_t host_page_size)
-+{
-+	uint32_t guest_page_size = data->vm->page_size;
-+	uint64_t mempages, pages_per_slot, rempages;
-+	uint64_t slots;
-+
-+	mempages = data->npages;
-+	slots = data->nslots;
-+	while (--slots > 1) {
-+		pages_per_slot = mempages / slots;
-+		rempages = mempages % pages_per_slot;
-+		if (check_slot_pages(host_page_size, guest_page_size,
-+				     pages_per_slot, rempages))
-+			return slots + 1;	/* slot 0 is reserved */
-+	}
-+
-+	return 0;
-+}
-+
- static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 		       void *guest_code, uint64_t mem_size,
- 		       struct timespec *slot_runtime)
- {
- 	uint64_t mempages, rempages;
- 	uint64_t guest_addr;
--	uint32_t slot, guest_page_size;
-+	uint32_t slot, host_page_size, guest_page_size;
- 	struct timespec tstart;
- 	struct sync_area *sync;
- 
-+	host_page_size = getpagesize();
- 	guest_page_size = vm_guest_mode_params[VM_MODE_DEFAULT].page_size;
- 	mempages = mem_size / guest_page_size;
- 
-@@ -250,12 +286,13 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 	TEST_ASSERT(data->npages > 1, "Can't test without any memory");
- 	data->nslots = nslots;
- 	data->pages_per_slot = data->npages / data->nslots;
--	if (!data->pages_per_slot) {
--		*maxslots = data->npages + 1;
-+	rempages = data->npages % data->nslots;
-+	if (!check_slot_pages(host_page_size, guest_page_size,
-+			      data->pages_per_slot, rempages)) {
-+		*maxslots = get_max_slots(data, host_page_size);
- 		return false;
- 	}
- 
--	rempages = data->npages % data->nslots;
- 	data->hva_slots = malloc(sizeof(*data->hva_slots) * data->nslots);
- 	TEST_ASSERT(data->hva_slots, "malloc() fail");
- 
+ 		id += next_offset;
+ 		gpa += byte_offset;
+ 		len -= byte_offset;
+
+
+If so, then I agree that this is a sensible fix. EricR, do you mind
+respinning this ASAP so that I can get it merged and backported?
+
+Thanks,
+
+	M.
+
 -- 
-2.23.0
-
+Without deviation from the norm, progress is not possible.
