@@ -2,76 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24863C433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Oct 2022 18:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D8E7C4332F
+	for <kvmarm@archiver.kernel.org>; Fri, 14 Oct 2022 21:15:11 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BFE040B62;
-	Fri, 14 Oct 2022 14:46:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B08DC4B62E;
+	Fri, 14 Oct 2022 17:15:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@chromium.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CbBo0i43BxVs; Fri, 14 Oct 2022 14:46:40 -0400 (EDT)
+	with ESMTP id 8in0X804pPrT; Fri, 14 Oct 2022 17:15:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FF374B621;
-	Fri, 14 Oct 2022 14:46:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 916394B5F5;
+	Fri, 14 Oct 2022 17:15:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CEFA4B0E6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 14:46:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5737B4B355
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 17:15:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WGuc7siQXqQD for <kvmarm@lists.cs.columbia.edu>;
- Fri, 14 Oct 2022 14:46:37 -0400 (EDT)
-Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com
- [209.85.210.195])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BB5D40DE6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 14:46:37 -0400 (EDT)
-Received: by mail-pf1-f195.google.com with SMTP id m6so5755441pfb.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 11:46:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=content-transfer-encoding:mime-version:message-id:date:subject:cc
- :to:from:from:to:cc:subject:date:message-id:reply-to;
- bh=r9b1WxYCtQHAvJQbAPYaXXw5JIstR8dPjphyBTVotDg=;
- b=C9ChpAljNx+6EX+b7MIXOhJ/DxR1oEgil1ZdehQzrOHu0htP0Wb4hihn7cdKw7kusB
- unlXoi0fYM8ckb4UqUThqiouQ/fgrebyEJmB7iEik2j7ocpYju1X+GtQNb/e2THXGyfu
- pdn2pYHgdd7SXL+E5NiLfpnCE8W4Xn9DguZTY=
+ with ESMTP id kkK3euoa7HgA for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Oct 2022 17:15:07 -0400 (EDT)
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com
+ [209.85.210.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3592D4966F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 17:15:07 -0400 (EDT)
+Received: by mail-pf1-f172.google.com with SMTP id d10so6016301pfh.6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 14:15:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=PZCd+YWp6Rkdf8GaAemTwPAfWHSubBGbIoqG74NI1ms=;
+ b=cRoXvbDvQMwnmouYRU9bA6BnbMqIjlR+t9dwtgHTh24hpPv7uk3XmVXIJbgw6P8Eg9
+ uU3QY2KRaVJK0F92yWi4lVW7keg0Y9Lful81loNULOo4P9SHVXeJSgQyrCaLfy3IHwIO
+ Obc5PDktwXnmgO12NR7VgdJPy/2idgNnHwyMniFZgxK7Es52QbzYDil5VIddOwZ9ycLV
+ /tsBIK0Z4qWqa44E/uQID8GzRzZNBvLyhcV8n6p+8JmNYRddayZJ+2GJDUnWEp21MPsQ
+ FphmiTX70hT3biWGoKJmjEUTUTIpadx1/5gtx6nTy/QFCJcUIglQuje8g1WsugdjDiHx
+ c6Jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=content-transfer-encoding:mime-version:message-id:date:subject:cc
- :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
- :reply-to;
- bh=r9b1WxYCtQHAvJQbAPYaXXw5JIstR8dPjphyBTVotDg=;
- b=j+9qTd767buA8ItQLNBVwhgp1tIgNFwclPXhlo7g+fo5YUY9kpIhlllAQ/GhgIAusc
- IsOaGXbLC6bPsZJdvvK+IA+IJXKDrTSoLxGnha/UrRW38PQFxsw2pmNjXSz0OViwYvHd
- kicGJJ2DCwG7Lpp1Bhdd4O6TjhJT2ETp9VEPa/iIkopbD4kbaeZdX2N1zqSJvBRF/e99
- VXZJr3XwE5z5rpKlh+uiyvde4y75rw6/6Gp82neMTlfS/PKCrwyznlIi+NQNED/IdsSp
- khMrvlZKyEmPMta2gbzvwMYFIKMgmuvHTzWKJvvB0wGFZKXceiijbQHcbxm7ffDT0e3C
- yAfg==
-X-Gm-Message-State: ACrzQf09Wr6m6RtWM2Pz1/JCqkzCnVT9JMdfpeGPyd3CB1cO0Nye9JD4
- 5Lnq2PxlgeJQX7lEudw8UofCFg==
-X-Google-Smtp-Source: AMsMyM4KxZFUnZ3+JVUZbSV1KdBMKe5N17ONrn6zYeMpUbJ+0CiKCyk427n5W/she7eWjJeNE5SITA==
-X-Received: by 2002:a05:6a00:1707:b0:562:e790:dfc3 with SMTP id
- h7-20020a056a00170700b00562e790dfc3mr6609803pfc.59.1665773196248; 
- Fri, 14 Oct 2022 11:46:36 -0700 (PDT)
-Received: from localhost ([2620:15c:2ce:200:e8c9:5029:f577:f6ca])
- by smtp.gmail.com with UTF8SMTPSA id
- 203-20020a6217d4000000b0053653c6b9f9sm2047145pfx.204.2022.10.14.11.46.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 14 Oct 2022 11:46:35 -0700 (PDT)
-From: Denis Nikitin <denik@chromium.org>
-To: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>
-Subject: [PATCH v3] KVM: arm64: nvhe: Fix build with profile optimization
-Date: Fri, 14 Oct 2022 11:45:32 -0700
-Message-Id: <20221014184532.3153551-1-denik@chromium.org>
-X-Mailer: git-send-email 2.38.0.413.g74048e4d9e-goog
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=PZCd+YWp6Rkdf8GaAemTwPAfWHSubBGbIoqG74NI1ms=;
+ b=1cCec+nSYa3ZuItsSjqoDVAlxf/RmFznA16Renzc7/rp96AWzVZzYjpUxbP6+mv7wZ
+ XKsVDQEZ6yJmge6fhRFC/NYnsVN+Gh5U5XB9987547KLZKdnn65Ezmm/Y521KQAiIVpA
+ Ct37a+kbWP9AnWjUoHQzBFnx6cltiOSLEnQ+9HjdhIJj3j5w16psLYNGC7HX1z/i+Bjs
+ As1MvVnFhCjAIGYIVu9e1mLKHb52rknafIInmh1Mu2PZjfyVhDqxtG8BS5ZeFxZ1coj6
+ jEGgP66iVLCE2nXSWDBt5NtW4BumY/Qvo8UW8SIB6e8sR9sLri4BUiCJIYb6vrCIKewn
+ FfSw==
+X-Gm-Message-State: ACrzQf33FmovgS4PoQEKt3QUJqBvVmN4E1H7bDKFD7CjU5ghhlXXxXEz
+ P1oG/74WqsDykfID8p1D8QQ4tQ==
+X-Google-Smtp-Source: AMsMyM6RmjeHSSzE4pJtJXoG7Eo99Kdim1xVs2z0jB4XgAle1pf8E0nfbUcXkYLxxP7MtTx96ZTsyw==
+X-Received: by 2002:aa7:8d17:0:b0:560:485a:e242 with SMTP id
+ j23-20020aa78d17000000b00560485ae242mr7099026pfe.31.1665782106003; 
+ Fri, 14 Oct 2022 14:15:06 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ u2-20020a17090341c200b0017f7bef8cfasm2127464ple.281.2022.10.14.14.15.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 14 Oct 2022 14:15:05 -0700 (PDT)
+Date: Fri, 14 Oct 2022 21:15:01 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v9 01/14] KVM: selftests: Add a userfaultfd library
+Message-ID: <Y0nRVTcWGybRAw+q@google.com>
+References: <20221011010628.1734342-1-ricarkol@google.com>
+ <20221011010628.1734342-2-ricarkol@google.com>
 MIME-Version: 1.0
-Cc: Denis Nikitin <denik@chromium.org>,
- Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
- Manoj Gupta <manojgupta@google.com>, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20221011010628.1734342-2-ricarkol@google.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
+ andrew.jones@linux.dev, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu, dmatlack@google.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,43 +92,18 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Kernel build with clang and KCFLAGS=-fprofile-sample-use=<profile> fails with:
+On Tue, Oct 11, 2022, Ricardo Koller wrote:
+> +struct uffd_desc *uffd_setup_demand_paging(int uffd_mode,
+> +		useconds_t uffd_delay, void *hva, uint64_t len,
+> +		uffd_handler_t handler)
 
-error: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.tmp.o: Unexpected SHT_REL
-section ".rel.llvm.call-graph-profile"
+s/uffd_delay/delay, and then this prototype is easier to align.  Keeping the
+uffd_ prefix for "mode" makes sense since that might be ambiguous, but like
+"handler", I don't see much value in prefixing "delay".
 
-Starting from 13.0.0 llvm can generate SHT_REL section, see
-https://reviews.llvm.org/rGca3bdb57fa1ac98b711a735de048c12b5fdd8086.
-gen-hyprel does not support SHT_REL relocation section.
-
-Filter out profile use flags to fix the build with profile optimization.
-
-Signed-off-by: Denis Nikitin <denik@chromium.org>
----
-V2 -> V3: Filter out the profile-use flags.
-V1 -> V2: Remove the relocation instead of disabling the profile-use flags.
----
- arch/arm64/kvm/hyp/nvhe/Makefile | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index b5c5119c7396..16c6abdda494 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -89,6 +89,10 @@ quiet_cmd_hypcopy = HYPCOPY $@
- # Remove ftrace, Shadow Call Stack, and CFI CFLAGS.
- # This is equivalent to the 'notrace', '__noscs', and '__nocfi' annotations.
- KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI), $(KBUILD_CFLAGS))
-+# Starting from 13.0.0 llvm emits SHT_REL section '.llvm.call-graph-profile'
-+# when profile optimization is applied. gen-hyprel does not support SHT_REL and
-+# causes a build failure. Remove profile optimization flags.
-+KBUILD_CFLAGS := $(filter-out -fprofile-sample-use=% -fprofile-use=%, $(KBUILD_CFLAGS))
- 
- # KVM nVHE code is run at a different exception code with a different map, so
- # compiler instrumentation that inserts callbacks or checks into the code may
--- 
-2.38.0.413.g74048e4d9e-goog
-
+struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
+					   void *hva, uint64_t len,
+					   uffd_handler_t handler)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
