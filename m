@@ -1,31 +1,31 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C967E7B
-	for <kvmarm@lists.linux.dev>; Fri, 14 Oct 2022 07:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38E77B
+	for <kvmarm@lists.linux.dev>; Fri, 14 Oct 2022 07:21:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1665731998;
+	s=mimecast20190719; t=1665732071;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9FjkKJ4RB0wBhJUFjtqAZ3VQdnrJF4akYRPmacZ3lG8=;
-	b=Gf4fLd15dM6J1L2/WpdroYqeSJMTOdMDR3iiu4CjQVf2JKxu97oEMHxYUNwCyNw92OcyHj
-	5tG/BCwP5lrZzBsWhDguxVeNgWX1w2QhhgCrEtc8hZ0xc6xG/O6fXlncMRwRFu2c6ZUhVv
-	9/opf+pojVBj4HViN9mBrByXNYSwws4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=DdHs0tIGZs6Hd5dMAbgHdexs9jDtMkST+MADKDSgxqM=;
+	b=as9BqTSWqng7mobUeUjwKK2LPHGo15/KchleXMVJYqlFE3blFjUz6K55/8zCZ3k0dENeib
+	HknrQHUQT8EA0I05SYNISAVd6NIA8NzzSJt9oZWBhcavTELpHTeqdBy41qZbTGg70dpTpp
+	EDA9NOEWLMAZLcTNjfFRfD/1Sa7HhE4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-547-p7IZhB-gOPeyF-R__aZl2Q-1; Fri, 14 Oct 2022 03:19:54 -0400
-X-MC-Unique: p7IZhB-gOPeyF-R__aZl2Q-1
+ us-mta-297-V9TD_DjrPUuoIF-FNHa4xw-1; Fri, 14 Oct 2022 03:21:08 -0400
+X-MC-Unique: V9TD_DjrPUuoIF-FNHa4xw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CA6A1185A7A9;
-	Fri, 14 Oct 2022 07:19:53 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A88133C0F446;
+	Fri, 14 Oct 2022 07:20:12 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-52.bne.redhat.com [10.64.54.52])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 183ACC06224;
-	Fri, 14 Oct 2022 07:19:48 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 60002C47DEC;
+	Fri, 14 Oct 2022 07:19:54 +0000 (UTC)
 From: Gavin Shan <gshan@redhat.com>
 To: kvmarm@lists.linux.dev
 Cc: kvmarm@lists.cs.columbia.edu,
@@ -42,9 +42,9 @@ Cc: kvmarm@lists.cs.columbia.edu,
 	ricarkol@google.com,
 	zhenyzha@redhat.com,
 	shan.gavin@gmail.com
-Subject: [PATCH 2/6] KVM: selftests: memslot_perf_test: Consolidate loop conditions in prepare_vm()
-Date: Fri, 14 Oct 2022 15:19:10 +0800
-Message-ID: <20221014071914.227134-3-gshan@redhat.com>
+Subject: [PATCH 3/6] KVM: selftests: memslot_perf_test: Probe memory slots for once
+Date: Fri, 14 Oct 2022 15:19:11 +0800
+Message-ID: <20221014071914.227134-4-gshan@redhat.com>
 In-Reply-To: <20221014071914.227134-1-gshan@redhat.com>
 References: <20221014071914.227134-1-gshan@redhat.com>
 Precedence: bulk
@@ -56,54 +56,86 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-Message-ID: <20221014071910.yWzPQ7B-RzUftOIe5RUYTUBFL4zMuU4P7Ct5ll1yp8U@z>
+Message-ID: <20221014071911.h_nRwWYiJ8Ta0WRAEEphEALFGqzDsd3qPpVg7fVElWs@z>
 
-There are two loops in prepare_vm(), which have different conditions.
-'slot' is treated as meory slot index in the first loop, but index of
-the host virtual address array in the second loop. It makes it a bit
-hard to understand the code.
+prepare_vm() is called in every iteration and run. The allowed memory
+slots (KVM_CAP_NR_MEMSLOTS) are probed for multiple times. It's not
+free and unnecessary.
 
-Change the usage of 'slot' in the second loop, to treat it as the
-memory slot index either.
+Move the probing logic for the allowed memory slots to parse_args()
+for once, which is upper layer of prepare_vm().
 
 No functional change intended.
 
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- tools/testing/selftests/kvm/memslot_perf_test.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ .../testing/selftests/kvm/memslot_perf_test.c | 29 ++++++++++---------
+ 1 file changed, 16 insertions(+), 13 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
-index 231cc8449c2e..dcb492b3f27b 100644
+index dcb492b3f27b..d5aa9148f96f 100644
 --- a/tools/testing/selftests/kvm/memslot_perf_test.c
 +++ b/tools/testing/selftests/kvm/memslot_perf_test.c
-@@ -297,21 +297,20 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
+@@ -245,27 +245,17 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
+ 		       void *guest_code, uint64_t mempages,
+ 		       struct timespec *slot_runtime)
+ {
+-	uint32_t max_mem_slots;
+ 	uint64_t rempages;
+ 	uint64_t guest_addr;
+ 	uint32_t slot;
+ 	struct timespec tstart;
+ 	struct sync_area *sync;
+ 
+-	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
+-	TEST_ASSERT(max_mem_slots > 1,
+-		    "KVM_CAP_NR_MEMSLOTS should be greater than 1");
+-	TEST_ASSERT(nslots > 1 || nslots == -1,
+-		    "Slot count cap should be greater than 1");
+-	if (nslots != -1)
+-		max_mem_slots = min(max_mem_slots, (uint32_t)nslots);
+-	pr_info_v("Allowed number of memory slots: %"PRIu32"\n", max_mem_slots);
+-
+ 	TEST_ASSERT(mempages > 1,
+ 		    "Can't test without any memory");
+ 
+ 	data->npages = mempages;
+-	data->nslots = max_mem_slots - 1;
++	data->nslots = nslots;
+ 	data->pages_per_slot = mempages / data->nslots;
+ 	if (!data->pages_per_slot) {
+ 		*maxslots = mempages + 1;
+@@ -885,8 +875,8 @@ static bool parse_args(int argc, char *argv[],
+ 			break;
+ 		case 's':
+ 			targs->nslots = atoi(optarg);
+-			if (targs->nslots <= 0 && targs->nslots != -1) {
+-				pr_info("Slot count cap has to be positive or -1 for no cap\n");
++			if (targs->nslots <= 1 && targs->nslots != -1) {
++				pr_info("Slot count cap must be larger than 1 or -1 for no cap\n");
+ 				return false;
+ 			}
+ 			break;
+@@ -932,6 +922,19 @@ static bool parse_args(int argc, char *argv[],
+ 		return false;
  	}
- 	*slot_runtime = timespec_elapsed(tstart);
  
--	for (slot = 0, guest_addr = MEM_GPA; slot < data->nslots; slot++) {
-+	for (slot = 1, guest_addr = MEM_GPA; slot <= data->nslots; slot++) {
- 		uint64_t npages;
- 		uint64_t gpa;
++	/* Memory slot 0 is reserved */
++	if (targs->nslots == -1) {
++		targs->nslots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS) - 1;
++		if (targs->nslots < 1) {
++			pr_info("KVM_CAP_NR_MEMSLOTS should be greater than 1\n");
++			return false;
++		}
++	} else {
++		targs->nslots--;
++	}
++
++	pr_info_v("Number of memory slots: %d\n", targs->nslots);
++
+ 	return true;
+ }
  
- 		npages = data->pages_per_slot;
--		if (slot == data->nslots - 1)
-+		if (slot == data->nslots)
- 			npages += rempages;
- 
--		gpa = vm_phy_pages_alloc(data->vm, npages, guest_addr,
--					 slot + 1);
-+		gpa = vm_phy_pages_alloc(data->vm, npages, guest_addr, slot);
- 		TEST_ASSERT(gpa == guest_addr,
- 			    "vm_phy_pages_alloc() failed\n");
- 
--		data->hva_slots[slot] = addr_gpa2hva(data->vm, guest_addr);
--		memset(data->hva_slots[slot], 0, npages * 4096);
-+		data->hva_slots[slot - 1] = addr_gpa2hva(data->vm, guest_addr);
-+		memset(data->hva_slots[slot - 1], 0, npages * 4096);
- 
- 		guest_addr += npages * 4096;
- 	}
 -- 
 2.23.0
 
