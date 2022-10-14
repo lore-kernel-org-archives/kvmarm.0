@@ -2,78 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94546C4332F
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Oct 2022 21:23:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA1BBC433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 14 Oct 2022 21:27:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0390D4087B;
-	Fri, 14 Oct 2022 17:23:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32C3F4B5F4;
+	Fri, 14 Oct 2022 17:27:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GeOBT4rg9G7t; Fri, 14 Oct 2022 17:23:38 -0400 (EDT)
+	with ESMTP id L85799zMO2gk; Fri, 14 Oct 2022 17:27:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BB414B24C;
-	Fri, 14 Oct 2022 17:23:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0867140159;
+	Fri, 14 Oct 2022 17:27:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5193E40B91
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 17:23:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BC67340B91
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 17:27:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BS-IuZuYrNjC for <kvmarm@lists.cs.columbia.edu>;
- Fri, 14 Oct 2022 17:23:36 -0400 (EDT)
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com
- [209.85.214.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C84604087B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 17:23:35 -0400 (EDT)
-Received: by mail-pl1-f181.google.com with SMTP id o21so3464292ple.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 14:23:35 -0700 (PDT)
+ with ESMTP id nrDJaPuW2vdC for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Oct 2022 17:27:10 -0400 (EDT)
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com
+ [209.85.216.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 993A94087B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 17:27:10 -0400 (EDT)
+Received: by mail-pj1-f54.google.com with SMTP id
+ o17-20020a17090aac1100b0020d98b0c0f4so7674106pjq.4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 14:27:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=xCLcgM5p0Xi25bsK6RWh7QvQp7XU1CO69/w1Ar3c+II=;
- b=gmGiZE77o04w3Lo/ylaRSpsaJ6T0ylACDyfKIIQbAZfJj51AKsMwVt8b5o9OAJWtli
- xeXFhWam3d/geNCFfveD8OaOu0/uny3xfFLlm8HOVq+u3TlQhtZ6Gwn13Fs0xdsGHtet
- T8PknKGOZBLm8Y9bojwtyArKrCCV4obDDexbhMXkMz1fKY4EOEB70m1o6PnQcNfp1iXv
- ejURaySDblSheuAfo1aSFyStmfYzNbFZIIo0anrx7aisz0dZq8T4sFgLwBsXCrYIp7FP
- VtzarBoMc82CBTOOr+jGSyo171CJ+2BZBGMKPeCFYmoXUVatiHxa4jFlzod+LGMm2Euv
- n/Cw==
+ bh=R7qTg4rvqZImy4oSXdOm12cIKEYmtASg3XAfcAnUDcM=;
+ b=l25kqs3a61DaB3+w+wPvWgbq+VuBHGQozUNEFz5hqhixj5qz64yh7XX1XVs5rquKe6
+ q7c23KkvieMhgPIT+OOgNM88n2dm7rJY3G4FRhwr/nNv5Rj0Lf6PZI8nP3roPxtXaMdS
+ GY+747N44GgC133eQMUHrGiBefoUnge0flfTz6nAAkC+s6tmNU+Hm3EZpwm19cGzXO+d
+ fob8k5w0NREvitPeDw5KMEzDaJ089YaSaWx4VLBcY2E4+4GbhauC28MpAFhEjfnGjnCq
+ bws1dIeh/bSHr5EhHNDRWYyKNcJGWWzf1+y2ugyae2FIkeB9grWmdYsr2MKh3VmOxyzo
+ 0zyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
  :message-id:reply-to;
- bh=xCLcgM5p0Xi25bsK6RWh7QvQp7XU1CO69/w1Ar3c+II=;
- b=FAsdHBktu/9qu3eIPFRsjf1xSM5XNmVsd1CWywq2NhUAzEURALSx0boY5iYF4HxlXF
- Hhgx99QPfEJElzR36SPcqNuJas9bz7pkheimJy6ywAAvLGWC7+wLvOICqJtM27lgSgXi
- P9zxQOi8ohbviYBGoAtE8qf4noRS5YVVLfkHqOM8Ot5QVBv1lHcwQ8CvovSnBgSqkUsz
- dWcQIT/PK72hR0y5l2ldiyHmY9gL18uCd2PTEwEwukyCd8WhYSXJJVOO9NPKAE3MZVJ8
- e4sEPtRCLtFe/On/LmG6pb6cEEsJrMdl6XSGhaaUW1HI4Kry3v886egg0g/KzO/+QJDh
- VCSA==
-X-Gm-Message-State: ACrzQf0bQZGh5DRQ8gvsEX2xp/Pae2hr9XZxKDxr3DUKtMr3g6BxhQ8D
- mF/hrH9d7Zdk3S8mWkE2rATIQg==
-X-Google-Smtp-Source: AMsMyM4T7f/zchI8yBfJsjb1QMLlCXvQLmbJzBWG/hENTAl0t/BseKUlwkTlh7t6m2TxyxfQCYJ0xQ==
-X-Received: by 2002:a17:90a:ba90:b0:20d:3434:7f56 with SMTP id
- t16-20020a17090aba9000b0020d34347f56mr7960241pjr.105.1665782614370; 
- Fri, 14 Oct 2022 14:23:34 -0700 (PDT)
+ bh=R7qTg4rvqZImy4oSXdOm12cIKEYmtASg3XAfcAnUDcM=;
+ b=ucQUVH8k77GLk+3kisGnYoAW9kye/aAH9F9LjiEM28Qt2Pvbz4LqGUmi0ffIpW/dg5
+ UAz7sBtmMs/VKj9vTbdGGxSpHgLO52KARnivt7SrZFTrbqwNpmqQRCpQa0pBMByoFpS9
+ LHk97KXAUMgrrVGfqELy+K6dOq4Yzv1efMjD3uRDfONzxBl1V8YkW29ajOb+vfKSZwyv
+ 6VlUY+aQlFMhO2+iN1T4rEhPxO8MacHNGmWhMrnUbqjduSbFSBs+bqzULBXqp9JeuVn6
+ XyMxAhKYSFn6dRywCQxd0WDQdnKjByobKYLovjC6pZCz5tXvOF7/peA9NY1mpW72gKNm
+ DPNQ==
+X-Gm-Message-State: ACrzQf0uabmKBsuZ+qz7J1DntG8Bk2b6ce4Ah93afFa2r3KRRkgZUfQS
+ xbnJFhYUnQPN02Wgh2Vo5FBWJw==
+X-Google-Smtp-Source: AMsMyM7sKoBkd+EySe6oS9G7uiWefGTirJ2MjX+Dl/2HH/8lz3/GH4/ihrDXbgHaNJ57gQFjt56hDg==
+X-Received: by 2002:a17:90b:1a91:b0:20d:268b:eab with SMTP id
+ ng17-20020a17090b1a9100b0020d268b0eabmr7681124pjb.177.1665782829503; 
+ Fri, 14 Oct 2022 14:27:09 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com.
  [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
- b10-20020a170902650a00b001752216ca51sm2161326plk.39.2022.10.14.14.23.33
+ d15-20020a170903230f00b0016be834d54asm2144558plh.306.2022.10.14.14.27.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 14 Oct 2022 14:23:34 -0700 (PDT)
-Date: Fri, 14 Oct 2022 21:23:30 +0000
+ Fri, 14 Oct 2022 14:27:09 -0700 (PDT)
+Date: Fri, 14 Oct 2022 21:27:06 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v9 10/14] KVM: selftests: aarch64: Add
- aarch64/page_fault_test
-Message-ID: <Y0nTUmsC7YGTQery@google.com>
+Subject: Re: [PATCH v9 11/14] KVM: selftests: aarch64: Add userfaultfd tests
+ into page_fault_test
+Message-ID: <Y0nUKhuCJHUaQukj@google.com>
 References: <20221011010628.1734342-1-ricarkol@google.com>
- <20221011010628.1734342-11-ricarkol@google.com>
+ <20221011010628.1734342-12-ricarkol@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20221011010628.1734342-11-ricarkol@google.com>
+In-Reply-To: <20221011010628.1734342-12-ricarkol@google.com>
 Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
  andrew.jones@linux.dev, kvmarm@lists.linux.dev, pbonzini@redhat.com,
  axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu, dmatlack@google.com
@@ -94,157 +95,80 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Tue, Oct 11, 2022, Ricardo Koller wrote:
-> +/* Returns true to continue the test, and false if it should be skipped. */
-> +static bool punch_hole_in_backing_store(struct kvm_vm *vm,
-> +					struct userspace_mem_region *region)
-> +{
-> +	void *hva = (void *)region->region.userspace_addr;
-> +	uint64_t paging_size = region->region.memory_size;
-> +	int ret, fd = region->fd;
-> +
-> +	if (fd != -1) {
-> +		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-> +				0, paging_size);
-> +		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
-> +	} else {
-> +		ret = madvise(hva, paging_size, MADV_DONTNEED);
-> +		TEST_ASSERT(ret == 0, "madvise failed, errno: %d\n", errno);
-> +	}
+>  /* Returns true to continue the test, and false if it should be skipped. */
+> +static int uffd_generic_handler(int uffd_mode, int uffd,
+> +		struct uffd_msg *msg, struct uffd_args *args,
+> +		bool expect_write)
 
-Uber nit, no need to manually print the errno, TEST_ASSERT() does that automatically
-and pretty prints the string too.  I know this because I keep forgetting myself :-).
+Align.
 
-> +/* Returns true to continue the test, and false if it should be skipped. */
-> +static bool handle_cmd(struct kvm_vm *vm, int cmd)
+static int uffd_generic_handler(int uffd_mode, int uffd,
+				struct uffd_msg *msg, struct uffd_args *args,
+				bool expect_write)
+
+> +static void setup_uffd(struct kvm_vm *vm, struct test_params *p,
+> +		struct uffd_desc **pt_uffd, struct uffd_desc **data_uffd)
+
+static void setup_uffd(struct kvm_vm *vm, struct test_params *p,
+		       struct uffd_desc **pt_uffd, struct uffd_desc **data_uffd)
+
 > +{
-> +	struct userspace_mem_region *data_region, *pt_region;
-> +	bool continue_test = true;
+> +	struct test_desc *test = p->test_desc;
 > +
-> +	data_region = vm_get_mem_region(vm, MEM_REGION_TEST_DATA);
-> +	pt_region = vm_get_mem_region(vm, MEM_REGION_PT);
+> +	setup_uffd_args(vm_get_mem_region(vm, MEM_REGION_PT), &pt_args);
+> +	setup_uffd_args(vm_get_mem_region(vm, MEM_REGION_TEST_DATA), &data_args);
 > +
-> +	if (cmd == CMD_SKIP_TEST)
-> +		continue_test = false;
+> +	*pt_uffd = NULL;
+> +	if (test->uffd_pt_handler)
+> +		*pt_uffd = uffd_setup_demand_paging(
+> +				UFFDIO_REGISTER_MODE_MISSING, 0,
+> +				pt_args.hva, pt_args.paging_size,
+> +				test->uffd_pt_handler);
 > +
-> +	if (cmd & CMD_HOLE_PT)
-> +		continue_test = punch_hole_in_backing_store(vm, pt_region);
-> +	if (cmd & CMD_HOLE_DATA)
-> +		continue_test = punch_hole_in_backing_store(vm, data_region);
-> +
-> +	return continue_test;
+> +	*data_uffd = NULL;
+> +	if (test->uffd_data_handler)
+> +		*data_uffd = uffd_setup_demand_paging(
+> +				UFFDIO_REGISTER_MODE_MISSING, 0,
+> +				data_args.hva, data_args.paging_size,
+> +				test->uffd_data_handler);
 > +}
+> +
+> +static void free_uffd(struct test_desc *test, struct uffd_desc *pt_uffd,
+> +			struct uffd_desc *data_uffd)
 
-...
+static void free_uffd(struct test_desc *test, struct uffd_desc *pt_uffd,
+		      struct uffd_desc *data_uffd)
 
-> +static void setup_abort_handlers(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
+> +static void reset_event_counts(void)
+> +{
+> +	memset(&events, 0, sizeof(events));
+> +}
+> +
+>  /*
+>   * This function either succeeds, skips the test (after setting test->skip), or
+>   * fails with a TEST_FAIL that aborts all tests.
+>   */
+>  static void vcpu_run_loop(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
+> -			  struct test_desc *test)
 > +		struct test_desc *test)
 
-Align params.
+Spurious change, and it introduces bad alignment.
 
-static void setup_abort_handlers(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
-				 struct test_desc *test)
+static void vcpu_run_loop(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
+			  struct test_desc *test)
 
-> +static void for_each_test_and_guest_mode(
-> +		void (*func)(enum vm_guest_mode m, void *a),
-
-If you spin a new version, can you put together a patch or mini-series to add a
-typedef for this function pointer?  Then this function doesn't need a funky wrap.
-Or alternatively, as follow-up to avoid delaying this series even longer.
-
-E.g.
-
-static void for_each_test_and_guest_mode(guest_mode_test_t func,
-					 enum vm_mem_backing_src_type src_type)
-
-diff --git a/tools/testing/selftests/kvm/include/guest_modes.h b/tools/testing/selftests/kvm/include/guest_modes.h
-index b691df33e64e..ee7c5c271eb2 100644
---- a/tools/testing/selftests/kvm/include/guest_modes.h
-+++ b/tools/testing/selftests/kvm/include/guest_modes.h
-@@ -15,7 +15,9 @@ extern struct guest_mode guest_modes[NUM_VM_MODES];
-        guest_modes[mode] = (struct guest_mode){ supported, enabled }; \
- })
- 
-+typedef void (*guest_mode_test_t)(enum vm_guest_mode, void *);
-+
- void guest_modes_append_default(void);
--void for_each_guest_mode(void (*func)(enum vm_guest_mode, void *), void *arg);
-+void for_each_guest_mode(guest_mode_test_t func, void *arg);
- void guest_modes_help(void);
- void guest_modes_cmdline(const char *arg);
-
-
-
-> +		enum vm_mem_backing_src_type src_type)
-> +{
-> +	struct test_desc *t;
-> +
-> +	for (t = &tests[0]; t->name; t++) {
-> +		if (t->skip)
-> +			continue;
-> +
-> +		struct test_params p = {
-> +			.src_type = src_type,
-> +			.test_desc = t,
-> +		};
-> +
-> +		for_each_guest_mode(run_test, &p);
-> +	}
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	enum vm_mem_backing_src_type src_type;
-> +	int opt;
-> +
-> +	setbuf(stdout, NULL);
-> +
-> +	src_type = DEFAULT_VM_MEM_SRC;
-> +
-> +	while ((opt = getopt(argc, argv, "hm:s:")) != -1) {
-> +		switch (opt) {
-> +		case 'm':
-> +			guest_modes_cmdline(optarg);
-> +			break;
-> +		case 's':
-> +			src_type = parse_backing_src_type(optarg);
-> +			break;
-> +		case 'h':
-> +		default:
-> +			help(argv[0]);
-> +			exit(0);
-> +		}
-> +	}
-> +
-> +	for_each_test_and_guest_mode(run_test, src_type);
-> +	return 0;
-> +}
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> index c1ddca8db225..5f977528e09c 100644
-> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> @@ -105,11 +105,19 @@ enum {
->  #define ESR_EC_MASK		(ESR_EC_NUM - 1)
+>  {
+>  	struct ucall uc;
 >  
->  #define ESR_EC_SVC64		0x15
-> +#define ESR_EC_IABT		0x21
-> +#define ESR_EC_DABT		0x25
->  #define ESR_EC_HW_BP_CURRENT	0x31
->  #define ESR_EC_SSTEP_CURRENT	0x33
->  #define ESR_EC_WP_CURRENT	0x35
->  #define ESR_EC_BRK_INS		0x3c
+> @@ -453,6 +575,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  	struct test_desc *test = p->test_desc;
+>  	struct kvm_vm *vm;
+>  	struct kvm_vcpu *vcpu;
+> +	struct uffd_desc *pt_uffd, *data_uffd;
 >  
-> +/* Access flag */
-> +#define PTE_AF			(1ULL << 10)
-> +
-> +/* Access flag update enable/disable */
-> +#define TCR_EL1_HA		(1ULL << 39)
-> +
->  void aarch64_get_supported_page_sizes(uint32_t ipa,
->  				      bool *ps4k, bool *ps16k, bool *ps64k);
+>  	print_test_banner(mode, p);
 >  
-> -- 
-> 2.38.0.rc1.362.ged0d419d3c-goog
-> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
