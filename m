@@ -2,80 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 471FBC4332F
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Oct 2022 21:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 291F7C4332F
+	for <kvmarm@archiver.kernel.org>; Sat, 15 Oct 2022 11:01:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD6584B62D;
-	Fri, 14 Oct 2022 17:37:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CA3F4B646;
+	Sat, 15 Oct 2022 07:01:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id szq53apQgsqF; Fri, 14 Oct 2022 17:37:43 -0400 (EDT)
+	with ESMTP id RjUUp+l-61wF; Sat, 15 Oct 2022 07:01:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B9B940762;
-	Fri, 14 Oct 2022 17:37:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29BC64B648;
+	Sat, 15 Oct 2022 07:01:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72C8140762
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 17:37:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD56F4B637
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 22:41:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mDxZ-XBvOVWR for <kvmarm@lists.cs.columbia.edu>;
- Fri, 14 Oct 2022 17:37:40 -0400 (EDT)
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com
- [209.85.210.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5000340755
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 17:37:40 -0400 (EDT)
-Received: by mail-pf1-f172.google.com with SMTP id i3so6041165pfk.9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 14:37:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=eZ0cdI79ADlanekkYUSD9fAGVZvM6bIrF+Eq4A7Ygd0=;
- b=koXuqSvky1riggc/IjIcBJ5QKS2r76UwNF0+m1YmtoN6x5TLzY40OyFxikqY09ee+d
- IWauiMTz1Uitfu3NbLRMgzzx2z50RtgVV/3czdNQkQ+VM1MvdWcrkAlrIVbbqRcn0fDb
- PwjvqrFQooRxEcUEpHH+d/XgavD1URG0v7hE3UyLPIjdYo1E+0nBkhHzvNBWTB20/5ws
- D/Z/CbMFtTLggU44MEzsvVbzh9AK7ugtr7wZgHSxwy1WZPmiPJ1lWT5whqPctMZ5nRJ5
- sPO62x9KQr4V/lLMM8AqrcJC2uaMw8dQMgUlwAKzsim2YjmaOC29XqKsNG95dG7+4X7l
- FHCA==
+ with ESMTP id 5npXOhULacSa for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Oct 2022 22:41:45 -0400 (EDT)
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com
+ [209.85.210.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2D2504B633
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 22:41:45 -0400 (EDT)
+Received: by mail-ot1-f52.google.com with SMTP id
+ br15-20020a056830390f00b0061c9d73b8bdso2878845otb.6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Oct 2022 19:41:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:from:to:cc:subject:date:message-id:reply-to;
+ bh=SIHNOBqgQyxjFMiIYqRn/5bMu0C03QCxB43mLGgsAkE=;
+ b=H6yLwoJP1TNfqoVQ7sC13/34xLAcBcXJMYQu3IXPcqh/GBHacqdXAKxzaRuBJL1eT2
+ NdDedDmjJMaXyfZFhCNbzRdEMWpgV13tMclsFOBBe8tQC1FdZ1yMdmuKMDldwATIMiIS
+ 14spzcEhav+VXCwBqg7ftD+dm3V7MZ84KHq4+aC1wFqlctDUUO3iz+R4sO+Vp0vQk+QW
+ Kv5aSVG4hbYfXHiCt5oCTSKyQMjFX8pk1op/pfHdqV5NbwiHrU0uLOa50CaqRjY6M/kJ
+ EV+SCi65nRcnIu6LK3/9B7SdQ4PZlM25VlhYqisflfZPNs+BW68YX4Tpk5eS40oYS8A9
+ TyZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
- :message-id:reply-to;
- bh=eZ0cdI79ADlanekkYUSD9fAGVZvM6bIrF+Eq4A7Ygd0=;
- b=xy6a7nNOnK8NEwEpa34BMs3QS/qkd7T53PJlJSPPXdZ9Iyyek7wsz5GxBkBYRg1KH/
- qAyZP2zPTDAuJJb2pNe3+MRkKCdezmriX7yLWcHT3tVz55fNxY4HsQzAlHDEuW1bWUah
- J/BcMYn3fNYPyqSgJpwIGuJB/iE8iz7anidN3CbUynzJwLrUH5wkWylV/4IIaN3wP5yw
- gwvZEJB7RkF1q5GRHn9Ex2nDjyICicYW5zwgit2QT0YIqxmPLtx+GQFszEbq24BWdYRW
- wpzzzxSUbJmjUNk5loPBSOn0QVrDBK14ET/MFaWWUnq9wvdvnhdN4uGZK+Jr/lmaYfbN
- IOYQ==
-X-Gm-Message-State: ACrzQf1EItXmWpsT+7Rz8gaKS6wzhW+Zr1pNjMsVoRMqmBYlkEYRBquW
- vaEzNhPB21WQed9m8tCPTSUjzQ==
-X-Google-Smtp-Source: AMsMyM41AXX3Xp6kESIBHSUm21LCu3v/fFVnruKqRqDloxK7fMPiUbElSAmaa5TqV5mp/qM93oOECQ==
-X-Received: by 2002:a65:6a12:0:b0:445:84f6:676a with SMTP id
- m18-20020a656a12000000b0044584f6676amr6173417pgu.40.1665783459080; 
- Fri, 14 Oct 2022 14:37:39 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com.
- [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
- a6-20020a1709027e4600b0017a0f40fa19sm2122355pln.191.2022.10.14.14.37.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 14 Oct 2022 14:37:38 -0700 (PDT)
-Date: Fri, 14 Oct 2022 14:37:34 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v9 00/14] KVM: selftests: Add aarch64/page_fault_test
-Message-ID: <Y0nWnr7GaPbBfLtf@google.com>
-References: <20221011010628.1734342-1-ricarkol@google.com>
- <Y0nU4vIIyjfQuQGV@google.com>
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+ :reply-to;
+ bh=SIHNOBqgQyxjFMiIYqRn/5bMu0C03QCxB43mLGgsAkE=;
+ b=yIdNowoy8wUl9IKNURoiPe1ShfItSal9GPRO99HKzKIIF81uoxiWh7bmvckUPPNJWm
+ q8yN1FBXZRX90YnFzl/xutiamixHQ4I2dq68eqOHbcivlSNqbd4LcwNzSJLa0EHvRggf
+ ssDy11h33n86CRuwrLSoMLFFE/UTi6iT98ylE3dVNteLp6QUKz8H8loOHccl6TT0W5t/
+ HOXM3b0B7fplsvb6AzOUKMN9FfkG30AUSbr8heombfcHFziMVc+0EWJnklM+vhSVfr5P
+ 4y9itjDE24oxy341qdueTfNPgS3xndUa6FGTwngVdbZoZ4zB1rsmMxa/vJGgFxrsDs8B
+ SpAA==
+X-Gm-Message-State: ACrzQf29ZJJZGtv7zT7YqUuu7f9NqX9XrDJNgE0gXUxUv3B370JdDyB5
+ zlU8zGRDD4lXGNNU3Zgq6+C0W4elAXvYWdYNBgs=
+X-Google-Smtp-Source: AMsMyM6xPjUzqyFR68JWmrNv3ikJwycuentgPMgPtiMFiGJNqjEios6Rrnd5EAtBcuwCRUWAf7a6hy6JwcODLZCCblo=
+X-Received: by 2002:a05:6830:148e:b0:661:9422:f0e1 with SMTP id
+ s14-20020a056830148e00b006619422f0e1mr413585otq.205.1665801704408; Fri, 14
+ Oct 2022 19:41:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Y0nU4vIIyjfQuQGV@google.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
- andrew.jones@linux.dev, kvmarm@lists.linux.dev, pbonzini@redhat.com,
- axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu, dmatlack@google.com
+References: <acd9f1643980fbd27cd22523d2d84ca7c9add84a.1665592448.git.renzhengeek@gmail.com>
+ <87o7ughoyf.wl-maz@kernel.org>
+ <7f071249-b402-9534-c127-40af9379756d@redhat.com>
+ <87mt9yh43x.wl-maz@kernel.org>
+In-Reply-To: <87mt9yh43x.wl-maz@kernel.org>
+From: Eric Ren <renzhengeek@gmail.com>
+Date: Sat, 15 Oct 2022 10:41:44 +0800
+Message-ID: <CAKM4Aey4wLA=mRBB-S2i2dcdwXCOFPAwwR7gGjTnti7ZLt9S4g@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm64: vgic: fix wrong loop condition in
+ scan_its_table()
+To: Marc Zyngier <maz@kernel.org>
+X-Mailman-Approved-At: Sat, 15 Oct 2022 07:01:04 -0400
+Cc: kvm@vger.kernel.org, Eric Auger <eauger@redhat.com>, kvmarm@lists.linux.dev,
+ kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,37 +90,248 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Oct 14, 2022 at 09:30:10PM +0000, Sean Christopherson wrote:
-> On Tue, Oct 11, 2022, Ricardo Koller wrote:
-> > Ricardo Koller (14):
-> >   KVM: selftests: Add a userfaultfd library
-> >   KVM: selftests: aarch64: Add virt_get_pte_hva() library function
-> >   KVM: selftests: Add missing close and munmap in
-> >     __vm_mem_region_delete()
-> >   KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1 using sysreg.h
-> >     macros
-> >   tools: Copy bitfield.h from the kernel sources
-> >   KVM: selftests: Stash backing_src_type in struct userspace_mem_region
-> >   KVM: selftests: Add vm->memslots[] and enum kvm_mem_region_type
-> >   KVM: selftests: Fix alignment in virt_arch_pgd_alloc() and
-> >     vm_vaddr_alloc()
-> >   KVM: selftests: Use the right memslot for code, page-tables, and data
-> >     allocations
-> >   KVM: selftests: aarch64: Add aarch64/page_fault_test
-> >   KVM: selftests: aarch64: Add userfaultfd tests into page_fault_test
-> >   KVM: selftests: aarch64: Add dirty logging tests into page_fault_test
-> >   KVM: selftests: aarch64: Add readonly memslot tests into
-> >     page_fault_test
-> >   KVM: selftests: aarch64: Add mix of tests into page_fault_test
-> 
-> A bunch of nits, mostly about alignment/indentation, but otherwise no more whining
-> on my end.  A v10 would probably be nice to avoid churn?  But I'm also ok if y'all
-> want to merge this asap and do the cleanup on top.
+Hi all,
 
-No prob, will send a v10 (most likely on Monday).
+snip...
 
-Thanks!
-Ricardo
+> > > You'll have to spell it out for me here. If you have a very sparse
+> > > device ID and you are only using a single level device table, you are
+> > > bound to have a large len. Now, is the issue that 'size' is so large
+> > > that it is negative as an 'int'? Describing the exact situation you're
+> > > in would help a lot.
+> > >
+
+The problem happens when we have a very sparse device ID and use "2
+level" device
+tables, ie. GITS_BASERn.Indirect enabled.
+
+For example,
+1. L1 table has 2 entries;
+2. and we are now scanning at L2 table entry index 2075 (pointed by L1
+first entry)
+3. if next device id is 9472, we will get a big offset: 7397;
+4. with signed 'len', 'len -= offset * esz', len will underflow to a
+positive number, mistakenly into next iteration with a bad GPA;
+(It should break the current L2 table scanning, and jump into the next
+L1 table entry)
+5. that bad GPA fails the guest read.
+
+hope this make it clean:-)
+> > >>
+> > >> Signed-off-by: Eric Ren <renzhengeek@gmail.com>
+> > >> ---
+> > >>  arch/arm64/kvm/vgic/vgic-its.c | 2 +-
+> > >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >>
+> > >> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> > >> index 24d7778d1ce6..673554ef02f9 100644
+> > >> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> > >> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> > >> @@ -2141,7 +2141,7 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
+> > >>                      int start_id, entry_fn_t fn, void *opaque)
+> > >>  {
+> > >>    struct kvm *kvm = its->dev->kvm;
+> > >> -  unsigned long len = size;
+> > >> +  ssize_t len = size;
+> > >
+> > > This feels wrong, really. If anything, all these types should be
+> > > unsigned, not signed. Signed types in this context make very little
+> > > sense...
+> >
+> > After digging into the code back again, I realized I told you something
+> > wrong. The next_offset is the delta between the current device id and
+> > the next one. The next device can perfectly be in a different L1 device
+>
+> A different L2 table, surely? By definition, we only have a single L1
+> table.
+>
+> > table, - it is your case actually- , in which case the code is
+> > definitely broken.
+> >
+
+Yes. You've got the point, hah.
+
+> > So I guess we should rather have a
+> > while (true) {
+> >       ../..
+> >       if (byte_offset >= len)
+> >               break;
+> >       len -= byte_offset;
+> > }
+> >
+
+Thanks. This looks better. I'll send v2.
+
+> > You can add a Fixes tag too:
+> > Fixes: 920a7a8fa92a ("KVM: arm64: vgic-its: Add infrastructure for table
+> > lookup")
+> > and cc stable@vger.kernel.org
+>
+> Just to make it clear, do you mean this:
+
+Yes, exactly.
+
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 9d3299a70242..e722cafdff60 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -2162,6 +2162,9 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
+>                         return next_offset;
+>
+>                 byte_offset = next_offset * esz;
+> +               if (byte_offset >= len)
+> +                       break;
+> +
+>                 id += next_offset;
+>                 gpa += byte_offset;
+>                 len -= byte_offset;
+>
+>
+> If so, then I agree that this is a sensible fix. EricR, do you mind
+> respinning this ASAP so that I can get it merged and backported?
+
+OK, please see V2:-)
+
+Thanks all!
+Eric
+
+
+
+-- 
+- Eric Ren
+
+On Fri, 14 Oct 2022 at 22:28, Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Thu, 13 Oct 2022 17:42:31 +0100,
+> Eric Auger <eauger@redhat.com> wrote:
+> >
+> > Hi Eric,
+> >
+> > On 10/12/22 20:33, Marc Zyngier wrote:
+> > > Hi Eric,
+> > >
+> > > Before I comment on this patch, a couple of things that need
+> > > addressing:
+> > >
+> > >> "Cc: marc.zyngier@arm.com, cdall@linaro.org"
+> > >
+> > > None of these two addresses are valid anymore, and haven't been for
+> > > several years.
+> > >
+> > > Please consult the MAINTAINERS file for up-to-date addresses for
+> > > current maintainers and reviewers, all of whom should be Cc'd on this
+> > > email. I've now added them as well as Eric Auger who has written most
+> > > of the ITS migration code, and the new mailing list (the Columbia list
+> > > is about to be killed).
+>
+> Duh, I never CC'd the new list... Now hopefully done.
+>
+> > >
+> > > On Wed, 12 Oct 2022 17:59:25 +0100,
+> > > Eric Ren <renzhengeek@gmail.com> wrote:
+> > >>
+> > >> Reproducer hints:
+> > >> 1. Create ARM virt VM with pxb-pcie bus which adds
+> > >>    extra host bridges, with qemu command like:
+> > >>
+> > >> ```
+> > >>   -device pxb-pcie,bus_nr=8,id=pci.x,numa_node=0,bus=pcie.0 \
+> > >>   -device pcie-root-port,..,bus=pci.x \
+> > >>   ...
+> > >>   -device pxb-pcie,bus_nr=37,id=pci.y,numa_node=1,bus=pcie.0 \
+> > >>   -device pcie-root-port,..,bus=pci.y \
+> > >>   ...
+> > >>
+> > >> ```
+> > >> 2. Perform VM migration which calls save/restore device tables.
+> > >>
+> > >> In that setup, we get a big "offset" between 2 device_ids (
+> > >> one is small, another is big), which makes unsigned "len" round
+> > >> up a big positive number, causing loop to continue exceptionally.
+> > >
+> > > You'll have to spell it out for me here. If you have a very sparse
+> > > device ID and you are only using a single level device table, you are
+> > > bound to have a large len. Now, is the issue that 'size' is so large
+> > > that it is negative as an 'int'? Describing the exact situation you're
+> > > in would help a lot.
+> > >
+> > >>
+> > >> Signed-off-by: Eric Ren <renzhengeek@gmail.com>
+> > >> ---
+> > >>  arch/arm64/kvm/vgic/vgic-its.c | 2 +-
+> > >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >>
+> > >> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> > >> index 24d7778d1ce6..673554ef02f9 100644
+> > >> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> > >> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> > >> @@ -2141,7 +2141,7 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
+> > >>                      int start_id, entry_fn_t fn, void *opaque)
+> > >>  {
+> > >>    struct kvm *kvm = its->dev->kvm;
+> > >> -  unsigned long len = size;
+> > >> +  ssize_t len = size;
+> > >
+> > > This feels wrong, really. If anything, all these types should be
+> > > unsigned, not signed. Signed types in this context make very little
+> > > sense...
+> >
+> > After digging into the code back again, I realized I told you something
+> > wrong. The next_offset is the delta between the current device id and
+> > the next one. The next device can perfectly be in a different L1 device
+>
+> A different L2 table, surely? By definition, we only have a single L1
+> table.
+>
+> > table, - it is your case actually- , in which case the code is
+> > definitely broken.
+> >
+> > So I guess we should rather have a
+> > while (true) {
+> >       ../..
+> >       if (byte_offset >= len)
+> >               break;
+> >       len -= byte_offset;
+> > }
+> >
+> > You can add a Fixes tag too:
+> > Fixes: 920a7a8fa92a ("KVM: arm64: vgic-its: Add infrastructure for table
+> > lookup")
+> > and cc stable@vger.kernel.org
+>
+> Just to make it clear, do you mean this:
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 9d3299a70242..e722cafdff60 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -2162,6 +2162,9 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
+>                         return next_offset;
+>
+>                 byte_offset = next_offset * esz;
+> +               if (byte_offset >= len)
+> +                       break;
+> +
+>                 id += next_offset;
+>                 gpa += byte_offset;
+>                 len -= byte_offset;
+>
+>
+> If so, then I agree that this is a sensible fix. EricR, do you mind
+> respinning this ASAP so that I can get it merged and backported?
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
+
+
+
+-- 
+- Eric Ren
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
