@@ -1,134 +1,80 @@
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813237B
-	for <kvmarm@lists.linux.dev>; Sat, 15 Oct 2022 03:19:38 +0000 (UTC)
-Received: by mail-pj1-f52.google.com with SMTP id a6-20020a17090abe0600b0020d7c0c6650so9609692pjs.0
-        for <kvmarm@lists.linux.dev>; Fri, 14 Oct 2022 20:19:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=62n/SKrDkBxAMeilZhMyUB+MsRZ+hq6qWI8NmvUUw/Y=;
-        b=ZgXqEF1Cf0UI0SlcSm6xYR2RqEJMRcTTEYUOLuYzMrWP4a1ySXtjBwBX+UeSqYrgud
-         8K9h3/PzsXf/pPH73Q1OqFNevxJXgkOtsMsawPfu8Q+TNhvz8n9DB088m82Q2UH+7Dab
-         HmvVICBXmIBOlQT1Kwx/btsSaQrr8lZ0LCTFuXycvwYRhRRX6V7dBgyhHp4j/g9cqfCh
-         GDnl4plmjDjOg5vAJ+u+hDoRXLUTkuznJnHKi2rgHiF3eQoSL6cgTzi7TvDOyHLRUTIX
-         pEw5b3KhucQRm3oU7XegKBJK8AiYM0bYKn6ZK3HGDZKtlcJNJrLvdScaY/Ewt1/gf2PH
-         K3Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=62n/SKrDkBxAMeilZhMyUB+MsRZ+hq6qWI8NmvUUw/Y=;
-        b=1I10R7pzd6u/uRqn2lUwrYb5WDQZp+nDM9D7CjRw8xSk3fS4QQb3w4rQ9hC5Cw8noo
-         hmZf2TqQVC52wJRek36s8xkim1D2UYjdi8mN0JxRB9TZ9i2SN4pkl7uy4zISk/Y/FfBC
-         l7k7+hVthRT9+0XtkFrvOZrp2CGpdAHExQDOURSCufNVPxEkuq/KhPLw3/wvkwZ7CNy2
-         MnFeHCBYOv6IoWq8GPlzSE1HsI1KqkP+JyvncoRwVtgBucOxHMmrgOMEGns2S6XifD09
-         a2l3t8sfmiLr18hQZnhUV2l3n89lSuMT+mry8hUS9A6G+Ex2PwpFn7jkZoOGC9yYfXnN
-         g/UA==
-X-Gm-Message-State: ACrzQf3FHbfBtPGuGXaPgUAEvbKvLnz/N9LF6tLYQ6hRHIdWfqmI9rQg
-	o3qCB1lm7YdgOrXThgbTyluFJtSSAbCtFQ==
-X-Google-Smtp-Source: AMsMyM5NBdJT1xV/iPskYV3xpxtHE/cTYEF+pA7jg6hgAcKEZTikivegIkKlM1tCU28TSxnGn/EYAQ==
-X-Received: by 2002:a17:902:9048:b0:17f:93a5:4638 with SMTP id w8-20020a170902904800b0017f93a54638mr1077192plz.108.1665803977349;
-        Fri, 14 Oct 2022 20:19:37 -0700 (PDT)
-Received: from e69h04161.et15sqa.tbsite.net ([140.205.118.227])
-        by smtp.gmail.com with ESMTPSA id g2-20020a17090a290200b0020a7d076bfesm2129699pjd.2.2022.10.14.20.19.33
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Oct 2022 20:19:36 -0700 (PDT)
-From: Eric Ren <renzhengeek@gmail.com>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68752369
+	for <kvmarm@lists.linux.dev>; Sat, 15 Oct 2022 14:43:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06375C433D6;
+	Sat, 15 Oct 2022 14:43:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1665845020;
+	bh=hdmj9Rrf0S29adC3/oPTPWmoQRbCjFPUJreRyWhIkoc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=iv6Jbp/tQQdOBX0ztsMIHMr4ABO9zC6EvMwNP2EinhCT/hV0FFdGZ15FUS7ka9tdn
+	 c2h3v+tAIJaf+RB5Y+xArLwBwilnQVwIh+PesGFzQBJifZ5zgapWRwQIpQ09pd/3M2
+	 0gGnSZKBb8KQYsclTVcs2xDJfjEdqN8ffcSAs36eVwOf9niYXPW08izYt49AM2aEE2
+	 1KS/s1bpl0d2S1yxYtryj1t57EqZXaF0K9ExrLpiQA3srVwXtHBURKfxCsxApoIZVC
+	 9dA6uN22nSz0RU8WkaLDRo0EKADe5HoqotOxMmBb0TGaXMVxRvCQr+9G+REYSLUe1F
+	 2oKuTUL6lw18g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ojiO1-00GhUt-L6;
+	Sat, 15 Oct 2022 15:43:37 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>,
+	Denis Nikitin <denik@chromium.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	David Brazdil <dbrazdil@google.com>,
 	linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	eauger@redhat.com,
-	maz@kernel.org
-Cc: james.morse@arm.com,
-	alexandru.elisei@arm.com,
-	suzuki.poulose@arm.com,
-	oliver.upton@linux.dev,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	ricarkol@google.com,
-	eric.auger@redhat.com,
-	yuzhe@nfschina.com,
-	gshan@redhat.com,
-	justin.he@arm.com
-Subject: [PATCH V2] KVM: arm64: vgic: fix wrong loop condition in scan_its_table()
-Date: Sat, 15 Oct 2022 11:19:28 +0800
-Message-Id: <d9c3a564af9e2c5bf63f48a7dcbf08cd593c5c0b.1665802985.git.renzhengeek@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Manoj Gupta <manojgupta@google.com>,
+	kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v3] KVM: arm64: nvhe: Fix build with profile optimization
+Date: Sat, 15 Oct 2022 15:43:33 +0100
+Message-ID: <166584499561.1372561.8808338756381167639.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221014184532.3153551-1-denik@chromium.org>
+References: <20221014184532.3153551-1-denik@chromium.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, denik@chromium.org, catalin.marinas@arm.com, kvmarm@lists.linux.dev, james.morse@arm.com, alexandru.elisei@arm.com, dbrazdil@google.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, ndesaulniers@google.com, manojgupta@google.com, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221015144333.W9TWnfmGBudh2BL3bsawMHRlQ_nGPX_qekjyufUN25Q@z>
 
-Reproducer hints:
-1. Create ARM virt VM with pxb-pcie bus which adds
-   extra host bridges, with qemu command like:
+On Fri, 14 Oct 2022 11:45:32 -0700, Denis Nikitin wrote:
+> Kernel build with clang and KCFLAGS=-fprofile-sample-use=<profile> fails with:
+> 
+> error: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.tmp.o: Unexpected SHT_REL
+> section ".rel.llvm.call-graph-profile"
+> 
+> Starting from 13.0.0 llvm can generate SHT_REL section, see
+> https://reviews.llvm.org/rGca3bdb57fa1ac98b711a735de048c12b5fdd8086.
+> gen-hyprel does not support SHT_REL relocation section.
+> 
+> [...]
 
-```
-  -device pxb-pcie,bus_nr=8,id=pci.x,numa_node=0,bus=pcie.0 \
-  -device pcie-root-port,..,bus=pci.x \
-  ...
-  -device pxb-pcie,bus_nr=37,id=pci.y,numa_node=1,bus=pcie.0 \
-  -device pcie-root-port,..,bus=pci.y \
-  ...
+Applied to fixes, thanks!
 
-```
-2. Perform VM migration which calls save/restore device tables;
-3. vgic its use 2 level device table.
+[1/1] KVM: arm64: nvhe: Fix build with profile optimization
+      commit: bde971a83bbff78561458ded236605a365411b87
 
-In that setup, we get a big "offset" between 2 device_ids (
-one is small, another is big), which makes unsigned "len" round
-up a big positive number, causing loop to continue with a
-bad GPA. For example,
+Cheers,
 
-1. L1 table has 2 entries;
-2. and we are now scanning at L2 table entry index 2075 (pointed by L1
-first entry)
-3. if next device id is 9472, we will get a big offset: 7397;
-4. with signed 'len', 'len -= offset * esz', len will underflow to a
-positive number, mistakenly into next iteration with a bad GPA;
-(It should break the current L2 table scanning, and jump into the next
-L1 table entry)
-5. that bad GPA fails the guest read.
-
-Fix it by stopping the L2 table scan when the next device id fits
-into next L1 table entry.
-
-Thanks Eric Auger's suggestion for the fix.
-
-Fixes: 920a7a8fa92a ("KVM: arm64: vgic-its: Add infrastructure for tableookup")
-Signed-off-by: Eric Ren <renzhengeek@gmail.com>
----
- arch/arm64/kvm/vgic/vgic-its.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 24d7778..733b530 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -2149,7 +2149,7 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
- 
- 	memset(entry, 0, esz);
- 
--	while (len > 0) {
-+	while (true) {
- 		int next_offset;
- 		size_t byte_offset;
- 
-@@ -2162,6 +2162,9 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
- 			return next_offset;
- 
- 		byte_offset = next_offset * esz;
-+		if (byte_offset >= len)
-+			break;
-+
- 		id += next_offset;
- 		gpa += byte_offset;
- 		len -= byte_offset;
+	M.
 -- 
-1.8.3.1
+Without deviation from the norm, progress is not possible.
+
 
