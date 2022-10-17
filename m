@@ -2,72 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6512DC43219
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Oct 2022 19:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D01EAC433FE
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Oct 2022 19:58:49 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E1F54B733;
-	Mon, 17 Oct 2022 15:58:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C7514B862;
+	Mon, 17 Oct 2022 15:58:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OP0EUl52iige; Mon, 17 Oct 2022 15:58:47 -0400 (EDT)
+	with ESMTP id JUynAPRUU6XA; Mon, 17 Oct 2022 15:58:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F6774B85B;
-	Mon, 17 Oct 2022 15:58:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5438E4B7A9;
+	Mon, 17 Oct 2022 15:58:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A0684B6FA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2022 15:58:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1316D4B847
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2022 15:58:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VhTanwvgX2ZC for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Oct 2022 15:58:42 -0400 (EDT)
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
- [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 634664B6DF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2022 15:58:42 -0400 (EDT)
-Received: by mail-yb1-f201.google.com with SMTP id
- g15-20020a25af8f000000b006bcad4bf46aso11407981ybh.19
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2022 12:58:42 -0700 (PDT)
+ with ESMTP id r0p38dAYjeMo for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Oct 2022 15:58:47 -0400 (EDT)
+Received: from mail-oa1-f73.google.com (mail-oa1-f73.google.com
+ [209.85.160.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B4524B733
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2022 15:58:44 -0400 (EDT)
+Received: by mail-oa1-f73.google.com with SMTP id
+ 586e51a60fabf-1329a5d3272so4900156fac.17
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2022 12:58:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:from:to:cc:subject:date:message-id:reply-to;
- bh=frMbmYegxOtgtF+Jjq9ubWz1wi/u8FMIRL0o35ogzl4=;
- b=FVyKm8AJ9lqnXFMnIVBf1tOS8wOQDtJ+Xy2Uop4XBqDNwL3RFWY+6erwzCG4KmxWyA
- WZy+dunuyl1K6cd9rROWRme5kGxDBVofrIEsB3JBAKNLqikP1XSuHM9j14eHUUeImxqk
- qX1+Dll/EhKGvxElhbloQzt2Lhb7zAmFtayUrXTAoCHswiZl5ohjLjTsqMTTh7zgp3mA
- nhe1psiyPBvpZW/NFmG+yf3uxq0ibbR1GQ59RjnF+lJvUqyZqNf0q+03LpGnBEk9YPRk
- RXbOgoJpQfT9u9z4ldIcQPCmSwQ/sveTptXYaLP+g658y8kJAW218iP5/44HgdcEZA7e
- r+6Q==
+ bh=jgCIrvyj0IDci5P6m/g4M7I9DXQORNjMkIRBxaHCRXY=;
+ b=ovz62uUAclqokr4+sK1sld0IXpy5sVrMhhq9Ztw46WvF06VocRRF4bINqwtQ6BZPpl
+ TNxpT6pwkIsjNqwfbE24kJqeTaMuQij07JvtMzpJpnWb+k5lMBn94JUxBekLZOfAKXHA
+ YwoG4h5WTYFEfxyyOEKLHR3jPojJCjxl+RHcO2yT69Pk0UQyNkkjW1XYvBmgAXKIMNK4
+ HUTYWrNphngocXw+g5WSAN3blUVG4SRK/GOZ1gstMo4GM8RHzi+F6BWGm67ZuNY6lubq
+ tP6zlKbL8jorR6bNLrO3wq0LZPuDLWOgObxgm6qD4CMOuwGYUbIE88qhCbRwtqRv3V2C
+ OPTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=frMbmYegxOtgtF+Jjq9ubWz1wi/u8FMIRL0o35ogzl4=;
- b=3bWHmwn2TjX4+oJ2Hhb2V0HUUibi/CBx0yYabg4mwrIre+sN9qWCWdJfQ2iBPo34C8
- viHALXTQm9TavVe982aO556zfhyPEeviFTbdEHbEM4bEB2I1CBbCc/FcdKI6mzfuiJkX
- p5qjyzTS0V3r4OZ7FzjlGTR7G3WJh0YBr2pAttbEP2E75+D/oX7+26/SciR6mx1b02St
- N3tCp73t7+aDbbS7v88RJUeqUFf08bOeOU974BpoGbuPExnm7e/35c/3TFBvgnSOdRy+
- ps9BEpAtETABHDk9TMd1Ht+FCOeHf5b5+U74saZDBUC1P4mVqshs9nGrQThM+SiBPvmZ
- YHfg==
-X-Gm-Message-State: ACrzQf04QkIFP0OVb69tX74uV5imSPtFSRdNiV+T+/GW1syxtcueQZyU
- N5hXoQpAelg27XNdA4E215OwC0WmHn7WvQ==
-X-Google-Smtp-Source: AMsMyM4tK2eFk3WKl8NqSllJ5w9+Cb5/5+XGTB1ov7n5qva2uCfQFWIm97I3xkvFqYDqfYIWH+X6VbW9OzHK4g==
+ bh=jgCIrvyj0IDci5P6m/g4M7I9DXQORNjMkIRBxaHCRXY=;
+ b=yCbbulNlk+DDuAehVbjErI0M2E+WWezrnQcy2uEM8tEj3g6hJwy2GpjO55+m/Ds3a9
+ 7tQbFUVin6YyrIgVxrTEy0OaOJg6PBaAwgUYlgitIC5NLNTPqzKkGK5GJV8EVEej37++
+ s1eqFrEALl/83hrM6Lu7sY+xB1qiGgD37FhM/CZx3RXFuULjTBoYKotp+5T/FSVzQI5L
+ nBy6F542uK4V8WX/22CvT+zLuw/8onG2AuaT7PudIMCFsLdjIolV+xgaLxHHe8rz8myy
+ 7z40UikIounyulr+rAlCji3gNg9QBKAANR2ArN7ra8GaiFgs8xgWvSQi3khOvK6n1BCj
+ V9tg==
+X-Gm-Message-State: ACrzQf1NkR+0PYjfvkbciFGyhYu8mPLHYrh5DigzQSA0O8j6KLsOZlKr
+ q1/h91USbBZGwzCCktJ8Nb8137Z4bB47WA==
+X-Google-Smtp-Source: AMsMyM5gN6HolrDQXK8DQ3qq5P69fItYC8UeUiEblU9Fno7u5E4vwNaG4hNg/nv1vmJNSfk9bS6oI/cvGWAmIQ==
 X-Received: from ricarkol4.c.googlers.com
  ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a25:4004:0:b0:6bd:5cd:9f60 with SMTP id
- n4-20020a254004000000b006bd05cd9f60mr11379639yba.292.1666036721981; Mon, 17
- Oct 2022 12:58:41 -0700 (PDT)
-Date: Mon, 17 Oct 2022 19:58:23 +0000
+ (user=ricarkol job=sendgmr) by 2002:a05:6870:525:b0:130:9e35:137a with SMTP
+ id j37-20020a056870052500b001309e35137amr6295123oao.88.1666036723631; Mon, 17
+ Oct 2022 12:58:43 -0700 (PDT)
+Date: Mon, 17 Oct 2022 19:58:24 +0000
 In-Reply-To: <20221017195834.2295901-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20221017195834.2295901-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.38.0.413.g74048e4d9e-goog
-Message-ID: <20221017195834.2295901-4-ricarkol@google.com>
-Subject: [PATCH v10 03/14] KVM: selftests: Add missing close and munmap in
- __vm_mem_region_delete()
+Message-ID: <20221017195834.2295901-5-ricarkol@google.com>
+Subject: [PATCH v10 04/14] KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1
+ using sysreg.h macros
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
  andrew.jones@linux.dev
@@ -89,34 +89,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Deleting a memslot (when freeing a VM) is not closing the backing fd,
-nor it's unmapping the alias mapping. Fix by adding the missing close
-and munmap.
+Define macros for memory type indexes and construct DEFAULT_MAIR_EL1
+with macros from asm/sysreg.h.  The index macros can then be used when
+constructing PTEs (instead of using raw numbers).
 
 Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 Reviewed-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- tools/testing/selftests/kvm/lib/kvm_util.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ .../selftests/kvm/include/aarch64/processor.h | 25 ++++++++++++++-----
+ .../selftests/kvm/lib/aarch64/processor.c     |  2 +-
+ 2 files changed, 20 insertions(+), 7 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index f1cb1627161f..19e37fb7de7c 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -586,6 +586,12 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
- 	sparsebit_free(&region->unused_phy_pages);
- 	ret = munmap(region->mmap_start, region->mmap_size);
- 	TEST_ASSERT(!ret, __KVM_SYSCALL_ERROR("munmap()", ret));
-+	if (region->fd >= 0) {
-+		/* There's an extra map when using shared memory. */
-+		ret = munmap(region->mmap_alias, region->mmap_size);
-+		TEST_ASSERT(!ret, __KVM_SYSCALL_ERROR("munmap()", ret));
-+		close(region->fd);
-+	}
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index df4bfac69551..c1ddca8db225 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -38,12 +38,25 @@
+  * NORMAL             4     1111:1111
+  * NORMAL_WT          5     1011:1011
+  */
+-#define DEFAULT_MAIR_EL1 ((0x00ul << (0 * 8)) | \
+-			  (0x04ul << (1 * 8)) | \
+-			  (0x0cul << (2 * 8)) | \
+-			  (0x44ul << (3 * 8)) | \
+-			  (0xfful << (4 * 8)) | \
+-			  (0xbbul << (5 * 8)))
++
++/* Linux doesn't use these memory types, so let's define them. */
++#define MAIR_ATTR_DEVICE_GRE	UL(0x0c)
++#define MAIR_ATTR_NORMAL_WT	UL(0xbb)
++
++#define MT_DEVICE_nGnRnE	0
++#define MT_DEVICE_nGnRE		1
++#define MT_DEVICE_GRE		2
++#define MT_NORMAL_NC		3
++#define MT_NORMAL		4
++#define MT_NORMAL_WT		5
++
++#define DEFAULT_MAIR_EL1							\
++	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |		\
++	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |		\
++	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |			\
++	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |			\
++	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |				\
++	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT))
  
- 	free(region);
+ #define MPIDR_HWID_BITMASK (0xff00fffffful)
+ 
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+index 63ef3c78e55e..26f0eccff6fe 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -133,7 +133,7 @@ static void _virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+ 
+ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+ {
+-	uint64_t attr_idx = 4; /* NORMAL (See DEFAULT_MAIR_EL1) */
++	uint64_t attr_idx = MT_NORMAL;
+ 
+ 	_virt_pg_map(vm, vaddr, paddr, attr_idx);
  }
 -- 
 2.38.0.413.g74048e4d9e-goog
