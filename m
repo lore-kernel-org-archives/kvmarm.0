@@ -1,89 +1,225 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A0D4A01
-	for <kvmarm@lists.linux.dev>; Mon, 17 Oct 2022 20:29:05 +0000 (UTC)
-Received: by mail-wr1-f45.google.com with SMTP id f11so20235494wrm.6
-        for <kvmarm@lists.linux.dev>; Mon, 17 Oct 2022 13:29:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2IMN4gNjwV4VBWuOeqMza8Wt49qGerSXwLQ1YGSitwQ=;
-        b=TfXUu3s3qPV4BBT6vUGPxy6HpB9PG2ZD2y1l3c2QXrIu1MWsxtsSLwLNDj8Acjj8yW
-         cyoG8RY42PKQGfiRexZWYj7J8bC4CzOHlPB/rHA5h+VHyDvwcdCLnmdgCNblVLh72YKv
-         5O3TI9GDMvomgZmofAhXoSKuvR+zWupriTph78/f6/2buTzKwHFRo9LYtuKcQHQ6n2cs
-         j08hsgu8oaZlbHfgRNvVONrzAPIrxiizspwD1bXhxadA0mu5TmK95gDAmpbbq/iwVpO4
-         75+r9Xo1vY34n1cJi7k/mvuiN/b7aaQWdezdtBdhGolFkq3iEwNY/ImbCS5q5uPw9GLM
-         uArw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2IMN4gNjwV4VBWuOeqMza8Wt49qGerSXwLQ1YGSitwQ=;
-        b=IItCTDkMB0HjGJ7bTjfWlrbwnWznGyiDMQWH/XViB7kaaqiv9MyWkcG1gfxpF90gXD
-         P4j1ldFgc9me/8sI/Xd6EtGZYJ2ZJh7XJ8kXZo+9VcqlFFJYuk1AVMrgS+cPauvn9wbN
-         MEqVoAVZbBpRyapPT6pYce+KYSoHIWkDxQvh4QhTeshCDUcmu7tTMCW36fxLRUQTG8oI
-         TB70xUApY5opUGBEsV/t/EDbEf/aPxpmIqXc6x/9lbnajfRjn2jgYt3Ysa1GjoUJ04PI
-         Fijeqcsyk3FgM/XoXts5iHGVb0jrVV3pvFbra/7GCj3jLL2N84XQ45nkyyz3dYnnn+/k
-         K6sQ==
-X-Gm-Message-State: ACrzQf1PJ8vEbg7sYmk8fsB8c7r8x1WPew31nQYmGhxDpYG6f6rgu/ib
-	1K1rdbi1wPD2Lt+BufTX5JoADQ==
-X-Google-Smtp-Source: AMsMyM7XmTQpO4YeME5joK/zSjPkgmYYjt4bxua8latURAc/NNVTbtvNDtlwT7WmJWFatkJAib9PcA==
-X-Received: by 2002:a5d:4150:0:b0:22f:f9f6:cca1 with SMTP id c16-20020a5d4150000000b0022ff9f6cca1mr7468159wrq.510.1666038543810;
-        Mon, 17 Oct 2022 13:29:03 -0700 (PDT)
-Received: from [192.168.1.115] ([185.126.107.38])
-        by smtp.gmail.com with ESMTPSA id m2-20020adfe0c2000000b0022e6178bd84sm9546712wri.8.2022.10.17.13.29.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Oct 2022 13:29:03 -0700 (PDT)
-Message-ID: <baa1094f-227a-96bf-8bf7-f7d0d094bec4@linaro.org>
-Date: Mon, 17 Oct 2022 22:29:00 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A757F
+	for <kvmarm@lists.linux.dev>; Mon, 17 Oct 2022 21:32:20 +0000 (UTC)
+Received: from MUA
+	by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <mail@maciej.szmigiero.name>)
+	id 1okXiN-0001oB-9u; Mon, 17 Oct 2022 23:32:03 +0200
+Message-ID: <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
+Date: Mon, 17 Oct 2022 23:31:57 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.1
-Subject: Re: [PATCH v4 01/25] KVM: arm64: Move hyp refcount manipulation
- helpers to common header file
-Content-Language: en-US
-To: Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev
-Cc: Sean Christopherson <seanjc@google.com>,
- Vincent Donnefort <vdonnefort@google.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, James Morse
- <james.morse@arm.com>, Chao Peng <chao.p.peng@linux.intel.com>,
- Quentin Perret <qperret@google.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
- Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
- kernel-team@android.com, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-References: <20221017115209.2099-1-will@kernel.org>
- <20221017115209.2099-2-will@kernel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20221017115209.2099-2-will@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Content-Language: en-US, pl-PL
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, ajones@ventanamicro.com, pbonzini@redhat.com,
+ maz@kernel.org, shuah@kernel.org, oliver.upton@linux.dev, seanjc@google.com,
+ peterx@redhat.com, ricarkol@google.com, zhenyzha@redhat.com,
+ shan.gavin@gmail.com, kvmarm@lists.linux.dev
+References: <20221014071914.227134-1-gshan@redhat.com>
+ <20221014071914.227134-5-gshan@redhat.com>
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH 4/6] KVM: selftests: memslot_perf_test: Support variable
+ guest page size
+In-Reply-To: <20221014071914.227134-5-gshan@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+Message-ID: <20221017213157.uB0ORxBbBDG0UffNt_Bkj4JYbAB7Hmbo2rlzrOpLI2g@z>
 
-On 17/10/22 13:51, Will Deacon wrote:
-> From: Quentin Perret <qperret@google.com>
+On 14.10.2022 09:19, Gavin Shan wrote:
+> The test case is obviously broken on aarch64 because non-4KB guest
+> page size is supported. The guest page size on aarch64 could be 4KB,
+> 16KB or 64KB.
 > 
-> We will soon need to manipulate 'struct hyp_page' refcounts from outside
-> page_alloc.c, so move the helpers to a common header file to allow them
-> to be reused easily.
+> This supports variable guest page size, mostly for aarch64.
 > 
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-> Tested-by: Vincent Donnefort <vdonnefort@google.com>
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> Signed-off-by: Will Deacon <will@kernel.org>
+>    - The host determines the guest page size when virtual machine is
+>      created. The value is also passed to guest through the synchronization
+>      area.
+> 
+>    - The number of guest pages are unknown until the virtual machine
+>      is to be created. So all the related macros are dropped. Instead,
+>      their values are dynamically calculated based on the guest page
+>      size.
+> 
+>    - The static checks on memory sizes and pages becomes dependent
+>      on guest page size, which is unknown until the virtual machine
+>      is about to be created. So all the static checks are converted
+>      to dynamic checks, done in check_memory_sizes().
+> 
+>    - As the address passed to madvise() should be aligned to host page,
+>      the size of page chunk is automatically selected, other than one
+>      page.
+> 
+>    - All other changes included in this patch are almost mechanical
+>      replacing '4096' with 'guest_page_size'.
+> 
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
 > ---
->   arch/arm64/kvm/hyp/include/nvhe/memory.h | 22 ++++++++++++++++++++++
->   arch/arm64/kvm/hyp/nvhe/page_alloc.c     | 19 -------------------
->   2 files changed, 22 insertions(+), 19 deletions(-)
+>   .../testing/selftests/kvm/memslot_perf_test.c | 191 +++++++++++-------
+>   1 file changed, 115 insertions(+), 76 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
+> index d5aa9148f96f..d587bd952ff9 100644
+> --- a/tools/testing/selftests/kvm/memslot_perf_test.c
+> +++ b/tools/testing/selftests/kvm/memslot_perf_test.c
+> @@ -26,14 +26,11 @@
+>   #include <processor.h>
+>   
+>   #define MEM_SIZE		((512U << 20) + 4096)
+> -#define MEM_SIZE_PAGES		(MEM_SIZE / 4096)
+>   #define MEM_GPA		0x10000000UL
+>   #define MEM_AUX_GPA		MEM_GPA
+>   #define MEM_SYNC_GPA		MEM_AUX_GPA
+>   #define MEM_TEST_GPA		(MEM_AUX_GPA + 4096)
+>   #define MEM_TEST_SIZE		(MEM_SIZE - 4096)
+> -static_assert(MEM_SIZE % 4096 == 0, "invalid mem size");
+> -static_assert(MEM_TEST_SIZE % 4096 == 0, "invalid mem test size");
+>   
+>   /*
+>    * 32 MiB is max size that gets well over 100 iterations on 509 slots.
+> @@ -42,29 +39,16 @@ static_assert(MEM_TEST_SIZE % 4096 == 0, "invalid mem test size");
+>    * limited resolution).
+>    */
+>   #define MEM_SIZE_MAP		((32U << 20) + 4096)
+> -#define MEM_SIZE_MAP_PAGES	(MEM_SIZE_MAP / 4096)
+>   #define MEM_TEST_MAP_SIZE	(MEM_SIZE_MAP - 4096)
+> -#define MEM_TEST_MAP_SIZE_PAGES (MEM_TEST_MAP_SIZE / 4096)
+> -static_assert(MEM_SIZE_MAP % 4096 == 0, "invalid map test region size");
+> -static_assert(MEM_TEST_MAP_SIZE % 4096 == 0, "invalid map test region size");
+> -static_assert(MEM_TEST_MAP_SIZE_PAGES % 2 == 0, "invalid map test region size");
+> -static_assert(MEM_TEST_MAP_SIZE_PAGES > 2, "invalid map test region size");
+>   
+>   /*
+>    * 128 MiB is min size that fills 32k slots with at least one page in each
+>    * while at the same time gets 100+ iterations in such test
+> + *
+> + * 2 MiB chunk size like a typical huge page
+>    */
+>   #define MEM_TEST_UNMAP_SIZE		(128U << 20)
+> -#define MEM_TEST_UNMAP_SIZE_PAGES	(MEM_TEST_UNMAP_SIZE / 4096)
+> -/* 2 MiB chunk size like a typical huge page */
+> -#define MEM_TEST_UNMAP_CHUNK_PAGES	(2U << (20 - 12))
+> -static_assert(MEM_TEST_UNMAP_SIZE <= MEM_TEST_SIZE,
+> -	      "invalid unmap test region size");
+> -static_assert(MEM_TEST_UNMAP_SIZE % 4096 == 0,
+> -	      "invalid unmap test region size");
+> -static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
+> -	      (2 * MEM_TEST_UNMAP_CHUNK_PAGES) == 0,
+> -	      "invalid unmap test region size");
+> +#define MEM_TEST_UNMAP_CHUNK_SIZE	(2U << 20)
+>   
+>   /*
+>    * For the move active test the middle of the test area is placed on
+> @@ -77,8 +61,7 @@ static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
+>    * for the total size of 25 pages.
+>    * Hence, the maximum size here is 50 pages.
+>    */
+> -#define MEM_TEST_MOVE_SIZE_PAGES	(50)
+> -#define MEM_TEST_MOVE_SIZE		(MEM_TEST_MOVE_SIZE_PAGES * 4096)
+> +#define MEM_TEST_MOVE_SIZE		0x32000
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+The above number seems less readable than an explicit value of 50 pages.
+
+In addition to that, it's 50 pages only with 4k page size, so at least
+the comment above needs to be updated to reflect this fact.
+
+>   #define MEM_TEST_MOVE_GPA_DEST		(MEM_GPA + MEM_SIZE)
+>   static_assert(MEM_TEST_MOVE_SIZE <= MEM_TEST_SIZE,
+>   	      "invalid move test region size");
+(...)
+> @@ -242,33 +229,34 @@ static struct vm_data *alloc_vm(void)
+>   }
+>   
+>   static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
+> -		       void *guest_code, uint64_t mempages,
+> +		       void *guest_code, uint64_t mem_size,
+>   		       struct timespec *slot_runtime)
+>   {
+> -	uint64_t rempages;
+> +	uint64_t mempages, rempages;
+>   	uint64_t guest_addr;
+> -	uint32_t slot;
+> +	uint32_t slot, guest_page_size;
+>   	struct timespec tstart;
+>   	struct sync_area *sync;
+>   
+> -	TEST_ASSERT(mempages > 1,
+> -		    "Can't test without any memory");
+> +	guest_page_size = vm_guest_mode_params[VM_MODE_DEFAULT].page_size;
+> +	mempages = mem_size / guest_page_size;
+> +
+> +	data->vm = __vm_create_with_one_vcpu(&data->vcpu, mempages, guest_code);
+> +	ucall_init(data->vm, NULL);
+>
+
+TEST_ASSERT(data->vm->page_size == guest_page_size, "Invalid VM page size")
+here would catch the case if someone accidentally modifies
+__vm_create_with_one_vcpu() to use other page size than specified for
+VM_MODE_DEFAULT.
+
+>   	data->npages = mempages;
+> +	TEST_ASSERT(data->npages > 1, "Can't test without any memory");
+>   	data->nslots = nslots;
+> -	data->pages_per_slot = mempages / data->nslots;
+> +	data->pages_per_slot = data->npages / data->nslots;
+>   	if (!data->pages_per_slot) {
+> -		*maxslots = mempages + 1;
+> +		*maxslots = data->npages + 1;
+>   		return false;
+>   	}
+>   
+> -	rempages = mempages % data->nslots;
+> +	rempages = data->npages % data->nslots;
+>   	data->hva_slots = malloc(sizeof(*data->hva_slots) * data->nslots);
+>   	TEST_ASSERT(data->hva_slots, "malloc() fail");
+>   
+> -	data->vm = __vm_create_with_one_vcpu(&data->vcpu, mempages, guest_code);
+> -	ucall_init(data->vm, NULL);
+> -
+>   	pr_info_v("Adding slots 1..%i, each slot with %"PRIu64" pages + %"PRIu64" extra pages last\n",
+>   		data->nslots, data->pages_per_slot, rempages);
+>   
+(...)
+> @@ -856,6 +863,35 @@ static void help(char *name, struct test_args *targs)
+>   		pr_info("%d: %s\n", ctr, tests[ctr].name);
+>   }
+>   
+> +static bool check_memory_sizes(void)
+> +{
+> +	uint32_t guest_page_size = vm_guest_mode_params[VM_MODE_DEFAULT].page_size;
+> +
+> +	if (MEM_SIZE % guest_page_size ||
+> +	    MEM_TEST_SIZE % guest_page_size) {
+> +		pr_info("invalid MEM_SIZE or MEM_TEST_SIZE\n");
+> +		return false;
+> +	}
+> +
+> +	if (MEM_SIZE_MAP % guest_page_size		||
+> +	    MEM_TEST_MAP_SIZE % guest_page_size		||
+> +	    (MEM_TEST_MAP_SIZE / guest_page_size) <= 2	||
+> +	    (MEM_TEST_MAP_SIZE / guest_page_size) % 2) {
+> +		pr_info("invalid MEM_SIZE_MAP or MEM_TEST_MAP_SIZE\n");
+> +		return false;
+> +	}
+> +
+> +	if (MEM_TEST_UNMAP_SIZE > MEM_TEST_SIZE		||
+> +	    MEM_TEST_UNMAP_SIZE % guest_page_size	||
+> +	    (MEM_TEST_UNMAP_SIZE / guest_page_size) %
+> +	    (MEM_TEST_UNMAP_CHUNK_SIZE / guest_page_size)) {
+
+This should be (MEM_TEST_UNMAP_SIZE / guest_page_size) % (2 * MEM_TEST_UNMAP_CHUNK_SIZE / guest_page_size))
+to match the old static_assert().
+
+Thanks,
+Maciej
+
