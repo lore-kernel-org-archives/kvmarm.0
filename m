@@ -2,69 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 751D3C433FE
-	for <kvmarm@archiver.kernel.org>; Mon, 17 Oct 2022 19:58:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E98C43219
+	for <kvmarm@archiver.kernel.org>; Mon, 17 Oct 2022 19:58:45 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBC424B7A9;
-	Mon, 17 Oct 2022 15:58:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4B444B7EF;
+	Mon, 17 Oct 2022 15:58:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nDchcU-NekxV; Mon, 17 Oct 2022 15:58:39 -0400 (EDT)
+	with ESMTP id rQWxYSNkpV5S; Mon, 17 Oct 2022 15:58:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B38024B6DF;
-	Mon, 17 Oct 2022 15:58:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB1744B743;
+	Mon, 17 Oct 2022 15:58:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DB1104B6DF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2022 15:58:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AF2F4B6DF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2022 15:58:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2eksmlvMH0x3 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Oct 2022 15:58:37 -0400 (EDT)
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
- [209.85.219.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7ECEB4B6CF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2022 15:58:37 -0400 (EDT)
-Received: by mail-yb1-f202.google.com with SMTP id
- a2-20020a5b0002000000b006b48689da76so11412910ybp.16
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2022 12:58:37 -0700 (PDT)
+ with ESMTP id QJPwPUyK0rFw for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 17 Oct 2022 15:58:41 -0400 (EDT)
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
+ [209.85.128.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A6A84B775
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2022 15:58:41 -0400 (EDT)
+Received: by mail-yw1-f202.google.com with SMTP id
+ 00721157ae682-3549b9f0a03so119833877b3.11
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2022 12:58:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
- :date:message-id:reply-to;
- bh=FAHgYJpfzcDpPf7VxOwSA+t+TQ+UPimMjnTVk0O2biE=;
- b=HggWik6kgJlAa6w/37YJ/TjcLVIvNxknEMP2tIvLgxhoi8cwLLSppPlybtsswRpWOi
- ncl+ngRMWra8+9qo3xYZyAvQVgItQSl85IqPjo/HZ5Wv9dV1ujiufVBQqxfyaI4Qwrrs
- te67M1xmQ+R54PXDfA0NbusOPUg7Yjff92cQ+1g6ZB3FERIjF3bW4nK9nBoMS8cenTU/
- FzmFWVXf8WfHEG1OECXmYl98+nkOT2YW7A8cTkBi1IU+B4NfbTDSrxKDd4J5R3suFsDs
- fc4kcrasjwMiHQvOUGSTVVdGr++M6uZICC8h/615I4ck6lkEkGiU33isWLReBomi7tZu
- jSbg==
+ h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+ :date:from:to:cc:subject:date:message-id:reply-to;
+ bh=QXN3DrxcNJ/Y/78wkRcairOywvsIdqiZwcK1G1DVGE4=;
+ b=oeemi9W1/NxTBGN+bi9ENS2eCzjdUF2iUZSF50JhLehojM563m9xTeji358OLyx/Ko
+ In2tJJsWxYNooHpB8nCKPIJh7QXAKL8V5cD2diGLIFs1QCtp1KQ35D7UyilwSMEiZvwq
+ aNSWvgtXiTIjl8q3nI2kS0UksX3kAnBSUlHLW3GuCoKZnQc5ZI/4+44dlqLd3P9qaoic
+ tvGT/l59bDNFqMnaa1KgE2JGsn97IbrxMWIQBPv+VAIuX1foYOuk9F3+uLgFQun37d2c
+ vg6d3ZzTlzG+W6vBrw3/y7UQQA6fKOCM0Q3nnUOitNafMD8JWj0v4i4uEJyBt3u2wnGI
+ BhxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
- :from:to:cc:subject:date:message-id:reply-to;
- bh=FAHgYJpfzcDpPf7VxOwSA+t+TQ+UPimMjnTVk0O2biE=;
- b=nxz6ujZl6J0lLdvFmDD1+ymMkl0X6Jx/QVt4Dg3igeO1KC/AKLQ4f3/F+XPojixCf9
- 2TfN2s8q8DeKPwjpbKPqDeNsVq10egp2Yq5MKHVH+bnhP3rmbwkoRmhVnVpO4rPiPFnq
- xTgZDcoalpvSAjYO3PfqPox7R+Tf/726wa3lPBosbX+OzNMxiWAiLoMsrOCYgvfL3iY9
- /nfHEmM7OVECaWYm2BKUXNKAATF13oGqlYvFBYdtnWS9bkk6jOy7FFFx17231SNUxfK4
- zb0jBF/BhlmNn1gwkQudBag3qB3sShq1xJ4Kr2f/iYC6T6lmde+7C7jXyGkWsJnS/kdm
- JLuQ==
-X-Gm-Message-State: ACrzQf0T/wxBDyqB3rnt6ONLHeYpY9o6Q66cOR9jsR5kQkkGyZDxj3SU
- /d1nJ8MML6hRedr+DF+dCd5HiqLr88LlcA==
-X-Google-Smtp-Source: AMsMyM6epjx47gI8sy+GTFaC/SdmxDJEvB0L05XsJ31+lfOICN3GkPjRPNwQiCHsq2GvfuTDW6fhAqyG2OlApQ==
+ h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+ :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+ bh=QXN3DrxcNJ/Y/78wkRcairOywvsIdqiZwcK1G1DVGE4=;
+ b=Vx5iONJAwvtEwnfxjUHWly2zaY7hUyLC369J5a8Ze6JJWFbpwCo4e70QdDK2H1zYhr
+ L17wqjX0hLs4I8bj8pjhyxdEYp1P7Hcc6mK7b5y+m59edE8cET/qx/nnrSXBas2e67HW
+ vCdf6xtfW0cdNKNSp1n4wnUhHRs7DaB8DwAwyu5KH1Pn4z3D0QBvqeOo2w0B0ud5YzB4
+ C/fv9BKXcceMDJHvMVUcsPJUDi+9AtZJ/kAc8+2YAiSnAU8u/IUPTuPux6hktd6kPzSc
+ Iah9TT+UfiHUJr2bDBOWI+Lw5RgT5Z1Czs75dlWrTbftVo1m5J5llLKncKZZIKWIhoob
+ sDzg==
+X-Gm-Message-State: ACrzQf0E//a0NUo2J8am+oTcNHXxn2L3PPIU/CKYiMi0kDRxzE/WllJq
+ YLbibsLFaZiO34rxF0dT2pJT6gJFRj+oIQ==
+X-Google-Smtp-Source: AMsMyM6uVRlnbaLwPvA5cv3CBaCfTtzZp4rvmAYbniP0zzjm8hjFbla7cidTFWAF8yo4gU9zCY481meE5wgeTg==
 X-Received: from ricarkol4.c.googlers.com
  ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a81:9e0d:0:b0:355:85e8:d975 with SMTP id
- m13-20020a819e0d000000b0035585e8d975mr10534264ywj.61.1666036717029; Mon, 17
- Oct 2022 12:58:37 -0700 (PDT)
-Date: Mon, 17 Oct 2022 19:58:20 +0000
+ (user=ricarkol job=sendgmr) by 2002:a81:ad5d:0:b0:357:1aeb:843d with SMTP id
+ l29-20020a81ad5d000000b003571aeb843dmr10576032ywk.44.1666036720654; Mon, 17
+ Oct 2022 12:58:40 -0700 (PDT)
+Date: Mon, 17 Oct 2022 19:58:22 +0000
+In-Reply-To: <20221017195834.2295901-1-ricarkol@google.com>
 Mime-Version: 1.0
+References: <20221017195834.2295901-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.38.0.413.g74048e4d9e-goog
-Message-ID: <20221017195834.2295901-1-ricarkol@google.com>
-Subject: [PATCH v10 00/14] KVM: selftests: Add aarch64/page_fault_test
+Message-ID: <20221017195834.2295901-3-ricarkol@google.com>
+Subject: [PATCH v10 02/14] KVM: selftests: aarch64: Add virt_get_pte_hva()
+ library function
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
  andrew.jones@linux.dev
@@ -86,101 +89,65 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This series adds a new aarch64 selftest for testing stage 2 fault handling
-for various combinations of guest accesses (e.g., write, S1PTW), backing
-sources (e.g., anon), and types of faults (e.g., read on hugetlbfs with a
-hole, write on a readonly memslot). Each test tries a different combination
-and then checks that the access results in the right behavior (e.g., uffd
-faults with the right address and write/read flag). Some interesting
-combinations are:
+Add a library function to get the PTE (a host virtual address) of a
+given GVA.  This will be used in a future commit by a test to clear and
+check the access flag of a particular page.
 
-- loading an instruction leads to a stage 1 page-table-walk that misses on
-  stage 2 because the backing memslot for the page table it not in host
-  memory (a hole was punched right there) and the fault is handled using
-  userfaultfd.  The expected behavior is that this leads to a userfaultfd
-  fault marked as a write. See commit c4ad98e4b72c ("KVM: arm64: Assume
-  write fault on S1PTW permission fault on instruction fetch") for why
-  that's a write.
-- a cas (compare-and-swap) on a readonly memslot leads to a failed vcpu
-  run.
-- write-faulting on a memslot that's marked for userfaultfd handling and
-  dirty logging should result in a uffd fault and having the respective bit
-  set in the dirty log.
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ .../selftests/kvm/include/aarch64/processor.h       |  2 ++
+ tools/testing/selftests/kvm/lib/aarch64/processor.c | 13 ++++++++++---
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
-The first 8 commits of this series add library support. The first one adds
-a new userfaultfd library. Commits 2-5 add some misc library changes that
-will be used by the new test, like a library function to get the GPA of a
-PTE.  Commits 6-8 breaks the implicit assumption that code and page tables
-live in memslot memslots should allocators use. This is then used by the
-new test to place the page tables in a specific memslot.  The last 5
-commits add the new selftest, one type of test at a time. It first adds
-core tests, then uffd, then dirty logging, then readonly memslots tests,
-and finally combinations of the previous ones (like uffd and dirty logging
-at the same time).
-
-v9 -> v10: https://lore.kernel.org/kvmarm/20221011010628.1734342-1-ricarkol@google.com/
-- collected r-b's from Andrew
-- fixed indentation in several places (mainly alignment of params) [Sean]
-- renamed args in uffd_setup [Sean]
-
-v8 -> v9: https://lore.kernel.org/kvmarm/20220922031857.2588688-1-ricarkol@google.com/
-- removed check before trying madvise(MADV_DONTNEED) on anon hugetlb. [Sean]
-- renamed punch_hole_in_memslot() [Sean]
-- changed the comment describing the accesses on "holes" [Sean]
-- collectd r-b's from Sean
-
-v7 -> v8: https://lore.kernel.org/kvmarm/20220920042551.3154283-1-ricarkol@google.com/
-- applied Sean's suggestion of adding a fourth region: DATA, and renamed
-  the old DATA one to DATA_TEST. [Sean]
-- removed some unneeded code in page_fault_test.c. [Andrew]
-- removed r-b's from Andrew and Oliver in commit "KVM: selftests: Use the
-  right memslot for code, page-tables, and data allocations", as the commit
-  changed quite a bit (again). Thanks for the reviews! would it have been OK
-  to keep it? not sure how strict we all are about collecting r-b's on a
-  commit that changed.
-
-Ricardo Koller (14):
-  KVM: selftests: Add a userfaultfd library
-  KVM: selftests: aarch64: Add virt_get_pte_hva() library function
-  KVM: selftests: Add missing close and munmap in
-    __vm_mem_region_delete()
-  KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1 using sysreg.h
-    macros
-  tools: Copy bitfield.h from the kernel sources
-  KVM: selftests: Stash backing_src_type in struct userspace_mem_region
-  KVM: selftests: Add vm->memslots[] and enum kvm_mem_region_type
-  KVM: selftests: Fix alignment in virt_arch_pgd_alloc() and
-    vm_vaddr_alloc()
-  KVM: selftests: Use the right memslot for code, page-tables, and data
-    allocations
-  KVM: selftests: aarch64: Add aarch64/page_fault_test
-  KVM: selftests: aarch64: Add userfaultfd tests into page_fault_test
-  KVM: selftests: aarch64: Add dirty logging tests into page_fault_test
-  KVM: selftests: aarch64: Add readonly memslot tests into
-    page_fault_test
-  KVM: selftests: aarch64: Add mix of tests into page_fault_test
-
- tools/include/linux/bitfield.h                |  176 +++
- tools/testing/selftests/kvm/.gitignore        |    1 +
- tools/testing/selftests/kvm/Makefile          |    2 +
- .../selftests/kvm/aarch64/page_fault_test.c   | 1112 +++++++++++++++++
- .../selftests/kvm/demand_paging_test.c        |  228 +---
- .../selftests/kvm/include/aarch64/processor.h |   35 +-
- .../selftests/kvm/include/kvm_util_base.h     |   31 +-
- .../selftests/kvm/include/userfaultfd_util.h  |   45 +
- .../selftests/kvm/lib/aarch64/processor.c     |   48 +-
- tools/testing/selftests/kvm/lib/elf.c         |    3 +-
- tools/testing/selftests/kvm/lib/kvm_util.c    |   82 +-
- .../selftests/kvm/lib/riscv/processor.c       |   29 +-
- .../selftests/kvm/lib/s390x/processor.c       |    8 +-
- .../selftests/kvm/lib/userfaultfd_util.c      |  186 +++
- .../selftests/kvm/lib/x86_64/processor.c      |   13 +-
- 15 files changed, 1723 insertions(+), 276 deletions(-)
- create mode 100644 tools/include/linux/bitfield.h
- create mode 100644 tools/testing/selftests/kvm/aarch64/page_fault_test.c
- create mode 100644 tools/testing/selftests/kvm/include/userfaultfd_util.h
- create mode 100644 tools/testing/selftests/kvm/lib/userfaultfd_util.c
-
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index a8124f9dd68a..df4bfac69551 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -109,6 +109,8 @@ void vm_install_exception_handler(struct kvm_vm *vm,
+ void vm_install_sync_handler(struct kvm_vm *vm,
+ 		int vector, int ec, handler_fn handler);
+ 
++uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva);
++
+ static inline void cpu_relax(void)
+ {
+ 	asm volatile("yield" ::: "memory");
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+index 6f5551368944..63ef3c78e55e 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -138,7 +138,7 @@ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+ 	_virt_pg_map(vm, vaddr, paddr, attr_idx);
+ }
+ 
+-vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
++uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
+ {
+ 	uint64_t *ptep;
+ 
+@@ -169,11 +169,18 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+ 		TEST_FAIL("Page table levels must be 2, 3, or 4");
+ 	}
+ 
+-	return pte_addr(vm, *ptep) + (gva & (vm->page_size - 1));
++	return ptep;
+ 
+ unmapped_gva:
+ 	TEST_FAIL("No mapping for vm virtual address, gva: 0x%lx", gva);
+-	exit(1);
++	exit(EXIT_FAILURE);
++}
++
++vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
++{
++	uint64_t *ptep = virt_get_pte_hva(vm, gva);
++
++	return pte_addr(vm, *ptep) + (gva & (vm->page_size - 1));
+ }
+ 
+ static void pte_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent, uint64_t page, int level)
 -- 
 2.38.0.413.g74048e4d9e-goog
 
