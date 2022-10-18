@@ -1,93 +1,318 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019837B
-	for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 08:48:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1666082938;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I71EikHKgf+Cumvg3ZhyuGvJzSPCx8y69uStaChXwig=;
-	b=A2lnRai5u1KHlyftJVm28Qb/JjIF1y7wiZlmZtARxvvVG7fCSZwtKgfdNzal3B69Db2eSG
-	SLKtOt8lTI6FDMchT9EhNmbrkglaPs5gLyzoxIvbFGN+bts3mVgkYhO+/M1vjzISF/kTZF
-	jmKQdjslt/UjVNpWXseBhV40V6KRF5o=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-576-EOXjjTozOO6CtfRjlIgsIw-1; Tue, 18 Oct 2022 04:48:53 -0400
-X-MC-Unique: EOXjjTozOO6CtfRjlIgsIw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 97229857FAB;
-	Tue, 18 Oct 2022 08:48:52 +0000 (UTC)
-Received: from [10.64.54.70] (vpn2-54-70.bne.redhat.com [10.64.54.70])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D4A1F2166B41;
-	Tue, 18 Oct 2022 08:48:43 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 5/6] KVM: selftests: memslot_perf_test: Consolidate memory
- sizes
-To: Oliver Upton <oliver.upton@linux.dev>,
- Sean Christopherson <seanjc@google.com>
-Cc: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
- kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, ajones@ventanamicro.com, pbonzini@redhat.com,
- maz@kernel.org, shuah@kernel.org, peterx@redhat.com, ricarkol@google.com,
- zhenyzha@redhat.com, shan.gavin@gmail.com
-References: <20221014071914.227134-1-gshan@redhat.com>
- <20221014071914.227134-6-gshan@redhat.com>
- <cebafa0d-a2dc-c3f7-64c8-2637a254e3d0@maciej.szmigiero.name>
- <Y03ScGUUCA1KwlLF@google.com> <Y05aCJH+BBo+Y+nh@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <2aa1e089-7af1-24f8-e33c-b123f094f4c3@redhat.com>
-Date: Tue, 18 Oct 2022 16:48:40 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935D44A24
+	for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 11:06:22 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED1C4113E;
+	Tue, 18 Oct 2022 04:06:27 -0700 (PDT)
+Received: from FVFF77S0Q05N (unknown [10.57.0.253])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6172A3F7D8;
+	Tue, 18 Oct 2022 04:06:19 -0700 (PDT)
+Date: Tue, 18 Oct 2022 12:06:14 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Quentin Perret <qperret@google.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 14/25] KVM: arm64: Add per-cpu fixmap infrastructure
+ at EL2
+Message-ID: <Y06Iihi/RPAOMuwR@FVFF77S0Q05N>
+References: <20221017115209.2099-1-will@kernel.org>
+ <20221017115209.2099-15-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <Y05aCJH+BBo+Y+nh@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-Message-ID: <20221018084840.FlMM6GFMjPElgoGN857y3FapCgPz8mf_EtzUCWPq4q0@z>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221017115209.2099-15-will@kernel.org>
 
-On 10/18/22 3:47 PM, Oliver Upton wrote:
-> On Mon, Oct 17, 2022 at 10:08:48PM +0000, Sean Christopherson wrote:
->> On Mon, Oct 17, 2022, Maciej S. Szmigiero wrote:
->>>> +#define MEM_EXTRA_SIZE		0x10000
->>>
->>> Also, an expression like "(64 << 10)" is more readable than a "1"
->>> with a tail of zeroes (it's easy to add one zero too many or be one
->>> zero short).
->>
->> +1 to not open coding raw numbers.
->>
->> I think it's high time KVM selftests add #defines for the common sizes, e.g. SIZE_4KB,
->> 16KB, 64K, 2MB, 1GB, etc...
->>
->> Alternatively (or in addition), just #define 1KB, 1MB, 1GB, and 1TB, and then do
->> math off of those.
+On Mon, Oct 17, 2022 at 12:51:58PM +0100, Will Deacon wrote:
+> From: Quentin Perret <qperret@google.com>
 > 
-> I mean I love boilerplate as much as the next guy, but we can just use
-> tools/include/linux/sizes.h
+> Mapping pages in a guest page-table from within the pKVM hypervisor at
+> EL2 may require cache maintenance to ensure that the initialised page
+> contents is visible even to non-cacheable (e.g. MMU-off) accesses from
+> the guest.
 > 
+> In preparation for performing this maintenance at EL2, introduce a
+> per-vCPU fixmap which allows the pKVM hypervisor to map guest pages
+> temporarily into its stage-1 page-table for the purposes of cache
+> maintenance and, in future, poisoning on the reclaim path. The use of a
+> fixmap avoids the need for memory allocation or locking on the map()
+> path.
+> 
+> Tested-by: Vincent Donnefort <vdonnefort@google.com>
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h          | 14 +++
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +
+>  arch/arm64/kvm/hyp/include/nvhe/mm.h          |  4 +
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  1 -
+>  arch/arm64/kvm/hyp/nvhe/mm.c                  | 94 +++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/setup.c               |  4 +
+>  arch/arm64/kvm/hyp/pgtable.c                  | 12 ---
+>  7 files changed, 118 insertions(+), 13 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 4f6d79fe4352..b2a886c9e78d 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -30,6 +30,8 @@ typedef u64 kvm_pte_t;
+>  #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
+>  #define KVM_PTE_ADDR_51_48		GENMASK(15, 12)
+>  
+> +#define KVM_PHYS_INVALID		(-1ULL)
+> +
+>  static inline bool kvm_pte_valid(kvm_pte_t pte)
+>  {
+>  	return pte & KVM_PTE_VALID;
+> @@ -45,6 +47,18 @@ static inline u64 kvm_pte_to_phys(kvm_pte_t pte)
+>  	return pa;
+>  }
+>  
+> +static inline kvm_pte_t kvm_phys_to_pte(u64 pa)
+> +{
+> +	kvm_pte_t pte = pa & KVM_PTE_ADDR_MASK;
+> +
+> +	if (PAGE_SHIFT == 16) {
+> +		pa &= GENMASK(51, 48);
+> +		pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
+> +	}
+> +
+> +	return pte;
+> +}
+> +
+>  static inline u64 kvm_granule_shift(u32 level)
+>  {
+>  	/* Assumes KVM_PGTABLE_MAX_LEVELS is 4 */
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> index ce9a796a85ee..ef31a1872c93 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -59,6 +59,8 @@ enum pkvm_component_id {
+>  	PKVM_ID_HYP,
+>  };
+>  
+> +extern unsigned long hyp_nr_cpus;
+> +
+>  int __pkvm_prot_finalize(void);
+>  int __pkvm_host_share_hyp(u64 pfn);
+>  int __pkvm_host_unshare_hyp(u64 pfn);
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+> index b2ee6d5df55b..d5ec972b5c1e 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+> @@ -13,6 +13,10 @@
+>  extern struct kvm_pgtable pkvm_pgtable;
+>  extern hyp_spinlock_t pkvm_pgd_lock;
+>  
+> +int hyp_create_pcpu_fixmap(void);
+> +void *hyp_fixmap_map(phys_addr_t phys);
+> +void hyp_fixmap_unmap(void);
+> +
+>  int hyp_create_idmap(u32 hyp_va_bits);
+>  int hyp_map_vectors(void);
+>  int hyp_back_vmemmap(phys_addr_t back);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 2ef6aaa21ba5..1c38451050e5 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -21,7 +21,6 @@
+>  
+>  #define KVM_HOST_S2_FLAGS (KVM_PGTABLE_S2_NOFWB | KVM_PGTABLE_S2_IDMAP)
+>  
+> -extern unsigned long hyp_nr_cpus;
+>  struct host_mmu host_mmu;
+>  
+>  static struct hyp_pool host_s2_pool;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+> index d3a3b47181de..b77215630d5c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+> @@ -14,6 +14,7 @@
+>  #include <nvhe/early_alloc.h>
+>  #include <nvhe/gfp.h>
+>  #include <nvhe/memory.h>
+> +#include <nvhe/mem_protect.h>
+>  #include <nvhe/mm.h>
+>  #include <nvhe/spinlock.h>
+>  
+> @@ -25,6 +26,12 @@ unsigned int hyp_memblock_nr;
+>  
+>  static u64 __io_map_base;
+>  
+> +struct hyp_fixmap_slot {
+> +	u64 addr;
+> +	kvm_pte_t *ptep;
+> +};
+> +static DEFINE_PER_CPU(struct hyp_fixmap_slot, fixmap_slots);
+> +
+>  static int __pkvm_create_mappings(unsigned long start, unsigned long size,
+>  				  unsigned long phys, enum kvm_pgtable_prot prot)
+>  {
+> @@ -212,6 +219,93 @@ int hyp_map_vectors(void)
+>  	return 0;
+>  }
+>  
+> +void *hyp_fixmap_map(phys_addr_t phys)
+> +{
+> +	struct hyp_fixmap_slot *slot = this_cpu_ptr(&fixmap_slots);
+> +	kvm_pte_t pte, *ptep = slot->ptep;
+> +
+> +	pte = *ptep;
+> +	pte &= ~kvm_phys_to_pte(KVM_PHYS_INVALID);
+> +	pte |= kvm_phys_to_pte(phys) | KVM_PTE_VALID;
+> +	WRITE_ONCE(*ptep, pte);
+> +	dsb(nshst);
+> +
+> +	return (void *)slot->addr;
+> +}
+> +
+> +static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
+> +{
+> +	kvm_pte_t *ptep = slot->ptep;
+> +	u64 addr = slot->addr;
+> +
+> +	WRITE_ONCE(*ptep, *ptep & ~KVM_PTE_VALID);
+> +	dsb(nshst);
+> +	__tlbi_level(vale2, __TLBI_VADDR(addr, 0), (KVM_PGTABLE_MAX_LEVELS - 1));
+> +	dsb(nsh);
+> +	isb();
+> +}
 
-Nice point, I didn't realize we already had 'tools/include/linux/sizes.h'.
-The suggested macros (KiB, MiB, GiB, TiB and their variants) have been added
-to PATCH[v2 5/6]. I think it's reasonable to use 'tools/include/linux/sizes.h'
-directly instead of reinventing the wheel.
+Does each CPU have independent Stage-1 tables at EL2? i.e. each has a distinct
+root table?
 
-I will go ahead to use 'tools/include/linux/sizes.h' directly in v3 if nobody
-objects. I would like to receive comments on v2 before I'm going to post v3.
+If the tables are shared, you need broadcast maintenance and ISH barriers here,
+or you risk the usual issues with asynchronous MMU behaviour.
+
+If those are per-cpu, sorry for the noise!
 
 Thanks,
-Gavin
+Mark.
 
+> +
+> +void hyp_fixmap_unmap(void)
+> +{
+> +	fixmap_clear_slot(this_cpu_ptr(&fixmap_slots));
+> +}
+> +
+> +static int __create_fixmap_slot_cb(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> +				   enum kvm_pgtable_walk_flags flag,
+> +				   void * const arg)
+> +{
+> +	struct hyp_fixmap_slot *slot = per_cpu_ptr(&fixmap_slots, (u64)arg);
+> +
+> +	if (!kvm_pte_valid(*ptep) || level != KVM_PGTABLE_MAX_LEVELS - 1)
+> +		return -EINVAL;
+> +
+> +	slot->addr = addr;
+> +	slot->ptep = ptep;
+> +
+> +	/*
+> +	 * Clear the PTE, but keep the page-table page refcount elevated to
+> +	 * prevent it from ever being freed. This lets us manipulate the PTEs
+> +	 * by hand safely without ever needing to allocate memory.
+> +	 */
+> +	fixmap_clear_slot(slot);
+> +
+> +	return 0;
+> +}
+> +
+> +static int create_fixmap_slot(u64 addr, u64 cpu)
+> +{
+> +	struct kvm_pgtable_walker walker = {
+> +		.cb	= __create_fixmap_slot_cb,
+> +		.flags	= KVM_PGTABLE_WALK_LEAF,
+> +		.arg = (void *)cpu,
+> +	};
+> +
+> +	return kvm_pgtable_walk(&pkvm_pgtable, addr, PAGE_SIZE, &walker);
+> +}
+> +
+> +int hyp_create_pcpu_fixmap(void)
+> +{
+> +	unsigned long addr, i;
+> +	int ret;
+> +
+> +	for (i = 0; i < hyp_nr_cpus; i++) {
+> +		ret = pkvm_alloc_private_va_range(PAGE_SIZE, &addr);
+> +		if (ret)
+> +			return ret;
+> +
+> +		ret = kvm_pgtable_hyp_map(&pkvm_pgtable, addr, PAGE_SIZE,
+> +					  __hyp_pa(__hyp_bss_start), PAGE_HYP);
+> +		if (ret)
+> +			return ret;
+> +
+> +		ret = create_fixmap_slot(addr, i);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  int hyp_create_idmap(u32 hyp_va_bits)
+>  {
+>  	unsigned long start, end;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index 2be72fbe7279..0f69c1393416 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -321,6 +321,10 @@ void __noreturn __pkvm_init_finalise(void)
+>  	if (ret)
+>  		goto out;
+>  
+> +	ret = hyp_create_pcpu_fixmap();
+> +	if (ret)
+> +		goto out;
+> +
+>  	pkvm_hyp_vm_table_init(vm_table_base);
+>  out:
+>  	/*
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index a1a27f88a312..2bcb2d5903ba 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -57,8 +57,6 @@ struct kvm_pgtable_walk_data {
+>  	u64				end;
+>  };
+>  
+> -#define KVM_PHYS_INVALID (-1ULL)
+> -
+>  static bool kvm_phys_is_valid(u64 phys)
+>  {
+>  	return phys < BIT(id_aa64mmfr0_parange_to_phys_shift(ID_AA64MMFR0_EL1_PARANGE_MAX));
+> @@ -122,16 +120,6 @@ static bool kvm_pte_table(kvm_pte_t pte, u32 level)
+>  	return FIELD_GET(KVM_PTE_TYPE, pte) == KVM_PTE_TYPE_TABLE;
+>  }
+>  
+> -static kvm_pte_t kvm_phys_to_pte(u64 pa)
+> -{
+> -	kvm_pte_t pte = pa & KVM_PTE_ADDR_MASK;
+> -
+> -	if (PAGE_SHIFT == 16)
+> -		pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
+> -
+> -	return pte;
+> -}
+> -
+>  static kvm_pte_t *kvm_pte_follow(kvm_pte_t pte, struct kvm_pgtable_mm_ops *mm_ops)
+>  {
+>  	return mm_ops->phys_to_virt(kvm_pte_to_phys(pte));
+> -- 
+> 2.38.0.413.g74048e4d9e-goog
+> 
