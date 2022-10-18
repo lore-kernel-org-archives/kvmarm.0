@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8217B
-	for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 00:46:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853D67B
+	for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 00:52:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1666053991;
+	s=mimecast20190719; t=1666054323;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=G5ql+ZHZqoj03bFqQztJ8LdTDZnWgqOwdaisBDDNe/I=;
-	b=h/oHIuj0IjJ0gBiHqPg4LNMVkpEEglaZZwQqb4kFftp6lkanwSnVYx+T+CpFT1C+9h4RA7
-	0VsC4nLbso57SBeM7uHNSIfTwDKaqizihWwsUatXjm7J2U+nCkuYhnK/MRYo7p53BU9TN6
-	aB+D3Ng032GM8VDEXT3XFlKKtaY0RCc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Lch+0lg3n7TS+igKmtmFC8qqNbSDuMXa3xxdCzWFQyQ=;
+	b=FyhDjt8m/x6hSkD/x/flOdf8WAhnW0F8ZtEQ0mScs2ibGISjixycVoCo52WQEtP63hb2No
+	F3VtJUQPHKe6l2//8vR+VfKpqUQgW4Dtl0j3EeAcWhCQwQH73SqSP7X1OlKfDWmyPLUUE/
+	91AOlyyLxsveALAb+POoG4y8JEctTz0=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-16-eT4pDrE-OVycqNH8JzyLBA-1; Mon, 17 Oct 2022 20:46:28 -0400
-X-MC-Unique: eT4pDrE-OVycqNH8JzyLBA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-376-b0g3CsSxPWelPq238NY-PQ-1; Mon, 17 Oct 2022 20:51:58 -0400
+X-MC-Unique: b0g3CsSxPWelPq238NY-PQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CC63A811E75;
-	Tue, 18 Oct 2022 00:46:27 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9945E38012C3;
+	Tue, 18 Oct 2022 00:51:57 +0000 (UTC)
 Received: from [10.64.54.70] (vpn2-54-70.bne.redhat.com [10.64.54.70])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A4E140C2140;
-	Tue, 18 Oct 2022 00:46:15 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 19C0B401D59;
+	Tue, 18 Oct 2022 00:51:52 +0000 (UTC)
 Reply-To: Gavin Shan <gshan@redhat.com>
 Subject: Re: [PATCH 4/6] KVM: selftests: memslot_perf_test: Support variable
  guest page size
+From: Gavin Shan <gshan@redhat.com>
 To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, ajones@ventanamicro.com, pbonzini@redhat.com,
- maz@kernel.org, shuah@kernel.org, oliver.upton@linux.dev, seanjc@google.com,
- peterx@redhat.com, ricarkol@google.com, zhenyzha@redhat.com,
- shan.gavin@gmail.com, kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
+ zhenyzha@redhat.com, shan.gavin@gmail.com, kvmarm@lists.linux.dev,
+ pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
+ ajones@ventanamicro.com
 References: <20221014071914.227134-1-gshan@redhat.com>
  <20221014071914.227134-5-gshan@redhat.com>
  <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <bd5df92c-6870-8053-0b35-a2ad993970bd@redhat.com>
-Date: Tue, 18 Oct 2022 08:46:11 +0800
+ <bd5df92c-6870-8053-0b35-a2ad993970bd@redhat.com>
+Message-ID: <da2b7db0-509a-c9e0-c36b-6487a265a779@redhat.com>
+Date: Tue, 18 Oct 2022 08:51:50 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 Precedence: bulk
@@ -50,204 +50,216 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
+In-Reply-To: <bd5df92c-6870-8053-0b35-a2ad993970bd@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
-Message-ID: <20221018004611.bLZjDfg2A6QLoNaH2F2iMntLcRS-cn9vm8z6HC3yyEY@z>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Message-ID: <20221018005150.mtjDzKoUWCI39uTJvhSg2_GpKLe76gRuMr8dEmq-wWs@z>
 
-On 10/18/22 5:31 AM, Maciej S. Szmigiero wrote:
-> On 14.10.2022 09:19, Gavin Shan wrote:
->> The test case is obviously broken on aarch64 because non-4KB guest
->> page size is supported. The guest page size on aarch64 could be 4KB,
->> 16KB or 64KB.
+On 10/18/22 8:46 AM, Gavin Shan wrote:
+> On 10/18/22 5:31 AM, Maciej S. Szmigiero wrote:
+>> On 14.10.2022 09:19, Gavin Shan wrote:
+>>> The test case is obviously broken on aarch64 because non-4KB guest
+>>> page size is supported. The guest page size on aarch64 could be 4KB,
+>>> 16KB or 64KB.
+>>>
+>>> This supports variable guest page size, mostly for aarch64.
+>>>
+>>>    - The host determines the guest page size when virtual machine is
+>>>      created. The value is also passed to guest through the synchronization
+>>>      area.
+>>>
+>>>    - The number of guest pages are unknown until the virtual machine
+>>>      is to be created. So all the related macros are dropped. Instead,
+>>>      their values are dynamically calculated based on the guest page
+>>>      size.
+>>>
+>>>    - The static checks on memory sizes and pages becomes dependent
+>>>      on guest page size, which is unknown until the virtual machine
+>>>      is about to be created. So all the static checks are converted
+>>>      to dynamic checks, done in check_memory_sizes().
+>>>
+>>>    - As the address passed to madvise() should be aligned to host page,
+>>>      the size of page chunk is automatically selected, other than one
+>>>      page.
+>>>
+>>>    - All other changes included in this patch are almost mechanical
+>>>      replacing '4096' with 'guest_page_size'.
+>>>
+>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>>> ---
+>>>   .../testing/selftests/kvm/memslot_perf_test.c | 191 +++++++++++-------
+>>>   1 file changed, 115 insertions(+), 76 deletions(-)
+>>>
+>>> diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
+>>> index d5aa9148f96f..d587bd952ff9 100644
+>>> --- a/tools/testing/selftests/kvm/memslot_perf_test.c
+>>> +++ b/tools/testing/selftests/kvm/memslot_perf_test.c
+>>> @@ -26,14 +26,11 @@
+>>>   #include <processor.h>
+>>>   #define MEM_SIZE        ((512U << 20) + 4096)
+>>> -#define MEM_SIZE_PAGES        (MEM_SIZE / 4096)
+>>>   #define MEM_GPA        0x10000000UL
+>>>   #define MEM_AUX_GPA        MEM_GPA
+>>>   #define MEM_SYNC_GPA        MEM_AUX_GPA
+>>>   #define MEM_TEST_GPA        (MEM_AUX_GPA + 4096)
+>>>   #define MEM_TEST_SIZE        (MEM_SIZE - 4096)
+>>> -static_assert(MEM_SIZE % 4096 == 0, "invalid mem size");
+>>> -static_assert(MEM_TEST_SIZE % 4096 == 0, "invalid mem test size");
+>>>   /*
+>>>    * 32 MiB is max size that gets well over 100 iterations on 509 slots.
+>>> @@ -42,29 +39,16 @@ static_assert(MEM_TEST_SIZE % 4096 == 0, "invalid mem test size");
+>>>    * limited resolution).
+>>>    */
+>>>   #define MEM_SIZE_MAP        ((32U << 20) + 4096)
+>>> -#define MEM_SIZE_MAP_PAGES    (MEM_SIZE_MAP / 4096)
+>>>   #define MEM_TEST_MAP_SIZE    (MEM_SIZE_MAP - 4096)
+>>> -#define MEM_TEST_MAP_SIZE_PAGES (MEM_TEST_MAP_SIZE / 4096)
+>>> -static_assert(MEM_SIZE_MAP % 4096 == 0, "invalid map test region size");
+>>> -static_assert(MEM_TEST_MAP_SIZE % 4096 == 0, "invalid map test region size");
+>>> -static_assert(MEM_TEST_MAP_SIZE_PAGES % 2 == 0, "invalid map test region size");
+>>> -static_assert(MEM_TEST_MAP_SIZE_PAGES > 2, "invalid map test region size");
+>>>   /*
+>>>    * 128 MiB is min size that fills 32k slots with at least one page in each
+>>>    * while at the same time gets 100+ iterations in such test
+>>> + *
+>>> + * 2 MiB chunk size like a typical huge page
+>>>    */
+>>>   #define MEM_TEST_UNMAP_SIZE        (128U << 20)
+>>> -#define MEM_TEST_UNMAP_SIZE_PAGES    (MEM_TEST_UNMAP_SIZE / 4096)
+>>> -/* 2 MiB chunk size like a typical huge page */
+>>> -#define MEM_TEST_UNMAP_CHUNK_PAGES    (2U << (20 - 12))
+>>> -static_assert(MEM_TEST_UNMAP_SIZE <= MEM_TEST_SIZE,
+>>> -          "invalid unmap test region size");
+>>> -static_assert(MEM_TEST_UNMAP_SIZE % 4096 == 0,
+>>> -          "invalid unmap test region size");
+>>> -static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
+>>> -          (2 * MEM_TEST_UNMAP_CHUNK_PAGES) == 0,
+>>> -          "invalid unmap test region size");
+>>> +#define MEM_TEST_UNMAP_CHUNK_SIZE    (2U << 20)
+>>>   /*
+>>>    * For the move active test the middle of the test area is placed on
+>>> @@ -77,8 +61,7 @@ static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
+>>>    * for the total size of 25 pages.
+>>>    * Hence, the maximum size here is 50 pages.
+>>>    */
+>>> -#define MEM_TEST_MOVE_SIZE_PAGES    (50)
+>>> -#define MEM_TEST_MOVE_SIZE        (MEM_TEST_MOVE_SIZE_PAGES * 4096)
+>>> +#define MEM_TEST_MOVE_SIZE        0x32000
 >>
->> This supports variable guest page size, mostly for aarch64.
+>> The above number seems less readable than an explicit value of 50 pages.
 >>
->>    - The host determines the guest page size when virtual machine is
->>      created. The value is also passed to guest through the synchronization
->>      area.
->>
->>    - The number of guest pages are unknown until the virtual machine
->>      is to be created. So all the related macros are dropped. Instead,
->>      their values are dynamically calculated based on the guest page
->>      size.
->>
->>    - The static checks on memory sizes and pages becomes dependent
->>      on guest page size, which is unknown until the virtual machine
->>      is about to be created. So all the static checks are converted
->>      to dynamic checks, done in check_memory_sizes().
->>
->>    - As the address passed to madvise() should be aligned to host page,
->>      the size of page chunk is automatically selected, other than one
->>      page.
->>
->>    - All other changes included in this patch are almost mechanical
->>      replacing '4096' with 'guest_page_size'.
->>
->> Signed-off-by: Gavin Shan <gshan@redhat.com>
->> ---
->>   .../testing/selftests/kvm/memslot_perf_test.c | 191 +++++++++++-------
->>   1 file changed, 115 insertions(+), 76 deletions(-)
->>
->> diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
->> index d5aa9148f96f..d587bd952ff9 100644
->> --- a/tools/testing/selftests/kvm/memslot_perf_test.c
->> +++ b/tools/testing/selftests/kvm/memslot_perf_test.c
->> @@ -26,14 +26,11 @@
->>   #include <processor.h>
->>   #define MEM_SIZE        ((512U << 20) + 4096)
->> -#define MEM_SIZE_PAGES        (MEM_SIZE / 4096)
->>   #define MEM_GPA        0x10000000UL
->>   #define MEM_AUX_GPA        MEM_GPA
->>   #define MEM_SYNC_GPA        MEM_AUX_GPA
->>   #define MEM_TEST_GPA        (MEM_AUX_GPA + 4096)
->>   #define MEM_TEST_SIZE        (MEM_SIZE - 4096)
->> -static_assert(MEM_SIZE % 4096 == 0, "invalid mem size");
->> -static_assert(MEM_TEST_SIZE % 4096 == 0, "invalid mem test size");
->>   /*
->>    * 32 MiB is max size that gets well over 100 iterations on 509 slots.
->> @@ -42,29 +39,16 @@ static_assert(MEM_TEST_SIZE % 4096 == 0, "invalid mem test size");
->>    * limited resolution).
->>    */
->>   #define MEM_SIZE_MAP        ((32U << 20) + 4096)
->> -#define MEM_SIZE_MAP_PAGES    (MEM_SIZE_MAP / 4096)
->>   #define MEM_TEST_MAP_SIZE    (MEM_SIZE_MAP - 4096)
->> -#define MEM_TEST_MAP_SIZE_PAGES (MEM_TEST_MAP_SIZE / 4096)
->> -static_assert(MEM_SIZE_MAP % 4096 == 0, "invalid map test region size");
->> -static_assert(MEM_TEST_MAP_SIZE % 4096 == 0, "invalid map test region size");
->> -static_assert(MEM_TEST_MAP_SIZE_PAGES % 2 == 0, "invalid map test region size");
->> -static_assert(MEM_TEST_MAP_SIZE_PAGES > 2, "invalid map test region size");
->>   /*
->>    * 128 MiB is min size that fills 32k slots with at least one page in each
->>    * while at the same time gets 100+ iterations in such test
->> + *
->> + * 2 MiB chunk size like a typical huge page
->>    */
->>   #define MEM_TEST_UNMAP_SIZE        (128U << 20)
->> -#define MEM_TEST_UNMAP_SIZE_PAGES    (MEM_TEST_UNMAP_SIZE / 4096)
->> -/* 2 MiB chunk size like a typical huge page */
->> -#define MEM_TEST_UNMAP_CHUNK_PAGES    (2U << (20 - 12))
->> -static_assert(MEM_TEST_UNMAP_SIZE <= MEM_TEST_SIZE,
->> -          "invalid unmap test region size");
->> -static_assert(MEM_TEST_UNMAP_SIZE % 4096 == 0,
->> -          "invalid unmap test region size");
->> -static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
->> -          (2 * MEM_TEST_UNMAP_CHUNK_PAGES) == 0,
->> -          "invalid unmap test region size");
->> +#define MEM_TEST_UNMAP_CHUNK_SIZE    (2U << 20)
->>   /*
->>    * For the move active test the middle of the test area is placed on
->> @@ -77,8 +61,7 @@ static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
->>    * for the total size of 25 pages.
->>    * Hence, the maximum size here is 50 pages.
->>    */
->> -#define MEM_TEST_MOVE_SIZE_PAGES    (50)
->> -#define MEM_TEST_MOVE_SIZE        (MEM_TEST_MOVE_SIZE_PAGES * 4096)
->> +#define MEM_TEST_MOVE_SIZE        0x32000
-> 
-> The above number seems less readable than an explicit value of 50 pages.
-> 
-> In addition to that, it's 50 pages only with 4k page size, so at least
-> the comment above needs to be updated to reflect this fact.
-> 
-
-Yeah, I will change the comments like below in next revision.
-
-  /*
-   * When running this test with 32k memslots, actually 32763 excluding
-   * the reserved memory slot 0, the memory for each slot is 0x4000 bytes.
-   * The last slot contains 0x19000 bytes memory. Hence, the maximum size
-   * here is 0x32000 bytes.
-   */
-
->>   #define MEM_TEST_MOVE_GPA_DEST        (MEM_GPA + MEM_SIZE)
->>   static_assert(MEM_TEST_MOVE_SIZE <= MEM_TEST_SIZE,
->>             "invalid move test region size");
-> (...)
->> @@ -242,33 +229,34 @@ static struct vm_data *alloc_vm(void)
->>   }
->>   static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
->> -               void *guest_code, uint64_t mempages,
->> +               void *guest_code, uint64_t mem_size,
->>                  struct timespec *slot_runtime)
->>   {
->> -    uint64_t rempages;
->> +    uint64_t mempages, rempages;
->>       uint64_t guest_addr;
->> -    uint32_t slot;
->> +    uint32_t slot, guest_page_size;
->>       struct timespec tstart;
->>       struct sync_area *sync;
->> -    TEST_ASSERT(mempages > 1,
->> -            "Can't test without any memory");
->> +    guest_page_size = vm_guest_mode_params[VM_MODE_DEFAULT].page_size;
->> +    mempages = mem_size / guest_page_size;
->> +
->> +    data->vm = __vm_create_with_one_vcpu(&data->vcpu, mempages, guest_code);
->> +    ucall_init(data->vm, NULL);
+>> In addition to that, it's 50 pages only with 4k page size, so at least
+>> the comment above needs to be updated to reflect this fact.
 >>
 > 
-> TEST_ASSERT(data->vm->page_size == guest_page_size, "Invalid VM page size")
-> here would catch the case if someone accidentally modifies
-> __vm_create_with_one_vcpu() to use other page size than specified for
-> VM_MODE_DEFAULT.
+> Yeah, I will change the comments like below in next revision.
+> 
+>   /*
+>    * When running this test with 32k memslots, actually 32763 excluding
+>    * the reserved memory slot 0, the memory for each slot is 0x4000 bytes.
+>    * The last slot contains 0x19000 bytes memory. Hence, the maximum size
+>    * here is 0x32000 bytes.
+>    */
 > 
 
-Sure, it's not harmful at least.
+I will replace those numbers with readable ones like below :)
 
->>       data->npages = mempages;
->> +    TEST_ASSERT(data->npages > 1, "Can't test without any memory");
->>       data->nslots = nslots;
->> -    data->pages_per_slot = mempages / data->nslots;
->> +    data->pages_per_slot = data->npages / data->nslots;
->>       if (!data->pages_per_slot) {
->> -        *maxslots = mempages + 1;
->> +        *maxslots = data->npages + 1;
->>           return false;
->>       }
->> -    rempages = mempages % data->nslots;
->> +    rempages = data->npages % data->nslots;
->>       data->hva_slots = malloc(sizeof(*data->hva_slots) * data->nslots);
->>       TEST_ASSERT(data->hva_slots, "malloc() fail");
->> -    data->vm = __vm_create_with_one_vcpu(&data->vcpu, mempages, guest_code);
->> -    ucall_init(data->vm, NULL);
->> -
->>       pr_info_v("Adding slots 1..%i, each slot with %"PRIu64" pages + %"PRIu64" extra pages last\n",
->>           data->nslots, data->pages_per_slot, rempages);
-> (...)
->> @@ -856,6 +863,35 @@ static void help(char *name, struct test_args *targs)
->>           pr_info("%d: %s\n", ctr, tests[ctr].name);
->>   }
->> +static bool check_memory_sizes(void)
->> +{
->> +    uint32_t guest_page_size = vm_guest_mode_params[VM_MODE_DEFAULT].page_size;
->> +
->> +    if (MEM_SIZE % guest_page_size ||
->> +        MEM_TEST_SIZE % guest_page_size) {
->> +        pr_info("invalid MEM_SIZE or MEM_TEST_SIZE\n");
->> +        return false;
->> +    }
->> +
->> +    if (MEM_SIZE_MAP % guest_page_size        ||
->> +        MEM_TEST_MAP_SIZE % guest_page_size        ||
->> +        (MEM_TEST_MAP_SIZE / guest_page_size) <= 2    ||
->> +        (MEM_TEST_MAP_SIZE / guest_page_size) % 2) {
->> +        pr_info("invalid MEM_SIZE_MAP or MEM_TEST_MAP_SIZE\n");
->> +        return false;
->> +    }
->> +
->> +    if (MEM_TEST_UNMAP_SIZE > MEM_TEST_SIZE        ||
->> +        MEM_TEST_UNMAP_SIZE % guest_page_size    ||
->> +        (MEM_TEST_UNMAP_SIZE / guest_page_size) %
->> +        (MEM_TEST_UNMAP_CHUNK_SIZE / guest_page_size)) {
-> 
-> This should be (MEM_TEST_UNMAP_SIZE / guest_page_size) % (2 * MEM_TEST_UNMAP_CHUNK_SIZE / guest_page_size))
-> to match the old static_assert().
-> 
+/*
+  * When running this test with 32k memslots, actually 32763 excluding
+  * the reserved memory slot 0, the memory for each slot is 16KB. The
+  * last slot contains 100KB memory with the remaining 84KB. Hence,
+  * the maximum size is double of that (200KB)
+  */
 
-Nice catch! I will fix it up in next revision :)
+>>>   #define MEM_TEST_MOVE_GPA_DEST        (MEM_GPA + MEM_SIZE)
+>>>   static_assert(MEM_TEST_MOVE_SIZE <= MEM_TEST_SIZE,
+>>>             "invalid move test region size");
+>> (...)
+>>> @@ -242,33 +229,34 @@ static struct vm_data *alloc_vm(void)
+>>>   }
+>>>   static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
+>>> -               void *guest_code, uint64_t mempages,
+>>> +               void *guest_code, uint64_t mem_size,
+>>>                  struct timespec *slot_runtime)
+>>>   {
+>>> -    uint64_t rempages;
+>>> +    uint64_t mempages, rempages;
+>>>       uint64_t guest_addr;
+>>> -    uint32_t slot;
+>>> +    uint32_t slot, guest_page_size;
+>>>       struct timespec tstart;
+>>>       struct sync_area *sync;
+>>> -    TEST_ASSERT(mempages > 1,
+>>> -            "Can't test without any memory");
+>>> +    guest_page_size = vm_guest_mode_params[VM_MODE_DEFAULT].page_size;
+>>> +    mempages = mem_size / guest_page_size;
+>>> +
+>>> +    data->vm = __vm_create_with_one_vcpu(&data->vcpu, mempages, guest_code);
+>>> +    ucall_init(data->vm, NULL);
+>>>
+>>
+>> TEST_ASSERT(data->vm->page_size == guest_page_size, "Invalid VM page size")
+>> here would catch the case if someone accidentally modifies
+>> __vm_create_with_one_vcpu() to use other page size than specified for
+>> VM_MODE_DEFAULT.
+>>
+> 
+> Sure, it's not harmful at least.
+> 
+>>>       data->npages = mempages;
+>>> +    TEST_ASSERT(data->npages > 1, "Can't test without any memory");
+>>>       data->nslots = nslots;
+>>> -    data->pages_per_slot = mempages / data->nslots;
+>>> +    data->pages_per_slot = data->npages / data->nslots;
+>>>       if (!data->pages_per_slot) {
+>>> -        *maxslots = mempages + 1;
+>>> +        *maxslots = data->npages + 1;
+>>>           return false;
+>>>       }
+>>> -    rempages = mempages % data->nslots;
+>>> +    rempages = data->npages % data->nslots;
+>>>       data->hva_slots = malloc(sizeof(*data->hva_slots) * data->nslots);
+>>>       TEST_ASSERT(data->hva_slots, "malloc() fail");
+>>> -    data->vm = __vm_create_with_one_vcpu(&data->vcpu, mempages, guest_code);
+>>> -    ucall_init(data->vm, NULL);
+>>> -
+>>>       pr_info_v("Adding slots 1..%i, each slot with %"PRIu64" pages + %"PRIu64" extra pages last\n",
+>>>           data->nslots, data->pages_per_slot, rempages);
+>> (...)
+>>> @@ -856,6 +863,35 @@ static void help(char *name, struct test_args *targs)
+>>>           pr_info("%d: %s\n", ctr, tests[ctr].name);
+>>>   }
+>>> +static bool check_memory_sizes(void)
+>>> +{
+>>> +    uint32_t guest_page_size = vm_guest_mode_params[VM_MODE_DEFAULT].page_size;
+>>> +
+>>> +    if (MEM_SIZE % guest_page_size ||
+>>> +        MEM_TEST_SIZE % guest_page_size) {
+>>> +        pr_info("invalid MEM_SIZE or MEM_TEST_SIZE\n");
+>>> +        return false;
+>>> +    }
+>>> +
+>>> +    if (MEM_SIZE_MAP % guest_page_size        ||
+>>> +        MEM_TEST_MAP_SIZE % guest_page_size        ||
+>>> +        (MEM_TEST_MAP_SIZE / guest_page_size) <= 2    ||
+>>> +        (MEM_TEST_MAP_SIZE / guest_page_size) % 2) {
+>>> +        pr_info("invalid MEM_SIZE_MAP or MEM_TEST_MAP_SIZE\n");
+>>> +        return false;
+>>> +    }
+>>> +
+>>> +    if (MEM_TEST_UNMAP_SIZE > MEM_TEST_SIZE        ||
+>>> +        MEM_TEST_UNMAP_SIZE % guest_page_size    ||
+>>> +        (MEM_TEST_UNMAP_SIZE / guest_page_size) %
+>>> +        (MEM_TEST_UNMAP_CHUNK_SIZE / guest_page_size)) {
+>>
+>> This should be (MEM_TEST_UNMAP_SIZE / guest_page_size) % (2 * MEM_TEST_UNMAP_CHUNK_SIZE / guest_page_size))
+>> to match the old static_assert().
+>>
+> 
+> Nice catch! I will fix it up in next revision :)
+> 
 
 Thanks,
 Gavin
