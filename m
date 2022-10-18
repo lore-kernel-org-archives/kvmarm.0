@@ -1,44 +1,14 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92102563
-	for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 16:45:31 +0000 (UTC)
-Received: by mail-ed1-f52.google.com with SMTP id e18so21353961edj.3
-        for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 09:45:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OCJsHqR3fQYSgnggViyn3fMnrEwEtr4DogQg4RXYXfU=;
-        b=OTRdidlgd4M+FwW6O5/QmVZjVoFUteHzrGjxAXNpavm6P0/bJ2oKKpVtri2Z7qkcWS
-         5JWQYnY7afyOrgZhzZHFjmw9efVV2gjkQeFaMP+fmwcjwuS82qAivOdVz5DIm0te1MzR
-         Pwchuxk3ooNK3QdvuAjNh9l1YqcgHyan06709W1zjjCD+KSz3zjOVbT3bqFpQ2yp4hIC
-         qbJxL5Oy7NcTMET5jxqyahqZNxTVKcYbOiWxUa0zcvNgixzWyb14gNlz2O+9P7yC8xtY
-         EREtg4jooDmz6U6w/mtou9+3RUms1DMcQaOFJyWn+75HCVGcEWNWxCPIirthBvftBJoq
-         VGaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OCJsHqR3fQYSgnggViyn3fMnrEwEtr4DogQg4RXYXfU=;
-        b=R6x7Tft47riyo+QyxaiIIdj2mIFxmC9+Kw+1WKNXMgTVPmt0nL+00cBSL00YzAQ2vo
-         KzVNApPwn8GWRHMLodVxXUtxhJslynY7nbSg+LfgXhrJn6puKbCPaMJC9JzVY8oEoF06
-         71N9yaypqUT2Pimgnu44ZIARzmWPM/4q1X7ZUwfsxQfLXtJY0w9OphMEEjEHvw0JQh32
-         0ikcuFsOxJqlke/px6ZYSmxTgdlC5oZD/3cYXyg+asI4MQy7HON6usxAjJe8Y6LFTHeh
-         s37x4v1lLSmfqPc14bcWomhfxobABIEnn6YYiM7dGyRx/IG2f6gBbwgg/25kqANQDdzT
-         frgQ==
-X-Gm-Message-State: ACrzQf1S15iN/OMD2S0y6HA5tpl3cr2Fe4ZyYQ9EQx2Q5Y2PsTIgyLcD
-	eCdikT9Ntn9tW33o6St5z9Cc8XNI2bPuTQ==
-X-Google-Smtp-Source: AMsMyM6I0P0S9DziDRNVM+YYRXKEEihJKzfSjWKlLw6I00yhLT/182go6gfMS7BANtRyQPharE/Otw==
-X-Received: by 2002:a05:6402:909:b0:435:a8b:5232 with SMTP id g9-20020a056402090900b004350a8b5232mr3457453edz.240.1666111529948;
-        Tue, 18 Oct 2022 09:45:29 -0700 (PDT)
-Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id hx15-20020a170906846f00b0074134543f82sm7856285ejc.90.2022.10.18.09.45.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Oct 2022 09:45:29 -0700 (PDT)
-Date: Tue, 18 Oct 2022 16:45:26 +0000
-From: Quentin Perret <qperret@google.com>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D986F3200
+	for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 16:52:27 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4AB5E113E;
+	Tue, 18 Oct 2022 09:52:33 -0700 (PDT)
+Received: from lakrids (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E1813F7D8;
+	Tue, 18 Oct 2022 09:52:25 -0700 (PDT)
+Date: Tue, 18 Oct 2022 17:52:18 +0100
+From: Mark Rutland <mark.rutland@arm.com>
 To: Will Deacon <will@kernel.org>
 Cc: kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
@@ -46,16 +16,19 @@ Cc: kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	James Morse <james.morse@arm.com>,
 	Chao Peng <chao.p.peng@linux.intel.com>,
+	Quentin Perret <qperret@google.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
+	Fuad Tabba <tabba@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
 	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 12/25] KVM: arm64: Add infrastructure to create and
- track pKVM instances at EL2
-Message-ID: <Y07YJvEsUnjSasA0@google.com>
+Subject: Re: [PATCH v4 14/25] KVM: arm64: Add per-cpu fixmap infrastructure
+ at EL2
+Message-ID: <Y07Zwsn+oFbMWeKI@lakrids>
 References: <20221017115209.2099-1-will@kernel.org>
- <20221017115209.2099-13-will@kernel.org>
+ <20221017115209.2099-15-will@kernel.org>
+ <Y06Iihi/RPAOMuwR@FVFF77S0Q05N>
+ <20221018140514.GA3323@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -64,27 +37,112 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221017115209.2099-13-will@kernel.org>
+In-Reply-To: <20221018140514.GA3323@willie-the-truck>
 
-On Monday 17 Oct 2022 at 12:51:56 (+0100), Will Deacon wrote:
-> +static int find_free_vm_table_entry(struct kvm *host_kvm)
-> +{
-> +	int i, ret = -ENOMEM;
-> +
-> +	for (i = 0; i < KVM_MAX_PVMS; ++i) {
-> +		struct pkvm_hyp_vm *vm = vm_table[i];
-> +
-> +		if (!vm) {
-> +			if (ret < 0)
-> +				ret = i;
-> +			continue;
-> +		}
-> +
-> +		if (unlikely(vm->host_kvm == host_kvm)) {
-> +			ret = -EEXIST;
-> +			break;
-> +		}
+On Tue, Oct 18, 2022 at 03:05:14PM +0100, Will Deacon wrote:
+> Hi Mark,
+> 
+> Cheers for having a look.
+> 
+> On Tue, Oct 18, 2022 at 12:06:14PM +0100, Mark Rutland wrote:
+> > On Mon, Oct 17, 2022 at 12:51:58PM +0100, Will Deacon wrote:
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+> > > index d3a3b47181de..b77215630d5c 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/mm.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+> > > @@ -14,6 +14,7 @@
+> > >  #include <nvhe/early_alloc.h>
+> > >  #include <nvhe/gfp.h>
+> > >  #include <nvhe/memory.h>
+> > > +#include <nvhe/mem_protect.h>
+> > >  #include <nvhe/mm.h>
+> > >  #include <nvhe/spinlock.h>
+> > >  
+> > > @@ -25,6 +26,12 @@ unsigned int hyp_memblock_nr;
+> > >  
+> > >  static u64 __io_map_base;
+> > >  
+> > > +struct hyp_fixmap_slot {
+> > > +	u64 addr;
+> > > +	kvm_pte_t *ptep;
+> > > +};
+> > > +static DEFINE_PER_CPU(struct hyp_fixmap_slot, fixmap_slots);
+> > > +
+> > >  static int __pkvm_create_mappings(unsigned long start, unsigned long size,
+> > >  				  unsigned long phys, enum kvm_pgtable_prot prot)
+> > >  {
+> > > @@ -212,6 +219,93 @@ int hyp_map_vectors(void)
+> > >  	return 0;
+> > >  }
+> > >  
+> > > +void *hyp_fixmap_map(phys_addr_t phys)
+> > > +{
+> > > +	struct hyp_fixmap_slot *slot = this_cpu_ptr(&fixmap_slots);
+> > > +	kvm_pte_t pte, *ptep = slot->ptep;
+> > > +
+> > > +	pte = *ptep;
+> > > +	pte &= ~kvm_phys_to_pte(KVM_PHYS_INVALID);
+> > > +	pte |= kvm_phys_to_pte(phys) | KVM_PTE_VALID;
+> > > +	WRITE_ONCE(*ptep, pte);
+> > > +	dsb(nshst);
+> > > +
+> > > +	return (void *)slot->addr;
+> > > +}
+> > > +
+> > > +static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
+> > > +{
+> > > +	kvm_pte_t *ptep = slot->ptep;
+> > > +	u64 addr = slot->addr;
+> > > +
+> > > +	WRITE_ONCE(*ptep, *ptep & ~KVM_PTE_VALID);
+> > > +	dsb(nshst);
+> > > +	__tlbi_level(vale2, __TLBI_VADDR(addr, 0), (KVM_PGTABLE_MAX_LEVELS - 1));
+> > > +	dsb(nsh);
+> > > +	isb();
+> > > +}
+> > 
+> > Does each CPU have independent Stage-1 tables at EL2? i.e. each has a distinct
+> > root table?
+> 
+> No, the CPUs share the same stage-1 table at EL2.
 
-That would be funny if the host passed the same struct twice, but do we
-care? If the host wants to shoot itself in the foot, it's not our
-problem I guess :) ? Also, we don't do the same check for vCPUs so ...
+Ah, then I think there's a problem here.
+
+> > If the tables are shared, you need broadcast maintenance and ISH barriers here,
+> > or you risk the usual issues with asynchronous MMU behaviour.
+> 
+> Can you elaborate a bit, please? What we're trying to do is reserve a page
+> of VA space for each CPU, which is only ever accessed explicitly by that
+> CPU using a normal memory mapping. The fixmap code therefore just updates
+> the relevant leaf entry for the CPU on which we're running and the TLBI
+> is there to ensure that the new mapping takes effect.
+> 
+> If another CPU speculatively walks another CPU's fixmap slot, then I agree
+> that it could access that page after the slot had been cleared. Although
+> I can see theoretical security arguments around avoiding that situation,
+> there's a very real performance cost to broadcast invalidation that we
+> were hoping to avoid on this fast path.
+
+The issue is that any CPU could walk any of these entries at any time
+for any reason, and without broadcast maintenance we'd be violating the
+Break-Before-Make requirements. That permits a number of things,
+including "amalgamation", which would permit the CPU to consume some
+arbitrary function of the old+new entries. Among other things, that can
+permit accesses to entirely bogus physical addresses that weren't in
+either entry (e.g. making speculative accesses to arbitrary device
+addresses).
+
+For correctness, you need the maintenance to be broadcast to all PEs
+which could observe the old and new entries.
+
+> Of course, in the likely event that I've purged "the usual issues" from
+> my head and we need broadcasting for _correctness_, then we'll just have
+> to suck it up!
+
+As above, I believe you need this for correctness.
+
+I'm not sure if FEAT_BBM level 2 gives you the necessary properties to
+relax this on some HW.
+
+Thanks,
+Mark.
