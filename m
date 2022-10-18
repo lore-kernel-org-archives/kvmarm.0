@@ -1,318 +1,148 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935D44A24
-	for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 11:06:22 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED1C4113E;
-	Tue, 18 Oct 2022 04:06:27 -0700 (PDT)
-Received: from FVFF77S0Q05N (unknown [10.57.0.253])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6172A3F7D8;
-	Tue, 18 Oct 2022 04:06:19 -0700 (PDT)
-Date: Tue, 18 Oct 2022 12:06:14 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Quentin Perret <qperret@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 14/25] KVM: arm64: Add per-cpu fixmap infrastructure
- at EL2
-Message-ID: <Y06Iihi/RPAOMuwR@FVFF77S0Q05N>
-References: <20221017115209.2099-1-will@kernel.org>
- <20221017115209.2099-15-will@kernel.org>
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0664C64
+	for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 13:42:14 +0000 (UTC)
+Received: by mail-wm1-f43.google.com with SMTP id l16-20020a05600c4f1000b003c6c0d2a445so12222288wmq.4
+        for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 06:42:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zJkCAiJHLxUZwzr5tFQxyP5W2DnDI9cvMk9vr73FdTQ=;
+        b=cH/a18bj2gfE2DhWLyxpNZsuWatw0ThunY35SY43PqJhoyct4SliXvj6pUNgT8bZiv
+         wMCc4GO8EaWqiXlj4mMYt2yRE39Az6OBsR+NdNXOo34k9MtwPtJt493q46vlXpYluy9L
+         9aAnKYuffQO3HPs+Q3SDyaqWO9+u+ud1f8YklGI4um083sOSdMxQEAsNMLzZ3daeCRnH
+         kPTma0lgo6jg0IzCUNkbV0hA4OyxiUlRE9jRbZm6PRDkAaB/s/KroN7PFy06Ujbae5GN
+         AwFzvTrFVI34wA8UCMxxZhrEBT3RjVHMRc3vbBr8c6vaF0midgWER6A4Luo7DTDi5Xta
+         iFww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zJkCAiJHLxUZwzr5tFQxyP5W2DnDI9cvMk9vr73FdTQ=;
+        b=4rmSyBKcFGp2TMnYtAaietoJuVZNItnBCfpF1pZ7vQxsVxX47JLl9AAO94p5QyqcSf
+         Hb4kEhwOoNDcBOYj99ciZL1uiFYAP4PdqBlJgy4XXV+2YihEXICjEfc+dGEM3tRP2qMy
+         vtg5jT9x3IHb14ZnwYk75ksc7tPPlqFAQ256+wk51pF5pSqEa4ByObexBHPv0G1NUSNd
+         ZEwMlWE3R+noD84mQFPbVzy5L8Ljs1PeL1toW00PPmH8ux41OiRS1LrOxkVFDn3YZEvJ
+         Z3t2Ad/If5xHodflppOGUPFYZy2vj4OZbaOxjibf1SjrZdzdk9h9pP6d50rX8DvYoG8v
+         rIQw==
+X-Gm-Message-State: ACrzQf3lwCuS76L+QOP6Q3fwFoLpRbNM4sSy2sBymAAdjMElWoPklXDy
+	VElcyUn3wKGVembBvVKUnBRi++hyiY3XrZhudhs=
+X-Google-Smtp-Source: AMsMyM7wCcbFf1zbh8Y5oHXV6AXBJ9PTPQ4114zKrWFWrMnafOFFV6P9gV4VERIFsDKqkmc71bs9wQ==
+X-Received: by 2002:a05:600c:1f16:b0:3c7:cf:8e72 with SMTP id bd22-20020a05600c1f1600b003c700cf8e72mr851015wmb.88.1666100533284;
+        Tue, 18 Oct 2022 06:42:13 -0700 (PDT)
+Received: from [192.168.1.115] ([185.126.107.38])
+        by smtp.gmail.com with ESMTPSA id t15-20020a5d49cf000000b0022e32f4c06asm11172895wrs.11.2022.10.18.06.42.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Oct 2022 06:42:12 -0700 (PDT)
+Message-ID: <4c9e1602-25e4-6489-e4da-3b1b7fda5302@linaro.org>
+Date: Tue, 18 Oct 2022 15:42:08 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221017115209.2099-15-will@kernel.org>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH v4 07/25] KVM: arm64: Prevent the donation of no-map pages
+Content-Language: en-US
+To: Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev
+Cc: Sean Christopherson <seanjc@google.com>,
+ Vincent Donnefort <vdonnefort@google.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, James Morse
+ <james.morse@arm.com>, Chao Peng <chao.p.peng@linux.intel.com>,
+ Quentin Perret <qperret@google.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
+ kernel-team@android.com, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+References: <20221017115209.2099-1-will@kernel.org>
+ <20221017115209.2099-8-will@kernel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <20221017115209.2099-8-will@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 17, 2022 at 12:51:58PM +0100, Will Deacon wrote:
+Hi Will & Quentin,
+
+On 17/10/22 13:51, Will Deacon wrote:
 > From: Quentin Perret <qperret@google.com>
 > 
-> Mapping pages in a guest page-table from within the pKVM hypervisor at
-> EL2 may require cache maintenance to ensure that the initialised page
-> contents is visible even to non-cacheable (e.g. MMU-off) accesses from
-> the guest.
+> Memory regions marked as "no-map" in the host device-tree routinely
+> include TrustZone carevouts and DMA pools. Although donating such pages
+
+Typo "carve-outs"?
+
+> to the hypervisor may not breach confidentiality, it could be used to
+> corrupt its state in uncontrollable ways. To prevent this, let's block
+> host-initiated memory transitions targeting "no-map" pages altogether in
+> nVHE protected mode as there should be no valid reason to do this in
+> current operation.
 > 
-> In preparation for performing this maintenance at EL2, introduce a
-> per-vCPU fixmap which allows the pKVM hypervisor to map guest pages
-> temporarily into its stage-1 page-table for the purposes of cache
-> maintenance and, in future, poisoning on the reclaim path. The use of a
-> fixmap avoids the need for memory allocation or locking on the map()
-> path.
+> Thankfully, the pKVM EL2 hypervisor has a full copy of the host's list
+> of memblock regions, so we can easily check for the presence of the
+> MEMBLOCK_NOMAP flag on a region containing pages being donated from the
+> host.
 > 
 > Tested-by: Vincent Donnefort <vdonnefort@google.com>
 > Signed-off-by: Quentin Perret <qperret@google.com>
 > Signed-off-by: Will Deacon <will@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h          | 14 +++
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +
->  arch/arm64/kvm/hyp/include/nvhe/mm.h          |  4 +
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  1 -
->  arch/arm64/kvm/hyp/nvhe/mm.c                  | 94 +++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/setup.c               |  4 +
->  arch/arm64/kvm/hyp/pgtable.c                  | 12 ---
->  7 files changed, 118 insertions(+), 13 deletions(-)
+>   arch/arm64/kvm/hyp/nvhe/mem_protect.c | 22 ++++++++++++++++------
+>   1 file changed, 16 insertions(+), 6 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 4f6d79fe4352..b2a886c9e78d 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -30,6 +30,8 @@ typedef u64 kvm_pte_t;
->  #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
->  #define KVM_PTE_ADDR_51_48		GENMASK(15, 12)
->  
-> +#define KVM_PHYS_INVALID		(-1ULL)
-> +
->  static inline bool kvm_pte_valid(kvm_pte_t pte)
->  {
->  	return pte & KVM_PTE_VALID;
-> @@ -45,6 +47,18 @@ static inline u64 kvm_pte_to_phys(kvm_pte_t pte)
->  	return pa;
->  }
->  
-> +static inline kvm_pte_t kvm_phys_to_pte(u64 pa)
-> +{
-> +	kvm_pte_t pte = pa & KVM_PTE_ADDR_MASK;
-> +
-> +	if (PAGE_SHIFT == 16) {
-> +		pa &= GENMASK(51, 48);
-> +		pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
-> +	}
-> +
-> +	return pte;
-> +}
-> +
->  static inline u64 kvm_granule_shift(u32 level)
->  {
->  	/* Assumes KVM_PGTABLE_MAX_LEVELS is 4 */
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index ce9a796a85ee..ef31a1872c93 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -59,6 +59,8 @@ enum pkvm_component_id {
->  	PKVM_ID_HYP,
->  };
->  
-> +extern unsigned long hyp_nr_cpus;
-> +
->  int __pkvm_prot_finalize(void);
->  int __pkvm_host_share_hyp(u64 pfn);
->  int __pkvm_host_unshare_hyp(u64 pfn);
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-> index b2ee6d5df55b..d5ec972b5c1e 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-> @@ -13,6 +13,10 @@
->  extern struct kvm_pgtable pkvm_pgtable;
->  extern hyp_spinlock_t pkvm_pgd_lock;
->  
-> +int hyp_create_pcpu_fixmap(void);
-> +void *hyp_fixmap_map(phys_addr_t phys);
-> +void hyp_fixmap_unmap(void);
-> +
->  int hyp_create_idmap(u32 hyp_va_bits);
->  int hyp_map_vectors(void);
->  int hyp_back_vmemmap(phys_addr_t back);
 > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 2ef6aaa21ba5..1c38451050e5 100644
+> index c30402737548..a7156fd13bc8 100644
 > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -21,7 +21,6 @@
->  
->  #define KVM_HOST_S2_FLAGS (KVM_PGTABLE_S2_NOFWB | KVM_PGTABLE_S2_IDMAP)
->  
-> -extern unsigned long hyp_nr_cpus;
->  struct host_mmu host_mmu;
->  
->  static struct hyp_pool host_s2_pool;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-> index d3a3b47181de..b77215630d5c 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-> @@ -14,6 +14,7 @@
->  #include <nvhe/early_alloc.h>
->  #include <nvhe/gfp.h>
->  #include <nvhe/memory.h>
-> +#include <nvhe/mem_protect.h>
->  #include <nvhe/mm.h>
->  #include <nvhe/spinlock.h>
->  
-> @@ -25,6 +26,12 @@ unsigned int hyp_memblock_nr;
->  
->  static u64 __io_map_base;
->  
-> +struct hyp_fixmap_slot {
-> +	u64 addr;
-> +	kvm_pte_t *ptep;
-> +};
-> +static DEFINE_PER_CPU(struct hyp_fixmap_slot, fixmap_slots);
-> +
->  static int __pkvm_create_mappings(unsigned long start, unsigned long size,
->  				  unsigned long phys, enum kvm_pgtable_prot prot)
->  {
-> @@ -212,6 +219,93 @@ int hyp_map_vectors(void)
->  	return 0;
->  }
->  
-> +void *hyp_fixmap_map(phys_addr_t phys)
-> +{
-> +	struct hyp_fixmap_slot *slot = this_cpu_ptr(&fixmap_slots);
-> +	kvm_pte_t pte, *ptep = slot->ptep;
-> +
-> +	pte = *ptep;
-> +	pte &= ~kvm_phys_to_pte(KVM_PHYS_INVALID);
-> +	pte |= kvm_phys_to_pte(phys) | KVM_PTE_VALID;
-> +	WRITE_ONCE(*ptep, pte);
-> +	dsb(nshst);
-> +
-> +	return (void *)slot->addr;
-> +}
-> +
-> +static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
-> +{
-> +	kvm_pte_t *ptep = slot->ptep;
-> +	u64 addr = slot->addr;
-> +
-> +	WRITE_ONCE(*ptep, *ptep & ~KVM_PTE_VALID);
-> +	dsb(nshst);
-> +	__tlbi_level(vale2, __TLBI_VADDR(addr, 0), (KVM_PGTABLE_MAX_LEVELS - 1));
-> +	dsb(nsh);
-> +	isb();
-> +}
+> @@ -193,7 +193,7 @@ struct kvm_mem_range {
+>   	u64 end;
+>   };
 
-Does each CPU have independent Stage-1 tables at EL2? i.e. each has a distinct
-root table?
-
-If the tables are shared, you need broadcast maintenance and ISH barriers here,
-or you risk the usual issues with asynchronous MMU behaviour.
-
-If those are per-cpu, sorry for the noise!
-
-Thanks,
-Mark.
-
-> +
-> +void hyp_fixmap_unmap(void)
-> +{
-> +	fixmap_clear_slot(this_cpu_ptr(&fixmap_slots));
+>   bool addr_is_memory(phys_addr_t phys)
+>   {
+>   	struct kvm_mem_range range;
+>   
+> -	return find_mem_range(phys, &range);
+> +	return !!find_mem_range(phys, &range);
 > +}
 > +
-> +static int __create_fixmap_slot_cb(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> +				   enum kvm_pgtable_walk_flags flag,
-> +				   void * const arg)
+> +static bool addr_is_allowed_memory(phys_addr_t phys)
 > +{
-> +	struct hyp_fixmap_slot *slot = per_cpu_ptr(&fixmap_slots, (u64)arg);
+> +	struct memblock_region *reg;
+> +	struct kvm_mem_range range;
 > +
-> +	if (!kvm_pte_valid(*ptep) || level != KVM_PGTABLE_MAX_LEVELS - 1)
-> +		return -EINVAL;
+> +	reg = find_mem_range(phys, &range);
 > +
-> +	slot->addr = addr;
-> +	slot->ptep = ptep;
-> +
-> +	/*
-> +	 * Clear the PTE, but keep the page-table page refcount elevated to
-> +	 * prevent it from ever being freed. This lets us manipulate the PTEs
-> +	 * by hand safely without ever needing to allocate memory.
-> +	 */
-> +	fixmap_clear_slot(slot);
-> +
-> +	return 0;
-> +}
-> +
-> +static int create_fixmap_slot(u64 addr, u64 cpu)
-> +{
-> +	struct kvm_pgtable_walker walker = {
-> +		.cb	= __create_fixmap_slot_cb,
-> +		.flags	= KVM_PGTABLE_WALK_LEAF,
-> +		.arg = (void *)cpu,
-> +	};
-> +
-> +	return kvm_pgtable_walk(&pkvm_pgtable, addr, PAGE_SIZE, &walker);
-> +}
-> +
-> +int hyp_create_pcpu_fixmap(void)
-> +{
-> +	unsigned long addr, i;
-> +	int ret;
-> +
-> +	for (i = 0; i < hyp_nr_cpus; i++) {
-> +		ret = pkvm_alloc_private_va_range(PAGE_SIZE, &addr);
-> +		if (ret)
-> +			return ret;
-> +
-> +		ret = kvm_pgtable_hyp_map(&pkvm_pgtable, addr, PAGE_SIZE,
-> +					  __hyp_pa(__hyp_bss_start), PAGE_HYP);
-> +		if (ret)
-> +			return ret;
-> +
-> +		ret = create_fixmap_slot(addr, i);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  int hyp_create_idmap(u32 hyp_va_bits)
->  {
->  	unsigned long start, end;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> index 2be72fbe7279..0f69c1393416 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> @@ -321,6 +321,10 @@ void __noreturn __pkvm_init_finalise(void)
->  	if (ret)
->  		goto out;
->  
-> +	ret = hyp_create_pcpu_fixmap();
-> +	if (ret)
-> +		goto out;
-> +
->  	pkvm_hyp_vm_table_init(vm_table_base);
->  out:
->  	/*
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index a1a27f88a312..2bcb2d5903ba 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -57,8 +57,6 @@ struct kvm_pgtable_walk_data {
->  	u64				end;
->  };
->  
-> -#define KVM_PHYS_INVALID (-1ULL)
-> -
->  static bool kvm_phys_is_valid(u64 phys)
->  {
->  	return phys < BIT(id_aa64mmfr0_parange_to_phys_shift(ID_AA64MMFR0_EL1_PARANGE_MAX));
-> @@ -122,16 +120,6 @@ static bool kvm_pte_table(kvm_pte_t pte, u32 level)
->  	return FIELD_GET(KVM_PTE_TYPE, pte) == KVM_PTE_TYPE_TABLE;
->  }
->  
-> -static kvm_pte_t kvm_phys_to_pte(u64 pa)
-> -{
-> -	kvm_pte_t pte = pa & KVM_PTE_ADDR_MASK;
-> -
-> -	if (PAGE_SHIFT == 16)
-> -		pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
-> -
-> -	return pte;
-> -}
-> -
->  static kvm_pte_t *kvm_pte_follow(kvm_pte_t pte, struct kvm_pgtable_mm_ops *mm_ops)
->  {
->  	return mm_ops->phys_to_virt(kvm_pte_to_phys(pte));
-> -- 
-> 2.38.0.413.g74048e4d9e-goog
-> 
+> +	return reg && !(reg->flags & MEMBLOCK_NOMAP);
+>   }
+>   
+>   static bool is_in_mem_range(u64 addr, struct kvm_mem_range *range)
+> @@ -346,7 +356,7 @@ static bool host_stage2_force_pte_cb(u64 addr, u64 end, enum kvm_pgtable_prot pr
+>   static int host_stage2_idmap(u64 addr)
+>   {
+>   	struct kvm_mem_range range;
+> -	bool is_memory = find_mem_range(addr, &range);
+> +	bool is_memory = !!find_mem_range(addr, &range);
+
+We don't replace by addr_is_allowed_memory() because we still use
+&range, OK.
+
+>   	enum kvm_pgtable_prot prot;
+>   	int ret;
+>   
+> @@ -424,7 +434,7 @@ static int __check_page_state_visitor(u64 addr, u64 end, u32 level,
+>   	struct check_walk_data *d = arg;
+>   	kvm_pte_t pte = *ptep;
+>   
+> -	if (kvm_pte_valid(pte) && !addr_is_memory(kvm_pte_to_phys(pte)))
+> +	if (kvm_pte_valid(pte) && !addr_is_allowed_memory(kvm_pte_to_phys(pte)))
+>   		return -EINVAL;
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
