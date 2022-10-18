@@ -1,102 +1,130 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02344C8A
-	for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 15:51:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1666108268;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BoKkcuxL5NREz5vjMqNcHiKa9FwvH6HgAB/kBFDCW9w=;
-	b=g/rhxnw/2kh8Kge3uMnNDqKfCpfX0B/mmIlKX4MVIpNu+9+/Gfnxw8X9R7bdDG2oj+PV7n
-	aATi+QhrmHe0oT3Jf0r3nnmKpewVt/Nn9VfKfEhmwtcb1bzmRLGo4ajBmt8L7Ufx1/hzj+
-	6thlgUrnNwpj8wHPDvSi7FyKlxCprUE=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-261-DNdPJk5kM5i8RhBdrKCNUA-1; Tue, 18 Oct 2022 11:51:06 -0400
-X-MC-Unique: DNdPJk5kM5i8RhBdrKCNUA-1
-Received: by mail-io1-f70.google.com with SMTP id 23-20020a5d9c57000000b006bbd963e8adso9826166iof.19
-        for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 08:51:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BoKkcuxL5NREz5vjMqNcHiKa9FwvH6HgAB/kBFDCW9w=;
-        b=Ft3wH4DwNclN5KbGn1048i2SXOE34NpfsFWqY6F9wGzWuB+VL6iPPJNz11oQh783mE
-         2rbD6MCXY79DLsO1sgfLqvoKX6/MTVJ4miamWrzqxw2+jFjmv9NqhHlyygq4BphOMVoI
-         oKgkYiEPN8wfOv/OoQdEPcAvX2ucysn2fIv2lpBBuOhgEGib7OwUyMlCShFAk714MbQA
-         RHl5czxzGF0VS91RTv3trq05VtB84p7kvKjsO5GjZAukDMKXVLDg+fGYKhu2oxbRzKNP
-         DKNTG35Olr3GGpyVdmvQwaHvGDTzSTRQyoF54P2A7L11AmISroeg6bPR0ug4Sc1FP3Qg
-         eKVQ==
-X-Gm-Message-State: ACrzQf2Tl1RnWawoJabMpZRxNlnTgE+93zLldCjbNVTBJDmFg2R6Ay/s
-	pyICMI/WhmjwP9r6jI6mUXYJYdH7m6IdqYt6Db6QmLPd29YwO0vGNMdpe1OBbeeA9Y7kfYoOCwK
-	ZMYx/E0ArI4Xs3Tki
-X-Received: by 2002:a05:6638:1903:b0:363:e824:2193 with SMTP id p3-20020a056638190300b00363e8242193mr2260587jal.40.1666108264900;
-        Tue, 18 Oct 2022 08:51:04 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7rTkkIhDBNg5wS6havwCc+dTDzEUFDvH98GZ+b7II2SM5/9WtuFcl6vpreWjVh7ZL84I5kVw==
-X-Received: by 2002:a05:6638:1903:b0:363:e824:2193 with SMTP id p3-20020a056638190300b00363e8242193mr2260559jal.40.1666108264633;
-        Tue, 18 Oct 2022 08:51:04 -0700 (PDT)
-Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
-        by smtp.gmail.com with ESMTPSA id h39-20020a022b27000000b00363c866d646sm1188924jaa.26.2022.10.18.08.51.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Oct 2022 08:51:04 -0700 (PDT)
-Date: Tue, 18 Oct 2022 11:50:59 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-	catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
-	andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
-	pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com,
-	suzuki.poulose@arm.com, alexandru.elisei@arm.com, seanjc@google.com,
-	shan.gavin@gmail.com
-Subject: Re: [PATCH v5 3/7] KVM: x86: Allow to use bitmap in ring-based dirty
- page tracking
-Message-ID: <Y07LY41y6ZRL3d3S@x1n>
-References: <Yz86gEbNflDpC8As@x1n>
- <a5e291b9-e862-7c71-3617-1620d5a7d407@redhat.com>
- <Y0A4VaSwllsSrVxT@x1n>
- <Y0SoX2/E828mbxuf@google.com>
- <Y0SvexjbHN78XVcq@xz-m1.local>
- <Y0SxnoT5u7+1TCT+@google.com>
- <Y0S2zY4G7jBxVgpu@xz-m1.local>
- <Y0TDCxfVVme8uPGU@google.com>
- <Y0mUh5dEErRVtfjl@x1n>
- <Y05X4o1TxxkvES9E@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCE94C8A
+	for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 15:56:45 +0000 (UTC)
+Received: from MUA
+	by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <mail@maciej.szmigiero.name>)
+	id 1okoxF-0006rH-E8; Tue, 18 Oct 2022 17:56:33 +0200
+Message-ID: <a1a8664c-4d06-89e7-8cfa-b730969bb841@maciej.szmigiero.name>
+Date: Tue, 18 Oct 2022 17:56:27 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <Y05X4o1TxxkvES9E@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Message-ID: <20221018155059.TGyqo18Fk_pkEIEZZ_016yPLKxFs-owZRPA27cRqYkA@z>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Content-Language: en-US, pl-PL
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
+ zhenyzha@redhat.com, shan.gavin@gmail.com, kvmarm@lists.linux.dev,
+ pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
+ ajones@ventanamicro.com
+References: <20221014071914.227134-1-gshan@redhat.com>
+ <20221014071914.227134-5-gshan@redhat.com>
+ <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
+ <bd5df92c-6870-8053-0b35-a2ad993970bd@redhat.com>
+ <da2b7db0-509a-c9e0-c36b-6487a265a779@redhat.com>
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH 4/6] KVM: selftests: memslot_perf_test: Support variable
+ guest page size
+In-Reply-To: <da2b7db0-509a-c9e0-c36b-6487a265a779@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Message-ID: <20221018155627.hg-dRGI2FdrhNY7BQiBiR2DOXPxH8vM26XWxcb_vt_M@z>
 
-On Tue, Oct 18, 2022 at 10:38:10AM +0300, Oliver Upton wrote:
-> If we ever get to the point that we can relax this restriction i think a
-> flag on the BITMAP_WITH_TABLE cap that says "I don't actually set any
-> bits in the bitmap" would do. We shouldn't hide the cap entirely, as
-> that would be ABI breakage for VMMs that expect bitmap+ring.
+On 18.10.2022 02:51, Gavin Shan wrote:
+> On 10/18/22 8:46 AM, Gavin Shan wrote:
+>> On 10/18/22 5:31 AM, Maciej S. Szmigiero wrote:
+>>> On 14.10.2022 09:19, Gavin Shan wrote:
+>>>> The test case is obviously broken on aarch64 because non-4KB guest
+>>>> page size is supported. The guest page size on aarch64 could be 4KB,
+>>>> 16KB or 64KB.
+>>>>
+>>>> This supports variable guest page size, mostly for aarch64.
+>>>>
+>>>>    - The host determines the guest page size when virtual machine is
+>>>>      created. The value is also passed to guest through the synchronization
+>>>>      area.
+>>>>
+>>>>    - The number of guest pages are unknown until the virtual machine
+>>>>      is to be created. So all the related macros are dropped. Instead,
+>>>>      their values are dynamically calculated based on the guest page
+>>>>      size.
+>>>>
+>>>>    - The static checks on memory sizes and pages becomes dependent
+>>>>      on guest page size, which is unknown until the virtual machine
+>>>>      is about to be created. So all the static checks are converted
+>>>>      to dynamic checks, done in check_memory_sizes().
+>>>>
+>>>>    - As the address passed to madvise() should be aligned to host page,
+>>>>      the size of page chunk is automatically selected, other than one
+>>>>      page.
+>>>>
+>>>>    - All other changes included in this patch are almost mechanical
+>>>>      replacing '4096' with 'guest_page_size'.
+>>>>
+>>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>>>> ---
+>>>>   .../testing/selftests/kvm/memslot_perf_test.c | 191 +++++++++++-------
+>>>>   1 file changed, 115 insertions(+), 76 deletions(-)
+>>>>
+>>>> diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
+>>>> index d5aa9148f96f..d587bd952ff9 100644
+>>>> --- a/tools/testing/selftests/kvm/memslot_perf_test.c
+>>>> +++ b/tools/testing/selftests/kvm/memslot_perf_test.c
+(...)
+>>>> @@ -77,8 +61,7 @@ static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
+>>>>    * for the total size of 25 pages.
+>>>>    * Hence, the maximum size here is 50 pages.
+>>>>    */
+>>>> -#define MEM_TEST_MOVE_SIZE_PAGES    (50)
+>>>> -#define MEM_TEST_MOVE_SIZE        (MEM_TEST_MOVE_SIZE_PAGES * 4096)
+>>>> +#define MEM_TEST_MOVE_SIZE        0x32000
+>>>
+>>> The above number seems less readable than an explicit value of 50 pages.
+>>>
+>>> In addition to that, it's 50 pages only with 4k page size, so at least
+>>> the comment above needs to be updated to reflect this fact.
+>>>
+>>
+>> Yeah, I will change the comments like below in next revision.
+>>
+>>   /*
+>>    * When running this test with 32k memslots, actually 32763 excluding
+>>    * the reserved memory slot 0, the memory for each slot is 0x4000 bytes.
+>>    * The last slot contains 0x19000 bytes memory. Hence, the maximum size
+>>    * here is 0x32000 bytes.
+>>    */
+>>
+> 
+> I will replace those numbers with readable ones like below :)
+> 
+> /*
+>   * When running this test with 32k memslots, actually 32763 excluding
+>   * the reserved memory slot 0, the memory for each slot is 16KB. The
+>   * last slot contains 100KB memory with the remaining 84KB. Hence,
+>   * the maximum size is double of that (200KB)
+>   */
 
-I'd rather drop the cap directly if it's just a boolean that tells us
-"whether we need bitmap to back rings". Btw when I said "dropping it" I
-meant "don't return 1 for the cap anymore" - we definitely need to make the
-cap macro stable as part of kvm API..
+Still, these numbers are for x86, which has KVM_INTERNAL_MEM_SLOTS
+defined as 3.
 
-But I think I misunderstood the proposal previously, sorry. I assumed we
-were discussing an internal HAVE_DIRTY_RING_WITH_BITMAP only.  I noticed
-this only after I had a closer look at Gavin's patch.  Having a cap exposed
-sounds always good to me.
+As far as I can see aarch64 has KVM_INTERNAL_MEM_SLOTS equal to 0, so
+this arch has 32766 slot available for the test memory.
 
-I'll comment on Gavin's patch directly, thanks.
+Quick calculations show that this will result in 112 KiB of memory in
+the last slot for 4 KiB page size (while for 64 KiB page size the
+maximum slot count for this test is 8192 anyway - not counting slot 0).
 
--- 
-Peter Xu
+> Thanks,
+> Gavin
+> 
+
+Thanks,
+Maciej
 
