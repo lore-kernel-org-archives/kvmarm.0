@@ -1,43 +1,43 @@
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD1F3200
-	for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 16:40:16 +0000 (UTC)
-Received: by mail-ed1-f51.google.com with SMTP id q19so21338099edd.10
-        for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 09:40:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92102563
+	for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 16:45:31 +0000 (UTC)
+Received: by mail-ed1-f52.google.com with SMTP id e18so21353961edj.3
+        for <kvmarm@lists.linux.dev>; Tue, 18 Oct 2022 09:45:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iOPA6fmSUQtvOcvu63Z4VIuGCcRSbgkai17AnO42Xg8=;
-        b=RwOSzwSlFSbCd7ZBY+OuXxbAjYHeUdWktNJRobH9SE1tBqo+ITG+S/2lqQ99WtmZGg
-         2aklvAWwCrZAx0WH3PgMsnj83COBQ8EHzUnN/XJ7xG6IsbY5W8R5VFOWceL//p/6rYJV
-         uIPytEw9UgH8/6EUaPS0RF+l5QZ1XgcJsIVQdyGngbNT6vPQuI/xdHCUv3ucc95MOCFB
-         /4X/44neCUuawCWgVLmlYyyt+MG8/pNfDjmANn88qH8rDWp0Ve4Y8GCi9bLi51hWzpdz
-         iDkB1tzuk46gjKvZYbU/sTHqsHpFLI3l87eHYe5xINvdWGxUBpfjq52o1EBlMeIiWQsq
-         tWiQ==
+        bh=OCJsHqR3fQYSgnggViyn3fMnrEwEtr4DogQg4RXYXfU=;
+        b=OTRdidlgd4M+FwW6O5/QmVZjVoFUteHzrGjxAXNpavm6P0/bJ2oKKpVtri2Z7qkcWS
+         5JWQYnY7afyOrgZhzZHFjmw9efVV2gjkQeFaMP+fmwcjwuS82qAivOdVz5DIm0te1MzR
+         Pwchuxk3ooNK3QdvuAjNh9l1YqcgHyan06709W1zjjCD+KSz3zjOVbT3bqFpQ2yp4hIC
+         qbJxL5Oy7NcTMET5jxqyahqZNxTVKcYbOiWxUa0zcvNgixzWyb14gNlz2O+9P7yC8xtY
+         EREtg4jooDmz6U6w/mtou9+3RUms1DMcQaOFJyWn+75HCVGcEWNWxCPIirthBvftBJoq
+         VGaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iOPA6fmSUQtvOcvu63Z4VIuGCcRSbgkai17AnO42Xg8=;
-        b=4LovynNwzfIh1Uz+RQBInphIeAd4DhtcEuL35S6vewNJs3/mHnqZTqYG7+XNxZCBPw
-         pYHqmnZyGMAxnLyuh6/XFNKgGGSMccmAzFhOkv3eMhS1MLCAb0kxLSZVPH5k0w9mjsSl
-         tUFxOvSLDKn18EVMbpaWoqJTzSgm+giRZ4gw0QVZOpd1eoOfHqpWpFuqystrbAYv0sln
-         7E7bYVr5OFnaaONaQSvwP5j2sju3mMEE+7duA1kfwFI4Ev7RLYmvC368mmk1iYka1ZLr
-         b22FPvpwwFCgXGEDH8Nz5FXEyIgGviHjywXVbBf+cU3ikbYMLD5pjLAAAU1JJaQwtIeY
-         Pl1g==
-X-Gm-Message-State: ACrzQf1L0rSabzityou7g47+XFbUgDH3N11oorTFPKBRMIU4O7LWf0Ga
-	RsgJ78nlYlqSMgviwfqt9dQN9w==
-X-Google-Smtp-Source: AMsMyM6jfwRi0igcgtP8NlX5XCTCI9iXBrg469ezzZODlwCSp+LE/lDHgH145M2jwzJFZG2F8RM4ZA==
-X-Received: by 2002:aa7:d348:0:b0:45b:8ae3:ee3d with SMTP id m8-20020aa7d348000000b0045b8ae3ee3dmr3440508edr.428.1666111214784;
-        Tue, 18 Oct 2022 09:40:14 -0700 (PDT)
+        bh=OCJsHqR3fQYSgnggViyn3fMnrEwEtr4DogQg4RXYXfU=;
+        b=R6x7Tft47riyo+QyxaiIIdj2mIFxmC9+Kw+1WKNXMgTVPmt0nL+00cBSL00YzAQ2vo
+         KzVNApPwn8GWRHMLodVxXUtxhJslynY7nbSg+LfgXhrJn6puKbCPaMJC9JzVY8oEoF06
+         71N9yaypqUT2Pimgnu44ZIARzmWPM/4q1X7ZUwfsxQfLXtJY0w9OphMEEjEHvw0JQh32
+         0ikcuFsOxJqlke/px6ZYSmxTgdlC5oZD/3cYXyg+asI4MQy7HON6usxAjJe8Y6LFTHeh
+         s37x4v1lLSmfqPc14bcWomhfxobABIEnn6YYiM7dGyRx/IG2f6gBbwgg/25kqANQDdzT
+         frgQ==
+X-Gm-Message-State: ACrzQf1S15iN/OMD2S0y6HA5tpl3cr2Fe4ZyYQ9EQx2Q5Y2PsTIgyLcD
+	eCdikT9Ntn9tW33o6St5z9Cc8XNI2bPuTQ==
+X-Google-Smtp-Source: AMsMyM6I0P0S9DziDRNVM+YYRXKEEihJKzfSjWKlLw6I00yhLT/182go6gfMS7BANtRyQPharE/Otw==
+X-Received: by 2002:a05:6402:909:b0:435:a8b:5232 with SMTP id g9-20020a056402090900b004350a8b5232mr3457453edz.240.1666111529948;
+        Tue, 18 Oct 2022 09:45:29 -0700 (PDT)
 Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id i18-20020a0564020f1200b00458a03203b1sm9244566eda.31.2022.10.18.09.40.14
+        by smtp.gmail.com with ESMTPSA id hx15-20020a170906846f00b0074134543f82sm7856285ejc.90.2022.10.18.09.45.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Oct 2022 09:40:14 -0700 (PDT)
-Date: Tue, 18 Oct 2022 16:40:11 +0000
+        Tue, 18 Oct 2022 09:45:29 -0700 (PDT)
+Date: Tue, 18 Oct 2022 16:45:26 +0000
 From: Quentin Perret <qperret@google.com>
 To: Will Deacon <will@kernel.org>
 Cc: kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
@@ -53,7 +53,7 @@ Cc: kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
 	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 Subject: Re: [PATCH v4 12/25] KVM: arm64: Add infrastructure to create and
  track pKVM instances at EL2
-Message-ID: <Y07W63YlwZ6yClOi@google.com>
+Message-ID: <Y07YJvEsUnjSasA0@google.com>
 References: <20221017115209.2099-1-will@kernel.org>
  <20221017115209.2099-13-will@kernel.org>
 Precedence: bulk
@@ -67,53 +67,24 @@ Content-Disposition: inline
 In-Reply-To: <20221017115209.2099-13-will@kernel.org>
 
 On Monday 17 Oct 2022 at 12:51:56 (+0100), Will Deacon wrote:
-> +static void *map_donated_memory_noclear(unsigned long host_va, size_t size)
+> +static int find_free_vm_table_entry(struct kvm *host_kvm)
 > +{
-> +	void *va = (void *)kern_hyp_va(host_va);
+> +	int i, ret = -ENOMEM;
 > +
-> +	if (!PAGE_ALIGNED(va))
-> +		return NULL;
+> +	for (i = 0; i < KVM_MAX_PVMS; ++i) {
+> +		struct pkvm_hyp_vm *vm = vm_table[i];
 > +
-> +	if (__pkvm_host_donate_hyp(hyp_virt_to_pfn(va),
-> +				   PAGE_ALIGN(size) >> PAGE_SHIFT))
-> +		return NULL;
+> +		if (!vm) {
+> +			if (ret < 0)
+> +				ret = i;
+> +			continue;
+> +		}
 > +
-> +	return va;
-> +}
-> +
-> +static void *map_donated_memory(unsigned long host_va, size_t size)
-> +{
-> +	void *va = map_donated_memory_noclear(host_va, size);
-> +
-> +	if (va)
-> +		memset(va, 0, size);
-> +
-> +	return va;
-> +}
-> +
-> +static void __unmap_donated_memory(void *va, size_t size)
-> +{
-> +	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(va),
-> +				       PAGE_ALIGN(size) >> PAGE_SHIFT));
-> +}
-> +
-> +static void unmap_donated_memory(void *va, size_t size)
-> +{
-> +	if (!va)
-> +		return;
-> +
-> +	memset(va, 0, size);
-> +	__unmap_donated_memory(va, size);
-> +}
-> +
-> +static void unmap_donated_memory_noclear(void *va, size_t size)
-> +{
-> +	if (!va)
-> +		return;
-> +
-> +	__unmap_donated_memory(va, size);
-> +}
+> +		if (unlikely(vm->host_kvm == host_kvm)) {
+> +			ret = -EEXIST;
+> +			break;
+> +		}
 
-Nit: I'm not a huge fan of the naming here, these do more than just
-map/unmap random pages. This only works for host pages, the donation
-path has permission checks, etc. Maybe {admit,return}_host_memory()?
+That would be funny if the host passed the same struct twice, but do we
+care? If the host wants to shoot itself in the foot, it's not our
+problem I guess :) ? Also, we don't do the same check for vCPUs so ...
