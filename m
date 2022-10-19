@@ -2,55 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D8CBC4332F
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Oct 2022 20:19:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A253DC433FE
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Oct 2022 23:17:53 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B57F4B8A0;
-	Wed, 19 Oct 2022 16:19:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAA0A4B8E6;
+	Wed, 19 Oct 2022 19:17:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8wtlN6Ob1sWC; Wed, 19 Oct 2022 16:19:09 -0400 (EDT)
+	with ESMTP id vgtpZgL2KZa8; Wed, 19 Oct 2022 19:17:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE5394B8F2;
-	Wed, 19 Oct 2022 16:19:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C93A4B8D0;
+	Wed, 19 Oct 2022 19:17:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EB874B8A0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 16:19:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B15BD4B869
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 19:17:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yEeMvRZyE-iz for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Oct 2022 16:19:06 -0400 (EDT)
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D2E54B89B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 16:19:06 -0400 (EDT)
-Received: from MUA by vps-vb.mhejs.net with esmtps (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94.2)
- (envelope-from <mail@maciej.szmigiero.name>)
- id 1olFWW-0003EF-DJ; Wed, 19 Oct 2022 22:18:44 +0200
-Message-ID: <a45cfcc9-0255-14f0-30a5-18d6efaad0d4@maciej.szmigiero.name>
-Date: Wed, 19 Oct 2022 22:18:38 +0200
+ with ESMTP id i-RRAtoLOtt6 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Oct 2022 19:17:49 -0400 (EDT)
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com
+ [209.85.214.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7CEE04B658
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 19:17:49 -0400 (EDT)
+Received: by mail-pl1-f178.google.com with SMTP id n7so18694309plp.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 16:17:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=Me73D3UIfDoCysc1MWGMK8EUvSaCv+Air3k0VL/BRN8=;
+ b=RmCtH8neEhRNB9EOWZTVkrahvAUVFTRCLPGLyV9Nb3VYKC99nZ2WwGhFzKu2zd6HVj
+ 0uiDQ0fsRP8/n8QzU7kIqDtbhRIkGoQL/i2SdXmhp8SDWC6ergvgFiSb+W1w4zuFcH2a
+ SZWduHd7knWotjL0Mm+L4nTpW9p7iR7JwE0yMzWN95zSotrbo9VjGX9yuDLmvdWRphjX
+ +H/H0qojfkImnsy0HIgOG6NIde3/7kIqOsCbLwiptGca8qtknEBtRNZfKvvivPq7IDt2
+ 3TNIVxbQksE24xTQ6z60h2Xdhr09RmEmeKnumzKlYfhKoC5eBLWNh5BT2+XEE/q2I0Cj
+ 6aTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=Me73D3UIfDoCysc1MWGMK8EUvSaCv+Air3k0VL/BRN8=;
+ b=V3iHdL0y8JNgVcBPEd/KjmCMlSfRhbnCGkTniDeOpXeq++nmGLKXhel4vzsxy3nbJ2
+ ML6Cf/NR3kJo+ZpZ3twnERbQCAx7oo66KShs6Dy7Tm7vXGimxmdKWGH5UX+tG6OdeTPn
+ 1yXDvFV4cQkYTqX2d3c8UHdNrDaBGzH+5vwdpXkvOU14ambtybis4khvsfwniEhnjtiv
+ QADTxlUe0yv1Dcec2ww32cL4chaN4LP8dlK29Zoi+kwje7uKhcgYNQVKcbJth3TJor5Q
+ hHhjuBQgjYqZQ+P8RRyXMfa3bwnQedHCjUxLokkXdHg8bgwNASUa1nHQosVgqQpHfSJG
+ c3KA==
+X-Gm-Message-State: ACrzQf1w69yaQsGgf2sWXRD5eRx+3Q5qBjNmCRLQ/nvE2hrvr7bSu6og
+ gd0mq3Y8HQbqAfQEb/sBuC67nA==
+X-Google-Smtp-Source: AMsMyM7BE+rbsUH5R/9cYMnwScFvrtkWbyHC05khyxy3u7jhhyoNaEpU284lTQQEk+0awE2RbPVfvw==
+X-Received: by 2002:a17:90a:b28d:b0:20d:6790:19fa with SMTP id
+ c13-20020a17090ab28d00b0020d679019famr47693623pjr.68.1666221468020; 
+ Wed, 19 Oct 2022 16:17:48 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ s8-20020a170902ea0800b00176a579fae8sm6310265plg.210.2022.10.19.16.17.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 19 Oct 2022 16:17:47 -0700 (PDT)
+Date: Wed, 19 Oct 2022 23:17:43 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 07/15] KVM: arm64: Use an opaque type for pteps
+Message-ID: <Y1CFl8sLllXm4seK@google.com>
+References: <20221007232818.459650-1-oliver.upton@linux.dev>
+ <20221007232818.459650-8-oliver.upton@linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Content-Language: en-US, pl-PL
-To: Gavin Shan <gshan@redhat.com>
-References: <20221014071914.227134-1-gshan@redhat.com>
- <20221014071914.227134-5-gshan@redhat.com>
- <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
- <bd5df92c-6870-8053-0b35-a2ad993970bd@redhat.com>
- <da2b7db0-509a-c9e0-c36b-6487a265a779@redhat.com>
- <a1a8664c-4d06-89e7-8cfa-b730969bb841@maciej.szmigiero.name>
- <5bfbe050-a654-8400-e1f1-dcfa4dba13e6@redhat.com>
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH 4/6] KVM: selftests: memslot_perf_test: Support variable
- guest page size
-In-Reply-To: <5bfbe050-a654-8400-e1f1-dcfa4dba13e6@redhat.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
- zhenyzha@redhat.com, shan.gavin@gmail.com, kvmarm@lists.linux.dev,
- pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
- ajones@ventanamicro.com
+Content-Disposition: inline
+In-Reply-To: <20221007232818.459650-8-oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
+ Ben Gardon <bgardon@google.com>, David Matlack <dmatlack@google.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -62,142 +88,120 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMTkuMTAuMjAyMiAwMjoyNiwgR2F2aW4gU2hhbiB3cm90ZToKPiBPbiAxMC8xOC8yMiAxMTo1
-NiBQTSwgTWFjaWVqIFMuIFN6bWlnaWVybyB3cm90ZToKPj4gT24gMTguMTAuMjAyMiAwMjo1MSwg
-R2F2aW4gU2hhbiB3cm90ZToKPj4+IE9uIDEwLzE4LzIyIDg6NDYgQU0sIEdhdmluIFNoYW4gd3Jv
-dGU6Cj4+Pj4gT24gMTAvMTgvMjIgNTozMSBBTSwgTWFjaWVqIFMuIFN6bWlnaWVybyB3cm90ZToK
-Pj4+Pj4gT24gMTQuMTAuMjAyMiAwOToxOSwgR2F2aW4gU2hhbiB3cm90ZToKPj4+Pj4+IFRoZSB0
-ZXN0IGNhc2UgaXMgb2J2aW91c2x5IGJyb2tlbiBvbiBhYXJjaDY0IGJlY2F1c2Ugbm9uLTRLQiBn
-dWVzdAo+Pj4+Pj4gcGFnZSBzaXplIGlzIHN1cHBvcnRlZC4gVGhlIGd1ZXN0IHBhZ2Ugc2l6ZSBv
-biBhYXJjaDY0IGNvdWxkIGJlIDRLQiwKPj4+Pj4+IDE2S0Igb3IgNjRLQi4KPj4+Pj4+Cj4+Pj4+
-PiBUaGlzIHN1cHBvcnRzIHZhcmlhYmxlIGd1ZXN0IHBhZ2Ugc2l6ZSwgbW9zdGx5IGZvciBhYXJj
-aDY0Lgo+Pj4+Pj4KPj4+Pj4+IMKgwqAgLSBUaGUgaG9zdCBkZXRlcm1pbmVzIHRoZSBndWVzdCBw
-YWdlIHNpemUgd2hlbiB2aXJ0dWFsIG1hY2hpbmUgaXMKPj4+Pj4+IMKgwqDCoMKgIGNyZWF0ZWQu
-IFRoZSB2YWx1ZSBpcyBhbHNvIHBhc3NlZCB0byBndWVzdCB0aHJvdWdoIHRoZSBzeW5jaHJvbml6
-YXRpb24KPj4+Pj4+IMKgwqDCoMKgIGFyZWEuCj4+Pj4+Pgo+Pj4+Pj4gwqDCoCAtIFRoZSBudW1i
-ZXIgb2YgZ3Vlc3QgcGFnZXMgYXJlIHVua25vd24gdW50aWwgdGhlIHZpcnR1YWwgbWFjaGluZQo+
-Pj4+Pj4gwqDCoMKgwqAgaXMgdG8gYmUgY3JlYXRlZC4gU28gYWxsIHRoZSByZWxhdGVkIG1hY3Jv
-cyBhcmUgZHJvcHBlZC4gSW5zdGVhZCwKPj4+Pj4+IMKgwqDCoMKgIHRoZWlyIHZhbHVlcyBhcmUg
-ZHluYW1pY2FsbHkgY2FsY3VsYXRlZCBiYXNlZCBvbiB0aGUgZ3Vlc3QgcGFnZQo+Pj4+Pj4gwqDC
-oMKgwqAgc2l6ZS4KPj4+Pj4+Cj4+Pj4+PiDCoMKgIC0gVGhlIHN0YXRpYyBjaGVja3Mgb24gbWVt
-b3J5IHNpemVzIGFuZCBwYWdlcyBiZWNvbWVzIGRlcGVuZGVudAo+Pj4+Pj4gwqDCoMKgwqAgb24g
-Z3Vlc3QgcGFnZSBzaXplLCB3aGljaCBpcyB1bmtub3duIHVudGlsIHRoZSB2aXJ0dWFsIG1hY2hp
-bmUKPj4+Pj4+IMKgwqDCoMKgIGlzIGFib3V0IHRvIGJlIGNyZWF0ZWQuIFNvIGFsbCB0aGUgc3Rh
-dGljIGNoZWNrcyBhcmUgY29udmVydGVkCj4+Pj4+PiDCoMKgwqDCoCB0byBkeW5hbWljIGNoZWNr
-cywgZG9uZSBpbiBjaGVja19tZW1vcnlfc2l6ZXMoKS4KPj4+Pj4+Cj4+Pj4+PiDCoMKgIC0gQXMg
-dGhlIGFkZHJlc3MgcGFzc2VkIHRvIG1hZHZpc2UoKSBzaG91bGQgYmUgYWxpZ25lZCB0byBob3N0
-IHBhZ2UsCj4+Pj4+PiDCoMKgwqDCoCB0aGUgc2l6ZSBvZiBwYWdlIGNodW5rIGlzIGF1dG9tYXRp
-Y2FsbHkgc2VsZWN0ZWQsIG90aGVyIHRoYW4gb25lCj4+Pj4+PiDCoMKgwqDCoCBwYWdlLgo+Pj4+
-Pj4KPj4+Pj4+IMKgwqAgLSBBbGwgb3RoZXIgY2hhbmdlcyBpbmNsdWRlZCBpbiB0aGlzIHBhdGNo
-IGFyZSBhbG1vc3QgbWVjaGFuaWNhbAo+Pj4+Pj4gwqDCoMKgwqAgcmVwbGFjaW5nICc0MDk2JyB3
-aXRoICdndWVzdF9wYWdlX3NpemUnLgo+Pj4+Pj4KPj4+Pj4+IFNpZ25lZC1vZmYtYnk6IEdhdmlu
-IFNoYW4gPGdzaGFuQHJlZGhhdC5jb20+Cj4+Pj4+PiAtLS0KPj4+Pj4+IMKgIC4uLi90ZXN0aW5n
-L3NlbGZ0ZXN0cy9rdm0vbWVtc2xvdF9wZXJmX3Rlc3QuYyB8IDE5MSArKysrKysrKysrKy0tLS0t
-LS0KPj4+Pj4+IMKgIDEgZmlsZSBjaGFuZ2VkLCAxMTUgaW5zZXJ0aW9ucygrKSwgNzYgZGVsZXRp
-b25zKC0pCj4+Pj4+Pgo+Pj4+Pj4gZGlmZiAtLWdpdCBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3Rz
-L2t2bS9tZW1zbG90X3BlcmZfdGVzdC5jIGIvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL21l
-bXNsb3RfcGVyZl90ZXN0LmMKPj4+Pj4+IGluZGV4IGQ1YWE5MTQ4Zjk2Zi4uZDU4N2JkOTUyZmY5
-IDEwMDY0NAo+Pj4+Pj4gLS0tIGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL21lbXNsb3Rf
-cGVyZl90ZXN0LmMKPj4+Pj4+ICsrKyBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9tZW1z
-bG90X3BlcmZfdGVzdC5jCj4+ICguLi4pCj4+Pj4+PiBAQCAtNzcsOCArNjEsNyBAQCBzdGF0aWNf
-YXNzZXJ0KE1FTV9URVNUX1VOTUFQX1NJWkVfUEFHRVMgJQo+Pj4+Pj4gwqDCoCAqIGZvciB0aGUg
-dG90YWwgc2l6ZSBvZiAyNSBwYWdlcy4KPj4+Pj4+IMKgwqAgKiBIZW5jZSwgdGhlIG1heGltdW0g
-c2l6ZSBoZXJlIGlzIDUwIHBhZ2VzLgo+Pj4+Pj4gwqDCoCAqLwo+Pj4+Pj4gLSNkZWZpbmUgTUVN
-X1RFU1RfTU9WRV9TSVpFX1BBR0VTwqDCoMKgICg1MCkKPj4+Pj4+IC0jZGVmaW5lIE1FTV9URVNU
-X01PVkVfU0laRcKgwqDCoMKgwqDCoMKgIChNRU1fVEVTVF9NT1ZFX1NJWkVfUEFHRVMgKiA0MDk2
-KQo+Pj4+Pj4gKyNkZWZpbmUgTUVNX1RFU1RfTU9WRV9TSVpFwqDCoMKgwqDCoMKgwqAgMHgzMjAw
-MAo+Pj4+Pgo+Pj4+PiBUaGUgYWJvdmUgbnVtYmVyIHNlZW1zIGxlc3MgcmVhZGFibGUgdGhhbiBh
-biBleHBsaWNpdCB2YWx1ZSBvZiA1MCBwYWdlcy4KPj4+Pj4KPj4+Pj4gSW4gYWRkaXRpb24gdG8g
-dGhhdCwgaXQncyA1MCBwYWdlcyBvbmx5IHdpdGggNGsgcGFnZSBzaXplLCBzbyBhdCBsZWFzdAo+
-Pj4+PiB0aGUgY29tbWVudCBhYm92ZSBuZWVkcyB0byBiZSB1cGRhdGVkIHRvIHJlZmxlY3QgdGhp
-cyBmYWN0Lgo+Pj4+Pgo+Pj4+Cj4+Pj4gWWVhaCwgSSB3aWxsIGNoYW5nZSB0aGUgY29tbWVudHMg
-bGlrZSBiZWxvdyBpbiBuZXh0IHJldmlzaW9uLgo+Pj4+Cj4+Pj4gwqDCoC8qCj4+Pj4gwqDCoCAq
-IFdoZW4gcnVubmluZyB0aGlzIHRlc3Qgd2l0aCAzMmsgbWVtc2xvdHMsIGFjdHVhbGx5IDMyNzYz
-IGV4Y2x1ZGluZwo+Pj4+IMKgwqAgKiB0aGUgcmVzZXJ2ZWQgbWVtb3J5IHNsb3QgMCwgdGhlIG1l
-bW9yeSBmb3IgZWFjaCBzbG90IGlzIDB4NDAwMCBieXRlcy4KPj4+PiDCoMKgICogVGhlIGxhc3Qg
-c2xvdCBjb250YWlucyAweDE5MDAwIGJ5dGVzIG1lbW9yeS4gSGVuY2UsIHRoZSBtYXhpbXVtIHNp
-emUKPj4+PiDCoMKgICogaGVyZSBpcyAweDMyMDAwIGJ5dGVzLgo+Pj4+IMKgwqAgKi8KPj4+Pgo+
-Pj4KPj4+IEkgd2lsbCByZXBsYWNlIHRob3NlIG51bWJlcnMgd2l0aCByZWFkYWJsZSBvbmVzIGxp
-a2UgYmVsb3cgOikKPj4+Cj4+PiAvKgo+Pj4gwqDCoCogV2hlbiBydW5uaW5nIHRoaXMgdGVzdCB3
-aXRoIDMyayBtZW1zbG90cywgYWN0dWFsbHkgMzI3NjMgZXhjbHVkaW5nCj4+PiDCoMKgKiB0aGUg
-cmVzZXJ2ZWQgbWVtb3J5IHNsb3QgMCwgdGhlIG1lbW9yeSBmb3IgZWFjaCBzbG90IGlzIDE2S0Iu
-IFRoZQo+Pj4gwqDCoCogbGFzdCBzbG90IGNvbnRhaW5zIDEwMEtCIG1lbW9yeSB3aXRoIHRoZSBy
-ZW1haW5pbmcgODRLQi4gSGVuY2UsCj4+PiDCoMKgKiB0aGUgbWF4aW11bSBzaXplIGlzIGRvdWJs
-ZSBvZiB0aGF0ICgyMDBLQikKPj4+IMKgwqAqLwo+Pgo+PiBTdGlsbCwgdGhlc2UgbnVtYmVycyBh
-cmUgZm9yIHg4Niwgd2hpY2ggaGFzIEtWTV9JTlRFUk5BTF9NRU1fU0xPVFMKPj4gZGVmaW5lZCBh
-cyAzLgo+Pgo+PiBBcyBmYXIgYXMgSSBjYW4gc2VlIGFhcmNoNjQgaGFzIEtWTV9JTlRFUk5BTF9N
-RU1fU0xPVFMgZXF1YWwgdG8gMCwgc28KPj4gdGhpcyBhcmNoIGhhcyAzMjc2NiBzbG90IGF2YWls
-YWJsZSBmb3IgdGhlIHRlc3QgbWVtb3J5Lgo+Pgo+PiBRdWljayBjYWxjdWxhdGlvbnMgc2hvdyB0
-aGF0IHRoaXMgd2lsbCByZXN1bHQgaW4gMTEyIEtpQiBvZiBtZW1vcnkgaW4KPj4gdGhlIGxhc3Qg
-c2xvdCBmb3IgNCBLaUIgcGFnZSBzaXplICh3aGlsZSBmb3IgNjQgS2lCIHBhZ2Ugc2l6ZSB0aGUK
-Pj4gbWF4aW11bSBzbG90IGNvdW50IGZvciB0aGlzIHRlc3QgaXMgODE5MiBhbnl3YXkgLSBub3Qg
-Y291bnRpbmcgc2xvdCAwKS4KPj4KPiAKPiBJdCBzZWVtcyB5b3VyIGNhbGN1bGF0aW9uIGhhZCAo
-NTEyTUIrNjRLQiksIGluc3RlYWQgb2YgKDUxMk1CKzRLQikuCj4gSW4gdGhpcyBwYXJ0aWN1bGFy
-IHBhdGNoLCB3ZSBzdGlsbCBoYXZlICg1MTJNQis0S0IpLiBIb3cgYWJvdXQgdG8gY2hhbmdlCj4g
-bGlrZSBiZWxvdyBpbiB0aGlzIHBhdGNoLiBJbiBuZXh0IHBhdGNoLCBpdCdzIGFkanVzdGVkIGFj
-Y29yZGluZ2x5IGFmdGVyCj4gd2UgaGF2ZSAoNTEyTUIrNjRLQikuCgpNeSByZXZpZXcgY29tbWVu
-dCBhYm92ZSByZWZlcnJlZCB0byB0aGUgZmluYWwgTUVNX1NJWkUgdmFsdWUgYWZ0ZXIgdGhlCndo
-b2xlIHNlcmllcywgc28gNTEyIE1pQiArIDY0IEtpQi4KCkkgcGxhY2VkIHRoYXQgcmV2aWV3IGNv
-bW1lbnQgb24gcGF0Y2ggNCBzaW5jZSBpdCdzIHRoZSBvbmx5IHBhdGNoIGluIHRoaXMKc2VyaWVz
-IHRoYXQgbW9kaWZpZWQgdGhlIGNvZGUgY29tbWVudCBhYm91dCBNRU1fVEVTVF9NT1ZFX1NJWkUu
-Cgo+IAo+ICgxKSBJbiB0aGlzIHBhdGNoLCB0aGUgY29tbWVudCBpcyBjaGFuZ2VkIHRvIGFzIGJl
-bG93Cj4gCj4gIMKgwqDCoCAvKgo+ICDCoMKgwqDCoCAqIFdlIGhhdmUgZGlmZmVyZW50IG51bWJl
-ciBvZiBtZW1vcnkgc2xvdHMsIGV4Y2x1ZGluZyB0aGUgcmVzZXJ2ZWQKPiAgwqDCoMKgwqAgKiBt
-ZW1vcnkgc2xvdCAwLCBvbiB2YXJpb3VzIGFyY2hpdGVjdHVyZXMgYW5kIGNvbmZpZ3VyYXRpb25z
-LiBUaGUKPiAgwqDCoMKgwqAgKiBtZW1vcnkgc2l6ZSBpbiB0aGlzIHRlc3QgaXMgY2FsY3VsYXRl
-ZCBieSBkb3VibGluZyB0aGUgbWF4aW1hbAo+ICDCoMKgwqDCoCAqIG1lbW9yeSBzaXplIGluIGxh
-c3QgbWVtb3J5IHNsb3QsIHdpdGggYWxpZ25tZW50IHRvIHRoZSBsYXJnZXN0Cj4gIMKgwqDCoMKg
-ICogc3VwcG9ydGVkIHBhZ2Ugc2l6ZSAoNjRLQikuCj4gIMKgwqDCoMKgICoKPiAgwqDCoMKgwqAg
-KiBhcmNoaXRlY3R1cmXCoMKgIHNsb3RzwqDCoMKgIG1lbW9yeS1wZXItc2xvdMKgwqDCoCBtZW1v
-cnktb24tbGFzdC1zbG90Cj4gIMKgwqDCoMKgICogLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiAgwqDCoMKgwqAgKiB4ODYtNEtC
-wqDCoMKgwqDCoMKgwqAgMzI3NjPCoMKgwqAgMTZLQsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAgMTAwS0IKPiAgwqDCoMKgwqAgKiBhcm02NC00S0LCoMKgwqDCoMKgIDMyNzY2wqDCoMKgIDE2
-S0LCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDUyS0IKPiAgwqDCoMKgwqAgKiBhcm02NC02
-NEtCwqDCoMKgwqAgODE5MsKgwqDCoMKgIDY0S0LCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IDY0S0IKPiAgwqDCoMKgwqAgKi8KPiAgwqDCoMKgICNkZWZpbmUgTUVNX1RFU1RfTU9WRV9TSVpF
-wqDCoMKgIDB4NDAwMDDCoMKgwqDCoMKgwqDCoMKgwqDCoCAvKiAyNTZLQiAqLwo+Cj4gKDIpIElu
-IHRoZSBuZXh0IHBhdGNoLCB3aGVyZSB3ZSBoYXZlICg1MTJNQis2NEtCKSBhZnRlciB0aGUgdmFy
-aW91cwo+ICDCoMKgwqAgbWVtb3J5IHNpemVzIGFyZSBjb25zb2xpZGF0ZWQsIEl0IGlzIGFkanVz
-dGVkIGFjY29yZGluZ2x5IGFzIGJlbG93Lgo+IAo+ICDCoMKgwqAgLyoKPiAgwqDCoMKgwqAgKiBX
-ZSBoYXZlIGRpZmZlcmVudCBudW1iZXIgb2YgbWVtb3J5IHNsb3RzLCBleGNsdWRpbmcgdGhlIHJl
-c2VydmVkCj4gIMKgwqDCoMKgICogbWVtb3J5IHNsb3QgMCwgb24gdmFyaW91cyBhcmNoaXRlY3R1
-cmVzIGFuZCBjb25maWd1cmF0aW9ucy4gVGhlCj4gIMKgwqDCoMKgICogbWVtb3J5IHNpemUgaW4g
-dGhpcyB0ZXN0IGlzIGNhbGN1bGF0ZWQgYnkgZG91YmxpbmcgdGhlIG1heGltYWwKPiAgwqDCoMKg
-wqAgKiBtZW1vcnkgc2l6ZSBpbiBsYXN0IG1lbW9yeSBzbG90LCB3aXRoIGFsaWdubWVudCB0byB0
-aGUgbGFyZ2VzdAo+ICDCoMKgwqDCoCAqIHN1cHBvcnRlZCBwYWdlIHNpemUgKDY0S0IpLgo+ICDC
-oMKgwqDCoCAqCj4gIMKgwqDCoMKgICogYXJjaGl0ZWN0dXJlwqDCoCBzbG90c8KgwqDCoCBtZW1v
-cnktcGVyLXNsb3TCoMKgwqAgbWVtb3J5LW9uLWxhc3Qtc2xvdAo+ICDCoMKgwqDCoCAqIC0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-Cj4gIMKgwqDCoMKgICogeDg2LTRLQsKgwqDCoMKgwqDCoMKgIDMyNzYzwqDCoMKgIDE2S0LCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDE2MEtCCj4gIMKgwqDCoMKgICogYXJtNjQtNEtCwqDC
-oMKgwqDCoCAzMjc2NsKgwqDCoCAxNktCwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAxMTJL
-Qgo+ICDCoMKgwqDCoCAqIGFybTY0LTY0S0LCoMKgwqDCoCA4MTkywqDCoMKgwqAgNjRLQsKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgMTI4S0IKPiAgwqDCoMKgwqAgKi8KPiAgwqDCoMKgICNk
-ZWZpbmUgTUVNX1RFU1RfTU9WRV9TSVpFwqDCoMKgIDB4NTAwMDDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCAvKiAzMjBLQiAqLwoKTm93IE1FTV9URVNUX01PVkVfU0laRSBpcyB0b28gaGlnaCBmb3IgYXJt
-NjQtNEtCIGFuZCBhcm02NC02NEtCIGNhc2VzCihpdCBuZWVkcyAxNjAgS2lCIGluIHRoZSBsYXN0
-IHNsb3QgYnV0IGhhcyBsZXNzIGF2YWlsYWJsZSBpbiB0aGVzZSB0d28KY2FzZXMpLgoKVXNpbmcg
-YSB0ZXN0IHNpemUgb2YgMTkyIEtpQiBpbnN0ZWFkIHNlZW1zIGxpa2UgYSBzbWFsbCBkaWZmZXJl
-bmNlCmZyb20gdGhlIG9yaWdpbmFsIHNpemUgb2YgMjAwIEtpQiwgd2hpbGUgc3RpbGwgYmVpbmcg
-YWxpZ25lZCB0bwo2NCBLaUIuCgpUaGUgbW92ZSBiZW5jaG1hcmtzIHJ1bnRpbWUgZGlmZmVyZW5j
-ZSBvbiB4ODYtNEtCIHdpdGggdGhpcyBzaXplCihjb21wYXJlZCB0byBzaXplcyBvZiAyMDAgS2lC
-IGFuZCAzMjAgS2lCKSBzZWVtcyB0byBiZSBuZWdsaWdpYmxlLgoKU2luY2UgaXQncyBhbiBvZGQg
-bnVtYmVyIG9mIDY0IEtpQiBwYWdlcyAoMykgdGhlIGNvZGUgdGhhdCBoYWx2ZXMKdGhpcyBudW1i
-ZXIgb2YgcGFnZXMgd2lsbCBuZWVkIHRvIGJlIGFkanVzdGVkIHRvIG9wZXJhdGUgb24gcmF3CnNp
-emVzIGluc3RlYWQuCgpJIGNhbiBzZWUgYSBzaW5nbGUgYmxvY2sgb2YgY29kZSB0aGF0IHdpbGwg
-bmVlZCBzdWNoIGFkanVzdG1lbnQ6Cj4gaWYgKGxhc3RwYWdlcyA8IG1vdmVfcGFnZXMgLyAyKSB7
-Cj4gICAgICAgICAqbWF4c2xvdHMgPSAwOwo+ICAgICAgICAgcmV0dXJuIGZhbHNlOwo+IH0gICAK
-ClNpbWlsYXIgcmVtYXJrIGdvZXMgZm9yIHRoZSBjYXNlICgxKSBhYm92ZSwgd2hlcmUgeW91J2xs
-IHByb2JhYmx5IG5lZWQKdG8gdXNlIDY0IEtpQiB0ZXN0IGFyZWEgc2l6ZSAoaXQncyBvbmx5IGFu
-IGludGVybWVkaWF0ZSBmb3JtIG9mIGNvZGUKYmVmb3JlIHRoZSBmaW5hbCBwYXRjaCBjaGFuZ2Vz
-IHRoaXMgdmFsdWUgc28gaXQncyBmaW5lIGlmIGl0IGRvZXNuJ3QKcGVyZm9ybSBhcyB3ZWxsIGFz
-IHRoZSBmaW5hbCBmb3JtIG9mIHRoZSBjb2RlKS4KCj4gVGhhbmtzLAo+IEdhdmluCj4gCgpUaGFu
-a3MsCk1hY2llagoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBz
-Oi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Fri, Oct 07, 2022, Oliver Upton wrote:
+> Use an opaque type for pteps and require visitors explicitly dereference
+> the pointer before using. Protecting page table memory with RCU requires
+> that KVM dereferences RCU-annotated pointers before using. However, RCU
+> is not available for use in the nVHE hypervisor and the opaque type can
+> be conditionally annotated with RCU for the stage-2 MMU.
+> 
+> Call the type a 'pteref' to avoid a naming collision with raw pteps. No
+> functional change intended.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h |  9 ++++++++-
+>  arch/arm64/kvm/hyp/pgtable.c         | 23 ++++++++++++-----------
+>  2 files changed, 20 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index c33edcf36b5b..beb89eac155c 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -25,6 +25,13 @@ static inline u64 kvm_get_parange(u64 mmfr0)
+>  
+>  typedef u64 kvm_pte_t;
+>  
+> +typedef kvm_pte_t *kvm_pteref_t;
+> +
+> +static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
+> +{
+> +	return pteref;
+
+Returning the pointer is unsafe (when it becomes RCU-protected).  The full
+dereference of the data needs to occur under RCU protection, not just the retrieval
+of the pointer.  E.g. this (straw man) would be broken
+
+	bool table = kvm_pte_table(ctx.old, level);
+
+	rcu_read_lock();
+	ptep = kvm_dereference_pteref(pteref, flags & KVM_PGTABLE_WALK_SHARED);
+	rcu_read_unlock();
+
+	if (table && (ctx.flags & KVM_PGTABLE_WALK_TABLE_PRE))
+		ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_PRE);
+
+	if (!table && (ctx.flags & KVM_PGTABLE_WALK_LEAF)) {
+		ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_LEAF);
+		ctx.old = READ_ONCE(*ptep);
+		table = kvm_pte_table(ctx.old, level);
+	}
+
+as the read of the entry pointed at by ptep could be to a page table that is freed
+in an RCU callback.
+
+The naming collision you are trying to avoid is a symptom of this bad pattern,
+as there should never be "raw" pteps floating around, at least not in non-pKVM
+contexts that utilize RCU.
+
+> +}
+> +
+>  #define KVM_PTE_VALID			BIT(0)
+>  
+>  #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
+> @@ -170,7 +177,7 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
+>  struct kvm_pgtable {
+>  	u32					ia_bits;
+>  	u32					start_level;
+> -	kvm_pte_t				*pgd;
+> +	kvm_pteref_t				pgd;
+>  	struct kvm_pgtable_mm_ops		*mm_ops;
+>  
+>  	/* Stage-2 only */
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 02c33fccb178..6b6e1ed7ee2f 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -175,13 +175,14 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
+>  }
+>  
+>  static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
+> -			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pte_t *pgtable, u32 level);
+> +			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, u32 level);
+>  
+>  static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+>  				      struct kvm_pgtable_mm_ops *mm_ops,
+> -				      kvm_pte_t *ptep, u32 level)
+> +				      kvm_pteref_t pteref, u32 level)
+>  {
+>  	enum kvm_pgtable_walk_flags flags = data->walker->flags;
+> +	kvm_pte_t *ptep = kvm_dereference_pteref(pteref, false);
+>  	struct kvm_pgtable_visit_ctx ctx = {
+>  		.ptep	= ptep,
+>  		.old	= READ_ONCE(*ptep),
+
+This is where you want the protection to kick in, e.g. 
+
+  typedef kvm_pte_t __rcu *kvm_ptep_t;
+
+  static inline kvm_pte_t kvm_read_pte(kvm_ptep_t ptep)
+  {
+	return READ_ONCE(*rcu_dereference(ptep));
+  }
+
+		.old	= kvm_read_pte(ptep),
+
+In other words, the pointer itself isn't that's protected, it's PTE that the
+pointer points at that's protected.
+
+rcu_dereference() has no overhead when CONFIG_PROVE_RCU=n, i.e. there's no reason
+to "optimize" dereferences.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
