@@ -1,270 +1,208 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658E253A3
-	for <kvmarm@lists.linux.dev>; Wed, 19 Oct 2022 19:11:35 +0000 (UTC)
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-1326637be6eso21814728fac.13
-        for <kvmarm@lists.linux.dev>; Wed, 19 Oct 2022 12:11:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1uHI8D71nZXIPql0Ea/USh9ISq5jM79VtrVQ2e/RcjE=;
-        b=7zKSIjYxdPXn7PwPyDPf+0Kn0LfuDaw77hmyVNzCGBW0xAwH/BkXH1CrKdFazCRtQr
-         /98xgtOaVFNLEqq375sDRYypAcPXcSwtctATsuekZKmoP9X0SmqlGAMAunmcFFMMt3Wo
-         6exxphSVkeap9CDd4sso78g5K0rt3G6sWnhs1Z17ETZm6mI4UdrF9/AgoId2CHVW97e6
-         MnFHdp4M4TqTf7Nde9HblGRbFueLE5qEXIy5NhczyfIURzNlSSAOYhlllblHaILuVypY
-         /VSG/SQCt26x/fi1vB768lrK8qm22Z/YxZ2qAjHmMip0K3h2PxWjL3XfUAITTcz1nsRp
-         J5ww==
-X-Gm-Message-State: ACrzQf3BNDDp08B+nedFvdNpI9yWMqkSX5F3AsDzE/UvonWrYeNYc/vp
-	dv2APD3at+7XOTWgQ82CCA==
-X-Google-Smtp-Source: AMsMyM7WkeQ7g4p9Ezrvy829By+9j1qkB1Fwp6SHcF4UBut9w8J0q3DhODuEycKY6qUiN1eBQPjq9A==
-X-Received: by 2002:a05:6870:4713:b0:132:d3fb:9f80 with SMTP id b19-20020a056870471300b00132d3fb9f80mr5866965oaq.15.1666206694359;
-        Wed, 19 Oct 2022 12:11:34 -0700 (PDT)
-Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id 23-20020aca2117000000b00354efb5be11sm7001508oiz.15.2022.10.19.12.11.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Oct 2022 12:11:33 -0700 (PDT)
-Received: (nullmailer pid 3420904 invoked by uid 1000);
-	Wed, 19 Oct 2022 19:11:25 -0000
-From: Rob Herring <robh@kernel.org>
-Date: Wed, 19 Oct 2022 14:11:27 -0500
-Subject: [PATCH v2 4/7] perf: arm_spe: Drop BIT() and use FIELD_GET/PREP accessors
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812D553A3
+	for <kvmarm@lists.linux.dev>; Wed, 19 Oct 2022 20:19:05 +0000 (UTC)
+Received: from MUA
+	by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <mail@maciej.szmigiero.name>)
+	id 1olFWW-0003EF-DJ; Wed, 19 Oct 2022 22:18:44 +0200
+Message-ID: <a45cfcc9-0255-14f0-30a5-18d6efaad0d4@maciej.szmigiero.name>
+Date: Wed, 19 Oct 2022 22:18:38 +0200
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Content-Language: en-US, pl-PL
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
+ zhenyzha@redhat.com, shan.gavin@gmail.com, kvmarm@lists.linux.dev,
+ pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
+ ajones@ventanamicro.com
+References: <20221014071914.227134-1-gshan@redhat.com>
+ <20221014071914.227134-5-gshan@redhat.com>
+ <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
+ <bd5df92c-6870-8053-0b35-a2ad993970bd@redhat.com>
+ <da2b7db0-509a-c9e0-c36b-6487a265a779@redhat.com>
+ <a1a8664c-4d06-89e7-8cfa-b730969bb841@maciej.szmigiero.name>
+ <5bfbe050-a654-8400-e1f1-dcfa4dba13e6@redhat.com>
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH 4/6] KVM: selftests: memslot_perf_test: Support variable
+ guest page size
+In-Reply-To: <5bfbe050-a654-8400-e1f1-dcfa4dba13e6@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Message-ID: <20220825-arm-spe-v8-7-v2-4-e37322d68ac0@kernel.org>
-References: <20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org>
-In-Reply-To: <20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org>
-To: Namhyung Kim <namhyung@kernel.org>, James Morse <james.morse@arm.com>, Ingo Molnar <mingo@redhat.com>, Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, Oliver Upton <oliver.upton@linux.dev>, Jiri Olsa <jolsa@kernel.org>
-Cc: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.11.0-dev
-Message-ID: <20221019191127.HOlXrYtWYBKePh8aWRS60uaFnS3fT1UrYa7E8y8FBxI@z>
+Message-ID: <20221019201838.AsKs8XMmib1ECwY7hZHpphf1ujlQd4pr6Q56p77nbP4@z>
 
-Now that generated sysregs are in place, update the register field
-accesses. The use of BIT() is no longer needed with the new defines. Use
-FIELD_GET and FIELD_PREP instead of open coding masking and shifting.
+On 19.10.2022 02:26, Gavin Shan wrote:
+> On 10/18/22 11:56 PM, Maciej S. Szmigiero wrote:
+>> On 18.10.2022 02:51, Gavin Shan wrote:
+>>> On 10/18/22 8:46 AM, Gavin Shan wrote:
+>>>> On 10/18/22 5:31 AM, Maciej S. Szmigiero wrote:
+>>>>> On 14.10.2022 09:19, Gavin Shan wrote:
+>>>>>> The test case is obviously broken on aarch64 because non-4KB guest
+>>>>>> page size is supported. The guest page size on aarch64 could be 4KB,
+>>>>>> 16KB or 64KB.
+>>>>>>
+>>>>>> This supports variable guest page size, mostly for aarch64.
+>>>>>>
+>>>>>>    - The host determines the guest page size when virtual machine is
+>>>>>>      created. The value is also passed to guest through the synchronization
+>>>>>>      area.
+>>>>>>
+>>>>>>    - The number of guest pages are unknown until the virtual machine
+>>>>>>      is to be created. So all the related macros are dropped. Instead,
+>>>>>>      their values are dynamically calculated based on the guest page
+>>>>>>      size.
+>>>>>>
+>>>>>>    - The static checks on memory sizes and pages becomes dependent
+>>>>>>      on guest page size, which is unknown until the virtual machine
+>>>>>>      is about to be created. So all the static checks are converted
+>>>>>>      to dynamic checks, done in check_memory_sizes().
+>>>>>>
+>>>>>>    - As the address passed to madvise() should be aligned to host page,
+>>>>>>      the size of page chunk is automatically selected, other than one
+>>>>>>      page.
+>>>>>>
+>>>>>>    - All other changes included in this patch are almost mechanical
+>>>>>>      replacing '4096' with 'guest_page_size'.
+>>>>>>
+>>>>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>>>>>> ---
+>>>>>>   .../testing/selftests/kvm/memslot_perf_test.c | 191 +++++++++++-------
+>>>>>>   1 file changed, 115 insertions(+), 76 deletions(-)
+>>>>>>
+>>>>>> diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
+>>>>>> index d5aa9148f96f..d587bd952ff9 100644
+>>>>>> --- a/tools/testing/selftests/kvm/memslot_perf_test.c
+>>>>>> +++ b/tools/testing/selftests/kvm/memslot_perf_test.c
+>> (...)
+>>>>>> @@ -77,8 +61,7 @@ static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
+>>>>>>    * for the total size of 25 pages.
+>>>>>>    * Hence, the maximum size here is 50 pages.
+>>>>>>    */
+>>>>>> -#define MEM_TEST_MOVE_SIZE_PAGES    (50)
+>>>>>> -#define MEM_TEST_MOVE_SIZE        (MEM_TEST_MOVE_SIZE_PAGES * 4096)
+>>>>>> +#define MEM_TEST_MOVE_SIZE        0x32000
+>>>>>
+>>>>> The above number seems less readable than an explicit value of 50 pages.
+>>>>>
+>>>>> In addition to that, it's 50 pages only with 4k page size, so at least
+>>>>> the comment above needs to be updated to reflect this fact.
+>>>>>
+>>>>
+>>>> Yeah, I will change the comments like below in next revision.
+>>>>
+>>>>   /*
+>>>>    * When running this test with 32k memslots, actually 32763 excluding
+>>>>    * the reserved memory slot 0, the memory for each slot is 0x4000 bytes.
+>>>>    * The last slot contains 0x19000 bytes memory. Hence, the maximum size
+>>>>    * here is 0x32000 bytes.
+>>>>    */
+>>>>
+>>>
+>>> I will replace those numbers with readable ones like below :)
+>>>
+>>> /*
+>>>   * When running this test with 32k memslots, actually 32763 excluding
+>>>   * the reserved memory slot 0, the memory for each slot is 16KB. The
+>>>   * last slot contains 100KB memory with the remaining 84KB. Hence,
+>>>   * the maximum size is double of that (200KB)
+>>>   */
+>>
+>> Still, these numbers are for x86, which has KVM_INTERNAL_MEM_SLOTS
+>> defined as 3.
+>>
+>> As far as I can see aarch64 has KVM_INTERNAL_MEM_SLOTS equal to 0, so
+>> this arch has 32766 slot available for the test memory.
+>>
+>> Quick calculations show that this will result in 112 KiB of memory in
+>> the last slot for 4 KiB page size (while for 64 KiB page size the
+>> maximum slot count for this test is 8192 anyway - not counting slot 0).
+>>
+> 
+> It seems your calculation had (512MB+64KB), instead of (512MB+4KB).
+> In this particular patch, we still have (512MB+4KB). How about to change
+> like below in this patch. In next patch, it's adjusted accordingly after
+> we have (512MB+64KB).
 
-No functional change.
+My review comment above referred to the final MEM_SIZE value after the
+whole series, so 512 MiB + 64 KiB.
 
-Signed-off-by: Rob Herring <robh@kernel.org>
----
- drivers/perf/arm_spe_pmu.c | 70 ++++++++++++++++++++++------------------------
- 1 file changed, 34 insertions(+), 36 deletions(-)
+I placed that review comment on patch 4 since it's the only patch in this
+series that modified the code comment about MEM_TEST_MOVE_SIZE.
 
-diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-index 814ed18346b6..9b4bd72087ea 100644
---- a/drivers/perf/arm_spe_pmu.c
-+++ b/drivers/perf/arm_spe_pmu.c
-@@ -283,18 +283,18 @@ static u64 arm_spe_event_to_pmscr(struct perf_event *event)
- 	struct perf_event_attr *attr = &event->attr;
- 	u64 reg = 0;
- 
--	reg |= ATTR_CFG_GET_FLD(attr, ts_enable) << PMSCR_EL1_TS_SHIFT;
--	reg |= ATTR_CFG_GET_FLD(attr, pa_enable) << PMSCR_EL1_PA_SHIFT;
--	reg |= ATTR_CFG_GET_FLD(attr, pct_enable) << PMSCR_EL1_PCT_SHIFT;
-+	reg |= FIELD_PREP(PMSCR_EL1_TS, ATTR_CFG_GET_FLD(attr, ts_enable));
-+	reg |= FIELD_PREP(PMSCR_EL1_PA, ATTR_CFG_GET_FLD(attr, pa_enable));
-+	reg |= FIELD_PREP(PMSCR_EL1_PCT, ATTR_CFG_GET_FLD(attr, pct_enable));
- 
- 	if (!attr->exclude_user)
--		reg |= BIT(PMSCR_EL1_E0SPE_SHIFT);
-+		reg |= PMSCR_EL1_E0SPE;
- 
- 	if (!attr->exclude_kernel)
--		reg |= BIT(PMSCR_EL1_E1SPE_SHIFT);
-+		reg |= PMSCR_EL1_E1SPE;
- 
- 	if (get_spe_event_has_cx(event))
--		reg |= BIT(PMSCR_EL1_CX_SHIFT);
-+		reg |= PMSCR_EL1_CX;
- 
- 	return reg;
- }
-@@ -322,7 +322,7 @@ static u64 arm_spe_event_to_pmsirr(struct perf_event *event)
- 
- 	arm_spe_event_sanitise_period(event);
- 
--	reg |= ATTR_CFG_GET_FLD(attr, jitter) << PMSIRR_EL1_RND_SHIFT;
-+	reg |= FIELD_PREP(PMSIRR_EL1_RND, ATTR_CFG_GET_FLD(attr, jitter));
- 	reg |= event->hw.sample_period;
- 
- 	return reg;
-@@ -333,18 +333,18 @@ static u64 arm_spe_event_to_pmsfcr(struct perf_event *event)
- 	struct perf_event_attr *attr = &event->attr;
- 	u64 reg = 0;
- 
--	reg |= ATTR_CFG_GET_FLD(attr, load_filter) << PMSFCR_EL1_LD_SHIFT;
--	reg |= ATTR_CFG_GET_FLD(attr, store_filter) << PMSFCR_EL1_ST_SHIFT;
--	reg |= ATTR_CFG_GET_FLD(attr, branch_filter) << PMSFCR_EL1_B_SHIFT;
-+	reg |= FIELD_PREP(PMSFCR_EL1_LD, ATTR_CFG_GET_FLD(attr, load_filter));
-+	reg |= FIELD_PREP(PMSFCR_EL1_ST, ATTR_CFG_GET_FLD(attr, store_filter));
-+	reg |= FIELD_PREP(PMSFCR_EL1_B, ATTR_CFG_GET_FLD(attr, branch_filter));
- 
- 	if (reg)
--		reg |= BIT(PMSFCR_EL1_FT_SHIFT);
-+		reg |= PMSFCR_EL1_FT;
- 
- 	if (ATTR_CFG_GET_FLD(attr, event_filter))
--		reg |= BIT(PMSFCR_EL1_FE_SHIFT);
-+		reg |= PMSFCR_EL1_FE;
- 
- 	if (ATTR_CFG_GET_FLD(attr, min_latency))
--		reg |= BIT(PMSFCR_EL1_FL_SHIFT);
-+		reg |= PMSFCR_EL1_FL;
- 
- 	return reg;
- }
-@@ -358,8 +358,7 @@ static u64 arm_spe_event_to_pmsevfr(struct perf_event *event)
- static u64 arm_spe_event_to_pmslatfr(struct perf_event *event)
- {
- 	struct perf_event_attr *attr = &event->attr;
--	return ATTR_CFG_GET_FLD(attr, min_latency)
--	       << PMSLATFR_EL1_MINLAT_SHIFT;
-+	return FIELD_PREP(PMSLATFR_EL1_MINLAT, ATTR_CFG_GET_FLD(attr, min_latency));
- }
- 
- static void arm_spe_pmu_pad_buf(struct perf_output_handle *handle, int len)
-@@ -511,7 +510,7 @@ static void arm_spe_perf_aux_output_begin(struct perf_output_handle *handle,
- 	limit = buf->snapshot ? arm_spe_pmu_next_snapshot_off(handle)
- 			      : arm_spe_pmu_next_off(handle);
- 	if (limit)
--		limit |= BIT(PMBLIMITR_EL1_E_SHIFT);
-+		limit |= PMBLIMITR_EL1_E;
- 
- 	limit += (u64)buf->base;
- 	base = (u64)buf->base + PERF_IDX2OFF(handle->head, buf);
-@@ -570,23 +569,23 @@ arm_spe_pmu_buf_get_fault_act(struct perf_output_handle *handle)
- 
- 	/* Service required? */
- 	pmbsr = read_sysreg_s(SYS_PMBSR_EL1);
--	if (!(pmbsr & BIT(PMBSR_EL1_S_SHIFT)))
-+	if (!FIELD_GET(PMBSR_EL1_S, pmbsr))
- 		return SPE_PMU_BUF_FAULT_ACT_SPURIOUS;
- 
- 	/*
- 	 * If we've lost data, disable profiling and also set the PARTIAL
- 	 * flag to indicate that the last record is corrupted.
- 	 */
--	if (pmbsr & BIT(PMBSR_EL1_DL_SHIFT))
-+	if (FIELD_GET(PMBSR_EL1_DL, pmbsr))
- 		perf_aux_output_flag(handle, PERF_AUX_FLAG_TRUNCATED |
- 					     PERF_AUX_FLAG_PARTIAL);
- 
- 	/* Report collisions to userspace so that it can up the period */
--	if (pmbsr & BIT(PMBSR_EL1_COLL_SHIFT))
-+	if (FIELD_GET(PMBSR_EL1_COLL, pmbsr))
- 		perf_aux_output_flag(handle, PERF_AUX_FLAG_COLLISION);
- 
- 	/* We only expect buffer management events */
--	switch (FIELD_GET(PMBSR_EL1_EC_MASK, pmbsr)) {
-+	switch (FIELD_GET(PMBSR_EL1_EC, pmbsr)) {
- 	case PMBSR_EL1_EC_BUF:
- 		/* Handled below */
- 		break;
-@@ -716,23 +715,22 @@ static int arm_spe_pmu_event_init(struct perf_event *event)
- 		return -EINVAL;
- 
- 	reg = arm_spe_event_to_pmsfcr(event);
--	if ((reg & BIT(PMSFCR_EL1_FE_SHIFT)) &&
-+	if ((FIELD_GET(PMSFCR_EL1_FE, reg)) &&
- 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_EVT))
- 		return -EOPNOTSUPP;
- 
--	if ((reg & BIT(PMSFCR_EL1_FT_SHIFT)) &&
-+	if ((FIELD_GET(PMSFCR_EL1_FT, reg)) &&
- 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_TYP))
- 		return -EOPNOTSUPP;
- 
--	if ((reg & BIT(PMSFCR_EL1_FL_SHIFT)) &&
-+	if ((FIELD_GET(PMSFCR_EL1_FL, reg)) &&
- 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_LAT))
- 		return -EOPNOTSUPP;
- 
- 	set_spe_event_has_cx(event);
- 	reg = arm_spe_event_to_pmscr(event);
- 	if (!perfmon_capable() &&
--	    (reg & (BIT(PMSCR_EL1_PA_SHIFT) |
--		    BIT(PMSCR_EL1_PCT_SHIFT))))
-+	    (reg & (PMSCR_EL1_PA | PMSCR_EL1_PCT)))
- 		return -EACCES;
- 
- 	return 0;
-@@ -970,14 +968,14 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 
- 	/* Read PMBIDR first to determine whether or not we have access */
- 	reg = read_sysreg_s(SYS_PMBIDR_EL1);
--	if (reg & BIT(PMBIDR_EL1_P_SHIFT)) {
-+	if (FIELD_GET(PMBIDR_EL1_P, reg)) {
- 		dev_err(dev,
- 			"profiling buffer owned by higher exception level\n");
- 		return;
- 	}
- 
- 	/* Minimum alignment. If it's out-of-range, then fail the probe */
--	fld = (reg & PMBIDR_EL1_ALIGN_MASK) >> PMBIDR_EL1_ALIGN_SHIFT;
-+	fld = FIELD_GET(PMBIDR_EL1_ALIGN, reg);
- 	spe_pmu->align = 1 << fld;
- 	if (spe_pmu->align > SZ_2K) {
- 		dev_err(dev, "unsupported PMBIDR.Align [%d] on CPU %d\n",
-@@ -987,26 +985,26 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 
- 	/* It's now safe to read PMSIDR and figure out what we've got */
- 	reg = read_sysreg_s(SYS_PMSIDR_EL1);
--	if (reg & BIT(PMSIDR_EL1_FE_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_FE, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_FILT_EVT;
- 
--	if (reg & BIT(PMSIDR_EL1_FT_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_FT, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_FILT_TYP;
- 
--	if (reg & BIT(PMSIDR_EL1_FL_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_FL, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_FILT_LAT;
- 
--	if (reg & BIT(PMSIDR_EL1_ARCHINST_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_ARCHINST, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_ARCH_INST;
- 
--	if (reg & BIT(PMSIDR_EL1_LDS_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_LDS, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_LDS;
- 
--	if (reg & BIT(PMSIDR_EL1_ERND_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_ERND, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_ERND;
- 
- 	/* This field has a spaced out encoding, so just use a look-up */
--	fld = (reg & PMSIDR_EL1_INTERVAL_MASK) >> PMSIDR_EL1_INTERVAL_SHIFT;
-+	fld = FIELD_GET(PMSIDR_EL1_INTERVAL, reg);
- 	switch (fld) {
- 	case 0:
- 		spe_pmu->min_period = 256;
-@@ -1038,7 +1036,7 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 	}
- 
- 	/* Maximum record size. If it's out-of-range, then fail the probe */
--	fld = (reg & PMSIDR_EL1_MAXSIZE_MASK) >> PMSIDR_EL1_MAXSIZE_SHIFT;
-+	fld = FIELD_GET(PMSIDR_EL1_MAXSIZE, reg);
- 	spe_pmu->max_record_sz = 1 << fld;
- 	if (spe_pmu->max_record_sz > SZ_2K || spe_pmu->max_record_sz < 16) {
- 		dev_err(dev, "unsupported PMSIDR_EL1.MaxSize [%d] on CPU %d\n",
-@@ -1046,7 +1044,7 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 		return;
- 	}
- 
--	fld = (reg & PMSIDR_EL1_COUNTSIZE_MASK) >> PMSIDR_EL1_COUNTSIZE_SHIFT;
-+	fld = FIELD_GET(PMSIDR_EL1_COUNTSIZE, reg);
- 	switch (fld) {
- 	default:
- 		dev_warn(dev, "unknown PMSIDR_EL1.CountSize [%d]; assuming 2\n",
+> 
+> (1) In this patch, the comment is changed to as below
+> 
+>      /*
+>       * We have different number of memory slots, excluding the reserved
+>       * memory slot 0, on various architectures and configurations. The
+>       * memory size in this test is calculated by doubling the maximal
+>       * memory size in last memory slot, with alignment to the largest
+>       * supported page size (64KB).
+>       *
+>       * architecture   slots    memory-per-slot    memory-on-last-slot
+>       * --------------------------------------------------------------
+>       * x86-4KB        32763    16KB               100KB
+>       * arm64-4KB      32766    16KB               52KB
+>       * arm64-64KB     8192     64KB               64KB
+>       */
+>      #define MEM_TEST_MOVE_SIZE    0x40000           /* 256KB */
+>
+> (2) In the next patch, where we have (512MB+64KB) after the various
+>      memory sizes are consolidated, It is adjusted accordingly as below.
+> 
+>      /*
+>       * We have different number of memory slots, excluding the reserved
+>       * memory slot 0, on various architectures and configurations. The
+>       * memory size in this test is calculated by doubling the maximal
+>       * memory size in last memory slot, with alignment to the largest
+>       * supported page size (64KB).
+>       *
+>       * architecture   slots    memory-per-slot    memory-on-last-slot
+>       * --------------------------------------------------------------
+>       * x86-4KB        32763    16KB               160KB
+>       * arm64-4KB      32766    16KB               112KB
+>       * arm64-64KB     8192     64KB               128KB
+>       */
+>      #define MEM_TEST_MOVE_SIZE    0x50000           /* 320KB */
 
--- 
-b4 0.11.0-dev
+Now MEM_TEST_MOVE_SIZE is too high for arm64-4KB and arm64-64KB cases
+(it needs 160 KiB in the last slot but has less available in these two
+cases).
+
+Using a test size of 192 KiB instead seems like a small difference
+from the original size of 200 KiB, while still being aligned to
+64 KiB.
+
+The move benchmarks runtime difference on x86-4KB with this size
+(compared to sizes of 200 KiB and 320 KiB) seems to be negligible.
+
+Since it's an odd number of 64 KiB pages (3) the code that halves
+this number of pages will need to be adjusted to operate on raw
+sizes instead.
+
+I can see a single block of code that will need such adjustment:
+> if (lastpages < move_pages / 2) {
+>         *maxslots = 0;
+>         return false;
+> }   
+
+Similar remark goes for the case (1) above, where you'll probably need
+to use 64 KiB test area size (it's only an intermediate form of code
+before the final patch changes this value so it's fine if it doesn't
+perform as well as the final form of the code).
+
+> Thanks,
+> Gavin
+> 
+
+Thanks,
+Maciej
+
