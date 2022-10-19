@@ -2,64 +2,63 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EA38C4332F
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Oct 2022 19:11:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9739C433FE
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Oct 2022 19:11:37 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACA2D4B917;
-	Wed, 19 Oct 2022 15:11:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82F504B8D0;
+	Wed, 19 Oct 2022 15:11:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 80-b2JTRZgzI; Wed, 19 Oct 2022 15:11:34 -0400 (EDT)
+	with ESMTP id rlx1-fu3d6Eb; Wed, 19 Oct 2022 15:11:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FEC14B933;
-	Wed, 19 Oct 2022 15:11:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E45D4B92F;
+	Wed, 19 Oct 2022 15:11:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1820D4B91F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 15:11:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 99C054B926
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 15:11:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lOZf3aJ1AjBw for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Oct 2022 15:11:30 -0400 (EDT)
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com
- [209.85.210.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E243E4B90E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 15:11:30 -0400 (EDT)
-Received: by mail-ot1-f53.google.com with SMTP id
- 101-20020a9d0bee000000b00661b54d945fso10070990oth.13
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 12:11:30 -0700 (PDT)
+ with ESMTP id bZmruud4y2Y9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Oct 2022 15:11:33 -0400 (EDT)
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com
+ [209.85.167.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E3F1F4B93E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 15:11:31 -0400 (EDT)
+Received: by mail-oi1-f178.google.com with SMTP id w74so20401964oie.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 12:11:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
  :mime-version:subject:date:from:x-gm-message-state:from:to:cc
  :subject:date:message-id:reply-to;
- bh=43IaqXn32YycCBd3/SGJ6Da4qva/kGDXqjobO4DMXeA=;
- b=4HY6ccFmR0gFVGJJL49oMWNbA49tLjKX8e9cidf2PjExDTDgs4yZ7M1R6X+vfQ5yPf
- uXg06nVBlhUZHS827JXCvrbW4Iy4YdRnHi0+5BfSNSL+AwAg2ipLxg/MiI/m42Ebh5ZB
- wn1t4S7sEMGwtkwKsn0sL3PJTR/2JbQBuyRsAe46xdqxnJKV19z+GoMIZda7SaOv7gZB
- w/L7TzxtdRseCwjbaaD4JLIkrjRm38hHPZ6Y9h2yX1ECQ2+cSqOQWg6KHZ0cW3ifozCX
- PQa2AwFR0ndWqLhnT+1KAfV4rtxrdul0w5tkIsbBjh9HnvEHmZDc28XMFiC5TwlqH8vv
- FqZw==
-X-Gm-Message-State: ACrzQf2u3nI9eAYUbh8J6Zu6KxiHqh5eDH0ecvEobrfFCM6tyYimEBvI
- 0FZfDoQGXBYoetNoOU2x/w==
-X-Google-Smtp-Source: AMsMyM52ccM2SuB4fJVuNR6xyd3GwViwYeYnmewRYJ6qofqTylHkTtpXjuHE/sY2iyCkl53jTYlNfw==
-X-Received: by 2002:a9d:6948:0:b0:661:a43c:77a3 with SMTP id
- p8-20020a9d6948000000b00661a43c77a3mr4934314oto.222.1666206690183; 
- Wed, 19 Oct 2022 12:11:30 -0700 (PDT)
+ bh=ZBd+XTJESJNOGYoq8Sf5QKUv5aLEk2PWt2aI7lcJy1Q=;
+ b=DzM9UmDQpDl8R5UHWKhV/bAPbYY0XpirKNQIxW/UzB65L82syCOE6g451QDKwsP+uW
+ itxgMWyHH5HqiyNijWoLd4T3KjjVgzP/MqCp1ICuca/Eb9GgJ9efVDVetbIa0mZmeRG6
+ 3LKWdeFhgesnTgP9sTEx8eKU6Q7MTQELP6v2m+KyuwCUj5iNJLQm1/48/EXtq5Tr2sBL
+ iJk2yblatZPMzoBWc97tXIzdg85dIuqzgAq1NQOoSEPjZOD2lPQDQD9d35cedrGe5iwS
+ ONIhesNXA7KMDASjFl7d7e5E+BLRGvYlUBRBI8RLCs15lQWOfKnaH6lZeWCaPrM6KWsh
+ 8R7A==
+X-Gm-Message-State: ACrzQf2+JIA2d62ioXibBZWyMs04yOPvZSZdqSoRyQMhr6JDRzKM3Bh9
+ EXpBNv0ElX853m1odofpaA==
+X-Google-Smtp-Source: AMsMyM53HC4eCK4NKlfS5OabG/2idCaE/8R5DmuO7iXth8yDJHlcBsw0Hkxwf9ZW/H1vTGzH8KmBcw==
+X-Received: by 2002:a05:6808:1510:b0:354:566c:78e5 with SMTP id
+ u16-20020a056808151000b00354566c78e5mr19239918oiw.188.1666206691599; 
+ Wed, 19 Oct 2022 12:11:31 -0700 (PDT)
 Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net.
  [66.90.144.107]) by smtp.gmail.com with ESMTPSA id
- q7-20020a4aac47000000b0047f8ceca22bsm6816526oon.15.2022.10.19.12.11.29
+ q78-20020a4a3351000000b00480db116926sm2048754ooq.27.2022.10.19.12.11.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 19 Oct 2022 12:11:29 -0700 (PDT)
-Received: (nullmailer pid 3420910 invoked by uid 1000);
+ Wed, 19 Oct 2022 12:11:31 -0700 (PDT)
+Received: (nullmailer pid 3420906 invoked by uid 1000);
  Wed, 19 Oct 2022 19:11:25 -0000
 From: Rob Herring <robh@kernel.org>
-Date: Wed, 19 Oct 2022 14:11:30 -0500
-Subject: [PATCH v2 7/7] perf: arm_spe: Add support for SPEv1.2 inverted event
- filtering
+Date: Wed, 19 Oct 2022 14:11:28 -0500
+Subject: [PATCH v2 5/7] perf: arm_spe: Support new SPEv1.2/v8.7 'not taken'
+ event
 MIME-Version: 1.0
-Message-Id: <20220825-arm-spe-v8-7-v2-7-e37322d68ac0@kernel.org>
+Message-Id: <20220825-arm-spe-v8-7-v2-5-e37322d68ac0@kernel.org>
 References: <20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org>
 In-Reply-To: <20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org>
 To: Namhyung Kim <namhyung@kernel.org>, James Morse <james.morse@arm.com>,
@@ -91,144 +90,48 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Arm SPEv1.2 (Arm v8.7/v9.2) adds a new feature called Inverted Event
-Filter which excludes samples matching the event filter. The feature
-mirrors the existing event filter in PMSEVFR_EL1 adding a new register,
-PMSNEVFR_EL1, which has the same event bit assignments.
+Arm SPEv1.2 (Armv8.7/v9.2) adds a new event, 'not taken', in bit 6 of
+the PMSEVFR_EL1 register. Update arm_spe_pmsevfr_res0() to support the
+additional event.
 
 Signed-off-by: Rob Herring <robh@kernel.org>
 ---
 v2:
- - Update for auto generated register defines
- - Avoid accessing SYS_PMSNEVFR_EL1 on < v8.7
+ - Update for v6.1 sysreg generated header changes
 ---
- drivers/perf/arm_spe_pmu.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+ arch/arm64/include/asm/sysreg.h | 2 ++
+ drivers/perf/arm_spe_pmu.c      | 4 +++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index d002dd00e53e..06231e896832 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -242,6 +242,8 @@
+ 	 BIT_ULL(6) | BIT_ULL(4) | BIT_ULL(2) | BIT_ULL(0))
+ #define PMSEVFR_EL1_RES0_V1P1	\
+ 	(PMSEVFR_EL1_RES0_IMP & ~(BIT_ULL(18) | BIT_ULL(17) | BIT_ULL(11)))
++#define PMSEVFR_EL1_RES0_V1P2	\
++	(PMSEVFR_EL1_RES0_V1P1 & ~BIT_ULL(6))
+ 
+ /* Buffer error reporting */
+ #define PMBSR_EL1_FAULT_FSC_SHIFT	PMBSR_EL1_MSS_SHIFT
 diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-index 0b9b847919d0..ab5fcf02a4ca 100644
+index 9b4bd72087ea..0b9b847919d0 100644
 --- a/drivers/perf/arm_spe_pmu.c
 +++ b/drivers/perf/arm_spe_pmu.c
-@@ -85,6 +85,7 @@ struct arm_spe_pmu {
- #define SPE_PMU_FEAT_ARCH_INST			(1UL << 3)
- #define SPE_PMU_FEAT_LDS			(1UL << 4)
- #define SPE_PMU_FEAT_ERND			(1UL << 5)
-+#define SPE_PMU_FEAT_INV_FILT_EVT		(1UL << 6)
- #define SPE_PMU_FEAT_DEV_PROBED			(1UL << 63)
- 	u64					features;
- 
-@@ -202,6 +203,10 @@ static const struct attribute_group arm_spe_pmu_cap_group = {
- #define ATTR_CFG_FLD_min_latency_LO		0
- #define ATTR_CFG_FLD_min_latency_HI		11
- 
-+#define ATTR_CFG_FLD_inv_event_filter_CFG	config3	/* PMSNEVFR_EL1 */
-+#define ATTR_CFG_FLD_inv_event_filter_LO	0
-+#define ATTR_CFG_FLD_inv_event_filter_HI	63
-+
- /* Why does everything I do descend into this? */
- #define __GEN_PMU_FORMAT_ATTR(cfg, lo, hi)				\
- 	(lo) == (hi) ? #cfg ":" #lo "\n" : #cfg ":" #lo "-" #hi
-@@ -232,6 +237,7 @@ GEN_PMU_FORMAT_ATTR(branch_filter);
- GEN_PMU_FORMAT_ATTR(load_filter);
- GEN_PMU_FORMAT_ATTR(store_filter);
- GEN_PMU_FORMAT_ATTR(event_filter);
-+GEN_PMU_FORMAT_ATTR(inv_event_filter);
- GEN_PMU_FORMAT_ATTR(min_latency);
- 
- static struct attribute *arm_spe_pmu_formats_attr[] = {
-@@ -243,12 +249,27 @@ static struct attribute *arm_spe_pmu_formats_attr[] = {
- 	&format_attr_load_filter.attr,
- 	&format_attr_store_filter.attr,
- 	&format_attr_event_filter.attr,
-+	&format_attr_inv_event_filter.attr,
- 	&format_attr_min_latency.attr,
- 	NULL,
- };
- 
-+static umode_t arm_spe_pmu_format_attr_is_visible(struct kobject *kobj,
-+						  struct attribute *attr,
-+						  int unused)
-+	{
-+	struct device *dev = kobj_to_dev(kobj);
-+	struct arm_spe_pmu *spe_pmu = dev_get_drvdata(dev);
-+
-+	if (attr == &format_attr_inv_event_filter.attr && !(spe_pmu->features & SPE_PMU_FEAT_INV_FILT_EVT))
-+		return 0;
-+
-+	return attr->mode;
-+}
-+
- static const struct attribute_group arm_spe_pmu_format_group = {
- 	.name	= "format",
-+	.is_visible = arm_spe_pmu_format_attr_is_visible,
- 	.attrs	= arm_spe_pmu_formats_attr,
- };
- 
-@@ -343,6 +364,9 @@ static u64 arm_spe_event_to_pmsfcr(struct perf_event *event)
- 	if (ATTR_CFG_GET_FLD(attr, event_filter))
- 		reg |= PMSFCR_EL1_FE;
- 
-+	if (ATTR_CFG_GET_FLD(attr, inv_event_filter))
-+		reg |= PMSFCR_EL1_FnE;
-+
- 	if (ATTR_CFG_GET_FLD(attr, min_latency))
- 		reg |= PMSFCR_EL1_FL;
- 
-@@ -355,6 +379,12 @@ static u64 arm_spe_event_to_pmsevfr(struct perf_event *event)
- 	return ATTR_CFG_GET_FLD(attr, event_filter);
+@@ -677,9 +677,11 @@ static u64 arm_spe_pmsevfr_res0(u16 pmsver)
+ 	case ID_AA64DFR0_EL1_PMSVer_IMP:
+ 		return PMSEVFR_EL1_RES0_IMP;
+ 	case ID_AA64DFR0_EL1_PMSVer_V1P1:
++		return PMSEVFR_EL1_RES0_V1P1;
++	case ID_AA64DFR0_EL1_PMSVer_V1P2:
+ 	/* Return the highest version we support in default */
+ 	default:
+-		return PMSEVFR_EL1_RES0_V1P1;
++		return PMSEVFR_EL1_RES0_V1P2;
+ 	}
  }
- 
-+static u64 arm_spe_event_to_pmsnevfr(struct perf_event *event)
-+{
-+	struct perf_event_attr *attr = &event->attr;
-+	return ATTR_CFG_GET_FLD(attr, inv_event_filter);
-+}
-+
- static u64 arm_spe_event_to_pmslatfr(struct perf_event *event)
- {
- 	struct perf_event_attr *attr = &event->attr;
-@@ -703,6 +733,9 @@ static int arm_spe_pmu_event_init(struct perf_event *event)
- 	if (arm_spe_event_to_pmsevfr(event) & arm_spe_pmsevfr_res0(spe_pmu->pmsver))
- 		return -EOPNOTSUPP;
- 
-+	if (arm_spe_event_to_pmsnevfr(event) & arm_spe_pmsevfr_res0(spe_pmu->pmsver))
-+		return -EOPNOTSUPP;
-+
- 	if (attr->exclude_idle)
- 		return -EOPNOTSUPP;
- 
-@@ -721,6 +754,10 @@ static int arm_spe_pmu_event_init(struct perf_event *event)
- 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_EVT))
- 		return -EOPNOTSUPP;
- 
-+	if ((FIELD_GET(PMSFCR_EL1_FnE, reg)) &&
-+	    !(spe_pmu->features & SPE_PMU_FEAT_INV_FILT_EVT))
-+		return -EOPNOTSUPP;
-+
- 	if ((FIELD_GET(PMSFCR_EL1_FT, reg)) &&
- 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_TYP))
- 		return -EOPNOTSUPP;
-@@ -756,6 +793,11 @@ static void arm_spe_pmu_start(struct perf_event *event, int flags)
- 	reg = arm_spe_event_to_pmsevfr(event);
- 	write_sysreg_s(reg, SYS_PMSEVFR_EL1);
- 
-+	if (spe_pmu->features & SPE_PMU_FEAT_INV_FILT_EVT) {
-+		reg = arm_spe_event_to_pmsnevfr(event);
-+		write_sysreg_s(reg, SYS_PMSNEVFR_EL1);
-+	}
-+
- 	reg = arm_spe_event_to_pmslatfr(event);
- 	write_sysreg_s(reg, SYS_PMSLATFR_EL1);
- 
-@@ -990,6 +1032,9 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 	if (FIELD_GET(PMSIDR_EL1_FE, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_FILT_EVT;
- 
-+	if (FIELD_GET(PMSIDR_EL1_FnE, reg))
-+		spe_pmu->features |= SPE_PMU_FEAT_INV_FILT_EVT;
-+
- 	if (FIELD_GET(PMSIDR_EL1_FT, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_FILT_TYP;
  
 
 -- 
