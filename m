@@ -1,100 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D505C28E8
-	for <kvmarm@lists.linux.dev>; Wed, 19 Oct 2022 12:01:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B19C0C433C1;
-	Wed, 19 Oct 2022 12:01:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1666180880;
-	bh=+YxEMHGjFNX/fMgJ7XtobqHhQhBy4sl/qF3hgM/FXHw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cJMUZVgcE81dR7vcUZH2grOThP6TRaOGmIq1CjMDNsQ0bfvbJFRfQLUlz8w9xX89B
-	 cLFOiVNw7fbZEqPhDa5KCEXrFq39MMbEPF20zxjgUIb0tsHthvYNK2Fv3/FWrae0zt
-	 ar2m07Woki4kuX1ErljedL+e6Z9vkPQEOTAjzPkzgFLaUXAhWxaaxLcxYwgkcIQ1fM
-	 fhSXKkXa1apkhqzaa2qwrYi7z/z/xXrIQOR5KTdiP2+0L2bVW1muNiJjiVSI1slQIH
-	 rKfbIZnpZ1xxYuevjHVu74Pzevjda7/xW2eU5r7biBwDez9VuKUJUCo+jYQUTJ+W6W
-	 cYeRV7R56EgKA==
-Date: Wed, 19 Oct 2022 13:01:13 +0100
-From: Will Deacon <will@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Quentin Perret <qperret@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 14/25] KVM: arm64: Add per-cpu fixmap infrastructure
- at EL2
-Message-ID: <20221019120110.GB4067@willie-the-truck>
-References: <20221017115209.2099-1-will@kernel.org>
- <20221017115209.2099-15-will@kernel.org>
- <Y06Iihi/RPAOMuwR@FVFF77S0Q05N>
- <20221018140514.GA3323@willie-the-truck>
- <Y07Zwsn+oFbMWeKI@lakrids>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2ABF28E8
+	for <kvmarm@lists.linux.dev>; Wed, 19 Oct 2022 12:19:02 +0000 (UTC)
+Received: by mail-lf1-f45.google.com with SMTP id g1so27762125lfu.12
+        for <kvmarm@lists.linux.dev>; Wed, 19 Oct 2022 05:19:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=l66+WLbhAlzPkyHFepjJ8VPyMoK+GDU3eUQBN3ZbwNk=;
+        b=QfLHua9SUQ3cWtrSq3McnLndCx2mA3ijM5R/zZF0C4k3w7iTfpZiDMJD0dMzR8po7r
+         nT12MX7BJ+z+zM1uhGOyUEMQ6LfI7wMqwDZLNgbyVWd6UEUjOINItZKgEiZqYiU27Iq5
+         lK8khYGQGBm35jPdTcQndnZluivOIi36+9gQNysUPwL65LwDvnvOZUh75rXUwd6yMD6U
+         /xnNP/G2B5RmZp1H3AN3TciuxupqJzz1XHKECOrL1Um2g/tA1R12KxRZihAwGMod7mBV
+         vULmqNaidNLc0U27P3UnnAY+Ue5K9e24NPsWmtbT4Eyzlo5HcJQ2VjOBcWQavWyNmqH/
+         AEhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=l66+WLbhAlzPkyHFepjJ8VPyMoK+GDU3eUQBN3ZbwNk=;
+        b=NrgP9HC2hRratKJMiP9Y12eVvvQ4aK9jap9ugdA0bpeBKWsQCgUK3AFkpCt6Sqb/jI
+         ktHa0F8a8H3OlGUpcxMolKD9Vgv7FB/BueOSNn1rBTk52ffqvhK5sFYorzAH9ZLI5vt3
+         nndt0pV3Ws2gJnzLOMDS9berXXA4BCFy8GeCAIx2vaY8en3OXIReoLG+E0z+GOqHDzFP
+         HYArzmF6lm9YLd34i5h+0XHYQL5XSt2aFrKqT8RUMs8Qe41B25nFSRX250xmLSkDi/kD
+         RxWomWQBtv4t+3bUM02Zic75v7TOuLlIq6CiLq3yBwkj0/kFrZlEeuDlsL4y17E+kUut
+         QxPA==
+X-Gm-Message-State: ACrzQf12ydNufZTGsO4T9JvYWnmyNSWXIAE+/ofZKiNqGscU4JUvTHBj
+	gIElfQ0+BMFQMb6zMG5fqw/ozfBqSuq/dN+r5ap1vA==
+X-Google-Smtp-Source: AMsMyM6QuAQGdziehqyNNg/dYLtJsZNxcgWER/SNrhmNQ9i6DMHJoP1Fx9le0dqEgW94QIKYhJ9aw9jygeYpRtlfJQw=
+X-Received: by 2002:ac2:5ca9:0:b0:4a6:f2c:a1f9 with SMTP id
+ e9-20020ac25ca9000000b004a60f2ca1f9mr217735lfq.26.1666181939680; Wed, 19 Oct
+ 2022 05:18:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y07Zwsn+oFbMWeKI@lakrids>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20221017115209.2099-1-will@kernel.org> <20221017115209.2099-13-will@kernel.org>
+ <Y07YJvEsUnjSasA0@google.com>
+In-Reply-To: <Y07YJvEsUnjSasA0@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 19 Oct 2022 13:18:23 +0100
+Message-ID: <CA+EHjTyrBCjJ_=qEs1tQ_4SO+oMq4BTGTnipJa1kDRXVxu0RcA@mail.gmail.com>
+Subject: Re: [PATCH v4 12/25] KVM: arm64: Add infrastructure to create and
+ track pKVM instances at EL2
+To: Quentin Perret <qperret@google.com>
+Cc: Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev, 
+	Sean Christopherson <seanjc@google.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	James Morse <james.morse@arm.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Mark Rutland <mark.rutland@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, kernel-team@android.com, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Oct 18, 2022 at 05:52:18PM +0100, Mark Rutland wrote:
-> On Tue, Oct 18, 2022 at 03:05:14PM +0100, Will Deacon wrote:
-> > On Tue, Oct 18, 2022 at 12:06:14PM +0100, Mark Rutland wrote:
-> > > If the tables are shared, you need broadcast maintenance and ISH barriers here,
-> > > or you risk the usual issues with asynchronous MMU behaviour.
-> > 
-> > Can you elaborate a bit, please? What we're trying to do is reserve a page
-> > of VA space for each CPU, which is only ever accessed explicitly by that
-> > CPU using a normal memory mapping. The fixmap code therefore just updates
-> > the relevant leaf entry for the CPU on which we're running and the TLBI
-> > is there to ensure that the new mapping takes effect.
-> > 
-> > If another CPU speculatively walks another CPU's fixmap slot, then I agree
-> > that it could access that page after the slot had been cleared. Although
-> > I can see theoretical security arguments around avoiding that situation,
-> > there's a very real performance cost to broadcast invalidation that we
-> > were hoping to avoid on this fast path.
-> 
-> The issue is that any CPU could walk any of these entries at any time
-> for any reason, and without broadcast maintenance we'd be violating the
-> Break-Before-Make requirements. That permits a number of things,
-> including "amalgamation", which would permit the CPU to consume some
-> arbitrary function of the old+new entries. Among other things, that can
-> permit accesses to entirely bogus physical addresses that weren't in
-> either entry (e.g. making speculative accesses to arbitrary device
-> addresses).
-> 
-> For correctness, you need the maintenance to be broadcast to all PEs
-> which could observe the old and new entries.
+Hi,
 
-Urgh, I had definitely purged that one. Thanks for the refresher.
+On Tue, Oct 18, 2022 at 5:45 PM Quentin Perret <qperret@google.com> wrote:
+>
+> On Monday 17 Oct 2022 at 12:51:56 (+0100), Will Deacon wrote:
+> > +static int find_free_vm_table_entry(struct kvm *host_kvm)
+> > +{
+> > +     int i, ret = -ENOMEM;
+> > +
+> > +     for (i = 0; i < KVM_MAX_PVMS; ++i) {
+> > +             struct pkvm_hyp_vm *vm = vm_table[i];
+> > +
+> > +             if (!vm) {
+> > +                     if (ret < 0)
+> > +                             ret = i;
+> > +                     continue;
+> > +             }
+> > +
+> > +             if (unlikely(vm->host_kvm == host_kvm)) {
+> > +                     ret = -EEXIST;
+> > +                     break;
+> > +             }
+>
+> That would be funny if the host passed the same struct twice, but do we
+> care? If the host wants to shoot itself in the foot, it's not our
+> problem I guess :) ? Also, we don't do the same check for vCPUs so ...
 
-> > Of course, in the likely event that I've purged "the usual issues" from
-> > my head and we need broadcasting for _correctness_, then we'll just have
-> > to suck it up!
-> 
-> As above, I believe you need this for correctness.
-> 
-> I'm not sure if FEAT_BBM level 2 gives you the necessary properties to
-> relax this on some HW.
+You're right, the host can shoot itself in the foot if it wants to.
+The reason why we don't have it for vcpus is that that code was
+factored out later, and as you said, a similar check isn't necessary.
 
-I'll seek clarification on this, as that amalgamation text feels a bit
-over-reaching to me (particularly when combined with the fact that the
-CPU still has to respect things like the NS bit) and I suspect that we
-wouldn't see it in practice for this case.
+TLDR: we'll remove it :)
 
-But for now, I'll add the broadcasting so we don't block the series.
-
-Will
+Thanks,
+/fuad
