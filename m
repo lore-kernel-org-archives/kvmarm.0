@@ -1,208 +1,175 @@
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812D553A3
-	for <kvmarm@lists.linux.dev>; Wed, 19 Oct 2022 20:19:05 +0000 (UTC)
-Received: from MUA
-	by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <mail@maciej.szmigiero.name>)
-	id 1olFWW-0003EF-DJ; Wed, 19 Oct 2022 22:18:44 +0200
-Message-ID: <a45cfcc9-0255-14f0-30a5-18d6efaad0d4@maciej.szmigiero.name>
-Date: Wed, 19 Oct 2022 22:18:38 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04D853BD
+	for <kvmarm@lists.linux.dev>; Wed, 19 Oct 2022 23:17:48 +0000 (UTC)
+Received: by mail-pj1-f50.google.com with SMTP id u8-20020a17090a5e4800b002106dcdd4a0so1637804pji.1
+        for <kvmarm@lists.linux.dev>; Wed, 19 Oct 2022 16:17:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Me73D3UIfDoCysc1MWGMK8EUvSaCv+Air3k0VL/BRN8=;
+        b=RmCtH8neEhRNB9EOWZTVkrahvAUVFTRCLPGLyV9Nb3VYKC99nZ2WwGhFzKu2zd6HVj
+         0uiDQ0fsRP8/n8QzU7kIqDtbhRIkGoQL/i2SdXmhp8SDWC6ergvgFiSb+W1w4zuFcH2a
+         SZWduHd7knWotjL0Mm+L4nTpW9p7iR7JwE0yMzWN95zSotrbo9VjGX9yuDLmvdWRphjX
+         +H/H0qojfkImnsy0HIgOG6NIde3/7kIqOsCbLwiptGca8qtknEBtRNZfKvvivPq7IDt2
+         3TNIVxbQksE24xTQ6z60h2Xdhr09RmEmeKnumzKlYfhKoC5eBLWNh5BT2+XEE/q2I0Cj
+         6aTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Me73D3UIfDoCysc1MWGMK8EUvSaCv+Air3k0VL/BRN8=;
+        b=ZBWlGehflHSUnoJpkrrAhF4ve+7wOjLlkZLSsVVS7dzpFQJ4GKJCIFUAZWrcF2G+UO
+         G1z9Z2Yu7+iqUVppQuUCnsN5cIYMLV63wMaSi8KjEWK7mgNzv/9nu8lhRraJALj/EScO
+         0pAp+ie+OPhOt+GhXUwUkufVMuHF0YFADbAu2cT5u0PDE0ROfA+Jx+zKbe7yxTUre+0v
+         OuSa+wMmn+LVyLt86jyKPM7IsZ0DXOugfBeVNVP3Qx0lgcFCgmG0PYNAEdCPRa85pwP5
+         I/N8Bys/fTb7j1I0M3Tx2yNNAtZYeXKJBg8C9DgEpC70g+ARMLqP+gY/KtSBXQUddHqF
+         BgeQ==
+X-Gm-Message-State: ACrzQf0yu+PKww4084JsY2MlMINjqkIuqF6XNCMw17o+S1pIrxoewOxs
+	OE7MZt2sN2pz1lv+fmMIS7xOtg==
+X-Google-Smtp-Source: AMsMyM7BE+rbsUH5R/9cYMnwScFvrtkWbyHC05khyxy3u7jhhyoNaEpU284lTQQEk+0awE2RbPVfvw==
+X-Received: by 2002:a17:90a:b28d:b0:20d:6790:19fa with SMTP id c13-20020a17090ab28d00b0020d679019famr47693623pjr.68.1666221468020;
+        Wed, 19 Oct 2022 16:17:48 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id s8-20020a170902ea0800b00176a579fae8sm6310265plg.210.2022.10.19.16.17.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Oct 2022 16:17:47 -0700 (PDT)
+Date: Wed, 19 Oct 2022 23:17:43 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	David Matlack <dmatlack@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
+	Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 07/15] KVM: arm64: Use an opaque type for pteps
+Message-ID: <Y1CFl8sLllXm4seK@google.com>
+References: <20221007232818.459650-1-oliver.upton@linux.dev>
+ <20221007232818.459650-8-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Content-Language: en-US, pl-PL
-To: Gavin Shan <gshan@redhat.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
- zhenyzha@redhat.com, shan.gavin@gmail.com, kvmarm@lists.linux.dev,
- pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
- ajones@ventanamicro.com
-References: <20221014071914.227134-1-gshan@redhat.com>
- <20221014071914.227134-5-gshan@redhat.com>
- <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
- <bd5df92c-6870-8053-0b35-a2ad993970bd@redhat.com>
- <da2b7db0-509a-c9e0-c36b-6487a265a779@redhat.com>
- <a1a8664c-4d06-89e7-8cfa-b730969bb841@maciej.szmigiero.name>
- <5bfbe050-a654-8400-e1f1-dcfa4dba13e6@redhat.com>
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH 4/6] KVM: selftests: memslot_perf_test: Support variable
- guest page size
-In-Reply-To: <5bfbe050-a654-8400-e1f1-dcfa4dba13e6@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Message-ID: <20221019201838.AsKs8XMmib1ECwY7hZHpphf1ujlQd4pr6Q56p77nbP4@z>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221007232818.459650-8-oliver.upton@linux.dev>
+Message-ID: <20221019231743.28qXyqLrXmOEiZ3VrhqI6ML041oswUmmIaFfgWRrz1w@z>
 
-On 19.10.2022 02:26, Gavin Shan wrote:
-> On 10/18/22 11:56 PM, Maciej S. Szmigiero wrote:
->> On 18.10.2022 02:51, Gavin Shan wrote:
->>> On 10/18/22 8:46 AM, Gavin Shan wrote:
->>>> On 10/18/22 5:31 AM, Maciej S. Szmigiero wrote:
->>>>> On 14.10.2022 09:19, Gavin Shan wrote:
->>>>>> The test case is obviously broken on aarch64 because non-4KB guest
->>>>>> page size is supported. The guest page size on aarch64 could be 4KB,
->>>>>> 16KB or 64KB.
->>>>>>
->>>>>> This supports variable guest page size, mostly for aarch64.
->>>>>>
->>>>>>    - The host determines the guest page size when virtual machine is
->>>>>>      created. The value is also passed to guest through the synchronization
->>>>>>      area.
->>>>>>
->>>>>>    - The number of guest pages are unknown until the virtual machine
->>>>>>      is to be created. So all the related macros are dropped. Instead,
->>>>>>      their values are dynamically calculated based on the guest page
->>>>>>      size.
->>>>>>
->>>>>>    - The static checks on memory sizes and pages becomes dependent
->>>>>>      on guest page size, which is unknown until the virtual machine
->>>>>>      is about to be created. So all the static checks are converted
->>>>>>      to dynamic checks, done in check_memory_sizes().
->>>>>>
->>>>>>    - As the address passed to madvise() should be aligned to host page,
->>>>>>      the size of page chunk is automatically selected, other than one
->>>>>>      page.
->>>>>>
->>>>>>    - All other changes included in this patch are almost mechanical
->>>>>>      replacing '4096' with 'guest_page_size'.
->>>>>>
->>>>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
->>>>>> ---
->>>>>>   .../testing/selftests/kvm/memslot_perf_test.c | 191 +++++++++++-------
->>>>>>   1 file changed, 115 insertions(+), 76 deletions(-)
->>>>>>
->>>>>> diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
->>>>>> index d5aa9148f96f..d587bd952ff9 100644
->>>>>> --- a/tools/testing/selftests/kvm/memslot_perf_test.c
->>>>>> +++ b/tools/testing/selftests/kvm/memslot_perf_test.c
->> (...)
->>>>>> @@ -77,8 +61,7 @@ static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
->>>>>>    * for the total size of 25 pages.
->>>>>>    * Hence, the maximum size here is 50 pages.
->>>>>>    */
->>>>>> -#define MEM_TEST_MOVE_SIZE_PAGES    (50)
->>>>>> -#define MEM_TEST_MOVE_SIZE        (MEM_TEST_MOVE_SIZE_PAGES * 4096)
->>>>>> +#define MEM_TEST_MOVE_SIZE        0x32000
->>>>>
->>>>> The above number seems less readable than an explicit value of 50 pages.
->>>>>
->>>>> In addition to that, it's 50 pages only with 4k page size, so at least
->>>>> the comment above needs to be updated to reflect this fact.
->>>>>
->>>>
->>>> Yeah, I will change the comments like below in next revision.
->>>>
->>>>   /*
->>>>    * When running this test with 32k memslots, actually 32763 excluding
->>>>    * the reserved memory slot 0, the memory for each slot is 0x4000 bytes.
->>>>    * The last slot contains 0x19000 bytes memory. Hence, the maximum size
->>>>    * here is 0x32000 bytes.
->>>>    */
->>>>
->>>
->>> I will replace those numbers with readable ones like below :)
->>>
->>> /*
->>>   * When running this test with 32k memslots, actually 32763 excluding
->>>   * the reserved memory slot 0, the memory for each slot is 16KB. The
->>>   * last slot contains 100KB memory with the remaining 84KB. Hence,
->>>   * the maximum size is double of that (200KB)
->>>   */
->>
->> Still, these numbers are for x86, which has KVM_INTERNAL_MEM_SLOTS
->> defined as 3.
->>
->> As far as I can see aarch64 has KVM_INTERNAL_MEM_SLOTS equal to 0, so
->> this arch has 32766 slot available for the test memory.
->>
->> Quick calculations show that this will result in 112 KiB of memory in
->> the last slot for 4 KiB page size (while for 64 KiB page size the
->> maximum slot count for this test is 8192 anyway - not counting slot 0).
->>
+On Fri, Oct 07, 2022, Oliver Upton wrote:
+> Use an opaque type for pteps and require visitors explicitly dereference
+> the pointer before using. Protecting page table memory with RCU requires
+> that KVM dereferences RCU-annotated pointers before using. However, RCU
+> is not available for use in the nVHE hypervisor and the opaque type can
+> be conditionally annotated with RCU for the stage-2 MMU.
 > 
-> It seems your calculation had (512MB+64KB), instead of (512MB+4KB).
-> In this particular patch, we still have (512MB+4KB). How about to change
-> like below in this patch. In next patch, it's adjusted accordingly after
-> we have (512MB+64KB).
-
-My review comment above referred to the final MEM_SIZE value after the
-whole series, so 512 MiB + 64 KiB.
-
-I placed that review comment on patch 4 since it's the only patch in this
-series that modified the code comment about MEM_TEST_MOVE_SIZE.
-
+> Call the type a 'pteref' to avoid a naming collision with raw pteps. No
+> functional change intended.
 > 
-> (1) In this patch, the comment is changed to as below
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h |  9 ++++++++-
+>  arch/arm64/kvm/hyp/pgtable.c         | 23 ++++++++++++-----------
+>  2 files changed, 20 insertions(+), 12 deletions(-)
 > 
->      /*
->       * We have different number of memory slots, excluding the reserved
->       * memory slot 0, on various architectures and configurations. The
->       * memory size in this test is calculated by doubling the maximal
->       * memory size in last memory slot, with alignment to the largest
->       * supported page size (64KB).
->       *
->       * architecture   slots    memory-per-slot    memory-on-last-slot
->       * --------------------------------------------------------------
->       * x86-4KB        32763    16KB               100KB
->       * arm64-4KB      32766    16KB               52KB
->       * arm64-64KB     8192     64KB               64KB
->       */
->      #define MEM_TEST_MOVE_SIZE    0x40000           /* 256KB */
->
-> (2) In the next patch, where we have (512MB+64KB) after the various
->      memory sizes are consolidated, It is adjusted accordingly as below.
-> 
->      /*
->       * We have different number of memory slots, excluding the reserved
->       * memory slot 0, on various architectures and configurations. The
->       * memory size in this test is calculated by doubling the maximal
->       * memory size in last memory slot, with alignment to the largest
->       * supported page size (64KB).
->       *
->       * architecture   slots    memory-per-slot    memory-on-last-slot
->       * --------------------------------------------------------------
->       * x86-4KB        32763    16KB               160KB
->       * arm64-4KB      32766    16KB               112KB
->       * arm64-64KB     8192     64KB               128KB
->       */
->      #define MEM_TEST_MOVE_SIZE    0x50000           /* 320KB */
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index c33edcf36b5b..beb89eac155c 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -25,6 +25,13 @@ static inline u64 kvm_get_parange(u64 mmfr0)
+>  
+>  typedef u64 kvm_pte_t;
+>  
+> +typedef kvm_pte_t *kvm_pteref_t;
+> +
+> +static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
+> +{
+> +	return pteref;
 
-Now MEM_TEST_MOVE_SIZE is too high for arm64-4KB and arm64-64KB cases
-(it needs 160 KiB in the last slot but has less available in these two
-cases).
+Returning the pointer is unsafe (when it becomes RCU-protected).  The full
+dereference of the data needs to occur under RCU protection, not just the retrieval
+of the pointer.  E.g. this (straw man) would be broken
 
-Using a test size of 192 KiB instead seems like a small difference
-from the original size of 200 KiB, while still being aligned to
-64 KiB.
+	bool table = kvm_pte_table(ctx.old, level);
 
-The move benchmarks runtime difference on x86-4KB with this size
-(compared to sizes of 200 KiB and 320 KiB) seems to be negligible.
+	rcu_read_lock();
+	ptep = kvm_dereference_pteref(pteref, flags & KVM_PGTABLE_WALK_SHARED);
+	rcu_read_unlock();
 
-Since it's an odd number of 64 KiB pages (3) the code that halves
-this number of pages will need to be adjusted to operate on raw
-sizes instead.
+	if (table && (ctx.flags & KVM_PGTABLE_WALK_TABLE_PRE))
+		ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_PRE);
 
-I can see a single block of code that will need such adjustment:
-> if (lastpages < move_pages / 2) {
->         *maxslots = 0;
->         return false;
-> }   
+	if (!table && (ctx.flags & KVM_PGTABLE_WALK_LEAF)) {
+		ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_LEAF);
+		ctx.old = READ_ONCE(*ptep);
+		table = kvm_pte_table(ctx.old, level);
+	}
 
-Similar remark goes for the case (1) above, where you'll probably need
-to use 64 KiB test area size (it's only an intermediate form of code
-before the final patch changes this value so it's fine if it doesn't
-perform as well as the final form of the code).
+as the read of the entry pointed at by ptep could be to a page table that is freed
+in an RCU callback.
 
-> Thanks,
-> Gavin
-> 
+The naming collision you are trying to avoid is a symptom of this bad pattern,
+as there should never be "raw" pteps floating around, at least not in non-pKVM
+contexts that utilize RCU.
 
-Thanks,
-Maciej
+> +}
+> +
+>  #define KVM_PTE_VALID			BIT(0)
+>  
+>  #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
+> @@ -170,7 +177,7 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
+>  struct kvm_pgtable {
+>  	u32					ia_bits;
+>  	u32					start_level;
+> -	kvm_pte_t				*pgd;
+> +	kvm_pteref_t				pgd;
+>  	struct kvm_pgtable_mm_ops		*mm_ops;
+>  
+>  	/* Stage-2 only */
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 02c33fccb178..6b6e1ed7ee2f 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -175,13 +175,14 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
+>  }
+>  
+>  static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
+> -			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pte_t *pgtable, u32 level);
+> +			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, u32 level);
+>  
+>  static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+>  				      struct kvm_pgtable_mm_ops *mm_ops,
+> -				      kvm_pte_t *ptep, u32 level)
+> +				      kvm_pteref_t pteref, u32 level)
+>  {
+>  	enum kvm_pgtable_walk_flags flags = data->walker->flags;
+> +	kvm_pte_t *ptep = kvm_dereference_pteref(pteref, false);
+>  	struct kvm_pgtable_visit_ctx ctx = {
+>  		.ptep	= ptep,
+>  		.old	= READ_ONCE(*ptep),
 
+This is where you want the protection to kick in, e.g. 
+
+  typedef kvm_pte_t __rcu *kvm_ptep_t;
+
+  static inline kvm_pte_t kvm_read_pte(kvm_ptep_t ptep)
+  {
+	return READ_ONCE(*rcu_dereference(ptep));
+  }
+
+		.old	= kvm_read_pte(ptep),
+
+In other words, the pointer itself isn't that's protected, it's PTE that the
+pointer points at that's protected.
+
+rcu_dereference() has no overhead when CONFIG_PROVE_RCU=n, i.e. there's no reason
+to "optimize" dereferences.
