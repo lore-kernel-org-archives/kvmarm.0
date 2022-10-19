@@ -2,63 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9739C433FE
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Oct 2022 19:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E80B2C43217
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Oct 2022 19:11:39 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82F504B8D0;
-	Wed, 19 Oct 2022 15:11:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0F954B90C;
+	Wed, 19 Oct 2022 15:11:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rlx1-fu3d6Eb; Wed, 19 Oct 2022 15:11:36 -0400 (EDT)
+	with ESMTP id PDkVx0wPciLw; Wed, 19 Oct 2022 15:11:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E45D4B92F;
-	Wed, 19 Oct 2022 15:11:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A4574B915;
+	Wed, 19 Oct 2022 15:11:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 99C054B926
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 15:11:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF9474B933
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 15:11:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bZmruud4y2Y9 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Oct 2022 15:11:33 -0400 (EDT)
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com
- [209.85.167.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E3F1F4B93E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 15:11:31 -0400 (EDT)
-Received: by mail-oi1-f178.google.com with SMTP id w74so20401964oie.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 12:11:31 -0700 (PDT)
+ with ESMTP id bjaAY6P7DcNd for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Oct 2022 15:11:35 -0400 (EDT)
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com
+ [209.85.210.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A2DAF4B92C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 15:11:33 -0400 (EDT)
+Received: by mail-ot1-f47.google.com with SMTP id
+ z11-20020a05683020cb00b00661a95cf920so10070707otq.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 12:11:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
  :mime-version:subject:date:from:x-gm-message-state:from:to:cc
  :subject:date:message-id:reply-to;
- bh=ZBd+XTJESJNOGYoq8Sf5QKUv5aLEk2PWt2aI7lcJy1Q=;
- b=DzM9UmDQpDl8R5UHWKhV/bAPbYY0XpirKNQIxW/UzB65L82syCOE6g451QDKwsP+uW
- itxgMWyHH5HqiyNijWoLd4T3KjjVgzP/MqCp1ICuca/Eb9GgJ9efVDVetbIa0mZmeRG6
- 3LKWdeFhgesnTgP9sTEx8eKU6Q7MTQELP6v2m+KyuwCUj5iNJLQm1/48/EXtq5Tr2sBL
- iJk2yblatZPMzoBWc97tXIzdg85dIuqzgAq1NQOoSEPjZOD2lPQDQD9d35cedrGe5iwS
- ONIhesNXA7KMDASjFl7d7e5E+BLRGvYlUBRBI8RLCs15lQWOfKnaH6lZeWCaPrM6KWsh
- 8R7A==
-X-Gm-Message-State: ACrzQf2+JIA2d62ioXibBZWyMs04yOPvZSZdqSoRyQMhr6JDRzKM3Bh9
- EXpBNv0ElX853m1odofpaA==
-X-Google-Smtp-Source: AMsMyM53HC4eCK4NKlfS5OabG/2idCaE/8R5DmuO7iXth8yDJHlcBsw0Hkxwf9ZW/H1vTGzH8KmBcw==
-X-Received: by 2002:a05:6808:1510:b0:354:566c:78e5 with SMTP id
- u16-20020a056808151000b00354566c78e5mr19239918oiw.188.1666206691599; 
- Wed, 19 Oct 2022 12:11:31 -0700 (PDT)
+ bh=JxlkIVs552Ejp+aX9wrJgo7YCeTd9sG0ZHnn6ZfglP4=;
+ b=INpvGng/20cbhoWWar9OLl/y6VR6bH4jotcvFqHd4zvSiOqbS/bh5r83O+4vMPL9vM
+ 1sOnwJHl1f2Kx0FIvDJpwNyIR0jTqzxg3CfMl0m1qUXd18vkMR9GPaFr0gvCuOU6yTJE
+ KH0SFXpBNNJsGEdS/daY0+D/o3DsIzhm3DfdxeUzpq35e/JuBfh5QPjsnndvEYHJOnAl
+ lCcVNlu4ReUbeNGOCnuIK5jAz3m+EaJooY0LQfIvBpw/oqriiRKkeSc7uUNjwUCV5u6V
+ cHvRmYBz196kaVFgXvMTVLPQSex6wXf3ISsWnOremdUKFOVM2KGkKsHN04f/dhYwbNdN
+ fYbA==
+X-Gm-Message-State: ACrzQf0Vcbe/MQ+ykTzPgXB1GJLqhtKx5zRlud3gIVhxIsdy/9bB9fJz
+ PhHHmYVVuSbgrU2hhDMRNg==
+X-Google-Smtp-Source: AMsMyM4c6mVzFUrkq81v9/CA7Mnv6GIXWQ7zeNYDSSDTWnk1r6iqqax4wHful0HevpS2dD/tJHkWSg==
+X-Received: by 2002:a05:6830:25c3:b0:661:c7e4:e785 with SMTP id
+ d3-20020a05683025c300b00661c7e4e785mr4817162otu.134.1666206692965; 
+ Wed, 19 Oct 2022 12:11:32 -0700 (PDT)
 Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net.
  [66.90.144.107]) by smtp.gmail.com with ESMTPSA id
- q78-20020a4a3351000000b00480db116926sm2048754ooq.27.2022.10.19.12.11.30
+ f17-20020a4ae611000000b00480b7efd5d9sm5922591oot.6.2022.10.19.12.11.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 19 Oct 2022 12:11:31 -0700 (PDT)
-Received: (nullmailer pid 3420906 invoked by uid 1000);
+ Wed, 19 Oct 2022 12:11:32 -0700 (PDT)
+Received: (nullmailer pid 3420898 invoked by uid 1000);
  Wed, 19 Oct 2022 19:11:25 -0000
 From: Rob Herring <robh@kernel.org>
-Date: Wed, 19 Oct 2022 14:11:28 -0500
-Subject: [PATCH v2 5/7] perf: arm_spe: Support new SPEv1.2/v8.7 'not taken'
- event
+Date: Wed, 19 Oct 2022 14:11:24 -0500
+Subject: [PATCH v2 1/7] perf: arm_spe: Use feature numbering for PMSEVFR_EL1
+ defines
 MIME-Version: 1.0
-Message-Id: <20220825-arm-spe-v8-7-v2-5-e37322d68ac0@kernel.org>
+Message-Id: <20220825-arm-spe-v8-7-v2-1-e37322d68ac0@kernel.org>
 References: <20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org>
 In-Reply-To: <20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org>
 To: Namhyung Kim <namhyung@kernel.org>, James Morse <james.morse@arm.com>,
@@ -90,46 +91,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Arm SPEv1.2 (Armv8.7/v9.2) adds a new event, 'not taken', in bit 6 of
-the PMSEVFR_EL1 register. Update arm_spe_pmsevfr_res0() to support the
-additional event.
+Similar to commit 121a8fc088f1 ("arm64/sysreg: Use feature numbering for
+PMU and SPE revisions") use feature numbering instead of architecture
+versions for the PMSEVFR_EL1 Res0 defines.
 
 Signed-off-by: Rob Herring <robh@kernel.org>
 ---
 v2:
- - Update for v6.1 sysreg generated header changes
+ - New patch
 ---
- arch/arm64/include/asm/sysreg.h | 2 ++
- drivers/perf/arm_spe_pmu.c      | 4 +++-
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/sysreg.h | 6 +++---
+ drivers/perf/arm_spe_pmu.c      | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index d002dd00e53e..06231e896832 100644
+index 7d301700d1a9..9a4cf12e3e16 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -242,6 +242,8 @@
- 	 BIT_ULL(6) | BIT_ULL(4) | BIT_ULL(2) | BIT_ULL(0))
- #define PMSEVFR_EL1_RES0_V1P1	\
- 	(PMSEVFR_EL1_RES0_IMP & ~(BIT_ULL(18) | BIT_ULL(17) | BIT_ULL(11)))
-+#define PMSEVFR_EL1_RES0_V1P2	\
-+	(PMSEVFR_EL1_RES0_V1P1 & ~BIT_ULL(6))
+@@ -294,11 +294,11 @@
+ #define SYS_PMSFCR_EL1_ST_SHIFT		18
  
- /* Buffer error reporting */
- #define PMBSR_EL1_FAULT_FSC_SHIFT	PMBSR_EL1_MSS_SHIFT
+ #define SYS_PMSEVFR_EL1			sys_reg(3, 0, 9, 9, 5)
+-#define SYS_PMSEVFR_EL1_RES0_8_2	\
++#define PMSEVFR_EL1_RES0_IMP	\
+ 	(GENMASK_ULL(47, 32) | GENMASK_ULL(23, 16) | GENMASK_ULL(11, 8) |\
+ 	 BIT_ULL(6) | BIT_ULL(4) | BIT_ULL(2) | BIT_ULL(0))
+-#define SYS_PMSEVFR_EL1_RES0_8_3	\
+-	(SYS_PMSEVFR_EL1_RES0_8_2 & ~(BIT_ULL(18) | BIT_ULL(17) | BIT_ULL(11)))
++#define PMSEVFR_EL1_RES0_V1P1	\
++	(PMSEVFR_EL1_RES0_IMP & ~(BIT_ULL(18) | BIT_ULL(17) | BIT_ULL(11)))
+ 
+ #define SYS_PMSLATFR_EL1		sys_reg(3, 0, 9, 9, 6)
+ #define SYS_PMSLATFR_EL1_MINLAT_SHIFT	0
 diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-index 9b4bd72087ea..0b9b847919d0 100644
+index 00e3a637f7b6..65cf93dcc8ee 100644
 --- a/drivers/perf/arm_spe_pmu.c
 +++ b/drivers/perf/arm_spe_pmu.c
-@@ -677,9 +677,11 @@ static u64 arm_spe_pmsevfr_res0(u16 pmsver)
+@@ -677,11 +677,11 @@ static u64 arm_spe_pmsevfr_res0(u16 pmsver)
+ {
+ 	switch (pmsver) {
  	case ID_AA64DFR0_EL1_PMSVer_IMP:
- 		return PMSEVFR_EL1_RES0_IMP;
+-		return SYS_PMSEVFR_EL1_RES0_8_2;
++		return PMSEVFR_EL1_RES0_IMP;
  	case ID_AA64DFR0_EL1_PMSVer_V1P1:
-+		return PMSEVFR_EL1_RES0_V1P1;
-+	case ID_AA64DFR0_EL1_PMSVer_V1P2:
  	/* Return the highest version we support in default */
  	default:
--		return PMSEVFR_EL1_RES0_V1P1;
-+		return PMSEVFR_EL1_RES0_V1P2;
+-		return SYS_PMSEVFR_EL1_RES0_8_3;
++		return PMSEVFR_EL1_RES0_V1P1;
  	}
  }
  
