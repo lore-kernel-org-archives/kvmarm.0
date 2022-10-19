@@ -2,79 +2,55 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABD62C433FE
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Oct 2022 19:11:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D8CBC4332F
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Oct 2022 20:19:11 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6864D4B92F;
-	Wed, 19 Oct 2022 15:11:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B57F4B8A0;
+	Wed, 19 Oct 2022 16:19:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LQmHJXkcXqNu; Wed, 19 Oct 2022 15:11:38 -0400 (EDT)
+	with ESMTP id 8wtlN6Ob1sWC; Wed, 19 Oct 2022 16:19:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A25774B938;
-	Wed, 19 Oct 2022 15:11:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE5394B8F2;
+	Wed, 19 Oct 2022 16:19:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1515A4B8D0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 15:11:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EB874B8A0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 16:19:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IWOf-fG48LDr for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Oct 2022 15:11:35 -0400 (EDT)
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com
- [209.85.160.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F7AA4B920
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 15:11:35 -0400 (EDT)
-Received: by mail-oa1-f50.google.com with SMTP id
- 586e51a60fabf-134072c15c1so21867902fac.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 12:11:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
- :mime-version:subject:date:from:x-gm-message-state:from:to:cc
- :subject:date:message-id:reply-to;
- bh=1uHI8D71nZXIPql0Ea/USh9ISq5jM79VtrVQ2e/RcjE=;
- b=psbV/s2fPjWlMv2o6R0TwR5z8WIgSRRLlneBGO5bVSyR+TTlI8bFeWIsMy7UkQmQSe
- acR1W+vOduviqS1cx7Wayx1Mqo4+5nC3tSbikNKEy2lHfNHczs3YT6pMlA4iilz6mbSn
- xZcXaL0Yqg5Vr3H4Ni5kqhF/P/QsfYEczuX1LAbWkhL+w4I2RaddJf4Ez/xg0cIutP7a
- ZYKpWmwfdILAta/1FSA3IjIR2lrO+NsZQ55e7AqkA/Jrq3NCDtpNhv36fPToKeTb+uBp
- A3Hfj2KQQpp3yO2M7hBbqRItGniRCvvX6xKY3x+uje6ST52G8K9jEreZ1VpI31ve/y94
- eH9g==
-X-Gm-Message-State: ACrzQf3hr5XwA/PWNxsZSOFfeRVUG+gu2eqpQwma2T7G81VU7uehlelq
- qKdZYjJf+fdmwdEDzj0XYQ==
-X-Google-Smtp-Source: AMsMyM7WkeQ7g4p9Ezrvy829By+9j1qkB1Fwp6SHcF4UBut9w8J0q3DhODuEycKY6qUiN1eBQPjq9A==
-X-Received: by 2002:a05:6870:4713:b0:132:d3fb:9f80 with SMTP id
- b19-20020a056870471300b00132d3fb9f80mr5866965oaq.15.1666206694359; 
- Wed, 19 Oct 2022 12:11:34 -0700 (PDT)
-Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net.
- [66.90.144.107]) by smtp.gmail.com with ESMTPSA id
- 23-20020aca2117000000b00354efb5be11sm7001508oiz.15.2022.10.19.12.11.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 19 Oct 2022 12:11:33 -0700 (PDT)
-Received: (nullmailer pid 3420904 invoked by uid 1000);
- Wed, 19 Oct 2022 19:11:25 -0000
-From: Rob Herring <robh@kernel.org>
-Date: Wed, 19 Oct 2022 14:11:27 -0500
-Subject: [PATCH v2 4/7] perf: arm_spe: Drop BIT() and use FIELD_GET/PREP
- accessors
+ with ESMTP id yEeMvRZyE-iz for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Oct 2022 16:19:06 -0400 (EDT)
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D2E54B89B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 16:19:06 -0400 (EDT)
+Received: from MUA by vps-vb.mhejs.net with esmtps (TLS1.2) tls
+ TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94.2)
+ (envelope-from <mail@maciej.szmigiero.name>)
+ id 1olFWW-0003EF-DJ; Wed, 19 Oct 2022 22:18:44 +0200
+Message-ID: <a45cfcc9-0255-14f0-30a5-18d6efaad0d4@maciej.szmigiero.name>
+Date: Wed, 19 Oct 2022 22:18:38 +0200
 MIME-Version: 1.0
-Message-Id: <20220825-arm-spe-v8-7-v2-4-e37322d68ac0@kernel.org>
-References: <20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org>
-In-Reply-To: <20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org>
-To: Namhyung Kim <namhyung@kernel.org>, James Morse <james.morse@arm.com>,
- Ingo Molnar <mingo@redhat.com>, Mark Rutland <mark.rutland@arm.com>,
- Marc Zyngier <maz@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Oliver Upton <oliver.upton@linux.dev>, Jiri Olsa <jolsa@kernel.org>
-X-Mailer: b4 0.11.0-dev
-Cc: linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Content-Language: en-US, pl-PL
+To: Gavin Shan <gshan@redhat.com>
+References: <20221014071914.227134-1-gshan@redhat.com>
+ <20221014071914.227134-5-gshan@redhat.com>
+ <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
+ <bd5df92c-6870-8053-0b35-a2ad993970bd@redhat.com>
+ <da2b7db0-509a-c9e0-c36b-6487a265a779@redhat.com>
+ <a1a8664c-4d06-89e7-8cfa-b730969bb841@maciej.szmigiero.name>
+ <5bfbe050-a654-8400-e1f1-dcfa4dba13e6@redhat.com>
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH 4/6] KVM: selftests: memslot_perf_test: Support variable
+ guest page size
+In-Reply-To: <5bfbe050-a654-8400-e1f1-dcfa4dba13e6@redhat.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
+ zhenyzha@redhat.com, shan.gavin@gmail.com, kvmarm@lists.linux.dev,
+ pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
+ ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,233 +62,142 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Now that generated sysregs are in place, update the register field
-accesses. The use of BIT() is no longer needed with the new defines. Use
-FIELD_GET and FIELD_PREP instead of open coding masking and shifting.
-
-No functional change.
-
-Signed-off-by: Rob Herring <robh@kernel.org>
----
- drivers/perf/arm_spe_pmu.c | 70 ++++++++++++++++++++++------------------------
- 1 file changed, 34 insertions(+), 36 deletions(-)
-
-diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-index 814ed18346b6..9b4bd72087ea 100644
---- a/drivers/perf/arm_spe_pmu.c
-+++ b/drivers/perf/arm_spe_pmu.c
-@@ -283,18 +283,18 @@ static u64 arm_spe_event_to_pmscr(struct perf_event *event)
- 	struct perf_event_attr *attr = &event->attr;
- 	u64 reg = 0;
- 
--	reg |= ATTR_CFG_GET_FLD(attr, ts_enable) << PMSCR_EL1_TS_SHIFT;
--	reg |= ATTR_CFG_GET_FLD(attr, pa_enable) << PMSCR_EL1_PA_SHIFT;
--	reg |= ATTR_CFG_GET_FLD(attr, pct_enable) << PMSCR_EL1_PCT_SHIFT;
-+	reg |= FIELD_PREP(PMSCR_EL1_TS, ATTR_CFG_GET_FLD(attr, ts_enable));
-+	reg |= FIELD_PREP(PMSCR_EL1_PA, ATTR_CFG_GET_FLD(attr, pa_enable));
-+	reg |= FIELD_PREP(PMSCR_EL1_PCT, ATTR_CFG_GET_FLD(attr, pct_enable));
- 
- 	if (!attr->exclude_user)
--		reg |= BIT(PMSCR_EL1_E0SPE_SHIFT);
-+		reg |= PMSCR_EL1_E0SPE;
- 
- 	if (!attr->exclude_kernel)
--		reg |= BIT(PMSCR_EL1_E1SPE_SHIFT);
-+		reg |= PMSCR_EL1_E1SPE;
- 
- 	if (get_spe_event_has_cx(event))
--		reg |= BIT(PMSCR_EL1_CX_SHIFT);
-+		reg |= PMSCR_EL1_CX;
- 
- 	return reg;
- }
-@@ -322,7 +322,7 @@ static u64 arm_spe_event_to_pmsirr(struct perf_event *event)
- 
- 	arm_spe_event_sanitise_period(event);
- 
--	reg |= ATTR_CFG_GET_FLD(attr, jitter) << PMSIRR_EL1_RND_SHIFT;
-+	reg |= FIELD_PREP(PMSIRR_EL1_RND, ATTR_CFG_GET_FLD(attr, jitter));
- 	reg |= event->hw.sample_period;
- 
- 	return reg;
-@@ -333,18 +333,18 @@ static u64 arm_spe_event_to_pmsfcr(struct perf_event *event)
- 	struct perf_event_attr *attr = &event->attr;
- 	u64 reg = 0;
- 
--	reg |= ATTR_CFG_GET_FLD(attr, load_filter) << PMSFCR_EL1_LD_SHIFT;
--	reg |= ATTR_CFG_GET_FLD(attr, store_filter) << PMSFCR_EL1_ST_SHIFT;
--	reg |= ATTR_CFG_GET_FLD(attr, branch_filter) << PMSFCR_EL1_B_SHIFT;
-+	reg |= FIELD_PREP(PMSFCR_EL1_LD, ATTR_CFG_GET_FLD(attr, load_filter));
-+	reg |= FIELD_PREP(PMSFCR_EL1_ST, ATTR_CFG_GET_FLD(attr, store_filter));
-+	reg |= FIELD_PREP(PMSFCR_EL1_B, ATTR_CFG_GET_FLD(attr, branch_filter));
- 
- 	if (reg)
--		reg |= BIT(PMSFCR_EL1_FT_SHIFT);
-+		reg |= PMSFCR_EL1_FT;
- 
- 	if (ATTR_CFG_GET_FLD(attr, event_filter))
--		reg |= BIT(PMSFCR_EL1_FE_SHIFT);
-+		reg |= PMSFCR_EL1_FE;
- 
- 	if (ATTR_CFG_GET_FLD(attr, min_latency))
--		reg |= BIT(PMSFCR_EL1_FL_SHIFT);
-+		reg |= PMSFCR_EL1_FL;
- 
- 	return reg;
- }
-@@ -358,8 +358,7 @@ static u64 arm_spe_event_to_pmsevfr(struct perf_event *event)
- static u64 arm_spe_event_to_pmslatfr(struct perf_event *event)
- {
- 	struct perf_event_attr *attr = &event->attr;
--	return ATTR_CFG_GET_FLD(attr, min_latency)
--	       << PMSLATFR_EL1_MINLAT_SHIFT;
-+	return FIELD_PREP(PMSLATFR_EL1_MINLAT, ATTR_CFG_GET_FLD(attr, min_latency));
- }
- 
- static void arm_spe_pmu_pad_buf(struct perf_output_handle *handle, int len)
-@@ -511,7 +510,7 @@ static void arm_spe_perf_aux_output_begin(struct perf_output_handle *handle,
- 	limit = buf->snapshot ? arm_spe_pmu_next_snapshot_off(handle)
- 			      : arm_spe_pmu_next_off(handle);
- 	if (limit)
--		limit |= BIT(PMBLIMITR_EL1_E_SHIFT);
-+		limit |= PMBLIMITR_EL1_E;
- 
- 	limit += (u64)buf->base;
- 	base = (u64)buf->base + PERF_IDX2OFF(handle->head, buf);
-@@ -570,23 +569,23 @@ arm_spe_pmu_buf_get_fault_act(struct perf_output_handle *handle)
- 
- 	/* Service required? */
- 	pmbsr = read_sysreg_s(SYS_PMBSR_EL1);
--	if (!(pmbsr & BIT(PMBSR_EL1_S_SHIFT)))
-+	if (!FIELD_GET(PMBSR_EL1_S, pmbsr))
- 		return SPE_PMU_BUF_FAULT_ACT_SPURIOUS;
- 
- 	/*
- 	 * If we've lost data, disable profiling and also set the PARTIAL
- 	 * flag to indicate that the last record is corrupted.
- 	 */
--	if (pmbsr & BIT(PMBSR_EL1_DL_SHIFT))
-+	if (FIELD_GET(PMBSR_EL1_DL, pmbsr))
- 		perf_aux_output_flag(handle, PERF_AUX_FLAG_TRUNCATED |
- 					     PERF_AUX_FLAG_PARTIAL);
- 
- 	/* Report collisions to userspace so that it can up the period */
--	if (pmbsr & BIT(PMBSR_EL1_COLL_SHIFT))
-+	if (FIELD_GET(PMBSR_EL1_COLL, pmbsr))
- 		perf_aux_output_flag(handle, PERF_AUX_FLAG_COLLISION);
- 
- 	/* We only expect buffer management events */
--	switch (FIELD_GET(PMBSR_EL1_EC_MASK, pmbsr)) {
-+	switch (FIELD_GET(PMBSR_EL1_EC, pmbsr)) {
- 	case PMBSR_EL1_EC_BUF:
- 		/* Handled below */
- 		break;
-@@ -716,23 +715,22 @@ static int arm_spe_pmu_event_init(struct perf_event *event)
- 		return -EINVAL;
- 
- 	reg = arm_spe_event_to_pmsfcr(event);
--	if ((reg & BIT(PMSFCR_EL1_FE_SHIFT)) &&
-+	if ((FIELD_GET(PMSFCR_EL1_FE, reg)) &&
- 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_EVT))
- 		return -EOPNOTSUPP;
- 
--	if ((reg & BIT(PMSFCR_EL1_FT_SHIFT)) &&
-+	if ((FIELD_GET(PMSFCR_EL1_FT, reg)) &&
- 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_TYP))
- 		return -EOPNOTSUPP;
- 
--	if ((reg & BIT(PMSFCR_EL1_FL_SHIFT)) &&
-+	if ((FIELD_GET(PMSFCR_EL1_FL, reg)) &&
- 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_LAT))
- 		return -EOPNOTSUPP;
- 
- 	set_spe_event_has_cx(event);
- 	reg = arm_spe_event_to_pmscr(event);
- 	if (!perfmon_capable() &&
--	    (reg & (BIT(PMSCR_EL1_PA_SHIFT) |
--		    BIT(PMSCR_EL1_PCT_SHIFT))))
-+	    (reg & (PMSCR_EL1_PA | PMSCR_EL1_PCT)))
- 		return -EACCES;
- 
- 	return 0;
-@@ -970,14 +968,14 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 
- 	/* Read PMBIDR first to determine whether or not we have access */
- 	reg = read_sysreg_s(SYS_PMBIDR_EL1);
--	if (reg & BIT(PMBIDR_EL1_P_SHIFT)) {
-+	if (FIELD_GET(PMBIDR_EL1_P, reg)) {
- 		dev_err(dev,
- 			"profiling buffer owned by higher exception level\n");
- 		return;
- 	}
- 
- 	/* Minimum alignment. If it's out-of-range, then fail the probe */
--	fld = (reg & PMBIDR_EL1_ALIGN_MASK) >> PMBIDR_EL1_ALIGN_SHIFT;
-+	fld = FIELD_GET(PMBIDR_EL1_ALIGN, reg);
- 	spe_pmu->align = 1 << fld;
- 	if (spe_pmu->align > SZ_2K) {
- 		dev_err(dev, "unsupported PMBIDR.Align [%d] on CPU %d\n",
-@@ -987,26 +985,26 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 
- 	/* It's now safe to read PMSIDR and figure out what we've got */
- 	reg = read_sysreg_s(SYS_PMSIDR_EL1);
--	if (reg & BIT(PMSIDR_EL1_FE_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_FE, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_FILT_EVT;
- 
--	if (reg & BIT(PMSIDR_EL1_FT_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_FT, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_FILT_TYP;
- 
--	if (reg & BIT(PMSIDR_EL1_FL_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_FL, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_FILT_LAT;
- 
--	if (reg & BIT(PMSIDR_EL1_ARCHINST_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_ARCHINST, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_ARCH_INST;
- 
--	if (reg & BIT(PMSIDR_EL1_LDS_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_LDS, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_LDS;
- 
--	if (reg & BIT(PMSIDR_EL1_ERND_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_ERND, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_ERND;
- 
- 	/* This field has a spaced out encoding, so just use a look-up */
--	fld = (reg & PMSIDR_EL1_INTERVAL_MASK) >> PMSIDR_EL1_INTERVAL_SHIFT;
-+	fld = FIELD_GET(PMSIDR_EL1_INTERVAL, reg);
- 	switch (fld) {
- 	case 0:
- 		spe_pmu->min_period = 256;
-@@ -1038,7 +1036,7 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 	}
- 
- 	/* Maximum record size. If it's out-of-range, then fail the probe */
--	fld = (reg & PMSIDR_EL1_MAXSIZE_MASK) >> PMSIDR_EL1_MAXSIZE_SHIFT;
-+	fld = FIELD_GET(PMSIDR_EL1_MAXSIZE, reg);
- 	spe_pmu->max_record_sz = 1 << fld;
- 	if (spe_pmu->max_record_sz > SZ_2K || spe_pmu->max_record_sz < 16) {
- 		dev_err(dev, "unsupported PMSIDR_EL1.MaxSize [%d] on CPU %d\n",
-@@ -1046,7 +1044,7 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 		return;
- 	}
- 
--	fld = (reg & PMSIDR_EL1_COUNTSIZE_MASK) >> PMSIDR_EL1_COUNTSIZE_SHIFT;
-+	fld = FIELD_GET(PMSIDR_EL1_COUNTSIZE, reg);
- 	switch (fld) {
- 	default:
- 		dev_warn(dev, "unknown PMSIDR_EL1.CountSize [%d]; assuming 2\n",
-
--- 
-b4 0.11.0-dev
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMTkuMTAuMjAyMiAwMjoyNiwgR2F2aW4gU2hhbiB3cm90ZToKPiBPbiAxMC8xOC8yMiAxMTo1
+NiBQTSwgTWFjaWVqIFMuIFN6bWlnaWVybyB3cm90ZToKPj4gT24gMTguMTAuMjAyMiAwMjo1MSwg
+R2F2aW4gU2hhbiB3cm90ZToKPj4+IE9uIDEwLzE4LzIyIDg6NDYgQU0sIEdhdmluIFNoYW4gd3Jv
+dGU6Cj4+Pj4gT24gMTAvMTgvMjIgNTozMSBBTSwgTWFjaWVqIFMuIFN6bWlnaWVybyB3cm90ZToK
+Pj4+Pj4gT24gMTQuMTAuMjAyMiAwOToxOSwgR2F2aW4gU2hhbiB3cm90ZToKPj4+Pj4+IFRoZSB0
+ZXN0IGNhc2UgaXMgb2J2aW91c2x5IGJyb2tlbiBvbiBhYXJjaDY0IGJlY2F1c2Ugbm9uLTRLQiBn
+dWVzdAo+Pj4+Pj4gcGFnZSBzaXplIGlzIHN1cHBvcnRlZC4gVGhlIGd1ZXN0IHBhZ2Ugc2l6ZSBv
+biBhYXJjaDY0IGNvdWxkIGJlIDRLQiwKPj4+Pj4+IDE2S0Igb3IgNjRLQi4KPj4+Pj4+Cj4+Pj4+
+PiBUaGlzIHN1cHBvcnRzIHZhcmlhYmxlIGd1ZXN0IHBhZ2Ugc2l6ZSwgbW9zdGx5IGZvciBhYXJj
+aDY0Lgo+Pj4+Pj4KPj4+Pj4+IMKgwqAgLSBUaGUgaG9zdCBkZXRlcm1pbmVzIHRoZSBndWVzdCBw
+YWdlIHNpemUgd2hlbiB2aXJ0dWFsIG1hY2hpbmUgaXMKPj4+Pj4+IMKgwqDCoMKgIGNyZWF0ZWQu
+IFRoZSB2YWx1ZSBpcyBhbHNvIHBhc3NlZCB0byBndWVzdCB0aHJvdWdoIHRoZSBzeW5jaHJvbml6
+YXRpb24KPj4+Pj4+IMKgwqDCoMKgIGFyZWEuCj4+Pj4+Pgo+Pj4+Pj4gwqDCoCAtIFRoZSBudW1i
+ZXIgb2YgZ3Vlc3QgcGFnZXMgYXJlIHVua25vd24gdW50aWwgdGhlIHZpcnR1YWwgbWFjaGluZQo+
+Pj4+Pj4gwqDCoMKgwqAgaXMgdG8gYmUgY3JlYXRlZC4gU28gYWxsIHRoZSByZWxhdGVkIG1hY3Jv
+cyBhcmUgZHJvcHBlZC4gSW5zdGVhZCwKPj4+Pj4+IMKgwqDCoMKgIHRoZWlyIHZhbHVlcyBhcmUg
+ZHluYW1pY2FsbHkgY2FsY3VsYXRlZCBiYXNlZCBvbiB0aGUgZ3Vlc3QgcGFnZQo+Pj4+Pj4gwqDC
+oMKgwqAgc2l6ZS4KPj4+Pj4+Cj4+Pj4+PiDCoMKgIC0gVGhlIHN0YXRpYyBjaGVja3Mgb24gbWVt
+b3J5IHNpemVzIGFuZCBwYWdlcyBiZWNvbWVzIGRlcGVuZGVudAo+Pj4+Pj4gwqDCoMKgwqAgb24g
+Z3Vlc3QgcGFnZSBzaXplLCB3aGljaCBpcyB1bmtub3duIHVudGlsIHRoZSB2aXJ0dWFsIG1hY2hp
+bmUKPj4+Pj4+IMKgwqDCoMKgIGlzIGFib3V0IHRvIGJlIGNyZWF0ZWQuIFNvIGFsbCB0aGUgc3Rh
+dGljIGNoZWNrcyBhcmUgY29udmVydGVkCj4+Pj4+PiDCoMKgwqDCoCB0byBkeW5hbWljIGNoZWNr
+cywgZG9uZSBpbiBjaGVja19tZW1vcnlfc2l6ZXMoKS4KPj4+Pj4+Cj4+Pj4+PiDCoMKgIC0gQXMg
+dGhlIGFkZHJlc3MgcGFzc2VkIHRvIG1hZHZpc2UoKSBzaG91bGQgYmUgYWxpZ25lZCB0byBob3N0
+IHBhZ2UsCj4+Pj4+PiDCoMKgwqDCoCB0aGUgc2l6ZSBvZiBwYWdlIGNodW5rIGlzIGF1dG9tYXRp
+Y2FsbHkgc2VsZWN0ZWQsIG90aGVyIHRoYW4gb25lCj4+Pj4+PiDCoMKgwqDCoCBwYWdlLgo+Pj4+
+Pj4KPj4+Pj4+IMKgwqAgLSBBbGwgb3RoZXIgY2hhbmdlcyBpbmNsdWRlZCBpbiB0aGlzIHBhdGNo
+IGFyZSBhbG1vc3QgbWVjaGFuaWNhbAo+Pj4+Pj4gwqDCoMKgwqAgcmVwbGFjaW5nICc0MDk2JyB3
+aXRoICdndWVzdF9wYWdlX3NpemUnLgo+Pj4+Pj4KPj4+Pj4+IFNpZ25lZC1vZmYtYnk6IEdhdmlu
+IFNoYW4gPGdzaGFuQHJlZGhhdC5jb20+Cj4+Pj4+PiAtLS0KPj4+Pj4+IMKgIC4uLi90ZXN0aW5n
+L3NlbGZ0ZXN0cy9rdm0vbWVtc2xvdF9wZXJmX3Rlc3QuYyB8IDE5MSArKysrKysrKysrKy0tLS0t
+LS0KPj4+Pj4+IMKgIDEgZmlsZSBjaGFuZ2VkLCAxMTUgaW5zZXJ0aW9ucygrKSwgNzYgZGVsZXRp
+b25zKC0pCj4+Pj4+Pgo+Pj4+Pj4gZGlmZiAtLWdpdCBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3Rz
+L2t2bS9tZW1zbG90X3BlcmZfdGVzdC5jIGIvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL21l
+bXNsb3RfcGVyZl90ZXN0LmMKPj4+Pj4+IGluZGV4IGQ1YWE5MTQ4Zjk2Zi4uZDU4N2JkOTUyZmY5
+IDEwMDY0NAo+Pj4+Pj4gLS0tIGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL21lbXNsb3Rf
+cGVyZl90ZXN0LmMKPj4+Pj4+ICsrKyBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9tZW1z
+bG90X3BlcmZfdGVzdC5jCj4+ICguLi4pCj4+Pj4+PiBAQCAtNzcsOCArNjEsNyBAQCBzdGF0aWNf
+YXNzZXJ0KE1FTV9URVNUX1VOTUFQX1NJWkVfUEFHRVMgJQo+Pj4+Pj4gwqDCoCAqIGZvciB0aGUg
+dG90YWwgc2l6ZSBvZiAyNSBwYWdlcy4KPj4+Pj4+IMKgwqAgKiBIZW5jZSwgdGhlIG1heGltdW0g
+c2l6ZSBoZXJlIGlzIDUwIHBhZ2VzLgo+Pj4+Pj4gwqDCoCAqLwo+Pj4+Pj4gLSNkZWZpbmUgTUVN
+X1RFU1RfTU9WRV9TSVpFX1BBR0VTwqDCoMKgICg1MCkKPj4+Pj4+IC0jZGVmaW5lIE1FTV9URVNU
+X01PVkVfU0laRcKgwqDCoMKgwqDCoMKgIChNRU1fVEVTVF9NT1ZFX1NJWkVfUEFHRVMgKiA0MDk2
+KQo+Pj4+Pj4gKyNkZWZpbmUgTUVNX1RFU1RfTU9WRV9TSVpFwqDCoMKgwqDCoMKgwqAgMHgzMjAw
+MAo+Pj4+Pgo+Pj4+PiBUaGUgYWJvdmUgbnVtYmVyIHNlZW1zIGxlc3MgcmVhZGFibGUgdGhhbiBh
+biBleHBsaWNpdCB2YWx1ZSBvZiA1MCBwYWdlcy4KPj4+Pj4KPj4+Pj4gSW4gYWRkaXRpb24gdG8g
+dGhhdCwgaXQncyA1MCBwYWdlcyBvbmx5IHdpdGggNGsgcGFnZSBzaXplLCBzbyBhdCBsZWFzdAo+
+Pj4+PiB0aGUgY29tbWVudCBhYm92ZSBuZWVkcyB0byBiZSB1cGRhdGVkIHRvIHJlZmxlY3QgdGhp
+cyBmYWN0Lgo+Pj4+Pgo+Pj4+Cj4+Pj4gWWVhaCwgSSB3aWxsIGNoYW5nZSB0aGUgY29tbWVudHMg
+bGlrZSBiZWxvdyBpbiBuZXh0IHJldmlzaW9uLgo+Pj4+Cj4+Pj4gwqDCoC8qCj4+Pj4gwqDCoCAq
+IFdoZW4gcnVubmluZyB0aGlzIHRlc3Qgd2l0aCAzMmsgbWVtc2xvdHMsIGFjdHVhbGx5IDMyNzYz
+IGV4Y2x1ZGluZwo+Pj4+IMKgwqAgKiB0aGUgcmVzZXJ2ZWQgbWVtb3J5IHNsb3QgMCwgdGhlIG1l
+bW9yeSBmb3IgZWFjaCBzbG90IGlzIDB4NDAwMCBieXRlcy4KPj4+PiDCoMKgICogVGhlIGxhc3Qg
+c2xvdCBjb250YWlucyAweDE5MDAwIGJ5dGVzIG1lbW9yeS4gSGVuY2UsIHRoZSBtYXhpbXVtIHNp
+emUKPj4+PiDCoMKgICogaGVyZSBpcyAweDMyMDAwIGJ5dGVzLgo+Pj4+IMKgwqAgKi8KPj4+Pgo+
+Pj4KPj4+IEkgd2lsbCByZXBsYWNlIHRob3NlIG51bWJlcnMgd2l0aCByZWFkYWJsZSBvbmVzIGxp
+a2UgYmVsb3cgOikKPj4+Cj4+PiAvKgo+Pj4gwqDCoCogV2hlbiBydW5uaW5nIHRoaXMgdGVzdCB3
+aXRoIDMyayBtZW1zbG90cywgYWN0dWFsbHkgMzI3NjMgZXhjbHVkaW5nCj4+PiDCoMKgKiB0aGUg
+cmVzZXJ2ZWQgbWVtb3J5IHNsb3QgMCwgdGhlIG1lbW9yeSBmb3IgZWFjaCBzbG90IGlzIDE2S0Iu
+IFRoZQo+Pj4gwqDCoCogbGFzdCBzbG90IGNvbnRhaW5zIDEwMEtCIG1lbW9yeSB3aXRoIHRoZSBy
+ZW1haW5pbmcgODRLQi4gSGVuY2UsCj4+PiDCoMKgKiB0aGUgbWF4aW11bSBzaXplIGlzIGRvdWJs
+ZSBvZiB0aGF0ICgyMDBLQikKPj4+IMKgwqAqLwo+Pgo+PiBTdGlsbCwgdGhlc2UgbnVtYmVycyBh
+cmUgZm9yIHg4Niwgd2hpY2ggaGFzIEtWTV9JTlRFUk5BTF9NRU1fU0xPVFMKPj4gZGVmaW5lZCBh
+cyAzLgo+Pgo+PiBBcyBmYXIgYXMgSSBjYW4gc2VlIGFhcmNoNjQgaGFzIEtWTV9JTlRFUk5BTF9N
+RU1fU0xPVFMgZXF1YWwgdG8gMCwgc28KPj4gdGhpcyBhcmNoIGhhcyAzMjc2NiBzbG90IGF2YWls
+YWJsZSBmb3IgdGhlIHRlc3QgbWVtb3J5Lgo+Pgo+PiBRdWljayBjYWxjdWxhdGlvbnMgc2hvdyB0
+aGF0IHRoaXMgd2lsbCByZXN1bHQgaW4gMTEyIEtpQiBvZiBtZW1vcnkgaW4KPj4gdGhlIGxhc3Qg
+c2xvdCBmb3IgNCBLaUIgcGFnZSBzaXplICh3aGlsZSBmb3IgNjQgS2lCIHBhZ2Ugc2l6ZSB0aGUK
+Pj4gbWF4aW11bSBzbG90IGNvdW50IGZvciB0aGlzIHRlc3QgaXMgODE5MiBhbnl3YXkgLSBub3Qg
+Y291bnRpbmcgc2xvdCAwKS4KPj4KPiAKPiBJdCBzZWVtcyB5b3VyIGNhbGN1bGF0aW9uIGhhZCAo
+NTEyTUIrNjRLQiksIGluc3RlYWQgb2YgKDUxMk1CKzRLQikuCj4gSW4gdGhpcyBwYXJ0aWN1bGFy
+IHBhdGNoLCB3ZSBzdGlsbCBoYXZlICg1MTJNQis0S0IpLiBIb3cgYWJvdXQgdG8gY2hhbmdlCj4g
+bGlrZSBiZWxvdyBpbiB0aGlzIHBhdGNoLiBJbiBuZXh0IHBhdGNoLCBpdCdzIGFkanVzdGVkIGFj
+Y29yZGluZ2x5IGFmdGVyCj4gd2UgaGF2ZSAoNTEyTUIrNjRLQikuCgpNeSByZXZpZXcgY29tbWVu
+dCBhYm92ZSByZWZlcnJlZCB0byB0aGUgZmluYWwgTUVNX1NJWkUgdmFsdWUgYWZ0ZXIgdGhlCndo
+b2xlIHNlcmllcywgc28gNTEyIE1pQiArIDY0IEtpQi4KCkkgcGxhY2VkIHRoYXQgcmV2aWV3IGNv
+bW1lbnQgb24gcGF0Y2ggNCBzaW5jZSBpdCdzIHRoZSBvbmx5IHBhdGNoIGluIHRoaXMKc2VyaWVz
+IHRoYXQgbW9kaWZpZWQgdGhlIGNvZGUgY29tbWVudCBhYm91dCBNRU1fVEVTVF9NT1ZFX1NJWkUu
+Cgo+IAo+ICgxKSBJbiB0aGlzIHBhdGNoLCB0aGUgY29tbWVudCBpcyBjaGFuZ2VkIHRvIGFzIGJl
+bG93Cj4gCj4gIMKgwqDCoCAvKgo+ICDCoMKgwqDCoCAqIFdlIGhhdmUgZGlmZmVyZW50IG51bWJl
+ciBvZiBtZW1vcnkgc2xvdHMsIGV4Y2x1ZGluZyB0aGUgcmVzZXJ2ZWQKPiAgwqDCoMKgwqAgKiBt
+ZW1vcnkgc2xvdCAwLCBvbiB2YXJpb3VzIGFyY2hpdGVjdHVyZXMgYW5kIGNvbmZpZ3VyYXRpb25z
+LiBUaGUKPiAgwqDCoMKgwqAgKiBtZW1vcnkgc2l6ZSBpbiB0aGlzIHRlc3QgaXMgY2FsY3VsYXRl
+ZCBieSBkb3VibGluZyB0aGUgbWF4aW1hbAo+ICDCoMKgwqDCoCAqIG1lbW9yeSBzaXplIGluIGxh
+c3QgbWVtb3J5IHNsb3QsIHdpdGggYWxpZ25tZW50IHRvIHRoZSBsYXJnZXN0Cj4gIMKgwqDCoMKg
+ICogc3VwcG9ydGVkIHBhZ2Ugc2l6ZSAoNjRLQikuCj4gIMKgwqDCoMKgICoKPiAgwqDCoMKgwqAg
+KiBhcmNoaXRlY3R1cmXCoMKgIHNsb3RzwqDCoMKgIG1lbW9yeS1wZXItc2xvdMKgwqDCoCBtZW1v
+cnktb24tbGFzdC1zbG90Cj4gIMKgwqDCoMKgICogLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiAgwqDCoMKgwqAgKiB4ODYtNEtC
+wqDCoMKgwqDCoMKgwqAgMzI3NjPCoMKgwqAgMTZLQsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgMTAwS0IKPiAgwqDCoMKgwqAgKiBhcm02NC00S0LCoMKgwqDCoMKgIDMyNzY2wqDCoMKgIDE2
+S0LCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDUyS0IKPiAgwqDCoMKgwqAgKiBhcm02NC02
+NEtCwqDCoMKgwqAgODE5MsKgwqDCoMKgIDY0S0LCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IDY0S0IKPiAgwqDCoMKgwqAgKi8KPiAgwqDCoMKgICNkZWZpbmUgTUVNX1RFU1RfTU9WRV9TSVpF
+wqDCoMKgIDB4NDAwMDDCoMKgwqDCoMKgwqDCoMKgwqDCoCAvKiAyNTZLQiAqLwo+Cj4gKDIpIElu
+IHRoZSBuZXh0IHBhdGNoLCB3aGVyZSB3ZSBoYXZlICg1MTJNQis2NEtCKSBhZnRlciB0aGUgdmFy
+aW91cwo+ICDCoMKgwqAgbWVtb3J5IHNpemVzIGFyZSBjb25zb2xpZGF0ZWQsIEl0IGlzIGFkanVz
+dGVkIGFjY29yZGluZ2x5IGFzIGJlbG93Lgo+IAo+ICDCoMKgwqAgLyoKPiAgwqDCoMKgwqAgKiBX
+ZSBoYXZlIGRpZmZlcmVudCBudW1iZXIgb2YgbWVtb3J5IHNsb3RzLCBleGNsdWRpbmcgdGhlIHJl
+c2VydmVkCj4gIMKgwqDCoMKgICogbWVtb3J5IHNsb3QgMCwgb24gdmFyaW91cyBhcmNoaXRlY3R1
+cmVzIGFuZCBjb25maWd1cmF0aW9ucy4gVGhlCj4gIMKgwqDCoMKgICogbWVtb3J5IHNpemUgaW4g
+dGhpcyB0ZXN0IGlzIGNhbGN1bGF0ZWQgYnkgZG91YmxpbmcgdGhlIG1heGltYWwKPiAgwqDCoMKg
+wqAgKiBtZW1vcnkgc2l6ZSBpbiBsYXN0IG1lbW9yeSBzbG90LCB3aXRoIGFsaWdubWVudCB0byB0
+aGUgbGFyZ2VzdAo+ICDCoMKgwqDCoCAqIHN1cHBvcnRlZCBwYWdlIHNpemUgKDY0S0IpLgo+ICDC
+oMKgwqDCoCAqCj4gIMKgwqDCoMKgICogYXJjaGl0ZWN0dXJlwqDCoCBzbG90c8KgwqDCoCBtZW1v
+cnktcGVyLXNsb3TCoMKgwqAgbWVtb3J5LW9uLWxhc3Qtc2xvdAo+ICDCoMKgwqDCoCAqIC0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+Cj4gIMKgwqDCoMKgICogeDg2LTRLQsKgwqDCoMKgwqDCoMKgIDMyNzYzwqDCoMKgIDE2S0LCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDE2MEtCCj4gIMKgwqDCoMKgICogYXJtNjQtNEtCwqDC
+oMKgwqDCoCAzMjc2NsKgwqDCoCAxNktCwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAxMTJL
+Qgo+ICDCoMKgwqDCoCAqIGFybTY0LTY0S0LCoMKgwqDCoCA4MTkywqDCoMKgwqAgNjRLQsKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgMTI4S0IKPiAgwqDCoMKgwqAgKi8KPiAgwqDCoMKgICNk
+ZWZpbmUgTUVNX1RFU1RfTU9WRV9TSVpFwqDCoMKgIDB4NTAwMDDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCAvKiAzMjBLQiAqLwoKTm93IE1FTV9URVNUX01PVkVfU0laRSBpcyB0b28gaGlnaCBmb3IgYXJt
+NjQtNEtCIGFuZCBhcm02NC02NEtCIGNhc2VzCihpdCBuZWVkcyAxNjAgS2lCIGluIHRoZSBsYXN0
+IHNsb3QgYnV0IGhhcyBsZXNzIGF2YWlsYWJsZSBpbiB0aGVzZSB0d28KY2FzZXMpLgoKVXNpbmcg
+YSB0ZXN0IHNpemUgb2YgMTkyIEtpQiBpbnN0ZWFkIHNlZW1zIGxpa2UgYSBzbWFsbCBkaWZmZXJl
+bmNlCmZyb20gdGhlIG9yaWdpbmFsIHNpemUgb2YgMjAwIEtpQiwgd2hpbGUgc3RpbGwgYmVpbmcg
+YWxpZ25lZCB0bwo2NCBLaUIuCgpUaGUgbW92ZSBiZW5jaG1hcmtzIHJ1bnRpbWUgZGlmZmVyZW5j
+ZSBvbiB4ODYtNEtCIHdpdGggdGhpcyBzaXplCihjb21wYXJlZCB0byBzaXplcyBvZiAyMDAgS2lC
+IGFuZCAzMjAgS2lCKSBzZWVtcyB0byBiZSBuZWdsaWdpYmxlLgoKU2luY2UgaXQncyBhbiBvZGQg
+bnVtYmVyIG9mIDY0IEtpQiBwYWdlcyAoMykgdGhlIGNvZGUgdGhhdCBoYWx2ZXMKdGhpcyBudW1i
+ZXIgb2YgcGFnZXMgd2lsbCBuZWVkIHRvIGJlIGFkanVzdGVkIHRvIG9wZXJhdGUgb24gcmF3CnNp
+emVzIGluc3RlYWQuCgpJIGNhbiBzZWUgYSBzaW5nbGUgYmxvY2sgb2YgY29kZSB0aGF0IHdpbGwg
+bmVlZCBzdWNoIGFkanVzdG1lbnQ6Cj4gaWYgKGxhc3RwYWdlcyA8IG1vdmVfcGFnZXMgLyAyKSB7
+Cj4gICAgICAgICAqbWF4c2xvdHMgPSAwOwo+ICAgICAgICAgcmV0dXJuIGZhbHNlOwo+IH0gICAK
+ClNpbWlsYXIgcmVtYXJrIGdvZXMgZm9yIHRoZSBjYXNlICgxKSBhYm92ZSwgd2hlcmUgeW91J2xs
+IHByb2JhYmx5IG5lZWQKdG8gdXNlIDY0IEtpQiB0ZXN0IGFyZWEgc2l6ZSAoaXQncyBvbmx5IGFu
+IGludGVybWVkaWF0ZSBmb3JtIG9mIGNvZGUKYmVmb3JlIHRoZSBmaW5hbCBwYXRjaCBjaGFuZ2Vz
+IHRoaXMgdmFsdWUgc28gaXQncyBmaW5lIGlmIGl0IGRvZXNuJ3QKcGVyZm9ybSBhcyB3ZWxsIGFz
+IHRoZSBmaW5hbCBmb3JtIG9mIHRoZSBjb2RlKS4KCj4gVGhhbmtzLAo+IEdhdmluCj4gCgpUaGFu
+a3MsCk1hY2llagoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBz
+Oi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
