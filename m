@@ -2,54 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6A1EC4332F
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Oct 2022 06:31:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF446C433FE
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Oct 2022 08:00:20 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EEF34B905;
-	Wed, 19 Oct 2022 02:31:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 25F614B908;
+	Wed, 19 Oct 2022 04:00:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vj2LPXoYwRe7; Wed, 19 Oct 2022 02:31:12 -0400 (EDT)
+	with ESMTP id Nhaxzz3yMRyi; Wed, 19 Oct 2022 04:00:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02ED84B91D;
-	Wed, 19 Oct 2022 02:31:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAF7B4B909;
+	Wed, 19 Oct 2022 04:00:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EA2374B256
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2022 18:57:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DAA154B907
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 04:00:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M860dkNE7pry for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Oct 2022 18:57:06 -0400 (EDT)
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1D0954A105
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Oct 2022 18:57:06 -0400 (EDT)
-Received: from MUA by vps-vb.mhejs.net with esmtps (TLS1.2) tls
- TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (Exim 4.94.2)
- (envelope-from <mail@maciej.szmigiero.name>)
- id 1okZ2Z-00024i-Nz; Tue, 18 Oct 2022 00:56:59 +0200
-Message-ID: <93529fb7-f558-cc5f-d5bd-7923eb4b492c@maciej.szmigiero.name>
-Date: Tue, 18 Oct 2022 00:56:53 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [PATCH 5/6] KVM: selftests: memslot_perf_test: Consolidate memory
- sizes
-Content-Language: en-US, pl-PL
-To: Gavin Shan <gshan@redhat.com>, Sean Christopherson <seanjc@google.com>
-References: <20221014071914.227134-1-gshan@redhat.com>
- <20221014071914.227134-6-gshan@redhat.com>
- <cebafa0d-a2dc-c3f7-64c8-2637a254e3d0@maciej.szmigiero.name>
- <Y03ScGUUCA1KwlLF@google.com>
- <9781c88f-06f9-4d17-8fa6-3cd82a739ccb@redhat.com>
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-In-Reply-To: <9781c88f-06f9-4d17-8fa6-3cd82a739ccb@redhat.com>
-X-Mailman-Approved-At: Wed, 19 Oct 2022 02:31:08 -0400
-Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
- zhenyzha@redhat.com, shan.gavin@gmail.com, kvmarm@lists.linux.dev,
- pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
- ajones@ventanamicro.com
+ with ESMTP id x7qjuqLY1-3W for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Oct 2022 04:00:15 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8B6394B8AE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Oct 2022 04:00:15 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 43576B82035;
+ Wed, 19 Oct 2022 08:00:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E922CC433B5;
+ Wed, 19 Oct 2022 08:00:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1666166413;
+ bh=kUqnFbzesWUiu7EdoTlex5UrNQvWnKpakjvsEvWTb5c=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=IeJI20bKxDh8uRMpzEIBeUTFy/z3cS8BvkjxSYEBKJ74gkgFgG5GcJTlQ+TpP7BgK
+ mgVoVIwGBzm8L0lILpE3jKnSCtuLX0Iixfo6ckmFK07mk5MHjBfjWP4hMr/DTOTMiJ
+ YXMrXguRpOroMRwGt3BHlSIBPQdmdyxndaws40B0QOW9L9aOwoFqhza2rrbBaZHSSB
+ 32m6CtQyVLcuCFlHpBB1/3yQ1FhKwe4sndCL6OiJb1fAAE/oLDw2413GSE8lBRBefO
+ V9lLENkrJOcrmWluFzrlSB8El3iNrCdrnB+O11C2OL3rN1GELVV6byZl4FoJxZKcCp
+ Ug+DmvG8N++Wg==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1ol3zm-00HTVn-HI;
+ Wed, 19 Oct 2022 09:00:10 +0100
+Date: Wed, 19 Oct 2022 08:59:25 +0100
+Message-ID: <87ilkggs6a.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: nv: Fixes for Nested Virtualization issues
+In-Reply-To: <b1bff394-f99f-8654-6b03-29166129763a@os.amperecomputing.com>
+References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
+ <b1bff394-f99f-8654-6b03-29166129763a@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, catalin.marinas@arm.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ scott@os.amperecomputing.com, keyur@os.amperecomputing.com,
+ darren@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: scott@os.amperecomputing.com, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ keyur@os.amperecomputing.com, Darren Hart <darren@os.amperecomputing.com>,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -61,39 +86,26 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMTguMTAuMjAyMiAwMDo1MSwgR2F2aW4gU2hhbiB3cm90ZToKPiBPbiAxMC8xOC8yMiA2OjA4
-IEFNLCBTZWFuIENocmlzdG9waGVyc29uIHdyb3RlOgo+PiBPbiBNb24sIE9jdCAxNywgMjAyMiwg
-TWFjaWVqIFMuIFN6bWlnaWVybyB3cm90ZToKPj4+PiArI2RlZmluZSBNRU1fRVhUUkFfU0laRcKg
-wqDCoMKgwqDCoMKgIDB4MTAwMDAKPj4+Cj4+PiBBbHNvLCBhbiBleHByZXNzaW9uIGxpa2UgIig2
-NCA8PCAxMCkiIGlzIG1vcmUgcmVhZGFibGUgdGhhbiBhICIxIgo+Pj4gd2l0aCBhIHRhaWwgb2Yg
-emVyb2VzIChpdCdzIGVhc3kgdG8gYWRkIG9uZSB6ZXJvIHRvbyBtYW55IG9yIGJlIG9uZQo+Pj4g
-emVybyBzaG9ydCkuCj4+Cj4+ICsxIHRvIG5vdCBvcGVuIGNvZGluZyByYXcgbnVtYmVycy4KPj4K
-Pj4gSSB0aGluayBpdCdzIGhpZ2ggdGltZSBLVk0gc2VsZnRlc3RzIGFkZCAjZGVmaW5lcyBmb3Ig
-dGhlIGNvbW1vbiBzaXplcywgZS5nLiBTSVpFXzRLQiwKPj4gMTZLQiwgNjRLLCAyTUIsIDFHQiwg
-ZXRjLi4uCj4+Cj4+IEFsdGVybmF0aXZlbHkgKG9yIGluIGFkZGl0aW9uKSwganVzdCAjZGVmaW5l
-IDFLQiwgMU1CLCAxR0IsIGFuZCAxVEIsIGFuZCB0aGVuIGRvCj4+IG1hdGggb2ZmIG9mIHRob3Nl
-Lgo+Pgo+IAo+IE9rLiBJIHdpbGwgaGF2ZSBvbmUgc2VwYXJhdGUgcGF0Y2ggdG8gZGVmaW5lIHRo
-b3NlIHNpemVzIGluIGt2bV91dGlsX2Jhc2UuaCwKPiByaWdodCBhZnRlciAnI2RlZmluZSBOU0VD
-X1BFUl9TRUMgMTAwMDAwMDAwMEwnLiBTZWFuLCBjb3VsZCB5b3UgbGV0IG1lIGtub3cKPiBpZiBp
-dCBsb29rcyBnb29kIHRvIHlvdT8KPiAKPiAgwqDCoMKgICNkZWZpbmUgS0LCoMKgwqDCoMKgwqDC
-oMKgICgxVUwgPDwgMTApCj4gIMKgwqDCoCAjZGVmaW5lIE1CwqDCoMKgwqDCoMKgwqDCoCAoMVVM
-IDw8IDIwKQo+ICDCoMKgwqAgI2RlZmluZSBHQsKgwqDCoMKgwqDCoMKgwqAgKDFVTCA8PCAzMCkK
-PiAgwqDCoMKgICNkZWZpbmUgVELCoMKgwqDCoMKgwqDCoMKgICgxVUwgPDwgNDApCj4gCj4gIMKg
-wqDCoCAvKiBCYXNlIHBhZ2UgYW5kIGh1Z2UgcGFnZSBzaXplICovCj4gIMKgwqDCoCAjZGVmaW5l
-IFNJWkVfNEtCwqDCoCAowqAgNCAqIEtCKQo+ICDCoMKgwqAgI2RlZmluZSBTSVpFXzE2S0LCoCAo
-IDE2ICogS0IpCj4gIMKgwqDCoCAjZGVmaW5lIFNJWkVfNjRLQsKgICggNjQgKiBLQikKPiAgwqDC
-oMKgICNkZWZpbmUgU0laRV8yTULCoMKgICjCoCAyICogTUIpCj4gIMKgwqDCoCAjZGVmaW5lIFNJ
-WkVfMzJNQsKgICggMzIgKiBNQikKPiAgwqDCoMKgICNkZWZpbmUgU0laRV81MTJNQiAoNTEyICog
-TUIpCj4gIMKgwqDCoCAjZGVmaW5lIFNJWkVfMUdCwqDCoCAowqAgMSAqIEdCKQo+ICDCoMKgwqAg
-I2RlZmluZSBTSVpFXzE2R0LCoCAoIDE2ICogR0IpCgpGWUksIFFFTVUgdXNlcyBLaUIsIE1pQiwg
-R2lCLCBldGMuLCBzZWUgWzFdLgoKPiBUaGFua3MsCj4gR2F2aW4KPiAKClRoYW5rcywKTWFjaWVq
-CgpbMV06IGh0dHBzOi8vZ2l0LnFlbXUub3JnLz9wPXFlbXUuZ2l0O2E9YmxvYjtmPWluY2x1ZGUv
-cWVtdS91bml0cy5oO2hiPUhFQUQKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
-LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
-bQo=
+On Mon, 10 Oct 2022 06:56:31 +0100,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+>
+> Hi Marc,
+> 
+> Any review comments on this series?
+
+Not yet. So far, the NV stuff is put on ice until I can source some
+actual HW to make the development less painful.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
