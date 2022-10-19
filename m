@@ -1,190 +1,67 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025257E
-	for <kvmarm@lists.linux.dev>; Wed, 19 Oct 2022 00:26:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1666139191;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2iRn13iSXiKN1tasBVGZtH8JeAlfEonkeX/dLbbng1k=;
-	b=iUhRaShlmmIdSVo9an2mkZi+zFcstqJzBUhpMZ8J7g0fDvQkWhRIoDOszcTtZ/4rI7HKQF
-	iU8s5EgqjwJuw1wcF8CzrEWzUBuGIRalbolOneMsyOWyfEN94XDNBN88dUbvMtnE0/N8gb
-	edbgnQ/u/Ndw2Teaubt8RP1gP+Nfgac=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-141-y8oaFLu7N5emg5q9o1-lYw-1; Tue, 18 Oct 2022 20:26:28 -0400
-X-MC-Unique: y8oaFLu7N5emg5q9o1-lYw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C8A1F3C01E0A;
-	Wed, 19 Oct 2022 00:26:27 +0000 (UTC)
-Received: from [10.64.54.70] (vpn2-54-70.bne.redhat.com [10.64.54.70])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 506502028DC1;
-	Wed, 19 Oct 2022 00:26:22 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 4/6] KVM: selftests: memslot_perf_test: Support variable
- guest page size
-To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
- zhenyzha@redhat.com, shan.gavin@gmail.com, kvmarm@lists.linux.dev,
- pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
- ajones@ventanamicro.com
-References: <20221014071914.227134-1-gshan@redhat.com>
- <20221014071914.227134-5-gshan@redhat.com>
- <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
- <bd5df92c-6870-8053-0b35-a2ad993970bd@redhat.com>
- <da2b7db0-509a-c9e0-c36b-6487a265a779@redhat.com>
- <a1a8664c-4d06-89e7-8cfa-b730969bb841@maciej.szmigiero.name>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <5bfbe050-a654-8400-e1f1-dcfa4dba13e6@redhat.com>
-Date: Wed, 19 Oct 2022 08:26:19 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E2528E8
+	for <kvmarm@lists.linux.dev>; Wed, 19 Oct 2022 11:57:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8FE8C433C1;
+	Wed, 19 Oct 2022 11:57:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1666180651;
+	bh=7dYUeVMl0ljljG/gREOSgn67ek1PhgEFY91pBBbAxwg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FhjdSpJQ8uYcQJVX7CfVuAb3mQh4YGQqss/P9iO096UxFvlaBpt8TtUeMiQUKr+3V
+	 WcUM4gQVr2OqxxwGV+nwGWU1ZUqiu92l79qBkuCNdrrbvSCqvNdfkhpRDyRQswyL1B
+	 3ZyDIN8dqx/moSdaMaGnzcc4cQHPozAtsWQDz3qO5yqJGPucL/QQlP4z62H94vEfum
+	 r4OdzPOlDTUErlKTnWVSfvak8jI3ThyYwH6Lh5QOp7zHuwqS9nhH4IRGLvrJzaVPXb
+	 PV6CJdmI8XxYHpt1OdJwfLfz0CqX98/5bA8mOa5ruSs1z+O5VCtfA1O6YRa011A240
+	 /qdl2LNThAvjA==
+Date: Wed, 19 Oct 2022 12:57:24 +0100
+From: Will Deacon <will@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Cc: kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 12/25] KVM: arm64: Add infrastructure to create and
+ track pKVM instances at EL2
+Message-ID: <20221019115723.GA4067@willie-the-truck>
+References: <20221017115209.2099-1-will@kernel.org>
+ <20221017115209.2099-13-will@kernel.org>
+ <Y07VaRwVf3McX27a@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <a1a8664c-4d06-89e7-8cfa-b730969bb841@maciej.szmigiero.name>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-Message-ID: <20221019002619.BrxBLKQi2wmvw4a_P99EMY7fMDCeYhHJb7WjM6eJaOw@z>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y07VaRwVf3McX27a@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On 10/18/22 11:56 PM, Maciej S. Szmigiero wrote:
-> On 18.10.2022 02:51, Gavin Shan wrote:
->> On 10/18/22 8:46 AM, Gavin Shan wrote:
->>> On 10/18/22 5:31 AM, Maciej S. Szmigiero wrote:
->>>> On 14.10.2022 09:19, Gavin Shan wrote:
->>>>> The test case is obviously broken on aarch64 because non-4KB guest
->>>>> page size is supported. The guest page size on aarch64 could be 4KB,
->>>>> 16KB or 64KB.
->>>>>
->>>>> This supports variable guest page size, mostly for aarch64.
->>>>>
->>>>>    - The host determines the guest page size when virtual machine is
->>>>>      created. The value is also passed to guest through the synchronization
->>>>>      area.
->>>>>
->>>>>    - The number of guest pages are unknown until the virtual machine
->>>>>      is to be created. So all the related macros are dropped. Instead,
->>>>>      their values are dynamically calculated based on the guest page
->>>>>      size.
->>>>>
->>>>>    - The static checks on memory sizes and pages becomes dependent
->>>>>      on guest page size, which is unknown until the virtual machine
->>>>>      is about to be created. So all the static checks are converted
->>>>>      to dynamic checks, done in check_memory_sizes().
->>>>>
->>>>>    - As the address passed to madvise() should be aligned to host page,
->>>>>      the size of page chunk is automatically selected, other than one
->>>>>      page.
->>>>>
->>>>>    - All other changes included in this patch are almost mechanical
->>>>>      replacing '4096' with 'guest_page_size'.
->>>>>
->>>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
->>>>> ---
->>>>>   .../testing/selftests/kvm/memslot_perf_test.c | 191 +++++++++++-------
->>>>>   1 file changed, 115 insertions(+), 76 deletions(-)
->>>>>
->>>>> diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
->>>>> index d5aa9148f96f..d587bd952ff9 100644
->>>>> --- a/tools/testing/selftests/kvm/memslot_perf_test.c
->>>>> +++ b/tools/testing/selftests/kvm/memslot_perf_test.c
-> (...)
->>>>> @@ -77,8 +61,7 @@ static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
->>>>>    * for the total size of 25 pages.
->>>>>    * Hence, the maximum size here is 50 pages.
->>>>>    */
->>>>> -#define MEM_TEST_MOVE_SIZE_PAGES    (50)
->>>>> -#define MEM_TEST_MOVE_SIZE        (MEM_TEST_MOVE_SIZE_PAGES * 4096)
->>>>> +#define MEM_TEST_MOVE_SIZE        0x32000
->>>>
->>>> The above number seems less readable than an explicit value of 50 pages.
->>>>
->>>> In addition to that, it's 50 pages only with 4k page size, so at least
->>>> the comment above needs to be updated to reflect this fact.
->>>>
->>>
->>> Yeah, I will change the comments like below in next revision.
->>>
->>>   /*
->>>    * When running this test with 32k memslots, actually 32763 excluding
->>>    * the reserved memory slot 0, the memory for each slot is 0x4000 bytes.
->>>    * The last slot contains 0x19000 bytes memory. Hence, the maximum size
->>>    * here is 0x32000 bytes.
->>>    */
->>>
->>
->> I will replace those numbers with readable ones like below :)
->>
->> /*
->>   * When running this test with 32k memslots, actually 32763 excluding
->>   * the reserved memory slot 0, the memory for each slot is 16KB. The
->>   * last slot contains 100KB memory with the remaining 84KB. Hence,
->>   * the maximum size is double of that (200KB)
->>   */
+On Tue, Oct 18, 2022 at 04:33:45PM +0000, Quentin Perret wrote:
+> On Monday 17 Oct 2022 at 12:51:56 (+0100), Will Deacon wrote:
+> > +void pkvm_hyp_vm_table_init(void *tbl)
+> > +{
+> > +	WARN_ON(vm_table);
+> > +	vm_table = tbl;
+> > +}
 > 
-> Still, these numbers are for x86, which has KVM_INTERNAL_MEM_SLOTS
-> defined as 3.
-> 
-> As far as I can see aarch64 has KVM_INTERNAL_MEM_SLOTS equal to 0, so
-> this arch has 32766 slot available for the test memory.
-> 
-> Quick calculations show that this will result in 112 KiB of memory in
-> the last slot for 4 KiB page size (while for 64 KiB page size the
-> maximum slot count for this test is 8192 anyway - not counting slot 0).
-> 
+> Uh, why does this one need to be exposed outside pkvm.c ?
 
-It seems your calculation had (512MB+64KB), instead of (512MB+4KB).
-In this particular patch, we still have (512MB+4KB). How about to change
-like below in this patch. In next patch, it's adjusted accordingly after
-we have (512MB+64KB).
+We need to initialise the table using the memory donated by the host
+on the __pkvm_init path. That's all private to nvhe/setup.c, so rather
+than expose the raw pointers (of either the table or the donated memory),
+we've got this initialisation function instead which is invoked by
+__pkvm_init_finalise() on the deprivilege path.
 
-(1) In this patch, the comment is changed to as below
+Happy to repaint it if you have a patch?
 
-     /*
-      * We have different number of memory slots, excluding the reserved
-      * memory slot 0, on various architectures and configurations. The
-      * memory size in this test is calculated by doubling the maximal
-      * memory size in last memory slot, with alignment to the largest
-      * supported page size (64KB).
-      *
-      * architecture   slots    memory-per-slot    memory-on-last-slot
-      * --------------------------------------------------------------
-      * x86-4KB        32763    16KB               100KB
-      * arm64-4KB      32766    16KB               52KB
-      * arm64-64KB     8192     64KB               64KB
-      */
-     #define MEM_TEST_MOVE_SIZE	0x40000           /* 256KB */
-
-(2) In the next patch, where we have (512MB+64KB) after the various
-     memory sizes are consolidated, It is adjusted accordingly as below.
-
-     /*
-      * We have different number of memory slots, excluding the reserved
-      * memory slot 0, on various architectures and configurations. The
-      * memory size in this test is calculated by doubling the maximal
-      * memory size in last memory slot, with alignment to the largest
-      * supported page size (64KB).
-      *
-      * architecture   slots    memory-per-slot    memory-on-last-slot
-      * --------------------------------------------------------------
-      * x86-4KB        32763    16KB               160KB
-      * arm64-4KB      32766    16KB               112KB
-      * arm64-64KB     8192     64KB               128KB
-      */
-     #define MEM_TEST_MOVE_SIZE	0x50000           /* 320KB */
-
-Thanks,
-Gavin
-
+Will
