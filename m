@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED5F7E
-	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 09:16:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5829C433D7;
-	Thu, 20 Oct 2022 09:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB4F7E
+	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 09:16:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E184C433C1;
+	Thu, 20 Oct 2022 09:16:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1666257401;
-	bh=3UxipA3fUndbyMhU66PV9SVzAL9vSse9sjm0ZKv3n0o=;
+	s=k20201202; t=1666257403;
+	bh=aLcbmyX/kgZvgaopcNcriA4ZyIsxFlgipcGUgzsXUfs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=T5gYd3isuT46pK01Hv3XBUd9AI69TE/tQb5/fsIwaZC6uc0z47hLtsYfOKz75OXBV
-	 guzyJ0vuD9Tfl5cnnnQ3n/WjsVwIo463cBu1M+nH7ivYzvAXDSx4jkQDp4kLrbJYbp
-	 RZTIN/CersEUlMxXuABUVxWM2gtQRbnGqGiTqYawQW026rdVA6qWqw2aHC9whwXIYt
-	 Wa20A2wrC5bFi1IlF3xYUMPzhKh04SbOkiE1KvALYHzpPfHhz3DgnVJiGNbZJytuaZ
-	 BusEtPp4agaNKM9VYQTCOyxWQMk2o188gOJXuZ6vFdO7E5uhZ6CVsZtDUTDFZDbWYB
-	 jQQzS5GUDPmkA==
+	b=oTCKgkNEk8Z0FKLsnxSj5WaHmv+AE3/EupRmztvJQZ71/vwlS/sa9xRqp/hC683WI
+	 jJ0+QXBbIpHBn1q86vDT4v0HV9syQkYELj0anKweTu3B4NMjtWdZMSjB/xBkpbkAKT
+	 jyLCAjgJLX0zHPHz+9eE/zQ9jxmu7wJEEXUBAL44JdmEN8CAAsur8HF8KQSf/HdMvb
+	 wudtP9RWwbloSoKM+8DC1MKpKdSJ0hEiKKvj8AjOcakt4Pke10sMTU1W74yftEO2Fb
+	 Jk9m4gAJBDfyyuOixv33//Dv243NrT3jtt+viwm2djhnXskIkgHGQs9tuVVOC9UiId
+	 gYQK+Zr0GTXEg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1olRWc-000Buf-4L;
-	Thu, 20 Oct 2022 10:07:38 +0100
+	id 1olRWb-000Buf-Bg;
+	Thu, 20 Oct 2022 10:07:37 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: <kvmarm@lists.cs.columbia.edu>,
 	<kvmarm@lists.linux.dev>,
@@ -33,9 +33,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Quentin Perret <qperret@google.com>,
 	Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH 14/17] KVM: arm64: Program the timer traps with VHE layout in hVHE mode
-Date: Thu, 20 Oct 2022 10:07:24 +0100
-Message-ID: <20221020090727.3669908-15-maz@kernel.org>
+Subject: [PATCH 11/17] KVM: arm64: Disable TTBR1_EL2 when using ARM64_KVM_HVHE
+Date: Thu, 20 Oct 2022 10:07:21 +0100
+Message-ID: <20221020090727.3669908-12-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221020090727.3669908-1-maz@kernel.org>
 References: <20221020090727.3669908-1-maz@kernel.org>
@@ -50,67 +50,38 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, qperret@google.com, will@kernel.org, tabba@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221020090724.TnxQcKq0om4j4wNUkiqHitPNAIQpYZmF7sL3onRDGFQ@z>
+Message-ID: <20221020090721.jXyRl4BqtPpzqiQ8xbhgGhz-cbDnjqTWFpTBzezMt5A@z>
 
-Just like the rest of the timer code, we need to shift the enable
-bits around when HCR_EL2.E2H is set, which is the case in hVHE mode.
+When using hVHE, we end-up with two TTBRs at EL2. That's great,
+but we're not quite ready for this just yet.
+
+Disable TTBR1_EL2 by setting TCR_EL2.EPD1 so that we only
+translate via TTBR0_EL2.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/timer-sr.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/arm.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-index 9072e71693ba..143cdc1d107f 100644
---- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-@@ -16,33 +16,39 @@ void __kvm_timer_set_cntvoff(u64 cntvoff)
- }
- 
- /*
-- * Should only be called on non-VHE systems.
-+ * Should only be called on non-VHE or hVHE setups.
-  * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
-  */
- void __timer_disable_traps(struct kvm_vcpu *vcpu)
- {
--	u64 val;
-+	u64 val, shift = 0;
-+
-+	if (has_hvhe())
-+		shift = 10;
- 
- 	/* Allow physical timer/counter access for the host */
- 	val = read_sysreg(cnthctl_el2);
--	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
-+	val |= (CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN) << shift;
- 	write_sysreg(val, cnthctl_el2);
- }
- 
- /*
-- * Should only be called on non-VHE systems.
-+ * Should only be called on non-VHE or hVHE setups.
-  * VHE systems use EL2 timers and configure EL1 timers in kvm_timer_init_vhe().
-  */
- void __timer_enable_traps(struct kvm_vcpu *vcpu)
- {
--	u64 val;
-+	u64 val, shift = 0;
- 
- 	/*
- 	 * Disallow physical timer access for the guest
- 	 * Physical counter access is allowed
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 85df7ce0b051..cf0f15f4d69a 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1548,7 +1548,13 @@ static void cpu_prepare_hyp_mode(int cpu)
+ 	 *
+ 	 * So use the same T0SZ value we use for the ID map.
  	 */
-+	if (has_hvhe())
-+		shift = 10;
-+
- 	val = read_sysreg(cnthctl_el2);
--	val &= ~CNTHCTL_EL1PCEN;
--	val |= CNTHCTL_EL1PCTEN;
-+	val &= ~(CNTHCTL_EL1PCEN << shift);
-+	val |= CNTHCTL_EL1PCTEN << shift;
- 	write_sysreg(val, cnthctl_el2);
- }
+-	tcr = (read_sysreg(tcr_el1) & TCR_EL2_MASK) | TCR_EL2_RES1;
++	tcr = read_sysreg(tcr_el1);
++	if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
++		tcr |= TCR_EPD1_MASK;
++	} else {
++		tcr &= TCR_EL2_MASK;
++		tcr |= TCR_EL2_RES1;
++	}
+ 	tcr &= ~TCR_T0SZ_MASK;
+ 	tcr |= (idmap_t0sz & GENMASK(TCR_TxSZ_WIDTH - 1, 0)) << TCR_T0SZ_OFFSET;
+ 	params->tcr_el2 = tcr;
 -- 
 2.34.1
 
