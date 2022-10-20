@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC78CC43217
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B709C43219
 	for <kvmarm@archiver.kernel.org>; Thu, 20 Oct 2022 09:07:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6821F4B956;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05CCB4B955;
 	Thu, 20 Oct 2022 05:07:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VnPhyewfEtkU; Thu, 20 Oct 2022 05:07:43 -0400 (EDT)
+	with ESMTP id KtWZfMyK8Hr6; Thu, 20 Oct 2022 05:07:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 351E64B960;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DA254B956;
 	Thu, 20 Oct 2022 05:07:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC4454B941
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CE5B4B941
  for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Oct 2022 05:07:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MSi+sG0g7eJe for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id OIduNzqLiefn for <kvmarm@lists.cs.columbia.edu>;
  Thu, 20 Oct 2022 05:07:39 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E4684B940
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A20C44B943
  for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Oct 2022 05:07:39 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 0B86361A90;
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 2612B614E2;
  Thu, 20 Oct 2022 09:07:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 200A5C43143;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA6F7C433B5;
  Thu, 20 Oct 2022 09:07:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1666256858;
- bh=1jQOoC4QeQ5PeHe2BUgnYaoSU2WdJgjc/MaY/L+aAw0=;
+ s=k20201202; t=1666256859;
+ bh=ofpdzFYKOYn+eXOLFJLXsfl4t5FhR9196xaEkofE7aM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=FI0AJzHCwQ27ve49DQJVt3jVb11zYNLOweUKPoM8w0DCWGWLIiS1IVQHn1kGca3Dd
- shNP2A6hLIZDbg4sjJSFcnoEV1YmVaWUNS4dzCZLQeGFlttJ6q0VyOY2mdSSktQqmp
- orBNIAxCwtxUoX5q1yCmYrnnGc4ReCc6IREj9NEvUjHI4BmoqJa3i+cuEiz22udzjM
- NkRp1LycxjwtIUXMkzy33EYGxLdLW+pdwa4TTd9yBtqgFGFagkXzgAWLOjkFAVElTE
- XemSEnThjC9TN7z5ukY3G//88qxl3AP5mgzB8S2Jsg5ymMhqTCSuxoy2rgl5t+CwgM
- wzToEtN6uBXog==
+ b=PTKdsBtzypQOm/L/vDlDpw07NNLw1kHTybU9V7/i4EGa59YfJNdmnyX2nDzNWs9Wy
+ KzYzWNuEJyCpt/tFL0ZgKpqu4SUz147DQUUJRaRFfRvSaJMTbfRoT/w8cgbyGDd5Ud
+ u1Q6ybU8k1ONx7GWM5XA3e4gfpZByeAC0mE8OIwIJlI18ZYuovG2HeeeRhrEf2kyGl
+ O5P50ATFagZK1Z7odQdCot1u4WqCSv0/CCdltOhORsHnEq6HaSkKkv8GcATRuiYxJR
+ rbhRdwfD9uHser7UPh4VCAwWzWpXE0PYa7K8+NnLNzdGjI+NsKxRv8v2Vjx0/v7Rlw
+ xWbwiZJ/4mwfw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1olRWa-000Buf-CF;
+ (envelope-from <maz@kernel.org>) id 1olRWa-000Buf-Qe;
  Thu, 20 Oct 2022 10:07:36 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: <kvmarm@lists.cs.columbia.edu>, <kvmarm@lists.linux.dev>,
  kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 07/17] KVM: arm64: Elide kern_hyp_va() in VHE-specific parts
- of the hypervisor
-Date: Thu, 20 Oct 2022 10:07:17 +0100
-Message-Id: <20221020090727.3669908-8-maz@kernel.org>
+Subject: [PATCH 09/17] KVM: arm64: Key use of VHE instructions in nVHE code
+ off ARM64_KVM_HVHE
+Date: Thu, 20 Oct 2022 10:07:19 +0100
+Message-Id: <20221020090727.3669908-10-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221020090727.3669908-1-maz@kernel.org>
 References: <20221020090727.3669908-1-maz@kernel.org>
@@ -85,51 +85,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-For VHE-specific hypervisor code, kern_hyp_va() is a NOP.
+We can now start with the fun stuff: if we enable VHE *only* for
+the hypervisor, we need to generate the VHE instructions when
+accessing the system registers.
 
-Actually, it is a whole range of NOPs. It'd be much better if
-this code simply didn't exist. Let's just do that.
+For this, reporpose the alternative sequence to be keyed off
+ARM64_KVM_HVHE in the nVHE hypervisor code, and only there.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm64/include/asm/kvm_hyp.h | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 7784081088e7..e32725e90360 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -63,6 +63,7 @@
-  * specific registers encoded in the instructions).
-  */
- .macro kern_hyp_va	reg
-+#ifndef __KVM_VHE_HYPERVISOR__
- alternative_cb ARM64_ALWAYS_SYSTEM, kvm_update_va_mask
- 	and     \reg, \reg, #1		/* mask with va_mask */
- 	ror	\reg, \reg, #1		/* rotate to the first tag bit */
-@@ -70,6 +71,7 @@ alternative_cb ARM64_ALWAYS_SYSTEM, kvm_update_va_mask
- 	add	\reg, \reg, #0, lsl 12	/* insert the top 12 bits of the tag */
- 	ror	\reg, \reg, #63		/* rotate back */
- alternative_cb_end
-+#endif
- .endm
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 461fc0dc4a70..e45215a62b43 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -33,12 +33,18 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
  
- /*
-@@ -126,6 +128,7 @@ void kvm_apply_hyp_relocations(void);
+ #else // !__KVM_VHE_HYPERVISOR__
  
- static __always_inline unsigned long __kern_hyp_va(unsigned long v)
- {
-+#ifndef __KVM_VHE_HYPERVISOR__
- 	asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n"
- 				    "ror %0, %0, #1\n"
- 				    "add %0, %0, #0\n"
-@@ -134,6 +137,7 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
- 				    ARM64_ALWAYS_SYSTEM,
- 				    kvm_update_va_mask)
- 		     : "+r" (v));
++#if defined(__KVM_NVHE_HYPERVISOR__)
++#define VHE_ALT_KEY	ARM64_KVM_HVHE
++#else
++#define VHE_ALT_KEY	ARM64_HAS_VIRT_HOST_EXTN
 +#endif
- 	return v;
- }
++
+ #define read_sysreg_elx(r,nvh,vh)					\
+ 	({								\
+ 		u64 reg;						\
+-		asm volatile(ALTERNATIVE(__mrs_s("%0", r##nvh),	\
++		asm volatile(ALTERNATIVE(__mrs_s("%0", r##nvh),		\
+ 					 __mrs_s("%0", r##vh),		\
+-					 ARM64_HAS_VIRT_HOST_EXTN)	\
++					 VHE_ALT_KEY)			\
+ 			     : "=r" (reg));				\
+ 		reg;							\
+ 	})
+@@ -48,7 +54,7 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+ 		u64 __val = (u64)(v);					\
+ 		asm volatile(ALTERNATIVE(__msr_s(r##nvh, "%x0"),	\
+ 					 __msr_s(r##vh, "%x0"),		\
+-					 ARM64_HAS_VIRT_HOST_EXTN)	\
++					 VHE_ALT_KEY)			\
+ 					 : : "rZ" (__val));		\
+ 	} while (0)
  
 -- 
 2.34.1
