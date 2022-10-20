@@ -1,101 +1,182 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4465B7E
-	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 10:02:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAE44C433D7;
-	Thu, 20 Oct 2022 10:02:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D4E3C20
+	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 13:38:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 561CBC433D6;
+	Thu, 20 Oct 2022 13:38:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1666260121;
-	bh=F7qx70jEHbzt/vc3VSIRa/2M9FvcpGx818RT/QyMnn4=;
+	s=k20201202; t=1666273117;
+	bh=HpX2uNEc0GUdzYR5KnGOZkH0x1pbX64lowoU6XXIYiM=;
 	h=From:To:Cc:Subject:Date:From;
-	b=rNottOnkoOUnHqL2cat/ocezSae1gieJhPortC8i2O3LbkolVLygfoh/4eklacETr
-	 JbFIH+nwTlqdrva6oqX7J5wBTgsSIyJ8x9dfy9p9qqqkBablet4Hs8pR6zfk4UIPVF
-	 beZBtBI1oXftI7RcRAxDP8bsYGoiI47/+qGLOvG57BwD9hkpYo0u5ybs2ilVDZrOFk
-	 nvCSuuBSa0kK38dboyew8mqKsfWkhU7ErmOA1moqz0RazP8UoxFZ/Y/tGwSzhgk9rr
-	 8T9Ua0ilUGokFok6oz0LKfWrUriDqC04YAAB7y5BF+ymoriNC4iBZDW2KKpObZ8b/5
-	 CXMzHGdxo92iA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1olSNC-000Cz4-Ru;
-	Thu, 20 Oct 2022 11:01:59 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Denis Nikitin <denik@chromium.org>,
-	Eric Auger <eric.auger@redhat.com>,
-	Eric Ren <renzhengeek@gmail.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	b=C8AQGXzsp9BTueq43xT/ola3YGVM9ZG57Q68jVxmR+9JHIdAcjAhhmNzVbBNdGd6A
+	 1gu8O8RWPe1GWrNMlMdbyYK7dt+1pMJvBvRT/S9/Tk5Qu77xq+g18pFO8MWAuBYOKf
+	 DVfXiqWWZs+NmkSBzZvmRnjJOJTsKxT9uleXE7N6H0UfPu+U2kfO1neZ0SvxnMQ0IO
+	 nq+sfQ+O/B24nMK8z6SEtF+LnVV8KYB8p8v/UJTTbYumuyLUvUmCt54S8yfwoMlcI/
+	 ka2iCP3rrkhxOH8Asf6qCZgct7hMyqPjVLBQmg0DTbfXMZdXTEmTNkG5/cPov/LMFv
+	 4s/Qrc/GrGd9g==
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.linux.dev
+Cc: Will Deacon <will@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	James Morse <james.morse@arm.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Quentin Perret <qperret@google.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <tabba@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	<kvmarm@lists.cs.columbia.edu>,
-	<kvmarm@lists.linux.dev>,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.1, take #2
-Date: Thu, 20 Oct 2022 11:01:25 +0100
-Message-ID: <20221020100125.3670769-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	Marc Zyngier <maz@kernel.org>,
+	kernel-team@android.com,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH v5 00/25] KVM: arm64: Introduce pKVM hyp VM and vCPU state at EL2
+Date: Thu, 20 Oct 2022 14:38:02 +0100
+Message-Id: <20221020133827.5541-1-will@kernel.org>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, denik@chromium.org, eric.auger@redhat.com, renzhengeek@gmail.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221020100125.VW__lyE-3NTApamzrnHKOEVVKZVp8GyNlIAGUx4YL6Q@z>
 
-Paolo,
+Hi all,
 
-Here's a couple of additional fixes for 6.1. The ITS one is pretty
-annoying as it prevents a VM from being restored if it has a
-convoluted device topology. Definitely a stable candidate.
+This is version five of the pKVM EL2 state series, following hot on the
+heels of v4:
 
-Note that I can't see that you have pulled the first set of fixes
-which I sent last week[1]. In order to avoid any problem, the current
-pull-request is a suffix of the previous one. But you may want to pull
-them individually in order to preserve the tag descriptions.
+  Mega-patch: https://lore.kernel.org/kvmarm/20220519134204.5379-1-will@kernel.org/
+  v2: https://lore.kernel.org/all/20220630135747.26983-1-will@kernel.org/
+  v3: https://lore.kernel.org/kvmarm/20220914083500.5118-1-will@kernel.org/
+  v4: https://lore.kernel.org/kvm/20221017115209.2099-1-will@kernel.org/
 
-Please pull,
+This series extends the pKVM EL2 code so that it can dynamically
+instantiate and manage VM data structures without the host being able to
+access them directly. These structures consist of a hyp VM, a set of hyp
+vCPUs and the stage-2 page-table for the MMU. The pages used to hold the
+hypervisor structures are returned to the host when the VM is destroyed.
 
-	M.
+Thanks to everyone who provided feedback and tags on the previous version.
+The main changes in v5 are:
 
-[1] https://lore.kernel.org/r/20221013132830.1304947-1-maz@kernel.org
+  * Removed kvm_protected_vm::vm_lock in favour of existing kvm::lock
 
-The following changes since commit 05c2224d4b049406b0545a10be05280ff4b8ba0a:
+  * Removed pkvm_hyp_vm::donated_memory_size as this can be computed
 
-  KVM: selftests: Fix number of pages for memory slot in memslot_modification_stress_test (2022-10-13 11:46:51 +0100)
+  * Use inner-shareable barriers and TLB invalidation in the fixmap code
 
-are available in the Git repository at:
+  * Don't check for the host donating the same host 'kvm' structure
+    twice
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.1-2
+  * Fixed comment relating to maximum number of protected VMs
 
-for you to fetch changes up to c000a2607145d28b06c697f968491372ea56c23a:
+  * Added tags
 
-  KVM: arm64: vgic: Fix exit condition in scan_its_table() (2022-10-15 12:10:54 +0100)
+  * Reworked some of the patch authorship/Co-developed-by tags to better
+    match reality
 
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.1, take #2
+  * Remembered to mark the last patch as RFC...
 
-- Fix a bug preventing restoring an ITS containing mappings
-  for very large and very sparse device topology
+Cheers,
 
-- Work around a relocation handling error when compiling
-  the nVHE object with profile optimisation
+Will, Quentin, Fuad and Marc
 
-----------------------------------------------------------------
-Denis Nikitin (1):
-      KVM: arm64: nvhe: Fix build with profile optimization
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Vincent Donnefort <vdonnefort@google.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Philippe Mathieu-Daudé <philmd@linaro.org>
+Cc: James Morse <james.morse@arm.com>
+Cc: Chao Peng <chao.p.peng@linux.intel.com>
+Cc: Quentin Perret <qperret@google.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Fuad Tabba <tabba@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>
 
-Eric Ren (1):
-      KVM: arm64: vgic: Fix exit condition in scan_its_table()
+Cc: kernel-team@android.com
+Cc: kvm@vger.kernel.org
+Cc: kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org
 
- arch/arm64/kvm/hyp/nvhe/Makefile | 4 ++++
- arch/arm64/kvm/vgic/vgic-its.c   | 5 ++++-
- 2 files changed, 8 insertions(+), 1 deletion(-)
+--->8
+
+Fuad Tabba (3):
+  KVM: arm64: Add hyp_spinlock_t static initializer
+  KVM: arm64: Add infrastructure to create and track pKVM instances at
+    EL2
+  KVM: arm64: Instantiate pKVM hypervisor VM and vCPU structures from
+    EL1
+
+Quentin Perret (14):
+  KVM: arm64: Move hyp refcount manipulation helpers to common header
+    file
+  KVM: arm64: Allow attaching of non-coalescable pages to a hyp pool
+  KVM: arm64: Back the hypervisor 'struct hyp_page' array for all memory
+  KVM: arm64: Fix-up hyp stage-1 refcounts for all pages mapped at EL2
+  KVM: arm64: Prevent the donation of no-map pages
+  KVM: arm64: Add helpers to pin memory shared with the hypervisor at
+    EL2
+  KVM: arm64: Add per-cpu fixmap infrastructure at EL2
+  KVM: arm64: Add generic hyp_memcache helpers
+  KVM: arm64: Consolidate stage-2 initialisation into a single function
+  KVM: arm64: Instantiate guest stage-2 page-tables at EL2
+  KVM: arm64: Return guest memory from EL2 via dedicated teardown
+    memcache
+  KVM: arm64: Unmap 'kvm_arm_hyp_percpu_base' from the host
+  KVM: arm64: Explicitly map 'kvm_vgic_global_state' at EL2
+  KVM: arm64: Don't unnecessarily map host kernel sections at EL2
+
+Will Deacon (8):
+  KVM: arm64: Unify identifiers used to distinguish host and hypervisor
+  KVM: arm64: Implement do_donate() helper for donating memory
+  KVM: arm64: Include asm/kvm_mmu.h in nvhe/mem_protect.h
+  KVM: arm64: Rename 'host_kvm' to 'host_mmu'
+  KVM: arm64: Initialise hypervisor copies of host symbols
+    unconditionally
+  KVM: arm64: Provide I-cache invalidation by virtual address at EL2
+  KVM: arm64: Maintain a copy of 'kvm_arm_vmid_bits' at EL2
+  KVM: arm64: Use the pKVM hyp vCPU structure in handle___kvm_vcpu_run()
+
+ arch/arm64/include/asm/kvm_arm.h              |   2 +-
+ arch/arm64/include/asm/kvm_asm.h              |   7 +-
+ arch/arm64/include/asm/kvm_host.h             |  72 ++-
+ arch/arm64/include/asm/kvm_hyp.h              |   3 +
+ arch/arm64/include/asm/kvm_mmu.h              |   2 +-
+ arch/arm64/include/asm/kvm_pgtable.h          |  22 +
+ arch/arm64/include/asm/kvm_pkvm.h             |  38 ++
+ arch/arm64/kernel/image-vars.h                |  15 -
+ arch/arm64/kvm/arm.c                          |  61 ++-
+ arch/arm64/kvm/hyp/hyp-constants.c            |   3 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  25 +-
+ arch/arm64/kvm/hyp/include/nvhe/memory.h      |  27 +
+ arch/arm64/kvm/hyp/include/nvhe/mm.h          |  18 +-
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |  68 +++
+ arch/arm64/kvm/hyp/include/nvhe/spinlock.h    |  10 +-
+ arch/arm64/kvm/hyp/nvhe/cache.S               |  11 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 110 +++-
+ arch/arm64/kvm/hyp/nvhe/hyp-smp.c             |   2 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 502 ++++++++++++++++--
+ arch/arm64/kvm/hyp/nvhe/mm.c                  | 168 +++++-
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c          |  28 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                | 434 +++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/setup.c               |  96 ++--
+ arch/arm64/kvm/hyp/pgtable.c                  |  21 +-
+ arch/arm64/kvm/mmu.c                          |  55 +-
+ arch/arm64/kvm/pkvm.c                         | 138 ++++-
+ arch/arm64/kvm/reset.c                        |  29 -
+ 27 files changed, 1751 insertions(+), 216 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+
+-- 
+2.38.0.413.g74048e4d9e-goog
+
