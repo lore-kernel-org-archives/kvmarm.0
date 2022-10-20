@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26DC93C20
-	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 13:39:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6B11C4347C;
-	Thu, 20 Oct 2022 13:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AABB63C20
+	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 13:40:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5978BC433D6;
+	Thu, 20 Oct 2022 13:39:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1666273198;
-	bh=5kbJEk2Cn8eJ01nJnSOrDBZQvX8bk9QVGz+x16Lip34=;
+	s=k20201202; t=1666273202;
+	bh=TlmuoizYiy7ocLRUX9ITRdoDGCG+RyLE/kBvsyVSA4Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=twFeyhPmfrdXvxcUoGGMz5Gf45vwI8f8I7iGWK+r3yn1iFwlbfg6PeyaPxtTyrzob
-	 +1gUn1gF2ET/sUO16+ac8JBTeWUA/97h9XJF/TTHDiOvbbEG+LpniJU74bsbsrYrwr
-	 XNMD2CfSjmsP4viF6Pl7lZoQrkwvHXU3WJOZoZdmaGx88eBiopfk2WOQupQOK5dRzE
-	 tmlu1kg6vaAOAPh3Ab4BkPNiUO8MHCdOj0m3HTuXNBf/Rzn9c7vdtKuqBh4+Oyqbub
-	 2vlaAK0+EMQos5sjhOB5thIiBE+h8+CLdEXuiH8mP1hL0cM1WiKXgZnUnTicON6TDm
-	 Iz0tjxdQeGcZQ==
+	b=aa/5NEzMxgzRNWleNJNolE1U55vS35EzGe9SwJ6FNEF4MPkp3vmDTnetSeop+T74y
+	 vk2QDFiRb/NYbcjTTDoezEmwgG2A1B1bUr3K5jh2lvo7CpmkGEsEIjzICrpcCdaNco
+	 uVZUfjr1mJ1BO9Mq/3SlsOfajSYwTSGIhd9T47VERTUv6pEJeQ9koLNcsO5j1jXtU2
+	 TDOQnyBTm1eirC4Pmb6Ely3BK4IPsHlPmMspTsU/6+d8iLisz56ZFmbsyPz7kajsVC
+	 Ihfl8BKBuBlbQA/Mdgq3YVZpdCtmDBWY7SkT2gbHZiWW4q8f953QDrW1N83Ays+S2B
+	 KTANdPphuHT1A==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Will Deacon <will@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Will Deacon <will@kernel.org>,
 	kernel-team@android.com,
 	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v5 22/25] KVM: arm64: Maintain a copy of 'kvm_arm_vmid_bits' at EL2
-Date: Thu, 20 Oct 2022 14:38:24 +0100
-Message-Id: <20221020133827.5541-23-will@kernel.org>
+Subject: [PATCH v5 23/25] KVM: arm64: Explicitly map 'kvm_vgic_global_state' at EL2
+Date: Thu, 20 Oct 2022 14:38:25 +0100
+Message-Id: <20221020133827.5541-24-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20221020133827.5541-1-will@kernel.org>
 References: <20221020133827.5541-1-will@kernel.org>
@@ -48,75 +48,39 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Sharing 'kvm_arm_vmid_bits' between EL1 and EL2 allows the host to
-modify the variable arbitrarily, potentially leading to all sorts of
-shenanians as this is used to configure the VTTBR register for the
-guest stage-2.
+From: Quentin Perret <qperret@google.com>
 
-In preparation for unmapping host sections entirely from EL2, maintain
-a copy of 'kvm_arm_vmid_bits' in the pKVM hypervisor and initialise it
-from the host value while it is still trusted.
+The pkvm hypervisor at EL2 may need to read the 'kvm_vgic_global_state'
+variable from the host, for example when saving and restoring the state
+of the virtual GIC.
+
+Explicitly map 'kvm_vgic_global_state' in the stage-1 page-table of the
+pKVM hypervisor rather than relying on mapping all of the host '.rodata'
+section.
 
 Tested-by: Vincent Donnefort <vdonnefort@google.com>
+Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h | 2 ++
- arch/arm64/kernel/image-vars.h   | 3 ---
- arch/arm64/kvm/arm.c             | 1 +
- arch/arm64/kvm/hyp/nvhe/pkvm.c   | 3 +++
- 4 files changed, 6 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/setup.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index fd99cf09972d..6797eafe7890 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -124,4 +124,6 @@ extern u64 kvm_nvhe_sym(id_aa64mmfr1_el1_sys_val);
- extern u64 kvm_nvhe_sym(id_aa64mmfr2_el1_sys_val);
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 0f69c1393416..5a371ab236db 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -161,6 +161,11 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+ 	if (ret)
+ 		return ret;
  
- extern unsigned long kvm_nvhe_sym(__icache_flags);
-+extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
++	ret = pkvm_create_mappings(&kvm_vgic_global_state,
++				   &kvm_vgic_global_state + 1, prot);
++	if (ret)
++		return ret;
 +
- #endif /* __ARM64_KVM_HYP_H__ */
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index ae8f37f4aa8c..31ad75da4d58 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -71,9 +71,6 @@ KVM_NVHE_ALIAS(nvhe_hyp_panic_handler);
- /* Vectors installed by hyp-init on reset HVC. */
- KVM_NVHE_ALIAS(__hyp_stub_vectors);
- 
--/* VMID bits set by the KVM VMID allocator */
--KVM_NVHE_ALIAS(kvm_arm_vmid_bits);
--
- /* Static keys which are set if a vGIC trap should be handled in hyp. */
- KVM_NVHE_ALIAS(vgic_v2_cpuif_trap);
- KVM_NVHE_ALIAS(vgic_v3_cpuif_trap);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 25467f24803d..1d4b8122d010 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1893,6 +1893,7 @@ static void kvm_hyp_init_symbols(void)
- 	kvm_nvhe_sym(id_aa64mmfr1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
- 	kvm_nvhe_sym(id_aa64mmfr2_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR2_EL1);
- 	kvm_nvhe_sym(__icache_flags) = __icache_flags;
-+	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
+ 	return 0;
  }
  
- static int kvm_hyp_init_protection(u32 hyp_va_bits)
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 0bf9d20b0eeb..0504f2678bd4 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -15,6 +15,9 @@
- /* Used by icache_is_vpipt(). */
- unsigned long __icache_flags;
- 
-+/* Used by kvm_get_vttbr(). */
-+unsigned int kvm_arm_vmid_bits;
-+
- /*
-  * Set trap register values based on features in ID_AA64PFR0.
-  */
 -- 
 2.38.0.413.g74048e4d9e-goog
 
