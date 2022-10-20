@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E465C3229
-	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 09:07:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 200A5C43143;
-	Thu, 20 Oct 2022 09:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918D72F3B
+	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 09:07:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 462D4C4347C;
+	Thu, 20 Oct 2022 09:07:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1666256858;
-	bh=1jQOoC4QeQ5PeHe2BUgnYaoSU2WdJgjc/MaY/L+aAw0=;
+	s=k20201202; t=1666256857;
+	bh=k/BVWO+txsJJRgTuCWcujYRETMFLEr9Wr1aMiW9873k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FI0AJzHCwQ27ve49DQJVt3jVb11zYNLOweUKPoM8w0DCWGWLIiS1IVQHn1kGca3Dd
-	 shNP2A6hLIZDbg4sjJSFcnoEV1YmVaWUNS4dzCZLQeGFlttJ6q0VyOY2mdSSktQqmp
-	 orBNIAxCwtxUoX5q1yCmYrnnGc4ReCc6IREj9NEvUjHI4BmoqJa3i+cuEiz22udzjM
-	 NkRp1LycxjwtIUXMkzy33EYGxLdLW+pdwa4TTd9yBtqgFGFagkXzgAWLOjkFAVElTE
-	 XemSEnThjC9TN7z5ukY3G//88qxl3AP5mgzB8S2Jsg5ymMhqTCSuxoy2rgl5t+CwgM
-	 wzToEtN6uBXog==
+	b=a1NMwwusqA1GZUZ9BgUEEg3ztXFZDCF53kp0yQoFR5liV+dsp1ucPlHBT6so+T6Hy
+	 x4iOoqYgypmxAWduEHhZNh+ecyWHwp2t9fVBDzQh9gNgm7lDrm0MG2shnaLkITiZOk
+	 mT3vJ3huN9ldEKxqCchGad2vfmN2oar4Nd1l9U6swQkiji1w96QnfxFO+Ra3T81isf
+	 7n1a/pYyVQuobINrYVYVCBit/9TVMJDBid7+tPPbLvPTc5p1f7sou29C4G8HoFlqKr
+	 ac077ZiRiZu+UMvGq0X/iQ9L8yqswcGhK2N5U+6m0tktcQ6fdFdJ7EJbokAkFCIc98
+	 pHPYLfrdHLITQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1olRWa-000Buf-CF;
-	Thu, 20 Oct 2022 10:07:36 +0100
+	id 1olRWZ-000Buf-1N;
+	Thu, 20 Oct 2022 10:07:35 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: <kvmarm@lists.cs.columbia.edu>,
 	<kvmarm@lists.linux.dev>,
@@ -33,9 +33,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Quentin Perret <qperret@google.com>,
 	Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH 07/17] KVM: arm64: Elide kern_hyp_va() in VHE-specific parts of the hypervisor
-Date: Thu, 20 Oct 2022 10:07:17 +0100
-Message-ID: <20221020090727.3669908-8-maz@kernel.org>
+Subject: [PATCH 02/17] arm64: Add KVM_HVHE capability and has_hvhe() predicate
+Date: Thu, 20 Oct 2022 10:07:12 +0100
+Message-ID: <20221020090727.3669908-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221020090727.3669908-1-maz@kernel.org>
 References: <20221020090727.3669908-1-maz@kernel.org>
@@ -50,54 +50,96 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, qperret@google.com, will@kernel.org, tabba@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221020090717.bB17r-41G1SE0MKRkUeogySRfK-bflA3pnczaO3kcgE@z>
+Message-ID: <20221020090712.isNqNYCIfszTX2fENXchGpRE_7kpQ7LWYIuln_pXCzk@z>
 
-For VHE-specific hypervisor code, kern_hyp_va() is a NOP.
-
-Actually, it is a whole range of NOPs. It'd be much better if
-this code simply didn't exist. Let's just do that.
+Expose a capability keying the hVHE feature as well as a new
+predicate testing it. Nothing is so far using it, and nothing
+is enabling it yet.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm64/include/asm/cpufeature.h |  1 +
+ arch/arm64/include/asm/virt.h       |  8 ++++++++
+ arch/arm64/kernel/cpufeature.c      | 15 +++++++++++++++
+ arch/arm64/tools/cpucaps            |  1 +
+ 4 files changed, 25 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 7784081088e7..e32725e90360 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -63,6 +63,7 @@
-  * specific registers encoded in the instructions).
-  */
- .macro kern_hyp_va	reg
-+#ifndef __KVM_VHE_HYPERVISOR__
- alternative_cb ARM64_ALWAYS_SYSTEM, kvm_update_va_mask
- 	and     \reg, \reg, #1		/* mask with va_mask */
- 	ror	\reg, \reg, #1		/* rotate to the first tag bit */
-@@ -70,6 +71,7 @@ alternative_cb ARM64_ALWAYS_SYSTEM, kvm_update_va_mask
- 	add	\reg, \reg, #0, lsl 12	/* insert the top 12 bits of the tag */
- 	ror	\reg, \reg, #63		/* rotate back */
- alternative_cb_end
-+#endif
- .endm
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index f44a7860636f..2d41015429b3 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -16,6 +16,7 @@
+ #define cpu_feature(x)		KERNEL_HWCAP_ ## x
  
- /*
-@@ -126,6 +128,7 @@ void kvm_apply_hyp_relocations(void);
+ #define ARM64_SW_FEATURE_OVERRIDE_NOKASLR	0
++#define ARM64_SW_FEATURE_OVERRIDE_HVHE		4
  
- static __always_inline unsigned long __kern_hyp_va(unsigned long v)
- {
-+#ifndef __KVM_VHE_HYPERVISOR__
- 	asm volatile(ALTERNATIVE_CB("and %0, %0, #1\n"
- 				    "ror %0, %0, #1\n"
- 				    "add %0, %0, #0\n"
-@@ -134,6 +137,7 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
- 				    ARM64_ALWAYS_SYSTEM,
- 				    kvm_update_va_mask)
- 		     : "+r" (v));
-+#endif
- 	return v;
+ #ifndef __ASSEMBLY__
+ 
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index 4eb601e7de50..b11a1c8c8b36 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -140,6 +140,14 @@ static __always_inline bool is_protected_kvm_enabled(void)
+ 		return cpus_have_final_cap(ARM64_KVM_PROTECTED_MODE);
  }
  
++static __always_inline bool has_hvhe(void)
++{
++	if (is_vhe_hyp_code())
++		return false;
++
++	return cpus_have_final_cap(ARM64_KVM_HVHE);
++}
++
+ static inline bool is_hyp_nvhe(void)
+ {
+ 	return is_hyp_mode_available() && !is_kernel_in_hyp_mode();
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index a3959e9f7d55..efac89c4c548 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1932,6 +1932,15 @@ static void cpu_copy_el2regs(const struct arm64_cpu_capabilities *__unused)
+ 		write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
+ }
+ 
++static bool hvhe_possible(const struct arm64_cpu_capabilities *entry,
++			  int __unused)
++{
++	u64 val;
++
++	val = arm64_sw_feature_override.val & arm64_sw_feature_override.mask;
++	return cpuid_feature_extract_unsigned_field(val, ARM64_SW_FEATURE_OVERRIDE_HVHE);
++}
++
+ #ifdef CONFIG_ARM64_PAN
+ static void cpu_enable_pan(const struct arm64_cpu_capabilities *__unused)
+ {
+@@ -2642,6 +2651,12 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = has_cpuid_feature,
+ 		.cpu_enable = cpu_trap_el0_impdef,
+ 	},
++	{
++		.desc = "VHE for hypervisor only",
++		.capability = ARM64_KVM_HVHE,
++		.type = ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE,
++		.matches = hvhe_possible,
++	},
+ 	{},
+ };
+ 
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index f1c0347ec31a..cee2be85b89b 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -43,6 +43,7 @@ HAS_TLB_RANGE
+ HAS_VIRT_HOST_EXTN
+ HAS_WFXT
+ HW_DBM
++KVM_HVHE
+ KVM_PROTECTED_MODE
+ MISMATCHED_CACHE_TYPE
+ MTE
 -- 
 2.34.1
 
