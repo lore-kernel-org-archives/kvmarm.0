@@ -2,59 +2,57 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0FEC4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Oct 2022 18:59:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 813F0C43217
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Oct 2022 19:08:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 239BA4B9FB;
-	Thu, 20 Oct 2022 14:59:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0F4B4BA03;
+	Thu, 20 Oct 2022 15:08:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tJB2CwRAhB4b; Thu, 20 Oct 2022 14:59:02 -0400 (EDT)
+	with ESMTP id 2tGgjP7I--gP; Thu, 20 Oct 2022 15:08:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA78C4B9FF;
-	Thu, 20 Oct 2022 14:59:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7733B4B9B5;
+	Thu, 20 Oct 2022 15:08:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DC984B9FA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Oct 2022 14:59:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8660D4B95D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Oct 2022 15:08:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id USMvnF4saTn6 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 Oct 2022 14:59:00 -0400 (EDT)
+ with ESMTP id 6sTkaeqZz5rL for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 Oct 2022 15:08:03 -0400 (EDT)
 Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C49484B9F9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Oct 2022 14:59:00 -0400 (EDT)
-Date: Thu, 20 Oct 2022 21:58:56 +0300
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 39E894B94A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Oct 2022 15:08:03 -0400 (EDT)
+Date: Thu, 20 Oct 2022 22:08:00 +0300
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1666292339;
+ t=1666292882;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=mFdDcgKlE3XXuFjEiY8riBIIBCcAHkobBQ7341g9M90=;
- b=GBvTT4pg9b2Mv+zTUr/jo41QG91tUZ/UsI3TdPofqrz7XnlrVadmYDpGENJWcjvANT1Xfm
- cI9/haQ1cXe+qrw7EQf0hZsacBftfAyDGUm318EGanAuncotmKPu9TAR2sVGTfH9gu/eNx
- LCymui04NS4GxPFRTL5nX7pbcsaG3fg=
+ bh=PiZzGkBrb0Pmhrx3lF3phKX07wonyvh6N79EhbYQ9YM=;
+ b=mF2OxDQ1HxBVIawk2bmNq8Bm7iyc/MhjIb9HEX0EF4BkyC/oX0pEyxm0sUL411qg96fZBl
+ vvYl9XnLSkacPHNqFcFZCrBHaC0854Il3yhS7XfUy7F00lguUY9JyO0xv63crUfhlv8oYV
+ BG9d4KxfLL7QmpHGT2e+ZZ5tDNqTFdE=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
- conjunction with bitmap
-Message-ID: <Y1GacKRhwBqKKekw@google.com>
-References: <20221011061447.131531-1-gshan@redhat.com>
- <20221011061447.131531-4-gshan@redhat.com> <Y07PNJZ+RJrWxDUP@x1n>
- <12746816-0d9e-15ee-bb08-2025aa4d9ed3@redhat.com>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v2 1/9] KVM: arm64: selftests: Use FIELD_GET() to extract
+ ID register fields
+Message-ID: <Y1GckDU/gCNQ6tAS@google.com>
+References: <20221020054202.2119018-1-reijiw@google.com>
+ <20221020054202.2119018-2-reijiw@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <12746816-0d9e-15ee-bb08-2025aa4d9ed3@redhat.com>
+In-Reply-To: <20221020054202.2119018-2-reijiw@google.com>
 X-Migadu-Flow: FLOW_OUT
-Cc: shuah@kernel.org, kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
- andrew.jones@linux.dev, dmatlack@google.com, shan.gavin@gmail.com,
- catalin.marinas@arm.com, kvmarm@lists.linux.dev, pbonzini@redhat.com,
- zhenyzha@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Andrew Jones <andrew.jones@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,89 +69,91 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Oct 19, 2022 at 06:20:32AM +0800, Gavin Shan wrote:
-> Hi Peter,
+On Wed, Oct 19, 2022 at 10:41:54PM -0700, Reiji Watanabe wrote:
+> Use FIELD_GET() macro to extract ID register fields for existing
+> aarch64 selftests code. No functional change intended.
 > 
-> On 10/19/22 12:07 AM, Peter Xu wrote:
-> > On Tue, Oct 11, 2022 at 02:14:42PM +0800, Gavin Shan wrote:
-
-[...]
-
-> > IMHO it'll be great to start with something like below to describe the
-> > userspace's responsibility to proactively detect the WITH_BITMAP cap:
-> > 
-> >    Before using the dirty rings, the userspace needs to detect the cap of
-> >    KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP to see whether the ring structures
-> >    need to be backed by per-slot bitmaps.
-> > 
-> >    When KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP returns 1, it means the arch can
-> >    dirty guest pages without vcpu/ring context, so that some of the dirty
-> >    information will still be maintained in the bitmap structure.
-> > 
-> >    Note that the bitmap here is only a backup of the ring structure, and it
-> >    doesn't need to be collected until the final switch-over of migration
-> >    process.  Normally the bitmap should only contain a very small amount of
-> >    dirty pages only, which needs to be transferred during VM downtime.
-> > 
-> >    To collect dirty bits in the backup bitmap, the userspace can use the
-> >    same KVM_GET_DIRTY_LOG ioctl.  Since it's always the last phase of
-> >    migration that needs the fetching of dirty bitmap, KVM_CLEAR_DIRTY_LOG
-> >    ioctl should not be needed in this case and its behavior undefined.
-> > 
-> > That's how I understand this new cap, but let me know if you think any of
-> > above is inproper.
-> > 
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> ---
+>  tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c  | 3 ++-
+>  tools/testing/selftests/kvm/aarch64/debug-exceptions.c | 3 ++-
+>  tools/testing/selftests/kvm/lib/aarch64/processor.c    | 7 ++++---
+>  3 files changed, 8 insertions(+), 5 deletions(-)
 > 
-> Yes, It looks much better to describe how KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
-> is used. However, the missed part is the capability is still need to be enabled
-> prior to KVM_CAP_DIRTY_LOG_RING_ACQ_REL on ARM64. It means the capability needs
-> to be acknowledged (confirmed) by user space. Otherwise, KVM_CAP_DIRTY_LOG_RING_ACQ_REL
-> can't be enabled successfully. It seems Oliver, you and I aren't on same page for
-> this part. Please refer to below reply for more discussion. After the discussion
-> is finalized, I can amend the description accordingly here.
+> diff --git a/tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c b/tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c
+> index 6f9c1f19c7f6..b6a5e8861b35 100644
+> --- a/tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c
+> +++ b/tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c
+> @@ -13,6 +13,7 @@
+>  #include "kvm_util.h"
+>  #include "processor.h"
+>  #include "test_util.h"
+> +#include <linux/bitfield.h>
+>  
+>  #define BAD_ID_REG_VAL	0x1badc0deul
+>  
+> @@ -145,7 +146,7 @@ static bool vcpu_aarch64_only(struct kvm_vcpu *vcpu)
+>  
+>  	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1), &val);
+>  
+> -	el0 = (val & ARM64_FEATURE_MASK(ID_AA64PFR0_EL0)) >> ID_AA64PFR0_EL0_SHIFT;
+> +	el0 = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL0), val);
+>  	return el0 == ID_AA64PFR0_ELx_64BIT_ONLY;
+>  }
+>  
+> diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> index 947bd201435c..3808d3d75055 100644
+> --- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> +++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> @@ -2,6 +2,7 @@
+>  #include <test_util.h>
+>  #include <kvm_util.h>
+>  #include <processor.h>
+> +#include <linux/bitfield.h>
+>  
+>  #define MDSCR_KDE	(1 << 13)
+>  #define MDSCR_MDE	(1 << 15)
+> @@ -284,7 +285,7 @@ static int debug_version(struct kvm_vcpu *vcpu)
+>  	uint64_t id_aa64dfr0;
+>  
+>  	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &id_aa64dfr0);
+> -	return id_aa64dfr0 & 0xf;
+> +	return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), id_aa64dfr0);
+>  }
+>  
+>  static void test_guest_debug_exceptions(void)
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index 6f5551368944..7c96b931edd5 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -11,6 +11,7 @@
+>  #include "guest_modes.h"
+>  #include "kvm_util.h"
+>  #include "processor.h"
+> +#include <linux/bitfield.h>
+>  
+>  #define DEFAULT_ARM64_GUEST_STACK_VADDR_MIN	0xac0000
+>  
+> @@ -486,9 +487,9 @@ void aarch64_get_supported_page_sizes(uint32_t ipa,
+>  	err = ioctl(vcpu_fd, KVM_GET_ONE_REG, &reg);
+>  	TEST_ASSERT(err == 0, KVM_IOCTL_ERROR(KVM_GET_ONE_REG, vcpu_fd));
+>  
+> -	*ps4k = ((val >> 28) & 0xf) != 0xf;
+> -	*ps64k = ((val >> 24) & 0xf) == 0;
+> -	*ps16k = ((val >> 20) & 0xf) != 0;
+> +	*ps4k = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_TGRAN4), val) != 0xf;
+> +	*ps64k = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_TGRAN64), val) == 0;
+> +	*ps16k = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR0_TGRAN16), val) != 0;
 
-I'll follow up on the details of the CAP below, but wanted to explicitly
-note some stuff for documentation:
+Not your code, but since we're here...
 
-Collecting the dirty bitmap should be the very last thing that the VMM
-does before transmitting state to the target VMM. You'll want to make
-sure that the dirty state is final and avoid missing dirty pages from
-another ioctl ordered after bitmap collection.
+Should we change the field values to use the #define's? Also, the test
+for TGRAN64 looks wrong. We should test != ID_AA64MMFR0_TGRAN64_NI. A
+value greater than 0 would indicate an extension of the feature.
 
-[...]
+But for this exact change:
 
-> > > +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP:
-> > > +		kvm->dirty_ring_with_bitmap = true;
-> > 
-> > IIUC what Oliver wanted to suggest is we can avoid enabling of this cap,
-> > then we don't need dirty_ring_with_bitmap field but instead we can check
-> > against CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP when needed.
-> > 
-> > I think that'll make sense, because without the bitmap the ring won't work
-> > with arm64, so not valid to not enable it at all.  But good to double check
-> > with Oliver too.
-> > 
-> > The rest looks good to me, thanks,
-> > 
-> 
-> It was suggested by Oliver to expose KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP. The
-> user space also needs to enable the capability prior to KVM_CAP_DIRTY_LOG_RING_ACQ_REL
-> on ARM64. I may be missing something since Oliver and you had lots of discussion
-> on this particular new capability.
-> 
-> I'm fine to drop the bits to enable KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP. It means
-> the capability is exposed to user space on ARM64 and user space need __not__ to
-> enable it prior to KVM_CAP_DIRTY_LOG_RING_ACQ_REL. I would like Oliver helps to
-> confirm before I'm able to post v7.
-
-IMO you really want the explicit buy-in from userspace, as failure to
-collect the dirty bitmap will result in a dead VM on the other side of
-migration. Fundamentally we're changing the ABI of
-KVM_CAP_DIRTY_LOG_RING[_ACQ_REL].
-
---
-Thanks,
-Oliver
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
