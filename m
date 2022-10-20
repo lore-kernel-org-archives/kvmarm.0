@@ -1,175 +1,240 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E556623BF
-	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 07:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0029723BF
+	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 07:19:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1666250003;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=mimecast20190719; t=1666250397;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=FzMWVAugfUTLDKVc6MZDfcXiQ1pIkYlmEhf7GtdgsCg=;
-	b=cPmG/l9vAa8XbXBAUVzLrP9I00nZoQw1ZWdbykUbAae6jmccBQjFNaQYqBDPQgKDCMFetQ
-	XRZT5SD1bKxTBC0sDwBGW0hu0e3uu6JCcFJV+0R9BtFA1lDeSICGmh6Ib2PovOm8fQdFQW
-	VxbG8pnf45X1VNafvBoB7CrmdLYM55E=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=d9HqOzVsB8T4yggWYl1bqige06n7AwLzVreZ+LrEySM=;
+	b=KzWb2GdqCw9t6whQCncjrTJ9pC6Gb2HBe7EpSnkOjwQaSyhAcR8aPHbavrnxdaq5OtGFUq
+	y4praoinjLI7y2Ycfhx/VU6ioWwyl5vaEQfM0IidH/5k3XpxHKHWqmHEu26JZvw54+pH2p
+	EkodJhJOPsOGLlBN3C9AHT8U46wY1VA=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-651-5ez8t1IUM6GylxvlF3TLAA-1; Thu, 20 Oct 2022 03:13:20 -0400
-X-MC-Unique: 5ez8t1IUM6GylxvlF3TLAA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-339--4tmXxcVONmOztGz3krQ0w-1; Thu, 20 Oct 2022 03:19:54 -0400
+X-MC-Unique: -4tmXxcVONmOztGz3krQ0w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B5EAC800B30;
-	Thu, 20 Oct 2022 07:13:19 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-70.bne.redhat.com [10.64.54.70])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D56C340C6EC2;
-	Thu, 20 Oct 2022 07:13:14 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EDD051C068C9;
+	Thu, 20 Oct 2022 07:19:53 +0000 (UTC)
+Received: from [10.64.54.70] (vpn2-54-70.bne.redhat.com [10.64.54.70])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A5A1EC15BA5;
+	Thu, 20 Oct 2022 07:19:45 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH 4/6] KVM: selftests: memslot_perf_test: Support variable
+ guest page size
+To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
+ zhenyzha@redhat.com, shan.gavin@gmail.com, kvmarm@lists.linux.dev,
+ pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
+ ajones@ventanamicro.com
+References: <20221014071914.227134-1-gshan@redhat.com>
+ <20221014071914.227134-5-gshan@redhat.com>
+ <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
+ <bd5df92c-6870-8053-0b35-a2ad993970bd@redhat.com>
+ <da2b7db0-509a-c9e0-c36b-6487a265a779@redhat.com>
+ <a1a8664c-4d06-89e7-8cfa-b730969bb841@maciej.szmigiero.name>
+ <5bfbe050-a654-8400-e1f1-dcfa4dba13e6@redhat.com>
+ <a45cfcc9-0255-14f0-30a5-18d6efaad0d4@maciej.szmigiero.name>
 From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.linux.dev
-Cc: kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mail@maciej.szmigiero.name,
-	maz@kernel.org,
-	pbonzini@redhat.com,
-	ajones@ventanamicro.com,
-	shuah@kernel.org,
-	peterx@redhat.com,
-	oliver.upton@linux.dev,
-	seanjc@google.com,
-	ricarkol@google.com,
-	zhenyzha@redhat.com,
-	shan.gavin@gmail.com
-Subject: [PATCH v3 6/6] KVM: selftests: memslot_perf_test: Report optimal memory slots
-Date: Thu, 20 Oct 2022 15:12:09 +0800
-Message-ID: <20221020071209.559062-7-gshan@redhat.com>
-In-Reply-To: <20221020071209.559062-1-gshan@redhat.com>
-References: <20221020071209.559062-1-gshan@redhat.com>
+Message-ID: <001d6b60-dc05-370d-5cb3-9f8f855089c3@redhat.com>
+Date: Thu, 20 Oct 2022 15:19:42 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <a45cfcc9-0255-14f0-30a5-18d6efaad0d4@maciej.szmigiero.name>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-Message-ID: <20221020071209.Huim9g-5n9R0LGJdOtZV38lsUmv7bXQv0jAppYA1o4w@z>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Message-ID: <20221020071942.AMA1m8aPgMFdy9grPVc90pTKPswZUNt7s1IhD7I-U1o@z>
 
-The memory area in each slot should be aligned to host page size.
-Otherwise, the test will fail. For example, the following command
-fails with the following messages with 64KB-page-size-host and
-4KB-pae-size-guest. It's not user friendly to abort the test.
-Lets do something to report the optimal memory slots, instead of
-failing the test.
+On 10/20/22 4:18 AM, Maciej S. Szmigiero wrote:
+> On 19.10.2022 02:26, Gavin Shan wrote:
+>> On 10/18/22 11:56 PM, Maciej S. Szmigiero wrote:
+>>> On 18.10.2022 02:51, Gavin Shan wrote:
+>>>> On 10/18/22 8:46 AM, Gavin Shan wrote:
+>>>>> On 10/18/22 5:31 AM, Maciej S. Szmigiero wrote:
+>>>>>> On 14.10.2022 09:19, Gavin Shan wrote:
+>>>>>>> The test case is obviously broken on aarch64 because non-4KB guest
+>>>>>>> page size is supported. The guest page size on aarch64 could be 4KB,
+>>>>>>> 16KB or 64KB.
+>>>>>>>
+>>>>>>> This supports variable guest page size, mostly for aarch64.
+>>>>>>>
+>>>>>>>    - The host determines the guest page size when virtual machine is
+>>>>>>>      created. The value is also passed to guest through the synchronization
+>>>>>>>      area.
+>>>>>>>
+>>>>>>>    - The number of guest pages are unknown until the virtual machine
+>>>>>>>      is to be created. So all the related macros are dropped. Instead,
+>>>>>>>      their values are dynamically calculated based on the guest page
+>>>>>>>      size.
+>>>>>>>
+>>>>>>>    - The static checks on memory sizes and pages becomes dependent
+>>>>>>>      on guest page size, which is unknown until the virtual machine
+>>>>>>>      is about to be created. So all the static checks are converted
+>>>>>>>      to dynamic checks, done in check_memory_sizes().
+>>>>>>>
+>>>>>>>    - As the address passed to madvise() should be aligned to host page,
+>>>>>>>      the size of page chunk is automatically selected, other than one
+>>>>>>>      page.
+>>>>>>>
+>>>>>>>    - All other changes included in this patch are almost mechanical
+>>>>>>>      replacing '4096' with 'guest_page_size'.
+>>>>>>>
+>>>>>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>>>>>>> ---
+>>>>>>>   .../testing/selftests/kvm/memslot_perf_test.c | 191 +++++++++++-------
+>>>>>>>   1 file changed, 115 insertions(+), 76 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
+>>>>>>> index d5aa9148f96f..d587bd952ff9 100644
+>>>>>>> --- a/tools/testing/selftests/kvm/memslot_perf_test.c
+>>>>>>> +++ b/tools/testing/selftests/kvm/memslot_perf_test.c
+>>> (...)
+>>>>>>> @@ -77,8 +61,7 @@ static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
+>>>>>>>    * for the total size of 25 pages.
+>>>>>>>    * Hence, the maximum size here is 50 pages.
+>>>>>>>    */
+>>>>>>> -#define MEM_TEST_MOVE_SIZE_PAGES    (50)
+>>>>>>> -#define MEM_TEST_MOVE_SIZE        (MEM_TEST_MOVE_SIZE_PAGES * 4096)
+>>>>>>> +#define MEM_TEST_MOVE_SIZE        0x32000
+>>>>>>
+>>>>>> The above number seems less readable than an explicit value of 50 pages.
+>>>>>>
+>>>>>> In addition to that, it's 50 pages only with 4k page size, so at least
+>>>>>> the comment above needs to be updated to reflect this fact.
+>>>>>>
+>>>>>
+>>>>> Yeah, I will change the comments like below in next revision.
+>>>>>
+>>>>>   /*
+>>>>>    * When running this test with 32k memslots, actually 32763 excluding
+>>>>>    * the reserved memory slot 0, the memory for each slot is 0x4000 bytes.
+>>>>>    * The last slot contains 0x19000 bytes memory. Hence, the maximum size
+>>>>>    * here is 0x32000 bytes.
+>>>>>    */
+>>>>>
+>>>>
+>>>> I will replace those numbers with readable ones like below :)
+>>>>
+>>>> /*
+>>>>   * When running this test with 32k memslots, actually 32763 excluding
+>>>>   * the reserved memory slot 0, the memory for each slot is 16KB. The
+>>>>   * last slot contains 100KB memory with the remaining 84KB. Hence,
+>>>>   * the maximum size is double of that (200KB)
+>>>>   */
+>>>
+>>> Still, these numbers are for x86, which has KVM_INTERNAL_MEM_SLOTS
+>>> defined as 3.
+>>>
+>>> As far as I can see aarch64 has KVM_INTERNAL_MEM_SLOTS equal to 0, so
+>>> this arch has 32766 slot available for the test memory.
+>>>
+>>> Quick calculations show that this will result in 112 KiB of memory in
+>>> the last slot for 4 KiB page size (while for 64 KiB page size the
+>>> maximum slot count for this test is 8192 anyway - not counting slot 0).
+>>>
+>>
+>> It seems your calculation had (512MB+64KB), instead of (512MB+4KB).
+>> In this particular patch, we still have (512MB+4KB). How about to change
+>> like below in this patch. In next patch, it's adjusted accordingly after
+>> we have (512MB+64KB).
+> 
+> My review comment above referred to the final MEM_SIZE value after the
+> whole series, so 512 MiB + 64 KiB.
+> 
+> I placed that review comment on patch 4 since it's the only patch in this
+> series that modified the code comment about MEM_TEST_MOVE_SIZE.
+> 
+>>
+>> (1) In this patch, the comment is changed to as below
+>>
+>>      /*
+>>       * We have different number of memory slots, excluding the reserved
+>>       * memory slot 0, on various architectures and configurations. The
+>>       * memory size in this test is calculated by doubling the maximal
+>>       * memory size in last memory slot, with alignment to the largest
+>>       * supported page size (64KB).
+>>       *
+>>       * architecture   slots    memory-per-slot    memory-on-last-slot
+>>       * --------------------------------------------------------------
+>>       * x86-4KB        32763    16KB               100KB
+>>       * arm64-4KB      32766    16KB               52KB
+>>       * arm64-64KB     8192     64KB               64KB
+>>       */
+>>      #define MEM_TEST_MOVE_SIZE    0x40000           /* 256KB */
+>>
+>> (2) In the next patch, where we have (512MB+64KB) after the various
+>>      memory sizes are consolidated, It is adjusted accordingly as below.
+>>
+>>      /*
+>>       * We have different number of memory slots, excluding the reserved
+>>       * memory slot 0, on various architectures and configurations. The
+>>       * memory size in this test is calculated by doubling the maximal
+>>       * memory size in last memory slot, with alignment to the largest
+>>       * supported page size (64KB).
+>>       *
+>>       * architecture   slots    memory-per-slot    memory-on-last-slot
+>>       * --------------------------------------------------------------
+>>       * x86-4KB        32763    16KB               160KB
+>>       * arm64-4KB      32766    16KB               112KB
+>>       * arm64-64KB     8192     64KB               128KB
+>>       */
+>>      #define MEM_TEST_MOVE_SIZE    0x50000           /* 320KB */
+> 
+> Now MEM_TEST_MOVE_SIZE is too high for arm64-4KB and arm64-64KB cases
+> (it needs 160 KiB in the last slot but has less available in these two
+> cases).
+> 
+> Using a test size of 192 KiB instead seems like a small difference
+> from the original size of 200 KiB, while still being aligned to
+> 64 KiB.
+> 
+> The move benchmarks runtime difference on x86-4KB with this size
+> (compared to sizes of 200 KiB and 320 KiB) seems to be negligible.
+> 
+> Since it's an odd number of 64 KiB pages (3) the code that halves
+> this number of pages will need to be adjusted to operate on raw
+> sizes instead.
+> 
+> I can see a single block of code that will need such adjustment:
+>> if (lastpages < move_pages / 2) {
+>>         *maxslots = 0;
+>>         return false;
+>> } 
+> 
+> Similar remark goes for the case (1) above, where you'll probably need
+> to use 64 KiB test area size (it's only an intermediate form of code
+> before the final patch changes this value so it's fine if it doesn't
+> perform as well as the final form of the code).
+> 
 
-  # ./memslot_perf_test -v -s 1000
-  Number of memory slots: 999
-  Testing map performance with 1 runs, 5 seconds each
-  Adding slots 1..999, each slot with 8 pages + 216 extra pages last
-  ==== Test Assertion Failure ====
-    lib/kvm_util.c:824: vm_adjust_num_guest_pages(vm->mode, npages) == npages
-    pid=19872 tid=19872 errno=0 - Success
-       1  0x00000000004065b3: vm_userspace_mem_region_add at kvm_util.c:822
-       2  0x0000000000401d6b: prepare_vm at memslot_perf_test.c:273
-       3  (inlined by) test_execute at memslot_perf_test.c:756
-       4  (inlined by) test_loop at memslot_perf_test.c:994
-       5  (inlined by) main at memslot_perf_test.c:1073
-       6  0x0000ffff7ebb4383: ?? ??:0
-       7  0x00000000004021ff: _start at :?
-    Number of guest pages is not compatible with the host. Try npages=16
+Maciej, all your comments make sense to me. It really took me some times
+to do the calculation. I just posted v3 to address all your comments.
+Hopefully, there is nothing missed. Please go ahead to review v3 directly
+when you get a chance.
 
-Report the optimal memory slots instead of failing the test when
-the memory area in each slot isn't aligned to host page size. With
-this applied, the optimal memory slots is reported.
+    v3: https://lore.kernel.org/kvmarm/20221020071209.559062-1-gshan@redhat.com/T/#t
 
-  # ./memslot_perf_test -v -s 1000
-  Number of memory slots: 999
-  Testing map performance with 1 runs, 5 seconds each
-  Memslot count too high for this test, decrease the cap (max is 514)
+In v3, the comments about MEM_TEST_MOVE_SIZE is fixed in PATCH[v3 4/6],
+but it's 64KB. In PATCH[v3 5/6], it's fixed up to 192KB and memory size
+is used for the comparison in test_memslot_move_prepare().
 
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- .../testing/selftests/kvm/memslot_perf_test.c | 45 +++++++++++++++++--
- 1 file changed, 41 insertions(+), 4 deletions(-)
+Thanks,
+Gavin
 
-diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
-index daebc264de5a..2ad40f7c9c08 100644
---- a/tools/testing/selftests/kvm/memslot_perf_test.c
-+++ b/tools/testing/selftests/kvm/memslot_perf_test.c
-@@ -239,16 +239,52 @@ static struct vm_data *alloc_vm(void)
- 	return data;
- }
- 
-+static bool check_slot_pages(uint32_t host_page_size, uint32_t guest_page_size,
-+			     uint64_t pages_per_slot, uint64_t rempages)
-+{
-+	if (!pages_per_slot)
-+		return false;
-+
-+	if ((pages_per_slot * guest_page_size) % host_page_size)
-+		return false;
-+
-+	if ((rempages * guest_page_size) % host_page_size)
-+		return false;
-+
-+	return true;
-+}
-+
-+
-+static uint64_t get_max_slots(struct vm_data *data, uint32_t host_page_size)
-+{
-+	uint32_t guest_page_size = data->vm->page_size;
-+	uint64_t mempages, pages_per_slot, rempages;
-+	uint64_t slots;
-+
-+	mempages = data->npages;
-+	slots = data->nslots;
-+	while (--slots > 1) {
-+		pages_per_slot = mempages / slots;
-+		rempages = mempages % pages_per_slot;
-+		if (check_slot_pages(host_page_size, guest_page_size,
-+				     pages_per_slot, rempages))
-+			return slots + 1;	/* slot 0 is reserved */
-+	}
-+
-+	return 0;
-+}
-+
- static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 		       void *guest_code, uint64_t mem_size,
- 		       struct timespec *slot_runtime)
- {
- 	uint64_t mempages, rempages;
- 	uint64_t guest_addr;
--	uint32_t slot, guest_page_size;
-+	uint32_t slot, host_page_size, guest_page_size;
- 	struct timespec tstart;
- 	struct sync_area *sync;
- 
-+	host_page_size = getpagesize();
- 	guest_page_size = vm_guest_mode_params[VM_MODE_DEFAULT].page_size;
- 	mempages = mem_size / guest_page_size;
- 
-@@ -260,12 +296,13 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 	TEST_ASSERT(data->npages > 1, "Can't test without any memory");
- 	data->nslots = nslots;
- 	data->pages_per_slot = data->npages / data->nslots;
--	if (!data->pages_per_slot) {
--		*maxslots = data->npages + 1;
-+	rempages = data->npages % data->nslots;
-+	if (!check_slot_pages(host_page_size, guest_page_size,
-+			      data->pages_per_slot, rempages)) {
-+		*maxslots = get_max_slots(data, host_page_size);
- 		return false;
- 	}
- 
--	rempages = data->npages % data->nslots;
- 	data->hva_slots = malloc(sizeof(*data->hva_slots) * data->nslots);
- 	TEST_ASSERT(data->hva_slots, "malloc() fail");
- 
--- 
-2.23.0
 
