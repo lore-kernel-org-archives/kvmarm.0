@@ -1,154 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA25115D0
-	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 14:33:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA8E6C433D6;
-	Thu, 20 Oct 2022 14:33:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1666276427;
-	bh=FaeuPMUHhNdQ1un6IB5cPZDWQfSVNpn50XrmvqcBfDw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=butNE0E3dApCwaoRTHIlqK9ITMhgzR7ZUe+MsoLn8uT7/c6LhoBOaxgAFYY/P/Ymq
-	 dGVUw50NJC/IJAmWiq7ap+++fHy/puTkKmI9cmEzhQeh28vbOGkJummh70lLBAJbk8
-	 7UOd7a1VlAbtSrg5+x5L76WVOMmjIyf7YQc57mTkSs3D2pUoKFC12SibW/YzziTBJj
-	 mD5dUHYD3NOPkWczFb5pwGqAdlF1X4hx+qW/CSwLDPsRGf9r6PrzF1mOe/ja0STLRU
-	 VNsiLEjS8Oss+IkCJlL6tx6TxTSswYI4AlamDLdIGUs+x8UkVVkJznD7iLOUNCtBUk
-	 v9kpsctpHUd/Q==
-Date: Thu, 20 Oct 2022 15:33:40 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: Namhyung Kim <namhyung@kernel.org>, James Morse <james.morse@arm.com>,
-	Ingo Molnar <mingo@redhat.com>, Mark Rutland <mark.rutland@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Oliver Upton <oliver.upton@linux.dev>, Jiri Olsa <jolsa@kernel.org>,
-	kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/7] arm64/sysreg: Convert SPE registers to automatic
- generation
-Message-ID: <Y1FcRNhFpZxZ7AMx@sirena.org.uk>
-References: <20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org>
- <20220825-arm-spe-v8-7-v2-3-e37322d68ac0@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753907E
+	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 18:59:01 +0000 (UTC)
+Date: Thu, 20 Oct 2022 21:58:56 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1666292339;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mFdDcgKlE3XXuFjEiY8riBIIBCcAHkobBQ7341g9M90=;
+	b=GBvTT4pg9b2Mv+zTUr/jo41QG91tUZ/UsI3TdPofqrz7XnlrVadmYDpGENJWcjvANT1Xfm
+	cI9/haQ1cXe+qrw7EQf0hZsacBftfAyDGUm318EGanAuncotmKPu9TAR2sVGTfH9gu/eNx
+	LCymui04NS4GxPFRTL5nX7pbcsaG3fg=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Gavin Shan <gshan@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, maz@kernel.org,
+	will@kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+	shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com,
+	pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com,
+	suzuki.poulose@arm.com, alexandru.elisei@arm.com, seanjc@google.com,
+	shan.gavin@gmail.com
+Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
+ conjunction with bitmap
+Message-ID: <Y1GacKRhwBqKKekw@google.com>
+References: <20221011061447.131531-1-gshan@redhat.com>
+ <20221011061447.131531-4-gshan@redhat.com>
+ <Y07PNJZ+RJrWxDUP@x1n>
+ <12746816-0d9e-15ee-bb08-2025aa4d9ed3@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="VOl7BrjAsP2F3VXr"
-Content-Disposition: inline
-In-Reply-To: <20220825-arm-spe-v8-7-v2-3-e37322d68ac0@kernel.org>
-X-Cookie: Today is what happened to yesterday.
-Message-ID: <20221020143340.iDTJBQaAnU80HaF9yC8_uB8aXGZbs0bMFaYpPN8y9QM@z>
-
-
---VOl7BrjAsP2F3VXr
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <12746816-0d9e-15ee-bb08-2025aa4d9ed3@redhat.com>
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <20221020185856.WlOFYjusSohhqw_GMIKLPgphUd-gunpmZAMp1rPUVYQ@z>
 
-On Wed, Oct 19, 2022 at 02:11:26PM -0500, Rob Herring wrote:
-> Convert all the SPE register defines to automatic generation. No
-> functional changes.
->=20
-> New registers and fields for SPEv1.2 are added with the conversion.
->=20
-> Some of the PMBSR MSS field defines are kept as the automatic generation
-> has no way to create multiple names for the same register bits. The
-> meaning of the MSS field depends on other bits.
+On Wed, Oct 19, 2022 at 06:20:32AM +0800, Gavin Shan wrote:
+> Hi Peter,
+> 
+> On 10/19/22 12:07 AM, Peter Xu wrote:
+> > On Tue, Oct 11, 2022 at 02:14:42PM +0800, Gavin Shan wrote:
 
-A few small things below from checking against DDI0487I.a, nothing
-major:
+[...]
 
-> +Sysreg	PMSCR_EL1	3	0	9	9	0
-> +Res0	63:8
-> +Field	7:6	PCT
+> > IMHO it'll be great to start with something like below to describe the
+> > userspace's responsibility to proactively detect the WITH_BITMAP cap:
+> > 
+> >    Before using the dirty rings, the userspace needs to detect the cap of
+> >    KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP to see whether the ring structures
+> >    need to be backed by per-slot bitmaps.
+> > 
+> >    When KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP returns 1, it means the arch can
+> >    dirty guest pages without vcpu/ring context, so that some of the dirty
+> >    information will still be maintained in the bitmap structure.
+> > 
+> >    Note that the bitmap here is only a backup of the ring structure, and it
+> >    doesn't need to be collected until the final switch-over of migration
+> >    process.  Normally the bitmap should only contain a very small amount of
+> >    dirty pages only, which needs to be transferred during VM downtime.
+> > 
+> >    To collect dirty bits in the backup bitmap, the userspace can use the
+> >    same KVM_GET_DIRTY_LOG ioctl.  Since it's always the last phase of
+> >    migration that needs the fetching of dirty bitmap, KVM_CLEAR_DIRTY_LOG
+> >    ioctl should not be needed in this case and its behavior undefined.
+> > 
+> > That's how I understand this new cap, but let me know if you think any of
+> > above is inproper.
+> > 
+> 
+> Yes, It looks much better to describe how KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
+> is used. However, the missed part is the capability is still need to be enabled
+> prior to KVM_CAP_DIRTY_LOG_RING_ACQ_REL on ARM64. It means the capability needs
+> to be acknowledged (confirmed) by user space. Otherwise, KVM_CAP_DIRTY_LOG_RING_ACQ_REL
+> can't be enabled successfully. It seems Oliver, you and I aren't on same page for
+> this part. Please refer to below reply for more discussion. After the discussion
+> is finalized, I can amend the description accordingly here.
 
-Given the potential multiple meanings depending on both integration and
-runtime configuration representing this as a field seems sensible.
+I'll follow up on the details of the CAP below, but wanted to explicitly
+note some stuff for documentation:
 
-> +Sysreg	PMSNEVFR_EL1	3	0	9	9	1
-> +Field	63:0	E
-> +EndSysreg
+Collecting the dirty bitmap should be the very last thing that the VMM
+does before transmitting state to the target VMM. You'll want to make
+sure that the dirty state is final and avoid missing dirty pages from
+another ioctl ordered after bitmap collection.
 
-While this does look rather different to the spec it does appear to be a
-sensible interpretation - the intent is clearly to have a mask of
-feature bits.
+[...]
 
-> +Sysreg	PMSIDR_EL1	3	0	9	9	7
+> > > +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP:
+> > > +		kvm->dirty_ring_with_bitmap = true;
+> > 
+> > IIUC what Oliver wanted to suggest is we can avoid enabling of this cap,
+> > then we don't need dirty_ring_with_bitmap field but instead we can check
+> > against CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP when needed.
+> > 
+> > I think that'll make sense, because without the bitmap the ring won't work
+> > with arm64, so not valid to not enable it at all.  But good to double check
+> > with Oliver too.
+> > 
+> > The rest looks good to me, thanks,
+> > 
+> 
+> It was suggested by Oliver to expose KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP. The
+> user space also needs to enable the capability prior to KVM_CAP_DIRTY_LOG_RING_ACQ_REL
+> on ARM64. I may be missing something since Oliver and you had lots of discussion
+> on this particular new capability.
+> 
+> I'm fine to drop the bits to enable KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP. It means
+> the capability is exposed to user space on ARM64 and user space need __not__ to
+> enable it prior to KVM_CAP_DIRTY_LOG_RING_ACQ_REL. I would like Oliver helps to
+> confirm before I'm able to post v7.
 
-> +Field	23:20	FORMAT
-> +Field	19:16	COUNTSIZE
-> +Field	15:12	MAXSIZE
-> +Field	11:8	INTERVAL
+IMO you really want the explicit buy-in from userspace, as failure to
+collect the dirty bitmap will result in a dead VM on the other side of
+migration. Fundamentally we're changing the ABI of
+KVM_CAP_DIRTY_LOG_RING[_ACQ_REL].
 
-These should really be enums.
-
-> +Sysreg	PMBLIMITR_EL1	3	0	9	10	0
-> +Enum	2:1	FM
-> +	0b0000	STOP_IRQ
-> +EndEnum
-
-DDI0487I.a also defines
-
-	0b01	DISCARD
-
-=66rom FEAT_SPEv1p2.  Also this is a two bit field so 0b00 would be a bit
-better.
-
-> +Sysreg	PMBSR_EL1	3	0	9	10	3
-> +Res0	63:32
-> +Enum	31:26	EC
-> +	0b000000	BUF
-> +	0b100100	FAULT_S1
-> +	0b100101	FAULT_S2
-> +EndEnum
-
-DDI0487I.a also has
-
-	0b011110	FAULT_GPC
-	0b011111	IMP_DEF
-
-(the former from FEAT_RME).
-
-> +Sysreg	PMBIDR_EL1	3	0	9	10	7
-> +Res0	63:12
-> +Field	11:8	EA
-
-This looks like it should be described as an enum.
-
-> +Field	3:0	ALIGN
-
-This could potentially also be an enum.
-
-> +Sysreg	PMSCR_EL2	3	4	9	9	0
-> +Res0	63:8
-> +Field	7:6	PCT
-
-This lookslike it should be an enum.
-
---VOl7BrjAsP2F3VXr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmNRXEMACgkQJNaLcl1U
-h9BxoAf/WoPWB2G/B9tOuYVL94BuR2DecQwcEGhVK7tOMRJ27Vo4dCUdnfTloTZz
-Jj0O/V6pHcc1kxMopuhhYRDYTW/kcub+dw2Rdj1T+Nv/OSMB2nISyK26sdYHa61+
-Rx7OT3fRDFmaAcJ04jma1wlwlBa3Busy60PGtTbT9CdWrYLUZo3AVeJkb7Mtacgo
-/XHM616UHZ8emOWdatKMQkYmTs0X9mNJ48cyOBrItDpbERep49qB8pDlxAfcSaYT
-oHICs5H0KJ66c/yRWC02LOFBIJBWmmmce6qLyqcNynxPbW5XSYV6k50wZXaIE0H/
-U6qk5ya1kaFNQ4WUN70owOOlw/nQ3g==
-=JWVG
------END PGP SIGNATURE-----
-
---VOl7BrjAsP2F3VXr--
+--
+Thanks,
+Oliver
