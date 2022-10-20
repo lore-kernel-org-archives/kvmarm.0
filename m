@@ -1,18 +1,18 @@
 Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B862D7E
-	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 08:32:38 +0000 (UTC)
-Date: Thu, 20 Oct 2022 11:32:28 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F9B7E
+	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 08:34:34 +0000 (UTC)
+Date: Thu, 20 Oct 2022 11:34:24 +0300
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1666254751;
+	t=1666254872;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ctJTA03g4S212w2fsHSI6DaGgRDXgMSNX17PNK39G/0=;
-	b=pgyjDfj23srvir/0JWPCeon9S2icBTGfjwie/jgTm29lfHFUB5MWMUQC2NOCYHM+Ev6Kwu
-	vYfDqUZn9trZqo950qlzCnTvt9p28mC3423MnKGH9g/cZ6eb9s50soaCKfJQLzQJkzCN7N
-	sIVBDEL8fDY+TEzFGGrstuX4JGlSOfY=
+	bh=qzX6SzV6RdnXytSM2ouehoSyV7++gCHengCJvmVIT7s=;
+	b=ha7Agfr0EZ1HqBNwRgfdeT84BnPAGCdqCmWxiw8zIoxjGznrHHmeb8r2ZOT6kEIhjttnjI
+	JvxjjwysVU/zudV3hs35G+nF2vyB/lOZmRkFRbJiEHOWfZ3PgsVHrBtc/g4SKQQcQZBtBN
+	V/iHop8+q44+UHjRL4hZo422bZj8pPY=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
@@ -26,11 +26,11 @@ Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
 	Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 07/15] KVM: arm64: Use an opaque type for pteps
-Message-ID: <Y1EHnFN2Goj2eLkE@google.com>
+Subject: Re: [PATCH v2 08/15] KVM: arm64: Protect stage-2 traversal with RCU
+Message-ID: <Y1EIEOoelp+ZG3+I@google.com>
 References: <20221007232818.459650-1-oliver.upton@linux.dev>
- <20221007232818.459650-8-oliver.upton@linux.dev>
- <Y1CFl8sLllXm4seK@google.com>
+ <20221007232818.459650-9-oliver.upton@linux.dev>
+ <Y1CIdN5kcJPaZdqv@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,127 +39,57 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y1CFl8sLllXm4seK@google.com>
+In-Reply-To: <Y1CIdN5kcJPaZdqv@google.com>
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221020083228.eGIT2ozuxZbS4AXr018FyesUz_MNg8r9g_WMkcADpSk@z>
+Message-ID: <20221020083424.dbnbcxxABi7KKU_nW7AJJwtL0xeHdTZOtWYBsrl0dAo@z>
 
-On Wed, Oct 19, 2022 at 11:17:43PM +0000, Sean Christopherson wrote:
+On Wed, Oct 19, 2022 at 11:29:56PM +0000, Sean Christopherson wrote:
 > On Fri, Oct 07, 2022, Oliver Upton wrote:
-> > Use an opaque type for pteps and require visitors explicitly dereference
-> > the pointer before using. Protecting page table memory with RCU requires
-> > that KVM dereferences RCU-annotated pointers before using. However, RCU
-> > is not available for use in the nVHE hypervisor and the opaque type can
-> > be conditionally annotated with RCU for the stage-2 MMU.
+> > The use of RCU is necessary to safely change the stage-2 page tables in
+> > parallel. Acquire and release the RCU read lock when traversing the page
+> > tables.
 > > 
-> > Call the type a 'pteref' to avoid a naming collision with raw pteps. No
-> > functional change intended.
+> > Use the _raw() flavor of rcu_dereference when changes to the page tables
+> > are otherwise protected from parallel software walkers (e.g. holding the
+> > write lock).
 > > 
 > > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h |  9 ++++++++-
-> >  arch/arm64/kvm/hyp/pgtable.c         | 23 ++++++++++++-----------
-> >  2 files changed, 20 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index c33edcf36b5b..beb89eac155c 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -25,6 +25,13 @@ static inline u64 kvm_get_parange(u64 mmfr0)
+> 
+> ...
+> 
+> > @@ -32,6 +39,33 @@ static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared
+> >  	return pteref;
+> >  }
 > >  
-> >  typedef u64 kvm_pte_t;
-> >  
-> > +typedef kvm_pte_t *kvm_pteref_t;
+> > +static inline void kvm_pgtable_walk_begin(void) {}
+> > +static inline void kvm_pgtable_walk_end(void) {}
+> > +
+> > +#else
+> > +
+> > +typedef kvm_pte_t __rcu *kvm_pteref_t;
 > > +
 > > +static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
 > > +{
-> > +	return pteref;
-> 
-> Returning the pointer is unsafe (when it becomes RCU-protected).  The full
-> dereference of the data needs to occur under RCU protection, not just the retrieval
-> of the pointer.  E.g. this (straw man) would be broken
-> 
-> 	bool table = kvm_pte_table(ctx.old, level);
-> 
-> 	rcu_read_lock();
-> 	ptep = kvm_dereference_pteref(pteref, flags & KVM_PGTABLE_WALK_SHARED);
-> 	rcu_read_unlock();
-> 
-> 	if (table && (ctx.flags & KVM_PGTABLE_WALK_TABLE_PRE))
-> 		ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_PRE);
-> 
-> 	if (!table && (ctx.flags & KVM_PGTABLE_WALK_LEAF)) {
-> 		ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_LEAF);
-> 		ctx.old = READ_ONCE(*ptep);
-> 		table = kvm_pte_table(ctx.old, level);
-> 	}
-> 
-> as the read of the entry pointed at by ptep could be to a page table that is freed
-> in an RCU callback.
-> 
-> The naming collision you are trying to avoid is a symptom of this bad pattern,
-> as there should never be "raw" pteps floating around, at least not in non-pKVM
-> contexts that utilize RCU.
-
-Fair enough, this was mostly from an attempt to avoid churn in the
-visitor callbacks by adding more layering for reads/writes through RCU
-pointers. The lifetime of the raw pointer is 'safe' as it sits on the
-stack and we go behind the rcu lock much further up.
-
-> > +}
+> > +	if (shared)
+> > +		return rcu_dereference(pteref);
 > > +
-> >  #define KVM_PTE_VALID			BIT(0)
-> >  
-> >  #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
-> > @@ -170,7 +177,7 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
-> >  struct kvm_pgtable {
-> >  	u32					ia_bits;
-> >  	u32					start_level;
-> > -	kvm_pte_t				*pgd;
-> > +	kvm_pteref_t				pgd;
-> >  	struct kvm_pgtable_mm_ops		*mm_ops;
-> >  
-> >  	/* Stage-2 only */
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 02c33fccb178..6b6e1ed7ee2f 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -175,13 +175,14 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
-> >  }
-> >  
-> >  static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
-> > -			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pte_t *pgtable, u32 level);
-> > +			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, u32 level);
-> >  
-> >  static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
-> >  				      struct kvm_pgtable_mm_ops *mm_ops,
-> > -				      kvm_pte_t *ptep, u32 level)
-> > +				      kvm_pteref_t pteref, u32 level)
-> >  {
-> >  	enum kvm_pgtable_walk_flags flags = data->walker->flags;
-> > +	kvm_pte_t *ptep = kvm_dereference_pteref(pteref, false);
-> >  	struct kvm_pgtable_visit_ctx ctx = {
-> >  		.ptep	= ptep,
-> >  		.old	= READ_ONCE(*ptep),
+> > +	return rcu_dereference_raw(pteref);
 > 
-> This is where you want the protection to kick in, e.g. 
+> Rather than use raw, use rcu_dereference_check().  If you can plumb down @kvm or
+> @mmu_lock, the ideal check would be (apparently there's no lockdep_is_held_write()
+> wrapper?)
 > 
->   typedef kvm_pte_t __rcu *kvm_ptep_t;
+> 	return READ_ONCE(*rcu_dereference_check(ptep, lockdep_is_held_type(mmu_lock, 0)));
 > 
->   static inline kvm_pte_t kvm_read_pte(kvm_ptep_t ptep)
->   {
-> 	return READ_ONCE(*rcu_dereference(ptep));
->   }
+> If getting at mmu_lock is too difficult, this can still be
 > 
-> 		.old	= kvm_read_pte(ptep),
+> 	return READ_ONCE(*rcu_dereference_check(ptep, !shared);
 > 
-> In other words, the pointer itself isn't that's protected, it's PTE that the
-> pointer points at that's protected.
+> Doubt it matters for code generation, but IMO it's cleaner overall.
 
-Right, but practically speaking it is the boundary at which we assert
-that protection.
-
-Anyhow, I'll look at abstracting the actual memory accesses in the
-visitors without too much mess.
+As the page table walkers can be used outside of the context of a VM
+(such as hyp stage-1), I think option #2 is probably a bit easier.
 
 --
 Thanks,
