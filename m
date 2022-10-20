@@ -2,73 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF723C4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Oct 2022 07:13:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06BA6C4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Oct 2022 07:20:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 735DA4B947;
-	Thu, 20 Oct 2022 03:13:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 952B44B93D;
+	Thu, 20 Oct 2022 03:20:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ANA2otqkm9XB; Thu, 20 Oct 2022 03:13:24 -0400 (EDT)
+	with ESMTP id 0pre0vxfV6Dy; Thu, 20 Oct 2022 03:19:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E2EC4B955;
-	Thu, 20 Oct 2022 03:13:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 082A64B8E6;
+	Thu, 20 Oct 2022 03:19:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49ACD4B949
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Oct 2022 03:13:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BB9124B8D8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Oct 2022 03:19:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5WkPCML7o-yL for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 Oct 2022 03:13:22 -0400 (EDT)
+ with ESMTP id k9AVRLt58wtN for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 Oct 2022 03:19:56 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0602B4B91E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Oct 2022 03:13:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 380134B887
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Oct 2022 03:19:56 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1666250001;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1666250395;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FzMWVAugfUTLDKVc6MZDfcXiQ1pIkYlmEhf7GtdgsCg=;
- b=cbhutpOM8MId5IdChhJZj5WLy4RpTnZmAcen08yKnXy3Njp5SJjwMit1sa8swBTb17yuiB
- p4ToO1oy1ddP/H47AFJhWMcaBItFIQJlDryCJ+MTGwpMtehxhuy060B5w4J4GwMw+/aMw7
- 94KigutHDL/S+2bk7cZ6hsYG7ZwJA/s=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=d9HqOzVsB8T4yggWYl1bqige06n7AwLzVreZ+LrEySM=;
+ b=L8BJhBOWHA+v2bsnHTsbLYj3hogeVz2ah+pKNVurHMSzhzkUtMgvmu6CY+T+chtuUxMzvk
+ Hh/k8n18Xoj+2djMHq2d3k3VPnRVeEfHuINhD+CqtOAGiGJnuNeoRuOuu52xDXFfFAds86
+ yVaPuq1fOLyOYTNUH3GNu8Iu9EUZS94=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-651-5ez8t1IUM6GylxvlF3TLAA-1; Thu, 20 Oct 2022 03:13:20 -0400
-X-MC-Unique: 5ez8t1IUM6GylxvlF3TLAA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com
- [10.11.54.2])
+ us-mta-339--4tmXxcVONmOztGz3krQ0w-1; Thu, 20 Oct 2022 03:19:54 -0400
+X-MC-Unique: -4tmXxcVONmOztGz3krQ0w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.8])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B5EAC800B30;
- Thu, 20 Oct 2022 07:13:19 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-70.bne.redhat.com [10.64.54.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D56C340C6EC2;
- Thu, 20 Oct 2022 07:13:14 +0000 (UTC)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EDD051C068C9;
+ Thu, 20 Oct 2022 07:19:53 +0000 (UTC)
+Received: from [10.64.54.70] (vpn2-54-70.bne.redhat.com [10.64.54.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A5A1EC15BA5;
+ Thu, 20 Oct 2022 07:19:45 +0000 (UTC)
+Subject: Re: [PATCH 4/6] KVM: selftests: memslot_perf_test: Support variable
+ guest page size
+To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+References: <20221014071914.227134-1-gshan@redhat.com>
+ <20221014071914.227134-5-gshan@redhat.com>
+ <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
+ <bd5df92c-6870-8053-0b35-a2ad993970bd@redhat.com>
+ <da2b7db0-509a-c9e0-c36b-6487a265a779@redhat.com>
+ <a1a8664c-4d06-89e7-8cfa-b730969bb841@maciej.szmigiero.name>
+ <5bfbe050-a654-8400-e1f1-dcfa4dba13e6@redhat.com>
+ <a45cfcc9-0255-14f0-30a5-18d6efaad0d4@maciej.szmigiero.name>
 From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.linux.dev
-Subject: [PATCH v3 6/6] KVM: selftests: memslot_perf_test: Report optimal
- memory slots
-Date: Thu, 20 Oct 2022 15:12:09 +0800
-Message-Id: <20221020071209.559062-7-gshan@redhat.com>
-In-Reply-To: <20221020071209.559062-1-gshan@redhat.com>
-References: <20221020071209.559062-1-gshan@redhat.com>
+Message-ID: <001d6b60-dc05-370d-5cb3-9f8f855089c3@redhat.com>
+Date: Thu, 20 Oct 2022 15:19:42 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-Cc: mail@maciej.szmigiero.name, kvm@vger.kernel.org, maz@kernel.org,
- linux-kernel@vger.kernel.org, zhenyzha@redhat.com, shan.gavin@gmail.com,
+In-Reply-To: <a45cfcc9-0255-14f0-30a5-18d6efaad0d4@maciej.szmigiero.name>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
+ zhenyzha@redhat.com, shan.gavin@gmail.com, kvmarm@lists.linux.dev,
  pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
  ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -77,127 +89,156 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The memory area in each slot should be aligned to host page size.
-Otherwise, the test will fail. For example, the following command
-fails with the following messages with 64KB-page-size-host and
-4KB-pae-size-guest. It's not user friendly to abort the test.
-Lets do something to report the optimal memory slots, instead of
-failing the test.
-
-  # ./memslot_perf_test -v -s 1000
-  Number of memory slots: 999
-  Testing map performance with 1 runs, 5 seconds each
-  Adding slots 1..999, each slot with 8 pages + 216 extra pages last
-  ==== Test Assertion Failure ====
-    lib/kvm_util.c:824: vm_adjust_num_guest_pages(vm->mode, npages) == npages
-    pid=19872 tid=19872 errno=0 - Success
-       1  0x00000000004065b3: vm_userspace_mem_region_add at kvm_util.c:822
-       2  0x0000000000401d6b: prepare_vm at memslot_perf_test.c:273
-       3  (inlined by) test_execute at memslot_perf_test.c:756
-       4  (inlined by) test_loop at memslot_perf_test.c:994
-       5  (inlined by) main at memslot_perf_test.c:1073
-       6  0x0000ffff7ebb4383: ?? ??:0
-       7  0x00000000004021ff: _start at :?
-    Number of guest pages is not compatible with the host. Try npages=16
-
-Report the optimal memory slots instead of failing the test when
-the memory area in each slot isn't aligned to host page size. With
-this applied, the optimal memory slots is reported.
-
-  # ./memslot_perf_test -v -s 1000
-  Number of memory slots: 999
-  Testing map performance with 1 runs, 5 seconds each
-  Memslot count too high for this test, decrease the cap (max is 514)
-
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- .../testing/selftests/kvm/memslot_perf_test.c | 45 +++++++++++++++++--
- 1 file changed, 41 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
-index daebc264de5a..2ad40f7c9c08 100644
---- a/tools/testing/selftests/kvm/memslot_perf_test.c
-+++ b/tools/testing/selftests/kvm/memslot_perf_test.c
-@@ -239,16 +239,52 @@ static struct vm_data *alloc_vm(void)
- 	return data;
- }
- 
-+static bool check_slot_pages(uint32_t host_page_size, uint32_t guest_page_size,
-+			     uint64_t pages_per_slot, uint64_t rempages)
-+{
-+	if (!pages_per_slot)
-+		return false;
-+
-+	if ((pages_per_slot * guest_page_size) % host_page_size)
-+		return false;
-+
-+	if ((rempages * guest_page_size) % host_page_size)
-+		return false;
-+
-+	return true;
-+}
-+
-+
-+static uint64_t get_max_slots(struct vm_data *data, uint32_t host_page_size)
-+{
-+	uint32_t guest_page_size = data->vm->page_size;
-+	uint64_t mempages, pages_per_slot, rempages;
-+	uint64_t slots;
-+
-+	mempages = data->npages;
-+	slots = data->nslots;
-+	while (--slots > 1) {
-+		pages_per_slot = mempages / slots;
-+		rempages = mempages % pages_per_slot;
-+		if (check_slot_pages(host_page_size, guest_page_size,
-+				     pages_per_slot, rempages))
-+			return slots + 1;	/* slot 0 is reserved */
-+	}
-+
-+	return 0;
-+}
-+
- static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 		       void *guest_code, uint64_t mem_size,
- 		       struct timespec *slot_runtime)
- {
- 	uint64_t mempages, rempages;
- 	uint64_t guest_addr;
--	uint32_t slot, guest_page_size;
-+	uint32_t slot, host_page_size, guest_page_size;
- 	struct timespec tstart;
- 	struct sync_area *sync;
- 
-+	host_page_size = getpagesize();
- 	guest_page_size = vm_guest_mode_params[VM_MODE_DEFAULT].page_size;
- 	mempages = mem_size / guest_page_size;
- 
-@@ -260,12 +296,13 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 	TEST_ASSERT(data->npages > 1, "Can't test without any memory");
- 	data->nslots = nslots;
- 	data->pages_per_slot = data->npages / data->nslots;
--	if (!data->pages_per_slot) {
--		*maxslots = data->npages + 1;
-+	rempages = data->npages % data->nslots;
-+	if (!check_slot_pages(host_page_size, guest_page_size,
-+			      data->pages_per_slot, rempages)) {
-+		*maxslots = get_max_slots(data, host_page_size);
- 		return false;
- 	}
- 
--	rempages = data->npages % data->nslots;
- 	data->hva_slots = malloc(sizeof(*data->hva_slots) * data->nslots);
- 	TEST_ASSERT(data->hva_slots, "malloc() fail");
- 
--- 
-2.23.0
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMTAvMjAvMjIgNDoxOCBBTSwgTWFjaWVqIFMuIFN6bWlnaWVybyB3cm90ZToKPiBPbiAxOS4x
+MC4yMDIyIDAyOjI2LCBHYXZpbiBTaGFuIHdyb3RlOgo+PiBPbiAxMC8xOC8yMiAxMTo1NiBQTSwg
+TWFjaWVqIFMuIFN6bWlnaWVybyB3cm90ZToKPj4+IE9uIDE4LjEwLjIwMjIgMDI6NTEsIEdhdmlu
+IFNoYW4gd3JvdGU6Cj4+Pj4gT24gMTAvMTgvMjIgODo0NiBBTSwgR2F2aW4gU2hhbiB3cm90ZToK
+Pj4+Pj4gT24gMTAvMTgvMjIgNTozMSBBTSwgTWFjaWVqIFMuIFN6bWlnaWVybyB3cm90ZToKPj4+
+Pj4+IE9uIDE0LjEwLjIwMjIgMDk6MTksIEdhdmluIFNoYW4gd3JvdGU6Cj4+Pj4+Pj4gVGhlIHRl
+c3QgY2FzZSBpcyBvYnZpb3VzbHkgYnJva2VuIG9uIGFhcmNoNjQgYmVjYXVzZSBub24tNEtCIGd1
+ZXN0Cj4+Pj4+Pj4gcGFnZSBzaXplIGlzIHN1cHBvcnRlZC4gVGhlIGd1ZXN0IHBhZ2Ugc2l6ZSBv
+biBhYXJjaDY0IGNvdWxkIGJlIDRLQiwKPj4+Pj4+PiAxNktCIG9yIDY0S0IuCj4+Pj4+Pj4KPj4+
+Pj4+PiBUaGlzIHN1cHBvcnRzIHZhcmlhYmxlIGd1ZXN0IHBhZ2Ugc2l6ZSwgbW9zdGx5IGZvciBh
+YXJjaDY0Lgo+Pj4+Pj4+Cj4+Pj4+Pj4gwqDCoCAtIFRoZSBob3N0IGRldGVybWluZXMgdGhlIGd1
+ZXN0IHBhZ2Ugc2l6ZSB3aGVuIHZpcnR1YWwgbWFjaGluZSBpcwo+Pj4+Pj4+IMKgwqDCoMKgIGNy
+ZWF0ZWQuIFRoZSB2YWx1ZSBpcyBhbHNvIHBhc3NlZCB0byBndWVzdCB0aHJvdWdoIHRoZSBzeW5j
+aHJvbml6YXRpb24KPj4+Pj4+PiDCoMKgwqDCoCBhcmVhLgo+Pj4+Pj4+Cj4+Pj4+Pj4gwqDCoCAt
+IFRoZSBudW1iZXIgb2YgZ3Vlc3QgcGFnZXMgYXJlIHVua25vd24gdW50aWwgdGhlIHZpcnR1YWwg
+bWFjaGluZQo+Pj4+Pj4+IMKgwqDCoMKgIGlzIHRvIGJlIGNyZWF0ZWQuIFNvIGFsbCB0aGUgcmVs
+YXRlZCBtYWNyb3MgYXJlIGRyb3BwZWQuIEluc3RlYWQsCj4+Pj4+Pj4gwqDCoMKgwqAgdGhlaXIg
+dmFsdWVzIGFyZSBkeW5hbWljYWxseSBjYWxjdWxhdGVkIGJhc2VkIG9uIHRoZSBndWVzdCBwYWdl
+Cj4+Pj4+Pj4gwqDCoMKgwqAgc2l6ZS4KPj4+Pj4+Pgo+Pj4+Pj4+IMKgwqAgLSBUaGUgc3RhdGlj
+IGNoZWNrcyBvbiBtZW1vcnkgc2l6ZXMgYW5kIHBhZ2VzIGJlY29tZXMgZGVwZW5kZW50Cj4+Pj4+
+Pj4gwqDCoMKgwqAgb24gZ3Vlc3QgcGFnZSBzaXplLCB3aGljaCBpcyB1bmtub3duIHVudGlsIHRo
+ZSB2aXJ0dWFsIG1hY2hpbmUKPj4+Pj4+PiDCoMKgwqDCoCBpcyBhYm91dCB0byBiZSBjcmVhdGVk
+LiBTbyBhbGwgdGhlIHN0YXRpYyBjaGVja3MgYXJlIGNvbnZlcnRlZAo+Pj4+Pj4+IMKgwqDCoMKg
+IHRvIGR5bmFtaWMgY2hlY2tzLCBkb25lIGluIGNoZWNrX21lbW9yeV9zaXplcygpLgo+Pj4+Pj4+
+Cj4+Pj4+Pj4gwqDCoCAtIEFzIHRoZSBhZGRyZXNzIHBhc3NlZCB0byBtYWR2aXNlKCkgc2hvdWxk
+IGJlIGFsaWduZWQgdG8gaG9zdCBwYWdlLAo+Pj4+Pj4+IMKgwqDCoMKgIHRoZSBzaXplIG9mIHBh
+Z2UgY2h1bmsgaXMgYXV0b21hdGljYWxseSBzZWxlY3RlZCwgb3RoZXIgdGhhbiBvbmUKPj4+Pj4+
+PiDCoMKgwqDCoCBwYWdlLgo+Pj4+Pj4+Cj4+Pj4+Pj4gwqDCoCAtIEFsbCBvdGhlciBjaGFuZ2Vz
+IGluY2x1ZGVkIGluIHRoaXMgcGF0Y2ggYXJlIGFsbW9zdCBtZWNoYW5pY2FsCj4+Pj4+Pj4gwqDC
+oMKgwqAgcmVwbGFjaW5nICc0MDk2JyB3aXRoICdndWVzdF9wYWdlX3NpemUnLgo+Pj4+Pj4+Cj4+
+Pj4+Pj4gU2lnbmVkLW9mZi1ieTogR2F2aW4gU2hhbiA8Z3NoYW5AcmVkaGF0LmNvbT4KPj4+Pj4+
+PiAtLS0KPj4+Pj4+PiDCoCAuLi4vdGVzdGluZy9zZWxmdGVzdHMva3ZtL21lbXNsb3RfcGVyZl90
+ZXN0LmMgfCAxOTEgKysrKysrKysrKystLS0tLS0tCj4+Pj4+Pj4gwqAgMSBmaWxlIGNoYW5nZWQs
+IDExNSBpbnNlcnRpb25zKCspLCA3NiBkZWxldGlvbnMoLSkKPj4+Pj4+Pgo+Pj4+Pj4+IGRpZmYg
+LS1naXQgYS90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vbWVtc2xvdF9wZXJmX3Rlc3QuYyBi
+L3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9tZW1zbG90X3BlcmZfdGVzdC5jCj4+Pj4+Pj4g
+aW5kZXggZDVhYTkxNDhmOTZmLi5kNTg3YmQ5NTJmZjkgMTAwNjQ0Cj4+Pj4+Pj4gLS0tIGEvdG9v
+bHMvdGVzdGluZy9zZWxmdGVzdHMva3ZtL21lbXNsb3RfcGVyZl90ZXN0LmMKPj4+Pj4+PiArKysg
+Yi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vbWVtc2xvdF9wZXJmX3Rlc3QuYwo+Pj4gKC4u
+LikKPj4+Pj4+PiBAQCAtNzcsOCArNjEsNyBAQCBzdGF0aWNfYXNzZXJ0KE1FTV9URVNUX1VOTUFQ
+X1NJWkVfUEFHRVMgJQo+Pj4+Pj4+IMKgwqAgKiBmb3IgdGhlIHRvdGFsIHNpemUgb2YgMjUgcGFn
+ZXMuCj4+Pj4+Pj4gwqDCoCAqIEhlbmNlLCB0aGUgbWF4aW11bSBzaXplIGhlcmUgaXMgNTAgcGFn
+ZXMuCj4+Pj4+Pj4gwqDCoCAqLwo+Pj4+Pj4+IC0jZGVmaW5lIE1FTV9URVNUX01PVkVfU0laRV9Q
+QUdFU8KgwqDCoCAoNTApCj4+Pj4+Pj4gLSNkZWZpbmUgTUVNX1RFU1RfTU9WRV9TSVpFwqDCoMKg
+wqDCoMKgwqAgKE1FTV9URVNUX01PVkVfU0laRV9QQUdFUyAqIDQwOTYpCj4+Pj4+Pj4gKyNkZWZp
+bmUgTUVNX1RFU1RfTU9WRV9TSVpFwqDCoMKgwqDCoMKgwqAgMHgzMjAwMAo+Pj4+Pj4KPj4+Pj4+
+IFRoZSBhYm92ZSBudW1iZXIgc2VlbXMgbGVzcyByZWFkYWJsZSB0aGFuIGFuIGV4cGxpY2l0IHZh
+bHVlIG9mIDUwIHBhZ2VzLgo+Pj4+Pj4KPj4+Pj4+IEluIGFkZGl0aW9uIHRvIHRoYXQsIGl0J3Mg
+NTAgcGFnZXMgb25seSB3aXRoIDRrIHBhZ2Ugc2l6ZSwgc28gYXQgbGVhc3QKPj4+Pj4+IHRoZSBj
+b21tZW50IGFib3ZlIG5lZWRzIHRvIGJlIHVwZGF0ZWQgdG8gcmVmbGVjdCB0aGlzIGZhY3QuCj4+
+Pj4+Pgo+Pj4+Pgo+Pj4+PiBZZWFoLCBJIHdpbGwgY2hhbmdlIHRoZSBjb21tZW50cyBsaWtlIGJl
+bG93IGluIG5leHQgcmV2aXNpb24uCj4+Pj4+Cj4+Pj4+IMKgwqAvKgo+Pj4+PiDCoMKgICogV2hl
+biBydW5uaW5nIHRoaXMgdGVzdCB3aXRoIDMyayBtZW1zbG90cywgYWN0dWFsbHkgMzI3NjMgZXhj
+bHVkaW5nCj4+Pj4+IMKgwqAgKiB0aGUgcmVzZXJ2ZWQgbWVtb3J5IHNsb3QgMCwgdGhlIG1lbW9y
+eSBmb3IgZWFjaCBzbG90IGlzIDB4NDAwMCBieXRlcy4KPj4+Pj4gwqDCoCAqIFRoZSBsYXN0IHNs
+b3QgY29udGFpbnMgMHgxOTAwMCBieXRlcyBtZW1vcnkuIEhlbmNlLCB0aGUgbWF4aW11bSBzaXpl
+Cj4+Pj4+IMKgwqAgKiBoZXJlIGlzIDB4MzIwMDAgYnl0ZXMuCj4+Pj4+IMKgwqAgKi8KPj4+Pj4K
+Pj4+Pgo+Pj4+IEkgd2lsbCByZXBsYWNlIHRob3NlIG51bWJlcnMgd2l0aCByZWFkYWJsZSBvbmVz
+IGxpa2UgYmVsb3cgOikKPj4+Pgo+Pj4+IC8qCj4+Pj4gwqDCoCogV2hlbiBydW5uaW5nIHRoaXMg
+dGVzdCB3aXRoIDMyayBtZW1zbG90cywgYWN0dWFsbHkgMzI3NjMgZXhjbHVkaW5nCj4+Pj4gwqDC
+oCogdGhlIHJlc2VydmVkIG1lbW9yeSBzbG90IDAsIHRoZSBtZW1vcnkgZm9yIGVhY2ggc2xvdCBp
+cyAxNktCLiBUaGUKPj4+PiDCoMKgKiBsYXN0IHNsb3QgY29udGFpbnMgMTAwS0IgbWVtb3J5IHdp
+dGggdGhlIHJlbWFpbmluZyA4NEtCLiBIZW5jZSwKPj4+PiDCoMKgKiB0aGUgbWF4aW11bSBzaXpl
+IGlzIGRvdWJsZSBvZiB0aGF0ICgyMDBLQikKPj4+PiDCoMKgKi8KPj4+Cj4+PiBTdGlsbCwgdGhl
+c2UgbnVtYmVycyBhcmUgZm9yIHg4Niwgd2hpY2ggaGFzIEtWTV9JTlRFUk5BTF9NRU1fU0xPVFMK
+Pj4+IGRlZmluZWQgYXMgMy4KPj4+Cj4+PiBBcyBmYXIgYXMgSSBjYW4gc2VlIGFhcmNoNjQgaGFz
+IEtWTV9JTlRFUk5BTF9NRU1fU0xPVFMgZXF1YWwgdG8gMCwgc28KPj4+IHRoaXMgYXJjaCBoYXMg
+MzI3NjYgc2xvdCBhdmFpbGFibGUgZm9yIHRoZSB0ZXN0IG1lbW9yeS4KPj4+Cj4+PiBRdWljayBj
+YWxjdWxhdGlvbnMgc2hvdyB0aGF0IHRoaXMgd2lsbCByZXN1bHQgaW4gMTEyIEtpQiBvZiBtZW1v
+cnkgaW4KPj4+IHRoZSBsYXN0IHNsb3QgZm9yIDQgS2lCIHBhZ2Ugc2l6ZSAod2hpbGUgZm9yIDY0
+IEtpQiBwYWdlIHNpemUgdGhlCj4+PiBtYXhpbXVtIHNsb3QgY291bnQgZm9yIHRoaXMgdGVzdCBp
+cyA4MTkyIGFueXdheSAtIG5vdCBjb3VudGluZyBzbG90IDApLgo+Pj4KPj4KPj4gSXQgc2VlbXMg
+eW91ciBjYWxjdWxhdGlvbiBoYWQgKDUxMk1CKzY0S0IpLCBpbnN0ZWFkIG9mICg1MTJNQis0S0Ip
+Lgo+PiBJbiB0aGlzIHBhcnRpY3VsYXIgcGF0Y2gsIHdlIHN0aWxsIGhhdmUgKDUxMk1CKzRLQiku
+IEhvdyBhYm91dCB0byBjaGFuZ2UKPj4gbGlrZSBiZWxvdyBpbiB0aGlzIHBhdGNoLiBJbiBuZXh0
+IHBhdGNoLCBpdCdzIGFkanVzdGVkIGFjY29yZGluZ2x5IGFmdGVyCj4+IHdlIGhhdmUgKDUxMk1C
+KzY0S0IpLgo+IAo+IE15IHJldmlldyBjb21tZW50IGFib3ZlIHJlZmVycmVkIHRvIHRoZSBmaW5h
+bCBNRU1fU0laRSB2YWx1ZSBhZnRlciB0aGUKPiB3aG9sZSBzZXJpZXMsIHNvIDUxMiBNaUIgKyA2
+NCBLaUIuCj4gCj4gSSBwbGFjZWQgdGhhdCByZXZpZXcgY29tbWVudCBvbiBwYXRjaCA0IHNpbmNl
+IGl0J3MgdGhlIG9ubHkgcGF0Y2ggaW4gdGhpcwo+IHNlcmllcyB0aGF0IG1vZGlmaWVkIHRoZSBj
+b2RlIGNvbW1lbnQgYWJvdXQgTUVNX1RFU1RfTU9WRV9TSVpFLgo+IAo+Pgo+PiAoMSkgSW4gdGhp
+cyBwYXRjaCwgdGhlIGNvbW1lbnQgaXMgY2hhbmdlZCB0byBhcyBiZWxvdwo+Pgo+PiDCoMKgwqDC
+oCAvKgo+PiDCoMKgwqDCoMKgICogV2UgaGF2ZSBkaWZmZXJlbnQgbnVtYmVyIG9mIG1lbW9yeSBz
+bG90cywgZXhjbHVkaW5nIHRoZSByZXNlcnZlZAo+PiDCoMKgwqDCoMKgICogbWVtb3J5IHNsb3Qg
+MCwgb24gdmFyaW91cyBhcmNoaXRlY3R1cmVzIGFuZCBjb25maWd1cmF0aW9ucy4gVGhlCj4+IMKg
+wqDCoMKgwqAgKiBtZW1vcnkgc2l6ZSBpbiB0aGlzIHRlc3QgaXMgY2FsY3VsYXRlZCBieSBkb3Vi
+bGluZyB0aGUgbWF4aW1hbAo+PiDCoMKgwqDCoMKgICogbWVtb3J5IHNpemUgaW4gbGFzdCBtZW1v
+cnkgc2xvdCwgd2l0aCBhbGlnbm1lbnQgdG8gdGhlIGxhcmdlc3QKPj4gwqDCoMKgwqDCoCAqIHN1
+cHBvcnRlZCBwYWdlIHNpemUgKDY0S0IpLgo+PiDCoMKgwqDCoMKgICoKPj4gwqDCoMKgwqDCoCAq
+IGFyY2hpdGVjdHVyZcKgwqAgc2xvdHPCoMKgwqAgbWVtb3J5LXBlci1zbG90wqDCoMKgIG1lbW9y
+eS1vbi1sYXN0LXNsb3QKPj4gwqDCoMKgwqDCoCAqIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4+IMKgwqDCoMKgwqAgKiB4ODYt
+NEtCwqDCoMKgwqDCoMKgwqAgMzI3NjPCoMKgwqAgMTZLQsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgMTAwS0IKPj4gwqDCoMKgwqDCoCAqIGFybTY0LTRLQsKgwqDCoMKgwqAgMzI3NjbCoMKg
+wqAgMTZLQsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgNTJLQgo+PiDCoMKgwqDCoMKgICog
+YXJtNjQtNjRLQsKgwqDCoMKgIDgxOTLCoMKgwqDCoCA2NEtCwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCA2NEtCCj4+IMKgwqDCoMKgwqAgKi8KPj4gwqDCoMKgwqAgI2RlZmluZSBNRU1fVEVT
+VF9NT1ZFX1NJWkXCoMKgwqAgMHg0MDAwMMKgwqDCoMKgwqDCoMKgwqDCoMKgIC8qIDI1NktCICov
+Cj4+Cj4+ICgyKSBJbiB0aGUgbmV4dCBwYXRjaCwgd2hlcmUgd2UgaGF2ZSAoNTEyTUIrNjRLQikg
+YWZ0ZXIgdGhlIHZhcmlvdXMKPj4gwqDCoMKgwqAgbWVtb3J5IHNpemVzIGFyZSBjb25zb2xpZGF0
+ZWQsIEl0IGlzIGFkanVzdGVkIGFjY29yZGluZ2x5IGFzIGJlbG93Lgo+Pgo+PiDCoMKgwqDCoCAv
+Kgo+PiDCoMKgwqDCoMKgICogV2UgaGF2ZSBkaWZmZXJlbnQgbnVtYmVyIG9mIG1lbW9yeSBzbG90
+cywgZXhjbHVkaW5nIHRoZSByZXNlcnZlZAo+PiDCoMKgwqDCoMKgICogbWVtb3J5IHNsb3QgMCwg
+b24gdmFyaW91cyBhcmNoaXRlY3R1cmVzIGFuZCBjb25maWd1cmF0aW9ucy4gVGhlCj4+IMKgwqDC
+oMKgwqAgKiBtZW1vcnkgc2l6ZSBpbiB0aGlzIHRlc3QgaXMgY2FsY3VsYXRlZCBieSBkb3VibGlu
+ZyB0aGUgbWF4aW1hbAo+PiDCoMKgwqDCoMKgICogbWVtb3J5IHNpemUgaW4gbGFzdCBtZW1vcnkg
+c2xvdCwgd2l0aCBhbGlnbm1lbnQgdG8gdGhlIGxhcmdlc3QKPj4gwqDCoMKgwqDCoCAqIHN1cHBv
+cnRlZCBwYWdlIHNpemUgKDY0S0IpLgo+PiDCoMKgwqDCoMKgICoKPj4gwqDCoMKgwqDCoCAqIGFy
+Y2hpdGVjdHVyZcKgwqAgc2xvdHPCoMKgwqAgbWVtb3J5LXBlci1zbG90wqDCoMKgIG1lbW9yeS1v
+bi1sYXN0LXNsb3QKPj4gwqDCoMKgwqDCoCAqIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4+IMKgwqDCoMKgwqAgKiB4ODYtNEtC
+wqDCoMKgwqDCoMKgwqAgMzI3NjPCoMKgwqAgMTZLQsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgMTYwS0IKPj4gwqDCoMKgwqDCoCAqIGFybTY0LTRLQsKgwqDCoMKgwqAgMzI3NjbCoMKgwqAg
+MTZLQsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgMTEyS0IKPj4gwqDCoMKgwqDCoCAqIGFy
+bTY0LTY0S0LCoMKgwqDCoCA4MTkywqDCoMKgwqAgNjRLQsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgMTI4S0IKPj4gwqDCoMKgwqDCoCAqLwo+PiDCoMKgwqDCoCAjZGVmaW5lIE1FTV9URVNU
+X01PVkVfU0laRcKgwqDCoCAweDUwMDAwwqDCoMKgwqDCoMKgwqDCoMKgwqAgLyogMzIwS0IgKi8K
+PiAKPiBOb3cgTUVNX1RFU1RfTU9WRV9TSVpFIGlzIHRvbyBoaWdoIGZvciBhcm02NC00S0IgYW5k
+IGFybTY0LTY0S0IgY2FzZXMKPiAoaXQgbmVlZHMgMTYwIEtpQiBpbiB0aGUgbGFzdCBzbG90IGJ1
+dCBoYXMgbGVzcyBhdmFpbGFibGUgaW4gdGhlc2UgdHdvCj4gY2FzZXMpLgo+IAo+IFVzaW5nIGEg
+dGVzdCBzaXplIG9mIDE5MiBLaUIgaW5zdGVhZCBzZWVtcyBsaWtlIGEgc21hbGwgZGlmZmVyZW5j
+ZQo+IGZyb20gdGhlIG9yaWdpbmFsIHNpemUgb2YgMjAwIEtpQiwgd2hpbGUgc3RpbGwgYmVpbmcg
+YWxpZ25lZCB0bwo+IDY0IEtpQi4KPiAKPiBUaGUgbW92ZSBiZW5jaG1hcmtzIHJ1bnRpbWUgZGlm
+ZmVyZW5jZSBvbiB4ODYtNEtCIHdpdGggdGhpcyBzaXplCj4gKGNvbXBhcmVkIHRvIHNpemVzIG9m
+IDIwMCBLaUIgYW5kIDMyMCBLaUIpIHNlZW1zIHRvIGJlIG5lZ2xpZ2libGUuCj4gCj4gU2luY2Ug
+aXQncyBhbiBvZGQgbnVtYmVyIG9mIDY0IEtpQiBwYWdlcyAoMykgdGhlIGNvZGUgdGhhdCBoYWx2
+ZXMKPiB0aGlzIG51bWJlciBvZiBwYWdlcyB3aWxsIG5lZWQgdG8gYmUgYWRqdXN0ZWQgdG8gb3Bl
+cmF0ZSBvbiByYXcKPiBzaXplcyBpbnN0ZWFkLgo+IAo+IEkgY2FuIHNlZSBhIHNpbmdsZSBibG9j
+ayBvZiBjb2RlIHRoYXQgd2lsbCBuZWVkIHN1Y2ggYWRqdXN0bWVudDoKPj4gaWYgKGxhc3RwYWdl
+cyA8IG1vdmVfcGFnZXMgLyAyKSB7Cj4+IMKgwqDCoMKgwqDCoMKgICptYXhzbG90cyA9IDA7Cj4+
+IMKgwqDCoMKgwqDCoMKgIHJldHVybiBmYWxzZTsKPj4gfSAKPiAKPiBTaW1pbGFyIHJlbWFyayBn
+b2VzIGZvciB0aGUgY2FzZSAoMSkgYWJvdmUsIHdoZXJlIHlvdSdsbCBwcm9iYWJseSBuZWVkCj4g
+dG8gdXNlIDY0IEtpQiB0ZXN0IGFyZWEgc2l6ZSAoaXQncyBvbmx5IGFuIGludGVybWVkaWF0ZSBm
+b3JtIG9mIGNvZGUKPiBiZWZvcmUgdGhlIGZpbmFsIHBhdGNoIGNoYW5nZXMgdGhpcyB2YWx1ZSBz
+byBpdCdzIGZpbmUgaWYgaXQgZG9lc24ndAo+IHBlcmZvcm0gYXMgd2VsbCBhcyB0aGUgZmluYWwg
+Zm9ybSBvZiB0aGUgY29kZSkuCj4gCgpNYWNpZWosIGFsbCB5b3VyIGNvbW1lbnRzIG1ha2Ugc2Vu
+c2UgdG8gbWUuIEl0IHJlYWxseSB0b29rIG1lIHNvbWUgdGltZXMKdG8gZG8gdGhlIGNhbGN1bGF0
+aW9uLiBJIGp1c3QgcG9zdGVkIHYzIHRvIGFkZHJlc3MgYWxsIHlvdXIgY29tbWVudHMuCkhvcGVm
+dWxseSwgdGhlcmUgaXMgbm90aGluZyBtaXNzZWQuIFBsZWFzZSBnbyBhaGVhZCB0byByZXZpZXcg
+djMgZGlyZWN0bHkKd2hlbiB5b3UgZ2V0IGEgY2hhbmNlLgoKICAgIHYzOiBodHRwczovL2xvcmUu
+a2VybmVsLm9yZy9rdm1hcm0vMjAyMjEwMjAwNzEyMDkuNTU5MDYyLTEtZ3NoYW5AcmVkaGF0LmNv
+bS9ULyN0CgpJbiB2MywgdGhlIGNvbW1lbnRzIGFib3V0IE1FTV9URVNUX01PVkVfU0laRSBpcyBm
+aXhlZCBpbiBQQVRDSFt2MyA0LzZdLApidXQgaXQncyA2NEtCLiBJbiBQQVRDSFt2MyA1LzZdLCBp
+dCdzIGZpeGVkIHVwIHRvIDE5MktCIGFuZCBtZW1vcnkgc2l6ZQppcyB1c2VkIGZvciB0aGUgY29t
+cGFyaXNvbiBpbiB0ZXN0X21lbXNsb3RfbW92ZV9wcmVwYXJlKCkuCgpUaGFua3MsCkdhdmluCgoK
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1h
+aWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3Mu
+Y29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
