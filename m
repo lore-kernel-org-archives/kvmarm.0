@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A04F2F3A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD907E
 	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 09:07:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 162A0C433D7;
-	Thu, 20 Oct 2022 09:07:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9B4CC433D6;
+	Thu, 20 Oct 2022 09:07:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1666256857;
-	bh=g8NaNuEldTy+x0KzS6ZbURgaE6wc7Eaz7sRUiTtxPbs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZOEbPDQyjrMk8DtKVtEQjrZtnPaA9jR7mjW4ndxxhDb31/qw2u5uqMPOiTuX+XIp0
-	 rhSRqyWn2Sx16hPO9bAKZMsG3bJVv33PMA+yIOVLNTtZr8y2dzz8+6li3vRnnJ6Gco
-	 wM3KBOvgNiNAl/oIVAB27d4iGH7HOilf7RHu0BE+zPtDiDYPJEncEyrnEo+0kzy5Vj
-	 YO6QidKcyVMjOuoNvYtL8E8huxxll06pOr6MXEiL1CHneVueUsqm58+9kt2tgSguJp
-	 NP5i0ejrIv/Mymksp4SAAqmCebVAo7mrYCvE4kqHjpn74F9tRBbjVmznezM91PKiUq
-	 pJlGoilJNxhbw==
+	bh=2HQPwIcjnx+D5AD9h09X90hRYsJsZKbWVHayjSpUAE0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WTIhtrff87iG+LcQydL0Dg7ipSaIR/2JhYX4DPIhYWInKK/JuSG+mOdQOj9GrmPe8
+	 JWCbNA1TxATmFaB/gVn4bPgr1n0CI62qsYYoiQRnJBEZUv+4xhrKS12SvDtrKscY7z
+	 Z/j3RloGHUOR2dy2CR/7Kj1E7aLwaejhdqKRauJdgo6SQigomaOo3vK3WgWjv/Ag85
+	 wQww3rBF74ueBLReJRMTfWJVQzF7kRy4KnIQy2EVdmow0gta+t0pOf30Z+n7cfDH7Y
+	 Ig+13g9oPVZRV40hjoPrw67wC4FV7TUJPpcyoePafiSAeDshQDleu9GasTvKloLIpI
+	 WnuoRW1Ko+0bQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1olRWY-000Buf-PN;
+	id 1olRWY-000Buf-GE;
 	Thu, 20 Oct 2022 10:07:34 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: <kvmarm@lists.cs.columbia.edu>,
@@ -33,12 +33,10 @@ Cc: James Morse <james.morse@arm.com>,
 	Quentin Perret <qperret@google.com>,
 	Will Deacon <will@kernel.org>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH 01/17] arm64: Turn kaslr_feature_override into a generic SW feature override
-Date: Thu, 20 Oct 2022 10:07:11 +0100
-Message-ID: <20221020090727.3669908-2-maz@kernel.org>
+Subject: [PATCH 00/17] KVM: arm64: Allow using VHE in the nVHE hypervisor
+Date: Thu, 20 Oct 2022 10:07:10 +0100
+Message-ID: <20221020090727.3669908-1-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221020090727.3669908-1-maz@kernel.org>
-References: <20221020090727.3669908-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -50,121 +48,84 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, qperret@google.com, will@kernel.org, tabba@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221020090711.3ceEhgpxLUJDwHP0DIhtvyM-qlzrTWEuX3gvYgXqees@z>
+Message-ID: <20221020090710.d1sCCIece_Z3MP3l4hWazA12YWZoeLN3Ck_la-q5f7s@z>
 
-Disabling KASLR from the command line is implemented as a feature
-override. Repaint it slightly so that it can further be used as
-more generic infrastructure for SW override purposes.
+KVM (on ARMv8.0) and pKVM (on all revisions of the architecture) uses
+the split hypervisor model that makes the EL2 code more or less
+standalone. For this, we totally ignore the VHE mode and stick with
+the good old v8.0 EL2 setup.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/cpufeature.h |  4 ++++
- arch/arm64/kernel/cpufeature.c      |  2 ++
- arch/arm64/kernel/idreg-override.c  | 16 ++++++----------
- arch/arm64/kernel/kaslr.c           |  6 +++---
- 4 files changed, 15 insertions(+), 13 deletions(-)
+This is all good, but means that the EL2 code is limited in what it
+can do with its own address space. This series proposes to remove this
+limitation and to allow VHE to be used even with the split hypervisor
+model. This has some potential isolation benefits[1], and *maybe*
+allow deviant systems to eventually run pKVM.
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index f73f11b55042..f44a7860636f 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -15,6 +15,8 @@
- #define MAX_CPU_FEATURES	128
- #define cpu_feature(x)		KERNEL_HWCAP_ ## x
- 
-+#define ARM64_SW_FEATURE_OVERRIDE_NOKASLR	0
-+
- #ifndef __ASSEMBLY__
- 
- #include <linux/bug.h>
-@@ -914,6 +916,8 @@ extern struct arm64_ftr_override id_aa64smfr0_override;
- extern struct arm64_ftr_override id_aa64isar1_override;
- extern struct arm64_ftr_override id_aa64isar2_override;
- 
-+extern struct arm64_ftr_override arm64_sw_feature_override;
-+
- u32 get_kvm_ipa_limit(void);
- void dump_cpu_features(void);
- 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 6062454a9067..a3959e9f7d55 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -620,6 +620,8 @@ struct arm64_ftr_override __ro_after_init id_aa64smfr0_override;
- struct arm64_ftr_override __ro_after_init id_aa64isar1_override;
- struct arm64_ftr_override __ro_after_init id_aa64isar2_override;
- 
-+struct arm64_ftr_override arm64_sw_feature_override;
-+
- static const struct __ftr_reg_entry {
- 	u32			sys_id;
- 	struct arm64_ftr_reg 	*reg;
-diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
-index 95133765ed29..4e8ef5e05db7 100644
---- a/arch/arm64/kernel/idreg-override.c
-+++ b/arch/arm64/kernel/idreg-override.c
-@@ -137,15 +137,11 @@ static const struct ftr_set_desc smfr0 __initconst = {
- 	},
- };
- 
--extern struct arm64_ftr_override kaslr_feature_override;
--
--static const struct ftr_set_desc kaslr __initconst = {
--	.name		= "kaslr",
--#ifdef CONFIG_RANDOMIZE_BASE
--	.override	= &kaslr_feature_override,
--#endif
-+static const struct ftr_set_desc sw_features __initconst = {
-+	.name		= "arm64_sw",
-+	.override	= &arm64_sw_feature_override,
- 	.fields		= {
--		FIELD("disabled", 0, NULL),
-+		FIELD("nokaslr", ARM64_SW_FEATURE_OVERRIDE_NOKASLR, NULL),
- 		{}
- 	},
- };
-@@ -157,7 +153,7 @@ static const struct ftr_set_desc * const regs[] __initconst = {
- 	&isar1,
- 	&isar2,
- 	&smfr0,
--	&kaslr,
-+	&sw_features,
- };
- 
- static const struct {
-@@ -174,7 +170,7 @@ static const struct {
- 	  "id_aa64isar1.api=0 id_aa64isar1.apa=0 "
- 	  "id_aa64isar2.gpa3=0 id_aa64isar2.apa3=0"	   },
- 	{ "arm64.nomte",		"id_aa64pfr1.mte=0" },
--	{ "nokaslr",			"kaslr.disabled=1" },
-+	{ "nokaslr",			"arm64_sw.nokaslr=1" },
- };
- 
- static int __init find_field(const char *cmdline,
-diff --git a/arch/arm64/kernel/kaslr.c b/arch/arm64/kernel/kaslr.c
-index 325455d16dbc..7b39283278e5 100644
---- a/arch/arm64/kernel/kaslr.c
-+++ b/arch/arm64/kernel/kaslr.c
-@@ -23,8 +23,6 @@
- u64 __ro_after_init module_alloc_base;
- u16 __initdata memstart_offset_seed;
- 
--struct arm64_ftr_override kaslr_feature_override __initdata;
--
- static int __init kaslr_init(void)
- {
- 	u64 module_range;
-@@ -36,7 +34,9 @@ static int __init kaslr_init(void)
- 	 */
- 	module_alloc_base = (u64)_etext - MODULES_VSIZE;
- 
--	if (kaslr_feature_override.val & kaslr_feature_override.mask & 0xf) {
-+	if (cpuid_feature_extract_unsigned_field(arm64_sw_feature_override.val &
-+						 arm64_sw_feature_override.mask,
-+						 ARM64_SW_FEATURE_OVERRIDE_NOKASLR)) {
- 		pr_info("KASLR disabled on command line\n");
- 		return 0;
- 	}
+It introduce a new "mode" for KVM called hVHE, in reference to the
+nVHE mode, and indicating that only the hypervisor is using VHE. Note
+that this is all this series does. No effort is made to improve the VA
+space management, which will be the subject of another series if this
+one ever makes it.
+
+This has been lightly tested on a M1 box, with no measurable change in
+performance.
+
+Thanks,
+
+	M.
+
+[1] https://www.youtube.com/watch?v=1F_Mf2j9eIo&list=PLbzoR-pLrL6qWL3v2KOcvwZ54-w0z5uXV&index=11
+
+Marc Zyngier (17):
+  arm64: Turn kaslr_feature_override into a generic SW feature override
+  arm64: Add KVM_HVHE capability and has_hvhe() predicate
+  arm64: Don't enable VHE for the kernel if OVERRIDE_HVHE is set
+  arm64: Prevent the use of is_kernel_in_hyp_mode() in hypervisor code
+  arm64: Allow EL1 physical timer access when running VHE
+  arm64: Use CPACR_EL1 format to set CPTR_EL2 when E2H is set
+  KVM: arm64: Elide kern_hyp_va() in VHE-specific parts of the
+    hypervisor
+  KVM: arm64: Remove alternatives from sysreg accessors in VHE
+    hypervisor context
+  KVM: arm64: Key use of VHE instructions in nVHE code off
+    ARM64_KVM_HVHE
+  KVM: arm64: Force HCR_EL2.E2H when ARM64_KVM_HVHE is set
+  KVM: arm64: Disable TTBR1_EL2 when using ARM64_KVM_HVHE
+  KVM: arm64: Adjust EL2 stage-1 leaf AP bits when ARM64_KVM_HVHE is set
+  KVM: arm64: Rework CPTR_EL2 programming for HVHE configuration
+  KVM: arm64: Program the timer traps with VHE layout in hVHE mode
+  KVM: arm64: Force HCR_E2H in guest context when ARM64_KVM_HVHE is set
+  arm64: Allow arm64_sw.hvhe on command line
+  KVM: arm64: Terrible timer hack for M1 with hVHE
+
+ arch/arm64/include/asm/arch_timer.h     |  8 ++++
+ arch/arm64/include/asm/cpufeature.h     |  5 +++
+ arch/arm64/include/asm/el2_setup.h      | 16 +++++++-
+ arch/arm64/include/asm/kvm_arm.h        |  3 --
+ arch/arm64/include/asm/kvm_asm.h        |  1 +
+ arch/arm64/include/asm/kvm_emulate.h    | 33 +++++++++++++++-
+ arch/arm64/include/asm/kvm_hyp.h        | 37 +++++++++++++-----
+ arch/arm64/include/asm/kvm_mmu.h        |  4 ++
+ arch/arm64/include/asm/virt.h           | 15 +++++++-
+ arch/arm64/kernel/cpufeature.c          | 17 +++++++++
+ arch/arm64/kernel/hyp-stub.S            | 21 ++++++++++-
+ arch/arm64/kernel/idreg-override.c      | 25 ++++++++-----
+ arch/arm64/kernel/image-vars.h          |  3 ++
+ arch/arm64/kernel/kaslr.c               |  6 +--
+ arch/arm64/kvm/arch_timer.c             |  5 +++
+ arch/arm64/kvm/arm.c                    | 12 +++++-
+ arch/arm64/kvm/fpsimd.c                 |  4 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 17 ++++++++-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c          | 27 ++++++++++---
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 28 ++++++++------
+ arch/arm64/kvm/hyp/nvhe/timer-sr.c      | 29 ++++++++++----
+ arch/arm64/kvm/hyp/pgtable.c            |  6 ++-
+ arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
+ arch/arm64/tools/cpucaps                |  1 +
+ drivers/irqchip/irq-apple-aic.c         | 50 ++++++++++++++++++++++++-
+ 26 files changed, 312 insertions(+), 65 deletions(-)
+
 -- 
 2.34.1
 
