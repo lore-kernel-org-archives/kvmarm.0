@@ -1,223 +1,154 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAD43C20
-	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 13:40:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B87C6C433D7;
-	Thu, 20 Oct 2022 13:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA25115D0
+	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 14:33:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA8E6C433D6;
+	Thu, 20 Oct 2022 14:33:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1666273209;
-	bh=Uuj76PE5UrSVtEHGj/sJNXinl/fnjBDdTi8gPTrjZJ8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TerLUVEAjjgNqSJ9Woe0yIin3a6Iw7z8cKuP/fpOH4ZqUW+FWOhspDn6FOQjEakW5
-	 wjPbJWJxmHYPFKfiIz0V2mtUVdePhiovx67JzDEE0uUhhoH50TkbyxLumX//7CXLJW
-	 rbWugNFMB/wGlwavvwwnFevdyLhbBqUQIkqyCyNUWLvKJ6BTQVWwF6H9uZGhFl1UBH
-	 rfAKo3YgNbaFaNRJ9KMIY9gl5gg39iFfr2CJ//JksexDiK4expkIw9F0wzxA02Oddm
-	 Z5r5o6KzzsHwoB2oko1ZweaFVDEmrN0Lvd8vp3cavcu4XKZYcQPze4WDQDq6vog8J9
-	 FxDzkCCanCp5g==
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: Will Deacon <will@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
+	s=k20201202; t=1666276427;
+	bh=FaeuPMUHhNdQ1un6IB5cPZDWQfSVNpn50XrmvqcBfDw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=butNE0E3dApCwaoRTHIlqK9ITMhgzR7ZUe+MsoLn8uT7/c6LhoBOaxgAFYY/P/Ymq
+	 dGVUw50NJC/IJAmWiq7ap+++fHy/puTkKmI9cmEzhQeh28vbOGkJummh70lLBAJbk8
+	 7UOd7a1VlAbtSrg5+x5L76WVOMmjIyf7YQc57mTkSs3D2pUoKFC12SibW/YzziTBJj
+	 mD5dUHYD3NOPkWczFb5pwGqAdlF1X4hx+qW/CSwLDPsRGf9r6PrzF1mOe/ja0STLRU
+	 VNsiLEjS8Oss+IkCJlL6tx6TxTSswYI4AlamDLdIGUs+x8UkVVkJznD7iLOUNCtBUk
+	 v9kpsctpHUd/Q==
+Date: Thu, 20 Oct 2022 15:33:40 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: Namhyung Kim <namhyung@kernel.org>, James Morse <james.morse@arm.com>,
+	Ingo Molnar <mingo@redhat.com>, Mark Rutland <mark.rutland@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	James Morse <james.morse@arm.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Quentin Perret <qperret@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>,
-	kernel-team@android.com,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [RFC PATCH v5 25/25] KVM: arm64: Use the pKVM hyp vCPU structure in handle___kvm_vcpu_run()
-Date: Thu, 20 Oct 2022 14:38:27 +0100
-Message-Id: <20221020133827.5541-26-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20221020133827.5541-1-will@kernel.org>
-References: <20221020133827.5541-1-will@kernel.org>
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Oliver Upton <oliver.upton@linux.dev>, Jiri Olsa <jolsa@kernel.org>,
+	kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 3/7] arm64/sysreg: Convert SPE registers to automatic
+ generation
+Message-ID: <Y1FcRNhFpZxZ7AMx@sirena.org.uk>
+References: <20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org>
+ <20220825-arm-spe-v8-7-v2-3-e37322d68ac0@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="VOl7BrjAsP2F3VXr"
+Content-Disposition: inline
+In-Reply-To: <20220825-arm-spe-v8-7-v2-3-e37322d68ac0@kernel.org>
+X-Cookie: Today is what happened to yesterday.
+Message-ID: <20221020143340.iDTJBQaAnU80HaF9yC8_uB8aXGZbs0bMFaYpPN8y9QM@z>
 
-As a stepping stone towards deprivileging the host's access to the
-guest's vCPU structures, introduce some naive flush/sync routines to
-copy most of the host vCPU into the hyp vCPU on vCPU run and back
-again on return to EL1.
 
-This allows us to run using the pKVM hyp structures when KVM is
-initialised in protected mode.
+--VOl7BrjAsP2F3VXr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Tested-by: Vincent Donnefort <vdonnefort@google.com>
-Co-developed-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Will Deacon <will@kernel.org>
----
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  4 ++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c     | 79 +++++++++++++++++++++++++-
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 28 +++++++++
- 3 files changed, 109 insertions(+), 2 deletions(-)
+On Wed, Oct 19, 2022 at 02:11:26PM -0500, Rob Herring wrote:
+> Convert all the SPE register defines to automatic generation. No
+> functional changes.
+>=20
+> New registers and fields for SPEv1.2 are added with the conversion.
+>=20
+> Some of the PMBSR MSS field defines are kept as the automatic generation
+> has no way to create multiple names for the same register bits. The
+> meaning of the MSS field depends on other bits.
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index d14dfbcb7da1..82b3d62538a6 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -61,4 +61,8 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
- 		     unsigned long vcpu_hva);
- int __pkvm_teardown_vm(pkvm_handle_t handle);
- 
-+struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
-+					 unsigned int vcpu_idx);
-+void pkvm_put_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu);
-+
- #endif /* __ARM64_KVM_NVHE_PKVM_H__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index b5f3fcfe9135..728e01d4536b 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -22,11 +22,86 @@ DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
- 
- void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
- 
-+static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-+
-+	hyp_vcpu->vcpu.arch.ctxt	= host_vcpu->arch.ctxt;
-+
-+	hyp_vcpu->vcpu.arch.sve_state	= kern_hyp_va(host_vcpu->arch.sve_state);
-+	hyp_vcpu->vcpu.arch.sve_max_vl	= host_vcpu->arch.sve_max_vl;
-+
-+	hyp_vcpu->vcpu.arch.hw_mmu	= host_vcpu->arch.hw_mmu;
-+
-+	hyp_vcpu->vcpu.arch.hcr_el2	= host_vcpu->arch.hcr_el2;
-+	hyp_vcpu->vcpu.arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
-+	hyp_vcpu->vcpu.arch.cptr_el2	= host_vcpu->arch.cptr_el2;
-+
-+	hyp_vcpu->vcpu.arch.iflags	= host_vcpu->arch.iflags;
-+	hyp_vcpu->vcpu.arch.fp_state	= host_vcpu->arch.fp_state;
-+
-+	hyp_vcpu->vcpu.arch.debug_ptr	= kern_hyp_va(host_vcpu->arch.debug_ptr);
-+	hyp_vcpu->vcpu.arch.host_fpsimd_state = host_vcpu->arch.host_fpsimd_state;
-+
-+	hyp_vcpu->vcpu.arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
-+
-+	hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3 = host_vcpu->arch.vgic_cpu.vgic_v3;
-+}
-+
-+static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-+	struct vgic_v3_cpu_if *hyp_cpu_if = &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
-+	struct vgic_v3_cpu_if *host_cpu_if = &host_vcpu->arch.vgic_cpu.vgic_v3;
-+	unsigned int i;
-+
-+	host_vcpu->arch.ctxt		= hyp_vcpu->vcpu.arch.ctxt;
-+
-+	host_vcpu->arch.hcr_el2		= hyp_vcpu->vcpu.arch.hcr_el2;
-+	host_vcpu->arch.cptr_el2	= hyp_vcpu->vcpu.arch.cptr_el2;
-+
-+	host_vcpu->arch.fault		= hyp_vcpu->vcpu.arch.fault;
-+
-+	host_vcpu->arch.iflags		= hyp_vcpu->vcpu.arch.iflags;
-+	host_vcpu->arch.fp_state	= hyp_vcpu->vcpu.arch.fp_state;
-+
-+	host_cpu_if->vgic_hcr		= hyp_cpu_if->vgic_hcr;
-+	for (i = 0; i < hyp_cpu_if->used_lrs; ++i)
-+		host_cpu_if->vgic_lr[i] = hyp_cpu_if->vgic_lr[i];
-+}
-+
- static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
- {
--	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
-+	DECLARE_REG(struct kvm_vcpu *, host_vcpu, host_ctxt, 1);
-+	int ret;
-+
-+	host_vcpu = kern_hyp_va(host_vcpu);
-+
-+	if (unlikely(is_protected_kvm_enabled())) {
-+		struct pkvm_hyp_vcpu *hyp_vcpu;
-+		struct kvm *host_kvm;
-+
-+		host_kvm = kern_hyp_va(host_vcpu->kvm);
-+		hyp_vcpu = pkvm_load_hyp_vcpu(host_kvm->arch.pkvm.handle,
-+					      host_vcpu->vcpu_idx);
-+		if (!hyp_vcpu) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+
-+		flush_hyp_vcpu(hyp_vcpu);
-+
-+		ret = __kvm_vcpu_run(&hyp_vcpu->vcpu);
-+
-+		sync_hyp_vcpu(hyp_vcpu);
-+		pkvm_put_hyp_vcpu(hyp_vcpu);
-+	} else {
-+		/* The host is fully trusted, run its vCPU directly. */
-+		ret = __kvm_vcpu_run(host_vcpu);
-+	}
- 
--	cpu_reg(host_ctxt, 1) =  __kvm_vcpu_run(kern_hyp_va(vcpu));
-+out:
-+	cpu_reg(host_ctxt, 1) =  ret;
- }
- 
- static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 0504f2678bd4..6f78a92679f4 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -241,6 +241,33 @@ static struct pkvm_hyp_vm *get_vm_by_handle(pkvm_handle_t handle)
- 	return vm_table[idx];
- }
- 
-+struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
-+					 unsigned int vcpu_idx)
-+{
-+	struct pkvm_hyp_vcpu *hyp_vcpu = NULL;
-+	struct pkvm_hyp_vm *hyp_vm;
-+
-+	hyp_spin_lock(&vm_table_lock);
-+	hyp_vm = get_vm_by_handle(handle);
-+	if (!hyp_vm || hyp_vm->nr_vcpus <= vcpu_idx)
-+		goto unlock;
-+
-+	hyp_vcpu = hyp_vm->vcpus[vcpu_idx];
-+	hyp_page_ref_inc(hyp_virt_to_page(hyp_vm));
-+unlock:
-+	hyp_spin_unlock(&vm_table_lock);
-+	return hyp_vcpu;
-+}
-+
-+void pkvm_put_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	struct pkvm_hyp_vm *hyp_vm = pkvm_hyp_vcpu_to_hyp_vm(hyp_vcpu);
-+
-+	hyp_spin_lock(&vm_table_lock);
-+	hyp_page_ref_dec(hyp_virt_to_page(hyp_vm));
-+	hyp_spin_unlock(&vm_table_lock);
-+}
-+
- static void unpin_host_vcpu(struct kvm_vcpu *host_vcpu)
- {
- 	if (host_vcpu)
-@@ -286,6 +313,7 @@ static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
- 	hyp_vcpu->vcpu.vcpu_idx = vcpu_idx;
- 
- 	hyp_vcpu->vcpu.arch.hw_mmu = &hyp_vm->kvm.arch.mmu;
-+	hyp_vcpu->vcpu.arch.cflags = READ_ONCE(host_vcpu->arch.cflags);
- done:
- 	if (ret)
- 		unpin_host_vcpu(host_vcpu);
--- 
-2.38.0.413.g74048e4d9e-goog
+A few small things below from checking against DDI0487I.a, nothing
+major:
 
+> +Sysreg	PMSCR_EL1	3	0	9	9	0
+> +Res0	63:8
+> +Field	7:6	PCT
+
+Given the potential multiple meanings depending on both integration and
+runtime configuration representing this as a field seems sensible.
+
+> +Sysreg	PMSNEVFR_EL1	3	0	9	9	1
+> +Field	63:0	E
+> +EndSysreg
+
+While this does look rather different to the spec it does appear to be a
+sensible interpretation - the intent is clearly to have a mask of
+feature bits.
+
+> +Sysreg	PMSIDR_EL1	3	0	9	9	7
+
+> +Field	23:20	FORMAT
+> +Field	19:16	COUNTSIZE
+> +Field	15:12	MAXSIZE
+> +Field	11:8	INTERVAL
+
+These should really be enums.
+
+> +Sysreg	PMBLIMITR_EL1	3	0	9	10	0
+> +Enum	2:1	FM
+> +	0b0000	STOP_IRQ
+> +EndEnum
+
+DDI0487I.a also defines
+
+	0b01	DISCARD
+
+=66rom FEAT_SPEv1p2.  Also this is a two bit field so 0b00 would be a bit
+better.
+
+> +Sysreg	PMBSR_EL1	3	0	9	10	3
+> +Res0	63:32
+> +Enum	31:26	EC
+> +	0b000000	BUF
+> +	0b100100	FAULT_S1
+> +	0b100101	FAULT_S2
+> +EndEnum
+
+DDI0487I.a also has
+
+	0b011110	FAULT_GPC
+	0b011111	IMP_DEF
+
+(the former from FEAT_RME).
+
+> +Sysreg	PMBIDR_EL1	3	0	9	10	7
+> +Res0	63:12
+> +Field	11:8	EA
+
+This looks like it should be described as an enum.
+
+> +Field	3:0	ALIGN
+
+This could potentially also be an enum.
+
+> +Sysreg	PMSCR_EL2	3	4	9	9	0
+> +Res0	63:8
+> +Field	7:6	PCT
+
+This lookslike it should be an enum.
+
+--VOl7BrjAsP2F3VXr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmNRXEMACgkQJNaLcl1U
+h9BxoAf/WoPWB2G/B9tOuYVL94BuR2DecQwcEGhVK7tOMRJ27Vo4dCUdnfTloTZz
+Jj0O/V6pHcc1kxMopuhhYRDYTW/kcub+dw2Rdj1T+Nv/OSMB2nISyK26sdYHa61+
+Rx7OT3fRDFmaAcJ04jma1wlwlBa3Busy60PGtTbT9CdWrYLUZo3AVeJkb7Mtacgo
+/XHM616UHZ8emOWdatKMQkYmTs0X9mNJ48cyOBrItDpbERep49qB8pDlxAfcSaYT
+oHICs5H0KJ66c/yRWC02LOFBIJBWmmmce6qLyqcNynxPbW5XSYV6k50wZXaIE0H/
+U6qk5ya1kaFNQ4WUN70owOOlw/nQ3g==
+=JWVG
+-----END PGP SIGNATURE-----
+
+--VOl7BrjAsP2F3VXr--
