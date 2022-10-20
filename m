@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDCE3C4321E
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Oct 2022 09:07:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C5C0C43217
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Oct 2022 09:07:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CC664B95C;
-	Thu, 20 Oct 2022 05:07:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC55B4B959;
+	Thu, 20 Oct 2022 05:07:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id e75rbFjDDzIS; Thu, 20 Oct 2022 05:07:48 -0400 (EDT)
+	with ESMTP id 0I2AUt913wED; Thu, 20 Oct 2022 05:07:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A5D8D4B971;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB49F4B976;
 	Thu, 20 Oct 2022 05:07:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A2414B950
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E20814B943
  for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Oct 2022 05:07:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5NoMKOZbsjz9 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 Oct 2022 05:07:41 -0400 (EDT)
+ with ESMTP id N4gq1kJLGNub for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 Oct 2022 05:07:40 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CF05C4B955
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Oct 2022 05:07:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A42AC4B944
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Oct 2022 05:07:39 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id D9348B826B6;
- Thu, 20 Oct 2022 09:07:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28722C43145;
+ by ams.source.kernel.org (Postfix) with ESMTPS id 50DDCB82566;
  Thu, 20 Oct 2022 09:07:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 162A0C433D7;
+ Thu, 20 Oct 2022 09:07:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1666256858;
- bh=AJXnFfTHgaOIMDoL81dQKVsT/QCJ6Az/cdXDIO/Qq20=;
+ s=k20201202; t=1666256857;
+ bh=g8NaNuEldTy+x0KzS6ZbURgaE6wc7Eaz7sRUiTtxPbs=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=MMZ25dusFB6tZJVV58+o5S++NtAaPdP5MYayJ/K5Wrz6enFli4winVFR0U38W/7KX
- VaOSPvnXSMWNr4NZH+IPHzAZmIrgYTsnEYP3wYEQiEhx56BwC1j5D0liXRVbnQFskh
- kBmhsxVwO3rNRmKwJcFdbJeq/OVtF9AmC8Q7Ig/rdNGdwN9DPQEomvFwjmjqw/ctCm
- IrCArnYS/EGsswAngYNdEhSyngrGe0hOBkoypAC+x7k7mq/AFZHSB0ep7n65N920RR
- Gw47IwMcpOyvM1jEwFIKRkToMejzJtXE1Ae5TxxHpjMIIunZvoY66vnS2pw8MBkRLP
- gvtziUEdCvZxw==
+ b=ZOEbPDQyjrMk8DtKVtEQjrZtnPaA9jR7mjW4ndxxhDb31/qw2u5uqMPOiTuX+XIp0
+ rhSRqyWn2Sx16hPO9bAKZMsG3bJVv33PMA+yIOVLNTtZr8y2dzz8+6li3vRnnJ6Gco
+ wM3KBOvgNiNAl/oIVAB27d4iGH7HOilf7RHu0BE+zPtDiDYPJEncEyrnEo+0kzy5Vj
+ YO6QidKcyVMjOuoNvYtL8E8huxxll06pOr6MXEiL1CHneVueUsqm58+9kt2tgSguJp
+ NP5i0ejrIv/Mymksp4SAAqmCebVAo7mrYCvE4kqHjpn74F9tRBbjVmznezM91PKiUq
+ pJlGoilJNxhbw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1olRWa-000Buf-4P;
- Thu, 20 Oct 2022 10:07:36 +0100
+ (envelope-from <maz@kernel.org>) id 1olRWY-000Buf-PN;
+ Thu, 20 Oct 2022 10:07:34 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: <kvmarm@lists.cs.columbia.edu>, <kvmarm@lists.linux.dev>,
  kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 06/17] arm64: Use CPACR_EL1 format to set CPTR_EL2 when E2H is
- set
-Date: Thu, 20 Oct 2022 10:07:16 +0100
-Message-Id: <20221020090727.3669908-7-maz@kernel.org>
+Subject: [PATCH 01/17] arm64: Turn kaslr_feature_override into a generic SW
+ feature override
+Date: Thu, 20 Oct 2022 10:07:11 +0100
+Message-Id: <20221020090727.3669908-2-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221020090727.3669908-1-maz@kernel.org>
 References: <20221020090727.3669908-1-maz@kernel.org>
@@ -85,71 +85,119 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When HCR_EL2.E2H is set, the CPTR_EL2 register takes the CPACR_EL1
-format. Yes, this is good fun.
-
-Hack the bits of startup code that assume E2H=0 while setting up
-CPTR_EL2 to make them grok the CPTR_EL1 format.
+Disabling KASLR from the command line is implemented as a feature
+override. Repaint it slightly so that it can further be used as
+more generic infrastructure for SW override purposes.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/el2_setup.h | 11 +++++++++--
- arch/arm64/kernel/hyp-stub.S       | 11 +++++++++++
- 2 files changed, 20 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/cpufeature.h |  4 ++++
+ arch/arm64/kernel/cpufeature.c      |  2 ++
+ arch/arm64/kernel/idreg-override.c  | 16 ++++++----------
+ arch/arm64/kernel/kaslr.c           |  6 +++---
+ 4 files changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index fa1045f709bb..605ff1a482db 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -129,8 +129,15 @@
- .endm
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index f73f11b55042..f44a7860636f 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -15,6 +15,8 @@
+ #define MAX_CPU_FEATURES	128
+ #define cpu_feature(x)		KERNEL_HWCAP_ ## x
  
- /* Coprocessor traps */
--.macro __init_el2_nvhe_cptr
-+.macro __init_el2_cptr
-+	mrs	x1, hcr_el2
-+	and	x1, x1, #HCR_E2H
-+	cbz	x1, .LnVHE_\@
-+	mov	x0, #(CPACR_EL1_FPEN_EL1EN | CPACR_EL1_FPEN_EL0EN)
-+	b	.Lset_cptr_\@
-+.LnVHE_\@:
- 	mov	x0, #0x33ff
-+.Lset_cptr_\@:
- 	msr	cptr_el2, x0			// Disable copro. traps to EL2
- .endm
++#define ARM64_SW_FEATURE_OVERRIDE_NOKASLR	0
++
+ #ifndef __ASSEMBLY__
  
-@@ -196,7 +203,7 @@
- 	__init_el2_gicv3
- 	__init_el2_hstr
- 	__init_el2_nvhe_idregs
--	__init_el2_nvhe_cptr
-+	__init_el2_cptr
- 	__init_el2_fgt
- 	__init_el2_nvhe_prepare_eret
- .endm
-diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-index 0601cc9592bd..7d2f24ae8c98 100644
---- a/arch/arm64/kernel/hyp-stub.S
-+++ b/arch/arm64/kernel/hyp-stub.S
-@@ -102,7 +102,18 @@ SYM_CODE_START_LOCAL(__finalise_el2)
+ #include <linux/bug.h>
+@@ -914,6 +916,8 @@ extern struct arm64_ftr_override id_aa64smfr0_override;
+ extern struct arm64_ftr_override id_aa64isar1_override;
+ extern struct arm64_ftr_override id_aa64isar2_override;
  
- .Linit_sve:	/* SVE register access */
- 	mrs	x0, cptr_el2			// Disable SVE traps
++extern struct arm64_ftr_override arm64_sw_feature_override;
 +
-+	mrs	x1, hcr_el2
-+	and	x1, x1, #HCR_E2H
-+	cbz	x1, .Lcptr_nvhe
+ u32 get_kvm_ipa_limit(void);
+ void dump_cpu_features(void);
+ 
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 6062454a9067..a3959e9f7d55 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -620,6 +620,8 @@ struct arm64_ftr_override __ro_after_init id_aa64smfr0_override;
+ struct arm64_ftr_override __ro_after_init id_aa64isar1_override;
+ struct arm64_ftr_override __ro_after_init id_aa64isar2_override;
+ 
++struct arm64_ftr_override arm64_sw_feature_override;
 +
-+	// VHE case
-+	orr	x0, x0, #(CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN)
-+	b	.Lset_cptr
-+
-+.Lcptr_nvhe: // nVHE case
- 	bic	x0, x0, #CPTR_EL2_TZ
-+.Lset_cptr:
- 	msr	cptr_el2, x0
- 	isb
- 	mov	x1, #ZCR_ELx_LEN_MASK		// SVE: Enable full vector
+ static const struct __ftr_reg_entry {
+ 	u32			sys_id;
+ 	struct arm64_ftr_reg 	*reg;
+diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+index 95133765ed29..4e8ef5e05db7 100644
+--- a/arch/arm64/kernel/idreg-override.c
++++ b/arch/arm64/kernel/idreg-override.c
+@@ -137,15 +137,11 @@ static const struct ftr_set_desc smfr0 __initconst = {
+ 	},
+ };
+ 
+-extern struct arm64_ftr_override kaslr_feature_override;
+-
+-static const struct ftr_set_desc kaslr __initconst = {
+-	.name		= "kaslr",
+-#ifdef CONFIG_RANDOMIZE_BASE
+-	.override	= &kaslr_feature_override,
+-#endif
++static const struct ftr_set_desc sw_features __initconst = {
++	.name		= "arm64_sw",
++	.override	= &arm64_sw_feature_override,
+ 	.fields		= {
+-		FIELD("disabled", 0, NULL),
++		FIELD("nokaslr", ARM64_SW_FEATURE_OVERRIDE_NOKASLR, NULL),
+ 		{}
+ 	},
+ };
+@@ -157,7 +153,7 @@ static const struct ftr_set_desc * const regs[] __initconst = {
+ 	&isar1,
+ 	&isar2,
+ 	&smfr0,
+-	&kaslr,
++	&sw_features,
+ };
+ 
+ static const struct {
+@@ -174,7 +170,7 @@ static const struct {
+ 	  "id_aa64isar1.api=0 id_aa64isar1.apa=0 "
+ 	  "id_aa64isar2.gpa3=0 id_aa64isar2.apa3=0"	   },
+ 	{ "arm64.nomte",		"id_aa64pfr1.mte=0" },
+-	{ "nokaslr",			"kaslr.disabled=1" },
++	{ "nokaslr",			"arm64_sw.nokaslr=1" },
+ };
+ 
+ static int __init find_field(const char *cmdline,
+diff --git a/arch/arm64/kernel/kaslr.c b/arch/arm64/kernel/kaslr.c
+index 325455d16dbc..7b39283278e5 100644
+--- a/arch/arm64/kernel/kaslr.c
++++ b/arch/arm64/kernel/kaslr.c
+@@ -23,8 +23,6 @@
+ u64 __ro_after_init module_alloc_base;
+ u16 __initdata memstart_offset_seed;
+ 
+-struct arm64_ftr_override kaslr_feature_override __initdata;
+-
+ static int __init kaslr_init(void)
+ {
+ 	u64 module_range;
+@@ -36,7 +34,9 @@ static int __init kaslr_init(void)
+ 	 */
+ 	module_alloc_base = (u64)_etext - MODULES_VSIZE;
+ 
+-	if (kaslr_feature_override.val & kaslr_feature_override.mask & 0xf) {
++	if (cpuid_feature_extract_unsigned_field(arm64_sw_feature_override.val &
++						 arm64_sw_feature_override.mask,
++						 ARM64_SW_FEATURE_OVERRIDE_NOKASLR)) {
+ 		pr_info("KASLR disabled on command line\n");
+ 		return 0;
+ 	}
 -- 
 2.34.1
 
