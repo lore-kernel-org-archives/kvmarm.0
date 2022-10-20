@@ -1,62 +1,170 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D477E
-	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 08:36:06 +0000 (UTC)
-Date: Thu, 20 Oct 2022 11:35:54 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1666254959;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4bFmitmS0e0DfzO3u2Vz/2OAVtqGb2XuvT7fYH4csp4=;
-	b=gdBGORDykXgxNOmBPdP5jxs2zgIt7+2yLsb9L5Loojh51BmO9Bhp5sbXOZYcs2wOL5nFou
-	3usATUday8HjdXJBureCI2ohWaixAFeplEUvxR9+F8baHiLfoFuegG0YhtUezyXFW61Xe+
-	Sy2IkrG1hDqhkDtSUxXERJ4D86HQ/20=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A04F2F3A
+	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 09:07:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 162A0C433D7;
+	Thu, 20 Oct 2022 09:07:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1666256857;
+	bh=g8NaNuEldTy+x0KzS6ZbURgaE6wc7Eaz7sRUiTtxPbs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ZOEbPDQyjrMk8DtKVtEQjrZtnPaA9jR7mjW4ndxxhDb31/qw2u5uqMPOiTuX+XIp0
+	 rhSRqyWn2Sx16hPO9bAKZMsG3bJVv33PMA+yIOVLNTtZr8y2dzz8+6li3vRnnJ6Gco
+	 wM3KBOvgNiNAl/oIVAB27d4iGH7HOilf7RHu0BE+zPtDiDYPJEncEyrnEo+0kzy5Vj
+	 YO6QidKcyVMjOuoNvYtL8E8huxxll06pOr6MXEiL1CHneVueUsqm58+9kt2tgSguJp
+	 NP5i0ejrIv/Mymksp4SAAqmCebVAo7mrYCvE4kqHjpn74F9tRBbjVmznezM91PKiUq
+	 pJlGoilJNxhbw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1olRWY-000Buf-PN;
+	Thu, 20 Oct 2022 10:07:34 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: <kvmarm@lists.cs.columbia.edu>,
+	<kvmarm@lists.linux.dev>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	David Matlack <dmatlack@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Quentin Perret <qperret@google.com>,
-	Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
-	Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 15/15] KVM: arm64: Handle stage-2 faults in parallel
-Message-ID: <Y1EIar1OGgxMKzSf@google.com>
-References: <20221007232818.459650-1-oliver.upton@linux.dev>
- <20221007233253.460257-1-oliver.upton@linux.dev>
- <Y1CJFLVnnbX4Ck85@google.com>
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH 01/17] arm64: Turn kaslr_feature_override into a generic SW feature override
+Date: Thu, 20 Oct 2022 10:07:11 +0100
+Message-ID: <20221020090727.3669908-2-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221020090727.3669908-1-maz@kernel.org>
+References: <20221020090727.3669908-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y1CJFLVnnbX4Ck85@google.com>
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221020083554.G0v0Eh_-bT4LvEWE-0g7dRKt0t0XHpzg7sX8W1Vv7Tc@z>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, qperret@google.com, will@kernel.org, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221020090711.3ceEhgpxLUJDwHP0DIhtvyM-qlzrTWEuX3gvYgXqees@z>
 
-On Wed, Oct 19, 2022 at 11:32:36PM +0000, Sean Christopherson wrote:
-> On Fri, Oct 07, 2022, Oliver Upton wrote:
-> > @@ -1534,7 +1517,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
-> >  	 */
-> >  	kvm_pgtable_stage2_map(kvm->arch.mmu.pgt, range->start << PAGE_SHIFT,
-> >  			       PAGE_SIZE, __pfn_to_phys(pfn),
-> > -			       KVM_PGTABLE_PROT_R, NULL);
-> > +			       KVM_PGTABLE_PROT_R, NULL, KVM_PGTABLE_WALK_SHARED);
-> 
-> All MMU notifier events acquire mmu_lock for write when invoking arch code, i.e.
-> this isn't a shared walk.
+Disabling KASLR from the command line is implemented as a feature
+override. Repaint it slightly so that it can further be used as
+more generic infrastructure for SW override purposes.
 
-Derp, didn't intend to set the flag here. I'll fix it in v3.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/cpufeature.h |  4 ++++
+ arch/arm64/kernel/cpufeature.c      |  2 ++
+ arch/arm64/kernel/idreg-override.c  | 16 ++++++----------
+ arch/arm64/kernel/kaslr.c           |  6 +++---
+ 4 files changed, 15 insertions(+), 13 deletions(-)
 
---
-Thanks,
-Oliver
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index f73f11b55042..f44a7860636f 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -15,6 +15,8 @@
+ #define MAX_CPU_FEATURES	128
+ #define cpu_feature(x)		KERNEL_HWCAP_ ## x
+ 
++#define ARM64_SW_FEATURE_OVERRIDE_NOKASLR	0
++
+ #ifndef __ASSEMBLY__
+ 
+ #include <linux/bug.h>
+@@ -914,6 +916,8 @@ extern struct arm64_ftr_override id_aa64smfr0_override;
+ extern struct arm64_ftr_override id_aa64isar1_override;
+ extern struct arm64_ftr_override id_aa64isar2_override;
+ 
++extern struct arm64_ftr_override arm64_sw_feature_override;
++
+ u32 get_kvm_ipa_limit(void);
+ void dump_cpu_features(void);
+ 
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 6062454a9067..a3959e9f7d55 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -620,6 +620,8 @@ struct arm64_ftr_override __ro_after_init id_aa64smfr0_override;
+ struct arm64_ftr_override __ro_after_init id_aa64isar1_override;
+ struct arm64_ftr_override __ro_after_init id_aa64isar2_override;
+ 
++struct arm64_ftr_override arm64_sw_feature_override;
++
+ static const struct __ftr_reg_entry {
+ 	u32			sys_id;
+ 	struct arm64_ftr_reg 	*reg;
+diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+index 95133765ed29..4e8ef5e05db7 100644
+--- a/arch/arm64/kernel/idreg-override.c
++++ b/arch/arm64/kernel/idreg-override.c
+@@ -137,15 +137,11 @@ static const struct ftr_set_desc smfr0 __initconst = {
+ 	},
+ };
+ 
+-extern struct arm64_ftr_override kaslr_feature_override;
+-
+-static const struct ftr_set_desc kaslr __initconst = {
+-	.name		= "kaslr",
+-#ifdef CONFIG_RANDOMIZE_BASE
+-	.override	= &kaslr_feature_override,
+-#endif
++static const struct ftr_set_desc sw_features __initconst = {
++	.name		= "arm64_sw",
++	.override	= &arm64_sw_feature_override,
+ 	.fields		= {
+-		FIELD("disabled", 0, NULL),
++		FIELD("nokaslr", ARM64_SW_FEATURE_OVERRIDE_NOKASLR, NULL),
+ 		{}
+ 	},
+ };
+@@ -157,7 +153,7 @@ static const struct ftr_set_desc * const regs[] __initconst = {
+ 	&isar1,
+ 	&isar2,
+ 	&smfr0,
+-	&kaslr,
++	&sw_features,
+ };
+ 
+ static const struct {
+@@ -174,7 +170,7 @@ static const struct {
+ 	  "id_aa64isar1.api=0 id_aa64isar1.apa=0 "
+ 	  "id_aa64isar2.gpa3=0 id_aa64isar2.apa3=0"	   },
+ 	{ "arm64.nomte",		"id_aa64pfr1.mte=0" },
+-	{ "nokaslr",			"kaslr.disabled=1" },
++	{ "nokaslr",			"arm64_sw.nokaslr=1" },
+ };
+ 
+ static int __init find_field(const char *cmdline,
+diff --git a/arch/arm64/kernel/kaslr.c b/arch/arm64/kernel/kaslr.c
+index 325455d16dbc..7b39283278e5 100644
+--- a/arch/arm64/kernel/kaslr.c
++++ b/arch/arm64/kernel/kaslr.c
+@@ -23,8 +23,6 @@
+ u64 __ro_after_init module_alloc_base;
+ u16 __initdata memstart_offset_seed;
+ 
+-struct arm64_ftr_override kaslr_feature_override __initdata;
+-
+ static int __init kaslr_init(void)
+ {
+ 	u64 module_range;
+@@ -36,7 +34,9 @@ static int __init kaslr_init(void)
+ 	 */
+ 	module_alloc_base = (u64)_etext - MODULES_VSIZE;
+ 
+-	if (kaslr_feature_override.val & kaslr_feature_override.mask & 0xf) {
++	if (cpuid_feature_extract_unsigned_field(arm64_sw_feature_override.val &
++						 arm64_sw_feature_override.mask,
++						 ARM64_SW_FEATURE_OVERRIDE_NOKASLR)) {
+ 		pr_info("KASLR disabled on command line\n");
+ 		return 0;
+ 	}
+-- 
+2.34.1
+
