@@ -1,96 +1,114 @@
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB0FC5C87
-	for <kvmarm@lists.linux.dev>; Wed, 19 Oct 2022 23:47:39 +0000 (UTC)
-Received: by mail-pg1-f172.google.com with SMTP id 128so17696479pga.1
-        for <kvmarm@lists.linux.dev>; Wed, 19 Oct 2022 16:47:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SMev/lW9fUqeyWhlXOgZuXyCWdyrzKCQD/McomQJ1RA=;
-        b=MbpsrN3VudRVHu0Gcx/JefnYoDsxETXGIEIlP76Fk2/9MaHQ5VzkUu0KmaEAJaEOLn
-         s1OZDBSarbltkUO3NufRfQQs7rv76vydj6cxIxCK2MV4RqaDr7tjEIfGbX0CqYuPkIxs
-         qzkopkWXQYJ7+Cgh+46XvoGlunBB7B3NQEL9ymCbDbdKMbJwfllvxqGRmxkRC8+4SeSv
-         HMgyrKynwN2JMyOLDqgh6dv8ZlI7E4gq0/9gJD2wW7dfmyQy57mngHv3/d2aQ7OWZSr9
-         sMx8oKKfHtNft9k9ja9zO3bCxFQ1IWsTq1QHCrEN3D6WFfPSBPL7vvJ56Onulo/O+bBi
-         u73Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SMev/lW9fUqeyWhlXOgZuXyCWdyrzKCQD/McomQJ1RA=;
-        b=yWwPx54+iJPCnEZdo5auu409iNDP67HEfjhuMr9CxYmwVLz308XCYbj779A59wH8FJ
-         PfJIE1WYbzClK+HgXILD420rflwaGWe/EiLNIY0HkXxg944kw5lMatHqUkHlhAYvaUJT
-         35kTj6uovyHNgras1n6/I2t5IA8mohK81iSMCjz15RkIKFLLs+TDC3d2zPRkf7O67aCJ
-         4eN7CFYiuZKz1+At9wmt4pr60UeRLQjYOZ7Ln+OpEp9oHOWbLk97IOmuBtikwsxydCLI
-         lRMKtAftDNQCu8s6t/8lXi7yVw6zi+ohEZwD2KK1QIAu6gr8EwJaMyFs+vj+T3VDngIS
-         541w==
-X-Gm-Message-State: ACrzQf3K8T8iTMihkh3IYk1f9eCQaVI3gkKN8jImjLuFxGWwuwk7G6b4
-	tCK5FuMnWCh/ATtjY3nSPIJbTQ==
-X-Google-Smtp-Source: AMsMyM62+iL+OA9RwIZDPmQbjrTbDqZbvXHqo7Kkj0k3+p7svo0gNo/pc+9H6Mb/jHd7JFB7WnS0nQ==
-X-Received: by 2002:a63:1e05:0:b0:451:31d0:8c0f with SMTP id e5-20020a631e05000000b0045131d08c0fmr9324222pge.227.1666223259315;
-        Wed, 19 Oct 2022 16:47:39 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id c28-20020aa7953c000000b0053725e331a1sm11889654pfp.82.2022.10.19.16.47.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Oct 2022 16:47:38 -0700 (PDT)
-Date: Wed, 19 Oct 2022 23:47:35 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Ricardo Koller <ricarkol@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
-	pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com,
-	eric.auger@redhat.com, oupton@google.com, reijiw@google.com,
-	rananta@google.com, bgardon@google.com, dmatlack@google.com,
-	axelrasmussen@google.com
-Subject: Re: [PATCH v10 00/14] KVM: selftests: Add aarch64/page_fault_test
-Message-ID: <Y1CMl3pkulxyjbfw@google.com>
-References: <20221017195834.2295901-1-ricarkol@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8926623BF
+	for <kvmarm@lists.linux.dev>; Thu, 20 Oct 2022 07:12:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1666249968;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=iSbqsg4g0J+uDTur4nOLOrDlqWhjBL7zIdyxmPl56wI=;
+	b=JBb5P3wSgMJfLi30+oCzV1VB7373nMV1LjGrmE5PySTrSnLcUDznAXSMJLqhevPvEPh+04
+	y9A3rU8jSCrwd9X1/MrTdg+TqatO0kLy92WBGYgB92zwUCbJgd23V29Mxkv7XwDMvelXwS
+	IOiTvgrqdg7L/pfQiPWFlt8kj0dfamk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-636-Va38NGliOg6Us14EzfvzXA-1; Thu, 20 Oct 2022 03:12:44 -0400
+X-MC-Unique: Va38NGliOg6Us14EzfvzXA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C45BE101A52A;
+	Thu, 20 Oct 2022 07:12:43 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-70.bne.redhat.com [10.64.54.70])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7703C40C6EC2;
+	Thu, 20 Oct 2022 07:12:38 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: kvmarm@lists.linux.dev
+Cc: kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mail@maciej.szmigiero.name,
+	maz@kernel.org,
+	pbonzini@redhat.com,
+	ajones@ventanamicro.com,
+	shuah@kernel.org,
+	peterx@redhat.com,
+	oliver.upton@linux.dev,
+	seanjc@google.com,
+	ricarkol@google.com,
+	zhenyzha@redhat.com,
+	shan.gavin@gmail.com
+Subject: [PATCH v3 0/6] KVM: selftests: memslot_perf_test: aarch64 cleanup/fixes
+Date: Thu, 20 Oct 2022 15:12:03 +0800
+Message-ID: <20221020071209.559062-1-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221017195834.2295901-1-ricarkol@google.com>
-Message-ID: <20221019234735.pw3CtxRS3Pf55yxBmx24LUYwMQdeVdnP00v9dY8a25Q@z>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Message-ID: <20221020071203.LuAUuQ0G7M3YTigFCwxJ52VSGhfnWl6-yn8XeocGab8@z>
 
-On Mon, Oct 17, 2022, Ricardo Koller wrote:
-> This series adds a new aarch64 selftest for testing stage 2 fault handling
-> for various combinations of guest accesses (e.g., write, S1PTW), backing
-> sources (e.g., anon), and types of faults (e.g., read on hugetlbfs with a
-> hole, write on a readonly memslot). Each test tries a different combination
-> and then checks that the access results in the right behavior (e.g., uffd
-> faults with the right address and write/read flag). Some interesting
-> combinations are:
+kvm/selftests/memslots_perf_test doesn't work with 64KB-page-size-host
+and 4KB-page-size-guest on aarch64. In the implementation, the host and
+guest page size have been hardcoded to 4KB. It's ovbiously not working
+on aarch64 which supports 4KB, 16KB, 64KB individually on host and guest.
 
-...
+This series tries to fix it. After the series is applied, the test runs
+successfully with 64KB-page-size-host and 4KB-page-size-guest.
 
-> Ricardo Koller (14):
->   KVM: selftests: Add a userfaultfd library
->   KVM: selftests: aarch64: Add virt_get_pte_hva() library function
->   KVM: selftests: Add missing close and munmap in
->     __vm_mem_region_delete()
->   KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1 using sysreg.h
->     macros
->   tools: Copy bitfield.h from the kernel sources
->   KVM: selftests: Stash backing_src_type in struct userspace_mem_region
->   KVM: selftests: Add vm->memslots[] and enum kvm_mem_region_type
->   KVM: selftests: Fix alignment in virt_arch_pgd_alloc() and
->     vm_vaddr_alloc()
->   KVM: selftests: Use the right memslot for code, page-tables, and data
->     allocations
->   KVM: selftests: aarch64: Add aarch64/page_fault_test
->   KVM: selftests: aarch64: Add userfaultfd tests into page_fault_test
->   KVM: selftests: aarch64: Add dirty logging tests into page_fault_test
->   KVM: selftests: aarch64: Add readonly memslot tests into
->     page_fault_test
->   KVM: selftests: aarch64: Add mix of tests into page_fault_test
+   # ./memslots_perf_tests -v -s 512
 
-One alignment nit in the first patch, but definitely not worthy of a v11.  If it
-gets fixed up when applying, yay.  If not, no big deal.
+Since we're here, the code is cleaned up a bit as PATCH[1-3] do. The
+other patches are fixes to handle the mismatched host/guest page
+sized.
+
+v1: https://lore.kernel.org/kvmarm/20221014071914.227134-1-gshan@redhat.com/T/#t
+v2: https://lore.kernel.org/kvmarm/20221018040454.405719-1-gshan@redhat.com/T/#t
+
+Changelog
+=========
+v3:
+  * Improved comments about MEM_TEST_MOVE_SIZE, which is set
+    to 64KB in PATCH[v3 4/6] and finally fixed to 192KB in
+    PATCH[v3 5/6].                                              (Maciej)
+  * Use size instead of pages to do the comparison in
+    test_memslot_move_prepare()                                 (Maciej)
+  * Use tools/include/linux/sizes.h instead of inventing
+    our own macros.                                             (Oliver)
+v2:
+  * Pick the smaller value between the ones specified by
+    user or probed from KVM_CAP_NR_MEMSLOTS in PATCH[v2 3/6]    (Maciej)
+  * Improved comments about MEM_TEST_MOVE_SIZE in
+    PATCH[v2 4/6]                                               (Maciej)
+  * Avoid mismatched guest page size after VM is started in
+    prepare_vm() in PATCH[v2 4/6]                               (Maciej)
+  * Fix condition to check MEM_TEST_{UNMAP, UNMAP_CHUNK}_SIZE
+    in check_memory_size() in PATCH[v2 4/6]                     (Maciej)
+  * Define base and huge page size in kvm_util_base.h in
+    PATCH[v2 5/6]                                               (Sean)
+  * Add checks on host/guest page size in check_memory_size()
+    and fail early if any of them exceeds 64KB in PATCH[v2 5/6] (Maciej)
+
+
+Gavin Shan (6):
+  KVM: selftests: memslot_perf_test: Use data->nslots in prepare_vm()
+  KVM: selftests: memslot_perf_test: Consolidate loop conditions in
+    prepare_vm()
+  KVM: selftests: memslot_perf_test: Probe memory slots for once
+  KVM: selftests: memslot_perf_test: Support variable guest page size
+  KVM: selftests: memslot_perf_test: Consolidate memory
+  KVM: selftests: memslot_perf_test: Report optimal memory slots
+
+ .../testing/selftests/kvm/memslot_perf_test.c | 317 ++++++++++++------
+ 1 file changed, 208 insertions(+), 109 deletions(-)
+
+-- 
+2.23.0
+
