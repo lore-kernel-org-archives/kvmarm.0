@@ -1,211 +1,196 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD36C6AB5
-	for <kvmarm@lists.linux.dev>; Fri, 21 Oct 2022 23:04:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BA5AC433B5;
-	Fri, 21 Oct 2022 23:04:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1666393443;
-	bh=OtC70SIN9mH9KFjzUBIVH0zuzHvdzXBo2osQ7N46N+s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=so9/0MtB2kL/sd6z7SfRohTE0GEEm74uhx11DapLbceGKJhi2+3Dw86QuZwnoe/jK
-	 53el99sH5vMhdAoxUqfp049/pUTaR+E4ySWLdnDLRndxmu2+UV7SaUThJrd4glMlJ8
-	 bDm1gWtT5WazkEM7B+BpV9ECUOpXvR8PgMwodYHY9wtwVqOA4uehvNJUljahxogq5x
-	 Yi+fBTsRTyRXh/wBgsE3jegVeENWj7RxoZltLVR3vmKO4OeWwtUxJEW1bS/KJAdVOc
-	 wVnyKGDHRJiSUoH8scBZfdE77TaG8Myzx7jEYUGM3RvNnyP7acnbZ/8O14Me6EnNym
-	 OgMo84+4petSw==
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>,
-	Zhang Lei <zhang.lei@jp.fujitsu.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 8/8] arm64/fp: Use a struct to pass data to fpsimd_bind_state_to_cpu()
-Date: Sat, 22 Oct 2022 00:03:21 +0100
-Message-Id: <20221021230321.1159287-9-broonie@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20221021230321.1159287-1-broonie@kernel.org>
-References: <20221021230321.1159287-1-broonie@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648FF6AB5
+	for <kvmarm@lists.linux.dev>; Fri, 21 Oct 2022 23:20:38 +0000 (UTC)
+Received: by mail-pj1-f45.google.com with SMTP id g8-20020a17090a128800b0020c79f987ceso8022397pja.5
+        for <kvmarm@lists.linux.dev>; Fri, 21 Oct 2022 16:20:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jFADivTYXt0iKSYFDxxhriwNslLr2BBs3QCrxCOrPv0=;
+        b=JMpqIw8HrIHaARoGbz2ckXu5phVBgKB2SlFp+CU7/Tdp/eJmEYUhUuylltTlK0rSCE
+         /n/X12NN/OLNE/HUMBpRD03hTsarM5CErCaIaw4KnuQXKr6eQI5H2UyPP3kUcowR3Ryq
+         bBPJdRLBfZtNDyln1wKS7dawow7EoynVjYlsQb2wlT75jtTw51/3hzRy+IJ9VUeXALBm
+         kVAN9zmns5pt9dWue2xuwvach+sF8Ps+AIgC2HSMWOdhVxKwH/Bo6rYE49wNTojhX4lm
+         Wcr1Rg96YMiFOykzWWWsmI89XCrxImvrbYWDn5dSHZKDeJy63A59BSE0VLMn1vEAf9Ua
+         bxYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jFADivTYXt0iKSYFDxxhriwNslLr2BBs3QCrxCOrPv0=;
+        b=KW++jk9sqM8j4YCsY6i4cP+iWJGJ6SNpPaTXiNsyZnKJRVLoS3mLNsjxF/K3ZIM8Qn
+         YCxW+yWm5GTAtmqYcvpTkhxjjQJbpjWX+tS60AgfHsMH0SNBs2iYZ/WytYcDklhYFKR+
+         NfWWvICRKnvBJ37LC4EuhYANkT1VkKNhJXaEtufLFlOALDUNq63iUsCP/fsqEzlaD75K
+         fGB/fqGbCZxM06wunFU2amvwfXyTe2smBpk6CD/5C9LmFcp4LQW5e7vZL/UPoMOd4mHO
+         e9B5hSmhX9LHgr59dPiVCBWMFANlDYt8vvoqHba+H1gwO4nIEvye37rnqSxygBw2zSQd
+         MPjw==
+X-Gm-Message-State: ACrzQf3XLt8uh83Jwlz1MCpPa9JMOR5xoq+arjxMZECPCEgy0rVvJQj6
+	rkzsmj8HoPovfHhLqJgdpnqKSQ==
+X-Google-Smtp-Source: AMsMyM4YaAa0ABZCj2ASInN0Xf13/04WyHFeFgtdb7Q3O6eD2rm1C4Ul/kgrQ1rH0j4m8Rhz7mpeMg==
+X-Received: by 2002:a17:902:d542:b0:186:6399:6b4f with SMTP id z2-20020a170902d54200b0018663996b4fmr10731662plf.162.1666394437621;
+        Fri, 21 Oct 2022 16:20:37 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id l10-20020a170902f68a00b0017834a6966csm15645992plg.176.2022.10.21.16.20.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Oct 2022 16:20:37 -0700 (PDT)
+Date: Fri, 21 Oct 2022 23:20:33 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org, peterx@redhat.com, maz@kernel.org,
+	will@kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+	shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com,
+	pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com,
+	suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+	oliver.upton@linux.dev, shan.gavin@gmail.com
+Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
+ conjunction with bitmap
+Message-ID: <Y1MpQTprxk+XdYFb@google.com>
+References: <20221011061447.131531-1-gshan@redhat.com>
+ <20221011061447.131531-4-gshan@redhat.com>
+ <Y1Hdc/UVta3A5kHM@google.com>
+ <0adc538b-594e-c662-5a38-3ca6b98ab059@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5745; i=broonie@kernel.org; h=from:subject; bh=OtC70SIN9mH9KFjzUBIVH0zuzHvdzXBo2osQ7N46N+s=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjUyU48CIsX3cJPVYh5fFvc2IzphS/0C7dMQ+FYDqS 6AqwFYyJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY1MlOAAKCRAk1otyXVSH0KQ+B/ 451cp1G4w3hczpFNUq+6BLP6h+au2xGpLni6zQDid4txZyuNzj154qk6BbHMHr1P3XqvntH/5fw5lL uorqiHaM7cEdnoJ4mTC2uir5C0gNocX+5ZdOBji+fb+pFm11n3aNai8w4Kyurjm1Fhv4R/4R66Y4Ee /KeOQIlxjhjiIDTFUbO+qwAETC9Th5QtAMOCHRD58jS7XBmiC3t+gC+z0yb5APBwNKqkQHyaXimXO/ OVggmLNLPSAO0WasFqA8JhxMjxqkkTgXwHlsfBDugpgYOX24q6iRRQ4OY25k/dd1xkKmgoonm2IeCH Wh6LnRfxc0eH9b6nBIu48MJWoveHXc
-X-Developer-Key: i=broonie@kernel.org; a=openpgp; fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0adc538b-594e-c662-5a38-3ca6b98ab059@redhat.com>
+Message-ID: <20221021232033.LjjUlmzKzSAzOXhdBCmulpV-jLpd502WJQegj2IaT5E@z>
 
-For reasons that are unclear to this reader fpsimd_bind_state_to_cpu()
-populates the struct fpsimd_last_state_struct that it uses to store the
-active floating point state for KVM guests by passing an argument for
-each member of the structure. As the richness of the architecture increases
-this is resulting in a function with a rather large number of arguments
-which isn't ideal.
+On Fri, Oct 21, 2022, Gavin Shan wrote:
+> > What about inverting the naming to better capture that this is about the dirty
+> > bitmap, and less so about the dirty ring?  It's not obvious what "exclusive"
+> > means, e.g. I saw this stub before reading the changelog and assumed it was
+> > making a dirty ring exclusive to something.
+> > 
+> > Something like this?
+> > 
+> > bool kvm_use_dirty_bitmap(struct kvm *kvm)
+> > {
+> > 	return !kvm->dirty_ring_size || kvm->dirty_ring_with_bitmap;
+> > }
+> > 
+> 
+> If you agree, I would rename is to kvm_dirty_ring_use_bitmap(). In this way,
+> we will have "kvm_dirty_ring" prefix for the function name, consistent with
+> other functions from same module.
 
-Simplify the interface by using the struct directly as the single argument
-for the function, renaming it as we lift the definition into the header.
-This could be built on further to reduce the work we do adding storage for
-new FP state in various places but for now it just simplifies this one
-interface.
+I'd prefer to avoid "ring" in the name at all, because in the common case (well,
+legacy case at least) the dirty ring has nothing to do with using the dirty
+bitmap, e.g. this code ends up being very confusing because the "dirty_ring"
+part implies that KVM _doesn't_ need to allocate the bitmap when the dirty ring
+isn't being used.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- arch/arm64/include/asm/fpsimd.h | 17 ++++++++++++-----
- arch/arm64/kernel/fpsimd.c      | 34 ++++++---------------------------
- arch/arm64/kvm/fpsimd.c         | 24 +++++++++++++----------
- 3 files changed, 32 insertions(+), 43 deletions(-)
+		if (!(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
+			new->dirty_bitmap = NULL;
+		else if (old && old->dirty_bitmap)
+			new->dirty_bitmap = old->dirty_bitmap;
+		else if (kvm_dirty_ring_use_bitmap(kvm) {
+			r = kvm_alloc_dirty_bitmap(new);
+			if (r)
+				return r;
 
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index 0ad683dab1e2..e6fa1e2982c8 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -58,11 +58,18 @@ extern void fpsimd_restore_current_state(void);
- extern void fpsimd_update_current_state(struct user_fpsimd_state const *state);
- extern void fpsimd_kvm_prepare(void);
- 
--extern void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *state,
--				     void *sve_state, unsigned int sve_vl,
--				     void *za_state, unsigned int sme_vl,
--				     u64 *svcr, enum fp_type *type,
--				     enum fp_type to_save);
-+struct cpu_fp_state {
-+	struct user_fpsimd_state *st;
-+	void *sve_state;
-+	void *za_state;
-+	u64 *svcr;
-+	unsigned int sve_vl;
-+	unsigned int sme_vl;
-+	enum fp_type *fp_type;
-+	enum fp_type to_save;
-+};
-+
-+extern void fpsimd_bind_state_to_cpu(struct cpu_fp_state *fp_state);
- 
- extern void fpsimd_flush_task_state(struct task_struct *target);
- extern void fpsimd_save_and_flush_cpu_state(void);
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 984ea997e7ca..8b1f9b44d831 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -118,18 +118,8 @@
-  *   returned from the 2nd syscall yet, TIF_FOREIGN_FPSTATE is still set so
-  *   whatever is in the FPSIMD registers is not saved to memory, but discarded.
-  */
--struct fpsimd_last_state_struct {
--	struct user_fpsimd_state *st;
--	void *sve_state;
--	void *za_state;
--	u64 *svcr;
--	unsigned int sve_vl;
--	unsigned int sme_vl;
--	enum fp_type *fp_type;
--	enum fp_type to_save;
--};
- 
--static DEFINE_PER_CPU(struct fpsimd_last_state_struct, fpsimd_last_state);
-+static DEFINE_PER_CPU(struct cpu_fp_state, fpsimd_last_state);
- 
- __ro_after_init struct vl_info vl_info[ARM64_VEC_MAX] = {
- #ifdef CONFIG_ARM64_SVE
-@@ -468,7 +458,7 @@ static void task_fpsimd_load(void)
-  */
- static void fpsimd_save(void)
- {
--	struct fpsimd_last_state_struct const *last =
-+	struct cpu_fp_state const *last =
- 		this_cpu_ptr(&fpsimd_last_state);
- 	/* set by fpsimd_bind_task_to_cpu() or fpsimd_bind_state_to_cpu() */
- 	bool save_sve_regs = false;
-@@ -1716,8 +1706,7 @@ void fpsimd_kvm_prepare(void)
-  */
- static void fpsimd_bind_task_to_cpu(void)
- {
--	struct fpsimd_last_state_struct *last =
--		this_cpu_ptr(&fpsimd_last_state);
-+	struct cpu_fp_state *last = this_cpu_ptr(&fpsimd_last_state);
- 
- 	WARN_ON(!system_supports_fpsimd());
- 	last->st = &current->thread.uw.fpsimd_state;
-@@ -1749,25 +1738,14 @@ static void fpsimd_bind_task_to_cpu(void)
- 	}
- }
- 
--void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
--			      unsigned int sve_vl, void *za_state,
--			      unsigned int sme_vl, u64 *svcr,
--			      enum fp_type *type, enum fp_type to_save)
-+void fpsimd_bind_state_to_cpu(struct cpu_fp_state *state)
- {
--	struct fpsimd_last_state_struct *last =
--		this_cpu_ptr(&fpsimd_last_state);
-+	struct cpu_fp_state *last = this_cpu_ptr(&fpsimd_last_state);
- 
- 	WARN_ON(!system_supports_fpsimd());
- 	WARN_ON(!in_softirq() && !irqs_disabled());
- 
--	last->st = st;
--	last->svcr = svcr;
--	last->sve_state = sve_state;
--	last->za_state = za_state;
--	last->sve_vl = sve_vl;
--	last->sme_vl = sme_vl;
--	last->fp_type = type;
--	last->to_save = to_save;
-+	*last = *state;
- }
- 
- /*
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index ec82d0191f76..02dd7e9ebd39 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -130,25 +130,29 @@ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu)
-  */
- void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
- {
--	enum fp_type fp_type;
-+	struct cpu_fp_state fp_state;
- 
- 	WARN_ON_ONCE(!irqs_disabled());
- 
- 	if (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED) {
--		if (vcpu_has_sve(vcpu))
--			fp_type = FP_STATE_SVE;
--		else
--			fp_type = FP_STATE_FPSIMD;
- 
- 		/*
- 		 * Currently we do not support SME guests so SVCR is
- 		 * always 0 and we just need a variable to point to.
- 		 */
--		fpsimd_bind_state_to_cpu(&vcpu->arch.ctxt.fp_regs,
--					 vcpu->arch.sve_state,
--					 vcpu->arch.sve_max_vl,
--					 NULL, 0, &vcpu->arch.svcr,
--					 &vcpu->arch.fp_type, fp_type);
-+		fp_state.st = &vcpu->arch.ctxt.fp_regs;
-+		fp_state.sve_state = vcpu->arch.sve_state;
-+		fp_state.sve_vl = vcpu->arch.sve_max_vl;
-+		fp_state.za_state = NULL;
-+		fp_state.svcr = &vcpu->arch.svcr;
-+		fp_state.fp_type = &vcpu->arch.fp_type;
-+
-+		if (vcpu_has_sve(vcpu))
-+			fp_state.to_save = FP_STATE_SVE;
-+		else
-+			fp_state.to_save = FP_STATE_FPSIMD;
-+
-+		fpsimd_bind_state_to_cpu(&fp_state);
- 
- 		clear_thread_flag(TIF_FOREIGN_FPSTATE);
- 	}
--- 
-2.30.2
+			if (kvm_dirty_log_manual_protect_and_init_set(kvm))
+				bitmap_set(new->dirty_bitmap, 0, new->npages);
+		}
 
+The helper exists because the dirty ring exists, but the helper is fundamentally
+about the dirty bitmap, not the ring.
+
+> > But dirty_ring_with_bitmap really shouldn't need to exist.  It's mandatory for
+> > architectures that have HAVE_KVM_DIRTY_RING_WITH_BITMAP, and unsupported for
+> > architectures that don't.  In other words, the API for enabling the dirty ring
+> > is a bit ugly.
+> > 
+> > Rather than add KVM_CAP_DIRTY_LOG_RING_ACQ_REL, which hasn't been officially
+> > released yet, and then KVM_CAP_DIRTY_LOG_ING_WITH_BITMAP on top, what about
+> > usurping bits 63:32 of cap->args[0] for flags?  E.g.
+> > 
+> > Ideally we'd use cap->flags directly, but we screwed up with KVM_CAP_DIRTY_LOG_RING
+> > and didn't require flags to be zero :-(
+> > 
+> > Actually, what's the point of allowing KVM_CAP_DIRTY_LOG_RING_ACQ_REL to be
+> > enabled?  I get why KVM would enumerate this info, i.e. allowing checking, but I
+> > don't seen any value in supporting a second method for enabling the dirty ring.
+> > 
+> > The acquire-release thing is irrelevant for x86, and no other architecture
+> > supports the dirty ring until this series, i.e. there's no need for KVM to detect
+> > that userspace has been updated to gain acquire-release semantics, because the
+> > fact that userspace is enabling the dirty ring on arm64 means userspace has been
+> > updated.
+> > 
+> > Same goes for the "with bitmap" capability.  There are no existing arm64 users,
+> > so there's no risk of breaking existing userspace by suddenly shoving stuff into
+> > the dirty bitmap.
+> > 
+> > KVM doesn't even get the enabling checks right, e.g. KVM_CAP_DIRTY_LOG_RING can be
+> > enabled on architectures that select CONFIG_HAVE_KVM_DIRTY_RING_ACQ_REL but not
+> > KVM_CAP_DIRTY_LOG_RING.  The reverse is true (ignoring that x86 selects both and
+> > is the only arch that selects the TSO variant).
+> > 
+> > Ditto for KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP...
+> 
+> If I didn't miss anything in the previous discussions, we don't want to make
+> KVM_CAP_DIRTY_LOG_RING_ACQ_REL and KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
+> architecture dependent. If they become architecture dependent, the userspace
+> will have different stubs (x86, arm64, other architectures to support
+> dirty-ring in future) to enable those capabilities. It's not friendly to
+> userspace. So I intend to prefer the existing pattern: advertise, enable. To
+> enable a capability without knowing if it's supported sounds a bit weird to
+> me.
+
+Enabling without KVM advertising that it's supported would indeed be odd.  Ugh,
+and QEMU doesn't have existing checks to restrict the dirty ring to x86, i.e. we
+can't make the ACQ_REL capability a true attribute without breaking userspace.
+
+Rats.
+
+> I think it's a good idea to enable KVM_CAP_DIRTY_LOG_RING_{ACQ_REL, WITH_BITMAP} as
+> flags, instead of standalone capabilities. In this way, those two capabilities can
+> be treated as sub-capability of KVM_CAP_DIRTY_LOG_RING. The question is how these
+> two flags can be exposed by kvm_vm_ioctl_check_extension_generic(), if we really
+> want to expose those two flags.
+> 
+> I don't understand your question on how KVM has wrong checks when KVM_CAP_DIRTY_LOG_RING
+> and KVM_CAP_DIRTY_LOG_RING_ACQ_REL are enabled.
+
+In the current code base, KVM only checks that _a_ form of dirty ring is supported,
+by way of kvm_vm_ioctl_enable_dirty_log_ring()'s check on KVM_DIRTY_LOG_PAGE_OFFSET.
+
+The callers don't verify that the "correct" capability is enabled.
+
+	case KVM_CAP_DIRTY_LOG_RING:
+	case KVM_CAP_DIRTY_LOG_RING_ACQ_REL:
+		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
+
+E.g. userspace could do
+
+	if (kvm_check(KVM_CAP_DIRTY_LOG_RING_ACQ_REL))
+		kvm_enable(KVM_CAP_DIRTY_LOG_RING)
+
+and KVM would happily enable the dirty ring.  Functionally it doesn't cause
+problems, it's just weird.
+
+Heh, we can fix without more ifdeffery by using the check internally.
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index e30f1b4ecfa5..300489a0eba5 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4585,6 +4585,8 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+        }
+        case KVM_CAP_DIRTY_LOG_RING:
+        case KVM_CAP_DIRTY_LOG_RING_ACQ_REL:
++               if (!kvm_vm_ioctl_check_extension_generic(kvm, cap->cap))
++                       return -EINVAL;
+                return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
+        default:
+                return kvm_vm_ioctl_enable_cap(kvm, cap);
