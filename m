@@ -2,76 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F549ECAAA1
-	for <kvmarm@archiver.kernel.org>; Mon, 24 Oct 2022 10:29:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB204FA373F
+	for <kvmarm@archiver.kernel.org>; Mon, 24 Oct 2022 18:05:24 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8588A49E18;
-	Mon, 24 Oct 2022 06:29:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 372544B643;
+	Mon, 24 Oct 2022 14:05:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WjHX84wzUHbN; Mon, 24 Oct 2022 06:29:31 -0400 (EDT)
+	with ESMTP id B5L-+iQd92VA; Mon, 24 Oct 2022 14:05:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 178DE4B177;
-	Mon, 24 Oct 2022 06:29:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E91814B20F;
+	Mon, 24 Oct 2022 14:05:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 071D549EC2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Oct 2022 06:29:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 695D74B20F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Oct 2022 14:05:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O4dltteb1nVA for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Oct 2022 06:29:28 -0400 (EDT)
+ with ESMTP id iRL7tcWOZjFn for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 Oct 2022 14:05:18 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D6FB49E18
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Oct 2022 06:29:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E92004B1C9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Oct 2022 14:05:17 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 3F2A6B810B0;
- Mon, 24 Oct 2022 10:29:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE13AC433C1;
- Mon, 24 Oct 2022 10:29:25 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 827E7B8114A;
+ Mon, 24 Oct 2022 18:05:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31E20C433C1;
+ Mon, 24 Oct 2022 18:05:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1666607366;
- bh=e9EJjLUy6t6gwdKoVDL3bho6pQx55paAnahTf23c/+I=;
+ s=k20201202; t=1666634715;
+ bh=B+c2N65DjkDMDGVo0eOlt+EOtgjk3znwuz//Nw5771g=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=V5KSuSnkGIMXtpKaGL98PrEKJ9aQkHuz0r24lmwoCxFg6Ps/6RuaIyw8MPVoEEnJV
- WuQZE+qJyjyIoT8R000LLhkrk93xsxyMcLae7lKIcPUv6LS0WImMy3+FhzDHcLonpT
- WjSzZLadY4L+snHKyFblPA1QQ7uWkcpZqMA+P1vVxLfH7LhgD7cXvj9QuaGjycCjfX
- UTaJBGcG+0FHhgTMbdQ5PVINv5Y0ikRXakPxKYDFIzArgxjgiTokH9yQ9VT753eiwu
- DsVtouLX70chZw1YZ9h39HGP0i/5u/YEqsfbIPdx5/eCJb0kcgpo6kirMTosftJtTT
- NCBJBTiM3NyUw==
+ b=lhR3syt4caWU8SMSSHvNdWWxn7AX82aUmCSuRKonW2VOVrFD5aAJ3iE3fnC3DDi60
+ MUoYqEX2Yd3oiacBtT8LDeWRgpVw4KgQkMXUkVh7Osw77Ae8AEkmCJ7ehnKasd1m2X
+ hPBJkNavDj4C0WAp/vhdil05E+vR9AnY690OmJJgKwFaLszcaYH5K/KLvfpFkg8rp8
+ 5x4vAZSqwU2JeanQnX7y0hG+M1HLrgS7QsgFktUsYZ7B0GXC61iSTZzSKnXQ+32pXN
+ 04JPceDn41Zpws9O5EAlnUPNnRe59TlEtiQkKkJGdtc1RakEu+6+X5eSAEKZAqq00K
+ 4RgJ2AsQ81vkw==
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=goblin-girl.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1omuhv-0017qA-Kt;
- Mon, 24 Oct 2022 11:29:23 +0100
-Date: Mon, 24 Oct 2022 11:29:23 +0100
-Message-ID: <86zgdlms58.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1on1p2-001IHZ-Rb;
+ Mon, 24 Oct 2022 19:05:13 +0100
+Date: Mon, 24 Oct 2022 19:05:12 +0100
+Message-ID: <86y1t5m71j.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 1/9] KVM: arm64: PMU: Align chained counter implementation
- with architecture pseudocode
-In-Reply-To: <CAAeT=Fz55H09PWpmMu1sBkV=iUEHWezwhghJskaWAoqQsi2N0A@mail.gmail.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH 0/9] KVM: arm64: PMU: Fixing chained events,
+ and PMUv3p5 support
+In-Reply-To: <YvbZ+OnPTjvIYbUz@google.com>
 References: <20220805135813.2102034-1-maz@kernel.org>
- <20220805135813.2102034-2-maz@kernel.org>
- <CAAeT=Fz55H09PWpmMu1sBkV=iUEHWezwhghJskaWAoqQsi2N0A@mail.gmail.com>
+ <YvP8/m9uDI2PcyoP@google.com> <YvQIIWnUkCGl9Ltp@google.com>
+ <YvQpN3SYePyTw13z@google.com> <87lervuefe.wl-maz@kernel.org>
+ <YvbZ+OnPTjvIYbUz@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Rcpt-To: ricarkol@google.com, oliver.upton@linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,157 +91,146 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Reiji,
+Hi Ricardo,
 
-Catching up on this.
-
-On Tue, 23 Aug 2022 05:30:21 +0100,
-Reiji Watanabe <reijiw@google.com> wrote:
+On Fri, 12 Aug 2022 23:53:44 +0100,
+Ricardo Koller <ricarkol@google.com> wrote:
 > 
-> Hi Marc,
+> On Thu, Aug 11, 2022 at 01:56:21PM +0100, Marc Zyngier wrote:
+> > On Wed, 10 Aug 2022 22:55:03 +0100,
+> > Ricardo Koller <ricarkol@google.com> wrote:
+> > > 
+> > > Just realized that KVM does not offer PMUv3p5 (with this series applied)
+> > > when the real hardware is only Armv8.2 (the setup I originally tried).
+> > > So, tried these other two setups on the fast model:
+> > > 
+> > > has_arm_v8-5=1
+> > > 
+> > > 	# ./lkvm-static run --nodefaults --pmu pmu.flat -p pmu-chained-sw-incr
+> > > 	# lkvm run -k pmu.flat -m 704 -c 8 --name guest-135
+> > > 
+> > > 	INFO: PMU version: 0x6
+> > >                            ^^^
+> > >                            PMUv3 for Armv8.5
+> > > 	INFO: PMU implementer/ID code: 0x41("A")/0
+> > > 	INFO: Implements 8 event counters
+> > > 	FAIL: pmu: pmu-chained-sw-incr: overflow and chain counter incremented after 100 SW_INCR/CHAIN
+> > > 	INFO: pmu: pmu-chained-sw-incr: overflow=0x0, #0=4294967380 #1=0
+> > >                                                  ^^^
+> > >                                                  no overflows
+> > > 	FAIL: pmu: pmu-chained-sw-incr: expected overflows and values after 100 SW_INCR/CHAIN
+> > > 	INFO: pmu: pmu-chained-sw-incr: overflow=0x0, #0=84 #1=-1
+> > > 	INFO: pmu: pmu-chained-sw-incr: overflow=0x0, #0=4294967380 #1=4294967295
+> > > 	SUMMARY: 2 tests, 2 unexpected failures
+> > 
+> > Hmm. I think I see what's wrong. In kvm_pmu_create_perf_event(), we
+> > have this:
+> > 
+> > 	if (kvm_pmu_idx_is_64bit(vcpu, select_idx))
+> > 		attr.config1 |= 1;
+> > 
+> > 	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
+> > 
+> > 	/* The initial sample period (overflow count) of an event. */
+> > 	if (kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx))
+> > 		attr.sample_period = (-counter) & GENMASK(63, 0);
+> > 	else
+> > 		attr.sample_period = (-counter) & GENMASK(31, 0);
+> > 
+> > but the initial sampling period shouldn't be based on the *guest*
+> > counter overflow. It really is about the getting to an overflow on the
+> > *host*, so the initial code was correct, and only the width of the
+> > counter matters here.
 > 
-> On Fri, Aug 5, 2022 at 6:58 AM Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > Ricardo recently pointed out that the PMU chained counter emulation
-> > in KVM wasn't quite behaving like the one on actual hardware, in
-> > the sense that a chained counter would expose an overflow on
-> > both halves of a chained counter, while KVM would only expose the
-> > overflow on the top half.
-> >
-> > The difference is subtle, but significant. What does the architecture
-> > say (DDI0087 H.a):
-> >
-> > - Before PMUv3p4, all counters but the cycle counter are 32bit
-> > - A 32bit counter that overflows generates a CHAIN event on the
-> >   adjacent counter after exposing its own overflow status
-> > - The CHAIN event is accounted if the counter is correctly
-> >   configured (CHAIN event selected and counter enabled)
-> >
-> > This all means that our current implementation (which uses 64bit
-> > perf events) prevents us from emulating this overflow on the lower half.
-> >
-> > How to fix this? By implementing the above, to the letter.
-> >
-> > This largly results in code deletion, removing the notions of
-> > "counter pair", "chained counters", and "canonical counter".
-> > The code is further restructured to make the CHAIN handling similar
-> > to SWINC, as the two are now extremely similar in behaviour.
-> >
-> > Reported-by: Ricardo Koller <ricarkol@google.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/pmu-emul.c | 324 +++++++++++---------------------------
-> >  include/kvm/arm_pmu.h     |   2 -
-> >  2 files changed, 91 insertions(+), 235 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > index 11c43bed5f97..4986e8b3ea6c 100644
-> > --- a/arch/arm64/kvm/pmu-emul.c
-> > +++ b/arch/arm64/kvm/pmu-emul.c
-
-[...]
-
-> > +/*
-> > + * Perform an increment on any of the counters described in @mask,
-> > + * generating the overflow if required, and propagate it as a chained
-> > + * event if possible.
-> > + */
-> > +static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
-> > +                                     unsigned long mask, u32 event)
-> > +{
-> > +       int i;
-> > +
-> > +       if (!kvm_vcpu_has_pmu(vcpu))
-> > +               return;
-> > +
-> > +       if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
-> > +               return;
-> > +
-> > +       /* Weed out disabled counters */
-> > +       mask &= __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
-> > +
-> > +       for_each_set_bit(i, &mask, ARMV8_PMU_CYCLE_IDX) {
-> > +               u64 type, reg;
-> > +
-> > +               /* Filter on event type */
-> > +               type = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
-> > +               type &= kvm_pmu_event_mask(vcpu->kvm);
-> > +               if (type != event)
-> > +                       continue;
-> > +
-> > +               /* Increment this counter */
-> > +               reg = __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
-> > +               reg = lower_32_bits(reg);
-> > +               __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
-> > +
-> > +               if (reg) /* No overflow? move on */
-> > +                       continue;
-> > +
-> > +               /* Mark overflow */
-> > +               __vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(i);
+> Right, I think this requires bringing back some of the chained related
+> code (like update_pmc_chained() and pmc_is_chained()), because
 > 
-> Perhaps it might be useful to create another helper that takes
-> care of just one counter (it would essentially do the code above
-> in the loop). The helper could be used (in addition to the above
-> loop) from the code below for the CHAIN event case and from
-> kvm_pmu_perf_overflow(). Then unnecessary execution of
-> for_each_set_bit() could be avoided for these two cases.
-
-I'm not sure it really helps. We would still need to check whether the
-counter is enabled, and we'd need to bring that into the helper
-instead of keeping it outside of the loop.
-
-[...]
-
-> > @@ -625,30 +528,27 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
-> >  {
-> >         struct arm_pmu *arm_pmu = vcpu->kvm->arch.arm_pmu;
-> >         struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> > -       struct kvm_pmc *pmc;
-> > +       struct kvm_pmc *pmc = &pmu->pmc[select_idx];
-> >         struct perf_event *event;
-> >         struct perf_event_attr attr;
-> >         u64 eventsel, counter, reg, data;
-> >
-> > -       /*
-> > -        * For chained counters the event type and filtering attributes are
-> > -        * obtained from the low/even counter. We also use this counter to
-> > -        * determine if the event is enabled/disabled.
-> > -        */
-> > -       pmc = kvm_pmu_get_canonical_pmc(&pmu->pmc[select_idx]);
-> > -
-> > -       reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
-> > +       reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
-> >               ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + pmc->idx;
+> 	attr.sample_period = (-counter) & GENMASK(31, 0);
 > 
-> You may want to use select_idx instead of pmc->id for consistency ?
+> should also be used when the counter is chained.
 
-Yes. Although Oliver had a point in saying that these pmc->idx vs
-select_idx conversions were not strictly necessary and cluttered the
-patch.
+Almost, but not quite. I came up with the following hack (not
+everything is relevant, but you'll get my drift):
 
-[...]
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 9f29212e8fcd..6470a42e981d 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -450,6 +450,9 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
+ 			reg = lower_32_bits(reg);
+ 		__vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
+ 
++		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, i))
++			reg = lower_32_bits(reg);
++
+ 		if (reg) /* No overflow? move on */
+ 			continue;
+ 
+@@ -483,7 +486,7 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+ 	 */
+ 	period = -(local64_read(&perf_event->count));
+ 
+-	if (!kvm_pmu_idx_has_64bit_overflow(vcpu, pmc->idx))
++	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
+ 		period &= GENMASK(31, 0);
+ 
+ 	local64_set(&perf_event->hw.period_left, 0);
+@@ -605,17 +608,24 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+ 	attr.exclude_host = 1; /* Don't count host events */
+ 	attr.config = eventsel;
+ 
+-	/* If counting a 64bit event, advertise it to the perf code */
+-	if (kvm_pmu_idx_is_64bit(vcpu, select_idx))
+-		attr.config1 |= 1;
+-
+ 	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
+ 
+-	/* The initial sample period (overflow count) of an event. */
+-	if (kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx))
+-		attr.sample_period = (-counter) & GENMASK(63, 0);
+-	else
++	/*
++	 * If counting with a 64bit counter, advertise it to the perf
++	 * code, carefully dealing with the initial sample period
++	 * which also depends on the overflow.
++	 */
++	if (kvm_pmu_idx_is_64bit(vcpu, select_idx)) {
++		attr.config1 |= 1;
++
++		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx)) {
++			attr.sample_period = -(counter & GENMASK(31, 0));
++		} else {
++			attr.sample_period = (-counter) & GENMASK(63, 0);
++		}
++	} else {
+ 		attr.sample_period = (-counter) & GENMASK(31, 0);
++	}
+ 
+ 	event = perf_event_create_kernel_counter(&attr, -1, current,
+ 						 kvm_pmu_perf_overflow, pmc);
 
-> > @@ -752,11 +607,15 @@ static void kvm_pmu_update_pmc_chained(struct kvm_vcpu *vcpu, u64 select_idx)
-> >  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
-> >                                     u64 select_idx)
-> >  {
-> > +       struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> > +       struct kvm_pmc *pmc = &pmu->pmc[select_idx];
-> >         u64 reg, mask;
-> >
-> >         if (!kvm_vcpu_has_pmu(vcpu))
-> >                 return;
-> >
-> > +       kvm_pmu_stop_counter(vcpu, pmc);
-> 
-> It appears that kvm_pmu_stop_counter() doesn't have to be called here
-> because it is called in the beginning of kvm_pmu_create_perf_event().
 
-It feels a bit odd to change the event type without stopping the
-counter first, but I can't see anything going wrong if we omit it.
+With this, I'm back in business (in QEMU, as I *still* cannot get ARM
+to give me a model that runs natively on arm64...):
 
-I'll drop it.
+root@debian:~/kvm-unit-tests# ../kvmtool/lkvm run --nodefaults --pmu --firmware arm/pmu.flat -p pmu-chained-sw-incr
+  # lkvm run --firmware arm/pmu.flat -m 448 -c 4 --name guest-400
+  Info: Removed ghost socket file "/root/.lkvm//guest-400.sock".
+WARNING: early print support may not work. Found uart at 0x1000000, but early base is 0x9000000.
+INFO: PMU version: 0x6
+INFO: PMU implementer/ID code: 0x41("A")/0x1
+INFO: Implements 6 event counters
+FAIL: pmu: pmu-chained-sw-incr: no overflow and chain counter incremented after 100 SW_INCR/CHAIN
+INFO: pmu: pmu-chained-sw-incr: overflow=0x1, #0=4294967380 #1=1
+FAIL: pmu: pmu-chained-sw-incr: overflow on chain counter and expected values after 100 SW_INCR/CHAIN
+INFO: pmu: pmu-chained-sw-incr: overflow=0x3, #0=4294967380 #1=4294967296
+SUMMARY: 2 tests, 2 unexpected failures
+
+The tests themselves need some extra love to account for the fact that
+the counters are always 64bit irrespective of the overflow, but at
+least I'm now correctly seeing the odd counter incrementing.
+
+I'll try to continue addressing the comments tomorrow.
 
 Thanks,
 
