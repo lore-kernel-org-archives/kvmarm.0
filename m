@@ -2,84 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 057D2C04A95
-	for <kvmarm@archiver.kernel.org>; Sat, 22 Oct 2022 10:55:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F549ECAAA1
+	for <kvmarm@archiver.kernel.org>; Mon, 24 Oct 2022 10:29:32 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BE6C4B164;
-	Sat, 22 Oct 2022 06:55:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8588A49E18;
+	Mon, 24 Oct 2022 06:29:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ciJzrzHP+wkB; Sat, 22 Oct 2022 06:55:28 -0400 (EDT)
+	with ESMTP id WjHX84wzUHbN; Mon, 24 Oct 2022 06:29:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCF6D4B199;
-	Sat, 22 Oct 2022 06:55:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 178DE4B177;
+	Mon, 24 Oct 2022 06:29:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 86CFA4B164
- for <kvmarm@lists.cs.columbia.edu>; Sat, 22 Oct 2022 06:55:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 071D549EC2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Oct 2022 06:29:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 98SnC99DKpbh for <kvmarm@lists.cs.columbia.edu>;
- Sat, 22 Oct 2022 06:55:25 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9ED5E4B086
- for <kvmarm@lists.cs.columbia.edu>; Sat, 22 Oct 2022 06:55:25 -0400 (EDT)
+ with ESMTP id O4dltteb1nVA for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 Oct 2022 06:29:28 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D6FB49E18
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Oct 2022 06:29:28 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 6D9A560BD4;
- Sat, 22 Oct 2022 10:55:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0F7DC433D6;
- Sat, 22 Oct 2022 10:55:23 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 3F2A6B810B0;
+ Mon, 24 Oct 2022 10:29:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE13AC433C1;
+ Mon, 24 Oct 2022 10:29:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1666436123;
- bh=KS+WkJ86iqrRRMGVoZGWfZBXbsnGkr3h7G4sUYD+NOQ=;
+ s=k20201202; t=1666607366;
+ bh=e9EJjLUy6t6gwdKoVDL3bho6pQx55paAnahTf23c/+I=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=gzRSLuZcFJQFJm33qAL7bK/TZLbEBF9uHRQzKCmN7Xnm6vbbeuCguMN+Dr7t/nYA+
- oJaw7wXaeE2YGk7a3S+Cu0EJ2DO618wpp+OhMB84pGxpq/xFv8T9oI/s9U/t8eTuaI
- IW9MtgPrvv4r38w6qOg9f9AkuW0P7Pdz/oVm6FQeeFttRtAyJDOQ6Dq526HqFLe10o
- kNq4UD1GYefeuw+nGoCU+J4QEF/9OVGBUCqVRZnaA7Y3oJoaqWXV6f3tC4cQ+U20xD
- Bak9QrELgkKeSWvAilvWu3rXIAoFlQ//r382bktTycKbiSdEFGY3jOVybQ2hn/zsEC
- ZYK8EWE9r2uQA==
+ b=V5KSuSnkGIMXtpKaGL98PrEKJ9aQkHuz0r24lmwoCxFg6Ps/6RuaIyw8MPVoEEnJV
+ WuQZE+qJyjyIoT8R000LLhkrk93xsxyMcLae7lKIcPUv6LS0WImMy3+FhzDHcLonpT
+ WjSzZLadY4L+snHKyFblPA1QQ7uWkcpZqMA+P1vVxLfH7LhgD7cXvj9QuaGjycCjfX
+ UTaJBGcG+0FHhgTMbdQ5PVINv5Y0ikRXakPxKYDFIzArgxjgiTokH9yQ9VT753eiwu
+ DsVtouLX70chZw1YZ9h39HGP0i/5u/YEqsfbIPdx5/eCJb0kcgpo6kirMTosftJtTT
+ NCBJBTiM3NyUw==
 Received: from sofa.misterjones.org ([185.219.108.64]
- helo=wait-a-minute.misterjones.org)
+ helo=goblin-girl.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1omC9x-000lCD-AM;
- Sat, 22 Oct 2022 11:55:21 +0100
-Date: Sat, 22 Oct 2022 11:54:39 +0100
-Message-ID: <87czakgmc0.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1omuhv-0017qA-Kt;
+ Mon, 24 Oct 2022 11:29:23 +0100
+Date: Mon, 24 Oct 2022 11:29:23 +0100
+Message-ID: <86zgdlms58.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
- conjunction with bitmap
-In-Reply-To: <6dd09645-056f-6fb2-6f35-b6b86aada722@redhat.com>
-References: <20221011061447.131531-1-gshan@redhat.com>
- <20221011061447.131531-4-gshan@redhat.com>
- <Y1Hdc/UVta3A5kHM@google.com> <8635bhfvnh.wl-maz@kernel.org>
- <Y1LDRkrzPeQXUHTR@google.com>
- <6dd09645-056f-6fb2-6f35-b6b86aada722@redhat.com>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH 1/9] KVM: arm64: PMU: Align chained counter implementation
+ with architecture pseudocode
+In-Reply-To: <CAAeT=Fz55H09PWpmMu1sBkV=iUEHWezwhghJskaWAoqQsi2N0A@mail.gmail.com>
+References: <20220805135813.2102034-1-maz@kernel.org>
+ <20220805135813.2102034-2-maz@kernel.org>
+ <CAAeT=Fz55H09PWpmMu1sBkV=iUEHWezwhghJskaWAoqQsi2N0A@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gshan@redhat.com, seanjc@google.com, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, peterx@redhat.com,
- will@kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
- andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com,
- zhenyzha@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, oliver.upton@linux.dev, shan.gavin@gmail.com
+X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: shuah@kernel.org, kvm@vger.kernel.org, bgardon@google.com,
- andrew.jones@linux.dev, dmatlack@google.com, shan.gavin@gmail.com,
- catalin.marinas@arm.com, kvmarm@lists.linux.dev, pbonzini@redhat.com,
- zhenyzha@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,279 +88,159 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, 22 Oct 2022 09:27:41 +0100,
-Gavin Shan <gshan@redhat.com> wrote:
-> 
-> Hi Sean,
-> 
-> On 10/22/22 12:05 AM, Sean Christopherson wrote:
-> > On Fri, Oct 21, 2022, Marc Zyngier wrote:
-> >> On Fri, 21 Oct 2022 00:44:51 +0100,
-> >> Sean Christopherson <seanjc@google.com> wrote:
-> >>> 
-> >>> On Tue, Oct 11, 2022, Gavin Shan wrote:
-> >>>> Some architectures (such as arm64) need to dirty memory outside of the
-> >>>> context of a vCPU. Of course, this simply doesn't fit with the UAPI of
-> >>>> KVM's per-vCPU dirty ring.
-> >>> 
-> >>> What is the point of using the dirty ring in this case?  KVM still
-> >>> burns a pile of memory for the bitmap.  Is the benefit that
-> >>> userspace can get away with scanning the bitmap fewer times,
-> >>> e.g. scan it once just before blackout under the assumption that
-> >>> very few pages will dirty the bitmap?
-> >> 
-> >> Apparently, the throttling effect of the ring makes it easier to
-> >> converge. Someone who actually uses the feature should be able to
-> >> tell you. But that's a policy decision, and I don't see why we should
-> >> be prescriptive.
-> > 
-> > I wasn't suggesting we be prescriptive, it was an honest question.
-> > 
-> >>> Why not add a global ring to @kvm?  I assume thread safety is a
-> >>> problem, but the memory overhead of the dirty_bitmap also seems like
-> >>> a fairly big problem.
-> >> 
-> >> Because we already have a stupidly bloated API surface, and that we
-> >> could do without yet another one based on a sample of *one*?
-> > 
-> > But we're adding a new API regardless.  A per-VM ring would definitely be a bigger
-> > addition, but if using the dirty_bitmap won't actually meet the needs of userspace,
-> > then we'll have added a new API and still not have solved the problem.  That's why
-> > I was asking why/when userspace would want to use dirty_ring+dirty_bitmap.
-> > 
-> 
-> Bitmap can help to solve the issue, but the extra memory consumption due to
-> the bitmap is a concern, as you mentioned previously. More information about
-> the issue can be found here [1]. On ARM64, multiple guest's physical pages are
-> used by VGIC/ITS to store its states during migration or system shutdown.
-> 
-> [1] https://lore.kernel.org/kvmarm/320005d1-fe88-fd6a-be91-ddb56f1aa80f@redhat.com/
-> 
-> >> Because dirtying memory outside of a vcpu context makes it incredibly awkward
-> >> to handle a "ring full" condition?
-> > 
-> > Kicking all vCPUs with the soft-full request isn't _that_ awkward.  It's certainly
-> > sub-optimal, but if inserting into the per-VM ring is relatively rare, then in
-> > practice it's unlikely to impact guest performance.
-> > 
-> 
-> It's still possible the per-vcpu-ring becomes hard full before it can be
-> kicked off. per-vm-ring has other issues, one of which is synchronization
-> between kvm and userspace to avoid overrunning per-kvm-ring. bitmap was
-> selected due to its simplicity.
+Hi Reiji,
 
-Exactly. And once you overflow a ring because the device generate too
-much data, what do you do? Return an error to the device?
+Catching up on this.
 
+On Tue, 23 Aug 2022 05:30:21 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> >>>> Introduce a new flavor of dirty ring that requires the use of both vCPU
-> >>>> dirty rings and a dirty bitmap. The expectation is that for non-vCPU
-> >>>> sources of dirty memory (such as the GIC ITS on arm64), KVM writes to
-> >>>> the dirty bitmap. Userspace should scan the dirty bitmap before
-> >>>> migrating the VM to the target.
-> >>>> 
-> >>>> Use an additional capability to advertize this behavior and require
-> >>>> explicit opt-in to avoid breaking the existing dirty ring ABI. And yes,
-> >>>> you can use this with your preferred flavor of DIRTY_RING[_ACQ_REL]. Do
-> >>>> not allow userspace to enable dirty ring if it hasn't also enabled the
-> >>>> ring && bitmap capability, as a VM is likely DOA without the pages
-> >>>> marked in the bitmap.
-> >> 
-> >> This is wrong. The *only* case this is useful is when there is an
-> >> in-kernel producer of data outside of the context of a vcpu, which is
-> >> so far only the ITS save mechanism. No ITS? No need for this.
-> > 
-> > How large is the ITS?  If it's a fixed, small size, could we treat the ITS as a
-> > one-off case for now?  E.g. do something gross like shove entries into vcpu0's
-> > dirty ring?
-> > 
+> Hi Marc,
 > 
-> There are several VGIC/ITS tables involved in the issue. I checked the
-> specification and the implementation. As the device ID is 16-bits, so
-> the maximal devices can be 0x10000. Each device has its ITT (Interrupt
-> Translation Table), looked by a 32-bits event ID. The memory used for
-> ITT can be large enough in theory.
-> 
->     Register       Description           Max-size   Entry-size  Max-entries
->     -----------------------------------------------------------------------
->     GITS_BASER0    ITS Device Table      512KB      8-bytes     0x10000
->     GITS_BASER1    ITS Collection Table  512KB      8-bytes     0x10000
+> On Fri, Aug 5, 2022 at 6:58 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Ricardo recently pointed out that the PMU chained counter emulation
+> > in KVM wasn't quite behaving like the one on actual hardware, in
+> > the sense that a chained counter would expose an overflow on
+> > both halves of a chained counter, while KVM would only expose the
+> > overflow on the top half.
+> >
+> > The difference is subtle, but significant. What does the architecture
+> > say (DDI0087 H.a):
+> >
+> > - Before PMUv3p4, all counters but the cycle counter are 32bit
+> > - A 32bit counter that overflows generates a CHAIN event on the
+> >   adjacent counter after exposing its own overflow status
+> > - The CHAIN event is accounted if the counter is correctly
+> >   configured (CHAIN event selected and counter enabled)
+> >
+> > This all means that our current implementation (which uses 64bit
+> > perf events) prevents us from emulating this overflow on the lower half.
+> >
+> > How to fix this? By implementing the above, to the letter.
+> >
+> > This largly results in code deletion, removing the notions of
+> > "counter pair", "chained counters", and "canonical counter".
+> > The code is further restructured to make the CHAIN handling similar
+> > to SWINC, as the two are now extremely similar in behaviour.
+> >
+> > Reported-by: Ricardo Koller <ricarkol@google.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/pmu-emul.c | 324 +++++++++++---------------------------
+> >  include/kvm/arm_pmu.h     |   2 -
+> >  2 files changed, 91 insertions(+), 235 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > index 11c43bed5f97..4986e8b3ea6c 100644
+> > --- a/arch/arm64/kvm/pmu-emul.c
+> > +++ b/arch/arm64/kvm/pmu-emul.c
 
-Both can be two levels. So you can multiply the max size by 64K. The
-entry size also depends on the revision of the ABI and can be changed
-anytime we see fit.
+[...]
 
->     GITS_BASER2    (GICv4) ITS VPE Table 512KB      8-bytes(?)  0x10000
+> > +/*
+> > + * Perform an increment on any of the counters described in @mask,
+> > + * generating the overflow if required, and propagate it as a chained
+> > + * event if possible.
+> > + */
+> > +static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
+> > +                                     unsigned long mask, u32 event)
+> > +{
+> > +       int i;
+> > +
+> > +       if (!kvm_vcpu_has_pmu(vcpu))
+> > +               return;
+> > +
+> > +       if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
+> > +               return;
+> > +
+> > +       /* Weed out disabled counters */
+> > +       mask &= __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
+> > +
+> > +       for_each_set_bit(i, &mask, ARMV8_PMU_CYCLE_IDX) {
+> > +               u64 type, reg;
+> > +
+> > +               /* Filter on event type */
+> > +               type = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
+> > +               type &= kvm_pmu_event_mask(vcpu->kvm);
+> > +               if (type != event)
+> > +                       continue;
+> > +
+> > +               /* Increment this counter */
+> > +               reg = __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
+> > +               reg = lower_32_bits(reg);
+> > +               __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
+> > +
+> > +               if (reg) /* No overflow? move on */
+> > +                       continue;
+> > +
+> > +               /* Mark overflow */
+> > +               __vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(i);
+> 
+> Perhaps it might be useful to create another helper that takes
+> care of just one counter (it would essentially do the code above
+> in the loop). The helper could be used (in addition to the above
+> loop) from the code below for the CHAIN event case and from
+> kvm_pmu_perf_overflow(). Then unnecessary execution of
+> for_each_set_bit() could be avoided for these two cases.
 
-We don't virtualise GICv4. We use GICv4 to virtualise a GICv3. So this
-table will never be saved (the guest never sees it, and only KVM
-manages it).
+I'm not sure it really helps. We would still need to check whether the
+counter is enabled, and we'd need to bring that into the helper
+instead of keeping it outside of the loop.
 
->     max-devices * (1UL << event_id_shift) * entry_size =
->     0x10000 * (1UL << 32) * 8                          = 1PB
-> 
-> >> Userspace knows what it has created the first place, and should be in
-> >> charge of it (i.e. I want to be able to migrate my GICv2 and
-> >> GICv3-without-ITS VMs with the rings only).
-> > 
-> > Ah, so enabling the dirty bitmap isn't strictly required.  That means this patch
-> > is wrong, and it also means that we need to figure out how we want to handle the
-> > case where mark_page_dirty_in_slot() is invoked without a running vCPU on a memslot
-> > without a dirty_bitmap.
-> > 
-> > I.e. what's an appropriate action in the below sequence:
-> > 
-> > void mark_page_dirty_in_slot(struct kvm *kvm,
-> > 			     const struct kvm_memory_slot *memslot,
-> > 		 	     gfn_t gfn)
-> > {
-> > 	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-> > 
-> > #ifdef CONFIG_HAVE_KVM_DIRTY_RING
-> > 	if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
-> > 		return;
-> > 
-> > #ifndef CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP
-> > 	if (WARN_ON_ONCE(!vcpu))
-> > 		return;
-> > #endif
-> > #endif
-> > 
-> > 	if (memslot && kvm_slot_dirty_track_enabled(memslot)) {
-> > 		unsigned long rel_gfn = gfn - memslot->base_gfn;
-> > 		u32 slot = (memslot->as_id << 16) | memslot->id;
-> > 
-> > 		if (vcpu && kvm->dirty_ring_size)
-> > 			kvm_dirty_ring_push(&vcpu->dirty_ring,
-> > 					    slot, rel_gfn);
-> > 		else if (memslot->dirty_bitmap)
-> > 			set_bit_le(rel_gfn, memslot->dirty_bitmap);
-> > 		else
-> > 			???? <=================================================
-> > 	}
-> > }
-> > 
-> > 
-> > Would it be possible to require a dirty bitmap when an ITS is
-> > created?  That would allow treating the above condition as a KVM
-> > bug.
-> > 
-> 
-> According to the above calculation, it's impossible to determine the
-> memory size for the bitmap in advance. The memory used by ITE
-> (Interrupt Translation Entry) tables can be huge enough to use all
-> guest's system memory in theory. ITE tables are scattered in guest's
-> system memory, but we don't know its location in advance. ITE tables
-> are created dynamically on requests from guest.
-> 
-> However, I think it's a good idea to enable the bitmap only when
-> "arm-its-kvm" is really used in userspace (QEMU). For example, the
-> machine and (kvm) accelerator are initialized like below. It's
-> unknown if "arm-its-kvm" is used until (c). So we can enable
-> KVM_CAP_DIRTY_RING_WITH_BITMAP in (d) and the bitmap is created in
-> (e) by KVM.
-> 
->   main
->     qemu_init
->       qemu_create_machine                   (a) machine instance is created
->       configure_accelerators
->         do_configure_accelerator
->           accel_init_machine
->             kvm_init                        (b) KVM is initialized
->       :
->       qmp_x_exit_preconfig
->         qemu_init_board
->           machine_run_board_init            (c) The board is initialized
->       :
->       accel_setup_post                      (d) KVM is post initialized
->       :
->       <migration>                           (e) Migration starts
-> 
-> In order to record if the bitmap is really needed, "struct
-> kvm::dirty_ring_with_bitmap" is still needed.
-> 
->    - KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP is advertised when
->      CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP is selected.
-> 
->    - KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP is enabled in (d) only when
->      "arm-its-kvm" is used in QEMU. After the capability is enabled,
->      "struct kvm::dirty_ring_with_bitmap" is set to 1.
-> 
->    - The bitmap is created by KVM in (e).
-> 
-> If the above analysis makes sense, I don't see there is anything
-> missed from the patch Of course, KVM_CAP_DIRTY_LOG_RING_{ACQ_REL,
-> WITH_BITMAP} needs to be enabled separately and don't depend on each
-> other. the description added to "Documentation/virt/kvm/abi.rst"
-> need to be improved as Peter and Oliver suggested.
-> kvm_dirty_ring_exclusive() needs to be renamed to
-> kvm_use_dirty_bitmap() and "#ifdef" needs to be cut down as Sean
-> suggested.
+[...]
 
-Frankly, I really hate the "mayo and ketchup" approach. Both dirty
-tracking approaches serve different purpose, and I really don't see
-the point in merging them behind a single cap. Userspace should be
-able to chose if and when it wants to use a logging method or another.
-We should document how they interact, but that's about it.
+> > @@ -625,30 +528,27 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+> >  {
+> >         struct arm_pmu *arm_pmu = vcpu->kvm->arch.arm_pmu;
+> >         struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> > -       struct kvm_pmc *pmc;
+> > +       struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> >         struct perf_event *event;
+> >         struct perf_event_attr attr;
+> >         u64 eventsel, counter, reg, data;
+> >
+> > -       /*
+> > -        * For chained counters the event type and filtering attributes are
+> > -        * obtained from the low/even counter. We also use this counter to
+> > -        * determine if the event is enabled/disabled.
+> > -        */
+> > -       pmc = kvm_pmu_get_canonical_pmc(&pmu->pmc[select_idx]);
+> > -
+> > -       reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+> > +       reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+> >               ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + pmc->idx;
+> 
+> You may want to use select_idx instead of pmc->id for consistency ?
 
+Yes. Although Oliver had a point in saying that these pmc->idx vs
+select_idx conversions were not strictly necessary and cluttered the
+patch.
 
-> 
-> 
-> >>>> @@ -4499,6 +4507,11 @@ static int kvm_vm_ioctl_enable_dirty_log_ring(struct kvm *kvm, u32 size)
-> >>>>   {
-> >>>>   	int r;
-> >>>>   +#ifdef CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP
-> >>>> +	if (!kvm->dirty_ring_with_bitmap)
-> >>>> +		return -EINVAL;
-> >>>> +#endif
-> >>> 
-> >>> This one at least is prettier with IS_ENABLED
-> >>> 
-> >>> 	if (IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) &&
-> >>> 	    !kvm->dirty_ring_with_bitmap)
-> >>> 		return -EINVAL;
-> >>> 
-> >>> But dirty_ring_with_bitmap really shouldn't need to exist.  It's
-> >>> mandatory for architectures that have
-> >>> HAVE_KVM_DIRTY_RING_WITH_BITMAP, and unsupported for architectures
-> >>> that don't.  In other words, the API for enabling the dirty ring is
-> >>> a bit ugly.
-> >>> 
-> >>> Rather than add KVM_CAP_DIRTY_LOG_RING_ACQ_REL, which hasn't been
-> >>> officially released yet, and then KVM_CAP_DIRTY_LOG_ING_WITH_BITMAP
-> >>> on top, what about usurping bits 63:32 of cap->args[0] for flags?
-> >>> E.g.
-> > 
-> > For posterity, filling in my missing idea...
-> > 
-> > Since the size is restricted to be well below a 32-bit value, and it's unlikely
-> > that KVM will ever support 4GiB per-vCPU rings, we could usurp the upper bits for
-> > flags:
-> > 
-> >    static int kvm_vm_ioctl_enable_dirty_log_ring(struct kvm *kvm, u64 arg0)
-> >    {
-> > 	u32 flags = arg0 >> 32;
-> > 	u32 size = arg0;
-> > 
-> > However, since it sounds like enabling dirty_bitmap isn't strictly
-> > required, I have no objection to enabling
-> > KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP, my objection was purely that
-> > KVM was adding a per-VM flag just to sanity check the
-> > configuration.
-> > 
-> 
-> If KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP is enabled for "arm-its-kvm",
-> it'd better to allow enabling those two capability (ACQ_REL and
-> WITH_BITMAP) separately, as I explained above. userspace (QEMU) will
-> gain flexibility if these two capabilities can be enabled
-> separately.
-> 
-> To QEMU, KVM_CAP_DIRTY_LOG_RING and KVM_CAP_DIRTY_LOG_RING_ACQ_REL
-> are accelerator's properties. KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP is
-> board's property. Relaxing their dependency will give flexibility to
-> QEMU.
+[...]
 
-That.
+> > @@ -752,11 +607,15 @@ static void kvm_pmu_update_pmc_chained(struct kvm_vcpu *vcpu, u64 select_idx)
+> >  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+> >                                     u64 select_idx)
+> >  {
+> > +       struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> > +       struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> >         u64 reg, mask;
+> >
+> >         if (!kvm_vcpu_has_pmu(vcpu))
+> >                 return;
+> >
+> > +       kvm_pmu_stop_counter(vcpu, pmc);
+> 
+> It appears that kvm_pmu_stop_counter() doesn't have to be called here
+> because it is called in the beginning of kvm_pmu_create_perf_event().
+
+It feels a bit odd to change the event type without stopping the
+counter first, but I can't see anything going wrong if we omit it.
+
+I'll drop it.
+
+Thanks,
 
 	M.
 
