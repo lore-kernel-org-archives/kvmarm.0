@@ -1,156 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F0A7B
-	for <kvmarm@lists.linux.dev>; Tue, 25 Oct 2022 07:32:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 385EDC433C1;
-	Tue, 25 Oct 2022 07:32:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1666683148;
-	bh=tBNkwO3cOXKnOowX13snOkKFao+dxrlC+LYHRf/nzzI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kEpLkzMu9VFnb6SiLF5I4pFzTSgQn46P3ARbhETN/1c+TwHrdX70NqE3zGcqUrdXC
-	 WxCRvu/ok3CrI5sPAm1q5vljjUbozeHwxoEaYJORAurmRrQ+SWAULbiHVxDCcdi2B5
-	 Qu7DFtQosJofpWdxnKiUUfPaFBzxVz+959Q3zgCo1nvDNMrFctMYxxv//TDRtPRsOD
-	 BlfSOVeIappfdnj2TBQoLuRom74TkBBYeErmcfzXH9Jna/ACJ8dteHPjOZP2550P0Q
-	 IhLzXxuEtj4C3B59hT1jA11jkJMGYb65sKm7WiqvzmpW0uXyt4YO6XgW7E8tkc7wve
-	 jHpgGTnRDsZRw==
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1onEQD-001S5f-Pm;
-	Tue, 25 Oct 2022 08:32:26 +0100
-Date: Tue, 25 Oct 2022 08:31:46 +0100
-Message-ID: <878rl4gxzx.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Gavin Shan <gshan@redhat.com>,
-	kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org,
-	peterx@redhat.com,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	bgardon@google.com,
-	shuah@kernel.org,
-	andrew.jones@linux.dev,
-	dmatlack@google.com,
-	pbonzini@redhat.com,
-	zhenyzha@redhat.com,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	alexandru.elisei@arm.com,
-	shan.gavin@gmail.com
-Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in conjunction with bitmap
-In-Reply-To: <Y1css8k0gtFkVwFQ@google.com>
-References: <20221011061447.131531-1-gshan@redhat.com>
-	<20221011061447.131531-4-gshan@redhat.com>
-	<Y1Hdc/UVta3A5kHM@google.com>
-	<8635bhfvnh.wl-maz@kernel.org>
-	<Y1LDRkrzPeQXUHTR@google.com>
-	<87edv0gnb3.wl-maz@kernel.org>
-	<Y1ckxYst3tc0LCqb@google.com>
-	<Y1css8k0gtFkVwFQ@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1801E7B
+	for <kvmarm@lists.linux.dev>; Tue, 25 Oct 2022 14:52:06 +0000 (UTC)
+Received: by mail-ej1-f74.google.com with SMTP id qk31-20020a1709077f9f00b00791a3e02c80so2921948ejc.21
+        for <kvmarm@lists.linux.dev>; Tue, 25 Oct 2022 07:52:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=iW7y1fLgpkJui3hvQxzLoNSX4KE+fgXa0IU1VCGorq8=;
+        b=qJakZ6WY7j9J9m8Y0t0mKscdKtWoQFQZx/SlIwtmdVidxM8A5xf050QT9Ki74jQrL1
+         I1jtlS5bPffVifc9+0ncXh2wwwFOzVaq6063eYqf/v/Pl2+CjzJRqU13Oz7kC4XO9shq
+         rk7e1jP74dU+C6IgUOoa4PVz3g4RhXXyTqm6wsiEhNC7ZVMmHNQhgmULb6ksYf93T5Pq
+         Hz1ccacdzLT7No3GpTOIBgRj9eUiZYuKalDOV91XpIhsNHChn2V7IF28NwUwvxVpR7ps
+         7iqals/Wlf90wOzqbZc+9XGB9AKrzHp5iU5dKE+mCdqT+LlsVAHopgFQJUCQmhrKOdkS
+         ENcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iW7y1fLgpkJui3hvQxzLoNSX4KE+fgXa0IU1VCGorq8=;
+        b=4LTlhs8PvhHxH+HauA8US55y6td/9O8yfDOErPQd16R7oNBU8wJ22sW9m4bnog5Vrp
+         G3NqszeK/+ua8ObWObpITp6aLjkXCj3hQz4/rn/8RrpgEr1t+YVA/ag6PIUUysJaBDV0
+         u9mFpgwpk2hmGly03aR9GcdtOaKke8yZ5wl9mIk/gDlNwUY5suyReCA0e4EtbqEa88PU
+         l7H6QyCYLrXpuIU9ynhK6WiaUdLOkyBbM858X4JzahyW74ACGeWa1Szp51r6bUZK2plK
+         l6OzY8o0j6wDPnnhyh5p5qLpDPlwrpSEgRAWsn9K5rSuCrSCh0UaHqRJ3U+uMwdz1TaK
+         J9LQ==
+X-Gm-Message-State: ACrzQf1na6Jb7wrceNzdF420RHRDnlywfAiG/wHN7ZZIT+Uzcetas6Eh
+	17XLqcB7hfm9ZmERyhBs9osoXZLvRrbR
+X-Google-Smtp-Source: AMsMyM4BGDxK+RsryB8gWtAc8z+lfBDtIE7P/25DUQWrqxjJtocSP2UPxVASx3qt+ngO9qDF5OIYpYiVN++A
+X-Received: from big-boi.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:129])
+ (user=qperret job=sendgmr) by 2002:a05:6402:d06:b0:45a:3ac6:ad26 with SMTP id
+ eb6-20020a0564020d0600b0045a3ac6ad26mr36497510edb.195.1666709525134; Tue, 25
+ Oct 2022 07:52:05 -0700 (PDT)
+Date: Tue, 25 Oct 2022 14:51:56 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, seanjc@google.com, gshan@redhat.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, shan.gavin@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221025073146.JA3nZjqq0BhLvtqCvrMd6W2o1a3IT-DaX6SfiELP7Uk@z>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.0.135.g90850a2211-goog
+Message-ID: <20221025145156.855308-1-qperret@google.com>
+Subject: [PATCH] KVM: arm64: Use correct accessor to parse stage-1 PTEs
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>
+Cc: Quentin Perret <qperret@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20221025145156.ic0Tzhjun8lk11-pa6bYMOmDQ95EeYvzROBlrp3yx4g@z>
 
-On Tue, 25 Oct 2022 01:24:19 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Mon, Oct 24, 2022 at 11:50:29PM +0000, Sean Christopherson wrote:
-> > On Sat, Oct 22, 2022, Marc Zyngier wrote:
-> > > On Fri, 21 Oct 2022 17:05:26 +0100, Sean Christopherson <seanjc@google.com> wrote:
-> 
-> [...]
-> 
-> > > > Would it be possible to require a dirty bitmap when an ITS is
-> > > > created?  That would allow treating the above condition as a KVM
-> > > > bug.
-> > > 
-> > > No. This should be optional. Everything about migration should be
-> > > absolutely optional (I run plenty of concurrent VMs on sub-2GB
-> > > systems). You want to migrate a VM that has an ITS or will collect
-> > > dirty bits originating from a SMMU with HTTU, you enable the dirty
-> > > bitmap. You want to have *vcpu* based dirty rings, you enable them.
-> > > 
-> > > In short, there shouldn't be any reason for the two are either
-> > > mandatory or conflated. Both should be optional, independent, because
-> > > they cover completely disjoined use cases. *userspace* should be in
-> > > charge of deciding this.
-> > 
-> > I agree about userspace being in control, what I want to avoid is letting userspace
-> > put KVM into a bad state without any indication from KVM that the setup is wrong
-> > until something actually dirties a page.
-> > 
-> > Specifically, if mark_page_dirty_in_slot() is invoked without a running vCPU, on
-> > a memslot with dirty tracking enabled but without a dirty bitmap, then the migration
-> > is doomed.  Dropping the dirty page isn't a sane response as that'd all but
-> > guaranatee memory corruption in the guest.  At best, KVM could kick all vCPUs out
-> > to userspace with a new exit reason, but that's not a very good experience for
-> > userspace as either the VM is unexpectedly unmigratable or the VM ends up being
-> > killed (or I suppose userspace could treat the exit as a per-VM dirty ring of
-> > size '1').
-> 
-> This only works on the assumption that the VM is in fact running. In the
-> case of the GIC ITS, I would expect that the VM has already been paused
-> in preparation for serialization. So, there would never be a vCPU thread
-> that would ever detect the kick.
+hyp_get_page_state() is used with pKVM to retrieve metadata about a page
+by parsing a hypervisor stage-1 PTE. However, it incorrectly uses a
+helper which parses *stage-2* mappings. Ouch.
 
-This is indeed the case. The ioctl will return -EBUSY if any vcpu is
-running.
+Luckily, pkvm_getstate() only looks at the software bits, which happen
+to be in the same place for stage-1 and stage-2 PTEs, and this all ends
+up working correctly by accident. But clearly, we should do better.
 
-> 
-> > That's why I asked if it's possible for KVM to require a dirty_bitmap when KVM
-> > might end up collecting dirty information without a vCPU.  KVM is still
-> > technically prescribing a solution to userspace, but only because there's only
-> > one solution.
-> 
-> I was trying to allude to something like this by flat-out requiring
-> ring + bitmap on arm64.
+Fix hyp_get_page_state() to use the correct helper.
 
-And I claim that this is wrong. It may suit a particular use case, but
-that's definitely not a universal truth.
+Fixes: e82edcc75c4e ("KVM: arm64: Implement do_share() helper for sharing memory")
+Signed-off-by: Quentin Perret <qperret@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
-> Otherwise, we'd either need to:
-> 
->  (1) Document the features that explicitly depend on ring + bitmap (i.e.
->  GIC ITS, whatever else may come) such that userspace sets up the
->  correct configuration based on what its using. The combined likelihood
->  of both KVM and userspace getting this right seems low.
-
-But what is there to get wrong? Absolutely nothing. Today, you can
-save/restore a GICv3-ITS VM without a bitmap at all. Just dump all of
-the memory. The bitmap only allows you to do it while the vcpus are
-running. Do you want a dirty ring because it makes things faster?
-Fine. But you need to understand what this does.
-
-Yes, this may require some additional documentation. But more
-importantly, it requires VMM authors to pay attention to what is
-happening. At least the QEMU folks are doing that.
-
->  (2) Outright reject the use of features that require ring + bitmap.
->  This pulls in ordering around caps and other UAPI.
-
-I don't think this makes any sense. Neither bitmap nor ring should be
-a prerequisite for *anything*.
-
-	M.
-
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 1e78acf9662e..07f9dc9848ef 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -516,7 +516,7 @@ static enum pkvm_page_state hyp_get_page_state(kvm_pte_t pte)
+ 	if (!kvm_pte_valid(pte))
+ 		return PKVM_NOPAGE;
+ 
+-	return pkvm_getstate(kvm_pgtable_stage2_pte_prot(pte));
++	return pkvm_getstate(kvm_pgtable_hyp_pte_prot(pte));
+ }
+ 
+ static int __hyp_check_page_state_range(u64 addr, u64 size,
 -- 
-Without deviation from the norm, progress is not possible.
+2.38.0.135.g90850a2211-goog
+
