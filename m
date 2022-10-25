@@ -1,78 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 124A07B
-	for <kvmarm@lists.linux.dev>; Tue, 25 Oct 2022 15:30:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9B91C433C1;
-	Tue, 25 Oct 2022 15:30:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1666711856;
-	bh=3YeEg2Oa90timi1XZ3PvEOat7cXoDLZyE/kx8ALR0fI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=k2yihkhMF0oKJomV48MeRvLFVsSnru0KmNrFtpW16uRT6BiJY9OhgvKDH10K7CTZQ
-	 xMBfgpF5/h6qwvzmOzDvlkZtpT6g53Bv0xdDRxNPfzUkP0tGGeUsKniHkUPXo6pDQl
-	 pC6Hm8II/0RR1F1GXlTU/VpCV81j3ZRedzb7pRczs2cfvLLn19HL8bZ9EoFO2BoKjd
-	 v7RFJ+0MzlqzfLPoXjtIz/KlHn0N1gXMBIJnl+yXygMtZE1CxqD9myABnczTMeWi+w
-	 dIa3Ka3SkhxFjRqmqSyBTzQyaKv136UemXswzie2idwwq316NWsVHZqYVcxDTYrVYS
-	 G3Sa9uMhWGL5Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1onLtG-001ZDz-L9;
-	Tue, 25 Oct 2022 16:30:54 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Quentin Perret <qperret@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	James Morse <james.morse@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91D47B
+	for <kvmarm@lists.linux.dev>; Tue, 25 Oct 2022 16:07:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1666714077;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=5KspUNdpIMJ1oi73gHAhE34NL4Dzppd2Wwilq7mP6L8=;
+	b=BlnOTPlU0PXNI6fnsuzm7pHid4Tfhm88VbN74jnpYOXytrJMKzHZ0fnqSNMs/RN+fy5t8K
+	tcB5x1OFVhQZsEx8hyWVCkS1zPayQktvgGo2NtvEa4OW/6lwk+Wf+zBVwZExDst/4HP8L9
+	yrPZgVzAe1mkEUYoqnO/C0ikbzsHPUE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-587-yzgsZNG4OMq5fO07-66Gqw-1; Tue, 25 Oct 2022 12:07:53 -0400
+X-MC-Unique: yzgsZNG4OMq5fO07-66Gqw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 16775185A7A3;
+	Tue, 25 Oct 2022 16:07:53 +0000 (UTC)
+Received: from gondolin.redhat.com (unknown [10.39.193.32])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A9405410B235;
+	Tue, 25 Oct 2022 16:07:37 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
 	kvmarm@lists.cs.columbia.edu,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH] KVM: arm64: Use correct accessor to parse stage-1 PTEs
-Date: Tue, 25 Oct 2022 16:30:50 +0100
-Message-ID: <166671184422.541929.12583367055859537857.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221025145156.855308-1-qperret@google.com>
-References: <20221025145156.855308-1-qperret@google.com>
+	Cornelia Huck <cohuck@redhat.com>
+Subject: [kvm-unit-tests PATCH] MAINTAINERS: new kvmarm mailing list
+Date: Tue, 25 Oct 2022 18:07:30 +0200
+Message-ID: <20221025160730.40846-1-cohuck@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-type: text/plain
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oliver.upton@linux.dev, qperret@google.com, suzuki.poulose@arm.com, will@kernel.org, catalin.marinas@arm.com, james.morse@arm.com, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221025153050.l3HpIH9O2Srji1GkO60gAocc_w5kaluJt11S_woNvak@z>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Message-ID: <20221025160730.Ypq_Tzo3fhct2J1ZJIZixH-wJE3XFzOvia80F1JfH0k@z>
 
-On Tue, 25 Oct 2022 14:51:56 +0000, Quentin Perret wrote:
-> hyp_get_page_state() is used with pKVM to retrieve metadata about a page
-> by parsing a hypervisor stage-1 PTE. However, it incorrectly uses a
-> helper which parses *stage-2* mappings. Ouch.
-> 
-> Luckily, pkvm_getstate() only looks at the software bits, which happen
-> to be in the same place for stage-1 and stage-2 PTEs, and this all ends
-> up working correctly by accident. But clearly, we should do better.
-> 
-> [...]
+KVM/arm64 development is moving to a new mailing list (see
+https://lore.kernel.org/all/20221001091245.3900668-1-maz@kernel.org/);
+kvm-unit-tests should advertise the new list as well.
 
-Applied to fixes, thanks!
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ MAINTAINERS | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-[1/1] KVM: arm64: Use correct accessor to parse stage-1 PTEs
-      commit: 6853a71726b6f5930b4450889faf02e8f1cfe35c
-
-Cheers,
-
-	M.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 90ead214a75d..649de509a511 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -67,7 +67,8 @@ ARM
+ M: Andrew Jones <andrew.jones@linux.dev>
+ S: Supported
+ L: kvm@vger.kernel.org
+-L: kvmarm@lists.cs.columbia.edu
++L: kvmarm@lists.linux.dev
++L: kvmarm@lists.cs.columbia.edu (deprecated)
+ F: arm/
+ F: lib/arm/
+ F: lib/arm64/
 -- 
-Without deviation from the norm, progress is not possible.
-
+2.37.3
 
