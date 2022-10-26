@@ -1,92 +1,96 @@
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9A41C06
-	for <kvmarm@lists.linux.dev>; Wed, 26 Oct 2022 14:29:50 +0000 (UTC)
-Received: by mail-wr1-f51.google.com with SMTP id k8so17999741wrh.1
-        for <kvmarm@lists.linux.dev>; Wed, 26 Oct 2022 07:29:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4LdezE8EPF95kOMABaW0r9ThuTtV2O0kq680uWey88E=;
-        b=Ok05VDaKcSpVKBozXBm5ibepRtCxTgrk92eOL/U+Z1qm7rU3uv593m2JotUVOl3+7y
-         8ty2vqn0xpO4P7404IFVqd+8EC3CR94GHXyss4IoOAu1q4/6jlGsQBs5Le0YkcX4z5kY
-         lil/Hk8mI+XQI1lhg4POsJ7/ZvCRXhyQ/7Me139VsjGs3LfQBF/XX4sDTcT9FmIhZATt
-         +WYNXykOgIawqMgwztGErtD8chjSzmSEb0AcCcFHHZP8VndPR+N+3rEX1kKAfAdJnwob
-         Ipov8I9y5wU259AcmJmvSSV7pQwRJ4Atm/QaMrhRElBUdt/FTGulriWUe57AH+kS9xRZ
-         gFoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4LdezE8EPF95kOMABaW0r9ThuTtV2O0kq680uWey88E=;
-        b=nN7pebPhir1MvKO4JgdqZ0r1h5AAXFE55FLz7UXNUH5ZNfvE9V5QZSQJL00WmNBt10
-         9Q4xhHK/k1Zx/1PXxPYQNHaHx+FcLOroOjAR1tyX0YZtSJOW1x6VeigzFM+zrCns5pe4
-         lgpVfSi+l02zCfK8fRLodH7wlEb3ox2soaddF6CPesup09WKXTYl7dY3fqR29W+emC43
-         mzQQa9vTpib1t9GLV9iTK5509Z32o3BSyCrwcIspBGulWlHDfTPjhil/k3/qjz6D+2kM
-         IO+Szivuk+cZ1iwTUSt8wPsM8khP/DDJRt9naj6QIRjDk/ro6gMLEDTT+9ibKkPePfQp
-         ny/g==
-X-Gm-Message-State: ACrzQf0YE3MiuTK0oU5OFe7YZj/f5ZJ+XSTt84gJ+3OpmtcKBWBV1JJu
-	Cm7D15VAkNo27qcfehASGFiJK5p9o/w92g==
-X-Google-Smtp-Source: AMsMyM5rydt9URLtM82O2TZ+mlJaBDCi38t/Jo3CmXtKBZrWlDPKLy68ILHoIPqvaCtiOPzGV7D7WA==
-X-Received: by 2002:adf:e192:0:b0:232:3648:776d with SMTP id az18-20020adfe192000000b002323648776dmr29817431wrb.698.1666794588850;
-        Wed, 26 Oct 2022 07:29:48 -0700 (PDT)
-Received: from google.com (65.0.187.35.bc.googleusercontent.com. [35.187.0.65])
-        by smtp.gmail.com with ESMTPSA id l18-20020a05600c1d1200b003a342933727sm2348945wms.3.2022.10.26.07.29.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Oct 2022 07:29:48 -0700 (PDT)
-Date: Wed, 26 Oct 2022 15:29:44 +0100
-From: Vincent Donnefort <vdonnefort@google.com>
-To: kvmarm@lists.linux.dev, maz@kernel.org, broonie@kernel.org
-Cc: catalin.marinas@arm.com, will@kernel.org
-Subject: Hang with nVHE mode and SME
-Message-ID: <Y1lEWJ7rO4m1CKWL@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70497B
+	for <kvmarm@lists.linux.dev>; Wed, 26 Oct 2022 15:07:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2970EC433D7;
+	Wed, 26 Oct 2022 15:07:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1666796846;
+	bh=BuD4/Vjf/xVADCL4bUbwfuVXmSZBG129I4i6e5yQyYY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DHEXd79Bxp5sDXgLWQQhW2j8khi4BHF2fVClyCHB3Xedvnpyyi9iziv8LPBSMNhrY
+	 oARupgdJ40FihvO6+Uthy/7MqhNiRxYuz/pO7fbU5JIP5sddwKLbTl4LgNxaKyB59C
+	 OvqGsT3R+Bp3RLs6O7xsEtebNxFCAa0/nBtuk2QO+m+8Q5BAieWVkhhbnlGLYJdo3Q
+	 hW3D5lQXmNCrZ83mqLzejY/JOGOmR0xTr+WasRrNNO/SU1y7eiu7Cwyni8HTzXmmtA
+	 VC5uiMq63wvuWesoVeRgrpM0BQigpTb535kN5oCGafe3bRjvSb1VC13A5cvVYE3EOM
+	 7eNOimH+2RqqQ==
+Date: Wed, 26 Oct 2022 16:07:21 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: kvmarm@lists.linux.dev, maz@kernel.org, catalin.marinas@arm.com,
+	will@kernel.org
+Subject: Re: Hang with nVHE mode and SME
+Message-ID: <Y1lNKcXfy/nHzTQ9@sirena.org.uk>
+References: <Y1lEWJ7rO4m1CKWL@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="5efKBJnPK6QRij7q"
+Content-Disposition: inline
+In-Reply-To: <Y1lEWJ7rO4m1CKWL@google.com>
+X-Cookie: Prunes give you a run for your money.
+
+
+--5efKBJnPK6QRij7q
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-Hi All,
+On Wed, Oct 26, 2022 at 03:29:44PM +0100, Vincent Donnefort wrote:
 
-I'm experiencing hangs when running a guest on a Qemu platform and a host
-started with nVHE mode.
+>   static void __activate_traps(struct kvm_vcpu *vcpu)
+>   {
+>       ...
+>       if (cpus_have_final_cap(ARM64_SME)) {
+>            // HANG !
 
-The hang occurs in 
+You're not entirely specific on where the hang is - I assume you mean
+the second SME block and that it's hanging on the first sysreg read in
+there:
 
-  static void __activate_traps(struct kvm_vcpu *vcpu)
-  {
-      ...
-      if (cpus_have_final_cap(ARM64_SME)) {
-           // HANG !
+	if (cpus_have_final_cap(ARM64_SME)) {
+		u64 val;
 
-No problem though with either VHE or if the host boots with arm64.nosme.
+		val = read_sysreg_s(SYS_HFGRTR_EL2);
 
-The host (and the guest) are 6.1-rc1. My Qemu is 7.1.
+rather than on the if statement?  A brief grep around the qemu source
+suggests that this register and fine grained traps in general are not
+implemented which is invalid with SME since this is required for SME in
+nVHE.  SME is a v9.2 feature, and v9.2 includes all the requirements of
+v8.7.  FEAT_FGT has been mandatory since v8.6 (where it was added).
 
-My Qemu setup:
+I did originally have a check in there for either/both this or FEAT_HCX
+but it got taken out during review due to the architecturual
+requirement.
 
-     $ qemu-system-aarch64 \
-      -M virt \
-      -machine virtualization=true -machine virt,gic-version=3  \
-      -cpu max,pauth=off -smp 1 -m 16384                 \
-      -drive file=rootfs.ext4,if=none,format=raw,id=hd0 \
-      -device virtio-blk-device,drive=hd0 \
-      -object rng-random,filename=/dev/urandom,id=rng0 \
-      -netdev user,id=eth0,hostfwd=tcp::8022-:22,hostfwd=tcp::1234-:1234 \
-      -device virtio-net-pci,netdev=eth0                \
-      -nographic \
-      -kernel arm64/boot/Image -append "earlycon root=/dev/vda kvm-arm.mode=nvhe nokaslr" \
+> No problem though with either VHE or if the host boots with arm64.nosme.
 
-The guest is run with kvm-tools:
+> The host (and the guest) are 6.1-rc1. My Qemu is 7.1.
 
-     $ lkvm run -p "break=mount arm64.nosme" -k ~/Image --force-pci
+I've only ever tested KVM with the fast model, never with qemu FWIW.
+FEAT_FGT is only used with SME when in nVHE mode.
 
-Is it a known issue?
+> Is it a known issue?
 
---
-Vincent
+It wasn't.
+
+--5efKBJnPK6QRij7q
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmNZTSkACgkQJNaLcl1U
+h9C13Af+NU7hM29HOl40428jfkQK9qlIjawTzJEKSx1fVFK3iJN2tp4W+8wZpxj2
++6w3nM0XgoKYLnY+NvsR4WPj70o+SPeL1jAKagxDQ6J9O/fc0hM+ph7NFh6LM5bb
+fJdf7XORTvPB/3h13uEwc7AxbUeviZ9K/g+TE7CRqXlCSr308Rqn6nO/e5ftZGAc
+y9zhW7BE58RmJV3w3ptPGG1NKoycpFgVD+IeuS+83C/9zWbSZQNwMlB9u5pGJlAp
+9n3ZN2wf8RIh96sk7n1uaGSBNUwI27Xct+Sfl5dQyI2RUVSNhUWaLoQDwKH+/SJq
+9M6IKS3f6FHIBvJW8eSnJ96WIK1ZyA==
+=VPVg
+-----END PGP SIGNATURE-----
+
+--5efKBJnPK6QRij7q--
