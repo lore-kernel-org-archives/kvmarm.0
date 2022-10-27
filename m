@@ -2,74 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E8ACFA3740
-	for <kvmarm@archiver.kernel.org>; Thu, 27 Oct 2022 18:53:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 816F4FA3742
+	for <kvmarm@archiver.kernel.org>; Thu, 27 Oct 2022 19:09:36 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7798C40B8F;
-	Thu, 27 Oct 2022 14:53:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D82CD40E00;
+	Thu, 27 Oct 2022 15:09:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FNC+iyAouhXf; Thu, 27 Oct 2022 14:53:01 -0400 (EDT)
+	with ESMTP id OHGwvyTsd9Rh; Thu, 27 Oct 2022 15:09:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74A8240BA3;
-	Thu, 27 Oct 2022 14:53:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA4E040712;
+	Thu, 27 Oct 2022 15:09:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 46A8E40B75
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 14:53:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 49ADD40712
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 15:09:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VnWrQtvBF22G for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Oct 2022 14:52:59 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4672040797
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 14:52:59 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 0941F6245E;
- Thu, 27 Oct 2022 18:52:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66568C433D6;
- Thu, 27 Oct 2022 18:52:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1666896777;
- bh=cE0DsxHVn8E3WSzZRpP4LLIDtwwk7/ADnshfq6mGRvk=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=kBkhQYh+SUZhFRwlDyQceHZjgXEG22RW+xi2baopYZjGNtcrGWBmbA0OnwrUcxDxf
- 1AbLkvJG5RzXjYSSSnntiRK7Bac2YMrk6Ci3v5ywlwwewQnwbxRWvLOUqK/NOQrHqD
- RA32Rb7rof30eixL/BzOco41FkMrlEzR5wDNtoH/nVmdknb36avKFisqC4s3Wx+1eg
- koJBef8N589Hrw4zo7igWctkRMn3n5ZSvUJT43RcVsWynwUORw6GUoPXFFKVbyCUYs
- ImSsbs9ynpqpN564sc/e9/vDRCAzE2NSplLCk60owpp6bvenCwx3hdfVgq55SAKGD2
- O+X7ry5BqKu9A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oo7zr-0024QE-1F;
- Thu, 27 Oct 2022 19:52:55 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Subject: Re: [PATCH v1] KVM: arm64: Fix bad dereference on MTE-enabled systems.
-Date: Thu, 27 Oct 2022 19:52:49 +0100
-Message-Id: <166689668290.1967996.11076695324695573284.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221027120945.29679-1-ryan.roberts@arm.com>
-References: <20221027120945.29679-1-ryan.roberts@arm.com>
+ with ESMTP id pYbVTfCgzVtf for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Oct 2022 15:09:32 -0400 (EDT)
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com
+ [209.85.214.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C7DA402C4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 15:09:31 -0400 (EDT)
+Received: by mail-pl1-f171.google.com with SMTP id g24so2551686plq.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 12:09:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=jcsG6Lpz86NDdXCXxaPnNHQBPM6Izrd1LxxhOme0rdg=;
+ b=RpAv17GfbyizrETcKPzbPLSPEuqfINiMIe/xj9cCq6vRXjwf0nYzMNPSc4bqvkVBJl
+ XwWqeSP4stXmFHJL94dcnmsw1gTk+oAOJOKMt0woiDHXSyFK0EgjgV+l9Pvqzk0GPCB5
+ VDTb3IDOKZ8Oo9u6D7BnXim5Mww2EPS6WNa76ndfvQC6CFPkO+zJBs+sXw+DsNTQrj6c
+ rFLckgEV1rDUzkEJ7bPe7Cfxk+1m6UddG9A1tv0OPSnZ8qleLTbJlVdm1YTYqvi8krNF
+ 3VxUfwWHAA1A0/HT3mnDZReVLS7FacP/aS8dULbCZfp0v1MMHM6T4v9lYUgbshzj/CL2
+ hz1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=jcsG6Lpz86NDdXCXxaPnNHQBPM6Izrd1LxxhOme0rdg=;
+ b=aaYbf6ZRUOtC2fK7Ngw8qa++wcdIIzPtDRWW6k3wZnaPnQF74hSsq1JLmwe0SrG4Lz
+ 8AstTomQQ8ZBrnFWTfKWqwQLZO/+pwssrX6lALEaJsCm1MY8KaRM1fImYlIQFLfUumEn
+ 00UxNNzu7i5CQckudscMWMI8qRJioP3c5+SRBZTHy76yOUQSsacHHvZOFDboB+6T3S6/
+ uRl7G8Bpd2uIOV23SK0lS4te+KF+7lK2i+GVZlBtGF8hBiwibKd5VVCYL7H15Yx+a/dI
+ 6qJziDVuc2UTP3WLNCC1rfIU6iuNDCTjNS+5SILIPHEjll8tzn7dq1pAHDAsAZ5D7T+g
+ WEFA==
+X-Gm-Message-State: ACrzQf0dsmbaZZyuSfUPJ+6XqyevFbgoR72lPlaMHf4Lr2jWs8EAOAB7
+ 95W08MXhXNqjqadT/9m94nABOQ==
+X-Google-Smtp-Source: AMsMyM68Ggi+CLlU0LelIxfDVS4J21qnnT+diZNuQGCktyMfBzQNILLH68pVNB2niDUECUSeKxAxhQ==
+X-Received: by 2002:a17:90b:4b09:b0:213:655c:158b with SMTP id
+ lx9-20020a17090b4b0900b00213655c158bmr8134972pjb.119.1666897770908; 
+ Thu, 27 Oct 2022 12:09:30 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ p19-20020a170902c71300b00186b758c9fasm1513521plp.33.2022.10.27.12.09.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 27 Oct 2022 12:09:30 -0700 (PDT)
+Date: Thu, 27 Oct 2022 19:09:26 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
+ conjunction with bitmap
+Message-ID: <Y1rXZshBbXGjPpTa@google.com>
+References: <8635bhfvnh.wl-maz@kernel.org> <Y1LDRkrzPeQXUHTR@google.com>
+ <87edv0gnb3.wl-maz@kernel.org> <Y1ckxYst3tc0LCqb@google.com>
+ <Y1css8k0gtFkVwFQ@google.com> <878rl4gxzx.wl-maz@kernel.org>
+ <Y1ghIKrAsRFwSFsO@google.com> <877d0lhdo9.wl-maz@kernel.org>
+ <Y1rDkz6q8+ZgYFWW@google.com> <875yg5glvk.wl-maz@kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ryan.roberts@arm.com, steven.price@arm.com,
- catalin.marinas@arm.com, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Steven Price <steven.price@arm.com>, kvmarm@lists.linux.dev,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <875yg5glvk.wl-maz@kernel.org>
+Cc: shuah@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ andrew.jones@linux.dev, dmatlack@google.com, shan.gavin@gmail.com,
+ bgardon@google.com, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ zhenyzha@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,28 +97,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 27 Oct 2022 13:09:45 +0100, Ryan Roberts wrote:
-> enter_exception64() performs an MTE check, which involves dereferencing
-> vcpu->kvm. While vcpu has already been fixed up for hyp va, kvm is still
-> a kern va pointer.
+On Thu, Oct 27, 2022, Marc Zyngier wrote:
+> On Thu, 27 Oct 2022 18:44:51 +0100,
+> Sean Christopherson <seanjc@google.com> wrote:
+> > 
+> > On Thu, Oct 27, 2022, Marc Zyngier wrote:
+> > > But in the long run, with dirty bits being collected from the IOMMU
+> > > page tables or directly from devices, we will need a way to reconcile
+> > > the dirty tracking. The above doesn't quite cut it, unfortunately.
+> > 
+> > Oooh, are you referring to IOMMU page tables and devices _in the
+> > guest_?  E.g. if KVM itself were to emulate a vIOMMU, then KVM would
+> > be responsible for updating dirty bits in the vIOMMU page tables.
 > 
-> Fix this by first converting kvm to a hyp va pointer. If the system does
-> not support MTE, the dereference is avoided in the first place.
-> 
-> [...]
+> No. I'm talking about the *physical* IOMMU, which is (with the correct
+> architecture revision and feature set) capable of providing its own
+> set of dirty bits, on a per-device, per-PTE basis. Once we enable
+> that, we'll need to be able to sink these bits into the bitmap and
+> provide a unified view of the dirty state to userspace.
 
-Applied to fixes with minor commit message fixes, thanks!
+Isn't that already handled by VFIO, e.g. via VFIO_IOMMU_DIRTY_PAGES?  There may
+be "duplicate" information if a page is dirty in both the IOMMU page tables and
+the CPU page tables, but that's ok in that the worst case scenario is that the
+VMM performs a redundant unnecessary transfer.
 
-[1/1] KVM: arm64: Fix bad dereference on MTE-enabled systems.
-      commit: b6bcdc9f6b8321e4471ff45413b6410e16762a8d
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+A unified dirty bitmap would potentially reduce the memory footprint needed for
+dirty logging, but presumably IOMMU-mapped memory is a small subset of CPU-mapped
+memory in most use cases.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
