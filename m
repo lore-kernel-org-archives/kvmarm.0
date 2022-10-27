@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139077B
-	for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 21:08:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42D1BC433D7;
-	Thu, 27 Oct 2022 21:08:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563BA7B
+	for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 21:08:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58393C433D6;
+	Thu, 27 Oct 2022 21:08:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1666904886;
-	bh=ZLcSspCrEAujqgxB3w5RAQ3I8xEQl8NZWfbjj1gmYDY=;
+	s=k20201202; t=1666904890;
+	bh=r/jnRnyyGayrX4/gO/vaY6RwRYSLrVP13xE/7oWXg2w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YqmHxoloY19+R/xUyVCflXnLqrG/w+fhQPVBurRPTACpQzRAlFuqL54R0ahzhw5HK
-	 U5C1L5a1yS/nMLaNh0OoRFi3B+UTdL+cbh9/WR045UHNA9OteRqGq0YAySz70Evhop
-	 EeDe3OC++pHbR8EnhmololmBvW8STNVzdyohaAkSoVGJRHaq6/PD4dlpX7cZy+Maol
-	 YLuXSmEGemDbI/AHWnm4uqA5jOd4zQBImsPaprULGDEN6KboZZ1Xc/0+GsrlW/txHs
-	 0fPAsArnS2FC0MnpxxMSDV7l5Ha+fDdutGXwJ8RSowBsCKXdVfqTrhaRKDMZAGdoON
-	 xMV3vTTf+2xbw==
+	b=lEG3910/jGaVLaSrbdP07Qw4kUhAMJEaWAq1z8Gr350BIiVOIaTXGrpBmt+YcGyyS
+	 3B9wYcRaXTJUJk1fBTMZec9PjxWc2jLTsXRBvG1CS1F6zhQmdpSEnqJnOsSWR+a5+o
+	 rmJiVVxvq2E15sLy8t7MhFGiaGBVXixHDah41jWcH9XdcmdWepYAY4zIprxNRNN8YM
+	 jwwgJESeikeychVvt2lrixyr31WH6G2DSMnn2P/xJTI9117YOsWkDzP1kZ65KOf7A4
+	 99Yu15rpHdyfE41vwQ2N2VTDRtgpUXa059J6FngvTcHcJO2tqmbOnnPW6yzZtbIZBd
+	 4gz9qfkvOJN4A==
 From: Mark Brown <broonie@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
@@ -28,10 +28,11 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v1 1/2] arm64: booting: Document our requirements for fine grained traps with SME
-Date: Thu, 27 Oct 2022 22:04:39 +0100
-Message-Id: <20221027210441.814061-2-broonie@kernel.org>
+	Mark Brown <broonie@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH v1 2/2] KVM: arm64: Trap access to SMPRI_EL1 in VHE mode
+Date: Thu, 27 Oct 2022 22:04:40 +0100
+Message-Id: <20221027210441.814061-3-broonie@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20221027210441.814061-1-broonie@kernel.org>
 References: <20221027210441.814061-1-broonie@kernel.org>
@@ -41,38 +42,73 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1110; i=broonie@kernel.org; h=from:subject; bh=ZLcSspCrEAujqgxB3w5RAQ3I8xEQl8NZWfbjj1gmYDY=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjWvJnOanXYMrPLhinlqShIE5ZFsXdC7kL+FeKnphk wqxrbcOJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY1ryZwAKCRAk1otyXVSH0GvKB/ 4zeluPJZkJ89ZZnHpBL8n8WZFUjdIR3K2iqdbf0Ex3pYOMKPL6szNgwQMfQHIdCA0gULc8MTBlp3IS 7J5UsLXo3ve5m1eBRSF16/AoIrAVXdkBDLxcdQqUKf9HURH7nl3L6ceZJnZhKHNdlT0ct+UsFJjnQa 05aHSm2tDO+5fHHzhWK4bwdmFbK27W0rExRgNz2mpk4DZ6gtnTD+ECYQunQ7WZ6zFEu9DntCytoUXi AmS5JCtxFC3XwuagM9lwlQx6jeW8pfpJEz81c7BoI5yXnfVB2cYfRO09Lho9on+5TU1BpGaB9jyGUO Jfcv9kqB+gc5v1ci0jjIXYu1NaHPSI
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2298; i=broonie@kernel.org; h=from:subject; bh=r/jnRnyyGayrX4/gO/vaY6RwRYSLrVP13xE/7oWXg2w=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjWvJoIkOm0eR9ETtgNFbmhIxXFccQODfCupOrHmnD nDsbbeeJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY1ryaAAKCRAk1otyXVSH0MHWB/ 4sUrRIkzglGyAJJSo/Cc5fr3nNTCm3Mg44+BHNuZQIq2uqM7opQevyw9QGwwiffWD15paYCy0Ed8wx FwOmSq4GuW5vu9Y6iExHYu6q6Lcl2+ige+sdvVVb3kkRpxZTTFHGmJPvQaB0He2ADnc4Hb4uEP3Llg 4tzZOx4xlKC5hOzcm7VfOx2gYddR1Q+f8edhODwhrKoKC2Z3hA2huO/i4U4Sy3KluOLVf1zGV0blAG IJR19V8WhpH3mhgOIPx1GQUKkPaq2bYJCM5PqLSaWoZL15/yJ3LWJs2dYVyKxbuSD1lrBbPJMlmMBZ RYXB5QWTFl2Gh9mkxmN3y1X2HfqZ5L
 X-Developer-Key: i=broonie@kernel.org; a=openpgp; fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 Content-Transfer-Encoding: 8bit
 
-With SME we require that fine grained traps on access to TPIDR2_EL0 and
-SMPRI_EL1 are disabled but did not document that fact. Add the relevant
-register bits.
+On systems with SME access to the SMPRI_EL1 priority management register is
+controlled by the nSMPRI_EL1 fine grained trap. We manage this trap in nVHE
+mode but do not do so when in VHE mode, add the required management.
 
+On systems which do not implement priority mapping not enabling this trap
+will allow the guest to discover if the host support SME since the register
+will be RES0 rather than UNDEF. On systems implementing priority mapping
+the register could be used as a side channel by guests.
+
+Fixes: 861262ab8627 ("KVM: arm64: Handle SME host state when running guests")
 Signed-off-by: Mark Brown <broonie@kernel.org>
+Cc: stable@vger.kernel.org
 ---
- Documentation/arm64/booting.rst | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm64/kvm/hyp/vhe/switch.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/arm64/booting.rst b/Documentation/arm64/booting.rst
-index 8aefa1001ae5..8c324ad638de 100644
---- a/Documentation/arm64/booting.rst
-+++ b/Documentation/arm64/booting.rst
-@@ -340,6 +340,14 @@ Before jumping into the kernel, the following conditions must be met:
-     - SMCR_EL2.LEN must be initialised to the same value for all CPUs the
-       kernel will execute on.
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 7acb87eaa092..cae581e8dd56 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -63,10 +63,20 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 		__activate_traps_fpsimd32(vcpu);
+ 	}
  
-+    - HWFGRTR_EL2.nTPIDR2_EL0 (bit 55) must be initialised to 0b01.
-+
-+    - HWFGWTR_EL2.nTPIDR2_EL0 (bit 55) must be initialised to 0b01.
-+
-+    - HWFGRTR_EL2.nSMPRI_EL1 (bit 54) must be initialised to 0b01.
-+
-+    - HWFGWTR_EL2.nSMPRI_EL1 (bit 54) must be initialised to 0b01.
-+
-   For CPUs with the Scalable Matrix Extension FA64 feature (FEAT_SME_FA64)
+-	if (cpus_have_final_cap(ARM64_SME))
++	if (cpus_have_final_cap(ARM64_SME)) {
+ 		write_sysreg(read_sysreg(sctlr_el2) & ~SCTLR_ELx_ENTP2,
+ 			     sctlr_el2);
  
-   - If EL3 is present:
++		/*
++		 * Disable access to SMPRI_EL1 - we don't need to control
++		 * nTPIDR2_EL0 in VHE mode.
++		 */
++		sysreg_clear_set_s(SYS_HFGRTR_EL2, HFGxTR_EL2_nSMPRI_EL1_MASK,
++				   0);
++		sysreg_clear_set_s(SYS_HFGWTR_EL2, HFGxTR_EL2_nSMPRI_EL1_MASK,
++				   0);
++	}
++
+ 	write_sysreg(val, cpacr_el1);
+ 
+ 	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el1);
+@@ -88,9 +98,19 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	 */
+ 	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
+ 
+-	if (cpus_have_final_cap(ARM64_SME))
++	if (cpus_have_final_cap(ARM64_SME)) {
++		/*
++		 * Enable access to SMPRI_EL1 - we don't need to
++		 * control nTPIDR2_EL0 in VHE mode.
++		 */
++		sysreg_clear_set_s(SYS_HFGRTR_EL2, 0,
++				   HFGxTR_EL2_nSMPRI_EL1_MASK);
++		sysreg_clear_set_s(SYS_HFGWTR_EL2, 0,
++				   HFGxTR_EL2_nSMPRI_EL1_MASK);
++
+ 		write_sysreg(read_sysreg(sctlr_el2) | SCTLR_ELx_ENTP2,
+ 			     sctlr_el2);
++	}
+ 
+ 	write_sysreg(CPACR_EL1_DEFAULT, cpacr_el1);
+ 
 -- 
 2.30.2
 
