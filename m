@@ -1,90 +1,181 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4626C7B
-	for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 21:17:17 +0000 (UTC)
-Received: by mail-pf1-f170.google.com with SMTP id d10so2960143pfh.6
-        for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 14:17:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DM/N1LiRYR5yDHC9HV4NzFlP3woquy/xP1yC7CcJoiA=;
-        b=VluDObdXopb8OAj9DyzgeU6LPp3JZHPn0iZsIbwsJ/VDaCueQ8VwT3B7TvUs2XlNF8
-         cl6e3Hhh4x7f6XgprihONG99p6rxwItlVzP3MLnhtN2MVuX36mU0A5Fzz1U0yrNKsiJa
-         4b4PoCN5cBeJl1qbJ9oLFjMYcmLxBvtxg4/jE8f4P7GYlzCmoGJRqalnqi9OPa5ToemN
-         mP/rlmhFbesoSquKtzlaZWmyvWESW8uXZEYBTn520OnSnMp7laThcmz6Rein1gk7QACQ
-         vxs3qxPeg88r6lpRDslENQJfQ6si1kJ6FBLy1LcDT80a4kPJIMC1yS5g4cEW2cwAs7aU
-         T3PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DM/N1LiRYR5yDHC9HV4NzFlP3woquy/xP1yC7CcJoiA=;
-        b=5rKf7lvTnhkz7NLnjzfGhut6eKXLmE0bKByGL3ijWweBFAGeXBXN0mHgJBoYbjlRh0
-         fJWMQGDd4eqFBTiXhK9n+tcxaw0ftqWLTt336dgaud3XhRxUZN12chgtyzzGsipGyxtb
-         bj4aTYeO07YRh/TbZKfCxRNy29/xktlN9m6TmEbvHyO2KfzQ7DFESvrDcO03WcKUr/O6
-         /XoeiASTAwI/KOxD0KI0odSziDC2YWA3j1NXEbdY6S0KmEqRU141mGTvOXj1pMzN18Ar
-         lpNgJ1zfi5pR2I6WJA85StgvcQLKTKwQTqX8ZVP6w+p7ZIG+Tovl+6fxN006je4fQcLB
-         dolA==
-X-Gm-Message-State: ACrzQf0g89E6PT9cGxPlXBs/IaKHpZqVeH+BYjyDPMCpcpI4UHHoQ2/C
-	MvSmoEIkKqnzupzhqcYL4K2h6w==
-X-Google-Smtp-Source: AMsMyM7pBE1eD4OtSevp7WS6mbWoc1thuhcbX7HeLyaRkxyHXJXBXYHwDnYQ/lDoXHycVN+YNaspaQ==
-X-Received: by 2002:a05:6a00:1306:b0:555:6d3f:11ed with SMTP id j6-20020a056a00130600b005556d3f11edmr51174431pfu.55.1666905436664;
-        Thu, 27 Oct 2022 14:17:16 -0700 (PDT)
-Received: from ?IPV6:2001:8003:501a:d301:93c4:c1c9:4368:47fa? ([2001:8003:501a:d301:93c4:c1c9:4368:47fa])
-        by smtp.gmail.com with ESMTPSA id u13-20020a170902714d00b001853e6d6179sm1620164plm.162.2022.10.27.14.17.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Oct 2022 14:17:16 -0700 (PDT)
-Message-ID: <a8e0768f-6537-8f4c-8ba1-956aedd052bb@linaro.org>
-Date: Fri, 28 Oct 2022 07:17:08 +1000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F97D7B
+	for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 22:18:18 +0000 (UTC)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1666909089;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9n+3RxdryoMl5Xxq5ZijFC40S1Mj/3IyMGm1mZ68lXA=;
+	b=YpTxtNemiM35mRdi+bTzmnJnzI3P1+mymjitmXCgHlEVVsu7a3xtLkBJE3esDp9lDvmOEy
+	cu0czVnjmaC8j0xf+4wxWk/K8GWLpg5l9GQgje9h0EWAaQH0Y0tJurnpxaFf96rnwdQ+Q8
+	WfReZB6MJofmj09d7zzSJwWmc8EMceg=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org,
+	Reiji Watanabe <reijiw@google.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	David Matlack <dmatlack@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Ben Gardon <bgardon@google.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Peter Xu <peterx@redhat.com>,
+	Will Deacon <will@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v3 00/15] KVM: arm64: Parallel stage-2 fault handling
+Date: Thu, 27 Oct 2022 22:17:37 +0000
+Message-ID: <20221027221752.1683510-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v1 0/2] KVM: arm: Refuse to enable KVM on systems with SME
- but not FGT
-Content-Language: en-US
-To: Mark Brown <broonie@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Vincent Donnefort <vdonnefort@google.com>, James Morse
- <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev
-References: <20221027205246.812586-1-broonie@kernel.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20221027205246.812586-1-broonie@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <20221027221737.OzQkxlXIgDexIKfkWDCBBG00aicZZ67a8viFJIy-jGU@z>
 
-On 10/28/22 06:52, Mark Brown wrote:
-> The architecture requires that any system which implements SME also has
-> fine grained traps since SME is a v9.2 feature, meaning that v8.7 must be
-> implemented, and FGT is mandatory from v8.6. SME relies on fine grained
-> traps to control access to SMPRI_EL1 and in nVHE mode to TPIDR2_EL0,
-> without traps SMPRI_EL1.Priority and TPIDR2_EL0 can be used as side
-> channels.
-> 
-> This series adds support for detecting FGT and refuses to allow KVM to
-> be used in architecturally invalid configurations which have SME but not
-> FGT, without detection the issue presents as faults due to EL2
-> attempting to access the FGT registers which isn't obvious to users.
-> Currently fine grained traps are only used in nVHE but but a series
-> "arm64/sme: Fix SMPRI_EL1 traps for KVM guests" sent along with this
-> will add usage for VHE mode too making the issue more pressing.
+Presently KVM only takes a read lock for stage 2 faults if it believes
+the fault can be fixed by relaxing permissions on a PTE (write unprotect
+for dirty logging). Otherwise, stage 2 faults grab the write lock, which
+predictably can pile up all the vCPUs in a sufficiently large VM.
 
-Series:
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Like the TDP MMU for x86, this series loosens the locking around
+manipulations of the stage 2 page tables to allow parallel faults. RCU
+and atomics are exploited to safely build/destroy the stage 2 page
+tables in light of multiple software observers.
+
+Patches 1-4 clean up the context associated with a page table walk / PTE
+visit. This is helpful for:
+ - Extending the context passed through for a visit
+ - Building page table walkers that operate outside of a kvm_pgtable
+   context (e.g. RCU callback)
+
+Patches 5-6 clean up the stage-2 map walkers by calling a helper to tear
+down removed tables. There is a small improvement here in that a broken
+PTE is replaced more quickly, as page table teardown happens afterwards.
+
+Patches 7-9 sprinkle in RCU to the page table walkers, punting the
+teardown of removed tables to an RCU callback.
+
+Patches 10-14 implement the meat of this series, extending the
+'break-before-make' sequence with atomics to realize locking on PTEs.
+Effectively a cmpxchg() is used to 'break' a PTE, thereby serializing
+changes to a given PTE.
+
+Finally, patch 15 flips the switch on all the new code and starts
+grabbing the read side of the MMU lock for stage 2 faults.
+
+Applies to 6.1-rc2. Tested with KVM selftests, kvm-unit-tests, and
+Google's internal VMM (Vanadium). Also tested with lockdep enabled and
+saw no puke for RCU.
+
+Branch available at:
+
+  https://github.com/oupton/linux kvm-arm64/parallel_mmu
+
+benchmarked with dirty_log_perf_test, scaling from 1 to 48 vCPUs with
+4GB of memory per vCPU backed by THP.
+
+  ./dirty_log_perf_test -s anonymous_thp -m 2 -b 4G -v ${NR_VCPUS}
+
+Time to dirty memory:
+
+        +-------+----------+-------------------+
+        | vCPUs | 6.1-rc2  | 6.1-rc2 + series  |
+        +-------+----------+-------------------+
+        |     1 | 0.87s    | 0.93s             |
+        |     2 | 1.11s    | 1.16s             |
+        |     4 | 2.39s    | 1.27s             |
+        |     8 | 5.01s    | 1.39s             |
+        |    16 | 8.89s    | 2.07s             |
+        |    32 | 19.90s   | 4.45s             |
+        |    48 | 32.10s   | 6.23s             |
+        +-------+----------+-------------------+
+
+It is also worth mentioning that the time to populate memory has
+improved:
+
+        +-------+----------+-------------------+
+        | vCPUs | 6.1-rc2  | 6.1-rc2 + series  |
+        +-------+----------+-------------------+
+        |     1 | 0.21s    | 0.17s             |
+        |     2 | 0.26s    | 0.23s             |
+        |     4 | 0.39s    | 0.31s             |
+        |     8 | 0.68s    | 0.39s             |
+        |    16 | 1.26s    | 0.53s             |
+        |    32 | 2.51s    | 1.04s             |
+        |    48 | 3.94s    | 1.55s             |
+        +-------+----------+-------------------+
+
+v2 -> v3:
+ - Drop const qualifier from opaque argument pointer. The whole visitor
+   context is passed as a const pointer.
+ - kvm_set_spte_gfn() is called under the write lock; don't set the
+   SHARED bit in this case (Sean).
+ - Fix build warning resulting from reparameterization residue (test
+   robot).
+ - Add an assertion that the RCU read lock is held before the raw
+   pointer is used in visitors (Marc, off list).
+
+v1 -> v2:
+ - It builds! :-)
+ - Roll all of the context associated with PTE visit into a
+   stack-allocated structure
+ - Clean up the oddball handling of PTE values, avoiding a UAF along the
+   way (Quentin)
+ - Leave the re-reading of the PTE after WALK_LEAF in place instead of
+   attempting to return the installed PTE value (David)
+ - Mention why RCU is stubbed out for hyp page table walkers (David)
+ - Ensure that all reads of page table memory pass through an
+   RCU-protected pointer. The lifetime of the dereference is contained
+   within __kvm_pgtable_visit() (David).
+ - Ensure that no user of stage2_map_walker() passes TABLE_POST (David)
+ - Unwire the page table walkers from relying on struct kvm_pgtable,
+   simplifying the passed context to RCU callbacks.
+ - Key rcu_dereference() off of a page table flag indicating a shared
+   walk. This is clear when either (1) the write lock is held or (2)
+   called from an RCU callback.
+
+v1: https://lore.kernel.org/kvmarm/20220830194132.962932-1-oliver.upton@linux.dev/
+v2: https://lore.kernel.org/kvmarm/20221007232818.459650-1-oliver.upton@linux.dev/
+
+Oliver Upton (15):
+  KVM: arm64: Combine visitor arguments into a context structure
+  KVM: arm64: Stash observed pte value in visitor context
+  KVM: arm64: Pass mm_ops through the visitor context
+  KVM: arm64: Don't pass kvm_pgtable through kvm_pgtable_walk_data
+  KVM: arm64: Add a helper to tear down unlinked stage-2 subtrees
+  KVM: arm64: Tear down unlinked stage-2 subtree after break-before-make
+  KVM: arm64: Use an opaque type for pteps
+  KVM: arm64: Protect stage-2 traversal with RCU
+  KVM: arm64: Free removed stage-2 tables in RCU callback
+  KVM: arm64: Atomically update stage 2 leaf attributes in parallel
+    walks
+  KVM: arm64: Split init and set for table PTE
+  KVM: arm64: Make block->table PTE changes parallel-aware
+  KVM: arm64: Make leaf->leaf PTE changes parallel-aware
+  KVM: arm64: Make table->block changes parallel-aware
+  KVM: arm64: Handle stage-2 faults in parallel
+
+ arch/arm64/include/asm/kvm_pgtable.h  |  92 +++-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |  21 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c       |  22 +-
+ arch/arm64/kvm/hyp/pgtable.c          | 624 ++++++++++++++------------
+ arch/arm64/kvm/mmu.c                  |  51 ++-
+ 5 files changed, 463 insertions(+), 347 deletions(-)
 
 
-r~
+base-commit: 247f34f7b80357943234f93f247a1ae6b6c3a740
+-- 
+2.38.1.273.g43a17bfeac-goog
 
