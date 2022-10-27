@@ -1,98 +1,114 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79791186A
-	for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 09:16:40 +0000 (UTC)
-Received: by mail-pl1-f169.google.com with SMTP id g24so814534plq.3
-        for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 02:16:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9966BA53
+	for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 09:44:51 +0000 (UTC)
+Received: by mail-pl1-f178.google.com with SMTP id y4so885362plb.2
+        for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 02:44:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=csie-ntu-edu-tw.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y0jwfzDPpiiIA6G13h9XyMG8TS+aWs3VsgaKFJG4r/Y=;
-        b=VdH5bBMbuaoLKAdZotjR+kRjpk0oZGv9hrkl9h8A1KXDH/zF2a2KjFmyUrMxaStb29
-         OyM0t531gOXJxVZxcFvVpf+ikh/UTgH8jszdO9mTAXfGLrTm5K83EJ01xVDx/dH+21OT
-         wPBqotTm8VEsHI+4Awayn7e/oFkQCmr6F8VVbfwvBEJnqxyz6fWjo5aJ3df/mEpFIlQI
-         DqdG6aC4WjX3SaEKNbjoEkK7BI7vOq1S4KrtFYB2XT0pZs3JndlEEPjv17XnDosPvHWc
-         VjY/MloT7ayanxfnaXkjo3bFpNcvKlSDIhSyOWgdfC3yluP02Ul6H15CxjCLHvklufr6
-         kb2A==
+        d=linaro.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=/j2A0pYLkA8OsROkAILPzXlvLVVJYZZ6PND++hwpXgU=;
+        b=Bi2tqtjzvm62JhERu0Dr85gYqo7fXeNGrI7jJ6XOQjf4gDYlRqOBDD9w5Pn8483eun
+         vTzLT+9Tx05xLvpt+Tc4ggZH/UkccJXkV9LdLiU5wjemb0K0R/lEv95CMvl9J6VMB3Wu
+         SVA/nJ7GkrHk4wgpmvGICg27eMUjjeWai2+a411SMAjyvDttt/ZR/yjFi2G4u9uvf9Dt
+         SfgEHCfPDgT4jJML0V/fP15dn9WPKTaInd5uCyltS8tzyxPDHWmhnV1dQSuG2e8uZFVV
+         6OP01BY74Wbz/VZrI8tKMN27l1K18wwQf/mQuqlFQyYyc3n+5F7UPiCdkdUlUVr/vYo0
+         5zKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Y0jwfzDPpiiIA6G13h9XyMG8TS+aWs3VsgaKFJG4r/Y=;
-        b=vkOVTqociLBZLVtZb7KWACJO1cZsphlF4FFEVn4pijA7iVciWAP22FgZHSwBTU+d6E
-         7ArHlTLHevf0zLTE4hbbLqywwfMygBj1wmlFIiHcnWut493uH7PS71vC4rsGDAyWDn0p
-         J/eHs0X6eYThyYzIRNpwhJQMJx/Yu6YlmoG2vE2Epv85QtPBAVHrTQtFp2X1YN8pBTWk
-         9uMRlc8aQ9FnlEWOVhFBPWFEjskK0eMpTtBntI9wMaAhBhHSKf2RAADbQryq9NJK/oyH
-         s7XL2Zgy9lxBMu7P038+yjbjhwnsZ4Q0hfuyek84MvpdJKH8zR2WdW+Gvn0eg5Qpl1qe
-         wDPg==
-X-Gm-Message-State: ACrzQf0T+vjb8hsnwuF00egJPoWWxCRsKG+59rzX87mLbyKWLwGZfz5i
-	afEbUBZvXnYC167hTkFB22zAImm26QH2PS/IB2gxuBcLS+B/9Qdsyk/lLRlJ2+qG/pECY9/1Axl
-	QdmgHR39KQOD4FII25PyG6CZOibuM/CFJBSbtwa1wBvELfTj6f68vLwJTLzsuD0xBXSOd1vpR+O
-	nG289EvYRQ3r0GiZMV+97eSL7QqhhmAQ==
-X-Google-Smtp-Source: AMsMyM4aHQAm15VDE1/vKTcXNEmcnXBX2pjTWeY3+FHq6p29Ayj+aYLyA1TFLyvsRWVx1l2oc2LxaQ==
-X-Received: by 2002:a17:902:b90b:b0:186:8a4d:d4b7 with SMTP id bf11-20020a170902b90b00b001868a4dd4b7mr26808587plb.129.1666862199646;
-        Thu, 27 Oct 2022 02:16:39 -0700 (PDT)
-Received: from rhythm-ZenBook-UX425EA-UX425EA.csie.ntu.edu.tw (114-45-31-164.dynamic-ip.hinet.net. [114.45.31.164])
-        by smtp.gmail.com with ESMTPSA id b11-20020a1709027e0b00b00178650510f9sm721113plm.160.2022.10.27.02.16.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Oct 2022 02:16:39 -0700 (PDT)
-From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-To: maz@kernel.org
-Cc: james.morse@arm.com,
-	alexandru.elisei@arm.com,
-	suzuki.poulose@arm.com,
-	oliver.upton@linux.dev,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu,
-	linux-kernel@vger.kernel.org,
-	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
-Subject: [PATCH] KVM: arm64: Update comment of create_hyp_mappings
-Date: Thu, 27 Oct 2022 17:15:23 +0800
-Message-Id: <20221027091523.139598-1-r09922117@csie.ntu.edu.tw>
-X-Mailer: git-send-email 2.34.1
+        bh=/j2A0pYLkA8OsROkAILPzXlvLVVJYZZ6PND++hwpXgU=;
+        b=MgQF/yyMtgS5lfuXeC3BHLGpppe26Ecz0WlfcIQO3HDJBpOEQNjkmx1A2Otu3LrjoG
+         wgF05CEC5oGtIu9X5O9aWjAFcs8wfZhGKuU+JyKGW2NhRRK39OCKL+p17NnDA/pk5Ylv
+         jcOORrF4i6H/1/nbEA1U+uXmqT+3NCjXVXaBh9D66N5W5lCwZ9vNnYc2fb8FACMLPeyV
+         yImOPqrU/s92MQt/4TF3Zj+7uRCnBTGv/3ZCgxJFvs72uAaWKNamtZYucMD0WRwk7a2h
+         BHUwX1QVXGUaKgA3//xOAW5W5CnZGCo1iaO1HLhU1pfHJpNHMRwJ23+mTguIp+tFMff+
+         5r0w==
+X-Gm-Message-State: ACrzQf1ch8f2Rf+iYVeWxSy2O0N7gPDsjZJrhAxYzYldxVaGkHbAJus+
+	RJpLpG0g4dKekVQUjFY19EWGFCg7JP9vEaq8ox7hRw==
+X-Google-Smtp-Source: AMsMyM4f4UsZpIqXzUihy1JpWuqwZkgkq5kT5JFzO74jTIwBrorDI66kx8uGjVi+dxWLAcm9nUy2gPnNU1TiEfXv7rA=
+X-Received: by 2002:a17:90b:1d04:b0:20b:cb40:4b3 with SMTP id
+ on4-20020a17090b1d0400b0020bcb4004b3mr8994406pjb.215.1666863891323; Thu, 27
+ Oct 2022 02:44:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Gm-Spam: 0
-X-Gm-Phishy: 0
+References: <Y1lEWJ7rO4m1CKWL@google.com> <Y1lNKcXfy/nHzTQ9@sirena.org.uk>
+ <86ilk6ef5x.wl-maz@kernel.org> <Y1lhrB3lq5dZAin1@sirena.org.uk>
+In-Reply-To: <Y1lhrB3lq5dZAin1@sirena.org.uk>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 27 Oct 2022 10:44:39 +0100
+Message-ID: <CAFEAcA-mo_ywRnC53aFfkYP=q3zDBD7U4sBSrzg7ZfRQA7QYXA@mail.gmail.com>
+Subject: Re: Hang with nVHE mode and SME
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Vincent Donnefort <vdonnefort@google.com>, kvmarm@lists.linux.dev, 
+	catalin.marinas@arm.com, will@kernel.org, 
+	Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-HYP_PAGE_OFFSET is removed since 4.8, and the method for generating Hyp
-VAs has evolved. Update the functional description of
-create_hyp_mappings accordingly.
+On Wed, 26 Oct 2022 at 17:34, Mark Brown <broonie@kernel.org> wrote:
+>
+> On Wed, Oct 26, 2022 at 05:13:46PM +0100, Marc Zyngier wrote:
+> > Mark Brown <broonie@kernel.org> wrote:
+> > > On Wed, Oct 26, 2022 at 03:29:44PM +0100, Vincent Donnefort wrote:
+>
+> > > rather than on the if statement?  A brief grep around the qemu source
+> > > suggests that this register and fine grained traps in general are not
+> > > implemented which is invalid with SME since this is required for SME in
+> > > nVHE.  SME is a v9.2 feature, and v9.2 includes all the requirements of
+> > > v8.7.  FEAT_FGT has been mandatory since v8.6 (where it was added).
 
-Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
----
- arch/arm64/kvm/mmu.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Yeah. This is pretty common for QEMU, because we don't have the
+resources to implement the full breadth of the architecture. We
+just implement various features and rely on the kernel to do
+fine-grained checking of ID registers rather than assuming that
+because feature X is present feature Y must be too, or that because
+some feature is in vX.Y then it must imply presence of all features
+in some other vA.B. Mostly this works out OK...
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index c9a13e487..a9ae4a3f9 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -424,9 +424,10 @@ void kvm_unshare_hyp(void *from, void *to)
-  * @to:		The virtual kernel end address of the range (exclusive)
-  * @prot:	The protection to be applied to this range
-  *
-- * The same virtual address as the kernel virtual address is also used
-- * in Hyp-mode mapping (modulo HYP_PAGE_OFFSET) to the same underlying
-- * physical pages.
-+ * The Hyp virtual address is generated by masking the kernel VA with
-+ * va_mask then inserting tag_val for the higher bits starting from
-+ * tag_lsb. See kvm_compute_layout() in va_layout.c for more info.
-+ * Both Hyp VA and kernel VA ranges map to the same underlying physical pages.
-  */
- int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
- {
--- 
-2.34.1
+> > It is very unfortunate that the SME spec doesn't call out this
+> > explicitly, while it is calling out the dependency on FEAT_HCX (OK,
+> > one is mandatory and the other isn't).
+>
+> Indeed.  It was there in the internal drafts but it looks like it got
+> removed as redundant when the v9.2 dependency was decided on but it does
+> make it harder to spot the interaction.
+>
+> > > I did originally have a check in there for either/both this or FEAT_HCX
+> > > but it got taken out during review due to the architecturual
+> > > requirement.
+>
+> > So the question is whether we work around this in the kernel (not
+> > enabling either KVM or SME if FEAT_FGT is not present), or leave it as
+> > is with the hope that QEMU gets updated.
+>
+> > I'm inclined to do the latter. Thoughts anyone?
 
+Is the "kernel needs FEAT_FGT here" requirement a strong "the design
+just means it's kind of expected" one, or a weak "the features
+aren't really strongly tied together, it would be easy to do without"
+one?
+
+> I tend to agree.
+>
+> Note that we don't need to use FGT in VHE mode so we could restrict
+> virtualisation with SME only in cases where we're in nVHE mode, though
+> narrowing the restriction does make things more complicated so may well
+> be more trouble than it's worth and we might need to revise if we start
+> using the SMPRI_El1 trap in future.
+
+We don't have any super-immediate plans to implement FGT, though
+we might want to think about adjusting the roadmap.
+
+We have released 7.1 with SME support, so you will see QEMU binaries
+in the field with SME but not FGT.
+
+thanks
+-- PMM
