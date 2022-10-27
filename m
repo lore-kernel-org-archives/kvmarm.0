@@ -1,210 +1,98 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C19B7B
-	for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 22:24:00 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A966A1861
+	for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 22:31:20 +0000 (UTC)
+Date: Thu, 27 Oct 2022 22:31:15 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1666909439;
+	t=1666909879;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2jqzZ8fiB+x078wcXJwKsX5i+1F8LZpF8dTbWmKnaj8=;
-	b=V+k2e2ZzvbQW5B5Q7NX6/KUk+LvQFZGhoNNhoUrWl7oVaTNZq9WqAtLLio2CmzccfceUg4
-	QmwUnzGdaKhsIU1RZcMIR+Pi+rEn8tzrO0DzPLRz6nNgjSCjy3laqcn9dfIQX24rAwAb/1
-	OPbw4yOP4hdxYrUK1GOKF+heN3TLuC0=
+	bh=GW5NB8+RTKGpYs1izwEP9mB0IXmkchEi4A58SakMWcs=;
+	b=SAz+URbCjnmNMltTgdDWAqtUOSNXXWz0wbOUwMMuaQN4L38TjZjE0neZdisQyK57xfF25S
+	Wc9HAGblbg7HKZiAP06j3kdCX8Z5pdQz5BAxfmPsIpVK6QJBDPU6VSL1hUt3Ra48mpCJbV
+	8a96aNnjz+U/wf6s+DmSBbhMLYzWvck=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org,
-	Reiji Watanabe <reijiw@google.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	David Matlack <dmatlack@google.com>,
-	Quentin Perret <qperret@google.com>,
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
 	Ben Gardon <bgardon@google.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Peter Xu <peterx@redhat.com>,
-	Will Deacon <will@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 15/15] KVM: arm64: Handle stage-2 faults in parallel
-Date: Thu, 27 Oct 2022 22:23:50 +0000
-Message-ID: <20221027222350.1685213-1-oliver.upton@linux.dev>
-In-Reply-To: <20221027221752.1683510-1-oliver.upton@linux.dev>
-References: <20221027221752.1683510-1-oliver.upton@linux.dev>
+	David Matlack <dmatlack@google.com>, kvmarm@lists.cs.columbia.edu,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 07/15] KVM: arm64: Use an opaque type for pteps
+Message-ID: <Y1sGs6TFh6P20ymH@google.com>
+References: <20221007232818.459650-1-oliver.upton@linux.dev>
+ <20221007232818.459650-8-oliver.upton@linux.dev>
+ <Y1CFl8sLllXm4seK@google.com>
+ <Y1EHnFN2Goj2eLkE@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y1EHnFN2Goj2eLkE@google.com>
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221027222350.9irCKDtiGngTMCRhU15ztHhXyLzRZqFCvhknU8bE1w8@z>
+Message-ID: <20221027223115.PxmKPr2KSQTogsVN9UF5z9Yg8YjXcS2oNpefMSEMxuI@z>
 
-The stage-2 map walker has been made parallel-aware, and as such can be
-called while only holding the read side of the MMU lock. Rip out the
-conditional locking in user_mem_abort() and instead grab the read lock.
-Continue to take the write lock from other callsites to
-kvm_pgtable_stage2_map().
+On Thu, Oct 20, 2022 at 11:32:28AM +0300, Oliver Upton wrote:
+> On Wed, Oct 19, 2022 at 11:17:43PM +0000, Sean Christopherson wrote:
+> > On Fri, Oct 07, 2022, Oliver Upton wrote:
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/kvm_pgtable.h  |  3 ++-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c |  2 +-
- arch/arm64/kvm/hyp/pgtable.c          |  5 +++--
- arch/arm64/kvm/mmu.c                  | 31 ++++++---------------------
- 4 files changed, 13 insertions(+), 28 deletions(-)
+[...]
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 7634b6964779..a874ce0ce7b5 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -412,6 +412,7 @@ void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pg
-  * @prot:	Permissions and attributes for the mapping.
-  * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-  *		page-table pages.
-+ * @flags:	Flags to control the page-table walk (ex. a shared walk)
-  *
-  * The offset of @addr within a page is ignored, @size is rounded-up to
-  * the next page boundary and @phys is rounded-down to the previous page
-@@ -433,7 +434,7 @@ void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pg
-  */
- int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   u64 phys, enum kvm_pgtable_prot prot,
--			   void *mc);
-+			   void *mc, enum kvm_pgtable_walk_flags flags);
- 
- /**
-  * kvm_pgtable_stage2_set_owner() - Unmap and annotate pages in the IPA space to
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 735769886b55..f6d82bf33ce1 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -257,7 +257,7 @@ static inline int __host_stage2_idmap(u64 start, u64 end,
- 				      enum kvm_pgtable_prot prot)
- {
- 	return kvm_pgtable_stage2_map(&host_kvm.pgt, start, end - start, start,
--				      prot, &host_s2_pool);
-+				      prot, &host_s2_pool, 0);
- }
- 
- /*
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index d08e14008bfb..9ffe2e0bccb9 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -912,7 +912,7 @@ static int stage2_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 
- int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   u64 phys, enum kvm_pgtable_prot prot,
--			   void *mc)
-+			   void *mc, enum kvm_pgtable_walk_flags flags)
- {
- 	int ret;
- 	struct stage2_map_data map_data = {
-@@ -923,7 +923,8 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	};
- 	struct kvm_pgtable_walker walker = {
- 		.cb		= stage2_map_walker,
--		.flags		= KVM_PGTABLE_WALK_TABLE_PRE |
-+		.flags		= flags |
-+				  KVM_PGTABLE_WALK_TABLE_PRE |
- 				  KVM_PGTABLE_WALK_LEAF,
- 		.arg		= &map_data,
- 	};
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index a1a623c5b069..93f014a97abf 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -861,7 +861,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 
- 		write_lock(&kvm->mmu_lock);
- 		ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
--					     &cache);
-+					     &cache, 0);
- 		write_unlock(&kvm->mmu_lock);
- 		if (ret)
- 			break;
-@@ -1156,7 +1156,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	gfn_t gfn;
- 	kvm_pfn_t pfn;
- 	bool logging_active = memslot_is_logging(memslot);
--	bool use_read_lock = false;
- 	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
- 	unsigned long vma_pagesize, fault_granule;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-@@ -1191,8 +1190,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (logging_active) {
- 		force_pte = true;
- 		vma_shift = PAGE_SHIFT;
--		use_read_lock = (fault_status == FSC_PERM && write_fault &&
--				 fault_granule == PAGE_SIZE);
- 	} else {
- 		vma_shift = get_vma_page_shift(vma, hva);
- 	}
-@@ -1291,15 +1288,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (exec_fault && device)
- 		return -ENOEXEC;
- 
--	/*
--	 * To reduce MMU contentions and enhance concurrency during dirty
--	 * logging dirty logging, only acquire read lock for permission
--	 * relaxation.
--	 */
--	if (use_read_lock)
--		read_lock(&kvm->mmu_lock);
--	else
--		write_lock(&kvm->mmu_lock);
-+	read_lock(&kvm->mmu_lock);
- 	pgt = vcpu->arch.hw_mmu->pgt;
- 	if (mmu_invalidate_retry(kvm, mmu_seq))
- 		goto out_unlock;
-@@ -1343,15 +1332,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
- 	 * kvm_pgtable_stage2_map() should be called to change block size.
- 	 */
--	if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
-+	if (fault_status == FSC_PERM && vma_pagesize == fault_granule)
- 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
--	} else {
--		WARN_ONCE(use_read_lock, "Attempted stage-2 map outside of write lock\n");
--
-+	else
- 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
- 					     __pfn_to_phys(pfn), prot,
--					     memcache);
--	}
-+					     memcache, KVM_PGTABLE_WALK_SHARED);
- 
- 	/* Mark the page dirty only if the fault is handled successfully */
- 	if (writable && !ret) {
-@@ -1360,10 +1346,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	}
- 
- out_unlock:
--	if (use_read_lock)
--		read_unlock(&kvm->mmu_lock);
--	else
--		write_unlock(&kvm->mmu_lock);
-+	read_unlock(&kvm->mmu_lock);
- 	kvm_set_pfn_accessed(pfn);
- 	kvm_release_pfn_clean(pfn);
- 	return ret != -EAGAIN ? ret : 0;
-@@ -1569,7 +1552,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- 	 */
- 	kvm_pgtable_stage2_map(kvm->arch.mmu.pgt, range->start << PAGE_SHIFT,
- 			       PAGE_SIZE, __pfn_to_phys(pfn),
--			       KVM_PGTABLE_PROT_R, NULL);
-+			       KVM_PGTABLE_PROT_R, NULL, 0);
- 
- 	return false;
- }
--- 
-2.38.1.273.g43a17bfeac-goog
+> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > > index 02c33fccb178..6b6e1ed7ee2f 100644
+> > > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > > @@ -175,13 +175,14 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
+> > >  }
+> > >  
+> > >  static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
+> > > -			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pte_t *pgtable, u32 level);
+> > > +			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, u32 level);
+> > >  
+> > >  static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+> > >  				      struct kvm_pgtable_mm_ops *mm_ops,
+> > > -				      kvm_pte_t *ptep, u32 level)
+> > > +				      kvm_pteref_t pteref, u32 level)
+> > >  {
+> > >  	enum kvm_pgtable_walk_flags flags = data->walker->flags;
+> > > +	kvm_pte_t *ptep = kvm_dereference_pteref(pteref, false);
+> > >  	struct kvm_pgtable_visit_ctx ctx = {
+> > >  		.ptep	= ptep,
+> > >  		.old	= READ_ONCE(*ptep),
+> > 
+> > This is where you want the protection to kick in, e.g. 
+> > 
+> >   typedef kvm_pte_t __rcu *kvm_ptep_t;
+> > 
+> >   static inline kvm_pte_t kvm_read_pte(kvm_ptep_t ptep)
+> >   {
+> > 	return READ_ONCE(*rcu_dereference(ptep));
+> >   }
+> > 
+> > 		.old	= kvm_read_pte(ptep),
+> > 
+> > In other words, the pointer itself isn't that's protected, it's PTE that the
+> > pointer points at that's protected.
+> 
+> Right, but practically speaking it is the boundary at which we assert
+> that protection.
+> 
+> Anyhow, I'll look at abstracting the actual memory accesses in the
+> visitors without too much mess.
 
+Took this in a slightly different direction after playing with it for a
+while. Abstracting all PTE accesses adds a lot of churn to the series.
+Adding in an assertion before invoking a visitor callback (i.e. when the
+raw pointer is about to be used) provides a similar degree of assurance
+that we are indeed RCU-safe.
+
+--
+Thanks,
+Oliver
