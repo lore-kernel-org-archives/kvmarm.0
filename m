@@ -1,19 +1,19 @@
 Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9ED7B
-	for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 22:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E917B
+	for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 22:23:23 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1666909381;
+	t=1666909401;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dPwjtzII4NJsaEvVqD8Y9/lgXYuRXWzbtMwl7fUqLuk=;
-	b=MmIH5HmhCHwt0avZHfKtX9MTg15VVkAla2tpvP7S0CI479c/WbUOI2CqhuLONOtVOhxXqu
-	u1M9qg1NcOy20UUTF3wp440Nv6g2a7mE7H/NIVSvX0orN7cnKWLGLKxHu2wcwZBEvCBrwB
-	LpPh0FPxnD4oyHee0SxMqNKsi87qxQs=
+	bh=QDsaPTkBMVoCvpIbixNEzKkPpLmJ5PGsxu8t4GywA5c=;
+	b=wYHQqf+dD0czI4mBZkyslR+ThYtCpgPd3GvtdhSqUuA0toNUVFKlGxD7Dhk1on/QapVGoL
+	PiK+8XDZOuRvPQFfkmD1mkJKZPMyRgyU/PvUT0UQzqQYj3Ovy3pgx9F3txPwU3KIThN6yP
+	8AgDitEUCXh9tC9FoqFHQyfkX/rKmQ4=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	James Morse <james.morse@arm.com>,
@@ -32,9 +32,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Sean Christopherson <seanjc@google.com>,
 	kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 12/15] KVM: arm64: Make block->table PTE changes parallel-aware
-Date: Thu, 27 Oct 2022 22:22:47 +0000
-Message-ID: <20221027222247.1685023-1-oliver.upton@linux.dev>
+Subject: [PATCH v3 13/15] KVM: arm64: Make leaf->leaf PTE changes parallel-aware
+Date: Thu, 27 Oct 2022 22:23:11 +0000
+Message-ID: <20221027222311.1685097-1-oliver.upton@linux.dev>
 In-Reply-To: <20221027221752.1683510-1-oliver.upton@linux.dev>
 References: <20221027221752.1683510-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -45,156 +45,63 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221027222247.jDEzJfRhqj-Y0jJ3SJN6xcPDQd-UTH6KU3X7rtJ5wIs@z>
+Message-ID: <20221027222311.45vQ3uhEQBrex6BN1cBpNP2T7r3fjxcMTeGHXgL8cn4@z>
 
-In order to service stage-2 faults in parallel, stage-2 table walkers
-must take exclusive ownership of the PTE being worked on. An additional
-requirement of the architecture is that software must perform a
-'break-before-make' operation when changing the block size used for
-mapping memory.
-
-Roll these two concepts together into helpers for performing a
-'break-before-make' sequence. Use a special PTE value to indicate a PTE
-has been locked by a software walker. Additionally, use an atomic
-compare-exchange to 'break' the PTE when the stage-2 page tables are
-possibly shared with another software walker. Elide the DSB + TLBI if
-the evicted PTE was invalid (and thus not subject to break-before-make).
-
-All of the atomics do nothing for now, as the stage-2 walker isn't fully
-ready to perform parallel walks.
+Convert stage2_map_walker_try_leaf() to use the new break-before-make
+helpers, thereby making the handler parallel-aware. As before, avoid the
+break-before-make if recreating the existing mapping. Additionally,
+retry execution if another vCPU thread is modifying the same PTE.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 82 +++++++++++++++++++++++++++++++++---
- 1 file changed, 76 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 26 ++++++++++++--------------
+ 1 file changed, 12 insertions(+), 14 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 4c579b3beabf..1df858c21b2e 100644
+index 1df858c21b2e..581ba688c6f7 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -49,6 +49,12 @@
- #define KVM_INVALID_PTE_OWNER_MASK	GENMASK(9, 2)
- #define KVM_MAX_OWNER_ID		1
+@@ -804,18 +804,17 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+ 	else
+ 		new = kvm_init_invalid_leaf_owner(data->owner_id);
  
-+/*
-+ * Used to indicate a pte for which a 'break-before-make' sequence is in
-+ * progress.
-+ */
-+#define KVM_INVALID_PTE_LOCKED		BIT(10)
-+
- struct kvm_pgtable_walk_data {
- 	struct kvm_pgtable_walker	*walker;
- 
-@@ -674,6 +680,11 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
- 	return !!pte;
- }
- 
-+static bool stage2_pte_is_locked(kvm_pte_t pte)
-+{
-+	return !kvm_pte_valid(pte) && (pte & KVM_INVALID_PTE_LOCKED);
-+}
-+
- static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
- {
- 	if (!kvm_pgtable_walk_shared(ctx)) {
-@@ -684,6 +695,64 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
- 	return cmpxchg(ctx->ptep, ctx->old, new) == ctx->old;
- }
- 
-+/**
-+ * stage2_try_break_pte() - Invalidates a pte according to the
-+ *			    'break-before-make' requirements of the
-+ *			    architecture.
-+ *
-+ * @ctx: context of the visited pte.
-+ * @data: stage-2 map data
-+ *
-+ * Returns: true if the pte was successfully broken.
-+ *
-+ * If the removed pte was valid, performs the necessary serialization and TLB
-+ * invalidation for the old value. For counted ptes, drops the reference count
-+ * on the containing table page.
-+ */
-+static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
-+				 struct stage2_map_data *data)
-+{
-+	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-+
-+	if (stage2_pte_is_locked(ctx->old)) {
-+		/*
-+		 * Should never occur if this walker has exclusive access to the
-+		 * page tables.
-+		 */
-+		WARN_ON(!kvm_pgtable_walk_shared(ctx));
-+		return false;
-+	}
-+
-+	if (!stage2_try_set_pte(ctx, KVM_INVALID_PTE_LOCKED))
-+		return false;
-+
+-	if (stage2_pte_is_counted(ctx->old)) {
+-		/*
+-		 * Skip updating the PTE if we are trying to recreate the exact
+-		 * same mapping or only change the access permissions. Instead,
+-		 * the vCPU will exit one more time from guest if still needed
+-		 * and then go through the path of relaxing permissions.
+-		 */
+-		if (!stage2_pte_needs_update(ctx->old, new))
+-			return -EAGAIN;
 +	/*
-+	 * Perform the appropriate TLB invalidation based on the evicted pte
-+	 * value (if any).
++	 * Skip updating the PTE if we are trying to recreate the exact
++	 * same mapping or only change the access permissions. Instead,
++	 * the vCPU will exit one more time from guest if still needed
++	 * and then go through the path of relaxing permissions.
 +	 */
-+	if (kvm_pte_table(ctx->old, ctx->level))
-+		kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
-+	else if (kvm_pte_valid(ctx->old))
-+		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, data->mmu, ctx->addr, ctx->level);
-+
-+	if (stage2_pte_is_counted(ctx->old))
-+		mm_ops->put_page(ctx->ptep);
-+
-+	return true;
-+}
-+
-+static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
-+{
-+	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-+
-+	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
-+
-+	if (stage2_pte_is_counted(new))
-+		mm_ops->get_page(ctx->ptep);
-+
-+	smp_store_release(ctx->ptep, new);
-+}
-+
- static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
- 			   struct kvm_pgtable_mm_ops *mm_ops)
- {
-@@ -795,7 +864,7 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 				struct stage2_map_data *data)
- {
- 	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
--	kvm_pte_t *childp;
-+	kvm_pte_t *childp, new;
- 	int ret;
- 
- 	ret = stage2_map_walker_try_leaf(ctx, data);
-@@ -812,17 +881,18 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 	if (!childp)
- 		return -ENOMEM;
- 
-+	if (!stage2_try_break_pte(ctx, data)) {
-+		mm_ops->put_page(childp);
++	if (!stage2_pte_needs_update(ctx->old, new))
 +		return -EAGAIN;
-+	}
-+
- 	/*
- 	 * If we've run into an existing block mapping then replace it with
- 	 * a table. Accesses beyond 'end' that fall within the new table
- 	 * will be mapped lazily.
- 	 */
--	if (stage2_pte_is_counted(ctx->old))
--		stage2_put_pte(ctx, data->mmu, mm_ops);
--
- 	new = kvm_init_table_pte(childp, mm_ops);
--	mm_ops->get_page(ctx->ptep);
--	smp_store_release(ctx->ptep, new);
-+	stage2_make_pte(ctx, new);
  
+-		stage2_put_pte(ctx, data->mmu, mm_ops);
+-	}
++	if (!stage2_try_break_pte(ctx, data))
++		return -EAGAIN;
+ 
+ 	/* Perform CMOs before installation of the guest stage-2 PTE */
+ 	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
+@@ -825,9 +824,8 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+ 	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
+ 		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
+ 
+-	smp_store_release(ctx->ptep, new);
+-	if (stage2_pte_is_counted(new))
+-		mm_ops->get_page(ctx->ptep);
++	stage2_make_pte(ctx, new);
++
+ 	if (kvm_phys_is_valid(phys))
+ 		data->phys += granule;
  	return 0;
- }
 -- 
 2.38.1.273.g43a17bfeac-goog
 
