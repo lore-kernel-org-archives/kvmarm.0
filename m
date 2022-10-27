@@ -2,50 +2,49 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37DE8FA3740
-	for <kvmarm@archiver.kernel.org>; Thu, 27 Oct 2022 22:23:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46663ECAAA1
+	for <kvmarm@archiver.kernel.org>; Thu, 27 Oct 2022 22:23:46 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D75BB49EED;
-	Thu, 27 Oct 2022 18:23:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E253C4B090;
+	Thu, 27 Oct 2022 18:23:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nM7p6yldMgqF; Thu, 27 Oct 2022 18:23:24 -0400 (EDT)
+	with ESMTP id SdzL4AbSxbD0; Thu, 27 Oct 2022 18:23:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A45649F53;
-	Thu, 27 Oct 2022 18:23:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB47749F51;
+	Thu, 27 Oct 2022 18:23:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 836C649F38
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 18:23:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EB80E49F38
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 18:23:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 02mYhSUW4krX for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Oct 2022 18:23:22 -0400 (EDT)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 50DD249EED
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 18:23:22 -0400 (EDT)
+ with ESMTP id mqMqxqqXwLck for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Oct 2022 18:23:42 -0400 (EDT)
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C596D49EED
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 18:23:42 -0400 (EDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1666909401;
+ t=1666909422;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QDsaPTkBMVoCvpIbixNEzKkPpLmJ5PGsxu8t4GywA5c=;
- b=wYHQqf+dD0czI4mBZkyslR+ThYtCpgPd3GvtdhSqUuA0toNUVFKlGxD7Dhk1on/QapVGoL
- PiK+8XDZOuRvPQFfkmD1mkJKZPMyRgyU/PvUT0UQzqQYj3Ovy3pgx9F3txPwU3KIThN6yP
- 8AgDitEUCXh9tC9FoqFHQyfkX/rKmQ4=
+ bh=6/INBoJIrWD1fTlLMrgpkisXK+cYYTD0nB+IU7Yqcwo=;
+ b=c7Pk/QPIzo2WNEr/uGsdXwLSfoLveKQJ2rYJ3OqsdUBNOfw3t85I9HISfCwHhUuaI8aULF
+ YGtef+KtplozjDLh/wHjM50g4yU8Xib+y92A3kIrzrMxS7NLA41CM+Tv+NWEtwO/wh8ayW
+ 9E5/4VEElglHNl4oaOYEzPh5vrHwa3Q=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
  Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH v3 13/15] KVM: arm64: Make leaf->leaf PTE changes
- parallel-aware
-Date: Thu, 27 Oct 2022 22:23:11 +0000
-Message-Id: <20221027222311.1685097-1-oliver.upton@linux.dev>
+Subject: [PATCH v3 14/15] KVM: arm64: Make table->block changes parallel-aware
+Date: Thu, 27 Oct 2022 22:23:32 +0000
+Message-Id: <20221027222332.1685156-1-oliver.upton@linux.dev>
 In-Reply-To: <20221027221752.1683510-1-oliver.upton@linux.dev>
 References: <20221027221752.1683510-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -70,61 +69,48 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Convert stage2_map_walker_try_leaf() to use the new break-before-make
-helpers, thereby making the handler parallel-aware. As before, avoid the
-break-before-make if recreating the existing mapping. Additionally,
-retry execution if another vCPU thread is modifying the same PTE.
+stage2_map_walk_leaf() and friends now handle stage-2 PTEs generically,
+and perform the correct flush when a table PTE is removed. Additionally,
+they've been made parallel-aware, using an atomic break to take
+ownership of the PTE.
+
+Stop clearing the PTE in the pre-order callback and instead let
+stage2_map_walk_leaf() deal with it.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 26 ++++++++++++--------------
- 1 file changed, 12 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 15 +++------------
+ 1 file changed, 3 insertions(+), 12 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 1df858c21b2e..581ba688c6f7 100644
+index 581ba688c6f7..d08e14008bfb 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -804,18 +804,17 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 	else
- 		new = kvm_init_invalid_leaf_owner(data->owner_id);
+@@ -841,21 +841,12 @@ static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
+ 	if (!stage2_leaf_mapping_allowed(ctx, data))
+ 		return 0;
  
--	if (stage2_pte_is_counted(ctx->old)) {
--		/*
--		 * Skip updating the PTE if we are trying to recreate the exact
--		 * same mapping or only change the access permissions. Instead,
--		 * the vCPU will exit one more time from guest if still needed
--		 * and then go through the path of relaxing permissions.
--		 */
--		if (!stage2_pte_needs_update(ctx->old, new))
--			return -EAGAIN;
-+	/*
-+	 * Skip updating the PTE if we are trying to recreate the exact
-+	 * same mapping or only change the access permissions. Instead,
-+	 * the vCPU will exit one more time from guest if still needed
-+	 * and then go through the path of relaxing permissions.
-+	 */
-+	if (!stage2_pte_needs_update(ctx->old, new))
-+		return -EAGAIN;
+-	kvm_clear_pte(ctx->ptep);
+-
+-	/*
+-	 * Invalidate the whole stage-2, as we may have numerous leaf
+-	 * entries below us which would otherwise need invalidating
+-	 * individually.
+-	 */
+-	kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
+-
+ 	ret = stage2_map_walker_try_leaf(ctx, data);
++	if (ret)
++		return ret;
  
--		stage2_put_pte(ctx, data->mmu, mm_ops);
--	}
-+	if (!stage2_try_break_pte(ctx, data))
-+		return -EAGAIN;
+-	mm_ops->put_page(ctx->ptep);
+ 	mm_ops->free_removed_table(childp, ctx->level + 1);
+-
+-	return ret;
++	return 0;
+ }
  
- 	/* Perform CMOs before installation of the guest stage-2 PTE */
- 	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
-@@ -825,9 +824,8 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
- 		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
- 
--	smp_store_release(ctx->ptep, new);
--	if (stage2_pte_is_counted(new))
--		mm_ops->get_page(ctx->ptep);
-+	stage2_make_pte(ctx, new);
-+
- 	if (kvm_phys_is_valid(phys))
- 		data->phys += granule;
- 	return 0;
+ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
 -- 
 2.38.1.273.g43a17bfeac-goog
 
