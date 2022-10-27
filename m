@@ -1,184 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C426F10F5
-	for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 08:30:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67F71C433C1;
-	Thu, 27 Oct 2022 08:30:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1666859438;
-	bh=arMQtq9DbRVuqGtl0NKqOp+U/tqrQrVnDDLZrYh0Cdc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ExMd5+2nADS9V31yBA8t9CNi8RmWkDsuC+CV/tuxZiiM8olH8S4tchOJ32wzWCgy4
-	 VdIDGm0P59b8dyDUYpHIckn2tuC39Tp3TJ/CYXrmvK+MVnwo4KkVj9weWKSWSFsqz7
-	 JNWJJ3oxtEmgjctHYLFIjGhs8oA0X0wJpAbn73MedRNFddi/FV8kO/OMmXYNcERWhz
-	 Fp+n3oqfXQMhGlxyvAvlWvBfrluwuk+mDAg58k0/D1KZ2EDhOluvE1/S2/1nLg1BqG
-	 hJtJUuxMsGetcHqnuz6YXixLbVL2XcSn0/1p7tG0FzazNCTdTAWASUYOdyZSGHzp7G
-	 KTWAiJlIUDkxA==
-Received: from [104.132.45.106] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1onyHb-001w1G-V7;
-	Thu, 27 Oct 2022 09:30:36 +0100
-Date: Thu, 27 Oct 2022 09:29:58 +0100
-Message-ID: <877d0lhdo9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Gavin Shan <gshan@redhat.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79791186A
+	for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 09:16:40 +0000 (UTC)
+Received: by mail-pl1-f169.google.com with SMTP id g24so814534plq.3
+        for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 02:16:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=csie-ntu-edu-tw.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y0jwfzDPpiiIA6G13h9XyMG8TS+aWs3VsgaKFJG4r/Y=;
+        b=VdH5bBMbuaoLKAdZotjR+kRjpk0oZGv9hrkl9h8A1KXDH/zF2a2KjFmyUrMxaStb29
+         OyM0t531gOXJxVZxcFvVpf+ikh/UTgH8jszdO9mTAXfGLrTm5K83EJ01xVDx/dH+21OT
+         wPBqotTm8VEsHI+4Awayn7e/oFkQCmr6F8VVbfwvBEJnqxyz6fWjo5aJ3df/mEpFIlQI
+         DqdG6aC4WjX3SaEKNbjoEkK7BI7vOq1S4KrtFYB2XT0pZs3JndlEEPjv17XnDosPvHWc
+         VjY/MloT7ayanxfnaXkjo3bFpNcvKlSDIhSyOWgdfC3yluP02Ul6H15CxjCLHvklufr6
+         kb2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Y0jwfzDPpiiIA6G13h9XyMG8TS+aWs3VsgaKFJG4r/Y=;
+        b=vkOVTqociLBZLVtZb7KWACJO1cZsphlF4FFEVn4pijA7iVciWAP22FgZHSwBTU+d6E
+         7ArHlTLHevf0zLTE4hbbLqywwfMygBj1wmlFIiHcnWut493uH7PS71vC4rsGDAyWDn0p
+         J/eHs0X6eYThyYzIRNpwhJQMJx/Yu6YlmoG2vE2Epv85QtPBAVHrTQtFp2X1YN8pBTWk
+         9uMRlc8aQ9FnlEWOVhFBPWFEjskK0eMpTtBntI9wMaAhBhHSKf2RAADbQryq9NJK/oyH
+         s7XL2Zgy9lxBMu7P038+yjbjhwnsZ4Q0hfuyek84MvpdJKH8zR2WdW+Gvn0eg5Qpl1qe
+         wDPg==
+X-Gm-Message-State: ACrzQf0T+vjb8hsnwuF00egJPoWWxCRsKG+59rzX87mLbyKWLwGZfz5i
+	afEbUBZvXnYC167hTkFB22zAImm26QH2PS/IB2gxuBcLS+B/9Qdsyk/lLRlJ2+qG/pECY9/1Axl
+	QdmgHR39KQOD4FII25PyG6CZOibuM/CFJBSbtwa1wBvELfTj6f68vLwJTLzsuD0xBXSOd1vpR+O
+	nG289EvYRQ3r0GiZMV+97eSL7QqhhmAQ==
+X-Google-Smtp-Source: AMsMyM4aHQAm15VDE1/vKTcXNEmcnXBX2pjTWeY3+FHq6p29Ayj+aYLyA1TFLyvsRWVx1l2oc2LxaQ==
+X-Received: by 2002:a17:902:b90b:b0:186:8a4d:d4b7 with SMTP id bf11-20020a170902b90b00b001868a4dd4b7mr26808587plb.129.1666862199646;
+        Thu, 27 Oct 2022 02:16:39 -0700 (PDT)
+Received: from rhythm-ZenBook-UX425EA-UX425EA.csie.ntu.edu.tw (114-45-31-164.dynamic-ip.hinet.net. [114.45.31.164])
+        by smtp.gmail.com with ESMTPSA id b11-20020a1709027e0b00b00178650510f9sm721113plm.160.2022.10.27.02.16.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Oct 2022 02:16:39 -0700 (PDT)
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: maz@kernel.org
+Cc: james.morse@arm.com,
+	alexandru.elisei@arm.com,
+	suzuki.poulose@arm.com,
+	oliver.upton@linux.dev,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org,
-	peterx@redhat.com,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	bgardon@google.com,
-	shuah@kernel.org,
-	andrew.jones@linux.dev,
-	dmatlack@google.com,
-	pbonzini@redhat.com,
-	zhenyzha@redhat.com,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	alexandru.elisei@arm.com,
-	shan.gavin@gmail.com
-Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in conjunction with bitmap
-In-Reply-To: <Y1ghIKrAsRFwSFsO@google.com>
-References: <20221011061447.131531-1-gshan@redhat.com>
-	<20221011061447.131531-4-gshan@redhat.com>
-	<Y1Hdc/UVta3A5kHM@google.com>
-	<8635bhfvnh.wl-maz@kernel.org>
-	<Y1LDRkrzPeQXUHTR@google.com>
-	<87edv0gnb3.wl-maz@kernel.org>
-	<Y1ckxYst3tc0LCqb@google.com>
-	<Y1css8k0gtFkVwFQ@google.com>
-	<878rl4gxzx.wl-maz@kernel.org>
-	<Y1ghIKrAsRFwSFsO@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-kernel@vger.kernel.org,
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Subject: [PATCH] KVM: arm64: Update comment of create_hyp_mappings
+Date: Thu, 27 Oct 2022 17:15:23 +0800
+Message-Id: <20221027091523.139598-1-r09922117@csie.ntu.edu.tw>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 104.132.45.106
-X-SA-Exim-Rcpt-To: seanjc@google.com, oliver.upton@linux.dev, gshan@redhat.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, shan.gavin@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221027082958.UBpwhBdApE7LpFCLoCaGT1tN5377zNy8JInk-EeG8sY@z>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-On Tue, 25 Oct 2022 18:47:12 +0100,
-Sean Christopherson <seanjc@google.com> wrote:
-> 
-> On Tue, Oct 25, 2022, Marc Zyngier wrote:
-> > On Tue, 25 Oct 2022 01:24:19 +0100, Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > > That's why I asked if it's possible for KVM to require a dirty_bitmap when KVM
-> > > > might end up collecting dirty information without a vCPU.  KVM is still
-> > > > technically prescribing a solution to userspace, but only because there's only
-> > > > one solution.
-> > > 
-> > > I was trying to allude to something like this by flat-out requiring
-> > > ring + bitmap on arm64.
-> > 
-> > And I claim that this is wrong. It may suit a particular use case, but
-> > that's definitely not a universal truth.
-> 
-> Agreed, KVM should not unconditionally require a dirty bitmap for arm64.
-> 
-> > > Otherwise, we'd either need to:
-> > > 
-> > >  (1) Document the features that explicitly depend on ring + bitmap (i.e.
-> > >  GIC ITS, whatever else may come) such that userspace sets up the
-> > >  correct configuration based on what its using. The combined likelihood
-> > >  of both KVM and userspace getting this right seems low.
-> > 
-> > But what is there to get wrong? Absolutely nothing.
-> 
-> I strongly disagree.  On x86, we've had two bugs escape where KVM
-> attempted to mark a page dirty without an active vCPU.
-> 
->   2efd61a608b0 ("KVM: Warn if mark_page_dirty() is called without an active vCPU") 
->   42dcbe7d8bac ("KVM: x86: hyper-v: Avoid writing to TSC page without an active vCPU")
-> 
-> Call us incompetent, but I have zero confidence that KVM will never
-> unintentionally add a path that invokes mark_page_dirty_in_slot()
-> without a running vCPU.
+HYP_PAGE_OFFSET is removed since 4.8, and the method for generating Hyp
+VAs has evolved. Update the functional description of
+create_hyp_mappings accordingly.
 
-Well, maybe it is time that KVM acknowledges there is a purpose to
-dirtying memory outside of a vcpu context, and that if a write happens
-in a vcpu context, this vcpu must be explicitly passed down rather
-than obtained from kvm_get_running_vcpu(). Yes, this requires some
-heavy surgery.
+Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+---
+ arch/arm64/kvm/mmu.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-> By completely dropping the rule that KVM must have an active vCPU on
-> architectures that support ring+bitmap, those types of bugs will go
-> silently unnoticed, and will manifest as guest data corruption after
-> live migration.
-
-The elephant in the room is still userspace writing to its view of the
-guest memory for device emulation. Do they get it right? I doubt it.
-
-> And ideally such bugs would detected without relying on userspace to
-> enabling dirty logging, e.g. the Hyper-V bug lurked for quite some
-> time and was only found when mark_page_dirty_in_slot() started
-> WARNing.
-> 
-> I'm ok if arm64 wants to let userspace shoot itself in the foot with
-> the ITS, but I'm not ok dropping the protections in the common
-> mark_page_dirty_in_slot().
-> 
-> One somewhat gross idea would be to let architectures override the
-> "there must be a running vCPU" rule, e.g. arm64 could toggle a flag
-> in kvm->arch in its kvm_write_guest_lock() to note that an expected
-> write without a vCPU is in-progress:
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 8c5c69ba47a7..d1da8914f749 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3297,7 +3297,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->         struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
->  
->  #ifdef CONFIG_HAVE_KVM_DIRTY_RING
-> -       if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
-> +       if (!kvm_arch_allow_write_without_running_vcpu(kvm) && WARN_ON_ONCE(!vcpu))
-> +               return;
-> +
-> +       if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
->                 return;
->  #endif
->  
-> @@ -3305,10 +3308,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->                 unsigned long rel_gfn = gfn - memslot->base_gfn;
->                 u32 slot = (memslot->as_id << 16) | memslot->id;
->  
-> -               if (kvm->dirty_ring_size)
-> +               if (kvm->dirty_ring_size && vcpu)
->                         kvm_dirty_ring_push(&vcpu->dirty_ring,
->                                             slot, rel_gfn);
-> -               else
-> +               else if (memslot->dirty_bitmap)
->                         set_bit_le(rel_gfn, memslot->dirty_bitmap);
->         }
->  }
-
-I think this is equally wrong. Writes occur from both CPUs and devices
-*concurrently*, and I don't see why KVM should keep ignoring this
-pretty obvious fact.
-
-Yes, your patch papers over the problem, and it can probably work if
-the kvm->arch flag only gets set in the ITS saving code, which is
-already exclusive of vcpus running.
-
-But in the long run, with dirty bits being collected from the IOMMU
-page tables or directly from devices, we will need a way to reconcile
-the dirty tracking. The above doesn't quite cut it, unfortunately.
-
-	M.
-
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index c9a13e487..a9ae4a3f9 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -424,9 +424,10 @@ void kvm_unshare_hyp(void *from, void *to)
+  * @to:		The virtual kernel end address of the range (exclusive)
+  * @prot:	The protection to be applied to this range
+  *
+- * The same virtual address as the kernel virtual address is also used
+- * in Hyp-mode mapping (modulo HYP_PAGE_OFFSET) to the same underlying
+- * physical pages.
++ * The Hyp virtual address is generated by masking the kernel VA with
++ * va_mask then inserting tag_val for the higher bits starting from
++ * tag_lsb. See kvm_compute_layout() in va_layout.c for more info.
++ * Both Hyp VA and kernel VA ranges map to the same underlying physical pages.
+  */
+ int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
+ {
 -- 
-Without deviation from the norm, progress is not possible.
+2.34.1
+
