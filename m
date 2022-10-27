@@ -2,49 +2,50 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA05CFA3740
-	for <kvmarm@archiver.kernel.org>; Thu, 27 Oct 2022 22:22:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B4E7FA3740
+	for <kvmarm@archiver.kernel.org>; Thu, 27 Oct 2022 22:23:06 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78E5B49F49;
-	Thu, 27 Oct 2022 18:22:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB81249F3B;
+	Thu, 27 Oct 2022 18:23:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Jdf5Ycb64W9K; Thu, 27 Oct 2022 18:22:41 -0400 (EDT)
+	with ESMTP id MsOD+8ZCzMxM; Thu, 27 Oct 2022 18:23:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B35D49EED;
-	Thu, 27 Oct 2022 18:22:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6493A49F37;
+	Thu, 27 Oct 2022 18:23:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0549C40D02
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 18:22:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EEBFC43C96
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 18:23:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OM+WYEjRKBZd for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Oct 2022 18:22:39 -0400 (EDT)
+ with ESMTP id emBbVZyrh9+A for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Oct 2022 18:23:02 -0400 (EDT)
 Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2B9940066
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 18:22:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8819240D02
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 18:23:02 -0400 (EDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1666909358;
+ t=1666909381;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fv07B9i1+YnYnnabDDdWUk5E6BN0JFEG/6h0PzD15vQ=;
- b=tMw1pP0QtTdmPkp6mMcvy6R7/8otW3KLHVWyJ8b/RcFb7DnLBH1xO/+tzt2Mu7Q46RnIBw
- jVMLKgUMCdz/VgUvRPh4uoxX3XPaPVLFHu7wbYCi5RKaAe6MJtU2f2TzD3FR+kzle5fiXr
- zdmi1uezfUzFTyj5vYpErAx24dVeu1s=
+ bh=dPwjtzII4NJsaEvVqD8Y9/lgXYuRXWzbtMwl7fUqLuk=;
+ b=MmIH5HmhCHwt0avZHfKtX9MTg15VVkAla2tpvP7S0CI479c/WbUOI2CqhuLONOtVOhxXqu
+ u1M9qg1NcOy20UUTF3wp440Nv6g2a7mE7H/NIVSvX0orN7cnKWLGLKxHu2wcwZBEvCBrwB
+ LpPh0FPxnD4oyHee0SxMqNKsi87qxQs=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
  Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH v3 11/15] KVM: arm64: Split init and set for table PTE
-Date: Thu, 27 Oct 2022 22:22:28 +0000
-Message-Id: <20221027222228.1684967-1-oliver.upton@linux.dev>
+Subject: [PATCH v3 12/15] KVM: arm64: Make block->table PTE changes
+ parallel-aware
+Date: Thu, 27 Oct 2022 22:22:47 +0000
+Message-Id: <20221027222247.1685023-1-oliver.upton@linux.dev>
 In-Reply-To: <20221027221752.1683510-1-oliver.upton@linux.dev>
 References: <20221027221752.1683510-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -69,68 +70,151 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Create a helper to initialize a table and directly call
-smp_store_release() to install it (for now). Prepare for a subsequent
-change that generalizes PTE writes with a helper.
+In order to service stage-2 faults in parallel, stage-2 table walkers
+must take exclusive ownership of the PTE being worked on. An additional
+requirement of the architecture is that software must perform a
+'break-before-make' operation when changing the block size used for
+mapping memory.
+
+Roll these two concepts together into helpers for performing a
+'break-before-make' sequence. Use a special PTE value to indicate a PTE
+has been locked by a software walker. Additionally, use an atomic
+compare-exchange to 'break' the PTE when the stage-2 page tables are
+possibly shared with another software walker. Elide the DSB + TLBI if
+the evicted PTE was invalid (and thus not subject to break-before-make).
+
+All of the atomics do nothing for now, as the stage-2 walker isn't fully
+ready to perform parallel walks.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 82 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 76 insertions(+), 6 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 7c0dd58544b0..4c579b3beabf 100644
+index 4c579b3beabf..1df858c21b2e 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -136,16 +136,13 @@ static void kvm_clear_pte(kvm_pte_t *ptep)
- 	WRITE_ONCE(*ptep, 0);
+@@ -49,6 +49,12 @@
+ #define KVM_INVALID_PTE_OWNER_MASK	GENMASK(9, 2)
+ #define KVM_MAX_OWNER_ID		1
+ 
++/*
++ * Used to indicate a pte for which a 'break-before-make' sequence is in
++ * progress.
++ */
++#define KVM_INVALID_PTE_LOCKED		BIT(10)
++
+ struct kvm_pgtable_walk_data {
+ 	struct kvm_pgtable_walker	*walker;
+ 
+@@ -674,6 +680,11 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
+ 	return !!pte;
  }
  
--static void kvm_set_table_pte(kvm_pte_t *ptep, kvm_pte_t *childp,
--			      struct kvm_pgtable_mm_ops *mm_ops)
-+static kvm_pte_t kvm_init_table_pte(kvm_pte_t *childp, struct kvm_pgtable_mm_ops *mm_ops)
++static bool stage2_pte_is_locked(kvm_pte_t pte)
++{
++	return !kvm_pte_valid(pte) && (pte & KVM_INVALID_PTE_LOCKED);
++}
++
+ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
  {
--	kvm_pte_t old = *ptep, pte = kvm_phys_to_pte(mm_ops->virt_to_phys(childp));
-+	kvm_pte_t pte = kvm_phys_to_pte(mm_ops->virt_to_phys(childp));
- 
- 	pte |= FIELD_PREP(KVM_PTE_TYPE, KVM_PTE_TYPE_TABLE);
- 	pte |= KVM_PTE_VALID;
--
--	WARN_ON(kvm_pte_valid(old));
--	smp_store_release(ptep, pte);
-+	return pte;
+ 	if (!kvm_pgtable_walk_shared(ctx)) {
+@@ -684,6 +695,64 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
+ 	return cmpxchg(ctx->ptep, ctx->old, new) == ctx->old;
  }
  
- static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
-@@ -413,7 +410,7 @@ static bool hyp_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 			  enum kvm_pgtable_walk_flags visit)
++/**
++ * stage2_try_break_pte() - Invalidates a pte according to the
++ *			    'break-before-make' requirements of the
++ *			    architecture.
++ *
++ * @ctx: context of the visited pte.
++ * @data: stage-2 map data
++ *
++ * Returns: true if the pte was successfully broken.
++ *
++ * If the removed pte was valid, performs the necessary serialization and TLB
++ * invalidation for the old value. For counted ptes, drops the reference count
++ * on the containing table page.
++ */
++static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
++				 struct stage2_map_data *data)
++{
++	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
++
++	if (stage2_pte_is_locked(ctx->old)) {
++		/*
++		 * Should never occur if this walker has exclusive access to the
++		 * page tables.
++		 */
++		WARN_ON(!kvm_pgtable_walk_shared(ctx));
++		return false;
++	}
++
++	if (!stage2_try_set_pte(ctx, KVM_INVALID_PTE_LOCKED))
++		return false;
++
++	/*
++	 * Perform the appropriate TLB invalidation based on the evicted pte
++	 * value (if any).
++	 */
++	if (kvm_pte_table(ctx->old, ctx->level))
++		kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
++	else if (kvm_pte_valid(ctx->old))
++		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, data->mmu, ctx->addr, ctx->level);
++
++	if (stage2_pte_is_counted(ctx->old))
++		mm_ops->put_page(ctx->ptep);
++
++	return true;
++}
++
++static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
++{
++	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
++
++	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
++
++	if (stage2_pte_is_counted(new))
++		mm_ops->get_page(ctx->ptep);
++
++	smp_store_release(ctx->ptep, new);
++}
++
+ static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
+ 			   struct kvm_pgtable_mm_ops *mm_ops)
  {
+@@ -795,7 +864,7 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+ 				struct stage2_map_data *data)
+ {
+ 	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
 -	kvm_pte_t *childp;
 +	kvm_pte_t *childp, new;
- 	struct hyp_map_data *data = ctx->arg;
- 	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+ 	int ret;
  
-@@ -427,8 +424,10 @@ static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 	ret = stage2_map_walker_try_leaf(ctx, data);
+@@ -812,17 +881,18 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
  	if (!childp)
  		return -ENOMEM;
  
--	kvm_set_table_pte(ctx->ptep, childp, mm_ops);
-+	new = kvm_init_table_pte(childp, mm_ops);
- 	mm_ops->get_page(ctx->ptep);
-+	smp_store_release(ctx->ptep, new);
++	if (!stage2_try_break_pte(ctx, data)) {
++		mm_ops->put_page(childp);
++		return -EAGAIN;
++	}
 +
- 	return 0;
- }
- 
-@@ -821,8 +820,9 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 	if (stage2_pte_is_counted(ctx->old))
- 		stage2_put_pte(ctx, data->mmu, mm_ops);
- 
--	kvm_set_table_pte(ctx->ptep, childp, mm_ops);
-+	new = kvm_init_table_pte(childp, mm_ops);
- 	mm_ops->get_page(ctx->ptep);
-+	smp_store_release(ctx->ptep, new);
+ 	/*
+ 	 * If we've run into an existing block mapping then replace it with
+ 	 * a table. Accesses beyond 'end' that fall within the new table
+ 	 * will be mapped lazily.
+ 	 */
+-	if (stage2_pte_is_counted(ctx->old))
+-		stage2_put_pte(ctx, data->mmu, mm_ops);
+-
+ 	new = kvm_init_table_pte(childp, mm_ops);
+-	mm_ops->get_page(ctx->ptep);
+-	smp_store_release(ctx->ptep, new);
++	stage2_make_pte(ctx, new);
  
  	return 0;
  }
