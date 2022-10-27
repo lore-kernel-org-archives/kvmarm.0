@@ -2,87 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8464DFA373D
-	for <kvmarm@archiver.kernel.org>; Thu, 27 Oct 2022 07:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1114C38A2D
+	for <kvmarm@archiver.kernel.org>; Thu, 27 Oct 2022 08:30:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD9AF4079D;
-	Thu, 27 Oct 2022 03:38:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4221F40A84;
+	Thu, 27 Oct 2022 04:30:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered)
-	header.i=@ozlabs-ru.20210112.gappssmtp.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id knnhiAjSHhyl; Thu, 27 Oct 2022 03:38:32 -0400 (EDT)
+	with ESMTP id mk5P+vvEgiJZ; Thu, 27 Oct 2022 04:30:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 595C640AEB;
-	Thu, 27 Oct 2022 03:38:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8C8940AEB;
+	Thu, 27 Oct 2022 04:30:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 376234079D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 03:38:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B07F4089E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 04:30:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HqdeN6a1B1ZW for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Oct 2022 03:38:28 -0400 (EDT)
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com
- [209.85.216.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B377E4040B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 03:38:28 -0400 (EDT)
-Received: by mail-pj1-f51.google.com with SMTP id h14so749802pjv.4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 00:38:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :from:to:cc:subject:date:message-id:reply-to;
- bh=VKQSudBZvWki0+CLHG9r3IJk/dRwqSLfexPzsqrOL10=;
- b=x1Vidfs809+nxHcSntjvb/QuAdCG/z26RlTfItr4BZ9GE6g8GavghOayuC4MBT/FZB
- kT0kux16HUr9NO46eRsomZONq8pXnJ1jwrcuCz9YkE3UXxEttVvN4mLLBjIAVuOeXyGL
- QT4FGgxubG6/xLSAjLDBGs566fxEhoXOGphArVzf9Q1Rk9fBfBV3iz7OZX5TXob34wgq
- JrNW3q9mVdkUMnZNIu4+hptcIxzJ4/DY5YAN9coC9YrQQBsM6JjNRaoUMom6IjxOYGdG
- AXMkgiiwlFEB/PsR67CLg3fbtTfM+sUJhiYGsJik+BeQsyi6xwlii/IWNnYzzCstX0wt
- Yuag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=VKQSudBZvWki0+CLHG9r3IJk/dRwqSLfexPzsqrOL10=;
- b=PPNpo85CrH4n2HxFFiIR3yDgoteBnCLtIZ9yuS3+EZYjljGBP0NA/bfRUIhTvyASW+
- 5T3OL/6XPC6clPvmmu69uteSzinWXhKUQ7RzgJU3KZx52S/7Ttj2EOUzoIEKGt2mT968
- CP5e0QGY24xNCv07EWd5+gFgcJrQvF9gNi8Zbf7oSXBLu2DRcC5sG+5oVfjoZMNK0rQf
- Afc8ryHoFqsxjJqiHAlYs3IIhDJ/gIsAXYXdACTGBn+k7+l0NtA/OYutCCuUP1mddnlq
- l7UMGLVD1YBcP4+pcQPIKoZVTjPvICS3ajpp06Voi5DRPxmTW5DxTeP81Jjg5SUbZ7Sk
- d0EA==
-X-Gm-Message-State: ACrzQf3NIixxo4feS3Xuz2pXqalmNqPeVeHv5VOgcJlE909M/4YQo0OA
- 4I8YZrLqrGhn+Y6Y+UudBr9KEw==
-X-Google-Smtp-Source: AMsMyM6H1exe3qYH4Ks+/ZVGoyDVw8cDO6zYG/dyVO3aZTV3T/P8NAf+BoYHwqqdQxR4cjI0F5IXhg==
-X-Received: by 2002:a17:902:f641:b0:17f:3633:5439 with SMTP id
- m1-20020a170902f64100b0017f36335439mr48542732plg.94.1666856307429; 
- Thu, 27 Oct 2022 00:38:27 -0700 (PDT)
-Received: from [192.168.10.153]
- (ppp121-45-204-168.cbr-trn-nor-bras38.tpg.internode.on.net. [121.45.204.168])
- by smtp.gmail.com with ESMTPSA id
- y1-20020a17090264c100b00178ab008364sm548557pli.37.2022.10.27.00.38.18
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 27 Oct 2022 00:38:26 -0700 (PDT)
-Message-ID: <7a790aa8-c643-1098-4d28-bd3b10399fcd@ozlabs.ru>
-Date: Thu, 27 Oct 2022 18:38:12 +1100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:107.0) Gecko/20100101
- Thunderbird/107.0
-Subject: Re: [PATCH kernel v4] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support
- platform dependent
-Content-Language: en-US
-To: kvm@vger.kernel.org
-References: <20221003235722.2085145-1-aik@ozlabs.ru>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <20221003235722.2085145-1-aik@ozlabs.ru>
-Cc: kvm-ppc@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>,
- kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id n9C5yOL5PeNi for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Oct 2022 04:30:39 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2271401D7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 04:30:39 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 1769D6210B;
+ Thu, 27 Oct 2022 08:30:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67F71C433C1;
+ Thu, 27 Oct 2022 08:30:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1666859438;
+ bh=arMQtq9DbRVuqGtl0NKqOp+U/tqrQrVnDDLZrYh0Cdc=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=ExMd5+2nADS9V31yBA8t9CNi8RmWkDsuC+CV/tuxZiiM8olH8S4tchOJ32wzWCgy4
+ VdIDGm0P59b8dyDUYpHIckn2tuC39Tp3TJ/CYXrmvK+MVnwo4KkVj9weWKSWSFsqz7
+ JNWJJ3oxtEmgjctHYLFIjGhs8oA0X0wJpAbn73MedRNFddi/FV8kO/OMmXYNcERWhz
+ Fp+n3oqfXQMhGlxyvAvlWvBfrluwuk+mDAg58k0/D1KZ2EDhOluvE1/S2/1nLg1BqG
+ hJtJUuxMsGetcHqnuz6YXixLbVL2XcSn0/1p7tG0FzazNCTdTAWASUYOdyZSGHzp7G
+ KTWAiJlIUDkxA==
+Received: from [104.132.45.106] (helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1onyHb-001w1G-V7;
+ Thu, 27 Oct 2022 09:30:36 +0100
+Date: Thu, 27 Oct 2022 09:29:58 +0100
+Message-ID: <877d0lhdo9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
+ conjunction with bitmap
+In-Reply-To: <Y1ghIKrAsRFwSFsO@google.com>
+References: <20221011061447.131531-1-gshan@redhat.com>
+ <20221011061447.131531-4-gshan@redhat.com>
+ <Y1Hdc/UVta3A5kHM@google.com> <8635bhfvnh.wl-maz@kernel.org>
+ <Y1LDRkrzPeQXUHTR@google.com> <87edv0gnb3.wl-maz@kernel.org>
+ <Y1ckxYst3tc0LCqb@google.com> <Y1css8k0gtFkVwFQ@google.com>
+ <878rl4gxzx.wl-maz@kernel.org> <Y1ghIKrAsRFwSFsO@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 104.132.45.106
+X-SA-Exim-Rcpt-To: seanjc@google.com, oliver.upton@linux.dev, gshan@redhat.com,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com,
+ bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev,
+ dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
+ james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: shuah@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ andrew.jones@linux.dev, dmatlack@google.com, shan.gavin@gmail.com,
+ bgardon@google.com, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ zhenyzha@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,116 +92,122 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Paolo, ping?
+On Tue, 25 Oct 2022 18:47:12 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> On Tue, Oct 25, 2022, Marc Zyngier wrote:
+> > On Tue, 25 Oct 2022 01:24:19 +0100, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > > That's why I asked if it's possible for KVM to require a dirty_bitmap when KVM
+> > > > might end up collecting dirty information without a vCPU.  KVM is still
+> > > > technically prescribing a solution to userspace, but only because there's only
+> > > > one solution.
+> > > 
+> > > I was trying to allude to something like this by flat-out requiring
+> > > ring + bitmap on arm64.
+> > 
+> > And I claim that this is wrong. It may suit a particular use case, but
+> > that's definitely not a universal truth.
+> 
+> Agreed, KVM should not unconditionally require a dirty bitmap for arm64.
+> 
+> > > Otherwise, we'd either need to:
+> > > 
+> > >  (1) Document the features that explicitly depend on ring + bitmap (i.e.
+> > >  GIC ITS, whatever else may come) such that userspace sets up the
+> > >  correct configuration based on what its using. The combined likelihood
+> > >  of both KVM and userspace getting this right seems low.
+> > 
+> > But what is there to get wrong? Absolutely nothing.
+> 
+> I strongly disagree.  On x86, we've had two bugs escape where KVM
+> attempted to mark a page dirty without an active vCPU.
+> 
+>   2efd61a608b0 ("KVM: Warn if mark_page_dirty() is called without an active vCPU") 
+>   42dcbe7d8bac ("KVM: x86: hyper-v: Avoid writing to TSC page without an active vCPU")
+> 
+> Call us incompetent, but I have zero confidence that KVM will never
+> unintentionally add a path that invokes mark_page_dirty_in_slot()
+> without a running vCPU.
 
+Well, maybe it is time that KVM acknowledges there is a purpose to
+dirtying memory outside of a vcpu context, and that if a write happens
+in a vcpu context, this vcpu must be explicitly passed down rather
+than obtained from kvm_get_running_vcpu(). Yes, this requires some
+heavy surgery.
 
-On 04/10/2022 10:57, Alexey Kardashevskiy wrote:
-> When introduced, IRQFD resampling worked on POWER8 with XICS. However
-> KVM on POWER9 has never implemented it - the compatibility mode code
-> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
-> XIVE mode does not handle INTx in KVM at all.
+> By completely dropping the rule that KVM must have an active vCPU on
+> architectures that support ring+bitmap, those types of bugs will go
+> silently unnoticed, and will manifest as guest data corruption after
+> live migration.
+
+The elephant in the room is still userspace writing to its view of the
+guest memory for device emulation. Do they get it right? I doubt it.
+
+> And ideally such bugs would detected without relying on userspace to
+> enabling dirty logging, e.g. the Hyper-V bug lurked for quite some
+> time and was only found when mark_page_dirty_in_slot() started
+> WARNing.
 > 
-> This moved the capability support advertising to platforms and stops
-> advertising it on XIVE, i.e. POWER9 and later.
+> I'm ok if arm64 wants to let userspace shoot itself in the foot with
+> the ITS, but I'm not ok dropping the protections in the common
+> mark_page_dirty_in_slot().
 > 
-> This should cause no behavioural change for other architectures.
+> One somewhat gross idea would be to let architectures override the
+> "there must be a running vCPU" rule, e.g. arm64 could toggle a flag
+> in kvm->arch in its kvm_write_guest_lock() to note that an expected
+> write without a vCPU is in-progress:
 > 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Acked-by: Nicholas Piggin <npiggin@gmail.com>
-> Acked-by: Marc Zyngier <maz@kernel.org>
-> ---
-> Changes:
-> v4:
-> * removed incorrect clause about changing behavoir on MIPS and RISCV
-> 
-> v3:
-> * removed all ifdeferry
-> * removed the capability for MIPS and RISCV
-> * adjusted the commit log about MIPS and RISCV
-> 
-> v2:
-> * removed ifdef for ARM64.
-> ---
->   arch/arm64/kvm/arm.c       | 1 +
->   arch/powerpc/kvm/powerpc.c | 6 ++++++
->   arch/s390/kvm/kvm-s390.c   | 1 +
->   arch/x86/kvm/x86.c         | 1 +
->   virt/kvm/kvm_main.c        | 1 -
->   5 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 2ff0ef62abad..d2daa4d375b5 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -218,6 +218,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_VCPU_ATTRIBUTES:
->   	case KVM_CAP_PTP_KVM:
->   	case KVM_CAP_ARM_SYSTEM_SUSPEND:
-> +	case KVM_CAP_IRQFD_RESAMPLE:
->   		r = 1;
->   		break;
->   	case KVM_CAP_SET_GUEST_DEBUG2:
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index fb1490761c87..908ce8bd91c9 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -593,6 +593,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   		break;
->   #endif
->   
-> +#ifdef CONFIG_HAVE_KVM_IRQFD
-> +	case KVM_CAP_IRQFD_RESAMPLE:
-> +		r = !xive_enabled();
-> +		break;
-> +#endif
-> +
->   	case KVM_CAP_PPC_ALLOC_HTAB:
->   		r = hv_enabled;
->   		break;
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index edfd4bbd0cba..7521adadb81b 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -577,6 +577,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_SET_GUEST_DEBUG:
->   	case KVM_CAP_S390_DIAG318:
->   	case KVM_CAP_S390_MEM_OP_EXTENSION:
-> +	case KVM_CAP_IRQFD_RESAMPLE:
->   		r = 1;
->   		break;
->   	case KVM_CAP_SET_GUEST_DEBUG2:
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 43a6a7efc6ec..2d6c5a8fdf14 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4395,6 +4395,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_VAPIC:
->   	case KVM_CAP_ENABLE_CAP:
->   	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
-> +	case KVM_CAP_IRQFD_RESAMPLE:
->   		r = 1;
->   		break;
->   	case KVM_CAP_EXIT_HYPERCALL:
 > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 584a5bab3af3..05cf94013f02 100644
+> index 8c5c69ba47a7..d1da8914f749 100644
 > --- a/virt/kvm/kvm_main.c
 > +++ b/virt/kvm/kvm_main.c
-> @@ -4447,7 +4447,6 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
->   #endif
->   #ifdef CONFIG_HAVE_KVM_IRQFD
->   	case KVM_CAP_IRQFD:
-> -	case KVM_CAP_IRQFD_RESAMPLE:
->   #endif
->   	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
->   	case KVM_CAP_CHECK_EXTENSION_VM:
+> @@ -3297,7 +3297,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>         struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+>  
+>  #ifdef CONFIG_HAVE_KVM_DIRTY_RING
+> -       if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
+> +       if (!kvm_arch_allow_write_without_running_vcpu(kvm) && WARN_ON_ONCE(!vcpu))
+> +               return;
+> +
+> +       if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
+>                 return;
+>  #endif
+>  
+> @@ -3305,10 +3308,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>                 unsigned long rel_gfn = gfn - memslot->base_gfn;
+>                 u32 slot = (memslot->as_id << 16) | memslot->id;
+>  
+> -               if (kvm->dirty_ring_size)
+> +               if (kvm->dirty_ring_size && vcpu)
+>                         kvm_dirty_ring_push(&vcpu->dirty_ring,
+>                                             slot, rel_gfn);
+> -               else
+> +               else if (memslot->dirty_bitmap)
+>                         set_bit_le(rel_gfn, memslot->dirty_bitmap);
+>         }
+>  }
+
+I think this is equally wrong. Writes occur from both CPUs and devices
+*concurrently*, and I don't see why KVM should keep ignoring this
+pretty obvious fact.
+
+Yes, your patch papers over the problem, and it can probably work if
+the kvm->arch flag only gets set in the ITS saving code, which is
+already exclusive of vcpus running.
+
+But in the long run, with dirty bits being collected from the IOMMU
+page tables or directly from devices, we will need a way to reconcile
+the dirty tracking. The above doesn't quite cut it, unfortunately.
+
+	M.
 
 -- 
-Alexey
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
