@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F83C23A3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B33023A6
 	for <kvmarm@lists.linux.dev>; Fri, 28 Oct 2022 10:54:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7140BC433D6;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A677DC433B5;
 	Fri, 28 Oct 2022 10:54:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1666954453;
-	bh=LDpHOoUTLZOBS0Pn/x1kE1SGXF+8M+SGG+sMaN5hl2Y=;
+	bh=7DPVNhiI7e1H2rXRI4KKeHqneAlTPa1uIRZNpUo176c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=d4EWI+TQq5fmgULaW+sIXpNP+PF4oQ4f/wMoSPvZOhsck9f8lgPDq/mzxGfU4RByN
-	 MIBzH3C8hwubTEoWYPkNt0tr3EsvCIlppVrP2T3GCz4z1I/UN/B8svKqZXXfJDt8VT
-	 jHR9AhSSIRrm1XwzoCR9f+oezqa05LO4GdrZ+FgPYtRsLZ3hDxmGZQG8+zonoWlkKB
-	 1ZU9MPxsKW8cQ5tvhRw8wIPJ70UxoNku/YTlt/9PMMv7a59g15I/ZwYBYQEE59Mjd0
-	 veM9z8PZD+MXZ8oZsMs/1GFoGMaIUzAVh7BB06rXCiC1p2Vu08A5OB/LlWz4tcQEze
-	 muZ+bG/ZkRMYQ==
+	b=ivqN/aB4M4kUeKoCDMc4kKFkBQTiwBz4KwIVSP1PMmsWPNT+qZVzI3c2PvrKMq8BO
+	 2xJkf22rNGyEHUThKvAje/jpx0pSSkk500ujY5ksdtdHjULaN+8x4rQEzUpsmfmyAz
+	 PJuM8Gp/kKh65La6p9WobZEEw+oSXEQ4hAAtexmjLilfd9FDzo6DgmCiHHg63MjgGk
+	 81fGefXMDJsQnGPZ5/FQfmQpAaf62gif5NoJh9NtpZBUfuVpQfNSgj6KC/HZKwjOMJ
+	 yhdi1VBFqx9S6gSkl510+vbOCMpccsud+PIR2AOcjUXx9s9YQgIAEkgum3TMNE5QUG
+	 iM8XKjzMrxxVA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ooN07-002E4C-E3;
+	id 1ooN07-002E4C-Tx;
 	Fri, 28 Oct 2022 11:54:11 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
@@ -32,9 +32,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Ricardo Koller <ricarkol@google.com>,
 	Reiji Watanabe <reijiw@google.com>
-Subject: [PATCH v2 01/14] arm64: Add ID_DFR0_EL1.PerfMon values for PMUv3p7 and IMP_DEF
-Date: Fri, 28 Oct 2022 11:53:49 +0100
-Message-ID: <20221028105402.2030192-2-maz@kernel.org>
+Subject: [PATCH v2 03/14] KVM: arm64: PMU: Always advertise the CHAIN event
+Date: Fri, 28 Oct 2022 11:53:51 +0100
+Message-ID: <20221028105402.2030192-4-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221028105402.2030192-1-maz@kernel.org>
 References: <20221028105402.2030192-1-maz@kernel.org>
@@ -49,28 +49,32 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221028105349.-SQJNqUUZMxOZN2jdWyJs61q_M4bgWc2oOVq2ql8aTk@z>
+Message-ID: <20221028105351.g2kSQ3qJVdT2gF4sfnWtgiGqOt60IIqrwVhm1q0me98@z>
 
-Align the ID_DFR0_EL1.PerfMon values with ID_AA64DFR0_EL1.PMUver.
+Even when the underlying HW doesn't offer the CHAIN event
+(which happens with QEMU), we can always support it as we're
+in control of the counter overflow.
+
+Always advertise the event via PMCEID0_EL0.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 2 ++
+ arch/arm64/kvm/pmu-emul.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 7d301700d1a9..84f59ce1dc6d 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -698,6 +698,8 @@
- #define ID_DFR0_PERFMON_8_1		0x4
- #define ID_DFR0_PERFMON_8_4		0x5
- #define ID_DFR0_PERFMON_8_5		0x6
-+#define ID_DFR0_PERFMON_8_7		0x7
-+#define ID_DFR0_PERFMON_IMP_DEF		0xf
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index a38b3127f649..e63ed0c71a37 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -703,6 +703,8 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
  
- #define ID_ISAR4_SWP_FRAC_SHIFT		28
- #define ID_ISAR4_PSR_M_SHIFT		24
+ 	if (!pmceid1) {
+ 		val = read_sysreg(pmceid0_el0);
++		/* always support CHAIN */
++		val |= BIT(ARMV8_PMUV3_PERFCTR_CHAIN);
+ 		base = 0;
+ 	} else {
+ 		val = read_sysreg(pmceid1_el0);
 -- 
 2.34.1
 
