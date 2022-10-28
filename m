@@ -2,53 +2,61 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BFE7FA373D
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Oct 2022 00:36:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3340CECAAA1
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Oct 2022 02:19:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BC8E405C1;
-	Thu, 27 Oct 2022 20:36:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A84E349673;
+	Thu, 27 Oct 2022 22:19:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id B2bAgHQ-w1Q0; Thu, 27 Oct 2022 20:36:54 -0400 (EDT)
+	with ESMTP id 9bSFpETG4G9x; Thu, 27 Oct 2022 22:19:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE6BD40FD3;
-	Thu, 27 Oct 2022 20:36:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 298EA41021;
+	Thu, 27 Oct 2022 22:19:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0773340755
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 20:36:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ACCD340DE6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 22:19:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7u0AYKvB+udj for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Oct 2022 20:36:51 -0400 (EDT)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E0F0405C1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 20:36:51 -0400 (EDT)
-Date: Fri, 28 Oct 2022 00:36:47 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1666917409;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=bmRIVhsrDv0rvlbSQbr/B1PSKAuul63UicKwKG0IWiw=;
- b=ePtwZ+ZnerVj+HcsfIEObf4tGKamDGYH/lW5eWzlL7bNuzeV9l+rG3OiKqdUJpwNi2xKer
- 9gCOxzGTSEL4UR/VnCTG8+kIimrGWU/dUjyfMZoqXfMFypRT8HD7AMJwPMOouy8DXpyQOI
- FbuVfCQdUbmxgZ9qOItyBLg5MtrBTmY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [REPOST][URGENT] kvmarm mailing list migration
-Message-ID: <Y1skH3k6SIV0hEMZ@google.com>
-References: <86edvbg3q7.wl-maz@kernel.org>
+ with ESMTP id B94+xNJVH+bG for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Oct 2022 22:18:59 -0400 (EDT)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E1C074018F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 22:18:58 -0400 (EDT)
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.57])
+ by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Mz5jq1J5qzpWFv;
+ Fri, 28 Oct 2022 10:15:27 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (7.193.23.208) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 28 Oct 2022 10:18:54 +0800
+Received: from [10.174.185.179] (10.174.185.179) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 28 Oct 2022 10:18:53 +0800
+Subject: Re: [PATCH V2] arm64/mm: Fix __enable_mmu() for new TGRAN range values
+To: Anders Roxell <anders.roxell@linaro.org>
+References: <1615355590-21102-1-git-send-email-anshuman.khandual@arm.com>
+ <20220826120020.GB520@mutt>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <84e674ab-3eee-3f2b-28c1-a08ff99d6d3b@huawei.com>
+Date: Fri, 28 Oct 2022 10:18:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <86edvbg3q7.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
-Cc: kvmarm <kvmarm@lists.cs.columbia.edu>
+In-Reply-To: <20220826120020.GB520@mutt>
+Content-Language: en-US
+X-Originating-IP: [10.174.185.179]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
+X-CFilter-Loop: Reflected
+Cc: linux-efi@vger.kernel.org, arnd@arndb.de,
+ Anshuman Khandual <anshuman.khandual@arm.com>, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -60,47 +68,63 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Oct 13, 2022 at 04:09:20PM +0100, Marc Zyngier wrote:
-> [Reposting this, as it has been almost two weeks since the initial
->  announcement and we're still at sub-10% of the users having
->  subscribed to the new list]
->  
-> Hi all,
+On 2022/8/26 20:00, Anders Roxell wrote:
+> On 2021-03-10 11:23, Anshuman Khandual wrote:
+>> From: James Morse <james.morse@arm.com>
+>>
+>> As per ARM ARM DDI 0487G.a, when FEAT_LPA2 is implemented, ID_AA64MMFR0_EL1
+>> might contain a range of values to describe supported translation granules
+>> (4K and 16K pages sizes in particular) instead of just enabled or disabled
+>> values. This changes __enable_mmu() function to handle complete acceptable
+>> range of values (depending on whether the field is signed or unsigned) now
+>> represented with ID_AA64MMFR0_TGRAN_SUPPORTED_[MIN..MAX] pair. While here,
+>> also fix similar situations in EFI stub and KVM as well.
+>>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will@kernel.org>
+>> Cc: Marc Zyngier <maz@kernel.org>
+>> Cc: James Morse <james.morse@arm.com>
+>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Cc: Ard Biesheuvel <ardb@kernel.org>
+>> Cc: Mark Rutland <mark.rutland@arm.com>
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> Cc: kvmarm@lists.cs.columbia.edu
+>> Cc: linux-efi@vger.kernel.org
+>> Cc: linux-kernel@vger.kernel.org
+>> Acked-by: Marc Zyngier <maz@kernel.org>
+>> Signed-off-by: James Morse <james.morse@arm.com>
+>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 > 
-> As you probably all know, the kvmarm mailing has been hosted on
-> Columbia's machines for as long as the project existed (over 13
-> years). After all this time, the university has decided to retire the
-> list infrastructure and asked us to find a new hosting.
+> Hi,
 > 
-> A new mailing list has been created on lists.linux.dev[1], and I'm
-> kindly asking everyone interested in following the KVM/arm64
-> developments to start subscribing to it (and start posting your
-> patches there). I hope that people will move over to it quickly enough
-> that we can soon give Columbia the green light to turn their systems
-> off.
+> When building an arm64 defconfig kernel from stable/linux-5.10.y and
+> booting that in QEMU (version: 1:7.0+dfsg-2~bpo11+2) with '-cpu max' the
+> kernel doesn't boot. I don't get any output.  The kernel boots fine if I
+> change to '-cpu cortex-a72'.
 > 
-> Note that the new list will only get archived automatically once we
-> fully switch over, but I'll make sure we fill any gap and not lose any
-> message. In the meantime, please Cc both lists.
+> If I cherry-pick this patch to stable/linux-5.10.y I'm able too boot the
+> kernel with '-cpu max'.
 
-Just wanted to explicitly highlight this point... can folks please
-continue to Cc the old list until we migrate to the new one?
-lore.kernel.org archives *only* contain mail sent to the columbia.edu
-address right now.
+You can workaround the kernel boot failure by specifying
+'-cpu max,lpa2=off' [*] in the QEMU command line.
 
-Fortunately, the series I'm aware of that didn't do this still hit
-another archived list so I could find it with a bit more digging.
+> However, I'm not comfortable to backport this patch to older kernels
+> since there are a lot of conflicts.
+> Can someone help out to do the packport?
 
-Marc -- any idea when we're going to finally switch to the new world?
+Upstream commit 26f55386f964 ("arm64/mm: Fix __enable_mmu() for new
+TGRAN range values") can still be applied cleanly on top of
+linux-5.10.y. I can send it to <stable@vger.kernel.org> if maintainers
+are okay with the stable-5.10 backport.
 
---
-Thanks,
-Oliver
+[*] https://gitlab.com/qemu-project/qemu/-/commit/69b2265d5fe8
+
+Zenghui
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
