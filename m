@@ -1,33 +1,38 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D161E804
-	for <kvmarm@lists.linux.dev>; Thu, 27 Oct 2022 23:39:20 +0000 (UTC)
-Date: Thu, 27 Oct 2022 23:39:11 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0F4161
+	for <kvmarm@lists.linux.dev>; Fri, 28 Oct 2022 00:17:46 +0000 (UTC)
+Date: Fri, 28 Oct 2022 00:17:40 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1666913955;
+	t=1666916264;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4OySq2lPcnWk1ygNMJS74tXjIlAzlxm25q99ZcmBZWU=;
-	b=W3q6w/rApxamTznGicrMweNO9AfF9b5YCfMEQ8dW9ZKNbgTLdS6e5WLmzyJ0xNMkFGK6dq
-	zXuAmu3YIUEGo/sQjDh04PD+4MuFq1FHB+ywX+0cWOGRBI15m3mbOfYy2Tc2QrFxSIaUDE
-	iFeo2388RPrwJarIpvJq5DFkVZ+4Zyg=
+	bh=8Y4lxu0Rs341PBPmflTbdmhLFMGIleK8lMVPgSwPa5I=;
+	b=Dv4ZmSswg2fxYyklKNOE8N6gBdhz8PIqYek8qHQjHl4JZ35+tOZnJKbcd5bpwcfh+743oQ
+	viiOHwj9hsV99SByAesVJX3USOny2iiyiQUUq9K3WblCHOLOTGY4KJ4dTcn6moydy4yspb
+	FKzvcs7+M8kNU81nIhKhp43o+BTxTpg=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	David Matlack <dmatlack@google.com>,
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	James Morse <james.morse@arm.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
 	Quentin Perret <qperret@google.com>,
-	Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
-	Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
-	Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 00/15] KVM: arm64: Parallel stage-2 fault handling
-Message-ID: <Y1sWnyHvMWP/DhHm@google.com>
-References: <20221027221752.1683510-1-oliver.upton@linux.dev>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
+	Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v5 02/25] KVM: arm64: Allow attaching of non-coalescable
+ pages to a hyp pool
+Message-ID: <Y1sfpM3IjNvr8ckf@google.com>
+References: <20221020133827.5541-1-will@kernel.org>
+ <20221020133827.5541-3-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -36,32 +41,67 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221027221752.1683510-1-oliver.upton@linux.dev>
+In-Reply-To: <20221020133827.5541-3-will@kernel.org>
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221027233911.5uiUhreWmHqIJQq0QYiVyCs3gOztPMV0dTZL1Xc1oZM@z>
 
-On Thu, Oct 27, 2022 at 10:17:37PM +0000, Oliver Upton wrote:
-> Presently KVM only takes a read lock for stage 2 faults if it believes
-> the fault can be fixed by relaxing permissions on a PTE (write unprotect
-> for dirty logging). Otherwise, stage 2 faults grab the write lock, which
-> predictably can pile up all the vCPUs in a sufficiently large VM.
+On Thu, Oct 20, 2022 at 02:38:04PM +0100, Will Deacon wrote:
+> From: Quentin Perret <qperret@google.com>
 > 
-> Like the TDP MMU for x86, this series loosens the locking around
-> manipulations of the stage 2 page tables to allow parallel faults. RCU
-> and atomics are exploited to safely build/destroy the stage 2 page
-> tables in light of multiple software observers.
+> All the contiguous pages used to initialize a 'struct hyp_pool' are
+> considered coalescable, which means that the hyp page allocator will
+> actively try to merge them with their buddies on the hyp_put_page() path.
+> However, using hyp_put_page() on a page that is not part of the inital
+> memory range given to a hyp_pool() is currently unsupported.
 > 
-> Patches 1-4 clean up the context associated with a page table walk / PTE
-> visit. This is helpful for:
->  - Extending the context passed through for a visit
->  - Building page table walkers that operate outside of a kvm_pgtable
->    context (e.g. RCU callback)
+> In order to allow dynamically extending hyp pools at run-time, add a
+> check to __hyp_attach_page() to allow inserting 'external' pages into
+> the free-list of order 0. This will be necessary to allow lazy donation
+> of pages from the host to the hypervisor when allocating guest stage-2
+> page-table pages at EL2.
 
-As is always the case, I failed to update the changelogs when twiddling
-things around a bit more.
+Is it ever going to be the case that we wind up mixing static and
+dynamic memory within the same buddy allocator? Reading ahead a bit it
+would seem pKVM uses separate allocators (i.e. pkvm_hyp_vm::pool for
+donated memory) but just wanted to make sure.
 
-Specifically, 8/15 and 14/15 don't directly match the diffs anymore. I
-wont respin (yet) to avoid bombarding mailboxes.
+I suppose what I'm getting at is the fact that the pool range makes
+little sense in this case. Adding a field to hyp_pool describing the
+type of pool that it is would make this more readable, such that we know
+a pool contains only donated memory, and thus zero order pages should
+never be coalesced.
+
+> Tested-by: Vincent Donnefort <vdonnefort@google.com>
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/page_alloc.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+> index 1ded09fc9b10..0d15227aced8 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+> @@ -93,11 +93,15 @@ static inline struct hyp_page *node_to_page(struct list_head *node)
+>  static void __hyp_attach_page(struct hyp_pool *pool,
+>  			      struct hyp_page *p)
+>  {
+> +	phys_addr_t phys = hyp_page_to_phys(p);
+>  	unsigned short order = p->order;
+>  	struct hyp_page *buddy;
+>  
+>  	memset(hyp_page_to_virt(p), 0, PAGE_SIZE << p->order);
+>  
+> +	if (phys < pool->range_start || phys >= pool->range_end)
+> +		goto insert;
+> +
+
+Assuming this is kept as-is...
+
+This check reads really odd to me, but I understand how it applies to
+the use case here. Perhaps create a helper (to be shared with
+__find_buddy_nocheck()) and add a nice comment atop it describing the
+significance of pages that exist outside the boundaries of the buddy
+allocator.
 
 --
 Thanks,
