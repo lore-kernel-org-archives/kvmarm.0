@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FCD23A3
-	for <kvmarm@lists.linux.dev>; Fri, 28 Oct 2022 10:53:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BD32C433D6;
-	Fri, 28 Oct 2022 10:53:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C152F23A5
+	for <kvmarm@lists.linux.dev>; Fri, 28 Oct 2022 10:54:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76899C433D7;
+	Fri, 28 Oct 2022 10:54:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1666954429;
+	s=k20201202; t=1666954453;
 	bh=53rg7TIHwfEpfmUyy4QvY3u8DYtBH+msqMaPikufBpw=;
 	h=From:To:Cc:Subject:Date:From;
-	b=sJlNGceAnd9VE8KgnvPrUjB2fMiOOPV5+2NAfECtDZ1o8LaK2WQ/92R97MTVjb+Jh
-	 zvqG552MgKXqNDsnMwCNsDBDJ5Hw+B2OWjPTfxhbTORM+GXP7WdgEodV/OrdG+mL02
-	 2vubFo8qO30ye7ofAYghVjyXmgIwTwttaYg/339ZoxL64Hei34MV4+/vlZ8HuN03G6
-	 UX3vBHWgE7ZdzfDVT09G/yv8dFiI7cI78Vj75m1gZTETX5sphtf4fQjtSGkgmKrcuV
-	 U0Iex6/dgv/RrQlTcpmKzPEN+i15o+GKCMv+eYFyz43MPMpdGSPpaUPpx5d0D95hYK
-	 N+pOCWFg5rQqQ==
+	b=MYnhzRWw+88bwMn7p7hDfdxREMqAMJh7O+b9w1PlZDlalpvipLbQ06ANdzGcFDs+0
+	 xYmvMA52ihOxMoJ0asktxWm+gQrfy/lUKp3kjEHgB0VdmbyPK08X7nRrMHtYcgaqch
+	 DPWJWe2Qizl9ptTwGGOjOGea+meYi8hD+EavXSYgOLuQcIIbX8YX7ujpMrUiQfXtzJ
+	 8a8QTgVTCuJWdALsK3TjhNDNH8gXOrLHF2hbHh589q2bkFAS6Pm1Hv01RFZ14xNcqe
+	 NYFfV9vG7iyz8OQ6MorqIe5RYf3dpiGYMfPyELt37e8kCevroSOzO6Z1zgS+xfJcvq
+	 a1LtqaAHf9yKg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ooMzi-002E3J-PG;
-	Fri, 28 Oct 2022 11:53:46 +0100
+	id 1ooN07-002E4C-7T;
+	Fri, 28 Oct 2022 11:54:11 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	<kvmarm@lists.cs.columbia.edu>,
@@ -33,8 +33,8 @@ Cc: James Morse <james.morse@arm.com>,
 	Ricardo Koller <ricarkol@google.com>,
 	Reiji Watanabe <reijiw@google.com>
 Subject: [PATCH v2 00/14] KVM: arm64: PMU: Fixing chained events, and PMUv3p5 support
-Date: Fri, 28 Oct 2022 11:53:22 +0100
-Message-ID: <20221028105322.2030167-1-maz@kernel.org>
+Date: Fri, 28 Oct 2022 11:53:48 +0100
+Message-ID: <20221028105402.2030192-1-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -47,7 +47,7 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221028105322.DBSitEXiuSnAP81VzBp31ZRPO-r1kqMQX_zMIslNImM@z>
+Message-ID: <20221028105348.B6irB9p2VWJG_BP5OdT7t39Z5aqegTzZcEo4IyoJJo4@z>
 
 Ricardo reported[0] that our PMU emulation was busted when it comes to
 chained events, as we cannot expose the overflow on a 32bit boundary
