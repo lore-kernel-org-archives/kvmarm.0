@@ -2,57 +2,53 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3FC5ECAAA1
-	for <kvmarm@archiver.kernel.org>; Thu, 27 Oct 2022 23:39:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BFE7FA373D
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Oct 2022 00:36:55 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FFEF49ED7;
-	Thu, 27 Oct 2022 19:39:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BC8E405C1;
+	Thu, 27 Oct 2022 20:36:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LBOLmrc2n2gm; Thu, 27 Oct 2022 19:39:19 -0400 (EDT)
+	with ESMTP id B2bAgHQ-w1Q0; Thu, 27 Oct 2022 20:36:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EAE849673;
-	Thu, 27 Oct 2022 19:39:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE6BD40FD3;
+	Thu, 27 Oct 2022 20:36:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A4A8413E2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 19:39:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0773340755
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 20:36:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GArpmlF548cm for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Oct 2022 19:39:17 -0400 (EDT)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2EF4A404CD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 19:39:17 -0400 (EDT)
-Date: Thu, 27 Oct 2022 23:39:11 +0000
+ with ESMTP id 7u0AYKvB+udj for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Oct 2022 20:36:51 -0400 (EDT)
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E0F0405C1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Oct 2022 20:36:51 -0400 (EDT)
+Date: Fri, 28 Oct 2022 00:36:47 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1666913955;
+ t=1666917409;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=4OySq2lPcnWk1ygNMJS74tXjIlAzlxm25q99ZcmBZWU=;
- b=W3q6w/rApxamTznGicrMweNO9AfF9b5YCfMEQ8dW9ZKNbgTLdS6e5WLmzyJ0xNMkFGK6dq
- zXuAmu3YIUEGo/sQjDh04PD+4MuFq1FHB+ywX+0cWOGRBI15m3mbOfYy2Tc2QrFxSIaUDE
- iFeo2388RPrwJarIpvJq5DFkVZ+4Zyg=
+ bh=bmRIVhsrDv0rvlbSQbr/B1PSKAuul63UicKwKG0IWiw=;
+ b=ePtwZ+ZnerVj+HcsfIEObf4tGKamDGYH/lW5eWzlL7bNuzeV9l+rG3OiKqdUJpwNi2xKer
+ 9gCOxzGTSEL4UR/VnCTG8+kIimrGWU/dUjyfMZoqXfMFypRT8HD7AMJwPMOouy8DXpyQOI
+ FbuVfCQdUbmxgZ9qOItyBLg5MtrBTmY=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v3 00/15] KVM: arm64: Parallel stage-2 fault handling
-Message-ID: <Y1sWnyHvMWP/DhHm@google.com>
-References: <20221027221752.1683510-1-oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [REPOST][URGENT] kvmarm mailing list migration
+Message-ID: <Y1skH3k6SIV0hEMZ@google.com>
+References: <86edvbg3q7.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20221027221752.1683510-1-oliver.upton@linux.dev>
+In-Reply-To: <86edvbg3q7.wl-maz@kernel.org>
 X-Migadu-Flow: FLOW_OUT
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Ben Gardon <bgardon@google.com>, David Matlack <dmatlack@google.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,28 +65,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Oct 27, 2022 at 10:17:37PM +0000, Oliver Upton wrote:
-> Presently KVM only takes a read lock for stage 2 faults if it believes
-> the fault can be fixed by relaxing permissions on a PTE (write unprotect
-> for dirty logging). Otherwise, stage 2 faults grab the write lock, which
-> predictably can pile up all the vCPUs in a sufficiently large VM.
+On Thu, Oct 13, 2022 at 04:09:20PM +0100, Marc Zyngier wrote:
+> [Reposting this, as it has been almost two weeks since the initial
+>  announcement and we're still at sub-10% of the users having
+>  subscribed to the new list]
+>  
+> Hi all,
 > 
-> Like the TDP MMU for x86, this series loosens the locking around
-> manipulations of the stage 2 page tables to allow parallel faults. RCU
-> and atomics are exploited to safely build/destroy the stage 2 page
-> tables in light of multiple software observers.
+> As you probably all know, the kvmarm mailing has been hosted on
+> Columbia's machines for as long as the project existed (over 13
+> years). After all this time, the university has decided to retire the
+> list infrastructure and asked us to find a new hosting.
 > 
-> Patches 1-4 clean up the context associated with a page table walk / PTE
-> visit. This is helpful for:
->  - Extending the context passed through for a visit
->  - Building page table walkers that operate outside of a kvm_pgtable
->    context (e.g. RCU callback)
+> A new mailing list has been created on lists.linux.dev[1], and I'm
+> kindly asking everyone interested in following the KVM/arm64
+> developments to start subscribing to it (and start posting your
+> patches there). I hope that people will move over to it quickly enough
+> that we can soon give Columbia the green light to turn their systems
+> off.
+> 
+> Note that the new list will only get archived automatically once we
+> fully switch over, but I'll make sure we fill any gap and not lose any
+> message. In the meantime, please Cc both lists.
 
-As is always the case, I failed to update the changelogs when twiddling
-things around a bit more.
+Just wanted to explicitly highlight this point... can folks please
+continue to Cc the old list until we migrate to the new one?
+lore.kernel.org archives *only* contain mail sent to the columbia.edu
+address right now.
 
-Specifically, 8/15 and 14/15 don't directly match the diffs anymore. I
-wont respin (yet) to avoid bombarding mailboxes.
+Fortunately, the series I'm aware of that didn't do this still hit
+another archived list so I could find it with a bit more digging.
+
+Marc -- any idea when we're going to finally switch to the new world?
 
 --
 Thanks,
