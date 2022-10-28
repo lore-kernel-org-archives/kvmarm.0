@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC4A0ECAAA1
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Oct 2022 11:16:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24481C38A02
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Oct 2022 11:16:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B31148A48;
-	Fri, 28 Oct 2022 07:16:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B352740E06;
+	Fri, 28 Oct 2022 07:16:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZBnedacBIcKl; Fri, 28 Oct 2022 07:16:39 -0400 (EDT)
+	with ESMTP id ifqsPaLlnAlf; Fri, 28 Oct 2022 07:16:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 593C149EC4;
-	Fri, 28 Oct 2022 07:16:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76B334B090;
+	Fri, 28 Oct 2022 07:16:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A0404403FD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 07:16:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 085D8403FD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 07:16:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EgL96bFLI0LI for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id a8CF+176TRKd for <kvmarm@lists.cs.columbia.edu>;
  Fri, 28 Oct 2022 07:16:37 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B95BD40E06
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 07:16:36 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 29FF44A105
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 07:16:37 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 3D787B82988;
- Fri, 28 Oct 2022 11:16:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF9ECC433D6;
- Fri, 28 Oct 2022 11:16:33 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id A4D89627BC;
+ Fri, 28 Oct 2022 11:16:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1475DC43143;
+ Fri, 28 Oct 2022 11:16:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1666955793;
- bh=pMK0VXNhD7ycsvN+xi1LZVqmI2jIAvm0ksqg3FfwXh0=;
+ s=k20201202; t=1666955796;
+ bh=D60MFyLpEw78+sOWRo2TJ29+lIqz4GhgxHE8JUK81VY=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=p3o+gJ/Sr4Fz08PNNXvuVxHSV3rWn5kspn3dBz3HNX6dCoOmIxs1QgHz3tMYbc6f7
- rDz9kkIxhQCBNuHPenfV2dSyciHSD40dn2fHKeyyyMrLS6mZkbaAxYpbxVzu32hHXI
- oj52p06rTWsYpbO+tTeUi4/5x8XiXV0VGYB07ppVHYjCRq1XQZg0cHioQvSvjGdruO
- qJBZP20CsSsTyJiyGZ9K/CwrlFjWvNyfSn474FbM/DwuUqfzMA+CVqXVTWmoq4v3cT
- LI683DvHnlNR2Mbe1/g6Vzo+NtJzGz0H/HuCfTWHY54pwgkhoxIIDE1YWakG3E+qUV
- l89mealSXP7iA==
+ b=kZf2AQm6n9v8xz3e37qa/cp6qNuBFgZSLeH20bvw1o5CC8HbJQ4ZbAE0km0ktuKKG
+ dr2CwblhcTC6ak7+T0/25GXzw1+oSvwD5Hd3W7aXwlnNwLbAoQsrwpVpWhOvnqHzAY
+ Bhge71dzPqrTOeEPV2jU408ATrKjH3u5gpd10/QnuTN80PrDo2NQ8wJcPEcS9nXh5/
+ lxeq2+Z51/qne7ZczQoEcx9rr2sFx7A60hG8dSmXB99RUzxY2AlwDrf5ggkFaVDG2q
+ Ve/R+7iFURqXB3DqFDr42pwok8jfw19f21HL7Nf2i/aK4FnEoVhlxbsaU1eABYsA+H
+ vYZ6KkQDazNFA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1ooN0A-002E4C-CL;
- Fri, 28 Oct 2022 11:54:14 +0100
+ (envelope-from <maz@kernel.org>) id 1ooN09-002E4C-Hh;
+ Fri, 28 Oct 2022 11:54:13 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, <kvmarm@lists.cs.columbia.edu>,
  <kvmarm@lists.linux.dev>, kvm@vger.kernel.org
-Subject: [PATCH v2 13/14] KVM: arm64: PMU: Implement PMUv3p5 long counter
- support
-Date: Fri, 28 Oct 2022 11:54:01 +0100
-Message-Id: <20221028105402.2030192-14-maz@kernel.org>
+Subject: [PATCH v2 10/14] KVM: arm64: PMU: Move the ID_AA64DFR0_EL1.PMUver
+ limit to VM creation
+Date: Fri, 28 Oct 2022 11:53:58 +0100
+Message-Id: <20221028105402.2030192-11-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221028105402.2030192-1-maz@kernel.org>
 References: <20221028105402.2030192-1-maz@kernel.org>
@@ -84,95 +84,157 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-PMUv3p5 (which is mandatory with ARMv8.5) comes with some extra
-features:
+As further patches will enable the selection of a PMU revision
+from userspace, sample the supported PMU revision at VM creation
+time, rather than building each time the ID_AA64DFR0_EL1 register
+is accessed.
 
-- All counters are 64bit
-
-- The overflow point is controlled by the PMCR_EL0.LP bit
-
-Add the required checks in the helpers that control counter
-width and overflow, as well as the sysreg handling for the LP
-bit. A new kvm_pmu_is_3p5() helper makes it easy to spot the
-PMUv3p5 specific handling.
+This shouldn't result in any change in behaviour.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/pmu-emul.c | 8 +++++---
- arch/arm64/kvm/sys_regs.c | 4 ++++
- include/kvm/arm_pmu.h     | 7 +++++++
- 3 files changed, 16 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/kvm/arm.c              |  6 +++++
+ arch/arm64/kvm/pmu-emul.c         | 11 +++++++++
+ arch/arm64/kvm/sys_regs.c         | 41 +++++++++++++++++++++++++------
+ include/kvm/arm_pmu.h             |  6 +++++
+ 5 files changed, 57 insertions(+), 8 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 45e2136322ba..90c9a2dd3f26 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -163,6 +163,7 @@ struct kvm_arch {
+ 
+ 	u8 pfr0_csv2;
+ 	u8 pfr0_csv3;
++	u8 dfr0_pmuver;
+ 
+ 	/* Hypercall features firmware registers' descriptor */
+ 	struct kvm_smccc_features smccc_feat;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 94d33e296e10..6b3ed524630d 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -164,6 +164,12 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	set_default_spectre(kvm);
+ 	kvm_arm_init_hypercalls(kvm);
+ 
++	/*
++	 * Initialise the default PMUver before there is a chance to
++	 * create an actual PMU.
++	 */
++	kvm->arch.dfr0_pmuver = kvm_arm_pmu_get_pmuver_limit();
++
+ 	return ret;
+ out_free_stage2_pgd:
+ 	kvm_free_stage2_pgd(&kvm->arch.mmu);
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index f126b45aa6c6..dc163e1a1fcf 100644
+index 87585c12ca41..f126b45aa6c6 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -52,13 +52,15 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
-  */
- static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
- {
--	return (select_idx == ARMV8_PMU_CYCLE_IDX);
-+	return (select_idx == ARMV8_PMU_CYCLE_IDX || kvm_pmu_is_3p5(vcpu));
- }
+@@ -1049,3 +1049,14 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
  
- static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 select_idx)
- {
--	return (select_idx == ARMV8_PMU_CYCLE_IDX &&
--		__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
-+	u64 val = __vcpu_sys_reg(vcpu, PMCR_EL0);
+ 	return -ENXIO;
+ }
 +
-+	return (select_idx < ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LP)) ||
-+	       (select_idx == ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LC));
- }
- 
- static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
++u8 kvm_arm_pmu_get_pmuver_limit(void)
++{
++	u64 tmp;
++
++	tmp = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
++	tmp = cpuid_feature_cap_perfmon_field(tmp,
++					      ID_AA64DFR0_EL1_PMUVer_SHIFT,
++					      ID_AA64DFR0_EL1_PMUVer_V3P4);
++	return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), tmp);
++}
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 603d2b43e8ce..8f4412cd4bf6 100644
+index f4a7c5abcbca..7a4cd644b9c0 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -654,6 +654,8 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	       | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
- 	if (!kvm_supports_32bit_el0())
- 		val |= ARMV8_PMU_PMCR_LC;
-+	if (!kvm_pmu_is_3p5(vcpu))
-+		val &= ~ARMV8_PMU_PMCR_LP;
- 	__vcpu_sys_reg(vcpu, r->reg) = val;
+@@ -1062,6 +1062,32 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
-@@ -703,6 +705,8 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 		val |= p->regval & ARMV8_PMU_PMCR_MASK;
- 		if (!kvm_supports_32bit_el0())
- 			val |= ARMV8_PMU_PMCR_LC;
-+		if (!kvm_pmu_is_3p5(vcpu))
-+			val &= ~ARMV8_PMU_PMCR_LP;
- 		__vcpu_sys_reg(vcpu, PMCR_EL0) = val;
- 		kvm_pmu_handle_pmcr(vcpu, val);
- 		kvm_vcpu_pmu_restore_guest(vcpu);
++static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
++{
++	if (kvm_vcpu_has_pmu(vcpu))
++		return vcpu->kvm->arch.dfr0_pmuver;
++
++	/* Special case for IMPDEF PMUs that KVM has exposed in the past... */
++	if (vcpu->kvm->arch.dfr0_pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
++		return ID_AA64DFR0_EL1_PMUVer_IMP_DEF;
++
++	/* The real "no PMU" */
++	return 0;
++}
++
++static u8 pmuver_to_perfmon(u8 pmuver)
++{
++	switch (pmuver) {
++	case ID_AA64DFR0_EL1_PMUVer_IMP:
++		return ID_DFR0_PERFMON_8_0;
++	case ID_AA64DFR0_EL1_PMUVer_IMP_DEF:
++		return ID_DFR0_PERFMON_IMP_DEF;
++	default:
++		/* Anything ARMv8.1+ has the same value. For now. */
++		return pmuver;
++	}
++}
++
+ /* Read a sanitised cpufeature ID register by sys_reg_desc */
+ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r)
+ {
+@@ -1111,18 +1137,17 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
+ 		/* Limit debug to ARMv8.0 */
+ 		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer);
+ 		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_DebugVer), 6);
+-		/* Limit guests to PMUv3 for ARMv8.4 */
+-		val = cpuid_feature_cap_perfmon_field(val,
+-						      ID_AA64DFR0_EL1_PMUVer_SHIFT,
+-						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_EL1_PMUVer_V3P4 : 0);
++		/* Set PMUver to the required version */
++		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
++		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
++				  vcpu_pmuver(vcpu));
+ 		/* Hide SPE from guests */
+ 		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMSVer);
+ 		break;
+ 	case SYS_ID_DFR0_EL1:
+-		/* Limit guests to PMUv3 for ARMv8.4 */
+-		val = cpuid_feature_cap_perfmon_field(val,
+-						      ID_DFR0_PERFMON_SHIFT,
+-						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
++		val &= ~ARM64_FEATURE_MASK(ID_DFR0_PERFMON);
++		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_PERFMON),
++				  pmuver_to_perfmon(vcpu_pmuver(vcpu)));
+ 		break;
+ 	}
+ 
 diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 812f729c9108..3d526df9f3c5 100644
+index 96b192139a23..812f729c9108 100644
 --- a/include/kvm/arm_pmu.h
 +++ b/include/kvm/arm_pmu.h
-@@ -89,6 +89,12 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+@@ -89,6 +89,8 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
  			vcpu->arch.pmu.events = *kvm_get_pmu_events();	\
  	} while (0)
  
-+/*
-+ * Evaluates as true when emulating PMUv3p5, and false otherwise.
-+ */
-+#define kvm_pmu_is_3p5(vcpu)						\
-+	(vcpu->kvm->arch.dfr0_pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P5)
++u8 kvm_arm_pmu_get_pmuver_limit(void);
 +
- u8 kvm_arm_pmu_get_pmuver_limit(void);
- 
  #else
-@@ -153,6 +159,7 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
- }
- 
- #define kvm_vcpu_has_pmu(vcpu)		({ false; })
-+#define kvm_pmu_is_3p5(vcpu)		({ false; })
+ struct kvm_pmu {
+ };
+@@ -154,6 +156,10 @@ static inline u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
  static inline void kvm_pmu_update_vcpu_events(struct kvm_vcpu *vcpu) {}
  static inline void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu) {}
  static inline void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu) {}
++static inline u8 kvm_arm_pmu_get_pmuver_limit(void)
++{
++	return 0;
++}
+ 
+ #endif
+ 
 -- 
 2.34.1
 
