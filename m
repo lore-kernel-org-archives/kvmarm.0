@@ -2,53 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39551C38A02
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Oct 2022 12:54:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E7F0ECAAA1
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Oct 2022 15:02:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A795E40431;
-	Fri, 28 Oct 2022 08:54:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7B0E43482;
+	Fri, 28 Oct 2022 11:01:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZmeCfjxVHekc; Fri, 28 Oct 2022 08:54:24 -0400 (EDT)
+	with ESMTP id xw9THHlL0Z15; Fri, 28 Oct 2022 11:01:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DB3F4141A;
-	Fri, 28 Oct 2022 08:54:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DB514B17C;
+	Fri, 28 Oct 2022 11:01:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 55CCA405C1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 08:54:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A0AB343482
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 11:01:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V1EmBCoc9MVL for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Oct 2022 08:54:21 -0400 (EDT)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE1BD40431
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 08:54:21 -0400 (EDT)
-Date: Fri, 28 Oct 2022 14:54:19 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1666961660;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=faBEUID8ecAxojrzIEDsR5vvjyAZdIaTRru7O3n6MSA=;
- b=HzQId8h+ivqZDyADgQ+r39KPBFNZme6jQ4lv3E/pippXUK9I/6TnboHl9U/bux6+UPHkDM
- K4YpxCCM/vvqXNZvl++r0upMO4ITfbA18qUZlMKBXK1Rleiymof6s7YZdvuKhhPknLselO
- O2Q8QINKo8V4n8hprlLlht7ma1NUeoI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] MAINTAINERS: new kvmarm mailing list
-Message-ID: <20221028125419.6cfeokgtm7ycifpt@kamzik>
-References: <20221025160730.40846-1-cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20221025160730.40846-1-cohuck@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+ with ESMTP id Kn1ZQlPC0ifb for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Oct 2022 11:01:56 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 22E7249F49
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 11:01:55 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 99B77B82AAC;
+ Fri, 28 Oct 2022 15:01:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A096C433C1;
+ Fri, 28 Oct 2022 15:01:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1666969313;
+ bh=YaZbsK17VEpH/0bAn+2G6cMJok1jwgGYoXMA7VpLhmI=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=OsMhVx7s09F436HGkTdccNW4fWIEvWRk/5s4c/jUnZamgJwBZRtUWKaDB8MFcdNea
+ 5s1+fh4Sl1NeTFoGeDd+o7acoRKKELFfEzVfljU1jUtltrXpUBljV8ub07ngYQJ8i9
+ gRP9zob9sgSa99SuGWPFiLe6S5Qu11qOShCnWEfX9o+smpCS0KhHSCdq4DEu6FVQaB
+ MLNb1LXTI9ibxIo0tYgw6sxWitIc9ksZ/43Z0xi/NfYu28v/ly5Ui+bTWp69Wvpfnx
+ EHm+S+Vtd8qCZpZeLP9gsmASLV1uzKLHYpyUBsmTvB/OL5TRavXjMHGFT5c72lSsah
+ ta/5eUeqvKVfw==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1ooQrn-002I5N-2c;
+ Fri, 28 Oct 2022 16:01:51 +0100
+Date: Fri, 28 Oct 2022 16:01:50 +0100
+Message-ID: <86fsf8dmap.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andrew Jones <andrew.jones@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v4 0/4] arm: pmu: Fixes for bare metal
+In-Reply-To: <20221028114041.5symayccvdgkqaor@kamzik>
+References: <20220811185210.234711-1-ricarkol@google.com>
+ <20221028114041.5symayccvdgkqaor@kamzik>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: andrew.jones@linux.dev, ricarkol@google.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alexandru.elisei@arm.com,
+ eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,37 +86,68 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Oct 25, 2022 at 06:07:30PM +0200, Cornelia Huck wrote:
-> KVM/arm64 development is moving to a new mailing list (see
-> https://lore.kernel.org/all/20221001091245.3900668-1-maz@kernel.org/);
-> kvm-unit-tests should advertise the new list as well.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  MAINTAINERS | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 90ead214a75d..649de509a511 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -67,7 +67,8 @@ ARM
->  M: Andrew Jones <andrew.jones@linux.dev>
->  S: Supported
->  L: kvm@vger.kernel.org
-> -L: kvmarm@lists.cs.columbia.edu
-> +L: kvmarm@lists.linux.dev
-> +L: kvmarm@lists.cs.columbia.edu (deprecated)
->  F: arm/
->  F: lib/arm/
->  F: lib/arm64/
-> -- 
-> 2.37.3
->
+Hi Drew,
 
-Pushed, thanks!
+On Fri, 28 Oct 2022 12:40:41 +0100,
+Andrew Jones <andrew.jones@linux.dev> wrote:
+> 
+> On Thu, Aug 11, 2022 at 11:52:06AM -0700, Ricardo Koller wrote:
+> > There are some tests that fail when running on bare metal (including a
+> > passthrough prototype).  There are three issues with the tests.  The
+> > first one is that there are some missing isb()'s between enabling event
+> > counting and the actual counting. This wasn't an issue on KVM as
+> > trapping on registers served as context synchronization events. The
+> > second issue is that some tests assume that registers reset to 0.  And
+> > finally, the third issue is that overflowing the low counter of a
+> > chained event sets the overflow flag in PMVOS and some tests fail by
+> > checking for it not being set.
+> > 
+> > Addressed all comments from the previous version:
+> > https://lore.kernel.org/kvmarm/YvPsBKGbHHQP+0oS@google.com/T/#mb077998e2eb9fb3e15930b3412fd7ba2fb4103ca
+> > - add pmu_reset() for 32-bit arm [Andrew]
+> > - collect r-b from Alexandru
+> > 
+> > Thanks!
+> > Ricardo
+> > 
+> > Ricardo Koller (4):
+> >   arm: pmu: Add missing isb()'s after sys register writing
+> >   arm: pmu: Add reset_pmu() for 32-bit arm
+> >   arm: pmu: Reset the pmu registers before starting some tests
+> >   arm: pmu: Check for overflow in the low counter in chained counters
+> >     tests
+> > 
+> >  arm/pmu.c | 72 ++++++++++++++++++++++++++++++++++++++++++-------------
+> >  1 file changed, 55 insertions(+), 17 deletions(-)
+> >
+> 
+> Hi all,
+> 
+> Please refresh my memory. Does this series work on current platforms? Or
+> was it introducing new test failures which may be in the test, as opposed
+> to KVM? If they work on most platforms, but not on every platform, then
+> have we identified what triggers them to fail and whether that should be
+> fixed or just worked-around? I'm sorry I still can't help out with the
+> testing as I haven't yet had time to setup the Rpi that Mark Rutland gave
+> me in Dublin.
 
-drew
+This series does show that KVM is buggy, and I have patches out to fix
+it [1]. The patches should work on anything, really.
+
+> I know this series has been rotting on arm/queue for months, so I'll be
+> happy to merge it if the consensus is to do so. I can also drop it, or
+> some of the patches, if that's the consensus.
+
+I'd be very happy to see these patches being merged.
+
+Thanks,
+
+	M.
+
+[1] https://lore.kernel.org/r/20221028105402.2030192-1-maz@kernel.org
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
