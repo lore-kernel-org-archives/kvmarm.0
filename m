@@ -2,58 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F09F7ECAAA1
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Oct 2022 09:19:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95E0AC38A02
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Oct 2022 09:57:13 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AD8B40BFA;
-	Fri, 28 Oct 2022 05:19:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00E4240E00;
+	Fri, 28 Oct 2022 05:57:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BySsE+cXv4Sw; Fri, 28 Oct 2022 05:19:30 -0400 (EDT)
+	with ESMTP id jBSIBBqmFJBT; Fri, 28 Oct 2022 05:57:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ABCD40D02;
-	Fri, 28 Oct 2022 05:19:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E374640D02;
+	Fri, 28 Oct 2022 05:57:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 835C740BFA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 05:19:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7873940298
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 05:57:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id a30yMySeh8lQ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Oct 2022 05:19:27 -0400 (EDT)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A14040B75
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 05:19:27 -0400 (EDT)
-Date: Fri, 28 Oct 2022 09:19:15 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1666948765;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=1neScYfEnwSJ+NX5bJKyCKTwiZXUeEpGO+gHaDwAPPk=;
- b=sDxLyh93SB9mcl5De1HP2Yk7RB6c4UYvrsf9ar0vcv4D9NFlPce7E2c8C0Pq1i88TJMWAb
- VoJ3p+UmF98/Hw19Lvnxu0TZHvr5IbooniT3GN3MJVbZqPzF9p0TXucQMVY7o1LHTLewWO
- hc1CT6/5k7yPcxG+xZ/JjPpYYE2iZEE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v3 08/15] KVM: arm64: Protect stage-2 traversal with RCU
-Message-ID: <Y1uek8RygHO+cXCF@google.com>
-References: <20221027221752.1683510-1-oliver.upton@linux.dev>
- <20221027221752.1683510-9-oliver.upton@linux.dev>
+ with ESMTP id QZkDO1EM73He for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Oct 2022 05:57:09 -0400 (EDT)
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com
+ [209.85.208.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6278B4024F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 05:57:09 -0400 (EDT)
+Received: by mail-ed1-f46.google.com with SMTP id f7so1443060edc.6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 02:57:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=mvHL5Drr+3t1aS/5ADf3q7iM5WIuHk2AYt4Ze0ZBgjk=;
+ b=XzOlmJP/jS7VT1xg6wG+42FDDXw981TfzCCruFtGWZepNQEEDI1xBoIQxendEL6nVw
+ gV++vJ7t7L7EWZHnXPGmx0WFIw3SkrgmFHy7yiCJmdCaMetbBp4gmGb8H0OpwnEhz4uA
+ NXR0EIjkLtokHm+btvWViZasIH8uRkLuXGJU84pBFCN9ZAMKWmzhw1vgpkv0EaZCYXGC
+ lRB/IpHGfMApklvbsCU3KW8TkXSHNoNTekYSvt6CgCgcciE56e87YjFKyn9JXOirreG8
+ e5BSpaR4vnFx+66Pxz1mIral+3sROyLK+wRy96aO3CnMOlMYCH/XbevP2WLneL9Q/7Yd
+ BWDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=mvHL5Drr+3t1aS/5ADf3q7iM5WIuHk2AYt4Ze0ZBgjk=;
+ b=TTnwHzdRB/WcjtHYVnBmnwkdJ+QfFJg9qUmty1s81UucxSowrPrIJ3o4QC0MPIDJ9u
+ 9jbAMfZwyKWA8NGWN04MMaeFji4aEjz91ITWa85X3gP/IREWmOfRgQCPBoaM/TSe7bB+
+ zQ+WHgrCzF5wdmX8FO3kHIE9KIS2OX0ZCaszmKJFHNokor7+vPh6KRKU0TwoG6bdK8fj
+ dD+/HWlzozmACGc655QGpnQkmqkfdxZQBm4vvAIJ61hCB3QpIf9ExbEs/vIvLoIVkors
+ NhA7A29ncofHfhW3DE1xEchEYEO8r4f8oq3X/2PjBTIJu8iN6MKhtgtfVbPndPosh+v/
+ wVlA==
+X-Gm-Message-State: ACrzQf3knLHwLK1DXQor+m5LObqH3Tze+o3IwfU/Crnz/FzEHouQgWWu
+ S3F0DMLSZJykPiCsVdH2dWM0Vg==
+X-Google-Smtp-Source: AMsMyM5zJVsp3vp9yM+1qZ9xU/7wt91EQOkPXZmY19wmU4+a4o6tvJjAEaJRmC8JNHIxmOjkkdPfsw==
+X-Received: by 2002:a50:ff09:0:b0:456:fd61:83b3 with SMTP id
+ a9-20020a50ff09000000b00456fd6183b3mr48978165edu.166.1666951028189; 
+ Fri, 28 Oct 2022 02:57:08 -0700 (PDT)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com.
+ [34.90.227.64]) by smtp.gmail.com with ESMTPSA id
+ x1-20020a05640226c100b00443d657d8a4sm2435255edd.61.2022.10.28.02.57.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 28 Oct 2022 02:57:07 -0700 (PDT)
+Date: Fri, 28 Oct 2022 09:57:04 +0000
+From: Quentin Perret <qperret@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 2/2] KVM: arm64: Redefine pKVM memory transitions in
+ terms of source/target
+Message-ID: <Y1uncNq2oyc5wALG@google.com>
+References: <20221028083448.1998389-1-oliver.upton@linux.dev>
+ <20221028083448.1998389-3-oliver.upton@linux.dev>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20221027221752.1683510-9-oliver.upton@linux.dev>
-X-Migadu-Flow: FLOW_OUT
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Ben Gardon <bgardon@google.com>, David Matlack <dmatlack@google.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20221028083448.1998389-3-oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,65 +93,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Oct 27, 2022 at 10:17:45PM +0000, Oliver Upton wrote:
-> The use of RCU is necessary to safely change the stage-2 page tables in
-> parallel. Acquire and release the RCU read lock when traversing the page
-> tables.
-> 
-> Use the _raw() flavor of rcu_dereference when changes to the page tables
-> are otherwise protected from parallel software walkers (e.g. holding the
-> write lock).
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 41 ++++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 10 ++++++-
->  2 files changed, 50 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index e70cf57b719e..d1859e8550df 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -37,6 +37,13 @@ static inline u64 kvm_get_parange(u64 mmfr0)
->  
->  typedef u64 kvm_pte_t;
->  
-> +/*
-> + * RCU cannot be used in a non-kernel context such as the hyp. As such, page
-> + * table walkers used in hyp do not call into RCU and instead use other
-> + * synchronization mechanisms (such as a spinlock).
-> + */
-> +#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
-> +
->  typedef kvm_pte_t *kvm_pteref_t;
->  
->  static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
-> @@ -44,6 +51,40 @@ static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared
->  	return pteref;
->  }
->  
-> +static inline void kvm_pgtable_walk_begin(void) {}
-> +static inline void kvm_pgtable_walk_end(void) {}
-> +
-> +static inline bool kvm_pgtable_walk_lock_held(void)
-> +{
-> +	return true;
-> +}
-> +
-> +#else
-> +
-> +typedef kvm_pte_t __rcu *kvm_pteref_t;
-> +
-> +static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
-> +{
-> +	return rcu_dereference_check(pteref, shared);
+Hey Oliver,
 
-I accidentally squashed the fix for !shared into 9/15, not this patch.
-Fix ready for v4.
+On Friday 28 Oct 2022 at 08:34:48 (+0000), Oliver Upton wrote:
+> Perhaps it is just me, but the 'initiator' and 'completer' terms are
+> slightly confusing descriptors for the addresses involved in a memory
+> transition. Apply a rename to instead describe memory transitions in
+> terms of a source and target address.
 
---
-Thanks,
-Oliver
+Just to provide some rationale for the initiator/completer terminology,
+the very first implementation we did of this used 'sender/recipient (or
+something along those lines I think), and we ended up confusing
+ourselves massively. The main issue is that memory doesn't necessarily
+'flow' in the same direction as the transition. It's all fine for a
+donation or a share, but reclaim and unshare become funny. 'The
+recipient of an unshare' can be easily misunderstood, I think.
+
+So yeah, we ended up with initiator/completer, which may not be the
+prettiest terminology, but it was useful to disambiguate things at
+least.
+
+Thanks for the review!
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
