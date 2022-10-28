@@ -2,69 +2,67 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0671EC38A02
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Oct 2022 11:20:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EF0ECAAA1
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Oct 2022 11:37:45 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BD81401CB;
-	Fri, 28 Oct 2022 07:20:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 968FD405F7;
+	Fri, 28 Oct 2022 07:37:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pJyvcpXRwqTr; Fri, 28 Oct 2022 07:20:26 -0400 (EDT)
+	with ESMTP id U6ALX0+PaavB; Fri, 28 Oct 2022 07:37:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5714E40BB3;
-	Fri, 28 Oct 2022 07:20:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B69240B8D;
+	Fri, 28 Oct 2022 07:37:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D50B340B8D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 07:20:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 22DD5405F7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 07:37:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aMOqFOQT0QxQ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Oct 2022 07:20:23 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 77B7D401CB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 07:20:23 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id ZyANnKH9Mv6D for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Oct 2022 07:37:41 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BA78405C1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Oct 2022 07:37:40 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1666957060;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=7oxL0Wn6bgvSdMNJpuJx00jMn03xxj9+wteuUP1B+kQ=;
+ b=TghEMDgvRYOSjqvAnSovtlsFOQSg+h7DGRQK480bRrVrrS2SwSk27TBagWVcF6bVI3v0So
+ FH53eUhT1wK+6v814k/dlNQQeKk3RQeshtQdic4GI33bcq1oEaRaDQmfhDZhtkW5vfkbAd
+ 5C7dYM8mwdRdHuimLeBzhNcI4KQmrcA=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-93-TldeBCsyNLa3XMgP1Ho9Qg-1; Fri, 28 Oct 2022 07:37:37 -0400
+X-MC-Unique: TldeBCsyNLa3XMgP1Ho9Qg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.9])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 902066275F;
- Fri, 28 Oct 2022 11:20:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2E56C433C1;
- Fri, 28 Oct 2022 11:20:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1666956022;
- bh=pL3H279MhLQcgUKud1LmxlhphCcUDPiJcZn2X4jLPvk=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=FWj6ooDezhD/j+4qVNEkYcUxz7XMaBO1pcbj4z0nmFyfRz1+RV7+m7QpSv/x+/5V5
- smAUv6tXBR+8ZyUXKZG/vHs8t183Wc+6Mxtcyty2kf3eW1Jmf16/AA8ODQa0kauWiv
- nkVZyh7Uo3xDOgWuomibHSz7lURlRUJyL9PXoutQqbREAgQvYYUUB6IBTLXLgCIO7X
- SU1IUen4qg2CRa8okecKndBEjIwrNPr5Xmk2RFt1mOinDBmGWHqopAWe+DMl7tC13G
- qtEdDHDouqdaAWb9P1sq0GD1gfh8m5ix6t+1UK9TNiPohU4KNDNuf4gPTs1q8XrhGv
- z0xl5+XImIMTg==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1ooNPQ-002EYW-6H;
- Fri, 28 Oct 2022 12:20:20 +0100
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B925B3C0F67B;
+ Fri, 28 Oct 2022 11:37:36 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.13])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B09949BB61;
+ Fri, 28 Oct 2022 11:37:36 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Andrew Jones <andrew.jones@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH] MAINTAINERS: new kvmarm mailing list
+In-Reply-To: <20221025160730.40846-1-cohuck@redhat.com>
+Organization: Red Hat GmbH
+References: <20221025160730.40846-1-cohuck@redhat.com>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date: Fri, 28 Oct 2022 13:37:34 +0200
+Message-ID: <87a65gkwld.fsf@redhat.com>
 MIME-Version: 1.0
-Date: Fri, 28 Oct 2022 12:20:20 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [REPOST][URGENT] kvmarm mailing list migration
-In-Reply-To: <Y1skH3k6SIV0hEMZ@google.com>
-References: <86edvbg3q7.wl-maz@kernel.org> <Y1skH3k6SIV0hEMZ@google.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <364100e884023234e4ab9e525774d427@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvmarm <kvmarm@lists.cs.columbia.edu>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,62 +74,43 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2022-10-28 01:36, Oliver Upton wrote:
-> On Thu, Oct 13, 2022 at 04:09:20PM +0100, Marc Zyngier wrote:
->> [Reposting this, as it has been almost two weeks since the initial
->>  announcement and we're still at sub-10% of the users having
->>  subscribed to the new list]
->> 
->> Hi all,
->> 
->> As you probably all know, the kvmarm mailing has been hosted on
->> Columbia's machines for as long as the project existed (over 13
->> years). After all this time, the university has decided to retire the
->> list infrastructure and asked us to find a new hosting.
->> 
->> A new mailing list has been created on lists.linux.dev[1], and I'm
->> kindly asking everyone interested in following the KVM/arm64
->> developments to start subscribing to it (and start posting your
->> patches there). I hope that people will move over to it quickly enough
->> that we can soon give Columbia the green light to turn their systems
->> off.
->> 
->> Note that the new list will only get archived automatically once we
->> fully switch over, but I'll make sure we fill any gap and not lose any
->> message. In the meantime, please Cc both lists.
-> 
-> Just wanted to explicitly highlight this point... can folks please
-> continue to Cc the old list until we migrate to the new one?
-> lore.kernel.org archives *only* contain mail sent to the columbia.edu
-> address right now.
-> 
-> Fortunately, the series I'm aware of that didn't do this still hit
-> another archived list so I could find it with a bit more digging.
-> 
-> Marc -- any idea when we're going to finally switch to the new world?
+On Tue, Oct 25 2022, Cornelia Huck <cohuck@redhat.com> wrote:
 
-Given the amount of spam I'm dealing with on the Columbia list,
-I'm tempted to say "real soon now".
+> KVM/arm64 development is moving to a new mailing list (see
+> https://lore.kernel.org/all/20221001091245.3900668-1-maz@kernel.org/);
+> kvm-unit-tests should advertise the new list as well.
+>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  MAINTAINERS | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 90ead214a75d..649de509a511 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -67,7 +67,8 @@ ARM
+>  M: Andrew Jones <andrew.jones@linux.dev>
+>  S: Supported
+>  L: kvm@vger.kernel.org
+> -L: kvmarm@lists.cs.columbia.edu
+> +L: kvmarm@lists.linux.dev
+> +L: kvmarm@lists.cs.columbia.edu (deprecated)
 
-I'll repeat my call for migration again next week, give it another
-week, then ask Konstantin to switch the archives over to the new
-list. This can take up to a week, but as soon as it is done,
-I'll place the list under full moderation and ask Columbia to
-kill it.
+As the days of the Columbia list really seem to be numbered (see
+https://lore.kernel.org/all/364100e884023234e4ab9e525774d427@kernel.org/),
+should we maybe drop it completely from MAINTAINERS, depending on when
+this gets merged?
 
-So it looks like we're looking at a ~2 week deadline. Should anyone
-object to this plan, shout now!
+>  F: arm/
+>  F: lib/arm/
+>  F: lib/arm64/
 
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
