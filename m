@@ -2,59 +2,55 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDDCFFA3740
-	for <kvmarm@archiver.kernel.org>; Mon, 31 Oct 2022 09:19:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1F0BFA3744
+	for <kvmarm@archiver.kernel.org>; Mon, 31 Oct 2022 11:23:11 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 709A84BAD6;
-	Mon, 31 Oct 2022 05:19:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6E4B4BACE;
+	Mon, 31 Oct 2022 07:23:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yGg0r+kuvlVq; Mon, 31 Oct 2022 05:19:01 -0400 (EDT)
+	with ESMTP id T5HZSCekJP3p; Mon, 31 Oct 2022 07:23:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 427714BAAD;
-	Mon, 31 Oct 2022 05:19:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2692C4BAD1;
+	Mon, 31 Oct 2022 07:23:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F1E734BA36
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Oct 2022 05:18:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 112CA4BAD3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Oct 2022 07:23:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Glxs6RUC5sWL for <kvmarm@lists.cs.columbia.edu>;
- Mon, 31 Oct 2022 05:18:58 -0400 (EDT)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CCC674BA0C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Oct 2022 05:18:58 -0400 (EDT)
-Date: Mon, 31 Oct 2022 09:18:44 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1667207937;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=UNUd2hX0hdMkIdzwLXRZNRwHJG+w0L3BFPgCSF2V2h4=;
- b=CaGONynma9CEbwNZEVDG+yImQsIJB5eeX0/0rXtRLfnfNR59VQBxdGKz6OlFPOb+BKcSaZ
- 1R55TELwMkeAGgecUypT465F9EutTVn2+LKfa+q0uToOuYVa05UhmGaWelJJn3Hobqz5kz
- jptzmt0+r8P9aPbHrF1iijrimPgKgtM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v7 3/9] KVM: Check KVM_CAP_DIRTY_LOG_{RING, RING_ACQ_REL}
- prior to enabling them
-Message-ID: <Y1+S9FC6GTpYehwJ@google.com>
-References: <20221031003621.164306-1-gshan@redhat.com>
- <20221031003621.164306-4-gshan@redhat.com>
+ with ESMTP id jkD4yul-09vL for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 31 Oct 2022 07:23:05 -0400 (EDT)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E3A284BA85
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 31 Oct 2022 07:23:04 -0400 (EDT)
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.57])
+ by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4N19cZ0c8LzVj0m;
+ Mon, 31 Oct 2022 19:18:06 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (7.193.23.208) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 31 Oct 2022 19:23:00 +0800
+Received: from DESKTOP-8RFUVS3.china.huawei.com (10.174.185.179) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 31 Oct 2022 19:22:59 +0800
+From: Zenghui Yu <yuzenghui@huawei.com>
+To: <stable@vger.kernel.org>, <gregkh@linuxfoundation.org>, <sashal@kernel.org>
+Subject: [PATCH 5.10 0/2] arm64: backport two patches to 5.10-stable
+Date: Mon, 31 Oct 2022 19:22:44 +0800
+Message-ID: <20221031112246.1588-1-yuzenghui@huawei.com>
+X-Mailer: git-send-email 2.23.0.windows.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20221031003621.164306-4-gshan@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-Cc: shuah@kernel.org, catalin.marinas@arm.com, kvm@vger.kernel.org,
- maz@kernel.org, andrew.jones@linux.dev, dmatlack@google.com,
- shan.gavin@gmail.com, bgardon@google.com, kvmarm@lists.linux.dev,
- pbonzini@redhat.com, zhenyzha@redhat.com, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
+X-Originating-IP: [10.174.185.179]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
+X-CFilter-Loop: Reflected
+Cc: linux-efi@vger.kernel.org, anders.roxell@linaro.org,
+ anshuman.khandual@arm.com, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, maz@kernel.org, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,34 +67,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Oct 31, 2022 at 08:36:15AM +0800, Gavin Shan wrote:
-> There are two capabilities related to ring-based dirty page tracking:
-> KVM_CAP_DIRTY_LOG_RING and KVM_CAP_DIRTY_LOG_RING_ACQ_REL. Both are
-> supported by x86. However, arm64 supports KVM_CAP_DIRTY_LOG_RING_ACQ_REL
-> only when the feature is supported on arm64. The userspace doesn't have
-> to enable the advertised capability, meaning KVM_CAP_DIRTY_LOG_RING can
-> be enabled on arm64 by userspace and it's wrong.
-> 
-> Fix it by double checking if the capability has been advertised prior to
-> enabling it. It's rejected to enable the capability if it hasn't been
-> advertised.
-> 
-> Fixes: 17601bfed909 ("KVM: Add KVM_CAP_DIRTY_LOG_RING_ACQ_REL capability and config option")
-> Reported-by: Sean Christopherson <seanjc@google.com>
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
+Patch #1 (merged in 5.12-rc3) is required to address the issue
+Anders Roxell reported on the list [1].  Patch #2 (in 5.15-rc1) is
+a follow up.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+[1] https://lore.kernel.org/lkml/20220826120020.GB520@mutt
 
-This patch should be picked up separate from this series for 6.1. The
-original patch went through kvmarm and I think there are a few other
-arm64 fixes to be sent out anyway.
+Anshuman Khandual (1):
+  arm64/kexec: Test page size support with new TGRAN range values
 
-Marc, can you grab this? :)
+James Morse (1):
+  arm64/mm: Fix __enable_mmu() for new TGRAN range values
 
---
-Thanks,
-Oliver
+ arch/arm64/include/asm/cpufeature.h       |  9 ++++--
+ arch/arm64/include/asm/sysreg.h           | 36 +++++++++++++++--------
+ arch/arm64/kernel/head.S                  |  6 ++--
+ arch/arm64/kvm/reset.c                    | 10 ++++---
+ drivers/firmware/efi/libstub/arm64-stub.c |  2 +-
+ 5 files changed, 41 insertions(+), 22 deletions(-)
+
+-- 
+2.33.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
