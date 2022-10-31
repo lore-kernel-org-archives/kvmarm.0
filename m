@@ -1,92 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0AC33C9
-	for <kvmarm@lists.linux.dev>; Mon, 31 Oct 2022 17:24:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 441E2C4314A;
-	Mon, 31 Oct 2022 17:24:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1667237047;
-	bh=BtJI2S7G3SFkXt/01dXN9vtpHl74EK9NiHMc7zybaFY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WR0Ke/s2u39ppT7JEfxQDBwaNy/RENJrlWoqHuklDr0F9d7d3UHpgpWiuUwLPMwBi
-	 nn+GZUCCPWIhA/UFGwt0gOTwsCnHkAvr9Kzyqz2ZjCIbJ9KuOhgBPfoIWTD98KBzkk
-	 mkimq3mM+AoqsHYpxXok2IO8jXPw8WBSiS3RKth5EmsWN4I32/DpNyy3F48lCs3277
-	 ipNTibJUK59SuzcUBsimaTdOnshjTmUHGKr+XjZwpf1ts2yUeX38PzDV30Zud1xUjy
-	 g8wfbD8W+KKB41rdb3enXxR55QZq2G1XkmByK0nKh4spg9erdIgP0xgkjCOj43IL4b
-	 pQ39QpjLD0Krw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1opYW4-002naO-Nh;
-	Mon, 31 Oct 2022 17:24:04 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Gavin Shan <gshan@redhat.com>,
-	kvmarm@lists.linux.dev
-Cc: ajones@ventanamicro.com,
-	andrew.jones@linux.dev,
-	suzuki.poulose@arm.com,
-	will@kernel.org,
-	james.morse@arm.com,
-	kvm@vger.kernel.org,
-	oliver.upton@linux.dev,
-	kvmarm@lists.cs.columbia.edu,
-	peterx@redhat.com,
-	dmatlack@google.com,
-	shuah@kernel.org,
-	catalin.marinas@arm.com,
-	alexandru.elisei@arm.com,
-	pbonzini@redhat.com,
-	seanjc@google.com,
-	shan.gavin@gmail.com,
-	bgardon@google.com,
-	zhenyzha@redhat.com
-Subject: Re: (subset) [PATCH v7 0/9] KVM: arm64: Enable ring-based dirty memory tracking
-Date: Mon, 31 Oct 2022 17:23:55 +0000
-Message-ID: <166723701641.2037271.10248037129602101185.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221031003621.164306-1-gshan@redhat.com>
-References: <20221031003621.164306-1-gshan@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F6B8F76
+	for <kvmarm@lists.linux.dev>; Mon, 31 Oct 2022 22:48:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1667256528;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BC6zO98Q8uKfNSR6EZGsLuEsjcHYX+7BdvJInvGMYP0=;
+	b=hTlcgYAoyhyiZxq2kot3B6nZ7nS0G/rXdabNKFFCipXx3jZXTRn8dkLRJfbcTO0G8uvb2Q
+	V6xIpPex4sQSJRI1O/lH4IhTlFLKGZhgV8I/1baqD+6Mum+RGr3IiCrLoob1umU7IzeA5G
+	z4CYqwwIDa0R2aTX588kQAsXlCtsqXE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-269-3jRxnHRDO4ah6fqU3o_hDw-1; Mon, 31 Oct 2022 18:48:47 -0400
+X-MC-Unique: 3jRxnHRDO4ah6fqU3o_hDw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6BAD785A583;
+	Mon, 31 Oct 2022 22:48:46 +0000 (UTC)
+Received: from [10.64.54.151] (vpn2-54-151.bne.redhat.com [10.64.54.151])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id BEB082166B29;
+	Mon, 31 Oct 2022 22:48:39 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
+ conjunction with bitmap
+To: Marc Zyngier <maz@kernel.org>, Sean Christopherson <seanjc@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, peterx@redhat.com,
+ will@kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+ shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com,
+ pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, shan.gavin@gmail.com
+References: <Y1LDRkrzPeQXUHTR@google.com> <87edv0gnb3.wl-maz@kernel.org>
+ <Y1ckxYst3tc0LCqb@google.com> <Y1css8k0gtFkVwFQ@google.com>
+ <878rl4gxzx.wl-maz@kernel.org> <Y1ghIKrAsRFwSFsO@google.com>
+ <877d0lhdo9.wl-maz@kernel.org> <Y1rDkz6q8+ZgYFWW@google.com>
+ <875yg5glvk.wl-maz@kernel.org>
+ <36c97b96-1427-ce05-8fce-fd21c4711af9@redhat.com>
+ <Y1wIj/sdJw7VMiY5@google.com> <9e57cd7616974c783cce5026d61d310b@kernel.org>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <b6ae2d5c-4974-6e1a-e65d-206104ba97ed@redhat.com>
+Date: Tue, 1 Nov 2022 06:48:37 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <9e57cd7616974c783cce5026d61d310b@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.linux.dev, ajones@ventanamicro.com, andrew.jones@linux.dev, suzuki.poulose@arm.com, will@kernel.org, james.morse@arm.com, kvm@vger.kernel.org, oliver.upton@linux.dev, kvmarm@lists.cs.columbia.edu, peterx@redhat.com, dmatlack@google.com, shuah@kernel.org, catalin.marinas@arm.com, alexandru.elisei@arm.com, pbonzini@redhat.com, seanjc@google.com, shan.gavin@gmail.com, bgardon@google.com, zhenyzha@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221031172355.hmbubJ0heQjCGGXPfBO0OjdP_ITo6K0O_JkIDgds4s0@z>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Message-ID: <20221031224837.w09k7kpJU6Ifo6bngbqCc3bHZslD2nnC8RvDclTNfn0@z>
 
-On Mon, 31 Oct 2022 08:36:12 +0800, Gavin Shan wrote:
-> This series enables the ring-based dirty memory tracking for ARM64.
-> The feature has been available and enabled on x86 for a while. It
-> is beneficial when the number of dirty pages is small in a checkpointing
-> system or live migration scenario. More details can be found from
-> fb04a1eddb1a ("KVM: X86: Implement ring-based dirty memory tracking").
+On 10/31/22 5:08 PM, Marc Zyngier wrote:
+> On 2022-10-28 17:51, Sean Christopherson wrote:
+>> On Fri, Oct 28, 2022, Gavin Shan wrote:
+>>> On 10/28/22 2:30 AM, Marc Zyngier wrote:
+>>> > On Thu, 27 Oct 2022 18:44:51 +0100,
+>>> > > On Thu, Oct 27, 2022, Marc Zyngier wrote:
+>>> > > > On Tue, 25 Oct 2022 18:47:12 +0100, Sean Christopherson <seanjc@google.com> wrote:
+
+[...]
+
+>>>
+>>> It's really a 'major surgery' and I would like to make sure I fully understand
+>>> 'a completely separate API for writing guest memory without an associated vCPU",
+>>> before I'm going to working on v7 for this.
+>>>
+>>> There are 7 functions and 2 macros involved as below. I assume Sean is suggesting
+>>> to add another argument, whose name can be 'has_vcpu', for these functions and macros?
+>>
+>> No.
+>>
+>> As March suggested, for your series just implement the hacky arch opt-out, don't
 > 
-> v6: https://lore.kernel.org/kvmarm/20221011061447.131531-1-gshan@redhat.com/
-> v5: https://lore.kernel.org/all/20221005004154.83502-1-gshan@redhat.com/
-> v4: https://lore.kernel.org/kvmarm/20220927005439.21130-1-gshan@redhat.com/
-> v3: https://lore.kernel.org/r/20220922003214.276736-1-gshan@redhat.com
-> v2: https://lore.kernel.org/lkml/YyiV%2Fl7O23aw5aaO@xz-m1.local/T/
-> v1: https://lore.kernel.org/lkml/20220819005601.198436-1-gshan@redhat.com
+> Please call me April.
 > 
-> [...]
+>> try and do surgery at this time as that's likely going to be a
+>> months-long effort
+>> that touches a lot of cross-arch code.
+>>
+>> E.g. I believe the ARM opt-out (opt-in?) for the above hack would be
+>>
+>> bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
+>> {
+>>     return vgic_has_its(kvm);
+>> }
+> 
+> Although that will probably lead to the expected effect,
+> this helper should only return true when the ITS is actively
+> dumped.
+> 
 
-Applied to fixes, thanks!
+Thanks, Marc. It makes sense to return true only when vgic/its tables
+are being saved. Lets have more discussion in PATCH[v7 5/9] since Oliver
+has other concerns there :)
 
-[3/9] KVM: Check KVM_CAP_DIRTY_LOG_{RING, RING_ACQ_REL} prior to enabling them
-      commit: 7a2726ec3290c52f52ce8d5f5af73ab8c7681bc1
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Gavin
 
 
