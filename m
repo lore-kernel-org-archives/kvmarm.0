@@ -1,43 +1,45 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB9717CB5
-	for <kvmarm@lists.linux.dev>; Mon, 31 Oct 2022 03:38:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1667187490;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5heqDPTvyg/WwWWnO5zE1eTi0JOXR9TBRklxSqDrFRk=;
-	b=JS/EZA67N4oVlfQLudFfF8wsLOvmK3466a77t8XWPCiHt5ECDXH2Z2pOTMSAEYKhV43Lad
-	iVwYVM0vJBTLh/X0X/aW13Y5bL00InALm2AnIkTYALrxD05DRCFotWmpU4bFougMcPtPlZ
-	UTFHFMzrXHvRkoo7TJGp0aSHH/ykEtk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-453-n2y_sGmJMmC9_R0eH2-6_w-1; Sun, 30 Oct 2022 23:38:06 -0400
-X-MC-Unique: n2y_sGmJMmC9_R0eH2-6_w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EC95D185A792;
-	Mon, 31 Oct 2022 03:38:05 +0000 (UTC)
-Received: from [10.64.54.151] (vpn2-54-151.bne.redhat.com [10.64.54.151])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 788FE4EA5B;
-	Mon, 31 Oct 2022 03:37:59 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
- conjunction with bitmap
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3DF17F4
+	for <kvmarm@lists.linux.dev>; Mon, 31 Oct 2022 09:08:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7249C433D6;
+	Mon, 31 Oct 2022 09:08:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1667207304;
+	bh=XyEyZaCaDS1iH/TW1RAmNRD0RiLTKVHIgX5Q3DeWWuU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=j1Caxz5EOxkO32/byri0Ilor35vjDhbVjYAna7ij9xr2+J10VAJ+yqMHBO1aJx58O
+	 oBZQaNcICWP7tg6yk1sb2OKpN7OTq+NWQaa7HsEvJv+n5A6QOBhZ2bBMg2UErCaONI
+	 fYGnbMEnzq/MUX8bKr7o+lVc6bwm+pKfhECy+n4VvJjVWeRNkgDC3RpEtNmyHQX2rz
+	 AlsDwol0OLCC5nEkCz2UJU4biXxN/dE4bfyenbNGyjudTfT4g/2o1kBKrG/KTnQP8Q
+	 gudzXIskeXlVZ21LldUCjJVH7RBTik4AU20Z/tYOXw/NGO6vwXngswY9OiheYHSH/S
+	 F15Pdqq7PpzeA==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1opQmM-002h7u-A3;
+	Mon, 31 Oct 2022 09:08:22 +0000
+Precedence: bulk
+X-Mailing-List: kvmarm@lists.linux.dev
+List-Id: <kvmarm.lists.linux.dev>
+List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
+List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+Date: Mon, 31 Oct 2022 09:08:21 +0000
+From: Marc Zyngier <maz@kernel.org>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+Cc: Gavin Shan <gshan@redhat.com>, Oliver Upton <oliver.upton@linux.dev>,
  kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com,
  bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev,
  dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
  james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
  shan.gavin@gmail.com
+Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
+ conjunction with bitmap
+In-Reply-To: <Y1wIj/sdJw7VMiY5@google.com>
 References: <Y1LDRkrzPeQXUHTR@google.com> <87edv0gnb3.wl-maz@kernel.org>
  <Y1ckxYst3tc0LCqb@google.com> <Y1css8k0gtFkVwFQ@google.com>
  <878rl4gxzx.wl-maz@kernel.org> <Y1ghIKrAsRFwSFsO@google.com>
@@ -45,109 +47,112 @@ References: <Y1LDRkrzPeQXUHTR@google.com> <87edv0gnb3.wl-maz@kernel.org>
  <875yg5glvk.wl-maz@kernel.org>
  <36c97b96-1427-ce05-8fce-fd21c4711af9@redhat.com>
  <Y1wIj/sdJw7VMiY5@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <a162a328-fc28-ce23-6f1c-e84abc4fab0c@redhat.com>
-Date: Mon, 31 Oct 2022 11:37:56 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-Precedence: bulk
-X-Mailing-List: kvmarm@lists.linux.dev
-List-Id: <kvmarm.lists.linux.dev>
-List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
-List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <Y1wIj/sdJw7VMiY5@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <9e57cd7616974c783cce5026d61d310b@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-Message-ID: <20221031033756.Wi6ZIXPf_-X9CS1B45NrhaM2-S6hyQZDn1NeJTw9XAE@z>
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: seanjc@google.com, gshan@redhat.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221031090821.TJevolb43kPGImhltGIx-iY-BBjhWXu5N3ddE9n_nE4@z>
 
-Hi Sean,
-
-On 10/29/22 12:51 AM, Sean Christopherson wrote:
+On 2022-10-28 17:51, Sean Christopherson wrote:
 > On Fri, Oct 28, 2022, Gavin Shan wrote:
+>> Hi Sean and Marc,
+>> 
 >> On 10/28/22 2:30 AM, Marc Zyngier wrote:
->>> On Thu, 27 Oct 2022 18:44:51 +0100,
->>> Sean Christopherson <seanjc@google.com> wrote:
->>>>
->>>> On Thu, Oct 27, 2022, Marc Zyngier wrote:
->>>>> On Tue, 25 Oct 2022 18:47:12 +0100, Sean Christopherson <seanjc@google.com> wrote:
->>
+>> > On Thu, 27 Oct 2022 18:44:51 +0100,
+>> > Sean Christopherson <seanjc@google.com> wrote:
+>> > >
+>> > > On Thu, Oct 27, 2022, Marc Zyngier wrote:
+>> > > > On Tue, 25 Oct 2022 18:47:12 +0100, Sean Christopherson <seanjc@google.com> wrote:
+>> 
 >> [...]
->>>>
->>>>>> And ideally such bugs would detected without relying on userspace to
->>>>>> enabling dirty logging, e.g. the Hyper-V bug lurked for quite some
->>>>>> time and was only found when mark_page_dirty_in_slot() started
->>>>>> WARNing.
->>>>>>
->>>>>> I'm ok if arm64 wants to let userspace shoot itself in the foot with
->>>>>> the ITS, but I'm not ok dropping the protections in the common
->>>>>> mark_page_dirty_in_slot().
->>>>>>
->>>>>> One somewhat gross idea would be to let architectures override the
->>>>>> "there must be a running vCPU" rule, e.g. arm64 could toggle a flag
->>>>>> in kvm->arch in its kvm_write_guest_lock() to note that an expected
->>>>>> write without a vCPU is in-progress:
->>>>>>
->>>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>>>>> index 8c5c69ba47a7..d1da8914f749 100644
->>>>>> --- a/virt/kvm/kvm_main.c
->>>>>> +++ b/virt/kvm/kvm_main.c
->>>>>> @@ -3297,7 +3297,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->>>>>>           struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
->>>>>>    #ifdef CONFIG_HAVE_KVM_DIRTY_RING
->>>>>> -       if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
->>>>>> +       if (!kvm_arch_allow_write_without_running_vcpu(kvm) && WARN_ON_ONCE(!vcpu))
->>>>>> +               return;
->>>>>> +
->>>>>> +       if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
->>>>>>                   return;
->>>>>>    #endif
->>>>>> @@ -3305,10 +3308,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->>>>>>                   unsigned long rel_gfn = gfn - memslot->base_gfn;
->>>>>>                   u32 slot = (memslot->as_id << 16) | memslot->id;
->>>>>> -               if (kvm->dirty_ring_size)
->>>>>> +               if (kvm->dirty_ring_size && vcpu)
->>>>>>                           kvm_dirty_ring_push(&vcpu->dirty_ring,
->>>>>>                                               slot, rel_gfn);
->>>>>> -               else
->>>>>> +               else if (memslot->dirty_bitmap)
->>>>>>                           set_bit_le(rel_gfn, memslot->dirty_bitmap);
->>>>>>           }
->>>>>>    }
+>> > >
+>> > > > > And ideally such bugs would detected without relying on userspace to
+>> > > > > enabling dirty logging, e.g. the Hyper-V bug lurked for quite some
+>> > > > > time and was only found when mark_page_dirty_in_slot() started
+>> > > > > WARNing.
+>> > > > >
+>> > > > > I'm ok if arm64 wants to let userspace shoot itself in the foot with
+>> > > > > the ITS, but I'm not ok dropping the protections in the common
+>> > > > > mark_page_dirty_in_slot().
+>> > > > >
+>> > > > > One somewhat gross idea would be to let architectures override the
+>> > > > > "there must be a running vCPU" rule, e.g. arm64 could toggle a flag
+>> > > > > in kvm->arch in its kvm_write_guest_lock() to note that an expected
+>> > > > > write without a vCPU is in-progress:
+>> > > > >
+>> > > > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>> > > > > index 8c5c69ba47a7..d1da8914f749 100644
+>> > > > > --- a/virt/kvm/kvm_main.c
+>> > > > > +++ b/virt/kvm/kvm_main.c
+>> > > > > @@ -3297,7 +3297,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>> > > > >          struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+>> > > > >   #ifdef CONFIG_HAVE_KVM_DIRTY_RING
+>> > > > > -       if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
+>> > > > > +       if (!kvm_arch_allow_write_without_running_vcpu(kvm) && WARN_ON_ONCE(!vcpu))
+>> > > > > +               return;
+>> > > > > +
+>> > > > > +       if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
+>> > > > >                  return;
+>> > > > >   #endif
+>> > > > > @@ -3305,10 +3308,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>> > > > >                  unsigned long rel_gfn = gfn - memslot->base_gfn;
+>> > > > >                  u32 slot = (memslot->as_id << 16) | memslot->id;
+>> > > > > -               if (kvm->dirty_ring_size)
+>> > > > > +               if (kvm->dirty_ring_size && vcpu)
+>> > > > >                          kvm_dirty_ring_push(&vcpu->dirty_ring,
+>> > > > >                                              slot, rel_gfn);
+>> > > > > -               else
+>> > > > > +               else if (memslot->dirty_bitmap)
+>> > > > >                          set_bit_le(rel_gfn, memslot->dirty_bitmap);
+>> > > > >          }
+>> > > > >   }
 > 
 > ...
 > 
->>>> A slightly different alternative would be have a completely separate
->>>> API for writing guest memory without an associated vCPU.  I.e. start
->>>> building up proper device emulation support.  Then the vCPU-based
->>>> APIs could yell if a vCPU isn't provided (or there is no running
->>>> vCPU in the current mess).  And the deviced-based API could be
->>>> provided if and only if the architecture actually supports emulating
->>>> writes from devices, i.e. x86 would not opt-in and so would even
->>>> have access to the API.
->>>
->>> Which is what I was putting under the "major surgery" label in my
->>> previous email.
->>>
->>> Anyhow, for the purpose of unblocking Gavin's series, I suggest to
->>> adopt your per-arch opt-out suggestion as a stop gap measure, and we
->>> will then be able to bike-shed for weeks on what the shape of the
->>> device-originated memory dirtying API should be.
->>>
->>
->> It's really a 'major surgery' and I would like to make sure I fully understand
->> 'a completely separate API for writing guest memory without an associated vCPU",
+>> > > A slightly different alternative would be have a completely separate
+>> > > API for writing guest memory without an associated vCPU.  I.e. start
+>> > > building up proper device emulation support.  Then the vCPU-based
+>> > > APIs could yell if a vCPU isn't provided (or there is no running
+>> > > vCPU in the current mess).  And the deviced-based API could be
+>> > > provided if and only if the architecture actually supports emulating
+>> > > writes from devices, i.e. x86 would not opt-in and so would even
+>> > > have access to the API.
+>> >
+>> > Which is what I was putting under the "major surgery" label in my
+>> > previous email.
+>> >
+>> > Anyhow, for the purpose of unblocking Gavin's series, I suggest to
+>> > adopt your per-arch opt-out suggestion as a stop gap measure, and we
+>> > will then be able to bike-shed for weeks on what the shape of the
+>> > device-originated memory dirtying API should be.
+>> >
+>> 
+>> It's really a 'major surgery' and I would like to make sure I fully 
+>> understand
+>> 'a completely separate API for writing guest memory without an 
+>> associated vCPU",
 >> before I'm going to working on v7 for this.
->>
->> There are 7 functions and 2 macros involved as below. I assume Sean is suggesting
->> to add another argument, whose name can be 'has_vcpu', for these functions and macros?
+>> 
+>> There are 7 functions and 2 macros involved as below. I assume Sean is 
+>> suggesting
+>> to add another argument, whose name can be 'has_vcpu', for these 
+>> functions and macros?
 > 
 > No.
 > 
-> As March suggested, for your series just implement the hacky arch opt-out, don't
-> try and do surgery at this time as that's likely going to be a months-long effort
+> As March suggested, for your series just implement the hacky arch 
+> opt-out, don't
+
+Please call me April.
+
+> try and do surgery at this time as that's likely going to be a
+> months-long effort
 > that touches a lot of cross-arch code.
 > 
 > E.g. I believe the ARM opt-out (opt-in?) for the above hack would be
@@ -156,13 +161,11 @@ On 10/29/22 12:51 AM, Sean Christopherson wrote:
 > {
 > 	return vgic_has_its(kvm);
 > }
-> 
 
-Ok, Thanks for your confirm. v7 was just posted to address comments from Marc,
-Peter, Oliver and you. Please help to review when you get a chance.
+Although that will probably lead to the expected effect,
+this helper should only return true when the ITS is actively
+dumped.
 
-https://lore.kernel.org/kvmarm/20221031003621.164306-1-gshan@redhat.com/T/#t
-
-Thanks,
-Gavin
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
