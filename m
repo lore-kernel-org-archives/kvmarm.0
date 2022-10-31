@@ -1,62 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8763B7B
-	for <kvmarm@lists.linux.dev>; Sun, 30 Oct 2022 17:44:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4C79C433C1;
-	Sun, 30 Oct 2022 17:44:42 +0000 (UTC)
-Date: Sun, 30 Oct 2022 17:44:39 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v1 0/2] KVM: arm: Refuse to enable KVM on systems with
- SME but not FGT
-Message-ID: <Y164B4m50JW6Y0hA@arm.com>
-References: <20221027205246.812586-1-broonie@kernel.org>
- <8735b6hmxo.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C2107E
+	for <kvmarm@lists.linux.dev>; Mon, 31 Oct 2022 00:38:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1667176680;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=fgF5TY0n6sdFTb9p1pcGikisWxsgRlr4pwfzGzDB+f0=;
+	b=DD/zUexSuf30r4S1E2usNg1o2GHLZL0ue8Z5JIxPLbAj7zO4gLUS8c2n5jsydV1FtiZ2Zb
+	Q/E9IuP466QCS/E14nGgA+ueS6UB1UPFekqfDunWZNAkzL24PMIDmg+75VCsxsqaVjOrNE
+	d1PJUJNLuzcwsFFqeGnR0rKRCLNyjDc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-614-vyGWONLmOWKYKYbzbW_20w-1; Sun, 30 Oct 2022 20:37:56 -0400
+X-MC-Unique: vyGWONLmOWKYKYbzbW_20w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 69D2C185A7A3;
+	Mon, 31 Oct 2022 00:37:55 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-151.bne.redhat.com [10.64.54.151])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A18A40C958D;
+	Mon, 31 Oct 2022 00:37:48 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.cs.columbia.edu,
+	andrew.jones@linux.dev,
+	ajones@ventanamicro.com,
+	maz@kernel.org,
+	bgardon@google.com,
+	catalin.marinas@arm.com,
+	dmatlack@google.com,
+	will@kernel.org,
+	pbonzini@redhat.com,
+	peterx@redhat.com,
+	oliver.upton@linux.dev,
+	seanjc@google.com,
+	james.morse@arm.com,
+	shuah@kernel.org,
+	suzuki.poulose@arm.com,
+	alexandru.elisei@arm.com,
+	zhenyzha@redhat.com,
+	shan.gavin@gmail.com
+Subject: [PATCH v7 0/9] KVM: arm64: Enable ring-based dirty memory tracking
+Date: Mon, 31 Oct 2022 08:36:12 +0800
+Message-ID: <20221031003621.164306-1-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8735b6hmxo.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Message-ID: <20221031003612.3EaX6CpkkkGo-iLFXVKxQCYqkGOnU7udo0_WMUHE48E@z>
 
-On Sat, Oct 29, 2022 at 12:46:43PM +0100, Marc Zyngier wrote:
-> On Thu, 27 Oct 2022 21:52:44 +0100,
-> Mark Brown <broonie@kernel.org> wrote:
-> > 
-> > The architecture requires that any system which implements SME also has
-> > fine grained traps since SME is a v9.2 feature, meaning that v8.7 must be
-> > implemented, and FGT is mandatory from v8.6. SME relies on fine grained
-> > traps to control access to SMPRI_EL1 and in nVHE mode to TPIDR2_EL0,
-> > without traps SMPRI_EL1.Priority and TPIDR2_EL0 can be used as side
-> > channels. 
-> > 
-> > This series adds support for detecting FGT and refuses to allow KVM to
-> > be used in architecturally invalid configurations which have SME but not
-> > FGT, without detection the issue presents as faults due to EL2
-> > attempting to access the FGT registers which isn't obvious to users.
-> > Currently fine grained traps are only used in nVHE but but a series
-> > "arm64/sme: Fix SMPRI_EL1 traps for KVM guests" sent along with this
-> > will add usage for VHE mode too making the issue more pressing.
-> 
-> I think this goes the wrong way around. SME without FGT is invalid,
-> and yet you keep SME around and device to kill virtualisation support.
-> 
-> I'd rather it is SME that gets disabled when the kernel boots at EL2.
+This series enables the ring-based dirty memory tracking for ARM64.
+The feature has been available and enabled on x86 for a while. It
+is beneficial when the number of dirty pages is small in a checkpointing
+system or live migration scenario. More details can be found from
+fb04a1eddb1a ("KVM: X86: Implement ring-based dirty memory tracking").
 
-I agree, I rather we did it the other way around.
+v6: https://lore.kernel.org/kvmarm/20221011061447.131531-1-gshan@redhat.com/
+v5: https://lore.kernel.org/all/20221005004154.83502-1-gshan@redhat.com/
+v4: https://lore.kernel.org/kvmarm/20220927005439.21130-1-gshan@redhat.com/
+v3: https://lore.kernel.org/r/20220922003214.276736-1-gshan@redhat.com
+v2: https://lore.kernel.org/lkml/YyiV%2Fl7O23aw5aaO@xz-m1.local/T/
+v1: https://lore.kernel.org/lkml/20220819005601.198436-1-gshan@redhat.com
+
+Testing
+=======
+(1) kvm/selftests/dirty_log_test
+(2) Live migration by QEMU
+
+Changelog
+=========
+v7:
+  * Cut down #ifdef, avoid using 'container_of()', move the
+    dirty-ring check after KVM_REQ_VM_DEAD, add comments
+    for kvm_dirty_ring_check_request(), use tab character
+    for KVM event definitions in kvm_host.h in PATCH[v7 01]    (Sean)
+  * Add PATCH[v7 03] to recheck if the capability has
+    been advertised prior to enable RING/RING_ACEL_REL         (Sean)
+  * Improve the description about capability RING_WITH_BITMAP,
+    rename kvm_dirty_ring_exclusive() to kvm_use_dirty_bitmap()
+    in PATCH[v7 04/09]                                         (Peter/Oliver/Sean)
+  * Add PATCH[v7 05/09] to improve no-running-vcpu report      (Marc/Sean)
+  * Improve commit messages                                    (Sean/Oliver)
+v6:
+  * Add CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP, for arm64
+    to advertise KVM_CAP_DIRTY_RING_WITH_BITMAP in
+    PATCH[v6 3/8]                                              (Oliver/Peter)
+  * Add helper kvm_dirty_ring_exclusive() to check if
+    traditional bitmap-based dirty log tracking is
+    exclusive to dirty-ring in PATCH[v6 3/8]                   (Peter)
+  * Enable KVM_CAP_DIRTY_RING_WITH_BITMAP in PATCH[v6 5/8]     (Gavin)
+v5:
+  * Drop empty stub kvm_dirty_ring_check_request()             (Marc/Peter)
+  * Add PATCH[v5 3/7] to allow using bitmap, indicated by
+    KVM_CAP_DIRTY_LOG_RING_ALLOW_BITMAP                        (Marc/Peter)
+v4:
+  * Commit log improvement                                     (Marc)
+  * Add helper kvm_dirty_ring_check_request()                  (Marc)
+  * Drop ifdef for kvm_cpu_dirty_log_size()                    (Marc)
+v3:
+  * Check KVM_REQ_RING_SOFT_RULL inside kvm_request_pending()  (Peter)
+  * Move declaration of kvm_cpu_dirty_log_size()               (test-robot)
+v2:
+  * Introduce KVM_REQ_RING_SOFT_FULL                           (Marc)
+  * Changelog improvement                                      (Marc)
+  * Fix dirty_log_test without knowing host page size          (Drew)
+
+Gavin Shan (9):
+  KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
+  KVM: Move declaration of kvm_cpu_dirty_log_size() to kvm_dirty_ring.h
+  KVM: Check KVM_CAP_DIRTY_LOG_{RING, RING_ACQ_REL} prior to enabling
+    them
+  KVM: Support dirty ring in conjunction with bitmap
+  KVM: arm64: Improve no-running-vcpu report for dirty ring
+  KVM: arm64: Enable ring-based dirty memory tracking
+  KVM: selftests: Use host page size to map ring buffer in
+    dirty_log_test
+  KVM: selftests: Clear dirty ring states between two modes in
+    dirty_log_test
+  KVM: selftests: Automate choosing dirty ring size in dirty_log_test
+
+ Documentation/virt/kvm/api.rst               | 33 +++++++++---
+ arch/arm64/include/uapi/asm/kvm.h            |  1 +
+ arch/arm64/kvm/Kconfig                       |  2 +
+ arch/arm64/kvm/arm.c                         |  3 ++
+ arch/arm64/kvm/mmu.c                         | 14 ++++++
+ arch/arm64/kvm/vgic/vgic-init.c              |  4 +-
+ arch/arm64/kvm/vgic/vgic-irqfd.c             |  4 +-
+ arch/arm64/kvm/vgic/vgic-its.c               |  2 +-
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c           | 18 ++-----
+ arch/arm64/kvm/vgic/vgic.c                   | 10 ++++
+ arch/arm64/kvm/vgic/vgic.h                   |  1 -
+ arch/x86/include/asm/kvm_host.h              |  2 -
+ arch/x86/kvm/x86.c                           | 15 +++---
+ include/kvm/arm_vgic.h                       |  1 +
+ include/linux/kvm_dirty_ring.h               | 25 +++++----
+ include/linux/kvm_host.h                     | 10 ++--
+ include/uapi/linux/kvm.h                     |  1 +
+ tools/testing/selftests/kvm/dirty_log_test.c | 53 ++++++++++++++------
+ tools/testing/selftests/kvm/lib/kvm_util.c   |  2 +-
+ virt/kvm/Kconfig                             |  8 +++
+ virt/kvm/dirty_ring.c                        | 44 ++++++++++++++--
+ virt/kvm/kvm_main.c                          | 39 +++++++++-----
+ 22 files changed, 208 insertions(+), 84 deletions(-)
 
 -- 
-Catalin
+2.23.0
+
