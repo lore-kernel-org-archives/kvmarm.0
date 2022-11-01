@@ -1,90 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E8D7E
-	for <kvmarm@lists.linux.dev>; Tue,  1 Nov 2022 19:36:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACB04C433C1;
-	Tue,  1 Nov 2022 19:36:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1667331362;
-	bh=Rj1bZFx9VnHU9uH341ke8qqC18aDyq7kOdah2pSpsFs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YC+I6FFOmLs2GrP43E1PIwZwp4hqH8c0hrhF5jnspJhqhuQ5qU/08rSdDT+hDr/oj
-	 GLlD9ZEkPSBSjm0M4Z9s2YzfvouqAt1N72Y0NnLcHdRRQGk4Eg5g1T1orcrfauiYzW
-	 E60pRxkPZaOKkjSU53zXQLEQbTt6zfAfXKymo2lJ8rE2CNPnskBMwvzKrTARa+gpxo
-	 ZrTzGoQ/wn1TIhe5d1pfJUbMyntHjOChT9jmIcBww1a8FkkTbuQYPiilRdGeVvTVby
-	 W2BPmfIXPmion7ug6/seJp1+ySq1Xr13teryrohXFmiBmX/tEGjdHOKRecOI8xPA6w
-	 Dg+PzXMPBqdpQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1opx3I-0033ep-8R;
-	Tue, 01 Nov 2022 19:36:00 +0000
-Date: Tue, 01 Nov 2022 19:35:59 +0000
-Message-ID: <86a65aeacg.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Trap access to SMPRI_EL1 and TPIDR2 in VHE mode
-In-Reply-To: <Y2EtcQSnu5R/Frhj@sirena.org.uk>
-References: <20221101112716.52035-1-broonie@kernel.org>
-	<20221101112716.52035-3-broonie@kernel.org>
-	<86bkpqer4z.wl-maz@kernel.org>
-	<Y2EtcQSnu5R/Frhj@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88BDD7E
+	for <kvmarm@lists.linux.dev>; Tue,  1 Nov 2022 19:39:30 +0000 (UTC)
+Received: by mail-pg1-f169.google.com with SMTP id h2so14313123pgp.4
+        for <kvmarm@lists.linux.dev>; Tue, 01 Nov 2022 12:39:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tnEODX2baOxy8d43W9uFCYaWlAQWT5w4AwPUA+Xic0c=;
+        b=NWg9Qf4jep8QtwAzp6LlGIBZ9WQD30RO5yMyObW05gSJG0RMgAVotBdXfDg/PFd7xS
+         wCgCLMtq5WSobjNO9MYRFanOAIe42cCUImyWBJwXI8lQ1IxIx07DZtoRY54cUC4l3g5S
+         UG9dDF1oqM0F4NJQBNPBytpWImiAMW/09OKcI+od9oiV/Khh+0eTOsRQ/FXclq4kKpE4
+         IdLvAE1X9Umsd54HDWZuQPvjoOdvKQ+0x3WcG/43TeY0YpKQrcpZVVnrmUlXN6EoA1/J
+         VNt0Oux+EbMueltF5UC/wafegmCKmhF/wOFdvOcmi+hzEKeFg9bK6RlnOmaRXyMP/fN+
+         T/0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tnEODX2baOxy8d43W9uFCYaWlAQWT5w4AwPUA+Xic0c=;
+        b=KhaUzIbOf90sS/FkWxHlp0lsDn/BJ89rMTMmRoKfPIKt5fossFSWBOwLuUzZ+8O0Nd
+         Vh1ZDc9liBXBx570YrSeqfZ3kpKV0PIVNxcIO3FEam3GWWOfFyyt214r3OtpOt+lhaOZ
+         7P+Xxn+tM87B4Y/4/de5Z3xtzxkFc6lRbrhWPqGAmjlm/LbPennf0pzayxuYzwcH3F7B
+         76KU5V+5mnsrxn5zUVHCu2WT6qfKJLpLEnH+5+b+YzlORRfo6Q4m+hdabgIn6Sj58AXL
+         egG5Gj/fGhc5KHSLZfsOtzS2TWbCeiNiT/JS8m/ej/8CWsGPoIuuAkeU5fGB/ZYpGXOy
+         qPbQ==
+X-Gm-Message-State: ACrzQf1vOgdsvGhmtY/N5Maxf7KztxG836LwETyOgkiI+gsF8LL80/CU
+	RJ4jYh5ZuN3vW5WNCwM99/kgTg==
+X-Google-Smtp-Source: AMsMyM7y1Oh83Y/hQ+zELq6lqCQy6nyQlUDKZUw2/ZCPUhQWvl3BJiU2S+q1OeuYAM5aix2PbSxXSQ==
+X-Received: by 2002:a63:89c3:0:b0:46e:d2d9:a960 with SMTP id v186-20020a6389c3000000b0046ed2d9a960mr18383448pgd.329.1667331569800;
+        Tue, 01 Nov 2022 12:39:29 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id b7-20020aa78ec7000000b0056262811c5fsm6862296pfr.59.2022.11.01.12.39.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Nov 2022 12:39:29 -0700 (PDT)
+Date: Tue, 1 Nov 2022 19:39:25 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
+	ajones@ventanamicro.com, maz@kernel.org, bgardon@google.com,
+	catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
+	pbonzini@redhat.com, peterx@redhat.com, oliver.upton@linux.dev,
+	james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
+	alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v7 1/9] KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
+Message-ID: <Y2F17Y7YG5Z9XnOJ@google.com>
+References: <20221031003621.164306-1-gshan@redhat.com>
+ <20221031003621.164306-2-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, peter.maydell@linaro.org, richard.henderson@linaro.org, vdonnefort@google.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221031003621.164306-2-gshan@redhat.com>
+Message-ID: <20221101193925.MjOyjWXSMtbohJwhcSNkQECW0oF5_gu_jEFa_ykv_mI@z>
 
-On Tue, 01 Nov 2022 14:30:09 +0000,
-Mark Brown <broonie@kernel.org> wrote:
+On Mon, Oct 31, 2022, Gavin Shan wrote:
+> The VCPU isn't expected to be runnable when the dirty ring becomes soft
+> full, until the dirty pages are harvested and the dirty ring is reset
+> from userspace. So there is a check in each guest's entrace to see if
+> the dirty ring is soft full or not. The VCPU is stopped from running if
+> its dirty ring has been soft full. The similar check will be needed when
+> the feature is going to be supported on ARM64. As Marc Zyngier suggested,
+> a new event will avoid pointless overhead to check the size of the dirty
+> ring ('vcpu->kvm->dirty_ring_size') in each guest's entrance.
 > 
-> On Tue, Nov 01, 2022 at 01:33:16PM +0000, Marc Zyngier wrote:
-> > Date: Tue, 1 Nov 2022 12:19:51 +0000
-> > Subject: [PATCH] KVM: arm64: Fix SMPRI_EL1/TPIDR2_EL0 trapping on VHE
-> > 
-> > The trapping of SMPRI_EL1 and TPIDR2_EL0 currently only really
-> > work on nVHE, as only this mode uses the fine-grained trapping
-> > that controls these two registers.
-> > 
-> > Move the trapping enable/disable code into
-> > __{de,}activate_traps_common(), allowing it to be called when it
-> > actually matters on VHE, and remove the flipping of EL2 control
-> > for TPIDR2_EL0, which only affects the host access of this
-> > register.
-> > 
-> > Fixes: 861262ab8627 ("KVM: arm64: Handle SME host state when running guests")
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Cc: stable@vger.kernel.org
+> Add KVM_REQ_DIRTY_RING_SOFT_FULL. The event is raised when the dirty ring
+> becomes soft full in kvm_dirty_ring_push(). The event is cleared in the
+> check, done in the newly added helper kvm_dirty_ring_check_request(), or
+> when the dirty ring is reset by userspace. Since the VCPU is not runnable
+> when the dirty ring becomes soft full, the KVM_REQ_DIRTY_RING_SOFT_FULL
+> event is always set to prevent the VCPU from running until the dirty pages
+> are harvested and the dirty ring is reset by userspace.
 > 
-> Reported-by: Mark Brown <broonie@kernel.org>
-> Reviewed-by: Mark Brown <broonie@kernel.org>
+> kvm_dirty_ring_soft_full() becomes a private function with the newly added
+> helper kvm_dirty_ring_check_request(). The alignment for the various event
+> definitions in kvm_host.h is changed to tab character by the way. In order
+> to avoid using 'container_of()', the argument @ring is replaced by @vcpu
+> in kvm_dirty_ring_push() and kvm_dirty_ring_reset(). The argument @kvm to
+> kvm_dirty_ring_reset() is dropped since it can be retrieved from the VCPU.
+> 
+> Link: https://lore.kernel.org/kvmarm/87lerkwtm5.wl-maz@kernel.org
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+> ---
 
-Thanks. I've now applied the first patch and this one to kvmarm/fixes.
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-	M.
+> @@ -142,13 +144,17 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
+>  
+>  	kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+>  
+> +	if (!kvm_dirty_ring_soft_full(ring))
+> +		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
+> +
 
--- 
-Without deviation from the norm, progress is not possible.
+Marc, Peter, and/or Paolo, can you confirm that clearing the request here won't
+cause ordering problems?  Logically, this makes perfect sense (to me, since I
+suggested it), but I'm mildly concerned I'm overlooking an edge case where KVM
+could end up with a soft-full ring but no pending request.
+
+>  	trace_kvm_dirty_ring_reset(ring);
+>  
+>  	return count;
+>  }
+>  
