@@ -1,219 +1,78 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EC58F76
-	for <kvmarm@lists.linux.dev>; Mon, 31 Oct 2022 23:08:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1667257727;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VQFFGriLEOJQiVzKnvQsJXHkfhk9DM13xloxVckNyEY=;
-	b=Oz1lAVrkU+aoJrsn9SgtQwHYQ6N4HvXg1XNbdgjduzdH8j6ek32Nxy67UCxWMCDXgJ7vG3
-	/TEwDOBdBgKpV4g8bD/TXH8GbZQwlR3UtyNAi3ooO9ykVNIJ2CDOMaC7WibtKtXpc7K0St
-	VPf40t/+Z7iryaYGJcZAA4LiZN0ShJg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-570-qvL3ykXUNg-TfIivNzV1IQ-1; Mon, 31 Oct 2022 19:08:44 -0400
-X-MC-Unique: qvL3ykXUNg-TfIivNzV1IQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3A06C3804506;
-	Mon, 31 Oct 2022 23:08:43 +0000 (UTC)
-Received: from [10.64.54.151] (vpn2-54-151.bne.redhat.com [10.64.54.151])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 79B7C17584;
-	Mon, 31 Oct 2022 23:08:34 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v7 5/9] KVM: arm64: Improve no-running-vcpu report for
- dirty ring
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
- ajones@ventanamicro.com, maz@kernel.org, bgardon@google.com,
- catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
- pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com,
- james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
-References: <20221031003621.164306-1-gshan@redhat.com>
- <20221031003621.164306-6-gshan@redhat.com> <Y1+QiS0S3e6b358Q@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <d3a4278a-94e2-7af4-da2d-946c903d8825@redhat.com>
-Date: Tue, 1 Nov 2022 07:08:32 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D47D7E
+	for <kvmarm@lists.linux.dev>; Tue,  1 Nov 2022 11:32:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 892CFC433C1;
+	Tue,  1 Nov 2022 11:32:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1667302367;
+	bh=t8VKqvFmmk4RxuCoYN5dBw2gikcBUHP9PRuaDdBB7lc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=C29gKNkl7FL6JBv7QoboZrAF7u0KHRkJ3JxsTudVc6JTQb4Khskqgwu9XkA75S8jP
+	 p4crHoMrGMs7/t4J9QldfXQhrBYZxCUhB1zsqVpa9rgISHpPox/9Tmazp42LL023qj
+	 q1rn1LNv6ZqkA6YGZvknzjcIhsXd09HxuVZ7q7HfP/AGHRewV+0b5QJFx9tWXytyjE
+	 ZkkwkNFLV7C9XXDDSi3U9o9IDZoM3CmvHLaLyOrxUrrIFOQrL/NmrI5Lt/ZIAXd0ff
+	 CfKQXPv6DKyA6S2KI19VkI0jNEYFRVbPpnxyHhuc7vkwWRpizeQeXCzFNscj9j7ghn
+	 KLmk89L88ce+A==
+From: Mark Brown <broonie@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH v2 0/2] arm64/sme: Fix SMPRI_EL1 traps for KVM guests
+Date: Tue,  1 Nov 2022 11:27:13 +0000
+Message-Id: <20221101112716.52035-1-broonie@kernel.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <Y1+QiS0S3e6b358Q@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-Message-ID: <20221031230832.QHzu59m9IHpzuHHgNDBk0w8MywnMFKE1sGcjQheqWW0@z>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1349; i=broonie@kernel.org; h=from:subject; bh=t8VKqvFmmk4RxuCoYN5dBw2gikcBUHP9PRuaDdBB7lc=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjYQKRhCas+5q0XzqQQ/bqrnd35MlB994XPFOtdf0w LRG/5o6JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY2ECkQAKCRAk1otyXVSH0LpFB/ 9jyeu+a7OHlR1tPzgGpH7Hrk2SyDEGpwSxU2sGfI47oAnuRdmbxoLr1bGBo6sze61dgki4gV0dTjjn L7s+Y5iixH1pzuX+yB6L6fib0WL3GWDNnATMHxcR4q/w82dDa29w5RF3jp75SBr25vbcHm7KdoUAuM D9PpuBUDyzRammxMtRwLNGI4y8vUi3yYg+iXbiDeDnUR0tUhz6fAAwtWIcHxk/zUhy20pOG6eup2ZC dJpT4Ml2W7WoX0OjVjLe5tA83Ga0V6ORRQ6lxcRp/XLhA5TLjihGiR5c03/UDQaKZXNTJUmKHuI5d/ C69JfgW3vLKuVjHKCZgsji9Dag/Ylx
+X-Developer-Key: i=broonie@kernel.org; a=openpgp; fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Transfer-Encoding: 8bit
 
-On 10/31/22 5:08 PM, Oliver Upton wrote:
-> On Mon, Oct 31, 2022 at 08:36:17AM +0800, Gavin Shan wrote:
->> KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP should be enabled only when KVM
->> device "kvm-arm-vgic-its" is used by userspace. Currently, it's the
->> only case where a running VCPU is missed for dirty ring. However,
->> there are potentially other devices introducing similar error in
->> future.
->>
->> In order to report those broken devices only, the no-running-vcpu
->> warning message is escaped from KVM device "kvm-arm-vgic-its". For
->> this, the function vgic_has_its() needs to be exposed with a more
->> generic function name (kvm_vgic_has_its()).
->>
->> Link: https://lore.kernel.org/kvmarm/Y1ghIKrAsRFwSFsO@google.com
->> Suggested-by: Sean Christopherson <seanjc@google.com>
->> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> 
-> I don't think this should be added as a separate patch.
-> 
-> The weak kvm_arch_allow_write_without_running_vcpu() (and adding its
-> caller) should be rolled into patch 4/9. The arm64 implementation of
-> that should be introduced in patch 6/9.
-> 
+When adding support for SME I missed management of traps for SMPRI_EL1
+in KVM guests, and also the need to manage TPIDR2_EL0 fine grained traps
+for EL1.  This series adds that management, and also updates the
+documentation to help avoid such issues in future.
 
-Ok, the changes will be distributed in PATCH[4/9] and PATCH[6/9].
+This was noticed due to Vincent Donnefort noticing that qemu has
+implemented support for SME virtualisation but not fine grained traps
+which was causing problems for qemu in nVHE mode since that already used
+fine grained traps with SME, the FGT registers are not implemented and
+UNDEF.  As a result of this change VHE will also be affected so a
+separate series "KVM: arm: Refuse to enable KVM on systems with SME but
+not FGT" has been sent which will ensure we don't run on such systems
+though initial review suggests that this will likely be treated as a
+qemu documentation issue.
 
->> ---
->>   arch/arm64/kvm/mmu.c               | 14 ++++++++++++++
->>   arch/arm64/kvm/vgic/vgic-init.c    |  4 ++--
->>   arch/arm64/kvm/vgic/vgic-irqfd.c   |  4 ++--
->>   arch/arm64/kvm/vgic/vgic-its.c     |  2 +-
->>   arch/arm64/kvm/vgic/vgic-mmio-v3.c | 18 ++++--------------
->>   arch/arm64/kvm/vgic/vgic.c         | 10 ++++++++++
->>   arch/arm64/kvm/vgic/vgic.h         |  1 -
->>   include/kvm/arm_vgic.h             |  1 +
->>   include/linux/kvm_dirty_ring.h     |  1 +
->>   virt/kvm/dirty_ring.c              |  5 +++++
->>   virt/kvm/kvm_main.c                |  2 +-
->>   11 files changed, 41 insertions(+), 21 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index 60ee3d9f01f8..e0855b2b3d66 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -932,6 +932,20 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
->>   	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
->>   }
->>   
->> +/*
->> + * kvm_arch_allow_write_without_running_vcpu - allow writing guest memory
->> + * without the running VCPU when dirty ring is enabled.
->> + *
->> + * The running VCPU is required to track dirty guest pages when dirty ring
->> + * is enabled. Otherwise, the backup bitmap should be used to track the
->> + * dirty guest pages. When vgic/its is enabled, we need to use the backup
->> + * bitmap to track the dirty guest pages for it.
->> + */
->> +bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
->> +{
->> +	return kvm->dirty_ring_with_bitmap && kvm_vgic_has_its(kvm);
->> +}
-> 
-> It is trivial for userspace to cause a WARN to fire like this. Just set
-> up the VM with !RING_WITH_BITMAP && ITS.
-> 
-> The goal is to catch KVM bugs, not userspace bugs, so I'd suggest only
-> checking whether or not an ITS is present.
-> 
-> [...]
-> 
+v2:
+ - Rebase onto v6.1-rc2
+ - Also manage TPIDR2 fine grained traps for VHE mode.
 
-Ok. 'kvm->dirty_ring_with_bitmap' needn't to be checked here if we don't
-plan to catch userspace bug. Marc had suggestions to escape from the
-no-running-vcpu check only when vgic/its tables are being restored [1].
+Mark Brown (2):
+  arm64: booting: Document our requirements for fine grained traps with
+    SME
+  KVM: arm64: Trap access to SMPRI_EL1 and TPIDR2 in VHE mode
 
-In order to cover Marc's concern, I would introduce a different helper
-kvm_vgic_save_its_tables_in_progress(), which simply returns
-'bool struct vgic_dist::save_its_tables_in_progress'. The newly added
-field is set and cleared in vgic_its_ctrl(). All these changes will be
-folded to PATCH[v7 6/9]. Oliver and Marc, could you please let me know
-if the changes sounds good?
+ Documentation/arm64/booting.rst |  8 ++++++++
+ arch/arm64/kvm/hyp/vhe/switch.c | 26 ++++++++++++++++++++++++--
+ 2 files changed, 32 insertions(+), 2 deletions(-)
 
-    static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
-    {
-        const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-        struct vgic_dist *dist = &kvm->arch.vgic;
-        int ret = 0;
-          :
-        switch (attr) {
-        case KVM_DEV_ARM_ITS_CTRL_RESET:
-             vgic_its_reset(kvm, its);
-             break;
-        case KVM_DEV_ARM_ITS_SAVE_TABLES:
-             dist->save_its_tables_in_progress = true;
-             ret = abi->save_tables(its);
-             dist->save_its_tables_in_progress = false;
-             break;
-        case KVM_DEV_ARM_ITS_RESTORE_TABLES:
-             ret = abi->restore_tables(its);
-             break;
-        }
-        :
-     }
-  
-[1] https://lore.kernel.org/kvmarm/2ce535e9-f57a-0ab6-5c30-2b8afd4472e6@redhat.com/T/#mcf10e2d3ca0235ab1cac8793d894c1634666d280
 
->> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> index 91201f743033..10218057c176 100644
->> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
->> @@ -38,20 +38,10 @@ u64 update_64bit_reg(u64 reg, unsigned int offset, unsigned int len,
->>   	return reg | ((u64)val << lower);
->>   }
->>   
->> -bool vgic_has_its(struct kvm *kvm)
->> -{
->> -	struct vgic_dist *dist = &kvm->arch.vgic;
->> -
->> -	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
->> -		return false;
->> -
->> -	return dist->has_its;
->> -}
->> -
-> 
-> nit: renaming/exposing this helper should be done in a separate patch.
-> Also, I don't think you need to move it anywhere either.
-> 
-> [...]
-> 
-
-As Marc suggested, we tend to escape the site of saving vgic/its tables from
-the no-running-vcpu check. So we need a new helper kvm_vgic_save_its_tables_in_progress()
-instead, meaning kvm_vgic_has_its() isn't needed.
-
->> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
->> index 7ce6a5f81c98..f27e038043f3 100644
->> --- a/virt/kvm/dirty_ring.c
->> +++ b/virt/kvm/dirty_ring.c
->> @@ -26,6 +26,11 @@ bool kvm_use_dirty_bitmap(struct kvm *kvm)
->>   	return !kvm->dirty_ring_size || kvm->dirty_ring_with_bitmap;
->>   }
->>   
->> +bool __weak kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
->> +{
->> +	return kvm->dirty_ring_with_bitmap;
->> +}
->> +
-> 
-> Same comment on the arm64 implementation applies here. This should just
-> return false by default.
-> 
-
-Ok. It return 'false' and the addition of kvm_arch_allow_write_without_running_vcpu()
-will be folded to PATCH[4/9], as you suggested.
-
-Thanks,
-Gavin
+base-commit: 30a0b95b1335e12efef89dd78518ed3e4a71a763
+-- 
+2.30.2
 
