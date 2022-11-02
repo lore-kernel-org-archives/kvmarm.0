@@ -2,83 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0186C4332F
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 14:31:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1695FC43217
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 15:58:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 672CA4B9D1;
-	Wed,  2 Nov 2022 10:31:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89E7340417;
+	Wed,  2 Nov 2022 11:58:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dcnAJNIYXsl7; Wed,  2 Nov 2022 10:31:49 -0400 (EDT)
+	with ESMTP id 7unYzaSnKEQp; Wed,  2 Nov 2022 11:58:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AB934B9B2;
-	Wed,  2 Nov 2022 10:31:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A5A54B984;
+	Wed,  2 Nov 2022 11:58:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C0FF74B9B2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 10:31:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DC1F4B904
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 11:58:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9Hg5tsjmAWmJ for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Nov 2022 10:31:46 -0400 (EDT)
+ with ESMTP id V7+tFV92JrPm for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Nov 2022 11:58:48 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 60C604B8FB
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 10:31:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0EC3540417
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 11:58:48 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 0C51A619BF;
- Wed,  2 Nov 2022 14:31:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 678ECC433D6;
- Wed,  2 Nov 2022 14:31:44 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id D830261590;
+ Wed,  2 Nov 2022 15:58:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1416C433D6;
+ Wed,  2 Nov 2022 15:58:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1667399504;
- bh=oqcRdONznDjK5OD/JbKdmCUVoIe+pWw8Rnw/Koogg1o=;
+ s=k20201202; t=1667404726;
+ bh=HX9zj9GM9OWe4YXhMsVjlp4lVDfOB/zbQjFOQfuR2To=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=AxF68Z/m4FDfzCw1D8gu4VRsHZOK+Fbbv+ODEpq1UOFidgxxNVHo0CvnYKyH8Xkco
- iDYxsAjoAbGa0Gp6iy2j+d/mzWdS08BnKBJtB/SHjg2HTyUgnUg2in9b4WosPvDL+G
- TEQrEGa/e4aexuXjr+ycVXui02R/pLdQDMx1GnO5lPIWH3PW3s+VYQ2e6gIhx6srlR
- xhPrbyukbuvBiq1ai7kalskSUdfiTMohROmEspag74At4XkUys81nLlAjIwtamsHxh
- 1GAbJjme+QxpNKtxH9sXndRFli97f2fwHNhf1OEGhsQwSI8NEY5bRgOF6pZ6D5TUO9
- HZb7eCotOosAA==
+ b=Qh07gmOgCeigjcvSBI719bVcZ7HH0lWvCkCGQatFgY/ual/4f6cDOOhVzsLPxzQvy
+ XvsFO0xWQD+E81EXUtgp+9Jehx8H+b7VIreoffjM+hQ4YNvGfMvzWGoABfro9nCQ67
+ A3wOvvcpj9am58IZVvd8ByhttmSTO5t38zowdEZ2Y+bGYKAnsTiGKSNjw40Zll0hnV
+ NVg5OQooEBpYS+JexDlD8pwo6NDfvfbxuye3TmaVWlR6JW5x3kpsgkGRbC39jd0ZUL
+ bqHiRhkI8CHNH3PUyCP9CAhqwgoNDzztJTci00YVy+MqO/CEqb3mYu9/N8PEvxden7
+ 8ywr4QILxnE5g==
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=goblin-girl.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oqEmL-003EJN-SU;
- Wed, 02 Nov 2022 14:31:42 +0000
-Date: Wed, 02 Nov 2022 14:31:41 +0000
-Message-ID: <868rkte8c2.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oqG8Z-003FIG-DC;
+ Wed, 02 Nov 2022 15:58:44 +0000
+Date: Wed, 02 Nov 2022 15:58:43 +0000
+Message-ID: <867d0de4b0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
+To: Peter Xu <peterx@redhat.com>
 Subject: Re: [PATCH v7 1/9] KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
-In-Reply-To: <Y2F17Y7YG5Z9XnOJ@google.com>
+In-Reply-To: <Y2J+xhBYhqBI81f7@x1n>
 References: <20221031003621.164306-1-gshan@redhat.com>
  <20221031003621.164306-2-gshan@redhat.com>
- <Y2F17Y7YG5Z9XnOJ@google.com>
+ <Y2F17Y7YG5Z9XnOJ@google.com> <Y2J+xhBYhqBI81f7@x1n>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, gshan@redhat.com, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
- ajones@ventanamicro.com, bgardon@google.com, catalin.marinas@arm.com,
- dmatlack@google.com, will@kernel.org, pbonzini@redhat.com, peterx@redhat.com,
- oliver.upton@linux.dev, james.morse@arm.com, shuah@kernel.org,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, zhenyzha@redhat.com,
- shan.gavin@gmail.com
+X-SA-Exim-Rcpt-To: peterx@redhat.com, seanjc@google.com, gshan@redhat.com,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com,
+ catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
+ pbonzini@redhat.com, oliver.upton@linux.dev, james.morse@arm.com,
+ shuah@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ zhenyzha@redhat.com, shan.gavin@gmail.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: shuah@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com,
- andrew.jones@linux.dev, dmatlack@google.com, shan.gavin@gmail.com,
- bgardon@google.com, kvmarm@lists.linux.dev, pbonzini@redhat.com,
- zhenyzha@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- ajones@ventanamicro.com
+Cc: shuah@kernel.org, kvm@vger.kernel.org, andrew.jones@linux.dev,
+ dmatlack@google.com, will@kernel.org, shan.gavin@gmail.com, bgardon@google.com,
+ kvmarm@lists.linux.dev, pbonzini@redhat.com, zhenyzha@redhat.com,
+ catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,71 +94,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 01 Nov 2022 19:39:25 +0000,
-Sean Christopherson <seanjc@google.com> wrote:
+On Wed, 02 Nov 2022 14:29:26 +0000,
+Peter Xu <peterx@redhat.com> wrote:
 > 
-> On Mon, Oct 31, 2022, Gavin Shan wrote:
-> > The VCPU isn't expected to be runnable when the dirty ring becomes soft
-> > full, until the dirty pages are harvested and the dirty ring is reset
-> > from userspace. So there is a check in each guest's entrace to see if
-> > the dirty ring is soft full or not. The VCPU is stopped from running if
-> > its dirty ring has been soft full. The similar check will be needed when
-> > the feature is going to be supported on ARM64. As Marc Zyngier suggested,
-> > a new event will avoid pointless overhead to check the size of the dirty
-> > ring ('vcpu->kvm->dirty_ring_size') in each guest's entrance.
+> On Tue, Nov 01, 2022 at 07:39:25PM +0000, Sean Christopherson wrote:
+> > > @@ -142,13 +144,17 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
+> > >  
+> > >  	kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+> > >  
+> > > +	if (!kvm_dirty_ring_soft_full(ring))
+> > > +		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
+> > > +
 > > 
-> > Add KVM_REQ_DIRTY_RING_SOFT_FULL. The event is raised when the dirty ring
-> > becomes soft full in kvm_dirty_ring_push(). The event is cleared in the
-> > check, done in the newly added helper kvm_dirty_ring_check_request(), or
-> > when the dirty ring is reset by userspace. Since the VCPU is not runnable
-> > when the dirty ring becomes soft full, the KVM_REQ_DIRTY_RING_SOFT_FULL
-> > event is always set to prevent the VCPU from running until the dirty pages
-> > are harvested and the dirty ring is reset by userspace.
-> > 
-> > kvm_dirty_ring_soft_full() becomes a private function with the newly added
-> > helper kvm_dirty_ring_check_request(). The alignment for the various event
-> > definitions in kvm_host.h is changed to tab character by the way. In order
-> > to avoid using 'container_of()', the argument @ring is replaced by @vcpu
-> > in kvm_dirty_ring_push() and kvm_dirty_ring_reset(). The argument @kvm to
-> > kvm_dirty_ring_reset() is dropped since it can be retrieved from the VCPU.
-> > 
-> > Link: https://lore.kernel.org/kvmarm/87lerkwtm5.wl-maz@kernel.org
-> > Suggested-by: Marc Zyngier <maz@kernel.org>
-> > Signed-off-by: Gavin Shan <gshan@redhat.com>
-> > Reviewed-by: Peter Xu <peterx@redhat.com>
-> > ---
+> > Marc, Peter, and/or Paolo, can you confirm that clearing the
+> > request here won't cause ordering problems?  Logically, this makes
+> > perfect sense (to me, since I suggested it), but I'm mildly
+> > concerned I'm overlooking an edge case where KVM could end up with
+> > a soft-full ring but no pending request.
 > 
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
+> I don't see an ordering issue here, as long as kvm_clear_request() is using
+> atomic version of bit clear, afaict that's genuine RMW and should always
+> imply a full memory barrier (on any arch?) between the soft full check and
+> the bit clear.  At least for x86 the lock prefix was applied.
+
+No, clear_bit() is not a full barrier. It only atomic, and thus
+completely unordered (see Documentation/atomic_bitops.txt). If you
+want a full barrier, you need to use test_and_clear_bit().
+
 > 
-> > @@ -142,13 +144,17 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
-> >  
-> >  	kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
-> >  
-> > +	if (!kvm_dirty_ring_soft_full(ring))
-> > +		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
-> > +
+> However I don't see anything stops a simple "race" to trigger like below:
 > 
-> Marc, Peter, and/or Paolo, can you confirm that clearing the request
-> here won't cause ordering problems?  Logically, this makes perfect
-> sense (to me, since I suggested it), but I'm mildly concerned I'm
-> overlooking an edge case where KVM could end up with a soft-full
-> ring but no pending request.
+>           recycle thread                   vcpu thread
+>           --------------                   -----------
+>       if (!dirty_ring_soft_full)                                   <--- not full
+>                                         dirty_ring_push();
+>                                         if (dirty_ring_soft_full)  <--- full due to the push
+>                                             set_request(SOFT_FULL);
+>           clear_request(SOFT_FULL);                                <--- can wrongly clear the request?
+>
 
-I don't think you'll end-up with a soft-full and no request situation,
-as kvm_make_request() enforces ordering, and you're making the request
-on the vcpu itself. Even on arm64, this is guaranteed to be ordered
-(same CPU, same address).
+Hmmm, well spotted. That's another ugly effect of the recycle thread
+playing with someone else's toys.
 
-However, resetting the ring and clearing the request are not ordered,
-which can lead to a slightly odd situation where the two events are
-out of sync. But kvm_dirty_ring_check_request() requires both the
-request to be set and the ring to be full to take any action. This
-work around the lack of order.
+> But I don't think that's a huge matter, as it'll just let the vcpu to have
+> one more chance to do another round of KVM_RUN.  Normally I think it means
+> there can be one more dirty GFN (perhaps there're cases that it can push >1
+> gfns for one KVM_RUN cycle?  I never figured out the details here, but
+> still..) pushed to the ring so closer to the hard limit, but we have had a
+> buffer zone of KVM_DIRTY_RING_RSVD_ENTRIES (64) entries.  So I assume
+> that's still fine, but maybe worth a short comment here?
+> 
+> I never know what's the maximum possible GFNs being dirtied for a KVM_RUN
+> cycle.  It would be good if there's an answer to that from anyone.
 
-I'd be much happier if kvm_clear_request() was fully ordered, but I
-otherwise don't think we have an issue here.
+This is dangerous, and I'd rather not go there.
 
-Thanks,
+It is starting to look like we need the recycle thread to get out of
+the way. And to be honest:
+
++	if (!kvm_dirty_ring_soft_full(ring))
++		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
+
+seems rather superfluous. Only clearing the flag in the vcpu entry
+path feels much saner, and I can't see anything that would break.
+
+Thoughts?
 
 	M.
 
