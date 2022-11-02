@@ -1,46 +1,52 @@
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEBF6D18
-	for <kvmarm@lists.linux.dev>; Wed,  2 Nov 2022 16:11:11 +0000 (UTC)
-Received: by mail-pg1-f174.google.com with SMTP id 64so355055pgc.5
-        for <kvmarm@lists.linux.dev>; Wed, 02 Nov 2022 09:11:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xjbiGog+CMLFws9ba0e8gTV0L7Jl5w0vMwDQ7UNnmBw=;
-        b=fg5ss+yu7hOd7zMQAayXu1r5V5FRoeiX0Ib8rbO1Hbpnplg28DwPoTzY3KXbp2IM5l
-         c8LhKRuFMH0LpjHZqJ/2MO63rmotIEtPBD0D+rrJYFHPwGvPjKFUWsaM0f6Or6MD+PMa
-         xWZBW7C28NlVRSBqddoR8LLJS5WgYHillPL2TPvWLB/q/bsrRkhbFv47BZ6Sjtk0FQVM
-         enNFn/n81hHrMVGNCRCSpNhDfglnUMmtyta2ATX+wgX831Gh9RjaU/U3AQkd3cynJHeo
-         U+5ETSrGJcaCiKGZdkgrI0jt9/jJ9kNO/LscVkh2clSBXP1iXeLU5+XbUTtSax048fuO
-         WbJQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A75A7461
+	for <kvmarm@lists.linux.dev>; Wed,  2 Nov 2022 16:23:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1667406202;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5byMHFaExyjDBXydjU2vjfyJkptyvIyynTJvAWyAxJc=;
+	b=K9ftRss7148fT6cuCnC6QfFmMVsFBPXt09trWXkjmAjW0aAJMC7nOKsJZy71XlKazbEvAS
+	cYoJqp+1LL7XeoeS+iJKBhXazausNu57dbN3uBiu8xsGSb9DuciR7ntGr0zkHRaVOro7Y6
+	67K4cwGnl/wS+FHGeh0ii2FmasOUqhs=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-481-4VgQ7IHHPrqe6B1eabstCg-1; Wed, 02 Nov 2022 12:23:21 -0400
+X-MC-Unique: 4VgQ7IHHPrqe6B1eabstCg-1
+Received: by mail-qk1-f198.google.com with SMTP id w4-20020a05620a444400b006fa24b2f394so9350022qkp.15
+        for <kvmarm@lists.linux.dev>; Wed, 02 Nov 2022 09:23:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xjbiGog+CMLFws9ba0e8gTV0L7Jl5w0vMwDQ7UNnmBw=;
-        b=CvrNB5XxJiSve646tIQrpYaVoPFSVLVMtTZ2NiWMNv2VTqFMD/bUMK8k3+Wjg6dGyl
-         Or4Hb2LdEODwhDmqMU60lbKwjlFyX8AOZmlfl6s5FRp5jJ8ppTelqIP5gqap7b3N8Ezh
-         CWtt3QZ2iW9AgXVoVWgrXPGlGeH8YeH2SRdzT5dcMcqSsXui2IDUVK9Y54S84kMPm4qr
-         JUC3BemLJpIjLZWYNVUE8GgtnqE8np5LXkO+Co8xqpNg5dfb2hmKO2UnWec9/OncAeYm
-         S1aCSo13zY9GyFZwmbovTO9GSCadLNAhTPkt34OVwNmrx97+8zX0OjGvMEZTPvehHYcE
-         Klsg==
-X-Gm-Message-State: ACrzQf12zRZc/2XFtAt2pOSVk8i7RrdqQ3pTKhoWN1AN4ihSsWY1DzCR
-	vPyU5G/gW9E3pzPOxD9UmbG6pA==
-X-Google-Smtp-Source: AMsMyM40y/EP1XZjLr8u5d95J50ow6Qq/UpZGFYNazWh9EsURT6JqjOG9NRHwf0ExoNxySlBc1J0Zw==
-X-Received: by 2002:a63:8b42:0:b0:46f:5bd0:1ae2 with SMTP id j63-20020a638b42000000b0046f5bd01ae2mr21786579pge.422.1667405471018;
-        Wed, 02 Nov 2022 09:11:11 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id a15-20020a170902710f00b001885041d7b8sm77000pll.293.2022.11.02.09.11.10
+        bh=5byMHFaExyjDBXydjU2vjfyJkptyvIyynTJvAWyAxJc=;
+        b=kxb5vP1c90x/hsjHXTRbS+YxnXybtIZYQ+7l+9ttp+TEslxbLWuIOYJegvrdD5NiMC
+         j4ECXaNbgyUp77sGVnTAKqUHTUL/TF00jJYOSZHdIS0eeH+wG6+V4jCs9sZxX+YTKkvz
+         EDCbJkL+1tOvChNXGuadIjJLIgzi63Rpzzv3o3Q50YzOG6aqaCBWS4+mM/baXv8k6bTD
+         BU302DSQI44D2Tk+Pv/END0zD/Tf5E6bRlvObeKU1amQdRVL4vz+mUVyrIqMp5/F5+Ae
+         e7SvhC942d0uOtjH1rcgUqGVhYBo0fWI+vEljd9vv7UOg6LAcoJLOb9G9h0PjQ96E21b
+         izkQ==
+X-Gm-Message-State: ACrzQf2rmZg0amzKbot0fl6yExto5Xqv2VZav6h7eJ04jk1/PFhIDD6b
+	KIIw1h1GEly6muRIaTjDIeRn04DlFOS8LjT3yqKUlWiaZq9vJFIkFYSBwBnswPbJgB0scAbNVjR
+	gxW7RN4EjTyP23iZb
+X-Received: by 2002:a05:622a:ca:b0:3a5:24d2:9295 with SMTP id p10-20020a05622a00ca00b003a524d29295mr14748781qtw.300.1667406199192;
+        Wed, 02 Nov 2022 09:23:19 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6EpjURP1I5j6n6rF3l05q9tySy58y2y7M9A2JRR097icY3iLQyUWI+2g5g7C6S/Ehg5hZGpQ==
+X-Received: by 2002:a05:622a:ca:b0:3a5:24d2:9295 with SMTP id p10-20020a05622a00ca00b003a524d29295mr14748754qtw.300.1667406198900;
+        Wed, 02 Nov 2022 09:23:18 -0700 (PDT)
+Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
+        by smtp.gmail.com with ESMTPSA id s16-20020a05620a255000b006ee7923c187sm8903281qko.42.2022.11.02.09.23.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 09:11:10 -0700 (PDT)
-Date: Wed, 2 Nov 2022 16:11:07 +0000
-From: Sean Christopherson <seanjc@google.com>
+        Wed, 02 Nov 2022 09:23:18 -0700 (PDT)
+Date: Wed, 2 Nov 2022 12:23:16 -0400
+From: Peter Xu <peterx@redhat.com>
 To: Marc Zyngier <maz@kernel.org>
-Cc: Peter Xu <peterx@redhat.com>, Gavin Shan <gshan@redhat.com>,
+Cc: Sean Christopherson <seanjc@google.com>, Gavin Shan <gshan@redhat.com>,
 	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
 	ajones@ventanamicro.com, bgardon@google.com,
@@ -49,7 +55,7 @@ Cc: Peter Xu <peterx@redhat.com>, Gavin Shan <gshan@redhat.com>,
 	shuah@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
 	zhenyzha@redhat.com, shan.gavin@gmail.com
 Subject: Re: [PATCH v7 1/9] KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
-Message-ID: <Y2KWm8wiL3jBryMI@google.com>
+Message-ID: <Y2KZdDAQN4889W9V@x1n>
 References: <20221031003621.164306-1-gshan@redhat.com>
  <20221031003621.164306-2-gshan@redhat.com>
  <Y2F17Y7YG5Z9XnOJ@google.com>
@@ -61,13 +67,66 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <867d0de4b0.wl-maz@kernel.org>
-Message-ID: <20221102161107.g97C3NuRgwhG5QNpDCh69_x5YQ9rpKj8qaDW73HjtQI@z>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Message-ID: <20221102162316.PTkeFRSkKV-WYONZcT0nyUjy3dEvgP8-_CZkn-VT3rg@z>
 
-On Wed, Nov 02, 2022, Marc Zyngier wrote:
-> On Wed, 02 Nov 2022 14:29:26 +0000, Peter Xu <peterx@redhat.com> wrote:
+On Wed, Nov 02, 2022 at 03:58:43PM +0000, Marc Zyngier wrote:
+> On Wed, 02 Nov 2022 14:29:26 +0000,
+> Peter Xu <peterx@redhat.com> wrote:
+> > 
+> > On Tue, Nov 01, 2022 at 07:39:25PM +0000, Sean Christopherson wrote:
+> > > > @@ -142,13 +144,17 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
+> > > >  
+> > > >  	kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+> > > >  
+> > > > +	if (!kvm_dirty_ring_soft_full(ring))
+> > > > +		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
+> > > > +
+> > > 
+> > > Marc, Peter, and/or Paolo, can you confirm that clearing the
+> > > request here won't cause ordering problems?  Logically, this makes
+> > > perfect sense (to me, since I suggested it), but I'm mildly
+> > > concerned I'm overlooking an edge case where KVM could end up with
+> > > a soft-full ring but no pending request.
+> > 
+> > I don't see an ordering issue here, as long as kvm_clear_request() is using
+> > atomic version of bit clear, afaict that's genuine RMW and should always
+> > imply a full memory barrier (on any arch?) between the soft full check and
+> > the bit clear.  At least for x86 the lock prefix was applied.
+> 
+> No, clear_bit() is not a full barrier. It only atomic, and thus
+> completely unordered (see Documentation/atomic_bitops.txt). If you
+> want a full barrier, you need to use test_and_clear_bit().
+
+Right, I mixed it up again. :(  It's genuine RMW indeed (unlike _set/_read)
+but I forgot it needs to have a retval to have the memory barriers.
+
+Quotting atomic_t.rst:
+
+---8<---
+ORDERING  (go read memory-barriers.txt first)
+--------
+
+The rule of thumb:
+
+ - non-RMW operations are unordered;
+
+ - RMW operations that have no return value are unordered;
+
+ - RMW operations that have a return value are fully ordered;
+
+ - RMW operations that are conditional are unordered on FAILURE,
+   otherwise the above rules apply.
+---8<---
+
+Bit clear unordered.
+
+> 
+> > 
 > > However I don't see anything stops a simple "race" to trigger like below:
 > > 
 > >           recycle thread                   vcpu thread
@@ -106,7 +165,13 @@ On Wed, Nov 02, 2022, Marc Zyngier wrote:
 > 
 > Thoughts?
 
-I've no objections to dropping the clear on reset, I suggested it primarily so
-that it would be easier to understand what action causes the dirty ring to become
-not-full.  I agree that the explicit clear is unnecessary from a functional
-perspective.
+Sounds good here.
+
+Might be slightly off-topic: I didn't quickly spot how do we guarantee two
+threads doing KVM_RUN ioctl on the same vcpu fd concurrently.  I know
+that's insane and could have corrupted things, but I just want to make sure
+e.g. even a malicious guest app won't be able to trigger host warnings.
+
+-- 
+Peter Xu
+
