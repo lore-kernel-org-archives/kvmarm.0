@@ -2,73 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30CEBC4167D
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:20:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE282C4332F
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:20:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E50364B862;
-	Wed,  2 Nov 2022 19:20:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77FA04B85D;
+	Wed,  2 Nov 2022 19:20:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1UZGgU-rHFst; Wed,  2 Nov 2022 19:20:12 -0400 (EDT)
+	with ESMTP id Ya8QIY0tiKCP; Wed,  2 Nov 2022 19:20:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E60F24B85B;
-	Wed,  2 Nov 2022 19:20:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E3024B6B7;
+	Wed,  2 Nov 2022 19:20:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B940E4B84C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:20:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E1804B750
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:20:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I7-EINn1oq+t for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Nov 2022 19:20:08 -0400 (EDT)
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
- [209.85.128.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 874094B846
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:20:07 -0400 (EDT)
-Received: by mail-yw1-f202.google.com with SMTP id
- 00721157ae682-37360a6236fso800017b3.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:20:07 -0700 (PDT)
+ with ESMTP id fn6CoOPd02Kf for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Nov 2022 19:20:14 -0400 (EDT)
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com
+ [209.85.215.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 865794B828
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:20:13 -0400 (EDT)
+Received: by mail-pg1-f202.google.com with SMTP id
+ h19-20020a63e153000000b00434dfee8dbaso81725pgk.18
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:20:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=xdi2HIR5lDsLzEB1UZrukxTClMK6e7wt2nFiWo5gXdY=;
- b=sb/k/6YChcjl+a9VYlAXhWYOgQyjQV32YX7EFiw9qqpx/WWSDY3oo2CdFxdxpN5cQ+
- bsen7KFdwbaDgiY7tE/ARuN34CNUQVNfQj40KonMSYzWyRevQJIJ8ucvWSt+5e0xldbM
- dG1h+yI8VvXovjZl23qRN2G1h0VDtyVIK/a8wCZyDk3med1nNg8la66zBWDcMMULCuHG
- GgMxZJTuhnm9Kg3Kf6izcH6H9MKXIo5IEEs5iURRrxNb+NCxH6KXLxeRheLVzOIs5Da0
- /j3GVJG8PRl/KZMyimVoe+5FEyijlgyVWBHJWpAL02rmgy07fT/EQi1GCc1WFNc58HpZ
- GW3A==
+ bh=FB9/txOY21wW/TPsgqc6j4ZQ11jhPkkdawz9sPCSXNA=;
+ b=Gh0pNKJAjUP7sOLxgeINR/cbIHMm/TCvJmesgDmGY7tgu6P6YXBVfYIXTfojpYFhsq
+ HkT9AYvu2cJGezPMeBp64lBMsTUd9ONRFB5hypdMyN7za0hetccYQckOK26B+CDbxF6r
+ +OhS46uwFsSqDvUawxhpwU4TdzcYBw50A+ZMoD8n+DmjlNK3aB9aXy9DkBx+JSHJ6ISO
+ pjQ1VfDtpdTwM/Mhh3TXxzf4TORrG3FqJQ2hX6AUGnQSwf155R85whsuIiWoEQQ1/uAN
+ 5ZiQXw1v8DLP7PBHC5uyXihM2rPnRlLj9wclnfoxTX04fyoZeThV5J1v6/TU+dV2434R
+ khBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=xdi2HIR5lDsLzEB1UZrukxTClMK6e7wt2nFiWo5gXdY=;
- b=0HYpqTPk8CgWv9ENTH/VhYsGUzhujLrGy709hsy/NFqq8uNCcmLKFgy6DuLgX9hKdT
- q7gyU7x1mMSMuQZXWiFvQ8eKgPxm2DuKGj1VT0TzoHynak6FhlikUxsQ8SJ/VW1TgrM2
- 6LWYCLmV+vXjO7caXj8kx80+gE7p87CST4s/lMNgrONuksh1bucEnFG8BTuDg9iDP2sP
- Z2FJHchU2/2W1eZ3QXUuGsNt3hRyAC3GxYhxh6IcxmvWrPYTXVmAXL/OP4Z87QJYYPAk
- 2+e2LdLG3NDCrqIk4h6YIiFeQ8DvpzGaosCu2s5aueYXoIZAB+NxBBN0UTk1vnV4OIcf
- AZcQ==
-X-Gm-Message-State: ACrzQf3uHNHQHP9k4GKxz+UaHjWc7O5jlUhgXE8B+nE49afopUGWSydZ
- jJZeVXb6YgGUOroSE1FvxaqNZ7G+y2w=
-X-Google-Smtp-Source: AMsMyM7e+TGdJRwAqNyPJfnKmxSn80oz3hoXq+YWtTdlfH8WIBioJcR7xPecdYC8HpWoY/uUAUWZTvNWC7g=
+ bh=FB9/txOY21wW/TPsgqc6j4ZQ11jhPkkdawz9sPCSXNA=;
+ b=yavYytyKAchEpDLrFXJbGT8x+IsUcjBFDspeCwhY8EXlR9+xpjowEEiuuuvQwo6xZ9
+ HzU2NRCMOi8YGb4sSiBIGtJ7rr8/lxTIPsYq+ygPB/w+3DB+H8FoFhdnY+3qhDPiWmgp
+ zWLZc05oOVj5um+gz995PEoAQj5NrKvMn4blHHXsmDhW3B3njrCgVj0zn55N/OVvNXE6
+ BsNwLg+lgIHNhE57wSjHPUpxVhJROA96rptwV1X30VlWGZ2tXi0yYbdQB58jfxsv2L7F
+ akdISrP+bbJDe3F6Ch1PU6KrEAJlgw56qOCKJ32u+Lj+n3O/oGJWuDpyjgFwY2wqUBo6
+ M+mg==
+X-Gm-Message-State: ACrzQf25lutfKKqiT6KGD7SRbghcIv34mOa/gB1oh1TEibqCaG5CDq5a
+ bVxJ1Q30ZkhPs7OOV7w7YSwUgRbQro0=
+X-Google-Smtp-Source: AMsMyM7nfKY/wHJ8tA5FRpJD6/RIsVOrpmudYjvQ2DhJNYVckSrzlEN04CTpOiyaCyk531P1edibX7B9dbc=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a5b:443:0:b0:6bc:e3d1:8990 with SMTP id
- s3-20020a5b0443000000b006bce3d18990mr28148778ybp.191.1667431207141; Wed, 02
- Nov 2022 16:20:07 -0700 (PDT)
-Date: Wed,  2 Nov 2022 23:18:58 +0000
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:3698:b0:56d:3180:e88f with SMTP id
+ dw24-20020a056a00369800b0056d3180e88fmr24063664pfb.66.1667431212769; Wed, 02
+ Nov 2022 16:20:12 -0700 (PDT)
+Date: Wed,  2 Nov 2022 23:19:01 +0000
 In-Reply-To: <20221102231911.3107438-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221102231911.3107438-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102231911.3107438-32-seanjc@google.com>
-Subject: [PATCH 31/44] KVM: x86: Use KBUILD_MODNAME to specify vendor module
- name
+Message-ID: <20221102231911.3107438-35-seanjc@google.com>
+Subject: [PATCH 34/44] KVM: VMX: Shuffle support checks and hardware enabling
+ code around
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -108,46 +108,254 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Use KBUILD_MODNAME to specify the vendor module name instead of manually
-writing out the name to make it a bit more obvious that the name isn't
-completely arbitrary.  A future patch will also use KBUILD_MODNAME to
-define pr_fmt, at which point using KBUILD_MODNAME for kvm_x86_ops.name
-further reinforces the intended usage of kvm_x86_ops.name.
+Reorder code in vmx.c so that the VMX support check helpers reside above
+the hardware enabling helpers, which will allow KVM to perform support
+checks during hardware enabling (in a future patch).
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 2 +-
- arch/x86/kvm/vmx/vmx.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 212 ++++++++++++++++++++---------------------
+ 1 file changed, 106 insertions(+), 106 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 99c1ac2d9c84..13457aa68112 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4737,7 +4737,7 @@ static int svm_vm_init(struct kvm *kvm)
- }
- 
- static struct kvm_x86_ops svm_x86_ops __initdata = {
--	.name = "kvm_amd",
-+	.name = KBUILD_MODNAME,
- 
- 	.hardware_unsetup = svm_hardware_unsetup,
- 	.hardware_enable = svm_hardware_enable,
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 25e28d368274..a563c9756e36 100644
+index 2a7e62d0707d..07d86535c032 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8074,7 +8074,7 @@ static void vmx_vm_destroy(struct kvm *kvm)
+@@ -2485,77 +2485,6 @@ static void vmx_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
+ 	}
  }
  
- static struct kvm_x86_ops vmx_x86_ops __initdata = {
--	.name = "kvm_intel",
-+	.name = KBUILD_MODNAME,
+-static int kvm_cpu_vmxon(u64 vmxon_pointer)
+-{
+-	u64 msr;
+-
+-	cr4_set_bits(X86_CR4_VMXE);
+-
+-	asm_volatile_goto("1: vmxon %[vmxon_pointer]\n\t"
+-			  _ASM_EXTABLE(1b, %l[fault])
+-			  : : [vmxon_pointer] "m"(vmxon_pointer)
+-			  : : fault);
+-	return 0;
+-
+-fault:
+-	WARN_ONCE(1, "VMXON faulted, MSR_IA32_FEAT_CTL (0x3a) = 0x%llx\n",
+-		  rdmsrl_safe(MSR_IA32_FEAT_CTL, &msr) ? 0xdeadbeef : msr);
+-	cr4_clear_bits(X86_CR4_VMXE);
+-
+-	return -EFAULT;
+-}
+-
+-static int vmx_hardware_enable(void)
+-{
+-	int cpu = raw_smp_processor_id();
+-	u64 phys_addr = __pa(per_cpu(vmxarea, cpu));
+-	int r;
+-
+-	if (cr4_read_shadow() & X86_CR4_VMXE)
+-		return -EBUSY;
+-
+-	/*
+-	 * This can happen if we hot-added a CPU but failed to allocate
+-	 * VP assist page for it.
+-	 */
+-	if (static_branch_unlikely(&enable_evmcs) &&
+-	    !hv_get_vp_assist_page(cpu))
+-		return -EFAULT;
+-
+-	intel_pt_handle_vmx(1);
+-
+-	r = kvm_cpu_vmxon(phys_addr);
+-	if (r) {
+-		intel_pt_handle_vmx(0);
+-		return r;
+-	}
+-
+-	if (enable_ept)
+-		ept_sync_global();
+-
+-	return 0;
+-}
+-
+-static void vmclear_local_loaded_vmcss(void)
+-{
+-	int cpu = raw_smp_processor_id();
+-	struct loaded_vmcs *v, *n;
+-
+-	list_for_each_entry_safe(v, n, &per_cpu(loaded_vmcss_on_cpu, cpu),
+-				 loaded_vmcss_on_cpu_link)
+-		__loaded_vmcs_clear(v);
+-}
+-
+-static void vmx_hardware_disable(void)
+-{
+-	vmclear_local_loaded_vmcss();
+-
+-	if (cpu_vmxoff())
+-		kvm_spurious_fault();
+-
+-	intel_pt_handle_vmx(0);
+-}
+-
+ /*
+  * There is no X86_FEATURE for SGX yet, but anyway we need to query CPUID
+  * directly instead of going through cpu_has(), to ensure KVM is trapping
+@@ -2781,6 +2710,112 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+ 	return 0;
+ }
  
- 	.hardware_unsetup = vmx_hardware_unsetup,
++static bool __init kvm_is_vmx_supported(void)
++{
++	if (!cpu_has_vmx()) {
++		pr_err("CPU doesn't support VMX\n");
++		return false;
++	}
++
++	if (!boot_cpu_has(X86_FEATURE_MSR_IA32_FEAT_CTL) ||
++	    !boot_cpu_has(X86_FEATURE_VMX)) {
++		pr_err("VMX not enabled in MSR_IA32_FEAT_CTL\n");
++		return false;
++	}
++
++	return true;
++}
++
++static int __init vmx_check_processor_compat(void)
++{
++	struct vmcs_config vmcs_conf;
++	struct vmx_capability vmx_cap;
++
++	if (!kvm_is_vmx_supported())
++		return -EIO;
++
++	if (setup_vmcs_config(&vmcs_conf, &vmx_cap) < 0)
++		return -EIO;
++	if (nested)
++		nested_vmx_setup_ctls_msrs(&vmcs_conf, vmx_cap.ept);
++	if (memcmp(&vmcs_config, &vmcs_conf, sizeof(struct vmcs_config)) != 0) {
++		pr_err("CPU %d feature inconsistency!\n", smp_processor_id());
++		return -EIO;
++	}
++	return 0;
++}
++
++static int kvm_cpu_vmxon(u64 vmxon_pointer)
++{
++	u64 msr;
++
++	cr4_set_bits(X86_CR4_VMXE);
++
++	asm_volatile_goto("1: vmxon %[vmxon_pointer]\n\t"
++			  _ASM_EXTABLE(1b, %l[fault])
++			  : : [vmxon_pointer] "m"(vmxon_pointer)
++			  : : fault);
++	return 0;
++
++fault:
++	WARN_ONCE(1, "VMXON faulted, MSR_IA32_FEAT_CTL (0x3a) = 0x%llx\n",
++		  rdmsrl_safe(MSR_IA32_FEAT_CTL, &msr) ? 0xdeadbeef : msr);
++	cr4_clear_bits(X86_CR4_VMXE);
++
++	return -EFAULT;
++}
++
++static int vmx_hardware_enable(void)
++{
++	int cpu = raw_smp_processor_id();
++	u64 phys_addr = __pa(per_cpu(vmxarea, cpu));
++	int r;
++
++	if (cr4_read_shadow() & X86_CR4_VMXE)
++		return -EBUSY;
++
++	/*
++	 * This can happen if we hot-added a CPU but failed to allocate
++	 * VP assist page for it.
++	 */
++	if (static_branch_unlikely(&enable_evmcs) &&
++	    !hv_get_vp_assist_page(cpu))
++		return -EFAULT;
++
++	intel_pt_handle_vmx(1);
++
++	r = kvm_cpu_vmxon(phys_addr);
++	if (r) {
++		intel_pt_handle_vmx(0);
++		return r;
++	}
++
++	if (enable_ept)
++		ept_sync_global();
++
++	return 0;
++}
++
++static void vmclear_local_loaded_vmcss(void)
++{
++	int cpu = raw_smp_processor_id();
++	struct loaded_vmcs *v, *n;
++
++	list_for_each_entry_safe(v, n, &per_cpu(loaded_vmcss_on_cpu, cpu),
++				 loaded_vmcss_on_cpu_link)
++		__loaded_vmcs_clear(v);
++}
++
++static void vmx_hardware_disable(void)
++{
++	vmclear_local_loaded_vmcss();
++
++	if (cpu_vmxoff())
++		kvm_spurious_fault();
++
++	intel_pt_handle_vmx(0);
++}
++
+ struct vmcs *alloc_vmcs_cpu(bool shadow, int cpu, gfp_t flags)
+ {
+ 	int node = cpu_to_node(cpu);
+@@ -7466,41 +7501,6 @@ static int vmx_vm_init(struct kvm *kvm)
+ 	return 0;
+ }
  
+-static bool __init kvm_is_vmx_supported(void)
+-{
+-	if (!cpu_has_vmx()) {
+-		pr_err("CPU doesn't support VMX\n");
+-		return false;
+-	}
+-
+-	if (!boot_cpu_has(X86_FEATURE_MSR_IA32_FEAT_CTL) ||
+-	    !boot_cpu_has(X86_FEATURE_VMX)) {
+-		pr_err("VMX not enabled in MSR_IA32_FEAT_CTL\n");
+-		return false;
+-	}
+-
+-	return true;
+-}
+-
+-static int __init vmx_check_processor_compat(void)
+-{
+-	struct vmcs_config vmcs_conf;
+-	struct vmx_capability vmx_cap;
+-
+-	if (!kvm_is_vmx_supported())
+-		return -EIO;
+-
+-	if (setup_vmcs_config(&vmcs_conf, &vmx_cap) < 0)
+-		return -EIO;
+-	if (nested)
+-		nested_vmx_setup_ctls_msrs(&vmcs_conf, vmx_cap.ept);
+-	if (memcmp(&vmcs_config, &vmcs_conf, sizeof(struct vmcs_config)) != 0) {
+-		pr_err("CPU %d feature inconsistency!\n", smp_processor_id());
+-		return -EIO;
+-	}
+-	return 0;
+-}
+-
+ static u8 vmx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+ {
+ 	u8 cache;
 -- 
 2.38.1.431.g37b22c650d-goog
 
