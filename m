@@ -2,73 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB2FC4332F
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:20:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43771C43219
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:20:39 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 681324B886;
-	Wed,  2 Nov 2022 19:20:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02A644B885;
+	Wed,  2 Nov 2022 19:20:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ILML0jCXiG7h; Wed,  2 Nov 2022 19:20:35 -0400 (EDT)
+	with ESMTP id guCtiiLyunO5; Wed,  2 Nov 2022 19:20:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 763634B87E;
-	Wed,  2 Nov 2022 19:20:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A18224B894;
+	Wed,  2 Nov 2022 19:20:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 563CC4B848
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:20:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77F084B894
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:20:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2GNAjzqXhV+h for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Nov 2022 19:20:32 -0400 (EDT)
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
- [209.85.215.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1CF384B884
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:20:31 -0400 (EDT)
-Received: by mail-pg1-f201.google.com with SMTP id
- p18-20020a63e652000000b0046b27534651so83897pgj.17
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:20:31 -0700 (PDT)
+ with ESMTP id hGWuIzIsQbZC for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Nov 2022 19:20:29 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7B0E4B815
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:20:28 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ f126-20020a255184000000b006cb2aebd124so364501ybb.11
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:20:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=LaNeYxCMK/0HkG90K8r+zFwgVfimGLm91QPHwbaIpUg=;
- b=GS9ZjitRS3MgBey/6Gsgnoq2TONIjUD3b6x+Qo9VWBk4QgVEjGz27nqFsQsHit2TJi
- vD3EZREXHyZDYXYkIaYw23EJCulJtKHTZGn272/fXLoHSPdRKLlAjVBdf81Iw48Vn3IC
- 05yzNtyxmh1tgwEByicnbP79WzVgeTcsKoNHLjoiizD1qOwUUC1Tu8C1pqtdcOiRefn8
- gWxIPUHv/TBdXXDaw/YnRhI+flEnjxqVdLjjz3Pf3vz+/i7ALiFEbLZZThj4ZQT5I5eH
- VGr8/x6gu6sMk9iTGyyFXf1/gW9mhk/DGzwnwrE6pOvFmRedO4vWQhwOOVeSHTcabmyr
- 8dzg==
+ bh=nvDOwkn7hwg+zfvJUXf8AHfTsU5S0iCSbbYe/XAvrQI=;
+ b=kPsyz565Bs3nWd/vXeOuSWMgvIdI7+RJdtnuc0znmJIjMQ8uzXLRwKs8W7PumGf1FB
+ TInnWKg6dZjNDAKuYUbWAGztsfGiZ+tk8yY6bKPVrq1xzztMo8xlFpqIJ6lhzJTHDPrm
+ lou7lyJZKFxoJ8wozjn3uJXVRhz+EYknGTCWfTAQUsNnFbSP/SLgEfh6MyRvKfldCG8U
+ pqOyiOjbRpZeYdvtQ7S7c4kgRIPHFaJSoTRioybyXKPMMU3h/v/TNXPFUOrsn8FChvzn
+ JAwsqVkjZPDDeC2WWvWJ0112+KgndOYyfFTaXcofTGWmMGiul8k48NIfwWZFm0EpNX4X
+ UhZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=LaNeYxCMK/0HkG90K8r+zFwgVfimGLm91QPHwbaIpUg=;
- b=5auTtjsvCaIgr5NGkZtaAckmTFh0Qmod6IrPM5xc7mTXy7zzjMDzPKsw7NDWBW0YIK
- 9IzcaqfGgHhl37Mv44ptOD7xlZGM+jk5xdjRdAWfV5RQztflzksrOtai9egthHUfEzAe
- UskTMjPhul91gf2MMYSmF7hGEFwR6zw0lRRrNl1V8aWXhYaj/cotD1C+6pA9DTVeEa/1
- rTqRobPzRkQ9EypYa4kHwq5dYCVEjoSENGGZPT3YyNc0m6WQPIcaCh8O4ThKbm861PQN
- YuQZo0S5ZVAw7TYPOzkNuAE65x0LYI6gSYRB8629XhvxVoceJL4E7B5umGrOBBbQLaEc
- /Xxw==
-X-Gm-Message-State: ACrzQf3RmNZXkCvvo2DxHMRUV3aAwxLc31gI4D6qxYg00A8fVf88FvLT
- /GuJJbL7piXINkWQke39rLJnWTQOwvY=
-X-Google-Smtp-Source: AMsMyM6BcOmNf3NoXJ9k0LbSmLVgaxyU1NHnfLkf3krcoPPzAcNfRbjvVlhtF4UBH97poEqzcuaAjhPzixE=
+ bh=nvDOwkn7hwg+zfvJUXf8AHfTsU5S0iCSbbYe/XAvrQI=;
+ b=xTwwC33AWtpEy2iKyvt2xyDvWZ2HG8Nprg00FOAx4p+kywWk2FS3DTex3Ss/nBkTyr
+ nTAfJOmp0s4viyEZZTphsAcIWhoxNrjRKjsFvpQ9W8gVPonog0usoIi/oD7eRCwpLtu4
+ vJNSKAuIkAdJcfRTsHDh/PgFbCmCXgYDEBnqd1EqPAfV5b0q/PM8looohqyHXE9DX7jl
+ ZrgYC8w68sGF6cgM3pNhv/4stiNplP2SxGyBCYjYfYw4hgkqmh8q+4YdRNUrZ6tN2HaH
+ oD9PZchne4iMlg4XMp/kwFuuLyw9rsRK06gvb/nHKpXxbSMuPa47JhxBGy3k+68Yas7a
+ 4Dkg==
+X-Gm-Message-State: ACrzQf0T6/fu0Kh2FBymHNceDenOwsJ9c2HukhIaXd60Y4eFKcpdhUY+
+ V/aAE6eZMC1NBUlOHXqJTNpPDHnPHA0=
+X-Google-Smtp-Source: AMsMyM5eowv7lcJiOd868nUuFM6ikjnC3RuvYPPk5CroI1jtu45SCXqk7PcUOxGjfgiO1DuVsExFVnovkSQ=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:a94:b0:56d:5c36:7eb8 with SMTP id
- b20-20020a056a000a9400b0056d5c367eb8mr19861116pfl.38.1667431230154; Wed, 02
- Nov 2022 16:20:30 -0700 (PDT)
-Date: Wed,  2 Nov 2022 23:19:11 +0000
+ (user=seanjc job=sendgmr) by 2002:a05:690c:b9b:b0:367:7d5a:3403 with SMTP id
+ ck27-20020a05690c0b9b00b003677d5a3403mr179885ywb.148.1667431228175; Wed, 02
+ Nov 2022 16:20:28 -0700 (PDT)
+Date: Wed,  2 Nov 2022 23:19:10 +0000
 In-Reply-To: <20221102231911.3107438-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221102231911.3107438-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102231911.3107438-45-seanjc@google.com>
-Subject: [PATCH 44/44] KVM: Opt out of generic hardware enabling on s390 and
- PPC
+Message-ID: <20221102231911.3107438-44-seanjc@google.com>
+Subject: [PATCH 43/44] KVM: Register syscore (suspend/resume) ops early in
+ kvm_init()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -108,267 +108,123 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Allow architectures to opt out of the generic hardware enabling logic,
-and opt out on both s390 and PPC, which don't need to manually enable
-virtualization as it's always on (when available).
+Register the suspend/resume notifier hooks at the same time KVM registers
+its reboot notifier so that all the code in kvm_init() that deals with
+enabling/disabling hardware is bundled together.  Opportunstically move
+KVM's implementations to reside near the reboot notifier code for the
+same reason.
 
-In addition to letting s390 and PPC drop a bit of dead code, this will
-hopefully also allow ARM to clean up its related code, e.g. ARM has its
-own per-CPU flag to track which CPUs have enable hardware due to the
-need to keep hardware enabled indefinitely when pKVM is enabled.
+Bunching the code together will allow architectures to opt out of KVM's
+generic hardware enable/disable logic with minimal #ifdeffery.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/arm64/kvm/Kconfig              |  1 +
- arch/mips/kvm/Kconfig               |  1 +
- arch/powerpc/include/asm/kvm_host.h |  1 -
- arch/powerpc/kvm/powerpc.c          |  5 -----
- arch/riscv/kvm/Kconfig              |  1 +
- arch/s390/include/asm/kvm_host.h    |  1 -
- arch/s390/kvm/kvm-s390.c            |  6 ------
- arch/x86/kvm/Kconfig                |  1 +
- include/linux/kvm_host.h            |  4 ++++
- virt/kvm/Kconfig                    |  3 +++
- virt/kvm/kvm_main.c                 | 30 +++++++++++++++++++++++------
- 11 files changed, 35 insertions(+), 19 deletions(-)
+ virt/kvm/kvm_main.c | 64 ++++++++++++++++++++++-----------------------
+ 1 file changed, 32 insertions(+), 32 deletions(-)
 
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 815cc118c675..0a7d2116b27b 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -21,6 +21,7 @@ if VIRTUALIZATION
- menuconfig KVM
- 	bool "Kernel-based Virtual Machine (KVM) support"
- 	depends on HAVE_KVM
-+	select KVM_GENERIC_HARDWARE_ENABLING
- 	select MMU_NOTIFIER
- 	select PREEMPT_NOTIFIERS
- 	select HAVE_KVM_CPU_RELAX_INTERCEPT
-diff --git a/arch/mips/kvm/Kconfig b/arch/mips/kvm/Kconfig
-index 91d197bee9c0..29e51649203b 100644
---- a/arch/mips/kvm/Kconfig
-+++ b/arch/mips/kvm/Kconfig
-@@ -28,6 +28,7 @@ config KVM
- 	select MMU_NOTIFIER
- 	select SRCU
- 	select INTERVAL_TREE
-+	select KVM_GENERIC_HARDWARE_ENABLING
- 	help
- 	  Support for hosting Guest kernels.
- 
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 0a80e80c7b9e..959f566a455c 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -876,7 +876,6 @@ struct kvm_vcpu_arch {
- #define __KVM_HAVE_ARCH_WQP
- #define __KVM_HAVE_CREATE_DEVICE
- 
--static inline void kvm_arch_hardware_disable(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
- static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 51268be60dac..ed426c9ee0e9 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -436,11 +436,6 @@ int kvmppc_ld(struct kvm_vcpu *vcpu, ulong *eaddr, int size, void *ptr,
- }
- EXPORT_SYMBOL_GPL(kvmppc_ld);
- 
--int kvm_arch_hardware_enable(void)
--{
--	return 0;
--}
--
- int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- {
- 	struct kvmppc_ops *kvm_ops = NULL;
-diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
-index f36a737d5f96..d5a658a047a7 100644
---- a/arch/riscv/kvm/Kconfig
-+++ b/arch/riscv/kvm/Kconfig
-@@ -20,6 +20,7 @@ if VIRTUALIZATION
- config KVM
- 	tristate "Kernel-based Virtual Machine (KVM) support (EXPERIMENTAL)"
- 	depends on RISCV_SBI && MMU
-+	select KVM_GENERIC_HARDWARE_ENABLING
- 	select MMU_NOTIFIER
- 	select PREEMPT_NOTIFIERS
- 	select KVM_MMIO
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index b1e98a9ed152..d3e4b5d7013a 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -1023,7 +1023,6 @@ extern char sie_exit;
- extern int kvm_s390_gisc_register(struct kvm *kvm, u32 gisc);
- extern int kvm_s390_gisc_unregister(struct kvm *kvm, u32 gisc);
- 
--static inline void kvm_arch_hardware_disable(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
- static inline void kvm_arch_free_memslot(struct kvm *kvm,
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 949231f1393e..129c159ab5ee 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -248,12 +248,6 @@ debug_info_t *kvm_s390_dbf;
- debug_info_t *kvm_s390_dbf_uv;
- 
- /* Section: not file related */
--int kvm_arch_hardware_enable(void)
--{
--	/* every s390 is virtualization enabled ;-) */
--	return 0;
--}
--
- /* forward declarations */
- static void kvm_gmap_notifier(struct gmap *gmap, unsigned long start,
- 			      unsigned long end);
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index fbeaa9ddef59..8e578311ca9d 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -49,6 +49,7 @@ config KVM
- 	select SRCU
- 	select INTERVAL_TREE
- 	select HAVE_KVM_PM_NOTIFIER if PM
-+	select KVM_GENERIC_HARDWARE_ENABLING
- 	help
- 	  Support hosting fully virtualized guest machines using hardware
- 	  virtualization extensions.  You will need a fairly recent
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 0b96d836a051..23c89c1e7788 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1441,8 +1441,10 @@ void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_
- static inline void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu) {}
- #endif
- 
-+#ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
- int kvm_arch_hardware_enable(void);
- void kvm_arch_hardware_disable(void);
-+#endif
- int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
- bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
- int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
-@@ -2074,7 +2076,9 @@ static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
- 	}
- }
- 
-+#ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
- extern bool kvm_rebooting;
-+#endif
- 
- extern unsigned int halt_poll_ns;
- extern unsigned int halt_poll_ns_grow;
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index 800f9470e36b..d28df77345e1 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -86,3 +86,6 @@ config KVM_XFER_TO_GUEST_WORK
- 
- config HAVE_KVM_PM_NOTIFIER
-        bool
-+
-+config KVM_GENERIC_HARDWARE_ENABLING
-+       bool
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 859bc27091cd..6736b36cf469 100644
+index a18296ee731b..859bc27091cd 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -102,9 +102,6 @@ EXPORT_SYMBOL_GPL(halt_poll_ns_shrink);
- DEFINE_MUTEX(kvm_lock);
- LIST_HEAD(vm_list);
- 
--static DEFINE_PER_CPU(bool, hardware_enabled);
--static int kvm_usage_count;
--
- static struct kmem_cache *kvm_vcpu_cache;
- 
- static __read_mostly struct preempt_ops kvm_preempt_ops;
-@@ -146,9 +143,6 @@ static void hardware_disable_all(void);
- 
- static void kvm_io_bus_destroy(struct kvm_io_bus *bus);
- 
--__visible bool kvm_rebooting;
--EXPORT_SYMBOL_GPL(kvm_rebooting);
--
- #define KVM_EVENT_CREATE_VM 0
- #define KVM_EVENT_DESTROY_VM 1
- static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm);
-@@ -5005,6 +4999,13 @@ static struct miscdevice kvm_dev = {
- 	&kvm_chardev_ops,
+@@ -5142,6 +5142,36 @@ static struct notifier_block kvm_reboot_notifier = {
+ 	.priority = 0,
  };
  
-+#ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
-+__visible bool kvm_rebooting;
-+EXPORT_SYMBOL_GPL(kvm_rebooting);
-+
-+static DEFINE_PER_CPU(bool, hardware_enabled);
-+static int kvm_usage_count;
-+
- static int __hardware_enable_nolock(void)
- {
- 	if (__this_cpu_read(hardware_enabled))
-@@ -5171,6 +5172,17 @@ static struct syscore_ops kvm_syscore_ops = {
- 	.suspend = kvm_suspend,
- 	.resume = kvm_resume,
- };
-+#else /* CONFIG_KVM_GENERIC_HARDWARE_ENABLING */
-+static int hardware_enable_all(void)
++static int kvm_suspend(void)
 +{
++	/*
++	 * Secondary CPUs and CPU hotplug are disabled across the suspend/resume
++	 * callbacks, i.e. no need to acquire kvm_lock to ensure the usage count
++	 * is stable.  Assert that kvm_lock is not held as a paranoid sanity
++	 * check that the system isn't suspended when KVM is enabling hardware.
++	 */
++	lockdep_assert_not_held(&kvm_lock);
++	lockdep_assert_irqs_disabled();
++
++	if (kvm_usage_count)
++		hardware_disable_nolock(NULL);
 +	return 0;
 +}
 +
-+static void hardware_disable_all(void)
++static void kvm_resume(void)
 +{
++	lockdep_assert_not_held(&kvm_lock);
++	lockdep_assert_irqs_disabled();
 +
++	if (kvm_usage_count)
++		WARN_ON_ONCE(__hardware_enable_nolock());
 +}
-+#endif /* CONFIG_KVM_GENERIC_HARDWARE_ENABLING */
- 
++
++static struct syscore_ops kvm_syscore_ops = {
++	.suspend = kvm_suspend,
++	.resume = kvm_resume,
++};
++
  static void kvm_io_bus_destroy(struct kvm_io_bus *bus)
  {
-@@ -5859,6 +5871,7 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
- 	int r;
- 	int cpu;
+ 	int i;
+@@ -5720,36 +5750,6 @@ static void kvm_init_debug(void)
+ 	}
+ }
  
-+#ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
- 	r = cpuhp_setup_state_nocalls(CPUHP_AP_KVM_ONLINE, "kvm/cpu:online",
- 				      kvm_online_cpu, kvm_offline_cpu);
- 	if (r)
-@@ -5866,6 +5879,7 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
+-static int kvm_suspend(void)
+-{
+-	/*
+-	 * Secondary CPUs and CPU hotplug are disabled across the suspend/resume
+-	 * callbacks, i.e. no need to acquire kvm_lock to ensure the usage count
+-	 * is stable.  Assert that kvm_lock is not held as a paranoid sanity
+-	 * check that the system isn't suspended when KVM is enabling hardware.
+-	 */
+-	lockdep_assert_not_held(&kvm_lock);
+-	lockdep_assert_irqs_disabled();
+-
+-	if (kvm_usage_count)
+-		hardware_disable_nolock(NULL);
+-	return 0;
+-}
+-
+-static void kvm_resume(void)
+-{
+-	lockdep_assert_not_held(&kvm_lock);
+-	lockdep_assert_irqs_disabled();
+-
+-	if (kvm_usage_count)
+-		WARN_ON_ONCE(__hardware_enable_nolock());
+-}
+-
+-static struct syscore_ops kvm_syscore_ops = {
+-	.suspend = kvm_suspend,
+-	.resume = kvm_resume,
+-};
+-
+ static inline
+ struct kvm_vcpu *preempt_notifier_to_vcpu(struct preempt_notifier *pn)
+ {
+@@ -5865,6 +5865,7 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
+ 		return r;
  
  	register_reboot_notifier(&kvm_reboot_notifier);
- 	register_syscore_ops(&kvm_syscore_ops);
-+#endif
++	register_syscore_ops(&kvm_syscore_ops);
  
  	/* A kmem cache lets us meet the alignment requirements of fx_save. */
  	if (!vcpu_align)
-@@ -5933,9 +5947,11 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
+@@ -5899,8 +5900,6 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
+ 
+ 	kvm_chardev_ops.owner = module;
+ 
+-	register_syscore_ops(&kvm_syscore_ops);
+-
+ 	kvm_preempt_ops.sched_in = kvm_sched_in;
+ 	kvm_preempt_ops.sched_out = kvm_sched_out;
+ 
+@@ -5934,6 +5933,7 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
  		free_cpumask_var(per_cpu(cpu_kick_mask, cpu));
  	kmem_cache_destroy(kvm_vcpu_cache);
  out_free_3:
-+#ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
- 	unregister_syscore_ops(&kvm_syscore_ops);
++	unregister_syscore_ops(&kvm_syscore_ops);
  	unregister_reboot_notifier(&kvm_reboot_notifier);
  	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_ONLINE);
-+#endif
  	return r;
- }
- EXPORT_SYMBOL_GPL(kvm_init);
-@@ -5957,9 +5973,11 @@ void kvm_exit(void)
- 	kmem_cache_destroy(kvm_vcpu_cache);
- 	kvm_vfio_ops_exit();
- 	kvm_async_pf_deinit();
-+#ifdef CONFIG_KVM_GENERIC_HARDWARE_ENABLING
- 	unregister_syscore_ops(&kvm_syscore_ops);
- 	unregister_reboot_notifier(&kvm_reboot_notifier);
- 	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_ONLINE);
-+#endif
- 	kvm_irqfd_exit();
- }
- EXPORT_SYMBOL_GPL(kvm_exit);
 -- 
 2.38.1.431.g37b22c650d-goog
 
