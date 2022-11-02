@@ -2,84 +2,94 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACCECC4167B
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 16:11:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B007C43217
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 16:23:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2EE84B955;
-	Wed,  2 Nov 2022 12:11:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CEA014B95B;
+	Wed,  2 Nov 2022 12:23:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5BQWlPBUbHkW; Wed,  2 Nov 2022 12:11:14 -0400 (EDT)
+	with ESMTP id rKDRc0zeHGgT; Wed,  2 Nov 2022 12:23:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1CB74B95A;
-	Wed,  2 Nov 2022 12:11:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 92E4E4B962;
+	Wed,  2 Nov 2022 12:23:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4215D4B93C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 12:11:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B6264B95B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 12:23:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SNA+z7jPvoIK for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Nov 2022 12:11:12 -0400 (EDT)
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com
- [209.85.210.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B8804B941
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 12:11:12 -0400 (EDT)
-Received: by mail-pf1-f171.google.com with SMTP id b29so16789084pfp.13
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 09:11:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=xjbiGog+CMLFws9ba0e8gTV0L7Jl5w0vMwDQ7UNnmBw=;
- b=fg5ss+yu7hOd7zMQAayXu1r5V5FRoeiX0Ib8rbO1Hbpnplg28DwPoTzY3KXbp2IM5l
- c8LhKRuFMH0LpjHZqJ/2MO63rmotIEtPBD0D+rrJYFHPwGvPjKFUWsaM0f6Or6MD+PMa
- xWZBW7C28NlVRSBqddoR8LLJS5WgYHillPL2TPvWLB/q/bsrRkhbFv47BZ6Sjtk0FQVM
- enNFn/n81hHrMVGNCRCSpNhDfglnUMmtyta2ATX+wgX831Gh9RjaU/U3AQkd3cynJHeo
- U+5ETSrGJcaCiKGZdkgrI0jt9/jJ9kNO/LscVkh2clSBXP1iXeLU5+XbUTtSax048fuO
- WbJQ==
+ with ESMTP id Bdpiu5jgmm-h for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Nov 2022 12:23:21 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3742E4B95A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 12:23:21 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1667406200;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=5byMHFaExyjDBXydjU2vjfyJkptyvIyynTJvAWyAxJc=;
+ b=DdYoU46mosBTy9xZVhbLcrXfMTN3YbXAdo4hWgnkjqAGRB/tgQJLKGv3Z7xKTqE59D20sy
+ oLpRhZ2RIXPIJHAwBF6ZWfm9Tcqkpm84wpKBN8J0SmEUIPZ5qgF8iqVEWFVygaQgjDlxbu
+ 2qtvpjMoEg5fR2U+dKZsrX6557ZlnfY=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-81-ZtM9r9BGPQO5IKvD3vDacg-1; Wed, 02 Nov 2022 12:23:19 -0400
+X-MC-Unique: ZtM9r9BGPQO5IKvD3vDacg-1
+Received: by mail-qk1-f198.google.com with SMTP id
+ bq13-20020a05620a468d00b006fa5a75759aso2381820qkb.13
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 09:23:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
  :message-id:reply-to;
- bh=xjbiGog+CMLFws9ba0e8gTV0L7Jl5w0vMwDQ7UNnmBw=;
- b=d6XFMql/dDxE0kN9cp/GDV4BoFSpmJ7RWbzzMKUPXITkDx2lCqFSagw5AzLdmez4mn
- tLnnmmrPG9IsWpWokho/ak2tkbWTTlE0zL/1j/ALyGDGbSNc1f/xxMEnbA5gLhDAv+6A
- xWQxN5Zu8tv1L7EwzzhFDQITlje2LFuizCe9fzcX+ShCF/UBZpdY12NUrDcU/vlH0Sku
- AI7e32JLKxL5YmULqBxdgHXjOyBZCw6gz3fJCqUDp/+Fn4to6kdGqNQcTM7D2vUlALw3
- R39z7WmVToKuupkcuUc9ZOZ63xUrVq4H1dad+SEFkd6Ww2i3Ofi7C0kvLOC5oOJsTZYy
- IOgA==
-X-Gm-Message-State: ACrzQf1sy2yxA0sE9+9dklQqHFRSceUUMuZgwcm4mGJ3ihDJA9BxRy83
- scc7fkUVg7I1CNm5pUodP9WxQg==
-X-Google-Smtp-Source: AMsMyM40y/EP1XZjLr8u5d95J50ow6Qq/UpZGFYNazWh9EsURT6JqjOG9NRHwf0ExoNxySlBc1J0Zw==
-X-Received: by 2002:a63:8b42:0:b0:46f:5bd0:1ae2 with SMTP id
- j63-20020a638b42000000b0046f5bd01ae2mr21786579pge.422.1667405471018; 
- Wed, 02 Nov 2022 09:11:11 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com.
- [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
- a15-20020a170902710f00b001885041d7b8sm77000pll.293.2022.11.02.09.11.10
+ bh=5byMHFaExyjDBXydjU2vjfyJkptyvIyynTJvAWyAxJc=;
+ b=hxivlTJRBuUKsmnaz4+xtUPRx1BNBn9fSTQjS/0l4HziS3mIznkzCG/mCazInGLoLB
+ DOVicfxviklIosyc1xCFlmWvK+x7e6JCjmheqERSYTQhkAPW2fjYDpNxdvFdCcjYDNBd
+ WM+GSL6fxfUC4tdjyzDr6LK3XLhWN2aXLq6tn5i77ZznpNtaQgZKkv+TsInCF0w4QPmx
+ Fo3o8kzAVo47YfXH6UPAdUz1Lz8MyMl8yZJO0YnmP1xuf4UUGkHPTUZ4DXEN79053BV9
+ Z8T9Qc0PLTe56fT21S/W1Cpch6RCgHwpMYGb87B2IQN/REad1hLJHWvipqPPAOM1Cizk
+ f5PQ==
+X-Gm-Message-State: ACrzQf2JUAQwDPzJ0uxdvG+tULbbU+rsbIe9zBXAswOhT0b8g7afEV6+
+ g4+/SHRwr98an/MY0Q9UGroK/mDtjukt84HjJQg0KuO6mf8w0lkEflELUx4rHQ/qfi0Jay229qS
+ lb9H4XENRIz9UasTMMG4Oq0KG
+X-Received: by 2002:a05:622a:ca:b0:3a5:24d2:9295 with SMTP id
+ p10-20020a05622a00ca00b003a524d29295mr14748780qtw.300.1667406199189; 
+ Wed, 02 Nov 2022 09:23:19 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6EpjURP1I5j6n6rF3l05q9tySy58y2y7M9A2JRR097icY3iLQyUWI+2g5g7C6S/Ehg5hZGpQ==
+X-Received: by 2002:a05:622a:ca:b0:3a5:24d2:9295 with SMTP id
+ p10-20020a05622a00ca00b003a524d29295mr14748754qtw.300.1667406198900; 
+ Wed, 02 Nov 2022 09:23:18 -0700 (PDT)
+Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca.
+ [70.31.27.79]) by smtp.gmail.com with ESMTPSA id
+ s16-20020a05620a255000b006ee7923c187sm8903281qko.42.2022.11.02.09.23.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 02 Nov 2022 09:11:10 -0700 (PDT)
-Date: Wed, 2 Nov 2022 16:11:07 +0000
-From: Sean Christopherson <seanjc@google.com>
+ Wed, 02 Nov 2022 09:23:18 -0700 (PDT)
+Date: Wed, 2 Nov 2022 12:23:16 -0400
+From: Peter Xu <peterx@redhat.com>
 To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [PATCH v7 1/9] KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
-Message-ID: <Y2KWm8wiL3jBryMI@google.com>
+Message-ID: <Y2KZdDAQN4889W9V@x1n>
 References: <20221031003621.164306-1-gshan@redhat.com>
  <20221031003621.164306-2-gshan@redhat.com>
  <Y2F17Y7YG5Z9XnOJ@google.com> <Y2J+xhBYhqBI81f7@x1n>
  <867d0de4b0.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
 In-Reply-To: <867d0de4b0.wl-maz@kernel.org>
-Cc: shuah@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com,
- andrew.jones@linux.dev, dmatlack@google.com, shan.gavin@gmail.com,
- bgardon@google.com, kvmarm@lists.linux.dev, pbonzini@redhat.com,
- zhenyzha@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- ajones@ventanamicro.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: shuah@kernel.org, kvm@vger.kernel.org, andrew.jones@linux.dev,
+ dmatlack@google.com, will@kernel.org, shan.gavin@gmail.com, bgardon@google.com,
+ kvmarm@lists.linux.dev, pbonzini@redhat.com, zhenyzha@redhat.com,
+ catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,8 +106,59 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Nov 02, 2022, Marc Zyngier wrote:
-> On Wed, 02 Nov 2022 14:29:26 +0000, Peter Xu <peterx@redhat.com> wrote:
+On Wed, Nov 02, 2022 at 03:58:43PM +0000, Marc Zyngier wrote:
+> On Wed, 02 Nov 2022 14:29:26 +0000,
+> Peter Xu <peterx@redhat.com> wrote:
+> > 
+> > On Tue, Nov 01, 2022 at 07:39:25PM +0000, Sean Christopherson wrote:
+> > > > @@ -142,13 +144,17 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
+> > > >  
+> > > >  	kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+> > > >  
+> > > > +	if (!kvm_dirty_ring_soft_full(ring))
+> > > > +		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
+> > > > +
+> > > 
+> > > Marc, Peter, and/or Paolo, can you confirm that clearing the
+> > > request here won't cause ordering problems?  Logically, this makes
+> > > perfect sense (to me, since I suggested it), but I'm mildly
+> > > concerned I'm overlooking an edge case where KVM could end up with
+> > > a soft-full ring but no pending request.
+> > 
+> > I don't see an ordering issue here, as long as kvm_clear_request() is using
+> > atomic version of bit clear, afaict that's genuine RMW and should always
+> > imply a full memory barrier (on any arch?) between the soft full check and
+> > the bit clear.  At least for x86 the lock prefix was applied.
+> 
+> No, clear_bit() is not a full barrier. It only atomic, and thus
+> completely unordered (see Documentation/atomic_bitops.txt). If you
+> want a full barrier, you need to use test_and_clear_bit().
+
+Right, I mixed it up again. :(  It's genuine RMW indeed (unlike _set/_read)
+but I forgot it needs to have a retval to have the memory barriers.
+
+Quotting atomic_t.rst:
+
+---8<---
+ORDERING  (go read memory-barriers.txt first)
+--------
+
+The rule of thumb:
+
+ - non-RMW operations are unordered;
+
+ - RMW operations that have no return value are unordered;
+
+ - RMW operations that have a return value are fully ordered;
+
+ - RMW operations that are conditional are unordered on FAILURE,
+   otherwise the above rules apply.
+---8<---
+
+Bit clear unordered.
+
+> 
+> > 
 > > However I don't see anything stops a simple "race" to trigger like below:
 > > 
 > >           recycle thread                   vcpu thread
@@ -136,10 +197,16 @@ On Wed, Nov 02, 2022, Marc Zyngier wrote:
 > 
 > Thoughts?
 
-I've no objections to dropping the clear on reset, I suggested it primarily so
-that it would be easier to understand what action causes the dirty ring to become
-not-full.  I agree that the explicit clear is unnecessary from a functional
-perspective.
+Sounds good here.
+
+Might be slightly off-topic: I didn't quickly spot how do we guarantee two
+threads doing KVM_RUN ioctl on the same vcpu fd concurrently.  I know
+that's insane and could have corrupted things, but I just want to make sure
+e.g. even a malicious guest app won't be able to trigger host warnings.
+
+-- 
+Peter Xu
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
