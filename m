@@ -2,73 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAF2AC433FE
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:19:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 005E3C43219
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:19:49 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DEFD4B78C;
-	Wed,  2 Nov 2022 19:19:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEA194B800;
+	Wed,  2 Nov 2022 19:19:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0J4+r0zz4P27; Wed,  2 Nov 2022 19:19:47 -0400 (EDT)
+	with ESMTP id F+nMZEWmo6vl; Wed,  2 Nov 2022 19:19:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CCE7C4B82E;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E99DD4B836;
 	Wed,  2 Nov 2022 19:19:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A6884B78C
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DBD6A4B7B5
  for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QnVO6CjDGY0A for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id hX27fUDw-Y7B for <kvmarm@lists.cs.columbia.edu>;
  Wed,  2 Nov 2022 19:19:43 -0400 (EDT)
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
- [209.85.216.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8F024B7ED
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:41 -0400 (EDT)
-Received: by mail-pj1-f74.google.com with SMTP id
- mj8-20020a17090b368800b002137a506927so17195pjb.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:19:41 -0700 (PDT)
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
+ [209.85.214.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 947CC4B7CF
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:43 -0400 (EDT)
+Received: by mail-pl1-f202.google.com with SMTP id
+ l1-20020a170902f68100b00187117d8e44so242770plg.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:19:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=yE/4Y9j/oYhrNnppN3pBbrFR3yZQeQID1rXlzF1UIrs=;
- b=ay8cPyDCIqaMfo0DK1yGgX9Wb9Bl9/1fVHbdhv2aAy1cj0+xuZ97OrHcZUeV1cFb37
- 6xEzJJ8+vktqwJnTtuH1USFvq8dlhSmN+zODY90fpIycgDYl660YnoWyBjRJ4shxmyzm
- eiIMz6ZQ5l1bjRGivO4fA9kceUx/9ETkzTfr9tWJ9HyO6sppdHxDi6fl6UdHy8ptqT6P
- DK4l+CKIMpqMLCpZJAWwhuO/obSacLjdsxWR0MNI7G5lNuNRlHspSUm1vSdSmF25/DFv
- q5eNxeOVs/atfRGxPMYHZj9KnffzNZveBs/Mh+BUBe8auRPPWp99Q7jjD7exn9MfTR0m
- 9eDg==
+ bh=KSp9zIzHXrxcJceHX59wYlpimn2+3DBl6/EkdM22YDo=;
+ b=GazJIJPM/pHmiFZ05wEIEUmIWAlYuh2ZlyTopcNekluhV4UHGi1yTDkMNANFS1jscV
+ sHaoW06GH/7QoV/u1MZ9MSnC1FGAiLQO/y23W8/5eah4jm88WvvNxPaF2O5WlqNX6AA2
+ 8Gs4UT7UUi7/ZwHf5DCZWbM2vulQhHbwn2WtGD6rJzl/FOBfxZ8G3NM+geD74+eDAUum
+ o1o3demNZa7SFz5SsAwJ7XKog0NdlraaEfYhRzZpffEE3gOpiTfLkShIIvuV3L13yEjN
+ xam914sm21iReYi10+r23ej5bJnTbIKx2d2irwZwjp5ibbzs0gCmvLJoawOipg8dYos5
+ 2Zgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=yE/4Y9j/oYhrNnppN3pBbrFR3yZQeQID1rXlzF1UIrs=;
- b=UspjfFVEh0J/hNKU3kyvXxGOZE6FkpoonuFe2wyPm050E1o7fRU8CxeyWf1YPTbbpp
- 1eSD7MpNg5rzhhwBXkKJ03zSPORXqVhuK+G5weYNOnKdI6XSOaYD9RAGoP5fG+WF5RSG
- URfvnIOmiO441t/JMF4IUCNiRDZ0E8waPit9I7jxtRMGnAj1v+HogRFbZDGDYb0gMEnQ
- SURBocd11tl8AxTVNt3RBw6Jm/RRDM3YkpHlqsO/ZLu+C7ccIWwIy2cFCgbps9tsvbTG
- GOWAt4JyPEiElDf3dxx7781xtdjzm7Xb/qYtSD3sa9okt1YZ4Pt9KNomYtChsoP0hcRL
- AtPQ==
-X-Gm-Message-State: ACrzQf15TUbV6cAlYEHMKWqN7hdQ9WFkXTS+61pTw5j7D1duHgn/jZNs
- 1BZOBOdWL+z8dQ96RYKhdDjyiaJL7ts=
-X-Google-Smtp-Source: AMsMyM5/m9Qv5qe0i9jmB6ZTvP1qiSAaI3rCUeMWt3X4Tz8UOP4pahzgtmW58pUMKKKCCfw0sH3ElrsKh+M=
+ bh=KSp9zIzHXrxcJceHX59wYlpimn2+3DBl6/EkdM22YDo=;
+ b=DBFp+vuX1VzY01nlIsu80T+S/WYL6gH2578fQItWmKuYCAp7MgELWPT57BWsDQLd5b
+ gu+7ze+w5LyZ4qPoNoJvp5QBy5DdnDvERWgYpsNjL34PzAxs7MLHMfv+SW1A6mS5mtfs
+ ZukG+1GBzuTcUn+X3qvHOgcWWllzXFkex8YzXB22WK1KY3eHdvOkPfYlNlhIEBG7XOyR
+ crbx698iv0MomHfXWX4U7ZNWXVZduEqZLgYcycvjXCEoMhSLmi25Zm62yKLScr8kkqfd
+ eV/Fdnevole+v8ihnqxDDz2izzx0zHxOp2Kf0mXRA505GkkGfITjSKTK6ouI4/i1JZ+4
+ KGHQ==
+X-Gm-Message-State: ACrzQf3/QW7LDaA8HXoxd9G0pjouZMp8ZZnT9ulLsOCPA2qCOAJIzZXW
+ TyX2WKML2wJWMDPxq6moIxO3GU3ZpNk=
+X-Google-Smtp-Source: AMsMyM5Lv2JMFeAlRDTbvWUtcHml4s/PYrbj2uJcHSHWkZsi31gUm2Ed915QDdWGieIzAX5rFOQTrQSszmI=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:d412:0:b0:56c:6f25:8b12 with SMTP id
- a18-20020a62d412000000b0056c6f258b12mr27322827pfh.60.1667431181026; Wed, 02
- Nov 2022 16:19:41 -0700 (PDT)
-Date: Wed,  2 Nov 2022 23:18:43 +0000
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:e0b:b0:56c:8c13:2a54 with SMTP id
+ bq11-20020a056a000e0b00b0056c8c132a54mr27442020pfb.17.1667431182821; Wed, 02
+ Nov 2022 16:19:42 -0700 (PDT)
+Date: Wed,  2 Nov 2022 23:18:44 +0000
 In-Reply-To: <20221102231911.3107438-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221102231911.3107438-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102231911.3107438-17-seanjc@google.com>
-Subject: [PATCH 16/44] KVM: arm64: Unregister perf callbacks if hypervisor
- finalization fails
+Message-ID: <20221102231911.3107438-18-seanjc@google.com>
+Subject: [PATCH 17/44] KVM: arm64: Do arm/arch initialiation without bouncing
+ through kvm_init()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -108,60 +108,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Undo everything done by init_subsystems() if a later initialization step
-fails, i.e. unregister perf callbacks in addition to unregistering the
-power management notifier.
+Move arm/arch specific initialization directly in arm's module_init(),
+now called kvm_arm_init(), instead of bouncing through kvm_init() to
+reach kvm_arch_init().  Invoking kvm_arch_init() is the very first action
+performed by kvm_init(), i.e. this is a glorified nop.
 
-Fixes: bfa79a805454 ("KVM: arm64: Elevate hypervisor mappings creation at EL2")
+Making kvm_arch_init() a nop will allow dropping it entirely once all
+other architectures follow suit.
+
+No functional change intended.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/arm64/kvm/arm.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/arm.c | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
 
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 73644def7780..f400a8c029dd 100644
+index f400a8c029dd..bfa2dcd3db11 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -1839,12 +1839,21 @@ static int init_subsystems(void)
- 	kvm_register_perf_callbacks(NULL);
- 
- out:
-+	if (err)
-+		hyp_cpu_pm_exit();
-+
- 	if (err || !is_protected_kvm_enabled())
- 		on_each_cpu(_kvm_arch_hardware_disable, NULL, 1);
- 
- 	return err;
- }
- 
-+static void teardown_subsystems(void)
-+{
-+	kvm_unregister_perf_callbacks();
-+	hyp_cpu_pm_exit();
-+}
-+
- static void teardown_hyp_mode(void)
+@@ -2190,7 +2190,7 @@ void kvm_arch_irq_bypass_start(struct irq_bypass_consumer *cons)
+ /**
+  * Initialize Hyp-mode and memory mappings on all CPUs.
+  */
+-int kvm_arch_init(void *opaque)
++int kvm_arm_init(void)
  {
- 	int cpu;
-@@ -2237,7 +2246,7 @@ int kvm_arch_init(void *opaque)
+ 	int err;
+ 	bool in_hyp_mode;
+@@ -2264,6 +2264,14 @@ int kvm_arch_init(void *opaque)
+ 		kvm_info("Hyp mode initialized successfully\n");
+ 	}
  
- 	err = init_subsystems();
- 	if (err)
--		goto out_subs;
-+		goto out_hyp;
- 
- 	if (!in_hyp_mode) {
- 		err = finalize_hyp_mode();
-@@ -2258,7 +2267,7 @@ int kvm_arch_init(void *opaque)
++	/*
++	 * FIXME: Do something reasonable if kvm_init() fails after pKVM
++	 * hypervisor protection is finalized.
++	 */
++	err = kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
++	if (err)
++		goto out_subs;
++
  	return 0;
  
  out_subs:
--	hyp_cpu_pm_exit();
-+	teardown_subsystems();
- out_hyp:
- 	if (!in_hyp_mode)
- 		teardown_hyp_mode();
+@@ -2276,10 +2284,15 @@ int kvm_arch_init(void *opaque)
+ 	return err;
+ }
+ 
++int kvm_arch_init(void *opaque)
++{
++	return 0;
++}
++
+ /* NOP: Compiling as a module not supported */
+ void kvm_arch_exit(void)
+ {
+-	kvm_unregister_perf_callbacks();
++
+ }
+ 
+ static int __init early_kvm_mode_cfg(char *arg)
+@@ -2320,10 +2333,4 @@ enum kvm_mode kvm_get_mode(void)
+ 	return kvm_mode;
+ }
+ 
+-static int arm_init(void)
+-{
+-	int rc = kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
+-	return rc;
+-}
+-
+-module_init(arm_init);
++module_init(kvm_arm_init);
 -- 
 2.38.1.431.g37b22c650d-goog
 
