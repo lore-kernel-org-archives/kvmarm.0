@@ -1,124 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505D17ED
-	for <kvmarm@lists.linux.dev>; Wed,  2 Nov 2022 09:10:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E59FCC433C1;
-	Wed,  2 Nov 2022 09:10:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1667380251;
-	bh=3NBoQ3ldUa+yOxeyENfnkBM2LyM5YloHDrknbDGq34c=;
-	h=From:To:Cc:Subject:Date:From;
-	b=sRjh0cGisFS4038BuCp8168oQUNIM6TzP9MDeK+A0wKFoWjwjVx2qpg6D7I8+JyP1
-	 Nungr/01NBkg9bQ2/wrYS9KsVKk/U/K4phdPtTVG0QfUBI9S6hkvxIYc0qISXh4Uis
-	 2Hk5bYADdWLGMR1Y3b9i9lDzbWHbSbzPNVRPDm7VpDX+g0QHelLg0YN/TCTAVvmVUF
-	 PLHc/0axacHTHKo0BLh9V9YdGUVCNYoWS2eyIm3aUtOqC+4Ir+bfQ5htnxgs9vZuun
-	 V+hLoiGyqYPG1BbzEfTnZgKIPTf3SPxrHVsBwLvVi8brtpVFTA/O1rAMtPBl/dIIFV
-	 bDkug7413Jmfg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1oq9lo-003AWO-FX;
-	Wed, 02 Nov 2022 09:10:48 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Mark Brown <broonie@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Quentin Perret <qperret@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Steven Price <steven.price@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	<kvmarm@lists.cs.columbia.edu>,
-	<kvmarm@lists.linux.dev>,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 6.1, take #3
-Date: Wed,  2 Nov 2022 09:10:36 +0000
-Message-ID: <20221102091036.2106882-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E5B2912
+	for <kvmarm@lists.linux.dev>; Wed,  2 Nov 2022 14:29:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1667399372;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ps9cbOxn8myNQkKIEtCMET8fcnuAnpf2+gT/tQF2P5Q=;
+	b=V67i33ud27R9qgMVFmMtF3uxltamfrgq3QEg1jFSZUPMZYQKMeXHj5kb6ERKROPL4C7XOq
+	kZbq0C2eUxChtdDIuU2GYqniXT8LWY5sh76mkNbirjoBAsGTlllJgxk9934freiCKpxRr8
+	MPiLxxI57kboqLZG9u7GyqUxc9yNVsw=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-592-sey7rR1SPj6ye091iuONMA-1; Wed, 02 Nov 2022 10:29:29 -0400
+X-MC-Unique: sey7rR1SPj6ye091iuONMA-1
+Received: by mail-qv1-f69.google.com with SMTP id b2-20020a0cfe62000000b004bbfb15297dso4943041qvv.19
+        for <kvmarm@lists.linux.dev>; Wed, 02 Nov 2022 07:29:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ps9cbOxn8myNQkKIEtCMET8fcnuAnpf2+gT/tQF2P5Q=;
+        b=ImdW0FTnR82/wIegIq7VnYzoRGmSXXXeQ7AWpOTQQ85K+ZOXQNRTCXwEDMzMSJt5Jl
+         bOXtPv/NDoQgp6If9Tz4yE1PdAXbe0ugRFIvoH+gCNMg1WfxeFv5VZmyl/DDu6BwSCMr
+         cgl2jiVgq7tVYGzlW0Pmy3us7eGWPxS5R5+dvXt+37CPDZ9H7wzpIo70YpYiaRtLFweJ
+         Ir0fTxoRPvlyqqb8KQHWTAr7qYopVWPgUOs0BgqDAK2ZzCPS7NqMx/hxUukW6DEF1Q/V
+         o1MB8RA1xhCLutiyVHIZQQ6bkJnfY+w5MwqZyfMnZq3OC4E2ZRKA8b7u3pRYSiCmtAvF
+         TWIQ==
+X-Gm-Message-State: ACrzQf0yM2DOiuvsQMkqPsQXsNlRgTU/mEajbTiQxfikaxX7McyYmBtR
+	4YNmrXWj2cqyWLbnHC3HreqRET9ve/5xw/YCbJw0Ris6lmu6p526kpPdR+6itjCam3r2h7uVtNM
+	Xg9uqb2gqRypcoZ1H
+X-Received: by 2002:a05:620a:f82:b0:6f9:d795:3f10 with SMTP id b2-20020a05620a0f8200b006f9d7953f10mr17162265qkn.675.1667399369235;
+        Wed, 02 Nov 2022 07:29:29 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7HQSoT03q9RYt45NNK062Snoc6XJiiqn2B5bpIZKFd3P+Iejj5f4Pza1S6pf/FRJShrYUf4w==
+X-Received: by 2002:a05:620a:f82:b0:6f9:d795:3f10 with SMTP id b2-20020a05620a0f8200b006f9d7953f10mr17162243qkn.675.1667399368917;
+        Wed, 02 Nov 2022 07:29:28 -0700 (PDT)
+Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
+        by smtp.gmail.com with ESMTPSA id ez5-20020a05622a4c8500b0039c37a7914csm6626967qtb.23.2022.11.02.07.29.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Nov 2022 07:29:28 -0700 (PDT)
+Date: Wed, 2 Nov 2022 10:29:26 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+	andrew.jones@linux.dev, ajones@ventanamicro.com, maz@kernel.org,
+	bgardon@google.com, catalin.marinas@arm.com, dmatlack@google.com,
+	will@kernel.org, pbonzini@redhat.com, oliver.upton@linux.dev,
+	james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
+	alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v7 1/9] KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
+Message-ID: <Y2J+xhBYhqBI81f7@x1n>
+References: <20221031003621.164306-1-gshan@redhat.com>
+ <20221031003621.164306-2-gshan@redhat.com>
+ <Y2F17Y7YG5Z9XnOJ@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, catalin.marinas@arm.com, gshan@redhat.com, broonie@kernel.org, oliver.upton@linux.dev, qperret@google.com, ryan.roberts@arm.com, seanjc@google.com, steven.price@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221102091036.aNh16QD0KJcMR4x2ZfLuA4prvPgXsuWQc_qXlIwFU6s@z>
+In-Reply-To: <Y2F17Y7YG5Z9XnOJ@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Message-ID: <20221102142926.v_2e-vr2mI3OeCjHWXpD1NhrikfiDj6A7-Z-FwgAI2o@z>
 
-Paolo,
+On Tue, Nov 01, 2022 at 07:39:25PM +0000, Sean Christopherson wrote:
+> > @@ -142,13 +144,17 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
+> >  
+> >  	kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
+> >  
+> > +	if (!kvm_dirty_ring_soft_full(ring))
+> > +		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
+> > +
+> 
+> Marc, Peter, and/or Paolo, can you confirm that clearing the request here won't
+> cause ordering problems?  Logically, this makes perfect sense (to me, since I
+> suggested it), but I'm mildly concerned I'm overlooking an edge case where KVM
+> could end up with a soft-full ring but no pending request.
 
-Here's another set of fixes for 6.1. Two of them are critical fixes
-(MTE support triggering an invalid pointer dereference in nVHE
-configurations, SME trapping not enabled in VHE configurations).
-Thankfully, these configuration are pretty rare, because hardly anyone
-is making us of MTE yet, and that SME HW simply doesn't exist in the
-wild.
+I don't see an ordering issue here, as long as kvm_clear_request() is using
+atomic version of bit clear, afaict that's genuine RMW and should always
+imply a full memory barrier (on any arch?) between the soft full check and
+the bit clear.  At least for x86 the lock prefix was applied.
 
-The rest is a limited set of fixes for relatively harmless bugs and
-documentation update.
+However I don't see anything stops a simple "race" to trigger like below:
 
-Please pull,
+          recycle thread                   vcpu thread
+          --------------                   -----------
+      if (!dirty_ring_soft_full)                                   <--- not full
+                                        dirty_ring_push();
+                                        if (dirty_ring_soft_full)  <--- full due to the push
+                                            set_request(SOFT_FULL);
+          clear_request(SOFT_FULL);                                <--- can wrongly clear the request?
 
-	M.
+But I don't think that's a huge matter, as it'll just let the vcpu to have
+one more chance to do another round of KVM_RUN.  Normally I think it means
+there can be one more dirty GFN (perhaps there're cases that it can push >1
+gfns for one KVM_RUN cycle?  I never figured out the details here, but
+still..) pushed to the ring so closer to the hard limit, but we have had a
+buffer zone of KVM_DIRTY_RING_RSVD_ENTRIES (64) entries.  So I assume
+that's still fine, but maybe worth a short comment here?
 
-The following changes since commit 247f34f7b80357943234f93f247a1ae6b6c3a740:
+I never know what's the maximum possible GFNs being dirtied for a KVM_RUN
+cycle.  It would be good if there's an answer to that from anyone.
 
-  Linux 6.1-rc2 (2022-10-23 15:27:33 -0700)
+-- 
+Peter Xu
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.1-3
-
-for you to fetch changes up to be0ddf5293a7895a8c9096e1a8560930c6a0ab3f:
-
-  arm64: booting: Document our requirements for fine grained traps with SME (2022-11-01 19:30:34 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.1, take #3
-
-- Fix the pKVM stage-1 walker erronously using the stage-2 accessor
-
-- Correctly convert vcpu->kvm to a hyp pointer when generating
-  an exception in a nVHE+MTE configuration
-
-- Check that KVM_CAP_DIRTY_LOG_* are valid before enabling them
-
-- Fix SMPRI_EL1/TPIDR2_EL0 trapping on VHE
-
-- Document the boot requirements for FGT when entering the kernel
-  at EL1
-
-----------------------------------------------------------------
-Gavin Shan (1):
-      KVM: Check KVM_CAP_DIRTY_LOG_{RING, RING_ACQ_REL} prior to enabling them
-
-Marc Zyngier (1):
-      KVM: arm64: Fix SMPRI_EL1/TPIDR2_EL0 trapping on VHE
-
-Mark Brown (1):
-      arm64: booting: Document our requirements for fine grained traps with SME
-
-Quentin Perret (1):
-      KVM: arm64: Use correct accessor to parse stage-1 PTEs
-
-Ryan Roberts (1):
-      KVM: arm64: Fix bad dereference on MTE-enabled systems
-
- Documentation/arm64/booting.rst         |  8 ++++++++
- arch/arm64/kvm/hyp/exception.c          |  3 ++-
- arch/arm64/kvm/hyp/include/hyp/switch.h | 20 ++++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c   |  2 +-
- arch/arm64/kvm/hyp/nvhe/switch.c        | 26 --------------------------
- arch/arm64/kvm/hyp/vhe/switch.c         |  8 --------
- virt/kvm/kvm_main.c                     |  3 +++
- 7 files changed, 34 insertions(+), 36 deletions(-)
