@@ -2,73 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2FBC43219
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:19:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7768C433FE
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:19:32 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC0D54B7EF;
-	Wed,  2 Nov 2022 19:19:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80F144B7B6;
+	Wed,  2 Nov 2022 19:19:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id F7LIGEqNjVlg; Wed,  2 Nov 2022 19:19:29 -0400 (EDT)
+	with ESMTP id MM7hpOMJGOdT; Wed,  2 Nov 2022 19:19:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33C9D4B7A9;
-	Wed,  2 Nov 2022 19:19:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F06A4B803;
+	Wed,  2 Nov 2022 19:19:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 891EA4B798
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 62F9C4B81A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Oe4ZuD0cdlMx for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 3rGZ30lu6rSP for <kvmarm@lists.cs.columbia.edu>;
  Wed,  2 Nov 2022 19:19:25 -0400 (EDT)
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
- [209.85.216.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9CCB84B77B
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:23 -0400 (EDT)
-Received: by mail-pj1-f73.google.com with SMTP id
- nl16-20020a17090b385000b002138288fd51so2481984pjb.6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:19:23 -0700 (PDT)
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
+ [209.85.215.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D0144B7E7
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:25 -0400 (EDT)
+Received: by mail-pg1-f201.google.com with SMTP id
+ s82-20020a632c55000000b0046b2491aa95so93154pgs.7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:19:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=61+uc/Y9XgqKqIqJKklgZKwyXFi4EpAveqLf+gzND20=;
- b=Utw2bIoFpd0OsW8gcFI5XrC8r/opoeV6PzEujs3E4Mr9+St+h1iGz7I0t2dfS8UClh
- tAtUjqK55zt6/KkvBXOzqfYjfHXVvlGdNUDx6aXeRWpNBB/SzUU3M7O4hGxRvmfcP7Dv
- H7xUVWjzIm9fOWFawnQ+tUiBa9aTdqs3xjhRiHy7QmZH5iQmDFc0LC68bjVk8Tk76MUY
- okNb1d05tSvdlxWMqm8WJt1KJ94gRKBpU/aaJyEkAN3CmyDtunrNwjuXsVAB9MDK12T5
- qP1tSiadBS2lzWdtmS7wbdVgSkTUTO1m/e38yDr5/ydciJMTwj/jwYNum8ez3aI14Ekv
- m1vw==
+ bh=Pp3PbLfGlbPMUpUfY94YYIKSvd3QEyEjimXY5GHh7Do=;
+ b=UkZGnXGmq2elzgV9DLUz74QXF30iTWbFGDiWfdaXhQTrFX8aiqCFVBpq5xcu6/5CJ0
+ 6CAeS4zBndyLbi6uL4aOTOJPom/GUXPjp+wnaiLNi/IOKHaUUiAdDM0lQqJcKi8lJ3vx
+ vnARJXxit3idHJ3CVkd3Epv6mh/Uh5po1QC+vmSMzcdxDA+trq8VPV/HTVpleuhXsuBJ
+ gB5evBsfkJOotXoUamKJrE8Yp7t9k0CZooSYyZMUGEw+wssTud1LYZ35nFOFQX6SsKf7
+ 8kThfTBVhIqoMM2+KcJViQg4ABdkLDTwvbAbS0YvwKJ8JO2nHVa2hjZQKtmcKqW09CRW
+ 6M/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=61+uc/Y9XgqKqIqJKklgZKwyXFi4EpAveqLf+gzND20=;
- b=7jXBOGFWnMO4+m9LiemcCZTmD9BMCL/+9WqyzOEmxrqNSVzTp3B8n5vl0yunsStByh
- 04FMp6Z3pdgq09RpvG57e7KJqwarkDf9lvLOTJKpEebIGPNmG5xTBFjMcyEMNuJXfN/2
- 3gx6iRiN9967N1Ie31339mLH2WJJcdw8hRc3JO4ZPbB5CQSEDPmG3dG22h5k5yOgCZaP
- vmQDDOmG9hXot9t9VC/OaKAuDabcr/xxrSVjF955ny8PaKZiCga33eY9rhvZ8Ws9K9Hr
- jJxY29XNpl8Lzgv8Spw3J5R/C745jAQciBoJU0XN0EFKM7LJVzMmjDJxsD0/K/T4paRZ
- L7fw==
-X-Gm-Message-State: ACrzQf0NNd8y1TeFrw3QrmVHdgM9ucOvgWaCa2hJxzqDZQR3WUW2JeL8
- JMYa+a3T0jlrqfFBU95EZaVfx+LLk6Q=
-X-Google-Smtp-Source: AMsMyM69CxKgcSWgM1vAnwvZeDyLX7/AeVTRbrDaM9LXBznOzPR+Ikthjk94S3wZJoe6s5YkzQYZMQYdPec=
+ bh=Pp3PbLfGlbPMUpUfY94YYIKSvd3QEyEjimXY5GHh7Do=;
+ b=Xdn+l0tHOACHII03HVAuPVwjbgIOpZEL2DfKoYlg/Snd4XJGlaES7Wpzaluh4Nhutr
+ +2xmsP/uYF+xUbZAbDg1pypbmrthPIXD8T1jkdEF19BQCSyaClBrfXQncyVxl4EWF2V1
+ Ni3TFcXnEl9LBZ+FxMqpnNjbBzmOG5OzrPfvNlaM5UNAgzqqBRhvX8/XUQ8HtCmn8Ntm
+ oFO7Tw+ar0riWsYUcOC3Uv/JXx/OGSoMD5Uaws460xdvNkbQiFH5WhbEz4D3QFCqEUiu
+ hW9nyKorzP7WS4tbI/1EW+NFPHS0gReTk2RxxQxYlhidzYSmOeaLXxpki507rPINfeZi
+ /uiQ==
+X-Gm-Message-State: ACrzQf28cyRtbcG3I142WsimVtCtHbykadH+/E6JBtqK1CsARJ8LmCPE
+ S7KSJdl+KtrIkXHa33ThJ5wiFOWaRFo=
+X-Google-Smtp-Source: AMsMyM5BN48AgcZOI4nVxc2uFg8TXUQwjAkA5TEHVSI5KiQDtZoUe78o5/c87/pf9J/oxQANcuw7e+pFPCs=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:38cd:b0:214:184f:4007 with SMTP id
- nn13-20020a17090b38cd00b00214184f4007mr9764899pjb.82.1667431162802; Wed, 02
- Nov 2022 16:19:22 -0700 (PDT)
-Date: Wed,  2 Nov 2022 23:18:32 +0000
+ (user=seanjc job=sendgmr) by 2002:a63:1206:0:b0:470:18c:1489 with SMTP id
+ h6-20020a631206000000b00470018c1489mr6904894pgl.357.1667431164538; Wed, 02
+ Nov 2022 16:19:24 -0700 (PDT)
+Date: Wed,  2 Nov 2022 23:18:33 +0000
 In-Reply-To: <20221102231911.3107438-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221102231911.3107438-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102231911.3107438-6-seanjc@google.com>
-Subject: [PATCH 05/44] KVM: s390: Unwind kvm_arch_init() piece-by-piece() if a
- step fails
+Message-ID: <20221102231911.3107438-7-seanjc@google.com>
+Subject: [PATCH 06/44] KVM: s390: Move hardware setup/unsetup to init/exit
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -108,77 +107,70 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In preparation for folding kvm_arch_hardware_setup() into kvm_arch_init(),
-unwind initialization one step at a time instead of simply calling
-kvm_arch_exit().  Using kvm_arch_exit() regardless of which initialization
-step failed relies on all affected state playing nice with being undone
-even if said state wasn't first setup.  That holds true for state that is
-currently configured by kvm_arch_init(), but not for state that's handled
-by kvm_arch_hardware_setup(), e.g. calling gmap_unregister_pte_notifier()
-without first registering a notifier would result in list corruption due
-to attempting to delete an entry that was never added to the list.
+Now that kvm_arch_hardware_setup() is called immediately after
+kvm_arch_init(), fold the guts of kvm_arch_hardware_(un)setup() into
+kvm_arch_{init,exit}() as a step towards dropping one of the hooks.
+
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/s390/kvm/kvm-s390.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+ arch/s390/kvm/kvm-s390.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
 diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 45d4b8182b07..8395433a79b2 100644
+index 8395433a79b2..1aaee15211f2 100644
 --- a/arch/s390/kvm/kvm-s390.c
 +++ b/arch/s390/kvm/kvm-s390.c
-@@ -490,11 +490,11 @@ int kvm_arch_init(void *opaque)
+@@ -323,21 +323,12 @@ static struct notifier_block kvm_clock_notifier = {
  
- 	kvm_s390_dbf_uv = debug_register("kvm-uv", 32, 1, 7 * sizeof(long));
- 	if (!kvm_s390_dbf_uv)
--		goto out;
-+		goto err_kvm_uv;
- 
- 	if (debug_register_view(kvm_s390_dbf, &debug_sprintf_view) ||
- 	    debug_register_view(kvm_s390_dbf_uv, &debug_sprintf_view))
--		goto out;
-+		goto err_debug_view;
- 
- 	kvm_s390_cpu_feat_init();
- 
-@@ -502,25 +502,32 @@ int kvm_arch_init(void *opaque)
- 	rc = kvm_register_device_ops(&kvm_flic_ops, KVM_DEV_TYPE_FLIC);
- 	if (rc) {
- 		pr_err("A FLIC registration call failed with rc=%d\n", rc);
--		goto out;
-+		goto err_flic;
- 	}
- 
- 	if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM)) {
- 		rc = kvm_s390_pci_init();
- 		if (rc) {
- 			pr_err("Unable to allocate AIFT for PCI\n");
--			goto out;
-+			goto err_pci;
- 		}
- 	}
- 
- 	rc = kvm_s390_gib_init(GAL_ISC);
- 	if (rc)
--		goto out;
-+		goto err_gib;
- 
+ int kvm_arch_hardware_setup(void *opaque)
+ {
+-	gmap_notifier.notifier_call = kvm_gmap_notifier;
+-	gmap_register_pte_notifier(&gmap_notifier);
+-	vsie_gmap_notifier.notifier_call = kvm_s390_vsie_gmap_notifier;
+-	gmap_register_pte_notifier(&vsie_gmap_notifier);
+-	atomic_notifier_chain_register(&s390_epoch_delta_notifier,
+-				       &kvm_clock_notifier);
  	return 0;
- 
--out:
--	kvm_arch_exit();
-+err_gib:
-+	if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM))
-+		kvm_s390_pci_exit();
-+err_pci:
-+err_flic:
-+err_debug_view:
-+	debug_unregister(kvm_s390_dbf_uv);
-+err_kvm_uv:
-+	debug_unregister(kvm_s390_dbf);
- 	return rc;
  }
  
+ void kvm_arch_hardware_unsetup(void)
+ {
+-	gmap_unregister_pte_notifier(&gmap_notifier);
+-	gmap_unregister_pte_notifier(&vsie_gmap_notifier);
+-	atomic_notifier_chain_unregister(&s390_epoch_delta_notifier,
+-					 &kvm_clock_notifier);
++
+ }
+ 
+ static void allow_cpu_feat(unsigned long nr)
+@@ -517,6 +508,13 @@ int kvm_arch_init(void *opaque)
+ 	if (rc)
+ 		goto err_gib;
+ 
++	gmap_notifier.notifier_call = kvm_gmap_notifier;
++	gmap_register_pte_notifier(&gmap_notifier);
++	vsie_gmap_notifier.notifier_call = kvm_s390_vsie_gmap_notifier;
++	gmap_register_pte_notifier(&vsie_gmap_notifier);
++	atomic_notifier_chain_register(&s390_epoch_delta_notifier,
++				       &kvm_clock_notifier);
++
+ 	return 0;
+ 
+ err_gib:
+@@ -533,6 +531,11 @@ int kvm_arch_init(void *opaque)
+ 
+ void kvm_arch_exit(void)
+ {
++	gmap_unregister_pte_notifier(&gmap_notifier);
++	gmap_unregister_pte_notifier(&vsie_gmap_notifier);
++	atomic_notifier_chain_unregister(&s390_epoch_delta_notifier,
++					 &kvm_clock_notifier);
++
+ 	kvm_s390_gib_destroy();
+ 	if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM))
+ 		kvm_s390_pci_exit();
 -- 
 2.38.1.431.g37b22c650d-goog
 
