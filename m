@@ -2,73 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC9D9C4332F
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:20:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C389FC43217
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:20:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A82524B797;
-	Wed,  2 Nov 2022 19:20:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 822304B822;
+	Wed,  2 Nov 2022 19:20:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VzjmUUdPQVap; Wed,  2 Nov 2022 19:20:00 -0400 (EDT)
+	with ESMTP id kWxC0RSBHuHP; Wed,  2 Nov 2022 19:20:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E95274B848;
-	Wed,  2 Nov 2022 19:19:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14C6E4B815;
+	Wed,  2 Nov 2022 19:20:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAC464B831
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FF884B7B6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:20:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PpYJ6N0Ojudf for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Nov 2022 19:19:57 -0400 (EDT)
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
- [209.85.128.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 157AF4B824
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:57 -0400 (EDT)
-Received: by mail-yw1-f202.google.com with SMTP id
- 00721157ae682-36810cfa61fso978637b3.6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:19:57 -0700 (PDT)
+ with ESMTP id 4Hy8cF2Sea3o for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Nov 2022 19:19:55 -0400 (EDT)
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
+ [209.85.216.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E26684B7BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:53 -0400 (EDT)
+Received: by mail-pj1-f74.google.com with SMTP id
+ q1-20020a17090aa00100b002139a592adbso2499834pjp.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:19:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=CzSf5zn0WCjHNHnOQoVFnBDZCb0UJEWJAWP5e8x7mpU=;
- b=qayOPbuABiIuhyUyS81pM4aIXP0zbbDCyOAoStlcDM54io6H46scG/b+AOJZ083vkp
- 7VUQSDA3F1PV+eczWk9jhX07na0Ee5Y/y96fcuWnjX0SDylBmMM507BoItRwczIvX47w
- quWZbFbuSFsnuRxvRxHTWN2VK6E9IoRaN3Rn0730zHfCEZF81HBccJpL9kyZIy1KxZA/
- 662DkzEQNlhCKGQQORLsI62wqsjL9SN7t5eET3UjVYfrxzuz8jEkm9iuoDgYatGUaOSX
- hwFfEfHx7Y5bc5lWLW7ELIceyIhTn7UMBpI42o+ooA3Zs7kMfZ0227v/cGHQHHsdYmrl
- HIHw==
+ bh=QZsBYUGDC2IkAwbx22iS+bX782/JjRlyYtWOGf9fm5w=;
+ b=gOl3cNoBRYj8Qpc32NlIEZiSXsQpB/DCyQ/znrDYIZGa+s4IthUOkEHZQZ1ojKZDv7
+ pTCluXhDLSbuLtIDsd06JUGzyqeVDBKsjduC6joRT5sGTNYRsVo9p/G6Hqiv2ugKa8LH
+ rdr0QZPkDK278uG4dV/k1t11BIQxvRWGgZaRWsIg0DoysUSAp2Ijq63EEZdxc0KL4gix
+ 0HGUBH8kF/zweMHI/2v4mLjob8+u7zdHCmj600jDg7rYDwZddIyY/q/ZMJIgho4CGwiq
+ Rf68OjR0Rg0ygAgFFNEea3lYykknrXRPiTB8JjAsW5m8iBtmAm27VPmRKJbUJVbPKnmY
+ wuxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=CzSf5zn0WCjHNHnOQoVFnBDZCb0UJEWJAWP5e8x7mpU=;
- b=NgoyoAUI/4DN2AW37cO9UKUhI2WM9MOulab0ks8m9VdXV4i8N0Q3HAKOtUiVqkckyg
- 02pvryISI4a9pCluGHdifVa+P5c3i88JUYLD8gM4h29lphyPm+ycfTMLZIKyUt6rIl4A
- i+FAtmYqTOqqTJU4KbKeB/2RBiEzsGW+gNtvY6vVdahUwHj1jtVJfdpXz3BNLOBAgxSJ
- BQ4gdl0nvtD9+oeE2AM87cvLQe+nD9JaApkvqBGqTcYz2XVj2X7HrgkoiXPzV3heHDgT
- vmYr+9n+oNoIcDCMizU5yCYM8W1peAP/8DupfIg7Lf1DgmPYicIMgUPBWnNCjwKwAZD5
- QVgg==
-X-Gm-Message-State: ACrzQf3GnGyZAUpnNEOWDYC1RJ+lMeYuOo/i+K3zSqkQQRuoRFIsvmPn
- bb3KnSvG5q9WtMPUborxrFNYyFXhtv8=
-X-Google-Smtp-Source: AMsMyM5QAC+6uL9KNRnm9M5TXJQCSY2aBJVNt4dTDVzjRpTyYTEDmCTYsEFvvoqsJQdz2eHBvIeRC0Fos4c=
+ bh=QZsBYUGDC2IkAwbx22iS+bX782/JjRlyYtWOGf9fm5w=;
+ b=zQKzoR5i8Q6kpRz3QPnpoEJnMQrnJx9IbMhF3PCdJat0bN9Ge0I/f4LObelH1b/ZmL
+ gmDSTGYwesvWkD3ewst8Y62ARUxySZ/nHl1A30ObEkr9c03GYs0y4DZ+ipRBVLFLNkfl
+ SwYO3Wk+8xuiR/6JwhiRXX5vXZ2d9EBpFvDFSK9SbzUjelFwW0N+CAEH14Jb615JLtjh
+ 51FQzqUs/Zl1tv+xEOoMo/eiYiTgdEKpgz+sq4HROAXts9WnyF7h7m/RHn7/SmIXMrkl
+ 5V3wdiulUAX54jNjqL5m+nRL+p65qFAi3SveBDwxoCnHFsBrn/waSyw3n0A/4GNy3V4C
+ 6+mg==
+X-Gm-Message-State: ACrzQf3KaBrgJxsni81gFQP33TxFyCwpevYI/QIoLJCFnHjrf9BHDT0N
+ IXVkUC1MZjjz5ubZ6mCrK9h5lpydPM4=
+X-Google-Smtp-Source: AMsMyM4F5G3DDnuJC2f+gpo6muVhVlP37u9Rx2CD7FgkZCjySGE+h3yA4RelKa6dFXDwgnEtjORGLCa20Ec=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:2544:0:b0:360:c270:15a1 with SMTP id
- l65-20020a812544000000b00360c27015a1mr24717446ywl.67.1667431196650; Wed, 02
- Nov 2022 16:19:56 -0700 (PDT)
-Date: Wed,  2 Nov 2022 23:18:52 +0000
+ (user=seanjc job=sendgmr) by 2002:a17:90b:384a:b0:213:2907:a528 with SMTP id
+ nl10-20020a17090b384a00b002132907a528mr27758885pjb.183.1667431193502; Wed, 02
+ Nov 2022 16:19:53 -0700 (PDT)
+Date: Wed,  2 Nov 2022 23:18:50 +0000
 In-Reply-To: <20221102231911.3107438-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221102231911.3107438-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102231911.3107438-26-seanjc@google.com>
-Subject: [PATCH 25/44] KVM: s390: Do s390 specific init without bouncing
- through kvm_init()
+Message-ID: <20221102231911.3107438-24-seanjc@google.com>
+Subject: [PATCH 23/44] KVM: RISC-V: Tag init functions and data with __init,
+ __ro_after_init
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -108,95 +108,91 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Move the guts of kvm_arch_init() into a new helper, __kvm_s390_init(),
-and invoke the new helper directly from kvm_s390_init() instead of
-bouncing through kvm_init().  Invoking kvm_arch_init() is the very
-first action performed by kvm_init(), i.e. this is a glorified nop.
-
-Moving setup to __kvm_s390_init() will allow tagging more functions as
-__init, and emptying kvm_arch_init() will allow dropping the hook
-entirely once all architecture implementations are nops.
-
-No functional change intended.
+Now that KVM setup is handled directly in riscv_kvm_init(), tag functions
+and data that are used/set only during init with __init/__ro_after_init.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/s390/kvm/kvm-s390.c | 29 +++++++++++++++++++++++++----
- 1 file changed, 25 insertions(+), 4 deletions(-)
+ arch/riscv/include/asm/kvm_host.h |  6 +++---
+ arch/riscv/kvm/mmu.c              | 12 ++++++------
+ arch/riscv/kvm/vmid.c             |  4 ++--
+ 3 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 7fcd2d3b3558..e1c9980aae78 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -461,7 +461,7 @@ static void kvm_s390_cpu_feat_init(void)
- 	 */
+diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+index 8c771fc4f5d2..778ff0f282b7 100644
+--- a/arch/riscv/include/asm/kvm_host.h
++++ b/arch/riscv/include/asm/kvm_host.h
+@@ -295,11 +295,11 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
+ int kvm_riscv_gstage_alloc_pgd(struct kvm *kvm);
+ void kvm_riscv_gstage_free_pgd(struct kvm *kvm);
+ void kvm_riscv_gstage_update_hgatp(struct kvm_vcpu *vcpu);
+-void kvm_riscv_gstage_mode_detect(void);
+-unsigned long kvm_riscv_gstage_mode(void);
++void __init kvm_riscv_gstage_mode_detect(void);
++unsigned long __init kvm_riscv_gstage_mode(void);
+ int kvm_riscv_gstage_gpa_bits(void);
+ 
+-void kvm_riscv_gstage_vmid_detect(void);
++void __init kvm_riscv_gstage_vmid_detect(void);
+ unsigned long kvm_riscv_gstage_vmid_bits(void);
+ int kvm_riscv_gstage_vmid_init(struct kvm *kvm);
+ bool kvm_riscv_gstage_vmid_ver_changed(struct kvm_vmid *vmid);
+diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+index 3620ecac2fa1..f42a34c7879a 100644
+--- a/arch/riscv/kvm/mmu.c
++++ b/arch/riscv/kvm/mmu.c
+@@ -20,12 +20,12 @@
+ #include <asm/pgtable.h>
+ 
+ #ifdef CONFIG_64BIT
+-static unsigned long gstage_mode = (HGATP_MODE_SV39X4 << HGATP_MODE_SHIFT);
+-static unsigned long gstage_pgd_levels = 3;
++static unsigned long gstage_mode __ro_after_init = (HGATP_MODE_SV39X4 << HGATP_MODE_SHIFT);
++static unsigned long gstage_pgd_levels __ro_after_init = 3;
+ #define gstage_index_bits	9
+ #else
+-static unsigned long gstage_mode = (HGATP_MODE_SV32X4 << HGATP_MODE_SHIFT);
+-static unsigned long gstage_pgd_levels = 2;
++static unsigned long gstage_mode __ro_after_init = (HGATP_MODE_SV32X4 << HGATP_MODE_SHIFT);
++static unsigned long gstage_pgd_levels __ro_after_init = 2;
+ #define gstage_index_bits	10
+ #endif
+ 
+@@ -760,7 +760,7 @@ void kvm_riscv_gstage_update_hgatp(struct kvm_vcpu *vcpu)
+ 		kvm_riscv_local_hfence_gvma_all();
  }
  
--int kvm_arch_init(void *opaque)
-+static int __kvm_s390_init(void)
+-void kvm_riscv_gstage_mode_detect(void)
++void __init kvm_riscv_gstage_mode_detect(void)
  {
- 	int rc = -ENOMEM;
- 
-@@ -519,7 +519,7 @@ int kvm_arch_init(void *opaque)
- 	return rc;
+ #ifdef CONFIG_64BIT
+ 	/* Try Sv57x4 G-stage mode */
+@@ -784,7 +784,7 @@ void kvm_riscv_gstage_mode_detect(void)
+ #endif
  }
  
--void kvm_arch_exit(void)
-+static void __kvm_s390_exit(void)
+-unsigned long kvm_riscv_gstage_mode(void)
++unsigned long __init kvm_riscv_gstage_mode(void)
  {
- 	gmap_unregister_pte_notifier(&gmap_notifier);
- 	gmap_unregister_pte_notifier(&vsie_gmap_notifier);
-@@ -533,6 +533,16 @@ void kvm_arch_exit(void)
- 	debug_unregister(kvm_s390_dbf_uv);
+ 	return gstage_mode >> HGATP_MODE_SHIFT;
  }
+diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
+index 6cd93995fb65..5246da1c9167 100644
+--- a/arch/riscv/kvm/vmid.c
++++ b/arch/riscv/kvm/vmid.c
+@@ -17,10 +17,10 @@
  
-+int kvm_arch_init(void *opaque)
-+{
-+	return 0;
-+}
-+
-+void kvm_arch_exit(void)
-+{
-+
-+}
-+
- /* Section: device related */
- long kvm_arch_dev_ioctl(struct file *filp,
- 			unsigned int ioctl, unsigned long arg)
-@@ -5634,7 +5644,7 @@ static inline unsigned long nonhyp_mask(int i)
+ static unsigned long vmid_version = 1;
+ static unsigned long vmid_next;
+-static unsigned long vmid_bits;
++static unsigned long vmid_bits __ro_after_init;
+ static DEFINE_SPINLOCK(vmid_lock);
  
- static int __init kvm_s390_init(void)
+-void kvm_riscv_gstage_vmid_detect(void)
++void __init kvm_riscv_gstage_vmid_detect(void)
  {
--	int i;
-+	int i, r;
+ 	unsigned long old;
  
- 	if (!sclp.has_sief2) {
- 		pr_info("SIE is not available\n");
-@@ -5650,12 +5660,23 @@ static int __init kvm_s390_init(void)
- 		kvm_s390_fac_base[i] |=
- 			stfle_fac_list[i] & nonhyp_mask(i);
- 
--	return kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
-+	r = __kvm_s390_init();
-+	if (r)
-+		return r;
-+
-+	r = kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
-+	if (r) {
-+		__kvm_s390_exit();
-+		return r;
-+	}
-+	return 0;
- }
- 
- static void __exit kvm_s390_exit(void)
- {
- 	kvm_exit();
-+
-+	__kvm_s390_exit();
- }
- 
- module_init(kvm_s390_init);
 -- 
 2.38.1.431.g37b22c650d-goog
 
