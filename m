@@ -2,87 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F642C4332F
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 16:49:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB63AC4332F
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 17:18:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 52ACC4B95A;
-	Wed,  2 Nov 2022 12:49:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D2934B837;
+	Wed,  2 Nov 2022 13:18:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered)
-	header.i=@bytedance-com.20210112.gappssmtp.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id V4GzWPL5XPlw; Wed,  2 Nov 2022 12:49:40 -0400 (EDT)
+	with ESMTP id I9rR42iZotO0; Wed,  2 Nov 2022 13:18:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF8CB4B9BB;
-	Wed,  2 Nov 2022 12:49:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F33134B83D;
+	Wed,  2 Nov 2022 13:18:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 690B04B984
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 12:14:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E23BB4B837
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 13:18:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HIXfKgycUk+j for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Nov 2022 12:14:24 -0400 (EDT)
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com
- [209.85.221.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 51B614B955
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 12:14:24 -0400 (EDT)
-Received: by mail-wr1-f49.google.com with SMTP id z14so25247611wrn.7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 09:14:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bytedance-com.20210112.gappssmtp.com; s=20210112;
- h=content-transfer-encoding:mime-version:references:in-reply-to
- :message-id:date:subject:cc:to:from:from:to:cc:subject:date
- :message-id:reply-to;
- bh=TKetkh4WHRfyiXWR3Ck7PLJHjhMFIGu7qwf9qalJlhM=;
- b=HXMN/eEDtXRg0lyznWzotr3Id2ejKM0OY0ZT7J1wWoBooooL9lw9TUkFXLirKbziOx
- 5ZpT0h0dn7/SEniBN03v1j0ElI5smjuDbOper+qxDTEIT7z3yQ0xvSxgu7JtD29haSWd
- 6tdgy38Uu6VXqF6Xb55fF0gb6L8X2QfogulXBPzPoMe3u9il7bCA9+XT/bpIVR4myrLy
- mCI91Rsl8oQq43jfRCxk+92/S4hxm0PbFpFBr0AYOtMEmWTwrJJ+za/3GNgEbLbVp0Md
- MEeR+3D3ayYWEoCqG+l+YCvPce/e4gZfKY88Ar6tBBM8P+4Zj4owL4VqQC+PYKeR/oQp
- M6IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=content-transfer-encoding:mime-version:references:in-reply-to
- :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
- :subject:date:message-id:reply-to;
- bh=TKetkh4WHRfyiXWR3Ck7PLJHjhMFIGu7qwf9qalJlhM=;
- b=4J7HAKvInOML7QXxKd12G8UsLUaDuvy7ZB2MRL5a/OVCNWwWeoLRPX6FkWSwhPA4v0
- SQTcGiFSE/itTSR1vHxIw3Etc//i431ZcBPRwzeUinxuvzjH+1aMlBqgoyb3mvfKF6/R
- U4AX5zi8xT1xhchNnvgSM8c7IP3TFp4GRzQ/HiJbl7hfXG/ScBZaNKywP2ZYZWuJ8EC+
- e7EA4u+OhJOH++4Z5Xm357UcNKx9XZD7BWzTD7rayI5qRTMZm89L4ynJPz2qNCpa8XYe
- XyXjbrk2sppPwYFFNHuUm0JNmK2Lb3YNofaz4YE36YHJQYhuR+wsBvknYxWqsXVx+1Xc
- G1AQ==
-X-Gm-Message-State: ACrzQf0M1zGv7n14JAI6Nrpm+rNbZeWOSSbD1mvMicg4VcPatPp4xrz9
- 4MlmWZpo4AxXVCqtrUaZ6W0tbg==
-X-Google-Smtp-Source: AMsMyM5+Z3lL6R6aAvTLh4btN5LWo2mJaU+uOsrPpgXgkxou+kqC31SRgBvxqKWg39boq3cROn42HA==
-X-Received: by 2002:a05:6000:170d:b0:236:6aa1:8a56 with SMTP id
- n13-20020a056000170d00b002366aa18a56mr15676520wrc.302.1667405663370; 
- Wed, 02 Nov 2022 09:14:23 -0700 (PDT)
-Received: from usaari01.cust.communityfibre.co.uk
- ([2a02:6b6a:b4d7:0:6a08:9b26:ab04:7065])
- by smtp.gmail.com with ESMTPSA id
- m17-20020a5d56d1000000b0022cc6b8df5esm13230923wrw.7.2022.11.02.09.14.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 02 Nov 2022 09:14:22 -0700 (PDT)
-From: Usama Arif <usama.arif@bytedance.com>
-To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-doc@vger.kernel.org, virtualization@lists.linux-foundation.org,
- linux@armlinux.org.uk, yezengruan@huawei.com, catalin.marinas@arm.com,
- will@kernel.org, maz@kernel.org, steven.price@arm.com, mark.rutland@arm.com
-Subject: [RFC 5/6] KVM: arm64: Support the VCPU preemption check
-Date: Wed,  2 Nov 2022 16:13:39 +0000
-Message-Id: <20221102161340.2982090-6-usama.arif@bytedance.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221102161340.2982090-1-usama.arif@bytedance.com>
-References: <20221102161340.2982090-1-usama.arif@bytedance.com>
-MIME-Version: 1.0
-X-Mailman-Approved-At: Wed, 02 Nov 2022 12:49:29 -0400
-Cc: punit.agrawal@bytedance.com, fam.zheng@bytedance.com, liangma@liangbit.com,
- Usama Arif <usama.arif@bytedance.com>
+ with ESMTP id k9M0Ye3ijdXC for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Nov 2022 13:18:47 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D34324B826
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 13:18:47 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id F311361AAC;
+ Wed,  2 Nov 2022 17:18:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D25BC43470;
+ Wed,  2 Nov 2022 17:18:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1667409526;
+ bh=t+XSBxtVm4q9uEvwXkO3w2nATlENacHRnZp9Kw64sVY=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=SJPUcexlv421RPT+uRVF0crG2rJQiWSpTV1vdBlet0+AtWLXczUGTXKN8LX7Js6cn
+ DPb4xPebyXZ1YeRkNgP9UaxZc3xhJiSATVIlqb1EhuIwjH3H146Ozr5rBlaF849DjU
+ QFJdZL7bcQgl1KelgspQQXuIOTmie2sWx9VysiZCS+KQaRBagHiMafBRpAUB9M2Ncc
+ hUOOmNExwM5PGT68Vsvhs3jKw5fqharoRp/kqMGIDt8X623JPzoewufqUesK185lzx
+ 2TWkDpAQ+IRcWsrcOm8Tji6cur065LjgqbHkDw6VCkRsaSe71BXKKl6NVlH03W4m01
+ kZSMzNHvRyEUw==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oqHO0-003H7v-4L;
+ Wed, 02 Nov 2022 17:18:44 +0000
+Date: Wed, 02 Nov 2022 17:18:13 +0000
+Message-ID: <87y1stff6y.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v7 5/9] KVM: arm64: Improve no-running-vcpu report for
+ dirty ring
+In-Reply-To: <d3a4278a-94e2-7af4-da2d-946c903d8825@redhat.com>
+References: <20221031003621.164306-1-gshan@redhat.com>
+ <20221031003621.164306-6-gshan@redhat.com>
+ <Y1+QiS0S3e6b358Q@google.com>
+ <d3a4278a-94e2-7af4-da2d-946c903d8825@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gshan@redhat.com, oliver.upton@linux.dev,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com,
+ catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
+ pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com, james.morse@arm.com,
+ shuah@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: shuah@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ andrew.jones@linux.dev, dmatlack@google.com, shan.gavin@gmail.com,
+ bgardon@google.com, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ zhenyzha@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,262 +97,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Support the vcpu_is_preempted() functionality under KVM/arm64. This will
-enhance lock performance on overcommitted hosts (more runnable VCPUs
-than physical CPUs in the system) as doing busy waits for preempted
-VCPUs will hurt system performance far worse than early yielding.
+On Mon, 31 Oct 2022 23:08:32 +0000,
+Gavin Shan <gshan@redhat.com> wrote:
+> 
+>
+> In order to cover Marc's concern, I would introduce a different helper
+> kvm_vgic_save_its_tables_in_progress(), which simply returns
+> 'bool struct vgic_dist::save_its_tables_in_progress'. The newly added
+> field is set and cleared in vgic_its_ctrl(). All these changes will be
+> folded to PATCH[v7 6/9]. Oliver and Marc, could you please let me know
+> if the changes sounds good?
+> 
+>    static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
+>    {
+>        const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+>        struct vgic_dist *dist = &kvm->arch.vgic;
+>        int ret = 0;
+>          :
+>        switch (attr) {
+>        case KVM_DEV_ARM_ITS_CTRL_RESET:
+>             vgic_its_reset(kvm, its);
+>             break;
+>        case KVM_DEV_ARM_ITS_SAVE_TABLES:
+>             dist->save_its_tables_in_progress = true;
+>             ret = abi->save_tables(its);
+>             dist->save_its_tables_in_progress = false;
+>             break;
+>        case KVM_DEV_ARM_ITS_RESTORE_TABLES:
+>             ret = abi->restore_tables(its);
+>             break;
+>        }
+>        :
+>     }
 
-Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
-Signed-off-by: Usama Arif <usama.arif@bytedance.com>
----
- arch/arm64/include/asm/paravirt.h |   2 +
- arch/arm64/include/asm/spinlock.h |  16 +++-
- arch/arm64/kernel/paravirt.c      | 126 ++++++++++++++++++++++++++++++
- arch/arm64/kernel/setup.c         |   3 +
- include/linux/cpuhotplug.h        |   1 +
- 5 files changed, 147 insertions(+), 1 deletion(-)
+Yes, this is the sort of thing I had in mind. This should make the
+whole patch rather trivial, and you could implement
+kvm_arch_allow_write_without_running_vcpu() as returning this flag.
 
-diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
-index 9aa193e0e8f2..4ccb4356c56b 100644
---- a/arch/arm64/include/asm/paravirt.h
-+++ b/arch/arm64/include/asm/paravirt.h
-@@ -19,10 +19,12 @@ static inline u64 paravirt_steal_clock(int cpu)
- }
- 
- int __init pv_time_init(void);
-+int __init pv_lock_init(void);
- 
- #else
- 
- #define pv_time_init() do {} while (0)
-+#define pv_lock_init() do {} while (0)
- 
- #endif // CONFIG_PARAVIRT
- 
-diff --git a/arch/arm64/include/asm/spinlock.h b/arch/arm64/include/asm/spinlock.h
-index 0525c0b089ed..7023efa4de96 100644
---- a/arch/arm64/include/asm/spinlock.h
-+++ b/arch/arm64/include/asm/spinlock.h
-@@ -10,7 +10,20 @@
- 
- /* See include/linux/spinlock.h */
- #define smp_mb__after_spinlock()	smp_mb()
-+#define vcpu_is_preempted vcpu_is_preempted
-+
-+#ifdef CONFIG_PARAVIRT
-+#include <linux/static_call_types.h>
-+
-+bool dummy_vcpu_is_preempted(int cpu);
- 
-+DECLARE_STATIC_CALL(pv_vcpu_is_preempted, dummy_vcpu_is_preempted);
-+static inline bool vcpu_is_preempted(int cpu)
-+{
-+	return static_call(pv_vcpu_is_preempted)(cpu);
-+}
-+
-+#else
- /*
-  * Changing this will break osq_lock() thanks to the call inside
-  * smp_cond_load_relaxed().
-@@ -18,10 +31,11 @@
-  * See:
-  * https://lore.kernel.org/lkml/20200110100612.GC2827@hirez.programming.kicks-ass.net
-  */
--#define vcpu_is_preempted vcpu_is_preempted
- static inline bool vcpu_is_preempted(int cpu)
- {
- 	return false;
- }
- 
-+#endif /* CONFIG_PARAVIRT */
-+
- #endif /* __ASM_SPINLOCK_H */
-diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
-index 57c7c211f8c7..45bcca87bed7 100644
---- a/arch/arm64/kernel/paravirt.c
-+++ b/arch/arm64/kernel/paravirt.c
-@@ -22,6 +22,7 @@
- 
- #include <asm/paravirt.h>
- #include <asm/pvclock-abi.h>
-+#include <asm/pvlock-abi.h>
- #include <asm/smp_plat.h>
- 
- struct static_key paravirt_steal_enabled;
-@@ -38,7 +39,12 @@ struct pv_time_stolen_time_region {
- 	struct pvclock_vcpu_stolen_time __rcu *kaddr;
- };
- 
-+struct pv_lock_state_region {
-+	struct pvlock_vcpu_state __rcu *kaddr;
-+};
-+
- static DEFINE_PER_CPU(struct pv_time_stolen_time_region, stolen_time_region);
-+static DEFINE_PER_CPU(struct pv_lock_state_region, lock_state_region);
- 
- static bool steal_acc = true;
- static int __init parse_no_stealacc(char *arg)
-@@ -178,3 +184,123 @@ int __init pv_time_init(void)
- 
- 	return 0;
- }
-+
-+static bool native_vcpu_is_preempted(int cpu)
-+{
-+	return false;
-+}
-+
-+DEFINE_STATIC_CALL(pv_vcpu_is_preempted, native_vcpu_is_preempted);
-+
-+static bool para_vcpu_is_preempted(int cpu)
-+{
-+	struct pv_lock_state_region *reg;
-+	__le64 preempted_le;
-+
-+	reg = per_cpu_ptr(&lock_state_region, cpu);
-+	if (!reg->kaddr) {
-+		pr_warn_once("PV lock enabled but not configured for cpu %d\n",
-+			     cpu);
-+		return false;
-+	}
-+
-+	preempted_le = le64_to_cpu(READ_ONCE(reg->kaddr->preempted));
-+
-+	return !!(preempted_le);
-+}
-+
-+static int pvlock_vcpu_state_dying_cpu(unsigned int cpu)
-+{
-+	struct pv_lock_state_region *reg;
-+
-+	reg = this_cpu_ptr(&lock_state_region);
-+	if (!reg->kaddr)
-+		return 0;
-+
-+	memunmap(reg->kaddr);
-+	memset(reg, 0, sizeof(*reg));
-+
-+	return 0;
-+}
-+
-+static int init_pvlock_vcpu_state(unsigned int cpu)
-+{
-+	struct pv_lock_state_region *reg;
-+	struct arm_smccc_res res;
-+
-+	reg = this_cpu_ptr(&lock_state_region);
-+
-+	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_LOCK_PREEMPTED, &res);
-+
-+	if (res.a0 == SMCCC_RET_NOT_SUPPORTED) {
-+		pr_warn("Failed to init PV lock data structure\n");
-+		return -EINVAL;
-+	}
-+
-+	reg->kaddr = memremap(res.a0,
-+			      sizeof(struct pvlock_vcpu_state),
-+			      MEMREMAP_WB);
-+
-+	if (!reg->kaddr) {
-+		pr_warn("Failed to map PV lock data structure\n");
-+		return -ENOMEM;
-+	}
-+
-+	return 0;
-+}
-+
-+static int kvm_arm_init_pvlock(void)
-+{
-+	int ret;
-+
-+	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
-+				"hypervisor/arm/pvlock:starting",
-+				init_pvlock_vcpu_state,
-+				pvlock_vcpu_state_dying_cpu);
-+	if (ret < 0) {
-+		pr_warn("PV-lock init failed\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static bool has_kvm_pvlock(void)
-+{
-+	struct arm_smccc_res res;
-+
-+	/* To detect the presence of PV lock support we require SMCCC 1.1+ */
-+	if (arm_smccc_1_1_get_conduit() == SMCCC_CONDUIT_NONE)
-+		return false;
-+
-+	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-+			     ARM_SMCCC_HV_PV_LOCK_FEATURES, &res);
-+
-+	if (res.a0 != SMCCC_RET_SUCCESS)
-+		return false;
-+
-+	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_LOCK_FEATURES,
-+			     ARM_SMCCC_HV_PV_LOCK_PREEMPTED, &res);
-+
-+	return (res.a0 == SMCCC_RET_SUCCESS);
-+}
-+
-+int __init pv_lock_init(void)
-+{
-+	int ret;
-+
-+	if (is_hyp_mode_available())
-+		return 0;
-+
-+	if (!has_kvm_pvlock())
-+		return 0;
-+
-+	ret = kvm_arm_init_pvlock();
-+	if (ret)
-+		return ret;
-+
-+	static_call_update(pv_vcpu_is_preempted, para_vcpu_is_preempted);
-+	pr_info("using PV-lock preempted\n");
-+
-+	return 0;
-+}
-\ No newline at end of file
-diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-index fea3223704b6..05ca07ac5800 100644
---- a/arch/arm64/kernel/setup.c
-+++ b/arch/arm64/kernel/setup.c
-@@ -42,6 +42,7 @@
- #include <asm/cpu_ops.h>
- #include <asm/kasan.h>
- #include <asm/numa.h>
-+#include <asm/paravirt.h>
- #include <asm/sections.h>
- #include <asm/setup.h>
- #include <asm/smp_plat.h>
-@@ -360,6 +361,8 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
- 	smp_init_cpus();
- 	smp_build_mpidr_hash();
- 
-+	pv_lock_init();
-+
- 	/* Init percpu seeds for random tags after cpus are set up. */
- 	kasan_init_sw_tags();
- 
-diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index f61447913db9..c0ee11855c73 100644
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -192,6 +192,7 @@ enum cpuhp_state {
- 	/* Must be the last timer callback */
- 	CPUHP_AP_DUMMY_TIMER_STARTING,
- 	CPUHP_AP_ARM_XEN_STARTING,
-+	CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
- 	CPUHP_AP_ARM_CORESIGHT_STARTING,
- 	CPUHP_AP_ARM_CORESIGHT_CTI_STARTING,
- 	CPUHP_AP_ARM64_ISNDEP_STARTING,
+	M.
+
 -- 
-2.25.1
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
