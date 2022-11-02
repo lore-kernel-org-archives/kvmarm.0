@@ -1,42 +1,42 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359321EA01
-	for <kvmarm@lists.linux.dev>; Wed,  2 Nov 2022 23:19:28 +0000 (UTC)
-Received: by mail-pg1-f202.google.com with SMTP id w191-20020a6382c8000000b0045bf92a0b5aso75298pgd.22
-        for <kvmarm@lists.linux.dev>; Wed, 02 Nov 2022 16:19:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A436B24F28
+	for <kvmarm@lists.linux.dev>; Wed,  2 Nov 2022 23:19:33 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id o2-20020a5b0502000000b006cade5e7c07so371185ybp.10
+        for <kvmarm@lists.linux.dev>; Wed, 02 Nov 2022 16:19:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=f6XefN5I5ruzVbYrkN1yZMFgJ8nhy1kqU9UZnCdhptg=;
-        b=FUnEcV14oY1HhDUwVKN8pTDouw0xzuRbPJ7dVWPyWf7LCB3wz7IYoyHrVonO3c387e
-         dI3MHWMYgBJQpreY7yX0zaLup4D/BjMQIPgcJ6/Y5XOKigJWcAdpUzONFvuLPzHtir52
-         zdaUHwROL74RXI3mkeR0R+qNmpt1jql/YrTnEJ1Qwsw3qcMId5mcp2klJsam49tVGQME
-         t8DMqjC0vOv+z1PP8Nu2ZgbAaFakedT9qRtNqclB+WBnuhzmQLAsPCqjW2pMYt0xh3QD
-         h7M2RWadICLZ+5uSGPG4Pb/Tc8N1vrQv0/X5wVejGopVyLeDeBxDnA93aC61xM1KOh59
-         ijig==
+        bh=hsvwPn56EufMwWrr4BQ3wXsJaNpmOPQxZWWpLewxvhQ=;
+        b=Y+WCubtqC448k8BS6Mqnaj28SHAW+AQfgFNGCLm2bJu3u1mJtG3sPN/6hEm3u5WKxX
+         gjm0xAmdiy0BNLmCTgESqNLWBkKXwZKx8x3UovP6tMr0tuTqm6uAbtXaFSg2tQ6IY8UY
+         VXa2F9flrbUexIM+erBgHE9ssHvFwc+slKWkiJrFDAVzrbJZgmqNXlASKZWSF88G1RsF
+         3WXrtRdOPomKp62p5k4CbApbNG6yrgaBuDlDbRhFN/CbQ2b9hIJBRdTCZXqQmNDbMEE4
+         ZnCQdPnQlkYKD1izSyGfMR40m61f2ixRTRCzDV7N9xc1b7MsAKZPHOhhZhsGAWMnpSoY
+         ov8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=f6XefN5I5ruzVbYrkN1yZMFgJ8nhy1kqU9UZnCdhptg=;
-        b=OQxzsq6NYq1YBbaU+jC7JH13cCfU4samL6NRpJq2i/GAaenQdvf832hyK+lzXqMlqD
-         tusoTGERaoKkEMb0+zWjbX/oPAcDzNqdwDgOUwR44mj5cD+XOypko/1b4evZXCFAMKj7
-         Lbqu4Im2MBi45gk01fMcNjaM1ZYzTDlqe8RMXipKsqRm0kdSukVdRdKfQHbGnpb1tzVN
-         tDANQNTNOGn+VQyiC9M5pkV8XG9A62xBZ7z4NF+7QxejxsYibRGxxxL/avQZJcZbdmrK
-         swPLtRb6Z7xJ08x8lw3Lc7jlUwAz32L8dUDjmz5fEScVV7BakOKnFauw5SzmcHv0p+YJ
-         QlwA==
-X-Gm-Message-State: ACrzQf1iNSY2Jn756mZr7DUGyDlqjVekPLOGcTynypE1M2qsjgUkKOa/
-	ljyXNXSKw202JY+tT1vKffmd5V4moSc=
-X-Google-Smtp-Source: AMsMyM6ZTzi+kKessshttxuP+R00ff+0MGY2J8p0+pI+2b6dGLsSDC25NpLjmF+zSycHkN8AtXN1EQYPl4Q=
+        bh=hsvwPn56EufMwWrr4BQ3wXsJaNpmOPQxZWWpLewxvhQ=;
+        b=IwzDetbIeX4Z/PYqsNMmiG6Kyik92XO4a7jKX3JfNzMaJCjX+W8IoNW0jaOogJJ6IU
+         XWOqN1mUxH19SCgWGw7QHvCHqGM3sCrSLFhSie98LV9keCsiFmWZo7Q7zQrTe3s+v9kl
+         AzZLVIFguLtM6xy7adJhy10Ya3XYwChQGEbw6phSXtDklkw02eDDwNi/E4RpqVdVvlpK
+         Nl0yB92NDq/Yrqis8kwZ+M6ylbGxhYml6N+UbU97XJNrU/e3kuRTssNM0kEj68yQiuDQ
+         OOWlRFzHCBklXaVRArPc3OUZSaS5sd5dq8TsKhivEEWhpLPMiNLYlGVe21BSSfQBeDsx
+         l9oQ==
+X-Gm-Message-State: ACrzQf0SDtwHPVdnqulplzBoL5YrxaF0XqTmn0I16FDckCdYGz7lcEv2
+	0zNCUrvgtU89kYzg27qte7vf83fUHdU=
+X-Google-Smtp-Source: AMsMyM6oJohPpBax4v0z1oNOFbI9XApbw28cX6E9TB+pABT2BMMHd99IJfTyuxyKkWfVMC7TDoAu4jEMuqY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:da86:b0:188:4eab:b782 with SMTP id
- j6-20020a170902da8600b001884eabb782mr2360300plx.171.1667431167708; Wed, 02
- Nov 2022 16:19:27 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:550:0:b0:6ca:5991:1abf with SMTP id
+ 77-20020a250550000000b006ca59911abfmr26235720ybf.371.1667431172753; Wed, 02
+ Nov 2022 16:19:32 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed,  2 Nov 2022 23:18:35 +0000
+Date: Wed,  2 Nov 2022 23:18:38 +0000
 In-Reply-To: <20221102231911.3107438-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -46,8 +46,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20221102231911.3107438-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102231911.3107438-9-seanjc@google.com>
-Subject: [PATCH 08/44] KVM: x86: Move hardware setup/unsetup to init/exit
+Message-ID: <20221102231911.3107438-12-seanjc@google.com>
+Subject: [PATCH 11/44] KVM: x86: Move guts of kvm_arch_init() to standalone helper
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Huacai Chen <chenhuacai@kernel.org>, 
@@ -68,205 +68,159 @@ Cc: James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.co
 	Fabiano Rosas <farosas@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
 	Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Yuan Yao <yuan.yao@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221102231835.sds_vOw9srrNGpA8wR6Qj82aNceDiVxolcu_RXGGOl8@z>
+Message-ID: <20221102231838.qrSHbTGBzWh35OjAzshDsyln0caTPtgMUGHGSqPzFmI@z>
 
-Now that kvm_arch_hardware_setup() is called immediately after
-kvm_arch_init(), fold the guts of kvm_arch_hardware_(un)setup() into
-kvm_arch_{init,exit}() as a step towards dropping one of the hooks.
+Move the guts of kvm_arch_init() to a new helper, kvm_x86_vendor_init(),
+so that VMX can do _all_ arch and vendor initialization before calling
+kvm_init().  Calling kvm_init() must be the _very_ last step during init,
+as kvm_init() exposes /dev/kvm to userspace, i.e. allows creating VMs.
 
-To avoid having to unwind various setup, e.g registration of several
-notifiers, slot in the vendor hardware setup before the registration of
-said notifiers and callbacks.  Introducing a functional change while
-moving code is less than ideal, but the alternative is adding a pile of
-unwinding code, which is much more error prone, e.g. several attempts to
-move the setup code verbatim all introduced bugs.
-
-Add a comment to document that kvm_ops_update() is effectively the point
-of no return, e.g. it sets the kvm_x86_ops.hardware_enable canary and so
-needs to be unwound.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 121 +++++++++++++++++++++++----------------------
- 1 file changed, 63 insertions(+), 58 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  3 +++
+ arch/x86/kvm/svm/svm.c          | 23 +++++++++++++++++++++--
+ arch/x86/kvm/vmx/vmx.c          |  9 ++++++++-
+ arch/x86/kvm/x86.c              | 15 +++++++++++++--
+ 4 files changed, 45 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9a7702b1c563..80ee580a9cd4 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9252,6 +9252,24 @@ static struct notifier_block pvclock_gtod_notifier = {
- };
- #endif
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 415113dea951..58a7cb8d8e96 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1695,6 +1695,9 @@ extern struct kvm_x86_ops kvm_x86_ops;
+ #define KVM_X86_OP_OPTIONAL_RET0 KVM_X86_OP
+ #include <asm/kvm-x86-ops.h>
  
-+static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
-+{
-+	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
++int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops);
++void kvm_x86_vendor_exit(void);
 +
-+#define __KVM_X86_OP(func) \
-+	static_call_update(kvm_x86_##func, kvm_x86_ops.func);
-+#define KVM_X86_OP(func) \
-+	WARN_ON(!kvm_x86_ops.func); __KVM_X86_OP(func)
-+#define KVM_X86_OP_OPTIONAL __KVM_X86_OP
-+#define KVM_X86_OP_OPTIONAL_RET0(func) \
-+	static_call_update(kvm_x86_##func, (void *)kvm_x86_ops.func ? : \
-+					   (void *)__static_call_return0);
-+#include <asm/kvm-x86-ops.h>
-+#undef __KVM_X86_OP
-+
-+	kvm_pmu_ops_update(ops->pmu_ops);
-+}
-+
- int kvm_arch_init(void *opaque)
+ #define __KVM_HAVE_ARCH_VM_ALLOC
+ static inline struct kvm *kvm_arch_alloc_vm(void)
  {
- 	struct kvm_x86_init_ops *ops = opaque;
-@@ -9325,6 +9343,24 @@ int kvm_arch_init(void *opaque)
- 		kvm_caps.supported_xcr0 = host_xcr0 & KVM_SUPPORTED_XCR0;
- 	}
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index d22a809d9233..f48d07bfc3d7 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -5132,15 +5132,34 @@ static struct kvm_x86_init_ops svm_init_ops __initdata = {
  
-+	rdmsrl_safe(MSR_EFER, &host_efer);
+ static int __init svm_init(void)
+ {
++	int r;
 +
-+	if (boot_cpu_has(X86_FEATURE_XSAVES))
-+		rdmsrl(MSR_IA32_XSS, host_xss);
-+
-+	kvm_init_pmu_capability();
-+
-+	r = ops->hardware_setup();
-+	if (r != 0)
-+		goto out_mmu_exit;
+ 	__unused_size_checks();
+ 
+-	return kvm_init(&svm_init_ops, sizeof(struct vcpu_svm),
+-			__alignof__(struct vcpu_svm), THIS_MODULE);
++	r = kvm_x86_vendor_init(&svm_init_ops);
++	if (r)
++		return r;
 +
 +	/*
-+	 * Point of no return!  DO NOT add error paths below this point unless
-+	 * absolutely necessary, as most operations from this point forward
-+	 * require unwinding.
++	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
++	 * exposed to userspace!
 +	 */
-+	kvm_ops_update(ops);
++	r = kvm_init(&svm_init_ops, sizeof(struct vcpu_svm),
++		     __alignof__(struct vcpu_svm), THIS_MODULE);
++	if (r)
++		goto err_kvm_init;
 +
- 	kvm_timer_init();
- 
- 	if (pi_inject_timer == -1)
-@@ -9336,8 +9372,32 @@ int kvm_arch_init(void *opaque)
- 		set_hv_tscchange_cb(kvm_hyperv_tsc_notifier);
- #endif
- 
-+	kvm_register_perf_callbacks(ops->handle_intel_pt_intr);
++	return 0;
 +
-+	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
-+		kvm_caps.supported_xss = 0;
-+
-+#define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
-+	cr4_reserved_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
-+#undef __kvm_cpu_cap_has
-+
-+	if (kvm_caps.has_tsc_control) {
-+		/*
-+		 * Make sure the user can only configure tsc_khz values that
-+		 * fit into a signed integer.
-+		 * A min value is not calculated because it will always
-+		 * be 1 on all machines.
-+		 */
-+		u64 max = min(0x7fffffffULL,
-+			      __scale_tsc(kvm_caps.max_tsc_scaling_ratio, tsc_khz));
-+		kvm_caps.max_guest_tsc_khz = max;
-+	}
-+	kvm_caps.default_tsc_scaling_ratio = 1ULL << kvm_caps.tsc_scaling_ratio_frac_bits;
-+	kvm_init_msr_list();
- 	return 0;
- 
-+out_mmu_exit:
-+	kvm_mmu_vendor_module_exit();
- out_free_percpu:
- 	free_percpu(user_return_msrs);
- out_free_x86_emulator_cache:
-@@ -9347,6 +9407,8 @@ int kvm_arch_init(void *opaque)
- 
- void kvm_arch_exit(void)
- {
-+	kvm_unregister_perf_callbacks();
-+
- #ifdef CONFIG_X86_64
- 	if (hypervisor_is_type(X86_HYPER_MS_HYPERV))
- 		clear_hv_tscchange_cb();
-@@ -9362,6 +9424,7 @@ void kvm_arch_exit(void)
- 	irq_work_sync(&pvclock_irq_work);
- 	cancel_work_sync(&pvclock_gtod_work);
- #endif
-+	static_call(kvm_x86_hardware_unsetup)();
- 	kvm_x86_ops.hardware_enable = NULL;
- 	kvm_mmu_vendor_module_exit();
- 	free_percpu(user_return_msrs);
-@@ -11922,72 +11985,14 @@ void kvm_arch_hardware_disable(void)
- 	drop_user_return_notifiers();
++err_kvm_init:
++	kvm_x86_vendor_exit();
++	return r;
  }
  
--static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
--{
--	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
--
--#define __KVM_X86_OP(func) \
--	static_call_update(kvm_x86_##func, kvm_x86_ops.func);
--#define KVM_X86_OP(func) \
--	WARN_ON(!kvm_x86_ops.func); __KVM_X86_OP(func)
--#define KVM_X86_OP_OPTIONAL __KVM_X86_OP
--#define KVM_X86_OP_OPTIONAL_RET0(func) \
--	static_call_update(kvm_x86_##func, (void *)kvm_x86_ops.func ? : \
--					   (void *)__static_call_return0);
--#include <asm/kvm-x86-ops.h>
--#undef __KVM_X86_OP
--
--	kvm_pmu_ops_update(ops->pmu_ops);
--}
--
- int kvm_arch_hardware_setup(void *opaque)
+ static void __exit svm_exit(void)
+ {
+ 	kvm_exit();
++	kvm_x86_vendor_exit();
+ }
+ 
+ module_init(svm_init)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index b3fd4049de01..118d9b29b339 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -8501,6 +8501,7 @@ static void vmx_exit(void)
+ #endif
+ 
+ 	kvm_exit();
++	kvm_x86_vendor_exit();
+ 
+ 	hv_cleanup_evmcs();
+ 
+@@ -8516,13 +8517,17 @@ static int __init vmx_init(void)
+ 
+ 	hv_setup_evmcs();
+ 
++	r = kvm_x86_vendor_init(&vmx_init_ops);
++	if (r)
++		goto err_x86_init;
++
+ 	r = kvm_init(&vmx_init_ops, sizeof(struct vcpu_vmx),
+ 		     __alignof__(struct vcpu_vmx), THIS_MODULE);
+ 	if (r)
+ 		goto err_kvm_init;
+ 
+ 	/*
+-	 * Must be called after kvm_init() so enable_ept is properly set
++	 * Must be called after common x86 init so enable_ept is properly set
+ 	 * up. Hand the parameter mitigation value in which was stored in
+ 	 * the pre module init parser. If no parameter was given, it will
+ 	 * contain 'auto' which will be turned into the default 'cond'
+@@ -8559,6 +8564,8 @@ static int __init vmx_init(void)
+ err_l1d_flush:
+ 	vmx_exit();
+ err_kvm_init:
++	kvm_x86_vendor_exit();
++err_x86_init:
+ 	hv_cleanup_evmcs();
+ 	return r;
+ }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 40d4bfaa17a4..a0ca401d3cdf 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9272,7 +9272,16 @@ static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
+ 
+ int kvm_arch_init(void *opaque)
  {
 -	struct kvm_x86_init_ops *ops = opaque;
--	int r;
--
--	rdmsrl_safe(MSR_EFER, &host_efer);
--
--	if (boot_cpu_has(X86_FEATURE_XSAVES))
--		rdmsrl(MSR_IA32_XSS, host_xss);
--
--	kvm_init_pmu_capability();
--
--	r = ops->hardware_setup();
--	if (r != 0)
--		return r;
--
--	kvm_ops_update(ops);
--
--	kvm_register_perf_callbacks(ops->handle_intel_pt_intr);
--
--	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
--		kvm_caps.supported_xss = 0;
--
--#define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
--	cr4_reserved_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
--#undef __kvm_cpu_cap_has
--
--	if (kvm_caps.has_tsc_control) {
--		/*
--		 * Make sure the user can only configure tsc_khz values that
--		 * fit into a signed integer.
--		 * A min value is not calculated because it will always
--		 * be 1 on all machines.
--		 */
--		u64 max = min(0x7fffffffULL,
--			      __scale_tsc(kvm_caps.max_tsc_scaling_ratio, tsc_khz));
--		kvm_caps.max_guest_tsc_khz = max;
--	}
--	kvm_caps.default_tsc_scaling_ratio = 1ULL << kvm_caps.tsc_scaling_ratio_frac_bits;
--	kvm_init_msr_list();
- 	return 0;
- }
++	return 0;
++}
++
++void kvm_arch_exit(void)
++{
++
++}
++
++int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
++{
+ 	u64 host_pat;
+ 	int r;
  
- void kvm_arch_hardware_unsetup(void)
+@@ -9404,8 +9413,9 @@ int kvm_arch_init(void *opaque)
+ 	kmem_cache_destroy(x86_emulator_cache);
+ 	return r;
+ }
++EXPORT_SYMBOL_GPL(kvm_x86_vendor_init);
+ 
+-void kvm_arch_exit(void)
++void kvm_x86_vendor_exit(void)
  {
--	kvm_unregister_perf_callbacks();
+ 	kvm_unregister_perf_callbacks();
  
--	static_call(kvm_x86_hardware_unsetup)();
+@@ -9434,6 +9444,7 @@ void kvm_arch_exit(void)
+ 	WARN_ON(static_branch_unlikely(&kvm_xen_enabled.key));
+ #endif
  }
++EXPORT_SYMBOL_GPL(kvm_x86_vendor_exit);
  
- int kvm_arch_check_processor_compat(void *opaque)
+ static int __kvm_emulate_halt(struct kvm_vcpu *vcpu, int state, int reason)
+ {
 -- 
 2.38.1.431.g37b22c650d-goog
 
