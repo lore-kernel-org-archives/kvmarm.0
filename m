@@ -2,82 +2,84 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1695FC43217
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 15:58:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACCECC4167B
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 16:11:16 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89E7340417;
-	Wed,  2 Nov 2022 11:58:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2EE84B955;
+	Wed,  2 Nov 2022 12:11:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7unYzaSnKEQp; Wed,  2 Nov 2022 11:58:50 -0400 (EDT)
+	with ESMTP id 5BQWlPBUbHkW; Wed,  2 Nov 2022 12:11:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A5A54B984;
-	Wed,  2 Nov 2022 11:58:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1CB74B95A;
+	Wed,  2 Nov 2022 12:11:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DC1F4B904
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 11:58:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4215D4B93C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 12:11:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V7+tFV92JrPm for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Nov 2022 11:58:48 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0EC3540417
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 11:58:48 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id D830261590;
- Wed,  2 Nov 2022 15:58:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1416C433D6;
- Wed,  2 Nov 2022 15:58:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1667404726;
- bh=HX9zj9GM9OWe4YXhMsVjlp4lVDfOB/zbQjFOQfuR2To=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=Qh07gmOgCeigjcvSBI719bVcZ7HH0lWvCkCGQatFgY/ual/4f6cDOOhVzsLPxzQvy
- XvsFO0xWQD+E81EXUtgp+9Jehx8H+b7VIreoffjM+hQ4YNvGfMvzWGoABfro9nCQ67
- A3wOvvcpj9am58IZVvd8ByhttmSTO5t38zowdEZ2Y+bGYKAnsTiGKSNjw40Zll0hnV
- NVg5OQooEBpYS+JexDlD8pwo6NDfvfbxuye3TmaVWlR6JW5x3kpsgkGRbC39jd0ZUL
- bqHiRhkI8CHNH3PUyCP9CAhqwgoNDzztJTci00YVy+MqO/CEqb3mYu9/N8PEvxden7
- 8ywr4QILxnE5g==
-Received: from sofa.misterjones.org ([185.219.108.64]
- helo=goblin-girl.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oqG8Z-003FIG-DC;
- Wed, 02 Nov 2022 15:58:44 +0000
-Date: Wed, 02 Nov 2022 15:58:43 +0000
-Message-ID: <867d0de4b0.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Peter Xu <peterx@redhat.com>
+ with ESMTP id SNA+z7jPvoIK for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Nov 2022 12:11:12 -0400 (EDT)
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com
+ [209.85.210.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B8804B941
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 12:11:12 -0400 (EDT)
+Received: by mail-pf1-f171.google.com with SMTP id b29so16789084pfp.13
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 09:11:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=xjbiGog+CMLFws9ba0e8gTV0L7Jl5w0vMwDQ7UNnmBw=;
+ b=fg5ss+yu7hOd7zMQAayXu1r5V5FRoeiX0Ib8rbO1Hbpnplg28DwPoTzY3KXbp2IM5l
+ c8LhKRuFMH0LpjHZqJ/2MO63rmotIEtPBD0D+rrJYFHPwGvPjKFUWsaM0f6Or6MD+PMa
+ xWZBW7C28NlVRSBqddoR8LLJS5WgYHillPL2TPvWLB/q/bsrRkhbFv47BZ6Sjtk0FQVM
+ enNFn/n81hHrMVGNCRCSpNhDfglnUMmtyta2ATX+wgX831Gh9RjaU/U3AQkd3cynJHeo
+ U+5ETSrGJcaCiKGZdkgrI0jt9/jJ9kNO/LscVkh2clSBXP1iXeLU5+XbUTtSax048fuO
+ WbJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=xjbiGog+CMLFws9ba0e8gTV0L7Jl5w0vMwDQ7UNnmBw=;
+ b=d6XFMql/dDxE0kN9cp/GDV4BoFSpmJ7RWbzzMKUPXITkDx2lCqFSagw5AzLdmez4mn
+ tLnnmmrPG9IsWpWokho/ak2tkbWTTlE0zL/1j/ALyGDGbSNc1f/xxMEnbA5gLhDAv+6A
+ xWQxN5Zu8tv1L7EwzzhFDQITlje2LFuizCe9fzcX+ShCF/UBZpdY12NUrDcU/vlH0Sku
+ AI7e32JLKxL5YmULqBxdgHXjOyBZCw6gz3fJCqUDp/+Fn4to6kdGqNQcTM7D2vUlALw3
+ R39z7WmVToKuupkcuUc9ZOZ63xUrVq4H1dad+SEFkd6Ww2i3Ofi7C0kvLOC5oOJsTZYy
+ IOgA==
+X-Gm-Message-State: ACrzQf1sy2yxA0sE9+9dklQqHFRSceUUMuZgwcm4mGJ3ihDJA9BxRy83
+ scc7fkUVg7I1CNm5pUodP9WxQg==
+X-Google-Smtp-Source: AMsMyM40y/EP1XZjLr8u5d95J50ow6Qq/UpZGFYNazWh9EsURT6JqjOG9NRHwf0ExoNxySlBc1J0Zw==
+X-Received: by 2002:a63:8b42:0:b0:46f:5bd0:1ae2 with SMTP id
+ j63-20020a638b42000000b0046f5bd01ae2mr21786579pge.422.1667405471018; 
+ Wed, 02 Nov 2022 09:11:11 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ a15-20020a170902710f00b001885041d7b8sm77000pll.293.2022.11.02.09.11.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 02 Nov 2022 09:11:10 -0700 (PDT)
+Date: Wed, 2 Nov 2022 16:11:07 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [PATCH v7 1/9] KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
-In-Reply-To: <Y2J+xhBYhqBI81f7@x1n>
+Message-ID: <Y2KWm8wiL3jBryMI@google.com>
 References: <20221031003621.164306-1-gshan@redhat.com>
  <20221031003621.164306-2-gshan@redhat.com>
  <Y2F17Y7YG5Z9XnOJ@google.com> <Y2J+xhBYhqBI81f7@x1n>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: peterx@redhat.com, seanjc@google.com, gshan@redhat.com,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com,
- catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
- pbonzini@redhat.com, oliver.upton@linux.dev, james.morse@arm.com,
- shuah@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
- zhenyzha@redhat.com, shan.gavin@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: shuah@kernel.org, kvm@vger.kernel.org, andrew.jones@linux.dev,
- dmatlack@google.com, will@kernel.org, shan.gavin@gmail.com, bgardon@google.com,
- kvmarm@lists.linux.dev, pbonzini@redhat.com, zhenyzha@redhat.com,
- catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
+ <867d0de4b0.wl-maz@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <867d0de4b0.wl-maz@kernel.org>
+Cc: shuah@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ andrew.jones@linux.dev, dmatlack@google.com, shan.gavin@gmail.com,
+ bgardon@google.com, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ zhenyzha@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,76 +96,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 02 Nov 2022 14:29:26 +0000,
-Peter Xu <peterx@redhat.com> wrote:
-> 
-> On Tue, Nov 01, 2022 at 07:39:25PM +0000, Sean Christopherson wrote:
-> > > @@ -142,13 +144,17 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
-> > >  
-> > >  	kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
-> > >  
-> > > +	if (!kvm_dirty_ring_soft_full(ring))
-> > > +		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
-> > > +
+On Wed, Nov 02, 2022, Marc Zyngier wrote:
+> On Wed, 02 Nov 2022 14:29:26 +0000, Peter Xu <peterx@redhat.com> wrote:
+> > However I don't see anything stops a simple "race" to trigger like below:
 > > 
-> > Marc, Peter, and/or Paolo, can you confirm that clearing the
-> > request here won't cause ordering problems?  Logically, this makes
-> > perfect sense (to me, since I suggested it), but I'm mildly
-> > concerned I'm overlooking an edge case where KVM could end up with
-> > a soft-full ring but no pending request.
+> >           recycle thread                   vcpu thread
+> >           --------------                   -----------
+> >       if (!dirty_ring_soft_full)                                   <--- not full
+> >                                         dirty_ring_push();
+> >                                         if (dirty_ring_soft_full)  <--- full due to the push
+> >                                             set_request(SOFT_FULL);
+> >           clear_request(SOFT_FULL);                                <--- can wrongly clear the request?
+> >
 > 
-> I don't see an ordering issue here, as long as kvm_clear_request() is using
-> atomic version of bit clear, afaict that's genuine RMW and should always
-> imply a full memory barrier (on any arch?) between the soft full check and
-> the bit clear.  At least for x86 the lock prefix was applied.
-
-No, clear_bit() is not a full barrier. It only atomic, and thus
-completely unordered (see Documentation/atomic_bitops.txt). If you
-want a full barrier, you need to use test_and_clear_bit().
-
+> Hmmm, well spotted. That's another ugly effect of the recycle thread
+> playing with someone else's toys.
 > 
-> However I don't see anything stops a simple "race" to trigger like below:
+> > But I don't think that's a huge matter, as it'll just let the vcpu to have
+> > one more chance to do another round of KVM_RUN.  Normally I think it means
+> > there can be one more dirty GFN (perhaps there're cases that it can push >1
+> > gfns for one KVM_RUN cycle?  I never figured out the details here, but
+> > still..) pushed to the ring so closer to the hard limit, but we have had a
+> > buffer zone of KVM_DIRTY_RING_RSVD_ENTRIES (64) entries.  So I assume
+> > that's still fine, but maybe worth a short comment here?
+> > 
+> > I never know what's the maximum possible GFNs being dirtied for a KVM_RUN
+> > cycle.  It would be good if there's an answer to that from anyone.
 > 
->           recycle thread                   vcpu thread
->           --------------                   -----------
->       if (!dirty_ring_soft_full)                                   <--- not full
->                                         dirty_ring_push();
->                                         if (dirty_ring_soft_full)  <--- full due to the push
->                                             set_request(SOFT_FULL);
->           clear_request(SOFT_FULL);                                <--- can wrongly clear the request?
->
-
-Hmmm, well spotted. That's another ugly effect of the recycle thread
-playing with someone else's toys.
-
-> But I don't think that's a huge matter, as it'll just let the vcpu to have
-> one more chance to do another round of KVM_RUN.  Normally I think it means
-> there can be one more dirty GFN (perhaps there're cases that it can push >1
-> gfns for one KVM_RUN cycle?  I never figured out the details here, but
-> still..) pushed to the ring so closer to the hard limit, but we have had a
-> buffer zone of KVM_DIRTY_RING_RSVD_ENTRIES (64) entries.  So I assume
-> that's still fine, but maybe worth a short comment here?
+> This is dangerous, and I'd rather not go there.
 > 
-> I never know what's the maximum possible GFNs being dirtied for a KVM_RUN
-> cycle.  It would be good if there's an answer to that from anyone.
+> It is starting to look like we need the recycle thread to get out of
+> the way. And to be honest:
+> 
+> +	if (!kvm_dirty_ring_soft_full(ring))
+> +		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
+> 
+> seems rather superfluous. Only clearing the flag in the vcpu entry
+> path feels much saner, and I can't see anything that would break.
+> 
+> Thoughts?
 
-This is dangerous, and I'd rather not go there.
-
-It is starting to look like we need the recycle thread to get out of
-the way. And to be honest:
-
-+	if (!kvm_dirty_ring_soft_full(ring))
-+		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
-
-seems rather superfluous. Only clearing the flag in the vcpu entry
-path feels much saner, and I can't see anything that would break.
-
-Thoughts?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+I've no objections to dropping the clear on reset, I suggested it primarily so
+that it would be easier to understand what action causes the dirty ring to become
+not-full.  I agree that the explicit clear is unnecessary from a functional
+perspective.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
