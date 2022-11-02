@@ -2,69 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E203C43217
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB231C4321E
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:19:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09D994B795;
-	Wed,  2 Nov 2022 19:19:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3857B4B6CF;
+	Wed,  2 Nov 2022 19:19:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GqnBkmINz887; Wed,  2 Nov 2022 19:19:21 -0400 (EDT)
+	with ESMTP id tM5uRzRPZ+Wm; Wed,  2 Nov 2022 19:19:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C8F54B798;
-	Wed,  2 Nov 2022 19:19:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF5384B797;
+	Wed,  2 Nov 2022 19:19:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DD764B750
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E77104B6CF
  for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JYkzXFQ85FFy for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Nov 2022 19:19:17 -0400 (EDT)
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com
- [209.85.215.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 749284B6CF
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:17 -0400 (EDT)
-Received: by mail-pg1-f202.google.com with SMTP id
- k16-20020a635a50000000b0042986056df6so97772pgm.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:19:17 -0700 (PDT)
+ with ESMTP id K62CAlmScBUx for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Nov 2022 19:19:18 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9622F40B65
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:18 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ m4-20020a258004000000b006cbf32f7ed8so366303ybk.9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:19:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
- :subject:date:message-id:reply-to;
- bh=v+0QB2AcjXWwXQFe0Sl30YwZEOHl7lG2VkKFom8MCIE=;
- b=aw3MvDnhjGhzU1N6s+Vpw6sc746Hsx1nkI0d46VmBcJKGrP/BJLyU4nszyhTbJdoTf
- oofi962rp1gcsq9xO3VFhTcWtZK6/xQ/3tFYJ9+Uj+Dk2GcKrDL4HigNkzsIFpy3Q79n
- /wG/NMqz1oBz2i5EST1RhC8Hi5hVLUf4USV0ge1OT5BhXgXcS8ylDR+K4VXPhApjhIG3
- OlaKTmjuVOgoRP+QcCoTz+8mzEp4DSP7dVJWGcJ12El2CQ1hCL3jRjRnd2iT2XfA+oCo
- nSPZrAZE9Fwc/n2HoWbhBJay4U0cc48uC3MWJYPi8Mq7p0wuNGF3sCDpmc1GQ081YOYu
- gnFw==
+ h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+ :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+ bh=7+eEYWgdfK2f235NQouH0yOVJiIE3XUzS6aBBcpH2Xg=;
+ b=GJuDT4qIFRmN0zrEcesKp5eZ38WFJtAk7eJLI6MT/Ki4scur3JzxZHizyJ8pIsBMLg
+ TZsxQflrMw0vV6/LQ4eLuVGkeHataXwJMbFJYWT60aCHjdYTQzerfB15KOU/infpl1Yg
+ Dq7XMjNzBlwZlnSc61H5gBHFkm3TEEd35yWHpJa13qtav7MsW7uSfcNWliarLL2r1uQq
+ n4Uyhy3npcssGJRIlfdRDpGm7iF4EKYzBOtaYqDiDMZ0E2gBBrutJfjyLCbotmATUg5n
+ cvQzCJ4G8GbG22iIRvx4lfqlDB2hxbUTz17cEFGPuQiDi1PGB1ilnB2TMVHOT/GiMblc
+ mfsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=cc:to:from:subject:message-id:mime-version:date:reply-to
- :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=v+0QB2AcjXWwXQFe0Sl30YwZEOHl7lG2VkKFom8MCIE=;
- b=VsfVfGsaNV1B10XvZpzKBD3c7E/1AZz64ksJsDm1roe1NdwLTTmcGcNGMOQeYGM6Rf
- YsgT/tpTh4MhGzjh0VdaXQ9KzS9FHSvPoL/fTEULWmKqh1x50lZqSiUOrBrOapWewb2/
- /bsgUfRHlNBSeuDztnVhjvcgEJnOAB1QUczoS7kYtKUTG3/On79eMPAEeocphDbhdZxo
- 5foTRMJflKVwiEeoHZE5Du2292DHWPJlfEawiv5mTVuw5yOhIEyMwOVEonaa1Nrkwy34
- ZEmBkSP4k5bXaiHyTAUYa+ri4Tym912orsA7vgqTW0Cks4I/uvfeJR82C/mPsLBxICMP
- eLbw==
-X-Gm-Message-State: ACrzQf1K/mhu5pcRGAMKlv97d6A6h9OdyTp9HAhjEDlXLwqiljeXuih/
- Srl3CYR6mdxv9FE73+ciAyV9VYUvM0M=
-X-Google-Smtp-Source: AMsMyM7HWZzp0WdXRiToVUsPaCC4IFhAkimeV47TR3c6KmefAfOorOpJlBK9HTJEVktIVE8qzHY5o99pP4Q=
+ h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+ :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+ :reply-to;
+ bh=7+eEYWgdfK2f235NQouH0yOVJiIE3XUzS6aBBcpH2Xg=;
+ b=8Kp5z4Kshz7vi0tDlaw8aX4d5ms/CzxWIcvKFW1Us0+RiESZOOotDknv9erauiq2nF
+ 2s+o5z/Ht0X7eFxaNeWWYnFz1sl38qxv2CFmsniT/XaMIHqeh4GrI5Sj9ENRzX/OiyJo
+ m7CbMcolNtWxDtWAG6aKiiGqP3c9XgTnByI1U88rMpdB+tPlZbzEW/VUCPTDjyv9W6si
+ dhuYBK8157IvjbNpJibkSkWZQyc8Ec5m7KCKPmGTOMKQPZFVRi/aXpQXXkTsd5ZaCBlK
+ FJu1MhozexfuCYcN89JvBNBva0+JcPYYHunAKe7Gghnbrlwbtm7ZRP+K3AypLYttQ+AC
+ zJBg==
+X-Gm-Message-State: ACrzQf10aoPsKy/9/8EMBjIKZ6lUh7EeHd7jD+BND4D7ql81WN6eM3Ry
+ K9WbQDYNOYTGYWzh3ljRm0rZFv0zSqo=
+X-Google-Smtp-Source: AMsMyM70haTx/XR5G28CKoYVC6XM4t6KIj6EhKrnhdUb7b9djmPG/60PGXPcAfFKa85v8fvZQusLb10dmQQ=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ef52:b0:17c:f072:95bc with SMTP id
- e18-20020a170902ef5200b0017cf07295bcmr26742303plx.28.1667431155303; Wed, 02
- Nov 2022 16:19:15 -0700 (PDT)
-Date: Wed,  2 Nov 2022 23:18:27 +0000
+ (user=seanjc job=sendgmr) by 2002:a25:afc2:0:b0:6cd:3a43:a395 with SMTP id
+ d2-20020a25afc2000000b006cd3a43a395mr12532811ybj.220.1667431158134; Wed, 02
+ Nov 2022 16:19:18 -0700 (PDT)
+Date: Wed,  2 Nov 2022 23:18:29 +0000
+In-Reply-To: <20221102231911.3107438-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20221102231911.3107438-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102231911.3107438-1-seanjc@google.com>
-Subject: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
+Message-ID: <20221102231911.3107438-3-seanjc@google.com>
+Subject: [PATCH 02/44] KVM: Initialize IRQ FD after arch hardware setup
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -104,195 +107,116 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Non-x86 folks, please test on hardware when possible.  I made a _lot_ of
-mistakes when moving code around.  Thankfully, x86 was the trickiest code
-to deal with, and I'm fairly confident that I found all the bugs I
-introduced via testing.  But the number of mistakes I made and found on
-x86 makes me more than a bit worried that I screwed something up in other
-arch code.
+Move initialization of KVM's IRQ FD workqueue below arch hardware setup
+as a step towards consolidating arch "init" and "hardware setup", and
+eventually towards dropping the hooks entirely.  There is no dependency
+on the workqueue being created before hardware setup, the workqueue is
+used only when destroying VMs, i.e. only needs to be created before
+/dev/kvm is exposed to userspace.
 
-This is a continuation of Chao's series to do x86 CPU compatibility checks
-during virtualization hardware enabling[1], and of Isaku's series to try
-and clean up the hardware enabling paths so that x86 (Intel specifically)
-can temporarily enable hardware during module initialization without
-causing undue pain for other architectures[2].  It also includes one patch
-from another mini-series from Isaku that provides the less controversial
-patches[3].
+Move the destruction of the workqueue before the arch hooks to maintain
+symmetry, and so that arch code can move away from the hooks without
+having to worry about ordering changes.
 
-The main theme of this series is to kill off kvm_arch_init(),
-kvm_arch_hardware_(un)setup(), and kvm_arch_check_processor_compat(), which
-all originated in x86 code from way back when, and needlessly complicate
-both common KVM code and architecture code.  E.g. many architectures don't
-mark functions/data as __init/__ro_after_init purely because kvm_init()
-isn't marked __init to support x86's separate vendor modules.
+Reword the comment about kvm_irqfd_init() needing to come after
+kvm_arch_init() to call out that kvm_arch_init() must come before common
+KVM does _anything_, as x86 very subtly relies on that behavior to deal
+with multiple calls to kvm_init(), e.g. if userspace attempts to load
+kvm_amd.ko and kvm_intel.ko.  Tag the code with a FIXME, as x86's subtle
+requirement is gross, and invoking an arch callback as the very first
+action in a helper that is called only from arch code is silly.
 
-The idea/hope is that with those hooks gone (moved to arch code), it will
-be easier for x86 (and other architectures) to modify their module init
-sequences as needed without having to fight common KVM code.  E.g. I'm
-hoping that ARM can build on this to simplify its hardware enabling logic,
-especially the pKVM side of things.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ virt/kvm/kvm_main.c | 37 ++++++++++++++++++-------------------
+ 1 file changed, 18 insertions(+), 19 deletions(-)
 
-There are bug fixes throughout this series.  They are more scattered than
-I would usually prefer, but getting the sequencing correct was a gigantic
-pain for many of the x86 fixes due to needing to fix common code in order
-for the x86 fix to have any meaning.  And while the bugs are often fatal,
-they aren't all that interesting for most users as they either require a
-malicious admin or broken hardware, i.e. aren't likely to be encountered
-by the vast majority of KVM users.  So unless someone _really_ wants a
-particular fix isolated for backporting, I'm not planning on shuffling
-patches.
-
-Tested on x86.  Lightly tested on arm64.  Compile tested only on all other
-architectures.
-
-[1] https://lore.kernel.org/all/20220216031528.92558-1-chao.gao@intel.com
-[2] https://lore.kernel.org/all/cover.1663869838.git.isaku.yamahata@intel.com
-[3] https://lore.kernel.org/all/cover.1667369456.git.isaku.yamahata@intel.com
-
-Chao Gao (3):
-  KVM: x86: Do compatibility checks when onlining CPU
-  KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
-  KVM: Disable CPU hotplug during hardware enabling
-
-Isaku Yamahata (3):
-  KVM: Drop kvm_count_lock and instead protect kvm_usage_count with
-    kvm_lock
-  KVM: Remove on_each_cpu(hardware_disable_nolock) in kvm_exit()
-  KVM: Make hardware_enable_failed a local variable in the "enable all"
-    path
-
-Marc Zyngier (1):
-  KVM: arm64: Simplify the CPUHP logic
-
-Sean Christopherson (37):
-  KVM: Register /dev/kvm as the _very_ last thing during initialization
-  KVM: Initialize IRQ FD after arch hardware setup
-  KVM: Allocate cpus_hardware_enabled after arch hardware setup
-  KVM: Teardown VFIO ops earlier in kvm_exit()
-  KVM: s390: Unwind kvm_arch_init() piece-by-piece() if a step fails
-  KVM: s390: Move hardware setup/unsetup to init/exit
-  KVM: x86: Do timer initialization after XCR0 configuration
-  KVM: x86: Move hardware setup/unsetup to init/exit
-  KVM: Drop arch hardware (un)setup hooks
-  KVM: VMX: Clean up eVMCS enabling if KVM initialization fails
-  KVM: x86: Move guts of kvm_arch_init() to standalone helper
-  KVM: VMX: Do _all_ initialization before exposing /dev/kvm to
-    userspace
-  KVM: x86: Serialize vendor module initialization (hardware setup)
-  KVM: arm64: Free hypervisor allocations if vector slot init fails
-  KVM: arm64: Unregister perf callbacks if hypervisor finalization fails
-  KVM: arm64: Do arm/arch initialiation without bouncing through
-    kvm_init()
-  KVM: arm64: Mark kvm_arm_init() and its unique descendants as __init
-  KVM: MIPS: Hardcode callbacks to hardware virtualization extensions
-  KVM: MIPS: Setup VZ emulation? directly from kvm_mips_init()
-  KVM: MIPS: Register die notifier prior to kvm_init()
-  KVM: RISC-V: Do arch init directly in riscv_kvm_init()
-  KVM: RISC-V: Tag init functions and data with __init, __ro_after_init
-  KVM: PPC: Move processor compatibility check to module init
-  KVM: s390: Do s390 specific init without bouncing through kvm_init()
-  KVM: s390: Mark __kvm_s390_init() and its descendants as __init
-  KVM: Drop kvm_arch_{init,exit}() hooks
-  KVM: VMX: Make VMCS configuration/capabilities structs read-only after
-    init
-  KVM: x86: Do CPU compatibility checks in x86 code
-  KVM: Drop kvm_arch_check_processor_compat() hook
-  KVM: x86: Use KBUILD_MODNAME to specify vendor module name
-  KVM: x86: Unify pr_fmt to use module name for all KVM modules
-  KVM: x86: Do VMX/SVM support checks directly in vendor code
-  KVM: VMX: Shuffle support checks and hardware enabling code around
-  KVM: SVM: Check for SVM support in CPU compatibility checks
-  KVM: Use a per-CPU variable to track which CPUs have enabled
-    virtualization
-  KVM: Register syscore (suspend/resume) ops early in kvm_init()
-  KVM: Opt out of generic hardware enabling on s390 and PPC
-
- Documentation/virt/kvm/locking.rst  |  18 +-
- arch/arm64/include/asm/kvm_host.h   |  15 +-
- arch/arm64/include/asm/kvm_mmu.h    |   4 +-
- arch/arm64/kvm/Kconfig              |   1 +
- arch/arm64/kvm/arch_timer.c         |  29 +-
- arch/arm64/kvm/arm.c                |  93 +++---
- arch/arm64/kvm/mmu.c                |  12 +-
- arch/arm64/kvm/reset.c              |   8 +-
- arch/arm64/kvm/sys_regs.c           |   6 +-
- arch/arm64/kvm/vgic/vgic-init.c     |  19 +-
- arch/arm64/kvm/vmid.c               |   6 +-
- arch/mips/include/asm/kvm_host.h    |   3 +-
- arch/mips/kvm/Kconfig               |   1 +
- arch/mips/kvm/Makefile              |   2 +-
- arch/mips/kvm/callback.c            |  14 -
- arch/mips/kvm/mips.c                |  34 +--
- arch/mips/kvm/vz.c                  |   7 +-
- arch/powerpc/include/asm/kvm_host.h |   3 -
- arch/powerpc/include/asm/kvm_ppc.h  |   1 -
- arch/powerpc/kvm/book3s.c           |  12 +-
- arch/powerpc/kvm/e500.c             |   6 +-
- arch/powerpc/kvm/e500mc.c           |   6 +-
- arch/powerpc/kvm/powerpc.c          |  20 --
- arch/riscv/include/asm/kvm_host.h   |   7 +-
- arch/riscv/kvm/Kconfig              |   1 +
- arch/riscv/kvm/main.c               |  23 +-
- arch/riscv/kvm/mmu.c                |  12 +-
- arch/riscv/kvm/vmid.c               |   4 +-
- arch/s390/include/asm/kvm_host.h    |   1 -
- arch/s390/kvm/interrupt.c           |   2 +-
- arch/s390/kvm/kvm-s390.c            |  84 +++---
- arch/s390/kvm/kvm-s390.h            |   2 +-
- arch/s390/kvm/pci.c                 |   2 +-
- arch/s390/kvm/pci.h                 |   2 +-
- arch/x86/include/asm/kvm_host.h     |   7 +-
- arch/x86/kvm/Kconfig                |   1 +
- arch/x86/kvm/cpuid.c                |   1 +
- arch/x86/kvm/debugfs.c              |   2 +
- arch/x86/kvm/emulate.c              |   1 +
- arch/x86/kvm/hyperv.c               |   1 +
- arch/x86/kvm/i8254.c                |   4 +-
- arch/x86/kvm/i8259.c                |   4 +-
- arch/x86/kvm/ioapic.c               |   1 +
- arch/x86/kvm/irq.c                  |   1 +
- arch/x86/kvm/irq_comm.c             |   7 +-
- arch/x86/kvm/kvm_onhyperv.c         |   1 +
- arch/x86/kvm/lapic.c                |   8 +-
- arch/x86/kvm/mmu/mmu.c              |   6 +-
- arch/x86/kvm/mmu/page_track.c       |   1 +
- arch/x86/kvm/mmu/spte.c             |   4 +-
- arch/x86/kvm/mmu/spte.h             |   4 +-
- arch/x86/kvm/mmu/tdp_iter.c         |   1 +
- arch/x86/kvm/mmu/tdp_mmu.c          |   1 +
- arch/x86/kvm/mtrr.c                 |   1 +
- arch/x86/kvm/pmu.c                  |   1 +
- arch/x86/kvm/smm.c                  |   1 +
- arch/x86/kvm/svm/avic.c             |   2 +-
- arch/x86/kvm/svm/nested.c           |   2 +-
- arch/x86/kvm/svm/pmu.c              |   2 +
- arch/x86/kvm/svm/sev.c              |   1 +
- arch/x86/kvm/svm/svm.c              |  90 +++---
- arch/x86/kvm/svm/svm_onhyperv.c     |   1 +
- arch/x86/kvm/svm/svm_onhyperv.h     |   4 +-
- arch/x86/kvm/vmx/capabilities.h     |   4 +-
- arch/x86/kvm/vmx/evmcs.c            |   1 +
- arch/x86/kvm/vmx/evmcs.h            |   4 +-
- arch/x86/kvm/vmx/nested.c           |   3 +-
- arch/x86/kvm/vmx/pmu_intel.c        |   5 +-
- arch/x86/kvm/vmx/posted_intr.c      |   2 +
- arch/x86/kvm/vmx/sgx.c              |   5 +-
- arch/x86/kvm/vmx/vmcs12.c           |   1 +
- arch/x86/kvm/vmx/vmx.c              | 438 +++++++++++++++-------------
- arch/x86/kvm/vmx/vmx_ops.h          |   4 +-
- arch/x86/kvm/x86.c                  | 252 +++++++++-------
- arch/x86/kvm/xen.c                  |   1 +
- include/kvm/arm_arch_timer.h        |   6 +-
- include/kvm/arm_vgic.h              |   4 +
- include/linux/cpuhotplug.h          |   5 +-
- include/linux/kvm_host.h            |  13 +-
- virt/kvm/Kconfig                    |   3 +
- virt/kvm/kvm_main.c                 | 302 ++++++++++---------
- 81 files changed, 861 insertions(+), 813 deletions(-)
- delete mode 100644 arch/mips/kvm/callback.c
-
-
-base-commit: d5af637323dd156bad071a3f8fc0d7166cca1276
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index a188d27f78af..e0424af52acc 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -5833,24 +5833,19 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+ 	int r;
+ 	int cpu;
+ 
++	/*
++	 * FIXME: Get rid of kvm_arch_init(), vendor code should call arch code
++	 * directly.  Note, kvm_arch_init() _must_ be called before anything
++	 * else as x86 relies on checks buried in kvm_arch_init() to guard
++	 * against multiple calls to kvm_init().
++	 */
+ 	r = kvm_arch_init(opaque);
+ 	if (r)
+-		goto out_fail;
+-
+-	/*
+-	 * kvm_arch_init makes sure there's at most one caller
+-	 * for architectures that support multiple implementations,
+-	 * like intel and amd on x86.
+-	 * kvm_arch_init must be called before kvm_irqfd_init to avoid creating
+-	 * conflicts in case kvm is already setup for another implementation.
+-	 */
+-	r = kvm_irqfd_init();
+-	if (r)
+-		goto out_irqfd;
++		return r;
+ 
+ 	if (!zalloc_cpumask_var(&cpus_hardware_enabled, GFP_KERNEL)) {
+ 		r = -ENOMEM;
+-		goto out_free_0;
++		goto err_hw_enabled;
+ 	}
+ 
+ 	r = kvm_arch_hardware_setup(opaque);
+@@ -5894,9 +5889,13 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+ 		}
+ 	}
+ 
++	r = kvm_irqfd_init();
++	if (r)
++		goto err_irqfd;
++
+ 	r = kvm_async_pf_init();
+ 	if (r)
+-		goto out_free_4;
++		goto err_async_pf;
+ 
+ 	kvm_chardev_ops.owner = module;
+ 
+@@ -5927,6 +5926,9 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+ 	kvm_vfio_ops_exit();
+ err_vfio:
+ 	kvm_async_pf_deinit();
++err_async_pf:
++	kvm_irqfd_exit();
++err_irqfd:
+ out_free_4:
+ 	for_each_possible_cpu(cpu)
+ 		free_cpumask_var(per_cpu(cpu_kick_mask, cpu));
+@@ -5938,11 +5940,8 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+ 	kvm_arch_hardware_unsetup();
+ out_free_1:
+ 	free_cpumask_var(cpus_hardware_enabled);
+-out_free_0:
+-	kvm_irqfd_exit();
+-out_irqfd:
++err_hw_enabled:
+ 	kvm_arch_exit();
+-out_fail:
+ 	return r;
+ }
+ EXPORT_SYMBOL_GPL(kvm_init);
+@@ -5967,9 +5966,9 @@ void kvm_exit(void)
+ 	unregister_reboot_notifier(&kvm_reboot_notifier);
+ 	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
+ 	on_each_cpu(hardware_disable_nolock, NULL, 1);
++	kvm_irqfd_exit();
+ 	kvm_arch_hardware_unsetup();
+ 	kvm_arch_exit();
+-	kvm_irqfd_exit();
+ 	free_cpumask_var(cpus_hardware_enabled);
+ 	kvm_vfio_ops_exit();
+ }
 -- 
 2.38.1.431.g37b22c650d-goog
 
