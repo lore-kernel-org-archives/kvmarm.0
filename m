@@ -2,83 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66955C433FE
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Nov 2022 21:07:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FFF8C4332F
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 01:27:06 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7FAB4BAC9;
-	Tue,  1 Nov 2022 17:07:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 135DC4BA97;
+	Tue,  1 Nov 2022 21:27:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linuxfoundation.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fU0ZhfnoJiNV; Tue,  1 Nov 2022 17:07:41 -0400 (EDT)
+	with ESMTP id lH8jyskwAGz3; Tue,  1 Nov 2022 21:27:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD6654BA86;
-	Tue,  1 Nov 2022 17:07:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4DA24BA85;
+	Tue,  1 Nov 2022 21:27:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6479C4BA86
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Nov 2022 17:07:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EAE64BA67
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Nov 2022 21:27:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zrWob2RYtO1G for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Nov 2022 17:07:35 -0400 (EDT)
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com
- [209.85.214.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 624754BA7C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Nov 2022 17:07:35 -0400 (EDT)
-Received: by mail-pl1-f182.google.com with SMTP id l2so14697404pld.13
- for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Nov 2022 14:07:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=oFX3TjIuKKqYykGd6uzPpB/gicyMyYF9f2ih7JzKNRQ=;
- b=nBxrbawSkasV5OIFis4uRsM+ydVhwdbUYy7S1Z3udwJaID7FVoII4y3e2Y6NcN+RFh
- lZp3bFFxhaissiuG6SA1KtcxUPcOTyxEnfs3GW5mwTdPgGenTxv71EwIcLPnJ5aI0kQL
- dTkinmMWMPJlBd1h4MrEs6dFRGDXU5ZWycVzIeEZRmebSIxux39oV0pjFOaqEEMwW3PI
- mdWnXqnGBZe7Y4JMXHIAhJSV70YC2ZZS7M8HJAu/hH0IOh/jqS9KEtS1DxLpUlDaT2HB
- iwxcgPifN/nh2CZXcMCvRbDSp/gibhS85slcsL0bNnD/E/hPfgU1EdRvi82v6+YKObPV
- 7Xzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
- :message-id:reply-to;
- bh=oFX3TjIuKKqYykGd6uzPpB/gicyMyYF9f2ih7JzKNRQ=;
- b=uEW91jnA0TAqTDNTtkBk3VS7Mu7UQVdEL9xiog3beSMyjffp6iD9+BG3Sw3v83A0fr
- iWJ6vtuySz+dPsYOrcROUBA5fRCTqtDQVPEdIN/hPN4C0ELrT/zYpiOUZ3dbZvjMl6Xk
- ZkcZi7H0Z08IK9HC/iXRaCr1nXaUOamuSxyAJtJiRSzGuSveq4ylhWvOqjjyrpcutsTO
- jp92Hl1rx6n424UqhKMkAc0uPFo3D5rs5Fc/03755L6UdLQTmJvEzvvi7cI5haj5vFN/
- /mubdbekqSsdJkTN6v7UufMJxGC5qTLpohr0AKeSmUQ5QCMssxdOYcQLCB3zhdjqfnT6
- TE0w==
-X-Gm-Message-State: ACrzQf1wCtgZEiMZTx2EdhdmL8Q0VRwBQPtTJdSH0XcApYIgQjvouvLo
- NxZkFdy+i5h+WtDEJVizDi3TyQ==
-X-Google-Smtp-Source: AMsMyM7wcyEL7piFmVnE/Id8mKnk5QFETXWa137oLbYLhxqiM7qCfR6bO73L99JU47mjSsviqexCHw==
-X-Received: by 2002:a17:90a:9bc7:b0:213:9d21:b0b0 with SMTP id
- b7-20020a17090a9bc700b002139d21b0b0mr22261185pjw.26.1667336854224; 
- Tue, 01 Nov 2022 14:07:34 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com.
- [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
- q3-20020a635c03000000b00460d89df1f1sm6321288pgb.57.2022.11.01.14.07.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 01 Nov 2022 14:07:33 -0700 (PDT)
-Date: Tue, 1 Nov 2022 21:07:30 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v3 09/15] KVM: arm64: Free removed stage-2 tables in RCU
- callback
-Message-ID: <Y2GKkvMWTHfuPf4Y@google.com>
-References: <20221027221752.1683510-1-oliver.upton@linux.dev>
- <20221027221752.1683510-10-oliver.upton@linux.dev>
- <Y2GBVML5MWXZE9Na@google.com> <Y2GFliAVxui9VyK2@google.com>
+ with ESMTP id KslpuPvLWNHi for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Nov 2022 21:27:02 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 503AD4BA22
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Nov 2022 21:27:02 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 163696179F;
+ Wed,  2 Nov 2022 01:27:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D102C433D6;
+ Wed,  2 Nov 2022 01:26:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+ s=korg; t=1667352420;
+ bh=k4P0hoQfhSxNC7Iu4COmXWBjx1cpoaAFcD65LMcpkR8=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=T2M2TndJir1D5natjoAn4VcJHKb3P9ZFYPWMeYUb5+Ccl4H74Pkb0dalFlAjak90/
+ oDZeguPtOpVNFbszteq6vkIgWIOUAbkLMo2yCepk+PCDc+QnURYzfkVrZn7LWne/BS
+ Bkxr+C50csTwGqESMLb9FD/IKD0uOt2998m0aFJc=
+Date: Wed, 2 Nov 2022 02:27:52 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 5.10 0/2] arm64: backport two patches to 5.10-stable
+Message-ID: <Y2HHmEUEHShi4PMX@kroah.com>
+References: <20221031112246.1588-1-yuzenghui@huawei.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <Y2GFliAVxui9VyK2@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
- Ben Gardon <bgardon@google.com>, David Matlack <dmatlack@google.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20221031112246.1588-1-yuzenghui@huawei.com>
+Cc: sashal@kernel.org, linux-efi@vger.kernel.org, anders.roxell@linaro.org,
+ anshuman.khandual@arm.com, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, maz@kernel.org,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,32 +71,22 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Nov 01, 2022, Oliver Upton wrote:
-> On Tue, Nov 01, 2022 at 08:28:04PM +0000, Sean Christopherson wrote:
-> > On Thu, Oct 27, 2022, Oliver Upton wrote:
-> > > There is no real urgency to free a stage-2 subtree that was pruned.
-> > > Nonetheless, KVM does the tear down in the stage-2 fault path while
-> > > holding the MMU lock.
-> > > 
+On Mon, Oct 31, 2022 at 07:22:44PM +0800, Zenghui Yu wrote:
+> Patch #1 (merged in 5.12-rc3) is required to address the issue
+> Anders Roxell reported on the list [1].  Patch #2 (in 5.15-rc1) is
+> a follow up.
 > 
-> [ copy ]
+> [1] https://lore.kernel.org/lkml/20220826120020.GB520@mutt
 > 
-> > This is _very_ misleading.  The above paints RCU as an optimization of sorts to
-> > avoid doing work while holding mmu_lock.  Freeing page tables in an RCU callback
-> > is _required_ for correctness when allowing parallel page faults to remove page
-> > tables, as holding mmu_lock for read in that case doesn't ensure no other CPU is
-> > accessing and/or holds a reference to the to-be-freed page table.
+> Anshuman Khandual (1):
+>   arm64/kexec: Test page size support with new TGRAN range values
 > 
-> Agree, but it is still important to reason about what is changing here
-> too. Moving work out of the vCPU fault path _is_ valuable, though
-> ancillary to the correctness requirements.
+> James Morse (1):
+>   arm64/mm: Fix __enable_mmu() for new TGRAN range values
 
-Sure, but that's at best a footnote.  Similar to protecting freeing, RCU isn't
-the only option for moving work out of the vCPU fault path.  In fact, it's probably
-one of the worst options because RCU callbacks run with soft IRQs disabled, i.e.
-doing _too_ much in a RCU callback is a real problem.  If RCU weren't being used
-to protect readers, deferring freeing via a workqueue, kthread, etc... would work
-just as well, if not better.
+Both now queued up, thanks.
+
+greg k-h
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
