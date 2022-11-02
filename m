@@ -2,73 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 584E0C4332F
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:20:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C44FDC433FE
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:20:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 161694B7EF;
-	Wed,  2 Nov 2022 19:20:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 836844B7FD;
+	Wed,  2 Nov 2022 19:20:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BKlaO+RuQy25; Wed,  2 Nov 2022 19:20:03 -0400 (EDT)
+	with ESMTP id KTr2JqbT8-0k; Wed,  2 Nov 2022 19:20:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 351B54B848;
-	Wed,  2 Nov 2022 19:20:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 804BD4B7F0;
+	Wed,  2 Nov 2022 19:20:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 29C2C4B811
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:20:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D647B4B7EF
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:20:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gNtFYret17VC for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Nov 2022 19:19:59 -0400 (EDT)
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
- [209.85.215.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 441544B797
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:59 -0400 (EDT)
-Received: by mail-pg1-f201.google.com with SMTP id
- 83-20020a630156000000b0046b208f6ae3so83230pgb.16
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:19:59 -0700 (PDT)
+ with ESMTP id ieJwnSzDWTKU for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Nov 2022 19:20:04 -0400 (EDT)
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com
+ [209.85.128.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D5A84B75D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:20:02 -0400 (EDT)
+Received: by mail-yw1-f201.google.com with SMTP id
+ 00721157ae682-349423f04dbso768757b3.13
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:20:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=w/Q7bH8THgyaKP3B1ctDp6/bth9WI6Zn0uJypuG9eac=;
- b=hkPOoen/pyqZsKi1YCSawLdA3GEp9C4f3mv9W0KoQWrN/JmnscJ/7nrSl0bhgo5kc/
- 284CZWTN6cQtZyS3BcYl1rO3d2JXX3uptOp6QgDDXHKKXwZWYnEXXtfdURHWu0sgST7b
- SR2jmNv70MkTjk45xUfHV7CREolEUHHjBimLzgCj57Qvy29dchlrARjt1C82JrSjtdvz
- CjPyz+19dEzhNchjZdr/kuW84eKlMR1llHgovF4ZVnGabG/rB0khgL15izrPpgwurgg8
- AnCmcr2wDk7Yyae3uT31jet5RZCDh/LNmD6fqF7lWW4xFuTB9UT2b6Ep4Ac5WXcUuWtP
- s9ug==
+ bh=mKnEtQX0QH/ggk+Ht36/d+63ROqx6WCYCltiz+Zzjv4=;
+ b=SdQ/LsY4NGnVE1yE06OYtnoYVCRmFREHfZbDy+hy/qKLprusJ3oD9C3Z6OVRKqQrnE
+ CInFERbmx9ZRnFYiATYzBK74mPS4+cAZJ+5ijRabgzbKKerJGVt8ZZlmJzt5Hj/aV0PA
+ EGW/7VotUp9NojxVblVL/QpJZuKvGxyCajSBZEMqVRwQDUQw2wRSv4vj1QT6bcpnpc9t
+ e4rP+2f3gLSJ/JJRtgPX3AbV2Tyauor4ctFIQiYJWU548K+/wXsudAS9Uik/E0jRBxNq
+ qFZGa2xPRMU89uQ30BChflY3hdbUkhWTUyAN3U9JeOyLGBy95xzkfXnGKk726vF8pKbF
+ n5DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=w/Q7bH8THgyaKP3B1ctDp6/bth9WI6Zn0uJypuG9eac=;
- b=5qdgUmJh9N4i3aHZk17P4CpM/Qu/FeGeipROgBzRnegyjnItqeM6uWkoAyMWvmqFWo
- 74Fmqpy11kvCqdzzTQTfBnrU7skqAXMj9WIEv14jY0OqAIcVJFPAgcg9j+Ryh4kRvQSK
- E3Bws8ExEoQtLmiExsADYju2YrmFODEsUIY+XkhzPkid5fByoViFJA1r6EzvmoXbU4QD
- c7wfYXI2ro5u28XxLve4SrZz+cw0X0J45YuiD8jDAlAz0YmNY7nyapXvqgAyeC4l9NCn
- grOvd1d6H0ivquugunnuZwAdfI7Z8LRK6vsxCAkTeGMne3h5dz+rO4kJN4VyFUHbOFtP
- GbWQ==
-X-Gm-Message-State: ACrzQf1w1Obbiht2qhmhFkGPN0NPq7VkBpj98/ZW7+pRRqEJMJ/ceKdh
- IS0j1TuUPQ+DdenBYAaiqINE+nq12kk=
-X-Google-Smtp-Source: AMsMyM52tU6iRK0I4Ec35KUAzBrT1sghmvSrKR24lxi1BsrlBLfXrWc/1+j2917tMPr6x8h/JqOXwdenWAg=
+ bh=mKnEtQX0QH/ggk+Ht36/d+63ROqx6WCYCltiz+Zzjv4=;
+ b=7/Wc8XEsAdhsfbdP5u1LzMEw3/S7zm8D8bgrwNjehqqOifeNKi8CSh03ay+dndAmdW
+ /DdrLm9Cw86QyIlEEeS1F42IAmo09x8/c3szlXQvO5ZggFs2n9YKN9Mka+51zGtsehr+
+ 5hX6E56FU8wkKhMBZ1HkWLhPl5Pm+DL7EeIAc3nsM4y9A92C6dRSfyynoADXTdUHRObR
+ J+ZFgHItkrfOiKI+Ui9siCaHUabtQYBghPK0bFWMRznDN02osvg9GVS/oe5dbYYhA2Ei
+ ZjE2kkwe+ldwCALijV3pBMK23vF5SJvkwNlf5WpJZrLwhbx0oZztyf3vzWvdtW6lCInQ
+ XdmQ==
+X-Gm-Message-State: ACrzQf2r4pvYdLRHoL6FD0c3HPbrLH+CLTFpu8aI40IO7vDL1n4xqlkI
+ 08C4Ta5KQkTg7F2tzVR8LeGA3ugSC2A=
+X-Google-Smtp-Source: AMsMyM58olcArAfGw4eM2juSx6NG/cSk/6KUdGGsxOwq8NmV4ZhdhKDU4RNI0GuMTLVYYG9b0/LsdP0LTpo=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:852:b0:56d:e2bc:1978 with SMTP id
- q18-20020a056a00085200b0056de2bc1978mr8835032pfk.47.1667431198455; Wed, 02
- Nov 2022 16:19:58 -0700 (PDT)
-Date: Wed,  2 Nov 2022 23:18:53 +0000
+ (user=seanjc job=sendgmr) by 2002:a25:c615:0:b0:6c9:f71a:f95d with SMTP id
+ k21-20020a25c615000000b006c9f71af95dmr26436245ybf.411.1667431202255; Wed, 02
+ Nov 2022 16:20:02 -0700 (PDT)
+Date: Wed,  2 Nov 2022 23:18:55 +0000
 In-Reply-To: <20221102231911.3107438-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221102231911.3107438-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102231911.3107438-27-seanjc@google.com>
-Subject: [PATCH 26/44] KVM: s390: Mark __kvm_s390_init() and its descendants
- as __init
+Message-ID: <20221102231911.3107438-29-seanjc@google.com>
+Subject: [PATCH 28/44] KVM: VMX: Make VMCS configuration/capabilities structs
+ read-only after init
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -108,94 +108,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Tag __kvm_s390_init() and its unique helpers as __init.  These functions
-are only ever called during module_init(), but could not be tagged
-accordingly while they were invoked from the common kvm_arch_init(),
-which is not __init because of x86.
+Tag vmcs_config and vmx_capability structs as __init, the canonical
+configuration is generated during hardware_setup() and must never be
+modified after that point.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/s390/kvm/interrupt.c | 2 +-
- arch/s390/kvm/kvm-s390.c  | 4 ++--
- arch/s390/kvm/kvm-s390.h  | 2 +-
- arch/s390/kvm/pci.c       | 2 +-
- arch/s390/kvm/pci.h       | 2 +-
- 5 files changed, 6 insertions(+), 6 deletions(-)
+ arch/x86/kvm/vmx/capabilities.h | 4 ++--
+ arch/x86/kvm/vmx/vmx.c          | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index ab569faf0df2..bf9d55fbc21a 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -3416,7 +3416,7 @@ void kvm_s390_gib_destroy(void)
- 	gib = NULL;
- }
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index 87c4e46daf37..2aaa0fd53d08 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -68,13 +68,13 @@ struct vmcs_config {
+ 	u64 misc;
+ 	struct nested_vmx_msrs nested;
+ };
+-extern struct vmcs_config vmcs_config;
++extern struct vmcs_config vmcs_config __ro_after_init;
  
--int kvm_s390_gib_init(u8 nisc)
-+int __init kvm_s390_gib_init(u8 nisc)
+ struct vmx_capability {
+ 	u32 ept;
+ 	u32 vpid;
+ };
+-extern struct vmx_capability vmx_capability;
++extern struct vmx_capability vmx_capability __ro_after_init;
+ 
+ static inline bool cpu_has_vmx_basic_inout(void)
  {
- 	int rc = 0;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 6adb60485839..81690fce0eb1 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -489,8 +489,8 @@ static DEFINE_PER_CPU(struct list_head, loaded_vmcss_on_cpu);
+ static DECLARE_BITMAP(vmx_vpid_bitmap, VMX_NR_VPIDS);
+ static DEFINE_SPINLOCK(vmx_vpid_lock);
  
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index e1c9980aae78..f6ae845bc1c1 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -358,7 +358,7 @@ static __always_inline void __insn32_query(unsigned int opcode, u8 *query)
- #define INSN_SORTL 0xb938
- #define INSN_DFLTCC 0xb939
+-struct vmcs_config vmcs_config;
+-struct vmx_capability vmx_capability;
++struct vmcs_config vmcs_config __ro_after_init;
++struct vmx_capability vmx_capability __ro_after_init;
  
--static void kvm_s390_cpu_feat_init(void)
-+static void __init kvm_s390_cpu_feat_init(void)
- {
- 	int i;
- 
-@@ -461,7 +461,7 @@ static void kvm_s390_cpu_feat_init(void)
- 	 */
- }
- 
--static int __kvm_s390_init(void)
-+static int __init __kvm_s390_init(void)
- {
- 	int rc = -ENOMEM;
- 
-diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-index f6fd668f887e..e7f6166129eb 100644
---- a/arch/s390/kvm/kvm-s390.h
-+++ b/arch/s390/kvm/kvm-s390.h
-@@ -467,7 +467,7 @@ void kvm_s390_gisa_clear(struct kvm *kvm);
- void kvm_s390_gisa_destroy(struct kvm *kvm);
- void kvm_s390_gisa_disable(struct kvm *kvm);
- void kvm_s390_gisa_enable(struct kvm *kvm);
--int kvm_s390_gib_init(u8 nisc);
-+int __init kvm_s390_gib_init(u8 nisc);
- void kvm_s390_gib_destroy(void);
- 
- /* implemented in guestdbg.c */
-diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
-index c50c1645c0ae..60548791c077 100644
---- a/arch/s390/kvm/pci.c
-+++ b/arch/s390/kvm/pci.c
-@@ -670,7 +670,7 @@ int kvm_s390_pci_zpci_op(struct kvm *kvm, struct kvm_s390_zpci_op *args)
- 	return r;
- }
- 
--int kvm_s390_pci_init(void)
-+int __init kvm_s390_pci_init(void)
- {
- 	zpci_kvm_hook.kvm_register = kvm_s390_pci_register_kvm;
- 	zpci_kvm_hook.kvm_unregister = kvm_s390_pci_unregister_kvm;
-diff --git a/arch/s390/kvm/pci.h b/arch/s390/kvm/pci.h
-index 486d06ef563f..ff0972dd5e71 100644
---- a/arch/s390/kvm/pci.h
-+++ b/arch/s390/kvm/pci.h
-@@ -60,7 +60,7 @@ void kvm_s390_pci_clear_list(struct kvm *kvm);
- 
- int kvm_s390_pci_zpci_op(struct kvm *kvm, struct kvm_s390_zpci_op *args);
- 
--int kvm_s390_pci_init(void);
-+int __init kvm_s390_pci_init(void);
- void kvm_s390_pci_exit(void);
- 
- static inline bool kvm_s390_pci_interp_allowed(void)
+ #define VMX_SEGMENT_FIELD(seg)					\
+ 	[VCPU_SREG_##seg] = {                                   \
 -- 
 2.38.1.431.g37b22c650d-goog
 
