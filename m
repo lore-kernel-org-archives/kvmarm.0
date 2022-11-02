@@ -2,72 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44120C43217
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:19:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36BACC433FE
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:20:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 034364B785;
-	Wed,  2 Nov 2022 19:19:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E88C54B847;
+	Wed,  2 Nov 2022 19:19:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6EpBgkpEkYPg; Wed,  2 Nov 2022 19:19:56 -0400 (EDT)
+	with ESMTP id L0og8PtFfZf1; Wed,  2 Nov 2022 19:19:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A063F4B813;
-	Wed,  2 Nov 2022 19:19:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD0124B7B5;
+	Wed,  2 Nov 2022 19:19:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B71404B797
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A7B464B7B5
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id crYHhlDYmrDm for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Nov 2022 19:19:52 -0400 (EDT)
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
- [209.85.216.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2EB0A4B824
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:50 -0400 (EDT)
-Received: by mail-pj1-f74.google.com with SMTP id
- pj8-20020a17090b4f4800b002140219b2b3so3130548pjb.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:19:50 -0700 (PDT)
+ with ESMTP id rUUW36Nxyo0E for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Nov 2022 19:19:56 -0400 (EDT)
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
+ [209.85.219.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 581324B80C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:19:55 -0400 (EDT)
+Received: by mail-yb1-f202.google.com with SMTP id
+ m200-20020a25d4d1000000b006cb7e26b93cso404506ybf.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:19:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=s9AuxTlRjBrfjYkcaQi28he/RkCYbCa6yMT59uzOKa0=;
- b=ddAfxHTlEUHw0qawyyn7Bns3LOyks9re4MtMC6FAIFAvlDf6eK/nu/+/9Fi10x1R6n
- WWJsCNbWaFv5FoXY2JkfL2gPHfmH7n5Ig/c/8vgYFwan9v+I5VkTcY5cAcyMIsF0YYgl
- ayeymXyuzlb1ZK6RywTZFK6M2TrYNtbmp52NtBkrAW3CizVOcP2GK1YSKNk0hRzbGX/H
- t6V+7QqjJlqd98Pv08NBqx2q5El2vxmRcwGZXuIwYC0OoPXag/D+TlMulKYngdYVLuGi
- IcUk8i0bIt121WR3Ua8dNN2eN53mKcAGIC6t4monNq6evoAdLql3aLFHNiEvl7F6ATwg
- 1KbQ==
+ bh=+L2f375WnDKSQSrHAcatMrAfJYCgg/AkS64YUNDhysQ=;
+ b=BFDMuesdcf+U8clFlnsdcKMjEl5mRxrD1n9OYPB//rQ3VCubJly/rCCXdf60izOQ91
+ gfZZvi49gCFrX7m6YJ/L3w1exRMCJjCuSICe4eRMng8+wai+/D16fwsJO3oG2Y3R0FX9
+ fdeZ05XsyRVj9dD8bnC/3GDU2X+txUX5pHb6PL20RI7N+YCsO7MLcF6r1LMuuK0Pg4nq
+ eE6rPQbqAixH7lbH5M4EJKUgaFlKJVjkGeGOUWsceZR0ohG40mmen016UsHv1w9M69we
+ XfA2eYS+cPWfEbsMnwoPEeVjdG1rAWn3/E5NNWh/oBhlSgRKP2yTVbQeeBXTj7yW7L6G
+ n2LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=s9AuxTlRjBrfjYkcaQi28he/RkCYbCa6yMT59uzOKa0=;
- b=jsUX2nZsUJY+Zo3hzxcCrH2LNFlWfBYMDIkNgY4POXoEO/OWzkb7y/sC7aVgKV19kC
- s0xipawQfPdP/rOpA9fsGbErZF4XsVEoj41BsczwKNbd1GjdWGR2NUO95QDBCYn4ea9m
- mMzCwnl61aEcYmW781M6vACBmbXofABsEMHQHEA4X7LxVXqja13PFBL7mFygQi/47pon
- qXnMKLARkK1COtAkymEqMGV/pJPsB5PEgRufGXPW1eVeOs8iN3owepibEqmDDyuTTAt0
- 3XX+bENk5s5L4GZH4+uSncZPLfmIqRMm4keDNghq5IY3Wyx3WeQFysXNryty1+zlg61q
- wHhA==
-X-Gm-Message-State: ACrzQf1Z6liMVN8sw22KXo3+pQ788pBrhFhThJbnG+yrP6gWN7i3K7nj
- BjhaRnaF+Y/asCiQRVYsujm8Pb6AHLk=
-X-Google-Smtp-Source: AMsMyM4Aj3fLciSdgeuMbOdggWgonn7AFJaBAotEN5fF2aTBDAVACdmSaSGC1ByL/Xgyuk/Z8cG2B3zdT14=
+ bh=+L2f375WnDKSQSrHAcatMrAfJYCgg/AkS64YUNDhysQ=;
+ b=XwvhApbiZVFbYq6pE4ck7nVjgVLEzOLLgoKDDsBh+px4wHaXJdB8ljRz0/K6LoODgB
+ 83UFPudwhIJCVOqlDP336Lu8dAcGwvJ04bd34H1EH/LY6NMT9Nc80wEB1JV5Wu/SSb/Z
+ oMVOEs1iNlBNcvS6TLgnBYecwjBXzsVZsUMSRgeTGklRxDSqcLTSFkjehCW8vgNy5Vm+
+ /3suHYn//dVitR3k18W2jwqwMy4F/EEzfvtXxJYWvs8vYWxeMo/smwR9EXrJn4rhBfSL
+ De0jPTd5tuzfn5sPOP0Ywo4MbaHiJk0m9DTAKhbBpknEiwBV315KlSN+cIrTmJ2b0IUw
+ x8AA==
+X-Gm-Message-State: ACrzQf3GltWKsB9chCrogSvl065OneKn+9sCKyvgwOCvvdo+XhijVTJW
+ MebcgXfaxBDWTI2l8KkzxfS5JU2GawI=
+X-Google-Smtp-Source: AMsMyM4PzbXrj68EN8oL/rsKX+M0E41FPJHAXl8jIfJjWzfdfyN3Z0LYOQj3COZgmfCbUolFuDEOGWUorR8=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:240a:b0:183:6555:7a89 with SMTP id
- e10-20020a170903240a00b0018365557a89mr27116619plo.68.1667431189462; Wed, 02
- Nov 2022 16:19:49 -0700 (PDT)
-Date: Wed,  2 Nov 2022 23:18:48 +0000
+ (user=seanjc job=sendgmr) by 2002:a25:83ca:0:b0:6ca:6c0c:9cb8 with SMTP id
+ v10-20020a2583ca000000b006ca6c0c9cb8mr26416502ybm.7.1667431195114; Wed, 02
+ Nov 2022 16:19:55 -0700 (PDT)
+Date: Wed,  2 Nov 2022 23:18:51 +0000
 In-Reply-To: <20221102231911.3107438-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221102231911.3107438-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102231911.3107438-22-seanjc@google.com>
-Subject: [PATCH 21/44] KVM: MIPS: Register die notifier prior to kvm_init()
+Message-ID: <20221102231911.3107438-25-seanjc@google.com>
+Subject: [PATCH 24/44] KVM: PPC: Move processor compatibility check to module
+ init
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -107,41 +108,112 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Call kvm_init() only after _all_ setup is complete, as kvm_init() exposes
-/dev/kvm to userspace and thus allows userspace to create VMs (and call
-other ioctls).
+Move KVM PPC's compatibility checks to their respective module_init()
+hooks, there's no need to wait until KVM's common compat check, nor is
+there a need to perform the check on every CPU (provided by common KVM's
+hook), as the compatibility checks operate on global data.
 
+  arch/powerpc/include/asm/cputable.h: extern struct cpu_spec *cur_cpu_spec;
+  arch/powerpc/kvm/book3s.c: return 0
+  arch/powerpc/kvm/e500.c: strcmp(cur_cpu_spec->cpu_name, "e500v2")
+  arch/powerpc/kvm/e500mc.c: strcmp(cur_cpu_spec->cpu_name, "e500mc")
+                             strcmp(cur_cpu_spec->cpu_name, "e5500")
+                             strcmp(cur_cpu_spec->cpu_name, "e6500")
+
+Cc: Fabiano Rosas <farosas@linux.ibm.com>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/mips/kvm/mips.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ arch/powerpc/include/asm/kvm_ppc.h |  1 -
+ arch/powerpc/kvm/book3s.c          | 10 ----------
+ arch/powerpc/kvm/e500.c            |  4 ++--
+ arch/powerpc/kvm/e500mc.c          |  4 ++++
+ arch/powerpc/kvm/powerpc.c         |  2 +-
+ 5 files changed, 7 insertions(+), 14 deletions(-)
 
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 75681281e2df..ae7a24342fdf 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -1640,16 +1640,17 @@ static int __init kvm_mips_init(void)
- 	if (ret)
- 		return ret;
+diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+index bfacf12784dd..51a1824b0a16 100644
+--- a/arch/powerpc/include/asm/kvm_ppc.h
++++ b/arch/powerpc/include/asm/kvm_ppc.h
+@@ -118,7 +118,6 @@ extern int kvmppc_xlate(struct kvm_vcpu *vcpu, ulong eaddr,
+ extern int kvmppc_core_vcpu_create(struct kvm_vcpu *vcpu);
+ extern void kvmppc_core_vcpu_free(struct kvm_vcpu *vcpu);
+ extern int kvmppc_core_vcpu_setup(struct kvm_vcpu *vcpu);
+-extern int kvmppc_core_check_processor_compat(void);
+ extern int kvmppc_core_vcpu_translate(struct kvm_vcpu *vcpu,
+                                       struct kvm_translation *tr);
  
--	ret = kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
+diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+index 6d525285dbe8..87283a0e33d8 100644
+--- a/arch/powerpc/kvm/book3s.c
++++ b/arch/powerpc/kvm/book3s.c
+@@ -999,16 +999,6 @@ int kvmppc_h_logical_ci_store(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(kvmppc_h_logical_ci_store);
+ 
+-int kvmppc_core_check_processor_compat(void)
+-{
+-	/*
+-	 * We always return 0 for book3s. We check
+-	 * for compatibility while loading the HV
+-	 * or PR module
+-	 */
+-	return 0;
+-}
 -
--	if (ret)
--		return ret;
- 
- 	if (boot_cpu_type() == CPU_LOONGSON64)
- 		kvm_priority_to_irq = kvm_loongson3_priority_to_irq;
- 
- 	register_die_notifier(&kvm_mips_csr_die_notifier);
- 
-+	ret = kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
-+	if (ret) {
-+		unregister_die_notifier(&kvm_mips_csr_die_notifier);
-+		return ret;
-+	}
- 	return 0;
+ int kvmppc_book3s_hcall_implemented(struct kvm *kvm, unsigned long hcall)
+ {
+ 	return kvm->arch.kvm_ops->hcall_implemented(hcall);
+diff --git a/arch/powerpc/kvm/e500.c b/arch/powerpc/kvm/e500.c
+index c8b2b4478545..0ea61190ec04 100644
+--- a/arch/powerpc/kvm/e500.c
++++ b/arch/powerpc/kvm/e500.c
+@@ -314,7 +314,7 @@ static void kvmppc_core_vcpu_put_e500(struct kvm_vcpu *vcpu)
+ 	kvmppc_booke_vcpu_put(vcpu);
  }
  
+-int kvmppc_core_check_processor_compat(void)
++static int kvmppc_e500_check_processor_compat(void)
+ {
+ 	int r;
+ 
+@@ -507,7 +507,7 @@ static int __init kvmppc_e500_init(void)
+ 	unsigned long handler_len;
+ 	unsigned long max_ivor = 0;
+ 
+-	r = kvmppc_core_check_processor_compat();
++	r = kvmppc_e500_check_processor_compat();
+ 	if (r)
+ 		goto err_out;
+ 
+diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
+index 57e0ad6a2ca3..795667f7ebf0 100644
+--- a/arch/powerpc/kvm/e500mc.c
++++ b/arch/powerpc/kvm/e500mc.c
+@@ -388,6 +388,10 @@ static int __init kvmppc_e500mc_init(void)
+ {
+ 	int r;
+ 
++	r = kvmppc_e500mc_check_processor_compat();
++	if (r)
++		return kvmppc_e500mc;
++
+ 	r = kvmppc_booke_init();
+ 	if (r)
+ 		goto err_out;
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 74ea5687ecbc..36c27381a769 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -443,7 +443,7 @@ int kvm_arch_hardware_enable(void)
+ 
+ int kvm_arch_check_processor_compat(void *opaque)
+ {
+-	return kvmppc_core_check_processor_compat();
++	return 0;
+ }
+ 
+ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
 -- 
 2.38.1.431.g37b22c650d-goog
 
