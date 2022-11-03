@@ -2,52 +2,51 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC13BC43217
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 13:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 468E7C433FE
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 13:45:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E2694B6B2;
-	Thu,  3 Nov 2022 09:25:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C24FC4B63E;
+	Thu,  3 Nov 2022 09:45:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id myrZI9c73o-I; Thu,  3 Nov 2022 09:25:36 -0400 (EDT)
+	with ESMTP id kbvBozHdlpCX; Thu,  3 Nov 2022 09:45:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 921AE4B643;
-	Thu,  3 Nov 2022 09:25:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53921410E6;
+	Thu,  3 Nov 2022 09:45:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DABFC4B636
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 09:25:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B0E8E410E6
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 09:45:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mQs44ramxcNE for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Nov 2022 09:25:33 -0400 (EDT)
+ with ESMTP id NhpB9s8JgQ6A for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Nov 2022 09:45:29 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CDB9C4B635
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 09:25:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 862ED4B808
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 09:45:12 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 32C751FB;
- Thu,  3 Nov 2022 06:25:39 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2B3421FB;
+ Thu,  3 Nov 2022 06:45:18 -0700 (PDT)
 Received: from [10.1.39.27] (e122027.cambridge.arm.com [10.1.39.27])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 654313F534;
- Thu,  3 Nov 2022 06:25:29 -0700 (PDT)
-Message-ID: <76f59579-b701-a243-2a50-72a1401d3a65@arm.com>
-Date: Thu, 3 Nov 2022 13:25:27 +0000
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1CF4A3F534;
+ Thu,  3 Nov 2022 06:45:07 -0700 (PDT)
+Message-ID: <fbdec740-5654-ee23-caa0-22cc7d7b1f02@arm.com>
+Date: Thu, 3 Nov 2022 13:45:06 +0000
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.2
-Subject: Re: [RFC 5/6] KVM: arm64: Support the VCPU preemption check
-Content-Language: en-GB
+Subject: Re: [PATCH] kvm/arm: Fix pvtime documentation
 To: Usama Arif <usama.arif@bytedance.com>, linux-kernel@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, linux-doc@vger.kernel.org,
  virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
  yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
- maz@kernel.org, mark.rutland@arm.com
-References: <20221102161340.2982090-1-usama.arif@bytedance.com>
- <20221102161340.2982090-6-usama.arif@bytedance.com>
+ maz@kernel.org, mark.rutland@arm.com, bagasdotme@gmail.com
+References: <20221103131210.3603385-1-usama.arif@bytedance.com>
+Content-Language: en-GB
 From: Steven Price <steven.price@arm.com>
-In-Reply-To: <20221102161340.2982090-6-usama.arif@bytedance.com>
+In-Reply-To: <20221103131210.3603385-1-usama.arif@bytedance.com>
 Cc: punit.agrawal@bytedance.com, fam.zheng@bytedance.com, liangma@liangbit.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -65,282 +64,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 02/11/2022 16:13, Usama Arif wrote:
-> Support the vcpu_is_preempted() functionality under KVM/arm64. This will
-> enhance lock performance on overcommitted hosts (more runnable VCPUs
-> than physical CPUs in the system) as doing busy waits for preempted
-> VCPUs will hurt system performance far worse than early yielding.
+On 03/11/2022 13:12, Usama Arif wrote:
+> This includes table format and using reST labels for
+> cross-referencing to vcpu.rst.
 > 
-> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
+> Suggested-by:  Bagas Sanjaya <bagasdotme@gmail.com>
 > Signed-off-by: Usama Arif <usama.arif@bytedance.com>
+
+Reviewed-by: Steven Price <steven.price@arm.com>
+
 > ---
->  arch/arm64/include/asm/paravirt.h |   2 +
->  arch/arm64/include/asm/spinlock.h |  16 +++-
->  arch/arm64/kernel/paravirt.c      | 126 ++++++++++++++++++++++++++++++
->  arch/arm64/kernel/setup.c         |   3 +
->  include/linux/cpuhotplug.h        |   1 +
->  5 files changed, 147 insertions(+), 1 deletion(-)
+>  Documentation/virt/kvm/arm/pvtime.rst   | 14 ++++++++------
+>  Documentation/virt/kvm/devices/vcpu.rst |  2 ++
+>  2 files changed, 10 insertions(+), 6 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
-> index 9aa193e0e8f2..4ccb4356c56b 100644
-> --- a/arch/arm64/include/asm/paravirt.h
-> +++ b/arch/arm64/include/asm/paravirt.h
-> @@ -19,10 +19,12 @@ static inline u64 paravirt_steal_clock(int cpu)
->  }
+> diff --git a/Documentation/virt/kvm/arm/pvtime.rst b/Documentation/virt/kvm/arm/pvtime.rst
+> index 392521af7c90..e88b34e586be 100644
+> --- a/Documentation/virt/kvm/arm/pvtime.rst
+> +++ b/Documentation/virt/kvm/arm/pvtime.rst
+> @@ -23,21 +23,23 @@ the PV_TIME_FEATURES hypercall should be probed using the SMCCC 1.1
+>  ARCH_FEATURES mechanism before calling it.
 >  
->  int __init pv_time_init(void);
-> +int __init pv_lock_init(void);
+>  PV_TIME_FEATURES
+> -    ============= ========    ==========
+> +
+> +    ============= ========    =================================================
+>      Function ID:  (uint32)    0xC5000020
+>      PV_call_id:   (uint32)    The function to query for support.
+>                                Currently only PV_TIME_ST is supported.
+>      Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
+>                                PV-time feature is supported by the hypervisor.
+> -    ============= ========    ==========
+> +    ============= ========    =================================================
 >  
->  #else
+>  PV_TIME_ST
+> -    ============= ========    ==========
+> +
+> +    ============= ========    ==============================================
+>      Function ID:  (uint32)    0xC5000021
+>      Return value: (int64)     IPA of the stolen time data structure for this
+>                                VCPU. On failure:
+>                                NOT_SUPPORTED (-1)
+> -    ============= ========    ==========
+> +    ============= ========    ==============================================
 >  
->  #define pv_time_init() do {} while (0)
-> +#define pv_lock_init() do {} while (0)
+>  The IPA returned by PV_TIME_ST should be mapped by the guest as normal memory
+>  with inner and outer write back caching attributes, in the inner shareable
+> @@ -76,5 +78,5 @@ It is advisable that one or more 64k pages are set aside for the purpose of
+>  these structures and not used for other purposes, this enables the guest to map
+>  the region using 64k pages and avoids conflicting attributes with other memory.
 >  
->  #endif // CONFIG_PARAVIRT
->  
-> diff --git a/arch/arm64/include/asm/spinlock.h b/arch/arm64/include/asm/spinlock.h
-> index 0525c0b089ed..7023efa4de96 100644
-> --- a/arch/arm64/include/asm/spinlock.h
-> +++ b/arch/arm64/include/asm/spinlock.h
-> @@ -10,7 +10,20 @@
->  
->  /* See include/linux/spinlock.h */
->  #define smp_mb__after_spinlock()	smp_mb()
-> +#define vcpu_is_preempted vcpu_is_preempted
-> +
-> +#ifdef CONFIG_PARAVIRT
-> +#include <linux/static_call_types.h>
-> +
-> +bool dummy_vcpu_is_preempted(int cpu);
->  
-> +DECLARE_STATIC_CALL(pv_vcpu_is_preempted, dummy_vcpu_is_preempted);
-> +static inline bool vcpu_is_preempted(int cpu)
-> +{
-> +	return static_call(pv_vcpu_is_preempted)(cpu);
-> +}
-> +
-> +#else
->  /*
->   * Changing this will break osq_lock() thanks to the call inside
->   * smp_cond_load_relaxed().
-> @@ -18,10 +31,11 @@
->   * See:
->   * https://lore.kernel.org/lkml/20200110100612.GC2827@hirez.programming.kicks-ass.net
->   */
-> -#define vcpu_is_preempted vcpu_is_preempted
->  static inline bool vcpu_is_preempted(int cpu)
->  {
->  	return false;
->  }
->  
-> +#endif /* CONFIG_PARAVIRT */
-> +
->  #endif /* __ASM_SPINLOCK_H */
-> diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
-> index 57c7c211f8c7..45bcca87bed7 100644
-> --- a/arch/arm64/kernel/paravirt.c
-> +++ b/arch/arm64/kernel/paravirt.c
-> @@ -22,6 +22,7 @@
->  
->  #include <asm/paravirt.h>
->  #include <asm/pvclock-abi.h>
-> +#include <asm/pvlock-abi.h>
->  #include <asm/smp_plat.h>
->  
->  struct static_key paravirt_steal_enabled;
-> @@ -38,7 +39,12 @@ struct pv_time_stolen_time_region {
->  	struct pvclock_vcpu_stolen_time __rcu *kaddr;
->  };
->  
-> +struct pv_lock_state_region {
-> +	struct pvlock_vcpu_state __rcu *kaddr;
-> +};
-> +
->  static DEFINE_PER_CPU(struct pv_time_stolen_time_region, stolen_time_region);
-> +static DEFINE_PER_CPU(struct pv_lock_state_region, lock_state_region);
->  
->  static bool steal_acc = true;
->  static int __init parse_no_stealacc(char *arg)
-> @@ -178,3 +184,123 @@ int __init pv_time_init(void)
->  
->  	return 0;
->  }
-> +
-> +static bool native_vcpu_is_preempted(int cpu)
-> +{
-> +	return false;
-> +}
-> +
-> +DEFINE_STATIC_CALL(pv_vcpu_is_preempted, native_vcpu_is_preempted);
-> +
-> +static bool para_vcpu_is_preempted(int cpu)
-> +{
-> +	struct pv_lock_state_region *reg;
-> +	__le64 preempted_le;
-> +
-> +	reg = per_cpu_ptr(&lock_state_region, cpu);
-> +	if (!reg->kaddr) {
-> +		pr_warn_once("PV lock enabled but not configured for cpu %d\n",
-> +			     cpu);
-> +		return false;
-> +	}
-> +
-> +	preempted_le = le64_to_cpu(READ_ONCE(reg->kaddr->preempted));
-> +
-> +	return !!(preempted_le);
-> +}
-> +
-> +static int pvlock_vcpu_state_dying_cpu(unsigned int cpu)
-> +{
-> +	struct pv_lock_state_region *reg;
-> +
-> +	reg = this_cpu_ptr(&lock_state_region);
-> +	if (!reg->kaddr)
-> +		return 0;
-> +
-> +	memunmap(reg->kaddr);
-> +	memset(reg, 0, sizeof(*reg));
-> +
-> +	return 0;
-> +}
-> +
-> +static int init_pvlock_vcpu_state(unsigned int cpu)
-> +{
-> +	struct pv_lock_state_region *reg;
-> +	struct arm_smccc_res res;
-> +
-> +	reg = this_cpu_ptr(&lock_state_region);
-> +
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_LOCK_PREEMPTED, &res);
-> +
-> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED) {
-> +		pr_warn("Failed to init PV lock data structure\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	reg->kaddr = memremap(res.a0,
-> +			      sizeof(struct pvlock_vcpu_state),
-> +			      MEMREMAP_WB);
-> +
-> +	if (!reg->kaddr) {
-> +		pr_warn("Failed to map PV lock data structure\n");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int kvm_arm_init_pvlock(void)
-> +{
-> +	int ret;
-> +
-> +	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
-> +				"hypervisor/arm/pvlock:starting",
-> +				init_pvlock_vcpu_state,
-> +				pvlock_vcpu_state_dying_cpu);
-> +	if (ret < 0) {
-> +		pr_warn("PV-lock init failed\n");
-> +		return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static bool has_kvm_pvlock(void)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	/* To detect the presence of PV lock support we require SMCCC 1.1+ */
-> +	if (arm_smccc_1_1_get_conduit() == SMCCC_CONDUIT_NONE)
-> +		return false;
-
-This is unnecessary as arm_smccc_1_1_invoke() will return failure if
-there's no conduit (or pre-SMCCC 1.1). I suspect this was a copy/paste
-from has_pv_steal_clock() which also has the unnecessary check (patch
-welcome ;) ).
-
-> +
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-> +			     ARM_SMCCC_HV_PV_LOCK_FEATURES, &res);
-
-Since this is a 'OWNER_VENDOR_HYP' call this should really be preceded
-by a check that we're running under the expected hypervisor. See e.g.
-kvm_init_hyp_services().
-
-Of course for KVM we already have a (different) discovery mechanism and
-this could be included as a ARM_SMCCC_KVM_FUNC_xxx feature. This
-has_kvm_pvlock() function would then simply be:
-
-static bool has_kvm_pvlock(void)
-{
-	return kvm_arm_hyp_service_available(ARM_SMCC_KVM_FUNC_PVLOCK);
-}
-
-Steve
-
-> +
-> +	if (res.a0 != SMCCC_RET_SUCCESS)
-> +		return false;
-> +
-> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_LOCK_FEATURES,
-> +			     ARM_SMCCC_HV_PV_LOCK_PREEMPTED, &res);
-> +
-> +	return (res.a0 == SMCCC_RET_SUCCESS);
-> +}
-> +
-> +int __init pv_lock_init(void)
-> +{
-> +	int ret;
-> +
-> +	if (is_hyp_mode_available())
-> +		return 0;
-> +
-> +	if (!has_kvm_pvlock())
-> +		return 0;
-> +
-> +	ret = kvm_arm_init_pvlock();
-> +	if (ret)
-> +		return ret;
-> +
-> +	static_call_update(pv_vcpu_is_preempted, para_vcpu_is_preempted);
-> +	pr_info("using PV-lock preempted\n");
-> +
-> +	return 0;
-> +}
+> -For the user space interface see Documentation/virt/kvm/devices/vcpu.rst
+> -section "3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL".
+> +For the user space interface see
+> +:ref:`Documentation/virt/kvm/devices/vcpu.rst <kvm_arm_vcpu_pvtime_ctrl>`.
 > \ No newline at end of file
-> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-> index fea3223704b6..05ca07ac5800 100644
-> --- a/arch/arm64/kernel/setup.c
-> +++ b/arch/arm64/kernel/setup.c
-> @@ -42,6 +42,7 @@
->  #include <asm/cpu_ops.h>
->  #include <asm/kasan.h>
->  #include <asm/numa.h>
-> +#include <asm/paravirt.h>
->  #include <asm/sections.h>
->  #include <asm/setup.h>
->  #include <asm/smp_plat.h>
-> @@ -360,6 +361,8 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
->  	smp_init_cpus();
->  	smp_build_mpidr_hash();
+> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+> index 716aa3edae14..31f14ec4a65b 100644
+> --- a/Documentation/virt/kvm/devices/vcpu.rst
+> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+> @@ -171,6 +171,8 @@ configured values on other VCPUs.  Userspace should configure the interrupt
+>  numbers on at least one VCPU after creating all VCPUs and before running any
+>  VCPUs.
 >  
-> +	pv_lock_init();
+> +.. _kvm_arm_vcpu_pvtime_ctrl:
 > +
->  	/* Init percpu seeds for random tags after cpus are set up. */
->  	kasan_init_sw_tags();
+>  3. GROUP: KVM_ARM_VCPU_PVTIME_CTRL
+>  ==================================
 >  
-> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-> index f61447913db9..c0ee11855c73 100644
-> --- a/include/linux/cpuhotplug.h
-> +++ b/include/linux/cpuhotplug.h
-> @@ -192,6 +192,7 @@ enum cpuhp_state {
->  	/* Must be the last timer callback */
->  	CPUHP_AP_DUMMY_TIMER_STARTING,
->  	CPUHP_AP_ARM_XEN_STARTING,
-> +	CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
->  	CPUHP_AP_ARM_CORESIGHT_STARTING,
->  	CPUHP_AP_ARM_CORESIGHT_CTI_STARTING,
->  	CPUHP_AP_ARM64_ISNDEP_STARTING,
 
 _______________________________________________
 kvmarm mailing list
