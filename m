@@ -1,43 +1,43 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1011163A0
-	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 17:44:56 +0000 (UTC)
-Received: by mail-pj1-f48.google.com with SMTP id gw22so2354458pjb.3
-        for <kvmarm@lists.linux.dev>; Thu, 03 Nov 2022 10:44:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EC763A0
+	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 17:53:36 +0000 (UTC)
+Received: by mail-pg1-f179.google.com with SMTP id f63so2333909pgc.2
+        for <kvmarm@lists.linux.dev>; Thu, 03 Nov 2022 10:53:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cK19xZ8r/JxZ6zrZk59CGRO4XALiFfw/k+DEo690ifc=;
-        b=AMXkMgBJe864E9ylH4eLhcV4DnnmpnUZQciwStcW/fWfVy8vl8xbyLHXqWoh/4n8QF
-         bRAhsfNtOcglKLMhK6Nb/v5AF7HvdYNYuPv80cwXOHPX5E9n4f4rIwmSH2XAdpFIqhuj
-         sSsx/7sAKHM3fmeDS7xyNpoxOPMcbkwOVVWM5XBPQcjHKuBxYoH5JxFh6oDyEgClSLr4
-         VePL27iqi0rk5/s+JivkXFUi7OtMXJLNacJQMnJ3M4obYSjfplMj8jxI5D4RNhWTNCit
-         VmDRgbq4Pt+ph415Zp0hH77zR2JN9eVpsj1xI6CTZrVgir1QKlQnpGg6QTPI6wKdJ0ls
-         3hyg==
+        bh=3tXwq1v6tJCedr2VtV8ELYd8BpIXTKwmGjuY8weIxs8=;
+        b=gjqnoLy192oz/Zxvag+BlBreQGGSfkeJOmpmCEx7rtJpm2GzAgZsoDzOerCZhLAwiY
+         s4s7ScvfoZl8zwg6HI1Ymb7QpOkn2NxzwKs5NTcMl1wbeFQ/hmv3VmCXwSollG4iohk8
+         ZfCLF4UOQot0TZFoB2ZSgy0wzT2PFfm47J97NCOCE8O1C25eIzJzc1jTDAryWTakKtb6
+         +QR4ykcFsYtONZVST62uH0g9I4NSfzwB8k/a9JLQz8I+tNs7JhVckzNuFRTBv1+mgFsk
+         IdkM799qrsruF4xx+MeYDtb4Sd8Y4cxbHh++70LJo94wIuv8aLLKYeYlUVyl7mOC3bBK
+         Ww4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cK19xZ8r/JxZ6zrZk59CGRO4XALiFfw/k+DEo690ifc=;
-        b=5co6LCXtkPVpW38nrOfE9R7FEK5MwUEfsHvYp6QXvFdicBsv2UieH/HEWZCA1sKq9l
-         VET9WTMNS5eeil8HuXGUY2qtMl6hdTNOtkmpT2Tbr1Ltk7GLOpZfl4vX5ZzHTHX9X2cu
-         YCkx5S7dVSK07vs4oBdTpmyJk5eVf6yb2bQV80EEV96YWx9mPgrA2FB0n0ETSfYN6GAi
-         ms5RfRbUlSd/Q4jHPdJAR+jT3n8E40Mtq3y6LBd/mT8PFIWq7IG2a8VNibbHXIo5rt/l
-         EDjn+0AW2XZZ/aq42hy6lT6HTtxjucKGfT/+1bFhwRq01ELRJ2D+rv57+FecmxVKQwTE
-         wH6w==
-X-Gm-Message-State: ACrzQf1JwEsYbv8ctY1FHpBPnXK2yyUUPnSSJhyYf4S3/SNzG3RZtYrt
-	nNGa1BWik3RZdqUAgE09O90u8g==
-X-Google-Smtp-Source: AMsMyM7Vi7ErqJmqrzHt1bwsO7Jfw+kVc4w4lCdxf/cK5b8KZHYV39XlOvASF4Eye8GSeC7ZJ2rbFQ==
-X-Received: by 2002:a17:90a:d24d:b0:213:d3e4:677a with SMTP id o13-20020a17090ad24d00b00213d3e4677amr24629292pjw.101.1667497496277;
-        Thu, 03 Nov 2022 10:44:56 -0700 (PDT)
+        bh=3tXwq1v6tJCedr2VtV8ELYd8BpIXTKwmGjuY8weIxs8=;
+        b=N/ixmfg+E77R2vC5k7aCTa8G55MyAiKIjVnXiELx+6q6OBlyoKz1c7Abnmo1d99QP0
+         H20ENMru+h+1/0q05IVdtXvBCC1HKBPxwkYd+x0L7xzdD1AhXslh9yzEmhnIzCbfJbM5
+         Tn2Z7dhM5Mf8isvWali059BhF2Ce7HAIku/syLqQhTfFrSZv+sfi3n1ztH4TlvlQfIZJ
+         wCZtiYo6HOMUa9UIlw6u7koqC+UDhX8LarE4vHDs3Bwg7qNS6aPjbxN6cX7eBrWb/gE7
+         PSjizkivCIEWDcP8bubnksNORw9ZTsXMlVJtZlBgVHihKFzqupyyoZcxaJQDh8Bsl1yh
+         rT0g==
+X-Gm-Message-State: ACrzQf32950DBrmX4tL0Mj9Rq1UztoFZ4P3FiWcBzAp0kBqNYAfb8XQD
+	U+6Psd5RsMntIv72h+G23gLHKg==
+X-Google-Smtp-Source: AMsMyM5pSkjZTiut6RFho0StQnuo7qAiklz26C63x768BJpOt4UV7sKT8fcspUYyR/B7P1xdFXKPhA==
+X-Received: by 2002:a05:6a00:999:b0:56c:3d0d:96fe with SMTP id u25-20020a056a00099900b0056c3d0d96femr31657100pfg.12.1667498015565;
+        Thu, 03 Nov 2022 10:53:35 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id i7-20020a17090332c700b00178aaf6247bsm1004862plr.21.2022.11.03.10.44.55
+        by smtp.gmail.com with ESMTPSA id e20-20020a63e014000000b0045ff216a0casm1080329pgh.3.2022.11.03.10.53.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 10:44:55 -0700 (PDT)
-Date: Thu, 3 Nov 2022 17:44:51 +0000
+        Thu, 03 Nov 2022 10:53:35 -0700 (PDT)
+Date: Thu, 3 Nov 2022 17:53:31 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
@@ -68,11 +68,12 @@ Cc: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
 	Michael Ellerman <mpe@ellerman.id.au>,
 	Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
 	Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 36/44] KVM: x86: Do compatibility checks when onlining CPU
-Message-ID: <Y2P+E+631c0TNcK7@google.com>
+Subject: Re: [PATCH 39/44] KVM: Drop kvm_count_lock and instead protect
+ kvm_usage_count with kvm_lock
+Message-ID: <Y2QAG0wCPNv7atC/@google.com>
 References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-37-seanjc@google.com>
- <23bfd709-f99a-5a74-e4b9-1381b88453f1@redhat.com>
+ <20221102231911.3107438-40-seanjc@google.com>
+ <7b6ce80e-7f1f-11cd-8bde-8d8fa9fd7e1d@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,37 +82,47 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <23bfd709-f99a-5a74-e4b9-1381b88453f1@redhat.com>
-Message-ID: <20221103174451.u4ThMi2c3sxKft3XqN4SrD-WqjRnQl68hvu4aXOyWxU@z>
+In-Reply-To: <7b6ce80e-7f1f-11cd-8bde-8d8fa9fd7e1d@redhat.com>
+Message-ID: <20221103175331.lSOkwvxFKRGilk-JAki1k3tJ40fddBJZChsN4qFOg68@z>
 
 On Thu, Nov 03, 2022, Paolo Bonzini wrote:
 > On 11/3/22 00:19, Sean Christopherson wrote:
-> > From: Chao Gao<chao.gao@intel.com>
-> > 
-> > Do compatibility checks when enabling hardware to effectively add
-> > compatibility checks when onlining a CPU.  Abort enabling, i.e. the
-> > online process, if the (hotplugged) CPU is incompatible with the known
-> > good setup.
+> > +- kvm_lock is taken outside kvm->mmu_lock
 > 
-> This paragraph is not true with this patch being before "KVM: Rename and
-> move CPUHP_AP_KVM_STARTING to ONLINE section".
+> Not surprising since one is a mutex and one is an rwlock. :)
 
-Argh, good eyes.  Getting the ordering correct in this series has been quite the
-struggle.  Assuming there are no subtle dependencies between x86 and common KVM,
-the ordering should be something like this:
+Heh, 
 
-  KVM: Opt out of generic hardware enabling on s390 and PPC
-  KVM: Register syscore (suspend/resume) ops early in kvm_init()
-  KVM: x86: Do compatibility checks when onlining CPU
-  KVM: SVM: Check for SVM support in CPU compatibility checks
-  KVM: VMX: Shuffle support checks and hardware enabling code around
-  KVM: x86: Do VMX/SVM support checks directly in vendor code
-  KVM: x86: Unify pr_fmt to use module name for all KVM modules
-  KVM: x86: Use KBUILD_MODNAME to specify vendor module name
-  KVM: Make hardware_enable_failed a local variable in the "enable all" path
-  KVM: Use a per-CPU variable to track which CPUs have enabled virtualization
-  KVM: Remove on_each_cpu(hardware_disable_nolock) in kvm_exit()
-  KVM: Drop kvm_count_lock and instead protect kvm_usage_count with kvm_lock
-  KVM: Disable CPU hotplug during hardware enabling
-  KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
-  KVM: Drop kvm_arch_check_processor_compat() hook
+  Signed-off-by: Captain Obvious <seanjc@google.com>
+
+> You can drop this hunk as well as the "Opportunistically update KVM's locking
+> documentation" sentence in the commit message.
+
+Will do.
+
+> >   - vcpu->mutex is taken outside kvm->arch.hyperv.hv_lock
+> >   - kvm->arch.mmu_lock is an rwlock.  kvm->arch.tdp_mmu_pages_lock and
+> > @@ -216,15 +220,11 @@ time it will be set using the Dirty tracking mechanism described above.
+> >   :Type:		mutex
+> >   :Arch:		any
+> >   :Protects:	- vm_list
+> > -
+> > -``kvm_count_lock``
+> > -^^^^^^^^^^^^^^^^^^
+> > -
+> > -:Type:		raw_spinlock_t
+> > -:Arch:		any
+> > -:Protects:	- hardware virtualization enable/disable
+> > -:Comment:	'raw' because hardware enabling/disabling must be atomic /wrt
+> > -		migration.
+> > +		- kvm_usage_count
+> > +		- hardware virtualization enable/disable
+> > +		- module probing (x86 only)
+> 
+> What do you mean exactly by "module probing"?  Is it anything else than what
+> is serialized by vendor_module_lock?
+
+Ooh, I forgot to update this patch after switching to vendor_module_lock.  I
+added the above after fixing the first deadlock between kvm_lock and cpu_hotplug_lock,
+but later gave up on trying to use kvm_lock after deadlock #2, which is when I
+when I realized piggybacking kvm_lock was going to be a maintainance nightmare due.
