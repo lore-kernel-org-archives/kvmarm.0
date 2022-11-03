@@ -1,145 +1,98 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCEE7E2
-	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 05:32:13 +0000 (UTC)
-Received: by mail-pf1-f182.google.com with SMTP id b185so672372pfb.9
-        for <kvmarm@lists.linux.dev>; Wed, 02 Nov 2022 22:32:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94C97E2
+	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 05:33:18 +0000 (UTC)
+Received: by mail-pf1-f180.google.com with SMTP id i3so668722pfc.11
+        for <kvmarm@lists.linux.dev>; Wed, 02 Nov 2022 22:33:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=plrjvAdTS0nKqwkjAzFhlx4V983yw9yOIJecZW8zvnc=;
-        b=NcV+yCiuxWOVxIsZo319+y5TyEFngethA6CQP6BOwGlsAkmNTjQraFrrswRtPZlkpD
-         SJRUCsZfHhroDFuc1HWmkqwVEVc2RVFlGiP5zvsmzzPynvcbshB4QamTuDtUOEEi6JX4
-         BmUNoa7MFmnhIEnLohD39eY/9J7H2XyS5v3+5c2obyaUdJSs75ghA1uFF39Ky7NSG8YJ
-         Fs1aAEnOM6YE3UXbpbHYeTtl8vatHs5B63YYsi93lW77Z447BjQnB4MN173r79lfZNfs
-         EeCfl2gHHg6Bb2KUGH/aEOT1ThtG05EipcaO2uura2cCTvv3plIIwNol/Hx+i5Ii5y9/
-         Z3nw==
+        d=csie-ntu-edu-tw.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y0jwfzDPpiiIA6G13h9XyMG8TS+aWs3VsgaKFJG4r/Y=;
+        b=mxroxZXUMUkz4XhlkDgs8s8+7XrSh7WWJTclkV3qQTHFYNn2rr7B1rVc7FQ1vwg5rd
+         aeNnyDeufwx5om4LYQWB4eKUVZgU8A1BQSFYQ2aV9ergBjzRyamSGf7rr+4IudJT50tt
+         FcdfRX2xMd8Iy1p5KKi88ezGSZmzUzHdxpfAIGWws5w0Yej4kOFaki8PnHwh1PtwhBsS
+         Ob3p5kbpMuqjL5VdPdOtzazOwqx4gJSiup/Lj2Y+8DC+UvJMICJsmTnQtamiMSDhJa33
+         Jjfl97tazJ5vGcIPXll1dcMTjCD/02gBAxRz+HTn7Rb6TO+K7zCEGdHiAufdXzkP+ENJ
+         9AHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=plrjvAdTS0nKqwkjAzFhlx4V983yw9yOIJecZW8zvnc=;
-        b=cV1MOAS8oyHr8aYJ4Sa05AG1qG8xuM+9RySa3LpQRCfoQondiZLonIwzQMD9aAudlm
-         LE7aSGmjc0jDjhFAtAC5+/xgvTJKw6xo/lF9i1YC8Wl/eucfZODvKYVDQQdeMZKLKfXq
-         WH0PTG49LBNezo6Adc7YtnRCsbE6ffPX4BSTM5jGoLl1L0+ojlrSDDlJT8Q2kuaz1TAq
-         AjD1sO2652uvNDL/RkuhsLrDcvn/Pg+P9OgFBKljhnab0mPi/pHKdOPUTg9fmH+qkt6I
-         DaCCCQYdwkeIK5l6I5BdajzAsGGthWNBNtRCqxkWrX2DK5lagQEj5QNNVVkIA9cesZqN
-         gTpw==
-X-Gm-Message-State: ACrzQf0B1a0tflLcfgdOOjuC1UTB83OuB8ysSgEU6K9PyU5bYiYtVewD
-	gGwW39l14YADlEPPhG3iOFr6qua9OYZn5BFkICPkLA==
-X-Google-Smtp-Source: AMsMyM4AzbIHrwu7GJ3+G6SgGpmo5sXra8QVKVVvusdM6c9LC+09ZHIwSIQNdprt/hyAqQXhcjpMftwwP6uibr705Fk=
-X-Received: by 2002:a63:db58:0:b0:443:575e:d1ed with SMTP id
- x24-20020a63db58000000b00443575ed1edmr24344874pgi.468.1667453533101; Wed, 02
- Nov 2022 22:32:13 -0700 (PDT)
+        bh=Y0jwfzDPpiiIA6G13h9XyMG8TS+aWs3VsgaKFJG4r/Y=;
+        b=5JLDRCQG2OJAWdJNl+jgR2/xG4yaQkoaXz0xLK6BXoRDwxubcSoN7obAYnxTFZsIXD
+         7gWBac3Lp8KAAFlCZK8fKXJDfQ7EGY4HQczhkTA/I/2n9kEFAZvXnaUQCarJrkP4Ojc9
+         fmZVNlfnIEZMpQjrYl2FEeJ9P+69eax4Id44Szu7wA9lxjLF9+RlvDXaqMBGtODdtcos
+         EgCxZcT4Ogv6ujlGjC6raQ+LnJ/fj7AMG2deM9Tkn8FUqUdrL+A3O9Td0Y/22TnEIRAw
+         XHvjsAVwRucF04c384x+eSShWEUGZbpmWgBox0eb0gRF5DZIXtq/eE3S7uc67bQhxhJD
+         O6EA==
+X-Gm-Message-State: ACrzQf0gQCljHKoAJumah+aFciPCsHZ7bDYQfPyI2BISvGNXxS945c+e
+	R2KW1+PbMcaymAoTJ25K/0fstAKLakOVMl1dXAz4H2N4OXbUgfronX93+3KOftH3XZsrE76cyGP
+	YMioMhIf9QtsOpbJkBC6eUOLTcjkLiUCV7m/6nyk8OBfDLA81eJe25tsqiEpHzDQ6wz9RyJlWnv
+	Kz8qU9g3wVi2nqmD54azQ=
+X-Google-Smtp-Source: AMsMyM5YD3Kv+bRTItC2EnabSgqHnEdgAworw+tKJ/WaqkqybiIf2VNdq72dJjo7lmn9TaCyghDjcg==
+X-Received: by 2002:a63:6909:0:b0:41c:9f4f:a63c with SMTP id e9-20020a636909000000b0041c9f4fa63cmr25661260pgc.76.1667453597997;
+        Wed, 02 Nov 2022 22:33:17 -0700 (PDT)
+Received: from localhost.localdomain (2001-b011-3803-1d6f-4606-a53e-f8a5-75e1.dynamic-ip6.hinet.net. [2001:b011:3803:1d6f:4606:a53e:f8a5:75e1])
+        by smtp.gmail.com with ESMTPSA id n17-20020a17090ac69100b00212d4cbcbfdsm67368pjt.22.2022.11.02.22.33.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Nov 2022 22:33:16 -0700 (PDT)
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: maz@kernel.org
+Cc: james.morse@arm.com,
+	alexandru.elisei@arm.com,
+	suzuki.poulose@arm.com,
+	oliver.upton@linux.dev,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	linux-kernel@vger.kernel.org,
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Subject: [PATCH] KVM: arm64: Update comment of create_hyp_mappings
+Date: Thu,  3 Nov 2022 13:32:28 +0800
+Message-Id: <20221103053228.961591-1-r09922117@csie.ntu.edu.tw>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20221028105402.2030192-1-maz@kernel.org> <20221028105402.2030192-12-maz@kernel.org>
-In-Reply-To: <20221028105402.2030192-12-maz@kernel.org>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Wed, 2 Nov 2022 22:31:56 -0700
-Message-ID: <CAAeT=FyiNeRun7oRL83AUkVabUSb9pxL2SS9yZwi1rjFnbhH6g@mail.gmail.com>
-Subject: Re: [PATCH v2 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to
- be set from userspace
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221103053156.-IxHPyM338KJ_aATpV7-cyd8xiRwII8lTVbhT2nWEF8@z>
+Content-Transfer-Encoding: 8bit
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-Hi Marc,
+HYP_PAGE_OFFSET is removed since 4.8, and the method for generating Hyp
+VAs has evolved. Update the functional description of
+create_hyp_mappings accordingly.
 
-On Fri, Oct 28, 2022 at 4:16 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Allow userspace to write ID_AA64DFR0_EL1, on the condition that only
-> the PMUver field can be altered and be at most the one that was
-> initially computed for the guest.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 37 ++++++++++++++++++++++++++++++++++++-
->  1 file changed, 36 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 7a4cd644b9c0..4fa14b4ae2a6 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1247,6 +1247,40 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->         return 0;
->  }
->
-> +static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> +                              const struct sys_reg_desc *rd,
-> +                              u64 val)
-> +{
-> +       u8 pmuver, host_pmuver;
-> +
-> +       host_pmuver = kvm_arm_pmu_get_pmuver_limit();
-> +
-> +       /*
-> +        * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
-> +        * as it doesn't promise more than what the HW gives us. We
-> +        * allow an IMPDEF PMU though, only if no PMU is supported
-> +        * (KVM backward compatibility handling).
-> +        */
+Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+---
+ arch/arm64/kvm/mmu.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-It appears the patch allows userspace to set IMPDEF even
-when host_pmuver == 0.  Shouldn't it be allowed only when
-host_pmuver == IMPDEF (as before)?
-Probably, it may not cause any real problems though.
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index c9a13e487..a9ae4a3f9 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -424,9 +424,10 @@ void kvm_unshare_hyp(void *from, void *to)
+  * @to:		The virtual kernel end address of the range (exclusive)
+  * @prot:	The protection to be applied to this range
+  *
+- * The same virtual address as the kernel virtual address is also used
+- * in Hyp-mode mapping (modulo HYP_PAGE_OFFSET) to the same underlying
+- * physical pages.
++ * The Hyp virtual address is generated by masking the kernel VA with
++ * va_mask then inserting tag_val for the higher bits starting from
++ * tag_lsb. See kvm_compute_layout() in va_layout.c for more info.
++ * Both Hyp VA and kernel VA ranges map to the same underlying physical pages.
+  */
+ int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
+ {
+-- 
+2.34.1
 
-
-> +       pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
-> +       if (pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver)
-> +               return -EINVAL;
-> +
-> +       /* We already have a PMU, don't try to disable it... */
-> +       if (kvm_vcpu_has_pmu(vcpu) &&
-> +           (pmuver == 0 || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF))
-> +               return -EINVAL;
-
-Nit: Perhaps it might be useful to return a different error code for the
-above two (new) error cases (I plan to use -E2BIG and -EPERM
-respectively for those cases with my ID register series).
-
-Thank you,
-Reiji
-
-> +
-> +       /* We can only differ with PMUver, and anything else is an error */
-> +       val ^= read_id_reg(vcpu, rd);
-> +       val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> +       if (val)
-> +               return -EINVAL;
-> +
-> +       vcpu->kvm->arch.dfr0_pmuver = pmuver;
-> +
-> +       return 0;
-> +}
-> +
->  /*
->   * cpufeature ID register user accessors
->   *
-> @@ -1508,7 +1542,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->         ID_UNALLOCATED(4,7),
->
->         /* CRm=5 */
-> -       ID_SANITISED(ID_AA64DFR0_EL1),
-> +       { SYS_DESC(SYS_ID_AA64DFR0_EL1), .access = access_id_reg,
-> +         .get_user = get_id_reg, .set_user = set_id_aa64dfr0_el1, },
->         ID_SANITISED(ID_AA64DFR1_EL1),
->         ID_UNALLOCATED(5,2),
->         ID_UNALLOCATED(5,3),
-> --
-> 2.34.1
->
->
