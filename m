@@ -2,90 +2,123 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF181C43217
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 13:15:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E913CC4332F
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 13:22:06 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D9C14B17C;
-	Thu,  3 Nov 2022 09:15:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 657A04B635;
+	Thu,  3 Nov 2022 09:22:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered)
-	header.i=@bytedance-com.20210112.gappssmtp.com
+	(fail, message has been altered) header.i=@ibm.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vwU1Obp4z8gH; Thu,  3 Nov 2022 09:15:50 -0400 (EDT)
+	with ESMTP id 9mU++O84OdJ9; Thu,  3 Nov 2022 09:22:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 185EC4B59D;
-	Thu,  3 Nov 2022 09:15:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15E2E4B62E;
+	Thu,  3 Nov 2022 09:22:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 938304B59D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 09:15:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9828D4B601
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 09:22:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IuIYWf00BV28 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Nov 2022 09:15:46 -0400 (EDT)
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com
- [209.85.221.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9F34D4B17C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 09:15:46 -0400 (EDT)
-Received: by mail-wr1-f46.google.com with SMTP id bs21so2729836wrb.4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Nov 2022 06:15:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bytedance-com.20210112.gappssmtp.com; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :from:to:cc:subject:date:message-id:reply-to;
- bh=/Uz8rR70OjyKINZokXTU1v1eU2uJSzZ6mJlBltevdQ8=;
- b=VsokLj8NPmmHIxAkl3U4Zzp9E2X0fE9dwKRILlOwYTC5LgI1wcPxeWlSpBDgZ2CmGb
- /cy/OLTi12us88ZigGcDebbjqepOHRisM5W05l4aMBAw/T/Pbo70p2e/eBOUAYC6kfHN
- XO5zvr0AR+3+u9m84L6yOf8JDsoCwrA6aZSQ9p5KFwWH3pFt/UW+cpZaqAaNhL42bzja
- /d2sKiGkYVjYLG5n6SK12FlE+GKh4a4gSRx8yawMPvf3reGzFbhKoH/9grm8BK+Uybbw
- og0TS+SlpJbgYS/Qx+Q4uY6SV86MMuq1AlKypE+rpBQG4W9uIKbYqO8mm89JA3vgje9d
- ibqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=/Uz8rR70OjyKINZokXTU1v1eU2uJSzZ6mJlBltevdQ8=;
- b=OzwnfVpASOXPFfElI+D/Yzre02DS2U25rtQEC1bpWW9rVMuNXU/sXOv3d4oJmqFq07
- lEL+DXIXvaU0kF0ct/riAfusy02fmk3aE41uG/VsKX2qqC4QWEdp5tJFe0XkOLuJ1EP8
- dT8HcMS1K4R9x7pePPAT/5JUw944s36K5bTRmKAu2YaU4NLHKOUrcwCqhPwp4ndGvnvg
- 98XJH1nnPoRgPw+l7BQMPXn1SyA9AwPJ/gIhKoBwKdk9qW2ggDUE7MJVz+hobcpro0X6
- 1lSLwCEaMQdUqtzUxodlAhR+tPEy1YbseQ+s/E9QyzS/lVQBPzGeDPOOKnla+gIkaT7R
- k+Cw==
-X-Gm-Message-State: ACrzQf1mbatvDsDs6h10rbDn4WE7FLw03sczWY9VH7ZzZRa8X8XF6Uq8
- qofPxiVO/9buKrLewDYWePpGUQ==
-X-Google-Smtp-Source: AMsMyM5/gRUBbSwi+M4mmRLzP89ZKG4CtBvh+iLD5Myg/vwJXcBalU33moc/YnG5bfRjlBqnD+q09w==
-X-Received: by 2002:a5d:6ac7:0:b0:236:b281:150 with SMTP id
- u7-20020a5d6ac7000000b00236b2810150mr18040279wrw.29.1667481345487; 
- Thu, 03 Nov 2022 06:15:45 -0700 (PDT)
-Received: from ?IPV6:2a02:6b6a:b4d7:0:e42f:dffe:32d3:8bf2?
- ([2a02:6b6a:b4d7:0:e42f:dffe:32d3:8bf2])
- by smtp.gmail.com with ESMTPSA id
- c4-20020a05600c0a4400b003cf894c05e4sm4027606wmq.22.2022.11.03.06.15.44
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Nov 2022 06:15:44 -0700 (PDT)
-Message-ID: <61800b69-5f6a-d173-fc42-628ee3db15d8@bytedance.com>
-Date: Thu, 3 Nov 2022 13:15:43 +0000
+ with ESMTP id GhWaudXOZEq7 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Nov 2022 09:21:55 -0400 (EDT)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com
+ [148.163.156.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1DF784B27F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 09:21:54 -0400 (EDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A3CJrRq005056;
+ Thu, 3 Nov 2022 13:21:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=aFkGVTo1XJsI6iGGvAkxQhjQYKM9aG4FMgppl4Mi3V4=;
+ b=oJ1AASijW3z94yCNGRZiFICP24fGSesVBCEC8Xqh2VdcOSvNxBynHuTHaQTYP/QuJhIZ
+ NxmeS6rFalfFqEImPhHnqx7l9m0DRnvCkPUBJEJD82t6dDaoo74fFkT92fc23c1D2lHW
+ z3uDhJrunZQbC1UjLKk4TC5rJ1OSHSJJw8YRacyK/Fc/6hpMYwSVOCBV4liDhrkRX+s3
+ 4vcis021UkJZus/SW5ZDm+zV40sIbdWd/kkCVxmMhKqN9jOyylEeC6toF69LcrW9uRf0
+ uYVKNSAlaqCYvq0CZRK55lKcF6VETT9NWK/9cu1NIH0e/BdZ3BvQqVhZ5qiRT66SJqWa IQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kmcabmsme-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 03 Nov 2022 13:21:27 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A3AtXV6006838;
+ Thu, 3 Nov 2022 13:21:26 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.107])
+ by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kmcabmsjq-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 03 Nov 2022 13:21:25 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+ by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A3D5ZwC024560;
+ Thu, 3 Nov 2022 13:21:23 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com
+ (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+ by ppma03fra.de.ibm.com with ESMTP id 3kgut8pkgt-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 03 Nov 2022 13:21:23 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 2A3DLJlt63635926
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 3 Nov 2022 13:21:19 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BB3664C04A;
+ Thu,  3 Nov 2022 13:21:19 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C63864C044;
+ Thu,  3 Nov 2022 13:21:18 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu,  3 Nov 2022 13:21:18 +0000 (GMT)
+Date: Thu, 3 Nov 2022 14:21:17 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 25/44] KVM: s390: Do s390 specific init without bouncing
+ through kvm_init()
+Message-ID: <20221103142117.4e27c80c@p-imbrenda>
+In-Reply-To: <20221103134415.5b277ce9@p-imbrenda>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221102231911.3107438-26-seanjc@google.com>
+ <20221103134415.5b277ce9@p-imbrenda>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [External] Re: [RFC 1/6] KVM: arm64: Document PV-lock interface
-Content-Language: en-US
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-References: <20221102161340.2982090-1-usama.arif@bytedance.com>
- <20221102161340.2982090-2-usama.arif@bytedance.com>
- <Y2M6eU6xW7jjVQNx@debian.me>
-From: Usama Arif <usama.arif@bytedance.com>
-In-Reply-To: <Y2M6eU6xW7jjVQNx@debian.me>
-Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
- linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
- fam.zheng@bytedance.com, maz@kernel.org, punit.agrawal@bytedance.com,
- linux@armlinux.org.uk, liangma@liangbit.com, steven.price@arm.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: qBPHBsV6cFHEd8MUfp3luW546x7XEBtX
+X-Proofpoint-GUID: PZHd2NjudsBQn9w2kOd6Znv6byrMRJIu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-03_04,2022-11-03_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015
+ priorityscore=1501 malwarescore=0 lowpriorityscore=0 suspectscore=0
+ phishscore=0 impostorscore=0 adultscore=0 mlxscore=0 mlxlogscore=826
+ spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211030090
+Cc: Matthew Rosato <mjrosato@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Yuan Yao <yuan.yao@intel.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, linux-kernel@vger.kernel.org,
+ Michael Ellerman <mpe@ellerman.id.au>, linux-riscv@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
+ Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Chao Gao <chao.gao@intel.com>, Eric Farman <farman@linux.ibm.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org,
+ Atish Patra <atishp@atishpatra.org>, kvmarm@lists.linux.dev,
+ Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Fabiano Rosas <farosas@linux.ibm.com>, linux-mips@vger.kernel.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ linuxppc-dev@lists.ozlabs.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,157 +130,115 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On Thu, 3 Nov 2022 13:44:15 +0100
+Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
 
-Thanks for the review. I will include the changes in the next version I 
-send for pvlock. I have sent a patch to fix pvtime here 
-https://lore.kernel.org/all/20221103131210.3603385-1-usama.arif@bytedance.com/.
+> On Wed,  2 Nov 2022 23:18:52 +0000
+> Sean Christopherson <seanjc@google.com> wrote:
+> 
+> > Move the guts of kvm_arch_init() into a new helper, __kvm_s390_init(),
+> > and invoke the new helper directly from kvm_s390_init() instead of
+> > bouncing through kvm_init().  Invoking kvm_arch_init() is the very
+> > first action performed by kvm_init(), i.e. this is a glorified nop.
+> > 
+> > Moving setup to __kvm_s390_init() will allow tagging more functions as
+> > __init, and emptying kvm_arch_init() will allow dropping the hook
+> > entirely once all architecture implementations are nops.
+> > 
+> > No functional change intended.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/s390/kvm/kvm-s390.c | 29 +++++++++++++++++++++++++----
+> >  1 file changed, 25 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> > index 7fcd2d3b3558..e1c9980aae78 100644
+> > --- a/arch/s390/kvm/kvm-s390.c
+> > +++ b/arch/s390/kvm/kvm-s390.c
+> > @@ -461,7 +461,7 @@ static void kvm_s390_cpu_feat_init(void)
+> >  	 */
+> >  }
+> >  
+> > -int kvm_arch_init(void *opaque)
+> > +static int __kvm_s390_init(void)
+> >  {
+> >  	int rc = -ENOMEM;
+> >  
+> > @@ -519,7 +519,7 @@ int kvm_arch_init(void *opaque)
+> >  	return rc;
+> >  }
+> >  
+> > -void kvm_arch_exit(void)
+> > +static void __kvm_s390_exit(void)
+> >  {
+> >  	gmap_unregister_pte_notifier(&gmap_notifier);
+> >  	gmap_unregister_pte_notifier(&vsie_gmap_notifier);
+> > @@ -533,6 +533,16 @@ void kvm_arch_exit(void)
+> >  	debug_unregister(kvm_s390_dbf_uv);
+> >  }
+> >  
+> > +int kvm_arch_init(void *opaque)
+> > +{
+> > +	return 0;
+> > +}
+> > +
+> > +void kvm_arch_exit(void)
+> > +{
+> > +
+> > +}
+> > +  
+> 
+> I wonder at this point if it's possible to define kvm_arch_init and
+> kvm_arch_exit directly in kvm_main.c with __weak
 
-Usama
+ah, nevermind, you get rid of them completely in the next patch
 
-On 03/11/2022 03:50, Bagas Sanjaya wrote:
-> On Wed, Nov 02, 2022 at 04:13:35PM +0000, Usama Arif wrote:
->> +    ============= ========    ==========
->> +    Function ID:  (uint32)    0xC6000020
->> +    PV_call_id:   (uint32)    The function to query for support.
->> +                              Currently only PV_LOCK_PREEMPTED is supported.
->> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
->> +                              PV-lock feature is supported by the hypervisor.
->> +    ============= ========    ==========
->> +
->> +PV_LOCK_PREEMPTED
->> +    ============= ========    ==========
->> +    Function ID:  (uint32)    0xC6000021
->> +    Return value: (int64)     IPA of the pv lock data structure for this
->> +                              VCPU. On failure:
->> +                              NOT_SUPPORTED (-1)
->> +    ============= ========    ==========
->> +
 > 
-> You need to fix up these tables above:
+> >  /* Section: device related */
+> >  long kvm_arch_dev_ioctl(struct file *filp,
+> >  			unsigned int ioctl, unsigned long arg)
+> > @@ -5634,7 +5644,7 @@ static inline unsigned long nonhyp_mask(int i)
+> >  
+> >  static int __init kvm_s390_init(void)
+> >  {
+> > -	int i;
+> > +	int i, r;
+> >  
+> >  	if (!sclp.has_sief2) {
+> >  		pr_info("SIE is not available\n");
+> > @@ -5650,12 +5660,23 @@ static int __init kvm_s390_init(void)
+> >  		kvm_s390_fac_base[i] |=
+> >  			stfle_fac_list[i] & nonhyp_mask(i);
+> >  
+> > -	return kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
+> > +	r = __kvm_s390_init();
+> > +	if (r)
+> > +		return r;
+> > +
+> > +	r = kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
+> > +	if (r) {
+> > +		__kvm_s390_exit();
+> > +		return r;
+> > +	}
+> > +	return 0;
+> >  }
+> >  
+> >  static void __exit kvm_s390_exit(void)
+> >  {
+> >  	kvm_exit();
+> > +
+> > +	__kvm_s390_exit();
+> >  }
+> >  
+> >  module_init(kvm_s390_init);  
 > 
-> ---- >8 ----
-> 
-> diff --git a/Documentation/virt/kvm/arm/pvlock.rst b/Documentation/virt/kvm/arm/pvlock.rst
-> index 766aeef50b2d31..940a1cb221bc90 100644
-> --- a/Documentation/virt/kvm/arm/pvlock.rst
-> +++ b/Documentation/virt/kvm/arm/pvlock.rst
-> @@ -15,21 +15,23 @@ The existence of the PV_LOCK hypercall should be probed using the SMCCC 1.1
->   ARCH_FEATURES mechanism before calling it.
->   
->   PV_LOCK_FEATURES
-> -    ============= ========    ==========
-> +
-> +    ============= ========    =================================================
->       Function ID:  (uint32)    0xC6000020
->       PV_call_id:   (uint32)    The function to query for support.
->                                 Currently only PV_LOCK_PREEMPTED is supported.
->       Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the relevant
->                                 PV-lock feature is supported by the hypervisor.
-> -    ============= ========    ==========
-> +    ============= ========    =================================================
->   
->   PV_LOCK_PREEMPTED
-> -    ============= ========    ==========
-> +
-> +    ============= ========    ==========================================
->       Function ID:  (uint32)    0xC6000021
->       Return value: (int64)     IPA of the pv lock data structure for this
->                                 VCPU. On failure:
->                                 NOT_SUPPORTED (-1)
-> -    ============= ========    ==========
-> +    ============= ========    ==========================================
->   
->   The IPA returned by PV_LOCK_PREEMPTED should be mapped by the guest as normal
->   memory with inner and outer write back caching attributes, in the inner
-> 
-> The similar fixup should also be made to the tables in
-> Documentation/virt/kvm/arm/pvtime.rst, though.
-> 
->> +The IPA returned by PV_LOCK_PREEMPTED should be mapped by the guest as normal
->> +memory with inner and outer write back caching attributes, in the inner
->> +shareable domain.
->> +
->> +PV_LOCK_PREEMPTED returns the structure for the calling VCPU.
->> +
->> +PV lock state
->> +-------------
->> +
->> +The structure pointed to by the PV_LOCK_PREEMPTED hypercall is as follows:
->> +
->> ++-----------+-------------+-------------+---------------------------------+
->> +| Field     | Byte Length | Byte Offset | Description                     |
->> ++===========+=============+=============+=================================+
->> +| preempted |      8      |      0      | Indicate if the VCPU that owns  |
->> +|           |             |             | this struct is running or not.  |
->> +|           |             |             | Non-zero values mean the VCPU   |
->> +|           |             |             | has been preempted. Zero means  |
->> +|           |             |             | the VCPU is not preempted.      |
->> ++-----------+-------------+-------------+---------------------------------+
->> +
->> +The preempted field will be updated to 1 by the hypervisor prior to scheduling
->> +a VCPU. When the VCPU is scheduled out, the preempted field will be updated
->> +to 0 by the hypervisor.
->> +
->> +The structure will be present within a reserved region of the normal memory
->> +given to the guest. The guest should not attempt to write into this memory.
->> +There is a structure per VCPU of the guest.
->> +
->> +For the user space interface see Documentation/virt/kvm/devices/vcpu.rst
->> +section "4. GROUP: KVM_ARM_VCPU_PVLOCK_CTRL".
-> 
-> Use reST labels for cross-referencing to the documentation section:
-> 
-> ---- >8 ----
-> 
-> diff --git a/Documentation/virt/kvm/arm/pvlock.rst b/Documentation/virt/kvm/arm/pvlock.rst
-> index 940a1cb221bc90..4e9d09b76ef033 100644
-> --- a/Documentation/virt/kvm/arm/pvlock.rst
-> +++ b/Documentation/virt/kvm/arm/pvlock.rst
-> @@ -62,5 +62,5 @@ The structure will be present within a reserved region of the normal memory
->   given to the guest. The guest should not attempt to write into this memory.
->   There is a structure per VCPU of the guest.
->   
-> -For the user space interface see Documentation/virt/kvm/devices/vcpu.rst
-> -section "4. GROUP: KVM_ARM_VCPU_PVLOCK_CTRL".
-> +For the user space interface see :ref:`KVM_VCPU_TSC_CTRL in Generic vcpu
-> +interface documentation <kvm-vcpu-tsc-ctrl>`.
-> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-> index 223ac2fe62f01f..6532f61073a39c 100644
-> --- a/Documentation/virt/kvm/devices/vcpu.rst
-> +++ b/Documentation/virt/kvm/devices/vcpu.rst
-> @@ -194,6 +194,8 @@ base address must be 64 byte aligned and exist within a valid guest memory
->   region. See Documentation/virt/kvm/arm/pvtime.rst for more information
->   including the layout of the stolen time structure.
->   
-> +.. _kvm-vcpu-tsc-ctrl:
-> +
->   4. GROUP: KVM_VCPU_TSC_CTRL
->   ===========================
->   
-> 
-> Also, you need to add the documentation to table of contents (index):
-> 
-> ---- >8 ----
-> 
-> diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
-> index e8484843215808..b8499dc00a6a96 100644
-> --- a/Documentation/virt/kvm/arm/index.rst
-> +++ b/Documentation/virt/kvm/arm/index.rst
-> @@ -10,4 +10,5 @@ ARM
->      hyp-abi
->      hypercalls
->      pvtime
-> +   pvlock
->      ptp_kvm
-> 
-> Thanks.
-> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
