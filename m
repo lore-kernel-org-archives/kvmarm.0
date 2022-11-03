@@ -1,221 +1,99 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815E46FD6
-	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 13:22:07 +0000 (UTC)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A3CJrRq005056;
-	Thu, 3 Nov 2022 13:21:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=aFkGVTo1XJsI6iGGvAkxQhjQYKM9aG4FMgppl4Mi3V4=;
- b=oJ1AASijW3z94yCNGRZiFICP24fGSesVBCEC8Xqh2VdcOSvNxBynHuTHaQTYP/QuJhIZ
- NxmeS6rFalfFqEImPhHnqx7l9m0DRnvCkPUBJEJD82t6dDaoo74fFkT92fc23c1D2lHW
- z3uDhJrunZQbC1UjLKk4TC5rJ1OSHSJJw8YRacyK/Fc/6hpMYwSVOCBV4liDhrkRX+s3
- 4vcis021UkJZus/SW5ZDm+zV40sIbdWd/kkCVxmMhKqN9jOyylEeC6toF69LcrW9uRf0
- uYVKNSAlaqCYvq0CZRK55lKcF6VETT9NWK/9cu1NIH0e/BdZ3BvQqVhZ5qiRT66SJqWa IQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kmcabmsme-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Nov 2022 13:21:27 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A3AtXV6006838;
-	Thu, 3 Nov 2022 13:21:26 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kmcabmsjq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Nov 2022 13:21:25 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-	by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A3D5ZwC024560;
-	Thu, 3 Nov 2022 13:21:23 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-	by ppma03fra.de.ibm.com with ESMTP id 3kgut8pkgt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Nov 2022 13:21:23 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A3DLJlt63635926
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 3 Nov 2022 13:21:19 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BB3664C04A;
-	Thu,  3 Nov 2022 13:21:19 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C63864C044;
-	Thu,  3 Nov 2022 13:21:18 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-	by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Thu,  3 Nov 2022 13:21:18 +0000 (GMT)
-Date: Thu, 3 Nov 2022 14:21:17 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic
- <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul
- Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Matthew
- Rosato <mjrosato@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Vitaly
- Kuznetsov <vkuznets@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose
- <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Atish
- Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Isaku Yamahata
- <isaku.yamahata@intel.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Michael
- Ellerman <mpe@ellerman.id.au>, Chao Gao <chao.gao@intel.com>,
-        Thomas
- Gleixner <tglx@linutronix.de>, Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 25/44] KVM: s390: Do s390 specific init without bouncing
- through kvm_init()
-Message-ID: <20221103142117.4e27c80c@p-imbrenda>
-In-Reply-To: <20221103134415.5b277ce9@p-imbrenda>
-References: <20221102231911.3107438-1-seanjc@google.com>
-	<20221102231911.3107438-26-seanjc@google.com>
-	<20221103134415.5b277ce9@p-imbrenda>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C6E6FD6
+	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 14:01:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1667484093;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gp3ZE1TCS6qUf/W2wfyFuvz85/MTtwzsFfwWgQFj3ps=;
+	b=Qo0SXA6+5H3ZBoogEL6UCs0UcxfnXe5K6TRqTja55nGKmuiYXb7LShyB5TuCujid+WusZS
+	Dz4yA8ncxDQh5SW8Q+jcrTA41nn7uBpQisHBa9HDW7fccHQfL4YrVYdYREWeO9yZ+qObMp
+	IN0ZLILxGxDgc/Kstx/J0LkKFbA++Zc=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-383-hXTUF79mMvW4Orm1VbWnNg-1; Thu, 03 Nov 2022 10:01:32 -0400
+X-MC-Unique: hXTUF79mMvW4Orm1VbWnNg-1
+Received: by mail-ed1-f70.google.com with SMTP id i17-20020a05640242d100b0044f18a5379aso1448693edc.21
+        for <kvmarm@lists.linux.dev>; Thu, 03 Nov 2022 07:01:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Gp3ZE1TCS6qUf/W2wfyFuvz85/MTtwzsFfwWgQFj3ps=;
+        b=XRzLJxBXPHiyyuJQ9L60kOJ88uAnZuV0rskLm/NMItnEDjQ6wbJTta7nz/2olRgb+g
+         n58no8Yx1KdVvswridBy3ExnBreAtBHvAVrOI+hTeEmTQuRDVzX+I3Wd/ZAGVFmuZAgU
+         x7c0PYN2hjpUOAowu+u1GB8MgtMJOCH2vlkKbNIhwxAk0kJgeguF4VK6B1e8kWEk1cfg
+         NTiqpI6kLpsZ2dZEnTHgD9jnvHjxuDYsoCi3HIw8Oll6O0gqN+r6sW5Lv2i/oOmGzv3X
+         /ro/76TA3BlHwXG5oQk+933I/1gtS2I7gs3udPUBS/a1SqvrxJNNND0Ka2vssWTMNCli
+         ewxg==
+X-Gm-Message-State: ACrzQf36nOTZ0YL1yiw17Qjje1OgiNBDGa1b22EB7fUbAIwixM0SNL5k
+	4NXjDHdR2tmHockc0vTbfglEXl4D5gLhMnlt/KE+TTK2tpDtBvVXx6zIngoyNruaH/H0zaMJJ8C
+	7P4Fba4zQxRIyZ/Uy
+X-Received: by 2002:a17:907:7e9e:b0:7ad:bc80:c003 with SMTP id qb30-20020a1709077e9e00b007adbc80c003mr25375085ejc.198.1667484089778;
+        Thu, 03 Nov 2022 07:01:29 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM573p4EUrag9CU7KGeV5DPwqVdO4hG3cdn9PAejBOFdAvPNF2Pfj2lgSHDnk+0puoAwMgBkew==
+X-Received: by 2002:a17:907:7e9e:b0:7ad:bc80:c003 with SMTP id qb30-20020a1709077e9e00b007adbc80c003mr25374580ejc.198.1667484084861;
+        Thu, 03 Nov 2022 07:01:24 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+        by smtp.googlemail.com with ESMTPSA id a7-20020a17090640c700b007305d408b3dsm532188ejk.78.2022.11.03.07.01.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Nov 2022 07:01:23 -0700 (PDT)
+Message-ID: <d641088f-87d9-da77-7e98-92d1a9de6493@redhat.com>
+Date: Thu, 3 Nov 2022 15:01:21 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 10/44] KVM: VMX: Clean up eVMCS enabling if KVM
+ initialization fails
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Matthew Rosato <mjrosato@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: James Morse <james.morse@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Atish Patra <atishp@atishpatra.org>,
+ David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>,
+ Fabiano Rosas <farosas@linux.ibm.com>, Michael Ellerman
+ <mpe@ellerman.id.au>, Chao Gao <chao.gao@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Yuan Yao <yuan.yao@intel.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221102231911.3107438-11-seanjc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20221102231911.3107438-11-seanjc@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: qBPHBsV6cFHEd8MUfp3luW546x7XEBtX
-X-Proofpoint-GUID: PZHd2NjudsBQn9w2kOd6Znv6byrMRJIu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-03_04,2022-11-03_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 malwarescore=0 lowpriorityscore=0 suspectscore=0
- phishscore=0 impostorscore=0 adultscore=0 mlxscore=0 mlxlogscore=826
- spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211030090
-Message-ID: <20221103132117.iH3Lh-wHYIt6j1e5eeclHJcA7u8QlzCWEkTcqqXTlAU@z>
+Message-ID: <20221103140121.VPFx2nCkqIUI6OP24t2dQS1Zl1eL0kuhKv3E97edJj0@z>
 
-On Thu, 3 Nov 2022 13:44:15 +0100
-Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
+On 11/3/22 00:18, Sean Christopherson wrote:
+> +static void hv_cleanup_evmcs(void)
 
-> On Wed,  2 Nov 2022 23:18:52 +0000
-> Sean Christopherson <seanjc@google.com> wrote:
-> 
-> > Move the guts of kvm_arch_init() into a new helper, __kvm_s390_init(),
-> > and invoke the new helper directly from kvm_s390_init() instead of
-> > bouncing through kvm_init().  Invoking kvm_arch_init() is the very
-> > first action performed by kvm_init(), i.e. this is a glorified nop.
-> > 
-> > Moving setup to __kvm_s390_init() will allow tagging more functions as
-> > __init, and emptying kvm_arch_init() will allow dropping the hook
-> > entirely once all architecture implementations are nops.
-> > 
-> > No functional change intended.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/s390/kvm/kvm-s390.c | 29 +++++++++++++++++++++++++----
-> >  1 file changed, 25 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> > index 7fcd2d3b3558..e1c9980aae78 100644
-> > --- a/arch/s390/kvm/kvm-s390.c
-> > +++ b/arch/s390/kvm/kvm-s390.c
-> > @@ -461,7 +461,7 @@ static void kvm_s390_cpu_feat_init(void)
-> >  	 */
-> >  }
-> >  
-> > -int kvm_arch_init(void *opaque)
-> > +static int __kvm_s390_init(void)
-> >  {
-> >  	int rc = -ENOMEM;
-> >  
-> > @@ -519,7 +519,7 @@ int kvm_arch_init(void *opaque)
-> >  	return rc;
-> >  }
-> >  
-> > -void kvm_arch_exit(void)
-> > +static void __kvm_s390_exit(void)
-> >  {
-> >  	gmap_unregister_pte_notifier(&gmap_notifier);
-> >  	gmap_unregister_pte_notifier(&vsie_gmap_notifier);
-> > @@ -533,6 +533,16 @@ void kvm_arch_exit(void)
-> >  	debug_unregister(kvm_s390_dbf_uv);
-> >  }
-> >  
-> > +int kvm_arch_init(void *opaque)
-> > +{
-> > +	return 0;
-> > +}
-> > +
-> > +void kvm_arch_exit(void)
-> > +{
-> > +
-> > +}
-> > +  
-> 
-> I wonder at this point if it's possible to define kvm_arch_init and
-> kvm_arch_exit directly in kvm_main.c with __weak
+This needs to be __init.
 
-ah, nevermind, you get rid of them completely in the next patch
-
-> 
-> >  /* Section: device related */
-> >  long kvm_arch_dev_ioctl(struct file *filp,
-> >  			unsigned int ioctl, unsigned long arg)
-> > @@ -5634,7 +5644,7 @@ static inline unsigned long nonhyp_mask(int i)
-> >  
-> >  static int __init kvm_s390_init(void)
-> >  {
-> > -	int i;
-> > +	int i, r;
-> >  
-> >  	if (!sclp.has_sief2) {
-> >  		pr_info("SIE is not available\n");
-> > @@ -5650,12 +5660,23 @@ static int __init kvm_s390_init(void)
-> >  		kvm_s390_fac_base[i] |=
-> >  			stfle_fac_list[i] & nonhyp_mask(i);
-> >  
-> > -	return kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
-> > +	r = __kvm_s390_init();
-> > +	if (r)
-> > +		return r;
-> > +
-> > +	r = kvm_init(NULL, sizeof(struct kvm_vcpu), 0, THIS_MODULE);
-> > +	if (r) {
-> > +		__kvm_s390_exit();
-> > +		return r;
-> > +	}
-> > +	return 0;
-> >  }
-> >  
-> >  static void __exit kvm_s390_exit(void)
-> >  {
-> >  	kvm_exit();
-> > +
-> > +	__kvm_s390_exit();
-> >  }
-> >  
-> >  module_init(kvm_s390_init);  
-> 
+Paolo
 
