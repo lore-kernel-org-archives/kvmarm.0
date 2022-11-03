@@ -2,79 +2,86 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31DA2C4321E
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 15:47:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0E2DC433FE
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 16:58:47 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B08C1410DE;
-	Thu,  3 Nov 2022 11:47:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F2CD4B63E;
+	Thu,  3 Nov 2022 12:58:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id G5eWqFv8H5LW; Thu,  3 Nov 2022 11:47:26 -0400 (EDT)
+	with ESMTP id VjtnQ3Ar3TJS; Thu,  3 Nov 2022 12:58:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4F7F4B256;
-	Thu,  3 Nov 2022 11:47:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E330E4B27F;
+	Thu,  3 Nov 2022 12:58:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAC0A4B256
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 11:47:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AC0C94B636
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 23:50:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iKEwfCCFc9yy for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Nov 2022 11:47:24 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9CC7A4B0F4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 11:47:24 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 274AFB82685;
- Thu,  3 Nov 2022 15:47:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAB34C433C1;
- Thu,  3 Nov 2022 15:47:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1667490441;
- bh=YyjFEMcRcjqRDNSfbQWiVKeLBUUkpDMT5jdKO6cAdqQ=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=TDr9qyKe/+dTR8gWFGKeBUhaC6zf/8HOy2icfeIp2fkVHh6HFeOyvTa2yirYgH9Uv
- g4p6zC9ZdppboGONR9r7YwziMTpiF2HbXUtg0n8i+Kbk9k6mvoNu4xv3ZaKijU7d6d
- haM3m5tT7hYMlfh7UBfNTT13941UTyCsMsHT3eEQrZuKkF3vhVU7/yKO7UR6K+b6f7
- PgKJmetND26xArGRpkC53q/67oQ63maKXTe7hybvMkyeKQPiqAiOM9KosvFZYi+Lc8
- tWWbtpIOX7OWLWvK1l729EYpyaHJi41yIut+oPFcdNnuQbQk6jHeaLmxoBM4KJY8nk
- wkgc4wFHl4lbA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oqcR5-003Xxs-PC;
- Thu, 03 Nov 2022 15:47:19 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: yezengruan@huawei.com, steven.price@arm.com, catalin.marinas@arm.com,
- mark.rutland@arm.com, linux@armlinux.org.uk,
- Usama Arif <usama.arif@bytedance.com>, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
- will@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, bagasdotme@gmail.com
-Subject: Re: [PATCH] kvm/arm: Fix pvtime documentation
-Date: Thu,  3 Nov 2022 15:47:16 +0000
-Message-Id: <166749042515.2400683.5463582608696818455.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221103131210.3603385-1-usama.arif@bytedance.com>
-References: <20221103131210.3603385-1-usama.arif@bytedance.com>
+ with ESMTP id 3Ei8ozUsumQx for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Nov 2022 23:50:24 -0400 (EDT)
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com
+ [209.85.216.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3169D4B635
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 23:50:24 -0400 (EDT)
+Received: by mail-pj1-f42.google.com with SMTP id
+ d59-20020a17090a6f4100b00213202d77e1so4034308pjk.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 20:50:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=iWVR2ehQGeZFXPOJNknn3hmzbHnYOWV57filXnjqjrU=;
+ b=IljhQhIC/sgv7OmXIphyRoF1Fm2arV5E5U02Kgp8tUT+YAED6LwaG9RD4QoU9CUSP5
+ 1/JNzISZO7e0k7LVi4Nhh5KwB3CiEdhylwRBnpUuPf9JfG2iFOLa5bBg4N7u4W1/WhBl
+ LJQGh6yVWhaw0tytwIyyV/ZB5HPOV0pCuqYcSOAT9NwusSA0CGBvX+EyWy3UKnp5kXPg
+ nIFT6Dh82si3xpSAfsD2M3v8F8yWE/FhhpLtf3lkKEWv52m501EQ66Nykxayp1XTqDvL
+ WAWBvQlIHGidKNnNKDn8JmAbCkreN9tLcEXmsdG3J1CBqteqkisOYXXjzr5N4tg3qu+Q
+ 7XoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=iWVR2ehQGeZFXPOJNknn3hmzbHnYOWV57filXnjqjrU=;
+ b=aL2fKNTg2VnMcfcWbm5xL5C7PC6GBOe2I5g8jm94Z8p3oTIKoGfD0ZwWAorjbsJd2W
+ 8i66wtxzudwLNfw8Eb4HKlH1ahKEmmHfX5x1Qs1oBwBQBxUbbRppVPYSw67c7NbvPdS+
+ AqnQF+QVIhdmCmgbCOgJfnhWYknVgK4xpvRx8MC90+1vO2ItXxRG+sxcO0ccVOGmGy16
+ 32eqwc+uz9NG+kx53JnYPdx7SB6aMT05uNIYFGzARaZry33r2N24gL9US3SdpwHRM8xc
+ DNPPO9DDX9Hptpc7TBtlhQU+GE1LxWVkzSQB4wZptGByjDdsuYiwAQgHPbtZ556j2mq+
+ hbew==
+X-Gm-Message-State: ACrzQf1iOoN1rIlJV/DTYhVE0KrplGIT7LJOVTvcxJEbOKSK5gXzZri8
+ CRuSamJXIk23jjEfbEGHmSo=
+X-Google-Smtp-Source: AMsMyM59vsw1ww2iJDViww6QqEMLB7bqz+DWsHRCrrgQ+b/6qP0v4EaYmz/ye+GUsaHp7b3ofc0NxA==
+X-Received: by 2002:a17:90a:c78a:b0:212:e56b:2b17 with SMTP id
+ gn10-20020a17090ac78a00b00212e56b2b17mr29293540pjb.51.1667447423005; 
+ Wed, 02 Nov 2022 20:50:23 -0700 (PDT)
+Received: from debian.me (subs02-180-214-232-93.three.co.id. [180.214.232.93])
+ by smtp.gmail.com with ESMTPSA id
+ u18-20020a170902e81200b001868d4600b8sm9150731plg.158.2022.11.02.20.50.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 02 Nov 2022 20:50:21 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+ id 51DCA1032A1; Thu,  3 Nov 2022 10:50:18 +0700 (WIB)
+Date: Thu, 3 Nov 2022 10:50:17 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Usama Arif <usama.arif@bytedance.com>
+Subject: Re: [RFC 1/6] KVM: arm64: Document PV-lock interface
+Message-ID: <Y2M6eU6xW7jjVQNx@debian.me>
+References: <20221102161340.2982090-1-usama.arif@bytedance.com>
+ <20221102161340.2982090-2-usama.arif@bytedance.com>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yezengruan@huawei.com, steven.price@arm.com,
- catalin.marinas@arm.com, mark.rutland@arm.com, linux@armlinux.org.uk,
- usama.arif@bytedance.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, will@kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, bagasdotme@gmail.com,
- fam.zheng@bytedance.com, liangma@liangbit.com, punit.agrawal@bytedance.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: punit.agrawal@bytedance.com, fam.zheng@bytedance.com, liangma@liangbit.com
+In-Reply-To: <20221102161340.2982090-2-usama.arif@bytedance.com>
+X-Mailman-Approved-At: Thu, 03 Nov 2022 12:58:44 -0400
+Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ fam.zheng@bytedance.com, maz@kernel.org, punit.agrawal@bytedance.com,
+ linux@armlinux.org.uk, liangma@liangbit.com, steven.price@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,28 +93,231 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============8334494174869380707=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 3 Nov 2022 13:12:10 +0000, Usama Arif wrote:
-> This includes table format and using reST labels for
-> cross-referencing to vcpu.rst.
 
-Applied to kvm-arm64/misc-6.2, thanks!
+--===============8334494174869380707==
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="0kw+g6XS/JN44czt"
+Content-Disposition: inline
 
-[1/1] kvm/arm: Fix pvtime documentation
-      commit: e7442ac1da07910f4731cb812c05484e4be2d4de
 
-Cheers,
+--0kw+g6XS/JN44czt
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+On Wed, Nov 02, 2022 at 04:13:35PM +0000, Usama Arif wrote:
+> +    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D    =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +    Function ID:  (uint32)    0xC6000020
+> +    PV_call_id:   (uint32)    The function to query for support.
+> +                              Currently only PV_LOCK_PREEMPTED is suppor=
+ted.
+> +    Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the r=
+elevant
+> +                              PV-lock feature is supported by the hyperv=
+isor.
+> +    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D    =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +PV_LOCK_PREEMPTED
+> +    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D    =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +    Function ID:  (uint32)    0xC6000021
+> +    Return value: (int64)     IPA of the pv lock data structure for this
+> +                              VCPU. On failure:
+> +                              NOT_SUPPORTED (-1)
+> +    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D    =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
 
+You need to fix up these tables above:
+
+---- >8 ----
+
+diff --git a/Documentation/virt/kvm/arm/pvlock.rst b/Documentation/virt/kvm=
+/arm/pvlock.rst
+index 766aeef50b2d31..940a1cb221bc90 100644
+--- a/Documentation/virt/kvm/arm/pvlock.rst
++++ b/Documentation/virt/kvm/arm/pvlock.rst
+@@ -15,21 +15,23 @@ The existence of the PV_LOCK hypercall should be probed=
+ using the SMCCC 1.1
+ ARCH_FEATURES mechanism before calling it.
+=20
+ PV_LOCK_FEATURES
+-    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D    =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D    =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+     Function ID:  (uint32)    0xC6000020
+     PV_call_id:   (uint32)    The function to query for support.
+                               Currently only PV_LOCK_PREEMPTED is supporte=
+d.
+     Return value: (int64)     NOT_SUPPORTED (-1) or SUCCESS (0) if the rel=
+evant
+                               PV-lock feature is supported by the hypervis=
+or.
+-    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D    =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D    =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+=20
+ PV_LOCK_PREEMPTED
+-    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D    =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D    =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+     Function ID:  (uint32)    0xC6000021
+     Return value: (int64)     IPA of the pv lock data structure for this
+                               VCPU. On failure:
+                               NOT_SUPPORTED (-1)
+-    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D    =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D    =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+=20
+ The IPA returned by PV_LOCK_PREEMPTED should be mapped by the guest as nor=
+mal
+ memory with inner and outer write back caching attributes, in the inner
+
+The similar fixup should also be made to the tables in
+Documentation/virt/kvm/arm/pvtime.rst, though.
+
+> +The IPA returned by PV_LOCK_PREEMPTED should be mapped by the guest as n=
+ormal
+> +memory with inner and outer write back caching attributes, in the inner
+> +shareable domain.
+> +
+> +PV_LOCK_PREEMPTED returns the structure for the calling VCPU.
+> +
+> +PV lock state
+> +-------------
+> +
+> +The structure pointed to by the PV_LOCK_PREEMPTED hypercall is as follow=
+s:
+> +
+> ++-----------+-------------+-------------+-------------------------------=
+--+
+> +| Field     | Byte Length | Byte Offset | Description                   =
+  |
+> ++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
+> +| preempted |      8      |      0      | Indicate if the VCPU that owns=
+  |
+> +|           |             |             | this struct is running or not.=
+  |
+> +|           |             |             | Non-zero values mean the VCPU =
+  |
+> +|           |             |             | has been preempted. Zero means=
+  |
+> +|           |             |             | the VCPU is not preempted.    =
+  |
+> ++-----------+-------------+-------------+-------------------------------=
+--+
+> +
+> +The preempted field will be updated to 1 by the hypervisor prior to sche=
+duling
+> +a VCPU. When the VCPU is scheduled out, the preempted field will be upda=
+ted
+> +to 0 by the hypervisor.
+> +
+> +The structure will be present within a reserved region of the normal mem=
+ory
+> +given to the guest. The guest should not attempt to write into this memo=
+ry.
+> +There is a structure per VCPU of the guest.
+> +
+> +For the user space interface see Documentation/virt/kvm/devices/vcpu.rst
+> +section "4. GROUP: KVM_ARM_VCPU_PVLOCK_CTRL".
+
+Use reST labels for cross-referencing to the documentation section:
+
+---- >8 ----
+
+diff --git a/Documentation/virt/kvm/arm/pvlock.rst b/Documentation/virt/kvm=
+/arm/pvlock.rst
+index 940a1cb221bc90..4e9d09b76ef033 100644
+--- a/Documentation/virt/kvm/arm/pvlock.rst
++++ b/Documentation/virt/kvm/arm/pvlock.rst
+@@ -62,5 +62,5 @@ The structure will be present within a reserved region of=
+ the normal memory
+ given to the guest. The guest should not attempt to write into this memory.
+ There is a structure per VCPU of the guest.
+=20
+-For the user space interface see Documentation/virt/kvm/devices/vcpu.rst
+-section "4. GROUP: KVM_ARM_VCPU_PVLOCK_CTRL".
++For the user space interface see :ref:`KVM_VCPU_TSC_CTRL in Generic vcpu
++interface documentation <kvm-vcpu-tsc-ctrl>`.
+diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/k=
+vm/devices/vcpu.rst
+index 223ac2fe62f01f..6532f61073a39c 100644
+--- a/Documentation/virt/kvm/devices/vcpu.rst
++++ b/Documentation/virt/kvm/devices/vcpu.rst
+@@ -194,6 +194,8 @@ base address must be 64 byte aligned and exist within a=
+ valid guest memory
+ region. See Documentation/virt/kvm/arm/pvtime.rst for more information
+ including the layout of the stolen time structure.
+=20
++.. _kvm-vcpu-tsc-ctrl:
++
+ 4. GROUP: KVM_VCPU_TSC_CTRL
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+=20
+
+Also, you need to add the documentation to table of contents (index):
+
+---- >8 ----
+
+diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/=
+arm/index.rst
+index e8484843215808..b8499dc00a6a96 100644
+--- a/Documentation/virt/kvm/arm/index.rst
++++ b/Documentation/virt/kvm/arm/index.rst
+@@ -10,4 +10,5 @@ ARM
+    hyp-abi
+    hypercalls
+    pvtime
++   pvlock
+    ptp_kvm
+
+Thanks.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--0kw+g6XS/JN44czt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCY2M6dAAKCRD2uYlJVVFO
+o6ypAQC4gXIOLzJaG1xrERxYGFbFMVCxsI4H9zRtmvL0N59oZAD+I4W4aE89G8OC
+aMB8yxTT1P3MYgIXYCERt69q1eOhAw0=
+=7yrW
+-----END PGP SIGNATURE-----
+
+--0kw+g6XS/JN44czt--
+
+--===============8334494174869380707==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============8334494174869380707==--
