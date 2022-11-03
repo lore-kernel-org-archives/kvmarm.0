@@ -1,314 +1,150 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E967470
-	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 14:28:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1667485706;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xJXDTOdlX1XyIcsWYcqglWBdRZQ9xmr4YB2PW91lUtk=;
-	b=Y8o9aQnZ3G3tLMJAZhZOeEpVNqHwShtj8XyuSqKyvSHEtYaovx5MipVGXOSFwKPYMiPHbR
-	OGiMYMs2835Og8eywbo9aF8e/jeJTsYjzGGzqZSUHJo0uulT43/vrmIR0A0AIc92xJmNrJ
-	Z7W7qs5oLWx+iOyBPtrtly30VAio/IE=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-447-OrrYmC98MMaI4xLLYiZF1g-1; Thu, 03 Nov 2022 10:28:25 -0400
-X-MC-Unique: OrrYmC98MMaI4xLLYiZF1g-1
-Received: by mail-ej1-f72.google.com with SMTP id qb12-20020a1709077e8c00b007a6c5a23a30so1357181ejc.12
-        for <kvmarm@lists.linux.dev>; Thu, 03 Nov 2022 07:28:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCAFE7481
+	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 14:53:14 +0000 (UTC)
+Received: by mail-pj1-f54.google.com with SMTP id b1-20020a17090a7ac100b00213fde52d49so2019666pjl.3
+        for <kvmarm@lists.linux.dev>; Thu, 03 Nov 2022 07:53:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+EOoy7YAYLFDl3hhNdNz/Dei5v7yTMufGMRoDAJQwns=;
+        b=DtlCiaFP2I1bckyWh5G0FM0i+CkRoJ8mvsBb/FLYQ5vsiNn+K5Kfn7De9s3JQXuFWh
+         H7mPuPNypG5Va/KzQj7+sGaovbWc+tl9ROBGVKX1lFNt3evPO2v0Ei2ctaqdE05U/zux
+         ZiXZpPEwzB4r3+qncQCDYv4T/92auL3oUUc02wrbgRMQherqPxfkT4821kjSGSum4WAF
+         cGlsnWBV0J+2ixoR0C1djo6X1hgD0NHBSynA4HTves7BwMiQrC8xwko7rm9oM4O2V6Uy
+         qFUKvrrxD2R6qqNFAeG1x4eHJdcQUJhvaSkqajPP+WL+NtH6rCIZ4qohw7R1BfLL7kTB
+         g1iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xJXDTOdlX1XyIcsWYcqglWBdRZQ9xmr4YB2PW91lUtk=;
-        b=QD7J1/EHbGZzjR5ng1cnqKxK3WWoVU+PI0jONnDdLbynIp0VTiP/nSTXLCxd0IEiX5
-         5LyFxQHVlQtOhuMjdyxI60wbMF5gM92Bq4oDMVbEUEVMN83JYORd4L8IC0LX1gKRLU2b
-         L9H6UmpsI+pXYgFNShibvj3JTDQhOT3bB61GzaB/rM+Bl3ZZDYVyIYX6woj36jwaJM6z
-         9vCKydhJJp+KjkhvvD+6OTAUwVZOoCTUFsqvILnVBkDrC0q+Hh7TVHB7nHjwQ0g2X56w
-         WvdP3K3ZBpAd8W2jfHgkDlv6FRcgvPQ6BoowUMYZm7gdIORsDrqzUMw0yYMPoE7M5EA9
-         8e0A==
-X-Gm-Message-State: ACrzQf1gCffBw6nylfgTNOYGhm55e7Tu2cx1s7kzozitZhAvCJunqN9x
-	gr/kCq1sklZcNyQPX4brQBi7lovPmx9Tliu43DM2RkT0ccvt57/36m4cTxXOZ+LZWTI7kBBL2MK
-	Y2mk49bIo5KJNf7e6
-X-Received: by 2002:a17:907:6da3:b0:78e:2a5f:5aaf with SMTP id sb35-20020a1709076da300b0078e2a5f5aafmr29209481ejc.554.1667485703916;
-        Thu, 03 Nov 2022 07:28:23 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4/BLSlzeBmBH2wK2ozHzek7JvfdOrTUEgVR1Jkq3btzgsJIv9L2s0vi2zOnPRlcAj1lu9eWg==
-X-Received: by 2002:a17:907:6da3:b0:78e:2a5f:5aaf with SMTP id sb35-20020a1709076da300b0078e2a5f5aafmr29209446ejc.554.1667485703617;
-        Thu, 03 Nov 2022 07:28:23 -0700 (PDT)
-Received: from ovpn-194-252.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id r18-20020a1709061bb200b0073d7bef38e3sm558528ejg.45.2022.11.03.07.28.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 07:28:22 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: James Morse <james.morse@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Atish Patra
- <atishp@atishpatra.org>, David Hildenbrand <david@redhat.com>,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, Isaku Yamahata
- <isaku.yamahata@intel.com>, Fabiano Rosas <farosas@linux.ibm.com>, Michael
- Ellerman <mpe@ellerman.id.au>, Chao Gao <chao.gao@intel.com>, Thomas
- Gleixner <tglx@linutronix.de>, Yuan Yao <yuan.yao@intel.com>, Paolo
- Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, Huacai Chen
- <chenhuacai@kernel.org>, Aleksandar Markovic
- <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, Paul
- Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Matthew Rosato
- <mjrosato@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH 10/44] KVM: VMX: Clean up eVMCS enabling if KVM
- initialization fails
-In-Reply-To: <20221102231911.3107438-11-seanjc@google.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-11-seanjc@google.com>
-Date: Thu, 03 Nov 2022 15:28:21 +0100
-Message-ID: <87mt98qfi2.fsf@ovpn-194-252.brq.redhat.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+EOoy7YAYLFDl3hhNdNz/Dei5v7yTMufGMRoDAJQwns=;
+        b=eoXDKblPcOy/BpFokymjfnwxyDej5AiB3waEBT4huQAxiKoKzWXZlvML0SdGWq1yZH
+         SKX32cJw6IVWILEsg5SuYisTvpxdhfNWUHb1/NPRxtory7HcD5Xs8oCHOp7WFZjOJG5v
+         AtbT6oqfPn+DTFuMo+AzLeuQSL6NUS69R0zk/lHBihLeyZY8k1QQp7vH0nMjQjsdL8yO
+         SPdabMYTrrqXpOHaAe2h9DCmEwb43LB8s33iCIMh7gkancp9RJOsKphZuk5S6Gep3Ad9
+         EpDTJMQ+jHp/YqMDmnf4GuMwB2+tIsPmLCcRiirD67a+/dk1j1gcjXWAMeupAA6m5SUD
+         LAnA==
+X-Gm-Message-State: ACrzQf33AStTNLzDT2QOrTThpyrvjSCiqpUo02jiRrakGkXCO3QeA1nu
+	Zzh/oUTbxNSnB8BER5RSNYii50GlL4WQLMUqK7upxQ==
+X-Google-Smtp-Source: AMsMyM4WzkVgP+HlYu/hXxndYVEW+ikrBgoVSC2s61IT60dLmVa4lu36WrgsBoYQ7rj4vYLHvfKQny4wvHwqFcAzXQE=
+X-Received: by 2002:a17:903:22c1:b0:187:2ced:455f with SMTP id
+ y1-20020a17090322c100b001872ced455fmr17805199plg.18.1667487193938; Thu, 03
+ Nov 2022 07:53:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Message-ID: <20221103142821.kvg6LKCL9fOUMOui2w8sOqLeCfy54b60l3f6DrkCDQA@z>
+References: <20221028105402.2030192-1-maz@kernel.org> <20221028105402.2030192-11-maz@kernel.org>
+ <CAAeT=FycObU5eHaR23OZ_PeR6-cQeNrmGs=Mi-VnrVuWR6ovSg@mail.gmail.com> <87v8nwfmwb.wl-maz@kernel.org>
+In-Reply-To: <87v8nwfmwb.wl-maz@kernel.org>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Thu, 3 Nov 2022 07:52:57 -0700
+Message-ID: <CAAeT=Fz9pKey3=bc=Nzn=c8HZ=PhGmv4tTGkwmi2yiEHG9eM3Q@mail.gmail.com>
+Subject: Re: [PATCH v2 10/14] KVM: arm64: PMU: Move the ID_AA64DFR0_EL1.PMUver
+ limit to VM creation
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20221103145257.ukcEy-ANy9MSYP3GTcE4cWRwwJi-58odQgi_bVu6Bbo@z>
 
-Sean Christopherson <seanjc@google.com> writes:
+Hi Marc,
 
-> To make it obvious that KVM doesn't have a lurking bug, cleanup eVMCS
-> enabling if kvm_init() fails even though the enabling doesn't strictly
-> need to be unwound.  eVMCS enabling only toggles values that are fully
-> contained in the VMX module, i.e. it's technically ok to leave the values
-> as-is since they'll disappear entirely when the module is unloaded, but
-> doing proper cleanup is relatively simple, and having a chunk of code
-> that isn't unwound is confusing.
+On Thu, Nov 3, 2022 at 1:44 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 137 +++++++++++++++++++++++------------------
->  1 file changed, 78 insertions(+), 59 deletions(-)
+> Hi Reiji,
 >
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 05a747c9a9ff..b3fd4049de01 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -524,6 +524,8 @@ static inline void vmx_segment_cache_clear(struct vcpu_vmx *vmx)
->  static unsigned long host_idt_base;
->  
->  #if IS_ENABLED(CONFIG_HYPERV)
-> +static struct kvm_x86_ops vmx_x86_ops __initdata;
-> +
->  static bool __read_mostly enlightened_vmcs = true;
->  module_param(enlightened_vmcs, bool, 0444);
->  
-> @@ -552,6 +554,71 @@ static int hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu)
->  	return 0;
->  }
->  
-> +static __init void hv_setup_evmcs(void)
-> +{
-> +	int cpu;
-> +
-> +	if (!enlightened_vmcs)
-> +		return;
-> +
-> +	/*
-> +	 * Enlightened VMCS usage should be recommended and the host needs
-> +	 * to support eVMCS v1 or above.
-> +	 */
-> +	if (ms_hyperv.hints & HV_X64_ENLIGHTENED_VMCS_RECOMMENDED &&
-> +	    (ms_hyperv.nested_features & HV_X64_ENLIGHTENED_VMCS_VERSION) >=
-> +	     KVM_EVMCS_VERSION) {
-> +
-> +		/* Check that we have assist pages on all online CPUs */
-> +		for_each_online_cpu(cpu) {
-> +			if (!hv_get_vp_assist_page(cpu)) {
-> +				enlightened_vmcs = false;
-> +				break;
-> +			}
-> +		}
-> +
-> +		if (enlightened_vmcs) {
-> +			pr_info("KVM: vmx: using Hyper-V Enlightened VMCS\n");
-> +			static_branch_enable(&enable_evmcs);
-> +		}
-> +
-> +		if (ms_hyperv.nested_features & HV_X64_NESTED_DIRECT_FLUSH)
-> +			vmx_x86_ops.enable_direct_tlbflush
-> +				= hv_enable_direct_tlbflush;
-> +
-> +	} else {
-> +		enlightened_vmcs = false;
-> +	}
-> +}
-> +static void hv_cleanup_evmcs(void)
-> +{
-> +	struct hv_vp_assist_page *vp_ap;
-> +	int cpu;
-> +
-> +	if (!static_branch_unlikely(&enable_evmcs))
-> +		return;
-> +
-> +	/*
-> +	 * Reset everything to support using non-enlightened VMCS access later
-> +	 * (e.g. when we reload the module with enlightened_vmcs=0)
-> +	 */
-> +	for_each_online_cpu(cpu) {
-> +		vp_ap =	hv_get_vp_assist_page(cpu);
-> +
-> +		if (!vp_ap)
-> +			continue;
-> +
-> +		vp_ap->nested_control.features.directhypercall = 0;
-> +		vp_ap->current_nested_vmcs = 0;
-> +		vp_ap->enlighten_vmentry = 0;
-> +	}
+> On Thu, 03 Nov 2022 04:55:52 +0000,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > Hi Marc,
+> >
+> > On Fri, Oct 28, 2022 at 4:16 AM Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > >         case SYS_ID_DFR0_EL1:
+> > > -               /* Limit guests to PMUv3 for ARMv8.4 */
+> > > -               val = cpuid_feature_cap_perfmon_field(val,
+> > > -                                                     ID_DFR0_PERFMON_SHIFT,
+> > > -                                                     kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
+> > > +               val &= ~ARM64_FEATURE_MASK(ID_DFR0_PERFMON);
+> > > +               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_PERFMON),
+> > > +                                 pmuver_to_perfmon(vcpu_pmuver(vcpu)));
+> >
+> > Shouldn't KVM expose the sanitized value as it is when AArch32 is
+> > not supported at EL0 ? Since the register value is UNKNOWN when AArch32
+> > is not supported at EL0, I would think this code might change the PERFMON
+> > field value on such systems (could cause live migration to fail).
+>
+> I'm not sure this would cause anything to fail as we now treat all
+> AArch32 idregs as RAZ/WI when AArch32 isn't supported (and the
+> visibility callback still applies here).
 
-Unrelated to your patch but while looking at this code I got curious
-about why don't we need a protection against CPU offlining here. Turns
-out that even when we offline a CPU, its VP assist page remains
-allocated (see hv_cpu_die()), we just write '0' to the MSR and thus
-accessing the page is safe. The consequent hv_cpu_init(), however, does
-not restore VP assist page when it's already allocated:
+Oops, sorry I totally forgot about that change...
 
-# rdmsr -p 24 0x40000073
-10212f001
-# echo 0 > /sys/devices/system/cpu/cpu24/online 
-# echo 1 > /sys/devices/system/cpu/cpu24/online 
-# rdmsr -p 24 0x40000073
-0
+> But it doesn't hurt to make pmuver_to_perfmon() return 0 when AArch32
+> isn't supported, and it will at least make the ID register consistent
+> from a guest perspective.
 
-The culprit is commit e5d9b714fe402 ("x86/hyperv: fix root partition
-faults when writing to VP assist page MSR"). A patch is inbound.
+I believe the register will be consistent (0) even from a guest
+perspective with the current patch when AArch32 isn't supported
+because read_id_reg() checks that with sysreg_visible_as_raz()
+in the beginning.
 
-'hv_root_partition' case is different though. We do memunmap() and reset
-VP assist page to zero so it is theoretically possible we're going to
-clash. Unless I'm missing some obvious reason why module unload can't
-coincide with CPU offlining, we may be better off surrounding this with
-cpus_read_lock()/cpus_read_unlock(). 
+I withdraw my comment, and the patch looks good to me.
 
-> +
-> +	static_branch_disable(&enable_evmcs);
-> +}
-> +
-> +#else /* IS_ENABLED(CONFIG_HYPERV) */
-> +static void hv_setup_evmcs(void) {}
-> +static void hv_cleanup_evmcs(void) {}
->  #endif /* IS_ENABLED(CONFIG_HYPERV) */
->  
->  /*
-> @@ -8435,29 +8502,8 @@ static void vmx_exit(void)
->  
->  	kvm_exit();
->  
-> -#if IS_ENABLED(CONFIG_HYPERV)
-> -	if (static_branch_unlikely(&enable_evmcs)) {
-> -		int cpu;
-> -		struct hv_vp_assist_page *vp_ap;
-> -		/*
-> -		 * Reset everything to support using non-enlightened VMCS
-> -		 * access later (e.g. when we reload the module with
-> -		 * enlightened_vmcs=0)
-> -		 */
-> -		for_each_online_cpu(cpu) {
-> -			vp_ap =	hv_get_vp_assist_page(cpu);
-> +	hv_cleanup_evmcs();
->  
-> -			if (!vp_ap)
-> -				continue;
-> -
-> -			vp_ap->nested_control.features.directhypercall = 0;
-> -			vp_ap->current_nested_vmcs = 0;
-> -			vp_ap->enlighten_vmentry = 0;
-> -		}
-> -
-> -		static_branch_disable(&enable_evmcs);
-> -	}
-> -#endif
->  	vmx_cleanup_l1d_flush();
->  
->  	allow_smaller_maxphyaddr = false;
-> @@ -8468,43 +8514,12 @@ static int __init vmx_init(void)
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
+
+Thank you,
+Reiji
+
+>
+> I plan to squash the following (untested) hack in:
+>
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 8f4412cd4bf6..3b28ef48a525 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1094,6 +1094,10 @@ static u8 perfmon_to_pmuver(u8 perfmon)
+>
+>  static u8 pmuver_to_perfmon(u8 pmuver)
 >  {
->  	int r, cpu;
->  
-> -#if IS_ENABLED(CONFIG_HYPERV)
-> -	/*
-> -	 * Enlightened VMCS usage should be recommended and the host needs
-> -	 * to support eVMCS v1 or above. We can also disable eVMCS support
-> -	 * with module parameter.
-> -	 */
-> -	if (enlightened_vmcs &&
-> -	    ms_hyperv.hints & HV_X64_ENLIGHTENED_VMCS_RECOMMENDED &&
-> -	    (ms_hyperv.nested_features & HV_X64_ENLIGHTENED_VMCS_VERSION) >=
-> -	    KVM_EVMCS_VERSION) {
-> -
-> -		/* Check that we have assist pages on all online CPUs */
-> -		for_each_online_cpu(cpu) {
-> -			if (!hv_get_vp_assist_page(cpu)) {
-> -				enlightened_vmcs = false;
-> -				break;
-> -			}
-> -		}
-> -
-> -		if (enlightened_vmcs) {
-> -			pr_info("KVM: vmx: using Hyper-V Enlightened VMCS\n");
-> -			static_branch_enable(&enable_evmcs);
-> -		}
-> -
-> -		if (ms_hyperv.nested_features & HV_X64_NESTED_DIRECT_FLUSH)
-> -			vmx_x86_ops.enable_direct_tlbflush
-> -				= hv_enable_direct_tlbflush;
-> -
-> -	} else {
-> -		enlightened_vmcs = false;
-> -	}
-> -#endif
-> +	hv_setup_evmcs();
->  
->  	r = kvm_init(&vmx_init_ops, sizeof(struct vcpu_vmx),
->  		     __alignof__(struct vcpu_vmx), THIS_MODULE);
->  	if (r)
-> -		return r;
-> +		goto err_kvm_init;
->  
->  	/*
->  	 * Must be called after kvm_init() so enable_ept is properly set
-> @@ -8514,10 +8529,8 @@ static int __init vmx_init(void)
->  	 * mitigation mode.
->  	 */
->  	r = vmx_setup_l1d_flush(vmentry_l1d_flush_param);
-> -	if (r) {
-> -		vmx_exit();
-> -		return r;
-> -	}
-> +	if (r)
-> +		goto err_l1d_flush;
->  
->  	vmx_setup_fb_clear_ctrl();
->  
-> @@ -8542,5 +8555,11 @@ static int __init vmx_init(void)
->  		allow_smaller_maxphyaddr = true;
->  
->  	return 0;
+> +       /* If no AArch32, make the field RAZ */
+> +       if (!kvm_supports_32bit_el0())
+> +               return 0;
 > +
-> +err_l1d_flush:
-> +	vmx_exit();
-> +err_kvm_init:
-> +	hv_cleanup_evmcs();
-> +	return r;
->  }
->  module_init(vmx_init);
-
--- 
-Vitaly
-
+>         switch (pmuver) {
+>         case ID_AA64DFR0_EL1_PMUVer_IMP:
+>                 return ID_DFR0_PERFMON_8_0;
+> @@ -1302,10 +1306,9 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+>                            const struct sys_reg_desc *rd,
+>                            u64 val)
+>  {
+> -       u8 perfmon, host_perfmon = 0;
+> +       u8 perfmon, host_perfmon;
+>
+> -       if (system_supports_32bit_el0())
+> -               host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
+> +       host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
+>
+>         /*
+>          * Allow DFR0_EL1.PerfMon to be set from userspace as long as
+>
+> > I should have noticed this with the previous version...
+>
+> No worries, thanks a lot for having had a look!
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
