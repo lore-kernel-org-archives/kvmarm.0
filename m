@@ -2,83 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA15C433FE
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 15:43:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31DA2C4321E
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 15:47:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 487094B5F4;
-	Thu,  3 Nov 2022 11:43:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B08C1410DE;
+	Thu,  3 Nov 2022 11:47:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ol4-WDuqpqwY; Thu,  3 Nov 2022 11:43:00 -0400 (EDT)
+	with ESMTP id G5eWqFv8H5LW; Thu,  3 Nov 2022 11:47:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 235574B62D;
-	Thu,  3 Nov 2022 11:43:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4F7F4B256;
+	Thu,  3 Nov 2022 11:47:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 687274B269
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 11:42:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BAC0A4B256
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 11:47:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fT1o7zV3KJEb for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Nov 2022 11:42:57 -0400 (EDT)
+ with ESMTP id iKEwfCCFc9yy for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Nov 2022 11:47:24 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 48B904B256
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 11:42:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9CC7A4B0F4
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 11:47:24 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id DCDCAB8269B;
- Thu,  3 Nov 2022 15:42:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A648C433D6;
- Thu,  3 Nov 2022 15:42:54 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 274AFB82685;
+ Thu,  3 Nov 2022 15:47:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAB34C433C1;
+ Thu,  3 Nov 2022 15:47:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1667490174;
- bh=PmqtbmT9mQWma23ymagJ11tWufGstamjMkYv5eb/5qo=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=P02zYSj2EXx8UFjhs0W38mcmH7PPhDxFrPAs3DIwwhe6kVMB5ibwdAun3jGpCY3Y0
- M08VVoWub2n2hyrhtGRR+mmykQmLuUjOx4UNjXm1UNFay342V8GGHmWoTpGWxiOaKH
- u+Nb3RWExGgZHx0Tie5GDON9iPIaNrOz4o0S9sKqUM9AYwtKKEWBOLvdCL2C47/yYX
- 1ooW7JvbX5/t0zVJf1DccEtvFvn2k/ObkEawkO86X17x3V2vSX8ofZ2bXJYj+hwaqZ
- HLWQU546DfPaovhrx6xD/ATmcTYzFxi1OLvcUMh6DrdUDLb+OUf+r9/r10eCBExuhV
- v6tNjRSjvqybA==
-Received: from sofa.misterjones.org ([185.219.108.64]
- helo=goblin-girl.misterjones.org)
+ s=k20201202; t=1667490441;
+ bh=YyjFEMcRcjqRDNSfbQWiVKeLBUUkpDMT5jdKO6cAdqQ=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=TDr9qyKe/+dTR8gWFGKeBUhaC6zf/8HOy2icfeIp2fkVHh6HFeOyvTa2yirYgH9Uv
+ g4p6zC9ZdppboGONR9r7YwziMTpiF2HbXUtg0n8i+Kbk9k6mvoNu4xv3ZaKijU7d6d
+ haM3m5tT7hYMlfh7UBfNTT13941UTyCsMsHT3eEQrZuKkF3vhVU7/yKO7UR6K+b6f7
+ PgKJmetND26xArGRpkC53q/67oQ63maKXTe7hybvMkyeKQPiqAiOM9KosvFZYi+Lc8
+ tWWbtpIOX7OWLWvK1l729EYpyaHJi41yIut+oPFcdNnuQbQk6jHeaLmxoBM4KJY8nk
+ wkgc4wFHl4lbA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oqcMm-003Xt1-3n;
- Thu, 03 Nov 2022 15:42:52 +0000
-Date: Thu, 03 Nov 2022 15:42:51 +0000
-Message-ID: <86fsf0qc1w.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oqcR5-003Xxs-PC;
+ Thu, 03 Nov 2022 15:47:19 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
+To: yezengruan@huawei.com, steven.price@arm.com, catalin.marinas@arm.com,
+ mark.rutland@arm.com, linux@armlinux.org.uk,
+ Usama Arif <usama.arif@bytedance.com>, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ will@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, bagasdotme@gmail.com
 Subject: Re: [PATCH] kvm/arm: Fix pvtime documentation
-In-Reply-To: <24d81fe9-7cd1-71eb-8c35-0739f638b3df@gmail.com>
+Date: Thu,  3 Nov 2022 15:47:16 +0000
+Message-Id: <166749042515.2400683.5463582608696818455.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221103131210.3603385-1-usama.arif@bytedance.com>
 References: <20221103131210.3603385-1-usama.arif@bytedance.com>
- <24d81fe9-7cd1-71eb-8c35-0739f638b3df@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: bagasdotme@gmail.com, usama.arif@bytedance.com,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
- yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
- steven.price@arm.com, mark.rutland@arm.com, fam.zheng@bytedance.com,
- liangma@liangbit.com, punit.agrawal@bytedance.com
+X-SA-Exim-Rcpt-To: yezengruan@huawei.com, steven.price@arm.com,
+ catalin.marinas@arm.com, mark.rutland@arm.com, linux@armlinux.org.uk,
+ usama.arif@bytedance.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, will@kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, bagasdotme@gmail.com,
+ fam.zheng@bytedance.com, liangma@liangbit.com, punit.agrawal@bytedance.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
- linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
- Usama Arif <usama.arif@bytedance.com>, fam.zheng@bytedance.com,
- punit.agrawal@bytedance.com, linux@armlinux.org.uk, liangma@liangbit.com,
- steven.price@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: punit.agrawal@bytedance.com, fam.zheng@bytedance.com, liangma@liangbit.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,32 +91,22 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 03 Nov 2022 13:55:29 +0000,
-Bagas Sanjaya <bagasdotme@gmail.com> wrote:
-> 
-> On 11/3/22 20:12, Usama Arif wrote:
-> > This includes table format and using reST labels for
-> > cross-referencing to vcpu.rst.
-> > 
-> > Suggested-by:  Bagas Sanjaya <bagasdotme@gmail.com>
-> > Signed-off-by: Usama Arif <usama.arif@bytedance.com>
-> 
-> This is not what people normally do when given suggestion diff like
-> what I sent before [1]. Instead, they just apply and squash the
-> suggestion (while also applying requested changes from reviewers).
+On Thu, 3 Nov 2022 13:12:10 +0000, Usama Arif wrote:
+> This includes table format and using reST labels for
+> cross-referencing to vcpu.rst.
 
-No, this is the correct course of action. There isn't any point in
-having an *unrelated* change in a separate series. This is a
-standalone change, posted as a standalone patch.
+Applied to kvm-arm64/misc-6.2, thanks!
 
-> Please reroll your series [2] with suggestion applied.
+[1/1] kvm/arm: Fix pvtime documentation
+      commit: e7442ac1da07910f4731cb812c05484e4be2d4de
 
-Or not.
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
