@@ -1,113 +1,129 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF970A31
-	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 07:25:43 +0000 (UTC)
-Received: by mail-wr1-f41.google.com with SMTP id l14so1345076wrw.2
-        for <kvmarm@lists.linux.dev>; Thu, 03 Nov 2022 00:25:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EDXCjZngZdqFd0T8UNtaJgIVNUXtxy5kh+IvZcYgc3o=;
-        b=KBb4CRffvbqT8vCYmIjrzMCnn1vGDH3hTE8kztkuirWCWDx5vmnnhlY12+76G8HB+D
-         zNMscqf1aWjU1jn9Q/+2qznV1nyjnfJgJejU0eBLDst+wEJ5JP32F9KCikAYwccYRz/4
-         CEoS+rbiQf+EK76mQ+O07yD4/kZHVOkQQ4sHVGI67dP7iLfCkYZsRk0ZykZuinHxGqnw
-         VBepbg5NHi4yk+ONf1CC+WSt8MwwyKu83Az0OvU8HlQtsrRUhgNXczuxh+p9v62b1ye5
-         0/LNF3gKJJGGBQ4GVZwf3fHBWg9tW8pDxWcOYgxGkG6PYQEim2NR9gsO5CmPy3fAtv6n
-         sc3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EDXCjZngZdqFd0T8UNtaJgIVNUXtxy5kh+IvZcYgc3o=;
-        b=t4R39bSDJj5aBTDxNAJ4IlOofK47hZWbO2nlvYc5vRRryW2ODK07yAeSCjXsqPJMNF
-         7BM34/BP9ynsYc6aK848xgGOaQtLtDU4AO7s2QQvGHV1qin1Hnk6wwmFcDNuP77Ee4Mp
-         FDcS2CLBnglAJLcGnbaJcUWZ78BuM9MQy+4wXL1yj1cIjRsbElvoVW8vDkv9qHleMRWa
-         B3oUCTkNwQ3dGfxCFsZcmf1Sr/hyN8gPSyH/vEnYSxvP4zw0GK2j76HOvRifzn7PTNJk
-         z3fIW04VMiwmoQaW3fAFHX84/snWROpt8upp43ObKFkQ3bslutaC/EthiMxspzPPNQa4
-         J03A==
-X-Gm-Message-State: ACrzQf0EL3WRlJ2ZS+8ieLtf+Czcg7C/oQYrIwPJIPJcy88vd32rUaAs
-	1HH+JZxJDvPvg350iBXHFF2z2QB0M/hWkw==
-X-Google-Smtp-Source: AMsMyM74HX/NoI0zgj7ni+fuzXHxAnM/kiJpMAz2sP8bktGhOQR4suw74I3bBM5aFs9fFpQjlVL3zA==
-X-Received: by 2002:a5d:50ca:0:b0:236:776c:3075 with SMTP id f10-20020a5d50ca000000b00236776c3075mr17956880wrt.656.1667460341889;
-        Thu, 03 Nov 2022 00:25:41 -0700 (PDT)
-Received: from [192.168.11.175] (216.red-88-29-181.dynamicip.rima-tde.net. [88.29.181.216])
-        by smtp.gmail.com with ESMTPSA id i10-20020a1c540a000000b003a3442f1229sm4408723wmb.29.2022.11.03.00.25.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Nov 2022 00:25:40 -0700 (PDT)
-Message-ID: <dd59d579-4a4e-6db2-eac4-6c5c3ab71fd3@linaro.org>
-Date: Thu, 3 Nov 2022 08:25:37 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33D1A23
+	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 08:44:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58B01C433C1;
+	Thu,  3 Nov 2022 08:44:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1667465084;
+	bh=6HC9cTjR3pmiIrioiO/OBwZqM/LEtqKSCEjcsbP+fGI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=G2/kSK4Y8xOTxpDstBuax/vzYlsm6ACyl6drdUdvPiCcyPostYlvl2G6kg/6jbHwJ
+	 Z+RjHZOpW6HrHWOpzc4vgS81QiYKFtobUuq7FUHtDq+Qp8CCRTew21RstOr5e+Sukl
+	 pLkzt3fUn++0dcQAUwmGDrtBU/+hJMnkInHSV6qI10kuSWR+Qth3QjB6Kcr+JUX9kR
+	 aM+qJ6d5s/+f5JvE4LMK0PrA0MwybSqa+YTM1z8UWfOsrk/YoWnT8uuAGPXOEFSXev
+	 U2rYpnlRwGh/z/7M0ztjfFFpJzzEVND0GC2f1jBMk2n/XILEgKT4XfEihaDm9FkHtd
+	 PRRTq8pSauVNQ==
+Received: from 82-132-225-179.dab.02.net ([82.132.225.179] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1oqVq4-003S3p-Ue;
+	Thu, 03 Nov 2022 08:44:41 +0000
+Date: Thu, 03 Nov 2022 08:44:04 +0000
+Message-ID: <87v8nwfmwb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Reiji Watanabe <reijiw@google.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v2 10/14] KVM: arm64: PMU: Move the ID_AA64DFR0_EL1.PMUver limit to VM creation
+In-Reply-To: <CAAeT=FycObU5eHaR23OZ_PeR6-cQeNrmGs=Mi-VnrVuWR6ovSg@mail.gmail.com>
+References: <20221028105402.2030192-1-maz@kernel.org>
+	<20221028105402.2030192-11-maz@kernel.org>
+	<CAAeT=FycObU5eHaR23OZ_PeR6-cQeNrmGs=Mi-VnrVuWR6ovSg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.4.1
-Subject: Re: [PATCH 17/44] KVM: arm64: Do arm/arch initialiation without
- bouncing through kvm_init()
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Atish Patra <atishp@atishpatra.org>,
- David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>,
- Fabiano Rosas <farosas@linux.ibm.com>, Michael Ellerman
- <mpe@ellerman.id.au>, Chao Gao <chao.gao@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>, Yuan Yao <yuan.yao@intel.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-18-seanjc@google.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20221102231911.3107438-18-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-ID: <20221103072537.jDAZcULp4tAdEuOFWBn01U9Z7P4km7DRxHmCTQSGMNU@z>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.132.225.179
+X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221103084404.4Jw_fV5kU_ip2NqOgjfgsAiDCdbegVSIzd6Bgcpl2SI@z>
 
-Hi Sean,
+Hi Reiji,
 
-On 3/11/22 00:18, Sean Christopherson wrote:
-> Move arm/arch specific initialization directly in arm's module_init(),
-> now called kvm_arm_init(), instead of bouncing through kvm_init() to
-> reach kvm_arch_init().  Invoking kvm_arch_init() is the very first action
-> performed by kvm_init(), i.e. this is a glorified nop.
+On Thu, 03 Nov 2022 04:55:52 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> Making kvm_arch_init() a nop will allow dropping it entirely once all
-> other architectures follow suit.
+> Hi Marc,
 > 
-> No functional change intended.
+> On Fri, Oct 28, 2022 at 4:16 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> >         case SYS_ID_DFR0_EL1:
+> > -               /* Limit guests to PMUv3 for ARMv8.4 */
+> > -               val = cpuid_feature_cap_perfmon_field(val,
+> > -                                                     ID_DFR0_PERFMON_SHIFT,
+> > -                                                     kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
+> > +               val &= ~ARM64_FEATURE_MASK(ID_DFR0_PERFMON);
+> > +               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_PERFMON),
+> > +                                 pmuver_to_perfmon(vcpu_pmuver(vcpu)));
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/arm64/kvm/arm.c | 25 ++++++++++++++++---------
->   1 file changed, 16 insertions(+), 9 deletions(-)
+> Shouldn't KVM expose the sanitized value as it is when AArch32 is
+> not supported at EL0 ? Since the register value is UNKNOWN when AArch32
+> is not supported at EL0, I would think this code might change the PERFMON
+> field value on such systems (could cause live migration to fail).
 
->   /* NOP: Compiling as a module not supported */
->   void kvm_arch_exit(void)
->   {
-> -	kvm_unregister_perf_callbacks();
+I'm not sure this would cause anything to fail as we now treat all
+AArch32 idregs as RAZ/WI when AArch32 isn't supported (and the
+visibility callback still applies here).
 
-Doesn't this belong to the previous patch?
+But it doesn't hurt to make pmuver_to_perfmon() return 0 when AArch32
+isn't supported, and it will at least make the ID register consistent
+from a guest perspective.
 
-> +
->   }
+I plan to squash the following (untested) hack in:
 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 8f4412cd4bf6..3b28ef48a525 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1094,6 +1094,10 @@ static u8 perfmon_to_pmuver(u8 perfmon)
+ 
+ static u8 pmuver_to_perfmon(u8 pmuver)
+ {
++       /* If no AArch32, make the field RAZ */
++       if (!kvm_supports_32bit_el0())
++               return 0;
++
+        switch (pmuver) {
+        case ID_AA64DFR0_EL1_PMUVer_IMP:
+                return ID_DFR0_PERFMON_8_0;
+@@ -1302,10 +1306,9 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+                           const struct sys_reg_desc *rd,
+                           u64 val)
+ {
+-       u8 perfmon, host_perfmon = 0;
++       u8 perfmon, host_perfmon;
+ 
+-       if (system_supports_32bit_el0())
+-               host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
++       host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
+ 
+        /*
+         * Allow DFR0_EL1.PerfMon to be set from userspace as long as
+
+> I should have noticed this with the previous version...
+
+No worries, thanks a lot for having had a look!
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
