@@ -1,128 +1,131 @@
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EC763A0
-	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 17:53:36 +0000 (UTC)
-Received: by mail-pg1-f179.google.com with SMTP id f63so2333909pgc.2
-        for <kvmarm@lists.linux.dev>; Thu, 03 Nov 2022 10:53:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3tXwq1v6tJCedr2VtV8ELYd8BpIXTKwmGjuY8weIxs8=;
-        b=gjqnoLy192oz/Zxvag+BlBreQGGSfkeJOmpmCEx7rtJpm2GzAgZsoDzOerCZhLAwiY
-         s4s7ScvfoZl8zwg6HI1Ymb7QpOkn2NxzwKs5NTcMl1wbeFQ/hmv3VmCXwSollG4iohk8
-         ZfCLF4UOQot0TZFoB2ZSgy0wzT2PFfm47J97NCOCE8O1C25eIzJzc1jTDAryWTakKtb6
-         +QR4ykcFsYtONZVST62uH0g9I4NSfzwB8k/a9JLQz8I+tNs7JhVckzNuFRTBv1+mgFsk
-         IdkM799qrsruF4xx+MeYDtb4Sd8Y4cxbHh++70LJo94wIuv8aLLKYeYlUVyl7mOC3bBK
-         Ww4w==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CD463A0
+	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 17:58:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1667498282;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yqxXm7t2WOic9y4ISYxOwK8KmYTr1cBIHzcg/Vydbzs=;
+	b=JO0fY+VMuNNNhB9GwqiOZKCp7OisVtjP792TK1lpPDIfzSzbT7aAJufF3oHGhVTVFyZUGQ
+	ypXwi8rVRS4QmQA6Lg0x3F8li1VJ7ovfimxJHpMQGE6P6HtY23MmbmBQro9xR8QSBVNE47
+	UJ/Be44vj5/GmEQJYh7tSZhvW+53jI8=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-288-R1QxJvaUNrCc9OZB0tRi_g-1; Thu, 03 Nov 2022 13:58:01 -0400
+X-MC-Unique: R1QxJvaUNrCc9OZB0tRi_g-1
+Received: by mail-ej1-f71.google.com with SMTP id he6-20020a1709073d8600b0078e20190301so1748668ejc.22
+        for <kvmarm@lists.linux.dev>; Thu, 03 Nov 2022 10:58:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3tXwq1v6tJCedr2VtV8ELYd8BpIXTKwmGjuY8weIxs8=;
-        b=N/ixmfg+E77R2vC5k7aCTa8G55MyAiKIjVnXiELx+6q6OBlyoKz1c7Abnmo1d99QP0
-         H20ENMru+h+1/0q05IVdtXvBCC1HKBPxwkYd+x0L7xzdD1AhXslh9yzEmhnIzCbfJbM5
-         Tn2Z7dhM5Mf8isvWali059BhF2Ce7HAIku/syLqQhTfFrSZv+sfi3n1ztH4TlvlQfIZJ
-         wCZtiYo6HOMUa9UIlw6u7koqC+UDhX8LarE4vHDs3Bwg7qNS6aPjbxN6cX7eBrWb/gE7
-         PSjizkivCIEWDcP8bubnksNORw9ZTsXMlVJtZlBgVHihKFzqupyyoZcxaJQDh8Bsl1yh
-         rT0g==
-X-Gm-Message-State: ACrzQf32950DBrmX4tL0Mj9Rq1UztoFZ4P3FiWcBzAp0kBqNYAfb8XQD
-	U+6Psd5RsMntIv72h+G23gLHKg==
-X-Google-Smtp-Source: AMsMyM5pSkjZTiut6RFho0StQnuo7qAiklz26C63x768BJpOt4UV7sKT8fcspUYyR/B7P1xdFXKPhA==
-X-Received: by 2002:a05:6a00:999:b0:56c:3d0d:96fe with SMTP id u25-20020a056a00099900b0056c3d0d96femr31657100pfg.12.1667498015565;
-        Thu, 03 Nov 2022 10:53:35 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id e20-20020a63e014000000b0045ff216a0casm1080329pgh.3.2022.11.03.10.53.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 10:53:35 -0700 (PDT)
-Date: Thu, 3 Nov 2022 17:53:31 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Atish Patra <atishp@atishpatra.org>,
-	David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Fabiano Rosas <farosas@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
-	Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 39/44] KVM: Drop kvm_count_lock and instead protect
- kvm_usage_count with kvm_lock
-Message-ID: <Y2QAG0wCPNv7atC/@google.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-40-seanjc@google.com>
- <7b6ce80e-7f1f-11cd-8bde-8d8fa9fd7e1d@redhat.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yqxXm7t2WOic9y4ISYxOwK8KmYTr1cBIHzcg/Vydbzs=;
+        b=rwxf9t0caEsPnzoyu3DtY+VlF+BJIbdsgN3ltJvUP9CF7BCJHVYegm1NeflOJ/FnCJ
+         6GeC0VCjQRtPhdAoe9bdW92W+JdBPpZFV0JX5MD1ttfpqEbxJpYgwFKvmEvmhpFPkJES
+         a6aVAHvhSxE7BuCijYnKO21mIu7ILQ9Wvpf+5LOuZ7IVo9tvqy4jPJRGLWOsAmE9lgYq
+         i/jtPlJG0/J1o8yHyTt1+CWlf9FjjtVobgOKV+vJBUhcS9gkoiHQlBPLTBOfhBOrYvdS
+         EM8jbik8flfoH+7yG+qBH4kSsRZlZHxc6Ly7IOh9Q19m0HlivQMUcNtbR3Co225zHI3E
+         u6Ng==
+X-Gm-Message-State: ACrzQf1BH4RmaZlUb7UcX7Uy9chqK4rFfnT+ZuAhkQE8Fu+f/k81d2YV
+	i4OCkIh07c1PmZCQ6hrzXMZLyf+p+3gAc0ZhKzX+PyLE+MzfI5F1WrjSi564N3RPEEIogpGO0LZ
+	6VSu+4PBxjE+4nBzZ
+X-Received: by 2002:a17:907:a087:b0:7ad:a2ec:1afa with SMTP id hu7-20020a170907a08700b007ada2ec1afamr30061861ejc.151.1667498280032;
+        Thu, 03 Nov 2022 10:58:00 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6QZmNq5hCph1jlllZl0PdTQdpFjKynjhfU4TqqXsTy2ri356CZrCrEtJkVH+I+gMfL+O9fNA==
+X-Received: by 2002:a17:907:a087:b0:7ad:a2ec:1afa with SMTP id hu7-20020a170907a08700b007ada2ec1afamr30061831ejc.151.1667498279805;
+        Thu, 03 Nov 2022 10:57:59 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+        by smtp.googlemail.com with ESMTPSA id l3-20020a170907914300b0078d76ee7543sm734215ejs.222.2022.11.03.10.57.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Nov 2022 10:57:58 -0700 (PDT)
+Message-ID: <1fd2e729-6e46-b0bf-d89e-f5d1b4dbde77@redhat.com>
+Date: Thu, 3 Nov 2022 18:57:55 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7b6ce80e-7f1f-11cd-8bde-8d8fa9fd7e1d@redhat.com>
-Message-ID: <20221103175331.lSOkwvxFKRGilk-JAki1k3tJ40fddBJZChsN4qFOg68@z>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 36/44] KVM: x86: Do compatibility checks when onlining CPU
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Matthew Rosato <mjrosato@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, James Morse <james.morse@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Atish Patra <atishp@atishpatra.org>,
+ David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>,
+ Fabiano Rosas <farosas@linux.ibm.com>, Michael Ellerman
+ <mpe@ellerman.id.au>, Chao Gao <chao.gao@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Yuan Yao <yuan.yao@intel.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221102231911.3107438-37-seanjc@google.com>
+ <23bfd709-f99a-5a74-e4b9-1381b88453f1@redhat.com>
+ <Y2P+E+631c0TNcK7@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Y2P+E+631c0TNcK7@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-ID: <20221103175755.6-SY03lSaLlI4Tb_5rj-SbPtKUkgMnxuZ5ZurZI8jXg@z>
 
-On Thu, Nov 03, 2022, Paolo Bonzini wrote:
-> On 11/3/22 00:19, Sean Christopherson wrote:
-> > +- kvm_lock is taken outside kvm->mmu_lock
+On 11/3/22 18:44, Sean Christopherson wrote:
+>>> Do compatibility checks when enabling hardware to effectively add
+>>> compatibility checks when onlining a CPU.  Abort enabling, i.e. the
+>>> online process, if the (hotplugged) CPU is incompatible with the known
+>>> good setup.
+>>
+>> This paragraph is not true with this patch being before "KVM: Rename and
+>> move CPUHP_AP_KVM_STARTING to ONLINE section".
+>
+> Argh, good eyes.  Getting the ordering correct in this series has been quite the
+> struggle.  Assuming there are no subtle dependencies between x86 and common KVM,
+> the ordering should be something like this:
+
+It's not a problem to keep the ordering in this v1, just fix the commit 
+message like "Do compatibility checks when enabling hardware to 
+effectively add compatibility checks on CPU hotplug.  For now KVM is 
+using a STARTING hook, which makes it impossible to abort the hotplug if 
+the new CPU is incompatible with the known good setup; switching to an 
+ONLINE hook will fix this."
+
+Paolo
+
+>    KVM: Opt out of generic hardware enabling on s390 and PPC
+>    KVM: Register syscore (suspend/resume) ops early in kvm_init()
+>    KVM: x86: Do compatibility checks when onlining CPU
+>    KVM: SVM: Check for SVM support in CPU compatibility checks
+>    KVM: VMX: Shuffle support checks and hardware enabling code around
+>    KVM: x86: Do VMX/SVM support checks directly in vendor code
+>    KVM: x86: Unify pr_fmt to use module name for all KVM modules
+>    KVM: x86: Use KBUILD_MODNAME to specify vendor module name
+>    KVM: Make hardware_enable_failed a local variable in the "enable all" path
+>    KVM: Use a per-CPU variable to track which CPUs have enabled virtualization
+>    KVM: Remove on_each_cpu(hardware_disable_nolock) in kvm_exit()
+>    KVM: Drop kvm_count_lock and instead protect kvm_usage_count with kvm_lock
+>    KVM: Disable CPU hotplug during hardware enabling
+>    KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
+>    KVM: Drop kvm_arch_check_processor_compat() hook
 > 
-> Not surprising since one is a mutex and one is an rwlock. :)
 
-Heh, 
-
-  Signed-off-by: Captain Obvious <seanjc@google.com>
-
-> You can drop this hunk as well as the "Opportunistically update KVM's locking
-> documentation" sentence in the commit message.
-
-Will do.
-
-> >   - vcpu->mutex is taken outside kvm->arch.hyperv.hv_lock
-> >   - kvm->arch.mmu_lock is an rwlock.  kvm->arch.tdp_mmu_pages_lock and
-> > @@ -216,15 +220,11 @@ time it will be set using the Dirty tracking mechanism described above.
-> >   :Type:		mutex
-> >   :Arch:		any
-> >   :Protects:	- vm_list
-> > -
-> > -``kvm_count_lock``
-> > -^^^^^^^^^^^^^^^^^^
-> > -
-> > -:Type:		raw_spinlock_t
-> > -:Arch:		any
-> > -:Protects:	- hardware virtualization enable/disable
-> > -:Comment:	'raw' because hardware enabling/disabling must be atomic /wrt
-> > -		migration.
-> > +		- kvm_usage_count
-> > +		- hardware virtualization enable/disable
-> > +		- module probing (x86 only)
-> 
-> What do you mean exactly by "module probing"?  Is it anything else than what
-> is serialized by vendor_module_lock?
-
-Ooh, I forgot to update this patch after switching to vendor_module_lock.  I
-added the above after fixing the first deadlock between kvm_lock and cpu_hotplug_lock,
-but later gave up on trying to use kvm_lock after deadlock #2, which is when I
-when I realized piggybacking kvm_lock was going to be a maintainance nightmare due.
