@@ -1,99 +1,141 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F42863CF
-	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 19:33:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1667504007;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bHrHw67H9V40qrnDXssLTsxUZ9uLutx6BAx0o7ln+HQ=;
-	b=KejkPwYt2au5GpvN1Qh0KA878HSbh5EnK/i74TDp2gOWCjZJLPDhLfKx90ZZwEMsOgSnBE
-	XQEQeP4aEx8naeddq/VBgIKWKglmkNfC5gdYS5lvDXHlWJU/2Y4ff+iqU6qQ6afDzkqcoJ
-	BX0ZUnB4Stg0LKswanX7sEEVaIvpdfk=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-18-R14Pp8gxNliAX59tI00Qdw-1; Thu, 03 Nov 2022 15:33:26 -0400
-X-MC-Unique: R14Pp8gxNliAX59tI00Qdw-1
-Received: by mail-qt1-f200.google.com with SMTP id fp9-20020a05622a508900b003a503ff1d4cso2495427qtb.22
-        for <kvmarm@lists.linux.dev>; Thu, 03 Nov 2022 12:33:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB77B29A8
+	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 21:04:04 +0000 (UTC)
+Received: by mail-pj1-f54.google.com with SMTP id h14so2816054pjv.4
+        for <kvmarm@lists.linux.dev>; Thu, 03 Nov 2022 14:04:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RKpWMQos6VVD1S/I4lACLsmO/tYS5LRA7d2ENkEKbRo=;
+        b=W1jfdVvCiC74H1TrCZBHpy39zmLx6ZdDw7CTvEA3hQRy2SYEYEHpqHKEqbYIPLurIe
+         Y2whGNqDI5mui4w+1QXrkHh+GC9ATmNd8ps8PeHw3qaJpwgt1d7jvMCXqs25Zy8Lpx4o
+         BRkdqU5nSWSpkaBgaA/lV+5CSWVpabSirQHa1cejuentrhT/uERBbBImlSMJgf6A967J
+         fjOlpx3kn0dIaEHhhAKeVdXj4/EkPaL2dmbdM+AJdzuPv1TA2eEp2KkYLi7TVhEuAixL
+         VUk9wO+wTZMMnlMLn0pWY/lQ/5O1/2ysb54mA9Nupm245dVRVUlabq2dQWglwCNzBaAj
+         yq6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bHrHw67H9V40qrnDXssLTsxUZ9uLutx6BAx0o7ln+HQ=;
-        b=DEfd0Gt7aMiv+HUAMqH0krSgyabJeUMNaedJNB2mF3kGSoN1gap3t36gZlYMpiT5Kw
-         tZoD9uVUmpvYnc52gy6eufU/fKCPCdc4ebRt/pvtw8ukcxD7yIhQ2vAfznJHozxoCW7b
-         2plzmMbP9qkNJOQM33XO9UM3EYQcXDatHP6QqRnPlPxMKYLNjLn27EY791Pf9XBOSIlL
-         CgdeMk5Qsx1ixazZtENWOH0ngOTw3Q9gPeeClQXSOcEEwawk8Quw8yCKFMAFiElbuJAq
-         RanF4Fj6s7mzH3g5R6u8186ZyvnmCGe5pE1RDE+b+2vFccOlIHWb9PpaiTnqKkQHX2yw
-         a53w==
-X-Gm-Message-State: ACrzQf23OJNjs74R2LeT7JPdISiry0smjLF3UMM1Yv9x8l81EzB+P16S
-	dCmVYXrJEPTtPjqRSGWRLTXF2F/1lIP/vQe9h8/mtadDqHC3WSlXnbKtuf0uN51x/Byu+VVJX2P
-	ZLQ1q/f4/fq8RuO/F
-X-Received: by 2002:ac8:4e89:0:b0:39c:c025:887a with SMTP id 9-20020ac84e89000000b0039cc025887amr26208776qtp.413.1667504005640;
-        Thu, 03 Nov 2022 12:33:25 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4R+CVRPC2arwivP79Qld/IvHiKE/cb49gnSORd3djcfXtq8j0yR40+W1k4QyB1f4cAEtdMdA==
-X-Received: by 2002:ac8:4e89:0:b0:39c:c025:887a with SMTP id 9-20020ac84e89000000b0039cc025887amr26208742qtp.413.1667504005412;
-        Thu, 03 Nov 2022 12:33:25 -0700 (PDT)
-Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
-        by smtp.gmail.com with ESMTPSA id h4-20020a05620a400400b006eea4b5abcesm1353401qko.89.2022.11.03.12.33.23
+        bh=RKpWMQos6VVD1S/I4lACLsmO/tYS5LRA7d2ENkEKbRo=;
+        b=1aBxodBRaWo9KdjdJK+QrDCERreBPCxcdTtvmQIRuIacYe6m30XAoiZILPAXRoDhDi
+         Inrdhk6MoSlQP0hGaBZtEX1PqIOIZWuxvfJZEUPKjE2xPpBIlqatmIeqy+sR448iRZ/b
+         k9DQWfZkl+Jl5kgtBWzklBPwhaav0F6mV9lgqQyiQAYZantPDGWwVRig6Ql46fw1Euu2
+         iungyt9FbksZIz75GLgudw3fzaG3m9FUZEQ9nSXzfBnuzOBRC0T+im1Oy706ZISLtEvR
+         4NF6zW04VAun0U2rRJROINlU68QIUDEIc6ijp884zJvW36bGwlk+jPyV4AMKtDP0998T
+         MqQA==
+X-Gm-Message-State: ACrzQf3ptj8rDCEonlHLjKZNLgXDMtUIrdleeg6Y4Kj7olFOFIAwgv33
+	TyJG7vTi3DJSi+vlmbkSy1A=
+X-Google-Smtp-Source: AMsMyM4B7LXLMUo1WLny520SMeR1sIUEIak6LqJqMDk6N+6eScsWNFNrZpvHK/6RhT2SJsSNsCUIWw==
+X-Received: by 2002:a17:902:e5c5:b0:186:5f09:8468 with SMTP id u5-20020a170902e5c500b001865f098468mr32699741plf.122.1667509444114;
+        Thu, 03 Nov 2022 14:04:04 -0700 (PDT)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id 27-20020a63125b000000b0046a1c832e9fsm1137383pgs.34.2022.11.03.14.04.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 12:33:24 -0700 (PDT)
-Date: Thu, 3 Nov 2022 15:33:23 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Gavin Shan <gshan@redhat.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
-	ajones@ventanamicro.com, maz@kernel.org, bgardon@google.com,
-	catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
-	pbonzini@redhat.com, oliver.upton@linux.dev, seanjc@google.com,
-	james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
-	alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v7 4/9] KVM: Support dirty ring in conjunction with bitmap
-Message-ID: <Y2QXg5BMl8lMufro@x1n>
-References: <20221031003621.164306-1-gshan@redhat.com>
- <20221031003621.164306-5-gshan@redhat.com>
+        Thu, 03 Nov 2022 14:04:03 -0700 (PDT)
+Date: Thu, 3 Nov 2022 14:04:02 -0700
+From: Isaku Yamahata <isaku.yamahata@gmail.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Atish Patra <atishp@atishpatra.org>,
+	David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	Fabiano Rosas <farosas@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
+	Yuan Yao <yuan.yao@intel.com>, isaku.yamahata@gmail.com
+Subject: Re: [PATCH 36/44] KVM: x86: Do compatibility checks when onlining CPU
+Message-ID: <20221103210402.GB1063309@ls.amr.corp.intel.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221102231911.3107438-37-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20221031003621.164306-5-gshan@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Message-ID: <20221103193323.0d0pFA5NrPxzLIxTQF-Oji55MnhrQvYfWzyRDxzdBAw@z>
+In-Reply-To: <20221102231911.3107438-37-seanjc@google.com>
+Message-ID: <20221103210402.k6iUGQ_7IkRhhvnWL_nsfpMSyYhli8bBqQmKNRG_-2s@z>
 
-On Mon, Oct 31, 2022 at 08:36:16AM +0800, Gavin Shan wrote:
-> ARM64 needs to dirty memory outside of a VCPU context when VGIC/ITS is
-> enabled. It's conflicting with that ring-based dirty page tracking always
-> requires a running VCPU context.
-> 
-> Introduce a new flavor of dirty ring that requires the use of both VCPU
-> dirty rings and a dirty bitmap. The expectation is that for non-VCPU
-> sources of dirty memory (such as the VGIC/ITS on arm64), KVM writes to
-> the dirty bitmap. Userspace should scan the dirty bitmap before migrating
-> the VM to the target.
-> 
-> Use an additional capability to advertise this behavior. The newly added
-> capability (KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP) can't be enabled before
-> KVM_CAP_DIRTY_LOG_RING_ACQ_REL on ARM64. In this way, the newly added
-> capability is treated as an extension of KVM_CAP_DIRTY_LOG_RING_ACQ_REL.
-> 
-> Suggested-by: Marc Zyngier <maz@kernel.org>
-> Suggested-by: Peter Xu <peterx@redhat.com>
-> Co-developed-by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
+On Wed, Nov 02, 2022 at 11:19:03PM +0000,
+Sean Christopherson <seanjc@google.com> wrote:
 
-Acked-by: Peter Xu <peterx@redhat.com>
+> From: Chao Gao <chao.gao@intel.com>
+> 
+> Do compatibility checks when enabling hardware to effectively add
+> compatibility checks when onlining a CPU.  Abort enabling, i.e. the
+> online process, if the (hotplugged) CPU is incompatible with the known
+> good setup.
+> 
+> At init time, KVM does compatibility checks to ensure that all online
+> CPUs support hardware virtualization and a common set of features. But
+> KVM uses hotplugged CPUs without such compatibility checks. On Intel
+> CPUs, this leads to #GP if the hotplugged CPU doesn't support VMX, or
+> VM-Entry failure if the hotplugged CPU doesn't support all features
+> enabled by KVM.
+> 
+> Note, this is little more than a NOP on SVM, as SVM already checks for
+> full SVM support during hardware enabling.
+> 
+> Opportunistically add a pr_err() if setup_vmcs_config() fails, and
+> tweak all error messages to output which CPU failed.
+> 
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  2 +-
+>  arch/x86/kvm/svm/svm.c          | 20 +++++++++++---------
+>  arch/x86/kvm/vmx/vmx.c          | 33 +++++++++++++++++++--------------
+>  arch/x86/kvm/x86.c              |  5 +++--
+>  4 files changed, 34 insertions(+), 26 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index f223c845ed6e..c99222b71fcc 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1666,7 +1666,7 @@ struct kvm_x86_nested_ops {
+>  };
+>  
+>  struct kvm_x86_init_ops {
+> -	int (*check_processor_compatibility)(void);
+> +	int (*check_processor_compatibility)(int cpu);
 
+Is this cpu argument used only for error message to include cpu number
+with avoiding repeating raw_smp_processor_id() in pr_err()?
+The actual check is done on the current executing cpu.
+
+If cpu != raw_smp_processor_id(), cpu is wrong. Although the function is called
+in non-preemptive context, it's a bit confusing. So voting to remove it and
+to use.
+
+Thanks,
 -- 
-Peter Xu
-
+Isaku Yamahata <isaku.yamahata@gmail.com>
