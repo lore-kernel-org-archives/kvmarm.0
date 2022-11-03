@@ -2,95 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB9B2C4332F
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 18:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3BB2C43219
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 18:58:26 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 641654B3C0;
-	Thu,  3 Nov 2022 14:46:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 43FAB4B092;
+	Thu,  3 Nov 2022 14:58:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1XgoRyFUcF0D; Thu,  3 Nov 2022 14:46:31 -0400 (EDT)
+	with ESMTP id csSbojjwe75u; Thu,  3 Nov 2022 14:58:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 516EE4B25A;
-	Thu,  3 Nov 2022 14:46:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06E394B24D;
+	Thu,  3 Nov 2022 14:58:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C09F4B239
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 14:46:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F0C7349E1A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 14:58:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xFHQ4rdMSmZI for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Nov 2022 14:46:28 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE8CB4B16F
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 14:46:28 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1667501188;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=KUvqpmismHtbPDi1RWOVBVQOlTCkIOX4rr6fY8m3qi8=;
- b=EabJpTwfu8tjjAfHEkBVi7bBq+lrfUWFHawhyEB1UMCeQZXnLUaK5P9HsuBOfU3j6e6noZ
- SJRT20RiiiB+HpCjpj0Hhrm05HM7kb7Wpu9MwqIEstj4N4izzUjgBuNbbsO4PblKrwrYHN
- iuCVN8/aEt7ngeIDwuH4QtswA1pOwKY=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-246-SQWKLz0dPRuObUHEg4XV7Q-1; Thu, 03 Nov 2022 14:46:27 -0400
-X-MC-Unique: SQWKLz0dPRuObUHEg4XV7Q-1
-Received: by mail-ej1-f70.google.com with SMTP id
- hq18-20020a1709073f1200b007ade8dd3494so1821395ejc.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Nov 2022 11:46:27 -0700 (PDT)
+ with ESMTP id TCtrYvd8qMHY for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Nov 2022 14:58:22 -0400 (EDT)
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com
+ [209.85.215.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB518412AC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 14:58:21 -0400 (EDT)
+Received: by mail-pg1-f169.google.com with SMTP id b62so2504850pgc.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Nov 2022 11:58:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=OgBlWniGTXEnPcASGuNFCxIZuwOSNaqHJ+Eb2HtkZ3A=;
+ b=crtTNSDLBpNcvDSxofCENmrvtDvGgpUzGCkxI3/S4zR915QtnPiMfGmQ1bfa1+IphI
+ JYKHG76keqoKUqskuvBrM1m0JyELxmvNXlZ4KiPUOKMYgaWfFysvap9RGXI963+2hoeq
+ HHT/GX+S1XBR2PYehjOUxetwVpL78GGV9aYozWyKXyCWQQP6iGe8zgNPOME2bv1qjA9e
+ apMslXORbm1rWkX1K/6OQ1RCG98VSwtHOf2J04nfLy9jITyFIIcn6ieZ9TY4AUm1gsGc
+ eyQU7zbjJP0kGKm2zN/8wgEWv2C3dUA3cPXDwDYFGn1wLuJmRxozNVKQFEnfavfSL6Lx
+ ZqXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=KUvqpmismHtbPDi1RWOVBVQOlTCkIOX4rr6fY8m3qi8=;
- b=UWLL0rCR23oqR4KMyVwsLRxY+j4ZGw0z5dH1OdGPobPjTsb6Bkf10BSGHbmn8qTu0l
- J7jE3O7vEune4853oUHIEmdWt1eETMKF00GxTz6I4D57l6AHi259x03723oOemEwvsev
- Ggh6OEJmSO6AO4g7VAHPA+Cjpi/5JlPiuS4jzUNtwduW94jOeyyaZNH/nwvmd61kHGv/
- jR21LmRafb0EgmCMDbCw57DgoAkOC4m0ZcSJdYyqADWyFOC0R9rTadMTORCVZI3pmkFO
- hVMR0emVIFqebfWWtNPezx2palFkpF60geBebW6hR+Z/+7onZeXzEXtgbu57JM6JiYC4
- /Lyg==
-X-Gm-Message-State: ACrzQf3H1j4mlrjTUmItiI8SBvp1OisCKtZLAyyNN7FcQcozsZQZwCzH
- ShwrEvYI5pwOQWYcojJ/GrUocWRxJlku/PNBs7D8xOkGJwiF0jAlMJAHcwTD6fLw30XjRv4bSEh
- PynK/iuFrrWoMul6NWjIQfyy9
-X-Received: by 2002:a17:907:31c9:b0:740:ef93:2ffd with SMTP id
- xf9-20020a17090731c900b00740ef932ffdmr30301715ejb.584.1667501186294; 
- Thu, 03 Nov 2022 11:46:26 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6jngiF1WMeYDLzQRcIfcwEai0RoBStUb1QJ9IQKOY38atIN4TLSIas8P4CJc6XubwxUck1WA==
-X-Received: by 2002:a17:907:31c9:b0:740:ef93:2ffd with SMTP id
- xf9-20020a17090731c900b00740ef932ffdmr30301665ejb.584.1667501186012; 
- Thu, 03 Nov 2022 11:46:26 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c?
- ([2001:b07:6468:f312:1c09:f536:3de6:228c])
- by smtp.googlemail.com with ESMTPSA id
- 2-20020a170906218200b0078246b1360fsm799044eju.131.2022.11.03.11.46.24
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Nov 2022 11:46:25 -0700 (PDT)
-Message-ID: <c29e7d40-ddb9-def0-f944-a921a05a4bb2@redhat.com>
-Date: Thu, 3 Nov 2022 19:46:22 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=OgBlWniGTXEnPcASGuNFCxIZuwOSNaqHJ+Eb2HtkZ3A=;
+ b=k0b3/PP5/oTxcSrT9UsGahedH/AuiFesR97eXgRNjAPr20x3nx1zF6+Yj/15fnyU+M
+ xf8N5gIwBi9FeJLpCBR6guJGeBi5ed8yPyy9qJrnxKCdudHDpZgLnHmABRLrbE75Q6pe
+ 4vsA06qj+V+bZ4m8GXEA1C/vjel/tgy0YlRHwiuJnvAzKuyDePYZD/FG+te+6+VlLS8n
+ CzwcrmL5JsPIJ9W2s7lYf5NY90tVQaZYeS1BUBYyEFReP31mOF+VIvuml2dDbtzgC5UU
+ uZuL2tIuQZeGXYTOy2UHmLUzrXzs23XZ5pdTVgzsM0ItfCEu/mZXr/dSeTV+jwKojuRR
+ 754g==
+X-Gm-Message-State: ACrzQf3X+cZrGrCJkmO4kmEQIkFI48LXEthOKP5QgAC+ZEXwAXVHX7hE
+ T1o9YlI8LnNO7IXIu83G/gqJeg==
+X-Google-Smtp-Source: AMsMyM7lUXjnrFRO+e+xTY8enXMXmh/YC+M/IqwbxJRPxqwsuhxb3fUJPK1b1MpOBO3HsUEvz+aKuA==
+X-Received: by 2002:aa7:81cf:0:b0:561:7d72:73ef with SMTP id
+ c15-20020aa781cf000000b005617d7273efmr31655060pfn.16.1667501900762; 
+ Thu, 03 Nov 2022 11:58:20 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ c20-20020a17090ad91400b00209a12b3879sm309308pjv.37.2022.11.03.11.58.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 03 Nov 2022 11:58:20 -0700 (PDT)
+Date: Thu, 3 Nov 2022 18:58:16 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 Subject: Re: [PATCH 33/44] KVM: x86: Do VMX/SVM support checks directly in
  vendor code
-To: Sean Christopherson <seanjc@google.com>
+Message-ID: <Y2QPSK1/6esl61wQ@google.com>
 References: <20221102231911.3107438-1-seanjc@google.com>
  <20221102231911.3107438-34-seanjc@google.com>
  <bfa98587-3b36-3834-a4b9-585a0e0aa56a@redhat.com>
  <Y2QJ2TuyZImbFFvi@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Y2QJ2TuyZImbFFvi@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
+ <c29e7d40-ddb9-def0-f944-a921a05a4bb2@redhat.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <c29e7d40-ddb9-def0-f944-a921a05a4bb2@redhat.com>
 Cc: Matthew Rosato <mjrosato@linux.ibm.com>,
  David Hildenbrand <david@redhat.com>, Yuan Yao <yuan.yao@intel.com>,
  Paul Walmsley <paul.walmsley@sifive.com>, linux-kernel@vger.kernel.org,
@@ -119,33 +105,61 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 11/3/22 19:35, Sean Christopherson wrote:
-> It's technically required.  IA32_FEAT_CTL and thus KVM_INTEL depends on any of
-> CPU_SUP_{INTEL,CENATUR,ZHAOXIN}, but init_ia32_feat_ctl() is invoked if and only
-> if the actual CPU type matches one of the aforementioned CPU_SUP_*.
+On Thu, Nov 03, 2022, Paolo Bonzini wrote:
+> On 11/3/22 19:35, Sean Christopherson wrote:
+> > It's technically required.  IA32_FEAT_CTL and thus KVM_INTEL depends on any of
+> > CPU_SUP_{INTEL,CENATUR,ZHAOXIN}, but init_ia32_feat_ctl() is invoked if and only
+> > if the actual CPU type matches one of the aforementioned CPU_SUP_*.
+> > 
+> > E.g. running a kernel built with
+> > 
+> >    CONFIG_CPU_SUP_INTEL=y
+> >    CONFIG_CPU_SUP_AMD=y
+> >    # CONFIG_CPU_SUP_HYGON is not set
+> >    # CONFIG_CPU_SUP_CENTAUR is not set
+> >    # CONFIG_CPU_SUP_ZHAOXIN is not set
+> > 
+> > on a Cenatur or Zhaoxin CPU will leave X86_FEATURE_VMX set but not set
+> > X86_FEATURE_MSR_IA32_FEAT_CTL.  If VMX isn't enabled in MSR_IA32_FEAT_CTL, KVM
+> > will get unexpected #UDs when trying to enable VMX.
 > 
-> E.g. running a kernel built with
-> 
->    CONFIG_CPU_SUP_INTEL=y
->    CONFIG_CPU_SUP_AMD=y
->    # CONFIG_CPU_SUP_HYGON is not set
->    # CONFIG_CPU_SUP_CENTAUR is not set
->    # CONFIG_CPU_SUP_ZHAOXIN is not set
-> 
-> on a Cenatur or Zhaoxin CPU will leave X86_FEATURE_VMX set but not set
-> X86_FEATURE_MSR_IA32_FEAT_CTL.  If VMX isn't enabled in MSR_IA32_FEAT_CTL, KVM
-> will get unexpected #UDs when trying to enable VMX.
+> Oh, I see.  Perhaps X86_FEATURE_VMX and X86_FEATURE_SGX should be moved to
+> one of the software words instead of using cpuid.  Nothing that you should
+> care about for this series though.
 
-Oh, I see.  Perhaps X86_FEATURE_VMX and X86_FEATURE_SGX should be moved 
-to one of the software words instead of using cpuid.  Nothing that you 
-should care about for this series though.
+Or maybe something like this?
 
-Paolo
+diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+index 3e508f239098..ebe617ab0b37 100644
+--- a/arch/x86/kernel/cpu/common.c
++++ b/arch/x86/kernel/cpu/common.c
+@@ -191,6 +191,8 @@ static void default_init(struct cpuinfo_x86 *c)
+                        strcpy(c->x86_model_id, "386");
+        }
+ #endif
++
++       clear_cpu_cap(c, X86_FEATURE_MSR_IA32_FEAT_CTL);
+ }
+ 
+ static const struct cpu_dev default_cpu = {
+diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
+index c881bcafba7d..3a7ae67f5a5e 100644
+--- a/arch/x86/kernel/cpu/cpuid-deps.c
++++ b/arch/x86/kernel/cpu/cpuid-deps.c
+@@ -72,6 +72,8 @@ static const struct cpuid_dep cpuid_deps[] = {
+        { X86_FEATURE_AVX512_FP16,              X86_FEATURE_AVX512BW  },
+        { X86_FEATURE_ENQCMD,                   X86_FEATURE_XSAVES    },
+        { X86_FEATURE_PER_THREAD_MBA,           X86_FEATURE_MBA       },
++       { X86_FEATURE_VMX,                      X86_FEATURE_MSR_IA32_FEAT_CTL         },
++       { X86_FEATURE_SGX,                      X86_FEATURE_MSR_IA32_FEAT_CTL         },
+        { X86_FEATURE_SGX_LC,                   X86_FEATURE_SGX       },
+        { X86_FEATURE_SGX1,                     X86_FEATURE_SGX       },
+        { X86_FEATURE_SGX2,                     X86_FEATURE_SGX1      },
 
 _______________________________________________
 kvmarm mailing list
