@@ -2,86 +2,89 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13DC8C433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB64BC43217
 	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 16:58:55 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B549E4B75D;
-	Thu,  3 Nov 2022 12:58:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A60974B638;
+	Thu,  3 Nov 2022 12:58:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2YJrbgagMpUr; Thu,  3 Nov 2022 12:58:53 -0400 (EDT)
+	with ESMTP id VHQZHycZWUTE; Thu,  3 Nov 2022 12:58:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0559A4B282;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22B404B634;
 	Thu,  3 Nov 2022 12:58:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C20004B649
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 09:55:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E887C4B649
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 09:56:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id r7Q69wjl6iZz for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Nov 2022 09:55:38 -0400 (EDT)
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com
- [209.85.214.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E7904B647
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 09:55:38 -0400 (EDT)
-Received: by mail-pl1-f179.google.com with SMTP id y4so2010311plb.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Nov 2022 06:55:38 -0700 (PDT)
+ with ESMTP id FKKpd1WXe7+P for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Nov 2022 09:56:32 -0400 (EDT)
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com
+ [209.85.214.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C0C714B647
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 09:56:32 -0400 (EDT)
+Received: by mail-pl1-f182.google.com with SMTP id d20so934692plr.10
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Nov 2022 06:56:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:content-language
- :references:cc:to:subject:user-agent:mime-version:date:message-id
+ h=content-transfer-encoding:in-reply-to:from:references:cc:to
+ :content-language:subject:user-agent:mime-version:date:message-id
  :from:to:cc:subject:date:message-id:reply-to;
- bh=2s5CjDAaY+90OmXPKcOa8nR9wP4LZVJneib6FSefkRA=;
- b=MS8/7KEh2OptfpY9W5htuDaz/SSTGx+/DggQYwJvqUceNYlopOwfxW2JcjxE64vnew
- xWEu8xE3P1/zcBWNS0oftj50W/EpNPO4oulM3NodbDZF9gOsSFwko/9dEa9Pg3ggylGD
- YUbtOtBdNW3kyrysWmdapq36lB0UUBHiHjoPslEBvMimAo9BHhSwe6g7GcDKVmfz/cND
- KU6iMth5PLHzvKuChZ6m9xMSj9BtW+oyuWHMhnKortAp9W0O4O/s6Hdt9VC4TsuGSxcR
- HjYax0FMkw+QXQhELnw4bIW1xXbd+hLyHEQp1zQr2WIkqF3ydF22p1CdqDXVS56UtBE4
- 9b1g==
+ bh=ign6P2397IfFIK8m+Wt90gPlj7W1vvnJv9kawkVb51E=;
+ b=HI60mlPg8m4ViBKO0Ko7cuIw5CWkpo8OHY1k84Ajd5UAw+zDBFvmBRD4QqqhAkWjrN
+ lNmUO5a0U0c9OsgC2lnIcjG0iXaXQwj1Rjdhdq3CWXM3n20R6+lqm1pCRuvrf7JrLUxY
+ ty8hjsDXeWQExDcegMa7fgsxIufgE5FGrldncF2oy/UlSjaix/bMMutFDFEgSiuDnZQO
+ 0DgEIpgx/XfW3tmQMZa/NUd6jvrjEc1L14YPWBE1ZcnUtLREdMF8hBrirywpkLkCcwtx
+ B38Pd5TkQTOi5rbP8ECHzsFmcft2lugGBX2bI3whqkTYnqsAwTPuWQomeqr5pzoOSuec
+ 9FCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:content-language
- :references:cc:to:subject:user-agent:mime-version:date:message-id
+ h=content-transfer-encoding:in-reply-to:from:references:cc:to
+ :content-language:subject:user-agent:mime-version:date:message-id
  :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=2s5CjDAaY+90OmXPKcOa8nR9wP4LZVJneib6FSefkRA=;
- b=hq5JEU4jOg0ZbEv7jSluLTMUfT7L0K468603mxUQJ08WbEmB9TdIH9Z96jA8vyepfk
- crnhIwrr1ELkyRMxHnSjClfBtTuZFlmRBfcEkXBgUygfm+bk1R1UbSqQECtOjP+dlYKB
- H7wsGYfDu+kFu3A/TLl7rMTGW+gxz0Dfh37KIJ2EzjBprqeUHI4NP95+bwGASZ9sbn20
- ScaT0bi/SoCl7hp606NDPFi88VdXrw3afXP0EbGZMw32O4pk0kxagzIA0xxDmjBVE8Nb
- LJsOJ/ml5WqyUngLmakzuVlJlUbsHayhlQUhIZxhEu9RfuPjhLCfCzVbeBNCxpSwrVcu
- 8UXg==
-X-Gm-Message-State: ACrzQf2ozZpi2D5510FDRfwQt+I8cPIyBqCLA1PQirLKFO+ckDhxTUrV
- jAFOy71/NtC49Tyqd5NAkcc=
-X-Google-Smtp-Source: AMsMyM7jLL4puj7iVEGlPCsNA/AfQoaXr2wHeqikdv+S7v8dxTEzekFXavxGHIU/DhFhAmAr4eRXNA==
-X-Received: by 2002:a17:902:aa0b:b0:187:34e8:7285 with SMTP id
- be11-20020a170902aa0b00b0018734e87285mr15105196plb.156.1667483737439; 
- Thu, 03 Nov 2022 06:55:37 -0700 (PDT)
+ bh=ign6P2397IfFIK8m+Wt90gPlj7W1vvnJv9kawkVb51E=;
+ b=j5oy9wx9Cc+IY7DjRV8B6mVuVZRgFDDYs8PJiEfepnwGbk6uIAYE2kRvd1h3+ZsG6h
+ 0dA5IyA0tjO+apo+MGBIWiI79glZ/ig3KOkDQd+t9U3tERr/t3rTTn5tlTGIR1wRhuRr
+ YdWXHFTpYYhfRJib7Hulne7mm0BfxA2RIewfSGhj8AFRWIkxOnG1NCjQ7SBrHyt7WDyq
+ irPJLv8hhkvUX8ZjgwdTxLqX56GdjZH4aHkQIQVOqgQFfQctfG3/q+pcHguvUVbRfjW7
+ pGJLH96W2/lNVumgXoSKG5C2O0lnkLOrn3idGSXTq5XAVZ2Y1qwnmS7GTECZaJdYthIP
+ bPnQ==
+X-Gm-Message-State: ACrzQf1OQUHfvSDoHU0aEvvFOMZope+mx9yhLzK1p6IZJ+HX7BPGSC7q
+ 1f4I1mn14drtebljXhC201k=
+X-Google-Smtp-Source: AMsMyM4vIEMLHQ7RSu1HWrdVM/SWZEWnhtUUleBmGwGYurtfIHzBYGeVcxvcjRtNSl0mHNh1iLLDqg==
+X-Received: by 2002:a17:90b:1c8d:b0:203:cc25:4eb5 with SMTP id
+ oo13-20020a17090b1c8d00b00203cc254eb5mr31460357pjb.132.1667483791949; 
+ Thu, 03 Nov 2022 06:56:31 -0700 (PDT)
 Received: from [192.168.43.80] (subs02-180-214-232-12.three.co.id.
  [180.214.232.12]) by smtp.gmail.com with ESMTPSA id
- u9-20020a170902714900b00185480a85f1sm608717plm.285.2022.11.03.06.55.32
+ b6-20020a170903228600b00187033cac81sm689757plh.145.2022.11.03.06.56.27
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Nov 2022 06:55:37 -0700 (PDT)
-Message-ID: <24d81fe9-7cd1-71eb-8c35-0739f638b3df@gmail.com>
-Date: Thu, 3 Nov 2022 20:55:29 +0700
+ Thu, 03 Nov 2022 06:56:31 -0700 (PDT)
+Message-ID: <5636b9a1-dbb8-5ab3-8b56-05f6faaccded@gmail.com>
+Date: Thu, 3 Nov 2022 20:56:25 +0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.4.1
-Subject: Re: [PATCH] kvm/arm: Fix pvtime documentation
-To: Usama Arif <usama.arif@bytedance.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
- yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
- maz@kernel.org, steven.price@arm.com, mark.rutland@arm.com
-References: <20221103131210.3603385-1-usama.arif@bytedance.com>
+Subject: Re: [External] Re: [RFC 1/6] KVM: arm64: Document PV-lock interface
 Content-Language: en-US
+To: Usama Arif <usama.arif@bytedance.com>
+References: <20221102161340.2982090-1-usama.arif@bytedance.com>
+ <20221102161340.2982090-2-usama.arif@bytedance.com>
+ <Y2M6eU6xW7jjVQNx@debian.me>
+ <61800b69-5f6a-d173-fc42-628ee3db15d8@bytedance.com>
 From: Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <20221103131210.3603385-1-usama.arif@bytedance.com>
+In-Reply-To: <61800b69-5f6a-d173-fc42-628ee3db15d8@bytedance.com>
 X-Mailman-Approved-At: Thu, 03 Nov 2022 12:58:44 -0400
-Cc: punit.agrawal@bytedance.com, fam.zheng@bytedance.com, liangma@liangbit.com
+Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ fam.zheng@bytedance.com, maz@kernel.org, punit.agrawal@bytedance.com,
+ linux@armlinux.org.uk, liangma@liangbit.com, steven.price@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,23 +101,13 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 11/3/22 20:12, Usama Arif wrote:
-> This includes table format and using reST labels for
-> cross-referencing to vcpu.rst.
+On 11/3/22 20:15, Usama Arif wrote:
+> Hi,
 > 
-> Suggested-by:  Bagas Sanjaya <bagasdotme@gmail.com>
-> Signed-off-by: Usama Arif <usama.arif@bytedance.com>
+> Thanks for the review. I will include the changes in the next version I send for pvlock. I have sent a patch to fix pvtime here https://lore.kernel.org/all/20221103131210.3603385-1-usama.arif@bytedance.com/.
+> 
 
-This is not what people normally do when given suggestion diff like
-what I sent before [1]. Instead, they just apply and squash the
-suggestion (while also applying requested changes from reviewers).
-
-Please reroll your series [2] with suggestion applied.
-
-Thanks.
-
-[1]: https://lore.kernel.org/linux-doc/Y2M6eU6xW7jjVQNx@debian.me/
-[2]: https://lore.kernel.org/linux-doc/20221102161340.2982090-1-usama.arif@bytedance.com/
+Please please please *DON'T* top-post; reply inline instead.
 
 -- 
 An old man doll... just what I always wanted! - Clara
