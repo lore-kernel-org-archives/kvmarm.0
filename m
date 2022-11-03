@@ -2,99 +2,98 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90AD4C4332F
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 15:23:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40274C433FE
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 15:27:57 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 150774B24C;
-	Thu,  3 Nov 2022 11:23:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3EAC4B633;
+	Thu,  3 Nov 2022 11:27:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7Szw9RaT7iem; Thu,  3 Nov 2022 11:23:21 -0400 (EDT)
+	with ESMTP id Rb4w7OvCIfCF; Thu,  3 Nov 2022 11:27:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3E244B5F4;
-	Thu,  3 Nov 2022 11:23:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5092B4B630;
+	Thu,  3 Nov 2022 11:27:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 389BD4B2A1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 11:23:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FDEA4B24C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 11:27:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IGMSuNXipKsp for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Nov 2022 11:23:19 -0400 (EDT)
+ with ESMTP id ZkTioE+jnmtF for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Nov 2022 11:27:53 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD74D4B24C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 11:23:19 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 795FB4B090
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 11:27:53 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1667488999;
+ s=mimecast20190719; t=1667489273;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ex9w6AF29xEwpNLs+Jj1aaojn2ZZjhH0ZX9iUoTOfgc=;
- b=JYIcN4Qvut2ueP8N4RFbgV0SYq5S8nvRybbNe2ttD9jexTpnOj2XngkrGJD88PEFd9PSiO
- khIJaLvEJXZECQvfBP2WCcEPF4mGZDl/ojdIeFDtnqLr+D9EM85KqMhDa91FrMO3n72YH3
- QJLdpwtvDAncQDbMJaVB0ruJZizXNQ0=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=xCSLioTknXwq+ek9x4fiuIn1LdVr/LliQOq4IIs2CLE=;
+ b=UlUeIPFghiiYsdAzdI7QI8/Es18nEexMjJc8+7ol0CpkKuFPaj2Js5ERkKmDlrN/j1uD9+
+ rVW7cDqusq3FABPutxi70/v6hNPNT4fxABLh0BKyzhhyhlP0Ct1Su+AFqMQA8HcmaIrZzC
+ IPwN0Oq5I3Q6xS6svsiMUtUvV90ZQN4=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-413-kjToxg4nMyKTiEv4BYwfEA-1; Thu, 03 Nov 2022 11:23:18 -0400
-X-MC-Unique: kjToxg4nMyKTiEv4BYwfEA-1
-Received: by mail-ej1-f70.google.com with SMTP id
- qf25-20020a1709077f1900b0078c02a23da3so1499247ejc.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Nov 2022 08:23:17 -0700 (PDT)
+ us-mta-102-ZZZvk8egNnmDFDtszQ9Xhg-1; Thu, 03 Nov 2022 11:27:52 -0400
+X-MC-Unique: ZZZvk8egNnmDFDtszQ9Xhg-1
+Received: by mail-ej1-f71.google.com with SMTP id
+ qk31-20020a1709077f9f00b00791a3e02c80so1490757ejc.21
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Nov 2022 08:27:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=content-transfer-encoding:in-reply-to:from:references:cc:to
  :content-language:subject:user-agent:mime-version:date:message-id
  :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=ex9w6AF29xEwpNLs+Jj1aaojn2ZZjhH0ZX9iUoTOfgc=;
- b=mz9VEMABOa+UwiMP83NEpayCSL4ok6G4G99O8rGfUyWuLU508lLn3wrxWHvP9dJ640
- epzOgZx1YGm13SRgsBfLfle4O+Fz5uv9V5mx706Naam0xE5uLm01jG4vYuCl9mxjPbuh
- VQWh7y7U1jI3lB7aLNhclP7R4axPIMyjeDqUISUuW7jbkm4a2Qv/wCQQIP2zHwVf84qv
- awirm9sp9J4w4vGc6Gc61brzj2+Srb5rYSgzNfnXKyNmioGSfFBZio8aEOA/c6wYKDje
- Ay9I0B8WYKFLrrGGbOui876QLGZ/6e8mDB1i53xRRgGuUwS7Q9KwtK2kkZMLA8wYxi1U
- yQtA==
-X-Gm-Message-State: ACrzQf0LL7MbmnpM0kAKoM0zgEKE0BBjRCUVxSCbz0tkPL9H4h/Ac/i1
- ZOHeh29CIptEjUA06pgE11brnVbQLCjB+gFzfGRhl6uFUn8TbruqO1Op+OtcRb2QGE+/jihp9++
- hycAh676Yal4nHJDaaBHW7Ddf
-X-Received: by 2002:a17:907:8a07:b0:7ad:e111:9f1f with SMTP id
- sc7-20020a1709078a0700b007ade1119f1fmr18706654ejc.748.1667488996732; 
- Thu, 03 Nov 2022 08:23:16 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7w/ZtXgKJ7V+2Z8oeupCi1g9Jll17Pmqv+y4uPqlw3EJEEB8/pAd5jt1iBgMRagb/0UlEDkg==
-X-Received: by 2002:a17:907:8a07:b0:7ad:e111:9f1f with SMTP id
- sc7-20020a1709078a0700b007ade1119f1fmr18706603ejc.748.1667488996425; 
- Thu, 03 Nov 2022 08:23:16 -0700 (PDT)
+ bh=xCSLioTknXwq+ek9x4fiuIn1LdVr/LliQOq4IIs2CLE=;
+ b=IGQhgB7GkLlJG1gKkd18cKdadRaOxznn08L5/jKnZtJnA3Et2iAOvzbmsob3INzrET
+ pdXae12TS/xQkiUD4SvI5H6QT17uibWvQg56AJSoANygjinjorJHt7IVyBxLMFPyuaqJ
+ EsCOkNqX+U1yvW76Z+CUE5Idsr2fAq3dkMJOSEkjmvM215j7EJIoQZjNAiyezx0j55sT
+ luyWMf0Jd+zXixTwMyx39YsAUslwgwIgBLcqhqLWNFRHh1zDrZ4Zm1VW5CYYS7hkIQzZ
+ GspsZMKtgcRfZowNztZPHOywjv0dwtHBuA/0k9Tt6brHdSWvsMC88oZrmfM5ThQJts5S
+ 6OBw==
+X-Gm-Message-State: ACrzQf1VkdCIs5tuOZYClWV0lgE+6HAJMoLtdyTabFvTmtjvKcmMHVy6
+ 7T1P1nyBmKafE6Bb5p2Kl50zEjfUNMy1E+XU595YOd5/TeNK9sk4MO48PBUDhDOUVl4jbyQ9QJb
+ XQTd7Tt0HrNc7kRBL/gPpJXaK
+X-Received: by 2002:a17:907:2dab:b0:78d:fc4b:7e31 with SMTP id
+ gt43-20020a1709072dab00b0078dfc4b7e31mr28147748ejc.531.1667489270826; 
+ Thu, 03 Nov 2022 08:27:50 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7u9a9PiI+1WXKEKW1T9dxImTSTFhIKArq6MPRri6hHxMVLdP9Ji+9iwit/AYCn6duMyFkDdg==
+X-Received: by 2002:a17:907:2dab:b0:78d:fc4b:7e31 with SMTP id
+ gt43-20020a1709072dab00b0078dfc4b7e31mr28147732ejc.531.1667489270591; 
+ Thu, 03 Nov 2022 08:27:50 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c?
  ([2001:b07:6468:f312:1c09:f536:3de6:228c])
  by smtp.googlemail.com with ESMTPSA id
- 9-20020a170906218900b007a9c3831409sm596520eju.137.2022.11.03.08.23.13
+ 15-20020a508e4f000000b00463bc1ddc76sm657729edx.28.2022.11.03.08.27.47
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Nov 2022 08:23:15 -0700 (PDT)
-Message-ID: <7b6ce80e-7f1f-11cd-8bde-8d8fa9fd7e1d@redhat.com>
-Date: Thu, 3 Nov 2022 16:23:12 +0100
+ Thu, 03 Nov 2022 08:27:49 -0700 (PDT)
+Message-ID: <82df23f2-b049-8bee-8bb8-608645b918d8@redhat.com>
+Date: Thu, 3 Nov 2022 16:27:47 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.4.0
-Subject: Re: [PATCH 39/44] KVM: Drop kvm_count_lock and instead protect
- kvm_usage_count with kvm_lock
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+Subject: Re: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
+To: Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Huacai Chen <chenhuacai@kernel.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
  Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>,
  Claudio Imbrenda <imbrenda@linux.ibm.com>,
  Matthew Rosato <mjrosato@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
  Vitaly Kuznetsov <vkuznets@redhat.com>
 References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-40-seanjc@google.com>
+ <b37267a9-c0b4-9841-71af-d8eab9baeb60@linux.ibm.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221102231911.3107438-40-seanjc@google.com>
+In-Reply-To: <b37267a9-c0b4-9841-71af-d8eab9baeb60@linux.ibm.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -119,172 +118,28 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 11/3/22 00:19, Sean Christopherson wrote:
-> +- kvm_lock is taken outside kvm->mmu_lock
-
-Not surprising since one is a mutex and one is an rwlock. :)  You can 
-drop this hunk as well as the "Opportunistically update KVM's locking 
-documentation" sentence in the commit message.
-
->   - vcpu->mutex is taken outside kvm->arch.hyperv.hv_lock
->   
->   - kvm->arch.mmu_lock is an rwlock.  kvm->arch.tdp_mmu_pages_lock and
-> @@ -216,15 +220,11 @@ time it will be set using the Dirty tracking mechanism described above.
->   :Type:		mutex
->   :Arch:		any
->   :Protects:	- vm_list
-> -
-> -``kvm_count_lock``
-> -^^^^^^^^^^^^^^^^^^
-> -
-> -:Type:		raw_spinlock_t
-> -:Arch:		any
-> -:Protects:	- hardware virtualization enable/disable
-> -:Comment:	'raw' because hardware enabling/disabling must be atomic /wrt
-> -		migration.
-> +		- kvm_usage_count
-> +		- hardware virtualization enable/disable
-> +		- module probing (x86 only)
-
-What do you mean exactly by "module probing"?  Is it anything else than 
-what is serialized by vendor_module_lock?
-
-Paolo
-
-> +:Comment:	KVM also disables CPU hotplug via cpus_read_lock() during
-> +		enable/disable.
->   
->   ``kvm->mn_invalidate_lock``
->   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 4e765ef9f4bd..c8d92e6c3922 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -100,7 +100,6 @@ EXPORT_SYMBOL_GPL(halt_poll_ns_shrink);
->    */
->   
->   DEFINE_MUTEX(kvm_lock);
-> -static DEFINE_RAW_SPINLOCK(kvm_count_lock);
->   LIST_HEAD(vm_list);
->   
->   static cpumask_var_t cpus_hardware_enabled;
-> @@ -5028,9 +5027,10 @@ static void hardware_enable_nolock(void *junk)
->   
->   static int kvm_online_cpu(unsigned int cpu)
->   {
-> +	unsigned long flags;
->   	int ret = 0;
->   
-> -	raw_spin_lock(&kvm_count_lock);
-> +	mutex_lock(&kvm_lock);
->   	/*
->   	 * Abort the CPU online process if hardware virtualization cannot
->   	 * be enabled. Otherwise running VMs would encounter unrecoverable
-> @@ -5039,13 +5039,16 @@ static int kvm_online_cpu(unsigned int cpu)
->   	if (kvm_usage_count) {
->   		WARN_ON_ONCE(atomic_read(&hardware_enable_failed));
->   
-> +		local_irq_save(flags);
->   		hardware_enable_nolock(NULL);
-> +		local_irq_restore(flags);
-> +
->   		if (atomic_read(&hardware_enable_failed)) {
->   			atomic_set(&hardware_enable_failed, 0);
->   			ret = -EIO;
->   		}
->   	}
-> -	raw_spin_unlock(&kvm_count_lock);
-> +	mutex_unlock(&kvm_lock);
->   	return ret;
->   }
->   
-> @@ -5061,10 +5064,13 @@ static void hardware_disable_nolock(void *junk)
->   
->   static int kvm_offline_cpu(unsigned int cpu)
->   {
-> -	raw_spin_lock(&kvm_count_lock);
-> -	if (kvm_usage_count)
-> +	mutex_lock(&kvm_lock);
-> +	if (kvm_usage_count) {
-> +		preempt_disable();
->   		hardware_disable_nolock(NULL);
-> -	raw_spin_unlock(&kvm_count_lock);
-> +		preempt_enable();
-> +	}
-> +	mutex_unlock(&kvm_lock);
->   	return 0;
->   }
->   
-> @@ -5079,9 +5085,11 @@ static void hardware_disable_all_nolock(void)
->   
->   static void hardware_disable_all(void)
->   {
-> -	raw_spin_lock(&kvm_count_lock);
-> +	cpus_read_lock();
-> +	mutex_lock(&kvm_lock);
->   	hardware_disable_all_nolock();
-> -	raw_spin_unlock(&kvm_count_lock);
-> +	mutex_unlock(&kvm_lock);
-> +	cpus_read_unlock();
->   }
->   
->   static int hardware_enable_all(void)
-> @@ -5097,7 +5105,7 @@ static int hardware_enable_all(void)
->   	 * Disable CPU hotplug to prevent scenarios where KVM sees
->   	 */
->   	cpus_read_lock();
-> -	raw_spin_lock(&kvm_count_lock);
-> +	mutex_lock(&kvm_lock);
->   
->   	kvm_usage_count++;
->   	if (kvm_usage_count == 1) {
-> @@ -5110,7 +5118,7 @@ static int hardware_enable_all(void)
->   		}
->   	}
->   
-> -	raw_spin_unlock(&kvm_count_lock);
-> +	mutex_unlock(&kvm_lock);
->   	cpus_read_unlock();
->   
->   	return r;
-> @@ -5716,6 +5724,15 @@ static void kvm_init_debug(void)
->   
->   static int kvm_suspend(void)
->   {
-> +	/*
-> +	 * Secondary CPUs and CPU hotplug are disabled across the suspend/resume
-> +	 * callbacks, i.e. no need to acquire kvm_lock to ensure the usage count
-> +	 * is stable.  Assert that kvm_lock is not held as a paranoid sanity
-> +	 * check that the system isn't suspended when KVM is enabling hardware.
-> +	 */
-> +	lockdep_assert_not_held(&kvm_lock);
-> +	lockdep_assert_irqs_disabled();
-> +
->   	if (kvm_usage_count)
->   		hardware_disable_nolock(NULL);
->   	return 0;
-> @@ -5723,10 +5740,11 @@ static int kvm_suspend(void)
->   
->   static void kvm_resume(void)
->   {
-> -	if (kvm_usage_count) {
-> -		lockdep_assert_not_held(&kvm_count_lock);
-> +	lockdep_assert_not_held(&kvm_lock);
-> +	lockdep_assert_irqs_disabled();
-> +
-> +	if (kvm_usage_count)
->   		hardware_enable_nolock(NULL);
-> -	}
->   }
->   
->   static struct syscore_ops kvm_syscore_ops = {
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gMTEvMy8yMiAxMzowOCwgQ2hyaXN0aWFuIEJvcm50cmFlZ2VyIHdyb3RlOgo+PiBUaGVyZSBh
+cmUgYnVnIGZpeGVzIHRocm91Z2hvdXQgdGhpcyBzZXJpZXMuwqAgVGhleSBhcmUgbW9yZSBzY2F0
+dGVyZWQgdGhhbgo+PiBJIHdvdWxkIHVzdWFsbHkgcHJlZmVyLCBidXQgZ2V0dGluZyB0aGUgc2Vx
+dWVuY2luZyBjb3JyZWN0IHdhcyBhIGdpZ2FudGljCj4+IHBhaW4gZm9yIG1hbnkgb2YgdGhlIHg4
+NiBmaXhlcyBkdWUgdG8gbmVlZGluZyB0byBmaXggY29tbW9uIGNvZGUgaW4gb3JkZXIKPj4gZm9y
+IHRoZSB4ODYgZml4IHRvIGhhdmUgYW55IG1lYW5pbmcuwqAgQW5kIHdoaWxlIHRoZSBidWdzIGFy
+ZSBvZnRlbiBmYXRhbCwKPj4gdGhleSBhcmVuJ3QgYWxsIHRoYXQgaW50ZXJlc3RpbmcgZm9yIG1v
+c3QgdXNlcnMgYXMgdGhleSBlaXRoZXIgcmVxdWlyZSBhCj4+IG1hbGljaW91cyBhZG1pbiBvciBi
+cm9rZW4gaGFyZHdhcmUsIGkuZS4gYXJlbid0IGxpa2VseSB0byBiZSBlbmNvdW50ZXJlZAo+PiBi
+eSB0aGUgdmFzdCBtYWpvcml0eSBvZiBLVk0gdXNlcnMuwqAgU28gdW5sZXNzIHNvbWVvbmUgX3Jl
+YWxseV8gd2FudHMgYQo+PiBwYXJ0aWN1bGFyIGZpeCBpc29sYXRlZCBmb3IgYmFja3BvcnRpbmcs
+IEknbSBub3QgcGxhbm5pbmcgb24gc2h1ZmZsaW5nCj4+IHBhdGNoZXMuCj4+Cj4+IFRlc3RlZCBv
+biB4ODYuwqAgTGlnaHRseSB0ZXN0ZWQgb24gYXJtNjQuwqAgQ29tcGlsZSB0ZXN0ZWQgb25seSBv
+biBhbGwgCj4+IG90aGVyIGFyY2hpdGVjdHVyZXMuCj4gCj4gU29tZSBzbmlmZiB0ZXN0cyBzZWVt
+IHRvIHdvcmsgb2sgb24gczM5MC4KClRoYW5rcy4gIFRoZXJlIGFyZSBqdXN0IGEgY291cGxlIG5p
+dHMsIGFuZCBNSVBTL1BQQy9SSVNDLVYgaGF2ZSB2ZXJ5IApzbWFsbCBjaGFuZ2VzLiAgRmVlbCBm
+cmVlIHRvIHNlbmQgbWUgYSBwdWxsIHJlcXVlc3Qgb25jZSBNYXJjIGFja3MuCgpQYW9sbwoKX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxp
+bmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29s
+dW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
