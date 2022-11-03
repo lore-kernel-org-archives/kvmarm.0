@@ -2,72 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B13C43217
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 05:32:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6C0FC4332F
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 08:44:50 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A35E4B6F0;
-	Thu,  3 Nov 2022 01:32:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2739A4B6F0;
+	Thu,  3 Nov 2022 04:44:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rzsbQHkAlOJb; Thu,  3 Nov 2022 01:32:16 -0400 (EDT)
+	with ESMTP id KgpM4945j8NS; Thu,  3 Nov 2022 04:44:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 128C84B6C7;
-	Thu,  3 Nov 2022 01:32:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1FEF4B6C5;
+	Thu,  3 Nov 2022 04:44:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B1F44B6B2
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 01:32:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 061644B693
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 04:44:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id N1ONreOEuZu8 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Nov 2022 01:32:14 -0400 (EDT)
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com
- [209.85.215.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 297C94B648
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 01:32:14 -0400 (EDT)
-Received: by mail-pg1-f175.google.com with SMTP id 128so771533pga.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 22:32:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:from:to:cc:subject:date:message-id:reply-to;
- bh=plrjvAdTS0nKqwkjAzFhlx4V983yw9yOIJecZW8zvnc=;
- b=NcV+yCiuxWOVxIsZo319+y5TyEFngethA6CQP6BOwGlsAkmNTjQraFrrswRtPZlkpD
- SJRUCsZfHhroDFuc1HWmkqwVEVc2RVFlGiP5zvsmzzPynvcbshB4QamTuDtUOEEi6JX4
- BmUNoa7MFmnhIEnLohD39eY/9J7H2XyS5v3+5c2obyaUdJSs75ghA1uFF39Ky7NSG8YJ
- Fs1aAEnOM6YE3UXbpbHYeTtl8vatHs5B63YYsi93lW77Z447BjQnB4MN173r79lfZNfs
- EeCfl2gHHg6Bb2KUGH/aEOT1ThtG05EipcaO2uura2cCTvv3plIIwNol/Hx+i5Ii5y9/
- Z3nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
- :reply-to;
- bh=plrjvAdTS0nKqwkjAzFhlx4V983yw9yOIJecZW8zvnc=;
- b=yhTvYmbVbquz58UeEeErfuvntC8WUcClEva/esKa+Zo1B6kvPR7RlsdyPCcBse/8mM
- cbw4yAKIAUrNQjiUDSQk1QgWsQ51NjAo7tHGcU9qnw3SAZTBQE2Ok5YNXeCDDGyJnRP6
- F2N2q1jbSi/XXd9YMq15KCuAinLl05QGGn5f9owIZ7wuggwY/RlVkJIvQ3kukfrdFXhP
- 4Sr9ci21MUrCluFJ1KIOe4xh+ZeKslN//NwL9XMsumvjEwqB4j2NGauWHhdgYg6GD2bg
- qRGatcXK1fGmaJqHNYVnejw+AYbHd9/dQQwKOZ9bYeu/H0adoqxoOoaZNJkhY7D0BDh0
- XNKw==
-X-Gm-Message-State: ACrzQf0tHtLsC7fw7z3maUt06MuVzPXKl0mbKQP4KEmno4S0eQB26xCw
- Vze7/9bRyZwwr9J3+++S5QeSUSxeCzNKi1fFKs889w==
-X-Google-Smtp-Source: AMsMyM4AzbIHrwu7GJ3+G6SgGpmo5sXra8QVKVVvusdM6c9LC+09ZHIwSIQNdprt/hyAqQXhcjpMftwwP6uibr705Fk=
-X-Received: by 2002:a63:db58:0:b0:443:575e:d1ed with SMTP id
- x24-20020a63db58000000b00443575ed1edmr24344874pgi.468.1667453533101; Wed, 02
- Nov 2022 22:32:13 -0700 (PDT)
-MIME-Version: 1.0
+ with ESMTP id 9bDI9ypU5hCX for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Nov 2022 04:44:45 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AF1EB4B6CF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 04:44:45 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 06F5161DB3;
+ Thu,  3 Nov 2022 08:44:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58B01C433C1;
+ Thu,  3 Nov 2022 08:44:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1667465084;
+ bh=6HC9cTjR3pmiIrioiO/OBwZqM/LEtqKSCEjcsbP+fGI=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=G2/kSK4Y8xOTxpDstBuax/vzYlsm6ACyl6drdUdvPiCcyPostYlvl2G6kg/6jbHwJ
+ Z+RjHZOpW6HrHWOpzc4vgS81QiYKFtobUuq7FUHtDq+Qp8CCRTew21RstOr5e+Sukl
+ pLkzt3fUn++0dcQAUwmGDrtBU/+hJMnkInHSV6qI10kuSWR+Qth3QjB6Kcr+JUX9kR
+ aM+qJ6d5s/+f5JvE4LMK0PrA0MwybSqa+YTM1z8UWfOsrk/YoWnT8uuAGPXOEFSXev
+ U2rYpnlRwGh/z/7M0ztjfFFpJzzEVND0GC2f1jBMk2n/XILEgKT4XfEihaDm9FkHtd
+ PRRTq8pSauVNQ==
+Received: from 82-132-225-179.dab.02.net ([82.132.225.179]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oqVq4-003S3p-Ue;
+ Thu, 03 Nov 2022 08:44:41 +0000
+Date: Thu, 03 Nov 2022 08:44:04 +0000
+Message-ID: <87v8nwfmwb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v2 10/14] KVM: arm64: PMU: Move the ID_AA64DFR0_EL1.PMUver
+ limit to VM creation
+In-Reply-To: <CAAeT=FycObU5eHaR23OZ_PeR6-cQeNrmGs=Mi-VnrVuWR6ovSg@mail.gmail.com>
 References: <20221028105402.2030192-1-maz@kernel.org>
- <20221028105402.2030192-12-maz@kernel.org>
-In-Reply-To: <20221028105402.2030192-12-maz@kernel.org>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Wed, 2 Nov 2022 22:31:56 -0700
-Message-ID: <CAAeT=FyiNeRun7oRL83AUkVabUSb9pxL2SS9yZwi1rjFnbhH6g@mail.gmail.com>
-Subject: Re: [PATCH v2 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to
- be set from userspace
-To: Marc Zyngier <maz@kernel.org>
+ <20221028105402.2030192-11-maz@kernel.org>
+ <CAAeT=FycObU5eHaR23OZ_PeR6-cQeNrmGs=Mi-VnrVuWR6ovSg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 82.132.225.179
+X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ oliver.upton@linux.dev, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -86,93 +90,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Reiji,
 
-On Fri, Oct 28, 2022 at 4:16 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Allow userspace to write ID_AA64DFR0_EL1, on the condition that only
-> the PMUver field can be altered and be at most the one that was
-> initially computed for the guest.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 37 ++++++++++++++++++++++++++++++++++++-
->  1 file changed, 36 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 7a4cd644b9c0..4fa14b4ae2a6 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1247,6 +1247,40 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->         return 0;
->  }
->
-> +static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> +                              const struct sys_reg_desc *rd,
-> +                              u64 val)
-> +{
-> +       u8 pmuver, host_pmuver;
-> +
-> +       host_pmuver = kvm_arm_pmu_get_pmuver_limit();
-> +
-> +       /*
-> +        * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
-> +        * as it doesn't promise more than what the HW gives us. We
-> +        * allow an IMPDEF PMU though, only if no PMU is supported
-> +        * (KVM backward compatibility handling).
-> +        */
+On Thu, 03 Nov 2022 04:55:52 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Fri, Oct 28, 2022 at 4:16 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> >         case SYS_ID_DFR0_EL1:
+> > -               /* Limit guests to PMUv3 for ARMv8.4 */
+> > -               val = cpuid_feature_cap_perfmon_field(val,
+> > -                                                     ID_DFR0_PERFMON_SHIFT,
+> > -                                                     kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
+> > +               val &= ~ARM64_FEATURE_MASK(ID_DFR0_PERFMON);
+> > +               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_PERFMON),
+> > +                                 pmuver_to_perfmon(vcpu_pmuver(vcpu)));
+> 
+> Shouldn't KVM expose the sanitized value as it is when AArch32 is
+> not supported at EL0 ? Since the register value is UNKNOWN when AArch32
+> is not supported at EL0, I would think this code might change the PERFMON
+> field value on such systems (could cause live migration to fail).
 
-It appears the patch allows userspace to set IMPDEF even
-when host_pmuver == 0.  Shouldn't it be allowed only when
-host_pmuver == IMPDEF (as before)?
-Probably, it may not cause any real problems though.
+I'm not sure this would cause anything to fail as we now treat all
+AArch32 idregs as RAZ/WI when AArch32 isn't supported (and the
+visibility callback still applies here).
 
+But it doesn't hurt to make pmuver_to_perfmon() return 0 when AArch32
+isn't supported, and it will at least make the ID register consistent
+from a guest perspective.
 
-> +       pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
-> +       if (pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver)
-> +               return -EINVAL;
-> +
-> +       /* We already have a PMU, don't try to disable it... */
-> +       if (kvm_vcpu_has_pmu(vcpu) &&
-> +           (pmuver == 0 || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF))
-> +               return -EINVAL;
+I plan to squash the following (untested) hack in:
 
-Nit: Perhaps it might be useful to return a different error code for the
-above two (new) error cases (I plan to use -E2BIG and -EPERM
-respectively for those cases with my ID register series).
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 8f4412cd4bf6..3b28ef48a525 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1094,6 +1094,10 @@ static u8 perfmon_to_pmuver(u8 perfmon)
+ 
+ static u8 pmuver_to_perfmon(u8 pmuver)
+ {
++       /* If no AArch32, make the field RAZ */
++       if (!kvm_supports_32bit_el0())
++               return 0;
++
+        switch (pmuver) {
+        case ID_AA64DFR0_EL1_PMUVer_IMP:
+                return ID_DFR0_PERFMON_8_0;
+@@ -1302,10 +1306,9 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+                           const struct sys_reg_desc *rd,
+                           u64 val)
+ {
+-       u8 perfmon, host_perfmon = 0;
++       u8 perfmon, host_perfmon;
+ 
+-       if (system_supports_32bit_el0())
+-               host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
++       host_perfmon = pmuver_to_perfmon(kvm_arm_pmu_get_pmuver_limit());
+ 
+        /*
+         * Allow DFR0_EL1.PerfMon to be set from userspace as long as
 
-Thank you,
-Reiji
+> I should have noticed this with the previous version...
 
-> +
-> +       /* We can only differ with PMUver, and anything else is an error */
-> +       val ^= read_id_reg(vcpu, rd);
-> +       val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> +       if (val)
-> +               return -EINVAL;
-> +
-> +       vcpu->kvm->arch.dfr0_pmuver = pmuver;
-> +
-> +       return 0;
-> +}
-> +
->  /*
->   * cpufeature ID register user accessors
->   *
-> @@ -1508,7 +1542,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->         ID_UNALLOCATED(4,7),
->
->         /* CRm=5 */
-> -       ID_SANITISED(ID_AA64DFR0_EL1),
-> +       { SYS_DESC(SYS_ID_AA64DFR0_EL1), .access = access_id_reg,
-> +         .get_user = get_id_reg, .set_user = set_id_aa64dfr0_el1, },
->         ID_SANITISED(ID_AA64DFR1_EL1),
->         ID_UNALLOCATED(5,2),
->         ID_UNALLOCATED(5,3),
-> --
-> 2.34.1
->
->
+No worries, thanks a lot for having had a look!
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
