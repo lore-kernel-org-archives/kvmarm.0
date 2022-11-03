@@ -1,45 +1,45 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D676A31
-	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 07:16:54 +0000 (UTC)
-Received: by mail-wm1-f41.google.com with SMTP id a11-20020a05600c2d4b00b003cf6f5fd9f1so548117wmg.2
-        for <kvmarm@lists.linux.dev>; Thu, 03 Nov 2022 00:16:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294A3A31
+	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 07:18:18 +0000 (UTC)
+Received: by mail-wr1-f41.google.com with SMTP id cl5so1274983wrb.9
+        for <kvmarm@lists.linux.dev>; Thu, 03 Nov 2022 00:18:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=hhVVFU4gv+0KPdkJhZ6Bsgp0nMXVzSegBp2GVEhxHuI=;
-        b=h9I23FTp6GIOXmio03YkEg/XABkIyK7okfyOacacDCySEptlxLcYcKstMetIpqEjVI
-         AJxxtkE/wdXbgKxacBRTI0vKPMD7Lrwttr/WvlHH6ej0kR33MU05lAqiRuHOXS6eYgUi
-         5D/WB/7tpxiogfi3huBIVAcoj+aw5jR0iw+raivB9st+zpUrHhjUaefLK8xl1XeXGROT
-         jIYtNJVpBXb1lhi22kZeWS2z2s2scGKIObYA8G99yKRsKrD7Waw2HL3AJk86rNi+kcwk
-         ldYfFW2HEUS0Ngd3K7BW6C8SpUqOYnm44amyRmlRCLpiKmxp0dOvOZKAUgifFtw1/6bS
-         zu8w==
+        bh=D/SNnecemsjQs+W90QUlkgsOD/Rjb4+lDkgjOjEDTCQ=;
+        b=jw3d99cvMg52Lg1tLW9BuRNFr97hU8VbjiyM8gochZWG1eGvxYgj4JDJfCZnnjS66j
+         2lDmaY49Y9gNXV+0NqqYMPompzAvLelDDyxTDyv63Mzv1FpaKJ2B9UYwTxwc6+9E1fj5
+         FJhI1fX/X/YYeQJFY71s0y5YmCRlxUG6ujCNUlpLlY/mY+G8+yumC0FbiEGwNFo+LVFU
+         bsVfMxNPq9XriX8IesQE+M4MIPqclT9ZI+C/ooGdqt08Ib6SHWOMYVtcjCYmkNt5Y22V
+         kEpFY0C9GTT/VRjoVENUsza65QqqGrehKGm4P0CKYdVEVtyKJm9XwB/y8pqmKkigPrlA
+         3XhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hhVVFU4gv+0KPdkJhZ6Bsgp0nMXVzSegBp2GVEhxHuI=;
-        b=YOrTtD7x9T6H2Vis0kAqRiItOgMOZQZmUFDrvTMUaLMKeN4hvQuaG47zkzgnERS4Z0
-         ppVVoz1NuVt8QdcLdKF0peAzs3N/lwm0Pog96ZxJkaHxoaFk2opuCod2pDKqUB+VXK06
-         1lGBDPICyuZbfeRDYIOyg2/dZ6rcff4ro0OKD5OxQlN92VeWtLVMrjRZgvKc7jmEOpiL
-         RIsbIEnD+ZEEg1W/717i0B/uI/uEhA6YTzOhRT7uzi1UN4p1dpyxwIHhiIb/FpXsPXLj
-         o9A9aeZUSVq94ZtMkoV0/k2n05VDE85EE5/N9EvnFJTxJgHnFBuB8k+658V4scn15Nin
-         CP8A==
-X-Gm-Message-State: ACrzQf3IeyCyfeUtCMgCM3oqK4DUnadZW2k43mbhHeGGbhHXmO+ZI0RK
-	DB/W4HKTKQHLKMlqPcRZlStvFA==
-X-Google-Smtp-Source: AMsMyM5U5tWVDdkP8vx2CGlIc4Tyh8xELM0VfMzpr/hFq4D4kTE8+riEzXzUJzEDmk/itTcMkiPp1A==
-X-Received: by 2002:a05:600c:22c6:b0:3cf:88bb:3a95 with SMTP id 6-20020a05600c22c600b003cf88bb3a95mr4075812wmg.71.1667459812670;
-        Thu, 03 Nov 2022 00:16:52 -0700 (PDT)
+        bh=D/SNnecemsjQs+W90QUlkgsOD/Rjb4+lDkgjOjEDTCQ=;
+        b=sHpS8f8DsWFeAu5Br+QxcBFAIgMtQnzq3gy53tZTl6b7iCzdg58UHifsjcrkU7kusf
+         lsGWKkGAh4kIwfrDWvtmejB/+WD26VhhZeM+gyysLLgwRJE5ngtmp9InrCjDkSJGhPqX
+         wojt3qE4zAhF5R5R0oP+Ekn3xl4loGNdrQOeIx2vDw5ywAWTzBVWmJOWTC+yy8btdsCg
+         raRnoAF7I/EmFUrNcB2xcUb3Ffkh7oAhW/2HSBELQ1Zv8zdVnE0FbYiutC0jn6AyYedP
+         R7BkbN7KztyvjJ7w8Ylzx3Iz/Hw0bkzlkw2x3rtowubbJ3Hv/VZTzLeDMAtHkEKKMfFT
+         UEqQ==
+X-Gm-Message-State: ACrzQf1OWgwOHEUvazmZbYzVvQqgB9/1Sy7N3JID7E77cXe2XTPsOC0v
+	gWMr1JfrEhwAKzHJZ0VTpcnKMA==
+X-Google-Smtp-Source: AMsMyM6jhYnE/aEjYcHXapzofavAu7pX7ddMD038s2P34j/GAHoNYKyfFysuRe52YUvpGlRBEmTO3A==
+X-Received: by 2002:a5d:42c7:0:b0:236:4ddd:3576 with SMTP id t7-20020a5d42c7000000b002364ddd3576mr17938354wrr.289.1667459896483;
+        Thu, 03 Nov 2022 00:18:16 -0700 (PDT)
 Received: from [192.168.11.175] (216.red-88-29-181.dynamicip.rima-tde.net. [88.29.181.216])
-        by smtp.gmail.com with ESMTPSA id p22-20020a05600c359600b003c6b9749505sm4601041wmq.30.2022.11.03.00.16.48
+        by smtp.gmail.com with ESMTPSA id j7-20020a05600c190700b003b477532e66sm6341187wmq.2.2022.11.03.00.18.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Nov 2022 00:16:51 -0700 (PDT)
-Message-ID: <5aaa19b8-da75-9a3c-634b-d4c26f77943b@linaro.org>
-Date: Thu, 3 Nov 2022 08:16:48 +0100
+        Thu, 03 Nov 2022 00:18:15 -0700 (PDT)
+Message-ID: <1da0b1fa-ca20-4370-26b4-9f18ab8ac95d@linaro.org>
+Date: Thu, 3 Nov 2022 08:18:12 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,8 +48,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.4.1
-Subject: Re: [PATCH 25/44] KVM: s390: Do s390 specific init without bouncing
- through kvm_init()
+Subject: Re: [PATCH 27/44] KVM: Drop kvm_arch_{init,exit}() hooks
 Content-Language: en-US
 To: Sean Christopherson <seanjc@google.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
@@ -76,29 +75,31 @@ Cc: James Morse <james.morse@arm.com>,
  <mpe@ellerman.id.au>, Chao Gao <chao.gao@intel.com>,
  Thomas Gleixner <tglx@linutronix.de>, Yuan Yao <yuan.yao@intel.com>
 References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-26-seanjc@google.com>
+ <20221102231911.3107438-28-seanjc@google.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20221102231911.3107438-26-seanjc@google.com>
+In-Reply-To: <20221102231911.3107438-28-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Message-ID: <20221103071648.jkMx69BMOh4gdiKdpuUUr6YTx-Uhu0a_US8l16mTc14@z>
+Message-ID: <20221103071812.xx96fHwn0Kz6lVlGCJF2I2VC71JwqUz-FxIm64jEs78@z>
 
 On 3/11/22 00:18, Sean Christopherson wrote:
-> Move the guts of kvm_arch_init() into a new helper, __kvm_s390_init(),
-> and invoke the new helper directly from kvm_s390_init() instead of
-> bouncing through kvm_init().  Invoking kvm_arch_init() is the very
-> first action performed by kvm_init(), i.e. this is a glorified nop.
-> 
-> Moving setup to __kvm_s390_init() will allow tagging more functions as
-> __init, and emptying kvm_arch_init() will allow dropping the hook
-> entirely once all architecture implementations are nops.
+> Drop kvm_arch_init() and kvm_arch_exit() now that all implementations
+> are nops.
 > 
 > No functional change intended.
 > 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->   arch/s390/kvm/kvm-s390.c | 29 +++++++++++++++++++++++++----
->   1 file changed, 25 insertions(+), 4 deletions(-)
+>   arch/arm64/kvm/arm.c                | 11 -----------
+>   arch/mips/kvm/mips.c                | 10 ----------
+>   arch/powerpc/include/asm/kvm_host.h |  1 -
+>   arch/powerpc/kvm/powerpc.c          |  5 -----
+>   arch/riscv/kvm/main.c               |  9 ---------
+>   arch/s390/kvm/kvm-s390.c            | 10 ----------
+>   arch/x86/kvm/x86.c                  | 10 ----------
+>   include/linux/kvm_host.h            |  3 ---
+>   virt/kvm/kvm_main.c                 | 19 ++-----------------
+>   9 files changed, 2 insertions(+), 76 deletions(-)
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 
