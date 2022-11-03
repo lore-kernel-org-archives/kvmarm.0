@@ -2,79 +2,94 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA6CFC433FE
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 17:53:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87561C4332F
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 17:58:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 026614B0D7;
-	Thu,  3 Nov 2022 13:53:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E95284B4D7;
+	Thu,  3 Nov 2022 13:58:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WsRJXhsIXR7E; Thu,  3 Nov 2022 13:53:38 -0400 (EDT)
+	with ESMTP id Mqhd5RB4LTp8; Thu,  3 Nov 2022 13:58:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E00914B105;
-	Thu,  3 Nov 2022 13:53:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C5164B0D7;
+	Thu,  3 Nov 2022 13:58:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BDB64B0D0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 13:53:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 179524B0D7
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 13:58:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GATZdjuBvqQf for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Nov 2022 13:53:37 -0400 (EDT)
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com
- [209.85.215.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E1214B0CB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 13:53:37 -0400 (EDT)
-Received: by mail-pg1-f171.google.com with SMTP id r18so2299844pgr.12
- for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Nov 2022 10:53:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=3tXwq1v6tJCedr2VtV8ELYd8BpIXTKwmGjuY8weIxs8=;
- b=gjqnoLy192oz/Zxvag+BlBreQGGSfkeJOmpmCEx7rtJpm2GzAgZsoDzOerCZhLAwiY
- s4s7ScvfoZl8zwg6HI1Ymb7QpOkn2NxzwKs5NTcMl1wbeFQ/hmv3VmCXwSollG4iohk8
- ZfCLF4UOQot0TZFoB2ZSgy0wzT2PFfm47J97NCOCE8O1C25eIzJzc1jTDAryWTakKtb6
- +QR4ykcFsYtONZVST62uH0g9I4NSfzwB8k/a9JLQz8I+tNs7JhVckzNuFRTBv1+mgFsk
- IdkM799qrsruF4xx+MeYDtb4Sd8Y4cxbHh++70LJo94wIuv8aLLKYeYlUVyl7mOC3bBK
- Ww4w==
+ with ESMTP id 0KxmF-67afRc for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Nov 2022 13:58:03 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DD3994B0D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 13:58:02 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1667498282;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=yqxXm7t2WOic9y4ISYxOwK8KmYTr1cBIHzcg/Vydbzs=;
+ b=JO0fY+VMuNNNhB9GwqiOZKCp7OisVtjP792TK1lpPDIfzSzbT7aAJufF3oHGhVTVFyZUGQ
+ ypXwi8rVRS4QmQA6Lg0x3F8li1VJ7ovfimxJHpMQGE6P6HtY23MmbmBQro9xR8QSBVNE47
+ UJ/Be44vj5/GmEQJYh7tSZhvW+53jI8=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-537-w4zrtZl2OhGkVqUSOgAhIA-1; Thu, 03 Nov 2022 13:58:01 -0400
+X-MC-Unique: w4zrtZl2OhGkVqUSOgAhIA-1
+Received: by mail-ed1-f72.google.com with SMTP id
+ c9-20020a05640227c900b00463de74bc15so1884494ede.13
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Nov 2022 10:58:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
- :message-id:reply-to;
- bh=3tXwq1v6tJCedr2VtV8ELYd8BpIXTKwmGjuY8weIxs8=;
- b=uu+Bu2Izr6tD06LnXxS/b/nGnMBhzbqdR1Hjcg5JmTKmEpNX90/TjX9Tpf+NM3cWSX
- 26+zYB0L5mCWDPOobQSZ0wgRMBtouWqp179XSiW59T4gwniNJ37MtEaBn+Jul2EoC2sm
- ZTfbzVi01HA0Lvx8iGo4Ih9ysNfPW1pohBLCMYT9EH7VDRcgmtld1E5gDUtk7pI5YvNO
- Ws4u46qtJSr9QAC1uQhSVXU74XnabAZnruAkYki7ErW+hoiuAyERmgIwyQomMoAs/GDF
- 826LHc5seQ0Kh5WDDayhzFn4CsVaoyFTp4Amx2PR2Oyfoa0Rh9oGBw8izLpVF24ptwks
- 8g9A==
-X-Gm-Message-State: ACrzQf2/ldT9hjwBPdMi2taMahHBr8jhS+JlUya8YYrHTroJ8/n8eCpQ
- fC/8yxYzow8U1rpAJbOE9T9p1g==
-X-Google-Smtp-Source: AMsMyM5pSkjZTiut6RFho0StQnuo7qAiklz26C63x768BJpOt4UV7sKT8fcspUYyR/B7P1xdFXKPhA==
-X-Received: by 2002:a05:6a00:999:b0:56c:3d0d:96fe with SMTP id
- u25-20020a056a00099900b0056c3d0d96femr31657100pfg.12.1667498015565; 
- Thu, 03 Nov 2022 10:53:35 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com.
- [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
- e20-20020a63e014000000b0045ff216a0casm1080329pgh.3.2022.11.03.10.53.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Nov 2022 10:53:35 -0700 (PDT)
-Date: Thu, 3 Nov 2022 17:53:31 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 39/44] KVM: Drop kvm_count_lock and instead protect
- kvm_usage_count with kvm_lock
-Message-ID: <Y2QAG0wCPNv7atC/@google.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-40-seanjc@google.com>
- <7b6ce80e-7f1f-11cd-8bde-8d8fa9fd7e1d@redhat.com>
+ h=content-transfer-encoding:in-reply-to:from:references:cc:to
+ :content-language:subject:user-agent:mime-version:date:message-id
+ :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+ bh=yqxXm7t2WOic9y4ISYxOwK8KmYTr1cBIHzcg/Vydbzs=;
+ b=C5JV3qIcaRBb0FWHNlNQ+nZhriJL3u6atPMjxQ2AOsOVgqmD3GgPKTVSe+WChyhWTh
+ ZIWTviczwrV2h9sZLQXhx5Xd4x4SxfNRc3ZEkRDnlw/mKAuapIIkghu2xk+9DFLDXktO
+ G1eQGq6xkc1TG9O9o7W3PJahq7UKbjTGjf4yqEAKQ5qQ1gA7dEmElUg9+7zfL5zof6qI
+ IHo0UMraU1maOhx8bd2LYwwGhWoZql4ZS/LuEgAE9Mn/TcbesdgSyIYA1FDsCeSBZzcc
+ vaYFUHvEaAdYalNemneqKVANrdlGPjg0gfPQq5luQf0Ph5HLlx40DTLDH6kZWDexTU2k
+ zkHg==
+X-Gm-Message-State: ACrzQf0t2m81kTYiN8ODsmsVUF/TlzQw+SWKw953gWWNlp5u1J5dj6if
+ qhRDmXaHqnzue474hB26ERbxYwSIPDPSE9jG28UWXUpzjYrwwpFZAGm9NnBPm4cAR+85M6vJaIY
+ dtQC+sKgXsz40mD5rly8vZkam
+X-Received: by 2002:a17:907:a087:b0:7ad:a2ec:1afa with SMTP id
+ hu7-20020a170907a08700b007ada2ec1afamr30061891ejc.151.1667498280174; 
+ Thu, 03 Nov 2022 10:58:00 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6QZmNq5hCph1jlllZl0PdTQdpFjKynjhfU4TqqXsTy2ri356CZrCrEtJkVH+I+gMfL+O9fNA==
+X-Received: by 2002:a17:907:a087:b0:7ad:a2ec:1afa with SMTP id
+ hu7-20020a170907a08700b007ada2ec1afamr30061831ejc.151.1667498279805; 
+ Thu, 03 Nov 2022 10:57:59 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c?
+ ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+ by smtp.googlemail.com with ESMTPSA id
+ l3-20020a170907914300b0078d76ee7543sm734215ejs.222.2022.11.03.10.57.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 03 Nov 2022 10:57:58 -0700 (PDT)
+Message-ID: <1fd2e729-6e46-b0bf-d89e-f5d1b4dbde77@redhat.com>
+Date: Thu, 3 Nov 2022 18:57:55 +0100
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <7b6ce80e-7f1f-11cd-8bde-8d8fa9fd7e1d@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 36/44] KVM: x86: Do compatibility checks when onlining CPU
+To: Sean Christopherson <seanjc@google.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221102231911.3107438-37-seanjc@google.com>
+ <23bfd709-f99a-5a74-e4b9-1381b88453f1@redhat.com>
+ <Y2P+E+631c0TNcK7@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Y2P+E+631c0TNcK7@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
 Cc: Matthew Rosato <mjrosato@linux.ibm.com>,
  David Hildenbrand <david@redhat.com>, Yuan Yao <yuan.yao@intel.com>,
  Paul Walmsley <paul.walmsley@sifive.com>, linux-kernel@vger.kernel.org,
@@ -103,52 +118,50 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Nov 03, 2022, Paolo Bonzini wrote:
-> On 11/3/22 00:19, Sean Christopherson wrote:
-> > +- kvm_lock is taken outside kvm->mmu_lock
+On 11/3/22 18:44, Sean Christopherson wrote:
+>>> Do compatibility checks when enabling hardware to effectively add
+>>> compatibility checks when onlining a CPU.  Abort enabling, i.e. the
+>>> online process, if the (hotplugged) CPU is incompatible with the known
+>>> good setup.
+>>
+>> This paragraph is not true with this patch being before "KVM: Rename and
+>> move CPUHP_AP_KVM_STARTING to ONLINE section".
+>
+> Argh, good eyes.  Getting the ordering correct in this series has been quite the
+> struggle.  Assuming there are no subtle dependencies between x86 and common KVM,
+> the ordering should be something like this:
+
+It's not a problem to keep the ordering in this v1, just fix the commit 
+message like "Do compatibility checks when enabling hardware to 
+effectively add compatibility checks on CPU hotplug.  For now KVM is 
+using a STARTING hook, which makes it impossible to abort the hotplug if 
+the new CPU is incompatible with the known good setup; switching to an 
+ONLINE hook will fix this."
+
+Paolo
+
+>    KVM: Opt out of generic hardware enabling on s390 and PPC
+>    KVM: Register syscore (suspend/resume) ops early in kvm_init()
+>    KVM: x86: Do compatibility checks when onlining CPU
+>    KVM: SVM: Check for SVM support in CPU compatibility checks
+>    KVM: VMX: Shuffle support checks and hardware enabling code around
+>    KVM: x86: Do VMX/SVM support checks directly in vendor code
+>    KVM: x86: Unify pr_fmt to use module name for all KVM modules
+>    KVM: x86: Use KBUILD_MODNAME to specify vendor module name
+>    KVM: Make hardware_enable_failed a local variable in the "enable all" path
+>    KVM: Use a per-CPU variable to track which CPUs have enabled virtualization
+>    KVM: Remove on_each_cpu(hardware_disable_nolock) in kvm_exit()
+>    KVM: Drop kvm_count_lock and instead protect kvm_usage_count with kvm_lock
+>    KVM: Disable CPU hotplug during hardware enabling
+>    KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
+>    KVM: Drop kvm_arch_check_processor_compat() hook
 > 
-> Not surprising since one is a mutex and one is an rwlock. :)
 
-Heh, 
-
-  Signed-off-by: Captain Obvious <seanjc@google.com>
-
-> You can drop this hunk as well as the "Opportunistically update KVM's locking
-> documentation" sentence in the commit message.
-
-Will do.
-
-> >   - vcpu->mutex is taken outside kvm->arch.hyperv.hv_lock
-> >   - kvm->arch.mmu_lock is an rwlock.  kvm->arch.tdp_mmu_pages_lock and
-> > @@ -216,15 +220,11 @@ time it will be set using the Dirty tracking mechanism described above.
-> >   :Type:		mutex
-> >   :Arch:		any
-> >   :Protects:	- vm_list
-> > -
-> > -``kvm_count_lock``
-> > -^^^^^^^^^^^^^^^^^^
-> > -
-> > -:Type:		raw_spinlock_t
-> > -:Arch:		any
-> > -:Protects:	- hardware virtualization enable/disable
-> > -:Comment:	'raw' because hardware enabling/disabling must be atomic /wrt
-> > -		migration.
-> > +		- kvm_usage_count
-> > +		- hardware virtualization enable/disable
-> > +		- module probing (x86 only)
-> 
-> What do you mean exactly by "module probing"?  Is it anything else than what
-> is serialized by vendor_module_lock?
-
-Ooh, I forgot to update this patch after switching to vendor_module_lock.  I
-added the above after fixing the first deadlock between kvm_lock and cpu_hotplug_lock,
-but later gave up on trying to use kvm_lock after deadlock #2, which is when I
-when I realized piggybacking kvm_lock was going to be a maintainance nightmare due.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
