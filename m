@@ -2,99 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43771C43219
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Nov 2022 23:20:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C3D4C4332F
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Nov 2022 00:44:50 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02A644B885;
-	Wed,  2 Nov 2022 19:20:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E88249EDE;
+	Wed,  2 Nov 2022 20:44:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id guCtiiLyunO5; Wed,  2 Nov 2022 19:20:37 -0400 (EDT)
+	with ESMTP id zmf6UWKRPNd5; Wed,  2 Nov 2022 20:44:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A18224B894;
-	Wed,  2 Nov 2022 19:20:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F5EF4B28D;
+	Wed,  2 Nov 2022 20:44:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 77F084B894
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:20:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 64FB749EDE
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 20:44:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hGWuIzIsQbZC for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Nov 2022 19:20:29 -0400 (EDT)
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
- [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7B0E4B815
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 19:20:28 -0400 (EDT)
-Received: by mail-yb1-f201.google.com with SMTP id
- f126-20020a255184000000b006cb2aebd124so364501ybb.11
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Nov 2022 16:20:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
- :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=nvDOwkn7hwg+zfvJUXf8AHfTsU5S0iCSbbYe/XAvrQI=;
- b=kPsyz565Bs3nWd/vXeOuSWMgvIdI7+RJdtnuc0znmJIjMQ8uzXLRwKs8W7PumGf1FB
- TInnWKg6dZjNDAKuYUbWAGztsfGiZ+tk8yY6bKPVrq1xzztMo8xlFpqIJ6lhzJTHDPrm
- lou7lyJZKFxoJ8wozjn3uJXVRhz+EYknGTCWfTAQUsNnFbSP/SLgEfh6MyRvKfldCG8U
- pqOyiOjbRpZeYdvtQ7S7c4kgRIPHFaJSoTRioybyXKPMMU3h/v/TNXPFUOrsn8FChvzn
- JAwsqVkjZPDDeC2WWvWJ0112+KgndOYyfFTaXcofTGWmMGiul8k48NIfwWZFm0EpNX4X
- UhZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
- :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
- :reply-to;
- bh=nvDOwkn7hwg+zfvJUXf8AHfTsU5S0iCSbbYe/XAvrQI=;
- b=xTwwC33AWtpEy2iKyvt2xyDvWZ2HG8Nprg00FOAx4p+kywWk2FS3DTex3Ss/nBkTyr
- nTAfJOmp0s4viyEZZTphsAcIWhoxNrjRKjsFvpQ9W8gVPonog0usoIi/oD7eRCwpLtu4
- vJNSKAuIkAdJcfRTsHDh/PgFbCmCXgYDEBnqd1EqPAfV5b0q/PM8looohqyHXE9DX7jl
- ZrgYC8w68sGF6cgM3pNhv/4stiNplP2SxGyBCYjYfYw4hgkqmh8q+4YdRNUrZ6tN2HaH
- oD9PZchne4iMlg4XMp/kwFuuLyw9rsRK06gvb/nHKpXxbSMuPa47JhxBGy3k+68Yas7a
- 4Dkg==
-X-Gm-Message-State: ACrzQf0T6/fu0Kh2FBymHNceDenOwsJ9c2HukhIaXd60Y4eFKcpdhUY+
- V/aAE6eZMC1NBUlOHXqJTNpPDHnPHA0=
-X-Google-Smtp-Source: AMsMyM5eowv7lcJiOd868nUuFM6ikjnC3RuvYPPk5CroI1jtu45SCXqk7PcUOxGjfgiO1DuVsExFVnovkSQ=
-X-Received: from zagreus.c.googlers.com
- ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:b9b:b0:367:7d5a:3403 with SMTP id
- ck27-20020a05690c0b9b00b003677d5a3403mr179885ywb.148.1667431228175; Wed, 02
- Nov 2022 16:20:28 -0700 (PDT)
-Date: Wed,  2 Nov 2022 23:19:10 +0000
-In-Reply-To: <20221102231911.3107438-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20221102231911.3107438-1-seanjc@google.com>
-X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221102231911.3107438-44-seanjc@google.com>
-Subject: [PATCH 43/44] KVM: Register syscore (suspend/resume) ops early in
- kvm_init()
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
- Huacai Chen <chenhuacai@kernel.org>, 
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Anup Patel <anup@brainfault.org>, 
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
- Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>, 
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, 
- Matthew Rosato <mjrosato@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, 
- Sean Christopherson <seanjc@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- Atish Patra <atishp@atishpatra.org>, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-s390@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
- Chao Gao <chao.gao@intel.com>, Yuan Yao <yuan.yao@intel.com>,
- kvmarm@lists.linux.dev, Thomas Gleixner <tglx@linutronix.de>,
- linux-arm-kernel@lists.infradead.org,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Fabiano Rosas <farosas@linux.ibm.com>, linux-mips@vger.kernel.org,
- kvm-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
+ with ESMTP id Q26XJTnWgq2z for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Nov 2022 20:44:45 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E84F141070
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Nov 2022 20:44:45 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1667436285;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SSLSYckBlW+n3JxKkI9fBnOPYDTW+sybGJFFtiBCB1Y=;
+ b=HfTE2yQ029MFEwb2PIcDk6Qn9yXBlyYiGLQ0L7zmn+KgIEsYVm8tvM8VDfJgfRTo9E/AO1
+ nD+DtFS6KNjTfnd42qQ1jMn4A10iLU9tCGd29wzFg6eFnoiT7vLxP1mmw7an8jLiETwpKG
+ +X3zbTEsfcM6o72S399tkDatNxbcpTI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-357-7Sa5Kei4P9qdoyUA1xC4lA-1; Wed, 02 Nov 2022 20:44:43 -0400
+X-MC-Unique: 7Sa5Kei4P9qdoyUA1xC4lA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.2])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2815D185A78F;
+ Thu,  3 Nov 2022 00:44:42 +0000 (UTC)
+Received: from [10.64.54.56] (vpn2-54-56.bne.redhat.com [10.64.54.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CF32C40C6EE9;
+ Thu,  3 Nov 2022 00:44:35 +0000 (UTC)
+Subject: Re: [PATCH v7 1/9] KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
+To: Marc Zyngier <maz@kernel.org>, Sean Christopherson <seanjc@google.com>
+References: <20221031003621.164306-1-gshan@redhat.com>
+ <20221031003621.164306-2-gshan@redhat.com> <Y2F17Y7YG5Z9XnOJ@google.com>
+ <Y2J+xhBYhqBI81f7@x1n> <867d0de4b0.wl-maz@kernel.org>
+ <Y2KWm8wiL3jBryMI@google.com> <871qqlgvba.wl-maz@kernel.org>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <c44d4e62-ffbb-bdba-f1a7-7fb6a0f44e75@redhat.com>
+Date: Thu, 3 Nov 2022 08:44:32 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <871qqlgvba.wl-maz@kernel.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Cc: shuah@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ andrew.jones@linux.dev, dmatlack@google.com, shan.gavin@gmail.com,
+ bgardon@google.com, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ zhenyzha@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Sean Christopherson <seanjc@google.com>
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -103,130 +85,85 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Register the suspend/resume notifier hooks at the same time KVM registers
-its reboot notifier so that all the code in kvm_init() that deals with
-enabling/disabling hardware is bundled together.  Opportunstically move
-KVM's implementations to reside near the reboot notifier code for the
-same reason.
+On 11/3/22 12:44 AM, Marc Zyngier wrote:
+> On Wed, 02 Nov 2022 16:11:07 +0000,
+> Sean Christopherson <seanjc@google.com> wrote:
+>>
+>> On Wed, Nov 02, 2022, Marc Zyngier wrote:
+>>> On Wed, 02 Nov 2022 14:29:26 +0000, Peter Xu <peterx@redhat.com> wrote:
+>>>> However I don't see anything stops a simple "race" to trigger like below:
+>>>>
+>>>>            recycle thread                   vcpu thread
+>>>>            --------------                   -----------
+>>>>        if (!dirty_ring_soft_full)                                   <--- not full
+>>>>                                          dirty_ring_push();
+>>>>                                          if (dirty_ring_soft_full)  <--- full due to the push
+>>>>                                              set_request(SOFT_FULL);
+>>>>            clear_request(SOFT_FULL);                                <--- can wrongly clear the request?
+>>>>
+>>>
+>>> Hmmm, well spotted. That's another ugly effect of the recycle thread
+>>> playing with someone else's toys.
+>>>
+>>>> But I don't think that's a huge matter, as it'll just let the vcpu to have
+>>>> one more chance to do another round of KVM_RUN.  Normally I think it means
+>>>> there can be one more dirty GFN (perhaps there're cases that it can push >1
+>>>> gfns for one KVM_RUN cycle?  I never figured out the details here, but
+>>>> still..) pushed to the ring so closer to the hard limit, but we have had a
+>>>> buffer zone of KVM_DIRTY_RING_RSVD_ENTRIES (64) entries.  So I assume
+>>>> that's still fine, but maybe worth a short comment here?
+>>>>
+>>>> I never know what's the maximum possible GFNs being dirtied for a KVM_RUN
+>>>> cycle.  It would be good if there's an answer to that from anyone.
+>>>
+>>> This is dangerous, and I'd rather not go there.
+>>>
+>>> It is starting to look like we need the recycle thread to get out of
+>>> the way. And to be honest:
+>>>
+>>> +	if (!kvm_dirty_ring_soft_full(ring))
+>>> +		kvm_clear_request(KVM_REQ_DIRTY_RING_SOFT_FULL, vcpu);
+>>>
+>>> seems rather superfluous. Only clearing the flag in the vcpu entry
+>>> path feels much saner, and I can't see anything that would break.
+>>>
+>>> Thoughts?
+>>
+>> I've no objections to dropping the clear on reset, I suggested it
+>> primarily so that it would be easier to understand what action
+>> causes the dirty ring to become not-full.  I agree that the explicit
+>> clear is unnecessary from a functional perspective.
+> 
+> The core of the issue is that the whole request mechanism is a
+> producer/consumer model, where consuming a request is a CLEAR
+> action. The standard model is that the vcpu thread is the consumer,
+> and that any thread (including the vcpu itself) can be a producer.
+> 
+> With this flag clearing being on a non-vcpu thread, you end-up with
+> two consumers, and things can go subtly wrong.
+> 
+> I'd suggest replacing this hunk with a comment saying that the request
+> will be cleared by the vcpu thread next time it enters the guest.
+> 
 
-Bunching the code together will allow architectures to opt out of KVM's
-generic hardware enable/disable logic with minimal #ifdeffery.
+Thanks, Marc. I will replace the hunk of code with the following
+comments, as you suggested, in next respin.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- virt/kvm/kvm_main.c | 64 ++++++++++++++++++++++-----------------------
- 1 file changed, 32 insertions(+), 32 deletions(-)
+     /*
+      * The request KVM_REQ_DIRTY_RING_SOFT_FULL will be cleared
+      * by the VCPU thread next time when it enters the guest.
+      */
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index a18296ee731b..859bc27091cd 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -5142,6 +5142,36 @@ static struct notifier_block kvm_reboot_notifier = {
- 	.priority = 0,
- };
- 
-+static int kvm_suspend(void)
-+{
-+	/*
-+	 * Secondary CPUs and CPU hotplug are disabled across the suspend/resume
-+	 * callbacks, i.e. no need to acquire kvm_lock to ensure the usage count
-+	 * is stable.  Assert that kvm_lock is not held as a paranoid sanity
-+	 * check that the system isn't suspended when KVM is enabling hardware.
-+	 */
-+	lockdep_assert_not_held(&kvm_lock);
-+	lockdep_assert_irqs_disabled();
-+
-+	if (kvm_usage_count)
-+		hardware_disable_nolock(NULL);
-+	return 0;
-+}
-+
-+static void kvm_resume(void)
-+{
-+	lockdep_assert_not_held(&kvm_lock);
-+	lockdep_assert_irqs_disabled();
-+
-+	if (kvm_usage_count)
-+		WARN_ON_ONCE(__hardware_enable_nolock());
-+}
-+
-+static struct syscore_ops kvm_syscore_ops = {
-+	.suspend = kvm_suspend,
-+	.resume = kvm_resume,
-+};
-+
- static void kvm_io_bus_destroy(struct kvm_io_bus *bus)
- {
- 	int i;
-@@ -5720,36 +5750,6 @@ static void kvm_init_debug(void)
- 	}
- }
- 
--static int kvm_suspend(void)
--{
--	/*
--	 * Secondary CPUs and CPU hotplug are disabled across the suspend/resume
--	 * callbacks, i.e. no need to acquire kvm_lock to ensure the usage count
--	 * is stable.  Assert that kvm_lock is not held as a paranoid sanity
--	 * check that the system isn't suspended when KVM is enabling hardware.
--	 */
--	lockdep_assert_not_held(&kvm_lock);
--	lockdep_assert_irqs_disabled();
--
--	if (kvm_usage_count)
--		hardware_disable_nolock(NULL);
--	return 0;
--}
--
--static void kvm_resume(void)
--{
--	lockdep_assert_not_held(&kvm_lock);
--	lockdep_assert_irqs_disabled();
--
--	if (kvm_usage_count)
--		WARN_ON_ONCE(__hardware_enable_nolock());
--}
--
--static struct syscore_ops kvm_syscore_ops = {
--	.suspend = kvm_suspend,
--	.resume = kvm_resume,
--};
--
- static inline
- struct kvm_vcpu *preempt_notifier_to_vcpu(struct preempt_notifier *pn)
- {
-@@ -5865,6 +5865,7 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
- 		return r;
- 
- 	register_reboot_notifier(&kvm_reboot_notifier);
-+	register_syscore_ops(&kvm_syscore_ops);
- 
- 	/* A kmem cache lets us meet the alignment requirements of fx_save. */
- 	if (!vcpu_align)
-@@ -5899,8 +5900,6 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
- 
- 	kvm_chardev_ops.owner = module;
- 
--	register_syscore_ops(&kvm_syscore_ops);
--
- 	kvm_preempt_ops.sched_in = kvm_sched_in;
- 	kvm_preempt_ops.sched_out = kvm_sched_out;
- 
-@@ -5934,6 +5933,7 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
- 		free_cpumask_var(per_cpu(cpu_kick_mask, cpu));
- 	kmem_cache_destroy(kvm_vcpu_cache);
- out_free_3:
-+	unregister_syscore_ops(&kvm_syscore_ops);
- 	unregister_reboot_notifier(&kvm_reboot_notifier);
- 	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_ONLINE);
- 	return r;
--- 
-2.38.1.431.g37b22c650d-goog
+I will post v8 after Peter/Sean/Oliver take a look on [PATCH v7 4/9].
+I think we're settled on other patches.
+
+Thanks,
+Gavin
 
 _______________________________________________
 kvmarm mailing list
