@@ -1,92 +1,93 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531556FC3
-	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 12:46:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1667479596;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6Lh+aq0KrT7YT7zq9EYFKfpsO05/wse1gFPTUN4LGR8=;
-	b=GMSdX3cPDluh9oLoXHYm4jnRKUMGsO1JxQ1RIlWNUCTDrhb2RDcDXjld3MvCGqGEJOSKNO
-	bsyphQZedinPg2D8t7gMXtB/BOgcWvZCZAyAGRvlWACH6nVhj5yXlm1X2/0aCzQaDifBps
-	L1DLZ9j9RVXu835mLTmENv78MlIXgn8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-425-rDTZzCaNMfqkeMoeZ1x5EQ-1; Thu, 03 Nov 2022 08:46:33 -0400
-X-MC-Unique: rDTZzCaNMfqkeMoeZ1x5EQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 145AE823F77;
-	Thu,  3 Nov 2022 12:46:31 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.104])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E6A2492B06;
-	Thu,  3 Nov 2022 12:46:30 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, Huacai Chen
- <chenhuacai@kernel.org>, Aleksandar Markovic
- <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, Paul
- Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Matthew Rosato
- <mjrosato@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Sean
- Christopherson <seanjc@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: James Morse <james.morse@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Atish Patra
- <atishp@atishpatra.org>, David Hildenbrand <david@redhat.com>,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, Isaku Yamahata
- <isaku.yamahata@intel.com>, Fabiano Rosas <farosas@linux.ibm.com>, Michael
- Ellerman <mpe@ellerman.id.au>, Chao Gao <chao.gao@intel.com>, Thomas
- Gleixner <tglx@linutronix.de>, Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 04/44] KVM: Teardown VFIO ops earlier in kvm_exit()
-In-Reply-To: <20221102231911.3107438-5-seanjc@google.com>
-Organization: Red Hat GmbH
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-5-seanjc@google.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date: Thu, 03 Nov 2022 13:46:28 +0100
-Message-ID: <87edukxl23.fsf@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A246FCC
+	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 13:07:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2138CC433C1;
+	Thu,  3 Nov 2022 13:07:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1667480867;
+	bh=paPkw39dqHtmErAsf9C/CLDJENUkAuTQbIXYzYC094Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HIYf+nQdrasSK/NVQgGx2iqIUt/stTwTv4lk1CfomCCZn/QTuub9yvHJ2Wz0QUSN5
+	 5N1JyUVMduehZOkIHHl7QNQ4DdLmYCACpfOfhQgxmANP7630fce2ubXIPGddWBv83b
+	 qsQp05lAMG3mQjRJram82blP7wQsyfYOwfKiVpvCy4TN/qi4ZJT8VrSGxtgjIBiY7E
+	 X5RigzF7elfmQ39vl0Dvr9Gpe/MDiRw81wLKqAFAHR0+k+Xxe9XQ50a7fRCYC+6Hvy
+	 8UMz4wscne+dbcAvK6NQstNmOYmR/seOHShcztXdN4FunsY2Zep9xIwonFje/L8WN6
+	 8mS8LIAkWcJUw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1oqZwe-003VMC-Gl;
+	Thu, 03 Nov 2022 13:07:44 +0000
+Date: Thu, 03 Nov 2022 13:07:38 +0000
+Message-ID: <86h6zgqj8l.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Cc: james.morse@arm.com,
+	alexandru.elisei@arm.com,
+	suzuki.poulose@arm.com,
+	oliver.upton@linux.dev,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Update comment of create_hyp_mappings
+In-Reply-To: <20221103053228.961591-1-r09922117@csie.ntu.edu.tw>
+References: <20221103053228.961591-1-r09922117@csie.ntu.edu.tw>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-Message-ID: <20221103124628.6cAG2iYRZEoKjmmdKVWxbAL8ZXeqt-M2Zf-o-8mDugg@z>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: r09922117@csie.ntu.edu.tw, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221103130738.Kx8Dh_c8trs6gfdl2KRY6_C9JyBjD3sptSA-OF_aCug@z>
 
-On Wed, Nov 02 2022, Sean Christopherson <seanjc@google.com> wrote:
-
-> Move the call to kvm_vfio_ops_exit() further up kvm_exit() to try and
-> bring some amount of symmetry to the setup order in kvm_init(), and more
-> importantly so that the arch hooks are invoked dead last by kvm_exit().
-> This will allow arch code to move away from the arch hooks without any
-> change in ordering between arch code and common code in kvm_exit().
->
-> That kvm_vfio_ops_exit() is called last appears to be 100% arbitrary.  It
-> was bolted on after the fact by commit 571ee1b68598 ("kvm: vfio: fix
-> unregister kvm_device_ops of vfio").  The nullified kvm_device_ops_table
-> is also local to kvm_main.c and is used only when there are active VMs,
-> so unless arch code is doing something truly bizarre, nullifying the
-> table earlier in kvm_exit() is little more than a nop.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Thu, 03 Nov 2022 05:32:28 +0000,
+Wei-Lin Chang <r09922117@csie.ntu.edu.tw> wrote:
+> 
+> HYP_PAGE_OFFSET is removed since 4.8, and the method for generating Hyp
+> VAs has evolved. Update the functional description of
+> create_hyp_mappings accordingly.
+> 
+> Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
 > ---
->  virt/kvm/kvm_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/arm64/kvm/mmu.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index c9a13e487..a9ae4a3f9 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -424,9 +424,10 @@ void kvm_unshare_hyp(void *from, void *to)
+>   * @to:		The virtual kernel end address of the range (exclusive)
+>   * @prot:	The protection to be applied to this range
+>   *
+> - * The same virtual address as the kernel virtual address is also used
+> - * in Hyp-mode mapping (modulo HYP_PAGE_OFFSET) to the same underlying
+> - * physical pages.
+> + * The Hyp virtual address is generated by masking the kernel VA with
+> + * va_mask then inserting tag_val for the higher bits starting from
+> + * tag_lsb. See kvm_compute_layout() in va_layout.c for more info.
+> + * Both Hyp VA and kernel VA ranges map to the same underlying physical pages.
+>   */
+>  int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
+>  {
 
-Looks safe to me.
+What's the difference with the previous instance of this patch?
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+       M.
 
+-- 
+Without deviation from the norm, progress is not possible.
