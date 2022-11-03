@@ -1,48 +1,46 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB167492
-	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 15:30:02 +0000 (UTC)
-Received: by mail-pf1-f177.google.com with SMTP id g62so1920012pfb.10
-        for <kvmarm@lists.linux.dev>; Thu, 03 Nov 2022 08:30:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1011163A0
+	for <kvmarm@lists.linux.dev>; Thu,  3 Nov 2022 17:44:56 +0000 (UTC)
+Received: by mail-pj1-f48.google.com with SMTP id gw22so2354458pjb.3
+        for <kvmarm@lists.linux.dev>; Thu, 03 Nov 2022 10:44:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=UyUe+HbRzSrTdJquQCMiaXWC2coZG28I37xguDaJaYg=;
-        b=JxP3em5mMEo8M/seyYjwqQClKWueZhrkefM7iopEbtJ9U0ARhXsBBlBaHvB0YZ+mCq
-         7I2lDIbzgsTnUJXXFFd+Mf2MRkvMQ3d/mi120+0k+co+feliF2fGnlDGLipP3oo4jHIs
-         yhCQnzB0LNdLsoCiyP2ThdGCDug/wevVBzx4ZCIoRVJzM62ULFanZrMyKnrfoLhgGw7L
-         LE3NJVvLI80qGdb5QUdNBUYtcEfD6sTxNonp/rLGuh5no7R8ACiBwreWQkoFJnyoE1Nq
-         joZ/uzznkWHqO7mwwbSR52gm1kYa+vf+hliw2Y9f1o05+cN6N5swUWJ7vJszMr5BEKoW
-         HTcg==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cK19xZ8r/JxZ6zrZk59CGRO4XALiFfw/k+DEo690ifc=;
+        b=AMXkMgBJe864E9ylH4eLhcV4DnnmpnUZQciwStcW/fWfVy8vl8xbyLHXqWoh/4n8QF
+         bRAhsfNtOcglKLMhK6Nb/v5AF7HvdYNYuPv80cwXOHPX5E9n4f4rIwmSH2XAdpFIqhuj
+         sSsx/7sAKHM3fmeDS7xyNpoxOPMcbkwOVVWM5XBPQcjHKuBxYoH5JxFh6oDyEgClSLr4
+         VePL27iqi0rk5/s+JivkXFUi7OtMXJLNacJQMnJ3M4obYSjfplMj8jxI5D4RNhWTNCit
+         VmDRgbq4Pt+ph415Zp0hH77zR2JN9eVpsj1xI6CTZrVgir1QKlQnpGg6QTPI6wKdJ0ls
+         3hyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UyUe+HbRzSrTdJquQCMiaXWC2coZG28I37xguDaJaYg=;
-        b=6YGJTGgoCOOjV0D2ckyjUzZnwBF0nJJFhEn9QzTuIr2XXXTmtng8uUk3uWenc4OFiW
-         QsUNJf0G8Q/uH4PxiY6FLmFs65lyCsFS4wQHHrOmJqDvTtRcnFZonJRND8GNVtpBSfgP
-         b1KDdedgq0QrAHZO1iQcmMW43qmAA4NAWStrbOVLSuog5L+khqiEYCZlyW6l85jwe0i+
-         hl/R44U6CYY7sGOazRrFoKFfzgYS4QiT5zvtmCYkTPGsSFyTzNF58NoR6px5IfMP6AHM
-         81VCwmRpnRd+7oSw13OlrYpPm32tNFfIj87TWR9ZS/iDLQAvlzTz/xCV+7RCO+hWcrVP
-         2qVA==
-X-Gm-Message-State: ACrzQf0o755SMKWs4RysAnK4d4KqxNsO16fpJ1eGdvnb+93UBL1VqnsI
-	6Rs9i55eEajnK313bq8ho0hndw==
-X-Google-Smtp-Source: AMsMyM6by5WQXi0G4lBZGaavWsGrxKC8DeWyAUbAtvZsM8BboB9ucyemIyMYLKoI4FadI1MlyxYOPw==
-X-Received: by 2002:a05:6a00:1996:b0:56d:a845:5789 with SMTP id d22-20020a056a00199600b0056da8455789mr17697890pfl.59.1667489402026;
-        Thu, 03 Nov 2022 08:30:02 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cK19xZ8r/JxZ6zrZk59CGRO4XALiFfw/k+DEo690ifc=;
+        b=5co6LCXtkPVpW38nrOfE9R7FEK5MwUEfsHvYp6QXvFdicBsv2UieH/HEWZCA1sKq9l
+         VET9WTMNS5eeil8HuXGUY2qtMl6hdTNOtkmpT2Tbr1Ltk7GLOpZfl4vX5ZzHTHX9X2cu
+         YCkx5S7dVSK07vs4oBdTpmyJk5eVf6yb2bQV80EEV96YWx9mPgrA2FB0n0ETSfYN6GAi
+         ms5RfRbUlSd/Q4jHPdJAR+jT3n8E40Mtq3y6LBd/mT8PFIWq7IG2a8VNibbHXIo5rt/l
+         EDjn+0AW2XZZ/aq42hy6lT6HTtxjucKGfT/+1bFhwRq01ELRJ2D+rv57+FecmxVKQwTE
+         wH6w==
+X-Gm-Message-State: ACrzQf1JwEsYbv8ctY1FHpBPnXK2yyUUPnSSJhyYf4S3/SNzG3RZtYrt
+	nNGa1BWik3RZdqUAgE09O90u8g==
+X-Google-Smtp-Source: AMsMyM7Vi7ErqJmqrzHt1bwsO7Jfw+kVc4w4lCdxf/cK5b8KZHYV39XlOvASF4Eye8GSeC7ZJ2rbFQ==
+X-Received: by 2002:a17:90a:d24d:b0:213:d3e4:677a with SMTP id o13-20020a17090ad24d00b00213d3e4677amr24629292pjw.101.1667497496277;
+        Thu, 03 Nov 2022 10:44:56 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id f3-20020a170902f38300b0017a018221e2sm835452ple.70.2022.11.03.08.30.01
+        by smtp.gmail.com with ESMTPSA id i7-20020a17090332c700b00178aaf6247bsm1004862plr.21.2022.11.03.10.44.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Nov 2022 08:30:01 -0700 (PDT)
-Date: Thu, 3 Nov 2022 15:29:58 +0000
+        Thu, 03 Nov 2022 10:44:55 -0700 (PDT)
+Date: Thu, 3 Nov 2022 17:44:51 +0000
 From: Sean Christopherson <seanjc@google.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
 	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
 	Anup Patel <anup@brainfault.org>,
 	Paul Walmsley <paul.walmsley@sifive.com>,
@@ -70,98 +68,50 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 	Michael Ellerman <mpe@ellerman.id.au>,
 	Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
 	Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 17/44] KVM: arm64: Do arm/arch initialiation without
- bouncing through kvm_init()
-Message-ID: <Y2Pedr1MYt/P1uL0@google.com>
+Subject: Re: [PATCH 36/44] KVM: x86: Do compatibility checks when onlining CPU
+Message-ID: <Y2P+E+631c0TNcK7@google.com>
 References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-18-seanjc@google.com>
- <dd59d579-4a4e-6db2-eac4-6c5c3ab71fd3@linaro.org>
+ <20221102231911.3107438-37-seanjc@google.com>
+ <23bfd709-f99a-5a74-e4b9-1381b88453f1@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <dd59d579-4a4e-6db2-eac4-6c5c3ab71fd3@linaro.org>
-Message-ID: <20221103152958.9np9OIStbdfycz1h6R7xJOXl4fY-AZRDpXckMpIPDnE@z>
+In-Reply-To: <23bfd709-f99a-5a74-e4b9-1381b88453f1@redhat.com>
+Message-ID: <20221103174451.u4ThMi2c3sxKft3XqN4SrD-WqjRnQl68hvu4aXOyWxU@z>
 
-On Thu, Nov 03, 2022, Philippe Mathieu-Daudé wrote:
-> Hi Sean,
-> 
-> On 3/11/22 00:18, Sean Christopherson wrote:
-> > Move arm/arch specific initialization directly in arm's module_init(),
-> > now called kvm_arm_init(), instead of bouncing through kvm_init() to
-> > reach kvm_arch_init().  Invoking kvm_arch_init() is the very first action
-> > performed by kvm_init(), i.e. this is a glorified nop.
+On Thu, Nov 03, 2022, Paolo Bonzini wrote:
+> On 11/3/22 00:19, Sean Christopherson wrote:
+> > From: Chao Gao<chao.gao@intel.com>
 > > 
-> > Making kvm_arch_init() a nop will allow dropping it entirely once all
-> > other architectures follow suit.
-> > 
-> > No functional change intended.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   arch/arm64/kvm/arm.c | 25 ++++++++++++++++---------
-> >   1 file changed, 16 insertions(+), 9 deletions(-)
+> > Do compatibility checks when enabling hardware to effectively add
+> > compatibility checks when onlining a CPU.  Abort enabling, i.e. the
+> > online process, if the (hotplugged) CPU is incompatible with the known
+> > good setup.
 > 
-> >   /* NOP: Compiling as a module not supported */
-> >   void kvm_arch_exit(void)
-> >   {
-> > -	kvm_unregister_perf_callbacks();
-> 
-> Doesn't this belong to the previous patch?
+> This paragraph is not true with this patch being before "KVM: Rename and
+> move CPUHP_AP_KVM_STARTING to ONLINE section".
 
-No, but the above changelog is a lie, there is very much a functional change here.
+Argh, good eyes.  Getting the ordering correct in this series has been quite the
+struggle.  Assuming there are no subtle dependencies between x86 and common KVM,
+the ordering should be something like this:
 
-The goal of the previous patch is to fix the error paths in kvm_arch_init(), a.k.a.
-kvm_arm_init().  After fixing kvm_arch_init(), there are still bugs in the sequence
-as a whole because kvm_arch_exit() doesn't unwind other state, e.g. kvm_arch_exit()
-should really look something like:
-
-  void kvm_arch_exit(void)
-  {
-	teardown_subsystems();
-
-	if (!is_kernel_in_hyp_mode())
-		teardown_hyp_mode();
-
-	kvm_arm_vmid_alloc_free();
-
-	if (is_protected_kvm_enabled())
-		???	
-  }
-
-Becuase although the comment "NOP: Compiling as a module not supported" is correct
-about KVM ARM always having to be built into the kernel, kvm_arch_exit() can still
-be called if a later stage of kvm_init() fails.
-
-But rather than add a patch to fix kvm_arch_exit(), I chose to fix the bug by
-moving code out of kvm_arch_init() so that the unwind sequence established in the
-previous patch could be reused.
-
-Except I managed to forget those details when writing the changelog.  The changelog
-should instead be:
-
-  KVM: arm64: Do arm/arch initialization without bouncing through kvm_init()
-  
-  Do arm/arch specific initialization directly in arm's module_init(), now
-  called kvm_arm_init(), instead of bouncing through kvm_init() to reach
-  kvm_arch_init().  Invoking kvm_arch_init() is the very first action
-  performed by kvm_init(), so from a initialization perspective this is a
-  glorified nop.
-  
-  Avoiding kvm_arch_init() also fixes a mostly benign bug as kvm_arch_exit()
-  doesn't properly unwind if a later stage of kvm_init() fails.  While the
-  soon-to-be-deleted comment about compiling as a module being unsupported
-  is correct, kvm_arch_exit() can still be called by kvm_init() if any step
-  after the call to kvm_arch_init() succeeds.
-
-  Add a FIXME to call out that pKVM initialization isn't unwound if
-  kvm_init() fails, which is a pre-existing problem inherited from
-  kvm_arch_exit().
-
-  Making kvm_arch_init() a nop will also allow dropping kvm_arch_init() and
-  kvm_arch_exit() entirely once all other architectures follow suit.
+  KVM: Opt out of generic hardware enabling on s390 and PPC
+  KVM: Register syscore (suspend/resume) ops early in kvm_init()
+  KVM: x86: Do compatibility checks when onlining CPU
+  KVM: SVM: Check for SVM support in CPU compatibility checks
+  KVM: VMX: Shuffle support checks and hardware enabling code around
+  KVM: x86: Do VMX/SVM support checks directly in vendor code
+  KVM: x86: Unify pr_fmt to use module name for all KVM modules
+  KVM: x86: Use KBUILD_MODNAME to specify vendor module name
+  KVM: Make hardware_enable_failed a local variable in the "enable all" path
+  KVM: Use a per-CPU variable to track which CPUs have enabled virtualization
+  KVM: Remove on_each_cpu(hardware_disable_nolock) in kvm_exit()
+  KVM: Drop kvm_count_lock and instead protect kvm_usage_count with kvm_lock
+  KVM: Disable CPU hotplug during hardware enabling
+  KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
+  KVM: Drop kvm_arch_check_processor_compat() hook
