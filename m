@@ -1,162 +1,180 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CFD1C3F
-	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 15:40:40 +0000 (UTC)
-Received: by mail-pg1-f169.google.com with SMTP id b5so4686106pgb.6
-        for <kvmarm@lists.linux.dev>; Fri, 04 Nov 2022 08:40:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EBF1C3F
+	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 15:53:38 +0000 (UTC)
+Received: by mail-pj1-f41.google.com with SMTP id q1-20020a17090a750100b002139ec1e999so4905278pjk.1
+        for <kvmarm@lists.linux.dev>; Fri, 04 Nov 2022 08:53:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aFlTeUJ4nQplolWHip6FrS/j8TYR0+QbDmRZAFvu7G8=;
-        b=slnKaxTVWka5uyvV8ksftk1iXtqkYG7wonGPtAtNy/P6RP4ZnWhdbZSV/6seXnMCof
-         dnF6JUiRfV2oVCETco2jEIOQzRouLfUDiH7vxFD2orQpNLxCcfMVtLr6ntSOZeUo+8A4
-         1WMtzeSAIQ00ZBggEzItHUadG+pi52a6RW5LTbSCWNWQHjLySk/BPh9TembQq8ly6ISW
-         XBS14fXfAOCGbRuWccsHUKA4no5JdNrqlAYc2mDDTkISHx1kXdJjDDClXTXp09r2HKHF
-         4YYshPvOotdfKVbVnw4u/+IsxQ4NAMvmIrkrc7+c9m8NGZEp/7DC/KTLI5ge39pksAS0
-         M2/g==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=xZr6sJYTNthILEKnYyiTIDKUQg5L0mQcLAjlSQHKvMA=;
+        b=DiPJ7hBYkHlGfJ3nf30pKFGntHtz5evEjXdhztqq8D/A407dMn5AvpQqylNiNLOMgz
+         nc3YDeYheeuuT9ftKl++CoVBnE/AP2CXvbMWD4eFsUsKk87usV/usn1bcTiwreMbOlnn
+         oj96CfLSJujMO64hMTma39wr1Pegh0jD6d/HM3v3N04CX9SCv4+6rKcukonUQpXHsLXz
+         C+MC4lvOQ6VjVb5UlfDRziD4JvPEGDO73B2J23nJbSOm5YSurMQ/M2etiRgDKVYl3cKv
+         mie5iAg0h4RxBTAn0on5XteEtmlTH/HJ/8i5Uss7Si1C4JqtOGUixIgTx9l+Rx4CHGzg
+         DTCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aFlTeUJ4nQplolWHip6FrS/j8TYR0+QbDmRZAFvu7G8=;
-        b=MM8Nk0fVCBNv+DuY2ANeO0afmIeuJAeWWVppwjDl/5bwd3q61GQILx6DgL+4Ulmkd+
-         3FBu9MWS6mo9G8TsdyBQkYfLXHd3yS3NoKpkwZt8WPnzSYNmA1c96/qEwaFhLvoylDpi
-         4slr7ZtQt+ALAPtAVC/17a9/n3wlYECR683+TYcUm/xYfGbLRx3WCAU/NroX49T0VabZ
-         mgPUxGUem9TKWKegsLpYn88fNjnI15QAeZb2RvUGQn0Bo6VqwXSBXBtF4qzudMs2amco
-         xRoSGzLoHqgFjxov0XSkoB9EqgBVkRMaUODmBdOZ75gZBNrY4x6BbDmLcApdmjPQG+QU
-         jA1w==
-X-Gm-Message-State: ACrzQf0911gDGSMFCbzX7b8x0uXRv4VEYrB64NczfPvXqxVXssUB05KP
-	u2JQSE6VY4iQObq4DGgKWWfpmQ==
-X-Google-Smtp-Source: AMsMyM5MdI5VKNUr37j2LDfWFXfSalVZ70lqDfROHdw5vEhrWbzDEJP2xBkjkN31VBShKB5D+mx4vA==
-X-Received: by 2002:a62:1a8d:0:b0:544:1309:19f3 with SMTP id a135-20020a621a8d000000b00544130919f3mr36549720pfa.37.1667576439875;
-        Fri, 04 Nov 2022 08:40:39 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id y133-20020a62ce8b000000b00565cbad9616sm2905778pfg.6.2022.11.04.08.40.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Nov 2022 08:40:39 -0700 (PDT)
-Date: Fri, 4 Nov 2022 15:40:36 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Atish Patra <atishp@atishpatra.org>,
-	David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Fabiano Rosas <farosas@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
-	Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 33/44] KVM: x86: Do VMX/SVM support checks directly in
- vendor code
-Message-ID: <Y2UydNBFR3e2DAe7@google.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-34-seanjc@google.com>
- <bfa98587-3b36-3834-a4b9-585a0e0aa56a@redhat.com>
- <Y2QJ2TuyZImbFFvi@google.com>
- <c29e7d40-ddb9-def0-f944-a921a05a4bb2@redhat.com>
- <Y2QPSK1/6esl61wQ@google.com>
- <6c71fcca-c17f-5979-e15e-afcf08899064@redhat.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xZr6sJYTNthILEKnYyiTIDKUQg5L0mQcLAjlSQHKvMA=;
+        b=yQDm8fiZXix/zxbz2AI0d4haCey5lY6KntuO3QR5rv32E3Q1fUvU2UAUzL5Rsd/301
+         uwDiUj28JrO8Tc8/eKCclkBxYF8o10iln+GajIIEKY9oZ9kK6BIGpBWyjP8FFUr4rF0y
+         UqV786XFGvErwfXsPR8TxWsgw94AJqkmXP2YjPrk6feDN2lS5rkH98panUT2RmOZ5scw
+         sc5Y2EfrwA7TXakwsbeRDBH6bFgVQqSikV+hhBugvZd/9i7lPUdmEzy4FxYH2h2BKTjv
+         G2yxCPpfbV68HUcrAFaRWticzh74Aidn5sYXYMEzZT5V8Tm+tImnznN97XROuGv0S4Pj
+         +1lg==
+X-Gm-Message-State: ACrzQf0X3gtYZ45L2hDNmPxAx+ZSH9H319ZIPQdfHba6Q+eOkJwbVSXw
+	aKkyP50B8c5+xeb3N5Hh4rQQS3lRz4hbJFIp3VhWeA==
+X-Google-Smtp-Source: AMsMyM5RjIpowH+EtUVsYugWjK1YsJUmZijSJNVPnbkraoQT7CYAkaAcrlZjjwisP8bWz4zMTHopTTUtp17kS/ninN4=
+X-Received: by 2002:a17:902:7145:b0:187:2356:c29d with SMTP id
+ u5-20020a170902714500b001872356c29dmr26043238plm.154.1667577218174; Fri, 04
+ Nov 2022 08:53:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6c71fcca-c17f-5979-e15e-afcf08899064@redhat.com>
-Message-ID: <20221104154036.nvfH20WCx-SqLj941lj_TJdSt1jE--7lOY066upKHUY@z>
+References: <20221028105402.2030192-1-maz@kernel.org> <20221028105402.2030192-12-maz@kernel.org>
+ <CAAeT=FyiNeRun7oRL83AUkVabUSb9pxL2SS9yZwi1rjFnbhH6g@mail.gmail.com>
+ <87tu3gfi8u.wl-maz@kernel.org> <CAAeT=FwViQRmyJjf3jxcWnLFQAYob8uvvx7QNhWyj6OmaYDKyg@mail.gmail.com>
+ <86bkpmrjv8.wl-maz@kernel.org>
+In-Reply-To: <86bkpmrjv8.wl-maz@kernel.org>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Fri, 4 Nov 2022 08:53:21 -0700
+Message-ID: <CAAeT=Fzp-7MMBJshAAQBgFwXLH2z5ASDgmDBLNJsQoFA=MSciw@mail.gmail.com>
+Subject: Re: [PATCH v2 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to
+ be set from userspace
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20221104155321.iAsbs9qhR7CDbs3dSbz8Q1YSWW2BixbK1En4fX6FwTY@z>
 
-On Fri, Nov 04, 2022, Paolo Bonzini wrote:
-> On 11/3/22 19:58, Sean Christopherson wrote:
-> > 
-> > diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-> > index 3e508f239098..ebe617ab0b37 100644
-> > --- a/arch/x86/kernel/cpu/common.c
-> > +++ b/arch/x86/kernel/cpu/common.c
-> > @@ -191,6 +191,8 @@ static void default_init(struct cpuinfo_x86 *c)
-> >                          strcpy(c->x86_model_id, "386");
-> >          }
-> >   #endif
-> > +
-> > +       clear_cpu_cap(c, X86_FEATURE_MSR_IA32_FEAT_CTL);
-> >   }
-> >   static const struct cpu_dev default_cpu = {
-> 
-> Not needed I think?  default_init does not call init_ia32_feat_ctl.
+Hi Marc,
 
-cpuid_deps is only processed by do_clear_cpu_cap(), so unless there's an explicit
-"clear" action, the dependencies will not be updated.  It kinda makes sense since
-hardware-based features shouldn't end up with scenarios where a dependent feature
-exists but the base feature does not (barring bad KVM setups :-) ).
+On Fri, Nov 4, 2022 at 5:21 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi Reiji,
+>
+> On Fri, 04 Nov 2022 07:00:22 +0000,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > On Thu, Nov 3, 2022 at 3:25 AM Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > On Thu, 03 Nov 2022 05:31:56 +0000,
+> > > Reiji Watanabe <reijiw@google.com> wrote:
+> > > >
+> > > > It appears the patch allows userspace to set IMPDEF even
+> > > > when host_pmuver == 0.  Shouldn't it be allowed only when
+> > > > host_pmuver == IMPDEF (as before)?
+> > > > Probably, it may not cause any real problems though.
+> > >
+> > > Given that we don't treat the two cases any differently, I thought it
+> > > would be reasonable to relax this particular case, and I can't see any
+> > > reason why we shouldn't tolerate this sort of migration.
+> >
+> > That's true. I assume it won't cause any functional issues.
+> >
+> > I have another comment related to this.
+> > KVM allows userspace to create a guest with a mix of vCPUs with and
+> > without PMU.  For such a guest, if the register for the vCPU without
+> > PMU is set last, I think the PMUVER value for vCPUs with PMU could
+> > become no PMU (0) or IMPDEF (0xf).
+> > Also, with the current patch, userspace can set PMUv3 support value
+> > (non-zero or non-IMPDEF) for vCPUs without the PMU.
+> > IMHO, KVM shouldn't allow userspace to set PMUVER to the value that
+> > is inconsistent with PMU configuration for the vCPU.
+> > What do you think ?
+>
+> Yes, this seems sensible, and we only do it one way at the moment.
+>
+> > I'm thinking of the following code (not tested).
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 4fa14b4ae2a6..ddd849027cc3 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -1265,10 +1265,17 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+> >         if (pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver)
+> >                 return -EINVAL;
+> >
+> > -       /* We already have a PMU, don't try to disable it... */
+> > -       if (kvm_vcpu_has_pmu(vcpu) &&
+> > -           (pmuver == 0 || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF))
+> > -               return -EINVAL;
+> > +       if (kvm_vcpu_has_pmu(vcpu)) {
+> > +               /* We already have a PMU, don't try to disable it... */
+> > +               if (pmuver == 0 || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF) {
+> > +                       return -EINVAL;
+> > +               }
+> > +       } else {
+> > +               /* We don't have a PMU, don't try to enable it... */
+> > +               if (pmuver > 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF) {
+> > +                       return -EINVAL;
+> > +               }
+> > +       }
+>
+> This is a bit ugly. I came up with this instead:
+>
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 3b28ef48a525..e104fde1a0ee 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1273,6 +1273,7 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>                                u64 val)
+>  {
+>         u8 pmuver, host_pmuver;
+> +       bool valid_pmu;
+>
+>         host_pmuver = kvm_arm_pmu_get_pmuver_limit();
+>
+> @@ -1286,9 +1287,10 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+>         if (pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver)
+>                 return -EINVAL;
+>
+> -       /* We already have a PMU, don't try to disable it... */
+> -       if (kvm_vcpu_has_pmu(vcpu) &&
+> -           (pmuver == 0 || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF))
+> +       valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
+> +
+> +       /* Make sure view register and PMU support do match */
+> +       if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
+>                 return -EINVAL;
 
-That said, this seems like a bug waiting to happen, and unless I'm missing something
-it's quite straightforward to process all dependencies during setup.  Time to find
-out if Boris and co. agree :-)
+Thanks, much better!
 
-diff --git a/arch/x86/include/asm/cpufeature.h b/arch/x86/include/asm/cpufeature.h
-index 1a85e1fb0922..c4408d03b180 100644
---- a/arch/x86/include/asm/cpufeature.h
-+++ b/arch/x86/include/asm/cpufeature.h
-@@ -147,6 +147,7 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
- 
- extern void setup_clear_cpu_cap(unsigned int bit);
- extern void clear_cpu_cap(struct cpuinfo_x86 *c, unsigned int bit);
-+extern void apply_cpuid_deps(struct cpuinfo_x86 *c);
- 
- #define setup_force_cpu_cap(bit) do { \
-        set_cpu_cap(&boot_cpu_data, bit);       \
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 3e508f239098..28ce31dadd7f 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -1884,6 +1884,8 @@ static void identify_cpu(struct cpuinfo_x86 *c)
-                        c->x86_capability[i] |= boot_cpu_data.x86_capability[i];
-        }
- 
-+       apply_cpuid_deps(c);
-+
-        ppin_init(c);
- 
-        /* Init Machine Check Exception if available. */
-diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
-index c881bcafba7d..7e91e97973ca 100644
---- a/arch/x86/kernel/cpu/cpuid-deps.c
-+++ b/arch/x86/kernel/cpu/cpuid-deps.c
-@@ -138,3 +138,13 @@ void setup_clear_cpu_cap(unsigned int feature)
- {
-        do_clear_cpu_cap(NULL, feature);
- }
-+
-+void apply_cpuid_deps(struct cpuinfo_x86 *c)
-+{
-+       const struct cpuid_dep *d;
-+
-+       for (d = cpuid_deps; d->feature; d++) {
-+               if (!cpu_has(c, d->feature))
-+                       clear_cpu_cap(c, d->feature);
-+       }
-+}
+>
+>         /* We can only differ with PMUver, and anything else is an error */
+>
+> and the similar check for the 32bit counterpart.
+>
+> >
+> >         /* We can only differ with PMUver, and anything else is an error */
+> >         val ^= read_id_reg(vcpu, rd);
+> > @@ -1276,7 +1283,8 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+> >         if (val)
+> >                 return -EINVAL;
+> >
+> > -       vcpu->kvm->arch.dfr0_pmuver = pmuver;
+> > +       if (kvm_vcpu_has_pmu(vcpu))
+> > +               vcpu->kvm->arch.dfr0_pmuver = pmuver;
+>
+> We need to update this unconditionally if we want to be able to
+> restore an IMPDEF PMU view to the guest.
 
+Yes, right.
+BTW, if we have no intention of supporting a mix of vCPUs with and
+without PMU, I think it would be nice if we have a clear comment on
+that in the code.  Or I'm hoping to disallow it if possible though.
+
+Thank you,
+Reiji
