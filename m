@@ -2,95 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 396BBC433FE
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 06:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C0BDC433FE
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 06:57:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA4A740FAC;
-	Fri,  4 Nov 2022 02:24:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C99C74B0D7;
+	Fri,  4 Nov 2022 02:57:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered)
-	header.i=@bytedance-com.20210112.gappssmtp.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Hcnr6dfr1VbU; Fri,  4 Nov 2022 02:24:19 -0400 (EDT)
+	with ESMTP id 4LcnyMXc3v+i; Fri,  4 Nov 2022 02:57:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 279CE43399;
-	Fri,  4 Nov 2022 02:24:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6599149F51;
+	Fri,  4 Nov 2022 02:57:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ABFE641278
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 02:24:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6892249F3B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 02:57:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vWsCnvbfmSgH for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Nov 2022 02:24:16 -0400 (EDT)
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com
- [209.85.128.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DCFEE40FAC
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 02:24:15 -0400 (EDT)
-Received: by mail-wm1-f44.google.com with SMTP id
- c3-20020a1c3503000000b003bd21e3dd7aso4784772wma.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Nov 2022 23:24:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bytedance-com.20210112.gappssmtp.com; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :from:to:cc:subject:date:message-id:reply-to;
- bh=bLZS4btyoBNJpvI4lDx3+/Q0QYaM9RdRgTuU5oqZXiw=;
- b=KpqOlJnpCBs9Fig3APpNHUOW+wgMUZPgu6tIMt4v79SYt0yKxG/vmAGuaT7XkQlc87
- cG3/vqkkXM/T/mNWMp5bbB6RujjWKiLJ+R+u7BIl0mIkv19DwSBzHJXgV6WYu+x+6w9a
- 5dKfCdwE9gDEcSVdRp7XrilbshhalAJpmIxH7w5BIlj5sjeEa6/kgfJfv8ZhAIXIsoAZ
- o8vNIWujZ6bWMQXjxDnZM1683oc0PeZrK8fGHhlbqvpxGzXRkTu5yzGUkEhGuHXBDsoc
- lH99C17SkvFlvHDKH43ZNSV2gUwYmwLodUfhSq3XPMbr7M+aSePyhJKAU0IbeWl3vg86
- KLEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=bLZS4btyoBNJpvI4lDx3+/Q0QYaM9RdRgTuU5oqZXiw=;
- b=zFFtLeST4bPCSCiDVtnt6+IgQiSqnm4XDYD0/Sxz8J+4y07uccyvdRIKpvJQsbcjUi
- sp48DNTpwQP5r8b7RRQtxStLyNdbWs0nBHtUxbpkG72LWA70BiDZnNU7tvwSkO/wkhAP
- 8nx4o0aDLvtQM46VXpgjG6+gzbmnu5sG03rgpN5jwMO1r/RzKz6whEu3mUeXmYgA2o2k
- I6159D9WDyGdlAVRuyaKy2TzjXkRP7Ui8cDwXLW677iuFZmHbS/ke44DS2WH75vcLub3
- NJMdLpixswiqK+Sj2Lkqx79cGqYrGc0sY93Sjds4BDPRDq4jNkgrHM5wWeNjFSAVoS8y
- YPbA==
-X-Gm-Message-State: ACrzQf3HqBw9j8OUNlpO2XwLM0op/ltCRYdx+e2JavYXgPdTXbcM3ki2
- nqG9vY15pOZw7p+8HX5DTzfRQQ==
-X-Google-Smtp-Source: AMsMyM5sPnjGMPF4hka3QeEWAs4A5/8vs19eoSmP9UDP8V2dxCbMF0Y5Ap0/e+T4dvK9BW1eLMVDdw==
-X-Received: by 2002:a7b:c455:0:b0:3cf:6817:297d with SMTP id
- l21-20020a7bc455000000b003cf6817297dmr21329910wmi.152.1667543054623; 
- Thu, 03 Nov 2022 23:24:14 -0700 (PDT)
-Received: from ?IPV6:2a02:6b6a:b4d7:0:c7c:f931:dd4c:1ea6?
- ([2a02:6b6a:b4d7:0:c7c:f931:dd4c:1ea6])
- by smtp.gmail.com with ESMTPSA id
- h4-20020adff184000000b00236e9755c02sm2494568wro.111.2022.11.03.23.24.13
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Nov 2022 23:24:13 -0700 (PDT)
-Message-ID: <1b404477-8bff-0d33-477f-514e12ba8546@bytedance.com>
-Date: Fri, 4 Nov 2022 06:24:13 +0000
+ with ESMTP id NBeZDfQsepQs for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Nov 2022 02:57:39 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 11E7840C58
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 02:57:39 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1667545058;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XgC2GA9gQcQ5pTnjhTA9hl/UPKBxdliaQJWvev7RHDU=;
+ b=CwZr29iQwFUiDp2aGAmQ/s9M7g7EXYXCbfqVEOrDxkqOYhwWU5IxuR/5H09PZD2z1rde+L
+ uXIZ8UBDlUuhtQDhW7XrXs5TboJBcsKBr1rzekVKNuiUdN9KRFZJSQgKtl4G8O08zsXzoC
+ pRVS6rIr7fqKD5cWOC4i4yls8a1xM1g=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-154-xFocka1WNgyfl5fzJiGtAg-1; Fri, 04 Nov 2022 02:57:27 -0400
+X-MC-Unique: xFocka1WNgyfl5fzJiGtAg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.3])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F11E1380451A;
+ Fri,  4 Nov 2022 06:57:26 +0000 (UTC)
+Received: from [10.64.54.78] (vpn2-54-78.bne.redhat.com [10.64.54.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 101CB1121320;
+ Fri,  4 Nov 2022 06:57:18 +0000 (UTC)
+Subject: Re: [PATCH v7 4/9] KVM: Support dirty ring in conjunction with bitmap
+To: Oliver Upton <oliver.upton@linux.dev>
+References: <20221031003621.164306-1-gshan@redhat.com>
+ <20221031003621.164306-5-gshan@redhat.com> <Y2RPhwIUsGLQ2cz/@google.com>
+ <d5b86a73-e030-7ce3-e5f3-301f4f505323@redhat.com>
+ <Y2RlfkyQMCtD6Rbh@google.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <d7e45de0-bff6-7d8c-4bf4-1a09e8acb726@redhat.com>
+Date: Fri, 4 Nov 2022 14:57:15 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [External] Re: [RFC 5/6] KVM: arm64: Support the VCPU preemption
- check
+In-Reply-To: <Y2RlfkyQMCtD6Rbh@google.com>
 Content-Language: en-US
-To: Steven Price <steven.price@arm.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
- yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
- maz@kernel.org, mark.rutland@arm.com
-References: <20221102161340.2982090-1-usama.arif@bytedance.com>
- <20221102161340.2982090-6-usama.arif@bytedance.com>
- <76f59579-b701-a243-2a50-72a1401d3a65@arm.com>
-From: Usama Arif <usama.arif@bytedance.com>
-In-Reply-To: <76f59579-b701-a243-2a50-72a1401d3a65@arm.com>
-Cc: punit.agrawal@bytedance.com, fam.zheng@bytedance.com, liangma@liangbit.com
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+Cc: shuah@kernel.org, catalin.marinas@arm.com, kvm@vger.kernel.org,
+ maz@kernel.org, andrew.jones@linux.dev, dmatlack@google.com,
+ shan.gavin@gmail.com, bgardon@google.com, kvmarm@lists.linux.dev,
+ pbonzini@redhat.com, zhenyzha@redhat.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -104,304 +90,189 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Oliver,
 
-
-On 03/11/2022 13:25, Steven Price wrote:
-> On 02/11/2022 16:13, Usama Arif wrote:
->> Support the vcpu_is_preempted() functionality under KVM/arm64. This will
->> enhance lock performance on overcommitted hosts (more runnable VCPUs
->> than physical CPUs in the system) as doing busy waits for preempted
->> VCPUs will hurt system performance far worse than early yielding.
+On 11/4/22 9:06 AM, Oliver Upton wrote:
+> On Fri, Nov 04, 2022 at 08:12:21AM +0800, Gavin Shan wrote:
+>> On 11/4/22 7:32 AM, Oliver Upton wrote:
+>>> On Mon, Oct 31, 2022 at 08:36:16AM +0800, Gavin Shan wrote:
+>>>> ARM64 needs to dirty memory outside of a VCPU context when VGIC/ITS is
+>>>> enabled. It's conflicting with that ring-based dirty page tracking always
+>>>> requires a running VCPU context.
+>>>>
+>>>> Introduce a new flavor of dirty ring that requires the use of both VCPU
+>>>> dirty rings and a dirty bitmap. The expectation is that for non-VCPU
+>>>> sources of dirty memory (such as the VGIC/ITS on arm64), KVM writes to
+>>>> the dirty bitmap. Userspace should scan the dirty bitmap before migrating
+>>>> the VM to the target.
+>>>>
+>>>> Use an additional capability to advertise this behavior. The newly added
+>>>> capability (KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP) can't be enabled before
+>>>> KVM_CAP_DIRTY_LOG_RING_ACQ_REL on ARM64. In this way, the newly added
+>>>> capability is treated as an extension of KVM_CAP_DIRTY_LOG_RING_ACQ_REL.
+>>>
+>>> Whatever ordering requirements we settle on between these capabilities
+>>> needs to be documented as well.
+>>>
+>>> [...]
+>>>
 >>
->> Signed-off-by: Zengruan Ye <yezengruan@huawei.com>
->> Signed-off-by: Usama Arif <usama.arif@bytedance.com>
->> ---
->>   arch/arm64/include/asm/paravirt.h |   2 +
->>   arch/arm64/include/asm/spinlock.h |  16 +++-
->>   arch/arm64/kernel/paravirt.c      | 126 ++++++++++++++++++++++++++++++
->>   arch/arm64/kernel/setup.c         |   3 +
->>   include/linux/cpuhotplug.h        |   1 +
->>   5 files changed, 147 insertions(+), 1 deletion(-)
+>> It's mentioned in 'Documentation/virt/kvm/api.rst' as below.
 >>
->> diff --git a/arch/arm64/include/asm/paravirt.h b/arch/arm64/include/asm/paravirt.h
->> index 9aa193e0e8f2..4ccb4356c56b 100644
->> --- a/arch/arm64/include/asm/paravirt.h
->> +++ b/arch/arm64/include/asm/paravirt.h
->> @@ -19,10 +19,12 @@ static inline u64 paravirt_steal_clock(int cpu)
->>   }
->>   
->>   int __init pv_time_init(void);
->> +int __init pv_lock_init(void);
->>   
->>   #else
->>   
->>   #define pv_time_init() do {} while (0)
->> +#define pv_lock_init() do {} while (0)
->>   
->>   #endif // CONFIG_PARAVIRT
->>   
->> diff --git a/arch/arm64/include/asm/spinlock.h b/arch/arm64/include/asm/spinlock.h
->> index 0525c0b089ed..7023efa4de96 100644
->> --- a/arch/arm64/include/asm/spinlock.h
->> +++ b/arch/arm64/include/asm/spinlock.h
->> @@ -10,7 +10,20 @@
->>   
->>   /* See include/linux/spinlock.h */
->>   #define smp_mb__after_spinlock()	smp_mb()
->> +#define vcpu_is_preempted vcpu_is_preempted
->> +
->> +#ifdef CONFIG_PARAVIRT
->> +#include <linux/static_call_types.h>
->> +
->> +bool dummy_vcpu_is_preempted(int cpu);
->>   
->> +DECLARE_STATIC_CALL(pv_vcpu_is_preempted, dummy_vcpu_is_preempted);
->> +static inline bool vcpu_is_preempted(int cpu)
->> +{
->> +	return static_call(pv_vcpu_is_preempted)(cpu);
->> +}
->> +
->> +#else
->>   /*
->>    * Changing this will break osq_lock() thanks to the call inside
->>    * smp_cond_load_relaxed().
->> @@ -18,10 +31,11 @@
->>    * See:
->>    * https://lore.kernel.org/lkml/20200110100612.GC2827@hirez.programming.kicks-ass.net
->>    */
->> -#define vcpu_is_preempted vcpu_is_preempted
->>   static inline bool vcpu_is_preempted(int cpu)
->>   {
->>   	return false;
->>   }
->>   
->> +#endif /* CONFIG_PARAVIRT */
->> +
->>   #endif /* __ASM_SPINLOCK_H */
->> diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
->> index 57c7c211f8c7..45bcca87bed7 100644
->> --- a/arch/arm64/kernel/paravirt.c
->> +++ b/arch/arm64/kernel/paravirt.c
->> @@ -22,6 +22,7 @@
->>   
->>   #include <asm/paravirt.h>
->>   #include <asm/pvclock-abi.h>
->> +#include <asm/pvlock-abi.h>
->>   #include <asm/smp_plat.h>
->>   
->>   struct static_key paravirt_steal_enabled;
->> @@ -38,7 +39,12 @@ struct pv_time_stolen_time_region {
->>   	struct pvclock_vcpu_stolen_time __rcu *kaddr;
->>   };
->>   
->> +struct pv_lock_state_region {
->> +	struct pvlock_vcpu_state __rcu *kaddr;
->> +};
->> +
->>   static DEFINE_PER_CPU(struct pv_time_stolen_time_region, stolen_time_region);
->> +static DEFINE_PER_CPU(struct pv_lock_state_region, lock_state_region);
->>   
->>   static bool steal_acc = true;
->>   static int __init parse_no_stealacc(char *arg)
->> @@ -178,3 +184,123 @@ int __init pv_time_init(void)
->>   
->>   	return 0;
->>   }
->> +
->> +static bool native_vcpu_is_preempted(int cpu)
->> +{
->> +	return false;
->> +}
->> +
->> +DEFINE_STATIC_CALL(pv_vcpu_is_preempted, native_vcpu_is_preempted);
->> +
->> +static bool para_vcpu_is_preempted(int cpu)
->> +{
->> +	struct pv_lock_state_region *reg;
->> +	__le64 preempted_le;
->> +
->> +	reg = per_cpu_ptr(&lock_state_region, cpu);
->> +	if (!reg->kaddr) {
->> +		pr_warn_once("PV lock enabled but not configured for cpu %d\n",
->> +			     cpu);
->> +		return false;
->> +	}
->> +
->> +	preempted_le = le64_to_cpu(READ_ONCE(reg->kaddr->preempted));
->> +
->> +	return !!(preempted_le);
->> +}
->> +
->> +static int pvlock_vcpu_state_dying_cpu(unsigned int cpu)
->> +{
->> +	struct pv_lock_state_region *reg;
->> +
->> +	reg = this_cpu_ptr(&lock_state_region);
->> +	if (!reg->kaddr)
->> +		return 0;
->> +
->> +	memunmap(reg->kaddr);
->> +	memset(reg, 0, sizeof(*reg));
->> +
->> +	return 0;
->> +}
->> +
->> +static int init_pvlock_vcpu_state(unsigned int cpu)
->> +{
->> +	struct pv_lock_state_region *reg;
->> +	struct arm_smccc_res res;
->> +
->> +	reg = this_cpu_ptr(&lock_state_region);
->> +
->> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_LOCK_PREEMPTED, &res);
->> +
->> +	if (res.a0 == SMCCC_RET_NOT_SUPPORTED) {
->> +		pr_warn("Failed to init PV lock data structure\n");
->> +		return -EINVAL;
->> +	}
->> +
->> +	reg->kaddr = memremap(res.a0,
->> +			      sizeof(struct pvlock_vcpu_state),
->> +			      MEMREMAP_WB);
->> +
->> +	if (!reg->kaddr) {
->> +		pr_warn("Failed to map PV lock data structure\n");
->> +		return -ENOMEM;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static int kvm_arm_init_pvlock(void)
->> +{
->> +	int ret;
->> +
->> +	ret = cpuhp_setup_state(CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
->> +				"hypervisor/arm/pvlock:starting",
->> +				init_pvlock_vcpu_state,
->> +				pvlock_vcpu_state_dying_cpu);
->> +	if (ret < 0) {
->> +		pr_warn("PV-lock init failed\n");
->> +		return ret;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static bool has_kvm_pvlock(void)
->> +{
->> +	struct arm_smccc_res res;
->> +
->> +	/* To detect the presence of PV lock support we require SMCCC 1.1+ */
->> +	if (arm_smccc_1_1_get_conduit() == SMCCC_CONDUIT_NONE)
->> +		return false;
+>>    After using the dirty rings, the userspace needs to detect the capability
+>>    of KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP to see whether the ring structures
+>>    need to be backed by per-slot bitmaps. With this capability advertised
+>>    and supported, it means the architecture can dirty guest pages without
+>>    vcpu/ring context, so that some of the dirty information will still be
+>>    maintained in the bitmap structure.
+>>
+>> The description may be not obvious about the ordering. For this, I can
+>> add the following sentence at end of the section.
+>>
+>>    The capability of KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP can't be enabled
+>>    until the capability of KVM_CAP_DIRTY_LOG_RING_ACQ_REL has been enabled.
+>>
+>>>> @@ -4588,6 +4594,13 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+>>>>    			return -EINVAL;
+>>>>    		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
+>>>> +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP:
+>>>> +		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+>>>> +		    !kvm->dirty_ring_size)
+>>>
+>>> I believe this ordering requirement is problematic, as it piles on top
+>>> of an existing problem w.r.t. KVM_CAP_DIRTY_LOG_RING v. memslot
+>>> creation.
+>>>
+>>> Example:
+>>>    - Enable KVM_CAP_DIRTY_LOG_RING
+>>>    - Create some memslots w/ dirty logging enabled (note that the bitmap
+>>>      is _not_ allocated)
+>>>    - Enable KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
+>>>    - Save ITS tables and get a NULL dereference in
+>>>      mark_page_dirty_in_slot():
+>>>
+>>>                   if (vcpu && kvm->dirty_ring_size)
+>>>                           kvm_dirty_ring_push(&vcpu->dirty_ring,
+>>>                                               slot, rel_gfn);
+>>>                   else
+>>> ------->		set_bit_le(rel_gfn, memslot->dirty_bitmap);
+>>>
+>>> Similarly, KVM may unnecessarily allocate bitmaps if dirty logging is
+>>> enabled on memslots before KVM_CAP_DIRTY_LOG_RING is enabled.
+>>>
+>>> You could paper over this issue by disallowing DIRTY_RING_WITH_BITMAP if
+>>> DIRTY_LOG_RING has already been enabled, but the better approach would
+>>> be to explicitly check kvm_memslots_empty() such that the real
+>>> dependency is obvious. Peter, hadn't you mentioned something about
+>>> checking against memslots in an earlier revision?
+>>>
+>>
+>> The userspace (QEMU) needs to ensure that no dirty bitmap is created
+>> before the capability of KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP is enabled.
+>> It's unknown by QEMU that vgic/its is used when KVM_CAP_DIRTY_LOG_RING_ACQ_REL
+>> is enabled.
 > 
-> This is unnecessary as arm_smccc_1_1_invoke() will return failure if
-> there's no conduit (or pre-SMCCC 1.1). I suspect this was a copy/paste
-> from has_pv_steal_clock() which also has the unnecessary check (patch
-> welcome ;) ).
-
-
-Thanks for the review!
-
-I have sent a seperate patch to remove it from pv_steal_clock: 
-https://lore.kernel.org/all/20221104061659.4116508-1-usama.arif@bytedance.com/. 
-
-
-I have removed it from pv_lock as well in the v2 patchset: 
-https://lore.kernel.org/all/20221104062105.4119003-1-usama.arif@bytedance.com/.
+> I'm not worried about what QEMU (or any particular VMM for that matter)
+> does with the UAPI. The problem is this patch provides a trivial way for
+> userspace to cause a NULL dereference in the kernel. Imposing ordering
+> between the cap and memslot creation avoids the problem altogether.
 > 
->> +
->> +	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
->> +			     ARM_SMCCC_HV_PV_LOCK_FEATURES, &res);
+> So, looking at your example:
 > 
-> Since this is a 'OWNER_VENDOR_HYP' call this should really be preceded
-> by a check that we're running under the expected hypervisor. See e.g.
-> kvm_init_hyp_services().
+>>     kvm_initialization
+>>       enable_KVM_CAP_DIRTY_LOG_RING_ACQ_REL        // Where KVM_CAP_DIRTY_LOG_RING is enabled
+>>     board_initialization                           // Where QEMU knows if vgic/its is used
 > 
-> Of course for KVM we already have a (different) discovery mechanism and
-> this could be included as a ARM_SMCCC_KVM_FUNC_xxx feature. This
-> has_kvm_pvlock() function would then simply be:
+> Is it possible that QEMU could hoist enabling RING_WITH_BITMAP here?
+> Based on your description QEMU has decided to use the vGIC ITS but
+> hasn't yet added any memslots.
 > 
-> static bool has_kvm_pvlock(void)
-> {
-> 	return kvm_arm_hyp_service_available(ARM_SMCC_KVM_FUNC_PVLOCK);
-> }
 
-Thanks, I have simplified has_kvm_pvlock to above. I also changed the 
-code in the v2 revision, so that its just 1 hypercall, 
-ARM_SMCCC_VENDOR_HYP_KVM_PV_LOCK_FUNC_ID. This is similar to how it is 
-done in ptp_kvm vendor call.
+It's possible to add ARM specific helper kvm_arm_enable_dirty_ring_with_bitmap()
+in qemu/target/arm.c, to enable RING_WITH_BITMAP if needed. The newly added
+function can be called here when vgic/its is used.
 
-Usama
+>>       add_memory_slots
+>>     kvm_post_initialization
+>>       enable_KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
+>>     :
+>>     start_migration
+>>       enable_dirty_page_tracking
+>>         create_dirty_bitmap                       // With KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP enabled
+> 
+> Just to make sure we're on the same page, there's two issues:
+> 
+>   (1) If DIRTY_LOG_RING is enabled before memslot creation and
+>       RING_WITH_BITMAP is enabled after memslots have been created w/
+>       dirty logging enabled, memslot->dirty_bitmap == NULL and the
+>       kernel will fault when attempting to save the ITS tables.
+> 
+>   (2) Not your code, but a similar issue. If DIRTY_LOG_RING[_ACQ_REL] is
+>       enabled after memslots have been created w/ dirty logging enabled,
+>       memslot->dirty_bitmap != NULL and that memory is wasted until the
+>       memslot is freed.
+> 
+> I don't expect you to fix #2, though I've mentioned it because using the
+> same approach to #1 and #2 would be nice.
+> 
 
-> 
-> Steve
-> 
->> +
->> +	if (res.a0 != SMCCC_RET_SUCCESS)
->> +		return false;
->> +
->> +	arm_smccc_1_1_invoke(ARM_SMCCC_HV_PV_LOCK_FEATURES,
->> +			     ARM_SMCCC_HV_PV_LOCK_PREEMPTED, &res);
->> +
->> +	return (res.a0 == SMCCC_RET_SUCCESS);
->> +}
->> +
->> +int __init pv_lock_init(void)
->> +{
->> +	int ret;
->> +
->> +	if (is_hyp_mode_available())
->> +		return 0;
->> +
->> +	if (!has_kvm_pvlock())
->> +		return 0;
->> +
->> +	ret = kvm_arm_init_pvlock();
->> +	if (ret)
->> +		return ret;
->> +
->> +	static_call_update(pv_vcpu_is_preempted, para_vcpu_is_preempted);
->> +	pr_info("using PV-lock preempted\n");
->> +
->> +	return 0;
->> +}
->> \ No newline at end of file
->> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
->> index fea3223704b6..05ca07ac5800 100644
->> --- a/arch/arm64/kernel/setup.c
->> +++ b/arch/arm64/kernel/setup.c
->> @@ -42,6 +42,7 @@
->>   #include <asm/cpu_ops.h>
->>   #include <asm/kasan.h>
->>   #include <asm/numa.h>
->> +#include <asm/paravirt.h>
->>   #include <asm/sections.h>
->>   #include <asm/setup.h>
->>   #include <asm/smp_plat.h>
->> @@ -360,6 +361,8 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
->>   	smp_init_cpus();
->>   	smp_build_mpidr_hash();
->>   
->> +	pv_lock_init();
->> +
->>   	/* Init percpu seeds for random tags after cpus are set up. */
->>   	kasan_init_sw_tags();
->>   
->> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
->> index f61447913db9..c0ee11855c73 100644
->> --- a/include/linux/cpuhotplug.h
->> +++ b/include/linux/cpuhotplug.h
->> @@ -192,6 +192,7 @@ enum cpuhp_state {
->>   	/* Must be the last timer callback */
->>   	CPUHP_AP_DUMMY_TIMER_STARTING,
->>   	CPUHP_AP_ARM_XEN_STARTING,
->> +	CPUHP_AP_ARM_KVM_PVLOCK_STARTING,
->>   	CPUHP_AP_ARM_CORESIGHT_STARTING,
->>   	CPUHP_AP_ARM_CORESIGHT_CTI_STARTING,
->>   	CPUHP_AP_ARM64_ISNDEP_STARTING,
-> 
+Yes, I got your points. Case (2) is still possible to happen with QEMU
+excluded. However, QEMU is always enabling DIRTY_LOG_RING[_ACQ_REL] before
+any memory slot is created. I agree that we need to ensure there are no
+memory slots when DIRTY_LOG_RING[_ACQ_REL] is enabled.
+
+For case (1), we can ensure RING_WTIH_BITMAP is enabled before any memory
+slot is added, as below. QEMU needs a new helper (as above) to enable it
+on board's level.
+
+Lets fix both with a new helper in PATCH[v8 4/9] like below?
+
+   static inline bool kvm_vm_has_memslot_pages(struct kvm *kvm)
+   {
+       bool has_memslot_pages;
+
+       mutex_lock(&kvm->slots_lock);
+
+       has_memslot_pages = !!kvm->nr_memslot_pages;
+
+       mutex_unlock(&kvm->slots_lock);
+
+       return has_memslot_pages;
+   }
+
+   static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+                                              struct kvm_enable_cap *cap)
+   {
+       :
+       switch (cap->cap) {
+       case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP:
+           if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+               !kvm->dirty_ring_size || kvm_vm_has_memslot_pages(kvm))
+               return -EINVAL;
+
+           kvm->dirty_ring_with_bitmap = true;
+
+           return 0;
+       default:
+           return kvm_vm_ioctl_enable_cap(kvm, cap);
+       }
+   }
+
+   static int kvm_vm_ioctl_enable_dirty_log_ring(struct kvm *kvm, u32 size)
+   {
+       :
+       /* We only allow it to set once */
+       if (kvm->dirty_ring_size)
+           return -EINVAL;
+
+       if (kvm_vm_has_memslot_pages(kvm))
+           return -EINVAL;
+       :
+   }
+
+Thanks,
+Gavin
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
