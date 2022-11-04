@@ -2,66 +2,66 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C7BC433FE
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 15:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EE0FC43219
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 15:55:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 970A740DFD;
-	Fri,  4 Nov 2022 11:55:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA95340F60;
+	Fri,  4 Nov 2022 11:55:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7seoiR8Mklw8; Fri,  4 Nov 2022 11:55:21 -0400 (EDT)
+	with ESMTP id PIGLiqB12jM9; Fri,  4 Nov 2022 11:55:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01BE340DF4;
-	Fri,  4 Nov 2022 11:55:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 213D440E25;
+	Fri,  4 Nov 2022 11:55:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A7BF40B80
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 11:55:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4780640E62
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 11:55:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LWVrvc0+LTZT for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Nov 2022 11:55:18 -0400 (EDT)
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com
- [209.85.160.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3613A40B65
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 11:55:18 -0400 (EDT)
-Received: by mail-oa1-f47.google.com with SMTP id
- 586e51a60fabf-13bd19c3b68so5959755fac.7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Nov 2022 08:55:18 -0700 (PDT)
+ with ESMTP id Rf7xXSHAPFf8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Nov 2022 11:55:20 -0400 (EDT)
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com
+ [209.85.160.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E748640B80
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 11:55:19 -0400 (EDT)
+Received: by mail-oa1-f43.google.com with SMTP id
+ 586e51a60fabf-13bef14ea06so5986718fac.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Nov 2022 08:55:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=cc:to:message-id:date:from:content-transfer-encoding:mime-version
- :subject:x-gm-message-state:from:to:cc:subject:date:message-id
- :reply-to;
- bh=EsRuXK+4fmKPfA/tRVgMzv8PA5fByXtuRn3wY8WPk0o=;
- b=PCYDXv1+8DSVM6YgVUz8TS4E558AO0sQpDUeZ0k9kYZg4oJUiTRx/i33ADFcxd4+K1
- 92JkD0bwskh25ZjM2CCHrrlrVgXwQ8rHifVkfNdrMT04w/Iy/EP+4j4hXyfgBKvA2Br5
- CPWnIeUYeg04Ajg5rxqUosPiOojicShjo+zVphdaIrDQZsrdgIpxgP29N0fiufYc9U+4
- fNUuHYUAJmB9h7dGEtMS1PQRZEbVVLMOPdgVVxz4SmQPhJD1h2ApvIm7326EuKFHEIX0
- SIBPb9UuY/VWXSH4AwSpP2kyg6op3Y0TbCCXMUiOaxu6EDuGaoB7C5m+nRE0ddmmA58w
- Zpvw==
-X-Gm-Message-State: ACrzQf3RuJWk4keBQWfVZkpc4/8jgCCpyOqYUJPgJg7Jr+3NFaXkE1Vs
- UnIrKEHq9wEWFgOXAqsTzg==
-X-Google-Smtp-Source: AMsMyM7QNaapYnVKiSJDZR5Z9xD6NPozpgwYM9qlpFMIkrrlOKfLSW+YN50skL9R7U4bPspCP1TYOg==
-X-Received: by 2002:a05:6870:ec90:b0:13b:b20a:ae81 with SMTP id
- eo16-20020a056870ec9000b0013bb20aae81mr21230053oab.77.1667577317450; 
- Fri, 04 Nov 2022 08:55:17 -0700 (PDT)
+ h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+ :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+ :subject:date:message-id:reply-to;
+ bh=UEANOaGnOLKPIxD2FErExSJrTxX7DU5rJvRw0e3bF80=;
+ b=a1DUi5a1rTpRSi2OjrcsRBBPfMYSRp+9/uT//+e2WjYRrbQ09oWxnJCElpe1hTFVnJ
+ 2K4MnGtF/vBYX/qng475enMhllBtlEKFFsjUtolSV5rUm4kCfvCpgHSglCO8ZlRPFLmi
+ m2e0U6Z6JjnOtppzTcGEasAQ7grsgspATYZfw/axzqRI2oL4oIAc7dejRXIUKQZJxu5E
+ Jnwjfgpw9u55ddsjRM4hIAkZQDIgR9Sr6XC2ckQiuduIj4QTyMoP+odVwiIOy3R6Ifmm
+ 6Qup4Y5SmNWcUfLJzKqMaoCIfxLR+Ax1EoRDK8tEolt0y6O6uBAboLQYJ7AAJaw1hEhh
+ QtqQ==
+X-Gm-Message-State: ACrzQf1rUjvZPEjWjJFkgTWjfDWNT1cCBj3hyyNdxy3ghlokcGO00h4/
+ uwz+To7jZL5jyNWwo5oKzg==
+X-Google-Smtp-Source: AMsMyM6WrFtmkapT1UrpNl2ZQAkfrsboc6K0XV+rMZwF1lg79gRvh93AF4KLZSe+/QOGuXp3fJ0Wbw==
+X-Received: by 2002:a05:6870:e2d6:b0:13c:a47a:c477 with SMTP id
+ w22-20020a056870e2d600b0013ca47ac477mr22216403oad.269.1667577319209; 
+ Fri, 04 Nov 2022 08:55:19 -0700 (PDT)
 Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net.
  [66.90.144.107]) by smtp.gmail.com with ESMTPSA id
- 9-20020aca0d09000000b00359a9663053sm1570850oin.4.2022.11.04.08.55.16
+ x19-20020a056808145300b0034fc91dbd7bsm1608088oiv.58.2022.11.04.08.55.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Nov 2022 08:55:16 -0700 (PDT)
-Received: (nullmailer pid 1880407 invoked by uid 1000);
+ Fri, 04 Nov 2022 08:55:18 -0700 (PDT)
+Received: (nullmailer pid 1880414 invoked by uid 1000);
  Fri, 04 Nov 2022 15:55:18 -0000
-Subject: [PATCH v3 0/8] perf: Arm SPEv1.2 support
-MIME-Version: 1.0
-X-b4-tracking: H4sIANQ1ZWMC/33NQQ6CMBAF0KuQrh1TpgLFlfcwLko7QCO2ptUmhnB3J+5c6Gryf/L+rCJT8pTFsV
- pFouKzj4GD2lXCziZMBN5xFigRpcYGTLpBvhMUDR2M5EZ5oLodUQkmg8kEQzLBzozCc1m4nH1+xPT6
- vCg1n/OPtVKDBNs1g3Y9Utvj6Uop0LKPaRIXXir4TyNrUp1CdK02Vn7pbdveeUPe4ewAAAA=
 From: Rob Herring <robh@kernel.org>
-Date: Fri, 04 Nov 2022 10:55:00 -0500
-Message-Id: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
+Date: Fri, 04 Nov 2022 10:55:03 -0500
+Subject: [PATCH v3 3/8] arm64/sysreg: Convert SPE registers to automatic
+ generation
+MIME-Version: 1.0
+Message-Id: <20220825-arm-spe-v8-7-v3-3-87682f78caac@kernel.org>
+References: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
+In-Reply-To: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
 To: Namhyung Kim <namhyung@kernel.org>, Will Deacon <will@kernel.org>,
  Arnaldo Carvalho de Melo <acme@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
  Peter Zijlstra <peterz@infradead.org>,
@@ -91,64 +91,296 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This series adds support for Arm SPEv1.2 which is part of the
-Armv8.7/Armv9.2 architecture. There's 2 new features that affect the 
-kernel: a new event filter bit, branch 'not taken', and an inverted 
-event filter register. 
+Convert all the SPE register defines to automatic generation. No
+functional changes.
 
-Since this support adds new registers and fields, first the SPE register 
-defines are converted to automatic generation.
+New registers and fields for SPEv1.2 are added with the conversion.
 
-Note that the 'config3' addition in sysfs format files causes SPE to 
-break. A stable fix e552b7be12ed ("perf: Skip and warn on unknown format 
-'configN' attrs") landed in v6.1-rc1.
+Some of the PMBSR MSS field defines are kept as the automatic generation
+has no way to create multiple names for the same register bits. The
+meaning of the MSS field depends on other bits.
 
-The perf tool side changes are available here[1].
-
-Tested on FVP.
-
-[1] https://lore.kernel.org/all/20220914-arm-perf-tool-spe1-2-v2-v4-0-83c098e6212e@kernel.org/
-
+Tested-by: James Clark <james.clark@arm.com>
 Signed-off-by: Rob Herring <robh@kernel.org>
 ---
-Changes in v3:
-- Add some more missing SPE register fields and use Enums for some 
-  fields
-- Use the new PMSIDR_EL1 register Enum defines in the SPE driver
-- Link to v2: https://lore.kernel.org/r/20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org
-
-Changes in v2:
-- Convert the SPE register defines to automatic generation
-- Fixed access to SYS_PMSNEVFR_EL1 when not present
-- Rebase on v6.1-rc1
-- Link to v1: https://lore.kernel.org/r/20220825-arm-spe-v8-7-v1-0-c75b8d92e692@kernel.org
-
+v3:
+ - Make some fields enums and add some missing fields
+v2:
+ - New patch
 ---
-Rob Herring (8):
-      perf: arm_spe: Use feature numbering for PMSEVFR_EL1 defines
-      arm64: Drop SYS_ from SPE register defines
-      arm64/sysreg: Convert SPE registers to automatic generation
-      perf: arm_spe: Drop BIT() and use FIELD_GET/PREP accessors
-      perf: arm_spe: Use new PMSIDR_EL1 register enums
-      perf: arm_spe: Support new SPEv1.2/v8.7 'not taken' event
-      perf: Add perf_event_attr::config3
-      perf: arm_spe: Add support for SPEv1.2 inverted event filtering
+ arch/arm64/include/asm/sysreg.h |  91 ++------------------------
+ arch/arm64/tools/sysreg         | 139 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 144 insertions(+), 86 deletions(-)
 
- arch/arm64/include/asm/el2_setup.h |   6 +-
- arch/arm64/include/asm/sysreg.h    |  99 +++--------------------
- arch/arm64/kvm/debug.c             |   2 +-
- arch/arm64/kvm/hyp/nvhe/debug-sr.c |   2 +-
- arch/arm64/tools/sysreg            | 139 +++++++++++++++++++++++++++++++++
- drivers/perf/arm_spe_pmu.c         | 156 ++++++++++++++++++++++++-------------
- include/uapi/linux/perf_event.h    |   3 +
- 7 files changed, 257 insertions(+), 150 deletions(-)
----
-base-commit: 9abf2313adc1ca1b6180c508c25f22f9395cc780
-change-id: 20220825-arm-spe-v8-7-fedf04e16f23
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 8df8a0a51273..d002dd00e53e 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -237,99 +237,18 @@
+ #define SYS_PAR_EL1_FST			GENMASK(6, 1)
+ 
+ /*** Statistical Profiling Extension ***/
+-/* ID registers */
+-#define SYS_PMSIDR_EL1			sys_reg(3, 0, 9, 9, 7)
+-#define PMSIDR_EL1_FE_SHIFT		0
+-#define PMSIDR_EL1_FT_SHIFT		1
+-#define PMSIDR_EL1_FL_SHIFT		2
+-#define PMSIDR_EL1_ARCHINST_SHIFT	3
+-#define PMSIDR_EL1_LDS_SHIFT	4
+-#define PMSIDR_EL1_ERND_SHIFT	5
+-#define PMSIDR_EL1_INTERVAL_SHIFT	8
+-#define PMSIDR_EL1_INTERVAL_MASK	GENMASK_ULL(11, 8)
+-#define PMSIDR_EL1_MAXSIZE_SHIFT	12
+-#define PMSIDR_EL1_MAXSIZE_MASK		GENMASK_ULL(15, 12)
+-#define PMSIDR_EL1_COUNTSIZE_SHIFT	16
+-#define PMSIDR_EL1_COUNTSIZE_MASK	GENMASK_ULL(19, 16)
+-
+-#define SYS_PMBIDR_EL1			sys_reg(3, 0, 9, 10, 7)
+-#define PMBIDR_EL1_ALIGN_SHIFT		0
+-#define PMBIDR_EL1_ALIGN_MASK		0xfU
+-#define PMBIDR_EL1_P_SHIFT		4
+-#define PMBIDR_EL1_F_SHIFT		5
+-
+-/* Sampling controls */
+-#define SYS_PMSCR_EL1			sys_reg(3, 0, 9, 9, 0)
+-#define PMSCR_EL1_E0SPE_SHIFT		0
+-#define PMSCR_EL1_E1SPE_SHIFT		1
+-#define PMSCR_EL1_CX_SHIFT		3
+-#define PMSCR_EL1_PA_SHIFT		4
+-#define PMSCR_EL1_TS_SHIFT		5
+-#define PMSCR_EL1_PCT_SHIFT		6
+-
+-#define SYS_PMSCR_EL2			sys_reg(3, 4, 9, 9, 0)
+-#define PMSCR_EL2_E0HSPE_SHIFT		0
+-#define PMSCR_EL2_E2SPE_SHIFT		1
+-#define PMSCR_EL2_CX_SHIFT		3
+-#define PMSCR_EL2_PA_SHIFT		4
+-#define PMSCR_EL2_TS_SHIFT		5
+-#define PMSCR_EL2_PCT_SHIFT		6
+-
+-#define SYS_PMSICR_EL1			sys_reg(3, 0, 9, 9, 2)
+-
+-#define SYS_PMSIRR_EL1			sys_reg(3, 0, 9, 9, 3)
+-#define PMSIRR_EL1_RND_SHIFT		0
+-#define PMSIRR_EL1_INTERVAL_SHIFT	8
+-#define PMSIRR_EL1_INTERVAL_MASK	GENMASK_ULL(31, 8)
+-
+-/* Filtering controls */
+-#define SYS_PMSNEVFR_EL1		sys_reg(3, 0, 9, 9, 1)
+-
+-#define SYS_PMSFCR_EL1			sys_reg(3, 0, 9, 9, 4)
+-#define PMSFCR_EL1_FE_SHIFT		0
+-#define PMSFCR_EL1_FT_SHIFT		1
+-#define PMSFCR_EL1_FL_SHIFT		2
+-#define PMSFCR_EL1_B_SHIFT		16
+-#define PMSFCR_EL1_LD_SHIFT		17
+-#define PMSFCR_EL1_ST_SHIFT		18
+-
+-#define SYS_PMSEVFR_EL1			sys_reg(3, 0, 9, 9, 5)
+ #define PMSEVFR_EL1_RES0_IMP	\
+ 	(GENMASK_ULL(47, 32) | GENMASK_ULL(23, 16) | GENMASK_ULL(11, 8) |\
+ 	 BIT_ULL(6) | BIT_ULL(4) | BIT_ULL(2) | BIT_ULL(0))
+ #define PMSEVFR_EL1_RES0_V1P1	\
+ 	(PMSEVFR_EL1_RES0_IMP & ~(BIT_ULL(18) | BIT_ULL(17) | BIT_ULL(11)))
+ 
+-#define SYS_PMSLATFR_EL1		sys_reg(3, 0, 9, 9, 6)
+-#define PMSLATFR_EL1_MINLAT_SHIFT	0
+-
+-/* Buffer controls */
+-#define SYS_PMBLIMITR_EL1		sys_reg(3, 0, 9, 10, 0)
+-#define PMBLIMITR_EL1_E_SHIFT		0
+-#define PMBLIMITR_EL1_FM_SHIFT		1
+-#define PMBLIMITR_EL1_FM_MASK	GENMASK_ULL(2, 1)
+-#define PMBLIMITR_EL1_FM_STOP_IRQ	0
+-
+-#define SYS_PMBPTR_EL1			sys_reg(3, 0, 9, 10, 1)
+-
+ /* Buffer error reporting */
+-#define SYS_PMBSR_EL1			sys_reg(3, 0, 9, 10, 3)
+-#define PMBSR_EL1_COLL_SHIFT		16
+-#define PMBSR_EL1_S_SHIFT		17
+-#define PMBSR_EL1_EA_SHIFT		18
+-#define PMBSR_EL1_DL_SHIFT		19
+-#define PMBSR_EL1_EC_SHIFT		26
+-#define PMBSR_EL1_EC_MASK		GENMASK_ULL(31, 26)
+-
+-#define PMBSR_EL1_EC_BUF		0x0UL
+-#define PMBSR_EL1_EC_FAULT_S1		0x24UL
+-#define PMBSR_EL1_EC_FAULT_S2		0x25UL
+-
+-#define PMBSR_EL1_FAULT_FSC_SHIFT	0
+-#define PMBSR_EL1_FAULT_FSC_MASK	0x3fUL
+-
+-#define PMBSR_EL1_BUF_BSC_SHIFT		0
+-#define PMBSR_EL1_BUF_BSC_MASK		0x3fUL
++#define PMBSR_EL1_FAULT_FSC_SHIFT	PMBSR_EL1_MSS_SHIFT
++#define PMBSR_EL1_FAULT_FSC_MASK	PMBSR_EL1_MSS_MASK
++
++#define PMBSR_EL1_BUF_BSC_SHIFT		PMBSR_EL1_MSS_SHIFT
++#define PMBSR_EL1_BUF_BSC_MASK		PMBSR_EL1_MSS_MASK
+ 
+ #define PMBSR_EL1_BUF_BSC_FULL		0x1UL
+ 
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 384757a7eda9..04741f446c46 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -854,6 +854,130 @@ Sysreg	FAR_EL1	3	0	6	0	0
+ Field	63:0	ADDR
+ EndSysreg
+ 
++Sysreg	PMSCR_EL1	3	0	9	9	0
++Res0	63:8
++Field	7:6	PCT
++Field	5	TS
++Field	4	PA
++Field	3	CX
++Res0	2
++Field	1	E1SPE
++Field	0	E0SPE
++EndSysreg
++
++Sysreg	PMSNEVFR_EL1	3	0	9	9	1
++Field	63:0	E
++EndSysreg
++
++Sysreg	PMSICR_EL1	3	0	9	9	2
++Field	63:56	ECOUNT
++Res0	55:32
++Field	31:0	COUNT
++EndSysreg
++
++Sysreg	PMSIRR_EL1	3	0	9	9	3
++Res0	63:32
++Field	31:8	INTERVAL
++Res0	7:1
++Field	0	RND
++EndSysreg
++
++Sysreg	PMSFCR_EL1	3	0	9	9	4
++Res0	63:19
++Field	18	ST
++Field	17	LD
++Field	16	B
++Res0	15:4
++Field	3	FnE
++Field	2	FL
++Field	1	FT
++Field	0	FE
++EndSysreg
++
++Sysreg	PMSEVFR_EL1	3	0	9	9	5
++Field	63:0	E
++EndSysreg
++
++Sysreg	PMSLATFR_EL1	3	0	9	9	6
++Res0	63:16
++Field	15:0	MINLAT
++EndSysreg
++
++Sysreg	PMSIDR_EL1	3	0	9	9	7
++Res0	63:25
++Field	24	PBT
++Field	23:20	FORMAT
++Enum	19:16	COUNTSIZE
++	0b0010	12_BIT_SAT
++	0b0011	16_BIT_SAT
++EndEnum
++Field	15:12	MAXSIZE
++Enum	11:8	INTERVAL
++	0b0000	256
++	0b0010	512
++	0b0011	768
++	0b0100	1024
++	0b0101	1536
++	0b0110	2048
++	0b0111	3072
++	0b1000	4096
++EndEnum
++Res0	7
++Field	6	FnE
++Field	5	ERND
++Field	4	LDS
++Field	3	ARCHINST
++Field	2	FL
++Field	1	FT
++Field	0	FE
++EndSysreg
++
++Sysreg	PMBLIMITR_EL1	3	0	9	10	0
++Field	63:12	LIMIT
++Res0	11:6
++Field	5	PMFZ
++Res0	4:3
++Enum	2:1	FM
++	0b00	FILL
++	0b10	DISCARD
++EndEnum
++Field	0	E
++EndSysreg
++
++Sysreg	PMBPTR_EL1	3	0	9	10	1
++Field	63:0	PTR
++EndSysreg
++
++Sysreg	PMBSR_EL1	3	0	9	10	3
++Res0	63:32
++Enum	31:26	EC
++	0b000000	BUF
++	0b100100	FAULT_S1
++	0b100101	FAULT_S2
++	0b011110	FAULT_GPC
++	0b011111	IMP_DEF
++EndEnum
++Res0	25:20
++Field	19	DL
++Field	18	EA
++Field	17	S
++Field	16	COLL
++Field	15:0	MSS
++EndSysreg
++
++Sysreg	PMBIDR_EL1	3	0	9	10	7
++Res0	63:12
++Enum	11:8	EA
++	0b0000	NotDescribed
++	0b0001	Ignored
++	0b0010	SError
++EndEnum
++Res0	7:6
++Field	5	F
++Field	4	P
++Field	3:0	ALIGN
++EndSysreg
++
+ SysregFields	CONTEXTIDR_ELx
+ Res0	63:32
+ Field	31:0	PROCID
+@@ -1008,6 +1132,21 @@ Sysreg	FAR_EL2	3	4	6	0	0
+ Field	63:0	ADDR
+ EndSysreg
+ 
++Sysreg	PMSCR_EL2	3	4	9	9	0
++Res0	63:8
++Enum	7:6	PCT
++	0b00	VIRT
++	0b01	PHYS
++	0b11	GUEST
++EndEnum
++Field	5	TS
++Field	4	PA
++Field	3	CX
++Res0	2
++Field	1	E2SPE
++Field	0	E0HSPE
++EndSysreg
++
+ Sysreg	CONTEXTIDR_EL2	3	4	13	0	1
+ Fields	CONTEXTIDR_ELx
+ EndSysreg
 
-Best regards,
 -- 
-Rob Herring <robh@kernel.org>
+b4 0.11.0-dev
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
