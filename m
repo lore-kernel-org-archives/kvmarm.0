@@ -2,55 +2,89 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF24EC4332F
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 11:47:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C8EC4332F
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 12:19:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 978FB41066;
-	Fri,  4 Nov 2022 07:47:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D625640FF0;
+	Fri,  4 Nov 2022 08:19:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KAzmovWdnHB6; Fri,  4 Nov 2022 07:47:55 -0400 (EDT)
+	with ESMTP id 9NjdzLh+b2L2; Fri,  4 Nov 2022 08:19:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB19849AF7;
-	Fri,  4 Nov 2022 07:47:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3C6541021;
+	Fri,  4 Nov 2022 08:19:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8634940F59
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 07:30:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A2DF41066
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 08:19:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NxLDAOEJ9FP2 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Nov 2022 07:30:15 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 292C740E00
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 07:30:15 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A4A3E1FB;
- Fri,  4 Nov 2022 04:30:20 -0700 (PDT)
-Received: from [10.57.69.48] (unknown [10.57.69.48])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EEB5E3F703;
- Fri,  4 Nov 2022 04:30:10 -0700 (PDT)
-Message-ID: <5c410969-2176-49cf-640f-8023c421682e@arm.com>
-Date: Fri, 4 Nov 2022 11:30:09 +0000
+ with ESMTP id hXBOwQWX838c for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Nov 2022 08:19:41 -0400 (EDT)
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com
+ [209.85.210.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD93640FD3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 08:19:40 -0400 (EDT)
+Received: by mail-pf1-f172.google.com with SMTP id k22so4379371pfd.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Nov 2022 05:19:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ h=content-transfer-encoding:in-reply-to:from:content-language
+ :references:cc:to:subject:user-agent:mime-version:date:message-id
+ :from:to:cc:subject:date:message-id:reply-to;
+ bh=lpOhz7OxgcyX16jnYCGIcgxXstL27/jHBLX3BQlZkeM=;
+ b=cgzEgr24LoI9IjU+XM4EMk8dKD1ZuwOUoG2l29SwIwhDpdCk1rND+HSkQzPaFXXUun
+ 5cwqt4utz8zuQy+631yxcp8JeTFWa3eEkR6rLzF+IQQONAm77Re4+TeMpD3W2MH1BG0k
+ xpw4hpqq2JLk9/rFoZ9a9PIltTd+TgIFu3ne1ijW4zZiDKY4Q2Lfnp1QKP/5fTQ/RXCF
+ sGZicS+qqji92R8nClF8Qce3AOCsMhu2lWkuuNsR5EHcX1aF3PHTZeyjQrPGzGFRsP4k
+ RN+MepWdTPb4gy5WMrWU7TZn6sYgVJl/ZAxP+ckrNg/JqvnI2g7HxwDXe6/hlJfR45wa
+ 16lQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=content-transfer-encoding:in-reply-to:from:content-language
+ :references:cc:to:subject:user-agent:mime-version:date:message-id
+ :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+ bh=lpOhz7OxgcyX16jnYCGIcgxXstL27/jHBLX3BQlZkeM=;
+ b=dHiNiBSill7GuCRD4cwklQVqdvFn+8BwGL2i+C0R33xOmqJoekO+/qay0t8iaGIlmv
+ xG+K+a24E1xibBBZQ/oSpKOBlfeJXAxwIATC+TsU5OmivvF6ZF/nqhnm9M4RIrzOVh5w
+ HJBaT/vsI7jDX3p7XGqzD3+piNX2oGR/IcethLp4vh89an9ouVfGOcSLHHlc1DfEU5Jg
+ 5wyl9Dve0BDAVXyDj5cXw/y+cSVGDGcqkpA6N6oPmKrLAag6etGZDnaaR02P5kz4xbC5
+ xipvUK3hq715d2In0pFjcUI46CD5hxrixhYp76TSaI0LJX4zzJiJWRUr1g8ExcBYK8Ij
+ 1YKg==
+X-Gm-Message-State: ACrzQf3uccnOAzbz8p460K1aZaJcVv44OJ3dKevI8kJEn03mNyWIk1GZ
+ XUwrhG9FVCiuDz29rL80lY0=
+X-Google-Smtp-Source: AMsMyM7+wkqLB0hFLrfY0ZTPMLFgrcCEO0q4UBENhChoWBosKogPXniCnR6xUQqM7H+JaXD1DhGp0g==
+X-Received: by 2002:a05:6a00:140a:b0:56c:b679:f812 with SMTP id
+ l10-20020a056a00140a00b0056cb679f812mr35864191pfu.46.1667564379656; 
+ Fri, 04 Nov 2022 05:19:39 -0700 (PDT)
+Received: from [192.168.43.80] (subs02-180-214-232-17.three.co.id.
+ [180.214.232.17]) by smtp.gmail.com with ESMTPSA id
+ b6-20020a170903228600b001782a6fbcacsm2543892plh.101.2022.11.04.05.19.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 04 Nov 2022 05:19:39 -0700 (PDT)
+Message-ID: <995a64b0-a9bb-05ce-85d1-6b5ee25ec0ef@gmail.com>
+Date: Fri, 4 Nov 2022 19:19:32 +0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v2 0/7] perf: Arm SPEv1.2 support
+ Thunderbird/102.4.1
+Subject: Re: [PATCH] kvm/arm: Fix pvtime documentation
+To: Marc Zyngier <maz@kernel.org>
+References: <20221103131210.3603385-1-usama.arif@bytedance.com>
+ <24d81fe9-7cd1-71eb-8c35-0739f638b3df@gmail.com>
+ <86fsf0qc1w.wl-maz@kernel.org>
+ <4b2b78c6-9903-1247-9d16-fc6270aa34fc@gmail.com>
+ <86cza3q8q5.wl-maz@kernel.org>
 Content-Language: en-US
-To: Rob Herring <robh@kernel.org>
-References: <20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org>
-From: James Clark <james.clark@arm.com>
-In-Reply-To: <20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org>
-X-Mailman-Approved-At: Fri, 04 Nov 2022 07:47:47 -0400
-Cc: Will Deacon <will@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
- Arnaldo Carvalho de Melo <acme@kernel.org>, linux-perf-users@vger.kernel.org,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Mark Brown <broonie@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
- Namhyung Kim <namhyung@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+In-Reply-To: <86cza3q8q5.wl-maz@kernel.org>
+Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ Usama Arif <usama.arif@bytedance.com>, fam.zheng@bytedance.com,
+ punit.agrawal@bytedance.com, linux@armlinux.org.uk, liangma@liangbit.com,
+ steven.price@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,65 +101,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On 11/4/22 18:06, Marc Zyngier wrote:
+> On Fri, 04 Nov 2022 01:48:21 +0000,
+> Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+>>
+>> On 11/3/22 22:42, Marc Zyngier wrote:
+>>> No, this is the correct course of action. There isn't any point in
+>>> having an *unrelated* change in a separate series. This is a
+>>> standalone change, posted as a standalone patch.
+>>>
+>>>> Please reroll your series [2] with suggestion applied.
+>>>
+>>> Or not.
+>>>
+>>
+>> You mean the series before this patch have already been applied,
+>> right?
+> 
+> This change is 100% independent from the series you quoted. Why should
+> there be a dependency between the two?
+> 
+> As for respinning the series at this stage for a documentation
+> formatting issue, this is pretty pointless, and only clutters people's
+> Inbox with redundant versions...
+> 
+> 	M.
+> 
 
+OK, thanks!
 
-On 19/10/2022 20:11, Rob Herring wrote:
-> This series adds support for Arm SPEv1.2 which is part of the
-> Armv8.7/Armv9.2 architecture. There's 2 new features that affect the 
-> kernel: a new event filter bit, branch 'not taken', and an inverted 
-> event filter register. 
-> 
-> Since this support adds new registers and fields, first the SPE register 
-> defines are converted to automatic generation.
-> 
-> Note that the 'config3' addition in sysfs format files causes SPE to 
-> break. A stable fix e552b7be12ed ("perf: Skip and warn on unknown format 
-> 'configN' attrs") landed in v6.1-rc1.
-> 
-> The perf tool side changes are available here[1].
-> 
-> Tested on FVP.
-> 
-> [1] https://lore.kernel.org/all/20220914-arm-perf-tool-spe1-2-v2-v4-0-83c098e6212e@kernel.org/
-> 
+-- 
+An old man doll... just what I always wanted! - Clara
 
-LGTM. Tested with [1] applied and on N1SDP (where it isn't supported),
-and on the FVP. Enabling all the inverted filters results in no trace
-and other combinations work as expected.
-
-James
-
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
-> Changes in v2:
-> - Convert the SPE register defines to automatic generation
-> - Fixed access to SYS_PMSNEVFR_EL1 when not present
-> - Rebase on v6.1-rc1
-> - Link to v1: https://lore.kernel.org/r/20220825-arm-spe-v8-7-v1-0-c75b8d92e692@kernel.org
-> 
-> ---
-> Rob Herring (7):
->       perf: arm_spe: Use feature numbering for PMSEVFR_EL1 defines
->       arm64: Drop SYS_ from SPE register defines
->       arm64/sysreg: Convert SPE registers to automatic generation
->       perf: arm_spe: Drop BIT() and use FIELD_GET/PREP accessors
->       perf: arm_spe: Support new SPEv1.2/v8.7 'not taken' event
->       perf: Add perf_event_attr::config3
->       perf: arm_spe: Add support for SPEv1.2 inverted event filtering
-> 
->  arch/arm64/include/asm/el2_setup.h |   6 +-
->  arch/arm64/include/asm/sysreg.h    |  99 +++------------------------
->  arch/arm64/kvm/debug.c             |   2 +-
->  arch/arm64/kvm/hyp/nvhe/debug-sr.c |   2 +-
->  arch/arm64/tools/sysreg            | 116 +++++++++++++++++++++++++++++++
->  drivers/perf/arm_spe_pmu.c         | 136 ++++++++++++++++++++++++-------------
->  include/uapi/linux/perf_event.h    |   3 +
->  7 files changed, 224 insertions(+), 140 deletions(-)
-> ---
-> base-commit: 9abf2313adc1ca1b6180c508c25f22f9395cc780
-> change-id: 20220825-arm-spe-v8-7-fedf04e16f23
-> 
-> Best regards,
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
