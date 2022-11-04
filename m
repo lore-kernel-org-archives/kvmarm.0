@@ -2,95 +2,56 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 728EDC4332F
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 20:27:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 811CAC433FE
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 20:47:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDF4440E76;
-	Fri,  4 Nov 2022 16:27:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA63C41081;
+	Fri,  4 Nov 2022 16:47:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id j5Isg+SUtogQ; Fri,  4 Nov 2022 16:27:22 -0400 (EDT)
+	with ESMTP id I9f5xYQNtupv; Fri,  4 Nov 2022 16:47:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A7CFA40F59;
-	Fri,  4 Nov 2022 16:27:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD4354106C;
+	Fri,  4 Nov 2022 16:47:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1236540E76
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 16:27:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 532FE40FB6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 16:47:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Mfl9w-CgIv8x for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Nov 2022 16:27:20 -0400 (EDT)
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com
- [209.85.210.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0751540E71
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 16:27:19 -0400 (EDT)
-Received: by mail-pf1-f177.google.com with SMTP id q9so5464862pfg.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Nov 2022 13:27:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=TzyhTv3BAtgpGpRr8HnNLx/d2zCvSqkboAFtik4Imo0=;
- b=q/PTXKQj3ArVm2XzZe97QeFygVMm1eXh+9AVtXcJ75aOhS7rpOmmmorCukrcxmTsXJ
- xtHpP7JyICLKwJpO4UdyBCOfADg9j8qWzQtBsGyOUBj4dtUE2hEcaa0M2lJNL2RYHNdm
- t9CE40syL4mSgI+9axRmHRY3m49U53Bcc5xsUL4w5HmCnvq3rZFCi8RspoeZ0S4Nhg0P
- dklWYN0e+iqclhNFPVLNqLlrIm4bRgIuUSiy6nVFx0aKBZbtXqUzzmm+oTu43A9TiINS
- r9mhyi03/1kAIfHUOzdEnLew/bMGSFKH13ZsSBoEdZkxO+PvUKRhjXGV6DaJ6ZELthJK
- tWVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
- :message-id:reply-to;
- bh=TzyhTv3BAtgpGpRr8HnNLx/d2zCvSqkboAFtik4Imo0=;
- b=cHUxFoFUqLfw5ueLFDCYdmpuD+3qIe5NkDoIeCq00G9C2hAJmdNakq2qrE1e3saRpo
- 7BBDlb4yGkZQTY0cL0GHnTFw82+9u5ax2GDf68RaRz+9Lcvi81RjQ/mCk79IIhJ4/jpB
- VQ2ca9VGs/XIsykTcRSMpIkXIbPuSsOhDQ4f573V/A/J/jAae/2DGylFhr2HSpBqaEqa
- C2W1krV+oaGkzkIAAzQ4Pa2WjzRb2U9KO8uRQV4PMbUahJPCSH4gNHG3Gcolvu1g4XvJ
- +a8kIi3IkeH338APs8crr4jP8l3v/kmaDVIPUVRsf+opT2wccgtByqKKBAQoV+6m+7OF
- 11sg==
-X-Gm-Message-State: ACrzQf3XQmtBoIaizwfwhP/WkAokHbIqDXl/HBMsL0q0AL6EgjVhsFDd
- N9IOO+2MuTSss48EB+0YazdTag==
-X-Google-Smtp-Source: AMsMyM6nILnCIcSIsk5JMrE+WRVnxFnaYDn7QGx3yWf1KAa3dZc7TNSn3aZcg19Xay3NbhiF32a9mw==
-X-Received: by 2002:a05:6a00:1781:b0:561:7f7f:dc38 with SMTP id
- s1-20020a056a00178100b005617f7fdc38mr38037687pfg.42.1667593638927; 
- Fri, 04 Nov 2022 13:27:18 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com.
- [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
- u8-20020a1709026e0800b0018863e1bd3csm159522plk.134.2022.11.04.13.27.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Nov 2022 13:27:18 -0700 (PDT)
-Date: Fri, 4 Nov 2022 20:27:14 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Isaku Yamahata <isaku.yamahata@gmail.com>
-Subject: Re: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
-Message-ID: <Y2V1oslbw24/2Opd@google.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221104071749.GC1063309@ls.amr.corp.intel.com>
+ with ESMTP id MbfIa7hF0JTs for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Nov 2022 16:47:26 -0400 (EDT)
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 00CC340F59
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 16:47:25 -0400 (EDT)
+Date: Fri, 4 Nov 2022 20:47:20 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1667594844;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=SCB5ELX6zZgbFvMbSeADp4LrffKecUl6OwVcbH2Uzy8=;
+ b=fSsh80Ev9RKwyRPXTjPjZnU8OndKbEKKb2oub4IYYNx7/0r0Cl5NPxk7/2oQHRgCEwv50o
+ ks3wuR9pOiR7dGF97YOFpa66PwHv7iJ7CIm/sj9Idto43b75OQM2kTtxmGk56r3h2povFz
+ toC5JLi8D2aRcFtpZmqyN/ZTcLqeX+A=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v2 01/14] arm64: Add ID_DFR0_EL1.PerfMon values for
+ PMUv3p7 and IMP_DEF
+Message-ID: <Y2V6WIu40Cg2ShXV@google.com>
+References: <20221028105402.2030192-1-maz@kernel.org>
+ <20221028105402.2030192-2-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20221104071749.GC1063309@ls.amr.corp.intel.com>
-Cc: Matthew Rosato <mjrosato@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Yuan Yao <yuan.yao@intel.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, linux-kernel@vger.kernel.org,
- Michael Ellerman <mpe@ellerman.id.au>, linux-riscv@lists.infradead.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
- linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Chao Gao <chao.gao@intel.com>, Eric Farman <farman@linux.ibm.com>,
- Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org,
- Atish Patra <atishp@atishpatra.org>, kvmarm@lists.linux.dev,
- Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Fabiano Rosas <farosas@linux.ibm.com>, linux-mips@vger.kernel.org,
- Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- linuxppc-dev@lists.ozlabs.org
+In-Reply-To: <20221028105402.2030192-2-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -107,20 +68,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Nov 04, 2022, Isaku Yamahata wrote:
-> Thanks for the patch series. I the rebased TDX KVM patch series and it worked.
-> Since cpu offline needs to be rejected in some cases(To keep at least one cpu
-> on a package), arch hook for cpu offline is needed.
+On Fri, Oct 28, 2022 at 11:53:49AM +0100, Marc Zyngier wrote:
+> Align the ID_DFR0_EL1.PerfMon values with ID_AA64DFR0_EL1.PMUver.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-I hate to bring this up because I doubt there's a real use case for SUSPEND with
-TDX, but the CPU offline path isn't just for true offlining of CPUs.  When the
-system enters SUSPEND, only the initiating CPU goes through kvm_suspend()+kvm_resume(),
-all responding CPUs go through CPU offline+online.  I.e. disallowing all CPUs from
-going "offline" will prevent suspending the system.
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-I don't see anything in the TDX series or the specs that suggests suspend+resume
-is disallowed when TDX is enabled, so blocking that seems just as wrong as
-preventing software from soft-offlining CPUs.
+FYI, another pile of ID reg changes is on the way that'll move DFR0 to a
+generated definition.
+
+https://lore.kernel.org/linux-arm-kernel/20220930140211.3215348-1-james.morse@arm.com/
+
+--
+Thanks,
+Oliver
+
+> ---
+>  arch/arm64/include/asm/sysreg.h | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 7d301700d1a9..84f59ce1dc6d 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -698,6 +698,8 @@
+>  #define ID_DFR0_PERFMON_8_1		0x4
+>  #define ID_DFR0_PERFMON_8_4		0x5
+>  #define ID_DFR0_PERFMON_8_5		0x6
+> +#define ID_DFR0_PERFMON_8_7		0x7
+> +#define ID_DFR0_PERFMON_IMP_DEF		0xf
+>  
+>  #define ID_ISAR4_SWP_FRAC_SHIFT		28
+>  #define ID_ISAR4_PSR_M_SHIFT		24
+> -- 
+> 2.34.1
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
