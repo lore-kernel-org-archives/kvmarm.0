@@ -2,62 +2,63 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0002C4167B
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 15:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E68C433FE
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 15:55:38 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B2E54A1D9;
-	Fri,  4 Nov 2022 11:55:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3144E49AF7;
+	Fri,  4 Nov 2022 11:55:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cpzLrHDBqmQd; Fri,  4 Nov 2022 11:55:32 -0400 (EDT)
+	with ESMTP id tbGxYdcy8o-q; Fri,  4 Nov 2022 11:55:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B827F41278;
-	Fri,  4 Nov 2022 11:55:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31DFB4141A;
+	Fri,  4 Nov 2022 11:55:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EA6943C8C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 11:55:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C93E41075
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 11:55:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id S40o8YM0dFX3 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Nov 2022 11:55:29 -0400 (EDT)
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com
- [209.85.167.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E99C241016
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 11:55:28 -0400 (EDT)
-Received: by mail-oi1-f170.google.com with SMTP id p127so5574103oih.9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Nov 2022 08:55:28 -0700 (PDT)
+ with ESMTP id hpmITEJ7IhCJ for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Nov 2022 11:55:34 -0400 (EDT)
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com
+ [209.85.210.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6AF5648F99
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 11:55:32 -0400 (EDT)
+Received: by mail-ot1-f46.google.com with SMTP id
+ 94-20020a9d0067000000b0066c8d13a33dso1582909ota.12
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Nov 2022 08:55:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
  :mime-version:subject:date:from:x-gm-message-state:from:to:cc
  :subject:date:message-id:reply-to;
- bh=YXxvA5Cmwe9nSMxNL2yH3Amn9qhEZ+Ppqa0CVXQahDM=;
- b=DljyexvSXsr9Mg833225aLFkgDwyEELxoYX+j96GcQ4Z8WztS9xNd3k/zTiDtuJrNA
- fsNCsU0w0JMooYY3Ib9bLEvTgOqkkbl1123BSGDIaxvfJB8PcCWj1IArXCn2/MyajQct
- uvBviQR3gwZElrxQfoX9SLIX/2rz7DUejY3kidfwsfiCW47x6KiYncyZaXwXdRBtHh/h
- 0twcF4+Iq/TpL6GXB51UMHMYZomz5O82CG66bt8THpIKoLZVhPAD46e2rprcZtpvX84H
- 4pMtRmQ/NS/8tXSG4uptwE9rqUr90Cjk82V3X3QYDdMLrgDzeK+ZSAG/5/HrSao/qRn6
- zwww==
-X-Gm-Message-State: ACrzQf2wA+LfJ9H1JRz4zIsYsKmwluV3o3tXiHdVlJoRKozrNdihiLs8
- qPaIpcUPhFtNc43w4ffDhA==
-X-Google-Smtp-Source: AMsMyM7j75hsQAjfZIMDag+E+uxVO086sbySFKGpZQmxBHGiFVlWgpE6vfapy3lhNwjdU+847kbdBg==
-X-Received: by 2002:a05:6808:2023:b0:359:c826:8085 with SMTP id
- q35-20020a056808202300b00359c8268085mr19906327oiw.156.1667577328221; 
- Fri, 04 Nov 2022 08:55:28 -0700 (PDT)
+ bh=rdANC8NrUTH0lQipJQx568c5Das7/Cs95kVjxC07YnA=;
+ b=MvlKDud0cbt62ByPVP1nhtc6THhJ8LqmpnhsQI9YCrzTkGc573uwMuv7lju599BTB5
+ 2cmiTB6uapWTiXO0/9HGGdaYAHh3CG43XEyH6LK3Ig/Dej6/MJtj4PwfKqiJ4/ODSap1
+ NXynmd1Jdgz4PxW0v66SeaHO+CYvYKMKtnzGsHPjGAXJYQY+N3ehvK4nuZyARYZPmiW3
+ 0GifDHaGMHq1zV4HeRiAQ+ZJeZYrPpWPn0kvnUAwpOFxXThrZ/GTiBnl2LzQV03Fn18b
+ Y/rG7AOHmFS2Zt6/s46alvgA0JskQRomqhB5bJb3QNzh4aAMv56SUdz2U3pab51/cD3x
+ RG8w==
+X-Gm-Message-State: ACrzQf2gEu++zhFTPqIp0s2zdyOwpmdY8NzJUnpbeKQl7j1C70KchnPB
+ vp+Q6Nln8SEfB2StZVqAMw==
+X-Google-Smtp-Source: AMsMyM59dgaW5KOcOiwYnuILFe/BJR9IA6bPecpfclxA2KHdZ3Eq+UoizXI26yxdMDvL0GyieiOjSA==
+X-Received: by 2002:a05:6830:1241:b0:66c:3bc2:f919 with SMTP id
+ s1-20020a056830124100b0066c3bc2f919mr16838358otp.33.1667577331662; 
+ Fri, 04 Nov 2022 08:55:31 -0700 (PDT)
 Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net.
  [66.90.144.107]) by smtp.gmail.com with ESMTPSA id
- h4-20020a9d2f04000000b00661a3f4113bsm1532860otb.64.2022.11.04.08.55.26
+ l21-20020a05687040d500b0013d9bd4ad2esm1906311oal.12.2022.11.04.08.55.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Nov 2022 08:55:27 -0700 (PDT)
-Received: (nullmailer pid 1880418 invoked by uid 1000);
+ Fri, 04 Nov 2022 08:55:31 -0700 (PDT)
+Received: (nullmailer pid 1880422 invoked by uid 1000);
  Fri, 04 Nov 2022 15:55:18 -0000
 From: Rob Herring <robh@kernel.org>
-Date: Fri, 04 Nov 2022 10:55:05 -0500
-Subject: [PATCH v3 5/8] perf: arm_spe: Use new PMSIDR_EL1 register enums
+Date: Fri, 04 Nov 2022 10:55:07 -0500
+Subject: [PATCH v3 7/8] perf: Add perf_event_attr::config3
 MIME-Version: 1.0
-Message-Id: <20220825-arm-spe-v8-7-v3-5-87682f78caac@kernel.org>
+Message-Id: <20220825-arm-spe-v8-7-v3-7-87682f78caac@kernel.org>
 References: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
 In-Reply-To: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
 To: Namhyung Kim <namhyung@kernel.org>, Will Deacon <will@kernel.org>,
@@ -89,74 +90,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Now that the SPE register definitions include enums for some PMSIDR_EL1
-fields, use them in the driver in place of magic values.
+Arm SPEv1.2 adds another 64-bits of event filtering control. As the
+existing perf_event_attr::configN fields are all used up for SPE PMU, an
+additional field is needed. Add a new 'config3' field.
 
+Tested-by: James Clark <james.clark@arm.com>
 Signed-off-by: Rob Herring <robh@kernel.org>
 ---
-v3: New patch
+v3:
+ - No change
+v2:
+ - Drop tools/ side update
 ---
- drivers/perf/arm_spe_pmu.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ include/uapi/linux/perf_event.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-index 9b4bd72087ea..af6d3867c3e7 100644
---- a/drivers/perf/arm_spe_pmu.c
-+++ b/drivers/perf/arm_spe_pmu.c
-@@ -1006,32 +1006,32 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 	/* This field has a spaced out encoding, so just use a look-up */
- 	fld = FIELD_GET(PMSIDR_EL1_INTERVAL, reg);
- 	switch (fld) {
--	case 0:
-+	case PMSIDR_EL1_INTERVAL_256:
- 		spe_pmu->min_period = 256;
- 		break;
--	case 2:
-+	case PMSIDR_EL1_INTERVAL_512:
- 		spe_pmu->min_period = 512;
- 		break;
--	case 3:
-+	case PMSIDR_EL1_INTERVAL_768:
- 		spe_pmu->min_period = 768;
- 		break;
--	case 4:
-+	case PMSIDR_EL1_INTERVAL_1024:
- 		spe_pmu->min_period = 1024;
- 		break;
--	case 5:
-+	case PMSIDR_EL1_INTERVAL_1536:
- 		spe_pmu->min_period = 1536;
- 		break;
--	case 6:
-+	case PMSIDR_EL1_INTERVAL_2048:
- 		spe_pmu->min_period = 2048;
- 		break;
--	case 7:
-+	case PMSIDR_EL1_INTERVAL_3072:
- 		spe_pmu->min_period = 3072;
- 		break;
- 	default:
- 		dev_warn(dev, "unknown PMSIDR_EL1.Interval [%d]; assuming 8\n",
- 			 fld);
- 		fallthrough;
--	case 8:
-+	case PMSIDR_EL1_INTERVAL_4096:
- 		spe_pmu->min_period = 4096;
- 	}
+diff --git a/include/uapi/linux/perf_event.h b/include/uapi/linux/perf_event.h
+index 85be78e0e7f6..b2b1d7b54097 100644
+--- a/include/uapi/linux/perf_event.h
++++ b/include/uapi/linux/perf_event.h
+@@ -374,6 +374,7 @@ enum perf_event_read_format {
+ #define PERF_ATTR_SIZE_VER5	112	/* add: aux_watermark */
+ #define PERF_ATTR_SIZE_VER6	120	/* add: aux_sample_size */
+ #define PERF_ATTR_SIZE_VER7	128	/* add: sig_data */
++#define PERF_ATTR_SIZE_VER8	136	/* add: config3 */
  
-@@ -1050,10 +1050,10 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 		dev_warn(dev, "unknown PMSIDR_EL1.CountSize [%d]; assuming 2\n",
- 			 fld);
- 		fallthrough;
--	case 2:
-+	case PMSIDR_EL1_COUNTSIZE_12_BIT_SAT:
- 		spe_pmu->counter_sz = 12;
- 		break;
--	case 3:
-+	case PMSIDR_EL1_COUNTSIZE_16_BIT_SAT:
- 		spe_pmu->counter_sz = 16;
- 	}
+ /*
+  * Hardware event_id to monitor via a performance monitoring event:
+@@ -515,6 +516,8 @@ struct perf_event_attr {
+ 	 * truncated accordingly on 32 bit architectures.
+ 	 */
+ 	__u64	sig_data;
++
++	__u64	config3; /* extension of config2 */
+ };
  
+ /*
 
 -- 
 b4 0.11.0-dev
