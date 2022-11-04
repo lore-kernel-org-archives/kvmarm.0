@@ -1,36 +1,36 @@
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AEB3846A
-	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 15:55:20 +0000 (UTC)
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-13c569e5ff5so5972798fac.6
-        for <kvmarm@lists.linux.dev>; Fri, 04 Nov 2022 08:55:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DD4D846A
+	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 15:55:21 +0000 (UTC)
+Received: by mail-oo1-f44.google.com with SMTP id e11-20020a4ab14b000000b0049be568062bso724246ooo.4
+        for <kvmarm@lists.linux.dev>; Fri, 04 Nov 2022 08:55:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UEANOaGnOLKPIxD2FErExSJrTxX7DU5rJvRw0e3bF80=;
-        b=awJ8vaGAdN3zZp/dj4SkcroFByoJDOm/qjBK0J+nPzmxVFaDXwdPh4+uvYOwYCfzX6
-         4YiuUw6uAh9dWHEMiQbSMepH6Vj1MUFMyhylnEb1meQPkzCrlL3PrKsoW+KfpAOW4X91
-         VyRHSCk196R7IgrWn+vLIWl+99bJ+3paBXLEkmle6hjd5OJEERiwxshR3FHhN+0Ru5wR
-         lsSUF5mD/ZFjccZAEnJRBaeRmk3M7TtPj+dt6wgQZOKFRhMOisrbfbAPBnvejrPkzH61
-         ybCw0WVCuB/vK2m9O+8pRu6pGAyhcVJhlr8ES4mfvkvtNT5DWVfwiVgzWZA+ZmFQdh3X
-         hv9A==
-X-Gm-Message-State: ACrzQf0btqECJFGtv+xygn31TPMR0jwQ9Yok4uWCBofA7gnOvV5mGlej
-	Zw7wIEMTv6Y5BQuTbMRGnQ==
-X-Google-Smtp-Source: AMsMyM6WrFtmkapT1UrpNl2ZQAkfrsboc6K0XV+rMZwF1lg79gRvh93AF4KLZSe+/QOGuXp3fJ0Wbw==
-X-Received: by 2002:a05:6870:e2d6:b0:13c:a47a:c477 with SMTP id w22-20020a056870e2d600b0013ca47ac477mr22216403oad.269.1667577319209;
-        Fri, 04 Nov 2022 08:55:19 -0700 (PDT)
+        bh=vXHN85rGi/sHJxkCh/EJ6+8yFyKV7jY1RaGb4FopPeo=;
+        b=FbVvM0seTgGZtceNfbVMFy+a63Y9zAbc8xV05CHn3cpMHnwGuDxHMTmhSiBwx5+FXD
+         p4b8rwg3wtW3JBjW6dZO++fKPE6L2Jb31FqtBpr8qA1RiPlB/BJkrxz+YtI3GTMKtJ02
+         m3CB/FHB70cqU37snMWgsAzdwwNlee7z6SgJveJNevT0PW4nLpYPkY4oNlZ+nwBTdd1Y
+         +ToSlFIl/J0tb683PXaNZ66arJQIDXrZeLEDHRSjFkg3n6NPf4tevDRJipRahmMHCuGg
+         8ffpol6MMZJ7MBEgjQ9e64lGT8hke4QYCp4Oo7b2/ii6vcHXgerrYxLhT5pTrCoqW3V1
+         yUoQ==
+X-Gm-Message-State: ACrzQf3/xkUnABY65pl8wZ1ZMJk6LSR/2rPUi52VEjBr7pt2YHoljDGq
+	UTJKsRUeA7ne+56N8d1NFQ==
+X-Google-Smtp-Source: AMsMyM7pCwyPgb66JWSqAhyJT2Zy19MfmfLvn4n0Iy5I5SMyodx/qFkxvUx6vK81mIjTcgeM6iIZtg==
+X-Received: by 2002:a4a:8e81:0:b0:475:811f:3f9e with SMTP id p1-20020a4a8e81000000b00475811f3f9emr15376005ook.35.1667577320918;
+        Fri, 04 Nov 2022 08:55:20 -0700 (PDT)
 Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id x19-20020a056808145300b0034fc91dbd7bsm1608088oiv.58.2022.11.04.08.55.17
+        by smtp.gmail.com with ESMTPSA id l8-20020a056870218800b0013669485016sm1884406oae.37.2022.11.04.08.55.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Nov 2022 08:55:18 -0700 (PDT)
-Received: (nullmailer pid 1880414 invoked by uid 1000);
+        Fri, 04 Nov 2022 08:55:20 -0700 (PDT)
+Received: (nullmailer pid 1880412 invoked by uid 1000);
 	Fri, 04 Nov 2022 15:55:18 -0000
 From: Rob Herring <robh@kernel.org>
-Date: Fri, 04 Nov 2022 10:55:03 -0500
-Subject: [PATCH v3 3/8] arm64/sysreg: Convert SPE registers to automatic generation
+Date: Fri, 04 Nov 2022 10:55:02 -0500
+Subject: [PATCH v3 2/8] arm64: Drop SYS_ from SPE register defines
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,301 +39,486 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-ID: <20220825-arm-spe-v8-7-v3-3-87682f78caac@kernel.org>
+Message-ID: <20220825-arm-spe-v8-7-v3-2-87682f78caac@kernel.org>
 References: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
 In-Reply-To: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
 To: Namhyung Kim <namhyung@kernel.org>, Will Deacon <will@kernel.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, Jiri Olsa <jolsa@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Ingo Molnar <mingo@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, James Clark <james.clark@arm.com>, Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-Mailer: b4 0.11.0-dev
-Message-ID: <20221104155503.Q8Pf4kdj439WzEvI_IVdnN4EQY-VkpijzlM3pPTcPBU@z>
+Message-ID: <20221104155502.mcxqZIXXg-5AAuqPxXjDLb57FKDJLpnieMEg2t7WKKM@z>
 
-Convert all the SPE register defines to automatic generation. No
-functional changes.
+We currently have a non-standard SYS_ prefix in the constants generated
+for the SPE register bitfields. Drop this in preparation for automatic
+register definition generation.
 
-New registers and fields for SPEv1.2 are added with the conversion.
+The SPE mask defines were unshifted, and the SPE register field
+enumerations were shifted. The autogenerated defines are the opposite,
+so make the necessary adjustments.
 
-Some of the PMBSR MSS field defines are kept as the automatic generation
-has no way to create multiple names for the same register bits. The
-meaning of the MSS field depends on other bits.
+No functional changes.
 
 Tested-by: James Clark <james.clark@arm.com>
 Signed-off-by: Rob Herring <robh@kernel.org>
 ---
 v3:
- - Make some fields enums and add some missing fields
+ - No change
 v2:
  - New patch
 ---
- arch/arm64/include/asm/sysreg.h |  91 ++------------------------
- arch/arm64/tools/sysreg         | 139 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 144 insertions(+), 86 deletions(-)
+ arch/arm64/include/asm/el2_setup.h |   6 +-
+ arch/arm64/include/asm/sysreg.h    | 112 ++++++++++++++++++-------------------
+ arch/arm64/kvm/debug.c             |   2 +-
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c |   2 +-
+ drivers/perf/arm_spe_pmu.c         |  85 ++++++++++++++--------------
+ 5 files changed, 103 insertions(+), 104 deletions(-)
 
+diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+index 668569adf4d3..f9da43e53cdb 100644
+--- a/arch/arm64/include/asm/el2_setup.h
++++ b/arch/arm64/include/asm/el2_setup.h
+@@ -53,10 +53,10 @@
+ 	cbz	x0, .Lskip_spe_\@		// Skip if SPE not present
+ 
+ 	mrs_s	x0, SYS_PMBIDR_EL1              // If SPE available at EL2,
+-	and	x0, x0, #(1 << SYS_PMBIDR_EL1_P_SHIFT)
++	and	x0, x0, #(1 << PMBIDR_EL1_P_SHIFT)
+ 	cbnz	x0, .Lskip_spe_el2_\@		// then permit sampling of physical
+-	mov	x0, #(1 << SYS_PMSCR_EL2_PCT_SHIFT | \
+-		      1 << SYS_PMSCR_EL2_PA_SHIFT)
++	mov	x0, #(1 << PMSCR_EL2_PCT_SHIFT | \
++		      1 << PMSCR_EL2_PA_SHIFT)
+ 	msr_s	SYS_PMSCR_EL2, x0		// addresses and physical counter
+ .Lskip_spe_el2_\@:
+ 	mov	x0, #(MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT)
 diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 8df8a0a51273..d002dd00e53e 100644
+index 9a4cf12e3e16..8df8a0a51273 100644
 --- a/arch/arm64/include/asm/sysreg.h
 +++ b/arch/arm64/include/asm/sysreg.h
-@@ -237,99 +237,18 @@
- #define SYS_PAR_EL1_FST			GENMASK(6, 1)
- 
+@@ -239,59 +239,59 @@
  /*** Statistical Profiling Extension ***/
--/* ID registers */
--#define SYS_PMSIDR_EL1			sys_reg(3, 0, 9, 9, 7)
--#define PMSIDR_EL1_FE_SHIFT		0
--#define PMSIDR_EL1_FT_SHIFT		1
--#define PMSIDR_EL1_FL_SHIFT		2
--#define PMSIDR_EL1_ARCHINST_SHIFT	3
--#define PMSIDR_EL1_LDS_SHIFT	4
--#define PMSIDR_EL1_ERND_SHIFT	5
--#define PMSIDR_EL1_INTERVAL_SHIFT	8
--#define PMSIDR_EL1_INTERVAL_MASK	GENMASK_ULL(11, 8)
--#define PMSIDR_EL1_MAXSIZE_SHIFT	12
--#define PMSIDR_EL1_MAXSIZE_MASK		GENMASK_ULL(15, 12)
--#define PMSIDR_EL1_COUNTSIZE_SHIFT	16
--#define PMSIDR_EL1_COUNTSIZE_MASK	GENMASK_ULL(19, 16)
--
--#define SYS_PMBIDR_EL1			sys_reg(3, 0, 9, 10, 7)
--#define PMBIDR_EL1_ALIGN_SHIFT		0
--#define PMBIDR_EL1_ALIGN_MASK		0xfU
--#define PMBIDR_EL1_P_SHIFT		4
--#define PMBIDR_EL1_F_SHIFT		5
--
--/* Sampling controls */
--#define SYS_PMSCR_EL1			sys_reg(3, 0, 9, 9, 0)
--#define PMSCR_EL1_E0SPE_SHIFT		0
--#define PMSCR_EL1_E1SPE_SHIFT		1
--#define PMSCR_EL1_CX_SHIFT		3
--#define PMSCR_EL1_PA_SHIFT		4
--#define PMSCR_EL1_TS_SHIFT		5
--#define PMSCR_EL1_PCT_SHIFT		6
--
--#define SYS_PMSCR_EL2			sys_reg(3, 4, 9, 9, 0)
--#define PMSCR_EL2_E0HSPE_SHIFT		0
--#define PMSCR_EL2_E2SPE_SHIFT		1
--#define PMSCR_EL2_CX_SHIFT		3
--#define PMSCR_EL2_PA_SHIFT		4
--#define PMSCR_EL2_TS_SHIFT		5
--#define PMSCR_EL2_PCT_SHIFT		6
--
--#define SYS_PMSICR_EL1			sys_reg(3, 0, 9, 9, 2)
--
--#define SYS_PMSIRR_EL1			sys_reg(3, 0, 9, 9, 3)
--#define PMSIRR_EL1_RND_SHIFT		0
--#define PMSIRR_EL1_INTERVAL_SHIFT	8
--#define PMSIRR_EL1_INTERVAL_MASK	GENMASK_ULL(31, 8)
--
--/* Filtering controls */
--#define SYS_PMSNEVFR_EL1		sys_reg(3, 0, 9, 9, 1)
--
--#define SYS_PMSFCR_EL1			sys_reg(3, 0, 9, 9, 4)
--#define PMSFCR_EL1_FE_SHIFT		0
--#define PMSFCR_EL1_FT_SHIFT		1
--#define PMSFCR_EL1_FL_SHIFT		2
--#define PMSFCR_EL1_B_SHIFT		16
--#define PMSFCR_EL1_LD_SHIFT		17
--#define PMSFCR_EL1_ST_SHIFT		18
--
--#define SYS_PMSEVFR_EL1			sys_reg(3, 0, 9, 9, 5)
+ /* ID registers */
+ #define SYS_PMSIDR_EL1			sys_reg(3, 0, 9, 9, 7)
+-#define SYS_PMSIDR_EL1_FE_SHIFT		0
+-#define SYS_PMSIDR_EL1_FT_SHIFT		1
+-#define SYS_PMSIDR_EL1_FL_SHIFT		2
+-#define SYS_PMSIDR_EL1_ARCHINST_SHIFT	3
+-#define SYS_PMSIDR_EL1_LDS_SHIFT	4
+-#define SYS_PMSIDR_EL1_ERND_SHIFT	5
+-#define SYS_PMSIDR_EL1_INTERVAL_SHIFT	8
+-#define SYS_PMSIDR_EL1_INTERVAL_MASK	0xfUL
+-#define SYS_PMSIDR_EL1_MAXSIZE_SHIFT	12
+-#define SYS_PMSIDR_EL1_MAXSIZE_MASK	0xfUL
+-#define SYS_PMSIDR_EL1_COUNTSIZE_SHIFT	16
+-#define SYS_PMSIDR_EL1_COUNTSIZE_MASK	0xfUL
++#define PMSIDR_EL1_FE_SHIFT		0
++#define PMSIDR_EL1_FT_SHIFT		1
++#define PMSIDR_EL1_FL_SHIFT		2
++#define PMSIDR_EL1_ARCHINST_SHIFT	3
++#define PMSIDR_EL1_LDS_SHIFT	4
++#define PMSIDR_EL1_ERND_SHIFT	5
++#define PMSIDR_EL1_INTERVAL_SHIFT	8
++#define PMSIDR_EL1_INTERVAL_MASK	GENMASK_ULL(11, 8)
++#define PMSIDR_EL1_MAXSIZE_SHIFT	12
++#define PMSIDR_EL1_MAXSIZE_MASK		GENMASK_ULL(15, 12)
++#define PMSIDR_EL1_COUNTSIZE_SHIFT	16
++#define PMSIDR_EL1_COUNTSIZE_MASK	GENMASK_ULL(19, 16)
+ 
+ #define SYS_PMBIDR_EL1			sys_reg(3, 0, 9, 10, 7)
+-#define SYS_PMBIDR_EL1_ALIGN_SHIFT	0
+-#define SYS_PMBIDR_EL1_ALIGN_MASK	0xfU
+-#define SYS_PMBIDR_EL1_P_SHIFT		4
+-#define SYS_PMBIDR_EL1_F_SHIFT		5
++#define PMBIDR_EL1_ALIGN_SHIFT		0
++#define PMBIDR_EL1_ALIGN_MASK		0xfU
++#define PMBIDR_EL1_P_SHIFT		4
++#define PMBIDR_EL1_F_SHIFT		5
+ 
+ /* Sampling controls */
+ #define SYS_PMSCR_EL1			sys_reg(3, 0, 9, 9, 0)
+-#define SYS_PMSCR_EL1_E0SPE_SHIFT	0
+-#define SYS_PMSCR_EL1_E1SPE_SHIFT	1
+-#define SYS_PMSCR_EL1_CX_SHIFT		3
+-#define SYS_PMSCR_EL1_PA_SHIFT		4
+-#define SYS_PMSCR_EL1_TS_SHIFT		5
+-#define SYS_PMSCR_EL1_PCT_SHIFT		6
++#define PMSCR_EL1_E0SPE_SHIFT		0
++#define PMSCR_EL1_E1SPE_SHIFT		1
++#define PMSCR_EL1_CX_SHIFT		3
++#define PMSCR_EL1_PA_SHIFT		4
++#define PMSCR_EL1_TS_SHIFT		5
++#define PMSCR_EL1_PCT_SHIFT		6
+ 
+ #define SYS_PMSCR_EL2			sys_reg(3, 4, 9, 9, 0)
+-#define SYS_PMSCR_EL2_E0HSPE_SHIFT	0
+-#define SYS_PMSCR_EL2_E2SPE_SHIFT	1
+-#define SYS_PMSCR_EL2_CX_SHIFT		3
+-#define SYS_PMSCR_EL2_PA_SHIFT		4
+-#define SYS_PMSCR_EL2_TS_SHIFT		5
+-#define SYS_PMSCR_EL2_PCT_SHIFT		6
++#define PMSCR_EL2_E0HSPE_SHIFT		0
++#define PMSCR_EL2_E2SPE_SHIFT		1
++#define PMSCR_EL2_CX_SHIFT		3
++#define PMSCR_EL2_PA_SHIFT		4
++#define PMSCR_EL2_TS_SHIFT		5
++#define PMSCR_EL2_PCT_SHIFT		6
+ 
+ #define SYS_PMSICR_EL1			sys_reg(3, 0, 9, 9, 2)
+ 
+ #define SYS_PMSIRR_EL1			sys_reg(3, 0, 9, 9, 3)
+-#define SYS_PMSIRR_EL1_RND_SHIFT	0
+-#define SYS_PMSIRR_EL1_INTERVAL_SHIFT	8
+-#define SYS_PMSIRR_EL1_INTERVAL_MASK	0xffffffUL
++#define PMSIRR_EL1_RND_SHIFT		0
++#define PMSIRR_EL1_INTERVAL_SHIFT	8
++#define PMSIRR_EL1_INTERVAL_MASK	GENMASK_ULL(31, 8)
+ 
+ /* Filtering controls */
+ #define SYS_PMSNEVFR_EL1		sys_reg(3, 0, 9, 9, 1)
+ 
+ #define SYS_PMSFCR_EL1			sys_reg(3, 0, 9, 9, 4)
+-#define SYS_PMSFCR_EL1_FE_SHIFT		0
+-#define SYS_PMSFCR_EL1_FT_SHIFT		1
+-#define SYS_PMSFCR_EL1_FL_SHIFT		2
+-#define SYS_PMSFCR_EL1_B_SHIFT		16
+-#define SYS_PMSFCR_EL1_LD_SHIFT		17
+-#define SYS_PMSFCR_EL1_ST_SHIFT		18
++#define PMSFCR_EL1_FE_SHIFT		0
++#define PMSFCR_EL1_FT_SHIFT		1
++#define PMSFCR_EL1_FL_SHIFT		2
++#define PMSFCR_EL1_B_SHIFT		16
++#define PMSFCR_EL1_LD_SHIFT		17
++#define PMSFCR_EL1_ST_SHIFT		18
+ 
+ #define SYS_PMSEVFR_EL1			sys_reg(3, 0, 9, 9, 5)
  #define PMSEVFR_EL1_RES0_IMP	\
- 	(GENMASK_ULL(47, 32) | GENMASK_ULL(23, 16) | GENMASK_ULL(11, 8) |\
- 	 BIT_ULL(6) | BIT_ULL(4) | BIT_ULL(2) | BIT_ULL(0))
- #define PMSEVFR_EL1_RES0_V1P1	\
+@@ -301,37 +301,37 @@
  	(PMSEVFR_EL1_RES0_IMP & ~(BIT_ULL(18) | BIT_ULL(17) | BIT_ULL(11)))
  
--#define SYS_PMSLATFR_EL1		sys_reg(3, 0, 9, 9, 6)
--#define PMSLATFR_EL1_MINLAT_SHIFT	0
--
--/* Buffer controls */
--#define SYS_PMBLIMITR_EL1		sys_reg(3, 0, 9, 10, 0)
--#define PMBLIMITR_EL1_E_SHIFT		0
--#define PMBLIMITR_EL1_FM_SHIFT		1
--#define PMBLIMITR_EL1_FM_MASK	GENMASK_ULL(2, 1)
--#define PMBLIMITR_EL1_FM_STOP_IRQ	0
--
--#define SYS_PMBPTR_EL1			sys_reg(3, 0, 9, 10, 1)
--
+ #define SYS_PMSLATFR_EL1		sys_reg(3, 0, 9, 9, 6)
+-#define SYS_PMSLATFR_EL1_MINLAT_SHIFT	0
++#define PMSLATFR_EL1_MINLAT_SHIFT	0
+ 
+ /* Buffer controls */
+ #define SYS_PMBLIMITR_EL1		sys_reg(3, 0, 9, 10, 0)
+-#define SYS_PMBLIMITR_EL1_E_SHIFT	0
+-#define SYS_PMBLIMITR_EL1_FM_SHIFT	1
+-#define SYS_PMBLIMITR_EL1_FM_MASK	0x3UL
+-#define SYS_PMBLIMITR_EL1_FM_STOP_IRQ	(0 << SYS_PMBLIMITR_EL1_FM_SHIFT)
++#define PMBLIMITR_EL1_E_SHIFT		0
++#define PMBLIMITR_EL1_FM_SHIFT		1
++#define PMBLIMITR_EL1_FM_MASK	GENMASK_ULL(2, 1)
++#define PMBLIMITR_EL1_FM_STOP_IRQ	0
+ 
+ #define SYS_PMBPTR_EL1			sys_reg(3, 0, 9, 10, 1)
+ 
  /* Buffer error reporting */
--#define SYS_PMBSR_EL1			sys_reg(3, 0, 9, 10, 3)
--#define PMBSR_EL1_COLL_SHIFT		16
--#define PMBSR_EL1_S_SHIFT		17
--#define PMBSR_EL1_EA_SHIFT		18
--#define PMBSR_EL1_DL_SHIFT		19
--#define PMBSR_EL1_EC_SHIFT		26
--#define PMBSR_EL1_EC_MASK		GENMASK_ULL(31, 26)
--
--#define PMBSR_EL1_EC_BUF		0x0UL
--#define PMBSR_EL1_EC_FAULT_S1		0x24UL
--#define PMBSR_EL1_EC_FAULT_S2		0x25UL
--
--#define PMBSR_EL1_FAULT_FSC_SHIFT	0
--#define PMBSR_EL1_FAULT_FSC_MASK	0x3fUL
--
--#define PMBSR_EL1_BUF_BSC_SHIFT		0
--#define PMBSR_EL1_BUF_BSC_MASK		0x3fUL
-+#define PMBSR_EL1_FAULT_FSC_SHIFT	PMBSR_EL1_MSS_SHIFT
-+#define PMBSR_EL1_FAULT_FSC_MASK	PMBSR_EL1_MSS_MASK
-+
-+#define PMBSR_EL1_BUF_BSC_SHIFT		PMBSR_EL1_MSS_SHIFT
-+#define PMBSR_EL1_BUF_BSC_MASK		PMBSR_EL1_MSS_MASK
+ #define SYS_PMBSR_EL1			sys_reg(3, 0, 9, 10, 3)
+-#define SYS_PMBSR_EL1_COLL_SHIFT	16
+-#define SYS_PMBSR_EL1_S_SHIFT		17
+-#define SYS_PMBSR_EL1_EA_SHIFT		18
+-#define SYS_PMBSR_EL1_DL_SHIFT		19
+-#define SYS_PMBSR_EL1_EC_SHIFT		26
+-#define SYS_PMBSR_EL1_EC_MASK		0x3fUL
++#define PMBSR_EL1_COLL_SHIFT		16
++#define PMBSR_EL1_S_SHIFT		17
++#define PMBSR_EL1_EA_SHIFT		18
++#define PMBSR_EL1_DL_SHIFT		19
++#define PMBSR_EL1_EC_SHIFT		26
++#define PMBSR_EL1_EC_MASK		GENMASK_ULL(31, 26)
  
- #define PMBSR_EL1_BUF_BSC_FULL		0x1UL
+-#define SYS_PMBSR_EL1_EC_BUF		(0x0UL << SYS_PMBSR_EL1_EC_SHIFT)
+-#define SYS_PMBSR_EL1_EC_FAULT_S1	(0x24UL << SYS_PMBSR_EL1_EC_SHIFT)
+-#define SYS_PMBSR_EL1_EC_FAULT_S2	(0x25UL << SYS_PMBSR_EL1_EC_SHIFT)
++#define PMBSR_EL1_EC_BUF		0x0UL
++#define PMBSR_EL1_EC_FAULT_S1		0x24UL
++#define PMBSR_EL1_EC_FAULT_S2		0x25UL
  
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 384757a7eda9..04741f446c46 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -854,6 +854,130 @@ Sysreg	FAR_EL1	3	0	6	0	0
- Field	63:0	ADDR
- EndSysreg
+-#define SYS_PMBSR_EL1_FAULT_FSC_SHIFT	0
+-#define SYS_PMBSR_EL1_FAULT_FSC_MASK	0x3fUL
++#define PMBSR_EL1_FAULT_FSC_SHIFT	0
++#define PMBSR_EL1_FAULT_FSC_MASK	0x3fUL
  
-+Sysreg	PMSCR_EL1	3	0	9	9	0
-+Res0	63:8
-+Field	7:6	PCT
-+Field	5	TS
-+Field	4	PA
-+Field	3	CX
-+Res0	2
-+Field	1	E1SPE
-+Field	0	E0SPE
-+EndSysreg
-+
-+Sysreg	PMSNEVFR_EL1	3	0	9	9	1
-+Field	63:0	E
-+EndSysreg
-+
-+Sysreg	PMSICR_EL1	3	0	9	9	2
-+Field	63:56	ECOUNT
-+Res0	55:32
-+Field	31:0	COUNT
-+EndSysreg
-+
-+Sysreg	PMSIRR_EL1	3	0	9	9	3
-+Res0	63:32
-+Field	31:8	INTERVAL
-+Res0	7:1
-+Field	0	RND
-+EndSysreg
-+
-+Sysreg	PMSFCR_EL1	3	0	9	9	4
-+Res0	63:19
-+Field	18	ST
-+Field	17	LD
-+Field	16	B
-+Res0	15:4
-+Field	3	FnE
-+Field	2	FL
-+Field	1	FT
-+Field	0	FE
-+EndSysreg
-+
-+Sysreg	PMSEVFR_EL1	3	0	9	9	5
-+Field	63:0	E
-+EndSysreg
-+
-+Sysreg	PMSLATFR_EL1	3	0	9	9	6
-+Res0	63:16
-+Field	15:0	MINLAT
-+EndSysreg
-+
-+Sysreg	PMSIDR_EL1	3	0	9	9	7
-+Res0	63:25
-+Field	24	PBT
-+Field	23:20	FORMAT
-+Enum	19:16	COUNTSIZE
-+	0b0010	12_BIT_SAT
-+	0b0011	16_BIT_SAT
-+EndEnum
-+Field	15:12	MAXSIZE
-+Enum	11:8	INTERVAL
-+	0b0000	256
-+	0b0010	512
-+	0b0011	768
-+	0b0100	1024
-+	0b0101	1536
-+	0b0110	2048
-+	0b0111	3072
-+	0b1000	4096
-+EndEnum
-+Res0	7
-+Field	6	FnE
-+Field	5	ERND
-+Field	4	LDS
-+Field	3	ARCHINST
-+Field	2	FL
-+Field	1	FT
-+Field	0	FE
-+EndSysreg
-+
-+Sysreg	PMBLIMITR_EL1	3	0	9	10	0
-+Field	63:12	LIMIT
-+Res0	11:6
-+Field	5	PMFZ
-+Res0	4:3
-+Enum	2:1	FM
-+	0b00	FILL
-+	0b10	DISCARD
-+EndEnum
-+Field	0	E
-+EndSysreg
-+
-+Sysreg	PMBPTR_EL1	3	0	9	10	1
-+Field	63:0	PTR
-+EndSysreg
-+
-+Sysreg	PMBSR_EL1	3	0	9	10	3
-+Res0	63:32
-+Enum	31:26	EC
-+	0b000000	BUF
-+	0b100100	FAULT_S1
-+	0b100101	FAULT_S2
-+	0b011110	FAULT_GPC
-+	0b011111	IMP_DEF
-+EndEnum
-+Res0	25:20
-+Field	19	DL
-+Field	18	EA
-+Field	17	S
-+Field	16	COLL
-+Field	15:0	MSS
-+EndSysreg
-+
-+Sysreg	PMBIDR_EL1	3	0	9	10	7
-+Res0	63:12
-+Enum	11:8	EA
-+	0b0000	NotDescribed
-+	0b0001	Ignored
-+	0b0010	SError
-+EndEnum
-+Res0	7:6
-+Field	5	F
-+Field	4	P
-+Field	3:0	ALIGN
-+EndSysreg
-+
- SysregFields	CONTEXTIDR_ELx
- Res0	63:32
- Field	31:0	PROCID
-@@ -1008,6 +1132,21 @@ Sysreg	FAR_EL2	3	4	6	0	0
- Field	63:0	ADDR
- EndSysreg
+-#define SYS_PMBSR_EL1_BUF_BSC_SHIFT	0
+-#define SYS_PMBSR_EL1_BUF_BSC_MASK	0x3fUL
++#define PMBSR_EL1_BUF_BSC_SHIFT		0
++#define PMBSR_EL1_BUF_BSC_MASK		0x3fUL
  
-+Sysreg	PMSCR_EL2	3	4	9	9	0
-+Res0	63:8
-+Enum	7:6	PCT
-+	0b00	VIRT
-+	0b01	PHYS
-+	0b11	GUEST
-+EndEnum
-+Field	5	TS
-+Field	4	PA
-+Field	3	CX
-+Res0	2
-+Field	1	E2SPE
-+Field	0	E0HSPE
-+EndSysreg
-+
- Sysreg	CONTEXTIDR_EL2	3	4	13	0	1
- Fields	CONTEXTIDR_ELx
- EndSysreg
+-#define SYS_PMBSR_EL1_BUF_BSC_FULL	(0x1UL << SYS_PMBSR_EL1_BUF_BSC_SHIFT)
++#define PMBSR_EL1_BUF_BSC_FULL		0x1UL
+ 
+ /*** End of Statistical Profiling Extension ***/
+ 
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index fccf9ec01813..55f80fb93925 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -328,7 +328,7 @@ void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu)
+ 	 * we may need to check if the host state needs to be saved.
+ 	 */
+ 	if (cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_EL1_PMSVer_SHIFT) &&
+-	    !(read_sysreg_s(SYS_PMBIDR_EL1) & BIT(SYS_PMBIDR_EL1_P_SHIFT)))
++	    !(read_sysreg_s(SYS_PMBIDR_EL1) & BIT(PMBIDR_EL1_P_SHIFT)))
+ 		vcpu_set_flag(vcpu, DEBUG_STATE_SAVE_SPE);
+ 
+ 	/* Check if we have TRBE implemented and available at the host */
+diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+index e17455773b98..2673bde62fad 100644
+--- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
++++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+@@ -27,7 +27,7 @@ static void __debug_save_spe(u64 *pmscr_el1)
+ 	 * Check if the host is actually using it ?
+ 	 */
+ 	reg = read_sysreg_s(SYS_PMBLIMITR_EL1);
+-	if (!(reg & BIT(SYS_PMBLIMITR_EL1_E_SHIFT)))
++	if (!(reg & BIT(PMBLIMITR_EL1_E_SHIFT)))
+ 		return;
+ 
+ 	/* Yes; save the control register and disable data generation */
+diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
+index 65cf93dcc8ee..814ed18346b6 100644
+--- a/drivers/perf/arm_spe_pmu.c
++++ b/drivers/perf/arm_spe_pmu.c
+@@ -12,6 +12,7 @@
+ #define DRVNAME					PMUNAME "_pmu"
+ #define pr_fmt(fmt)				DRVNAME ": " fmt
+ 
++#include <linux/bitfield.h>
+ #include <linux/bitops.h>
+ #include <linux/bug.h>
+ #include <linux/capability.h>
+@@ -282,18 +283,18 @@ static u64 arm_spe_event_to_pmscr(struct perf_event *event)
+ 	struct perf_event_attr *attr = &event->attr;
+ 	u64 reg = 0;
+ 
+-	reg |= ATTR_CFG_GET_FLD(attr, ts_enable) << SYS_PMSCR_EL1_TS_SHIFT;
+-	reg |= ATTR_CFG_GET_FLD(attr, pa_enable) << SYS_PMSCR_EL1_PA_SHIFT;
+-	reg |= ATTR_CFG_GET_FLD(attr, pct_enable) << SYS_PMSCR_EL1_PCT_SHIFT;
++	reg |= ATTR_CFG_GET_FLD(attr, ts_enable) << PMSCR_EL1_TS_SHIFT;
++	reg |= ATTR_CFG_GET_FLD(attr, pa_enable) << PMSCR_EL1_PA_SHIFT;
++	reg |= ATTR_CFG_GET_FLD(attr, pct_enable) << PMSCR_EL1_PCT_SHIFT;
+ 
+ 	if (!attr->exclude_user)
+-		reg |= BIT(SYS_PMSCR_EL1_E0SPE_SHIFT);
++		reg |= BIT(PMSCR_EL1_E0SPE_SHIFT);
+ 
+ 	if (!attr->exclude_kernel)
+-		reg |= BIT(SYS_PMSCR_EL1_E1SPE_SHIFT);
++		reg |= BIT(PMSCR_EL1_E1SPE_SHIFT);
+ 
+ 	if (get_spe_event_has_cx(event))
+-		reg |= BIT(SYS_PMSCR_EL1_CX_SHIFT);
++		reg |= BIT(PMSCR_EL1_CX_SHIFT);
+ 
+ 	return reg;
+ }
+@@ -302,8 +303,7 @@ static void arm_spe_event_sanitise_period(struct perf_event *event)
+ {
+ 	struct arm_spe_pmu *spe_pmu = to_spe_pmu(event->pmu);
+ 	u64 period = event->hw.sample_period;
+-	u64 max_period = SYS_PMSIRR_EL1_INTERVAL_MASK
+-			 << SYS_PMSIRR_EL1_INTERVAL_SHIFT;
++	u64 max_period = PMSIRR_EL1_INTERVAL_MASK;
+ 
+ 	if (period < spe_pmu->min_period)
+ 		period = spe_pmu->min_period;
+@@ -322,7 +322,7 @@ static u64 arm_spe_event_to_pmsirr(struct perf_event *event)
+ 
+ 	arm_spe_event_sanitise_period(event);
+ 
+-	reg |= ATTR_CFG_GET_FLD(attr, jitter) << SYS_PMSIRR_EL1_RND_SHIFT;
++	reg |= ATTR_CFG_GET_FLD(attr, jitter) << PMSIRR_EL1_RND_SHIFT;
+ 	reg |= event->hw.sample_period;
+ 
+ 	return reg;
+@@ -333,18 +333,18 @@ static u64 arm_spe_event_to_pmsfcr(struct perf_event *event)
+ 	struct perf_event_attr *attr = &event->attr;
+ 	u64 reg = 0;
+ 
+-	reg |= ATTR_CFG_GET_FLD(attr, load_filter) << SYS_PMSFCR_EL1_LD_SHIFT;
+-	reg |= ATTR_CFG_GET_FLD(attr, store_filter) << SYS_PMSFCR_EL1_ST_SHIFT;
+-	reg |= ATTR_CFG_GET_FLD(attr, branch_filter) << SYS_PMSFCR_EL1_B_SHIFT;
++	reg |= ATTR_CFG_GET_FLD(attr, load_filter) << PMSFCR_EL1_LD_SHIFT;
++	reg |= ATTR_CFG_GET_FLD(attr, store_filter) << PMSFCR_EL1_ST_SHIFT;
++	reg |= ATTR_CFG_GET_FLD(attr, branch_filter) << PMSFCR_EL1_B_SHIFT;
+ 
+ 	if (reg)
+-		reg |= BIT(SYS_PMSFCR_EL1_FT_SHIFT);
++		reg |= BIT(PMSFCR_EL1_FT_SHIFT);
+ 
+ 	if (ATTR_CFG_GET_FLD(attr, event_filter))
+-		reg |= BIT(SYS_PMSFCR_EL1_FE_SHIFT);
++		reg |= BIT(PMSFCR_EL1_FE_SHIFT);
+ 
+ 	if (ATTR_CFG_GET_FLD(attr, min_latency))
+-		reg |= BIT(SYS_PMSFCR_EL1_FL_SHIFT);
++		reg |= BIT(PMSFCR_EL1_FL_SHIFT);
+ 
+ 	return reg;
+ }
+@@ -359,7 +359,7 @@ static u64 arm_spe_event_to_pmslatfr(struct perf_event *event)
+ {
+ 	struct perf_event_attr *attr = &event->attr;
+ 	return ATTR_CFG_GET_FLD(attr, min_latency)
+-	       << SYS_PMSLATFR_EL1_MINLAT_SHIFT;
++	       << PMSLATFR_EL1_MINLAT_SHIFT;
+ }
+ 
+ static void arm_spe_pmu_pad_buf(struct perf_output_handle *handle, int len)
+@@ -511,7 +511,7 @@ static void arm_spe_perf_aux_output_begin(struct perf_output_handle *handle,
+ 	limit = buf->snapshot ? arm_spe_pmu_next_snapshot_off(handle)
+ 			      : arm_spe_pmu_next_off(handle);
+ 	if (limit)
+-		limit |= BIT(SYS_PMBLIMITR_EL1_E_SHIFT);
++		limit |= BIT(PMBLIMITR_EL1_E_SHIFT);
+ 
+ 	limit += (u64)buf->base;
+ 	base = (u64)buf->base + PERF_IDX2OFF(handle->head, buf);
+@@ -570,28 +570,28 @@ arm_spe_pmu_buf_get_fault_act(struct perf_output_handle *handle)
+ 
+ 	/* Service required? */
+ 	pmbsr = read_sysreg_s(SYS_PMBSR_EL1);
+-	if (!(pmbsr & BIT(SYS_PMBSR_EL1_S_SHIFT)))
++	if (!(pmbsr & BIT(PMBSR_EL1_S_SHIFT)))
+ 		return SPE_PMU_BUF_FAULT_ACT_SPURIOUS;
+ 
+ 	/*
+ 	 * If we've lost data, disable profiling and also set the PARTIAL
+ 	 * flag to indicate that the last record is corrupted.
+ 	 */
+-	if (pmbsr & BIT(SYS_PMBSR_EL1_DL_SHIFT))
++	if (pmbsr & BIT(PMBSR_EL1_DL_SHIFT))
+ 		perf_aux_output_flag(handle, PERF_AUX_FLAG_TRUNCATED |
+ 					     PERF_AUX_FLAG_PARTIAL);
+ 
+ 	/* Report collisions to userspace so that it can up the period */
+-	if (pmbsr & BIT(SYS_PMBSR_EL1_COLL_SHIFT))
++	if (pmbsr & BIT(PMBSR_EL1_COLL_SHIFT))
+ 		perf_aux_output_flag(handle, PERF_AUX_FLAG_COLLISION);
+ 
+ 	/* We only expect buffer management events */
+-	switch (pmbsr & (SYS_PMBSR_EL1_EC_MASK << SYS_PMBSR_EL1_EC_SHIFT)) {
+-	case SYS_PMBSR_EL1_EC_BUF:
++	switch (FIELD_GET(PMBSR_EL1_EC_MASK, pmbsr)) {
++	case PMBSR_EL1_EC_BUF:
+ 		/* Handled below */
+ 		break;
+-	case SYS_PMBSR_EL1_EC_FAULT_S1:
+-	case SYS_PMBSR_EL1_EC_FAULT_S2:
++	case PMBSR_EL1_EC_FAULT_S1:
++	case PMBSR_EL1_EC_FAULT_S2:
+ 		err_str = "Unexpected buffer fault";
+ 		goto out_err;
+ 	default:
+@@ -600,9 +600,8 @@ arm_spe_pmu_buf_get_fault_act(struct perf_output_handle *handle)
+ 	}
+ 
+ 	/* Buffer management event */
+-	switch (pmbsr &
+-		(SYS_PMBSR_EL1_BUF_BSC_MASK << SYS_PMBSR_EL1_BUF_BSC_SHIFT)) {
+-	case SYS_PMBSR_EL1_BUF_BSC_FULL:
++	switch (FIELD_GET(PMBSR_EL1_BUF_BSC_MASK, pmbsr)) {
++	case PMBSR_EL1_BUF_BSC_FULL:
+ 		ret = SPE_PMU_BUF_FAULT_ACT_OK;
+ 		goto out_stop;
+ 	default:
+@@ -717,23 +716,23 @@ static int arm_spe_pmu_event_init(struct perf_event *event)
+ 		return -EINVAL;
+ 
+ 	reg = arm_spe_event_to_pmsfcr(event);
+-	if ((reg & BIT(SYS_PMSFCR_EL1_FE_SHIFT)) &&
++	if ((reg & BIT(PMSFCR_EL1_FE_SHIFT)) &&
+ 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_EVT))
+ 		return -EOPNOTSUPP;
+ 
+-	if ((reg & BIT(SYS_PMSFCR_EL1_FT_SHIFT)) &&
++	if ((reg & BIT(PMSFCR_EL1_FT_SHIFT)) &&
+ 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_TYP))
+ 		return -EOPNOTSUPP;
+ 
+-	if ((reg & BIT(SYS_PMSFCR_EL1_FL_SHIFT)) &&
++	if ((reg & BIT(PMSFCR_EL1_FL_SHIFT)) &&
+ 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_LAT))
+ 		return -EOPNOTSUPP;
+ 
+ 	set_spe_event_has_cx(event);
+ 	reg = arm_spe_event_to_pmscr(event);
+ 	if (!perfmon_capable() &&
+-	    (reg & (BIT(SYS_PMSCR_EL1_PA_SHIFT) |
+-		    BIT(SYS_PMSCR_EL1_PCT_SHIFT))))
++	    (reg & (BIT(PMSCR_EL1_PA_SHIFT) |
++		    BIT(PMSCR_EL1_PCT_SHIFT))))
+ 		return -EACCES;
+ 
+ 	return 0;
+@@ -971,14 +970,14 @@ static void __arm_spe_pmu_dev_probe(void *info)
+ 
+ 	/* Read PMBIDR first to determine whether or not we have access */
+ 	reg = read_sysreg_s(SYS_PMBIDR_EL1);
+-	if (reg & BIT(SYS_PMBIDR_EL1_P_SHIFT)) {
++	if (reg & BIT(PMBIDR_EL1_P_SHIFT)) {
+ 		dev_err(dev,
+ 			"profiling buffer owned by higher exception level\n");
+ 		return;
+ 	}
+ 
+ 	/* Minimum alignment. If it's out-of-range, then fail the probe */
+-	fld = reg >> SYS_PMBIDR_EL1_ALIGN_SHIFT & SYS_PMBIDR_EL1_ALIGN_MASK;
++	fld = (reg & PMBIDR_EL1_ALIGN_MASK) >> PMBIDR_EL1_ALIGN_SHIFT;
+ 	spe_pmu->align = 1 << fld;
+ 	if (spe_pmu->align > SZ_2K) {
+ 		dev_err(dev, "unsupported PMBIDR.Align [%d] on CPU %d\n",
+@@ -988,26 +987,26 @@ static void __arm_spe_pmu_dev_probe(void *info)
+ 
+ 	/* It's now safe to read PMSIDR and figure out what we've got */
+ 	reg = read_sysreg_s(SYS_PMSIDR_EL1);
+-	if (reg & BIT(SYS_PMSIDR_EL1_FE_SHIFT))
++	if (reg & BIT(PMSIDR_EL1_FE_SHIFT))
+ 		spe_pmu->features |= SPE_PMU_FEAT_FILT_EVT;
+ 
+-	if (reg & BIT(SYS_PMSIDR_EL1_FT_SHIFT))
++	if (reg & BIT(PMSIDR_EL1_FT_SHIFT))
+ 		spe_pmu->features |= SPE_PMU_FEAT_FILT_TYP;
+ 
+-	if (reg & BIT(SYS_PMSIDR_EL1_FL_SHIFT))
++	if (reg & BIT(PMSIDR_EL1_FL_SHIFT))
+ 		spe_pmu->features |= SPE_PMU_FEAT_FILT_LAT;
+ 
+-	if (reg & BIT(SYS_PMSIDR_EL1_ARCHINST_SHIFT))
++	if (reg & BIT(PMSIDR_EL1_ARCHINST_SHIFT))
+ 		spe_pmu->features |= SPE_PMU_FEAT_ARCH_INST;
+ 
+-	if (reg & BIT(SYS_PMSIDR_EL1_LDS_SHIFT))
++	if (reg & BIT(PMSIDR_EL1_LDS_SHIFT))
+ 		spe_pmu->features |= SPE_PMU_FEAT_LDS;
+ 
+-	if (reg & BIT(SYS_PMSIDR_EL1_ERND_SHIFT))
++	if (reg & BIT(PMSIDR_EL1_ERND_SHIFT))
+ 		spe_pmu->features |= SPE_PMU_FEAT_ERND;
+ 
+ 	/* This field has a spaced out encoding, so just use a look-up */
+-	fld = reg >> SYS_PMSIDR_EL1_INTERVAL_SHIFT & SYS_PMSIDR_EL1_INTERVAL_MASK;
++	fld = (reg & PMSIDR_EL1_INTERVAL_MASK) >> PMSIDR_EL1_INTERVAL_SHIFT;
+ 	switch (fld) {
+ 	case 0:
+ 		spe_pmu->min_period = 256;
+@@ -1039,7 +1038,7 @@ static void __arm_spe_pmu_dev_probe(void *info)
+ 	}
+ 
+ 	/* Maximum record size. If it's out-of-range, then fail the probe */
+-	fld = reg >> SYS_PMSIDR_EL1_MAXSIZE_SHIFT & SYS_PMSIDR_EL1_MAXSIZE_MASK;
++	fld = (reg & PMSIDR_EL1_MAXSIZE_MASK) >> PMSIDR_EL1_MAXSIZE_SHIFT;
+ 	spe_pmu->max_record_sz = 1 << fld;
+ 	if (spe_pmu->max_record_sz > SZ_2K || spe_pmu->max_record_sz < 16) {
+ 		dev_err(dev, "unsupported PMSIDR_EL1.MaxSize [%d] on CPU %d\n",
+@@ -1047,7 +1046,7 @@ static void __arm_spe_pmu_dev_probe(void *info)
+ 		return;
+ 	}
+ 
+-	fld = reg >> SYS_PMSIDR_EL1_COUNTSIZE_SHIFT & SYS_PMSIDR_EL1_COUNTSIZE_MASK;
++	fld = (reg & PMSIDR_EL1_COUNTSIZE_MASK) >> PMSIDR_EL1_COUNTSIZE_SHIFT;
+ 	switch (fld) {
+ 	default:
+ 		dev_warn(dev, "unknown PMSIDR_EL1.CountSize [%d]; assuming 2\n",
 
 -- 
 b4 0.11.0-dev
