@@ -1,78 +1,192 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C8F803
-	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 20:47:28 +0000 (UTC)
-Date: Fri, 4 Nov 2022 20:47:20 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1667594844;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7661AD56
+	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 21:57:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1667599069;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SCB5ELX6zZgbFvMbSeADp4LrffKecUl6OwVcbH2Uzy8=;
-	b=fSsh80Ev9RKwyRPXTjPjZnU8OndKbEKKb2oub4IYYNx7/0r0Cl5NPxk7/2oQHRgCEwv50o
-	ks3wuR9pOiR7dGF97YOFpa66PwHv7iJ7CIm/sj9Idto43b75OQM2kTtxmGk56r3h2povFz
-	toC5JLi8D2aRcFtpZmqyN/ZTcLqeX+A=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH v2 01/14] arm64: Add ID_DFR0_EL1.PerfMon values for
- PMUv3p7 and IMP_DEF
-Message-ID: <Y2V6WIu40Cg2ShXV@google.com>
-References: <20221028105402.2030192-1-maz@kernel.org>
- <20221028105402.2030192-2-maz@kernel.org>
+	bh=echi3gnEWFqiTz8OsdlvFnKn/n9jHbzMBcKU0UjomWA=;
+	b=KfqyxlW9qh1i+6JpEuCzQunOG9EL4AKgJJGMgN7UKrkbgGYtP24VEkQoYudxFfx98a3Bda
+	lGI9799Pi3ex+1x08d2ClwW0w8+IXSHPCPagxUzHFO5JnihG+DMVEYSRLCU4/v1ufHVOW8
+	lywTZlfZ3EvqeVMLZokdtW8W5GbHjnQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-605-R4Ug5tsJOii1Z79It740oQ-1; Fri, 04 Nov 2022 17:57:43 -0400
+X-MC-Unique: R4Ug5tsJOii1Z79It740oQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 36D9286E91C;
+	Fri,  4 Nov 2022 21:57:42 +0000 (UTC)
+Received: from [10.64.54.78] (vpn2-54-78.bne.redhat.com [10.64.54.78])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B64A040C835A;
+	Fri,  4 Nov 2022 21:57:35 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v7 4/9] KVM: Support dirty ring in conjunction with bitmap
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
+ ajones@ventanamicro.com, maz@kernel.org, bgardon@google.com,
+ catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
+ pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com,
+ james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+References: <20221031003621.164306-1-gshan@redhat.com>
+ <20221031003621.164306-5-gshan@redhat.com> <Y2RPhwIUsGLQ2cz/@google.com>
+ <d5b86a73-e030-7ce3-e5f3-301f4f505323@redhat.com>
+ <Y2RlfkyQMCtD6Rbh@google.com>
+ <d7e45de0-bff6-7d8c-4bf4-1a09e8acb726@redhat.com>
+ <Y2VyMwAlg7U9pXzV@google.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <f2d95d47-6411-8d01-14eb-5e17e1a16dbf@redhat.com>
+Date: Sat, 5 Nov 2022 05:57:33 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221028105402.2030192-2-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221104204720.LRoroTBeIgGdoUC4e9fDQg3p6oto4EPohVXsYfSvNBA@z>
+In-Reply-To: <Y2VyMwAlg7U9pXzV@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+Message-ID: <20221104215733.VpRb0fUUN91WfM6XQidADNtaBDLzEJ9JjJwcbhHbrc8@z>
 
-On Fri, Oct 28, 2022 at 11:53:49AM +0100, Marc Zyngier wrote:
-> Align the ID_DFR0_EL1.PerfMon values with ID_AA64DFR0_EL1.PMUver.
+Hi Oliver,
+
+On 11/5/22 4:12 AM, Oliver Upton wrote:
+> On Fri, Nov 04, 2022 at 02:57:15PM +0800, Gavin Shan wrote:
+>> On 11/4/22 9:06 AM, Oliver Upton wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> [...]
+> 
+>>> Just to make sure we're on the same page, there's two issues:
+>>>
+>>>    (1) If DIRTY_LOG_RING is enabled before memslot creation and
+>>>        RING_WITH_BITMAP is enabled after memslots have been created w/
+>>>        dirty logging enabled, memslot->dirty_bitmap == NULL and the
+>>>        kernel will fault when attempting to save the ITS tables.
+>>>
+>>>    (2) Not your code, but a similar issue. If DIRTY_LOG_RING[_ACQ_REL] is
+>>>        enabled after memslots have been created w/ dirty logging enabled,
+>>>        memslot->dirty_bitmap != NULL and that memory is wasted until the
+>>>        memslot is freed.
+>>>
+>>> I don't expect you to fix #2, though I've mentioned it because using the
+>>> same approach to #1 and #2 would be nice.
+>>>
+>>
+>> Yes, I got your points. Case (2) is still possible to happen with QEMU
+>> excluded. However, QEMU is always enabling DIRTY_LOG_RING[_ACQ_REL] before
+>> any memory slot is created. I agree that we need to ensure there are no
+>> memory slots when DIRTY_LOG_RING[_ACQ_REL] is enabled.
+>>
+>> For case (1), we can ensure RING_WTIH_BITMAP is enabled before any memory
+>> slot is added, as below. QEMU needs a new helper (as above) to enable it
+>> on board's level.
+>>
+>> Lets fix both with a new helper in PATCH[v8 4/9] like below?
+> 
+> I agree that we should address (1) like this, but in (2) requiring that
+> no memslots were created before enabling the existing capabilities would
+> be a change in ABI. If we can get away with that, great, but otherwise
+> we may need to delete the bitmaps associated with all memslots when the
+> cap is enabled.
+> 
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+I had the assumption QEMU and kvm/selftests are the only consumers to
+use DIRTY_RING. In this case, requiring that no memslots were created
+to enable DIRTY_RING won't break userspace. Following your thoughts,
+the tracked dirty pages in the bitmap also need to be synchronized to
+the per-vcpu-ring before the bitmap can be destroyed. We don't have
+per-vcpu-ring at this stage.
 
-FYI, another pile of ID reg changes is on the way that'll move DFR0 to a
-generated definition.
+>>    static inline bool kvm_vm_has_memslot_pages(struct kvm *kvm)
+>>    {
+>>        bool has_memslot_pages;
+>>
+>>        mutex_lock(&kvm->slots_lock);
+>>
+>>        has_memslot_pages = !!kvm->nr_memslot_pages;
+>>
+>>        mutex_unlock(&kvm->slots_lock);
+>>
+>>        return has_memslot_pages;
+>>    }
+> 
+> Do we need to build another helper for this? kvm_memslots_empty() will
+> tell you whether or not a memslot has been created by checking the gfn
+> tree.
+> 
 
-https://lore.kernel.org/linux-arm-kernel/20220930140211.3215348-1-james.morse@arm.com/
+The helper was introduced to be shared when DIRTY_RING[_ACQ_REL] and
+DIRTY_RING_WITH_BITMAP are enabled. Since the issue (2) isn't concern
+to us, lets put it aside and the helper isn't needed. kvm_memslots_empty()
+has same effect as to 'kvm->nr_memslot_pages', it's fine to use
+kvm_memslots_empty(), which is more generic.
 
---
+> On top of that, the memslot check and setting
+> kvm->dirty_ring_with_bitmap must happen behind the slots_lock. Otherwise
+> you could still wind up creating memslots w/o bitmaps.
+> 
+
+Agree.
+
+> 
+> Something like:
+> 
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 91cf51a25394..420cc101a16e 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4588,6 +4588,32 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+>   			return -EINVAL;
+>   
+>   		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
+> +
+> +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP: {
+> +		struct kvm_memslots *slots;
+> +		int r = -EINVAL;
+> +
+> +		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+> +		    !kvm->dirty_ring_size)
+> +			return r;
+> +
+> +		mutex_lock(&kvm->slots_lock);
+> +
+> +		slots = kvm_memslots(kvm);
+> +
+> +		/*
+> +		 * Avoid a race between memslot creation and enabling the ring +
+> +		 * bitmap capability to guarantee that no memslots have been
+> +		 * created without a bitmap.
+> +		 */
+> +		if (kvm_memslots_empty(slots)) {
+> +			kvm->dirty_ring_with_bitmap = cap->args[0];
+> +			r = 0;
+> +		}
+> +
+> +		mutex_unlock(&kvm->slots_lock);
+> +		return r;
+> +	}
+>   	default:
+>   		return kvm_vm_ioctl_enable_cap(kvm, cap);
+>   	}
+> 
+
+The proposed changes look good to me. It will be integrated to PATCH[v8 4/9].
+By the way, v8 will be posted shortly.
+
 Thanks,
-Oliver
+Gavin
 
-> ---
->  arch/arm64/include/asm/sysreg.h | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 7d301700d1a9..84f59ce1dc6d 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -698,6 +698,8 @@
->  #define ID_DFR0_PERFMON_8_1		0x4
->  #define ID_DFR0_PERFMON_8_4		0x5
->  #define ID_DFR0_PERFMON_8_5		0x6
-> +#define ID_DFR0_PERFMON_8_7		0x7
-> +#define ID_DFR0_PERFMON_IMP_DEF		0xf
->  
->  #define ID_ISAR4_SWP_FRAC_SHIFT		28
->  #define ID_ISAR4_PSR_M_SHIFT		24
-> -- 
-> 2.34.1
-> 
