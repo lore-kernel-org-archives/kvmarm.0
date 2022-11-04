@@ -1,180 +1,108 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EBF1C3F
-	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 15:53:38 +0000 (UTC)
-Received: by mail-pj1-f41.google.com with SMTP id q1-20020a17090a750100b002139ec1e999so4905278pjk.1
-        for <kvmarm@lists.linux.dev>; Fri, 04 Nov 2022 08:53:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xZr6sJYTNthILEKnYyiTIDKUQg5L0mQcLAjlSQHKvMA=;
-        b=DiPJ7hBYkHlGfJ3nf30pKFGntHtz5evEjXdhztqq8D/A407dMn5AvpQqylNiNLOMgz
-         nc3YDeYheeuuT9ftKl++CoVBnE/AP2CXvbMWD4eFsUsKk87usV/usn1bcTiwreMbOlnn
-         oj96CfLSJujMO64hMTma39wr1Pegh0jD6d/HM3v3N04CX9SCv4+6rKcukonUQpXHsLXz
-         C+MC4lvOQ6VjVb5UlfDRziD4JvPEGDO73B2J23nJbSOm5YSurMQ/M2etiRgDKVYl3cKv
-         mie5iAg0h4RxBTAn0on5XteEtmlTH/HJ/8i5Uss7Si1C4JqtOGUixIgTx9l+Rx4CHGzg
-         DTCg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE421C3F
+	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 15:55:18 +0000 (UTC)
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-13bef14ea06so5986634fac.3
+        for <kvmarm@lists.linux.dev>; Fri, 04 Nov 2022 08:55:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:message-id:date:from:content-transfer-encoding:mime-version
+         :subject:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xZr6sJYTNthILEKnYyiTIDKUQg5L0mQcLAjlSQHKvMA=;
-        b=yQDm8fiZXix/zxbz2AI0d4haCey5lY6KntuO3QR5rv32E3Q1fUvU2UAUzL5Rsd/301
-         uwDiUj28JrO8Tc8/eKCclkBxYF8o10iln+GajIIEKY9oZ9kK6BIGpBWyjP8FFUr4rF0y
-         UqV786XFGvErwfXsPR8TxWsgw94AJqkmXP2YjPrk6feDN2lS5rkH98panUT2RmOZ5scw
-         sc5Y2EfrwA7TXakwsbeRDBH6bFgVQqSikV+hhBugvZd/9i7lPUdmEzy4FxYH2h2BKTjv
-         G2yxCPpfbV68HUcrAFaRWticzh74Aidn5sYXYMEzZT5V8Tm+tImnznN97XROuGv0S4Pj
-         +1lg==
-X-Gm-Message-State: ACrzQf0X3gtYZ45L2hDNmPxAx+ZSH9H319ZIPQdfHba6Q+eOkJwbVSXw
-	aKkyP50B8c5+xeb3N5Hh4rQQS3lRz4hbJFIp3VhWeA==
-X-Google-Smtp-Source: AMsMyM5RjIpowH+EtUVsYugWjK1YsJUmZijSJNVPnbkraoQT7CYAkaAcrlZjjwisP8bWz4zMTHopTTUtp17kS/ninN4=
-X-Received: by 2002:a17:902:7145:b0:187:2356:c29d with SMTP id
- u5-20020a170902714500b001872356c29dmr26043238plm.154.1667577218174; Fri, 04
- Nov 2022 08:53:38 -0700 (PDT)
+        bh=EsRuXK+4fmKPfA/tRVgMzv8PA5fByXtuRn3wY8WPk0o=;
+        b=QhLbUg0kkmanGxI/mMq/aLCeYkB9OiJOFetAhZbIEcUPjZjacxTG6gK7RbfdzV0V5E
+         ruic0QajsSkLV9YPOhyqnJmBOIMjgpZZ+UuJy3EGKfrHmqNITAIUexoGtAUVXhwDlcrt
+         yefbCAlBYyARcf3P7VV1ECT27c/PCFkeOPkqm+WAolAFE/NUQyDkm52lwrGnGdopBmCX
+         Zhx5LnB+OhZ6fKO6s0me1f4+kf9c0KSU+SFQr2nsThfAYh/mFo/ozLB4PTXgkKPVvUbj
+         Jfvd/rONRogZHNHoEndz/KhLMVW8I6bfyJaRw26ts/4C+J+IpbFlwq3XnK9El7DRUnv9
+         cbsQ==
+X-Gm-Message-State: ACrzQf0CKb70h5xXyMcSzOwIjyONbPlGSHPb+RdOF3DT+MPrFnqvNdCl
+	5zlUkhBnIfccXGLV81AZNA==
+X-Google-Smtp-Source: AMsMyM7QNaapYnVKiSJDZR5Z9xD6NPozpgwYM9qlpFMIkrrlOKfLSW+YN50skL9R7U4bPspCP1TYOg==
+X-Received: by 2002:a05:6870:ec90:b0:13b:b20a:ae81 with SMTP id eo16-20020a056870ec9000b0013bb20aae81mr21230053oab.77.1667577317450;
+        Fri, 04 Nov 2022 08:55:17 -0700 (PDT)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id 9-20020aca0d09000000b00359a9663053sm1570850oin.4.2022.11.04.08.55.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Nov 2022 08:55:16 -0700 (PDT)
+Received: (nullmailer pid 1880407 invoked by uid 1000);
+	Fri, 04 Nov 2022 15:55:18 -0000
+Subject: [PATCH v3 0/8] perf: Arm SPEv1.2 support
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20221028105402.2030192-1-maz@kernel.org> <20221028105402.2030192-12-maz@kernel.org>
- <CAAeT=FyiNeRun7oRL83AUkVabUSb9pxL2SS9yZwi1rjFnbhH6g@mail.gmail.com>
- <87tu3gfi8u.wl-maz@kernel.org> <CAAeT=FwViQRmyJjf3jxcWnLFQAYob8uvvx7QNhWyj6OmaYDKyg@mail.gmail.com>
- <86bkpmrjv8.wl-maz@kernel.org>
-In-Reply-To: <86bkpmrjv8.wl-maz@kernel.org>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Fri, 4 Nov 2022 08:53:21 -0700
-Message-ID: <CAAeT=Fzp-7MMBJshAAQBgFwXLH2z5ASDgmDBLNJsQoFA=MSciw@mail.gmail.com>
-Subject: Re: [PATCH v2 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to
- be set from userspace
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221104155321.iAsbs9qhR7CDbs3dSbz8Q1YSWW2BixbK1En4fX6FwTY@z>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-b4-tracking: H4sIANQ1ZWMC/33NQQ6CMBAF0KuQrh1TpgLFlfcwLko7QCO2ptUmhnB3J+5c6Gryf/L+rCJT8pTFsV
+ pFouKzj4GD2lXCziZMBN5xFigRpcYGTLpBvhMUDR2M5EZ5oLodUQkmg8kEQzLBzozCc1m4nH1+xPT6
+ vCg1n/OPtVKDBNs1g3Y9Utvj6Uop0LKPaRIXXir4TyNrUp1CdK02Vn7pbdveeUPe4ewAAAA=
+From: Rob Herring <robh@kernel.org>
+Date: Fri, 04 Nov 2022 10:55:00 -0500
+Message-ID: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
+To: Namhyung Kim <namhyung@kernel.org>, Will Deacon <will@kernel.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, Jiri Olsa <jolsa@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Ingo Molnar <mingo@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, James Clark <james.clark@arm.com>, Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+X-Mailer: b4 0.11.0-dev
+Message-ID: <20221104155500.KBQWhx5ci9HPUD5S21NokSAwD7RbgjuIeWveUco7beM@z>
 
-Hi Marc,
+This series adds support for Arm SPEv1.2 which is part of the
+Armv8.7/Armv9.2 architecture. There's 2 new features that affect the 
+kernel: a new event filter bit, branch 'not taken', and an inverted 
+event filter register. 
 
-On Fri, Nov 4, 2022 at 5:21 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Reiji,
->
-> On Fri, 04 Nov 2022 07:00:22 +0000,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > On Thu, Nov 3, 2022 at 3:25 AM Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > On Thu, 03 Nov 2022 05:31:56 +0000,
-> > > Reiji Watanabe <reijiw@google.com> wrote:
-> > > >
-> > > > It appears the patch allows userspace to set IMPDEF even
-> > > > when host_pmuver == 0.  Shouldn't it be allowed only when
-> > > > host_pmuver == IMPDEF (as before)?
-> > > > Probably, it may not cause any real problems though.
-> > >
-> > > Given that we don't treat the two cases any differently, I thought it
-> > > would be reasonable to relax this particular case, and I can't see any
-> > > reason why we shouldn't tolerate this sort of migration.
-> >
-> > That's true. I assume it won't cause any functional issues.
-> >
-> > I have another comment related to this.
-> > KVM allows userspace to create a guest with a mix of vCPUs with and
-> > without PMU.  For such a guest, if the register for the vCPU without
-> > PMU is set last, I think the PMUVER value for vCPUs with PMU could
-> > become no PMU (0) or IMPDEF (0xf).
-> > Also, with the current patch, userspace can set PMUv3 support value
-> > (non-zero or non-IMPDEF) for vCPUs without the PMU.
-> > IMHO, KVM shouldn't allow userspace to set PMUVER to the value that
-> > is inconsistent with PMU configuration for the vCPU.
-> > What do you think ?
->
-> Yes, this seems sensible, and we only do it one way at the moment.
->
-> > I'm thinking of the following code (not tested).
-> >
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 4fa14b4ae2a6..ddd849027cc3 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -1265,10 +1265,17 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> >         if (pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver)
-> >                 return -EINVAL;
-> >
-> > -       /* We already have a PMU, don't try to disable it... */
-> > -       if (kvm_vcpu_has_pmu(vcpu) &&
-> > -           (pmuver == 0 || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF))
-> > -               return -EINVAL;
-> > +       if (kvm_vcpu_has_pmu(vcpu)) {
-> > +               /* We already have a PMU, don't try to disable it... */
-> > +               if (pmuver == 0 || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF) {
-> > +                       return -EINVAL;
-> > +               }
-> > +       } else {
-> > +               /* We don't have a PMU, don't try to enable it... */
-> > +               if (pmuver > 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF) {
-> > +                       return -EINVAL;
-> > +               }
-> > +       }
->
-> This is a bit ugly. I came up with this instead:
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 3b28ef48a525..e104fde1a0ee 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1273,6 +1273,7 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->                                u64 val)
->  {
->         u8 pmuver, host_pmuver;
-> +       bool valid_pmu;
->
->         host_pmuver = kvm_arm_pmu_get_pmuver_limit();
->
-> @@ -1286,9 +1287,10 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->         if (pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver)
->                 return -EINVAL;
->
-> -       /* We already have a PMU, don't try to disable it... */
-> -       if (kvm_vcpu_has_pmu(vcpu) &&
-> -           (pmuver == 0 || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF))
-> +       valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
-> +
-> +       /* Make sure view register and PMU support do match */
-> +       if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
->                 return -EINVAL;
+Since this support adds new registers and fields, first the SPE register 
+defines are converted to automatic generation.
 
-Thanks, much better!
+Note that the 'config3' addition in sysfs format files causes SPE to 
+break. A stable fix e552b7be12ed ("perf: Skip and warn on unknown format 
+'configN' attrs") landed in v6.1-rc1.
 
->
->         /* We can only differ with PMUver, and anything else is an error */
->
-> and the similar check for the 32bit counterpart.
->
-> >
-> >         /* We can only differ with PMUver, and anything else is an error */
-> >         val ^= read_id_reg(vcpu, rd);
-> > @@ -1276,7 +1283,8 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> >         if (val)
-> >                 return -EINVAL;
-> >
-> > -       vcpu->kvm->arch.dfr0_pmuver = pmuver;
-> > +       if (kvm_vcpu_has_pmu(vcpu))
-> > +               vcpu->kvm->arch.dfr0_pmuver = pmuver;
->
-> We need to update this unconditionally if we want to be able to
-> restore an IMPDEF PMU view to the guest.
+The perf tool side changes are available here[1].
 
-Yes, right.
-BTW, if we have no intention of supporting a mix of vCPUs with and
-without PMU, I think it would be nice if we have a clear comment on
-that in the code.  Or I'm hoping to disallow it if possible though.
+Tested on FVP.
 
-Thank you,
-Reiji
+[1] https://lore.kernel.org/all/20220914-arm-perf-tool-spe1-2-v2-v4-0-83c098e6212e@kernel.org/
+
+Signed-off-by: Rob Herring <robh@kernel.org>
+---
+Changes in v3:
+- Add some more missing SPE register fields and use Enums for some 
+  fields
+- Use the new PMSIDR_EL1 register Enum defines in the SPE driver
+- Link to v2: https://lore.kernel.org/r/20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org
+
+Changes in v2:
+- Convert the SPE register defines to automatic generation
+- Fixed access to SYS_PMSNEVFR_EL1 when not present
+- Rebase on v6.1-rc1
+- Link to v1: https://lore.kernel.org/r/20220825-arm-spe-v8-7-v1-0-c75b8d92e692@kernel.org
+
+---
+Rob Herring (8):
+      perf: arm_spe: Use feature numbering for PMSEVFR_EL1 defines
+      arm64: Drop SYS_ from SPE register defines
+      arm64/sysreg: Convert SPE registers to automatic generation
+      perf: arm_spe: Drop BIT() and use FIELD_GET/PREP accessors
+      perf: arm_spe: Use new PMSIDR_EL1 register enums
+      perf: arm_spe: Support new SPEv1.2/v8.7 'not taken' event
+      perf: Add perf_event_attr::config3
+      perf: arm_spe: Add support for SPEv1.2 inverted event filtering
+
+ arch/arm64/include/asm/el2_setup.h |   6 +-
+ arch/arm64/include/asm/sysreg.h    |  99 +++--------------------
+ arch/arm64/kvm/debug.c             |   2 +-
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c |   2 +-
+ arch/arm64/tools/sysreg            | 139 +++++++++++++++++++++++++++++++++
+ drivers/perf/arm_spe_pmu.c         | 156 ++++++++++++++++++++++++-------------
+ include/uapi/linux/perf_event.h    |   3 +
+ 7 files changed, 257 insertions(+), 150 deletions(-)
+---
+base-commit: 9abf2313adc1ca1b6180c508c25f22f9395cc780
+change-id: 20220825-arm-spe-v8-7-fedf04e16f23
+
+Best regards,
+-- 
+Rob Herring <robh@kernel.org>
