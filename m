@@ -1,51 +1,14 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C84B10EB
-	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 08:06:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1667549161;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QJu1Z+r/Jj1Q22H/Z28kMZfifRbtSqoNatlqDbaYr8M=;
-	b=EusLQQCfzg21x/s6fQNl8lymlNrZvzSUs1y49wBAxZMKibNUxZpbdohpQ/7W8z5zuFcFV6
-	ENAsJqiI0rTgakDOxzkKDa7CJ5GTt57TFIb4pavGhzlsGmvRZYx8IGQcjWN/2F7q49UOu7
-	XnjJSS1xm6D5WcCu37PvyY57ogA9/mY=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-330-xAAi2l1WPeSCGMtlL7ouEQ-1; Fri, 04 Nov 2022 04:02:37 -0400
-X-MC-Unique: xAAi2l1WPeSCGMtlL7ouEQ-1
-Received: by mail-ed1-f69.google.com with SMTP id c9-20020a05640227c900b00463de74bc15so2951868ede.13
-        for <kvmarm@lists.linux.dev>; Fri, 04 Nov 2022 01:02:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QJu1Z+r/Jj1Q22H/Z28kMZfifRbtSqoNatlqDbaYr8M=;
-        b=FgPAY/lEvgYapuFF1t0SvAJ0iuKrjnPgNi9LIJRK97rLsDl7JKcJasNfasdvqPk2Ih
-         hw2juAsilS3X7+S4rdfYM2GWDRabYwqVUBmzo0eEIUD6KOtGpMZFnxIlXtzfBcwFFE1t
-         kpD2J9zlLElrgXCJXDd2fMpP1uaAM7IZ+AqWbbuWgTdvV9RmhAg0h1wljKbI2GCo4Fwg
-         lEfhUEMSSQWTINKn4zN+S1AmSyrSiGqv8psjlP0atmeud8fbhtOF0+dA1QDR4V2LP0sD
-         RKMQlNnfH3lxMJ7QzxNYs33ydjMfjX3cgySLWk8OxOlHkLxfvbckHxcZ5GWgfNuVLNny
-         XDLA==
-X-Gm-Message-State: ACrzQf104CZS2VBgwOX8Ye6LZur7mWRZOaqcJdKdgfaSTiI0iE906PnU
-	I0RBN1gOyp7MEhnRHYadenIUx4TahYjX+Qo5GLo3KZmThLlmZqxMoIJbUEfbfU1RWR1K3m2UGIt
-	gNosTxa+pm7h+Ilq5
-X-Received: by 2002:a17:907:1dda:b0:7a6:8ffc:7dc with SMTP id og26-20020a1709071dda00b007a68ffc07dcmr33677012ejc.163.1667548955855;
-        Fri, 04 Nov 2022 01:02:35 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5ZNqKb/aQP9ibAQb8G5uHFxFpKasjpH84kkwoGMwJiLbxjg9Lh2wolUrwViafofx0ss1frxA==
-X-Received: by 2002:a17:907:1dda:b0:7a6:8ffc:7dc with SMTP id og26-20020a1709071dda00b007a68ffc07dcmr33676971ejc.163.1667548955613;
-        Fri, 04 Nov 2022 01:02:35 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:4783:a68:c1ee:15c5? ([2001:b07:6468:f312:4783:a68:c1ee:15c5])
-        by smtp.googlemail.com with ESMTPSA id tz14-20020a170907c78e00b0078ddb518a90sm1433630ejc.223.2022.11.04.01.02.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Nov 2022 01:02:34 -0700 (PDT)
-Message-ID: <6c71fcca-c17f-5979-e15e-afcf08899064@redhat.com>
-Date: Fri, 4 Nov 2022 09:02:32 +0100
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9902E7C
+	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 11:30:15 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A4A3E1FB;
+	Fri,  4 Nov 2022 04:30:20 -0700 (PDT)
+Received: from [10.57.69.48] (unknown [10.57.69.48])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EEB5E3F703;
+	Fri,  4 Nov 2022 04:30:10 -0700 (PDT)
+Message-ID: <5c410969-2176-49cf-640f-8023c421682e@arm.com>
+Date: Fri, 4 Nov 2022 11:30:09 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,80 +16,85 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH 33/44] KVM: x86: Do VMX/SVM support checks directly in
- vendor code
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Matthew Rosato <mjrosato@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Atish Patra <atishp@atishpatra.org>,
- David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>,
- Fabiano Rosas <farosas@linux.ibm.com>, Michael Ellerman
- <mpe@ellerman.id.au>, Chao Gao <chao.gao@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>, Yuan Yao <yuan.yao@intel.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-34-seanjc@google.com>
- <bfa98587-3b36-3834-a4b9-585a0e0aa56a@redhat.com>
- <Y2QJ2TuyZImbFFvi@google.com>
- <c29e7d40-ddb9-def0-f944-a921a05a4bb2@redhat.com>
- <Y2QPSK1/6esl61wQ@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Y2QPSK1/6esl61wQ@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+ Thunderbird/102.2.2
+Subject: Re: [PATCH v2 0/7] perf: Arm SPEv1.2 support
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Rob Herring <robh@kernel.org>
+Cc: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, James Morse <james.morse@arm.com>,
+ Ingo Molnar <mingo@redhat.com>, Mark Rutland <mark.rutland@arm.com>,
+ Marc Zyngier <maz@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Will Deacon <will@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Jiri Olsa <jolsa@kernel.org>
+References: <20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org>
+From: James Clark <james.clark@arm.com>
+In-Reply-To: <20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-ID: <20221104080232.MwhVUoWZ4QQxNbKBOMERmHm3CtaP0HDNKjHRPtlUa0g@z>
+Message-ID: <20221104113009.X0C-n2ggV48fmqO_vh9k6Sj_PnEly8gd7RrfD6rthTA@z>
 
-On 11/3/22 19:58, Sean Christopherson wrote:
+
+
+On 19/10/2022 20:11, Rob Herring wrote:
+> This series adds support for Arm SPEv1.2 which is part of the
+> Armv8.7/Armv9.2 architecture. There's 2 new features that affect the 
+> kernel: a new event filter bit, branch 'not taken', and an inverted 
+> event filter register. 
 > 
-> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-> index 3e508f239098..ebe617ab0b37 100644
-> --- a/arch/x86/kernel/cpu/common.c
-> +++ b/arch/x86/kernel/cpu/common.c
-> @@ -191,6 +191,8 @@ static void default_init(struct cpuinfo_x86 *c)
->                          strcpy(c->x86_model_id, "386");
->          }
->   #endif
-> +
-> +       clear_cpu_cap(c, X86_FEATURE_MSR_IA32_FEAT_CTL);
->   }
->   
->   static const struct cpu_dev default_cpu = {
-
-Not needed I think?  default_init does not call init_ia32_feat_ctl.
-
-> diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
-> index c881bcafba7d..3a7ae67f5a5e 100644
-> --- a/arch/x86/kernel/cpu/cpuid-deps.c
-> +++ b/arch/x86/kernel/cpu/cpuid-deps.c
-> @@ -72,6 +72,8 @@ static const struct cpuid_dep cpuid_deps[] = {
->          { X86_FEATURE_AVX512_FP16,              X86_FEATURE_AVX512BW  },
->          { X86_FEATURE_ENQCMD,                   X86_FEATURE_XSAVES    },
->          { X86_FEATURE_PER_THREAD_MBA,           X86_FEATURE_MBA       },
-> +       { X86_FEATURE_VMX,                      X86_FEATURE_MSR_IA32_FEAT_CTL         },
-> +       { X86_FEATURE_SGX,                      X86_FEATURE_MSR_IA32_FEAT_CTL         },
->          { X86_FEATURE_SGX_LC,                   X86_FEATURE_SGX       },
->          { X86_FEATURE_SGX1,                     X86_FEATURE_SGX       },
->          { X86_FEATURE_SGX2,                     X86_FEATURE_SGX1      },
+> Since this support adds new registers and fields, first the SPE register 
+> defines are converted to automatic generation.
+> 
+> Note that the 'config3' addition in sysfs format files causes SPE to 
+> break. A stable fix e552b7be12ed ("perf: Skip and warn on unknown format 
+> 'configN' attrs") landed in v6.1-rc1.
+> 
+> The perf tool side changes are available here[1].
+> 
+> Tested on FVP.
+> 
+> [1] https://lore.kernel.org/all/20220914-arm-perf-tool-spe1-2-v2-v4-0-83c098e6212e@kernel.org/
 > 
 
-Yes, good idea.
+LGTM. Tested with [1] applied and on N1SDP (where it isn't supported),
+and on the FVP. Enabling all the inverted filters results in no trace
+and other combinations work as expected.
 
-Paolo
+James
 
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+> Changes in v2:
+> - Convert the SPE register defines to automatic generation
+> - Fixed access to SYS_PMSNEVFR_EL1 when not present
+> - Rebase on v6.1-rc1
+> - Link to v1: https://lore.kernel.org/r/20220825-arm-spe-v8-7-v1-0-c75b8d92e692@kernel.org
+> 
+> ---
+> Rob Herring (7):
+>       perf: arm_spe: Use feature numbering for PMSEVFR_EL1 defines
+>       arm64: Drop SYS_ from SPE register defines
+>       arm64/sysreg: Convert SPE registers to automatic generation
+>       perf: arm_spe: Drop BIT() and use FIELD_GET/PREP accessors
+>       perf: arm_spe: Support new SPEv1.2/v8.7 'not taken' event
+>       perf: Add perf_event_attr::config3
+>       perf: arm_spe: Add support for SPEv1.2 inverted event filtering
+> 
+>  arch/arm64/include/asm/el2_setup.h |   6 +-
+>  arch/arm64/include/asm/sysreg.h    |  99 +++------------------------
+>  arch/arm64/kvm/debug.c             |   2 +-
+>  arch/arm64/kvm/hyp/nvhe/debug-sr.c |   2 +-
+>  arch/arm64/tools/sysreg            | 116 +++++++++++++++++++++++++++++++
+>  drivers/perf/arm_spe_pmu.c         | 136 ++++++++++++++++++++++++-------------
+>  include/uapi/linux/perf_event.h    |   3 +
+>  7 files changed, 224 insertions(+), 140 deletions(-)
+> ---
+> base-commit: 9abf2313adc1ca1b6180c508c25f22f9395cc780
+> change-id: 20220825-arm-spe-v8-7-fedf04e16f23
+> 
+> Best regards,
