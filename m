@@ -1,78 +1,33 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD784AD25
-	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 20:27:19 +0000 (UTC)
-Received: by mail-pf1-f178.google.com with SMTP id g62so5445070pfb.10
-        for <kvmarm@lists.linux.dev>; Fri, 04 Nov 2022 13:27:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TzyhTv3BAtgpGpRr8HnNLx/d2zCvSqkboAFtik4Imo0=;
-        b=q/PTXKQj3ArVm2XzZe97QeFygVMm1eXh+9AVtXcJ75aOhS7rpOmmmorCukrcxmTsXJ
-         xtHpP7JyICLKwJpO4UdyBCOfADg9j8qWzQtBsGyOUBj4dtUE2hEcaa0M2lJNL2RYHNdm
-         t9CE40syL4mSgI+9axRmHRY3m49U53Bcc5xsUL4w5HmCnvq3rZFCi8RspoeZ0S4Nhg0P
-         dklWYN0e+iqclhNFPVLNqLlrIm4bRgIuUSiy6nVFx0aKBZbtXqUzzmm+oTu43A9TiINS
-         r9mhyi03/1kAIfHUOzdEnLew/bMGSFKH13ZsSBoEdZkxO+PvUKRhjXGV6DaJ6ZELthJK
-         tWVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TzyhTv3BAtgpGpRr8HnNLx/d2zCvSqkboAFtik4Imo0=;
-        b=q7g3r96Kky2zG9K/TJ7L+KX6aUHYjrP/px3mlPlcXwGwSj9cntDT3Ys5BllPkFXejj
-         6Tv84RHRW6sis7oRQOwzs4PB0flMFkyZLzKLGBhoswlotCBqLVlx/mfOtrFf+J5Q+AzW
-         TyT2EtPSqvBi+R1POnZjozfxpvu1auqTL6mj8+Ox8KBeCiZmmSWeCqTR/kMsFQaXSHIb
-         GuQrJIZrEi+NNWa092EHQLQIQUIxByWsXNAv6KP8xs9PSx6Gahl4b5bCj8/WnwtWy1MO
-         /vcUNvL0JsY+uoV36UQ3Vxf2eENDvnUSDb6029gkP4JDt32z+svlid/DsKiyX+uMOgt2
-         1xTw==
-X-Gm-Message-State: ACrzQf3ig8bLyczs/DzJVqB4Zi/f6gd8TwuzOJGCHyzAk+GXivzylUzc
-	EwJIDdPdTI2E1tH1AQtwNFiplg==
-X-Google-Smtp-Source: AMsMyM6nILnCIcSIsk5JMrE+WRVnxFnaYDn7QGx3yWf1KAa3dZc7TNSn3aZcg19Xay3NbhiF32a9mw==
-X-Received: by 2002:a05:6a00:1781:b0:561:7f7f:dc38 with SMTP id s1-20020a056a00178100b005617f7fdc38mr38037687pfg.42.1667593638927;
-        Fri, 04 Nov 2022 13:27:18 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u8-20020a1709026e0800b0018863e1bd3csm159522plk.134.2022.11.04.13.27.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Nov 2022 13:27:18 -0700 (PDT)
-Date: Fri, 4 Nov 2022 20:27:14 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C8F803
+	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 20:47:28 +0000 (UTC)
+Date: Fri, 4 Nov 2022 20:47:20 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1667594844;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SCB5ELX6zZgbFvMbSeADp4LrffKecUl6OwVcbH2Uzy8=;
+	b=fSsh80Ev9RKwyRPXTjPjZnU8OndKbEKKb2oub4IYYNx7/0r0Cl5NPxk7/2oQHRgCEwv50o
+	ks3wuR9pOiR7dGF97YOFpa66PwHv7iJ7CIm/sj9Idto43b75OQM2kTtxmGk56r3h2povFz
+	toC5JLi8D2aRcFtpZmqyN/ZTcLqeX+A=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Atish Patra <atishp@atishpatra.org>,
-	David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Fabiano Rosas <farosas@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
-	Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
-Message-ID: <Y2V1oslbw24/2Opd@google.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221104071749.GC1063309@ls.amr.corp.intel.com>
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v2 01/14] arm64: Add ID_DFR0_EL1.PerfMon values for
+ PMUv3p7 and IMP_DEF
+Message-ID: <Y2V6WIu40Cg2ShXV@google.com>
+References: <20221028105402.2030192-1-maz@kernel.org>
+ <20221028105402.2030192-2-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,20 +36,43 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221104071749.GC1063309@ls.amr.corp.intel.com>
-Message-ID: <20221104202714.rP4EMA-sjFE_Fhn8It4rRy5PD6fzb_Bdf54Sljnb2jM@z>
+In-Reply-To: <20221028105402.2030192-2-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <20221104204720.LRoroTBeIgGdoUC4e9fDQg3p6oto4EPohVXsYfSvNBA@z>
 
-On Fri, Nov 04, 2022, Isaku Yamahata wrote:
-> Thanks for the patch series. I the rebased TDX KVM patch series and it worked.
-> Since cpu offline needs to be rejected in some cases(To keep at least one cpu
-> on a package), arch hook for cpu offline is needed.
+On Fri, Oct 28, 2022 at 11:53:49AM +0100, Marc Zyngier wrote:
+> Align the ID_DFR0_EL1.PerfMon values with ID_AA64DFR0_EL1.PMUver.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-I hate to bring this up because I doubt there's a real use case for SUSPEND with
-TDX, but the CPU offline path isn't just for true offlining of CPUs.  When the
-system enters SUSPEND, only the initiating CPU goes through kvm_suspend()+kvm_resume(),
-all responding CPUs go through CPU offline+online.  I.e. disallowing all CPUs from
-going "offline" will prevent suspending the system.
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-I don't see anything in the TDX series or the specs that suggests suspend+resume
-is disallowed when TDX is enabled, so blocking that seems just as wrong as
-preventing software from soft-offlining CPUs.
+FYI, another pile of ID reg changes is on the way that'll move DFR0 to a
+generated definition.
+
+https://lore.kernel.org/linux-arm-kernel/20220930140211.3215348-1-james.morse@arm.com/
+
+--
+Thanks,
+Oliver
+
+> ---
+>  arch/arm64/include/asm/sysreg.h | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 7d301700d1a9..84f59ce1dc6d 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -698,6 +698,8 @@
+>  #define ID_DFR0_PERFMON_8_1		0x4
+>  #define ID_DFR0_PERFMON_8_4		0x5
+>  #define ID_DFR0_PERFMON_8_5		0x6
+> +#define ID_DFR0_PERFMON_8_7		0x7
+> +#define ID_DFR0_PERFMON_IMP_DEF		0xf
+>  
+>  #define ID_ISAR4_SWP_FRAC_SHIFT		28
+>  #define ID_ISAR4_PSR_M_SHIFT		24
+> -- 
+> 2.34.1
+> 
