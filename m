@@ -2,90 +2,94 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA750C4332F
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 07:59:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EABC1C433FE
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 08:02:42 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CEC749F49;
-	Fri,  4 Nov 2022 03:59:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 720F649F49;
+	Fri,  4 Nov 2022 04:02:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aeWuwKWpzI-9; Fri,  4 Nov 2022 03:59:14 -0400 (EDT)
+	with ESMTP id v7cE61sg6K07; Fri,  4 Nov 2022 04:02:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B364243482;
-	Fri,  4 Nov 2022 03:59:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 401E14A49C;
+	Fri,  4 Nov 2022 04:02:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3542341075
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 03:59:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CBE9249F49
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 04:02:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sT3NqQWqjhBe for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Nov 2022 03:59:12 -0400 (EDT)
+ with ESMTP id VBSf9NyGjoPl for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Nov 2022 04:02:38 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B15D94013F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 03:59:12 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 80DA549F3F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 04:02:38 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1667548752;
+ s=mimecast20190719; t=1667548958;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EJeUF4PeIyDwWhg83Rm4e9DTJIlz0RfDdBHuS7iY8Qc=;
- b=IR2tdOmrTRSk+dJN70STqGRsLNF6IZmhLHLJmJIg2ruYnIlRpt9pL03yRnwBgNveZkDPWy
- We/dhWd20tMKwJpyKjIpBspxnbBzyHtfrLdXrkH48ALEgl4/BKzHb+6HNCYPJdp6jNWipy
- n7KlGpQ4H5hpJw0szmYI/aDXFAawgTc=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=QJu1Z+r/Jj1Q22H/Z28kMZfifRbtSqoNatlqDbaYr8M=;
+ b=Ht881+Jlk5g+JMhSSLNDUJyiPl1UFMFDxFF9LzjwLU9xxQgu9oKJvvXsOJj+Pzlzgrs21E
+ J6OWFWTWg6jrvcXwWk8vnmUSA/DI3Gv4bwgJ5W2BUCe0SyMptQeSs7A7RaSLTJfhITqF2S
+ C16Sm+gvNoncb4hATdNLsdRfOpIH/fg=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-669-3s-fC7yHOl2sYie33MfhbA-1; Fri, 04 Nov 2022 03:59:11 -0400
-X-MC-Unique: 3s-fC7yHOl2sYie33MfhbA-1
-Received: by mail-ej1-f71.google.com with SMTP id
- jg27-20020a170907971b00b007ad9892f5f6so2704356ejc.7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Nov 2022 00:59:10 -0700 (PDT)
+ us-mta-10-KFqvTpzDOVKCBNnFcajMgg-1; Fri, 04 Nov 2022 04:02:37 -0400
+X-MC-Unique: KFqvTpzDOVKCBNnFcajMgg-1
+Received: by mail-ej1-f72.google.com with SMTP id
+ qk31-20020a1709077f9f00b00791a3e02c80so2756046ejc.21
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Nov 2022 01:02:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=content-transfer-encoding:in-reply-to:from:references:cc:to
  :content-language:subject:user-agent:mime-version:date:message-id
  :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=EJeUF4PeIyDwWhg83Rm4e9DTJIlz0RfDdBHuS7iY8Qc=;
- b=whWgYIr4Z7WpGtcC/cBV7Sk3FjXxPf5Z9NuoHwXD5do8OQ3G6jyasL43BzGY6Stweh
- /+F82bh7eHZbtqVblUDcEO9kwevxho+8tDVFFVX68ZSAeHnSOTQnpQodHsCWcuTsWS5n
- QwCn3vA0/jy47+fPJMSOBW02fl6wr9IQFzo1XZavIfgH4vt02kuhKWiE6vhZSrQKk8FF
- 7EnlMeQeZEtYDSjlawd2PiQXoHVTlN2t1LkB0V+RpYbLRcJVQGSr6DbV5wP2wVCDUGme
- cYOgHy9r5oPK/iHqN0z5+P8Y1+XwNlcX2a1nlBnrvhp14staA7tjWBEziMWNlFWo70aQ
- ozIA==
-X-Gm-Message-State: ACrzQf2DMr7rcSUPBFeKyfZWIlQ9/SRsQZMHjpBDoVI556tlQ77PVorh
- 00VhSQWRLswAY7bMySqqtdO1xCqImVCKK9WPVXh9ylgnw82T6uHAgJ0570xXomex3LFFIcKvxrL
- GhM9Yv6qoZ4BeR2ZdGqZWIx7F
-X-Received: by 2002:a05:6402:378c:b0:458:8053:6c5f with SMTP id
- et12-20020a056402378c00b0045880536c5fmr33842111edb.9.1667548749724; 
- Fri, 04 Nov 2022 00:59:09 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4JQssOxBto/uy8zX5hPa1fJjqq666daf9UF+4lfquuNi1ItDIQofNjauQbNAII7zHijsljig==
-X-Received: by 2002:a05:6402:378c:b0:458:8053:6c5f with SMTP id
- et12-20020a056402378c00b0045880536c5fmr33842056edb.9.1667548749383; 
- Fri, 04 Nov 2022 00:59:09 -0700 (PDT)
+ bh=QJu1Z+r/Jj1Q22H/Z28kMZfifRbtSqoNatlqDbaYr8M=;
+ b=wLzZEIwFztS6SSPyMppXcISXo6owjzvJFX+7g1QBuh6xc+CU5Kz0DRapDQHXGSPh60
+ FkzvIp5N3LS98tk/udMYdTO1a0U5RBmaVCaYCz1OgVwPie1X9Mjc/tqqvivXlhqKd7nX
+ 7MR2TWOfOXA4JtLj1JbDVoYeOeCoXxR2mqAsWRUe1imhPPMYt265HLsogwC4yxeJG+8y
+ UW/ezJnihVve+k1RwcXx/EVv/Uf3hJxwZ0Kh/gNN6XBnKZbJ9i4lFEvLUfeJVjUv2wJe
+ +NlVwiW1oQQIrhsQsUUHEh5vUCotFBnqSw6BlJtY7QEY4qoHFOGbck8ZuAzTCvTNTi+a
+ rkaQ==
+X-Gm-Message-State: ACrzQf2HgMD49b7q1Z6EtLaegE5TqMJpgRjEe9maMPKLZ/NSfG7KtpR1
+ p+M5KHvq83Te6pG8hI3fjL84c+Flb9HkxWb3Gk0ElRqtKpLhUlMDwW6gQlMWXDQVn3o4YcguPig
+ aQrt+DNYWF30nk9qfGCyGDYof
+X-Received: by 2002:a17:907:1dda:b0:7a6:8ffc:7dc with SMTP id
+ og26-20020a1709071dda00b007a68ffc07dcmr33677016ejc.163.1667548955857; 
+ Fri, 04 Nov 2022 01:02:35 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5ZNqKb/aQP9ibAQb8G5uHFxFpKasjpH84kkwoGMwJiLbxjg9Lh2wolUrwViafofx0ss1frxA==
+X-Received: by 2002:a17:907:1dda:b0:7a6:8ffc:7dc with SMTP id
+ og26-20020a1709071dda00b007a68ffc07dcmr33676971ejc.163.1667548955613; 
+ Fri, 04 Nov 2022 01:02:35 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:4783:a68:c1ee:15c5?
  ([2001:b07:6468:f312:4783:a68:c1ee:15c5])
  by smtp.googlemail.com with ESMTPSA id
- t24-20020aa7d4d8000000b00461a98a2128sm1576537edr.26.2022.11.04.00.59.07
+ tz14-20020a170907c78e00b0078ddb518a90sm1433630ejc.223.2022.11.04.01.02.33
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 04 Nov 2022 00:59:08 -0700 (PDT)
-Message-ID: <2d964d60-c2e9-ea00-37b4-ad82af9e013f@redhat.com>
-Date: Fri, 4 Nov 2022 08:59:05 +0100
+ Fri, 04 Nov 2022 01:02:34 -0700 (PDT)
+Message-ID: <6c71fcca-c17f-5979-e15e-afcf08899064@redhat.com>
+Date: Fri, 4 Nov 2022 09:02:32 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.4.0
-Subject: Re: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
-To: Isaku Yamahata <isaku.yamahata@gmail.com>,
- Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 33/44] KVM: x86: Do VMX/SVM support checks directly in
+ vendor code
+To: Sean Christopherson <seanjc@google.com>
 References: <20221102231911.3107438-1-seanjc@google.com>
- <20221104071749.GC1063309@ls.amr.corp.intel.com>
+ <20221102231911.3107438-34-seanjc@google.com>
+ <bfa98587-3b36-3834-a4b9-585a0e0aa56a@redhat.com>
+ <Y2QJ2TuyZImbFFvi@google.com>
+ <c29e7d40-ddb9-def0-f944-a921a05a4bb2@redhat.com>
+ <Y2QPSK1/6esl61wQ@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221104071749.GC1063309@ls.amr.corp.intel.com>
+In-Reply-To: <Y2QPSK1/6esl61wQ@google.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -122,144 +126,42 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 11/4/22 08:17, Isaku Yamahata wrote:
-> On Wed, Nov 02, 2022 at 11:18:27PM +0000,
-> Sean Christopherson <seanjc@google.com> wrote:
+On 11/3/22 19:58, Sean Christopherson wrote:
 > 
->> Non-x86 folks, please test on hardware when possible.  I made a _lot_ of
->> mistakes when moving code around.  Thankfully, x86 was the trickiest code
->> to deal with, and I'm fairly confident that I found all the bugs I
->> introduced via testing.  But the number of mistakes I made and found on
->> x86 makes me more than a bit worried that I screwed something up in other
->> arch code.
->>
->> This is a continuation of Chao's series to do x86 CPU compatibility checks
->> during virtualization hardware enabling[1], and of Isaku's series to try
->> and clean up the hardware enabling paths so that x86 (Intel specifically)
->> can temporarily enable hardware during module initialization without
->> causing undue pain for other architectures[2].  It also includes one patch
->> from another mini-series from Isaku that provides the less controversial
->> patches[3].
->>
->> The main theme of this series is to kill off kvm_arch_init(),
->> kvm_arch_hardware_(un)setup(), and kvm_arch_check_processor_compat(), which
->> all originated in x86 code from way back when, and needlessly complicate
->> both common KVM code and architecture code.  E.g. many architectures don't
->> mark functions/data as __init/__ro_after_init purely because kvm_init()
->> isn't marked __init to support x86's separate vendor modules.
->>
->> The idea/hope is that with those hooks gone (moved to arch code), it will
->> be easier for x86 (and other architectures) to modify their module init
->> sequences as needed without having to fight common KVM code.  E.g. I'm
->> hoping that ARM can build on this to simplify its hardware enabling logic,
->> especially the pKVM side of things.
->>
->> There are bug fixes throughout this series.  They are more scattered than
->> I would usually prefer, but getting the sequencing correct was a gigantic
->> pain for many of the x86 fixes due to needing to fix common code in order
->> for the x86 fix to have any meaning.  And while the bugs are often fatal,
->> they aren't all that interesting for most users as they either require a
->> malicious admin or broken hardware, i.e. aren't likely to be encountered
->> by the vast majority of KVM users.  So unless someone _really_ wants a
->> particular fix isolated for backporting, I'm not planning on shuffling
->> patches.
->>
->> Tested on x86.  Lightly tested on arm64.  Compile tested only on all other
->> architectures.
-> 
-> Thanks for the patch series. I the rebased TDX KVM patch series and it worked.
-> Since cpu offline needs to be rejected in some cases(To keep at least one cpu
-> on a package), arch hook for cpu offline is needed.
-> I can keep it in TDX KVM patch series.
+> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+> index 3e508f239098..ebe617ab0b37 100644
+> --- a/arch/x86/kernel/cpu/common.c
+> +++ b/arch/x86/kernel/cpu/common.c
+> @@ -191,6 +191,8 @@ static void default_init(struct cpuinfo_x86 *c)
+>                          strcpy(c->x86_model_id, "386");
+>          }
+>   #endif
+> +
+> +       clear_cpu_cap(c, X86_FEATURE_MSR_IA32_FEAT_CTL);
+>   }
+>   
+>   static const struct cpu_dev default_cpu = {
 
-Yes, this patch looks good.
+Not needed I think?  default_init does not call init_ia32_feat_ctl.
+
+> diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
+> index c881bcafba7d..3a7ae67f5a5e 100644
+> --- a/arch/x86/kernel/cpu/cpuid-deps.c
+> +++ b/arch/x86/kernel/cpu/cpuid-deps.c
+> @@ -72,6 +72,8 @@ static const struct cpuid_dep cpuid_deps[] = {
+>          { X86_FEATURE_AVX512_FP16,              X86_FEATURE_AVX512BW  },
+>          { X86_FEATURE_ENQCMD,                   X86_FEATURE_XSAVES    },
+>          { X86_FEATURE_PER_THREAD_MBA,           X86_FEATURE_MBA       },
+> +       { X86_FEATURE_VMX,                      X86_FEATURE_MSR_IA32_FEAT_CTL         },
+> +       { X86_FEATURE_SGX,                      X86_FEATURE_MSR_IA32_FEAT_CTL         },
+>          { X86_FEATURE_SGX_LC,                   X86_FEATURE_SGX       },
+>          { X86_FEATURE_SGX1,                     X86_FEATURE_SGX       },
+>          { X86_FEATURE_SGX2,                     X86_FEATURE_SGX1      },
+> 
+
+Yes, good idea.
 
 Paolo
-
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index 23c0f4bc63f1..ef7bcb845d42 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -17,6 +17,7 @@ BUILD_BUG_ON(1)
->   KVM_X86_OP(hardware_enable)
->   KVM_X86_OP(hardware_disable)
->   KVM_X86_OP(hardware_unsetup)
-> +KVM_X86_OP_OPTIONAL_RET0(offline_cpu)
->   KVM_X86_OP(has_emulated_msr)
->   KVM_X86_OP(vcpu_after_set_cpuid)
->   KVM_X86_OP(is_vm_type_supported)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 496c7c6eaff9..c420409aa96f 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1468,6 +1468,7 @@ struct kvm_x86_ops {
->   	int (*hardware_enable)(void);
->   	void (*hardware_disable)(void);
->   	void (*hardware_unsetup)(void);
-> +	int (*offline_cpu)(void);
->   	bool (*has_emulated_msr)(struct kvm *kvm, u32 index);
->   	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
->   
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 2ed5a017f7bc..17c5d6a76c93 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12039,6 +12039,11 @@ void kvm_arch_hardware_disable(void)
->   	drop_user_return_notifiers();
->   }
->   
-> +int kvm_arch_offline_cpu(unsigned int cpu)
-> +{
-> +	return static_call(kvm_x86_offline_cpu)();
-> +}
-> +
->   bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
->   {
->   	return vcpu->kvm->arch.bsp_vcpu_id == vcpu->vcpu_id;
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 620489b9aa93..4df79443fd11 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1460,6 +1460,7 @@ static inline void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu) {}
->   int kvm_arch_hardware_enable(void);
->   void kvm_arch_hardware_disable(void);
->   #endif
-> +int kvm_arch_offline_cpu(unsigned int cpu);
->   int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
->   bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
->   int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index f6b6dcedaa0a..f770fdc662d0 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -5396,16 +5396,24 @@ static void hardware_disable_nolock(void *junk)
->   	__this_cpu_write(hardware_enabled, false);
->   }
->   
-> +__weak int kvm_arch_offline_cpu(unsigned int cpu)
-> +{
-> +	return 0;
-> +}
-> +
->   static int kvm_offline_cpu(unsigned int cpu)
->   {
-> +	int r = 0;
-> +
->   	mutex_lock(&kvm_lock);
-> -	if (kvm_usage_count) {
-> +	r = kvm_arch_offline_cpu(cpu);
-> +	if (!r && kvm_usage_count) {
->   		preempt_disable();
->   		hardware_disable_nolock(NULL);
->   		preempt_enable();
->   	}
->   	mutex_unlock(&kvm_lock);
-> -	return 0;
-> +	return r;
->   }
->   
->   static void hardware_disable_all_nolock(void)
-> 
 
 _______________________________________________
 kvmarm mailing list
