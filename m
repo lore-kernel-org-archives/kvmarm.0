@@ -1,34 +1,69 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0141A47
-	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 01:06:16 +0000 (UTC)
-Date: Fri, 4 Nov 2022 01:06:06 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1667523974;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bKxKhySc2WJqu4VmQGIMdexfpeONNbD4T7hOlSoxqCw=;
-	b=iZspM8OSBuirndZgGJBhxe0XlxDxbKVfw5Bx17VFUn6k1gvXRo8iqyWd11HkHjyiKq5L9f
-	5ATaB71ArQ6hwHM0SSZkTcpjQwbc+2PqTvxPTLIIVZybb/eTe55lEP4JPLuUh+JPZtik3Q
-	/rhEG/4b7pJJ8jiai8XlShAcpV3jPMM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Gavin Shan <gshan@redhat.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
-	ajones@ventanamicro.com, maz@kernel.org, bgardon@google.com,
-	catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
-	pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com,
-	james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
-	alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v7 4/9] KVM: Support dirty ring in conjunction with bitmap
-Message-ID: <Y2RlfkyQMCtD6Rbh@google.com>
-References: <20221031003621.164306-1-gshan@redhat.com>
- <20221031003621.164306-5-gshan@redhat.com>
- <Y2RPhwIUsGLQ2cz/@google.com>
- <d5b86a73-e030-7ce3-e5f3-301f4f505323@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF03BED7
+	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 05:37:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667540274; x=1699076274;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EgmtsBqJVK3JbLONjG56zRgFCzcOwywt2/xTnCkOP1Y=;
+  b=RRsqVmeFV1jdWym2d/I+Kc9LjXpsQQlKhLAOZVCDQxfjGNhGTwTvv5Dq
+   oENIPmIdC9RWNBMANhk8/4BkB7cx/usEvNcjvXEHJiN49nMgBKdvTnq/M
+   8x1ht8HlyB+DYQ0xJg36bhoKX8fkXHvlmPpt7zqpYJw/InLqK+3BffjM/
+   vlV1bvNUgnH5n6eE2Z2byVu7fWSmbq2hw776McV4ezWkYYr3v3jrYqsL8
+   qSsUTpFiD0KpRUGMHF4By711gZcuO/mS+XYbduSeo43EtIsuNSER2sxiW
+   Dt9aEsSQ4YhqwToPklubLr8rGdZacR3iz38o+yHQJMjAmSmwg1fU8MloG
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10520"; a="311006063"
+X-IronPort-AV: E=Sophos;i="5.96,136,1665471600"; 
+   d="scan'208";a="311006063"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2022 22:37:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10520"; a="666249074"
+X-IronPort-AV: E=Sophos;i="5.96,136,1665471600"; 
+   d="scan'208";a="666249074"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orsmga008.jf.intel.com with ESMTP; 03 Nov 2022 22:37:46 -0700
+Date: Fri, 4 Nov 2022 13:37:45 +0800
+From: Yuan Yao <yuan.yao@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Atish Patra <atishp@atishpatra.org>,
+	David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	Fabiano Rosas <farosas@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
+	Yuan Yao <yuan.yao@intel.com>
+Subject: Re: [PATCH 03/44] KVM: Allocate cpus_hardware_enabled after arch
+ hardware setup
+Message-ID: <20221104053745.qvi35kflf2i2ifgs@yy-desk-7060>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221102231911.3107438-4-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,129 +72,79 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d5b86a73-e030-7ce3-e5f3-301f4f505323@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221104010606.L23mzb0YnYwwtyFlaepinjp20Rh8zk0_UGGijUv24Ac@z>
+In-Reply-To: <20221102231911.3107438-4-seanjc@google.com>
+User-Agent: NeoMutt/20171215
+Message-ID: <20221104053745.h-v9ztksBolUqxhRclRfh5cPsRekjObIPxZEVJjYC9E@z>
 
-On Fri, Nov 04, 2022 at 08:12:21AM +0800, Gavin Shan wrote:
-> Hi Oliver,
-> 
-> On 11/4/22 7:32 AM, Oliver Upton wrote:
-> > On Mon, Oct 31, 2022 at 08:36:16AM +0800, Gavin Shan wrote:
-> > > ARM64 needs to dirty memory outside of a VCPU context when VGIC/ITS is
-> > > enabled. It's conflicting with that ring-based dirty page tracking always
-> > > requires a running VCPU context.
-> > > 
-> > > Introduce a new flavor of dirty ring that requires the use of both VCPU
-> > > dirty rings and a dirty bitmap. The expectation is that for non-VCPU
-> > > sources of dirty memory (such as the VGIC/ITS on arm64), KVM writes to
-> > > the dirty bitmap. Userspace should scan the dirty bitmap before migrating
-> > > the VM to the target.
-> > > 
-> > > Use an additional capability to advertise this behavior. The newly added
-> > > capability (KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP) can't be enabled before
-> > > KVM_CAP_DIRTY_LOG_RING_ACQ_REL on ARM64. In this way, the newly added
-> > > capability is treated as an extension of KVM_CAP_DIRTY_LOG_RING_ACQ_REL.
-> > 
-> > Whatever ordering requirements we settle on between these capabilities
-> > needs to be documented as well.
-> > 
-> > [...]
-> > 
-> 
-> It's mentioned in 'Documentation/virt/kvm/api.rst' as below.
-> 
->   After using the dirty rings, the userspace needs to detect the capability
->   of KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP to see whether the ring structures
->   need to be backed by per-slot bitmaps. With this capability advertised
->   and supported, it means the architecture can dirty guest pages without
->   vcpu/ring context, so that some of the dirty information will still be
->   maintained in the bitmap structure.
-> 
-> The description may be not obvious about the ordering. For this, I can
-> add the following sentence at end of the section.
-> 
->   The capability of KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP can't be enabled
->   until the capability of KVM_CAP_DIRTY_LOG_RING_ACQ_REL has been enabled.
-> 
-> > > @@ -4588,6 +4594,13 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
-> > >   			return -EINVAL;
-> > >   		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
-> > > +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP:
-> > > +		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
-> > > +		    !kvm->dirty_ring_size)
-> > 
-> > I believe this ordering requirement is problematic, as it piles on top
-> > of an existing problem w.r.t. KVM_CAP_DIRTY_LOG_RING v. memslot
-> > creation.
-> > 
-> > Example:
-> >   - Enable KVM_CAP_DIRTY_LOG_RING
-> >   - Create some memslots w/ dirty logging enabled (note that the bitmap
-> >     is _not_ allocated)
-> >   - Enable KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
-> >   - Save ITS tables and get a NULL dereference in
-> >     mark_page_dirty_in_slot():
-> > 
-> >                  if (vcpu && kvm->dirty_ring_size)
-> >                          kvm_dirty_ring_push(&vcpu->dirty_ring,
-> >                                              slot, rel_gfn);
-> >                  else
-> > ------->		set_bit_le(rel_gfn, memslot->dirty_bitmap);
-> > 
-> > Similarly, KVM may unnecessarily allocate bitmaps if dirty logging is
-> > enabled on memslots before KVM_CAP_DIRTY_LOG_RING is enabled.
-> > 
-> > You could paper over this issue by disallowing DIRTY_RING_WITH_BITMAP if
-> > DIRTY_LOG_RING has already been enabled, but the better approach would
-> > be to explicitly check kvm_memslots_empty() such that the real
-> > dependency is obvious. Peter, hadn't you mentioned something about
-> > checking against memslots in an earlier revision?
-> > 
-> 
-> The userspace (QEMU) needs to ensure that no dirty bitmap is created
-> before the capability of KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP is enabled.
-> It's unknown by QEMU that vgic/its is used when KVM_CAP_DIRTY_LOG_RING_ACQ_REL
-> is enabled.
+On Wed, Nov 02, 2022 at 11:18:30PM +0000, Sean Christopherson wrote:
+> Allocate cpus_hardware_enabled after arch hardware setup so that arch
+> "init" and "hardware setup" are called back-to-back and thus can be
+> combined in a future patch.  cpus_hardware_enabled is never used before
+> kvm_create_vm(), i.e. doesn't have a dependency with hardware setup and
+> only needs to be allocated before /dev/kvm is exposed to userspace.
+>
+> Free the object before the arch hooks are invoked to maintain symmetry,
+> and so that arch code can move away from the hooks without having to
+> worry about ordering changes.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  virt/kvm/kvm_main.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+>
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index e0424af52acc..8b7534cc953b 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -5843,15 +5843,15 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+>  	if (r)
+>  		return r;
+>
+> +	r = kvm_arch_hardware_setup(opaque);
+> +	if (r < 0)
+> +		goto err_hw_setup;
+> +
+>  	if (!zalloc_cpumask_var(&cpus_hardware_enabled, GFP_KERNEL)) {
+>  		r = -ENOMEM;
+>  		goto err_hw_enabled;
+>  	}
+>
+> -	r = kvm_arch_hardware_setup(opaque);
+> -	if (r < 0)
+> -		goto out_free_1;
+> -
+>  	c.ret = &r;
+>  	c.opaque = opaque;
+>  	for_each_online_cpu(cpu) {
+> @@ -5937,10 +5937,10 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+>  	unregister_reboot_notifier(&kvm_reboot_notifier);
+>  	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
+>  out_free_2:
+> -	kvm_arch_hardware_unsetup();
+> -out_free_1:
+>  	free_cpumask_var(cpus_hardware_enabled);
+>  err_hw_enabled:
+> +	kvm_arch_hardware_unsetup();
+> +err_hw_setup:
+>  	kvm_arch_exit();
+>  	return r;
+>  }
+> @@ -5967,9 +5967,9 @@ void kvm_exit(void)
+>  	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
+>  	on_each_cpu(hardware_disable_nolock, NULL, 1);
+>  	kvm_irqfd_exit();
+> +	free_cpumask_var(cpus_hardware_enabled);
+>  	kvm_arch_hardware_unsetup();
+>  	kvm_arch_exit();
+> -	free_cpumask_var(cpus_hardware_enabled);
+>  	kvm_vfio_ops_exit();
 
-I'm not worried about what QEMU (or any particular VMM for that matter)
-does with the UAPI. The problem is this patch provides a trivial way for
-userspace to cause a NULL dereference in the kernel. Imposing ordering
-between the cap and memslot creation avoids the problem altogether.
+Looks good to me.
 
-So, looking at your example:
+Reviewed-by: Yuan Yao <yuan.yao@intel.com>
 
->    kvm_initialization
->      enable_KVM_CAP_DIRTY_LOG_RING_ACQ_REL        // Where KVM_CAP_DIRTY_LOG_RING is enabled
->    board_initialization                           // Where QEMU knows if vgic/its is used
-
-Is it possible that QEMU could hoist enabling RING_WITH_BITMAP here?
-Based on your description QEMU has decided to use the vGIC ITS but
-hasn't yet added any memslots.
-
->      add_memory_slots
->    kvm_post_initialization
->      enable_KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
->    :
->    start_migration
->      enable_dirty_page_tracking
->        create_dirty_bitmap                       // With KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP enabled
-
-Just to make sure we're on the same page, there's two issues:
-
- (1) If DIRTY_LOG_RING is enabled before memslot creation and
-     RING_WITH_BITMAP is enabled after memslots have been created w/
-     dirty logging enabled, memslot->dirty_bitmap == NULL and the
-     kernel will fault when attempting to save the ITS tables.
-
- (2) Not your code, but a similar issue. If DIRTY_LOG_RING[_ACQ_REL] is
-     enabled after memslots have been created w/ dirty logging enabled,
-     memslot->dirty_bitmap != NULL and that memory is wasted until the
-     memslot is freed.
-
-I don't expect you to fix #2, though I've mentioned it because using the
-same approach to #1 and #2 would be nice.
-
---
-Thanks,
-Oliver
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_exit);
+> --
+> 2.38.1.431.g37b22c650d-goog
+>
