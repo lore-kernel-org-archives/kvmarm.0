@@ -2,52 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6255EC433FE
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 09:13:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D7FEC433FE
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 11:07:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B614A49F49;
-	Fri,  4 Nov 2022 05:13:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E3A540E00;
+	Fri,  4 Nov 2022 07:07:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id T3dHVZGvyhVI; Fri,  4 Nov 2022 05:13:23 -0400 (EDT)
+	with ESMTP id o57a-u9xwUEA; Fri,  4 Nov 2022 07:07:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 388FC4B086;
-	Fri,  4 Nov 2022 05:13:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 420A440E62;
+	Fri,  4 Nov 2022 07:07:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E69E14A1B0
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 05:13:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DF0FF40DFD
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 07:07:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dAEAM4bmG0ak for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Nov 2022 05:13:20 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 60F2F49F49
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 05:13:20 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D87C61FB;
- Fri,  4 Nov 2022 02:13:25 -0700 (PDT)
-Received: from [10.1.27.15] (e122027.cambridge.arm.com [10.1.27.15])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0AAE83F703;
- Fri,  4 Nov 2022 02:13:16 -0700 (PDT)
-Message-ID: <55b704b7-0a44-8f34-e22f-d60b58db610f@arm.com>
-Date: Fri, 4 Nov 2022 09:13:14 +0000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH] arm64: paravirt: remove conduit check in
- has_pv_steal_clock
-To: Usama Arif <usama.arif@bytedance.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
- linux@armlinux.org.uk, yezengruan@huawei.com, catalin.marinas@arm.com,
- will@kernel.org, maz@kernel.org, mark.rutland@arm.com
-References: <20221104061659.4116508-1-usama.arif@bytedance.com>
-Content-Language: en-GB
-From: Steven Price <steven.price@arm.com>
-In-Reply-To: <20221104061659.4116508-1-usama.arif@bytedance.com>
-Cc: punit.agrawal@bytedance.com, fam.zheng@bytedance.com, liangma@liangbit.com
+ with ESMTP id w1nfuaOxoCia for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Nov 2022 07:07:04 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 83F7240DF4
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 07:07:04 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 27AE0B82CF9;
+ Fri,  4 Nov 2022 11:07:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C55D6C433D6;
+ Fri,  4 Nov 2022 11:07:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1667560021;
+ bh=D9p9S1ydD8MQNluvBI5O/R0bIkf9iDKhWvtR/SEIOuo=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=GOQE8UhpKNLVzJH69gWuCsLA7W+RJq5VZo9XmzTuOsoUhiu1xo4HUlBsdK4BtW0Qe
+ 7hBYTjC2zsUqhZVFR2eYPjcqkuOHVKOhqKUhPBEKLVBtm5+Tc0Z0EWDsU6Qt9Rk7g8
+ d0TnOSPWJ1VACGJJHpMMyuo5uhE3AN1qlTXohEJUk+tkW2uCe9kC0YKqg1qcRAl7MJ
+ ASve4U9LHoqaaaiVE4OX5apqqHdGzy62Zocvz0RdYfcY8hBRzZuf4c/NGXwlEI6HJ6
+ OnlkENr5V9z8ssLPdNvWw+LS59DtNfFmgInqOgprKbZr2+geQf7AAJpCknbZiAju+6
+ hTgoCCZEv7zxg==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1oquXL-003kAf-06;
+ Fri, 04 Nov 2022 11:06:59 +0000
+Date: Fri, 04 Nov 2022 11:06:58 +0000
+Message-ID: <86cza3q8q5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: Re: [PATCH] kvm/arm: Fix pvtime documentation
+In-Reply-To: <4b2b78c6-9903-1247-9d16-fc6270aa34fc@gmail.com>
+References: <20221103131210.3603385-1-usama.arif@bytedance.com>
+ <24d81fe9-7cd1-71eb-8c35-0739f638b3df@gmail.com>
+ <86fsf0qc1w.wl-maz@kernel.org>
+ <4b2b78c6-9903-1247-9d16-fc6270aa34fc@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: bagasdotme@gmail.com, usama.arif@bytedance.com,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
+ yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+ steven.price@arm.com, mark.rutland@arm.com, fam.zheng@bytedance.com,
+ liangma@liangbit.com, punit.agrawal@bytedance.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ Usama Arif <usama.arif@bytedance.com>, fam.zheng@bytedance.com,
+ punit.agrawal@bytedance.com, linux@armlinux.org.uk, liangma@liangbit.com,
+ steven.price@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -64,36 +97,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 04/11/2022 06:16, Usama Arif wrote:
-> arm_smccc_1_1_invoke() which is called later on in the function
-> will return failure if there's no conduit (or pre-SMCCC 1.1),
-> hence the check is unnecessary.
+On Fri, 04 Nov 2022 01:48:21 +0000,
+Bagas Sanjaya <bagasdotme@gmail.com> wrote:
 > 
-> Suggested-by: Steven Price <steven.price@arm.com>
-> Signed-off-by: Usama Arif <usama.arif@bytedance.com>
-
-Reviewed-by: Steven Price <steven.price@arm.com>
-
-> ---
->  arch/arm64/kernel/paravirt.c | 4 ----
->  1 file changed, 4 deletions(-)
+> On 11/3/22 22:42, Marc Zyngier wrote:
+> > No, this is the correct course of action. There isn't any point in
+> > having an *unrelated* change in a separate series. This is a
+> > standalone change, posted as a standalone patch.
+> > 
+> >> Please reroll your series [2] with suggestion applied.
+> > 
+> > Or not.
+> > 
 > 
-> diff --git a/arch/arm64/kernel/paravirt.c b/arch/arm64/kernel/paravirt.c
-> index 57c7c211f8c7..aa718d6a9274 100644
-> --- a/arch/arm64/kernel/paravirt.c
-> +++ b/arch/arm64/kernel/paravirt.c
-> @@ -141,10 +141,6 @@ static bool __init has_pv_steal_clock(void)
->  {
->  	struct arm_smccc_res res;
->  
-> -	/* To detect the presence of PV time support we require SMCCC 1.1+ */
-> -	if (arm_smccc_1_1_get_conduit() == SMCCC_CONDUIT_NONE)
-> -		return false;
-> -
->  	arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
->  			     ARM_SMCCC_HV_PV_TIME_FEATURES, &res);
->  
+> You mean the series before this patch have already been applied,
+> right?
 
+This change is 100% independent from the series you quoted. Why should
+there be a dependency between the two?
+
+As for respinning the series at this stage for a documentation
+formatting issue, this is pretty pointless, and only clutters people's
+Inbox with redundant versions...
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
