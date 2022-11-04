@@ -2,63 +2,62 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4A5CC433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0002C4167B
 	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 15:55:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CB4A49F3B;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B2E54A1D9;
 	Fri,  4 Nov 2022 11:55:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jo2XJp+fVGpV; Fri,  4 Nov 2022 11:55:33 -0400 (EDT)
+	with ESMTP id cpzLrHDBqmQd; Fri,  4 Nov 2022 11:55:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA0D549EC2;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B827F41278;
 	Fri,  4 Nov 2022 11:55:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 66A5F4106C
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EA6943C8C
  for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 11:55:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SI1c9IEJXQ2y for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Nov 2022 11:55:25 -0400 (EDT)
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com
- [209.85.167.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 448D640FD3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 11:55:25 -0400 (EDT)
-Received: by mail-oi1-f169.google.com with SMTP id n186so5590130oih.7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Nov 2022 08:55:25 -0700 (PDT)
+ with ESMTP id S40o8YM0dFX3 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Nov 2022 11:55:29 -0400 (EDT)
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com
+ [209.85.167.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E99C241016
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Nov 2022 11:55:28 -0400 (EDT)
+Received: by mail-oi1-f170.google.com with SMTP id p127so5574103oih.9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Nov 2022 08:55:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
  :mime-version:subject:date:from:x-gm-message-state:from:to:cc
  :subject:date:message-id:reply-to;
- bh=nbh4kYtAszd2WFH06dmd+kkJjoRcl20JJM5emroag08=;
- b=grCMYUU9I3fr/fayZNLg4gqmLqLFLn0vr6WRE5Ns1bKr2rRLCcTHBcZkCZt78VX46g
- B86lSb+1WgVyTfOq1mCqpIVfVKz2+gyFNe0LpfKqzGiBtLIYsHzJzOV8DO+DMHEULzTp
- jOLDMsbYzJu1EcRk+PMuP1+23c8zUJ2esHXQQ0k1p9t05w2/kTga8nXXei6k6milK+Qd
- kiyqr/32NRDN4xZcQzGAJx3TgkALODfSY4nnPUPes9wiiKjH2GMJ7txhGBnDaRWfizf/
- jFzZ2mPyAYMsHuXL/qcHZgJrOYep01bqEktlZ4mQRXO7y3Ele6Tww0KT7Q1Cy2SwoTCw
- I/Bw==
-X-Gm-Message-State: ACrzQf0t2FW5XTyejHWRnCEkcOTiy2ACZZujEuSAWcLoW6qQ5+5Rgn0r
- 5EqoNXqSwNnXYAbR9e1BLg==
-X-Google-Smtp-Source: AMsMyM6XCGOxDkWp/KDtlfrAH+Z735zS9ydDsev6tHg8eM+cXyEV7Ga+K7IZqgQFpv3gP3gCDvvgow==
-X-Received: by 2002:a05:6808:11c1:b0:353:f1a5:207a with SMTP id
- p1-20020a05680811c100b00353f1a5207amr27451988oiv.183.1667577324586; 
- Fri, 04 Nov 2022 08:55:24 -0700 (PDT)
+ bh=YXxvA5Cmwe9nSMxNL2yH3Amn9qhEZ+Ppqa0CVXQahDM=;
+ b=DljyexvSXsr9Mg833225aLFkgDwyEELxoYX+j96GcQ4Z8WztS9xNd3k/zTiDtuJrNA
+ fsNCsU0w0JMooYY3Ib9bLEvTgOqkkbl1123BSGDIaxvfJB8PcCWj1IArXCn2/MyajQct
+ uvBviQR3gwZElrxQfoX9SLIX/2rz7DUejY3kidfwsfiCW47x6KiYncyZaXwXdRBtHh/h
+ 0twcF4+Iq/TpL6GXB51UMHMYZomz5O82CG66bt8THpIKoLZVhPAD46e2rprcZtpvX84H
+ 4pMtRmQ/NS/8tXSG4uptwE9rqUr90Cjk82V3X3QYDdMLrgDzeK+ZSAG/5/HrSao/qRn6
+ zwww==
+X-Gm-Message-State: ACrzQf2wA+LfJ9H1JRz4zIsYsKmwluV3o3tXiHdVlJoRKozrNdihiLs8
+ qPaIpcUPhFtNc43w4ffDhA==
+X-Google-Smtp-Source: AMsMyM7j75hsQAjfZIMDag+E+uxVO086sbySFKGpZQmxBHGiFVlWgpE6vfapy3lhNwjdU+847kbdBg==
+X-Received: by 2002:a05:6808:2023:b0:359:c826:8085 with SMTP id
+ q35-20020a056808202300b00359c8268085mr19906327oiw.156.1667577328221; 
+ Fri, 04 Nov 2022 08:55:28 -0700 (PDT)
 Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net.
  [66.90.144.107]) by smtp.gmail.com with ESMTPSA id
- cg27-20020a056830631b00b00661b019accbsm1588176otb.3.2022.11.04.08.55.23
+ h4-20020a9d2f04000000b00661a3f4113bsm1532860otb.64.2022.11.04.08.55.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Nov 2022 08:55:24 -0700 (PDT)
-Received: (nullmailer pid 1880410 invoked by uid 1000);
+ Fri, 04 Nov 2022 08:55:27 -0700 (PDT)
+Received: (nullmailer pid 1880418 invoked by uid 1000);
  Fri, 04 Nov 2022 15:55:18 -0000
 From: Rob Herring <robh@kernel.org>
-Date: Fri, 04 Nov 2022 10:55:01 -0500
-Subject: [PATCH v3 1/8] perf: arm_spe: Use feature numbering for PMSEVFR_EL1
- defines
+Date: Fri, 04 Nov 2022 10:55:05 -0500
+Subject: [PATCH v3 5/8] perf: arm_spe: Use new PMSIDR_EL1 register enums
 MIME-Version: 1.0
-Message-Id: <20220825-arm-spe-v8-7-v3-1-87682f78caac@kernel.org>
+Message-Id: <20220825-arm-spe-v8-7-v3-5-87682f78caac@kernel.org>
 References: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
 In-Reply-To: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
 To: Namhyung Kim <namhyung@kernel.org>, Will Deacon <will@kernel.org>,
@@ -90,58 +89,73 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Similar to commit 121a8fc088f1 ("arm64/sysreg: Use feature numbering for
-PMU and SPE revisions") use feature numbering instead of architecture
-versions for the PMSEVFR_EL1 Res0 defines.
+Now that the SPE register definitions include enums for some PMSIDR_EL1
+fields, use them in the driver in place of magic values.
 
-Tested-by: James Clark <james.clark@arm.com>
 Signed-off-by: Rob Herring <robh@kernel.org>
 ---
-v3:
- - No change
-v2:
- - New patch
+v3: New patch
 ---
- arch/arm64/include/asm/sysreg.h | 6 +++---
- drivers/perf/arm_spe_pmu.c      | 4 ++--
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ drivers/perf/arm_spe_pmu.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 7d301700d1a9..9a4cf12e3e16 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -294,11 +294,11 @@
- #define SYS_PMSFCR_EL1_ST_SHIFT		18
- 
- #define SYS_PMSEVFR_EL1			sys_reg(3, 0, 9, 9, 5)
--#define SYS_PMSEVFR_EL1_RES0_8_2	\
-+#define PMSEVFR_EL1_RES0_IMP	\
- 	(GENMASK_ULL(47, 32) | GENMASK_ULL(23, 16) | GENMASK_ULL(11, 8) |\
- 	 BIT_ULL(6) | BIT_ULL(4) | BIT_ULL(2) | BIT_ULL(0))
--#define SYS_PMSEVFR_EL1_RES0_8_3	\
--	(SYS_PMSEVFR_EL1_RES0_8_2 & ~(BIT_ULL(18) | BIT_ULL(17) | BIT_ULL(11)))
-+#define PMSEVFR_EL1_RES0_V1P1	\
-+	(PMSEVFR_EL1_RES0_IMP & ~(BIT_ULL(18) | BIT_ULL(17) | BIT_ULL(11)))
- 
- #define SYS_PMSLATFR_EL1		sys_reg(3, 0, 9, 9, 6)
- #define SYS_PMSLATFR_EL1_MINLAT_SHIFT	0
 diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-index 00e3a637f7b6..65cf93dcc8ee 100644
+index 9b4bd72087ea..af6d3867c3e7 100644
 --- a/drivers/perf/arm_spe_pmu.c
 +++ b/drivers/perf/arm_spe_pmu.c
-@@ -677,11 +677,11 @@ static u64 arm_spe_pmsevfr_res0(u16 pmsver)
- {
- 	switch (pmsver) {
- 	case ID_AA64DFR0_EL1_PMSVer_IMP:
--		return SYS_PMSEVFR_EL1_RES0_8_2;
-+		return PMSEVFR_EL1_RES0_IMP;
- 	case ID_AA64DFR0_EL1_PMSVer_V1P1:
- 	/* Return the highest version we support in default */
+@@ -1006,32 +1006,32 @@ static void __arm_spe_pmu_dev_probe(void *info)
+ 	/* This field has a spaced out encoding, so just use a look-up */
+ 	fld = FIELD_GET(PMSIDR_EL1_INTERVAL, reg);
+ 	switch (fld) {
+-	case 0:
++	case PMSIDR_EL1_INTERVAL_256:
+ 		spe_pmu->min_period = 256;
+ 		break;
+-	case 2:
++	case PMSIDR_EL1_INTERVAL_512:
+ 		spe_pmu->min_period = 512;
+ 		break;
+-	case 3:
++	case PMSIDR_EL1_INTERVAL_768:
+ 		spe_pmu->min_period = 768;
+ 		break;
+-	case 4:
++	case PMSIDR_EL1_INTERVAL_1024:
+ 		spe_pmu->min_period = 1024;
+ 		break;
+-	case 5:
++	case PMSIDR_EL1_INTERVAL_1536:
+ 		spe_pmu->min_period = 1536;
+ 		break;
+-	case 6:
++	case PMSIDR_EL1_INTERVAL_2048:
+ 		spe_pmu->min_period = 2048;
+ 		break;
+-	case 7:
++	case PMSIDR_EL1_INTERVAL_3072:
+ 		spe_pmu->min_period = 3072;
+ 		break;
  	default:
--		return SYS_PMSEVFR_EL1_RES0_8_3;
-+		return PMSEVFR_EL1_RES0_V1P1;
+ 		dev_warn(dev, "unknown PMSIDR_EL1.Interval [%d]; assuming 8\n",
+ 			 fld);
+ 		fallthrough;
+-	case 8:
++	case PMSIDR_EL1_INTERVAL_4096:
+ 		spe_pmu->min_period = 4096;
  	}
- }
+ 
+@@ -1050,10 +1050,10 @@ static void __arm_spe_pmu_dev_probe(void *info)
+ 		dev_warn(dev, "unknown PMSIDR_EL1.CountSize [%d]; assuming 2\n",
+ 			 fld);
+ 		fallthrough;
+-	case 2:
++	case PMSIDR_EL1_COUNTSIZE_12_BIT_SAT:
+ 		spe_pmu->counter_sz = 12;
+ 		break;
+-	case 3:
++	case PMSIDR_EL1_COUNTSIZE_16_BIT_SAT:
+ 		spe_pmu->counter_sz = 16;
+ 	}
  
 
 -- 
