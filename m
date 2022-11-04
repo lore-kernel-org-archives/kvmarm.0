@@ -2,79 +2,87 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5C2DC43219
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 01:11:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFDBCC4332F
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 01:48:33 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8001E4B1C6;
-	Thu,  3 Nov 2022 21:11:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BD3040DF4;
+	Thu,  3 Nov 2022 21:48:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TD7aLcy09Pjs; Thu,  3 Nov 2022 21:11:19 -0400 (EDT)
+	with ESMTP id 5xdI3I5BSVeP; Thu,  3 Nov 2022 21:48:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60EAC4B125;
-	Thu,  3 Nov 2022 21:11:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CBF240F58;
+	Thu,  3 Nov 2022 21:48:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C15144291D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 21:11:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EEDCC40D0B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 21:48:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id abnntNzbZMpx for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Nov 2022 21:11:16 -0400 (EDT)
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com
- [209.85.128.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9DB644141A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 21:11:16 -0400 (EDT)
-Received: by mail-yw1-f201.google.com with SMTP id
- 00721157ae682-37360a6236fso33636147b3.12
- for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Nov 2022 18:11:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
- :date:from:to:cc:subject:date:message-id:reply-to;
- bh=ZNLPTbSTlYPZjBY9HcgmDn5JBJ/klYO2bN4Z3HIMVZY=;
- b=bwqOOb8Qn4eAWyxn4R+vdMrp7z+X9MlDWhtS2hi7whYYdWkf5FJmAUT0M76zNFvK5c
- GyzhxZ5ilEPl4VxyNPOGGI5u87KZWaJ1KVssckoBO832LOf4XmVPYHCNIjRZdotM/F0J
- qj1sLHsNomzmqZ/nB59WTDwW3KcDU6htZGJrewk9dIdhjOkArVUQSeDtjaXhXp/5erjH
- pGMeBPkgMHqGoItOyxvfZeHzrb0m0uG0h2Zw+/go7QH1C0Uwo43havjN/hLRO/V/Inez
- e9WWTq8U9kdPOCNEajZfZcONdmtEe3Q8gQJwu+MfMee3ynkyU1T5t0Zg2llvErCGZsqA
- Tb1A==
+ with ESMTP id xkbnkq5klzVv for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Nov 2022 21:48:30 -0400 (EDT)
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com
+ [209.85.214.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D2BE340BED
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 21:48:29 -0400 (EDT)
+Received: by mail-pl1-f172.google.com with SMTP id io19so3593760plb.8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Nov 2022 18:48:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ h=content-transfer-encoding:in-reply-to:from:content-language
+ :references:cc:to:subject:user-agent:mime-version:date:message-id
+ :from:to:cc:subject:date:message-id:reply-to;
+ bh=kI2bio8wmQ0tUqhuEplLTLsBHSGHlrsvdLcA5KYXd1o=;
+ b=okJIUsjhGpoSr7ebbtfgAqH0GYDYyL7dOwFsAvIpPQxaUkfj0UP2ubzMSszKzLoSJN
+ v6PakLQ+XxWm79MGsDUXql9IQEZxdMTWbKG81FTHJSY9kzQGK+YsR1OvwDbkE09D1VlJ
+ 4dw4AZi5O9K8lqfRcZFGFnYrPVqUMUcNoMABhjUk0b4JfdXLO0pshLnVS/0Z74PotUp/
+ mlKcoIwavTTTQ18DLNZ1g2AW+XuW2afaA+rYfxRqMHWRPYZsUyIvJriVnnZSrEQKK6le
+ XI6Un19ShxQI7Ey405lypQalZbGVguAIjN21YMsahXg364hurzORypaF2/fKRwCkV3D2
+ vW7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
- :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=ZNLPTbSTlYPZjBY9HcgmDn5JBJ/klYO2bN4Z3HIMVZY=;
- b=sEd3OpHbksZB13hB+QefnflsG5ewQY/EkejJKd3nWj6LzrRIf5NeaFslTLOCUIonZ5
- btIKpOOktHqBmvKfz/vWR2JM6wyziseNHm+0zF4dg/rB1dyB2m+5lSK6qTmQ5xzNWRdF
- CygDA/6tKEsbobYFo4BUCcz/CUFVMk3eJMnxBrfk4eYP+Uo0AAwQnWD0mvLFR3i4ZhHI
- UpXAs1o80Bhz6fVLqz8ENr6LVu276rdWiowmgNd3kCeUAFMsHvka8tX0pPrAgjZ6OJ8X
- tKOjXp2BXWGSDuvhmI1LdkMZT50iUDLf67yAuj52pdNhBJlPUC8Oq/xtAkege4NRA6X4
- 0yaw==
-X-Gm-Message-State: ACrzQf2ksKuDXRIIRFAtbYJz+yo2t0Tm2dmErgaA/O0e9FClunLzqwOS
- jDSUwXzpQO1kEJm4kyXJlnAJWzc=
-X-Google-Smtp-Source: AMsMyM6nmXxJ8Gq+/aWVuDapWKSZFcWfvUUDZ0UKrzoV1+beR/aXVD1kiZHnxs3uVYWp1mJAGj9lGKM=
-X-Received: from pcc-desktop.svl.corp.google.com
- ([2620:15c:2ce:200:2844:b0ec:e556:30d8])
- (user=pcc job=sendgmr) by 2002:a0d:d705:0:b0:36f:f574:49a2 with SMTP id
- z5-20020a0dd705000000b0036ff57449a2mr32986451ywd.442.1667524276250; Thu, 03
- Nov 2022 18:11:16 -0700 (PDT)
-Date: Thu,  3 Nov 2022 18:10:40 -0700
-In-Reply-To: <20221104011041.290951-1-pcc@google.com>
-Message-Id: <20221104011041.290951-8-pcc@google.com>
-Mime-Version: 1.0
-References: <20221104011041.290951-1-pcc@google.com>
-X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Subject: [PATCH v5 7/8] KVM: arm64: permit all VM_MTE_ALLOWED mappings with
- MTE enabled
-From: Peter Collingbourne <pcc@google.com>
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Cornelia Huck <cohuck@redhat.com>,
- Steven Price <steven.price@arm.com>, Marc Zyngier <maz@kernel.org>,
- Vincenzo Frascino <vincenzo.frascino@arm.com>,
- Peter Collingbourne <pcc@google.com>, Evgenii Stepanov <eugenis@google.com>
+ h=content-transfer-encoding:in-reply-to:from:content-language
+ :references:cc:to:subject:user-agent:mime-version:date:message-id
+ :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+ bh=kI2bio8wmQ0tUqhuEplLTLsBHSGHlrsvdLcA5KYXd1o=;
+ b=t9gV82ytHvZGJnTrGgyCfhUixeG4ShPEw3CwdF2+cCduFuJ2iZW38NCNcxLCa4QS2N
+ NLXNa+dXw9lMj0m63HqKAEwTXTNEb9Aif4G7y7yQINp9dUqbp6q0p6pkExC1gv5Sme2A
+ xqv9Ero+sxIHKxJ+ilj4Xh0utL+cuXAZqkPZn6aa1qVcw64KUP5uiBp2LbHQmuMAxeVp
+ bEuk/L2gTz4Bljr2SYrO9D/4eNMW0W+ZY1nVoCD280MZ9EpkNmZhqnlmJq+fiwUje7b6
+ Mo8+yvOamXE6frEAc3vx6l/VC02ygnlIa5txELzlaARtc9hu/pzV1foGATixC34JqK69
+ +F4w==
+X-Gm-Message-State: ACrzQf3pSPHsVrsCpnGAd+ME6PA4dj+1hMVVuhcYq9j6oTYOL39cX2QI
+ YBQG08Z6LM05WlJwH4ENa60=
+X-Google-Smtp-Source: AMsMyM5IldMoiS3xXBLh2Vh0OIVV2RvQ8KbcaI/UFxFMESQqDNIp1EYyZ1RDviZLejrZpnABGqs7Zg==
+X-Received: by 2002:a17:902:f686:b0:187:16a0:fd2b with SMTP id
+ l6-20020a170902f68600b0018716a0fd2bmr27368685plg.91.1667526508865; 
+ Thu, 03 Nov 2022 18:48:28 -0700 (PDT)
+Received: from [192.168.43.80] (subs02-180-214-232-15.three.co.id.
+ [180.214.232.15]) by smtp.gmail.com with ESMTPSA id
+ m5-20020a17090b068500b002132f3e71c6sm592915pjz.52.2022.11.03.18.48.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 03 Nov 2022 18:48:28 -0700 (PDT)
+Message-ID: <4b2b78c6-9903-1247-9d16-fc6270aa34fc@gmail.com>
+Date: Fri, 4 Nov 2022 08:48:21 +0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH] kvm/arm: Fix pvtime documentation
+To: Marc Zyngier <maz@kernel.org>
+References: <20221103131210.3603385-1-usama.arif@bytedance.com>
+ <24d81fe9-7cd1-71eb-8c35-0739f638b3df@gmail.com>
+ <86fsf0qc1w.wl-maz@kernel.org>
+Content-Language: en-US
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+In-Reply-To: <86fsf0qc1w.wl-maz@kernel.org>
+Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ Usama Arif <usama.arif@bytedance.com>, fam.zheng@bytedance.com,
+ punit.agrawal@bytedance.com, linux@armlinux.org.uk, liangma@liangbit.com,
+ steven.price@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,42 +99,21 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Certain VMMs such as crosvm have features (e.g. sandboxing) that depend
-on being able to map guest memory as MAP_SHARED. The current restriction
-on sharing MAP_SHARED pages with the guest is preventing the use of
-those features with MTE. Now that the races between tasks concurrently
-clearing tags on the same page have been fixed, remove this restriction.
+On 11/3/22 22:42, Marc Zyngier wrote:
+> No, this is the correct course of action. There isn't any point in
+> having an *unrelated* change in a separate series. This is a
+> standalone change, posted as a standalone patch.
+> 
+>> Please reroll your series [2] with suggestion applied.
+> 
+> Or not.
+> 
 
-Note that this is a relaxation of the ABI.
+You mean the series before this patch have already been applied,
+right?
 
-Signed-off-by: Peter Collingbourne <pcc@google.com>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-Reviewed-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/kvm/mmu.c | 8 --------
- 1 file changed, 8 deletions(-)
-
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9ff9a271cf01..b9402d8b5a90 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1110,14 +1110,6 @@ static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
- 
- static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
- {
--	/*
--	 * VM_SHARED mappings are not allowed with MTE to avoid races
--	 * when updating the PG_mte_tagged page flag, see
--	 * sanitise_mte_tags for more details.
--	 */
--	if (vma->vm_flags & VM_SHARED)
--		return false;
--
- 	return vma->vm_flags & VM_MTE_ALLOWED;
- }
- 
 -- 
-2.38.1.431.g37b22c650d-goog
+An old man doll... just what I always wanted! - Clara
 
 _______________________________________________
 kvmarm mailing list
