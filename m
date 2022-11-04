@@ -1,113 +1,170 @@
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A35AAD56
-	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 22:23:10 +0000 (UTC)
-Date: Fri, 4 Nov 2022 22:23:02 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1667600588;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F3C2F3C
+	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 23:41:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1667605272;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=43rE8449ZA7RnQbWm7rB14AGuyEAs2Cqf2MmYOuEeis=;
-	b=KtO70yIWLIG65aNkmLBqbApAYzf4PgA71drYUOQAG8xzy0NEoAqLDq4/w2l90ngnhFpWc/
-	yz4Ebn90BVG8oNXY86Y2/ZaEQ/hixZVScNXKqeCwZDFD0IURuVETOP+Gi91qdk5xk0fV+z
-	HOA3H4/lWXP8+b4Y+SW+fxTcDgXqRug=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Gavin Shan <gshan@redhat.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
-	ajones@ventanamicro.com, maz@kernel.org, bgardon@google.com,
-	catalin.marinas@arm.com, dmatlack@google.com, will@kernel.org,
-	pbonzini@redhat.com, peterx@redhat.com, seanjc@google.com,
-	james.morse@arm.com, shuah@kernel.org, suzuki.poulose@arm.com,
-	alexandru.elisei@arm.com, zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v7 4/9] KVM: Support dirty ring in conjunction with bitmap
-Message-ID: <Y2WQxsgOBZwzWzPq@google.com>
-References: <20221031003621.164306-1-gshan@redhat.com>
- <20221031003621.164306-5-gshan@redhat.com>
- <Y2RPhwIUsGLQ2cz/@google.com>
- <d5b86a73-e030-7ce3-e5f3-301f4f505323@redhat.com>
- <Y2RlfkyQMCtD6Rbh@google.com>
- <d7e45de0-bff6-7d8c-4bf4-1a09e8acb726@redhat.com>
- <Y2VyMwAlg7U9pXzV@google.com>
- <f2d95d47-6411-8d01-14eb-5e17e1a16dbf@redhat.com>
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=XWxgwafshZIITRYDM/RSB09f3dY5+w75t0i+zCM8F8E=;
+	b=KF9YTJhHlVLZqYOqTJaNO0Zo3QET4Lx8B2p7ex0ByfLE8sMFlNJAyNcJubF/mmNRimJsDD
+	o1XA618WnUleYuaApW89lxuAmqC4Fqws5uF22BZ+3cvRBrsI7c87FyLTm/dBS1Mn8qGSTb
+	5IkXl2+wYKUklOuFcg+KHg1OAWa+Yc0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-589-zgzoIETZNWmtuv6fOn29OA-1; Fri, 04 Nov 2022 19:41:09 -0400
+X-MC-Unique: zgzoIETZNWmtuv6fOn29OA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 65932101A528;
+	Fri,  4 Nov 2022 23:41:02 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-78.bne.redhat.com [10.64.54.78])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A247E4A9254;
+	Fri,  4 Nov 2022 23:40:55 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: kvmarm@lists.linux.dev
+Cc: kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org,
+	shuah@kernel.org,
+	catalin.marinas@arm.com,
+	andrew.jones@linux.dev,
+	ajones@ventanamicro.com,
+	bgardon@google.com,
+	dmatlack@google.com,
+	will@kernel.org,
+	suzuki.poulose@arm.com,
+	alexandru.elisei@arm.com,
+	pbonzini@redhat.com,
+	maz@kernel.org,
+	peterx@redhat.com,
+	seanjc@google.com,
+	oliver.upton@linux.dev,
+	zhenyzha@redhat.com,
+	shan.gavin@gmail.com
+Subject: [PATCH v8 0/7] KVM: arm64: Enable ring-based dirty memory tracking
+Date: Sat,  5 Nov 2022 07:40:42 +0800
+Message-ID: <20221104234049.25103-1-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f2d95d47-6411-8d01-14eb-5e17e1a16dbf@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221104222302.9jYSVuGHs3A_EcIvzUVRSaLZyQ6U69Ji6xN5qBIPbTI@z>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Message-ID: <20221104234042.Ru0HMOjC2N4lBcF45U7Igjnol_Qo5MgBmqE97OmM9uQ@z>
 
-On Sat, Nov 05, 2022 at 05:57:33AM +0800, Gavin Shan wrote:
-> On 11/5/22 4:12 AM, Oliver Upton wrote:
-> > I agree that we should address (1) like this, but in (2) requiring that
-> > no memslots were created before enabling the existing capabilities would
-> > be a change in ABI. If we can get away with that, great, but otherwise
-> > we may need to delete the bitmaps associated with all memslots when the
-> > cap is enabled.
-> > 
-> 
-> I had the assumption QEMU and kvm/selftests are the only consumers to
-> use DIRTY_RING. In this case, requiring that no memslots were created
-> to enable DIRTY_RING won't break userspace.
-> Following your thoughts, the tracked dirty pages in the bitmap also
-> need to be synchronized to the per-vcpu-ring before the bitmap can be
-> destroyed.
+This series enables the ring-based dirty memory tracking for ARM64.
+The feature has been available and enabled on x86 for a while. It
+is beneficial when the number of dirty pages is small in a checkpointing
+system or live migration scenario. More details can be found from
+fb04a1eddb1a ("KVM: X86: Implement ring-based dirty memory tracking").
 
-Eh, I don't think we'd need to go that far. No matter what, any dirty
-bits that were present in the bitmap could never be read again anyway,
-as we reject KVM_GET_DIRTY_LOG if kvm->dirty_ring_size != 0.
+This series is applied to v6.1.rc3, plus commit c227590467cb ("KVM:
+Check KVM_CAP_DIRTY_LOG_{RING, RING_ACQ_REL} prior to enabling them").
+The commit is currently in Marc's 'fixes' branch, targeting v6.1.rc4/5.
 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 91cf51a25394..420cc101a16e 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -4588,6 +4588,32 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
-> >   			return -EINVAL;
-> >   		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
-> > +
-> > +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP: {
-> > +		struct kvm_memslots *slots;
-> > +		int r = -EINVAL;
-> > +
-> > +		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
-> > +		    !kvm->dirty_ring_size)
-> > +			return r;
-> > +
-> > +		mutex_lock(&kvm->slots_lock);
-> > +
-> > +		slots = kvm_memslots(kvm);
-> > +
-> > +		/*
-> > +		 * Avoid a race between memslot creation and enabling the ring +
-> > +		 * bitmap capability to guarantee that no memslots have been
-> > +		 * created without a bitmap.
-> > +		 */
-> > +		if (kvm_memslots_empty(slots)) {
-> > +			kvm->dirty_ring_with_bitmap = cap->args[0];
-> > +			r = 0;
-> > +		}
-> > +
-> > +		mutex_unlock(&kvm->slots_lock);
-> > +		return r;
-> > +	}
-> >   	default:
-> >   		return kvm_vm_ioctl_enable_cap(kvm, cap);
-> >   	}
-> > 
-> 
-> The proposed changes look good to me. It will be integrated to PATCH[v8 4/9].
-> By the way, v8 will be posted shortly.
+v7: https://lore.kernel.org/kvmarm/20221031003621.164306-1-gshan@redhat.com/
+v6: https://lore.kernel.org/kvmarm/20221011061447.131531-1-gshan@redhat.com/
+v5: https://lore.kernel.org/all/20221005004154.83502-1-gshan@redhat.com/
+v4: https://lore.kernel.org/kvmarm/20220927005439.21130-1-gshan@redhat.com/
+v3: https://lore.kernel.org/r/20220922003214.276736-1-gshan@redhat.com
+v2: https://lore.kernel.org/lkml/YyiV%2Fl7O23aw5aaO@xz-m1.local/T/
+v1: https://lore.kernel.org/lkml/20220819005601.198436-1-gshan@redhat.com
 
-Excellent, thanks!
+Testing
+=======
+(1) kvm/selftests/dirty_log_test
+(2) Live migration by QEMU
 
---
-Best,
-Oliver
+Changelog
+=========
+v8:
+  * Pick review-by and ack-by                                   (Peter/Sean)
+  * Drop chunk of code to clear KVM_REQ_DIRTY_RING_SOFT_FULL
+    in kvm_dirty_ring_reset(). Add comments to say the event
+    will be cleared by the VCPU thread next time when it enters
+    the guest. All other changes related to kvm_dirty_ring_reset()
+    are dropped in PATCH[v8 1/7].                               (Sean/Peter/Marc)
+  * Drop PATCH[v7 3/7] since it has been merged                 (Marc/Oliver)
+  * Document the order of DIRTY_RING_{ACQ_REL, WITH_BITMAP},
+    add check to ensure no memslots are created when
+    DIRTY_RING_WITH_BITMAP is enabled, and add weak function
+    kvm_arch_allow_write_without_running_vcpu() in PATCH[v8 3/7] (Oliver)
+  * Only keep ourself out of non-running-vcpu radar when vgic/its
+    tables are being saved in PATCH[v8 4/7]                      (Marc/Sean)
+v7:
+  * Cut down #ifdef, avoid using 'container_of()', move the
+    dirty-ring check after KVM_REQ_VM_DEAD, add comments
+    for kvm_dirty_ring_check_request(), use tab character
+    for KVM event definitions in kvm_host.h in PATCH[v7 01]    (Sean)
+  * Add PATCH[v7 03] to recheck if the capability has
+    been advertised prior to enable RING/RING_ACEL_REL         (Sean)
+  * Improve the description about capability RING_WITH_BITMAP,
+    rename kvm_dirty_ring_exclusive() to kvm_use_dirty_bitmap()
+    in PATCH[v7 04/09]                                         (Peter/Oliver/Sean)
+  * Add PATCH[v7 05/09] to improve no-running-vcpu report      (Marc/Sean)
+  * Improve commit messages                                    (Sean/Oliver)
+v6:
+  * Add CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP, for arm64
+    to advertise KVM_CAP_DIRTY_RING_WITH_BITMAP in
+    PATCH[v6 3/8]                                              (Oliver/Peter)
+  * Add helper kvm_dirty_ring_exclusive() to check if
+    traditional bitmap-based dirty log tracking is
+    exclusive to dirty-ring in PATCH[v6 3/8]                   (Peter)
+  * Enable KVM_CAP_DIRTY_RING_WITH_BITMAP in PATCH[v6 5/8]     (Gavin)
+v5:
+  * Drop empty stub kvm_dirty_ring_check_request()             (Marc/Peter)
+  * Add PATCH[v5 3/7] to allow using bitmap, indicated by
+    KVM_CAP_DIRTY_LOG_RING_ALLOW_BITMAP                        (Marc/Peter)
+v4:
+  * Commit log improvement                                     (Marc)
+  * Add helper kvm_dirty_ring_check_request()                  (Marc)
+  * Drop ifdef for kvm_cpu_dirty_log_size()                    (Marc)
+v3:
+  * Check KVM_REQ_RING_SOFT_RULL inside kvm_request_pending()  (Peter)
+  * Move declaration of kvm_cpu_dirty_log_size()               (test-robot)
+v2:
+  * Introduce KVM_REQ_RING_SOFT_FULL                           (Marc)
+  * Changelog improvement                                      (Marc)
+  * Fix dirty_log_test without knowing host page size          (Drew)
+
+Gavin Shan (7):
+  KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
+  KVM: Move declaration of kvm_cpu_dirty_log_size() to kvm_dirty_ring.h
+  KVM: Support dirty ring in conjunction with bitmap
+  KVM: arm64: Enable ring-based dirty memory tracking
+  KVM: selftests: Use host page size to map ring buffer in
+    dirty_log_test
+  KVM: selftests: Clear dirty ring states between two modes in
+    dirty_log_test
+  KVM: selftests: Automate choosing dirty ring size in dirty_log_test
+
+ Documentation/virt/kvm/api.rst               | 35 ++++++++++---
+ arch/arm64/include/uapi/asm/kvm.h            |  1 +
+ arch/arm64/kvm/Kconfig                       |  2 +
+ arch/arm64/kvm/arm.c                         |  3 ++
+ arch/arm64/kvm/mmu.c                         | 15 ++++++
+ arch/arm64/kvm/vgic/vgic-its.c               |  3 ++
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c           |  7 +++
+ arch/x86/include/asm/kvm_host.h              |  2 -
+ arch/x86/kvm/x86.c                           | 15 +++---
+ include/kvm/arm_vgic.h                       |  2 +
+ include/linux/kvm_dirty_ring.h               | 20 +++++---
+ include/linux/kvm_host.h                     | 10 ++--
+ include/uapi/linux/kvm.h                     |  1 +
+ tools/testing/selftests/kvm/dirty_log_test.c | 53 ++++++++++++++------
+ tools/testing/selftests/kvm/lib/kvm_util.c   |  2 +-
+ virt/kvm/Kconfig                             |  8 +++
+ virt/kvm/dirty_ring.c                        | 42 +++++++++++++++-
+ virt/kvm/kvm_main.c                          | 52 +++++++++++++++----
+ 18 files changed, 214 insertions(+), 59 deletions(-)
+
+-- 
+2.23.0
+
