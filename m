@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C274C4332F
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 01:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B446C4332F
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Nov 2022 01:11:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C175249F38;
-	Thu,  3 Nov 2022 21:11:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A25BC49A51;
+	Thu,  3 Nov 2022 21:11:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pLUlJSA11wiP; Thu,  3 Nov 2022 21:11:09 -0400 (EDT)
+	with ESMTP id H0YLsDWZcEwq; Thu,  3 Nov 2022 21:11:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9598E43479;
-	Thu,  3 Nov 2022 21:11:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B75C143479;
+	Thu,  3 Nov 2022 21:11:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC70741070
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 21:11:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 528FC410AD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 21:11:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0WI3l9eLvmNp for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id mh3ZK5mpNa1S for <kvmarm@lists.cs.columbia.edu>;
  Thu,  3 Nov 2022 21:11:07 -0400 (EDT)
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com
- [209.85.128.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6580243399
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 21:11:07 -0400 (EDT)
-Received: by mail-yw1-f201.google.com with SMTP id
- 00721157ae682-360b9418f64so33434527b3.7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Nov 2022 18:11:07 -0700 (PDT)
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
+ [209.85.219.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CDD2B410F1
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Nov 2022 21:11:04 -0400 (EDT)
+Received: by mail-yb1-f202.google.com with SMTP id
+ 205-20020a2503d6000000b006d2132f6f85so1983882ybd.16
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Nov 2022 18:11:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
  :date:from:to:cc:subject:date:message-id:reply-to;
- bh=8wvPVNBIGqPordV4VqCP60h9NBW3OrQ+oktJeQ7thTw=;
- b=A+A0tEpthLB+uuGmFa5yS0IHcK7j38Tj0ebvhxSMPg5emU5TZZt2mYe9MZh7RAtr0y
- Ps00sS0Er2FbYA2csEblRJ1UfNxH9upYvLoLCdEkMyFMXQBFOhNaC2MCVmmTypPwANaO
- vJUmDW5hpXkvRUy2dJnOSd+c2zABMrXNOESfwAiNk9IO2oZPq1WieXohqRV2p1kj+aO3
- w11BWq3t4PIQVWPI1rpRlsVI+HWzbrfNvVm/toq/WiprZlRhhvXKwv1BkHKFv0oDtHxC
- SsTRY97Q6pnqX6cUoNLCT9g9pBtiOytIELUkyKORJXfQh5+ohRzxLE7H8/lfP8qosxxz
- oojg==
+ bh=enKd+t4eJv1iCVLwU/CpdgqOFVo2JUX/2BgM5ys+4Is=;
+ b=ROwcrVfpbkHzp7VSmZVNOZJLwQa3cQ+T6sLG9zIhwaI5ZspQ86U37ISNiHCDGpGP+B
+ 2C2pEItFIGDkQS/V7jwmaAxaqpXWeM+RJ2vm8Z5QAk2QeI08VAfwyDr6qhO5LwJ3OXZU
+ fhLLp9LwXBf3JQ/IqUmOCBvEzztdh7ltWIwn5oVPbwf6L6xwJnK738Puxt6IVqATlkt1
+ NhqsBivKF5zAiBJa/nk3uA/IgYBRbAF40JhuAjK/59HnOkIzYlEaj/mczIZl7k/hz6CD
+ JpZuwjHYrkLIHPTluZvg1e9L7vrEOsuMQ1Kh8KjV81zb28LGQABce6/iJrbzEvkaCJwm
+ 7G2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
  :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=8wvPVNBIGqPordV4VqCP60h9NBW3OrQ+oktJeQ7thTw=;
- b=uBNe9tgeXOVbsEQQq9Qt4TtIusNy7bhhxYV+X+7sQrmeHQDLjMMbCFn9geUnYuGwIi
- 87y6nLgjsctXQMwv83WYZ8zVWBnMtaTmvX/8I+Z0OCUco1tYIXvmGO7ygTqV65/8+wir
- buVW9ZIuesitsHNyHTahUUOso1HO2rHH3879booeDiln1r7KbH0mVYnZAyFEH2mHA7Uq
- mXYifotOHHtnRhbvrOefxTGP7EU50kO71ZYAZuTJ6EqBM+z0HZviMYPP64ZjNQY5ZR8P
- pXuBkvdgJxyr7alnWcAeWg7KYAvJdbFyXnwolUcAvM7YnTWs1o/qUaTrp9hl1N2gieRB
- qrUQ==
-X-Gm-Message-State: ANoB5pk7846WmgujStI9qDrolB+z37K06oEwNKjcBFkkGAIM6dFvi/IV
- eFlNZuzS7wKSmuEJ+CF294R/OF4=
-X-Google-Smtp-Source: AA0mqf6aCG6H1JcdeUQvIHj3QDAK9Uph6TKu2Ix1eLoqmjpSVgiU9fa0kE/LaoMn+PfmE2uXJxHiEHw=
+ bh=enKd+t4eJv1iCVLwU/CpdgqOFVo2JUX/2BgM5ys+4Is=;
+ b=tVIf2OwOD1eWJXoROSC7iX0VLAvBuTZxfLkpxRvRnSNiNsXVwnamLh8jsF/hwew7Kr
+ T1PsRV0W+YWGdvrxqvtxS9gPy7egcSD+Qk9xcOh6/M2bIvHU7zcXFG36oqMF8B69mq3k
+ EdcMT2dqQHqgC/C7ouKHZ68b5ufsddRi6Gsk7ERzIIY2df5paUUtYzIRYlTzNsKlbrJm
+ HsjPbeQ5BxpB2bjjTLFORTvJeLFs1EZ8F4Uj9CXcHvfK6+Hhu7ee+EqMo5i1J6mqfKjF
+ P/Gl693Crs/Kh8DtwqxOwpeC326EmOMx50XCwgOmlOqL23dE4aqq9P3dkTEIA82smzUA
+ ag1Q==
+X-Gm-Message-State: ACrzQf2XhjNv6fnkQ/D0GhXfU02OVB42wXpdfmhYL6nHRfhhsgtVNPZz
+ ZeEcycbqF7azI79/E13nCFCDNgU=
+X-Google-Smtp-Source: AMsMyM6OWmcMcz5nWUA2j7ban26mEKWLjlVaESKinRAIU1AT6Rl42zJnvWiPQfwAeLGfN170IwUH000=
 X-Received: from pcc-desktop.svl.corp.google.com
  ([2620:15c:2ce:200:2844:b0ec:e556:30d8])
- (user=pcc job=sendgmr) by 2002:a25:234f:0:b0:6d2:f2e8:c131 with SMTP id
- j76-20020a25234f000000b006d2f2e8c131mr31156ybj.418.1667524266424; Thu, 03 Nov
- 2022 18:11:06 -0700 (PDT)
-Date: Thu,  3 Nov 2022 18:10:36 -0700
+ (user=pcc job=sendgmr) by 2002:a25:6ec3:0:b0:6b4:22f8:10df with SMTP id
+ j186-20020a256ec3000000b006b422f810dfmr31472467ybc.444.1667524264438; Thu, 03
+ Nov 2022 18:11:04 -0700 (PDT)
+Date: Thu,  3 Nov 2022 18:10:35 -0700
 In-Reply-To: <20221104011041.290951-1-pcc@google.com>
-Message-Id: <20221104011041.290951-4-pcc@google.com>
+Message-Id: <20221104011041.290951-3-pcc@google.com>
 Mime-Version: 1.0
 References: <20221104011041.290951-1-pcc@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Subject: [PATCH v5 3/8] KVM: arm64: Simplify the sanitise_mte_tags() logic
+Subject: [PATCH v5 2/8] arm64: mte: Fix/clarify the PG_mte_tagged semantics
 From: Peter Collingbourne <pcc@google.com>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Peter Collingbourne <pcc@google.com>,
@@ -92,122 +92,288 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Catalin Marinas <catalin.marinas@arm.com>
 
-Currently sanitise_mte_tags() checks if it's an online page before
-attempting to sanitise the tags. Such detection should be done in the
-caller via the VM_MTE_ALLOWED vma flag. Since kvm_set_spte_gfn() does
-not have the vma, leave the page unmapped if not already tagged. Tag
-initialisation will be done on a subsequent access fault in
+Currently the PG_mte_tagged page flag mostly means the page contains
+valid tags and it should be set after the tags have been cleared or
+restored. However, in mte_sync_tags() it is set before setting the tags
+to avoid, in theory, a race with concurrent mprotect(PROT_MTE) for
+shared pages. However, a concurrent mprotect(PROT_MTE) with a copy on
+write in another thread can cause the new page to have stale tags.
+Similarly, tag reading via ptrace() can read stale tags if the
+PG_mte_tagged flag is set before actually clearing/restoring the tags.
+
+Fix the PG_mte_tagged semantics so that it is only set after the tags
+have been cleared or restored. This is safe for swap restoring into a
+MAP_SHARED or CoW page since the core code takes the page lock. Add two
+functions to test and set the PG_mte_tagged flag with acquire and
+release semantics. The downside is that concurrent mprotect(PROT_MTE) on
+a MAP_SHARED page may cause tag loss. This is already the case for KVM
+guests if a VMM changes the page protection while the guest triggers a
 user_mem_abort().
 
 Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
-[pcc@google.com: fix the page initializer]
+[pcc@google.com: fix build with CONFIG_ARM64_MTE disabled]
 Signed-off-by: Peter Collingbourne <pcc@google.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Reviewed-by: Steven Price <steven.price@arm.com>
 Cc: Will Deacon <will@kernel.org>
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Peter Collingbourne <pcc@google.com>
 ---
- arch/arm64/kvm/mmu.c | 40 +++++++++++++++-------------------------
- 1 file changed, 15 insertions(+), 25 deletions(-)
+ arch/arm64/include/asm/mte.h     | 30 ++++++++++++++++++++++++++++++
+ arch/arm64/include/asm/pgtable.h |  2 +-
+ arch/arm64/kernel/cpufeature.c   |  4 +++-
+ arch/arm64/kernel/elfcore.c      |  2 +-
+ arch/arm64/kernel/hibernate.c    |  2 +-
+ arch/arm64/kernel/mte.c          | 17 +++++++++++------
+ arch/arm64/kvm/guest.c           |  4 ++--
+ arch/arm64/kvm/mmu.c             |  4 ++--
+ arch/arm64/mm/copypage.c         |  5 +++--
+ arch/arm64/mm/fault.c            |  2 +-
+ arch/arm64/mm/mteswap.c          |  2 +-
+ 11 files changed, 56 insertions(+), 18 deletions(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 2c3759f1f2c5..e81bfb730629 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1091,23 +1091,14 @@ static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
-  * - mmap_lock protects between a VM faulting a page in and the VMM performing
-  *   an mprotect() to add VM_MTE
-  */
--static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
--			     unsigned long size)
-+static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
-+			      unsigned long size)
+diff --git a/arch/arm64/include/asm/mte.h b/arch/arm64/include/asm/mte.h
+index 760c62f8e22f..3f8199ba265a 100644
+--- a/arch/arm64/include/asm/mte.h
++++ b/arch/arm64/include/asm/mte.h
+@@ -37,6 +37,29 @@ void mte_free_tag_storage(char *storage);
+ /* track which pages have valid allocation tags */
+ #define PG_mte_tagged	PG_arch_2
+ 
++static inline void set_page_mte_tagged(struct page *page)
++{
++	/*
++	 * Ensure that the tags written prior to this function are visible
++	 * before the page flags update.
++	 */
++	smp_wmb();
++	set_bit(PG_mte_tagged, &page->flags);
++}
++
++static inline bool page_mte_tagged(struct page *page)
++{
++	bool ret = test_bit(PG_mte_tagged, &page->flags);
++
++	/*
++	 * If the page is tagged, ensure ordering with a likely subsequent
++	 * read of the tags.
++	 */
++	if (ret)
++		smp_rmb();
++	return ret;
++}
++
+ void mte_zero_clear_page_tags(void *addr);
+ void mte_sync_tags(pte_t old_pte, pte_t pte);
+ void mte_copy_page_tags(void *kto, const void *kfrom);
+@@ -56,6 +79,13 @@ size_t mte_probe_user_range(const char __user *uaddr, size_t size);
+ /* unused if !CONFIG_ARM64_MTE, silence the compiler */
+ #define PG_mte_tagged	0
+ 
++static inline void set_page_mte_tagged(struct page *page)
++{
++}
++static inline bool page_mte_tagged(struct page *page)
++{
++	return false;
++}
+ static inline void mte_zero_clear_page_tags(void *addr)
  {
- 	unsigned long i, nr_pages = size >> PAGE_SHIFT;
--	struct page *page;
-+	struct page *page = pfn_to_page(pfn);
- 
- 	if (!kvm_has_mte(kvm))
--		return 0;
--
--	/*
--	 * pfn_to_online_page() is used to reject ZONE_DEVICE pages
--	 * that may not support tags.
--	 */
--	page = pfn_to_online_page(pfn);
--
--	if (!page)
--		return -EFAULT;
-+		return;
- 
- 	for (i = 0; i < nr_pages; i++, page++) {
- 		if (!page_mte_tagged(page)) {
-@@ -1115,8 +1106,6 @@ static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
- 			set_page_mte_tagged(page);
- 		}
- 	}
--
--	return 0;
+ }
+diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+index 4873c1d6e7d0..c6a2d8891d2a 100644
+--- a/arch/arm64/include/asm/pgtable.h
++++ b/arch/arm64/include/asm/pgtable.h
+@@ -1048,7 +1048,7 @@ static inline void arch_swap_invalidate_area(int type)
+ static inline void arch_swap_restore(swp_entry_t entry, struct folio *folio)
+ {
+ 	if (system_supports_mte() && mte_restore_tags(entry, &folio->page))
+-		set_bit(PG_mte_tagged, &folio->flags);
++		set_page_mte_tagged(&folio->page);
  }
  
- static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-@@ -1127,7 +1116,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	bool write_fault, writable, force_pte = false;
- 	bool exec_fault;
- 	bool device = false;
--	bool shared;
- 	unsigned long mmu_seq;
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
-@@ -1177,8 +1165,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		vma_shift = get_vma_page_shift(vma, hva);
- 	}
+ #endif /* CONFIG_ARM64_MTE */
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 6062454a9067..df11cfe61fcb 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2050,8 +2050,10 @@ static void cpu_enable_mte(struct arm64_cpu_capabilities const *cap)
+ 	 * Clear the tags in the zero page. This needs to be done via the
+ 	 * linear map which has the Tagged attribute.
+ 	 */
+-	if (!test_and_set_bit(PG_mte_tagged, &ZERO_PAGE(0)->flags))
++	if (!page_mte_tagged(ZERO_PAGE(0))) {
+ 		mte_clear_page_tags(lm_alias(empty_zero_page));
++		set_page_mte_tagged(ZERO_PAGE(0));
++	}
  
--	shared = (vma->vm_flags & VM_SHARED);
--
- 	switch (vma_shift) {
- #ifndef __PAGETABLE_PMD_FOLDED
- 	case PUD_SHIFT:
-@@ -1299,12 +1285,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	kasan_init_hw_tags_cpu();
+ }
+diff --git a/arch/arm64/kernel/elfcore.c b/arch/arm64/kernel/elfcore.c
+index 27ef7ad3ffd2..353009d7f307 100644
+--- a/arch/arm64/kernel/elfcore.c
++++ b/arch/arm64/kernel/elfcore.c
+@@ -47,7 +47,7 @@ static int mte_dump_tag_range(struct coredump_params *cprm,
+ 		 * Pages mapped in user space as !pte_access_permitted() (e.g.
+ 		 * PROT_EXEC only) may not have the PG_mte_tagged flag set.
+ 		 */
+-		if (!test_bit(PG_mte_tagged, &page->flags)) {
++		if (!page_mte_tagged(page)) {
+ 			put_page(page);
+ 			dump_skip(cprm, MTE_PAGE_TAG_STORAGE);
+ 			continue;
+diff --git a/arch/arm64/kernel/hibernate.c b/arch/arm64/kernel/hibernate.c
+index af5df48ba915..788597a6b6a2 100644
+--- a/arch/arm64/kernel/hibernate.c
++++ b/arch/arm64/kernel/hibernate.c
+@@ -271,7 +271,7 @@ static int swsusp_mte_save_tags(void)
+ 			if (!page)
+ 				continue;
  
- 	if (fault_status != FSC_PERM && !device && kvm_has_mte(kvm)) {
- 		/* Check the VMM hasn't introduced a new VM_SHARED VMA */
--		if (!shared)
--			ret = sanitise_mte_tags(kvm, pfn, vma_pagesize);
--		else
-+		if ((vma->vm_flags & VM_MTE_ALLOWED) &&
-+		    !(vma->vm_flags & VM_SHARED)) {
-+			sanitise_mte_tags(kvm, pfn, vma_pagesize);
-+		} else {
- 			ret = -EFAULT;
--		if (ret)
- 			goto out_unlock;
+-			if (!test_bit(PG_mte_tagged, &page->flags))
++			if (!page_mte_tagged(page))
+ 				continue;
+ 
+ 			ret = save_tags(page, pfn);
+diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
+index 7467217c1eaf..84a085d536f8 100644
+--- a/arch/arm64/kernel/mte.c
++++ b/arch/arm64/kernel/mte.c
+@@ -41,8 +41,10 @@ static void mte_sync_page_tags(struct page *page, pte_t old_pte,
+ 	if (check_swap && is_swap_pte(old_pte)) {
+ 		swp_entry_t entry = pte_to_swp_entry(old_pte);
+ 
+-		if (!non_swap_entry(entry) && mte_restore_tags(entry, page))
++		if (!non_swap_entry(entry) && mte_restore_tags(entry, page)) {
++			set_page_mte_tagged(page);
+ 			return;
 +		}
  	}
  
- 	if (writable)
-@@ -1526,15 +1513,18 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 	if (!pte_is_tagged)
+@@ -52,8 +54,10 @@ static void mte_sync_page_tags(struct page *page, pte_t old_pte,
+ 	 * Test PG_mte_tagged again in case it was racing with another
+ 	 * set_pte_at().
+ 	 */
+-	if (!test_and_set_bit(PG_mte_tagged, &page->flags))
++	if (!page_mte_tagged(page)) {
+ 		mte_clear_page_tags(page_address(page));
++		set_page_mte_tagged(page);
++	}
+ }
+ 
+ void mte_sync_tags(pte_t old_pte, pte_t pte)
+@@ -69,9 +73,11 @@ void mte_sync_tags(pte_t old_pte, pte_t pte)
+ 
+ 	/* if PG_mte_tagged is set, tags have already been initialised */
+ 	for (i = 0; i < nr_pages; i++, page++) {
+-		if (!test_bit(PG_mte_tagged, &page->flags))
++		if (!page_mte_tagged(page)) {
+ 			mte_sync_page_tags(page, old_pte, check_swap,
+ 					   pte_is_tagged);
++			set_page_mte_tagged(page);
++		}
+ 	}
+ 
+ 	/* ensure the tags are visible before the PTE is set */
+@@ -96,8 +102,7 @@ int memcmp_pages(struct page *page1, struct page *page2)
+ 	 * pages is tagged, set_pte_at() may zero or change the tags of the
+ 	 * other page via mte_sync_tags().
+ 	 */
+-	if (test_bit(PG_mte_tagged, &page1->flags) ||
+-	    test_bit(PG_mte_tagged, &page2->flags))
++	if (page_mte_tagged(page1) || page_mte_tagged(page2))
+ 		return addr1 != addr2;
+ 
+ 	return ret;
+@@ -454,7 +459,7 @@ static int __access_remote_tags(struct mm_struct *mm, unsigned long addr,
+ 			put_page(page);
+ 			break;
+ 		}
+-		WARN_ON_ONCE(!test_bit(PG_mte_tagged, &page->flags));
++		WARN_ON_ONCE(!page_mte_tagged(page));
+ 
+ 		/* limit access to the end of the page */
+ 		offset = offset_in_page(addr);
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 2ff13a3f8479..817fdd1ab778 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -1059,7 +1059,7 @@ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 		maddr = page_address(page);
+ 
+ 		if (!write) {
+-			if (test_bit(PG_mte_tagged, &page->flags))
++			if (page_mte_tagged(page))
+ 				num_tags = mte_copy_tags_to_user(tags, maddr,
+ 							MTE_GRANULES_PER_PAGE);
+ 			else
+@@ -1076,7 +1076,7 @@ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 			 * completed fully
+ 			 */
+ 			if (num_tags == MTE_GRANULES_PER_PAGE)
+-				set_bit(PG_mte_tagged, &page->flags);
++				set_page_mte_tagged(page);
+ 
+ 			kvm_release_pfn_dirty(pfn);
+ 		}
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 60ee3d9f01f8..2c3759f1f2c5 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1110,9 +1110,9 @@ static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+ 		return -EFAULT;
+ 
+ 	for (i = 0; i < nr_pages; i++, page++) {
+-		if (!test_bit(PG_mte_tagged, &page->flags)) {
++		if (!page_mte_tagged(page)) {
+ 			mte_clear_page_tags(page_address(page));
+-			set_bit(PG_mte_tagged, &page->flags);
++			set_page_mte_tagged(page);
+ 		}
+ 	}
+ 
+diff --git a/arch/arm64/mm/copypage.c b/arch/arm64/mm/copypage.c
+index 24913271e898..731d8a35701e 100644
+--- a/arch/arm64/mm/copypage.c
++++ b/arch/arm64/mm/copypage.c
+@@ -21,9 +21,10 @@ void copy_highpage(struct page *to, struct page *from)
+ 
+ 	copy_page(kto, kfrom);
+ 
+-	if (system_supports_mte() && test_bit(PG_mte_tagged, &from->flags)) {
+-		set_bit(PG_mte_tagged, &to->flags);
++	if (system_supports_mte() && page_mte_tagged(from)) {
++		page_kasan_tag_reset(to);
+ 		mte_copy_page_tags(kto, kfrom);
++		set_page_mte_tagged(to);
+ 	}
+ }
+ EXPORT_SYMBOL(copy_highpage);
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index 3e9cf9826417..e09e0344c7a7 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -938,5 +938,5 @@ struct page *alloc_zeroed_user_highpage_movable(struct vm_area_struct *vma,
+ void tag_clear_highpage(struct page *page)
  {
- 	kvm_pfn_t pfn = pte_pfn(range->pte);
--	int ret;
+ 	mte_zero_clear_page_tags(page_address(page));
+-	set_bit(PG_mte_tagged, &page->flags);
++	set_page_mte_tagged(page);
+ }
+diff --git a/arch/arm64/mm/mteswap.c b/arch/arm64/mm/mteswap.c
+index bed803d8e158..70f913205db9 100644
+--- a/arch/arm64/mm/mteswap.c
++++ b/arch/arm64/mm/mteswap.c
+@@ -24,7 +24,7 @@ int mte_save_tags(struct page *page)
+ {
+ 	void *tag_storage, *ret;
  
- 	if (!kvm->arch.mmu.pgt)
- 		return false;
+-	if (!test_bit(PG_mte_tagged, &page->flags))
++	if (!page_mte_tagged(page))
+ 		return 0;
  
- 	WARN_ON(range->end - range->start != 1);
- 
--	ret = sanitise_mte_tags(kvm, pfn, PAGE_SIZE);
--	if (ret)
-+	/*
-+	 * If the page isn't tagged, defer to user_mem_abort() for sanitising
-+	 * the MTE tags. The S2 pte should have been unmapped by
-+	 * mmu_notifier_invalidate_range_end().
-+	 */
-+	if (kvm_has_mte(kvm) && !page_mte_tagged(pfn_to_page(pfn)))
- 		return false;
- 
- 	/*
+ 	tag_storage = mte_allocate_tag_storage();
 -- 
 2.38.1.431.g37b22c650d-goog
 
