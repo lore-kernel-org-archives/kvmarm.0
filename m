@@ -1,36 +1,36 @@
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09028469
-	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 15:55:26 +0000 (UTC)
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-13bef14ea06so5987066fac.3
-        for <kvmarm@lists.linux.dev>; Fri, 04 Nov 2022 08:55:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 457FB8469
+	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 15:55:29 +0000 (UTC)
+Received: by mail-oi1-f174.google.com with SMTP id n83so5574606oif.11
+        for <kvmarm@lists.linux.dev>; Fri, 04 Nov 2022 08:55:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ubE2AAZXlCuiNyL1KuoZrNEXriWN5pZWIN4cSFgHZnA=;
-        b=MCn+94c5vzsBgO3IXDhHr1B94+JFna+42UNKAXWcdFDLzoEKjI53FdYPrlVPc17Ny+
-         tkqN2QFq2ekP7ISuJ3AE54bSrk7vV7XG3vGcat7Grs/B3/S1ztDR1EbYtvNnaPWRpboC
-         AvIdLfkUFh5TfTDx8GEMxu6LD7F8HOYhuxURu16/62cDMUkVDomxblZC8EO0vkwvwDKV
-         PNhLGlUNm9DWdnkoHbqIMNQfGjPSBOMs4jm+ayv5aThbayftwbv+A17yVEsD9FwnA/6a
-         YUJQnGyIwFO6RlqkX+TxHExZzufrrxFTU50kBOijYiGfVlDDKRcCdV808KIQC4w95szA
-         YpyQ==
-X-Gm-Message-State: ACrzQf28pjZtTNHWK6gYFUkNL/KL0neBskwH4FcWPFRisI9qzUR3wQ/k
-	MNJJyScK9k1jngz4JpUzBQ==
-X-Google-Smtp-Source: AMsMyM5i6RcuCkLATEdqES8PyM2eEeChV16kftf4iuKKCEnn8hY58tD8/bZ9w+Cv8IMCuJDpXPQTQA==
-X-Received: by 2002:a05:6870:a70a:b0:13c:19bc:12ae with SMTP id g10-20020a056870a70a00b0013c19bc12aemr21300865oam.240.1667577326358;
-        Fri, 04 Nov 2022 08:55:26 -0700 (PDT)
+        bh=YXxvA5Cmwe9nSMxNL2yH3Amn9qhEZ+Ppqa0CVXQahDM=;
+        b=kfX4yOTYm1GvgWAx94XsZ3HDippX/Ex8wrhI3z++5rpyNwCbJexJ3zAoQK0eDl9jmX
+         MwoSeeCEmHUtraUVdCIJpdC+XfCwoqKglNvp4ORHUHiIdCFzwVSz68oyG0hNXkAgBB+4
+         aWbAfnfr8OmnMDy8XTDZOQTVn+iFIsG3tAqVRVzBVHBXc3Jl6KlLiIA0Z64SHt04nPdP
+         kAU6CNLhuDqgYDXxhhC+NNdYbAH4LUL1uvk0xEUGSnMgaSOKbJJ78oVjDmayk+d/xutI
+         gdDzyUt701BPY5z8E2GGImLsH86QT84Vjw2BbNl/73/Jw7Ag9D6So0h6z+/XhTZkFsKX
+         WVJQ==
+X-Gm-Message-State: ACrzQf0e8IcnsuDW9Zm0Dqoyx/dNBKNKPc4y61flgeXi2hLLDot83GvI
+	ubsjt9WdXCQAG9kSrjh3zw==
+X-Google-Smtp-Source: AMsMyM7j75hsQAjfZIMDag+E+uxVO086sbySFKGpZQmxBHGiFVlWgpE6vfapy3lhNwjdU+847kbdBg==
+X-Received: by 2002:a05:6808:2023:b0:359:c826:8085 with SMTP id q35-20020a056808202300b00359c8268085mr19906327oiw.156.1667577328221;
+        Fri, 04 Nov 2022 08:55:28 -0700 (PDT)
 Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id v20-20020a4ac014000000b0049052c66126sm1278110oop.2.2022.11.04.08.55.25
+        by smtp.gmail.com with ESMTPSA id h4-20020a9d2f04000000b00661a3f4113bsm1532860otb.64.2022.11.04.08.55.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Nov 2022 08:55:25 -0700 (PDT)
-Received: (nullmailer pid 1880416 invoked by uid 1000);
+        Fri, 04 Nov 2022 08:55:27 -0700 (PDT)
+Received: (nullmailer pid 1880418 invoked by uid 1000);
 	Fri, 04 Nov 2022 15:55:18 -0000
 From: Rob Herring <robh@kernel.org>
-Date: Fri, 04 Nov 2022 10:55:04 -0500
-Subject: [PATCH v3 4/8] perf: arm_spe: Drop BIT() and use FIELD_GET/PREP accessors
+Date: Fri, 04 Nov 2022 10:55:05 -0500
+Subject: [PATCH v3 5/8] perf: arm_spe: Use new PMSIDR_EL1 register enums
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,236 +39,82 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-ID: <20220825-arm-spe-v8-7-v3-4-87682f78caac@kernel.org>
+Message-ID: <20220825-arm-spe-v8-7-v3-5-87682f78caac@kernel.org>
 References: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
 In-Reply-To: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
 To: Namhyung Kim <namhyung@kernel.org>, Will Deacon <will@kernel.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, Jiri Olsa <jolsa@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Ingo Molnar <mingo@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, James Clark <james.clark@arm.com>, Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-Mailer: b4 0.11.0-dev
-Message-ID: <20221104155504.HbO8_YIrrR8QNJGq3_5u9gwFiIsTTWqkSZu9axpOZrc@z>
+Message-ID: <20221104155505.aNuLnguSWfNbgxXdAt6YXN4DPCxNOGfgKa7qMshCzyI@z>
 
-Now that generated sysregs are in place, update the register field
-accesses. The use of BIT() is no longer needed with the new defines. Use
-FIELD_GET and FIELD_PREP instead of open coding masking and shifting.
+Now that the SPE register definitions include enums for some PMSIDR_EL1
+fields, use them in the driver in place of magic values.
 
-No functional change.
-
-Tested-by: James Clark <james.clark@arm.com>
 Signed-off-by: Rob Herring <robh@kernel.org>
 ---
-v3:
- - no change
+v3: New patch
 ---
- drivers/perf/arm_spe_pmu.c | 70 ++++++++++++++++++++++------------------------
- 1 file changed, 34 insertions(+), 36 deletions(-)
+ drivers/perf/arm_spe_pmu.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-index 814ed18346b6..9b4bd72087ea 100644
+index 9b4bd72087ea..af6d3867c3e7 100644
 --- a/drivers/perf/arm_spe_pmu.c
 +++ b/drivers/perf/arm_spe_pmu.c
-@@ -283,18 +283,18 @@ static u64 arm_spe_event_to_pmscr(struct perf_event *event)
- 	struct perf_event_attr *attr = &event->attr;
- 	u64 reg = 0;
- 
--	reg |= ATTR_CFG_GET_FLD(attr, ts_enable) << PMSCR_EL1_TS_SHIFT;
--	reg |= ATTR_CFG_GET_FLD(attr, pa_enable) << PMSCR_EL1_PA_SHIFT;
--	reg |= ATTR_CFG_GET_FLD(attr, pct_enable) << PMSCR_EL1_PCT_SHIFT;
-+	reg |= FIELD_PREP(PMSCR_EL1_TS, ATTR_CFG_GET_FLD(attr, ts_enable));
-+	reg |= FIELD_PREP(PMSCR_EL1_PA, ATTR_CFG_GET_FLD(attr, pa_enable));
-+	reg |= FIELD_PREP(PMSCR_EL1_PCT, ATTR_CFG_GET_FLD(attr, pct_enable));
- 
- 	if (!attr->exclude_user)
--		reg |= BIT(PMSCR_EL1_E0SPE_SHIFT);
-+		reg |= PMSCR_EL1_E0SPE;
- 
- 	if (!attr->exclude_kernel)
--		reg |= BIT(PMSCR_EL1_E1SPE_SHIFT);
-+		reg |= PMSCR_EL1_E1SPE;
- 
- 	if (get_spe_event_has_cx(event))
--		reg |= BIT(PMSCR_EL1_CX_SHIFT);
-+		reg |= PMSCR_EL1_CX;
- 
- 	return reg;
- }
-@@ -322,7 +322,7 @@ static u64 arm_spe_event_to_pmsirr(struct perf_event *event)
- 
- 	arm_spe_event_sanitise_period(event);
- 
--	reg |= ATTR_CFG_GET_FLD(attr, jitter) << PMSIRR_EL1_RND_SHIFT;
-+	reg |= FIELD_PREP(PMSIRR_EL1_RND, ATTR_CFG_GET_FLD(attr, jitter));
- 	reg |= event->hw.sample_period;
- 
- 	return reg;
-@@ -333,18 +333,18 @@ static u64 arm_spe_event_to_pmsfcr(struct perf_event *event)
- 	struct perf_event_attr *attr = &event->attr;
- 	u64 reg = 0;
- 
--	reg |= ATTR_CFG_GET_FLD(attr, load_filter) << PMSFCR_EL1_LD_SHIFT;
--	reg |= ATTR_CFG_GET_FLD(attr, store_filter) << PMSFCR_EL1_ST_SHIFT;
--	reg |= ATTR_CFG_GET_FLD(attr, branch_filter) << PMSFCR_EL1_B_SHIFT;
-+	reg |= FIELD_PREP(PMSFCR_EL1_LD, ATTR_CFG_GET_FLD(attr, load_filter));
-+	reg |= FIELD_PREP(PMSFCR_EL1_ST, ATTR_CFG_GET_FLD(attr, store_filter));
-+	reg |= FIELD_PREP(PMSFCR_EL1_B, ATTR_CFG_GET_FLD(attr, branch_filter));
- 
- 	if (reg)
--		reg |= BIT(PMSFCR_EL1_FT_SHIFT);
-+		reg |= PMSFCR_EL1_FT;
- 
- 	if (ATTR_CFG_GET_FLD(attr, event_filter))
--		reg |= BIT(PMSFCR_EL1_FE_SHIFT);
-+		reg |= PMSFCR_EL1_FE;
- 
- 	if (ATTR_CFG_GET_FLD(attr, min_latency))
--		reg |= BIT(PMSFCR_EL1_FL_SHIFT);
-+		reg |= PMSFCR_EL1_FL;
- 
- 	return reg;
- }
-@@ -358,8 +358,7 @@ static u64 arm_spe_event_to_pmsevfr(struct perf_event *event)
- static u64 arm_spe_event_to_pmslatfr(struct perf_event *event)
- {
- 	struct perf_event_attr *attr = &event->attr;
--	return ATTR_CFG_GET_FLD(attr, min_latency)
--	       << PMSLATFR_EL1_MINLAT_SHIFT;
-+	return FIELD_PREP(PMSLATFR_EL1_MINLAT, ATTR_CFG_GET_FLD(attr, min_latency));
- }
- 
- static void arm_spe_pmu_pad_buf(struct perf_output_handle *handle, int len)
-@@ -511,7 +510,7 @@ static void arm_spe_perf_aux_output_begin(struct perf_output_handle *handle,
- 	limit = buf->snapshot ? arm_spe_pmu_next_snapshot_off(handle)
- 			      : arm_spe_pmu_next_off(handle);
- 	if (limit)
--		limit |= BIT(PMBLIMITR_EL1_E_SHIFT);
-+		limit |= PMBLIMITR_EL1_E;
- 
- 	limit += (u64)buf->base;
- 	base = (u64)buf->base + PERF_IDX2OFF(handle->head, buf);
-@@ -570,23 +569,23 @@ arm_spe_pmu_buf_get_fault_act(struct perf_output_handle *handle)
- 
- 	/* Service required? */
- 	pmbsr = read_sysreg_s(SYS_PMBSR_EL1);
--	if (!(pmbsr & BIT(PMBSR_EL1_S_SHIFT)))
-+	if (!FIELD_GET(PMBSR_EL1_S, pmbsr))
- 		return SPE_PMU_BUF_FAULT_ACT_SPURIOUS;
- 
- 	/*
- 	 * If we've lost data, disable profiling and also set the PARTIAL
- 	 * flag to indicate that the last record is corrupted.
- 	 */
--	if (pmbsr & BIT(PMBSR_EL1_DL_SHIFT))
-+	if (FIELD_GET(PMBSR_EL1_DL, pmbsr))
- 		perf_aux_output_flag(handle, PERF_AUX_FLAG_TRUNCATED |
- 					     PERF_AUX_FLAG_PARTIAL);
- 
- 	/* Report collisions to userspace so that it can up the period */
--	if (pmbsr & BIT(PMBSR_EL1_COLL_SHIFT))
-+	if (FIELD_GET(PMBSR_EL1_COLL, pmbsr))
- 		perf_aux_output_flag(handle, PERF_AUX_FLAG_COLLISION);
- 
- 	/* We only expect buffer management events */
--	switch (FIELD_GET(PMBSR_EL1_EC_MASK, pmbsr)) {
-+	switch (FIELD_GET(PMBSR_EL1_EC, pmbsr)) {
- 	case PMBSR_EL1_EC_BUF:
- 		/* Handled below */
- 		break;
-@@ -716,23 +715,22 @@ static int arm_spe_pmu_event_init(struct perf_event *event)
- 		return -EINVAL;
- 
- 	reg = arm_spe_event_to_pmsfcr(event);
--	if ((reg & BIT(PMSFCR_EL1_FE_SHIFT)) &&
-+	if ((FIELD_GET(PMSFCR_EL1_FE, reg)) &&
- 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_EVT))
- 		return -EOPNOTSUPP;
- 
--	if ((reg & BIT(PMSFCR_EL1_FT_SHIFT)) &&
-+	if ((FIELD_GET(PMSFCR_EL1_FT, reg)) &&
- 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_TYP))
- 		return -EOPNOTSUPP;
- 
--	if ((reg & BIT(PMSFCR_EL1_FL_SHIFT)) &&
-+	if ((FIELD_GET(PMSFCR_EL1_FL, reg)) &&
- 	    !(spe_pmu->features & SPE_PMU_FEAT_FILT_LAT))
- 		return -EOPNOTSUPP;
- 
- 	set_spe_event_has_cx(event);
- 	reg = arm_spe_event_to_pmscr(event);
- 	if (!perfmon_capable() &&
--	    (reg & (BIT(PMSCR_EL1_PA_SHIFT) |
--		    BIT(PMSCR_EL1_PCT_SHIFT))))
-+	    (reg & (PMSCR_EL1_PA | PMSCR_EL1_PCT)))
- 		return -EACCES;
- 
- 	return 0;
-@@ -970,14 +968,14 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 
- 	/* Read PMBIDR first to determine whether or not we have access */
- 	reg = read_sysreg_s(SYS_PMBIDR_EL1);
--	if (reg & BIT(PMBIDR_EL1_P_SHIFT)) {
-+	if (FIELD_GET(PMBIDR_EL1_P, reg)) {
- 		dev_err(dev,
- 			"profiling buffer owned by higher exception level\n");
- 		return;
- 	}
- 
- 	/* Minimum alignment. If it's out-of-range, then fail the probe */
--	fld = (reg & PMBIDR_EL1_ALIGN_MASK) >> PMBIDR_EL1_ALIGN_SHIFT;
-+	fld = FIELD_GET(PMBIDR_EL1_ALIGN, reg);
- 	spe_pmu->align = 1 << fld;
- 	if (spe_pmu->align > SZ_2K) {
- 		dev_err(dev, "unsupported PMBIDR.Align [%d] on CPU %d\n",
-@@ -987,26 +985,26 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 
- 	/* It's now safe to read PMSIDR and figure out what we've got */
- 	reg = read_sysreg_s(SYS_PMSIDR_EL1);
--	if (reg & BIT(PMSIDR_EL1_FE_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_FE, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_FILT_EVT;
- 
--	if (reg & BIT(PMSIDR_EL1_FT_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_FT, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_FILT_TYP;
- 
--	if (reg & BIT(PMSIDR_EL1_FL_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_FL, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_FILT_LAT;
- 
--	if (reg & BIT(PMSIDR_EL1_ARCHINST_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_ARCHINST, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_ARCH_INST;
- 
--	if (reg & BIT(PMSIDR_EL1_LDS_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_LDS, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_LDS;
- 
--	if (reg & BIT(PMSIDR_EL1_ERND_SHIFT))
-+	if (FIELD_GET(PMSIDR_EL1_ERND, reg))
- 		spe_pmu->features |= SPE_PMU_FEAT_ERND;
- 
+@@ -1006,32 +1006,32 @@ static void __arm_spe_pmu_dev_probe(void *info)
  	/* This field has a spaced out encoding, so just use a look-up */
--	fld = (reg & PMSIDR_EL1_INTERVAL_MASK) >> PMSIDR_EL1_INTERVAL_SHIFT;
-+	fld = FIELD_GET(PMSIDR_EL1_INTERVAL, reg);
+ 	fld = FIELD_GET(PMSIDR_EL1_INTERVAL, reg);
  	switch (fld) {
- 	case 0:
+-	case 0:
++	case PMSIDR_EL1_INTERVAL_256:
  		spe_pmu->min_period = 256;
-@@ -1038,7 +1036,7 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 	}
- 
- 	/* Maximum record size. If it's out-of-range, then fail the probe */
--	fld = (reg & PMSIDR_EL1_MAXSIZE_MASK) >> PMSIDR_EL1_MAXSIZE_SHIFT;
-+	fld = FIELD_GET(PMSIDR_EL1_MAXSIZE, reg);
- 	spe_pmu->max_record_sz = 1 << fld;
- 	if (spe_pmu->max_record_sz > SZ_2K || spe_pmu->max_record_sz < 16) {
- 		dev_err(dev, "unsupported PMSIDR_EL1.MaxSize [%d] on CPU %d\n",
-@@ -1046,7 +1044,7 @@ static void __arm_spe_pmu_dev_probe(void *info)
- 		return;
- 	}
- 
--	fld = (reg & PMSIDR_EL1_COUNTSIZE_MASK) >> PMSIDR_EL1_COUNTSIZE_SHIFT;
-+	fld = FIELD_GET(PMSIDR_EL1_COUNTSIZE, reg);
- 	switch (fld) {
+ 		break;
+-	case 2:
++	case PMSIDR_EL1_INTERVAL_512:
+ 		spe_pmu->min_period = 512;
+ 		break;
+-	case 3:
++	case PMSIDR_EL1_INTERVAL_768:
+ 		spe_pmu->min_period = 768;
+ 		break;
+-	case 4:
++	case PMSIDR_EL1_INTERVAL_1024:
+ 		spe_pmu->min_period = 1024;
+ 		break;
+-	case 5:
++	case PMSIDR_EL1_INTERVAL_1536:
+ 		spe_pmu->min_period = 1536;
+ 		break;
+-	case 6:
++	case PMSIDR_EL1_INTERVAL_2048:
+ 		spe_pmu->min_period = 2048;
+ 		break;
+-	case 7:
++	case PMSIDR_EL1_INTERVAL_3072:
+ 		spe_pmu->min_period = 3072;
+ 		break;
  	default:
+ 		dev_warn(dev, "unknown PMSIDR_EL1.Interval [%d]; assuming 8\n",
+ 			 fld);
+ 		fallthrough;
+-	case 8:
++	case PMSIDR_EL1_INTERVAL_4096:
+ 		spe_pmu->min_period = 4096;
+ 	}
+ 
+@@ -1050,10 +1050,10 @@ static void __arm_spe_pmu_dev_probe(void *info)
  		dev_warn(dev, "unknown PMSIDR_EL1.CountSize [%d]; assuming 2\n",
+ 			 fld);
+ 		fallthrough;
+-	case 2:
++	case PMSIDR_EL1_COUNTSIZE_12_BIT_SAT:
+ 		spe_pmu->counter_sz = 12;
+ 		break;
+-	case 3:
++	case PMSIDR_EL1_COUNTSIZE_16_BIT_SAT:
+ 		spe_pmu->counter_sz = 16;
+ 	}
+ 
 
 -- 
 b4 0.11.0-dev
