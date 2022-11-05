@@ -1,123 +1,127 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E2ABA34
-	for <kvmarm@lists.linux.dev>; Fri,  4 Nov 2022 23:58:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1667606282;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZnzJmimE900iiRy7VTWPGN9EpNmm/Y1LD4I/QC6tB0Q=;
-	b=SAaScsy5VY4LkU/F29nQbQkVTdRnZ2Uug7YnY4hJq2aPUYT9avq/N/8zcbi5BuJxdoINE+
-	zTySlv0elts214yRAh2OsPXZSVHutrTsc3KpBUiIZrmsmztdlcQC8yNvCMXbeklvnvMOXw
-	ps3avhtBNlxNGI9jnwpY37JfuU7+8sg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-196-T678CyveNP-D_kNb-7hxrA-1; Fri, 04 Nov 2022 19:57:57 -0400
-X-MC-Unique: T678CyveNP-D_kNb-7hxrA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 20CF785A583;
-	Fri,  4 Nov 2022 23:57:46 +0000 (UTC)
-Received: from [10.64.54.78] (vpn2-54-78.bne.redhat.com [10.64.54.78])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 343EFC16932;
-	Fri,  4 Nov 2022 23:57:26 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v3 0/6] KVM: selftests: memslot_perf_test: aarch64
- cleanup/fixes
-To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
- ajones@ventanamicro.com, kvmarm@lists.linux.dev, shuah@kernel.org,
- peterx@redhat.com, oliver.upton@linux.dev, seanjc@google.com,
- ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com
-References: <20221020071209.559062-1-gshan@redhat.com>
- <91d563b6-5f1c-5ecc-0a40-7d8838770b22@maciej.szmigiero.name>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <ee1167f3-5b43-55a9-c815-b759d243dc4e@redhat.com>
-Date: Sat, 5 Nov 2022 07:57:24 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188251C04
+	for <kvmarm@lists.linux.dev>; Sat,  5 Nov 2022 07:23:36 +0000 (UTC)
+Received: by mail-pj1-f46.google.com with SMTP id h14so6337197pjv.4
+        for <kvmarm@lists.linux.dev>; Sat, 05 Nov 2022 00:23:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LgggK8hkZgVH++8BD/dM0aO2tMGo/D//b9l3kVhUdaM=;
+        b=U/x0+UrK6WD6QwysmwpCA6LmD53P1GxIR19amIkClJs1U+DHkp7esj810/Xw7URgnY
+         6NZVQQh5o9g8yaYpc02GHR8JOzUihaJcqSDdOE4cbtwJ85fzUguLvM3x7ZP842rNUC4G
+         IOH+V7ahbW783oQ8t1L6kNWapP1kP/J2F7tFsu6XQqecGj3cX7fYSRayd64pTmcy8HAn
+         d6cI4eeNhbX20o3Zwkz6bJbo5zvNtLkTeCPbaESHSN2yBcXQQxv6d5gjfmS+2xwxXfSZ
+         fv3McoM3OjyE9c0uf4tT/4mLzwamPM6YxCUj/eClgwuZOznnXV4mUenapD7gr/s648tl
+         fm7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LgggK8hkZgVH++8BD/dM0aO2tMGo/D//b9l3kVhUdaM=;
+        b=1GAsMGOiaPH0ouMUlYD3SE3+0P3B/pI+wfpBRIDHxD8XzlNfs3YLVxzr1LCzaGGkkT
+         VI+b1ZWpnnrVfDUdZtw7BtHS3J3DVVPD6GvWTf1YjES0gPqjhlc4aNse8KCuUVTo80yC
+         nFC+AwGV+Sgso9oURPU3KRpSy+uG2bkLba/ymRpYs6YbwMqVzWZtOA880LG+NcZa2S7y
+         CnzYHydO5K62W1Ti/voIRC8LprqAtlYbg1VntX+6Uy75Yg+73F/1pzv1vSU1iRbkTf/d
+         FkZZA4pmMTuDWgYDqkWBfZulaXf/uW/ZTmjTYUA05MDlrVl5FfupwCK0iGxRGq17wgD1
+         5Spg==
+X-Gm-Message-State: ACrzQf3W9BSYMAowwBGrYPLMuiYhCifSPBahsyHxPgv9WFcarAaKnKgW
+	KdxNN3zMBVVbIk7JSg2LFUy5UQ==
+X-Google-Smtp-Source: AMsMyM44ZOypFpAKOh/gnh0gedsNVpBtxc3XmEVYmQYriCbTJfC96MuNcATWjqEewuhMoI5TXce8Dw==
+X-Received: by 2002:a17:902:e745:b0:187:2033:1832 with SMTP id p5-20020a170902e74500b0018720331832mr31176766plf.119.1667633016062;
+        Sat, 05 Nov 2022 00:23:36 -0700 (PDT)
+Received: from leoy-huangpu.lan (211-75-219-201.hinet-ip.hinet.net. [211.75.219.201])
+        by smtp.gmail.com with ESMTPSA id w27-20020aa79a1b000000b00562ef28aac6sm698138pfj.185.2022.11.05.00.23.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Nov 2022 00:23:35 -0700 (PDT)
+From: Leo Yan <leo.yan@linaro.org>
+To: Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	John Garry <john.garry@huawei.com>,
+	James Clark <james.clark@arm.com>,
+	Mike Leach <mike.leach@linaro.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org
+Cc: Leo Yan <leo.yan@linaro.org>
+Subject: [PATCH v1 0/3] KVM: arm64: Support tracing virtual CPU ID
+Date: Sat,  5 Nov 2022 07:23:08 +0000
+Message-ID: <20221105072311.8214-1-leo.yan@linaro.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <91d563b6-5f1c-5ecc-0a40-7d8838770b22@maciej.szmigiero.name>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-Message-ID: <20221104235724.H2Xl96kOvy6ANIaQJLNaEp_zm6GBLqMi_qOs4PeHusE@z>
+Message-ID: <20221105072308.B-MF0jir9b5H1pg67jEtUGgS-0j4mO30mz6_7dHw0lE@z>
 
-On 10/25/22 7:18 AM, Maciej S. Szmigiero wrote:
-> On 20.10.2022 09:12, Gavin Shan wrote:
->> kvm/selftests/memslots_perf_test doesn't work with 64KB-page-size-host
->> and 4KB-page-size-guest on aarch64. In the implementation, the host and
->> guest page size have been hardcoded to 4KB. It's ovbiously not working
->> on aarch64 which supports 4KB, 16KB, 64KB individually on host and guest.
->>
->> This series tries to fix it. After the series is applied, the test runs
->> successfully with 64KB-page-size-host and 4KB-page-size-guest.
->>
->>     # ./memslots_perf_tests -v -s 512
->>
->> Since we're here, the code is cleaned up a bit as PATCH[1-3] do. The
->> other patches are fixes to handle the mismatched host/guest page
->> sized.
->>
->> v1: https://lore.kernel.org/kvmarm/20221014071914.227134-1-gshan@redhat.com/T/#t
->> v2: https://lore.kernel.org/kvmarm/20221018040454.405719-1-gshan@redhat.com/T/#t
->>
->> Changelog
->> =========
->> v3:
->>    * Improved comments about MEM_TEST_MOVE_SIZE, which is set
->>      to 64KB in PATCH[v3 4/6] and finally fixed to 192KB in
->>      PATCH[v3 5/6].                                              (Maciej)
->>    * Use size instead of pages to do the comparison in
->>      test_memslot_move_prepare()                                 (Maciej)
->>    * Use tools/include/linux/sizes.h instead of inventing
->>      our own macros.                                             (Oliver)
->> v2:
->>    * Pick the smaller value between the ones specified by
->>      user or probed from KVM_CAP_NR_MEMSLOTS in PATCH[v2 3/6]    (Maciej)
->>    * Improved comments about MEM_TEST_MOVE_SIZE in
->>      PATCH[v2 4/6]                                               (Maciej)
->>    * Avoid mismatched guest page size after VM is started in
->>      prepare_vm() in PATCH[v2 4/6]                               (Maciej)
->>    * Fix condition to check MEM_TEST_{UNMAP, UNMAP_CHUNK}_SIZE
->>      in check_memory_size() in PATCH[v2 4/6]                     (Maciej)
->>    * Define base and huge page size in kvm_util_base.h in
->>      PATCH[v2 5/6]                                               (Sean)
->>    * Add checks on host/guest page size in check_memory_size()
->>      and fail early if any of them exceeds 64KB in PATCH[v2 5/6] (Maciej)
->>
->>
->> Gavin Shan (6):
->>    KVM: selftests: memslot_perf_test: Use data->nslots in prepare_vm()
->>    KVM: selftests: memslot_perf_test: Consolidate loop conditions in
->>      prepare_vm()
->>    KVM: selftests: memslot_perf_test: Probe memory slots for once
->>    KVM: selftests: memslot_perf_test: Support variable guest page size
->>    KVM: selftests: memslot_perf_test: Consolidate memory
->>    KVM: selftests: memslot_perf_test: Report optimal memory slots
->>
-> 
-> This patch set now looks good to me, so for the whole series:
-> Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> 
+Before there have some efforts and discussion for supprot tracing
+virtual CPU ID in Arm64 KVM, see [1][2].
 
-Thanks for your time on reviews, Maciej. The broken test case was reported
-in our downstream Linux, which means our downstream linux needs the improvements
-and fixes to make the test case working.
+The issue was blocked with a main concern that we cannot change the
+existed trace events to avoid ABI breakage.  So the question is how
+we add new trace events with tracing virtual CPU ID and also need to
+keep backward compatibility.
 
-Thanks,
-Gavin
+This patch set is to restart the work, it's inspired by Qais Yousef's
+work for adding scheduler tracepoints [3].
+
+The first patch changes to register tracepoint callbacks, this can allow
+us to support multiple trace events with a single call site, it's a
+preparation to add new trace events.
+
+The second patch is to add two new trace events kvm_entry_v2 and
+kvm_exit_v2, and these two trace events contain the field "vcpu_id" for
+virtual CPU ID.
+
+For more complete view, the third patch is the change in perf tool.
+It dynamically detects trace nodes under sysfs and decide to use the
+version 2's trace events or rollback to use original events.
+
+This patch set has been tested with mainline kernel on Arm64 Ampere
+Altra platform.
+
+Note: I used checkpatch.pl to validate patches format and observed it
+reports error for second patch for adding trace events; since the trace
+event definition uses its own coding style, I just keep as it is.
+
+[1] https://lore.kernel.org/lkml/1560330526-15468-2-git-send-email-yuzenghui@huawei.com/
+[2] https://lore.kernel.org/lkml/20200917003645.689665-1-sergey.senozhatsky@gmail.com/
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/kernel/sched/core.c?id=a056a5bed7fa67706574b00cf1122c38596b2be1
+
+
+Leo Yan (3):
+  KVM: arm64: Dynamically register callback for tracepoints
+  KVM: arm64: Add trace events with field 'vcpu_id'
+  perf arm64: Support virtual CPU ID for kvm-stat
+
+ arch/arm64/kvm/Makefile               |  2 +-
+ arch/arm64/kvm/arm.c                  |  4 +-
+ arch/arm64/kvm/trace.c                | 35 +++++++++++++++++
+ arch/arm64/kvm/trace_arm.h            | 53 ++++++++++++++++++++++++++
+ tools/perf/arch/arm64/util/kvm-stat.c | 54 ++++++++++++++++++++++++---
+ 5 files changed, 140 insertions(+), 8 deletions(-)
+ create mode 100644 arch/arm64/kvm/trace.c
+
+-- 
+2.34.1
 
