@@ -2,91 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70E4CC433FE
-	for <kvmarm@archiver.kernel.org>; Sat,  5 Nov 2022 07:24:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1758C4332F
+	for <kvmarm@archiver.kernel.org>; Sat,  5 Nov 2022 09:42:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 173374B0B4;
-	Sat,  5 Nov 2022 03:24:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62CF84A1D9;
+	Sat,  5 Nov 2022 05:42:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gDZWT-mj5amy; Sat,  5 Nov 2022 03:23:58 -0400 (EDT)
+	with ESMTP id tnWr3Nbr7VMw; Sat,  5 Nov 2022 05:42:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E7F984A1D9;
-	Sat,  5 Nov 2022 03:23:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60C1D41066;
+	Sat,  5 Nov 2022 05:42:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C183748FA4
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Nov 2022 03:23:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E7F641066
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Nov 2022 05:42:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3Z9VNL+n9UsT for <kvmarm@lists.cs.columbia.edu>;
- Sat,  5 Nov 2022 03:23:55 -0400 (EDT)
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com
- [209.85.216.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4063A4A1D9
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Nov 2022 03:23:55 -0400 (EDT)
-Received: by mail-pj1-f41.google.com with SMTP id o7so6356866pjj.1
- for <kvmarm@lists.cs.columbia.edu>; Sat, 05 Nov 2022 00:23:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=content-transfer-encoding:mime-version:references:in-reply-to
- :message-id:date:subject:cc:to:from:from:to:cc:subject:date
- :message-id:reply-to;
- bh=S8CxQ8M2QM9sBIlwmPDF3sO4KY64cCnbt7okAkRcIdI=;
- b=c0dlly7hwTw7JU56MQSd2/9OjXdPEB8Z/l2dmasIIKMvsyZHc8sBbN5UJQtR7mVC09
- q1RR61V+SDTO2DuU2hQynG5H3e4yn4CM6fXf36AcT70kPYKmFbcQCH7SXXZkg4VyVfhu
- EPFrH9rYmLzLRfPkGFi1Qz02uF9/Zt1E3vUw0+DG9adou/Lc4Ndq83SCfiSm6MmDRz8s
- s1D/JRn7aWkc58Nrswu24cJ8DSKi/vsbmPgm6gAHhajuLe1RWjCt6XzHurTyatoUKKtT
- 7iVtd1ml8i5VhcahkoMggu5Al7bKaRASIgh9v83JNHCWiqAvE+xNgcz8FYTpsyBAMetU
- 3/EQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=content-transfer-encoding:mime-version:references:in-reply-to
- :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
- :subject:date:message-id:reply-to;
- bh=S8CxQ8M2QM9sBIlwmPDF3sO4KY64cCnbt7okAkRcIdI=;
- b=CZmPPQD0JMae1wiFoMOrbORAEgE7iRpKnG0NTfAW06hQ/GJaoFBz8VOmQetUFr5roH
- O1T18OQUkWOhwS0qIHpi9gNPxM/exrl9EVukOh5tmUkSHYKk2uIrseUUpnbmq+pBUn0F
- MLTnaIUXQ7CclYYqfFTksVzLbifsBcYeeG6L4CsewWp62JeB114mZDw0WiP1drDi2ozQ
- nkmG3/CGirWNtNq7hV3CL6zxGSV4u7FUlj9nH17wKz6SI8gOnroZp1HK831WbeaysLP+
- tzRnL9Mp4wkZ++6KDY/qPiCpswsjMhHcDy58svyStZdgjd2UEhcU9wMFME6e2hIf8S/f
- 9UgQ==
-X-Gm-Message-State: ACrzQf1e4ziaqB20vvrt3oIy0ifeZCGrg4lyDZXnjAvP97rOQqQQUDEi
- OH1byqI1AtIx9no+OFBZ1hWklw==
-X-Google-Smtp-Source: AMsMyM5leRTjPX8cC2BZ8OxRg1qLemGZp+/Aqexr9F666mTxh2xSMl5cDCaV8E5Oxa1vtL+dJHRYXA==
-X-Received: by 2002:a17:902:ec92:b0:186:9fc6:868c with SMTP id
- x18-20020a170902ec9200b001869fc6868cmr39074139plg.12.1667633034808; 
- Sat, 05 Nov 2022 00:23:54 -0700 (PDT)
-Received: from leoy-huangpu.lan (211-75-219-201.hinet-ip.hinet.net.
- [211.75.219.201]) by smtp.gmail.com with ESMTPSA id
- w27-20020aa79a1b000000b00562ef28aac6sm698138pfj.185.2022.11.05.00.23.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 05 Nov 2022 00:23:54 -0700 (PDT)
-From: Leo Yan <leo.yan@linaro.org>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- John Garry <john.garry@huawei.com>, James Clark <james.clark@arm.com>,
- Mike Leach <mike.leach@linaro.org>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org
-Subject: [PATCH v1 3/3] perf arm64: Support virtual CPU ID for kvm-stat
-Date: Sat,  5 Nov 2022 07:23:11 +0000
-Message-Id: <20221105072311.8214-4-leo.yan@linaro.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221105072311.8214-1-leo.yan@linaro.org>
-References: <20221105072311.8214-1-leo.yan@linaro.org>
+ with ESMTP id 3IS7+QwUUhh3 for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  5 Nov 2022 05:42:31 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1D60140BED
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Nov 2022 05:42:31 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 5DBDB60A66;
+ Sat,  5 Nov 2022 09:42:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E03EC433D6;
+ Sat,  5 Nov 2022 09:42:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1667641349;
+ bh=JN6aU2159+LnIGdVUDFlVD7XJbpBPoujgJJuF+mYRII=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=PcYuG0V+rCExyWsyXI9kd/0Y8E/9ufh8ploElPHjPWPige8l3QF5Op90x7/rnyotA
+ MiItM2Xxj6vzq6OQz5M62Eybdk+A1RKg1JMNen6cKv6mj+qypW80gL8GSNSizysH63
+ by2BLGrUPVtf+GrICFx+1u6I0ifUCLCTkpXdOar3RE/omguTAd/IEPZDH36fCFP2Bl
+ P4wIMsX+OoeJ22+LuvWDLYoP60H2INCpeisWFmU7d3uDtmnUzZYgY5w/BfYmNj1PDK
+ X3lA5gp+C9qSKijkIXEnnAW5QyBe6zeO8kLAtKIBXrN+Usa11aEYEQLFhdSbU/v7Ro
+ sFHCEIU+IT+DQ==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1orFh5-0041Ff-9v;
+ Sat, 05 Nov 2022 09:42:27 +0000
 MIME-Version: 1.0
-Cc: Leo Yan <leo.yan@linaro.org>
+Date: Sat, 05 Nov 2022 09:42:26 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 01/14] arm64: Add ID_DFR0_EL1.PerfMon values for
+ PMUv3p7 and IMP_DEF
+In-Reply-To: <Y2V6WIu40Cg2ShXV@google.com>
+References: <20221028105402.2030192-1-maz@kernel.org>
+ <20221028105402.2030192-2-maz@kernel.org> <Y2V6WIu40Cg2ShXV@google.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <778e0ed6767f1d0771bee1cc54b0c49c@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ ricarkol@google.com, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,145 +82,35 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Since the two trace events kvm_entry_v2/kvm_exit_v2 are added, we can
-use the field "vcpu_id" in the events to get to know the virtual CPU ID.
-To keep backward compatibility, we still need to rely on the trace
-events kvm_entry/kvm_exit for old kernels.
+On 2022-11-04 20:47, Oliver Upton wrote:
+> On Fri, Oct 28, 2022 at 11:53:49AM +0100, Marc Zyngier wrote:
+>> Align the ID_DFR0_EL1.PerfMon values with ID_AA64DFR0_EL1.PMUver.
+>> 
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> 
+> FYI, another pile of ID reg changes is on the way that'll move DFR0 to 
+> a
+> generated definition.
+> 
+> https://lore.kernel.org/linux-arm-kernel/20220930140211.3215348-1-james.morse@arm.com/
+> 
 
-This patch adds Arm64's functions setup_kvm_events_tp() and
-arm64__setup_kvm_tp(), by detecting the nodes under sysfs folder, it can
-dynamically register trace events kvm_entry_v2/kvm_exit_v2 when the
-kernel has provided them, otherwise, it rolls back to use events
-kvm_entry/kvm_exit for backward compatibility.
+Eh, another of these. The usual way we deal with this churn
+is to have a stable branch in the arm64 tree which I pull into
+the offending branch in the kvmarm tree.
 
-Let cpu_isa_init() to invoke arm64__setup_kvm_tp(), this can allow the
-command "perf kvm stat report" also to dynamically setup trace events.
+Thanks for the heads up!
 
-Before:
-
-  # perf kvm stat report --vcpu 27
-
-  Analyze events for all VMs, VCPU 27:
-
-               VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time         Avg time
-
-  Total Samples:0, Total events handled time:0.00us.
-
-After:
-
-  # perf kvm stat report --vcpu 27
-
-  Analyze events for all VMs, VCPU 27:
-
-               VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time         Avg time
-
-                 SYS64        808    98.54%    91.24%      0.00us    303.76us      3.46us ( +-  13.54% )
-                   WFx         10     1.22%     7.79%      0.00us     69.48us     23.91us ( +-  25.91% )
-                   IRQ          2     0.24%     0.97%      0.00us     22.64us     14.82us ( +-  52.77% )
-
-  Total Samples:820, Total events handled time:3068.28us.
-
-Signed-off-by: Leo Yan <leo.yan@linaro.org>
----
- tools/perf/arch/arm64/util/kvm-stat.c | 54 ++++++++++++++++++++++++---
- 1 file changed, 49 insertions(+), 5 deletions(-)
-
-diff --git a/tools/perf/arch/arm64/util/kvm-stat.c b/tools/perf/arch/arm64/util/kvm-stat.c
-index 73d18e0ed6f6..1ba54ce3d7d8 100644
---- a/tools/perf/arch/arm64/util/kvm-stat.c
-+++ b/tools/perf/arch/arm64/util/kvm-stat.c
-@@ -3,6 +3,7 @@
- #include <memory.h>
- #include "../../../util/evsel.h"
- #include "../../../util/kvm-stat.h"
-+#include "../../../util/tracepoint.h"
- #include "arm64_exception_types.h"
- #include "debug.h"
- 
-@@ -10,18 +11,28 @@ define_exit_reasons_table(arm64_exit_reasons, kvm_arm_exception_type);
- define_exit_reasons_table(arm64_trap_exit_reasons, kvm_arm_exception_class);
- 
- const char *kvm_trap_exit_reason = "esr_ec";
--const char *vcpu_id_str = "id";
-+const char *vcpu_id_str = "vcpu_id";
- const int decode_str_len = 20;
- const char *kvm_exit_reason = "ret";
--const char *kvm_entry_trace = "kvm:kvm_entry";
--const char *kvm_exit_trace = "kvm:kvm_exit";
-+const char *kvm_entry_trace;
-+const char *kvm_exit_trace;
- 
--const char *kvm_events_tp[] = {
-+#define NR_TPS	2
-+
-+static const char *kvm_events_tp_v1[NR_TPS + 1] = {
- 	"kvm:kvm_entry",
- 	"kvm:kvm_exit",
- 	NULL,
- };
- 
-+static const char *kvm_events_tp_v2[NR_TPS + 1] = {
-+	"kvm:kvm_entry_v2",
-+	"kvm:kvm_exit_v2",
-+	NULL,
-+};
-+
-+const char *kvm_events_tp[NR_TPS + 1];
-+
- static void event_get_key(struct evsel *evsel,
- 			  struct perf_sample *sample,
- 			  struct event_key *key)
-@@ -78,8 +89,41 @@ const char * const kvm_skip_events[] = {
- 	NULL,
- };
- 
--int cpu_isa_init(struct perf_kvm_stat *kvm, const char *cpuid __maybe_unused)
-+static int arm64__setup_kvm_tp(struct perf_kvm_stat *kvm)
- {
-+	const char **kvm_events, **events_ptr;
-+	int i, nr_tp = 0;
-+
-+	if (is_valid_tracepoint("kvm:kvm_entry_v2")) {
-+		kvm_events = kvm_events_tp_v2;
-+		kvm_entry_trace = "kvm:kvm_entry_v2";
-+		kvm_exit_trace = "kvm:kvm_exit_v2";
-+	} else {
-+		kvm_events = kvm_events_tp_v1;
-+		kvm_entry_trace = "kvm:kvm_entry";
-+		kvm_exit_trace = "kvm:kvm_exit";
-+	}
-+
-+	for (events_ptr = kvm_events; *events_ptr; events_ptr++) {
-+		if (!is_valid_tracepoint(*events_ptr))
-+			return -1;
-+		nr_tp++;
-+	}
-+
-+	for (i = 0; i < nr_tp; i++)
-+		kvm_events_tp[i] = kvm_events[i];
-+	kvm_events_tp[i] = NULL;
-+
- 	kvm->exit_reasons_isa = "arm64";
- 	return 0;
- }
-+
-+int setup_kvm_events_tp(struct perf_kvm_stat *kvm)
-+{
-+	return arm64__setup_kvm_tp(kvm);
-+}
-+
-+int cpu_isa_init(struct perf_kvm_stat *kvm, const char *cpuid __maybe_unused)
-+{
-+	return arm64__setup_kvm_tp(kvm);
-+}
+         M.
 -- 
-2.34.1
-
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
