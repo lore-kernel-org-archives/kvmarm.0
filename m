@@ -2,88 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E545C433FE
-	for <kvmarm@archiver.kernel.org>; Sat,  5 Nov 2022 13:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C91E2C433FE
+	for <kvmarm@archiver.kernel.org>; Sun,  6 Nov 2022 12:48:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAE85410E6;
-	Sat,  5 Nov 2022 09:28:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44B304B63C;
+	Sun,  6 Nov 2022 07:48:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3F-WvmwBU-hJ; Sat,  5 Nov 2022 09:28:47 -0400 (EDT)
+	with ESMTP id tz85ywVWoBXF; Sun,  6 Nov 2022 07:48:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79C9341081;
-	Sat,  5 Nov 2022 09:28:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F6DE4B634;
+	Sun,  6 Nov 2022 07:48:27 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3267D41081
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Nov 2022 09:28:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E37E4B632
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Nov 2022 07:48:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2FGLb77GUTHi for <kvmarm@lists.cs.columbia.edu>;
- Sat,  5 Nov 2022 09:28:44 -0400 (EDT)
+ with ESMTP id F2D7UU6q0yeC for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  6 Nov 2022 07:48:25 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B91EB41075
- for <kvmarm@lists.cs.columbia.edu>; Sat,  5 Nov 2022 09:28:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C19E49EDE
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Nov 2022 07:48:25 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id C196B60B47;
- Sat,  5 Nov 2022 13:28:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A5AAC433D6;
- Sat,  5 Nov 2022 13:28:43 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 5CDD760C55;
+ Sun,  6 Nov 2022 12:48:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4003C433C1;
+ Sun,  6 Nov 2022 12:48:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1667654923;
- bh=LHNxWfv4lFpGRWDjFEVWeEhY+NjqCvnXHLnf01bxTdY=;
+ s=k20201202; t=1667738903;
+ bh=lPkPvrrBnX0tum9Cs3g5MY8Kww2Y8rLfZv7Bw6QwLPo=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=LbwYLN5SeGDotOAWDCaYThJR9r5jNTQbm8tt06i9Y3Qvrj76515aGET7+Or4bmHe/
- h+6mK7YUmxJxBdlnRHV8THYyvUg3n8hpmZnkFaAxjxwptoa3yM5uwmxc7Xz7kh1Snu
- d2veqeJqK6WbelqUT8FM5DjjsGQKzQEOLOEQDpQvrY00VksUjfH2K99AV0p0R7GAVa
- GDBSBgGA+8gFNaFdbVanPmv0YOiYSLaC4KL3JmpbPR2xFu+J/crsASLM+UsMN8Kb1k
- 2WEqypGh9UCPfYpxb9Ff4I8WrCxX9PB76At0fb+5Fx9EfkVE8gPHKw0dAsEP+OQSkf
- s/1UFPuaJbIBw==
+ b=udADkqfFCiPrepd+awS0kdEUSpM4CSqvKYWb4KpnEjs0g7posfsFPHGk/F9jsOHFB
+ OqjBk7SxbzdbZ62rG+SlefchxqEmpvELaOL6wVJbRrU9vNX1WuJh6HWuZjXWSEoHfA
+ 6MprE1Q+rA+Y0VyUdoaESSebGwvvvKuGPnDYS3edysTb4pqd4ItIKInmvc7axnpt0A
+ D56kId2qZgbyru0Fj5j99yPAh1abjuiVn1r1pJus8b/n6C3aZcCr4ny+kwsTXIyzX9
+ VRtA/llZrAVwBYAiUBEgJbVYC6uFtYgE0VxMa38CutaDvd+lAui2bB1Jflcw/TVIX8
+ Ds8sfYS6qEd8g==
 Received: from sofa.misterjones.org ([185.219.108.64]
- helo=goblin-girl.misterjones.org)
+ helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1orJE0-0043rY-Rv;
- Sat, 05 Nov 2022 13:28:40 +0000
-Date: Sat, 05 Nov 2022 13:28:40 +0000
-Message-ID: <868rkpr0mv.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1orf4X-004CH5-FR;
+ Sun, 06 Nov 2022 12:48:21 +0000
+Date: Sun, 06 Nov 2022 12:47:54 +0000
+Message-ID: <87pme0fdvp.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Leo Yan <leo.yan@linaro.org>
-Subject: Re: [PATCH v1 3/3] perf arm64: Support virtual CPU ID for kvm-stat
-In-Reply-To: <20221105072311.8214-4-leo.yan@linaro.org>
-References: <20221105072311.8214-1-leo.yan@linaro.org>
- <20221105072311.8214-4-leo.yan@linaro.org>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v2 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to
+ be set from userspace
+In-Reply-To: <CAAeT=Fzp-7MMBJshAAQBgFwXLH2z5ASDgmDBLNJsQoFA=MSciw@mail.gmail.com>
+References: <20221028105402.2030192-1-maz@kernel.org>
+ <20221028105402.2030192-12-maz@kernel.org>
+ <CAAeT=FyiNeRun7oRL83AUkVabUSb9pxL2SS9yZwi1rjFnbhH6g@mail.gmail.com>
+ <87tu3gfi8u.wl-maz@kernel.org>
+ <CAAeT=FwViQRmyJjf3jxcWnLFQAYob8uvvx7QNhWyj6OmaYDKyg@mail.gmail.com>
+ <86bkpmrjv8.wl-maz@kernel.org>
+ <CAAeT=Fzp-7MMBJshAAQBgFwXLH2z5ASDgmDBLNJsQoFA=MSciw@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: leo.yan@linaro.org, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev,
- catalin.marinas@arm.com, will@kernel.org, acme@kernel.org,
- john.garry@huawei.com, james.clark@arm.com, mike.leach@linaro.org,
- peterz@infradead.org, mingo@redhat.com, mark.rutland@arm.com,
- alexander.shishkin@linux.intel.com, jolsa@kernel.org, namhyung@kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org
+X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ oliver.upton@linux.dev, ricarkol@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Peter Zijlstra <peterz@infradead.org>, Will Deacon <will@kernel.org>,
- John Garry <john.garry@huawei.com>, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Jiri Olsa <jolsa@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.linux.dev, Namhyung Kim <namhyung@kernel.org>,
- Mike Leach <mike.leach@linaro.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, James Clark <james.clark@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,66 +94,23 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, 05 Nov 2022 07:23:11 +0000,
-Leo Yan <leo.yan@linaro.org> wrote:
-> 
-> Since the two trace events kvm_entry_v2/kvm_exit_v2 are added, we can
-> use the field "vcpu_id" in the events to get to know the virtual CPU ID.
-> To keep backward compatibility, we still need to rely on the trace
-> events kvm_entry/kvm_exit for old kernels.
-> 
-> This patch adds Arm64's functions setup_kvm_events_tp() and
-> arm64__setup_kvm_tp(), by detecting the nodes under sysfs folder, it can
-> dynamically register trace events kvm_entry_v2/kvm_exit_v2 when the
-> kernel has provided them, otherwise, it rolls back to use events
-> kvm_entry/kvm_exit for backward compatibility.
-> 
-> Let cpu_isa_init() to invoke arm64__setup_kvm_tp(), this can allow the
-> command "perf kvm stat report" also to dynamically setup trace events.
-> 
-> Before:
-> 
->   # perf kvm stat report --vcpu 27
-> 
->   Analyze events for all VMs, VCPU 27:
-> 
->                VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time         Avg time
-> 
->   Total Samples:0, Total events handled time:0.00us.
->
-> After:
-> 
->   # perf kvm stat report --vcpu 27
-> 
->   Analyze events for all VMs, VCPU 27:
-> 
->                VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time         Avg time
-> 
->                  SYS64        808    98.54%    91.24%      0.00us    303.76us      3.46us ( +-  13.54% )
->                    WFx         10     1.22%     7.79%      0.00us     69.48us     23.91us ( +-  25.91% )
->                    IRQ          2     0.24%     0.97%      0.00us     22.64us     14.82us ( +-  52.77% )
-> 
->   Total Samples:820, Total events handled time:3068.28us.
+Hi Reiji,
 
-Please educate me: how useful is it to filter on a vcpu number across
-all VMs? What sense does it even make?
+On Fri, 04 Nov 2022 15:53:21 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> BTW, if we have no intention of supporting a mix of vCPUs with and
+> without PMU, I think it would be nice if we have a clear comment on
+> that in the code.  Or I'm hoping to disallow it if possible though.
 
-Conversely, what would be the purpose of filtering on a 5th thread of
-any process irrespective of what the process does? To me, this is the
-same level of non-sense.
+I'm not sure we're in a position to do this right now. The current API
+has always (for good or bad reasons) been per-vcpu as it is tied to
+the vcpu initialisation.
 
-AFAICT, this is just piling more arbitrary data extraction for no
-particular reason other than "just because we can", and there is
-absolutely no guarantee that this is fit for anyone else's purpose.
-
-I'd rather you have a generic tracepoint taking the vcpu as a context
-and a BPF program that spits out the information people actually need,
-keeping things out of the kernel. Or even a tracehook (like the
-scheduler does), and let people load a module to dump whatever
-information they please.
-
-But randomly adding new tracepoints to output a semi-useless field
-without any consideration for future-proofing? No, thank you.
+However, once we move to a sysreg-based API to control the vcpu
+features, we can revisit this and say that some features have a
+VM-wide effect if the vcpus have been created with some special flag
+(or some other TBD mechanism).
 
 Thanks,
 
