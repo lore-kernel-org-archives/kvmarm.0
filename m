@@ -2,62 +2,61 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4815BC4332F
-	for <kvmarm@archiver.kernel.org>; Sun,  6 Nov 2022 15:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB98C4332F
+	for <kvmarm@archiver.kernel.org>; Sun,  6 Nov 2022 16:09:13 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B37FF4B7BE;
-	Sun,  6 Nov 2022 10:51:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF90340ECE;
+	Sun,  6 Nov 2022 11:09:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IYcKE-hDCjb7; Sun,  6 Nov 2022 10:51:23 -0500 (EST)
+	with ESMTP id uf3++PI9aT8F; Sun,  6 Nov 2022 11:09:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 607ED4B6B9;
-	Sun,  6 Nov 2022 10:51:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A33A04B70F;
+	Sun,  6 Nov 2022 11:09:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF26D4B654
- for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Nov 2022 10:51:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 933C44B62D
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Nov 2022 11:09:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NP9yzobxSfSF for <kvmarm@lists.cs.columbia.edu>;
- Sun,  6 Nov 2022 10:51:20 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8594D4B643
- for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Nov 2022 10:51:20 -0500 (EST)
+ with ESMTP id bw7DRXbFaEyo for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  6 Nov 2022 11:09:05 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3964B4089A
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Nov 2022 11:09:05 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 38F4EB80BFE;
- Sun,  6 Nov 2022 15:51:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD0EAC433D6;
- Sun,  6 Nov 2022 15:51:17 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 0D27E60C8C;
+ Sun,  6 Nov 2022 16:09:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1FA1C433D6;
+ Sun,  6 Nov 2022 16:09:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1667749877;
- bh=V+jRW3DTjGuWCrSGuNtqChV2ZVbAmdSc6ZhgYGl2HFA=;
+ s=k20201202; t=1667750943;
+ bh=msYrpTcvZ6EtKQqrb1ppIM+/iIo+IpvgPs9nlu9+Lf4=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=XDmZGuBJ7wbj/ggFkuEq+2HCYrxs2mojStiFRwnRkD7JZtAQP/TIMhw6Ka+AWwvI0
- W4xqQCIN8wfmiTqPFnCZI+5APf2TdN4taCdxNI50CB36yt6K6j/mwZC3k+0Cgagfns
- 9BPaC9fwHWplFS45UyahKOuSMi09IfiaaJClSRudsdB6cVFi4b6tsjCF5RF1gKLoi4
- fsIIsoGvVMU5Fv78Fdvpv925PXhfNwpfsf31piDXlq3Mw+0Bq+tbvPLdir1f2DDk2z
- eNXNE28FsEVXV1SevZs3jIdurca232UmczbUk0zFJN5R0VaB7YnZS8zb4ceOP4uAE8
- XxRrFnuDQdfMQ==
+ b=AMBN1L/q8KvWG0yx/cmcevecVggutCYHE3VAJi2ElFTuY4w254KW8txh670m6ewJe
+ PuCnYF2d1aApSW2xyHCAZSH0F7jAZuROYrooKCO/PsTmLwmKoj4k4NQnAjamRdi7yJ
+ xU3vylM9uPreABqrP0BpsSvgtlpTCvkoVRd0CdU21pOx6zhfYB/whJCt7W2Q3ipZJS
+ n8oImGO2EFtKhS2/IgbrAO2WiY2jn8ajoa0UN1b0YYy5xa+HxPK/PGbZIAq3xagumZ
+ OGTI9xNyi2WV/oy1ofMhvxxIG7xWsBk2y1Py2f80nejxhod10XqTzW2H2/hy5fwx28
+ uYGCVPMD/FY8w==
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1orhvX-004DOW-BQ;
- Sun, 06 Nov 2022 15:51:15 +0000
-Date: Sun, 06 Nov 2022 15:50:48 +0000
-Message-ID: <87mt94f5ev.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oriCj-004DYD-Il;
+ Sun, 06 Nov 2022 16:09:01 +0000
+Date: Sun, 06 Nov 2022 16:08:34 +0000
+Message-ID: <87leoof4l9.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v8 4/7] KVM: arm64: Enable ring-based dirty memory tracking
-In-Reply-To: <20221104234049.25103-5-gshan@redhat.com>
+Subject: Re: [PATCH v8 0/7] KVM: arm64: Enable ring-based dirty memory tracking
+In-Reply-To: <20221104234049.25103-1-gshan@redhat.com>
 References: <20221104234049.25103-1-gshan@redhat.com>
- <20221104234049.25103-5-gshan@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -93,109 +92,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 04 Nov 2022 23:40:46 +0000,
+On Fri, 04 Nov 2022 23:40:42 +0000,
 Gavin Shan <gshan@redhat.com> wrote:
 > 
-> Enable ring-based dirty memory tracking on arm64 by selecting
-> CONFIG_HAVE_KVM_DIRTY_{RING_ACQ_REL, RING_WITH_BITMAP} and providing
-> the ring buffer's physical page offset (KVM_DIRTY_LOG_PAGE_OFFSET).
+> This series enables the ring-based dirty memory tracking for ARM64.
+> The feature has been available and enabled on x86 for a while. It
+> is beneficial when the number of dirty pages is small in a checkpointing
+> system or live migration scenario. More details can be found from
+> fb04a1eddb1a ("KVM: X86: Implement ring-based dirty memory tracking").
 > 
-> Besides, helper kvm_vgic_save_its_tables_in_progress() is added to
-> indicate if vgic/its tables are being saved or not. The helper is used
-> in ARM64's kvm_arch_allow_write_without_running_vcpu() to keep the
-> site of saving vgic/its tables out of no-running-vcpu radar.
-> 
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> ---
->  Documentation/virt/kvm/api.rst     |  2 +-
->  arch/arm64/include/uapi/asm/kvm.h  |  1 +
->  arch/arm64/kvm/Kconfig             |  2 ++
->  arch/arm64/kvm/arm.c               |  3 +++
->  arch/arm64/kvm/mmu.c               | 15 +++++++++++++++
->  arch/arm64/kvm/vgic/vgic-its.c     |  3 +++
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c |  7 +++++++
->  include/kvm/arm_vgic.h             |  2 ++
->  8 files changed, 34 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 2ec32bd41792..2fc68f684ad8 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -7921,7 +7921,7 @@ regardless of what has actually been exposed through the CPUID leaf.
->  8.29 KVM_CAP_DIRTY_LOG_RING/KVM_CAP_DIRTY_LOG_RING_ACQ_REL
->  ----------------------------------------------------------
->  
-> -:Architectures: x86
-> +:Architectures: x86, arm64
->  :Parameters: args[0] - size of the dirty log ring
->  
->  KVM is capable of tracking dirty memory using ring buffers that are
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 316917b98707..a7a857f1784d 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -43,6 +43,7 @@
->  #define __KVM_HAVE_VCPU_EVENTS
->  
->  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
-> +#define KVM_DIRTY_LOG_PAGE_OFFSET 64
->  
->  #define KVM_REG_SIZE(id)						\
->  	(1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 815cc118c675..066b053e9eb9 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -32,6 +32,8 @@ menuconfig KVM
->  	select KVM_VFIO
->  	select HAVE_KVM_EVENTFD
->  	select HAVE_KVM_IRQFD
-> +	select HAVE_KVM_DIRTY_RING_ACQ_REL
-> +	select HAVE_KVM_DIRTY_RING_WITH_BITMAP
->  	select HAVE_KVM_MSI
->  	select HAVE_KVM_IRQCHIP
->  	select HAVE_KVM_IRQ_ROUTING
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 94d33e296e10..6b097605e38c 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -746,6 +746,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
->  
->  		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
->  			return kvm_vcpu_suspend(vcpu);
-> +
-> +		if (kvm_dirty_ring_check_request(vcpu))
-> +			return 0;
->  	}
->  
->  	return 1;
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 60ee3d9f01f8..fbeb55e45f53 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -932,6 +932,21 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
->  	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
->  }
->  
-> +/*
-> + * kvm_arch_allow_write_without_running_vcpu - allow writing guest memory
-> + * without the running VCPU when dirty ring is enabled.
-> + *
-> + * The running VCPU is required to track dirty guest pages when dirty ring
-> + * is enabled. Otherwise, the backup bitmap should be used to track the
-> + * dirty guest pages. When vgic/its tables are being saved, the backup
-> + * bitmap is used to track the dirty guest pages due to the missed running
-> + * VCPU in the period.
-> + */
-> +bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
-> +{
-> +	return kvm_vgic_save_its_tables_in_progress(kvm);
+> This series is applied to v6.1.rc3, plus commit c227590467cb ("KVM:
+> Check KVM_CAP_DIRTY_LOG_{RING, RING_ACQ_REL} prior to enabling them").
+> The commit is currently in Marc's 'fixes' branch, targeting v6.1.rc4/5.
 
-I don't think we need the extra level of abstraction here. Just return
-kvm->arch.vgic.save_its_tables_in_progress and be done with it.
+This is starting to look good to me, and my only concerns are around
+the documentation and the bit of nitpicking on patch 4. If we can
+converge quickly on that, I'd like to queue this quickly and leave it
+to simmer in -next.
 
-You can also move the helper to the vgic-its code since they are
-closely related for now.
+> v7: https://lore.kernel.org/kvmarm/20221031003621.164306-1-gshan@redhat.com/
+> v6: https://lore.kernel.org/kvmarm/20221011061447.131531-1-gshan@redhat.com/
+> v5: https://lore.kernel.org/all/20221005004154.83502-1-gshan@redhat.com/
+> v4: https://lore.kernel.org/kvmarm/20220927005439.21130-1-gshan@redhat.com/
+> v3: https://lore.kernel.org/r/20220922003214.276736-1-gshan@redhat.com
+> v2: https://lore.kernel.org/lkml/YyiV%2Fl7O23aw5aaO@xz-m1.local/T/
+> v1: https://lore.kernel.org/lkml/20220819005601.198436-1-gshan@redhat.com
+> 
+> Testing
+> =======
+> (1) kvm/selftests/dirty_log_test
+> (2) Live migration by QEMU
+
+Could you point to a branch that has the required QEMU changes?
 
 Thanks,
 
