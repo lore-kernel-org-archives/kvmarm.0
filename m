@@ -1,54 +1,53 @@
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7057212294
-	for <kvmarm@lists.linux.dev>; Mon,  7 Nov 2022 18:22:51 +0000 (UTC)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A7IBfhG003607;
-	Mon, 7 Nov 2022 18:22:19 GMT
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF09122AB
+	for <kvmarm@lists.linux.dev>; Mon,  7 Nov 2022 19:09:19 +0000 (UTC)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A7IMGES008477;
+	Mon, 7 Nov 2022 19:08:53 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
  from : to : cc : date : in-reply-to : references : content-type :
  content-transfer-encoding : mime-version; s=pp1;
- bh=EzR8gIJXN5CxUQRbcB4MiNn9dtOoco2fyNz/1FbCYTs=;
- b=oLSyj97Tdsnk0VQOOelX0cMC03SHso5gNnzaHyD+AU0QdK4ObvkSGhKy5MB3Eu0X4nH3
- cwQlVJnBR+mHedqllHCGkozoyH6XI3rvXWzRd6B14keKEVzxvN6OwiPguQYiPjgoozr5
- CuCksG6s9mdmq7QLIUQJIca83ZvoD2XgDSxzv6A51X5fRtxNeiKKljGLcDn9w2C0oVaI
- lt4UbjIbWAu4ejWPW7Tu9j/0mFdDdf2RJQ//Gs+6w72ns70J8ekHGYyOg0A6bX47zuXl
- 7JNyzQw/vMhVPkpKIf+E0zSFCsOlxjnE+4eVRtOOT/s/U0hkUCCpuH99DScbFKpRAn6z EA== 
+ bh=35tiOQSLtBhpiOtSDCyJvMTBa1BQEbmXkVMynO0AJNU=;
+ b=bA2xI6jDXMw9GkKQ/17B2PsR08MngGD0BHr9lBdCncbze6ptiqW8yVYRlK8PyOz23yvD
+ JJticYfnUSdWXwC0raCaPFMyDmDoTxVBT9GKCamiHjyfA3WaKPEVh69kCZEg5iupN8BC
+ kspshGIvi7umhulLeej6gduBxnKXpRSRNfNc2nYBp7PJ6EPMDgBFDwRGeGK/qvilR8vM
+ +K/1gvJLsVNYQtqHUdHQkOMXAFenkN/6JGFGZ61Aakroetl1TyzMfmKYgotX48AULjFp
+ eig846ulngDwsfy+DjKBvTFBUri0aJLQSx2IXlOKn62ajHxUP8ret3ZPJA/CaddJtlwY cw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1uuwfy4-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1vspayt-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 07 Nov 2022 18:22:19 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A7Gap8F020063;
-	Mon, 7 Nov 2022 18:22:18 GMT
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1uuwfxe-1
+	Mon, 07 Nov 2022 19:08:53 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A7GxdSO017285;
+	Mon, 7 Nov 2022 19:08:52 GMT
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1vspay5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 07 Nov 2022 18:22:17 +0000
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-	by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A7IL2nI028450;
-	Mon, 7 Nov 2022 18:22:16 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-	by ppma04dal.us.ibm.com with ESMTP id 3kngmswr5v-1
+	Mon, 07 Nov 2022 19:08:52 +0000
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+	by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A7J6Qwe004644;
+	Mon, 7 Nov 2022 19:08:51 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+	by ppma05wdc.us.ibm.com with ESMTP id 3kngpksn53-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 07 Nov 2022 18:22:16 +0000
-Received: from smtpav04.dal12v.mail.ibm.com ([9.208.128.131])
-	by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A7IMJ895243508
+	Mon, 07 Nov 2022 19:08:51 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com ([9.208.128.113])
+	by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A7J8nEF22807444
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 7 Nov 2022 18:22:19 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B096858062;
-	Mon,  7 Nov 2022 18:22:14 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E657058052;
-	Mon,  7 Nov 2022 18:22:11 +0000 (GMT)
+	Mon, 7 Nov 2022 19:08:50 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 92AAC5805B;
+	Mon,  7 Nov 2022 19:08:49 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 896CB5804B;
+	Mon,  7 Nov 2022 19:08:44 +0000 (GMT)
 Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.65.225.56])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  7 Nov 2022 18:22:11 +0000 (GMT)
-Message-ID: <e2b21ebfec94bcc3d830a5c7f11837d6dedac652.camel@linux.ibm.com>
-Subject: Re: [PATCH 25/44] KVM: s390: Do s390 specific init without bouncing
- through kvm_init()
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  7 Nov 2022 19:08:44 +0000 (GMT)
+Message-ID: <c015f51c8011f1b8e9dbf55c8d3ffd7a3b001ba5.camel@linux.ibm.com>
+Subject: Re: [PATCH 27/44] KVM: Drop kvm_arch_{init,exit}() hooks
 From: Eric Farman <farman@linux.ibm.com>
 To: Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini
@@ -86,12 +85,12 @@ Cc: James Morse <james.morse@arm.com>,
  <mpe@ellerman.id.au>, Chao Gao <chao.gao@intel.com>,
         Thomas Gleixner
  <tglx@linutronix.de>, Yuan Yao <yuan.yao@intel.com>
-Date: Mon, 07 Nov 2022 13:22:11 -0500
-In-Reply-To: <20221102231911.3107438-26-seanjc@google.com>
+Date: Mon, 07 Nov 2022 14:08:44 -0500
+In-Reply-To: <20221102231911.3107438-28-seanjc@google.com>
 References: <20221102231911.3107438-1-seanjc@google.com>
-	 <20221102231911.3107438-26-seanjc@google.com>
+	 <20221102231911.3107438-28-seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: base64
 User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -100,36 +99,33 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Zz_sQx9dIUW7WUoiYMvv3aj8CVyX61yu
-X-Proofpoint-ORIG-GUID: x0YF0w8yQ2jwBDgCwuGa40JfBxQPUq9F
+X-Proofpoint-ORIG-GUID: EGRhxfVownb69WBbMarN5b--dY5-Hx8c
+X-Proofpoint-GUID: JbH8lnx2OyFdlHqJPERqpVN2xJ_qztsc
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-11-07_08,2022-11-07_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- mlxlogscore=598 clxscore=1015 impostorscore=0 malwarescore=0
- lowpriorityscore=0 mlxscore=0 adultscore=0 spamscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2211070144
-Message-ID: <20221107182211.Jn6gsi3O290_W7NSyZkqAUDA2Yp_OwbAoTa7rNyH5Xc@z>
+ definitions=2022-11-07_09,2022-11-07_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=949
+ phishscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0 malwarescore=0
+ bulkscore=0 spamscore=0 adultscore=0 suspectscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
+ definitions=main-2211070152
+Message-ID: <20221107190844.6JZwN225aJXdaBK1NH8ARWKSkMzHGBbBC9M7MpADyyg@z>
 
-On Wed, 2022-11-02 at 23:18 +0000, Sean Christopherson wrote:
-> Move the guts of kvm_arch_init() into a new helper,
-> __kvm_s390_init(),
-> and invoke the new helper directly from kvm_s390_init() instead of
-> bouncing through kvm_init().=C2=A0 Invoking kvm_arch_init() is the very
-> first action performed by kvm_init(), i.e. this is a glorified nop.
->=20
-> Moving setup to __kvm_s390_init() will allow tagging more functions
-> as
-> __init, and emptying kvm_arch_init() will allow dropping the hook
-> entirely once all architecture implementations are nops.
->=20
-> No functional change intended.
->=20
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-> =C2=A0arch/s390/kvm/kvm-s390.c | 29 +++++++++++++++++++++++++----
-> =C2=A01 file changed, 25 insertions(+), 4 deletions(-)
-
-Reviewed-by: Eric Farman <farman@linux.ibm.com>
+T24gV2VkLCAyMDIyLTExLTAyIGF0IDIzOjE4ICswMDAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOgo+IERyb3Aga3ZtX2FyY2hfaW5pdCgpIGFuZCBrdm1fYXJjaF9leGl0KCkgbm93IHRoYXQg
+YWxsIGltcGxlbWVudGF0aW9ucwo+IGFyZSBub3BzLgo+IAo+IE5vIGZ1bmN0aW9uYWwgY2hhbmdl
+IGludGVuZGVkLgo+IAo+IFNpZ25lZC1vZmYtYnk6IFNlYW4gQ2hyaXN0b3BoZXJzb24gPHNlYW5q
+Y0Bnb29nbGUuY29tPgo+IC0tLQo+IMKgYXJjaC9hcm02NC9rdm0vYXJtLmPCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgfCAxMSAtLS0tLS0tLS0tLQo+IMKgYXJjaC9taXBzL2t2bS9taXBz
+LmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAxMCAtLS0tLS0tLS0tCj4gwqBhcmNo
+L3Bvd2VycGMvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCB8wqAgMSAtCj4gwqBhcmNoL3Bvd2VycGMv
+a3ZtL3Bvd2VycGMuY8KgwqDCoMKgwqDCoMKgwqDCoCB8wqAgNSAtLS0tLQo+IMKgYXJjaC9yaXNj
+di9rdm0vbWFpbi5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgOSAtLS0tLS0tLS0K
+PiDCoGFyY2gvczM5MC9rdm0va3ZtLXMzOTAuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAxMCAt
+LS0tLS0tLS0tCj4gwqBhcmNoL3g4Ni9rdm0veDg2LmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIHwgMTAgLS0tLS0tLS0tLQo+IMKgaW5jbHVkZS9saW51eC9rdm1faG9zdC5owqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgMyAtLS0KPiDCoHZpcnQva3ZtL2t2bV9tYWluLmPCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDE5ICsrLS0tLS0tLS0tLS0tLS0tLS0KPiDC
+oDkgZmlsZXMgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCA3NiBkZWxldGlvbnMoLSkKClJldmll
+d2VkLWJ5OiBFcmljIEZhcm1hbiA8ZmFybWFuQGxpbnV4LmlibS5jb20+CSMgczM5MAo=
 
