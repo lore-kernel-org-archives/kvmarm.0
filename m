@@ -1,199 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD39728E2
-	for <kvmarm@lists.linux.dev>; Mon,  7 Nov 2022 11:33:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53127C433C1;
-	Mon,  7 Nov 2022 11:33:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1667820800;
-	bh=XwhO6MA3akkpMZda29WLKHtXktbNkiqedyDL/Uu/0hg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fMFATCoA7bcu62RyEYLe3h3gMegZyEK31YaDCV3SnIszSLr2lrDnhZrxTtmxfYnLs
-	 EvLRre58+9VTGhUsDJEP5s/fSmuZvrw3FvEi8NIn4KDNnk5FMLN0AMUn9N/aLgwDxK
-	 zxYeU3oD6ngGS/Nz8cUpRchfMnpC4zHGCoRUT3JRH4YqSLl9F6PnTBE7pKPJqssC2w
-	 eKyT7JJM7w2InebCWAyTfE1U+dLPHe6sszhTjoybsQiyVeWhhBm4Zvapb/PGkF4yHp
-	 zrMq1DrOvDV1PRzj2eJjWhdXcg4NT5ANgTe/m9Q24cHxrDxNqCmNcDnTmj+iMokbJz
-	 r++fGfP8EygqA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1os0NR-004NP0-TT;
-	Mon, 07 Nov 2022 11:33:18 +0000
-Date: Mon, 07 Nov 2022 11:33:17 +0000
-Message-ID: <861qqfq9s2.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Gavin Shan <gshan@redhat.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	catalin.marinas@arm.com,
-	andrew.jones@linux.dev,
-	will@kernel.org,
-	shan.gavin@gmail.com,
-	bgardon@google.com,
-	dmatlack@google.com,
-	pbonzini@redhat.com,
-	zhenyzha@redhat.com,
-	shuah@kernel.org,
-	kvmarm@lists.cs.columbia.edu,
-	ajones@ventanamicro.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936E2D516
+	for <kvmarm@lists.linux.dev>; Mon,  7 Nov 2022 14:29:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1667831344;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=humq6rQ40+uCr1dmaqj2I5gLtIPMUKzBIm5JAKLU5kM=;
+	b=aKvlic6VPiEtzOueIUBnYGtYNqwy6tpAx8Gs0m6ApYap4v1phE/aFVNJ8cN7p7NlijzxFD
+	W6RuzQKCS3JLnPnAALoSD13PU4w2SNmOLQh7pjnmbgEqapMdvJfZlS/560+GPQ+ZSOWjOm
+	ywUmWxXNetn0InCLvHdzNVNb5pgvFmg=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-416-BvkJAhZZNqOuxf3pKhRayw-1; Mon, 07 Nov 2022 09:29:03 -0500
+X-MC-Unique: BvkJAhZZNqOuxf3pKhRayw-1
+Received: by mail-qt1-f200.google.com with SMTP id y19-20020a05622a121300b003a526e0ff9bso8211419qtx.15
+        for <kvmarm@lists.linux.dev>; Mon, 07 Nov 2022 06:29:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=humq6rQ40+uCr1dmaqj2I5gLtIPMUKzBIm5JAKLU5kM=;
+        b=7Ex3ST5eoC4yHcuLTjQFey6+mkTcjy1yVGBGtvhvkAvNc7+jYUXD0nVXhzzh/qVH3O
+         HC5KiGt0TYgAJyVDogSnO2922/66Cz6SIdYIUccfgxDxM1aYk++claoicoCdE+aH7tp9
+         6cb8n//nqHwjoGclU7MbK7IZofgchnl+KLBiGiCClKOxBgY5rcPzTDFeIPM+4lSNKBE1
+         P6tA9bj+kQYd+/x5Du81aEu5uDQkRoJiIB+jvWSBmmeibVMEYXTIDwjHRotpQYmaqOuv
+         u0Gw4Sp31lxQ4oQOCQrmi4nsBJs+9IZaF1qz7RhIhAEpUOURN0wvmBPUGQV1j8z59p7k
+         zItQ==
+X-Gm-Message-State: ACrzQf3iu+3hjd8+dH2tytxSNTHryiOvkK3RNJhNeqjZLdLg60oDcREm
+	CiTHXk1Ie0SiKOzRdDSObY6jsYdxSW5rbz923V+yiJNnSnDDnKguBBuSCdzOgLiu3UgQ51vtewE
+	6okNeDAiOG1agpAoS
+X-Received: by 2002:a05:620a:d55:b0:6f9:fadd:4762 with SMTP id o21-20020a05620a0d5500b006f9fadd4762mr35863872qkl.335.1667831342865;
+        Mon, 07 Nov 2022 06:29:02 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM6QWKXb1TWdkP9qu08deog1NKsig/FMQot7OkY7UfMNUpgr2zjUhL2SrUPx+ND9wgrgFSLMDw==
+X-Received: by 2002:a05:620a:d55:b0:6f9:fadd:4762 with SMTP id o21-20020a05620a0d5500b006f9fadd4762mr35863853qkl.335.1667831342661;
+        Mon, 07 Nov 2022 06:29:02 -0800 (PST)
+Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
+        by smtp.gmail.com with ESMTPSA id cg5-20020a05622a408500b0035cf31005e2sm6150909qtb.73.2022.11.07.06.29.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Nov 2022 06:29:02 -0800 (PST)
+Date: Mon, 7 Nov 2022 09:29:00 -0500
+From: Peter Xu <peterx@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, shuah@kernel.org,
+	catalin.marinas@arm.com, andrew.jones@linux.dev,
+	ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com,
+	will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+	pbonzini@redhat.com, seanjc@google.com, oliver.upton@linux.dev,
+	zhenyzha@redhat.com, shan.gavin@gmail.com
 Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
-In-Reply-To: <ec281dc5-baa2-3e18-8e83-089322db551a@redhat.com>
+Message-ID: <Y2kWLMMTho0+/BLR@x1n>
 References: <20221104234049.25103-1-gshan@redhat.com>
-	<20221104234049.25103-4-gshan@redhat.com>
-	<ec281dc5-baa2-3e18-8e83-089322db551a@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20221104234049.25103-4-gshan@redhat.com>
+ <87o7tkf5re.wl-maz@kernel.org>
+ <Y2ffRYoqlQOxgVtk@x1n>
+ <87iljrg7vd.wl-maz@kernel.org>
+ <Y2gh4x4MD8BJvogH@x1n>
+ <35d005f3-655a-88f5-2de3-848576a26e42@redhat.com>
+ <865yfrqf3j.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev, will@kernel.org, shan.gavin@gmail.com, bgardon@google.com, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221107113317.6QIbiDQzGzix19_avBdlvxgpkZuvFPz5_3fqnflz-9s@z>
+MIME-Version: 1.0
+In-Reply-To: <865yfrqf3j.wl-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Message-ID: <20221107142900.QvnzA6s0c4RR9Hy3de2CqS_9JQ4-spXXLQbTi5Ldads@z>
 
-On Mon, 07 Nov 2022 10:45:34 +0000,
-Gavin Shan <gshan@redhat.com> wrote:
-> 
-> Hi Marc, Peter, Oliver and Sean,
-> 
-> On 11/5/22 7:40 AM, Gavin Shan wrote:
-> > ARM64 needs to dirty memory outside of a VCPU context when VGIC/ITS is
-> > enabled. It's conflicting with that ring-based dirty page tracking always
-> > requires a running VCPU context.
-> > 
-> > Introduce a new flavor of dirty ring that requires the use of both VCPU
-> > dirty rings and a dirty bitmap. The expectation is that for non-VCPU
-> > sources of dirty memory (such as the VGIC/ITS on arm64), KVM writes to
-> > the dirty bitmap. Userspace should scan the dirty bitmap before migrating
-> > the VM to the target.
-> > 
-> > Use an additional capability to advertise this behavior. The newly added
-> > capability (KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP) can't be enabled before
-> > KVM_CAP_DIRTY_LOG_RING_ACQ_REL on ARM64. In this way, the newly added
-> > capability is treated as an extension of KVM_CAP_DIRTY_LOG_RING_ACQ_REL.
-> > 
-> > Suggested-by: Marc Zyngier <maz@kernel.org>
-> > Suggested-by: Peter Xu <peterx@redhat.com>
-> > Co-developed-by: Oliver Upton <oliver.upton@linux.dev>
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > Signed-off-by: Gavin Shan <gshan@redhat.com>
-> > Acked-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >   Documentation/virt/kvm/api.rst | 33 ++++++++++++++++++-----
-> >   include/linux/kvm_dirty_ring.h |  7 +++++
-> >   include/linux/kvm_host.h       |  1 +
-> >   include/uapi/linux/kvm.h       |  1 +
-> >   virt/kvm/Kconfig               |  8 ++++++
-> >   virt/kvm/dirty_ring.c          | 10 +++++++
-> >   virt/kvm/kvm_main.c            | 49 +++++++++++++++++++++++++++-------
-> >   7 files changed, 93 insertions(+), 16 deletions(-)
-> > 
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index eee9f857a986..2ec32bd41792 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -8003,13 +8003,6 @@ flushing is done by the KVM_GET_DIRTY_LOG ioctl).  To achieve that, one
-> >   needs to kick the vcpu out of KVM_RUN using a signal.  The resulting
-> >   vmexit ensures that all dirty GFNs are flushed to the dirty rings.
-> >   -NOTE: the capability KVM_CAP_DIRTY_LOG_RING and the corresponding
-> > -ioctl KVM_RESET_DIRTY_RINGS are mutual exclusive to the existing ioctls
-> > -KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG.  After enabling
-> > -KVM_CAP_DIRTY_LOG_RING with an acceptable dirty ring size, the virtual
-> > -machine will switch to ring-buffer dirty page tracking and further
-> > -KVM_GET_DIRTY_LOG or KVM_CLEAR_DIRTY_LOG ioctls will fail.
-> > -
-> >   NOTE: KVM_CAP_DIRTY_LOG_RING_ACQ_REL is the only capability that
-> >   should be exposed by weakly ordered architecture, in order to indicate
-> >   the additional memory ordering requirements imposed on userspace when
-> > @@ -8018,6 +8011,32 @@ Architecture with TSO-like ordering (such as x86) are allowed to
-> >   expose both KVM_CAP_DIRTY_LOG_RING and KVM_CAP_DIRTY_LOG_RING_ACQ_REL
-> >   to userspace.
-> >   +After using the dirty rings, the userspace needs to detect the
-> > capability
-> > +of KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP to see whether the ring structures
-> > +need to be backed by per-slot bitmaps. With this capability advertised
-> > +and supported, it means the architecture can dirty guest pages without
-> > +vcpu/ring context, so that some of the dirty information will still be
-> > +maintained in the bitmap structure. KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
-> > +can't be enabled until the capability of KVM_CAP_DIRTY_LOG_RING_ACQ_REL
-> > +has been enabled.
-> > +
-> > +Note that the bitmap here is only a backup of the ring structure, and
-> > +normally should only contain a very small amount of dirty pages, which
-> > +needs to be transferred during VM downtime. Collecting the dirty bitmap
-> > +should be the very last thing that the VMM does before transmitting state
-> > +to the target VM. VMM needs to ensure that the dirty state is final and
-> > +avoid missing dirty pages from another ioctl ordered after the bitmap
-> > +collection.
-> > +
-> > +To collect dirty bits in the backup bitmap, the userspace can use the
-> > +same KVM_GET_DIRTY_LOG ioctl. KVM_CLEAR_DIRTY_LOG shouldn't be needed
-> > +and its behavior is undefined since collecting the dirty bitmap always
-> > +happens in the last phase of VM's migration.
-> > +
-> > +NOTE: One example of using the backup bitmap is saving arm64 vgic/its
-> > +tables through KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} command on
-> > +KVM device "kvm-arm-vgic-its" during VM's migration.
-> > +
-> 
-> In order to speed up the review and reduce unnecessary respins. After
-> collecting comments on PATCH[v8 3/7] from Marc and Peter, I would change
-> above description as below. Could you please confirm it looks good to you?
-> 
-> In the 4th paragraph, the words starting from "Collecting the dirty bitmap..."
-> to the end, was previously suggested by Oliver, even Marc suggested to avoid
-> mentioning "migration".
-> 
->   After enabling the dirty rings, the userspace needs to detect the
->   capability of KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP to see whether the ring
->   structures need to be backed by per-slot bitmaps. With this capability
+On Mon, Nov 07, 2022 at 09:38:24AM +0000, Marc Zyngier wrote:
+> Peter said there is an undefined behaviour. I want to understand
+> whether this is the case or not. QEMU is only one of the users of this
+> stuff, as all the vendors have their own custom VMM, and they do
+> things in funny ways.
 
-s/need/can/. If there was a *need*, it should happen automatically
-without user intervention.
-
->   advertised, it means the architecture can dirty guest pages without
->   vcpu/ring context, so that some of the dirty information will still be
->   maintained in the bitmap structure. KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
->   can't be enabled if the capability of KVM_CAP_DIRTY_LOG_RING_ACQ_REL
->   hasn't been enabled, or any memslot has been existing.
-> 
->   Note that the bitmap here is only a backup of the ring structure. The
->   use of the ring and bitmap combination is only beneficial if there is
->   only a very small amount of memory that is dirtied out of vcpu/ring
->   context. Otherwise, the stand-alone per-slot bitmap mechanism needs to
->   be considered.
-> 
->   To collect dirty bits in the backup bitmap, userspace can use the same
->   KVM_GET_DIRTY_LOG ioctl. KVM_CLEAR_DIRTY_LOG isn't needed as long as all
->   the generation of the dirty bits is done in a single pass. Collecting
->   the dirty bitmap should be the very last thing that the VMM does before
->   transmitting state to the target VM. VMM needs to ensure that the dirty
->   state is final and avoid missing dirty pages from another ioctl ordered
->   after the bitmap collection.
-
-I would replace "transmitting state to the target VM" with
-"considering the state as complete", as I still object to casting this
-API into the migration mold. People use this stuff more far more than
-migration (checkpointing, for example).
-
-> 
->   NOTE: One example of using the backup bitmap is saving arm64 vgic/its
->   tables through KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} command on
->   KVM device "kvm-arm-vgic-its" during VM's migration.
-
-Same remark about migration.
-
-Thanks,
-
-	M.
+It's not, as we don't special case this case in KVM_CLEAR_DIRTY_LOG.  If
+that's confusing, we can drop it in the document.  Thanks.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Peter Xu
+
