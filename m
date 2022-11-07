@@ -2,80 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C13C4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 14:51:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B97C433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 14:51:53 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E0604BB02;
-	Thu, 10 Nov 2022 09:51:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 514C74BAC0;
+	Thu, 10 Nov 2022 09:51:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@ibm.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4vVrTcyvSf2d; Thu, 10 Nov 2022 09:51:50 -0500 (EST)
+	with ESMTP id 8-mcN8upMiPi; Thu, 10 Nov 2022 09:51:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38B7A4BB35;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 763734BB3A;
 	Thu, 10 Nov 2022 09:51:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AC594B877
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 13:22:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 95DAC4B86D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 13:22:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O9bGqv4IQzJM for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Nov 2022 13:22:27 -0500 (EST)
+ with ESMTP id Y7J80cYBEZQO for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Nov 2022 13:22:48 -0500 (EST)
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com
  [148.163.158.5])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D42784B866
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 13:22:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61C084B866
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 13:22:48 -0500 (EST)
 Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A7IBq2u003348;
- Mon, 7 Nov 2022 18:22:12 GMT
+ by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A7IBfhG003607;
+ Mon, 7 Nov 2022 18:22:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
  h=message-id : subject :
  from : to : cc : date : in-reply-to : references : content-type :
  content-transfer-encoding : mime-version; s=pp1;
- bh=DdfWgA9vouqG75fSo60uN652MOW4sllCxUOKeP3RfcQ=;
- b=eebFqKmEkCdsVhVRi/XbOsQdRoLwq4ZqlPHzBEH8C4MPmOdN3J6x8ZbxV5zTXLIgDm15
- qQMOH8r09V5AhYha+kX4r724Ee4Rs17OS5mdepLKgsCtM6E+cKKeEzVbWBSKtzUU4YY/
- aol74r7eqOMb3RVogdjXRRpLoaEf7XKjZLctN4O010ACm93+mKOIeOp847ulP5z3lJdS
- a6r/G22054YYfe1JEjnORfLH3epvLYpdmC1s98grcGDpk1fzOzBAhj8oDY55/damEQhE
- H/H/yzX12ifeRs3++3u3YxAL0OCP8U9NqLLbLLjBZeOyB0VpgKfGjSVo9Axrk8+wTTm8 9Q== 
+ bh=EzR8gIJXN5CxUQRbcB4MiNn9dtOoco2fyNz/1FbCYTs=;
+ b=oLSyj97Tdsnk0VQOOelX0cMC03SHso5gNnzaHyD+AU0QdK4ObvkSGhKy5MB3Eu0X4nH3
+ cwQlVJnBR+mHedqllHCGkozoyH6XI3rvXWzRd6B14keKEVzxvN6OwiPguQYiPjgoozr5
+ CuCksG6s9mdmq7QLIUQJIca83ZvoD2XgDSxzv6A51X5fRtxNeiKKljGLcDn9w2C0oVaI
+ lt4UbjIbWAu4ejWPW7Tu9j/0mFdDdf2RJQ//Gs+6w72ns70J8ekHGYyOg0A6bX47zuXl
+ 7JNyzQw/vMhVPkpKIf+E0zSFCsOlxjnE+4eVRtOOT/s/U0hkUCCpuH99DScbFKpRAn6z EA== 
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1uuwfut-1
+ by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1uuwfy4-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 07 Nov 2022 18:22:12 +0000
+ Mon, 07 Nov 2022 18:22:19 +0000
 Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A7Gap89020063;
- Mon, 7 Nov 2022 18:22:11 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1uuwfu3-1
+ by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A7Gap8F020063;
+ Mon, 7 Nov 2022 18:22:18 GMT
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1uuwfxe-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 07 Nov 2022 18:22:11 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A7IL2m0022680;
- Mon, 7 Nov 2022 18:22:10 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma02dal.us.ibm.com with ESMTP id 3kngnd5nhx-1
+ Mon, 07 Nov 2022 18:22:17 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A7IL2nI028450;
+ Mon, 7 Nov 2022 18:22:16 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma04dal.us.ibm.com with ESMTP id 3kngmswr5v-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 07 Nov 2022 18:22:10 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com ([9.208.128.116])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 2A7IM8k714090930
+ Mon, 07 Nov 2022 18:22:16 +0000
+Received: from smtpav04.dal12v.mail.ibm.com ([9.208.128.131])
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 2A7IMJ895243508
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 7 Nov 2022 18:22:09 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D47C358062;
- Mon,  7 Nov 2022 18:22:07 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1A18E5805F;
- Mon,  7 Nov 2022 18:22:04 +0000 (GMT)
+ Mon, 7 Nov 2022 18:22:19 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B096858062;
+ Mon,  7 Nov 2022 18:22:14 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E657058052;
+ Mon,  7 Nov 2022 18:22:11 +0000 (GMT)
 Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown
- [9.65.225.56]) by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
- Mon,  7 Nov 2022 18:22:03 +0000 (GMT)
-Message-ID: <1166ac40ae848d81e7fa7aeec056c91079d768d4.camel@linux.ibm.com>
-Subject: Re: [PATCH 09/44] KVM: Drop arch hardware (un)setup hooks
+ [9.65.225.56]) by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+ Mon,  7 Nov 2022 18:22:11 +0000 (GMT)
+Message-ID: <e2b21ebfec94bcc3d830a5c7f11837d6dedac652.camel@linux.ibm.com>
+Subject: Re: [PATCH 25/44] KVM: s390: Do s390 specific init without bouncing
+ through kvm_init()
 From: Eric Farman <farman@linux.ibm.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
  <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, Huacai Chen
@@ -87,21 +89,21 @@ To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
  Janosch Frank <frankja@linux.ibm.com>,
  Claudio Imbrenda <imbrenda@linux.ibm.com>, Matthew Rosato
  <mjrosato@linux.ibm.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Mon, 07 Nov 2022 13:22:03 -0500
-In-Reply-To: <20221102231911.3107438-10-seanjc@google.com>
+Date: Mon, 07 Nov 2022 13:22:11 -0500
+In-Reply-To: <20221102231911.3107438-26-seanjc@google.com>
 References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-10-seanjc@google.com>
+ <20221102231911.3107438-26-seanjc@google.com>
 User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
 MIME-Version: 1.0
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: otjvlxlCigjzwqXdeFPxNBxJt_I7IxRm
-X-Proofpoint-ORIG-GUID: dd3fkNzioIT2BrJda-qHcffczlDpzuYb
+X-Proofpoint-GUID: Zz_sQx9dIUW7WUoiYMvv3aj8CVyX61yu
+X-Proofpoint-ORIG-GUID: x0YF0w8yQ2jwBDgCwuGa40JfBxQPUq9F
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-11-07_08,2022-11-07_02,2022-06-22_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  suspectscore=0 bulkscore=0
- mlxlogscore=888 clxscore=1015 impostorscore=0 malwarescore=0
+ mlxlogscore=598 clxscore=1015 impostorscore=0 malwarescore=0
  lowpriorityscore=0 mlxscore=0 adultscore=0 spamscore=0 phishscore=0
  priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2210170000 definitions=main-2211070144
@@ -133,24 +135,20 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 T24gV2VkLCAyMDIyLTExLTAyIGF0IDIzOjE4ICswMDAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOgo+IERyb3Aga3ZtX2FyY2hfaGFyZHdhcmVfc2V0dXAoKSBhbmQga3ZtX2FyY2hfaGFyZHdh
-cmVfdW5zZXR1cCgpIG5vdwo+IHRoYXQKPiBhbGwgaW1wbGVtZW50YXRpb25zIGFyZSBub3BzLgo+
-IAo+IE5vIGZ1bmN0aW9uYWwgY2hhbmdlIGludGVuZGVkLgo+IAo+IFNpZ25lZC1vZmYtYnk6IFNl
-YW4gQ2hyaXN0b3BoZXJzb24gPHNlYW5qY0Bnb29nbGUuY29tPgo+IC0tLQo+IMKgYXJjaC9hcm02
-NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5owqDCoCB8wqAgMSAtCj4gwqBhcmNoL2FybTY0L2t2bS9h
-cm0uY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgNSAtLS0tLQo+IMKgYXJjaC9t
-aXBzL2luY2x1ZGUvYXNtL2t2bV9ob3N0LmjCoMKgwqAgfMKgIDEgLQo+IMKgYXJjaC9taXBzL2t2
-bS9taXBzLmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDUgLS0tLS0KPiDCoGFy
-Y2gvcG93ZXJwYy9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIHzCoCAxIC0KPiDCoGFyY2gvcG93ZXJw
-Yy9rdm0vcG93ZXJwYy5jwqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA1IC0tLS0tCj4gwqBhcmNoL3Jp
-c2N2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmjCoMKgIHzCoCAxIC0KPiDCoGFyY2gvcmlzY3Yva3Zt
-L21haW4uY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfMKgIDUgLS0tLS0KPiDCoGFyY2gv
-czM5MC9rdm0va3ZtLXMzOTAuY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAxMCAtLS0tLS0tLS0t
-Cj4gwqBhcmNoL3g4Ni9rdm0veDg2LmPCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IHwgMTAgLS0tLS0tLS0tLQo+IMKgaW5jbHVkZS9saW51eC9rdm1faG9zdC5owqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCB8wqAgMiAtLQo+IMKgdmlydC9rdm0va3ZtX21haW4uY8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIHzCoCA3IC0tLS0tLS0KPiDCoDEyIGZpbGVzIGNoYW5nZWQsIDUz
-IGRlbGV0aW9ucygtKQoKUmV2aWV3ZWQtYnk6IEVyaWMgRmFybWFuIDxmYXJtYW5AbGludXguaWJt
-LmNvbT4JIyBzMzkwCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRw
-czovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+b3RlOgo+IE1vdmUgdGhlIGd1dHMgb2Yga3ZtX2FyY2hfaW5pdCgpIGludG8gYSBuZXcgaGVscGVy
+LAo+IF9fa3ZtX3MzOTBfaW5pdCgpLAo+IGFuZCBpbnZva2UgdGhlIG5ldyBoZWxwZXIgZGlyZWN0
+bHkgZnJvbSBrdm1fczM5MF9pbml0KCkgaW5zdGVhZCBvZgo+IGJvdW5jaW5nIHRocm91Z2gga3Zt
+X2luaXQoKS7CoCBJbnZva2luZyBrdm1fYXJjaF9pbml0KCkgaXMgdGhlIHZlcnkKPiBmaXJzdCBh
+Y3Rpb24gcGVyZm9ybWVkIGJ5IGt2bV9pbml0KCksIGkuZS4gdGhpcyBpcyBhIGdsb3JpZmllZCBu
+b3AuCj4gCj4gTW92aW5nIHNldHVwIHRvIF9fa3ZtX3MzOTBfaW5pdCgpIHdpbGwgYWxsb3cgdGFn
+Z2luZyBtb3JlIGZ1bmN0aW9ucwo+IGFzCj4gX19pbml0LCBhbmQgZW1wdHlpbmcga3ZtX2FyY2hf
+aW5pdCgpIHdpbGwgYWxsb3cgZHJvcHBpbmcgdGhlIGhvb2sKPiBlbnRpcmVseSBvbmNlIGFsbCBh
+cmNoaXRlY3R1cmUgaW1wbGVtZW50YXRpb25zIGFyZSBub3BzLgo+IAo+IE5vIGZ1bmN0aW9uYWwg
+Y2hhbmdlIGludGVuZGVkLgo+IAo+IFNpZ25lZC1vZmYtYnk6IFNlYW4gQ2hyaXN0b3BoZXJzb24g
+PHNlYW5qY0Bnb29nbGUuY29tPgo+IC0tLQo+IMKgYXJjaC9zMzkwL2t2bS9rdm0tczM5MC5jIHwg
+MjkgKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0KPiDCoDEgZmlsZSBjaGFuZ2VkLCAyNSBp
+bnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQoKUmV2aWV3ZWQtYnk6IEVyaWMgRmFybWFuIDxm
+YXJtYW5AbGludXguaWJtLmNvbT4KCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
+LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
+bQo=
