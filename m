@@ -1,155 +1,139 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FBED531
-	for <kvmarm@lists.linux.dev>; Mon,  7 Nov 2022 16:05:41 +0000 (UTC)
-Received: by mail-pj1-f49.google.com with SMTP id d13-20020a17090a3b0d00b00213519dfe4aso10735064pjc.2
-        for <kvmarm@lists.linux.dev>; Mon, 07 Nov 2022 08:05:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CwCXHOiuiyfKv69+MEzKNVwp3Ov8oZ78eR0WR4d2A90=;
-        b=NLcMdAU2vS38J28r0bBcsw9sZG6YcZkl/8nBVDjJmKmae84CrIcfXGeRXyu5K/r2XC
-         UXrnEq0BsJneLcHe1CNJYHR75xYsoXID5BQbTEcuwORpbQ+QfxAjFkkD8vDJsL2oodUp
-         DIuWBiHaNivTC8uyPcgEfz1vmoWtscFYydQi+R3bmF6HEgWJmUiWrYPuVIaUChxcqxTi
-         di9evWogJbj1Hbyk9lUBgezlAa96Ur8/3SxAxP0+2IU0yS7UH7HSbHYQwC9QdQrQmZGN
-         JyXtK6CAsYEae29AWcTHURqTPdtdj6RMhazriqop30Mk5iNQ232Ex5JAIGbk+jM6+DBc
-         He+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CwCXHOiuiyfKv69+MEzKNVwp3Ov8oZ78eR0WR4d2A90=;
-        b=Eo9a6fjZ6hti/hP+P/xOe+0j6e0aO++uFN0eWJkoxTrYnDZQHqhsNGntxbOSHi3jv4
-         lPb5SMQjxl3v63jVicXB6kRdEzUXyiWD+uMuzWSo79MuRJsBpzQg2JyIdTHbDkXRZnZW
-         8Z5AEeaJYij3nMMdMz3LVn0YdQ0PTPTisank7FB4Heootv4sPWb4mu7kHzId6sbOeFu/
-         b5bKRFZpiiBjrADXI6Fp9QlwTmV6xgvX3y1rkafanVu9ymKVMbf4AkOrqgz4aqBRHou3
-         hCT1JBwnNiNBEOJXvpyg+iKAD5Rco8CBYrQ629peX04VTYLVmdRLhW4ovPwi801aeSZY
-         xcVw==
-X-Gm-Message-State: ANoB5pluqBttBj6oQoCsH8tb2bBSTYuNEle3M0dxS4evB4mbAfK1N9nQ
-	uvx0A5Ux/OL6fWQfKao2uvXIUA==
-X-Google-Smtp-Source: AA0mqf7NmHUwnj4p1J7j0E54Y9RXMXBZQMv0Sw4ZZdbS0IXjebmkq5OLQBCE6zzlWdvLIEkqEMOzqA==
-X-Received: by 2002:a17:903:4052:b0:188:6bad:3ff0 with SMTP id n18-20020a170903405200b001886bad3ff0mr16812130pla.6.1667837140430;
-        Mon, 07 Nov 2022 08:05:40 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id n5-20020a170902e54500b00186c54188b4sm5188752plf.240.2022.11.07.08.05.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Nov 2022 08:05:39 -0800 (PST)
-Date: Mon, 7 Nov 2022 16:05:36 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Gavin Shan <gshan@redhat.com>
-Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com,
-	andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com,
-	dmatlack@google.com, will@kernel.org, suzuki.poulose@arm.com,
-	alexandru.elisei@arm.com, pbonzini@redhat.com, maz@kernel.org,
-	peterx@redhat.com, oliver.upton@linux.dev, zhenyzha@redhat.com,
-	shan.gavin@gmail.com
-Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
-Message-ID: <Y2ks0NWEEfN8bWV1@google.com>
-References: <20221104234049.25103-1-gshan@redhat.com>
- <20221104234049.25103-4-gshan@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3AE12294
+	for <kvmarm@lists.linux.dev>; Mon,  7 Nov 2022 17:57:51 +0000 (UTC)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2A7GWJ3q025033;
+	Mon, 7 Nov 2022 17:56:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=f/VyMxldYSSF3j2oK7NPGa3PSNeBgbkNFvcSuG+2vx0=;
+ b=S/OmHIKl6xk3e5DTWJwBRHY4lzU49Rc8ZGVwoj57UADrowOK07/esILhX51XvfJdOMXr
+ mGyQ+AfwLDXvZLh6Y9AXiwN7sJ7f03jvlfn8cP2lyWNruJtWNqei483yk5/BJuN/WUE4
+ +gww4sppA6zPjXCHUAJaLGlfBRtvSFJfa/dLDmf24cRnkgeaih1LzugmsJlZ7fMHhd5A
+ ac8WW8nmTO1n8QaI/YhrR898ZaXXwP3xILX1k0Zz4zJaLt+cgarxEXI7olJSehWyz89k
+ 7VgnIOaxNZTBYMVZSWT0rjhsgcdrdPWr4gKgulZ3e0kr7jg6dJBNUiMelAsjUsixhgYP XQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1gmcfya-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 07 Nov 2022 17:56:58 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2A7GfRN3013181;
+	Mon, 7 Nov 2022 17:56:57 GMT
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kp1gmcfxr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 07 Nov 2022 17:56:57 +0000
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+	by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2A7Hpg97017981;
+	Mon, 7 Nov 2022 17:56:56 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+	by ppma03wdc.us.ibm.com with ESMTP id 3kngs717x9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 07 Nov 2022 17:56:56 +0000
+Received: from smtpav02.dal12v.mail.ibm.com ([9.208.128.128])
+	by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2A7Huq9X25494124
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 7 Nov 2022 17:56:53 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CC5055805E;
+	Mon,  7 Nov 2022 17:56:54 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B470A5805F;
+	Mon,  7 Nov 2022 17:56:51 +0000 (GMT)
+Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.65.225.56])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  7 Nov 2022 17:56:51 +0000 (GMT)
+Message-ID: <5e44854b2781a0be6fae5c82645ac64ef9b5dccf.camel@linux.ibm.com>
+Subject: Re: [PATCH 04/44] KVM: Teardown VFIO ops earlier in kvm_exit()
+From: Eric Farman <farman@linux.ibm.com>
+To: Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini
+ <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen
+ <chenhuacai@kernel.org>,
+        Aleksandar Markovic
+ <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Paul
+ Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Matthew Rosato
+ <mjrosato@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: James Morse <james.morse@arm.com>,
+        Alexandru Elisei
+ <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Atish Patra <atishp@atishpatra.org>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Isaku Yamahata <isaku.yamahata@intel.com>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Michael Ellerman
+ <mpe@ellerman.id.au>, Chao Gao <chao.gao@intel.com>,
+        Thomas Gleixner
+ <tglx@linutronix.de>, Yuan Yao <yuan.yao@intel.com>
+Date: Mon, 07 Nov 2022 12:56:51 -0500
+In-Reply-To: <20221102231911.3107438-5-seanjc@google.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+	 <20221102231911.3107438-5-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221104234049.25103-4-gshan@redhat.com>
-Message-ID: <20221107160536.qLqB1nnZpQJGyzIqInJZSaT4guF6GNMn_zmxWD5tpss@z>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: lZlTwgd7mrqbECRxIjDdrL-RNnawny2B
+X-Proofpoint-GUID: bMDCUJB8k6cbTpkwMsak__06bTu4RXWC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-11-07_08,2022-11-07_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 mlxscore=0 mlxlogscore=999 suspectscore=0 clxscore=1011
+ priorityscore=1501 malwarescore=0 impostorscore=0 phishscore=0 spamscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2211070140
+Message-ID: <20221107175651.JP8nme6V04I3w2jiOIOjX2PFKPLaVGV5-BSM1BYwh5E@z>
 
-On Sat, Nov 05, 2022, Gavin Shan wrote:
-> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-> index fecbb7d75ad2..758679724447 100644
-> --- a/virt/kvm/dirty_ring.c
-> +++ b/virt/kvm/dirty_ring.c
-> @@ -21,6 +21,16 @@ u32 kvm_dirty_ring_get_rsvd_entries(void)
->  	return KVM_DIRTY_RING_RSVD_ENTRIES + kvm_cpu_dirty_log_size();
->  }
->  
-> +bool kvm_use_dirty_bitmap(struct kvm *kvm)
-> +{
+On Wed, 2022-11-02 at 23:18 +0000, Sean Christopherson wrote:
+> Move the call to kvm_vfio_ops_exit() further up kvm_exit() to try and
+> bring some amount of symmetry to the setup order in kvm_init(), and
+> more
+> importantly so that the arch hooks are invoked dead last by
+> kvm_exit().
+> This will allow arch code to move away from the arch hooks without
+> any
+> change in ordering between arch code and common code in kvm_exit().
+>=20
+> That kvm_vfio_ops_exit() is called last appears to be 100%
+> arbitrary.=C2=A0 It
+> was bolted on after the fact by commit 571ee1b68598 ("kvm: vfio: fix
+> unregister kvm_device_ops of vfio").=C2=A0 The nullified
+> kvm_device_ops_table
+> is also local to kvm_main.c and is used only when there are active
+> VMs,
+> so unless arch code is doing something truly bizarre, nullifying the
+> table earlier in kvm_exit() is little more than a nop.
+>=20
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+> =C2=A0virt/kvm/kvm_main.c | 2 +-
+> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
 
-	lockdep_assert_held(&kvm->slots_lock);
-
-To guard against accessing kvm->dirty_ring_with_bitmap without holding slots_lock.
-
-> +	return !kvm->dirty_ring_size || kvm->dirty_ring_with_bitmap;
-> +}
-> +
-> @@ -4588,6 +4594,31 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
->  			return -EINVAL;
->  
->  		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
-> +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP: {
-> +		struct kvm_memslots *slots;
-> +		int r = -EINVAL;
-> +
-> +		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
-> +		    !kvm->dirty_ring_size)
-> +			return r;
-> +
-> +		mutex_lock(&kvm->slots_lock);
-> +
-> +		slots = kvm_memslots(kvm);
-
-Sadly, this needs to iterate over all possible memslots thanks to x86's SMM
-address space.  Might be worth adding a separate helper (that's local to kvm_main.c
-to discourage use), e.g. 
-
-static bool kvm_are_all_memslots_empty(struct kvm *kvm)
-{
-	int i;
-
-	lockdep_assert_held(&kvm->slots_lock);
-
-	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-		if (!kvm_memslots_empty(__kvm_memslots(kvm, i)))
-			return false;
-	}
-
-	return true;
-}
-
-> +
-> +		/*
-> +		 * Avoid a race between memslot creation and enabling the ring +
-> +		 * bitmap capability to guarantee that no memslots have been
-> +		 * created without a bitmap.
-
-Nit, it's not just enabling, the below also allows disabling the bitmap.  The
-enabling case is definitely the most interesting, but the above wording makes it
-sound like the enabling case is the only thing that being given protection.  That's
-kinda true since KVM frees bitmaps without checking kvm_use_dirty_bitmap(), but
-that's not a strict requirement.
-
-And there's no race required, e.g. without this check userspace could simply create
-a memslot and then toggle on the capability.  Acquiring slots_lock above is what
-guards against races.
-
-Might also be worth alluding to the alternative solution of allocating the bitmap
-for all memslots here, e.g. something like
-
-		/*
-		 * For simplicity, allow toggling ring+bitmap if and only if
-		 * there are no memslots, e.g. to ensure all memslots allocate a
-		 * bitmap after the capability is enabled.
-		 */
-
-> +		 */
-> +		if (kvm_memslots_empty(slots)) {
-> +			kvm->dirty_ring_with_bitmap = cap->args[0];
-> +			r = 0;
-> +		}
-> +
-> +		mutex_unlock(&kvm->slots_lock);
-> +		return r;
-> +	}
->  	default:
->  		return kvm_vm_ioctl_enable_cap(kvm, cap);
->  	}
-> -- 
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
