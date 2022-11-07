@@ -2,84 +2,89 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D5BC433FE
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Nov 2022 15:31:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E2C2C433FE
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Nov 2022 15:39:17 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 672D64B88F;
-	Mon,  7 Nov 2022 10:31:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B80E34B8B1;
+	Mon,  7 Nov 2022 10:39:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CGyn6hycfmVh; Mon,  7 Nov 2022 10:31:07 -0500 (EST)
+	with ESMTP id e7BuHfJIDjZl; Mon,  7 Nov 2022 10:39:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 282A74B893;
-	Mon,  7 Nov 2022 10:31:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EEEF4B885;
+	Mon,  7 Nov 2022 10:39:15 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A03BE4B88C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 10:31:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E9EF4B845
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 10:39:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TWGDRT5lm5Ke for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Nov 2022 10:31:04 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6890D4B885
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 10:31:04 -0500 (EST)
+ with ESMTP id 7l1Ed7cu1G-2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Nov 2022 10:39:12 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C4A1E4B812
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 10:39:12 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 4144B60DE3;
- Mon,  7 Nov 2022 15:31:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A11DCC433D6;
- Mon,  7 Nov 2022 15:31:02 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 680D2B812AA;
+ Mon,  7 Nov 2022 15:39:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF7BEC433D6;
+ Mon,  7 Nov 2022 15:39:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1667835062;
- bh=bkVktwW5TQjNJ7vT92h9Ndj7XiwAcQLTowe267DgFCM=;
+ s=k20201202; t=1667835550;
+ bh=LJTIX6EOyaGeco5U/ATP5mMAgf2Y3X8oNl0EWEryn5o=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=n6poy86h9Rm4cDZcXm40fl1O2bbwobQTLE1dNyZvG7LyEe4N6BXXkjxlhywPpw+sW
- cXAM33t1k16JO/VLniR7wxF3VPJNxL2/XhIcq5c/vX/xxkDnyUBcco1opwqdd8sUA7
- Ll5SjjbNQHHFgXCSX3Y/Kau8KyhSEhuKlCTlUTZtA9buC06CBQyomUoxp1ByWAtRry
- wTPhEApW2RUD+v3HYx2zGnXe24Yw+65Y1VvGD0jOv67zq94Kdjt8I13O3ITOsEGnd0
- lY6An1wsYTUm03vJGthMwUcLa3iE0PmMzH6BZ/AMXwY8zWWwSpe3RubmzrgrbtFA6U
- m7nVDvTlb/y7w==
+ b=nsdFJc9TqagjKvmFhMqOxOGFd9zPtEIUDgrKBq1eaNwvFUXm/2MT2aEvrvPfmz7J7
+ JIw+bt+4p8KLa/zn3pkuPjPS8R0Bh1J+xpk+eX/gVzh8hVLMkb52DFNTZXSq14utSE
+ rzVVJDENJRiZLmhavv6oR67vreSXOvHPNGz4XhvbYqOCH8AIs9rXMVSsclitgNiG5x
+ ZNL1FBuqhtZnRUidWMLLrEGZCt5miwTj+H9/522i6VgM2oCNT94tTEvR4849xFqzdm
+ vUxQ0Vvsh/UD0V7Kfavqdl7K4xON3elnskuxhxpest11c2Ytv1bhlBIsg/gC2bctp8
+ 7upVCChMDUuLA==
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=goblin-girl.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1os45U-004QlV-B6;
- Mon, 07 Nov 2022 15:31:00 +0000
-Date: Mon, 07 Nov 2022 15:30:59 +0000
-Message-ID: <86zgd2pyrw.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1os4DL-004Qsn-Ss;
+ Mon, 07 Nov 2022 15:39:08 +0000
+Date: Mon, 07 Nov 2022 15:39:07 +0000
+Message-ID: <86y1smpyec.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
-In-Reply-To: <Y2kdXTn6X3O08sFv@x1n>
-References: <20221104234049.25103-1-gshan@redhat.com>
- <20221104234049.25103-4-gshan@redhat.com>
- <87o7tkf5re.wl-maz@kernel.org> <Y2ffRYoqlQOxgVtk@x1n>
- <87iljrg7vd.wl-maz@kernel.org> <Y2gh4x4MD8BJvogH@x1n>
- <867d07qfvk.wl-maz@kernel.org> <Y2kdXTn6X3O08sFv@x1n>
+To: Leo Yan <leo.yan@linaro.org>
+Subject: Re: [PATCH v1 3/3] perf arm64: Support virtual CPU ID for kvm-stat
+In-Reply-To: <Y2kabsQdddiX4G+O@leoy-huanghe.lan>
+References: <20221105072311.8214-1-leo.yan@linaro.org>
+ <20221105072311.8214-4-leo.yan@linaro.org>
+ <868rkpr0mv.wl-maz@kernel.org> <Y2kabsQdddiX4G+O@leoy-huanghe.lan>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: peterx@redhat.com, gshan@redhat.com, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, shuah@kernel.org,
- catalin.marinas@arm.com, andrew.jones@linux.dev, ajones@ventanamicro.com,
- bgardon@google.com, dmatlack@google.com, will@kernel.org,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, pbonzini@redhat.com,
- seanjc@google.com, oliver.upton@linux.dev, zhenyzha@redhat.com,
- shan.gavin@gmail.com
+X-SA-Exim-Rcpt-To: leo.yan@linaro.org, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev,
+ catalin.marinas@arm.com, will@kernel.org, acme@kernel.org,
+ john.garry@huawei.com, james.clark@arm.com, mike.leach@linaro.org,
+ peterz@infradead.org, mingo@redhat.com, mark.rutland@arm.com,
+ alexander.shishkin@linux.intel.com, jolsa@kernel.org, namhyung@kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ linux-perf-users@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
- dmatlack@google.com, will@kernel.org, shan.gavin@gmail.com, bgardon@google.com,
- kvmarm@lists.linux.dev, pbonzini@redhat.com, zhenyzha@redhat.com,
- shuah@kernel.org, kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
+Cc: Peter Zijlstra <peterz@infradead.org>, Will Deacon <will@kernel.org>,
+ John Garry <john.garry@huawei.com>, linux-kernel@vger.kernel.org,
+ linux-perf-users@vger.kernel.org,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Jiri Olsa <jolsa@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ kvmarm@lists.linux.dev, Namhyung Kim <namhyung@kernel.org>,
+ Mike Leach <mike.leach@linaro.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, James Clark <james.clark@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,59 +101,155 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 07 Nov 2022 14:59:41 +0000,
-Peter Xu <peterx@redhat.com> wrote:
+On Mon, 07 Nov 2022 14:47:10 +0000,
+Leo Yan <leo.yan@linaro.org> wrote:
 > 
-> On Mon, Nov 07, 2022 at 09:21:35AM +0000, Marc Zyngier wrote:
-> > On Sun, 06 Nov 2022 21:06:43 +0000,
-> > Peter Xu <peterx@redhat.com> wrote:
+> On Sat, Nov 05, 2022 at 01:28:40PM +0000, Marc Zyngier wrote:
+> 
+> [...]
+> 
+> > > Before:
 > > > 
-> > > It's definitely not the case for x86, but if it's true for
-> > > arm64, then could the DMA be spread across all the guest pages?
-> > > If it's also true, I really don't know how this will work..
+> > >   # perf kvm stat report --vcpu 27
+> > > 
+> > >   Analyze events for all VMs, VCPU 27:
+> > > 
+> > >                VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time         Avg time
+> > > 
+> > >   Total Samples:0, Total events handled time:0.00us.
+> > >
+> > > After:
+> > > 
+> > >   # perf kvm stat report --vcpu 27
+> > > 
+> > >   Analyze events for all VMs, VCPU 27:
+> > > 
+> > >                VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time         Avg time
+> > > 
+> > >                  SYS64        808    98.54%    91.24%      0.00us    303.76us      3.46us ( +-  13.54% )
+> > >                    WFx         10     1.22%     7.79%      0.00us     69.48us     23.91us ( +-  25.91% )
+> > >                    IRQ          2     0.24%     0.97%      0.00us     22.64us     14.82us ( +-  52.77% )
+> > > 
+> > >   Total Samples:820, Total events handled time:3068.28us.
 > > 
-> > Of course, all pages can be the target of DMA. It works the same way
-> > it works for the ITS: you sync the state, you obtain the dirty bits,
-> > you move on.
-> > 
-> > And mimicking what x86 does is really not my concern (if you still
-> > think that arm64 is just another flavour of x86, stay tuned!  ;-).
+> > Please educate me: how useful is it to filter on a vcpu number across
+> > all VMs? What sense does it even make?
 > 
-> I didn't mean so, I should probably stop mentioning x86. :)
+> Now "perf kvm" tool is not sophisticated since it doesn't capture VMID
+> and virtual CPU ID together.
 
-Please! I turned off my last x86 development machine over the weekend,
-and my x86 laptop is now a glorified window manager... ;-)
+VMID is not a relevant indicator anyway, as it can change at any
+point. But that's only to show that everybody has a different view on
+what they need to collect. At which point, we need to provide an
+infrastructure for data extraction, and not the data itself.
 
-> I had some sense already from the topics in past few years of kvm forum.
-> Yeah I'll be looking forward to anything more coming.
-
-Yup. Hopefully we won't have to wait for too long to see this stuff (I
-had good discussions on the subject at both KF and Plumbers in Dublin
-earlier this year).
-
-> > > We're only syncing the dirty bitmap once right now with the
-> > > protocol.  If that can cover most of the guest mem, it's same as
-> > > non-live.  If we sync it periodically, then it's the same as
-> > > enabling dirty-log alone and the rings are useless.
-> > 
-> > I'm glad that you finally accept it: the ring *ARE* useless in the
-> > general sense. Only limited, CPU-only workloads can make any use of
-> > the current design. This probably covers a large proportion of what
-> > the cloud vendors do, but this doesn't work for general situations
-> > where you have a stream of dirty pages originating outside of the
-> > CPUs.
+> I think a case is we can spin a program on a specific virtual CPU with
+> taskset in VM, in this way we can check if any bottleneck is caused by
+> VM entry/exit, but I have to say that it's inaccurate if we only filter
+> on VCPU ID, we should consider tracing VMID and VCPU ID together in
+> later's enhancement.
 > 
-> The ring itself is really not the thing to blame, IMHO it's a good attempt
-> to try out de-coupling guest size in regard of dirty tracking from kvm.  It
-> may not be perfect, but it may still service some of the goals, e.g., at
-> least it allows the user app to detect per-vcpu information and also since
-> there's the ring full events we can do something more than before like the
-> vcpu throttling that China Telecom does with the ring structures.
+> > Conversely, what would be the purpose of filtering on a 5th thread of
+> > any process irrespective of what the process does? To me, this is the
+> > same level of non-sense.
+> 
+> I agree.
+> 
+> > AFAICT, this is just piling more arbitrary data extraction for no
+> > particular reason other than "just because we can", and there is
+> > absolutely no guarantee that this is fit for anyone else's purpose.
+> > 
+> > I'd rather you have a generic tracepoint taking the vcpu as a context
+> > and a BPF program that spits out the information people actually need,
+> > keeping things out of the kernel. Or even a tracehook (like the
+> > scheduler does), and let people load a module to dump whatever
+> > information they please.
+> 
+> Actually I considered three options:
+> 
+> Option 1: Simply add new version's trace events for recording more info.
+> This is not flexible and we even have risk to add more version's trace
+> event if later we might find that more data should traced.
+> 
+> This approach is straightforward and the implementation would be
+> simple.  This is main reason why finally I choosed to add new trace
+> events.
 
-I don't disagree with that: for vcpu-based workloads, the rings are
-great and doing their job. It's just that there is another side to
-this problem, and you'll have to deal with both eventually. We're just
-ahead of the curve here...
+But that doesn't scale at all.
+
+> 
+> Option 2: use Kprobe to dynamically insert tracepoints; but this means
+> the user must have the corresponding vmlinux file, otherwise, perf
+> tool might inject tracepoint at an incorrect address.  This is the
+> main reason I didn't use Kprobe to add dynamic tracepoints.
+>
+> Option 3: As you suggested, I can bind KVM tracepoints with a eBPF
+> program and the eBPF program records perf events.
+> 
+> When I reviewed Arm64's kvm_entry / kvm_exit trace events, they don't
+> have vcpu context in the arguments, this means I need to add new trace
+> events for accessing "vcpu" context.
+
+I'm not opposed to adding new trace{point,hook}s if you demonstrate
+that they are generic enough or will never need to evolve.
+
+> 
+> Option 1 and 3 both need to add trace events; option 1 is more
+> straightforward solution and this is why it was choosed in current patch
+> set.
+> 
+> I recognized that I made a mistake, actually we can modify the trace
+> event's definition for kvm_entry / kvm_exit, note we only modify the
+> trace event's arguments, this will change the trace function's
+> definition but it will not break ABI (the format is exactly same for
+> the user space).  Below changes demonstrate what's my proposing:
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 94d33e296e10..16f6b61abfec 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -917,7 +917,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>                 /**************************************************************
+>                  * Enter the guest
+>                  */
+> -               trace_kvm_entry(*vcpu_pc(vcpu));
+> +               trace_kvm_entry(vcpu);
+>                 guest_timing_enter_irqoff();
+>  
+>                 ret = kvm_arm_vcpu_enter_exit(vcpu);
+> diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
+> index 33e4e7dd2719..9df4fd30093c 100644
+> --- a/arch/arm64/kvm/trace_arm.h
+> +++ b/arch/arm64/kvm/trace_arm.h
+> @@ -12,15 +12,15 @@
+>   * Tracepoints for entry/exit to guest
+>   */
+>  TRACE_EVENT(kvm_entry,
+> -       TP_PROTO(unsigned long vcpu_pc),
+> -       TP_ARGS(vcpu_pc),
+> +       TP_PROTO(struct kvm_vcpu *vcpu),
+> +       TP_ARGS(vcpu),
+>  
+>         TP_STRUCT__entry(
+>                 __field(        unsigned long,  vcpu_pc         )
+>         ),
+>  
+>         TP_fast_assign(
+> -               __entry->vcpu_pc                = vcpu_pc;
+> +               __entry->vcpu_pc                = *vcpu_pc(vcpu);
+>         ),
+>  
+>         TP_printk("PC: 0x%016lx", __entry->vcpu_pc)
+> 
+> Please let me know your opinion, if you don't object, I can move
+> forward with this approach.
+
+I have no issue with this if this doesn't change anything else.
+
+And if you can make use of this with a BPF program and get to the same
+result as your initial patch, then please submit it for inclusion in
+the kernel as an example. We can then point people to it next time
+this crop up (probably before Xmas).
 
 Thanks,
 
