@@ -1,226 +1,155 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E899D527
-	for <kvmarm@lists.linux.dev>; Mon,  7 Nov 2022 15:39:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF7BEC433D6;
-	Mon,  7 Nov 2022 15:39:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1667835550;
-	bh=LJTIX6EOyaGeco5U/ATP5mMAgf2Y3X8oNl0EWEryn5o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nsdFJc9TqagjKvmFhMqOxOGFd9zPtEIUDgrKBq1eaNwvFUXm/2MT2aEvrvPfmz7J7
-	 JIw+bt+4p8KLa/zn3pkuPjPS8R0Bh1J+xpk+eX/gVzh8hVLMkb52DFNTZXSq14utSE
-	 rzVVJDENJRiZLmhavv6oR67vreSXOvHPNGz4XhvbYqOCH8AIs9rXMVSsclitgNiG5x
-	 ZNL1FBuqhtZnRUidWMLLrEGZCt5miwTj+H9/522i6VgM2oCNT94tTEvR4849xFqzdm
-	 vUxQ0Vvsh/UD0V7Kfavqdl7K4xON3elnskuxhxpest11c2Ytv1bhlBIsg/gC2bctp8
-	 7upVCChMDUuLA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1os4DL-004Qsn-Ss;
-	Mon, 07 Nov 2022 15:39:08 +0000
-Date: Mon, 07 Nov 2022 15:39:07 +0000
-Message-ID: <86y1smpyec.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Leo Yan <leo.yan@linaro.org>
-Cc: James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	John Garry <john.garry@huawei.com>,
-	James Clark <james.clark@arm.com>,
-	Mike Leach <mike.leach@linaro.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu,
-	linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org
-Subject: Re: [PATCH v1 3/3] perf arm64: Support virtual CPU ID for kvm-stat
-In-Reply-To: <Y2kabsQdddiX4G+O@leoy-huanghe.lan>
-References: <20221105072311.8214-1-leo.yan@linaro.org>
-	<20221105072311.8214-4-leo.yan@linaro.org>
-	<868rkpr0mv.wl-maz@kernel.org>
-	<Y2kabsQdddiX4G+O@leoy-huanghe.lan>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FBED531
+	for <kvmarm@lists.linux.dev>; Mon,  7 Nov 2022 16:05:41 +0000 (UTC)
+Received: by mail-pj1-f49.google.com with SMTP id d13-20020a17090a3b0d00b00213519dfe4aso10735064pjc.2
+        for <kvmarm@lists.linux.dev>; Mon, 07 Nov 2022 08:05:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CwCXHOiuiyfKv69+MEzKNVwp3Ov8oZ78eR0WR4d2A90=;
+        b=NLcMdAU2vS38J28r0bBcsw9sZG6YcZkl/8nBVDjJmKmae84CrIcfXGeRXyu5K/r2XC
+         UXrnEq0BsJneLcHe1CNJYHR75xYsoXID5BQbTEcuwORpbQ+QfxAjFkkD8vDJsL2oodUp
+         DIuWBiHaNivTC8uyPcgEfz1vmoWtscFYydQi+R3bmF6HEgWJmUiWrYPuVIaUChxcqxTi
+         di9evWogJbj1Hbyk9lUBgezlAa96Ur8/3SxAxP0+2IU0yS7UH7HSbHYQwC9QdQrQmZGN
+         JyXtK6CAsYEae29AWcTHURqTPdtdj6RMhazriqop30Mk5iNQ232Ex5JAIGbk+jM6+DBc
+         He+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CwCXHOiuiyfKv69+MEzKNVwp3Ov8oZ78eR0WR4d2A90=;
+        b=Eo9a6fjZ6hti/hP+P/xOe+0j6e0aO++uFN0eWJkoxTrYnDZQHqhsNGntxbOSHi3jv4
+         lPb5SMQjxl3v63jVicXB6kRdEzUXyiWD+uMuzWSo79MuRJsBpzQg2JyIdTHbDkXRZnZW
+         8Z5AEeaJYij3nMMdMz3LVn0YdQ0PTPTisank7FB4Heootv4sPWb4mu7kHzId6sbOeFu/
+         b5bKRFZpiiBjrADXI6Fp9QlwTmV6xgvX3y1rkafanVu9ymKVMbf4AkOrqgz4aqBRHou3
+         hCT1JBwnNiNBEOJXvpyg+iKAD5Rco8CBYrQ629peX04VTYLVmdRLhW4ovPwi801aeSZY
+         xcVw==
+X-Gm-Message-State: ANoB5pluqBttBj6oQoCsH8tb2bBSTYuNEle3M0dxS4evB4mbAfK1N9nQ
+	uvx0A5Ux/OL6fWQfKao2uvXIUA==
+X-Google-Smtp-Source: AA0mqf7NmHUwnj4p1J7j0E54Y9RXMXBZQMv0Sw4ZZdbS0IXjebmkq5OLQBCE6zzlWdvLIEkqEMOzqA==
+X-Received: by 2002:a17:903:4052:b0:188:6bad:3ff0 with SMTP id n18-20020a170903405200b001886bad3ff0mr16812130pla.6.1667837140430;
+        Mon, 07 Nov 2022 08:05:40 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id n5-20020a170902e54500b00186c54188b4sm5188752plf.240.2022.11.07.08.05.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Nov 2022 08:05:39 -0800 (PST)
+Date: Mon, 7 Nov 2022 16:05:36 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com,
+	andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com,
+	dmatlack@google.com, will@kernel.org, suzuki.poulose@arm.com,
+	alexandru.elisei@arm.com, pbonzini@redhat.com, maz@kernel.org,
+	peterx@redhat.com, oliver.upton@linux.dev, zhenyzha@redhat.com,
+	shan.gavin@gmail.com
+Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
+Message-ID: <Y2ks0NWEEfN8bWV1@google.com>
+References: <20221104234049.25103-1-gshan@redhat.com>
+ <20221104234049.25103-4-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: leo.yan@linaro.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, catalin.marinas@arm.com, will@kernel.org, acme@kernel.org, john.garry@huawei.com, james.clark@arm.com, mike.leach@linaro.org, peterz@infradead.org, mingo@redhat.com, mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, namhyung@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221107153907.4LES4s9GdIGOVKxLOXFHoqA5cdlDUzues37EYe_DAQo@z>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221104234049.25103-4-gshan@redhat.com>
+Message-ID: <20221107160536.qLqB1nnZpQJGyzIqInJZSaT4guF6GNMn_zmxWD5tpss@z>
 
-On Mon, 07 Nov 2022 14:47:10 +0000,
-Leo Yan <leo.yan@linaro.org> wrote:
-> 
-> On Sat, Nov 05, 2022 at 01:28:40PM +0000, Marc Zyngier wrote:
-> 
-> [...]
-> 
-> > > Before:
-> > > 
-> > >   # perf kvm stat report --vcpu 27
-> > > 
-> > >   Analyze events for all VMs, VCPU 27:
-> > > 
-> > >                VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time         Avg time
-> > > 
-> > >   Total Samples:0, Total events handled time:0.00us.
-> > >
-> > > After:
-> > > 
-> > >   # perf kvm stat report --vcpu 27
-> > > 
-> > >   Analyze events for all VMs, VCPU 27:
-> > > 
-> > >                VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time         Avg time
-> > > 
-> > >                  SYS64        808    98.54%    91.24%      0.00us    303.76us      3.46us ( +-  13.54% )
-> > >                    WFx         10     1.22%     7.79%      0.00us     69.48us     23.91us ( +-  25.91% )
-> > >                    IRQ          2     0.24%     0.97%      0.00us     22.64us     14.82us ( +-  52.77% )
-> > > 
-> > >   Total Samples:820, Total events handled time:3068.28us.
-> > 
-> > Please educate me: how useful is it to filter on a vcpu number across
-> > all VMs? What sense does it even make?
-> 
-> Now "perf kvm" tool is not sophisticated since it doesn't capture VMID
-> and virtual CPU ID together.
-
-VMID is not a relevant indicator anyway, as it can change at any
-point. But that's only to show that everybody has a different view on
-what they need to collect. At which point, we need to provide an
-infrastructure for data extraction, and not the data itself.
-
-> I think a case is we can spin a program on a specific virtual CPU with
-> taskset in VM, in this way we can check if any bottleneck is caused by
-> VM entry/exit, but I have to say that it's inaccurate if we only filter
-> on VCPU ID, we should consider tracing VMID and VCPU ID together in
-> later's enhancement.
-> 
-> > Conversely, what would be the purpose of filtering on a 5th thread of
-> > any process irrespective of what the process does? To me, this is the
-> > same level of non-sense.
-> 
-> I agree.
-> 
-> > AFAICT, this is just piling more arbitrary data extraction for no
-> > particular reason other than "just because we can", and there is
-> > absolutely no guarantee that this is fit for anyone else's purpose.
-> > 
-> > I'd rather you have a generic tracepoint taking the vcpu as a context
-> > and a BPF program that spits out the information people actually need,
-> > keeping things out of the kernel. Or even a tracehook (like the
-> > scheduler does), and let people load a module to dump whatever
-> > information they please.
-> 
-> Actually I considered three options:
-> 
-> Option 1: Simply add new version's trace events for recording more info.
-> This is not flexible and we even have risk to add more version's trace
-> event if later we might find that more data should traced.
-> 
-> This approach is straightforward and the implementation would be
-> simple.  This is main reason why finally I choosed to add new trace
-> events.
-
-But that doesn't scale at all.
-
-> 
-> Option 2: use Kprobe to dynamically insert tracepoints; but this means
-> the user must have the corresponding vmlinux file, otherwise, perf
-> tool might inject tracepoint at an incorrect address.  This is the
-> main reason I didn't use Kprobe to add dynamic tracepoints.
->
-> Option 3: As you suggested, I can bind KVM tracepoints with a eBPF
-> program and the eBPF program records perf events.
-> 
-> When I reviewed Arm64's kvm_entry / kvm_exit trace events, they don't
-> have vcpu context in the arguments, this means I need to add new trace
-> events for accessing "vcpu" context.
-
-I'm not opposed to adding new trace{point,hook}s if you demonstrate
-that they are generic enough or will never need to evolve.
-
-> 
-> Option 1 and 3 both need to add trace events; option 1 is more
-> straightforward solution and this is why it was choosed in current patch
-> set.
-> 
-> I recognized that I made a mistake, actually we can modify the trace
-> event's definition for kvm_entry / kvm_exit, note we only modify the
-> trace event's arguments, this will change the trace function's
-> definition but it will not break ABI (the format is exactly same for
-> the user space).  Below changes demonstrate what's my proposing:
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 94d33e296e10..16f6b61abfec 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -917,7 +917,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->                 /**************************************************************
->                  * Enter the guest
->                  */
-> -               trace_kvm_entry(*vcpu_pc(vcpu));
-> +               trace_kvm_entry(vcpu);
->                 guest_timing_enter_irqoff();
+On Sat, Nov 05, 2022, Gavin Shan wrote:
+> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+> index fecbb7d75ad2..758679724447 100644
+> --- a/virt/kvm/dirty_ring.c
+> +++ b/virt/kvm/dirty_ring.c
+> @@ -21,6 +21,16 @@ u32 kvm_dirty_ring_get_rsvd_entries(void)
+>  	return KVM_DIRTY_RING_RSVD_ENTRIES + kvm_cpu_dirty_log_size();
+>  }
 >  
->                 ret = kvm_arm_vcpu_enter_exit(vcpu);
-> diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-> index 33e4e7dd2719..9df4fd30093c 100644
-> --- a/arch/arm64/kvm/trace_arm.h
-> +++ b/arch/arm64/kvm/trace_arm.h
-> @@ -12,15 +12,15 @@
->   * Tracepoints for entry/exit to guest
->   */
->  TRACE_EVENT(kvm_entry,
-> -       TP_PROTO(unsigned long vcpu_pc),
-> -       TP_ARGS(vcpu_pc),
-> +       TP_PROTO(struct kvm_vcpu *vcpu),
-> +       TP_ARGS(vcpu),
+> +bool kvm_use_dirty_bitmap(struct kvm *kvm)
+> +{
+
+	lockdep_assert_held(&kvm->slots_lock);
+
+To guard against accessing kvm->dirty_ring_with_bitmap without holding slots_lock.
+
+> +	return !kvm->dirty_ring_size || kvm->dirty_ring_with_bitmap;
+> +}
+> +
+> @@ -4588,6 +4594,31 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+>  			return -EINVAL;
 >  
->         TP_STRUCT__entry(
->                 __field(        unsigned long,  vcpu_pc         )
->         ),
->  
->         TP_fast_assign(
-> -               __entry->vcpu_pc                = vcpu_pc;
-> +               __entry->vcpu_pc                = *vcpu_pc(vcpu);
->         ),
->  
->         TP_printk("PC: 0x%016lx", __entry->vcpu_pc)
-> 
-> Please let me know your opinion, if you don't object, I can move
-> forward with this approach.
+>  		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
+> +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP: {
+> +		struct kvm_memslots *slots;
+> +		int r = -EINVAL;
+> +
+> +		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+> +		    !kvm->dirty_ring_size)
+> +			return r;
+> +
+> +		mutex_lock(&kvm->slots_lock);
+> +
+> +		slots = kvm_memslots(kvm);
 
-I have no issue with this if this doesn't change anything else.
+Sadly, this needs to iterate over all possible memslots thanks to x86's SMM
+address space.  Might be worth adding a separate helper (that's local to kvm_main.c
+to discourage use), e.g. 
 
-And if you can make use of this with a BPF program and get to the same
-result as your initial patch, then please submit it for inclusion in
-the kernel as an example. We can then point people to it next time
-this crop up (probably before Xmas).
+static bool kvm_are_all_memslots_empty(struct kvm *kvm)
+{
+	int i;
 
-Thanks,
+	lockdep_assert_held(&kvm->slots_lock);
 
-	M.
+	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+		if (!kvm_memslots_empty(__kvm_memslots(kvm, i)))
+			return false;
+	}
 
--- 
-Without deviation from the norm, progress is not possible.
+	return true;
+}
+
+> +
+> +		/*
+> +		 * Avoid a race between memslot creation and enabling the ring +
+> +		 * bitmap capability to guarantee that no memslots have been
+> +		 * created without a bitmap.
+
+Nit, it's not just enabling, the below also allows disabling the bitmap.  The
+enabling case is definitely the most interesting, but the above wording makes it
+sound like the enabling case is the only thing that being given protection.  That's
+kinda true since KVM frees bitmaps without checking kvm_use_dirty_bitmap(), but
+that's not a strict requirement.
+
+And there's no race required, e.g. without this check userspace could simply create
+a memslot and then toggle on the capability.  Acquiring slots_lock above is what
+guards against races.
+
+Might also be worth alluding to the alternative solution of allocating the bitmap
+for all memslots here, e.g. something like
+
+		/*
+		 * For simplicity, allow toggling ring+bitmap if and only if
+		 * there are no memslots, e.g. to ensure all memslots allocate a
+		 * bitmap after the capability is enabled.
+		 */
+
+> +		 */
+> +		if (kvm_memslots_empty(slots)) {
+> +			kvm->dirty_ring_with_bitmap = cap->args[0];
+> +			r = 0;
+> +		}
+> +
+> +		mutex_unlock(&kvm->slots_lock);
+> +		return r;
+> +	}
+>  	default:
+>  		return kvm_vm_ioctl_enable_cap(kvm, cap);
+>  	}
+> -- 
