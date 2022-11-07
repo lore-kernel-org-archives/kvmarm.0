@@ -1,191 +1,165 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6EC122BC
-	for <kvmarm@lists.linux.dev>; Mon,  7 Nov 2022 22:08:19 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1667858345;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E675D15CA1
+	for <kvmarm@lists.linux.dev>; Mon,  7 Nov 2022 23:53:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1667865210;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Wjq4QDt9xZJvVi5eTYg9PIR4fiNZZIcRNu978aLl+WU=;
-	b=qlHqiut8sI1vgbFWY9FSD2/2a16CyuAbQeA3uuU451g2i3xwblSgrH+EwM2o5+2i2A0AB6
-	yhJj6DoLWjl8fbIbMIMQyIj812LambgYU75iuQ5zMrgqNsYFewtzJjQo/nqxX8aT2xL7dy
-	tu5OPjHn6rOJbipMkSGD1vkcJVqso30=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org,
-	Reiji Watanabe <reijiw@google.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	David Matlack <dmatlack@google.com>,
-	Quentin Perret <qperret@google.com>,
-	Ben Gardon <bgardon@google.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Peter Xu <peterx@redhat.com>,
-	Will Deacon <will@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v5 11/14] KVM: arm64: Make block->table PTE changes parallel-aware
-Date: Mon,  7 Nov 2022 21:58:55 +0000
-Message-ID: <20221107215855.1895367-1-oliver.upton@linux.dev>
-In-Reply-To: <20221107215644.1895162-1-oliver.upton@linux.dev>
-References: <20221107215644.1895162-1-oliver.upton@linux.dev>
+	bh=pT3sJPmwBj29BZlhUVGZFUrh95hujl1L/E+LlGzj8c8=;
+	b=fp7MS5g3Nhc4PzlhUKtibsgJ7/u7sMdObm4Yt7dGa/3rqi+4nm7PzWG0hMy75PJjPB6YaZ
+	qSbT7YDOyCuyypsrLA785+JAKFL4xyNMQYISQzRTbDn0MySYuSplDemlEyw9OyYY3tTijP
+	v94lmElQRZM5rGtT2hSMW6aXqKnHvco=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-595-d7dFaKVHN2WExWFIgfGwJw-1; Mon, 07 Nov 2022 18:53:27 -0500
+X-MC-Unique: d7dFaKVHN2WExWFIgfGwJw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7EB9985A59D;
+	Mon,  7 Nov 2022 23:53:26 +0000 (UTC)
+Received: from [10.64.54.78] (vpn2-54-78.bne.redhat.com [10.64.54.78])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id F236EC15BB5;
+	Mon,  7 Nov 2022 23:53:20 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ andrew.jones@linux.dev, will@kernel.org, shan.gavin@gmail.com,
+ bgardon@google.com, dmatlack@google.com, pbonzini@redhat.com,
+ zhenyzha@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
+ ajones@ventanamicro.com
+References: <20221104234049.25103-1-gshan@redhat.com>
+ <20221104234049.25103-4-gshan@redhat.com>
+ <ec281dc5-baa2-3e18-8e83-089322db551a@redhat.com>
+ <861qqfq9s2.wl-maz@kernel.org>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <3b1ed84e-c911-f41a-a57d-eada16e093c3@redhat.com>
+Date: Tue, 8 Nov 2022 07:53:17 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221107215855.RXYIA9HSMDLw6UKx6147q8ZMDyLXqAEJbVHpJYtG7_Q@z>
+In-Reply-To: <861qqfq9s2.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Message-ID: <20221107235317.JHguSvvw4y5Lq5J6cLMnhT74YCTltbCdSbwXriQcVQk@z>
 
-In order to service stage-2 faults in parallel, stage-2 table walkers
-must take exclusive ownership of the PTE being worked on. An additional
-requirement of the architecture is that software must perform a
-'break-before-make' operation when changing the block size used for
-mapping memory.
+Hi Marc,
 
-Roll these two concepts together into helpers for performing a
-'break-before-make' sequence. Use a special PTE value to indicate a PTE
-has been locked by a software walker. Additionally, use an atomic
-compare-exchange to 'break' the PTE when the stage-2 page tables are
-possibly shared with another software walker. Elide the DSB + TLBI if
-the evicted PTE was invalid (and thus not subject to break-before-make).
+On 11/7/22 7:33 PM, Marc Zyngier wrote:
+> On Mon, 07 Nov 2022 10:45:34 +0000,
+> Gavin Shan <gshan@redhat.com> wrote:
+>> On 11/5/22 7:40 AM, Gavin Shan wrote:
+>>> ARM64 needs to dirty memory outside of a VCPU context when VGIC/ITS is
+>>> enabled. It's conflicting with that ring-based dirty page tracking always
+>>> requires a running VCPU context.
+>>>
+>>> Introduce a new flavor of dirty ring that requires the use of both VCPU
+>>> dirty rings and a dirty bitmap. The expectation is that for non-VCPU
+>>> sources of dirty memory (such as the VGIC/ITS on arm64), KVM writes to
+>>> the dirty bitmap. Userspace should scan the dirty bitmap before migrating
+>>> the VM to the target.
+>>>
+>>> Use an additional capability to advertise this behavior. The newly added
+>>> capability (KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP) can't be enabled before
+>>> KVM_CAP_DIRTY_LOG_RING_ACQ_REL on ARM64. In this way, the newly added
+>>> capability is treated as an extension of KVM_CAP_DIRTY_LOG_RING_ACQ_REL.
+>>>
+>>> Suggested-by: Marc Zyngier <maz@kernel.org>
+>>> Suggested-by: Peter Xu <peterx@redhat.com>
+>>> Co-developed-by: Oliver Upton <oliver.upton@linux.dev>
+>>> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>>> Acked-by: Peter Xu <peterx@redhat.com>
+>>> ---
+>>>    Documentation/virt/kvm/api.rst | 33 ++++++++++++++++++-----
+>>>    include/linux/kvm_dirty_ring.h |  7 +++++
+>>>    include/linux/kvm_host.h       |  1 +
+>>>    include/uapi/linux/kvm.h       |  1 +
+>>>    virt/kvm/Kconfig               |  8 ++++++
+>>>    virt/kvm/dirty_ring.c          | 10 +++++++
+>>>    virt/kvm/kvm_main.c            | 49 +++++++++++++++++++++++++++-------
+>>>    7 files changed, 93 insertions(+), 16 deletions(-)
+>>>
+>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
 
-All of the atomics do nothing for now, as the stage-2 walker isn't fully
-ready to perform parallel walks.
+[...]
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/hyp/pgtable.c | 80 +++++++++++++++++++++++++++++++++---
- 1 file changed, 75 insertions(+), 5 deletions(-)
+>>
+>> In order to speed up the review and reduce unnecessary respins. After
+>> collecting comments on PATCH[v8 3/7] from Marc and Peter, I would change
+>> above description as below. Could you please confirm it looks good to you?
+>>
+>> In the 4th paragraph, the words starting from "Collecting the dirty bitmap..."
+>> to the end, was previously suggested by Oliver, even Marc suggested to avoid
+>> mentioning "migration".
+>>
+>>    After enabling the dirty rings, the userspace needs to detect the
+>>    capability of KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP to see whether the ring
+>>    structures need to be backed by per-slot bitmaps. With this capability
+> 
+> s/need/can/. If there was a *need*, it should happen automatically
+> without user intervention.
+> 
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index f4dd77c6c97d..b9f0d792b8d9 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -49,6 +49,12 @@
- #define KVM_INVALID_PTE_OWNER_MASK	GENMASK(9, 2)
- #define KVM_MAX_OWNER_ID		1
- 
-+/*
-+ * Used to indicate a pte for which a 'break-before-make' sequence is in
-+ * progress.
-+ */
-+#define KVM_INVALID_PTE_LOCKED		BIT(10)
-+
- struct kvm_pgtable_walk_data {
- 	struct kvm_pgtable_walker	*walker;
- 
-@@ -674,6 +680,11 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
- 	return !!pte;
- }
- 
-+static bool stage2_pte_is_locked(kvm_pte_t pte)
-+{
-+	return !kvm_pte_valid(pte) && (pte & KVM_INVALID_PTE_LOCKED);
-+}
-+
- static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
- {
- 	if (!kvm_pgtable_walk_shared(ctx)) {
-@@ -684,6 +695,64 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
- 	return cmpxchg(ctx->ptep, ctx->old, new) == ctx->old;
- }
- 
-+/**
-+ * stage2_try_break_pte() - Invalidates a pte according to the
-+ *			    'break-before-make' requirements of the
-+ *			    architecture.
-+ *
-+ * @ctx: context of the visited pte.
-+ * @mmu: stage-2 mmu
-+ *
-+ * Returns: true if the pte was successfully broken.
-+ *
-+ * If the removed pte was valid, performs the necessary serialization and TLB
-+ * invalidation for the old value. For counted ptes, drops the reference count
-+ * on the containing table page.
-+ */
-+static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
-+				 struct kvm_s2_mmu *mmu)
-+{
-+	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-+
-+	if (stage2_pte_is_locked(ctx->old)) {
-+		/*
-+		 * Should never occur if this walker has exclusive access to the
-+		 * page tables.
-+		 */
-+		WARN_ON(!kvm_pgtable_walk_shared(ctx));
-+		return false;
-+	}
-+
-+	if (!stage2_try_set_pte(ctx, KVM_INVALID_PTE_LOCKED))
-+		return false;
-+
-+	/*
-+	 * Perform the appropriate TLB invalidation based on the evicted pte
-+	 * value (if any).
-+	 */
-+	if (kvm_pte_table(ctx->old, ctx->level))
-+		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-+	else if (kvm_pte_valid(ctx->old))
-+		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
-+
-+	if (stage2_pte_is_counted(ctx->old))
-+		mm_ops->put_page(ctx->ptep);
-+
-+	return true;
-+}
-+
-+static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
-+{
-+	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-+
-+	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
-+
-+	if (stage2_pte_is_counted(new))
-+		mm_ops->get_page(ctx->ptep);
-+
-+	smp_store_release(ctx->ptep, new);
-+}
-+
- static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
- 			   struct kvm_pgtable_mm_ops *mm_ops)
- {
-@@ -812,17 +881,18 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 	if (!childp)
- 		return -ENOMEM;
- 
-+	if (!stage2_try_break_pte(ctx, data->mmu)) {
-+		mm_ops->put_page(childp);
-+		return -EAGAIN;
-+	}
-+
- 	/*
- 	 * If we've run into an existing block mapping then replace it with
- 	 * a table. Accesses beyond 'end' that fall within the new table
- 	 * will be mapped lazily.
- 	 */
--	if (stage2_pte_is_counted(ctx->old))
--		stage2_put_pte(ctx, data->mmu, mm_ops);
--
- 	new = kvm_init_table_pte(childp, mm_ops);
--	mm_ops->get_page(ctx->ptep);
--	smp_store_release(ctx->ptep, new);
-+	stage2_make_pte(ctx, new);
- 
- 	return 0;
- }
--- 
-2.38.1.431.g37b22c650d-goog
+Ok. s/need to/can in next revision :)
+
+>>    advertised, it means the architecture can dirty guest pages without
+>>    vcpu/ring context, so that some of the dirty information will still be
+>>    maintained in the bitmap structure. KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
+>>    can't be enabled if the capability of KVM_CAP_DIRTY_LOG_RING_ACQ_REL
+>>    hasn't been enabled, or any memslot has been existing.
+>>
+>>    Note that the bitmap here is only a backup of the ring structure. The
+>>    use of the ring and bitmap combination is only beneficial if there is
+>>    only a very small amount of memory that is dirtied out of vcpu/ring
+>>    context. Otherwise, the stand-alone per-slot bitmap mechanism needs to
+>>    be considered.
+>>
+>>    To collect dirty bits in the backup bitmap, userspace can use the same
+>>    KVM_GET_DIRTY_LOG ioctl. KVM_CLEAR_DIRTY_LOG isn't needed as long as all
+>>    the generation of the dirty bits is done in a single pass. Collecting
+>>    the dirty bitmap should be the very last thing that the VMM does before
+>>    transmitting state to the target VM. VMM needs to ensure that the dirty
+>>    state is final and avoid missing dirty pages from another ioctl ordered
+>>    after the bitmap collection.
+> 
+> I would replace "transmitting state to the target VM" with
+> "considering the state as complete", as I still object to casting this
+> API into the migration mold. People use this stuff more far more than
+> migration (checkpointing, for example).
+> 
+
+Fair enough. I will change accordingly in next revision.
+
+>>
+>>    NOTE: One example of using the backup bitmap is saving arm64 vgic/its
+>>    tables through KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} command on
+>>    KVM device "kvm-arm-vgic-its" during VM's migration.
+> 
+> Same remark about migration.
+> 
+
+Ok. I will change this paragraph as below in next revision, to avoid mentioning
+"migration".
+
+   NOTE: One example of using the backup bitmap is saving arm64 vgic/its
+   tables through KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} command on
+   KVM device "kvm-arm-vgic-its" when dirty ring is enabled.
+
+Thanks,
+Gavin
 
