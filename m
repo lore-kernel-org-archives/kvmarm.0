@@ -2,68 +2,84 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70A68C4332F
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Nov 2022 15:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D5BC433FE
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Nov 2022 15:31:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D366A4B8B9;
-	Mon,  7 Nov 2022 10:11:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 672D64B88F;
+	Mon,  7 Nov 2022 10:31:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5GR4W0n6uxhL; Mon,  7 Nov 2022 10:11:19 -0500 (EST)
+	with ESMTP id CGyn6hycfmVh; Mon,  7 Nov 2022 10:31:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A882B4B893;
-	Mon,  7 Nov 2022 10:11:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 282A74B893;
+	Mon,  7 Nov 2022 10:31:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 121FE4B877
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 10:11:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A03BE4B88C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 10:31:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IdxzZTrFJRt8 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Nov 2022 10:11:18 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DFB464B84C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 10:11:17 -0500 (EST)
+ with ESMTP id TWGDRT5lm5Ke for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Nov 2022 10:31:04 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6890D4B885
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 10:31:04 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 4FBAEB811E7;
- Mon,  7 Nov 2022 15:11:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC3D5C433D6;
- Mon,  7 Nov 2022 15:11:10 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 4144B60DE3;
+ Mon,  7 Nov 2022 15:31:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A11DCC433D6;
+ Mon,  7 Nov 2022 15:31:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1667833875;
- bh=wVgLPr5v//yG11ovNQ85JwEVr3YQFb/RyVao7hWCqlk=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=V+0FY/orTZt8mOb9jO02zZqXQwJgbcIqcYmXk5XODvNm+QnTru0kqiwIgZzaEb2yr
- 9uvDsafbDYZ01c2d00etldMGUDc1+dUoRrbFmBhB1N0OgKexApvC2ihASE52yjy17S
- Lsrae0+c0CNWW5+llsspm0oIcF55qpxyF7NGLJ0nXjE5JAehXOUn3LqSvqHved8SRL
- WZLO3njMrB5bVHxGYdg5+WK661dy1GDviEhzfDKFjKg4FcqnWV4JhylF2jpCqN2W0M
- YKMBEkMrKHeGxQ/+EHwhvg6xcKoqSfufHleq5vjKgtjXBnIeZ9FwwsBR6Z3xuJI31x
- kXzAi1jwTAmMw==
-Date: Mon, 7 Nov 2022 15:11:07 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v3 3/8] arm64/sysreg: Convert SPE registers to automatic
- generation
-Message-ID: <Y2kgC9QlBwvXTLe6@sirena.org.uk>
-References: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
- <20220825-arm-spe-v8-7-v3-3-87682f78caac@kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20220825-arm-spe-v8-7-v3-3-87682f78caac@kernel.org>
-X-Cookie: Minimum charge for booths.
-Cc: Peter Zijlstra <peterz@infradead.org>,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Arnaldo Carvalho de Melo <acme@kernel.org>, linux-perf-users@vger.kernel.org,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Ingo Molnar <mingo@redhat.com>, Jiri Olsa <jolsa@kernel.org>,
- Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- Namhyung Kim <namhyung@kernel.org>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- James Clark <james.clark@arm.com>
+ s=k20201202; t=1667835062;
+ bh=bkVktwW5TQjNJ7vT92h9Ndj7XiwAcQLTowe267DgFCM=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=n6poy86h9Rm4cDZcXm40fl1O2bbwobQTLE1dNyZvG7LyEe4N6BXXkjxlhywPpw+sW
+ cXAM33t1k16JO/VLniR7wxF3VPJNxL2/XhIcq5c/vX/xxkDnyUBcco1opwqdd8sUA7
+ Ll5SjjbNQHHFgXCSX3Y/Kau8KyhSEhuKlCTlUTZtA9buC06CBQyomUoxp1ByWAtRry
+ wTPhEApW2RUD+v3HYx2zGnXe24Yw+65Y1VvGD0jOv67zq94Kdjt8I13O3ITOsEGnd0
+ lY6An1wsYTUm03vJGthMwUcLa3iE0PmMzH6BZ/AMXwY8zWWwSpe3RubmzrgrbtFA6U
+ m7nVDvTlb/y7w==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1os45U-004QlV-B6;
+ Mon, 07 Nov 2022 15:31:00 +0000
+Date: Mon, 07 Nov 2022 15:30:59 +0000
+Message-ID: <86zgd2pyrw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
+In-Reply-To: <Y2kdXTn6X3O08sFv@x1n>
+References: <20221104234049.25103-1-gshan@redhat.com>
+ <20221104234049.25103-4-gshan@redhat.com>
+ <87o7tkf5re.wl-maz@kernel.org> <Y2ffRYoqlQOxgVtk@x1n>
+ <87iljrg7vd.wl-maz@kernel.org> <Y2gh4x4MD8BJvogH@x1n>
+ <867d07qfvk.wl-maz@kernel.org> <Y2kdXTn6X3O08sFv@x1n>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: peterx@redhat.com, gshan@redhat.com, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, shuah@kernel.org,
+ catalin.marinas@arm.com, andrew.jones@linux.dev, ajones@ventanamicro.com,
+ bgardon@google.com, dmatlack@google.com, will@kernel.org,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, pbonzini@redhat.com,
+ seanjc@google.com, oliver.upton@linux.dev, zhenyzha@redhat.com,
+ shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
+ dmatlack@google.com, will@kernel.org, shan.gavin@gmail.com, bgardon@google.com,
+ kvmarm@lists.linux.dev, pbonzini@redhat.com, zhenyzha@redhat.com,
+ shuah@kernel.org, kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,72 +91,72 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============4855655160262654782=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Mon, 07 Nov 2022 14:59:41 +0000,
+Peter Xu <peterx@redhat.com> wrote:
+> 
+> On Mon, Nov 07, 2022 at 09:21:35AM +0000, Marc Zyngier wrote:
+> > On Sun, 06 Nov 2022 21:06:43 +0000,
+> > Peter Xu <peterx@redhat.com> wrote:
+> > > 
+> > > It's definitely not the case for x86, but if it's true for
+> > > arm64, then could the DMA be spread across all the guest pages?
+> > > If it's also true, I really don't know how this will work..
+> > 
+> > Of course, all pages can be the target of DMA. It works the same way
+> > it works for the ITS: you sync the state, you obtain the dirty bits,
+> > you move on.
+> > 
+> > And mimicking what x86 does is really not my concern (if you still
+> > think that arm64 is just another flavour of x86, stay tuned!  ;-).
+> 
+> I didn't mean so, I should probably stop mentioning x86. :)
 
---===============4855655160262654782==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2G3Dfetw2HrPyugm"
-Content-Disposition: inline
+Please! I turned off my last x86 development machine over the weekend,
+and my x86 laptop is now a glorified window manager... ;-)
 
+> I had some sense already from the topics in past few years of kvm forum.
+> Yeah I'll be looking forward to anything more coming.
 
---2G3Dfetw2HrPyugm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yup. Hopefully we won't have to wait for too long to see this stuff (I
+had good discussions on the subject at both KF and Plumbers in Dublin
+earlier this year).
 
-On Fri, Nov 04, 2022 at 10:55:03AM -0500, Rob Herring wrote:
+> > > We're only syncing the dirty bitmap once right now with the
+> > > protocol.  If that can cover most of the guest mem, it's same as
+> > > non-live.  If we sync it periodically, then it's the same as
+> > > enabling dirty-log alone and the rings are useless.
+> > 
+> > I'm glad that you finally accept it: the ring *ARE* useless in the
+> > general sense. Only limited, CPU-only workloads can make any use of
+> > the current design. This probably covers a large proportion of what
+> > the cloud vendors do, but this doesn't work for general situations
+> > where you have a stream of dirty pages originating outside of the
+> > CPUs.
+> 
+> The ring itself is really not the thing to blame, IMHO it's a good attempt
+> to try out de-coupling guest size in regard of dirty tracking from kvm.  It
+> may not be perfect, but it may still service some of the goals, e.g., at
+> least it allows the user app to detect per-vcpu information and also since
+> there's the ring full events we can do something more than before like the
+> vcpu throttling that China Telecom does with the ring structures.
 
-> Convert all the SPE register defines to automatic generation. No
-> functional changes.
->=20
-> New registers and fields for SPEv1.2 are added with the conversion.
->=20
-> Some of the PMBSR MSS field defines are kept as the automatic generation
-> has no way to create multiple names for the same register bits. The
-> meaning of the MSS field depends on other bits.
+I don't disagree with that: for vcpu-based workloads, the rings are
+great and doing their job. It's just that there is another side to
+this problem, and you'll have to deal with both eventually. We're just
+ahead of the curve here...
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+Thanks,
 
-> +Sysreg	PMSNEVFR_EL1	3	0	9	9	1
-> +Field	63:0	E
-> +EndSysreg
+	M.
 
-JFTR as noted last time this looks nothing like the spec but is clearly
-a sensible interpretation.
-
-I do note that one advantage of doing this register by register rather
-than en masse is that it makes it a lot easier to avoid re-reviewing the
-same register...
-
---2G3Dfetw2HrPyugm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmNpIAoACgkQJNaLcl1U
-h9DvBgf9EuKrsvAgMvRabqAgl2mo979wY3OQJcNNexlQAPguIlNJOpjdL2Dvko0o
-oHza2RbBfzmfHVQEMoiqbN+VUN9QxV7jgiP/50FrhH3G5oADAMRfYY6ubrg6STfw
-1/KlPkOiDj02yrS3S4rqH8gBbJ+OKWmxqFT2mINdB14b50FiSJ2++nKphUYHsS0D
-IRzNoBLllDsd+NqlXoQ4ma12NpJPOCpF+UOnIha7ersIgXxzrWyNQEkw48uWyg+g
-xjMyRJZvZW59hE4HPXl/6EypHNrnIBlAVzX+JE3vnep7cn5Y0STit5s53L7kkTsD
-B9N0R8ar/bOBI7vJMDHmI7qHigyuew==
-=WP8T
------END PGP SIGNATURE-----
-
---2G3Dfetw2HrPyugm--
-
---===============4855655160262654782==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============4855655160262654782==--
