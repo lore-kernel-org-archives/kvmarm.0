@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DF5CC4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA03BC43217
 	for <kvmarm@archiver.kernel.org>; Mon,  7 Nov 2022 08:55:13 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC2114B8C9;
-	Mon,  7 Nov 2022 03:55:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 85C284B8B9;
+	Mon,  7 Nov 2022 03:55:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JvBQz7AeqSa4; Mon,  7 Nov 2022 03:55:11 -0500 (EST)
+	with ESMTP id Q9HiMe7AAKhb; Mon,  7 Nov 2022 03:55:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1611B4B8F4;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BC4B4B8F7;
 	Mon,  7 Nov 2022 03:55:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 02C284B8BB
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 03:55:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 41ADF4B8BC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 03:55:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 34EjoUvI5Vz2 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Nov 2022 03:54:59 -0500 (EST)
+ with ESMTP id 6ND9bCArPzqt for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Nov 2022 03:55:00 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 688204B88C
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB6C44B887
  for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 03:54:59 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id D2FF060F60;
- Mon,  7 Nov 2022 08:54:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A339DC43143;
- Mon,  7 Nov 2022 08:54:58 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 7969560F2E;
+ Mon,  7 Nov 2022 08:54:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BAE9C43144;
+ Mon,  7 Nov 2022 08:54:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1667811298;
- bh=0lZ//3BHR5+56dy8d+BEO9s/7eEiHz5+gPDQ0l6HjH4=;
+ s=k20201202; t=1667811299;
+ bh=+0uL2LsE517XXiRSnYb+8lBrywGyDTjttJ4tHMrTfgQ=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=UJ+o4ZtlZgLOh7MR3HMwAb5j6hB0SF3a1BMw2nDChEkPBYLjDvzy4dnv4bWiolZrp
- MIm5aBZ9sigo6Ul35Smz+nJvXhNqbunHCCYBExkwYM6eqRExPxdlBaXZNjfuYESDLo
- zifBrrF/+VC07XDeqa7hXEAqnC9DfmXTrzTYpBAfIfsMuXY65tdU+IM3zEXnkhMux5
- 9xoy/VHzmJ/H57v5J7ws+ajW3esbhGYn8r71ZzbEp0h8vKUUS7ysyhD4oVBPuG14FH
- YAPVEXUVYcJlnlAUxA6eZ5N9xhyPzBDsEvX31ZTZZl5oFCTtRqXkr0HjfuiZuzcapN
- T3z86yAvIBetw==
+ b=bs/C9zjRSHX1vgSIXCSeXFqAHTrSqLYQe1tf62vZr2hwzMr+g8jlpXj2TyFIAi/Sm
+ NwcKzkBoUvuWPCRtjMcDlGnCfTPwVeCTfkGwtbf0XtbqfA1taTI726uYLT//c3ItA8
+ rMJpfYpWpH6Aqm1rQKfgchjGoEbpzOtTL/MuGhsdv5HPEQQfRc76I1zZkjwVPksuAL
+ n44Pa8n4Qsc8Ez7DcSF3x3xislDf5VNzmJ1zvCa4u2ZJYKqB+DycW8F8M92BYFQyq4
+ pIO75ZR+TEaBUL88Kut1VSm7rLT6FnZ2TG8QrqMQ8iLKld5ANVEn/6jgyUaiF/gk/7
+ w9X1lL9LfFe/Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1orxuC-004KxX-Nr;
- Mon, 07 Nov 2022 08:54:56 +0000
+ (envelope-from <maz@kernel.org>) id 1orxuD-004KxX-H1;
+ Mon, 07 Nov 2022 08:54:57 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, <kvmarm@lists.cs.columbia.edu>,
  <kvmarm@lists.linux.dev>, kvm@vger.kernel.org
-Subject: [PATCH v3 06/14] KVM: arm64: PMU: Only narrow counters that are not
- 64bit wide
-Date: Mon,  7 Nov 2022 08:54:27 +0000
-Message-Id: <20221107085435.2581641-7-maz@kernel.org>
+Subject: [PATCH v3 09/14] KVM: arm64: PMU: Do not let AArch32 change the
+ counters' top 32 bits
+Date: Mon,  7 Nov 2022 08:54:30 +0000
+Message-Id: <20221107085435.2581641-10-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221107085435.2581641-1-maz@kernel.org>
 References: <20221107085435.2581641-1-maz@kernel.org>
@@ -84,55 +84,85 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The current PMU emulation sometimes narrows counters to 32bit
-if the counter isn't the cycle counter. As this is going to
-change with PMUv3p5 where the counters are all 64bit, fix
-the couple of cases where this happens unconditionally.
+Even when using PMUv3p5 (which implies 64bit counters), there is
+no way for AArch32 to write to the top 32 bits of the counters.
+The only way to influence these bits (other than by counting
+events) is by writing PMCR.P==1.
+
+Make sure we obey the architecture and preserve the top 32 bits
+on a counter update.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/pmu-emul.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+ arch/arm64/kvm/pmu-emul.c | 35 +++++++++++++++++++++++++++--------
+ 1 file changed, 27 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 39a04ae424d1..8f6462cbc408 100644
+index 03b761a63f5f..87585c12ca41 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -151,20 +151,17 @@ static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
-  */
- static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
+@@ -119,13 +119,8 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+ 	return counter;
+ }
+ 
+-/**
+- * kvm_pmu_set_counter_value - set PMU counter value
+- * @vcpu: The vcpu pointer
+- * @select_idx: The counter index
+- * @val: The counter value
+- */
+-void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
++static void kvm_pmu_set_counter(struct kvm_vcpu *vcpu, u64 select_idx, u64 val,
++				bool force)
  {
--	u64 counter, reg, val;
-+	u64 reg, val;
+ 	u64 reg;
  
- 	if (!pmc->perf_event)
- 		return;
+@@ -135,12 +130,36 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+ 	kvm_pmu_release_perf_event(&vcpu->arch.pmu.pmc[select_idx]);
  
--	counter = kvm_pmu_get_counter_value(vcpu, pmc->idx);
-+	val = kvm_pmu_get_counter_value(vcpu, pmc->idx);
- 
--	if (pmc->idx == ARMV8_PMU_CYCLE_IDX) {
-+	if (pmc->idx == ARMV8_PMU_CYCLE_IDX)
- 		reg = PMCCNTR_EL0;
--		val = counter;
--	} else {
-+	else
- 		reg = PMEVCNTR0_EL0 + pmc->idx;
--		val = lower_32_bits(counter);
--	}
- 
+ 	reg = counter_index_to_reg(select_idx);
++
++	if (vcpu_mode_is_32bit(vcpu) && select_idx != ARMV8_PMU_CYCLE_IDX &&
++	    !force) {
++		/*
++		 * Even with PMUv3p5, AArch32 cannot write to the top
++		 * 32bit of the counters. The only possible course of
++		 * action is to use PMCR.P, which will reset them to
++		 * 0 (the only use of the 'force' parameter).
++		 */
++		val  = lower_32_bits(val);
++		val |= upper_32_bits(__vcpu_sys_reg(vcpu, reg));
++	}
++
  	__vcpu_sys_reg(vcpu, reg) = val;
  
-@@ -416,7 +413,8 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
+ 	/* Recreate the perf event to reflect the updated sample_period */
+ 	kvm_pmu_create_perf_event(vcpu, select_idx);
+ }
  
- 		/* Increment this counter */
- 		reg = __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
--		reg = lower_32_bits(reg);
-+		if (!kvm_pmu_idx_is_64bit(vcpu, i))
-+			reg = lower_32_bits(reg);
- 		__vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
++/**
++ * kvm_pmu_set_counter_value - set PMU counter value
++ * @vcpu: The vcpu pointer
++ * @select_idx: The counter index
++ * @val: The counter value
++ */
++void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
++{
++	kvm_pmu_set_counter(vcpu, select_idx, val, false);
++}
++
+ /**
+  * kvm_pmu_release_perf_event - remove the perf event
+  * @pmc: The PMU counter pointer
+@@ -535,7 +554,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+ 		unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
+ 		mask &= ~BIT(ARMV8_PMU_CYCLE_IDX);
+ 		for_each_set_bit(i, &mask, 32)
+-			kvm_pmu_set_counter_value(vcpu, i, 0);
++			kvm_pmu_set_counter(vcpu, i, 0, true);
+ 	}
+ }
  
- 		/* No overflow? move on */
 -- 
 2.34.1
 
