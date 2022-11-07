@@ -2,60 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C206DC4332F
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Nov 2022 22:00:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95769C43219
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Nov 2022 23:53:36 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BFAD4B8CC;
-	Mon,  7 Nov 2022 17:00:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06E354B8B5;
+	Mon,  7 Nov 2022 18:53:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8v7htPcmLTVn; Mon,  7 Nov 2022 17:00:46 -0500 (EST)
+	with ESMTP id fXJ1+LBridiI; Mon,  7 Nov 2022 18:53:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0049A4B886;
-	Mon,  7 Nov 2022 17:00:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63C484B8B6;
+	Mon,  7 Nov 2022 18:53:34 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 22F7F4B865
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 17:00:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AD344B898
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 18:53:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wu3rxYGq4i0p for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Nov 2022 17:00:43 -0500 (EST)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8465D4B862
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 17:00:43 -0500 (EST)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1667858442;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
+ with ESMTP id AQ1GUtSOnW6D for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Nov 2022 18:53:31 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 51E4E4B88F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 18:53:31 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1667865210;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RqLk7RWPKnUNF/MDbobVslqYC6flZA3inOBRUipp+ik=;
- b=OkUF+oqTfbepr2gFpL5x6/EJditl869PCjbfwzwYU81D/Cv6Ie62EC2u8/eXySeHSHWT6v
- NjyeiBIiKsLaZl8/HwKKvVc9C3CxWi7WIPnUBHmpXKs8nA3S64FN03xJpB43Ul5vI9KS9x
- 6qhbiazeQyfU6gUcXQshUEt/xz6Rq7s=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH v5 14/14] KVM: arm64: Handle stage-2 faults in parallel
-Date: Mon,  7 Nov 2022 22:00:33 +0000
-Message-Id: <20221107220033.1895655-1-oliver.upton@linux.dev>
-In-Reply-To: <20221107215644.1895162-1-oliver.upton@linux.dev>
-References: <20221107215644.1895162-1-oliver.upton@linux.dev>
+ bh=pT3sJPmwBj29BZlhUVGZFUrh95hujl1L/E+LlGzj8c8=;
+ b=fp7MS5g3Nhc4PzlhUKtibsgJ7/u7sMdObm4Yt7dGa/3rqi+4nm7PzWG0hMy75PJjPB6YaZ
+ qSbT7YDOyCuyypsrLA785+JAKFL4xyNMQYISQzRTbDn0MySYuSplDemlEyw9OyYY3tTijP
+ v94lmElQRZM5rGtT2hSMW6aXqKnHvco=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-595-d7dFaKVHN2WExWFIgfGwJw-1; Mon, 07 Nov 2022 18:53:27 -0500
+X-MC-Unique: d7dFaKVHN2WExWFIgfGwJw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.8])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7EB9985A59D;
+ Mon,  7 Nov 2022 23:53:26 +0000 (UTC)
+Received: from [10.64.54.78] (vpn2-54-78.bne.redhat.com [10.64.54.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F236EC15BB5;
+ Mon,  7 Nov 2022 23:53:20 +0000 (UTC)
+Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
+To: Marc Zyngier <maz@kernel.org>
+References: <20221104234049.25103-1-gshan@redhat.com>
+ <20221104234049.25103-4-gshan@redhat.com>
+ <ec281dc5-baa2-3e18-8e83-089322db551a@redhat.com>
+ <861qqfq9s2.wl-maz@kernel.org>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <3b1ed84e-c911-f41a-a57d-eada16e093c3@redhat.com>
+Date: Tue, 8 Nov 2022 07:53:17 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-Migadu-Flow: FLOW_OUT
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Ben Gardon <bgardon@google.com>, David Matlack <dmatlack@google.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <861qqfq9s2.wl-maz@kernel.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Cc: shuah@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ andrew.jones@linux.dev, dmatlack@google.com, shan.gavin@gmail.com,
+ bgardon@google.com, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ zhenyzha@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -64,171 +85,116 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The stage-2 map walker has been made parallel-aware, and as such can be
-called while only holding the read side of the MMU lock. Rip out the
-conditional locking in user_mem_abort() and instead grab the read lock.
-Continue to take the write lock from other callsites to
-kvm_pgtable_stage2_map().
+Hi Marc,
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/kvm_pgtable.h  |  3 ++-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c |  2 +-
- arch/arm64/kvm/hyp/pgtable.c          |  5 +++--
- arch/arm64/kvm/mmu.c                  | 31 ++++++---------------------
- 4 files changed, 13 insertions(+), 28 deletions(-)
+On 11/7/22 7:33 PM, Marc Zyngier wrote:
+> On Mon, 07 Nov 2022 10:45:34 +0000,
+> Gavin Shan <gshan@redhat.com> wrote:
+>> On 11/5/22 7:40 AM, Gavin Shan wrote:
+>>> ARM64 needs to dirty memory outside of a VCPU context when VGIC/ITS is
+>>> enabled. It's conflicting with that ring-based dirty page tracking always
+>>> requires a running VCPU context.
+>>>
+>>> Introduce a new flavor of dirty ring that requires the use of both VCPU
+>>> dirty rings and a dirty bitmap. The expectation is that for non-VCPU
+>>> sources of dirty memory (such as the VGIC/ITS on arm64), KVM writes to
+>>> the dirty bitmap. Userspace should scan the dirty bitmap before migrating
+>>> the VM to the target.
+>>>
+>>> Use an additional capability to advertise this behavior. The newly added
+>>> capability (KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP) can't be enabled before
+>>> KVM_CAP_DIRTY_LOG_RING_ACQ_REL on ARM64. In this way, the newly added
+>>> capability is treated as an extension of KVM_CAP_DIRTY_LOG_RING_ACQ_REL.
+>>>
+>>> Suggested-by: Marc Zyngier <maz@kernel.org>
+>>> Suggested-by: Peter Xu <peterx@redhat.com>
+>>> Co-developed-by: Oliver Upton <oliver.upton@linux.dev>
+>>> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>>> Acked-by: Peter Xu <peterx@redhat.com>
+>>> ---
+>>>    Documentation/virt/kvm/api.rst | 33 ++++++++++++++++++-----
+>>>    include/linux/kvm_dirty_ring.h |  7 +++++
+>>>    include/linux/kvm_host.h       |  1 +
+>>>    include/uapi/linux/kvm.h       |  1 +
+>>>    virt/kvm/Kconfig               |  8 ++++++
+>>>    virt/kvm/dirty_ring.c          | 10 +++++++
+>>>    virt/kvm/kvm_main.c            | 49 +++++++++++++++++++++++++++-------
+>>>    7 files changed, 93 insertions(+), 16 deletions(-)
+>>>
+>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 7634b6964779..a874ce0ce7b5 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -412,6 +412,7 @@ void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pg
-  * @prot:	Permissions and attributes for the mapping.
-  * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-  *		page-table pages.
-+ * @flags:	Flags to control the page-table walk (ex. a shared walk)
-  *
-  * The offset of @addr within a page is ignored, @size is rounded-up to
-  * the next page boundary and @phys is rounded-down to the previous page
-@@ -433,7 +434,7 @@ void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pg
-  */
- int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   u64 phys, enum kvm_pgtable_prot prot,
--			   void *mc);
-+			   void *mc, enum kvm_pgtable_walk_flags flags);
- 
- /**
-  * kvm_pgtable_stage2_set_owner() - Unmap and annotate pages in the IPA space to
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 735769886b55..f6d82bf33ce1 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -257,7 +257,7 @@ static inline int __host_stage2_idmap(u64 start, u64 end,
- 				      enum kvm_pgtable_prot prot)
- {
- 	return kvm_pgtable_stage2_map(&host_kvm.pgt, start, end - start, start,
--				      prot, &host_s2_pool);
-+				      prot, &host_s2_pool, 0);
- }
- 
- /*
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index f814422ef795..5bca9610d040 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -912,7 +912,7 @@ static int stage2_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 
- int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   u64 phys, enum kvm_pgtable_prot prot,
--			   void *mc)
-+			   void *mc, enum kvm_pgtable_walk_flags flags)
- {
- 	int ret;
- 	struct stage2_map_data map_data = {
-@@ -923,7 +923,8 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	};
- 	struct kvm_pgtable_walker walker = {
- 		.cb		= stage2_map_walker,
--		.flags		= KVM_PGTABLE_WALK_TABLE_PRE |
-+		.flags		= flags |
-+				  KVM_PGTABLE_WALK_TABLE_PRE |
- 				  KVM_PGTABLE_WALK_LEAF,
- 		.arg		= &map_data,
- 	};
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 52e042399ba5..410c2a37fe32 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -861,7 +861,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 
- 		write_lock(&kvm->mmu_lock);
- 		ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
--					     &cache);
-+					     &cache, 0);
- 		write_unlock(&kvm->mmu_lock);
- 		if (ret)
- 			break;
-@@ -1156,7 +1156,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	gfn_t gfn;
- 	kvm_pfn_t pfn;
- 	bool logging_active = memslot_is_logging(memslot);
--	bool use_read_lock = false;
- 	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
- 	unsigned long vma_pagesize, fault_granule;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-@@ -1191,8 +1190,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (logging_active) {
- 		force_pte = true;
- 		vma_shift = PAGE_SHIFT;
--		use_read_lock = (fault_status == FSC_PERM && write_fault &&
--				 fault_granule == PAGE_SIZE);
- 	} else {
- 		vma_shift = get_vma_page_shift(vma, hva);
- 	}
-@@ -1291,15 +1288,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (exec_fault && device)
- 		return -ENOEXEC;
- 
--	/*
--	 * To reduce MMU contentions and enhance concurrency during dirty
--	 * logging dirty logging, only acquire read lock for permission
--	 * relaxation.
--	 */
--	if (use_read_lock)
--		read_lock(&kvm->mmu_lock);
--	else
--		write_lock(&kvm->mmu_lock);
-+	read_lock(&kvm->mmu_lock);
- 	pgt = vcpu->arch.hw_mmu->pgt;
- 	if (mmu_invalidate_retry(kvm, mmu_seq))
- 		goto out_unlock;
-@@ -1343,15 +1332,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
- 	 * kvm_pgtable_stage2_map() should be called to change block size.
- 	 */
--	if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
-+	if (fault_status == FSC_PERM && vma_pagesize == fault_granule)
- 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
--	} else {
--		WARN_ONCE(use_read_lock, "Attempted stage-2 map outside of write lock\n");
--
-+	else
- 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
- 					     __pfn_to_phys(pfn), prot,
--					     memcache);
--	}
-+					     memcache, KVM_PGTABLE_WALK_SHARED);
- 
- 	/* Mark the page dirty only if the fault is handled successfully */
- 	if (writable && !ret) {
-@@ -1360,10 +1346,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	}
- 
- out_unlock:
--	if (use_read_lock)
--		read_unlock(&kvm->mmu_lock);
--	else
--		write_unlock(&kvm->mmu_lock);
-+	read_unlock(&kvm->mmu_lock);
- 	kvm_set_pfn_accessed(pfn);
- 	kvm_release_pfn_clean(pfn);
- 	return ret != -EAGAIN ? ret : 0;
-@@ -1569,7 +1552,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- 	 */
- 	kvm_pgtable_stage2_map(kvm->arch.mmu.pgt, range->start << PAGE_SHIFT,
- 			       PAGE_SIZE, __pfn_to_phys(pfn),
--			       KVM_PGTABLE_PROT_R, NULL);
-+			       KVM_PGTABLE_PROT_R, NULL, 0);
- 
- 	return false;
- }
--- 
-2.38.1.431.g37b22c650d-goog
+[...]
+
+>>
+>> In order to speed up the review and reduce unnecessary respins. After
+>> collecting comments on PATCH[v8 3/7] from Marc and Peter, I would change
+>> above description as below. Could you please confirm it looks good to you?
+>>
+>> In the 4th paragraph, the words starting from "Collecting the dirty bitmap..."
+>> to the end, was previously suggested by Oliver, even Marc suggested to avoid
+>> mentioning "migration".
+>>
+>>    After enabling the dirty rings, the userspace needs to detect the
+>>    capability of KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP to see whether the ring
+>>    structures need to be backed by per-slot bitmaps. With this capability
+> 
+> s/need/can/. If there was a *need*, it should happen automatically
+> without user intervention.
+> 
+
+Ok. s/need to/can in next revision :)
+
+>>    advertised, it means the architecture can dirty guest pages without
+>>    vcpu/ring context, so that some of the dirty information will still be
+>>    maintained in the bitmap structure. KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
+>>    can't be enabled if the capability of KVM_CAP_DIRTY_LOG_RING_ACQ_REL
+>>    hasn't been enabled, or any memslot has been existing.
+>>
+>>    Note that the bitmap here is only a backup of the ring structure. The
+>>    use of the ring and bitmap combination is only beneficial if there is
+>>    only a very small amount of memory that is dirtied out of vcpu/ring
+>>    context. Otherwise, the stand-alone per-slot bitmap mechanism needs to
+>>    be considered.
+>>
+>>    To collect dirty bits in the backup bitmap, userspace can use the same
+>>    KVM_GET_DIRTY_LOG ioctl. KVM_CLEAR_DIRTY_LOG isn't needed as long as all
+>>    the generation of the dirty bits is done in a single pass. Collecting
+>>    the dirty bitmap should be the very last thing that the VMM does before
+>>    transmitting state to the target VM. VMM needs to ensure that the dirty
+>>    state is final and avoid missing dirty pages from another ioctl ordered
+>>    after the bitmap collection.
+> 
+> I would replace "transmitting state to the target VM" with
+> "considering the state as complete", as I still object to casting this
+> API into the migration mold. People use this stuff more far more than
+> migration (checkpointing, for example).
+> 
+
+Fair enough. I will change accordingly in next revision.
+
+>>
+>>    NOTE: One example of using the backup bitmap is saving arm64 vgic/its
+>>    tables through KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} command on
+>>    KVM device "kvm-arm-vgic-its" during VM's migration.
+> 
+> Same remark about migration.
+> 
+
+Ok. I will change this paragraph as below in next revision, to avoid mentioning
+"migration".
+
+   NOTE: One example of using the backup bitmap is saving arm64 vgic/its
+   tables through KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} command on
+   KVM device "kvm-arm-vgic-its" when dirty ring is enabled.
+
+Thanks,
+Gavin
 
 _______________________________________________
 kvmarm mailing list
