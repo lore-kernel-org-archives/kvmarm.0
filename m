@@ -2,70 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E015BC433FE
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Nov 2022 09:21:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2010C433FE
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Nov 2022 09:38:37 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C8534B8A9;
-	Mon,  7 Nov 2022 04:21:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56C874B8BC;
+	Mon,  7 Nov 2022 04:38:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MatGV6TJJ8Zx; Mon,  7 Nov 2022 04:21:49 -0500 (EST)
+	with ESMTP id 27atJz0rG-EO; Mon,  7 Nov 2022 04:38:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32C9E4B868;
-	Mon,  7 Nov 2022 04:21:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0039F4B875;
+	Mon,  7 Nov 2022 04:38:36 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 940894B868
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 04:21:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 692034B866
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 04:38:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e2FRuUvTyyc5 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Nov 2022 04:21:46 -0500 (EST)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A62B34B866
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 04:21:45 -0500 (EST)
+ with ESMTP id hGdXnam7+ncR for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Nov 2022 04:38:30 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A83814B85E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 04:38:30 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id C942DCE10F9;
- Mon,  7 Nov 2022 09:21:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D70AC433C1;
- Mon,  7 Nov 2022 09:21:38 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 382CBB80ECE;
+ Mon,  7 Nov 2022 09:38:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E64C1C433C1;
+ Mon,  7 Nov 2022 09:38:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1667812898;
- bh=Qg31ejv/r9mPj2NkbcR5VRKWxl4krVjVLbPtDxF3eb4=;
+ s=k20201202; t=1667813907;
+ bh=H0rFkYnoaXV7s4LrmOspIHxtkdjVnhbZoGTomVEV1Zc=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=nrgOMUZbrd5cLsvbvqLVbqO1ZPQff1dS/kTVYGmLfWIdb/qygRHwyGw7ZHYfSAQVr
- 515MAnFA1PWwDOPF+hv+KUVaOxKWQHHuW+vpPZBfIKG6uJkiSdPc8cvgaIBnQ2zoi0
- kN+NGRMlhT3fx/M24WHdFvQrbjmlGb0/owtSgFUKN6yG5tssV5b8tAwDzgL5Xway3Y
- pyFdMaZeMNkDp1rkXa2vQDqYj7qbKPfuArOFgs/9PcpT4Q3/QAuU5nywwD6Xb8KMFI
- 1yqJI4zwJiUu1GXQ0Uycz23xnDAULPIow3SH7L0JFWuduKdQWLLSR1uC6kJ2E9wvUg
- IBTZCcM6vXufg==
+ b=XF5PWoV8e8s5fiyQ5u+IOc8+i6yg3DgrJgBPSJontSGyIWfRRZbwoVAXAbvjU6ZCw
+ dWTkaVtZdr6+haicqvQjBJ8Qc9pExcs4tmlCs3Pmm60QxBUQGU9hZ8MAQ2QRlHZ+5o
+ vg6qVrWJZaiEl0tUzY6IHqhpjlabw27TqXCPdUAhT0Ixfst0vP1Q9ypB/cbuXweioH
+ PQWqBK/mrp/oWIPBTTvsHEDzlzS61Qmg0orsXLJDb2RHRRH05EJHlhQveWgp8aKerP
+ UiUaA0X1xg8dHCp8mDvaVxYiJAsmAMbdawcj2rsWlcgmQYVMAw9djG7dhLRLrOghEr
+ Y2HWkKzwV3dIQ==
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=goblin-girl.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1oryK0-004LaN-3M;
- Mon, 07 Nov 2022 09:21:36 +0000
-Date: Mon, 07 Nov 2022 09:21:35 +0000
-Message-ID: <867d07qfvk.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1oryaH-004LrT-EH;
+ Mon, 07 Nov 2022 09:38:25 +0000
+Date: Mon, 07 Nov 2022 09:38:24 +0000
+Message-ID: <865yfrqf3j.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Peter Xu <peterx@redhat.com>
+To: Gavin Shan <gshan@redhat.com>
 Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
-In-Reply-To: <Y2gh4x4MD8BJvogH@x1n>
+In-Reply-To: <35d005f3-655a-88f5-2de3-848576a26e42@redhat.com>
 References: <20221104234049.25103-1-gshan@redhat.com>
  <20221104234049.25103-4-gshan@redhat.com>
  <87o7tkf5re.wl-maz@kernel.org> <Y2ffRYoqlQOxgVtk@x1n>
  <87iljrg7vd.wl-maz@kernel.org> <Y2gh4x4MD8BJvogH@x1n>
+ <35d005f3-655a-88f5-2de3-848576a26e42@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: peterx@redhat.com, gshan@redhat.com, kvmarm@lists.linux.dev,
+X-SA-Exim-Rcpt-To: gshan@redhat.com, peterx@redhat.com, kvmarm@lists.linux.dev,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, shuah@kernel.org,
  catalin.marinas@arm.com, andrew.jones@linux.dev, ajones@ventanamicro.com,
  bgardon@google.com, dmatlack@google.com, will@kernel.org,
@@ -95,114 +96,89 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, 06 Nov 2022 21:06:43 +0000,
-Peter Xu <peterx@redhat.com> wrote:
+On Sun, 06 Nov 2022 21:23:13 +0000,
+Gavin Shan <gshan@redhat.com> wrote:
 > 
-> On Sun, Nov 06, 2022 at 08:12:22PM +0000, Marc Zyngier wrote:
-> > Hi Peter,
-> > 
-> > On Sun, 06 Nov 2022 16:22:29 +0000,
-> > Peter Xu <peterx@redhat.com> wrote:
-> > > 
-> > > Hi, Marc,
-> > > 
-> > > On Sun, Nov 06, 2022 at 03:43:17PM +0000, Marc Zyngier wrote:
-> > > > > +Note that the bitmap here is only a backup of the ring structure, and
-> > > > > +normally should only contain a very small amount of dirty pages, which
-> > > > 
-> > > > I don't think we can claim this. It is whatever amount of memory is
-> > > > dirtied outside of a vcpu context, and we shouldn't make any claim
-> > > > regarding the number of dirty pages.
-> > > 
-> > > The thing is the current with-bitmap design assumes that the two logs are
-> > > collected in different windows of migration, while the dirty log is only
-> > > collected after the VM is stopped.  So collecting dirty bitmap and sending
-> > > the dirty pages within the bitmap will be part of the VM downtime.
-> > > 
-> > > It will stop to make sense if the dirty bitmap can contain a large portion
-> > > of the guest memory, because then it'll be simpler to just stop the VM,
-> > > transfer pages, and restart on dest node without any tracking mechanism.
-> > 
-> > Oh, I absolutely agree that the whole vcpu dirty ring makes zero sense
-> > in general. It only makes sense if the source of the dirty pages is
-> > limited to the vcpus, which is literally a corner case. Look at any
-> > real machine, and you'll quickly realise that this isn't the case, and
-> > that DMA *is* a huge source of dirty pages.
-> > 
-> > Here, we're just lucky enough not to have much DMA tracking yet. Once
-> > that happens (and I have it from people doing the actual work that it
-> > *is* happening), you'll realise that the dirty ring story is of very
-> > limited use. So I'd rather drop anything quantitative here, as this is
-> > likely to be wrong.
+> Hi Peter and Marc,
 > 
-> Is it a must that arm64 needs to track device DMAs using the same dirty
-> tracking interface rather than VFIO or any other interface?
-
-What does it change? At the end of the day, you want a list of dirty
-pages. How you obtain it is irrelevant.
-
-> It's
-> definitely not the case for x86, but if it's true for arm64, then could the
-> DMA be spread across all the guest pages?  If it's also true, I really
-> don't know how this will work..
-
-Of course, all pages can be the target of DMA. It works the same way
-it works for the ITS: you sync the state, you obtain the dirty bits,
-you move on.
-
-And mimicking what x86 does is really not my concern (if you still
-think that arm64 is just another flavour of x86, stay tuned!  ;-).
-
+> On 11/7/22 5:06 AM, Peter Xu wrote:
+> > On Sun, Nov 06, 2022 at 08:12:22PM +0000, Marc Zyngier wrote:
+> >> On Sun, 06 Nov 2022 16:22:29 +0000,
+> >> Peter Xu <peterx@redhat.com> wrote:
+> >>> On Sun, Nov 06, 2022 at 03:43:17PM +0000, Marc Zyngier wrote:
+> >>>>> +Note that the bitmap here is only a backup of the ring structure, and
+> >>>>> +normally should only contain a very small amount of dirty pages, which
+> >>>> 
+> >>>> I don't think we can claim this. It is whatever amount of memory is
+> >>>> dirtied outside of a vcpu context, and we shouldn't make any claim
+> >>>> regarding the number of dirty pages.
+> >>> 
+> >>> The thing is the current with-bitmap design assumes that the two logs are
+> >>> collected in different windows of migration, while the dirty log is only
+> >>> collected after the VM is stopped.  So collecting dirty bitmap and sending
+> >>> the dirty pages within the bitmap will be part of the VM downtime.
+> >>> 
+> >>> It will stop to make sense if the dirty bitmap can contain a large portion
+> >>> of the guest memory, because then it'll be simpler to just stop the VM,
+> >>> transfer pages, and restart on dest node without any tracking mechanism.
+> >> 
+> >> Oh, I absolutely agree that the whole vcpu dirty ring makes zero sense
+> >> in general. It only makes sense if the source of the dirty pages is
+> >> limited to the vcpus, which is literally a corner case. Look at any
+> >> real machine, and you'll quickly realise that this isn't the case, and
+> >> that DMA *is* a huge source of dirty pages.
+> >> 
+> >> Here, we're just lucky enough not to have much DMA tracking yet. Once
+> >> that happens (and I have it from people doing the actual work that it
+> >> *is* happening), you'll realise that the dirty ring story is of very
+> >> limited use. So I'd rather drop anything quantitative here, as this is
+> >> likely to be wrong.
+> > 
+> > Is it a must that arm64 needs to track device DMAs using the same dirty
+> > tracking interface rather than VFIO or any other interface?  It's
+> > definitely not the case for x86, but if it's true for arm64, then could the
+> > DMA be spread across all the guest pages?  If it's also true, I really
+> > don't know how this will work..
+> > 
+> > We're only syncing the dirty bitmap once right now with the protocol.  If
+> > that can cover most of the guest mem, it's same as non-live.  If we sync it
+> > periodically, then it's the same as enabling dirty-log alone and the rings
+> > are useless.
+> > 
 > 
-> We're only syncing the dirty bitmap once right now with the protocol.  If
-> that can cover most of the guest mem, it's same as non-live.  If we sync it
-> periodically, then it's the same as enabling dirty-log alone and the rings
-> are useless.
+> For vgic/its tables, the number of dirty pages can be huge in theory. However,
+> they're limited in practice. So I intend to agree with Peter that dirty-ring
+> should be avoided and dirty-log needs to be used instead when the DMA case
+> is supported in future. As Peter said, the small amount of dirty pages in
+> the bitmap is the condition to use it here. I think it makes sense to mention
+> it in the document.
 
-I'm glad that you finally accept it: the ring *ARE* useless in the
-general sense. Only limited, CPU-only workloads can make any use of
-the current design. This probably covers a large proportion of what
-the cloud vendors do, but this doesn't work for general situations
-where you have a stream of dirty pages originating outside of the
-CPUs.
+And again, I disagree. This API has *nothing* to do with the ITS. It
+is completely general purpose and should work with anything because it
+is designed for that.
+
+The problem is that you're considering that RING+BITMAP is a different
+thing from BITMAP alone when it comes to non-CPU traffic. It really
+isn't.  We can't say "there will only be a few pages dirtied", because
+we simply don't know.
+
+If you really want a quantitative argument then say something like:
+
+"The use of the ring+bitmap combination is only beneficial if there is
+only very little memory that is dirtied by non-CPU agents. Consider
+using the stand-alone bitmap API if this isn't the case."
+
+which clearly puts the choice in the hand of the user.
 
 [...]
 
-> > > I wanted to make it clear that we don't need CLEAR_LOG at all in this case,
-> > > as fundamentally clear log is about re-protect the guest pages, but if
-> > > we're with the restriction of above (having the dirty bmap the last to
-> > > collect and once and for all) then it'll make no sense to protect the guest
-> > > page at all at this stage since src host shouldn't run after the GET_LOG
-> > > then the CLEAR_LOG will be a vain effort.
-> > 
-> > That's not for you to decide, but userspace. I can perfectly expect
-> > userspace saving an ITS, getting the bitmap, saving the pages and then
-> > *clearing the log* before processing the next ITS. Or anything else.
-> 
-> I think I can get your point on why you're not happy with the document, but
-> IMHO how we document is one thing, how it'll work is another.  I preferred
-> explicit documentation because it'll help the app developer to support the
-> interface, also more docs to reference in the future; no strong opinion,
-> though.
+> How about to avoid mentioning KVM_CLEAR_DIRTY_LOG here? I don't expect QEMU
+> to clear the dirty bitmap after it's collected in this particular case.
 
-Here's my beef with the current documentation: it sets quantitative
-expectations. This is wrong. It also introduces undefined behaviours
-where there should be none. This is even worse, because there
-shouldn't be *any* undefined behaviour today, and I cannot see why the
-dirty rings would influence this.
-
-> However if there's fundamental statement that was literally wrong, then
-> it's another thing, and we may need to rethink.
-
-See above. If the undefined behaviour was just a mistake, let's drop
-it and move on. If you have spotted something that is indeed an
-undefined behaviour in using CLEAR_LOG when the VM is stopped, then
-live migration is already broken on arm64 *today*.
-
-And if that's the case, we should fix it now instead of adding the
-dirty ring stuff.
-
-Thanks,
+Peter said there is an undefined behaviour. I want to understand
+whether this is the case or not. QEMU is only one of the users of this
+stuff, as all the vendors have their own custom VMM, and they do
+things in funny ways.
 
 	M.
 
