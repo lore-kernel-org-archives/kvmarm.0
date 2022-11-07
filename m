@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8460DC43219
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Nov 2022 08:55:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAEA7C433FE
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Nov 2022 09:16:36 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 442D44B8CC;
-	Mon,  7 Nov 2022 03:55:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D3E74B8C1;
+	Mon,  7 Nov 2022 04:16:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Vh48KJ5oaxdB; Mon,  7 Nov 2022 03:55:13 -0500 (EST)
+	with ESMTP id ZzVgWYW2Vd4Q; Mon,  7 Nov 2022 04:16:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 413C44B8FA;
-	Mon,  7 Nov 2022 03:55:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F40084B8A5;
+	Mon,  7 Nov 2022 04:16:34 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 97C6F4B77F
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 03:55:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C2484B8A4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 04:16:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gA7WxcnoAzdD for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Nov 2022 03:55:01 -0500 (EST)
+ with ESMTP id cZkDnFioIOZf for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Nov 2022 04:16:33 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2C6394B8C0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 03:55:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2CDC94B88D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 04:16:33 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id D3D87B80E6A;
- Mon,  7 Nov 2022 08:54:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B49CC433C1;
- Mon,  7 Nov 2022 08:54:57 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id D17F0B80E81;
+ Mon,  7 Nov 2022 09:16:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 894C4C433C1;
+ Mon,  7 Nov 2022 09:16:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1667811297;
- bh=Y6xxfM4ND10MuEIQCLvziXMSdXkZfkvKinsYllpKaj8=;
+ s=k20201202; t=1667812590;
+ bh=6WGsGnGK0FfwzX7+49pswSKcxsS+/HcYsIcCPHuyXmE=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=u5ASzgfNLAduhtODIQEPaUOcvUX4YnmwCPsrH+yAayzfTaVeKKsTQSVnUG7EwznZg
- /v26etvjxOzYle4fisZrq9knNl4SrozJIu/i21f33sVxbCx+lcrQ4PD7RYHlIDK5OT
- QlwCrv3iXagWXuWJqMRD1ymXxmbeR8vErXNWxn09RnJQ+hvpINEfadJLglNlVNhVb5
- BJP43HTb+VP3al2IZfKzSjGxjQnuZnrgeThQeA93XaL8GnTW0zt4xwnwSBq4dmj5lp
- 1Irkt8SstcaAvfAfwua0HKWGmOkESGYQ5XYYRKGYrMuxdKnrpGWsi4D6f8/1le6518
- SjM3r56tWvQsg==
+ b=Xf2MwDUnU9mahXaUwQgdvNqoRbW0Kg4H7toT9b0PYxXBmdOhe+k+Hu7IC7AeuJPBa
+ J00Wxy3HWJqvFeaSVigdrBuZBwzgwbg3VWg1scxXxSyu7SuAm/COXpKAdJa6DvMpBL
+ QsGn5UDM7EqVOZ6VVF1k3FIyMyLCEPIlaORULKT4Q8mQ01T/jADUe6/JKVw+GqkapN
+ OYS4teLH19j/QzFhSnw4184KQYHM92KJjDZosHdOVztd03RXkkNbPCenjyCUm452HT
+ bLdFJbJubd8/G+BlcaP83KDCkijDR/Lssd3xMdrcGjjajY3vJiCuohLbSzwt4EkLpv
+ L0CiBpEzJQ5cQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1orxuB-004KxX-Gc;
- Mon, 07 Nov 2022 08:54:55 +0000
+ (envelope-from <maz@kernel.org>) id 1orxuE-004KxX-0R;
+ Mon, 07 Nov 2022 08:54:58 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, <kvmarm@lists.cs.columbia.edu>,
  <kvmarm@lists.linux.dev>, kvm@vger.kernel.org
-Subject: [PATCH v3 01/14] arm64: Add ID_DFR0_EL1.PerfMon values for PMUv3p7
- and IMP_DEF
-Date: Mon,  7 Nov 2022 08:54:22 +0000
-Message-Id: <20221107085435.2581641-2-maz@kernel.org>
+Subject: [PATCH v3 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to be
+ set from userspace
+Date: Mon,  7 Nov 2022 08:54:32 +0000
+Message-Id: <20221107085435.2581641-12-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221107085435.2581641-1-maz@kernel.org>
 References: <20221107085435.2581641-1-maz@kernel.org>
@@ -84,27 +84,73 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Align the ID_DFR0_EL1.PerfMon values with ID_AA64DFR0_EL1.PMUver.
+Allow userspace to write ID_AA64DFR0_EL1, on the condition that only
+the PMUver field can be altered and be at most the one that was
+initially computed for the guest.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 40 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 7d301700d1a9..84f59ce1dc6d 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -698,6 +698,8 @@
- #define ID_DFR0_PERFMON_8_1		0x4
- #define ID_DFR0_PERFMON_8_4		0x5
- #define ID_DFR0_PERFMON_8_5		0x6
-+#define ID_DFR0_PERFMON_8_7		0x7
-+#define ID_DFR0_PERFMON_IMP_DEF		0xf
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 7a4cd644b9c0..47c882401f3c 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1247,6 +1247,43 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
  
- #define ID_ISAR4_SWP_FRAC_SHIFT		28
- #define ID_ISAR4_PSR_M_SHIFT		24
++static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
++			       const struct sys_reg_desc *rd,
++			       u64 val)
++{
++	u8 pmuver, host_pmuver;
++	bool valid_pmu;
++
++	host_pmuver = kvm_arm_pmu_get_pmuver_limit();
++
++	/*
++	 * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
++	 * as it doesn't promise more than what the HW gives us. We
++	 * allow an IMPDEF PMU though, only if no PMU is supported
++	 * (KVM backward compatibility handling).
++	 */
++	pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
++	if ((pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver) ||
++	    (pmuver != 0 && pmuver < ID_AA64DFR0_EL1_PMUVer_IMP))
++		return -EINVAL;
++
++	valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
++
++	/* Make sure view register and PMU support do match */
++	if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
++		return -EINVAL;
++
++	/* We can only differ with PMUver, and anything else is an error */
++	val ^= read_id_reg(vcpu, rd);
++	val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
++	if (val)
++		return -EINVAL;
++
++	vcpu->kvm->arch.dfr0_pmuver = pmuver;
++
++	return 0;
++}
++
+ /*
+  * cpufeature ID register user accessors
+  *
+@@ -1508,7 +1545,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	ID_UNALLOCATED(4,7),
+ 
+ 	/* CRm=5 */
+-	ID_SANITISED(ID_AA64DFR0_EL1),
++	{ SYS_DESC(SYS_ID_AA64DFR0_EL1), .access = access_id_reg,
++	  .get_user = get_id_reg, .set_user = set_id_aa64dfr0_el1, },
+ 	ID_SANITISED(ID_AA64DFR1_EL1),
+ 	ID_UNALLOCATED(5,2),
+ 	ID_UNALLOCATED(5,3),
 -- 
 2.34.1
 
