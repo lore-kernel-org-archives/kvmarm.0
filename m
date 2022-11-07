@@ -1,99 +1,131 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5717ED527
-	for <kvmarm@lists.linux.dev>; Mon,  7 Nov 2022 15:11:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC3D5C433D6;
-	Mon,  7 Nov 2022 15:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4EAFD527
+	for <kvmarm@lists.linux.dev>; Mon,  7 Nov 2022 15:31:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A11DCC433D6;
+	Mon,  7 Nov 2022 15:31:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1667833875;
-	bh=wVgLPr5v//yG11ovNQ85JwEVr3YQFb/RyVao7hWCqlk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V+0FY/orTZt8mOb9jO02zZqXQwJgbcIqcYmXk5XODvNm+QnTru0kqiwIgZzaEb2yr
-	 9uvDsafbDYZ01c2d00etldMGUDc1+dUoRrbFmBhB1N0OgKexApvC2ihASE52yjy17S
-	 Lsrae0+c0CNWW5+llsspm0oIcF55qpxyF7NGLJ0nXjE5JAehXOUn3LqSvqHved8SRL
-	 WZLO3njMrB5bVHxGYdg5+WK661dy1GDviEhzfDKFjKg4FcqnWV4JhylF2jpCqN2W0M
-	 YKMBEkMrKHeGxQ/+EHwhvg6xcKoqSfufHleq5vjKgtjXBnIeZ9FwwsBR6Z3xuJI31x
-	 kXzAi1jwTAmMw==
-Date: Mon, 7 Nov 2022 15:11:07 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: Namhyung Kim <namhyung@kernel.org>, Will Deacon <will@kernel.org>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Ingo Molnar <mingo@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>, kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-	James Clark <james.clark@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH v3 3/8] arm64/sysreg: Convert SPE registers to automatic
- generation
-Message-ID: <Y2kgC9QlBwvXTLe6@sirena.org.uk>
-References: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
- <20220825-arm-spe-v8-7-v3-3-87682f78caac@kernel.org>
+	s=k20201202; t=1667835062;
+	bh=bkVktwW5TQjNJ7vT92h9Ndj7XiwAcQLTowe267DgFCM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=n6poy86h9Rm4cDZcXm40fl1O2bbwobQTLE1dNyZvG7LyEe4N6BXXkjxlhywPpw+sW
+	 cXAM33t1k16JO/VLniR7wxF3VPJNxL2/XhIcq5c/vX/xxkDnyUBcco1opwqdd8sUA7
+	 Ll5SjjbNQHHFgXCSX3Y/Kau8KyhSEhuKlCTlUTZtA9buC06CBQyomUoxp1ByWAtRry
+	 wTPhEApW2RUD+v3HYx2zGnXe24Yw+65Y1VvGD0jOv67zq94Kdjt8I13O3ITOsEGnd0
+	 lY6An1wsYTUm03vJGthMwUcLa3iE0PmMzH6BZ/AMXwY8zWWwSpe3RubmzrgrbtFA6U
+	 m7nVDvTlb/y7w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1os45U-004QlV-B6;
+	Mon, 07 Nov 2022 15:31:00 +0000
+Date: Mon, 07 Nov 2022 15:30:59 +0000
+Message-ID: <86zgd2pyrw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: Gavin Shan <gshan@redhat.com>,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org,
+	shuah@kernel.org,
+	catalin.marinas@arm.com,
+	andrew.jones@linux.dev,
+	ajones@ventanamicro.com,
+	bgardon@google.com,
+	dmatlack@google.com,
+	will@kernel.org,
+	suzuki.poulose@arm.com,
+	alexandru.elisei@arm.com,
+	pbonzini@redhat.com,
+	seanjc@google.com,
+	oliver.upton@linux.dev,
+	zhenyzha@redhat.com,
+	shan.gavin@gmail.com
+Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
+In-Reply-To: <Y2kdXTn6X3O08sFv@x1n>
+References: <20221104234049.25103-1-gshan@redhat.com>
+	<20221104234049.25103-4-gshan@redhat.com>
+	<87o7tkf5re.wl-maz@kernel.org>
+	<Y2ffRYoqlQOxgVtk@x1n>
+	<87iljrg7vd.wl-maz@kernel.org>
+	<Y2gh4x4MD8BJvogH@x1n>
+	<867d07qfvk.wl-maz@kernel.org>
+	<Y2kdXTn6X3O08sFv@x1n>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2G3Dfetw2HrPyugm"
-Content-Disposition: inline
-In-Reply-To: <20220825-arm-spe-v8-7-v3-3-87682f78caac@kernel.org>
-X-Cookie: Minimum charge for booths.
-Message-ID: <20221107151107.4xWoQCT5nJ6Q5nD7mYO3t0ncnXhi2F9D-MAW57QnnnY@z>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: peterx@redhat.com, gshan@redhat.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com, will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com, pbonzini@redhat.com, seanjc@google.com, oliver.upton@linux.dev, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221107153059.cm7q0dLCLP0jSj1uEm1UPs-3vlCCqfF3Bzz-_FP58Ts@z>
 
+On Mon, 07 Nov 2022 14:59:41 +0000,
+Peter Xu <peterx@redhat.com> wrote:
+> 
+> On Mon, Nov 07, 2022 at 09:21:35AM +0000, Marc Zyngier wrote:
+> > On Sun, 06 Nov 2022 21:06:43 +0000,
+> > Peter Xu <peterx@redhat.com> wrote:
+> > > 
+> > > It's definitely not the case for x86, but if it's true for
+> > > arm64, then could the DMA be spread across all the guest pages?
+> > > If it's also true, I really don't know how this will work..
+> > 
+> > Of course, all pages can be the target of DMA. It works the same way
+> > it works for the ITS: you sync the state, you obtain the dirty bits,
+> > you move on.
+> > 
+> > And mimicking what x86 does is really not my concern (if you still
+> > think that arm64 is just another flavour of x86, stay tuned!  ;-).
+> 
+> I didn't mean so, I should probably stop mentioning x86. :)
 
---2G3Dfetw2HrPyugm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Please! I turned off my last x86 development machine over the weekend,
+and my x86 laptop is now a glorified window manager... ;-)
 
-On Fri, Nov 04, 2022 at 10:55:03AM -0500, Rob Herring wrote:
+> I had some sense already from the topics in past few years of kvm forum.
+> Yeah I'll be looking forward to anything more coming.
 
-> Convert all the SPE register defines to automatic generation. No
-> functional changes.
->=20
-> New registers and fields for SPEv1.2 are added with the conversion.
->=20
-> Some of the PMBSR MSS field defines are kept as the automatic generation
-> has no way to create multiple names for the same register bits. The
-> meaning of the MSS field depends on other bits.
+Yup. Hopefully we won't have to wait for too long to see this stuff (I
+had good discussions on the subject at both KF and Plumbers in Dublin
+earlier this year).
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+> > > We're only syncing the dirty bitmap once right now with the
+> > > protocol.  If that can cover most of the guest mem, it's same as
+> > > non-live.  If we sync it periodically, then it's the same as
+> > > enabling dirty-log alone and the rings are useless.
+> > 
+> > I'm glad that you finally accept it: the ring *ARE* useless in the
+> > general sense. Only limited, CPU-only workloads can make any use of
+> > the current design. This probably covers a large proportion of what
+> > the cloud vendors do, but this doesn't work for general situations
+> > where you have a stream of dirty pages originating outside of the
+> > CPUs.
+> 
+> The ring itself is really not the thing to blame, IMHO it's a good attempt
+> to try out de-coupling guest size in regard of dirty tracking from kvm.  It
+> may not be perfect, but it may still service some of the goals, e.g., at
+> least it allows the user app to detect per-vcpu information and also since
+> there's the ring full events we can do something more than before like the
+> vcpu throttling that China Telecom does with the ring structures.
 
-> +Sysreg	PMSNEVFR_EL1	3	0	9	9	1
-> +Field	63:0	E
-> +EndSysreg
+I don't disagree with that: for vcpu-based workloads, the rings are
+great and doing their job. It's just that there is another side to
+this problem, and you'll have to deal with both eventually. We're just
+ahead of the curve here...
 
-JFTR as noted last time this looks nothing like the spec but is clearly
-a sensible interpretation.
+Thanks,
 
-I do note that one advantage of doing this register by register rather
-than en masse is that it makes it a lot easier to avoid re-reviewing the
-same register...
+	M.
 
---2G3Dfetw2HrPyugm
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmNpIAoACgkQJNaLcl1U
-h9DvBgf9EuKrsvAgMvRabqAgl2mo979wY3OQJcNNexlQAPguIlNJOpjdL2Dvko0o
-oHza2RbBfzmfHVQEMoiqbN+VUN9QxV7jgiP/50FrhH3G5oADAMRfYY6ubrg6STfw
-1/KlPkOiDj02yrS3S4rqH8gBbJ+OKWmxqFT2mINdB14b50FiSJ2++nKphUYHsS0D
-IRzNoBLllDsd+NqlXoQ4ma12NpJPOCpF+UOnIha7ersIgXxzrWyNQEkw48uWyg+g
-xjMyRJZvZW59hE4HPXl/6EypHNrnIBlAVzX+JE3vnep7cn5Y0STit5s53L7kkTsD
-B9N0R8ar/bOBI7vJMDHmI7qHigyuew==
-=WP8T
------END PGP SIGNATURE-----
-
---2G3Dfetw2HrPyugm--
+-- 
+Without deviation from the norm, progress is not possible.
