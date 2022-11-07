@@ -2,90 +2,96 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D91C433FE
-	for <kvmarm@archiver.kernel.org>; Mon,  7 Nov 2022 12:00:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20BF1C433FE
+	for <kvmarm@archiver.kernel.org>; Mon,  7 Nov 2022 14:29:09 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C342F4B8A2;
-	Mon,  7 Nov 2022 07:00:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 853B24B887;
+	Mon,  7 Nov 2022 09:29:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered)
-	header.i=@bytedance-com.20210112.gappssmtp.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5sy6YofpIng7; Mon,  7 Nov 2022 07:00:49 -0500 (EST)
+	with ESMTP id dhzE8eOQ6CCq; Mon,  7 Nov 2022 09:29:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D3104B89F;
-	Mon,  7 Nov 2022 07:00:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77E334B895;
+	Mon,  7 Nov 2022 09:29:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BC5A4B89F
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 07:00:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 279B84B887
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 09:29:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id f0munUFmg6wB for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Nov 2022 07:00:47 -0500 (EST)
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com
- [209.85.221.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DA1D84B88A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 07:00:46 -0500 (EST)
-Received: by mail-wr1-f48.google.com with SMTP id k8so15889645wrh.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 07 Nov 2022 04:00:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bytedance-com.20210112.gappssmtp.com; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :from:to:cc:subject:date:message-id:reply-to;
- bh=zWvz8bh4+vQKDNdPBDvtEEjozaiA8NxpItsV7tm0Qy0=;
- b=RM2XZktvK25OAmJHVCsqxExlx2YDb8taU5jJP6p51IieAMAC7rVqfwilaQF7Xqqe3G
- UwMWWVo3jrRu5oK/J3jJN4bG6MrzlcwfXbL/gDA98pemG49BzKD6bgFyow0xVV6hIC4N
- cf6zx1TH/gu3ilDDICAD4lfW6uErG3Aj8PE+aPiMsDZzvwiNA5Y84Nf0p0SZtWeekrp2
- 3qdK1/twOpDLX49v/t/ybYncTBiauIlLPODLWk6KsnXmtK/KZ/QbdXqSQ3r7uxN3WAvW
- bCAtytlDiReH1KhZkxHPGBBrCC7+BrOifMA+vx31z4AXM6SLhrkDGFn6tpeXsfo6CyjO
- Ug9w==
+ with ESMTP id wLt3eiZUd7nQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Nov 2022 09:29:07 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EEB514B845
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Nov 2022 09:29:06 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1667831346;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=humq6rQ40+uCr1dmaqj2I5gLtIPMUKzBIm5JAKLU5kM=;
+ b=ZARNp8ShzSLa1oCn5ac43prUu+GVFIS92TM3+SujBt7SwR8r35uxHvONi+SHygjY/U2V52
+ qA/bQ0T84dLEu7IGDTUe9QlXowgi/xH6Q+XztMz03QZXG/t+rBtF9gLniVGwLP/qfzjdMp
+ F5UIqFqfLSXFNBKv/t+B2YOKWTQYZx0=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-332-i-j7GyyPM9eAQ2R6Wb37sg-1; Mon, 07 Nov 2022 09:29:04 -0500
+X-MC-Unique: i-j7GyyPM9eAQ2R6Wb37sg-1
+Received: by mail-qt1-f197.google.com with SMTP id
+ cd6-20020a05622a418600b003a54cb17ad9so8199877qtb.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 07 Nov 2022 06:29:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=zWvz8bh4+vQKDNdPBDvtEEjozaiA8NxpItsV7tm0Qy0=;
- b=wLD5JOkiXogBJZiqWt5j6ZbPtK9JzDWHLid7BIA7U4N9jj0+hB8VmbFTl4+Dl588LM
- QwLklUFgxE530B53Brki3hRrjR0fBPtfEaK51AoMx/fm7Z8sOP7BN/A2MBSxvOGkfHXo
- aZlQM6UQhG0bsPmy1pbePp0ZYfw6mBGqJr8ZTgwoKNJNeEXbDd22fUvAWWA9lALK+CDA
- HSXkgSL4qB6BkX/Amq8Du+MmSQdV7aW68vlFypG78lPU2qmOg0q6ZQL+vEt2AfVVhaEo
- aMT00bEVvKFBuBk89zKCGMUYLVAwi1FFzp2+yVW+XU1nxtSdbkObmJ3U9z1B1Q1YOYGU
- d1Og==
-X-Gm-Message-State: ACrzQf1heJU0aHcZBEDYRw8/kytRCHzr8gpykHhttcqc+Ub2/AQBQeVD
- 8qBfC5NOApZ3xzR98oHyNlkjOA==
-X-Google-Smtp-Source: AMsMyM59k115pH9o+6WIgEa9CaPh3ktLnt7NSnldWl3F1VAmeY4BCiQWWWW9a39fkvnQOQN6hJYR7A==
-X-Received: by 2002:adf:e241:0:b0:238:3c64:decc with SMTP id
- bl1-20020adfe241000000b002383c64deccmr15833238wrb.698.1667822445787; 
- Mon, 07 Nov 2022 04:00:45 -0800 (PST)
-Received: from ?IPV6:2a02:6b6a:b4d7:0:ebf7:de38:f6bc:8fe8?
- ([2a02:6b6a:b4d7:0:ebf7:de38:f6bc:8fe8])
- by smtp.gmail.com with ESMTPSA id
- g2-20020a5d4882000000b00236cb3fec8fsm8600966wrq.9.2022.11.07.04.00.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 07 Nov 2022 04:00:45 -0800 (PST)
-Message-ID: <180b91af-a2aa-2cfd-eb7f-b2825c4e3dbe@bytedance.com>
-Date: Mon, 7 Nov 2022 12:00:44 +0000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [External] Re: [v2 0/6] KVM: arm64: implement vcpu_is_preempted
- check
-Content-Language: en-US
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=humq6rQ40+uCr1dmaqj2I5gLtIPMUKzBIm5JAKLU5kM=;
+ b=4B3K/4VUDaeHF77kOw1bkH7XwFZjsHTRgNjXaYitCei3Equmrikd06AA94KpYMDLpS
+ eS0wb52Og9s0HcDx/yqZhGmuzk72gNJLbCiCzQuu52fc0pKwf60e6IOPkRVMmW1jck4B
+ 6fbmq1Wolfdna3HyDkBU3paOPDRUHM6/h9e4nqv9fYtGRpLQgWnmVdxdn4AkJ/3ysG//
+ CrHF3Z1SP8QOlTF44yPALnRmZFeHUE8RydZpNxYZ/i8t2SEGST6dFJGBVqiw07OKc/7J
+ BlPl2ExGJM25atwve0UiTW5UrE7WwLWNt1YpgDXQVss5ZSkuZfehVWE2uwT/hV1hfziI
+ WGpQ==
+X-Gm-Message-State: ACrzQf0h/pLwWXs+5T00brZzThCjhC/S5vbWIjiSpiRpTU+Oq+wJLUfZ
+ 7c2Lrm3gzyVurkqkgkLckNlTTVdsQe0QerStUyhOIpRzh6rwYZbLCU+kTZP/PzZEunYLGLOhnnM
+ 9+IwnhLjne4UgyyA/CcX5VH86
+X-Received: by 2002:a05:620a:d55:b0:6f9:fadd:4762 with SMTP id
+ o21-20020a05620a0d5500b006f9fadd4762mr35863876qkl.335.1667831342865; 
+ Mon, 07 Nov 2022 06:29:02 -0800 (PST)
+X-Google-Smtp-Source: AMsMyM6QWKXb1TWdkP9qu08deog1NKsig/FMQot7OkY7UfMNUpgr2zjUhL2SrUPx+ND9wgrgFSLMDw==
+X-Received: by 2002:a05:620a:d55:b0:6f9:fadd:4762 with SMTP id
+ o21-20020a05620a0d5500b006f9fadd4762mr35863853qkl.335.1667831342661; 
+ Mon, 07 Nov 2022 06:29:02 -0800 (PST)
+Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca.
+ [70.31.27.79]) by smtp.gmail.com with ESMTPSA id
+ cg5-20020a05622a408500b0035cf31005e2sm6150909qtb.73.2022.11.07.06.29.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 07 Nov 2022 06:29:02 -0800 (PST)
+Date: Mon, 7 Nov 2022 09:29:00 -0500
+From: Peter Xu <peterx@redhat.com>
 To: Marc Zyngier <maz@kernel.org>
-References: <20221104062105.4119003-1-usama.arif@bytedance.com>
- <87k048f3cm.wl-maz@kernel.org>
-From: Usama Arif <usama.arif@bytedance.com>
-In-Reply-To: <87k048f3cm.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
- linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
- bagasdotme@gmail.com, fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
- linux@armlinux.org.uk, liangma@liangbit.com, steven.price@arm.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v8 3/7] KVM: Support dirty ring in conjunction with bitmap
+Message-ID: <Y2kWLMMTho0+/BLR@x1n>
+References: <20221104234049.25103-1-gshan@redhat.com>
+ <20221104234049.25103-4-gshan@redhat.com>
+ <87o7tkf5re.wl-maz@kernel.org> <Y2ffRYoqlQOxgVtk@x1n>
+ <87iljrg7vd.wl-maz@kernel.org> <Y2gh4x4MD8BJvogH@x1n>
+ <35d005f3-655a-88f5-2de3-848576a26e42@redhat.com>
+ <865yfrqf3j.wl-maz@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <865yfrqf3j.wl-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
+ dmatlack@google.com, will@kernel.org, shan.gavin@gmail.com, bgardon@google.com,
+ kvmarm@lists.linux.dev, pbonzini@redhat.com, zhenyzha@redhat.com,
+ shuah@kernel.org, kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,73 +103,23 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Mon, Nov 07, 2022 at 09:38:24AM +0000, Marc Zyngier wrote:
+> Peter said there is an undefined behaviour. I want to understand
+> whether this is the case or not. QEMU is only one of the users of this
+> stuff, as all the vendors have their own custom VMM, and they do
+> things in funny ways.
 
+It's not, as we don't special case this case in KVM_CLEAR_DIRTY_LOG.  If
+that's confusing, we can drop it in the document.  Thanks.
 
-On 06/11/2022 16:35, Marc Zyngier wrote:
-> On Fri, 04 Nov 2022 06:20:59 +0000,
-> Usama Arif <usama.arif@bytedance.com> wrote:
->>
->> This patchset adds support for vcpu_is_preempted in arm64, which
->> allows the guest to check if a vcpu was scheduled out, which is
->> useful to know incase it was holding a lock. vcpu_is_preempted can
->> be used to improve performance in locking (see owner_on_cpu usage in
->> mutex_spin_on_owner, mutex_can_spin_on_owner, rtmutex_spin_on_owner
->> and osq_lock) and scheduling (see available_idle_cpu which is used
->> in several places in kernel/sched/fair.c for e.g. in wake_affine to
->> determine which CPU can run soonest):
-> 
-> [...]
-> 
->> pvcy shows a smaller overall improvement (50%) compared to
->> vcpu_is_preempted (277%).  Host side flamegraph analysis shows that
->> ~60% of the host time when using pvcy is spent in kvm_handle_wfx,
->> compared with ~1.5% when using vcpu_is_preempted, hence
->> vcpu_is_preempted shows a larger improvement.
-> 
-> And have you worked out *why* we spend so much time handling WFE?
-> 
-> 	M.
+-- 
+Peter Xu
 
-Its from the following change in pvcy patchset:
-
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index e778eefcf214..915644816a85 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -118,7 +118,12 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
-         }
-
-         if (esr & ESR_ELx_WFx_ISS_WFE) {
--               kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
-+               int state;
-+               while ((state = kvm_pvcy_check_state(vcpu)) == 0)
-+                       schedule();
-+
-+               if (state == -1)
-+                       kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
-         } else {
-                 if (esr & ESR_ELx_WFx_ISS_WFxT)
-                         vcpu_set_flag(vcpu, IN_WFIT);
-
-
-If my understanding is correct of the pvcy changes, whenever pvcy 
-returns an unchanged vcpu state, we would schedule to another vcpu. And 
-its the constant scheduling where the time is spent. I guess the affects 
-are much higher when the lock contention is very high. This can be seem 
-from the pvcy host side flamegraph as well with (~67% of the time spent 
-in the schedule() call in kvm_handle_wfx), For reference, I have put the 
-graph at:
-https://uarif1.github.io/pvlock/perf_host_pvcy_nmi.svg
-
-Thanks,
-Usama
-
-> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
