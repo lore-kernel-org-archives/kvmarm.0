@@ -1,19 +1,19 @@
 Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE2615C8C
-	for <kvmarm@lists.linux.dev>; Mon,  7 Nov 2022 21:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A3D15C8C
+	for <kvmarm@lists.linux.dev>; Mon,  7 Nov 2022 21:58:01 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1667858274;
+	t=1667858280;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vlMEzdNgHf7wiuW7CTQkZnwfNnM0HFjoar2vWU53GNw=;
-	b=Az2FCcw3bdQ5UtxP/IufM5r5Wfpsl7/R5fzIxcyu4RGrB6YUZyJFkMGwDObayCqK0Bs0ET
-	57UoSVNBSmhxKOZKH+SNrXyWmGjwq2VPL3A4r/FT/dY34yanYNtIDCK5WfZH5NVKIbwA5C
-	uybnFFlQQVmgMpPxpXjf8CEQ8q0aE4w=
+	bh=UZiyD2k3y+EgHFhd63YTq4eWFfM6/StSmrCFVfziB3E=;
+	b=xLi/4ocdf+ppLrJmfOO+OYHS7mtB+7dzqmhZiOcFcQZHi8X8TOQ/crSA6zZYUCcP6Y/RHg
+	+xbh68fMgMm8gPPpUe60TmWNqPpB27Ji699w5Z1P247b+uHye6ghSkJKJA0oK/wiCaKmgN
+	ndLg94qd5fQh+6KgVLM7dveIGEDA0uw=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	James Morse <james.morse@arm.com>,
@@ -32,9 +32,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Sean Christopherson <seanjc@google.com>,
 	kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v5 08/14] KVM: arm64: Protect stage-2 traversal with RCU
-Date: Mon,  7 Nov 2022 21:56:38 +0000
-Message-ID: <20221107215644.1895162-9-oliver.upton@linux.dev>
+Subject: [PATCH v5 10/14] KVM: arm64: Split init and set for table PTE
+Date: Mon,  7 Nov 2022 21:56:40 +0000
+Message-ID: <20221107215644.1895162-11-oliver.upton@linux.dev>
 In-Reply-To: <20221107215644.1895162-1-oliver.upton@linux.dev>
 References: <20221107215644.1895162-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -45,169 +45,82 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221107215638.um9nJgkPwQuuZ8wqdWJPzNE3stei4uGTtiXr51Y71BU@z>
+Message-ID: <20221107215640.w0L2gEqWrwP2YgpfJzHq_2zfedMsd9gkIMbgD-HW79k@z>
 
-Use RCU to safely walk the stage-2 page tables in parallel. Acquire and
-release the RCU read lock when traversing the page tables. Defer the
-freeing of table memory to an RCU callback. Indirect the calls into RCU
-and provide stubs for hypervisor code, as RCU is not available in such a
-context.
-
-The RCU protection doesn't amount to much at the moment, as readers are
-already protected by the read-write lock (all walkers that free table
-memory take the write lock). Nonetheless, a subsequent change will
-futher relax the locking requirements around the stage-2 MMU, thereby
-depending on RCU.
+Create a helper to initialize a table and directly call
+smp_store_release() to install it (for now). Prepare for a subsequent
+change that generalizes PTE writes with a helper.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 49 ++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/pgtable.c         | 10 +++++-
- arch/arm64/kvm/mmu.c                 | 14 +++++++-
- 3 files changed, 71 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index e70cf57b719e..7634b6964779 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -37,6 +37,13 @@ static inline u64 kvm_get_parange(u64 mmfr0)
- 
- typedef u64 kvm_pte_t;
- 
-+/*
-+ * RCU cannot be used in a non-kernel context such as the hyp. As such, page
-+ * table walkers used in hyp do not call into RCU and instead use other
-+ * synchronization mechanisms (such as a spinlock).
-+ */
-+#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
-+
- typedef kvm_pte_t *kvm_pteref_t;
- 
- static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
-@@ -44,6 +51,40 @@ static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared
- 	return pteref;
- }
- 
-+static inline void kvm_pgtable_walk_begin(void) {}
-+static inline void kvm_pgtable_walk_end(void) {}
-+
-+static inline bool kvm_pgtable_walk_lock_held(void)
-+{
-+	return true;
-+}
-+
-+#else
-+
-+typedef kvm_pte_t __rcu *kvm_pteref_t;
-+
-+static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
-+{
-+	return rcu_dereference_check(pteref, !shared);
-+}
-+
-+static inline void kvm_pgtable_walk_begin(void)
-+{
-+	rcu_read_lock();
-+}
-+
-+static inline void kvm_pgtable_walk_end(void)
-+{
-+	rcu_read_unlock();
-+}
-+
-+static inline bool kvm_pgtable_walk_lock_held(void)
-+{
-+	return rcu_read_lock_held();
-+}
-+
-+#endif
-+
- #define KVM_PTE_VALID			BIT(0)
- 
- #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
-@@ -202,11 +243,14 @@ struct kvm_pgtable {
-  *					children.
-  * @KVM_PGTABLE_WALK_TABLE_POST:	Visit table entries after their
-  *					children.
-+ * @KVM_PGTABLE_WALK_SHARED:		Indicates the page-tables may be shared
-+ *					with other software walkers.
-  */
- enum kvm_pgtable_walk_flags {
- 	KVM_PGTABLE_WALK_LEAF			= BIT(0),
- 	KVM_PGTABLE_WALK_TABLE_PRE		= BIT(1),
- 	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
-+	KVM_PGTABLE_WALK_SHARED			= BIT(3),
- };
- 
- struct kvm_pgtable_visit_ctx {
-@@ -223,6 +267,11 @@ struct kvm_pgtable_visit_ctx {
- typedef int (*kvm_pgtable_visitor_fn_t)(const struct kvm_pgtable_visit_ctx *ctx,
- 					enum kvm_pgtable_walk_flags visit);
- 
-+static inline bool kvm_pgtable_walk_shared(const struct kvm_pgtable_visit_ctx *ctx)
-+{
-+	return ctx->flags & KVM_PGTABLE_WALK_SHARED;
-+}
-+
- /**
-  * struct kvm_pgtable_walker - Hook into a page-table walk.
-  * @cb:		Callback function to invoke during the walk.
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 7c9782347570..d8d963521d4e 100644
+index a34e2050f931..f4dd77c6c97d 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -171,6 +171,9 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
- 				  enum kvm_pgtable_walk_flags visit)
+@@ -136,16 +136,13 @@ static void kvm_clear_pte(kvm_pte_t *ptep)
+ 	WRITE_ONCE(*ptep, 0);
+ }
+ 
+-static void kvm_set_table_pte(kvm_pte_t *ptep, kvm_pte_t *childp,
+-			      struct kvm_pgtable_mm_ops *mm_ops)
++static kvm_pte_t kvm_init_table_pte(kvm_pte_t *childp, struct kvm_pgtable_mm_ops *mm_ops)
  {
- 	struct kvm_pgtable_walker *walker = data->walker;
-+
-+	/* Ensure the appropriate lock is held (e.g. RCU lock for stage-2 MMU) */
-+	WARN_ON_ONCE(kvm_pgtable_walk_shared(ctx) && !kvm_pgtable_walk_lock_held());
- 	return walker->cb(ctx, visit);
+-	kvm_pte_t old = *ptep, pte = kvm_phys_to_pte(mm_ops->virt_to_phys(childp));
++	kvm_pte_t pte = kvm_phys_to_pte(mm_ops->virt_to_phys(childp));
+ 
+ 	pte |= FIELD_PREP(KVM_PTE_TYPE, KVM_PTE_TYPE_TABLE);
+ 	pte |= KVM_PTE_VALID;
+-
+-	WARN_ON(kvm_pte_valid(old));
+-	smp_store_release(ptep, pte);
++	return pte;
  }
  
-@@ -281,8 +284,13 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 		.end	= PAGE_ALIGN(walk_data.addr + size),
- 		.walker	= walker,
- 	};
-+	int r;
-+
-+	kvm_pgtable_walk_begin();
-+	r = _kvm_pgtable_walk(pgt, &walk_data);
-+	kvm_pgtable_walk_end();
- 
--	return _kvm_pgtable_walk(pgt, &walk_data);
-+	return r;
- }
- 
- struct leaf_walk_data {
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 73ae908eb5d9..52e042399ba5 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -130,9 +130,21 @@ static void kvm_s2_free_pages_exact(void *virt, size_t size)
- 
- static struct kvm_pgtable_mm_ops kvm_s2_mm_ops;
- 
-+static void stage2_free_removed_table_rcu_cb(struct rcu_head *head)
-+{
-+	struct page *page = container_of(head, struct page, rcu_head);
-+	void *pgtable = page_to_virt(page);
-+	u32 level = page_private(page);
-+
-+	kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, pgtable, level);
-+}
-+
- static void stage2_free_removed_table(void *addr, u32 level)
+ static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
+@@ -413,7 +410,7 @@ static bool hyp_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+ static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 			  enum kvm_pgtable_walk_flags visit)
  {
--	kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, addr, level);
-+	struct page *page = virt_to_page(addr);
+-	kvm_pte_t *childp;
++	kvm_pte_t *childp, new;
+ 	struct hyp_map_data *data = ctx->arg;
+ 	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+ 
+@@ -427,8 +424,10 @@ static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 	if (!childp)
+ 		return -ENOMEM;
+ 
+-	kvm_set_table_pte(ctx->ptep, childp, mm_ops);
++	new = kvm_init_table_pte(childp, mm_ops);
+ 	mm_ops->get_page(ctx->ptep);
++	smp_store_release(ctx->ptep, new);
 +
-+	set_page_private(page, (unsigned long)level);
-+	call_rcu(&page->rcu_head, stage2_free_removed_table_rcu_cb);
+ 	return 0;
  }
  
- static void kvm_host_get_page(void *addr)
+@@ -796,7 +795,7 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+ 				struct stage2_map_data *data)
+ {
+ 	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+-	kvm_pte_t *childp;
++	kvm_pte_t *childp, new;
+ 	int ret;
+ 
+ 	ret = stage2_map_walker_try_leaf(ctx, data);
+@@ -821,8 +820,9 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+ 	if (stage2_pte_is_counted(ctx->old))
+ 		stage2_put_pte(ctx, data->mmu, mm_ops);
+ 
+-	kvm_set_table_pte(ctx->ptep, childp, mm_ops);
++	new = kvm_init_table_pte(childp, mm_ops);
+ 	mm_ops->get_page(ctx->ptep);
++	smp_store_release(ctx->ptep, new);
+ 
+ 	return 0;
+ }
 -- 
 2.38.1.431.g37b22c650d-goog
 
