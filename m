@@ -1,142 +1,136 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027212F39
-	for <kvmarm@lists.linux.dev>; Tue,  8 Nov 2022 05:39:14 +0000 (UTC)
-Received: by mail-pl1-f173.google.com with SMTP id 4so13275788pli.0
-        for <kvmarm@lists.linux.dev>; Mon, 07 Nov 2022 21:39:14 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4410D5CB0
+	for <kvmarm@lists.linux.dev>; Tue,  8 Nov 2022 05:43:56 +0000 (UTC)
+Received: by mail-pl1-f179.google.com with SMTP id l2so13204591pld.13
+        for <kvmarm@lists.linux.dev>; Mon, 07 Nov 2022 21:43:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pz3TQvJYE17eelsCmAIKQH4K5ZpJA4fTVBa1z1nTTM8=;
-        b=IOwNbZZGA7GQ46cWFdsY+B8zogEIS2IXjVotgY9MfbBfAfpoa5E/uc/8KrHVc/Pwg+
-         F5ILEXrqOb0BxfkrFhUsLFMHq9NqlTWE1sy3CSju4txDxRFGMb7rJPZ3OHQeqh8pLGkV
-         A8Ws3BEJX/fDhOtwYRrUAKJzX63a4TJHYV1t0p4jGmkELlOj0/CCnuid55gKcVbtfGp/
-         hZU1/8MqdjbLhSC3XekuujoIMvuPvTczjvEZsK/3RwbQr+LLE/y93/zAYJZbq+CQpTOD
-         Qcl0dEbAq+GZ8eGtx06f8ADzYtJZb3CS6jizD9O7H+v+y/WeV+1wvRI4H4DbkLh3tkTP
-         mOtA==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3UicMHRBXNKZ6klzBYtNlGfdpT3ipHtBcp9O7LuoFbE=;
+        b=XNdeC13pb4LjOBaRWcKMBNqFRJ+RgsbfVoNw18z5L+vfkg1SZceZjUxbLhiIy1qySy
+         Y4hI02da8j9ev8qt2sUsGeUiOSLlDAUgz5JUplPGm8kAk4jLtNdmDFZCCStM1EGIelNU
+         pjjtL4FSGAVwgisQucoSj4vLVpkgLqzZdzX9wYytiy3sfYNB3aYKj8S/Nug5gaKAa8gA
+         /5oDb+KCNmSa3bC/jNyCQmeij+quPN3cyVSSr1ovXCPVJxrqYAAydTsm3Q4bRt6yNhxm
+         6FVSyKTuVZN23UWZkdV6Uc7djgZpboRwjQPImKvKrchYImM3eB6pVBMtJk1jJ8Nfk6ob
+         kIoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Pz3TQvJYE17eelsCmAIKQH4K5ZpJA4fTVBa1z1nTTM8=;
-        b=pX6VgGpaHvdKTM88fKF6h+KUF3O77mh0+c1HXzX7JZbimWAsukiwISCkLK0bx7cW3R
-         N4Wd9A2jVLk4N8I6uquA230Oq05HQoo7blpDzqNrvMQn1A1F9+ERgrMqkdlJX+0HXWSh
-         /tU7W3wuFXw5b8lgOCuKPTKoDpUYrnT/riD47YgL3ol9+AdpQVjfNQmflTlD4hzTJGp7
-         UQbYeNiAUTELn/AQkuE/Xn8qc8YF68TdoovXTnYdLeXrE32y+VGf9OswMVoMuPRQtZII
-         VXfTFIRAyF9ilgHEKJ0pB7J0g1hVfABlyJ0+AU527n05hyOUXdsBZuDdt9AEqWPMTgy7
-         j00A==
-X-Gm-Message-State: ACrzQf0mvMxrm5Nkh8pFtKDhCTf6GUngzQq5hdvlqMi1H+pHDqQtzYFT
-	VEb3cLq+33WBMkDS6MmlQQfAuh2dKPHeMyGDotpdCA==
-X-Google-Smtp-Source: AMsMyM4s6UBfXivryrOibC1CJghXZh+LewJC7EVe1bijyzWBrmOnmSw5hn3QDTcMQZSqMPexbYbexJp1QaywwsPftvw=
-X-Received: by 2002:a17:903:3252:b0:186:59e9:8dca with SMTP id
- ji18-20020a170903325200b0018659e98dcamr949010plb.154.1667885954190; Mon, 07
- Nov 2022 21:39:14 -0800 (PST)
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3UicMHRBXNKZ6klzBYtNlGfdpT3ipHtBcp9O7LuoFbE=;
+        b=1G3fsbH1GhvXaz8hz+nfg/tLNJJaZ815+rp6TvhxvB/X1GJ+PERZPlTTMIVfW/lIqB
+         iyv5ylmcGFRiSsO0El2+ZlAy7zW+hcfRdeEa4Inh5KOGkYubRMHAETYYfDZIXseuCqyI
+         2QvxsNTf0H4NKBHc5T+uJVEcm/6B4V2RfwAVZPjZ8PhbrOty1C+Tl8pzxsYR36y1iqzC
+         gmptWbuvUD6izYZlm928sujy+NBkzXTTm8HkYcEHTtN/BqAqAeRiiQ1EAcAT8YIyTWmS
+         J0tn0QcIm8fCdO5aUbLNgyfo16ltTs+XllmRRiq+PHWwk7UFVk40SLtXb535KF0yKOMr
+         svWQ==
+X-Gm-Message-State: ACrzQf1P0OLvROBsPsuARzXo2bRS+B/s0gBI1lbfANMMjQaCEdvaIrMT
+	T4FmYvbULMW4RYr6TxWvWWg=
+X-Google-Smtp-Source: AMsMyM6Ssf7qu6Zt1cmqzeY+6ksfJF4jyx1t2euaZBhwzvq5JPVY+8zsaODdG48vWXQYQDWTdtSyvw==
+X-Received: by 2002:a17:90b:4a04:b0:213:587b:204e with SMTP id kk4-20020a17090b4a0400b00213587b204emr55088612pjb.98.1667886235549;
+        Mon, 07 Nov 2022 21:43:55 -0800 (PST)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id k21-20020a628415000000b0056bb06ce1cfsm5614872pfd.97.2022.11.07.21.43.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Nov 2022 21:43:55 -0800 (PST)
+Date: Mon, 7 Nov 2022 21:43:54 -0800
+From: Isaku Yamahata <isaku.yamahata@gmail.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: "Christopherson,, Sean" <seanjc@google.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"Yao, Yuan" <yuan.yao@intel.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"david@redhat.com" <david@redhat.com>,
+	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"farosas@linux.ibm.com" <farosas@linux.ibm.com>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>,
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+	"chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+	"mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"anup@brainfault.org" <anup@brainfault.org>,
+	"frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+	"farman@linux.ibm.com" <farman@linux.ibm.com>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+	"aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"atishp@atishpatra.org" <atishp@atishpatra.org>,
+	"imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+	"Gao, Chao" <chao.gao@intel.com>
+Subject: Re: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
+Message-ID: <20221108054354.GA1708572@ls.amr.corp.intel.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221104071749.GC1063309@ls.amr.corp.intel.com>
+ <Y2V1oslbw24/2Opd@google.com>
+ <20221107214634.GE1063309@ls.amr.corp.intel.com>
+ <bf29fe1ac84cae8ddb06e566b56c653600a1901c.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20221107085435.2581641-1-maz@kernel.org> <20221107085435.2581641-12-maz@kernel.org>
-In-Reply-To: <20221107085435.2581641-12-maz@kernel.org>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Mon, 7 Nov 2022 21:38:57 -0800
-Message-ID: <CAAeT=FyR_4d1HzDjNEdVhsdgzRuBGuEwGuoMYY0xvi+YAbMqSg@mail.gmail.com>
-Subject: Re: [PATCH v3 11/14] KVM: arm64: PMU: Allow ID_AA64DFR0_EL1.PMUver to
- be set from userspace
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221108053857.hP4neMoWfrPvRWeKoU2QrFzH4b8ete9SBfudKWSdBW0@z>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <bf29fe1ac84cae8ddb06e566b56c653600a1901c.camel@intel.com>
+Message-ID: <20221108054354.rrjjOuSezHxNS6jyt3LdkV0L1V_D2fYlNz2nE-vJhTw@z>
 
-Hi Marc,
+On Tue, Nov 08, 2022 at 01:09:27AM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-On Mon, Nov 7, 2022 at 1:16 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Allow userspace to write ID_AA64DFR0_EL1, on the condition that only
-> the PMUver field can be altered and be at most the one that was
-> initially computed for the guest.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 40 ++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 39 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 7a4cd644b9c0..47c882401f3c 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1247,6 +1247,43 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->         return 0;
->  }
->
-> +static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> +                              const struct sys_reg_desc *rd,
-> +                              u64 val)
-> +{
-> +       u8 pmuver, host_pmuver;
-> +       bool valid_pmu;
-> +
-> +       host_pmuver = kvm_arm_pmu_get_pmuver_limit();
-> +
-> +       /*
-> +        * Allow AA64DFR0_EL1.PMUver to be set from userspace as long
-> +        * as it doesn't promise more than what the HW gives us. We
-> +        * allow an IMPDEF PMU though, only if no PMU is supported
-> +        * (KVM backward compatibility handling).
-> +        */
-> +       pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), val);
-> +       if ((pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF && pmuver > host_pmuver) ||
-> +           (pmuver != 0 && pmuver < ID_AA64DFR0_EL1_PMUVer_IMP))
+> On Mon, 2022-11-07 at 13:46 -0800, Isaku Yamahata wrote:
+> > > On Fri, Nov 04, 2022, Isaku Yamahata wrote:
+> > > > Thanks for the patch series. I the rebased TDX KVM patch series and it
+> > > > worked.
+> > > > Since cpu offline needs to be rejected in some cases(To keep at least one
+> > > > cpu
+> > > > on a package), arch hook for cpu offline is needed.
+> > > 
+> > > I hate to bring this up because I doubt there's a real use case for SUSPEND
+> > > with
+> > > TDX, but the CPU offline path isn't just for true offlining of CPUs.  When
+> > > the
+> > > system enters SUSPEND, only the initiating CPU goes through
+> > > kvm_suspend()+kvm_resume(),
+> > > all responding CPUs go through CPU offline+online.  I.e. disallowing all
+> > > CPUs from
+> > > going "offline" will prevent suspending the system.
+> > 
+> > The current TDX KVM implementation disallows CPU package from offline only
+> > when
+> > TDs are running.  If no TD is running, CPU offline is allowed.  So before
+> > SUSPEND, TDs need to be killed via systemd or something.  After killing TDs,
+> > the
+> > system can enter into SUSPEND state.
+> 
+> This seems not correct.  You need one cpu for each to be online in order to
+> create TD as well, as TDH.MNG.KEY.CONFIG needs to be called on all packages,
+> correct?
 
-Nit: Since this second condition cannot be true (right?), perhaps it might
-be rather confusing?  I wasn't able to understand what it meant until
-I see the equivalent check in set_id_dfr0_el1() (Maybe just me though:).
-
-Thank you,
-Reiji
-
-
-> +               return -EINVAL;
-> +
-> +       valid_pmu = (pmuver != 0 && pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF);
-> +
-> +       /* Make sure view register and PMU support do match */
-> +       if (kvm_vcpu_has_pmu(vcpu) != valid_pmu)
-> +               return -EINVAL;
-> +
-> +       /* We can only differ with PMUver, and anything else is an error */
-> +       val ^= read_id_reg(vcpu, rd);
-> +       val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> +       if (val)
-> +               return -EINVAL;
-> +
-> +       vcpu->kvm->arch.dfr0_pmuver = pmuver;
-> +
-> +       return 0;
-> +}
-> +
->  /*
->   * cpufeature ID register user accessors
->   *
-> @@ -1508,7 +1545,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->         ID_UNALLOCATED(4,7),
->
->         /* CRm=5 */
-> -       ID_SANITISED(ID_AA64DFR0_EL1),
-> +       { SYS_DESC(SYS_ID_AA64DFR0_EL1), .access = access_id_reg,
-> +         .get_user = get_id_reg, .set_user = set_id_aa64dfr0_el1, },
->         ID_SANITISED(ID_AA64DFR1_EL1),
->         ID_UNALLOCATED(5,2),
->         ID_UNALLOCATED(5,3),
-> --
-> 2.34.1
->
->
+That's correct. In such case, the creation of TD fails.  TD creation checks if
+at least one cpu is online on all CPU packages.  If no, error.
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
