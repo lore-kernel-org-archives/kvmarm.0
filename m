@@ -1,167 +1,184 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459B18C18
-	for <kvmarm@lists.linux.dev>; Tue,  8 Nov 2022 17:46:37 +0000 (UTC)
-Received: by mail-pl1-f173.google.com with SMTP id 4so14874502pli.0
-        for <kvmarm@lists.linux.dev>; Tue, 08 Nov 2022 09:46:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cjSjC5m99kmUUHYC704oOlI8KJi6LTudhKVnFW3q+Mo=;
-        b=ftWxPl3+8IfelsK/irLrvblaLrX6dvTk43ZU1RGb7E7QhEuhpuFGQnZUs1B/6eqA8Y
-         9uQybJjBJrLcnswih9ZuqdP/IGzw5N1LHsBYZwMjKm4pxbrW1ieLuxCyIbeQvnPHGIX9
-         KlKI+02Y2PtkvzGrkUCj7EVO4k0DJZDFtOtuUtFMvCioPX+FiFS160StdFwaRhG4AwZY
-         /X/0r60JYMQEe4UtsauftLe+islfrGWTT7n2RWyEhP6x94J5Vb4QTPr7DjEYHP04yepW
-         KF97tjKStfZxjB8uLonmnyGRloE774fNFuZ/STi6vuLRLYYB1EDXjhtfDOqD4TBoTzbU
-         ZVkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cjSjC5m99kmUUHYC704oOlI8KJi6LTudhKVnFW3q+Mo=;
-        b=knowYnCTi1SPTYMIJEyWIkqsisVj1rs22jy2tLw2bPqYjaaIlSGVMysX0qBgaLvOeb
-         amFHvrfqtyEu1p9nmFewWkhPfAS3E8MlnsXEPcoz3ChoHctDwFsBB71KYQ+9vj0uD3G5
-         blZqG90MgVyQOVOnUaaNc9rV7lMelCHvKLmbPl4XZBNmY/VBBRBQT/4qrPeWF4sj/KAe
-         M+OeDg10DvFYZioVxKzk5amujTlanI2ty16dXgTtSdo7PVuHPUhk2/v7KYGWAAYSSnuD
-         w7c7DIzomN4kn5wpjRH2SIHAc98MRYSdixB3K8CYkse0p1NrUa9F58d+9mp6ytPP3uXD
-         6Ukg==
-X-Gm-Message-State: ACrzQf2DkoRys+z4MPEciMyVUaWpgdNMw3FjX63pNv2dIqWr4Ne6zMxd
-	IWP3sFeZoW3WmuhqS66aGsKSLw==
-X-Google-Smtp-Source: AMsMyM6IejjlUU0y+myBNmX6xdBJY00CqsdAF2QTJKOsZh5WixYj1ODA6TQRcmab3f8JPfGm8K7ciQ==
-X-Received: by 2002:a17:902:ea04:b0:187:4923:56f4 with SMTP id s4-20020a170902ea0400b00187492356f4mr35142106plg.97.1667929596484;
-        Tue, 08 Nov 2022 09:46:36 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id b9-20020a170902d50900b00185402cfedesm7283578plg.246.2022.11.08.09.46.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Nov 2022 09:46:35 -0800 (PST)
-Date: Tue, 8 Nov 2022 17:46:32 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Atish Patra <atishp@atishpatra.org>,
-	David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Fabiano Rosas <farosas@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
-	Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
-Message-ID: <Y2qV+IGKyKQItMj2@google.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221104071749.GC1063309@ls.amr.corp.intel.com>
- <Y2V1oslbw24/2Opd@google.com>
- <20221107214634.GE1063309@ls.amr.corp.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E10A480
+	for <kvmarm@lists.linux.dev>; Tue,  8 Nov 2022 22:19:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1667945990;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rM9d9QcLMO4Gb1UJawRpOr7BbjkeIgjtt3r4okgE/aQ=;
+	b=MdcmPnov6DCy6gm7h+a0marJyJAH18OwalNztZeoO17ZqKouvdDk3iAzaUW0LIhvfyMJyA
+	Reo1xcMAXdVO0BhsjVzDGkyeCvzKQJ6v429JKimDY0WS+6pxI03XnGjXquaGke31x2n0DA
+	XdU9qmemN5ZSMbh6qGFI06akSltv/O8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-607-eW1u_DuAMGKbU_l2DpPbjg-1; Tue, 08 Nov 2022 17:19:46 -0500
+X-MC-Unique: eW1u_DuAMGKbU_l2DpPbjg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8B431380673F;
+	Tue,  8 Nov 2022 22:19:45 +0000 (UTC)
+Received: from [10.64.54.78] (vpn2-54-78.bne.redhat.com [10.64.54.78])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 635324B3FC6;
+	Tue,  8 Nov 2022 22:19:39 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v9 3/7] KVM: Support dirty ring in conjunction with bitmap
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com,
+ andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com,
+ dmatlack@google.com, will@kernel.org, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, pbonzini@redhat.com, maz@kernel.org,
+ peterx@redhat.com, oliver.upton@linux.dev, zhenyzha@redhat.com,
+ shan.gavin@gmail.com
+References: <20221108041039.111145-1-gshan@redhat.com>
+ <20221108041039.111145-4-gshan@redhat.com> <Y2qDCqFeL1vwqq3f@google.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <49217b8f-ce53-c41b-98aa-ced34cd079cc@redhat.com>
+Date: Wed, 9 Nov 2022 06:19:36 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221107214634.GE1063309@ls.amr.corp.intel.com>
-Message-ID: <20221108174632.nb-ULwIBnaBIfy1U2TNtTQqlH88dS4MUIaiO0zkzAGo@z>
+In-Reply-To: <Y2qDCqFeL1vwqq3f@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Message-ID: <20221108221936.lMUTtQoJBB2chAUH5YvPRnI5p2kCQJuTlxgcVim6oak@z>
 
-On Mon, Nov 07, 2022, Isaku Yamahata wrote:
-> On Fri, Nov 04, 2022 at 08:27:14PM +0000,
-> Sean Christopherson <seanjc@google.com> wrote:
-> 
-> > On Fri, Nov 04, 2022, Isaku Yamahata wrote:
-> > > Thanks for the patch series. I the rebased TDX KVM patch series and it worked.
-> > > Since cpu offline needs to be rejected in some cases(To keep at least one cpu
-> > > on a package), arch hook for cpu offline is needed.
-> > 
-> > I hate to bring this up because I doubt there's a real use case for SUSPEND with
-> > TDX, but the CPU offline path isn't just for true offlining of CPUs.  When the
-> > system enters SUSPEND, only the initiating CPU goes through kvm_suspend()+kvm_resume(),
-> > all responding CPUs go through CPU offline+online.  I.e. disallowing all CPUs from
-> > going "offline" will prevent suspending the system.
-> 
-> The current TDX KVM implementation disallows CPU package from offline only when
-> TDs are running.  If no TD is running, CPU offline is allowed.  So before
-> SUSPEND, TDs need to be killed via systemd or something.  After killing TDs, the
-> system can enter into SUSPEND state.
+Hi Sean,
 
-Ah, I assumed offlining was disallowed if TDX was enabled.
+On 11/9/22 12:25 AM, Sean Christopherson wrote:
+> On Tue, Nov 08, 2022, Gavin Shan wrote:
+>> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+>> index 800f9470e36b..228be1145cf3 100644
+>> --- a/virt/kvm/Kconfig
+>> +++ b/virt/kvm/Kconfig
+>> @@ -33,6 +33,14 @@ config HAVE_KVM_DIRTY_RING_ACQ_REL
+>>          bool
+>>          select HAVE_KVM_DIRTY_RING
+>>   
+>> +# Only architectures that need to dirty memory outside of a vCPU
+>> +# context should select this, advertising to userspace the
+>> +# requirement to use a dirty bitmap in addition to the vCPU dirty
+>> +# ring.
+> 
+> The Kconfig does more than advertise a feature to userspace.
+> 
+>   # Allow enabling both the dirty bitmap and dirty ring.  Only architectures that
+>   # need to dirty memory outside of a vCPU context should select this.
+> 
 
-> > I don't see anything in the TDX series or the specs that suggests suspend+resume
-> > is disallowed when TDX is enabled, so blocking that seems just as wrong as
-> > preventing software from soft-offlining CPUs.
-> 
-> When it comes to SUSPEND, it means suspend-to-idle, ACPI S1, S3, or S4.
-> suspend-to-idle doesn't require CPU offline.
-> 
-> Although CPU related spec doesn't mention about S3, the ACPI spec says
-> 
->   7.4.2.2 System _S1 State (Sleeping with Processor Context Maintained)
->   The processor-complex context is maintained.
-> 
->   7.4.2.4 System _S3 State or 7.4.2.5 System _S4 State
->   The processor-complex context is not maintained.
-> 
-> It's safe to say the processor context related to TDX is complex, I think.
-> Let me summarize the situation. What do you think?
-> 
-> - While no TD running:
->   No additional limitation on CPU offline.
-> 
-> - On TD creation:
->   If any of whole cpu package is software offlined, TD creation fails.
->   Alternative: forcibly online necessary CPUs, create TD, and offline CPUs
+Agreed. The comments will be adjusted accordingly.
 
-The alternative isn't really viable because there's no way the kernel can guarantee
-a CPU can be onlined, i.e. the kernel would need to fallback of disallowing TD
-creation anyways.
-
-> - TD running:
->   Although it's not required to keep all CPU packages online, keep CPU package
->   from offlining for TD destruction.
+>> +config HAVE_KVM_DIRTY_RING_WITH_BITMAP
 > 
-> - TD destruction:
->   If any of whole cpu package is software offlined, TD destruction fails.
->   The current implementation prevents any cpu package from offlinining during
->   TD running.
->   Alternative:
->   - forcibly online necessary CPUs, destruct TD, and offline CPUs again and
->     allow CPU package to offline
->   - Stash TDX resources somewhere. When cpu packages are onlined, free those
->     release.
+> I think we should replace "HAVE" with "NEED".  Any architecture that supports the
+> dirty ring can easily support ring+bitmap, but based on the discussion from v5[*],
+> the comment above, and the fact that the bitmap will _never_ be used in the
+> proposed implementation because x86 will always have a vCPU, this Kconfig should
+> only be selected if the bitmap is needed to support migration.
 > 
-> - On SUSPEND:
->   TODO: Allow CPU offline if S1 is requested.
+> [*] https://lore.kernel.org/all/Y0SxnoT5u7+1TCT+@google.com
+> 
 
-Is this actually a TODO?  I assume the kernel doesn't actually try to offline
-CPUs in this case, i.e. it Just Works.
+Both look good to me. Lets change it to CONFIG_NEED_KVM_DIRTY_RING_WITH_BITMAP
+then.
 
->   - suspend-to-idle: nothing to do because cpu offline isn't required
->   - ACPI S1: Need to allow offline CPUs.  This can be implemented by referencing
->     suspend_state_t pm_suspend_target_state is PM_SUSPEND_TO_STANBY.
->   - ACPI S3/S4: refuse cpu offline.  The system needs to kill all TDs before
->     starting SUSPEND process. This is what is implemented.
+>> +	bool
+>> +	depends on HAVE_KVM_DIRTY_RING
+>> +
+>>   config HAVE_KVM_EVENTFD
+>>          bool
+>>          select EVENTFD
+>> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+>> index fecbb7d75ad2..f95cbcdd74ff 100644
+>> --- a/virt/kvm/dirty_ring.c
+>> +++ b/virt/kvm/dirty_ring.c
+>> @@ -21,6 +21,18 @@ u32 kvm_dirty_ring_get_rsvd_entries(void)
+>>   	return KVM_DIRTY_RING_RSVD_ENTRIES + kvm_cpu_dirty_log_size();
+>>   }
+>>   
+>> +bool kvm_use_dirty_bitmap(struct kvm *kvm)
+>> +{
+>> +	lockdep_assert_held(&kvm->slots_lock);
+>> +
+>> +	return !kvm->dirty_ring_size || kvm->dirty_ring_with_bitmap;
+>> +}
+>> +
+>> +bool __weak kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
+> 
+> Rather than __weak, what about wrapping this with an #ifdef to effectively force
+> architectures to implement the override if they need ring+bitmap?  Given that the
+> bitmap will never be used if there's a running vCPU, selecting the Kconfig without
+> overriding this utility can't possibly be correct.
+> 
+>    #ifndef CONFIG_NEED_KVM_DIRTY_RING_WITH_BITMAP
+>    bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
+>    {
+> 	return false;
+>    }
+>    #endif
+> 
 
-Looks good, disallowing SUSPEND with active TDs is a reasonable tradeoff.  As
-above, I highly doubt anyone actually cares.
+It's a good idea, which will be included to next revision :)
+
+>> @@ -4588,6 +4608,29 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+>>   			return -EINVAL;
+>>   
+>>   		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
+>> +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP: {
+>> +		int r = -EINVAL;
+>> +
+>> +		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+>> +		    !kvm->dirty_ring_size)
+> 
+> I have no objection to disallowing userspace from disabling the combo, but I
+> think it's worth requiring cap->args[0] to be '0' just in case we change our minds
+> in the future.
+> 
+
+I assume you're suggesting to have non-zero value in cap->args[0] to enable the
+capability.
+
+     if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+         !kvm->dirty_ring_size || !cap->args[0])
+         return r;
+     
+>> +			return r;
+>> +
+>> +		mutex_lock(&kvm->slots_lock);
+>> +
+>> +		/*
+>> +		 * For simplicity, allow enabling ring+bitmap if and only if
+>> +		 * there are no memslots, e.g. to ensure all memslots allocate
+>> +		 * a bitmap after the capability is enabled.
+>> +		 */
+>> +		if (kvm_are_all_memslots_empty(kvm)) {
+>> +			kvm->dirty_ring_with_bitmap = true;
+>> +			r = 0;
+>> +		}
+>> +
+>> +		mutex_unlock(&kvm->slots_lock);
+>> +
+>> +		return r;
+>> +	}
+>>   	default:
+>>   		return kvm_vm_ioctl_enable_cap(kvm, cap);
+>>   	}
+
+
+Thanks,
+Gavin
+
