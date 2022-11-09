@@ -1,51 +1,52 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6839EBF6
-	for <kvmarm@lists.linux.dev>; Wed,  9 Nov 2022 22:23:37 +0000 (UTC)
-Received: by mail-qt1-f170.google.com with SMTP id h24so33183qta.9
-        for <kvmarm@lists.linux.dev>; Wed, 09 Nov 2022 14:23:37 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D004BEBF6
+	for <kvmarm@lists.linux.dev>; Wed,  9 Nov 2022 22:23:44 +0000 (UTC)
+Received: by mail-qv1-f49.google.com with SMTP id w10so246392qvr.3
+        for <kvmarm@lists.linux.dev>; Wed, 09 Nov 2022 14:23:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uJg+kpvNkPD030tpMMGmVHe2gjQx4qRtyPNBYhTi0Do=;
-        b=spArdvT5xfNKFKqJhO//PlvjWcnhvTF2+ViWLb1H96v+OMZm56WD/DL3FTv1+ByYEN
-         lsgdE+x7WHSdiZJoLNMKj10oOzlPFVH7OOqJ3Jyl5kqmK/M/sL+IkOQM+KUYRBnDS+Am
-         BC+jNOVK5u7F88DAPQFuRMrP8sNj8OpZ35wpepJFStMGQbp7Oicy1zBJOnz2SHSZDpbi
-         iZIdImQTkj60o6FYxDzctqMSs5CpMqWSbgDo03a2UfLWnKiqGab805LagiU7qMPRCfXE
-         Sq2ANew7d5NwsmA7OWYYkZd+UB7ov+92nWYlaeLE/MXNuAxohNyYD8KzCxJoTSOA58/c
-         HdoA==
+        bh=T4nhT+5+y72roggfQdrm+izhSoBAQsPwGSdMCJ4k+/s=;
+        b=ZRk7+7DpcBDPfssndDH0jCsamFZ4YFaIenBG2tIgkAkWQDqVwmqi3fxsDov3PqIR/i
+         skbO0PMGHk6vhDr0gZPT0+F6QhsLM/3CNLNtPocc682fg9VP0+lrtztvKipjBgkAa5Qz
+         6yvEY7mPt7wfiEUpxrngFbezvdkNerpDIKyKImWGy0INUfvIyf/zX8UcE62Eexfq+Tms
+         dTZb0Ent0XVyDBRC219MOJtGajH9xJJ9n548ytZM26stde3QdXEaWepM/7/cIjGzL8d5
+         GhoYEcAjU2lmbn2F6w2G44+XHfcx9H+sem+ZVz8T0qp1xSt7GF3Hf2b3gYHqRUwXFgwc
+         8PRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uJg+kpvNkPD030tpMMGmVHe2gjQx4qRtyPNBYhTi0Do=;
-        b=uBdH4QcEJ3h+qDYN6y0toKk6rWbeNaSQHRvvkSgBooS0SpvvXzhTMDh1yF/O0Cg68a
-         +9LHMTKgqIlsB4j79NAjDH4U6tN0uDkHjfZ2InP/M3AnTtvDObXRoNQImodh3HVpFl50
-         zsIqyDH+vCk9lXUfLi+gB48RQ5XWts+VTbAV+ZFnlr9hHF8dCsp8/G9HI85DuJ8+Grk9
-         Meq7vm7ySI/9P/pjYkL/7Iki9w6k0oaWlaW1SpqvunmfJadQpApc2UTMZ4wEha56gDgM
-         /fV8mqf2LYn1c56ZgRLRWT8UpQr87axiE7TRkUgLSyCSIQoYh25RgSXEZ1oOPb+NgAiy
-         0yXA==
-X-Gm-Message-State: ACrzQf1rnUn6SSctm92zb7Dcr23P1eoUBbLDtPbYrG2NsNd8LwhMI5Pq
-	9aNlTY8O3De8kNceglIDucjeX6iXucNUZrH7OtV+ig==
-X-Google-Smtp-Source: AMsMyM4tGmioPPwHHbmDR56b9nxo9rsvbynmSavlKkjED5lHQQmrp870AqPkMfEw30VQwHWm31A/vU+rVcf7R8CSS1Q=
-X-Received: by 2002:ac8:7d4d:0:b0:3a5:5987:432b with SMTP id
- h13-20020ac87d4d000000b003a55987432bmr26351094qtb.566.1668032617470; Wed, 09
- Nov 2022 14:23:37 -0800 (PST)
+        bh=T4nhT+5+y72roggfQdrm+izhSoBAQsPwGSdMCJ4k+/s=;
+        b=LE4t+xtxOOlWDWAJVVpK9S4cFpClSS/+Tzx6CPgkeKMPH5PCitg9Za7GEIFzsgwq+g
+         CwCxylIHaaWBBnwa8ihM39R3yEnmr9xzRCweF2yXwtIXQh+HZbd3XV3OhV1g1D2uqIJb
+         7Yy8UM7TbV8yH615NhPUxslGuW+h6IR8X3LIGKswymU4SUxvw1AVXnHEHajcluyPrQRA
+         C7sH+o0qj6g4Fdjkf1F9DtWlNprhvAbq9KrNooFXKGQHOnVLo+dKSm/Rnkrbk/OlQgYj
+         jFmMWW7p2OVXwK2Vwu52pkWJOdjkj5jSl7tcOakRtVOsohMHg/jetBcvjf9N9ZywvkN5
+         apng==
+X-Gm-Message-State: ACrzQf0cYtPB6cfSPtpHJNhnFvpL3lWm/voecA15UaLy1JOsrJV053fd
+	ntrhL1w+YYy5uzBc5nDfkrh593k0Qk1tuv1Nxg6IvQ==
+X-Google-Smtp-Source: AMsMyM5TapTqPRC0kKImkN6kMspQ3TuK1Gmv3b9wyzlFRHK+SpRPTCXYNOg2RgAbIk324w0L82kK6VOq6bWdOqkcmso=
+X-Received: by 2002:a05:6214:21a6:b0:4bb:85b4:fd96 with SMTP id
+ t6-20020a05621421a600b004bb85b4fd96mr56191873qvc.28.1668032623716; Wed, 09
+ Nov 2022 14:23:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20221107215644.1895162-1-oliver.upton@linux.dev> <20221107215644.1895162-5-oliver.upton@linux.dev>
-In-Reply-To: <20221107215644.1895162-5-oliver.upton@linux.dev>
+References: <20221107215644.1895162-1-oliver.upton@linux.dev> <20221107215644.1895162-6-oliver.upton@linux.dev>
+In-Reply-To: <20221107215644.1895162-6-oliver.upton@linux.dev>
 From: Ben Gardon <bgardon@google.com>
-Date: Wed, 9 Nov 2022 14:23:26 -0800
-Message-ID: <CANgfPd_RXJXGQDWrzT-ZCYLOkK_J_LMP3mFkmGsnVAPsqr7KdQ@mail.gmail.com>
-Subject: Re: [PATCH v5 04/14] KVM: arm64: Don't pass kvm_pgtable through kvm_pgtable_walk_data
+Date: Wed, 9 Nov 2022 14:23:33 -0800
+Message-ID: <CANgfPd_vAmVR0BTLTFAXuQhS-bP7+B_+2s6cDmTeM5=mf440Gg@mail.gmail.com>
+Subject: Re: [PATCH v5 05/14] KVM: arm64: Add a helper to tear down unlinked
+ stage-2 subtrees
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
 	Alexandru Elisei <alexandru.elisei@arm.com>, linux-arm-kernel@lists.infradead.org, 
@@ -55,104 +56,84 @@ Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>, 
 	Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221109222326.s7zL-AQrHo-wacCmDmh78XZDn58cEJHEoObbXFlrqjA@z>
+Message-ID: <20221109222333.4xqVflA-N4w9HclnBsYqnqs33kTL7ecyYWcV5Cnyjos@z>
 
 On Mon, Nov 7, 2022 at 1:57 PM Oliver Upton <oliver.upton@linux.dev> wrote:
 >
-> In order to tear down page tables from outside the context of
-> kvm_pgtable (such as an RCU callback), stop passing a pointer through
-> kvm_pgtable_walk_data.
+> A subsequent change to KVM will move the tear down of an unlinked
+> stage-2 subtree out of the critical path of the break-before-make
+> sequence.
 >
-> No functional change intended.
+> Introduce a new helper for tearing down unlinked stage-2 subtrees.
+> Leverage the existing stage-2 free walkers to do so, with a deep call
+> into __kvm_pgtable_walk() as the subtree is no longer reachable from the
+> root.
 >
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-
-Reviewed-by: Ben Gardon <bgardon@google.com>
-
-
 > ---
->  arch/arm64/kvm/hyp/pgtable.c | 18 +++++-------------
->  1 file changed, 5 insertions(+), 13 deletions(-)
+>  arch/arm64/include/asm/kvm_pgtable.h | 11 +++++++++++
+>  arch/arm64/kvm/hyp/pgtable.c         | 23 +++++++++++++++++++++++
+>  2 files changed, 34 insertions(+)
 >
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index a752793482cb..93b1feeaebab 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -333,6 +333,17 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>   */
+>  void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+>
+> +/**
+> + * kvm_pgtable_stage2_free_removed() - Free a removed stage-2 paging structure.
+> + * @mm_ops:    Memory management callbacks.
+> + * @pgtable:   Unlinked stage-2 paging structure to be freed.
+> + * @level:     Level of the stage-2 paging structure to be freed.
+> + *
+> + * The page-table is assumed to be unreachable by any hardware walkers prior to
+> + * freeing and therefore no TLB invalidation is performed.
+> + */
+> +void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
+> +
+>  /**
+>   * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
+>   * @pgt:       Page-table structure initialised by kvm_pgtable_stage2_init*().
 > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index db25e81a9890..93989b750a26 100644
+> index 93989b750a26..363a5cce7e1a 100644
 > --- a/arch/arm64/kvm/hyp/pgtable.c
 > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -50,7 +50,6 @@
->  #define KVM_MAX_OWNER_ID               1
->
->  struct kvm_pgtable_walk_data {
-> -       struct kvm_pgtable              *pgt;
->         struct kvm_pgtable_walker       *walker;
->
->         u64                             addr;
-> @@ -88,7 +87,7 @@ static u32 kvm_pgtable_idx(struct kvm_pgtable_walk_data *data, u32 level)
->         return (data->addr >> shift) & mask;
+> @@ -1203,3 +1203,26 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
+>         pgt->mm_ops->free_pages_exact(pgt->pgd, pgd_sz);
+>         pgt->pgd = NULL;
 >  }
->
-> -static u32 __kvm_pgd_page_idx(struct kvm_pgtable *pgt, u64 addr)
-> +static u32 kvm_pgd_page_idx(struct kvm_pgtable *pgt, u64 addr)
->  {
->         u64 shift = kvm_granule_shift(pgt->start_level - 1); /* May underflow */
->         u64 mask = BIT(pgt->ia_bits) - 1;
-> @@ -96,11 +95,6 @@ static u32 __kvm_pgd_page_idx(struct kvm_pgtable *pgt, u64 addr)
->         return (addr & mask) >> shift;
->  }
->
-> -static u32 kvm_pgd_page_idx(struct kvm_pgtable_walk_data *data)
-> -{
-> -       return __kvm_pgd_page_idx(data->pgt, data->addr);
-> -}
-> -
->  static u32 kvm_pgd_pages(u32 ia_bits, u32 start_level)
->  {
->         struct kvm_pgtable pgt = {
-> @@ -108,7 +102,7 @@ static u32 kvm_pgd_pages(u32 ia_bits, u32 start_level)
->                 .start_level    = start_level,
->         };
->
-> -       return __kvm_pgd_page_idx(&pgt, -1ULL) + 1;
-> +       return kvm_pgd_page_idx(&pgt, -1ULL) + 1;
->  }
->
->  static bool kvm_pte_table(kvm_pte_t pte, u32 level)
-> @@ -255,11 +249,10 @@ static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
->         return ret;
->  }
->
-> -static int _kvm_pgtable_walk(struct kvm_pgtable_walk_data *data)
-> +static int _kvm_pgtable_walk(struct kvm_pgtable *pgt, struct kvm_pgtable_walk_data *data)
->  {
->         u32 idx;
->         int ret = 0;
-> -       struct kvm_pgtable *pgt = data->pgt;
->         u64 limit = BIT(pgt->ia_bits);
->
->         if (data->addr > limit || data->end > limit)
-> @@ -268,7 +261,7 @@ static int _kvm_pgtable_walk(struct kvm_pgtable_walk_data *data)
->         if (!pgt->pgd)
->                 return -EINVAL;
->
-> -       for (idx = kvm_pgd_page_idx(data); data->addr < data->end; ++idx) {
-> +       for (idx = kvm_pgd_page_idx(pgt, data->addr); data->addr < data->end; ++idx) {
->                 kvm_pte_t *ptep = &pgt->pgd[idx * PTRS_PER_PTE];
->
->                 ret = __kvm_pgtable_walk(data, pgt->mm_ops, ptep, pgt->start_level);
-> @@ -283,13 +276,12 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
->                      struct kvm_pgtable_walker *walker)
->  {
->         struct kvm_pgtable_walk_data walk_data = {
-> -               .pgt    = pgt,
->                 .addr   = ALIGN_DOWN(addr, PAGE_SIZE),
->                 .end    = PAGE_ALIGN(walk_data.addr + size),
->                 .walker = walker,
->         };
->
-> -       return _kvm_pgtable_walk(&walk_data);
-> +       return _kvm_pgtable_walk(pgt, &walk_data);
->  }
->
->  struct leaf_walk_data {
+> +
+> +void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level)
+> +{
+> +       kvm_pte_t *ptep = (kvm_pte_t *)pgtable;
+> +       struct kvm_pgtable_walker walker = {
+> +               .cb     = stage2_free_walker,
+> +               .flags  = KVM_PGTABLE_WALK_LEAF |
+> +                         KVM_PGTABLE_WALK_TABLE_POST,
+> +       };
+> +       struct kvm_pgtable_walk_data data = {
+> +               .walker = &walker,
+> +
+> +               /*
+> +                * At this point the IPA really doesn't matter, as the page
+> +                * table being traversed has already been removed from the stage
+> +                * 2. Set an appropriate range to cover the entire page table.
+> +                */
+> +               .addr   = 0,
+> +               .end    = kvm_granule_size(level),
+> +       };
+> +
+> +       WARN_ON(__kvm_pgtable_walk(&data, mm_ops, ptep, level));
+> +}
+
+Will this callback be able to yield? In my experience, if processing a
+large teardown (i.e. level >=3 / maps 512G region) it's possible to
+hit scheduler tick warnings.
+
+
 > --
 > 2.38.1.431.g37b22c650d-goog
 >
