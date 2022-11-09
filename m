@@ -1,153 +1,88 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F177A46F
-	for <kvmarm@lists.linux.dev>; Wed,  9 Nov 2022 00:51:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1667955105;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CA553UdMHM5fe7exANwpCbWYCtvriI9MY8mWlunIGdY=;
-	b=WR4V99TIIO8B5MhvnrHAlbGDpM6VveFRtCIelNRKzXKnMJpqNLcFmNOqnWsgRplCDw7anu
-	UcnPc56NSfFd8DGOCvgNAN3jnvvNUpSa5LVF9e2L0ycA1GP0WOLVveQDueBexmV4GKUm8f
-	zelgYZT9EBkxDWeZzpQN5zmwWaIXDBc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-408-lAi4c7PLNBi9hDTwzs2qeQ-1; Tue, 08 Nov 2022 19:51:40 -0500
-X-MC-Unique: lAi4c7PLNBi9hDTwzs2qeQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 648BA101A528;
-	Wed,  9 Nov 2022 00:51:30 +0000 (UTC)
-Received: from [10.64.54.78] (vpn2-54-78.bne.redhat.com [10.64.54.78])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C38D140EBF3;
-	Wed,  9 Nov 2022 00:51:23 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v9 3/7] KVM: Support dirty ring in conjunction with bitmap
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, shuah@kernel.org, catalin.marinas@arm.com,
- andrew.jones@linux.dev, ajones@ventanamicro.com, bgardon@google.com,
- dmatlack@google.com, will@kernel.org, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, pbonzini@redhat.com, maz@kernel.org,
- peterx@redhat.com, oliver.upton@linux.dev, zhenyzha@redhat.com,
- shan.gavin@gmail.com
-References: <20221108041039.111145-1-gshan@redhat.com>
- <20221108041039.111145-4-gshan@redhat.com> <Y2qDCqFeL1vwqq3f@google.com>
- <49217b8f-ce53-c41b-98aa-ced34cd079cc@redhat.com>
- <Y2rurDmCrXZaxY8F@google.com>
- <49c18201-b73a-b654-7f8a-77befa80c61b@redhat.com>
- <Y2r1ErahBE3+Dsv8@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <672eb11b-19db-9a9f-1898-8d2af0d45724@redhat.com>
-Date: Wed, 9 Nov 2022 08:51:21 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49FA7107B9
+	for <kvmarm@lists.linux.dev>; Wed,  9 Nov 2022 21:53:50 +0000 (UTC)
+Received: by mail-pf1-f176.google.com with SMTP id y13so17937265pfp.7
+        for <kvmarm@lists.linux.dev>; Wed, 09 Nov 2022 13:53:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OjtTll63kEDv75PwR7o0lnOxIMI339azC+QX7bn1Io8=;
+        b=ZO89qv+qCkNp/HiQ4Q6ZJHGSsutpkVQ0xhTCiLfOk0GkhfFmwFuMtZN/Ed/uuBdDsm
+         b4X5XeR59abjiW7lNZ1Z9sR8LJFUsx+a9B2SHUeRRp6/cYrXLpoetVMHXFuCgwZAQnqE
+         pZ/BWXqM7bIWHIcqAXTSDbjGG1ERbeFNTk0Y4PtVgfNcm9PuSJ9sfiFrUcEyBLE9HlM8
+         QkMLkRFVrLYk5OZ84sNAclJOw5/83UK4EKX6nFYv+wTNUyqxRuFtrezzGGJav2rHU/CN
+         Zf6bz4ZbCHT13Hi9brY3D91Fmcisb7qCwzTNns0F2mJxXzQkAu6FEZ58AeO8lHDoc3Oi
+         RJWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OjtTll63kEDv75PwR7o0lnOxIMI339azC+QX7bn1Io8=;
+        b=01oy6zdqApuFGPxvoI1WOhgdWGdApa6JkU+cSV1DUC/KXmu2FnGn7aSaiqZ3eY8UDe
+         /Zx9IPVrt0Wo/Xedd2hBYIqwt1HDO+Pbn1b3lbKVWDmXpkrVdXFehSsDm4iUanw0300h
+         sJGGCX9mlpVkdlHvlsSF+/TRQaktmNt2JNrHdCUy+0ZjElK1x7AngHh73ItEarzpwy42
+         IWp0I0vFPxnu0vVGyni0B7ZrdBe5P99MphyWQHIEsv8RVovtMxSnqwDp/I3M1NB1FG7t
+         M1ZH5mjSWgg1/3C9kaWvdNqPesoVFvxh1gJTdPrR9dreay209JFrIvRtffEYMsNS7H6i
+         /lAQ==
+X-Gm-Message-State: ACrzQf1piRH46wHKiQY00kwTj7tqgs33yH4BSCQu9xIllaSca7YqGbZv
+	Bx1xtO40m/PmUZj/ja4aQ0fBWw==
+X-Google-Smtp-Source: AMsMyM405OCKBpJo33fzWng4KuCQaVeCIAwiX562TxX4BcFcitQF+k78e7DEu09G23/oE/uOT0+mjQ==
+X-Received: by 2002:aa7:859a:0:b0:56b:d76d:8c76 with SMTP id w26-20020aa7859a000000b0056bd76d8c76mr61634658pfn.77.1668030829526;
+        Wed, 09 Nov 2022 13:53:49 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id j12-20020a170902da8c00b00186b04776b0sm9672086plx.118.2022.11.09.13.53.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Nov 2022 13:53:49 -0800 (PST)
+Date: Wed, 9 Nov 2022 21:53:45 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	David Matlack <dmatlack@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
+	Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v5 08/14] KVM: arm64: Protect stage-2 traversal with RCU
+Message-ID: <Y2whaWo3SIOOMKOE@google.com>
+References: <20221107215644.1895162-1-oliver.upton@linux.dev>
+ <20221107215644.1895162-9-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <Y2r1ErahBE3+Dsv8@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-Message-ID: <20221109005121.FGeLp5d6D1ByMW7A8ao49DY48CvzTmzThmmYvpiIqW4@z>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221107215644.1895162-9-oliver.upton@linux.dev>
+Message-ID: <20221109215345.Ed-rS_LJdikT4QJIAh6Pm_MIQ2XDmiOS-WLejjGxVqI@z>
 
-Hi Sean,
-
-On 11/9/22 8:32 AM, Sean Christopherson wrote:
-> On Wed, Nov 09, 2022, Gavin Shan wrote:
->> On 11/9/22 8:05 AM, Sean Christopherson wrote:
->>> On Wed, Nov 09, 2022, Gavin Shan wrote:
->>>> On 11/9/22 12:25 AM, Sean Christopherson wrote:
->>>>> I have no objection to disallowing userspace from disabling the combo, but I
->>>>> think it's worth requiring cap->args[0] to be '0' just in case we change our minds
->>>>> in the future.
->>>>>
->>>>
->>>> I assume you're suggesting to have non-zero value in cap->args[0] to enable the
->>>> capability.
->>>>
->>>>       if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
->>>>           !kvm->dirty_ring_size || !cap->args[0])
->>>>           return r;
->>>
->>> I was actually thinking of taking the lazy route and requiring userspace to zero
->>> the arg, i.e. treat it as a flags extensions.  Oh, wait, that's silly.  I always
->>> forget that `cap->flags` exists.
->>>
->>> Just this?
->>>
->>> 	if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
->>> 	    !kvm->dirty_ring_size || cap->flags)
->>> 		return r;
->>>
->>> It'll be kinda awkward if KVM ever does add a flag to disable the bitmap, but
->>> that's seems quite unlikely and not the end of the world if it does happen.  And
->>> on the other hand, requiring '0' is less weird and less annoying for userspace
->>> _now_.
->>>
->>
->> I don't quiet understand the term "lazy route".
+On Mon, Nov 07, 2022, Oliver Upton wrote:
+> Use RCU to safely walk the stage-2 page tables in parallel. Acquire and
+> release the RCU read lock when traversing the page tables. Defer the
+> freeing of table memory to an RCU callback. Indirect the calls into RCU
+> and provide stubs for hypervisor code, as RCU is not available in such a
+> context.
 > 
-> "lazy" in that requiring a non-zero value would mean adding another #define,
-> otherwise the extensibility is limited to two values.  Again, unlikely to matter,
-> but it wouldn't make sense to go through the effort to provide some extensibility
-> and then only allow for one possible extension.  If KVM is "lazy" and just requires
-> flags to be '0', then there's no need for more #defines, and userspace doesn't
-> have to pass more values in its enabling.
-> 
+> The RCU protection doesn't amount to much at the moment, as readers are
+> already protected by the read-write lock (all walkers that free table
+> memory take the write lock). Nonetheless, a subsequent change will
+> futher relax the locking requirements around the stage-2 MMU, thereby
+> depending on RCU.
 
-Thanks for the explanation. I understand the term 'lazy route' now. Right,
-cap->flags is good place to hold #defines in future. cap->args[0] doesn't
-suite strictly here.
+Two somewhat off-topic questions (because I'm curious):
 
->> So you're still thinking of the possibility to allow disabling the capability
->> in future?
-> 
-> Yes, or more likely, tweaking the behavior of ring+bitmap.  As is, the behavior
-> is purely a fallback for a single case where KVM can't push to the dirty ring due
-> to not having a running vCPU.  It's possible someone might come up with a use case
-> where they want KVM to do something different, e.g. fallback to the bitmap if the
-> ring is full.
-> 
-> In other words, it's mostly to hedge against futures we haven't thought of.  Reserving
-> cap->flags is cheap and easy for both KVM and userspace, so there's no real reason
-> not to do so.
-> 
+ 1. Are there plans to enable "fast" page faults on ARM?  E.g. to fixup access
+    faults (handle_access_fault()) and/or write-protection faults without acquiring
+    mmu_lock?
 
-Agreed that it's cheap to reserve cap->flags. I will change the code accordingly
-in v10.
-
->> If so, cap->flags or cap->args[0] can be used. For now, we just
->> need a binding between cap->flags/args[0] with the operation of enabling the
->> capability. For example, "cap->flags == 0x0" means to enable the capability
->> for now, and "cap->flags != 0x0" to disable the capability in future.
->>
->> The suggested changes look good to me in either way. Sean, can I grab your
->> reviewed-by with your comments addressed?
-> 
-> I'll look at v10, I don't like providing reviews that are conditional on changes
-> that are more than nits.
-> 
-> That said, there're no remaining issues that can't be sorted out on top, so don't
-> hold up v10 if I don't look at it in a timely manner for whatever reason.  I agree
-> with Marc that it'd be good to get this in -next sooner than later.
-> 
-
-Sure. I would give v9 a few days, prior to posting v10. I'm not sure if other people
-still have concerns. If there are more comments, I want to address all of them
-in v10 :)
-
-Thanks,
-Gavin
-
-
+ 2. If the answer to (1) is "yes!", what's the plan to protect the lockless walks
+    for the RCU-less hypervisor code?
