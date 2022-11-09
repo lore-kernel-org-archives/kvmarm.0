@@ -1,18 +1,18 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B6B107A7
-	for <kvmarm@lists.linux.dev>; Wed,  9 Nov 2022 22:49:11 +0000 (UTC)
-Date: Wed, 9 Nov 2022 22:48:48 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CEC107A7
+	for <kvmarm@lists.linux.dev>; Wed,  9 Nov 2022 22:54:58 +0000 (UTC)
+Date: Wed, 9 Nov 2022 22:54:41 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1668034140;
+	t=1668034486;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uy8PKmBJllUyFJnAMPXkpcKsBKhmjino2ZkcFTbS9rs=;
-	b=sUu1+UXh7oEBAIs4hIdEgPV8KWK0j3gsGb9InYHeHjT0tU5n3mMiYYMOeVdXGc2M49fMAB
-	9x+1Uhk+3EgMVSPzaDyJ6Tijp2FBsZDTpw8lRKQ6d0b+d0zuVcY480/UygcXT7rWNI3/Gn
-	4T/XSrE44KY34fkUSjdG7+XP0ezELL0=
+	bh=4eBpAl0Bh9NbuP8Ymsao9EXIdBXAUBLyzei2R+zKTK8=;
+	b=uhfXgpyEfhg4Ga1kHg1dG1UjMBRbTcsJYPhEvleu3pIn5o6JkiV3G0MJUARNHQWtBwdZfO
+	Q3JulEggtEgv8DaRX5dfmSTgDs8ICLIy8tc2l7+wgxjTKy0UC+TxffojFH2TbMkz65+BlC
+	A8ewu8EoWavvaOt+sYbKUsKJa2UEAl0=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Ben Gardon <bgardon@google.com>
@@ -25,12 +25,12 @@ Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Quentin Perret <qperret@google.com>, Gavin Shan <gshan@redhat.com>,
 	Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
 	Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v5 01/14] KVM: arm64: Combine visitor arguments into a
- context structure
-Message-ID: <Y2wuUNNAlsIlxnwM@google.com>
+Subject: Re: [PATCH v5 05/14] KVM: arm64: Add a helper to tear down unlinked
+ stage-2 subtrees
+Message-ID: <Y2wvsR6DvyM5YzqN@google.com>
 References: <20221107215644.1895162-1-oliver.upton@linux.dev>
- <20221107215644.1895162-2-oliver.upton@linux.dev>
- <CANgfPd9ooA5c+ZQMx4-yy+n92TsxoAXZyHRoTpatoSOb+jXi-w@mail.gmail.com>
+ <20221107215644.1895162-6-oliver.upton@linux.dev>
+ <CANgfPd_vAmVR0BTLTFAXuQhS-bP7+B_+2s6cDmTeM5=mf440Gg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,46 +39,96 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANgfPd9ooA5c+ZQMx4-yy+n92TsxoAXZyHRoTpatoSOb+jXi-w@mail.gmail.com>
+In-Reply-To: <CANgfPd_vAmVR0BTLTFAXuQhS-bP7+B_+2s6cDmTeM5=mf440Gg@mail.gmail.com>
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221109224848.1TL3ufBAn7VNOHy7OQfiD4xakphPvTKuGDRViectgGU@z>
+Message-ID: <20221109225441.NkdioU7iBAUv3-c_5uy1iRv8gYClmiE25SIXd2slJ7I@z>
 
-On Wed, Nov 09, 2022 at 02:23:08PM -0800, Ben Gardon wrote:
+On Wed, Nov 09, 2022 at 02:23:33PM -0800, Ben Gardon wrote:
 > On Mon, Nov 7, 2022 at 1:57 PM Oliver Upton <oliver.upton@linux.dev> wrote:
 > >
-> > Passing new arguments by value to the visitor callbacks is extremely
-> > inflexible for stuffing new parameters used by only some of the
-> > visitors. Use a context structure instead and pass the pointer through
-> > to the visitor callback.
+> > A subsequent change to KVM will move the tear down of an unlinked
+> > stage-2 subtree out of the critical path of the break-before-make
+> > sequence.
 > >
-> > While at it, redefine the 'flags' parameter to the visitor to contain
-> > the bit indicating the phase of the walk. Pass the entire set of flags
-> > through the context structure such that the walker can communicate
-> > additional state to the visitor callback.
-> >
-> > No functional change intended.
+> > Introduce a new helper for tearing down unlinked stage-2 subtrees.
+> > Leverage the existing stage-2 free walkers to do so, with a deep call
+> > into __kvm_pgtable_walk() as the subtree is no longer reachable from the
+> > root.
 > >
 > > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h | 11 +++++++++++
+> >  arch/arm64/kvm/hyp/pgtable.c         | 23 +++++++++++++++++++++++
+> >  2 files changed, 34 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index a752793482cb..93b1feeaebab 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -333,6 +333,17 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+> >   */
+> >  void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+> >
+> > +/**
+> > + * kvm_pgtable_stage2_free_removed() - Free a removed stage-2 paging structure.
+> > + * @mm_ops:    Memory management callbacks.
+> > + * @pgtable:   Unlinked stage-2 paging structure to be freed.
+> > + * @level:     Level of the stage-2 paging structure to be freed.
+> > + *
+> > + * The page-table is assumed to be unreachable by any hardware walkers prior to
+> > + * freeing and therefore no TLB invalidation is performed.
+> > + */
+> > +void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
+> > +
+> >  /**
+> >   * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
+> >   * @pgt:       Page-table structure initialised by kvm_pgtable_stage2_init*().
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 93989b750a26..363a5cce7e1a 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -1203,3 +1203,26 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
+> >         pgt->mm_ops->free_pages_exact(pgt->pgd, pgd_sz);
+> >         pgt->pgd = NULL;
+> >  }
+> > +
+> > +void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level)
+> > +{
+> > +       kvm_pte_t *ptep = (kvm_pte_t *)pgtable;
+> > +       struct kvm_pgtable_walker walker = {
+> > +               .cb     = stage2_free_walker,
+> > +               .flags  = KVM_PGTABLE_WALK_LEAF |
+> > +                         KVM_PGTABLE_WALK_TABLE_POST,
+> > +       };
+> > +       struct kvm_pgtable_walk_data data = {
+> > +               .walker = &walker,
+> > +
+> > +               /*
+> > +                * At this point the IPA really doesn't matter, as the page
+> > +                * table being traversed has already been removed from the stage
+> > +                * 2. Set an appropriate range to cover the entire page table.
+> > +                */
+> > +               .addr   = 0,
+> > +               .end    = kvm_granule_size(level),
+> > +       };
+> > +
+> > +       WARN_ON(__kvm_pgtable_walk(&data, mm_ops, ptep, level));
+> > +}
 > 
-> This looks good to me. It's all fairly mechanical and I don't see any
-> problems. I was a little confused by the walk context flags passed via
-> visit, because they seem somewhat redundant if the leaf-ness can be
-> determined by looking at the PTE, but perhaps that's not always
-> possible.
+> Will this callback be able to yield? In my experience, if processing a
+> large teardown (i.e. level >=3 / maps 512G region) it's possible to
+> hit scheduler tick warnings.
 
-Some explanation is probably owed here. I think you caught the detail
-later on in the series, but I'm overloading flags to describe both the
-requested visits and some properties about the walk (i.e. a SHARED
-walk).
+No, but this is a pretty obvious problem with all of our table walkers,
+which led to commit 5994bc9e05c2 ("KVM: arm64: Limit
+stage2_apply_range() batch size to largest block").
 
-I tried to leave it sufficiently generic as there will be other
-configuration bits we will want to stuff into a walker later on (such as
-TLBI and CMO elision).
+We're lucky in that the largest supported granule across all page table
+sizes is 1GB (no true 5-level paging yet), so it may not be too
+horrendous.
 
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-
-Thanks!
+But yeah, it is on the list of things to fix :)
 
 --
-Best,
+Thanks,
 Oliver
