@@ -2,70 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A1C9C43219
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 14:52:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C31C4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 14:52:15 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE6494BAC8;
-	Thu, 10 Nov 2022 09:52:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA06F4BB68;
+	Thu, 10 Nov 2022 09:52:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xNawC4Z-9JBP; Thu, 10 Nov 2022 09:52:11 -0500 (EST)
+	with ESMTP id GSi2okwD8gUR; Thu, 10 Nov 2022 09:52:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89F084BB74;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB3D44BADD;
 	Thu, 10 Nov 2022 09:51:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E445C4BA23
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 17:25:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7231B4B9FF
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 17:26:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id neHMuB4gu2pp for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Nov 2022 17:25:49 -0500 (EST)
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com
- [209.85.160.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9C0A44BA1F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 17:25:49 -0500 (EST)
-Received: by mail-qt1-f181.google.com with SMTP id cg5so27957qtb.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Nov 2022 14:25:49 -0800 (PST)
+ with ESMTP id VhQnHL6L+Mpj for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Nov 2022 17:26:38 -0500 (EST)
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com
+ [209.85.219.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 34F9E4B9A7
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 17:26:38 -0500 (EST)
+Received: by mail-qv1-f43.google.com with SMTP id n18so221011qvt.11
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Nov 2022 14:26:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:from:to:cc:subject:date:message-id:reply-to;
- bh=EJ5hbNpYS+ert13sTz7i63mDVdE2zo94Ie0Np0yf4C4=;
- b=cfMqImfZTMZnlKj2jdeEaJuDUP7VnyM66+m8J86n6SFssRHn0iIC2F9wa9MXxIn31Z
- V8kmlz7nUwwssqiKl9tzw+mx5niRTVNADgJ9I3AlHHXI8VfDjaRlHu/bmn4MRdJ47DPe
- CrMuHQLM7WtrkEWKHMDMahOPpewkokSAjHfMdpZfro0KZq9ttZ+fCtEwiKZn7goTjBM0
- Aii7jVwY8t4PkHEUuasKl2+LOiTKvLvL9xHqXWcrjrkXQ1X+K0JlRwjQvreQ3wtuY4zv
- YYs7AZMiXseOHBgOhkwLdHU6SoeaLqqIHpXqqrLvMtrtgY748im08EE1NJB+W2EDoeyZ
- 00PQ==
+ bh=BFALFEh11gYbShb1RAGYtj5dFXgHaYyKewnp1K6Oabw=;
+ b=nkpPoywYHDX5oTr3GbMz5tTHTbZRWuHW8NsemjQAHKz4xMNyjw9Kw3TWRe27yjr76z
+ IBZ1A+/qXFEjCKl27M3fE9pkpDU9I3JTR4zbvOj+4jCI9hqLDgluIov21g9AdxlOvH6f
+ 6+jQxDfcpBkBuv8/es+JjRYaZuzv05sxFzhJp+iJ0ocYP1bVwD4kNHNJE54E0BHJKzvh
+ xm7E8paRC3gDOrz6zKCidGlV55d7khDLjydj3bnP0caZAz7Jv9eySzK7b3Kyiev3SnDD
+ pLccJJKiuNRt3H8cIeX8/LTgYv910T61kXFTc8Wa18t+rCI6AekXKlRECex2xYxVMoCn
+ GETg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=EJ5hbNpYS+ert13sTz7i63mDVdE2zo94Ie0Np0yf4C4=;
- b=lVpQjaTiHZhjFXBAddtLojVCb4W90T6ERLcVnB1kbKpJRX4SeEDezCdUT83zpD6hD9
- Qh2wUewJUIvvhp2vpnMIv9F0qwSyYEQQH2pDDSoHz4FYqGMHBRcXazh4UiPBoqGZrHwW
- 8xMgM5lFQNxc+BiV0/Zit/HbJQDW32uQKRHKh9L+8zsi526kvbGAzIny0yENce8gh7xS
- 13oc3C9rmZFDa0cYuT58LWkLJ8EVNZRPRLTaUYPjhpTOjjUPrmaFJEBRbSo05YSViKXW
- JeVYSQGIGilaqENAxhShE724XVsgaGMa3DuH3D+JgTnugrVXJSvkW750WcLc0mYlmWoJ
- tiuw==
-X-Gm-Message-State: ANoB5plQsKzjedRi1TJqphQIrDz/zIkkGrjn/ETV05lbeANlDpI/zZXM
- kEq7toNI3+LsX1kK+8XAaA38c/843f7Sy0cafLKbsA==
-X-Google-Smtp-Source: AA0mqf6b1QwQU+t2rhpz0pYfoh8FoW+OMhhjudxrUGJuaDbrsZeDMXk8N/bPz9y5AXGikecVlQYPq4Ul5OIWkT/wRxI=
-X-Received: by 2002:ac8:5ac2:0:b0:3a5:afca:2322 with SMTP id
- d2-20020ac85ac2000000b003a5afca2322mr4280890qtd.500.1668032749051; Wed, 09
- Nov 2022 14:25:49 -0800 (PST)
+ bh=BFALFEh11gYbShb1RAGYtj5dFXgHaYyKewnp1K6Oabw=;
+ b=LYyX8y0btdrvtH5jNiCgEfU9+dNwsWcOT9wFc22NRGY4GV9r0tgUtWrl1pv9qqq90O
+ Pj5kj434FXSdUZyqhCrt1B142TqN6wkHL8Rud82Pr6CNR2m25tTW5cMVny0bGybjoO/m
+ ClHvU7dmnUdjrbL8z/FMY4Exj1yqKypl9iuMHEfVVn28gh9Crzhq4QXBPA6xNSgM7FeI
+ FWUGMDPsPPtBgrtThkc5TEvMQPcMoJcBvrIzOHso2PkGjh0ZoUzwbztrLTCMZejFDIiL
+ bo1y1olwVSNQHMpbr8EZr9AyNNaLmzDaNzhhnmPAqF4z/h6daOFJx4xp+pLnQjO2Rj5g
+ 96xg==
+X-Gm-Message-State: ACrzQf1UwAc2uUdbf9OHYdsGgxHBz6HHwi6Q51g1X/oRUD0DSPUtpCdq
+ RJBe+2zfMKozrT5PGDXUJlaixh5BqmncRsWjvDh26w==
+X-Google-Smtp-Source: AMsMyM67iMqLmmP+/O0bTNzsRNFWvVwvyyOSZ+AivFDFmfKATCCtpTElHUJLpL1k112VENpp1GALRfF2i5Y8/vcehHM=
+X-Received: by 2002:a05:6214:4103:b0:4b6:818c:eb7b with SMTP id
+ kc3-20020a056214410300b004b6818ceb7bmr57729500qvb.28.1668032797696; Wed, 09
+ Nov 2022 14:26:37 -0800 (PST)
 MIME-Version: 1.0
 References: <20221107215644.1895162-1-oliver.upton@linux.dev>
- <20221107215644.1895162-9-oliver.upton@linux.dev>
-In-Reply-To: <20221107215644.1895162-9-oliver.upton@linux.dev>
+ <20221107215644.1895162-11-oliver.upton@linux.dev>
+In-Reply-To: <20221107215644.1895162-11-oliver.upton@linux.dev>
 From: Ben Gardon <bgardon@google.com>
-Date: Wed, 9 Nov 2022 14:25:38 -0800
-Message-ID: <CANgfPd9fynvsBLjio1zz0hPy4SGAd8XZfzYQaR_gg0UJrOyAcA@mail.gmail.com>
-Subject: Re: [PATCH v5 08/14] KVM: arm64: Protect stage-2 traversal with RCU
+Date: Wed, 9 Nov 2022 14:26:26 -0800
+Message-ID: <CANgfPd_XyTuXa6T01tL9v0tdaG7OUp=Mtikvo0tVNtoBW5stAg@mail.gmail.com>
+Subject: Re: [PATCH v5 10/14] KVM: arm64: Split init and set for table PTE
 To: Oliver Upton <oliver.upton@linux.dev>
 X-Mailman-Approved-At: Thu, 10 Nov 2022 09:51:44 -0500
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -88,185 +88,86 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Nov 7, 2022 at 1:57 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+On Mon, Nov 7, 2022 at 1:58 PM Oliver Upton <oliver.upton@linux.dev> wrote:
 >
-> Use RCU to safely walk the stage-2 page tables in parallel. Acquire and
-> release the RCU read lock when traversing the page tables. Defer the
-> freeing of table memory to an RCU callback. Indirect the calls into RCU
-> and provide stubs for hypervisor code, as RCU is not available in such a
-> context.
->
-> The RCU protection doesn't amount to much at the moment, as readers are
-> already protected by the read-write lock (all walkers that free table
-> memory take the write lock). Nonetheless, a subsequent change will
-> futher relax the locking requirements around the stage-2 MMU, thereby
-> depending on RCU.
+> Create a helper to initialize a table and directly call
+> smp_store_release() to install it (for now). Prepare for a subsequent
+> change that generalizes PTE writes with a helper.
 >
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h | 49 ++++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 10 +++++-
->  arch/arm64/kvm/mmu.c                 | 14 +++++++-
->  3 files changed, 71 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/hyp/pgtable.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
 >
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index e70cf57b719e..7634b6964779 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -37,6 +37,13 @@ static inline u64 kvm_get_parange(u64 mmfr0)
->
->  typedef u64 kvm_pte_t;
->
-> +/*
-> + * RCU cannot be used in a non-kernel context such as the hyp. As such, page
-> + * table walkers used in hyp do not call into RCU and instead use other
-> + * synchronization mechanisms (such as a spinlock).
-> + */
-> +#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
-> +
->  typedef kvm_pte_t *kvm_pteref_t;
->
->  static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
-> @@ -44,6 +51,40 @@ static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared
->         return pteref;
->  }
->
-> +static inline void kvm_pgtable_walk_begin(void) {}
-> +static inline void kvm_pgtable_walk_end(void) {}
-> +
-> +static inline bool kvm_pgtable_walk_lock_held(void)
-> +{
-> +       return true;
-
-Forgive my ignorance, but does hyp not use a MMU lock at all? Seems
-like this would be a good place to add a lockdep check.
-
-> +}
-> +
-> +#else
-> +
-> +typedef kvm_pte_t __rcu *kvm_pteref_t;
-> +
-> +static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
-> +{
-> +       return rcu_dereference_check(pteref, !shared);
-
-Same here, could add a lockdep check depending on shared.
-
-> +}
-> +
-> +static inline void kvm_pgtable_walk_begin(void)
-> +{
-> +       rcu_read_lock();
-> +}
-> +
-> +static inline void kvm_pgtable_walk_end(void)
-> +{
-> +       rcu_read_unlock();
-> +}
-> +
-> +static inline bool kvm_pgtable_walk_lock_held(void)
-> +{
-> +       return rcu_read_lock_held();
-
-Likewise could do some lockdep here.
-
-> +}
-> +
-> +#endif
-> +
->  #define KVM_PTE_VALID                  BIT(0)
->
->  #define KVM_PTE_ADDR_MASK              GENMASK(47, PAGE_SHIFT)
-> @@ -202,11 +243,14 @@ struct kvm_pgtable {
->   *                                     children.
->   * @KVM_PGTABLE_WALK_TABLE_POST:       Visit table entries after their
->   *                                     children.
-> + * @KVM_PGTABLE_WALK_SHARED:           Indicates the page-tables may be shared
-> + *                                     with other software walkers.
->   */
->  enum kvm_pgtable_walk_flags {
->         KVM_PGTABLE_WALK_LEAF                   = BIT(0),
->         KVM_PGTABLE_WALK_TABLE_PRE              = BIT(1),
->         KVM_PGTABLE_WALK_TABLE_POST             = BIT(2),
-> +       KVM_PGTABLE_WALK_SHARED                 = BIT(3),
-
-Not sure if necessary, but it might pay to have 3 shared options:
-exclusive, shared mmu lock, no mmu lock if we ever want lockless fast
-page faults.
-
-
->  };
->
->  struct kvm_pgtable_visit_ctx {
-> @@ -223,6 +267,11 @@ struct kvm_pgtable_visit_ctx {
->  typedef int (*kvm_pgtable_visitor_fn_t)(const struct kvm_pgtable_visit_ctx *ctx,
->                                         enum kvm_pgtable_walk_flags visit);
->
-> +static inline bool kvm_pgtable_walk_shared(const struct kvm_pgtable_visit_ctx *ctx)
-> +{
-> +       return ctx->flags & KVM_PGTABLE_WALK_SHARED;
-> +}
-> +
->  /**
->   * struct kvm_pgtable_walker - Hook into a page-table walk.
->   * @cb:                Callback function to invoke during the walk.
 > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 7c9782347570..d8d963521d4e 100644
+> index a34e2050f931..f4dd77c6c97d 100644
 > --- a/arch/arm64/kvm/hyp/pgtable.c
 > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -171,6 +171,9 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
->                                   enum kvm_pgtable_walk_flags visit)
+> @@ -136,16 +136,13 @@ static void kvm_clear_pte(kvm_pte_t *ptep)
+>         WRITE_ONCE(*ptep, 0);
+>  }
+>
+> -static void kvm_set_table_pte(kvm_pte_t *ptep, kvm_pte_t *childp,
+> -                             struct kvm_pgtable_mm_ops *mm_ops)
+> +static kvm_pte_t kvm_init_table_pte(kvm_pte_t *childp, struct kvm_pgtable_mm_ops *mm_ops)
 >  {
->         struct kvm_pgtable_walker *walker = data->walker;
-> +
-> +       /* Ensure the appropriate lock is held (e.g. RCU lock for stage-2 MMU) */
-> +       WARN_ON_ONCE(kvm_pgtable_walk_shared(ctx) && !kvm_pgtable_walk_lock_held());
->         return walker->cb(ctx, visit);
+> -       kvm_pte_t old = *ptep, pte = kvm_phys_to_pte(mm_ops->virt_to_phys(childp));
+> +       kvm_pte_t pte = kvm_phys_to_pte(mm_ops->virt_to_phys(childp));
+>
+>         pte |= FIELD_PREP(KVM_PTE_TYPE, KVM_PTE_TYPE_TABLE);
+>         pte |= KVM_PTE_VALID;
+> -
+> -       WARN_ON(kvm_pte_valid(old));
+
+Is there any reason to drop this warning?
+
+
+> -       smp_store_release(ptep, pte);
+> +       return pte;
 >  }
 >
-> @@ -281,8 +284,13 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
->                 .end    = PAGE_ALIGN(walk_data.addr + size),
->                 .walker = walker,
->         };
-> +       int r;
-> +
-> +       kvm_pgtable_walk_begin();
-> +       r = _kvm_pgtable_walk(pgt, &walk_data);
-> +       kvm_pgtable_walk_end();
->
-> -       return _kvm_pgtable_walk(pgt, &walk_data);
-> +       return r;
->  }
->
->  struct leaf_walk_data {
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 73ae908eb5d9..52e042399ba5 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -130,9 +130,21 @@ static void kvm_s2_free_pages_exact(void *virt, size_t size)
->
->  static struct kvm_pgtable_mm_ops kvm_s2_mm_ops;
->
-> +static void stage2_free_removed_table_rcu_cb(struct rcu_head *head)
-> +{
-> +       struct page *page = container_of(head, struct page, rcu_head);
-> +       void *pgtable = page_to_virt(page);
-> +       u32 level = page_private(page);
-> +
-> +       kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, pgtable, level);
-> +}
-> +
->  static void stage2_free_removed_table(void *addr, u32 level)
+>  static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
+> @@ -413,7 +410,7 @@ static bool hyp_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>  static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>                           enum kvm_pgtable_walk_flags visit)
 >  {
-> -       kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, addr, level);
-> +       struct page *page = virt_to_page(addr);
+> -       kvm_pte_t *childp;
+> +       kvm_pte_t *childp, new;
+>         struct hyp_map_data *data = ctx->arg;
+>         struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+>
+> @@ -427,8 +424,10 @@ static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>         if (!childp)
+>                 return -ENOMEM;
+>
+> -       kvm_set_table_pte(ctx->ptep, childp, mm_ops);
+> +       new = kvm_init_table_pte(childp, mm_ops);
+>         mm_ops->get_page(ctx->ptep);
+> +       smp_store_release(ctx->ptep, new);
 > +
-> +       set_page_private(page, (unsigned long)level);
-> +       call_rcu(&page->rcu_head, stage2_free_removed_table_rcu_cb);
+>         return 0;
 >  }
 >
->  static void kvm_host_get_page(void *addr)
+> @@ -796,7 +795,7 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>                                 struct stage2_map_data *data)
+>  {
+>         struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> -       kvm_pte_t *childp;
+> +       kvm_pte_t *childp, new;
+>         int ret;
+>
+>         ret = stage2_map_walker_try_leaf(ctx, data);
+> @@ -821,8 +820,9 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>         if (stage2_pte_is_counted(ctx->old))
+>                 stage2_put_pte(ctx, data->mmu, mm_ops);
+>
+> -       kvm_set_table_pte(ctx->ptep, childp, mm_ops);
+> +       new = kvm_init_table_pte(childp, mm_ops);
+>         mm_ops->get_page(ctx->ptep);
+> +       smp_store_release(ctx->ptep, new);
+>
+>         return 0;
+>  }
 > --
 > 2.38.1.431.g37b22c650d-goog
 >
