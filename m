@@ -2,70 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE8AEC433FE
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Nov 2022 22:19:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98699C433FE
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Nov 2022 00:05:09 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F7954B875;
-	Tue,  8 Nov 2022 17:19:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 098A74B887;
+	Tue,  8 Nov 2022 19:05:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FEoC6qLvzxiO; Tue,  8 Nov 2022 17:19:52 -0500 (EST)
+	with ESMTP id RujKamw9OFep; Tue,  8 Nov 2022 19:05:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCCFD4B877;
-	Tue,  8 Nov 2022 17:19:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAC954B88B;
+	Tue,  8 Nov 2022 19:05:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD1A04B850
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Nov 2022 17:19:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E6AA04B886
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Nov 2022 19:05:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QuZdPVW-k1tj for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Nov 2022 17:19:50 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 644E04B803
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Nov 2022 17:19:50 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1667945990;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rM9d9QcLMO4Gb1UJawRpOr7BbjkeIgjtt3r4okgE/aQ=;
- b=MdcmPnov6DCy6gm7h+a0marJyJAH18OwalNztZeoO17ZqKouvdDk3iAzaUW0LIhvfyMJyA
- Reo1xcMAXdVO0BhsjVzDGkyeCvzKQJ6v429JKimDY0WS+6pxI03XnGjXquaGke31x2n0DA
- XdU9qmemN5ZSMbh6qGFI06akSltv/O8=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-607-eW1u_DuAMGKbU_l2DpPbjg-1; Tue, 08 Nov 2022 17:19:46 -0500
-X-MC-Unique: eW1u_DuAMGKbU_l2DpPbjg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com
- [10.11.54.9])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8B431380673F;
- Tue,  8 Nov 2022 22:19:45 +0000 (UTC)
-Received: from [10.64.54.78] (vpn2-54-78.bne.redhat.com [10.64.54.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 635324B3FC6;
- Tue,  8 Nov 2022 22:19:39 +0000 (UTC)
+ with ESMTP id KNJoyCQzRZ2K for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Nov 2022 19:05:05 -0500 (EST)
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com
+ [209.85.215.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C9BC24B82C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Nov 2022 19:05:05 -0500 (EST)
+Received: by mail-pg1-f173.google.com with SMTP id 136so10908426pga.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Nov 2022 16:05:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=8mN4lJ0ugApMl1P1+zNxhl9RCm2csyd+rIUafb5kLio=;
+ b=Ved11eCrNxyvfhZoDnk9yg1nEoH5NfSvLqbQQWkLH5gv7U3BpGORKcXovnYiMK0v0b
+ ZSJmkaQmxqFPifBVIoDVlY5gYp0CiXA4BrrRrrUe0/A7qvgSmFISzkMljW0ZOz1lINow
+ sH0rWbGMCHylbTsCaXEcKNRQZN17+MtUMq2LCR0l8Z5v86NGJNPMYetqm1q76nYCcJiw
+ ambwzPDpVv9v72wkGNUN/OcDvzd57cKfSPqAX4jbiQb//z/0+hCgw1HkxeKdhpcQsicK
+ UElHeJ0aV5lNcCgUUdKuY/qkz8GUWu9RwG2MJDk/dLFm5fUL4/t1o7Oh5BuyAkQEkunI
+ IF8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=8mN4lJ0ugApMl1P1+zNxhl9RCm2csyd+rIUafb5kLio=;
+ b=a5DVffHBRQpB2HTM81MAjlpGdRvQMya1fPlIi6d67RL6RB9q2IJ8GO8n1Eb6DH8o3p
+ uh2EgEbbEpAEseWE8yrjwXhaM2gondCA2GB1rXyYM04K7o4jhR5LA2PG7Q20CMVVfgeF
+ c2dFI9PJC3qmWzLd5NXqylrWYS2spRl+4U71t2TbS7zMIRQJIXRCegnNqmPctPUebrO9
+ MuU1WiH05UFPX68O3AB6Vn+7vZZpdfBmYP4KmrRo8jCUxHCIFENWy6NZmdP9aZvWJABb
+ TpoZy4Vf92Acz2tXqY/fsiAYrnzXok2qPApHYTR1zunFU6hGq365R/kVRWGGmbDMJ9Ui
+ M7AA==
+X-Gm-Message-State: ACrzQf3zwR3kE8IFTziNwARBWk9cPlD/mXUkhJA6aXERE1eZAx2eyJzU
+ /BmbRPiUYs3OS6HcfMkKpkYY4w==
+X-Google-Smtp-Source: AMsMyM6lqHfLRza4xpTYFG5OCmO3t7QpGSB8EMMMXUfcY2HCMAhGNyyP1NkF3U+FKGNN9RZhDBNBYQ==
+X-Received: by 2002:a63:e153:0:b0:439:2fa3:74d1 with SMTP id
+ h19-20020a63e153000000b004392fa374d1mr49274307pgk.85.1667952304721; 
+ Tue, 08 Nov 2022 16:05:04 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ k21-20020a628415000000b0056bb06ce1cfsm7128531pfd.97.2022.11.08.16.05.03
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 08 Nov 2022 16:05:04 -0800 (PST)
+Date: Wed, 9 Nov 2022 00:05:00 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Gavin Shan <gshan@redhat.com>
 Subject: Re: [PATCH v9 3/7] KVM: Support dirty ring in conjunction with bitmap
-To: Sean Christopherson <seanjc@google.com>
+Message-ID: <Y2rurDmCrXZaxY8F@google.com>
 References: <20221108041039.111145-1-gshan@redhat.com>
- <20221108041039.111145-4-gshan@redhat.com> <Y2qDCqFeL1vwqq3f@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <49217b8f-ce53-c41b-98aa-ced34cd079cc@redhat.com>
-Date: Wed, 9 Nov 2022 06:19:36 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ <20221108041039.111145-4-gshan@redhat.com>
+ <Y2qDCqFeL1vwqq3f@google.com>
+ <49217b8f-ce53-c41b-98aa-ced34cd079cc@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <Y2qDCqFeL1vwqq3f@google.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Content-Disposition: inline
+In-Reply-To: <49217b8f-ce53-c41b-98aa-ced34cd079cc@redhat.com>
 Cc: maz@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com,
  andrew.jones@linux.dev, dmatlack@google.com, will@kernel.org,
  shan.gavin@gmail.com, bgardon@google.com, kvmarm@lists.linux.dev,
@@ -74,7 +83,6 @@ Cc: maz@kernel.org, kvm@vger.kernel.org, catalin.marinas@arm.com,
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -83,136 +91,41 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Sean,
-
-On 11/9/22 12:25 AM, Sean Christopherson wrote:
-> On Tue, Nov 08, 2022, Gavin Shan wrote:
->> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
->> index 800f9470e36b..228be1145cf3 100644
->> --- a/virt/kvm/Kconfig
->> +++ b/virt/kvm/Kconfig
->> @@ -33,6 +33,14 @@ config HAVE_KVM_DIRTY_RING_ACQ_REL
->>          bool
->>          select HAVE_KVM_DIRTY_RING
->>   
->> +# Only architectures that need to dirty memory outside of a vCPU
->> +# context should select this, advertising to userspace the
->> +# requirement to use a dirty bitmap in addition to the vCPU dirty
->> +# ring.
+On Wed, Nov 09, 2022, Gavin Shan wrote:
+> Hi Sean,
 > 
-> The Kconfig does more than advertise a feature to userspace.
+> On 11/9/22 12:25 AM, Sean Christopherson wrote:
+> > I have no objection to disallowing userspace from disabling the combo, but I
+> > think it's worth requiring cap->args[0] to be '0' just in case we change our minds
+> > in the future.
+> > 
 > 
->   # Allow enabling both the dirty bitmap and dirty ring.  Only architectures that
->   # need to dirty memory outside of a vCPU context should select this.
+> I assume you're suggesting to have non-zero value in cap->args[0] to enable the
+> capability.
 > 
+>     if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+>         !kvm->dirty_ring_size || !cap->args[0])
+>         return r;
 
-Agreed. The comments will be adjusted accordingly.
+I was actually thinking of taking the lazy route and requiring userspace to zero
+the arg, i.e. treat it as a flags extensions.  Oh, wait, that's silly.  I always
+forget that `cap->flags` exists.
 
->> +config HAVE_KVM_DIRTY_RING_WITH_BITMAP
-> 
-> I think we should replace "HAVE" with "NEED".  Any architecture that supports the
-> dirty ring can easily support ring+bitmap, but based on the discussion from v5[*],
-> the comment above, and the fact that the bitmap will _never_ be used in the
-> proposed implementation because x86 will always have a vCPU, this Kconfig should
-> only be selected if the bitmap is needed to support migration.
-> 
-> [*] https://lore.kernel.org/all/Y0SxnoT5u7+1TCT+@google.com
-> 
+Just this?
 
-Both look good to me. Lets change it to CONFIG_NEED_KVM_DIRTY_RING_WITH_BITMAP
-then.
+	if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+	    !kvm->dirty_ring_size || cap->flags) 
+		return r;
 
->> +	bool
->> +	depends on HAVE_KVM_DIRTY_RING
->> +
->>   config HAVE_KVM_EVENTFD
->>          bool
->>          select EVENTFD
->> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
->> index fecbb7d75ad2..f95cbcdd74ff 100644
->> --- a/virt/kvm/dirty_ring.c
->> +++ b/virt/kvm/dirty_ring.c
->> @@ -21,6 +21,18 @@ u32 kvm_dirty_ring_get_rsvd_entries(void)
->>   	return KVM_DIRTY_RING_RSVD_ENTRIES + kvm_cpu_dirty_log_size();
->>   }
->>   
->> +bool kvm_use_dirty_bitmap(struct kvm *kvm)
->> +{
->> +	lockdep_assert_held(&kvm->slots_lock);
->> +
->> +	return !kvm->dirty_ring_size || kvm->dirty_ring_with_bitmap;
->> +}
->> +
->> +bool __weak kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
-> 
-> Rather than __weak, what about wrapping this with an #ifdef to effectively force
-> architectures to implement the override if they need ring+bitmap?  Given that the
-> bitmap will never be used if there's a running vCPU, selecting the Kconfig without
-> overriding this utility can't possibly be correct.
-> 
->    #ifndef CONFIG_NEED_KVM_DIRTY_RING_WITH_BITMAP
->    bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
->    {
-> 	return false;
->    }
->    #endif
-> 
-
-It's a good idea, which will be included to next revision :)
-
->> @@ -4588,6 +4608,29 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
->>   			return -EINVAL;
->>   
->>   		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
->> +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP: {
->> +		int r = -EINVAL;
->> +
->> +		if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
->> +		    !kvm->dirty_ring_size)
-> 
-> I have no objection to disallowing userspace from disabling the combo, but I
-> think it's worth requiring cap->args[0] to be '0' just in case we change our minds
-> in the future.
-> 
-
-I assume you're suggesting to have non-zero value in cap->args[0] to enable the
-capability.
-
-     if (!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
-         !kvm->dirty_ring_size || !cap->args[0])
-         return r;
-     
->> +			return r;
->> +
->> +		mutex_lock(&kvm->slots_lock);
->> +
->> +		/*
->> +		 * For simplicity, allow enabling ring+bitmap if and only if
->> +		 * there are no memslots, e.g. to ensure all memslots allocate
->> +		 * a bitmap after the capability is enabled.
->> +		 */
->> +		if (kvm_are_all_memslots_empty(kvm)) {
->> +			kvm->dirty_ring_with_bitmap = true;
->> +			r = 0;
->> +		}
->> +
->> +		mutex_unlock(&kvm->slots_lock);
->> +
->> +		return r;
->> +	}
->>   	default:
->>   		return kvm_vm_ioctl_enable_cap(kvm, cap);
->>   	}
-
-
-Thanks,
-Gavin
-
+It'll be kinda awkward if KVM ever does add a flag to disable the bitmap, but
+that's seems quite unlikely and not the end of the world if it does happen.  And
+on the other hand, requiring '0' is less weird and less annoying for userspace
+_now_.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
