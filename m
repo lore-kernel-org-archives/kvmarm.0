@@ -2,74 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00209C4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 14:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F4C1C43217
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 14:52:19 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AFE484BB3F;
-	Thu, 10 Nov 2022 09:52:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2AB94BAEB;
+	Thu, 10 Nov 2022 09:52:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WgL7djMPsnzX; Thu, 10 Nov 2022 09:52:16 -0500 (EST)
+	with ESMTP id cGD1ojnB8JGl; Thu, 10 Nov 2022 09:52:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FE394BB82;
-	Thu, 10 Nov 2022 09:51:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E56614BB77;
+	Thu, 10 Nov 2022 09:51:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B4BC54BA22
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 18:00:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B1134B9FF
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 17:26:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3aOpMvoSwY3B for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Nov 2022 18:00:27 -0500 (EST)
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com
- [209.85.222.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE3C24BA1C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 18:00:27 -0500 (EST)
-Received: by mail-qk1-f175.google.com with SMTP id z30so152355qkz.13
- for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Nov 2022 15:00:27 -0800 (PST)
+ with ESMTP id DFP6z71fCnyw for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Nov 2022 17:26:47 -0500 (EST)
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com
+ [209.85.160.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CBD274B9A7
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 17:26:47 -0500 (EST)
+Received: by mail-qt1-f172.google.com with SMTP id hh9so25829qtb.13
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Nov 2022 14:26:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:from:to:cc:subject:date:message-id:reply-to;
- bh=cmFG+lMjzf/ZVIEgSvSUi/Kw8nPzVjb1fGFMbu/W5vY=;
- b=dudkNi4O683uD+TNndcPtPCeCpa9QA7FbrHjaVOmIRg+UIGVhAfjaXmH9wBmtQDeLP
- uNHcUO7j+uCpDHYxGSZ329F4Pqk6v23Tz3bL13gqm3RiGz3qJQ/5WwLouTw/AcT5Af9A
- rQwCxIpQ+YDTTjArHhx2QEoIvvIdpsL61e+NndZ9oI8EQss2i6rc9Xfaom1mQcgOEuKg
- X725WqyvZrKDxE82nLTfL2duzd2WFlc4dcdajM8jpWTqjR8pxMwjOHMgSw7/94Xya4Fw
- OtHNgVbPfchbdE78tQKPU3oB9S3RIz76UsqxoZzTcwc1Vr43CTJ+spRrWppH+q9QCzYf
- 4lBw==
+ bh=ys/jQ8RbuqT3YumCTMbd+2452VktWwQQOObS7LSk5p4=;
+ b=mk9lRpuokDL/uAOGOKs/+T+PEfPR48B5jrdBCU4h3IJuESuNqf45ir8gw9bRIeOeS2
+ 5boDsxOTz8DpWvHPjQhCVVSwOM6ovQKP64R6KI0RCxiP7tMx1y1DV02kaqZQLWfTIIIK
+ TbjJqgkN+FpzGJDz9nIIK8l9JHwSamFn0UQVHIRm3S8ypg8qo2oRFMAbGNEOyPMoHgVs
+ guGP5sgv0zVSjtqTSdAgYZhxbtjyozc30kfsiDsPFZZvSEgusnttdCQYnX0wMsBIhRsK
+ PS2Rwu4d/kFG+09LQxPgUcg1wT8Uk5LZsZZvFYYJUXzlidk4zjrNqzmeBbQj7G25Mb/i
+ N6DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=cmFG+lMjzf/ZVIEgSvSUi/Kw8nPzVjb1fGFMbu/W5vY=;
- b=OTolMPUxI4gxCxuizbzH19ABNm92kMAOK4q8LPNClbBW4t3QOav3BfcNkT7sqocVUC
- snbmclTRjgcdk+xc4wqPNKH9CptfzI7BaU46w63KzzvUj8MHj9NistvumiJzcFJAjOfK
- LDnCBzel8kp4zEHNbcnYFxavOj6nhMGuJatPJjbEqQqxxUGqWU8iCFrklamagipJD3Zo
- Ng3Uq7fHigrfGTw6dxTMdQcOJbdc19r8be7h+/X4ecJI/itrSBFRUksiiv5yjSgagFdG
- NPodmXwDbaNnS3Xsi3N99C0+jLnk+Xe7iCj292nMLAMu5OHiJdvUnLSri/bK1eUAsHfA
- ZOwg==
-X-Gm-Message-State: ACrzQf1aYGknUiYBKC/6O/eBUlDSZhSpmwifHtI+8kK82YVMtNCjL4ob
- UvzKVeirmtdR2AuRDz6rqh6wfcpOT42kwAkbpSZ66A==
-X-Google-Smtp-Source: AMsMyM4kdVFylTXfA6FM8xY8axVjaBWiaQEF+FUnFYjRSXBpMV5wYMwqbp4Gdq5EBHSBdeNF/gET466fMdMwNRFqj/U=
-X-Received: by 2002:ae9:eb48:0:b0:6fa:d61:4510 with SMTP id
- b69-20020ae9eb48000000b006fa0d614510mr43595869qkg.768.1668034827137; Wed, 09
- Nov 2022 15:00:27 -0800 (PST)
+ bh=ys/jQ8RbuqT3YumCTMbd+2452VktWwQQOObS7LSk5p4=;
+ b=6+hXTZugIgVQ+J2GZYoZfZulZShn0OKkie5RVkxFzhbyUbEErVIx069Y+1siB3SCJd
+ ySCUWq03pYR8/s/GUR/U5joGIFGWeQz9NaTZRS22ewAnyGCZO0AC7ez8HpcPKpszKHnF
+ lRp+7PCHveShRaDiIK1lEY9pHnuWVLrwKodhpZnOoGpKXR0GIOAPVdPs/5SUKGvAwEpw
+ oS48RV/QWpAqSew4Joz0i2i14Q3gm5ToamrD32QoZCQaE2ol8kHLZTzQ5krEHfCIhE6w
+ PI5pA9rpuifhccLAZpwBDJPPA6mom3MMhKAfagp6+QXFqF7GYhARoBhHXOEigDX0JvZs
+ uVgw==
+X-Gm-Message-State: ANoB5plCCamHLAtAez+0NOZ6bqjgUEeyquiCOAbyWMaa4CqUAtoOTktj
+ ERX1GvP5C2rc+XqBsoaDYFFyzEBF1jISaI7fq0ysDA==
+X-Google-Smtp-Source: AA0mqf78NDQ8xLt/Zae6fTGp38dnPf5BMr45qBFnT7kZ5Z23obSQYwTbVOjufSO4/KwQlp/1DoVnG+QFF53vnN4/bwY=
+X-Received: by 2002:ac8:5ac2:0:b0:3a5:afca:2322 with SMTP id
+ d2-20020ac85ac2000000b003a5afca2322mr4284025qtd.500.1668032807310; Wed, 09
+ Nov 2022 14:26:47 -0800 (PST)
 MIME-Version: 1.0
 References: <20221107215644.1895162-1-oliver.upton@linux.dev>
- <20221107215644.1895162-10-oliver.upton@linux.dev>
- <CANgfPd9SK=9jUYh+aMXwYCf2-JtoJtSZ_BDmbjiZX=nvG-9uXA@mail.gmail.com>
- <Y2wswsHgDHIIXram@google.com>
-In-Reply-To: <Y2wswsHgDHIIXram@google.com>
+ <20221107215855.1895367-1-oliver.upton@linux.dev>
+In-Reply-To: <20221107215855.1895367-1-oliver.upton@linux.dev>
 From: Ben Gardon <bgardon@google.com>
-Date: Wed, 9 Nov 2022 15:00:16 -0800
-Message-ID: <CANgfPd_=6r1pmuNbrEdiom4JpryUBkVxxxmKTCN+xfiAQYrP0w@mail.gmail.com>
-Subject: Re: [PATCH v5 09/14] KVM: arm64: Atomically update stage 2 leaf
- attributes in parallel walks
-To: Sean Christopherson <seanjc@google.com>
+Date: Wed, 9 Nov 2022 14:26:36 -0800
+Message-ID: <CANgfPd9OSUfDGCQG8tHXTCYtrrCDnkgPZM6qPDaQF90bZsVCkA@mail.gmail.com>
+Subject: Re: [PATCH v5 11/14] KVM: arm64: Make block->table PTE changes
+ parallel-aware
+To: Oliver Upton <oliver.upton@linux.dev>
 X-Mailman-Approved-At: Thu, 10 Nov 2022 09:51:44 -0500
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
@@ -91,33 +89,155 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Nov 9, 2022 at 2:42 PM Sean Christopherson <seanjc@google.com> wrote:
+On Mon, Nov 7, 2022 at 1:59 PM Oliver Upton <oliver.upton@linux.dev> wrote:
 >
-> On Wed, Nov 09, 2022, Ben Gardon wrote:
-> > On Mon, Nov 7, 2022 at 1:58 PM Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > @@ -1054,7 +1066,7 @@ kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr)
-> > >  bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr)
-> > >  {
-> > >         kvm_pte_t pte = 0;
-> > > -       stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte, NULL);
-> > > +       stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte, NULL, 0);
-> >
-> > Would be nice to have an enum for KVM_PGTABLE_WALK_EXCLUSIVE so this
-> > doesn't just have to pass 0.
+> In order to service stage-2 faults in parallel, stage-2 table walkers
+> must take exclusive ownership of the PTE being worked on. An additional
+> requirement of the architecture is that software must perform a
+> 'break-before-make' operation when changing the block size used for
+> mapping memory.
 >
-> That's also dangerous though since the param is a set of flags, not unique,
-> arbitrary values.  E.g. this won't do the expected thing
+> Roll these two concepts together into helpers for performing a
+> 'break-before-make' sequence. Use a special PTE value to indicate a PTE
+> has been locked by a software walker. Additionally, use an atomic
+> compare-exchange to 'break' the PTE when the stage-2 page tables are
+> possibly shared with another software walker. Elide the DSB + TLBI if
+> the evicted PTE was invalid (and thus not subject to break-before-make).
 >
->         if (flags & KVM_PGTABLE_WALK_EXCLUSIVE)
+> All of the atomics do nothing for now, as the stage-2 walker isn't fully
+> ready to perform parallel walks.
 >
-> I assume compilers would complain, but never say never when it comes to compilers :-)
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/hyp/pgtable.c | 80 +++++++++++++++++++++++++++++++++---
+>  1 file changed, 75 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index f4dd77c6c97d..b9f0d792b8d9 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -49,6 +49,12 @@
+>  #define KVM_INVALID_PTE_OWNER_MASK     GENMASK(9, 2)
+>  #define KVM_MAX_OWNER_ID               1
+>
+> +/*
+> + * Used to indicate a pte for which a 'break-before-make' sequence is in
+> + * progress.
+> + */
+> +#define KVM_INVALID_PTE_LOCKED         BIT(10)
+> +
+>  struct kvm_pgtable_walk_data {
+>         struct kvm_pgtable_walker       *walker;
+>
+> @@ -674,6 +680,11 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
+>         return !!pte;
+>  }
+>
+> +static bool stage2_pte_is_locked(kvm_pte_t pte)
+> +{
+> +       return !kvm_pte_valid(pte) && (pte & KVM_INVALID_PTE_LOCKED);
+> +}
+> +
+>  static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
+>  {
+>         if (!kvm_pgtable_walk_shared(ctx)) {
+> @@ -684,6 +695,64 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
+>         return cmpxchg(ctx->ptep, ctx->old, new) == ctx->old;
+>  }
+>
+> +/**
+> + * stage2_try_break_pte() - Invalidates a pte according to the
+> + *                         'break-before-make' requirements of the
+> + *                         architecture.
+> + *
+> + * @ctx: context of the visited pte.
+> + * @mmu: stage-2 mmu
+> + *
+> + * Returns: true if the pte was successfully broken.
+> + *
+> + * If the removed pte was valid, performs the necessary serialization and TLB
+> + * invalidation for the old value. For counted ptes, drops the reference count
+> + * on the containing table page.
+> + */
+> +static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+> +                                struct kvm_s2_mmu *mmu)
+> +{
+> +       struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> +
+> +       if (stage2_pte_is_locked(ctx->old)) {
+> +               /*
+> +                * Should never occur if this walker has exclusive access to the
+> +                * page tables.
+> +                */
+> +               WARN_ON(!kvm_pgtable_walk_shared(ctx));
+> +               return false;
+> +       }
+> +
+> +       if (!stage2_try_set_pte(ctx, KVM_INVALID_PTE_LOCKED))
+> +               return false;
+> +
+> +       /*
+> +        * Perform the appropriate TLB invalidation based on the evicted pte
+> +        * value (if any).
+> +        */
+> +       if (kvm_pte_table(ctx->old, ctx->level))
+> +               kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> +       else if (kvm_pte_valid(ctx->old))
+> +               kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
+> +
+> +       if (stage2_pte_is_counted(ctx->old))
+> +               mm_ops->put_page(ctx->ptep);
+> +
+> +       return true;
+> +}
+> +
+> +static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
+> +{
+> +       struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> +
+> +       WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
+> +
+> +       if (stage2_pte_is_counted(new))
+> +               mm_ops->get_page(ctx->ptep);
+> +
+> +       smp_store_release(ctx->ptep, new);
+> +}
+> +
+>  static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
+>                            struct kvm_pgtable_mm_ops *mm_ops)
+>  {
+> @@ -812,17 +881,18 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>         if (!childp)
+>                 return -ENOMEM;
+>
+> +       if (!stage2_try_break_pte(ctx, data->mmu)) {
+> +               mm_ops->put_page(childp);
+> +               return -EAGAIN;
+> +       }
+> +
+>         /*
+>          * If we've run into an existing block mapping then replace it with
+>          * a table. Accesses beyond 'end' that fall within the new table
+>          * will be mapped lazily.
+>          */
+> -       if (stage2_pte_is_counted(ctx->old))
+> -               stage2_put_pte(ctx, data->mmu, mm_ops);
+> -
+>         new = kvm_init_table_pte(childp, mm_ops);
 
-Yeah, I was thinking about that too. IMO using one enum for multiple
-flags is kind of an abuse of the enum. If you're going to put multiple
-orthogonal flags in an int or whatever, it would probably be best to
-have separate enums for each flag. That way you can define masks to
-extract the enum from the int and only compare with == and != as
-opposed to using &.
+Does it make any sense to move this before the "break" to minimize the
+critical section in which the PTE is locked?
+
+
+> -       mm_ops->get_page(ctx->ptep);
+> -       smp_store_release(ctx->ptep, new);
+> +       stage2_make_pte(ctx, new);
+>
+>         return 0;
+>  }
+> --
+> 2.38.1.431.g37b22c650d-goog
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
