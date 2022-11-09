@@ -2,80 +2,55 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91220C4332F
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Nov 2022 22:42:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C11CFC433FE
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Nov 2022 22:49:09 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 12F6F4BA2F;
-	Wed,  9 Nov 2022 17:42:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B39F4BA2B;
+	Wed,  9 Nov 2022 17:49:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nip6f7zG49N5; Wed,  9 Nov 2022 17:42:18 -0500 (EST)
+	with ESMTP id 9zWC1tW7KLy0; Wed,  9 Nov 2022 17:49:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD4734BA25;
-	Wed,  9 Nov 2022 17:42:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C9DEA4002F;
+	Wed,  9 Nov 2022 17:49:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 364E84BA23
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 17:42:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BC9DF4BA2C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 17:49:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vCMyusFdzxVo for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Nov 2022 17:42:16 -0500 (EST)
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com
- [209.85.216.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 14E474BA07
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 17:42:16 -0500 (EST)
-Received: by mail-pj1-f46.google.com with SMTP id
- q1-20020a17090a750100b002139ec1e999so104705pjk.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Nov 2022 14:42:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=ZKiMsUeXYzlgxWfF0WcmHUUjbEiQdWPsUbhG4FuUTvU=;
- b=cD4gLgROz4g4LtmSRbdLXGAjaJuR6pnQPfjazM0yU0Hn/lv/WT5o4Her5FZZKbaJvo
- 3llk8DYE2nZDW2sbqQRiQfbjE1ZapQwwU0U2Cv08c9Ebk8FU0i0XK4awq7K7iidJf8OH
- 3GcfjHTDxs/DR50LOoQvFL4LWTUNBDsk4dxtwc4SeMTKq2oVpauMgfCUNtsr3uNWy3cz
- RpG+CtA8bVTi2doo034FUCj8Kt6OAO4pYKClaQOLsbg15mz+DJmaYa7LRAgZji6biWZu
- +q6Wz7oH6l72tqHN4GUlfyDALVakTWYywy2upo+HFDthGSfQgKq+AvRIE4mmZZ0GudzA
- bgyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
- :message-id:reply-to;
- bh=ZKiMsUeXYzlgxWfF0WcmHUUjbEiQdWPsUbhG4FuUTvU=;
- b=XVjEw5eVFS+O/HrQGphWQOrbR3lwtT32W5AL7uS2JEXNFPwDwsP0byfyzG0pZmDH3B
- d85zwT2OGzF+O+dtt5ekjGYd+O4dAO+ji07B8rd11SwlyI1d9kqrePiHB91O/6ScchGP
- +1V6KX3OgMCWlnScQRIDQohAENQ4QhTT/L602d5ZBQSFJzu9+ljSJZ89qZSeTBSRRfUi
- Y66hWyN9FRs56XMT7WcHjFYuWHQHIAiurDWOL+cywAFZ63+Doga05flOpWWXlI7ElqfK
- ZWkXyETE4Rp4xwtyEOsvoM/1joxO7rFeAL9HTaixiDcb1saJ/XSqQVssH3P1yd1t7kxt
- p3zg==
-X-Gm-Message-State: ACrzQf00G/0lJu1RKCpfhGWsAMX4Ol3X8aVuy0yRSJjox2IVIhcUL61X
- apNFfSjs++Dw5LrO9boeDmpBBQ==
-X-Google-Smtp-Source: AMsMyM7VhBvIBJZq8DOffvWOeCdh5Qe5jEL63Uu0jploe/nMqN4VkZSgtUrZB0hVopNblvbQ13kL9w==
-X-Received: by 2002:a17:902:e811:b0:186:8a61:ea76 with SMTP id
- u17-20020a170902e81100b001868a61ea76mr63663058plg.10.1668033734747; 
- Wed, 09 Nov 2022 14:42:14 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com.
- [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
- f5-20020a655505000000b00434760ee36asm7850505pgr.16.2022.11.09.14.42.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Nov 2022 14:42:14 -0800 (PST)
-Date: Wed, 9 Nov 2022 22:42:10 +0000
-From: Sean Christopherson <seanjc@google.com>
+ with ESMTP id gUmvaURHDvTn for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Nov 2022 17:49:05 -0500 (EST)
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 639C34BA2B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 17:49:05 -0500 (EST)
+Date: Wed, 9 Nov 2022 22:48:48 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1668034140;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=uy8PKmBJllUyFJnAMPXkpcKsBKhmjino2ZkcFTbS9rs=;
+ b=sUu1+UXh7oEBAIs4hIdEgPV8KWK0j3gsGb9InYHeHjT0tU5n3mMiYYMOeVdXGc2M49fMAB
+ 9x+1Uhk+3EgMVSPzaDyJ6Tijp2FBsZDTpw8lRKQ6d0b+d0zuVcY480/UygcXT7rWNI3/Gn
+ 4T/XSrE44KY34fkUSjdG7+XP0ezELL0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
 To: Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v5 09/14] KVM: arm64: Atomically update stage 2 leaf
- attributes in parallel walks
-Message-ID: <Y2wswsHgDHIIXram@google.com>
+Subject: Re: [PATCH v5 01/14] KVM: arm64: Combine visitor arguments into a
+ context structure
+Message-ID: <Y2wuUNNAlsIlxnwM@google.com>
 References: <20221107215644.1895162-1-oliver.upton@linux.dev>
- <20221107215644.1895162-10-oliver.upton@linux.dev>
- <CANgfPd9SK=9jUYh+aMXwYCf2-JtoJtSZ_BDmbjiZX=nvG-9uXA@mail.gmail.com>
+ <20221107215644.1895162-2-oliver.upton@linux.dev>
+ <CANgfPd9ooA5c+ZQMx4-yy+n92TsxoAXZyHRoTpatoSOb+jXi-w@mail.gmail.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <CANgfPd9SK=9jUYh+aMXwYCf2-JtoJtSZ_BDmbjiZX=nvG-9uXA@mail.gmail.com>
+In-Reply-To: <CANgfPd9ooA5c+ZQMx4-yy+n92TsxoAXZyHRoTpatoSOb+jXi-w@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
  David Matlack <dmatlack@google.com>, kvmarm@lists.cs.columbia.edu,
@@ -96,24 +71,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Nov 09, 2022, Ben Gardon wrote:
-> On Mon, Nov 7, 2022 at 1:58 PM Oliver Upton <oliver.upton@linux.dev> wrote:
-> > @@ -1054,7 +1066,7 @@ kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr)
-> >  bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr)
-> >  {
-> >         kvm_pte_t pte = 0;
-> > -       stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte, NULL);
-> > +       stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte, NULL, 0);
+On Wed, Nov 09, 2022 at 02:23:08PM -0800, Ben Gardon wrote:
+> On Mon, Nov 7, 2022 at 1:57 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > Passing new arguments by value to the visitor callbacks is extremely
+> > inflexible for stuffing new parameters used by only some of the
+> > visitors. Use a context structure instead and pass the pointer through
+> > to the visitor callback.
+> >
+> > While at it, redefine the 'flags' parameter to the visitor to contain
+> > the bit indicating the phase of the walk. Pass the entire set of flags
+> > through the context structure such that the walker can communicate
+> > additional state to the visitor callback.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > 
-> Would be nice to have an enum for KVM_PGTABLE_WALK_EXCLUSIVE so this
-> doesn't just have to pass 0.
+> This looks good to me. It's all fairly mechanical and I don't see any
+> problems. I was a little confused by the walk context flags passed via
+> visit, because they seem somewhat redundant if the leaf-ness can be
+> determined by looking at the PTE, but perhaps that's not always
+> possible.
 
-That's also dangerous though since the param is a set of flags, not unique,
-arbitrary values.  E.g. this won't do the expected thing
+Some explanation is probably owed here. I think you caught the detail
+later on in the series, but I'm overloading flags to describe both the
+requested visits and some properties about the walk (i.e. a SHARED
+walk).
 
-	if (flags & KVM_PGTABLE_WALK_EXCLUSIVE)
+I tried to leave it sufficiently generic as there will be other
+configuration bits we will want to stuff into a walker later on (such as
+TLBI and CMO elision).
 
-I assume compilers would complain, but never say never when it comes to compilers :-)
+> Reviewed-by: Ben Gardon <bgardon@google.com>
+
+Thanks!
+
+--
+Best,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
