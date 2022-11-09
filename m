@@ -1,123 +1,87 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA30EBF6
-	for <kvmarm@lists.linux.dev>; Wed,  9 Nov 2022 22:26:55 +0000 (UTC)
-Received: by mail-qv1-f50.google.com with SMTP id lf15so227585qvb.9
-        for <kvmarm@lists.linux.dev>; Wed, 09 Nov 2022 14:26:55 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67444107A7
+	for <kvmarm@lists.linux.dev>; Wed,  9 Nov 2022 22:42:15 +0000 (UTC)
+Received: by mail-pj1-f53.google.com with SMTP id b1-20020a17090a7ac100b00213fde52d49so85441pjl.3
+        for <kvmarm@lists.linux.dev>; Wed, 09 Nov 2022 14:42:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mIH/gnU14scU0A1hyWtmYd9lzDy4ZgiwB42b18TqphI=;
-        b=HFR4OdnxHrsQVbCXJcHORcKq3LD310hCms8AAWUb9x0WfZhWqQ6vfgIdCi9y6aMJqn
-         ntUPcIVnrCEAomqTv2G9Op/3FygLTY8aQ7k5Q14ornuw1MbBp3zItwYfOhDBr4hO9zYR
-         dmqKIWyBZP6xhWegZrdSKiyCzjlEXbKqWVZBKi/iv9zcWqpz6Uwg0C8hAIs+dvXcT/vS
-         qv0A+h+egVI/qNJXzGyz/FXaq0evLNo44P9eBJ8RQdkcUbwVRfgHQkZT7ltKYHgnceUO
-         KfNxgVRovf/22rKLGQkhf7NNqjEpo5AwVF46ehyydkzYwjQojxIopV/Pxc55C3hjJ41v
-         x+9Q==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZKiMsUeXYzlgxWfF0WcmHUUjbEiQdWPsUbhG4FuUTvU=;
+        b=cD4gLgROz4g4LtmSRbdLXGAjaJuR6pnQPfjazM0yU0Hn/lv/WT5o4Her5FZZKbaJvo
+         3llk8DYE2nZDW2sbqQRiQfbjE1ZapQwwU0U2Cv08c9Ebk8FU0i0XK4awq7K7iidJf8OH
+         3GcfjHTDxs/DR50LOoQvFL4LWTUNBDsk4dxtwc4SeMTKq2oVpauMgfCUNtsr3uNWy3cz
+         RpG+CtA8bVTi2doo034FUCj8Kt6OAO4pYKClaQOLsbg15mz+DJmaYa7LRAgZji6biWZu
+         +q6Wz7oH6l72tqHN4GUlfyDALVakTWYywy2upo+HFDthGSfQgKq+AvRIE4mmZZ0GudzA
+         bgyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mIH/gnU14scU0A1hyWtmYd9lzDy4ZgiwB42b18TqphI=;
-        b=YQWF+/Q5FSuYLy2uj0IKVWdah/S3mTFAvwbYLIoh7QfHBKZVv5kY04MZhqu9UaSqI4
-         BwKlR5gjPk744KvIldGWKKpHLwj2vZtv56ajaE/uS0zpJacHnz6fT485krj51Bt0n+3S
-         FpExQ8l4/9352RJ5J7/t4pEB1bowIZ3lky0l0BcvomLjrZios+3QItfi67QL0XWZNQpH
-         LeLwlEn2nJUCt3Q4XSg2fIvwFw0piaY8lv1ink7bR4kgX+v4sJzcLj8hLHlp2Aob4JUN
-         urChIRqnqJ9DA1rtMyTdUNrqsBUQWhKd3kvAZmISb0yNs5l57Wpg/1MbJa16g9sZS6BH
-         6Vkw==
-X-Gm-Message-State: ACrzQf0A4Tx8Zu7sP9IbM4E9KteMgOOmJoVKzTAU8JHVtX3ZNuZvWQJN
-	u/fQosUFSFSN+VjFahOlhHnldf0Iqsm/j/9JXENhXg==
-X-Google-Smtp-Source: AMsMyM5J4JGxdLxEvM+TDclGKxrd4EGyAN5hOkeEDZV0xVYhb9vkBF6uFdXqxyk3atCKOBNJ2lAaV7B4qRWzA01q8BA=
-X-Received: by 2002:a05:6214:21a6:b0:4bb:85b4:fd96 with SMTP id
- t6-20020a05621421a600b004bb85b4fd96mr56203622qvc.28.1668032814598; Wed, 09
- Nov 2022 14:26:54 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZKiMsUeXYzlgxWfF0WcmHUUjbEiQdWPsUbhG4FuUTvU=;
+        b=3JvRy4KfGdtSA/UFJHE/SSVRyjc/AurKTVVH9V9kvQdTcEqrAxaFyfL4jPLlPrIjPF
+         ZAgnTfOFjMol3GdjI7aj0WSaFZlpolABqkX8h/JX89IRrTlrPgGtA3xD8c1OjTvcPTKw
+         IjO1PpAXdEH4PwjvZ5TW44YVIvgAMCkS/RJU9EVEB6rQ+VNjbuxQMLPfEcgiOy5VT87g
+         ghjCWOO8S1kGQN+HTK21U2pR2GuSNuiLRTt2uipwE64wIlyv4bLy4bIynCRvMbIfw+di
+         SL7Tj1CszQ3zA4DjxPASv05FHbuZugGbIWJEQx/RoVpee5RMTRfRUxEqr2d8E6Be/0RK
+         4t7g==
+X-Gm-Message-State: ACrzQf2D6PwrvmSgutcHRa5NBOW/2rdCOvNzyCPlijqFaXgm54Nr+Z5t
+	Q/BQq/r/4GcIcE2+7IKkX8bK5A==
+X-Google-Smtp-Source: AMsMyM7VhBvIBJZq8DOffvWOeCdh5Qe5jEL63Uu0jploe/nMqN4VkZSgtUrZB0hVopNblvbQ13kL9w==
+X-Received: by 2002:a17:902:e811:b0:186:8a61:ea76 with SMTP id u17-20020a170902e81100b001868a61ea76mr63663058plg.10.1668033734747;
+        Wed, 09 Nov 2022 14:42:14 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id f5-20020a655505000000b00434760ee36asm7850505pgr.16.2022.11.09.14.42.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Nov 2022 14:42:14 -0800 (PST)
+Date: Wed, 9 Nov 2022 22:42:10 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Ben Gardon <bgardon@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	David Matlack <dmatlack@google.com>,
+	Quentin Perret <qperret@google.com>, Gavin Shan <gshan@redhat.com>,
+	Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v5 09/14] KVM: arm64: Atomically update stage 2 leaf
+ attributes in parallel walks
+Message-ID: <Y2wswsHgDHIIXram@google.com>
+References: <20221107215644.1895162-1-oliver.upton@linux.dev>
+ <20221107215644.1895162-10-oliver.upton@linux.dev>
+ <CANgfPd9SK=9jUYh+aMXwYCf2-JtoJtSZ_BDmbjiZX=nvG-9uXA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20221107215644.1895162-1-oliver.upton@linux.dev> <20221107215934.1895478-1-oliver.upton@linux.dev>
-In-Reply-To: <20221107215934.1895478-1-oliver.upton@linux.dev>
-From: Ben Gardon <bgardon@google.com>
-Date: Wed, 9 Nov 2022 14:26:43 -0800
-Message-ID: <CANgfPd8b+JZq5AAvasY=GaRjLPyEN87irg2HkcYvaBxdRhZgdA@mail.gmail.com>
-Subject: Re: [PATCH v5 12/14] KVM: arm64: Make leaf->leaf PTE changes parallel-aware
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 
-	Reiji Watanabe <reijiw@google.com>, Ricardo Koller <ricarkol@google.com>, 
-	David Matlack <dmatlack@google.com>, Quentin Perret <qperret@google.com>, Gavin Shan <gshan@redhat.com>, 
-	Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221109222643.y_UGFUg4JDA-15h5ijkaokhXOM7veGY4V84-HSbvfBY@z>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANgfPd9SK=9jUYh+aMXwYCf2-JtoJtSZ_BDmbjiZX=nvG-9uXA@mail.gmail.com>
+Message-ID: <20221109224210.0uQwWuksReKykGZTknOzDpurgBgASDoKoLMxT5dYiaQ@z>
 
-On Mon, Nov 7, 2022 at 1:59 PM Oliver Upton <oliver.upton@linux.dev> wrote:
->
-> Convert stage2_map_walker_try_leaf() to use the new break-before-make
-> helpers, thereby making the handler parallel-aware. As before, avoid the
-> break-before-make if recreating the existing mapping. Additionally,
-> retry execution if another vCPU thread is modifying the same PTE.
->
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+On Wed, Nov 09, 2022, Ben Gardon wrote:
+> On Mon, Nov 7, 2022 at 1:58 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> > @@ -1054,7 +1066,7 @@ kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr)
+> >  bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr)
+> >  {
+> >         kvm_pte_t pte = 0;
+> > -       stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte, NULL);
+> > +       stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte, NULL, 0);
+> 
+> Would be nice to have an enum for KVM_PGTABLE_WALK_EXCLUSIVE so this
+> doesn't just have to pass 0.
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+That's also dangerous though since the param is a set of flags, not unique,
+arbitrary values.  E.g. this won't do the expected thing
 
+	if (flags & KVM_PGTABLE_WALK_EXCLUSIVE)
 
-> ---
->  arch/arm64/kvm/hyp/pgtable.c | 26 ++++++++++++--------------
->  1 file changed, 12 insertions(+), 14 deletions(-)
->
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index b9f0d792b8d9..238f29389617 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -804,18 +804,17 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->         else
->                 new = kvm_init_invalid_leaf_owner(data->owner_id);
->
-> -       if (stage2_pte_is_counted(ctx->old)) {
-> -               /*
-> -                * Skip updating the PTE if we are trying to recreate the exact
-> -                * same mapping or only change the access permissions. Instead,
-> -                * the vCPU will exit one more time from guest if still needed
-> -                * and then go through the path of relaxing permissions.
-> -                */
-> -               if (!stage2_pte_needs_update(ctx->old, new))
-> -                       return -EAGAIN;
-> +       /*
-> +        * Skip updating the PTE if we are trying to recreate the exact
-> +        * same mapping or only change the access permissions. Instead,
-> +        * the vCPU will exit one more time from guest if still needed
-> +        * and then go through the path of relaxing permissions.
-> +        */
-> +       if (!stage2_pte_needs_update(ctx->old, new))
-> +               return -EAGAIN;
->
-> -               stage2_put_pte(ctx, data->mmu, mm_ops);
-> -       }
-> +       if (!stage2_try_break_pte(ctx, data->mmu))
-> +               return -EAGAIN;
->
->         /* Perform CMOs before installation of the guest stage-2 PTE */
->         if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
-> @@ -825,9 +824,8 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->         if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
->                 mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
->
-> -       smp_store_release(ctx->ptep, new);
-> -       if (stage2_pte_is_counted(new))
-> -               mm_ops->get_page(ctx->ptep);
-> +       stage2_make_pte(ctx, new);
-> +
->         if (kvm_phys_is_valid(phys))
->                 data->phys += granule;
->         return 0;
-> --
-> 2.38.1.431.g37b22c650d-goog
->
+I assume compilers would complain, but never say never when it comes to compilers :-)
