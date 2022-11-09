@@ -2,201 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB5E4C4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50AA2C433FE
 	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 14:52:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A85244BABC;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EBAE4BACB;
 	Thu, 10 Nov 2022 09:52:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@intel.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id K47uo12uVMCD; Thu, 10 Nov 2022 09:52:01 -0500 (EST)
+	with ESMTP id LhBkTv3Csvak; Thu, 10 Nov 2022 09:52:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D5B84BB57;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9739A4BB5A;
 	Thu, 10 Nov 2022 09:51:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ACA324B8AF
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Nov 2022 05:35:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 679644BA1D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 17:23:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 50jqJdsNYkKX for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Nov 2022 05:35:11 -0500 (EST)
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B3EB44B878
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Nov 2022 05:35:10 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
- t=1667903710; x=1699439710;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-id:content-transfer-encoding: mime-version;
- bh=qETIum2KYwGc7vEfg46uyhkEvvddZG32/0wkkAWfUEI=;
- b=AfgkRf30kKFKeiN1J9uU6EP5LDWx68Gko8PbAPO8ECqbaURFjAQmQjjc
- DFwZr2/lQ5Q2N7pui3Y/K1/lF+g+te0RDmlpPv3c0BD11N8mjJjhtPILe
- z7WS+EQaJb86YEPWb5rtg7NskF+JKvMcvZpUVG6W1LkS3zI3lVt5orgZz
- BqY9d+qKK2TtPlV6+cmpkY2oA7iwC3H6UlawEwiS+sqLH5bSZx/1E7abs
- b9MH45pNs+6S9aKfKtvpWVZqovaEtDuLq+afZMrmUC3ZEM0WR1g5YgsI6
- uTAiHf+22ovoOZxJrjzQx+93Iw8fvpC8qEsZhuF1su4ndrXHru/paFIU2 A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="312453420"
-X-IronPort-AV: E=Sophos;i="5.96,147,1665471600"; d="scan'208";a="312453420"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 08 Nov 2022 02:35:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10524"; a="811192156"
-X-IronPort-AV: E=Sophos;i="5.96,147,1665471600"; d="scan'208";a="811192156"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
- by orsmga005.jf.intel.com with ESMTP; 08 Nov 2022 02:35:09 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 8 Nov 2022 02:35:08 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 8 Nov 2022 02:35:08 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Tue, 8 Nov 2022 02:35:08 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Tue, 8 Nov 2022 02:35:08 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YcGBZIVxpXcvEhb+31qU2B4b7IkFW0MTice/NY1lUI1+V2j1gLl4ZAfoCBJe5OSUtBJ74yl/XhLTxZf6h+4ZyAIDVLUy54JtKoam5QoEBCdYD+qukPOcqbTb6MZDPFjhJsHFS4mrMDrtsMfd33VzO0RtYTEEYhkvCAdGUrt65YGgfgqq4L43pxmns5+/GlOW02N1wSXxykkx2YAlT5TCfXvDz8WrrzB/HYVhO3NBV91iqiTTauez9GPu7Lj+l3iLq4+SYISkLCBTytse7bcFymIiu7o1lmC9gK327qvQoh6s5U+DdYs0ReSxWFcb/UCGQjgFRDC8wZ2sj6DCMqPDcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qETIum2KYwGc7vEfg46uyhkEvvddZG32/0wkkAWfUEI=;
- b=RlxtWk57yEJVS3uSJ7fCsJ6lcS97nPjWdvCMAQLcGmDwQ5fm4M2rywq0A72Qeg9MJc4rNORUzTHGx3+ksDRlgy1LWgwMZEcPbHCdGM/x2pry2x4qT7nyTtPWw32fW2u5Tvu2A650KdFMBr6nrB6dsx0TNyOm/FER1X/HpvQ7tJ6ccZm4SCMUYl9EOVetM3+aUoH261wsQsqYWEWvRGTGjycGmJcsqxsZy0OM53q6QZ3yissAHr8C83oWxDhK3aYcU7vSuO7u7uqXukz9SuyDiAGH68nNzQx15yEkE92kQPxNf6y1wR8kvMsQS7CCZtbq4PTPIGzrewz/7LF7/WLlWA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by PH7PR11MB7513.namprd11.prod.outlook.com (2603:10b6:510:270::20)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5791.26; Tue, 8 Nov
- 2022 10:35:03 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::6eb:99bf:5c45:a94b]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::6eb:99bf:5c45:a94b%3]) with mapi id 15.20.5791.026; Tue, 8 Nov 2022
- 10:35:03 +0000
-From: "Huang, Kai" <kai.huang@intel.com>
-To: "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>
-Subject: Re: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
-Thread-Topic: [PATCH 00/44] KVM: Rework kvm_init() and hardware enabling
-Thread-Index: AQHY7xGUTp4lUVPML0yWgaOmsA79Vq4uXPOAgADckACABM0oAIAAOK8AgABMrwCAADXwgIAAG2aA
-Date: Tue, 8 Nov 2022 10:35:02 +0000
-Message-ID: <4ea4f8422b22486717239b39a0c206e7a91d49a8.camel@intel.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221104071749.GC1063309@ls.amr.corp.intel.com>
- <Y2V1oslbw24/2Opd@google.com>
- <20221107214634.GE1063309@ls.amr.corp.intel.com>
- <bf29fe1ac84cae8ddb06e566b56c653600a1901c.camel@intel.com>
- <20221108054354.GA1708572@ls.amr.corp.intel.com>
- <9890f67846f1c2c6a12bd086fc822f0762966223.camel@intel.com>
-In-Reply-To: <9890f67846f1c2c6a12bd086fc822f0762966223.camel@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.44.4 (3.44.4-2.fc36) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|PH7PR11MB7513:EE_
-x-ms-office365-filtering-correlation-id: 28b49618-ff8e-49fc-5549-08dac174e50f
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: EFHMvj7I1yz7sZnu9UDrM4O3YcFgNcKtVXqye4FRiBAgQgV7hqhUxoAfqAH/3zWNBlcSJxVcSzL1PpmMl+T5qypZopMOcWafjryrp3f8kC+mPm38fIuEIb313BRm0aZmk+et/F8EBzjBTSTV7mGgnTMFUMNOuBuofYE54g0vql0O4tYEAmDM4LmM/qObuYoKuHSctZgIEZvaIR/7yOuUq8C7Hh4Ehp2//CAuOU7AwqeN1JPwu1jImgDaPT2+JkJnPo3DTIdwagR6YvNLQtX0g2VPPqCv4WlBRTYwZtXUt2Svm/K6g7jt3Mqbt5jUzEGDTC5oZt73Tga6N5jcQ3kY7hcVzuUtSlWT+Zn0XuQoyY5vmiWbIddnI3lXfMZePX/wBw8fNs7Xo+A0JfnPJR22xjea7M6FhU6u/Edz5tJDuxXXJ7Q01IXd29+ZukQQOJvb8f01V+J7+GC8AlvqdI7edwzFoccB5NJDBMHqs48wJNxhBejWu7Ozx0yHjHH98xlblXQ2S9qET3bD28UxXYcpDrhzwbPKVguWZAS/v1XG+uZ5yqSrnFntleCLaGIAC8JmHQPQFXwU5uQrYdDcgzWV1uEcFxo360MeU6t8TUvyiekLjM9+4lCVb5pLwtn8pB66YTebLS4NtM1uBoYVR11Yyf9GK4xfQhS+LYBtCyvo9gxRswu0pqD5l1OfV34fjcPuuPPQ8AJ5JPfZhcZEAIVFFLR0qOciVU7EW46y7oH5/lGa+XcfhjpeNhF8sU6hKBst
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:BL1PR11MB5978.namprd11.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(13230022)(396003)(39860400002)(346002)(366004)(376002)(136003)(451199015)(36756003)(86362001)(38070700005)(82960400001)(83380400001)(7406005)(2906002)(5660300002)(7416002)(6506007)(186003)(38100700002)(2616005)(107886003)(26005)(122000001)(6512007)(76116006)(66946007)(91956017)(6916009)(478600001)(66556008)(71200400001)(64756008)(66476007)(4326008)(66446008)(8676002)(41300700001)(6486002)(316002)(54906003)(8936002);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?OFovc1VFcXBGa2NUa0dTbXducnJ2UWJIdERGdktPOWxvelppZXlwUjhRYnVi?=
- =?utf-8?B?UUNyaFF0R2FPMGZRcVBOaW9rTHd2Wmt5SGxTSG8zakRpbWJHM0IxYVlKRWhB?=
- =?utf-8?B?SmFPWkVvQ0tYZ0lXVWJqLzRLTUY5MitMVHd5dk9hbzlCUFllMEpTSk04bDBh?=
- =?utf-8?B?VnJZRlVXdSs3MGxKT2MwS1hxQU5WK3RLV2lpUjlrczFqY1NBK2FqOGxQRXZj?=
- =?utf-8?B?ZXFLaGhLeVFzeGpmUUNVY2h1VHBkSHJKTHY1M2VjWHNVN1NYd09HZDZDTE0x?=
- =?utf-8?B?MVRsbHBDVG5adFRjdHZ3VU1QNkJ0cVoyeWl1MFk3Y3BzSUhybDB5bUxqa2VK?=
- =?utf-8?B?RWlvWGc4ZTFZVEJaTVJudkd4NS9PVWRYaTBuVU0waFVWQWd1Q0xxRGdpMjZM?=
- =?utf-8?B?eXpNZ1JGbStaOStOT3NZdnRXRzNmWGNBSzBXbm9qTVFDejJQRjJvMlFxQnRO?=
- =?utf-8?B?OHdiL0NyZHRiQ0NzQmxFVWppa0NHL0duSEl3T3VWSTdjcVJ4WUc1NmVTeE9w?=
- =?utf-8?B?UjliS0M2T3V3d2NTdFNsdC9XNXRBTy9vaE1uZlJWRjdvSElGL3U1RFFGelk0?=
- =?utf-8?B?Y2tER0pySEkwSDNvU2hUVkpkZU5Ga2FtRVlGUWpHaTY4NzgvbC96NXZFaFZu?=
- =?utf-8?B?T1ZNb1NodmZVa1Zrb1l1aFlHa3k1aTVKZzdJcnExTGR1ajMrNGJ3ZytMQlZT?=
- =?utf-8?B?czdOZVB4T2VMbnJKTlllSjVMUDVCTHo1QU9DaU9QL2NRZVBoSjhsN1hKWFZr?=
- =?utf-8?B?NS84MVBaM21nZ2dtdWlubGVZcEZTVDM5T00wM0h4clUzemkvNkhleDVlc2Vj?=
- =?utf-8?B?U1dUN3RNdlA5WjdST2hURXVlWFNVNWZ3NGtUZjFsR1BPSCtUT09qeERadFdZ?=
- =?utf-8?B?Z1N4QTNoeTNGcGx0WWtuZUNubnQwOHk1K0wzc1dZNWcvaXRySXhDQUpqVkRk?=
- =?utf-8?B?bWdrV3REY1U2NmZYU2JxTWNQWG1kMUs0UkJ4elpWTU1VM1JyVHpodUkyKzRG?=
- =?utf-8?B?MThMV0cxdG92Q2tGQUdCSVM2WDVURC9FaWpsWEdsd244MUdldVJ5TmxybDZJ?=
- =?utf-8?B?RmpNT2tmK0R5Tk1NU0NROE1YTEcveFFxdkpqemdIT0dSNkdtZHBSWXRNcWxi?=
- =?utf-8?B?MFRhOU83dHpqY29qTHo3T1Q0cWhPMEF4R2pwdUlDL1hmVjVabXFmLy9BWWYv?=
- =?utf-8?B?T0N4aWY0b1lORi9MSHhCMmlUeFFkcHdubGRzL2REMUdEbUZZcWpKUTJlcGI1?=
- =?utf-8?B?elVmWFdlN0FuaGlORjE2cFVxZUF2T21MMk9kSEkvM0x3K0JzTFFHNWVTM0Mw?=
- =?utf-8?B?b3BYU2lQTGNuMGp1Q1hKOEJyTkRJa2ZuZDcvTXdJbkZkRFJwYVN5bVl6WEhU?=
- =?utf-8?B?MndYRndxRjErOTFRUFZTNHUrSmY1aG1MMFgxVFZaYmRkSjZqSHY1TXhBS1Vm?=
- =?utf-8?B?WGlBUTlMcXB5djdQYUNvbTBYSG4yckNSZVAzS2Y5b1Y5YjlZaHpvK0tXdytK?=
- =?utf-8?B?bzM4cXdMQzEzZGpGZjY2cVdTZ1UyUXBMakJEMyt3VytRSWphM2VubFNRSHBH?=
- =?utf-8?B?c1VUa2d5NTVLaXg5SDA4UGxkRXFJLzMrRVRPSFFtdU13MTJ0a29WM3VtMDc4?=
- =?utf-8?B?a2NvdDFqS1lBcXJsZklFVjM3UG45Z3ZsWitTeFpIUkFrRDQ5UnlJVENWQTc4?=
- =?utf-8?B?NnpiWml0Umw5NkNHV2picWxUQzFPdS9pS3h0YWhLQitnWDNGb2s3ZEpHeUR0?=
- =?utf-8?B?MjZmNVBpcHhVL05EZ0hWQmNiUDJqSDdtTEhSRTlEc2NLbG5lTEVwOWlLYWh2?=
- =?utf-8?B?OEhNRnBMczFnMHhVOUFFUkY5Vkt3V29BaXRlbmFTbzVsRm02TW9rdkRqZlo0?=
- =?utf-8?B?SWpocjB1L0tOM0VvUU1mcHdjYUlxZHNrK2UyOVF0bHdZaFN4RGZKVldRVWUr?=
- =?utf-8?B?YTA0ZTQzdFhkR2RtdDlKRWVtK2pPTzFwcjJJR2tiVkZKNkRodFFVR0RaS2tw?=
- =?utf-8?B?dG1MWEtsOEZDeDRLMWJKTVdFTFd6bkR1cEhOd1VzMWF3V2tNdDhGN2NYM1RZ?=
- =?utf-8?B?Y01YY0lTUVNvY202eHNXOHFxQUFUWXlmaENOYndjdDI1cGU0Yk5CbWlyWEtk?=
- =?utf-8?B?YUZHRHZtS0JNc3FXVUREZlpZTlA1aGI3Q25OREhaR3hVZUhrc2ROWXFnVklG?=
- =?utf-8?B?MHc9PQ==?=
-Content-ID: <29C96261C107024F81A22260C6B7C04A@namprd11.prod.outlook.com>
+ with ESMTP id f9samL30kf0L for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Nov 2022 17:23:20 -0500 (EST)
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com
+ [209.85.222.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 49B7D4BA1C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 17:23:20 -0500 (EST)
+Received: by mail-qk1-f174.google.com with SMTP id x18so129807qki.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Nov 2022 14:23:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:from:to:cc:subject:date:message-id:reply-to;
+ bh=7+XKvQNZTA2Lrh1T8NHSrBOzGdUOuD1R2UcbCitS5c0=;
+ b=XaGqb+I+XIuXxbFNc+zyHp7YNDYLKtGAw8kx1uKphi8/8QekE+wQnDQ0R7zk8iIw+p
+ Q6pKz8BkaQFq7uzovOqUyUUep3UqZ3/YOqVuaI3/dX2ADWDnA9RJSxZHFLHdvbDXp+/l
+ urMQUJN/oFtElp0zPbQOD7GAkm/REO4BbgQeLdEtLUx2QjDok+1415RMD90BHmbkABPW
+ /I4NyjhcBtzVIf6M4Q89SHwle9IVI1YcDthMb6/7Dxy0nFmYMRzqOvJkR+0QHOeuYQUb
+ CLFlHQvVESln/RLsuQfNi963zFk9egiiEjfa+7SVigwkcIFbfVc/XOgAXPAS7P/d1pa6
+ W6+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+ :reply-to;
+ bh=7+XKvQNZTA2Lrh1T8NHSrBOzGdUOuD1R2UcbCitS5c0=;
+ b=ePn6ydbDii7e/kCnOLB8qlVt9VpHFqIbHW0k+gMTi0+UDoTB1V+cniHyyUSOhTsNaA
+ m64FFqAuZVwwEin2lBY+kYNnfmgyB7fZ7X6ELcpSsm8AMnTaEsptbiL+KohneS+vixdj
+ IeUYfjKdYkNYZYOCdr9Csybv8z2EQ9t5GWSqpoRbL4hHApK6najaskvrQvUZj5HXwWZk
+ xDZT7y6aI9fPvk8CagB9wP6KXqq7Bj4K1ViC1iwp/ptuvkAcBkfhjJM0GJmQGGzKAa2F
+ ZB4EjV/HpWmSrsJlx5tk48rBIqgv9MOgl7IA5lYSIyzaLd0mjN7IhkgZ+3fY3ht1S1jW
+ pdjg==
+X-Gm-Message-State: ACrzQf2DnB92w9Zg9Od43vJ+uRc4+S8m4e44jK9QO8/3LcDNSM/K1wUy
+ YS00VALASk1zxogXZKg4pp2JAZeb2xr8/tBEfOvhwA==
+X-Google-Smtp-Source: AMsMyM5ZpuwZOMYbeiupVv2kRd4DELH05heYb9SSay7qX/SuVCES88GwLiYBjpKk5iwZxVbXZ4CLtOLHzUnmp1pxB2o=
+X-Received: by 2002:ae9:eb48:0:b0:6fa:d61:4510 with SMTP id
+ b69-20020ae9eb48000000b006fa0d614510mr43493856qkg.768.1668032599310; Wed, 09
+ Nov 2022 14:23:19 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 28b49618-ff8e-49fc-5549-08dac174e50f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2022 10:35:02.9231 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BGpd/xqpcNQRreIBOeohnpoO/4LrzcGf3XilZADIvgXV6u6g86+e6qRV2fANY5077fjOTQ0vyt0wMi0Xd3yvpQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7513
-X-OriginatorOrg: intel.com
+References: <20221107215644.1895162-1-oliver.upton@linux.dev>
+ <20221107215644.1895162-2-oliver.upton@linux.dev>
+In-Reply-To: <20221107215644.1895162-2-oliver.upton@linux.dev>
+From: Ben Gardon <bgardon@google.com>
+Date: Wed, 9 Nov 2022 14:23:08 -0800
+Message-ID: <CANgfPd9ooA5c+ZQMx4-yy+n92TsxoAXZyHRoTpatoSOb+jXi-w@mail.gmail.com>
+Subject: Re: [PATCH v5 01/14] KVM: arm64: Combine visitor arguments into a
+ context structure
+To: Oliver Upton <oliver.upton@linux.dev>
 X-Mailman-Approved-At: Thu, 10 Nov 2022 09:51:44 -0500
-Cc: "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
- "david@redhat.com" <david@redhat.com>,
- "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
- "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
- "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
- "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
- "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "Gao,
- Chao" <chao.gao@intel.com>, "farman@linux.ibm.com" <farman@linux.ibm.com>,
- "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "Yao,
- Yuan" <yuan.yao@intel.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- "frankja@linux.ibm.com" <frankja@linux.ibm.com>, "Yamahata,
- Isaku" <isaku.yamahata@intel.com>,
- "atishp@atishpatra.org" <atishp@atishpatra.org>,
- "farosas@linux.ibm.com" <farosas@linux.ibm.com>,
- "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
- "palmer@dabbelt.com" <palmer@dabbelt.com>,
- "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
- "maz@kernel.org" <maz@kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "vkuznets@redhat.com" <vkuznets@redhat.com>,
- "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
+ David Matlack <dmatlack@google.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -208,46 +84,735 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gVHVlLCAyMDIyLTExLTA4IGF0IDA4OjU2ICswMDAwLCBIdWFuZywgS2FpIHdyb3RlOg0KPiBP
-biBNb24sIDIwMjItMTEtMDcgYXQgMjE6NDMgLTA4MDAsIElzYWt1IFlhbWFoYXRhIHdyb3RlOg0K
-PiA+IE9uIFR1ZSwgTm92IDA4LCAyMDIyIGF0IDAxOjA5OjI3QU0gKzAwMDAsDQo+ID4gIkh1YW5n
-LCBLYWkiIDxrYWkuaHVhbmdAaW50ZWwuY29tPiB3cm90ZToNCj4gPiANCj4gPiA+IE9uIE1vbiwg
-MjAyMi0xMS0wNyBhdCAxMzo0NiAtMDgwMCwgSXNha3UgWWFtYWhhdGEgd3JvdGU6DQo+ID4gPiA+
-ID4gT24gRnJpLCBOb3YgMDQsIDIwMjIsIElzYWt1IFlhbWFoYXRhIHdyb3RlOg0KPiA+ID4gPiA+
-ID4gVGhhbmtzIGZvciB0aGUgcGF0Y2ggc2VyaWVzLiBJIHRoZSByZWJhc2VkIFREWCBLVk0gcGF0
-Y2ggc2VyaWVzIGFuZCBpdA0KPiA+ID4gPiA+ID4gd29ya2VkLg0KPiA+ID4gPiA+ID4gU2luY2Ug
-Y3B1IG9mZmxpbmUgbmVlZHMgdG8gYmUgcmVqZWN0ZWQgaW4gc29tZSBjYXNlcyhUbyBrZWVwIGF0
-IGxlYXN0IG9uZQ0KPiA+ID4gPiA+ID4gY3B1DQo+ID4gPiA+ID4gPiBvbiBhIHBhY2thZ2UpLCBh
-cmNoIGhvb2sgZm9yIGNwdSBvZmZsaW5lIGlzIG5lZWRlZC4NCj4gPiA+ID4gPiANCj4gPiA+ID4g
-PiBJIGhhdGUgdG8gYnJpbmcgdGhpcyB1cCBiZWNhdXNlIEkgZG91YnQgdGhlcmUncyBhIHJlYWwg
-dXNlIGNhc2UgZm9yIFNVU1BFTkQNCj4gPiA+ID4gPiB3aXRoDQo+ID4gPiA+ID4gVERYLCBidXQg
-dGhlIENQVSBvZmZsaW5lIHBhdGggaXNuJ3QganVzdCBmb3IgdHJ1ZSBvZmZsaW5pbmcgb2YgQ1BV
-cy7CoCBXaGVuDQo+ID4gPiA+ID4gdGhlDQo+ID4gPiA+ID4gc3lzdGVtIGVudGVycyBTVVNQRU5E
-LCBvbmx5IHRoZSBpbml0aWF0aW5nIENQVSBnb2VzIHRocm91Z2gNCj4gPiA+ID4gPiBrdm1fc3Vz
-cGVuZCgpK2t2bV9yZXN1bWUoKSwNCj4gPiA+ID4gPiBhbGwgcmVzcG9uZGluZyBDUFVzIGdvIHRo
-cm91Z2ggQ1BVIG9mZmxpbmUrb25saW5lLsKgIEkuZS4gZGlzYWxsb3dpbmcgYWxsDQo+ID4gPiA+
-ID4gQ1BVcyBmcm9tDQo+ID4gPiA+ID4gZ29pbmcgIm9mZmxpbmUiIHdpbGwgcHJldmVudCBzdXNw
-ZW5kaW5nIHRoZSBzeXN0ZW0uDQo+ID4gPiA+IA0KPiA+ID4gPiBUaGUgY3VycmVudCBURFggS1ZN
-IGltcGxlbWVudGF0aW9uIGRpc2FsbG93cyBDUFUgcGFja2FnZSBmcm9tIG9mZmxpbmUgb25seQ0K
-PiA+ID4gPiB3aGVuDQo+ID4gPiA+IFREcyBhcmUgcnVubmluZy7CoCBJZiBubyBURCBpcyBydW5u
-aW5nLCBDUFUgb2ZmbGluZSBpcyBhbGxvd2VkLsKgIFNvIGJlZm9yZQ0KPiA+ID4gPiBTVVNQRU5E
-LCBURHMgbmVlZCB0byBiZSBraWxsZWQgdmlhIHN5c3RlbWQgb3Igc29tZXRoaW5nLsKgIEFmdGVy
-IGtpbGxpbmcgVERzLA0KPiA+ID4gPiB0aGUNCj4gPiA+ID4gc3lzdGVtIGNhbiBlbnRlciBpbnRv
-IFNVU1BFTkQgc3RhdGUuDQo+ID4gPiANCj4gPiA+IFRoaXMgc2VlbXMgbm90IGNvcnJlY3QuICBZ
-b3UgbmVlZCBvbmUgY3B1IGZvciBlYWNoIHRvIGJlIG9ubGluZSBpbiBvcmRlciB0bw0KPiA+ID4g
-Y3JlYXRlIFREIGFzIHdlbGwsIGFzIFRESC5NTkcuS0VZLkNPTkZJRyBuZWVkcyB0byBiZSBjYWxs
-ZWQgb24gYWxsIHBhY2thZ2VzLA0KPiA+ID4gY29ycmVjdD8NCj4gPiANCj4gPiBUaGF0J3MgY29y
-cmVjdC4gSW4gc3VjaCBjYXNlLCB0aGUgY3JlYXRpb24gb2YgVEQgZmFpbHMuICBURCBjcmVhdGlv
-biBjaGVja3MgaWYNCj4gPiBhdCBsZWFzdCBvbmUgY3B1IGlzIG9ubGluZSBvbiBhbGwgQ1BVIHBh
-Y2thZ2VzLiAgSWYgbm8sIGVycm9yLg0KPiANCj4gSSB0aGluayB3ZSBjYW4ganVzdCBhbHdheXMg
-cmVmdXNlIHRvIG9mZmxpbmUgdGhlIGxhc3QgY3B1IGZvciBlYWNoIHBhY2thZ2Ugd2hlbg0KPiBU
-RFggaXMgZW5hYmxlZC4gIEl0J3Mgc2ltcGxlciBJIGd1ZXNzLg0KDQpTb3JyeSBJIHdhc24ndCBy
-ZWFkaW5nIGNhcmVmdWxseS4gIFBsZWFzZSBpZ25vcmUuICBXZSBuZWVkIHRvIHN1cHBvcnQgc3Vz
-cGVuZCA6KQ0KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
-a3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8v
-bGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Mon, Nov 7, 2022 at 1:57 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+>
+> Passing new arguments by value to the visitor callbacks is extremely
+> inflexible for stuffing new parameters used by only some of the
+> visitors. Use a context structure instead and pass the pointer through
+> to the visitor callback.
+>
+> While at it, redefine the 'flags' parameter to the visitor to contain
+> the bit indicating the phase of the walk. Pass the entire set of flags
+> through the context structure such that the walker can communicate
+> additional state to the visitor callback.
+>
+> No functional change intended.
+>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+
+This looks good to me. It's all fairly mechanical and I don't see any
+problems. I was a little confused by the walk context flags passed via
+visit, because they seem somewhat redundant if the leaf-ness can be
+determined by looking at the PTE, but perhaps that's not always
+possible.
+
+Reviewed-by: Ben Gardon <bgardon@google.com>
+
+
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h  |  15 +-
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c |  10 +-
+>  arch/arm64/kvm/hyp/nvhe/setup.c       |  16 +-
+>  arch/arm64/kvm/hyp/pgtable.c          | 269 +++++++++++++-------------
+>  4 files changed, 154 insertions(+), 156 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 3252eb50ecfe..607f9bb8aab4 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -199,10 +199,17 @@ enum kvm_pgtable_walk_flags {
+>         KVM_PGTABLE_WALK_TABLE_POST             = BIT(2),
+>  };
+>
+> -typedef int (*kvm_pgtable_visitor_fn_t)(u64 addr, u64 end, u32 level,
+> -                                       kvm_pte_t *ptep,
+> -                                       enum kvm_pgtable_walk_flags flag,
+> -                                       void * const arg);
+> +struct kvm_pgtable_visit_ctx {
+> +       kvm_pte_t                               *ptep;
+> +       void                                    *arg;
+> +       u64                                     addr;
+> +       u64                                     end;
+> +       u32                                     level;
+> +       enum kvm_pgtable_walk_flags             flags;
+> +};
+> +
+> +typedef int (*kvm_pgtable_visitor_fn_t)(const struct kvm_pgtable_visit_ctx *ctx,
+> +                                       enum kvm_pgtable_walk_flags visit);
+>
+>  /**
+>   * struct kvm_pgtable_walker - Hook into a page-table walk.
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 1e78acf9662e..8f5b6a36a039 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -417,13 +417,11 @@ struct check_walk_data {
+>         enum pkvm_page_state    (*get_page_state)(kvm_pte_t pte);
+>  };
+>
+> -static int __check_page_state_visitor(u64 addr, u64 end, u32 level,
+> -                                     kvm_pte_t *ptep,
+> -                                     enum kvm_pgtable_walk_flags flag,
+> -                                     void * const arg)
+> +static int __check_page_state_visitor(const struct kvm_pgtable_visit_ctx *ctx,
+> +                                     enum kvm_pgtable_walk_flags visit)
+>  {
+> -       struct check_walk_data *d = arg;
+> -       kvm_pte_t pte = *ptep;
+> +       struct check_walk_data *d = ctx->arg;
+> +       kvm_pte_t pte = *ctx->ptep;
+>
+>         if (kvm_pte_valid(pte) && !addr_is_memory(kvm_pte_to_phys(pte)))
+>                 return -EINVAL;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index e8d4ea2fcfa0..a293cf5eba1b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -186,15 +186,13 @@ static void hpool_put_page(void *addr)
+>         hyp_put_page(&hpool, addr);
+>  }
+>
+> -static int finalize_host_mappings_walker(u64 addr, u64 end, u32 level,
+> -                                        kvm_pte_t *ptep,
+> -                                        enum kvm_pgtable_walk_flags flag,
+> -                                        void * const arg)
+> +static int finalize_host_mappings_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +                                        enum kvm_pgtable_walk_flags visit)
+>  {
+> -       struct kvm_pgtable_mm_ops *mm_ops = arg;
+> +       struct kvm_pgtable_mm_ops *mm_ops = ctx->arg;
+>         enum kvm_pgtable_prot prot;
+>         enum pkvm_page_state state;
+> -       kvm_pte_t pte = *ptep;
+> +       kvm_pte_t pte = *ctx->ptep;
+>         phys_addr_t phys;
+>
+>         if (!kvm_pte_valid(pte))
+> @@ -205,11 +203,11 @@ static int finalize_host_mappings_walker(u64 addr, u64 end, u32 level,
+>          * was unable to access the hyp_vmemmap and so the buddy allocator has
+>          * initialised the refcount to '1'.
+>          */
+> -       mm_ops->get_page(ptep);
+> -       if (flag != KVM_PGTABLE_WALK_LEAF)
+> +       mm_ops->get_page(ctx->ptep);
+> +       if (visit != KVM_PGTABLE_WALK_LEAF)
+>                 return 0;
+>
+> -       if (level != (KVM_PGTABLE_MAX_LEVELS - 1))
+> +       if (ctx->level != (KVM_PGTABLE_MAX_LEVELS - 1))
+>                 return -EINVAL;
+>
+>         phys = kvm_pte_to_phys(pte);
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index cdf8e76b0be1..900c8b9c0cfc 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -64,20 +64,20 @@ static bool kvm_phys_is_valid(u64 phys)
+>         return phys < BIT(id_aa64mmfr0_parange_to_phys_shift(ID_AA64MMFR0_EL1_PARANGE_MAX));
+>  }
+>
+> -static bool kvm_block_mapping_supported(u64 addr, u64 end, u64 phys, u32 level)
+> +static bool kvm_block_mapping_supported(const struct kvm_pgtable_visit_ctx *ctx, u64 phys)
+>  {
+> -       u64 granule = kvm_granule_size(level);
+> +       u64 granule = kvm_granule_size(ctx->level);
+>
+> -       if (!kvm_level_supports_block_mapping(level))
+> +       if (!kvm_level_supports_block_mapping(ctx->level))
+>                 return false;
+>
+> -       if (granule > (end - addr))
+> +       if (granule > (ctx->end - ctx->addr))
+>                 return false;
+>
+>         if (kvm_phys_is_valid(phys) && !IS_ALIGNED(phys, granule))
+>                 return false;
+>
+> -       return IS_ALIGNED(addr, granule);
+> +       return IS_ALIGNED(ctx->addr, granule);
+>  }
+>
+>  static u32 kvm_pgtable_idx(struct kvm_pgtable_walk_data *data, u32 level)
+> @@ -172,12 +172,12 @@ static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
+>         return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
+>  }
+>
+> -static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data, u64 addr,
+> -                                 u32 level, kvm_pte_t *ptep,
+> -                                 enum kvm_pgtable_walk_flags flag)
+> +static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
+> +                                 const struct kvm_pgtable_visit_ctx *ctx,
+> +                                 enum kvm_pgtable_walk_flags visit)
+>  {
+>         struct kvm_pgtable_walker *walker = data->walker;
+> -       return walker->cb(addr, data->end, level, ptep, flag, walker->arg);
+> +       return walker->cb(ctx, visit);
+>  }
+>
+>  static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
+> @@ -186,20 +186,24 @@ static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
+>  static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+>                                       kvm_pte_t *ptep, u32 level)
+>  {
+> +       enum kvm_pgtable_walk_flags flags = data->walker->flags;
+> +       struct kvm_pgtable_visit_ctx ctx = {
+> +               .ptep   = ptep,
+> +               .arg    = data->walker->arg,
+> +               .addr   = data->addr,
+> +               .end    = data->end,
+> +               .level  = level,
+> +               .flags  = flags,
+> +       };
+>         int ret = 0;
+> -       u64 addr = data->addr;
+>         kvm_pte_t *childp, pte = *ptep;
+>         bool table = kvm_pte_table(pte, level);
+> -       enum kvm_pgtable_walk_flags flags = data->walker->flags;
+>
+> -       if (table && (flags & KVM_PGTABLE_WALK_TABLE_PRE)) {
+> -               ret = kvm_pgtable_visitor_cb(data, addr, level, ptep,
+> -                                            KVM_PGTABLE_WALK_TABLE_PRE);
+> -       }
+> +       if (table && (ctx.flags & KVM_PGTABLE_WALK_TABLE_PRE))
+> +               ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_PRE);
+>
+> -       if (!table && (flags & KVM_PGTABLE_WALK_LEAF)) {
+> -               ret = kvm_pgtable_visitor_cb(data, addr, level, ptep,
+> -                                            KVM_PGTABLE_WALK_LEAF);
+> +       if (!table && (ctx.flags & KVM_PGTABLE_WALK_LEAF)) {
+> +               ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_LEAF);
+>                 pte = *ptep;
+>                 table = kvm_pte_table(pte, level);
+>         }
+> @@ -218,10 +222,8 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+>         if (ret)
+>                 goto out;
+>
+> -       if (flags & KVM_PGTABLE_WALK_TABLE_POST) {
+> -               ret = kvm_pgtable_visitor_cb(data, addr, level, ptep,
+> -                                            KVM_PGTABLE_WALK_TABLE_POST);
+> -       }
+> +       if (ctx.flags & KVM_PGTABLE_WALK_TABLE_POST)
+> +               ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_POST);
+>
+>  out:
+>         return ret;
+> @@ -292,13 +294,13 @@ struct leaf_walk_data {
+>         u32             level;
+>  };
+>
+> -static int leaf_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> -                      enum kvm_pgtable_walk_flags flag, void * const arg)
+> +static int leaf_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +                      enum kvm_pgtable_walk_flags visit)
+>  {
+> -       struct leaf_walk_data *data = arg;
+> +       struct leaf_walk_data *data = ctx->arg;
+>
+> -       data->pte   = *ptep;
+> -       data->level = level;
+> +       data->pte   = *ctx->ptep;
+> +       data->level = ctx->level;
+>
+>         return 0;
+>  }
+> @@ -383,47 +385,47 @@ enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte)
+>         return prot;
+>  }
+>
+> -static bool hyp_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+> -                                   kvm_pte_t *ptep, struct hyp_map_data *data)
+> +static bool hyp_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+> +                                   struct hyp_map_data *data)
+>  {
+> -       kvm_pte_t new, old = *ptep;
+> -       u64 granule = kvm_granule_size(level), phys = data->phys;
+> +       kvm_pte_t new, old = *ctx->ptep;
+> +       u64 granule = kvm_granule_size(ctx->level), phys = data->phys;
+>
+> -       if (!kvm_block_mapping_supported(addr, end, phys, level))
+> +       if (!kvm_block_mapping_supported(ctx, phys))
+>                 return false;
+>
+>         data->phys += granule;
+> -       new = kvm_init_valid_leaf_pte(phys, data->attr, level);
+> +       new = kvm_init_valid_leaf_pte(phys, data->attr, ctx->level);
+>         if (old == new)
+>                 return true;
+>         if (!kvm_pte_valid(old))
+> -               data->mm_ops->get_page(ptep);
+> +               data->mm_ops->get_page(ctx->ptep);
+>         else if (WARN_ON((old ^ new) & ~KVM_PTE_LEAF_ATTR_HI_SW))
+>                 return false;
+>
+> -       smp_store_release(ptep, new);
+> +       smp_store_release(ctx->ptep, new);
+>         return true;
+>  }
+>
+> -static int hyp_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> -                         enum kvm_pgtable_walk_flags flag, void * const arg)
+> +static int hyp_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +                         enum kvm_pgtable_walk_flags visit)
+>  {
+>         kvm_pte_t *childp;
+> -       struct hyp_map_data *data = arg;
+> +       struct hyp_map_data *data = ctx->arg;
+>         struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
+>
+> -       if (hyp_map_walker_try_leaf(addr, end, level, ptep, arg))
+> +       if (hyp_map_walker_try_leaf(ctx, data))
+>                 return 0;
+>
+> -       if (WARN_ON(level == KVM_PGTABLE_MAX_LEVELS - 1))
+> +       if (WARN_ON(ctx->level == KVM_PGTABLE_MAX_LEVELS - 1))
+>                 return -EINVAL;
+>
+>         childp = (kvm_pte_t *)mm_ops->zalloc_page(NULL);
+>         if (!childp)
+>                 return -ENOMEM;
+>
+> -       kvm_set_table_pte(ptep, childp, mm_ops);
+> -       mm_ops->get_page(ptep);
+> +       kvm_set_table_pte(ctx->ptep, childp, mm_ops);
+> +       mm_ops->get_page(ctx->ptep);
+>         return 0;
+>  }
+>
+> @@ -456,39 +458,39 @@ struct hyp_unmap_data {
+>         struct kvm_pgtable_mm_ops       *mm_ops;
+>  };
+>
+> -static int hyp_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> -                           enum kvm_pgtable_walk_flags flag, void * const arg)
+> +static int hyp_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +                           enum kvm_pgtable_walk_flags visit)
+>  {
+> -       kvm_pte_t pte = *ptep, *childp = NULL;
+> -       u64 granule = kvm_granule_size(level);
+> -       struct hyp_unmap_data *data = arg;
+> +       kvm_pte_t pte = *ctx->ptep, *childp = NULL;
+> +       u64 granule = kvm_granule_size(ctx->level);
+> +       struct hyp_unmap_data *data = ctx->arg;
+>         struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
+>
+>         if (!kvm_pte_valid(pte))
+>                 return -EINVAL;
+>
+> -       if (kvm_pte_table(pte, level)) {
+> +       if (kvm_pte_table(pte, ctx->level)) {
+>                 childp = kvm_pte_follow(pte, mm_ops);
+>
+>                 if (mm_ops->page_count(childp) != 1)
+>                         return 0;
+>
+> -               kvm_clear_pte(ptep);
+> +               kvm_clear_pte(ctx->ptep);
+>                 dsb(ishst);
+> -               __tlbi_level(vae2is, __TLBI_VADDR(addr, 0), level);
+> +               __tlbi_level(vae2is, __TLBI_VADDR(ctx->addr, 0), ctx->level);
+>         } else {
+> -               if (end - addr < granule)
+> +               if (ctx->end - ctx->addr < granule)
+>                         return -EINVAL;
+>
+> -               kvm_clear_pte(ptep);
+> +               kvm_clear_pte(ctx->ptep);
+>                 dsb(ishst);
+> -               __tlbi_level(vale2is, __TLBI_VADDR(addr, 0), level);
+> +               __tlbi_level(vale2is, __TLBI_VADDR(ctx->addr, 0), ctx->level);
+>                 data->unmapped += granule;
+>         }
+>
+>         dsb(ish);
+>         isb();
+> -       mm_ops->put_page(ptep);
+> +       mm_ops->put_page(ctx->ptep);
+>
+>         if (childp)
+>                 mm_ops->put_page(childp);
+> @@ -532,18 +534,18 @@ int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits,
+>         return 0;
+>  }
+>
+> -static int hyp_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> -                          enum kvm_pgtable_walk_flags flag, void * const arg)
+> +static int hyp_free_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +                          enum kvm_pgtable_walk_flags visit)
+>  {
+> -       struct kvm_pgtable_mm_ops *mm_ops = arg;
+> -       kvm_pte_t pte = *ptep;
+> +       struct kvm_pgtable_mm_ops *mm_ops = ctx->arg;
+> +       kvm_pte_t pte = *ctx->ptep;
+>
+>         if (!kvm_pte_valid(pte))
+>                 return 0;
+>
+> -       mm_ops->put_page(ptep);
+> +       mm_ops->put_page(ctx->ptep);
+>
+> -       if (kvm_pte_table(pte, level))
+> +       if (kvm_pte_table(pte, ctx->level))
+>                 mm_ops->put_page(kvm_pte_follow(pte, mm_ops));
+>
+>         return 0;
+> @@ -682,19 +684,19 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
+>         return !!pte;
+>  }
+>
+> -static void stage2_put_pte(kvm_pte_t *ptep, struct kvm_s2_mmu *mmu, u64 addr,
+> -                          u32 level, struct kvm_pgtable_mm_ops *mm_ops)
+> +static void stage2_put_pte(const struct kvm_pgtable_visit_ctx *ctx, struct kvm_s2_mmu *mmu,
+> +                          struct kvm_pgtable_mm_ops *mm_ops)
+>  {
+>         /*
+>          * Clear the existing PTE, and perform break-before-make with
+>          * TLB maintenance if it was valid.
+>          */
+> -       if (kvm_pte_valid(*ptep)) {
+> -               kvm_clear_pte(ptep);
+> -               kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, addr, level);
+> +       if (kvm_pte_valid(*ctx->ptep)) {
+> +               kvm_clear_pte(ctx->ptep);
+> +               kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
+>         }
+>
+> -       mm_ops->put_page(ptep);
+> +       mm_ops->put_page(ctx->ptep);
+>  }
+>
+>  static bool stage2_pte_cacheable(struct kvm_pgtable *pgt, kvm_pte_t pte)
+> @@ -708,29 +710,28 @@ static bool stage2_pte_executable(kvm_pte_t pte)
+>         return !(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN);
+>  }
+>
+> -static bool stage2_leaf_mapping_allowed(u64 addr, u64 end, u32 level,
+> +static bool stage2_leaf_mapping_allowed(const struct kvm_pgtable_visit_ctx *ctx,
+>                                         struct stage2_map_data *data)
+>  {
+> -       if (data->force_pte && (level < (KVM_PGTABLE_MAX_LEVELS - 1)))
+> +       if (data->force_pte && (ctx->level < (KVM_PGTABLE_MAX_LEVELS - 1)))
+>                 return false;
+>
+> -       return kvm_block_mapping_supported(addr, end, data->phys, level);
+> +       return kvm_block_mapping_supported(ctx, data->phys);
+>  }
+>
+> -static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+> -                                     kvm_pte_t *ptep,
+> +static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>                                       struct stage2_map_data *data)
+>  {
+> -       kvm_pte_t new, old = *ptep;
+> -       u64 granule = kvm_granule_size(level), phys = data->phys;
+> +       kvm_pte_t new, old = *ctx->ptep;
+> +       u64 granule = kvm_granule_size(ctx->level), phys = data->phys;
+>         struct kvm_pgtable *pgt = data->mmu->pgt;
+>         struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
+>
+> -       if (!stage2_leaf_mapping_allowed(addr, end, level, data))
+> +       if (!stage2_leaf_mapping_allowed(ctx, data))
+>                 return -E2BIG;
+>
+>         if (kvm_phys_is_valid(phys))
+> -               new = kvm_init_valid_leaf_pte(phys, data->attr, level);
+> +               new = kvm_init_valid_leaf_pte(phys, data->attr, ctx->level);
+>         else
+>                 new = kvm_init_invalid_leaf_owner(data->owner_id);
+>
+> @@ -744,7 +745,7 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+>                 if (!stage2_pte_needs_update(old, new))
+>                         return -EAGAIN;
+>
+> -               stage2_put_pte(ptep, data->mmu, addr, level, mm_ops);
+> +               stage2_put_pte(ctx, data->mmu, mm_ops);
+>         }
+>
+>         /* Perform CMOs before installation of the guest stage-2 PTE */
+> @@ -755,26 +756,25 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+>         if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
+>                 mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
+>
+> -       smp_store_release(ptep, new);
+> +       smp_store_release(ctx->ptep, new);
+>         if (stage2_pte_is_counted(new))
+> -               mm_ops->get_page(ptep);
+> +               mm_ops->get_page(ctx->ptep);
+>         if (kvm_phys_is_valid(phys))
+>                 data->phys += granule;
+>         return 0;
+>  }
+>
+> -static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
+> -                                    kvm_pte_t *ptep,
+> +static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
+>                                      struct stage2_map_data *data)
+>  {
+>         if (data->anchor)
+>                 return 0;
+>
+> -       if (!stage2_leaf_mapping_allowed(addr, end, level, data))
+> +       if (!stage2_leaf_mapping_allowed(ctx, data))
+>                 return 0;
+>
+> -       data->childp = kvm_pte_follow(*ptep, data->mm_ops);
+> -       kvm_clear_pte(ptep);
+> +       data->childp = kvm_pte_follow(*ctx->ptep, data->mm_ops);
+> +       kvm_clear_pte(ctx->ptep);
+>
+>         /*
+>          * Invalidate the whole stage-2, as we may have numerous leaf
+> @@ -782,29 +782,29 @@ static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
+>          * individually.
+>          */
+>         kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
+> -       data->anchor = ptep;
+> +       data->anchor = ctx->ptep;
+>         return 0;
+>  }
+>
+> -static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> +static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>                                 struct stage2_map_data *data)
+>  {
+>         struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
+> -       kvm_pte_t *childp, pte = *ptep;
+> +       kvm_pte_t *childp, pte = *ctx->ptep;
+>         int ret;
+>
+>         if (data->anchor) {
+>                 if (stage2_pte_is_counted(pte))
+> -                       mm_ops->put_page(ptep);
+> +                       mm_ops->put_page(ctx->ptep);
+>
+>                 return 0;
+>         }
+>
+> -       ret = stage2_map_walker_try_leaf(addr, end, level, ptep, data);
+> +       ret = stage2_map_walker_try_leaf(ctx, data);
+>         if (ret != -E2BIG)
+>                 return ret;
+>
+> -       if (WARN_ON(level == KVM_PGTABLE_MAX_LEVELS - 1))
+> +       if (WARN_ON(ctx->level == KVM_PGTABLE_MAX_LEVELS - 1))
+>                 return -EINVAL;
+>
+>         if (!data->memcache)
+> @@ -820,16 +820,15 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>          * will be mapped lazily.
+>          */
+>         if (stage2_pte_is_counted(pte))
+> -               stage2_put_pte(ptep, data->mmu, addr, level, mm_ops);
+> +               stage2_put_pte(ctx, data->mmu, mm_ops);
+>
+> -       kvm_set_table_pte(ptep, childp, mm_ops);
+> -       mm_ops->get_page(ptep);
+> +       kvm_set_table_pte(ctx->ptep, childp, mm_ops);
+> +       mm_ops->get_page(ctx->ptep);
+>
+>         return 0;
+>  }
+>
+> -static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
+> -                                     kvm_pte_t *ptep,
+> +static int stage2_map_walk_table_post(const struct kvm_pgtable_visit_ctx *ctx,
+>                                       struct stage2_map_data *data)
+>  {
+>         struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
+> @@ -839,17 +838,17 @@ static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
+>         if (!data->anchor)
+>                 return 0;
+>
+> -       if (data->anchor == ptep) {
+> +       if (data->anchor == ctx->ptep) {
+>                 childp = data->childp;
+>                 data->anchor = NULL;
+>                 data->childp = NULL;
+> -               ret = stage2_map_walk_leaf(addr, end, level, ptep, data);
+> +               ret = stage2_map_walk_leaf(ctx, data);
+>         } else {
+> -               childp = kvm_pte_follow(*ptep, mm_ops);
+> +               childp = kvm_pte_follow(*ctx->ptep, mm_ops);
+>         }
+>
+>         mm_ops->put_page(childp);
+> -       mm_ops->put_page(ptep);
+> +       mm_ops->put_page(ctx->ptep);
+>
+>         return ret;
+>  }
+> @@ -873,18 +872,18 @@ static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
+>   * the page-table, installing the block entry when it revisits the anchor
+>   * pointer and clearing the anchor to NULL.
+>   */
+> -static int stage2_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> -                            enum kvm_pgtable_walk_flags flag, void * const arg)
+> +static int stage2_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +                            enum kvm_pgtable_walk_flags visit)
+>  {
+> -       struct stage2_map_data *data = arg;
+> +       struct stage2_map_data *data = ctx->arg;
+>
+> -       switch (flag) {
+> +       switch (visit) {
+>         case KVM_PGTABLE_WALK_TABLE_PRE:
+> -               return stage2_map_walk_table_pre(addr, end, level, ptep, data);
+> +               return stage2_map_walk_table_pre(ctx, data);
+>         case KVM_PGTABLE_WALK_LEAF:
+> -               return stage2_map_walk_leaf(addr, end, level, ptep, data);
+> +               return stage2_map_walk_leaf(ctx, data);
+>         case KVM_PGTABLE_WALK_TABLE_POST:
+> -               return stage2_map_walk_table_post(addr, end, level, ptep, data);
+> +               return stage2_map_walk_table_post(ctx, data);
+>         }
+>
+>         return -EINVAL;
+> @@ -949,25 +948,24 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>         return ret;
+>  }
+>
+> -static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> -                              enum kvm_pgtable_walk_flags flag,
+> -                              void * const arg)
+> +static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +                              enum kvm_pgtable_walk_flags visit)
+>  {
+> -       struct kvm_pgtable *pgt = arg;
+> +       struct kvm_pgtable *pgt = ctx->arg;
+>         struct kvm_s2_mmu *mmu = pgt->mmu;
+>         struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+> -       kvm_pte_t pte = *ptep, *childp = NULL;
+> +       kvm_pte_t pte = *ctx->ptep, *childp = NULL;
+>         bool need_flush = false;
+>
+>         if (!kvm_pte_valid(pte)) {
+>                 if (stage2_pte_is_counted(pte)) {
+> -                       kvm_clear_pte(ptep);
+> -                       mm_ops->put_page(ptep);
+> +                       kvm_clear_pte(ctx->ptep);
+> +                       mm_ops->put_page(ctx->ptep);
+>                 }
+>                 return 0;
+>         }
+>
+> -       if (kvm_pte_table(pte, level)) {
+> +       if (kvm_pte_table(pte, ctx->level)) {
+>                 childp = kvm_pte_follow(pte, mm_ops);
+>
+>                 if (mm_ops->page_count(childp) != 1)
+> @@ -981,11 +979,11 @@ static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>          * block entry and rely on the remaining portions being faulted
+>          * back lazily.
+>          */
+> -       stage2_put_pte(ptep, mmu, addr, level, mm_ops);
+> +       stage2_put_pte(ctx, mmu, mm_ops);
+>
+>         if (need_flush && mm_ops->dcache_clean_inval_poc)
+>                 mm_ops->dcache_clean_inval_poc(kvm_pte_follow(pte, mm_ops),
+> -                                              kvm_granule_size(level));
+> +                                              kvm_granule_size(ctx->level));
+>
+>         if (childp)
+>                 mm_ops->put_page(childp);
+> @@ -1012,18 +1010,17 @@ struct stage2_attr_data {
+>         struct kvm_pgtable_mm_ops       *mm_ops;
+>  };
+>
+> -static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> -                             enum kvm_pgtable_walk_flags flag,
+> -                             void * const arg)
+> +static int stage2_attr_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +                             enum kvm_pgtable_walk_flags visit)
+>  {
+> -       kvm_pte_t pte = *ptep;
+> -       struct stage2_attr_data *data = arg;
+> +       kvm_pte_t pte = *ctx->ptep;
+> +       struct stage2_attr_data *data = ctx->arg;
+>         struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
+>
+>         if (!kvm_pte_valid(pte))
+>                 return 0;
+>
+> -       data->level = level;
+> +       data->level = ctx->level;
+>         data->pte = pte;
+>         pte &= ~data->attr_clr;
+>         pte |= data->attr_set;
+> @@ -1039,10 +1036,10 @@ static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>                  * stage-2 PTE if we are going to add executable permission.
+>                  */
+>                 if (mm_ops->icache_inval_pou &&
+> -                   stage2_pte_executable(pte) && !stage2_pte_executable(*ptep))
+> +                   stage2_pte_executable(pte) && !stage2_pte_executable(*ctx->ptep))
+>                         mm_ops->icache_inval_pou(kvm_pte_follow(pte, mm_ops),
+> -                                                 kvm_granule_size(level));
+> -               WRITE_ONCE(*ptep, pte);
+> +                                                 kvm_granule_size(ctx->level));
+> +               WRITE_ONCE(*ctx->ptep, pte);
+>         }
+>
+>         return 0;
+> @@ -1140,20 +1137,19 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+>         return ret;
+>  }
+>
+> -static int stage2_flush_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> -                              enum kvm_pgtable_walk_flags flag,
+> -                              void * const arg)
+> +static int stage2_flush_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +                              enum kvm_pgtable_walk_flags visit)
+>  {
+> -       struct kvm_pgtable *pgt = arg;
+> +       struct kvm_pgtable *pgt = ctx->arg;
+>         struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+> -       kvm_pte_t pte = *ptep;
+> +       kvm_pte_t pte = *ctx->ptep;
+>
+>         if (!kvm_pte_valid(pte) || !stage2_pte_cacheable(pgt, pte))
+>                 return 0;
+>
+>         if (mm_ops->dcache_clean_inval_poc)
+>                 mm_ops->dcache_clean_inval_poc(kvm_pte_follow(pte, mm_ops),
+> -                                              kvm_granule_size(level));
+> +                                              kvm_granule_size(ctx->level));
+>         return 0;
+>  }
+>
+> @@ -1200,19 +1196,18 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>         return 0;
+>  }
+>
+> -static int stage2_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> -                             enum kvm_pgtable_walk_flags flag,
+> -                             void * const arg)
+> +static int stage2_free_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +                             enum kvm_pgtable_walk_flags visit)
+>  {
+> -       struct kvm_pgtable_mm_ops *mm_ops = arg;
+> -       kvm_pte_t pte = *ptep;
+> +       struct kvm_pgtable_mm_ops *mm_ops = ctx->arg;
+> +       kvm_pte_t pte = *ctx->ptep;
+>
+>         if (!stage2_pte_is_counted(pte))
+>                 return 0;
+>
+> -       mm_ops->put_page(ptep);
+> +       mm_ops->put_page(ctx->ptep);
+>
+> -       if (kvm_pte_table(pte, level))
+> +       if (kvm_pte_table(pte, ctx->level))
+>                 mm_ops->put_page(kvm_pte_follow(pte, mm_ops));
+>
+>         return 0;
+> --
+> 2.38.1.431.g37b22c650d-goog
+>
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
