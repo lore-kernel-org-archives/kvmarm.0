@@ -1,223 +1,108 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7251A629
-	for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 19:04:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A87FC433D7;
-	Thu, 10 Nov 2022 19:04:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E7151A629
+	for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 19:14:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CC41C433C1;
+	Thu, 10 Nov 2022 19:14:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668107084;
-	bh=UMaYZomZaRsHtJ0POtFMIHPZNQ1Icy7xTxlW9yeWwlg=;
+	s=k20201202; t=1668107641;
+	bh=T79CFtYcyb6c1mZV9P2/O70KOCeYCcKUaMZB5RbWzdg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XlKqNvdIaPmC0y2XTC4ql4ghgavnrMfG4gLX2vPlP0200WEluGnNrd8J+JZceIYiE
-	 i9a37osJEgLzSQo+mfI/XxXjhDWnSp7Y4bQfGWyIDQPitqW4OqxB+PdyAKIlvJcIUr
-	 0d2Dgs4h1imHD9lROrjNWMswkE5Qe0PiiayWll7OJutaE3bi4lYiNFVgR90XQp9spi
-	 YwUd72CLYcoNixLpO8nYSvXtbygJN/RXFMDSXVlxNrNUq07wAnAcYBz+3qzxzKfts6
-	 4YD/4HynPO6SXUt0T1pGTiegGyWCY2AriChHGrVkcX5+sApJcTaT8vLJWZ1QEd7CQI
-	 g8sFpVbN2/cSA==
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: Will Deacon <will@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	James Morse <james.morse@arm.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>,
-	Quentin Perret <qperret@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>,
-	kernel-team@android.com,
+	b=M71ylMGIDoqohUmZgQHkfUullJTju+MiiJxtGl2+/DK3+Qe5lxPAOrA0bVmDx8pME
+	 TObqBbsw343dZSNcM+pdNcOA2W8p7uCF8r/VeNwnIb8aG8eSRO1hHzUb9G+ASqce+m
+	 CsOmTLmoxv+Ca+xzaCi56t1cLcxbQ+RGppq5plgPxP4kJJP7l46E/O1C8oOXHrIc4A
+	 QFbnsFVJpTwQ6zWpp84hWIWB/6XtPto7eP5f+LIlpRImONfGI/zz9i+DlZNBJQWJn4
+	 +5SqLoaK/TFPwCCUDIdcoeam5e7EQDyTmFYy3IFrrsQZFo6WP+bms9uIc3S/UBbkY1
+	 pONGyRuYZrC/g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1otCzu-005Ekr-OL;
+	Thu, 10 Nov 2022 19:13:58 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: andrew.jones@linux.dev,
 	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [RFC PATCH v6 26/26] KVM: arm64: Use the pKVM hyp vCPU structure in handle___kvm_vcpu_run()
-Date: Thu, 10 Nov 2022 19:02:59 +0000
-Message-Id: <20221110190259.26861-27-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20221110190259.26861-1-will@kernel.org>
-References: <20221110190259.26861-1-will@kernel.org>
+	Ricardo Koller <ricarkol@google.com>,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu
+Cc: bgardon@google.com,
+	oupton@google.com,
+	reijiw@google.com,
+	pbonzini@redhat.com,
+	eric.auger@redhat.com,
+	rananta@google.com,
+	axelrasmussen@google.com,
+	alexandru.elisei@arm.com,
+	dmatlack@google.com,
+	seanjc@google.com
+Subject: Re: [PATCH v10 00/14] KVM: selftests: Add aarch64/page_fault_test
+Date: Thu, 10 Nov 2022 19:13:53 +0000
+Message-ID: <166810762188.3361918.17667021556485650781.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221017195834.2295901-1-ricarkol@google.com>
+References: <20221017195834.2295901-1-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: andrew.jones@linux.dev, kvm@vger.kernel.org, ricarkol@google.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, bgardon@google.com, oupton@google.com, reijiw@google.com, pbonzini@redhat.com, eric.auger@redhat.com, rananta@google.com, axelrasmussen@google.com, alexandru.elisei@arm.com, dmatlack@google.com, seanjc@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221110191353.vs5danp7JJRQ-an0JB-E42dHetkxVdkIQVcQqj3yOKw@z>
 
-As a stepping stone towards deprivileging the host's access to the
-guest's vCPU structures, introduce some naive flush/sync routines to
-copy most of the host vCPU into the hyp vCPU on vCPU run and back
-again on return to EL1.
+On Mon, 17 Oct 2022 19:58:20 +0000, Ricardo Koller wrote:
+> This series adds a new aarch64 selftest for testing stage 2 fault handling
+> for various combinations of guest accesses (e.g., write, S1PTW), backing
+> sources (e.g., anon), and types of faults (e.g., read on hugetlbfs with a
+> hole, write on a readonly memslot). Each test tries a different combination
+> and then checks that the access results in the right behavior (e.g., uffd
+> faults with the right address and write/read flag). Some interesting
+> combinations are:
+> 
+> [...]
 
-This allows us to run using the pKVM hyp structures when KVM is
-initialised in protected mode.
+Applied to next, thanks!
 
-Tested-by: Vincent Donnefort <vdonnefort@google.com>
-Co-developed-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Will Deacon <will@kernel.org>
----
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  4 ++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c     | 79 +++++++++++++++++++++++++-
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 28 +++++++++
- 3 files changed, 109 insertions(+), 2 deletions(-)
+[01/14] KVM: selftests: Add a userfaultfd library
+        commit: a93871d0ea9fd59fb5eb783619334183d7f07f51
+[02/14] KVM: selftests: aarch64: Add virt_get_pte_hva() library function
+        commit: 228f324dc718f702e8777164c4e2e7426824fb13
+[03/14] KVM: selftests: Add missing close and munmap in __vm_mem_region_delete()
+        commit: b6b03b86c0250a80b671313dbc0d7bcdbab78f41
+[04/14] KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1 using sysreg.h macros
+        commit: 41f5189ea9c08f7fc28340a7aefc93d0d2dcb769
+[05/14] tools: Copy bitfield.h from the kernel sources
+        commit: 590b949597b1e811d35df2f32021dd17d8e47f8c
+[06/14] KVM: selftests: Stash backing_src_type in struct userspace_mem_region
+        commit: bd3ed7e1a47eb7b3838ca09439f1eb289ec3be1f
+[07/14] KVM: selftests: Add vm->memslots[] and enum kvm_mem_region_type
+        commit: 290c5b54012b7f05e9c51af32d557574bf69a654
+[08/14] KVM: selftests: Fix alignment in virt_arch_pgd_alloc() and vm_vaddr_alloc()
+        commit: 5485e822e31a75dfac3713d94b6b22025d4895da
+[09/14] KVM: selftests: Use the right memslot for code, page-tables, and data allocations
+        commit: 1446e331432d7f24ed56b870ad605a4345fee43f
+[10/14] KVM: selftests: aarch64: Add aarch64/page_fault_test
+        commit: 35c5810157124cb71aaa939cd2d5508192714877
+[11/14] KVM: selftests: aarch64: Add userfaultfd tests into page_fault_test
+        commit: 3b1d915659c64dce079f4926a648f2271faea008
+[12/14] KVM: selftests: aarch64: Add dirty logging tests into page_fault_test
+        commit: a4edf25b3e25656c69cbc768d1c704868e4a616f
+[13/14] KVM: selftests: aarch64: Add readonly memslot tests into page_fault_test
+        commit: 45acde40f538a30e759f3b3f4aa5089edf097b2f
+[14/14] KVM: selftests: aarch64: Add mix of tests into page_fault_test
+        commit: ff2b5509e1d252cd18bb1430b5461d5044701559
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index d14dfbcb7da1..82b3d62538a6 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -61,4 +61,8 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
- 		     unsigned long vcpu_hva);
- int __pkvm_teardown_vm(pkvm_handle_t handle);
- 
-+struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
-+					 unsigned int vcpu_idx);
-+void pkvm_put_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu);
-+
- #endif /* __ARM64_KVM_NVHE_PKVM_H__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index b5f3fcfe9135..728e01d4536b 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -22,11 +22,86 @@ DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
- 
- void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
- 
-+static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-+
-+	hyp_vcpu->vcpu.arch.ctxt	= host_vcpu->arch.ctxt;
-+
-+	hyp_vcpu->vcpu.arch.sve_state	= kern_hyp_va(host_vcpu->arch.sve_state);
-+	hyp_vcpu->vcpu.arch.sve_max_vl	= host_vcpu->arch.sve_max_vl;
-+
-+	hyp_vcpu->vcpu.arch.hw_mmu	= host_vcpu->arch.hw_mmu;
-+
-+	hyp_vcpu->vcpu.arch.hcr_el2	= host_vcpu->arch.hcr_el2;
-+	hyp_vcpu->vcpu.arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
-+	hyp_vcpu->vcpu.arch.cptr_el2	= host_vcpu->arch.cptr_el2;
-+
-+	hyp_vcpu->vcpu.arch.iflags	= host_vcpu->arch.iflags;
-+	hyp_vcpu->vcpu.arch.fp_state	= host_vcpu->arch.fp_state;
-+
-+	hyp_vcpu->vcpu.arch.debug_ptr	= kern_hyp_va(host_vcpu->arch.debug_ptr);
-+	hyp_vcpu->vcpu.arch.host_fpsimd_state = host_vcpu->arch.host_fpsimd_state;
-+
-+	hyp_vcpu->vcpu.arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
-+
-+	hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3 = host_vcpu->arch.vgic_cpu.vgic_v3;
-+}
-+
-+static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-+	struct vgic_v3_cpu_if *hyp_cpu_if = &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
-+	struct vgic_v3_cpu_if *host_cpu_if = &host_vcpu->arch.vgic_cpu.vgic_v3;
-+	unsigned int i;
-+
-+	host_vcpu->arch.ctxt		= hyp_vcpu->vcpu.arch.ctxt;
-+
-+	host_vcpu->arch.hcr_el2		= hyp_vcpu->vcpu.arch.hcr_el2;
-+	host_vcpu->arch.cptr_el2	= hyp_vcpu->vcpu.arch.cptr_el2;
-+
-+	host_vcpu->arch.fault		= hyp_vcpu->vcpu.arch.fault;
-+
-+	host_vcpu->arch.iflags		= hyp_vcpu->vcpu.arch.iflags;
-+	host_vcpu->arch.fp_state	= hyp_vcpu->vcpu.arch.fp_state;
-+
-+	host_cpu_if->vgic_hcr		= hyp_cpu_if->vgic_hcr;
-+	for (i = 0; i < hyp_cpu_if->used_lrs; ++i)
-+		host_cpu_if->vgic_lr[i] = hyp_cpu_if->vgic_lr[i];
-+}
-+
- static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
- {
--	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
-+	DECLARE_REG(struct kvm_vcpu *, host_vcpu, host_ctxt, 1);
-+	int ret;
-+
-+	host_vcpu = kern_hyp_va(host_vcpu);
-+
-+	if (unlikely(is_protected_kvm_enabled())) {
-+		struct pkvm_hyp_vcpu *hyp_vcpu;
-+		struct kvm *host_kvm;
-+
-+		host_kvm = kern_hyp_va(host_vcpu->kvm);
-+		hyp_vcpu = pkvm_load_hyp_vcpu(host_kvm->arch.pkvm.handle,
-+					      host_vcpu->vcpu_idx);
-+		if (!hyp_vcpu) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+
-+		flush_hyp_vcpu(hyp_vcpu);
-+
-+		ret = __kvm_vcpu_run(&hyp_vcpu->vcpu);
-+
-+		sync_hyp_vcpu(hyp_vcpu);
-+		pkvm_put_hyp_vcpu(hyp_vcpu);
-+	} else {
-+		/* The host is fully trusted, run its vCPU directly. */
-+		ret = __kvm_vcpu_run(host_vcpu);
-+	}
- 
--	cpu_reg(host_ctxt, 1) =  __kvm_vcpu_run(kern_hyp_va(vcpu));
-+out:
-+	cpu_reg(host_ctxt, 1) =  ret;
- }
- 
- static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index ed6ceac1e854..a06ece14a6d8 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -241,6 +241,33 @@ static struct pkvm_hyp_vm *get_vm_by_handle(pkvm_handle_t handle)
- 	return vm_table[idx];
- }
- 
-+struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
-+					 unsigned int vcpu_idx)
-+{
-+	struct pkvm_hyp_vcpu *hyp_vcpu = NULL;
-+	struct pkvm_hyp_vm *hyp_vm;
-+
-+	hyp_spin_lock(&vm_table_lock);
-+	hyp_vm = get_vm_by_handle(handle);
-+	if (!hyp_vm || hyp_vm->nr_vcpus <= vcpu_idx)
-+		goto unlock;
-+
-+	hyp_vcpu = hyp_vm->vcpus[vcpu_idx];
-+	hyp_page_ref_inc(hyp_virt_to_page(hyp_vm));
-+unlock:
-+	hyp_spin_unlock(&vm_table_lock);
-+	return hyp_vcpu;
-+}
-+
-+void pkvm_put_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	struct pkvm_hyp_vm *hyp_vm = pkvm_hyp_vcpu_to_hyp_vm(hyp_vcpu);
-+
-+	hyp_spin_lock(&vm_table_lock);
-+	hyp_page_ref_dec(hyp_virt_to_page(hyp_vm));
-+	hyp_spin_unlock(&vm_table_lock);
-+}
-+
- static void unpin_host_vcpu(struct kvm_vcpu *host_vcpu)
- {
- 	if (host_vcpu)
-@@ -286,6 +313,7 @@ static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
- 	hyp_vcpu->vcpu.vcpu_idx = vcpu_idx;
- 
- 	hyp_vcpu->vcpu.arch.hw_mmu = &hyp_vm->kvm.arch.mmu;
-+	hyp_vcpu->vcpu.arch.cflags = READ_ONCE(host_vcpu->arch.cflags);
- done:
- 	if (ret)
- 		unpin_host_vcpu(host_vcpu);
+Cheers,
+
+	M.
 -- 
-2.38.1.431.g37b22c650d-goog
+Without deviation from the norm, progress is not possible.
+
 
