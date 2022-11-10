@@ -2,59 +2,88 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C34AC433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 05:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13441C4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 10:26:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A7284BA62;
-	Thu, 10 Nov 2022 00:38:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7234B4BA95;
+	Thu, 10 Nov 2022 05:26:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EcuXyMw4B6Pm; Thu, 10 Nov 2022 00:38:56 -0500 (EST)
+	with ESMTP id tu9Q9BnEKNY9; Thu, 10 Nov 2022 05:26:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D69C4BA68;
-	Thu, 10 Nov 2022 00:38:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62DF54BA96;
+	Thu, 10 Nov 2022 05:26:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87C034BA62
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 00:38:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 177624BA92
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 05:26:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pVcQVY42qB7x for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Nov 2022 00:38:54 -0500 (EST)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2D4C24BA39
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 00:38:54 -0500 (EST)
-Date: Thu, 10 Nov 2022 05:38:43 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1668058728;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Cz0g122FW3hWdq2eHIOMV7hQCiSlXiVP/4zHh+q+Qq0=;
- b=niJA84Quup1g33NjpucWgilFD6cKWSGkmmg79fRyKKMCCj38GzothGXiO0FqQ/Ep/Zn3e/
- TxfMu/QWFWEvxts+FQHY1uvhJTwmeoOAGVHEHR/Gf33KdN6MHH1K28hIs1iegy+qSvtXD3
- dcIAT1pfI0BM3eJ40oo50kQD+mcDB/Q=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
+ with ESMTP id gQ3SRPI2D6e4 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Nov 2022 05:26:01 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D0E754BA80
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 05:26:01 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id A8E8A61214;
+ Thu, 10 Nov 2022 10:26:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1099DC433C1;
+ Thu, 10 Nov 2022 10:26:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1668075960;
+ bh=usVvc3qUSQzUyfwxt7bBhJT3G4j6rz4r+fc3JVOfoHM=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=ZfHO/A++9eV+bGyB9OV1AWT0/Z3ZHUQTBRPipeaAgPfF3Cl+i2WCaoT+sX7XX4YzF
+ yB8AYZyiCieu22R1vmylE8/UpHLkH1A0ETcdTSHvNUiewF9jwN68Ept7f9tz4jY3Jh
+ QCTHbvCGJzijmcRR7GBYe1GpSwxeSllvWkAM+wN5xUhhHrCsP99yHPQHtls7FZlU1s
+ IA0nt4hLT00Q1KZCS/JHYKCbwkOSKPlZ8p3cJVRrsSnpKyi+/NWJyAjmKe6WueOlkG
+ SzoneKfJGPQPHEvVTezhDsP5B9oXe7wDXQbK+59w0uF9dcc8UAOdTS5EzD7hQ4ayDR
+ U/hO9KL/VtsPA==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1ot4kv-0057cS-HF;
+ Thu, 10 Nov 2022 10:25:57 +0000
+Date: Thu, 10 Nov 2022 10:25:57 +0000
+Message-ID: <86sfirp0lm.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v5 04/14] KVM: arm64: Don't pass kvm_pgtable through
- kvm_pgtable_walk_data
-Message-ID: <Y2yOY0FKNmri8J4h@google.com>
-References: <20221107215644.1895162-1-oliver.upton@linux.dev>
- <20221107215644.1895162-5-oliver.upton@linux.dev>
- <acce8160-a559-648f-ea9f-995843b9a3fb@redhat.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <acce8160-a559-648f-ea9f-995843b9a3fb@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
- Ben Gardon <bgardon@google.com>, David Matlack <dmatlack@google.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v9 3/7] KVM: Support dirty ring in conjunction with bitmap
+In-Reply-To: <672eb11b-19db-9a9f-1898-8d2af0d45724@redhat.com>
+References: <20221108041039.111145-1-gshan@redhat.com>
+ <20221108041039.111145-4-gshan@redhat.com>
+ <Y2qDCqFeL1vwqq3f@google.com>
+ <49217b8f-ce53-c41b-98aa-ced34cd079cc@redhat.com>
+ <Y2rurDmCrXZaxY8F@google.com>
+ <49c18201-b73a-b654-7f8a-77befa80c61b@redhat.com>
+ <Y2r1ErahBE3+Dsv8@google.com>
+ <672eb11b-19db-9a9f-1898-8d2af0d45724@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gshan@redhat.com, seanjc@google.com, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, shuah@kernel.org,
+ catalin.marinas@arm.com, andrew.jones@linux.dev, ajones@ventanamicro.com,
+ bgardon@google.com, dmatlack@google.com, will@kernel.org,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, pbonzini@redhat.com,
+ peterx@redhat.com, oliver.upton@linux.dev, zhenyzha@redhat.com,
+ shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, bgardon@google.com, andrew.jones@linux.dev,
+ dmatlack@google.com, will@kernel.org, shan.gavin@gmail.com,
+ catalin.marinas@arm.com, kvmarm@lists.linux.dev, pbonzini@redhat.com,
+ zhenyzha@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
+ ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,52 +100,32 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Nov 10, 2022 at 01:30:08PM +0800, Gavin Shan wrote:
-> Hi Oliver,
+Hi Gavin,
+
+On Wed, 09 Nov 2022 00:51:21 +0000,
+Gavin Shan <gshan@redhat.com> wrote:
 > 
-> On 11/8/22 5:56 AM, Oliver Upton wrote:
-> > In order to tear down page tables from outside the context of
-> > kvm_pgtable (such as an RCU callback), stop passing a pointer through
-> > kvm_pgtable_walk_data.
-> > 
-> > No functional change intended.
-> > 
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > ---
-> >   arch/arm64/kvm/hyp/pgtable.c | 18 +++++-------------
-> >   1 file changed, 5 insertions(+), 13 deletions(-)
+> On 11/9/22 8:32 AM, Sean Christopherson wrote:
+> > That said, there're no remaining issues that can't be sorted out
+> > on top, so don't hold up v10 if I don't look at it in a timely
+> > manner for whatever reason.  I agree with Marc that it'd be good
+> > to get this in -next sooner than later.
 > > 
 > 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Sure. I would give v9 a few days, prior to posting v10. I'm not sure
+> if other people still have concerns. If there are more comments, I
+> want to address all of them in v10 :)
 
-Appreciated :)
+Please post v10 ASAP. I'm a bit behind on queuing stuff, and I'll be
+travelling next week, making it a bit more difficult to be on top of
+things. So whatever I can put into -next now is good.
 
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index db25e81a9890..93989b750a26 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -50,7 +50,6 @@
-> >   #define KVM_MAX_OWNER_ID		1
-> >   struct kvm_pgtable_walk_data {
-> > -	struct kvm_pgtable		*pgt;
-> >   	struct kvm_pgtable_walker	*walker;
-> >   	u64				addr;
-> 
-> Ok. Here is the answer why data->pgt->mm_ops isn't reachable in the walker
-> and visitor, and @mm_ops needs to be passed down.
-
-Yup, the reason for unhitching all of this from kvm_pgtable is explained
-in the cover letter as well:
-
-  Patches 1-4 clean up the context associated with a page table walk / PTE
-  visit. This is helpful for:
-   - Extending the context passed through for a visit
-   - Building page table walkers that operate outside of a kvm_pgtable
-     context (e.g. RCU callback)
-
---
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
