@@ -1,94 +1,246 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1934185E
-	for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 10:56:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1668077818;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EI4/m9Qd02qpE1/nZDW14QUuG36/1JG5M4vfvVB0x/4=;
-	b=LPgMRyc5JqWJYqg7yRdgfRji4pDr8piYSFhqr9vWi1OlhJ46lAIiiwWqC3+lqgM5JjmlSL
-	u1+IA9msvp4NEWASI5EyZglvFQMSsA0TIvTiOJuN7Mp09Mb4uWGPti30nifX3Fk/CCSei/
-	egfT8s3+tKdgzUiDWTwepiBu1tDRASU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-564-8pMJ5VrTM4SNvvdH64v-sg-1; Thu, 10 Nov 2022 05:56:53 -0500
-X-MC-Unique: 8pMJ5VrTM4SNvvdH64v-sg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3957885A59D;
-	Thu, 10 Nov 2022 10:56:52 +0000 (UTC)
-Received: from [10.64.54.49] (vpn2-54-49.bne.redhat.com [10.64.54.49])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 306B240C6F73;
-	Thu, 10 Nov 2022 10:56:45 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v9 3/7] KVM: Support dirty ring in conjunction with bitmap
-To: Marc Zyngier <maz@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, shuah@kernel.org,
- catalin.marinas@arm.com, andrew.jones@linux.dev, ajones@ventanamicro.com,
- bgardon@google.com, dmatlack@google.com, will@kernel.org,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, pbonzini@redhat.com,
- peterx@redhat.com, oliver.upton@linux.dev, zhenyzha@redhat.com,
- shan.gavin@gmail.com
-References: <20221108041039.111145-1-gshan@redhat.com>
- <20221108041039.111145-4-gshan@redhat.com> <Y2qDCqFeL1vwqq3f@google.com>
- <49217b8f-ce53-c41b-98aa-ced34cd079cc@redhat.com>
- <Y2rurDmCrXZaxY8F@google.com>
- <49c18201-b73a-b654-7f8a-77befa80c61b@redhat.com>
- <Y2r1ErahBE3+Dsv8@google.com>
- <672eb11b-19db-9a9f-1898-8d2af0d45724@redhat.com>
- <86sfirp0lm.wl-maz@kernel.org>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <94d9e15f-103b-304b-65a4-a9c60e590965@redhat.com>
-Date: Thu, 10 Nov 2022 18:56:43 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4859612DB3
+	for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 12:22:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC338C433D6;
+	Thu, 10 Nov 2022 12:22:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1668082936;
+	bh=W91//Q5p/av6RqQ//BHWaHh0G2y0jMwAuKUaYxm/zQI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oAz2FFUVvmlMGTAq7rwzLBMcUJqKxwZ2ulWakIBuE2qQ4elYc2nRHTi3jF0KpVwp5
+	 e692kQu1PFENjwd23Ruw5uk+Hr7RqCGUUC3/2a57ilujselmtn0viOJCNBpFWTx96N
+	 JzRM3g1VzUX5DmxfXaRNZK449utkCVj7MZ3cHXoe0h8jUgfS5rV8ODUDHQLfKSdCPP
+	 9g/nbtjMUoLb9NAALKD4rL4jVaGlgm5JLU9PrrzPb9P44sjqOPA6yIzJzY+7kwCF59
+	 AdK6R7Csb21krOdImIG5T11e898KxAAkSKlmcsKaKqggugBfXKw4hZGNKOHAdGYruL
+	 T55OcbMfZHErA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1ot6ZR-0059I0-GV;
+	Thu, 10 Nov 2022 12:22:13 +0000
+Date: Thu, 10 Nov 2022 12:22:12 +0000
+Message-ID: <86o7tfov7v.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 2/3] KVM: arm64: Allow userspace to trap SMCCC sub-ranges
+In-Reply-To: <20221110015327.3389351-3-oliver.upton@linux.dev>
+References: <20221110015327.3389351-1-oliver.upton@linux.dev>
+	<20221110015327.3389351-3-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <86sfirp0lm.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-Message-ID: <20221110105643.O6BZpDTPE_pNSmIjufFU8dv5-b41wZBo0FUnnfw8e6c@z>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221110122212.3d8opcXfkGcDvE4cW_-1ZQzFI948rnsShBzsLNYWg1c@z>
 
-Hi Marc,
-
-On 11/10/22 6:25 PM, Marc Zyngier wrote:
-> On Wed, 09 Nov 2022 00:51:21 +0000,
-> Gavin Shan <gshan@redhat.com> wrote:
->>
->> On 11/9/22 8:32 AM, Sean Christopherson wrote:
->>> That said, there're no remaining issues that can't be sorted out
->>> on top, so don't hold up v10 if I don't look at it in a timely
->>> manner for whatever reason.  I agree with Marc that it'd be good
->>> to get this in -next sooner than later.
->>>
->>
->> Sure. I would give v9 a few days, prior to posting v10. I'm not sure
->> if other people still have concerns. If there are more comments, I
->> want to address all of them in v10 :)
+On Thu, 10 Nov 2022 01:53:26 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Please post v10 ASAP. I'm a bit behind on queuing stuff, and I'll be
-> travelling next week, making it a bit more difficult to be on top of
-> things. So whatever I can put into -next now is good.
+> As the SMCCC (and related specifications) march towards an
+> 'everything and the kitchen sink' interface for interacting with a
+> system, it is less likely that KVM will implement every supported
+> feature.
 > 
+> Add a capability that allows userspace to trap hypercall ranges,
+> allowing the VMM to mix-and-match between calls handled in userspace vs.
+> KVM.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  5 ++++
+>  arch/arm64/include/uapi/asm/kvm.h | 15 ++++++++++
+>  arch/arm64/kvm/arm.c              | 10 +++++++
+>  arch/arm64/kvm/hypercalls.c       | 48 +++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h          |  1 +
+>  5 files changed, 79 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e33ed7c09a28..cc3872f1900c 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -52,6 +52,9 @@
+>  
+>  #define KVM_HAVE_MMU_RWLOCK
+>  
+> +#define KVM_ARM_USER_HYPERCALL_FLAGS	\
+> +		GENMASK_ULL(KVM_ARM_USER_HYPERCALL_FLAGS_COUNT - 1, 0)
+> +
+>  /*
+>   * Mode of operation configurable with kvm-arm.mode early param.
+>   * See Documentation/admin-guide/kernel-parameters.txt for more information.
+> @@ -104,11 +107,13 @@ struct kvm_arch_memory_slot {
+>  /**
+>   * struct kvm_smccc_features: Descriptor of the hypercall services exposed to the guests
+>   *
+> + * @user_trap_bmap: Bitmap of SMCCC function ranges trapped to userspace
+>   * @std_bmap: Bitmap of standard secure service calls
+>   * @std_hyp_bmap: Bitmap of standard hypervisor service calls
+>   * @vendor_hyp_bmap: Bitmap of vendor specific hypervisor service calls
+>   */
+>  struct kvm_smccc_features {
+> +	unsigned long user_trap_bmap;
 
-Thanks, Marc. v10 was just posted :)
+nit: I strongly object to the word 'trap'. By definition, this is a
+trap. The difference here is that you *forward* something to userspace
+instead of implementing it in the kernel.
 
-https://lore.kernel.org/kvmarm/20221110104914.31280-1-gshan@redhat.com/T/#t
+>  	unsigned long std_bmap;
+>  	unsigned long std_hyp_bmap;
+>  	unsigned long vendor_hyp_bmap;
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 316917b98707..07fa3f597e61 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -370,6 +370,21 @@ enum {
+>  #endif
+>  };
+>  
+> +enum {
+> +	KVM_ARM_USER_HYPERCALL_OWNER_ARCH		= 0,
+> +	KVM_ARM_USER_HYPERCALL_OWNER_CPU		= 1,
+> +	KVM_ARM_USER_HYPERCALL_OWNER_SIP		= 2,
+> +	KVM_ARM_USER_HYPERCALL_OWNER_OEM		= 3,
+> +	KVM_ARM_USER_HYPERCALL_OWNER_STANDARD		= 4,
+> +	KVM_ARM_USER_HYPERCALL_OWNER_STANDARD_HYP	= 5,
+> +	KVM_ARM_USER_HYPERCALL_OWNER_VENDOR_HYP		= 6,
+> +	KVM_ARM_USER_HYPERCALL_OWNER_TRUSTED_APP	= 7,
+> +	KVM_ARM_USER_HYPERCALL_OWNER_TRUSTED_OS		= 8,
+> +#ifdef __KERNEL__
+> +	KVM_ARM_USER_HYPERCALL_FLAGS_COUNT,
+> +#endif
+> +};
+> +
+>  /* Device Control API: ARM VGIC */
+>  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
+>  #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS	1
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 6f0b56e7f8c7..6e8a222fc295 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -100,6 +100,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		r = 0;
+>  		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
+>  		break;
+> +	case KVM_CAP_ARM_USER_HYPERCALLS:
+> +		if (cap->args[0] & ~KVM_ARM_USER_HYPERCALL_FLAGS)
+> +			return -EINVAL;
+> +
+> +		r = 0;
+> +		kvm->arch.smccc_feat.user_trap_bmap = cap->args[0];
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		break;
+> @@ -285,6 +292,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+>  		r = system_has_full_ptr_auth();
+>  		break;
+> +	case KVM_CAP_ARM_USER_HYPERCALLS:
+> +		r = KVM_ARM_USER_HYPERCALL_FLAGS;
+> +		break;
+>  	default:
+>  		r = 0;
+>  	}
+> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> index 62ce45d0d957..22a23b12201d 100644
+> --- a/arch/arm64/kvm/hypercalls.c
+> +++ b/arch/arm64/kvm/hypercalls.c
+> @@ -92,6 +92,49 @@ static bool kvm_hvc_call_default_allowed(u32 func_id)
+>  	}
+>  }
+>  
+> +static bool kvm_hvc_call_user_trapped(struct kvm_vcpu *vcpu, u32 func_id)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	unsigned long *bmap = &kvm->arch.smccc_feat.user_trap_bmap;
+> +
+> +	switch (ARM_SMCCC_OWNER_NUM(func_id)) {
+> +	case ARM_SMCCC_OWNER_ARCH:
+> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_ARCH, bmap);
+> +	case ARM_SMCCC_OWNER_CPU:
+> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_CPU, bmap);
+> +	case ARM_SMCCC_OWNER_SIP:
+> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_SIP, bmap);
+> +	case ARM_SMCCC_OWNER_OEM:
+> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_OEM, bmap);
+> +	case ARM_SMCCC_OWNER_STANDARD:
+> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_STANDARD, bmap);
+> +	case ARM_SMCCC_OWNER_STANDARD_HYP:
+> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_STANDARD_HYP, bmap);
+> +	case ARM_SMCCC_OWNER_VENDOR_HYP:
+> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_VENDOR_HYP, bmap);
+> +	case ARM_SMCCC_OWNER_TRUSTED_APP ... ARM_SMCCC_OWNER_TRUSTED_APP_END:
+> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_TRUSTED_APP, bmap);
+> +	case ARM_SMCCC_OWNER_TRUSTED_OS ... ARM_SMCCC_OWNER_TRUSTED_OS_END:
+> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_TRUSTED_OS, bmap);
+> +	default:
+> +		return false;
+> +	}
+
+You have multiple problems here:
+
+- the granularity is way too coarse. You want to express arbitrary
+  ranges, and not necessarily grab a whole owner range.
+
+- you have now an overlap between ranges that are handled in the
+  kernel (PSCI, spectre mitigations) and ranges that userspace wants
+  to observe. Not good.
+
+If we are going down this road, this can only be done at the
+*function* level. And userspace must know that the kernel will refuse
+to forward some ranges.
+
+So obviously, this cannot be a simple bitmap. Making it a radix tree
+(or an xarray, which is basically the same thing) could work. And the
+filtering request from userspace can be similar to what we have for
+the PMU filters.
+
+> +}
+> +
+> +static void kvm_hvc_prepare_user_trap(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_run *run = vcpu->run;
+> +
+> +	run->exit_reason	= KVM_EXIT_HYPERCALL;
+> +	run->hypercall.nr	= smccc_get_function(vcpu);
+> +	run->hypercall.args[0]	= smccc_get_arg(vcpu, 1);
+> +	run->hypercall.args[1]	= smccc_get_arg(vcpu, 2);
+> +	run->hypercall.args[2]	= smccc_get_arg(vcpu, 3);
+> +	run->hypercall.args[3]	= smccc_get_arg(vcpu, 4);
+> +	run->hypercall.args[4]	= smccc_get_arg(vcpu, 5);
+> +	run->hypercall.args[5]	= smccc_get_arg(vcpu, 6);
+
+All of which is readily available through the ONE_REG interface. I'm
+mildly reluctant to expose another interface that disclose the same
+information (yes, I understand the performance impact).
 
 Thanks,
-Gavin
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
