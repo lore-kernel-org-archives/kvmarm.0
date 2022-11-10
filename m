@@ -2,75 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63F82C433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 19:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39D6EC433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 19:14:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3AE34BAEC;
-	Thu, 10 Nov 2022 14:07:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF72E4BAF9;
+	Thu, 10 Nov 2022 14:14:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0fWuBGvmdelE; Thu, 10 Nov 2022 14:07:18 -0500 (EST)
+	with ESMTP id QeUr9D7Ycn8I; Thu, 10 Nov 2022 14:14:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 858214BAF3;
-	Thu, 10 Nov 2022 14:07:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DA264BAF8;
+	Thu, 10 Nov 2022 14:14:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 621594BACF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 14:07:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 932074BAF3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 14:14:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5tChLLjkftQL for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Nov 2022 14:07:16 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 54EF54BAC9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 14:07:16 -0500 (EST)
+ with ESMTP id mSj65QqGa0P9 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Nov 2022 14:14:04 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2476F4BAFE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 14:14:04 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 74B3661E12;
- Thu, 10 Nov 2022 19:07:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D25B6C433C1;
- Thu, 10 Nov 2022 19:07:14 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id A3EEAB8224F;
+ Thu, 10 Nov 2022 19:14:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CC41C433C1;
+ Thu, 10 Nov 2022 19:14:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1668107234;
- bh=n5RqcH+r3Pr3N5MvLY5kNdjJD72G1QSkvwLCwqb/nxQ=;
+ s=k20201202; t=1668107641;
+ bh=T79CFtYcyb6c1mZV9P2/O70KOCeYCcKUaMZB5RbWzdg=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=lBykAl5QAR54gfFIPccn7LHfRTgCamAGEYwjYWRe99h9pr9hJBMuKXAQTbm4qr8nA
- GhmRzgSM5NA2kPRZp1WGGJVsF7uyH4UMKn1z3KSvTxVzBkf7TisBdL14TOevSTs5fy
- z1k3NirXzDdk5+6Qo1smXykdSxv9IuG1aue2RHTi1oJ1f4LWtMB9hvL8kvrOy9CBfj
- BLmAvzxQQS2aaRN6r6Kuokvc1pacDImbWb8mZpRAif/runUTi30aE/+dCbAgQ0K7S8
- wNF6E0DFjpnVo07UPaQ0T3AWEmoECANJNGM/mZAsEenu4cKRcQDRL3b7c7rAFerBBg
- hNXA81mwOjjSg==
+ b=M71ylMGIDoqohUmZgQHkfUullJTju+MiiJxtGl2+/DK3+Qe5lxPAOrA0bVmDx8pME
+ TObqBbsw343dZSNcM+pdNcOA2W8p7uCF8r/VeNwnIb8aG8eSRO1hHzUb9G+ASqce+m
+ CsOmTLmoxv+Ca+xzaCi56t1cLcxbQ+RGppq5plgPxP4kJJP7l46E/O1C8oOXHrIc4A
+ QFbnsFVJpTwQ6zWpp84hWIWB/6XtPto7eP5f+LIlpRImONfGI/zz9i+DlZNBJQWJn4
+ +5SqLoaK/TFPwCCUDIdcoeam5e7EQDyTmFYy3IFrrsQZFo6WP+bms9uIc3S/UBbkY1
+ pONGyRuYZrC/g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1otCtM-005Ecq-E2;
- Thu, 10 Nov 2022 19:07:12 +0000
+ (envelope-from <maz@kernel.org>) id 1otCzu-005Ekr-OL;
+ Thu, 10 Nov 2022 19:13:58 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu,
-	Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH v2 0/9] KVM: arm64: selftests: Test linked {break,
- watch}points
-Date: Thu, 10 Nov 2022 19:07:05 +0000
-Message-Id: <166810721166.3361564.3176052818843423972.b4-ty@kernel.org>
+To: andrew.jones@linux.dev, kvm@vger.kernel.org,
+ Ricardo Koller <ricarkol@google.com>, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v10 00/14] KVM: selftests: Add aarch64/page_fault_test
+Date: Thu, 10 Nov 2022 19:13:53 +0000
+Message-Id: <166810762188.3361918.17667021556485650781.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221020054202.2119018-1-reijiw@google.com>
-References: <20221020054202.2119018-1-reijiw@google.com>
+In-Reply-To: <20221017195834.2295901-1-ricarkol@google.com>
+References: <20221017195834.2295901-1-ricarkol@google.com>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, reijiw@google.com,
- andrew.jones@linux.dev, pbonzini@redhat.com, kvm@vger.kernel.org,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, jingzhangos@google.com,
- ricarkol@google.com, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- oliver.upton@linux.dev, rananta@google.com
+X-SA-Exim-Rcpt-To: andrew.jones@linux.dev, kvm@vger.kernel.org,
+ ricarkol@google.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ bgardon@google.com, oupton@google.com, reijiw@google.com, pbonzini@redhat.com,
+ eric.auger@redhat.com, rananta@google.com, axelrasmussen@google.com,
+ alexandru.elisei@arm.com, dmatlack@google.com, seanjc@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
- Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org
+Cc: bgardon@google.com, dmatlack@google.com, pbonzini@redhat.com,
+ axelrasmussen@google.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,40 +87,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 19 Oct 2022 22:41:53 -0700, Reiji Watanabe wrote:
-> This series adds test cases for linked {break,watch}points to the
-> debug-exceptions test, and expands {break,watch}point tests to
-> use non-zero {break,watch}points (the current test always uses
-> {break,watch}point#0).
-> 
-> Patches 1-6 add some helpers or do minor refactoring for
-> preparation of adding test cases in subsequent patches.
-> Patches 7-8 add test cases for a linked {break,watch}point.
-> Patch 9 expands {break,watch}point test cases to use non-zero
-> {break,watch}points.
+On Mon, 17 Oct 2022 19:58:20 +0000, Ricardo Koller wrote:
+> This series adds a new aarch64 selftest for testing stage 2 fault handling
+> for various combinations of guest accesses (e.g., write, S1PTW), backing
+> sources (e.g., anon), and types of faults (e.g., read on hugetlbfs with a
+> hole, write on a readonly memslot). Each test tries a different combination
+> and then checks that the access results in the right behavior (e.g., uffd
+> faults with the right address and write/read flag). Some interesting
+> combinations are:
 > 
 > [...]
 
 Applied to next, thanks!
 
-[1/9] KVM: arm64: selftests: Use FIELD_GET() to extract ID register fields
-      commit: 1a6182033f2d5c481aec1f8c1c26ebc649693d57
-[2/9] KVM: arm64: selftests: Add write_dbg{b,w}{c,v}r helpers in debug-exceptions
-      commit: f6d02aa28ae21161d64300bac62b2dde85584004
-[3/9] KVM: arm64: selftests: Remove the hard-coded {b,w}pn#0 from debug-exceptions
-      commit: 700b8860e02cbaa7dd1181a914ff38e0fae18bf0
-[4/9] KVM: arm64: selftests: Add helpers to enable debug exceptions
-      commit: 152880d8edf5ad6df5b4b4915a4d9f9085ab8fef
-[5/9] KVM: arm64: selftests: Stop unnecessary test stage tracking of debug-exceptions
-      commit: 948f439c9d0080972ec937f4aefbe51229546510
-[6/9] KVM: arm64: selftests: Change debug_version() to take ID_AA64DFR0_EL1
-      commit: 5dd544e882d96d43b363c5ef64683281f2a386d9
-[7/9] KVM: arm64: selftests: Add a test case for a linked breakpoint
-      commit: 142365932f5f296df593dd653d79194ff5457722
-[8/9] KVM: arm64: selftests: Add a test case for a linked watchpoint
-      commit: 5ced4e533b676b1a582d89aba5328e4b316957e0
-[9/9] KVM: arm64: selftests: Test with every breakpoint/watchpoint
-      commit: ebb8cc10316de3040efc4cfb40030f374cbbaa3b
+[01/14] KVM: selftests: Add a userfaultfd library
+        commit: a93871d0ea9fd59fb5eb783619334183d7f07f51
+[02/14] KVM: selftests: aarch64: Add virt_get_pte_hva() library function
+        commit: 228f324dc718f702e8777164c4e2e7426824fb13
+[03/14] KVM: selftests: Add missing close and munmap in __vm_mem_region_delete()
+        commit: b6b03b86c0250a80b671313dbc0d7bcdbab78f41
+[04/14] KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1 using sysreg.h macros
+        commit: 41f5189ea9c08f7fc28340a7aefc93d0d2dcb769
+[05/14] tools: Copy bitfield.h from the kernel sources
+        commit: 590b949597b1e811d35df2f32021dd17d8e47f8c
+[06/14] KVM: selftests: Stash backing_src_type in struct userspace_mem_region
+        commit: bd3ed7e1a47eb7b3838ca09439f1eb289ec3be1f
+[07/14] KVM: selftests: Add vm->memslots[] and enum kvm_mem_region_type
+        commit: 290c5b54012b7f05e9c51af32d557574bf69a654
+[08/14] KVM: selftests: Fix alignment in virt_arch_pgd_alloc() and vm_vaddr_alloc()
+        commit: 5485e822e31a75dfac3713d94b6b22025d4895da
+[09/14] KVM: selftests: Use the right memslot for code, page-tables, and data allocations
+        commit: 1446e331432d7f24ed56b870ad605a4345fee43f
+[10/14] KVM: selftests: aarch64: Add aarch64/page_fault_test
+        commit: 35c5810157124cb71aaa939cd2d5508192714877
+[11/14] KVM: selftests: aarch64: Add userfaultfd tests into page_fault_test
+        commit: 3b1d915659c64dce079f4926a648f2271faea008
+[12/14] KVM: selftests: aarch64: Add dirty logging tests into page_fault_test
+        commit: a4edf25b3e25656c69cbc768d1c704868e4a616f
+[13/14] KVM: selftests: aarch64: Add readonly memslot tests into page_fault_test
+        commit: 45acde40f538a30e759f3b3f4aa5089edf097b2f
+[14/14] KVM: selftests: aarch64: Add mix of tests into page_fault_test
+        commit: ff2b5509e1d252cd18bb1430b5461d5044701559
 
 Cheers,
 
