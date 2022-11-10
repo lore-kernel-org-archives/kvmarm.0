@@ -2,81 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA035C4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 12:22:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A429C4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 13:21:57 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BFC34BAA2;
-	Thu, 10 Nov 2022 07:22:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD7244BABC;
+	Thu, 10 Nov 2022 08:21:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EUN9yPfcUVTl; Thu, 10 Nov 2022 07:22:20 -0500 (EST)
+	with ESMTP id IRQLABbzoeuR; Thu, 10 Nov 2022 08:21:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB12F4BAA4;
-	Thu, 10 Nov 2022 07:22:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 904B34BAB0;
+	Thu, 10 Nov 2022 08:21:55 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 70C084BAA0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 07:22:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D003D4BAAE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 08:21:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MfTLPoiTy2nB for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Nov 2022 07:22:18 -0500 (EST)
+ with ESMTP id THVQEddx-n9i for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Nov 2022 08:21:52 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0EADA4BA9A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 07:22:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6ACB24BA9B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 08:21:52 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 884D5615C2;
- Thu, 10 Nov 2022 12:22:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC338C433D6;
- Thu, 10 Nov 2022 12:22:15 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id B99B961759;
+ Thu, 10 Nov 2022 13:21:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20B72C433C1;
+ Thu, 10 Nov 2022 13:21:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1668082936;
- bh=W91//Q5p/av6RqQ//BHWaHh0G2y0jMwAuKUaYxm/zQI=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=oAz2FFUVvmlMGTAq7rwzLBMcUJqKxwZ2ulWakIBuE2qQ4elYc2nRHTi3jF0KpVwp5
- e692kQu1PFENjwd23Ruw5uk+Hr7RqCGUUC3/2a57ilujselmtn0viOJCNBpFWTx96N
- JzRM3g1VzUX5DmxfXaRNZK449utkCVj7MZ3cHXoe0h8jUgfS5rV8ODUDHQLfKSdCPP
- 9g/nbtjMUoLb9NAALKD4rL4jVaGlgm5JLU9PrrzPb9P44sjqOPA6yIzJzY+7kwCF59
- AdK6R7Csb21krOdImIG5T11e898KxAAkSKlmcsKaKqggugBfXKw4hZGNKOHAdGYruL
- T55OcbMfZHErA==
-Received: from sofa.misterjones.org ([185.219.108.64]
- helo=goblin-girl.misterjones.org)
+ s=k20201202; t=1668086511;
+ bh=vsKYJwz6b+8G9OYObnAUmHW9XZF2g9Jn8L3VpwTYoLo=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=Cw9PUhvxJOphnbK+yH0weDhtE/IJ9rrAJtFBNWJ2OCUmFFXZ7mxR5nYCBMRtxoVAl
+ SATrNZktcM7DppSFMnU+61XPpGqM0/6Ty6QFUAwHtk8/t6Ibe4bCVN9olBTRvLCJtC
+ 6hhCZUHQT6gadLeUFZDtSjZXyg5wPWgq2/dh2mkrp7jE/98NOr5VXAOTQmfHgRzrVt
+ Q/tT43TCO3pG/dC/0r5B99h6oQ8z8q6yVufZzrRqegOt7mR8erArTIwZjTvvARF2rq
+ U8UKFHHDI+TkjNp84mBDHXNb33v96p5B3eiQ5IBw790HhW6MNyt4gXXas0CME2bqQs
+ bEJKPNpBRBjbQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1ot6ZR-0059I0-GV;
- Thu, 10 Nov 2022 12:22:13 +0000
-Date: Thu, 10 Nov 2022 12:22:12 +0000
-Message-ID: <86o7tfov7v.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1ot7V7-0059yG-00;
+ Thu, 10 Nov 2022 13:21:49 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH 2/3] KVM: arm64: Allow userspace to trap SMCCC
- sub-ranges
-In-Reply-To: <20221110015327.3389351-3-oliver.upton@linux.dev>
-References: <20221110015327.3389351-1-oliver.upton@linux.dev>
- <20221110015327.3389351-3-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+To: kvmarm@lists.linux.dev,
+	Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v10 0/7] KVM: arm64: Enable ring-based dirty memory
+ tracking
+Date: Thu, 10 Nov 2022 13:21:46 +0000
+Message-Id: <166808649563.2653656.5582018167024205345.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221110104914.31280-1-gshan@redhat.com>
+References: <20221110104914.31280-1-gshan@redhat.com>
+MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
- will@kernel.org, pbonzini@redhat.com, rananta@google.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, gshan@redhat.com,
+ catalin.marinas@arm.com, kvm@vger.kernel.org, ajones@ventanamicro.com,
+ bgardon@google.com, shuah@kernel.org, shan.gavin@gmail.com,
+ kvmarm@lists.cs.columbia.edu, dmatlack@google.com, andrew.jones@linux.dev,
+ zhenyzha@redhat.com, pbonzini@redhat.com, will@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
+ will@kernel.org, shan.gavin@gmail.com, bgardon@google.com, dmatlack@google.com,
+ pbonzini@redhat.com, zhenyzha@redhat.com, shuah@kernel.org,
+ kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,193 +89,43 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 10 Nov 2022 01:53:26 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Thu, 10 Nov 2022 18:49:07 +0800, Gavin Shan wrote:
+> This series enables the ring-based dirty memory tracking for ARM64.
+> The feature has been available and enabled on x86 for a while. It
+> is beneficial when the number of dirty pages is small in a checkpointing
+> system or live migration scenario. More details can be found from
+> fb04a1eddb1a ("KVM: X86: Implement ring-based dirty memory tracking").
 > 
-> As the SMCCC (and related specifications) march towards an
-> 'everything and the kitchen sink' interface for interacting with a
-> system, it is less likely that KVM will implement every supported
-> feature.
+> For PATCH[v9 3/7], Peter's ack-by is kept since the recent changes
+> don't fundamentally break what he agreed. However, it would be nice
+> for Peter to double confirm.
 > 
-> Add a capability that allows userspace to trap hypercall ranges,
-> allowing the VMM to mix-and-match between calls handled in userspace vs.
-> KVM.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  5 ++++
->  arch/arm64/include/uapi/asm/kvm.h | 15 ++++++++++
->  arch/arm64/kvm/arm.c              | 10 +++++++
->  arch/arm64/kvm/hypercalls.c       | 48 +++++++++++++++++++++++++++++++
->  include/uapi/linux/kvm.h          |  1 +
->  5 files changed, 79 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e33ed7c09a28..cc3872f1900c 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -52,6 +52,9 @@
->  
->  #define KVM_HAVE_MMU_RWLOCK
->  
-> +#define KVM_ARM_USER_HYPERCALL_FLAGS	\
-> +		GENMASK_ULL(KVM_ARM_USER_HYPERCALL_FLAGS_COUNT - 1, 0)
-> +
->  /*
->   * Mode of operation configurable with kvm-arm.mode early param.
->   * See Documentation/admin-guide/kernel-parameters.txt for more information.
-> @@ -104,11 +107,13 @@ struct kvm_arch_memory_slot {
->  /**
->   * struct kvm_smccc_features: Descriptor of the hypercall services exposed to the guests
->   *
-> + * @user_trap_bmap: Bitmap of SMCCC function ranges trapped to userspace
->   * @std_bmap: Bitmap of standard secure service calls
->   * @std_hyp_bmap: Bitmap of standard hypervisor service calls
->   * @vendor_hyp_bmap: Bitmap of vendor specific hypervisor service calls
->   */
->  struct kvm_smccc_features {
-> +	unsigned long user_trap_bmap;
+> [...]
 
-nit: I strongly object to the word 'trap'. By definition, this is a
-trap. The difference here is that you *forward* something to userspace
-instead of implementing it in the kernel.
+Applied to next, thanks!
 
->  	unsigned long std_bmap;
->  	unsigned long std_hyp_bmap;
->  	unsigned long vendor_hyp_bmap;
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 316917b98707..07fa3f597e61 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -370,6 +370,21 @@ enum {
->  #endif
->  };
->  
-> +enum {
-> +	KVM_ARM_USER_HYPERCALL_OWNER_ARCH		= 0,
-> +	KVM_ARM_USER_HYPERCALL_OWNER_CPU		= 1,
-> +	KVM_ARM_USER_HYPERCALL_OWNER_SIP		= 2,
-> +	KVM_ARM_USER_HYPERCALL_OWNER_OEM		= 3,
-> +	KVM_ARM_USER_HYPERCALL_OWNER_STANDARD		= 4,
-> +	KVM_ARM_USER_HYPERCALL_OWNER_STANDARD_HYP	= 5,
-> +	KVM_ARM_USER_HYPERCALL_OWNER_VENDOR_HYP		= 6,
-> +	KVM_ARM_USER_HYPERCALL_OWNER_TRUSTED_APP	= 7,
-> +	KVM_ARM_USER_HYPERCALL_OWNER_TRUSTED_OS		= 8,
-> +#ifdef __KERNEL__
-> +	KVM_ARM_USER_HYPERCALL_FLAGS_COUNT,
-> +#endif
-> +};
-> +
->  /* Device Control API: ARM VGIC */
->  #define KVM_DEV_ARM_VGIC_GRP_ADDR	0
->  #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS	1
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 6f0b56e7f8c7..6e8a222fc295 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -100,6 +100,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  		r = 0;
->  		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
->  		break;
-> +	case KVM_CAP_ARM_USER_HYPERCALLS:
-> +		if (cap->args[0] & ~KVM_ARM_USER_HYPERCALL_FLAGS)
-> +			return -EINVAL;
-> +
-> +		r = 0;
-> +		kvm->arch.smccc_feat.user_trap_bmap = cap->args[0];
-> +		break;
->  	default:
->  		r = -EINVAL;
->  		break;
-> @@ -285,6 +292,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_ARM_PTRAUTH_GENERIC:
->  		r = system_has_full_ptr_auth();
->  		break;
-> +	case KVM_CAP_ARM_USER_HYPERCALLS:
-> +		r = KVM_ARM_USER_HYPERCALL_FLAGS;
-> +		break;
->  	default:
->  		r = 0;
->  	}
-> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> index 62ce45d0d957..22a23b12201d 100644
-> --- a/arch/arm64/kvm/hypercalls.c
-> +++ b/arch/arm64/kvm/hypercalls.c
-> @@ -92,6 +92,49 @@ static bool kvm_hvc_call_default_allowed(u32 func_id)
->  	}
->  }
->  
-> +static bool kvm_hvc_call_user_trapped(struct kvm_vcpu *vcpu, u32 func_id)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	unsigned long *bmap = &kvm->arch.smccc_feat.user_trap_bmap;
-> +
-> +	switch (ARM_SMCCC_OWNER_NUM(func_id)) {
-> +	case ARM_SMCCC_OWNER_ARCH:
-> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_ARCH, bmap);
-> +	case ARM_SMCCC_OWNER_CPU:
-> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_CPU, bmap);
-> +	case ARM_SMCCC_OWNER_SIP:
-> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_SIP, bmap);
-> +	case ARM_SMCCC_OWNER_OEM:
-> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_OEM, bmap);
-> +	case ARM_SMCCC_OWNER_STANDARD:
-> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_STANDARD, bmap);
-> +	case ARM_SMCCC_OWNER_STANDARD_HYP:
-> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_STANDARD_HYP, bmap);
-> +	case ARM_SMCCC_OWNER_VENDOR_HYP:
-> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_VENDOR_HYP, bmap);
-> +	case ARM_SMCCC_OWNER_TRUSTED_APP ... ARM_SMCCC_OWNER_TRUSTED_APP_END:
-> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_TRUSTED_APP, bmap);
-> +	case ARM_SMCCC_OWNER_TRUSTED_OS ... ARM_SMCCC_OWNER_TRUSTED_OS_END:
-> +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_TRUSTED_OS, bmap);
-> +	default:
-> +		return false;
-> +	}
+[1/7] KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
+      commit: cf87ac739e488055a6046a410caa8f4da108948f
+[2/7] KVM: Move declaration of kvm_cpu_dirty_log_size() to kvm_dirty_ring.h
+      commit: e8a18565e59303ac12c626a161d72bd890bd2062
+[3/7] KVM: Support dirty ring in conjunction with bitmap
+      commit: 86bdf3ebcfe1ded055282536fecce13001874740
+[4/7] KVM: arm64: Enable ring-based dirty memory tracking
+      commit: 9cb1096f8590bc590326087bea65db932b53c3b5
+[5/7] KVM: selftests: Use host page size to map ring buffer in dirty_log_test
+      commit: a737f5ffb1e883e580730122be11c9eb832a7749
+[6/7] KVM: selftests: Clear dirty ring states between two modes in dirty_log_test
+      commit: 7167190ddb863bd061c0c6b61f4cec94184b40da
+[7/7] KVM: selftests: Automate choosing dirty ring size in dirty_log_test
+      commit: dc6df7d4d0633e65850d5372ae9f1234bcc6e26e
 
-You have multiple problems here:
-
-- the granularity is way too coarse. You want to express arbitrary
-  ranges, and not necessarily grab a whole owner range.
-
-- you have now an overlap between ranges that are handled in the
-  kernel (PSCI, spectre mitigations) and ranges that userspace wants
-  to observe. Not good.
-
-If we are going down this road, this can only be done at the
-*function* level. And userspace must know that the kernel will refuse
-to forward some ranges.
-
-So obviously, this cannot be a simple bitmap. Making it a radix tree
-(or an xarray, which is basically the same thing) could work. And the
-filtering request from userspace can be similar to what we have for
-the PMU filters.
-
-> +}
-> +
-> +static void kvm_hvc_prepare_user_trap(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_run *run = vcpu->run;
-> +
-> +	run->exit_reason	= KVM_EXIT_HYPERCALL;
-> +	run->hypercall.nr	= smccc_get_function(vcpu);
-> +	run->hypercall.args[0]	= smccc_get_arg(vcpu, 1);
-> +	run->hypercall.args[1]	= smccc_get_arg(vcpu, 2);
-> +	run->hypercall.args[2]	= smccc_get_arg(vcpu, 3);
-> +	run->hypercall.args[3]	= smccc_get_arg(vcpu, 4);
-> +	run->hypercall.args[4]	= smccc_get_arg(vcpu, 5);
-> +	run->hypercall.args[5]	= smccc_get_arg(vcpu, 6);
-
-All of which is readily available through the ONE_REG interface. I'm
-mildly reluctant to expose another interface that disclose the same
-information (yes, I understand the performance impact).
-
-Thanks,
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
