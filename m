@@ -1,92 +1,217 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2AE836E
-	for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 05:38:54 +0000 (UTC)
-Date: Thu, 10 Nov 2022 05:38:43 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1668058728;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cz0g122FW3hWdq2eHIOMV7hQCiSlXiVP/4zHh+q+Qq0=;
-	b=niJA84Quup1g33NjpucWgilFD6cKWSGkmmg79fRyKKMCCj38GzothGXiO0FqQ/Ep/Zn3e/
-	TxfMu/QWFWEvxts+FQHY1uvhJTwmeoOAGVHEHR/Gf33KdN6MHH1K28hIs1iegy+qSvtXD3
-	dcIAT1pfI0BM3eJ40oo50kQD+mcDB/Q=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Gavin Shan <gshan@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	David Matlack <dmatlack@google.com>,
-	Quentin Perret <qperret@google.com>,
-	Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
-	Will Deacon <will@kernel.org>,
-	Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v5 04/14] KVM: arm64: Don't pass kvm_pgtable through
- kvm_pgtable_walk_data
-Message-ID: <Y2yOY0FKNmri8J4h@google.com>
-References: <20221107215644.1895162-1-oliver.upton@linux.dev>
- <20221107215644.1895162-5-oliver.upton@linux.dev>
- <acce8160-a559-648f-ea9f-995843b9a3fb@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B06626
+	for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 07:26:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1668065202; x=1699601202;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=pbTBjPz4IyVuY4zZ6WctFWouTkxuPa2wDTFr4cxuFDk=;
+  b=NrBb9bBtweaIUa6a0y5SIGezjufPBv4++ijJexbep3Sj9VOkInx5vhWJ
+   qt6TampDbsWLdr1vKuCtWH+Sv5xQfbSPlALJ6z5TLDkhcs6daIwa9aXFZ
+   xw9nFPwiyIXgeGDkIvHj8fmNf3M/TezmiYbVuQtn/VgdOsHXZH+L3F0A7
+   FA9FQDflDe12Nb1WmTRWQhzBi+m1HIGQ/wieSR3C9SmaDXFSA4DI9mKi3
+   xtos/z8+Rccaee4j8q6aBP5r8smZuNLyf2pUkKx2dycXnIOqfMxSY4EJo
+   SZy3Qzcz86O+lX1VUX+G33saemkXWnOZTKiO2oYjjkCNpLxl+aCIley8V
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="312367415"
+X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
+   d="scan'208";a="312367415"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2022 23:26:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10526"; a="700688553"
+X-IronPort-AV: E=Sophos;i="5.96,153,1665471600"; 
+   d="scan'208";a="700688553"
+Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
+  by fmsmga008.fm.intel.com with ESMTP; 09 Nov 2022 23:26:33 -0800
+Message-ID: <301a8a33a5cbe5b4fd3efe03b05bb8410a46e9f5.camel@linux.intel.com>
+Subject: Re: [PATCH 37/44] KVM: Rename and move CPUHP_AP_KVM_STARTING to
+ ONLINE section
+From: Robert Hoo <robert.hu@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>, Huacai Chen
+ <chenhuacai@kernel.org>, Aleksandar Markovic
+ <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, Paul
+ Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>,  Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Matthew Rosato
+ <mjrosato@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, Vitaly
+ Kuznetsov <vkuznets@redhat.com>
+Cc: James Morse <james.morse@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Oliver Upton <oliver.upton@linux.dev>, Atish Patra <atishp@atishpatra.org>,
+ David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org,  kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, 
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>, 
+ Fabiano Rosas <farosas@linux.ibm.com>, Michael Ellerman
+ <mpe@ellerman.id.au>, Chao Gao <chao.gao@intel.com>,  Thomas Gleixner
+ <tglx@linutronix.de>, Yuan Yao <yuan.yao@intel.com>
+Date: Thu, 10 Nov 2022 15:26:32 +0800
+In-Reply-To: <20221102231911.3107438-38-seanjc@google.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+	 <20221102231911.3107438-38-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acce8160-a559-648f-ea9f-995843b9a3fb@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221110053843.FjA6wYJLUsN_NLlEjBhw4WiGr4oRt8WpzRaRweRU1u4@z>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Message-ID: <20221110072632.RLghg9cqNUpKx9mucmbWWrfVypPEcBapCO8NFy9S7zY@z>
 
-On Thu, Nov 10, 2022 at 01:30:08PM +0800, Gavin Shan wrote:
-> Hi Oliver,
+On Wed, 2022-11-02 at 23:19 +0000, Sean Christopherson wrote:
+> From: Chao Gao <chao.gao@intel.com>
 > 
-> On 11/8/22 5:56 AM, Oliver Upton wrote:
-> > In order to tear down page tables from outside the context of
-> > kvm_pgtable (such as an RCU callback), stop passing a pointer through
-> > kvm_pgtable_walk_data.
-> > 
-> > No functional change intended.
-> > 
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > ---
-> >   arch/arm64/kvm/hyp/pgtable.c | 18 +++++-------------
-> >   1 file changed, 5 insertions(+), 13 deletions(-)
-> > 
+> The CPU STARTING section doesn't allow callbacks to fail. Move KVM's
+> hotplug callback to ONLINE section so that it can abort onlining a
+> CPU in
+> certain cases to avoid potentially breaking VMs running on existing
+> CPUs.
+> For example, when KVM fails to enable hardware virtualization on the
+> hotplugged CPU.
 > 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-
-Appreciated :)
-
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index db25e81a9890..93989b750a26 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -50,7 +50,6 @@
-> >   #define KVM_MAX_OWNER_ID		1
-> >   struct kvm_pgtable_walk_data {
-> > -	struct kvm_pgtable		*pgt;
-> >   	struct kvm_pgtable_walker	*walker;
-> >   	u64				addr;
+> Place KVM's hotplug state before CPUHP_AP_SCHED_WAIT_EMPTY as it
+> ensures
+> when offlining a CPU, all user tasks and non-pinned kernel tasks have
+> left
+> the CPU, i.e. there cannot be a vCPU task around. So, it is safe for
+> KVM's
+> CPU offline callback to disable hardware virtualization at that
+> point.
+> Likewise, KVM's online callback can enable hardware virtualization
+> before
+> any vCPU task gets a chance to run on hotplugged CPUs.
 > 
-> Ok. Here is the answer why data->pgt->mm_ops isn't reachable in the walker
-> and visitor, and @mm_ops needs to be passed down.
+> Rename KVM's CPU hotplug callbacks accordingly.
+> 
+> Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Reviewed-by: Yuan Yao <yuan.yao@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  include/linux/cpuhotplug.h |  2 +-
+>  virt/kvm/kvm_main.c        | 30 ++++++++++++++++++++++--------
+>  2 files changed, 23 insertions(+), 9 deletions(-)
+> 
+> diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+> index 7337414e4947..de45be38dd27 100644
+> --- a/include/linux/cpuhotplug.h
+> +++ b/include/linux/cpuhotplug.h
+> @@ -185,7 +185,6 @@ enum cpuhp_state {
+>  	CPUHP_AP_CSKY_TIMER_STARTING,
+>  	CPUHP_AP_TI_GP_TIMER_STARTING,
+>  	CPUHP_AP_HYPERV_TIMER_STARTING,
+> -	CPUHP_AP_KVM_STARTING,
+>  	/* Must be the last timer callback */
+>  	CPUHP_AP_DUMMY_TIMER_STARTING,
+>  	CPUHP_AP_ARM_XEN_STARTING,
+> @@ -200,6 +199,7 @@ enum cpuhp_state {
+>  
+>  	/* Online section invoked on the hotplugged CPU from the
+> hotplug thread */
+>  	CPUHP_AP_ONLINE_IDLE,
+> +	CPUHP_AP_KVM_ONLINE,
+>  	CPUHP_AP_SCHED_WAIT_EMPTY,
+>  	CPUHP_AP_SMPBOOT_THREADS,
+>  	CPUHP_AP_X86_VDSO_VMA_ONLINE,
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index dd13af9f06d5..fd9e39c85549 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -5026,13 +5026,27 @@ static void hardware_enable_nolock(void
+> *junk)
+>  	}
+>  }
+>  
+> -static int kvm_starting_cpu(unsigned int cpu)
+> +static int kvm_online_cpu(unsigned int cpu)
+>  {
+> +	int ret = 0;
+> +
+>  	raw_spin_lock(&kvm_count_lock);
+> -	if (kvm_usage_count)
+> +	/*
+> +	 * Abort the CPU online process if hardware virtualization
+> cannot
+> +	 * be enabled. Otherwise running VMs would encounter
+> unrecoverable
+> +	 * errors when scheduled to this CPU.
+> +	 */
+> +	if (kvm_usage_count) {
+> +		WARN_ON_ONCE(atomic_read(&hardware_enable_failed));
+> +
+>  		hardware_enable_nolock(NULL);
+> +		if (atomic_read(&hardware_enable_failed)) {
+> +			atomic_set(&hardware_enable_failed, 0);
 
-Yup, the reason for unhitching all of this from kvm_pgtable is explained
-in the cover letter as well:
+I see other places using this hardware_enable_failed with atomic_inc(),
+should here use atomic_dec() instead of straightly set to 0?
+Though here is embraced by spin_lock, hardware_enable_nolock() can be
+invoked in other places in parallel?
 
-  Patches 1-4 clean up the context associated with a page table walk / PTE
-  visit. This is helpful for:
-   - Extending the context passed through for a visit
-   - Building page table walkers that operate outside of a kvm_pgtable
-     context (e.g. RCU callback)
+Fortunately in the end of this patch set, global hardware_enable_failed
+is get rid of.
 
---
-Thanks,
-Oliver
+> +			ret = -EIO;
+> +		}
+> +	}
+>  	raw_spin_unlock(&kvm_count_lock);
+> -	return 0;
+> +	return ret;
+>  }
+>  
+>  static void hardware_disable_nolock(void *junk)
+> @@ -5045,7 +5059,7 @@ static void hardware_disable_nolock(void *junk)
+>  	kvm_arch_hardware_disable();
+>  }
+>  
+> -static int kvm_dying_cpu(unsigned int cpu)
+> +static int kvm_offline_cpu(unsigned int cpu)
+>  {
+>  	raw_spin_lock(&kvm_count_lock);
+>  	if (kvm_usage_count)
+> @@ -5822,8 +5836,8 @@ int kvm_init(unsigned vcpu_size, unsigned
+> vcpu_align, struct module *module)
+>  	if (!zalloc_cpumask_var(&cpus_hardware_enabled, GFP_KERNEL))
+>  		return -ENOMEM;
+>  
+> -	r = cpuhp_setup_state_nocalls(CPUHP_AP_KVM_STARTING,
+> "kvm/cpu:starting",
+> -				      kvm_starting_cpu, kvm_dying_cpu);
+> +	r = cpuhp_setup_state_nocalls(CPUHP_AP_KVM_ONLINE,
+> "kvm/cpu:online",
+> +				      kvm_online_cpu, kvm_offline_cpu);
+>  	if (r)
+>  		goto out_free_2;
+>  	register_reboot_notifier(&kvm_reboot_notifier);
+> @@ -5897,7 +5911,7 @@ int kvm_init(unsigned vcpu_size, unsigned
+> vcpu_align, struct module *module)
+>  	kmem_cache_destroy(kvm_vcpu_cache);
+>  out_free_3:
+>  	unregister_reboot_notifier(&kvm_reboot_notifier);
+> -	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
+> +	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_ONLINE);
+>  out_free_2:
+>  	free_cpumask_var(cpus_hardware_enabled);
+>  	return r;
+> @@ -5923,7 +5937,7 @@ void kvm_exit(void)
+>  	kvm_async_pf_deinit();
+>  	unregister_syscore_ops(&kvm_syscore_ops);
+>  	unregister_reboot_notifier(&kvm_reboot_notifier);
+> -	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
+> +	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_ONLINE);
+>  	on_each_cpu(hardware_disable_nolock, NULL, 1);
+>  	kvm_irqfd_exit();
+>  	free_cpumask_var(cpus_hardware_enabled);
+
