@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289FB1A629
-	for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 19:03:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5767C43144;
-	Thu, 10 Nov 2022 19:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2BE1A629
+	for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 19:03:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 796D1C433B5;
+	Thu, 10 Nov 2022 19:03:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668107018;
-	bh=OPo/mj320HqdZsyoQ2ccnEvq8qG7W/wr/wwsirNU3ak=;
+	s=k20201202; t=1668107021;
+	bh=QQWrljJUDPTW8Fqhy1sB16bt5Z2ZLpBG0A9XOoNLh/E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=E7hefLA2ecjyPlD41ExQJ+7R0XI1kk8Svm0urMAf0dtpUmUzDtEH+QsBMv6/Jyolq
-	 E6GBv+vWernfyXQXfuy29ZQCyCo8kcT6yVXNbUtTd0MUAkApU85oN+GtDCSmQ8k2Bj
-	 kB/mtAOdSpKsIu9UeDDpyJ8StJV8YPt57pZCyAVguQa95L1lLn+euaF2KabBa8R0+m
-	 ZYXRFMw38lZ1qILnHU4LNei+E/hQByZaVQIjAv4w0BsQfHW6sbJ/lGsUFKavmPWqgK
-	 VPOsDVIiGlgaF7wZHGOhCYlsQCqVYQbQTwaz9t9vwLq7YRmHHiN3jw+nXWkekhk+69
-	 gjcZL5uxAXbkA==
+	b=tMcBNOrY4P3xGXPNhtA8x67PVzfmG37qIV8PWNH0z1+8baXtmidv/hFqKDTpsHqJQ
+	 Rb9z1B3Nq4iVDdDo8Nlmg1vHD0PLGVpY0m/H3nBSLQfYuBtcxq2an+qq/jVlSs//C4
+	 9rggPoID5+9J7+Gvp4sQiYEmdsykAZOMYSctTpy+gmlzIGmmdsHljyVkGeCYwbmstG
+	 NrKw78fzU84AxgrucvqoMaC2a2UEJiKpUdWup2Al1SGIs9rfSiOPMToA9nWbuA3PHp
+	 CVPagrEpiAky9432Isyk6QKeFlMuKMMi+CfirrFMnho9lreTrsqmFqDNzYhS+/fMaf
+	 Dxyqebz4q7tkw==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Will Deacon <will@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Will Deacon <will@kernel.org>,
 	kernel-team@android.com,
 	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v6 08/26] KVM: arm64: Add helpers to pin memory shared with the hypervisor at EL2
-Date: Thu, 10 Nov 2022 19:02:41 +0000
-Message-Id: <20221110190259.26861-9-will@kernel.org>
+Subject: [PATCH v6 09/26] KVM: arm64: Include asm/kvm_mmu.h in nvhe/mem_protect.h
+Date: Thu, 10 Nov 2022 19:02:42 +0000
+Message-Id: <20221110190259.26861-10-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20221110190259.26861-1-will@kernel.org>
 References: <20221110190259.26861-1-will@kernel.org>
@@ -46,126 +46,34 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Quentin Perret <qperret@google.com>
+nvhe/mem_protect.h refers to __load_stage2() in the definition of
+__load_host_stage2() but doesn't include the relevant header.
 
-Add helpers allowing the hypervisor to check whether a range of pages
-are currently shared by the host, and 'pin' them if so by blocking host
-unshare operations until the memory has been unpinned.
+Include asm/kvm_mmu.h in nvhe/mem_protect.h so that users of the latter
+don't have to do this themselves.
 
-This will allow the hypervisor to take references on host-provided
-data-structures (e.g. 'struct kvm') with the guarantee that these pages
-will remain in a stable state until the hypervisor decides to release
-them, for example during guest teardown.
-
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Tested-by: Vincent Donnefort <vdonnefort@google.com>
-Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  3 ++
- arch/arm64/kvm/hyp/include/nvhe/memory.h      |  7 ++-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 48 +++++++++++++++++++
- 3 files changed, 57 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index c87b19b2d468..998bf165af71 100644
+index 998bf165af71..3bea816296dc 100644
 --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
 +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -69,6 +69,9 @@ int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id);
- int kvm_host_prepare_stage2(void *pgt_pool_base);
- void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt);
- 
-+int hyp_pin_shared_mem(void *from, void *to);
-+void hyp_unpin_shared_mem(void *from, void *to);
-+
- static __always_inline void __load_host_stage2(void)
- {
- 	if (static_branch_likely(&kvm_protected_mode_initialized))
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-index 9422900e5c6a..ab205c4d6774 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-@@ -55,10 +55,15 @@ static inline void hyp_page_ref_inc(struct hyp_page *p)
- 	p->refcount++;
- }
- 
--static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
-+static inline void hyp_page_ref_dec(struct hyp_page *p)
- {
- 	BUG_ON(!p->refcount);
- 	p->refcount--;
-+}
-+
-+static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
-+{
-+	hyp_page_ref_dec(p);
- 	return (p->refcount == 0);
- }
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index f7e3afaf9f11..83c2f67e1b58 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -625,6 +625,9 @@ static int hyp_ack_unshare(u64 addr, const struct pkvm_mem_transition *tx)
- {
- 	u64 size = tx->nr_pages * PAGE_SIZE;
- 
-+	if (tx->initiator.id == PKVM_ID_HOST && hyp_page_count((void *)addr))
-+		return -EBUSY;
-+
- 	if (__hyp_ack_skip_pgtable_check(tx))
- 		return 0;
- 
-@@ -1038,3 +1041,48 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
- 
- 	return ret;
- }
-+
-+int hyp_pin_shared_mem(void *from, void *to)
-+{
-+	u64 cur, start = ALIGN_DOWN((u64)from, PAGE_SIZE);
-+	u64 end = PAGE_ALIGN((u64)to);
-+	u64 size = end - start;
-+	int ret;
-+
-+	host_lock_component();
-+	hyp_lock_component();
-+
-+	ret = __host_check_page_state_range(__hyp_pa(start), size,
-+					    PKVM_PAGE_SHARED_OWNED);
-+	if (ret)
-+		goto unlock;
-+
-+	ret = __hyp_check_page_state_range(start, size,
-+					   PKVM_PAGE_SHARED_BORROWED);
-+	if (ret)
-+		goto unlock;
-+
-+	for (cur = start; cur < end; cur += PAGE_SIZE)
-+		hyp_page_ref_inc(hyp_virt_to_page(cur));
-+
-+unlock:
-+	hyp_unlock_component();
-+	host_unlock_component();
-+
-+	return ret;
-+}
-+
-+void hyp_unpin_shared_mem(void *from, void *to)
-+{
-+	u64 cur, start = ALIGN_DOWN((u64)from, PAGE_SIZE);
-+	u64 end = PAGE_ALIGN((u64)to);
-+
-+	host_lock_component();
-+	hyp_lock_component();
-+
-+	for (cur = start; cur < end; cur += PAGE_SIZE)
-+		hyp_page_ref_dec(hyp_virt_to_page(cur));
-+
-+	hyp_unlock_component();
-+	host_unlock_component();
-+}
+@@ -8,6 +8,7 @@
+ #define __KVM_NVHE_MEM_PROTECT__
+ #include <linux/kvm_host.h>
+ #include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
+ #include <asm/kvm_pgtable.h>
+ #include <asm/virt.h>
+ #include <nvhe/spinlock.h>
 -- 
 2.38.1.431.g37b22c650d-goog
 
