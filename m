@@ -2,77 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A429C4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 13:21:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25AF8C43217
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 13:34:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD7244BABC;
-	Thu, 10 Nov 2022 08:21:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9026A4BA8B;
+	Thu, 10 Nov 2022 08:34:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IRQLABbzoeuR; Thu, 10 Nov 2022 08:21:55 -0500 (EST)
+	with ESMTP id UedGYuPIfuIC; Thu, 10 Nov 2022 08:34:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 904B34BAB0;
-	Thu, 10 Nov 2022 08:21:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 506144BA9B;
+	Thu, 10 Nov 2022 08:34:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D003D4BAAE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 08:21:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E258D4BA79
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 08:34:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id THVQEddx-n9i for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Nov 2022 08:21:52 -0500 (EST)
+ with ESMTP id 2R3xIKRKHF46 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Nov 2022 08:34:18 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6ACB24BA9B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 08:21:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B7D444BA76
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 08:34:18 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id B99B961759;
- Thu, 10 Nov 2022 13:21:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20B72C433C1;
- Thu, 10 Nov 2022 13:21:51 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 1CFA16163C;
+ Thu, 10 Nov 2022 13:34:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B112C433D6;
+ Thu, 10 Nov 2022 13:34:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1668086511;
- bh=vsKYJwz6b+8G9OYObnAUmHW9XZF2g9Jn8L3VpwTYoLo=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Cw9PUhvxJOphnbK+yH0weDhtE/IJ9rrAJtFBNWJ2OCUmFFXZ7mxR5nYCBMRtxoVAl
- SATrNZktcM7DppSFMnU+61XPpGqM0/6Ty6QFUAwHtk8/t6Ibe4bCVN9olBTRvLCJtC
- 6hhCZUHQT6gadLeUFZDtSjZXyg5wPWgq2/dh2mkrp7jE/98NOr5VXAOTQmfHgRzrVt
- Q/tT43TCO3pG/dC/0r5B99h6oQ8z8q6yVufZzrRqegOt7mR8erArTIwZjTvvARF2rq
- U8UKFHHDI+TkjNp84mBDHXNb33v96p5B3eiQ5IBw790HhW6MNyt4gXXas0CME2bqQs
- bEJKPNpBRBjbQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+ s=k20201202; t=1668087257;
+ bh=CxU5CLs5OzAY7rGv18GgAC+P9XrarCRDN5MlMlNYwc0=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Ig3W1MeBQMrSMV0bQOlZ63AAFX/0x05D4mvVeQpGUSLykXvxa4WbCPvHWf9WbSWGq
+ 7mwKiCYgBH0guWQT0Yo2Z/ZvIo9tX+gqnQfcg/hOktDB5keIM66X2DFpRImUKuaBQB
+ y27td9nyeWERrxZ37BcQoHZTEnlW9hk3sR4MI8NZ1AADpwt2CWZVZ9XJY+nEb4z/R0
+ 3qD4ZtDye4MjatDM8IL8SIWKZD3UkhdrRCW9Sxhc0q9Amnk6q+uWgjcBkRwxMInt/O
+ WIiERHFhc8sJeSbcpVr2PRLHAWGOrzV6h9xhIg0ok0I1A929w+P3gKpZizpHX1VMKq
+ SPbynZR5N5kBA==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1ot7V7-0059yG-00;
- Thu, 10 Nov 2022 13:21:49 +0000
+ (envelope-from <maz@kernel.org>) id 1ot7h9-005A9N-90;
+ Thu, 10 Nov 2022 13:34:15 +0000
+Date: Thu, 10 Nov 2022 13:34:14 +0000
+Message-ID: <86mt8zorvt.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v10 0/7] KVM: arm64: Enable ring-based dirty memory
- tracking
-Date: Thu, 10 Nov 2022 13:21:46 +0000
-Message-Id: <166808649563.2653656.5582018167024205345.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221110104914.31280-1-gshan@redhat.com>
-References: <20221110104914.31280-1-gshan@redhat.com>
-MIME-Version: 1.0
+To: Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH v5 08/14] KVM: arm64: Protect stage-2 traversal with RCU
+In-Reply-To: <CANgfPd9fynvsBLjio1zz0hPy4SGAd8XZfzYQaR_gg0UJrOyAcA@mail.gmail.com>
+References: <20221107215644.1895162-1-oliver.upton@linux.dev>
+ <20221107215644.1895162-9-oliver.upton@linux.dev>
+ <CANgfPd9fynvsBLjio1zz0hPy4SGAd8XZfzYQaR_gg0UJrOyAcA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, gshan@redhat.com,
- catalin.marinas@arm.com, kvm@vger.kernel.org, ajones@ventanamicro.com,
- bgardon@google.com, shuah@kernel.org, shan.gavin@gmail.com,
- kvmarm@lists.cs.columbia.edu, dmatlack@google.com, andrew.jones@linux.dev,
- zhenyzha@redhat.com, pbonzini@redhat.com, will@kernel.org
+X-SA-Exim-Rcpt-To: bgardon@google.com, oliver.upton@linux.dev,
+ james.morse@arm.com, alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, reijiw@google.com, ricarkol@google.com,
+ dmatlack@google.com, qperret@google.com, gshan@redhat.com, peterx@redhat.com,
+ will@kernel.org, seanjc@google.com, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
- will@kernel.org, shan.gavin@gmail.com, bgardon@google.com, dmatlack@google.com,
- pbonzini@redhat.com, zhenyzha@redhat.com, shuah@kernel.org,
- kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
+ David Matlack <dmatlack@google.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,43 +92,80 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 10 Nov 2022 18:49:07 +0800, Gavin Shan wrote:
-> This series enables the ring-based dirty memory tracking for ARM64.
-> The feature has been available and enabled on x86 for a while. It
-> is beneficial when the number of dirty pages is small in a checkpointing
-> system or live migration scenario. More details can be found from
-> fb04a1eddb1a ("KVM: X86: Implement ring-based dirty memory tracking").
+On Wed, 09 Nov 2022 22:25:38 +0000,
+Ben Gardon <bgardon@google.com> wrote:
 > 
-> For PATCH[v9 3/7], Peter's ack-by is kept since the recent changes
-> don't fundamentally break what he agreed. However, it would be nice
-> for Peter to double confirm.
+> On Mon, Nov 7, 2022 at 1:57 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > Use RCU to safely walk the stage-2 page tables in parallel. Acquire and
+> > release the RCU read lock when traversing the page tables. Defer the
+> > freeing of table memory to an RCU callback. Indirect the calls into RCU
+> > and provide stubs for hypervisor code, as RCU is not available in such a
+> > context.
+> >
+> > The RCU protection doesn't amount to much at the moment, as readers are
+> > already protected by the read-write lock (all walkers that free table
+> > memory take the write lock). Nonetheless, a subsequent change will
+> > futher relax the locking requirements around the stage-2 MMU, thereby
+> > depending on RCU.
+> >
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h | 49 ++++++++++++++++++++++++++++
+> >  arch/arm64/kvm/hyp/pgtable.c         | 10 +++++-
+> >  arch/arm64/kvm/mmu.c                 | 14 +++++++-
+> >  3 files changed, 71 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index e70cf57b719e..7634b6964779 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -37,6 +37,13 @@ static inline u64 kvm_get_parange(u64 mmfr0)
+> >
+> >  typedef u64 kvm_pte_t;
+> >
+> > +/*
+> > + * RCU cannot be used in a non-kernel context such as the hyp. As such, page
+> > + * table walkers used in hyp do not call into RCU and instead use other
+> > + * synchronization mechanisms (such as a spinlock).
+> > + */
+> > +#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
+> > +
+> >  typedef kvm_pte_t *kvm_pteref_t;
+> >
+> >  static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
+> > @@ -44,6 +51,40 @@ static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared
+> >         return pteref;
+> >  }
+> >
+> > +static inline void kvm_pgtable_walk_begin(void) {}
+> > +static inline void kvm_pgtable_walk_end(void) {}
+> > +
+> > +static inline bool kvm_pgtable_walk_lock_held(void)
+> > +{
+> > +       return true;
 > 
-> [...]
+> Forgive my ignorance, but does hyp not use a MMU lock at all? Seems
+> like this would be a good place to add a lockdep check.
 
-Applied to next, thanks!
+For normal KVM, we don't mess with the page tables in the HYP code *at
+all*. That's just not the place. It is for pKVM that this is a bit
+different, as EL2 is where the stuff happens.
 
-[1/7] KVM: x86: Introduce KVM_REQ_DIRTY_RING_SOFT_FULL
-      commit: cf87ac739e488055a6046a410caa8f4da108948f
-[2/7] KVM: Move declaration of kvm_cpu_dirty_log_size() to kvm_dirty_ring.h
-      commit: e8a18565e59303ac12c626a161d72bd890bd2062
-[3/7] KVM: Support dirty ring in conjunction with bitmap
-      commit: 86bdf3ebcfe1ded055282536fecce13001874740
-[4/7] KVM: arm64: Enable ring-based dirty memory tracking
-      commit: 9cb1096f8590bc590326087bea65db932b53c3b5
-[5/7] KVM: selftests: Use host page size to map ring buffer in dirty_log_test
-      commit: a737f5ffb1e883e580730122be11c9eb832a7749
-[6/7] KVM: selftests: Clear dirty ring states between two modes in dirty_log_test
-      commit: 7167190ddb863bd061c0c6b61f4cec94184b40da
-[7/7] KVM: selftests: Automate choosing dirty ring size in dirty_log_test
-      commit: dc6df7d4d0633e65850d5372ae9f1234bcc6e26e
+Lockdep at EL2 is wishful thinking. However, we have the next best
+thing, which is an assertion such as:
 
-Cheers,
+	hyp_assert_lock_held(&host_kvm.lock);
+
+though at the moment, this is a *global* lock that serialises
+everyone, as a guest stage-2 operation usually affects the host
+stage-2 as well (ownership change and such). Quentin should be able to
+provide more details on that.
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
