@@ -1,43 +1,43 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE384107A2
-	for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 16:49:34 +0000 (UTC)
-Received: by mail-pj1-f41.google.com with SMTP id m6-20020a17090a5a4600b00212f8dffec9so2077594pji.0
-        for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 08:49:34 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB2A1A601
+	for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 16:50:37 +0000 (UTC)
+Received: by mail-pg1-f181.google.com with SMTP id s196so2365029pgs.3
+        for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 08:50:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rPjVc+C4keVB9JNeySRKdiTbUPe13351AhOJe9TtZf8=;
-        b=OOR4bwRUplBbyMMh2BEwu+86VP3qxijSJnezQ7clymoLz9HUcLonm3WyVFc88kB5fY
-         O/E+L3vna3lCH6PwuGGALEpEbdqf//FCQPJXnQH0fruVZmuKpiXxpksMlHLNli5FBIVk
-         yHcqF3ftlcFWSWpaRO18yKIRlZ4MLKYwLTrjNA/qL4cv528Rj8wkmrotYw4AfXaxmJus
-         pcCX78Uh4a0+xqNPkY5yiRwsOaQfBATcwvX2XL8kq2aQkn5xXT0ESqE2s4sWnkM2XUP1
-         lN0YUhWFEsDiU77d2rUZObTRDQeLPD96HT9QdyztVtB+kfc9jl7KnKnrsPBskzRSRVH/
-         XRTg==
+        bh=ngpTqFXA20Qov7vlYrPcJjUI8sUR/quxgJrGzBa7LTQ=;
+        b=dFHHoN/Nh+VXrE9JsY3e3+fkRaRAvb1aGnzgeGfgDdwTgSMupLwM8ROA3+W4pYGjY0
+         5rtK6lElI+DgF0DyaiLvpiaAorCWCegKieghDDMY6o0ECE7iPV/tCP64EmRRyb1QKnLg
+         h1cjN79kb5l9jgix2MCBmxfqZYQuwhlkODvDz7ZvaH4sxe61Ml97iSmSMtvAoCeE4p6S
+         zdFuv8u4MZbd4uwMLlGMYvkNsSjoXRG5kz2GxfEgOPys7+fCqRAsVr0dupEjPva4LkLJ
+         QEyjxBRtbWEN1lQAedlvI4TNbWVV6gyxLgVr0x17HRSOYZcACGBuRj0/yzFNApiBrJr+
+         O6JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rPjVc+C4keVB9JNeySRKdiTbUPe13351AhOJe9TtZf8=;
-        b=Jazd3h9OGvUl64KJ7OX+hWC1uIv4E/j6Rdp7P1+ijuj6GlKTw2ycs2gAcX6BTfgGk3
-         x3K3mS4R0GjqtTIMME7aoR9ocsothmJ5AnZLoI+S1dyexlyMjvR1fFpqQDVAsJ7U3mpr
-         eXyVRCc+Wk91QaHgdnn/BEBUiRaGhzvXplr1dMo8wP3OfnZxRN4qpDe/nDUNtADDe3/w
-         lEo7ZEvfz71dk82SKRH/amC67zEUmf2wmL6q1NpRjkCX324x7gGLvi9VGKBiiTkjgC05
-         QlcWzATegPp0L4Xn4iRNBJQ8WtS2V3ekTszKCYJszZxJLuWvIg+PWxhlNY4otzusPGDB
-         iVYg==
-X-Gm-Message-State: ACrzQf2AELBqsHc4gDP4K9Y/JaFe1apn9iUDnX53206r2bYP8eQu4MYX
-	JSvBaHDNk6zK8XIs5ppJ5ttYNA==
-X-Google-Smtp-Source: AMsMyM7nQN/gdgW0z481CkQ/WjHrrL4d++/kzaSXhuKO9UuGt09a3AowKSZBoBJ0HDICWxNrCbdrGA==
-X-Received: by 2002:a17:902:d50c:b0:187:460:bf9c with SMTP id b12-20020a170902d50c00b001870460bf9cmr65545589plg.4.1668098974180;
-        Thu, 10 Nov 2022 08:49:34 -0800 (PST)
+        bh=ngpTqFXA20Qov7vlYrPcJjUI8sUR/quxgJrGzBa7LTQ=;
+        b=jYTJZTzauvnmgyayQ7eNPv73zU9qFa0d1j8Kp/XoSkahaK4e7EYqPW2QmGlcS4lYli
+         MrvWlsx86N57zKdQcH4KnaNbrkVbs8f2ti3u+v252a5HPOUBml+CSvPoBHaunEkuAKB0
+         KSxRGAf69ZX/foBOvQ/Oq8vugKhC4lRSZCNc1HoQ7iGoRZ4+ExtL7g+3vf5uWeODpN0N
+         GfXVWC1aJFWPbHX/2vYrfeY2VFhDrMYTDmNAaU3XhgrAcjZiEn1Bpr57n6hLvPRd7lHD
+         j3sYH9xMFmUhvETBffoKfkyK5adpzDy6KVQy1g45ZNBTZlM2Zsvuj2xMDpUhB7+DNOHX
+         rqdg==
+X-Gm-Message-State: ACrzQf34zuLp25N+aCM1h9ON6CPoSY983Co/Rpq7DtLIBeW3B8h5sGSD
+	Gc800BMSdY8+TWa5OEObNNPl5A==
+X-Google-Smtp-Source: AMsMyM41GjMawKBCP5Kop4vnrwekEGW/LOSR6lYqiErYbTmquFxjglLK4Ryhg/mdPPwnXrGhT3xNoQ==
+X-Received: by 2002:aa7:8d08:0:b0:56b:a4f6:e030 with SMTP id j8-20020aa78d08000000b0056ba4f6e030mr3031241pfe.85.1668099036440;
+        Thu, 10 Nov 2022 08:50:36 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id c3-20020a17090a020300b00205d85cfb30sm3288107pjc.20.2022.11.10.08.49.33
+        by smtp.gmail.com with ESMTPSA id m2-20020a170902db0200b00186f81bb3f0sm11518667plx.122.2022.11.10.08.50.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Nov 2022 08:49:33 -0800 (PST)
-Date: Thu, 10 Nov 2022 16:49:29 +0000
+        Thu, 10 Nov 2022 08:50:35 -0800 (PST)
+Date: Thu, 10 Nov 2022 16:50:32 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: Robert Hoo <robert.hu@linux.intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
@@ -69,12 +69,12 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 	Michael Ellerman <mpe@ellerman.id.au>,
 	Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
 	Yuan Yao <yuan.yao@intel.com>
-Subject: Re: [PATCH 37/44] KVM: Rename and move CPUHP_AP_KVM_STARTING to
- ONLINE section
-Message-ID: <Y20rmaU14rZFFCZI@google.com>
+Subject: Re: [PATCH 32/44] KVM: x86: Unify pr_fmt to use module name for all
+ KVM modules
+Message-ID: <Y20r2NR9MaBbOGLn@google.com>
 References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-38-seanjc@google.com>
- <301a8a33a5cbe5b4fd3efe03b05bb8410a46e9f5.camel@linux.intel.com>
+ <20221102231911.3107438-33-seanjc@google.com>
+ <ff0e8701d02ee161d064f92c8b742c2cc061bce0.camel@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -83,42 +83,12 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <301a8a33a5cbe5b4fd3efe03b05bb8410a46e9f5.camel@linux.intel.com>
-Message-ID: <20221110164929.3_wbCMgq073Y0_vWWpCAC0DQrP4CSUagLBQFLRJdf3I@z>
+In-Reply-To: <ff0e8701d02ee161d064f92c8b742c2cc061bce0.camel@linux.intel.com>
+Message-ID: <20221110165032.Wb3C86P5ir9gObYXlA_uroK3rKQcvtkVAhr2Ybp27Dg@z>
 
 On Thu, Nov 10, 2022, Robert Hoo wrote:
-> > -static int kvm_starting_cpu(unsigned int cpu)
-> > +static int kvm_online_cpu(unsigned int cpu)
-> >  {
-> > +	int ret = 0;
-> > +
-> >  	raw_spin_lock(&kvm_count_lock);
-> > -	if (kvm_usage_count)
-> > +	/*
-> > +	 * Abort the CPU online process if hardware virtualization
-> > cannot
-> > +	 * be enabled. Otherwise running VMs would encounter
-> > unrecoverable
-> > +	 * errors when scheduled to this CPU.
-> > +	 */
-> > +	if (kvm_usage_count) {
-> > +		WARN_ON_ONCE(atomic_read(&hardware_enable_failed));
-> > +
-> >  		hardware_enable_nolock(NULL);
-> > +		if (atomic_read(&hardware_enable_failed)) {
-> > +			atomic_set(&hardware_enable_failed, 0);
-> 
-> I see other places using this hardware_enable_failed with atomic_inc(),
-> should here use atomic_dec() instead of straightly set to 0?
+> After this patch set, still find some printk()s left in arch/x86/kvm/*,
+> consider clean all of them up?
 
-Meh, both options are flawed.  E.g. if hardware_enable_failed was left dangling
-(the WARN above), then atomic_dec() won't remedy the problem and KVM will reject
-onlining CPUs indefinitely.  Forcing the atomic back to '0' will remedy that
-particular issue, but could lead to problems if there are other bugs.
-
-> Though here is embraced by spin_lock, hardware_enable_nolock() can be
-> invoked in other places in parallel?
-
-Only because of a KVM bug, which gets fixed in the next patch:
-
-  KVM: Disable CPU hotplug during hardware enabling
+Hmm, yeah, I suppose at this point it makes sense to tack on a patch to clean
+them up.
