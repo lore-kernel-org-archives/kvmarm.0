@@ -2,73 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B5C5C433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 10:50:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F5FC4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 10:54:29 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E24274BA69;
-	Thu, 10 Nov 2022 05:50:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 756214BA59;
+	Thu, 10 Nov 2022 05:54:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Of0pH45-PvZv; Thu, 10 Nov 2022 05:50:35 -0500 (EST)
+	with ESMTP id FLpw3PYIenUT; Thu, 10 Nov 2022 05:54:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6B6C4BA68;
-	Thu, 10 Nov 2022 05:50:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F1604BA61;
+	Thu, 10 Nov 2022 05:54:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 513B84BA68
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 05:50:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 06D624BA37
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 05:54:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wftp07ASB7nL for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Nov 2022 05:50:33 -0500 (EST)
+ with ESMTP id oBQXHHNLvFCi for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Nov 2022 05:54:25 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A9954BA61
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 05:50:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A266A4BA22
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 05:54:25 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1668077433;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1668077665;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UeYV9gtrEMC/f2NfGupIKl3UhHTgEqpO1AGhP6jS8dg=;
- b=U+5J6XbtSXjEE55/Mbqcmjhp4f4Q+tToJahpEoz8bE4LCjTndHttM/eKy38zs3ExgAIeN7
- YAwGEMIYVdqc1eOzus0NXvxjkEW3QRbxfyOxl2CSibxjRnY/JEBBMx6SElH5zWuvMlvQxr
- px8//PhiwWazUCBKD6m/wkRBl6y2ZPE=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=NpgGU2I/tE+Cblp78lY33qKu10Xyg6kfJBT0/tIEJsk=;
+ b=Igge6aljXd5v4zr4eAF4ID5vY/4wmAbvVK9Vn9PzLKqXa8L0g+SVATkrQ6dR3wOlcIyJDn
+ CPbvTOxazJ8QjRRv4IownQ048NrYdxeheL4tvkVFpLOfySKROuDmPuLMJRVI9JBone0yXg
+ PQ9f0uV2HTmpZGSJJgglX3cGCb526ok=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-631-CkpLQw9hPkacLJJ5CzWDyw-1; Thu, 10 Nov 2022 05:50:29 -0500
-X-MC-Unique: CkpLQw9hPkacLJJ5CzWDyw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com
- [10.11.54.7])
+ us-mta-317-7OyvaXjfPfyzXgoyEastcg-1; Thu, 10 Nov 2022 05:54:22 -0500
+X-MC-Unique: 7OyvaXjfPfyzXgoyEastcg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.8])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E0BA13816EA9;
- Thu, 10 Nov 2022 10:50:28 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-49.bne.redhat.com [10.64.54.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E4941415114;
- Thu, 10 Nov 2022 10:50:22 +0000 (UTC)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6779F833AEF;
+ Thu, 10 Nov 2022 10:54:21 +0000 (UTC)
+Received: from [10.64.54.49] (vpn2-54-49.bne.redhat.com [10.64.54.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 44E19C1908A;
+ Thu, 10 Nov 2022 10:54:15 +0000 (UTC)
+Subject: Re: [PATCH v3 0/6] KVM: selftests: memslot_perf_test: aarch64
+ cleanup/fixes
+To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+References: <20221020071209.559062-1-gshan@redhat.com>
+ <91d563b6-5f1c-5ecc-0a40-7d8838770b22@maciej.szmigiero.name>
 From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.linux.dev
-Subject: [PATCH v10 7/7] KVM: selftests: Automate choosing dirty ring size in
- dirty_log_test
-Date: Thu, 10 Nov 2022 18:49:14 +0800
-Message-Id: <20221110104914.31280-8-gshan@redhat.com>
-In-Reply-To: <20221110104914.31280-1-gshan@redhat.com>
-References: <20221110104914.31280-1-gshan@redhat.com>
+Message-ID: <3903eeef-e037-9651-6041-0d16c29d67b0@redhat.com>
+Date: Thu, 10 Nov 2022 18:54:13 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
- dmatlack@google.com, will@kernel.org, shan.gavin@gmail.com, maz@kernel.org,
- bgardon@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, shuah@kernel.org,
- kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
+In-Reply-To: <91d563b6-5f1c-5ecc-0a40-7d8838770b22@maciej.szmigiero.name>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
+ zhenyzha@redhat.com, shan.gavin@gmail.com, kvmarm@lists.linux.dev,
+ pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
+ ajones@ventanamicro.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -77,101 +83,73 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In the dirty ring case, we rely on vcpu exit due to full dirty ring
-state. On ARM64 system, there are 4096 host pages when the host
-page size is 64KB. In this case, the vcpu never exits due to the
-full dirty ring state. The similar case is 4KB page size on host
-and 64KB page size on guest. The vcpu corrupts same set of host
-pages, but the dirty page information isn't collected in the main
-thread. This leads to infinite loop as the following log shows.
-
-  # ./dirty_log_test -M dirty-ring -c 65536 -m 5
-  Setting log mode to: 'dirty-ring'
-  Test iterations: 32, interval: 10 (ms)
-  Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
-  guest physical test memory offset: 0xffbffe0000
-  vcpu stops because vcpu is kicked out...
-  Notifying vcpu to continue
-  vcpu continues now.
-  Iteration 1 collected 576 pages
-  <No more output afterwards>
-
-Fix the issue by automatically choosing the best dirty ring size,
-to ensure vcpu exit due to full dirty ring state. The option '-c'
-becomes a hint to the dirty ring count, instead of the value of it.
-
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 26 +++++++++++++++++---
- 1 file changed, 22 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 8758c10ec850..a87e5f78ebf1 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -24,6 +24,9 @@
- #include "guest_modes.h"
- #include "processor.h"
- 
-+#define DIRTY_MEM_BITS 30 /* 1G */
-+#define PAGE_SHIFT_4K  12
-+
- /* The memory slot index to track dirty pages */
- #define TEST_MEM_SLOT_INDEX		1
- 
-@@ -273,6 +276,24 @@ static bool dirty_ring_supported(void)
- 
- static void dirty_ring_create_vm_done(struct kvm_vm *vm)
- {
-+	uint64_t pages;
-+	uint32_t limit;
-+
-+	/*
-+	 * We rely on vcpu exit due to full dirty ring state. Adjust
-+	 * the ring buffer size to ensure we're able to reach the
-+	 * full dirty ring state.
-+	 */
-+	pages = (1ul << (DIRTY_MEM_BITS - vm->page_shift)) + 3;
-+	pages = vm_adjust_num_guest_pages(vm->mode, pages);
-+	if (vm->page_size < getpagesize())
-+		pages = vm_num_host_pages(vm->mode, pages);
-+
-+	limit = 1 << (31 - __builtin_clz(pages));
-+	test_dirty_ring_count = 1 << (31 - __builtin_clz(test_dirty_ring_count));
-+	test_dirty_ring_count = min(limit, test_dirty_ring_count);
-+	pr_info("dirty ring count: 0x%x\n", test_dirty_ring_count);
-+
- 	/*
- 	 * Switch to dirty ring mode after VM creation but before any
- 	 * of the vcpu creation.
-@@ -685,9 +706,6 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, struct kvm_vcpu **vcpu,
- 	return vm;
- }
- 
--#define DIRTY_MEM_BITS 30 /* 1G */
--#define PAGE_SHIFT_4K  12
--
- struct test_params {
- 	unsigned long iterations;
- 	unsigned long interval;
-@@ -830,7 +848,7 @@ static void help(char *name)
- 	printf("usage: %s [-h] [-i iterations] [-I interval] "
- 	       "[-p offset] [-m mode]\n", name);
- 	puts("");
--	printf(" -c: specify dirty ring size, in number of entries\n");
-+	printf(" -c: hint to dirty ring size, in number of entries\n");
- 	printf("     (only useful for dirty-ring test; default: %"PRIu32")\n",
- 	       TEST_DIRTY_RING_COUNT);
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
--- 
-2.23.0
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDEwLzI1LzIyIDc6MTggQU0sIE1hY2llaiBTLiBTem1pZ2llcm8gd3JvdGU6
+Cj4gT24gMjAuMTAuMjAyMiAwOToxMiwgR2F2aW4gU2hhbiB3cm90ZToKPj4ga3ZtL3NlbGZ0ZXN0
+cy9tZW1zbG90c19wZXJmX3Rlc3QgZG9lc24ndCB3b3JrIHdpdGggNjRLQi1wYWdlLXNpemUtaG9z
+dAo+PiBhbmQgNEtCLXBhZ2Utc2l6ZS1ndWVzdCBvbiBhYXJjaDY0LiBJbiB0aGUgaW1wbGVtZW50
+YXRpb24sIHRoZSBob3N0IGFuZAo+PiBndWVzdCBwYWdlIHNpemUgaGF2ZSBiZWVuIGhhcmRjb2Rl
+ZCB0byA0S0IuIEl0J3Mgb3ZiaW91c2x5IG5vdCB3b3JraW5nCj4+IG9uIGFhcmNoNjQgd2hpY2gg
+c3VwcG9ydHMgNEtCLCAxNktCLCA2NEtCIGluZGl2aWR1YWxseSBvbiBob3N0IGFuZCBndWVzdC4K
+Pj4KPj4gVGhpcyBzZXJpZXMgdHJpZXMgdG8gZml4IGl0LiBBZnRlciB0aGUgc2VyaWVzIGlzIGFw
+cGxpZWQsIHRoZSB0ZXN0IHJ1bnMKPj4gc3VjY2Vzc2Z1bGx5IHdpdGggNjRLQi1wYWdlLXNpemUt
+aG9zdCBhbmQgNEtCLXBhZ2Utc2l6ZS1ndWVzdC4KPj4KPj4gwqDCoMKgICMgLi9tZW1zbG90c19w
+ZXJmX3Rlc3RzIC12IC1zIDUxMgo+Pgo+PiBTaW5jZSB3ZSdyZSBoZXJlLCB0aGUgY29kZSBpcyBj
+bGVhbmVkIHVwIGEgYml0IGFzIFBBVENIWzEtM10gZG8uIFRoZQo+PiBvdGhlciBwYXRjaGVzIGFy
+ZSBmaXhlcyB0byBoYW5kbGUgdGhlIG1pc21hdGNoZWQgaG9zdC9ndWVzdCBwYWdlCj4+IHNpemVk
+Lgo+Pgo+PiB2MTogaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcva3ZtYXJtLzIwMjIxMDE0MDcxOTE0
+LjIyNzEzNC0xLWdzaGFuQHJlZGhhdC5jb20vVC8jdAo+PiB2MjogaHR0cHM6Ly9sb3JlLmtlcm5l
+bC5vcmcva3ZtYXJtLzIwMjIxMDE4MDQwNDU0LjQwNTcxOS0xLWdzaGFuQHJlZGhhdC5jb20vVC8j
+dAo+Pgo+PiBDaGFuZ2Vsb2cKPj4gPT09PT09PT09Cj4+IHYzOgo+PiDCoMKgICogSW1wcm92ZWQg
+Y29tbWVudHMgYWJvdXQgTUVNX1RFU1RfTU9WRV9TSVpFLCB3aGljaCBpcyBzZXQKPj4gwqDCoMKg
+wqAgdG8gNjRLQiBpbiBQQVRDSFt2MyA0LzZdIGFuZCBmaW5hbGx5IGZpeGVkIHRvIDE5MktCIGlu
+Cj4+IMKgwqDCoMKgIFBBVENIW3YzIDUvNl0uwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIChNYWNpZWopCj4+IMKgwqAgKiBVc2Ugc2l6ZSBpbnN0ZWFkIG9mIHBhZ2VzIHRvIGRvIHRo
+ZSBjb21wYXJpc29uIGluCj4+IMKgwqDCoMKgIHRlc3RfbWVtc2xvdF9tb3ZlX3ByZXBhcmUoKcKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgKE1hY2llaikKPj4gwqDCoCAqIFVzZSB0b29scy9pbmNsdWRlL2xpbnV4L3NpemVzLmgg
+aW5zdGVhZCBvZiBpbnZlbnRpbmcKPj4gwqDCoMKgwqAgb3VyIG93biBtYWNyb3MuwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAoT2xpdmVyKQo+PiB2MjoKPj4gwqDCoCAqIFBpY2sgdGhl
+IHNtYWxsZXIgdmFsdWUgYmV0d2VlbiB0aGUgb25lcyBzcGVjaWZpZWQgYnkKPj4gwqDCoMKgwqAg
+dXNlciBvciBwcm9iZWQgZnJvbSBLVk1fQ0FQX05SX01FTVNMT1RTIGluIFBBVENIW3YyIDMvNl3C
+oMKgwqAgKE1hY2llaikKPj4gwqDCoCAqIEltcHJvdmVkIGNvbW1lbnRzIGFib3V0IE1FTV9URVNU
+X01PVkVfU0laRSBpbgo+PiDCoMKgwqDCoCBQQVRDSFt2MiA0LzZdwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgKE1hY2llaikKPj4gwqDCoCAqIEF2b2lkIG1pc21hdGNoZWQgZ3Vl
+c3QgcGFnZSBzaXplIGFmdGVyIFZNIGlzIHN0YXJ0ZWQgaW4KPj4gwqDCoMKgwqAgcHJlcGFyZV92
+bSgpIGluIFBBVENIW3YyIDQvNl3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKE1hY2llaikKPj4gwqDCoCAqIEZpeCBjb25kaXRpb24g
+dG8gY2hlY2sgTUVNX1RFU1Rfe1VOTUFQLCBVTk1BUF9DSFVOS31fU0laRQo+PiDCoMKgwqDCoCBp
+biBjaGVja19tZW1vcnlfc2l6ZSgpIGluIFBBVENIW3YyIDQvNl3CoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIChNYWNpZWopCj4+IMKgwqAgKiBEZWZpbmUgYmFzZSBhbmQg
+aHVnZSBwYWdlIHNpemUgaW4ga3ZtX3V0aWxfYmFzZS5oIGluCj4+IMKgwqDCoMKgIFBBVENIW3Yy
+IDUvNl3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAoU2VhbikKPj4gwqDCoCAq
+IEFkZCBjaGVja3Mgb24gaG9zdC9ndWVzdCBwYWdlIHNpemUgaW4gY2hlY2tfbWVtb3J5X3NpemUo
+KQo+PiDCoMKgwqDCoCBhbmQgZmFpbCBlYXJseSBpZiBhbnkgb2YgdGhlbSBleGNlZWRzIDY0S0Ig
+aW4gUEFUQ0hbdjIgNS82XSAoTWFjaWVqKQo+Pgo+Pgo+PiBHYXZpbiBTaGFuICg2KToKPj4gwqDC
+oCBLVk06IHNlbGZ0ZXN0czogbWVtc2xvdF9wZXJmX3Rlc3Q6IFVzZSBkYXRhLT5uc2xvdHMgaW4g
+cHJlcGFyZV92bSgpCj4+IMKgwqAgS1ZNOiBzZWxmdGVzdHM6IG1lbXNsb3RfcGVyZl90ZXN0OiBD
+b25zb2xpZGF0ZSBsb29wIGNvbmRpdGlvbnMgaW4KPj4gwqDCoMKgwqAgcHJlcGFyZV92bSgpCj4+
+IMKgwqAgS1ZNOiBzZWxmdGVzdHM6IG1lbXNsb3RfcGVyZl90ZXN0OiBQcm9iZSBtZW1vcnkgc2xv
+dHMgZm9yIG9uY2UKPj4gwqDCoCBLVk06IHNlbGZ0ZXN0czogbWVtc2xvdF9wZXJmX3Rlc3Q6IFN1
+cHBvcnQgdmFyaWFibGUgZ3Vlc3QgcGFnZSBzaXplCj4+IMKgwqAgS1ZNOiBzZWxmdGVzdHM6IG1l
+bXNsb3RfcGVyZl90ZXN0OiBDb25zb2xpZGF0ZSBtZW1vcnkKPj4gwqDCoCBLVk06IHNlbGZ0ZXN0
+czogbWVtc2xvdF9wZXJmX3Rlc3Q6IFJlcG9ydCBvcHRpbWFsIG1lbW9yeSBzbG90cwo+Pgo+IAo+
+IFRoaXMgcGF0Y2ggc2V0IG5vdyBsb29rcyBnb29kIHRvIG1lLCBzbyBmb3IgdGhlIHdob2xlIHNl
+cmllczoKPiBSZXZpZXdlZC1ieTogTWFjaWVqIFMuIFN6bWlnaWVybyA8bWFjaWVqLnN6bWlnaWVy
+b0BvcmFjbGUuY29tPgo+IAoKSWYgcG9zc2libGUsIGNvdWxkIHlvdSBwbGVhc2UgbWVyZ2UgdGhp
+cyBzZXJpZXMgdG8gJ25leHQnIGJyYW5jaCBlaXRoZXI/CkkgaG9wZSBpdCBjYW4gYmUgbWVyZ2Vk
+IGVhcmx5IGJlY2F1c2Ugb3VyIGRvd25zdHJlYW0gbmVlZHMgdGhlIGZpeGVzIHRvCm1ha2UgdGhl
+IHRlc3QgY2FzZSB3b3JrLiBJdCdzIGRlZmluaXRlbHkgZmluZSB0byB3YWl0IGZvciBtb3JlIGNv
+bW1lbnRzLApidXQgSSBoYXZlbid0IHJlY2VpdmUgYW55IG1vcmUgY29tbWVudHMgaW4gbGFzdCBt
+b250aCA6KQoKVGhhbmtzLApHYXZpbgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1i
+aWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3Zt
+YXJtCg==
