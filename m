@@ -2,59 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 292E1C433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 10:42:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F57C4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 10:46:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A6254BA95;
-	Thu, 10 Nov 2022 05:42:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 397814BA9F;
+	Thu, 10 Nov 2022 05:46:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YfMyo2JitDyz; Thu, 10 Nov 2022 05:42:30 -0500 (EST)
+	with ESMTP id iSKTBS2zqr1x; Thu, 10 Nov 2022 05:46:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B73A4BA96;
-	Thu, 10 Nov 2022 05:42:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 138844BA96;
+	Thu, 10 Nov 2022 05:46:24 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CFAE4BA96
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 05:42:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 33E144BA96
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 05:46:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dRcmYpBydIGu for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Nov 2022 05:42:27 -0500 (EST)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0770F4BA95
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 05:42:26 -0500 (EST)
+ with ESMTP id xMrkolUAqwKd for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Nov 2022 05:46:21 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 12C704BA95
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Nov 2022 05:46:21 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id A1518CE2160;
- Thu, 10 Nov 2022 10:42:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D25F6C433D7;
- Thu, 10 Nov 2022 10:42:19 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id ED94261214;
+ Thu, 10 Nov 2022 10:46:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DFA5C433D6;
+ Thu, 10 Nov 2022 10:46:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1668076941;
- bh=r+qt6kAors3KYeKH/GVRE9wZe3RSl+L32qhSytiS8Bk=;
+ s=k20201202; t=1668077179;
+ bh=zoF9eW1NJnxp6NvTOasLQrApPq3gLiET4Xnl6HJ4PW0=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=eSp07hYtumWj2FerpC9vH+x5PZLqC8d5feD+U9WC4WPn85pMm4fhLJ3zTp5DzdVWK
- bNt0NNT9T1tzqYGdQ+FFRYrdSiXkmTR/CHowxVjTogFw9KRQMFq1nV7a1eT5QuPYC0
- W409e7B+YYgBDK9de6SpCMq7aoLNCN2HIzBdE2vBjGuqHH2Ut+OFBwc1tH36WIV3UT
- Cs4fbzqegdE5AJl/dNzIzOFDaRCWCTe79BWO//6i3J9VNI4Z9tfP5Nm8EMACCllStA
- tM3P/oKuI0adtPUXxiPjEjmDugWUgZL1NEk9E81xjHRnyrgEddM0L4tpw+urnF5iCs
- Kq+bbIW9YQEdg==
-Date: Thu, 10 Nov 2022 10:42:15 +0000
+ b=q7yrCBYaMVt5lQUJck43cNgkEMT+tC1Nw66t1auZNSnh//Yylt2VOd8unkP88N97q
+ 43FJPjDH/nBQbzrXLZqFovxD+orcb8Q0HL4ILi3Z98noryk44P4Z0JrByTmaL1+nTO
+ 8VfNXxVODjqV5SgaebFtb6OAu3iLTg9KdtVelNBwAOFguVj24a06Zqi20epeupTnzO
+ CRCWGg9+Pe5/feaoe4BkM54g3hZ3KB6TFDVORI0hrODNK5Wbnc9PPx0zkwHz0yx/7p
+ hcYpy1zmwG7sek/QC4vDqiEs6y5uO5UrBsfOg4L8DgPiJeM2vuOxAv5jX3e4G/tL5b
+ arKH2PscveFkw==
+Date: Thu, 10 Nov 2022 10:46:13 +0000
 From: Will Deacon <will@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH 1/2] KVM: arm64: Clean out the odd handling of
- completer_addr
-Message-ID: <20221110104215.GA26282@willie-the-truck>
+Subject: Re: [PATCH 2/2] KVM: arm64: Redefine pKVM memory transitions in
+ terms of source/target
+Message-ID: <20221110104612.GB26282@willie-the-truck>
 References: <20221028083448.1998389-1-oliver.upton@linux.dev>
- <20221028083448.1998389-2-oliver.upton@linux.dev>
+ <20221028083448.1998389-3-oliver.upton@linux.dev>
+ <Y1uncNq2oyc5wALG@google.com> <Y1utqG5f0lRrNwlI@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20221028083448.1998389-2-oliver.upton@linux.dev>
+In-Reply-To: <Y1utqG5f0lRrNwlI@google.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
@@ -74,60 +75,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Oliver,
-
-On Fri, Oct 28, 2022 at 08:34:47AM +0000, Oliver Upton wrote:
-> The layout of struct pkvm_mem_transition is a bit weird; the destination
-> address for the transition is actually stashed in the initiator address
-> context. Even weirder so, that address is thrown inside a union and
-> return from helpers by use of an out pointer.
+On Fri, Oct 28, 2022 at 10:23:36AM +0000, Oliver Upton wrote:
+> On Fri, Oct 28, 2022 at 09:57:04AM +0000, Quentin Perret wrote:
+> > On Friday 28 Oct 2022 at 08:34:48 (+0000), Oliver Upton wrote:
+> > > Perhaps it is just me, but the 'initiator' and 'completer' terms are
+> > > slightly confusing descriptors for the addresses involved in a memory
+> > > transition. Apply a rename to instead describe memory transitions in
+> > > terms of a source and target address.
+> > 
+> > Just to provide some rationale for the initiator/completer terminology,
+> > the very first implementation we did of this used 'sender/recipient (or
+> > something along those lines I think), and we ended up confusing
+> > ourselves massively. The main issue is that memory doesn't necessarily
+> > 'flow' in the same direction as the transition. It's all fine for a
+> > donation or a share, but reclaim and unshare become funny. 'The
+> > recipient of an unshare' can be easily misunderstood, I think.
+> > 
+> > So yeah, we ended up with initiator/completer, which may not be the
+> > prettiest terminology, but it was useful to disambiguate things at
+> > least.
 > 
-> Rip out the whole mess and move the destination address into the
-> destination context sub-struct. No functional change intended.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 70 ++++++++++-----------------
->  1 file changed, 25 insertions(+), 45 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 1e78acf9662e..3636a24e1b34 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -393,17 +393,12 @@ struct pkvm_mem_transition {
->  		enum pkvm_component_id	id;
->  		/* Address in the initiator's address space */
->  		u64			addr;
-> -
-> -		union {
-> -			struct {
-> -				/* Address in the completer's address space */
-> -				u64	completer_addr;
-> -			} host;
-> -		};
->  	} initiator;
->  
->  	struct {
->  		enum pkvm_component_id	id;
-> +		/* Address in the completer's address space */
-> +		u64			addr;
->  	} completer;
->  };
+> I see, thanks for the background :) If I've managed to re-ambiguate the
+> language here then LMK. Frankly, I'm more strongly motivated on the
+> first patch anyway.
 
-I'm reasonably sure we'll end up putting this back like we had it as we gain
-support for guest-initiatied transitions, where we have to walk the guest
-stage-2 page-table to figure out the physical address of the memory being
-shared, which is the host (completer's) IPA thanks to the identity mapping
-there.
+Having been previously tangled up in the confusion mentioned by Quentin, I'm
+also strongly in favour of leaving the terminology as-is for the time being.
+Once we have some of the more interesting memory transitions (i.e.
+approaching the cross-product of host/guest/hyp/trustzone doing
+share/unshare/donate) then I think we'll be in a much better position to
+improve the naming, but whatever we change now is very unlikely to stick and
+the patches as we have them now are at least consistent.
 
-So here's what I'll do: I'll post a v6 of the EL2 state series, and I'll
-include this at the end (before the RFC patch) and let Marc decide whether
-to go ahead with it. I do agree that it cleans things up for now but, as
-above, I think that's likely to be a short-lived change.
-
-Sound reasonable?
-
-Cheers,
+I replied separately on the first patch, as I don't really have a strong
+opinion on that one.
 
 Will
 _______________________________________________
