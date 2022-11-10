@@ -2,56 +2,51 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95662C433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 01:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFC44C43217
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Nov 2022 01:54:16 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CC8B4BA84;
-	Wed,  9 Nov 2022 20:06:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B4694BA62;
+	Wed,  9 Nov 2022 20:54:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id I0lh8N7EbCLd; Wed,  9 Nov 2022 20:06:20 -0500 (EST)
+	with ESMTP id GXoXxPxKU3mK; Wed,  9 Nov 2022 20:54:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15F354BA3D;
-	Wed,  9 Nov 2022 20:06:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE56F4BA63;
+	Wed,  9 Nov 2022 20:54:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 58C234BA28
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 20:06:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C613C4BA63
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 20:54:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4PNArS1Fn3zc for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Nov 2022 20:06:16 -0500 (EST)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 487394B9D6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 20:06:16 -0500 (EST)
+ with ESMTP id hfih1hK6Zqoj for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Nov 2022 20:54:12 -0500 (EST)
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 00EF24BA62
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Nov 2022 20:54:11 -0500 (EST)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1668042371;
+ t=1668045246;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding;
- bh=eZILFSaz86K3PCTmubRu/Ja27ewYZKXSfl7+aUl2EoU=;
- b=qyhF2ZdqbbmUNk6arPBPQ485kemkFB/KXq0j/XGDaM23JdUw51d0aPnQG8LVMqmzlFGz9K
- naWFDEgXTw4gC36CQ3Qu9Cap8eXX0V776UyG0iQpRG25JG9jVWl4V5oCi1F8ygOx92Avnr
- TaanTuuMJBNyyVMk7o/jg3r9JiQfMLw=
+ bh=031ydeJtovOSU9UK7Zdq7wfix4bS349PsNi9KAdKvDc=;
+ b=X3XzqfNXXcRLTeLoYDb82vNYtNnhU2Pdma2Im8vRiBs2PSgzGPRW3QO/JNmqwXuxk0JBuy
+ fE77/gDtEDf/U8wyFS+sVBbxcQzFvMs8sb+VLpgHQDZCMdppxhy+n8ex4xzju71p5DNCbA
+ FR7K2KcG2xFsRiX7clp/P9Qigd2Ig0g=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Subject: [RESEND PATCH] KVM: arm64: Move arch-specific headers out of
- include/kvm/
-Date: Thu, 10 Nov 2022 01:05:59 +0000
-Message-Id: <20221110010603.3382385-1-oliver.upton@linux.dev>
+To: 
+Subject: [RFC PATCH 0/3] KVM: arm64: Allow userspace to trap hypercall ranges
+Date: Thu, 10 Nov 2022 01:53:24 +0000
+Message-Id: <20221110015327.3389351-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
 X-Migadu-Flow: FLOW_OUT
-Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,605 +63,75 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Long ago in a galaxy far, far away, KVM was supported on both 32 bit and
-64 bit arm architectures. A considerable portion of the code was shared
-between these architectures, hence some headers needed to live in an
-arch-generic path.
+The Arm SMCCC is rather prescriptive in regards to the allocation of
+SMCCC function ID ranges. Many of the hypercall ranges have an
+associated specification from Arm (FF-A, PSCI, SDEI, etc.) with some
+room for vendor-specific implementations.
 
-KVM/arm64 is the only supported arm KVM port now. Sweep some remaining
-residue into the arch-specific include path.
+The ever-expanding hypercall surface leaves a lot of work within KVM for
+providing new features. Furthermore, KVM implements its own
+vendor-specific ABI, leaving little room for other implementations (like
+Hyper-V, for example).
 
-No functional change intended.
+This series takes a stab at both by allowing SMCCC ranges to shunt to
+userspace. The meat of the UAPI is a bitmap (conveyed through a VM
+capability) that creates trap bits for known SMCCC ranges. Exits are
+done by reusing the KVM_EXIT_HYPERCALL interface, with its hilariously
+x86-specific kvm_run structure (no longmode here!)
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
+=> We have these new hypercall bitmap registers, why not use that?
 
-The one time I forget to run checkpatch.pl I left the stupid Gerrit
-Change-Id in the commit message...
+The hypercall bitmap registers aren't necessarily aimed at the same
+problem. The bitmap registers allow a VMM to preserve the ABI the guest
+gets from KVM by default when migrating between hosts. By default KVM
+exposes the entire feature set to the guest, whereas user hypercalls
+need explicit opt-in from userspace.
 
- MAINTAINERS                                              | 1 -
- .../arm64/include/asm/kvm_arch_timer.h                   | 5 +++--
- arch/arm64/include/asm/kvm_host.h                        | 7 +++----
- .../arm64/include/asm/kvm_hypercalls.h                   | 4 ++--
- .../kvm/arm_pmu.h => arch/arm64/include/asm/kvm_pmu.h    | 5 +++--
- .../kvm/arm_psci.h => arch/arm64/include/asm/kvm_psci.h  | 6 +++---
- .../kvm/arm_vgic.h => arch/arm64/include/asm/kvm_vgic.h  | 4 ++--
- arch/arm64/kvm/arch_timer.c                              | 5 ++---
- arch/arm64/kvm/arm.c                                     | 9 ++++-----
- arch/arm64/kvm/guest.c                                   | 2 +-
- arch/arm64/kvm/handle_exit.c                             | 3 +--
- arch/arm64/kvm/hyp/include/hyp/switch.h                  | 3 +--
- arch/arm64/kvm/hyp/nvhe/switch.c                         | 3 +--
- arch/arm64/kvm/hyp/vhe/switch.c                          | 3 +--
- arch/arm64/kvm/hypercalls.c                              | 5 ++---
- arch/arm64/kvm/irq.h                                     | 7 +++----
- arch/arm64/kvm/pmu-emul.c                                | 4 ++--
- arch/arm64/kvm/psci.c                                    | 5 ++---
- arch/arm64/kvm/pvtime.c                                  | 3 +--
- arch/arm64/kvm/reset.c                                   | 3 +--
- arch/arm64/kvm/trace_arm.h                               | 2 +-
- arch/arm64/kvm/trng.c                                    | 3 +--
- arch/arm64/kvm/vgic/vgic-debug.c                         | 2 +-
- arch/arm64/kvm/vgic/vgic-init.c                          | 2 +-
- arch/arm64/kvm/vgic/vgic-irqfd.c                         | 2 +-
- arch/arm64/kvm/vgic/vgic-kvm-device.c                    | 2 +-
- arch/arm64/kvm/vgic/vgic-mmio-v2.c                       | 2 +-
- arch/arm64/kvm/vgic/vgic-mmio-v3.c                       | 2 +-
- arch/arm64/kvm/vgic/vgic-mmio.c                          | 4 ++--
- arch/arm64/kvm/vgic/vgic-v2.c                            | 2 +-
- arch/arm64/kvm/vgic/vgic-v3.c                            | 4 ++--
- 31 files changed, 51 insertions(+), 63 deletions(-)
- rename include/kvm/arm_arch_timer.h => arch/arm64/include/asm/kvm_arch_timer.h (96%)
- rename include/kvm/arm_hypercalls.h => arch/arm64/include/asm/kvm_hypercalls.h (94%)
- rename include/kvm/arm_pmu.h => arch/arm64/include/asm/kvm_pmu.h (98%)
- rename include/kvm/arm_psci.h => arch/arm64/include/asm/kvm_psci.h (91%)
- rename include/kvm/arm_vgic.h => arch/arm64/include/asm/kvm_vgic.h (99%)
+TODO:
+ - SMCCC_ARCH_FEATURES is pitifully overloaded to allow discovery of
+   paravirtualized time features. Queries to SMCCC_ARCH_FEATURES against
+   PV time should go to userspace if userspace has PV time trapped.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 379945f82a64..f7742e89e7b5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11218,7 +11218,6 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git
- F:	arch/arm64/include/asm/kvm*
- F:	arch/arm64/include/uapi/asm/kvm*
- F:	arch/arm64/kvm/
--F:	include/kvm/arm_*
- F:	tools/testing/selftests/kvm/*/aarch64/
- F:	tools/testing/selftests/kvm/aarch64/
- 
-diff --git a/include/kvm/arm_arch_timer.h b/arch/arm64/include/asm/kvm_arch_timer.h
-similarity index 96%
-rename from include/kvm/arm_arch_timer.h
-rename to arch/arm64/include/asm/kvm_arch_timer.h
-index cd6d8f260eab..8982845a59d8 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/arch/arm64/include/asm/kvm_arch_timer.h
-@@ -4,11 +4,12 @@
-  * Author: Marc Zyngier <marc.zyngier@arm.com>
-  */
- 
--#ifndef __ASM_ARM_KVM_ARCH_TIMER_H
--#define __ASM_ARM_KVM_ARCH_TIMER_H
-+#ifndef __ARM64_KVM_ARCH_TIMER_H
-+#define __ARM64_KVM_ARCH_TIMER_H
- 
- #include <linux/clocksource.h>
- #include <linux/hrtimer.h>
-+#include <linux/kvm.h>
- 
- enum kvm_arch_timers {
- 	TIMER_PTIMER,
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 45e2136322ba..e33ed7c09a28 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -25,16 +25,15 @@
- #include <asm/daifflags.h>
- #include <asm/fpsimd.h>
- #include <asm/kvm.h>
-+#include <asm/kvm_arch_timer.h>
- #include <asm/kvm_asm.h>
-+#include <asm/kvm_pmu.h>
-+#include <asm/kvm_vgic.h>
- 
- #define __KVM_HAVE_ARCH_INTC_INITIALIZED
- 
- #define KVM_HALT_POLL_NS_DEFAULT 500000
- 
--#include <kvm/arm_vgic.h>
--#include <kvm/arm_arch_timer.h>
--#include <kvm/arm_pmu.h>
--
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
- 
- #define KVM_VCPU_MAX_FEATURES 7
-diff --git a/include/kvm/arm_hypercalls.h b/arch/arm64/include/asm/kvm_hypercalls.h
-similarity index 94%
-rename from include/kvm/arm_hypercalls.h
-rename to arch/arm64/include/asm/kvm_hypercalls.h
-index 1188f116cf4e..dfebe8dd8dcd 100644
---- a/include/kvm/arm_hypercalls.h
-+++ b/arch/arm64/include/asm/kvm_hypercalls.h
-@@ -1,8 +1,8 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- /* Copyright (C) 2019 Arm Ltd. */
- 
--#ifndef __KVM_ARM_HYPERCALLS_H
--#define __KVM_ARM_HYPERCALLS_H
-+#ifndef __ARM64_KVM_HYPERCALLS_H
-+#define __ARM64_KVM_HYPERCALLS_H
- 
- #include <asm/kvm_emulate.h>
- 
-diff --git a/include/kvm/arm_pmu.h b/arch/arm64/include/asm/kvm_pmu.h
-similarity index 98%
-rename from include/kvm/arm_pmu.h
-rename to arch/arm64/include/asm/kvm_pmu.h
-index c0b868ce6a8f..04a1a1565d4a 100644
---- a/include/kvm/arm_pmu.h
-+++ b/arch/arm64/include/asm/kvm_pmu.h
-@@ -4,9 +4,10 @@
-  * Author: Shannon Zhao <shannon.zhao@linaro.org>
-  */
- 
--#ifndef __ASM_ARM_KVM_PMU_H
--#define __ASM_ARM_KVM_PMU_H
-+#ifndef __ARM64_KVM_PMU_H
-+#define __ARM64_KVM_PMU_H
- 
-+#include <linux/kvm.h>
- #include <linux/perf_event.h>
- #include <asm/perf_event.h>
- 
-diff --git a/include/kvm/arm_psci.h b/arch/arm64/include/asm/kvm_psci.h
-similarity index 91%
-rename from include/kvm/arm_psci.h
-rename to arch/arm64/include/asm/kvm_psci.h
-index 6e55b9283789..befec38c572a 100644
---- a/include/kvm/arm_psci.h
-+++ b/arch/arm64/include/asm/kvm_psci.h
-@@ -4,8 +4,8 @@
-  * Author: Marc Zyngier <marc.zyngier@arm.com>
-  */
- 
--#ifndef __KVM_ARM_PSCI_H__
--#define __KVM_ARM_PSCI_H__
-+#ifndef __ARM64_KVM_PSCI_H__
-+#define __ARM64_KVM_PSCI_H__
- 
- #include <linux/kvm_host.h>
- #include <uapi/linux/psci.h>
-@@ -39,4 +39,4 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
- 
- int kvm_psci_call(struct kvm_vcpu *vcpu);
- 
--#endif /* __KVM_ARM_PSCI_H__ */
-+#endif /* __ARM64_KVM_PSCI_H__ */
-diff --git a/include/kvm/arm_vgic.h b/arch/arm64/include/asm/kvm_vgic.h
-similarity index 99%
-rename from include/kvm/arm_vgic.h
-rename to arch/arm64/include/asm/kvm_vgic.h
-index 4df9e73a8bb5..2a261ca9f8ea 100644
---- a/include/kvm/arm_vgic.h
-+++ b/arch/arm64/include/asm/kvm_vgic.h
-@@ -2,8 +2,8 @@
- /*
-  * Copyright (C) 2015, 2016 ARM Ltd.
-  */
--#ifndef __KVM_ARM_VGIC_H
--#define __KVM_ARM_VGIC_H
-+#ifndef __ARM64_KVM_VGIC_H
-+#define __ARM64_KVM_VGIC_H
- 
- #include <linux/bits.h>
- #include <linux/kvm.h>
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index bb24a76b4224..f99430a48e0e 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -14,11 +14,10 @@
- 
- #include <clocksource/arm_arch_timer.h>
- #include <asm/arch_timer.h>
-+#include <asm/kvm_arch_timer.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
--
--#include <kvm/arm_vgic.h>
--#include <kvm/arm_arch_timer.h>
-+#include <asm/kvm_vgic.h>
- 
- #include "trace.h"
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 94d33e296e10..6f0b56e7f8c7 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -36,14 +36,13 @@
- #include <asm/virt.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
--#include <asm/kvm_mmu.h>
- #include <asm/kvm_emulate.h>
-+#include <asm/kvm_hypercalls.h>
-+#include <asm/kvm_mmu.h>
-+#include <asm/kvm_pmu.h>
-+#include <asm/kvm_psci.h>
- #include <asm/sections.h>
- 
--#include <kvm/arm_hypercalls.h>
--#include <kvm/arm_pmu.h>
--#include <kvm/arm_psci.h>
--
- static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
- DEFINE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
- 
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 2ff13a3f8479..f60d7886df03 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -18,12 +18,12 @@
- #include <linux/string.h>
- #include <linux/vmalloc.h>
- #include <linux/fs.h>
--#include <kvm/arm_hypercalls.h>
- #include <asm/cputype.h>
- #include <linux/uaccess.h>
- #include <asm/fpsimd.h>
- #include <asm/kvm.h>
- #include <asm/kvm_emulate.h>
-+#include <asm/kvm_hypercalls.h>
- #include <asm/sigcontext.h>
- 
- #include "trace.h"
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index e778eefcf214..cdfd7aef385e 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -15,13 +15,12 @@
- #include <asm/exception.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
-+#include <asm/kvm_hypercalls.h>
- #include <asm/kvm_mmu.h>
- #include <asm/debug-monitors.h>
- #include <asm/stacktrace/nvhe.h>
- #include <asm/traps.h>
- 
--#include <kvm/arm_hypercalls.h>
--
- #define CREATE_TRACE_POINTS
- #include "trace_handle_exit.h"
- 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 6cbbb6c02f66..d033fc531ada 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -16,8 +16,6 @@
- #include <linux/jump_label.h>
- #include <uapi/linux/psci.h>
- 
--#include <kvm/arm_psci.h>
--
- #include <asm/barrier.h>
- #include <asm/cpufeature.h>
- #include <asm/extable.h>
-@@ -26,6 +24,7 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_psci.h>
- #include <asm/fpsimd.h>
- #include <asm/debug-monitors.h>
- #include <asm/processor.h>
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 8e9d49a964be..02a4f5d10de5 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -13,8 +13,6 @@
- #include <linux/jump_label.h>
- #include <uapi/linux/psci.h>
- 
--#include <kvm/arm_psci.h>
--
- #include <asm/barrier.h>
- #include <asm/cpufeature.h>
- #include <asm/kprobes.h>
-@@ -22,6 +20,7 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_psci.h>
- #include <asm/fpsimd.h>
- #include <asm/debug-monitors.h>
- #include <asm/processor.h>
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 7acb87eaa092..fe3db6a1cbac 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -13,8 +13,6 @@
- #include <linux/percpu.h>
- #include <uapi/linux/psci.h>
- 
--#include <kvm/arm_psci.h>
--
- #include <asm/barrier.h>
- #include <asm/cpufeature.h>
- #include <asm/kprobes.h>
-@@ -22,6 +20,7 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_psci.h>
- #include <asm/fpsimd.h>
- #include <asm/debug-monitors.h>
- #include <asm/processor.h>
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index c9f401fa01a9..6804075ce57f 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -5,9 +5,8 @@
- #include <linux/kvm_host.h>
- 
- #include <asm/kvm_emulate.h>
--
--#include <kvm/arm_hypercalls.h>
--#include <kvm/arm_psci.h>
-+#include <asm/kvm_hypercalls.h>
-+#include <asm/kvm_psci.h>
- 
- #define KVM_ARM_SMCCC_STD_FEATURES				\
- 	GENMASK(KVM_REG_ARM_STD_BMAP_BIT_COUNT - 1, 0)
-diff --git a/arch/arm64/kvm/irq.h b/arch/arm64/kvm/irq.h
-index 0d257de42c10..e79301e48938 100644
---- a/arch/arm64/kvm/irq.h
-+++ b/arch/arm64/kvm/irq.h
-@@ -3,14 +3,13 @@
-  * irq.h: in kernel interrupt controller related definitions
-  * Copyright (c) 2016 Red Hat, Inc.
-  *
-- * This header is included by irqchip.c. However, on ARM, interrupt
-- * controller declarations are located in include/kvm/arm_vgic.h since
-- * they are mostly shared between arm and arm64.
-+ * This header is included by irqchip.c. However, on arm64, interrupt
-+ * controller declarations are located in arch/arm64/include/asm/kvm_vgic.h
-  */
- 
- #ifndef __IRQ_H
- #define __IRQ_H
- 
--#include <kvm/arm_vgic.h>
-+#include <asm/kvm_vgic.h>
- 
- #endif
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 0003c7d37533..c370ffe41076 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -12,8 +12,8 @@
- #include <linux/perf/arm_pmu.h>
- #include <linux/uaccess.h>
- #include <asm/kvm_emulate.h>
--#include <kvm/arm_pmu.h>
--#include <kvm/arm_vgic.h>
-+#include <asm/kvm_pmu.h>
-+#include <asm/kvm_vgic.h>
- 
- DEFINE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
- 
-diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index 7fbc4c1b9df0..809710808b25 100644
---- a/arch/arm64/kvm/psci.c
-+++ b/arch/arm64/kvm/psci.c
-@@ -12,9 +12,8 @@
- 
- #include <asm/cputype.h>
- #include <asm/kvm_emulate.h>
--
--#include <kvm/arm_psci.h>
--#include <kvm/arm_hypercalls.h>
-+#include <asm/kvm_hypercalls.h>
-+#include <asm/kvm_psci.h>
- 
- /*
-  * This is an implementation of the Power State Coordination Interface
-diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
-index 78a09f7a6637..614b2e70b815 100644
---- a/arch/arm64/kvm/pvtime.c
-+++ b/arch/arm64/kvm/pvtime.c
-@@ -5,11 +5,10 @@
- #include <linux/kvm_host.h>
- #include <linux/sched/stat.h>
- 
-+#include <asm/kvm_hypercalls.h>
- #include <asm/kvm_mmu.h>
- #include <asm/pvclock-abi.h>
- 
--#include <kvm/arm_hypercalls.h>
--
- void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 5ae18472205a..86321c968de7 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -17,12 +17,11 @@
- #include <linux/string.h>
- #include <linux/types.h>
- 
--#include <kvm/arm_arch_timer.h>
--
- #include <asm/cpufeature.h>
- #include <asm/cputype.h>
- #include <asm/fpsimd.h>
- #include <asm/ptrace.h>
-+#include <asm/kvm_arch_timer.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
-diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-index 33e4e7dd2719..a4028b46f22f 100644
---- a/arch/arm64/kvm/trace_arm.h
-+++ b/arch/arm64/kvm/trace_arm.h
-@@ -2,7 +2,7 @@
- #if !defined(_TRACE_ARM_ARM64_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
- #define _TRACE_ARM_ARM64_KVM_H
- 
--#include <kvm/arm_arch_timer.h>
-+#include <asm/kvm_arch_timer.h>
- #include <linux/tracepoint.h>
- 
- #undef TRACE_SYSTEM
-diff --git a/arch/arm64/kvm/trng.c b/arch/arm64/kvm/trng.c
-index 99bdd7103c9c..b257d4eace50 100644
---- a/arch/arm64/kvm/trng.c
-+++ b/arch/arm64/kvm/trng.c
-@@ -4,10 +4,9 @@
- #include <linux/arm-smccc.h>
- #include <linux/kvm_host.h>
- 
-+#include <asm/kvm_hypercalls.h>
- #include <asm/kvm_emulate.h>
- 
--#include <kvm/arm_hypercalls.h>
--
- #define ARM_SMCCC_TRNG_VERSION_1_0	0x10000UL
- 
- /* Those values are deliberately separate from the generic SMCCC definitions. */
-diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
-index 78cde687383c..a75d423b6c2e 100644
---- a/arch/arm64/kvm/vgic/vgic-debug.c
-+++ b/arch/arm64/kvm/vgic/vgic-debug.c
-@@ -9,8 +9,8 @@
- #include <linux/interrupt.h>
- #include <linux/kvm_host.h>
- #include <linux/seq_file.h>
--#include <kvm/arm_vgic.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_vgic.h>
- #include "vgic.h"
- 
- /*
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index f6d4f4052555..7adc0beae769 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -7,9 +7,9 @@
- #include <linux/interrupt.h>
- #include <linux/cpu.h>
- #include <linux/kvm_host.h>
--#include <kvm/arm_vgic.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_vgic.h>
- #include "vgic.h"
- 
- /*
-diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
-index 475059bacedf..c2005f85a614 100644
---- a/arch/arm64/kvm/vgic/vgic-irqfd.c
-+++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
-@@ -5,8 +5,8 @@
- 
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
-+#include <asm/kvm_vgic.h>
- #include <trace/events/kvm.h>
--#include <kvm/arm_vgic.h>
- #include "vgic.h"
- 
- /**
-diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index edeac2380591..3d628f4916f3 100644
---- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-+++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -6,7 +6,7 @@
-  * Author: Marc Zyngier <marc.zyngier@arm.com>
-  */
- #include <linux/kvm_host.h>
--#include <kvm/arm_vgic.h>
-+#include <asm/kvm_vgic.h>
- #include <linux/uaccess.h>
- #include <asm/kvm_mmu.h>
- #include <asm/cputype.h>
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-index e070cda86e12..682a5a86c512 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-@@ -7,9 +7,9 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <linux/nospec.h>
-+#include <asm/kvm_vgic.h>
- 
- #include <kvm/iodev.h>
--#include <kvm/arm_vgic.h>
- 
- #include "vgic.h"
- #include "vgic-mmio.h"
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index 91201f743033..96a2a3460c3f 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -8,8 +8,8 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <linux/interrupt.h>
-+#include <asm/kvm_vgic.h>
- #include <kvm/iodev.h>
--#include <kvm/arm_vgic.h>
- 
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_arm.h>
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
-index b32d434c1d4a..046a65485ce9 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio.c
-@@ -9,9 +9,9 @@
- #include <linux/irq.h>
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
-+#include <asm/kvm_arch_timer.h>
-+#include <asm/kvm_vgic.h>
- #include <kvm/iodev.h>
--#include <kvm/arm_arch_timer.h>
--#include <kvm/arm_vgic.h>
- 
- #include "vgic.h"
- #include "vgic-mmio.h"
-diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index 645648349c99..2a803be83b4b 100644
---- a/arch/arm64/kvm/vgic/vgic-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-v2.c
-@@ -6,7 +6,7 @@
- #include <linux/irqchip/arm-gic.h>
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
--#include <kvm/arm_vgic.h>
-+#include <asm/kvm_vgic.h>
- #include <asm/kvm_mmu.h>
- 
- #include "vgic.h"
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 826ff6f2a4e7..f904447fc740 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -5,10 +5,10 @@
- #include <linux/irqdomain.h>
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
--#include <kvm/arm_vgic.h>
-+#include <asm/kvm_asm.h>
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
--#include <asm/kvm_asm.h>
-+#include <asm/kvm_vgic.h>
- 
- #include "vgic.h"
- 
+ - May want to use a completion on reentry for propagating the return
+   value to avoid extra ioctls (SMCCC calls can return more than a
+   single register value).
 
-base-commit: 30a0b95b1335e12efef89dd78518ed3e4a71a763
+Tossing up on the list as an RFC to gauge interest in such an interface.
+Gently tested with the included selftest and that's about it.
+
+Applies to v6.1-rc3 + the header relocation [1]. No firm reason for it
+besides the fact that I initially did the refactoring as part of this
+series and am too lazy to rebase.
+
+[1] https://lore.kernel.org/kvmarm/20221110010603.3382385-1-oliver.upton@linux.dev/
+
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.linux.dev
+Cc: kvmarm@lists.cs.columbia.edu
+
+Oliver Upton (3):
+  KVM: arm64: Use a generalized accessor for SMCCC args
+  KVM: arm64: Allow userspace to trap SMCCC sub-ranges
+  KVM: selftests: Test user hypercalls
+
+ arch/arm64/include/asm/kvm_host.h             |   5 +
+ arch/arm64/include/asm/kvm_hypercalls.h       |  22 ++-
+ arch/arm64/include/uapi/asm/kvm.h             |  15 ++
+ arch/arm64/kvm/arm.c                          |  10 ++
+ arch/arm64/kvm/hypercalls.c                   |  52 ++++++-
+ arch/arm64/kvm/psci.c                         |  14 +-
+ arch/arm64/kvm/pvtime.c                       |   2 +-
+ arch/arm64/kvm/trng.c                         |   4 +-
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/user_hypercalls.c   | 130 ++++++++++++++++++
+ 12 files changed, 231 insertions(+), 26 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/user_hypercalls.c
+
 -- 
 2.38.1.431.g37b22c650d-goog
 
