@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F13382
-	for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 19:03:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5F08C433D7;
-	Thu, 10 Nov 2022 19:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA851A629
+	for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 19:03:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83368C433C1;
+	Thu, 10 Nov 2022 19:03:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668106992;
-	bh=97q5A9Gd4TgMnrgY4I6Ig8NHxzSasHDA5K5vsZWaiGs=;
+	s=k20201202; t=1668106995;
+	bh=CgvCcN0w8RSnobGp+pWjrUtf6udUwWRpslfHA1QtLho=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iOonGwpMNdQiuqHMmis6uHKeXtpIN2iKZOg7MS7H/VqkPMgjcEXRcitptZstkMMWs
-	 34WW9Hof0okR9GhnOJOFUJuEC7Ca4+prGcW/kTE+yFldgIYf1WsWt1+H6mz8pCvOB+
-	 scTRZqIjhX2aVOgBQOoYClWFiZrGzrvbeqLkzgjK5hzmpX3byiutg/VDwzKupnFsx0
-	 npoDt+9+wWiNPL16E/JQ3qdhIvESvsmWUZ1RytOIxJyaB32rTuFgbcxxHhaDJcSn1D
-	 V4yEjdEqjxSQn1+2dQ47q6JbwPvpS+fUNsOLQNycAw3AO8Pl50LpOqJQU9QSr/6Xrx
-	 tR7SicyryU/HA==
+	b=RhxpPOarAXUTKV23j8xbMMyFzemBUqydFEMbZUybOb6bFTGdqY2mzZ7Dp1K6qkXwY
+	 q92WTX1Li89s45N5Df90uwpmylmpAFccan12ojrLp01gEqexUqmnFtnt2jPZwzFuv5
+	 pOS4G5HWcawfHwGOTBNKH8GAb8bHJqQntWVR+X2+o2cUInIe4CmhdnOEpHpE5Kd/rk
+	 2/1URxE7QFt2wvSN2XjU8SWQvmz1hPGEXRvnZinfciaWZ6hibW78cOdQM+jOgNFpTQ
+	 hqw6T0NtKpzzdIAoxITWkf9MWLge/jShjUme1ebyUBUbYUjKDk/EWkvqzJx8+yfUL3
+	 j276L7xrOpxww==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Will Deacon <will@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Will Deacon <will@kernel.org>,
 	kernel-team@android.com,
 	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v6 01/26] KVM: arm64: Move hyp refcount manipulation helpers to common header file
-Date: Thu, 10 Nov 2022 19:02:34 +0000
-Message-Id: <20221110190259.26861-2-will@kernel.org>
+Subject: [PATCH v6 02/26] KVM: arm64: Allow attaching of non-coalescable pages to a hyp pool
+Date: Thu, 10 Nov 2022 19:02:35 +0000
+Message-Id: <20221110190259.26861-3-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20221110190259.26861-1-will@kernel.org>
 References: <20221110190259.26861-1-will@kernel.org>
@@ -46,93 +46,58 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Quentin Perret <qperret@google.com>
 
-We will soon need to manipulate 'struct hyp_page' refcounts from outside
-page_alloc.c, so move the helpers to a common header file to allow them
-to be reused easily.
+All the contiguous pages used to initialize a 'struct hyp_pool' are
+considered coalescable, which means that the hyp page allocator will
+actively try to merge them with their buddies on the hyp_put_page() path.
+However, using hyp_put_page() on a page that is not part of the inital
+memory range given to a hyp_pool() is currently unsupported.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+In order to allow dynamically extending hyp pools at run-time, add a
+check to __hyp_attach_page() to allow inserting 'external' pages into
+the free-list of order 0. This will be necessary to allow lazy donation
+of pages from the host to the hypervisor when allocating guest stage-2
+page-table pages at EL2.
+
 Tested-by: Vincent Donnefort <vdonnefort@google.com>
 Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/nvhe/memory.h | 22 ++++++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/page_alloc.c     | 19 -------------------
- 2 files changed, 22 insertions(+), 19 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-index 592b7edb3edb..9422900e5c6a 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-@@ -38,6 +38,10 @@ static inline phys_addr_t hyp_virt_to_phys(void *addr)
- #define hyp_page_to_virt(page)	__hyp_va(hyp_page_to_phys(page))
- #define hyp_page_to_pool(page)	(((struct hyp_page *)page)->pool)
- 
-+/*
-+ * Refcounting for 'struct hyp_page'.
-+ * hyp_pool::lock must be held if atomic access to the refcount is required.
-+ */
- static inline int hyp_page_count(void *addr)
- {
- 	struct hyp_page *p = hyp_virt_to_page(addr);
-@@ -45,4 +49,22 @@ static inline int hyp_page_count(void *addr)
- 	return p->refcount;
- }
- 
-+static inline void hyp_page_ref_inc(struct hyp_page *p)
-+{
-+	BUG_ON(p->refcount == USHRT_MAX);
-+	p->refcount++;
-+}
-+
-+static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
-+{
-+	BUG_ON(!p->refcount);
-+	p->refcount--;
-+	return (p->refcount == 0);
-+}
-+
-+static inline void hyp_set_page_refcounted(struct hyp_page *p)
-+{
-+	BUG_ON(p->refcount);
-+	p->refcount = 1;
-+}
- #endif /* __KVM_HYP_MEMORY_H */
 diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-index d40f0b30b534..1ded09fc9b10 100644
+index 1ded09fc9b10..dad88e203598 100644
 --- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
 +++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-@@ -144,25 +144,6 @@ static struct hyp_page *__hyp_extract_page(struct hyp_pool *pool,
- 	return p;
- }
- 
--static inline void hyp_page_ref_inc(struct hyp_page *p)
--{
--	BUG_ON(p->refcount == USHRT_MAX);
--	p->refcount++;
--}
--
--static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
--{
--	BUG_ON(!p->refcount);
--	p->refcount--;
--	return (p->refcount == 0);
--}
--
--static inline void hyp_set_page_refcounted(struct hyp_page *p)
--{
--	BUG_ON(p->refcount);
--	p->refcount = 1;
--}
--
- static void __hyp_put_page(struct hyp_pool *pool, struct hyp_page *p)
+@@ -93,11 +93,16 @@ static inline struct hyp_page *node_to_page(struct list_head *node)
+ static void __hyp_attach_page(struct hyp_pool *pool,
+ 			      struct hyp_page *p)
  {
- 	if (hyp_page_ref_dec_and_test(p))
++	phys_addr_t phys = hyp_page_to_phys(p);
+ 	unsigned short order = p->order;
+ 	struct hyp_page *buddy;
+ 
+ 	memset(hyp_page_to_virt(p), 0, PAGE_SIZE << p->order);
+ 
++	/* Skip coalescing for 'external' pages being freed into the pool. */
++	if (phys < pool->range_start || phys >= pool->range_end)
++		goto insert;
++
+ 	/*
+ 	 * Only the first struct hyp_page of a high-order page (otherwise known
+ 	 * as the 'head') should have p->order set. The non-head pages should
+@@ -116,6 +121,7 @@ static void __hyp_attach_page(struct hyp_pool *pool,
+ 		p = min(p, buddy);
+ 	}
+ 
++insert:
+ 	/* Mark the new head, and insert it */
+ 	p->order = order;
+ 	page_add_to_list(p, &pool->free_area[order]);
 -- 
 2.38.1.431.g37b22c650d-goog
 
