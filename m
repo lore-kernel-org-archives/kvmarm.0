@@ -1,92 +1,189 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E820F382
-	for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 19:00:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8018BC433D6;
-	Thu, 10 Nov 2022 19:00:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB545382
+	for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 19:03:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DAFCC433C1;
+	Thu, 10 Nov 2022 19:03:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668106844;
-	bh=Xo5ZXPpv2Kz2QQAGSoMKDNSlgsw71TmAienD13Km1Z8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bceoK/IiO31N0l4xqOqhszwwzTzzH79tlkJG/Wjq20uTXVJmWDb17Qc3kkVsqqvBC
-	 VfCLQ5T+w9YOhH/No2W6ja8zCGx34roiiXIvIVVDVr/jM4py3ZdOJoKukGO3K+Tf0O
-	 yD9c6fzXALHfvsW8ExvyuLLxNqnLxI8Ds9HONhU8cgWn5WY4uuXNXDC30G2/xPDQ8Y
-	 YkImyr8Pig9+utm8AwGuGvc1fhYktn4XsSN2DRUK8zuLXmq5vLhUb93OWhr4+XB7bF
-	 6yZpSC0s4YZ7clMuSRyMHJ5ygDpiyfNjCjQWK8JsTQt//J/cuzMt4BB8jIlxAgkhIg
-	 nRwZpUj7PxKaA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1otCn4-005EHi-3v;
-	Thu, 10 Nov 2022 19:00:42 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	Gavin Shan <gshan@redhat.com>
-Cc: pbonzini@redhat.com,
+	s=k20201202; t=1668106988;
+	bh=kCyoC7Owlf6Rzfvz/B9oBU6dzXwkKh/MKTKr2w1oykQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jsuupxlwK3KY/ceOwMtt2hRLQ4+AxO+Rgg8C39EyvKcAz7wOZ5MlAJI1zSxc7zKHD
+	 BjRIIxnjqEAzU++YCgqcoko092QW9j1p2r3TAhwe2q+xAzzQpNWEZm8mqlzcUjouEP
+	 iB7MOBnwsZT3RWas0X1IUstTYPFuFxL4BB2RC/nRboL5JrqV5xgdXHdaWoIA+D3MfT
+	 c420D0Hi6SmDKxv9F39LU1nJRs7nshTNFXnZLEUa2CZCzyN3OP9MUgOGGUS4j2bTz1
+	 kedIjSTLJpd7YjLhfEZfCJUfvU6kNgJeaLdFpq/SJA+YVwOGECkAO6RSpr2jU/DW2x
+	 kS1wVgowc7x5A==
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.linux.dev
+Cc: Will Deacon <will@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	James Morse <james.morse@arm.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Quentin Perret <qperret@google.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	kernel-team@android.com,
 	kvm@vger.kernel.org,
-	oliver.upton@linux.dev,
-	linux-kernel@vger.kernel.org,
-	zhenyzha@redhat.com,
-	peterx@redhat.com,
-	kvmarm@lists.cs.columbia.edu,
-	ricarkol@google.com,
-	mail@maciej.szmigiero.name,
-	shan.gavin@gmail.com,
-	shuah@kernel.org,
-	seanjc@google.com,
-	ajones@ventanamicro.com
-Subject: Re: [PATCH v3 0/6] KVM: selftests: memslot_perf_test: aarch64 cleanup/fixes
-Date: Thu, 10 Nov 2022 19:00:38 +0000
-Message-ID: <166810681799.3361246.8104966072193072364.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221020071209.559062-1-gshan@redhat.com>
-References: <20221020071209.559062-1-gshan@redhat.com>
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH v6 00/26] KVM: arm64: Introduce pKVM hyp VM and vCPU state at EL2
+Date: Thu, 10 Nov 2022 19:02:33 +0000
+Message-Id: <20221110190259.26861-1-will@kernel.org>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, gshan@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org, oliver.upton@linux.dev, linux-kernel@vger.kernel.org, zhenyzha@redhat.com, peterx@redhat.com, kvmarm@lists.cs.columbia.edu, ricarkol@google.com, mail@maciej.szmigiero.name, shan.gavin@gmail.com, shuah@kernel.org, seanjc@google.com, ajones@ventanamicro.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221110190038.xwiOv0sQSObQFZof46sYReYzPbvL7kZfD-iVh7cx8eE@z>
 
-On Thu, 20 Oct 2022 15:12:03 +0800, Gavin Shan wrote:
-> kvm/selftests/memslots_perf_test doesn't work with 64KB-page-size-host
-> and 4KB-page-size-guest on aarch64. In the implementation, the host and
-> guest page size have been hardcoded to 4KB. It's ovbiously not working
-> on aarch64 which supports 4KB, 16KB, 64KB individually on host and guest.
-> 
-> This series tries to fix it. After the series is applied, the test runs
-> successfully with 64KB-page-size-host and 4KB-page-size-guest.
-> 
-> [...]
+Hi all,
 
-Applied to next, thanks!
+This is version six of the pKVM EL2 state series, extending the pKVM
+hypervisor code so that it can dynamically instantiate and manage VM
+data structures without the host being able to access them directly.
+These structures consist of a hyp VM, a set of hyp vCPUs and the stage-2
+page-table for the MMU. The pages used to hold the hypervisor structures
+are returned to the host when the VM is destroyed.
 
-[1/6] KVM: selftests: memslot_perf_test: Use data->nslots in prepare_vm()
-      commit: 3bfadb2325891d122771ce534336af531e93d7b2
-[2/6] KVM: selftests: memslot_perf_test: Consolidate loop conditions in prepare_vm()
-      commit: 2aae5e6795e1407334bb849f96f11c9051b959e2
-[3/6] KVM: selftests: memslot_perf_test: Probe memory slots for once
-      commit: 34396437b11f904fc61b272e3974f4c92868451b
-[4/6] KVM: selftests: memslot_perf_test: Support variable guest page size
-      commit: 8675c6f226986ddb67752be22279a0e2385b197e
-[5/6] KVM: selftests: memslot_perf_test: Consolidate memory
-      commit: 88a64e65484ef6b5cb09fe545d0dd00c950a1131
-[6/6] KVM: selftests: memslot_perf_test: Report optimal memory slots
-      commit: a69170c65acdf430e24fc1b6174dcc3aa501fe2f
+Previous versions are archived at:
+
+  Mega-patch: https://lore.kernel.org/kvmarm/20220519134204.5379-1-will@kernel.org/
+  v2: https://lore.kernel.org/all/20220630135747.26983-1-will@kernel.org/
+  v3: https://lore.kernel.org/kvmarm/20220914083500.5118-1-will@kernel.org/
+  v4: https://lore.kernel.org/kvm/20221017115209.2099-1-will@kernel.org/
+  v5: https://lore.kernel.org/r/20221020133827.5541-1-will@kernel.org
+
+The changes since v5 include:
+
+  * Fix teardown ordering so that the host 'kvm' structure remains pins
+    while the memcache is being filled.
+
+  * Fixed a kerneldoc typo.
+
+  * Included a patch from Oliver to rework the 'pkvm_mem_transition'
+    structure and it's handling of the completer address.
+
+  * Tweaked some commit messages and added new R-b tags.
+
+As before, the final patch is RFC since it illustrates a very naive use
+of the new hypervisor structures and subsequent changes will improve on
+this once we have the guest private memory story sorted out.
+
+Oliver: I'm pretty sure we're going to need to revert your completer
+address cleanup as soon as we have guest-host sharing. We want to keep
+the 'pkvm_mem_transition' structure 'const', but we will only know the
+host address (PA) after walking the guest stage-2 and so we're going to
+want to track that separately. Anyway, I've included it here at the end
+so Marc can decide what he wants to do!
 
 Cheers,
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+Will, Quentin and Fuad
 
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Vincent Donnefort <vdonnefort@google.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Philippe Mathieu-Daudé <philmd@linaro.org>
+Cc: James Morse <james.morse@arm.com>
+Cc: Chao Peng <chao.p.peng@linux.intel.com>
+Cc: Quentin Perret <qperret@google.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Fuad Tabba <tabba@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>
+
+Cc: kernel-team@android.com
+Cc: kvm@vger.kernel.org
+Cc: kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org
+
+
+--->8
+
+Fuad Tabba (3):
+  KVM: arm64: Add hyp_spinlock_t static initializer
+  KVM: arm64: Add infrastructure to create and track pKVM instances at
+    EL2
+  KVM: arm64: Instantiate pKVM hypervisor VM and vCPU structures from
+    EL1
+
+Oliver Upton (1):
+  KVM: arm64: Clean out the odd handling of completer_addr
+
+Quentin Perret (14):
+  KVM: arm64: Move hyp refcount manipulation helpers to common header
+    file
+  KVM: arm64: Allow attaching of non-coalescable pages to a hyp pool
+  KVM: arm64: Back the hypervisor 'struct hyp_page' array for all memory
+  KVM: arm64: Fix-up hyp stage-1 refcounts for all pages mapped at EL2
+  KVM: arm64: Prevent the donation of no-map pages
+  KVM: arm64: Add helpers to pin memory shared with the hypervisor at
+    EL2
+  KVM: arm64: Add per-cpu fixmap infrastructure at EL2
+  KVM: arm64: Add generic hyp_memcache helpers
+  KVM: arm64: Consolidate stage-2 initialisation into a single function
+  KVM: arm64: Instantiate guest stage-2 page-tables at EL2
+  KVM: arm64: Return guest memory from EL2 via dedicated teardown
+    memcache
+  KVM: arm64: Unmap 'kvm_arm_hyp_percpu_base' from the host
+  KVM: arm64: Explicitly map 'kvm_vgic_global_state' at EL2
+  KVM: arm64: Don't unnecessarily map host kernel sections at EL2
+
+Will Deacon (8):
+  KVM: arm64: Unify identifiers used to distinguish host and hypervisor
+  KVM: arm64: Implement do_donate() helper for donating memory
+  KVM: arm64: Include asm/kvm_mmu.h in nvhe/mem_protect.h
+  KVM: arm64: Rename 'host_kvm' to 'host_mmu'
+  KVM: arm64: Initialise hypervisor copies of host symbols
+    unconditionally
+  KVM: arm64: Provide I-cache invalidation by virtual address at EL2
+  KVM: arm64: Maintain a copy of 'kvm_arm_vmid_bits' at EL2
+  KVM: arm64: Use the pKVM hyp vCPU structure in handle___kvm_vcpu_run()
+
+ arch/arm64/include/asm/kvm_arm.h              |   2 +-
+ arch/arm64/include/asm/kvm_asm.h              |   7 +-
+ arch/arm64/include/asm/kvm_host.h             |  72 ++-
+ arch/arm64/include/asm/kvm_hyp.h              |   3 +
+ arch/arm64/include/asm/kvm_mmu.h              |   2 +-
+ arch/arm64/include/asm/kvm_pgtable.h          |  22 +
+ arch/arm64/include/asm/kvm_pkvm.h             |  38 ++
+ arch/arm64/kernel/image-vars.h                |  15 -
+ arch/arm64/kvm/arm.c                          |  61 +-
+ arch/arm64/kvm/hyp/hyp-constants.c            |   3 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  25 +-
+ arch/arm64/kvm/hyp/include/nvhe/memory.h      |  27 +
+ arch/arm64/kvm/hyp/include/nvhe/mm.h          |  18 +-
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |  68 +++
+ arch/arm64/kvm/hyp/include/nvhe/spinlock.h    |  10 +-
+ arch/arm64/kvm/hyp/nvhe/cache.S               |  11 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 110 +++-
+ arch/arm64/kvm/hyp/nvhe/hyp-smp.c             |   2 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 558 +++++++++++++++---
+ arch/arm64/kvm/hyp/nvhe/mm.c                  | 168 +++++-
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c          |  29 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                | 436 ++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/setup.c               |  96 ++-
+ arch/arm64/kvm/hyp/pgtable.c                  |  21 +-
+ arch/arm64/kvm/mmu.c                          |  55 +-
+ arch/arm64/kvm/pkvm.c                         | 138 ++++-
+ arch/arm64/kvm/reset.c                        |  29 -
+ 27 files changed, 1765 insertions(+), 261 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+
+-- 
+2.38.1.431.g37b22c650d-goog
 
