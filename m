@@ -1,276 +1,167 @@
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105C6620
-	for <kvmarm@lists.linux.dev>; Fri, 11 Nov 2022 01:38:59 +0000 (UTC)
-Received: by mail-pg1-f181.google.com with SMTP id q1so3205654pgl.11
-        for <kvmarm@lists.linux.dev>; Thu, 10 Nov 2022 17:38:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RS3a6hLMxUUoEPjaozjVNm3jkJhC+H0XClz14w/jfaA=;
-        b=SoG++eGsogNhOXHNYNGSQwqVVuREga4mMXnUJPEp2Aaf3wDTjmN4pUpcDu6NyDyk/7
-         ZCrJ5tCMaVWUaaxyvaQrhL0T5FiyghxHxIWcZucG8+WiPsxAaytMKmY0pIZmkCvM/P3A
-         FzRDVfuDDdZ0ZvXjDTxrK9PvmsGmkf3tvXZwJCbLUSF0TG776tNA1944kmAMkLT9zZec
-         fBYk+3bEeWzmhZC19FCrSr44X5QV+XC8WpwQgvzfkBuRNUn1T3FMjmURa/IIpEBzEphS
-         S5BEZ0ZwTijqaaaZMQZlcNfQrroFpxn8GJ4NeHygg9gK3xqWbjbKbAj8qSY8fGLozXvu
-         Gsig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RS3a6hLMxUUoEPjaozjVNm3jkJhC+H0XClz14w/jfaA=;
-        b=OlV47HjTa+t+OH+Zi5dAKxoP8dwBUDXNA+1aMxzbBqBKNG3NsiM3cGHGDOXEVKIDuj
-         GNdM0o9USzjP3b+qdJOHs+UICEHlae4GoNSKpG3j1tbDqyor+yb/Xw24bL+HB/J/Pvo4
-         1LkxpLzJGFd3VipgtCkfDkq+S3XvaHUm2Yg6zczRZwompppyDqW3fPjsFeRUdGpY0ze1
-         K4hYXMMhQZE9e/+R6EPhVhdYRZyhu8U8f2B4exs+Aiic7dk5jJSPMJ619qByHpJ41rGE
-         dDZfko62SsKY95F17Qoy6vuXCVQb1wWxhy4HuMWUTQXmr/sb5kRreT9PPgO9020W06GP
-         Ehfw==
-X-Gm-Message-State: ACrzQf2V7DoQaVyC3H+yAKICaX8TxeLG69d2C5LiyoAcStkdg+XoUh8n
-	Kxt3h4IWr+jOOMIXRvdVIvkyxg==
-X-Google-Smtp-Source: AMsMyM5NZekdvfkLtC3kWWLVHXrB1AuT7u9X73tzeCo4RhIdse0v2yQHD++RSAOfBDE10qOQXDbeUA==
-X-Received: by 2002:a63:e62:0:b0:46f:e658:a8ff with SMTP id 34-20020a630e62000000b0046fe658a8ffmr4116215pgo.493.1668130739232;
-        Thu, 10 Nov 2022 17:38:59 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id z6-20020aa79486000000b005636326fdbfsm310014pfk.78.2022.11.10.17.38.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Nov 2022 17:38:58 -0800 (PST)
-Date: Fri, 11 Nov 2022 01:38:53 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C560652
+	for <kvmarm@lists.linux.dev>; Fri, 11 Nov 2022 08:27:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B667EC433D6;
+	Fri, 11 Nov 2022 08:27:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1668155253;
+	bh=e1/d/8WJcd5q4Zo+wAS3Yn8BOJ7hTNu5U8ybWGzTWSA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Z5Lo6/QxPZZi4/tmWRUwTkusz+fQQk/7gsE9/crjsG55v2Z6z08e23HfnklH6VzT2
+	 wChL012poapeFKpMu+BSLo9D3Oc9QG8c16Gj2j6So7CBeU0XjudS6dMeu6CQNHSkdI
+	 USGb3AOBLBe9RbbCaM2tXYnup+Hk8eUX9vgrng4/kGbKCLuytHFwQduzxjoENMgU0P
+	 m51kt2c1AI+lveMeHr9pyvpQfZV9HFFkrMlwdx/v53gCZW0zGVNGGaqAM3avyr32br
+	 Kj2Xewc3c9nHeDfr94d4YGc732/P00mx3+PiggLlxocooMFw/o1Nv2FcocojC8tWzq
+	 I3ZDnFbw/SgEA==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1otPNr-005Lew-C3;
+	Fri, 11 Nov 2022 08:27:31 +0000
+Date: Fri, 11 Nov 2022 08:26:02 +0000
+Message-ID: <87fsepvqw5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
 Cc: James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Atish Patra <atishp@atishpatra.org>,
-	David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
 	linux-kernel@vger.kernel.org,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Fabiano Rosas <farosas@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>,
-	Yuan Yao <yuan.yao@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH 10/44] KVM: VMX: Clean up eVMCS enabling if KVM
- initialization fails
-Message-ID: <Y22nrQ7aziK0NMOE@google.com>
-References: <20221102231911.3107438-1-seanjc@google.com>
- <20221102231911.3107438-11-seanjc@google.com>
- <87mt98qfi2.fsf@ovpn-194-252.brq.redhat.com>
+	kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 2/3] KVM: arm64: Allow userspace to trap SMCCC sub-ranges
+In-Reply-To: <Y21pktYPLPM6eYga@google.com>
+References: <20221110015327.3389351-1-oliver.upton@linux.dev>
+	<20221110015327.3389351-3-oliver.upton@linux.dev>
+	<86o7tfov7v.wl-maz@kernel.org>
+	<Y21pktYPLPM6eYga@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87mt98qfi2.fsf@ovpn-194-252.brq.redhat.com>
-Message-ID: <20221111013853.0qVPrlwOTVjyFLWhg5Sk5E1ezoX-mp1IdYQfjzaD9NM@z>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221111082602.dOPe71o3HvjczT9EEK_6_RZUVrOPI_0cYVoDRAnoj7w@z>
 
-On Thu, Nov 03, 2022, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> > +	/*
-> > +	 * Reset everything to support using non-enlightened VMCS access later
-> > +	 * (e.g. when we reload the module with enlightened_vmcs=0)
-> > +	 */
-> > +	for_each_online_cpu(cpu) {
-> > +		vp_ap =	hv_get_vp_assist_page(cpu);
-> > +
-> > +		if (!vp_ap)
-> > +			continue;
-> > +
-> > +		vp_ap->nested_control.features.directhypercall = 0;
-> > +		vp_ap->current_nested_vmcs = 0;
-> > +		vp_ap->enlighten_vmentry = 0;
-> > +	}
+On Thu, 10 Nov 2022 21:13:54 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Unrelated to your patch but while looking at this code I got curious
-> about why don't we need a protection against CPU offlining here. Turns
-> out that even when we offline a CPU, its VP assist page remains
-> allocated (see hv_cpu_die()), we just write '0' to the MSR and thus
-
-Heh, "die".  Hyper-V is quite dramatic.
-
-> accessing the page is safe. The consequent hv_cpu_init(), however, does
-> not restore VP assist page when it's already allocated:
+> On Thu, Nov 10, 2022 at 12:22:12PM +0000, Marc Zyngier wrote:
+> > > +static bool kvm_hvc_call_user_trapped(struct kvm_vcpu *vcpu, u32 func_id)
+> > > +{
+> > > +	struct kvm *kvm = vcpu->kvm;
+> > > +	unsigned long *bmap = &kvm->arch.smccc_feat.user_trap_bmap;
+> > > +
+> > > +	switch (ARM_SMCCC_OWNER_NUM(func_id)) {
+> > > +	case ARM_SMCCC_OWNER_ARCH:
+> > > +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_ARCH, bmap);
+> > > +	case ARM_SMCCC_OWNER_CPU:
+> > > +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_CPU, bmap);
+> > > +	case ARM_SMCCC_OWNER_SIP:
+> > > +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_SIP, bmap);
+> > > +	case ARM_SMCCC_OWNER_OEM:
+> > > +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_OEM, bmap);
+> > > +	case ARM_SMCCC_OWNER_STANDARD:
+> > > +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_STANDARD, bmap);
+> > > +	case ARM_SMCCC_OWNER_STANDARD_HYP:
+> > > +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_STANDARD_HYP, bmap);
+> > > +	case ARM_SMCCC_OWNER_VENDOR_HYP:
+> > > +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_VENDOR_HYP, bmap);
+> > > +	case ARM_SMCCC_OWNER_TRUSTED_APP ... ARM_SMCCC_OWNER_TRUSTED_APP_END:
+> > > +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_TRUSTED_APP, bmap);
+> > > +	case ARM_SMCCC_OWNER_TRUSTED_OS ... ARM_SMCCC_OWNER_TRUSTED_OS_END:
+> > > +		return test_bit(KVM_ARM_USER_HYPERCALL_OWNER_TRUSTED_OS, bmap);
+> > > +	default:
+> > > +		return false;
+> > > +	}
+> > 
+> > You have multiple problems here:
+> > 
+> > - the granularity is way too coarse. You want to express arbitrary
+> >   ranges, and not necessarily grab a whole owner range.
+> > 
+> > - you have now an overlap between ranges that are handled in the
+> >   kernel (PSCI, spectre mitigations) and ranges that userspace wants
+> >   to observe. Not good.
 > 
-> # rdmsr -p 24 0x40000073
-> 10212f001
-> # echo 0 > /sys/devices/system/cpu/cpu24/online 
-> # echo 1 > /sys/devices/system/cpu/cpu24/online 
-> # rdmsr -p 24 0x40000073
-> 0
+> We need to come to agreement on what degree of mix-and-match should be
+> supported.
 > 
-> The culprit is commit e5d9b714fe402 ("x86/hyperv: fix root partition
-> faults when writing to VP assist page MSR"). A patch is inbound.
+> Spectre really ought to be in the kernel, and I don't think anyone is
+> particularly excited about reimplementing PSCI. Right now my interest
+> in this starts and ends with forwarding the vendor-specific hypercall
+> range to userspace, allowing something like Hyper-V PV on KVM.
 > 
-> 'hv_root_partition' case is different though. We do memunmap() and reset
-> VP assist page to zero so it is theoretically possible we're going to
-> clash. Unless I'm missing some obvious reason why module unload can't
-> coincide with CPU offlining, we may be better off surrounding this with
-> cpus_read_lock()/cpus_read_unlock(). 
+> > If we are going down this road, this can only be done at the
+> > *function* level. And userspace must know that the kernel will refuse
+> > to forward some ranges.
+> 
+> The goal of what I was trying to get at is that either the kernel or
+> userspace takes ownership of a range that has an ABI, but not both. i.e.
+> you really wouldn't want some VMM or cloud provider trapping portions of
+> KVM's vendor-specific range while still reporting a 'vanilla' ABI at the
+> time of discovery. Same goes for PSCI, TRNG, etc.
 
-I finally see what you're concerned about.  If a CPU goes offline and its assist
-page is unmapped, zeroing out the nested/eVMCS stuff will fault.
+But I definitely think this is one of the major use cases. For
+example, there is value in taking PSCI to userspace in order to
+implement a newer version of the spec, or to support sub-features that
+KVM doesn't (want to) implement. I don't think this changes the ABI
+from the guest perspective.
 
-I think the real problem is that the purging of the eVMCS is in the wrong place.
-Move the clearing to vmx_hardware_disable() and then the CPU hotplug bug goes
-away once KVM disables hotplug during hardware enabling/disable later in the series.
-There's no need to wait until module exit, e.g. it's not like it costs much to
-clear a few variables, and IIUC the state is used only when KVM is actively using
-VMX/eVMCS.
+pKVM also has a use case for this where userspace gets a notification
+of the hypercall that a guest has performed to share memory.
 
-However, I believe there's a second bug.  KVM's CPU online hook is called before
-Hyper-V's online hook (CPUHP_AP_ONLINE_DYN).  Before this series, which moves KVM's
-hook from STARTING to ONLINE, KVM's hook is waaaay before Hyper-V's.  That means
-that hv_cpu_init()'s allocation of the VP assist page will come _after_ KVM's
-check in vmx_hardware_enable()
+Communication with a TEE also is on the cards, as would be a FFA
+implementation. All of this could be implemented in KVM, or in
+userspace, depending what users of these misfeatures want to do.
 
-	/*
-	 * This can happen if we hot-added a CPU but failed to allocate
-	 * VP assist page for it.
-	 */
-	if (static_branch_unlikely(&enable_evmcs) &&
-	    !hv_get_vp_assist_page(cpu))
-		return -EFAULT;
+> 
+> > So obviously, this cannot be a simple bitmap. Making it a radix tree
+> > (or an xarray, which is basically the same thing) could work. And the
+> > filtering request from userspace can be similar to what we have for
+> > the PMU filters.
+> 
+> Right, we'll need a more robust data structure for all this.
+> 
+> My only concern is that communicating the hypercall filter between
+> user/kernel with a set of ranges or function numbers is that we could be
+> mutating what KVM *doesn't* already implement into an ABI of sorts.
+> 
+> i.e. suppose that userspace wants to filter function(s) in an
+> unallocated/unused range of function numbers. Later down the line KVM
+> adds support for a new shiny thing and the filter becomes a subset of a
+> now allocated range of calls. We then reject the filter due to the
+> incongruence.
 
-I.e. CPU hotplug will never work if KVM is running VMs as a Hyper-V guest.  I bet
-you can repro by doing a SUSPEND+RESUME.
+But isn't the problem to ask for ranges that are unallocated the first
+place? What semantic can userspace give to such a thing other than
+replying "not implemented", which is what the kernel would do anyway?
 
-Can you try to see if that's actually a bug?  If so, the only sane fix seems to
-be to add a dedicated ONLINE action for Hyper-V.  Per patch
+The more interesting problem is when you want to emulate another
+hypervisor, and that the vendor spaces overlap (a very likely
+outcome). Somehow, this means overriding all the KVM-specific
+hypercalls, and let userspace deal with it. But again, this can be
+done on a per function basis.
 
-  KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
+Thanks,
 
-from this series, CPUHP_AP_KVM_ONLINE needs to be before CPUHP_AP_SCHED_WAIT_EMPTY
-to ensure there are no tasks, i.e. no vCPUs, running on the to-be-unplugged CPU.
+	M.
 
-Back to the original bug, proposed fix is below.  The other advantage of moving
-the reset to hardware disabling is that the "cleanup" is just disabling the static
-key, and at that point can simply be deleted as there's no need to disable the
-static key when kvm-intel is unloaded since kvm-intel owns the key.  I.e. this
-patch (that we're replying to) would get replaced with a patch to delete the
-disabling of the static key.
-
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Thu, 10 Nov 2022 17:28:08 -0800
-Subject: [PATCH] KVM: VMX: Reset eVMCS controls in VP assist page during
- hardware disabling
-
-Reset the eVMCS controls in the per-CPU VP assist page during hardware
-disabling instead of waiting until kvm-intel's module exit.  The controls
-are activated if and only if KVM creates a VM, i.e. don't need to be
-reset if hardware is never enabled.
-
-Doing the reset during hardware disabling will naturally fix a potential
-NULL pointer deref bug once KVM disables CPU hotplug while enabling and
-disabling hardware (which is necessary to fix a variety of bugs).  If the
-kernel is running as the root partition, the VP assist page is unmapped
-during CPU hot unplug, and so KVM's clearing of the eVMCS controls needs
-to occur with CPU hot(un)plug disabled, otherwise KVM could attempt to
-write to a CPU's VP assist page after it's unmapped.
-
-Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/vmx.c | 50 +++++++++++++++++++++++++-----------------
- 1 file changed, 30 insertions(+), 20 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index aca88524fd1e..ae13aa3e8a1d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -552,6 +552,33 @@ static int hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
-+static void hv_reset_evmcs(void)
-+{
-+	struct hv_vp_assist_page *vp_ap;
-+
-+	if (!static_branch_unlikely(&enable_evmcs))
-+		return;
-+
-+	/*
-+	 * KVM should enable eVMCS if and only if all CPUs have a VP assist
-+	 * page, and should reject CPU onlining if eVMCS is enabled the CPU
-+	 * doesn't have a VP assist page allocated.
-+	 */
-+	vp_ap = hv_get_vp_assist_page(smp_processor_id());
-+	if (WARN_ON_ONCE(!vp_ap))
-+		return;
-+
-+	/*
-+	 * Reset everything to support using non-enlightened VMCS access later
-+	 * (e.g. when we reload the module with enlightened_vmcs=0)
-+	 */
-+	vp_ap->nested_control.features.directhypercall = 0;
-+	vp_ap->current_nested_vmcs = 0;
-+	vp_ap->enlighten_vmentry = 0;
-+}
-+
-+#else /* IS_ENABLED(CONFIG_HYPERV) */
-+static void hv_reset_evmcs(void) {}
- #endif /* IS_ENABLED(CONFIG_HYPERV) */
- 
- /*
-@@ -2497,6 +2524,8 @@ static void vmx_hardware_disable(void)
- 	if (cpu_vmxoff())
- 		kvm_spurious_fault();
- 
-+	hv_reset_evmcs();
-+
- 	intel_pt_handle_vmx(0);
- }
- 
-@@ -8463,27 +8492,8 @@ static void vmx_exit(void)
- 	kvm_exit();
- 
- #if IS_ENABLED(CONFIG_HYPERV)
--	if (static_branch_unlikely(&enable_evmcs)) {
--		int cpu;
--		struct hv_vp_assist_page *vp_ap;
--		/*
--		 * Reset everything to support using non-enlightened VMCS
--		 * access later (e.g. when we reload the module with
--		 * enlightened_vmcs=0)
--		 */
--		for_each_online_cpu(cpu) {
--			vp_ap =	hv_get_vp_assist_page(cpu);
--
--			if (!vp_ap)
--				continue;
--
--			vp_ap->nested_control.features.directhypercall = 0;
--			vp_ap->current_nested_vmcs = 0;
--			vp_ap->enlighten_vmentry = 0;
--		}
--
-+	if (static_branch_unlikely(&enable_evmcs))
- 		static_branch_disable(&enable_evmcs);
--	}
- #endif
- 	vmx_cleanup_l1d_flush();
- 
-
-base-commit: 5f47ba6894477dfbdc5416467a25fb7acb47d404
 -- 
-
+Without deviation from the norm, progress is not possible.
