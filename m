@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8AE2F2B
-	for <kvmarm@lists.linux.dev>; Fri, 11 Nov 2022 16:54:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D50DDC433D7;
-	Fri, 11 Nov 2022 16:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70202F2B
+	for <kvmarm@lists.linux.dev>; Fri, 11 Nov 2022 17:11:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B0BBC433D6;
+	Fri, 11 Nov 2022 17:11:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668185656;
-	bh=V/4r+ljPjRP3kyOGZMiUj9fZdU5kQWc0BerI3B4lM74=;
+	s=k20201202; t=1668186719;
+	bh=TdxutI1XV0aUY/REXRLlQEMl+uODGYf9T0Ad8c8nxgU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OEp3VPeo/Dc5lHgnCZGsftYiePdL0Z503ga2WED+orMdhlpaJjYNwVOf8/YDNn1je
-	 UUSuHz6XvbMIQOsslEqhyHp6qG29WxrNGb3UOSCcQwe6PTTkz9vwLRySagfzNiJiLO
-	 W5eTU2maM6z2Mz0bv3SY2ekiGlt7HAYjXTb7WiE4+4RBHLCQOacbZEpE1NQf7VMkxk
-	 B4jsksLjr+DjNUUAiDLFDTME8J7DxdVPVHeV4EUkZot6su8HdgGVvJrr2Pwwd/8lr7
-	 EAy1MnmnPjeKOjvJU1Osutjtdh/UTFsaARDp/VBmVqTAVzDR1iEUjNAxLpkyzQnqxU
-	 qVB3cpwU8GBZw==
+	b=VDxHwGYqe8S/l8FYc1joK4hEgM/w1GVuLyVFG86I2OrVqmXmvDpsl7vl58cEbdgYk
+	 8Ky9h/+IOCGm6oa88sRVIUJlyqpG1A44pYR/oOmfeEPJIClelvjxT26ESvemwrmIJT
+	 YV+h6OLAIPa/PMDZ33VMVezJkWQ4opqwq8Khu8SwGl8xFxR/KGvtwazYQWn+G6M2pI
+	 j+8Mqpz6R3MapLXW26Ga9N0ef/65S77oWZcjN0nf0PZzcNgTPbcDca5aaXHBTS+gBU
+	 NPMBK8e4+GnHyEQgLvxr8OO+NnJGbkUGjrvdaSmBc772h1HVci+ilFndHSFz5PmKb/
+	 +17Nz2OV2lSbQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1otXIE-005TOg-LT;
-	Fri, 11 Nov 2022 16:54:14 +0000
-Date: Fri, 11 Nov 2022 16:54:14 +0000
-Message-ID: <86edu9ph3d.wl-maz@kernel.org>
+	id 1otXZN-005Tbb-7n;
+	Fri, 11 Nov 2022 17:11:57 +0000
+Date: Fri, 11 Nov 2022 17:11:56 +0000
+Message-ID: <86cz9tpg9v.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Will Deacon <will@kernel.org>
 Cc: kvmarm@lists.linux.dev,	Sean Christopherson <seanjc@google.com>,	Vincent
@@ -34,9 +34,10 @@ Cc: kvmarm@lists.linux.dev,	Sean Christopherson <seanjc@google.com>,	Vincent
 	Mark Rutland <mark.rutland@arm.com>,	Fuad Tabba <tabba@google.com>,	Oliver
  Upton <oliver.upton@linux.dev>,	kernel-team@android.com,
 	kvm@vger.kernel.org,	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v6 00/26] KVM: arm64: Introduce pKVM hyp VM and vCPU state at EL2
-In-Reply-To: <20221110190259.26861-1-will@kernel.org>
+Subject: Re: [PATCH v6 12/26] KVM: arm64: Add infrastructure to create and track pKVM instances at EL2
+In-Reply-To: <20221110190259.26861-13-will@kernel.org>
 References: <20221110190259.26861-1-will@kernel.org>
+	<20221110190259.26861-13-will@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -52,58 +53,41 @@ X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, seanjc@google.com, v
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 10 Nov 2022 19:02:33 +0000,
+On Thu, 10 Nov 2022 19:02:45 +0000,
 Will Deacon <will@kernel.org> wrote:
 > 
-> Hi all,
+> From: Fuad Tabba <tabba@google.com>
 > 
-> This is version six of the pKVM EL2 state series, extending the pKVM
-> hypervisor code so that it can dynamically instantiate and manage VM
-> data structures without the host being able to access them directly.
-> These structures consist of a hyp VM, a set of hyp vCPUs and the stage-2
-> page-table for the MMU. The pages used to hold the hypervisor structures
-> are returned to the host when the VM is destroyed.
+> Introduce a global table (and lock) to track pKVM instances at EL2, and
+> provide hypercalls that can be used by the untrusted host to create and
+> destroy pKVM VMs and their vCPUs. pKVM VM/vCPU state is directly
+> accessible only by the trusted hypervisor (EL2).
 > 
-> Previous versions are archived at:
+> Each pKVM VM is directly associated with an untrusted host KVM instance,
+> and is referenced by the host using an opaque handle. Future patches
+> will provide hypercalls to allow the host to initialize/set/get pKVM
+> VM/vCPU state using the opaque handle.
 > 
->   Mega-patch: https://lore.kernel.org/kvmarm/20220519134204.5379-1-will@kernel.org/
->   v2: https://lore.kernel.org/all/20220630135747.26983-1-will@kernel.org/
->   v3: https://lore.kernel.org/kvmarm/20220914083500.5118-1-will@kernel.org/
->   v4: https://lore.kernel.org/kvm/20221017115209.2099-1-will@kernel.org/
->   v5: https://lore.kernel.org/r/20221020133827.5541-1-will@kernel.org
-> 
-> The changes since v5 include:
-> 
->   * Fix teardown ordering so that the host 'kvm' structure remains pins
->     while the memcache is being filled.
-> 
->   * Fixed a kerneldoc typo.
-> 
->   * Included a patch from Oliver to rework the 'pkvm_mem_transition'
->     structure and it's handling of the completer address.
-> 
->   * Tweaked some commit messages and added new R-b tags.
-> 
-> As before, the final patch is RFC since it illustrates a very naive use
-> of the new hypervisor structures and subsequent changes will improve on
-> this once we have the guest private memory story sorted out.
-> 
-> Oliver: I'm pretty sure we're going to need to revert your completer
-> address cleanup as soon as we have guest-host sharing. We want to keep
-> the 'pkvm_mem_transition' structure 'const', but we will only know the
-> host address (PA) after walking the guest stage-2 and so we're going to
-> want to track that separately. Anyway, I've included it here at the end
-> so Marc can decide what he wants to do!
+> Tested-by: Vincent Donnefort <vdonnefort@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> Co-developed-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Will Deacon <will@kernel.org>
 
-Thanks, I guess... :-/
+[...]
 
-If this patch is going to be reverted, I'd rather not take it (without
-guest/host sharing, we don't have much of a hypervisor).
+> +static void unmap_donated_memory_noclear(void *va, size_t size)
+> +{
+> +	if (!va)
+> +		return;
+> +
+> +	__unmap_donated_memory(va, size);
+> +}
 
-I guess we can always revisit this in the light of the avalanche of
-pKVM patches that will follow...
+This triggers a warning that persist until patch #19 (unused static
+function) and breaks my build (I've enabled CONFIG_WERROR).
 
-Cheers,
+I'm going to stick a __maybe_unused there, and drop it once it is
+used...
 
 	M.
 
