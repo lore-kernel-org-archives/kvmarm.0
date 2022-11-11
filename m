@@ -1,140 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EAA6368
-	for <kvmarm@lists.linux.dev>; Fri, 11 Nov 2022 19:06:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3515C433D6;
-	Fri, 11 Nov 2022 19:06:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668193579;
-	bh=glUZLqZQVoxiOyzIfHGRfq6bY6J3iXv73EeOSZbGuyI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RCBMVH408hR6/dNC2gHgo8eXBO9ISeYqcfw0MnUnTjUhENnIn4IGEBkQh/18pmJyD
-	 mRpvEOxI8tstgnQERg/ZjUfO7dk42BJPM5FlYpRM8N3YYOySErzlVPGgtdwxl1ZiGr
-	 pQRUVAhma5N1O7OoJF4bflUWIPnUiGmSJo4UIMjdRY0ljuG6fcob0OuM0G2c+6AF84
-	 shi4o3fgBvtQJWNkT7puMyy7Q7n9uQ68gxrDjBbDYjw4+sy3l++psfdYBd7I03agnx
-	 ft/td6Kl43SCJBZ10nmHAq4onJbtRSGso7AXnaJiwh8P2Q6Z38gnDkaHa/HIYI1poS
-	 c1dJvDVXqZ0SA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1otZM1-005Ux5-IC;
-	Fri, 11 Nov 2022 19:06:17 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>,
-	kvmarm@lists.linux.dev
-Cc: Vincent Donnefort <vdonnefort@google.com>,
-	James Morse <james.morse@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	kernel-team@android.com,
-	Quentin Perret <qperret@google.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Oliver Upton <oliver.upton@linux.dev>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA93368
+	for <kvmarm@lists.linux.dev>; Fri, 11 Nov 2022 19:42:59 +0000 (UTC)
+Date: Fri, 11 Nov 2022 19:42:46 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1668195771;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=489V1xO2Jk4quKvIvlMb+9p2vWfkmCHH5cQqMf67ius=;
+	b=ctsL1hsC7qEw5KiW28UAtXJRlnFS4iPL22CHt0GFvCmPRUlo8Rsweb1Y6WREvqho0r9sXc
+	N657AWKzK8lHkXEclZcbTk1apEVn4VSgW4n9PysclSm15DxsXi37Yd1oYbNU8SA3MqXrE4
+	7J/tg6Q6syps7GjxLcmOHG3ltCVunSU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
 	Sean Christopherson <seanjc@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Chao Peng <chao.p.peng@linux.intel.com>
-Subject: Re: [PATCH v6 00/26] KVM: arm64: Introduce pKVM hyp VM and vCPU state at EL2
-Date: Fri, 11 Nov 2022 19:06:14 +0000
-Message-Id: <166819337067.3836113.13147674500457473286.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221110190259.26861-1-will@kernel.org>
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	James Morse <james.morse@arm.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Quentin Perret <qperret@google.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>, Fuad Tabba <tabba@google.com>,
+	kernel-team@android.com, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v6 00/26] KVM: arm64: Introduce pKVM hyp VM and vCPU
+ state at EL2
+Message-ID: <Y26ltgCIObKpRTWx@google.com>
 References: <20221110190259.26861-1-will@kernel.org>
+ <86edu9ph3d.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, vdonnefort@google.com, james.morse@arm.com, mark.rutland@arm.com, alexandru.elisei@arm.com, kernel-team@android.com, qperret@google.com, philmd@linaro.org, suzuki.poulose@arm.com, tabba@google.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, seanjc@google.com, catalin.marinas@arm.com, chao.p.peng@linux.intel.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86edu9ph3d.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 10 Nov 2022 19:02:33 +0000, Will Deacon wrote:
-> This is version six of the pKVM EL2 state series, extending the pKVM
-> hypervisor code so that it can dynamically instantiate and manage VM
-> data structures without the host being able to access them directly.
-> These structures consist of a hyp VM, a set of hyp vCPUs and the stage-2
-> page-table for the MMU. The pages used to hold the hypervisor structures
-> are returned to the host when the VM is destroyed.
+On Fri, Nov 11, 2022 at 04:54:14PM +0000, Marc Zyngier wrote:
+> On Thu, 10 Nov 2022 19:02:33 +0000,
+> Will Deacon <will@kernel.org> wrote:
+> > 
+> > Hi all,
+> > 
+> > This is version six of the pKVM EL2 state series, extending the pKVM
+> > hypervisor code so that it can dynamically instantiate and manage VM
+> > data structures without the host being able to access them directly.
+> > These structures consist of a hyp VM, a set of hyp vCPUs and the stage-2
+> > page-table for the MMU. The pages used to hold the hypervisor structures
+> > are returned to the host when the VM is destroyed.
+> > 
+> > Previous versions are archived at:
+> > 
+> >   Mega-patch: https://lore.kernel.org/kvmarm/20220519134204.5379-1-will@kernel.org/
+> >   v2: https://lore.kernel.org/all/20220630135747.26983-1-will@kernel.org/
+> >   v3: https://lore.kernel.org/kvmarm/20220914083500.5118-1-will@kernel.org/
+> >   v4: https://lore.kernel.org/kvm/20221017115209.2099-1-will@kernel.org/
+> >   v5: https://lore.kernel.org/r/20221020133827.5541-1-will@kernel.org
+> > 
+> > The changes since v5 include:
+> > 
+> >   * Fix teardown ordering so that the host 'kvm' structure remains pins
+> >     while the memcache is being filled.
+> > 
+> >   * Fixed a kerneldoc typo.
+> > 
+> >   * Included a patch from Oliver to rework the 'pkvm_mem_transition'
+> >     structure and it's handling of the completer address.
+> > 
+> >   * Tweaked some commit messages and added new R-b tags.
+> > 
+> > As before, the final patch is RFC since it illustrates a very naive use
+> > of the new hypervisor structures and subsequent changes will improve on
+> > this once we have the guest private memory story sorted out.
+> > 
+> > Oliver: I'm pretty sure we're going to need to revert your completer
+> > address cleanup as soon as we have guest-host sharing. We want to keep
+> > the 'pkvm_mem_transition' structure 'const', but we will only know the
+> > host address (PA) after walking the guest stage-2 and so we're going to
+> > want to track that separately. Anyway, I've included it here at the end
+> > so Marc can decide what he wants to do!
 > 
-> [...]
+> Thanks, I guess... :-/
+> 
+> If this patch is going to be reverted, I'd rather not take it (without
+> guest/host sharing, we don't have much of a hypervisor).
 
-As for Oliver's series, I've tentatively applied this to -next.
-I've dropped Oliver's patch for now, but kept the RFC one. Maybe I'll
-change my mind.
++1, I'm more than happy being told my patch doesn't work :)
 
-Anyway, there was an interesting number of conflicts between the two
-series, which I tried to resolve as well as I could, but it is likely
-I broke something (although it compiles, so it must be perfect).
+Having said that, if there are parts of the design that I've whined
+about that are intentional then please educate me. Some things haven't
+been quite as obvious, but I know you folks have been working on this
+feature for a while.
 
-Please have a look and shout if/when you spot something.
+I probably need to give the full patch-bomb another read to get all the
+context too.
 
-[01/26] KVM: arm64: Move hyp refcount manipulation helpers to common header file
-        commit: 0f4f7ae10ee4e6403659b2d9ddf05424eecde45b
-[02/26] KVM: arm64: Allow attaching of non-coalescable pages to a hyp pool
-        commit: 72a5bc0f153ce8ca80e9abbd1d9adec7d586915a
-[03/26] KVM: arm64: Back the hypervisor 'struct hyp_page' array for all memory
-        commit: 8e6bcc3a4502a0d8d065466efd888b6b59b85789
-[04/26] KVM: arm64: Fix-up hyp stage-1 refcounts for all pages mapped at EL2
-        commit: 0d16d12eb26ef85602ef8a678d94825a66772774
-[05/26] KVM: arm64: Unify identifiers used to distinguish host and hypervisor
-        commit: 33bc332d4061e95db55594893c4f80105b1dd813
-[06/26] KVM: arm64: Implement do_donate() helper for donating memory
-        commit: 1ed5c24c26f48ff61dc5d97c655769821f36a622
-[07/26] KVM: arm64: Prevent the donation of no-map pages
-        commit: 43c1ff8b75011bc3e3e923adf31ba815864a2494
-[08/26] KVM: arm64: Add helpers to pin memory shared with the hypervisor at EL2
-        commit: 9926cfce8dcb880255f30ab9ac930add787e1ead
-[09/26] KVM: arm64: Include asm/kvm_mmu.h in nvhe/mem_protect.h
-        commit: 4d968b12e6bbe4440f4f220c41d779e02df8af1a
-[10/26] KVM: arm64: Add hyp_spinlock_t static initializer
-        commit: 1c80002e3264552d8b9c0e162e09aa4087403716
-[11/26] KVM: arm64: Rename 'host_kvm' to 'host_mmu'
-        commit: 5304002dc3754a5663d75c977bfa2d9e3c08906d
-[12/26] KVM: arm64: Add infrastructure to create and track pKVM instances at EL2
-        commit: a1ec5c70d3f63d8a143fb83cd7f53bd8ff2f72c8
-[13/26] KVM: arm64: Instantiate pKVM hypervisor VM and vCPU structures from EL1
-        commit: 9d0c063a4d1d10ef8e6288899b8524413e40cfa0
-[14/26] KVM: arm64: Add per-cpu fixmap infrastructure at EL2
-        commit: aa6948f82f0b7060fbbac21911dc7996b144ba3c
-[15/26] KVM: arm64: Initialise hypervisor copies of host symbols unconditionally
-        commit: 6c165223e9a6384aa1e934b90f2650e71adb972a
-[16/26] KVM: arm64: Provide I-cache invalidation by virtual address at EL2
-        commit: 13e248aab73d2f1c27b458ef09d38b44f3e5bf2e
-[17/26] KVM: arm64: Add generic hyp_memcache helpers
-        commit: 717a7eebac106a5cc5d5493f8eef9cf4ae6edf19
-[18/26] KVM: arm64: Consolidate stage-2 initialisation into a single function
-        commit: 315775ff7c6de497dd07c3f6eff499fb538783eb
-[19/26] KVM: arm64: Instantiate guest stage-2 page-tables at EL2
-        commit: 60dfe093ec13b056856c672e1daa35134be38283
-[20/26] KVM: arm64: Return guest memory from EL2 via dedicated teardown memcache
-        commit: f41dff4efb918db68923a826e966ca62c7c8e929
-[21/26] KVM: arm64: Unmap 'kvm_arm_hyp_percpu_base' from the host
-        commit: fe41a7f8c0ee3ee2f682f8c28c7e1c5ff2be8a79
-[22/26] KVM: arm64: Maintain a copy of 'kvm_arm_vmid_bits' at EL2
-        commit: 73f38ef2ae531b180685173e0923225551434fcb
-[23/26] KVM: arm64: Explicitly map 'kvm_vgic_global_state' at EL2
-        commit: 27eb26bfff5d358d42911d04bbecc62e659ec32b
-[24/26] KVM: arm64: Don't unnecessarily map host kernel sections at EL2
-        commit: 169cd0f8238f2598b85d2db2e15828e8f8da18e5
-[25/26] KVM: arm64: Clean out the odd handling of completer_addr
-        (no commit info)
-[26/26] KVM: arm64: Use the pKVM hyp vCPU structure in handle___kvm_vcpu_run()
-        commit: be66e67f175096f283c9d5614c4991fc9e7ed975
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+--
+Thanks,
+Oliver
