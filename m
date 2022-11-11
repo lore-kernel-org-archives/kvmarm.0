@@ -2,84 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2792CC433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Nov 2022 15:19:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B48C43217
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Nov 2022 15:47:46 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F51F4B92C;
-	Fri, 11 Nov 2022 10:19:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44F444B91E;
+	Fri, 11 Nov 2022 10:47:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xe7npDd9MF6p; Fri, 11 Nov 2022 10:19:12 -0500 (EST)
+	with ESMTP id PTn-hmDpnNoG; Fri, 11 Nov 2022 10:47:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B8574B8FA;
-	Fri, 11 Nov 2022 10:19:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFC074B921;
+	Fri, 11 Nov 2022 10:47:44 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D9D24B8E5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Nov 2022 10:19:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F52D4B921
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Nov 2022 10:47:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gh1afeXBQL3v for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Nov 2022 10:19:09 -0500 (EST)
+ with ESMTP id 5tfBshGcw3ls for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Nov 2022 10:47:42 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 52E194B8D4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Nov 2022 10:19:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 07F044B91E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Nov 2022 10:47:41 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 5495A61FD3;
- Fri, 11 Nov 2022 15:19:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AACABC43470;
- Fri, 11 Nov 2022 15:19:07 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 8427D62023;
+ Fri, 11 Nov 2022 15:47:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6017C433C1;
+ Fri, 11 Nov 2022 15:47:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1668179947;
- bh=Myih+8eSXLKw3bm/7g/0UFkXRjh+SapEsLznCy0f9CI=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=dVcPkuhWLZcqwcllPFPJ1OK1KqydWxpSIA33Nh7cJaW/Q6wTeT77ronYe0J4TUpUB
- /ndiA/6wu3YBHOsS5XTg4Zx04bhlC39whiL+oNms3WyYvmXlRYXagsxlT5MxMEgcbG
- 04gwZmRCuBmaiLWeC3NVJEwOV9lAoRPTfC3KAP7+s9EzR3KVIunpSwlAFkNRxJRXMf
- QeJNNF/auixMZfG6iCdqQA8Nq+taeG2Jq/1RHgl+qR70QbruE+ylatjc/q19EPhi/q
- iKHmWVazlYj9dIlebQhOZOpfeZ7E2lY50ggMzDS/PxpVed+eFTGO/iTwN/SuIu6tb0
- Hdwh7iCvZ3V9A==
-Received: from sofa.misterjones.org ([185.219.108.64]
- helo=goblin-girl.misterjones.org)
+ s=k20201202; t=1668181659;
+ bh=ieiibTmDrFYVTnTf2P9P+mwebXpKPMN4HIQwkxrTT54=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=BDJqlCSoXKUc2tIHGpdf46XyjiJUb0FugqmunaImzUbYD+eF7V80k+OHqrcLpwITP
+ y3d6rGZJdZDq0ike5/4kPHFA2iw6BiUdAiH7QkUxMJuVU1D7FWIPqlArkNn5SwKUOl
+ 6ad6sW/OPY5SIePylKYuf+AS1QJnYhSnCKERBbmYmdVqu3gsIHVbMDB5Hl5H9J+HCI
+ zb6+GQFdTSI2CWyIfh5M7lMh6MbYiWk5KSvFgydPEIkKe0lrP6j/wlZ12uMMVGm+4F
+ HUtuRX8P6dTMgCuyqiJC7ngDqNT/Y1Axp4tWFazvj2Vvu8mHpyUKYqiA+HOtZpi2fC
+ uo/bAX3FlljSA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1otVo9-005SPW-7g;
- Fri, 11 Nov 2022 15:19:05 +0000
-Date: Fri, 11 Nov 2022 15:19:04 +0000
-Message-ID: <86h6z5plhz.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1otWFl-005Shi-Fz;
+ Fri, 11 Nov 2022 15:47:37 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v10 3/7] KVM: Support dirty ring in conjunction with bitmap
-In-Reply-To: <1cfa0286-9a42-edd9-beab-02f95fc440ad@redhat.com>
-References: <20221110104914.31280-1-gshan@redhat.com>
- <20221110104914.31280-4-gshan@redhat.com>
- <Y20q3lq5oc2gAqr+@google.com>
- <1cfa0286-9a42-edd9-beab-02f95fc440ad@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+To: James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v5 00/14] KVM: arm64: Parallel stage-2 fault handling
+Date: Fri, 11 Nov 2022 15:47:34 +0000
+Message-Id: <166818113574.3365943.966631047504377265.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221107215644.1895162-1-oliver.upton@linux.dev>
+References: <20221107215644.1895162-1-oliver.upton@linux.dev>
+MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gshan@redhat.com, seanjc@google.com, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, shuah@kernel.org,
- catalin.marinas@arm.com, andrew.jones@linux.dev, ajones@ventanamicro.com,
- bgardon@google.com, dmatlack@google.com, will@kernel.org,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, pbonzini@redhat.com,
- peterx@redhat.com, oliver.upton@linux.dev, zhenyzha@redhat.com,
- shan.gavin@gmail.com
+X-SA-Exim-Rcpt-To: james.morse@arm.com, oliver.upton@linux.dev,
+ alexandru.elisei@arm.com, qperret@google.com, peterx@redhat.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, will@kernel.org,
+ kvmarm@lists.linux.dev, bgardon@google.com, ricarkol@google.com,
+ linux-arm-kernel@lists.infradead.org, seanjc@google.com, reijiw@google.com,
+ gshan@redhat.com, dmatlack@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, bgardon@google.com, andrew.jones@linux.dev,
- dmatlack@google.com, will@kernel.org, shan.gavin@gmail.com,
- catalin.marinas@arm.com, kvmarm@lists.linux.dev, pbonzini@redhat.com,
- zhenyzha@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
- ajones@ventanamicro.com
+Cc: kvm@vger.kernel.org, David Matlack <dmatlack@google.com>,
+ Ben Gardon <bgardon@google.com>, kvmarm@lists.linux.dev,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,72 +89,62 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 10 Nov 2022 23:47:41 +0000,
-Gavin Shan <gshan@redhat.com> wrote:
+On Mon, 7 Nov 2022 21:56:30 +0000, Oliver Upton wrote:
+> Presently KVM only takes a read lock for stage 2 faults if it believes
+> the fault can be fixed by relaxing permissions on a PTE (write unprotect
+> for dirty logging). Otherwise, stage 2 faults grab the write lock, which
+> predictably can pile up all the vCPUs in a sufficiently large VM.
 > 
-> commit b05377ecbe003f12c8b79846fa3a300401dcab68 (HEAD -> kvm/arm64_dirtyring)
-> Author: Gavin Shan <gshan@redhat.com>
-> Date:   Fri Nov 11 07:13:12 2022 +0800
+> Like the TDP MMU for x86, this series loosens the locking around
+> manipulations of the stage 2 page tables to allow parallel faults. RCU
+> and atomics are exploited to safely build/destroy the stage 2 page
+> tables in light of multiple software observers.
 > 
->     KVM: Push dirty information unconditionally to backup bitmap
->         In mark_page_dirty_in_slot(), we bail out when no running vcpu
-> exists and
->     a running vcpu context is strictly required by architecture. It may cause
->     backwards compatible issue. Currently, saving vgic/its tables is the only
->     case where no running vcpu context is required. We may have other unknown
->     cases where no running vcpu context exists and it's reported by the warning
->     message. For this, the application is going to enable the backup bitmap for
->     the unknown cases. However, the dirty information can't be pushed to the
->     backup bitmap even though the backup bitmap has been enabled, until the
->     unknown cases are added to the allowed list of non-running vcpu context
->     with extra code changes to the host kernel.
->         In order to make the new application, where the backup bitmap
-> has been
->     enabled, to work with the unchanged host, we continue to push the dirty
->     information to the backup bitmap instead of bailing out early.
->         Suggested-by: Sean Christopherson <seanjc@google.com>
->     Signed-off-by: Gavin Shan <gshan@redhat.com>
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 2719e10dd37d..03e6a38094c1 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3308,8 +3308,7 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->         if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
->                 return;
->  -       if
-> (WARN_ON_ONCE(!kvm_arch_allow_write_without_running_vcpu(kvm) &&
-> !vcpu))
-> -               return;
-> +       WARN_ON_ONCE(!vcpu && !kvm_arch_allow_write_without_running_vcpu(kvm));
+> [...]
 
-I'm happy with this.
+I've gone over this for quite a while, and while I'm still sh*t
+scared about it, I've decided to let it simmer in -next for a bit.
 
->  #endif
->          if (memslot && kvm_slot_dirty_track_enabled(memslot)) {
-> @@ -3318,7 +3317,7 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->                  if (kvm->dirty_ring_size && vcpu)
->                         kvm_dirty_ring_push(vcpu, slot, rel_gfn);
-> -               else
-> +               else if (memslot->dirty_bitmap)
->                         set_bit_le(rel_gfn, memslot->dirty_bitmap);
+If anything goes wrong or that someone spots something ugly,
+it will be easy to simply drop the branch. For simple fixes, they
+can go on top.
 
-But that I don't get. Or rather, I don't get the commit message that
-matches this hunk. Do we want to catch the case where all of the
-following are true:
+[01/14] KVM: arm64: Combine visitor arguments into a context structure
+        commit: dfc7a7769ab7f2a2f629c673717ef1fa7b63aa42
+[02/14] KVM: arm64: Stash observed pte value in visitor context
+        commit: 83844a2317ecad935f6735abd854e4bf3f757040
+[03/14] KVM: arm64: Pass mm_ops through the visitor context
+        commit: 2a611c7f87f26cca405da63a57f06d0e4dc14240
+[04/14] KVM: arm64: Don't pass kvm_pgtable through kvm_pgtable_walk_data
+        commit: fa002e8e79b3f980455ba585c1f47b26680de5b9
+[05/14] KVM: arm64: Add a helper to tear down unlinked stage-2 subtrees
+        commit: 8e94e1252cc054bb31fd3e9a15235cd831970ec1
+[06/14] KVM: arm64: Use an opaque type for pteps
+        commit: 6b91b8f95cadd3441c056182daf9024475ac4a91
+[07/14] KVM: arm64: Tear down unlinked stage-2 subtree after break-before-make
+        commit: 5c359cca1faf6d7671537fe1c240e8668467864d
+[08/14] KVM: arm64: Protect stage-2 traversal with RCU
+        commit: c3119ae45dfb6038ca458ab5ba7a9fba2810845b
+[09/14] KVM: arm64: Atomically update stage 2 leaf attributes in parallel walks
+        commit: ca5de2448c3b4c018fe3d6223df8b59068be1cd7
+[10/14] KVM: arm64: Split init and set for table PTE
+        commit: 331aa3a0547d1c794587e0df374d13b16645e832
+[11/14] KVM: arm64: Make block->table PTE changes parallel-aware
+        commit: 0ab12f3574db6cb432917a667f9392a88e8f0dfc
+[12/14] KVM: arm64: Make leaf->leaf PTE changes parallel-aware
+        commit: 946fbfdf336b811479e024136c7cabc00157b6b9
+[13/14] KVM: arm64: Make table->block changes parallel-aware
+        commit: af87fc03cfdf6893011df419588d27acdfb9c197
+[14/14] KVM: arm64: Handle stage-2 faults in parallel
+        commit: 1577cb5823cefdff4416f272a88143ee933d97f5
 
-- we don't have a vcpu,
-- we're allowed to log non-vcpu dirtying
-- we *only* have the ring?
-
-If so, can we please capture that in the commit message?
-
-Thanks,
+Fingers crossed,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
