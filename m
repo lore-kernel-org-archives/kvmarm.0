@@ -2,76 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC69C4332F
-	for <kvmarm@archiver.kernel.org>; Sat, 12 Nov 2022 12:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5EF5C4332F
+	for <kvmarm@archiver.kernel.org>; Sat, 12 Nov 2022 17:12:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BAEE04B815;
-	Sat, 12 Nov 2022 07:40:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 144D04B83B;
+	Sat, 12 Nov 2022 12:12:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yqzKHgMIWcgv; Sat, 12 Nov 2022 07:40:15 -0500 (EST)
+	with ESMTP id xuGri4IFnFzN; Sat, 12 Nov 2022 12:12:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B5174B828;
-	Sat, 12 Nov 2022 07:40:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DE514B83D;
+	Sat, 12 Nov 2022 12:12:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BFAF64B815
- for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 07:40:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF7104B83B
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 12:12:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 99xyjIDbYc86 for <kvmarm@lists.cs.columbia.edu>;
- Sat, 12 Nov 2022 07:40:13 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 323C84B7FC
- for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 07:40:13 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 6704860BC2;
- Sat, 12 Nov 2022 12:40:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FCAEC433D6;
- Sat, 12 Nov 2022 12:40:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1668256811;
- bh=BtDS21E0zXMKBuDPAchV3ZZrdiDGkpu1m8zPgSJAf1c=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=FRxvrMJWQo4ZPZpg9CBD0FLXBSRyE2c4HAQDaNgYKhBaEwOvFBQ/Q5Va7kVy71OXV
- JX5gcBKcw0l4uuZ+33qPzQb41ftWQfH9pmkw2MQXdn7wIsBnd4ZXJMnT1Lw5MsEhTN
- a0D4R3mbmae934cO1CHlzMPT8XrdrteteuCEbzCXIeBRltNXxIPivyZZ6UPg7vqdGP
- aDucdzTF762yA+JgeZXYQD7aY1mN3gDSU/vseigSh5PtrNpxQN9S9p0MCybmhhtrd3
- se9EJ8c9Yf8dLm9oA+Sn6F3PEfnQaHs5bZRagVJCqQtR6X+VnSyrHlaZA/CZxN+CFv
- VznRP/N0bxbQw==
-Received: from sofa.misterjones.org ([185.219.108.64]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1otpnt-005bqs-7w;
- Sat, 12 Nov 2022 12:40:09 +0000
-Date: Sat, 12 Nov 2022 12:39:47 +0000
-Message-ID: <87edu8uz1o.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH v3 02/14] KVM: arm64: PMU: Align chained counter
- implementation with architecture pseudocode
-In-Reply-To: <CAAeT=FwNKZhc=a4Jggw-ENL=9G26QTU7OsRbHd2+F+=ZTPt24w@mail.gmail.com>
+ with ESMTP id NoOfNCrIJ-9r for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 12 Nov 2022 12:12:00 -0500 (EST)
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com
+ [209.85.215.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D1B524B83A
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 12:12:00 -0500 (EST)
+Received: by mail-pg1-f174.google.com with SMTP id 136so6811116pga.1
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 09:12:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:from:to:cc:subject:date:message-id:reply-to;
+ bh=huOfRfTKX8VpR+zLQmX1u05LOoSZKsTiMBH9KVLbC90=;
+ b=YOPdyFPHiHdfei20a0O7mxQJEQ1ngcz2Ak7zBVLQQL6m6BCgnGfpFH9NTCV5g3TkKb
+ lhJ/Oix0aRGD4D0zw7tU9n/WWfjvoDT4CIJZ+st0hZCA2bVYqhniDRjY/c+Tn/lktx8w
+ P6E46/GhBxnYcFdIVsWV2BjvcAxD1Oz93Mm61R/l2EajnTBEtD7fsBnJDZJMWNMEvcOI
+ ngtnFreoV3caaRvProwwSKldBKPGjk3MUgTrZ8Hz0ukRGsosJ+LxNxVhajZk7nssB7kp
+ ok1uvAeLWgYsUVYt/TemRAbnH/NofOgyy+GWdIo4doZcp15qloZblfU/KSw65we3g32K
+ tfCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+ :reply-to;
+ bh=huOfRfTKX8VpR+zLQmX1u05LOoSZKsTiMBH9KVLbC90=;
+ b=Oie0cNtPi9KdTRqeg4T6yk6z/sdxklt1Mdf5Kcypq4sZyyeZmHWE/k6RfeDJLOjx1U
+ ue41oafm7rMidhp8wrhDY1+b9e3zWxHfnwZncuvEef+hHH1rtUmzKmI0zeM+wCM6D3B3
+ 4sE/Yi8o24OvRx5vnpncVpt/PA3fP23I9Bx+bfM5Ojf1Uvln534G6snp6UoC5j/MYbAW
+ sxN37AwQou/EuCikur8JFlI2sVJVAJ2fgPhJAvq7lthXEIh7yT8XsZ/cKPd7Jhs4lv8H
+ Aa0uGdGONAiXDFlhMPoLhXf8WA8QrTXg0wzfD8Aj+PAucGKAKvsrAmTljXiflzJ2XpRq
+ nxGA==
+X-Gm-Message-State: ANoB5pm2dm/iUsgA8L65SW5BiStHx1dyLQufBNpPej5CKIRTknLoLlvO
+ Nmz5gePryosbnTZbLhs2nNRdKITPNTo+KWizYAna4A==
+X-Google-Smtp-Source: AA0mqf5DICL/2gA2W9iIaKXpvPpequGwdfWsmg3dq8MWyHwh/KLJ/3GKXQMeXrpPRy8098xWMqdkZMYeGaya8U+kDxg=
+X-Received: by 2002:a63:4711:0:b0:474:4380:cca6 with SMTP id
+ u17-20020a634711000000b004744380cca6mr5941504pga.229.1668273119742; Sat, 12
+ Nov 2022 09:11:59 -0800 (PST)
+MIME-Version: 1.0
 References: <20221107085435.2581641-1-maz@kernel.org>
  <20221107085435.2581641-3-maz@kernel.org>
  <CAAeT=FwNKZhc=a4Jggw-ENL=9G26QTU7OsRbHd2+F+=ZTPt24w@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
- oliver.upton@linux.dev, ricarkol@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <87edu8uz1o.wl-maz@kernel.org>
+In-Reply-To: <87edu8uz1o.wl-maz@kernel.org>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Sat, 12 Nov 2022 09:11:42 -0800
+Message-ID: <CAAeT=Fwp-Xx49XmbVm55x-4+GRVuGbT6kqhAcfXTpWTqfvEu+Q@mail.gmail.com>
+Subject: Re: [PATCH v3 02/14] KVM: arm64: PMU: Align chained counter
+ implementation with architecture pseudocode
+To: Marc Zyngier <maz@kernel.org>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -90,193 +88,93 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Reiji,
+Hi Marc,
 
-On Sat, 12 Nov 2022 07:55:38 +0000,
-Reiji Watanabe <reijiw@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Mon, Nov 7, 2022 at 12:54 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > +#define PERF_ATTR_CFG1_COUNTER_64BIT   BIT(0)
 > >
-> > Ricardo recently pointed out that the PMU chained counter emulation
-> > in KVM wasn't quite behaving like the one on actual hardware, in
-> > the sense that a chained counter would expose an overflow on
-> > both halves of a chained counter, while KVM would only expose the
-> > overflow on the top half.
-> >
-> > The difference is subtle, but significant. What does the architecture
-> > say (DDI0087 H.a):
-> >
-> > - Up to PMUv3p4, all counters but the cycle counter are 32bit
-> >
-> > - A 32bit counter that overflows generates a CHAIN event on the
-> >   adjacent counter after exposing its own overflow status
-> >
-> > - The CHAIN event is accounted if the counter is correctly
-> >   configured (CHAIN event selected and counter enabled)
-> >
-> > This all means that our current implementation (which uses 64bit
-> > perf events) prevents us from emulating this overflow on the lower half.
-> >
-> > How to fix this? By implementing the above, to the letter.
-> >
-> > This largly results in code deletion, removing the notions of
-> > "counter pair", "chained counters", and "canonical counter".
-> > The code is further restructured to make the CHAIN handling similar
-> > to SWINC, as the two are now extremely similar in behaviour.
-> >
-> > Reported-by: Ricardo Koller <ricarkol@google.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/pmu-emul.c | 312 ++++++++++----------------------------
-> >  include/kvm/arm_pmu.h     |   2 -
-> >  2 files changed, 83 insertions(+), 231 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > index 0003c7d37533..a38b3127f649 100644
-> > --- a/arch/arm64/kvm/pmu-emul.c
-> > +++ b/arch/arm64/kvm/pmu-emul.c
-> > @@ -15,16 +15,14 @@
-> >  #include <kvm/arm_pmu.h>
-> >  #include <kvm/arm_vgic.h>
-> >
-> > +#define PERF_ATTR_CFG1_COUNTER_64BIT   BIT(0)
-> 
-> Although this isn't the new code (but just a name change),
-> wouldn't it be nicer to have armv8pmu_event_is_64bit()
-> (in arch/arm64/kernel/perf_event.c) use the macro as well ?
+> > Although this isn't the new code (but just a name change),
+> > wouldn't it be nicer to have armv8pmu_event_is_64bit()
+> > (in arch/arm64/kernel/perf_event.c) use the macro as well ?
+>
+> We tried that in the past, and the amount of churn wasn't really worth
+> it. I'm happy to revisit this in the future, but probably as a
+> separate patch.
 
-We tried that in the past, and the amount of churn wasn't really worth
-it. I'm happy to revisit this in the future, but probably as a
-separate patch.
+I see... Thank you for the clarification.  As this isn't new,
+I agree with that (not addressing it in this series).
 
-[...]
-
-> > @@ -163,29 +97,7 @@ static u64 kvm_pmu_get_pair_counter_value(struct kvm_vcpu *vcpu,
-> >                 counter += perf_event_read_value(pmc->perf_event, &enabled,
-> >                                                  &running);
+> > > @@ -340,11 +245,8 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+> > >
+> > >                 pmc = &pmu->pmc[i];
+> > >
+> > > -               /* A change in the enable state may affect the chain state */
+> > > -               kvm_pmu_update_pmc_chained(vcpu, i);
+> > >                 kvm_pmu_create_perf_event(vcpu, i);
+> > >
+> > > -               /* At this point, pmc must be the canonical */
+> > >                 if (pmc->perf_event) {
+> > >                         perf_event_enable(pmc->perf_event);
+> > >                         if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
+> > > @@ -375,11 +277,8 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+> > >
+> > >                 pmc = &pmu->pmc[i];
+> > >
+> > > -               /* A change in the enable state may affect the chain state */
+> > > -               kvm_pmu_update_pmc_chained(vcpu, i);
+> > >                 kvm_pmu_create_perf_event(vcpu, i);
 > >
-> > -       return counter;
-> > -}
-> > -
-> > -/**
-> > - * kvm_pmu_get_counter_value - get PMU counter value
-> > - * @vcpu: The vcpu pointer
-> > - * @select_idx: The counter index
-> > - */
-> > -u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
-> > -{
-> > -       u64 counter;
-> > -       struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> > -       struct kvm_pmc *pmc = &pmu->pmc[select_idx];
-> > -
-> > -       if (!kvm_vcpu_has_pmu(vcpu))
-> > -               return 0;
-> > -
-> > -       counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
-> > -
-> > -       if (kvm_pmu_pmc_is_chained(pmc) &&
-> > -           kvm_pmu_idx_is_high_counter(select_idx))
-> > -               counter = upper_32_bits(counter);
-> > -       else if (select_idx != ARMV8_PMU_CYCLE_IDX)
-> > +       if (select_idx != ARMV8_PMU_CYCLE_IDX)
-> 
-> Nit:Using 'pmc->idx' instead of 'select_idx' appears to be more consistent.
+> > Do we still need to call kvm_pmu_update_pmc_chained() here even
+> > with this patch ? (I would think the reason why the function was
+> > called here was because the chain state change could affect the
+> > backed perf event attribute before).
+> > I have the same comment for kvm_pmu_enable_counter_mask().
+>
+> Do you mean kvm_pmu_create_perf_event() instead? I think we can drop
+> the one on disable. But the one on enable is required, as we need to
+> be able to start counting an event even if the guest hasn't programmed
+> the event number (unlikely, but allowed by the architecture). It can
+> be made conditional though.
 
-Well, this is the exact opposite of Oliver's comment last time. I
-initially used pmc->idx, but it made the diff somehow larger and also
-more difficult to understand what changed.
+I'm so sorry for the confusion...
+Yes, kvm_pmu_create_perf_event() is what I meant.
+Thank you for the explanation for the one enabled case.
+Now, I understand.
 
-In the end, I'd rather rework the whole file to consistently use
-vcpu+idx or pmc, as the mixed use of both is annoying. And that's
-probably a cleanup patch for later.
+>
+> I have the following fix queued:
 
-[...]
+Looks good!
 
-> > @@ -340,11 +245,8 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
-> >
-> >                 pmc = &pmu->pmc[i];
-> >
-> > -               /* A change in the enable state may affect the chain state */
-> > -               kvm_pmu_update_pmc_chained(vcpu, i);
-> >                 kvm_pmu_create_perf_event(vcpu, i);
-> >
-> > -               /* At this point, pmc must be the canonical */
-> >                 if (pmc->perf_event) {
-> >                         perf_event_enable(pmc->perf_event);
-> >                         if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
-> > @@ -375,11 +277,8 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
-> >
-> >                 pmc = &pmu->pmc[i];
-> >
-> > -               /* A change in the enable state may affect the chain state */
-> > -               kvm_pmu_update_pmc_chained(vcpu, i);
-> >                 kvm_pmu_create_perf_event(vcpu, i);
-> 
-> Do we still need to call kvm_pmu_update_pmc_chained() here even
-> with this patch ? (I would think the reason why the function was
-> called here was because the chain state change could affect the
-> backed perf event attribute before).
-> I have the same comment for kvm_pmu_enable_counter_mask().
+Thank you,
+Reiji
 
-Do you mean kvm_pmu_create_perf_event() instead? I think we can drop
-the one on disable. But the one on enable is required, as we need to
-be able to start counting an event even if the guest hasn't programmed
-the event number (unlikely, but allowed by the architecture). It can
-be made conditional though.
-
-I have the following fix queued:
-
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 26293f842b0f..b7a5f75d008d 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -277,9 +277,9 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
- 
- 		pmc = &pmu->pmc[i];
- 
--		kvm_pmu_create_perf_event(vcpu, i);
--
--		if (pmc->perf_event) {
-+		if (!pmc->perf_event) {
-+			kvm_pmu_create_perf_event(vcpu, i);
-+		} else {
- 			perf_event_enable(pmc->perf_event);
- 			if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
- 				kvm_debug("fail to enable perf event\n");
-@@ -309,8 +309,6 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
- 
- 		pmc = &pmu->pmc[i];
- 
--		kvm_pmu_create_perf_event(vcpu, i);
--
- 		if (pmc->perf_event)
- 			perf_event_disable(pmc->perf_event);
- 	}
-
-[...]
-
-> > @@ -670,30 +569,21 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
-> >         attr.exclude_host = 1; /* Don't count host events */
-> >         attr.config = eventsel;
-> >
-> > -       counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
-> > +       counter = kvm_pmu_get_counter_value(vcpu, select_idx);
-> 
-> Nit: Since all existing codes in the function use pmc->idx,
-> I would think it would be better to use 'pmc->idx' instead of
-> 'select_idx' consistently.
-
-See my above comment about the need for a more global cleanup of this
-file, and the ask to keep the patch focused on the actual rework.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+>
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 26293f842b0f..b7a5f75d008d 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -277,9 +277,9 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>
+>                 pmc = &pmu->pmc[i];
+>
+> -               kvm_pmu_create_perf_event(vcpu, i);
+> -
+> -               if (pmc->perf_event) {
+> +               if (!pmc->perf_event) {
+> +                       kvm_pmu_create_perf_event(vcpu, i);
+> +               } else {
+>                         perf_event_enable(pmc->perf_event);
+>                         if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
+>                                 kvm_debug("fail to enable perf event\n");
+> @@ -309,8 +309,6 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+>
+>                 pmc = &pmu->pmc[i];
+>
+> -               kvm_pmu_create_perf_event(vcpu, i);
+> -
+>                 if (pmc->perf_event)
+>                         perf_event_disable(pmc->perf_event);
+>         }
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
