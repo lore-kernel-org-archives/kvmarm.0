@@ -1,40 +1,40 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 491B2A42
-	for <kvmarm@lists.linux.dev>; Sat, 12 Nov 2022 08:17:25 +0000 (UTC)
-Received: by mail-pl1-f201.google.com with SMTP id k15-20020a170902c40f00b001887cd71fe6so5045515plk.5
-        for <kvmarm@lists.linux.dev>; Sat, 12 Nov 2022 00:17:25 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9407A23
+	for <kvmarm@lists.linux.dev>; Sat, 12 Nov 2022 08:17:26 +0000 (UTC)
+Received: by mail-pj1-f74.google.com with SMTP id b1-20020a17090a10c100b0020da29fa5e5so3711655pje.2
+        for <kvmarm@lists.linux.dev>; Sat, 12 Nov 2022 00:17:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WvQqbOcRRIz/a65YfrYqybuwAR7lzCQSMUK3wSeET0M=;
-        b=LkFfKClWZ3DQ8LNaYJFEYJMH70YWUdqSFByma4dpsP65aCuCHTkXXM1y1a8uHQWgsQ
-         C6oQq887h12aD6a3qPKeYmOV/TyUIvHDsQxoxbF3TTQpgtjjKFptWMqn9kTP/TomejZz
-         NGr6lKfMW+/956h4TSvkm41L1g52Ri5Phi+4K0xyyrwsAG/m+zEPa6rjt9mUFh/GTMsW
-         9/mCvDVmwzr23PW9gvU5F8acyAcqEJvw6xm1SAy71DaSxI11NOFK6NYEwJ+/6OfqJgpa
-         X/+qaFPJfb3gRYGJvsgQlPNYWEs4RE0EjGkq8C0U43XFVMlyfAY90JSpoBZByzfdITp4
-         pFoQ==
+        bh=erREdX/KDsXecKj6gAJQc8HQGGxLcgScAAv0CqZULEU=;
+        b=YpZw7R2gC5bvKwjGM8NpdnFt1KqwMZgN0FK+q3Tcnq4RSpkrJ5mlI8gWdBgR1P3PNY
+         wtWzQsCJAqHyfWbM4T6Blssr1vYpjmXg8r3avJ3Ag1eRynebA0swGQiLy+T/1xOLVqmx
+         uKzeeAOCidZWlofpDaepHSuA37EGmUdkY+nB9QsBoniCzied3NX2L3xwX+W+QenR+ZG1
+         qe7sBJhQop7ZDaWqme1bLG2j1DUYNgOzuWcEQ4r62GNmnVKY3n/YokKrJD6DndIW86EL
+         O5F8B+cOkhxiU1R0kRa5Etvr8wVBsf/tf0E3jTUURwKOs26mJNks+CHuJUcJpad+jjix
+         9UEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WvQqbOcRRIz/a65YfrYqybuwAR7lzCQSMUK3wSeET0M=;
-        b=B9D+BYOwAa5ik/4H/mS2WUuNbebSu+IsKKezvZR9cu2XZUMTtN0Ht8noZgWUadieTS
-         qx1NoBL/CCBnBF8i+KFsPc5zEC7VkkxLmUDXud22IwMCMIWyaswp9tpudFBh9gM+jnI1
-         FVMianUELdCjxtOBCKdzNqCDx9svqrKkyIoqiudhTSc0aov25WXonAHGAdPSDLUtaDzF
-         ZYVrmi1JvDEk18idphSxPWzNKDQwzf6q5KFCE5pypRhlzmapBcpC1oWuzq8AuW54vswO
-         YE5MBkBAEebvYC5wDEZO0g1529edKmVSscaNl1GRr4D83gV/6FtkS4ZZAKt5xV3TqO6O
-         gV0Q==
-X-Gm-Message-State: ANoB5pmrYFJOYzGa7dUrj+N159/lwKUuxe2EUjd9R6NoIw59QrjFK1no
-	2EfKIrLdjKwe/Exa5sFkHcoFoOrm1QMK2A==
-X-Google-Smtp-Source: AA0mqf5CBaojmhCyotBHoWR2qMVyeqzR1Pjirb9yO8vur3R/1ist1s7bbeFg75RVf1LANl9XifIznNL9Xa2a0g==
+        bh=erREdX/KDsXecKj6gAJQc8HQGGxLcgScAAv0CqZULEU=;
+        b=6TT4ZqLevfbGsrUQg6vXe/HP+4YaOKjVwKyXc7ljgguNWecJvJEyjVPoi1FFZwnHtl
+         pQAtkCijt3A4ySfPJjIobUDIqldnob/v15OtsJrtYkcwsZlOvt1ELHvgjCklWdoq39iJ
+         yuZaxrUCHIWXGEcG0ZdCNUgKsYvXP7VE6iHQbHiArdXW8N0yJop4NHMIYNmVeAxLRqOI
+         7rQ8IuNObh4eEI9W7dwU5vLESIinl0m8GcHtehHC6NO2m59YBT/K9m1HB9eu91P2taZh
+         QqgIPOXA+Pcc2aglaag4hIzeIY2uAA/x99sb3da9Mfy3Pih2+Fioh7WlecGaUfcgqyfr
+         CkQQ==
+X-Gm-Message-State: ANoB5pnhNebu2kLVkkH9iixbhM4I23q0HKxI56B7HDIujYbaB3ri/N1F
+	p0PWhKhuoFBd7o/EOu9gD3kWwNbZx3MnIQ==
+X-Google-Smtp-Source: AA0mqf6QQp6GfMYPE6XZxs/+skS8K7KjLSTBecvWkfOO3UbLxYSWSVwUiwHGGOFgupv2VbGHKjubxmxwv9+J9A==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:aa7:8617:0:b0:56e:7424:bc0f with SMTP id
- p23-20020aa78617000000b0056e7424bc0fmr6225324pfn.11.1668241044591; Sat, 12
- Nov 2022 00:17:24 -0800 (PST)
-Date: Sat, 12 Nov 2022 08:17:06 +0000
+ (user=ricarkol job=sendgmr) by 2002:aa7:92ca:0:b0:56c:6bcc:cf0e with SMTP id
+ k10-20020aa792ca000000b0056c6bcccf0emr6073185pfa.64.1668241046330; Sat, 12
+ Nov 2022 00:17:26 -0800 (PST)
+Date: Sat, 12 Nov 2022 08:17:07 +0000
 In-Reply-To: <20221112081714.2169495-1-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20221112081714.2169495-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221112081714.2169495-5-ricarkol@google.com>
-Subject: [RFC PATCH 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
+Message-ID: <20221112081714.2169495-6-ricarkol@google.com>
+Subject: [RFC PATCH 05/12] arm64: Add a capability for FEAT_BBM level 2
 From: Ricardo Koller <ricarkol@google.com>
 To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
 	dmatlack@google.com, qperret@google.com, catalin.marinas@arm.com, 
@@ -55,147 +55,51 @@ To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
 	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221112081706.-hfmoUfAe-g58sH84swvMxZFqc8ayh7a0WPZC1vaJRM@z>
+Message-ID: <20221112081707.awUE0uU3bcUvaTdCER4LpNQiyrHRNAS1aGt04sTdco4@z>
 
-Add a new stage2 function, kvm_pgtable_stage2_split(), for splitting a
-range of huge pages. This will be used for eager-splitting huge pages into
-PAGE_SIZE pages. The goal is to avoid having to split huge pages on
-write-protection faults, and instead use this function to do it ahead of
-time for large ranges (e.g., all guest memory in 1G chunks at a time).
-
-No functional change intended. This new function will be used in a
+Add a new capability to detect "Stage-2 Translation table
+break-before-make" (FEAT_BBM) level 2.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 29 +++++++++++
- arch/arm64/kvm/hyp/pgtable.c         | 74 ++++++++++++++++++++++++++++
- 2 files changed, 103 insertions(+)
+ arch/arm64/kernel/cpufeature.c | 11 +++++++++++
+ arch/arm64/tools/cpucaps       |  1 +
+ 2 files changed, 12 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index d2e4a5032146..396ebb0949fb 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -594,6 +594,35 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
-  */
- int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
- 
-+/**
-+ * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
-+ *				to PAGE_SIZE guest pages.
-+ * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-+ * @addr:	Intermediate physical address from which to split.
-+ * @size:	Size of the range.
-+ * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-+ *		page-table pages.
-+ *
-+ * @addr and the end (@addr + @size) are effectively aligned down and up to
-+ * the top level huge-page block size. This is an exampe using 1GB
-+ * huge-pages and 4KB granules.
-+ *
-+ *                          [---input range---]
-+ *                          :                 :
-+ * [--1G block pte--][--1G block pte--][--1G block pte--][--1G block pte--]
-+ *                          :                 :
-+ *                   [--2MB--][--2MB--][--2MB--][--2MB--]
-+ *                          :                 :
-+ *                   [ ][ ][:][ ][ ][ ][ ][ ][:][ ][ ][ ]
-+ *                          :                 :
-+ *
-+ * Return: 0 on success, negative error code on failure. Note that
-+ * kvm_pgtable_stage2_split() is best effort: it tries to break as many
-+ * blocks in the input range as allowed by the size of the memcache. It
-+ * will fail it wasn't able to break any block.
-+ */
-+int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size, void *mc);
-+
- /**
-  * kvm_pgtable_walk() - Walk a page-table.
-  * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index d1f309128118..9c42eff6d42e 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1267,6 +1267,80 @@ static int stage2_create_removed(kvm_pte_t *ptep, u64 phys, u32 level,
- 	return __kvm_pgtable_visit(&data, mm_ops, ptep, level);
- }
- 
-+struct stage2_split_data {
-+	struct kvm_s2_mmu		*mmu;
-+	void				*memcache;
-+	struct kvm_pgtable_mm_ops	*mm_ops;
-+};
-+
-+static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
-+			       enum kvm_pgtable_walk_flags visit)
-+{
-+	struct stage2_split_data *data = ctx->arg;
-+	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
-+	kvm_pte_t pte = ctx->old, attr, new;
-+	enum kvm_pgtable_prot prot;
-+	void *mc = data->memcache;
-+	u32 level = ctx->level;
-+	u64 phys;
-+
-+	if (WARN_ON_ONCE(kvm_pgtable_walk_shared(ctx)))
-+		return -EINVAL;
-+
-+	/* Nothing to split at the last level */
-+	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
-+		return 0;
-+
-+	/* We only split valid block mappings */
-+	if (!kvm_pte_valid(pte) || kvm_pte_table(pte, ctx->level))
-+		return 0;
-+
-+	phys = kvm_pte_to_phys(pte);
-+	prot = kvm_pgtable_stage2_pte_prot(pte);
-+	stage2_set_prot_attr(data->mmu->pgt, prot, &attr);
-+
-+	/*
-+	 * Eager page splitting is best-effort, so we can ignore the error.
-+	 * The returned PTE (new) will be valid even if this call returns
-+	 * error: new will be a single (big) block PTE.  The only issue is
-+	 * that it will affect dirty logging performance, as the huge-pages
-+	 * will have to be split on fault, and so we WARN.
-+	 */
-+	WARN_ON(stage2_create_removed(&new, phys, level, attr, mc, mm_ops));
-+
-+	stage2_put_pte(ctx, data->mmu, mm_ops);
-+
-+	/*
-+	 * Note, the contents of the page table are guaranteed to be made
-+	 * visible before the new PTE is assigned because
-+	 * stage2_make__pte() writes the PTE using smp_store_release().
-+	 */
-+	stage2_make_pte(ctx, new);
-+	dsb(ishst);
-+	return 0;
-+}
-+
-+int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt,
-+			     u64 addr, u64 size, void *mc)
-+{
-+	int ret;
-+
-+	struct stage2_split_data split_data = {
-+		.mmu		= pgt->mmu,
-+		.memcache	= mc,
-+		.mm_ops		= pgt->mm_ops,
-+	};
-+
-+	struct kvm_pgtable_walker walker = {
-+		.cb	= stage2_split_walker,
-+		.flags	= KVM_PGTABLE_WALK_POST,
-+		.arg	= &split_data,
-+	};
-+
-+	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
-+	return ret;
-+}
-+
- int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
- 			      struct kvm_pgtable_mm_ops *mm_ops,
- 			      enum kvm_pgtable_stage2_flags flags,
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 6062454a9067..ff97fb05d430 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2339,6 +2339,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.min_field_value = 1,
+ 		.matches = has_cpuid_feature,
+ 	},
++	{
++		.desc = "Stage-2 Translation table break-before-make level 2",
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.capability = ARM64_HAS_STAGE2_BBM2,
++		.sys_reg = SYS_ID_AA64MMFR2_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64MMFR2_EL1_BBM_SHIFT,
++		.field_width = 4,
++		.min_field_value = 2,
++		.matches = has_cpuid_feature,
++	},
+ 	{
+ 		.desc = "TLB range maintenance instructions",
+ 		.capability = ARM64_HAS_TLB_RANGE,
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index f1c0347ec31a..f421adbdb08b 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -36,6 +36,7 @@ HAS_PAN
+ HAS_RAS_EXTN
+ HAS_RNG
+ HAS_SB
++HAS_STAGE2_BBM2
+ HAS_STAGE2_FWB
+ HAS_SYSREG_GIC_CPUIF
+ HAS_TIDCP1
 -- 
 2.38.1.431.g37b22c650d-goog
 
