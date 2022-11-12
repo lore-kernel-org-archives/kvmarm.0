@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8349184E
-	for <kvmarm@lists.linux.dev>; Sat, 12 Nov 2022 15:18:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A04DAC433D6;
-	Sat, 12 Nov 2022 15:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1D30184E
+	for <kvmarm@lists.linux.dev>; Sat, 12 Nov 2022 15:18:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F384C433D7;
+	Sat, 12 Nov 2022 15:18:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668266289;
-	bh=16TcJUXx7TByNWK3ZREePc2xQJ7uGGHCMViO4LPLnVU=;
+	s=k20201202; t=1668266293;
+	bh=n2cI2Ryl/K/Hs+xrWGQoTkD5IBBhNXw75Kv5kwvMdWQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TzSkdtQW0GY4QsAPp8JjQw+4w4OGCSHDbYFXW1IwK0E4GvEh+6RzmN+SngnrDergn
-	 N5HzA+pD2zCKHWKD+qO6FOmS9tWFxWNWVIN19A/N8tM85ZhcaodWTyGgMjFguIEK89
-	 zcrxu7/AQBYuXc+x/Iynk4w9/ozmdDmwhGHSVpHmbICj7AMFZYESkFOkTyN0NwLtlV
-	 BnpZINIpeOjZ8rNDKm0PLsiUW3HCLU8IiA6eKI1+3ACn4CPRxOhz9igwPYLV6jIgcR
-	 e8w9+13MIFraxVke9a2O/OIOFAOIa04Gu1RRLBT/u8NSG9xxTO08TwqaVxIH1e4pEH
-	 dfQpaOv0ncsQw==
+	b=K/hVpOltuDPiYePlUwip2Nfkn1iq5MOPmMh6wi/IIZ+bQPguv0tYJBbUoxB0+A27D
+	 rDb8KDARC0iwIFx8D9YJjrXBWYgx2iweHR1hxJxXCq9ZUBr6pfxN1xSONZcDlbI40K
+	 C9O+o+t2IxUglLO8OAwp6TrQTrULAEi6UA198XJNpK+MV7HK0keOp8ampyJfBKorEa
+	 DK6r7am+QPbapL9OjyVeYmeqyHo6s91ULrmrLW6ChKGe/WWUwdB7wnSzcwgbblAE3Y
+	 QS9BB4R8uIU85NLUdpkoy0ST+sszOwQwdh8j0PzXplxkOtaTrzGMHPbgwtyGMwl161
+	 54QdK+dl8anTg==
 From: Mark Brown <broonie@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
@@ -26,9 +26,9 @@ Cc: Lorenzo Pieralisi <lpieralisi@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 09/14] KVM: arm64: Hide FEAT_NMI from guests
-Date: Sat, 12 Nov 2022 15:17:03 +0000
-Message-Id: <20221112151708.175147-10-broonie@kernel.org>
+Subject: [PATCH v2 10/14] arm64/nmi: Manage masking for superpriority interrupts along with DAIF
+Date: Sat, 12 Nov 2022 15:17:04 +0000
+Message-Id: <20221112151708.175147-11-broonie@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20221112151708.175147-1-broonie@kernel.org>
 References: <20221112151708.175147-1-broonie@kernel.org>
@@ -38,61 +38,129 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2080; i=broonie@kernel.org; h=from:subject; bh=16TcJUXx7TByNWK3ZREePc2xQJ7uGGHCMViO4LPLnVU=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjb7juXZHFkisEYb2JU6vcImxPS9r6K29A3RYLFP7v DyMOLwCJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY2+47gAKCRAk1otyXVSH0IlRB/ 4qQx4KGXZDq76v2g6fQRHSKhLC8FMDi8ZhLREI+AzOOgwvE4p/rhRjAP5+/W1I1pCAXMHl99HExHdf w1d1fnxSApfGg5pbOYwXZm/OEP1azFc5MemNBin3To1aii0QCvNvCpF/FwBDiPFLqY0Xa6RCIS+1MR jenH9P2VjrmPkiZl1prRr2qePCQx4dScFOFc/2OazH/AbFQBup+Hd7vOA8vovvYbTwl496RboM0o5M H8DXNcc4sV2oLF/FfwKW6f+Apl/ZJPwEEExz+wJVHxLIwTYA5hvi+45c9NNm+L4ZMZl/VNa1OuPXMj ISYJw3ssw18gfF6UsuS6y9sHtCN+CL
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3997; i=broonie@kernel.org; h=from:subject; bh=n2cI2Ryl/K/Hs+xrWGQoTkD5IBBhNXw75Kv5kwvMdWQ=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjb7jvNhEWyWb+I8gtv1BvP6iwP9rPCXkQUSj4TjI2 67sB5+WJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY2+47wAKCRAk1otyXVSH0DoeB/ 0cu+7D2eO1FlLwWz4eRBj+q5XeE92P2X6d7RyZtGIu4h5ZTIpmHfbqe49u7mx1Z/s2eY5tFsDCqDSO k4q75p7uoL1/gMzrUktGRqigECIMaGiC8I/jiavBORmt0M2X3oK9FWzWWU+zdNMEkiBOxE+ubWO1Se PPV8BUbPFZSVbejp2Fgn9ubDiPjdPwYNZ+sWCZAkWOWvbN5uNBNUkxdz/P9bjKNBm0ET8HmpOjDcyc 4IuAUrxTxdtO2cVw5S6dKNJhEkJz95M9bui/KGhEwBU3+zYNsDCi9OW7pnzj3AzDuRnLItHyMq81p4 OYOEha7oiTH9TzJSmIZ9xQTWx9i5xv
 X-Developer-Key: i=broonie@kernel.org; a=openpgp; fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 Content-Transfer-Encoding: 8bit
 
-FEAT_NMI is not yet useful to guests pending implementation of vGIC
-support. Mask out the feature from the ID register and prevent guests
-creating state in ALLINT.ALLINT by activating the trap on write provided
-in HCRX_EL2.TALLINT when they are running. There is no trap available
-for reads from ALLINT.
+As we do for pseudo NMIs add code to our DAIF management which keeps
+superpriority interrupts unmasked when we have asynchronous exceptions
+enabled. Since superpriority interrupts are not masked through DAIF like
+pseduo NMIs are we also need to modify the assembler macros for managing
+DAIF to ensure that the masking is done in the assembly code. At present
+users of the assembly macros always mask pseudo NMIs.
 
-We do not need to check for FEAT_HCRX since it is mandatory since v8.7
-and FEAT_NMI is a v8.8 feature.
+There is a difference to the actual handling between pseudo NMIs
+and superpriority interrupts in the assembly save_and_disable_irq and
+restore_irq macros, these cover both interrupts and FIQs using DAIF
+without regard for the use of pseudo NMIs so also mask those but are not
+updated here to mask superpriority interrupts. Given the names it is not
+clear that the behaviour with pseudo NMIs is particularly intentional,
+and in any case these macros are only used in the implementation of
+alternatives for software PAN while hardware PAN has been mandatory
+since v8.1 so it is not anticipated that practical systems with support
+for FEAT_NMI will ever execute the affected code.
+
+This should be a conservative set of masked regions, we may be able to
+relax this in future, but this should represent a good starting point.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 6 ++++++
- arch/arm64/kvm/sys_regs.c               | 1 +
- 2 files changed, 7 insertions(+)
+ arch/arm64/include/asm/assembler.h | 11 +++++++++++
+ arch/arm64/include/asm/daifflags.h | 18 ++++++++++++++++++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 6cbbb6c02f66..89e78c4e5cce 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -85,6 +85,9 @@ static inline void __activate_traps_common(struct kvm_vcpu *vcpu)
- 		write_sysreg(ARMV8_PMU_USERENR_MASK, pmuserenr_el0);
+diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+index 88d9779a83c0..e85a7e9af9ae 100644
+--- a/arch/arm64/include/asm/assembler.h
++++ b/arch/arm64/include/asm/assembler.h
+@@ -52,19 +52,30 @@ alternative_else_nop_endif
+ 
+ 	.macro save_and_disable_daif, flags
+ 	mrs	\flags, daif
++        disable_allint
+ 	msr	daifset, #0xf
+ 	.endm
+ 
+ 	.macro disable_daif
++        disable_allint
+ 	msr	daifset, #0xf
+ 	.endm
+ 
+ 	.macro enable_daif
+ 	msr	daifclr, #0xf
++	enable_allint
+ 	.endm
+ 
+ 	.macro	restore_daif, flags:req
+ 	msr	daif, \flags
++#ifdef CONFIG_ARM64_NMI
++alternative_if ARM64_HAS_NMI
++	/* If async exceptions are unmasked we can take NMIs */
++	tbnz	\flags, #8, 2004f
++	msr_s	SYS_ALLINT_CLR, xzr
++2004:
++alternative_else_nop_endif
++#endif
+ 	.endm
+ 
+ 	/* IRQ/FIQ are the lowest priority flags, unconditionally unmask the rest. */
+diff --git a/arch/arm64/include/asm/daifflags.h b/arch/arm64/include/asm/daifflags.h
+index b3bed2004342..fda73976068f 100644
+--- a/arch/arm64/include/asm/daifflags.h
++++ b/arch/arm64/include/asm/daifflags.h
+@@ -10,6 +10,7 @@
+ #include <asm/arch_gicv3.h>
+ #include <asm/barrier.h>
+ #include <asm/cpufeature.h>
++#include <asm/nmi.h>
+ #include <asm/ptrace.h>
+ 
+ #define DAIF_PROCCTX		0
+@@ -35,6 +36,9 @@ static inline void local_daif_mask(void)
+ 	if (system_uses_irq_prio_masking())
+ 		gic_write_pmr(GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET);
+ 
++	if (system_uses_nmi())
++		_allint_set();
++
+ 	trace_hardirqs_off();
+ }
+ 
+@@ -50,6 +54,12 @@ static inline unsigned long local_daif_save_flags(void)
+ 			flags |= PSR_I_BIT | PSR_F_BIT;
  	}
  
-+	if (cpus_have_final_cap(ARM64_HAS_NMI))
-+		sysreg_clear_set_s(SYS_HCRX_EL2, 0, HCRX_EL2_TALLINT);
++	if (system_uses_nmi()) {
++		/* If IRQs are masked with ALLINT, reflect in in the flags */
++		if (read_sysreg_s(SYS_ALLINT) & ALLINT_ALLINT)
++			flags |= PSR_I_BIT | PSR_F_BIT;
++	}
 +
- 	vcpu->arch.mdcr_el2_host = read_sysreg(mdcr_el2);
- 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+ 	return flags;
  }
-@@ -93,6 +96,9 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
- {
- 	write_sysreg(vcpu->arch.mdcr_el2_host, mdcr_el2);
  
-+	if (cpus_have_final_cap(ARM64_HAS_NMI))
-+		sysreg_clear_set_s(SYS_HCRX_EL2, HCRX_EL2_TALLINT, 0);
+@@ -114,6 +124,10 @@ static inline void local_daif_restore(unsigned long flags)
+ 		gic_write_pmr(pmr);
+ 	}
+ 
++	/* If we can take asynchronous errors we can take NMIs */
++	if (system_uses_nmi() && !(flags & PSR_A_BIT))
++		_allint_clear();
 +
- 	write_sysreg(0, hstr_el2);
- 	if (kvm_arm_support_pmu_v3())
- 		write_sysreg(0, pmuserenr_el0);
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index f4a7c5abcbca..1bd4d4109a05 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1092,6 +1092,7 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
- 			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_MTE);
+ 	write_sysreg(flags, daif);
  
- 		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_SME);
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_EL1_NMI);
- 		break;
- 	case SYS_ID_AA64ISAR1_EL1:
- 		if (!vcpu_has_ptrauth(vcpu))
+ 	if (irq_disabled)
+@@ -131,6 +145,10 @@ static inline void local_daif_inherit(struct pt_regs *regs)
+ 	if (interrupts_enabled(regs))
+ 		trace_hardirqs_on();
+ 
++	/* If we can take asynchronous errors we can take NMIs */
++	if (system_uses_nmi() && !(flags & PSR_A_BIT))
++		_allint_clear();
++
+ 	if (system_uses_irq_prio_masking())
+ 		gic_write_pmr(regs->pmr_save);
+ 
 -- 
 2.30.2
 
