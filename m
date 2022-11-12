@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB11A184E
-	for <kvmarm@lists.linux.dev>; Sat, 12 Nov 2022 15:17:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FBCCC433C1;
-	Sat, 12 Nov 2022 15:17:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5434D1C01
+	for <kvmarm@lists.linux.dev>; Sat, 12 Nov 2022 15:17:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A942C43140;
+	Sat, 12 Nov 2022 15:17:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668266270;
-	bh=BQ7I6eN+6GZ/o5t5Vk4K6cshxfRrAyFnFSi5m4uTojg=;
+	s=k20201202; t=1668266273;
+	bh=x4bmiErZJ7SZyMFRSsk5JKsWnPXrlyR9WZE/FfpAobo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Rsw0aabbBIrmC4/S/C6JJwUcKSz7Ji5GOqkBGBfjZhjrySrGoHh7KpzHdWhhRIxN7
-	 NGPl00ZlnExi/TzP2xv94T1nwOGoxUaOIwaPFGPu7Oh1oV7jnshVtxrqJGGeuzekYO
-	 v5lm+5RJ1S5GJSDMgVXML4YZI1ZBzu58g4NUFZFqergjUzQLXKpgh9pyWMe3RVZxUY
-	 v3AEa01pmdjhNieRDRFPcvOZ4sT5pjUszxOP0FS1jsyhhY5qc4KeBCpXPxE/xE8QpH
-	 3hZ/7FiQHl6CcFLkNF9UrA5CiluNNuQuY2zh1/cw1vXPeKEJQ18nnu5WOw4h50NSY2
-	 x10IVwWSMvcTw==
+	b=n834n9xYigEzQcnS+ISbZw8BAZX3MMSaT/TL5F0yozxQ7/5Sr0a9zWwUY7fwAtl4l
+	 d8FuXt6qIZKAEbOAJNA+ZwfpNLd2tjtKWBwxA9NzcVZ2ah9QD89ZlE4bxSsLymELVJ
+	 6UA5WkXSXOJb+R+ohhUX0AMwtt3Wt1ov6tGUwyvyvHWD66T+phAcqndUBqOd2zGlVB
+	 I+QTn4gw2rKKC3aLEEU10X5MOTydMa7YyopHtIFDDTsBD67V39mWy+F76B4pID2HzU
+	 d6ypTnzgMEdRcZeVmkrL5qPfPGtRy6n+vFpWzYHpBV39B3QmYS8kE62lOYOZxkHBds
+	 Uds97/4b6L7IQ==
 From: Mark Brown <broonie@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
@@ -26,9 +26,9 @@ Cc: Lorenzo Pieralisi <lpieralisi@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 03/14] arm64/sysreg: Add definition of ISR_EL1
-Date: Sat, 12 Nov 2022 15:16:57 +0000
-Message-Id: <20221112151708.175147-4-broonie@kernel.org>
+Subject: [PATCH v2 04/14] arm64/sysreg: Add definitions for immediate versions of MSR ALLINT
+Date: Sat, 12 Nov 2022 15:16:58 +0000
+Message-Id: <20221112151708.175147-5-broonie@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20221112151708.175147-1-broonie@kernel.org>
 References: <20221112151708.175147-1-broonie@kernel.org>
@@ -38,39 +38,75 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=701; i=broonie@kernel.org; h=from:subject; bh=BQ7I6eN+6GZ/o5t5Vk4K6cshxfRrAyFnFSi5m4uTojg=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjb7joOOLN0FUshrdiNy93qhEC4keUgDrC3s0fn6P4 8eod0BiJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY2+46AAKCRAk1otyXVSH0D5/B/ 47ok/13qm7w5flwldiCm+v13vfeH5VIGXqc4O2M3xJQg2wMXgFY0dql1G+athbEUI0UGmloDBLQlm6 AtWzy3fxaPTHmZnnp289+34bYRjeltlMqVpjbjy8b723EK0pnN/PmQwTiG0o/0dcljPrF9Cj4Zg4xl GCuy7+ZO1tk2EqFE8BXPVFBbc4Nli0NrATrrBRHq0PnOj3BKzS6V3IBjRcShNZ3YGkK2bzKcY5wJgK qXBxW8ge8QJ2EPNnACivbOBdO1ja4OrhMazYbFb7KoIOITFP7TxfoEpkFAuS81RpQfjumKCLdI385l /lOr76aPfVQlcIUOw6OeB7XLVM8t+j
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2341; i=broonie@kernel.org; h=from:subject; bh=x4bmiErZJ7SZyMFRSsk5JKsWnPXrlyR9WZE/FfpAobo=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjb7jpAQOBqUkutL7vHrnFr1g+2sG1otffMzqRe+hO UMSeKw+JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY2+46QAKCRAk1otyXVSH0P5LB/ 0Wag/kVRLMLup8h6WKe999vdDlGGMOfNSdxCPL+3yyNwXR2cKYYRgin2ePDt9K5ejmvvF6iwvXa2eT sLboNoGQIDLYgcPSCDc8BfGmIhkd3g8HPThYS4SFbGqWKX+bvbw69Ji1082rnd2JlnuSAw+7lsUhkc IQiT75UxrsRgof5dZXR8Q/72ZLeE2MXch2CY+Z+3zxCXjdPaVARmyQ5CnfySPeEJU9vDoQzYXskDiC Sg6Ot8FQr9h9r5vMttkE7K+XZaayK4my6JmCGynFl4GhVzUdL0QexXEQgZt9V2GXLjs1KIiyk22m/z kWmZBoFTB1QAFD5Z+ijbLaUFU/v/tG
 X-Developer-Key: i=broonie@kernel.org; a=openpgp; fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 Content-Transfer-Encoding: 8bit
 
-Add a definition of ISR_EL1 as per DDI0487I.a. This register was not
-previously defined in sysreg.h, no functional changes.
+Encodings are provided for ALLINT which allow setting of ALLINT.ALLINT
+using an immediate rather than requiring that a register be loaded with
+the value to write. Since these don't currently fit within the scheme we
+have for sysreg generation add manual encodings like we currently do for
+other similar registers such as SVCR.
+
+Since it is required that these immediate versions be encoded with xzr
+as the source register provide asm wrapper which ensure this is the
+case.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/tools/sysreg | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ arch/arm64/include/asm/daifflags.h |  1 +
+ arch/arm64/include/asm/nmi.h       | 18 ++++++++++++++++++
+ arch/arm64/include/asm/sysreg.h    |  2 ++
+ 3 files changed, 21 insertions(+)
+ create mode 100644 arch/arm64/include/asm/nmi.h
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 5d0d2498c635..3660e680b7f5 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -1079,6 +1079,16 @@ Res0	15:8
- Field	7:0	LR
- EndSysreg
- 
-+Sysreg	ISR_EL1	3	0	12	1	0
-+Res0	63:11
-+Field	10	IS
-+Field	9	FS
-+Field	8	A
-+Field	7	I
-+Field	6	F
-+Res0	5:0
-+EndSysreg
+diff --git a/arch/arm64/include/asm/daifflags.h b/arch/arm64/include/asm/daifflags.h
+index 55f57dfa8e2f..b3bed2004342 100644
+--- a/arch/arm64/include/asm/daifflags.h
++++ b/arch/arm64/include/asm/daifflags.h
+@@ -141,4 +141,5 @@ static inline void local_daif_inherit(struct pt_regs *regs)
+ 	 */
+ 	write_sysreg(flags, daif);
+ }
 +
- Sysreg	ICC_NMIAR1_EL1	3	0	12	9	5
- Res0	63:24
- Field	23:0	INTID
+ #endif
+diff --git a/arch/arm64/include/asm/nmi.h b/arch/arm64/include/asm/nmi.h
+new file mode 100644
+index 000000000000..067e2554e144
+--- /dev/null
++++ b/arch/arm64/include/asm/nmi.h
+@@ -0,0 +1,18 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2022 ARM Ltd.
++ */
++#ifndef __ASM_NMI_H
++#define __ASM_NMI_H
++
++static __always_inline void _allint_clear(void)
++{
++	asm volatile(__msr_s(SYS_ALLINT_CLR, "xzr"));
++}
++
++static __always_inline void _allint_set(void)
++{
++	asm volatile(__msr_s(SYS_ALLINT_SET, "xzr"));
++}
++
++#endif
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 7d301700d1a9..0c07b740c750 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -126,6 +126,8 @@
+  * System registers, organised loosely by encoding but grouped together
+  * where the architected name contains an index. e.g. ID_MMFR<n>_EL1.
+  */
++#define SYS_ALLINT_CLR			sys_reg(0, 1, 4, 0, 0)
++#define SYS_ALLINT_SET			sys_reg(0, 1, 4, 1, 0)
+ #define SYS_SVCR_SMSTOP_SM_EL0		sys_reg(0, 3, 4, 2, 3)
+ #define SYS_SVCR_SMSTART_SM_EL0		sys_reg(0, 3, 4, 3, 3)
+ #define SYS_SVCR_SMSTOP_SMZA_EL0	sys_reg(0, 3, 4, 6, 3)
 -- 
 2.30.2
 
