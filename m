@@ -2,72 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 791DDC43217
-	for <kvmarm@archiver.kernel.org>; Sat, 12 Nov 2022 08:17:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9283EC4321E
+	for <kvmarm@archiver.kernel.org>; Sat, 12 Nov 2022 08:17:35 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31BC34B7F0;
-	Sat, 12 Nov 2022 03:17:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F5DB4B811;
+	Sat, 12 Nov 2022 03:17:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id X0A0MzbjwwsV; Sat, 12 Nov 2022 03:17:33 -0500 (EST)
+	with ESMTP id QYUSbb-TJamD; Sat, 12 Nov 2022 03:17:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA1064B7DB;
-	Sat, 12 Nov 2022 03:17:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B7C84B839;
+	Sat, 12 Nov 2022 03:17:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 939994B830
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BFEB64B828
  for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 03:17:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zzUmkJ-hkKal for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 8npoxYyV-utR for <kvmarm@lists.cs.columbia.edu>;
  Sat, 12 Nov 2022 03:17:30 -0500 (EST)
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
- [209.85.214.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EEAC84B828
- for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 03:17:28 -0500 (EST)
-Received: by mail-pl1-f201.google.com with SMTP id
- q6-20020a170902dac600b001873ef77938so5059978plx.18
- for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 00:17:28 -0800 (PST)
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
+ [209.85.128.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 130C54B7D8
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 03:17:30 -0500 (EST)
+Received: by mail-yw1-f202.google.com with SMTP id
+ 00721157ae682-37010fefe48so63438247b3.19
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 00:17:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:from:to:cc:subject:date:message-id:reply-to;
- bh=L6sxJiifG/HbcI/kD9HXwh1w5rUr/VbuNcHdSSEcRpA=;
- b=FacScKAelNZrGtgwl8w+3ds6vKtyYp808JuUQWEzIIVYOOJlOjcRWuUTvbIoA3BtvV
- K3J0uCUKlxt5wvgfQMZm7xPR5YfJItnFP1kjZcOT+7su8jLIaXVWm+n4P2LFU8KIzFHW
- m4f/I1VNmAFezxGI67Z+iuWEGpH2YJQlhAlB7DTz7PqrUnrF23WwFZWVgBUTNFZIoAr4
- +g5eCvtaOf6vZoUeLPvZHrqlf9C3sd2ywaN0FRXaPkfbvTu1wdg314O5h+cGnkcOK3hB
- alv5KrakCKq94WoxhQ6EWq84sNAGs+cFc11nr109zSRgOi4O5L2vDw39F05glpPR+m23
- /9eQ==
+ bh=XowvsvOcOv2Dze5DffbrE0m7myhjg52x/AYqKu/6H0Q=;
+ b=EsW5Gdp75rU2DUuHrGdfowsd3Xg7XJrLSdam+fpUtlwTdh1xrokqMFBjDQfu3ZSN5v
+ 3WNIAfsqOLgz9ApP/xZH1HRwWly+toBAPueZXyk9cB7bHX4lZw9gZFw4kGeCmEHf6xww
+ tgIkAGZLt+9amtGXX3/mSDXUkXfTwEy7EGY+SR6BC7T6OygBkq45p4xA35d9sDiVisW6
+ rs966VJsnUdF16OGJeOV5eAMSKeo90JTQ5w2yVogPJnhnlnsJXskfaWTBhhwD2JHSNut
+ 04cT72ye0o4MEN0FBYX5wuczQ8IkaZcFUgY2DAv5Ajod7vm1m9BGTFuDSumglosNjDzp
+ 7GZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=L6sxJiifG/HbcI/kD9HXwh1w5rUr/VbuNcHdSSEcRpA=;
- b=SJe80f2DhjcgEAjE61sC6dyFJHpMtskjZsp4+SBBbVcQrJTsAN7zYmmEivGGNSLehp
- vwu7q/+sJAYQo0/qx902kiEvnkNYNRjWoL5jMAJw8KpA1q9jwbm/sD8+taG9La5ZL9hU
- 7YjEWbDjePNWUsHkgFKhqJ3UF8nYyLyvsBpbiseFdLeKCmNmh+EZ44t/Naofh7C+3JaX
- mEB85PZroHA1qNJ963ISqTFqLQ3Az2+oWYv8OUuofnDFk68T3pbgHGgszaMsYP61uz/h
- HapT7ksKKb3V0IeaacHRLOTRTdRxaEA3DznBkPp93tvciQMnbpf8jx1qDrvX0XZJG/0F
- lQjw==
-X-Gm-Message-State: ANoB5pkdqtSz2dr18/hw/ZbFOgn4tyImLHHp0p9dhfzcfNnaEZx3J1xF
- cji75r/vqeXI+oyCQS5hFXtOpi6kqQEexg==
-X-Google-Smtp-Source: AA0mqf7aQpUifUSeHmW7DiqEX55OKzbVwNTuSNUOb6rC8J81HSb9LyTNzd73+bZceLSa4TYbJsj7t2D3QIZ4qw==
+ bh=XowvsvOcOv2Dze5DffbrE0m7myhjg52x/AYqKu/6H0Q=;
+ b=kltikhUfQ/XXhzpeKPsmWLmWnFWQWZiFiyH5cCfOdhp5Iz3pTgBMgbXG4LuJ3/CJM0
+ foEVyeFGfGSU9R7WA2M4NnNfUWr9oQyi5L8EZ1J35f3+bQWNi4+39FxBnDjgZ+EQSn5G
+ TtOlmkalp1lt0/vYcI6ka9m/13YkuBNESIAzul0HqsAe64pHKpjtudW3Samug+phSMTr
+ e4jva9rvhPSpiJGGtOJeTkBh+KVglAz63WghejfU8RPI9x8QxzOThIuhy2AJveMUpRHT
+ au5f/rSURGQhqMpsybZW/wGBvhmSwdjKHvV7eWG+ytamaU5aaRyEzOSyBr2IEYCnftS+
+ NJfQ==
+X-Gm-Message-State: ANoB5plrQrZ7VaDI8gKEqW2XmjmK4iCpUcZWQTFwu2jMb1YkFGuKKQTT
+ JvTKzZVjcNaJXEVdKKRssngRYPZbaJiuow==
+X-Google-Smtp-Source: AA0mqf5J4lgPyBB5y+f3Nq56r3EX+3f3XVFGVpba92grsCihrLzXFlwxYutDNVRoff367ywYqhaBZFCdb+AbvQ==
 X-Received: from ricarkol4.c.googlers.com
  ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a17:902:7e01:b0:186:b38a:9c4a with SMTP
- id b1-20020a1709027e0100b00186b38a9c4amr5537618plm.163.1668241047863; Sat, 12
- Nov 2022 00:17:27 -0800 (PST)
-Date: Sat, 12 Nov 2022 08:17:08 +0000
+ (user=ricarkol job=sendgmr) by 2002:a0d:cc86:0:b0:368:738a:b13b with SMTP id
+ o128-20020a0dcc86000000b00368738ab13bmr5277155ywd.97.1668241049641; Sat, 12
+ Nov 2022 00:17:29 -0800 (PST)
+Date: Sat, 12 Nov 2022 08:17:09 +0000
 In-Reply-To: <20221112081714.2169495-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20221112081714.2169495-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221112081714.2169495-7-ricarkol@google.com>
-Subject: [RFC PATCH 06/12] KVM: arm64: Split block PTEs without using
- break-before-make
+Message-ID: <20221112081714.2169495-8-ricarkol@google.com>
+Subject: [RFC PATCH 07/12] KVM: arm64: Refactor kvm_arch_commit_memory_region()
 From: Ricardo Koller <ricarkol@google.com>
 To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
  dmatlack@google.com, qperret@google.com, catalin.marinas@arm.com, 
@@ -92,92 +91,52 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Breaking a huge-page block PTE into an equivalent table of smaller PTEs
-does not require using break-before-make (BBM) when FEAT_BBM level 2 is
-implemented. Add the respective check for eager page splitting and avoid
-using BBM.
+Refactor kvm_arch_commit_memory_region() as a preparation for a future
+commit to look cleaner and more understandable. Also, it looks more like
+its x86 counterpart (in kvm_mmu_slot_apply_flags()).
 
-Also take care of possible Conflict aborts.  According to the rules
-specified in the Arm ARM (DDI 0487H.a) section "Support levels for changing
-block size" D5.10.1, this can result in a Conflict abort. So, handle it by
-clearing all VM TLB entries.
+No functional change intended.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/include/asm/esr.h     |  1 +
- arch/arm64/include/asm/kvm_arm.h |  1 +
- arch/arm64/kvm/hyp/pgtable.c     | 10 +++++++++-
- arch/arm64/kvm/mmu.c             |  6 ++++++
- 4 files changed, 17 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/mmu.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 15b34fbfca66..6f5b976396e7 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -114,6 +114,7 @@
- #define ESR_ELx_FSC_ACCESS	(0x08)
- #define ESR_ELx_FSC_FAULT	(0x04)
- #define ESR_ELx_FSC_PERM	(0x0C)
-+#define ESR_ELx_FSC_CONFLICT	(0x30)
- 
- /* ISS field definitions for Data Aborts */
- #define ESR_ELx_ISV_SHIFT	(24)
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 0df3fc3a0173..58e7cbe3c250 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -333,6 +333,7 @@
- #define FSC_SECC_TTW1	(0x1d)
- #define FSC_SECC_TTW2	(0x1e)
- #define FSC_SECC_TTW3	(0x1f)
-+#define FSC_CONFLICT	ESR_ELx_FSC_CONFLICT
- 
- /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
- #define HPFAR_MASK	(~UL(0xf))
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 9c42eff6d42e..36b81df5687e 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1267,6 +1267,11 @@ static int stage2_create_removed(kvm_pte_t *ptep, u64 phys, u32 level,
- 	return __kvm_pgtable_visit(&data, mm_ops, ptep, level);
- }
- 
-+static bool stage2_has_bbm_level2(void)
-+{
-+	return cpus_have_const_cap(ARM64_HAS_STAGE2_BBM2);
-+}
-+
- struct stage2_split_data {
- 	struct kvm_s2_mmu		*mmu;
- 	void				*memcache;
-@@ -1308,7 +1313,10 @@ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	 */
- 	WARN_ON(stage2_create_removed(&new, phys, level, attr, mc, mm_ops));
- 
--	stage2_put_pte(ctx, data->mmu, mm_ops);
-+	if (stage2_has_bbm_level2())
-+		mm_ops->put_page(ctx->ptep);
-+	else
-+		stage2_put_pte(ctx, data->mmu, mm_ops);
- 
- 	/*
- 	 * Note, the contents of the page table are guaranteed to be made
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 8f26c65693a9..318f7b0aa20b 100644
+index 318f7b0aa20b..6599a45eebf5 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1481,6 +1481,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		return 1;
- 	}
- 
-+	/* Conflict abort? */
-+	if (fault_status == FSC_CONFLICT) {
-+		kvm_flush_remote_tlbs(vcpu->kvm);
-+		return 1;
-+	}
+@@ -1770,20 +1770,27 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 				   const struct kvm_memory_slot *new,
+ 				   enum kvm_mr_change change)
+ {
++	bool log_dirty_pages = new && new->flags & KVM_MEM_LOG_DIRTY_PAGES;
 +
- 	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
- 			      kvm_vcpu_get_hfar(vcpu), fault_ipa);
+ 	/*
+ 	 * At this point memslot has been committed and there is an
+ 	 * allocated dirty_bitmap[], dirty pages will be tracked while the
+ 	 * memory slot is write protected.
+ 	 */
+-	if (change != KVM_MR_DELETE && new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
++	if (log_dirty_pages) {
++
++		if (change == KVM_MR_DELETE)
++			return;
++
+ 		/*
+ 		 * If we're with initial-all-set, we don't need to write
+ 		 * protect any pages because they're all reported as dirty.
+ 		 * Huge pages and normal pages will be write protect gradually.
+ 		 */
+-		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
+-			kvm_mmu_wp_memory_region(kvm, new->id);
+-		}
++		if (kvm_dirty_log_manual_protect_and_init_set(kvm))
++			return;
++
++		kvm_mmu_wp_memory_region(kvm, new->id);
+ 	}
+ }
  
 -- 
 2.38.1.431.g37b22c650d-goog
