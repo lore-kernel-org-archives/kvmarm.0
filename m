@@ -2,71 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C5E7C4332F
-	for <kvmarm@archiver.kernel.org>; Sat, 12 Nov 2022 08:17:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 791DDC43217
+	for <kvmarm@archiver.kernel.org>; Sat, 12 Nov 2022 08:17:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0755A4B824;
-	Sat, 12 Nov 2022 03:17:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31BC34B7F0;
+	Sat, 12 Nov 2022 03:17:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id d9l0Z05r-M6S; Sat, 12 Nov 2022 03:17:30 -0500 (EST)
+	with ESMTP id X0A0MzbjwwsV; Sat, 12 Nov 2022 03:17:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4E6E4B84B;
-	Sat, 12 Nov 2022 03:17:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA1064B7DB;
+	Sat, 12 Nov 2022 03:17:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 445D44B7F9
- for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 03:17:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 939994B830
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 03:17:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zgoIMv37P4Vb for <kvmarm@lists.cs.columbia.edu>;
- Sat, 12 Nov 2022 03:17:27 -0500 (EST)
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
- [209.85.210.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 196134B7DB
- for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 03:17:27 -0500 (EST)
-Received: by mail-pf1-f202.google.com with SMTP id
- e12-20020a62aa0c000000b0056c12c0aadeso3842816pff.21
- for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 00:17:27 -0800 (PST)
+ with ESMTP id zzUmkJ-hkKal for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 12 Nov 2022 03:17:30 -0500 (EST)
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
+ [209.85.214.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EEAC84B828
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 03:17:28 -0500 (EST)
+Received: by mail-pl1-f201.google.com with SMTP id
+ q6-20020a170902dac600b001873ef77938so5059978plx.18
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Nov 2022 00:17:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:from:to:cc:subject:date:message-id:reply-to;
- bh=erREdX/KDsXecKj6gAJQc8HQGGxLcgScAAv0CqZULEU=;
- b=YpZw7R2gC5bvKwjGM8NpdnFt1KqwMZgN0FK+q3Tcnq4RSpkrJ5mlI8gWdBgR1P3PNY
- wtWzQsCJAqHyfWbM4T6Blssr1vYpjmXg8r3avJ3Ag1eRynebA0swGQiLy+T/1xOLVqmx
- uKzeeAOCidZWlofpDaepHSuA37EGmUdkY+nB9QsBoniCzied3NX2L3xwX+W+QenR+ZG1
- qe7sBJhQop7ZDaWqme1bLG2j1DUYNgOzuWcEQ4r62GNmnVKY3n/YokKrJD6DndIW86EL
- O5F8B+cOkhxiU1R0kRa5Etvr8wVBsf/tf0E3jTUURwKOs26mJNks+CHuJUcJpad+jjix
- 9UEg==
+ bh=L6sxJiifG/HbcI/kD9HXwh1w5rUr/VbuNcHdSSEcRpA=;
+ b=FacScKAelNZrGtgwl8w+3ds6vKtyYp808JuUQWEzIIVYOOJlOjcRWuUTvbIoA3BtvV
+ K3J0uCUKlxt5wvgfQMZm7xPR5YfJItnFP1kjZcOT+7su8jLIaXVWm+n4P2LFU8KIzFHW
+ m4f/I1VNmAFezxGI67Z+iuWEGpH2YJQlhAlB7DTz7PqrUnrF23WwFZWVgBUTNFZIoAr4
+ +g5eCvtaOf6vZoUeLPvZHrqlf9C3sd2ywaN0FRXaPkfbvTu1wdg314O5h+cGnkcOK3hB
+ alv5KrakCKq94WoxhQ6EWq84sNAGs+cFc11nr109zSRgOi4O5L2vDw39F05glpPR+m23
+ /9eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=erREdX/KDsXecKj6gAJQc8HQGGxLcgScAAv0CqZULEU=;
- b=1881/kqd9folJ8wOZXAoll7r5TJgKLKOwzY9Xr164ytM3ayF2skBVSYBNUm8YHj2Zx
- Dj5joXuj4CW727mv/qhDECiZl2ZiZZVpMrU22ryU9CsxDWNs3Kpa1Fm4lBBfZpJB8Mn1
- 9KO4gvjWPPzcskY9LKuYZstSf5mdHVcSU1PExx2TgHj5uu0szC6zv3qNfRdlSfAukbCj
- NQyeqDLRur6FLip5M4g5skTAOVuplo+5R/N0ZgeWHhYB+8WtR40+WMz2geIYwdhdURnC
- /Rv1bNyoDrqeaz0N+DwUsDSrECeB/iU5SK0KOD+tR3Bt9pOy3HYD/c9ZlqQmG1XwWXfV
- pGew==
-X-Gm-Message-State: ANoB5plXsaexjGyvf14me1fmnficgbyMUS7HZNtAAGHX2r0wDSgxg3Wv
- 1X4w23p0+F4eDSu/Gga+P09I26LJEHvY/w==
-X-Google-Smtp-Source: AA0mqf6QQp6GfMYPE6XZxs/+skS8K7KjLSTBecvWkfOO3UbLxYSWSVwUiwHGGOFgupv2VbGHKjubxmxwv9+J9A==
+ bh=L6sxJiifG/HbcI/kD9HXwh1w5rUr/VbuNcHdSSEcRpA=;
+ b=SJe80f2DhjcgEAjE61sC6dyFJHpMtskjZsp4+SBBbVcQrJTsAN7zYmmEivGGNSLehp
+ vwu7q/+sJAYQo0/qx902kiEvnkNYNRjWoL5jMAJw8KpA1q9jwbm/sD8+taG9La5ZL9hU
+ 7YjEWbDjePNWUsHkgFKhqJ3UF8nYyLyvsBpbiseFdLeKCmNmh+EZ44t/Naofh7C+3JaX
+ mEB85PZroHA1qNJ963ISqTFqLQ3Az2+oWYv8OUuofnDFk68T3pbgHGgszaMsYP61uz/h
+ HapT7ksKKb3V0IeaacHRLOTRTdRxaEA3DznBkPp93tvciQMnbpf8jx1qDrvX0XZJG/0F
+ lQjw==
+X-Gm-Message-State: ANoB5pkdqtSz2dr18/hw/ZbFOgn4tyImLHHp0p9dhfzcfNnaEZx3J1xF
+ cji75r/vqeXI+oyCQS5hFXtOpi6kqQEexg==
+X-Google-Smtp-Source: AA0mqf7aQpUifUSeHmW7DiqEX55OKzbVwNTuSNUOb6rC8J81HSb9LyTNzd73+bZceLSa4TYbJsj7t2D3QIZ4qw==
 X-Received: from ricarkol4.c.googlers.com
  ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:aa7:92ca:0:b0:56c:6bcc:cf0e with SMTP id
- k10-20020aa792ca000000b0056c6bcccf0emr6073185pfa.64.1668241046330; Sat, 12
- Nov 2022 00:17:26 -0800 (PST)
-Date: Sat, 12 Nov 2022 08:17:07 +0000
+ (user=ricarkol job=sendgmr) by 2002:a17:902:7e01:b0:186:b38a:9c4a with SMTP
+ id b1-20020a1709027e0100b00186b38a9c4amr5537618plm.163.1668241047863; Sat, 12
+ Nov 2022 00:17:27 -0800 (PST)
+Date: Sat, 12 Nov 2022 08:17:08 +0000
 In-Reply-To: <20221112081714.2169495-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20221112081714.2169495-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
-Message-ID: <20221112081714.2169495-6-ricarkol@google.com>
-Subject: [RFC PATCH 05/12] arm64: Add a capability for FEAT_BBM level 2
+Message-ID: <20221112081714.2169495-7-ricarkol@google.com>
+Subject: [RFC PATCH 06/12] KVM: arm64: Split block PTEs without using
+ break-before-make
 From: Ricardo Koller <ricarkol@google.com>
 To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
  dmatlack@google.com, qperret@google.com, catalin.marinas@arm.com, 
@@ -91,49 +92,93 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a new capability to detect "Stage-2 Translation table
-break-before-make" (FEAT_BBM) level 2.
+Breaking a huge-page block PTE into an equivalent table of smaller PTEs
+does not require using break-before-make (BBM) when FEAT_BBM level 2 is
+implemented. Add the respective check for eager page splitting and avoid
+using BBM.
+
+Also take care of possible Conflict aborts.  According to the rules
+specified in the Arm ARM (DDI 0487H.a) section "Support levels for changing
+block size" D5.10.1, this can result in a Conflict abort. So, handle it by
+clearing all VM TLB entries.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/kernel/cpufeature.c | 11 +++++++++++
- arch/arm64/tools/cpucaps       |  1 +
- 2 files changed, 12 insertions(+)
+ arch/arm64/include/asm/esr.h     |  1 +
+ arch/arm64/include/asm/kvm_arm.h |  1 +
+ arch/arm64/kvm/hyp/pgtable.c     | 10 +++++++++-
+ arch/arm64/kvm/mmu.c             |  6 ++++++
+ 4 files changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 6062454a9067..ff97fb05d430 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2339,6 +2339,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.min_field_value = 1,
- 		.matches = has_cpuid_feature,
- 	},
-+	{
-+		.desc = "Stage-2 Translation table break-before-make level 2",
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.capability = ARM64_HAS_STAGE2_BBM2,
-+		.sys_reg = SYS_ID_AA64MMFR2_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64MMFR2_EL1_BBM_SHIFT,
-+		.field_width = 4,
-+		.min_field_value = 2,
-+		.matches = has_cpuid_feature,
-+	},
- 	{
- 		.desc = "TLB range maintenance instructions",
- 		.capability = ARM64_HAS_TLB_RANGE,
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index f1c0347ec31a..f421adbdb08b 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -36,6 +36,7 @@ HAS_PAN
- HAS_RAS_EXTN
- HAS_RNG
- HAS_SB
-+HAS_STAGE2_BBM2
- HAS_STAGE2_FWB
- HAS_SYSREG_GIC_CPUIF
- HAS_TIDCP1
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 15b34fbfca66..6f5b976396e7 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -114,6 +114,7 @@
+ #define ESR_ELx_FSC_ACCESS	(0x08)
+ #define ESR_ELx_FSC_FAULT	(0x04)
+ #define ESR_ELx_FSC_PERM	(0x0C)
++#define ESR_ELx_FSC_CONFLICT	(0x30)
+ 
+ /* ISS field definitions for Data Aborts */
+ #define ESR_ELx_ISV_SHIFT	(24)
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 0df3fc3a0173..58e7cbe3c250 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -333,6 +333,7 @@
+ #define FSC_SECC_TTW1	(0x1d)
+ #define FSC_SECC_TTW2	(0x1e)
+ #define FSC_SECC_TTW3	(0x1f)
++#define FSC_CONFLICT	ESR_ELx_FSC_CONFLICT
+ 
+ /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+ #define HPFAR_MASK	(~UL(0xf))
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 9c42eff6d42e..36b81df5687e 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -1267,6 +1267,11 @@ static int stage2_create_removed(kvm_pte_t *ptep, u64 phys, u32 level,
+ 	return __kvm_pgtable_visit(&data, mm_ops, ptep, level);
+ }
+ 
++static bool stage2_has_bbm_level2(void)
++{
++	return cpus_have_const_cap(ARM64_HAS_STAGE2_BBM2);
++}
++
+ struct stage2_split_data {
+ 	struct kvm_s2_mmu		*mmu;
+ 	void				*memcache;
+@@ -1308,7 +1313,10 @@ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 	 */
+ 	WARN_ON(stage2_create_removed(&new, phys, level, attr, mc, mm_ops));
+ 
+-	stage2_put_pte(ctx, data->mmu, mm_ops);
++	if (stage2_has_bbm_level2())
++		mm_ops->put_page(ctx->ptep);
++	else
++		stage2_put_pte(ctx, data->mmu, mm_ops);
+ 
+ 	/*
+ 	 * Note, the contents of the page table are guaranteed to be made
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 8f26c65693a9..318f7b0aa20b 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1481,6 +1481,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		return 1;
+ 	}
+ 
++	/* Conflict abort? */
++	if (fault_status == FSC_CONFLICT) {
++		kvm_flush_remote_tlbs(vcpu->kvm);
++		return 1;
++	}
++
+ 	trace_kvm_guest_fault(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
+ 			      kvm_vcpu_get_hfar(vcpu), fault_ipa);
+ 
 -- 
 2.38.1.431.g37b22c650d-goog
 
