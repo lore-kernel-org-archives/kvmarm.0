@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 456A1C4332F
-	for <kvmarm@archiver.kernel.org>; Sun, 13 Nov 2022 16:39:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71951C4321E
+	for <kvmarm@archiver.kernel.org>; Sun, 13 Nov 2022 16:39:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F35984B95F;
-	Sun, 13 Nov 2022 11:39:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D0C24B92C;
+	Sun, 13 Nov 2022 11:39:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YMUF+g+gK0RP; Sun, 13 Nov 2022 11:39:00 -0500 (EST)
+	with ESMTP id 6Zs8d-nxA5bj; Sun, 13 Nov 2022 11:39:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1592C4B980;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 303EC4B98C;
 	Sun, 13 Nov 2022 11:38:58 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E118B4B919
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Nov 2022 11:38:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A2374B8DE
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Nov 2022 11:38:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ouva-8W6gXeN for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id WvlJ9I9XVyvF for <kvmarm@lists.cs.columbia.edu>;
  Sun, 13 Nov 2022 11:38:53 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 498C04B921
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 767BD4B935
  for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Nov 2022 11:38:53 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 5FBA6B80C85;
+ by ams.source.kernel.org (Postfix) with ESMTPS id 8CDE1B80C94;
  Sun, 13 Nov 2022 16:38:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12461C43147;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33A9BC43149;
  Sun, 13 Nov 2022 16:38:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=k20201202; t=1668357531;
- bh=3arBPLxr2n7vEE6t4eMmR9rFDMkxqV7WFOx0zNPdYm0=;
+ bh=CJRLsxvax8eWLi+fmzkiLamQ7jUvwvAO3mB0JuSYTWc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=VZ0BN6ld7ZMINoOJasHNpBmllhfDjWfETxXc6ToJOsOkIu/Kjq21Xx4PrIJqcQAu6
- P+HR473XqrC067VQBJoPpFWuLyGw44dlq7pSkUr2Zf25RbMpj6uinVTknogg2pGpPJ
- gY9RLRvIy4pJb21AlKVfAwCx0jjsfelLvH62KfgiOW4IQq6Uc4iV1K1kxbHjkXvfiP
- UWrPpLaMaT8hNmXarhCuNzUdblFC+9bYsv53ZWJ+NpUwoqV86eYqwu+9cL/kohJrCJ
- FbLmIdzCgkW4hZgInv6bf9nSnvCMQrsUf0HQBQyg9xOR/WnOgO9c4DPxlbU2TbjnmG
- UH9c6j1ayNe0A==
+ b=mIbofQm9W4aTC6jlinuqZx/Z/skG6BIpL1rUJrkLKLU7DUhJ9n9yeLEk0s0RfhBL/
+ 7q548PynmdZosmGU9+jDCezw+6CBhXicoyiH8QfLKZ7JcJQ20Upwuu/nilEbej5B25
+ X6NjCi4//dVSFHJYzsPqLW0g/2yxLDMNG/gV/eB4l4m4NmMJQiaPSM+/Sv9j9WuFEZ
+ KJt2MnCA5opn1zMP2Evg4qwFotm1UNTTLmbYiDMHbDNNke5Fj+i9Q1YbYhYJiTtzUX
+ GJis1eHY04uIiYnaihbXNmI0R+bpkkvKRnjRPeaWTHIuXauh7cxPD4GW0+OlH9eHJ2
+ xKLZgf+E0W9fw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1ouG0O-005oYZ-VY;
+ (envelope-from <maz@kernel.org>) id 1ouG0P-005oYZ-CR;
  Sun, 13 Nov 2022 16:38:49 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, <kvmarm@lists.cs.columbia.edu>,
  <kvmarm@lists.linux.dev>, kvm@vger.kernel.org
-Subject: [PATCH v4 06/16] KVM: arm64: PMU: Only narrow counters that are not
- 64bit wide
-Date: Sun, 13 Nov 2022 16:38:22 +0000
-Message-Id: <20221113163832.3154370-7-maz@kernel.org>
+Subject: [PATCH v4 08/16] KVM: arm64: PMU: Simplify setting a counter to a
+ specific value
+Date: Sun, 13 Nov 2022 16:38:24 +0000
+Message-Id: <20221113163832.3154370-9-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221113163832.3154370-1-maz@kernel.org>
 References: <20221113163832.3154370-1-maz@kernel.org>
@@ -84,55 +84,48 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The current PMU emulation sometimes narrows counters to 32bit
-if the counter isn't the cycle counter. As this is going to
-change with PMUv3p5 where the counters are all 64bit, fix
-the couple of cases where this happens unconditionally.
+kvm_pmu_set_counter_value() is pretty odd, as it tries to update
+the counter value while taking into account the value that is
+currently held by the running perf counter.
+
+This is not only complicated, this is quite wrong. Nowhere in
+the architecture is it said that the counter would be offset
+by something that is pending. The counter should be updated
+with the value set by SW, and start counting from there if
+required.
+
+Remove the odd computation and just assign the provided value
+after having released the perf event (which is then restarted).
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/pmu-emul.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+ arch/arm64/kvm/pmu-emul.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 9e6bc7edc4de..1fab889dbc74 100644
+index faab0f57a45d..ea0c8411641f 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -151,20 +151,17 @@ static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc)
-  */
- static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
- {
--	u64 counter, reg, val;
-+	u64 reg, val;
+@@ -23,6 +23,7 @@ static LIST_HEAD(arm_pmus);
+ static DEFINE_MUTEX(arm_pmus_lock);
  
- 	if (!pmc->perf_event)
+ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx);
++static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc);
+ 
+ static u32 kvm_pmu_event_mask(struct kvm *kvm)
+ {
+@@ -131,8 +132,10 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+ 	if (!kvm_vcpu_has_pmu(vcpu))
  		return;
  
--	counter = kvm_pmu_get_counter_value(vcpu, pmc->idx);
-+	val = kvm_pmu_get_counter_value(vcpu, pmc->idx);
++	kvm_pmu_release_perf_event(&vcpu->arch.pmu.pmc[select_idx]);
++
+ 	reg = counter_index_to_reg(select_idx);
+-	__vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
++	__vcpu_sys_reg(vcpu, reg) = val;
  
--	if (pmc->idx == ARMV8_PMU_CYCLE_IDX) {
-+	if (pmc->idx == ARMV8_PMU_CYCLE_IDX)
- 		reg = PMCCNTR_EL0;
--		val = counter;
--	} else {
-+	else
- 		reg = PMEVCNTR0_EL0 + pmc->idx;
--		val = lower_32_bits(counter);
--	}
- 
- 	__vcpu_sys_reg(vcpu, reg) = val;
- 
-@@ -414,7 +411,8 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
- 
- 		/* Increment this counter */
- 		reg = __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
--		reg = lower_32_bits(reg);
-+		if (!kvm_pmu_idx_is_64bit(vcpu, i))
-+			reg = lower_32_bits(reg);
- 		__vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
- 
- 		/* No overflow? move on */
+ 	/* Recreate the perf event to reflect the updated sample_period */
+ 	kvm_pmu_create_perf_event(vcpu, select_idx);
 -- 
 2.34.1
 
