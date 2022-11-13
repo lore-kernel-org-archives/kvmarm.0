@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E90C4332F
-	for <kvmarm@archiver.kernel.org>; Sun, 13 Nov 2022 16:38:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2539C43217
+	for <kvmarm@archiver.kernel.org>; Sun, 13 Nov 2022 16:38:59 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0C7E4B943;
-	Sun, 13 Nov 2022 11:38:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D91F4B8B3;
+	Sun, 13 Nov 2022 11:38:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id w47VxVdBJVU3; Sun, 13 Nov 2022 11:38:57 -0500 (EST)
+	with ESMTP id 3smqUef1Tb0z; Sun, 13 Nov 2022 11:38:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A26224B96B;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C252B4B974;
 	Sun, 13 Nov 2022 11:38:55 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EAB704B928
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Nov 2022 11:38:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A47E4B92C
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Nov 2022 11:38:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 84659Tfztpkk for <kvmarm@lists.cs.columbia.edu>;
- Sun, 13 Nov 2022 11:38:51 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E379D4B879
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Nov 2022 11:38:51 -0500 (EST)
+ with ESMTP id XrM8qLJXxLBi for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 13 Nov 2022 11:38:53 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C0FBA4B91E
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Nov 2022 11:38:52 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 5333560C3B;
+ by ams.source.kernel.org (Postfix) with ESMTPS id 7F955B80B86;
  Sun, 13 Nov 2022 16:38:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BED4C4347C;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21097C433D7;
  Sun, 13 Nov 2022 16:38:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=k20201202; t=1668357530;
- bh=i6EbkWxG0QBBSP86CJx06YA0tn2k0Yt3SekpMFHAmT4=;
+ bh=Y6xxfM4ND10MuEIQCLvziXMSdXkZfkvKinsYllpKaj8=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=FtYd312tuTt5BsBBhM7K5n75pKQwN44zk5mdAwBODYKhrLe6yJwBTNM6oRIGECBqs
- dOsEDEv6sfsi2AXfrknGM822HaAhxCM52mq+B8OvrQOXQEYTeL8R+6PlDnryM3Moky
- YvNSfF/kqj0lhdLcog7ARk7/GZ7jXsa9WXsgAznBFaNkjV3hDuiNn1i5daIGAPOm2n
- vYFyGiqaAR3zL8mGB/I2jHZ4I926TWZxIwMYl/y7CvK9TdCggd0grLOKXTJHQ/PBnr
- mAsBFLT+GS4jPhRUmwx4fyWL7NwC197NQoTLXyNL6eMnymWUX9j9w5Obnp6Nf/Qo9/
- FifAqel5uDN8g==
+ b=qxSEug68DAT0jMRx3Il7LtSkqO3zwVd6Sbn/khEspP5iwEsbcIgWcEKtIE+A5ynpH
+ V1KDaT0LhFvFbqssyOGuZRO+O1kKZ/Ak0eJammye/mR76e1+f5GB4XWz2DuAcvHgi+
+ b/Wr5Q2ZVN1YK6BBnpWosxLBMcX/fNsr9CBzycn8JhvCmq+ND24ek5jvYmoGg6szF8
+ cV6UIxXGRXB4H3VodexdNKjAfi445Crwv2U9uH2c2AroM4XcJM1YPHkjtlYm97sw3p
+ 56IyQf5fKYFtSsYzUnwdulyF/obKTcHzZRVL3/FBSVKlFTYkenjoxkOOjC2CZ1mvXG
+ 0iQHTvbEhH3aQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1ouG0O-005oYZ-PR;
- Sun, 13 Nov 2022 16:38:48 +0000
+ (envelope-from <maz@kernel.org>) id 1ouG0N-005oYZ-Tn;
+ Sun, 13 Nov 2022 16:38:47 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, <kvmarm@lists.cs.columbia.edu>,
  <kvmarm@lists.linux.dev>, kvm@vger.kernel.org
-Subject: [PATCH v4 05/16] KVM: arm64: PMU: Narrow the overflow checking when
- required
-Date: Sun, 13 Nov 2022 16:38:21 +0000
-Message-Id: <20221113163832.3154370-6-maz@kernel.org>
+Subject: [PATCH v4 01/16] arm64: Add ID_DFR0_EL1.PerfMon values for PMUv3p7
+ and IMP_DEF
+Date: Sun, 13 Nov 2022 16:38:17 +0000
+Message-Id: <20221113163832.3154370-2-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221113163832.3154370-1-maz@kernel.org>
 References: <20221113163832.3154370-1-maz@kernel.org>
@@ -84,28 +84,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-For 64bit counters that overflow on a 32bit boundary, make
-sure we only check the bottom 32bit to generate a CHAIN event.
+Align the ID_DFR0_EL1.PerfMon values with ID_AA64DFR0_EL1.PMUver.
 
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/pmu-emul.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/sysreg.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index d050143326b5..9e6bc7edc4de 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -417,7 +417,8 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
- 		reg = lower_32_bits(reg);
- 		__vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 7d301700d1a9..84f59ce1dc6d 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -698,6 +698,8 @@
+ #define ID_DFR0_PERFMON_8_1		0x4
+ #define ID_DFR0_PERFMON_8_4		0x5
+ #define ID_DFR0_PERFMON_8_5		0x6
++#define ID_DFR0_PERFMON_8_7		0x7
++#define ID_DFR0_PERFMON_IMP_DEF		0xf
  
--		if (reg) /* No overflow? move on */
-+		/* No overflow? move on */
-+		if (kvm_pmu_idx_has_64bit_overflow(vcpu, i) ? reg : lower_32_bits(reg))
- 			continue;
- 
- 		/* Mark overflow */
+ #define ID_ISAR4_SWP_FRAC_SHIFT		28
+ #define ID_ISAR4_PSR_M_SHIFT		24
 -- 
 2.34.1
 
