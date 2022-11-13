@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD0146AB
-	for <kvmarm@lists.linux.dev>; Sun, 13 Nov 2022 16:38:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21097C433D7;
-	Sun, 13 Nov 2022 16:38:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B7246BA
+	for <kvmarm@lists.linux.dev>; Sun, 13 Nov 2022 16:38:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33A9BC43149;
+	Sun, 13 Nov 2022 16:38:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668357530;
-	bh=Y6xxfM4ND10MuEIQCLvziXMSdXkZfkvKinsYllpKaj8=;
+	s=k20201202; t=1668357531;
+	bh=CJRLsxvax8eWLi+fmzkiLamQ7jUvwvAO3mB0JuSYTWc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qxSEug68DAT0jMRx3Il7LtSkqO3zwVd6Sbn/khEspP5iwEsbcIgWcEKtIE+A5ynpH
-	 V1KDaT0LhFvFbqssyOGuZRO+O1kKZ/Ak0eJammye/mR76e1+f5GB4XWz2DuAcvHgi+
-	 b/Wr5Q2ZVN1YK6BBnpWosxLBMcX/fNsr9CBzycn8JhvCmq+ND24ek5jvYmoGg6szF8
-	 cV6UIxXGRXB4H3VodexdNKjAfi445Crwv2U9uH2c2AroM4XcJM1YPHkjtlYm97sw3p
-	 56IyQf5fKYFtSsYzUnwdulyF/obKTcHzZRVL3/FBSVKlFTYkenjoxkOOjC2CZ1mvXG
-	 0iQHTvbEhH3aQ==
+	b=mIbofQm9W4aTC6jlinuqZx/Z/skG6BIpL1rUJrkLKLU7DUhJ9n9yeLEk0s0RfhBL/
+	 7q548PynmdZosmGU9+jDCezw+6CBhXicoyiH8QfLKZ7JcJQ20Upwuu/nilEbej5B25
+	 X6NjCi4//dVSFHJYzsPqLW0g/2yxLDMNG/gV/eB4l4m4NmMJQiaPSM+/Sv9j9WuFEZ
+	 KJt2MnCA5opn1zMP2Evg4qwFotm1UNTTLmbYiDMHbDNNke5Fj+i9Q1YbYhYJiTtzUX
+	 GJis1eHY04uIiYnaihbXNmI0R+bpkkvKRnjRPeaWTHIuXauh7cxPD4GW0+OlH9eHJ2
+	 xKLZgf+E0W9fw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1ouG0N-005oYZ-Tn;
-	Sun, 13 Nov 2022 16:38:47 +0000
+	id 1ouG0P-005oYZ-CR;
+	Sun, 13 Nov 2022 16:38:49 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	<kvmarm@lists.cs.columbia.edu>,
@@ -32,9 +32,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Ricardo Koller <ricarkol@google.com>,
 	Reiji Watanabe <reijiw@google.com>
-Subject: [PATCH v4 01/16] arm64: Add ID_DFR0_EL1.PerfMon values for PMUv3p7 and IMP_DEF
-Date: Sun, 13 Nov 2022 16:38:17 +0000
-Message-ID: <20221113163832.3154370-2-maz@kernel.org>
+Subject: [PATCH v4 08/16] KVM: arm64: PMU: Simplify setting a counter to a specific value
+Date: Sun, 13 Nov 2022 16:38:24 +0000
+Message-ID: <20221113163832.3154370-9-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221113163832.3154370-1-maz@kernel.org>
 References: <20221113163832.3154370-1-maz@kernel.org>
@@ -49,29 +49,50 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ricarkol@google.com, reijiw@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221113163817.RLYK18XH-zG7v9enjDTgczz5k9TVneWXvkNTIBnFReM@z>
+Message-ID: <20221113163824.g32CbbLLCQZ-EbmeaaPRln3y3LLoi8Sj_tsl26sLkEU@z>
 
-Align the ID_DFR0_EL1.PerfMon values with ID_AA64DFR0_EL1.PMUver.
+kvm_pmu_set_counter_value() is pretty odd, as it tries to update
+the counter value while taking into account the value that is
+currently held by the running perf counter.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+This is not only complicated, this is quite wrong. Nowhere in
+the architecture is it said that the counter would be offset
+by something that is pending. The counter should be updated
+with the value set by SW, and start counting from there if
+required.
+
+Remove the odd computation and just assign the provided value
+after having released the perf event (which is then restarted).
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/kvm/pmu-emul.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 7d301700d1a9..84f59ce1dc6d 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -698,6 +698,8 @@
- #define ID_DFR0_PERFMON_8_1		0x4
- #define ID_DFR0_PERFMON_8_4		0x5
- #define ID_DFR0_PERFMON_8_5		0x6
-+#define ID_DFR0_PERFMON_8_7		0x7
-+#define ID_DFR0_PERFMON_IMP_DEF		0xf
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index faab0f57a45d..ea0c8411641f 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -23,6 +23,7 @@ static LIST_HEAD(arm_pmus);
+ static DEFINE_MUTEX(arm_pmus_lock);
  
- #define ID_ISAR4_SWP_FRAC_SHIFT		28
- #define ID_ISAR4_PSR_M_SHIFT		24
+ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx);
++static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc);
+ 
+ static u32 kvm_pmu_event_mask(struct kvm *kvm)
+ {
+@@ -131,8 +132,10 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+ 	if (!kvm_vcpu_has_pmu(vcpu))
+ 		return;
+ 
++	kvm_pmu_release_perf_event(&vcpu->arch.pmu.pmc[select_idx]);
++
+ 	reg = counter_index_to_reg(select_idx);
+-	__vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
++	__vcpu_sys_reg(vcpu, reg) = val;
+ 
+ 	/* Recreate the perf event to reflect the updated sample_period */
+ 	kvm_pmu_create_perf_event(vcpu, select_idx);
 -- 
 2.34.1
 
