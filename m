@@ -2,59 +2,57 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E2CDC433FE
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Nov 2022 20:11:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9310EC4332F
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Nov 2022 20:55:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 88BFD4B90A;
-	Mon, 14 Nov 2022 15:11:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06EB24B733;
+	Mon, 14 Nov 2022 15:55:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MdLK-hHJiX30; Mon, 14 Nov 2022 15:11:46 -0500 (EST)
+	with ESMTP id 6V3xiBeKWG39; Mon, 14 Nov 2022 15:55:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E93B4B949;
-	Mon, 14 Nov 2022 15:11:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B4A14B8E2;
+	Mon, 14 Nov 2022 15:55:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C2B54B949
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 15:11:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BFEB4B811
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 15:55:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X+wGieylDm-6 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Nov 2022 15:11:43 -0500 (EST)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2010E4B8CD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 15:11:42 -0500 (EST)
+ with ESMTP id 9aBblEr68WdB for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Nov 2022 15:54:58 -0500 (EST)
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA2D04B733
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 15:54:58 -0500 (EST)
+Date: Mon, 14 Nov 2022 20:54:52 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1668459297;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=A678RV37X2a5WAdwm/7rFErOS5ZproL4wmh+eRAOrpo=;
+ b=B+rTg85BNob60Y8KzATpVLW3TAzfrCuopXNCGmZ/lR0PoxYCXGLcjQls41txe211SpDK7T
+ ck32Iiv8/6yqgWwbkunnWdVMUwao0/YgT7W/3yGETav5Gd240aA9yEebm60YWmftjtErZ+
+ kU1REr35oS30HK8FaC8oEq0uIst1ANI=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1668456701;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mglCJONHjZaMkBoIgcjixSkCCSFrzRBKYTMx418wVb4=;
- b=oja4AWIi6mYdgYeWVFJ67Cqf9vP4TIUr4x/wU74OS60f/fSGWh3gGuvD4GPrnpZnx90l/i
- VttLBxAj+U4AeyZ91bChgEKiB0+OiIzyb2uhL8ZQ+9QFn96jNJQx0u/v6/1iAHZ/62fWMD
- c/OEw66RkQ10zTcxDtKRoUdPA010VyQ=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Subject: [PATCH 1/1] KVM: arm64: Use a separate function for hyp stage-1 walks
-Date: Mon, 14 Nov 2022 20:11:27 +0000
-Message-Id: <20221114201127.1814794-2-oliver.upton@linux.dev>
-In-Reply-To: <20221114201127.1814794-1-oliver.upton@linux.dev>
-References: <20221114201127.1814794-1-oliver.upton@linux.dev>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [RFC PATCH 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
+Message-ID: <Y3KrHG4WMXMUquUy@google.com>
+References: <20221112081714.2169495-1-ricarkol@google.com>
+ <20221112081714.2169495-5-ricarkol@google.com>
 MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20221112081714.2169495-5-ricarkol@google.com>
 X-Migadu-Flow: FLOW_OUT
-Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org
+Cc: ricarkol@gmail.com, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ kvmarm@lists.linux.dev, andrew.jones@linux.dev, bgardon@google.com,
+ maz@kernel.org, dmatlack@google.com, pbonzini@redhat.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,125 +69,122 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-A subsequent change to the page table walkers adds RCU protection for
-walking stage-2 page tables. KVM uses a global lock to serialize hyp
-stage-1 walks, meaning RCU protection is quite meaningless for
-protecting hyp stage-1 walkers.
+Hi Ricardo,
 
-Add a new helper, kvm_pgtable_hyp_walk(), for use when walking hyp
-stage-1 tables. Call directly into __kvm_pgtable_walk() as table
-concatenation is not a supported feature at stage-1.
+On Sat, Nov 12, 2022 at 08:17:06AM +0000, Ricardo Koller wrote:
 
-No functional change intended.
+[...]
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/kvm_pgtable.h | 24 ++++++++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/setup.c      |  2 +-
- arch/arm64/kvm/hyp/pgtable.c         | 18 +++++++++++++++---
- 3 files changed, 40 insertions(+), 4 deletions(-)
+> +/**
+> + * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
+> + *				to PAGE_SIZE guest pages.
+> + * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
+> + * @addr:	Intermediate physical address from which to split.
+> + * @size:	Size of the range.
+> + * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
+> + *		page-table pages.
+> + *
+> + * @addr and the end (@addr + @size) are effectively aligned down and up to
+> + * the top level huge-page block size. This is an exampe using 1GB
+> + * huge-pages and 4KB granules.
+> + *
+> + *                          [---input range---]
+> + *                          :                 :
+> + * [--1G block pte--][--1G block pte--][--1G block pte--][--1G block pte--]
+> + *                          :                 :
+> + *                   [--2MB--][--2MB--][--2MB--][--2MB--]
+> + *                          :                 :
+> + *                   [ ][ ][:][ ][ ][ ][ ][ ][:][ ][ ][ ]
+> + *                          :                 :
+> + *
+> + * Return: 0 on success, negative error code on failure. Note that
+> + * kvm_pgtable_stage2_split() is best effort: it tries to break as many
+> + * blocks in the input range as allowed by the size of the memcache. It
+> + * will fail it wasn't able to break any block.
+> + */
+> +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size, void *mc);
+> +
+>  /**
+>   * kvm_pgtable_walk() - Walk a page-table.
+>   * @pgt:	Page-table structure initialised by kvm_pgtable_*_init().
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index d1f309128118..9c42eff6d42e 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -1267,6 +1267,80 @@ static int stage2_create_removed(kvm_pte_t *ptep, u64 phys, u32 level,
+>  	return __kvm_pgtable_visit(&data, mm_ops, ptep, level);
+>  }
+>  
+> +struct stage2_split_data {
+> +	struct kvm_s2_mmu		*mmu;
+> +	void				*memcache;
+> +	struct kvm_pgtable_mm_ops	*mm_ops;
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index a874ce0ce7b5..43b2f1882e11 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -596,6 +596,30 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
- int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 		     struct kvm_pgtable_walker *walker);
- 
-+/**
-+ * kvm_pgtable_hyp_walk() - Walk a hyp stage-1 page-table.
-+ * @pgt:	Page-table structure initialized by kvm_pgtable_hyp_init().
-+ * @addr:	Input address for the start of the walk.
-+ * @size:	Size of the range to walk.
-+ * @walker:	Walker callback description.
-+ *
-+ * The offset of @addr within a page is ignored and @size is rounded-up to
-+ * the next page boundary.
-+ *
-+ * The walker will walk the page-table entries corresponding to the input
-+ * address range specified, visiting entries according to the walker flags.
-+ * Invalid entries are treated as leaf entries. Leaf entries are reloaded
-+ * after invoking the walker callback, allowing the walker to descend into
-+ * a newly installed table.
-+ *
-+ * Returning a negative error code from the walker callback function will
-+ * terminate the walk immediately with the same error code.
-+ *
-+ * Return: 0 on success, negative error code on failure.
-+ */
-+int kvm_pgtable_hyp_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
-+			 struct kvm_pgtable_walker *walker);
-+
- /**
-  * kvm_pgtable_get_leaf() - Walk a page-table and retrieve the leaf entry
-  *			    with its level.
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 1068338d77f3..55eeb3ed1891 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -246,7 +246,7 @@ static int finalize_host_mappings(void)
- 		struct memblock_region *reg = &hyp_memory[i];
- 		u64 start = (u64)hyp_phys_to_virt(reg->base);
- 
--		ret = kvm_pgtable_walk(&pkvm_pgtable, start, reg->size, &walker);
-+		ret = kvm_pgtable_hyp_walk(&pkvm_pgtable, start, reg->size, &walker);
- 		if (ret)
- 			return ret;
- 	}
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 5bca9610d040..385fa1051b5d 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -335,6 +335,18 @@ int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
- 	return ret;
- }
- 
-+int kvm_pgtable_hyp_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
-+			 struct kvm_pgtable_walker *walker)
-+{
-+	struct kvm_pgtable_walk_data data = {
-+		.walker	= walker,
-+		.addr	= ALIGN_DOWN(addr, PAGE_SIZE),
-+		.end	= PAGE_ALIGN(addr + size),
-+	};
-+
-+	return __kvm_pgtable_walk(&data, pgt->mm_ops, pgt->pgd, pgt->start_level);
-+}
-+
- struct hyp_map_data {
- 	u64				phys;
- 	kvm_pte_t			attr;
-@@ -454,7 +466,7 @@ int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
- 	if (ret)
- 		return ret;
- 
--	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
-+	ret = kvm_pgtable_hyp_walk(pgt, addr, size, &walker);
- 	dsb(ishst);
- 	isb();
- 	return ret;
-@@ -512,7 +524,7 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
- 	if (!pgt->mm_ops->page_count)
- 		return 0;
- 
--	kvm_pgtable_walk(pgt, addr, size, &walker);
-+	kvm_pgtable_hyp_walk(pgt, addr, size, &walker);
- 	return unmapped;
- }
- 
-@@ -557,7 +569,7 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
- 		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
- 	};
- 
--	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
-+	WARN_ON(kvm_pgtable_hyp_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
- 	pgt->mm_ops->put_page(kvm_dereference_pteref(pgt->pgd, false));
- 	pgt->pgd = NULL;
- }
--- 
-2.38.1.431.g37b22c650d-goog
+You can also get at mm_ops through kvm_pgtable_visit_ctx
 
+> +};
+> +
+> +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> +			       enum kvm_pgtable_walk_flags visit)
+> +{
+> +	struct stage2_split_data *data = ctx->arg;
+> +	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
+> +	kvm_pte_t pte = ctx->old, attr, new;
+> +	enum kvm_pgtable_prot prot;
+> +	void *mc = data->memcache;
+> +	u32 level = ctx->level;
+> +	u64 phys;
+> +
+> +	if (WARN_ON_ONCE(kvm_pgtable_walk_shared(ctx)))
+> +		return -EINVAL;
+> +
+> +	/* Nothing to split at the last level */
+> +	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
+> +		return 0;
+> +
+> +	/* We only split valid block mappings */
+> +	if (!kvm_pte_valid(pte) || kvm_pte_table(pte, ctx->level))
+> +		return 0;
+> +
+> +	phys = kvm_pte_to_phys(pte);
+> +	prot = kvm_pgtable_stage2_pte_prot(pte);
+> +	stage2_set_prot_attr(data->mmu->pgt, prot, &attr);
+> +
+> +	/*
+> +	 * Eager page splitting is best-effort, so we can ignore the error.
+> +	 * The returned PTE (new) will be valid even if this call returns
+> +	 * error: new will be a single (big) block PTE.  The only issue is
+> +	 * that it will affect dirty logging performance, as the huge-pages
+> +	 * will have to be split on fault, and so we WARN.
+> +	 */
+> +	WARN_ON(stage2_create_removed(&new, phys, level, attr, mc, mm_ops));
+
+I don't believe we should warn in this case, at least not
+unconditionally. ENOMEM is an expected outcome, for example.
+
+Additionally, I believe you'll want to bail out at this point to avoid
+installing a potentially garbage PTE as well.
+
+> +	stage2_put_pte(ctx, data->mmu, mm_ops);
+
+Ah, I see why you've relaxed the WARN in patch 1 now.
+
+I would recommend you follow the break-before-make pattern and use the
+helpers here as well. stage2_try_break_pte() will demote the store to
+WRITE_ONCE() if called from a non-shared context.
+
+Then the WARN will behave as expected in stage2_make_pte().
+
+> +	/*
+> +	 * Note, the contents of the page table are guaranteed to be made
+> +	 * visible before the new PTE is assigned because
+> +	 * stage2_make__pte() writes the PTE using smp_store_release().
+
+typo: stage2_make_pte()
+
+--
+Thanks,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
