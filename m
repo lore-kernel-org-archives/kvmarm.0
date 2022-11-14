@@ -1,124 +1,333 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A5A46B8
-	for <kvmarm@lists.linux.dev>; Mon, 14 Nov 2022 11:37:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5718EC433C1;
-	Mon, 14 Nov 2022 11:37:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668425845;
-	bh=X1WXUuEiCKYnCaSnllroe9lO9yo1oclX61iorR2hfP8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W8W7cT4G0eRhxxQtb/fG1Agad036i8WDiWbKv+7fyVCRbtdWrMK0YRAUyw3aA0cHv
-	 ZixjCxb6xkWxqH5vTFUokG6TPXIq7Ol4JOU4fSPj46hFKxF9o6LqvVYGAf/qIj0dRx
-	 fzjrxfpBWMiGe9oed60NTUh8lNzyzzztJ24pcs+XFTQKWOSURKyt2/4vkP2VMwB4hU
-	 2AXgwCfpB9N9TCctCLljVhTZhCWNhexgwkpNsr3ukcvsbqh3zrRDfkPWGGY5+s3sqc
-	 uNh4JUM9cFMn4VTneWbR/GZGzDkGHZVvYV/vwdjfN4/ZrdQ+0qVyexESqBNmYgvaoh
-	 sm39gLiANN6CA==
-Received: from [82.3.55.76] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1ouXmE-005wky-Vy;
-	Mon, 14 Nov 2022 11:37:23 +0000
-Date: Mon, 14 Nov 2022 11:36:56 +0000
-Message-ID: <878rkdvkbr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 2/3] KVM: arm64: Allow userspace to trap SMCCC sub-ranges
-In-Reply-To: <Y27dHf+PRt+G4jNg@google.com>
-References: <20221110015327.3389351-1-oliver.upton@linux.dev>
-	<20221110015327.3389351-3-oliver.upton@linux.dev>
-	<86o7tfov7v.wl-maz@kernel.org>
-	<Y21pktYPLPM6eYga@google.com>
-	<87fsepvqw5.wl-maz@kernel.org>
-	<Y27dHf+PRt+G4jNg@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7464C78
+	for <kvmarm@lists.linux.dev>; Mon, 14 Nov 2022 14:29:17 +0000 (UTC)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20221114142915euoutp013d44c6eb92e894f9aa5b3b83d18088f9~nedgN88Oz2419624196euoutp010
+	for <kvmarm@lists.linux.dev>; Mon, 14 Nov 2022 14:29:15 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20221114142915euoutp013d44c6eb92e894f9aa5b3b83d18088f9~nedgN88Oz2419624196euoutp010
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1668436155;
+	bh=tH7IvdpIRni8xd8mM+dKwkwd+lFrflP2wBRHEgT3wJc=;
+	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+	b=BrzQkGfeLACul2lUmFt9c4BJ7/IxGcp/unQxzgG207NLWpgGKGfYGz3CTQ/6VNrAn
+	 j+P5rXoPpQKodlYfFgDOq0FxgfyGRqghIu3wSuxAg50FQFuFAfGC2rR2MTK2egW3CX
+	 i9avjRJDcwXPWvlkEXrMvQ2GJXTRQZxBxWVyJH4c=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20221114142915eucas1p19dbfd418578d2c55d92133788422a21b~nedf3wAAz2164621646eucas1p1q;
+	Mon, 14 Nov 2022 14:29:15 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+	eusmges1new.samsung.com (EUCPMTA) with SMTP id AC.B3.09561.BB052736; Mon, 14
+	Nov 2022 14:29:15 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20221114142915eucas1p258f3ca2c536bde712c068e96851468fd~nedffZu6s1272912729eucas1p2d;
+	Mon, 14 Nov 2022 14:29:15 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20221114142915eusmtrp2eb2cd8603adfc2795efcc4618842ba77~nedfeZvH42331123311eusmtrp2W;
+	Mon, 14 Nov 2022 14:29:15 +0000 (GMT)
+X-AuditID: cbfec7f2-0b3ff70000002559-b2-637250bbe67a
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+	eusmgms1.samsung.com (EUCPMTA) with SMTP id 08.6A.08916.AB052736; Mon, 14
+	Nov 2022 14:29:14 +0000 (GMT)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20221114142914eusmtip150f1cfb9b1e92f0c95d56aa3760fc365~nedepCj391861518615eusmtip1i;
+	Mon, 14 Nov 2022 14:29:14 +0000 (GMT)
+Message-ID: <d9854277-0411-8169-9e8b-68d15e4c0248@samsung.com>
+Date: Mon, 14 Nov 2022 15:29:14 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.3.55.76
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, rananta@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221114113656.42dtMgt9tr_kOSSV7pt_eD_N7JvAH_lqH8G6EKGm-o4@z>
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0)
+	Gecko/20100101 Thunderbird/102.4.2
+Subject: Re: [PATCH v5 08/14] KVM: arm64: Protect stage-2 traversal with RCU
+Content-Language: en-US
+To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>, Alexandru Elisei
+	<alexandru.elisei@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>, Ricardo Koller
+	<ricarkol@google.com>, David Matlack <dmatlack@google.com>, Quentin Perret
+	<qperret@google.com>, Ben Gardon <bgardon@google.com>, Gavin Shan
+	<gshan@redhat.com>, Peter Xu <peterx@redhat.com>, Will Deacon
+	<will@kernel.org>, Sean Christopherson <seanjc@google.com>,
+	kvmarm@lists.linux.dev
+From: Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <20221107215644.1895162-9-oliver.upton@linux.dev>
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrIKsWRmVeSWpSXmKPExsWy7djP87q7A4qSDW7NFLeYvvIym8WyC/IW
+	kxubWSxe7trGZHF/33ImizlTCy0+njrObvFqy2EWi02Pr7Fa7JxzktVi6s83bBZb9n9jtziz
+	aRuLxd6GGWwWe9c8Z7E4ev4Wk0XLHVMHQY8189YweizYVOqxaVUnm8fChqnMHuc3rWH22Lyk
+	3uPF5pmMHu/3XWXz+LxJLoAzissmJTUnsyy1SN8ugSvj5vdbjAV91hX3eyexNzCuM+hi5OSQ
+	EDCReNSygK2LkYtDSGAFo8Ta+9OZIJwvjBJTf7SwQDifGSWOdn9lg2n5OP8DK0RiOaPEhWON
+	zCAJIYGPjBK/PgiD2LwCdhI9B/+DxVkEVCUunp/EAhEXlDg58wmYLSqQIrFwyw0mEFtYwEei
+	/9YfMJtZQFzi1pP5YGeICMxhlLg68QnYNmaBncwSjzr6wKrYBAwlut52gZ3ECbTtxtKFrBDd
+	8hLNW2czgzRICBzmlPj8ZgLU3S4SF3bcY4ewhSVeHd8CZctI/N8JsU5CoJ1RYsHv+1DOBEaJ
+	hue3GCGqrCXunPsFNIkDaIWmxPpd+hBhR4mJP6exgIQlBPgkbrwVhDiCT2LStunMEGFeiY42
+	IYhqNYlZx9fBrT144RLzBEalWUgBMwspAGYheWcWwt4FjCyrGMVTS4tz01OLDfNSy/WKE3OL
+	S/PS9ZLzczcxAlPh6X/HP+1gnPvqo94hRiYOxkOMEhzMSiK882Tyk4V4UxIrq1KL8uOLSnNS
+	iw8xSnOwKInzss3QShYSSE8sSc1OTS1ILYLJMnFwSjUw9XkWhoWIL69oNuOSkTe8HPSnrfHp
+	Qk5OBc5dd7/X/xJwO8YgudaRabuG/445IU/Tlc0ZXfdZmQf0nwxve+b6hC9ewqn/01Xpj+4T
+	s5ivLQ/9tI3zjkFmhdqt6+6srELXFW14rsfcn3r20r+53/9ptCyatCKD9W2z47YXRX8d1v/d
+	vz32tPAf07u3mKPnWeauX3IhaW7apoLpD01XLywuW5Fi3+W2r4TlpubOnsXrBOWPGWzJm/Zx
+	zdT6DV+3rCp9bXapVqi94fKOF1ua5b2VFeNm3vnFqCRz//kRzT3BF17feMK17OqflIjAm3ss
+	fSacTnd4aTDVr1mEMfSEfFLxmvKl6Tafnl/S2uucE1SooMRSnJFoqMVcVJwIAMbVT2n0AwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrEIsWRmVeSWpSXmKPExsVy+t/xu7q7AoqSDVYdM7eYvvIym8WyC/IW
+	kxubWSxe7trGZHF/33ImizlTCy0+njrObvFqy2EWi02Pr7Fa7JxzktVi6s83bBZb9n9jtziz
+	aRuLxd6GGWwWe9c8Z7E4ev4Wk0XLHVMHQY8189YweizYVOqxaVUnm8fChqnMHuc3rWH22Lyk
+	3uPF5pmMHu/3XWXz+LxJLoAzSs+mKL+0JFUhI7+4xFYp2tDCSM/Q0kLPyMRSz9DYPNbKyFRJ
+	384mJTUnsyy1SN8uQS/j5vdbjAV91hX3eyexNzCuM+hi5OSQEDCR+Dj/A2sXIxeHkMBSRonT
+	s+YzQyRkJE5Oa2CFsIUl/lzrYoMoes8oMXfiC0aQBK+AnUTPwf9gDSwCqhIXz09igYgLSpyc
+	+QTI5uAQFUiRWHckCiQsLOAj0X/rDxOIzSwgLnHryXwmkJkiAnMYJTbfmskI4jAL7GSW2HTi
+	NTtIlZBAocTuu6vBFrAJGEp0vQW5gpODE2jxjaULWSEmmUl0be1ihLDlJZq3zmaewCg0C8kd
+	s5AsnIWkZRaSlgWMLKsYRVJLi3PTc4sN9YoTc4tL89L1kvNzNzECI3/bsZ+bdzDOe/VR7xAj
+	EwfjIUYJDmYlEd55MvnJQrwpiZVVqUX58UWlOanFhxhNgYExkVlKNDkfmHrySuINzQxMDU3M
+	LA1MLc2MlcR5PQs6EoUE0hNLUrNTUwtSi2D6mDg4pRqYYi+dXblJyi09uyFtTn5uEItr5R23
+	jLnF+eyJ/7Kny1w/95lP+kDW117Opp3P111I5rvpn7XW037iT0urnw45n1ctM989eepu5hm8
+	N/mkqi1PMlbKvlvYKcYmIsBzbVWV1NmoaasCVvjO4XedFCbi93RNjlJJHk/At3c3k33e7Hu3
+	LP3gLW7TG475vAtq7Yx2nem5zPxE6PGvRuk7c07lXjsreFG8PL3vOY/OsV89JhnyyQfaexQV
+	/S7IOKsmsZ/zE72izal/8Pmn3i4tq7f7w1uXMGmWr7ylto7b89i1WzK3Xpqs/+jQ4Wj2t07A
+	4sy/PVVlAkt2yZw4ULKH1T7uetbLSTfuGX4T3uX1pyRCiaU4I9FQi7moOBEAdwTikYUDAAA=
+X-CMS-MailID: 20221114142915eucas1p258f3ca2c536bde712c068e96851468fd
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20221114142915eucas1p258f3ca2c536bde712c068e96851468fd
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20221114142915eucas1p258f3ca2c536bde712c068e96851468fd
+References: <20221107215644.1895162-1-oliver.upton@linux.dev>
+	<20221107215644.1895162-9-oliver.upton@linux.dev>
+	<CGME20221114142915eucas1p258f3ca2c536bde712c068e96851468fd@eucas1p2.samsung.com>
+Message-ID: <20221114142914.0en4dz9NIzqEsOlVuZ8w88nPwBvatnLW-OsjoJkyPI4@z>
 
-On Fri, 11 Nov 2022 23:39:09 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Fri, Nov 11, 2022 at 08:26:02AM +0000, Marc Zyngier wrote:
-> > On Thu, 10 Nov 2022 21:13:54 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > The goal of what I was trying to get at is that either the kernel or
-> > > userspace takes ownership of a range that has an ABI, but not both. i.e.
-> > > you really wouldn't want some VMM or cloud provider trapping portions of
-> > > KVM's vendor-specific range while still reporting a 'vanilla' ABI at the
-> > > time of discovery. Same goes for PSCI, TRNG, etc.
-> > 
-> > But I definitely think this is one of the major use cases. For
-> > example, there is value in taking PSCI to userspace in order to
-> > implement a newer version of the spec, or to support sub-features that
-> > KVM doesn't (want to) implement. I don't think this changes the ABI from
-> > the guest perspective.
-> 
-> I disagree for the implications of partially trapping the 'Vendor
-> Specific Hypervisor Service'. If the UID for the range still reports KVM
-> but userspace decided to add some new widget, then from the guest
-> perspective that widget is now part of KVM's own ABI with the guest.
+Hi Oliver,
 
-But that's what I mean by "I don't think this changes the ABI from the
-guest perspective". The guest cannot know who is doing the emulation
-anyway, so it is userspace's duty to preserve the illusion. At the
-end of the day, this is only a configuration mechanism, and it is no
-different from all other configuration bits (i.e. they need to be
-identical on both side for migration).
+On 07.11.2022 22:56, Oliver Upton wrote:
+> Use RCU to safely walk the stage-2 page tables in parallel. Acquire and
+> release the RCU read lock when traversing the page tables. Defer the
+> freeing of table memory to an RCU callback. Indirect the calls into RCU
+> and provide stubs for hypervisor code, as RCU is not available in such a
+> context.
+>
+> The RCU protection doesn't amount to much at the moment, as readers are
+> already protected by the read-write lock (all walkers that free table
+> memory take the write lock). Nonetheless, a subsequent change will
+> futher relax the locking requirements around the stage-2 MMU, thereby
+> depending on RCU.
+>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 
-> Trapping the whole range is a bit of a hack to workaround the need for
-> more complicated verification of a hypercall filter.
+This patch landed in today's linux-next (20221114) as commit 
+c3119ae45dfb ("KVM: arm64: Protect stage-2 traversal with RCU"). 
+Unfortunately it introduces a following warning:
 
-We already need these things for architected hypercalls. Once we have
-the infrastructure, it doesn't matter anymore which range this is for.
+--->8---
 
-> 
-> But for everything else, I'm fine with arbitrary function filtering.
-> Userspace is always welcome to shoot itself in the foot.
-> 
-> > pKVM also has a use case for this where userspace gets a notification
-> > of the hypercall that a guest has performed to share memory.
-> 
-> Is that hypercall in the 'Vendor Specific Hypervisor Service' range?
+kvm [1]: IPA Size Limit: 40 bits
+BUG: sleeping function called from invalid context at 
+include/linux/sched/mm.h:274
+in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 1, name: swapper/0
+preempt_count: 0, expected: 0
+RCU nest depth: 1, expected: 0
+2 locks held by swapper/0/1:
+  #0: ffff80000a8a44d0 (kvm_hyp_pgd_mutex){+.+.}-{3:3}, at: 
+__create_hyp_mappings+0x80/0xc4
+  #1: ffff80000a927720 (rcu_read_lock){....}-{1:2}, at: 
+kvm_pgtable_walk+0x0/0x1f4
+CPU: 2 PID: 1 Comm: swapper/0 Not tainted 6.1.0-rc3+ #5918
+Hardware name: Raspberry Pi 3 Model B (DT)
+Call trace:
+  dump_backtrace.part.0+0xe4/0xf0
+  show_stack+0x18/0x40
+  dump_stack_lvl+0x8c/0xb8
+  dump_stack+0x18/0x34
+  __might_resched+0x178/0x220
+  __might_sleep+0x48/0xa0
+  prepare_alloc_pages+0x178/0x1a0
+  __alloc_pages+0x9c/0x109c
+  alloc_page_interleave+0x1c/0xc4
+  alloc_pages+0xec/0x160
+  get_zeroed_page+0x1c/0x44
+  kvm_hyp_zalloc_page+0x14/0x20
+  hyp_map_walker+0xd4/0x134
+  kvm_pgtable_visitor_cb.isra.0+0x38/0x5c
+  __kvm_pgtable_walk+0x1a4/0x220
+  kvm_pgtable_walk+0x104/0x1f4
+  kvm_pgtable_hyp_map+0x80/0xc4
+  __create_hyp_mappings+0x9c/0xc4
+  kvm_mmu_init+0x144/0x1cc
+  kvm_arch_init+0xe4/0xef4
+  kvm_init+0x3c/0x3d0
+  arm_init+0x20/0x30
+  do_one_initcall+0x74/0x400
+  kernel_init_freeable+0x2e0/0x350
+  kernel_init+0x24/0x130
+  ret_from_fork+0x10/0x20
+kvm [1]: Hyp mode initialized successfully
 
-Yes. It is get another KVM hypercall.
+--->8----
 
-> 
-> > Communication with a TEE also is on the cards, as would be a FFA
-> > implementation. All of this could be implemented in KVM, or in
-> > userspace, depending what users of these misfeatures want to do.
-> 
-> I'm very hopeful that by forwarding all of this to userspace we can get
-> out of the business of implementing every darn spec that comes along.
+I looks that more changes in the KVM code are needed to use RCU for that 
+code.
 
-Good luck. All the TEEs have private, home grown APIs, and every
-vendor will want to implement their own crap (i.e. there is no spec).
+> ---
+>   arch/arm64/include/asm/kvm_pgtable.h | 49 ++++++++++++++++++++++++++++
+>   arch/arm64/kvm/hyp/pgtable.c         | 10 +++++-
+>   arch/arm64/kvm/mmu.c                 | 14 +++++++-
+>   3 files changed, 71 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index e70cf57b719e..7634b6964779 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -37,6 +37,13 @@ static inline u64 kvm_get_parange(u64 mmfr0)
+>   
+>   typedef u64 kvm_pte_t;
+>   
+> +/*
+> + * RCU cannot be used in a non-kernel context such as the hyp. As such, page
+> + * table walkers used in hyp do not call into RCU and instead use other
+> + * synchronization mechanisms (such as a spinlock).
+> + */
+> +#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
+> +
+>   typedef kvm_pte_t *kvm_pteref_t;
+>   
+>   static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
+> @@ -44,6 +51,40 @@ static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared
+>   	return pteref;
+>   }
+>   
+> +static inline void kvm_pgtable_walk_begin(void) {}
+> +static inline void kvm_pgtable_walk_end(void) {}
+> +
+> +static inline bool kvm_pgtable_walk_lock_held(void)
+> +{
+> +	return true;
+> +}
+> +
+> +#else
+> +
+> +typedef kvm_pte_t __rcu *kvm_pteref_t;
+> +
+> +static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
+> +{
+> +	return rcu_dereference_check(pteref, !shared);
+> +}
+> +
+> +static inline void kvm_pgtable_walk_begin(void)
+> +{
+> +	rcu_read_lock();
+> +}
+> +
+> +static inline void kvm_pgtable_walk_end(void)
+> +{
+> +	rcu_read_unlock();
+> +}
+> +
+> +static inline bool kvm_pgtable_walk_lock_held(void)
+> +{
+> +	return rcu_read_lock_held();
+> +}
+> +
+> +#endif
+> +
+>   #define KVM_PTE_VALID			BIT(0)
+>   
+>   #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
+> @@ -202,11 +243,14 @@ struct kvm_pgtable {
+>    *					children.
+>    * @KVM_PGTABLE_WALK_TABLE_POST:	Visit table entries after their
+>    *					children.
+> + * @KVM_PGTABLE_WALK_SHARED:		Indicates the page-tables may be shared
+> + *					with other software walkers.
+>    */
+>   enum kvm_pgtable_walk_flags {
+>   	KVM_PGTABLE_WALK_LEAF			= BIT(0),
+>   	KVM_PGTABLE_WALK_TABLE_PRE		= BIT(1),
+>   	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
+> +	KVM_PGTABLE_WALK_SHARED			= BIT(3),
+>   };
+>   
+>   struct kvm_pgtable_visit_ctx {
+> @@ -223,6 +267,11 @@ struct kvm_pgtable_visit_ctx {
+>   typedef int (*kvm_pgtable_visitor_fn_t)(const struct kvm_pgtable_visit_ctx *ctx,
+>   					enum kvm_pgtable_walk_flags visit);
+>   
+> +static inline bool kvm_pgtable_walk_shared(const struct kvm_pgtable_visit_ctx *ctx)
+> +{
+> +	return ctx->flags & KVM_PGTABLE_WALK_SHARED;
+> +}
+> +
+>   /**
+>    * struct kvm_pgtable_walker - Hook into a page-table walk.
+>    * @cb:		Callback function to invoke during the walk.
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 7c9782347570..d8d963521d4e 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -171,6 +171,9 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
+>   				  enum kvm_pgtable_walk_flags visit)
+>   {
+>   	struct kvm_pgtable_walker *walker = data->walker;
+> +
+> +	/* Ensure the appropriate lock is held (e.g. RCU lock for stage-2 MMU) */
+> +	WARN_ON_ONCE(kvm_pgtable_walk_shared(ctx) && !kvm_pgtable_walk_lock_held());
+>   	return walker->cb(ctx, visit);
+>   }
+>   
+> @@ -281,8 +284,13 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>   		.end	= PAGE_ALIGN(walk_data.addr + size),
+>   		.walker	= walker,
+>   	};
+> +	int r;
+> +
+> +	kvm_pgtable_walk_begin();
+> +	r = _kvm_pgtable_walk(pgt, &walk_data);
+> +	kvm_pgtable_walk_end();
+>   
+> -	return _kvm_pgtable_walk(pgt, &walk_data);
+> +	return r;
+>   }
+>   
+>   struct leaf_walk_data {
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 73ae908eb5d9..52e042399ba5 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -130,9 +130,21 @@ static void kvm_s2_free_pages_exact(void *virt, size_t size)
+>   
+>   static struct kvm_pgtable_mm_ops kvm_s2_mm_ops;
+>   
+> +static void stage2_free_removed_table_rcu_cb(struct rcu_head *head)
+> +{
+> +	struct page *page = container_of(head, struct page, rcu_head);
+> +	void *pgtable = page_to_virt(page);
+> +	u32 level = page_private(page);
+> +
+> +	kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, pgtable, level);
+> +}
+> +
+>   static void stage2_free_removed_table(void *addr, u32 level)
+>   {
+> -	kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, addr, level);
+> +	struct page *page = virt_to_page(addr);
+> +
+> +	set_page_private(page, (unsigned long)level);
+> +	call_rcu(&page->rcu_head, stage2_free_removed_table_rcu_cb);
+>   }
+>   
+>   static void kvm_host_get_page(void *addr)
 
-	M.
-
+Best regards
 -- 
-Without deviation from the norm, progress is not possible.
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
+
