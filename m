@@ -1,33 +1,41 @@
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357DB8469
-	for <kvmarm@lists.linux.dev>; Mon, 14 Nov 2022 18:56:32 +0000 (UTC)
-Date: Mon, 14 Nov 2022 18:56:25 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1668452190;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Q5udZ+ISDmPheWfBt897YJ48hWO5BmuEk3t0+EgBqyY=;
-	b=qZZvxC+eJaT/x29y7C98Iv0te2QPyvqPHPnSQau+WHWzWl3J3lyFpvRx4+Q97icgQOWhUm
-	ubcx7aaMR4ASeegeaahM1IxcIf844OwQpiN2QMgXJp39Zk0wFUcFYKCuJs8JeVMy47Ylps
-	50eVXZsTXpHNMuCUdCq9f/UU1S2iSxo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Ricardo Koller <ricarkol@google.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, dmatlack@google.com,
-	qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev,
-	seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-	eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-	rananta@google.com, bgardon@google.com, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-	ricarkol@gmail.com
-Subject: Re: [RFC PATCH 06/12] KVM: arm64: Split block PTEs without using
- break-before-make
-Message-ID: <Y3KPWTj0KwLtL535@google.com>
-References: <20221112081714.2169495-1-ricarkol@google.com>
- <20221112081714.2169495-7-ricarkol@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85408470
+	for <kvmarm@lists.linux.dev>; Mon, 14 Nov 2022 19:30:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 626EAC43470;
+	Mon, 14 Nov 2022 19:30:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1668454235;
+	bh=llpXHAF5OWOiK2xL3RLSoCIqLyphKu1AInLE8Ka6w2I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Rhq6nrc3C4VKkHptcd+G0RQtCpi59Klo/ayDVDPn579Q60QJ+4QqrBtebMdndZaWM
+	 9Sp0UjXcF+SHwpZbqdQFP3aqLzi5QR5SV+fR0BXOuZ5CFAoK/x0x1NWguBnyVYUD9M
+	 CFs4Q5JJ8p0tQeJjSn3U9MeuHhjh5ezdmGuR/Rho7lVMGos6NKefqFVAKkjjw7Rw2h
+	 jGpoCpHk25l0OGpDmoOiv6lKU9yvB75jS74r4jqVUDQ7ee9Xsjhy3VsOYLhvbw58j6
+	 PxbEEMYvpD43VZYlDUNH+xP8yBFUJB0YIiy60JK4pg8MqYV+7bqf6ev8MydM+RzcKp
+	 nqXu+Im45Tefw==
+Date: Mon, 14 Nov 2022 19:30:28 +0000
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, Vincent Donnefort <vdonnefort@google.com>,
+	James Morse <james.morse@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	kernel-team@android.com, Quentin Perret <qperret@google.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Sean Christopherson <seanjc@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>
+Subject: Re: [PATCH v6 00/26] KVM: arm64: Introduce pKVM hyp VM and vCPU
+ state at EL2
+Message-ID: <20221114193027.GA31791@willie-the-truck>
+References: <20221110190259.26861-1-will@kernel.org>
+ <166819337067.3836113.13147674500457473286.b4-ty@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -36,100 +44,31 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221112081714.2169495-7-ricarkol@google.com>
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221114185625.qkJX8GkwdAbmjpEEz_jkGsqaP0T22WJOcsbbyoqIQcY@z>
+In-Reply-To: <166819337067.3836113.13147674500457473286.b4-ty@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Sat, Nov 12, 2022 at 08:17:08AM +0000, Ricardo Koller wrote:
-> Breaking a huge-page block PTE into an equivalent table of smaller PTEs
-> does not require using break-before-make (BBM) when FEAT_BBM level 2 is
-> implemented. Add the respective check for eager page splitting and avoid
-> using BBM.
+On Fri, Nov 11, 2022 at 07:06:14PM +0000, Marc Zyngier wrote:
+> On Thu, 10 Nov 2022 19:02:33 +0000, Will Deacon wrote:
+> > This is version six of the pKVM EL2 state series, extending the pKVM
+> > hypervisor code so that it can dynamically instantiate and manage VM
+> > data structures without the host being able to access them directly.
+> > These structures consist of a hyp VM, a set of hyp vCPUs and the stage-2
+> > page-table for the MMU. The pages used to hold the hypervisor structures
+> > are returned to the host when the VM is destroyed.
+> > 
+> > [...]
 > 
-> Also take care of possible Conflict aborts.  According to the rules
-> specified in the Arm ARM (DDI 0487H.a) section "Support levels for changing
-> block size" D5.10.1, this can result in a Conflict abort. So, handle it by
-> clearing all VM TLB entries.
+> As for Oliver's series, I've tentatively applied this to -next.
+> I've dropped Oliver's patch for now, but kept the RFC one. Maybe I'll
+> change my mind.
 > 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-
-I'd suggest adding the TLB conflict abort handler as a separate commit
-prior to actually relaxing break-before-make requirements.
-
-> ---
->  arch/arm64/include/asm/esr.h     |  1 +
->  arch/arm64/include/asm/kvm_arm.h |  1 +
->  arch/arm64/kvm/hyp/pgtable.c     | 10 +++++++++-
->  arch/arm64/kvm/mmu.c             |  6 ++++++
->  4 files changed, 17 insertions(+), 1 deletion(-)
+> Anyway, there was an interesting number of conflicts between the two
+> series, which I tried to resolve as well as I could, but it is likely
+> I broke something (although it compiles, so it must be perfect).
 > 
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index 15b34fbfca66..6f5b976396e7 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -114,6 +114,7 @@
->  #define ESR_ELx_FSC_ACCESS	(0x08)
->  #define ESR_ELx_FSC_FAULT	(0x04)
->  #define ESR_ELx_FSC_PERM	(0x0C)
-> +#define ESR_ELx_FSC_CONFLICT	(0x30)
->  
->  /* ISS field definitions for Data Aborts */
->  #define ESR_ELx_ISV_SHIFT	(24)
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 0df3fc3a0173..58e7cbe3c250 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -333,6 +333,7 @@
->  #define FSC_SECC_TTW1	(0x1d)
->  #define FSC_SECC_TTW2	(0x1e)
->  #define FSC_SECC_TTW3	(0x1f)
-> +#define FSC_CONFLICT	ESR_ELx_FSC_CONFLICT
->  
->  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
->  #define HPFAR_MASK	(~UL(0xf))
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 9c42eff6d42e..36b81df5687e 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1267,6 +1267,11 @@ static int stage2_create_removed(kvm_pte_t *ptep, u64 phys, u32 level,
->  	return __kvm_pgtable_visit(&data, mm_ops, ptep, level);
->  }
->  
-> +static bool stage2_has_bbm_level2(void)
-> +{
-> +	return cpus_have_const_cap(ARM64_HAS_STAGE2_BBM2);
-> +}
-> +
->  struct stage2_split_data {
->  	struct kvm_s2_mmu		*mmu;
->  	void				*memcache;
-> @@ -1308,7 +1313,10 @@ static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
->  	 */
->  	WARN_ON(stage2_create_removed(&new, phys, level, attr, mc, mm_ops));
->  
-> -	stage2_put_pte(ctx, data->mmu, mm_ops);
-> +	if (stage2_has_bbm_level2())
-> +		mm_ops->put_page(ctx->ptep);
-> +	else
-> +		stage2_put_pte(ctx, data->mmu, mm_ops);
->  
->  	/*
->  	 * Note, the contents of the page table are guaranteed to be made
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 8f26c65693a9..318f7b0aa20b 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1481,6 +1481,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  		return 1;
->  	}
->  
-> +	/* Conflict abort? */
-> +	if (fault_status == FSC_CONFLICT) {
-> +		kvm_flush_remote_tlbs(vcpu->kvm);
+> Please have a look and shout if/when you spot something.
 
-You don't need to perfom a broadcasted invalidation in this case. A
-local invalidation using the guest's VMID should suffice.
+Cheers, the resolution looks good to me and I've played around booting
+non-protected guests under pKVM without any issues so far.
 
---
-Thanks,
-Oliver
+Will
