@@ -2,58 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB5DC4332F
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Nov 2022 20:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF3CEC4332F
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Nov 2022 21:57:29 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DC504B8B9;
-	Mon, 14 Nov 2022 15:59:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 197FB4B93E;
+	Mon, 14 Nov 2022 16:57:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6skfizBoF5xI; Mon, 14 Nov 2022 15:59:26 -0500 (EST)
+	with ESMTP id vBFsqmph7o04; Mon, 14 Nov 2022 16:57:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BAC14B83D;
-	Mon, 14 Nov 2022 15:59:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DE854B93A;
+	Mon, 14 Nov 2022 16:57:27 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C49974B83D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 15:59:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C06E4B933
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 16:57:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lc3ZNWOpHeMn for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Nov 2022 15:59:23 -0500 (EST)
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BFBB549F53
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 15:59:23 -0500 (EST)
-Date: Mon, 14 Nov 2022 20:59:13 +0000
+ with ESMTP id NQuP12YKTZLk for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Nov 2022 16:57:24 -0500 (EST)
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CBD314B92F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 16:57:24 -0500 (EST)
+Date: Mon, 14 Nov 2022 21:57:19 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1668459563;
+ t=1668463043;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=hGeByEF7fiPw7L8RkZy6v3SdTEQDaiCEVE4F9gxaZWU=;
- b=QZGj0VnKfsWs4mmYs5F8K2KzfTrFTlQ11QyOmE6mpMfbFQzlOQCUkNNYmyJ+tD7/0LR3Nk
- VwtMk3HwDmV2fJNzQWGHVnZ6ULtAPfFfWVkHX60MD8aEUxv/aJMhqGhgWY+u2IADU8ax1k
- ZbR1yeBw8FU3uOrTPeENLsM5XOYKJNQ=
+ bh=cvv73VT4lN9E4M2VgijTPhMKxC7cic18qdqEvGgeM/0=;
+ b=SwtRf5XHuoWAxp0FBIwIXxlgQz46tnQNxZ4bg2tvIoj/8cMdMGExDIaLj+GztJATAH9Kzo
+ 5ZGE5IiG9egbnMHnNarasSnVRiyZNCKbK1AVaOZZIZIrWMEcMrRd6tlHdAgN2r3gjO/D1v
+ Oa1cbcgndr9Z99MMExgfOEerkso2u1c=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [RFC PATCH 01/12] KVM: arm64: Relax WARN check in
- stage2_make_pte()
-Message-ID: <Y3KsIUpKISgYRAV9@google.com>
-References: <20221112081714.2169495-1-ricarkol@google.com>
- <20221112081714.2169495-2-ricarkol@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 1/2] KVM: selftests: Allow >1 guest mode in
+ access_tracking_perf_test
+Message-ID: <Y3K5vyWB8m/mKmZD@google.com>
+References: <20221111231946.944807-1-oliver.upton@linux.dev>
+ <20221111231946.944807-2-oliver.upton@linux.dev>
+ <Y3J3EH74B6yafeqm@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20221112081714.2169495-2-ricarkol@google.com>
+In-Reply-To: <Y3J3EH74B6yafeqm@google.com>
 X-Migadu-Flow: FLOW_OUT
-Cc: ricarkol@gmail.com, kvm@vger.kernel.org, catalin.marinas@arm.com,
- kvmarm@lists.linux.dev, andrew.jones@linux.dev, bgardon@google.com,
- maz@kernel.org, dmatlack@google.com, pbonzini@redhat.com,
- kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
+ linux-kselftest@vger.kernel.org, kvmarm@lists.linux.dev,
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -70,50 +72,181 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Ricardo,
-
-On Sat, Nov 12, 2022 at 08:17:03AM +0000, Ricardo Koller wrote:
-> stage2_make_pte() throws a warning when used in a non-shared walk, as PTEs
-> are not "locked" when walking non-shared. Add a check so it can be used
-> non-shared.
+On Mon, Nov 14, 2022 at 05:12:48PM +0000, Sean Christopherson wrote:
+> On Fri, Nov 11, 2022, Oliver Upton wrote:
+> > As the name implies, for_each_guest_mode() will run the test case for
+> > all supported guest addressing modes. On x86 that doesn't amount to
+> > anything, but arm64 can handle 4K, 16K, and 64K page sizes on supporting
+> > hardware.
+> > 
+> > Blindly attempting to run access_tracking_perf_test on arm64 stalls on
+> > the second test case, as the 'done' global remains set between test
+> > iterations. Clear it after VM teardown in anticipation of a subsequent
+> > test case.
+> > 
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  tools/testing/selftests/kvm/access_tracking_perf_test.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> > index 76c583a07ea2..4da066479e0a 100644
+> > --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> > +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> > @@ -326,6 +326,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+> >  
+> >  	perf_test_join_vcpu_threads(nr_vcpus);
+> >  	perf_test_destroy_vm(vm);
+> > +
+> > +	/* Clear done in anticipation of testing another guest mode */
+> > +	done = false;
 > 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> Can we fix this in the so called "perf_test" infrastructure?
+> memslot_modification_stress_test.c has the same bug just inverted (see run_vcpus).
 
-I would very much prefer to leave this WARN as-is. Correct me if I am
-wrong, but I do not believe this warning is firing with the existing
-code.
-
-While the locking portion doesn't make a whole lot of sense for a
-non-shared walk, it is also a magic value that indicates we've already
-done the break side of break-before-make. If the warning fires then that
-would suggest our break-before-make implementation isn't working as
-expected.
+Yeah, sounds good to me. I'll wrap your diff up in a patch here in a
+bit.
 
 --
 Thanks,
 Oliver
 
 > ---
->  arch/arm64/kvm/hyp/pgtable.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  .../selftests/kvm/access_tracking_perf_test.c | 28 +++++--------------
+>  .../selftests/kvm/include/perf_test_util.h    |  3 ++
+>  .../selftests/kvm/lib/perf_test_util.c        |  3 ++
+>  .../kvm/memslot_modification_stress_test.c    |  6 +---
+>  4 files changed, 14 insertions(+), 26 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index c12462439e70..b16107bf917c 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -733,7 +733,8 @@ static void stage2_make_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t n
+> diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> index 76c583a07ea2..786bc62a2c79 100644
+> --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> @@ -58,9 +58,6 @@ static enum {
+>  	ITERATION_MARK_IDLE,
+>  } iteration_work;
+>  
+> -/* Set to true when vCPU threads should exit. */
+> -static bool done;
+> -
+>  /* The iteration that was last completed by each vCPU. */
+>  static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
+>  
+> @@ -206,28 +203,20 @@ static void assert_ucall(struct kvm_vcpu *vcpu, uint64_t expected_ucall)
+>  		    expected_ucall, actual_ucall);
+>  }
+>  
+> -static bool spin_wait_for_next_iteration(int *current_iteration)
+> -{
+> -	int last_iteration = *current_iteration;
+> -
+> -	do {
+> -		if (READ_ONCE(done))
+> -			return false;
+> -
+> -		*current_iteration = READ_ONCE(iteration);
+> -	} while (last_iteration == *current_iteration);
+> -
+> -	return true;
+> -}
+> -
+>  static void vcpu_thread_main(struct perf_test_vcpu_args *vcpu_args)
 >  {
->  	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+>  	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
+>  	struct kvm_vm *vm = perf_test_args.vm;
+>  	int vcpu_idx = vcpu_args->vcpu_idx;
+>  	int current_iteration = 0;
+> +	int last_iteration;
+> +
+> +	while (!READ_ONCE(perf_test_args.stop_vcpus)) {
+> +		last_iteration = current_iteration;
+> +		do {
+> +			current_iteration = READ_ONCE(iteration);
+> +		} while (current_iteration == last_iteration);
 >  
-> -	WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
-> +	if (kvm_pgtable_walk_shared(ctx))
-> +		WARN_ON(!stage2_pte_is_locked(*ctx->ptep));
+> -	while (spin_wait_for_next_iteration(&current_iteration)) {
+>  		switch (READ_ONCE(iteration_work)) {
+>  		case ITERATION_ACCESS_MEMORY:
+>  			vcpu_run(vcpu);
+> @@ -321,9 +310,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  	mark_memory_idle(vm, nr_vcpus);
+>  	access_memory(vm, nr_vcpus, ACCESS_READ, "Reading from idle memory");
 >  
->  	if (stage2_pte_is_counted(new))
->  		mm_ops->get_page(ctx->ptep);
-> -- 
-> 2.38.1.431.g37b22c650d-goog
+> -	/* Set done to signal the vCPU threads to exit */
+> -	done = true;
+> -
+>  	perf_test_join_vcpu_threads(nr_vcpus);
+>  	perf_test_destroy_vm(vm);
+>  }
+> diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
+> index eaa88df0555a..536d7c3c3f14 100644
+> --- a/tools/testing/selftests/kvm/include/perf_test_util.h
+> +++ b/tools/testing/selftests/kvm/include/perf_test_util.h
+> @@ -40,6 +40,9 @@ struct perf_test_args {
+>  	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
+>  	bool nested;
+>  
+> +	/* Test is done, stop running vCPUs. */
+> +	bool stop_vcpus;
+> +
+>  	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
+>  };
+>  
+> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> index 9618b37c66f7..ee3f499ccbd2 100644
+> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> @@ -267,6 +267,7 @@ void perf_test_start_vcpu_threads(int nr_vcpus,
+>  
+>  	vcpu_thread_fn = vcpu_fn;
+>  	WRITE_ONCE(all_vcpu_threads_running, false);
+> +	WRITE_ONCE(perf_test_args.stop_vcpus, false);
+>  
+>  	for (i = 0; i < nr_vcpus; i++) {
+>  		struct vcpu_thread *vcpu = &vcpu_threads[i];
+> @@ -289,6 +290,8 @@ void perf_test_join_vcpu_threads(int nr_vcpus)
+>  {
+>  	int i;
+>  
+> +	WRITE_ONCE(perf_test_args.stop_vcpus, true);
+> +
+>  	for (i = 0; i < nr_vcpus; i++)
+>  		pthread_join(vcpu_threads[i].thread, NULL);
+>  }
+> diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+> index bb1d17a1171b..3a5e4518307c 100644
+> --- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+> +++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+> @@ -34,8 +34,6 @@
+>  static int nr_vcpus = 1;
+>  static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
+>  
+> -static bool run_vcpus = true;
+> -
+>  static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
+>  {
+>  	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
+> @@ -45,7 +43,7 @@ static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
+>  	run = vcpu->run;
+>  
+>  	/* Let the guest access its memory until a stop signal is received */
+> -	while (READ_ONCE(run_vcpus)) {
+> +	while (!READ_ONCE(perf_test_args.stop_vcpus)) {
+>  		ret = _vcpu_run(vcpu);
+>  		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
+>  
+> @@ -110,8 +108,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  	add_remove_memslot(vm, p->memslot_modification_delay,
+>  			   p->nr_memslot_modifications);
+>  
+> -	run_vcpus = false;
+> -
+>  	perf_test_join_vcpu_threads(nr_vcpus);
+>  	pr_info("All vCPU threads joined\n");
+>  
 > 
+> base-commit: 10dbc57b5777e6938a648eb4a870bad448fcb6f5
+> -- 
 > 
 _______________________________________________
 kvmarm mailing list
