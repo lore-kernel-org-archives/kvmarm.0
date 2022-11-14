@@ -1,235 +1,118 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F0E79C9
-	for <kvmarm@lists.linux.dev>; Mon, 14 Nov 2022 17:12:52 +0000 (UTC)
-Received: by mail-pj1-f54.google.com with SMTP id f5-20020a17090a4a8500b002131bb59d61so12762490pjh.1
-        for <kvmarm@lists.linux.dev>; Mon, 14 Nov 2022 09:12:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2Gq4n5C/t1zsqZOKXkWVuXqIWklkF8rMGlYoqGLC400=;
-        b=hO7Q0TY2AdjW2SD6aH3T1YtUt0UZafhbqB0bSJCNd1xF7xWabCGu1E1fsaROX7rMfy
-         lD/V1XZSYCQTOyl4lO43R3jo9F6M7vce40/CeherGcldJjB5RPgLIfFmbrFJSzwzxfMd
-         BXd0zzNBMn6jOLrN/30xO3Bv+pdhDJfCsRTjBOieHA4HrRntn+wqabxFbaeh1JkFqtdj
-         PWcnLeRo5ToYlgDUzFSQhe4s8MjIlZhNeOUSgHtcwllrfmnWyU6cL+kEo9QD0G5XFhDa
-         8BX2PObkGRyQB3gUdAzMgkNUp4Fe9d8wBcsCgtIHFSRpLwVW6ettTS4D0Ui+DIZ5dA6I
-         tPSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2Gq4n5C/t1zsqZOKXkWVuXqIWklkF8rMGlYoqGLC400=;
-        b=MkLrxX+XEkW3o4KjT8C7tH2HbRopHJgyw5VlTGWKatDGL3BrJ8LKkOYtlXfNmmOrqu
-         1bUfBa5b59ZT9uKYQ32l6bmv9kIPIo1xxr4ylY2KcKegbORQToJurUe744RkVy3igohx
-         hmNNYfF8gSFx38F5hFeha32kI8bgp5NX9CQHmXLY1c9hbDLKJ7Yfrg/Yezaz0SZfjcUc
-         kilNbFgLmfvZ00Br4zCJAet74+3ivJLMdQH9hFzmmSzU5qzy+pFXt0zmtsIMrjLbMwbd
-         mLkdxEfPtMAtfjYGhL0tD73NdRzqw39Pj+jjIZMEOQLAXjUQsqDooeW4oYNIq7rTwOOJ
-         eYsg==
-X-Gm-Message-State: ANoB5pm3lur9W1eFgvhAVvGK7NBuYG36S4jR0Wut+5Dlz8lf9C08U0Pp
-	RcQG+hIWZjA97s3VpShxJm3f2A==
-X-Google-Smtp-Source: AA0mqf7XnNmTQkkH7vcYfSPzE2TNLhf316K5J+UMYFkTvtQuWgviRBWa4oPj+NOxyf42Em0406m3YQ==
-X-Received: by 2002:a17:902:f08a:b0:17f:8011:dd03 with SMTP id p10-20020a170902f08a00b0017f8011dd03mr250380pla.59.1668445972073;
-        Mon, 14 Nov 2022 09:12:52 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id q6-20020a17090a2dc600b0020af2411721sm6689583pjm.34.2022.11.14.09.12.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Nov 2022 09:12:51 -0800 (PST)
-Date: Mon, 14 Nov 2022 17:12:48 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3D1749D
+	for <kvmarm@lists.linux.dev>; Mon, 14 Nov 2022 17:42:17 +0000 (UTC)
+Date: Mon, 14 Nov 2022 17:42:05 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1668447730;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=81grqjfzDbXvj/kXaN38dFg6IyEuzMGxJS1cZ3BwExg=;
+	b=BYYs+S93PrA9vVkBPWsRJ92HUs5Bu24WxHWBumocLkBoLuv73fHHvwn4/0+o2MapvGeTyT
+	RPXB5tTSzzkHJlhJt2zzpoKv+E3mEZPegjVH8mRb1KektxarogfmLvmou14ILn5UAplWns
+	JjLprqhlcu/VJzDptSMXok7eHx8HAnk=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marek Szyprowski <m.szyprowski@samsung.com>
 Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
-	David Matlack <dmatlack@google.com>, kvmarm@lists.cs.columbia.edu,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 1/2] KVM: selftests: Allow >1 guest mode in
- access_tracking_perf_test
-Message-ID: <Y3J3EH74B6yafeqm@google.com>
-References: <20221111231946.944807-1-oliver.upton@linux.dev>
- <20221111231946.944807-2-oliver.upton@linux.dev>
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	David Matlack <dmatlack@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
+	Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
+	Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v5 08/14] KVM: arm64: Protect stage-2 traversal with RCU
+Message-ID: <Y3J97ZTef8HLUv4i@google.com>
+References: <20221107215644.1895162-1-oliver.upton@linux.dev>
+ <20221107215644.1895162-9-oliver.upton@linux.dev>
+ <CGME20221114142915eucas1p258f3ca2c536bde712c068e96851468fd@eucas1p2.samsung.com>
+ <d9854277-0411-8169-9e8b-68d15e4c0248@samsung.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20221111231946.944807-2-oliver.upton@linux.dev>
-Message-ID: <20221114171248.bR4bpNhmCwxCze3QwjxU1r857XFfQzM0YOmwrfDwAgw@z>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d9854277-0411-8169-9e8b-68d15e4c0248@samsung.com>
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <20221114174205.JUDyxZ6DJOnxY-V93cK6Pg9lEHSW25kxoRM3UtKtEmA@z>
 
-On Fri, Nov 11, 2022, Oliver Upton wrote:
-> As the name implies, for_each_guest_mode() will run the test case for
-> all supported guest addressing modes. On x86 that doesn't amount to
-> anything, but arm64 can handle 4K, 16K, and 64K page sizes on supporting
-> hardware.
+Hi Marek,
+
+On Mon, Nov 14, 2022 at 03:29:14PM +0100, Marek Szyprowski wrote:
+> This patch landed in today's linux-next (20221114) as commit 
+> c3119ae45dfb ("KVM: arm64: Protect stage-2 traversal with RCU"). 
+> Unfortunately it introduces a following warning:
+
+Thanks for the bug report :) I had failed to test nVHE in the past few
+revisions of this series.
+
+> --->8---
 > 
-> Blindly attempting to run access_tracking_perf_test on arm64 stalls on
-> the second test case, as the 'done' global remains set between test
-> iterations. Clear it after VM teardown in anticipation of a subsequent
-> test case.
+> kvm [1]: IPA Size Limit: 40 bits
+> BUG: sleeping function called from invalid context at 
+> include/linux/sched/mm.h:274
+> in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 1, name: swapper/0
+> preempt_count: 0, expected: 0
+> RCU nest depth: 1, expected: 0
+> 2 locks held by swapper/0/1:
+>   #0: ffff80000a8a44d0 (kvm_hyp_pgd_mutex){+.+.}-{3:3}, at: 
+> __create_hyp_mappings+0x80/0xc4
+>   #1: ffff80000a927720 (rcu_read_lock){....}-{1:2}, at: 
+> kvm_pgtable_walk+0x0/0x1f4
+> CPU: 2 PID: 1 Comm: swapper/0 Not tainted 6.1.0-rc3+ #5918
+> Hardware name: Raspberry Pi 3 Model B (DT)
+> Call trace:
+>   dump_backtrace.part.0+0xe4/0xf0
+>   show_stack+0x18/0x40
+>   dump_stack_lvl+0x8c/0xb8
+>   dump_stack+0x18/0x34
+>   __might_resched+0x178/0x220
+>   __might_sleep+0x48/0xa0
+>   prepare_alloc_pages+0x178/0x1a0
+>   __alloc_pages+0x9c/0x109c
+>   alloc_page_interleave+0x1c/0xc4
+>   alloc_pages+0xec/0x160
+>   get_zeroed_page+0x1c/0x44
+>   kvm_hyp_zalloc_page+0x14/0x20
+>   hyp_map_walker+0xd4/0x134
+>   kvm_pgtable_visitor_cb.isra.0+0x38/0x5c
+>   __kvm_pgtable_walk+0x1a4/0x220
+>   kvm_pgtable_walk+0x104/0x1f4
+>   kvm_pgtable_hyp_map+0x80/0xc4
+>   __create_hyp_mappings+0x9c/0xc4
+>   kvm_mmu_init+0x144/0x1cc
+>   kvm_arch_init+0xe4/0xef4
+>   kvm_init+0x3c/0x3d0
+>   arm_init+0x20/0x30
+>   do_one_initcall+0x74/0x400
+>   kernel_init_freeable+0x2e0/0x350
+>   kernel_init+0x24/0x130
+>   ret_from_fork+0x10/0x20
+> kvm [1]: Hyp mode initialized successfully
 > 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  tools/testing/selftests/kvm/access_tracking_perf_test.c | 3 +++
->  1 file changed, 3 insertions(+)
+> --->8----
 > 
-> diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> index 76c583a07ea2..4da066479e0a 100644
-> --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> @@ -326,6 +326,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  
->  	perf_test_join_vcpu_threads(nr_vcpus);
->  	perf_test_destroy_vm(vm);
-> +
-> +	/* Clear done in anticipation of testing another guest mode */
-> +	done = false;
+> I looks that more changes in the KVM code are needed to use RCU for that 
+> code.
 
-Can we fix this in the so called "perf_test" infrastructure?
-memslot_modification_stress_test.c has the same bug just inverted (see run_vcpus).
+Right, the specific issue is that while the stage-2 walkers preallocate
+any table memory they may need, the hyp walkers do not and allocate
+inline.
 
-E.g. (compile tested only)
+As hyp stage-1 is protected by a spinlock there is no actual need for
+RCU in that case. I'll post something later on today that addresses the
+issue.
 
----
- .../selftests/kvm/access_tracking_perf_test.c | 28 +++++--------------
- .../selftests/kvm/include/perf_test_util.h    |  3 ++
- .../selftests/kvm/lib/perf_test_util.c        |  3 ++
- .../kvm/memslot_modification_stress_test.c    |  6 +---
- 4 files changed, 14 insertions(+), 26 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-index 76c583a07ea2..786bc62a2c79 100644
---- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-+++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-@@ -58,9 +58,6 @@ static enum {
- 	ITERATION_MARK_IDLE,
- } iteration_work;
- 
--/* Set to true when vCPU threads should exit. */
--static bool done;
--
- /* The iteration that was last completed by each vCPU. */
- static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
- 
-@@ -206,28 +203,20 @@ static void assert_ucall(struct kvm_vcpu *vcpu, uint64_t expected_ucall)
- 		    expected_ucall, actual_ucall);
- }
- 
--static bool spin_wait_for_next_iteration(int *current_iteration)
--{
--	int last_iteration = *current_iteration;
--
--	do {
--		if (READ_ONCE(done))
--			return false;
--
--		*current_iteration = READ_ONCE(iteration);
--	} while (last_iteration == *current_iteration);
--
--	return true;
--}
--
- static void vcpu_thread_main(struct perf_test_vcpu_args *vcpu_args)
- {
- 	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
- 	struct kvm_vm *vm = perf_test_args.vm;
- 	int vcpu_idx = vcpu_args->vcpu_idx;
- 	int current_iteration = 0;
-+	int last_iteration;
-+
-+	while (!READ_ONCE(perf_test_args.stop_vcpus)) {
-+		last_iteration = current_iteration;
-+		do {
-+			current_iteration = READ_ONCE(iteration);
-+		} while (current_iteration == last_iteration);
- 
--	while (spin_wait_for_next_iteration(&current_iteration)) {
- 		switch (READ_ONCE(iteration_work)) {
- 		case ITERATION_ACCESS_MEMORY:
- 			vcpu_run(vcpu);
-@@ -321,9 +310,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	mark_memory_idle(vm, nr_vcpus);
- 	access_memory(vm, nr_vcpus, ACCESS_READ, "Reading from idle memory");
- 
--	/* Set done to signal the vCPU threads to exit */
--	done = true;
--
- 	perf_test_join_vcpu_threads(nr_vcpus);
- 	perf_test_destroy_vm(vm);
- }
-diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-index eaa88df0555a..536d7c3c3f14 100644
---- a/tools/testing/selftests/kvm/include/perf_test_util.h
-+++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-@@ -40,6 +40,9 @@ struct perf_test_args {
- 	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
- 	bool nested;
- 
-+	/* Test is done, stop running vCPUs. */
-+	bool stop_vcpus;
-+
- 	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
- };
- 
-diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-index 9618b37c66f7..ee3f499ccbd2 100644
---- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-+++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-@@ -267,6 +267,7 @@ void perf_test_start_vcpu_threads(int nr_vcpus,
- 
- 	vcpu_thread_fn = vcpu_fn;
- 	WRITE_ONCE(all_vcpu_threads_running, false);
-+	WRITE_ONCE(perf_test_args.stop_vcpus, false);
- 
- 	for (i = 0; i < nr_vcpus; i++) {
- 		struct vcpu_thread *vcpu = &vcpu_threads[i];
-@@ -289,6 +290,8 @@ void perf_test_join_vcpu_threads(int nr_vcpus)
- {
- 	int i;
- 
-+	WRITE_ONCE(perf_test_args.stop_vcpus, true);
-+
- 	for (i = 0; i < nr_vcpus; i++)
- 		pthread_join(vcpu_threads[i].thread, NULL);
- }
-diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-index bb1d17a1171b..3a5e4518307c 100644
---- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-+++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-@@ -34,8 +34,6 @@
- static int nr_vcpus = 1;
- static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
- 
--static bool run_vcpus = true;
--
- static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
- {
- 	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
-@@ -45,7 +43,7 @@ static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
- 	run = vcpu->run;
- 
- 	/* Let the guest access its memory until a stop signal is received */
--	while (READ_ONCE(run_vcpus)) {
-+	while (!READ_ONCE(perf_test_args.stop_vcpus)) {
- 		ret = _vcpu_run(vcpu);
- 		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
- 
-@@ -110,8 +108,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	add_remove_memslot(vm, p->memslot_modification_delay,
- 			   p->nr_memslot_modifications);
- 
--	run_vcpus = false;
--
- 	perf_test_join_vcpu_threads(nr_vcpus);
- 	pr_info("All vCPU threads joined\n");
- 
-
-base-commit: 10dbc57b5777e6938a648eb4a870bad448fcb6f5
--- 
-
+--
+Thanks,
+Oliver
