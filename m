@@ -2,60 +2,57 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D34B4C4332F
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Nov 2022 17:42:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 164B6C433FE
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Nov 2022 18:44:26 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 39DD74B9C7;
-	Mon, 14 Nov 2022 12:42:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E1B64B95C;
+	Mon, 14 Nov 2022 13:44:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id B1jcsmPkj1OS; Mon, 14 Nov 2022 12:42:13 -0500 (EST)
+	with ESMTP id LYOCmmE3EBd5; Mon, 14 Nov 2022 13:44:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E54584B9E3;
-	Mon, 14 Nov 2022 12:42:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 134404B96B;
+	Mon, 14 Nov 2022 13:44:25 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DCCA54B9C7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 12:42:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 08B034B95A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 13:44:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JB4Ny2DWsqvc for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Nov 2022 12:42:11 -0500 (EST)
+ with ESMTP id 8Rz4-cqMta52 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Nov 2022 13:44:17 -0500 (EST)
 Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A35874B97E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 12:42:11 -0500 (EST)
-Date: Mon, 14 Nov 2022 17:42:05 +0000
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BA3D24B94A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 13:44:17 -0500 (EST)
+Date: Mon, 14 Nov 2022 18:42:36 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1668447730;
+ t=1668451368;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=81grqjfzDbXvj/kXaN38dFg6IyEuzMGxJS1cZ3BwExg=;
- b=BYYs+S93PrA9vVkBPWsRJ92HUs5Bu24WxHWBumocLkBoLuv73fHHvwn4/0+o2MapvGeTyT
- RPXB5tTSzzkHJlhJt2zzpoKv+E3mEZPegjVH8mRb1KektxarogfmLvmou14ILn5UAplWns
- JjLprqhlcu/VJzDptSMXok7eHx8HAnk=
+ bh=X+U+NJNCu/c8YMS1IS3cNEP5WXAs5yXLq4otDmEC+Mo=;
+ b=dk40lOcyHXzcVC3i95Xna883cfotKgSWyiRtvWC6evDFfwVPNAFBDv9AA+y1Pq06w1EGdR
+ Ty9O0T9QfCKo0KVkhpCMHiQQ/YGjd7XJnUk2VBf3BMEG3rdzn6qDAJ2sQJXP34DolZL/gs
+ nTTlkMDV0XzfXD7RxOyOnQRslvOW/Xk=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Subject: Re: [PATCH v5 08/14] KVM: arm64: Protect stage-2 traversal with RCU
-Message-ID: <Y3J97ZTef8HLUv4i@google.com>
-References: <20221107215644.1895162-1-oliver.upton@linux.dev>
- <20221107215644.1895162-9-oliver.upton@linux.dev>
- <CGME20221114142915eucas1p258f3ca2c536bde712c068e96851468fd@eucas1p2.samsung.com>
- <d9854277-0411-8169-9e8b-68d15e4c0248@samsung.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [RFC PATCH 00/12] KVM: arm64: Eager huge-page splitting for
+ dirty-logging
+Message-ID: <Y3KMHGvIEuwhU1wS@google.com>
+References: <20221112081714.2169495-1-ricarkol@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <d9854277-0411-8169-9e8b-68d15e4c0248@samsung.com>
+In-Reply-To: <20221112081714.2169495-1-ricarkol@google.com>
 X-Migadu-Flow: FLOW_OUT
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
- Ben Gardon <bgardon@google.com>, David Matlack <dmatlack@google.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: ricarkol@gmail.com, kvm@vger.kernel.org, catalin.marinas@arm.com,
+ kvmarm@lists.linux.dev, andrew.jones@linux.dev, bgardon@google.com,
+ maz@kernel.org, dmatlack@google.com, pbonzini@redhat.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,86 +64,82 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marek,
+Hi Ricardo,
 
-On Mon, Nov 14, 2022 at 03:29:14PM +0100, Marek Szyprowski wrote:
-> This patch landed in today's linux-next (20221114) as commit =
+On Sat, Nov 12, 2022 at 08:17:02AM +0000, Ricardo Koller wrote:
+> Hi,
+> 
+> I'm sending this RFC mainly to get some early feedback on the approach used
+> for implementing "Eager Page Splitting" on ARM.  "Eager Page Splitting"
+> improves the performance of dirty-logging (used in live migrations) when
+> guest memory is backed by huge-pages.  It's an optimization used in Google
+> Cloud since 2016 on x86, and for the last couple of months on ARM.
+> 
+> I tried multiple ways of implementing this optimization on ARM: from
+> completely reusing the stage2 mapper, to implementing a new walker from
+> scratch, and some versions in between. This RFC is one of those in
+> between. They all have similar performance benefits, based on some light
+> performance testing (mainly dirty_log_perf_test).
+> 
+> Background and motivation
+> =========================
+> Dirty logging is typically used for live-migration iterative copying.  KVM
+> implements dirty-logging at the PAGE_SIZE granularity (will refer to 4K
+> pages from now on).  It does it by faulting on write-protected 4K pages.
+> Therefore, enabling dirty-logging on a huge-page requires breaking it into
+> 4K pages in the first place.  KVM does this breaking on fault, and because
+> it's in the critical path it only maps the 4K page that faulted; every
+> other 4K page is left unmapped.  This is not great for performance on ARM
+> for a couple of reasons:
+> 
+> - Splitting on fault can halt vcpus for milliseconds in some
+>   implementations. Splitting a block PTE requires using a broadcasted TLB
+>   invalidation (TLBI) for every huge-page (due to the break-before-make
+>   requirement). Note that x86 doesn't need this. We observed some
+>   implementations that take millliseconds to complete broadcasted TLBIs
+>   when done in parallel from multiple vcpus.  And that's exactly what
+>   happens when doing it on fault: multiple vcpus fault at the same time
+>   triggering TLBIs in parallel.
+> 
+> - Read intensive guest workloads end up paying for dirty-logging.  Only
+>   mapping the faulting 4K page means that all the other pages that were
+>   part of the huge-page will now be unmapped. The effect is that any
+>   access, including reads, now has to fault.
+> 
+> Eager Page Splitting (on ARM)
+> =============================
+> Eager Page Splitting fixes the above two issues by eagerly splitting
+> huge-pages when enabling dirty logging. The goal is to avoid doing it while
+> faulting on write-protected pages. This is what the TDP MMU does for x86
+> [0], except that x86 does it for different reasons: to avoid grabbing the
+> MMU lock on fault. Note that taking care of write-protection faults still
+> requires grabbing the MMU lock on ARM, but not on x86 (with the
+> fast_page_fault path).
+> 
+> An additional benefit of eagerly splitting huge-pages is that it can be
+> done in a controlled way (e.g., via an IOCTL). This series provides two
+> knobs for doing it, just like its x86 counterpart: when enabling dirty
+> logging, and when using the KVM_CLEAR_DIRTY_LOG ioctl. The benefit of doing
+> it on KVM_CLEAR_DIRTY_LOG is that this ioctl takes ranges, and not complete
+> memslots like when enabling dirty logging. This means that the cost of
+> splitting (mainly broadcasted TLBIs) can be throttled: split a range, wait
+> for a bit, split another range, etc. The benefits of this approach were
+> presented by Oliver Upton at KVM Forum 2022 [1].
+> 
+> Implementation
+> ==============
+> Patches 1-4 add a pgtable utility function for splitting huge block PTEs:
+> kvm_pgtable_stage2_split(). Patches 5-6 add support for not doing
+> break-before-make on huge-page breaking when FEAT_BBM level 2 is supported.
 
-> c3119ae45dfb ("KVM: arm64: Protect stage-2 traversal with RCU"). =
-
-> Unfortunately it introduces a following warning:
-
-Thanks for the bug report :) I had failed to test nVHE in the past few
-revisions of this series.
-
-> --->8---
-> =
-
-> kvm [1]: IPA Size Limit: 40 bits
-> BUG: sleeping function called from invalid context at =
-
-> include/linux/sched/mm.h:274
-> in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 1, name: swapper/0
-> preempt_count: 0, expected: 0
-> RCU nest depth: 1, expected: 0
-> 2 locks held by swapper/0/1:
->  =A0#0: ffff80000a8a44d0 (kvm_hyp_pgd_mutex){+.+.}-{3:3}, at: =
-
-> __create_hyp_mappings+0x80/0xc4
->  =A0#1: ffff80000a927720 (rcu_read_lock){....}-{1:2}, at: =
-
-> kvm_pgtable_walk+0x0/0x1f4
-> CPU: 2 PID: 1 Comm: swapper/0 Not tainted 6.1.0-rc3+ #5918
-> Hardware name: Raspberry Pi 3 Model B (DT)
-> Call trace:
->  =A0dump_backtrace.part.0+0xe4/0xf0
->  =A0show_stack+0x18/0x40
->  =A0dump_stack_lvl+0x8c/0xb8
->  =A0dump_stack+0x18/0x34
->  =A0__might_resched+0x178/0x220
->  =A0__might_sleep+0x48/0xa0
->  =A0prepare_alloc_pages+0x178/0x1a0
->  =A0__alloc_pages+0x9c/0x109c
->  =A0alloc_page_interleave+0x1c/0xc4
->  =A0alloc_pages+0xec/0x160
->  =A0get_zeroed_page+0x1c/0x44
->  =A0kvm_hyp_zalloc_page+0x14/0x20
->  =A0hyp_map_walker+0xd4/0x134
->  =A0kvm_pgtable_visitor_cb.isra.0+0x38/0x5c
->  =A0__kvm_pgtable_walk+0x1a4/0x220
->  =A0kvm_pgtable_walk+0x104/0x1f4
->  =A0kvm_pgtable_hyp_map+0x80/0xc4
->  =A0__create_hyp_mappings+0x9c/0xc4
->  =A0kvm_mmu_init+0x144/0x1cc
->  =A0kvm_arch_init+0xe4/0xef4
->  =A0kvm_init+0x3c/0x3d0
->  =A0arm_init+0x20/0x30
->  =A0do_one_initcall+0x74/0x400
->  =A0kernel_init_freeable+0x2e0/0x350
->  =A0kernel_init+0x24/0x130
->  =A0ret_from_fork+0x10/0x20
-> kvm [1]: Hyp mode initialized successfully
-> =
-
-> --->8----
-> =
-
-> I looks that more changes in the KVM code are needed to use RCU for that =
-
-> code.
-
-Right, the specific issue is that while the stage-2 walkers preallocate
-any table memory they may need, the hyp walkers do not and allocate
-inline.
-
-As hyp stage-1 is protected by a spinlock there is no actual need for
-RCU in that case. I'll post something later on today that addresses the
-issue.
+I would suggest you split up FEAT_BBM=2 and eager page splitting into
+two separate series, if possible. IMO, the eager page split is easier to
+reason about if it follows the existing pattern of break-before-make.
 
 --
 Thanks,
