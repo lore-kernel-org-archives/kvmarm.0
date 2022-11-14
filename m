@@ -1,333 +1,235 @@
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7464C78
-	for <kvmarm@lists.linux.dev>; Mon, 14 Nov 2022 14:29:17 +0000 (UTC)
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20221114142915euoutp013d44c6eb92e894f9aa5b3b83d18088f9~nedgN88Oz2419624196euoutp010
-	for <kvmarm@lists.linux.dev>; Mon, 14 Nov 2022 14:29:15 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20221114142915euoutp013d44c6eb92e894f9aa5b3b83d18088f9~nedgN88Oz2419624196euoutp010
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1668436155;
-	bh=tH7IvdpIRni8xd8mM+dKwkwd+lFrflP2wBRHEgT3wJc=;
-	h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-	b=BrzQkGfeLACul2lUmFt9c4BJ7/IxGcp/unQxzgG207NLWpgGKGfYGz3CTQ/6VNrAn
-	 j+P5rXoPpQKodlYfFgDOq0FxgfyGRqghIu3wSuxAg50FQFuFAfGC2rR2MTK2egW3CX
-	 i9avjRJDcwXPWvlkEXrMvQ2GJXTRQZxBxWVyJH4c=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20221114142915eucas1p19dbfd418578d2c55d92133788422a21b~nedf3wAAz2164621646eucas1p1q;
-	Mon, 14 Nov 2022 14:29:15 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges1new.samsung.com (EUCPMTA) with SMTP id AC.B3.09561.BB052736; Mon, 14
-	Nov 2022 14:29:15 +0000 (GMT)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20221114142915eucas1p258f3ca2c536bde712c068e96851468fd~nedffZu6s1272912729eucas1p2d;
-	Mon, 14 Nov 2022 14:29:15 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20221114142915eusmtrp2eb2cd8603adfc2795efcc4618842ba77~nedfeZvH42331123311eusmtrp2W;
-	Mon, 14 Nov 2022 14:29:15 +0000 (GMT)
-X-AuditID: cbfec7f2-0b3ff70000002559-b2-637250bbe67a
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-	eusmgms1.samsung.com (EUCPMTA) with SMTP id 08.6A.08916.AB052736; Mon, 14
-	Nov 2022 14:29:14 +0000 (GMT)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20221114142914eusmtip150f1cfb9b1e92f0c95d56aa3760fc365~nedepCj391861518615eusmtip1i;
-	Mon, 14 Nov 2022 14:29:14 +0000 (GMT)
-Message-ID: <d9854277-0411-8169-9e8b-68d15e4c0248@samsung.com>
-Date: Mon, 14 Nov 2022 15:29:14 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F0E79C9
+	for <kvmarm@lists.linux.dev>; Mon, 14 Nov 2022 17:12:52 +0000 (UTC)
+Received: by mail-pj1-f54.google.com with SMTP id f5-20020a17090a4a8500b002131bb59d61so12762490pjh.1
+        for <kvmarm@lists.linux.dev>; Mon, 14 Nov 2022 09:12:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Gq4n5C/t1zsqZOKXkWVuXqIWklkF8rMGlYoqGLC400=;
+        b=hO7Q0TY2AdjW2SD6aH3T1YtUt0UZafhbqB0bSJCNd1xF7xWabCGu1E1fsaROX7rMfy
+         lD/V1XZSYCQTOyl4lO43R3jo9F6M7vce40/CeherGcldJjB5RPgLIfFmbrFJSzwzxfMd
+         BXd0zzNBMn6jOLrN/30xO3Bv+pdhDJfCsRTjBOieHA4HrRntn+wqabxFbaeh1JkFqtdj
+         PWcnLeRo5ToYlgDUzFSQhe4s8MjIlZhNeOUSgHtcwllrfmnWyU6cL+kEo9QD0G5XFhDa
+         8BX2PObkGRyQB3gUdAzMgkNUp4Fe9d8wBcsCgtIHFSRpLwVW6ettTS4D0Ui+DIZ5dA6I
+         tPSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2Gq4n5C/t1zsqZOKXkWVuXqIWklkF8rMGlYoqGLC400=;
+        b=MkLrxX+XEkW3o4KjT8C7tH2HbRopHJgyw5VlTGWKatDGL3BrJ8LKkOYtlXfNmmOrqu
+         1bUfBa5b59ZT9uKYQ32l6bmv9kIPIo1xxr4ylY2KcKegbORQToJurUe744RkVy3igohx
+         hmNNYfF8gSFx38F5hFeha32kI8bgp5NX9CQHmXLY1c9hbDLKJ7Yfrg/Yezaz0SZfjcUc
+         kilNbFgLmfvZ00Br4zCJAet74+3ivJLMdQH9hFzmmSzU5qzy+pFXt0zmtsIMrjLbMwbd
+         mLkdxEfPtMAtfjYGhL0tD73NdRzqw39Pj+jjIZMEOQLAXjUQsqDooeW4oYNIq7rTwOOJ
+         eYsg==
+X-Gm-Message-State: ANoB5pm3lur9W1eFgvhAVvGK7NBuYG36S4jR0Wut+5Dlz8lf9C08U0Pp
+	RcQG+hIWZjA97s3VpShxJm3f2A==
+X-Google-Smtp-Source: AA0mqf7XnNmTQkkH7vcYfSPzE2TNLhf316K5J+UMYFkTvtQuWgviRBWa4oPj+NOxyf42Em0406m3YQ==
+X-Received: by 2002:a17:902:f08a:b0:17f:8011:dd03 with SMTP id p10-20020a170902f08a00b0017f8011dd03mr250380pla.59.1668445972073;
+        Mon, 14 Nov 2022 09:12:52 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id q6-20020a17090a2dc600b0020af2411721sm6689583pjm.34.2022.11.14.09.12.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Nov 2022 09:12:51 -0800 (PST)
+Date: Mon, 14 Nov 2022 17:12:48 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
+	David Matlack <dmatlack@google.com>, kvmarm@lists.cs.columbia.edu,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 1/2] KVM: selftests: Allow >1 guest mode in
+ access_tracking_perf_test
+Message-ID: <Y3J3EH74B6yafeqm@google.com>
+References: <20221111231946.944807-1-oliver.upton@linux.dev>
+ <20221111231946.944807-2-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0)
-	Gecko/20100101 Thunderbird/102.4.2
-Subject: Re: [PATCH v5 08/14] KVM: arm64: Protect stage-2 traversal with RCU
-Content-Language: en-US
-To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>, Alexandru Elisei
-	<alexandru.elisei@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>, Ricardo Koller
-	<ricarkol@google.com>, David Matlack <dmatlack@google.com>, Quentin Perret
-	<qperret@google.com>, Ben Gardon <bgardon@google.com>, Gavin Shan
-	<gshan@redhat.com>, Peter Xu <peterx@redhat.com>, Will Deacon
-	<will@kernel.org>, Sean Christopherson <seanjc@google.com>,
-	kvmarm@lists.linux.dev
-From: Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <20221107215644.1895162-9-oliver.upton@linux.dev>
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrIKsWRmVeSWpSXmKPExsWy7djP87q7A4qSDW7NFLeYvvIym8WyC/IW
-	kxubWSxe7trGZHF/33ImizlTCy0+njrObvFqy2EWi02Pr7Fa7JxzktVi6s83bBZb9n9jtziz
-	aRuLxd6GGWwWe9c8Z7E4ev4Wk0XLHVMHQY8189YweizYVOqxaVUnm8fChqnMHuc3rWH22Lyk
-	3uPF5pmMHu/3XWXz+LxJLoAzissmJTUnsyy1SN8ugSvj5vdbjAV91hX3eyexNzCuM+hi5OSQ
-	EDCReNSygK2LkYtDSGAFo8Ta+9OZIJwvjBJTf7SwQDifGSWOdn9lg2n5OP8DK0RiOaPEhWON
-	zCAJIYGPjBK/PgiD2LwCdhI9B/+DxVkEVCUunp/EAhEXlDg58wmYLSqQIrFwyw0mEFtYwEei
-	/9YfMJtZQFzi1pP5YGeICMxhlLg68QnYNmaBncwSjzr6wKrYBAwlut52gZ3ECbTtxtKFrBDd
-	8hLNW2czgzRICBzmlPj8ZgLU3S4SF3bcY4ewhSVeHd8CZctI/N8JsU5CoJ1RYsHv+1DOBEaJ
-	hue3GCGqrCXunPsFNIkDaIWmxPpd+hBhR4mJP6exgIQlBPgkbrwVhDiCT2LStunMEGFeiY42
-	IYhqNYlZx9fBrT144RLzBEalWUgBMwspAGYheWcWwt4FjCyrGMVTS4tz01OLDfNSy/WKE3OL
-	S/PS9ZLzczcxAlPh6X/HP+1gnPvqo94hRiYOxkOMEhzMSiK882Tyk4V4UxIrq1KL8uOLSnNS
-	iw8xSnOwKInzss3QShYSSE8sSc1OTS1ILYLJMnFwSjUw9XkWhoWIL69oNuOSkTe8HPSnrfHp
-	Qk5OBc5dd7/X/xJwO8YgudaRabuG/445IU/Tlc0ZXfdZmQf0nwxve+b6hC9ewqn/01Xpj+4T
-	s5ivLQ/9tI3zjkFmhdqt6+6srELXFW14rsfcn3r20r+53/9ptCyatCKD9W2z47YXRX8d1v/d
-	vz32tPAf07u3mKPnWeauX3IhaW7apoLpD01XLywuW5Fi3+W2r4TlpubOnsXrBOWPGWzJm/Zx
-	zdT6DV+3rCp9bXapVqi94fKOF1ua5b2VFeNm3vnFqCRz//kRzT3BF17feMK17OqflIjAm3ss
-	fSacTnd4aTDVr1mEMfSEfFLxmvKl6Tafnl/S2uucE1SooMRSnJFoqMVcVJwIAMbVT2n0AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrEIsWRmVeSWpSXmKPExsVy+t/xu7q7AoqSDVYdM7eYvvIym8WyC/IW
-	kxubWSxe7trGZHF/33ImizlTCy0+njrObvFqy2EWi02Pr7Fa7JxzktVi6s83bBZb9n9jtziz
-	aRuLxd6GGWwWe9c8Z7E4ev4Wk0XLHVMHQY8189YweizYVOqxaVUnm8fChqnMHuc3rWH22Lyk
-	3uPF5pmMHu/3XWXz+LxJLoAzSs+mKL+0JFUhI7+4xFYp2tDCSM/Q0kLPyMRSz9DYPNbKyFRJ
-	384mJTUnsyy1SN8uQS/j5vdbjAV91hX3eyexNzCuM+hi5OSQEDCR+Dj/A2sXIxeHkMBSRonT
-	s+YzQyRkJE5Oa2CFsIUl/lzrYoMoes8oMXfiC0aQBK+AnUTPwf9gDSwCqhIXz09igYgLSpyc
-	+QTI5uAQFUiRWHckCiQsLOAj0X/rDxOIzSwgLnHryXwmkJkiAnMYJTbfmskI4jAL7GSW2HTi
-	NTtIlZBAocTuu6vBFrAJGEp0vQW5gpODE2jxjaULWSEmmUl0be1ihLDlJZq3zmaewCg0C8kd
-	s5AsnIWkZRaSlgWMLKsYRVJLi3PTc4sN9YoTc4tL89L1kvNzNzECI3/bsZ+bdzDOe/VR7xAj
-	EwfjIUYJDmYlEd55MvnJQrwpiZVVqUX58UWlOanFhxhNgYExkVlKNDkfmHrySuINzQxMDU3M
-	LA1MLc2MlcR5PQs6EoUE0hNLUrNTUwtSi2D6mDg4pRqYYi+dXblJyi09uyFtTn5uEItr5R23
-	jLnF+eyJ/7Kny1w/95lP+kDW117Opp3P111I5rvpn7XW037iT0urnw45n1ctM989eepu5hm8
-	N/mkqi1PMlbKvlvYKcYmIsBzbVWV1NmoaasCVvjO4XedFCbi93RNjlJJHk/At3c3k33e7Hu3
-	LP3gLW7TG475vAtq7Yx2nem5zPxE6PGvRuk7c07lXjsreFG8PL3vOY/OsV89JhnyyQfaexQV
-	/S7IOKsmsZ/zE72izal/8Pmn3i4tq7f7w1uXMGmWr7ylto7b89i1WzK3Xpqs/+jQ4Wj2t07A
-	4sy/PVVlAkt2yZw4ULKH1T7uetbLSTfuGX4T3uX1pyRCiaU4I9FQi7moOBEAdwTikYUDAAA=
-X-CMS-MailID: 20221114142915eucas1p258f3ca2c536bde712c068e96851468fd
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20221114142915eucas1p258f3ca2c536bde712c068e96851468fd
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20221114142915eucas1p258f3ca2c536bde712c068e96851468fd
-References: <20221107215644.1895162-1-oliver.upton@linux.dev>
-	<20221107215644.1895162-9-oliver.upton@linux.dev>
-	<CGME20221114142915eucas1p258f3ca2c536bde712c068e96851468fd@eucas1p2.samsung.com>
-Message-ID: <20221114142914.0en4dz9NIzqEsOlVuZ8w88nPwBvatnLW-OsjoJkyPI4@z>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221111231946.944807-2-oliver.upton@linux.dev>
+Message-ID: <20221114171248.bR4bpNhmCwxCze3QwjxU1r857XFfQzM0YOmwrfDwAgw@z>
 
-Hi Oliver,
-
-On 07.11.2022 22:56, Oliver Upton wrote:
-> Use RCU to safely walk the stage-2 page tables in parallel. Acquire and
-> release the RCU read lock when traversing the page tables. Defer the
-> freeing of table memory to an RCU callback. Indirect the calls into RCU
-> and provide stubs for hypervisor code, as RCU is not available in such a
-> context.
->
-> The RCU protection doesn't amount to much at the moment, as readers are
-> already protected by the read-write lock (all walkers that free table
-> memory take the write lock). Nonetheless, a subsequent change will
-> futher relax the locking requirements around the stage-2 MMU, thereby
-> depending on RCU.
->
+On Fri, Nov 11, 2022, Oliver Upton wrote:
+> As the name implies, for_each_guest_mode() will run the test case for
+> all supported guest addressing modes. On x86 that doesn't amount to
+> anything, but arm64 can handle 4K, 16K, and 64K page sizes on supporting
+> hardware.
+> 
+> Blindly attempting to run access_tracking_perf_test on arm64 stalls on
+> the second test case, as the 'done' global remains set between test
+> iterations. Clear it after VM teardown in anticipation of a subsequent
+> test case.
+> 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-
-This patch landed in today's linux-next (20221114) as commit 
-c3119ae45dfb ("KVM: arm64: Protect stage-2 traversal with RCU"). 
-Unfortunately it introduces a following warning:
-
---->8---
-
-kvm [1]: IPA Size Limit: 40 bits
-BUG: sleeping function called from invalid context at 
-include/linux/sched/mm.h:274
-in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 1, name: swapper/0
-preempt_count: 0, expected: 0
-RCU nest depth: 1, expected: 0
-2 locks held by swapper/0/1:
-  #0: ffff80000a8a44d0 (kvm_hyp_pgd_mutex){+.+.}-{3:3}, at: 
-__create_hyp_mappings+0x80/0xc4
-  #1: ffff80000a927720 (rcu_read_lock){....}-{1:2}, at: 
-kvm_pgtable_walk+0x0/0x1f4
-CPU: 2 PID: 1 Comm: swapper/0 Not tainted 6.1.0-rc3+ #5918
-Hardware name: Raspberry Pi 3 Model B (DT)
-Call trace:
-  dump_backtrace.part.0+0xe4/0xf0
-  show_stack+0x18/0x40
-  dump_stack_lvl+0x8c/0xb8
-  dump_stack+0x18/0x34
-  __might_resched+0x178/0x220
-  __might_sleep+0x48/0xa0
-  prepare_alloc_pages+0x178/0x1a0
-  __alloc_pages+0x9c/0x109c
-  alloc_page_interleave+0x1c/0xc4
-  alloc_pages+0xec/0x160
-  get_zeroed_page+0x1c/0x44
-  kvm_hyp_zalloc_page+0x14/0x20
-  hyp_map_walker+0xd4/0x134
-  kvm_pgtable_visitor_cb.isra.0+0x38/0x5c
-  __kvm_pgtable_walk+0x1a4/0x220
-  kvm_pgtable_walk+0x104/0x1f4
-  kvm_pgtable_hyp_map+0x80/0xc4
-  __create_hyp_mappings+0x9c/0xc4
-  kvm_mmu_init+0x144/0x1cc
-  kvm_arch_init+0xe4/0xef4
-  kvm_init+0x3c/0x3d0
-  arm_init+0x20/0x30
-  do_one_initcall+0x74/0x400
-  kernel_init_freeable+0x2e0/0x350
-  kernel_init+0x24/0x130
-  ret_from_fork+0x10/0x20
-kvm [1]: Hyp mode initialized successfully
-
---->8----
-
-I looks that more changes in the KVM code are needed to use RCU for that 
-code.
-
 > ---
->   arch/arm64/include/asm/kvm_pgtable.h | 49 ++++++++++++++++++++++++++++
->   arch/arm64/kvm/hyp/pgtable.c         | 10 +++++-
->   arch/arm64/kvm/mmu.c                 | 14 +++++++-
->   3 files changed, 71 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index e70cf57b719e..7634b6964779 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -37,6 +37,13 @@ static inline u64 kvm_get_parange(u64 mmfr0)
->   
->   typedef u64 kvm_pte_t;
->   
-> +/*
-> + * RCU cannot be used in a non-kernel context such as the hyp. As such, page
-> + * table walkers used in hyp do not call into RCU and instead use other
-> + * synchronization mechanisms (such as a spinlock).
-> + */
-> +#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
+>  tools/testing/selftests/kvm/access_tracking_perf_test.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> index 76c583a07ea2..4da066479e0a 100644
+> --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> @@ -326,6 +326,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  
+>  	perf_test_join_vcpu_threads(nr_vcpus);
+>  	perf_test_destroy_vm(vm);
 > +
->   typedef kvm_pte_t *kvm_pteref_t;
->   
->   static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
-> @@ -44,6 +51,40 @@ static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared
->   	return pteref;
->   }
->   
-> +static inline void kvm_pgtable_walk_begin(void) {}
-> +static inline void kvm_pgtable_walk_end(void) {}
-> +
-> +static inline bool kvm_pgtable_walk_lock_held(void)
-> +{
-> +	return true;
-> +}
-> +
-> +#else
-> +
-> +typedef kvm_pte_t __rcu *kvm_pteref_t;
-> +
-> +static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
-> +{
-> +	return rcu_dereference_check(pteref, !shared);
-> +}
-> +
-> +static inline void kvm_pgtable_walk_begin(void)
-> +{
-> +	rcu_read_lock();
-> +}
-> +
-> +static inline void kvm_pgtable_walk_end(void)
-> +{
-> +	rcu_read_unlock();
-> +}
-> +
-> +static inline bool kvm_pgtable_walk_lock_held(void)
-> +{
-> +	return rcu_read_lock_held();
-> +}
-> +
-> +#endif
-> +
->   #define KVM_PTE_VALID			BIT(0)
->   
->   #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
-> @@ -202,11 +243,14 @@ struct kvm_pgtable {
->    *					children.
->    * @KVM_PGTABLE_WALK_TABLE_POST:	Visit table entries after their
->    *					children.
-> + * @KVM_PGTABLE_WALK_SHARED:		Indicates the page-tables may be shared
-> + *					with other software walkers.
->    */
->   enum kvm_pgtable_walk_flags {
->   	KVM_PGTABLE_WALK_LEAF			= BIT(0),
->   	KVM_PGTABLE_WALK_TABLE_PRE		= BIT(1),
->   	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
-> +	KVM_PGTABLE_WALK_SHARED			= BIT(3),
->   };
->   
->   struct kvm_pgtable_visit_ctx {
-> @@ -223,6 +267,11 @@ struct kvm_pgtable_visit_ctx {
->   typedef int (*kvm_pgtable_visitor_fn_t)(const struct kvm_pgtable_visit_ctx *ctx,
->   					enum kvm_pgtable_walk_flags visit);
->   
-> +static inline bool kvm_pgtable_walk_shared(const struct kvm_pgtable_visit_ctx *ctx)
-> +{
-> +	return ctx->flags & KVM_PGTABLE_WALK_SHARED;
-> +}
-> +
->   /**
->    * struct kvm_pgtable_walker - Hook into a page-table walk.
->    * @cb:		Callback function to invoke during the walk.
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 7c9782347570..d8d963521d4e 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -171,6 +171,9 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
->   				  enum kvm_pgtable_walk_flags visit)
->   {
->   	struct kvm_pgtable_walker *walker = data->walker;
-> +
-> +	/* Ensure the appropriate lock is held (e.g. RCU lock for stage-2 MMU) */
-> +	WARN_ON_ONCE(kvm_pgtable_walk_shared(ctx) && !kvm_pgtable_walk_lock_held());
->   	return walker->cb(ctx, visit);
->   }
->   
-> @@ -281,8 +284,13 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
->   		.end	= PAGE_ALIGN(walk_data.addr + size),
->   		.walker	= walker,
->   	};
-> +	int r;
-> +
-> +	kvm_pgtable_walk_begin();
-> +	r = _kvm_pgtable_walk(pgt, &walk_data);
-> +	kvm_pgtable_walk_end();
->   
-> -	return _kvm_pgtable_walk(pgt, &walk_data);
-> +	return r;
->   }
->   
->   struct leaf_walk_data {
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 73ae908eb5d9..52e042399ba5 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -130,9 +130,21 @@ static void kvm_s2_free_pages_exact(void *virt, size_t size)
->   
->   static struct kvm_pgtable_mm_ops kvm_s2_mm_ops;
->   
-> +static void stage2_free_removed_table_rcu_cb(struct rcu_head *head)
-> +{
-> +	struct page *page = container_of(head, struct page, rcu_head);
-> +	void *pgtable = page_to_virt(page);
-> +	u32 level = page_private(page);
-> +
-> +	kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, pgtable, level);
-> +}
-> +
->   static void stage2_free_removed_table(void *addr, u32 level)
->   {
-> -	kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, addr, level);
-> +	struct page *page = virt_to_page(addr);
-> +
-> +	set_page_private(page, (unsigned long)level);
-> +	call_rcu(&page->rcu_head, stage2_free_removed_table_rcu_cb);
->   }
->   
->   static void kvm_host_get_page(void *addr)
+> +	/* Clear done in anticipation of testing another guest mode */
+> +	done = false;
 
-Best regards
+Can we fix this in the so called "perf_test" infrastructure?
+memslot_modification_stress_test.c has the same bug just inverted (see run_vcpus).
+
+E.g. (compile tested only)
+
+---
+ .../selftests/kvm/access_tracking_perf_test.c | 28 +++++--------------
+ .../selftests/kvm/include/perf_test_util.h    |  3 ++
+ .../selftests/kvm/lib/perf_test_util.c        |  3 ++
+ .../kvm/memslot_modification_stress_test.c    |  6 +---
+ 4 files changed, 14 insertions(+), 26 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+index 76c583a07ea2..786bc62a2c79 100644
+--- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
++++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+@@ -58,9 +58,6 @@ static enum {
+ 	ITERATION_MARK_IDLE,
+ } iteration_work;
+ 
+-/* Set to true when vCPU threads should exit. */
+-static bool done;
+-
+ /* The iteration that was last completed by each vCPU. */
+ static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
+ 
+@@ -206,28 +203,20 @@ static void assert_ucall(struct kvm_vcpu *vcpu, uint64_t expected_ucall)
+ 		    expected_ucall, actual_ucall);
+ }
+ 
+-static bool spin_wait_for_next_iteration(int *current_iteration)
+-{
+-	int last_iteration = *current_iteration;
+-
+-	do {
+-		if (READ_ONCE(done))
+-			return false;
+-
+-		*current_iteration = READ_ONCE(iteration);
+-	} while (last_iteration == *current_iteration);
+-
+-	return true;
+-}
+-
+ static void vcpu_thread_main(struct perf_test_vcpu_args *vcpu_args)
+ {
+ 	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
+ 	struct kvm_vm *vm = perf_test_args.vm;
+ 	int vcpu_idx = vcpu_args->vcpu_idx;
+ 	int current_iteration = 0;
++	int last_iteration;
++
++	while (!READ_ONCE(perf_test_args.stop_vcpus)) {
++		last_iteration = current_iteration;
++		do {
++			current_iteration = READ_ONCE(iteration);
++		} while (current_iteration == last_iteration);
+ 
+-	while (spin_wait_for_next_iteration(&current_iteration)) {
+ 		switch (READ_ONCE(iteration_work)) {
+ 		case ITERATION_ACCESS_MEMORY:
+ 			vcpu_run(vcpu);
+@@ -321,9 +310,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	mark_memory_idle(vm, nr_vcpus);
+ 	access_memory(vm, nr_vcpus, ACCESS_READ, "Reading from idle memory");
+ 
+-	/* Set done to signal the vCPU threads to exit */
+-	done = true;
+-
+ 	perf_test_join_vcpu_threads(nr_vcpus);
+ 	perf_test_destroy_vm(vm);
+ }
+diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
+index eaa88df0555a..536d7c3c3f14 100644
+--- a/tools/testing/selftests/kvm/include/perf_test_util.h
++++ b/tools/testing/selftests/kvm/include/perf_test_util.h
+@@ -40,6 +40,9 @@ struct perf_test_args {
+ 	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
+ 	bool nested;
+ 
++	/* Test is done, stop running vCPUs. */
++	bool stop_vcpus;
++
+ 	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
+ };
+ 
+diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+index 9618b37c66f7..ee3f499ccbd2 100644
+--- a/tools/testing/selftests/kvm/lib/perf_test_util.c
++++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+@@ -267,6 +267,7 @@ void perf_test_start_vcpu_threads(int nr_vcpus,
+ 
+ 	vcpu_thread_fn = vcpu_fn;
+ 	WRITE_ONCE(all_vcpu_threads_running, false);
++	WRITE_ONCE(perf_test_args.stop_vcpus, false);
+ 
+ 	for (i = 0; i < nr_vcpus; i++) {
+ 		struct vcpu_thread *vcpu = &vcpu_threads[i];
+@@ -289,6 +290,8 @@ void perf_test_join_vcpu_threads(int nr_vcpus)
+ {
+ 	int i;
+ 
++	WRITE_ONCE(perf_test_args.stop_vcpus, true);
++
+ 	for (i = 0; i < nr_vcpus; i++)
+ 		pthread_join(vcpu_threads[i].thread, NULL);
+ }
+diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+index bb1d17a1171b..3a5e4518307c 100644
+--- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
++++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+@@ -34,8 +34,6 @@
+ static int nr_vcpus = 1;
+ static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
+ 
+-static bool run_vcpus = true;
+-
+ static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
+ {
+ 	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
+@@ -45,7 +43,7 @@ static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
+ 	run = vcpu->run;
+ 
+ 	/* Let the guest access its memory until a stop signal is received */
+-	while (READ_ONCE(run_vcpus)) {
++	while (!READ_ONCE(perf_test_args.stop_vcpus)) {
+ 		ret = _vcpu_run(vcpu);
+ 		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
+ 
+@@ -110,8 +108,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	add_remove_memslot(vm, p->memslot_modification_delay,
+ 			   p->nr_memslot_modifications);
+ 
+-	run_vcpus = false;
+-
+ 	perf_test_join_vcpu_threads(nr_vcpus);
+ 	pr_info("All vCPU threads joined\n");
+ 
+
+base-commit: 10dbc57b5777e6938a648eb4a870bad448fcb6f5
 -- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
 
