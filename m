@@ -2,75 +2,106 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10D57C4332F
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Nov 2022 03:29:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E090C4332F
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Nov 2022 09:30:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D0334B8A9;
-	Mon, 14 Nov 2022 22:29:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 053344B8CA;
+	Tue, 15 Nov 2022 04:30:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VRaAX4bNRbIB; Mon, 14 Nov 2022 22:29:05 -0500 (EST)
+	with ESMTP id OmerKI8XIgWg; Tue, 15 Nov 2022 04:30:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EACA4B8AD;
-	Mon, 14 Nov 2022 22:29:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E6034B8E2;
+	Tue, 15 Nov 2022 04:30:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B7CE34B8A9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 22:29:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D9DB4B8DB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Nov 2022 04:30:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ew0je31NX6dR for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Nov 2022 22:29:02 -0500 (EST)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2FAE4B89C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 22:29:01 -0500 (EST)
-Received: from dggpemm500023.china.huawei.com (unknown [172.30.72.53])
- by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NBBPz29c4zqSHG;
- Tue, 15 Nov 2022 11:25:11 +0800 (CST)
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 15 Nov 2022 11:28:56 +0800
-Subject: Re: disabling halt polling broken? (was Re: [PATCH 00/14] KVM:
- Halt-polling fixes, cleanups and a new stat)
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>
-References: <20210925005528.1145584-1-seanjc@google.com>
- <03f2f5ab-e809-2ba5-bd98-3393c3b843d2@de.ibm.com>
- <YVHcY6y1GmvGJnMg@google.com>
- <f37ab68c-61ce-b6fb-7a49-831bacfc7424@redhat.com>
- <43e42f5c-9d9f-9e8b-3a61-9a053a818250@de.ibm.com>
- <CABgObfYtS6wiQe=BhF3t5usr7J6q4PWE4=rwZMMukfC9wT_6fA@mail.gmail.com>
- <YVIAdVxc+q2UWB+J@google.com>
-From: "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <32810c89-44c6-6780-9d05-e49f6b897b6e@huawei.com>
-Date: Tue, 15 Nov 2022 11:28:56 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ with ESMTP id GS9AZa6sNHEO for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Nov 2022 04:30:22 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F8204B8CA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Nov 2022 04:30:22 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1668504621;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=PI4QkJgg5xRejZYnaDkrohoS+PcA0MTFv2A75peo2zg=;
+ b=AcwCInwO9hR30N2K8Kb8YW9jottbyNINOUUeMTmj1TqPCWLZHXLCkK+XYSPZPok2OPGd9d
+ SQgbT8Xu+lpGLwgLbr5aZ9BwgSfE/RT9F8pMaePufjBXkmH7Ez3Hq1SOldLh+YtwHibUgq
+ X40Y+9x4QF9yc2maA6rxNexOQFujzv4=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-306-MvYcW0AmNtWGhJa7bp3UvQ-1; Tue, 15 Nov 2022 04:30:18 -0500
+X-MC-Unique: MvYcW0AmNtWGhJa7bp3UvQ-1
+Received: by mail-ej1-f69.google.com with SMTP id
+ hp16-20020a1709073e1000b007adf5a83df7so6913742ejc.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Nov 2022 01:30:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+ :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+ bh=PI4QkJgg5xRejZYnaDkrohoS+PcA0MTFv2A75peo2zg=;
+ b=dfogxKytqYJCzDsW0UPW0vOrXz8pcbiKmNAvuLL9MyVVshL02nCyJHX+dUJBWFcJyi
+ OmIQwuMRznTxPOg4Skn0W1IUE9ls7a6Hghozqj4bRZidXnDcS3o4whG7b4KEZ+8qUwJx
+ DHo1Upc4cgToRf+Vlbvf4giwtBfXyAVEnTu7d8lGsLrunjebAOOUNdV8u/WDtVpYyNcA
+ bFDxOpzGeYT7TvWgkaDCOr1FH3ZEtKEKzqRZ/mxemKl/eOE5ZAnsdyaZIKWQdLT6Xa5m
+ pLgwindnlQP3+B48OA86qKDXhPXDbtgNcVMzN5J0G0s00Mf5XqswbsZI0igXtcy0LWQS
+ B1Yg==
+X-Gm-Message-State: ANoB5pkHVzgbOUg4dX5g0+qM1X3OsbosIVFm5J3rumSlgr4vtVTxh2aR
+ 2WgGxjOvXnUbuMsgaBR287gJNHOGW9Z7WxpGVeAmM/rrWpejbof6dfvE8cPRhCZz802TOCL4Vao
+ l77OiBFEUxnu32mhvcWS64w15
+X-Received: by 2002:a50:fe13:0:b0:461:565e:8779 with SMTP id
+ f19-20020a50fe13000000b00461565e8779mr14489196edt.387.1668504617490; 
+ Tue, 15 Nov 2022 01:30:17 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5Zsa4CnM7XTxV75wUJGjjLzRgPV7NQ4412B1eIJSCcezAuycjNE+mpvlda5nQMKDxwK/vVkA==
+X-Received: by 2002:a50:fe13:0:b0:461:565e:8779 with SMTP id
+ f19-20020a50fe13000000b00461565e8779mr14489153edt.387.1668504617196; 
+ Tue, 15 Nov 2022 01:30:17 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+ by smtp.gmail.com with ESMTPSA id
+ ew13-20020a056402538d00b004642b35f89esm5950875edb.9.2022.11.15.01.30.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 15 Nov 2022 01:30:16 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 10/44] KVM: VMX: Clean up eVMCS enabling if KVM
+ initialization fails
+In-Reply-To: <Y22nrQ7aziK0NMOE@google.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221102231911.3107438-11-seanjc@google.com>
+ <87mt98qfi2.fsf@ovpn-194-252.brq.redhat.com> <Y22nrQ7aziK0NMOE@google.com>
+Date: Tue, 15 Nov 2022 10:30:14 +0100
+Message-ID: <87sfikmuop.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YVIAdVxc+q2UWB+J@google.com>
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
-Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- Janosch Frank <frankja@linux.ibm.com>, kvm <kvm@vger.kernel.org>,
- David Hildenbrand <david@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
- "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
- kvm-ppc <kvm-ppc@vger.kernel.org>,
- "open list:MIPS" <linux-mips@vger.kernel.org>,
- Paul Mackerras <paulus@ozlabs.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Cc: kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+ Atish Patra <atishp@atishpatra.org>, linux-kernel@vger.kernel.org,
+ linux-riscv@lists.infradead.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
+ Janosch Frank <frankja@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ Huacai Chen <chenhuacai@kernel.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Jon Cargille <jcargill@google.com>, David Matlack <dmatlack@google.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- KVM ARM <kvmarm@lists.cs.columbia.edu>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- Jim Mattson <jmattson@google.com>
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Matthew Rosato <mjrosato@linux.ibm.com>, Chao Gao <chao.gao@intel.com>,
+ Eric Farman <farman@linux.ibm.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Yuan Yao <yuan.yao@intel.com>,
+ kvmarm@lists.linux.dev, Thomas Gleixner <tglx@linutronix.de>,
+ linux-arm-kernel@lists.infradead.org,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Fabiano Rosas <farosas@linux.ibm.com>, linux-mips@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, linuxppc-dev@lists.ozlabs.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,82 +113,225 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Sean, Paolo,
+Sean Christopherson <seanjc@google.com> writes:
 
-I recently also notice the behavior change of param halt_poll_ns.
-Now it loses the ability to:
-1) dynamically disable halt polling for all the running VMs
-by `echo 0 > /sys`
-2) dynamically adjust the halt polling interval for all the
-running VMs by `echo * > /sys`
-
-While in our cases, we usually use above two abilities, and
-KVM_CAP_HALT_POLL is not used yet.
-
-On 2021/9/28 1:33, Sean Christopherson wrote:
-> On Mon, Sep 27, 2021, Paolo Bonzini wrote:
->> On Mon, Sep 27, 2021 at 5:17 PM Christian Borntraeger
->> <borntraeger@de.ibm.com> wrote:
->>>> So I think there are two possibilities that makes sense:
->>>>
->>>> * track what is using KVM_CAP_HALT_POLL, and make writes to halt_poll_ns follow that
->>> what about using halt_poll_ns for those VMs that did not uses KVM_CAP_HALT_POLL and the private number for those that did.
->> Yes, that's what I meant.  David pointed out that doesn't allow you to
->> disable halt polling altogether, but for that you can always ask each
->> VM's userspace one by one, or just not use KVM_CAP_HALT_POLL. (Also, I
->> don't know about Google's usecase, but mine was actually more about
->> using KVM_CAP_HALT_POLL to *disable* halt polling on some VMs!).
-> I kinda like the idea if special-casing halt_poll_ns=0, e.g. for testing or
-> in-the-field mitigation if halt-polling is broken.  It'd be trivial to support, e.g.
-Do we have any plan to repost the diff as a fix?
-I would be very nice that this issue can be solved.
-
-Besides, I think we may need some Doc for users to describe
-how halt_poll_ns works with KVM_CAP_HALT_POLL, like
-"Documentation/virt/guest-halt-polling.rst".
-> @@ -3304,19 +3304,23 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
->                  update_halt_poll_stats(vcpu, start, poll_end, !waited);
+> On Thu, Nov 03, 2022, Vitaly Kuznetsov wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>> > +	/*
+>> > +	 * Reset everything to support using non-enlightened VMCS access later
+>> > +	 * (e.g. when we reload the module with enlightened_vmcs=0)
+>> > +	 */
+>> > +	for_each_online_cpu(cpu) {
+>> > +		vp_ap =	hv_get_vp_assist_page(cpu);
+>> > +
+>> > +		if (!vp_ap)
+>> > +			continue;
+>> > +
+>> > +		vp_ap->nested_control.features.directhypercall = 0;
+>> > +		vp_ap->current_nested_vmcs = 0;
+>> > +		vp_ap->enlighten_vmentry = 0;
+>> > +	}
+>> 
+>> Unrelated to your patch but while looking at this code I got curious
+>> about why don't we need a protection against CPU offlining here. Turns
+>> out that even when we offline a CPU, its VP assist page remains
+>> allocated (see hv_cpu_die()), we just write '0' to the MSR and thus
 >
->          if (halt_poll_allowed) {
-> +               max_halt_poll_ns = vcpu->kvm->max_halt_poll_ns;
-> +               if (!max_halt_poll_ns || !halt_poll_ns)  <------ squish the max if halt_poll_ns==0
-> +                       max_halt_poll_ns = halt_poll_ns;
+> Heh, "die".  Hyper-V is quite dramatic.
+>
+>> accessing the page is safe. The consequent hv_cpu_init(), however, does
+>> not restore VP assist page when it's already allocated:
+>> 
+>> # rdmsr -p 24 0x40000073
+>> 10212f001
+>> # echo 0 > /sys/devices/system/cpu/cpu24/online 
+>> # echo 1 > /sys/devices/system/cpu/cpu24/online 
+>> # rdmsr -p 24 0x40000073
+>> 0
+>> 
+>> The culprit is commit e5d9b714fe402 ("x86/hyperv: fix root partition
+>> faults when writing to VP assist page MSR"). A patch is inbound.
+>> 
+>> 'hv_root_partition' case is different though. We do memunmap() and reset
+>> VP assist page to zero so it is theoretically possible we're going to
+>> clash. Unless I'm missing some obvious reason why module unload can't
+>> coincide with CPU offlining, we may be better off surrounding this with
+>> cpus_read_lock()/cpus_read_unlock(). 
+>
+> I finally see what you're concerned about.  If a CPU goes offline and its assist
+> page is unmapped, zeroing out the nested/eVMCS stuff will fault.
+>
+> I think the real problem is that the purging of the eVMCS is in the wrong place.
+> Move the clearing to vmx_hardware_disable() and then the CPU hotplug bug goes
+> away once KVM disables hotplug during hardware enabling/disable later in the series.
+> There's no need to wait until module exit, e.g. it's not like it costs much to
+> clear a few variables, and IIUC the state is used only when KVM is actively using
+> VMX/eVMCS.
+>
+> However, I believe there's a second bug.  KVM's CPU online hook is called before
+> Hyper-V's online hook (CPUHP_AP_ONLINE_DYN).  Before this series, which moves KVM's
+> hook from STARTING to ONLINE, KVM's hook is waaaay before Hyper-V's.  That means
+> that hv_cpu_init()'s allocation of the VP assist page will come _after_ KVM's
+> check in vmx_hardware_enable()
+>
+> 	/*
+> 	 * This can happen if we hot-added a CPU but failed to allocate
+> 	 * VP assist page for it.
+> 	 */
+> 	if (static_branch_unlikely(&enable_evmcs) &&
+> 	    !hv_get_vp_assist_page(cpu))
+> 		return -EFAULT;
+>
+> I.e. CPU hotplug will never work if KVM is running VMs as a Hyper-V guest.  I bet
+> you can repro by doing a SUSPEND+RESUME.
+>
+> Can you try to see if that's actually a bug?  If so, the only sane fix seems to
+> be to add a dedicated ONLINE action for Hyper-V.  
+
+It seems we can't get away without a dedicated stage for Hyper-V anyway,
+e.g. see our discussion with Michael:
+
+https://lore.kernel.org/linux-hyperv/878rkqr7ku.fsf@ovpn-192-136.brq.redhat.com/
+
+All these issues are more or less "theoretical" as there's no real CPU
+hotplug on Hyper-V/Azure. Yes, it is possible to trigger problems by
+doing CPU offline/online but I don't see how this may come handy outside
+of testing envs.
+
+> Per patch
+>
+>   KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
+>
+> from this series, CPUHP_AP_KVM_ONLINE needs to be before CPUHP_AP_SCHED_WAIT_EMPTY
+> to ensure there are no tasks, i.e. no vCPUs, running on the to-be-unplugged CPU.
+>
+> Back to the original bug, proposed fix is below.  The other advantage of moving
+> the reset to hardware disabling is that the "cleanup" is just disabling the static
+> key, and at that point can simply be deleted as there's no need to disable the
+> static key when kvm-intel is unloaded since kvm-intel owns the key.  I.e. this
+> patch (that we're replying to) would get replaced with a patch to delete the
+> disabling of the static key.
+>
+
+From a quick glance looks good to me, I'll try to find some time to work
+on this issue. I will likely end up proposing a dedicated CPU hotplug
+stage for Hyper-V (which needs to happen before KVM's
+CPUHP_AP_KVM_ONLINE on CPU hotplug and after on unplug) anyway.
+
+Thanks for looking into this!
+
+> --
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Thu, 10 Nov 2022 17:28:08 -0800
+> Subject: [PATCH] KVM: VMX: Reset eVMCS controls in VP assist page during
+>  hardware disabling
+>
+> Reset the eVMCS controls in the per-CPU VP assist page during hardware
+> disabling instead of waiting until kvm-intel's module exit.  The controls
+> are activated if and only if KVM creates a VM, i.e. don't need to be
+> reset if hardware is never enabled.
+>
+> Doing the reset during hardware disabling will naturally fix a potential
+> NULL pointer deref bug once KVM disables CPU hotplug while enabling and
+> disabling hardware (which is necessary to fix a variety of bugs).  If the
+> kernel is running as the root partition, the VP assist page is unmapped
+> during CPU hot unplug, and so KVM's clearing of the eVMCS controls needs
+> to occur with CPU hot(un)plug disabled, otherwise KVM could attempt to
+> write to a CPU's VP assist page after it's unmapped.
+>
+> Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 50 +++++++++++++++++++++++++-----------------
+>  1 file changed, 30 insertions(+), 20 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index aca88524fd1e..ae13aa3e8a1d 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -552,6 +552,33 @@ static int hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+>  
+> +static void hv_reset_evmcs(void)
+> +{
+> +	struct hv_vp_assist_page *vp_ap;
 > +
-Does this mean that KVM_CAP_HALT_POLL will not be able to
-disable halt polling for a VM individually when halt_poll_ns !=0?
->                  if (!vcpu_valid_wakeup(vcpu)) {
->                          shrink_halt_poll_ns(vcpu);
-> -               } else if (vcpu->kvm->max_halt_poll_ns) {
-> +               } else if (max_halt_poll_ns) {
->                          if (halt_ns <= vcpu->halt_poll_ns)
->                                  ;
->                          /* we had a long block, shrink polling */
->                          else if (vcpu->halt_poll_ns &&
-> -                                halt_ns > vcpu->kvm->max_halt_poll_ns)
-> +                                halt_ns > max_halt_poll_ns)
->                                  shrink_halt_poll_ns(vcpu);
->                          /* we had a short halt and our poll time is too small */
-> -                       else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
-> -                                halt_ns < vcpu->kvm->max_halt_poll_ns)
-> -                               grow_halt_poll_ns(vcpu);
-> +                       else if (vcpu->halt_poll_ns < max_halt_poll_ns &&
-> +                                halt_ns < max_halt_poll_ns)
-> +                               grow_halt_poll_ns(vcpu, max_halt_poll_ns);
->                  } else {
->                          vcpu->halt_poll_ns = 0;
->                  }
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> .
-Thanks,
-Yanan
+> +	if (!static_branch_unlikely(&enable_evmcs))
+> +		return;
+> +
+> +	/*
+> +	 * KVM should enable eVMCS if and only if all CPUs have a VP assist
+> +	 * page, and should reject CPU onlining if eVMCS is enabled the CPU
+> +	 * doesn't have a VP assist page allocated.
+> +	 */
+> +	vp_ap = hv_get_vp_assist_page(smp_processor_id());
+> +	if (WARN_ON_ONCE(!vp_ap))
+> +		return;
+> +
+> +	/*
+> +	 * Reset everything to support using non-enlightened VMCS access later
+> +	 * (e.g. when we reload the module with enlightened_vmcs=0)
+> +	 */
+> +	vp_ap->nested_control.features.directhypercall = 0;
+> +	vp_ap->current_nested_vmcs = 0;
+> +	vp_ap->enlighten_vmentry = 0;
+> +}
+> +
+> +#else /* IS_ENABLED(CONFIG_HYPERV) */
+> +static void hv_reset_evmcs(void) {}
+>  #endif /* IS_ENABLED(CONFIG_HYPERV) */
+>  
+>  /*
+> @@ -2497,6 +2524,8 @@ static void vmx_hardware_disable(void)
+>  	if (cpu_vmxoff())
+>  		kvm_spurious_fault();
+>  
+> +	hv_reset_evmcs();
+> +
+>  	intel_pt_handle_vmx(0);
+>  }
+>  
+> @@ -8463,27 +8492,8 @@ static void vmx_exit(void)
+>  	kvm_exit();
+>  
+>  #if IS_ENABLED(CONFIG_HYPERV)
+> -	if (static_branch_unlikely(&enable_evmcs)) {
+> -		int cpu;
+> -		struct hv_vp_assist_page *vp_ap;
+> -		/*
+> -		 * Reset everything to support using non-enlightened VMCS
+> -		 * access later (e.g. when we reload the module with
+> -		 * enlightened_vmcs=0)
+> -		 */
+> -		for_each_online_cpu(cpu) {
+> -			vp_ap =	hv_get_vp_assist_page(cpu);
+> -
+> -			if (!vp_ap)
+> -				continue;
+> -
+> -			vp_ap->nested_control.features.directhypercall = 0;
+> -			vp_ap->current_nested_vmcs = 0;
+> -			vp_ap->enlighten_vmentry = 0;
+> -		}
+> -
+> +	if (static_branch_unlikely(&enable_evmcs))
+>  		static_branch_disable(&enable_evmcs);
+> -	}
+>  #endif
+>  	vmx_cleanup_l1d_flush();
+>  
+>
+> base-commit: 5f47ba6894477dfbdc5416467a25fb7acb47d404
+
+-- 
+Vitaly
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
