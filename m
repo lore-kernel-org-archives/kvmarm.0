@@ -1,212 +1,109 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C0428ED
-	for <kvmarm@lists.linux.dev>; Tue, 15 Nov 2022 09:48:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D1E3C433C1;
-	Tue, 15 Nov 2022 09:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C622AD30
+	for <kvmarm@lists.linux.dev>; Tue, 15 Nov 2022 13:25:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAE73C433C1;
+	Tue, 15 Nov 2022 13:25:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668505691;
-	bh=wZku0e20qY1rCdRoFu/99XhutUPsudrcxYeWpqL98JI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CVxWf42LpGHbF3a7pDjv8DvzYPYyM0sJYJiL2P63/qmEj4ytdCJmD+bwwxKDX2o5I
-	 PVfdYGus7EOracTWwvh7kVDv/eY4faYXOp4jjdceYFnc6PzuEadPu94sqf5oGR3Avr
-	 /twjO2mVGfzGGMx/sKGY9JXOiDMSSHP3Nz6gHONUvT5j1Xg4SwX7VLnZtC17WfcK8I
-	 9L05R3nU5SBxQztWjuSV8BtfpCEzbD6hQr3KpxfNXcgMIdrgJjtKdEuJQQLPpb4nd2
-	 TAivcObukLqlhHIZOmmVbhd1djLUffhQXoZv/cc5DQlM6z7fRUpI6CoKXqIIR5mDLV
-	 PFudsoNiTAO3A==
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>,
-	Zhang Lei <zhang.lei@jp.fujitsu.com>,
-	James Morse <james.morse@arm.com>,
+	s=k20201202; t=1668518739;
+	bh=UM+NUCSnWPwBJSvEkj5YDlxzvPW4Tgd7hH1Drivd2Zs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RqZ9uF5m3XKPVewGy4ALND0OQ3MGnKSHjy6twsxd/uCbC94LRX+4P51B1H4QaTxRD
+	 I0Yy/vswyh50t4VuZYD3hnnTuBbwyd9XFlu5LQWYWY6iS80PIzaXUij+A35UJcrEiX
+	 aXt8nrrXToBs78xY5yW0ngDQDtSEWbkMBKGpeTs4P8num13y4kByCOzf8c7Lcxb6RS
+	 YLaeuzgyKOo/3hSbvu/kps+pUtZyMu45nNRH4G5UBCYrbTrFI3F5mWR5nTzMfImfGw
+	 JQrrE0Z15YULA9373JtK5yDZxF583FEM8EGEUErB24fKur2C12EhbLj+CNG5/SGOr8
+	 vRjFt987RBnYQ==
+Date: Tue, 15 Nov 2022 13:25:34 +0000
+From: Will Deacon <will@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Andre Przywara <andre.przywara@arm.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v5 8/8] arm64/fp: Use a struct to pass data to fpsimd_bind_state_to_cpu()
-Date: Tue, 15 Nov 2022 09:46:40 +0000
-Message-Id: <20221115094640.112848-9-broonie@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20221115094640.112848-1-broonie@kernel.org>
-References: <20221115094640.112848-1-broonie@kernel.org>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] KVM: arm64: Use a separate function for hyp stage-1
+ walks
+Message-ID: <20221115132532.GA524@willie-the-truck>
+References: <20221114201127.1814794-1-oliver.upton@linux.dev>
+ <20221114201127.1814794-2-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5801; i=broonie@kernel.org; h=from:subject; bh=wZku0e20qY1rCdRoFu/99XhutUPsudrcxYeWpqL98JI=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjc1//Vbp2RklclrMStydIOPWfWU8htlm/kwGtqVtD 8DaRFSKJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY3Nf/wAKCRAk1otyXVSH0MooB/ 9BGfit2noXM6i9/T+woxLodz3HLH2XaunWQynP8AZu+zS8KlmxLK2mpId3aWp+AcNfzNQG5nWVtLWS wXS+tySvkmf5/BOi1FKN1qEJnwP2hp2u6ln6nGzjLQbfVg4JyX65IzylzbMP8WS6MCpb0XK+dwWWts eu9c9vj1mzFXQIZY6eCU7b52BnkeJ6gLbnJBAO7k065Yux5l2ShTM+hVFq0mNRKtK45JHQeYJI3IzO BsSlnfgWbeUSJUmbVylU5wdbVJG+GhQEYF9fL5q1b/bH/0GRNGvPnknUSq6Qds8R/HxzS+uCaRj7zm U+418VbQVeO2LPz1E9j2qabM2J9rsi
-X-Developer-Key: i=broonie@kernel.org; a=openpgp; fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221114201127.1814794-2-oliver.upton@linux.dev>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Message-ID: <20221115132534.IY2AEmJxEp_vXyO44WkfquKmHSlGZEedZaQrC1HWWDg@z>
 
-For reasons that are unclear to this reader fpsimd_bind_state_to_cpu()
-populates the struct fpsimd_last_state_struct that it uses to store the
-active floating point state for KVM guests by passing an argument for
-each member of the structure. As the richness of the architecture increases
-this is resulting in a function with a rather large number of arguments
-which isn't ideal.
+On Mon, Nov 14, 2022 at 08:11:27PM +0000, Oliver Upton wrote:
+> A subsequent change to the page table walkers adds RCU protection for
+> walking stage-2 page tables. KVM uses a global lock to serialize hyp
+> stage-1 walks, meaning RCU protection is quite meaningless for
+> protecting hyp stage-1 walkers.
+> 
+> Add a new helper, kvm_pgtable_hyp_walk(), for use when walking hyp
+> stage-1 tables. Call directly into __kvm_pgtable_walk() as table
+> concatenation is not a supported feature at stage-1.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h | 24 ++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/setup.c      |  2 +-
+>  arch/arm64/kvm/hyp/pgtable.c         | 18 +++++++++++++++---
+>  3 files changed, 40 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index a874ce0ce7b5..43b2f1882e11 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -596,6 +596,30 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
+>  int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  		     struct kvm_pgtable_walker *walker);
+>  
+> +/**
+> + * kvm_pgtable_hyp_walk() - Walk a hyp stage-1 page-table.
+> + * @pgt:	Page-table structure initialized by kvm_pgtable_hyp_init().
+> + * @addr:	Input address for the start of the walk.
+> + * @size:	Size of the range to walk.
+> + * @walker:	Walker callback description.
+> + *
+> + * The offset of @addr within a page is ignored and @size is rounded-up to
+> + * the next page boundary.
+> + *
+> + * The walker will walk the page-table entries corresponding to the input
+> + * address range specified, visiting entries according to the walker flags.
+> + * Invalid entries are treated as leaf entries. Leaf entries are reloaded
+> + * after invoking the walker callback, allowing the walker to descend into
+> + * a newly installed table.
+> + *
+> + * Returning a negative error code from the walker callback function will
+> + * terminate the walk immediately with the same error code.
+> + *
+> + * Return: 0 on success, negative error code on failure.
+> + */
+> +int kvm_pgtable_hyp_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> +			 struct kvm_pgtable_walker *walker);
 
-Simplify the interface by using the struct directly as the single argument
-for the function, renaming it as we lift the definition into the header.
-This could be built on further to reduce the work we do adding storage for
-new FP state in various places but for now it just simplifies this one
-interface.
+Hmm, this feels like slightly the wrong abstraction to me -- there's nothing
+hyp-specific about the problem being solved, it's just that the only user
+is for hyp walks.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
----
- arch/arm64/include/asm/fpsimd.h | 17 ++++++++++++-----
- arch/arm64/kernel/fpsimd.c      | 34 ++++++---------------------------
- arch/arm64/kvm/fpsimd.c         | 24 +++++++++++++----------
- 3 files changed, 32 insertions(+), 43 deletions(-)
+Could we instead rework 'struct kvm_pgtable' slightly so that the existing
+'flags' field is no-longer stage-2 specific and includes a KVM_PGTABLE_LOCKED
+flag which could be set by kvm_pgtable_hyp_init()?
 
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index 0ad683dab1e2..e6fa1e2982c8 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -58,11 +58,18 @@ extern void fpsimd_restore_current_state(void);
- extern void fpsimd_update_current_state(struct user_fpsimd_state const *state);
- extern void fpsimd_kvm_prepare(void);
- 
--extern void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *state,
--				     void *sve_state, unsigned int sve_vl,
--				     void *za_state, unsigned int sme_vl,
--				     u64 *svcr, enum fp_type *type,
--				     enum fp_type to_save);
-+struct cpu_fp_state {
-+	struct user_fpsimd_state *st;
-+	void *sve_state;
-+	void *za_state;
-+	u64 *svcr;
-+	unsigned int sve_vl;
-+	unsigned int sme_vl;
-+	enum fp_type *fp_type;
-+	enum fp_type to_save;
-+};
-+
-+extern void fpsimd_bind_state_to_cpu(struct cpu_fp_state *fp_state);
- 
- extern void fpsimd_flush_task_state(struct task_struct *target);
- extern void fpsimd_save_and_flush_cpu_state(void);
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index a66b8640a0a4..de97d2be915b 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -118,18 +118,8 @@
-  *   returned from the 2nd syscall yet, TIF_FOREIGN_FPSTATE is still set so
-  *   whatever is in the FPSIMD registers is not saved to memory, but discarded.
-  */
--struct fpsimd_last_state_struct {
--	struct user_fpsimd_state *st;
--	void *sve_state;
--	void *za_state;
--	u64 *svcr;
--	unsigned int sve_vl;
--	unsigned int sme_vl;
--	enum fp_type *fp_type;
--	enum fp_type to_save;
--};
- 
--static DEFINE_PER_CPU(struct fpsimd_last_state_struct, fpsimd_last_state);
-+static DEFINE_PER_CPU(struct cpu_fp_state, fpsimd_last_state);
- 
- __ro_after_init struct vl_info vl_info[ARM64_VEC_MAX] = {
- #ifdef CONFIG_ARM64_SVE
-@@ -468,7 +458,7 @@ static void task_fpsimd_load(void)
-  */
- static void fpsimd_save(void)
- {
--	struct fpsimd_last_state_struct const *last =
-+	struct cpu_fp_state const *last =
- 		this_cpu_ptr(&fpsimd_last_state);
- 	/* set by fpsimd_bind_task_to_cpu() or fpsimd_bind_state_to_cpu() */
- 	bool save_sve_regs = false;
-@@ -1716,8 +1706,7 @@ void fpsimd_kvm_prepare(void)
-  */
- static void fpsimd_bind_task_to_cpu(void)
- {
--	struct fpsimd_last_state_struct *last =
--		this_cpu_ptr(&fpsimd_last_state);
-+	struct cpu_fp_state *last = this_cpu_ptr(&fpsimd_last_state);
- 
- 	WARN_ON(!system_supports_fpsimd());
- 	last->st = &current->thread.uw.fpsimd_state;
-@@ -1749,25 +1738,14 @@ static void fpsimd_bind_task_to_cpu(void)
- 	}
- }
- 
--void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
--			      unsigned int sve_vl, void *za_state,
--			      unsigned int sme_vl, u64 *svcr,
--			      enum fp_type *type, enum fp_type to_save)
-+void fpsimd_bind_state_to_cpu(struct cpu_fp_state *state)
- {
--	struct fpsimd_last_state_struct *last =
--		this_cpu_ptr(&fpsimd_last_state);
-+	struct cpu_fp_state *last = this_cpu_ptr(&fpsimd_last_state);
- 
- 	WARN_ON(!system_supports_fpsimd());
- 	WARN_ON(!in_softirq() && !irqs_disabled());
- 
--	last->st = st;
--	last->svcr = svcr;
--	last->sve_state = sve_state;
--	last->za_state = za_state;
--	last->sve_vl = sve_vl;
--	last->sme_vl = sme_vl;
--	last->fp_type = type;
--	last->to_save = to_save;
-+	*last = *state;
- }
- 
- /*
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index ec82d0191f76..02dd7e9ebd39 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -130,25 +130,29 @@ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu)
-  */
- void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
- {
--	enum fp_type fp_type;
-+	struct cpu_fp_state fp_state;
- 
- 	WARN_ON_ONCE(!irqs_disabled());
- 
- 	if (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED) {
--		if (vcpu_has_sve(vcpu))
--			fp_type = FP_STATE_SVE;
--		else
--			fp_type = FP_STATE_FPSIMD;
- 
- 		/*
- 		 * Currently we do not support SME guests so SVCR is
- 		 * always 0 and we just need a variable to point to.
- 		 */
--		fpsimd_bind_state_to_cpu(&vcpu->arch.ctxt.fp_regs,
--					 vcpu->arch.sve_state,
--					 vcpu->arch.sve_max_vl,
--					 NULL, 0, &vcpu->arch.svcr,
--					 &vcpu->arch.fp_type, fp_type);
-+		fp_state.st = &vcpu->arch.ctxt.fp_regs;
-+		fp_state.sve_state = vcpu->arch.sve_state;
-+		fp_state.sve_vl = vcpu->arch.sve_max_vl;
-+		fp_state.za_state = NULL;
-+		fp_state.svcr = &vcpu->arch.svcr;
-+		fp_state.fp_type = &vcpu->arch.fp_type;
-+
-+		if (vcpu_has_sve(vcpu))
-+			fp_state.to_save = FP_STATE_SVE;
-+		else
-+			fp_state.to_save = FP_STATE_FPSIMD;
-+
-+		fpsimd_bind_state_to_cpu(&fp_state);
- 
- 		clear_thread_flag(TIF_FOREIGN_FPSTATE);
- 	}
--- 
-2.30.2
+That way the top-level API remains unchanged and the existing callers will
+continue to work.
 
+Cheers,
+
+Will
