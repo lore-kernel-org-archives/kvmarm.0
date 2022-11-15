@@ -1,219 +1,299 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685338490
-	for <kvmarm@lists.linux.dev>; Mon, 14 Nov 2022 21:57:25 +0000 (UTC)
-Date: Mon, 14 Nov 2022 21:57:19 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1668463043;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACAB28ED
+	for <kvmarm@lists.linux.dev>; Tue, 15 Nov 2022 09:30:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1668504621;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cvv73VT4lN9E4M2VgijTPhMKxC7cic18qdqEvGgeM/0=;
-	b=SwtRf5XHuoWAxp0FBIwIXxlgQz46tnQNxZ4bg2tvIoj/8cMdMGExDIaLj+GztJATAH9Kzo
-	5ZGE5IiG9egbnMHnNarasSnVRiyZNCKbK1AVaOZZIZIrWMEcMrRd6tlHdAgN2r3gjO/D1v
-	Oa1cbcgndr9Z99MMExgfOEerkso2u1c=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
+	bh=PI4QkJgg5xRejZYnaDkrohoS+PcA0MTFv2A75peo2zg=;
+	b=AcwCInwO9hR30N2K8Kb8YW9jottbyNINOUUeMTmj1TqPCWLZHXLCkK+XYSPZPok2OPGd9d
+	SQgbT8Xu+lpGLwgLbr5aZ9BwgSfE/RT9F8pMaePufjBXkmH7Ez3Hq1SOldLh+YtwHibUgq
+	X40Y+9x4QF9yc2maA6rxNexOQFujzv4=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-510-54YAh8qqN-CbvkEafEs8NQ-1; Tue, 15 Nov 2022 04:30:18 -0500
+X-MC-Unique: 54YAh8qqN-CbvkEafEs8NQ-1
+Received: by mail-ej1-f70.google.com with SMTP id sb4-20020a1709076d8400b007ae596eac08so7073164ejc.22
+        for <kvmarm@lists.linux.dev>; Tue, 15 Nov 2022 01:30:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PI4QkJgg5xRejZYnaDkrohoS+PcA0MTFv2A75peo2zg=;
+        b=yTndR5GyFmHL1ASZrqI3Qi6YMmPJZ+/xGoINFHBy+2hee5WqcmYRc+owo1D6og3ghs
+         D6qXx6PPa8EZrwoeabXR12kAKXFlBQiGo7tUllTXbqriVCWAgdEQ7hJkubg9FaneEhBF
+         9hnhKkjTmcerEY2s0fR3BhuugDe9JbuPyZ/70LGKcQZcgMjF5woIDHjoiPGDCtA7U2Jp
+         ERhzAeFPLp43aOE4kk7Wpaww/j88vYDPb/rz8a9CsqXAjJDnYRfRH94yt9ALSwVu7c9r
+         csShS6QFr/oVM/ifz4y07f23nR66W3aceA0OJT8lYXTxWeY22Pa3h2MwpHcgzPlDegA9
+         1pWg==
+X-Gm-Message-State: ANoB5pksGXXUvjW9csk9t2X5E+I8eXH6UFwApmN5TlK1i4ZFdFPVeKqc
+	pr2O9+J/FwiGEfa/UtZ0WFUcyGi+reenCR/FULCm8WZMa71Qw915XZVMqzMl01PPoNHBGJJ3HNp
+	dQW3KkxoyEJ+ueSUn
+X-Received: by 2002:a50:fe13:0:b0:461:565e:8779 with SMTP id f19-20020a50fe13000000b00461565e8779mr14489181edt.387.1668504617481;
+        Tue, 15 Nov 2022 01:30:17 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5Zsa4CnM7XTxV75wUJGjjLzRgPV7NQ4412B1eIJSCcezAuycjNE+mpvlda5nQMKDxwK/vVkA==
+X-Received: by 2002:a50:fe13:0:b0:461:565e:8779 with SMTP id f19-20020a50fe13000000b00461565e8779mr14489153edt.387.1668504617196;
+        Tue, 15 Nov 2022 01:30:17 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id ew13-20020a056402538d00b004642b35f89esm5950875edb.9.2022.11.15.01.30.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Nov 2022 01:30:16 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org,
-	David Matlack <dmatlack@google.com>, kvmarm@lists.cs.columbia.edu,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 1/2] KVM: selftests: Allow >1 guest mode in
- access_tracking_perf_test
-Message-ID: <Y3K5vyWB8m/mKmZD@google.com>
-References: <20221111231946.944807-1-oliver.upton@linux.dev>
- <20221111231946.944807-2-oliver.upton@linux.dev>
- <Y3J3EH74B6yafeqm@google.com>
+Cc: James Morse <james.morse@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Atish Patra
+ <atishp@atishpatra.org>, David Hildenbrand <david@redhat.com>,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, Isaku Yamahata
+ <isaku.yamahata@intel.com>, Fabiano Rosas <farosas@linux.ibm.com>, Michael
+ Ellerman <mpe@ellerman.id.au>, Chao Gao <chao.gao@intel.com>, Thomas
+ Gleixner <tglx@linutronix.de>, Yuan Yao <yuan.yao@intel.com>, Paolo
+ Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, Huacai Chen
+ <chenhuacai@kernel.org>, Aleksandar Markovic
+ <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, Paul
+ Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Matthew Rosato
+ <mjrosato@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>
+Subject: Re: [PATCH 10/44] KVM: VMX: Clean up eVMCS enabling if KVM
+ initialization fails
+In-Reply-To: <Y22nrQ7aziK0NMOE@google.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221102231911.3107438-11-seanjc@google.com>
+ <87mt98qfi2.fsf@ovpn-194-252.brq.redhat.com> <Y22nrQ7aziK0NMOE@google.com>
+Date: Tue, 15 Nov 2022 10:30:14 +0100
+Message-ID: <87sfikmuop.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y3J3EH74B6yafeqm@google.com>
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221114215719.-mBvIxtHO1suD9cHZ6_4BiCFldNGvSTpepjgGFN41V0@z>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Message-ID: <20221115093014.rK587Ma7F3ywHYfmEJld4Qisl-cb63O-frR23zGWWHc@z>
 
-On Mon, Nov 14, 2022 at 05:12:48PM +0000, Sean Christopherson wrote:
-> On Fri, Nov 11, 2022, Oliver Upton wrote:
-> > As the name implies, for_each_guest_mode() will run the test case for
-> > all supported guest addressing modes. On x86 that doesn't amount to
-> > anything, but arm64 can handle 4K, 16K, and 64K page sizes on supporting
-> > hardware.
-> > 
-> > Blindly attempting to run access_tracking_perf_test on arm64 stalls on
-> > the second test case, as the 'done' global remains set between test
-> > iterations. Clear it after VM teardown in anticipation of a subsequent
-> > test case.
-> > 
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > ---
-> >  tools/testing/selftests/kvm/access_tracking_perf_test.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> > index 76c583a07ea2..4da066479e0a 100644
-> > --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> > +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> > @@ -326,6 +326,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
-> >  
-> >  	perf_test_join_vcpu_threads(nr_vcpus);
-> >  	perf_test_destroy_vm(vm);
-> > +
-> > +	/* Clear done in anticipation of testing another guest mode */
-> > +	done = false;
-> 
-> Can we fix this in the so called "perf_test" infrastructure?
-> memslot_modification_stress_test.c has the same bug just inverted (see run_vcpus).
+Sean Christopherson <seanjc@google.com> writes:
 
-Yeah, sounds good to me. I'll wrap your diff up in a patch here in a
-bit.
+> On Thu, Nov 03, 2022, Vitaly Kuznetsov wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>> > +	/*
+>> > +	 * Reset everything to support using non-enlightened VMCS access later
+>> > +	 * (e.g. when we reload the module with enlightened_vmcs=0)
+>> > +	 */
+>> > +	for_each_online_cpu(cpu) {
+>> > +		vp_ap =	hv_get_vp_assist_page(cpu);
+>> > +
+>> > +		if (!vp_ap)
+>> > +			continue;
+>> > +
+>> > +		vp_ap->nested_control.features.directhypercall = 0;
+>> > +		vp_ap->current_nested_vmcs = 0;
+>> > +		vp_ap->enlighten_vmentry = 0;
+>> > +	}
+>> 
+>> Unrelated to your patch but while looking at this code I got curious
+>> about why don't we need a protection against CPU offlining here. Turns
+>> out that even when we offline a CPU, its VP assist page remains
+>> allocated (see hv_cpu_die()), we just write '0' to the MSR and thus
+>
+> Heh, "die".  Hyper-V is quite dramatic.
+>
+>> accessing the page is safe. The consequent hv_cpu_init(), however, does
+>> not restore VP assist page when it's already allocated:
+>> 
+>> # rdmsr -p 24 0x40000073
+>> 10212f001
+>> # echo 0 > /sys/devices/system/cpu/cpu24/online 
+>> # echo 1 > /sys/devices/system/cpu/cpu24/online 
+>> # rdmsr -p 24 0x40000073
+>> 0
+>> 
+>> The culprit is commit e5d9b714fe402 ("x86/hyperv: fix root partition
+>> faults when writing to VP assist page MSR"). A patch is inbound.
+>> 
+>> 'hv_root_partition' case is different though. We do memunmap() and reset
+>> VP assist page to zero so it is theoretically possible we're going to
+>> clash. Unless I'm missing some obvious reason why module unload can't
+>> coincide with CPU offlining, we may be better off surrounding this with
+>> cpus_read_lock()/cpus_read_unlock(). 
+>
+> I finally see what you're concerned about.  If a CPU goes offline and its assist
+> page is unmapped, zeroing out the nested/eVMCS stuff will fault.
+>
+> I think the real problem is that the purging of the eVMCS is in the wrong place.
+> Move the clearing to vmx_hardware_disable() and then the CPU hotplug bug goes
+> away once KVM disables hotplug during hardware enabling/disable later in the series.
+> There's no need to wait until module exit, e.g. it's not like it costs much to
+> clear a few variables, and IIUC the state is used only when KVM is actively using
+> VMX/eVMCS.
+>
+> However, I believe there's a second bug.  KVM's CPU online hook is called before
+> Hyper-V's online hook (CPUHP_AP_ONLINE_DYN).  Before this series, which moves KVM's
+> hook from STARTING to ONLINE, KVM's hook is waaaay before Hyper-V's.  That means
+> that hv_cpu_init()'s allocation of the VP assist page will come _after_ KVM's
+> check in vmx_hardware_enable()
+>
+> 	/*
+> 	 * This can happen if we hot-added a CPU but failed to allocate
+> 	 * VP assist page for it.
+> 	 */
+> 	if (static_branch_unlikely(&enable_evmcs) &&
+> 	    !hv_get_vp_assist_page(cpu))
+> 		return -EFAULT;
+>
+> I.e. CPU hotplug will never work if KVM is running VMs as a Hyper-V guest.  I bet
+> you can repro by doing a SUSPEND+RESUME.
+>
+> Can you try to see if that's actually a bug?  If so, the only sane fix seems to
+> be to add a dedicated ONLINE action for Hyper-V.  
 
---
-Thanks,
-Oliver
+It seems we can't get away without a dedicated stage for Hyper-V anyway,
+e.g. see our discussion with Michael:
 
+https://lore.kernel.org/linux-hyperv/878rkqr7ku.fsf@ovpn-192-136.brq.redhat.com/
+
+All these issues are more or less "theoretical" as there's no real CPU
+hotplug on Hyper-V/Azure. Yes, it is possible to trigger problems by
+doing CPU offline/online but I don't see how this may come handy outside
+of testing envs.
+
+> Per patch
+>
+>   KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
+>
+> from this series, CPUHP_AP_KVM_ONLINE needs to be before CPUHP_AP_SCHED_WAIT_EMPTY
+> to ensure there are no tasks, i.e. no vCPUs, running on the to-be-unplugged CPU.
+>
+> Back to the original bug, proposed fix is below.  The other advantage of moving
+> the reset to hardware disabling is that the "cleanup" is just disabling the static
+> key, and at that point can simply be deleted as there's no need to disable the
+> static key when kvm-intel is unloaded since kvm-intel owns the key.  I.e. this
+> patch (that we're replying to) would get replaced with a patch to delete the
+> disabling of the static key.
+>
+
+From a quick glance looks good to me, I'll try to find some time to work
+on this issue. I will likely end up proposing a dedicated CPU hotplug
+stage for Hyper-V (which needs to happen before KVM's
+CPUHP_AP_KVM_ONLINE on CPU hotplug and after on unplug) anyway.
+
+Thanks for looking into this!
+
+> --
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Thu, 10 Nov 2022 17:28:08 -0800
+> Subject: [PATCH] KVM: VMX: Reset eVMCS controls in VP assist page during
+>  hardware disabling
+>
+> Reset the eVMCS controls in the per-CPU VP assist page during hardware
+> disabling instead of waiting until kvm-intel's module exit.  The controls
+> are activated if and only if KVM creates a VM, i.e. don't need to be
+> reset if hardware is never enabled.
+>
+> Doing the reset during hardware disabling will naturally fix a potential
+> NULL pointer deref bug once KVM disables CPU hotplug while enabling and
+> disabling hardware (which is necessary to fix a variety of bugs).  If the
+> kernel is running as the root partition, the VP assist page is unmapped
+> during CPU hot unplug, and so KVM's clearing of the eVMCS controls needs
+> to occur with CPU hot(un)plug disabled, otherwise KVM could attempt to
+> write to a CPU's VP assist page after it's unmapped.
+>
+> Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  .../selftests/kvm/access_tracking_perf_test.c | 28 +++++--------------
->  .../selftests/kvm/include/perf_test_util.h    |  3 ++
->  .../selftests/kvm/lib/perf_test_util.c        |  3 ++
->  .../kvm/memslot_modification_stress_test.c    |  6 +---
->  4 files changed, 14 insertions(+), 26 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> index 76c583a07ea2..786bc62a2c79 100644
-> --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> @@ -58,9 +58,6 @@ static enum {
->  	ITERATION_MARK_IDLE,
->  } iteration_work;
->  
-> -/* Set to true when vCPU threads should exit. */
-> -static bool done;
-> -
->  /* The iteration that was last completed by each vCPU. */
->  static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
->  
-> @@ -206,28 +203,20 @@ static void assert_ucall(struct kvm_vcpu *vcpu, uint64_t expected_ucall)
->  		    expected_ucall, actual_ucall);
+>  arch/x86/kvm/vmx/vmx.c | 50 +++++++++++++++++++++++++-----------------
+>  1 file changed, 30 insertions(+), 20 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index aca88524fd1e..ae13aa3e8a1d 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -552,6 +552,33 @@ static int hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu)
+>  	return 0;
 >  }
 >  
-> -static bool spin_wait_for_next_iteration(int *current_iteration)
-> -{
-> -	int last_iteration = *current_iteration;
-> -
-> -	do {
-> -		if (READ_ONCE(done))
-> -			return false;
-> -
-> -		*current_iteration = READ_ONCE(iteration);
-> -	} while (last_iteration == *current_iteration);
-> -
-> -	return true;
-> -}
-> -
->  static void vcpu_thread_main(struct perf_test_vcpu_args *vcpu_args)
->  {
->  	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
->  	struct kvm_vm *vm = perf_test_args.vm;
->  	int vcpu_idx = vcpu_args->vcpu_idx;
->  	int current_iteration = 0;
-> +	int last_iteration;
+> +static void hv_reset_evmcs(void)
+> +{
+> +	struct hv_vp_assist_page *vp_ap;
 > +
-> +	while (!READ_ONCE(perf_test_args.stop_vcpus)) {
-> +		last_iteration = current_iteration;
-> +		do {
-> +			current_iteration = READ_ONCE(iteration);
-> +		} while (current_iteration == last_iteration);
+> +	if (!static_branch_unlikely(&enable_evmcs))
+> +		return;
+> +
+> +	/*
+> +	 * KVM should enable eVMCS if and only if all CPUs have a VP assist
+> +	 * page, and should reject CPU onlining if eVMCS is enabled the CPU
+> +	 * doesn't have a VP assist page allocated.
+> +	 */
+> +	vp_ap = hv_get_vp_assist_page(smp_processor_id());
+> +	if (WARN_ON_ONCE(!vp_ap))
+> +		return;
+> +
+> +	/*
+> +	 * Reset everything to support using non-enlightened VMCS access later
+> +	 * (e.g. when we reload the module with enlightened_vmcs=0)
+> +	 */
+> +	vp_ap->nested_control.features.directhypercall = 0;
+> +	vp_ap->current_nested_vmcs = 0;
+> +	vp_ap->enlighten_vmentry = 0;
+> +}
+> +
+> +#else /* IS_ENABLED(CONFIG_HYPERV) */
+> +static void hv_reset_evmcs(void) {}
+>  #endif /* IS_ENABLED(CONFIG_HYPERV) */
 >  
-> -	while (spin_wait_for_next_iteration(&current_iteration)) {
->  		switch (READ_ONCE(iteration_work)) {
->  		case ITERATION_ACCESS_MEMORY:
->  			vcpu_run(vcpu);
-> @@ -321,9 +310,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  	mark_memory_idle(vm, nr_vcpus);
->  	access_memory(vm, nr_vcpus, ACCESS_READ, "Reading from idle memory");
+>  /*
+> @@ -2497,6 +2524,8 @@ static void vmx_hardware_disable(void)
+>  	if (cpu_vmxoff())
+>  		kvm_spurious_fault();
 >  
-> -	/* Set done to signal the vCPU threads to exit */
-> -	done = true;
-> -
->  	perf_test_join_vcpu_threads(nr_vcpus);
->  	perf_test_destroy_vm(vm);
+> +	hv_reset_evmcs();
+> +
+>  	intel_pt_handle_vmx(0);
 >  }
-> diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-> index eaa88df0555a..536d7c3c3f14 100644
-> --- a/tools/testing/selftests/kvm/include/perf_test_util.h
-> +++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-> @@ -40,6 +40,9 @@ struct perf_test_args {
->  	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
->  	bool nested;
 >  
-> +	/* Test is done, stop running vCPUs. */
-> +	bool stop_vcpus;
-> +
->  	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
->  };
+> @@ -8463,27 +8492,8 @@ static void vmx_exit(void)
+>  	kvm_exit();
 >  
-> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> index 9618b37c66f7..ee3f499ccbd2 100644
-> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> @@ -267,6 +267,7 @@ void perf_test_start_vcpu_threads(int nr_vcpus,
->  
->  	vcpu_thread_fn = vcpu_fn;
->  	WRITE_ONCE(all_vcpu_threads_running, false);
-> +	WRITE_ONCE(perf_test_args.stop_vcpus, false);
->  
->  	for (i = 0; i < nr_vcpus; i++) {
->  		struct vcpu_thread *vcpu = &vcpu_threads[i];
-> @@ -289,6 +290,8 @@ void perf_test_join_vcpu_threads(int nr_vcpus)
->  {
->  	int i;
->  
-> +	WRITE_ONCE(perf_test_args.stop_vcpus, true);
-> +
->  	for (i = 0; i < nr_vcpus; i++)
->  		pthread_join(vcpu_threads[i].thread, NULL);
->  }
-> diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> index bb1d17a1171b..3a5e4518307c 100644
-> --- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> +++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> @@ -34,8 +34,6 @@
->  static int nr_vcpus = 1;
->  static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
->  
-> -static bool run_vcpus = true;
+>  #if IS_ENABLED(CONFIG_HYPERV)
+> -	if (static_branch_unlikely(&enable_evmcs)) {
+> -		int cpu;
+> -		struct hv_vp_assist_page *vp_ap;
+> -		/*
+> -		 * Reset everything to support using non-enlightened VMCS
+> -		 * access later (e.g. when we reload the module with
+> -		 * enlightened_vmcs=0)
+> -		 */
+> -		for_each_online_cpu(cpu) {
+> -			vp_ap =	hv_get_vp_assist_page(cpu);
 > -
->  static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
->  {
->  	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
-> @@ -45,7 +43,7 @@ static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
->  	run = vcpu->run;
->  
->  	/* Let the guest access its memory until a stop signal is received */
-> -	while (READ_ONCE(run_vcpus)) {
-> +	while (!READ_ONCE(perf_test_args.stop_vcpus)) {
->  		ret = _vcpu_run(vcpu);
->  		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
->  
-> @@ -110,8 +108,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  	add_remove_memslot(vm, p->memslot_modification_delay,
->  			   p->nr_memslot_modifications);
->  
-> -	run_vcpus = false;
+> -			if (!vp_ap)
+> -				continue;
 > -
->  	perf_test_join_vcpu_threads(nr_vcpus);
->  	pr_info("All vCPU threads joined\n");
+> -			vp_ap->nested_control.features.directhypercall = 0;
+> -			vp_ap->current_nested_vmcs = 0;
+> -			vp_ap->enlighten_vmentry = 0;
+> -		}
+> -
+> +	if (static_branch_unlikely(&enable_evmcs))
+>  		static_branch_disable(&enable_evmcs);
+> -	}
+>  #endif
+>  	vmx_cleanup_l1d_flush();
 >  
-> 
-> base-commit: 10dbc57b5777e6938a648eb4a870bad448fcb6f5
-> -- 
-> 
+>
+> base-commit: 5f47ba6894477dfbdc5416467a25fb7acb47d404
+
+-- 
+Vitaly
+
