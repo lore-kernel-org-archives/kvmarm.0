@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA4628ED
-	for <kvmarm@lists.linux.dev>; Tue, 15 Nov 2022 09:47:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D80DBC433C1;
-	Tue, 15 Nov 2022 09:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE4E28ED
+	for <kvmarm@lists.linux.dev>; Tue, 15 Nov 2022 09:47:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBCD5C433D7;
+	Tue, 15 Nov 2022 09:47:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668505663;
-	bh=j5oHSznvzW4swC33RjoF6wr1n2sYjeKuRG8sBMM0hw4=;
+	s=k20201202; t=1668505669;
+	bh=JLVuoW3jh+1CW+WlNlcQ0ZAA9wy3Ok23gSqwP2rr8KU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OXW65a576lNyageEVSxMxFjWURDuEdFWU41HGKLJcCazQmitQzl+bceEsZ4C5Khdx
-	 lTIW4Mk5s5oawyT2ULmyW3S3Is1HLXxio3MAkHHiAJxxuZ63SsCgN8VYUrpUJy0rF0
-	 EoIjSrCMFV3mrrM5+huLtrXPpLIzISSA/NIemvw1Z1nIr4vILzYUhi9UxX+Pgl/9Y7
-	 o+eiwkT/rch4wmfd+rJMN4wFvswBIp/wlrXqY6U8+YnDxHMDx4/UMIkycaqGlkOZCp
-	 1aHa4bgL03V/U5zSLt6NJoPSdnRPJTNnJcYiPWBhruwPQSJLQncgMYVqJPpU9YW0o1
-	 gd9XiclaR60yg==
+	b=rBxolnIm2L0ZUxoyk0aMkSNahVrGCaoqX6n4jgywRkvOu3EKj9YXxbSzBk2oqZ81M
+	 p1DHbOQ2/aOuVdSufUuQIU9yztB0GUWVJnDBHGMr60Zvo1wsQDUe63/doOuQxndpWn
+	 Mxpnd0OjI+mdNqy6fNQKyBVnq2Gy1QEiX870027r5Hhgvzrqt2MJgNgOXtOwv120Sd
+	 mdbNsUHiNC+ZZB6XSniLaH+/q/PS86h2fsg5XtHlme+5b24tbsNbdyB20anN2osxbg
+	 +CdgMzEAAnMFIbDvIl4yPQemcYPJq7hCvP5GtoF5OXpNnp/UaZp4YuqTtMXs0wQReV
+	 BYqo0EVSHYXdw==
 From: Mark Brown <broonie@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
@@ -26,9 +26,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v5 3/8] arm64/fpsimd: Have KVM explicitly say which FP registers to save
-Date: Tue, 15 Nov 2022 09:46:35 +0000
-Message-Id: <20221115094640.112848-4-broonie@kernel.org>
+Subject: [PATCH v5 4/8] arm64/fpsimd: Stop using TIF_SVE to manage register saving in KVM
+Date: Tue, 15 Nov 2022 09:46:36 +0000
+Message-Id: <20221115094640.112848-5-broonie@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20221115094640.112848-1-broonie@kernel.org>
 References: <20221115094640.112848-1-broonie@kernel.org>
@@ -38,178 +38,90 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6616; i=broonie@kernel.org; h=from:subject; bh=j5oHSznvzW4swC33RjoF6wr1n2sYjeKuRG8sBMM0hw4=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjc1/7JgonilKZcoPfxSearAISb+3MrndCcNFtbmWy JgVLIeSJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY3Nf+wAKCRAk1otyXVSH0BlXB/ 9o6nbfpFpErNT0Q5OeJQJS6ng8vm/0Cr/sJpFICgxd8s/jSK9CtqFw/aVM+WffKwU5niRXXLNYV2Ij 24lUjkh2iX0XaZOiqmsxOPEo3Y11rpyq8V3bLeCLbqBaHpgumKVf+l9ActutdIud1tld6+ZiUW1r8+ s4t6oH8tu5rfiUCYT8wovkfizbcnVG8vE5qsiIHTmqHeKbQ+tqf3sg033NM1I/EeKnsFRzK9npud1T 6bbgkE9xyFMPFr+b48eljeE98gR3RRmZkyKPiKES6nBQ8lF2zuAensMsdX0fIBMyMNAOP3FcB/K/An Mmh+XjJyOkTUFCIT/p5I9YLMVIXnaf
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2740; i=broonie@kernel.org; h=from:subject; bh=JLVuoW3jh+1CW+WlNlcQ0ZAA9wy3Ok23gSqwP2rr8KU=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjc1/8sVyn63EcOZwjWu8YJ4RUh1sGsRn14zXgByqW VOKfta2JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY3Nf/AAKCRAk1otyXVSH0NjpB/ 9HFprYnDKdQLxEQYTLnnb27IuppGqY6Iu2w4ifIUY8rXpTQ7qOwhxkRsbTKqHwKyPTRFDVX7Piwb7Y xS1pb4lpEmx03HG1uWKI9510NXOomyk7VS2796XMRJBtcRNBmsa6ZaqKCaEU8Ls+F1Olop8iQdopjC ymSRzn4sVD7oW+u15B1nno4EjqvWjACpipB+uVy0Fn0oNjt/FlLnOOAm5CMHrRsa1CihNIZCZ1auDW bCojnon5nSkECQBFXH3xOor/IoYvETGqTIGmF4RLoQNLhas8mXMhmz9Abol2Pa0u7krRa0tSoDEMcW wFN8tHleNUNtjDRss3JreOMG+t2X0e
 X-Developer-Key: i=broonie@kernel.org; a=openpgp; fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 Content-Transfer-Encoding: 8bit
 
-In order to avoid needlessly saving and restoring the guest registers KVM
-relies on the host FPSMID code to save the guest registers when we context
-switch away from the guest. This is done by binding the KVM guest state to
-the CPU on top of the task state that was originally there, then carefully
-managing the TIF_SVE flag for the task to cause the host to save the full
-SVE state when needed regardless of the needs of the host task. This works
-well enough but isn't terribly direct about what is going on and makes it
-much more complicated to try to optimise what we're doing with the SVE
-register state.
+Now that we are explicitly telling the host FP code which register state
+it needs to save we can remove the manipulation of TIF_SVE from the KVM
+code, simplifying it and allowing us to optimise our handling of normal
+tasks. Remove the manipulation of TIF_SVE from KVM and instead rely on
+to_save to ensure we save the correct data for it.
 
-Let's instead have KVM pass in the register state it wants saving when it
-binds to the CPU. We introduce a new FP_STATE_CURRENT for use
-during normal task binding to indicate that we should base our
-decisions on the current task. This should not be used when
-actually saving. Ideally we might want to use a separate enum for
-the type to save but this enum and the enum values would then
-need to be named which has problems with clarity and ambiguity.
-
-In order to ease any future debugging that might be required this patch
-does not actually update any of the decision making about what to save,
-it merely starts tracking the new information and warns if the requested
-state is not what we would otherwise have decided to save.
+There should be no functional or performance impact from this change.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 ---
- arch/arm64/include/asm/fpsimd.h    |  3 ++-
- arch/arm64/include/asm/processor.h |  1 +
- arch/arm64/kernel/fpsimd.c         | 27 ++++++++++++++++++++++++---
- arch/arm64/kvm/fpsimd.c            |  9 ++++++++-
- 4 files changed, 35 insertions(+), 5 deletions(-)
+ arch/arm64/kernel/fpsimd.c | 22 ++++------------------
+ arch/arm64/kvm/fpsimd.c    |  3 ---
+ 2 files changed, 4 insertions(+), 21 deletions(-)
 
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index 341705fcb7bb..0ad683dab1e2 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -61,7 +61,8 @@ extern void fpsimd_kvm_prepare(void);
- extern void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *state,
- 				     void *sve_state, unsigned int sve_vl,
- 				     void *za_state, unsigned int sme_vl,
--				     u64 *svcr, enum fp_type *type);
-+				     u64 *svcr, enum fp_type *type,
-+				     enum fp_type to_save);
- 
- extern void fpsimd_flush_task_state(struct task_struct *target);
- extern void fpsimd_save_and_flush_cpu_state(void);
-diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
-index 3cce0a4c4e8d..09f39a2bab47 100644
---- a/arch/arm64/include/asm/processor.h
-+++ b/arch/arm64/include/asm/processor.h
-@@ -123,6 +123,7 @@ enum vec_type {
- };
- 
- enum fp_type {
-+	FP_STATE_CURRENT,	/* Save based on current task state. */
- 	FP_STATE_FPSIMD,
- 	FP_STATE_SVE,
- };
 diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index aacd8e356084..21775f3db58a 100644
+index 21775f3db58a..3041e55b1581 100644
 --- a/arch/arm64/kernel/fpsimd.c
 +++ b/arch/arm64/kernel/fpsimd.c
-@@ -126,6 +126,7 @@ struct fpsimd_last_state_struct {
- 	unsigned int sve_vl;
- 	unsigned int sme_vl;
- 	enum fp_type *fp_type;
-+	enum fp_type to_save;
- };
+@@ -439,8 +439,8 @@ static void task_fpsimd_load(void)
+  * last, if KVM is involved this may be the guest VM context rather
+  * than the host thread for the VM pointed to by current. This means
+  * that we must always reference the state storage via last rather
+- * than via current, other than the TIF_ flags which KVM will
+- * carefully maintain for us.
++ * than via current, if we are saving KVM state then it will have
++ * ensured that the type of registers to save is set in last->to_save.
+  */
+ static void fpsimd_save(void)
+ {
+@@ -457,27 +457,13 @@ static void fpsimd_save(void)
+ 	if (test_thread_flag(TIF_FOREIGN_FPSTATE))
+ 		return;
  
- static DEFINE_PER_CPU(struct fpsimd_last_state_struct, fpsimd_last_state);
-@@ -356,7 +357,8 @@ void task_set_vl_onexec(struct task_struct *task, enum vec_type type,
-  *    but userspace is discouraged from relying on this.
-  *
-  *    task->thread.sve_state does not need to be non-NULL, valid or any
-- *    particular size: it must not be dereferenced.
-+ *    particular size: it must not be dereferenced and any data stored
-+ *    there should be considered stale and not referenced.
-  *
-  *  * SVE state - FP_STATE_SVE:
-  *
-@@ -369,7 +371,9 @@ void task_set_vl_onexec(struct task_struct *task, enum vec_type type,
-  *    task->thread.uw.fpsimd_state should be ignored.
-  *
-  *    task->thread.sve_state must point to a valid buffer at least
-- *    sve_state_size(task) bytes in size.
-+ *    sve_state_size(task) bytes in size. The data stored in
-+ *    task->thread.uw.fpsimd_state.vregs should be considered stale
-+ *    and not referenced.
-  *
-  *  * FPSR and FPCR are always stored in task->thread.uw.fpsimd_state
-  *    irrespective of whether TIF_SVE is clear or set, since these are
-@@ -459,6 +463,21 @@ static void fpsimd_save(void)
+-	if (test_thread_flag(TIF_SVE)) {
++	if ((last->to_save == FP_STATE_CURRENT && test_thread_flag(TIF_SVE)) ||
++	    last->to_save == FP_STATE_SVE) {
+ 		save_sve_regs = true;
+ 		save_ffr = true;
  		vl = last->sve_vl;
  	}
  
-+	/*
-+	 * Validate that an explicitly specified state to save is
-+	 * consistent with the task state.
-+	 */
-+	switch (last->to_save) {
-+	case FP_STATE_CURRENT:
-+		break;
-+	case FP_STATE_FPSIMD:
-+		WARN_ON_ONCE(save_sve_regs);
-+		break;
-+	case FP_STATE_SVE:
-+		WARN_ON_ONCE(!save_sve_regs);
-+		break;
-+	}
-+
+-	/*
+-	 * Validate that an explicitly specified state to save is
+-	 * consistent with the task state.
+-	 */
+-	switch (last->to_save) {
+-	case FP_STATE_CURRENT:
+-		break;
+-	case FP_STATE_FPSIMD:
+-		WARN_ON_ONCE(save_sve_regs);
+-		break;
+-	case FP_STATE_SVE:
+-		WARN_ON_ONCE(!save_sve_regs);
+-		break;
+-	}
+-
  	if (system_supports_sme()) {
  		u64 *svcr = last->svcr;
  
-@@ -1693,6 +1712,7 @@ static void fpsimd_bind_task_to_cpu(void)
- 	last->sme_vl = task_get_sme_vl(current);
- 	last->svcr = &current->thread.svcr;
- 	last->fp_type = &current->thread.fp_type;
-+	last->to_save = FP_STATE_CURRENT;
- 	current->thread.fpsimd_cpu = smp_processor_id();
- 
- 	/*
-@@ -1717,7 +1737,7 @@ static void fpsimd_bind_task_to_cpu(void)
- void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
- 			      unsigned int sve_vl, void *za_state,
- 			      unsigned int sme_vl, u64 *svcr,
--			      enum fp_type *type)
-+			      enum fp_type *type, enum fp_type to_save)
- {
- 	struct fpsimd_last_state_struct *last =
- 		this_cpu_ptr(&fpsimd_last_state);
-@@ -1732,6 +1752,7 @@ void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
- 	last->sve_vl = sve_vl;
- 	last->sme_vl = sme_vl;
- 	last->fp_type = type;
-+	last->to_save = to_save;
- }
- 
- /*
 diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index a4b4502ad850..89c02ce797b8 100644
+index 89c02ce797b8..ec82d0191f76 100644
 --- a/arch/arm64/kvm/fpsimd.c
 +++ b/arch/arm64/kvm/fpsimd.c
-@@ -130,9 +130,16 @@ void kvm_arch_vcpu_ctxflush_fp(struct kvm_vcpu *vcpu)
-  */
- void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
- {
-+	enum fp_type fp_type;
-+
- 	WARN_ON_ONCE(!irqs_disabled());
- 
- 	if (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED) {
-+		if (vcpu_has_sve(vcpu))
-+			fp_type = FP_STATE_SVE;
-+		else
-+			fp_type = FP_STATE_FPSIMD;
-+
- 		/*
- 		 * Currently we do not support SME guests so SVCR is
- 		 * always 0 and we just need a variable to point to.
-@@ -141,7 +148,7 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
- 					 vcpu->arch.sve_state,
- 					 vcpu->arch.sve_max_vl,
- 					 NULL, 0, &vcpu->arch.svcr,
--					 &vcpu->arch.fp_type);
-+					 &vcpu->arch.fp_type, fp_type);
+@@ -151,7 +151,6 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
+ 					 &vcpu->arch.fp_type, fp_type);
  
  		clear_thread_flag(TIF_FOREIGN_FPSTATE);
- 		update_thread_flag(TIF_SVE, vcpu_has_sve(vcpu));
+-		update_thread_flag(TIF_SVE, vcpu_has_sve(vcpu));
+ 	}
+ }
+ 
+@@ -208,7 +207,5 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+ 			sysreg_clear_set(CPACR_EL1, CPACR_EL1_ZEN_EL0EN, 0);
+ 	}
+ 
+-	update_thread_flag(TIF_SVE, 0);
+-
+ 	local_irq_restore(flags);
+ }
 -- 
 2.30.2
 
