@@ -2,78 +2,55 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C425C4332F
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Nov 2022 18:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08A21C433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Nov 2022 18:57:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5FEC4B8D2;
-	Tue, 15 Nov 2022 13:47:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 673164B7F0;
+	Tue, 15 Nov 2022 13:57:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7GW2a5f0M+vo; Tue, 15 Nov 2022 13:47:44 -0500 (EST)
+	with ESMTP id SFTE8nlsrm-B; Tue, 15 Nov 2022 13:57:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E8864B897;
-	Tue, 15 Nov 2022 13:47:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B05A4B831;
+	Tue, 15 Nov 2022 13:57:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C2C84B857
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Nov 2022 13:47:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EE6394B7C2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Nov 2022 13:57:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dVJ0CtjttlsN for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Nov 2022 13:47:42 -0500 (EST)
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com
- [209.85.215.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 45A614B84C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Nov 2022 13:47:42 -0500 (EST)
-Received: by mail-pg1-f181.google.com with SMTP id b62so14136938pgc.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Nov 2022 10:47:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=AkKPIWHeRn4hniFMrnTGIvHiqEhhgn36keNoZHXH3oI=;
- b=hDLtK/CfhXpByl5cdJHj5fS6CRLCYmzHAAmcDFoAq0ZWMqmrPakIcZ7dyCKeczjCoU
- ijVNKn8k2kccZk6ZkpitihnY2qlj8f7j/fPfk2POgyWKHBUnkCSOh3kueO1ZX0g2IL30
- IAZEpHmHEfgTXiDQzQNlTqmTr/xibzlUqGu9uaxhaxHk8xDxgoeBTrvt0pL0N7vlKXdU
- 3uAjS/AJ/zsByV84zOyxr3NkKiC6ze5xAjSZ2QbeaVlSdAW3PAoa6n0F287ykgDHtDS7
- AHuAbh6r6PuJ+clQieWCi5h1ryW4s/uVIwz//7XkCgod/d5XMjb1T6loNU4sDlNJDlsd
- wNSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
- :message-id:reply-to;
- bh=AkKPIWHeRn4hniFMrnTGIvHiqEhhgn36keNoZHXH3oI=;
- b=PwyuixR9bcoviS7Fjo2ImJNjGwaFg25EmOF3/j4pLpBSJ0l5E/KNog5j8kNC9dSkX/
- lAR+EyCf1FEbCtk6EgSygvH3E0fKbKCj8BoDWIA4+HMYgD7HLSZrgO+3lKaShIYfuvVk
- Fw5Ap/Fuqir8IxC2/r1V69sW+WCThfYBiSbgQ5xW6hPAjSWng4iCJrZIvg9NSeWyZcSV
- smxur/M9LOSe/2ZQ2LEgB0L7orzaoGOGVPCEY9ubwJ73eq5PMJy7AFFoxb/ZYUegNhq0
- vYw05lNpU2ebe67wL+fiiFBZn1dikq6ZMwY2EodgeSKLnLuHt6YSfk8FYtQ8DxilAaJn
- gYzQ==
-X-Gm-Message-State: ANoB5pnh1L8SrvmELC7+RL3Lp8bxiGIPeZIPc9P9t2O6mJJSE7u2Aj4E
- SoA+EIy+uUFMtpOvmvllpmRGQg==
-X-Google-Smtp-Source: AA0mqf5ewUFxFuYZmhYALZjNpcyEotKOZbibubDZGdomI5FE4JI3gXz3HN+ZL/JWRORbOZ+Q96LHew==
-X-Received: by 2002:a62:bd19:0:b0:56e:a001:8cb0 with SMTP id
- a25-20020a62bd19000000b0056ea0018cb0mr19447236pff.60.1668538061122; 
- Tue, 15 Nov 2022 10:47:41 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com.
- [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
- o38-20020a634e66000000b004639c772878sm8147241pgl.48.2022.11.15.10.47.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Nov 2022 10:47:40 -0800 (PST)
-Date: Tue, 15 Nov 2022 10:47:37 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
+ with ESMTP id eMLBOR9h9gMK for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Nov 2022 13:57:17 -0500 (EST)
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A81D940E76
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Nov 2022 13:57:17 -0500 (EST)
+Date: Tue, 15 Nov 2022 18:57:11 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1668538636;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=7QB1+Pi5ihYjPOVelH2p1IvQmXrfrqBb7hAw9xGI4+s=;
+ b=I1myR4ndvHoG/R+3q3YyBBw752W7c7nAptLsdp9bzz2TaXNUvXLTmSBz8RDrT1fNs4fur4
+ qJ1Kt7tkmB2cUMJHbqNEnTOaVo7XEcWlyf52cXvPNkodaQCImpKorJcU3DiDrwX2BxPaE7
+ 3jNh9frc0of7v9Wspln4+YPOazLXBV4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Ricardo Koller <ricarkol@google.com>
 Subject: Re: [PATCH v5 08/14] KVM: arm64: Protect stage-2 traversal with RCU
-Message-ID: <Y3PeyV4KIjoBBYNV@google.com>
+Message-ID: <Y3PhBwQPD5QtyRbf@google.com>
 References: <20221107215644.1895162-1-oliver.upton@linux.dev>
  <20221107215644.1895162-9-oliver.upton@linux.dev>
  <Y2whaWo3SIOOMKOE@google.com> <Y2w98zPmtefJlNfa@google.com>
+ <Y3PeyV4KIjoBBYNV@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <Y2w98zPmtefJlNfa@google.com>
+In-Reply-To: <Y3PeyV4KIjoBBYNV@google.com>
+X-Migadu-Flow: FLOW_OUT
 Cc: kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
  kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
  Marc Zyngier <maz@kernel.org>, David Matlack <dmatlack@google.com>,
@@ -94,55 +71,56 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Nov 09, 2022 at 11:55:31PM +0000, Oliver Upton wrote:
-> On Wed, Nov 09, 2022 at 09:53:45PM +0000, Sean Christopherson wrote:
-> > On Mon, Nov 07, 2022, Oliver Upton wrote:
-> > > Use RCU to safely walk the stage-2 page tables in parallel. Acquire and
-> > > release the RCU read lock when traversing the page tables. Defer the
-> > > freeing of table memory to an RCU callback. Indirect the calls into RCU
-> > > and provide stubs for hypervisor code, as RCU is not available in such a
-> > > context.
+On Tue, Nov 15, 2022 at 10:47:37AM -0800, Ricardo Koller wrote:
+> On Wed, Nov 09, 2022 at 11:55:31PM +0000, Oliver Upton wrote:
+> > On Wed, Nov 09, 2022 at 09:53:45PM +0000, Sean Christopherson wrote:
+> > > On Mon, Nov 07, 2022, Oliver Upton wrote:
+> > > > Use RCU to safely walk the stage-2 page tables in parallel. Acquire and
+> > > > release the RCU read lock when traversing the page tables. Defer the
+> > > > freeing of table memory to an RCU callback. Indirect the calls into RCU
+> > > > and provide stubs for hypervisor code, as RCU is not available in such a
+> > > > context.
+> > > > 
+> > > > The RCU protection doesn't amount to much at the moment, as readers are
+> > > > already protected by the read-write lock (all walkers that free table
+> > > > memory take the write lock). Nonetheless, a subsequent change will
+> > > > futher relax the locking requirements around the stage-2 MMU, thereby
+> > > > depending on RCU.
 > > > 
-> > > The RCU protection doesn't amount to much at the moment, as readers are
-> > > already protected by the read-write lock (all walkers that free table
-> > > memory take the write lock). Nonetheless, a subsequent change will
-> > > futher relax the locking requirements around the stage-2 MMU, thereby
-> > > depending on RCU.
+> > > Two somewhat off-topic questions (because I'm curious):
 > > 
-> > Two somewhat off-topic questions (because I'm curious):
+> > Worth asking!
+> > 
+> > >  1. Are there plans to enable "fast" page faults on ARM?  E.g. to fixup access
+> > >     faults (handle_access_fault()) and/or write-protection faults without acquiring
+> > >     mmu_lock?
+> > 
+> > I don't have any plans personally.
+> > 
+> > OTOH, adding support for read-side access faults is trivial, I just
+> > didn't give it much thought as most large-scale implementations have
+> > FEAT_HAFDBS (hardware access flag management).
 > 
-> Worth asking!
+> WDYT of permission relaxation (write-protection faults) on the fast
+> path?
 > 
-> >  1. Are there plans to enable "fast" page faults on ARM?  E.g. to fixup access
-> >     faults (handle_access_fault()) and/or write-protection faults without acquiring
-> >     mmu_lock?
-> 
-> I don't have any plans personally.
-> 
-> OTOH, adding support for read-side access faults is trivial, I just
-> didn't give it much thought as most large-scale implementations have
-> FEAT_HAFDBS (hardware access flag management).
+> The benefits won't be as good as in x86 due to the required TLBI, but
+> may be worth it due to not dealing with the mmu lock and avoiding some
+> of the context save/restore.  Note that unlike x86, in ARM the TLB entry
+> related to a protection fault needs to be flushed.
 
-WDYT of permission relaxation (write-protection faults) on the fast
-path?
+Right, the only guarantee we have on arm64 is that the TLB will never
+hold an entry that would produce an access fault.
 
-The benefits won't be as good as in x86 due to the required TLBI, but
-may be worth it due to not dealing with the mmu lock and avoiding some
-of the context save/restore.  Note that unlike x86, in ARM the TLB entry
-related to a protection fault needs to be flushed.
+I have no issues whatsoever with implementing a lock-free walker, we're
+already most of the way there with the RCU implementation modulo some
+rules for atomic PTE updates. I don't believe lock acquisition is a
+bounding issue for us quite yet as break-before-make + lazy splitting
+hurts.
 
-> 
-> >  2. If the answer to (1) is "yes!", what's the plan to protect the lockless walks
-> >     for the RCU-less hypervisor code?
-> 
-> If/when we are worried about fault serialization in the lowvisor I was
-> thinking something along the lines of disabling interrupts and using
-> IPIs as barriers before freeing removed table memory, crudely giving the
-> same protection as RCU.
-> 
-> --
-> Thanks,
-> Oliver
+--
+Thanks,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
