@@ -2,60 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF3CEC4332F
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Nov 2022 21:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10D57C4332F
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Nov 2022 03:29:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 197FB4B93E;
-	Mon, 14 Nov 2022 16:57:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D0334B8A9;
+	Mon, 14 Nov 2022 22:29:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vBFsqmph7o04; Mon, 14 Nov 2022 16:57:27 -0500 (EST)
+	with ESMTP id VRaAX4bNRbIB; Mon, 14 Nov 2022 22:29:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DE854B93A;
-	Mon, 14 Nov 2022 16:57:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EACA4B8AD;
+	Mon, 14 Nov 2022 22:29:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C06E4B933
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 16:57:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B7CE34B8A9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 22:29:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NQuP12YKTZLk for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Nov 2022 16:57:24 -0500 (EST)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CBD314B92F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 16:57:24 -0500 (EST)
-Date: Mon, 14 Nov 2022 21:57:19 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1668463043;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=cvv73VT4lN9E4M2VgijTPhMKxC7cic18qdqEvGgeM/0=;
- b=SwtRf5XHuoWAxp0FBIwIXxlgQz46tnQNxZ4bg2tvIoj/8cMdMGExDIaLj+GztJATAH9Kzo
- 5ZGE5IiG9egbnMHnNarasSnVRiyZNCKbK1AVaOZZIZIrWMEcMrRd6tlHdAgN2r3gjO/D1v
- Oa1cbcgndr9Z99MMExgfOEerkso2u1c=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 1/2] KVM: selftests: Allow >1 guest mode in
- access_tracking_perf_test
-Message-ID: <Y3K5vyWB8m/mKmZD@google.com>
-References: <20221111231946.944807-1-oliver.upton@linux.dev>
- <20221111231946.944807-2-oliver.upton@linux.dev>
- <Y3J3EH74B6yafeqm@google.com>
+ with ESMTP id Ew0je31NX6dR for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Nov 2022 22:29:02 -0500 (EST)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2FAE4B89C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Nov 2022 22:29:01 -0500 (EST)
+Received: from dggpemm500023.china.huawei.com (unknown [172.30.72.53])
+ by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NBBPz29c4zqSHG;
+ Tue, 15 Nov 2022 11:25:11 +0800 (CST)
+Received: from [10.174.187.128] (10.174.187.128) by
+ dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 15 Nov 2022 11:28:56 +0800
+Subject: Re: disabling halt polling broken? (was Re: [PATCH 00/14] KVM:
+ Halt-polling fixes, cleanups and a new stat)
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>
+References: <20210925005528.1145584-1-seanjc@google.com>
+ <03f2f5ab-e809-2ba5-bd98-3393c3b843d2@de.ibm.com>
+ <YVHcY6y1GmvGJnMg@google.com>
+ <f37ab68c-61ce-b6fb-7a49-831bacfc7424@redhat.com>
+ <43e42f5c-9d9f-9e8b-3a61-9a053a818250@de.ibm.com>
+ <CABgObfYtS6wiQe=BhF3t5usr7J6q4PWE4=rwZMMukfC9wT_6fA@mail.gmail.com>
+ <YVIAdVxc+q2UWB+J@google.com>
+From: "wangyanan (Y)" <wangyanan55@huawei.com>
+Message-ID: <32810c89-44c6-6780-9d05-e49f6b897b6e@huawei.com>
+Date: Tue, 15 Nov 2022 11:28:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Y3J3EH74B6yafeqm@google.com>
-X-Migadu-Flow: FLOW_OUT
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
- linux-kselftest@vger.kernel.org, kvmarm@lists.linux.dev,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <YVIAdVxc+q2UWB+J@google.com>
+Content-Language: en-US
+X-Originating-IP: [10.174.187.128]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500023.china.huawei.com (7.185.36.83)
+X-CFilter-Loop: Reflected
+Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
+ Janosch Frank <frankja@linux.ibm.com>, kvm <kvm@vger.kernel.org>,
+ David Hildenbrand <david@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
+ "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
+ kvm-ppc <kvm-ppc@vger.kernel.org>,
+ "open list:MIPS" <linux-mips@vger.kernel.org>,
+ Paul Mackerras <paulus@ozlabs.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Jon Cargille <jcargill@google.com>, David Matlack <dmatlack@google.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ KVM ARM <kvmarm@lists.cs.columbia.edu>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,187 +82,82 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Nov 14, 2022 at 05:12:48PM +0000, Sean Christopherson wrote:
-> On Fri, Nov 11, 2022, Oliver Upton wrote:
-> > As the name implies, for_each_guest_mode() will run the test case for
-> > all supported guest addressing modes. On x86 that doesn't amount to
-> > anything, but arm64 can handle 4K, 16K, and 64K page sizes on supporting
-> > hardware.
-> > 
-> > Blindly attempting to run access_tracking_perf_test on arm64 stalls on
-> > the second test case, as the 'done' global remains set between test
-> > iterations. Clear it after VM teardown in anticipation of a subsequent
-> > test case.
-> > 
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > ---
-> >  tools/testing/selftests/kvm/access_tracking_perf_test.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> > index 76c583a07ea2..4da066479e0a 100644
-> > --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> > +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> > @@ -326,6 +326,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
-> >  
-> >  	perf_test_join_vcpu_threads(nr_vcpus);
-> >  	perf_test_destroy_vm(vm);
-> > +
-> > +	/* Clear done in anticipation of testing another guest mode */
-> > +	done = false;
-> 
-> Can we fix this in the so called "perf_test" infrastructure?
-> memslot_modification_stress_test.c has the same bug just inverted (see run_vcpus).
+Hi Sean, Paolo,
 
-Yeah, sounds good to me. I'll wrap your diff up in a patch here in a
-bit.
+I recently also notice the behavior change of param halt_poll_ns.
+Now it loses the ability to:
+1) dynamically disable halt polling for all the running VMs
+by `echo 0 > /sys`
+2) dynamically adjust the halt polling interval for all the
+running VMs by `echo * > /sys`
 
---
+While in our cases, we usually use above two abilities, and
+KVM_CAP_HALT_POLL is not used yet.
+
+On 2021/9/28 1:33, Sean Christopherson wrote:
+> On Mon, Sep 27, 2021, Paolo Bonzini wrote:
+>> On Mon, Sep 27, 2021 at 5:17 PM Christian Borntraeger
+>> <borntraeger@de.ibm.com> wrote:
+>>>> So I think there are two possibilities that makes sense:
+>>>>
+>>>> * track what is using KVM_CAP_HALT_POLL, and make writes to halt_poll_ns follow that
+>>> what about using halt_poll_ns for those VMs that did not uses KVM_CAP_HALT_POLL and the private number for those that did.
+>> Yes, that's what I meant.  David pointed out that doesn't allow you to
+>> disable halt polling altogether, but for that you can always ask each
+>> VM's userspace one by one, or just not use KVM_CAP_HALT_POLL. (Also, I
+>> don't know about Google's usecase, but mine was actually more about
+>> using KVM_CAP_HALT_POLL to *disable* halt polling on some VMs!).
+> I kinda like the idea if special-casing halt_poll_ns=0, e.g. for testing or
+> in-the-field mitigation if halt-polling is broken.  It'd be trivial to support, e.g.
+Do we have any plan to repost the diff as a fix?
+I would be very nice that this issue can be solved.
+
+Besides, I think we may need some Doc for users to describe
+how halt_poll_ns works with KVM_CAP_HALT_POLL, like
+"Documentation/virt/guest-halt-polling.rst".
+> @@ -3304,19 +3304,23 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+>                  update_halt_poll_stats(vcpu, start, poll_end, !waited);
+>
+>          if (halt_poll_allowed) {
+> +               max_halt_poll_ns = vcpu->kvm->max_halt_poll_ns;
+> +               if (!max_halt_poll_ns || !halt_poll_ns)  <------ squish the max if halt_poll_ns==0
+> +                       max_halt_poll_ns = halt_poll_ns;
+> +
+Does this mean that KVM_CAP_HALT_POLL will not be able to
+disable halt polling for a VM individually when halt_poll_ns !=0?
+>                  if (!vcpu_valid_wakeup(vcpu)) {
+>                          shrink_halt_poll_ns(vcpu);
+> -               } else if (vcpu->kvm->max_halt_poll_ns) {
+> +               } else if (max_halt_poll_ns) {
+>                          if (halt_ns <= vcpu->halt_poll_ns)
+>                                  ;
+>                          /* we had a long block, shrink polling */
+>                          else if (vcpu->halt_poll_ns &&
+> -                                halt_ns > vcpu->kvm->max_halt_poll_ns)
+> +                                halt_ns > max_halt_poll_ns)
+>                                  shrink_halt_poll_ns(vcpu);
+>                          /* we had a short halt and our poll time is too small */
+> -                       else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
+> -                                halt_ns < vcpu->kvm->max_halt_poll_ns)
+> -                               grow_halt_poll_ns(vcpu);
+> +                       else if (vcpu->halt_poll_ns < max_halt_poll_ns &&
+> +                                halt_ns < max_halt_poll_ns)
+> +                               grow_halt_poll_ns(vcpu, max_halt_poll_ns);
+>                  } else {
+>                          vcpu->halt_poll_ns = 0;
+>                  }
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> .
 Thanks,
-Oliver
-
-> ---
->  .../selftests/kvm/access_tracking_perf_test.c | 28 +++++--------------
->  .../selftests/kvm/include/perf_test_util.h    |  3 ++
->  .../selftests/kvm/lib/perf_test_util.c        |  3 ++
->  .../kvm/memslot_modification_stress_test.c    |  6 +---
->  4 files changed, 14 insertions(+), 26 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> index 76c583a07ea2..786bc62a2c79 100644
-> --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> @@ -58,9 +58,6 @@ static enum {
->  	ITERATION_MARK_IDLE,
->  } iteration_work;
->  
-> -/* Set to true when vCPU threads should exit. */
-> -static bool done;
-> -
->  /* The iteration that was last completed by each vCPU. */
->  static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
->  
-> @@ -206,28 +203,20 @@ static void assert_ucall(struct kvm_vcpu *vcpu, uint64_t expected_ucall)
->  		    expected_ucall, actual_ucall);
->  }
->  
-> -static bool spin_wait_for_next_iteration(int *current_iteration)
-> -{
-> -	int last_iteration = *current_iteration;
-> -
-> -	do {
-> -		if (READ_ONCE(done))
-> -			return false;
-> -
-> -		*current_iteration = READ_ONCE(iteration);
-> -	} while (last_iteration == *current_iteration);
-> -
-> -	return true;
-> -}
-> -
->  static void vcpu_thread_main(struct perf_test_vcpu_args *vcpu_args)
->  {
->  	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
->  	struct kvm_vm *vm = perf_test_args.vm;
->  	int vcpu_idx = vcpu_args->vcpu_idx;
->  	int current_iteration = 0;
-> +	int last_iteration;
-> +
-> +	while (!READ_ONCE(perf_test_args.stop_vcpus)) {
-> +		last_iteration = current_iteration;
-> +		do {
-> +			current_iteration = READ_ONCE(iteration);
-> +		} while (current_iteration == last_iteration);
->  
-> -	while (spin_wait_for_next_iteration(&current_iteration)) {
->  		switch (READ_ONCE(iteration_work)) {
->  		case ITERATION_ACCESS_MEMORY:
->  			vcpu_run(vcpu);
-> @@ -321,9 +310,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  	mark_memory_idle(vm, nr_vcpus);
->  	access_memory(vm, nr_vcpus, ACCESS_READ, "Reading from idle memory");
->  
-> -	/* Set done to signal the vCPU threads to exit */
-> -	done = true;
-> -
->  	perf_test_join_vcpu_threads(nr_vcpus);
->  	perf_test_destroy_vm(vm);
->  }
-> diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-> index eaa88df0555a..536d7c3c3f14 100644
-> --- a/tools/testing/selftests/kvm/include/perf_test_util.h
-> +++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-> @@ -40,6 +40,9 @@ struct perf_test_args {
->  	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
->  	bool nested;
->  
-> +	/* Test is done, stop running vCPUs. */
-> +	bool stop_vcpus;
-> +
->  	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
->  };
->  
-> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> index 9618b37c66f7..ee3f499ccbd2 100644
-> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> @@ -267,6 +267,7 @@ void perf_test_start_vcpu_threads(int nr_vcpus,
->  
->  	vcpu_thread_fn = vcpu_fn;
->  	WRITE_ONCE(all_vcpu_threads_running, false);
-> +	WRITE_ONCE(perf_test_args.stop_vcpus, false);
->  
->  	for (i = 0; i < nr_vcpus; i++) {
->  		struct vcpu_thread *vcpu = &vcpu_threads[i];
-> @@ -289,6 +290,8 @@ void perf_test_join_vcpu_threads(int nr_vcpus)
->  {
->  	int i;
->  
-> +	WRITE_ONCE(perf_test_args.stop_vcpus, true);
-> +
->  	for (i = 0; i < nr_vcpus; i++)
->  		pthread_join(vcpu_threads[i].thread, NULL);
->  }
-> diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> index bb1d17a1171b..3a5e4518307c 100644
-> --- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> +++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> @@ -34,8 +34,6 @@
->  static int nr_vcpus = 1;
->  static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
->  
-> -static bool run_vcpus = true;
-> -
->  static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
->  {
->  	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
-> @@ -45,7 +43,7 @@ static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
->  	run = vcpu->run;
->  
->  	/* Let the guest access its memory until a stop signal is received */
-> -	while (READ_ONCE(run_vcpus)) {
-> +	while (!READ_ONCE(perf_test_args.stop_vcpus)) {
->  		ret = _vcpu_run(vcpu);
->  		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
->  
-> @@ -110,8 +108,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  	add_remove_memslot(vm, p->memslot_modification_delay,
->  			   p->nr_memslot_modifications);
->  
-> -	run_vcpus = false;
-> -
->  	perf_test_join_vcpu_threads(nr_vcpus);
->  	pr_info("All vCPU threads joined\n");
->  
-> 
-> base-commit: 10dbc57b5777e6938a648eb4a870bad448fcb6f5
-> -- 
-> 
+Yanan
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
