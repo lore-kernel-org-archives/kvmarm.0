@@ -1,103 +1,99 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD80191
-	for <kvmarm@lists.linux.dev>; Thu, 17 Nov 2022 03:07:39 +0000 (UTC)
-Received: by mail-pj1-f54.google.com with SMTP id l22-20020a17090a3f1600b00212fbbcfb78so4179807pjc.3
-        for <kvmarm@lists.linux.dev>; Wed, 16 Nov 2022 19:07:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EBBEB1C
+	for <kvmarm@lists.linux.dev>; Thu, 17 Nov 2022 06:51:04 +0000 (UTC)
+Received: by mail-pg1-f175.google.com with SMTP id b62so1235509pgc.0
+        for <kvmarm@lists.linux.dev>; Wed, 16 Nov 2022 22:51:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=pa5UqVHoKtSmMcTtq44P+OTbkS+eAwwWT8kOI+vqzfQ=;
-        b=fGfwLJbYQdy/G/BDCUmvzEKCl86N3TtDPIxkdzCUUG5SxWXmkaqsjH4zxZjm+9EqQ3
-         0DnbmWLdhVLD47jVGlDwt1Qi6cjG3CIXIHP5oC5CQ2zRR7QTACY9/Sb//2HfGoIVou2o
-         lDypdJakoSkMG3OzQNBziXbuuQAqSMTXNI8tHZFEW3YYnLF489LAS1awa1C6y1UBWVUL
-         2dEn1B0NeuQluzDRXry+DZBdotiZsXrloQg00i634wfHsCm6zZ+VSRzNBsejwHT7/IFV
-         fuEAkUYy07DwH+JrjYGkN8EM7flnITG0xEK3F4svo31W7SWMBhULnsAp5qwRqfjTF03S
-         Xx/A==
+        bh=0y7VdxwHLwhJHQkWTFwHzknojiHUon3RH8OwCo8MxdU=;
+        b=COdBKeWciEUcxRjfv54pacO7y07o7BOLG2qNenQAwJZp0M8UcST5OLdENV5peqP150
+         Lld+WqcJLCLA+svE//sI6HZ6boKGiC065GyL/C0UlhvdTHZ5Meyas0NOdL7b7ZTEU28Q
+         QLyIkqxH2KQnHACOB7hgCx24pGu5v7lo6J9P8KPO1SdtyT1QdItekW+gmj2e75LB+Abb
+         7Vz+f0D6/pT4wBL1tP/5/3ue0NtF0FKlpOScalgJvQq4lHJCJ3neX4zMR2gLkiQifGyx
+         /CtxNEeSMt8duyrk6Q8s95bPhQFa4YdeIoinYBLMM+OR1Ywg6jMqEoVCkufjCJXEcqHY
+         bHmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=pa5UqVHoKtSmMcTtq44P+OTbkS+eAwwWT8kOI+vqzfQ=;
-        b=OR5ThsLh9nRwRbxBNsfh7vFMMNU89ac1b7syi86HvzoiQHJ/9vP23BOswe+bkeCqJz
-         xuFSNcuNsSPoYCMJ+oXgDl6iANVpeurvj+niDqO+QXj7WIWCSt/MV1rgcgLjjH6uSkBF
-         PwFmSAHwCrTxRSYZhD8OCEtZVbpHHBa30/BPpnwpJFTpnfgIzruKivU8JTz77jqSO2mA
-         i3ZHNDk22RGLIE2o2hs128ZsDeuyaMonAxpNzCUpjoq0n5INBi6AMxdNOH+Q1BOEVzUs
-         ZfSDymxDVNuz2J7y96w/jRuXPkKIe7vLHPV5etAHKyE167+Jp2YIu8pvu35d7GPvByxs
-         t+zw==
-X-Gm-Message-State: ANoB5plOETabnsS9fgdxg84o8/40OQNCmZQHFUB37TMBtk49FDNpunET
-	Ilx93qUzp2Qcuyu5t9WqbUjW8hEPwL3G82w91VOoWg==
-X-Google-Smtp-Source: AA0mqf5jM3My1EFwIt/TwMaZZNxkmVEVeIgETQ8NwxHMtyqxBMr0+Vx0ky5+Ys2cY70a/jv7ld+2MVmtsd4eI1eTa5I=
-X-Received: by 2002:a17:90a:ab84:b0:213:343:9873 with SMTP id
- n4-20020a17090aab8400b0021303439873mr6754073pjq.102.1668654458703; Wed, 16
- Nov 2022 19:07:38 -0800 (PST)
+        bh=0y7VdxwHLwhJHQkWTFwHzknojiHUon3RH8OwCo8MxdU=;
+        b=l+QHsr4iVl6CfLJQuJvN6jWBz/BKG8YOrWqvh4t17w60qlnWtPwIX2fIa2+q/2+4Zw
+         TOHRtgsrLqiX5Gsso5VyUoAVulD4Lxq2WVz9Wmz25x9mcN67QjZKPLXSPvGUIrGsfA7F
+         6Y3D420nJ+jPW9z5knqyF0esKgn+UGr8BtGYRUqDgospCOq8At0mV2gdAjSpQGVe/otX
+         DsTZth43YT97BUk2hJzAkboF2eIm+UQVsBiSrV2oSNxzjCbBZWfYm81ci5vjIeZc839k
+         3iTjwkG8txjTpo80hLpmXpMYa1ESKhdk9kGbIY0jVhOiTrKDThuGKGyw8CoU09rpLkmz
+         SfWg==
+X-Gm-Message-State: ANoB5pmAFn7lfMQLPCrdhpICFSXuCUYhrj7MwyAFHX7Yyozfw+lU+pJ4
+	UX1HNoaI7OoTEhpSvrYVxnlHtqXBy4HlVlci65e4+A==
+X-Google-Smtp-Source: AA0mqf7ZAaFwtnsQ/o31Qma+1YQJIdWkjS6YTmda5EJO78rYJYD90n/VB3W/Ch7Q9Uxv6tcnOHnWL1HG6hz+RkFwHUk=
+X-Received: by 2002:a62:1b0b:0:b0:56d:384:e13a with SMTP id
+ b11-20020a621b0b000000b0056d0384e13amr1555432pfb.75.1668667863849; Wed, 16
+ Nov 2022 22:51:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20221117002350.2178351-1-seanjc@google.com> <20221117002350.2178351-2-seanjc@google.com>
-In-Reply-To: <20221117002350.2178351-2-seanjc@google.com>
+References: <20221113163832.3154370-1-maz@kernel.org> <20221113163832.3154370-6-maz@kernel.org>
+In-Reply-To: <20221113163832.3154370-6-maz@kernel.org>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Wed, 16 Nov 2022 19:07:22 -0800
-Message-ID: <CAAeT=Fx1u=H=5xvmaPxnv4osNwAqNT5c_K1XTfwT0HiPucn+gg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: selftests: Disable single-step with
- correct KVM define
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
-	linux-kernel@vger.kernel.org
+Date: Wed, 16 Nov 2022 22:50:47 -0800
+Message-ID: <CAAeT=FzO4_bzOY3m6X=2a4VWxwfBPP8u0wQ0VTeK+64NVe+e3w@mail.gmail.com>
+Subject: Re: [PATCH v4 05/16] KVM: arm64: PMU: Narrow the overflow checking
+ when required
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221117030722.95BXjXej-zTGSlkZfEIFKwArlQ735VTY6O3p63T5GeU@z>
+Message-ID: <20221117065047.oMS3tI954Va50gLHJp-a_RhxqSEId3oueUqFqUXvl-Y@z>
 
-On Wed, Nov 16, 2022 at 4:24 PM Sean Christopherson <seanjc@google.com> wrote:
+On Sun, Nov 13, 2022 at 8:38 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Disable single-step by setting debug.control to KVM_GUESTDBG_ENABLE,
-> not to SINGLE_STEP_DISABLE.  The latter is an arbitrary test enum that
-> just happens to have the same value as KVM_GUESTDBG_ENABLE, and so
-> effectively disables single-step debug.
+> For 64bit counters that overflow on a 32bit boundary, make
+> sure we only check the bottom 32bit to generate a CHAIN event.
 >
-> No functional change intended.
->
-> Cc: Reiji Watanabe <reijiw@google.com>
-> Fixes: b18e4d4aebdd ("KVM: arm64: selftests: Add a test case for KVM_GUESTDBG_SINGLESTEP")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  tools/testing/selftests/kvm/aarch64/debug-exceptions.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/arm64/kvm/pmu-emul.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> index 947bd201435c..91f55b45dfc7 100644
-> --- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> +++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> @@ -369,7 +369,7 @@ void test_single_step_from_userspace(int test_cnt)
->                                                 KVM_GUESTDBG_SINGLESTEP;
->                                 ss_enable = true;
->                         } else {
-> -                               debug.control = SINGLE_STEP_DISABLE;
-> +                               debug.control = KVM_GUESTDBG_ENABLE;
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index d050143326b5..9e6bc7edc4de 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -417,7 +417,8 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
+>                 reg = lower_32_bits(reg);
+>                 __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
+>
+> -               if (reg) /* No overflow? move on */
+> +               /* No overflow? move on */
+> +               if (kvm_pmu_idx_has_64bit_overflow(vcpu, i) ? reg : lower_32_bits(reg))
 
+A few lines up, the 'reg' is unconditionally updated with
+"lower_32_bits(reg)". So, the change initially confused me
+(until I checked the following patch).  IMHO it might be more
+clear if this patch and the next patch are folded into one patch.
+
+Anyway:
 Reviewed-by: Reiji Watanabe <reijiw@google.com>
 
-Maybe I originally wanted to set it to 0:)
-There is no issue with KVM_GUESTDBG_ENABLE at all,
-as KVM_GUESTDBG_SINGLESTEP is cleared with that.
-
-Thank you for fixing this!
-
-Thanks,
+Thank you,
 Reiji
 
 
->                                 ss_enable = false;
->                         }
+
+>                         continue;
 >
+>                 /* Mark overflow */
 > --
-> 2.38.1.431.g37b22c650d-goog
+> 2.34.1
 >
