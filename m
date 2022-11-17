@@ -2,83 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 813C0C4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Nov 2022 21:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDDDAC433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Nov 2022 22:33:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5B4A4B8B4;
-	Thu, 17 Nov 2022 16:50:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5258A4B89F;
+	Thu, 17 Nov 2022 17:33:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1-N4cZoRBx1s; Thu, 17 Nov 2022 16:50:56 -0500 (EST)
+	with ESMTP id IvhhhTYOkcwC; Thu, 17 Nov 2022 17:33:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B71C4B7B2;
-	Thu, 17 Nov 2022 16:50:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C2654B7FC;
+	Thu, 17 Nov 2022 17:33:00 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C79C94B7A7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 16:50:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E8874B754
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 17:32:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hEb5-RBrTfko for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Nov 2022 16:50:54 -0500 (EST)
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com
- [209.85.215.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 463B54B355
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 16:50:54 -0500 (EST)
-Received: by mail-pg1-f181.google.com with SMTP id n17so3265471pgh.9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 13:50:54 -0800 (PST)
+ with ESMTP id H9Fy8BstPBlR for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Nov 2022 17:32:58 -0500 (EST)
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com
+ [209.85.210.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F1E174B69D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 17:32:57 -0500 (EST)
+Received: by mail-pf1-f176.google.com with SMTP id d192so3195205pfd.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 14:32:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=wVmf135oDM7cjIg0p5NOjXYbOvJzirQGQpU1E7UATjY=;
- b=MvR6zBMU0iANN+nwt76pdZpEdGUXfCq0ZK+4B8OYKPG0Dza8+CFdmcnhM0yTTqlWlu
- iWfcDWW6MFSAJ/Xu5HsJ7pwHCG3e5GksnU6q9t+P0b07psgKC3SWh1Xf1WXkDGWFIQt6
- zeZLwT//eWzHFTuXYAZwo1LXDvc7tvVe+HQxu8UJ4wVGYI/Bzz/iWIuclnK15dtJNIMX
- d6CQ7CTfZ/xqppeMX3oU25UT5bKpW8WNjdgLk8m0mFOZpXmHboq3Y3R65+yjWkMybBor
- Da9Dab8hL+kPFkVRci1CXVUX9k7/eXKTKpQctbD8c1rXAKJHq2cC89y2B2JzDSbtiGGy
- Cgew==
+ bh=JJnX0WEos5jTRigFggqcWTgwGYoctrWx0Q/bRYwgPOw=;
+ b=orjwgIe8kl6hEsdghGmcAPLmmi79K3QzB0hGVLCFUsglgQGZ8IidYAjJg/GV/FkMG7
+ YB2CDLhUOoJ2G1Mxu+LekKxKsCieo31v5V6eqREZVDobQElRzRHpP1yyPiS1SIh6qc9E
+ syPdIm+LBmeWIDtVfWYaqyh5WhEykp+DyFu/8QImqc/L8aTMhenEivOBPO2YDaW9MNrU
+ sCQdT2+9Tz4TB/z8MFExA73zCjSbEpbuT9w2ifakvP/HYNZ8q980hn3+6fb8LMQb4gu2
+ sNl6/ZRrJiDtK48TYUhTcIM5kSgFa69VE7BFzSDb8a0j0LQOg6/pTb507wWlNkEK8f0b
+ kCNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
  :message-id:reply-to;
- bh=wVmf135oDM7cjIg0p5NOjXYbOvJzirQGQpU1E7UATjY=;
- b=uxc99EDRlCsfte/CPsGTNRiP63ciXokv/ey7skDmZgV7peK44vwvDHBh0C78pwLt5k
- 0jSxvkV9M6hzNVnvypi2voOJGB5vGCQQ1joiph4OTpTPo6RB5Mu9kqAFM1fH0fXykTrf
- Xo/8NhQZ5TwyW/ouGr15uIZV6/D/CcfaN7CHZbe/+Qfj/vsuc+BlkN/YnlUZ8uEQpalf
- 8z+um8zLBMm3e6SgXjHDV2VNgRk6hctFKlYXCxp6riPo5p2sHRLcpSdW9uQz5XwrRlC9
- jVrujbtAnDVFFC8D3t+SysIc26xQls/Mw9yg4IW8lcRQUihYVwASXPPDaqqzJxx5QBEG
- redw==
-X-Gm-Message-State: ANoB5pnq3W61clZGCd/9hq6/ffhC7iPZ1Lxfl7I5lkwSHzZSrKEz4am8
- GH553H3IhLO8S7QElQXLUKptrQ==
-X-Google-Smtp-Source: AA0mqf7ojiEOfGMugQYHg3mgtr0O+ymG8fIyWealzk5fox/o6TkFLXvXx/gvXMhXQPTcyJUS9c5J7A==
-X-Received: by 2002:a63:5359:0:b0:46f:7e1c:e6e6 with SMTP id
- t25-20020a635359000000b0046f7e1ce6e6mr3941995pgl.138.1668721853125; 
- Thu, 17 Nov 2022 13:50:53 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com.
- [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
- i8-20020a170902c94800b00172fad607b3sm1879087pla.207.2022.11.17.13.50.52
+ bh=JJnX0WEos5jTRigFggqcWTgwGYoctrWx0Q/bRYwgPOw=;
+ b=5aSyeKR442k5oTrRDYe/MCEf+/WOw85zk0kIpKJ5QynseJjH16PVIN7ml/8eao4mYG
+ Q9jafkgra/fVd+QK825U3ByKTeRU7BJ8xMYvL6zjMIWK6ZPgwqfsSIPtajJKh/h9IXiL
+ LJ9tljo6MeK8ifDvxGJyJsDBhv5e7wydER47GYyPBqeoXH4jT3xDfYhe2o38/EWDXK1p
+ O0PNoDaIAi4d4trXCkwg1vH04wfbxLk2es0khEPj/m9+eKqth1BNzYiWVOkJ9vob2yJj
+ 1FVOjpDPlmNx58HPPgRTKAz/siRIdnjOLQa3JqA7Md/n752pTFmSxnYZwWJIn/ZwUYey
+ HDfA==
+X-Gm-Message-State: ANoB5pkHH7bfcibVpW1XTIv36KX7ariAS37lhSjOndX+OBcSPBVaIxXs
+ Gg6w1JLW8Z3R6b0GQjwWbgjkiA==
+X-Google-Smtp-Source: AA0mqf62hgVFP75vxpYXME1e9myoKhlSOl3NkjrteC+H66jW50x5Upfk3tLqM3B4NZYvwuXH4gz+ag==
+X-Received: by 2002:a63:ff62:0:b0:476:898c:ded8 with SMTP id
+ s34-20020a63ff62000000b00476898cded8mr4068515pgk.251.1668724376940; 
+ Thu, 17 Nov 2022 14:32:56 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ k186-20020a6324c3000000b0046fd180640asm1561643pgk.24.2022.11.17.14.32.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Nov 2022 13:50:52 -0800 (PST)
-Date: Thu, 17 Nov 2022 13:50:49 -0800
-From: Ricardo Koller <ricarkol@google.com>
+ Thu, 17 Nov 2022 14:32:56 -0800 (PST)
+Date: Thu, 17 Nov 2022 22:32:53 +0000
+From: Sean Christopherson <seanjc@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [RFC PATCH 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
-Message-ID: <Y3asuXMXYPjsGgCA@google.com>
-References: <20221112081714.2169495-1-ricarkol@google.com>
- <20221112081714.2169495-5-ricarkol@google.com>
- <Y3KrHG4WMXMUquUy@google.com> <Y3QazjAUVE+T6rHh@google.com>
- <Y3QgVqSUCm8kdbeN@google.com> <Y3Qms0lbCiLFJvG+@google.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: selftests: Disable single-step without
+ relying on ucall()
+Message-ID: <Y3a2lfLLys4BtET3@google.com>
+References: <20221117002350.2178351-1-seanjc@google.com>
+ <20221117002350.2178351-3-seanjc@google.com>
+ <Y3WF8YlvFm8NGYHd@google.com> <Y3WMeovid9z1qOjD@google.com>
+ <Y3ZQ+fCobB4DOc+S@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <Y3Qms0lbCiLFJvG+@google.com>
-Cc: ricarkol@gmail.com, kvm@vger.kernel.org, catalin.marinas@arm.com,
- kvmarm@lists.linux.dev, andrew.jones@linux.dev, bgardon@google.com,
- maz@kernel.org, dmatlack@google.com, pbonzini@redhat.com,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <Y3ZQ+fCobB4DOc+S@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,118 +95,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Nov 15, 2022 at 11:54:27PM +0000, Oliver Upton wrote:
-> On Tue, Nov 15, 2022 at 03:27:18PM -0800, Ricardo Koller wrote:
-> > On Tue, Nov 15, 2022 at 03:03:42PM -0800, Ricardo Koller wrote:
-> > > On Mon, Nov 14, 2022 at 08:54:52PM +0000, Oliver Upton wrote:
-> 
-> [...]
-> 
-> > > > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > > > > index d1f309128118..9c42eff6d42e 100644
-> > > > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > > > > @@ -1267,6 +1267,80 @@ static int stage2_create_removed(kvm_pte_t *ptep, u64 phys, u32 level,
-> > > > >  	return __kvm_pgtable_visit(&data, mm_ops, ptep, level);
-> > > > >  }
-> > > > >  
-> > > > > +struct stage2_split_data {
-> > > > > +	struct kvm_s2_mmu		*mmu;
-> > > > > +	void				*memcache;
-> > > > > +	struct kvm_pgtable_mm_ops	*mm_ops;
-> > > > 
-> > > > You can also get at mm_ops through kvm_pgtable_visit_ctx
-> > > > 
-> > > > > +};
-> > > > > +
-> > > > > +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> > > > > +			       enum kvm_pgtable_walk_flags visit)
-> > > > > +{
-> > > > > +	struct stage2_split_data *data = ctx->arg;
-> > > > > +	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
-> > > > > +	kvm_pte_t pte = ctx->old, attr, new;
-> > > > > +	enum kvm_pgtable_prot prot;
-> > > > > +	void *mc = data->memcache;
-> > > > > +	u32 level = ctx->level;
-> > > > > +	u64 phys;
-> > > > > +
-> > > > > +	if (WARN_ON_ONCE(kvm_pgtable_walk_shared(ctx)))
-> > > > > +		return -EINVAL;
-> > > > > +
-> > > > > +	/* Nothing to split at the last level */
-> > > > > +	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
-> > > > > +		return 0;
-> > > > > +
-> > > > > +	/* We only split valid block mappings */
-> > > > > +	if (!kvm_pte_valid(pte) || kvm_pte_table(pte, ctx->level))
-> > > > > +		return 0;
-> > > > > +
-> > > > > +	phys = kvm_pte_to_phys(pte);
-> > > > > +	prot = kvm_pgtable_stage2_pte_prot(pte);
-> > > > > +	stage2_set_prot_attr(data->mmu->pgt, prot, &attr);
-> > > > > +
-> > > > > +	/*
-> > > > > +	 * Eager page splitting is best-effort, so we can ignore the error.
-> > > > > +	 * The returned PTE (new) will be valid even if this call returns
-> > > > > +	 * error: new will be a single (big) block PTE.  The only issue is
-> > > > > +	 * that it will affect dirty logging performance, as the huge-pages
-> > > > > +	 * will have to be split on fault, and so we WARN.
-> > > > > +	 */
-> > > > > +	WARN_ON(stage2_create_removed(&new, phys, level, attr, mc, mm_ops));
-> > > > 
-> > > > I don't believe we should warn in this case, at least not
-> > > > unconditionally. ENOMEM is an expected outcome, for example.
+On Thu, Nov 17, 2022, Sean Christopherson wrote:
+> On Thu, Nov 17, 2022, Sean Christopherson wrote:
+> > On Thu, Nov 17, 2022, Oliver Upton wrote:
+> > > On Thu, Nov 17, 2022 at 12:23:50AM +0000, Sean Christopherson wrote:
+> > > > Automatically disable single-step when the guest reaches the end of the
+> > > > verified section instead of using an explicit ucall() to ask userspace to
+> > > > disable single-step.  An upcoming change to implement a pool-based scheme
+> > > > for ucall() will add an atomic operation (bit test and set) in the guest
+> > > > ucall code, and if the compiler generate "old school" atomics, e.g.
 > > > 
-> > > Given that "eager page splitting" is best-effort, the error must be
-> > > ignored somewhere: either here or by the caller (in mmu.c). It seems
-> > > that ignoring the error here is not a very good idea.
+> > > Off topic, but I didn't ask when we were discussing this issue. What is
+> > > the atomic used for in the pool-based ucall implementation?
 > > 
-> > Actually, ignoring the error here simplifies the error handling.
-> > stage2_create_removed() is best-effort; here's an example.  If
-> > stage2_create_removed() was called to split a 1G block PTE, and it
-> > wasn't able to split all 2MB blocks, it would return ENOMEM and a valid
-> > PTE pointing to a tree like this:
+> > To avoid having to plumb an "id" into the guest, vCPUs grab a ucall entry from
+> > the pool on a first-come first-serve basis, and then release the entry when the
+> > ucall is complete.  The current implementation is a bitmap, e.g. every possible
+> > entry has a bit in the map, and vCPUs do an atomic bit-test-and-set to claim an
+> > entry.
 > > 
-> > 		[---------1GB-------------]
-> > 		:                         :
-> > 		[--2MB--][--2MB--][--2MB--]
-> > 		:       :
-> > 		[ ][ ][ ]
+> > Ugh.  And there's a bug.  Of course I notice it after sending the pull request.
+> > Depsite being defined in atomic.h, and despite clear_bit() being atomic in the
+> > kernel, tools' clear_bit() isn't actually atomic.  Grr.
 > > 
-> > If we returned ENOMEM instead of ignoring the error, we would have to
-> > clean all the intermediate state.  But stage2_create_removed() is
-> > designed to always return a valid PTE, even if the tree is not fully
-> > split (as above).  So, there's no really need to clean it: it's a valid
-> > tree. Moreover, this valid tree would result in better dirty logging
-> > performance as it already has some 2M blocks split into 4K pages.
+> > Doesn't cause problems because there are so few multi-vCPU selftests, but that
+> > needs to be fixed.  Best thing would be to fix clear_bit() itself.
 > 
-> I have no issue with installing a partially-populated table, but
-> unconditionally ignoring the return code and marching onwards seems
-> dangerous. If you document the behavior of -ENOMEM on
-> stage2_create_removed() and return early for anything else it may read a
-> bit better.
+> Ha!  And I bet when clear_bit() is fixed, this test will start failing again
+> because the ucall() to activate single-step needs to release the entry _after_
+> exiting to the host, i.e. single-step will be enabled across the atomic region
+> again.
 
-This got me thinking. These partially-populated tables are complicating
-things too much for not good reason. They should be very rare, as the
-caller will ensure there's enough memory in the memcache. So what do you
-think of this other option?
-
-https://github.com/ricarkol/linux/commit/54ba44f7d00d93cbaecebd148c102ca9d7c0e711
-
-used here:
-
-https://github.com/ricarkol/linux/commit/ff63a8744c18d5e4589911831e20ccb41712bda2#
-
-It reuses the stage2 mapper to implement create_removed(), and makes
-things simpler by only returning success when building a fully populated
-tree. The caller doesn't need to clean anything in case of failures:
-partially populated trees are cleaned up by create_removed() before
-returninf failure.
-
-> 
-> --
-> Thanks,
-> Oliver
+LOL, yep.  Test gets stuck in __aarch64_ldclr8_sync().
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
