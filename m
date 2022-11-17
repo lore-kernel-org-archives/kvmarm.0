@@ -2,77 +2,112 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C86C4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Nov 2022 14:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D990C43217
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Nov 2022 15:16:24 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31F154B81E;
-	Thu, 17 Nov 2022 09:43:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BBCFA4B6C5;
+	Thu, 17 Nov 2022 10:16:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kVId0S9ohBC6; Thu, 17 Nov 2022 09:43:36 -0500 (EST)
+	with ESMTP id qPb3u-Ns70YZ; Thu, 17 Nov 2022 10:16:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 17B1C4B822;
-	Thu, 17 Nov 2022 09:43:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 721394B81F;
+	Thu, 17 Nov 2022 10:16:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73C704B811
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 09:43:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E13D34B822
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 10:16:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vBL6fsASfbHv for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Nov 2022 09:43:29 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 910634B808
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 09:43:29 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 8642F61ECB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 14:43:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB642C43470
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 14:43:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1668696208;
- bh=PtQQuZh4x6gkV/7zv1jhLBJM1shrxLNzaR2wdAV4Bd0=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=kB2sPWpNiRz3Ae5/wQ0URqxkNLVMl/RxfCfciicYJPXxVc5Y2XSJ/yPnX2YBvz0cD
- OTa9l2PKqLK95LJ7u8UH8tINKpDUs2hElD9P4RJm1SAeWti+PD9Q3rUiejlkp9BE/p
- pEbgHD6MSE+4y1YjRNh9F0tLmC3lm9lQEYHj1MqDbLg4JkFxyhKwqLJFMRlT3Xza/1
- XYUpqClvX3tNAGecFCaCLZ/Oam405WgZIJiYAtNJUhfqbc48PMmACkcw3iI2loi24S
- dkiHMLnpG0EOssXf+F24ZRWgvAStUW3PMJdF2XcNZnI3DcY5+zV56DDjy7wH3CfUO0
- /7jyoYL6te+/g==
-Received: by mail-lj1-f179.google.com with SMTP id c25so2961557ljr.8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 06:43:27 -0800 (PST)
-X-Gm-Message-State: ANoB5pmHUGMvkPDrSADyL9KqHgw+/c91S8FQEtZucpwQu6HtDsnksCLo
- gYmj67DFRr3bLXPW1Oe3a4hfQM97OVBnpofLVQ==
-X-Google-Smtp-Source: AA0mqf7jB2iKLFyRkgEPhmDznVrq+mWMaPm8RVbm9kLapVF5jFapO3LQ2aTW4BZ64Qc2gAP6XYENyA06X1A0z4BBREg=
-X-Received: by 2002:a05:651c:1690:b0:277:2b10:bf69 with SMTP id
- bd16-20020a05651c169000b002772b10bf69mr1213015ljb.392.1668696205975; Thu, 17
- Nov 2022 06:43:25 -0800 (PST)
+ with ESMTP id U5v7xq-GpQna for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Nov 2022 10:16:20 -0500 (EST)
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com
+ [209.85.216.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 985F74B6C5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 10:16:20 -0500 (EST)
+Received: by mail-pj1-f42.google.com with SMTP id
+ l22-20020a17090a3f1600b00212fbbcfb78so5680815pjc.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 07:16:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=Geqy1MGLbG4CNNhTg6ig5gMw4IRIu2ApDkqg8kUu6fE=;
+ b=im3ECY8irru0d2J3PmRkK1oS6XMYGDmkKrSKiLpQr6kggh65U519LacoANhp99/wDs
+ yHeOZt/b6IK2ihlol7f0Ba2me3bs0cr3TxYhTcQThAifpYqs8dB3p/8NK2dEXBDay90O
+ bW6pXrP7B14I1MNWa+NfggtZKbyTz1rnHhMsVYBCQiIPWqcakktYyuja6CoTLxQtkpfs
+ JsqTKBMeEN72FgBWe/ihbCXP9h1x9TEb9ulziUgPn3ZIyNK23YQtGzg65j8/As9Xyk7K
+ 3+HVs34s1miAiKC8ZfgoVMv73WwF3DJWJcQDYskZpYkejUuTFt6cPMAw/xSDBCQyvpM1
+ B6Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=Geqy1MGLbG4CNNhTg6ig5gMw4IRIu2ApDkqg8kUu6fE=;
+ b=QjUXNjBBGBeJKkR9PZhBmdt/fJjeRBn8u85PvVkVwcLjxne5dWbhsCrXrSecpatFbh
+ k7QmMFcZiVH33CL2pnamGFtlTwhch0sHOQtpjY29NweWs3z5k4/x2hNdfzKKOYi9r+Xl
+ +hdSR3l/kqV7JXFWFgG85VwJX45mPMZiJ2kQeZnHvMInjBrzzhsmTtyDsnP99fRlTqLa
+ pDUCeZyrswt/+PIIj39wRnc/0xBZVS0F9eH1/aaId8E2C5ZjnUiq73mPBdkRD+zaULD6
+ ZnZ/wGQrFhcjscv0oCeVZHkIpuSL9+OG4rn3IrBnR2LCRr6AzkEbnS3aYsJk2pPnP6/o
+ FltQ==
+X-Gm-Message-State: ANoB5pkDAWwjihk8QwlRd2wQnjF8Xz/RQVK+lzRdgVNWBvbOIGMVXAdH
+ 7zX1yagYI9UvVgVcQx2Hq46cSw==
+X-Google-Smtp-Source: AA0mqf5Drbj5GGUy8zNXmPljMG8UuEFTPTHf+YuwVXyWlSocFeljs1OjIQ+Ab7mWXZMNXetmsxdGbQ==
+X-Received: by 2002:a17:90a:6b84:b0:20a:cbb0:3c9b with SMTP id
+ w4-20020a17090a6b8400b0020acbb03c9bmr3280802pjj.81.1668698179289; 
+ Thu, 17 Nov 2022 07:16:19 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ r12-20020a63e50c000000b00476dc914262sm1135777pgh.1.2022.11.17.07.16.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 17 Nov 2022 07:16:18 -0800 (PST)
+Date: Thu, 17 Nov 2022 15:16:15 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Subject: Re: [PATCH 38/44] KVM: Disable CPU hotplug during hardware enabling
+Message-ID: <Y3ZQP3C1f8pk199t@google.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221102231911.3107438-39-seanjc@google.com>
+ <88e920944de70e7d69a98f74005b49c59b5aaa3b.camel@intel.com>
+ <b198fe971cecd301f0c7c66028cfd71dd7ba7e62.camel@intel.com>
+ <Y3PzhANShVlTXVg1@google.com>
+ <95ca433349eca601bdd2b16d70f59ba8e56d8e3f.camel@intel.com>
+ <Y3UZtoIidMyE8qVz@google.com>
+ <7fb66c497b6c41049167b05c63267cbc301b1c20.camel@intel.com>
 MIME-Version: 1.0
-References: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
-In-Reply-To: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
-From: Rob Herring <robh@kernel.org>
-Date: Thu, 17 Nov 2022 08:43:17 -0600
-X-Gmail-Original-Message-ID: <CAL_Jsq+WOjoPW0FDSa=B9-aCMwXC3tc5HUqokoVkKUucKgqanQ@mail.gmail.com>
-Message-ID: <CAL_Jsq+WOjoPW0FDSa=B9-aCMwXC3tc5HUqokoVkKUucKgqanQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/8] perf: Arm SPEv1.2 support
-To: Namhyung Kim <namhyung@kernel.org>, Will Deacon <will@kernel.org>, 
- Arnaldo Carvalho de Melo <acme@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
- Peter Zijlstra <peterz@infradead.org>, 
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Mark Rutland <mark.rutland@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, 
- Oliver Upton <oliver.upton@linux.dev>, Ingo Molnar <mingo@redhat.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse <james.morse@arm.com>, 
- Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- Mark Brown <broonie@kernel.org>, James Clark <james.clark@arm.com>,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <7fb66c497b6c41049167b05c63267cbc301b1c20.camel@intel.com>
+Cc: "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+ "david@redhat.com" <david@redhat.com>,
+ "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+ "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+ "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+ "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
+ "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "Gao,
+ Chao" <chao.gao@intel.com>, "farman@linux.ibm.com" <farman@linux.ibm.com>,
+ "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "Yao,
+ Yuan" <yuan.yao@intel.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ "frankja@linux.ibm.com" <frankja@linux.ibm.com>, "Yamahata,
+ Isaku" <isaku.yamahata@intel.com>,
+ "atishp@atishpatra.org" <atishp@atishpatra.org>,
+ "farosas@linux.ibm.com" <farosas@linux.ibm.com>,
+ "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+ "palmer@dabbelt.com" <palmer@dabbelt.com>,
+ "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+ "maz@kernel.org" <maz@kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "vkuznets@redhat.com" <vkuznets@redhat.com>,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,61 +124,32 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Nov 4, 2022 at 10:55 AM Rob Herring <robh@kernel.org> wrote:
->
-> This series adds support for Arm SPEv1.2 which is part of the
-> Armv8.7/Armv9.2 architecture. There's 2 new features that affect the
-> kernel: a new event filter bit, branch 'not taken', and an inverted
-> event filter register.
->
-> Since this support adds new registers and fields, first the SPE register
-> defines are converted to automatic generation.
->
-> Note that the 'config3' addition in sysfs format files causes SPE to
-> break. A stable fix e552b7be12ed ("perf: Skip and warn on unknown format
-> 'configN' attrs") landed in v6.1-rc1.
->
-> The perf tool side changes are available here[1].
->
-> Tested on FVP.
->
-> [1] https://lore.kernel.org/all/20220914-arm-perf-tool-spe1-2-v2-v4-0-83c098e6212e@kernel.org/
->
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
-> Changes in v3:
-> - Add some more missing SPE register fields and use Enums for some
->   fields
-> - Use the new PMSIDR_EL1 register Enum defines in the SPE driver
-> - Link to v2: https://lore.kernel.org/r/20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org
->
-> Changes in v2:
-> - Convert the SPE register defines to automatic generation
-> - Fixed access to SYS_PMSNEVFR_EL1 when not present
-> - Rebase on v6.1-rc1
-> - Link to v1: https://lore.kernel.org/r/20220825-arm-spe-v8-7-v1-0-c75b8d92e692@kernel.org
->
-> ---
-> Rob Herring (8):
->       perf: arm_spe: Use feature numbering for PMSEVFR_EL1 defines
->       arm64: Drop SYS_ from SPE register defines
->       arm64/sysreg: Convert SPE registers to automatic generation
->       perf: arm_spe: Drop BIT() and use FIELD_GET/PREP accessors
->       perf: arm_spe: Use new PMSIDR_EL1 register enums
->       perf: arm_spe: Support new SPEv1.2/v8.7 'not taken' event
->       perf: Add perf_event_attr::config3
->       perf: arm_spe: Add support for SPEv1.2 inverted event filtering
->
->  arch/arm64/include/asm/el2_setup.h |   6 +-
->  arch/arm64/include/asm/sysreg.h    |  99 +++--------------------
->  arch/arm64/kvm/debug.c             |   2 +-
->  arch/arm64/kvm/hyp/nvhe/debug-sr.c |   2 +-
->  arch/arm64/tools/sysreg            | 139 +++++++++++++++++++++++++++++++++
->  drivers/perf/arm_spe_pmu.c         | 156 ++++++++++++++++++++++++-------------
->  include/uapi/linux/perf_event.h    |   3 +
->  7 files changed, 257 insertions(+), 150 deletions(-)
+On Thu, Nov 17, 2022, Huang, Kai wrote:
+> On Wed, 2022-11-16 at 17:11 +0000, Sean Christopherson wrote:
+> > static int kvm_x86_check_processor_compatibility(void)
+> > {
+> >         int cpu = smp_processor_id();
+> >         struct cpuinfo_x86 *c = &cpu_data(cpu);
+> > 
+> >         /*
+> >          * Compatibility checks are done when loading KVM and when enabling
+> >          * hardware, e.g. during CPU hotplug, to ensure all online CPUs are
+> >          * compatible, i.e. KVM should never perform a compatibility check on
+> >          * an offline CPU.
+> >          */
+> >         WARN_ON(!cpu_online(cpu));
+> 
+> Looks good to me.  Perhaps this also can be removed, though.
 
-Will, any comments on this series?
+Hmm, it's a bit superfluous, but I think it could fire if KVM messed up CPU
+hotplug again, e.g. if the for_each_online_cpu() => IPI raced with CPU unplug.
+
+> And IMHO the removing of WARN_ON(!irq_disabled()) should be folded to the patch
+> "[PATCH 37/44] KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section". 
+> Because moving from STARTING section to ONLINE section changes the IRQ status
+> when the compatibility check is called.
+
+Yep, that's what I have coded up, just smushed it all together here.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
