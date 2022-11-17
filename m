@@ -1,113 +1,86 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44EE15B0
-	for <kvmarm@lists.linux.dev>; Wed, 16 Nov 2022 17:48:47 +0000 (UTC)
-Date: Wed, 16 Nov 2022 17:48:42 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1668620926;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XmW9WCvz+s/qLEawf6fSBFXtTILAUrT47yXR3/eJuXA=;
-	b=gHOya6+ikm8w73hzuv3v8gYs1nwKsVXAiDPYeHh25rYtsls8WnfmYPtLeNtJZoyISRHBLT
-	ovYBecRu4QtPVPemAsppXx0Z0S/INA9VcgBZ5hzHUeeWV5EHNPl0dwzYNtsJmLU7qTKEeo
-	S+Uoppf66b4Pw0ULuegq2accZeXeKQk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Quentin Perret <qperret@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Sudeep Holla <sudeep.holla@arm.com>,
-	Andrew Walbran <qwandor@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH 03/12] KVM: arm64: Block unsafe FF-A calls from the host
-Message-ID: <Y3Uiemx6YQxoZWhh@google.com>
-References: <20221116170335.2341003-1-qperret@google.com>
- <20221116170335.2341003-4-qperret@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C8DC182
+	for <kvmarm@lists.linux.dev>; Thu, 17 Nov 2022 00:23:57 +0000 (UTC)
+Received: by mail-pj1-f74.google.com with SMTP id k9-20020a17090a39c900b0021671e97a25so228977pjf.1
+        for <kvmarm@lists.linux.dev>; Wed, 16 Nov 2022 16:23:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lpmvhPUsFZSSLhAYtyq+lnahyrVFyMY6HS7SD72pXuo=;
+        b=gNlC3pG6woPDN/PLsQTy7kCfejxGoDjjgCDqeYlESkUwnl4hdFlijtgdjR92RU+gDu
+         Zvo8aD6WPhj34C6XqgL8Sskbz28auhO8ceP0/v4Qh6yw/gYonpMDGFF2irfWRDwSHyCJ
+         R/ICN9FQuNt2xrG9CFVwkPxtgwMvdbVsMB65kgtt35DNEtXRdtqpCU2V13yuti5yTYL8
+         Z3VSSx1ug+op/sspO4IX8cxnJtAIuY89m6RhH/CqaIrxUOGiouWM3QjjyQlbL0bHBQMD
+         1YLN18yT9tPwAwJv3JeHZvjHNPbabEUNFw65JWje87zDEuyCoJDSomUUafz3p9TOXCCL
+         zUxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lpmvhPUsFZSSLhAYtyq+lnahyrVFyMY6HS7SD72pXuo=;
+        b=vLBeMJm5hy8zpElVKJioX8iUZXzFNHmd9gz5foMzBBavJGRml0hnlrpg4Jrp7l/yF2
+         u1+mJPzN+8PIk/LGVfBAbZI9qWngss5Jni4mNvF6FpnJ9RzqSPfosndxfzzQZJ7hFgSQ
+         6sD1JU47qwrjx2lD7QebwZ03FHi3ARFKwu7AIhlThTIqwOQtUGrcKH2dcKLI2R6dIB30
+         8n0KqUXO31aWF8jw+nZpTfHoc8vJ8qcg5eXUsfKfq6lP/qvGNC+u68/wQkb6V4czK7pU
+         U6s4g9NCucdlDNHKZoWI/RL71ue9S7Ji0gJry6wWDqjMoLoAsOgBBV/BPaVBnAfJJgTi
+         YuEw==
+X-Gm-Message-State: ANoB5pk6FeqWEyOAnfM2mc5hI1bMJbXmAsSor8W5caseTtr9QoIm9VVl
+	vFPSZ8mlnItz2xiX2LVzv8uEqqgdBqc=
+X-Google-Smtp-Source: AA0mqf48bzKDE2Lb8bz6HjmAijvXpLnfL7EKx0nmUTvxI/NOxkKZ8jGDDtXitJI0o6StktvINPXJ6rgmuPU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:7609:b0:187:3c62:5837 with SMTP id
+ k9-20020a170902760900b001873c625837mr223332pll.123.1668644636835; Wed, 16 Nov
+ 2022 16:23:56 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 17 Nov 2022 00:23:48 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221116170335.2341003-4-qperret@google.com>
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221116174842.i1hdjkxcHiHY54-BHYVxiXCmCVrrj7LTKmrlMT4-_q0@z>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.1.431.g37b22c650d-goog
+Message-ID: <20221117002350.2178351-1-seanjc@google.com>
+Subject: [PATCH 0/2] KVM: arm64: selftests: Fixes for single-step test
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, 
+	Reiji Watanabe <reijiw@google.com>, Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20221117002348.1W0qH0nHziSORD-t19ubWhvo0Pv_EoLz1RRhJwIB5mQ@z>
 
-Sorry, hit send a bit too early. Reviewing the patch itself:
+Marc,
 
-On Wed, Nov 16, 2022 at 05:03:26PM +0000, Quentin Perret wrote:
+I would like to route this through Paolo's tree/queue for 6.2 along with
+a big pile of other selftests updates.  I am hoping to get the selftests
+pile queued sooner than later as there is a lot of active development in
+that area, and don't want to have the selftests be in a broken state.
+I'm going to send Paolo a pull request shortly, I'll Cc you (and others)
+to keep everyone in the loop and give a chance for objections.
 
-[...]
 
-> +static bool ffa_call_unsupported(u64 func_id)
-> +{
-> +	switch (func_id) {
-> +	/* Unsupported memory management calls */
-> +	case FFA_FN64_MEM_RETRIEVE_REQ:
-> +	case FFA_MEM_RETRIEVE_RESP:
-> +	case FFA_MEM_RELINQUISH:
-> +	case FFA_MEM_OP_PAUSE:
-> +	case FFA_MEM_OP_RESUME:
-> +	case FFA_MEM_FRAG_RX:
-> +	case FFA_FN64_MEM_DONATE:
-> +	/* Indirect message passing via RX/TX buffers */
-> +	case FFA_MSG_SEND:
-> +	case FFA_MSG_POLL:
-> +	case FFA_MSG_WAIT:
-> +	/* 32-bit variants of 64-bit calls */
-> +	case FFA_MSG_SEND_DIRECT_REQ:
-> +	case FFA_MSG_SEND_DIRECT_RESP:
-> +	case FFA_RXTX_MAP:
-> +	case FFA_MEM_DONATE:
-> +	case FFA_MEM_RETRIEVE_REQ:
-> +		return true;
-> +	}
-> +
-> +	return false;
-> +}
 
-Wouldn't an allowlist behave better in this case? While unlikely, you
-wouldn't want EL3 implementing some FFA_BACKDOOR_PVM SMC that falls
-outside of the denylist and is passed through.
+Fix a typo and an imminenent not-technically-a-bug bug in the single-step
+test where executing an atomic sequence in the guest with single-step
+enable will hang the guest due to eret clearing the local exclusive
+monitor.
 
-> +bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(u64, func_id, host_ctxt, 0);
-> +	struct arm_smccc_res res;
-> +
-> +	if (!is_ffa_call(func_id))
-> +		return false;
-> +
-> +	switch (func_id) {
-> +	/* Memory management */
-> +	case FFA_FN64_RXTX_MAP:
-> +	case FFA_RXTX_UNMAP:
-> +	case FFA_MEM_SHARE:
-> +	case FFA_FN64_MEM_SHARE:
-> +	case FFA_MEM_LEND:
-> +	case FFA_FN64_MEM_LEND:
-> +	case FFA_MEM_RECLAIM:
-> +	case FFA_MEM_FRAG_TX:
-> +		break;
-> +	}
 
-What is the purpose of this switch?
+Sean Christopherson (2):
+  KVM: arm64: selftests: Disable single-step with correct KVM define
+  KVM: arm64: selftests: Disable single-step without relying on ucall()
 
-> +
-> +	if (!ffa_call_unsupported(func_id))
-> +		return false; /* Pass through */
+ .../selftests/kvm/aarch64/debug-exceptions.c  | 28 ++++++++++---------
+ 1 file changed, 15 insertions(+), 13 deletions(-)
 
-Another (tiny) benefit of implementing an allowlist is that it avoids
-the use of double-negative logic like this.
 
---
-Thanks,
-Oliver
+base-commit: d663b8a285986072428a6a145e5994bc275df994
+-- 
+2.38.1.431.g37b22c650d-goog
+
