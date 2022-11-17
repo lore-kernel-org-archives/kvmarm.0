@@ -1,108 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9F03208
-	for <kvmarm@lists.linux.dev>; Thu, 17 Nov 2022 14:43:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E92A3C433B5
-	for <kvmarm@lists.linux.dev>; Thu, 17 Nov 2022 14:43:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668696207;
-	bh=PtQQuZh4x6gkV/7zv1jhLBJM1shrxLNzaR2wdAV4Bd0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=juVH2HuerqtB0el4ObInnz8agOFZsKBRk/cI4KapZRPjo90NkVuQdMGb7fWSeh1yG
-	 hz0uebHKVWJiNebub2kkx8DnONmxVs9apTrE4AasILxb4t+C+93xGKxRw49fJJ2GXd
-	 s3uJHsdRU6Oo0bXRPQdCM5Zf8EXy0GMydk1bQWxXS+tKMfq8pYlZE9YfrpBwLskv81
-	 HH73GIP3SUwPG3u7iTO2utrB6klh2yZdSFHQtD3MahJJN0ZPSOURsldBTFzKzoLEDV
-	 V1WcnlMxNpG2ij5MM7stTs/BjGxQp6tmmHDsTA5KZoUIqURrcp/uEYqTHaZVDj0FnH
-	 1B2JY6+//uZQw==
-Received: by mail-lj1-f178.google.com with SMTP id l8so2936249ljh.13
-        for <kvmarm@lists.linux.dev>; Thu, 17 Nov 2022 06:43:27 -0800 (PST)
-X-Gm-Message-State: ANoB5pktA7zWkKFBjWYAvGVnN3pcXYcQkbFcr4kQGYPA/CYt2cfMPpr4
-	XifLwvjWA+fOCA1lMGXAIjbxCDChy8Fv3FOHhg==
-X-Google-Smtp-Source: AA0mqf7jB2iKLFyRkgEPhmDznVrq+mWMaPm8RVbm9kLapVF5jFapO3LQ2aTW4BZ64Qc2gAP6XYENyA06X1A0z4BBREg=
-X-Received: by 2002:a05:651c:1690:b0:277:2b10:bf69 with SMTP id
- bd16-20020a05651c169000b002772b10bf69mr1213015ljb.392.1668696205975; Thu, 17
- Nov 2022 06:43:25 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1004E3FDD
+	for <kvmarm@lists.linux.dev>; Thu, 17 Nov 2022 15:16:19 +0000 (UTC)
+Received: by mail-pj1-f51.google.com with SMTP id d13-20020a17090a3b0d00b00213519dfe4aso2258212pjc.2
+        for <kvmarm@lists.linux.dev>; Thu, 17 Nov 2022 07:16:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Geqy1MGLbG4CNNhTg6ig5gMw4IRIu2ApDkqg8kUu6fE=;
+        b=im3ECY8irru0d2J3PmRkK1oS6XMYGDmkKrSKiLpQr6kggh65U519LacoANhp99/wDs
+         yHeOZt/b6IK2ihlol7f0Ba2me3bs0cr3TxYhTcQThAifpYqs8dB3p/8NK2dEXBDay90O
+         bW6pXrP7B14I1MNWa+NfggtZKbyTz1rnHhMsVYBCQiIPWqcakktYyuja6CoTLxQtkpfs
+         JsqTKBMeEN72FgBWe/ihbCXP9h1x9TEb9ulziUgPn3ZIyNK23YQtGzg65j8/As9Xyk7K
+         3+HVs34s1miAiKC8ZfgoVMv73WwF3DJWJcQDYskZpYkejUuTFt6cPMAw/xSDBCQyvpM1
+         B6Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Geqy1MGLbG4CNNhTg6ig5gMw4IRIu2ApDkqg8kUu6fE=;
+        b=OGOOGd6OXEJ+9gy11vKfxedlcO3CRhqXCg/4/8+TGLH4A1CFb5n2xT0T/Y0CSQ7G+c
+         p0TXlgqGY+XlkLM4kPwsRxN8Y0N7zr473kBOyUEr8h2k4fliRpJnty4C8keVIkkFE3hA
+         sVgXdvE0KkNGfPGp8GtmOc/ZYT58ZT30VwGKFLN2WAvwH2UYbDOWgwxgaef/OwvNQ5Up
+         VeWsWg5w6XdwLU9AMF6DaMq2Ooo83u2+ec+XqgGQcID1NdQ8Kr3bhOafSGEURCZWSUvL
+         ZHJc7dv1MKq2TXxRbzA8/topj1Z2Tor5b9svaj/xIlFD6IgHieg3hIq9nGlfna4/8/Sl
+         JCSA==
+X-Gm-Message-State: ANoB5pn3fWnab9Y5ESj4Lhk5sLAeiFff0IhVlTNIYsE+D1vQo4F4/Uzx
+	edzk0lx31+1w6LHFTLmv4xeiEg==
+X-Google-Smtp-Source: AA0mqf5Drbj5GGUy8zNXmPljMG8UuEFTPTHf+YuwVXyWlSocFeljs1OjIQ+Ab7mWXZMNXetmsxdGbQ==
+X-Received: by 2002:a17:90a:6b84:b0:20a:cbb0:3c9b with SMTP id w4-20020a17090a6b8400b0020acbb03c9bmr3280802pjj.81.1668698179289;
+        Thu, 17 Nov 2022 07:16:19 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id r12-20020a63e50c000000b00476dc914262sm1135777pgh.1.2022.11.17.07.16.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Nov 2022 07:16:18 -0800 (PST)
+Date: Thu, 17 Nov 2022 15:16:15 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+	"Yao, Yuan" <yuan.yao@intel.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"david@redhat.com" <david@redhat.com>,
+	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"farosas@linux.ibm.com" <farosas@linux.ibm.com>,
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>,
+	"chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+	"mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"alexandru.elisei@arm.com" <alexandru.elisei@arm.com>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"anup@brainfault.org" <anup@brainfault.org>,
+	"frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+	"aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
+	"james.morse@arm.com" <james.morse@arm.com>,
+	"kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+	"farman@linux.ibm.com" <farman@linux.ibm.com>,
+	"paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"atishp@atishpatra.org" <atishp@atishpatra.org>,
+	"imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+	"Gao, Chao" <chao.gao@intel.com>
+Subject: Re: [PATCH 38/44] KVM: Disable CPU hotplug during hardware enabling
+Message-ID: <Y3ZQP3C1f8pk199t@google.com>
+References: <20221102231911.3107438-1-seanjc@google.com>
+ <20221102231911.3107438-39-seanjc@google.com>
+ <88e920944de70e7d69a98f74005b49c59b5aaa3b.camel@intel.com>
+ <b198fe971cecd301f0c7c66028cfd71dd7ba7e62.camel@intel.com>
+ <Y3PzhANShVlTXVg1@google.com>
+ <95ca433349eca601bdd2b16d70f59ba8e56d8e3f.camel@intel.com>
+ <Y3UZtoIidMyE8qVz@google.com>
+ <7fb66c497b6c41049167b05c63267cbc301b1c20.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
-In-Reply-To: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
-From: Rob Herring <robh@kernel.org>
-Date: Thu, 17 Nov 2022 08:43:17 -0600
-X-Gmail-Original-Message-ID: <CAL_Jsq+WOjoPW0FDSa=B9-aCMwXC3tc5HUqokoVkKUucKgqanQ@mail.gmail.com>
-Message-ID: <CAL_Jsq+WOjoPW0FDSa=B9-aCMwXC3tc5HUqokoVkKUucKgqanQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/8] perf: Arm SPEv1.2 support
-To: Namhyung Kim <namhyung@kernel.org>, Will Deacon <will@kernel.org>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Ingo Molnar <mingo@redhat.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse <james.morse@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, James Clark <james.clark@arm.com>, 
-	Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.cs.columbia.edu
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221117144317.GaG61Izc9pqHEv1TM_vNaRCzcqEd_nUsFtMGMvPEf_c@z>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7fb66c497b6c41049167b05c63267cbc301b1c20.camel@intel.com>
+Message-ID: <20221117151615.2GZxnpuI21lb-1WbWdzYVvalE6dObjvnfWBz0dwrNGw@z>
 
-On Fri, Nov 4, 2022 at 10:55 AM Rob Herring <robh@kernel.org> wrote:
->
-> This series adds support for Arm SPEv1.2 which is part of the
-> Armv8.7/Armv9.2 architecture. There's 2 new features that affect the
-> kernel: a new event filter bit, branch 'not taken', and an inverted
-> event filter register.
->
-> Since this support adds new registers and fields, first the SPE register
-> defines are converted to automatic generation.
->
-> Note that the 'config3' addition in sysfs format files causes SPE to
-> break. A stable fix e552b7be12ed ("perf: Skip and warn on unknown format
-> 'configN' attrs") landed in v6.1-rc1.
->
-> The perf tool side changes are available here[1].
->
-> Tested on FVP.
->
-> [1] https://lore.kernel.org/all/20220914-arm-perf-tool-spe1-2-v2-v4-0-83c098e6212e@kernel.org/
->
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
-> Changes in v3:
-> - Add some more missing SPE register fields and use Enums for some
->   fields
-> - Use the new PMSIDR_EL1 register Enum defines in the SPE driver
-> - Link to v2: https://lore.kernel.org/r/20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org
->
-> Changes in v2:
-> - Convert the SPE register defines to automatic generation
-> - Fixed access to SYS_PMSNEVFR_EL1 when not present
-> - Rebase on v6.1-rc1
-> - Link to v1: https://lore.kernel.org/r/20220825-arm-spe-v8-7-v1-0-c75b8d92e692@kernel.org
->
-> ---
-> Rob Herring (8):
->       perf: arm_spe: Use feature numbering for PMSEVFR_EL1 defines
->       arm64: Drop SYS_ from SPE register defines
->       arm64/sysreg: Convert SPE registers to automatic generation
->       perf: arm_spe: Drop BIT() and use FIELD_GET/PREP accessors
->       perf: arm_spe: Use new PMSIDR_EL1 register enums
->       perf: arm_spe: Support new SPEv1.2/v8.7 'not taken' event
->       perf: Add perf_event_attr::config3
->       perf: arm_spe: Add support for SPEv1.2 inverted event filtering
->
->  arch/arm64/include/asm/el2_setup.h |   6 +-
->  arch/arm64/include/asm/sysreg.h    |  99 +++--------------------
->  arch/arm64/kvm/debug.c             |   2 +-
->  arch/arm64/kvm/hyp/nvhe/debug-sr.c |   2 +-
->  arch/arm64/tools/sysreg            | 139 +++++++++++++++++++++++++++++++++
->  drivers/perf/arm_spe_pmu.c         | 156 ++++++++++++++++++++++++-------------
->  include/uapi/linux/perf_event.h    |   3 +
->  7 files changed, 257 insertions(+), 150 deletions(-)
+On Thu, Nov 17, 2022, Huang, Kai wrote:
+> On Wed, 2022-11-16 at 17:11 +0000, Sean Christopherson wrote:
+> > static int kvm_x86_check_processor_compatibility(void)
+> > {
+> >         int cpu = smp_processor_id();
+> >         struct cpuinfo_x86 *c = &cpu_data(cpu);
+> > 
+> >         /*
+> >          * Compatibility checks are done when loading KVM and when enabling
+> >          * hardware, e.g. during CPU hotplug, to ensure all online CPUs are
+> >          * compatible, i.e. KVM should never perform a compatibility check on
+> >          * an offline CPU.
+> >          */
+> >         WARN_ON(!cpu_online(cpu));
+> 
+> Looks good to me.  Perhaps this also can be removed, though.
 
-Will, any comments on this series?
+Hmm, it's a bit superfluous, but I think it could fire if KVM messed up CPU
+hotplug again, e.g. if the for_each_online_cpu() => IPI raced with CPU unplug.
+
+> And IMHO the removing of WARN_ON(!irq_disabled()) should be folded to the patch
+> "[PATCH 37/44] KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section". 
+> Because moving from STARTING section to ONLINE section changes the IRQ status
+> when the compatibility check is called.
+
+Yep, that's what I have coded up, just smushed it all together here.
