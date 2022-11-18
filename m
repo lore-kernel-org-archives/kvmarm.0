@@ -2,82 +2,84 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDDDAC433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Nov 2022 22:33:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49D05C43217
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Nov 2022 00:20:39 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5258A4B89F;
-	Thu, 17 Nov 2022 17:33:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C07BC4B8C0;
+	Thu, 17 Nov 2022 19:20:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IvhhhTYOkcwC; Thu, 17 Nov 2022 17:33:00 -0500 (EST)
+	with ESMTP id HHns3ptnzped; Thu, 17 Nov 2022 19:20:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C2654B7FC;
-	Thu, 17 Nov 2022 17:33:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 927994B8A7;
+	Thu, 17 Nov 2022 19:20:37 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E8874B754
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 17:32:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0585A4B89F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 19:20:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H9Fy8BstPBlR for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Nov 2022 17:32:58 -0500 (EST)
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com
- [209.85.210.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F1E174B69D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 17:32:57 -0500 (EST)
-Received: by mail-pf1-f176.google.com with SMTP id d192so3195205pfd.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 14:32:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=JJnX0WEos5jTRigFggqcWTgwGYoctrWx0Q/bRYwgPOw=;
- b=orjwgIe8kl6hEsdghGmcAPLmmi79K3QzB0hGVLCFUsglgQGZ8IidYAjJg/GV/FkMG7
- YB2CDLhUOoJ2G1Mxu+LekKxKsCieo31v5V6eqREZVDobQElRzRHpP1yyPiS1SIh6qc9E
- syPdIm+LBmeWIDtVfWYaqyh5WhEykp+DyFu/8QImqc/L8aTMhenEivOBPO2YDaW9MNrU
- sCQdT2+9Tz4TB/z8MFExA73zCjSbEpbuT9w2ifakvP/HYNZ8q980hn3+6fb8LMQb4gu2
- sNl6/ZRrJiDtK48TYUhTcIM5kSgFa69VE7BFzSDb8a0j0LQOg6/pTb507wWlNkEK8f0b
- kCNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
- :message-id:reply-to;
- bh=JJnX0WEos5jTRigFggqcWTgwGYoctrWx0Q/bRYwgPOw=;
- b=5aSyeKR442k5oTrRDYe/MCEf+/WOw85zk0kIpKJ5QynseJjH16PVIN7ml/8eao4mYG
- Q9jafkgra/fVd+QK825U3ByKTeRU7BJ8xMYvL6zjMIWK6ZPgwqfsSIPtajJKh/h9IXiL
- LJ9tljo6MeK8ifDvxGJyJsDBhv5e7wydER47GYyPBqeoXH4jT3xDfYhe2o38/EWDXK1p
- O0PNoDaIAi4d4trXCkwg1vH04wfbxLk2es0khEPj/m9+eKqth1BNzYiWVOkJ9vob2yJj
- 1FVOjpDPlmNx58HPPgRTKAz/siRIdnjOLQa3JqA7Md/n752pTFmSxnYZwWJIn/ZwUYey
- HDfA==
-X-Gm-Message-State: ANoB5pkHH7bfcibVpW1XTIv36KX7ariAS37lhSjOndX+OBcSPBVaIxXs
- Gg6w1JLW8Z3R6b0GQjwWbgjkiA==
-X-Google-Smtp-Source: AA0mqf62hgVFP75vxpYXME1e9myoKhlSOl3NkjrteC+H66jW50x5Upfk3tLqM3B4NZYvwuXH4gz+ag==
-X-Received: by 2002:a63:ff62:0:b0:476:898c:ded8 with SMTP id
- s34-20020a63ff62000000b00476898cded8mr4068515pgk.251.1668724376940; 
- Thu, 17 Nov 2022 14:32:56 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com.
- [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
- k186-20020a6324c3000000b0046fd180640asm1561643pgk.24.2022.11.17.14.32.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 17 Nov 2022 14:32:56 -0800 (PST)
-Date: Thu, 17 Nov 2022 22:32:53 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH 2/2] KVM: arm64: selftests: Disable single-step without
- relying on ucall()
-Message-ID: <Y3a2lfLLys4BtET3@google.com>
-References: <20221117002350.2178351-1-seanjc@google.com>
- <20221117002350.2178351-3-seanjc@google.com>
- <Y3WF8YlvFm8NGYHd@google.com> <Y3WMeovid9z1qOjD@google.com>
- <Y3ZQ+fCobB4DOc+S@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Y3ZQ+fCobB4DOc+S@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ with ESMTP id dy3VOc07snB1 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Nov 2022 19:20:35 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E54D4B782
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 19:20:35 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 36264B810DF;
+ Fri, 18 Nov 2022 00:20:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0DD1C433C1;
+ Fri, 18 Nov 2022 00:20:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1668730832;
+ bh=UPKFz2DsiakqWhGmlH6ehaMqM4wm6M3vd2T7GaE1SQw=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=imroKEniBTTIqxq1/mcUCDjw0gXXBCz/5lchVAcVG5jEO3ZeNbN2jlyHR7W2fLaPq
+ WsKOtqPfrLtoxMNvxsBVu0rUhlnsnlrAGbyaILTeLAuRa0I2QJqysQbak1S8I2EkS+
+ SLMy4MKsd/r2wmkrT9XiSrRjf96AaDtD6zD0OlQCdaWnSP9LViEUcpuBmVWxMJHdmy
+ m7rESH7yae05V8s5QOYoMy5IiOIcMESXCWdzXbHOeof6TwOv715rmmPk/YXN2d59Pv
+ +QE4ZIxIJnjN9ifVukmDw7c/VfTTija0hA6eDgt92nbUmt/LKBVFBdHMi++HjOhLGX
+ wELms2dbIY27w==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1ovp7O-006roN-TM;
+ Fri, 18 Nov 2022 00:20:31 +0000
+Date: Fri, 18 Nov 2022 00:20:30 +0000
+Message-ID: <86r0y1nmep.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Usama Arif <usama.arif@bytedance.com>
+Subject: Re: [External] Re: [v2 0/6] KVM: arm64: implement vcpu_is_preempted
+ check
+In-Reply-To: <180b91af-a2aa-2cfd-eb7f-b2825c4e3dbe@bytedance.com>
+References: <20221104062105.4119003-1-usama.arif@bytedance.com>
+ <87k048f3cm.wl-maz@kernel.org>
+ <180b91af-a2aa-2cfd-eb7f-b2825c4e3dbe@bytedance.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: usama.arif@bytedance.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux@armlinux.org.uk,
+ yezengruan@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+ steven.price@arm.com, mark.rutland@arm.com, bagasdotme@gmail.com,
+ fam.zheng@bytedance.com, liangma@liangbit.com, punit.agrawal@bytedance.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ bagasdotme@gmail.com, fam.zheng@bytedance.com, punit.agrawal@bytedance.com,
+ linux@armlinux.org.uk, liangma@liangbit.com, steven.price@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -95,38 +97,80 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Nov 17, 2022, Sean Christopherson wrote:
-> On Thu, Nov 17, 2022, Sean Christopherson wrote:
-> > On Thu, Nov 17, 2022, Oliver Upton wrote:
-> > > On Thu, Nov 17, 2022 at 12:23:50AM +0000, Sean Christopherson wrote:
-> > > > Automatically disable single-step when the guest reaches the end of the
-> > > > verified section instead of using an explicit ucall() to ask userspace to
-> > > > disable single-step.  An upcoming change to implement a pool-based scheme
-> > > > for ucall() will add an atomic operation (bit test and set) in the guest
-> > > > ucall code, and if the compiler generate "old school" atomics, e.g.
-> > > 
-> > > Off topic, but I didn't ask when we were discussing this issue. What is
-> > > the atomic used for in the pool-based ucall implementation?
-> > 
-> > To avoid having to plumb an "id" into the guest, vCPUs grab a ucall entry from
-> > the pool on a first-come first-serve basis, and then release the entry when the
-> > ucall is complete.  The current implementation is a bitmap, e.g. every possible
-> > entry has a bit in the map, and vCPUs do an atomic bit-test-and-set to claim an
-> > entry.
-> > 
-> > Ugh.  And there's a bug.  Of course I notice it after sending the pull request.
-> > Depsite being defined in atomic.h, and despite clear_bit() being atomic in the
-> > kernel, tools' clear_bit() isn't actually atomic.  Grr.
-> > 
-> > Doesn't cause problems because there are so few multi-vCPU selftests, but that
-> > needs to be fixed.  Best thing would be to fix clear_bit() itself.
+On Mon, 07 Nov 2022 12:00:44 +0000,
+Usama Arif <usama.arif@bytedance.com> wrote:
 > 
-> Ha!  And I bet when clear_bit() is fixed, this test will start failing again
-> because the ucall() to activate single-step needs to release the entry _after_
-> exiting to the host, i.e. single-step will be enabled across the atomic region
-> again.
+> 
+> 
+> On 06/11/2022 16:35, Marc Zyngier wrote:
+> > On Fri, 04 Nov 2022 06:20:59 +0000,
+> > Usama Arif <usama.arif@bytedance.com> wrote:
+> >> 
+> >> This patchset adds support for vcpu_is_preempted in arm64, which
+> >> allows the guest to check if a vcpu was scheduled out, which is
+> >> useful to know incase it was holding a lock. vcpu_is_preempted can
+> >> be used to improve performance in locking (see owner_on_cpu usage in
+> >> mutex_spin_on_owner, mutex_can_spin_on_owner, rtmutex_spin_on_owner
+> >> and osq_lock) and scheduling (see available_idle_cpu which is used
+> >> in several places in kernel/sched/fair.c for e.g. in wake_affine to
+> >> determine which CPU can run soonest):
+> > 
+> > [...]
+> > 
+> >> pvcy shows a smaller overall improvement (50%) compared to
+> >> vcpu_is_preempted (277%).  Host side flamegraph analysis shows that
+> >> ~60% of the host time when using pvcy is spent in kvm_handle_wfx,
+> >> compared with ~1.5% when using vcpu_is_preempted, hence
+> >> vcpu_is_preempted shows a larger improvement.
+> > 
+> > And have you worked out *why* we spend so much time handling WFE?
+> > 
+> > 	M.
+> 
+> Its from the following change in pvcy patchset:
+> 
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index e778eefcf214..915644816a85 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -118,7 +118,12 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
+>         }
+> 
+>         if (esr & ESR_ELx_WFx_ISS_WFE) {
+> -               kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
+> +               int state;
+> +               while ((state = kvm_pvcy_check_state(vcpu)) == 0)
+> +                       schedule();
+> +
+> +               if (state == -1)
+> +                       kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
+>         } else {
+>                 if (esr & ESR_ELx_WFx_ISS_WFxT)
+>                         vcpu_set_flag(vcpu, IN_WFIT);
+> 
+> 
+> If my understanding is correct of the pvcy changes, whenever pvcy
+> returns an unchanged vcpu state, we would schedule to another
+> vcpu. And its the constant scheduling where the time is spent. I guess
+> the affects are much higher when the lock contention is very
+> high. This can be seem from the pvcy host side flamegraph as well with
+> (~67% of the time spent in the schedule() call in kvm_handle_wfx), For
+> reference, I have put the graph at:
+> https://uarif1.github.io/pvlock/perf_host_pvcy_nmi.svg
 
-LOL, yep.  Test gets stuck in __aarch64_ldclr8_sync().
+The real issue here is that we don't try to pick the right vcpu to
+run, and strictly rely on schedule() to eventually pick something that
+can run.
+
+An interesting to do would be to try and fit the directed yield
+mechanism there. It would be a lot more interesting than the one-off
+vcpu_is_preempted hack, as it gives us a low-level primitive on which
+to construct things (pvcy is effectively a mwait-like primitive).
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
