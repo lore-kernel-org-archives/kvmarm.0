@@ -1,37 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3CA2F43
-	for <kvmarm@lists.linux.dev>; Fri, 18 Nov 2022 14:56:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49A0CC433C1;
-	Fri, 18 Nov 2022 14:56:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C6328E1
+	for <kvmarm@lists.linux.dev>; Fri, 18 Nov 2022 16:49:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EE7DC433D6;
+	Fri, 18 Nov 2022 16:49:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668783404;
-	bh=kQqNwIRTX/hMdAUkbPpnbCbz6J1Qz8mIuBGg79EWriQ=;
+	s=k20201202; t=1668790192;
+	bh=Ezeq8ffMYvaPt9FpoGuX5EQSh2HNXruXkEIhBtNrqXo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YAcGcNO717vxcqR6gw7hPCPkskQj2wFxDzeuW9mROwlkdTfHvsj313IATnooRiuH7
-	 tggG//xkOzUdbhHJi9RH5nUHr7JyjuEL8To04GZkGxQ+NqDdJYuK0xU8yvqQm2SnY5
-	 Gv9xoQAQQwMXscRow5tS3mEG0waNLDXKKDfLUaCfkyCYxD/MDglLWUCFLE8+3Dp8iv
-	 0mSr5zAFkl6F8Wv3JRf0R4kjtOsD7JHBNfgBGcKygeKngjWkZ4TPuc+YarzIdVBPqn
-	 55sMg9/gLjLP2+8k17o7zmujzTy38yupQVAQHhdgtLRalXIq0dYP63UmSdSl8lUPu9
-	 OZ4b8PrPzo3Mg==
-Date: Fri, 18 Nov 2022 14:56:38 +0000
+	b=t+JTQsE5gBlbQKNkVdC+DxA8XuWAPw+UeaHxdk4s7mPJ549BmuWk3MM6R4F6c7n6C
+	 EsCL6Hk9H1J8XQPoNjTdfH2WJ8E6eUXq6otr2IhTOtYkxxdm3zXcv0un0lLCl5sc+t
+	 3VP++ldEfKNntD/Tt+XxhZ/oVmWxCS39+2V0zwu4sPIrvGXB/u4JjkclpYadaIR7LR
+	 m42PXa1FGhJvPcWmctVEpKKAzJetqlDkoRMDxgIJ/ipTmOv6diUYQI7rA0BGhoKyy+
+	 QDDPH2K1Iv6AFjuh4lxI7nQdxnJZBu0jk91emROjy0tryHhV5qU+56VwXbPiW+8s82
+	 OEFUywC54fQwA==
+Date: Fri, 18 Nov 2022 16:49:45 +0000
 From: Will Deacon <will@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+To: Rob Herring <robh@kernel.org>
+Cc: Namhyung Kim <namhyung@kernel.org>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Mark Rutland <mark.rutland@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 2/3] KVM: arm64: Allow userspace to trap SMCCC
- sub-ranges
-Message-ID: <20221118145637.GC4624@willie-the-truck>
-References: <20221110015327.3389351-1-oliver.upton@linux.dev>
- <20221110015327.3389351-3-oliver.upton@linux.dev>
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Ingo Molnar <mingo@redhat.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>, kvmarm@lists.linux.dev,
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	James Clark <james.clark@arm.com>, Mark Brown <broonie@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v3 7/8] perf: Add perf_event_attr::config3
+Message-ID: <20221118164943.GA4872@willie-the-truck>
+References: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
+ <20220825-arm-spe-v8-7-v3-7-87682f78caac@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -40,54 +45,45 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221110015327.3389351-3-oliver.upton@linux.dev>
+In-Reply-To: <20220825-arm-spe-v8-7-v3-7-87682f78caac@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
-Message-ID: <20221118145638.eIFnw4is38oqaYCytGvL2LJUrd8SiQ8ClFsiDCQVbyI@z>
+Message-ID: <20221118164945.6KKJAqpHWBE6ybeU-GYwWuLb4ST_aDiuropYQiy-HJ8@z>
 
-Hey Oliver,
-
-On Thu, Nov 10, 2022 at 01:53:26AM +0000, Oliver Upton wrote:
-> As the SMCCC (and related specifications) march towards an
-> 'everything and the kitchen sink' interface for interacting with a
-> system, it is less likely that KVM will implement every supported
-> feature.
+On Fri, Nov 04, 2022 at 10:55:07AM -0500, Rob Herring wrote:
+> Arm SPEv1.2 adds another 64-bits of event filtering control. As the
+> existing perf_event_attr::configN fields are all used up for SPE PMU, an
+> additional field is needed. Add a new 'config3' field.
 > 
-> Add a capability that allows userspace to trap hypercall ranges,
-> allowing the VMM to mix-and-match between calls handled in userspace vs.
-> KVM.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> Tested-by: James Clark <james.clark@arm.com>
+> Signed-off-by: Rob Herring <robh@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_host.h |  5 ++++
->  arch/arm64/include/uapi/asm/kvm.h | 15 ++++++++++
->  arch/arm64/kvm/arm.c              | 10 +++++++
->  arch/arm64/kvm/hypercalls.c       | 48 +++++++++++++++++++++++++++++++
->  include/uapi/linux/kvm.h          |  1 +
->  5 files changed, 79 insertions(+)
+> v3:
+>  - No change
+> v2:
+>  - Drop tools/ side update
+> ---
+>  include/uapi/linux/perf_event.h | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/include/uapi/linux/perf_event.h b/include/uapi/linux/perf_event.h
+> index 85be78e0e7f6..b2b1d7b54097 100644
+> --- a/include/uapi/linux/perf_event.h
+> +++ b/include/uapi/linux/perf_event.h
+> @@ -374,6 +374,7 @@ enum perf_event_read_format {
+>  #define PERF_ATTR_SIZE_VER5	112	/* add: aux_watermark */
+>  #define PERF_ATTR_SIZE_VER6	120	/* add: aux_sample_size */
+>  #define PERF_ATTR_SIZE_VER7	128	/* add: sig_data */
+> +#define PERF_ATTR_SIZE_VER8	136	/* add: config3 */
+>  
+>  /*
+>   * Hardware event_id to monitor via a performance monitoring event:
+> @@ -515,6 +516,8 @@ struct perf_event_attr {
+>  	 * truncated accordingly on 32 bit architectures.
+>  	 */
+>  	__u64	sig_data;
+> +
+> +	__u64	config3; /* extension of config2 */
 
-[...]
-
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 6f0b56e7f8c7..6e8a222fc295 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -100,6 +100,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  		r = 0;
->  		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
->  		break;
-> +	case KVM_CAP_ARM_USER_HYPERCALLS:
-> +		if (cap->args[0] & ~KVM_ARM_USER_HYPERCALL_FLAGS)
-> +			return -EINVAL;
-
-Why not use KVM_CAP_EXIT_HYPERCALL for this? At some point during pKVM
-development, we used that to notify the VMM about memory being shared
-back from the guest but we eventually dropped it as the notification to
-userspace ended up not being needed:
-
-https://android-kvm.googlesource.com/linux/+/dbd2861832dfc4c8a3103214b3c212ee7ace1c44%5E%21/
-https://android-kvm.googlesource.com/linux/+/2a3afc6da99c0e0cb62be1687153ee572903aa80%5E%21/
-
-I'm not saying that what we did was necessarily better, but it seems a bit
-simpler and I figured it might be useful to point you to it.
+I need an ack from the perf core maintainers before I can take this.
 
 Will
