@@ -1,38 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71CDE29A1
-	for <kvmarm@lists.linux.dev>; Fri, 18 Nov 2022 12:19:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5FD0C433C1;
-	Fri, 18 Nov 2022 12:19:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3CA2F43
+	for <kvmarm@lists.linux.dev>; Fri, 18 Nov 2022 14:56:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49A0CC433C1;
+	Fri, 18 Nov 2022 14:56:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668773996;
-	bh=4JxZQz18/grkc1FqZWiq5Dfac3rhr+RHKptMtajtmCU=;
+	s=k20201202; t=1668783404;
+	bh=kQqNwIRTX/hMdAUkbPpnbCbz6J1Qz8mIuBGg79EWriQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cmOF3PFW7xBBeFULSHg5Gp+fc3p4MViAOAqdlA/ug0xCIRdSMOJtUoHGsX+QL2mpS
-	 bTPOQLjhB86Sys7VFp08puWia/RHlVlLM0wT4B8Z3pbW6tO4Fz3TMvX+G/EVVFOktA
-	 /p8qOYNZGe9OhaGAFpw2qLDgDVZBnxxjh/VFwonn2jMINr6L4q9z2m4yxiurj1gV84
-	 TN/Sdu7nrtBuQ+iAYXICRRY29b+eTQAyfmYsaA6wKhDK3CVuaU+64QLN3FHpRquzez
-	 i4wfrwiA/0x+zSp0NHZWziFGoRsP74OpUmgM2rG6XleEn2/bX78qeeKP5JFaZrL5Yr
-	 f4BTl7ZBDC+BQ==
-Date: Fri, 18 Nov 2022 12:19:50 +0000
+	b=YAcGcNO717vxcqR6gw7hPCPkskQj2wFxDzeuW9mROwlkdTfHvsj313IATnooRiuH7
+	 tggG//xkOzUdbhHJi9RH5nUHr7JyjuEL8To04GZkGxQ+NqDdJYuK0xU8yvqQm2SnY5
+	 Gv9xoQAQQwMXscRow5tS3mEG0waNLDXKKDfLUaCfkyCYxD/MDglLWUCFLE8+3Dp8iv
+	 0mSr5zAFkl6F8Wv3JRf0R4kjtOsD7JHBNfgBGcKygeKngjWkZ4TPuc+YarzIdVBPqn
+	 55sMg9/gLjLP2+8k17o7zmujzTy38yupQVAQHhdgtLRalXIq0dYP63UmSdSl8lUPu9
+	 OZ4b8PrPzo3Mg==
+Date: Fri, 18 Nov 2022 14:56:38 +0000
 From: Will Deacon <will@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] KVM: arm64: Don't acquire RCU read lock for
- exclusive table walks
-Message-ID: <20221118121949.GA3697@willie-the-truck>
-References: <20221116165655.2649475-1-oliver.upton@linux.dev>
- <20221116165655.2649475-3-oliver.upton@linux.dev>
- <20221117174951.GA2916@willie-the-truck>
- <Y3Z8G3aCuRzzoq5e@google.com>
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 2/3] KVM: arm64: Allow userspace to trap SMCCC
+ sub-ranges
+Message-ID: <20221118145637.GC4624@willie-the-truck>
+References: <20221110015327.3389351-1-oliver.upton@linux.dev>
+ <20221110015327.3389351-3-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,69 +40,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y3Z8G3aCuRzzoq5e@google.com>
+In-Reply-To: <20221110015327.3389351-3-oliver.upton@linux.dev>
 User-Agent: Mutt/1.10.1 (2018-07-13)
-Message-ID: <20221118121950.b4lXtJqXo6rXy-phIf4oL-UAEVBQCf_aEPu_B11aka4@z>
+Message-ID: <20221118145638.eIFnw4is38oqaYCytGvL2LJUrd8SiQ8ClFsiDCQVbyI@z>
 
-On Thu, Nov 17, 2022 at 06:23:23PM +0000, Oliver Upton wrote:
-> On Thu, Nov 17, 2022 at 05:49:52PM +0000, Will Deacon wrote:
-> > On Wed, Nov 16, 2022 at 04:56:55PM +0000, Oliver Upton wrote:
-> 
-> [...]
-> 
-> > > -static inline void kvm_pgtable_walk_begin(void) {}
-> > > -static inline void kvm_pgtable_walk_end(void) {}
-> > > +static inline void kvm_pgtable_walk_begin(struct kvm_pgtable_walker *walker)
-> > > +{
-> > > +	/*
-> > > +	 * Due to the lack of RCU (or a similar protection scheme), only
-> > > +	 * non-shared table walkers are allowed in the hypervisor.
-> > > +	 */
-> > > +	WARN_ON(walker->flags & KVM_PGTABLE_WALK_SHARED);
-> > > +}
-> > 
-> > I think it would be better to propagate the error to the caller rather
-> > than WARN here.
-> 
-> I'd really like to warn somewhere though since we're rather fscked at
-> this point. Keeping that WARN close to the exceptional condition would
-> help w/ debugging.
-> 
-> Were you envisioning bubbling the error all the way back up (i.e. early
-> return from kvm_pgtable_walk())?
+Hey Oliver,
 
-Yes, that's what I had in mind. WARN is fatal at EL2, so I think it's
-better to fail the pgtable operation rather than bring down the entire
-machine by default. Now, it _might_ be fatal anyway (e.g. if we were
-handling a host stage-2 fault w/ pKVM), but the caller is in a better
-position to decide the severity.
-
-> I had really only intended these to indirect lock acquisition/release,
-> so the error handling on the caller side feels weird:
+On Thu, Nov 10, 2022 at 01:53:26AM +0000, Oliver Upton wrote:
+> As the SMCCC (and related specifications) march towards an
+> 'everything and the kitchen sink' interface for interacting with a
+> system, it is less likely that KVM will implement every supported
+> feature.
 > 
->   static inline int kvm_pgtable_walk_begin(struct kvm_pgtable_walker *walker)
->   {
->   	if (WARN_ON(walker->flags & KVM_PGTABLE_WALK_SHARED))
-> 		return -EPERM;
+> Add a capability that allows userspace to trap hypercall ranges,
+> allowing the VMM to mix-and-match between calls handled in userspace vs.
+> KVM.
 > 
-> 	return 0;
->   }
-> 
->   r = kvm_pgtable_walk_begin()
->   if (r)
->   	return r;
-> 
->   r = _kvm_pgtable_walk();
->   kvm_pgtable_walk_end();
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  5 ++++
+>  arch/arm64/include/uapi/asm/kvm.h | 15 ++++++++++
+>  arch/arm64/kvm/arm.c              | 10 +++++++
+>  arch/arm64/kvm/hypercalls.c       | 48 +++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h          |  1 +
+>  5 files changed, 79 insertions(+)
 
-This doesn't look particularly weird to me (modulo dropping the WARN, or
-moving it to _end()), but maybe I've lost my sense of taste.
+[...]
 
-> > Since you're rejigging things anyway, can you have this
-> > function return int?
-> 
-> If having this is a strong motivator I can do a v4.
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 6f0b56e7f8c7..6e8a222fc295 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -100,6 +100,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		r = 0;
+>  		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
+>  		break;
+> +	case KVM_CAP_ARM_USER_HYPERCALLS:
+> +		if (cap->args[0] & ~KVM_ARM_USER_HYPERCALL_FLAGS)
+> +			return -EINVAL;
 
-It's a really minor point, so I'll leave it up to you guys.
+Why not use KVM_CAP_EXIT_HYPERCALL for this? At some point during pKVM
+development, we used that to notify the VMM about memory being shared
+back from the guest but we eventually dropped it as the notification to
+userspace ended up not being needed:
 
-WIll
+https://android-kvm.googlesource.com/linux/+/dbd2861832dfc4c8a3103214b3c212ee7ace1c44%5E%21/
+https://android-kvm.googlesource.com/linux/+/2a3afc6da99c0e0cb62be1687153ee572903aa80%5E%21/
+
+I'm not saying that what we did was necessarily better, but it seems a bit
+simpler and I figured it might be useful to point you to it.
+
+Will
