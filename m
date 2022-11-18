@@ -1,99 +1,96 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1B88F7F
-	for <kvmarm@lists.linux.dev>; Thu, 17 Nov 2022 22:32:57 +0000 (UTC)
-Received: by mail-pf1-f169.google.com with SMTP id 130so3144197pfu.8
-        for <kvmarm@lists.linux.dev>; Thu, 17 Nov 2022 14:32:57 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2922620EE
+	for <kvmarm@lists.linux.dev>; Fri, 18 Nov 2022 06:00:10 +0000 (UTC)
+Received: by mail-pl1-f172.google.com with SMTP id v17so3706820plo.1
+        for <kvmarm@lists.linux.dev>; Thu, 17 Nov 2022 22:00:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JJnX0WEos5jTRigFggqcWTgwGYoctrWx0Q/bRYwgPOw=;
-        b=orjwgIe8kl6hEsdghGmcAPLmmi79K3QzB0hGVLCFUsglgQGZ8IidYAjJg/GV/FkMG7
-         YB2CDLhUOoJ2G1Mxu+LekKxKsCieo31v5V6eqREZVDobQElRzRHpP1yyPiS1SIh6qc9E
-         syPdIm+LBmeWIDtVfWYaqyh5WhEykp+DyFu/8QImqc/L8aTMhenEivOBPO2YDaW9MNrU
-         sCQdT2+9Tz4TB/z8MFExA73zCjSbEpbuT9w2ifakvP/HYNZ8q980hn3+6fb8LMQb4gu2
-         sNl6/ZRrJiDtK48TYUhTcIM5kSgFa69VE7BFzSDb8a0j0LQOg6/pTb507wWlNkEK8f0b
-         kCNQ==
+        d=csie-ntu-edu-tw.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=q4Wk+KzFpp8McF2mDNBn6lyFAwa5ExYeoo2v/dCLoXE=;
+        b=F6o5IA2rQckRHAgrVgFVJsNGoM3dOXI/T05L8otWp8O0NUh4J5fPSDaGJp7VPnkp/2
+         OTEXlejbStDWGw5Vw3VHFjA91SPh974r6KgoVy5BP7pIkGnMhcYn/Hcm8XXyLChcklDX
+         Yuslm1FkyrYoG/q1m/IES0FpKMEh2aQoap3ZUskMIQ0MUZXvCtPBdKMFLa3t1upZ4i5G
+         iaGoJit0pUb/g9OX5fjyVx+k3yQFbgEXmew9glBZeLVJBh4ryqUyhOS+/PtHW62Ejzl8
+         kieaLjS/C1/R7a/NVlpNLlhQXM3PfNaBo/kVr1GLa57CgplAeDpIUKxaT1M6cmRxwStU
+         4pBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JJnX0WEos5jTRigFggqcWTgwGYoctrWx0Q/bRYwgPOw=;
-        b=QvyWLyCQ1VLjD4F38GDihbfpPMqgbZ82fwlMcDWzqs9jkrXG/lZet/3VExGQPhRJ1m
-         zI954EdLz3VXtrGTIxVflokU2o1w8u5JD1Lnjy/K9gHE06EX25myOyxnP1kDj1Kl6zuY
-         tP7Jn+Lu0TtW/JmDmBQ9xKcnNwUA4KZ/k0MMccpk3giZbmv6GS69KMszwcFIuntdG6bW
-         +wZfeD3bo7HX647uxR5ad1EF7NP6Zm14UM9Gg+d1bQw0wXYSjVO248xUunfPs1qgYIJc
-         ZwSnLugaZouG9ARePh/SR5fse9xrs5EbISlxIs8YSy2ZLWkipKJ5qqWIQXI7QDaRK93G
-         ZHcg==
-X-Gm-Message-State: ANoB5pngtKizSH14gmiu1S+FR1FKpvNcE6cXrOC0xjwuuaU30QESlyCY
-	c6q0sYN829Q0xh3eiX6HHR0odg==
-X-Google-Smtp-Source: AA0mqf62hgVFP75vxpYXME1e9myoKhlSOl3NkjrteC+H66jW50x5Upfk3tLqM3B4NZYvwuXH4gz+ag==
-X-Received: by 2002:a63:ff62:0:b0:476:898c:ded8 with SMTP id s34-20020a63ff62000000b00476898cded8mr4068515pgk.251.1668724376940;
-        Thu, 17 Nov 2022 14:32:56 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id k186-20020a6324c3000000b0046fd180640asm1561643pgk.24.2022.11.17.14.32.56
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=q4Wk+KzFpp8McF2mDNBn6lyFAwa5ExYeoo2v/dCLoXE=;
+        b=cDmyykjaxceH7L8HVfEAY3e+TUAxROITg76rj7NkQJm14TU+8PjjjBPWR63eV86392
+         TTyMYA3wFgdm71QDJy/0UofuyFKnOJTrgzuYLkitTW056X1NpH4bgtprv6hpUYvaq8fh
+         uyJTl19ul1Ahicl85cRZI5W7tErStUnpdW0Py9Og7vGxEDkH2BqDfIgDoLAPAKxEUBnb
+         zd7lfmDY6kDGMBTvZeO+0rPW7f4+/lOkdkXU0eE9cgU/aLQHDGKotEX9w+04c/LKBlWx
+         ZxjDnV8c8uPltJSCf3UVftvYkLCBRNaE01nFhXGsqLpPDzXIkbjBzva94CjtTLs3RbOI
+         5O2w==
+X-Gm-Message-State: ANoB5pktrDjRv3NEFtILDMEX4JmzrZZBBWqLhgu0CRdtL7Hn8jx/Bf7V
+	FhR4k2Mng7t0LFGsnXpI5B9zLu2weaPvSSyKsdmkKVSd5nZXe2P6iQCAe5klmn32W+BVfYBGsnc
+	ufhGf1JUiK7unqP8ROwn1J1x8tNwYgpeqAJDW91s/X8AY0Cl5G95XGzKATmoeImookI6/jLsRvR
+	VYhHm8O/V2LSiZePHBVTo=
+X-Google-Smtp-Source: AA0mqf7JGkj+dhtm+n3CMsmmaicX6T43PbeSs87rwh9x5tEbgbshfwL2GcJwh/+hs46IiO5iW+Axqw==
+X-Received: by 2002:a17:90a:6904:b0:208:4bfa:51e1 with SMTP id r4-20020a17090a690400b002084bfa51e1mr11873419pjj.228.1668751210234;
+        Thu, 17 Nov 2022 22:00:10 -0800 (PST)
+Received: from localhost.localdomain (2001-b011-3803-1a96-3716-7fae-2678-9ea1.dynamic-ip6.hinet.net. [2001:b011:3803:1a96:3716:7fae:2678:9ea1])
+        by smtp.gmail.com with ESMTPSA id h9-20020aa796c9000000b0056d98e359a5sm2169627pfq.165.2022.11.17.22.00.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Nov 2022 14:32:56 -0800 (PST)
-Date: Thu, 17 Nov 2022 22:32:53 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
-	Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: selftests: Disable single-step without
- relying on ucall()
-Message-ID: <Y3a2lfLLys4BtET3@google.com>
-References: <20221117002350.2178351-1-seanjc@google.com>
- <20221117002350.2178351-3-seanjc@google.com>
- <Y3WF8YlvFm8NGYHd@google.com>
- <Y3WMeovid9z1qOjD@google.com>
- <Y3ZQ+fCobB4DOc+S@google.com>
+        Thu, 17 Nov 2022 22:00:09 -0800 (PST)
+From: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+To: maz@kernel.org
+Cc: james.morse@arm.com,
+	alexandru.elisei@arm.com,
+	suzuki.poulose@arm.com,
+	oliver.upton@linux.dev,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	linux-kernel@vger.kernel.org,
+	Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+Subject: [PATCH v2] KVM: arm64: Update comment of create_hyp_mappings
+Date: Fri, 18 Nov 2022 13:59:37 +0800
+Message-Id: <20221118055937.14605-1-r09922117@csie.ntu.edu.tw>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y3ZQ+fCobB4DOc+S@google.com>
-Message-ID: <20221117223253.308hwYUdOJa4Lw3Eh-mlzYSt3kwXmScSwJV6RkP3r_Y@z>
+Content-Transfer-Encoding: 8bit
+X-Gm-Spam: 0
+X-Gm-Phishy: 0
 
-On Thu, Nov 17, 2022, Sean Christopherson wrote:
-> On Thu, Nov 17, 2022, Sean Christopherson wrote:
-> > On Thu, Nov 17, 2022, Oliver Upton wrote:
-> > > On Thu, Nov 17, 2022 at 12:23:50AM +0000, Sean Christopherson wrote:
-> > > > Automatically disable single-step when the guest reaches the end of the
-> > > > verified section instead of using an explicit ucall() to ask userspace to
-> > > > disable single-step.  An upcoming change to implement a pool-based scheme
-> > > > for ucall() will add an atomic operation (bit test and set) in the guest
-> > > > ucall code, and if the compiler generate "old school" atomics, e.g.
-> > > 
-> > > Off topic, but I didn't ask when we were discussing this issue. What is
-> > > the atomic used for in the pool-based ucall implementation?
-> > 
-> > To avoid having to plumb an "id" into the guest, vCPUs grab a ucall entry from
-> > the pool on a first-come first-serve basis, and then release the entry when the
-> > ucall is complete.  The current implementation is a bitmap, e.g. every possible
-> > entry has a bit in the map, and vCPUs do an atomic bit-test-and-set to claim an
-> > entry.
-> > 
-> > Ugh.  And there's a bug.  Of course I notice it after sending the pull request.
-> > Depsite being defined in atomic.h, and despite clear_bit() being atomic in the
-> > kernel, tools' clear_bit() isn't actually atomic.  Grr.
-> > 
-> > Doesn't cause problems because there are so few multi-vCPU selftests, but that
-> > needs to be fixed.  Best thing would be to fix clear_bit() itself.
-> 
-> Ha!  And I bet when clear_bit() is fixed, this test will start failing again
-> because the ucall() to activate single-step needs to release the entry _after_
-> exiting to the host, i.e. single-step will be enabled across the atomic region
-> again.
+HYP_PAGE_OFFSET is removed since 4.8, and the method for generating Hyp
+VAs has evolved. Update the functional description of
+create_hyp_mappings accordingly.
 
-LOL, yep.  Test gets stuck in __aarch64_ldclr8_sync().
+Signed-off-by: Wei-Lin Chang <r09922117@csie.ntu.edu.tw>
+---
+Changes in v2:
+ - Take Marc's advice
+
+ arch/arm64/kvm/mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 8f26c6569..6dda4f4bd 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -479,7 +479,7 @@ void kvm_unshare_hyp(void *from, void *to)
+  * @prot:	The protection to be applied to this range
+  *
+  * The same virtual address as the kernel virtual address is also used
+- * in Hyp-mode mapping (modulo HYP_PAGE_OFFSET) to the same underlying
++ * in Hyp-mode mapping (modulo a random offset) to the same underlying
+  * physical pages.
+  */
+ int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
+-- 
+2.34.1
+
