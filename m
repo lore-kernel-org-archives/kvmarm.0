@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F077CC433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Nov 2022 18:22:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1BE7C433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Nov 2022 18:22:49 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82E944B9F8;
-	Fri, 18 Nov 2022 13:22:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 097794B9E7;
+	Fri, 18 Nov 2022 13:22:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0EfTLa2lzOTZ; Fri, 18 Nov 2022 13:22:39 -0500 (EST)
+	with ESMTP id EfGnwoYl7E8w; Fri, 18 Nov 2022 13:22:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 421C14BA10;
-	Fri, 18 Nov 2022 13:22:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 678354B9BE;
+	Fri, 18 Nov 2022 13:22:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC45B4B9F8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Nov 2022 13:22:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7960F4B9F4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Nov 2022 13:22:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uJbOm2uuChzc for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Nov 2022 13:22:37 -0500 (EST)
+ with ESMTP id Pd-iUrEahwd8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Nov 2022 13:22:40 -0500 (EST)
 Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9A0A54BA11
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Nov 2022 13:22:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B37E34BA0A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Nov 2022 13:22:39 -0500 (EST)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1668795755;
+ t=1668795758;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+qDiuD3jNJZ8Nv9puwEItiXV//K/fyrAyxIFLC1o90U=;
- b=O3BqBMwEhbr8A/vM/SVElBuYyf7xPw/9MyiZuBoq8PDwlYJWCeMuOp0sx+adWywkoE6VYm
- MfMTPfuWgjIzXh2gZz+ONv9NMGAAHMO8TGcKA8TgdW/N3g/NdVXMCoZNex3UeQE8j3WWn3
- UCuGJrbycelVoEX+ClAjww3vSmmZ+40=
+ bh=+uOM/Fua4rhDVOWefaZ8Uq5AA7UeFgjxJb3kFrB+tz4=;
+ b=EI93hjYHkqlernG2+yC6o8UByESVp2FCWuzQD0gzXgeNCSKZPJ9WCc3OrNqzHbk3vz1q+B
+ RU7LXauCNfP2WenYN272ma1Mww+UaS1WDm2Hm3qtzpIv7jIUBtlUFQgeCeEtCXM5141r/5
+ 82I1DTf2dYq5ORX4Hog6LQXJfhtql7I=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
  Alexandru Elisei <alexandru.elisei@arm.com>,
  Suzuki K Poulose <suzuki.poulose@arm.com>,
  Oliver Upton <oliver.upton@linux.dev>,
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Subject: [PATCH v4 1/3] KVM: arm64: Take a pointer to walker data in
- kvm_dereference_pteref()
-Date: Fri, 18 Nov 2022 18:22:20 +0000
-Message-Id: <20221118182222.3932898-2-oliver.upton@linux.dev>
+Subject: [PATCH v4 2/3] KVM: arm64: Don't acquire RCU read lock for exclusive
+ table walks
+Date: Fri, 18 Nov 2022 18:22:21 +0000
+Message-Id: <20221118182222.3932898-3-oliver.upton@linux.dev>
 In-Reply-To: <20221118182222.3932898-1-oliver.upton@linux.dev>
 References: <20221118182222.3932898-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
 X-Migadu-Flow: FLOW_OUT
-Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org
+ Marek Szyprowski <m.szyprowski@samsung.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,220 +72,113 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Rather than passing through the state of the KVM_PGTABLE_WALK_SHARED
-flag, just take a pointer to the whole walker structure instead. Move
-around struct kvm_pgtable and the RCU indirection such that the
-associated ifdeffery remains in one place while ensuring the walker +
-flags definitions precede their use.
+Marek reported a BUG resulting from the recent parallel faults changes,
+as the hyp stage-1 map walker attempted to allocate table memory while
+holding the RCU read lock:
 
-No functional change intended.
+  BUG: sleeping function called from invalid context at
+  include/linux/sched/mm.h:274
+  in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 1, name: swapper/0
+  preempt_count: 0, expected: 0
+  RCU nest depth: 1, expected: 0
+  2 locks held by swapper/0/1:
+    #0: ffff80000a8a44d0 (kvm_hyp_pgd_mutex){+.+.}-{3:3}, at:
+  __create_hyp_mappings+0x80/0xc4
+    #1: ffff80000a927720 (rcu_read_lock){....}-{1:2}, at:
+  kvm_pgtable_walk+0x0/0x1f4
+  CPU: 2 PID: 1 Comm: swapper/0 Not tainted 6.1.0-rc3+ #5918
+  Hardware name: Raspberry Pi 3 Model B (DT)
+  Call trace:
+    dump_backtrace.part.0+0xe4/0xf0
+    show_stack+0x18/0x40
+    dump_stack_lvl+0x8c/0xb8
+    dump_stack+0x18/0x34
+    __might_resched+0x178/0x220
+    __might_sleep+0x48/0xa0
+    prepare_alloc_pages+0x178/0x1a0
+    __alloc_pages+0x9c/0x109c
+    alloc_page_interleave+0x1c/0xc4
+    alloc_pages+0xec/0x160
+    get_zeroed_page+0x1c/0x44
+    kvm_hyp_zalloc_page+0x14/0x20
+    hyp_map_walker+0xd4/0x134
+    kvm_pgtable_visitor_cb.isra.0+0x38/0x5c
+    __kvm_pgtable_walk+0x1a4/0x220
+    kvm_pgtable_walk+0x104/0x1f4
+    kvm_pgtable_hyp_map+0x80/0xc4
+    __create_hyp_mappings+0x9c/0xc4
+    kvm_mmu_init+0x144/0x1cc
+    kvm_arch_init+0xe4/0xef4
+    kvm_init+0x3c/0x3d0
+    arm_init+0x20/0x30
+    do_one_initcall+0x74/0x400
+    kernel_init_freeable+0x2e0/0x350
+    kernel_init+0x24/0x130
+    ret_from_fork+0x10/0x20
 
+Since the hyp stage-1 table walkers are serialized by kvm_hyp_pgd_mutex,
+RCU protection really doesn't add anything. Don't acquire the RCU read
+lock for an exclusive walk.
+
+Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 144 ++++++++++++++-------------
- arch/arm64/kvm/hyp/pgtable.c         |   6 +-
- 2 files changed, 76 insertions(+), 74 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h | 14 ++++++++------
+ arch/arm64/kvm/hyp/pgtable.c         |  4 ++--
+ 2 files changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index a874ce0ce7b5..f23af693e3c5 100644
+index f23af693e3c5..4b6b52ebc11c 100644
 --- a/arch/arm64/include/asm/kvm_pgtable.h
 +++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -37,54 +37,6 @@ static inline u64 kvm_get_parange(u64 mmfr0)
+@@ -229,8 +229,8 @@ static inline kvm_pte_t *kvm_dereference_pteref(struct kvm_pgtable_walker *walke
+ 	return pteref;
+ }
  
- typedef u64 kvm_pte_t;
- 
--/*
-- * RCU cannot be used in a non-kernel context such as the hyp. As such, page
-- * table walkers used in hyp do not call into RCU and instead use other
-- * synchronization mechanisms (such as a spinlock).
-- */
--#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
--
--typedef kvm_pte_t *kvm_pteref_t;
--
--static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
--{
--	return pteref;
--}
--
 -static inline void kvm_pgtable_walk_begin(void) {}
 -static inline void kvm_pgtable_walk_end(void) {}
--
--static inline bool kvm_pgtable_walk_lock_held(void)
--{
--	return true;
--}
--
--#else
--
--typedef kvm_pte_t __rcu *kvm_pteref_t;
--
--static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
--{
--	return rcu_dereference_check(pteref, !shared);
--}
--
++static inline void kvm_pgtable_walk_begin(struct kvm_pgtable_walker *walker) {}
++static inline void kvm_pgtable_walk_end(struct kvm_pgtable_walker *walker) {}
+ 
+ static inline bool kvm_pgtable_walk_lock_held(void)
+ {
+@@ -247,14 +247,16 @@ static inline kvm_pte_t *kvm_dereference_pteref(struct kvm_pgtable_walker *walke
+ 	return rcu_dereference_check(pteref, !(walker->flags & KVM_PGTABLE_WALK_SHARED));
+ }
+ 
 -static inline void kvm_pgtable_walk_begin(void)
--{
++static inline void kvm_pgtable_walk_begin(struct kvm_pgtable_walker *walker)
+ {
 -	rcu_read_lock();
--}
--
++	if (walker->flags & KVM_PGTABLE_WALK_SHARED)
++		rcu_read_lock();
+ }
+ 
 -static inline void kvm_pgtable_walk_end(void)
--{
++static inline void kvm_pgtable_walk_end(struct kvm_pgtable_walker *walker)
+ {
 -	rcu_read_unlock();
--}
--
--static inline bool kvm_pgtable_walk_lock_held(void)
--{
--	return rcu_read_lock_held();
--}
--
--#endif
--
- #define KVM_PTE_VALID			BIT(0)
++	if (walker->flags & KVM_PGTABLE_WALK_SHARED)
++		rcu_read_unlock();
+ }
  
- #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
-@@ -212,29 +164,6 @@ enum kvm_pgtable_prot {
- typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
- 					   enum kvm_pgtable_prot prot);
- 
--/**
-- * struct kvm_pgtable - KVM page-table.
-- * @ia_bits:		Maximum input address size, in bits.
-- * @start_level:	Level at which the page-table walk starts.
-- * @pgd:		Pointer to the first top-level entry of the page-table.
-- * @mm_ops:		Memory management callbacks.
-- * @mmu:		Stage-2 KVM MMU struct. Unused for stage-1 page-tables.
-- * @flags:		Stage-2 page-table flags.
-- * @force_pte_cb:	Function that returns true if page level mappings must
-- *			be used instead of block mappings.
-- */
--struct kvm_pgtable {
--	u32					ia_bits;
--	u32					start_level;
--	kvm_pteref_t				pgd;
--	struct kvm_pgtable_mm_ops		*mm_ops;
--
--	/* Stage-2 only */
--	struct kvm_s2_mmu			*mmu;
--	enum kvm_pgtable_stage2_flags		flags;
--	kvm_pgtable_force_pte_cb_t		force_pte_cb;
--};
--
- /**
-  * enum kvm_pgtable_walk_flags - Flags to control a depth-first page-table walk.
-  * @KVM_PGTABLE_WALK_LEAF:		Visit leaf entries, including invalid
-@@ -285,6 +214,79 @@ struct kvm_pgtable_walker {
- 	const enum kvm_pgtable_walk_flags	flags;
- };
- 
-+/*
-+ * RCU cannot be used in a non-kernel context such as the hyp. As such, page
-+ * table walkers used in hyp do not call into RCU and instead use other
-+ * synchronization mechanisms (such as a spinlock).
-+ */
-+#if defined(__KVM_NVHE_HYPERVISOR__) || defined(__KVM_VHE_HYPERVISOR__)
-+
-+typedef kvm_pte_t *kvm_pteref_t;
-+
-+static inline kvm_pte_t *kvm_dereference_pteref(struct kvm_pgtable_walker *walker,
-+						kvm_pteref_t pteref)
-+{
-+	return pteref;
-+}
-+
-+static inline void kvm_pgtable_walk_begin(void) {}
-+static inline void kvm_pgtable_walk_end(void) {}
-+
-+static inline bool kvm_pgtable_walk_lock_held(void)
-+{
-+	return true;
-+}
-+
-+#else
-+
-+typedef kvm_pte_t __rcu *kvm_pteref_t;
-+
-+static inline kvm_pte_t *kvm_dereference_pteref(struct kvm_pgtable_walker *walker,
-+						kvm_pteref_t pteref)
-+{
-+	return rcu_dereference_check(pteref, !(walker->flags & KVM_PGTABLE_WALK_SHARED));
-+}
-+
-+static inline void kvm_pgtable_walk_begin(void)
-+{
-+	rcu_read_lock();
-+}
-+
-+static inline void kvm_pgtable_walk_end(void)
-+{
-+	rcu_read_unlock();
-+}
-+
-+static inline bool kvm_pgtable_walk_lock_held(void)
-+{
-+	return rcu_read_lock_held();
-+}
-+
-+#endif
-+
-+/**
-+ * struct kvm_pgtable - KVM page-table.
-+ * @ia_bits:		Maximum input address size, in bits.
-+ * @start_level:	Level at which the page-table walk starts.
-+ * @pgd:		Pointer to the first top-level entry of the page-table.
-+ * @mm_ops:		Memory management callbacks.
-+ * @mmu:		Stage-2 KVM MMU struct. Unused for stage-1 page-tables.
-+ * @flags:		Stage-2 page-table flags.
-+ * @force_pte_cb:	Function that returns true if page level mappings must
-+ *			be used instead of block mappings.
-+ */
-+struct kvm_pgtable {
-+	u32					ia_bits;
-+	u32					start_level;
-+	kvm_pteref_t				pgd;
-+	struct kvm_pgtable_mm_ops		*mm_ops;
-+
-+	/* Stage-2 only */
-+	struct kvm_s2_mmu			*mmu;
-+	enum kvm_pgtable_stage2_flags		flags;
-+	kvm_pgtable_force_pte_cb_t		force_pte_cb;
-+};
-+
- /**
-  * kvm_pgtable_hyp_init() - Initialise a hypervisor stage-1 page-table.
-  * @pgt:	Uninitialised page-table structure to initialise.
+ static inline bool kvm_pgtable_walk_lock_held(void)
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 5bca9610d040..b5b91a882836 100644
+index b5b91a882836..d6f3753cb87e 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -188,7 +188,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
- 				      kvm_pteref_t pteref, u32 level)
- {
- 	enum kvm_pgtable_walk_flags flags = data->walker->flags;
--	kvm_pte_t *ptep = kvm_dereference_pteref(pteref, flags & KVM_PGTABLE_WALK_SHARED);
-+	kvm_pte_t *ptep = kvm_dereference_pteref(data->walker, pteref);
- 	struct kvm_pgtable_visit_ctx ctx = {
- 		.ptep	= ptep,
- 		.old	= READ_ONCE(*ptep),
-@@ -558,7 +558,7 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
+@@ -289,9 +289,9 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
  	};
+ 	int r;
  
- 	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
--	pgt->mm_ops->put_page(kvm_dereference_pteref(pgt->pgd, false));
-+	pgt->mm_ops->put_page(kvm_dereference_pteref(&walker, pgt->pgd));
- 	pgt->pgd = NULL;
+-	kvm_pgtable_walk_begin();
++	kvm_pgtable_walk_begin(walker);
+ 	r = _kvm_pgtable_walk(pgt, &walk_data);
+-	kvm_pgtable_walk_end();
++	kvm_pgtable_walk_end(walker);
+ 
+ 	return r;
  }
- 
-@@ -1241,7 +1241,7 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
- 
- 	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
- 	pgd_sz = kvm_pgd_pages(pgt->ia_bits, pgt->start_level) * PAGE_SIZE;
--	pgt->mm_ops->free_pages_exact(kvm_dereference_pteref(pgt->pgd, false), pgd_sz);
-+	pgt->mm_ops->free_pages_exact(kvm_dereference_pteref(&walker, pgt->pgd), pgd_sz);
- 	pgt->pgd = NULL;
- }
- 
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
