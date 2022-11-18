@@ -2,74 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF831C43217
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Nov 2022 02:29:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0CA9C433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Nov 2022 06:17:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27A1E4B754;
-	Thu, 17 Nov 2022 21:29:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 164444B875;
+	Fri, 18 Nov 2022 01:17:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Zjg21el4ev66; Thu, 17 Nov 2022 21:29:51 -0500 (EST)
+	with ESMTP id R6HbIh2nzX29; Fri, 18 Nov 2022 01:17:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16AC84B802;
-	Thu, 17 Nov 2022 21:29:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D41AA4B89C;
+	Fri, 18 Nov 2022 01:17:16 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D05C24B754
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 21:29:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B07F4B7FC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Nov 2022 01:17:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id n-BwR0YcojIM for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Nov 2022 21:29:46 -0500 (EST)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 49A684B69D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 21:29:46 -0500 (EST)
-Received: from dggpemm500023.china.huawei.com (unknown [172.30.72.57])
- by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4ND126472Wz15Mbg;
- Fri, 18 Nov 2022 10:29:18 +0800 (CST)
-Received: from [10.174.187.128] (10.174.187.128) by
- dggpemm500023.china.huawei.com (7.185.36.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Fri, 18 Nov 2022 10:29:41 +0800
-Subject: Re: disabling halt polling broken? (was Re: [PATCH 00/14] KVM:
- Halt-polling fixes, cleanups and a new stat)
-To: David Matlack <dmatlack@google.com>
-References: <20210925005528.1145584-1-seanjc@google.com>
- <03f2f5ab-e809-2ba5-bd98-3393c3b843d2@de.ibm.com>
- <YVHcY6y1GmvGJnMg@google.com>
- <f37ab68c-61ce-b6fb-7a49-831bacfc7424@redhat.com>
- <43e42f5c-9d9f-9e8b-3a61-9a053a818250@de.ibm.com>
- <CABgObfYtS6wiQe=BhF3t5usr7J6q4PWE4=rwZMMukfC9wT_6fA@mail.gmail.com>
- <YVIAdVxc+q2UWB+J@google.com>
- <32810c89-44c6-6780-9d05-e49f6b897b6e@huawei.com>
- <Y3UboELxugwDJkIG@google.com>
-From: "wangyanan (Y)" <wangyanan55@huawei.com>
-Message-ID: <e124456c-0691-460b-c471-00ac1d7b0254@huawei.com>
-Date: Fri, 18 Nov 2022 10:29:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+ with ESMTP id zYmQTCbukK3Z for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Nov 2022 01:17:15 -0500 (EST)
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com
+ [209.85.216.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E94E94B796
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Nov 2022 01:17:14 -0500 (EST)
+Received: by mail-pj1-f54.google.com with SMTP id
+ w3-20020a17090a460300b00218524e8877so6356086pjg.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Nov 2022 22:17:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:from:to:cc:subject:date:message-id:reply-to;
+ bh=O4krRe8XDBdLIpjFY/ER5AqvIQp00WsZTiZcVijc1ZI=;
+ b=XpXWPsuUQPdeaSh+PB7FepZiiaCD2ScGfbp3zoh2o1VxOfHYXcccs2zVlSeCXWR482
+ pCgoir28+6RM1WCKscSprXI4GSA2g/hw/KzlqPmC6NBRL+R5p7u43tzcfU/SU3udOt5F
+ W5I5b+NdertH6JIBi9b5aXaTJH3560AduFVgMy4ZwliolBJZzhKD8XdpUo6oiIRyaItW
+ N2/Np8pDGroR8EizlFI11TZViucKHufjUjdFl2pjND/C1f/21Fx1NtiR57VMcrnvKUR3
+ X95M8MrtNqshEKXbjTONVOmHRfAIWniYJoRB2jvwUcQC4oQyFdSiEfsThFytQ1yGv4bX
+ Hpmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=cc:to:subject:message-id:date:from:in-reply-to:references
+ :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+ :reply-to;
+ bh=O4krRe8XDBdLIpjFY/ER5AqvIQp00WsZTiZcVijc1ZI=;
+ b=ZfgrHBW4rnqvSWQlrCUuVEhgQnjZq8VEWrQ903I/KNDZlrEqILBAsN0jAxklAJ3mcq
+ rPbhYsbWO0eMSbJAtVSN8/Dry5p2zI3sRMcp/HBek8h7TTtcAKUZuElhU+fg2zWFV3np
+ yB2faJiHuYeHywxi0rYQVBezF+xpomGC8KNgtnqwonP+OKufmkWChK7phHdkJg5vs6LD
+ 5w7cFNjMKTFP/cgCycdoT7oQKiaN37iw80PPs6efK/tQi700QERyzCS+u6+eSc67krtX
+ fhNYxckqIU2c1jgyqhgwxMipFSEK2H2ULRvxpm/L827vd2Rq8NxkoAuqT90vZJWVbJJ3
+ FObA==
+X-Gm-Message-State: ANoB5pkn9VzqDzRBV32MnUmxDMma4CFFihQmIEWjz6zFFBxRF4C7O+SO
+ TmbgbijG4YEDcfaMoU/tV0g+b+NhhTxmLTRwoQQ8Tg==
+X-Google-Smtp-Source: AA0mqf6F3NyThYJD8zv8B8XMOE2kYz0CUcnIuV6DoYi9y5eEjTe+8F6Mn2Uq93dJuL2v0dYfk/N2/a1lsRjiy2L+4Kw=
+X-Received: by 2002:a17:90a:ab84:b0:213:343:9873 with SMTP id
+ n4-20020a17090aab8400b0021303439873mr12284511pjq.102.1668752233721; Thu, 17
+ Nov 2022 22:17:13 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <Y3UboELxugwDJkIG@google.com>
-Content-Language: en-US
-X-Originating-IP: [10.174.187.128]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500023.china.huawei.com (7.185.36.83)
-X-CFilter-Loop: Reflected
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm <kvm@vger.kernel.org>,
- David Hildenbrand <david@redhat.com>,
- "open list:MIPS" <linux-mips@vger.kernel.org>,
- Paul Mackerras <paulus@ozlabs.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- KVM ARM <kvmarm@lists.cs.columbia.edu>, Janosch Frank <frankja@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, wangyuan38@huawei.com,
- Jon Cargille <jcargill@google.com>, kvm-ppc <kvm-ppc@vger.kernel.org>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
- "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20221113163832.3154370-1-maz@kernel.org>
+ <20221113163832.3154370-8-maz@kernel.org>
+In-Reply-To: <20221113163832.3154370-8-maz@kernel.org>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Thu, 17 Nov 2022 22:16:57 -0800
+Message-ID: <CAAeT=FysJPMs5mG1E02rMcGtjULb7MviZr6RE699x_a=LZNK6w@mail.gmail.com>
+Subject: Re: [PATCH v4 07/16] KVM: arm64: PMU: Add counter_index_to_*reg()
+ helpers
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,207 +82,129 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Marc,
 
-
-On 2022/11/17 1:19, David Matlack wrote:
-> On Tue, Nov 15, 2022 at 11:28:56AM +0800, wangyanan (Y) wrote:
->> Hi Sean, Paolo,
->>
->> I recently also notice the behavior change of param halt_poll_ns.
->> Now it loses the ability to:
->> 1) dynamically disable halt polling for all the running VMs
->> by `echo 0 > /sys`
->> 2) dynamically adjust the halt polling interval for all the
->> running VMs by `echo * > /sys`
->>
->> While in our cases, we usually use above two abilities, and
->> KVM_CAP_HALT_POLL is not used yet.
-> I think the right path forward is to make KVM_CAP_HALT_POLL a pure
-> override of halt_poll_ns, and restore the pre-existing behavior of
-> halt_poll_ns whenever KVM_CAP_HALT_POLL is not used. e.g. see the patch
-> below.
-Agree with this.
-kvm.halt_poll_ns serves like a legacy method to control halt polling
-globally. Once KVM_CAP_HALT_POLL is used for a VM, it should
-hold 100% responsibility to control on the VM, including disabling
-the polling. This strategy helps to keep the two mechanisms
-decoupled.
-> That will fix issues (1) and (2) above for any VM not using
-> KVM_CAP_HALT_POLL. If a VM is using KVM_CAP_HALT_POLL, it will ignore
-> all changes to halt_poll_ns. If we truly need a mechanism for admins to
-> disable halt-polling on VMs using KVM_CAP_HALT_POLL, we can introduce a
-> separate module parameter for that. But IMO, any setup that is
-> sophisticated enough to use KVM_CAP_HALT_POLL should also be able to use
-> KVM_CAP_HALT_POLL to disable halt polling.
+On Sun, Nov 13, 2022 at 8:38 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> If everyone is happy with this approach I can test and send a real patch
-> to the mailing list.
+> In order to reduce the boilerplate code, add two helpers returning
+> the counter register index (resp. the event register) in the vcpu
+> register file from the counter index.
 >
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index e6e66c5e56f2..253ad055b6ad 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -788,6 +788,7 @@ struct kvm {
->   	struct srcu_struct srcu;
->   	struct srcu_struct irq_srcu;
->   	pid_t userspace_pid;
-> +	bool override_halt_poll_ns;
->   	unsigned int max_halt_poll_ns;
->   	u32 dirty_ring_size;
->   	bool vm_bugged;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 43bbe4fde078..479d0d0da0b5 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1198,8 +1198,6 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
->   			goto out_err_no_arch_destroy_vm;
->   	}
->   
-> -	kvm->max_halt_poll_ns = halt_poll_ns;
-> -
->   	r = kvm_arch_init_vm(kvm, type);
->   	if (r)
->   		goto out_err_no_arch_destroy_vm;
-> @@ -3371,7 +3369,7 @@ void kvm_sigset_deactivate(struct kvm_vcpu *vcpu)
->   	sigemptyset(&current->real_blocked);
->   }
->   
-> -static void grow_halt_poll_ns(struct kvm_vcpu *vcpu)
-> +static void grow_halt_poll_ns(struct kvm_vcpu *vcpu, unsigned int max)
->   {
->   	unsigned int old, val, grow, grow_start;
->   
-> @@ -3385,8 +3383,8 @@ static void grow_halt_poll_ns(struct kvm_vcpu *vcpu)
->   	if (val < grow_start)
->   		val = grow_start;
->   
-> -	if (val > vcpu->kvm->max_halt_poll_ns)
-> -		val = vcpu->kvm->max_halt_poll_ns;
-> +	if (val > max)
-> +		val = max;
->   
->   	vcpu->halt_poll_ns = val;
->   out:
-> @@ -3501,10 +3499,17 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
->   {
->   	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
->   	bool do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
-> +	unsigned int max_halt_poll_ns;
->   	ktime_t start, cur, poll_end;
-> +	struct kvm *kvm = vcpu->kvm;
->   	bool waited = false;
->   	u64 halt_ns;
->   
-> +	if (kvm->override_halt_poll_ns)
-> +		max_halt_poll_ns = kvm->max_halt_poll_ns;
-> +	else
-> +		max_halt_poll_ns = READ_ONCE(halt_poll_ns);
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/pmu-emul.c | 33 ++++++++++++++++++---------------
+>  1 file changed, 18 insertions(+), 15 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 1fab889dbc74..faab0f57a45d 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -77,6 +77,16 @@ static struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
+>         return container_of(vcpu_arch, struct kvm_vcpu, arch);
+>  }
+>
+> +static u32 counter_index_to_reg(u64 idx)
+> +{
+> +       return (idx == ARMV8_PMU_CYCLE_IDX) ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + idx;
+> +}
 > +
->   	start = cur = poll_end = ktime_get();
->   	if (do_halt_poll) {
->   		ktime_t stop = ktime_add_ns(start, vcpu->halt_poll_ns);
-> @@ -3545,17 +3550,16 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
->   	if (halt_poll_allowed) {
->   		if (!vcpu_valid_wakeup(vcpu)) {
->   			shrink_halt_poll_ns(vcpu);
-> -		} else if (vcpu->kvm->max_halt_poll_ns) {
-> +		} else if (max_halt_poll_ns) {
->   			if (halt_ns <= vcpu->halt_poll_ns)
->   				;
->   			/* we had a long block, shrink polling */
-> -			else if (vcpu->halt_poll_ns &&
-> -				 halt_ns > vcpu->kvm->max_halt_poll_ns)
-> +			else if (vcpu->halt_poll_ns && halt_ns > max_halt_poll_ns)
->   				shrink_halt_poll_ns(vcpu);
->   			/* we had a short halt and our poll time is too small */
-> -			else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
-> -				 halt_ns < vcpu->kvm->max_halt_poll_ns)
-> -				grow_halt_poll_ns(vcpu);
-> +			else if (vcpu->halt_poll_ns < max_halt_poll_ns &&
-> +				 halt_ns < max_halt_poll_ns)
-> +				grow_halt_poll_ns(vcpu, max_halt_poll_ns);
->   		} else {
->   			vcpu->halt_poll_ns = 0;
->   		}
-> @@ -4588,6 +4592,7 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
->   		if (cap->flags || cap->args[0] != (unsigned int)cap->args[0])
->   			return -EINVAL;
->   
-> +		kvm->override_halt_poll_ns = true;
->   		kvm->max_halt_poll_ns = cap->args[0];
->   		return 0;
->   	}
-Looks sensible to me overall.
-I will look at the RFC series, thanks for your quick response.
+> +static u32 counter_index_to_evtreg(u64 idx)
+> +{
+> +       return (idx == ARMV8_PMU_CYCLE_IDX) ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + idx;
+> +}
 
-Yanan
-.
->> On 2021/9/28 1:33, Sean Christopherson wrote:
->>> On Mon, Sep 27, 2021, Paolo Bonzini wrote:
->>>> On Mon, Sep 27, 2021 at 5:17 PM Christian Borntraeger
->>>> <borntraeger@de.ibm.com> wrote:
->>>>>> So I think there are two possibilities that makes sense:
->>>>>>
->>>>>> * track what is using KVM_CAP_HALT_POLL, and make writes to halt_poll_ns follow that
->>>>> what about using halt_poll_ns for those VMs that did not uses KVM_CAP_HALT_POLL and the private number for those that did.
->>>> Yes, that's what I meant.  David pointed out that doesn't allow you to
->>>> disable halt polling altogether, but for that you can always ask each
->>>> VM's userspace one by one, or just not use KVM_CAP_HALT_POLL. (Also, I
->>>> don't know about Google's usecase, but mine was actually more about
->>>> using KVM_CAP_HALT_POLL to *disable* halt polling on some VMs!).
->>> I kinda like the idea if special-casing halt_poll_ns=0, e.g. for testing or
->>> in-the-field mitigation if halt-polling is broken.  It'd be trivial to support, e.g.
->> Do we have any plan to repost the diff as a fix?
->> I would be very nice that this issue can be solved.
->>
->> Besides, I think we may need some Doc for users to describe
->> how halt_poll_ns works with KVM_CAP_HALT_POLL, like
->> "Documentation/virt/guest-halt-polling.rst".
->>> @@ -3304,19 +3304,23 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
->>>                   update_halt_poll_stats(vcpu, start, poll_end, !waited);
->>>
->>>           if (halt_poll_allowed) {
->>> +               max_halt_poll_ns = vcpu->kvm->max_halt_poll_ns;
->>> +               if (!max_halt_poll_ns || !halt_poll_ns)  <------ squish the max if halt_poll_ns==0
->>> +                       max_halt_poll_ns = halt_poll_ns;
->>> +
->> Does this mean that KVM_CAP_HALT_POLL will not be able to
->> disable halt polling for a VM individually when halt_poll_ns !=0?
->>>                   if (!vcpu_valid_wakeup(vcpu)) {
->>>                           shrink_halt_poll_ns(vcpu);
->>> -               } else if (vcpu->kvm->max_halt_poll_ns) {
->>> +               } else if (max_halt_poll_ns) {
->>>                           if (halt_ns <= vcpu->halt_poll_ns)
->>>                                   ;
->>>                           /* we had a long block, shrink polling */
->>>                           else if (vcpu->halt_poll_ns &&
->>> -                                halt_ns > vcpu->kvm->max_halt_poll_ns)
->>> +                                halt_ns > max_halt_poll_ns)
->>>                                   shrink_halt_poll_ns(vcpu);
->>>                           /* we had a short halt and our poll time is too small */
->>> -                       else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
->>> -                                halt_ns < vcpu->kvm->max_halt_poll_ns)
->>> -                               grow_halt_poll_ns(vcpu);
->>> +                       else if (vcpu->halt_poll_ns < max_halt_poll_ns &&
->>> +                                halt_ns < max_halt_poll_ns)
->>> +                               grow_halt_poll_ns(vcpu, max_halt_poll_ns);
->>>                   } else {
->>>                           vcpu->halt_poll_ns = 0;
->>>                   }
->>> _______________________________________________
->>> kvmarm mailing list
->>> kvmarm@lists.cs.columbia.edu
->>> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
->>> .
->> Thanks,
->> Yanan
-> .
+It looks like we could use this function for access_pmu_evtyper()
+in arch/arm64/kvm/sys_regs.c as well.
 
+Thank you,
+Reiji
+
+
+> +
+>  /**
+>   * kvm_pmu_get_counter_value - get PMU counter value
+>   * @vcpu: The vcpu pointer
+> @@ -91,8 +101,7 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+>         if (!kvm_vcpu_has_pmu(vcpu))
+>                 return 0;
+>
+> -       reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+> -               ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
+> +       reg = counter_index_to_reg(select_idx);
+>         counter = __vcpu_sys_reg(vcpu, reg);
+>
+>         /*
+> @@ -122,8 +131,7 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+>         if (!kvm_vcpu_has_pmu(vcpu))
+>                 return;
+>
+> -       reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+> -             ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
+> +       reg = counter_index_to_reg(select_idx);
+>         __vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
+>
+>         /* Recreate the perf event to reflect the updated sample_period */
+> @@ -158,10 +166,7 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
+>
+>         val = kvm_pmu_get_counter_value(vcpu, pmc->idx);
+>
+> -       if (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+> -               reg = PMCCNTR_EL0;
+> -       else
+> -               reg = PMEVCNTR0_EL0 + pmc->idx;
+> +       reg = counter_index_to_reg(pmc->idx);
+>
+>         __vcpu_sys_reg(vcpu, reg) = val;
+>
+> @@ -404,16 +409,16 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
+>                 u64 type, reg;
+>
+>                 /* Filter on event type */
+> -               type = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
+> +               type = __vcpu_sys_reg(vcpu, counter_index_to_evtreg(i));
+>                 type &= kvm_pmu_event_mask(vcpu->kvm);
+>                 if (type != event)
+>                         continue;
+>
+>                 /* Increment this counter */
+> -               reg = __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
+> +               reg = __vcpu_sys_reg(vcpu, counter_index_to_reg(i)) + 1;
+>                 if (!kvm_pmu_idx_is_64bit(vcpu, i))
+>                         reg = lower_32_bits(reg);
+> -               __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
+> +               __vcpu_sys_reg(vcpu, counter_index_to_reg(i)) = reg;
+>
+>                 /* No overflow? move on */
+>                 if (kvm_pmu_idx_has_64bit_overflow(vcpu, i) ? reg : lower_32_bits(reg))
+> @@ -549,8 +554,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>         struct perf_event_attr attr;
+>         u64 eventsel, counter, reg, data;
+>
+> -       reg = (pmc->idx == ARMV8_PMU_CYCLE_IDX)
+> -             ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + pmc->idx;
+> +       reg = counter_index_to_evtreg(select_idx);
+>         data = __vcpu_sys_reg(vcpu, reg);
+>
+>         kvm_pmu_stop_counter(vcpu, pmc);
+> @@ -632,8 +636,7 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+>         mask &= ~ARMV8_PMU_EVTYPE_EVENT;
+>         mask |= kvm_pmu_event_mask(vcpu->kvm);
+>
+> -       reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
+> -             ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + select_idx;
+> +       reg = counter_index_to_evtreg(select_idx);
+>
+>         __vcpu_sys_reg(vcpu, reg) = data & mask;
+>
+> --
+> 2.34.1
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
