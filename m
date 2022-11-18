@@ -1,42 +1,36 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284AF28E1
-	for <kvmarm@lists.linux.dev>; Fri, 18 Nov 2022 16:50:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F026C433D6;
-	Fri, 18 Nov 2022 16:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668790234;
-	bh=2SvZU2ZbmXvIOHrpSjoDJyk8GuB3PC2eqavTqAih/c4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PDCyFX1t2lbX2Y+JbxJspQJxL5IivL9nB6T9T8jDuj1ADFyeQ6AhYtrm7AMXDTrR9
-	 3A4jPSXrHBkSeATkubSjiphuP/ZAmTP4Bdu2u/gBp/NdFMaNEjisc9WUIy1/y74jHG
-	 dOARPW4nFoH7nbO80T8fpwi4qxBngjNaKyW50XgZMmTTdqDjH6VQQnl/9qmNyK0gy5
-	 Qa62UpjpBwrCiNE4cv2lHgSut3CLX3Ox4hvHWnz2gEi2Q7A/QqhMK0ytZ1NzsQbBtA
-	 3d8r/tBKMo563L/+EBD+upeTVN/Xy+jXaNnw90FnSFpaTbsu6jGPV93yC25scr1K6u
-	 UMyclmg+Rj8yA==
-Date: Fri, 18 Nov 2022 16:50:26 +0000
-From: Will Deacon <will@kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: Namhyung Kim <namhyung@kernel.org>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Ingo Molnar <mingo@redhat.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669808F65
+	for <kvmarm@lists.linux.dev>; Fri, 18 Nov 2022 17:04:54 +0000 (UTC)
+Date: Fri, 18 Nov 2022 17:04:42 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1668791087;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TT9WIDG2PcC0Y0VIGysC67t4tuJ3IbUzD2E14K7Mj+U=;
+	b=LGYC1eBuUtn8jOWDiDcXMIJ1YnhdPWLXut1ZBEcavASub+m8ULYW0AASixs5J/vq/3BhV1
+	mVS8burSTjm3iAAFWmAcG5ZCDTMyuAxBv3B0ihS0N/cgR1xxf7HIwJlJWJnK35X8d7ijLp
+	fU7waACJ//jWMMIY9avT7eDUsKoxS+A=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>, kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-	James Clark <james.clark@arm.com>, Mark Brown <broonie@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH v3 0/8] perf: Arm SPEv1.2 support
-Message-ID: <20221118165025.GB4872@willie-the-truck>
-References: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
- <CAL_Jsq+WOjoPW0FDSa=B9-aCMwXC3tc5HUqokoVkKUucKgqanQ@mail.gmail.com>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 2/3] KVM: arm64: Allow userspace to trap SMCCC
+ sub-ranges
+Message-ID: <Y3e7KqJKz6nHjFSu@google.com>
+References: <20221110015327.3389351-1-oliver.upton@linux.dev>
+ <20221110015327.3389351-3-oliver.upton@linux.dev>
+ <20221118145637.GC4624@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,67 +39,73 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAL_Jsq+WOjoPW0FDSa=B9-aCMwXC3tc5HUqokoVkKUucKgqanQ@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Message-ID: <20221118165026.4xx-hUpLWHOvFwFafh6RRo7VrqNBeeI1jaHP6Ju9MlI@z>
+In-Reply-To: <20221118145637.GC4624@willie-the-truck>
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <20221118170442.uT02Z5Ta73QICslsHbG2k0wpyHMqy2uvzdXb1SqK6K8@z>
 
-On Thu, Nov 17, 2022 at 08:43:17AM -0600, Rob Herring wrote:
-> On Fri, Nov 4, 2022 at 10:55 AM Rob Herring <robh@kernel.org> wrote:
-> >
-> > This series adds support for Arm SPEv1.2 which is part of the
-> > Armv8.7/Armv9.2 architecture. There's 2 new features that affect the
-> > kernel: a new event filter bit, branch 'not taken', and an inverted
-> > event filter register.
-> >
-> > Since this support adds new registers and fields, first the SPE register
-> > defines are converted to automatic generation.
-> >
-> > Note that the 'config3' addition in sysfs format files causes SPE to
-> > break. A stable fix e552b7be12ed ("perf: Skip and warn on unknown format
-> > 'configN' attrs") landed in v6.1-rc1.
-> >
-> > The perf tool side changes are available here[1].
-> >
-> > Tested on FVP.
-> >
-> > [1] https://lore.kernel.org/all/20220914-arm-perf-tool-spe1-2-v2-v4-0-83c098e6212e@kernel.org/
-> >
-> > Signed-off-by: Rob Herring <robh@kernel.org>
+On Fri, Nov 18, 2022 at 02:56:38PM +0000, Will Deacon wrote:
+> On Thu, Nov 10, 2022 at 01:53:26AM +0000, Oliver Upton wrote:
+> > As the SMCCC (and related specifications) march towards an
+> > 'everything and the kitchen sink' interface for interacting with a
+> > system, it is less likely that KVM will implement every supported
+> > feature.
+> > 
+> > Add a capability that allows userspace to trap hypercall ranges,
+> > allowing the VMM to mix-and-match between calls handled in userspace vs.
+> > KVM.
+> > 
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > > ---
-> > Changes in v3:
-> > - Add some more missing SPE register fields and use Enums for some
-> >   fields
-> > - Use the new PMSIDR_EL1 register Enum defines in the SPE driver
-> > - Link to v2: https://lore.kernel.org/r/20220825-arm-spe-v8-7-v2-0-e37322d68ac0@kernel.org
-> >
-> > Changes in v2:
-> > - Convert the SPE register defines to automatic generation
-> > - Fixed access to SYS_PMSNEVFR_EL1 when not present
-> > - Rebase on v6.1-rc1
-> > - Link to v1: https://lore.kernel.org/r/20220825-arm-spe-v8-7-v1-0-c75b8d92e692@kernel.org
-> >
-> > ---
-> > Rob Herring (8):
-> >       perf: arm_spe: Use feature numbering for PMSEVFR_EL1 defines
-> >       arm64: Drop SYS_ from SPE register defines
-> >       arm64/sysreg: Convert SPE registers to automatic generation
-> >       perf: arm_spe: Drop BIT() and use FIELD_GET/PREP accessors
-> >       perf: arm_spe: Use new PMSIDR_EL1 register enums
-> >       perf: arm_spe: Support new SPEv1.2/v8.7 'not taken' event
-> >       perf: Add perf_event_attr::config3
-> >       perf: arm_spe: Add support for SPEv1.2 inverted event filtering
-> >
-> >  arch/arm64/include/asm/el2_setup.h |   6 +-
-> >  arch/arm64/include/asm/sysreg.h    |  99 +++--------------------
-> >  arch/arm64/kvm/debug.c             |   2 +-
-> >  arch/arm64/kvm/hyp/nvhe/debug-sr.c |   2 +-
-> >  arch/arm64/tools/sysreg            | 139 +++++++++++++++++++++++++++++++++
-> >  drivers/perf/arm_spe_pmu.c         | 156 ++++++++++++++++++++++++-------------
-> >  include/uapi/linux/perf_event.h    |   3 +
-> >  7 files changed, 257 insertions(+), 150 deletions(-)
+> >  arch/arm64/include/asm/kvm_host.h |  5 ++++
+> >  arch/arm64/include/uapi/asm/kvm.h | 15 ++++++++++
+> >  arch/arm64/kvm/arm.c              | 10 +++++++
+> >  arch/arm64/kvm/hypercalls.c       | 48 +++++++++++++++++++++++++++++++
+> >  include/uapi/linux/kvm.h          |  1 +
+> >  5 files changed, 79 insertions(+)
 > 
-> Will, any comments on this series?
+> [...]
+> 
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 6f0b56e7f8c7..6e8a222fc295 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -100,6 +100,13 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> >  		r = 0;
+> >  		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
+> >  		break;
+> > +	case KVM_CAP_ARM_USER_HYPERCALLS:
+> > +		if (cap->args[0] & ~KVM_ARM_USER_HYPERCALL_FLAGS)
+> > +			return -EINVAL;
+> 
+> Why not use KVM_CAP_EXIT_HYPERCALL for this?
 
-Looks fine to me. Happy to queue it once the uapi change has been acked.
+Err... I hilariously hijacked its UAPI for the exit but added a new cap
+for it :)
 
-Will
+I think the direction going forward will be to provide userspace with a
+range-based filter such that (to a degree) we can arbitrarily forward
+hypercalls to userspace, allowing for a mix-and-match approach.
+
+> At some point during pKVM
+> development, we used that to notify the VMM about memory being shared
+> back from the guest but we eventually dropped it as the notification to
+> userspace ended up not being needed:
+> 
+> https://android-kvm.googlesource.com/linux/+/dbd2861832dfc4c8a3103214b3c212ee7ace1c44%5E%21/
+> https://android-kvm.googlesource.com/linux/+/2a3afc6da99c0e0cb62be1687153ee572903aa80%5E%21/
+> 
+> I'm not saying that what we did was necessarily better, but it seems a bit
+> simpler and I figured it might be useful to point you to it.
+
+Yeah, this is certainly a lot cleaner than what I've proposed here. And
+frankly, for my immediate interest (forwarding vendor hypercalls to
+userspace), this would fit the bill. OTOH, I was hoping that something
+a bit more flexible could move the onus of implementing every darn spec
+onto userspace (where possible).
+
+I know you said pKVM has no need for userspace notifications at this
+moment, but could user hypercalls be useful again going forward?
+
+--
+Thanks,
+Oliver
