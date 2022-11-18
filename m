@@ -1,90 +1,64 @@
 Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A29C8F65
-	for <kvmarm@lists.linux.dev>; Fri, 18 Nov 2022 17:12:55 +0000 (UTC)
-Date: Fri, 18 Nov 2022 17:12:49 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1668791573;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SZClopAzQZuqTFUhQclgWoQ7jvZ2RLe6Z0cHJygex2I=;
-	b=pg/shj4QLtOPw9mnu1T7TalbMSXwxOcCnj7v/lwgEdv806cCTaPHYBQp6Opzx3ysZ426ld
-	DVpCO70x+BsZLC91lzrJs3+nwF6okrCjLrt/kHK5dZrd1YXpLoqguwoaUTXwDJxJRY2BTa
-	8h35XCtgTiFFx+RnZHLmSg2kD79h+lM=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3CE8F65
+	for <kvmarm@lists.linux.dev>; Fri, 18 Nov 2022 18:22:34 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1668795752;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=X3QgCq9Cs1WQYoJL0dvRfozZCN58kkuvkY3dlbpQxA0=;
+	b=lNR7BG2xlqj9DA3KvAaQJbfmbXR8ph56cTV2x9m89DaPyumgHHR9/DGSNBKAvckoa0b6Pp
+	UuDMc2gPhsNp+XbYnttyuhGhZMPnLOYzmcYsbalOM2noVK3bZ7f0fHCPves1FwYShNimdp
+	tFDjE/qc/9BtPLR32uCBbZu2VNneSdg=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] KVM: arm64: Don't acquire RCU read lock for
- exclusive table walks
-Message-ID: <Y3e9EXICIfgw4nSz@google.com>
-References: <20221116165655.2649475-1-oliver.upton@linux.dev>
- <20221116165655.2649475-3-oliver.upton@linux.dev>
- <20221117174951.GA2916@willie-the-truck>
- <Y3Z8G3aCuRzzoq5e@google.com>
- <20221118121949.GA3697@willie-the-truck>
+To: Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v4 0/3] KVM: arm64: Fixes for parallel faults series
+Date: Fri, 18 Nov 2022 18:22:19 +0000
+Message-ID: <20221118182222.3932898-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221118121949.GA3697@willie-the-truck>
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221118171249.HZRBUeOHz5FdDXsMGomSDH0_qHFaB10V4a7C8iA7Ntk@z>
+Message-ID: <20221118182219.DtVdjkeRV3eRbzIx5yMY4zgo-y5JhsxI9eAF3_gY808@z>
 
-On Fri, Nov 18, 2022 at 12:19:50PM +0000, Will Deacon wrote:
-> On Thu, Nov 17, 2022 at 06:23:23PM +0000, Oliver Upton wrote:
-> > On Thu, Nov 17, 2022 at 05:49:52PM +0000, Will Deacon wrote:
-> > > On Wed, Nov 16, 2022 at 04:56:55PM +0000, Oliver Upton wrote:
-> > 
-> > [...]
-> > 
-> > > > -static inline void kvm_pgtable_walk_begin(void) {}
-> > > > -static inline void kvm_pgtable_walk_end(void) {}
-> > > > +static inline void kvm_pgtable_walk_begin(struct kvm_pgtable_walker *walker)
-> > > > +{
-> > > > +	/*
-> > > > +	 * Due to the lack of RCU (or a similar protection scheme), only
-> > > > +	 * non-shared table walkers are allowed in the hypervisor.
-> > > > +	 */
-> > > > +	WARN_ON(walker->flags & KVM_PGTABLE_WALK_SHARED);
-> > > > +}
-> > > 
-> > > I think it would be better to propagate the error to the caller rather
-> > > than WARN here.
-> > 
-> > I'd really like to warn somewhere though since we're rather fscked at
-> > this point. Keeping that WARN close to the exceptional condition would
-> > help w/ debugging.
-> > 
-> > Were you envisioning bubbling the error all the way back up (i.e. early
-> > return from kvm_pgtable_walk())?
-> 
-> Yes, that's what I had in mind. WARN is fatal at EL2, so I think it's
-> better to fail the pgtable operation rather than bring down the entire
-> machine by default.
+Small set of fixes for the parallel faults series. Most importantly,
+stop taking the RCU read lock for walking hyp stage-1. For the sake of
+consistency, take a pointer to kvm_pgtable_walker in
+kvm_dereference_pteref() as well.
 
-Duh, I forgot WARNs really do go boom at EL2. Yeah, in that case it'd be
-best to let the caller clean up the mess.
+Tested on an Ampere Altra system with kvm-arm.mode={nvhe,protected} and
+lockdep. Applies on top of the parallel faults series picked up last
+week.
 
-> > If having this is a strong motivator I can do a v4.
-> 
-> It's a really minor point, so I'll leave it up to you guys.
+v3: https://lore.kernel.org/kvmarm/20221116165655.2649475-1-oliver.upton@linux.dev/
 
-Sold (sorry I wasn't following before). v4 on the way.
+v3 -> v4:
+ - Return an error instead of WARN() in hyp for shared walks (Will)
 
---
-Thanks,
-Oliver
+Oliver Upton (3):
+  KVM: arm64: Take a pointer to walker data in kvm_dereference_pteref()
+  KVM: arm64: Don't acquire RCU read lock for exclusive table walks
+  KVM: arm64: Reject shared table walks in the hyp code
+
+ arch/arm64/include/asm/kvm_pgtable.h | 159 +++++++++++++++------------
+ arch/arm64/kvm/hyp/pgtable.c         |  13 ++-
+ 2 files changed, 96 insertions(+), 76 deletions(-)
+
+-- 
+2.38.1.584.g0f3c55d4c2-goog
+
