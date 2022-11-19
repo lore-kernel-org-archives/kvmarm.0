@@ -1,69 +1,151 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA62CA486
-	for <kvmarm@lists.linux.dev>; Fri, 18 Nov 2022 21:15:28 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1668806126;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SoeoR80PV/I/rJnKhi6LFTTPG99Qc3nASuSBHKetOac=;
-	b=WDtooANP+yRelVErrNeqgt4cQi0k6omVWrwHBibo8mwlz9/dnJiYituBfqMEkU+R1Yu6Iw
-	0ktpj8yIhA0vkeXZxLFP14S3tuskayzXcaksLQ67965SQ5aNXKfpZg1g1ZxXcv9ngGjhlA
-	0KTgkhxFawEcjevHowItlrlVog+/Ou4=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Sean Christopherson <seanjc@google.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] KVM: selftests: Build access_tracking_perf_test for arm64
-Date: Fri, 18 Nov 2022 21:15:03 +0000
-Message-ID: <20221118211503.4049023-3-oliver.upton@linux.dev>
-In-Reply-To: <20221118211503.4049023-1-oliver.upton@linux.dev>
-References: <20221118211503.4049023-1-oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2269B17E
+	for <kvmarm@lists.linux.dev>; Sat, 19 Nov 2022 01:34:54 +0000 (UTC)
+Received: by mail-pf1-f201.google.com with SMTP id u18-20020a627912000000b0056d93d8b8bdso3985300pfc.16
+        for <kvmarm@lists.linux.dev>; Fri, 18 Nov 2022 17:34:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CjK5nD/uvnQk7qUQi9oIboYcWNk4lZcV0pG+jDjHbYw=;
+        b=sO/BixX+Fxa6IYPQU8TkdF+XFQ44C4ZySQ2iwNGf4nj3I51S8QIRUibkPiKNqU6bw1
+         j4PlnepiO1Ad8v/zZSnMeIBI68hxaFqyJGMZebX4cy3Jv14uXBvY/oT0aik++6OQL6oN
+         DbLgAWDsPzUK72v+4dKMHKRTS+Pj0wR02zmTyQNbwMmm5J9cue1G73b6Acb3Oy+6Rqq7
+         SFCX3tIjVDK5Bkgwj3xiOgKx932eMjN+X5AA0/Lbv6Dl4c1cRTcxk/wdcfGn/cUpN1uD
+         EJ0BOyIS/RA9GP99cIy1ORxMCIBlL+dVVmi0pQd37KDIkkhww3/YCplg0uN9lfWxW1qn
+         tETw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CjK5nD/uvnQk7qUQi9oIboYcWNk4lZcV0pG+jDjHbYw=;
+        b=7jY0VwndIA+gXRidO9UT5tbnRqrVWK4nXdLlOF1YNJMlx1uwp53uWGaOAv6ERj98yt
+         WN2EACN0EmrzRZfeEAF3HonaILoQ26kFOOOHJAqqkSM4i9x3xIlIZl+f5Nl+nbxct5aA
+         6SVX5GgpRpHLe+Ita4/11ucFkXFcn4TZT8gaHKI8goTe+rVZTDm1DEmwrEKV9AT7H6fA
+         +Y+/l+lmzmRgVhdJ6JZuKL6hfyILK48RJsoJ24JTVdQaJQk2SnK8AtL0S1wyuXHOJI6A
+         ABKb3y3vXGU9Urwj/mZvzjZB5G/yhxFKJjkupXqSdKYM7FnC0LIO+j/XZ9L75NAawT1w
+         4bSg==
+X-Gm-Message-State: ANoB5pnHBL9uscNoV93FPznw0ZLqHzWcuaG6uppKfaGj4UQeos41EDg2
+	O3JiWZkl2s+ZJw34zagNX0z2vRfBcQI=
+X-Google-Smtp-Source: AA0mqf40VxY3bniB1w/5m0fnfOQyqSksKugX3b7aeyvG44COkqlBU1UDui2GOB4g4JxSgT+nQap4mhTD/UM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a62:31c4:0:b0:56e:989d:7410 with SMTP id
+ x187-20020a6231c4000000b0056e989d7410mr10648162pfx.1.1668821693609; Fri, 18
+ Nov 2022 17:34:53 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Sat, 19 Nov 2022 01:34:41 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221118211503.NIYGgZbw_GREU5xG4buV0H8gynjz2Ml8TnZHR4mNB_8@z>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
+Message-ID: <20221119013450.2643007-1-seanjc@google.com>
+Subject: [PATCH 0/9] tools: Make {clear,set}_bit() atomic for reals
+From: Sean Christopherson <seanjc@google.com>
+To: Yury Norov <yury.norov@gmail.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Mark Rutland <mark.rutland@arm.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, James Morse <james.morse@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, linux-perf-users@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20221119013441.0bJmx_-rtwOqDR_2VzUsrimUEvj5t9sw7meDxuPP6nE@z>
 
-Does exactly what it says on the tin.
+For obvious reasons I'd like to route the this through Paolo's tree.
+In theory, taking just patch 5 through tip would work, but creating a
+topic branch seems like the way to go, though maybe I'm being overly
+paranoid.  The current tip/perf/core doesn't have any conflicts, nor does
+it have new set_bit() or clear_bit() users.
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- tools/testing/selftests/kvm/Makefile | 1 +
- 1 file changed, 1 insertion(+)
+ 
+Code sitting in kvm/queue for 6.2 adds functionality that relies on
+clear_bit() being an atomic operation.  Unfortunately, despite being
+implemented in atomic.h (among other strong hits that they should be
+atomic), clear_bit() and set_bit() aren't actually atomic (and of course
+I realized this _just_ after everything got queued up).
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 0172eb6cb6ee..4c0ff91a8964 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -156,6 +156,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/psci_test
- TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
-+TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
- TEST_GEN_PROGS_aarch64 += demand_paging_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
- TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
+Move current tools/ users of clear_bit() and set_bit() to the
+double-underscore versions (which tools/ already provides and documents
+as being non-atomic), and then implement clear_bit() and set_bit() as
+actual atomics to fix the KVM selftests bug.
+
+Perf and KVM are the only affected users.  NVDIMM also has test code
+in tools/, but that builds against the kernel proper.  The KVM code is
+well tested and fully audited.  The perf code is lightly tested; if I
+understand the build system, it's probably not even fully compile tested.
+
+Patches 1 and 2 are completely unrelated and are fixes for patches
+sitting in kvm/queue.  Paolo, they can be squashed if you want to rewrite
+history.
+
+Patch 3 fixes a hilarious collision in a KVM ARM selftest that will arise
+when clear_bit() is converted to an atomic.
+
+Patch 4 changes clear_bit() and set_bit() to take an "unsigned long"
+instead of an "int" so that patches 5-6 aren't accompanied by functional
+changes.  I.e. if something in perf is somehow relying on "bit" being a
+signed int, failures will bisect to patch 4 and not to the
+supposed-to-be-a-nop conversion to __clear_bit() and __set_bit().
+
+Patch 5-9 switch perf+KVM and complete the conversion.
+
+Applies on:
+  
+  git://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+
+Sean Christopherson (9):
+  KVM: selftests: Add rdmsr_from_l2() implementation in Hyper-V eVMCS
+    test
+  KVM: selftests: Remove unused "vcpu" param to fix build error
+  KVM: arm64: selftests: Enable single-step without a "full" ucall()
+  tools: Take @bit as an "unsigned long" in {clear,set}_bit() helpers
+  perf tools: Use dedicated non-atomic clear/set bit helpers
+  KVM: selftests: Use non-atomic clear/set bit helpers in KVM tests
+  tools: Drop conflicting non-atomic test_and_{clear,set}_bit() helpers
+  tools: Drop "atomic_" prefix from atomic test_and_set_bit()
+  tools: KVM: selftests: Convert clear/set_bit() to actual atomics
+
+ tools/arch/x86/include/asm/atomic.h           |  6 +++-
+ tools/include/asm-generic/atomic-gcc.h        | 13 ++++++-
+ tools/include/asm-generic/bitops/atomic.h     | 15 ++++----
+ tools/include/linux/bitmap.h                  | 34 -------------------
+ tools/perf/bench/find-bit-bench.c             |  2 +-
+ tools/perf/builtin-c2c.c                      |  6 ++--
+ tools/perf/builtin-kwork.c                    |  6 ++--
+ tools/perf/builtin-record.c                   |  6 ++--
+ tools/perf/builtin-sched.c                    |  2 +-
+ tools/perf/tests/bitmap.c                     |  2 +-
+ tools/perf/tests/mem2node.c                   |  2 +-
+ tools/perf/util/affinity.c                    |  4 +--
+ tools/perf/util/header.c                      |  8 ++---
+ tools/perf/util/mmap.c                        |  6 ++--
+ tools/perf/util/pmu.c                         |  2 +-
+ .../util/scripting-engines/trace-event-perl.c |  2 +-
+ .../scripting-engines/trace-event-python.c    |  2 +-
+ tools/perf/util/session.c                     |  2 +-
+ tools/perf/util/svghelper.c                   |  2 +-
+ .../selftests/kvm/aarch64/arch_timer.c        |  2 +-
+ .../selftests/kvm/aarch64/debug-exceptions.c  | 21 ++++++------
+ tools/testing/selftests/kvm/dirty_log_test.c  | 34 +++++++++----------
+ .../selftests/kvm/include/ucall_common.h      |  8 +++++
+ .../testing/selftests/kvm/lib/ucall_common.c  |  2 +-
+ .../selftests/kvm/x86_64/hyperv_evmcs.c       | 13 +++++--
+ .../selftests/kvm/x86_64/hyperv_svm_test.c    |  4 +--
+ .../selftests/kvm/x86_64/hyperv_tlb_flush.c   |  2 +-
+ 27 files changed, 102 insertions(+), 106 deletions(-)
+
+
+base-commit: 3321eef4acb51c303f0598d8a8493ca58528a054
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
