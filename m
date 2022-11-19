@@ -1,42 +1,42 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E04E37B
-	for <kvmarm@lists.linux.dev>; Sat, 19 Nov 2022 01:35:00 +0000 (UTC)
-Received: by mail-pg1-f202.google.com with SMTP id f22-20020a635556000000b0046fd05d55cdso3946540pgm.1
-        for <kvmarm@lists.linux.dev>; Fri, 18 Nov 2022 17:35:00 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E296B37C
+	for <kvmarm@lists.linux.dev>; Sat, 19 Nov 2022 01:35:01 +0000 (UTC)
+Received: by mail-pl1-f201.google.com with SMTP id c1-20020a170902d48100b0018723580343so5000894plg.15
+        for <kvmarm@lists.linux.dev>; Fri, 18 Nov 2022 17:35:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=TighIegw0FVxEDaBlZjjTMFerelt3ds/i85zL8CdikU=;
-        b=rmXe3VvPa8zVoj+4dcS77sndQg/asQbzYB56Apv5ggGW1UuoVvHp+A5nMUNJLLDfT3
-         0SofbaNG1mdy2xYr69bYijAVWvASmZ+BqpR/39RMUQ9fkkgAxOfAbbiCLxjhwxFDSnJD
-         CYvPDNSf4OyAJDiay7zq/RREBEcBoCo+j9xnBGDg3cCGMQQFHgk7xqMIHyhqLMB+bCwR
-         NAaB2xI/+noK1nArryRf5o2AI/YWSXe/+BtRdDtBj4KcS5PatRnf6S7gkyW5Yh4ep5o2
-         9FIQoQ8VkWuppw661uC0FbLCjWmBTrmiieXQzRAdkvaLBoGT3HMeR/wJf7SYLzVFCqzk
-         4tiA==
+        bh=jYDJ9XgbSK1d9HoZtCqk9N73DkrhQlQprGuYiT+qPlM=;
+        b=kwFBcPJnGMlsB/29xUFzZq4VtMmnBsyX5OzE/1svd9gRnfU6LLzcF8t37X2NNG32t1
+         Bgc27WpG66hJDzm6l54eNYoWaB+FNHXVRtLV2NDHKYE4SJtlxEx3h4v1cvI217WS0o7C
+         jEV3CYYrVQisgSWUCo5d/nroZBQrF5pKsbVhzGgnVzRopuOSiTQotgtU5JUDLjQNeu+2
+         WVZaskUzUJ2o8K5kS/S/9VeOhGlOFUXX9CpZcV1ZWBZ6cgVMHPlTmal6kXHv+6fIVROR
+         AvfeWIQ4ZhSYnnykMBYHDmA0gsIuaE5lHLPpGvXR3EAFTCxxOTA0afV+Xvc9wrGpXqUf
+         apsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=TighIegw0FVxEDaBlZjjTMFerelt3ds/i85zL8CdikU=;
-        b=twnlmOx271T9H2c9vwX2mpvufOtHE458WNNKxtcseSfpq/buHhUVfwvNdoGlZPwBWO
-         8Zfalf+34A4FFlumt+LehlrIf+h5cMcWOQAiGht3B1Nc5BEF37DjNZ3dVLLI1JRS2QRV
-         T9ORcPeO45Z993zNf0Upl7/JSJ4OngOI8jDdSN/W6cjh/ClYdJ2NwVVidDUTNQl1ZOoE
-         XxfsGtofeqjw8tsSuA/bQxkqzlQ2QBlxtqrPKj0dHpClYMRM9BBx+M8XZfm91XkZRtZM
-         2l49AR3Dp0V8E8Dptqtsk4FhToYIAmqEAcRNtXjccf5WEopVE2M8skD/u/4DXe+jozzn
-         tx8A==
-X-Gm-Message-State: ANoB5pk1gcLpqTJQH7p8Rc6F2rLEjTjzIzOOUzGDPYQJdgihNdCv9GJL
-	hKXwF6Fslfp1GRiFhFLFOmYHhfE0jPE=
-X-Google-Smtp-Source: AA0mqf7npHfQc5LwOz0q7JCYBS7uttfoGJCbriNRIIB73IIE/vGbpLSdnE48DGaUO0X9NP3W41W4iWnhxeQ=
+        bh=jYDJ9XgbSK1d9HoZtCqk9N73DkrhQlQprGuYiT+qPlM=;
+        b=gw+mU09VJNyIqGj+xtTcwNk/CtNxrOwYncV8FJSLtTHn/dSc0n7LS3AJMJUvpd3OiH
+         /tBCg1wY6kDw3GRtJ7/wjZBPid06pocbRlml7WM5OFbGqAN7vtExoDKnT9bKuy4McZQK
+         muG65cLY5PtAv6cxDZqss5W4DSL0OV8FW3AAuP2Yhy4b9K5H2XDOqrpUAh7P3tETb97p
+         wgXDc6QxZ/QUrzPz38Idgoj5zUpZj1uXoDghrwvY1C748a2sjg6kndg2BQRjkdVF9jG+
+         YAwDFhV0eJ9uoXh2kfeju2H37DUnzxcqe3oYx/C/Fxf/72Yjrpr0Z/aBzq8wxX6053O7
+         YfLg==
+X-Gm-Message-State: ANoB5pmEAVeD9XEC3heg2OuXqFhnoiVnZK29qEYqbGzLQ0uG2LBeKkwP
+	hfd6Dk7JYR+sXqj5hnD5gASo5i4OIh0=
+X-Google-Smtp-Source: AA0mqf58GhlIRj68viRDbHyf8r7RevulGOfjuPacei8aNDHQ4OT1GGFQfYh51TiZf6mEV3JWhy88V5y1SgM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:8d88:0:b0:562:69d4:f9f3 with SMTP id
- i8-20020aa78d88000000b0056269d4f9f3mr10570461pfr.5.1668821700033; Fri, 18 Nov
- 2022 17:35:00 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:903:3241:b0:186:dcc3:5d1d with SMTP id
+ ji1-20020a170903324100b00186dcc35d1dmr2180824plb.20.1668821701443; Fri, 18
+ Nov 2022 17:35:01 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Sat, 19 Nov 2022 01:34:45 +0000
+Date: Sat, 19 Nov 2022 01:34:46 +0000
 In-Reply-To: <20221119013450.2643007-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -46,9 +46,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20221119013450.2643007-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221119013450.2643007-5-seanjc@google.com>
-Subject: [PATCH 4/9] tools: Take @bit as an "unsigned long" in
- {clear,set}_bit() helpers
+Message-ID: <20221119013450.2643007-6-seanjc@google.com>
+Subject: [PATCH 5/9] perf tools: Use dedicated non-atomic clear/set bit helpers
 From: Sean Christopherson <seanjc@google.com>
 To: Yury Norov <yury.norov@gmail.com>, Peter Zijlstra <peterz@infradead.org>, 
 	Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Marc Zyngier <maz@kernel.org>, 
@@ -63,64 +62,322 @@ Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 
 	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221119013445.YDCOTd9vG6m4QtaEGn0iPpmv_y7EKwCCfBsR0rb-qAA@z>
+Message-ID: <20221119013446.N3pAwHIEC3MsQR_-eMsAWnh4fxX_cg3SUYF60wdHGMM@z>
 
-Take @bit as an unsigned long instead of a signed int in clear_bit() and
-set_bit() so that they match the double-underscore versions, __clear_bit()
-and __set_bit().  This will allow converting users that really don't want
-atomic operations to the double-underscores without introducing a
-functional change, which will in turn allow making {clear,set}_bit()
-atomic (as advertised).
+Use the dedicated non-atomic helpers for {clear,set}_bit() and their
+test variants, i.e. the double-underscore versions.  Depsite being
+defined in atomic.h, and despite the kernel versions being atomic in the
+kernel, tools' {clear,set}_bit() helpers aren't actually atomic.  Move
+to the double-underscore versions so that the versions that are expected
+to be atomic (for kernel developers) can be made atomic without affecting
+users that don't want atomic operations.
 
-Practically speaking, this _should_ have no functional impact.  KVM's
-selftests usage is either hardcoded (Hyper-V tests) or is artificially
-limited (arch_timer test and dirty_log test).  In KVM, dirty_log test is
-the only mildly interesting case as it's use indirectly restricted to
-unsigned 32-bit values, but in theory it could generate a negative value
-when cast to a signed int.  But in that case, taking an "unsigned long"
-is actually a bug fix.
-
-Perf's usage is more difficult to audit, but any code that is affected
-by the switch is likely already broken.  perf_header__{set,clear}_feat()
-and perf_file_header__read() effectively use only hardcoded enums with
-small, positive values, atom_new() passes an unsigned long, but its value
-is capped at 128 via NR_ATOM_PER_PAGE, etc...
-
-The only real potential for breakage is in the perf flows that take a
-"cpu", but it's unlikely perf is subtly relying on a negative index into
-bitmaps, e.g. "cpu" can be "-1", but only as "not valid" placeholder.
-
-Note, tools/testing/nvdimm/ makes heavy use of set_bit(), but that code
-builds into a kernel module of sorts, i.e. pulls in all of the kernel's
-header and so is getting the kernel's atomic set_bit().  The NVDIMM test
-usage of atomics is likely unnecessary, e.g. ndtest_dimm_register() sets
-bits in a local variable, but that's neither here nor there as far as
-this change is concerned.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/include/asm-generic/bitops/atomic.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tools/perf/bench/find-bit-bench.c                      | 2 +-
+ tools/perf/builtin-c2c.c                               | 6 +++---
+ tools/perf/builtin-kwork.c                             | 6 +++---
+ tools/perf/builtin-record.c                            | 6 +++---
+ tools/perf/builtin-sched.c                             | 2 +-
+ tools/perf/tests/bitmap.c                              | 2 +-
+ tools/perf/tests/mem2node.c                            | 2 +-
+ tools/perf/util/affinity.c                             | 4 ++--
+ tools/perf/util/header.c                               | 8 ++++----
+ tools/perf/util/mmap.c                                 | 6 +++---
+ tools/perf/util/pmu.c                                  | 2 +-
+ tools/perf/util/scripting-engines/trace-event-perl.c   | 2 +-
+ tools/perf/util/scripting-engines/trace-event-python.c | 2 +-
+ tools/perf/util/session.c                              | 2 +-
+ tools/perf/util/svghelper.c                            | 2 +-
+ 15 files changed, 27 insertions(+), 27 deletions(-)
 
-diff --git a/tools/include/asm-generic/bitops/atomic.h b/tools/include/asm-generic/bitops/atomic.h
-index 2f6ea28764a7..f64b049d236c 100644
---- a/tools/include/asm-generic/bitops/atomic.h
-+++ b/tools/include/asm-generic/bitops/atomic.h
-@@ -5,12 +5,12 @@
- #include <asm/types.h>
- #include <asm/bitsperlong.h>
+diff --git a/tools/perf/bench/find-bit-bench.c b/tools/perf/bench/find-bit-bench.c
+index 22b5cfe97023..d103c3136983 100644
+--- a/tools/perf/bench/find-bit-bench.c
++++ b/tools/perf/bench/find-bit-bench.c
+@@ -70,7 +70,7 @@ static int do_for_each_set_bit(unsigned int num_bits)
+ 		bitmap_zero(to_test, num_bits);
+ 		skip = num_bits / set_bits;
+ 		for (i = 0; i < num_bits; i += skip)
+-			set_bit(i, to_test);
++			__set_bit(i, to_test);
  
--static inline void set_bit(int nr, unsigned long *addr)
-+static inline void set_bit(unsigned long nr, unsigned long *addr)
- {
- 	addr[nr / __BITS_PER_LONG] |= 1UL << (nr % __BITS_PER_LONG);
+ 		for (i = 0; i < outer_iterations; i++) {
+ 			old = accumulator;
+diff --git a/tools/perf/builtin-c2c.c b/tools/perf/builtin-c2c.c
+index a9190458d2d5..52d94c7dd836 100644
+--- a/tools/perf/builtin-c2c.c
++++ b/tools/perf/builtin-c2c.c
+@@ -230,7 +230,7 @@ static void c2c_he__set_cpu(struct c2c_hist_entry *c2c_he,
+ 		      "WARNING: no sample cpu value"))
+ 		return;
+ 
+-	set_bit(sample->cpu, c2c_he->cpuset);
++	__set_bit(sample->cpu, c2c_he->cpuset);
  }
  
--static inline void clear_bit(int nr, unsigned long *addr)
-+static inline void clear_bit(unsigned long nr, unsigned long *addr)
- {
- 	addr[nr / __BITS_PER_LONG] &= ~(1UL << (nr % __BITS_PER_LONG));
+ static void c2c_he__set_node(struct c2c_hist_entry *c2c_he,
+@@ -247,7 +247,7 @@ static void c2c_he__set_node(struct c2c_hist_entry *c2c_he,
+ 	if (WARN_ONCE(node < 0, "WARNING: failed to find node\n"))
+ 		return;
+ 
+-	set_bit(node, c2c_he->nodeset);
++	__set_bit(node, c2c_he->nodeset);
+ 
+ 	if (c2c_he->paddr != sample->phys_addr) {
+ 		c2c_he->paddr_cnt++;
+@@ -2318,7 +2318,7 @@ static int setup_nodes(struct perf_session *session)
+ 			continue;
+ 
+ 		perf_cpu_map__for_each_cpu(cpu, idx, map) {
+-			set_bit(cpu.cpu, set);
++			__set_bit(cpu.cpu, set);
+ 
+ 			if (WARN_ONCE(cpu2node[cpu.cpu] != -1, "node/cpu topology bug"))
+ 				return -EINVAL;
+diff --git a/tools/perf/builtin-kwork.c b/tools/perf/builtin-kwork.c
+index fb8c63656ad8..1f63e24f704e 100644
+--- a/tools/perf/builtin-kwork.c
++++ b/tools/perf/builtin-kwork.c
+@@ -216,7 +216,7 @@ static struct kwork_atom *atom_new(struct perf_kwork *kwork,
+ 	list_add_tail(&page->list, &kwork->atom_page_list);
+ 
+ found_atom:
+-	set_bit(i, page->bitmap);
++	__set_bit(i, page->bitmap);
+ 	atom->time = sample->time;
+ 	atom->prev = NULL;
+ 	atom->page_addr = page;
+@@ -229,8 +229,8 @@ static void atom_free(struct kwork_atom *atom)
+ 	if (atom->prev != NULL)
+ 		atom_free(atom->prev);
+ 
+-	clear_bit(atom->bit_inpage,
+-		  ((struct kwork_atom_page *)atom->page_addr)->bitmap);
++	__clear_bit(atom->bit_inpage,
++		    ((struct kwork_atom_page *)atom->page_addr)->bitmap);
  }
+ 
+ static void atom_del(struct kwork_atom *atom)
+diff --git a/tools/perf/builtin-record.c b/tools/perf/builtin-record.c
+index e128b855ddde..2711c141c5bf 100644
+--- a/tools/perf/builtin-record.c
++++ b/tools/perf/builtin-record.c
+@@ -3555,7 +3555,7 @@ static int record__mmap_cpu_mask_init(struct mmap_cpu_mask *mask, struct perf_cp
+ 		/* Return ENODEV is input cpu is greater than max cpu */
+ 		if ((unsigned long)cpu.cpu > mask->nbits)
+ 			return -ENODEV;
+-		set_bit(cpu.cpu, mask->bits);
++		__set_bit(cpu.cpu, mask->bits);
+ 	}
+ 
+ 	return 0;
+@@ -3627,8 +3627,8 @@ static int record__init_thread_cpu_masks(struct record *rec, struct perf_cpu_map
+ 	pr_debug("nr_threads: %d\n", rec->nr_threads);
+ 
+ 	for (t = 0; t < rec->nr_threads; t++) {
+-		set_bit(perf_cpu_map__cpu(cpus, t).cpu, rec->thread_masks[t].maps.bits);
+-		set_bit(perf_cpu_map__cpu(cpus, t).cpu, rec->thread_masks[t].affinity.bits);
++		__set_bit(perf_cpu_map__cpu(cpus, t).cpu, rec->thread_masks[t].maps.bits);
++		__set_bit(perf_cpu_map__cpu(cpus, t).cpu, rec->thread_masks[t].affinity.bits);
+ 		if (verbose) {
+ 			pr_debug("thread_masks[%d]: ", t);
+ 			mmap_cpu_mask__scnprintf(&rec->thread_masks[t].maps, "maps");
+diff --git a/tools/perf/builtin-sched.c b/tools/perf/builtin-sched.c
+index f93737eef07b..86e18575c9be 100644
+--- a/tools/perf/builtin-sched.c
++++ b/tools/perf/builtin-sched.c
+@@ -1573,7 +1573,7 @@ static int map_switch_event(struct perf_sched *sched, struct evsel *evsel,
+ 
+ 	if (sched->map.comp) {
+ 		cpus_nr = bitmap_weight(sched->map.comp_cpus_mask, MAX_CPUS);
+-		if (!test_and_set_bit(this_cpu.cpu, sched->map.comp_cpus_mask)) {
++		if (!__test_and_set_bit(this_cpu.cpu, sched->map.comp_cpus_mask)) {
+ 			sched->map.comp_cpus[cpus_nr++] = this_cpu;
+ 			new_cpu = true;
+ 		}
+diff --git a/tools/perf/tests/bitmap.c b/tools/perf/tests/bitmap.c
+index 4965dd666956..0173f5402a35 100644
+--- a/tools/perf/tests/bitmap.c
++++ b/tools/perf/tests/bitmap.c
+@@ -18,7 +18,7 @@ static unsigned long *get_bitmap(const char *str, int nbits)
+ 
+ 	if (map && bm) {
+ 		for (i = 0; i < perf_cpu_map__nr(map); i++)
+-			set_bit(perf_cpu_map__cpu(map, i).cpu, bm);
++			__set_bit(perf_cpu_map__cpu(map, i).cpu, bm);
+ 	}
+ 
+ 	if (map)
+diff --git a/tools/perf/tests/mem2node.c b/tools/perf/tests/mem2node.c
+index 4c96829510c9..a0e88c496107 100644
+--- a/tools/perf/tests/mem2node.c
++++ b/tools/perf/tests/mem2node.c
+@@ -33,7 +33,7 @@ static unsigned long *get_bitmap(const char *str, int nbits)
+ 		int i;
+ 
+ 		perf_cpu_map__for_each_cpu(cpu, i, map)
+-			set_bit(cpu.cpu, bm);
++			__set_bit(cpu.cpu, bm);
+ 	}
+ 
+ 	if (map)
+diff --git a/tools/perf/util/affinity.c b/tools/perf/util/affinity.c
+index 4ee96b3c755b..38dc4524b7e8 100644
+--- a/tools/perf/util/affinity.c
++++ b/tools/perf/util/affinity.c
+@@ -58,14 +58,14 @@ void affinity__set(struct affinity *a, int cpu)
+ 		return;
+ 
+ 	a->changed = true;
+-	set_bit(cpu, a->sched_cpus);
++	__set_bit(cpu, a->sched_cpus);
+ 	/*
+ 	 * We ignore errors because affinity is just an optimization.
+ 	 * This could happen for example with isolated CPUs or cpusets.
+ 	 * In this case the IPIs inside the kernel's perf API still work.
+ 	 */
+ 	sched_setaffinity(0, cpu_set_size, (cpu_set_t *)a->sched_cpus);
+-	clear_bit(cpu, a->sched_cpus);
++	__clear_bit(cpu, a->sched_cpus);
+ }
+ 
+ static void __affinity__cleanup(struct affinity *a)
+diff --git a/tools/perf/util/header.c b/tools/perf/util/header.c
+index 98dfaf84bd13..dc2ae397d400 100644
+--- a/tools/perf/util/header.c
++++ b/tools/perf/util/header.c
+@@ -79,12 +79,12 @@ struct perf_file_attr {
+ 
+ void perf_header__set_feat(struct perf_header *header, int feat)
+ {
+-	set_bit(feat, header->adds_features);
++	__set_bit(feat, header->adds_features);
+ }
+ 
+ void perf_header__clear_feat(struct perf_header *header, int feat)
+ {
+-	clear_bit(feat, header->adds_features);
++	__clear_bit(feat, header->adds_features);
+ }
+ 
+ bool perf_header__has_feat(const struct perf_header *header, int feat)
+@@ -1358,7 +1358,7 @@ static int memory_node__read(struct memory_node *n, unsigned long idx)
+ 	rewinddir(dir);
+ 
+ 	for_each_memory(phys, dir) {
+-		set_bit(phys, n->set);
++		__set_bit(phys, n->set);
+ 	}
+ 
+ 	closedir(dir);
+@@ -3952,7 +3952,7 @@ int perf_file_header__read(struct perf_file_header *header,
+ 
+ 		if (!test_bit(HEADER_HOSTNAME, header->adds_features)) {
+ 			bitmap_zero(header->adds_features, HEADER_FEAT_BITS);
+-			set_bit(HEADER_BUILD_ID, header->adds_features);
++			__set_bit(HEADER_BUILD_ID, header->adds_features);
+ 		}
+ 	}
+ 
+diff --git a/tools/perf/util/mmap.c b/tools/perf/util/mmap.c
+index a4dff881be39..49093b21ee2d 100644
+--- a/tools/perf/util/mmap.c
++++ b/tools/perf/util/mmap.c
+@@ -111,7 +111,7 @@ static int perf_mmap__aio_bind(struct mmap *map, int idx, struct perf_cpu cpu, i
+ 			pr_err("Failed to allocate node mask for mbind: error %m\n");
+ 			return -1;
+ 		}
+-		set_bit(node_index, node_mask);
++		__set_bit(node_index, node_mask);
+ 		if (mbind(data, mmap_len, MPOL_BIND, node_mask, node_index + 1 + 1, 0)) {
+ 			pr_err("Failed to bind [%p-%p] AIO buffer to node %lu: error %m\n",
+ 				data, data + mmap_len, node_index);
+@@ -256,7 +256,7 @@ static void build_node_mask(int node, struct mmap_cpu_mask *mask)
+ 	for (idx = 0; idx < nr_cpus; idx++) {
+ 		cpu = perf_cpu_map__cpu(cpu_map, idx); /* map c index to online cpu index */
+ 		if (cpu__get_node(cpu) == node)
+-			set_bit(cpu.cpu, mask->bits);
++			__set_bit(cpu.cpu, mask->bits);
+ 	}
+ }
+ 
+@@ -270,7 +270,7 @@ static int perf_mmap__setup_affinity_mask(struct mmap *map, struct mmap_params *
+ 	if (mp->affinity == PERF_AFFINITY_NODE && cpu__max_node() > 1)
+ 		build_node_mask(cpu__get_node(map->core.cpu), &map->affinity_mask);
+ 	else if (mp->affinity == PERF_AFFINITY_CPU)
+-		set_bit(map->core.cpu.cpu, map->affinity_mask.bits);
++		__set_bit(map->core.cpu.cpu, map->affinity_mask.bits);
+ 
+ 	return 0;
+ }
+diff --git a/tools/perf/util/pmu.c b/tools/perf/util/pmu.c
+index 03284059175f..371d8f7a3de3 100644
+--- a/tools/perf/util/pmu.c
++++ b/tools/perf/util/pmu.c
+@@ -1513,7 +1513,7 @@ void perf_pmu__set_format(unsigned long *bits, long from, long to)
+ 
+ 	memset(bits, 0, BITS_TO_BYTES(PERF_PMU_FORMAT_BITS));
+ 	for (b = from; b <= to; b++)
+-		set_bit(b, bits);
++		__set_bit(b, bits);
+ }
+ 
+ void perf_pmu__del_formats(struct list_head *formats)
+diff --git a/tools/perf/util/scripting-engines/trace-event-perl.c b/tools/perf/util/scripting-engines/trace-event-perl.c
+index a5d945415bbc..5b602b6d4685 100644
+--- a/tools/perf/util/scripting-engines/trace-event-perl.c
++++ b/tools/perf/util/scripting-engines/trace-event-perl.c
+@@ -365,7 +365,7 @@ static void perl_process_tracepoint(struct perf_sample *sample,
+ 
+ 	sprintf(handler, "%s::%s", event->system, event->name);
+ 
+-	if (!test_and_set_bit(event->id, events_defined))
++	if (!__test_and_set_bit(event->id, events_defined))
+ 		define_event_symbols(event, handler, event->print_fmt.args);
+ 
+ 	s = nsecs / NSEC_PER_SEC;
+diff --git a/tools/perf/util/scripting-engines/trace-event-python.c b/tools/perf/util/scripting-engines/trace-event-python.c
+index 1f2040f36d4e..0f229fa29163 100644
+--- a/tools/perf/util/scripting-engines/trace-event-python.c
++++ b/tools/perf/util/scripting-engines/trace-event-python.c
+@@ -933,7 +933,7 @@ static void python_process_tracepoint(struct perf_sample *sample,
+ 
+ 	sprintf(handler_name, "%s__%s", event->system, event->name);
+ 
+-	if (!test_and_set_bit(event->id, events_defined))
++	if (!__test_and_set_bit(event->id, events_defined))
+ 		define_event_symbols(event, handler_name, event->print_fmt.args);
+ 
+ 	handler = get_handler(handler_name);
+diff --git a/tools/perf/util/session.c b/tools/perf/util/session.c
+index 1a4f10de29ff..873fd51ec1b2 100644
+--- a/tools/perf/util/session.c
++++ b/tools/perf/util/session.c
+@@ -2748,7 +2748,7 @@ int perf_session__cpu_bitmap(struct perf_session *session,
+ 			goto out_delete_map;
+ 		}
+ 
+-		set_bit(cpu.cpu, cpu_bitmap);
++		__set_bit(cpu.cpu, cpu_bitmap);
+ 	}
+ 
+ 	err = 0;
+diff --git a/tools/perf/util/svghelper.c b/tools/perf/util/svghelper.c
+index 1e0c731fc539..5c62d3118c41 100644
+--- a/tools/perf/util/svghelper.c
++++ b/tools/perf/util/svghelper.c
+@@ -741,7 +741,7 @@ static int str_to_bitmap(char *s, cpumask_t *b, int nr_cpus)
+ 			break;
+ 		}
+ 
+-		set_bit(c.cpu, cpumask_bits(b));
++		__set_bit(c.cpu, cpumask_bits(b));
+ 	}
+ 
+ 	perf_cpu_map__put(m);
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
