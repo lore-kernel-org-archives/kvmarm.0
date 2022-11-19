@@ -2,73 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B62C4332F
-	for <kvmarm@archiver.kernel.org>; Sat, 19 Nov 2022 01:35:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2410C43219
+	for <kvmarm@archiver.kernel.org>; Sat, 19 Nov 2022 01:35:09 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EB924B64F;
-	Fri, 18 Nov 2022 20:35:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FA0F4BB54;
+	Fri, 18 Nov 2022 20:35:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wbUoWrcmRc+C; Fri, 18 Nov 2022 20:35:06 -0500 (EST)
+	with ESMTP id 1JrBl2kqmzDB; Fri, 18 Nov 2022 20:35:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30D104BB6C;
-	Fri, 18 Nov 2022 20:35:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4884A4BB8D;
+	Fri, 18 Nov 2022 20:35:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B1A984B64F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Nov 2022 20:35:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D6824BB4E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Nov 2022 20:35:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tUV8OoWEOXCK for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Nov 2022 20:35:02 -0500 (EST)
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
- [209.85.215.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C5F704BB5F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Nov 2022 20:35:00 -0500 (EST)
-Received: by mail-pg1-f201.google.com with SMTP id
- k16-20020a635a50000000b0042986056df6so3956705pgm.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Nov 2022 17:35:00 -0800 (PST)
+ with ESMTP id 5em4DSWxAMDM for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Nov 2022 20:35:04 -0500 (EST)
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
+ [209.85.210.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B51154BB57
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Nov 2022 20:35:03 -0500 (EST)
+Received: by mail-pf1-f202.google.com with SMTP id
+ b13-20020a056a000a8d00b0057348c50123so1093153pfl.18
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Nov 2022 17:35:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=TighIegw0FVxEDaBlZjjTMFerelt3ds/i85zL8CdikU=;
- b=rmXe3VvPa8zVoj+4dcS77sndQg/asQbzYB56Apv5ggGW1UuoVvHp+A5nMUNJLLDfT3
- 0SofbaNG1mdy2xYr69bYijAVWvASmZ+BqpR/39RMUQ9fkkgAxOfAbbiCLxjhwxFDSnJD
- CYvPDNSf4OyAJDiay7zq/RREBEcBoCo+j9xnBGDg3cCGMQQFHgk7xqMIHyhqLMB+bCwR
- NAaB2xI/+noK1nArryRf5o2AI/YWSXe/+BtRdDtBj4KcS5PatRnf6S7gkyW5Yh4ep5o2
- 9FIQoQ8VkWuppw661uC0FbLCjWmBTrmiieXQzRAdkvaLBoGT3HMeR/wJf7SYLzVFCqzk
- 4tiA==
+ bh=yrZp0Djf+nyn4dNgeVKpvxujZLza+5E14t16z5zmdQE=;
+ b=GfhP7WVWA+MYs6WFdLXnOeFZv+EFlcBt9kUtLrizDVaNbbbRf+/hIQHM4mpfquOA2+
+ etvmV4c5QMeLYA4HWv+3abWSna8UbhMZ5gnofZtt5cMW3uCwav0Vah3EfL1P69WtEOkh
+ lNjWaDtI3rsomxW+cDzLIRNuWP9Nh9xkOAbHBolIJxm4bC+eDDAGhq6o6YsNoSo4Nl/y
+ HvX50Vmi36E89jR0fyzcYpwnFWzwSoQieDiEDhejLlS7jB4bv08nyZznLcB4JrzMp5Mh
+ F/G3B24MJR49AUAJ2TeBjEAt+tZPNfxObTq+bg7i/LNG/Ck/WoibSz1qBxwFnJo3MGuf
+ XH3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=TighIegw0FVxEDaBlZjjTMFerelt3ds/i85zL8CdikU=;
- b=553ZCqA/uJMj6j+kaksk1v+6pSJMmZ+QXB8STZZzduZvqkhLSdxO3Y5pLmvRmryZLQ
- tsRnSCxtBkd/2nVS+V/Ff4hYuRnbyhWi7Y81gr3gNWL9EKsG/vsQoFD2wOxiqWx/wI+G
- lYx1xAJpm08CWhoQoYSuyQmpdq7Kin/JtgHdubPBsWAgK6gXY97jq3QDabDgLfjjreyg
- PfkD4MMkIcBwZ15MBJUcwlCKsWXYaeb5rYQJdWcmsBAPLCkezMpQTB4QSqhm6t9FjlGO
- UbUyQRE2kxZBv7RUEkjx3EUfpLFO1DAiJeA0qEeveSunfoWwct0tXtW2re/H03+aMYjL
- qoqg==
-X-Gm-Message-State: ANoB5pmkb1urYfLoPPILFruiV/0VU9m1MpXzKYJ6SBU+pzUpt2Re9puX
- gSAJ58zbPVgAZFTK8+KMdhj1CekiRLM=
-X-Google-Smtp-Source: AA0mqf7npHfQc5LwOz0q7JCYBS7uttfoGJCbriNRIIB73IIE/vGbpLSdnE48DGaUO0X9NP3W41W4iWnhxeQ=
+ bh=yrZp0Djf+nyn4dNgeVKpvxujZLza+5E14t16z5zmdQE=;
+ b=uId8bBR4esRc7XO/lKpPVjaLFKXqKfDI92HOyyKsPcsW7BL3Zu2At7a1gBKX/GWe6g
+ RhoQt2PjY32Y2G+IvUZgB/NBhOXUSf8t/v18/SlkyX0QXqAo1ndrNUGmT7PBYiPZD7WN
+ 5H2fJaKMJlgfOdD0lVSDLlTB7RGWvj3sSuTU42hjtfLE38Q/tVYnJzfTeFP72y0PRsrS
+ XIP4sA/6yQiqEhLfPRZdpRiN8moaNIIIsKBJOtAlgnxxTrNvIwrkIcSxvyR2ncz+JyrE
+ kG+MqYyaBCj3N+/96oW5dEfx9sF819afdtLBuo+A0C4Isfz85LCO82fT5fXVb2DtN5oS
+ rooQ==
+X-Gm-Message-State: ANoB5pmZa33T6VsDgAL6gSBjJyT8ucw3ZeZVgli2t6LOrxF1x+4JCFgM
+ PtK/RkmkjHGIW5uoj27GalHZP4daNw8=
+X-Google-Smtp-Source: AA0mqf4F7zjmekYcCzO9zVxMtoWH8+ZW/nRPfBpqtmz4TLB8swAWq640uipjbD7rRbzs391daM0nYXErtD0=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:8d88:0:b0:562:69d4:f9f3 with SMTP id
- i8-20020aa78d88000000b0056269d4f9f3mr10570461pfr.5.1668821700033; Fri, 18 Nov
- 2022 17:35:00 -0800 (PST)
-Date: Sat, 19 Nov 2022 01:34:45 +0000
+ (user=seanjc job=sendgmr) by 2002:a17:90b:48c8:b0:213:2912:7a28 with SMTP id
+ li8-20020a17090b48c800b0021329127a28mr10482060pjb.51.1668821702989; Fri, 18
+ Nov 2022 17:35:02 -0800 (PST)
+Date: Sat, 19 Nov 2022 01:34:47 +0000
 In-Reply-To: <20221119013450.2643007-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221119013450.2643007-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221119013450.2643007-5-seanjc@google.com>
-Subject: [PATCH 4/9] tools: Take @bit as an "unsigned long" in
- {clear,set}_bit() helpers
+Message-ID: <20221119013450.2643007-7-seanjc@google.com>
+Subject: [PATCH 6/9] KVM: selftests: Use non-atomic clear/set bit helpers in
+ KVM tests
 From: Sean Christopherson <seanjc@google.com>
 To: Yury Norov <yury.norov@gmail.com>, Peter Zijlstra <peterz@infradead.org>, 
  Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
@@ -97,62 +97,156 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Take @bit as an unsigned long instead of a signed int in clear_bit() and
-set_bit() so that they match the double-underscore versions, __clear_bit()
-and __set_bit().  This will allow converting users that really don't want
-atomic operations to the double-underscores without introducing a
-functional change, which will in turn allow making {clear,set}_bit()
-atomic (as advertised).
+Use the dedicated non-atomic helpers for {clear,set}_bit() and their
+test variants, i.e. the double-underscore versions.  Depsite being
+defined in atomic.h, and despite the kernel versions being atomic in the
+kernel, tools' {clear,set}_bit() helpers aren't actually atomic.  Move
+to the double-underscore versions so that the versions that are expected
+to be atomic (for kernel developers) can be made atomic without affecting
+users that don't want atomic operations.
 
-Practically speaking, this _should_ have no functional impact.  KVM's
-selftests usage is either hardcoded (Hyper-V tests) or is artificially
-limited (arch_timer test and dirty_log test).  In KVM, dirty_log test is
-the only mildly interesting case as it's use indirectly restricted to
-unsigned 32-bit values, but in theory it could generate a negative value
-when cast to a signed int.  But in that case, taking an "unsigned long"
-is actually a bug fix.
-
-Perf's usage is more difficult to audit, but any code that is affected
-by the switch is likely already broken.  perf_header__{set,clear}_feat()
-and perf_file_header__read() effectively use only hardcoded enums with
-small, positive values, atom_new() passes an unsigned long, but its value
-is capped at 128 via NR_ATOM_PER_PAGE, etc...
-
-The only real potential for breakage is in the perf flows that take a
-"cpu", but it's unlikely perf is subtly relying on a negative index into
-bitmaps, e.g. "cpu" can be "-1", but only as "not valid" placeholder.
-
-Note, tools/testing/nvdimm/ makes heavy use of set_bit(), but that code
-builds into a kernel module of sorts, i.e. pulls in all of the kernel's
-header and so is getting the kernel's atomic set_bit().  The NVDIMM test
-usage of atomics is likely unnecessary, e.g. ndtest_dimm_register() sets
-bits in a local variable, but that's neither here nor there as far as
-this change is concerned.
+Leave the usage in ucall_free() as-is, it's the one place in tools/ that
+actually wants/needs atomic behavior.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/include/asm-generic/bitops/atomic.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ .../selftests/kvm/aarch64/arch_timer.c        |  2 +-
+ tools/testing/selftests/kvm/dirty_log_test.c  | 34 +++++++++----------
+ .../selftests/kvm/x86_64/hyperv_evmcs.c       |  4 +--
+ .../selftests/kvm/x86_64/hyperv_svm_test.c    |  4 +--
+ 4 files changed, 22 insertions(+), 22 deletions(-)
 
-diff --git a/tools/include/asm-generic/bitops/atomic.h b/tools/include/asm-generic/bitops/atomic.h
-index 2f6ea28764a7..f64b049d236c 100644
---- a/tools/include/asm-generic/bitops/atomic.h
-+++ b/tools/include/asm-generic/bitops/atomic.h
-@@ -5,12 +5,12 @@
- #include <asm/types.h>
- #include <asm/bitsperlong.h>
+diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+index f2a96779716a..26556a266021 100644
+--- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
++++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+@@ -222,7 +222,7 @@ static void *test_vcpu_run(void *arg)
  
--static inline void set_bit(int nr, unsigned long *addr)
-+static inline void set_bit(unsigned long nr, unsigned long *addr)
- {
- 	addr[nr / __BITS_PER_LONG] |= 1UL << (nr % __BITS_PER_LONG);
- }
+ 	/* Currently, any exit from guest is an indication of completion */
+ 	pthread_mutex_lock(&vcpu_done_map_lock);
+-	set_bit(vcpu_idx, vcpu_done_map);
++	__set_bit(vcpu_idx, vcpu_done_map);
+ 	pthread_mutex_unlock(&vcpu_done_map_lock);
  
--static inline void clear_bit(int nr, unsigned long *addr)
-+static inline void clear_bit(unsigned long nr, unsigned long *addr)
- {
- 	addr[nr / __BITS_PER_LONG] &= ~(1UL << (nr % __BITS_PER_LONG));
- }
+ 	switch (get_ucall(vcpu, &uc)) {
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index a38c4369fb8e..a75548865f6b 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -44,20 +44,20 @@
+ # define BITOP_LE_SWIZZLE	((BITS_PER_LONG-1) & ~0x7)
+ # define test_bit_le(nr, addr) \
+ 	test_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+-# define set_bit_le(nr, addr) \
+-	set_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+-# define clear_bit_le(nr, addr) \
+-	clear_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+-# define test_and_set_bit_le(nr, addr) \
+-	test_and_set_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+-# define test_and_clear_bit_le(nr, addr) \
+-	test_and_clear_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
++# define __set_bit_le(nr, addr) \
++	__set_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
++# define __clear_bit_le(nr, addr) \
++	__clear_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
++# define __test_and_set_bit_le(nr, addr) \
++	__test_and_set_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
++# define __test_and_clear_bit_le(nr, addr) \
++	__test_and_clear_bit((nr) ^ BITOP_LE_SWIZZLE, addr)
+ #else
+-# define test_bit_le		test_bit
+-# define set_bit_le		set_bit
+-# define clear_bit_le		clear_bit
+-# define test_and_set_bit_le	test_and_set_bit
+-# define test_and_clear_bit_le	test_and_clear_bit
++# define test_bit_le			test_bit
++# define __set_bit_le			__set_bit
++# define __clear_bit_le			__clear_bit
++# define __test_and_set_bit_le		__test_and_set_bit
++# define __test_and_clear_bit_le	__test_and_clear_bit
+ #endif
+ 
+ #define TEST_DIRTY_RING_COUNT		65536
+@@ -305,7 +305,7 @@ static uint32_t dirty_ring_collect_one(struct kvm_dirty_gfn *dirty_gfns,
+ 		TEST_ASSERT(cur->offset < num_pages, "Offset overflow: "
+ 			    "0x%llx >= 0x%x", cur->offset, num_pages);
+ 		//pr_info("fetch 0x%x page %llu\n", *fetch_index, cur->offset);
+-		set_bit_le(cur->offset, bitmap);
++		__set_bit_le(cur->offset, bitmap);
+ 		dirty_ring_last_page = cur->offset;
+ 		dirty_gfn_set_collected(cur);
+ 		(*fetch_index)++;
+@@ -560,7 +560,7 @@ static void vm_dirty_log_verify(enum vm_guest_mode mode, unsigned long *bmap)
+ 		value_ptr = host_test_mem + page * host_page_size;
+ 
+ 		/* If this is a special page that we were tracking... */
+-		if (test_and_clear_bit_le(page, host_bmap_track)) {
++		if (__test_and_clear_bit_le(page, host_bmap_track)) {
+ 			host_track_next_count++;
+ 			TEST_ASSERT(test_bit_le(page, bmap),
+ 				    "Page %"PRIu64" should have its dirty bit "
+@@ -568,7 +568,7 @@ static void vm_dirty_log_verify(enum vm_guest_mode mode, unsigned long *bmap)
+ 				    page);
+ 		}
+ 
+-		if (test_and_clear_bit_le(page, bmap)) {
++		if (__test_and_clear_bit_le(page, bmap)) {
+ 			bool matched;
+ 
+ 			host_dirty_count++;
+@@ -661,7 +661,7 @@ static void vm_dirty_log_verify(enum vm_guest_mode mode, unsigned long *bmap)
+ 				 * should report its dirtyness in the
+ 				 * next run
+ 				 */
+-				set_bit_le(page, host_bmap_track);
++				__set_bit_le(page, host_bmap_track);
+ 			}
+ 		}
+ 	}
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c b/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
+index ea58e5b436e8..ab51865c80be 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
+@@ -142,7 +142,7 @@ void guest_code(struct vmx_pages *vmx_pages, struct hyperv_test_pages *hv_pages,
+ 	/* Intercept RDMSR 0xc0000100 */
+ 	vmwrite(CPU_BASED_VM_EXEC_CONTROL, vmreadz(CPU_BASED_VM_EXEC_CONTROL) |
+ 		CPU_BASED_USE_MSR_BITMAPS);
+-	set_bit(MSR_FS_BASE & 0x1fff, vmx_pages->msr + 0x400);
++	__set_bit(MSR_FS_BASE & 0x1fff, vmx_pages->msr + 0x400);
+ 	GUEST_ASSERT(!vmresume());
+ 	GUEST_ASSERT(vmreadz(VM_EXIT_REASON) == EXIT_REASON_MSR_READ);
+ 	current_evmcs->guest_rip += 2; /* rdmsr */
+@@ -154,7 +154,7 @@ void guest_code(struct vmx_pages *vmx_pages, struct hyperv_test_pages *hv_pages,
+ 	current_evmcs->guest_rip += 2; /* rdmsr */
+ 
+ 	/* Intercept RDMSR 0xc0000101 without telling KVM about it */
+-	set_bit(MSR_GS_BASE & 0x1fff, vmx_pages->msr + 0x400);
++	__set_bit(MSR_GS_BASE & 0x1fff, vmx_pages->msr + 0x400);
+ 	/* Make sure HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP is set */
+ 	current_evmcs->hv_clean_fields |= HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP;
+ 	GUEST_ASSERT(!vmresume());
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
+index 3b3cc94ba8e4..68a7d354ea07 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
+@@ -103,7 +103,7 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm,
+ 
+ 	/* Intercept RDMSR 0xc0000100 */
+ 	vmcb->control.intercept |= 1ULL << INTERCEPT_MSR_PROT;
+-	set_bit(2 * (MSR_FS_BASE & 0x1fff), svm->msr + 0x800);
++	__set_bit(2 * (MSR_FS_BASE & 0x1fff), svm->msr + 0x800);
+ 	run_guest(vmcb, svm->vmcb_gpa);
+ 	GUEST_ASSERT(vmcb->control.exit_code == SVM_EXIT_MSR);
+ 	vmcb->save.rip += 2; /* rdmsr */
+@@ -115,7 +115,7 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm,
+ 	vmcb->save.rip += 2; /* rdmsr */
+ 
+ 	/* Intercept RDMSR 0xc0000101 without telling KVM about it */
+-	set_bit(2 * (MSR_GS_BASE & 0x1fff), svm->msr + 0x800);
++	__set_bit(2 * (MSR_GS_BASE & 0x1fff), svm->msr + 0x800);
+ 	/* Make sure HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP is set */
+ 	vmcb->control.clean |= HV_VMCB_NESTED_ENLIGHTENMENTS;
+ 	run_guest(vmcb, svm->vmcb_gpa);
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
