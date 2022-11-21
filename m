@@ -1,113 +1,61 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49ECA381
-	for <kvmarm@lists.linux.dev>; Sat, 19 Nov 2022 12:54:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCD73C433D6;
-	Sat, 19 Nov 2022 12:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F074563D6
+	for <kvmarm@lists.linux.dev>; Mon, 21 Nov 2022 18:09:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11659C433C1;
+	Mon, 21 Nov 2022 18:09:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1668862444;
-	bh=vioAvYwfiaLZn2wwZZq6HjQqCvgo19zaYRMDjhkRB4U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LGoMvRluIE3TsL7CDUqe2tLxyTeVvN3GQABrBDYTnvZuErTa3wLMUUl68KOrer/Rn
-	 371Kg+wQf9fJ7ngdBDRRg2pMLLdd6fUKDTsLmtowCxh2l6IxlKkLZ8GDSShAELXhqV
-	 iYvkpo9sQCJJmy8I8hrLBkzaMKW+hsLlUftPYjda7krJXVNyHZqtuWkRsfgggbc4qn
-	 UNHyk3gJrcU36H2XFwk2LvLwznlSBH3VObVUzJz9vltv3oGEdeK10PGnsW+7gzy0uc
-	 mLxzA0Q2FnP5AQ0EHSh99UAcnemd9FlZQOryYtjBWMkEX2zoEtT4qeDp9i6thZs5tL
-	 oJvTPVIps2E2A==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1owNMA-007EQZ-H7;
-	Sat, 19 Nov 2022 12:54:02 +0000
+	s=k20201202; t=1669054147;
+	bh=/7KHXu25uYdxptbYApPiI4X6tmxB+JZaBclz27zxScA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=s/GpyKDjXOFYp5ugSCAdXo1NhlB2IPARJM3jRaplMsXTLpV8lxciaQnUUyxQquulK
+	 KzEe49FCFaD8LuZy5w40TIz8akrFGG53YphhnwI5jTjvzL+/8C9YHEIelrPhT2xilp
+	 CFcT+oCqfydITYFEx1ZK3OI+iuL03YCEyIygLd19LEeKPQQ8m2HuC9LebUr+2cA4i0
+	 /MoOm0DInv0d9t1r/8qvWSt0x+gJwsPr+mi9mVlqj1ORRgENAhZmHOZfClgfcbHTBE
+	 XmnydxyEqRfCurqpHdYQZDorzFQqvAhcZmuPCp/ecd0IWnHVtsC41IQui39XQPk8/f
+	 yyvZa3qp0B0/g==
+Date: Mon, 21 Nov 2022 18:09:02 +0000
+From: Will Deacon <will@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 0/3] KVM: arm64: Fixes for parallel faults series
+Message-ID: <20221121180901.GC7645@willie-the-truck>
+References: <20221118182222.3932898-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Sat, 19 Nov 2022 12:54:02 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Reiji Watanabe <reijiw@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org, James Morse
- <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Alexandru
- Elisei <alexandru.elisei@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v4 12/16] KVM: arm64: PMU: Allow ID_DFR0_EL1.PerfMon to be
- set from userspace
-In-Reply-To: <CAAeT=Fwq8wcBvoWE+5RJt4og4uD5KgQ0kzhDZorGPjHmTguwzw@mail.gmail.com>
-References: <20221113163832.3154370-1-maz@kernel.org>
- <20221113163832.3154370-13-maz@kernel.org>
- <CAAeT=Fwq8wcBvoWE+5RJt4og4uD5KgQ0kzhDZorGPjHmTguwzw@mail.gmail.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <6b70f8fac8b2fd316b618c3c2e67e07b@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ricarkol@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221119125402.gteEG1ZHS-q1FJTxCuVYg4VkJfhH0uEgQNjDR3Vh-oc@z>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221118182222.3932898-1-oliver.upton@linux.dev>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Message-ID: <20221121180902.wohTZDOiXHKbop7h1ZDS1km8n7z0vukON56vnjemlU8@z>
 
-On 2022-11-19 05:52, Reiji Watanabe wrote:
-> Hi Marc,
+On Fri, Nov 18, 2022 at 06:22:19PM +0000, Oliver Upton wrote:
+> Small set of fixes for the parallel faults series. Most importantly,
+> stop taking the RCU read lock for walking hyp stage-1. For the sake of
+> consistency, take a pointer to kvm_pgtable_walker in
+> kvm_dereference_pteref() as well.
 > 
-> On Sun, Nov 13, 2022 at 8:46 AM Marc Zyngier <maz@kernel.org> wrote:
->> 
->> Allow userspace to write ID_DFR0_EL1, on the condition that only
->> the PerfMon field can be altered and be something that is compatible
->> with what was computed for the AArch64 view of the guest.
->> 
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  arch/arm64/kvm/sys_regs.c | 57 
->> ++++++++++++++++++++++++++++++++++++++-
->>  1 file changed, 56 insertions(+), 1 deletion(-)
->> 
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 3cbcda665d23..dc201a0557c0 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1070,6 +1070,19 @@ static u8 vcpu_pmuver(const struct kvm_vcpu 
->> *vcpu)
->>         return vcpu->kvm->arch.dfr0_pmuver.unimp;
->>  }
->> 
->> +static u8 perfmon_to_pmuver(u8 perfmon)
->> +{
->> +       switch (perfmon) {
->> +       case ID_DFR0_PERFMON_8_0:
->> +               return ID_AA64DFR0_EL1_PMUVer_IMP;
->> +       case ID_DFR0_PERFMON_IMP_DEF:
->> +               return ID_AA64DFR0_EL1_PMUVer_IMP_DEF;
+> Tested on an Ampere Altra system with kvm-arm.mode={nvhe,protected} and
+> lockdep. Applies on top of the parallel faults series picked up last
+> week.
 > 
-> Nit: Since IMP_DEF is 0xf for both PMUVER and PERFMON,
-> I think the 'default' can handle IMP_DEF (I have the same
-> comment for pmuver_to_perfmon in the patch-10).
-
-It sure can, but IMP_DEF is special enough in its treatment
-(we explicitly check this value in set_id_dfr0_el1()) that
-it actually helps the reader to keep the explicit conversion
-here.
-
+> v3: https://lore.kernel.org/kvmarm/20221116165655.2649475-1-oliver.upton@linux.dev/
 > 
->> +       default:
->> +               /* Anything ARMv8.1+ has the same value. For now. */
-> 
-> Nit: Shouldn't the comment also mention NI (and IMP_DEF) ?
-> (I have the same comment for pmuver_to_perfmon in the patch-10)
+> v3 -> v4:
+>  - Return an error instead of WARN() in hyp for shared walks (Will)
 
-I can expand the comment to include NI.
+For the series:
 
-> Otherwise:
-> Reviewed-by: Reiji Watanabe <reijiw@google.com>
+Acked-by: Will Deacon <will@kernel.org>
 
-Thanks,
+Thanks!
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Will
