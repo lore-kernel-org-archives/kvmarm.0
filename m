@@ -1,52 +1,52 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25B567E
-	for <kvmarm@lists.linux.dev>; Wed, 23 Nov 2022 06:08:09 +0000 (UTC)
-Received: by mail-pl1-f171.google.com with SMTP id y10so14562933plp.3
-        for <kvmarm@lists.linux.dev>; Tue, 22 Nov 2022 22:08:09 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B2A7E
+	for <kvmarm@lists.linux.dev>; Wed, 23 Nov 2022 06:27:33 +0000 (UTC)
+Received: by mail-pj1-f54.google.com with SMTP id a1-20020a17090abe0100b00218a7df7789so1029091pjs.5
+        for <kvmarm@lists.linux.dev>; Tue, 22 Nov 2022 22:27:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=h5tlKNi35V94k0QmV2ysH94Zb5ALfgaBlCa6CRxYIVw=;
-        b=eEdddm6ebarYt7g7uJhWOnpgtypJcRMCmOrwuMaNVAA0C5aBaCucbUGx0fVJIOPlSW
-         hNU/iCZT3w1eHA9yNvRVrKP4s/WGB5nWkZ5SNaTLoDMrZdetIXV7DUlzXgQ0ZI6O6D+6
-         turNtaZkl1rWGQ25PWMZCrZdZetW0KQ5nSknO98LM/koczRsx+sr997Z6Y/nWEVSjfkg
-         qVEcHzGhPUx8KY4y+poF1Ed4OUzls/fCfaCQ+ku5rLVm7nWR2Fvu/iFVPShBI//SIcTM
-         EYWYxB+VjSWM0PzjWaZYoES2vXUzhfLJe96SE6tNaWrzXSI35zv+R9NxKDwCNWfzNNlH
-         YRoQ==
+        bh=tit1GoRDHXxGIzZdw8RHtC91q2gw44B8zNxKS7z02AA=;
+        b=fqnDNTMFJXL6XBTeO+kRQJFWvP7cvAJx1e8OAUaq01/iImdfKXDQth+CsyTAS02ErY
+         gOASCuAizTdmqPf5oolegW2ktzaQxnmm8fsEurNaP3n2A5eGDsVdiCQk7omLcW2Fsf2S
+         d6eM1CdGhpj3oVBsg76UpeggwkYA2ZpHdbx9ZOht42+LjzbynTlqPC1AJu+Ys1YbvfuN
+         9DPIqYCqPnVcmaFMZmdhqecrwmSt0sebO8Q/c8q2Dl8+K61eAoRUDjFLkI32HrMvP5V+
+         8/u19Bqkt8t5bZcwoRi9HlB3NbnkFH9T5nDQlYaRQUwJenxVBBuN2WUHHZ/QPb2FQGOV
+         QB3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=h5tlKNi35V94k0QmV2ysH94Zb5ALfgaBlCa6CRxYIVw=;
-        b=Ow96Rd3O2ZiyLBf3eBHcKhBHZGEUHaaQSE2oOTPmAPoibgby39Z9fjeeIq+jkSFlhT
-         a+EhDhiRdt3YsHsJgy/vcWW4UhDjn/qaBy15XMeQzfhLg8B93/ou0wztfRXlpyXX/G4D
-         2PJnzVZsJMh4czL9KKcJ1GfmgMr1+NAQkBDv/YhxY/lgsNybuEXFCThvtns+sQizyky1
-         O8JDrkRJ728GD3/odoUE9RdibQ4csZEDLkY+kR7hLtarsEX6K4RRX3xbW5MnFyPasJA8
-         Gh0GLYBT8MMs30CxLxBetco6hdPHt21txKvoMvt0GG2Ffjs+v+NhMBALHUMrZR0+giEt
-         j5JQ==
-X-Gm-Message-State: ANoB5pkm1luq2GeSl4oS1TbLiZvZpO3PfupRoiJtvJYINzgbNp/5zg4i
-	39nBUU/jrl9iSrmt2zauRjLgzj8jtwPtadmdAepGkw==
-X-Google-Smtp-Source: AA0mqf5lImrYjSG2qG8wHkOxPafuxpqJyZLTwqEDiwfRe0ptbYcQ09on7ZiYFobULDz+0AHmQt42G9VURGZZHsd0DAk=
-X-Received: by 2002:a17:90a:e2c5:b0:214:1648:687d with SMTP id
- fr5-20020a17090ae2c500b002141648687dmr35554546pjb.78.1669183688483; Tue, 22
- Nov 2022 22:08:08 -0800 (PST)
+        bh=tit1GoRDHXxGIzZdw8RHtC91q2gw44B8zNxKS7z02AA=;
+        b=ovxNSihF2oIfcWKuS1XKLXNxsRyYfVpOIB+7n6IEzyyODIcRWfmZt4fQGxxHgM4aer
+         42XTicK2F7BreH7Gl/x6gIElKWPBgKhOupdE690dUBCC4JAPNyJ529DnxAYg8XOhtAhD
+         4IDwywDUVAxYn5z30glqAWIWQXAH8928PjsXYH5e34biV7RYzzK9z9TWtIJdghHu5+ot
+         3IIQnvKhXasqNsXtmt7Ok5N4BxP7776VdvTwHioge5M994b3sF7sZdj3kQMdSIxA9TPl
+         WJAgw6Dentje/JNGVISjpQ2fKLNHjP6KRFNScHuSZFJizQKKGpBLYUgakajbkMRWo5aV
+         EW4Q==
+X-Gm-Message-State: ANoB5pnWhR1sG4Iz2s1xt7qSzHdfPq/svJ2E3PCxm7F5IYQ6iiplSrbL
+	HWnGNx3KeEJzdEVVTQsG0eReBTSDWfNoQBjDbmyu8A==
+X-Google-Smtp-Source: AA0mqf5nlutVfDZV3mLPMpBH63zenw1aNZTS1OGEV25ZP+8iiz3jkhX4OVBoK3Ai4ysrDyk3GPfTAhlBrvQ5qYUgktI=
+X-Received: by 2002:a17:902:9006:b0:172:d410:2a91 with SMTP id
+ a6-20020a170902900600b00172d4102a91mr7622542plp.30.1669184853196; Tue, 22 Nov
+ 2022 22:27:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20221113163832.3154370-1-maz@kernel.org> <20221113163832.3154370-15-maz@kernel.org>
-In-Reply-To: <20221113163832.3154370-15-maz@kernel.org>
+References: <20221113163832.3154370-1-maz@kernel.org> <20221113163832.3154370-16-maz@kernel.org>
+In-Reply-To: <20221113163832.3154370-16-maz@kernel.org>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Tue, 22 Nov 2022 22:07:52 -0800
-Message-ID: <CAAeT=FwKuB2mAhWaeDSVQnHyDnQrLnNAuZ+Z3=KoFZe5imiwXQ@mail.gmail.com>
-Subject: Re: [PATCH v4 14/16] KVM: arm64: PMU: Allow PMUv3p5 to be exposed to
- the guest
+Date: Tue, 22 Nov 2022 22:27:16 -0800
+Message-ID: <CAAeT=Fz-zYX4qLt-RKvO6P0D5Si9vxxpsbALH1LPbON8efyEeg@mail.gmail.com>
+Subject: Re: [PATCH v4 15/16] KVM: arm64: PMU: Simplify vcpu computation on
+ perf overflow notification
 To: Marc Zyngier <maz@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, 
 	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
@@ -54,12 +54,16 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
 	Alexandru Elisei <alexandru.elisei@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
 	Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221123060752.Uh6MVu7wxucaBSv1EqTBAUOFE6SK90icCKB_VL8_uJw@z>
+Message-ID: <20221123062716.LVodTF2ZMVVHegahJQsuCT01s1blqroSzQiz16EOjsg@z>
 
 On Sun, Nov 13, 2022 at 8:46 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Now that the infrastructure is in place, bump the PMU support up
-> to PMUv3p5.
+> The way we compute the target vcpu on getting an overflow is
+> a bit odd, as we use the PMC array as an anchor for kvm_pmc_to_vcpu,
+> while we could directly compute the correct address.
+>
+> Get rid of the intermediate step and directly compute the target
+> vcpu.
 >
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 
