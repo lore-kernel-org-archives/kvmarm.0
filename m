@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A6FCC4332F
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Nov 2022 06:08:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FD6AC4332F
+	for <kvmarm@archiver.kernel.org>; Wed, 23 Nov 2022 06:27:37 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E961649F41;
-	Wed, 23 Nov 2022 01:08:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C94B4B62D;
+	Wed, 23 Nov 2022 01:27:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id M5bhjs5pDY8r; Wed, 23 Nov 2022 01:08:11 -0500 (EST)
+	with ESMTP id Dsa4HzaqYq3L; Wed, 23 Nov 2022 01:27:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCAC84B3F3;
-	Wed, 23 Nov 2022 01:08:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A6374B615;
+	Wed, 23 Nov 2022 01:27:36 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E89F4B3D0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2022 01:08:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 290D341070
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2022 01:27:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Q6dX445CWaLb for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Nov 2022 01:08:09 -0500 (EST)
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com
- [209.85.214.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7BC7249F41
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2022 01:08:09 -0500 (EST)
-Received: by mail-pl1-f174.google.com with SMTP id jn7so13890062plb.13
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Nov 2022 22:08:09 -0800 (PST)
+ with ESMTP id SjdUsiK4Bs8o for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Nov 2022 01:27:34 -0500 (EST)
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com
+ [209.85.216.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2F17549DEB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Nov 2022 01:27:34 -0500 (EST)
+Received: by mail-pj1-f53.google.com with SMTP id k5so15097701pjo.5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Nov 2022 22:27:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:from:to:cc:subject:date:message-id:reply-to;
- bh=h5tlKNi35V94k0QmV2ysH94Zb5ALfgaBlCa6CRxYIVw=;
- b=eEdddm6ebarYt7g7uJhWOnpgtypJcRMCmOrwuMaNVAA0C5aBaCucbUGx0fVJIOPlSW
- hNU/iCZT3w1eHA9yNvRVrKP4s/WGB5nWkZ5SNaTLoDMrZdetIXV7DUlzXgQ0ZI6O6D+6
- turNtaZkl1rWGQ25PWMZCrZdZetW0KQ5nSknO98LM/koczRsx+sr997Z6Y/nWEVSjfkg
- qVEcHzGhPUx8KY4y+poF1Ed4OUzls/fCfaCQ+ku5rLVm7nWR2Fvu/iFVPShBI//SIcTM
- EYWYxB+VjSWM0PzjWaZYoES2vXUzhfLJe96SE6tNaWrzXSI35zv+R9NxKDwCNWfzNNlH
- YRoQ==
+ bh=tit1GoRDHXxGIzZdw8RHtC91q2gw44B8zNxKS7z02AA=;
+ b=fqnDNTMFJXL6XBTeO+kRQJFWvP7cvAJx1e8OAUaq01/iImdfKXDQth+CsyTAS02ErY
+ gOASCuAizTdmqPf5oolegW2ktzaQxnmm8fsEurNaP3n2A5eGDsVdiCQk7omLcW2Fsf2S
+ d6eM1CdGhpj3oVBsg76UpeggwkYA2ZpHdbx9ZOht42+LjzbynTlqPC1AJu+Ys1YbvfuN
+ 9DPIqYCqPnVcmaFMZmdhqecrwmSt0sebO8Q/c8q2Dl8+K61eAoRUDjFLkI32HrMvP5V+
+ 8/u19Bqkt8t5bZcwoRi9HlB3NbnkFH9T5nDQlYaRQUwJenxVBBuN2WUHHZ/QPb2FQGOV
+ QB3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:subject:message-id:date:from:in-reply-to:references
  :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=h5tlKNi35V94k0QmV2ysH94Zb5ALfgaBlCa6CRxYIVw=;
- b=Z/boUenT0OUEgFsG7EIaCrQijkttcoC76QosFQpHBFFw0cG6h7ZhEtkW5ulCX6CC/n
- gCmfz54NzNjQ0Hc9Jwz3I1r+4NGBGMpqROndiU1eLv9u9o4Lbv/3KNeCvMw0DyBZaOCT
- P6GfN07zHYA7S8J4tgMtnP0N+QEJDB+z7yG2hefWn31GAbbI3ZHVc+Dq4CpAS3knLErw
- WJMThJYT/6tVYsTvD4aSRnJFr3E5WILI6ZNW+TnpZJthZ7DIZz5lIlU6myiwEWkedMmx
- AitSXUzWb3dMm+TJp8irrgeQ7LwvyJFbk4qogGsSYrr7cF0o8DEe2/GhWi7v0jxATvr1
- W0zw==
-X-Gm-Message-State: ANoB5pkmrCvzCmytNNMCiQs8taLB7anB71fiJ+4FOOBAPLrSySpIFOMT
- RirgtDrHJpq+iuU73Ye+vSXYB4zGbw1KV83YkmCGRA==
-X-Google-Smtp-Source: AA0mqf5lImrYjSG2qG8wHkOxPafuxpqJyZLTwqEDiwfRe0ptbYcQ09on7ZiYFobULDz+0AHmQt42G9VURGZZHsd0DAk=
-X-Received: by 2002:a17:90a:e2c5:b0:214:1648:687d with SMTP id
- fr5-20020a17090ae2c500b002141648687dmr35554546pjb.78.1669183688483; Tue, 22
- Nov 2022 22:08:08 -0800 (PST)
+ bh=tit1GoRDHXxGIzZdw8RHtC91q2gw44B8zNxKS7z02AA=;
+ b=Geaz5rrcCxcKdGncXsvZOoSgiEPzUjyidiNK3b+ghzWFyXSmiRMFa3wjFebgHSy5Ix
+ 5X/lMPrtWp7fb1tlQNgLK2Nb1cTZaQd/0Yov9QfC+pnZAJSjH160l53Ti7PEHM80wdPT
+ g5g3wHwF9VoZVnFqsRslDQDGakhZzgpasGegsY1GuX/OusADNcMEiR8rKsbSLNq9W2p2
+ ShKo6nWErDnIlmMACj4F830d6+b4bNneIOv6lXG3TVAH8do+90tpoJm3mzp1G7jQ74t6
+ Z6F7tfXM6geFMQB1IVNQhe6ezW7Tn1Xx5GqUxucnWZoSgtARNk6oZnf1wt7k8brDnGUj
+ q3RA==
+X-Gm-Message-State: ANoB5pkJpysjMq2JkAmET7f9yaccZn3vsIWIUszsej1add5mt9AIs1FI
+ kplJ68jKJ7zWC+i4tiDdlLZopVqg4MIKuJSXP7OmEQ==
+X-Google-Smtp-Source: AA0mqf5nlutVfDZV3mLPMpBH63zenw1aNZTS1OGEV25ZP+8iiz3jkhX4OVBoK3Ai4ysrDyk3GPfTAhlBrvQ5qYUgktI=
+X-Received: by 2002:a17:902:9006:b0:172:d410:2a91 with SMTP id
+ a6-20020a170902900600b00172d4102a91mr7622542plp.30.1669184853196; Tue, 22 Nov
+ 2022 22:27:33 -0800 (PST)
 MIME-Version: 1.0
 References: <20221113163832.3154370-1-maz@kernel.org>
- <20221113163832.3154370-15-maz@kernel.org>
-In-Reply-To: <20221113163832.3154370-15-maz@kernel.org>
+ <20221113163832.3154370-16-maz@kernel.org>
+In-Reply-To: <20221113163832.3154370-16-maz@kernel.org>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Tue, 22 Nov 2022 22:07:52 -0800
-Message-ID: <CAAeT=FwKuB2mAhWaeDSVQnHyDnQrLnNAuZ+Z3=KoFZe5imiwXQ@mail.gmail.com>
-Subject: Re: [PATCH v4 14/16] KVM: arm64: PMU: Allow PMUv3p5 to be exposed to
- the guest
+Date: Tue, 22 Nov 2022 22:27:16 -0800
+Message-ID: <CAAeT=Fz-zYX4qLt-RKvO6P0D5Si9vxxpsbALH1LPbON8efyEeg@mail.gmail.com>
+Subject: Re: [PATCH v4 15/16] KVM: arm64: PMU: Simplify vcpu computation on
+ perf overflow notification
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
@@ -88,8 +88,12 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Sun, Nov 13, 2022 at 8:46 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Now that the infrastructure is in place, bump the PMU support up
-> to PMUv3p5.
+> The way we compute the target vcpu on getting an overflow is
+> a bit odd, as we use the PMC array as an anchor for kvm_pmc_to_vcpu,
+> while we could directly compute the correct address.
+>
+> Get rid of the intermediate step and directly compute the target
+> vcpu.
 >
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 
