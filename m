@@ -1,70 +1,278 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B2A7E
-	for <kvmarm@lists.linux.dev>; Wed, 23 Nov 2022 06:27:33 +0000 (UTC)
-Received: by mail-pj1-f54.google.com with SMTP id a1-20020a17090abe0100b00218a7df7789so1029091pjs.5
-        for <kvmarm@lists.linux.dev>; Tue, 22 Nov 2022 22:27:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=tit1GoRDHXxGIzZdw8RHtC91q2gw44B8zNxKS7z02AA=;
-        b=fqnDNTMFJXL6XBTeO+kRQJFWvP7cvAJx1e8OAUaq01/iImdfKXDQth+CsyTAS02ErY
-         gOASCuAizTdmqPf5oolegW2ktzaQxnmm8fsEurNaP3n2A5eGDsVdiCQk7omLcW2Fsf2S
-         d6eM1CdGhpj3oVBsg76UpeggwkYA2ZpHdbx9ZOht42+LjzbynTlqPC1AJu+Ys1YbvfuN
-         9DPIqYCqPnVcmaFMZmdhqecrwmSt0sebO8Q/c8q2Dl8+K61eAoRUDjFLkI32HrMvP5V+
-         8/u19Bqkt8t5bZcwoRi9HlB3NbnkFH9T5nDQlYaRQUwJenxVBBuN2WUHHZ/QPb2FQGOV
-         QB3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tit1GoRDHXxGIzZdw8RHtC91q2gw44B8zNxKS7z02AA=;
-        b=ovxNSihF2oIfcWKuS1XKLXNxsRyYfVpOIB+7n6IEzyyODIcRWfmZt4fQGxxHgM4aer
-         42XTicK2F7BreH7Gl/x6gIElKWPBgKhOupdE690dUBCC4JAPNyJ529DnxAYg8XOhtAhD
-         4IDwywDUVAxYn5z30glqAWIWQXAH8928PjsXYH5e34biV7RYzzK9z9TWtIJdghHu5+ot
-         3IIQnvKhXasqNsXtmt7Ok5N4BxP7776VdvTwHioge5M994b3sF7sZdj3kQMdSIxA9TPl
-         WJAgw6Dentje/JNGVISjpQ2fKLNHjP6KRFNScHuSZFJizQKKGpBLYUgakajbkMRWo5aV
-         EW4Q==
-X-Gm-Message-State: ANoB5pnWhR1sG4Iz2s1xt7qSzHdfPq/svJ2E3PCxm7F5IYQ6iiplSrbL
-	HWnGNx3KeEJzdEVVTQsG0eReBTSDWfNoQBjDbmyu8A==
-X-Google-Smtp-Source: AA0mqf5nlutVfDZV3mLPMpBH63zenw1aNZTS1OGEV25ZP+8iiz3jkhX4OVBoK3Ai4ysrDyk3GPfTAhlBrvQ5qYUgktI=
-X-Received: by 2002:a17:902:9006:b0:172:d410:2a91 with SMTP id
- a6-20020a170902900600b00172d4102a91mr7622542plp.30.1669184853196; Tue, 22 Nov
- 2022 22:27:33 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B9B1FA3
+	for <kvmarm@lists.linux.dev>; Wed, 23 Nov 2022 11:11:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D365C433D7;
+	Wed, 23 Nov 2022 11:11:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1669201865;
+	bh=x4KaZbDoH1MuZ2K5sO4iYbMKMLrznQlP44Sem7CFhwY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=U2UkebtvC/If47HOuif31QOIrwKQfONUoKxCsT37kiPM1YLzkZberf/6WykVnYQf2
+	 Xl8eC/MrNFK49bp+yorQ78u4I34E6ZqHb4f46XM+mDX+iB56XlGYzoWkuAxNWesjl/
+	 Pfol3vfGscydOFXd5zWbEyVk2/D+Ct//7vaXumkVG+rUdZqYEYfHw9ujH8MqS2uCAX
+	 eF5huN2RK/i3Zk4Vrc0HLm6mUzWMN2aZ0gfBBHLZn0sPoLvc9/uoN+DtLcFXfciR0W
+	 BclfGyM81/4dcDLGtfqC7IVb/FpnJJeqe5P4P+WPv8Txj77/6hSkzADbOeC/8HtvFJ
+	 8o63ncYRhhFrA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1oxneg-0085wY-L3;
+	Wed, 23 Nov 2022 11:11:02 +0000
+Date: Wed, 23 Nov 2022 11:11:02 +0000
+Message-ID: <86leo2ncxl.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Reiji Watanabe <reijiw@google.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v4 13/16] KVM: arm64: PMU: Implement PMUv3p5 long counter support
+In-Reply-To: <CAAeT=Fx=8g2-Z8nzqUit5owtoxbenXnAFA5Mu6AfgZJFN4CfVw@mail.gmail.com>
+References: <20221113163832.3154370-1-maz@kernel.org>
+	<20221113163832.3154370-14-maz@kernel.org>
+	<CAAeT=Fx=8g2-Z8nzqUit5owtoxbenXnAFA5Mu6AfgZJFN4CfVw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20221113163832.3154370-1-maz@kernel.org> <20221113163832.3154370-16-maz@kernel.org>
-In-Reply-To: <20221113163832.3154370-16-maz@kernel.org>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Tue, 22 Nov 2022 22:27:16 -0800
-Message-ID: <CAAeT=Fz-zYX4qLt-RKvO6P0D5Si9vxxpsbALH1LPbON8efyEeg@mail.gmail.com>
-Subject: Re: [PATCH v4 15/16] KVM: arm64: PMU: Simplify vcpu computation on
- perf overflow notification
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221123062716.LVodTF2ZMVVHegahJQsuCT01s1blqroSzQiz16EOjsg@z>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221123111102.PwDSsTD5JCOPUiTYv7-kPP02srROwKez3-MIeUCpxOo@z>
 
-On Sun, Nov 13, 2022 at 8:46 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> The way we compute the target vcpu on getting an overflow is
-> a bit odd, as we use the PMC array as an anchor for kvm_pmc_to_vcpu,
-> while we could directly compute the correct address.
->
-> Get rid of the intermediate step and directly compute the target
-> vcpu.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+On Wed, 23 Nov 2022 05:58:17 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
+>=20
+> Hi Marc,
+>=20
+> On Sun, Nov 13, 2022 at 8:46 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > PMUv3p5 (which is mandatory with ARMv8.5) comes with some extra
+> > features:
+> >
+> > - All counters are 64bit
+> >
+> > - The overflow point is controlled by the PMCR_EL0.LP bit
+> >
+> > Add the required checks in the helpers that control counter
+> > width and overflow, as well as the sysreg handling for the LP
+> > bit. A new kvm_pmu_is_3p5() helper makes it easy to spot the
+> > PMUv3p5 specific handling.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/pmu-emul.c | 8 +++++---
+> >  arch/arm64/kvm/sys_regs.c | 4 ++++
+> >  include/kvm/arm_pmu.h     | 7 +++++++
+> >  3 files changed, 16 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > index 4320c389fa7f..c37cc67ff1d7 100644
+> > --- a/arch/arm64/kvm/pmu-emul.c
+> > +++ b/arch/arm64/kvm/pmu-emul.c
+> > @@ -52,13 +52,15 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
+> >   */
+> >  static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
+> >  {
+> > -       return (select_idx =3D=3D ARMV8_PMU_CYCLE_IDX);
+> > +       return (select_idx =3D=3D ARMV8_PMU_CYCLE_IDX || kvm_pmu_is_3p5=
+(vcpu));
+> >  }
+> >
+> >  static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 =
+select_idx)
+> >  {
+> > -       return (select_idx =3D=3D ARMV8_PMU_CYCLE_IDX &&
+> > -               __vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
+> > +       u64 val =3D __vcpu_sys_reg(vcpu, PMCR_EL0);
+> > +
+> > +       return (select_idx < ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PM=
+CR_LP)) ||
+> > +              (select_idx =3D=3D ARMV8_PMU_CYCLE_IDX && (val & ARMV8_P=
+MU_PMCR_LC));
+>=20
+> Since the vCPU's PMCR_EL0 value is not always in sync with
+> kvm->arch.dfr0_pmuver.imp, shouldn't kvm_pmu_idx_has_64bit_overflow()
+> check kvm_pmu_is_3p5() ?
+> (e.g. when the host supports PMUv3p5, PMCR.LP will be set by reset_pmcr()
+> initially. Then, even if userspace sets ID_AA64DFR0_EL1.PMUVER to
+> PMUVer_V3P1, PMCR.LP will stay the same (still set) unless PMCR is
+> written.  So, kvm_pmu_idx_has_64bit_overflow() might return true
+> even though the guest's PMU version is lower than PMUVer_V3P5.)
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+I can see two ways to address this: either we spray PMUv3p5 checks
+every time we evaluate PMCR, or we sanitise PMCR after each userspace
+write to ID_AA64DFR0_EL1.
+
+I'd like to be able to take what is stored in the register file at
+face value, so I'm angling towards the second possibility. It also
+makes some sense from a 'HW' perspective: you change the HW
+dynamically by selecting a new version, the HW comes up with its reset
+configuration (i.e don't expect PMCR to stick after you write to
+DFR0 with a different PMUVer).
+
+>
+>=20
+> >  }
+> >
+> >  static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index dc201a0557c0..615cb148e22a 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -654,6 +654,8 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const=
+ struct sys_reg_desc *r)
+> >                | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR=
+_E);
+> >         if (!kvm_supports_32bit_el0())
+> >                 val |=3D ARMV8_PMU_PMCR_LC;
+> > +       if (!kvm_pmu_is_3p5(vcpu))
+> > +               val &=3D ~ARMV8_PMU_PMCR_LP;
+> >         __vcpu_sys_reg(vcpu, r->reg) =3D val;
+> >  }
+> >
+> > @@ -703,6 +705,8 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, stru=
+ct sys_reg_params *p,
+> >                 val |=3D p->regval & ARMV8_PMU_PMCR_MASK;
+> >                 if (!kvm_supports_32bit_el0())
+> >                         val |=3D ARMV8_PMU_PMCR_LC;
+> > +               if (!kvm_pmu_is_3p5(vcpu))
+> > +                       val &=3D ~ARMV8_PMU_PMCR_LP;
+> >                 __vcpu_sys_reg(vcpu, PMCR_EL0) =3D val;
+> >                 kvm_pmu_handle_pmcr(vcpu, val);
+> >                 kvm_vcpu_pmu_restore_guest(vcpu);
+>=20
+> For the read case of access_pmcr() (the code below),
+> since PMCR.LP is RES0 when FEAT_PMUv3p5 is not implemented,
+> shouldn't it clear PMCR.LP if kvm_pmu_is_3p5(vcpu) is false ?
+> (Similar issue to kvm_pmu_idx_has_64bit_overflow())
+>=20
+>         } else {
+>                 /* PMCR.P & PMCR.C are RAZ */
+>                 val =3D __vcpu_sys_reg(vcpu, PMCR_EL0)
+>                       & ~(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C);
+>                 p->regval =3D val;
+>         }
+
+I think the above would address it. I've tentatively queued the
+following patch, please let me know if this looks OK to you.
+
+Thanks,
+
+	M.
+
+=46rom d90ec0e8768ce5f7ae11403b29db76260dfaa3f2 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Wed, 23 Nov 2022 11:03:07 +0000
+Subject: [PATCH] KVM: arm64: PMU: Reset PMCR_EL0 on PMU version change
+
+Changing the version of the PMU emulation may result in stale
+bits still being present in the PMCR_EL0 register, leading to
+unexpected results.
+
+Address it by forcing PMCR_EL0 to its reset value when the value
+of ID_AA64DFR0.PMUVer (or ID_DFR0.Perfmon) changes.
+
+Reported-by: Reiji Watanabe <reijiw@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/sys_regs.c | 32 ++++++++++++++++++++++----------
+ 1 file changed, 22 insertions(+), 10 deletions(-)
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 67eac0f747be..12a873d94aaf 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -637,15 +637,10 @@ static void reset_pmselr(struct kvm_vcpu *vcpu, const=
+ struct sys_reg_desc *r)
+ 	__vcpu_sys_reg(vcpu, r->reg) &=3D ARMV8_PMU_COUNTER_MASK;
+ }
+=20
+-static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++static void __reset_pmcr(struct kvm_vcpu *vcpu, u64 pmcr)
+ {
+-	u64 pmcr, val;
+-
+-	/* No PMU available, PMCR_EL0 may UNDEF... */
+-	if (!kvm_arm_support_pmu_v3())
+-		return;
++	u64 val;
+=20
+-	pmcr =3D read_sysreg(pmcr_el0);
+ 	/*
+ 	 * Writable bits of PMCR_EL0 (ARMV8_PMU_PMCR_MASK) are reset to UNKNOWN
+ 	 * except PMCR.E resetting to zero.
+@@ -656,7 +651,16 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const st=
+ruct sys_reg_desc *r)
+ 		val |=3D ARMV8_PMU_PMCR_LC;
+ 	if (!kvm_pmu_is_3p5(vcpu))
+ 		val &=3D ~ARMV8_PMU_PMCR_LP;
+-	__vcpu_sys_reg(vcpu, r->reg) =3D val;
++	__vcpu_sys_reg(vcpu, PMCR_EL0) =3D val;
++}
++
++static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++{
++	/* No PMU available, PMCR_EL0 may UNDEF... */
++	if (!kvm_arm_support_pmu_v3())
++		return;
++
++	__reset_pmcr(vcpu, read_sysreg(pmcr_el0));
+ }
+=20
+ static bool check_pmu_access_disabled(struct kvm_vcpu *vcpu, u64 flags)
+@@ -1259,6 +1263,14 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+=20
++static void update_dfr0_pmuver(struct kvm_vcpu *vcpu, u8 pmuver)
++{
++	if (vcpu->kvm->arch.dfr0_pmuver.imp !=3D pmuver) {
++		vcpu->kvm->arch.dfr0_pmuver.imp =3D pmuver;
++		__reset_pmcr(vcpu, __vcpu_sys_reg(vcpu, PMCR_EL0));
++	}
++}
++
+ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 			       const struct sys_reg_desc *rd,
+ 			       u64 val)
+@@ -1291,7 +1303,7 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+ 		return -EINVAL;
+=20
+ 	if (valid_pmu)
+-		vcpu->kvm->arch.dfr0_pmuver.imp =3D pmuver;
++		update_dfr0_pmuver(vcpu, pmuver);
+ 	else
+ 		vcpu->kvm->arch.dfr0_pmuver.unimp =3D pmuver;
+=20
+@@ -1331,7 +1343,7 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
+ 		return -EINVAL;
+=20
+ 	if (valid_pmu)
+-		vcpu->kvm->arch.dfr0_pmuver.imp =3D perfmon_to_pmuver(perfmon);
++		update_dfr0_pmuver(vcpu, perfmon_to_pmuver(perfmon));
+ 	else
+ 		vcpu->kvm->arch.dfr0_pmuver.unimp =3D perfmon_to_pmuver(perfmon);
+=20
+--=20
+2.34.1
+
+
+--=20
+Without deviation from the norm, progress is not possible.
