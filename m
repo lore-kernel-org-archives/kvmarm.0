@@ -1,79 +1,92 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C654BA25
-	for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 19:20:07 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1669749605;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=laDyv7YUrXbfqGAwMagZdnkFS+VaAukLw7cc05haSWA=;
-	b=UdwE2yD+Xreg9YPfNtiPciJasEmnad33G1DHyWSBDA7LwaT7n3KiwnnNO9bOgfsuBoI54F
-	tbwcE9gGmZR/9cDmZ4YCQnOunSbgBloPF44HFlAEaw3Wbv927EOOsrVHVQZJ6abGcSkfq1
-	IGTSDogzwposXRkOGXjkbNu+97c6p1U=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A6AAD5E
+	for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 19:52:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C59DDC433C1;
+	Tue, 29 Nov 2022 19:52:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1669751575;
+	bh=J1F2Q6Yb5LAAUS+mGAvNbWV55kglz5DVWB22nLbnzrw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=azPcrL26MA+/q6Ki1sfNoB6l3O+FYoS5JPS3HVzAV36vo1KcH7es9N97nVqop9401
+	 bUxo4znU91Y3zaLmCJYfw2FNsuNMHL0LDjY+xA7VvYB8kScLm/faMDMgAZHTdj64HO
+	 ecSQ7zlc4hcvoXYskZEQjEb619obqN7uk7arCQlLWyW6SL5UR7aRaviE2GL5Dp/usY
+	 AnXc4SWMkPYGt2kuPJwDpA5N1XD5qQZ5xPjLzqFZ9GhM5+yULO1Hp1ky0DMsHN5gDO
+	 uG102SKiVf/ZsrSAnlSAhIgv2HjvnBf16KekIWw+mzFuVuNXGQcE2JxT6+kV7va2tq
+	 /opAu442Lk16w==
+From: Will Deacon <will@kernel.org>
+To: Mark Brown <broonie@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Cc: kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] KVM: arm64: Condition HW AF updates on config option
-Date: Tue, 29 Nov 2022 19:19:46 +0000
-Message-ID: <20221129191946.1735662-5-oliver.upton@linux.dev>
-In-Reply-To: <20221129191946.1735662-1-oliver.upton@linux.dev>
-References: <20221129191946.1735662-1-oliver.upton@linux.dev>
+	Marc Zyngier <maz@kernel.org>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Zhang Lei <zhang.lei@jp.fujitsu.com>
+Subject: Re: [PATCH v5 0/8] arm64/sve: Clean up KVM integration and optimise syscalls
+Date: Tue, 29 Nov 2022 19:52:45 +0000
+Message-Id: <166973411736.1509628.9066833798546669515.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20221115094640.112848-1-broonie@kernel.org>
+References: <20221115094640.112848-1-broonie@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221129191946.b5Ebdov870dkq-nOFR3JYN7yLvWygCCRlvYnZ8NQw_Y@z>
 
-As it currently stands, KVM makes use of FEAT_HAFDBS unconditionally.
-Use of the feature in the rest of the kernel is guarded by an associated
-Kconfig option.
+On Tue, 15 Nov 2022 09:46:32 +0000, Mark Brown wrote:
+> This patch series attempts to clarify the tracking of which set of
+> floating point registers we save on systems supporting SVE, particularly
+> with reference to KVM, and then uses the results of this clarification
+> to improve the performance of simple syscalls where we return directly
+> to userspace in cases where userspace is using SVE.
+> 
+> At present we track which register state is active by using the TIF_SVE
+> flag for the current task which also controls if userspace is able to
+> use SVE, this is reasonably straightforward if limiting but for KVM it
+> gets a bit hairy since we may have guest state loaded in registers. This
+> results in KVM modifying TIF_SVE for the VMM task while the guest is
+> running which doesn't entirely help make things easy to follow. To help
+> make things clearer the series changes things so that in addition to
+> TIF_SVE we explicitly track both the type of registers that are
+> currently saved in the task struct and the type of registers that we
+> should save when we do so. TIF_SVE then solely controls if userspace
+> can use SVE without trapping, it has no function for KVM guests and we
+> can remove the code for managing it from KVM.
+> 
+> [...]
 
-Align KVM with the rest of the kernel and only enable VTCR_HA when
-ARM64_HW_AFDBM is enabled. This can be helpful for testing changes to
-the stage-2 access fault path on Armv8.1+ implementations.
+Applied to arm64 (for-next/sve-state), thanks!
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/hyp/pgtable.c | 2 ++
- 1 file changed, 2 insertions(+)
+[1/8] KVM: arm64: Discard any SVE state when entering KVM guests
+      https://git.kernel.org/arm64/c/93ae6b01bafe
+[2/8] arm64/fpsimd: Track the saved FPSIMD state type separately to TIF_SVE
+      https://git.kernel.org/arm64/c/baa8515281b3
+[3/8] arm64/fpsimd: Have KVM explicitly say which FP registers to save
+      https://git.kernel.org/arm64/c/deeb8f9a80fd
+[4/8] arm64/fpsimd: Stop using TIF_SVE to manage register saving in KVM
+      https://git.kernel.org/arm64/c/62021cc36add
+[5/8] arm64/fpsimd: Load FP state based on recorded data type
+      https://git.kernel.org/arm64/c/a0136be443d5
+[6/8] arm64/fpsimd: SME no longer requires SVE register state
+      https://git.kernel.org/arm64/c/bbc6172eefdb
+[7/8] arm64/sve: Leave SVE enabled on syscall if we don't context switch
+      https://git.kernel.org/arm64/c/8c845e273104
+[8/8] arm64/fp: Use a struct to pass data to fpsimd_bind_state_to_cpu()
+      https://git.kernel.org/arm64/c/1192b93ba352
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 1a3dd9774707..9c651b6d4092 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -584,12 +584,14 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
- 		lvls = 2;
- 	vtcr |= VTCR_EL2_LVLS_TO_SL0(lvls);
- 
-+#ifdef CONFIG_ARM64_HW_AFDBM
- 	/*
- 	 * Enable the Hardware Access Flag management, unconditionally
- 	 * on all CPUs. The features is RES0 on CPUs without the support
- 	 * and must be ignored by the CPUs.
- 	 */
- 	vtcr |= VTCR_EL2_HA;
-+#endif /* CONFIG_ARM64_HW_AFDBM */
- 
- 	/* Set the vmid bits */
- 	vtcr |= (get_vmid_bits(mmfr1) == 16) ?
+Cheers,
 -- 
-2.38.1.584.g0f3c55d4c2-goog
+Will
 
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
