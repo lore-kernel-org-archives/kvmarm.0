@@ -2,76 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62CF0C46467
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Nov 2022 09:34:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD8AC4332F
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Nov 2022 17:31:55 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD7C44B3DA;
-	Tue, 29 Nov 2022 04:34:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05D2440E1A;
+	Tue, 29 Nov 2022 12:31:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XGr9aDoh3cUZ; Tue, 29 Nov 2022 04:34:00 -0500 (EST)
+	with ESMTP id jVv6qCRkc7kB; Tue, 29 Nov 2022 12:31:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4ACE4B2A3;
-	Tue, 29 Nov 2022 04:34:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA1F743C58;
+	Tue, 29 Nov 2022 12:31:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD7B240ECC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2022 04:33:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E5D2D40E62
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2022 12:31:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rIYN7TTr2ods for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Nov 2022 04:33:58 -0500 (EST)
+ with ESMTP id BZ+8EHcmN-3w for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Nov 2022 12:31:51 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7B7D940D74
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2022 04:33:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E3EF40E1A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Nov 2022 12:31:51 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 7D2DE615F9;
- Tue, 29 Nov 2022 09:33:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7284C433B5;
- Tue, 29 Nov 2022 09:33:56 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id E67F16187E;
+ Tue, 29 Nov 2022 17:31:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A4E1C433C1;
+ Tue, 29 Nov 2022 17:31:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1669714436;
- bh=ytWdPWoB0JLE0rRUZJi+OM1M3Tzfp92cT1vL1sIg8v8=;
+ s=k20201202; t=1669743109;
+ bh=UVinZvTim66u4bD8bc5xOZyCcQ1X8BETh6hP7fGDBAU=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Y6JH88oo4vC9v6ACmJS+9+NyoNhLVThp44OSn2zWEDbHiPU3tjy1NGI88c8Dik4+s
- e4LJ+fJz5twYy0FB0LwIDXO6T8xb5xDJHIBMcReDOSfTVwWYO8kc4czV9/2MH8MF4c
- 8d3gi8ruxhHrgakpzA2JlUCDxGOTd7c9IO1DBJri9COdFMeTLh1Z+8+LmPFprlZxcR
- NR2+RynL7ufl+FiGNkikBmb1GYoqydCm/hfbe2kct7f+fk8e4xOf6W/xqlBTo8mbrx
- HYqaCIxCDd3Rv+6ltHolWJc9bOv09NJa9IP3Wo/Fw86SBdIRXkeILgagnYbAJOZqec
- mi7n0Ux4LNybg==
+ b=jSGqNuRZSJi2DZAT5I2TcjbMZE/x9XmLA+z8A9P8IGRIuSYlKw9zJyOenjacAXnLz
+ tNBq75DZ1OC1Zy+G0JU2WKeBmQszUHVCZ5N6LqVK+DnWhXcE2i0kZJdmxaOLClZJe3
+ tYENqLz22d1Qx6iif/UjCs+BXDz6hvSDkETK3iARdvMHYpMC7/VHS4kU34eJgt+ooU
+ XeIC+ksbjEbmiZu8yjRwjy5NjyIWF19/uxwx24oPX1+McinLXUJAkY82saEXxncT/i
+ xNhEBocnLfBppcWb0dTPBa0fHKh7GuQcWYPDY5HDG0R3jKwLnWWUZRL4EeIYJ0Qebi
+ YRSkSoXm6Lpcw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1ozwzy-009Jpu-AB;
- Tue, 29 Nov 2022 09:33:54 +0000
+ (envelope-from <maz@kernel.org>) id 1p04SR-009PeW-37;
+ Tue, 29 Nov 2022 17:31:47 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Peter Collingbourne <pcc@google.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-mm <linux-mm@kvack.org>
-Subject: Re: [PATCH v5 0/8] KVM: arm64: permit MAP_SHARED mappings with MTE
- enabled
-Date: Tue, 29 Nov 2022 09:33:51 +0000
-Message-Id: <166971432264.1905185.15808052624158484529.b4-ty@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 0/2] KVM: selftests: Enable access_tracking_perf_test
+ for arm64
+Date: Tue, 29 Nov 2022 17:31:44 +0000
+Message-Id: <166974309671.1909695.14457318687237410207.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221104011041.290951-1-pcc@google.com>
-References: <20221104011041.290951-1-pcc@google.com>
+In-Reply-To: <20221118211503.4049023-1-oliver.upton@linux.dev>
+References: <20221118211503.4049023-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pcc@google.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org, steven.price@arm.com,
- catalin.marinas@arm.com, eugenis@google.com, cohuck@redhat.com,
- kvm@vger.kernel.org, vincenzo.frascino@arm.com, will@kernel.org
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, james.morse@arm.com,
+ oliver.upton@linux.dev, seanjc@google.com, gshan@redhat.com,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Cornelia Huck <cohuck@redhat.com>, Steven Price <steven.price@arm.com>,
- Vincenzo Frascino <vincenzo.frascino@arm.com>, Will Deacon <will@kernel.org>,
- Evgenii Stepanov <eugenis@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,37 +86,25 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 3 Nov 2022 18:10:33 -0700, Peter Collingbourne wrote:
-> This patch series allows VMMs to use shared mappings in MTE enabled
-> guests. The first five patches were taken from Catalin's tree [1] which
-> addressed some review feedback from when they were previously sent out
-> as v3 of this series. The first patch from Catalin's tree makes room
-> for an additional PG_arch_3 flag by making the newer PG_arch_* flags
-> arch-dependent. The next four patches are based on a series that
-> Catalin sent out prior to v3, whose cover letter [2] I quote from below:
+On Fri, 18 Nov 2022 21:15:01 +0000, Oliver Upton wrote:
+> Small series to add support for arm64 to access_tracking_perf_test and
+> correct a couple bugs along the way.
+> 
+> Tested on Ampere Altra w/ all supported guest modes.
+> 
+> v1 -> v2:
+>  - Have perf_test_util indicate when to stop vCPU threads (Sean)
+>  - Collect Gavin's R-b on the second patch. I left off Gavin's R-b on
+>    the first patch as it was retooled.
 > 
 > [...]
 
-No feedback has been received, so this code is obviously perfect.
-
 Applied to next, thanks!
 
-[1/8] mm: Do not enable PG_arch_2 for all 64-bit architectures
-      commit: b0284cd29a957e62d60c2886fd663be93c56f9c0
-[2/8] arm64: mte: Fix/clarify the PG_mte_tagged semantics
-      commit: e059853d14ca4ed0f6a190d7109487918a22a976
-[3/8] KVM: arm64: Simplify the sanitise_mte_tags() logic
-      commit: 2dbf12ae132cc78048615cfa19c9be64baaf0ced
-[4/8] mm: Add PG_arch_3 page flag
-      commit: ef6458b1b6ca3fdb991ce4182e981a88d4c58c0f
-[5/8] arm64: mte: Lock a page for MTE tag initialisation
-      commit: d77e59a8fccde7fb5dd8c57594ed147b4291c970
-[6/8] KVM: arm64: unify the tests for VMAs in memslots when MTE is enabled
-      commit: d89585fbb30869011b326ef26c94c3137d228df9
-[7/8] KVM: arm64: permit all VM_MTE_ALLOWED mappings with MTE enabled
-      commit: c911f0d4687947915f04024aa01803247fcf7f1a
-[8/8] Documentation: document the ABI changes for KVM_CAP_ARM_MTE
-      commit: a4baf8d2639f24d4d31983ff67c01878e7a5393f
+[1/2] KVM: selftests: Have perf_test_util signal when to stop vCPUs
+      commit: 9ec1eb1bcceec735fb3c9255cdcdbcc2acf860a0
+[2/2] KVM: selftests: Build access_tracking_perf_test for arm64
+      commit: 4568180411e0fb5613e217da1c693466e39b9c27
 
 Cheers,
 
