@@ -1,92 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A6AAD5E
-	for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 19:52:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C59DDC433C1;
-	Tue, 29 Nov 2022 19:52:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1669751575;
-	bh=J1F2Q6Yb5LAAUS+mGAvNbWV55kglz5DVWB22nLbnzrw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=azPcrL26MA+/q6Ki1sfNoB6l3O+FYoS5JPS3HVzAV36vo1KcH7es9N97nVqop9401
-	 bUxo4znU91Y3zaLmCJYfw2FNsuNMHL0LDjY+xA7VvYB8kScLm/faMDMgAZHTdj64HO
-	 ecSQ7zlc4hcvoXYskZEQjEb619obqN7uk7arCQlLWyW6SL5UR7aRaviE2GL5Dp/usY
-	 AnXc4SWMkPYGt2kuPJwDpA5N1XD5qQZ5xPjLzqFZ9GhM5+yULO1Hp1ky0DMsHN5gDO
-	 uG102SKiVf/ZsrSAnlSAhIgv2HjvnBf16KekIWw+mzFuVuNXGQcE2JxT6+kV7va2tq
-	 /opAu442Lk16w==
-From: Will Deacon <will@kernel.org>
-To: Mark Brown <broonie@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Cc: kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B65ABA28
+	for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 20:52:16 +0000 (UTC)
+Received: by mail-pl1-f181.google.com with SMTP id k7so14613923pll.6
+        for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 12:52:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=52SMROLRGWbt9mwpSBUjPx/3msXb6vFt7ItVy/cqB1k=;
+        b=VhKagD+9381ydRAyKPEL5EsmY+AM67HAZZ/33h8VvA8l2VXlMlKxq+fM5BueYSKXKt
+         MlYUlT1r2orjroDtbBdQLFNwyfElcb4r+5lE0sxkugaizGLV5rqQhubBgdx5ttpa3za0
+         oliMzzN9b4nvEx2UounppSrAbCEbsdm/nmGfxJve0S1hIp8oK/34PAiQq2P0gRHNpQON
+         Hed36jy70ZutuQ+XKz5nU9QmAvnQT6CmU+OyL+RjADMzi1jdYipeoPsS5VzO7M2oqh+q
+         oUjXehpCZSlKTc1/n9q+Fw+1tkSNk+0rW8qA5VeEmwAbYZihapsyiUMqxDw9ljYAQ/PU
+         SMqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=52SMROLRGWbt9mwpSBUjPx/3msXb6vFt7ItVy/cqB1k=;
+        b=F7jvBnyDwX9jxgAemBxejnd4O9JXPZrcvYXNE7GFZGQm/Z0q2kdvMSWiGMGyQ6qMwA
+         Vv6fFZZT1ZUAcE/BH2BQjE4MTsN0LU5H0ypBMObfgp/SvNWXX0JV/sfJENc+GRwE5cGv
+         Q0tjfCNBTGA5yuWKjxzaXGD/BbTlWbuUjFysKTv0WaDbj2/TNvLL2Nc0ZN0B1FybkBVB
+         skt1uA4U2z4qMeKjILz+19uhFUgNiMIsOvhZOEEFQUQMpUkX0+K2HfAvIIkqe80xJHen
+         Vum9HVri9OMfTgf6U1cevcV0V4qb+2j0QXjNvjBnthx7WaQpOn4W7217C5SavgC6c/xS
+         Pccw==
+X-Gm-Message-State: ANoB5plBunV5yQynB91GKu7h895ANT2pAnjSpSL9f2B2Jzkhg/wHpWjh
+	FFybUm5HI9nS5y07TG4QHdFLUQ==
+X-Google-Smtp-Source: AA0mqf5zWdkH3xH2EphKKbDCqWzEBIeWxi3op3Of+IS1hUt3Omy1pEG69elJYrpi56m64lfNCX6qYA==
+X-Received: by 2002:a17:902:7790:b0:189:9973:fb58 with SMTP id o16-20020a170902779000b001899973fb58mr5888074pll.59.1669755135786;
+        Tue, 29 Nov 2022 12:52:15 -0800 (PST)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id c31-20020a17090a492200b00218b32f6a9esm1784905pjh.18.2022.11.29.12.52.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Nov 2022 12:52:15 -0800 (PST)
+Date: Tue, 29 Nov 2022 12:52:12 -0800
+From: Ricardo Koller <ricarkol@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
-	James Morse <james.morse@arm.com>,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Zhang Lei <zhang.lei@jp.fujitsu.com>
-Subject: Re: [PATCH v5 0/8] arm64/sve: Clean up KVM integration and optimise syscalls
-Date: Tue, 29 Nov 2022 19:52:45 +0000
-Message-Id: <166973411736.1509628.9066833798546669515.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20221115094640.112848-1-broonie@kernel.org>
-References: <20221115094640.112848-1-broonie@kernel.org>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] KVM: arm64: Don't serialize if the access flag isn't
+ set
+Message-ID: <Y4Zw/J3srTsZ57P7@google.com>
+References: <20221129191946.1735662-1-oliver.upton@linux.dev>
+ <20221129191946.1735662-3-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221129191946.1735662-3-oliver.upton@linux.dev>
+Message-ID: <20221129205212.vk5LmN-daMt7t7pL7cPbOLO-zeWhRvThnF8OaoSNfBA@z>
 
-On Tue, 15 Nov 2022 09:46:32 +0000, Mark Brown wrote:
-> This patch series attempts to clarify the tracking of which set of
-> floating point registers we save on systems supporting SVE, particularly
-> with reference to KVM, and then uses the results of this clarification
-> to improve the performance of simple syscalls where we return directly
-> to userspace in cases where userspace is using SVE.
+On Tue, Nov 29, 2022 at 07:19:44PM +0000, Oliver Upton wrote:
+> Of course, if the PTE wasn't changed then there are absolutely no
+> serialization requirements. Skip the DSB for an unsuccessful update to
+> the access flag.
 > 
-> At present we track which register state is active by using the TIF_SVE
-> flag for the current task which also controls if userspace is able to
-> use SVE, this is reasonably straightforward if limiting but for KVM it
-> gets a bit hairy since we may have guest state loaded in registers. This
-> results in KVM modifying TIF_SVE for the VMM task while the guest is
-> running which doesn't entirely help make things easy to follow. To help
-> make things clearer the series changes things so that in addition to
-> TIF_SVE we explicitly track both the type of registers that are
-> currently saved in the task struct and the type of registers that we
-> should save when we do so. TIF_SVE then solely controls if userspace
-> can use SVE without trapping, it has no function for KVM guests and we
-> can remove the code for managing it from KVM.
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/hyp/pgtable.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
 > 
-> [...]
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index b11cf2c618a6..9626f615d9b8 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -1094,9 +1094,13 @@ int kvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr)
+>  {
+>  	kvm_pte_t pte = 0;
+> -	stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
+> -				 &pte, NULL, 0);
+> -	dsb(ishst);
+> +	int ret;
+> +
+> +	ret = stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
+> +				       &pte, NULL, 0);
+> +	if (!ret)
+> +		dsb(ishst);
 
-Applied to arm64 (for-next/sve-state), thanks!
+At the moment, the only reason for stage2_update_leaf_attrs() to not
+update the PTE is if it's not valid:
 
-[1/8] KVM: arm64: Discard any SVE state when entering KVM guests
-      https://git.kernel.org/arm64/c/93ae6b01bafe
-[2/8] arm64/fpsimd: Track the saved FPSIMD state type separately to TIF_SVE
-      https://git.kernel.org/arm64/c/baa8515281b3
-[3/8] arm64/fpsimd: Have KVM explicitly say which FP registers to save
-      https://git.kernel.org/arm64/c/deeb8f9a80fd
-[4/8] arm64/fpsimd: Stop using TIF_SVE to manage register saving in KVM
-      https://git.kernel.org/arm64/c/62021cc36add
-[5/8] arm64/fpsimd: Load FP state based on recorded data type
-      https://git.kernel.org/arm64/c/a0136be443d5
-[6/8] arm64/fpsimd: SME no longer requires SVE register state
-      https://git.kernel.org/arm64/c/bbc6172eefdb
-[7/8] arm64/sve: Leave SVE enabled on syscall if we don't context switch
-      https://git.kernel.org/arm64/c/8c845e273104
-[8/8] arm64/fp: Use a struct to pass data to fpsimd_bind_state_to_cpu()
-      https://git.kernel.org/arm64/c/1192b93ba352
+	if (!kvm_pte_valid(pte))
+			return 0;
 
-Cheers,
--- 
-Will
+I guess you could check that as well:
 
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
++	if (!ret || kvm_pte_valid(pte))
++		dsb(ishst);
+
+> +
+>  	return pte;
+>  }
+>  
+> -- 
+> 2.38.1.584.g0f3c55d4c2-goog
+> 
+> 
