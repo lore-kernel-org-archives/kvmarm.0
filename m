@@ -1,57 +1,56 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B65ABA28
-	for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 20:52:16 +0000 (UTC)
-Received: by mail-pl1-f181.google.com with SMTP id k7so14613923pll.6
-        for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 12:52:16 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63004BA28
+	for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 21:00:49 +0000 (UTC)
+Received: by mail-pf1-f172.google.com with SMTP id z17so10076904pff.1
+        for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 13:00:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=52SMROLRGWbt9mwpSBUjPx/3msXb6vFt7ItVy/cqB1k=;
-        b=VhKagD+9381ydRAyKPEL5EsmY+AM67HAZZ/33h8VvA8l2VXlMlKxq+fM5BueYSKXKt
-         MlYUlT1r2orjroDtbBdQLFNwyfElcb4r+5lE0sxkugaizGLV5rqQhubBgdx5ttpa3za0
-         oliMzzN9b4nvEx2UounppSrAbCEbsdm/nmGfxJve0S1hIp8oK/34PAiQq2P0gRHNpQON
-         Hed36jy70ZutuQ+XKz5nU9QmAvnQT6CmU+OyL+RjADMzi1jdYipeoPsS5VzO7M2oqh+q
-         oUjXehpCZSlKTc1/n9q+Fw+1tkSNk+0rW8qA5VeEmwAbYZihapsyiUMqxDw9ljYAQ/PU
-         SMqA==
+        bh=Cv7bP6Ykoos9p/GSChQ3hTQpD+T90m2BXvicS8ztKkY=;
+        b=LjZa0NyucvKgdFLDZuq/BMDOGwBjA+nS/RFT6FpAkCYZ7VfBn0Zxee9PeRD82I1fN8
+         E1bQmWmUQrYGjJni2jrPozVvZT6FDGsqjfy66v3/QQydBYikDmMXH+ULHSk0nfg5QSgP
+         h2iuulqYQXz4Su5XKM7uealW6p3CrNk550WHCTnvyoaxLQ2nrEZ/yq8ti7QR4HBj3SgA
+         e2RMNQY1NIW38zpdVC5XjX/JXKOVp5mVsxFXRDDscvhzdzCyA92Vs9g2XJUGfFl2xb2C
+         kMb9AoRdkWS7O20ZHucbwBET0m1JZX9LwgAZUQyQ6um1Fl+numP+ifFobdYTGf4+VA8/
+         rP2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=52SMROLRGWbt9mwpSBUjPx/3msXb6vFt7ItVy/cqB1k=;
-        b=F7jvBnyDwX9jxgAemBxejnd4O9JXPZrcvYXNE7GFZGQm/Z0q2kdvMSWiGMGyQ6qMwA
-         Vv6fFZZT1ZUAcE/BH2BQjE4MTsN0LU5H0ypBMObfgp/SvNWXX0JV/sfJENc+GRwE5cGv
-         Q0tjfCNBTGA5yuWKjxzaXGD/BbTlWbuUjFysKTv0WaDbj2/TNvLL2Nc0ZN0B1FybkBVB
-         skt1uA4U2z4qMeKjILz+19uhFUgNiMIsOvhZOEEFQUQMpUkX0+K2HfAvIIkqe80xJHen
-         Vum9HVri9OMfTgf6U1cevcV0V4qb+2j0QXjNvjBnthx7WaQpOn4W7217C5SavgC6c/xS
-         Pccw==
-X-Gm-Message-State: ANoB5plBunV5yQynB91GKu7h895ANT2pAnjSpSL9f2B2Jzkhg/wHpWjh
-	FFybUm5HI9nS5y07TG4QHdFLUQ==
-X-Google-Smtp-Source: AA0mqf5zWdkH3xH2EphKKbDCqWzEBIeWxi3op3Of+IS1hUt3Omy1pEG69elJYrpi56m64lfNCX6qYA==
-X-Received: by 2002:a17:902:7790:b0:189:9973:fb58 with SMTP id o16-20020a170902779000b001899973fb58mr5888074pll.59.1669755135786;
-        Tue, 29 Nov 2022 12:52:15 -0800 (PST)
+        bh=Cv7bP6Ykoos9p/GSChQ3hTQpD+T90m2BXvicS8ztKkY=;
+        b=Ltud02S5SJaRKBSiqPoY7CDJEXlM3tq/ujy/RHA/uILyK4QUnQn9ltMnPU2edzWSWZ
+         3FKebiD1x5XHSEIlssKXOqVRm8I8xm6nmOWianJOr8p7vssXxtPbeAMKmoEvq96D+Pys
+         LhMAqtN8Es9XbqsnC1TtK2l8oSVoA3r3cvFxEvZhbLZunv14zlXRA2d/EU4NtYWsagH5
+         QHLmDgtOdqc0Xq+hA6ES7Np83YTBtt7KuXdR7FYza/4oeTjNmyEczagtsyfpeo8a2nBO
+         RxO7WLVNMEKxc1eYhzbnuGmrx0Dx1UKfY3aS2EadFoZiAcekIWOgjNfm5IFCumy00wTr
+         WFjQ==
+X-Gm-Message-State: ANoB5pnNbNIOJLNa64m7HBJ+8AudvR9BMu5X774SaRJTLUZpjvouGMac
+	lq/BEXAI05VTje+o5+KbkbqCQA==
+X-Google-Smtp-Source: AA0mqf6LGlNdkJlLDcwfP4oo7asFABbkB+ZP9oQrvqjFFePdLkCPII5mdqk5RqRXD5AGhShcjzDHXg==
+X-Received: by 2002:a63:5a62:0:b0:476:ed2a:6215 with SMTP id k34-20020a635a62000000b00476ed2a6215mr34342882pgm.559.1669755648622;
+        Tue, 29 Nov 2022 13:00:48 -0800 (PST)
 Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id c31-20020a17090a492200b00218b32f6a9esm1784905pjh.18.2022.11.29.12.52.15
+        by smtp.gmail.com with ESMTPSA id f14-20020a170902ce8e00b0018957322953sm11407727plg.45.2022.11.29.13.00.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Nov 2022 12:52:15 -0800 (PST)
-Date: Tue, 29 Nov 2022 12:52:12 -0800
+        Tue, 29 Nov 2022 13:00:48 -0800 (PST)
+Date: Tue, 29 Nov 2022 13:00:44 -0800
 From: Ricardo Koller <ricarkol@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/4] KVM: arm64: Don't serialize if the access flag isn't
- set
-Message-ID: <Y4Zw/J3srTsZ57P7@google.com>
+	Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 3/4] KVM: arm64: Handle access faults behind the read lock
+Message-ID: <Y4Zy/MtIgeLyRGy9@google.com>
 References: <20221129191946.1735662-1-oliver.upton@linux.dev>
- <20221129191946.1735662-3-oliver.upton@linux.dev>
+ <20221129191946.1735662-4-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,53 +59,57 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221129191946.1735662-3-oliver.upton@linux.dev>
-Message-ID: <20221129205212.vk5LmN-daMt7t7pL7cPbOLO-zeWhRvThnF8OaoSNfBA@z>
+In-Reply-To: <20221129191946.1735662-4-oliver.upton@linux.dev>
+Message-ID: <20221129210044.7Gqgekk3yCx-CT0kQvPq18EH6qhutbCL3Xz4m8nAzBk@z>
 
-On Tue, Nov 29, 2022 at 07:19:44PM +0000, Oliver Upton wrote:
-> Of course, if the PTE wasn't changed then there are absolutely no
-> serialization requirements. Skip the DSB for an unsuccessful update to
-> the access flag.
+On Tue, Nov 29, 2022 at 07:19:45PM +0000, Oliver Upton wrote:
+> As the underlying software walkers are able to traverse and update
+> stage-2 in parallel there is no need to serialize access faults.
+> 
+> Only take the read lock when handling an access fault.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/kvm/hyp/pgtable.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
+>  arch/arm64/kvm/hyp/pgtable.c | 2 +-
+>  arch/arm64/kvm/mmu.c         | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index b11cf2c618a6..9626f615d9b8 100644
+> index 9626f615d9b8..1a3dd9774707 100644
 > --- a/arch/arm64/kvm/hyp/pgtable.c
 > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1094,9 +1094,13 @@ int kvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
->  kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr)
->  {
->  	kvm_pte_t pte = 0;
-> -	stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
-> -				 &pte, NULL, 0);
-> -	dsb(ishst);
-> +	int ret;
-> +
-> +	ret = stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
-> +				       &pte, NULL, 0);
-> +	if (!ret)
-> +		dsb(ishst);
-
-At the moment, the only reason for stage2_update_leaf_attrs() to not
-update the PTE is if it's not valid:
-
-	if (!kvm_pte_valid(pte))
-			return 0;
-
-I guess you could check that as well:
-
-+	if (!ret || kvm_pte_valid(pte))
-+		dsb(ishst);
-
-> +
->  	return pte;
->  }
+> @@ -1097,7 +1097,7 @@ kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr)
+>  	int ret;
 >  
+>  	ret = stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
+> -				       &pte, NULL, 0);
+> +				       &pte, NULL, KVM_PGTABLE_WALK_SHARED);
+>  	if (!ret)
+>  		dsb(ishst);
+>  
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 886ad5ee767a..347985a56414 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1404,10 +1404,10 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+>  
+>  	trace_kvm_access_fault(fault_ipa);
+>  
+> -	write_lock(&vcpu->kvm->mmu_lock);
+> +	read_lock(&vcpu->kvm->mmu_lock);
+>  	mmu = vcpu->arch.hw_mmu;
+>  	pte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
+> -	write_unlock(&vcpu->kvm->mmu_lock);
+> +	read_unlock(&vcpu->kvm->mmu_lock);
+>  
+>  	if (kvm_pte_valid(pte))
+>  		kvm_set_pfn_accessed(kvm_pte_to_pfn(pte));
 > -- 
 > 2.38.1.584.g0f3c55d4c2-goog
 > 
-> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
