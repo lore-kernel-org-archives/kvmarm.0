@@ -1,56 +1,34 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63004BA28
-	for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 21:00:49 +0000 (UTC)
-Received: by mail-pf1-f172.google.com with SMTP id z17so10076904pff.1
-        for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 13:00:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cv7bP6Ykoos9p/GSChQ3hTQpD+T90m2BXvicS8ztKkY=;
-        b=LjZa0NyucvKgdFLDZuq/BMDOGwBjA+nS/RFT6FpAkCYZ7VfBn0Zxee9PeRD82I1fN8
-         E1bQmWmUQrYGjJni2jrPozVvZT6FDGsqjfy66v3/QQydBYikDmMXH+ULHSk0nfg5QSgP
-         h2iuulqYQXz4Su5XKM7uealW6p3CrNk550WHCTnvyoaxLQ2nrEZ/yq8ti7QR4HBj3SgA
-         e2RMNQY1NIW38zpdVC5XjX/JXKOVp5mVsxFXRDDscvhzdzCyA92Vs9g2XJUGfFl2xb2C
-         kMb9AoRdkWS7O20ZHucbwBET0m1JZX9LwgAZUQyQ6um1Fl+numP+ifFobdYTGf4+VA8/
-         rP2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cv7bP6Ykoos9p/GSChQ3hTQpD+T90m2BXvicS8ztKkY=;
-        b=Ltud02S5SJaRKBSiqPoY7CDJEXlM3tq/ujy/RHA/uILyK4QUnQn9ltMnPU2edzWSWZ
-         3FKebiD1x5XHSEIlssKXOqVRm8I8xm6nmOWianJOr8p7vssXxtPbeAMKmoEvq96D+Pys
-         LhMAqtN8Es9XbqsnC1TtK2l8oSVoA3r3cvFxEvZhbLZunv14zlXRA2d/EU4NtYWsagH5
-         QHLmDgtOdqc0Xq+hA6ES7Np83YTBtt7KuXdR7FYza/4oeTjNmyEczagtsyfpeo8a2nBO
-         RxO7WLVNMEKxc1eYhzbnuGmrx0Dx1UKfY3aS2EadFoZiAcekIWOgjNfm5IFCumy00wTr
-         WFjQ==
-X-Gm-Message-State: ANoB5pnNbNIOJLNa64m7HBJ+8AudvR9BMu5X774SaRJTLUZpjvouGMac
-	lq/BEXAI05VTje+o5+KbkbqCQA==
-X-Google-Smtp-Source: AA0mqf6LGlNdkJlLDcwfP4oo7asFABbkB+ZP9oQrvqjFFePdLkCPII5mdqk5RqRXD5AGhShcjzDHXg==
-X-Received: by 2002:a63:5a62:0:b0:476:ed2a:6215 with SMTP id k34-20020a635a62000000b00476ed2a6215mr34342882pgm.559.1669755648622;
-        Tue, 29 Nov 2022 13:00:48 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id f14-20020a170902ce8e00b0018957322953sm11407727plg.45.2022.11.29.13.00.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Nov 2022 13:00:48 -0800 (PST)
-Date: Tue, 29 Nov 2022 13:00:44 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A2B0BA28
+	for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 21:15:27 +0000 (UTC)
+Date: Tue, 29 Nov 2022 21:15:21 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1669756525;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FtYFpXu5/fa0TaYiI4P0+GO9iWhqJmCXUsHphTqwjGw=;
+	b=oE86JcLcGxsicJ5+/muPqhDr7FrTiNs6WD8LcTD34Qo6fvG4ULczduWra99AnJWXD8Xtg0
+	garTf7J0LX7RmBFNAhjKicG/NVDNgHM7JNlVsJIgPMT0ZyHg3SMpR3SR8h5DHbZkmS+wfD
+	UYYEx/SftPydGa+lK+iguxXp2/OPh14=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Ricardo Koller <ricarkol@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 3/4] KVM: arm64: Handle access faults behind the read lock
-Message-ID: <Y4Zy/MtIgeLyRGy9@google.com>
+	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] KVM: arm64: Don't serialize if the access flag isn't
+ set
+Message-ID: <Y4Z2aWVEnluy+d3+@google.com>
 References: <20221129191946.1735662-1-oliver.upton@linux.dev>
- <20221129191946.1735662-4-oliver.upton@linux.dev>
+ <20221129191946.1735662-3-oliver.upton@linux.dev>
+ <Y4Zw/J3srTsZ57P7@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,57 +37,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221129191946.1735662-4-oliver.upton@linux.dev>
-Message-ID: <20221129210044.7Gqgekk3yCx-CT0kQvPq18EH6qhutbCL3Xz4m8nAzBk@z>
+In-Reply-To: <Y4Zw/J3srTsZ57P7@google.com>
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <20221129211521.domT0FWh7AhJfCbpFTU1LEQLuHF4vt9mfGMymwdqihE@z>
 
-On Tue, Nov 29, 2022 at 07:19:45PM +0000, Oliver Upton wrote:
-> As the underlying software walkers are able to traverse and update
-> stage-2 in parallel there is no need to serialize access faults.
-> 
-> Only take the read lock when handling an access fault.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/hyp/pgtable.c | 2 +-
->  arch/arm64/kvm/mmu.c         | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 9626f615d9b8..1a3dd9774707 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1097,7 +1097,7 @@ kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr)
->  	int ret;
->  
->  	ret = stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
-> -				       &pte, NULL, 0);
-> +				       &pte, NULL, KVM_PGTABLE_WALK_SHARED);
->  	if (!ret)
->  		dsb(ishst);
->  
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 886ad5ee767a..347985a56414 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1404,10 +1404,10 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
->  
->  	trace_kvm_access_fault(fault_ipa);
->  
-> -	write_lock(&vcpu->kvm->mmu_lock);
-> +	read_lock(&vcpu->kvm->mmu_lock);
->  	mmu = vcpu->arch.hw_mmu;
->  	pte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
-> -	write_unlock(&vcpu->kvm->mmu_lock);
-> +	read_unlock(&vcpu->kvm->mmu_lock);
->  
->  	if (kvm_pte_valid(pte))
->  		kvm_set_pfn_accessed(kvm_pte_to_pfn(pte));
-> -- 
-> 2.38.1.584.g0f3c55d4c2-goog
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Hi Ricardo,
 
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
+Thanks for having a look.
+
+On Tue, Nov 29, 2022 at 12:52:12PM -0800, Ricardo Koller wrote:
+> On Tue, Nov 29, 2022 at 07:19:44PM +0000, Oliver Upton wrote:
+
+[...]
+
+> > +	ret = stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
+> > +				       &pte, NULL, 0);
+> > +	if (!ret)
+> > +		dsb(ishst);
+> 
+> At the moment, the only reason for stage2_update_leaf_attrs() to not
+> update the PTE is if it's not valid:
+> 
+> 	if (!kvm_pte_valid(pte))
+> 			return 0;
+> 
+> I guess you could check that as well:
+> 
+> +	if (!ret || kvm_pte_valid(pte))
+> +		dsb(ishst);
+
+Thanks for catching this.
+
+Instead of pivoting on the returned PTE value, how about we return
+-EAGAIN from the early return in stage2_attr_walker()? It would better
+match the pattern used elsewhere in the pgtable code.
+
+--
+Thanks,
+Oliver
