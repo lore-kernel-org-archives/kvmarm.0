@@ -1,19 +1,19 @@
 Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27975BA25
-	for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 19:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C654BA25
+	for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 19:20:07 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1669749597;
+	t=1669749605;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LAtIXRb0PxV3UcO4TbJwOQlCaH/bLzgHLa5c6EYoqNs=;
-	b=trhLlHeGTz/PmAoiA09w30q8K6SNnj0CmzpDhmRBg7tUGjLWpYvph7djOsZrwFb0DDpZjd
-	GrOFF+Vpj2I+jmVU2b6vUUyiz1X6AdNx+RwQRy7Iq+wVnC/7WYjaBLfaifsaWR/fs8UaFo
-	jU/Xs8zsAjfPx3e1g4ONEZ1v11gRIP4=
+	bh=laDyv7YUrXbfqGAwMagZdnkFS+VaAukLw7cc05haSWA=;
+	b=UdwE2yD+Xreg9YPfNtiPciJasEmnad33G1DHyWSBDA7LwaT7n3KiwnnNO9bOgfsuBoI54F
+	tbwcE9gGmZR/9cDmZ4YCQnOunSbgBloPF44HFlAEaw3Wbv927EOOsrVHVQZJ6abGcSkfq1
+	IGTSDogzwposXRkOGXjkbNu+97c6p1U=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	James Morse <james.morse@arm.com>,
@@ -27,9 +27,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/4] KVM: arm64: Use KVM's pte type/helpers in handle_access_fault()
-Date: Tue, 29 Nov 2022 19:19:43 +0000
-Message-ID: <20221129191946.1735662-2-oliver.upton@linux.dev>
+Subject: [PATCH 4/4] KVM: arm64: Condition HW AF updates on config option
+Date: Tue, 29 Nov 2022 19:19:46 +0000
+Message-ID: <20221129191946.1735662-5-oliver.upton@linux.dev>
 In-Reply-To: <20221129191946.1735662-1-oliver.upton@linux.dev>
 References: <20221129191946.1735662-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -40,64 +40,40 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221129191943.Vmb0FTSPuC1CtHgn5AsjarxFwY3GiQlDymo4Yn7n5XM@z>
+Message-ID: <20221129191946.b5Ebdov870dkq-nOFR3JYN7yLvWygCCRlvYnZ8NQw_Y@z>
 
-Consistently use KVM's own pte types and helpers in
-handle_access_fault().
+As it currently stands, KVM makes use of FEAT_HAFDBS unconditionally.
+Use of the feature in the rest of the kernel is guarded by an associated
+Kconfig option.
 
-No functional change intended.
+Align KVM with the rest of the kernel and only enable VTCR_HA when
+ARM64_HW_AFDBM is enabled. This can be helpful for testing changes to
+the stage-2 access fault path on Armv8.1+ implementations.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_pgtable.h |  5 +++++
- arch/arm64/kvm/mmu.c                 | 10 ++++------
- 2 files changed, 9 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 63f81b27a4e3..192f33b88dc1 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -71,6 +71,11 @@ static inline kvm_pte_t kvm_phys_to_pte(u64 pa)
- 	return pte;
- }
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 1a3dd9774707..9c651b6d4092 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -584,12 +584,14 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+ 		lvls = 2;
+ 	vtcr |= VTCR_EL2_LVLS_TO_SL0(lvls);
  
-+static inline kvm_pfn_t kvm_pte_to_pfn(kvm_pte_t pte)
-+{
-+	return __phys_to_pfn(kvm_pte_to_phys(pte));
-+}
-+
- static inline u64 kvm_granule_shift(u32 level)
- {
- 	/* Assumes KVM_PGTABLE_MAX_LEVELS is 4 */
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index a3c71b5172cd..886ad5ee767a 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1399,20 +1399,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- /* Resolve the access fault by making the page young again. */
- static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- {
--	pte_t pte;
--	kvm_pte_t kpte;
-+	kvm_pte_t pte;
- 	struct kvm_s2_mmu *mmu;
++#ifdef CONFIG_ARM64_HW_AFDBM
+ 	/*
+ 	 * Enable the Hardware Access Flag management, unconditionally
+ 	 * on all CPUs. The features is RES0 on CPUs without the support
+ 	 * and must be ignored by the CPUs.
+ 	 */
+ 	vtcr |= VTCR_EL2_HA;
++#endif /* CONFIG_ARM64_HW_AFDBM */
  
- 	trace_kvm_access_fault(fault_ipa);
- 
- 	write_lock(&vcpu->kvm->mmu_lock);
- 	mmu = vcpu->arch.hw_mmu;
--	kpte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
-+	pte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
- 	write_unlock(&vcpu->kvm->mmu_lock);
- 
--	pte = __pte(kpte);
--	if (pte_valid(pte))
--		kvm_set_pfn_accessed(pte_pfn(pte));
-+	if (kvm_pte_valid(pte))
-+		kvm_set_pfn_accessed(kvm_pte_to_pfn(pte));
- }
- 
- /**
+ 	/* Set the vmid bits */
+ 	vtcr |= (get_vmid_bits(mmfr1) == 16) ?
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
