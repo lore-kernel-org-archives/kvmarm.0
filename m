@@ -1,19 +1,19 @@
 Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279A9BA27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27975BA25
 	for <kvmarm@lists.linux.dev>; Tue, 29 Nov 2022 19:20:04 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1669749602;
+	t=1669749597;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kcCcdEvvwNGIdQ75NLzM3W5ItGtWtDkpHRzsetWKNGE=;
-	b=hxIfAAInTnpV80RJl1MOplU9B+F7wko1aZ0kXwoNfPeIZ7mLgQMPu/2k0UoJcp40WP/Rbd
-	2bDrV8+x6MOHHN9BWWHQ5tkBOIM2kbW4M6a6SKLfqI8MCQ80kj47HEfkIrGFCirYKQP9u7
-	OmDozB0QEQ52eFKqV6Kq+CasS6AhCOg=
+	bh=LAtIXRb0PxV3UcO4TbJwOQlCaH/bLzgHLa5c6EYoqNs=;
+	b=trhLlHeGTz/PmAoiA09w30q8K6SNnj0CmzpDhmRBg7tUGjLWpYvph7djOsZrwFb0DDpZjd
+	GrOFF+Vpj2I+jmVU2b6vUUyiz1X6AdNx+RwQRy7Iq+wVnC/7WYjaBLfaifsaWR/fs8UaFo
+	jU/Xs8zsAjfPx3e1g4ONEZ1v11gRIP4=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	James Morse <james.morse@arm.com>,
@@ -27,9 +27,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 3/4] KVM: arm64: Handle access faults behind the read lock
-Date: Tue, 29 Nov 2022 19:19:45 +0000
-Message-ID: <20221129191946.1735662-4-oliver.upton@linux.dev>
+Subject: [PATCH 1/4] KVM: arm64: Use KVM's pte type/helpers in handle_access_fault()
+Date: Tue, 29 Nov 2022 19:19:43 +0000
+Message-ID: <20221129191946.1735662-2-oliver.upton@linux.dev>
 In-Reply-To: <20221129191946.1735662-1-oliver.upton@linux.dev>
 References: <20221129191946.1735662-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -40,49 +40,64 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221129191945.dlV-7IULFgfsQlHYvd8aKBiPe8z4RDG6ifiSqbXBCzU@z>
+Message-ID: <20221129191943.Vmb0FTSPuC1CtHgn5AsjarxFwY3GiQlDymo4Yn7n5XM@z>
 
-As the underlying software walkers are able to traverse and update
-stage-2 in parallel there is no need to serialize access faults.
+Consistently use KVM's own pte types and helpers in
+handle_access_fault().
 
-Only take the read lock when handling an access fault.
+No functional change intended.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 2 +-
- arch/arm64/kvm/mmu.c         | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h |  5 +++++
+ arch/arm64/kvm/mmu.c                 | 10 ++++------
+ 2 files changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 9626f615d9b8..1a3dd9774707 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1097,7 +1097,7 @@ kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr)
- 	int ret;
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 63f81b27a4e3..192f33b88dc1 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -71,6 +71,11 @@ static inline kvm_pte_t kvm_phys_to_pte(u64 pa)
+ 	return pte;
+ }
  
- 	ret = stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
--				       &pte, NULL, 0);
-+				       &pte, NULL, KVM_PGTABLE_WALK_SHARED);
- 	if (!ret)
- 		dsb(ishst);
- 
++static inline kvm_pfn_t kvm_pte_to_pfn(kvm_pte_t pte)
++{
++	return __phys_to_pfn(kvm_pte_to_phys(pte));
++}
++
+ static inline u64 kvm_granule_shift(u32 level)
+ {
+ 	/* Assumes KVM_PGTABLE_MAX_LEVELS is 4 */
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 886ad5ee767a..347985a56414 100644
+index a3c71b5172cd..886ad5ee767a 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1404,10 +1404,10 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+@@ -1399,20 +1399,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ /* Resolve the access fault by making the page young again. */
+ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ {
+-	pte_t pte;
+-	kvm_pte_t kpte;
++	kvm_pte_t pte;
+ 	struct kvm_s2_mmu *mmu;
  
  	trace_kvm_access_fault(fault_ipa);
  
--	write_lock(&vcpu->kvm->mmu_lock);
-+	read_lock(&vcpu->kvm->mmu_lock);
+ 	write_lock(&vcpu->kvm->mmu_lock);
  	mmu = vcpu->arch.hw_mmu;
- 	pte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
--	write_unlock(&vcpu->kvm->mmu_lock);
-+	read_unlock(&vcpu->kvm->mmu_lock);
+-	kpte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
++	pte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
+ 	write_unlock(&vcpu->kvm->mmu_lock);
  
- 	if (kvm_pte_valid(pte))
- 		kvm_set_pfn_accessed(kvm_pte_to_pfn(pte));
+-	pte = __pte(kpte);
+-	if (pte_valid(pte))
+-		kvm_set_pfn_accessed(pte_pfn(pte));
++	if (kvm_pte_valid(pte))
++		kvm_set_pfn_accessed(kvm_pte_to_pfn(pte));
+ }
+ 
+ /**
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
