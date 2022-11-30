@@ -2,73 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5109C4321E
-	for <kvmarm@archiver.kernel.org>; Wed, 30 Nov 2022 23:10:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9F27C47089
+	for <kvmarm@archiver.kernel.org>; Wed, 30 Nov 2022 23:10:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C03F4B18F;
-	Wed, 30 Nov 2022 18:10:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A58A4B615;
+	Wed, 30 Nov 2022 18:10:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uwLO28+CvZLc; Wed, 30 Nov 2022 18:10:08 -0500 (EST)
+	with ESMTP id pUQk6aP5TJZI; Wed, 30 Nov 2022 18:10:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDD4F4B422;
-	Wed, 30 Nov 2022 18:10:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9DD74B5E6;
+	Wed, 30 Nov 2022 18:10:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 538FD40B8F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0484B4B28D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kYqZIpNRyrbA for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Nov 2022 18:09:59 -0500 (EST)
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
- [209.85.215.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 818894B3DD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:09:57 -0500 (EST)
-Received: by mail-pg1-f201.google.com with SMTP id
- l186-20020a6388c3000000b00478410026bfso84118pgd.10
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 15:09:57 -0800 (PST)
+ with ESMTP id b5UFuAbpnCD1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Nov 2022 18:10:04 -0500 (EST)
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
+ [209.85.210.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9713F4B3F6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:01 -0500 (EST)
+Received: by mail-pf1-f202.google.com with SMTP id
+ t18-20020aa79392000000b0057539377070so150362pfe.21
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 15:10:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=uhI8yDhdR7lIAaqvku/gdFE7HWy6VU8JNAGQp8QsO6I=;
- b=JGKTwFHTr3zFyFeRyDhx800NTwE8fbKBoChRZ4rCsQDcOc/eGjPbGsVDNkCwWmSHdn
- 4zWsAcy02h7DG9I7KIrR/3G3ynUAl5zHFprvqWawNYq0ujuz0rj9xQPN87hRttEvJWya
- MaZkpYk6hJDhRKiSggxmfSLSCGk6wAycOhmze7v3vnTNsBJM82DsGnT9K7gXXth5q453
- GXnW0gnhFQMQ7rKcFFJUmj9xHXOE1CyUnZYbsfJ9eekI1f6DwJJHgA0YwjDavFZGHgxi
- PIdF3Xw7u6ZSs+rqvW6sJFzKLF1Mn/CCKFnzXLHVYU5aHYTg5a9RqdAAC/8bhq/W34bo
- HRWw==
+ bh=di4GPfaF6WKRfgW0XqJub+upfuRM26VzAsGaqEV4LGw=;
+ b=Zp0X+tvqlodbVDmXJAlHsgiG3eKVrrt9FqJ/G91Ka+FyaPGocW43mHdutS/PZpQE36
+ Iieu9/BWXmUBsCNeoXw2w6AGd8PrG42NkgB6lU08wcdcc8UwAyPwoD57C6YJX6W8d8L6
+ zT+J1YBLZIf8EiLqUI0I1OI8MzvM21Wx5gQBxNbTBtyOAXzto+GobOper+U00pyFgXJf
+ UdMZA+TjdcslZ9rB8fGS/EHatJp3upDo3FA+0llGAcT+1sttGOmsewFGvBZuTST5TDKg
+ atyPT5DCNi18z7jSv+tnMdXu5HV1aXplTTP+Szmkxtce4LN+raVvUsuQA85wOwn+8uqH
+ psnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=uhI8yDhdR7lIAaqvku/gdFE7HWy6VU8JNAGQp8QsO6I=;
- b=taOdHKiDFjOGirvKoE2SKA4yjQaCW8ke5ADXSRnVPFor7Jm4n8/on+lLkShvGzl3HV
- iGuubTnLz3Na0z+GSfZ8e7EUMVeAqGoVUoXY5cplQuIXGf+4x5StQUZvKJQTcxQjuD8G
- BdYPm1Q5wHK5wjEz05tjojwwJP8j+Ao2dCDezssvTEe855GNzSZWMHcvckoNXRobHcVs
- HhOm50nc5KnjskfsC9taLZAdXJK4MgYpzTVxMQDxV5RBseHz4TFPX8xSgDifbmcgwrVO
- nqGB8LQ/+YTKbVgN0vGZy63Nyr/btsZ31kHjBm/UBkj8ydrKfLdBsqfChSkXxSDpX/mD
- TuxA==
-X-Gm-Message-State: ANoB5plyAZ58CzbcHV8wBFgx8uUefK07YfbiAzAIRVf9KStmLkvOL52f
- n7eHMS6FmscofdZnRmiquSBvZvk/ckw=
-X-Google-Smtp-Source: AA0mqf4UbHeO/7xp9TeaJC3lcd9wjoTeVcRzR2/roKzeL1N7msdBGBxph7L3Wcu7JbcPwh3sZzXNOI19OJg=
+ bh=di4GPfaF6WKRfgW0XqJub+upfuRM26VzAsGaqEV4LGw=;
+ b=CnW1yS1NE7YSEMK5wO0e+dPtsmxevgD7dXUw4McbP5NleJfn/BlKfrkEwHQU4dqEux
+ s7XZrEoID0XD9Kybq22F2irCegXVFnbEW4ZYp1Uq8MJSM/WNXT1lmmf0xSYIoLWnqP0d
+ YrF0xuQtZmGeDQX3Fw0iyOLdXKwn6JoOAqNxvAE8UKV8rsCGxHg5XekR7nVEhRGYf9UK
+ EnPthTJOVcCZp/MB6i4+Uhs5SW0AucGevAtUiamrE9Bd1Ptw/EGWAxzBZbEMU3j1NA3T
+ /OAvaGsd2WsZCG2iFnwwVyIMOLSJ94Tp6KpveSXchYktWDa/oSHpD0wpvfn/uCBigvC/
+ 9atA==
+X-Gm-Message-State: ANoB5pkbDFL/BRoO5lqwjYGtIiTosdaBBVd6g7ooZ0QyRxNucYQ8nyIg
+ Nf9dlAbK2/N2RXoJ+SgzIREwYOTrnG8=
+X-Google-Smtp-Source: AA0mqf4OklfcBkfFMEfVjeAO6z8Tg9xRFY+PEerZY3OMpeOrjrDiJtxtxuLC1x65bjbuGkZn4Pd66WRIuco=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:3084:0:b0:56d:dd2a:c494 with SMTP id
- w126-20020a623084000000b0056ddd2ac494mr44472082pfw.76.1669849796263; Wed, 30
- Nov 2022 15:09:56 -0800 (PST)
-Date: Wed, 30 Nov 2022 23:08:55 +0000
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1409:b0:56b:e1d8:e7a1 with SMTP id
+ l9-20020a056a00140900b0056be1d8e7a1mr44197245pfu.28.1669849801157; Wed, 30
+ Nov 2022 15:10:01 -0800 (PST)
+Date: Wed, 30 Nov 2022 23:08:58 +0000
 In-Reply-To: <20221130230934.1014142-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221130230934.1014142-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221130230934.1014142-12-seanjc@google.com>
-Subject: [PATCH v2 11/50] KVM: VMX: Don't bother disabling eVMCS static key on
- module exit
+Message-ID: <20221130230934.1014142-15-seanjc@google.com>
+Subject: [PATCH v2 14/50] KVM: VMX: Do _all_ initialization before exposing
+ /dev/kvm to userspace
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -111,30 +111,109 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Don't disable the eVMCS static key on module exit, kvm_intel.ko owns the
-key so there can't possibly be users after the kvm_intel.ko is unloaded,
-at least not without much bigger issues.
+Call kvm_init() only after _all_ setup is complete, as kvm_init() exposes
+/dev/kvm to userspace and thus allows userspace to create VMs (and call
+other ioctls).  E.g. KVM will encounter a NULL pointer when attempting to
+add a vCPU to the per-CPU loaded_vmcss_on_cpu list if userspace is able to
+create a VM before vmx_init() configures said list.
 
+ BUG: kernel NULL pointer dereference, address: 0000000000000008
+ #PF: supervisor write access in kernel mode
+ #PF: error_code(0x0002) - not-present page
+ PGD 0 P4D 0
+ Oops: 0002 [#1] SMP
+ CPU: 6 PID: 1143 Comm: stable Not tainted 6.0.0-rc7+ #988
+ Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+ RIP: 0010:vmx_vcpu_load_vmcs+0x68/0x230 [kvm_intel]
+  <TASK>
+  vmx_vcpu_load+0x16/0x60 [kvm_intel]
+  kvm_arch_vcpu_load+0x32/0x1f0 [kvm]
+  vcpu_load+0x2f/0x40 [kvm]
+  kvm_arch_vcpu_create+0x231/0x310 [kvm]
+  kvm_vm_ioctl+0x79f/0xe10 [kvm]
+  ? handle_mm_fault+0xb1/0x220
+  __x64_sys_ioctl+0x80/0xb0
+  do_syscall_64+0x2b/0x50
+  entry_SYSCALL_64_after_hwframe+0x46/0xb0
+ RIP: 0033:0x7f5a6b05743b
+  </TASK>
+ Modules linked in: vhost_net vhost vhost_iotlb tap kvm_intel(+) kvm irqbypass
+
+Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 4 ----
- 1 file changed, 4 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 34 +++++++++++++++++++++-------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d85d175dca70..c0de7160700b 100644
+index 8e81cd94407d..76185a7a7ded 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8490,10 +8490,6 @@ static void vmx_exit(void)
+@@ -8521,19 +8521,23 @@ static void vmx_cleanup_l1d_flush(void)
+ 	l1tf_vmx_mitigation = VMENTER_L1D_FLUSH_AUTO;
+ }
  
- 	kvm_exit();
- 
--#if IS_ENABLED(CONFIG_HYPERV)
--	if (static_branch_unlikely(&enable_evmcs))
--		static_branch_disable(&enable_evmcs);
--#endif
+-static void vmx_exit(void)
++static void __vmx_exit(void)
+ {
++	allow_smaller_maxphyaddr = false;
++
+ #ifdef CONFIG_KEXEC_CORE
+ 	RCU_INIT_POINTER(crash_vmclear_loaded_vmcss, NULL);
+ 	synchronize_rcu();
+ #endif
+-
+-	kvm_exit();
+-	kvm_x86_vendor_exit();
+-
  	vmx_cleanup_l1d_flush();
++}
  
- 	allow_smaller_maxphyaddr = false;
+-	allow_smaller_maxphyaddr = false;
++static void vmx_exit(void)
++{
++	kvm_exit();
++	kvm_x86_vendor_exit();
++
++	__vmx_exit();
+ }
+ module_exit(vmx_exit);
+ 
+@@ -8551,11 +8555,6 @@ static int __init vmx_init(void)
+ 	if (r)
+ 		return r;
+ 
+-	r = kvm_init(&vmx_init_ops, sizeof(struct vcpu_vmx),
+-		     __alignof__(struct vcpu_vmx), THIS_MODULE);
+-	if (r)
+-		goto err_kvm_init;
+-
+ 	/*
+ 	 * Must be called after common x86 init so enable_ept is properly set
+ 	 * up. Hand the parameter mitigation value in which was stored in
+@@ -8589,11 +8588,20 @@ static int __init vmx_init(void)
+ 	if (!enable_ept)
+ 		allow_smaller_maxphyaddr = true;
+ 
++	/*
++	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
++	 * exposed to userspace!
++	 */
++	r = kvm_init(&vmx_init_ops, sizeof(struct vcpu_vmx),
++		     __alignof__(struct vcpu_vmx), THIS_MODULE);
++	if (r)
++		goto err_kvm_init;
++
+ 	return 0;
+ 
+-err_l1d_flush:
+-	vmx_exit();
+ err_kvm_init:
++	__vmx_exit();
++err_l1d_flush:
+ 	kvm_x86_vendor_exit();
+ 	return r;
+ }
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
