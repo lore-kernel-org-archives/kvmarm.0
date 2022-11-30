@@ -2,74 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70705C4708E
-	for <kvmarm@archiver.kernel.org>; Wed, 30 Nov 2022 23:10:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 583BCC4321E
+	for <kvmarm@archiver.kernel.org>; Wed, 30 Nov 2022 23:10:38 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D3B64B642;
-	Wed, 30 Nov 2022 18:10:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F2A0A4B643;
+	Wed, 30 Nov 2022 18:10:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JIx35Rgt6rBS; Wed, 30 Nov 2022 18:10:34 -0500 (EST)
+	with ESMTP id VJGxmiMeCkdm; Wed, 30 Nov 2022 18:10:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A23774B647;
-	Wed, 30 Nov 2022 18:10:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE7184B64A;
+	Wed, 30 Nov 2022 18:10:34 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2975340B80
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 90BB54B28D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 04-Lahfy2slj for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Nov 2022 18:10:29 -0500 (EST)
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
- [209.85.215.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BBE14B3CA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:25 -0500 (EST)
-Received: by mail-pg1-f201.google.com with SMTP id
- r126-20020a632b84000000b004393806c06eso100078pgr.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 15:10:25 -0800 (PST)
+ with ESMTP id OYHmYk9CuCIy for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Nov 2022 18:10:32 -0500 (EST)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2B594B39B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:29 -0500 (EST)
+Received: by mail-yb1-f201.google.com with SMTP id
+ m62-20020a252641000000b006f16683bb4eso17875653ybm.12
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 15:10:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=content-transfer-encoding:cc:to:from:subject:message-id:references
- :mime-version:in-reply-to:date:reply-to:from:to:cc:subject:date
- :message-id:reply-to;
- bh=oZ/AA3AN9yZfFS+Yz2Hj0GA1Db97x+XE1LjIfmdmS/w=;
- b=luHLl3WdRQNdBhH/vZv/hfYOmt9Q6vwep+qjtUAST73H1MF3LqvzoF2Ukv7UaDUlgb
- fXELwkqnEzgBN1h88nvzTImTYOnZGPEMito85bT2cMG/Dw2lvuyXP8zeBz8U2jGVs5tj
- pSDhoig8xe+6jwKUzsQZ0HNL6W7uKODl2j0YOlmoXogdfyORLlX0GkBhzBuT5EaiKGr7
- PCHzZt497tY3kEsEdxjbaw0LnCs8v3tH39skbarsReDUyuZOdzK6YVSLerydaPGb/0Z5
- eHv7VqvGcSRs3JMgPsz9Bq5kCqCHy9eUbAeqCz5po17CqSrTsXQffsEYVsh38nZQAmal
- lJaA==
+ h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+ :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+ bh=syK6eF0z1YIhw5KnDfEJ/sqHR3QdYzGhfq3h/5i5Sas=;
+ b=GVS6tfQs69HM9iPg5RyanavfgqTtstL/hP2NZwyz6ZiOn7sQ0OggFONinN3Xpq5A5O
+ ROAGkLrScqRoWmoumJCapQkQLkR93EZiZmJgM/igbQR0yiEQhTM5NlbokX/zSqXnB7+r
+ NTk4xoTIRJmdEYgV5XTVp3WbKa8QFND0VjYsfazhzfL9lIlQKqNHJYrNBIvwG1lwEaBo
+ U+Ok61fL2GtL8yDcgFKd5TgqnT7w/4A4Fxq0CZ9SiNKAiH0owEiGaxOBRpIJfpm0capw
+ Q57SZ4+/8uPzzEqCtGgs63hTCqUtPFogvCulI6jofLJAraG2Zyu8sPd3r85eKSZc1cYA
+ LlTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=content-transfer-encoding:cc:to:from:subject:message-id:references
- :mime-version:in-reply-to:date:reply-to:x-gm-message-state:from:to
- :cc:subject:date:message-id:reply-to;
- bh=oZ/AA3AN9yZfFS+Yz2Hj0GA1Db97x+XE1LjIfmdmS/w=;
- b=25R9E1JG6Xpr/Of2GVssG6Dze0WPvHNpudvjIK2ew4fpT1t62KICfFiMVYV48sJBQi
- oV3tKkJm1zRT+g91oEHN13AdSvlPXKjB1tu0sBxFzjdgqJzMQUWmTqQ+x1VqL8JWTP16
- raNKh4KVCDzX5TV/+DNDaZ3jiYLVgslTOacYgirPDbGC97I0ltYywDXU6rOVhZIFOv1G
- CxrKmAHH6zKjRcdEKMXHuvwFSGtBy8AnBrFp7xtp4yu55JHN4ZGwWP+FbNaB1ZThy7py
- Ed0ATNydI7SGk1QDs5pan/A3j8j4gptWk8uwiv1nXUwy6dvVLKG3dp1phrXt5wNrpT1o
- s6yQ==
-X-Gm-Message-State: ANoB5pmeiS2hI5ublYj/bxhV2nljrCYbVfKcJjPOfX1BRbtjgt1AZrs2
- nn6yHDxGBQKN/urij/fA7nHNHv+1Lvk=
-X-Google-Smtp-Source: AA0mqf70Xm5b73dwbCTmumj9PiXG1e+aKYb1a7npTh2VM+OaIt1Kg/9NwT12H0mJEQDQr8PRUFC8axppjXM=
+ h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+ :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+ :reply-to;
+ bh=syK6eF0z1YIhw5KnDfEJ/sqHR3QdYzGhfq3h/5i5Sas=;
+ b=TsLcEDAGeLyq4OeNX4+O4CBtNvorJoLSQjS5HeFL+Dv54ENdurJj4XU6ktAfDkOwuV
+ +PSzlm0hOYGETvcIq9596W3eHjwwfR1JUnIf1cddedP+PEpYF0o/eczG/r7BVexjbaGu
+ Z6Aibx9iTjTymjumXDviD8bM0eOzDHZFZ7Nv1mz95oE+gUwSKXP4aULNoiYManCidp2n
+ 4jIgYrGgGiaUhxRx3CbYxozSC0VUJNR1xFk+C8ddFZ4oC1sEohRbNl5qfvsoT9cWRAha
+ nIvAYNzYbhbjVQ+JUNqenX44CnBZ2QCLfN6sGq2kN3BziCfnX7izJIajHyhFylge09vl
+ 3Fow==
+X-Gm-Message-State: ANoB5pnB6bL/3Cfda58jqOeKPv3Ke9krnuE5NaKtbfa04PKc7k60bL3p
+ QNDCuN/JbyCy66/OCI1PQD6YG5xQAYU=
+X-Google-Smtp-Source: AA0mqf6GlYmz6ao1Ocazy6XnieuesyYU9e/N0B6T5bGw3DwYIfX3lPKm+B7r5ybTp9p3YaVUKLjnuY7j4Vk=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:f1c5:b0:189:39e4:c0ed with SMTP id
- e5-20020a170902f1c500b0018939e4c0edmr41790703plc.108.1669849824265; Wed, 30
- Nov 2022 15:10:24 -0800 (PST)
-Date: Wed, 30 Nov 2022 23:09:11 +0000
+ (user=seanjc job=sendgmr) by 2002:a05:690c:e8b:b0:3c9:bdbf:444d with SMTP id
+ cq11-20020a05690c0e8b00b003c9bdbf444dmr15670072ywb.56.1669849829390; Wed, 30
+ Nov 2022 15:10:29 -0800 (PST)
+Date: Wed, 30 Nov 2022 23:09:14 +0000
 In-Reply-To: <20221130230934.1014142-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221130230934.1014142-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221130230934.1014142-28-seanjc@google.com>
-Subject: [PATCH v2 27/50] KVM: s390: Do s390 specific init without bouncing
- through kvm_init()
+Message-ID: <20221130230934.1014142-31-seanjc@google.com>
+Subject: [PATCH v2 30/50] KVM: VMX: Make VMCS configuration/capabilities
+ structs read-only after init
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -107,53 +106,60 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-TW92ZSB0aGUgZ3V0cyBvZiBrdm1fYXJjaF9pbml0KCkgaW50byBhIG5ldyBoZWxwZXIsIF9fa3Zt
-X3MzOTBfaW5pdCgpLAphbmQgaW52b2tlIHRoZSBuZXcgaGVscGVyIGRpcmVjdGx5IGZyb20ga3Zt
-X3MzOTBfaW5pdCgpIGluc3RlYWQgb2YKYm91bmNpbmcgdGhyb3VnaCBrdm1faW5pdCgpLiAgSW52
-b2tpbmcga3ZtX2FyY2hfaW5pdCgpIGlzIHRoZSB2ZXJ5CmZpcnN0IGFjdGlvbiBwZXJmb3JtZWQg
-Ynkga3ZtX2luaXQoKSwgaS5lLiB0aGlzIGlzIGEgZ2xvcmlmaWVkIG5vcC4KCk1vdmluZyBzZXR1
-cCB0byBfX2t2bV9zMzkwX2luaXQoKSB3aWxsIGFsbG93IHRhZ2dpbmcgbW9yZSBmdW5jdGlvbnMg
-YXMKX19pbml0LCBhbmQgZW1wdHlpbmcga3ZtX2FyY2hfaW5pdCgpIHdpbGwgYWxsb3cgZHJvcHBp
-bmcgdGhlIGhvb2sKZW50aXJlbHkgb25jZSBhbGwgYXJjaGl0ZWN0dXJlIGltcGxlbWVudGF0aW9u
-cyBhcmUgbm9wcy4KCk5vIGZ1bmN0aW9uYWwgY2hhbmdlIGludGVuZGVkLgoKU2lnbmVkLW9mZi1i
-eTogU2VhbiBDaHJpc3RvcGhlcnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+ClJldmlld2VkLWJ5OiBF
-cmljIEZhcm1hbiA8ZmFybWFuQGxpbnV4LmlibS5jb20+ClJldmlld2VkLWJ5OiBQaGlsaXBwZSBN
-YXRoaWV1LURhdWTDqSA8cGhpbG1kQGxpbmFyby5vcmc+Ci0tLQogYXJjaC9zMzkwL2t2bS9rdm0t
-czM5MC5jIHwgMjkgKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0KIDEgZmlsZSBjaGFuZ2Vk
-LCAyNSBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FyY2gvczM5
-MC9rdm0va3ZtLXMzOTAuYyBiL2FyY2gvczM5MC9rdm0va3ZtLXMzOTAuYwppbmRleCA4MjllNmUw
-NDYwMDMuLjhjNGZjYWYyYmQzNiAxMDA2NDQKLS0tIGEvYXJjaC9zMzkwL2t2bS9rdm0tczM5MC5j
-CisrKyBiL2FyY2gvczM5MC9rdm0va3ZtLXMzOTAuYwpAQCAtNDY5LDcgKzQ2OSw3IEBAIHN0YXRp
-YyB2b2lkIGt2bV9zMzkwX2NwdV9mZWF0X2luaXQodm9pZCkKIAkgKi8KIH0KIAotaW50IGt2bV9h
-cmNoX2luaXQodm9pZCAqb3BhcXVlKQorc3RhdGljIGludCBfX2t2bV9zMzkwX2luaXQodm9pZCkK
-IHsKIAlpbnQgcmMgPSAtRU5PTUVNOwogCkBAIC01MjcsNyArNTI3LDcgQEAgaW50IGt2bV9hcmNo
-X2luaXQodm9pZCAqb3BhcXVlKQogCXJldHVybiByYzsKIH0KIAotdm9pZCBrdm1fYXJjaF9leGl0
-KHZvaWQpCitzdGF0aWMgdm9pZCBfX2t2bV9zMzkwX2V4aXQodm9pZCkKIHsKIAlnbWFwX3VucmVn
-aXN0ZXJfcHRlX25vdGlmaWVyKCZnbWFwX25vdGlmaWVyKTsKIAlnbWFwX3VucmVnaXN0ZXJfcHRl
-X25vdGlmaWVyKCZ2c2llX2dtYXBfbm90aWZpZXIpOwpAQCAtNTQxLDYgKzU0MSwxNiBAQCB2b2lk
-IGt2bV9hcmNoX2V4aXQodm9pZCkKIAlkZWJ1Z191bnJlZ2lzdGVyKGt2bV9zMzkwX2RiZl91dik7
-CiB9CiAKK2ludCBrdm1fYXJjaF9pbml0KHZvaWQgKm9wYXF1ZSkKK3sKKwlyZXR1cm4gMDsKK30K
-Kwordm9pZCBrdm1fYXJjaF9leGl0KHZvaWQpCit7CisKK30KKwogLyogU2VjdGlvbjogZGV2aWNl
-IHJlbGF0ZWQgKi8KIGxvbmcga3ZtX2FyY2hfZGV2X2lvY3RsKHN0cnVjdCBmaWxlICpmaWxwLAog
-CQkJdW5zaWduZWQgaW50IGlvY3RsLCB1bnNpZ25lZCBsb25nIGFyZykKQEAgLTU2OTYsNyArNTcw
-Niw3IEBAIHN0YXRpYyBpbmxpbmUgdW5zaWduZWQgbG9uZyBub25oeXBfbWFzayhpbnQgaSkKIAog
-c3RhdGljIGludCBfX2luaXQga3ZtX3MzOTBfaW5pdCh2b2lkKQogewotCWludCBpOworCWludCBp
-LCByOwogCiAJaWYgKCFzY2xwLmhhc19zaWVmMikgewogCQlwcl9pbmZvKCJTSUUgaXMgbm90IGF2
-YWlsYWJsZVxuIik7CkBAIC01NzEyLDEyICs1NzIyLDIzIEBAIHN0YXRpYyBpbnQgX19pbml0IGt2
-bV9zMzkwX2luaXQodm9pZCkKIAkJa3ZtX3MzOTBfZmFjX2Jhc2VbaV0gfD0KIAkJCXN0ZmxlX2Zh
-Y19saXN0W2ldICYgbm9uaHlwX21hc2soaSk7CiAKLQlyZXR1cm4ga3ZtX2luaXQoTlVMTCwgc2l6
-ZW9mKHN0cnVjdCBrdm1fdmNwdSksIDAsIFRISVNfTU9EVUxFKTsKKwlyID0gX19rdm1fczM5MF9p
-bml0KCk7CisJaWYgKHIpCisJCXJldHVybiByOworCisJciA9IGt2bV9pbml0KE5VTEwsIHNpemVv
-ZihzdHJ1Y3Qga3ZtX3ZjcHUpLCAwLCBUSElTX01PRFVMRSk7CisJaWYgKHIpIHsKKwkJX19rdm1f
-czM5MF9leGl0KCk7CisJCXJldHVybiByOworCX0KKwlyZXR1cm4gMDsKIH0KIAogc3RhdGljIHZv
-aWQgX19leGl0IGt2bV9zMzkwX2V4aXQodm9pZCkKIHsKIAlrdm1fZXhpdCgpOworCisJX19rdm1f
-czM5MF9leGl0KCk7CiB9CiAKIG1vZHVsZV9pbml0KGt2bV9zMzkwX2luaXQpOwotLSAKMi4zOC4x
-LjU4NC5nMGYzYzU1ZDRjMi1nb29nCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
-YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
-cm0K
+Tag vmcs_config and vmx_capability structs as __init, the canonical
+configuration is generated during hardware_setup() and must never be
+modified after that point.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/capabilities.h | 4 ++--
+ arch/x86/kvm/vmx/vmx.c          | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index cd2ac9536c99..45162c1bcd8f 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -66,13 +66,13 @@ struct vmcs_config {
+ 	u64 misc;
+ 	struct nested_vmx_msrs nested;
+ };
+-extern struct vmcs_config vmcs_config;
++extern struct vmcs_config vmcs_config __ro_after_init;
+ 
+ struct vmx_capability {
+ 	u32 ept;
+ 	u32 vpid;
+ };
+-extern struct vmx_capability vmx_capability;
++extern struct vmx_capability vmx_capability __ro_after_init;
+ 
+ static inline bool cpu_has_vmx_basic_inout(void)
+ {
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 76185a7a7ded..654d81f781da 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -488,8 +488,8 @@ static DEFINE_PER_CPU(struct list_head, loaded_vmcss_on_cpu);
+ static DECLARE_BITMAP(vmx_vpid_bitmap, VMX_NR_VPIDS);
+ static DEFINE_SPINLOCK(vmx_vpid_lock);
+ 
+-struct vmcs_config vmcs_config;
+-struct vmx_capability vmx_capability;
++struct vmcs_config vmcs_config __ro_after_init;
++struct vmx_capability vmx_capability __ro_after_init;
+ 
+ #define VMX_SEGMENT_FIELD(seg)					\
+ 	[VCPU_SREG_##seg] = {                                   \
+-- 
+2.38.1.584.g0f3c55d4c2-goog
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
