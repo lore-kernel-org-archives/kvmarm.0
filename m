@@ -2,73 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 372EBC4321E
-	for <kvmarm@archiver.kernel.org>; Wed, 30 Nov 2022 23:11:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B1FCC352A1
+	for <kvmarm@archiver.kernel.org>; Wed, 30 Nov 2022 23:11:16 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8E0D4B648;
-	Wed, 30 Nov 2022 18:11:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EE4A4B703;
+	Wed, 30 Nov 2022 18:11:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HFkVd0OUmi94; Wed, 30 Nov 2022 18:11:13 -0500 (EST)
+	with ESMTP id WlKj2i09Rzio; Wed, 30 Nov 2022 18:11:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08EF64B199;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EF614B743;
 	Wed, 30 Nov 2022 18:11:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC0264B3EA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:11:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BE604B199
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:11:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id shdeUP07udjH for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Nov 2022 18:11:03 -0500 (EST)
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
- [209.85.216.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D84F94B3DF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:54 -0500 (EST)
-Received: by mail-pj1-f74.google.com with SMTP id
- c10-20020a17090aa60a00b00212e91df6acso166935pjq.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 15:10:54 -0800 (PST)
+ with ESMTP id ezZ43JOZ82s4 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Nov 2022 18:11:05 -0500 (EST)
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
+ [209.85.214.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 526AD4B778
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:11:00 -0500 (EST)
+Received: by mail-pl1-f202.google.com with SMTP id
+ l7-20020a170902f68700b001890d921b36so19024768plg.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 15:11:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=pe1Kkjvkgy8PDlwU67QIc0+aecYuhy5E1AiDnDSceyU=;
- b=PtfTeuxltMAWC2r28YkEpC42/mHVqlVK9cbH6+HjFFnh8l3fnLdSvP/QyQcZjiH0fJ
- bAAP0a8yCSDYKaUdaH21SBJdNohuMejKBiChzsMvrmU4O6PwxgsyB11gpo8HZ1qpOnNj
- 0KjvQaXNCIfI/gT8JFhhVnnRkflSvNYyY4jp8svnC7Lan9kSJyrM/U9WEp+pXRwL/qXE
- QPH/u84NCMboZU39GSXi9Lj4fcmoi1xI+xbEkS68VCcV+znlZLd7AdaPCKmQ9tBL0Okt
- aG5KOLnbOknW0mumwkbW75rjZaylsDPJeJ0+up/D0vzJ/h6wHyc7pmAOmpfzYxQCQRg1
- XCJA==
+ bh=WLPEY1JyVUKovgrvfyqFU2AVSMCiclyJ+2DT9qhmJc8=;
+ b=D8YRDQ8ziUXauvBx+ARbm7TFIG8K7whjxR1q1N+cb/wQeXeKfhINWzhaARQHkNtQ4Q
+ /IkiRc+iCBcbWjdykCUjCkjfmBOkEmyXXZuqZ+gft9hkrhkkdMqanjtrg4ALTxlHbAys
+ XyZFW4WpGejE/dbUyxR5jHE+duvddzg3otAhdocqYEFE0BojJYcMyB6GyJtaNLxkOiTS
+ 6/HoCl1WQ1OC+nYzecGGIZN2fe3pbBkzvUu82a2MomMsooPz9zdPN9UTgK+KQHWv7U8y
+ 6le7VvNBnrJaTj35gdwc23Q+wETCAHgYr/YFnbP1YFNzrxVi7lomowBDPcjY/WZjR0nW
+ ur1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=pe1Kkjvkgy8PDlwU67QIc0+aecYuhy5E1AiDnDSceyU=;
- b=UuSzCN8MGxxL0u/Yd0Dg/3OMpYaQLnS1k5RdBTc50/oB6ZX2znvmTioE4u7P/ZhlFL
- Se7IED2BBTMtc6/RLY5/+wI/WTL2Q/daH0irONU2ow1HbUxZRpWKnWpt9bmnxcktmCxt
- FoJbHA6w46dit+jwZ2OgcftHO8xHHglweOSTkAMC1bmqvGqlvtcDpo487/X4Y+X4G1Gw
- JsZiO9zunX69c0bprPhbvENyNWSEu0p8cuesn/h1iPqI+k9u7ofLZIJrS/BdP+MKiuE9
- dSc+fmz9v9BKbpgqR+QhPoIoHcF8jfxhNK6xDG+rmVw9KiA0wzYoadE4iEsB4VntqY9c
- gAmQ==
-X-Gm-Message-State: ANoB5pllBei3k3s4HqiwMDpRjgUK2U69h1hr2nh4+RBDlw6ADuyYpirF
- QDZMQ56DFTGwjwaVVWE4whJETxKPigU=
-X-Google-Smtp-Source: AA0mqf4jOwpuCSGbn98bo3vks+P0Y1utEHPDSunPwfv+lom3uyEWpWcpvAjoSiednnXdmVtMG3ik4xfUbWU=
+ bh=WLPEY1JyVUKovgrvfyqFU2AVSMCiclyJ+2DT9qhmJc8=;
+ b=F028lf3qCcqHIvM/64SGxWuH1DPnOeIDGFzhMuQBGWdVix7ymNdlB41/GtsQ5QaImE
+ CgqUKd7/0VmIGBiZdiMa+urmra1LwzsQqMJZOuwsck4tyNRXA7kvq/4wo983wjYLDMDP
+ nW5AINK8OUvmlvlGPwR0SuAKLSypIkkWFGZtSV032GGUZItNTl3IVs5efui4sCql2gkp
+ tIC6n69lNwnqS8UVYIc2lsF5kVaZ6LuNcJLGQkMa/hH2tj/PQU7DVJxdO0eapOBMARIu
+ fkuoSSn+IfxAZaxVGCZ/kxyBU9X2Hp4PGBfGT9cC4FRQ7I78U6rAGU5Bixl5WxoDYww+
+ Rceg==
+X-Gm-Message-State: ANoB5plqWcApuUr/3MvwOPwZVuzK//6j0RkaKm53/jjvgvstS/vbGa5/
+ /C6ggjcwugfuag6pY3ctlkOXJPcxtks=
+X-Google-Smtp-Source: AA0mqf72C+cKZiLjk1SNO5cIqAlPKX7LUztOwBw+loP6Ps/JXv2MDFezzzhDDa6QyIWvD5qfSqI35S2Rp2o=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2c87:b0:562:e790:dfe0 with SMTP id
- ef7-20020a056a002c8700b00562e790dfe0mr65114033pfb.16.1669849853870; Wed, 30
- Nov 2022 15:10:53 -0800 (PST)
-Date: Wed, 30 Nov 2022 23:09:28 +0000
+ (user=seanjc job=sendgmr) by 2002:aa7:9ec2:0:b0:574:8995:eb7f with SMTP id
+ r2-20020aa79ec2000000b005748995eb7fmr33643125pfq.85.1669849859262; Wed, 30
+ Nov 2022 15:10:59 -0800 (PST)
+Date: Wed, 30 Nov 2022 23:09:31 +0000
 In-Reply-To: <20221130230934.1014142-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221130230934.1014142-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221130230934.1014142-45-seanjc@google.com>
-Subject: [PATCH v2 44/50] KVM: Drop kvm_count_lock and instead protect
- kvm_usage_count with kvm_lock
+Message-ID: <20221130230934.1014142-48-seanjc@google.com>
+Subject: [PATCH v2 47/50] KVM: Make hardware_enable_failed a local variable in
+ the "enable all" path
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -113,191 +113,134 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Drop kvm_count_lock and instead protect kvm_usage_count with kvm_lock now
-that KVM hooks CPU hotplug during the ONLINE phase, which can sleep.
-Previously, KVM hooked the STARTING phase, which is not allowed to sleep
-and thus could not take kvm_lock (a mutex).  This effectively allows the
-task that's initiating hardware enabling/disabling to preempted and/or
-migrated.
+Rework detecting hardware enabling errors to use a local variable in the
+"enable all" path to track whether or not enabling was successful across
+all CPUs.  Using a global variable complicates paths that enable hardware
+only on the current CPU, e.g. kvm_resume() and kvm_online_cpu().
 
-Note, the Documentation/virt/kvm/locking.rst statement that kvm_count_lock
-is "raw" because hardware enabling/disabling needs to be atomic with
-respect to migration is wrong on multiple fronts.  First, while regular
-spinlocks can be preempted, the task holding the lock cannot be migrated.
-Second, preventing migration is not required.  on_each_cpu() disables
-preemption, which ensures that cpus_hardware_enabled correctly reflects
-hardware state.  The task may be preempted/migrated between bumping
-kvm_usage_count and invoking on_each_cpu(), but that's perfectly ok as
-kvm_usage_count is still protected, e.g. other tasks that call
-hardware_enable_all() will be blocked until the preempted/migrated owner
-exits its critical section.
+Opportunistically add a WARN if hardware enabling fails during
+kvm_resume(), KVM is all kinds of hosed if CPU0 fails to enable hardware.
+The WARN is largely futile in the current code, as KVM BUG()s on spurious
+faults on VMX instructions, e.g. attempting to run a vCPU on CPU if
+hardware enabling fails will explode.
 
-KVM does have lockless accesses to kvm_usage_count in the suspend/resume
-flows, but those are safe because all tasks must be frozen prior to
-suspending CPUs, and a task cannot be frozen while it holds one or more
-locks (userspace tasks are frozen via a fake signal).
+  ------------[ cut here ]------------
+  kernel BUG at arch/x86/kvm/x86.c:508!
+  invalid opcode: 0000 [#1] SMP
+  CPU: 3 PID: 1009 Comm: CPU 4/KVM Not tainted 6.1.0-rc1+ #11
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  RIP: 0010:kvm_spurious_fault+0xa/0x10
+  Call Trace:
+   vmx_vcpu_load_vmcs+0x192/0x230 [kvm_intel]
+   vmx_vcpu_load+0x16/0x60 [kvm_intel]
+   kvm_arch_vcpu_load+0x32/0x1f0
+   vcpu_load+0x2f/0x40
+   kvm_arch_vcpu_ioctl_run+0x19/0x9d0
+   kvm_vcpu_ioctl+0x271/0x660
+   __x64_sys_ioctl+0x80/0xb0
+   do_syscall_64+0x2b/0x50
+   entry_SYSCALL_64_after_hwframe+0x46/0xb0
 
-Preemption doesn't need to be explicitly disabled in the hotplug path.
-The hotplug thread is pinned to the CPU that's being hotplugged, and KVM
-only cares about having a stable CPU, i.e. to ensure hardware is enabled
-on the correct CPU.  Lockep, i.e. check_preemption_disabled(), plays nice
-with this state too, as is_percpu_thread() is true for the hotplug thread.
+But, the WARN may provide a breadcrumb to understand what went awry, and
+someday KVM may fix one or both of those bugs, e.g. by finding a way to
+eat spurious faults no matter the context (easier said than done due to
+side effects of certain operations, e.g. Intel's VMCLEAR).
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Co-developed-by: Sean Christopherson <seanjc@google.com>
+[sean: rebase, WARN on failure in kvm_resume()]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- Documentation/virt/kvm/locking.rst | 19 ++++++++--------
- virt/kvm/kvm_main.c                | 36 ++++++++++++++++++++----------
- 2 files changed, 34 insertions(+), 21 deletions(-)
+ virt/kvm/kvm_main.c | 35 ++++++++++++++++-------------------
+ 1 file changed, 16 insertions(+), 19 deletions(-)
 
-diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
-index 132a9e5436e5..cd570e565522 100644
---- a/Documentation/virt/kvm/locking.rst
-+++ b/Documentation/virt/kvm/locking.rst
-@@ -9,6 +9,8 @@ KVM Lock Overview
- 
- The acquisition orders for mutexes are as follows:
- 
-+- cpus_read_lock() is taken outside kvm_lock
-+
- - kvm->lock is taken outside vcpu->mutex
- 
- - kvm->lock is taken outside kvm->slots_lock and kvm->irq_lock
-@@ -216,15 +218,10 @@ time it will be set using the Dirty tracking mechanism described above.
- :Type:		mutex
- :Arch:		any
- :Protects:	- vm_list
--
--``kvm_count_lock``
--^^^^^^^^^^^^^^^^^^
--
--:Type:		raw_spinlock_t
--:Arch:		any
--:Protects:	- hardware virtualization enable/disable
--:Comment:	'raw' because hardware enabling/disabling must be atomic /wrt
--		migration.
-+		- kvm_usage_count
-+		- hardware virtualization enable/disable
-+:Comment:	KVM also disables CPU hotplug via cpus_read_lock() during
-+		enable/disable.
- 
- ``kvm->mn_invalidate_lock``
- ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-@@ -288,3 +285,7 @@ time it will be set using the Dirty tracking mechanism described above.
- :Type:		mutex
- :Arch:		x86
- :Protects:	loading a vendor module (kvm_amd or kvm_intel)
-+:Comment:	Exists because using kvm_lock leads to deadlock.  cpu_hotplug_lock is
-+    taken outside of kvm_lock, e.g. in KVM's CPU online/offline callbacks, and
-+    many operations need to take cpu_hotplug_lock when loading a vendor module,
-+    e.g. updating static calls.
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index a46d61e9c053..6a8fb53b32f0 100644
+index c1e48c18e2d9..674a9dab5411 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -100,7 +100,6 @@ EXPORT_SYMBOL_GPL(halt_poll_ns_shrink);
-  */
+@@ -104,7 +104,6 @@ LIST_HEAD(vm_list);
  
- DEFINE_MUTEX(kvm_lock);
--static DEFINE_RAW_SPINLOCK(kvm_count_lock);
- LIST_HEAD(vm_list);
+ static DEFINE_PER_CPU(bool, hardware_enabled);
+ static int kvm_usage_count;
+-static atomic_t hardware_enable_failed;
  
- static cpumask_var_t cpus_hardware_enabled;
-@@ -5054,17 +5053,18 @@ static int kvm_online_cpu(unsigned int cpu)
- 	 * be enabled. Otherwise running VMs would encounter unrecoverable
+ static struct kmem_cache *kvm_vcpu_cache;
+ 
+@@ -5025,19 +5024,25 @@ static struct miscdevice kvm_dev = {
+ 	&kvm_chardev_ops,
+ };
+ 
+-static void hardware_enable_nolock(void *junk)
++static int __hardware_enable_nolock(void)
+ {
+ 	if (__this_cpu_read(hardware_enabled))
+-		return;
++		return 0;
+ 
+ 	if (kvm_arch_hardware_enable()) {
+-		atomic_inc(&hardware_enable_failed);
+ 		pr_info("kvm: enabling virtualization on CPU%d failed\n",
+ 			raw_smp_processor_id());
+-		return;
++		return -EIO;
+ 	}
+ 
+ 	__this_cpu_write(hardware_enabled, true);
++	return 0;
++}
++
++static void hardware_enable_nolock(void *failed)
++{
++	if (__hardware_enable_nolock())
++		atomic_inc(failed);
+ }
+ 
+ static int kvm_online_cpu(unsigned int cpu)
+@@ -5050,16 +5055,8 @@ static int kvm_online_cpu(unsigned int cpu)
  	 * errors when scheduled to this CPU.
  	 */
--	raw_spin_lock(&kvm_count_lock);
-+	mutex_lock(&kvm_lock);
- 	if (kvm_usage_count) {
- 		WARN_ON_ONCE(atomic_read(&hardware_enable_failed));
- 
- 		hardware_enable_nolock(NULL);
-+
- 		if (atomic_read(&hardware_enable_failed)) {
- 			atomic_set(&hardware_enable_failed, 0);
- 			ret = -EIO;
- 		}
- 	}
--	raw_spin_unlock(&kvm_count_lock);
-+	mutex_unlock(&kvm_lock);
+ 	mutex_lock(&kvm_lock);
+-	if (kvm_usage_count) {
+-		WARN_ON_ONCE(atomic_read(&hardware_enable_failed));
+-
+-		hardware_enable_nolock(NULL);
+-
+-		if (atomic_read(&hardware_enable_failed)) {
+-			atomic_set(&hardware_enable_failed, 0);
+-			ret = -EIO;
+-		}
+-	}
++	if (kvm_usage_count)
++		ret = __hardware_enable_nolock();
+ 	mutex_unlock(&kvm_lock);
  	return ret;
  }
+@@ -5107,6 +5104,7 @@ static void hardware_disable_all(void)
  
-@@ -5080,10 +5080,10 @@ static void hardware_disable_nolock(void *junk)
- 
- static int kvm_offline_cpu(unsigned int cpu)
+ static int hardware_enable_all(void)
  {
--	raw_spin_lock(&kvm_count_lock);
-+	mutex_lock(&kvm_lock);
- 	if (kvm_usage_count)
- 		hardware_disable_nolock(NULL);
--	raw_spin_unlock(&kvm_count_lock);
-+	mutex_unlock(&kvm_lock);
- 	return 0;
- }
++	atomic_t failed = ATOMIC_INIT(0);
+ 	int r = 0;
  
-@@ -5099,9 +5099,9 @@ static void hardware_disable_all_nolock(void)
- static void hardware_disable_all(void)
- {
- 	cpus_read_lock();
--	raw_spin_lock(&kvm_count_lock);
-+	mutex_lock(&kvm_lock);
- 	hardware_disable_all_nolock();
--	raw_spin_unlock(&kvm_count_lock);
-+	mutex_unlock(&kvm_lock);
- 	cpus_read_unlock();
- }
- 
-@@ -5118,7 +5118,7 @@ static int hardware_enable_all(void)
- 	 * enable hardware multiple times.
- 	 */
- 	cpus_read_lock();
--	raw_spin_lock(&kvm_count_lock);
-+	mutex_lock(&kvm_lock);
+ 	/*
+@@ -5122,10 +5120,9 @@ static int hardware_enable_all(void)
  
  	kvm_usage_count++;
  	if (kvm_usage_count == 1) {
-@@ -5131,7 +5131,7 @@ static int hardware_enable_all(void)
+-		atomic_set(&hardware_enable_failed, 0);
+-		on_each_cpu(hardware_enable_nolock, NULL, 1);
++		on_each_cpu(hardware_enable_nolock, &failed, 1);
+ 
+-		if (atomic_read(&hardware_enable_failed)) {
++		if (atomic_read(&failed)) {
+ 			hardware_disable_all_nolock();
+ 			r = -EBUSY;
  		}
- 	}
+@@ -5759,7 +5756,7 @@ static void kvm_resume(void)
+ 	lockdep_assert_irqs_disabled();
  
--	raw_spin_unlock(&kvm_count_lock);
-+	mutex_unlock(&kvm_lock);
- 	cpus_read_unlock();
- 
- 	return r;
-@@ -5737,6 +5737,17 @@ static void kvm_init_debug(void)
- 
- static int kvm_suspend(void)
- {
-+	/*
-+	 * Secondary CPUs and CPU hotplug are disabled across the suspend/resume
-+	 * callbacks, i.e. no need to acquire kvm_lock to ensure the usage count
-+	 * is stable.  Assert that kvm_lock is not held to ensure the system
-+	 * isn't suspended while KVM is enabling hardware.  Hardware enabling
-+	 * can be preempted, but the task cannot be frozen until it has dropped
-+	 * all locks (userspace tasks are frozen via a fake signal).
-+	 */
-+	lockdep_assert_not_held(&kvm_lock);
-+	lockdep_assert_irqs_disabled();
-+
  	if (kvm_usage_count)
- 		hardware_disable_nolock(NULL);
- 	return 0;
-@@ -5744,10 +5755,11 @@ static int kvm_suspend(void)
- 
- static void kvm_resume(void)
- {
--	if (kvm_usage_count) {
--		lockdep_assert_not_held(&kvm_count_lock);
-+	lockdep_assert_not_held(&kvm_lock);
-+	lockdep_assert_irqs_disabled();
-+
-+	if (kvm_usage_count)
- 		hardware_enable_nolock(NULL);
--	}
+-		hardware_enable_nolock(NULL);
++		WARN_ON_ONCE(__hardware_enable_nolock());
  }
  
  static struct syscore_ops kvm_syscore_ops = {
