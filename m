@@ -2,73 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EBF3C47088
-	for <kvmarm@archiver.kernel.org>; Wed, 30 Nov 2022 23:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F705C4321E
+	for <kvmarm@archiver.kernel.org>; Wed, 30 Nov 2022 23:11:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 188634B3E8;
-	Wed, 30 Nov 2022 18:11:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DE134B6EB;
+	Wed, 30 Nov 2022 18:11:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VQ5Ep4isPR9v; Wed, 30 Nov 2022 18:11:08 -0500 (EST)
+	with ESMTP id v-yEre9etXtO; Wed, 30 Nov 2022 18:11:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A44774B754;
-	Wed, 30 Nov 2022 18:11:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1D514B796;
+	Wed, 30 Nov 2022 18:11:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 742F64B199
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:11:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D49E4B636
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:11:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I6k20Zd7yx3A for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Nov 2022 18:10:59 -0500 (EST)
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
- [209.85.214.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 29D964B69D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:53 -0500 (EST)
-Received: by mail-pl1-f201.google.com with SMTP id
- u10-20020a17090341ca00b001897a151311so14114570ple.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 15:10:53 -0800 (PST)
+ with ESMTP id O8suNBITeNlS for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Nov 2022 18:11:03 -0500 (EST)
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
+ [209.85.216.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B70B94B73E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:56 -0500 (EST)
+Received: by mail-pj1-f74.google.com with SMTP id
+ w2-20020a17090a8a0200b002119ea856edso3789451pjn.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 15:10:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=X0tmq9TjsMbdzf016NYPEZWLDrtJgEerkZwlPByjvHs=;
- b=ffiAil8tYfi3nQXQblraVPD6jbdbOOCVG7uQkkKJrYkDL25R/TkQAeFRDogqa/QMMv
- 6wZOWt9R/eeSPWTlpWV3IYmrtl04WJOPJAhS7DhGuKTgLTJnehBcyBsLWlgRsCVFi/Ix
- ksxZjkBOqqqo9hOr9qKhrYgS8WLlfTE4UM6Vkkhhf880kZVvVEdvLhl4X0FaFYBb/6vC
- 1lACz1AHExA2AbJQILx7vCyuTDoL44EAFEV/X6CifJwvfMkGg0ai47n8Yg94c4IO+cHQ
- jlRTeSXfVKpq0j3GPFNIBJZpOCvznvIZyM5DfqXmXJnRlhyCma48IFWCHmjS0A3NCAbs
- hdMw==
+ bh=feUvU0TLPbMF/Oljy4/vBwowA1Kv3aShJc2OjvbIIRg=;
+ b=XCz6nxyHGgxyXLRmcMfZAC0EtbhsJIztANoSGpUb1GyxR0U89bx0wlthHvMKMPI0ma
+ xTY/WZ7Fnj2wVoHKg3Vrqyc1suf4XCMLsHgGlIH3pS8IMgIqbDNn8Omsv3AOuHpjB+t4
+ oJgjvYZQ+8fVUpIqLH/jYWFcOCZ826P4/OUhmmvNmOkV9CXcwA4ogZ7MlttInnuYA3IQ
+ qZwoJRmoUlDf0X9EXI/DaNlV615GX7fyKck9fxTOKS6fYcbuWk1qBQZKq1fDAhiXHC8W
+ oTikmOFUnyHawi/4Gg7a9PphvtU6rlpDzwiPDXnAHDvGYvOqtwCfNDpZ92x3xkT78SFn
+ sWLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=X0tmq9TjsMbdzf016NYPEZWLDrtJgEerkZwlPByjvHs=;
- b=h7SKppmI3AZq1JnoYUCOQnMZ0xUIYeByHH879a8sDsy/0N6oW53t0o9gRyrpqn9CV9
- ateiDTuRjuGFBFeONL2ZjDXkdifwtqytPC5qEhzrFFwUwwyY5QBZYVtDF0B9os6n08pV
- acu0xCZa8kelEwrYZjnxFhoIw7FaXQ5W82iAxk1O/sQiA8PkHPojAMGLV0rtLupP2jux
- KhK7Ya/fDdLUOfo+5rOMNFaQLkHcJsWO3UM1AMbfy2FiHtvkMUJmWIUbrjMv9hkcib1d
- kIKSGKU5lc21OGkxd675TxcXmUC6BS+Ow/iIAsZEsEfcKaSoQchHcRhv9Sy3BWC+pINh
- 6Nvg==
-X-Gm-Message-State: ANoB5pmt8OHqTjAtcWP6XcXllq4qyMsEYDn3cPTY3fFEJH37nD1GCY5t
- pISJ4JyXC3tWcJLyO145i1UXV+XKmAQ=
-X-Google-Smtp-Source: AA0mqf4tYdOmumtBwzOsj2b757evhXiqjnmJBxVweHABwP7YhX6XXp+28OecLtWsiEbLYyMEiAceUWRYidE=
+ bh=feUvU0TLPbMF/Oljy4/vBwowA1Kv3aShJc2OjvbIIRg=;
+ b=4ZPgyBrPC0JWhQxGXg7g5rKRzX1wCmZJguyFSZYi5U0FAhmp+HQe7xSY9sFORuZNeh
+ 0By4q4WuIhMDA1c+I+8Izv5tyuOxNj1Sz0ptnq/DBNt8A6aV1nSFcHa0xQNzqohnDtTn
+ +UgISz9ruQmwTt2V7qiDPwOvvHWOlhy+UeBPPJH86jTpvAEBDIGpcoOcG+Gy1q78Z6sk
+ pXHdTU7V1OUxYHjawSy5Cmdc552gEhDYDZZ54UlDWQF4EfNqmbH5pw4I8XXTtZOoACKi
+ g4U9Rn8s3pY6Aosff8+ubuTfucGixhyKqz7IuMc1u+hH2bphs6u25K8UXzmvFku2yvhs
+ o/yA==
+X-Gm-Message-State: ANoB5plGgdzZ5A1ZJXaPeGLRRjFPdzRbOxSQEdhGJYZuDciyEhqoPpgE
+ tB5stZYnPInZyQOzjj7A9eXInYrOp3I=
+X-Google-Smtp-Source: AA0mqf7uQUQw4xuwzzaB6cJbzF2qtgtcI8g7o82e8li02vBC7sSOacIeo1pVvgKatFPeZtczncyD3ypFXvs=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:8487:0:b0:56c:3bb4:28a8 with SMTP id
- u7-20020aa78487000000b0056c3bb428a8mr44633084pfn.83.1669849852226; Wed, 30
- Nov 2022 15:10:52 -0800 (PST)
-Date: Wed, 30 Nov 2022 23:09:27 +0000
+ (user=seanjc job=sendgmr) by 2002:a17:903:268d:b0:189:a50d:2a23 with SMTP id
+ jf13-20020a170903268d00b00189a50d2a23mr7180858plb.32.1669849855698; Wed, 30
+ Nov 2022 15:10:55 -0800 (PST)
+Date: Wed, 30 Nov 2022 23:09:29 +0000
 In-Reply-To: <20221130230934.1014142-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221130230934.1014142-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221130230934.1014142-44-seanjc@google.com>
-Subject: [PATCH v2 43/50] KVM: Ensure CPU is stable during low level hardware
- enable/disable
+Message-ID: <20221130230934.1014142-46-seanjc@google.com>
+Subject: [PATCH v2 45/50] KVM: Remove on_each_cpu(hardware_disable_nolock) in
+ kvm_exit()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -111,38 +111,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Use the non-raw smp_processor_id() in the low hardware enable/disable
-helpers as KVM absolutely relies on the CPU being stable, e.g. KVM would
-end up with incorrect state if the task were migrated between accessing
-cpus_hardware_enabled and actually enabling/disabling hardware.
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
+Drop the superfluous invocation of hardware_disable_nolock() during
+kvm_exit(), as it's nothing more than a glorified nop.
+
+KVM automatically disables hardware on all CPUs when the last VM is
+destroyed, and kvm_exit() cannot be called until the last VM goes
+away as the calling module is pinned by an elevated refcount of the fops
+associated with /dev/kvm.  This holds true even on x86, where the caller
+of kvm_exit() is not kvm.ko, but is instead a dependent module, kvm_amd.ko
+or kvm_intel.ko, as kvm_chardev_ops.owner is set to the module that calls
+kvm_init(), not hardcoded to the base kvm.ko module.
+
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+[sean: rework changelog]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/kvm/kvm_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ virt/kvm/kvm_main.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index d985b24c423b..a46d61e9c053 100644
+index 6a8fb53b32f0..a27ded004644 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -5028,7 +5028,7 @@ static struct miscdevice kvm_dev = {
- 
- static void hardware_enable_nolock(void *junk)
- {
--	int cpu = raw_smp_processor_id();
-+	int cpu = smp_processor_id();
- 	int r;
- 
- 	if (cpumask_test_cpu(cpu, cpus_hardware_enabled))
-@@ -5070,7 +5070,7 @@ static int kvm_online_cpu(unsigned int cpu)
- 
- static void hardware_disable_nolock(void *junk)
- {
--	int cpu = raw_smp_processor_id();
-+	int cpu = smp_processor_id();
- 
- 	if (!cpumask_test_cpu(cpu, cpus_hardware_enabled))
- 		return;
+@@ -5981,7 +5981,6 @@ void kvm_exit(void)
+ 	unregister_syscore_ops(&kvm_syscore_ops);
+ 	unregister_reboot_notifier(&kvm_reboot_notifier);
+ 	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_ONLINE);
+-	on_each_cpu(hardware_disable_nolock, NULL, 1);
+ 	kvm_irqfd_exit();
+ 	free_cpumask_var(cpus_hardware_enabled);
+ }
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
