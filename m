@@ -1,42 +1,42 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17846D516
-	for <kvmarm@lists.linux.dev>; Wed, 30 Nov 2022 23:09:43 +0000 (UTC)
-Received: by mail-pj1-f74.google.com with SMTP id pi2-20020a17090b1e4200b0021834843687so3835937pjb.0
-        for <kvmarm@lists.linux.dev>; Wed, 30 Nov 2022 15:09:43 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9723D516
+	for <kvmarm@lists.linux.dev>; Wed, 30 Nov 2022 23:09:44 +0000 (UTC)
+Received: by mail-pf1-f201.google.com with SMTP id y23-20020aa78057000000b00574277cb386so162986pfm.16
+        for <kvmarm@lists.linux.dev>; Wed, 30 Nov 2022 15:09:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=kawSfeiAQQiBaQdAeCS12WX5tLp3dBMfNzsm6MZMVDM=;
-        b=FuPyDk5HrtCF5qsfcl43lYyhvkgSpcbbsM90YW/3vO3HUB6l7+MBsntxd3/q8gIxoj
-         rdKuy8tsa4qXKw46UszgYe7A8/TdMyQmeCoF+YYW9dIEj0dViDiBTtgxBOSRXDRa96/f
-         KliWaD9EYRQHMZlNfki4Q8T7/+zZVlwydZoPGCadpemWGxJB7IFN8q6Q93mpMbE0d+Tv
-         Gf+jRZICWLnpxC3g1kbOTurVfxPkN8C+UYy/6R3UIEQErk2k3Er1Jkq5UmKt+OcBkjXI
-         DwaZ1o75hI5oxdTAgGbi6NECIv+ulAm+Z4MzH2VhP/t3nIxcOzScSD0PtVDNJOMhMUZG
-         LZUw==
+        bh=E8JVGgtDpa1adQbcFKdjF0h5x+zc5eW3OzNDv17W+I0=;
+        b=DS5tl3JZt5ENZ41z8LWoU7l/LLAZg0bKxr9NB64mArQBR7Z4xQ54gwA8E1Foi7ucUI
+         WLpYLHet6DIopxUbH10y1vLmghI4adUhheVz2l+sfpolKRTogMb2+JXMX5kC+1I07F/z
+         xq02cwtlNoKx8xWnfdsY/DFfLTDmRaQZCHvCCDtocOPTXWGXE+6cy/K/TTmkXZECJ1T5
+         UPbbMU++Q0JdnDp6PdsJU4We1R6snVfDObMmpUXwD7SotdnLb3fRUaZHvapd0uWqxFq9
+         B+vmtfzyaE3KTk8T/zN+WUL7QMUukMAgZHVrZIfnA64+0ySQ/W2zwvQkWpKfKL7fFmQx
+         zvng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=kawSfeiAQQiBaQdAeCS12WX5tLp3dBMfNzsm6MZMVDM=;
-        b=AiVpLKfl+QCEgbOUiYI3l4nxPt4Z2YFk2soTtanuhmggj/ukW1EY6rgIshK0y2fizq
-         QVO5OPwqC0X2RZC9AoB4GgcGaB4luBgRzAqYcB1Frayg9id04lIJjCWSXDmvoyyDmOAU
-         2jF7fUymkne+S8h3GtJVdKpzL0BQKsH2LToFbcChXaxESWZ9J0ZVBzdabJWhhLuHHh9o
-         4hyuAnxSGcYukpE2bEo87SLfNEyaPXdozReky11qBTSshCoKMVp5OPmQx+n60yNL3fzt
-         1cIYYA5UIGwz4a2ggMkBf+Xurt12xyIWoRXQfvA/W/QfgHn2qU7aEAhCc+dMqekd6nqa
-         ouQQ==
-X-Gm-Message-State: ANoB5pmdoWWOyUlZjL+ehFEXmvfl7lv8+c6vL8FmXXUYfwigWptO0rtV
-	wJqsVfjhU/WumMw2welW/l+XnN6MkPY=
-X-Google-Smtp-Source: AA0mqf6wj4HWNV+5cP60rIX6ofADo44xPOiR/JXYf/UmKFCdE5+oZoM8ajSF5PuZFF+kh92E+ZGoi4VvFjg=
+        bh=E8JVGgtDpa1adQbcFKdjF0h5x+zc5eW3OzNDv17W+I0=;
+        b=qLpOfRHYrBM3RsxRjC9QYncyl1h6axl5J7Tls25Fp47ATFssx0n7Xfd3A/kg0M9UKK
+         k3Nz6eJ0rlCEXmxLNBvdHiuWmF6UW3qVAC6pgXYw7yX0oNoGce0xd+nl6PU7oOAVYLnm
+         mab0NM8DBwSRgecAoM7WAay34FuhSh9eKyfBJXzTNbhjjvushCnTWoaWtja8mDhwDEyw
+         0MBwtOmUi7nVpd2pg9UbGYCUAc9KKMBg+FlbO2B9TuV3a1SxKitqypzu6E9O4dE+ISru
+         huyC91JE9WDuXBGYQzJlb8IYR/yYrcTKK8ml8Oxt8aqHy1BdpsCDv1+zCwU6xyDsrkhp
+         pTZw==
+X-Gm-Message-State: ANoB5pnoiThA+hfGQYPkXsi46Qx7Ayz0Q0npmwpOiWwBRP9swyD+oEn9
+	vnI/4LxpfHDZnrUw50yP1elUQmzCV5s=
+X-Google-Smtp-Source: AA0mqf6Q0BFR2rWNLKbL3PfSbJ45azh4M9K0FqaT09LmFusT3iMI987lBa2MWHLHJI40i8Y0hHfQV/M7a6M=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:82c7:0:b0:575:398:468c with SMTP id
- w190-20020a6282c7000000b005750398468cmr21072041pfd.23.1669849782508; Wed, 30
- Nov 2022 15:09:42 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:e887:b0:189:1fcf:6ceb with SMTP id
+ w7-20020a170902e88700b001891fcf6cebmr43466277plg.45.1669849784316; Wed, 30
+ Nov 2022 15:09:44 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Wed, 30 Nov 2022 23:08:47 +0000
+Date: Wed, 30 Nov 2022 23:08:48 +0000
 In-Reply-To: <20221130230934.1014142-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -46,9 +46,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20221130230934.1014142-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221130230934.1014142-4-seanjc@google.com>
-Subject: [PATCH v2 03/50] KVM: Allocate cpus_hardware_enabled after arch
- hardware setup
+Message-ID: <20221130230934.1014142-5-seanjc@google.com>
+Subject: [PATCH v2 04/50] KVM: Teardown VFIO ops earlier in kvm_exit()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Huacai Chen <chenhuacai@kernel.org>, 
@@ -72,72 +71,48 @@ Cc: James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.co
 	Michael Ellerman <mpe@ellerman.id.au>, Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>, 
 	Thomas Gleixner <tglx@linutronix.de>
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221130230847.jWSVDfVMReGoGkyk-iBFuXbJCJB_kaQQgOFcaxLnqoo@z>
+Message-ID: <20221130230848.9SL6fQYmONXq14vsEl9pSSQueSDlY8rc9MCnk7nciTw@z>
 
-Allocate cpus_hardware_enabled after arch hardware setup so that arch
-"init" and "hardware setup" are called back-to-back and thus can be
-combined in a future patch.  cpus_hardware_enabled is never used before
-kvm_create_vm(), i.e. doesn't have a dependency with hardware setup and
-only needs to be allocated before /dev/kvm is exposed to userspace.
+Move the call to kvm_vfio_ops_exit() further up kvm_exit() to try and
+bring some amount of symmetry to the setup order in kvm_init(), and more
+importantly so that the arch hooks are invoked dead last by kvm_exit().
+This will allow arch code to move away from the arch hooks without any
+change in ordering between arch code and common code in kvm_exit().
 
-Free the object before the arch hooks are invoked to maintain symmetry,
-and so that arch code can move away from the hooks without having to
-worry about ordering changes.
+That kvm_vfio_ops_exit() is called last appears to be 100% arbitrary.  It
+was bolted on after the fact by commit 571ee1b68598 ("kvm: vfio: fix
+unregister kvm_device_ops of vfio").  The nullified kvm_device_ops_table
+is also local to kvm_main.c and is used only when there are active VMs,
+so unless arch code is doing something truly bizarre, nullifying the
+table earlier in kvm_exit() is little more than a nop.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
-Reviewed-by: Yuan Yao <yuan.yao@intel.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
 ---
- virt/kvm/kvm_main.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ virt/kvm/kvm_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 43e2e4f38151..ded88ad6c2d8 100644
+index ded88ad6c2d8..988f7d92db2e 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -5862,15 +5862,15 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
- 	if (r)
- 		return r;
- 
-+	r = kvm_arch_hardware_setup(opaque);
-+	if (r < 0)
-+		goto err_hw_setup;
-+
- 	if (!zalloc_cpumask_var(&cpus_hardware_enabled, GFP_KERNEL)) {
- 		r = -ENOMEM;
- 		goto err_hw_enabled;
- 	}
- 
--	r = kvm_arch_hardware_setup(opaque);
--	if (r < 0)
--		goto out_free_1;
--
- 	c.ret = &r;
- 	c.opaque = opaque;
- 	for_each_online_cpu(cpu) {
-@@ -5956,10 +5956,10 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+@@ -5980,6 +5980,7 @@ void kvm_exit(void)
+ 	for_each_possible_cpu(cpu)
+ 		free_cpumask_var(per_cpu(cpu_kick_mask, cpu));
+ 	kmem_cache_destroy(kvm_vcpu_cache);
++	kvm_vfio_ops_exit();
+ 	kvm_async_pf_deinit();
+ 	unregister_syscore_ops(&kvm_syscore_ops);
  	unregister_reboot_notifier(&kvm_reboot_notifier);
- 	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
- out_free_2:
--	kvm_arch_hardware_unsetup();
--out_free_1:
+@@ -5989,7 +5990,6 @@ void kvm_exit(void)
  	free_cpumask_var(cpus_hardware_enabled);
- err_hw_enabled:
-+	kvm_arch_hardware_unsetup();
-+err_hw_setup:
- 	kvm_arch_exit();
- 	return r;
- }
-@@ -5986,9 +5986,9 @@ void kvm_exit(void)
- 	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
- 	on_each_cpu(hardware_disable_nolock, NULL, 1);
- 	kvm_irqfd_exit();
-+	free_cpumask_var(cpus_hardware_enabled);
  	kvm_arch_hardware_unsetup();
  	kvm_arch_exit();
--	free_cpumask_var(cpus_hardware_enabled);
- 	kvm_vfio_ops_exit();
+-	kvm_vfio_ops_exit();
  }
  EXPORT_SYMBOL_GPL(kvm_exit);
+ 
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
