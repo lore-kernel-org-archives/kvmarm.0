@@ -2,72 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F405C47088
-	for <kvmarm@archiver.kernel.org>; Wed, 30 Nov 2022 23:10:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA45C4321E
+	for <kvmarm@archiver.kernel.org>; Wed, 30 Nov 2022 23:09:58 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 03743403A6;
-	Wed, 30 Nov 2022 18:10:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B728F4B0B9;
+	Wed, 30 Nov 2022 18:09:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vNHA5by5A8Ct; Wed, 30 Nov 2022 18:09:58 -0500 (EST)
+	with ESMTP id ZvGbZFWuaAsj; Wed, 30 Nov 2022 18:09:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 219D34B286;
-	Wed, 30 Nov 2022 18:09:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EBD404B3E3;
+	Wed, 30 Nov 2022 18:09:54 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 59E974A0DA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:09:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D4BC44A0DA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:09:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1R+DWq-GX-95 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Nov 2022 18:09:53 -0500 (EST)
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
- [209.85.210.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61B4B43C6F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:09:52 -0500 (EST)
-Received: by mail-pf1-f201.google.com with SMTP id
- v23-20020aa78097000000b005748c087db1so207221pff.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 15:09:52 -0800 (PST)
+ with ESMTP id 5mInj7jXhFaX for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Nov 2022 18:09:50 -0500 (EST)
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
+ [209.85.216.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0270E4B2FF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:09:50 -0500 (EST)
+Received: by mail-pj1-f73.google.com with SMTP id
+ ep17-20020a17090ae65100b00219702c495cso178948pjb.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 15:09:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=esfNuzSAi/jMqEjqcJNo6bIy6sJwzrzidHm2yeELoEE=;
- b=RHjA8cOArqP2LyeykqmAhEEzgihArYtCw4eZPNsGjabk6EQQDpguK3dzIBeh0ut2C7
- PPDN/VqxLVg8WLs42m8fnp/J4Rw/PqEx2bEWgR/G8bafWlBBHGcYbV6d5pPiGmkb2pzW
- 9MQwIZ/R/X2SvMhJdYca9rHP411MfEi5HhKen+9TmeridULcN9q+xVvOizSgO5aHdLNB
- OfUR1PLANgTJwrCH2LfR2DV1ZiL4M/R+MN/04sld9hh0pGP7jhvIgwq004EtxJ2aer+5
- G+wvXxp+5g9bTFYHRVhBvg6+cjfBRSwHIVy9QtEk1wovK+KCS0HL1G3XNYXWGocr8Ait
- 87XA==
+ bh=g1stMgF+unVz+1wniuTG4sBb8H6V2BLTtzNNraJ+L2g=;
+ b=Qu2Gj2AQMSdn5ynZ5uRxUGFqbeHyl2Ed5IXeJ2cS9b8RyxUmxP+UPpwD4AXe0Ud2wQ
+ GLE5fpqUn5yzNfMmkf1QqZp6YlOWxyIHZvzY2PTHyliCph5U92Ri7VRil5QNW2hbhlro
+ eqLV3fzPciK364AgPpAWure/pils1YFI032lNHB5vYzqLYNGO/HTaCFu4SnHfGbx0IJL
+ YzVxc9OdZl6JuUto8jah8ZZUeY5Nlgmu8NeURLW2FfXGR4hkpIETaC3DDgh3Y+VWw9aT
+ wnj+XTBDiyARsefNZ1R+h94oYnfXDMDFEaIxFxgvi52xPOyDG50iBdiNI6MjV0enlZkj
+ ltag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=esfNuzSAi/jMqEjqcJNo6bIy6sJwzrzidHm2yeELoEE=;
- b=kkomn7tcQpo8eodxs4AzBKLDCjiaLWL2MtnRt2oCwRcAW2w6tRkvDr9VtL4TJqZ9XF
- OcUj7j8BomTTrMFtXDzef+tFKEiL7Hvj8+ggZ2TiL7HZwOXW0MGIn7jHWIwuVNJy4vyj
- w2uIs7PMIxoYqZRNvVYwcl6Ai5qZ1IWbC+XEkzyO33uF4Eq9Tr2o4+rbNZwGGoUBXiRc
- MTQCPzWg/emVHSKAcna1yqtFZR63wo0GmGUaMxvS5z+fgbbCgRtcOC0E7Npnxl397LVz
- EtZbIanlI3l50VYL+Y6NleDN/r6MPoyXcyiFEZcxVB1ir+glpa9dvFlAoG58syjl4xNq
- tbuw==
-X-Gm-Message-State: ANoB5pkqigLQ4xQqxrGut8MWoqZ5g2hyizNUKsX/amdDmG53xBPOl8K6
- RuPK5V2FEZieH3U8cBCWrKYaR5RZGz0=
-X-Google-Smtp-Source: AA0mqf6VCCRS4k0TLjDpnoby5i4cra48ljK8Gw56qbYi0tKiUNfM4Har78Bt4viDX2riIS5uhRMjlWJGOTo=
+ bh=g1stMgF+unVz+1wniuTG4sBb8H6V2BLTtzNNraJ+L2g=;
+ b=y7dwViV7Qt44nJ5U/CVx7DsjEnS+8wCFTcsNQhI4FIhpzjZoO9esjh2MPo3od8FqkZ
+ UYWYREZz0l+n2GKvsZYcKZ0x4NV6/iyPX5bTwf0CZevxqPsWbtLFjwdeYcGyrht7ALDN
+ IrqCxQk1PYS52JcYThwXhGhWOzk+xpyWuEqTJSW34f2deL12fI+isIf1WzCw+Z9N4XAs
+ BXu9BIxTrUGcxX/RxkgGKw5zpL07zO0W5vvyM8bh3kzD6tfFVGwg1r3d0oOIwymFdO+U
+ X/++KCjbtRJOUdi5ozXUGqn3u/tzjwf2h8A9JWVdL5tLi27E0heHiblemgyfOix0yANA
+ swow==
+X-Gm-Message-State: ANoB5pm5L4zWYxomS2BIW05YYOjHRyTedTlUfn5aHRlALvkB+1S5W6sg
+ RVblQec6n6L9Ni9UBvb/DuVRGRl1LHA=
+X-Google-Smtp-Source: AA0mqf66P6cZGe+dew2XFgeia1skilH4V8u9knhT3C8CLrninF2nDNQmOIJQuI+E9fZev+1MNEWaGc+MIJs=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:238b:b0:219:7904:6de with SMTP id
- mr11-20020a17090b238b00b00219790406demr111983pjb.136.1669849791256; Wed, 30
- Nov 2022 15:09:51 -0800 (PST)
-Date: Wed, 30 Nov 2022 23:08:52 +0000
+ (user=seanjc job=sendgmr) by 2002:a17:902:9a47:b0:189:acf9:87af with SMTP id
+ x7-20020a1709029a4700b00189acf987afmr3514511plv.160.1669849789646; Wed, 30
+ Nov 2022 15:09:49 -0800 (PST)
+Date: Wed, 30 Nov 2022 23:08:51 +0000
 In-Reply-To: <20221130230934.1014142-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221130230934.1014142-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221130230934.1014142-9-seanjc@google.com>
-Subject: [PATCH v2 08/50] KVM: x86: Move hardware setup/unsetup to init/exit
+Message-ID: <20221130230934.1014142-8-seanjc@google.com>
+Subject: [PATCH v2 07/50] KVM: x86: Do timer initialization after XCR0
+ configuration
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -110,203 +111,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Now that kvm_arch_hardware_setup() is called immediately after
-kvm_arch_init(), fold the guts of kvm_arch_hardware_(un)setup() into
-kvm_arch_{init,exit}() as a step towards dropping one of the hooks.
-
-To avoid having to unwind various setup, e.g registration of several
-notifiers, slot in the vendor hardware setup before the registration of
-said notifiers and callbacks.  Introducing a functional change while
-moving code is less than ideal, but the alternative is adding a pile of
-unwinding code, which is much more error prone, e.g. several attempts to
-move the setup code verbatim all introduced bugs.
-
-Add a comment to document that kvm_ops_update() is effectively the point
-of no return, e.g. it sets the kvm_x86_ops.hardware_enable canary and so
-needs to be unwound.
+Move kvm_arch_init()'s call to kvm_timer_init() down a few lines below
+the XCR0 configuration code.  A future patch will move hardware setup
+into kvm_arch_init() and slot in vendor hardware setup before the call
+to kvm_timer_init() so that timer initialization (among other stuff)
+doesn't need to be unwound if vendor setup fails.  XCR0 setup on the
+other hand needs to happen before vendor hardware setup.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 121 +++++++++++++++++++++++----------------------
- 1 file changed, 63 insertions(+), 58 deletions(-)
+ arch/x86/kvm/x86.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index a873618564cd..fe5f2e49b5eb 100644
+index f18f579ebde8..a873618564cd 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -9258,6 +9258,24 @@ static struct notifier_block pvclock_gtod_notifier = {
- };
- #endif
+@@ -9326,13 +9326,13 @@ int kvm_arch_init(void *opaque)
+ 	if (r)
+ 		goto out_free_percpu;
  
-+static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
-+{
-+	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
-+
-+#define __KVM_X86_OP(func) \
-+	static_call_update(kvm_x86_##func, kvm_x86_ops.func);
-+#define KVM_X86_OP(func) \
-+	WARN_ON(!kvm_x86_ops.func); __KVM_X86_OP(func)
-+#define KVM_X86_OP_OPTIONAL __KVM_X86_OP
-+#define KVM_X86_OP_OPTIONAL_RET0(func) \
-+	static_call_update(kvm_x86_##func, (void *)kvm_x86_ops.func ? : \
-+					   (void *)__static_call_return0);
-+#include <asm/kvm-x86-ops.h>
-+#undef __KVM_X86_OP
-+
-+	kvm_pmu_ops_update(ops->pmu_ops);
-+}
-+
- int kvm_arch_init(void *opaque)
- {
- 	struct kvm_x86_init_ops *ops = opaque;
-@@ -9331,6 +9349,24 @@ int kvm_arch_init(void *opaque)
+-	kvm_timer_init();
+-
+ 	if (boot_cpu_has(X86_FEATURE_XSAVE)) {
+ 		host_xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
  		kvm_caps.supported_xcr0 = host_xcr0 & KVM_SUPPORTED_XCR0;
  	}
  
-+	rdmsrl_safe(MSR_EFER, &host_efer);
++	kvm_timer_init();
 +
-+	if (boot_cpu_has(X86_FEATURE_XSAVES))
-+		rdmsrl(MSR_IA32_XSS, host_xss);
-+
-+	kvm_init_pmu_capability();
-+
-+	r = ops->hardware_setup();
-+	if (r != 0)
-+		goto out_mmu_exit;
-+
-+	/*
-+	 * Point of no return!  DO NOT add error paths below this point unless
-+	 * absolutely necessary, as most operations from this point forward
-+	 * require unwinding.
-+	 */
-+	kvm_ops_update(ops);
-+
- 	kvm_timer_init();
- 
  	if (pi_inject_timer == -1)
-@@ -9342,8 +9378,32 @@ int kvm_arch_init(void *opaque)
- 		set_hv_tscchange_cb(kvm_hyperv_tsc_notifier);
- #endif
- 
-+	kvm_register_perf_callbacks(ops->handle_intel_pt_intr);
-+
-+	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
-+		kvm_caps.supported_xss = 0;
-+
-+#define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
-+	cr4_reserved_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
-+#undef __kvm_cpu_cap_has
-+
-+	if (kvm_caps.has_tsc_control) {
-+		/*
-+		 * Make sure the user can only configure tsc_khz values that
-+		 * fit into a signed integer.
-+		 * A min value is not calculated because it will always
-+		 * be 1 on all machines.
-+		 */
-+		u64 max = min(0x7fffffffULL,
-+			      __scale_tsc(kvm_caps.max_tsc_scaling_ratio, tsc_khz));
-+		kvm_caps.max_guest_tsc_khz = max;
-+	}
-+	kvm_caps.default_tsc_scaling_ratio = 1ULL << kvm_caps.tsc_scaling_ratio_frac_bits;
-+	kvm_init_msr_list();
- 	return 0;
- 
-+out_mmu_exit:
-+	kvm_mmu_vendor_module_exit();
- out_free_percpu:
- 	free_percpu(user_return_msrs);
- out_free_x86_emulator_cache:
-@@ -9353,6 +9413,8 @@ int kvm_arch_init(void *opaque)
- 
- void kvm_arch_exit(void)
- {
-+	kvm_unregister_perf_callbacks();
-+
+ 		pi_inject_timer = housekeeping_enabled(HK_TYPE_TIMER);
  #ifdef CONFIG_X86_64
- 	if (hypervisor_is_type(X86_HYPER_MS_HYPERV))
- 		clear_hv_tscchange_cb();
-@@ -9368,6 +9430,7 @@ void kvm_arch_exit(void)
- 	irq_work_sync(&pvclock_irq_work);
- 	cancel_work_sync(&pvclock_gtod_work);
- #endif
-+	static_call(kvm_x86_hardware_unsetup)();
- 	kvm_x86_ops.hardware_enable = NULL;
- 	kvm_mmu_vendor_module_exit();
- 	free_percpu(user_return_msrs);
-@@ -11957,72 +12020,14 @@ void kvm_arch_hardware_disable(void)
- 	drop_user_return_notifiers();
- }
- 
--static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
--{
--	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
--
--#define __KVM_X86_OP(func) \
--	static_call_update(kvm_x86_##func, kvm_x86_ops.func);
--#define KVM_X86_OP(func) \
--	WARN_ON(!kvm_x86_ops.func); __KVM_X86_OP(func)
--#define KVM_X86_OP_OPTIONAL __KVM_X86_OP
--#define KVM_X86_OP_OPTIONAL_RET0(func) \
--	static_call_update(kvm_x86_##func, (void *)kvm_x86_ops.func ? : \
--					   (void *)__static_call_return0);
--#include <asm/kvm-x86-ops.h>
--#undef __KVM_X86_OP
--
--	kvm_pmu_ops_update(ops->pmu_ops);
--}
--
- int kvm_arch_hardware_setup(void *opaque)
- {
--	struct kvm_x86_init_ops *ops = opaque;
--	int r;
--
--	rdmsrl_safe(MSR_EFER, &host_efer);
--
--	if (boot_cpu_has(X86_FEATURE_XSAVES))
--		rdmsrl(MSR_IA32_XSS, host_xss);
--
--	kvm_init_pmu_capability();
--
--	r = ops->hardware_setup();
--	if (r != 0)
--		return r;
--
--	kvm_ops_update(ops);
--
--	kvm_register_perf_callbacks(ops->handle_intel_pt_intr);
--
--	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
--		kvm_caps.supported_xss = 0;
--
--#define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
--	cr4_reserved_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
--#undef __kvm_cpu_cap_has
--
--	if (kvm_caps.has_tsc_control) {
--		/*
--		 * Make sure the user can only configure tsc_khz values that
--		 * fit into a signed integer.
--		 * A min value is not calculated because it will always
--		 * be 1 on all machines.
--		 */
--		u64 max = min(0x7fffffffULL,
--			      __scale_tsc(kvm_caps.max_tsc_scaling_ratio, tsc_khz));
--		kvm_caps.max_guest_tsc_khz = max;
--	}
--	kvm_caps.default_tsc_scaling_ratio = 1ULL << kvm_caps.tsc_scaling_ratio_frac_bits;
--	kvm_init_msr_list();
- 	return 0;
- }
- 
- void kvm_arch_hardware_unsetup(void)
- {
--	kvm_unregister_perf_callbacks();
- 
--	static_call(kvm_x86_hardware_unsetup)();
- }
- 
- int kvm_arch_check_processor_compat(void *opaque)
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
