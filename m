@@ -2,73 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1692BC4321E
-	for <kvmarm@archiver.kernel.org>; Wed, 30 Nov 2022 23:10:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70705C4708E
+	for <kvmarm@archiver.kernel.org>; Wed, 30 Nov 2022 23:10:36 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B72294B28D;
-	Wed, 30 Nov 2022 18:10:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D3B64B642;
+	Wed, 30 Nov 2022 18:10:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9prQCH-4YQy9; Wed, 30 Nov 2022 18:10:32 -0500 (EST)
+	with ESMTP id JIx35Rgt6rBS; Wed, 30 Nov 2022 18:10:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B68B4B63C;
-	Wed, 30 Nov 2022 18:10:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A23774B647;
+	Wed, 30 Nov 2022 18:10:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 25ED44B3DE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2975340B80
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4N6FhzYZcmIg for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Nov 2022 18:10:27 -0500 (EST)
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
- [209.85.128.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 312744B3F5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:23 -0500 (EST)
-Received: by mail-yw1-f202.google.com with SMTP id
- 00721157ae682-3d2994e2d7dso46600077b3.9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 15:10:23 -0800 (PST)
+ with ESMTP id 04-Lahfy2slj for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Nov 2022 18:10:29 -0500 (EST)
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
+ [209.85.215.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BBE14B3CA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:25 -0500 (EST)
+Received: by mail-pg1-f201.google.com with SMTP id
+ r126-20020a632b84000000b004393806c06eso100078pgr.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 15:10:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
- :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=Ajf/v6plBmBpvMRb25eu7yZbuYHVVa1MLg3BBW1ApnM=;
- b=Q7q/5TXzNDPohOMoxUDiD0nnqEk1FoSW4RF/EEt8HMYjM52gPxj46PgYF/68/eUC70
- R52IpECaCvp222vr9xTL7j44GbL8VsDvPS5HArvcL4xJanWkN6UNBVlmOIcOzEnjqYoe
- h8mvG1+Ri644iv9eVrF8AA62rM3of5sqQn2h8l1NJ4Hp9LBXQlFjVGfCJ0M8iuidAG/g
- r3QoWBzS8+6cQpNc7qHKOescERK5wH+DxZ5oURQjRLgPy9Nq0G8eKIEZQN5DdxTswpJO
- dO7YdMWEfCe6tuDQ8/4qvPOOW5vLDHcu9lY8BtQx5KXbThVrpdnPftQhmMi0Ij7DKBRT
- iKQg==
+ h=content-transfer-encoding:cc:to:from:subject:message-id:references
+ :mime-version:in-reply-to:date:reply-to:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=oZ/AA3AN9yZfFS+Yz2Hj0GA1Db97x+XE1LjIfmdmS/w=;
+ b=luHLl3WdRQNdBhH/vZv/hfYOmt9Q6vwep+qjtUAST73H1MF3LqvzoF2Ukv7UaDUlgb
+ fXELwkqnEzgBN1h88nvzTImTYOnZGPEMito85bT2cMG/Dw2lvuyXP8zeBz8U2jGVs5tj
+ pSDhoig8xe+6jwKUzsQZ0HNL6W7uKODl2j0YOlmoXogdfyORLlX0GkBhzBuT5EaiKGr7
+ PCHzZt497tY3kEsEdxjbaw0LnCs8v3tH39skbarsReDUyuZOdzK6YVSLerydaPGb/0Z5
+ eHv7VqvGcSRs3JMgPsz9Bq5kCqCHy9eUbAeqCz5po17CqSrTsXQffsEYVsh38nZQAmal
+ lJaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
- :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
- :reply-to;
- bh=Ajf/v6plBmBpvMRb25eu7yZbuYHVVa1MLg3BBW1ApnM=;
- b=bqw66vpxO7wjW1bnTN3FhKY17H3FwV23DY8iNNmyAywxybU9xQDEH/d7758JwLvzIt
- zvhZDkEy3b0dm7DLGpGZUERfAByHDcXi9b/P26jzp1lyEIj0W/h5EPuGvMCK1he8HXQG
- w86BlzwYK/4EbwEQBELSknG37CA8uB0jRGKEtAUiYamjB6P6qFKnx5Sy5AWSugOu0Pls
- dLium2Pn1dy0bETK9Ds3N/0nCNBxcAWOTLGHnEfLcNGr+FCmBlZD9Bop36/cvXxMjkny
- 8GV/vVRqFGisBYWkpCrxfd0+bgJGQyHXMJSfJatNtzQprvRrGl4DEiuYn0FtYvPWAxqb
- eWcQ==
-X-Gm-Message-State: ANoB5pmmF7CqnAEPUUetoNwgiBlqEPghIBd+vgOZxnZzLWs/R8o1R3Fq
- XubL7sBe/pGWoLrILXeIYlcEmeurwRk=
-X-Google-Smtp-Source: AA0mqf6Y4D7Qf+J2WKP5H4v6O2gU4VSt61bmL1SListQ4TvwmtEqTFXL/Zt8AS/4xR6esIpeSKRCzrkbQ9o=
+ h=content-transfer-encoding:cc:to:from:subject:message-id:references
+ :mime-version:in-reply-to:date:reply-to:x-gm-message-state:from:to
+ :cc:subject:date:message-id:reply-to;
+ bh=oZ/AA3AN9yZfFS+Yz2Hj0GA1Db97x+XE1LjIfmdmS/w=;
+ b=25R9E1JG6Xpr/Of2GVssG6Dze0WPvHNpudvjIK2ew4fpT1t62KICfFiMVYV48sJBQi
+ oV3tKkJm1zRT+g91oEHN13AdSvlPXKjB1tu0sBxFzjdgqJzMQUWmTqQ+x1VqL8JWTP16
+ raNKh4KVCDzX5TV/+DNDaZ3jiYLVgslTOacYgirPDbGC97I0ltYywDXU6rOVhZIFOv1G
+ CxrKmAHH6zKjRcdEKMXHuvwFSGtBy8AnBrFp7xtp4yu55JHN4ZGwWP+FbNaB1ZThy7py
+ Ed0ATNydI7SGk1QDs5pan/A3j8j4gptWk8uwiv1nXUwy6dvVLKG3dp1phrXt5wNrpT1o
+ s6yQ==
+X-Gm-Message-State: ANoB5pmeiS2hI5ublYj/bxhV2nljrCYbVfKcJjPOfX1BRbtjgt1AZrs2
+ nn6yHDxGBQKN/urij/fA7nHNHv+1Lvk=
+X-Google-Smtp-Source: AA0mqf70Xm5b73dwbCTmumj9PiXG1e+aKYb1a7npTh2VM+OaIt1Kg/9NwT12H0mJEQDQr8PRUFC8axppjXM=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:8401:0:b0:6f1:4590:92b9 with SMTP id
- u1-20020a258401000000b006f1459092b9mr33613349ybk.430.1669849822483; Wed, 30
- Nov 2022 15:10:22 -0800 (PST)
-Date: Wed, 30 Nov 2022 23:09:10 +0000
+ (user=seanjc job=sendgmr) by 2002:a17:902:f1c5:b0:189:39e4:c0ed with SMTP id
+ e5-20020a170902f1c500b0018939e4c0edmr41790703plc.108.1669849824265; Wed, 30
+ Nov 2022 15:10:24 -0800 (PST)
+Date: Wed, 30 Nov 2022 23:09:11 +0000
 In-Reply-To: <20221130230934.1014142-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221130230934.1014142-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221130230934.1014142-27-seanjc@google.com>
-Subject: [PATCH v2 26/50] KVM: PPC: Move processor compatibility check to
- module init
+Message-ID: <20221130230934.1014142-28-seanjc@google.com>
+Subject: [PATCH v2 27/50] KVM: s390: Do s390 specific init without bouncing
+ through kvm_init()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -106,121 +107,53 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Move KVM PPC's compatibility checks to their respective module_init()
-hooks, there's no need to wait until KVM's common compat check, nor is
-there a need to perform the check on every CPU (provided by common KVM's
-hook), as the compatibility checks operate on global data.
-
-  arch/powerpc/include/asm/cputable.h: extern struct cpu_spec *cur_cpu_spec;
-  arch/powerpc/kvm/book3s.c: return 0
-  arch/powerpc/kvm/e500.c: strcmp(cur_cpu_spec->cpu_name, "e500v2")
-  arch/powerpc/kvm/e500mc.c: strcmp(cur_cpu_spec->cpu_name, "e500mc")
-                             strcmp(cur_cpu_spec->cpu_name, "e5500")
-                             strcmp(cur_cpu_spec->cpu_name, "e6500")
-
-Cc: Fabiano Rosas <farosas@linux.ibm.com>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/powerpc/include/asm/kvm_ppc.h |  1 -
- arch/powerpc/kvm/book3s.c          | 10 ----------
- arch/powerpc/kvm/e500.c            |  4 ++--
- arch/powerpc/kvm/e500mc.c          |  4 ++++
- arch/powerpc/kvm/powerpc.c         |  2 +-
- 5 files changed, 7 insertions(+), 14 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-index bfacf12784dd..51a1824b0a16 100644
---- a/arch/powerpc/include/asm/kvm_ppc.h
-+++ b/arch/powerpc/include/asm/kvm_ppc.h
-@@ -118,7 +118,6 @@ extern int kvmppc_xlate(struct kvm_vcpu *vcpu, ulong eaddr,
- extern int kvmppc_core_vcpu_create(struct kvm_vcpu *vcpu);
- extern void kvmppc_core_vcpu_free(struct kvm_vcpu *vcpu);
- extern int kvmppc_core_vcpu_setup(struct kvm_vcpu *vcpu);
--extern int kvmppc_core_check_processor_compat(void);
- extern int kvmppc_core_vcpu_translate(struct kvm_vcpu *vcpu,
-                                       struct kvm_translation *tr);
- 
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index 6d525285dbe8..87283a0e33d8 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -999,16 +999,6 @@ int kvmppc_h_logical_ci_store(struct kvm_vcpu *vcpu)
- }
- EXPORT_SYMBOL_GPL(kvmppc_h_logical_ci_store);
- 
--int kvmppc_core_check_processor_compat(void)
--{
--	/*
--	 * We always return 0 for book3s. We check
--	 * for compatibility while loading the HV
--	 * or PR module
--	 */
--	return 0;
--}
--
- int kvmppc_book3s_hcall_implemented(struct kvm *kvm, unsigned long hcall)
- {
- 	return kvm->arch.kvm_ops->hcall_implemented(hcall);
-diff --git a/arch/powerpc/kvm/e500.c b/arch/powerpc/kvm/e500.c
-index c8b2b4478545..0ea61190ec04 100644
---- a/arch/powerpc/kvm/e500.c
-+++ b/arch/powerpc/kvm/e500.c
-@@ -314,7 +314,7 @@ static void kvmppc_core_vcpu_put_e500(struct kvm_vcpu *vcpu)
- 	kvmppc_booke_vcpu_put(vcpu);
- }
- 
--int kvmppc_core_check_processor_compat(void)
-+static int kvmppc_e500_check_processor_compat(void)
- {
- 	int r;
- 
-@@ -507,7 +507,7 @@ static int __init kvmppc_e500_init(void)
- 	unsigned long handler_len;
- 	unsigned long max_ivor = 0;
- 
--	r = kvmppc_core_check_processor_compat();
-+	r = kvmppc_e500_check_processor_compat();
- 	if (r)
- 		goto err_out;
- 
-diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
-index 57e0ad6a2ca3..795667f7ebf0 100644
---- a/arch/powerpc/kvm/e500mc.c
-+++ b/arch/powerpc/kvm/e500mc.c
-@@ -388,6 +388,10 @@ static int __init kvmppc_e500mc_init(void)
- {
- 	int r;
- 
-+	r = kvmppc_e500mc_check_processor_compat();
-+	if (r)
-+		return kvmppc_e500mc;
-+
- 	r = kvmppc_booke_init();
- 	if (r)
- 		goto err_out;
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 5faf69421f13..d44b85ba8cef 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -442,7 +442,7 @@ int kvm_arch_hardware_enable(void)
- 
- int kvm_arch_check_processor_compat(void *opaque)
- {
--	return kvmppc_core_check_processor_compat();
-+	return 0;
- }
- 
- int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
--- 
-2.38.1.584.g0f3c55d4c2-goog
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+TW92ZSB0aGUgZ3V0cyBvZiBrdm1fYXJjaF9pbml0KCkgaW50byBhIG5ldyBoZWxwZXIsIF9fa3Zt
+X3MzOTBfaW5pdCgpLAphbmQgaW52b2tlIHRoZSBuZXcgaGVscGVyIGRpcmVjdGx5IGZyb20ga3Zt
+X3MzOTBfaW5pdCgpIGluc3RlYWQgb2YKYm91bmNpbmcgdGhyb3VnaCBrdm1faW5pdCgpLiAgSW52
+b2tpbmcga3ZtX2FyY2hfaW5pdCgpIGlzIHRoZSB2ZXJ5CmZpcnN0IGFjdGlvbiBwZXJmb3JtZWQg
+Ynkga3ZtX2luaXQoKSwgaS5lLiB0aGlzIGlzIGEgZ2xvcmlmaWVkIG5vcC4KCk1vdmluZyBzZXR1
+cCB0byBfX2t2bV9zMzkwX2luaXQoKSB3aWxsIGFsbG93IHRhZ2dpbmcgbW9yZSBmdW5jdGlvbnMg
+YXMKX19pbml0LCBhbmQgZW1wdHlpbmcga3ZtX2FyY2hfaW5pdCgpIHdpbGwgYWxsb3cgZHJvcHBp
+bmcgdGhlIGhvb2sKZW50aXJlbHkgb25jZSBhbGwgYXJjaGl0ZWN0dXJlIGltcGxlbWVudGF0aW9u
+cyBhcmUgbm9wcy4KCk5vIGZ1bmN0aW9uYWwgY2hhbmdlIGludGVuZGVkLgoKU2lnbmVkLW9mZi1i
+eTogU2VhbiBDaHJpc3RvcGhlcnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+ClJldmlld2VkLWJ5OiBF
+cmljIEZhcm1hbiA8ZmFybWFuQGxpbnV4LmlibS5jb20+ClJldmlld2VkLWJ5OiBQaGlsaXBwZSBN
+YXRoaWV1LURhdWTDqSA8cGhpbG1kQGxpbmFyby5vcmc+Ci0tLQogYXJjaC9zMzkwL2t2bS9rdm0t
+czM5MC5jIHwgMjkgKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0KIDEgZmlsZSBjaGFuZ2Vk
+LCAyNSBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2FyY2gvczM5
+MC9rdm0va3ZtLXMzOTAuYyBiL2FyY2gvczM5MC9rdm0va3ZtLXMzOTAuYwppbmRleCA4MjllNmUw
+NDYwMDMuLjhjNGZjYWYyYmQzNiAxMDA2NDQKLS0tIGEvYXJjaC9zMzkwL2t2bS9rdm0tczM5MC5j
+CisrKyBiL2FyY2gvczM5MC9rdm0va3ZtLXMzOTAuYwpAQCAtNDY5LDcgKzQ2OSw3IEBAIHN0YXRp
+YyB2b2lkIGt2bV9zMzkwX2NwdV9mZWF0X2luaXQodm9pZCkKIAkgKi8KIH0KIAotaW50IGt2bV9h
+cmNoX2luaXQodm9pZCAqb3BhcXVlKQorc3RhdGljIGludCBfX2t2bV9zMzkwX2luaXQodm9pZCkK
+IHsKIAlpbnQgcmMgPSAtRU5PTUVNOwogCkBAIC01MjcsNyArNTI3LDcgQEAgaW50IGt2bV9hcmNo
+X2luaXQodm9pZCAqb3BhcXVlKQogCXJldHVybiByYzsKIH0KIAotdm9pZCBrdm1fYXJjaF9leGl0
+KHZvaWQpCitzdGF0aWMgdm9pZCBfX2t2bV9zMzkwX2V4aXQodm9pZCkKIHsKIAlnbWFwX3VucmVn
+aXN0ZXJfcHRlX25vdGlmaWVyKCZnbWFwX25vdGlmaWVyKTsKIAlnbWFwX3VucmVnaXN0ZXJfcHRl
+X25vdGlmaWVyKCZ2c2llX2dtYXBfbm90aWZpZXIpOwpAQCAtNTQxLDYgKzU0MSwxNiBAQCB2b2lk
+IGt2bV9hcmNoX2V4aXQodm9pZCkKIAlkZWJ1Z191bnJlZ2lzdGVyKGt2bV9zMzkwX2RiZl91dik7
+CiB9CiAKK2ludCBrdm1fYXJjaF9pbml0KHZvaWQgKm9wYXF1ZSkKK3sKKwlyZXR1cm4gMDsKK30K
+Kwordm9pZCBrdm1fYXJjaF9leGl0KHZvaWQpCit7CisKK30KKwogLyogU2VjdGlvbjogZGV2aWNl
+IHJlbGF0ZWQgKi8KIGxvbmcga3ZtX2FyY2hfZGV2X2lvY3RsKHN0cnVjdCBmaWxlICpmaWxwLAog
+CQkJdW5zaWduZWQgaW50IGlvY3RsLCB1bnNpZ25lZCBsb25nIGFyZykKQEAgLTU2OTYsNyArNTcw
+Niw3IEBAIHN0YXRpYyBpbmxpbmUgdW5zaWduZWQgbG9uZyBub25oeXBfbWFzayhpbnQgaSkKIAog
+c3RhdGljIGludCBfX2luaXQga3ZtX3MzOTBfaW5pdCh2b2lkKQogewotCWludCBpOworCWludCBp
+LCByOwogCiAJaWYgKCFzY2xwLmhhc19zaWVmMikgewogCQlwcl9pbmZvKCJTSUUgaXMgbm90IGF2
+YWlsYWJsZVxuIik7CkBAIC01NzEyLDEyICs1NzIyLDIzIEBAIHN0YXRpYyBpbnQgX19pbml0IGt2
+bV9zMzkwX2luaXQodm9pZCkKIAkJa3ZtX3MzOTBfZmFjX2Jhc2VbaV0gfD0KIAkJCXN0ZmxlX2Zh
+Y19saXN0W2ldICYgbm9uaHlwX21hc2soaSk7CiAKLQlyZXR1cm4ga3ZtX2luaXQoTlVMTCwgc2l6
+ZW9mKHN0cnVjdCBrdm1fdmNwdSksIDAsIFRISVNfTU9EVUxFKTsKKwlyID0gX19rdm1fczM5MF9p
+bml0KCk7CisJaWYgKHIpCisJCXJldHVybiByOworCisJciA9IGt2bV9pbml0KE5VTEwsIHNpemVv
+ZihzdHJ1Y3Qga3ZtX3ZjcHUpLCAwLCBUSElTX01PRFVMRSk7CisJaWYgKHIpIHsKKwkJX19rdm1f
+czM5MF9leGl0KCk7CisJCXJldHVybiByOworCX0KKwlyZXR1cm4gMDsKIH0KIAogc3RhdGljIHZv
+aWQgX19leGl0IGt2bV9zMzkwX2V4aXQodm9pZCkKIHsKIAlrdm1fZXhpdCgpOworCisJX19rdm1f
+czM5MF9leGl0KCk7CiB9CiAKIG1vZHVsZV9pbml0KGt2bV9zMzkwX2luaXQpOwotLSAKMi4zOC4x
+LjU4NC5nMGYzYzU1ZDRjMi1nb29nCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
+YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
+cm0K
