@@ -2,73 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15448C47089
-	for <kvmarm@archiver.kernel.org>; Wed, 30 Nov 2022 23:10:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5109C4321E
+	for <kvmarm@archiver.kernel.org>; Wed, 30 Nov 2022 23:10:10 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FB584B286;
-	Wed, 30 Nov 2022 18:10:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C03F4B18F;
+	Wed, 30 Nov 2022 18:10:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dxAyP6V8KabY; Wed, 30 Nov 2022 18:10:06 -0500 (EST)
+	with ESMTP id uwLO28+CvZLc; Wed, 30 Nov 2022 18:10:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A24184B5EA;
-	Wed, 30 Nov 2022 18:10:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDD4F4B422;
+	Wed, 30 Nov 2022 18:10:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C45B40A93
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 538FD40B8F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6+kagaPtemkX for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Nov 2022 18:10:00 -0500 (EST)
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
- [209.85.210.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8BF934B248
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:10:00 -0500 (EST)
-Received: by mail-pf1-f201.google.com with SMTP id
- d3-20020a056a0010c300b005728633819aso185841pfu.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 15:10:00 -0800 (PST)
+ with ESMTP id kYqZIpNRyrbA for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Nov 2022 18:09:59 -0500 (EST)
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
+ [209.85.215.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 818894B3DD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 18:09:57 -0500 (EST)
+Received: by mail-pg1-f201.google.com with SMTP id
+ l186-20020a6388c3000000b00478410026bfso84118pgd.10
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Nov 2022 15:09:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
- bh=MJave+Z+CqVOQlKYNh+9u1XLbNgTtvhVtL4XdeBXq3U=;
- b=ZO3Ftedng5ZXtAj1HLjLejIkXeEuGF++TCmzhSGUO/jffRhjc4H+xBEcj7yIeqEdat
- 0U3Y+Ads6LzFvxNp27Uo8B2HMacUCZIv0pSE92rlIHxzWTi7f9KsRULC+bwhGX87ZVPR
- vnMRqpKsuzzrvEbFNarvM7whj/3tQRNLMCHwuLgw98CUXaVYGXJOn+GNNpcbHsAkPmeN
- tXU852Btu7ns0KpVR55ygwmLkYJEnvUvyvy5iEVsL5b//kXV7FWMRdutGQwiv7w9+h2Y
- WeYcLiKtjVQOAjeb0ZzTx4wnLQ7dUbOEoRqTrEQ9fS/dnvpncahogy2siy31VVqOiND3
- XFqA==
+ bh=uhI8yDhdR7lIAaqvku/gdFE7HWy6VU8JNAGQp8QsO6I=;
+ b=JGKTwFHTr3zFyFeRyDhx800NTwE8fbKBoChRZ4rCsQDcOc/eGjPbGsVDNkCwWmSHdn
+ 4zWsAcy02h7DG9I7KIrR/3G3ynUAl5zHFprvqWawNYq0ujuz0rj9xQPN87hRttEvJWya
+ MaZkpYk6hJDhRKiSggxmfSLSCGk6wAycOhmze7v3vnTNsBJM82DsGnT9K7gXXth5q453
+ GXnW0gnhFQMQ7rKcFFJUmj9xHXOE1CyUnZYbsfJ9eekI1f6DwJJHgA0YwjDavFZGHgxi
+ PIdF3Xw7u6ZSs+rqvW6sJFzKLF1Mn/CCKFnzXLHVYU5aHYTg5a9RqdAAC/8bhq/W34bo
+ HRWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
  :reply-to;
- bh=MJave+Z+CqVOQlKYNh+9u1XLbNgTtvhVtL4XdeBXq3U=;
- b=kVoC4Nm9U0LnJ+ODpMYEUFupaPfebpkZAYC/iXybGrVj3t3VnSHd6vHmgaBo7qvpDy
- /QOhTi4BVghPVE/16I+D2lIa1U5El69h05Zukk7jLDkWTeim2RU7KSq6nELe6Amb263R
- mQ+y9i/JJyFgv6iZ+9bQMjlMnbaBlz1Dx+mDIYabeQZgSUWGwqLVRSau1X4/RzCUd401
- ivtkvlN4T/sWgx3G14X6xL5aPgYKrRHNGehZbViK1LcPcmze+mfto3tUQSRyTL8HYkP6
- Kg7qoIZ3rNp3qND5LKWw5UYRMyfzib0ZQ94JFiZ8Rxfm5AKGNjAri4FLBQGnikaLdEF4
- LL0A==
-X-Gm-Message-State: ANoB5pnv96e4TgRFTl4m91K9vJxYJ3aZjrQKHnE+pLpA2+c/mFHzF+rD
- +qw3OOxQWG3nW6lOVZlCpA2loZDgTm0=
-X-Google-Smtp-Source: AA0mqf5OF5+sS7pzLlgqnJtqaKfzLdsx3EOQi2ZpWetSPzJEZYu9zjdDHGwAbdG5EGES6Cvu/KbnbnXMVFE=
+ bh=uhI8yDhdR7lIAaqvku/gdFE7HWy6VU8JNAGQp8QsO6I=;
+ b=taOdHKiDFjOGirvKoE2SKA4yjQaCW8ke5ADXSRnVPFor7Jm4n8/on+lLkShvGzl3HV
+ iGuubTnLz3Na0z+GSfZ8e7EUMVeAqGoVUoXY5cplQuIXGf+4x5StQUZvKJQTcxQjuD8G
+ BdYPm1Q5wHK5wjEz05tjojwwJP8j+Ao2dCDezssvTEe855GNzSZWMHcvckoNXRobHcVs
+ HhOm50nc5KnjskfsC9taLZAdXJK4MgYpzTVxMQDxV5RBseHz4TFPX8xSgDifbmcgwrVO
+ nqGB8LQ/+YTKbVgN0vGZy63Nyr/btsZ31kHjBm/UBkj8ydrKfLdBsqfChSkXxSDpX/mD
+ TuxA==
+X-Gm-Message-State: ANoB5plyAZ58CzbcHV8wBFgx8uUefK07YfbiAzAIRVf9KStmLkvOL52f
+ n7eHMS6FmscofdZnRmiquSBvZvk/ckw=
+X-Google-Smtp-Source: AA0mqf4UbHeO/7xp9TeaJC3lcd9wjoTeVcRzR2/roKzeL1N7msdBGBxph7L3Wcu7JbcPwh3sZzXNOI19OJg=
 X-Received: from zagreus.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:8090:0:b0:575:4e92:189e with SMTP id
- v16-20020aa78090000000b005754e92189emr14689428pff.59.1669849799328; Wed, 30
- Nov 2022 15:09:59 -0800 (PST)
-Date: Wed, 30 Nov 2022 23:08:57 +0000
+ (user=seanjc job=sendgmr) by 2002:a62:3084:0:b0:56d:dd2a:c494 with SMTP id
+ w126-20020a623084000000b0056ddd2ac494mr44472082pfw.76.1669849796263; Wed, 30
+ Nov 2022 15:09:56 -0800 (PST)
+Date: Wed, 30 Nov 2022 23:08:55 +0000
 In-Reply-To: <20221130230934.1014142-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221130230934.1014142-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221130230934.1014142-14-seanjc@google.com>
-Subject: [PATCH v2 13/50] KVM: x86: Move guts of kvm_arch_init() to standalone
- helper
+Message-ID: <20221130230934.1014142-12-seanjc@google.com>
+Subject: [PATCH v2 11/50] KVM: VMX: Don't bother disabling eVMCS static key on
+ module exit
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, 
@@ -111,173 +111,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Move the guts of kvm_arch_init() to a new helper, kvm_x86_vendor_init(),
-so that VMX can do _all_ arch and vendor initialization before calling
-kvm_init().  Calling kvm_init() must be the _very_ last step during init,
-as kvm_init() exposes /dev/kvm to userspace, i.e. allows creating VMs.
-
-No functional change intended.
+Don't disable the eVMCS static key on module exit, kvm_intel.ko owns the
+key so there can't possibly be users after the kvm_intel.ko is unloaded,
+at least not without much bigger issues.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  3 +++
- arch/x86/kvm/svm/svm.c          | 23 +++++++++++++++++++++--
- arch/x86/kvm/vmx/vmx.c          | 21 +++++++++++++++------
- arch/x86/kvm/x86.c              | 15 +++++++++++++--
- 4 files changed, 52 insertions(+), 10 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 70af7240a1d5..04a9ae66fb8d 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1758,6 +1758,9 @@ extern struct kvm_x86_ops kvm_x86_ops;
- #define KVM_X86_OP_OPTIONAL_RET0 KVM_X86_OP
- #include <asm/kvm-x86-ops.h>
- 
-+int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops);
-+void kvm_x86_vendor_exit(void);
-+
- #define __KVM_HAVE_ARCH_VM_ALLOC
- static inline struct kvm *kvm_arch_alloc_vm(void)
- {
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 91352d692845..19e81a99c58f 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -5091,15 +5091,34 @@ static struct kvm_x86_init_ops svm_init_ops __initdata = {
- 
- static int __init svm_init(void)
- {
-+	int r;
-+
- 	__unused_size_checks();
- 
--	return kvm_init(&svm_init_ops, sizeof(struct vcpu_svm),
--			__alignof__(struct vcpu_svm), THIS_MODULE);
-+	r = kvm_x86_vendor_init(&svm_init_ops);
-+	if (r)
-+		return r;
-+
-+	/*
-+	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
-+	 * exposed to userspace!
-+	 */
-+	r = kvm_init(&svm_init_ops, sizeof(struct vcpu_svm),
-+		     __alignof__(struct vcpu_svm), THIS_MODULE);
-+	if (r)
-+		goto err_kvm_init;
-+
-+	return 0;
-+
-+err_kvm_init:
-+	kvm_x86_vendor_exit();
-+	return r;
- }
- 
- static void __exit svm_exit(void)
- {
- 	kvm_exit();
-+	kvm_x86_vendor_exit();
- }
- 
- module_init(svm_init)
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b8bf95b9710d..8e81cd94407d 100644
+index d85d175dca70..c0de7160700b 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8529,6 +8529,7 @@ static void vmx_exit(void)
- #endif
+@@ -8490,10 +8490,6 @@ static void vmx_exit(void)
  
  	kvm_exit();
-+	kvm_x86_vendor_exit();
  
+-#if IS_ENABLED(CONFIG_HYPERV)
+-	if (static_branch_unlikely(&enable_evmcs))
+-		static_branch_disable(&enable_evmcs);
+-#endif
  	vmx_cleanup_l1d_flush();
  
-@@ -8546,23 +8547,25 @@ static int __init vmx_init(void)
- 	 */
- 	hv_init_evmcs();
- 
-+	r = kvm_x86_vendor_init(&vmx_init_ops);
-+	if (r)
-+		return r;
-+
- 	r = kvm_init(&vmx_init_ops, sizeof(struct vcpu_vmx),
- 		     __alignof__(struct vcpu_vmx), THIS_MODULE);
- 	if (r)
--		return r;
-+		goto err_kvm_init;
- 
- 	/*
--	 * Must be called after kvm_init() so enable_ept is properly set
-+	 * Must be called after common x86 init so enable_ept is properly set
- 	 * up. Hand the parameter mitigation value in which was stored in
- 	 * the pre module init parser. If no parameter was given, it will
- 	 * contain 'auto' which will be turned into the default 'cond'
- 	 * mitigation mode.
- 	 */
- 	r = vmx_setup_l1d_flush(vmentry_l1d_flush_param);
--	if (r) {
--		vmx_exit();
--		return r;
--	}
-+	if (r)
-+		goto err_l1d_flush;
- 
- 	vmx_setup_fb_clear_ctrl();
- 
-@@ -8587,5 +8590,11 @@ static int __init vmx_init(void)
- 		allow_smaller_maxphyaddr = true;
- 
- 	return 0;
-+
-+err_l1d_flush:
-+	vmx_exit();
-+err_kvm_init:
-+	kvm_x86_vendor_exit();
-+	return r;
- }
- module_init(vmx_init);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 915d57c3b41d..b33932fca36e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9278,7 +9278,16 @@ static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
- 
- int kvm_arch_init(void *opaque)
- {
--	struct kvm_x86_init_ops *ops = opaque;
-+	return 0;
-+}
-+
-+void kvm_arch_exit(void)
-+{
-+
-+}
-+
-+int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
-+{
- 	u64 host_pat;
- 	int r;
- 
-@@ -9410,8 +9419,9 @@ int kvm_arch_init(void *opaque)
- 	kmem_cache_destroy(x86_emulator_cache);
- 	return r;
- }
-+EXPORT_SYMBOL_GPL(kvm_x86_vendor_init);
- 
--void kvm_arch_exit(void)
-+void kvm_x86_vendor_exit(void)
- {
- 	kvm_unregister_perf_callbacks();
- 
-@@ -9440,6 +9450,7 @@ void kvm_arch_exit(void)
- 	WARN_ON(static_branch_unlikely(&kvm_xen_enabled.key));
- #endif
- }
-+EXPORT_SYMBOL_GPL(kvm_x86_vendor_exit);
- 
- static int __kvm_emulate_halt(struct kvm_vcpu *vcpu, int state, int reason)
- {
+ 	allow_smaller_maxphyaddr = false;
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
