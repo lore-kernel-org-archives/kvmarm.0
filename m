@@ -2,63 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ECF7C47089
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Dec 2022 15:50:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4C81C47089
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Dec 2022 15:52:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 866A0401AD;
-	Thu,  1 Dec 2022 10:50:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C2464B15C;
+	Thu,  1 Dec 2022 10:52:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered)
+	header.i=@daynix-com.20210112.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8-uL9EfJuqrt; Thu,  1 Dec 2022 10:50:09 -0500 (EST)
+	with ESMTP id DVCPIcJgZmLH; Thu,  1 Dec 2022 10:52:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 47CD64038C;
-	Thu,  1 Dec 2022 10:50:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B0C2A4B10B;
+	Thu,  1 Dec 2022 10:52:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9528040298
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 10:50:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7038740DAE
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 05:49:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4jhbRMwdOb7L for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Dec 2022 10:50:06 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 608EF401AD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 10:50:06 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id CCD67B81F5E;
- Thu,  1 Dec 2022 15:50:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDCE1C433C1;
- Thu,  1 Dec 2022 15:50:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1669909803;
- bh=LUT1bQztocCXvyDRR6quaBkfdm6TJC4VK3CcqENBpls=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=k0Z59nYHBrf584E9ogu8bxEUVrMHyFuQbzRH/g/hRi5fj+xjVT93zwZm2RbI4G2VA
- tvoMPjvOv2YXsQd8/iPu8/T1ExoPhhxCDDNBOISmlRWgebFQ4ftKQtnkIWLxFtxhda
- KYmycqreGvAfFEYwW98LiDTjAgO1CgwO6cXo69jdqYO/Fh8/nC16dL5NdosdKlHJh2
- wHozbBGE1I+upsM6V32hFdxebJPPOhEeRL87+HHM0Ll4vMMsomliXoflBOWze60DMF
- dmYtHRApxQCgNTDWJd+jdk2Wyaokq2PGxqIDjgNpvhzrzIkCVM7B2/PrsdU5/847/b
- DKYFPCDnCP8gA==
-Date: Thu, 1 Dec 2022 15:49:56 +0000
-From: Will Deacon <will@kernel.org>
-To: Sudeep Holla <sudeep.holla@arm.com>
-Subject: Re: [PATCH 02/12] firmware: arm_ffa: Move comment before the field
- it is documenting
-Message-ID: <20221201154956.GA28682@willie-the-truck>
-References: <20221116170335.2341003-1-qperret@google.com>
- <20221116170335.2341003-3-qperret@google.com>
- <20221201115308.gciyfttnhvz2wcuz@bogus>
+ with ESMTP id DqwoGlKJWwqP for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Dec 2022 05:49:47 -0500 (EST)
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com
+ [209.85.215.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A705240399
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 05:49:47 -0500 (EST)
+Received: by mail-pg1-f182.google.com with SMTP id v3so1336050pgh.4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Dec 2022 02:49:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20210112.gappssmtp.com; s=20210112;
+ h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+ :to:from:from:to:cc:subject:date:message-id:reply-to;
+ bh=foBGF6JlnonEt7u87TDzA6BdrpBeBHRT3WfaCgQwD4w=;
+ b=pGFrHYoSXyP+05btXeBT3GDPA3BBMxmoFjzQZdLLbgcGtRtd7Y/ed5g89sJ1Ko2BPl
+ w/8U2Gtv0tPTKbIoyyXc0HC34rPREN8tpEVZ/Qtoy8EeMjUkcOed+O4vgW6MMT3hG2Tb
+ tO9d9Tl7iu01SE4eUZGMehhVYLEiufve+6A3CwtlCYfgpP/KxK/0YZh41SA3Qd/K0L0p
+ nljgnw7gJjidBiRqpmEM674grrj/teo9cmJEC8loX80WVe6FUFnf0OGBf/zgJL2lXACi
+ RkyW+dL8owebIelG/XFn8Kfi64VfgOBe21NgfHGMBM72tOVxpHAQkbIbXMQ3GtPimpw/
+ ZP5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+ :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+ :reply-to;
+ bh=foBGF6JlnonEt7u87TDzA6BdrpBeBHRT3WfaCgQwD4w=;
+ b=ECbdAgX9V+A1v8sRxMq4XBBm1vUUCrxpoDAS8+WsOhnrQgrxaYaGhjOkqdLQwIpUyS
+ O9WrRzuCb+nTpelDkslgSH7YgXmplg2WkxgibXc7e1DZkdBOXXAzMJlHQ4q+u9/rFfK2
+ EXI8XDkEdVB1PZpIy/RrM9cIdLCNh8YzEH8JZ6phZCLBFUGRuWQxPWz0fz5xzI/qBZnk
+ xFwKZpSs8WSKer04ZEt6K/pHAAxKB4d0FGU0k0UlTmVV02JN6zxwOomgIRaMrTPImQO/
+ LaBdOOYDZnB70RyPFe1j2OvFGdkUzRbvAxW769dAfJkrlvG8Ghtb8l1m0AjgVyl2l9WF
+ ZOuA==
+X-Gm-Message-State: ANoB5plPMcVd+2CZJ9zbRB5qvpTdRVxVVkEHveMj9DQym63WJxGJQ1HS
+ Djtn+dH4sBPy3CSYmXjUG+06kw==
+X-Google-Smtp-Source: AA0mqf6Cyu7laoCbi5JoSZv0gkqjvpvrXeXiVPp6Vj2NLBpsceZWkQJBNxO9yJFLr0IOOo439dEXsQ==
+X-Received: by 2002:a63:310:0:b0:478:7e02:fa11 with SMTP id
+ 16-20020a630310000000b004787e02fa11mr25577pgd.222.1669891786574; 
+ Thu, 01 Dec 2022 02:49:46 -0800 (PST)
+Received: from fedora.flets-east.jp ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
+ by smtp.gmail.com with ESMTPSA id
+ 4-20020a630804000000b004785a63b44bsm2320580pgi.43.2022.12.01.02.49.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 01 Dec 2022 02:49:46 -0800 (PST)
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+To: 
+Subject: [PATCH 0/3] KVM: arm64: Handle CCSIDR associativity mismatches
+Date: Thu,  1 Dec 2022 19:49:11 +0900
+Message-Id: <20221201104914.28944-1-akihiko.odaki@daynix.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20221201115308.gciyfttnhvz2wcuz@bogus>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: kernel-team@android.com, Andrew Walbran <qwandor@google.com>,
- Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+X-Mailman-Approved-At: Thu, 01 Dec 2022 10:52:00 -0500
+Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>, Marc Zyngier <maz@kernel.org>,
+ Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
+ Will Deacon <will@kernel.org>, asahi@lists.linux.dev,
  Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -77,33 +96,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Dec 01, 2022 at 11:53:08AM +0000, Sudeep Holla wrote:
-> On Wed, Nov 16, 2022 at 05:03:25PM +0000, Quentin Perret wrote:
-> > From: Will Deacon <will@kernel.org>
-> > 
-> > This is consistent with the other comments in the struct.
-> >
-> Not sure how that happened :). Anyways,
-> 
-> Reviewed-by: Sudeep Holla <sudeep.holla@arm.com>
-> 
-> I am yet to look at the other patches and I would like to have a setup
-> to test it as well. So I will look at the other patches and test it later.
-> The reason for reviewing the first 2 patches moving the code out of the
-> driver is to check if they can be merged for v6.2 itself.
-> 
-> I may start pushing FF-A v1.1 changes for v6.3 and trying to avoid conflicts
-> or cross tree dependencies. I know it is quite late for v6.2 but these changes
-> are trivial and good to get it in for v6.2 if possible.
-> 
-> Will, thoughts ? If you agree, please take it via arm64 for v6.2. I don't
-> have any FF-A changes for v6.2 ATM, so there should be not conflicts.
+M2 MacBook Air has mismatched CCSIDR associativity bits, which makes the
+bits a KVM vCPU sees inconsistent when migrating.
 
-You're asking me to merge my own patches? Of course I can do that :D
+It also makes QEMU fail restoring the vCPU registers because QEMU saves
+and restores all of the registers including CCSIDRs, and if the vCPU
+migrated among physical CPUs between saving and restoring, it tries to
+restore CCSIDR values that mismatch with the current physical CPU, which
+causes EFAULT.
 
-Cheers,
+Trap CCSIDRs if there are CCSIDR value msimatches, and override the
+associativity bits when handling the trap.
 
-Will
+Akihiko Odaki (3):
+  KVM: arm64: Make CCSIDRs consistent
+  arm64: errata: Check for mismatched cache associativity
+  KVM: arm64: Handle CCSIDR associativity mismatches
+
+ arch/arm64/include/asm/cache.h       |  3 ++
+ arch/arm64/include/asm/cpu.h         |  1 +
+ arch/arm64/include/asm/cpufeature.h  |  8 +++++
+ arch/arm64/include/asm/kvm_emulate.h | 10 ++++--
+ arch/arm64/include/asm/sysreg.h      |  7 ++++
+ arch/arm64/kernel/cacheinfo.c        |  4 +--
+ arch/arm64/kernel/cpu_errata.c       | 52 ++++++++++++++++++++++++++++
+ arch/arm64/kernel/cpufeature.c       |  4 +++
+ arch/arm64/kernel/cpuinfo.c          | 30 ++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            | 50 ++++++++++++++------------
+ arch/arm64/tools/cpucaps             |  1 +
+ 11 files changed, 144 insertions(+), 26 deletions(-)
+
+-- 
+2.38.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
