@@ -2,81 +2,89 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06025C43217
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Dec 2022 16:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 691FDC43217
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Dec 2022 17:26:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 827D2410E6;
-	Thu,  1 Dec 2022 11:51:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4EE740399;
+	Thu,  1 Dec 2022 12:26:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered)
+	header.i=@daynix-com.20210112.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ng9ydiT-Ts1T; Thu,  1 Dec 2022 11:51:53 -0500 (EST)
+	with ESMTP id jw-UBjPivIFL; Thu,  1 Dec 2022 12:26:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51FB540B78;
-	Thu,  1 Dec 2022 11:51:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DDC6403C2;
+	Thu,  1 Dec 2022 12:26:16 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BE4D40319
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 11:51:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C4CE4076C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 12:26:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id emkJ6PQ4IUrz for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Dec 2022 11:51:51 -0500 (EST)
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com
- [209.85.216.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2059840C80
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 11:51:51 -0500 (EST)
-Received: by mail-pj1-f54.google.com with SMTP id
- 3-20020a17090a098300b00219041dcbe9so2634588pjo.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Dec 2022 08:51:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=vTY+8zbB0KLCO6w0Ejf7JKks2CQ81Juv1hZh5NUQZR4=;
- b=c2tDzLnwBzOZzqviYzit1W1/hj0S+WHGqFBG67B3f014LVPjpgKuphY8pgHLNJEhKX
- rhdrNHHIxdP/IH+KoaJv1ex/0Ea7kLjT/hyOZ+w7qEbjgwgUsyxutS1qpPVbTa5fxMsJ
- 3bGQ5f6h+Mmr2kpnXnJKqZFNic3Sy62qxsFhJHgitibcuPZuuRcMPSe/to1zaadGZ2q4
- TUNpyR0HI8HE5Kzfnws4K8x8fftdyFGt19wwqa0rLS2ENbD7qoQ787Ttm2KUt5uDV6v1
- Nh77eHD1xFwa5fKDgsSZWV8pRJZNVWBIBfnuyyMPUDeKk1ZfQOw91OnGcq0KP4l7KMgm
- UJLQ==
+ with ESMTP id nULJepQxVNk5 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Dec 2022 12:26:14 -0500 (EST)
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com
+ [209.85.216.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 08317403C2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 12:26:13 -0500 (EST)
+Received: by mail-pj1-f49.google.com with SMTP id
+ b13-20020a17090a5a0d00b0021906102d05so2735549pjd.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Dec 2022 09:26:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20210112.gappssmtp.com; s=20210112;
+ h=content-transfer-encoding:in-reply-to:from:content-language
+ :references:cc:to:subject:user-agent:mime-version:date:message-id
+ :from:to:cc:subject:date:message-id:reply-to;
+ bh=02CF0TJYI4L7g3srrazD4xH+/OuBD9klT/4Hk2gtU0U=;
+ b=txApKc3gtDcQMm+FVBYm+D0Mo1n4TL0Vapxd3lQf0wekHKp4QFL/juRdq0ivkrC709
+ rVw0C5ACxYCPAbySn7V5JKA+NV3okQWkwPGbENM2SJwgdMTeyObxCCwgwUOOx0BC7oWz
+ +h7qGkFumy1Mw737V/jWWIQ0z6+NFFhlD5owjCq/feMugXvEoCHJax5uCjFKdA88ptVQ
+ C2bNboHdjpx/p+BBKcMcghLfjGguL5CJ+usVgzk6pHX7s0eXXjYbXywS0/ciUiAkhj6B
+ w4jY4IdmFe2vSaYLG2oj5UHN9K1ZzirLTvOs3K1gjqpLYDePd8bzLoi1/rndXhowE6SL
+ zdPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
- :message-id:reply-to;
- bh=vTY+8zbB0KLCO6w0Ejf7JKks2CQ81Juv1hZh5NUQZR4=;
- b=cgu4qiPNvwwytDDeSF5TMqg0pjKGEmmUXvT87jWRDstG6/vmBm5iqlDHHNua+sWxLq
- mCAoZ6+VbuMi53UY8k9vQsX7Ge2CoONz6Y6Hy/NwXGknMQCI63VA739k7On+nQQXAAY/
- OfY5GooTugWWqZva1iAIkUPgXm78iYN6wHEEyf/zG4btINwQsuYskWZHd+pZUbX4UxNw
- qYJXdQofLjEMdz2ZiWRJDvhC1LS/WyUWAzpQcClMEU5bJeKSBmHIAk9Koa+RcN4lz8zG
- lXdmuKx1ZDGSLQQ0s5Zde6tNVftZjJpgozbwhxL3xP0HEDyJBAIit5nAkRaqu/5tGHej
- u5Fw==
-X-Gm-Message-State: ANoB5pnTM37gdD8stNNDfD7CrQ4xsdgJazgOpLidlYy4n2idKkE/oI2Y
- b/un16NWGbbC+7onT7a/kM3uvg==
-X-Google-Smtp-Source: AA0mqf5UZ9qHBSuQEb51ccUtt96/EYaqD9BX/Idpdnx6b6AJi+o87tpAhwiganp1cvDCxUMzAoT9UA==
-X-Received: by 2002:a17:903:240b:b0:186:9fc5:6c2c with SMTP id
- e11-20020a170903240b00b001869fc56c2cmr48339955plo.174.1669913509971; 
- Thu, 01 Dec 2022 08:51:49 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com.
- [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
- ij19-20020a170902ab5300b001769e6d4fafsm3865136plb.57.2022.12.01.08.51.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 01 Dec 2022 08:51:49 -0800 (PST)
-Date: Thu, 1 Dec 2022 08:51:46 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v4 04/16] KVM: arm64: PMU: Distinguish between 64bit
- counter and 64bit overflow
-Message-ID: <Y4jbosgHbUDI0WF4@google.com>
-References: <20221113163832.3154370-1-maz@kernel.org>
- <20221113163832.3154370-5-maz@kernel.org>
- <Y4jasyxvFRNvvmox@google.com>
+ h=content-transfer-encoding:in-reply-to:from:content-language
+ :references:cc:to:subject:user-agent:mime-version:date:message-id
+ :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+ bh=02CF0TJYI4L7g3srrazD4xH+/OuBD9klT/4Hk2gtU0U=;
+ b=lJQHvAp0jckuM5gnN9n6psW/rY2IfuzUqkIa2+vARFcWodPm/XcNTT15v/AY6aAmbr
+ dO7TdLo3OmzXuZ2xfk33RMqz1amj/TT5wywQ3qkaIy/2gdnyJ+nM1ZsuWzwTDHj6wL8c
+ iPZM0SPnMSKjuObHG5HfPjS1Cj8Mr++ejYz5RViChQQlxWmBh7EbtehCRs/58wOPr+6o
+ VHNahNb7sCssTF2BQJ+ptYyCGwzxxmorK+3+q33DhYRxCgcbzr8twHQCFq+Pz1REukiC
+ 51Y1am23bnx7ja0wAlqg3LsnLRJ9aTaV9O4R8Gxz5BLLrqlfFxV3G2CKhhJeOA2ELm0E
+ Yp+w==
+X-Gm-Message-State: ANoB5pmSZYvtcGoSHxIALPLkiayvGM58Afk28h8xuvZ00gyENBSXV+Rx
+ 5N6VpJ4Ku8mAtkI9PwWN7/TtTg==
+X-Google-Smtp-Source: AA0mqf4SMFdu/n4a1aFlo3szQD2bjOfheoqlSHE9xuODUTMXDUAclzarx3ixXW8iNFKhgeVWojv9Lg==
+X-Received: by 2002:a17:902:d650:b0:189:f86:ecb with SMTP id
+ y16-20020a170902d65000b001890f860ecbmr58839022plh.45.1669915572825; 
+ Thu, 01 Dec 2022 09:26:12 -0800 (PST)
+Received: from ?IPV6:2400:4050:c360:8200:8ae8:3c4:c0da:7419?
+ ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
+ by smtp.gmail.com with ESMTPSA id
+ n11-20020a170902e54b00b00178aaf6247bsm3965798plf.21.2022.12.01.09.26.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 01 Dec 2022 09:26:12 -0800 (PST)
+Message-ID: <50499ee9-33fe-4f5d-9d0a-76ceef038333@daynix.com>
+Date: Fri, 2 Dec 2022 02:26:08 +0900
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Y4jasyxvFRNvvmox@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH 0/3] KVM: arm64: Handle CCSIDR associativity mismatches
+To: Marc Zyngier <maz@kernel.org>
+References: <20221201104914.28944-1-akihiko.odaki@daynix.com>
+ <867czbmlh1.wl-maz@kernel.org>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <867czbmlh1.wl-maz@kernel.org>
+Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>, Will Deacon <will@kernel.org>,
+ Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
+ asahi@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -89,144 +97,87 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Dec 01, 2022 at 08:47:47AM -0800, Ricardo Koller wrote:
-> On Sun, Nov 13, 2022 at 04:38:20PM +0000, Marc Zyngier wrote:
-> > The PMU architecture makes a subtle difference between a 64bit
-> > counter and a counter that has a 64bit overflow. This is for example
-> > the case of the cycle counter, which can generate an overflow on
-> > a 32bit boundary if PMCR_EL0.LC==0 despite the accumulation being
-> > done on 64 bits.
-> > 
-> > Use this distinction in the few cases where it matters in the code,
-> > as we will reuse this with PMUv3p5 long counters.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/pmu-emul.c | 43 ++++++++++++++++++++++++++++-----------
-> >  1 file changed, 31 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > index 69b67ab3c4bf..d050143326b5 100644
-> > --- a/arch/arm64/kvm/pmu-emul.c
-> > +++ b/arch/arm64/kvm/pmu-emul.c
-> > @@ -50,6 +50,11 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
-> >   * @select_idx: The counter index
-> >   */
-> >  static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
-> > +{
-> > +	return (select_idx == ARMV8_PMU_CYCLE_IDX);
-> > +}
-> > +
-> > +static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 select_idx)
-> >  {
-> >  	return (select_idx == ARMV8_PMU_CYCLE_IDX &&
-> >  		__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
-> > @@ -57,7 +62,8 @@ static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
-> >  
-> >  static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
-> >  {
-> > -	return (!(idx & 1) && (idx + 1) < ARMV8_PMU_CYCLE_IDX);
-> > +	return (!(idx & 1) && (idx + 1) < ARMV8_PMU_CYCLE_IDX &&
-> > +		!kvm_pmu_idx_has_64bit_overflow(vcpu, idx));
-> >  }
-> >  
-> >  static struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
-> > @@ -97,7 +103,7 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
-> >  		counter += perf_event_read_value(pmc->perf_event, &enabled,
-> >  						 &running);
-> >  
-> > -	if (select_idx != ARMV8_PMU_CYCLE_IDX)
-> > +	if (!kvm_pmu_idx_is_64bit(vcpu, select_idx))
-> >  		counter = lower_32_bits(counter);
-> >  
-> >  	return counter;
-> > @@ -423,6 +429,23 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
-> >  	}
-> >  }
-> >  
-> > +/* Compute the sample period for a given counter value */
-> > +static u64 compute_period(struct kvm_vcpu *vcpu, u64 select_idx, u64 counter)
-> > +{
-> > +	u64 val;
-> > +
-> > +	if (kvm_pmu_idx_is_64bit(vcpu, select_idx)) {
-> > +		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx))
-> > +			val = -(counter & GENMASK(31, 0));
+On 2022/12/01 20:06, Marc Zyngier wrote:
+> On Thu, 01 Dec 2022 10:49:11 +0000,
+> Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
 > 
-> If I understand things correctly, this might be missing another mask:
+> Thanks for looking into this.
 > 
-> +		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx)) {
-> +			val = -(counter & GENMASK(31, 0));
-> +			val &= GENMASK(31, 0);
-> +		} else {
+>> M2 MacBook Air has mismatched CCSIDR associativity bits, which makes the
+>> bits a KVM vCPU sees inconsistent when migrating.
 > 
-> For example, if the counter is 64-bits wide, it overflows at 32-bits,
-> and it is _one_ sample away from overflowing at 32-bits:
-> 
-> 	0x01010101_ffffffff
-> 
-> Then "val = (-counter) & GENMASK(63, 0)" would return 0xffffffff_00000001.
+> Can you describe the actual discrepancy? Is that an issue between the
+> two core types? In which case, nothing says that these two cluster
+> should have the same cache topology.
 
-Sorry, this should be:
+Yes, the processor has big.LITTLE configuration.
 
-	Then "val = -(counter & GENMASK(31, 0))" would return 0xffffffff_00000001.
+On the processor, the valid CSSELR values are 0 (L1D), 1 (L1I), 3 (L2D). 
+For each CSSELR values, each cluster has:
+- 0x700FE03A, 0x203FE01A, 0x70FFE07B
+- 0x701FE03A, 0x203FE02A, 0x73FFE07B
 
-> But the right period is 0x00000000_00000001 (it's one sample away from
-> overflowing).
 > 
-> > +		else
-> > +			val = (-counter) & GENMASK(63, 0);
-> > +	} else {
-> > +		val = (-counter) & GENMASK(31, 0);
-> > +	}
-> > +
-> > +	return val;
-> > +}
-> > +
-> >  /**
-> >   * When the perf event overflows, set the overflow status and inform the vcpu.
-> >   */
-> > @@ -442,10 +465,7 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
-> >  	 * Reset the sample period to the architectural limit,
-> >  	 * i.e. the point where the counter overflows.
-> >  	 */
-> > -	period = -(local64_read(&perf_event->count));
-> > -
-> > -	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
-> > -		period &= GENMASK(31, 0);
-> > +	period = compute_period(vcpu, idx, local64_read(&perf_event->count));
-> >  
-> >  	local64_set(&perf_event->hw.period_left, 0);
-> >  	perf_event->attr.sample_period = period;
-> > @@ -571,14 +591,13 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
-> >  
-> >  	/*
-> >  	 * If counting with a 64bit counter, advertise it to the perf
-> > -	 * code, carefully dealing with the initial sample period.
-> > +	 * code, carefully dealing with the initial sample period
-> > +	 * which also depends on the overflow.
-> >  	 */
-> > -	if (kvm_pmu_idx_is_64bit(vcpu, select_idx)) {
-> > +	if (kvm_pmu_idx_is_64bit(vcpu, select_idx))
-> >  		attr.config1 |= PERF_ATTR_CFG1_COUNTER_64BIT;
-> > -		attr.sample_period = (-counter) & GENMASK(63, 0);
-> > -	} else {
-> > -		attr.sample_period = (-counter) & GENMASK(31, 0);
-> > -	}
-> > +
-> > +	attr.sample_period = compute_period(vcpu, select_idx, counter);
-> >  
-> >  	event = perf_event_create_kernel_counter(&attr, -1, current,
-> >  						 kvm_pmu_perf_overflow, pmc);
-> > -- 
-> > 2.34.1
-> > 
-> > 
+>> It also makes QEMU fail restoring the vCPU registers because QEMU saves
+>> and restores all of the registers including CCSIDRs, and if the vCPU
+>> migrated among physical CPUs between saving and restoring, it tries to
+>> restore CCSIDR values that mismatch with the current physical CPU, which
+>> causes EFAULT.
+> 
+> Well, QEMU will have plenty of other problems, starting with MIDRs,
+> which always reflect the physical one. In general, KVM isn't well
+> geared for VMs spanning multiple CPU types. It is improving, but there
+> is a long way to go.
+
+On M2 MacBook Air, I have seen no other difference in standard ID 
+registers and CCSIDRs are exceptions. Perhaps Apple designed this way so 
+that macOS's Hypervisor can freely migrate vCPU, but I can't assure that 
+without more analysis. This is still enough to migrate vCPU running 
+Linux at least.
+
+> 
+>> Trap CCSIDRs if there are CCSIDR value msimatches, and override the
+>> associativity bits when handling the trap.
+> 
+> TBH, I'd rather we stop reporting this stuff altogether.
+> 
+> There is nothing a correctly written arm64 guest should do with any of
+> this (this is only useful for set/way CMOs, which non-secure SW should
+> never issue). It would be a lot better to expose a virtual topology
+> (one set, one way, one level). It would also save us from the CCSIDRX
+> silliness.
+> 
+> The only complexity would be to still accept different topologies from
+> userspace so that we can restore a VM saved before this virtual
+> topology.
+
+Another (minor) concern is that trapping relevant registers may cost too 
+much. Currently KVM traps CSSELR and CCSIDR accesses with HCR_TID2, but 
+HCR_TID2 also affects CTR_EL0. Although I'm not sure if the register is 
+referred frequently, Arm introduced FEAT_EVT to trap CSSELR and CSSIDR 
+but not CTR_EL0 so there may be some case where trapping CTR_EL0 is not 
+tolerated. Perhaps Arm worried that a userspace application may read 
+CTR_EL0 frequently.
+
+If you think the concern on VM restoration you mentioned and the 
+trapping overhead is tolerable, I'll write a new, much smaller patch 
+accordingly.
+
+Regards,
+Akihiko Odaki
+
+> 
+> Do you mind having a look at this?
+> 
+> Thanks,
+> 
+> 	M.
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
