@@ -2,84 +2,107 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4C81C47089
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C5CC47088
 	for <kvmarm@archiver.kernel.org>; Thu,  1 Dec 2022 15:52:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C2464B15C;
-	Thu,  1 Dec 2022 10:52:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF68040755;
+	Thu,  1 Dec 2022 10:52:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered)
-	header.i=@daynix-com.20210112.gappssmtp.com
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DVCPIcJgZmLH; Thu,  1 Dec 2022 10:52:03 -0500 (EST)
+	with ESMTP id JuTN6eUmkYEV; Thu,  1 Dec 2022 10:52:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B0C2A4B10B;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 980C449E34;
 	Thu,  1 Dec 2022 10:52:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7038740DAE
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 05:49:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C65D403C5
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 05:43:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DqwoGlKJWwqP for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Dec 2022 05:49:47 -0500 (EST)
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com
- [209.85.215.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A705240399
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 05:49:47 -0500 (EST)
-Received: by mail-pg1-f182.google.com with SMTP id v3so1336050pgh.4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Dec 2022 02:49:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20210112.gappssmtp.com; s=20210112;
- h=content-transfer-encoding:mime-version:message-id:date:subject:cc
- :to:from:from:to:cc:subject:date:message-id:reply-to;
- bh=foBGF6JlnonEt7u87TDzA6BdrpBeBHRT3WfaCgQwD4w=;
- b=pGFrHYoSXyP+05btXeBT3GDPA3BBMxmoFjzQZdLLbgcGtRtd7Y/ed5g89sJ1Ko2BPl
- w/8U2Gtv0tPTKbIoyyXc0HC34rPREN8tpEVZ/Qtoy8EeMjUkcOed+O4vgW6MMT3hG2Tb
- tO9d9Tl7iu01SE4eUZGMehhVYLEiufve+6A3CwtlCYfgpP/KxK/0YZh41SA3Qd/K0L0p
- nljgnw7gJjidBiRqpmEM674grrj/teo9cmJEC8loX80WVe6FUFnf0OGBf/zgJL2lXACi
- RkyW+dL8owebIelG/XFn8Kfi64VfgOBe21NgfHGMBM72tOVxpHAQkbIbXMQ3GtPimpw/
- ZP5Q==
+ with ESMTP id Kb6r5+ORWEFm for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Dec 2022 05:43:23 -0500 (EST)
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com
+ [209.85.128.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D2008403BC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 05:43:23 -0500 (EST)
+Received: by mail-wm1-f52.google.com with SMTP id
+ p13-20020a05600c468d00b003cf8859ed1bso1179819wmo.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Dec 2022 02:43:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+ :content-language:subject:user-agent:mime-version:date:message-id
+ :from:from:to:cc:subject:date:message-id:reply-to;
+ bh=34xRbeJm4Ksf3agn72vdHuQrCy+xFaOAkMI20jSUs8E=;
+ b=AzHg60UfqWIuniRDwSV0kUn58L84AxRbLj1KxaWUpkExnaz9Jf0mpMJsRIxs0KObgd
+ soQ1W7t6DClFqZL5Sz4pVLJxPODSdcfWH2JFiVW2zEBMerlLvjkR1+DJoc4+WpNBKL+I
+ PW6xkLEEUmN/Se6yT0vIWJph39WzqIA+SJPH1Jsv7h7dKXsKvjwPoKUClZhTIgXjAbFD
+ m9zWUx0GIE8Dv1vkZzsH73Fq4mPpvgYZnpRmT8AL17xzVUC4+XcR3wej4y3vY5DfOIdr
+ 5pF7L9v5/ffa3NIJyyFg3JxW0kRC69giw2m5lejSbkJhsGZxR9w1oE4BDHpBORKVLYtO
+ 3/ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=content-transfer-encoding:mime-version:message-id:date:subject:cc
- :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
- :reply-to;
- bh=foBGF6JlnonEt7u87TDzA6BdrpBeBHRT3WfaCgQwD4w=;
- b=ECbdAgX9V+A1v8sRxMq4XBBm1vUUCrxpoDAS8+WsOhnrQgrxaYaGhjOkqdLQwIpUyS
- O9WrRzuCb+nTpelDkslgSH7YgXmplg2WkxgibXc7e1DZkdBOXXAzMJlHQ4q+u9/rFfK2
- EXI8XDkEdVB1PZpIy/RrM9cIdLCNh8YzEH8JZ6phZCLBFUGRuWQxPWz0fz5xzI/qBZnk
- xFwKZpSs8WSKer04ZEt6K/pHAAxKB4d0FGU0k0UlTmVV02JN6zxwOomgIRaMrTPImQO/
- LaBdOOYDZnB70RyPFe1j2OvFGdkUzRbvAxW769dAfJkrlvG8Ghtb8l1m0AjgVyl2l9WF
- ZOuA==
-X-Gm-Message-State: ANoB5plPMcVd+2CZJ9zbRB5qvpTdRVxVVkEHveMj9DQym63WJxGJQ1HS
- Djtn+dH4sBPy3CSYmXjUG+06kw==
-X-Google-Smtp-Source: AA0mqf6Cyu7laoCbi5JoSZv0gkqjvpvrXeXiVPp6Vj2NLBpsceZWkQJBNxO9yJFLr0IOOo439dEXsQ==
-X-Received: by 2002:a63:310:0:b0:478:7e02:fa11 with SMTP id
- 16-20020a630310000000b004787e02fa11mr25577pgd.222.1669891786574; 
- Thu, 01 Dec 2022 02:49:46 -0800 (PST)
-Received: from fedora.flets-east.jp ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
+ h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+ :content-language:subject:user-agent:mime-version:date:message-id
+ :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+ bh=34xRbeJm4Ksf3agn72vdHuQrCy+xFaOAkMI20jSUs8E=;
+ b=ISrGfWOltBvBmnpn/fq93ExALOh1CyfprokX6dLfvGN1KtI+aD+kG4JDzbvNHVBDyX
+ ya4KCbzPkwvruqcaZ/NiosfBGPwaj7IqaoKNTKvpCAnMChOnNaQe+pn7D2w0iQP5YsOJ
+ 4nIiSrgAGAJGWaKAE635XK2OUgYju7xHoDyWGA4v2X9aUa8helIRdD3fsccO6xgExx/S
+ zn9jCa8NCmbGV4zBCm5R7r74x9Qxk6/9LJ7khLz4Q2g4Zo5bAOBvhFu1BD38gqM6YmDA
+ ST5IoQP8cefQwuzImUgGatoEM4UFpkxkEuFSTN70/BkfPavg9jUOL+N71OyEj9pTSdax
+ Ibsg==
+X-Gm-Message-State: ANoB5pn318jZz6NZa4PEeJzVWWkPj/YN7DqtcCJkoDFs5S1NIzDRSc8/
+ arA/KJnePfdZKT789WloFvE=
+X-Google-Smtp-Source: AA0mqf6f8L9W/LFpuxiieU1hwL0SgbBmWKJep4VDP/7W75bGJuJSe0KFg6OoADvN7w7dpRP5siL0uQ==
+X-Received: by 2002:a05:600c:1f16:b0:3cf:66a2:d440 with SMTP id
+ bd22-20020a05600c1f1600b003cf66a2d440mr47429561wmb.108.1669891402569; 
+ Thu, 01 Dec 2022 02:43:22 -0800 (PST)
+Received: from [192.168.0.248] (54-240-197-238.amazon.com. [54.240.197.238])
  by smtp.gmail.com with ESMTPSA id
- 4-20020a630804000000b004785a63b44bsm2320580pgi.43.2022.12.01.02.49.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 01 Dec 2022 02:49:46 -0800 (PST)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-To: 
-Subject: [PATCH 0/3] KVM: arm64: Handle CCSIDR associativity mismatches
-Date: Thu,  1 Dec 2022 19:49:11 +0900
-Message-Id: <20221201104914.28944-1-akihiko.odaki@daynix.com>
-X-Mailer: git-send-email 2.38.1
+ i10-20020a1c540a000000b003cfc02ab8basm8303094wmb.33.2022.12.01.02.43.20
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 01 Dec 2022 02:43:22 -0800 (PST)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <aa3be096-4f05-b653-b801-e102abe01903@xen.org>
+Date: Thu, 1 Dec 2022 10:43:18 +0000
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v2 34/50] KVM: x86: Unify pr_fmt to use module name for
+ all KVM modules
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Matthew Rosato <mjrosato@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, David Woodhouse <dwmw2@infradead.org>
+References: <20221130230934.1014142-1-seanjc@google.com>
+ <20221130230934.1014142-35-seanjc@google.com>
+Organization: Xen Project
+In-Reply-To: <20221130230934.1014142-35-seanjc@google.com>
 X-Mailman-Approved-At: Thu, 01 Dec 2022 10:52:00 -0500
-Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
- Akihiko Odaki <akihiko.odaki@daynix.com>,
- Mathieu Poirier <mathieu.poirier@linaro.org>, Marc Zyngier <maz@kernel.org>,
- Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, asahi@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+ Atish Patra <atishp@atishpatra.org>, linux-kernel@vger.kernel.org,
+ Kai Huang <kai.huang@intel.com>, linux-riscv@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
+ Michael Ellerman <mpe@ellerman.id.au>, Chao Gao <chao.gao@intel.com>,
+ Yuan Yao <yuan.yao@intel.com>, kvmarm@lists.linux.dev,
+ Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+ Fabiano Rosas <farosas@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linuxppc-dev@lists.ozlabs.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,43 +114,50 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-M2 MacBook Air has mismatched CCSIDR associativity bits, which makes the
-bits a KVM vCPU sees inconsistent when migrating.
+On 30/11/2022 23:09, Sean Christopherson wrote:
+> Define pr_fmt using KBUILD_MODNAME for all KVM x86 code so that printks
+> use consistent formatting across common x86, Intel, and AMD code.  In
+> addition to providing consistent print formatting, using KBUILD_MODNAME,
+> e.g. kvm_amd and kvm_intel, allows referencing SVM and VMX (and SEV and
+> SGX and ...) as technologies without generating weird messages, and
+> without causing naming conflicts with other kernel code, e.g. "SEV: ",
+> "tdx: ", "sgx: " etc.. are all used by the kernel for non-KVM subsystems.
+> 
+> Opportunistically move away from printk() for prints that need to be
+> modified anyways, e.g. to drop a manual "kvm: " prefix.
+> 
+> Opportunistically convert a few SGX WARNs that are similarly modified to
+> WARN_ONCE; in the very unlikely event that the WARNs fire, odds are good
+> that they would fire repeatedly and spam the kernel log without providing
+> unique information in each print.
+> 
+> Note, defining pr_fmt yields undesirable results for code that uses KVM's
+> printk wrappers, e.g. vcpu_unimpl().  But, that's a pre-existing problem
+> as SVM/kvm_amd already defines a pr_fmt, and thankfully use of KVM's
+> wrappers is relatively limited in KVM x86 code.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+[snip]
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index b246decb53a9..3bf7d69373cf 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -5,6 +5,7 @@
+>    *
+>    * KVM Xen emulation
+>    */
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+>   
+>   #include "x86.h"
+>   #include "xen.h"
 
-It also makes QEMU fail restoring the vCPU registers because QEMU saves
-and restores all of the registers including CCSIDRs, and if the vCPU
-migrated among physical CPUs between saving and restoring, it tries to
-restore CCSIDR values that mismatch with the current physical CPU, which
-causes EFAULT.
-
-Trap CCSIDRs if there are CCSIDR value msimatches, and override the
-associativity bits when handling the trap.
-
-Akihiko Odaki (3):
-  KVM: arm64: Make CCSIDRs consistent
-  arm64: errata: Check for mismatched cache associativity
-  KVM: arm64: Handle CCSIDR associativity mismatches
-
- arch/arm64/include/asm/cache.h       |  3 ++
- arch/arm64/include/asm/cpu.h         |  1 +
- arch/arm64/include/asm/cpufeature.h  |  8 +++++
- arch/arm64/include/asm/kvm_emulate.h | 10 ++++--
- arch/arm64/include/asm/sysreg.h      |  7 ++++
- arch/arm64/kernel/cacheinfo.c        |  4 +--
- arch/arm64/kernel/cpu_errata.c       | 52 ++++++++++++++++++++++++++++
- arch/arm64/kernel/cpufeature.c       |  4 +++
- arch/arm64/kernel/cpuinfo.c          | 30 ++++++++++++++++
- arch/arm64/kvm/sys_regs.c            | 50 ++++++++++++++------------
- arch/arm64/tools/cpucaps             |  1 +
- 11 files changed, 144 insertions(+), 26 deletions(-)
-
--- 
-2.38.1
+Reviewed-by: Paul Durrant <paul@xen.org>
 
 _______________________________________________
 kvmarm mailing list
