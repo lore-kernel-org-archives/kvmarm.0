@@ -1,259 +1,192 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD0310F6
-	for <kvmarm@lists.linux.dev>; Thu,  1 Dec 2022 16:38:23 +0000 (UTC)
-Received: by mail-pf1-f176.google.com with SMTP id k79so2362570pfd.7
-        for <kvmarm@lists.linux.dev>; Thu, 01 Dec 2022 08:38:23 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF5EF10F6
+	for <kvmarm@lists.linux.dev>; Thu,  1 Dec 2022 16:47:51 +0000 (UTC)
+Received: by mail-pl1-f173.google.com with SMTP id w23so2153242ply.12
+        for <kvmarm@lists.linux.dev>; Thu, 01 Dec 2022 08:47:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=wz5UjU3Ma0W7cBTZ/63jSNwcUzSf/RN7ETO0YflOK9Q=;
-        b=L5oONEpJeyYInhCN8kEGfJ8WS2VPlfmSQI0EIRyACnSb62Ho4uiLAZ+22FZ0LpKSBY
-         OanLGdeorUn/O6YHVn5BHqcWoMtKOfzbPKcz+4fsn48JXXYOuwBU81HsoXu4yIA+KxBs
-         oNf69ULLkYXBFawHATlUKtmTRlCCGuue7O3x4Uj20kNa312jwW6CLd6dDy2pzPGk3DaL
-         y4jm5SpqWS/wMH/C2TjT2ihvVuFcoRw2TnuuxPCYPfzDwkDLPEA8hE11/Idhqhxr7xt0
-         rj/FXhrQIb1ypgd2I2CBp8L/oyRKWO3NUq8Jq7LgrgnoUKAu1/kU3hKmcHIeaOcvmDNO
-         M6Aw==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oiPlfSphC7yJwjzyONiuPHRaJCv76fAx56UNQh41g3U=;
+        b=aaSEEL1+r4eJA9s7O/txHL7Xi6SeBXxCYU48kQub2FzkoNiCQgY/eKMqO5OpiGzNkd
+         1fgcRFsW0Q8Eus37xwWj3KdJkf/nkdAn7deQM9A3unixyBBmCtnk4ItrX5zmkqeauV7Z
+         EHSxi6t3xV9JTzBKEe6qyUH3nU5jd8scAngXmGxbO4kHLXLzwd7eMIA1U+m6io8/hlIA
+         inkGF5zxjhY3WjorcUncv5WMH8ppC3yRqxudwsfmA3Vd8bdpGI39pdI3xbMqZhlJ9Dae
+         qoVrUQ5fNhLvFb2qSkC+7WLtct4Cl639VfIpdiNSV+VUkVIZJmLINY9wkDpQ16j8PGnQ
+         DUMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wz5UjU3Ma0W7cBTZ/63jSNwcUzSf/RN7ETO0YflOK9Q=;
-        b=lDVF2X0Xhv3PxjbAc9BXU+rjiUblDungalxQbgf6175pHlKBOurQ0tgFdHVCDTWtNh
-         pYSrvex06A3e0L9QcLUM95TFgHJw61+Bg6PjXtZ1lEzXlMtxlS6IYjqgdF8F+D6BGeo1
-         PBhGrUBtdPLzWDLXRJOAhk7Qvbb3avoyiJ+VLAL8g9EnwptX1WpQ1bk7l7Z1/j1YWYaL
-         GFza6OAGFz7ZxYMU3IYi703EyfqqLheNERrA1WzkXyyQFrFciu0NOx0/n7QPpG56JkWx
-         FD2H2n2OUP4m1QGDGXcklIQBaLCeYiou84kR8djfBjf6XnRrMHLRe3fEMU3S8lFBKKQt
-         nF1A==
-X-Gm-Message-State: ANoB5pkL0cZvUErYjqD8FqhO7Hh9/CUe3MVFAS0suoYd/iOa6vRY0pm/
-	Qw5d/1BjoRyTH1wYRzbwWaI0gg==
-X-Google-Smtp-Source: AA0mqf7E8VTs9g+yA9GqMgTdFbO4YLYoa36a9KLdCj074cztIQB7gniXVzh1et27ldGMC17rtCxmqQ==
-X-Received: by 2002:aa7:8512:0:b0:575:65ff:8831 with SMTP id v18-20020aa78512000000b0057565ff8831mr16235817pfn.80.1669912703144;
-        Thu, 01 Dec 2022 08:38:23 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id l4-20020a17090a384400b00212c27abcaesm5118172pjf.17.2022.12.01.08.38.22
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oiPlfSphC7yJwjzyONiuPHRaJCv76fAx56UNQh41g3U=;
+        b=JEr7tC5VIHq0stWyG1bw25pGEJIc6F+tU+8EvyD5i31V3dhqCxVq3F5Zys9RKFpdAq
+         8YV7q1dj3e7swiu6t6omGqdPI+abwwuSKTLnbl7E8fDl/4QCwgvtefg/yKq7uZvPALe2
+         +ey+3OGjeLnrxEBL7EhviwPX1wzOtbgOx0GsiGSk4k31k2gkPWzH5SIspw/eSf/QqS51
+         Dq2hwlbAFPLpTC8WUpOZYZx4bTY225GUADzQZaJPrUJdVpjcoKI2PhCg2Gdhbdexoz1V
+         T9tqt9xqL3KdXCogNkhPVzYVueKKngA62oZX8EkiWxBAry4fTSYLPm6tuyM0vAC23n5j
+         jqPg==
+X-Gm-Message-State: ANoB5pnaSmp2C8uQXKaB/hfCWPetA0kEFIgCOXtRpJDclRAO4QqMJek1
+	QPIoJXSowPrD8AiYSMifxugtkg==
+X-Google-Smtp-Source: AA0mqf53wGa2uc6DutJAhGFjA4M2t8L/aNqHRIlBg+n5iB0HMiUkSRxe6etbVweNGGfkPbg13GSeTw==
+X-Received: by 2002:a17:90a:4e41:b0:218:a971:d847 with SMTP id t1-20020a17090a4e4100b00218a971d847mr56219004pjl.91.1669913271049;
+        Thu, 01 Dec 2022 08:47:51 -0800 (PST)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id g6-20020a63fa46000000b0046f469a2661sm2751612pgk.27.2022.12.01.08.47.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Dec 2022 08:38:22 -0800 (PST)
-Date: Thu, 1 Dec 2022 16:38:16 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
+        Thu, 01 Dec 2022 08:47:50 -0800 (PST)
+Date: Thu, 1 Dec 2022 08:47:47 -0800
+From: Ricardo Koller <ricarkol@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Atish Patra <atishp@atishpatra.org>,
-	David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Yuan Yao <yuan.yao@intel.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Fabiano Rosas <farosas@linux.ibm.com>,
-	Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v2 26/50] KVM: PPC: Move processor compatibility check to
- module init
-Message-ID: <Y4jXuh4P9Oibki6W@google.com>
-References: <20221130230934.1014142-1-seanjc@google.com>
- <20221130230934.1014142-27-seanjc@google.com>
- <87cz93snqc.fsf@mpe.ellerman.id.au>
+	Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v4 04/16] KVM: arm64: PMU: Distinguish between 64bit
+ counter and 64bit overflow
+Message-ID: <Y4jasyxvFRNvvmox@google.com>
+References: <20221113163832.3154370-1-maz@kernel.org>
+ <20221113163832.3154370-5-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87cz93snqc.fsf@mpe.ellerman.id.au>
-Message-ID: <20221201163816.d1CdTmvQ9q2mt89XTgxdQ5E9RcBt-Ua_P6Moqb0Hhys@z>
+In-Reply-To: <20221113163832.3154370-5-maz@kernel.org>
+Message-ID: <20221201164747.CZDnSKg4W-OqgxhPAz-uZ4s9aTGEZB2wSkG4gz2bkR0@z>
 
-On Thu, Dec 01, 2022, Michael Ellerman wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> > Move KVM PPC's compatibility checks to their respective module_init()
-> > hooks, there's no need to wait until KVM's common compat check, nor is
-> > there a need to perform the check on every CPU (provided by common KVM's
-> > hook), as the compatibility checks operate on global data.
-> >
-> >   arch/powerpc/include/asm/cputable.h: extern struct cpu_spec *cur_cpu_spec;
-> >   arch/powerpc/kvm/book3s.c: return 0
-> >   arch/powerpc/kvm/e500.c: strcmp(cur_cpu_spec->cpu_name, "e500v2")
-> >   arch/powerpc/kvm/e500mc.c: strcmp(cur_cpu_spec->cpu_name, "e500mc")
-> >                              strcmp(cur_cpu_spec->cpu_name, "e5500")
-> >                              strcmp(cur_cpu_spec->cpu_name, "e6500")
+On Sun, Nov 13, 2022 at 04:38:20PM +0000, Marc Zyngier wrote:
+> The PMU architecture makes a subtle difference between a 64bit
+> counter and a counter that has a 64bit overflow. This is for example
+> the case of the cycle counter, which can generate an overflow on
+> a 32bit boundary if PMCR_EL0.LC==0 despite the accumulation being
+> done on 64 bits.
 > 
-> I'm not sure that output is really useful in the change log unless you
-> explain more about what it is.
-
-Agreed, I got lazy.  I'll write a proper description.
- 
-> > diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
-> > index 57e0ad6a2ca3..795667f7ebf0 100644
-> > --- a/arch/powerpc/kvm/e500mc.c
-> > +++ b/arch/powerpc/kvm/e500mc.c
-> > @@ -388,6 +388,10 @@ static int __init kvmppc_e500mc_init(void)
-> >  {
-> >  	int r;
-> >  
-> > +	r = kvmppc_e500mc_check_processor_compat();
-> > +	if (r)
-> > +		return kvmppc_e500mc;
+> Use this distinction in the few cases where it matters in the code,
+> as we will reuse this with PMUv3p5 long counters.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/pmu-emul.c | 43 ++++++++++++++++++++++++++++-----------
+>  1 file changed, 31 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 69b67ab3c4bf..d050143326b5 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -50,6 +50,11 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
+>   * @select_idx: The counter index
+>   */
+>  static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
+> +{
+> +	return (select_idx == ARMV8_PMU_CYCLE_IDX);
+> +}
+> +
+> +static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 select_idx)
+>  {
+>  	return (select_idx == ARMV8_PMU_CYCLE_IDX &&
+>  		__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
+> @@ -57,7 +62,8 @@ static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
 >  
-> This doesn't build:
+>  static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
+>  {
+> -	return (!(idx & 1) && (idx + 1) < ARMV8_PMU_CYCLE_IDX);
+> +	return (!(idx & 1) && (idx + 1) < ARMV8_PMU_CYCLE_IDX &&
+> +		!kvm_pmu_idx_has_64bit_overflow(vcpu, idx));
+>  }
+>  
+>  static struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
+> @@ -97,7 +103,7 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+>  		counter += perf_event_read_value(pmc->perf_event, &enabled,
+>  						 &running);
+>  
+> -	if (select_idx != ARMV8_PMU_CYCLE_IDX)
+> +	if (!kvm_pmu_idx_is_64bit(vcpu, select_idx))
+>  		counter = lower_32_bits(counter);
+>  
+>  	return counter;
+> @@ -423,6 +429,23 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
+>  	}
+>  }
+>  
+> +/* Compute the sample period for a given counter value */
+> +static u64 compute_period(struct kvm_vcpu *vcpu, u64 select_idx, u64 counter)
+> +{
+> +	u64 val;
+> +
+> +	if (kvm_pmu_idx_is_64bit(vcpu, select_idx)) {
+> +		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx))
+> +			val = -(counter & GENMASK(31, 0));
+
+If I understand things correctly, this might be missing another mask:
+
++		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx)) {
++			val = -(counter & GENMASK(31, 0));
++			val &= GENMASK(31, 0);
++		} else {
+
+For example, if the counter is 64-bits wide, it overflows at 32-bits,
+and it is _one_ sample away from overflowing at 32-bits:
+
+	0x01010101_ffffffff
+
+Then "val = (-counter) & GENMASK(63, 0)" would return 0xffffffff_00000001.
+But the right period is 0x00000000_00000001 (it's one sample away from
+overflowing).
+
+> +		else
+> +			val = (-counter) & GENMASK(63, 0);
+> +	} else {
+> +		val = (-counter) & GENMASK(31, 0);
+> +	}
+> +
+> +	return val;
+> +}
+> +
+>  /**
+>   * When the perf event overflows, set the overflow status and inform the vcpu.
+>   */
+> @@ -442,10 +465,7 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+>  	 * Reset the sample period to the architectural limit,
+>  	 * i.e. the point where the counter overflows.
+>  	 */
+> -	period = -(local64_read(&perf_event->count));
+> -
+> -	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
+> -		period &= GENMASK(31, 0);
+> +	period = compute_period(vcpu, idx, local64_read(&perf_event->count));
+>  
+>  	local64_set(&perf_event->hw.period_left, 0);
+>  	perf_event->attr.sample_period = period;
+> @@ -571,14 +591,13 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+>  
+>  	/*
+>  	 * If counting with a 64bit counter, advertise it to the perf
+> -	 * code, carefully dealing with the initial sample period.
+> +	 * code, carefully dealing with the initial sample period
+> +	 * which also depends on the overflow.
+>  	 */
+> -	if (kvm_pmu_idx_is_64bit(vcpu, select_idx)) {
+> +	if (kvm_pmu_idx_is_64bit(vcpu, select_idx))
+>  		attr.config1 |= PERF_ATTR_CFG1_COUNTER_64BIT;
+> -		attr.sample_period = (-counter) & GENMASK(63, 0);
+> -	} else {
+> -		attr.sample_period = (-counter) & GENMASK(31, 0);
+> -	}
+> +
+> +	attr.sample_period = compute_period(vcpu, select_idx, counter);
+>  
+>  	event = perf_event_create_kernel_counter(&attr, -1, current,
+>  						 kvm_pmu_perf_overflow, pmc);
+> -- 
+> 2.34.1
 > 
-> linux/arch/powerpc/kvm/e500mc.c: In function ‘kvmppc_e500mc_init’:
-> linux/arch/powerpc/kvm/e500mc.c:391:13: error: implicit declaration of function ‘kvmppc_e500mc_check_processor_compat’; did you mean ‘kvmppc_core_check_processor_compat’? [-Werror=implicit-function-declaration]
->   391 |         r = kvmppc_e500mc_check_processor_compat();
->       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->       |             kvmppc_core_check_processor_compat
-> linux/arch/powerpc/kvm/e500mc.c:393:24: error: ‘kvmppc_e500mc’ undeclared (first use in this function); did you mean ‘kvm_ops_e500mc’?
->   393 |                 return kvmppc_e500mc;
->       |                        ^~~~~~~~~~~~~
->       |                        kvm_ops_e500mc
-> linux/arch/powerpc/kvm/e500mc.c:393:24: note: each undeclared identifier is reported only once for each function it appears in
-
-Huh, CONFIG_PPC_E500MC got unselected in the config I use to compile test this
-flavor.  I suspect I botched an oldconfig at some point.
- 
-Anyways, fixed that and the bugs.
-
-Thanks much!
-
---
-Subject: [PATCH] KVM: PPC: Move processor compatibility check to module init
-
-Move KVM PPC's compatibility checks to their respective module_init()
-hooks, there's no need to wait until KVM's common compat check, nor is
-there a need to perform the check on every CPU (provided by common KVM's
-hook).  The compatibility checks are either a nop (Book3S), or simply
-check the CPU name stored in the global CPU spec (e500 and e500mc).
-
-Cc: Fabiano Rosas <farosas@linux.ibm.com>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/powerpc/include/asm/kvm_ppc.h |  1 -
- arch/powerpc/kvm/book3s.c          | 10 ----------
- arch/powerpc/kvm/e500.c            |  4 ++--
- arch/powerpc/kvm/e500mc.c          |  6 +++++-
- arch/powerpc/kvm/powerpc.c         |  2 +-
- 5 files changed, 8 insertions(+), 15 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-index bfacf12784dd..51a1824b0a16 100644
---- a/arch/powerpc/include/asm/kvm_ppc.h
-+++ b/arch/powerpc/include/asm/kvm_ppc.h
-@@ -118,7 +118,6 @@ extern int kvmppc_xlate(struct kvm_vcpu *vcpu, ulong eaddr,
- extern int kvmppc_core_vcpu_create(struct kvm_vcpu *vcpu);
- extern void kvmppc_core_vcpu_free(struct kvm_vcpu *vcpu);
- extern int kvmppc_core_vcpu_setup(struct kvm_vcpu *vcpu);
--extern int kvmppc_core_check_processor_compat(void);
- extern int kvmppc_core_vcpu_translate(struct kvm_vcpu *vcpu,
-                                       struct kvm_translation *tr);
- 
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index 6d525285dbe8..87283a0e33d8 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -999,16 +999,6 @@ int kvmppc_h_logical_ci_store(struct kvm_vcpu *vcpu)
- }
- EXPORT_SYMBOL_GPL(kvmppc_h_logical_ci_store);
- 
--int kvmppc_core_check_processor_compat(void)
--{
--	/*
--	 * We always return 0 for book3s. We check
--	 * for compatibility while loading the HV
--	 * or PR module
--	 */
--	return 0;
--}
--
- int kvmppc_book3s_hcall_implemented(struct kvm *kvm, unsigned long hcall)
- {
- 	return kvm->arch.kvm_ops->hcall_implemented(hcall);
-diff --git a/arch/powerpc/kvm/e500.c b/arch/powerpc/kvm/e500.c
-index c8b2b4478545..0ea61190ec04 100644
---- a/arch/powerpc/kvm/e500.c
-+++ b/arch/powerpc/kvm/e500.c
-@@ -314,7 +314,7 @@ static void kvmppc_core_vcpu_put_e500(struct kvm_vcpu *vcpu)
- 	kvmppc_booke_vcpu_put(vcpu);
- }
- 
--int kvmppc_core_check_processor_compat(void)
-+static int kvmppc_e500_check_processor_compat(void)
- {
- 	int r;
- 
-@@ -507,7 +507,7 @@ static int __init kvmppc_e500_init(void)
- 	unsigned long handler_len;
- 	unsigned long max_ivor = 0;
- 
--	r = kvmppc_core_check_processor_compat();
-+	r = kvmppc_e500_check_processor_compat();
- 	if (r)
- 		goto err_out;
- 
-diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
-index 57e0ad6a2ca3..4564aa27edcf 100644
---- a/arch/powerpc/kvm/e500mc.c
-+++ b/arch/powerpc/kvm/e500mc.c
-@@ -168,7 +168,7 @@ static void kvmppc_core_vcpu_put_e500mc(struct kvm_vcpu *vcpu)
- 	kvmppc_booke_vcpu_put(vcpu);
- }
- 
--int kvmppc_core_check_processor_compat(void)
-+int kvmppc_e500mc_check_processor_compat(void)
- {
- 	int r;
- 
-@@ -388,6 +388,10 @@ static int __init kvmppc_e500mc_init(void)
- {
- 	int r;
- 
-+	r = kvmppc_e500mc_check_processor_compat();
-+	if (r)
-+		goto err_out;
-+
- 	r = kvmppc_booke_init();
- 	if (r)
- 		goto err_out;
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 5faf69421f13..d44b85ba8cef 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -442,7 +442,7 @@ int kvm_arch_hardware_enable(void)
- 
- int kvm_arch_check_processor_compat(void *opaque)
- {
--	return kvmppc_core_check_processor_compat();
-+	return 0;
- }
- 
- int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-
-base-commit: 00e4493db7c6163d48d5b45034d1a77e16a1c8dc
--- 
-
+> 
