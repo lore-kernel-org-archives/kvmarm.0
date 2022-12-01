@@ -2,72 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF3A7C4332F
-	for <kvmarm@archiver.kernel.org>; Thu,  1 Dec 2022 23:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91308C4332F
+	for <kvmarm@archiver.kernel.org>; Thu,  1 Dec 2022 23:14:56 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22AAD4B1AD;
-	Thu,  1 Dec 2022 18:14:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 328E44B248;
+	Thu,  1 Dec 2022 18:14:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IH9fnx0qbrc2; Thu,  1 Dec 2022 18:14:09 -0500 (EST)
+	with ESMTP id Z3Y2mr09BQDu; Thu,  1 Dec 2022 18:14:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B35D040719;
-	Thu,  1 Dec 2022 18:14:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E3D514A0D8;
+	Thu,  1 Dec 2022 18:14:54 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4401140719
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 18:14:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 792524A0D8
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 18:14:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EsnV3-G7BP+O for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Dec 2022 18:14:06 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B0565403C4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 18:14:06 -0500 (EST)
+ with ESMTP id gapOFMwdm3w3 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Dec 2022 18:14:52 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15E53403C4
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 18:14:52 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 5F115621A1;
- Thu,  1 Dec 2022 23:14:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF261C433C1;
- Thu,  1 Dec 2022 23:14:04 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id D3BC1B81F50;
+ Thu,  1 Dec 2022 23:14:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D45EC433D6;
+ Thu,  1 Dec 2022 23:14:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1669936444;
- bh=ozp0kC2g9+TotjQ9j2Pw3XRqzPeryuGFH0wGXi5UC/Y=;
+ s=k20201202; t=1669936489;
+ bh=sW2w9vG53AsHMr88biNtK5xVlmmBmRvG3cpj2Bp8Jg4=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=RdPD0jGlqLp3uEAhn0aFEjETKR8VNVD/JPLofMJf3Yp7CXvgsXMteQfqb2UGCnPQM
- 29Zdpm8HsAtw/CblVCJKkiQ/OcMXphmydCW9m5W6eNXPJPRxf6Z7QLwsWBwul9Gj33
- 0VjEN3YfMM3rseBp6VpGvpAxLa86qiKaXWYVx+MOtYyD8nrOkDz3DWGT/zrfDbRi/M
- ehn9I/+41au4Bk7FNHDbNRc7qTC6z3akboH6ko5yTg+stWIIbmQDsq5JMWtrqbCRdq
- MUazZozc/2xl3tg+JMZO2NulQr7n+Byv273rvkxjBccRJqLpgMgALYRJXC0UEV9O7W
- OBBbHwAyWKkhw==
+ b=rsthgWMx6bnE+lspTiwU+KDdWOou+nBiG3jBf5wj014VIwGxMiGdpV0oRwYMbTQhb
+ ZL0lRC49+Aq+/cPwWa63O2wtLQlh6jnj1ogAw12hQA7fMVGdJAnuRdy49S75f786Ph
+ zNF7ejF1U0y7fcmlqghsZZoMx57g/TNk6H2DSbzsWvuxke0S8psrF2s5eznardWAXR
+ aaE11RfDe/Gsb0L3onC8e+fvwJ11mKK9LgoxzrDNMgv9xOau9QBaZx7PwiaTrLBe83
+ ICp/+PraeAlJ8qLbEftISRM3qylUs/D2MwvJ0tUJi71BOk9/SzCDLqD5JgBPWlRJbj
+ ucGRYQH0OBf8A==
 Received: from 51-171-6-54-dynamic.agg9.chf.chf-qkr.eircom.net ([51.171.6.54]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1p0skk-009wGh-B3;
- Thu, 01 Dec 2022 23:14:02 +0000
-Date: Thu, 01 Dec 2022 23:13:58 +0000
-Message-ID: <87lenqu37t.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1p0slT-009wHo-7n;
+ Thu, 01 Dec 2022 23:14:47 +0000
+Date: Thu, 01 Dec 2022 23:14:43 +0000
+Message-ID: <87k03au36k.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
+To: Oliver Upton <oliver.upton@linux.dev>
 Subject: Re: [PATCH 0/3] KVM: arm64: Handle CCSIDR associativity mismatches
-In-Reply-To: <50499ee9-33fe-4f5d-9d0a-76ceef038333@daynix.com>
+In-Reply-To: <Y4jyn+aMUGcaa6Ag@google.com>
 References: <20221201104914.28944-1-akihiko.odaki@daynix.com>
- <867czbmlh1.wl-maz@kernel.org>
- <50499ee9-33fe-4f5d-9d0a-76ceef038333@daynix.com>
+ <867czbmlh1.wl-maz@kernel.org> <Y4jyn+aMUGcaa6Ag@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 51.171.6.54
-X-SA-Exim-Rcpt-To: akihiko.odaki@daynix.com, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, mathieu.poirier@linaro.org,
- oliver.upton@linux.dev, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, akihiko.odaki@daynix.com,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ mathieu.poirier@linaro.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
  james.morse@arm.com, will@kernel.org, catalin.marinas@arm.com,
  asahi@lists.linux.dev, alyssa@rosenzweig.io, sven@svenpeter.dev,
  marcan@marcan.st
@@ -75,6 +74,7 @@ X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
 Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>,
  Mathieu Poirier <mathieu.poirier@linaro.org>, Will Deacon <will@kernel.org>,
  Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
  asahi@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
@@ -96,63 +96,14 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 01 Dec 2022 17:26:08 +0000,
-Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+On Thu, 01 Dec 2022 18:29:51 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> On 2022/12/01 20:06, Marc Zyngier wrote:
-> > On Thu, 01 Dec 2022 10:49:11 +0000,
-> > Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
-> > 
-> > Thanks for looking into this.
-> > 
-> >> M2 MacBook Air has mismatched CCSIDR associativity bits, which makes the
-> >> bits a KVM vCPU sees inconsistent when migrating.
-> > 
-> > Can you describe the actual discrepancy? Is that an issue between the
-> > two core types? In which case, nothing says that these two cluster
-> > should have the same cache topology.
+> On Thu, Dec 01, 2022 at 11:06:50AM +0000, Marc Zyngier wrote:
 > 
-> Yes, the processor has big.LITTLE configuration.
+> [...]
 > 
-> On the processor, the valid CSSELR values are 0 (L1D), 1 (L1I), 3
-> (L2D). For each CSSELR values, each cluster has:
-> - 0x700FE03A, 0x203FE01A, 0x70FFE07B
-> - 0x701FE03A, 0x203FE02A, 0x73FFE07B
-
-This is a perfectly valid configuration. The architecture doesn't
-place any limitation on how different or identical the cache
-hierarchies are from the PoV of each CPU. Actually, most big-little
-systems show similar differences across their clusters.
-
-> >> It also makes QEMU fail restoring the vCPU registers because QEMU saves
-> >> and restores all of the registers including CCSIDRs, and if the vCPU
-> >> migrated among physical CPUs between saving and restoring, it tries to
-> >> restore CCSIDR values that mismatch with the current physical CPU, which
-> >> causes EFAULT.
-> > 
-> > Well, QEMU will have plenty of other problems, starting with MIDRs,
-> > which always reflect the physical one. In general, KVM isn't well
-> > geared for VMs spanning multiple CPU types. It is improving, but there
-> > is a long way to go.
-> 
-> On M2 MacBook Air, I have seen no other difference in standard ID
-> registers and CCSIDRs are exceptions. Perhaps Apple designed this way
-> so that macOS's Hypervisor can freely migrate vCPU, but I can't assure
-> that without more analysis. This is still enough to migrate vCPU
-> running Linux at least.
-
-I guess that MacOS hides more of the underlying HW than KVM does. And
-KVM definitely doesn't hide the MIDR_EL1 registers, which *are*
-different between the two clusters.
-
-> >> Trap CCSIDRs if there are CCSIDR value msimatches, and override the
-> >> associativity bits when handling the trap.
-> > 
-> > TBH, I'd rather we stop reporting this stuff altogether.
-> > 
-> > There is nothing a correctly written arm64 guest should do with any of
-> > this (this is only useful for set/way CMOs, which non-secure SW should
-> > never issue). It would be a lot better to expose a virtual topology
+> > It would be a lot better to expose a virtual topology
 > > (one set, one way, one level). It would also save us from the CCSIDRX
 > > silliness.
 > > 
@@ -160,37 +111,30 @@ different between the two clusters.
 > > userspace so that we can restore a VM saved before this virtual
 > > topology.
 > 
-> Another (minor) concern is that trapping relevant registers may cost
-> too much. Currently KVM traps CSSELR and CCSIDR accesses with
-> HCR_TID2, but HCR_TID2 also affects CTR_EL0.
+> I generally agree that the reported topology is meaningless to
+> non-secure software.
+> 
+> However, with the cloud vendor hat on, I'm worried that inevitably some
+> customer will inspect the cache topology of the VM we've provided them
+> and complain.
 
-It will have an additional impact (JITs, for example, will take a hit
-if they don't cache that value), but this is pretty easy to mitigate
-if it proves to have too much of an impact. We already have a bunch of
-fast-paths for things that we want to emulate more efficiently, and
-CTR_EL0 could be one of them,
+That's their prerogative. It is idiotic, but I guess paying customers
+get this privilege ;-).
 
-> Although I'm not sure if the register is referred frequently, Arm
-> introduced FEAT_EVT to trap CSSELR and CSSIDR but not CTR_EL0 so
-> there may be some case where trapping CTR_EL0 is not
-> tolerated. Perhaps Arm worried that a userspace application may read
-> CTR_EL0 frequently.
+> Could we extend your suggestion about accepting different topologies to
+> effectively tolerate _any_ topology provided by userspace? KVM can
+> default to the virtual topology, but a well-informed userspace could
+> still provide different values to its guest. No point in trying to
+> babyproofing the UAPI further, IMO.
 
-FEAT_EVT is one of these "let's add random traps" extensions,
-culminating in FEAT_FGT. Having FEAT_EVT would make it more efficient,
-but we need to support this for all revisions of the architecture.
+I think this is *exactly* what I suggested. Any valid topology should
+be able to be restored, as we currently present the VM with any
+topology the host HW may have. This must be preserved.
 
-So let's first build on top of HCR_EL2.TID2, and only then once we
-have an idea of the overhead add support for HCR_EL2.TID4 for the
-systems that have FEAT_EVT.
+Eventually, we may even have to expose CCSIDRX, but let's cross that
+bridge when we get to it.
 
-> If you think the concern on VM restoration you mentioned and the
-> trapping overhead is tolerable, I'll write a new, much smaller patch
-> accordingly.
-
-That would great, thanks. There are a number of gotchas around that
-(like the 32bit stuff that already plays the emulation game), but this
-is the right time to start and have something in 6.3 if you keep to it!
+Thanks,
 
 	M.
 
