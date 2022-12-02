@@ -2,170 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D67EC4167B
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Dec 2022 08:02:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C153C47088
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Dec 2022 09:19:49 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF9834B248;
-	Fri,  2 Dec 2022 03:02:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E31874B256;
+	Fri,  2 Dec 2022 04:19:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@intel.com
+	(fail, message has been altered)
+	header.i=@daynix-com.20210112.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hHJ7nrXituiv; Fri,  2 Dec 2022 03:02:28 -0500 (EST)
+	with ESMTP id bLD+HcGiA70V; Fri,  2 Dec 2022 04:19:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E2674A0D8;
-	Fri,  2 Dec 2022 03:02:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 371D040C88;
+	Fri,  2 Dec 2022 04:19:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1104840BFA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 03:02:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6431A43399
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 04:19:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 20AELUmfcNKI for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Dec 2022 03:02:24 -0500 (EST)
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E635403AD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 03:02:24 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
- t=1669968144; x=1701504144;
- h=date:from:to:cc:subject:message-id:references:
- in-reply-to:mime-version;
- bh=3u2qa+K5LwgLmrP2NXT4ZlvDi8zcqYjGUVfvrsyKUvQ=;
- b=Pc+JaWJdxcArVxJQO0jTvkJBEemsY0Rax3t3fwbNMXiPDTwmPZDX10po
- An+jp55Sw+SzJcIwoZivW9ci++tVrlyyu66IWeSFpAeUvHAOX7MaeKpjI
- wQDmx3z7RsCOj3EIaxjjOOyqIjFF7o7UGfAXoQ26SDpKa5Gi0QmWOe5+a
- on8Yx/mYg/1x2LYxTFR1Nn02LGMZf9rbYovrJjW9VPQOFSVJKxQqetWWS
- JYp16hZwMv0TrwC9+yxWAixLOoPFSoGhwk0RY8mkx8BmGyXBLQlthN3pA
- pj9acja61Zq+gIZQOLU3JFXgO6t/fu24NJ3C6Qbo+PYNCxqnCRn8gcDWD w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="317043496"
-X-IronPort-AV: E=Sophos;i="5.96,210,1665471600"; d="scan'208";a="317043496"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 02 Dec 2022 00:02:22 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="644944361"
-X-IronPort-AV: E=Sophos;i="5.96,210,1665471600"; d="scan'208";a="644944361"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
- by orsmga002.jf.intel.com with ESMTP; 02 Dec 2022 00:02:22 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Fri, 2 Dec 2022 00:02:21 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Fri, 2 Dec 2022 00:02:21 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Fri, 2 Dec 2022 00:02:21 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WzQl5CWDZa8m6h+Vkt3R3wLFqCLiutyWIX/+qnRGXXbPVItfCdoltudzASRQS5nLU7/x30aOz8pe4wS9P2oDdPReUVSCE9nRm05FxI3ktZHojOLvLFaKk130TRhzYUtKhLIQRfmRKS6xO+++jeCnNvd/+jEpqYJ5pzf/7ToMd/ipfLnW04mOmHnlW0+byZ7IoPGoxfh1DDlVGjas57doqhePDhVRa7/o5gpitK9SMorjKZ4G/gyEf5oiEWvJg2OR2brfCCR/mw2nlaf8gSP3cafi+Ai4GFZH4gcUkDucNjARIbEiKx3MsJfYu36JspJoWGIINtMX8+wGToEQyCq+Jw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y0JkCnL5yuhNfcpLiZP+8v2mEy/roPie5pXq2WAmow8=;
- b=XKuvNJhZUnWc1lm3GJ3lTqfLTA9ctlw1E3URpisHMzN7GiyxEGkOmV00VHaXDN6xzmvV3V1otHoEbUfrVR5AL3ttYdocxElDdZDub8A/DA0nYZKG7Q2Fs3HR1A4c/AMErFWtWXXhuFWHmRmKwthzAFa4XeZqx8WpVgLW+5DaIzzYggTHv45RX1ygbqf7eYiiwvShLUusqaf8aqZyTRRenlbMdPQyKTxxKUJajjCmZpPO0ETFYNTQTuzTbMSxK4RMXElTOxYtN4o7WNSGLxAT4ZQHChT8LKzck18yCSBH5dYXUnXgfoVdM/797itHaIBxc9S28toTKhQbMvbd14mGaQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MWHPR1101MB2221.namprd11.prod.outlook.com
- (2603:10b6:301:53::18) by DS7PR11MB6200.namprd11.prod.outlook.com
- (2603:10b6:8:98::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Fri, 2 Dec
- 2022 08:02:18 +0000
-Received: from MWHPR1101MB2221.namprd11.prod.outlook.com
- ([fe80::5cf5:bbad:8442:f2b4]) by MWHPR1101MB2221.namprd11.prod.outlook.com
- ([fe80::5cf5:bbad:8442:f2b4%2]) with mapi id 15.20.5880.008; Fri, 2 Dec 2022
- 08:02:17 +0000
-Date: Fri, 2 Dec 2022 16:02:08 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v2 00/50] KVM: Rework kvm_init() and hardware enabling
-Message-ID: <Y4mxACzVOsJpiIow@gao-cwp>
-References: <20221130230934.1014142-1-seanjc@google.com>
-Content-Disposition: inline
-In-Reply-To: <20221130230934.1014142-1-seanjc@google.com>
-X-ClientProxiedBy: SG2PR01CA0117.apcprd01.prod.exchangelabs.com
- (2603:1096:4:40::21) To MWHPR1101MB2221.namprd11.prod.outlook.com
- (2603:10b6:301:53::18)
+ with ESMTP id vei-VfzPP1Gl for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Dec 2022 04:19:44 -0500 (EST)
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com
+ [209.85.214.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AB5AB40C88
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 04:19:44 -0500 (EST)
+Received: by mail-pl1-f169.google.com with SMTP id p24so4131017plw.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 02 Dec 2022 01:19:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20210112.gappssmtp.com; s=20210112;
+ h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+ :to:from:from:to:cc:subject:date:message-id:reply-to;
+ bh=t5dutFU/unBRoBttuUB/M6fMP+Yt2NpTWIJuMYFm8fU=;
+ b=yFXhxEX5toalHPauuWYtCa7BdnorZqc24D1//LZCzjceETJtpLT8CQutud7DJLnJ7H
+ PladqCcjR/4xovXkmhaUAIjnZgVWtnhcKnXTxfSvdWpFit0AdA3u3N4XRBJtrlZpxHwf
+ AnXf0wtgrijwHFN7+wlmuUWSdqNxnExo1fMDKZedaGoKaMfOPcCfsbu5PWa4+xNrUfhw
+ +W6h0AYMWvA+A7JRCOtlBvov0PMdMCJPIzTq9mt/EbZoJkj9C1kZ2BoVnOltwOOaKFM4
+ cO4qVoXBziyQuIxJgjkCdrYKoBZJrpoIl0v8eipf+SMa+WoltFw1VFzbp+j5vqExqjR8
+ mhrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+ :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+ :reply-to;
+ bh=t5dutFU/unBRoBttuUB/M6fMP+Yt2NpTWIJuMYFm8fU=;
+ b=gXVQePfI5XKt39860efsBaCGf9Tp/GnUUg1iMWf8tw4VCb5MKBetyOxbwgublJrFvW
+ 0+3zgudfC0gwOu6e3/6fCKK4al1YC3unCJwLuW4U5IxZJDwSOeYsX62u3PmgE6xcMFHC
+ Bys4xL1rtbTeEFP5Eh+cjZYVRk9inVpFRnvLIspExDY+okDjB5H0dwcz/njeSsZMiL1n
+ KfkhiyNEh3OwkAgTAiO66wi4xVq4X4nWkLaI5Oodw878dufS3+kaExnVlzNJIZtL4pZ/
+ VmGTZCXu+kqF2w/Rja2hxyh4L116GplxcsB6uVKYK4qqlzpBepF4IthIPLQrNKumygcS
+ ycqQ==
+X-Gm-Message-State: ANoB5plNojPC1v4tFgbgqgs5wlg0eeOa8hoq2tJMZsSr/Z4d6x8FD3Fd
+ 92fHIPAL8yuBQvq/QpvzcXbCIw==
+X-Google-Smtp-Source: AA0mqf4SGMDXTH8QBpljz4O1upV9TZVrHwCKnJDpZWqO3jSNBJeCszABeyAXU2aCtJziNxV9tm3+7g==
+X-Received: by 2002:a17:90a:1a11:b0:213:f398:ed51 with SMTP id
+ 17-20020a17090a1a1100b00213f398ed51mr74040091pjk.216.1669972783449; 
+ Fri, 02 Dec 2022 01:19:43 -0800 (PST)
+Received: from fedora.flets-east.jp ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
+ by smtp.gmail.com with ESMTPSA id
+ v129-20020a622f87000000b005761c4754e7sm2847375pfv.144.2022.12.02.01.19.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 02 Dec 2022 01:19:42 -0800 (PST)
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+To: 
+Subject: [PATCH] KVM: arm64: Always mask CCSIDR associativity bits
+Date: Fri,  2 Dec 2022 18:18:56 +0900
+Message-Id: <20221202091856.104868-1-akihiko.odaki@daynix.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWHPR1101MB2221:EE_|DS7PR11MB6200:EE_
-X-MS-Office365-Filtering-Correlation-Id: c20b277e-aa52-4a09-4a90-08dad43b87ce
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5xmtXBOmYTCqEx9bsI8AUQs3eNgQ2GZUAVGu6LRKAX0xc1Qj44QoJBoklyfveJQWZKj5xz23rpesJfsZmfreis+UDof52Cc8DJ8N2nXruTl/oEgLMOkQ9GvXldP3jGXqTXNn7lb4vie/pWcjTrdNVq8mDRxTgCKo1t7zAW+kLInY7yfUXnGHl7LFadVIUJTL1qKgwWFF8bAm84/o3L5BzSctXvwjvVTiDedcjHmZ6wntvmJxI/VsjdJNMhIxiaDNyPoiOHQwAANXEuwK+7DX8MkQb6bLm9oDZayakNSbo6Ib645KZI9VmUF+7HiARmc0G6ea/DNwoLPXAsvf/AA/cWbB3KkEU9QMt7u2+yAaILLrUJbdYgvdrQRqPdk+dGQATaUfQzDR2E6yf3VEC7Arvh8rWp/hH2Xw2C5w/BZWKyI7yg5iG12zK8vsiCO8h2OS2nPteAjJp3iRmW1wa9+V+/nQ8dhyT3Cw+tKkhI5Skc3cntYE9l49FF2QQG81R7yxy7W8c75xY3VEnzMarkofrybxZ0IHSngXbhFj15Q0UIdmmJn8vWC9MgultcpHz8GUgQfaPlQzxiZstGEcV4ouid9D9Au+uXeWMkScJ4R9BmG8gk8xPHJJwII45gzJpeGVp3snN8H5krdA5FXAej4byw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MWHPR1101MB2221.namprd11.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(13230022)(7916004)(39860400002)(396003)(136003)(346002)(366004)(376002)(451199015)(44832011)(86362001)(83380400001)(6486002)(2906002)(4326008)(41300700001)(82960400001)(66476007)(7406005)(7416002)(4744005)(66946007)(54906003)(33716001)(9686003)(186003)(8936002)(5660300002)(6666004)(8676002)(6506007)(6512007)(478600001)(6916009)(26005)(66556008)(316002)(38100700002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4aTDGEDazO5skc343i07bjXay2Tuul8oazjDHUA1A/JfGWCFPMwYTQJ+JvgW?=
- =?us-ascii?Q?hA8t8h+m51BPyIAT3S1iMiCiN3CkdparD209+/1oh5Qq2KauTTmiZpomrAxH?=
- =?us-ascii?Q?hEduUzhEJG/DRdCXVvyVbahMqWHPhkOxbnFZjtBIR/ctVRY+se7GdJHDQBG6?=
- =?us-ascii?Q?62tvTS6Q1WCvLc9fy+UpRtYRgRbbH/eZdiVsjsrPc03DmQO/bdY50vG1EYGo?=
- =?us-ascii?Q?YZIQd6tZOO1vS1JFWucDGAiHLwFd3Jdbc/6MgjogvBin+pa0nYpEJJBvmTwK?=
- =?us-ascii?Q?h6rMyI92Ljbda+u6sfox2MVgMDE7v6mWcAipzy9zDYlaSlUNsW1b1wgKzbjU?=
- =?us-ascii?Q?aUOgbFoEOL2t9X5sTcImVDKSXY64pQWUyU+4aeWbT+FNwgz/p2YO1bZoq3qJ?=
- =?us-ascii?Q?l2g7Rt98Gw/w3qBQpbSrThMvz0kQR856z8kshu8mse3jTAqiZ15zGSuO1SNY?=
- =?us-ascii?Q?VNqpK/qAskNcGg2d6E6BuvMGlYp423n/LwmFNBwu4VnccRI2KbvEr3Ds+oCn?=
- =?us-ascii?Q?+LQ7or4TeLNRxiv9EXjEuKxz7f5SdDnKsY0eK5lVTH7Qh4+ygTeTAt+ZWvtb?=
- =?us-ascii?Q?fpXwGhzo0+M1w0cPioY1YG4vjwlKrqMXzKEZQrOyS/up+VqaelbVf36XU74L?=
- =?us-ascii?Q?AfPz9RUutwWk/XsMiDxwK7IBbkZ33a8NBkfcFuSheIYLV3q67noyHjFJlNtU?=
- =?us-ascii?Q?/me04jpnXwys8nmswofJou/cOQH4xvlXP3Bh8xjTqVuxIQkMEj6ktM9Okd+7?=
- =?us-ascii?Q?SSZVnLiZEn6nmFQKh6Xu7H38A8jIH7VcBkjDZYiA75/XcZ//04WJfpIlIVzu?=
- =?us-ascii?Q?iNj07e32/oI9PvK1WIFO4QyRZKRSBfnLrNO2zHLFV+6qo50/ioCFX8RdYygQ?=
- =?us-ascii?Q?7P/6V9kIW3vXL6CwbVwRWP0lYeJU8i0iuQvzsjHN+PF5MxBMTrsy3Jtcg/TT?=
- =?us-ascii?Q?s1uu8g0YU2YYvNtVTyDO3/rfoxWjB22Qvb02Uvt+J3CqJ0VLfTdgQO2zGtEC?=
- =?us-ascii?Q?UQmbSgzyDl2VIbUS3q9ObwzQazXqOcB164p2jjUWUtgiCrotBJTJTC0pXwqG?=
- =?us-ascii?Q?Vd6Aje2H2bK/n6w2VnIlqo+oWWvyu2UGgPZ2j40E9fqA1RqTz1hnSrfeDqUK?=
- =?us-ascii?Q?aWa8FxEVtyOiQZO2W8eMXhXBIAJszGSP1jhdvsHNKRZ+Unvg8hyqEBnpHsHZ?=
- =?us-ascii?Q?TgLbstsfgZRYOvoXgPS/Y1wf2ph1r1HyfJYE3mXkatMQvDy76WnGZPUrV5K0?=
- =?us-ascii?Q?5bnfTRBShZ04E51jCM+G5lj/URvVuXN1TGksN4NGbTv5mPXRPgumHCxYD940?=
- =?us-ascii?Q?yF/+5iJSK5AVjnzaKSHTBAH9h3+U5Z3YJ5jn3Mn3826wUIh4Diy1j5ll/IKO?=
- =?us-ascii?Q?qh+2Ug9aG8/UP0z9AKpuxOjU3CYkHed4eEl7VabyNqz8jxXLwzT7ScqyD9C0?=
- =?us-ascii?Q?eMVgJpP2TGdHDDMg8AYAaGSypjORJy0Qbs0VdFW+Dkf/CJHrhCbETKeW8SKB?=
- =?us-ascii?Q?HV915oWtsJCErpNao5m2FQKcUz6L3NnAdcbkkgHwmnzDQ8Rd+6ol5M7kkgWm?=
- =?us-ascii?Q?4Xlh3HwhOS6Z8v4db9/2bXbn++y9SQqy99Pq4ory?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: c20b277e-aa52-4a09-4a90-08dad43b87ce
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR1101MB2221.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2022 08:02:17.5605 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +TB7Hg1KC+iwn+xMHCoWoyNmmlW0zsHSz+FUqqBX2lPsaFKz6NB6QLwHghDdpkwgEVyAvRm39dMj1iqc9ONgfA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6200
-X-OriginatorOrg: intel.com
-Cc: Matthew Rosato <mjrosato@linux.ibm.com>, Paul Durrant <paul@xen.org>,
- Yuan Yao <yuan.yao@intel.com>, Paul
- Walmsley <paul.walmsley@sifive.com>, David
- Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
- Kai Huang <kai.huang@intel.com>, Michael Ellerman <mpe@ellerman.id.au>,
- linux-riscv@lists.infradead.org, Claudio
- Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
- linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>, Albert Ou <aou@eecs.berkeley.edu>,
- kvm@vger.kernel.org, Atish Patra <atishp@atishpatra.org>,
- kvmarm@lists.linux.dev, Thomas Gleixner <tglx@linutronix.de>,
- linux-arm-kernel@lists.infradead.org,
- Isaku Yamahata <isaku.yamahata@intel.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
- Fabiano Rosas <farosas@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
- Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
- Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- David Woodhouse <dwmw2@infradead.org>
+Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>, Marc Zyngier <maz@kernel.org>,
+ Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
+ Will Deacon <will@kernel.org>, asahi@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -182,16 +95,317 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Nov 30, 2022 at 11:08:44PM +0000, Sean Christopherson wrote:
->The main theme of this series is to kill off kvm_arch_init(),
->kvm_arch_hardware_(un)setup(), and kvm_arch_check_processor_compat(), which
->all originated in x86 code from way back when, and needlessly complicate
->both common KVM code and architecture code.  E.g. many architectures don't
->mark functions/data as __init/__ro_after_init purely because kvm_init()
->isn't marked __init to support x86's separate vendor modules.
+M2 MacBook Air has mismatched CCSIDR associativity bits among physical
+CPUs, which makes the bits a KVM vCPU sees inconsistent when migrating
+among them.
 
-Applied this series and verified that an attempt to online incompatible
-CPUs (no VMX support) when some VMs are running will fail.
+While it is possible to detect CCSIDR associativity bit mismatches and
+mask them with that condition, it requires mismatch detection and
+increases complexity. Instead, always mask the CCSIDR associativity bits
+to keep the code simple.
+
+Also, allow the userspace to overwrite the bits with arbitrary values so
+that it can restore a vCPU state saved with an older kernel.
+
+Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+Suggested-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_arm.h     |   3 +-
+ arch/arm64/include/asm/kvm_emulate.h |   4 -
+ arch/arm64/include/asm/kvm_host.h    |   4 +
+ arch/arm64/include/asm/sysreg.h      |   3 +
+ arch/arm64/kvm/sys_regs.c            | 146 ++++++++++++++-------------
+ 5 files changed, 87 insertions(+), 73 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 8aa8492dafc0..f69cd96a65ab 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -81,11 +81,12 @@
+  * SWIO:	Turn set/way invalidates into set/way clean+invalidate
+  * PTW:		Take a stage2 fault if a stage1 walk steps in device memory
+  * TID3:	Trap EL1 reads of group 3 ID registers
++ * TID2:	Trap CCSIDR_EL1
+  */
+ #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
+ 			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+-			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 )
++			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID2)
+ #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+ #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
+ #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 9bdba47f7e14..30c4598d643b 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -88,10 +88,6 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 	if (vcpu_el1_is_32bit(vcpu))
+ 		vcpu->arch.hcr_el2 &= ~HCR_RW;
+ 
+-	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
+-	    vcpu_el1_is_32bit(vcpu))
+-		vcpu->arch.hcr_el2 |= HCR_TID2;
+-
+ 	if (kvm_has_mte(vcpu->kvm))
+ 		vcpu->arch.hcr_el2 |= HCR_ATA;
+ }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 45e2136322ba..cc051cd56179 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -53,6 +53,9 @@
+ 
+ #define KVM_HAVE_MMU_RWLOCK
+ 
++/* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
++#define CSSELR_MAX 14
++
+ /*
+  * Mode of operation configurable with kvm-arm.mode early param.
+  * See Documentation/admin-guide/kernel-parameters.txt for more information.
+@@ -266,6 +269,7 @@ struct kvm_cpu_context {
+ 	struct user_fpsimd_state fp_regs;
+ 
+ 	u64 sys_regs[NR_SYS_REGS];
++	u32 ccsidr[CSSELR_MAX + 1];
+ 
+ 	struct kvm_vcpu *__hyp_running_vcpu;
+ };
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 7d301700d1a9..0c5f3675b4c2 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -941,6 +941,9 @@
+ #define HFGxTR_EL2_nSMPRI_EL1_SHIFT	54
+ #define HFGxTR_EL2_nSMPRI_EL1_MASK	BIT_MASK(HFGxTR_EL2_nSMPRI_EL1_SHIFT)
+ 
++/* CCSIDR_EL1 bit definitions */
++#define CCSIDR_EL1_ASSOCIATIVITY_BITS	GENMASK(27, 3)
++
+ #define ARM64_FEATURE_FIELD_BITS	4
+ 
+ /* Create a mask for the feature bits of the specified feature. */
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index f4a7c5abcbca..3518d021d3a0 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -84,24 +84,6 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+ /* 3 bits per cache level, as per CLIDR, but non-existent caches always 0 */
+ static u32 cache_levels;
+ 
+-/* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
+-#define CSSELR_MAX 14
+-
+-/* Which cache CCSIDR represents depends on CSSELR value. */
+-static u32 get_ccsidr(u32 csselr)
+-{
+-	u32 ccsidr;
+-
+-	/* Make sure noone else changes CSSELR during this! */
+-	local_irq_disable();
+-	write_sysreg(csselr, csselr_el1);
+-	isb();
+-	ccsidr = read_sysreg(ccsidr_el1);
+-	local_irq_enable();
+-
+-	return ccsidr;
+-}
+-
+ /*
+  * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
+  */
+@@ -1300,25 +1282,76 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 		return write_to_read_only(vcpu, p, r);
+ 
+ 	csselr = vcpu_read_sys_reg(vcpu, CSSELR_EL1);
+-	p->regval = get_ccsidr(csselr);
++	p->regval = vcpu->arch.ctxt.ccsidr[csselr];
+ 
+-	/*
+-	 * Guests should not be doing cache operations by set/way at all, and
+-	 * for this reason, we trap them and attempt to infer the intent, so
+-	 * that we can flush the entire guest's address space at the appropriate
+-	 * time.
+-	 * To prevent this trapping from causing performance problems, let's
+-	 * expose the geometry of all data and unified caches (which are
+-	 * guaranteed to be PIPT and thus non-aliasing) as 1 set and 1 way.
+-	 * [If guests should attempt to infer aliasing properties from the
+-	 * geometry (which is not permitted by the architecture), they would
+-	 * only do so for virtually indexed caches.]
+-	 */
+-	if (!(csselr & 1)) // data or unified cache
+-		p->regval &= ~GENMASK(27, 3);
+ 	return true;
+ }
+ 
++static bool is_valid_cache(u32 val)
++{
++	u32 level, ctype;
++
++	if (val >= CSSELR_MAX)
++		return false;
++
++	/* Bottom bit is Instruction or Data bit.  Next 3 bits are level. */
++	level = (val >> 1);
++	ctype = (cache_levels >> (level * 3)) & 7;
++
++	switch (ctype) {
++	case 0: /* No cache */
++		return false;
++	case 1: /* Instruction cache only */
++		return (val & 1);
++	case 2: /* Data cache only */
++	case 4: /* Unified cache */
++		return !(val & 1);
++	case 3: /* Separate instruction and data caches */
++		return true;
++	default: /* Reserved: we can't know instruction or data. */
++		return false;
++	}
++}
++
++static void reset_ccsidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++{
++	u32 ccsidr;
++	int i;
++
++	/* Make sure noone else changes CSSELR during this! */
++	local_irq_disable();
++
++	for (i = 0; i < CSSELR_MAX; i++) {
++		if (!is_valid_cache(i))
++			continue;
++
++		/* Which cache CCSIDR represents depends on CSSELR value. */
++		write_sysreg(i, csselr_el1);
++		isb();
++		ccsidr = read_sysreg(ccsidr_el1);
++
++		/*
++		 * Guests should not be doing cache operations by set/way at
++		 * all, and for this reason, we trap them and attempt to infer
++		 * the intent, so that we can flush the entire guest's address
++		 * space at the appropriate time.
++		 * To prevent this trapping from causing performance problems,
++		 * let's expose the geometry of all data and unified caches
++		 * (which are guaranteed to be PIPT and thus non-aliasing) as
++		 * 1 set and 1 way.
++		 * [If guests should attempt to infer aliasing properties from
++		 * the geometry (which is not permitted by the architecture),
++		 * they would only do so for virtually indexed caches.]
++		 *
++		 * This also make sure vCPU see the consistent geometry even if
++		 * it migrates among phyiscal CPUs with different geometries.
++		 */
++		vcpu->arch.ctxt.ccsidr[i] = ccsidr & ~CCSIDR_EL1_ASSOCIATIVITY_BITS;
++	}
++
++	local_irq_enable();
++}
++
+ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
+ 				   const struct sys_reg_desc *rd)
+ {
+@@ -1603,7 +1636,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	{ SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
+ 
+-	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
++	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr, reset_ccsidr },
+ 	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr },
+ 	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
+ 	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
+@@ -2660,33 +2693,7 @@ static int set_invariant_sys_reg(u64 id, u64 __user *uaddr)
+ 	return 0;
+ }
+ 
+-static bool is_valid_cache(u32 val)
+-{
+-	u32 level, ctype;
+-
+-	if (val >= CSSELR_MAX)
+-		return false;
+-
+-	/* Bottom bit is Instruction or Data bit.  Next 3 bits are level. */
+-	level = (val >> 1);
+-	ctype = (cache_levels >> (level * 3)) & 7;
+-
+-	switch (ctype) {
+-	case 0: /* No cache */
+-		return false;
+-	case 1: /* Instruction cache only */
+-		return (val & 1);
+-	case 2: /* Data cache only */
+-	case 4: /* Unified cache */
+-		return !(val & 1);
+-	case 3: /* Separate instruction and data caches */
+-		return true;
+-	default: /* Reserved: we can't know instruction or data. */
+-		return false;
+-	}
+-}
+-
+-static int demux_c15_get(u64 id, void __user *uaddr)
++static int demux_c15_get(struct kvm_vcpu *vcpu, u64 id, void __user *uaddr)
+ {
+ 	u32 val;
+ 	u32 __user *uval = uaddr;
+@@ -2705,15 +2712,15 @@ static int demux_c15_get(u64 id, void __user *uaddr)
+ 		if (!is_valid_cache(val))
+ 			return -ENOENT;
+ 
+-		return put_user(get_ccsidr(val), uval);
++		return put_user(vcpu->arch.ctxt.ccsidr[val], uval);
+ 	default:
+ 		return -ENOENT;
+ 	}
+ }
+ 
+-static int demux_c15_set(u64 id, void __user *uaddr)
++static int demux_c15_set(struct kvm_vcpu *vcpu, u64 id, void __user *uaddr)
+ {
+-	u32 val, newval;
++	u32 val, newval, mask;
+ 	u32 __user *uval = uaddr;
+ 
+ 	/* Fail if we have unknown bits set. */
+@@ -2733,9 +2740,12 @@ static int demux_c15_set(u64 id, void __user *uaddr)
+ 		if (get_user(newval, uval))
+ 			return -EFAULT;
+ 
+-		/* This is also invariant: you can't change it. */
+-		if (newval != get_ccsidr(val))
++		/* The bits other than the associativity bits are invariant. */
++		mask = CCSIDR_EL1_ASSOCIATIVITY_BITS;
++		if ((vcpu->arch.ctxt.ccsidr[val] ^ newval) & ~mask)
+ 			return -EINVAL;
++
++		vcpu->arch.ctxt.ccsidr[val] = newval;
+ 		return 0;
+ 	default:
+ 		return -ENOENT;
+@@ -2773,7 +2783,7 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+ 	int err;
+ 
+ 	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
+-		return demux_c15_get(reg->id, uaddr);
++		return demux_c15_get(vcpu, reg->id, uaddr);
+ 
+ 	err = get_invariant_sys_reg(reg->id, uaddr);
+ 	if (err != -ENOENT)
+@@ -2817,7 +2827,7 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+ 	int err;
+ 
+ 	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
+-		return demux_c15_set(reg->id, uaddr);
++		return demux_c15_set(vcpu, reg->id, uaddr);
+ 
+ 	err = set_invariant_sys_reg(reg->id, uaddr);
+ 	if (err != -ENOENT)
+-- 
+2.38.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
