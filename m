@@ -2,91 +2,170 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF02C47088
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Dec 2022 05:17:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D67EC4167B
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Dec 2022 08:02:32 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BEF6449E4B;
-	Fri,  2 Dec 2022 00:17:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF9834B248;
+	Fri,  2 Dec 2022 03:02:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered)
-	header.i=@daynix-com.20210112.gappssmtp.com
+	(fail, message has been altered) header.i=@intel.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iNqflK4ghmTO; Fri,  2 Dec 2022 00:17:21 -0500 (EST)
+	with ESMTP id hHJ7nrXituiv; Fri,  2 Dec 2022 03:02:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 198E840E25;
-	Fri,  2 Dec 2022 00:17:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E2674A0D8;
+	Fri,  2 Dec 2022 03:02:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B53740439
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 00:17:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1104840BFA
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 03:02:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id btNsISJCc2ga for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Dec 2022 00:17:18 -0500 (EST)
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com
- [209.85.215.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A5CA6403A6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 00:17:18 -0500 (EST)
-Received: by mail-pg1-f181.google.com with SMTP id q1so3496250pgl.11
- for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Dec 2022 21:17:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20210112.gappssmtp.com; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :from:to:cc:subject:date:message-id:reply-to;
- bh=uXDFMrE1UvonJwna6/qDy1dIKcqVQK/pCVdH6z/kGzg=;
- b=XO5vDtYYGE/vrJRZL9jWWossHYkzldTugmavz8aHWQ1I5R3D2HZ2rBLEi5IDZgzw3t
- NOa/IIA7+JkueaK9aAXvgWQ/Ui12YZ4+T7FFMGXfBUE+97KTYV0MgSu07a/QW2toPXLp
- rtgaOLj4x6l7oq1sQj+eGrTlModC3tN7r5tHY0lbwiUDa27dkMlngWp17EcPudo/FKS/
- YtziY2Z0YZ0lVGKGzJnbNHryh0GoTv0x5UO9WvIjCoXUmSXPAxH/R/wRh+kU59LvmFbe
- BZAhRitKM7cl3dLT+ewft2HG/mSWOJ5Fm7yaBSMHSTkqnvoYfHt7Rgi5/FB+pX7RNp/7
- W/vA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=uXDFMrE1UvonJwna6/qDy1dIKcqVQK/pCVdH6z/kGzg=;
- b=rNhUkxcGMJygNPE5gDrtvGhdxsoqa93sqCioP91PriZZdgdTLXKLswTB42HWKR7sxT
- /R4nU03/7V/1mXLFvgvujLJawWTmj24/jJOcP+Wi4gFOwLR039VWsCCqvc4QwGt5PW05
- gelfb9jDq2LLUOg3yXSXknDxWv/AwEs7AiwVJWhQSsEt62GaQB72s5HW5vpwblbU6HX/
- M+DMWvd5SY0lsWqVK0TIVSL0QXz7foUS3RxlX2qQ1DSNC2fDP5oRpuge+zjMbrhbXr30
- ZH1gplUYVyE3ZgzGpr4G7sxAuiAxrdKxZC9TBVhZOXytzqV1a4m3BxLJ8lXeYUu19JWf
- al3A==
-X-Gm-Message-State: ANoB5plQS8p1gsYwvLi0iC6IL/lpi5XyCV5aeDUMtbyjSGyTDDgUbQyB
- MSQp2q/8x9LV52k2IaH0Z9+Yjg==
-X-Google-Smtp-Source: AA0mqf64KfT5K8NMbONNZg0RyISrnBcnpyDV0KjqhI+e4U6B3E5IyPBgeaoyrnNls02jIqo5qGFdlA==
-X-Received: by 2002:a63:2306:0:b0:46f:918e:7339 with SMTP id
- j6-20020a632306000000b0046f918e7339mr42792281pgj.429.1669958237424; 
- Thu, 01 Dec 2022 21:17:17 -0800 (PST)
-Received: from ?IPV6:2400:4050:c360:8200:8ae8:3c4:c0da:7419?
- ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
- by smtp.gmail.com with ESMTPSA id
- p29-20020a635b1d000000b004785d99321asm3368017pgb.86.2022.12.01.21.17.13
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 01 Dec 2022 21:17:17 -0800 (PST)
-Message-ID: <525ff263-90b3-5b12-da31-171b09f9ad1b@daynix.com>
-Date: Fri, 2 Dec 2022 14:17:12 +0900
+ with ESMTP id 20AELUmfcNKI for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Dec 2022 03:02:24 -0500 (EST)
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E635403AD
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 03:02:24 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+ t=1669968144; x=1701504144;
+ h=date:from:to:cc:subject:message-id:references:
+ in-reply-to:mime-version;
+ bh=3u2qa+K5LwgLmrP2NXT4ZlvDi8zcqYjGUVfvrsyKUvQ=;
+ b=Pc+JaWJdxcArVxJQO0jTvkJBEemsY0Rax3t3fwbNMXiPDTwmPZDX10po
+ An+jp55Sw+SzJcIwoZivW9ci++tVrlyyu66IWeSFpAeUvHAOX7MaeKpjI
+ wQDmx3z7RsCOj3EIaxjjOOyqIjFF7o7UGfAXoQ26SDpKa5Gi0QmWOe5+a
+ on8Yx/mYg/1x2LYxTFR1Nn02LGMZf9rbYovrJjW9VPQOFSVJKxQqetWWS
+ JYp16hZwMv0TrwC9+yxWAixLOoPFSoGhwk0RY8mkx8BmGyXBLQlthN3pA
+ pj9acja61Zq+gIZQOLU3JFXgO6t/fu24NJ3C6Qbo+PYNCxqnCRn8gcDWD w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="317043496"
+X-IronPort-AV: E=Sophos;i="5.96,210,1665471600"; d="scan'208";a="317043496"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 02 Dec 2022 00:02:22 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="644944361"
+X-IronPort-AV: E=Sophos;i="5.96,210,1665471600"; d="scan'208";a="644944361"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+ by orsmga002.jf.intel.com with ESMTP; 02 Dec 2022 00:02:22 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Fri, 2 Dec 2022 00:02:21 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Fri, 2 Dec 2022 00:02:21 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Fri, 2 Dec 2022 00:02:21 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WzQl5CWDZa8m6h+Vkt3R3wLFqCLiutyWIX/+qnRGXXbPVItfCdoltudzASRQS5nLU7/x30aOz8pe4wS9P2oDdPReUVSCE9nRm05FxI3ktZHojOLvLFaKk130TRhzYUtKhLIQRfmRKS6xO+++jeCnNvd/+jEpqYJ5pzf/7ToMd/ipfLnW04mOmHnlW0+byZ7IoPGoxfh1DDlVGjas57doqhePDhVRa7/o5gpitK9SMorjKZ4G/gyEf5oiEWvJg2OR2brfCCR/mw2nlaf8gSP3cafi+Ai4GFZH4gcUkDucNjARIbEiKx3MsJfYu36JspJoWGIINtMX8+wGToEQyCq+Jw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Y0JkCnL5yuhNfcpLiZP+8v2mEy/roPie5pXq2WAmow8=;
+ b=XKuvNJhZUnWc1lm3GJ3lTqfLTA9ctlw1E3URpisHMzN7GiyxEGkOmV00VHaXDN6xzmvV3V1otHoEbUfrVR5AL3ttYdocxElDdZDub8A/DA0nYZKG7Q2Fs3HR1A4c/AMErFWtWXXhuFWHmRmKwthzAFa4XeZqx8WpVgLW+5DaIzzYggTHv45RX1ygbqf7eYiiwvShLUusqaf8aqZyTRRenlbMdPQyKTxxKUJajjCmZpPO0ETFYNTQTuzTbMSxK4RMXElTOxYtN4o7WNSGLxAT4ZQHChT8LKzck18yCSBH5dYXUnXgfoVdM/797itHaIBxc9S28toTKhQbMvbd14mGaQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MWHPR1101MB2221.namprd11.prod.outlook.com
+ (2603:10b6:301:53::18) by DS7PR11MB6200.namprd11.prod.outlook.com
+ (2603:10b6:8:98::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Fri, 2 Dec
+ 2022 08:02:18 +0000
+Received: from MWHPR1101MB2221.namprd11.prod.outlook.com
+ ([fe80::5cf5:bbad:8442:f2b4]) by MWHPR1101MB2221.namprd11.prod.outlook.com
+ ([fe80::5cf5:bbad:8442:f2b4%2]) with mapi id 15.20.5880.008; Fri, 2 Dec 2022
+ 08:02:17 +0000
+Date: Fri, 2 Dec 2022 16:02:08 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v2 00/50] KVM: Rework kvm_init() and hardware enabling
+Message-ID: <Y4mxACzVOsJpiIow@gao-cwp>
+References: <20221130230934.1014142-1-seanjc@google.com>
+Content-Disposition: inline
+In-Reply-To: <20221130230934.1014142-1-seanjc@google.com>
+X-ClientProxiedBy: SG2PR01CA0117.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:40::21) To MWHPR1101MB2221.namprd11.prod.outlook.com
+ (2603:10b6:301:53::18)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH 0/3] KVM: arm64: Handle CCSIDR associativity mismatches
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-References: <20221201104914.28944-1-akihiko.odaki@daynix.com>
- <867czbmlh1.wl-maz@kernel.org>
- <50499ee9-33fe-4f5d-9d0a-76ceef038333@daynix.com>
- <87lenqu37t.wl-maz@kernel.org>
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <87lenqu37t.wl-maz@kernel.org>
-Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
- Mathieu Poirier <mathieu.poirier@linaro.org>, Will Deacon <will@kernel.org>,
- Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
- asahi@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWHPR1101MB2221:EE_|DS7PR11MB6200:EE_
+X-MS-Office365-Filtering-Correlation-Id: c20b277e-aa52-4a09-4a90-08dad43b87ce
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5xmtXBOmYTCqEx9bsI8AUQs3eNgQ2GZUAVGu6LRKAX0xc1Qj44QoJBoklyfveJQWZKj5xz23rpesJfsZmfreis+UDof52Cc8DJ8N2nXruTl/oEgLMOkQ9GvXldP3jGXqTXNn7lb4vie/pWcjTrdNVq8mDRxTgCKo1t7zAW+kLInY7yfUXnGHl7LFadVIUJTL1qKgwWFF8bAm84/o3L5BzSctXvwjvVTiDedcjHmZ6wntvmJxI/VsjdJNMhIxiaDNyPoiOHQwAANXEuwK+7DX8MkQb6bLm9oDZayakNSbo6Ib645KZI9VmUF+7HiARmc0G6ea/DNwoLPXAsvf/AA/cWbB3KkEU9QMt7u2+yAaILLrUJbdYgvdrQRqPdk+dGQATaUfQzDR2E6yf3VEC7Arvh8rWp/hH2Xw2C5w/BZWKyI7yg5iG12zK8vsiCO8h2OS2nPteAjJp3iRmW1wa9+V+/nQ8dhyT3Cw+tKkhI5Skc3cntYE9l49FF2QQG81R7yxy7W8c75xY3VEnzMarkofrybxZ0IHSngXbhFj15Q0UIdmmJn8vWC9MgultcpHz8GUgQfaPlQzxiZstGEcV4ouid9D9Au+uXeWMkScJ4R9BmG8gk8xPHJJwII45gzJpeGVp3snN8H5krdA5FXAej4byw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MWHPR1101MB2221.namprd11.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(13230022)(7916004)(39860400002)(396003)(136003)(346002)(366004)(376002)(451199015)(44832011)(86362001)(83380400001)(6486002)(2906002)(4326008)(41300700001)(82960400001)(66476007)(7406005)(7416002)(4744005)(66946007)(54906003)(33716001)(9686003)(186003)(8936002)(5660300002)(6666004)(8676002)(6506007)(6512007)(478600001)(6916009)(26005)(66556008)(316002)(38100700002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4aTDGEDazO5skc343i07bjXay2Tuul8oazjDHUA1A/JfGWCFPMwYTQJ+JvgW?=
+ =?us-ascii?Q?hA8t8h+m51BPyIAT3S1iMiCiN3CkdparD209+/1oh5Qq2KauTTmiZpomrAxH?=
+ =?us-ascii?Q?hEduUzhEJG/DRdCXVvyVbahMqWHPhkOxbnFZjtBIR/ctVRY+se7GdJHDQBG6?=
+ =?us-ascii?Q?62tvTS6Q1WCvLc9fy+UpRtYRgRbbH/eZdiVsjsrPc03DmQO/bdY50vG1EYGo?=
+ =?us-ascii?Q?YZIQd6tZOO1vS1JFWucDGAiHLwFd3Jdbc/6MgjogvBin+pa0nYpEJJBvmTwK?=
+ =?us-ascii?Q?h6rMyI92Ljbda+u6sfox2MVgMDE7v6mWcAipzy9zDYlaSlUNsW1b1wgKzbjU?=
+ =?us-ascii?Q?aUOgbFoEOL2t9X5sTcImVDKSXY64pQWUyU+4aeWbT+FNwgz/p2YO1bZoq3qJ?=
+ =?us-ascii?Q?l2g7Rt98Gw/w3qBQpbSrThMvz0kQR856z8kshu8mse3jTAqiZ15zGSuO1SNY?=
+ =?us-ascii?Q?VNqpK/qAskNcGg2d6E6BuvMGlYp423n/LwmFNBwu4VnccRI2KbvEr3Ds+oCn?=
+ =?us-ascii?Q?+LQ7or4TeLNRxiv9EXjEuKxz7f5SdDnKsY0eK5lVTH7Qh4+ygTeTAt+ZWvtb?=
+ =?us-ascii?Q?fpXwGhzo0+M1w0cPioY1YG4vjwlKrqMXzKEZQrOyS/up+VqaelbVf36XU74L?=
+ =?us-ascii?Q?AfPz9RUutwWk/XsMiDxwK7IBbkZ33a8NBkfcFuSheIYLV3q67noyHjFJlNtU?=
+ =?us-ascii?Q?/me04jpnXwys8nmswofJou/cOQH4xvlXP3Bh8xjTqVuxIQkMEj6ktM9Okd+7?=
+ =?us-ascii?Q?SSZVnLiZEn6nmFQKh6Xu7H38A8jIH7VcBkjDZYiA75/XcZ//04WJfpIlIVzu?=
+ =?us-ascii?Q?iNj07e32/oI9PvK1WIFO4QyRZKRSBfnLrNO2zHLFV+6qo50/ioCFX8RdYygQ?=
+ =?us-ascii?Q?7P/6V9kIW3vXL6CwbVwRWP0lYeJU8i0iuQvzsjHN+PF5MxBMTrsy3Jtcg/TT?=
+ =?us-ascii?Q?s1uu8g0YU2YYvNtVTyDO3/rfoxWjB22Qvb02Uvt+J3CqJ0VLfTdgQO2zGtEC?=
+ =?us-ascii?Q?UQmbSgzyDl2VIbUS3q9ObwzQazXqOcB164p2jjUWUtgiCrotBJTJTC0pXwqG?=
+ =?us-ascii?Q?Vd6Aje2H2bK/n6w2VnIlqo+oWWvyu2UGgPZ2j40E9fqA1RqTz1hnSrfeDqUK?=
+ =?us-ascii?Q?aWa8FxEVtyOiQZO2W8eMXhXBIAJszGSP1jhdvsHNKRZ+Unvg8hyqEBnpHsHZ?=
+ =?us-ascii?Q?TgLbstsfgZRYOvoXgPS/Y1wf2ph1r1HyfJYE3mXkatMQvDy76WnGZPUrV5K0?=
+ =?us-ascii?Q?5bnfTRBShZ04E51jCM+G5lj/URvVuXN1TGksN4NGbTv5mPXRPgumHCxYD940?=
+ =?us-ascii?Q?yF/+5iJSK5AVjnzaKSHTBAH9h3+U5Z3YJ5jn3Mn3826wUIh4Diy1j5ll/IKO?=
+ =?us-ascii?Q?qh+2Ug9aG8/UP0z9AKpuxOjU3CYkHed4eEl7VabyNqz8jxXLwzT7ScqyD9C0?=
+ =?us-ascii?Q?eMVgJpP2TGdHDDMg8AYAaGSypjORJy0Qbs0VdFW+Dkf/CJHrhCbETKeW8SKB?=
+ =?us-ascii?Q?HV915oWtsJCErpNao5m2FQKcUz6L3NnAdcbkkgHwmnzDQ8Rd+6ol5M7kkgWm?=
+ =?us-ascii?Q?4Xlh3HwhOS6Z8v4db9/2bXbn++y9SQqy99Pq4ory?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: c20b277e-aa52-4a09-4a90-08dad43b87ce
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1101MB2221.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2022 08:02:17.5605 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +TB7Hg1KC+iwn+xMHCoWoyNmmlW0zsHSz+FUqqBX2lPsaFKz6NB6QLwHghDdpkwgEVyAvRm39dMj1iqc9ONgfA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6200
+X-OriginatorOrg: intel.com
+Cc: Matthew Rosato <mjrosato@linux.ibm.com>, Paul Durrant <paul@xen.org>,
+ Yuan Yao <yuan.yao@intel.com>, Paul
+ Walmsley <paul.walmsley@sifive.com>, David
+ Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
+ Kai Huang <kai.huang@intel.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ linux-riscv@lists.infradead.org, Claudio
+ Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
+ Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Eric Farman <farman@linux.ibm.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ kvm@vger.kernel.org, Atish Patra <atishp@atishpatra.org>,
+ kvmarm@lists.linux.dev, Thomas Gleixner <tglx@linutronix.de>,
+ linux-arm-kernel@lists.infradead.org,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+ Fabiano Rosas <farosas@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+ Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ David Woodhouse <dwmw2@infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,152 +177,21 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Wed, Nov 30, 2022 at 11:08:44PM +0000, Sean Christopherson wrote:
+>The main theme of this series is to kill off kvm_arch_init(),
+>kvm_arch_hardware_(un)setup(), and kvm_arch_check_processor_compat(), which
+>all originated in x86 code from way back when, and needlessly complicate
+>both common KVM code and architecture code.  E.g. many architectures don't
+>mark functions/data as __init/__ro_after_init purely because kvm_init()
+>isn't marked __init to support x86's separate vendor modules.
 
-
-On 2022/12/02 8:13, Marc Zyngier wrote:
-> On Thu, 01 Dec 2022 17:26:08 +0000,
-> Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> On 2022/12/01 20:06, Marc Zyngier wrote:
->>> On Thu, 01 Dec 2022 10:49:11 +0000,
->>> Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>
->>> Thanks for looking into this.
->>>
->>>> M2 MacBook Air has mismatched CCSIDR associativity bits, which makes the
->>>> bits a KVM vCPU sees inconsistent when migrating.
->>>
->>> Can you describe the actual discrepancy? Is that an issue between the
->>> two core types? In which case, nothing says that these two cluster
->>> should have the same cache topology.
->>
->> Yes, the processor has big.LITTLE configuration.
->>
->> On the processor, the valid CSSELR values are 0 (L1D), 1 (L1I), 3
->> (L2D). For each CSSELR values, each cluster has:
->> - 0x700FE03A, 0x203FE01A, 0x70FFE07B
->> - 0x701FE03A, 0x203FE02A, 0x73FFE07B
-> 
-> This is a perfectly valid configuration. The architecture doesn't
-> place any limitation on how different or identical the cache
-> hierarchies are from the PoV of each CPU. Actually, most big-little
-> systems show similar differences across their clusters.
-> 
->>>> It also makes QEMU fail restoring the vCPU registers because QEMU saves
->>>> and restores all of the registers including CCSIDRs, and if the vCPU
->>>> migrated among physical CPUs between saving and restoring, it tries to
->>>> restore CCSIDR values that mismatch with the current physical CPU, which
->>>> causes EFAULT.
->>>
->>> Well, QEMU will have plenty of other problems, starting with MIDRs,
->>> which always reflect the physical one. In general, KVM isn't well
->>> geared for VMs spanning multiple CPU types. It is improving, but there
->>> is a long way to go.
->>
->> On M2 MacBook Air, I have seen no other difference in standard ID
->> registers and CCSIDRs are exceptions. Perhaps Apple designed this way
->> so that macOS's Hypervisor can freely migrate vCPU, but I can't assure
->> that without more analysis. This is still enough to migrate vCPU
->> running Linux at least.
-> 
-> I guess that MacOS hides more of the underlying HW than KVM does. And
-> KVM definitely doesn't hide the MIDR_EL1 registers, which *are*
-> different between the two clusters.
-
-It seems KVM stores a MIDR value of a CPU and reuse it as "invariant" 
-value for ioctls while it exposes the MIDR value each physical CPU owns 
-to vCPU.
-
-This may be a problem worth fixing. My understanding is that while there 
-is no serious application which requires vCPU migration among physical 
-clusters, crosvm uses KVM on big.LITTLE processors by pinning vCPU to 
-physical CPU, and it is a real-world application which needs to be 
-supported.
-
-For an application like crosvm, you would expect the vCPU thread gets 
-the MIDR value of the physical CPU which the thread is pinned to when it 
-calls ioctl, but it can get one of another arbitrary CPU in reality.
-
-Fixing this problem will pose two design questions:
-
-1. Should it expose a value consistent among clusters?
-
-For example, we can change the KVM initialization code so that it 
-initializes VPIDR with the value stored as "invariant". This would help 
-migrating vCPU among clusters, but if you pin each vCPU thread to a 
-distinct phyiscal CPU, you may rather want the vCPU to see the MIDR 
-value specific to each physical CPU and to apply quirks or tuning 
-parameters according to the value.
-
-2. Should it be invariant or variable?
-
-Fortunately making it variable is easy. Arm provides VPIDR_EL1 register 
-to specify the value exposed as MPIDR_EL0 so there is no trapping cost.
-
-...or we may just say the value of MPIDR_EL0 (and possibly other 
-"invariant" registers) exposed via ioctl are useless and deprecated.
-
-> 
->>>> Trap CCSIDRs if there are CCSIDR value msimatches, and override the
->>>> associativity bits when handling the trap.
->>>
->>> TBH, I'd rather we stop reporting this stuff altogether.
->>>
->>> There is nothing a correctly written arm64 guest should do with any of
->>> this (this is only useful for set/way CMOs, which non-secure SW should
->>> never issue). It would be a lot better to expose a virtual topology
->>> (one set, one way, one level). It would also save us from the CCSIDRX
->>> silliness.
->>>
->>> The only complexity would be to still accept different topologies from
->>> userspace so that we can restore a VM saved before this virtual
->>> topology.
->>
->> Another (minor) concern is that trapping relevant registers may cost
->> too much. Currently KVM traps CSSELR and CCSIDR accesses with
->> HCR_TID2, but HCR_TID2 also affects CTR_EL0.
-> 
-> It will have an additional impact (JITs, for example, will take a hit
-> if they don't cache that value), but this is pretty easy to mitigate
-> if it proves to have too much of an impact. We already have a bunch of
-> fast-paths for things that we want to emulate more efficiently, and
-> CTR_EL0 could be one of them,
-> 
->> Although I'm not sure if the register is referred frequently, Arm
->> introduced FEAT_EVT to trap CSSELR and CSSIDR but not CTR_EL0 so
->> there may be some case where trapping CTR_EL0 is not
->> tolerated. Perhaps Arm worried that a userspace application may read
->> CTR_EL0 frequently.
-> 
-> FEAT_EVT is one of these "let's add random traps" extensions,
-> culminating in FEAT_FGT. Having FEAT_EVT would make it more efficient,
-> but we need to support this for all revisions of the architecture.
-> 
-> So let's first build on top of HCR_EL2.TID2, and only then once we
-> have an idea of the overhead add support for HCR_EL2.TID4 for the
-> systems that have FEAT_EVT.
-
-That sounds good, I'll write a new series according to this idea.
-
-Regards,
-Akihiko Odaki
-
-> 
->> If you think the concern on VM restoration you mentioned and the
->> trapping overhead is tolerable, I'll write a new, much smaller patch
->> accordingly.
-> 
-> That would great, thanks. There are a number of gotchas around that
-> (like the 32bit stuff that already plays the emulation game), but this
-> is the right time to start and have something in 6.3 if you keep to it!
-> 
-> 	M.
-> 
+Applied this series and verified that an attempt to online incompatible
+CPUs (no VMX support) when some VMs are running will fail.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
