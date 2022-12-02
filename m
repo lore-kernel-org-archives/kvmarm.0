@@ -2,74 +2,91 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDC5C4167B
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Dec 2022 04:55:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF02C47088
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Dec 2022 05:17:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF3C74B16F;
-	Thu,  1 Dec 2022 23:55:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BEF6449E4B;
+	Fri,  2 Dec 2022 00:17:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered)
+	header.i=@daynix-com.20210112.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wPYMakO5p5M1; Thu,  1 Dec 2022 23:55:39 -0500 (EST)
+	with ESMTP id iNqflK4ghmTO; Fri,  2 Dec 2022 00:17:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4F9E4B27F;
-	Thu,  1 Dec 2022 23:55:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 198E840E25;
+	Fri,  2 Dec 2022 00:17:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C7CE40E25
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 23:55:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B53740439
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 00:17:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4Qeb+QMpY+9T for <kvmarm@lists.cs.columbia.edu>;
- Thu,  1 Dec 2022 23:55:36 -0500 (EST)
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
- [209.85.219.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EFAD34B1AD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Dec 2022 23:55:35 -0500 (EST)
-Received: by mail-yb1-f202.google.com with SMTP id
- j6-20020a05690212c600b006fc7f6e6955so3189638ybu.12
- for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Dec 2022 20:55:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
- :date:from:to:cc:subject:date:message-id:reply-to;
- bh=uRcBcYBhcK2NFHWoVxmpF09t7tRHe45LFzDCXQhbeiI=;
- b=G+EjzY/fhE5Hp0d5sz5Sst7KvfmwMgiKeHyqn57eMfAVPUkFy+YszzcpRMod4EmjaJ
- jr7KzFWoz/JEDCEhKLOgXlxoa6GG/Bll4Vi+L1NOFD4QHgiBzWMCsqq+yDk5Oi3i+qBU
- lcYzA1qpmSZ/oMazPB2Tiq73FQbmwzD75wxsKcNpVJAp7aZn2aC1hegfd+VkVbB7TghL
- Y7WWGC5ph0BYPe5EgxTTSe708O1uxNrQKlZqvu5O67bjmAoNm4REqwwB1EWp0g5yZpOM
- oi+YTEnHMmK6iEWPtVa+9GPStuqFJX+MLWa3aEyq8kU7Jtx8HRfoHJb1XZfthyvFHOV9
- ad9Q==
+ with ESMTP id btNsISJCc2ga for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Dec 2022 00:17:18 -0500 (EST)
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com
+ [209.85.215.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A5CA6403A6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 00:17:18 -0500 (EST)
+Received: by mail-pg1-f181.google.com with SMTP id q1so3496250pgl.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 01 Dec 2022 21:17:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20210112.gappssmtp.com; s=20210112;
+ h=content-transfer-encoding:in-reply-to:from:references:cc:to
+ :content-language:subject:user-agent:mime-version:date:message-id
+ :from:to:cc:subject:date:message-id:reply-to;
+ bh=uXDFMrE1UvonJwna6/qDy1dIKcqVQK/pCVdH6z/kGzg=;
+ b=XO5vDtYYGE/vrJRZL9jWWossHYkzldTugmavz8aHWQ1I5R3D2HZ2rBLEi5IDZgzw3t
+ NOa/IIA7+JkueaK9aAXvgWQ/Ui12YZ4+T7FFMGXfBUE+97KTYV0MgSu07a/QW2toPXLp
+ rtgaOLj4x6l7oq1sQj+eGrTlModC3tN7r5tHY0lbwiUDa27dkMlngWp17EcPudo/FKS/
+ YtziY2Z0YZ0lVGKGzJnbNHryh0GoTv0x5UO9WvIjCoXUmSXPAxH/R/wRh+kU59LvmFbe
+ BZAhRitKM7cl3dLT+ewft2HG/mSWOJ5Fm7yaBSMHSTkqnvoYfHt7Rgi5/FB+pX7RNp/7
+ W/vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
- :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=uRcBcYBhcK2NFHWoVxmpF09t7tRHe45LFzDCXQhbeiI=;
- b=vZfd8QUxbIzdVD4q2KEkTLYNESJxMHqVOkO/OanNuzi31757merWVwQB7cCwG+1Tk5
- itHjOG4Rh9jtmZT8b15byul2f7zP+WwH08eWQ6//iE1aqDzXDI8GaCrI5r1jbg9ntYdK
- X1QnouKeYe6gsAo0HMAJGPRh2tbgRfrnuhdp9Jg3UWcLStLcNoWP97wnyWfEBXypxzwV
- 9gGz+sJa0ATB9DWZprR7jQVLPLX+Ew5byhDc282RmmUNSHR8JKaB/W67qDdkCk3gBFsE
- KuocT6gMpSSp0m5x6+fCidJBjhNs6Rm9qRqjLV3ZonTVWLFs6RymPEivawifPqeKvH7t
- 3Tvw==
-X-Gm-Message-State: ANoB5pkdUJQX7i/jsWaSCFW2v35E3hNkqt6c5Y4euuJSjcakpoWfanky
- H4ajpTmjNQneRLA9/LNBnGwbw0m/2Dp6Lg==
-X-Google-Smtp-Source: AA0mqf5/z0V4HhAkHhS66x/c3XI6gjQ0P/ZMMMaGl5hNJ6YT9xRP1+986m7vYWWUA3qJQDPe6PYdm3h8CsJvqA==
-X-Received: from ricarkol4.c.googlers.com
- ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a05:6902:4e6:b0:6cb:f83c:98d5 with SMTP
- id w6-20020a05690204e600b006cbf83c98d5mr48943119ybs.544.1669956935539; Thu,
- 01 Dec 2022 20:55:35 -0800 (PST)
-Date: Fri,  2 Dec 2022 04:55:27 +0000
-In-Reply-To: <20221202045527.3646838-1-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20221202045527.3646838-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221202045527.3646838-4-ricarkol@google.com>
-Subject: [kvm-unit-tests PATCH 3/3] arm: pmu: Add tests for 64-bit overflows
-From: Ricardo Koller <ricarkol@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev
-Cc: maz@kernel.org
+ h=content-transfer-encoding:in-reply-to:from:references:cc:to
+ :content-language:subject:user-agent:mime-version:date:message-id
+ :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+ bh=uXDFMrE1UvonJwna6/qDy1dIKcqVQK/pCVdH6z/kGzg=;
+ b=rNhUkxcGMJygNPE5gDrtvGhdxsoqa93sqCioP91PriZZdgdTLXKLswTB42HWKR7sxT
+ /R4nU03/7V/1mXLFvgvujLJawWTmj24/jJOcP+Wi4gFOwLR039VWsCCqvc4QwGt5PW05
+ gelfb9jDq2LLUOg3yXSXknDxWv/AwEs7AiwVJWhQSsEt62GaQB72s5HW5vpwblbU6HX/
+ M+DMWvd5SY0lsWqVK0TIVSL0QXz7foUS3RxlX2qQ1DSNC2fDP5oRpuge+zjMbrhbXr30
+ ZH1gplUYVyE3ZgzGpr4G7sxAuiAxrdKxZC9TBVhZOXytzqV1a4m3BxLJ8lXeYUu19JWf
+ al3A==
+X-Gm-Message-State: ANoB5plQS8p1gsYwvLi0iC6IL/lpi5XyCV5aeDUMtbyjSGyTDDgUbQyB
+ MSQp2q/8x9LV52k2IaH0Z9+Yjg==
+X-Google-Smtp-Source: AA0mqf64KfT5K8NMbONNZg0RyISrnBcnpyDV0KjqhI+e4U6B3E5IyPBgeaoyrnNls02jIqo5qGFdlA==
+X-Received: by 2002:a63:2306:0:b0:46f:918e:7339 with SMTP id
+ j6-20020a632306000000b0046f918e7339mr42792281pgj.429.1669958237424; 
+ Thu, 01 Dec 2022 21:17:17 -0800 (PST)
+Received: from ?IPV6:2400:4050:c360:8200:8ae8:3c4:c0da:7419?
+ ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
+ by smtp.gmail.com with ESMTPSA id
+ p29-20020a635b1d000000b004785d99321asm3368017pgb.86.2022.12.01.21.17.13
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 01 Dec 2022 21:17:17 -0800 (PST)
+Message-ID: <525ff263-90b3-5b12-da31-171b09f9ad1b@daynix.com>
+Date: Fri, 2 Dec 2022 14:17:12 +0900
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.1
+Subject: Re: [PATCH 0/3] KVM: arm64: Handle CCSIDR associativity mismatches
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+References: <20221201104914.28944-1-akihiko.odaki@daynix.com>
+ <867czbmlh1.wl-maz@kernel.org>
+ <50499ee9-33fe-4f5d-9d0a-76ceef038333@daynix.com>
+ <87lenqu37t.wl-maz@kernel.org>
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <87lenqu37t.wl-maz@kernel.org>
+Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>, Will Deacon <will@kernel.org>,
+ Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
+ asahi@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,278 +98,152 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Modify all tests checking overflows to support both 32 (PMCR_EL0.LP == 0)
-and 64-bit overflows (PMCR_EL0.LP == 1). 64-bit overflows are only
-supported on PMUv3p5.
 
-Note that chained tests do not implement "overflow_at_64bits == true".
-That's because there are no CHAIN events when "PMCR_EL0.LP == 1" (for more
-details see AArch64.IncrementEventCounter() pseudocode in the ARM ARM DDI
-0487H.a, J1.1.1 "aarch64/debug").
 
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- arm/pmu.c | 91 ++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 60 insertions(+), 31 deletions(-)
+On 2022/12/02 8:13, Marc Zyngier wrote:
+> On Thu, 01 Dec 2022 17:26:08 +0000,
+> Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> On 2022/12/01 20:06, Marc Zyngier wrote:
+>>> On Thu, 01 Dec 2022 10:49:11 +0000,
+>>> Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>
+>>> Thanks for looking into this.
+>>>
+>>>> M2 MacBook Air has mismatched CCSIDR associativity bits, which makes the
+>>>> bits a KVM vCPU sees inconsistent when migrating.
+>>>
+>>> Can you describe the actual discrepancy? Is that an issue between the
+>>> two core types? In which case, nothing says that these two cluster
+>>> should have the same cache topology.
+>>
+>> Yes, the processor has big.LITTLE configuration.
+>>
+>> On the processor, the valid CSSELR values are 0 (L1D), 1 (L1I), 3
+>> (L2D). For each CSSELR values, each cluster has:
+>> - 0x700FE03A, 0x203FE01A, 0x70FFE07B
+>> - 0x701FE03A, 0x203FE02A, 0x73FFE07B
+> 
+> This is a perfectly valid configuration. The architecture doesn't
+> place any limitation on how different or identical the cache
+> hierarchies are from the PoV of each CPU. Actually, most big-little
+> systems show similar differences across their clusters.
+> 
+>>>> It also makes QEMU fail restoring the vCPU registers because QEMU saves
+>>>> and restores all of the registers including CCSIDRs, and if the vCPU
+>>>> migrated among physical CPUs between saving and restoring, it tries to
+>>>> restore CCSIDR values that mismatch with the current physical CPU, which
+>>>> causes EFAULT.
+>>>
+>>> Well, QEMU will have plenty of other problems, starting with MIDRs,
+>>> which always reflect the physical one. In general, KVM isn't well
+>>> geared for VMs spanning multiple CPU types. It is improving, but there
+>>> is a long way to go.
+>>
+>> On M2 MacBook Air, I have seen no other difference in standard ID
+>> registers and CCSIDRs are exceptions. Perhaps Apple designed this way
+>> so that macOS's Hypervisor can freely migrate vCPU, but I can't assure
+>> that without more analysis. This is still enough to migrate vCPU
+>> running Linux at least.
+> 
+> I guess that MacOS hides more of the underlying HW than KVM does. And
+> KVM definitely doesn't hide the MIDR_EL1 registers, which *are*
+> different between the two clusters.
 
-diff --git a/arm/pmu.c b/arm/pmu.c
-index 59e5bfe..3cb563b 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -28,6 +28,7 @@
- #define PMU_PMCR_X         (1 << 4)
- #define PMU_PMCR_DP        (1 << 5)
- #define PMU_PMCR_LC        (1 << 6)
-+#define PMU_PMCR_LP        (1 << 7)
- #define PMU_PMCR_N_SHIFT   11
- #define PMU_PMCR_N_MASK    0x1f
- #define PMU_PMCR_ID_SHIFT  16
-@@ -55,10 +56,15 @@
- #define EXT_COMMON_EVENTS_HIGH	0x403F
- 
- #define ALL_SET			0x00000000FFFFFFFFULL
-+#define ALL_SET_64		0xFFFFFFFFFFFFFFFFULL
- #define ALL_CLEAR		0x0000000000000000ULL
- #define PRE_OVERFLOW		0x00000000FFFFFFF0ULL
-+#define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
- #define PRE_OVERFLOW2		0x00000000FFFFFFDCULL
- 
-+#define PRE_OVERFLOW_AT(_64b)	(_64b ? PRE_OVERFLOW_64 : PRE_OVERFLOW)
-+#define ALL_SET_AT(_64b)	(_64b ? ALL_SET_64 : ALL_SET)
-+
- #define PMU_PPI			23
- 
- struct pmu {
-@@ -429,8 +435,10 @@ static bool satisfy_prerequisites(uint32_t *events, unsigned int nb_events,
- static void test_basic_event_count(bool overflow_at_64bits)
- {
- 	uint32_t implemented_counter_mask, non_implemented_counter_mask;
--	uint32_t counter_mask;
-+	uint64_t pre_overflow = PRE_OVERFLOW_AT(overflow_at_64bits);
-+	uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
- 	uint32_t events[] = {CPU_CYCLES, INST_RETIRED};
-+	uint32_t counter_mask;
- 
- 	if (!satisfy_prerequisites(events, ARRAY_SIZE(events),
- 				   overflow_at_64bits))
-@@ -452,13 +460,13 @@ static void test_basic_event_count(bool overflow_at_64bits)
- 	 * clear cycle and all event counters and allow counter enablement
- 	 * through PMCNTENSET. LC is RES1.
- 	 */
--	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
-+	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P | pmcr_lp);
- 	isb();
--	report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC), "pmcr: reset counters");
-+	report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC | pmcr_lp), "pmcr: reset counters");
- 
- 	/* Preset counter #0 to pre overflow value to trigger an overflow */
--	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
--	report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW,
-+	write_regn_el0(pmevcntr, 0, pre_overflow);
-+	report(read_regn_el0(pmevcntr, 0) == pre_overflow,
- 		"counter #0 preset to pre-overflow value");
- 	report(!read_regn_el0(pmevcntr, 1), "counter #1 is 0");
- 
-@@ -511,6 +519,8 @@ static void test_mem_access(bool overflow_at_64bits)
- {
- 	void *addr = malloc(PAGE_SIZE);
- 	uint32_t events[] = {MEM_ACCESS, MEM_ACCESS};
-+	uint64_t pre_overflow = PRE_OVERFLOW_AT(overflow_at_64bits);
-+	uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
- 
- 	if (!satisfy_prerequisites(events, ARRAY_SIZE(events),
- 				   overflow_at_64bits))
-@@ -522,7 +532,7 @@ static void test_mem_access(bool overflow_at_64bits)
- 	write_regn_el0(pmevtyper, 1, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
- 	write_sysreg_s(0x3, PMCNTENSET_EL0);
- 	isb();
--	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
- 	report_info("counter #0 is %ld (MEM_ACCESS)", read_regn_el0(pmevcntr, 0));
- 	report_info("counter #1 is %ld (MEM_ACCESS)", read_regn_el0(pmevcntr, 1));
- 	/* We may measure more than 20 mem access depending on the core */
-@@ -532,11 +542,11 @@ static void test_mem_access(bool overflow_at_64bits)
- 
- 	pmu_reset();
- 
--	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
--	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-+	write_regn_el0(pmevcntr, 0, pre_overflow);
-+	write_regn_el0(pmevcntr, 1, pre_overflow);
- 	write_sysreg_s(0x3, PMCNTENSET_EL0);
- 	isb();
--	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
- 	report(read_sysreg(pmovsclr_el0) == 0x3,
- 	       "Ran 20 mem accesses with expected overflows on both counters");
- 	report_info("cnt#0 = %ld cnt#1=%ld overflow=0x%lx",
-@@ -546,6 +556,8 @@ static void test_mem_access(bool overflow_at_64bits)
- 
- static void test_sw_incr(bool overflow_at_64bits)
- {
-+	uint64_t pre_overflow = PRE_OVERFLOW_AT(overflow_at_64bits);
-+	uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
- 	uint32_t events[] = {SW_INCR, SW_INCR};
- 	uint64_t cntr0;
- 	int i;
-@@ -561,7 +573,7 @@ static void test_sw_incr(bool overflow_at_64bits)
- 	/* enable counters #0 and #1 */
- 	write_sysreg_s(0x3, PMCNTENSET_EL0);
- 
--	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-+	write_regn_el0(pmevcntr, 0, pre_overflow);
- 	isb();
- 
- 	for (i = 0; i < 100; i++)
-@@ -569,21 +581,21 @@ static void test_sw_incr(bool overflow_at_64bits)
- 
- 	isb();
- 	report_info("SW_INCR counter #0 has value %ld", read_regn_el0(pmevcntr, 0));
--	report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW,
-+	report(read_regn_el0(pmevcntr, 0) == pre_overflow,
- 		"PWSYNC does not increment if PMCR.E is unset");
- 
- 	pmu_reset();
- 
--	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-+	write_regn_el0(pmevcntr, 0, pre_overflow);
- 	write_sysreg_s(0x3, PMCNTENSET_EL0);
--	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-+	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
- 	isb();
- 
- 	for (i = 0; i < 100; i++)
- 		write_sysreg(0x3, pmswinc_el0);
- 
- 	isb();
--	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
-+	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : pre_overflow + 100;
- 	report(read_regn_el0(pmevcntr, 0) == cntr0, "counter #0 after + 100 SW_INCR");
- 	report(read_regn_el0(pmevcntr, 1) == 100, "counter #1 after + 100 SW_INCR");
- 	report_info("counter values after 100 SW_INCR #0=%ld #1=%ld",
-@@ -844,6 +856,9 @@ static bool expect_interrupts(uint32_t bitmap)
- 
- static void test_overflow_interrupt(bool overflow_at_64bits)
- {
-+	uint64_t pre_overflow = PRE_OVERFLOW_AT(overflow_at_64bits);
-+	uint64_t all_set = ALL_SET_AT(overflow_at_64bits);
-+	uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
- 	uint32_t events[] = {MEM_ACCESS, SW_INCR};
- 	void *addr = malloc(PAGE_SIZE);
- 	int i;
-@@ -862,16 +877,16 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
- 	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
- 	write_regn_el0(pmevtyper, 1, SW_INCR | PMEVTYPER_EXCLUDE_EL0);
- 	write_sysreg_s(0x3, PMCNTENSET_EL0);
--	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
--	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-+	write_regn_el0(pmevcntr, 0, pre_overflow);
-+	write_regn_el0(pmevcntr, 1, pre_overflow);
- 	isb();
- 
- 	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
- 
--	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
- 	report(expect_interrupts(0), "no overflow interrupt after preset");
- 
--	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-+	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
- 	isb();
- 
- 	for (i = 0; i < 100; i++)
-@@ -886,12 +901,12 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
- 
- 	pmu_reset_stats();
- 
--	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
--	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-+	write_regn_el0(pmevcntr, 0, pre_overflow);
-+	write_regn_el0(pmevcntr, 1, pre_overflow);
- 	write_sysreg(ALL_SET, pmintenset_el1);
- 	isb();
- 
--	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
- 	for (i = 0; i < 100; i++)
- 		write_sysreg(0x3, pmswinc_el0);
- 
-@@ -900,25 +915,35 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
- 	report(expect_interrupts(0x3),
- 		"overflow interrupts expected on #0 and #1");
- 
--	/* promote to 64-b */
-+	/*
-+	 * promote to 64-b:
-+	 *
-+	 * This only applies to the !overflow_at_64bits case, as
-+	 * overflow_at_64bits doesn't implement CHAIN events. The
-+	 * overflow_at_64bits case just checks that chained counters are
-+	 * not incremented when PMCR.LP == 1.
-+	 */
- 
- 	pmu_reset_stats();
- 
- 	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
--	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-+	write_regn_el0(pmevcntr, 0, pre_overflow);
- 	isb();
--	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
--	report(expect_interrupts(0x1),
--		"expect overflow interrupt on 32b boundary");
-+	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-+	report(expect_interrupts(0x1), "expect overflow interrupt");
- 
- 	/* overflow on odd counter */
- 	pmu_reset_stats();
--	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
--	write_regn_el0(pmevcntr, 1, ALL_SET);
-+	write_regn_el0(pmevcntr, 0, pre_overflow);
-+	write_regn_el0(pmevcntr, 1, all_set);
- 	isb();
--	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E);
--	report(expect_interrupts(0x3),
--		"expect overflow interrupt on even and odd counter");
-+	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-+	if (overflow_at_64bits)
-+		report(expect_interrupts(0x1),
-+		       "expect overflow interrupt on even counter");
-+	else
-+		report(expect_interrupts(0x3),
-+		       "expect overflow interrupt on even and odd counter");
- }
- #endif
- 
-@@ -1119,10 +1144,13 @@ int main(int argc, char *argv[])
- 		report_prefix_pop();
- 	} else if (strcmp(argv[1], "pmu-basic-event-count") == 0) {
- 		run_test(argv[1], test_basic_event_count, false);
-+		run_test(argv[1], test_basic_event_count, true);
- 	} else if (strcmp(argv[1], "pmu-mem-access") == 0) {
- 		run_test(argv[1], test_mem_access, false);
-+		run_test(argv[1], test_mem_access, true);
- 	} else if (strcmp(argv[1], "pmu-sw-incr") == 0) {
- 		run_test(argv[1], test_sw_incr, false);
-+		run_test(argv[1], test_sw_incr, true);
- 	} else if (strcmp(argv[1], "pmu-chained-counters") == 0) {
- 		run_test(argv[1], test_chained_counters, false);
- 	} else if (strcmp(argv[1], "pmu-chained-sw-incr") == 0) {
-@@ -1131,6 +1159,7 @@ int main(int argc, char *argv[])
- 		run_test(argv[1], test_chain_promotion, false);
- 	} else if (strcmp(argv[1], "pmu-overflow-interrupt") == 0) {
- 		run_test(argv[1], test_overflow_interrupt, false);
-+		run_test(argv[1], test_overflow_interrupt, true);
- 	} else {
- 		report_abort("Unknown sub-test '%s'", argv[1]);
- 	}
--- 
-2.39.0.rc0.267.gcb52ba06e7-goog
+It seems KVM stores a MIDR value of a CPU and reuse it as "invariant" 
+value for ioctls while it exposes the MIDR value each physical CPU owns 
+to vCPU.
 
+This may be a problem worth fixing. My understanding is that while there 
+is no serious application which requires vCPU migration among physical 
+clusters, crosvm uses KVM on big.LITTLE processors by pinning vCPU to 
+physical CPU, and it is a real-world application which needs to be 
+supported.
+
+For an application like crosvm, you would expect the vCPU thread gets 
+the MIDR value of the physical CPU which the thread is pinned to when it 
+calls ioctl, but it can get one of another arbitrary CPU in reality.
+
+Fixing this problem will pose two design questions:
+
+1. Should it expose a value consistent among clusters?
+
+For example, we can change the KVM initialization code so that it 
+initializes VPIDR with the value stored as "invariant". This would help 
+migrating vCPU among clusters, but if you pin each vCPU thread to a 
+distinct phyiscal CPU, you may rather want the vCPU to see the MIDR 
+value specific to each physical CPU and to apply quirks or tuning 
+parameters according to the value.
+
+2. Should it be invariant or variable?
+
+Fortunately making it variable is easy. Arm provides VPIDR_EL1 register 
+to specify the value exposed as MPIDR_EL0 so there is no trapping cost.
+
+...or we may just say the value of MPIDR_EL0 (and possibly other 
+"invariant" registers) exposed via ioctl are useless and deprecated.
+
+> 
+>>>> Trap CCSIDRs if there are CCSIDR value msimatches, and override the
+>>>> associativity bits when handling the trap.
+>>>
+>>> TBH, I'd rather we stop reporting this stuff altogether.
+>>>
+>>> There is nothing a correctly written arm64 guest should do with any of
+>>> this (this is only useful for set/way CMOs, which non-secure SW should
+>>> never issue). It would be a lot better to expose a virtual topology
+>>> (one set, one way, one level). It would also save us from the CCSIDRX
+>>> silliness.
+>>>
+>>> The only complexity would be to still accept different topologies from
+>>> userspace so that we can restore a VM saved before this virtual
+>>> topology.
+>>
+>> Another (minor) concern is that trapping relevant registers may cost
+>> too much. Currently KVM traps CSSELR and CCSIDR accesses with
+>> HCR_TID2, but HCR_TID2 also affects CTR_EL0.
+> 
+> It will have an additional impact (JITs, for example, will take a hit
+> if they don't cache that value), but this is pretty easy to mitigate
+> if it proves to have too much of an impact. We already have a bunch of
+> fast-paths for things that we want to emulate more efficiently, and
+> CTR_EL0 could be one of them,
+> 
+>> Although I'm not sure if the register is referred frequently, Arm
+>> introduced FEAT_EVT to trap CSSELR and CSSIDR but not CTR_EL0 so
+>> there may be some case where trapping CTR_EL0 is not
+>> tolerated. Perhaps Arm worried that a userspace application may read
+>> CTR_EL0 frequently.
+> 
+> FEAT_EVT is one of these "let's add random traps" extensions,
+> culminating in FEAT_FGT. Having FEAT_EVT would make it more efficient,
+> but we need to support this for all revisions of the architecture.
+> 
+> So let's first build on top of HCR_EL2.TID2, and only then once we
+> have an idea of the overhead add support for HCR_EL2.TID4 for the
+> systems that have FEAT_EVT.
+
+That sounds good, I'll write a new series according to this idea.
+
+Regards,
+Akihiko Odaki
+
+> 
+>> If you think the concern on VM restoration you mentioned and the
+>> trapping overhead is tolerable, I'll write a new, much smaller patch
+>> accordingly.
+> 
+> That would great, thanks. There are a number of gotchas around that
+> (like the 32bit stuff that already plays the emulation game), but this
+> is the right time to start and have something in 6.3 if you keep to it!
+> 
+> 	M.
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
