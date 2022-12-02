@@ -2,92 +2,113 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C88CBC4321E
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Dec 2022 15:54:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09B31C4321E
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Dec 2022 16:04:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B7B949E4B;
-	Fri,  2 Dec 2022 10:54:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89CCC4120D;
+	Fri,  2 Dec 2022 11:04:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Lt3Ug75B3Pfi; Fri,  2 Dec 2022 10:54:11 -0500 (EST)
+	with ESMTP id s9mai4bjLS85; Fri,  2 Dec 2022 11:04:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05E7049E34;
-	Fri,  2 Dec 2022 10:54:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 524374B133;
+	Fri,  2 Dec 2022 11:04:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DC9C40C88
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 04:55:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C9C0411C7
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 11:04:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id b82iFadsVZE6 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Dec 2022 04:55:31 -0500 (EST)
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com
- [209.85.216.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3E433403C2
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 04:55:31 -0500 (EST)
-Received: by mail-pj1-f50.google.com with SMTP id q15so3407483pja.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 02 Dec 2022 01:55:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :from:to:cc:subject:date:message-id:reply-to;
- bh=SiNH+J33VpyIQDYVvWeq7Cr+JtDYqACf4JbEasUl180=;
- b=F0CI7XedxSQCcnKRIkZSxjtelGz9DSWh5cWO9aQfJorTeZDaYnJynPxfX7GoFKQ29j
- cwVU0Rg0wtPS7tBi+6PcyAgITcvp2twH/fqGXXgRRgDfrwYcwwlJFAJsjJbvjHzyAeU6
- 1T4TDvn8Lk9tP1hag0Go94jolQrB4VYh96lwa+q8QsMBJOQIvdYCwzbx5Ieuyfw1ZCxu
- Idzcl1YOFDobBWi3soxwWY+Vl5bQ043PDlSi+qRmotpkGrqC4uoo9FJCvou4wIgk9IQ2
- 8mvyiz90lU2S/Sc3yJKVRMkTBws7x5m2A5aqM8d+CuFukjigIsn3cT8uLcBFkM7ewWls
- DmyA==
+ with ESMTP id wqBDaLGK2Jjp for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Dec 2022 11:04:15 -0500 (EST)
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com
+ [209.85.214.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 46FFA410E6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 11:04:15 -0500 (EST)
+Received: by mail-pl1-f179.google.com with SMTP id b21so5007492plc.9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 02 Dec 2022 08:04:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-transfer-encoding:content-disposition
+ :mime-version:references:message-id:subject:cc:to:from:date:from:to
+ :cc:subject:date:message-id:reply-to;
+ bh=b2GsRYGpugbtZSHFD2RurCZ4JW4xZuzTsOfxXrCkfT8=;
+ b=NpcRjd8PL93RDmu18EFPPR+cTZLP3kvCDAEAva9wUQzgEtv6dhPvDs1R9Q9+h2mN7N
+ H42dGaT+sl8xeMuYK2rfUD+midQutKuG+T3MUl21HeEIW4MolVpdsUIo9SmBbkggNx39
+ 8eN3yXePSJelVozj19wEaq9z6VDhzvEr0ForIWyEXE5qa5rozQa3WxAYewh7SubIBKmO
+ 02PPePyseXuLiMMtCMvFiCLdBEv6hZUEsP/WY2KPh2svytXFAqt8tvoUSmd0DdfZmIR5
+ sLez1JP4ikgagdRRPh2k9RbfsucGTq+KVdolkDHLvc/Uk58Zr0iw+nxpff3e47GDmBB4
+ X4Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
+ h=in-reply-to:content-transfer-encoding:content-disposition
+ :mime-version:references:message-id:subject:cc:to:from:date
  :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=SiNH+J33VpyIQDYVvWeq7Cr+JtDYqACf4JbEasUl180=;
- b=nkY7yvKUhEOnxbHdKbGBnUaKtPDTamp5NaeQA49gfOSf98b7JISKfR7j611v/R0iBy
- 4xKoaMM5vqyHsFI6Ps/aM8uVLr8yB84+2oq+dRiUvQwFPWtqqH6UCuOPREikuAo/xHY2
- nAhgdROc/D13kMx46P9S1ntrQ/0hWvHFesgmDwAoNk75odw7j2a6gFmhWghh4aSUumxI
- 542Wj3SPZK3r0e0Xqv6FpQt3JfMUStIFDnwoWnPy+HjPyhtsWCeZSllaD2LZO9YXYlla
- rp4MF9W0mFIX1PAuEJDSL7AjrOde+PB4SGII5qbGWEQa05lX7csUO0GKz0M3EwKaehOs
- Qjgw==
-X-Gm-Message-State: ANoB5pmdIYJQASFygpqAngv6SYECbYwKvVNhC7heM9z7ChY7Jj0wx1qp
- SJKYXxAp+kyFRRnzdTXSMHk=
-X-Google-Smtp-Source: AA0mqf63Cfx6DN4ieT70IkDlzzYu/aJCUI5CVTk21hXSBeKgLZNTwJo7rTYDppkPPNMBI3gzxSB1qg==
-X-Received: by 2002:a17:903:22c4:b0:184:cb7e:ba36 with SMTP id
- y4-20020a17090322c400b00184cb7eba36mr51321205plg.57.1669974930149; 
- Fri, 02 Dec 2022 01:55:30 -0800 (PST)
-Received: from ?IPV6:2400:4050:c360:8200:8ae8:3c4:c0da:7419?
- ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
- by smtp.gmail.com with ESMTPSA id
- 133-20020a62148b000000b0056c3a0dc65fsm4675471pfu.71.2022.12.02.01.55.26
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 02 Dec 2022 01:55:29 -0800 (PST)
-Message-ID: <d54e7e38-cdf6-ef5d-a6e6-e30ad8a59034@gmail.com>
-Date: Fri, 2 Dec 2022 18:55:24 +0900
+ bh=b2GsRYGpugbtZSHFD2RurCZ4JW4xZuzTsOfxXrCkfT8=;
+ b=hARYbKIb1K3Av/XzshZ1NSTurTKurqrhxn0tf1GdjfG4zdoiO+3G+JDuXNhquOWWzE
+ 9MPOxuZv+u2tMl2NMo3OTIK5R25ebCFWc/0PJkSiQJMDGhLnGt0Gx286OrNhaPj64fwU
+ 8rxUxeMjCk8eWH3dF+1OLtE/lSMKjccpP4cAGk+cjsxH0UddEG4hOvC9ds0UVNyVlgzu
+ ONfJO+zHJT8p3eWJtlnaUeih4+kMIdS2zwQexmuO1760YuwewCQnW5dujTF3UuYbPftJ
+ mEHtgqHoeoNNWHCY4uDbOD6FbE6Y9ozvLbYQXkEkzAiLdPKGqIi3bKz7bSg0U9GvbEeE
+ jRGg==
+X-Gm-Message-State: ANoB5pndUKZ021fDqNFfPosXxNnroreC7l/IDJWUdW+EJZIz/iEUkwTW
+ 2NCaiGCDxtjIUHIqgB/SMwUIPg==
+X-Google-Smtp-Source: AA0mqf7w0TN/IsoZof5JEkNGBQ8Yd2Zjjhh4wCVFAlaPO07IGqPcQWl6OiCMwNp3DG6Q8B9rQJAiYA==
+X-Received: by 2002:a17:90a:9a98:b0:219:2f90:4fb3 with SMTP id
+ e24-20020a17090a9a9800b002192f904fb3mr28837193pjp.109.1669997053879; 
+ Fri, 02 Dec 2022 08:04:13 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ q42-20020a17090a1b2d00b00219752c8ea5sm3349337pjq.37.2022.12.02.08.04.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 02 Dec 2022 08:04:13 -0800 (PST)
+Date: Fri, 2 Dec 2022 16:04:09 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Subject: Re: [PATCH v2 40/50] KVM: x86: Do compatibility checks when onlining
+ CPU
+Message-ID: <Y4oh+XsbifA2BSj9@google.com>
+References: <20221130230934.1014142-1-seanjc@google.com>
+ <20221130230934.1014142-41-seanjc@google.com>
+ <cf755389c21c73e8367d8162cabc83629d3f9a74.camel@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH 0/3] KVM: arm64: Handle CCSIDR associativity mismatches
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>, Akihiko Odaki <akihiko.odaki@daynix.com>
-References: <20221201104914.28944-1-akihiko.odaki@daynix.com>
- <867czbmlh1.wl-maz@kernel.org>
- <50499ee9-33fe-4f5d-9d0a-76ceef038333@daynix.com>
- <87lenqu37t.wl-maz@kernel.org>
- <525ff263-90b3-5b12-da31-171b09f9ad1b@daynix.com>
- <87h6yeta8b.wl-maz@kernel.org>
-From: Akihiko Odaki <akihiko.odaki@gmail.com>
-In-Reply-To: <87h6yeta8b.wl-maz@kernel.org>
-X-Mailman-Approved-At: Fri, 02 Dec 2022 10:54:09 -0500
-Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
- Mathieu Poirier <mathieu.poirier@linaro.org>, Will Deacon <will@kernel.org>,
- Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
- asahi@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <cf755389c21c73e8367d8162cabc83629d3f9a74.camel@intel.com>
+Cc: "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+ "paul@xen.org" <paul@xen.org>, "Yao, Yuan" <yuan.yao@intel.com>,
+ "david@redhat.com" <david@redhat.com>,
+ "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+ "atishp@atishpatra.org" <atishp@atishpatra.org>,
+ "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
+ "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+ "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+ "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+ "maz@kernel.org" <maz@kernel.org>,
+ "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+ "aleksandar.qemu.devel@gmail.com" <aleksandar.qemu.devel@gmail.com>,
+ "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "Gao,
+ Chao" <chao.gao@intel.com>, "farman@linux.ibm.com" <farman@linux.ibm.com>,
+ "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "paul.walmsley@sifive.com" <paul.walmsley@sifive.com>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "tglx@linutronix.de" <tglx@linutronix.de>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+ "philmd@linaro.org" <philmd@linaro.org>,
+ "farosas@linux.ibm.com" <farosas@linux.ibm.com>,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "palmer@dabbelt.com" <palmer@dabbelt.com>,
+ "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "vkuznets@redhat.com" <vkuznets@redhat.com>,
+ "dwmw2@infradead.org" <dwmw2@infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,87 +120,61 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2022/12/02 18:40, Marc Zyngier wrote:
-> On Fri, 02 Dec 2022 05:17:12 +0000,
-> Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->>>> On M2 MacBook Air, I have seen no other difference in standard ID
->>>> registers and CCSIDRs are exceptions. Perhaps Apple designed this way
->>>> so that macOS's Hypervisor can freely migrate vCPU, but I can't assure
->>>> that without more analysis. This is still enough to migrate vCPU
->>>> running Linux at least.
->>>
->>> I guess that MacOS hides more of the underlying HW than KVM does. And
->>> KVM definitely doesn't hide the MIDR_EL1 registers, which *are*
->>> different between the two clusters.
->>
->> It seems KVM stores a MIDR value of a CPU and reuse it as "invariant"
->> value for ioctls while it exposes the MIDR value each physical CPU
->> owns to vCPU.
-> 
-> This only affects the VMM though, and not the guest which sees the
-> MIDR of the CPU it runs on. The problem is that at short of pinning
-> the vcpus, you don't know where they will run. So any value is fair
-> game.
+On Fri, Dec 02, 2022, Huang, Kai wrote:
+> On Wed, 2022-11-30 at 23:09 +0000, Sean Christopherson wrote:
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -11967,6 +11967,11 @@ int kvm_arch_hardware_enable(void)
+> > =A0	bool stable, backwards_tsc =3D false;
+> > =A0
+> > =A0	kvm_user_return_msr_cpu_online();
+> > +
+> > +	ret =3D kvm_x86_check_processor_compatibility();
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > =A0	ret =3D static_call(kvm_x86_hardware_enable)();
+> > =A0	if (ret !=3D 0)
+> > =A0		return ret;
+> =
 
-Yes, my concern is that VMM can be confused if it sees something 
-different from what the guest on the vCPU sees.
+> Thinking more, AFAICT, kvm_x86_vendor_init() so far still does the compat=
+ibility
+> check on all online cpus.  Since now kvm_arch_hardware_enable() also does=
+ the
+> compatibility check, IIUC the compatibility check will be done twice -- o=
+ne in
+> kvm_x86_vendor_init() and one in hardware_enable_all() when creating the =
+first
+> VM.
+> =
 
->> crosvm uses KVM on big.LITTLE processors by pinning
->> vCPU to physical CPU, and it is a real-world application which needs
->> to be supported.
->>
->> For an application like crosvm, you would expect the vCPU thread gets
->> the MIDR value of the physical CPU which the thread is pinned to when
->> it calls ioctl, but it can get one of another arbitrary CPU in
->> reality.
-> 
-> No. It will get the MIDR of the CPU it runs on. Check again. What you
-> describing above is solely for userspace.
+> Do you think it's still worth to do compatibility check in vm_x86_vendor_=
+init()?
+> =
 
-By "ioctl", I meant the value the VMM gets for the vCPU thread. The 
-problem is that the guest on the vCPU and the VMM issuing ioctl on the 
-same thread can see different values, and it doesn't seem quite right.
+> The behaviour difference should be "KVM module fail to load" vs "failing =
+to
+> create the first VM" IIUC.  I don't know whether the former is better tha=
+n the
+> better, but it seems duplicated compatibility checking isn't needed?
 
->> ...or we may just say the value of MPIDR_EL0 (and possibly other
-> 
-> I assume you meant MIDR_EL1 here, as MPIDR_EL1 is something else (and
-> it has no _EL0 equivalent).
-
-Yes, I meant MIDR_EL1.
-
-> 
->> "invariant" registers) exposed via ioctl are useless and deprecated.
-> 
-> Useless? Not really. The all are meaningful to the guest, and a change
-> there will cause issues.
-> 
-> CTR_EL0 must, for example, be an invariant. Otherwise, you need to
-> trap all the CMOs when the {I,D}minLine values that are restored from
-> userspace are bigger than the ones the HW has. Even worse, when the
-> DIC/IDC bits are set from userspace while the HW has them cleared: you
-> cannot mitigate that one, and you'll end up with memory corruption.
-> 
-> I've been toying with the idea of exposing to guests the list of
-> MIDR/REVIDR the guest is allowed to run on, as a PV service. This
-> would allow that guest to enable all the mitigations it wants in one
-> go.
-> 
-> Not sure I have time for this at the moment, but that'd be something
-> to explore.
-> 
-> [...]
-
-I meant that the values exposed to the VMM via ioctls does not seem 
-useful. They still need to be exposed to the guest as you say.
-
-Regards,
-Akihiko Odaki
+It's not strictly needed, but I think it's worth keeping.  The duplicate ch=
+ecking
+annoys me too, and I considered removing it multiple times when creating th=
+is
+series.  But, if there is a hardware incompatibility for whatever reason, f=
+ailing
+to load and thus not instantiating /dev/kvm is friendlier to userspace, e.g.
+userspace can immediately flag the platform as potentially flaky, whereas
+detecting the likely hardware issue when VM creation fails would essentialy=
+ require
+scraping the kernel logs.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
