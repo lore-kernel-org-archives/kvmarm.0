@@ -1,65 +1,104 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from out-161.mta0.migadu.com (out-161.mta0.migadu.com [91.218.175.161])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688A8110C;
-	Fri,  2 Dec 2022 18:55:04 +0000 (UTC)
-Date: Fri, 2 Dec 2022 18:54:51 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1670007296;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QF7YyY0zCO4x691PE+6++2gBpkKD4tpfGa6u+JeBMx4=;
-	b=EXkS9mLpz+vLNs65I4j2M/dADkhs3aXj6C2J9/QQBDtzZvHcNqfe16I74H5FqC54X6IZh1
-	vDlLk2ztWLvPpDhIQey3K7nj4r9t8dEgpELG+MGppVJXr0vTOFEn8BqpFWmyYmdKr0UKQZ
-	7KgvNJRzvcj4Zw0lGfzfhiHCt5vdOM8=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC9F110C
+	for <kvmarm@lists.linux.dev>; Fri,  2 Dec 2022 18:57:49 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1670007134;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HSI8GaEsrat3YCFbYitHgJjBxasqUXZCSku/OSEtqlI=;
+	b=rn85i92GvmxIPofIBwzmf1lgVTJuWw0qPq1mAfrFEoJGvXJqdyrlRYn1kHDeuX+rlP4Vx/
+	tmJ5gmeMa66ZXMnADmpVdaE5YinkQjY/RVPLx5K/leof84T2RL7O+6UkRik8oNep32Mcye
+	z1yTKtG3yErw1oBHC6vUD1maCGLrZ00=
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Akihiko Odaki <akihiko.odaki@daynix.com>, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-	linux-arm-kernel@lists.infradead.org,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+To: Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
-	James Morse <james.morse@arm.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>, asahi@lists.linux.dev,
-	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-	Sven Peter <sven@svenpeter.dev>, Hector Martin <marcan@marcan.st>
-Subject: Re: [PATCH 0/3] KVM: arm64: Handle CCSIDR associativity mismatches
-Message-ID: <Y4pJ+wnzHv0Rpws+@google.com>
-References: <20221201104914.28944-1-akihiko.odaki@daynix.com>
- <867czbmlh1.wl-maz@kernel.org>
- <Y4jyn+aMUGcaa6Ag@google.com>
- <87k03au36k.wl-maz@kernel.org>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Ricardo Koller <ricarkol@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 1/6] KVM: arm64: Use KVM's pte type/helpers in handle_access_fault()
+Date: Fri,  2 Dec 2022 18:51:51 +0000
+Message-ID: <20221202185156.696189-2-oliver.upton@linux.dev>
+In-Reply-To: <20221202185156.696189-1-oliver.upton@linux.dev>
+References: <20221202185156.696189-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87k03au36k.wl-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221202185451.ARBorN6ifJm02GbkE8vHogIvcgXXEfA-J2mgH2l7h2M@z>
+Message-ID: <20221202185151.7NrPCz6QLOVKGJhOHdlBoGIQyFMwhxmQYZNhaKwHQmQ@z>
 
-On Thu, Dec 01, 2022 at 11:14:43PM +0000, Marc Zyngier wrote:
-> On Thu, 01 Dec 2022 18:29:51 +0000,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > Could we extend your suggestion about accepting different topologies to
-> > effectively tolerate _any_ topology provided by userspace? KVM can
-> > default to the virtual topology, but a well-informed userspace could
-> > still provide different values to its guest. No point in trying to
-> > babyproofing the UAPI further, IMO.
-> 
-> I think this is *exactly* what I suggested. Any valid topology should
-> be able to be restored, as we currently present the VM with any
-> topology the host HW may have. This must be preserved.
+Consistently use KVM's own pte types and helpers in
+handle_access_fault().
 
-Ah, I was narrowly reading into the conversation as it relates to the M2
-implementation, my bad. SGTM :)
+No functional change intended.
 
---
-Thanks,
-Oliver
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/include/asm/kvm_pgtable.h |  5 +++++
+ arch/arm64/kvm/mmu.c                 | 10 ++++------
+ 2 files changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 63f81b27a4e3..192f33b88dc1 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -71,6 +71,11 @@ static inline kvm_pte_t kvm_phys_to_pte(u64 pa)
+ 	return pte;
+ }
+ 
++static inline kvm_pfn_t kvm_pte_to_pfn(kvm_pte_t pte)
++{
++	return __phys_to_pfn(kvm_pte_to_phys(pte));
++}
++
+ static inline u64 kvm_granule_shift(u32 level)
+ {
+ 	/* Assumes KVM_PGTABLE_MAX_LEVELS is 4 */
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index a3c71b5172cd..886ad5ee767a 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1399,20 +1399,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ /* Resolve the access fault by making the page young again. */
+ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ {
+-	pte_t pte;
+-	kvm_pte_t kpte;
++	kvm_pte_t pte;
+ 	struct kvm_s2_mmu *mmu;
+ 
+ 	trace_kvm_access_fault(fault_ipa);
+ 
+ 	write_lock(&vcpu->kvm->mmu_lock);
+ 	mmu = vcpu->arch.hw_mmu;
+-	kpte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
++	pte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
+ 	write_unlock(&vcpu->kvm->mmu_lock);
+ 
+-	pte = __pte(kpte);
+-	if (pte_valid(pte))
+-		kvm_set_pfn_accessed(pte_pfn(pte));
++	if (kvm_pte_valid(pte))
++		kvm_set_pfn_accessed(kvm_pte_to_pfn(pte));
+ }
+ 
+ /**
+-- 
+2.39.0.rc0.267.gcb52ba06e7-goog
+
