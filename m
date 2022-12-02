@@ -2,88 +2,84 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61C5BC4321E
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Dec 2022 12:19:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8ABFC47090
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Dec 2022 12:59:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F1A8F409B7;
-	Fri,  2 Dec 2022 07:19:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3ACEF40BED;
+	Fri,  2 Dec 2022 07:59:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@intel.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0LrZLcDTHn09; Fri,  2 Dec 2022 07:18:58 -0500 (EST)
+	with ESMTP id g7ljYqAH4dY2; Fri,  2 Dec 2022 07:59:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 34FE44B15C;
-	Fri,  2 Dec 2022 07:18:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A540749E4B;
+	Fri,  2 Dec 2022 07:59:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 939604089A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 07:18:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BC1E40CDE
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 07:59:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IYLMswdu7AI0 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Dec 2022 07:18:55 -0500 (EST)
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8CDE54052C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 07:18:55 -0500 (EST)
+ with ESMTP id I3Gd7Y+rlzIH for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Dec 2022 07:59:26 -0500 (EST)
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AD88B40BED
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 07:59:25 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
- t=1669983535; x=1701519535;
+ t=1669985965; x=1701521965;
  h=from:to:cc:subject:date:message-id:references:
  in-reply-to:content-id:content-transfer-encoding: mime-version;
- bh=wi48IRAlj8rws7OXian+RqCB7j1U88ZDa1zqvDwWk3c=;
- b=efxfcj8ENLTl62HabsxPfwYVGRFdWPDcoKp8qhazkyrMOt38mK+a9HJu
- 8NwQPC3b4flsg8BF9phh6dLgqAxtK94tpPdzNT6Ue3QaA+9GKXW5SulH+
- U/YilEU1S8o0uPetVJ+yxtgFlnOnmWayBtH7x1e92TPvPDOvqmYlXpNcn
- oS8yBgVDIvEKdlrJ8F0M/zC53k/YqnHSajc9YiDqxyh2CksqJIJiLW2vG
- 4uZEjpD/5jF/c3LUSclQrPjdD+YD0cViYXvvPX1Q9VkLV1KEGuDuBF98O
- xYn9n5naKm0e9KqxUkierM+dg3Ae3CjTuGbPqBn6Pmdh1zFzzNzhrWA4V g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="303544309"
-X-IronPort-AV: E=Sophos;i="5.96,212,1665471600"; d="scan'208";a="303544309"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
- by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 02 Dec 2022 04:18:54 -0800
+ bh=Y57nduZJ/KnCsYoa25EcTNImNFv7hA7gbKPEVW0u2B8=;
+ b=B4/7rx7Y5e/WJ/6agrxxqzdfsoV3GLBVHTB4pJxOK4i6i+g/qFhslIMo
+ qBDCGPzBgofDF+Rq9wpSbO9pX2oKLAHsxOWbwlvCQWDzapddCr5ZIbWfL
+ jZu6KOOPa+Zim29Sobv9MkjOIvLUgXFVnZ9GHuIepAFxRKQ74J5iFp6FM
+ JsvHsYtdqffIS/BJYc1SO+4khfzx1jn5qeh1yiy5pLvuMOPJT1dlV/2Ge
+ scy3wB33dChNGvJKZxFCARxdlhADBLRv8h28dbI68Wn1tUW4zoX6IZ8iF
+ VA+TS/DMmip4mT9cTvyttVShKfKZfzs7eKz/5DNg1DunnWQ/LUKOELw/+ g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="315974581"
+X-IronPort-AV: E=Sophos;i="5.96,212,1665471600"; d="scan'208";a="315974581"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 02 Dec 2022 04:59:06 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="677582600"
-X-IronPort-AV: E=Sophos;i="5.96,212,1665471600"; d="scan'208";a="677582600"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
- by orsmga001.jf.intel.com with ESMTP; 02 Dec 2022 04:18:53 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="638744065"
+X-IronPort-AV: E=Sophos;i="5.96,212,1665471600"; d="scan'208";a="638744065"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+ by orsmga007.jf.intel.com with ESMTP; 02 Dec 2022 04:59:05 -0800
 Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Fri, 2 Dec 2022 04:18:53 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ 15.1.2507.16; Fri, 2 Dec 2022 04:59:04 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Fri, 2 Dec 2022 04:18:52 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Fri, 2 Dec 2022 04:18:52 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.177)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ 15.1.2507.16 via Frontend Transport; Fri, 2 Dec 2022 04:59:04 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.171)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Fri, 2 Dec 2022 04:18:52 -0800
+ 15.1.2507.16; Fri, 2 Dec 2022 04:59:04 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=W+YVQYh8kEpkh1kwsXNoCo2I+ywl9up8yv8Jbv6b/8wuo4rx1p41rPs/n2F0iEoQLrpBQqtWp0XpaX9MGT6+1Nti/kgnBlGYftUtmGq2PdXDSD/KCpN4vkhxIlAIWb4m6RSq5PUzGkBnY9GWox6cP+wjdHeLkRwQndpwVEwmMA56Jw+7BNYzcTCa8NYI9JU24aAdvAsltSwSpGWVM6ZRJ1GmZf9CBjGOpGXZLIbVzCHl+REbemh9IyyJlZdwZ96aazHVhN/uwlGCNgrjRlmbDoAhQOMAUX0en2nKUpgYgqfB5gYBnN7+WX9QzkKH3rD5IpVWLpmAxpFLOkAT66wKCQ==
+ b=ST7vJ6slVCnrTkS92Zj/FSz7aL3+bJB20/k0cZW4XErsgnSe5L80eG5MD7bU2W/ClvnXCLGsh9RMDKRSCSUwyMbFHH6zL2XJJWhZjDCUPdNkzP7dFVn+nBMPtKjXksyt02TDYX63mV+3D4wXqH/Xe9bIEXd3+TtcecQn39iG2Tgn5yDu7HUv8izQtjYjKy03ee+4mtyzSC2nznGNRiz+CG5KGYT6RmxXPTAQKh8CWtnf1ULKnWm/6T58L/ewVszYdJZ6/rSDUT8+CjqsGd+qdAaxjQFmWyeGet9EEGGLcncnytpFE8pv+Oa9Wrr+WYgsr5DLlxah4ragqaf1KqpQWQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wi48IRAlj8rws7OXian+RqCB7j1U88ZDa1zqvDwWk3c=;
- b=MxoZ8LXqL2ypwySuP2agnbFi4afD5w3N6PVYoCepM3SrNGxbWnRqEGLTQsMD/5jBDa/6xOsPUs/Mp4xJyYt1PGqxnFGvaO9PMifUhfS7d+rJ9+znXaMCnwrgfNQ9had4fnM+5B+CBkkAfIs2U3VIGsh4HwtEpfLEbWcNojgtC0MWb5pyTX3L9Kvh98Fgt9TjAMUtGCW3KVS1fHbmiAkWO90BDalZ5Hw/Cf+0rm55nWxAxdk+mSIjBNF1LXMYrI9dHlKHvT1OznWIIXRnK5cdg3mGBPShgIO1w/dmtAtKq842t9a5//KR2WgyeNfGQtp91kTHVigHzKc60HOk2rxppg==
+ bh=Y57nduZJ/KnCsYoa25EcTNImNFv7hA7gbKPEVW0u2B8=;
+ b=La4d9ubClC1jAgz3B+Ie+xeXyUjf2s/tPKlmqCfuV+hWHJjKhuQMeKevSPGOqkJc8r+Mqs+usoKXCfKicaOvTS/yVsUOFTmeKi9f6vL3i6ZQ29Cx18/MaPLZ+Pix9bNc6XaxygxQg9lDPwV1QLO3e8ITFxSCduSho6vJYdxG1mZ/zAbtqq6+iiYBfKA0LhzY+H8C1MgDjxNiOlakclW9Ot7ykmrjFnjanfoUGXoXnyxVhz8gXa8wktZ83fqtExKBAHN53lZyXFitWrxaQsE2B+YLp3EZdnntB02rclMrdMqL/UtDS79YE8LEAdivDb/dYiucHlhelRe4EO3iGP2g1g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by PH0PR11MB5061.namprd11.prod.outlook.com (2603:10b6:510:3c::21)
+ by IA1PR11MB6394.namprd11.prod.outlook.com (2603:10b6:208:3ad::13)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.8; Fri, 2 Dec
- 2022 12:18:49 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.10; Fri, 2 Dec
+ 2022 12:59:02 +0000
 Received: from BL1PR11MB5978.namprd11.prod.outlook.com
  ([fe80::2fb7:be18:a20d:9b6e]) by BL1PR11MB5978.namprd11.prod.outlook.com
  ([fe80::2fb7:be18:a20d:9b6e%9]) with mapi id 15.20.5857.023; Fri, 2 Dec 2022
- 12:18:49 +0000
+ 12:59:02 +0000
 From: "Huang, Kai" <kai.huang@intel.com>
 To: "chenhuacai@kernel.org" <chenhuacai@kernel.org>, "maz@kernel.org"
  <maz@kernel.org>, "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
@@ -98,16 +94,16 @@ To: "chenhuacai@kernel.org" <chenhuacai@kernel.org>, "maz@kernel.org"
  <paul@xen.org>, "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
  "vkuznets@redhat.com" <vkuznets@redhat.com>, "anup@brainfault.org"
  <anup@brainfault.org>
-Subject: Re: [PATCH v2 35/50] KVM: VMX: Use current CPU's info to perform
- "disabled by BIOS?" checks
-Thread-Topic: [PATCH v2 35/50] KVM: VMX: Use current CPU's info to perform
- "disabled by BIOS?" checks
-Thread-Index: AQHZBRD6iqD9Xi/jQ0CDB6+2sIzlZa5ahlMA
-Date: Fri, 2 Dec 2022 12:18:49 +0000
-Message-ID: <94ced947d0f6a82905afbfe413cf1b6d16fa5fd8.camel@intel.com>
+Subject: Re: [PATCH v2 42/50] KVM: Disable CPU hotplug during hardware
+ enabling/disabling
+Thread-Topic: [PATCH v2 42/50] KVM: Disable CPU hotplug during hardware
+ enabling/disabling
+Thread-Index: AQHZBREJrC/cMYL66UyZW4tPjPbYXq5akY8A
+Date: Fri, 2 Dec 2022 12:59:02 +0000
+Message-ID: <8b1053781e859aa95a08c10b0e8a06912a2b42a2.camel@intel.com>
 References: <20221130230934.1014142-1-seanjc@google.com>
- <20221130230934.1014142-36-seanjc@google.com>
-In-Reply-To: <20221130230934.1014142-36-seanjc@google.com>
+ <20221130230934.1014142-43-seanjc@google.com>
+In-Reply-To: <20221130230934.1014142-43-seanjc@google.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -116,66 +112,66 @@ user-agent: Evolution 3.44.4 (3.44.4-2.fc36)
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|PH0PR11MB5061:EE_
-x-ms-office365-filtering-correlation-id: 62133e92-ac4f-42f0-c652-08dad45f5e2c
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|IA1PR11MB6394:EE_
+x-ms-office365-filtering-correlation-id: 502c7b12-9880-4a37-9254-08dad464fc66
 x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: uxrWgTc450VZbeWbFPvWZQCwS+1pjY08Xt4utqXgK+ImRNq8FpaEOu3OQcjYVZFwUG1be1U5GWwE0GczDYmqjmh1e5HSotKJ+zb0UxjSQxGru+cXtXVZNVabTjccQWvu2kMgZnwyLyfgv1MJkvom/XCE4RypXujnLSDJuOC0UGbNy8lEvrEUlYX2CRIys3LqinyaDTdWJxAPUMEE4QIlVyeE7hjGhB/uZM2ydsjZQOzwkXtWaWFnNiJyoyg+QfQntFbbGMSNZOWRQ4GwQ7rseqTKCM+Q26SK3BDdWgxJVGtHHw5LrwEVdQCG56/PLgQ4pvz6hnJ997bOMwR2YRoZ8VCvMtnywPnS+Dwc1xSSDo9c33VBldOMB7uGxYfT7RqvhMZPliLGVEhDccVtrJk7MP258zIogadjAWtJCB7clPNoNVlPahJtMpMv2OA7qLH7HRibiQnj0reaWB6dNhTfh7EJe+fsUjEW3dPWLlJ082zh456bm2bTCCarQo+H6r9p6YU6gmewFDQCGd2UnrPr1hAAZ9eqbIQzfscojXOiAYemEoUcDfcpkSiE52WgSF101IIhz61+NgACku7Ho1DFC8bvWY0N9AhPyCO6Jd7G6eCis4U3Q0JmEpCYMnoYANWT28OHQUS/J/CTUtWQarfhUciQnlnoGJpgviQ/vdIRiaKzrZtoGp3PU0mz7E3tSUNm7T97LcynK7vVT4TSJbzbDQamHW5IGddVn2z36tp2q2s=
+x-microsoft-antispam-message-info: PeGKPdhdn9NEmZyXrYYhpPW+HYSwujBEj8H2bvWaUs6TE2lXQZ6PkM63ycyAo5YT5+b8QJ+62USGuMHEkGCfyUAM2Ha6Kn4sWRST5o6z5+zoHS8Nl767R3AlgeJqBRFKnriPNEkRJXhnCFFzres3TqvlgZUc8bfki+OQNXEPlUPYXnt06tm7mM0CR7mQ1YkrSeQ6IBQk1DFhqangs+RiEyPQt3we77wSQKyKxbsKC7FSVKQ/UQTMs6wLFQiNvTDm495w7n91ZcpLGuBERmQhXzTyX0EhNI8QoZNnM8oHMgbNa5TK2132WaAvmChnVMMOncl+dUKRq8m4i26OMFWWviTzyynlb+TzNFVL/lFJySeOYEDe+S+u9J3Fak5DlY9bT7z4I9ZbBhR1tpuEP5L3oEmPcebRq5WOHVhpYyK7AmwYOy1v9KBQhRgV7bE04hEmY5PqCZdh1Sy2McC74CCnzqGQXqsZJP84krRxhWnVS5/xmRJFdfuPN2BklUTjRS81LKppNHG4krDvl7JpiTA5GCZy5lJ3UovkxcUBLo73REZgUBqgUkuGdKU7Dvqp6vkMGqGRlX33OJr9+kxjIoWUcF7pmzYokMkZIYgAaXKfrxj6UYCynqjhM3ceayVOX7mDCv1JuWYBp4hOxWOIeLzeMlx72zOJ9pzPZT1secD4AxR0X1z8t/Pj1R7yXuW2+KLGFDVGPmL1bBOloqNEW9UjJ/DD4q6n8vRTpyYnWcvkLsc=
 x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:BL1PR11MB5978.namprd11.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(13230022)(39860400002)(366004)(346002)(396003)(136003)(376002)(451199015)(2616005)(110136005)(6486002)(316002)(38070700005)(54906003)(36756003)(921005)(86362001)(107886003)(82960400001)(38100700002)(6506007)(83380400001)(186003)(26005)(122000001)(6512007)(7406005)(4001150100001)(478600001)(2906002)(64756008)(66556008)(66476007)(41300700001)(5660300002)(71200400001)(8936002)(66946007)(76116006)(66446008)(91956017)(7416002)(8676002)(4326008);
+ SFS:(13230022)(366004)(376002)(346002)(396003)(136003)(39860400002)(451199015)(186003)(26005)(71200400001)(6506007)(64756008)(66476007)(8676002)(76116006)(66556008)(478600001)(107886003)(66446008)(6486002)(91956017)(66946007)(4326008)(2616005)(41300700001)(5660300002)(8936002)(7406005)(7416002)(83380400001)(2906002)(4001150100001)(38100700002)(122000001)(82960400001)(36756003)(6512007)(316002)(66899015)(86362001)(54906003)(110136005)(921005)(38070700005);
  DIR:OUT; SFP:1102; 
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?eXpjSks2T2ZVTitRMDJVM05wRUJ3c1p3dUllSzRjWDFWTW1TVFNtWHp6QThF?=
- =?utf-8?B?S2hTMjNuWUdBdVhJS0tPQTdwdzBaQndoSjFqZDFVOGNCeGcwK2p5NUhueE4x?=
- =?utf-8?B?eVRyZVFtdjZoN3ZoMXFDVlNQMEFIdnh5UW10bzgvSGFISkZVTlIwYmF5ZXl6?=
- =?utf-8?B?bm5SZkJxZHBjcUFJMWRHNldTY05QYlpKOGcyaEZtQW50YlcyTDBQdjR3RjY4?=
- =?utf-8?B?N0lmRjROZXNZUGtTcHUxT3p1QThCclp1N3loSnhzTDUyS29jTGZoL0lNNzhr?=
- =?utf-8?B?WGduUFZRVm9KN2pXZW5qcnM0SXArUE5NS0tlU0EybERwajhHQUREUk55ZHM4?=
- =?utf-8?B?ZkxJRHpmTnZ4b3Z2MGtWYllTcTdaQ1FpTE1KRGJjRmdROGhtekxvQWJEMS9V?=
- =?utf-8?B?NzNpV041WGRXd3FZeDVIeHNpcG5yYWNDRjluNXM4UkZVRkpTNkV5TTFUeERm?=
- =?utf-8?B?THRGcDBvVzVjaS95K1MrY2VEK1U4bm9pVUROUlFkcUMyM3U4MWppa3hpZUZZ?=
- =?utf-8?B?NUsydzQ2TkZRVC9TV1FJWE9TWjJBc0JGSTZxZlRIZHJSRUNkMnBwT2Q4b2tB?=
- =?utf-8?B?a0g1UXNzRUNONG0rZFFQTkkzbHNzWG8zUTI0dE15YjJVc0M1VG9TaEZnU3RE?=
- =?utf-8?B?N1ZjUzB0aXN0Z3JoRjMvd1RJR1FwOXZROXMvbHRsdzNPY2dQUXRPNmNpa3o1?=
- =?utf-8?B?YUowSnVGaFVzNVJxemdjeEdhUFVTZ3o1UVNGVDFaQXlVREpvYmw0M3k0R3ZY?=
- =?utf-8?B?aVp3YWh1MkFsYTZOc1BHaGtSMmdmVFU5aTFhVURuWEx6U215VVZDVk8yeW9E?=
- =?utf-8?B?YVBBaEdLcnZwQXhMUHFhcmgwZHhxUG4zMWZYcGFzZkN1amQ4bXFGYkV2RXVz?=
- =?utf-8?B?UG9vZkpPRDVia0ExK0FaOWJRdUN6OUNxTmxWVnhUZHNBSUw1MXVHMXBNL203?=
- =?utf-8?B?Zjc5ZXpCOXFBTTQxKzZsWVBndWVQWldnUGE5YUpxRzF4Rkk0RzlCTDlYTXh1?=
- =?utf-8?B?ODhWSEhHS21MOHhuTU9YYklEMkcwNmtDazJGam5lUjlTcTdJQ0xlTFpTZitS?=
- =?utf-8?B?RStpL052bEIwdkxpMVQ4Y0dJa05pMmtRTEZ1N2EwbVozOVlxcnR2empCTlpm?=
- =?utf-8?B?MmNEYmtMRHVXR3p5aklRWlhOOG9Bdk55Qmp2UnFzVDhDS2FqRmVTd295SWhi?=
- =?utf-8?B?SUM1Wldoa3VxUHRwS0poT0VYS3k5OStTdnNQdVYxdEx1R1puSGk2dFdDODlF?=
- =?utf-8?B?RnJxZmxTaW9kVlQ3MWRTNXhxVVJGNDV0OTJGczJsM0xaeDkxUnJWbG1uclR3?=
- =?utf-8?B?TmhRNzFJVFpPd1lKNld5SFFGeEtmaGZtNFlKSGRXZURvcWZ4RFIzZmZITFo1?=
- =?utf-8?B?YUpkb1EzVzVoSk9rTjQ2VHdSTUZHSSt6YlY2SDFoNlJ4VzFxWFZ0ZTFUbUxM?=
- =?utf-8?B?MWlrVzhtYXpzQy9EV05xWjBDenlaYk81aHgzQzN5emxnMTBiYTdiNGRYNFVW?=
- =?utf-8?B?cTUycFRHbFdtaFphbzRETHBlUWxwSnVPZ3h6U3loYzhPL05PTVdMRnhPUUpp?=
- =?utf-8?B?MkFSVmpXbGd3emNVb3BxajVhVFRDdWJiM0h5ckx1ejFRY0VObko0VnlIdjZL?=
- =?utf-8?B?RlZkUmd3TURwckV5Y2N0UWRpWGlPZXZDY2tJQ2h5c0Z5UFBmZ0tMWHNMWWFH?=
- =?utf-8?B?MG9mMmtjRys5MWdTYlNLbm0zaXRMRXhaSXUreHhXcjJEWXBEZWRGdEx0SmU4?=
- =?utf-8?B?M3FyUTJSOC9EUFIwanhjYkNGdExWeURWNG5hN0o0OGNYWldIc1drMDdpSUZQ?=
- =?utf-8?B?YXVvQmFoRm1WQWJVdGVSWUlIS0tUbUJQQWU5MHZ1YkhMSHN2U3M2OE9yd2ov?=
- =?utf-8?B?SExLNmxDUG1XM25NSUEyNnBCZmtZQnY4WlI5emlwZUdwSHlsMVEwU1lHemx1?=
- =?utf-8?B?RUJobVErcFVSckNsWnlXTWlSRFVBSWxoMTRaN0lWU2RDcFFJd1RzdkIvN2Fo?=
- =?utf-8?B?NzZpMEpUUW1UL3U0VDltamFGdjlFOGhVcjd6NzVqN2ozeFFWT3BuLzRSdit4?=
- =?utf-8?B?Tjhzb0FDS3Znajd5bzd1VHlPck5GTVlJZTBSelAxeVdjemVDSUJDVzBmYXhZ?=
- =?utf-8?B?cEZ4UTdXK01ONEwzQmFtUFdPY1dqb1R6NjNCYU5zRjZQR1N3bW03dEEybkxL?=
- =?utf-8?B?d0E9PQ==?=
-Content-ID: <99D4C9A3D984C2428A927ED5B867F5BF@namprd11.prod.outlook.com>
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZzRoUElXUFV1SzEzak5UMnNzamVsdzJTdW5sZlR3b1lGYnQ3alVWTlJEUHBn?=
+ =?utf-8?B?RmUvRDNFYW0wTGZkak5lNHAzeTFMUUFUMHoxSFNsaExHRFVSSnZRanJHYkx0?=
+ =?utf-8?B?TW1ubjVkQUpFajBGbzlwenR3Y1JkMDVGdVJjL1kxellkLzZDUzRYS29qNHZU?=
+ =?utf-8?B?WDBqWWhRbzhlaVU1K0c1eDNuaEJZaWV2MjUzSkdDb0swZ1ZLZDY2R1pUUnlz?=
+ =?utf-8?B?aDR4Q2hVZUV5eHQyTzc2bHNhRFJYTm0wNnk0REdpUE1DaCtKUmExZVE2SkRr?=
+ =?utf-8?B?OWxMZDhtSUFLcVhpMUlSc2ZzZlkwMjhuQVRtUHBiRy8yVHowNXNxRnREZUNB?=
+ =?utf-8?B?RjlLTmFGTXBxV004MlJJaFBxVTNtdkR3UUtueDJZQkt5VGxxazVHZjdKTGJW?=
+ =?utf-8?B?SDZoaHN0bFRwSWMvcUpoeUV6b0h2TG9Xa3l6VHdZTTE4cm9nMElZOE5kNDM4?=
+ =?utf-8?B?L0pWbVBRSGUwaVlUTzlkVy9oRWZYRWFuSVZtWGxZYk9Kc0xSRnBBYmtYL2FI?=
+ =?utf-8?B?WEJFRk1NcUx0eDNCQWFHdDhISStkUXJ2eUw2cSt6T2k0NkxNMExrU0V1R1Js?=
+ =?utf-8?B?MXI5Q1BQUzBpMjliRTk5NHVMR1N0eEN1ZGtYbSt1UDVkb0lnR0ZSL2N3SU9j?=
+ =?utf-8?B?aXlhVnhEbWhIcHRSdkpPOFZ0RjY0NHUvQTNJc3FMenRhc25pYkhkNmlpdXho?=
+ =?utf-8?B?aTJpdDl5QUtFN2E5Z29TMEw3YkxIZlFOSVlWUnFnUkpyMnV4aXhobjQxNXBR?=
+ =?utf-8?B?YWVZNm9YazVrZ1N0c09KVzNwWnZOTHpEeFRGWHkyUzBYWm1GUHZhNDdiZ0U1?=
+ =?utf-8?B?Y0lZMWdsVVpPVmt0OWk0V1JNeWRCOWlnK01qdTZiTXZjeGxHTUJDalJZWjk1?=
+ =?utf-8?B?Tm4wRVh5STRld0VLdytqam1laDhzUVE2L1V3RDQ4RFFTWUd6enVjWEV5TU5o?=
+ =?utf-8?B?ZTd6a0p5d3R6V0xmT1BFY0JZem1tOFRBQnErK0RPVG0xMDBUQWJOa1dCSUVX?=
+ =?utf-8?B?S2NqQ2F0Zi9RbXVzazkvUTNGcWl3WDNCMC9RSkVDb2xzQStLY1BhcW9HTE1w?=
+ =?utf-8?B?Z0ZPRUV4b2JUUWhqNUg2dXVrWDFjNjhhbDJQZjVXblJOemJBWDhTNDdZa05D?=
+ =?utf-8?B?SFdyS1lZSkQ5ZFZpWG9iQXpGU0Q2M3NueWUwQlJTc3lOMEljYk05VzhhRjdI?=
+ =?utf-8?B?MjdrY3JNZDJuR2JQZ2Y0dVJwZnRUdGxrakltb1dGQkNRSW5CcGp2UW5vL2lQ?=
+ =?utf-8?B?d0dzZ3BtU3BrSW9qMmV4a0hvaG8zZEgyR0orZUs3Zk1hdlNiODAzbFVwMjJh?=
+ =?utf-8?B?eVh1a1VhZktaTThHc05yQ3RVWmVFcXE4ZnRNM3hOcWFkb3ZDUTE5azJYL1E0?=
+ =?utf-8?B?bWJhangvNi8yaWVHemZsb0J3TWFlZW9nQm9sM1NyV2NGTmlXUFp1VGNDUEJt?=
+ =?utf-8?B?cjNlbGNvNkpPV09UMDZRdmRBTGlTdFUvTzIzY1E1S0JhVzdPV1JVT1JIL2Fl?=
+ =?utf-8?B?ZTdoYjBmTlVneW1jdGtTK0ZiRzg4eXNkV2thVGdOQ2lzQWFKM2RsYllRZTFh?=
+ =?utf-8?B?bnNwbUZ6dUpRUks2dTVaQzhPbnNHMEZkWG0zcElxZmhMeFBRTTFsNEdmUm5E?=
+ =?utf-8?B?Um53aWY0ZllYVWkybGI2MGhOS2tVRWtXR0tPV0ZkZWZrZkVCR0gxQTJEZkhV?=
+ =?utf-8?B?bmtJM3J0VUdIakx0N3hXQ2NmMk04WWFyTnBadFM5YnV2MEYzUmNYK3VPYU51?=
+ =?utf-8?B?em1NWDhJTWRXRFpDaHNzRkJScWl4NXV4dmZNNkx2aW1QRE9LZ0F1Qm9RQVR5?=
+ =?utf-8?B?Q1ZQQnBBVjlJZ2FqTHJBY1ZjdTNuRTBTWlpaRVFtQSs0VldBN1FGRTgydXZJ?=
+ =?utf-8?B?ckxvNkE2QzQrVC95VzE0YklMMVZVUmU1T3oydE9SVDRId2ZuVW1xSmFTNGl2?=
+ =?utf-8?B?TUpuNkZuZS9RRjVWN3Y4ZzF1Y2xOZjJ4YVFuelJ6TDNwdXZXNDFlVUxaYW1w?=
+ =?utf-8?B?VUV4b0hkWVJRLy9DNTZtQTRiaGpGSGFMTGJDN0U4UlAyRWhFWC94TVU0QlpC?=
+ =?utf-8?B?VXRZOVRCSkQrdGZ4SUVuNUQrRU1BL2MzallYc2hPTW5zL3RCNFNvZXdYRzZ5?=
+ =?utf-8?B?c1BnWnVQbncwL2VjY29zNGRDTzBpbEcwd2hhYUQvOGR2L2hiTWNLa2hXNkdZ?=
+ =?utf-8?B?a3c9PQ==?=
+Content-ID: <1C396E37D994CC4CA9103DAD20883EAD@namprd11.prod.outlook.com>
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 62133e92-ac4f-42f0-c652-08dad45f5e2c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2022 12:18:49.2695 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 502c7b12-9880-4a37-9254-08dad464fc66
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2022 12:59:02.2588 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: D8sfVH2lNpgmmjNH3fhelMv0ILsRAGM5Re0l7ofIu3xuYV3WnXzg8Lp2u42wHkephYXX5NDKJAnScO8VqLpPzQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5061
+X-MS-Exchange-CrossTenant-userprincipalname: 2rjsNgdpw4MaFE4mt1ix9UHTIUKI8sSXwA81n3LkH9NsxPOfxwgwsqIFU4AjF6r25IcvPJmhd5Um0ddBD+WSVg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6394
 X-OriginatorOrg: intel.com
 Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
  "david@redhat.com" <david@redhat.com>, "Yao, Yuan" <yuan.yao@intel.com>,
@@ -212,43 +208,128 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Wed, 2022-11-30 at 23:09 +0000, Sean Christopherson wrote:
-> Use this_cpu_has() instead of boot_cpu_has() to perform the effective
-> "disabled by BIOS?" checks for VMX.  This will allow consolidating code
-> between vmx_disabled_by_bios() and vmx_check_processor_compat().
+> From: Chao Gao <chao.gao@intel.com>
 > 
-> Checking the boot CPU isn't a strict requirement as any divergence in VMX
-> enabling between the boot CPU and other CPUs will result in KVM refusing
-> to load thanks to the aforementioned vmx_check_processor_compat().
+> Disable CPU hotplug when enabling/disabling hardware to prevent the
+> corner case where if the following sequence occurs:
 > 
-> Furthermore, using the boot CPU was an unintentional change introduced by
-> commit a4d0b2fdbcf7 ("KVM: VMX: Use VMX feature flag to query BIOS
-> enabling").  Prior to using the feature flags, KVM checked the raw MSR
-> value from the current CPU.
+>   1. A hotplugged CPU marks itself online in cpu_online_mask
+>   2. The hotplugged CPU enables interrupt before invoking KVM's ONLINE
+>      callback
+>   3  hardware_{en,dis}able_all() is invoked on another CPU
 > 
-> Reported-by: Kai Huang <kai.huang@intel.com>
+> the hotplugged CPU will be included in on_each_cpu() and thus get sent
+> through hardware_{en,dis}able_nolock() before kvm_online_cpu() is called.
+
+Should we explicitly call out what is the consequence of such case, otherwise
+it's hard to tell whether this truly is an issue?
+
+IIUC, since now the compatibility check has already been moved to
+kvm_arch_hardware_enable(), the consequence is hardware_enable_all() will fail
+if the now online cpu isn't compatible, which will results in failing to create
+the first VM.  This isn't ideal since the incompatible cpu should be rejected to
+go online instead.
+
+> 
+>         start_secondary { ...
+>                 set_cpu_online(smp_processor_id(), true); <- 1
+>                 ...
+>                 local_irq_enable();  <- 2
+>                 ...
+>                 cpu_startup_entry(CPUHP_AP_ONLINE_IDLE); <- 3
+>         }
+> 
+> KVM currently fudges around this race by keeping track of which CPUs have
+> done hardware enabling (see commit 1b6c016818a5 "KVM: Keep track of which
+> cpus have virtualization enabled"), but that's an inefficient, convoluted,
+> and hacky solution.
+> 
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> [sean: split to separate patch, write changelog]
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-Reviewed-by: Kai Huang <kai.huang@intel.com>
-
 > ---
->  arch/x86/kvm/vmx/vmx.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  arch/x86/kvm/x86.c  | 11 ++++++++++-
+>  virt/kvm/kvm_main.c | 12 ++++++++++++
+>  2 files changed, 22 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index e859d2b7daa4..3f7d9f88b314 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2492,8 +2492,8 @@ static __init int cpu_has_kvm_support(void)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index dad30097f0c3..d2ad383da998 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9281,7 +9281,16 @@ static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
 >  
->  static __init int vmx_disabled_by_bios(void)
+>  static int kvm_x86_check_processor_compatibility(void)
 >  {
-> -	return !boot_cpu_has(X86_FEATURE_MSR_IA32_FEAT_CTL) ||
-> -	       !boot_cpu_has(X86_FEATURE_VMX);
-> +	return !this_cpu_has(X86_FEATURE_MSR_IA32_FEAT_CTL) ||
-> +	       !this_cpu_has(X86_FEATURE_VMX);
+> -	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
+> +	int cpu = smp_processor_id();
+> +	struct cpuinfo_x86 *c = &cpu_data(cpu);
+> +
+> +	/*
+> +	 * Compatibility checks are done when loading KVM and when enabling
+> +	 * hardware, e.g. during CPU hotplug, to ensure all online CPUs are
+> +	 * compatible, i.e. KVM should never perform a compatibility check on
+> +	 * an offline CPU.
+> +	 */
+> +	WARN_ON(!cpu_online(cpu));
+
+IMHO this chunk logically should belong to previous patch.  IIUC disabling CPU
+hotplug during hardware_enable_all() doesn't have relationship to this WARN().
+
+>  
+>  	if (__cr4_reserved_bits(cpu_has, c) !=
+>  	    __cr4_reserved_bits(cpu_has, &boot_cpu_data))
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index f26ea779710a..d985b24c423b 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -5098,15 +5098,26 @@ static void hardware_disable_all_nolock(void)
+>  
+>  static void hardware_disable_all(void)
+>  {
+> +	cpus_read_lock();
+>  	raw_spin_lock(&kvm_count_lock);
+>  	hardware_disable_all_nolock();
+>  	raw_spin_unlock(&kvm_count_lock);
+> +	cpus_read_unlock();
 >  }
 >  
->  static int kvm_cpu_vmxon(u64 vmxon_pointer)
+>  static int hardware_enable_all(void)
+>  {
+>  	int r = 0;
+>  
+> +	/*
+> +	 * When onlining a CPU, cpu_online_mask is set before kvm_online_cpu()
+> +	 * is called, and so on_each_cpu() between them includes the CPU that
+> +	 * is being onlined.  As a result, hardware_enable_nolock() may get
+> +	 * invoked before kvm_online_cpu(), which also enables hardware if the
+> +	 * usage count is non-zero.  Disable CPU hotplug to avoid attempting to
+> +	 * enable hardware multiple times.
+
+It won't enable hardware multiple times, right?  Since hardware_enable_nolock()
+has below check:
+
+        if (cpumask_test_cpu(cpu, cpus_hardware_enabled))                      
+                return;                                                        
+                                                                                                                                                   
+        cpumask_set_cpu(cpu, cpus_hardware_enabled);     
+
+IIUC the only issue is the one that I replied in the changelog.
+
+Or perhaps I am missing something?
+
+> +	 */
+> +	cpus_read_lock();
+>  	raw_spin_lock(&kvm_count_lock);
+>  
+>  	kvm_usage_count++;
+> @@ -5121,6 +5132,7 @@ static int hardware_enable_all(void)
+>  	}
+>  
+>  	raw_spin_unlock(&kvm_count_lock);
+> +	cpus_read_unlock();
+>  
+>  	return r;
+>  }
 
 _______________________________________________
 kvmarm mailing list
