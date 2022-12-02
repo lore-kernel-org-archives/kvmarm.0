@@ -2,84 +2,88 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8ABFC47090
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Dec 2022 12:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D0FC4321E
+	for <kvmarm@archiver.kernel.org>; Fri,  2 Dec 2022 13:01:42 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3ACEF40BED;
-	Fri,  2 Dec 2022 07:59:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 210F940BED;
+	Fri,  2 Dec 2022 08:01:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@intel.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id g7ljYqAH4dY2; Fri,  2 Dec 2022 07:59:28 -0500 (EST)
+	with ESMTP id b3KNx0F+XBjd; Fri,  2 Dec 2022 08:01:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A540749E4B;
-	Fri,  2 Dec 2022 07:59:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 40A704B086;
+	Fri,  2 Dec 2022 08:01:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BC1E40CDE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 07:59:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A7ACD40CDE
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 08:01:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I3Gd7Y+rlzIH for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Dec 2022 07:59:26 -0500 (EST)
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AD88B40BED
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 07:59:25 -0500 (EST)
+ with ESMTP id bhsHWNFzCQqj for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Dec 2022 08:01:38 -0500 (EST)
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BA08240BED
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 08:01:37 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
- t=1669985965; x=1701521965;
+ t=1669986097; x=1701522097;
  h=from:to:cc:subject:date:message-id:references:
  in-reply-to:content-id:content-transfer-encoding: mime-version;
- bh=Y57nduZJ/KnCsYoa25EcTNImNFv7hA7gbKPEVW0u2B8=;
- b=B4/7rx7Y5e/WJ/6agrxxqzdfsoV3GLBVHTB4pJxOK4i6i+g/qFhslIMo
- qBDCGPzBgofDF+Rq9wpSbO9pX2oKLAHsxOWbwlvCQWDzapddCr5ZIbWfL
- jZu6KOOPa+Zim29Sobv9MkjOIvLUgXFVnZ9GHuIepAFxRKQ74J5iFp6FM
- JsvHsYtdqffIS/BJYc1SO+4khfzx1jn5qeh1yiy5pLvuMOPJT1dlV/2Ge
- scy3wB33dChNGvJKZxFCARxdlhADBLRv8h28dbI68Wn1tUW4zoX6IZ8iF
- VA+TS/DMmip4mT9cTvyttVShKfKZfzs7eKz/5DNg1DunnWQ/LUKOELw/+ g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="315974581"
-X-IronPort-AV: E=Sophos;i="5.96,212,1665471600"; d="scan'208";a="315974581"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
- by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 02 Dec 2022 04:59:06 -0800
+ bh=aqZXLt1WlRpGTjHIKSC9AII12PephzHwg6VCmqrUgT4=;
+ b=S0LczTa8Hd9UDc29s3FyWV4qJejBt7zHhwgijgakmoPmZQbfNoSdAFKN
+ 6aVjD1r5uzgyGpu695j4/vD8kkFVHkyKJn1JCTzuSjfTbxC/iMt8Ncm7r
+ kQSr+XcWzlyDJ7l2F0OH1Y3Pe/I3DFwZAApSRUJywonU8n9a2QTZZgqsH
+ YleMOQono5gJo2MIrLkbFmaD0ciExBKdT6arlalB8RjldJCcAhYnwy8DH
+ WJR2d6kH6cvYCsvoaxIvod9XU14TinmLgHJ5KKAHikyvsFcZRrHQWJYDu
+ zOJEClChH2dYpfSZnFLxafxQ9AEJavHD/j6ESQsRAaK2Rr/UxWsA6KMD9 g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="378100813"
+X-IronPort-AV: E=Sophos;i="5.96,212,1665471600"; d="scan'208";a="378100813"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 02 Dec 2022 05:01:36 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="638744065"
-X-IronPort-AV: E=Sophos;i="5.96,212,1665471600"; d="scan'208";a="638744065"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
- by orsmga007.jf.intel.com with ESMTP; 02 Dec 2022 04:59:05 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+X-IronPort-AV: E=McAfee;i="6500,9779,10548"; a="751255002"
+X-IronPort-AV: E=Sophos;i="5.96,212,1665471600"; d="scan'208";a="751255002"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+ by fmsmga002.fm.intel.com with ESMTP; 02 Dec 2022 05:01:35 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Fri, 2 Dec 2022 04:59:04 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ 15.1.2507.16; Fri, 2 Dec 2022 05:01:29 -0800
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Fri, 2 Dec 2022 04:59:04 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.171)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ 15.1.2507.16; Fri, 2 Dec 2022 05:01:29 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Fri, 2 Dec 2022 05:01:29 -0800
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.46) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Fri, 2 Dec 2022 04:59:04 -0800
+ 15.1.2507.16; Fri, 2 Dec 2022 05:01:28 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ST7vJ6slVCnrTkS92Zj/FSz7aL3+bJB20/k0cZW4XErsgnSe5L80eG5MD7bU2W/ClvnXCLGsh9RMDKRSCSUwyMbFHH6zL2XJJWhZjDCUPdNkzP7dFVn+nBMPtKjXksyt02TDYX63mV+3D4wXqH/Xe9bIEXd3+TtcecQn39iG2Tgn5yDu7HUv8izQtjYjKy03ee+4mtyzSC2nznGNRiz+CG5KGYT6RmxXPTAQKh8CWtnf1ULKnWm/6T58L/ewVszYdJZ6/rSDUT8+CjqsGd+qdAaxjQFmWyeGet9EEGGLcncnytpFE8pv+Oa9Wrr+WYgsr5DLlxah4ragqaf1KqpQWQ==
+ b=JBKtPLDeRyGdVGzzti82ibIGZJ/v3J5KlcehfYjKtwsRV6Ayd4NghnN8+7FqqENJ0BPb8oXvmZzdx0MeB4eVJIDatOhv4wR0ae38A5FEnAZeqUTK7CnpBUAv8ABRIKzVe0dTtVqAiZZLPVDtm7aLJ2SysOcuu5CM/nGPJ91s98K7l0WZEoxrn0q1HrorFkK/eQpdMJ42X8pAmpVu7sG2N3imiBKN1tK/I7C+z/dBAxaWAK+2NwElVHslyKY8DQRyDmEYzLnCn4UsoW32fXhfb4vqa4fd5y5pw0vIrJBGbk9Rb258Fi5Kne5pWkkBloKqElidBbWqfTMCd2QyyXPMOg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y57nduZJ/KnCsYoa25EcTNImNFv7hA7gbKPEVW0u2B8=;
- b=La4d9ubClC1jAgz3B+Ie+xeXyUjf2s/tPKlmqCfuV+hWHJjKhuQMeKevSPGOqkJc8r+Mqs+usoKXCfKicaOvTS/yVsUOFTmeKi9f6vL3i6ZQ29Cx18/MaPLZ+Pix9bNc6XaxygxQg9lDPwV1QLO3e8ITFxSCduSho6vJYdxG1mZ/zAbtqq6+iiYBfKA0LhzY+H8C1MgDjxNiOlakclW9Ot7ykmrjFnjanfoUGXoXnyxVhz8gXa8wktZ83fqtExKBAHN53lZyXFitWrxaQsE2B+YLp3EZdnntB02rclMrdMqL/UtDS79YE8LEAdivDb/dYiucHlhelRe4EO3iGP2g1g==
+ bh=aqZXLt1WlRpGTjHIKSC9AII12PephzHwg6VCmqrUgT4=;
+ b=V94vjaZPYNnMySpbycpa5cusrAyrsRZ/u2eWXvbIg9WLuW1qa33iAKSa0GQg8xxfrGi9mYOX2/W71OSrv4TRdZUlTRT5YjNSvuWofnIFnQFyT4ecxz1+aE/CnOdjgr3V4yRMW3uCcorKw0vMh/5ftGA8I8GJf/M4GCiYmbAcjFtqS3/T52lNnAm/K6ZaDmkz1SM1+HDEi8yO66k6ydB9MYJT9PbppPJpRVBAyy0SrmL79/YszmopjwswlqVV6cFRUqZbgWgkIVNXV61kyXpz3dI0HPTMDPPatMXPncSkzh19D2km+3ye0tQRk+EHSqP4KTG6pBRbTFe1TgsjJ6LaVQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by IA1PR11MB6394.namprd11.prod.outlook.com (2603:10b6:208:3ad::13)
+ by CH3PR11MB7818.namprd11.prod.outlook.com (2603:10b6:610:129::5)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.10; Fri, 2 Dec
- 2022 12:59:02 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.8; Fri, 2 Dec
+ 2022 13:01:24 +0000
 Received: from BL1PR11MB5978.namprd11.prod.outlook.com
  ([fe80::2fb7:be18:a20d:9b6e]) by BL1PR11MB5978.namprd11.prod.outlook.com
  ([fe80::2fb7:be18:a20d:9b6e%9]) with mapi id 15.20.5857.023; Fri, 2 Dec 2022
- 12:59:02 +0000
+ 13:01:24 +0000
 From: "Huang, Kai" <kai.huang@intel.com>
 To: "chenhuacai@kernel.org" <chenhuacai@kernel.org>, "maz@kernel.org"
  <maz@kernel.org>, "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
@@ -94,16 +98,16 @@ To: "chenhuacai@kernel.org" <chenhuacai@kernel.org>, "maz@kernel.org"
  <paul@xen.org>, "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
  "vkuznets@redhat.com" <vkuznets@redhat.com>, "anup@brainfault.org"
  <anup@brainfault.org>
-Subject: Re: [PATCH v2 42/50] KVM: Disable CPU hotplug during hardware
- enabling/disabling
-Thread-Topic: [PATCH v2 42/50] KVM: Disable CPU hotplug during hardware
- enabling/disabling
-Thread-Index: AQHZBREJrC/cMYL66UyZW4tPjPbYXq5akY8A
-Date: Fri, 2 Dec 2022 12:59:02 +0000
-Message-ID: <8b1053781e859aa95a08c10b0e8a06912a2b42a2.camel@intel.com>
+Subject: Re: [PATCH v2 39/50] KVM: x86: Move CPU compat checks hook to
+ kvm_x86_ops (from kvm_x86_init_ops)
+Thread-Topic: [PATCH v2 39/50] KVM: x86: Move CPU compat checks hook to
+ kvm_x86_ops (from kvm_x86_init_ops)
+Thread-Index: AQHZBREEXtDOKnrjT0enXrS6tk8i165akjeA
+Date: Fri, 2 Dec 2022 13:01:24 +0000
+Message-ID: <1b0ece3937436f59f466c352b84cb35f84347399.camel@intel.com>
 References: <20221130230934.1014142-1-seanjc@google.com>
- <20221130230934.1014142-43-seanjc@google.com>
-In-Reply-To: <20221130230934.1014142-43-seanjc@google.com>
+ <20221130230934.1014142-40-seanjc@google.com>
+In-Reply-To: <20221130230934.1014142-40-seanjc@google.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -112,66 +116,66 @@ user-agent: Evolution 3.44.4 (3.44.4-2.fc36)
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|IA1PR11MB6394:EE_
-x-ms-office365-filtering-correlation-id: 502c7b12-9880-4a37-9254-08dad464fc66
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|CH3PR11MB7818:EE_
+x-ms-office365-filtering-correlation-id: cd298c8c-69e5-495b-a330-08dad4655129
 x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: PeGKPdhdn9NEmZyXrYYhpPW+HYSwujBEj8H2bvWaUs6TE2lXQZ6PkM63ycyAo5YT5+b8QJ+62USGuMHEkGCfyUAM2Ha6Kn4sWRST5o6z5+zoHS8Nl767R3AlgeJqBRFKnriPNEkRJXhnCFFzres3TqvlgZUc8bfki+OQNXEPlUPYXnt06tm7mM0CR7mQ1YkrSeQ6IBQk1DFhqangs+RiEyPQt3we77wSQKyKxbsKC7FSVKQ/UQTMs6wLFQiNvTDm495w7n91ZcpLGuBERmQhXzTyX0EhNI8QoZNnM8oHMgbNa5TK2132WaAvmChnVMMOncl+dUKRq8m4i26OMFWWviTzyynlb+TzNFVL/lFJySeOYEDe+S+u9J3Fak5DlY9bT7z4I9ZbBhR1tpuEP5L3oEmPcebRq5WOHVhpYyK7AmwYOy1v9KBQhRgV7bE04hEmY5PqCZdh1Sy2McC74CCnzqGQXqsZJP84krRxhWnVS5/xmRJFdfuPN2BklUTjRS81LKppNHG4krDvl7JpiTA5GCZy5lJ3UovkxcUBLo73REZgUBqgUkuGdKU7Dvqp6vkMGqGRlX33OJr9+kxjIoWUcF7pmzYokMkZIYgAaXKfrxj6UYCynqjhM3ceayVOX7mDCv1JuWYBp4hOxWOIeLzeMlx72zOJ9pzPZT1secD4AxR0X1z8t/Pj1R7yXuW2+KLGFDVGPmL1bBOloqNEW9UjJ/DD4q6n8vRTpyYnWcvkLsc=
+x-microsoft-antispam-message-info: i73RYT/8IkegGzI3F6yi9S+VQDoThyiF27KPwrNSIJ+NhKikyrLoHADeK5u3zb81RNsQFglyRDKn6Ul7bl7a0AHhVjaX0BaLcxKe/7aWLafYvI4/aGzNikDKKmIqR3Rxyqwq2h1ypVjNjruxFam+9GCiuL1Nb2KfhOkb9Nra7FMZyvsYHx44yZ01VWfLqpCjLsQLuajxqjlEVLHUsIMM6mp3L5lzjiHnkq66RpP3uugvaYZtF2aJFJKs95f8d7vTKSzrLP5DunLmLxYi0pdTiY22AAe0bQntPMikuEeCTzTsshpqWOaBJ3p6LtwpwAWrN0ylXkLOC/IFzgEPlKodcNZFGSs3LCNCjyJzpNDNG53L542GqQO+rp1Mc/8vMPsypthd9kxBZV3CzmKnznCYHz6/FskbXHb+Pg6eVhfyFbBPGC1mkcuBaU3nqU/r77yohLdrj0tML1VU5XFxL+X/bqSTcGGdZV/4toFCKXlyHj7Mnx16nFoCBLcecYY5SDgRY8A52OvK4E9596i6Z636ELzckTSgDCzVvy+S44URhuX8n6npspLApwBRvKvBHsBhWbH5HVrtLIIBOxH2KuLkzivofLjJ9uUJUoXX9Ti+5K0Xhi7JoTsFMeZj74wdEZbUDsWLkCP+PZa85I/+bnAVyrJBt2cBX1xZT5cX0wspYk9hOfP0g3X2NxoQ92aBkGVfJkSb/WUZfslBAbnTWZgjIEWUGNWAwQsABPQiOJp/t3A=
 x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:BL1PR11MB5978.namprd11.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(13230022)(366004)(376002)(346002)(396003)(136003)(39860400002)(451199015)(186003)(26005)(71200400001)(6506007)(64756008)(66476007)(8676002)(76116006)(66556008)(478600001)(107886003)(66446008)(6486002)(91956017)(66946007)(4326008)(2616005)(41300700001)(5660300002)(8936002)(7406005)(7416002)(83380400001)(2906002)(4001150100001)(38100700002)(122000001)(82960400001)(36756003)(6512007)(316002)(66899015)(86362001)(54906003)(110136005)(921005)(38070700005);
+ SFS:(13230022)(376002)(136003)(396003)(346002)(366004)(39860400002)(451199015)(36756003)(316002)(921005)(86362001)(54906003)(71200400001)(110136005)(38070700005)(6486002)(82960400001)(478600001)(64756008)(4001150100001)(7406005)(91956017)(4326008)(76116006)(8676002)(7416002)(66946007)(41300700001)(66476007)(66556008)(66446008)(8936002)(107886003)(83380400001)(26005)(38100700002)(6512007)(2906002)(5660300002)(6506007)(122000001)(186003)(2616005);
  DIR:OUT; SFP:1102; 
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZzRoUElXUFV1SzEzak5UMnNzamVsdzJTdW5sZlR3b1lGYnQ3alVWTlJEUHBn?=
- =?utf-8?B?RmUvRDNFYW0wTGZkak5lNHAzeTFMUUFUMHoxSFNsaExHRFVSSnZRanJHYkx0?=
- =?utf-8?B?TW1ubjVkQUpFajBGbzlwenR3Y1JkMDVGdVJjL1kxellkLzZDUzRYS29qNHZU?=
- =?utf-8?B?WDBqWWhRbzhlaVU1K0c1eDNuaEJZaWV2MjUzSkdDb0swZ1ZLZDY2R1pUUnlz?=
- =?utf-8?B?aDR4Q2hVZUV5eHQyTzc2bHNhRFJYTm0wNnk0REdpUE1DaCtKUmExZVE2SkRr?=
- =?utf-8?B?OWxMZDhtSUFLcVhpMUlSc2ZzZlkwMjhuQVRtUHBiRy8yVHowNXNxRnREZUNB?=
- =?utf-8?B?RjlLTmFGTXBxV004MlJJaFBxVTNtdkR3UUtueDJZQkt5VGxxazVHZjdKTGJW?=
- =?utf-8?B?SDZoaHN0bFRwSWMvcUpoeUV6b0h2TG9Xa3l6VHdZTTE4cm9nMElZOE5kNDM4?=
- =?utf-8?B?L0pWbVBRSGUwaVlUTzlkVy9oRWZYRWFuSVZtWGxZYk9Kc0xSRnBBYmtYL2FI?=
- =?utf-8?B?WEJFRk1NcUx0eDNCQWFHdDhISStkUXJ2eUw2cSt6T2k0NkxNMExrU0V1R1Js?=
- =?utf-8?B?MXI5Q1BQUzBpMjliRTk5NHVMR1N0eEN1ZGtYbSt1UDVkb0lnR0ZSL2N3SU9j?=
- =?utf-8?B?aXlhVnhEbWhIcHRSdkpPOFZ0RjY0NHUvQTNJc3FMenRhc25pYkhkNmlpdXho?=
- =?utf-8?B?aTJpdDl5QUtFN2E5Z29TMEw3YkxIZlFOSVlWUnFnUkpyMnV4aXhobjQxNXBR?=
- =?utf-8?B?YWVZNm9YazVrZ1N0c09KVzNwWnZOTHpEeFRGWHkyUzBYWm1GUHZhNDdiZ0U1?=
- =?utf-8?B?Y0lZMWdsVVpPVmt0OWk0V1JNeWRCOWlnK01qdTZiTXZjeGxHTUJDalJZWjk1?=
- =?utf-8?B?Tm4wRVh5STRld0VLdytqam1laDhzUVE2L1V3RDQ4RFFTWUd6enVjWEV5TU5o?=
- =?utf-8?B?ZTd6a0p5d3R6V0xmT1BFY0JZem1tOFRBQnErK0RPVG0xMDBUQWJOa1dCSUVX?=
- =?utf-8?B?S2NqQ2F0Zi9RbXVzazkvUTNGcWl3WDNCMC9RSkVDb2xzQStLY1BhcW9HTE1w?=
- =?utf-8?B?Z0ZPRUV4b2JUUWhqNUg2dXVrWDFjNjhhbDJQZjVXblJOemJBWDhTNDdZa05D?=
- =?utf-8?B?SFdyS1lZSkQ5ZFZpWG9iQXpGU0Q2M3NueWUwQlJTc3lOMEljYk05VzhhRjdI?=
- =?utf-8?B?MjdrY3JNZDJuR2JQZ2Y0dVJwZnRUdGxrakltb1dGQkNRSW5CcGp2UW5vL2lQ?=
- =?utf-8?B?d0dzZ3BtU3BrSW9qMmV4a0hvaG8zZEgyR0orZUs3Zk1hdlNiODAzbFVwMjJh?=
- =?utf-8?B?eVh1a1VhZktaTThHc05yQ3RVWmVFcXE4ZnRNM3hOcWFkb3ZDUTE5azJYL1E0?=
- =?utf-8?B?bWJhangvNi8yaWVHemZsb0J3TWFlZW9nQm9sM1NyV2NGTmlXUFp1VGNDUEJt?=
- =?utf-8?B?cjNlbGNvNkpPV09UMDZRdmRBTGlTdFUvTzIzY1E1S0JhVzdPV1JVT1JIL2Fl?=
- =?utf-8?B?ZTdoYjBmTlVneW1jdGtTK0ZiRzg4eXNkV2thVGdOQ2lzQWFKM2RsYllRZTFh?=
- =?utf-8?B?bnNwbUZ6dUpRUks2dTVaQzhPbnNHMEZkWG0zcElxZmhMeFBRTTFsNEdmUm5E?=
- =?utf-8?B?Um53aWY0ZllYVWkybGI2MGhOS2tVRWtXR0tPV0ZkZWZrZkVCR0gxQTJEZkhV?=
- =?utf-8?B?bmtJM3J0VUdIakx0N3hXQ2NmMk04WWFyTnBadFM5YnV2MEYzUmNYK3VPYU51?=
- =?utf-8?B?em1NWDhJTWRXRFpDaHNzRkJScWl4NXV4dmZNNkx2aW1QRE9LZ0F1Qm9RQVR5?=
- =?utf-8?B?Q1ZQQnBBVjlJZ2FqTHJBY1ZjdTNuRTBTWlpaRVFtQSs0VldBN1FGRTgydXZJ?=
- =?utf-8?B?ckxvNkE2QzQrVC95VzE0YklMMVZVUmU1T3oydE9SVDRId2ZuVW1xSmFTNGl2?=
- =?utf-8?B?TUpuNkZuZS9RRjVWN3Y4ZzF1Y2xOZjJ4YVFuelJ6TDNwdXZXNDFlVUxaYW1w?=
- =?utf-8?B?VUV4b0hkWVJRLy9DNTZtQTRiaGpGSGFMTGJDN0U4UlAyRWhFWC94TVU0QlpC?=
- =?utf-8?B?VXRZOVRCSkQrdGZ4SUVuNUQrRU1BL2MzallYc2hPTW5zL3RCNFNvZXdYRzZ5?=
- =?utf-8?B?c1BnWnVQbncwL2VjY29zNGRDTzBpbEcwd2hhYUQvOGR2L2hiTWNLa2hXNkdZ?=
- =?utf-8?B?a3c9PQ==?=
-Content-ID: <1C396E37D994CC4CA9103DAD20883EAD@namprd11.prod.outlook.com>
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?a1FSYUxPbGswYXJDUnNGV0ZLUkhTYUlYVU5maTQ3empwbElKRk1WMno0R0du?=
+ =?utf-8?B?VEJkakN0MkZiUThVYlpOSEdNbXBqeEZqaGp3SE5rRVhPVitjdHJyQ1YzOG9a?=
+ =?utf-8?B?OG9QczF5YnpvR09UYld2R0M5clRvbkJneThLQ3RqblMxNVVUNzNuUGQxWkkv?=
+ =?utf-8?B?eHBDdERrS2dNMU4ySW9zbFNuRVZlQjIrSnlQcjJWOXlLak1BVXc4TldNTTdu?=
+ =?utf-8?B?KzNrK1l3ZjFTRlJ4Z0E1bjgxcnBWL1dkc050Q016cklWdjdhNm5UcDFrR2VC?=
+ =?utf-8?B?aFY3ZDJKT1k1SGFaaGl5UUlRVmJhYXhWWVkxTVJmRkliT0x5SkpISEVndEdv?=
+ =?utf-8?B?a1I1aDRRbHRrZkkwTngrbit0N3lhNzJqb2dSbVFLVTJnK090VzBrNFhLQ0xI?=
+ =?utf-8?B?THAvWGlFUkRJLzBGV0tpNXV0Vk1WNzU2aGVGdG1rekFKTzFCa0tPVTlRbmZk?=
+ =?utf-8?B?ZExreVYvOWVYTTBYLzQxOW5QZUVEaHNBMW5ZSUhHcUFWRUppQVpleHBhRnRh?=
+ =?utf-8?B?YVpGQzRDRlJ3dzVCY0hkbElUcVJnRVFCaHRsbHJLRjY4K2d1ZmlBd3UvUVla?=
+ =?utf-8?B?bi9RanRCTDc0UTljUU5TVDNWeGQvcFdOMDkydU9mVm1ZL0pqZCtCS1hSd05P?=
+ =?utf-8?B?VTQ2S2tiYnJNUEFDVjhhUkNaaVBuUVhGb1JnaDV4MlYzN25iVmNzZmxUNE9Y?=
+ =?utf-8?B?Mk9rWlpkOWJaVDBFYldQQnZhZmJXZ3BzekdqYnVLL0tPaXczWFlHaEVYV1c3?=
+ =?utf-8?B?b0g5cjJMdU1WaFpKZzg0bW1UUGNGaU9iOCtYQ3RxU01CZGtUSWxhQlhGYzg3?=
+ =?utf-8?B?bW5KMHZOTHlORHJWcFJwMzcvdFQ4QzczRlhtSzRzQlByMDJuTkNWMDRQcFhZ?=
+ =?utf-8?B?aE1XZGhwZnQvQ0R6bkxBeVhXRG1uanZDbmRXZW1RVTdPVlJaOXBiQ2FJYm1Q?=
+ =?utf-8?B?MGJ5R3ZBdTNUS1MyNEpHT3VhTFpOYWhkaU95SFNrVXBXOUZ4NDg5SjlDOTZq?=
+ =?utf-8?B?c2tyazZxSlBkNXpzMXpaUEMvdzF0OTE5NUw3NEU4WCs4anRobVkzeFE2Q0pt?=
+ =?utf-8?B?RERlZDFzSGhFSlNWR0NaaHBvN25pNVRpcDg2TUZMdThhbjJ5L291eGZVRGhM?=
+ =?utf-8?B?NUw0ekxHbFcwZEprbHB1MnZhUURHL2hRVVZMWEtsT2UyQ0cvbzJRR2dScHJl?=
+ =?utf-8?B?VXhGTTVJL1hrV3h4Ymh5WmJMMFB4a3d1dmdZU2dobW9sb1d6Y2lvUyt6QUY5?=
+ =?utf-8?B?a045VU5FL2hEWEt6OG9ZejFGeWxISWlpcUFoYkk2eTUydzc5TmJraFpVekd4?=
+ =?utf-8?B?TE1WWHQ2U1R2Y2ltdVE4YlAxNDFsem1MbUFKR3h6MDZwVU1acURScnFBMEsy?=
+ =?utf-8?B?YzJsc21NaHo3bFJhWmJoWEhnd05CR2pJTjhqTkRVL3dOZU50NnhOMG5iUHlw?=
+ =?utf-8?B?Y0dxOEZjTk91THFvTmlxNzJkcVIrUHFzS2dscGRwTmZBRXVmb3d0K2haSEtN?=
+ =?utf-8?B?SjlZdXFiL1Rhb2swMUFvMG1yQm1QOXp6VmF6Z2doSGRyTXpmYitHQk1RbkZk?=
+ =?utf-8?B?VFFrYklSWlFGZlNka1BrU3JoMGNTYmRtcnRQY1FSVXBjMkZUMThYYWFLbTk5?=
+ =?utf-8?B?SWRWcnErOGIxYkFuN0JsWXdTdU9qNjBQSnB2YUlDK2gxTWgwRml6R3BVWHlX?=
+ =?utf-8?B?VVFWTWYxK0tUVWh4WjJ1VnVTZnZKS1diQnltL0cvWjllUW81a2MyeitPdVFn?=
+ =?utf-8?B?TXZ3OUJDN0JId0taV0RCd0xsMlJvdFlWZ0JpdWVjaGJIcVQwTEpub3pvYTBQ?=
+ =?utf-8?B?WHJVNXdMZE4zK2ZRRFA1RG4rQktEeFdPaHhzc2pJZmI2dWQ3OCtidzJrQUQ4?=
+ =?utf-8?B?UWFpc3M5YjZtc29lL09PbGJNem1XdjV1RDJKenRnRVhqc0U2bWRXV0gvMnBX?=
+ =?utf-8?B?MXZRNzN0Z25DZngxU3hjazFXek1QMU9NN3B0TFZVNGNJejRkL3V3eGU2Qkdm?=
+ =?utf-8?B?ZDNoRytTSjdkQUwxVzIzUnlmTllSY1k3ZHFJa3Q0RXBjcDZnaG9ZY2VJbS9S?=
+ =?utf-8?B?T0ZvMm5jNFlGS21YZXE3c0NIN2h4Tm9Pcm1UcTBtOTRDQWdhQWVETmIxdmNo?=
+ =?utf-8?B?Y3pjenhkdndpWWg3MkNVZzFBbXV6VFU4djhVNTRKYmxMUFRmbzZmcGREZ0pC?=
+ =?utf-8?B?ZlE9PQ==?=
+Content-ID: <AAA12427268DEE47A4504740CB297790@namprd11.prod.outlook.com>
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 502c7b12-9880-4a37-9254-08dad464fc66
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2022 12:59:02.2588 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: cd298c8c-69e5-495b-a330-08dad4655129
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2022 13:01:24.4658 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2rjsNgdpw4MaFE4mt1ix9UHTIUKI8sSXwA81n3LkH9NsxPOfxwgwsqIFU4AjF6r25IcvPJmhd5Um0ddBD+WSVg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6394
+X-MS-Exchange-CrossTenant-userprincipalname: mtNGYq+uOMk6mAsbqmZMiACho43xu6iVNAtXSD75aFVMaQFueHVp9Rc8/Dqg6lZ0JQ0F+5aOoNI1ltcQYKMARw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7818
 X-OriginatorOrg: intel.com
 Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
  "david@redhat.com" <david@redhat.com>, "Yao, Yuan" <yuan.yao@intel.com>,
@@ -208,128 +212,236 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Wed, 2022-11-30 at 23:09 +0000, Sean Christopherson wrote:
-> From: Chao Gao <chao.gao@intel.com>
+> Move the .check_processor_compatibility() callback from kvm_x86_init_ops
+> to kvm_x86_ops to allow a future patch to do compatibility checks during
+> CPU hotplug.
 > 
-> Disable CPU hotplug when enabling/disabling hardware to prevent the
-> corner case where if the following sequence occurs:
+> Do kvm_ops_update() before compat checks so that static_call() can be
+> used during compat checks.
 > 
->   1. A hotplugged CPU marks itself online in cpu_online_mask
->   2. The hotplugged CPU enables interrupt before invoking KVM's ONLINE
->      callback
->   3  hardware_{en,dis}able_all() is invoked on another CPU
-> 
-> the hotplugged CPU will be included in on_each_cpu() and thus get sent
-> through hardware_{en,dis}able_nolock() before kvm_online_cpu() is called.
-
-Should we explicitly call out what is the consequence of such case, otherwise
-it's hard to tell whether this truly is an issue?
-
-IIUC, since now the compatibility check has already been moved to
-kvm_arch_hardware_enable(), the consequence is hardware_enable_all() will fail
-if the now online cpu isn't compatible, which will results in failing to create
-the first VM.  This isn't ideal since the incompatible cpu should be rejected to
-go online instead.
-
-> 
->         start_secondary { ...
->                 set_cpu_online(smp_processor_id(), true); <- 1
->                 ...
->                 local_irq_enable();  <- 2
->                 ...
->                 cpu_startup_entry(CPUHP_AP_ONLINE_IDLE); <- 3
->         }
-> 
-> KVM currently fudges around this race by keeping track of which CPUs have
-> done hardware enabling (see commit 1b6c016818a5 "KVM: Keep track of which
-> cpus have virtualization enabled"), but that's an inefficient, convoluted,
-> and hacky solution.
-> 
-> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> [sean: split to separate patch, write changelog]
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Reviewed-by: Kai Huang <kai.huang@intel.com>
+
 > ---
->  arch/x86/kvm/x86.c  | 11 ++++++++++-
->  virt/kvm/kvm_main.c | 12 ++++++++++++
->  2 files changed, 22 insertions(+), 1 deletion(-)
+>  arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>  arch/x86/include/asm/kvm_host.h    |  3 ++-
+>  arch/x86/kvm/svm/svm.c             |  5 +++--
+>  arch/x86/kvm/vmx/vmx.c             | 16 +++++++--------
+>  arch/x86/kvm/x86.c                 | 31 +++++++++++-------------------
+>  5 files changed, 25 insertions(+), 31 deletions(-)
 > 
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index abccd51dcfca..dba2909e5ae2 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -14,6 +14,7 @@ BUILD_BUG_ON(1)
+>   * to make a definition optional, but in this case the default will
+>   * be __static_call_return0.
+>   */
+> +KVM_X86_OP(check_processor_compatibility)
+>  KVM_X86_OP(hardware_enable)
+>  KVM_X86_OP(hardware_disable)
+>  KVM_X86_OP(hardware_unsetup)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index d79aedf70908..ba74fea6850b 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1518,6 +1518,8 @@ static inline u16 kvm_lapic_irq_dest_mode(bool dest_mode_logical)
+>  struct kvm_x86_ops {
+>  	const char *name;
+>  
+> +	int (*check_processor_compatibility)(void);
+> +
+>  	int (*hardware_enable)(void);
+>  	void (*hardware_disable)(void);
+>  	void (*hardware_unsetup)(void);
+> @@ -1729,7 +1731,6 @@ struct kvm_x86_nested_ops {
+>  };
+>  
+>  struct kvm_x86_init_ops {
+> -	int (*check_processor_compatibility)(void);
+>  	int (*hardware_setup)(void);
+>  	unsigned int (*handle_intel_pt_intr)(void);
+>  
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 9f94efcb9aa6..c2e95c0d9fd8 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -543,7 +543,7 @@ static bool kvm_is_svm_supported(void)
+>  	return true;
+>  }
+>  
+> -static int __init svm_check_processor_compat(void)
+> +static int svm_check_processor_compat(void)
+>  {
+>  	if (!kvm_is_svm_supported())
+>  		return -EIO;
+> @@ -4695,6 +4695,8 @@ static int svm_vm_init(struct kvm *kvm)
+>  static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.name = KBUILD_MODNAME,
+>  
+> +	.check_processor_compatibility = svm_check_processor_compat,
+> +
+>  	.hardware_unsetup = svm_hardware_unsetup,
+>  	.hardware_enable = svm_hardware_enable,
+>  	.hardware_disable = svm_hardware_disable,
+> @@ -5079,7 +5081,6 @@ static __init int svm_hardware_setup(void)
+>  
+>  static struct kvm_x86_init_ops svm_init_ops __initdata = {
+>  	.hardware_setup = svm_hardware_setup,
+> -	.check_processor_compatibility = svm_check_processor_compat,
+>  
+>  	.runtime_ops = &svm_x86_ops,
+>  	.pmu_ops = &amd_pmu_ops,
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 2a8a6e481c76..6416ed5b7f89 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2520,8 +2520,7 @@ static bool cpu_has_perf_global_ctrl_bug(void)
+>  	return false;
+>  }
+>  
+> -static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
+> -				      u32 msr, u32 *result)
+> +static int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt, u32 msr, u32 *result)
+>  {
+>  	u32 vmx_msr_low, vmx_msr_high;
+>  	u32 ctl = ctl_min | ctl_opt;
+> @@ -2539,7 +2538,7 @@ static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
+>  	return 0;
+>  }
+>  
+> -static __init u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
+> +static u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
+>  {
+>  	u64 allowed;
+>  
+> @@ -2548,8 +2547,8 @@ static __init u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
+>  	return  ctl_opt & allowed;
+>  }
+>  
+> -static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+> -				    struct vmx_capability *vmx_cap)
+> +static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+> +			     struct vmx_capability *vmx_cap)
+>  {
+>  	u32 vmx_msr_low, vmx_msr_high;
+>  	u32 _pin_based_exec_control = 0;
+> @@ -2710,7 +2709,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>  	return 0;
+>  }
+>  
+> -static bool __init kvm_is_vmx_supported(void)
+> +static bool kvm_is_vmx_supported(void)
+>  {
+>  	if (!cpu_has_vmx()) {
+>  		pr_err("CPU doesn't support VMX\n");
+> @@ -2726,7 +2725,7 @@ static bool __init kvm_is_vmx_supported(void)
+>  	return true;
+>  }
+>  
+> -static int __init vmx_check_processor_compat(void)
+> +static int vmx_check_processor_compat(void)
+>  {
+>  	struct vmcs_config vmcs_conf;
+>  	struct vmx_capability vmx_cap;
+> @@ -8104,6 +8103,8 @@ static void vmx_vm_destroy(struct kvm *kvm)
+>  static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>  	.name = KBUILD_MODNAME,
+>  
+> +	.check_processor_compatibility = vmx_check_processor_compat,
+> +
+>  	.hardware_unsetup = vmx_hardware_unsetup,
+>  
+>  	.hardware_enable = vmx_hardware_enable,
+> @@ -8501,7 +8502,6 @@ static __init int hardware_setup(void)
+>  }
+>  
+>  static struct kvm_x86_init_ops vmx_init_ops __initdata = {
+> -	.check_processor_compatibility = vmx_check_processor_compat,
+>  	.hardware_setup = hardware_setup,
+>  	.handle_intel_pt_intr = NULL,
+>  
 > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index dad30097f0c3..d2ad383da998 100644
+> index 5551f3552f08..ee9af412ffd4 100644
 > --- a/arch/x86/kvm/x86.c
 > +++ b/arch/x86/kvm/x86.c
-> @@ -9281,7 +9281,16 @@ static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
->  
->  static int kvm_x86_check_processor_compatibility(void)
->  {
-> -	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
-> +	int cpu = smp_processor_id();
-> +	struct cpuinfo_x86 *c = &cpu_data(cpu);
-> +
-> +	/*
-> +	 * Compatibility checks are done when loading KVM and when enabling
-> +	 * hardware, e.g. during CPU hotplug, to ensure all online CPUs are
-> +	 * compatible, i.e. KVM should never perform a compatibility check on
-> +	 * an offline CPU.
-> +	 */
-> +	WARN_ON(!cpu_online(cpu));
-
-IMHO this chunk logically should belong to previous patch.  IIUC disabling CPU
-hotplug during hardware_enable_all() doesn't have relationship to this WARN().
-
->  
->  	if (__cr4_reserved_bits(cpu_has, c) !=
->  	    __cr4_reserved_bits(cpu_has, &boot_cpu_data))
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index f26ea779710a..d985b24c423b 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -5098,15 +5098,26 @@ static void hardware_disable_all_nolock(void)
->  
->  static void hardware_disable_all(void)
->  {
-> +	cpus_read_lock();
->  	raw_spin_lock(&kvm_count_lock);
->  	hardware_disable_all_nolock();
->  	raw_spin_unlock(&kvm_count_lock);
-> +	cpus_read_unlock();
+> @@ -9279,12 +9279,7 @@ static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
+>  	kvm_pmu_ops_update(ops->pmu_ops);
 >  }
 >  
->  static int hardware_enable_all(void)
+> -struct kvm_cpu_compat_check {
+> -	struct kvm_x86_init_ops *ops;
+> -	int *ret;
+> -};
+> -
+> -static int kvm_x86_check_processor_compatibility(struct kvm_x86_init_ops *ops)
+> +static int kvm_x86_check_processor_compatibility(void)
 >  {
->  	int r = 0;
+>  	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
 >  
-> +	/*
-> +	 * When onlining a CPU, cpu_online_mask is set before kvm_online_cpu()
-> +	 * is called, and so on_each_cpu() between them includes the CPU that
-> +	 * is being onlined.  As a result, hardware_enable_nolock() may get
-> +	 * invoked before kvm_online_cpu(), which also enables hardware if the
-> +	 * usage count is non-zero.  Disable CPU hotplug to avoid attempting to
-> +	 * enable hardware multiple times.
-
-It won't enable hardware multiple times, right?  Since hardware_enable_nolock()
-has below check:
-
-        if (cpumask_test_cpu(cpu, cpus_hardware_enabled))                      
-                return;                                                        
-                                                                                                                                                   
-        cpumask_set_cpu(cpu, cpus_hardware_enabled);     
-
-IIUC the only issue is the one that I replied in the changelog.
-
-Or perhaps I am missing something?
-
-> +	 */
-> +	cpus_read_lock();
->  	raw_spin_lock(&kvm_count_lock);
+> @@ -9294,19 +9289,16 @@ static int kvm_x86_check_processor_compatibility(struct kvm_x86_init_ops *ops)
+>  	    __cr4_reserved_bits(cpu_has, &boot_cpu_data))
+>  		return -EIO;
 >  
->  	kvm_usage_count++;
-> @@ -5121,6 +5132,7 @@ static int hardware_enable_all(void)
+> -	return ops->check_processor_compatibility();
+> +	return static_call(kvm_x86_check_processor_compatibility)();
+>  }
+>  
+> -static void kvm_x86_check_cpu_compat(void *data)
+> +static void kvm_x86_check_cpu_compat(void *ret)
+>  {
+> -	struct kvm_cpu_compat_check *c = data;
+> -
+> -	*c->ret = kvm_x86_check_processor_compatibility(c->ops);
+> +	*(int *)ret = kvm_x86_check_processor_compatibility();
+>  }
+>  
+>  static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>  {
+> -	struct kvm_cpu_compat_check c;
+>  	u64 host_pat;
+>  	int r, cpu;
+>  
+> @@ -9377,12 +9369,12 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>  	if (r != 0)
+>  		goto out_mmu_exit;
+>  
+> -	c.ret = &r;
+> -	c.ops = ops;
+> +	kvm_ops_update(ops);
+> +
+>  	for_each_online_cpu(cpu) {
+> -		smp_call_function_single(cpu, kvm_x86_check_cpu_compat, &c, 1);
+> +		smp_call_function_single(cpu, kvm_x86_check_cpu_compat, &r, 1);
+>  		if (r < 0)
+> -			goto out_hardware_unsetup;
+> +			goto out_unwind_ops;
 >  	}
 >  
->  	raw_spin_unlock(&kvm_count_lock);
-> +	cpus_read_unlock();
+>  	/*
+> @@ -9390,8 +9382,6 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>  	 * absolutely necessary, as most operations from this point forward
+>  	 * require unwinding.
+>  	 */
+> -	kvm_ops_update(ops);
+> -
+>  	kvm_timer_init();
 >  
->  	return r;
->  }
+>  	if (pi_inject_timer == -1)
+> @@ -9427,8 +9417,9 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>  	kvm_init_msr_list();
+>  	return 0;
+>  
+> -out_hardware_unsetup:
+> -	ops->runtime_ops->hardware_unsetup();
+> +out_unwind_ops:
+> +	kvm_x86_ops.hardware_enable = NULL;
+> +	static_call(kvm_x86_hardware_unsetup)();
+>  out_mmu_exit:
+>  	kvm_mmu_vendor_module_exit();
+>  out_free_percpu:
 
 _______________________________________________
 kvmarm mailing list
