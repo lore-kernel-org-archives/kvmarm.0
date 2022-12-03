@@ -1,92 +1,75 @@
-Received: from out-223.mta0.migadu.com (out-223.mta0.migadu.com [91.218.175.223])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630FC7486
-	for <kvmarm@lists.linux.dev>; Fri,  2 Dec 2022 21:02:13 +0000 (UTC)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1670007131;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MpKufAjAF/g+30wBdMSCH1h9pcp+y/qwWl4scHSVwd4=;
-	b=wcSk4Oflw5w66Zb3y27I3DVuLOMQIEX76IgGexKJezpSQlE5vmVXPET/3ip7LhrWnDFOd+
-	FJ0GAe3PLG97aPbXwdKnt6bIMgiiNw5tjqCGKWTKKg09t/29Ba6u4EEr5oajOsQPc0BxHS
-	7T/8dWxxJcOIM1fPgY3A8AXwuBTWajI=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Ricardo Koller <ricarkol@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 0/6] KVM: arm64: Parallel access faults
-Date: Fri,  2 Dec 2022 18:51:50 +0000
-Message-ID: <20221202185156.696189-1-oliver.upton@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB74B7B
+	for <kvmarm@lists.linux.dev>; Sat,  3 Dec 2022 08:25:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DFC9C433C1;
+	Sat,  3 Dec 2022 08:25:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1670055917;
+	bh=Wqok4FHLhgxXM4mLQpg+789IGSwx4hU/a/ecXqnHTBo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YqWdmKNF+vpsB+YsEkhgH/PO0OaRRLBj2l3oLf8sO6z39YFmsmJay//cLXdFIvZFj
+	 yAbdt53DoMgC9u6UdIQiNovfKNwJGTMKRsVKut60ZYMXTmHCJaXlwpuouCPrc3pI7E
+	 Bf4r4FkPpRdK3PWR4AvmHvU4an8DkeE/4OYMuXQM9FGKX+gl0Y7+cFiFKLVkoqdW+K
+	 I/XgtWTonvCo0y7zH6539eNPLQp21YJUQnJFJK+2D0UmaFzXbz6pDvF+CBi0Ow/Ew7
+	 TkwxggSGaIU9eSAM5FxEGBl7lbfvF5efY/mquBvPq0PpLYXDNPW8KvPxiWVO7evmQ9
+	 MZPCi8+cYdUVA==
+Date: Sat, 3 Dec 2022 09:25:10 +0100
+From: Lorenzo Pieralisi <lpieralisi@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Sami Mujawar <Sami.Mujawar@arm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 00/14] arm64/nmi: Support for FEAT_NMI
+Message-ID: <Y4sH5qX5bK9xfEBp@lpieralisi>
+References: <20221112151708.175147-1-broonie@kernel.org>
+ <87edthtzoz.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221202185150.z71pmS0kwTbHqg01MIIGb7QVli_4xtsr2D4Z6g5jNaU@z>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87edthtzoz.wl-maz@kernel.org>
 
-When I implemented the parallel faults series I was mostly focused on
-improving the performance of 8.1+ implementations which bring us
-FEAT_HAFDBS. In so doing, I failed to put access faults on the read side
-of the MMU lock.
+On Fri, Dec 02, 2022 at 06:42:20PM +0000, Marc Zyngier wrote:
+> On Sat, 12 Nov 2022 15:16:54 +0000,
+> Mark Brown <broonie@kernel.org> wrote:
+> > 
+> > This series enables the architecture and GIC support for the arm64
+> > FEAT_NMI and FEAT_GICv3_NMI extensions in host kernels. These introduce
+> > support for a new category of interrupts in the architecture code which
+> > we can use to provide NMI like functionality, though the interrupts are
+> > in fact maskable as the name would not imply. The GIC support was done
+> > by Loreozo Pieralisi.
+> 
+> FWIW, I have stashed a rework of my 2 year old vgic NMI series at
+> [1]. It hasn't broken non-NMI behaviour in my early testing, but my
+> FVP is out of commission for the time being.
 
-Anyhow, this small series adds support for handling access faults in
-parallel, piling on top of the infrastructure from the first parallel
-faults series.
+Thanks Marc, I will test the changes and update the ones I made
+already accordingly, I should be able to do that next week I have
+been sick but things are on the mend.
 
-Patch 1 is a nit I had when working on this series.
+Lorenzo
 
-Patches 2-4 improve the retry logic to avoid unnecessarily serializing
-and/or invalidating when an attr walker has no effect on the page
-tables due to a race.
-
-I added a flag to indicate whether or not a table walk takes place
-within a fault handler to decide whether or not an early return is
-necessary for EAGAIN. We could probably pile even more onto this in the
-future with lock contention and need_resched() detection.
-
-Patch 5 rolls over access faults to the read lock.
-
-Finally, patch 6 guards KVM's use of VTCR_EL2.HA with the corresponding
-kernel config option for FEAT_HAFDBS. FWIW, it is rather useful for
-testing access faults on systems that implement FEAT_HAFDBS.
-
-Applies to kvmarm/next. Tested on Ampere Altra w/ VTCR_EL2.HA=0 and
-lockdep enabled.
-
-v1 -> v2:
- - Don't serialize if attr walker fails due to an invalid PTE (Ricardo)
- - Rejig the error handling path in the table walker to suppress EAGAIN
-   in non-fault handling paths
-
-v1: https://lore.kernel.org/kvmarm/20221129191946.1735662-1-oliver.upton@linux.dev
-
-Oliver Upton (6):
-  KVM: arm64: Use KVM's pte type/helpers in handle_access_fault()
-  KVM: arm64: Ignore EAGAIN for walks outside of a fault
-  KVM: arm64: Return EAGAIN for invalid PTE in attr walker
-  KVM: arm64: Don't serialize if the access flag isn't set
-  KVM: arm64: Handle access faults behind the read lock
-  KVM: arm64: Condition HW AF updates on config option
-
- arch/arm64/include/asm/kvm_pgtable.h |  8 ++++++
- arch/arm64/kvm/hyp/pgtable.c         | 43 ++++++++++++++++++++++++----
- arch/arm64/kvm/mmu.c                 | 18 ++++++------
- 3 files changed, 54 insertions(+), 15 deletions(-)
-
-
-base-commit: edf3e6d30db78cc37bb57944b2255225aa73bbe8
--- 
-2.39.0.rc0.267.gcb52ba06e7-goog
-
+> 
+> What could possibly go wrong?
+> 
+> 	M.
+> 
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=arm64/nmi
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
