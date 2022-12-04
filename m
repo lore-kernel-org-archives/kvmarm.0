@@ -2,54 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 769E2C4332F
-	for <kvmarm@archiver.kernel.org>; Fri,  2 Dec 2022 18:55:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6370C4321E
+	for <kvmarm@archiver.kernel.org>; Sun,  4 Dec 2022 14:58:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 122004086F;
-	Fri,  2 Dec 2022 13:55:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19ADE4B2A5;
+	Sun,  4 Dec 2022 09:58:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jmitMYF7Lv+l; Fri,  2 Dec 2022 13:55:00 -0500 (EST)
+	with ESMTP id CFc7qFmm4HgU; Sun,  4 Dec 2022 09:58:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB9D540BE7;
-	Fri,  2 Dec 2022 13:55:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE64C4B355;
+	Sun,  4 Dec 2022 09:58:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 12BF7401AF
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 13:54:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A8C2C4B2A5
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Dec 2022 09:58:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HCILduNv19Ll for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Dec 2022 13:54:57 -0500 (EST)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B277140183
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Dec 2022 13:54:57 -0500 (EST)
-Date: Fri, 2 Dec 2022 18:54:51 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1670007296;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=QF7YyY0zCO4x691PE+6++2gBpkKD4tpfGa6u+JeBMx4=;
- b=EXkS9mLpz+vLNs65I4j2M/dADkhs3aXj6C2J9/QQBDtzZvHcNqfe16I74H5FqC54X6IZh1
- vDlLk2ztWLvPpDhIQey3K7nj4r9t8dEgpELG+MGppVJXr0vTOFEn8BqpFWmyYmdKr0UKQZ
- 7KgvNJRzvcj4Zw0lGfzfhiHCt5vdOM8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
+ with ESMTP id 2KlRWOQuLP6R for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  4 Dec 2022 09:57:59 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4F7C04B269
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  4 Dec 2022 09:57:59 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 2DB6360EA0;
+ Sun,  4 Dec 2022 14:57:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EAC0C433C1;
+ Sun,  4 Dec 2022 14:57:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1670165877;
+ bh=Cgm74NkKEZ/DK5RPHt06OPQZsab/+7Dm33HMyFy16EQ=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=IBbWkhGldTnPxTm2GnBQewKJxktXrW8xPU5icmaUJHIc6PcgSX9oSrvnxV9D8cLcl
+ jPYkNrjmWwB3TIlWFYT28Jv8O5lZHK/R3WTQP7i+bwz+oasHthcsKkk2XFtg+IVVZa
+ Xc1hn1YayMhURTJIVCoswxTnOiAJv2JLbOegzL1Dix3VwQXPka+7IUorL1/j11AV0W
+ W0VXR3DgPel2+vk7UyFeUKTOq9+TnNDLS8nmmDXYz0+Rztow0DSCl9KLFTWNPT8H0F
+ FOE8A8wVMGTr68t9Hi23GWKt1E7EcQMEjzKRI0ZkwI3LRCfezpbpTS/zIx0DGQtycg
+ u0GvX8eDS/veQ==
+Received: from [82.141.251.28] (helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1p1qRG-00AP6F-Pg;
+ Sun, 04 Dec 2022 14:57:54 +0000
+Date: Sun, 04 Dec 2022 14:57:53 +0000
+Message-ID: <87bkojtdvy.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Akihiko Odaki <akihiko.odaki@gmail.com>
 Subject: Re: [PATCH 0/3] KVM: arm64: Handle CCSIDR associativity mismatches
-Message-ID: <Y4pJ+wnzHv0Rpws+@google.com>
+In-Reply-To: <d54e7e38-cdf6-ef5d-a6e6-e30ad8a59034@gmail.com>
 References: <20221201104914.28944-1-akihiko.odaki@daynix.com>
- <867czbmlh1.wl-maz@kernel.org> <Y4jyn+aMUGcaa6Ag@google.com>
- <87k03au36k.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87k03au36k.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+ <867czbmlh1.wl-maz@kernel.org>
+ <50499ee9-33fe-4f5d-9d0a-76ceef038333@daynix.com>
+ <87lenqu37t.wl-maz@kernel.org>
+ <525ff263-90b3-5b12-da31-171b09f9ad1b@daynix.com>
+ <87h6yeta8b.wl-maz@kernel.org>
+ <d54e7e38-cdf6-ef5d-a6e6-e30ad8a59034@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 82.141.251.28
+X-SA-Exim-Rcpt-To: akihiko.odaki@gmail.com, akihiko.odaki@daynix.com,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ mathieu.poirier@linaro.org, oliver.upton@linux.dev, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, james.morse@arm.com, will@kernel.org,
+ catalin.marinas@arm.com, asahi@lists.linux.dev, alyssa@rosenzweig.io,
+ sven@svenpeter.dev, marcan@marcan.st
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
  Akihiko Odaki <akihiko.odaki@daynix.com>,
  Mathieu Poirier <mathieu.poirier@linaro.org>, Will Deacon <will@kernel.org>,
@@ -73,25 +100,130 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Dec 01, 2022 at 11:14:43PM +0000, Marc Zyngier wrote:
-> On Thu, 01 Dec 2022 18:29:51 +0000,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > Could we extend your suggestion about accepting different topologies to
-> > effectively tolerate _any_ topology provided by userspace? KVM can
-> > default to the virtual topology, but a well-informed userspace could
-> > still provide different values to its guest. No point in trying to
-> > babyproofing the UAPI further, IMO.
+On Fri, 02 Dec 2022 09:55:24 +0000,
+Akihiko Odaki <akihiko.odaki@gmail.com> wrote:
 > 
-> I think this is *exactly* what I suggested. Any valid topology should
-> be able to be restored, as we currently present the VM with any
-> topology the host HW may have. This must be preserved.
+> On 2022/12/02 18:40, Marc Zyngier wrote:
+> > On Fri, 02 Dec 2022 05:17:12 +0000,
+> > Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+> >> 
+> >>>> On M2 MacBook Air, I have seen no other difference in standard ID
+> >>>> registers and CCSIDRs are exceptions. Perhaps Apple designed this way
+> >>>> so that macOS's Hypervisor can freely migrate vCPU, but I can't assure
+> >>>> that without more analysis. This is still enough to migrate vCPU
+> >>>> running Linux at least.
+> >>> 
+> >>> I guess that MacOS hides more of the underlying HW than KVM does. And
+> >>> KVM definitely doesn't hide the MIDR_EL1 registers, which *are*
+> >>> different between the two clusters.
+> >> 
+> >> It seems KVM stores a MIDR value of a CPU and reuse it as "invariant"
+> >> value for ioctls while it exposes the MIDR value each physical CPU
+> >> owns to vCPU.
+> > 
+> > This only affects the VMM though, and not the guest which sees the
+> > MIDR of the CPU it runs on. The problem is that at short of pinning
+> > the vcpus, you don't know where they will run. So any value is fair
+> > game.
+> 
+> Yes, my concern is that VMM can be confused if it sees something
+> different from what the guest on the vCPU sees.
 
-Ah, I was narrowly reading into the conversation as it relates to the M2
-implementation, my bad. SGTM :)
+Well, this has been part of the ABI for about 10 years, since Rusty
+introduced this notion of invariant, so userspace is already working
+around it if that's an actual issue.
 
---
+This would be easily addressed though, and shouldn't result in any
+issue. The following should do the trick (only lightly tested on an
+M1).
+
 Thanks,
-Oliver
+
+	M.
+
+From f1caacb89eb8ae40dc38669160a2f081f87f4b15 Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Sun, 4 Dec 2022 14:22:22 +0000
+Subject: [PATCH] KVM: arm64: Return MIDR_EL1 to userspace as seen on the vcpu
+ thread
+
+When booting, KVM sample the MIDR of the CPU it initialises on,
+and keep this as the value that will forever be exposed to userspace.
+
+However, this has nothing to do with the value that the guest will
+see. On an asymetric system, this can result in userspace observing
+weird things, specially if it has pinned the vcpus on a *different*
+set of CPUs.
+
+Instead, return the MIDR value for the vpcu we're currently on and
+that the vcpu will observe if it has been pinned onto that CPU.
+
+For symmetric systems, this changes nothing. For asymmetric machines,
+they will observe the correct MIDR value at the point of the call.
+
+Reported-by: Akihiko Odaki <akihiko.odaki@gmail.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/sys_regs.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index f4a7c5abcbca..f6bcf8ba9b2e 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1246,6 +1246,22 @@ static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 	return 0;
+ }
+ 
++static int get_midr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
++		    u64 *val)
++{
++	*val = read_sysreg(midr_el1);
++	return 0;
++}
++
++static int set_midr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
++		    u64 val)
++{
++	if (val != read_sysreg(midr_el1))
++		return -EINVAL;
++
++	return 0;
++}
++
+ static int get_raz_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+ 		       u64 *val)
+ {
+@@ -1432,6 +1448,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	{ SYS_DESC(SYS_DBGVCR32_EL2), NULL, reset_val, DBGVCR32_EL2, 0 },
+ 
++	{ SYS_DESC(SYS_MIDR_EL1), .get_user = get_midr, .set_user = set_midr },
+ 	{ SYS_DESC(SYS_MPIDR_EL1), NULL, reset_mpidr, MPIDR_EL1 },
+ 
+ 	/*
+@@ -2609,7 +2626,6 @@ id_to_sys_reg_desc(struct kvm_vcpu *vcpu, u64 id,
+ 		((struct sys_reg_desc *)r)->val = read_sysreg(reg);	\
+ 	}
+ 
+-FUNCTION_INVARIANT(midr_el1)
+ FUNCTION_INVARIANT(revidr_el1)
+ FUNCTION_INVARIANT(clidr_el1)
+ FUNCTION_INVARIANT(aidr_el1)
+@@ -2621,7 +2637,6 @@ static void get_ctr_el0(struct kvm_vcpu *v, const struct sys_reg_desc *r)
+ 
+ /* ->val is filled in by kvm_sys_reg_table_init() */
+ static struct sys_reg_desc invariant_sys_regs[] = {
+-	{ SYS_DESC(SYS_MIDR_EL1), NULL, get_midr_el1 },
+ 	{ SYS_DESC(SYS_REVIDR_EL1), NULL, get_revidr_el1 },
+ 	{ SYS_DESC(SYS_CLIDR_EL1), NULL, get_clidr_el1 },
+ 	{ SYS_DESC(SYS_AIDR_EL1), NULL, get_aidr_el1 },
+-- 
+2.34.1
+
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
