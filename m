@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4589E612B
-	for <kvmarm@lists.linux.dev>; Mon,  5 Dec 2022 16:38:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3824C433D6;
-	Mon,  5 Dec 2022 16:38:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6D0612B
+	for <kvmarm@lists.linux.dev>; Mon,  5 Dec 2022 16:45:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AA16C433D6;
+	Mon,  5 Dec 2022 16:45:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670258336;
-	bh=Lq1rTjycwqQDl0USchgqfdUUYNYKVqa3EijEOwfwyXk=;
+	s=k20201202; t=1670258713;
+	bh=O8WHBoRTGrVpJJOIFE762achrQIdETh7En9Qg67ZZHA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BuU4480AlqsNBzIDtN7NBaZSLYtTAEakgxVzbxTeSXE1GUdjFU5Bw1Ut36of9rqck
-	 BJ6g5+Ssx1Aqxb3z0GUzOtcawo9N9YrXivqt+nR1hcgF9dtwl/VzXAfgC3LrlWs9n0
-	 rP7mGr7egEYA/akn3qZj8RZZVogAN/MNyXnvyKelJXYXsLDlFAv81mQ5qnRuBLCrkW
-	 mPBysgyfxc8dsdviR/Y6pDZxisUIgKmrNh9DZD5f/4RGq5SN94sMKowVhovRNXfDWe
-	 +OFg3BMJZBwAkXf0jNSf8lgOdF9PJ1jCLDfi0zh/DtpF1/WI7Wkghl3jKls4hXwiHE
-	 CotLbLKtvFHjQ==
+	b=gChSXPmDNl5eRuWm+IAmswM/DtnDlW5rQZM3+8gaCYg2SBU1uI6zo4Hj7ejSdbPxb
+	 wC6fqqMsQafmNWaMuQJJFt9eetHrP9/b0MwChq5j+KgHro9g2Ypr0X6uFpSLb3E2yr
+	 M0BpiAu7wrJ7uimp3NEaIhUVNfYOwy9tHoH9sq7QAMcWjLcCOSKi0hPrwWHNuSr3wf
+	 kAOROWqxQaRqeFj5Y7tkANBTRh+AYNcX9C7Sg5Ft9qIqWjq5mWwOJm2tb/a2/NGUoW
+	 AbWeXM8q+LJHJ5HmqVzoA4ckGdfLOznux8Oml42wPmDApJbsieJHNLcCzintsHEtZr
+	 w0Oh2Lb7Al1cQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1p2EUX-00AcQ0-HD;
-	Mon, 05 Dec 2022 16:38:53 +0000
-Date: Mon, 05 Dec 2022 16:38:53 +0000
-Message-ID: <86wn75ls9u.wl-maz@kernel.org>
+	id 1p2Eac-00AcX2-EU;
+	Mon, 05 Dec 2022 16:45:11 +0000
+Date: Mon, 05 Dec 2022 16:45:10 +0000
+Message-ID: <86v8mplrzd.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -33,10 +33,10 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 04/14] arm64/sysreg: Add definitions for immediate versions of MSR ALLINT
-In-Reply-To: <20221112151708.175147-5-broonie@kernel.org>
+Subject: Re: [PATCH v2 03/14] arm64/sysreg: Add definition of ISR_EL1
+In-Reply-To: <20221112151708.175147-4-broonie@kernel.org>
 References: <20221112151708.175147-1-broonie@kernel.org>
-	<20221112151708.175147-5-broonie@kernel.org>
+	<20221112151708.175147-4-broonie@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -52,82 +52,43 @@ X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 12 Nov 2022 15:16:58 +0000,
+On Sat, 12 Nov 2022 15:16:57 +0000,
 Mark Brown <broonie@kernel.org> wrote:
 > 
-> Encodings are provided for ALLINT which allow setting of ALLINT.ALLINT
-> using an immediate rather than requiring that a register be loaded with
-> the value to write. Since these don't currently fit within the scheme we
-> have for sysreg generation add manual encodings like we currently do for
-> other similar registers such as SVCR.
-> 
-> Since it is required that these immediate versions be encoded with xzr
-> as the source register provide asm wrapper which ensure this is the
-> case.
+> Add a definition of ISR_EL1 as per DDI0487I.a. This register was not
+> previously defined in sysreg.h, no functional changes.
 > 
 > Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  arch/arm64/include/asm/daifflags.h |  1 +
->  arch/arm64/include/asm/nmi.h       | 18 ++++++++++++++++++
->  arch/arm64/include/asm/sysreg.h    |  2 ++
->  3 files changed, 21 insertions(+)
->  create mode 100644 arch/arm64/include/asm/nmi.h
+>  arch/arm64/tools/sysreg | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/daifflags.h b/arch/arm64/include/asm/daifflags.h
-> index 55f57dfa8e2f..b3bed2004342 100644
-> --- a/arch/arm64/include/asm/daifflags.h
-> +++ b/arch/arm64/include/asm/daifflags.h
-> @@ -141,4 +141,5 @@ static inline void local_daif_inherit(struct pt_regs *regs)
->  	 */
->  	write_sysreg(flags, daif);
->  }
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 5d0d2498c635..3660e680b7f5 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -1079,6 +1079,16 @@ Res0	15:8
+>  Field	7:0	LR
+>  EndSysreg
+>  
+> +Sysreg	ISR_EL1	3	0	12	1	0
+> +Res0	63:11
+> +Field	10	IS
+> +Field	9	FS
+> +Field	8	A
+
+You might as well make use of this field in arch/arm64/kvm/hyp/entry.S
+
+> +Field	7	I
+> +Field	6	F
+> +Res0	5:0
+> +EndSysreg
 > +
->  #endif
+>  Sysreg	ICC_NMIAR1_EL1	3	0	12	9	5
+>  Res0	63:24
+>  Field	23:0	INTID
 
-Spurious change?
-
-> diff --git a/arch/arm64/include/asm/nmi.h b/arch/arm64/include/asm/nmi.h
-> new file mode 100644
-> index 000000000000..067e2554e144
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/nmi.h
-> @@ -0,0 +1,18 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2022 ARM Ltd.
-> + */
-> +#ifndef __ASM_NMI_H
-> +#define __ASM_NMI_H
-> +
-> +static __always_inline void _allint_clear(void)
-> +{
-> +	asm volatile(__msr_s(SYS_ALLINT_CLR, "xzr"));
-> +}
-> +
-> +static __always_inline void _allint_set(void)
-> +{
-> +	asm volatile(__msr_s(SYS_ALLINT_SET, "xzr"));
-> +}
-> +
-> +#endif
-
-If this *really* must be a separate include file, it should at least
-directly include its dependencies. My gut feeling is that it would be
-better placed in daiflags.h.
-
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 7d301700d1a9..0c07b740c750 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -126,6 +126,8 @@
->   * System registers, organised loosely by encoding but grouped together
->   * where the architected name contains an index. e.g. ID_MMFR<n>_EL1.
->   */
-> +#define SYS_ALLINT_CLR			sys_reg(0, 1, 4, 0, 0)
-> +#define SYS_ALLINT_SET			sys_reg(0, 1, 4, 1, 0)
-
-This only covers the immediate versions of ALLINT, and misses the
-definition for the register version, aka sys_reg(3, 0, 4, 3, 0).
+Thanks,
 
 	M.
 
