@@ -2,82 +2,97 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B77CC4332F
-	for <kvmarm@archiver.kernel.org>; Mon,  5 Dec 2022 18:50:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B03DC4321E
+	for <kvmarm@archiver.kernel.org>; Mon,  5 Dec 2022 20:52:53 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5AFB4B2F1;
-	Mon,  5 Dec 2022 13:50:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F11B4B285;
+	Mon,  5 Dec 2022 15:52:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Q5Vdjr17MSVz; Mon,  5 Dec 2022 13:50:42 -0500 (EST)
+	with ESMTP id DIk5h9Pd8O8k; Mon,  5 Dec 2022 15:52:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FF4A4B125;
-	Mon,  5 Dec 2022 13:50:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FBFD4B2A5;
+	Mon,  5 Dec 2022 15:52:52 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C93FF4089C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Dec 2022 13:50:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D6D64B285
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Dec 2022 15:52:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZaA1A9p58IBF for <kvmarm@lists.cs.columbia.edu>;
- Mon,  5 Dec 2022 13:50:40 -0500 (EST)
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com
- [209.85.215.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 750F14042A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Dec 2022 13:50:40 -0500 (EST)
-Received: by mail-pg1-f178.google.com with SMTP id w37so11282945pga.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 05 Dec 2022 10:50:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ with ESMTP id pcqLw0PEl32w for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Dec 2022 15:52:50 -0500 (EST)
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com
+ [209.85.210.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0441C4B269
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Dec 2022 15:52:49 -0500 (EST)
+Received: by mail-pf1-f173.google.com with SMTP id d82so3837322pfd.11
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 05 Dec 2022 12:52:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=p5ashMmlbLpHS/ekdQ6Rli3d8exmQ4txWz1/CMHFXQk=;
- b=GlALXVUVyecG1mOEFO21aXN1nBxC1f9g38wb9bXfpUl8Wgjy0xAtLTM2LaB3YxJ7/q
- x+fY+IFN9JVmqQ2JYJACVJsrBxsvE+qM3S5RfUK+NN5je79JbIGHvoGdd24y4HsUGWk9
- 9+ywZIvougKMLPZ2DGq1i7x0rqiiQ0DQwoCmjUgJigXqREQGm6/zbQAKXDnoR9uvb2PT
- xBSXwFW9bHfA8xKAgNu3q6t4zjhzvCM5cmhD5oUl7NmjmD5pYIoOCQ1L0hFNTAtIEXFl
- BMf2gUvK8vxrI3ILX9IIOws45ZGxZlv9IyioR3V5tHqupBZEc0bCe3L7gtkMRRXU0qYk
- c+qA==
+ bh=N16dq1CjYHOw+jv6Di6rohy5xmWMqcOUPt5c96rryYM=;
+ b=YfFvmGBbFyecNX7HuYSwK+aGIglSOKNXdG/GyCa5qUzLMOe/bS3LGfF0q9vWX+ZfHt
+ 3Z92dtbJE772PsZ/NJy5FRdBdPEPZm5rcU7jdu4sFmCGP/7IKFYS0/CsqrcgEPVmen5V
+ y6ej8cIOWvXwaBIve/M5ONQiyIWsJPUuFBVbweXevgwwGb/E9u9wEIP6iF6QJbkluoas
+ PAiChapsuF6enaxC+tqdFRIctA1WbhgM/AjJeBOJlUlozWnDnw8Sd2pTj6YzSHsPtsBl
+ J/2/tufxjQZdaKhz5ClxSt9r4yMQhCI1VtASfuD1Pfedea9GvzKUkPwh7azEivUucBcM
+ puDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
  :message-id:reply-to;
- bh=p5ashMmlbLpHS/ekdQ6Rli3d8exmQ4txWz1/CMHFXQk=;
- b=7+Lqhu0gy5kfgTG9ZAG7r+n2BvPSX91QsxrLJEKvB2y0hF1m9tEjgk5KixNzHRbixY
- xZWVpqVYKEsiITgDvDWNuOOcGZYFj8FSFNlMPzCLJ0v17db6lS8mbJM/6fr0m8TsRwk9
- ++OffECbR2WA9ML/r/wNjzf6tMRwAVl0dc+NYrflYHgAMEcKAvNJYhDqELk/cra2SstC
- 8qvwyM2Q4rONYbbpGJbBwu1Phrpa8YMRcBAw9bhxqhOYfn2iNHfGpIPLuaXRfPVy81lu
- CG8hhJ3Y+w6IqvLiIsz+KOh/9hK1v7aJBaEADBCujjdS5KQ+qHo1tmxW6LOOmpl6dBnY
- +wPg==
-X-Gm-Message-State: ANoB5pnH8EIx0awRyqXDfWGrlREK540xXa/O4faQjuh6j6b6H/qVovbO
- BeeGVzio43/hHOYRmxy1XlzWIA==
-X-Google-Smtp-Source: AA0mqf5twGUsQSeEi1/4s7d6sQeK1iMb4NejovSmn0WyEQ+wyi5jPiXs8MAqwng6CVsoyRqnvMgjMQ==
-X-Received: by 2002:a05:6a00:198d:b0:569:92fa:cbbc with SMTP id
- d13-20020a056a00198d00b0056992facbbcmr66701255pfl.77.1670266239153; 
- Mon, 05 Dec 2022 10:50:39 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com.
- [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
- q100-20020a17090a1b6d00b00218ddc8048bsm11243965pjq.34.2022.12.05.10.50.38
+ bh=N16dq1CjYHOw+jv6Di6rohy5xmWMqcOUPt5c96rryYM=;
+ b=acdJK4uk7m7ZLfUviQJFi1OLuL4tK5aw+uizMD/p3L372bsgf8A+rIDRJgaYBkVRDd
+ y7fB/nU8R3ksgJswAdvLdwxLy7aRc9qRFlkyhYaScSnv4Q9dx2Ymrf9qMeLe4+VLPqor
+ jWBijZCxaRCFDjGYCpXeO3AJRldn0TXaQm3MwxB0IUDTThyIqZq1L3GTT7Z9djdwWRrn
+ j76+jYTdK8AzjUYHanrTFEn0yAQ39r/RtP6IW0VoegxsGXYw5BgaB35hWCsX4IOySPBe
+ wD7oFok9ocqHY8j3apqSI6Ix+0X688rJJzmGfBmO/U2WHgKYHgVpaEEgyyB+23GT1Val
+ 0gpg==
+X-Gm-Message-State: ANoB5plNteTsDXFknr3VefQX3lbWGWBJteErtHTGAKd/Yuagq8LgMsB1
+ +K6jsQkK8UDvgk6RwZ4kNoI=
+X-Google-Smtp-Source: AA0mqf4HpL3/0El3PrCiEsjkXuyAuKLQ7k5vbcFuFyn7/o3SL661WsLVyVHRUVAGEIBg3Ob2/Ax1ug==
+X-Received: by 2002:a05:6a00:4097:b0:576:cadf:16cc with SMTP id
+ bw23-20020a056a00409700b00576cadf16ccmr9458181pfb.55.1670273568627; 
+ Mon, 05 Dec 2022 12:52:48 -0800 (PST)
+Received: from localhost ([192.55.54.55]) by smtp.gmail.com with ESMTPSA id
+ f3-20020a170902ce8300b001780e4e6b65sm11105896plg.114.2022.12.05.12.52.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 05 Dec 2022 10:50:38 -0800 (PST)
-Date: Mon, 5 Dec 2022 10:50:35 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v4 04/16] KVM: arm64: PMU: Distinguish between 64bit
- counter and 64bit overflow
-Message-ID: <Y449e7dMzf1zaOh4@google.com>
-References: <20221113163832.3154370-1-maz@kernel.org>
- <20221113163832.3154370-5-maz@kernel.org>
- <Y4jasyxvFRNvvmox@google.com> <Y4jbosgHbUDI0WF4@google.com>
- <86zgc2kqcz.wl-maz@kernel.org>
+ Mon, 05 Dec 2022 12:52:47 -0800 (PST)
+Date: Mon, 5 Dec 2022 12:52:46 -0800
+From: Isaku Yamahata <isaku.yamahata@gmail.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v2 31/50] KVM: x86: Do CPU compatibility checks in x86 code
+Message-ID: <20221205205246.GA3630770@ls.amr.corp.intel.com>
+References: <20221130230934.1014142-1-seanjc@google.com>
+ <20221130230934.1014142-32-seanjc@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <86zgc2kqcz.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20221130230934.1014142-32-seanjc@google.com>
+Cc: Matthew Rosato <mjrosato@linux.ibm.com>, Paul Durrant <paul@xen.org>,
+ Yuan Yao <yuan.yao@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>,
+ David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
+ Kai Huang <kai.huang@intel.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ linux-riscv@lists.infradead.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ kvmarm@lists.cs.columbia.edu, isaku.yamahata@gmail.com,
+ linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
+ Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Chao Gao <chao.gao@intel.com>, Eric Farman <farman@linux.ibm.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org,
+ Atish Patra <atishp@atishpatra.org>, kvmarm@lists.linux.dev,
+ Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Fabiano Rosas <farosas@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+ Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ David Woodhouse <dwmw2@infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,137 +109,149 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Dec 05, 2022 at 12:05:32PM +0000, Marc Zyngier wrote:
-> On Thu, 01 Dec 2022 16:51:46 +0000,
-> Ricardo Koller <ricarkol@google.com> wrote:
-> > 
-> > On Thu, Dec 01, 2022 at 08:47:47AM -0800, Ricardo Koller wrote:
-> > > On Sun, Nov 13, 2022 at 04:38:20PM +0000, Marc Zyngier wrote:
-> > > > The PMU architecture makes a subtle difference between a 64bit
-> > > > counter and a counter that has a 64bit overflow. This is for example
-> > > > the case of the cycle counter, which can generate an overflow on
-> > > > a 32bit boundary if PMCR_EL0.LC==0 despite the accumulation being
-> > > > done on 64 bits.
-> > > > 
-> > > > Use this distinction in the few cases where it matters in the code,
-> > > > as we will reuse this with PMUv3p5 long counters.
-> > > > 
-> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > ---
-> > > >  arch/arm64/kvm/pmu-emul.c | 43 ++++++++++++++++++++++++++++-----------
-> > > >  1 file changed, 31 insertions(+), 12 deletions(-)
-> > > > 
-> > > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > > > index 69b67ab3c4bf..d050143326b5 100644
-> > > > --- a/arch/arm64/kvm/pmu-emul.c
-> > > > +++ b/arch/arm64/kvm/pmu-emul.c
-> > > > @@ -50,6 +50,11 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
-> > > >   * @select_idx: The counter index
-> > > >   */
-> > > >  static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
-> > > > +{
-> > > > +	return (select_idx == ARMV8_PMU_CYCLE_IDX);
-> > > > +}
-> > > > +
-> > > > +static bool kvm_pmu_idx_has_64bit_overflow(struct kvm_vcpu *vcpu, u64 select_idx)
-> > > >  {
-> > > >  	return (select_idx == ARMV8_PMU_CYCLE_IDX &&
-> > > >  		__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_LC);
-> > > > @@ -57,7 +62,8 @@ static bool kvm_pmu_idx_is_64bit(struct kvm_vcpu *vcpu, u64 select_idx)
-> > > >  
-> > > >  static bool kvm_pmu_counter_can_chain(struct kvm_vcpu *vcpu, u64 idx)
-> > > >  {
-> > > > -	return (!(idx & 1) && (idx + 1) < ARMV8_PMU_CYCLE_IDX);
-> > > > +	return (!(idx & 1) && (idx + 1) < ARMV8_PMU_CYCLE_IDX &&
-> > > > +		!kvm_pmu_idx_has_64bit_overflow(vcpu, idx));
-> > > >  }
-> > > >  
-> > > >  static struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
-> > > > @@ -97,7 +103,7 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
-> > > >  		counter += perf_event_read_value(pmc->perf_event, &enabled,
-> > > >  						 &running);
-> > > >  
-> > > > -	if (select_idx != ARMV8_PMU_CYCLE_IDX)
-> > > > +	if (!kvm_pmu_idx_is_64bit(vcpu, select_idx))
-> > > >  		counter = lower_32_bits(counter);
-> > > >  
-> > > >  	return counter;
-> > > > @@ -423,6 +429,23 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
-> > > >  	}
-> > > >  }
-> > > >  
-> > > > +/* Compute the sample period for a given counter value */
-> > > > +static u64 compute_period(struct kvm_vcpu *vcpu, u64 select_idx, u64 counter)
-> > > > +{
-> > > > +	u64 val;
-> > > > +
-> > > > +	if (kvm_pmu_idx_is_64bit(vcpu, select_idx)) {
-> > > > +		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx))
-> > > > +			val = -(counter & GENMASK(31, 0));
-> > > 
-> > > If I understand things correctly, this might be missing another mask:
-> > > 
-> > > +		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx)) {
-> > > +			val = -(counter & GENMASK(31, 0));
-> > > +			val &= GENMASK(31, 0);
-> > > +		} else {
-> > > 
-> > > For example, if the counter is 64-bits wide, it overflows at 32-bits,
-> > > and it is _one_ sample away from overflowing at 32-bits:
-> > > 
-> > > 	0x01010101_ffffffff
-> > > 
-> > > Then "val = (-counter) & GENMASK(63, 0)" would return 0xffffffff_00000001.
-> > 
-> > Sorry, this should be:
-> > 
-> > 	Then "val = -(counter & GENMASK(31, 0))" would return 0xffffffff_00000001.
-> > 
-> > > But the right period is 0x00000000_00000001 (it's one sample away from
-> > > overflowing).
-> 
-> Yup, this is a bit bogus. But this can be simplified by falling back
-> to the normal 32bit handling (on top of the pmu-unchained branch):
-> 
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index d8ea39943086..24908400e190 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -461,14 +461,10 @@ static u64 compute_period(struct kvm_pmc *pmc, u64 counter)
->  {
->  	u64 val;
->  
-> -	if (kvm_pmc_is_64bit(pmc)) {
-> -		if (!kvm_pmc_has_64bit_overflow(pmc))
-> -			val = -(counter & GENMASK(31, 0));
-> -		else
-> -			val = (-counter) & GENMASK(63, 0);
-> -	} else {
-> +	if (kvm_pmc_is_64bit(pmc) && kvm_pmc_has_64bit_overflow(pmc))
+On Wed, Nov 30, 2022 at 11:09:15PM +0000,
+Sean Christopherson <seanjc@google.com> wrote:
 
-Great, thanks! Yes, that definitely makes things simpler ^.
-
-> +		val = (-counter) & GENMASK(63, 0);
-> +	else
->  		val = (-counter) & GENMASK(31, 0);
-> -	}
->  
->  	return val;
+> Move the CPU compatibility checks to pure x86 code, i.e. drop x86's use
+> of the common kvm_x86_check_cpu_compat() arch hook.  x86 is the only
+> architecture that "needs" to do per-CPU compatibility checks, moving
+> the logic to x86 will allow dropping the common code, and will also
+> give x86 more control over when/how the compatibility checks are
+> performed, e.g. TDX will need to enable hardware (do VMXON) in order to
+> perform compatibility checks.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/svm.c |  2 +-
+>  arch/x86/kvm/vmx/vmx.c |  2 +-
+>  arch/x86/kvm/x86.c     | 49 ++++++++++++++++++++++++++++++++----------
+>  3 files changed, 40 insertions(+), 13 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 19e81a99c58f..d7ea1c1175c2 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -5103,7 +5103,7 @@ static int __init svm_init(void)
+>  	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
+>  	 * exposed to userspace!
+>  	 */
+> -	r = kvm_init(&svm_init_ops, sizeof(struct vcpu_svm),
+> +	r = kvm_init(NULL, sizeof(struct vcpu_svm),
+>  		     __alignof__(struct vcpu_svm), THIS_MODULE);
+>  	if (r)
+>  		goto err_kvm_init;
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 654d81f781da..8deb1bd60c10 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -8592,7 +8592,7 @@ static int __init vmx_init(void)
+>  	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
+>  	 * exposed to userspace!
+>  	 */
+> -	r = kvm_init(&vmx_init_ops, sizeof(struct vcpu_vmx),
+> +	r = kvm_init(NULL, sizeof(struct vcpu_vmx),
+>  		     __alignof__(struct vcpu_vmx), THIS_MODULE);
+>  	if (r)
+>  		goto err_kvm_init;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 66f16458aa97..3571bc968cf8 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9277,10 +9277,36 @@ static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
+>  	kvm_pmu_ops_update(ops->pmu_ops);
 >  }
-> 
-> which satisfies the requirement without any extra masking, and makes
-> it plain that only a 64bit counter with 64bit overflow gets its period
-> computed on the full 64bit, and that anyone else gets the 32bit
-> truncation.
-> 
-> I'll stash yet another patch on top and push it onto -next.
-> 
-> Thanks!
-> 
-> 	M.
-> 
+>  
+> +struct kvm_cpu_compat_check {
+> +	struct kvm_x86_init_ops *ops;
+> +	int *ret;
+
+minor nitpick: just int ret. I don't see the necessity of the pointer.
+Anyway overall it looks good to me.
+
+Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+
+> +};
+> +
+> +static int kvm_x86_check_processor_compatibility(struct kvm_x86_init_ops *ops)
+> +{
+> +	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
+> +
+> +	WARN_ON(!irqs_disabled());
+> +
+> +	if (__cr4_reserved_bits(cpu_has, c) !=
+> +	    __cr4_reserved_bits(cpu_has, &boot_cpu_data))
+> +		return -EIO;
+> +
+> +	return ops->check_processor_compatibility();
+> +}
+> +
+> +static void kvm_x86_check_cpu_compat(void *data)
+> +{
+> +	struct kvm_cpu_compat_check *c = data;
+> +
+> +	*c->ret = kvm_x86_check_processor_compatibility(c->ops);
+> +}
+> +
+>  static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>  {
+> +	struct kvm_cpu_compat_check c;
+>  	u64 host_pat;
+> -	int r;
+> +	int r, cpu;
+>  
+>  	if (kvm_x86_ops.hardware_enable) {
+>  		pr_err("kvm: already loaded vendor module '%s'\n", kvm_x86_ops.name);
+> @@ -9360,6 +9386,14 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>  	if (r != 0)
+>  		goto out_mmu_exit;
+>  
+> +	c.ret = &r;
+> +	c.ops = ops;
+> +	for_each_online_cpu(cpu) {
+> +		smp_call_function_single(cpu, kvm_x86_check_cpu_compat, &c, 1);
+> +		if (r < 0)
+
+Here it can be "c.ret < 0".
+
+> +			goto out_hardware_unsetup;
+> +	}
+> +
+>  	/*
+>  	 * Point of no return!  DO NOT add error paths below this point unless
+>  	 * absolutely necessary, as most operations from this point forward
+> @@ -9402,6 +9436,8 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>  	kvm_init_msr_list();
+>  	return 0;
+>  
+> +out_hardware_unsetup:
+> +	ops->runtime_ops->hardware_unsetup();
+>  out_mmu_exit:
+>  	kvm_mmu_vendor_module_exit();
+>  out_free_percpu:
+> @@ -12037,16 +12073,7 @@ void kvm_arch_hardware_disable(void)
+>  
+>  int kvm_arch_check_processor_compat(void *opaque)
+>  {
+> -	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
+> -	struct kvm_x86_init_ops *ops = opaque;
+> -
+> -	WARN_ON(!irqs_disabled());
+> -
+> -	if (__cr4_reserved_bits(cpu_has, c) !=
+> -	    __cr4_reserved_bits(cpu_has, &boot_cpu_data))
+> -		return -EIO;
+> -
+> -	return ops->check_processor_compatibility();
+> +	return 0;
+>  }
+>  
+>  bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
 > -- 
-> Without deviation from the norm, progress is not possible.
+> 2.38.1.584.g0f3c55d4c2-goog
+> 
+
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
