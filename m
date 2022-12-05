@@ -1,132 +1,233 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1CF15C99
-	for <kvmarm@lists.linux.dev>; Mon,  5 Dec 2022 20:52:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDD76C433B5;
-	Mon,  5 Dec 2022 20:52:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670273541;
-	bh=fhtuKrKeylfRZqROvlIzJUqwt+rxgcDBajtohkwUijg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WJrZZlTia13a/wajtZV9G90f7WJ6tA+B3h1V+mXlufiYDH8/4ekIIUq1JLPqLq+vb
-	 iel5k2q0B2n/n/WdjnWt/M0LNv/wUvzzFtsE8TGVeO2nvJmHkdHjVPWqGhtXnNH00S
-	 o0zJIXaM9PVI2Or/jm2L/pzndx1eJeQ9G4FlaxRAD8aoXsZZetRm+dVeVltuX2EELc
-	 E2pmpvcnfuBHGaagUHLm9sA8m3u/wDWBgd/GxutiSWY7MK4DWmlRdhMq2Y424I7Hjw
-	 nxuYjWXSIE7x6MNHyCLD2VUGFCG90neW8MUSMlZai3+pmDlyQZcp81Pi93VPDZxoQ+
-	 u/kwKPQI/PjvA==
-Date: Mon, 5 Dec 2022 20:52:16 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Sami Mujawar <Sami.Mujawar@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 10/14] arm64/nmi: Manage masking for superpriority
- interrupts along with DAIF
-Message-ID: <Y45aAOYXqYQB+oHb@sirena.org.uk>
-References: <20221112151708.175147-1-broonie@kernel.org>
- <20221112151708.175147-11-broonie@kernel.org>
- <86o7shlmb2.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8897C
+	for <kvmarm@lists.linux.dev>; Mon,  5 Dec 2022 20:52:49 +0000 (UTC)
+Received: by mail-pf1-f179.google.com with SMTP id c13so5477367pfp.5
+        for <kvmarm@lists.linux.dev>; Mon, 05 Dec 2022 12:52:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=N16dq1CjYHOw+jv6Di6rohy5xmWMqcOUPt5c96rryYM=;
+        b=YfFvmGBbFyecNX7HuYSwK+aGIglSOKNXdG/GyCa5qUzLMOe/bS3LGfF0q9vWX+ZfHt
+         3Z92dtbJE772PsZ/NJy5FRdBdPEPZm5rcU7jdu4sFmCGP/7IKFYS0/CsqrcgEPVmen5V
+         y6ej8cIOWvXwaBIve/M5ONQiyIWsJPUuFBVbweXevgwwGb/E9u9wEIP6iF6QJbkluoas
+         PAiChapsuF6enaxC+tqdFRIctA1WbhgM/AjJeBOJlUlozWnDnw8Sd2pTj6YzSHsPtsBl
+         J/2/tufxjQZdaKhz5ClxSt9r4yMQhCI1VtASfuD1Pfedea9GvzKUkPwh7azEivUucBcM
+         puDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N16dq1CjYHOw+jv6Di6rohy5xmWMqcOUPt5c96rryYM=;
+        b=DdMc9WqzsOpNtmHYKneJHUESTJzzJiTa9f4mycHBEj75/jphlEoQ0XafyrsFUUYNQo
+         DNlQ2nrHnjCuR4x2VQBr3IiDu0X4uOlLJ9OzjWuEPE7ucZh+1Au8QbwEGuEI5DkyYYP9
+         YvBJWwn4QNIoLQxxn58oocT375DSeksIWbUbft+lc7U2P01Hja1ynJVVwASYSe2wv8XL
+         i4YDLUJTofWFgg5Q5xLUr+XsV1Z3Cq+jgJ68I0UEY+jPe3Ep7RCOjHpk88pYGEz3TPq8
+         5OqS0Q4pf7zNfti5lkFAEVNuXlKZELs8234dZ65EgdTzjDz1mIILqCy3FrRpWsCB2xKI
+         aF0w==
+X-Gm-Message-State: ANoB5pmo4ZYJ0KZ29PkA1xzvZDCKJlSIFJr+f0wlPe5DqIt5vuDnb2q1
+	Lup/dBV4XLU+6rKTjt9RfZE=
+X-Google-Smtp-Source: AA0mqf4HpL3/0El3PrCiEsjkXuyAuKLQ7k5vbcFuFyn7/o3SL661WsLVyVHRUVAGEIBg3Ob2/Ax1ug==
+X-Received: by 2002:a05:6a00:4097:b0:576:cadf:16cc with SMTP id bw23-20020a056a00409700b00576cadf16ccmr9458181pfb.55.1670273568627;
+        Mon, 05 Dec 2022 12:52:48 -0800 (PST)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id f3-20020a170902ce8300b001780e4e6b65sm11105896plg.114.2022.12.05.12.52.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Dec 2022 12:52:47 -0800 (PST)
+Date: Mon, 5 Dec 2022 12:52:46 -0800
+From: Isaku Yamahata <isaku.yamahata@gmail.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Atish Patra <atishp@atishpatra.org>,
+	David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Yuan Yao <yuan.yao@intel.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Fabiano Rosas <farosas@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>, isaku.yamahata@gmail.com
+Subject: Re: [PATCH v2 31/50] KVM: x86: Do CPU compatibility checks in x86
+ code
+Message-ID: <20221205205246.GA3630770@ls.amr.corp.intel.com>
+References: <20221130230934.1014142-1-seanjc@google.com>
+ <20221130230934.1014142-32-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="B7iIh0TWRFobH+EO"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <86o7shlmb2.wl-maz@kernel.org>
-X-Cookie: If it ain't broke, don't fix it.
+In-Reply-To: <20221130230934.1014142-32-seanjc@google.com>
+Message-ID: <20221205205246.t6MoTg3X_wLzYNduZsTmQ9aRCAk504Byw143rTrfA0Y@z>
 
+On Wed, Nov 30, 2022 at 11:09:15PM +0000,
+Sean Christopherson <seanjc@google.com> wrote:
 
---B7iIh0TWRFobH+EO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Move the CPU compatibility checks to pure x86 code, i.e. drop x86's use
+> of the common kvm_x86_check_cpu_compat() arch hook.  x86 is the only
+> architecture that "needs" to do per-CPU compatibility checks, moving
+> the logic to x86 will allow dropping the common code, and will also
+> give x86 more control over when/how the compatibility checks are
+> performed, e.g. TDX will need to enable hardware (do VMXON) in order to
+> perform compatibility checks.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/svm.c |  2 +-
+>  arch/x86/kvm/vmx/vmx.c |  2 +-
+>  arch/x86/kvm/x86.c     | 49 ++++++++++++++++++++++++++++++++----------
+>  3 files changed, 40 insertions(+), 13 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 19e81a99c58f..d7ea1c1175c2 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -5103,7 +5103,7 @@ static int __init svm_init(void)
+>  	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
+>  	 * exposed to userspace!
+>  	 */
+> -	r = kvm_init(&svm_init_ops, sizeof(struct vcpu_svm),
+> +	r = kvm_init(NULL, sizeof(struct vcpu_svm),
+>  		     __alignof__(struct vcpu_svm), THIS_MODULE);
+>  	if (r)
+>  		goto err_kvm_init;
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 654d81f781da..8deb1bd60c10 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -8592,7 +8592,7 @@ static int __init vmx_init(void)
+>  	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
+>  	 * exposed to userspace!
+>  	 */
+> -	r = kvm_init(&vmx_init_ops, sizeof(struct vcpu_vmx),
+> +	r = kvm_init(NULL, sizeof(struct vcpu_vmx),
+>  		     __alignof__(struct vcpu_vmx), THIS_MODULE);
+>  	if (r)
+>  		goto err_kvm_init;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 66f16458aa97..3571bc968cf8 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9277,10 +9277,36 @@ static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
+>  	kvm_pmu_ops_update(ops->pmu_ops);
+>  }
+>  
+> +struct kvm_cpu_compat_check {
+> +	struct kvm_x86_init_ops *ops;
+> +	int *ret;
 
-On Mon, Dec 05, 2022 at 06:47:45PM +0000, Marc Zyngier wrote:
-> On Sat, 12 Nov 2022 15:17:04 +0000,
-> Mark Brown <broonie@kernel.org> wrote:
+minor nitpick: just int ret. I don't see the necessity of the pointer.
+Anyway overall it looks good to me.
 
-> > As we do for pseudo NMIs add code to our DAIF management which keeps
->                           ,
-> > superpriority interrupts unmasked when we have asynchronous exceptions
-> > enabled. Since superpriority interrupts are not masked through DAIF like
-> > pseduo NMIs are we also need to modify the assembler macros for managing
->                  ,
->=20
-> > DAIF to ensure that the masking is done in the assembly code. At present
-> > users of the assembly macros always mask pseudo NMIs.
+Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
-> In patch #5, you say:
+> +};
+> +
+> +static int kvm_x86_check_processor_compatibility(struct kvm_x86_init_ops *ops)
+> +{
+> +	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
+> +
+> +	WARN_ON(!irqs_disabled());
+> +
+> +	if (__cr4_reserved_bits(cpu_has, c) !=
+> +	    __cr4_reserved_bits(cpu_has, &boot_cpu_data))
+> +		return -EIO;
+> +
+> +	return ops->check_processor_compatibility();
+> +}
+> +
+> +static void kvm_x86_check_cpu_compat(void *data)
+> +{
+> +	struct kvm_cpu_compat_check *c = data;
+> +
+> +	*c->ret = kvm_x86_check_processor_compatibility(c->ops);
+> +}
+> +
+>  static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>  {
+> +	struct kvm_cpu_compat_check c;
+>  	u64 host_pat;
+> -	int r;
+> +	int r, cpu;
+>  
+>  	if (kvm_x86_ops.hardware_enable) {
+>  		pr_err("kvm: already loaded vendor module '%s'\n", kvm_x86_ops.name);
+> @@ -9360,6 +9386,14 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>  	if (r != 0)
+>  		goto out_mmu_exit;
+>  
+> +	c.ret = &r;
+> +	c.ops = ops;
+> +	for_each_online_cpu(cpu) {
+> +		smp_call_function_single(cpu, kvm_x86_check_cpu_compat, &c, 1);
+> +		if (r < 0)
 
-> "This is not integrated into the existing DAIF macros since we do not
-> always wish to manage ALLINT along with DAIF and the use of DAIF in
-> the naming of the existing macros might lead to surprises if ALLINT is
-> also managed."
+Here it can be "c.ret < 0".
 
-> It isn't integrated, and yet it is.
+> +			goto out_hardware_unsetup;
+> +	}
+> +
+>  	/*
+>  	 * Point of no return!  DO NOT add error paths below this point unless
+>  	 * absolutely necessary, as most operations from this point forward
+> @@ -9402,6 +9436,8 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+>  	kvm_init_msr_list();
+>  	return 0;
+>  
+> +out_hardware_unsetup:
+> +	ops->runtime_ops->hardware_unsetup();
+>  out_mmu_exit:
+>  	kvm_mmu_vendor_module_exit();
+>  out_free_percpu:
+> @@ -12037,16 +12073,7 @@ void kvm_arch_hardware_disable(void)
+>  
+>  int kvm_arch_check_processor_compat(void *opaque)
+>  {
+> -	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
+> -	struct kvm_x86_init_ops *ops = opaque;
+> -
+> -	WARN_ON(!irqs_disabled());
+> -
+> -	if (__cr4_reserved_bits(cpu_has, c) !=
+> -	    __cr4_reserved_bits(cpu_has, &boot_cpu_data))
+> -		return -EIO;
+> -
+> -	return ops->check_processor_compatibility();
+> +	return 0;
+>  }
+>  
+>  bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
+> -- 
+> 2.38.1.584.g0f3c55d4c2-goog
+> 
 
-Ah, yes - the note on patch 5 is a bit bitrotted now.  I'll update that.
-
-
-> > There is a difference to the actual handling between pseudo NMIs
-> > and superpriority interrupts in the assembly save_and_disable_irq and
-> > restore_irq macros, these cover both interrupts and FIQs using DAIF
-> > without regard for the use of pseudo NMIs so also mask those but are not
-> > updated here to mask superpriority interrupts. Given the names it is not
-> > clear that the behaviour with pseudo NMIs is particularly intentional,
-
-> Pseudo-NMIs are still compatible with the standard DAIF behaviour,
-> where setting PSTATE.I is strictly equivalent to setting PSTATE.ALLINT
-> when you have architected NMIs.
-
-> So I don't really understand your concern here.
-
-The existing code is fine, the thing here was that unlike the C code
-there's no matching management of PMR here where we're adding management
-of ALLINT which might raise alarm bells for the reader.  I'll reword a
-bit.
-
-> > @@ -131,6 +145,10 @@ static inline void local_daif_inherit(struct pt_re=
-gs *regs)
-> >  	if (interrupts_enabled(regs))
-> >  		trace_hardirqs_on();
-> > =20
-> > +	/* If we can take asynchronous errors we can take NMIs */
-> > +	if (system_uses_nmi() && !(flags & PSR_A_BIT))
-> > +		_allint_clear();
-> > +
-
-> Same remark about the ordering. Also, we don't check for PSTATE.A in
-> the pseudo-NMI case. Why is this any different?
-
-For NMIs we're making it track PSTATE.A so I wrote things that way to
-make it clear that this should be what the end result is.  I've already
-got a change locally which makes this even more explicit by having both
-the set and clear cases rather than just only the clear cases.  You're
-right though that we should achieve the same effect by restoring what
-was saved in regs->pstate which is the equivalent of what pseudo NMIs
-are doing so I'll change to do that.
-
---B7iIh0TWRFobH+EO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOOWf8ACgkQJNaLcl1U
-h9AU9gf9Hl1l46LgRtzhhpr07CpYkKAk8Mz7+52CNWUVsg5zz+i3w72RyYnuVAnl
-ZvjmE4cNsxVJDpPSUL12xw3q8YQIMpvCdqOK9y3HHEdqcS72C8fC6lt0STzLX5hp
-Z7RQrRnnYbdfgTXPpJLHKCvBr235UjzipUsgp+VC4Iud1PUgKz1xkPYhMFsPoZeK
-mPjIAKqfdy4JqCQ/eSF6gUbvUME5fIUEI2QayWQdvsN6TSH9ow9L8NV7b6YJQQaw
-blMIpI4kSBFfb6Gk38zHvtekAk/JDq1KayHR8xeSrBccacwmZCGgjSftrtjOOJvD
-zw7Icd0TQI6/KjYEtkbfubXhjRBUQA==
-=IvI0
------END PGP SIGNATURE-----
-
---B7iIh0TWRFobH+EO--
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
