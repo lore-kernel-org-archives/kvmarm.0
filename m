@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9CF6125
-	for <kvmarm@lists.linux.dev>; Mon,  5 Dec 2022 17:29:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C102C433C1;
-	Mon,  5 Dec 2022 17:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86D66125
+	for <kvmarm@lists.linux.dev>; Mon,  5 Dec 2022 17:50:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66F46C433D6;
+	Mon,  5 Dec 2022 17:50:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670261397;
-	bh=rGThX//Vr1og/2ailLtUTMKLZ2sDP9Sevx/ByKW4tOQ=;
+	s=k20201202; t=1670262638;
+	bh=RjRusTgDu+5A3y4QhS3DIyGHr9qWxQFZ8RHadBBdFPk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gzhPqHSByp8YBafYkcx/c1QFQESLhW/5pzq4/jjopqI3BOOEC8o3P1vtFFX3HqBlM
-	 5F1Y5omOPsk2iuqqLCxNHBo0RcSOhhewETUrWi9CHBHzYBDuO7mNX0IUSOzo5oGvhS
-	 AAWqSV5HWx02Zkvm0vOfujz5bYZ7Go8BO578mzWu/5UHSiBTsamKzLZO8SJiM0GwrI
-	 6m6AIZys4tldMWLNSqmxhigUCfhThGozrLQh8VMqr3FSz42yQnKeAlxjkP4uBu6TCb
-	 Y92k0LmGt3rBFjE37S4e9yFZ2pJ5ytsP0S8JORzBjjQaRTcXcoCj655wc4wK3V0++N
-	 uhUvCy96EQ0pA==
+	b=cHPiFqf6Aw157ls+P9bJZmcslUqOdYeCgypNMpdM5fgSetbyi8UaFafLm+CgD4MvL
+	 4iBh8ZkHtfV+QpK/gS5Iz63V8SWP5LffCY5PXmRKwBMrZPdfzF+TbbSOpzBXRf8Md8
+	 wggGZ9YqbWA5R2otbA39w7tV82F4hdTA9yZOHLCb2kMrHOpbCKJ4nzfMTmhZ2mz+x9
+	 xZ8MfwunROzI2NIjBQ9sco/b3TzmxfgaqLsYF/J2lSKGbkrDhL12d+fZZmSCxUcr4A
+	 ElwR0pixGAl7kHES45K94RUG4XdbuyQg+g2m0J49DnMT+JEYH6kfpq/9ilX9lH97Ja
+	 Ccd7Eo6hMtFew==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1p2FHu-00AdFY-KA;
-	Mon, 05 Dec 2022 17:29:55 +0000
-Date: Mon, 05 Dec 2022 17:29:54 +0000
-Message-ID: <86tu29lpwt.wl-maz@kernel.org>
+	id 1p2Fbw-00AdaZ-2r;
+	Mon, 05 Dec 2022 17:50:36 +0000
+Date: Mon, 05 Dec 2022 17:50:35 +0000
+Message-ID: <86sfhtloyc.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -33,10 +33,10 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 05/14] arm64/asm: Introduce assembly macros for managing ALLINT
-In-Reply-To: <20221112151708.175147-6-broonie@kernel.org>
+Subject: Re: [PATCH v2 06/14] arm64/hyp-stub: Enable access to ALLINT
+In-Reply-To: <20221112151708.175147-7-broonie@kernel.org>
 References: <20221112151708.175147-1-broonie@kernel.org>
-	<20221112151708.175147-6-broonie@kernel.org>
+	<20221112151708.175147-7-broonie@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -52,21 +52,46 @@ X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 12 Nov 2022 15:16:59 +0000,
+On Sat, 12 Nov 2022 15:17:00 +0000,
 Mark Brown <broonie@kernel.org> wrote:
 > 
-> In order to allow assembly code to ensure that not even superpriorty
-> interrupts can preempt it provide macros for enabling and disabling
-                        ^
-                        \ Insert comma here
+> In order to use NMIs we need to ensure that traps are disabled for it so
+> update HCRX_EL2 to ensure that TALLINT is not set when we detect support
+> for NMIs.
+> 
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/kernel/hyp-stub.S | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+> index 2ee18c860f2a..4e0b06467973 100644
+> --- a/arch/arm64/kernel/hyp-stub.S
+> +++ b/arch/arm64/kernel/hyp-stub.S
+> @@ -151,6 +151,18 @@ SYM_CODE_START_LOCAL(__finalise_el2)
+>  
+>  .Lskip_sme:
+>  
+> +	// NMIs
+> +	__check_override id_aa64pfr1 ID_AA64PFR1_EL1_NMI_SHIFT 4 .Linit_nmi .Lskip_nmi
 
-> ALLINT.ALLINT.  This is not integrated into the existing DAIF macros
-> since we do not always wish to manage ALLINT along with DAIF and the
-                                                              ^
-                                            Insert comma here /
+Err.., What makes sure that x1 contains id_aa64pfr1_el1, as per the
+big fat warning at the beginning of the file?? If you have SME, x1
+will contain some other junk... Really, this must be written as:
 
-> use of DAIF in the naming of the existing macros might lead to surprises
-> if ALLINT is also managed.
+	check_override id_aa64pfr1 ID_AA64PFR1_EL1_NMI_SHIFT .Linit_nmi .Lskip_nmi
+
+> +.Linit_nmi:
+> +	mrs	x1, id_aa64mmfr1_el1		// HCRX_EL2 present?
+> +	ubfx	x1, x1, #ID_AA64MMFR1_EL1_HCX_SHIFT, #4
+> +	cbz	x1, .Lskip_nmi
+> +
+> +	mrs_s	x1, SYS_HCRX_EL2
+> +	and	x1, x1, #~HCRX_EL2_TALLINT_MASK	// Don't trap ALLINT
+
+A nicer way of writing this is:
+
+	bic	x1, x1, #HCRX_EL2_TALLINT_MASK
 
 	M.
 
