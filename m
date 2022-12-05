@@ -1,21 +1,21 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E44A107BF
-	for <kvmarm@lists.linux.dev>; Mon,  5 Dec 2022 19:03:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 374BCC433D6;
-	Mon,  5 Dec 2022 19:03:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8B315C83
+	for <kvmarm@lists.linux.dev>; Mon,  5 Dec 2022 19:32:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7FD1C433D6;
+	Mon,  5 Dec 2022 19:32:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670267036;
-	bh=ElWImseXnCKCUqRGElNw3z8mIAd2iPIFbjvL7PDyqXk=;
+	s=k20201202; t=1670268726;
+	bh=9CnHmINLwUwFVW5vwib1lecyWslV/WF46W+aAbbY5Fs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LXVQwXReHJnOHYyfFy2+ULch1ohTUfbiKJAxaFarh9lEhvIzZmKLoDkB/LAv2KiKW
-	 QHm7n3pubOMr+eXuLspwDD4lD3YrUBvf+VFSjpe3ItqJy2qhJ0MxIRnIBVKp+SXu2V
-	 53USY+PwtdxWAlzn0VUM3rz7Roj3oItXsD3ZjiffwnwAomd+l5DymVB8kkn+hrliNt
-	 k0Uto3t/ZNilqFKpUbrJ4gLHb8y7nK0ck3TcKJeyGO+09CLJka1SXboxpJHNg2n2u1
-	 Mrl17lTF1jt8C4i1Q1AvjD5sQaKpCfffHWcpsSlotYi2M1H7320Lu5aKFSOFq7HyuJ
-	 Mcl2XM9F0ZW+g==
-Date: Mon, 5 Dec 2022 19:03:50 +0000
+	b=QxYbNrYuTe2qiXVXb0jG0YQSHeQR0Jxl8fNh+yUnlY7mFVDNd79NUqxIUZQePAtgv
+	 wPjepuUSiXeFXkxm+lAPg9D7ntK0EDsGRCt3tnxFyXWB0vyZkW6NzTTJmDKAdRSGO0
+	 nQLECS18uAX2miJ2zHtxH0JQIo3GJX6RcipnMMN3RIZ51HGHLN3L3vsAbqsFCfjGGz
+	 rcWgup6EXgVLmHP48tKjZoeQDCg70vj9iAoQdkz28+kxpdGXu9nWKlRG8qgURTSt+v
+	 QykXxnfQBKvtCj/oP3O5oehalTxb7q1jGsl/STieHWpdG26dch6OUabMzZ7vZaFwxl
+	 UtfuDbkUy3nxQ==
+Date: Mon, 5 Dec 2022 19:32:01 +0000
 From: Mark Brown <broonie@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -25,11 +25,11 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Sami Mujawar <Sami.Mujawar@arm.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 09/14] KVM: arm64: Hide FEAT_NMI from guests
-Message-ID: <Y45Aluq2zJoQ828W@sirena.org.uk>
+Subject: Re: [PATCH v2 08/14] arm64/cpufeature: Detect PE support for FEAT_NMI
+Message-ID: <Y45HMaXwUcSHEplv@sirena.org.uk>
 References: <20221112151708.175147-1-broonie@kernel.org>
- <20221112151708.175147-10-broonie@kernel.org>
- <86pmcxlo7z.wl-maz@kernel.org>
+ <20221112151708.175147-9-broonie@kernel.org>
+ <86r0xdlodg.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,55 +37,62 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="uMgfBnj769AQ4B8P"
+	protocol="application/pgp-signature"; boundary="JxYSsaiqUzbyilFy"
 Content-Disposition: inline
-In-Reply-To: <86pmcxlo7z.wl-maz@kernel.org>
+In-Reply-To: <86r0xdlodg.wl-maz@kernel.org>
 X-Cookie: If it ain't broke, don't fix it.
 
 
---uMgfBnj769AQ4B8P
+--JxYSsaiqUzbyilFy
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Mon, Dec 05, 2022 at 06:06:24PM +0000, Marc Zyngier wrote:
+On Mon, Dec 05, 2022 at 06:03:07PM +0000, Marc Zyngier wrote:
 > Mark Brown <broonie@kernel.org> wrote:
 
-> > FEAT_NMI is not yet useful to guests pending implementation of vGIC
-> > support. Mask out the feature from the ID register and prevent guests
-> > creating state in ALLINT.ALLINT by activating the trap on write provided
-> > in HCRX_EL2.TALLINT when they are running. There is no trap available
-> > for reads from ALLINT.
+> > +#ifdef CONFIG_ARM64_NMI
+> > +	{
+> > +		.desc = "Non-maskable Interrupts",
+> > +		.capability = ARM64_HAS_NMI,
+> > +		.type = ARM64_CPUCAP_BOOT_CPU_FEATURE,
 
-> > We do not need to check for FEAT_HCRX since it is mandatory since v8.7
-> > and FEAT_NMI is a v8.8 feature.
+> PSEUDO_NMI uses ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE. What is the
+> rational for using a different policy here?
 
-> And yet you check for it in hyp-stub.S after having checked for
-> FEAT_NMI. What gives?
+I couldn't identify any issues that the kernel would have if the feature
+was present in the hardware but unused so I didn't see the need to be
+additionally restrictive.  TBH I'm not 100% clear why the _STRICT is
+there for pseudo NMIs, it seemed a bit out of scope for this series to
+try to clean that up though.
 
-Being aware that you have a strong preference for not having safety
-checks for mandatory features I didn't add any here but noted it so
-people could see why they were omitted.  The checks in hyp-stub.S were
-probably written before I'd checked the dependency situation out.
+> The whole thing is way too restrictive: KVM definitely needs to know
+> that the feature exists, even if there is no use for it in the host
+> kernel. There is no reason why guests shouldn't be able to use this
+> even if the host doesn't care about it.
 
-I can remove those checks if preferred but TBH given that the failure
-mode in hyp-stub.S is typically going to be to die with no output if
-something goes wrong it does feel like it's worth the extra couple of
-instructions to double check things just in case, especially with the
-virtual platforms being so easy to misconfigure.
+> Which means you need two properties: one that advertises the
+> availability of the feature, and one that makes use of it in the
+> kernel.
 
---uMgfBnj769AQ4B8P
+To be clear I think what you're looking for here is a capability that
+omits the cross-check with pseudo NMIs rather than something that's
+strictly checking the hardware (so ID register overrides will still
+apply)?  I've done that locally, my tree currently has capabilites
+HAS_NMI and USES_NMI.
+
+--JxYSsaiqUzbyilFy
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOOQJYACgkQJNaLcl1U
-h9A7eQf8C8GfeXxvjx7hEypOLSK/NymCMBz7O4TpGPwYm6JyQaJD6h+QdAbR6e/A
-TBIm+obQEuaBLPQBncOnlcaYwnbktR8mLErJgDT3d2R/1g5isiDWj1NdQypm3Bqh
-FJttLBp7EZGwCuZUx/NA87DuUuIThwRZ8LZcL37L3Sn47OBLKtWTcrx5LtY9XD3r
-OMpsg9lsXUyj/M1DM8WArNXRukJY92WvEtlJD9irM/cDCOZxOKbgaq+PKD+1oT40
-lCxH2WaegA0IlNP2EW5U4upkduTefj6CXzI8+Pj4cfkEeIdqo58iiQR0ZGETMy7S
-TIYzsKUfwdoW/2/dPi5tNCjnS1QGgQ==
-=R6LF
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOORzAACgkQJNaLcl1U
+h9BwkQf/YpN9KFkad/ukpfEAjti3rWgQZqO67313c2237y9LuzW3ehQd1O5oovAg
+Zi6pYl/KtiAOs1arpTdqKNjjsk1cRKjBC7Kb10vg4SjtLg3elD1Ogp+ji2NUerME
+s/FkCz3UeGw/qd0fqNCBhV439hORNR9oQTxWnjND/fCbRFRFgDKjsI3LxB2kBbrs
++ZvMvGVpMI21KB1YS+t/SUOnre9EItpFkHQ1oONVdS/j7mgATmimg6RMVbcYR0tB
+kJ484tV5MY/ySfdjZBnzpoFNTDEBLBV02u3q6obo4GQmXGaVcT5WEXPrnrffClNt
+wh1h3pxGFLC6EmwhixeiCVPlBLrorQ==
+=/513
 -----END PGP SIGNATURE-----
 
---uMgfBnj769AQ4B8P--
+--JxYSsaiqUzbyilFy--
