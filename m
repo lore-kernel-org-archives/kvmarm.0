@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86D66125
-	for <kvmarm@lists.linux.dev>; Mon,  5 Dec 2022 17:50:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66F46C433D6;
-	Mon,  5 Dec 2022 17:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603066125
+	for <kvmarm@lists.linux.dev>; Mon,  5 Dec 2022 18:03:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01D8AC433C1;
+	Mon,  5 Dec 2022 18:03:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670262638;
-	bh=RjRusTgDu+5A3y4QhS3DIyGHr9qWxQFZ8RHadBBdFPk=;
+	s=k20201202; t=1670263390;
+	bh=oW1D+qSKh6SLQ7pQhhk43PMiigdVlm+ZiTRBvQ4dDYo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cHPiFqf6Aw157ls+P9bJZmcslUqOdYeCgypNMpdM5fgSetbyi8UaFafLm+CgD4MvL
-	 4iBh8ZkHtfV+QpK/gS5Iz63V8SWP5LffCY5PXmRKwBMrZPdfzF+TbbSOpzBXRf8Md8
-	 wggGZ9YqbWA5R2otbA39w7tV82F4hdTA9yZOHLCb2kMrHOpbCKJ4nzfMTmhZ2mz+x9
-	 xZ8MfwunROzI2NIjBQ9sco/b3TzmxfgaqLsYF/J2lSKGbkrDhL12d+fZZmSCxUcr4A
-	 ElwR0pixGAl7kHES45K94RUG4XdbuyQg+g2m0J49DnMT+JEYH6kfpq/9ilX9lH97Ja
-	 Ccd7Eo6hMtFew==
+	b=oa9rg+2B3WrJnzBEiJRqPSPZUFTSqbbA8QIwdEgW6qHV/0Sg56q0gACZdc4x12pR+
+	 MMGtUK59Uvg3ONQF/zYlBX6oTRI/YYp/ZekJ66kQDwlAm8gqZmoQsqjUp2pnuzQV8q
+	 Lac6SRiz923QIjJ4cTSuqNwNtkoOK0fX1B01n7s7p+V0P9UQuO4QD4eAs47Wbt/OAM
+	 dGmUz1cWIT4yYhu8bB6l2pDta/lktyUQsHxIGM86sZ305NV5cpYaygcQ+LrvAd6p7F
+	 DdcneodiyTb51MPXV2G6/drHuA6OfKZm9zdd2PYOVtc0NCwVItaVOey3itHN5XnnJt
+	 S67gpycVA0m0A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1p2Fbw-00AdaZ-2r;
-	Mon, 05 Dec 2022 17:50:36 +0000
-Date: Mon, 05 Dec 2022 17:50:35 +0000
-Message-ID: <86sfhtloyc.wl-maz@kernel.org>
+	id 1p2Fo3-00Adgw-Jq;
+	Mon, 05 Dec 2022 18:03:07 +0000
+Date: Mon, 05 Dec 2022 18:03:07 +0000
+Message-ID: <86r0xdlodg.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -33,10 +33,10 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 06/14] arm64/hyp-stub: Enable access to ALLINT
-In-Reply-To: <20221112151708.175147-7-broonie@kernel.org>
+Subject: Re: [PATCH v2 08/14] arm64/cpufeature: Detect PE support for FEAT_NMI
+In-Reply-To: <20221112151708.175147-9-broonie@kernel.org>
 References: <20221112151708.175147-1-broonie@kernel.org>
-	<20221112151708.175147-7-broonie@kernel.org>
+	<20221112151708.175147-9-broonie@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -52,46 +52,152 @@ X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 12 Nov 2022 15:17:00 +0000,
+On Sat, 12 Nov 2022 15:17:02 +0000,
 Mark Brown <broonie@kernel.org> wrote:
 > 
-> In order to use NMIs we need to ensure that traps are disabled for it so
-> update HCRX_EL2 to ensure that TALLINT is not set when we detect support
-> for NMIs.
+> Use of FEAT_NMI requires that all the PEs in the system and the GIC have NMI
+> support. This patch implements the PE part of that detection.
+> 
+> In order to avoid problematic interactions between real and pseudo NMIs
+> we disable the architected feature if the user has enabled pseudo NMIs
+> on the command line. If this is done on a system where support for the
+> architected feature is detected then a warning is printed during boot in
+> order to help users spot what is likely to be a misconfiguration.
 > 
 > Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  arch/arm64/kernel/hyp-stub.S | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+>  arch/arm64/include/asm/cpufeature.h |  6 ++++
+>  arch/arm64/kernel/cpufeature.c      | 55 ++++++++++++++++++++++++++++-
+>  arch/arm64/tools/cpucaps            |  1 +
+>  3 files changed, 61 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
-> index 2ee18c860f2a..4e0b06467973 100644
-> --- a/arch/arm64/kernel/hyp-stub.S
-> +++ b/arch/arm64/kernel/hyp-stub.S
-> @@ -151,6 +151,18 @@ SYM_CODE_START_LOCAL(__finalise_el2)
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index f73f11b55042..85eeb331a0ef 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -809,6 +809,12 @@ static __always_inline bool system_uses_irq_prio_masking(void)
+>  	       cpus_have_const_cap(ARM64_HAS_IRQ_PRIO_MASKING);
+>  }
 >  
->  .Lskip_sme:
->  
-> +	// NMIs
-> +	__check_override id_aa64pfr1 ID_AA64PFR1_EL1_NMI_SHIFT 4 .Linit_nmi .Lskip_nmi
-
-Err.., What makes sure that x1 contains id_aa64pfr1_el1, as per the
-big fat warning at the beginning of the file?? If you have SME, x1
-will contain some other junk... Really, this must be written as:
-
-	check_override id_aa64pfr1 ID_AA64PFR1_EL1_NMI_SHIFT .Linit_nmi .Lskip_nmi
-
-> +.Linit_nmi:
-> +	mrs	x1, id_aa64mmfr1_el1		// HCRX_EL2 present?
-> +	ubfx	x1, x1, #ID_AA64MMFR1_EL1_HCX_SHIFT, #4
-> +	cbz	x1, .Lskip_nmi
+> +static __always_inline bool system_uses_nmi(void)
+> +{
+> +	return IS_ENABLED(CONFIG_ARM64_NMI) &&
+> +		cpus_have_const_cap(ARM64_HAS_NMI);
+> +}
 > +
-> +	mrs_s	x1, SYS_HCRX_EL2
-> +	and	x1, x1, #~HCRX_EL2_TALLINT_MASK	// Don't trap ALLINT
+>  static inline bool system_supports_mte(void)
+>  {
+>  	return IS_ENABLED(CONFIG_ARM64_MTE) &&
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 6062454a9067..18ab50b76f50 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -84,6 +84,7 @@
+>  #include <asm/kvm_host.h>
+>  #include <asm/mmu_context.h>
+>  #include <asm/mte.h>
+> +#include <asm/nmi.h>
+>  #include <asm/processor.h>
+>  #include <asm/smp.h>
+>  #include <asm/sysreg.h>
+> @@ -243,6 +244,7 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
+>  };
+>  
+>  static const struct arm64_ftr_bits ftr_id_aa64pfr1[] = {
+> +	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_NMI_SHIFT, 4, 0),
+>  	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SME),
+>  		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_SME_SHIFT, 4, 0),
+>  	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_MPAM_frac_SHIFT, 4, 0),
+> @@ -2008,9 +2010,11 @@ static void cpu_enable_e0pd(struct arm64_cpu_capabilities const *cap)
+>  }
+>  #endif /* CONFIG_ARM64_E0PD */
+>  
+> -#ifdef CONFIG_ARM64_PSEUDO_NMI
+> +#if IS_ENABLED(CONFIG_ARM64_PSEUDO_NMI) || IS_ENABLED(CONFIG_ARM64_NMI)
+>  static bool enable_pseudo_nmi;
+> +#endif
+>  
+> +#ifdef CONFIG_ARM64_PSEUDO_NMI
+>  static int __init early_enable_pseudo_nmi(char *p)
+>  {
+>  	return strtobool(p, &enable_pseudo_nmi);
+> @@ -2024,6 +2028,41 @@ static bool can_use_gic_priorities(const struct arm64_cpu_capabilities *entry,
+>  }
+>  #endif
+>  
+> +#ifdef CONFIG_ARM64_NMI
+> +static bool has_nmi(const struct arm64_cpu_capabilities *entry, int scope)
+> +{
+> +	if (!has_cpuid_feature(entry, scope))
+> +		return false;
+> +
+> +	/*
+> +	 * Having both real and pseudo NMIs enabled simultaneously is
+> +	 * likely to cause confusion.  Since pseudo NMIs must be
+> +	 * enabled with an explicit command line option, if the user
+> +	 * has set that option on a system with real NMIs for some
+> +	 * reason assume they know what they're doing.
+> +	 */
+> +	if (IS_ENABLED(CONFIG_ARM64_PSEUDO_NMI) && enable_pseudo_nmi) {
+> +		pr_info("Pseudo NMI enabled, not using architected NMI\n");
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +static void nmi_enable(const struct arm64_cpu_capabilities *__unused)
+> +{
+> +	/*
+> +	 * Enable use of NMIs controlled by ALLINT, SPINTMASK should
+> +	 * be clear by default but make it explicit that we are using
+> +	 * this mode.  Ensure that ALLINT is clear first in order to
+> +	 * avoid leaving things masked.
+> +	 */
+> +	_allint_clear();
+> +	sysreg_clear_set(sctlr_el1, SCTLR_EL1_SPINTMASK, SCTLR_EL1_NMI);
+> +	isb();
+> +}
+> +#endif
+> +
+>  #ifdef CONFIG_ARM64_BTI
+>  static void bti_enable(const struct arm64_cpu_capabilities *__unused)
+>  {
+> @@ -2640,6 +2679,20 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>  		.matches = has_cpuid_feature,
+>  		.cpu_enable = cpu_trap_el0_impdef,
+>  	},
+> +#ifdef CONFIG_ARM64_NMI
+> +	{
+> +		.desc = "Non-maskable Interrupts",
+> +		.capability = ARM64_HAS_NMI,
+> +		.type = ARM64_CPUCAP_BOOT_CPU_FEATURE,
 
-A nicer way of writing this is:
+PSEUDO_NMI uses ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE. What is the
+rational for using a different policy here?
 
-	bic	x1, x1, #HCRX_EL2_TALLINT_MASK
+> +		.sys_reg = SYS_ID_AA64PFR1_EL1,
+> +		.sign = FTR_UNSIGNED,
+> +		.field_pos = ID_AA64PFR1_EL1_NMI_SHIFT,
+> +		.field_width = 4,
+> +		.min_field_value = ID_AA64PFR1_EL1_NMI_IMP,
+> +		.matches = has_nmi,
+> +		.cpu_enable = nmi_enable,
+> +	},
+> +#endif
+>  	{},
+>  };
+
+The whole thing is way too restrictive: KVM definitely needs to know
+that the feature exists, even if there is no use for it in the host
+kernel. There is no reason why guests shouldn't be able to use this
+even if the host doesn't care about it.
+
+Which means you need two properties: one that advertises the
+availability of the feature, and one that makes use of it in the
+kernel.
+
+Thanks,
 
 	M.
 
