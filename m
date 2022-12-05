@@ -1,21 +1,21 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8B315C83
-	for <kvmarm@lists.linux.dev>; Mon,  5 Dec 2022 19:32:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7FD1C433D6;
-	Mon,  5 Dec 2022 19:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1CF15C99
+	for <kvmarm@lists.linux.dev>; Mon,  5 Dec 2022 20:52:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDD76C433B5;
+	Mon,  5 Dec 2022 20:52:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670268726;
-	bh=9CnHmINLwUwFVW5vwib1lecyWslV/WF46W+aAbbY5Fs=;
+	s=k20201202; t=1670273541;
+	bh=fhtuKrKeylfRZqROvlIzJUqwt+rxgcDBajtohkwUijg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QxYbNrYuTe2qiXVXb0jG0YQSHeQR0Jxl8fNh+yUnlY7mFVDNd79NUqxIUZQePAtgv
-	 wPjepuUSiXeFXkxm+lAPg9D7ntK0EDsGRCt3tnxFyXWB0vyZkW6NzTTJmDKAdRSGO0
-	 nQLECS18uAX2miJ2zHtxH0JQIo3GJX6RcipnMMN3RIZ51HGHLN3L3vsAbqsFCfjGGz
-	 rcWgup6EXgVLmHP48tKjZoeQDCg70vj9iAoQdkz28+kxpdGXu9nWKlRG8qgURTSt+v
-	 QykXxnfQBKvtCj/oP3O5oehalTxb7q1jGsl/STieHWpdG26dch6OUabMzZ7vZaFwxl
-	 UtfuDbkUy3nxQ==
-Date: Mon, 5 Dec 2022 19:32:01 +0000
+	b=WJrZZlTia13a/wajtZV9G90f7WJ6tA+B3h1V+mXlufiYDH8/4ekIIUq1JLPqLq+vb
+	 iel5k2q0B2n/n/WdjnWt/M0LNv/wUvzzFtsE8TGVeO2nvJmHkdHjVPWqGhtXnNH00S
+	 o0zJIXaM9PVI2Or/jm2L/pzndx1eJeQ9G4FlaxRAD8aoXsZZetRm+dVeVltuX2EELc
+	 E2pmpvcnfuBHGaagUHLm9sA8m3u/wDWBgd/GxutiSWY7MK4DWmlRdhMq2Y424I7Hjw
+	 nxuYjWXSIE7x6MNHyCLD2VUGFCG90neW8MUSMlZai3+pmDlyQZcp81Pi93VPDZxoQ+
+	 u/kwKPQI/PjvA==
+Date: Mon, 5 Dec 2022 20:52:16 +0000
 From: Mark Brown <broonie@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -25,11 +25,12 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Sami Mujawar <Sami.Mujawar@arm.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 08/14] arm64/cpufeature: Detect PE support for FEAT_NMI
-Message-ID: <Y45HMaXwUcSHEplv@sirena.org.uk>
+Subject: Re: [PATCH v2 10/14] arm64/nmi: Manage masking for superpriority
+ interrupts along with DAIF
+Message-ID: <Y45aAOYXqYQB+oHb@sirena.org.uk>
 References: <20221112151708.175147-1-broonie@kernel.org>
- <20221112151708.175147-9-broonie@kernel.org>
- <86r0xdlodg.wl-maz@kernel.org>
+ <20221112151708.175147-11-broonie@kernel.org>
+ <86o7shlmb2.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,62 +38,95 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="JxYSsaiqUzbyilFy"
+	protocol="application/pgp-signature"; boundary="B7iIh0TWRFobH+EO"
 Content-Disposition: inline
-In-Reply-To: <86r0xdlodg.wl-maz@kernel.org>
+In-Reply-To: <86o7shlmb2.wl-maz@kernel.org>
 X-Cookie: If it ain't broke, don't fix it.
 
 
---JxYSsaiqUzbyilFy
+--B7iIh0TWRFobH+EO
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 05, 2022 at 06:03:07PM +0000, Marc Zyngier wrote:
+On Mon, Dec 05, 2022 at 06:47:45PM +0000, Marc Zyngier wrote:
+> On Sat, 12 Nov 2022 15:17:04 +0000,
 > Mark Brown <broonie@kernel.org> wrote:
 
-> > +#ifdef CONFIG_ARM64_NMI
-> > +	{
-> > +		.desc = "Non-maskable Interrupts",
-> > +		.capability = ARM64_HAS_NMI,
-> > +		.type = ARM64_CPUCAP_BOOT_CPU_FEATURE,
+> > As we do for pseudo NMIs add code to our DAIF management which keeps
+>                           ,
+> > superpriority interrupts unmasked when we have asynchronous exceptions
+> > enabled. Since superpriority interrupts are not masked through DAIF like
+> > pseduo NMIs are we also need to modify the assembler macros for managing
+>                  ,
+>=20
+> > DAIF to ensure that the masking is done in the assembly code. At present
+> > users of the assembly macros always mask pseudo NMIs.
 
-> PSEUDO_NMI uses ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE. What is the
-> rational for using a different policy here?
+> In patch #5, you say:
 
-I couldn't identify any issues that the kernel would have if the feature
-was present in the hardware but unused so I didn't see the need to be
-additionally restrictive.  TBH I'm not 100% clear why the _STRICT is
-there for pseudo NMIs, it seemed a bit out of scope for this series to
-try to clean that up though.
+> "This is not integrated into the existing DAIF macros since we do not
+> always wish to manage ALLINT along with DAIF and the use of DAIF in
+> the naming of the existing macros might lead to surprises if ALLINT is
+> also managed."
 
-> The whole thing is way too restrictive: KVM definitely needs to know
-> that the feature exists, even if there is no use for it in the host
-> kernel. There is no reason why guests shouldn't be able to use this
-> even if the host doesn't care about it.
+> It isn't integrated, and yet it is.
 
-> Which means you need two properties: one that advertises the
-> availability of the feature, and one that makes use of it in the
-> kernel.
+Ah, yes - the note on patch 5 is a bit bitrotted now.  I'll update that.
 
-To be clear I think what you're looking for here is a capability that
-omits the cross-check with pseudo NMIs rather than something that's
-strictly checking the hardware (so ID register overrides will still
-apply)?  I've done that locally, my tree currently has capabilites
-HAS_NMI and USES_NMI.
 
---JxYSsaiqUzbyilFy
+> > There is a difference to the actual handling between pseudo NMIs
+> > and superpriority interrupts in the assembly save_and_disable_irq and
+> > restore_irq macros, these cover both interrupts and FIQs using DAIF
+> > without regard for the use of pseudo NMIs so also mask those but are not
+> > updated here to mask superpriority interrupts. Given the names it is not
+> > clear that the behaviour with pseudo NMIs is particularly intentional,
+
+> Pseudo-NMIs are still compatible with the standard DAIF behaviour,
+> where setting PSTATE.I is strictly equivalent to setting PSTATE.ALLINT
+> when you have architected NMIs.
+
+> So I don't really understand your concern here.
+
+The existing code is fine, the thing here was that unlike the C code
+there's no matching management of PMR here where we're adding management
+of ALLINT which might raise alarm bells for the reader.  I'll reword a
+bit.
+
+> > @@ -131,6 +145,10 @@ static inline void local_daif_inherit(struct pt_re=
+gs *regs)
+> >  	if (interrupts_enabled(regs))
+> >  		trace_hardirqs_on();
+> > =20
+> > +	/* If we can take asynchronous errors we can take NMIs */
+> > +	if (system_uses_nmi() && !(flags & PSR_A_BIT))
+> > +		_allint_clear();
+> > +
+
+> Same remark about the ordering. Also, we don't check for PSTATE.A in
+> the pseudo-NMI case. Why is this any different?
+
+For NMIs we're making it track PSTATE.A so I wrote things that way to
+make it clear that this should be what the end result is.  I've already
+got a change locally which makes this even more explicit by having both
+the set and clear cases rather than just only the clear cases.  You're
+right though that we should achieve the same effect by restoring what
+was saved in regs->pstate which is the equivalent of what pseudo NMIs
+are doing so I'll change to do that.
+
+--B7iIh0TWRFobH+EO
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOORzAACgkQJNaLcl1U
-h9BwkQf/YpN9KFkad/ukpfEAjti3rWgQZqO67313c2237y9LuzW3ehQd1O5oovAg
-Zi6pYl/KtiAOs1arpTdqKNjjsk1cRKjBC7Kb10vg4SjtLg3elD1Ogp+ji2NUerME
-s/FkCz3UeGw/qd0fqNCBhV439hORNR9oQTxWnjND/fCbRFRFgDKjsI3LxB2kBbrs
-+ZvMvGVpMI21KB1YS+t/SUOnre9EItpFkHQ1oONVdS/j7mgATmimg6RMVbcYR0tB
-kJ484tV5MY/ySfdjZBnzpoFNTDEBLBV02u3q6obo4GQmXGaVcT5WEXPrnrffClNt
-wh1h3pxGFLC6EmwhixeiCVPlBLrorQ==
-=/513
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOOWf8ACgkQJNaLcl1U
+h9AU9gf9Hl1l46LgRtzhhpr07CpYkKAk8Mz7+52CNWUVsg5zz+i3w72RyYnuVAnl
+ZvjmE4cNsxVJDpPSUL12xw3q8YQIMpvCdqOK9y3HHEdqcS72C8fC6lt0STzLX5hp
+Z7RQrRnnYbdfgTXPpJLHKCvBr235UjzipUsgp+VC4Iud1PUgKz1xkPYhMFsPoZeK
+mPjIAKqfdy4JqCQ/eSF6gUbvUME5fIUEI2QayWQdvsN6TSH9ow9L8NV7b6YJQQaw
+blMIpI4kSBFfb6Gk38zHvtekAk/JDq1KayHR8xeSrBccacwmZCGgjSftrtjOOJvD
+zw7Icd0TQI6/KjYEtkbfubXhjRBUQA==
+=IvI0
 -----END PGP SIGNATURE-----
 
---JxYSsaiqUzbyilFy--
+--B7iIh0TWRFobH+EO--
