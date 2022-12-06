@@ -1,106 +1,145 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337482772C
-	for <kvmarm@lists.linux.dev>; Tue,  6 Dec 2022 18:20:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B958BC433C1;
-	Tue,  6 Dec 2022 18:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75865661
+	for <kvmarm@lists.linux.dev>; Tue,  6 Dec 2022 19:27:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D4F0C433C1;
+	Tue,  6 Dec 2022 19:27:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670350832;
-	bh=T9UHAdLSg/MknZgZmsb/1izlnh+4dsvzvBWofrFnvPE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=luoPid1iZfu97Vys9ehffT9v4D2YjnhX+hRe3Ze191e72jhYr66Qn06GryAP2duoZ
-	 1RE42tKko+FstPRliilBSUoanqmmlntF0Pwo/idQGwcxuI/UuVL9j03fZmPKxdhkk+
-	 ynMXSyLih0xdWhwPts8R+zucxOoOpuza+6JtctEtRruJOu8kpnSCddjejE++z12uVw
-	 oZ7vQ6u40msrAkSwhs6iSArVxG9wWO8kyPUU+6QRdWGRwUoS3ZMNnIywOsy55uXO/U
-	 3XIlwh1bM24m6SWYrLm72pJ+zUKLyiEF+XNwOwxBcjC+vo8okKnW3XIgAkS1JOL7Rg
-	 GpG/RdgMc7ZGA==
-Date: Tue, 6 Dec 2022 18:20:21 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Bagas Sanjaya <bagasdotme@gmail.com>,
-	Ben Gardon <bgardon@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Cornelia Huck <cohuck@redhat.com>, Fuad Tabba <tabba@google.com>,
-	Gavin Shan <gshan@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	"Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Peter Collingbourne <pcc@google.com>, Peter Xu <peterx@redhat.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Quentin Perret <qperret@google.com>,
-	Reiji Watanabe <reijiw@google.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Usama Arif <usama.arif@bytedance.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Will Deacon <will@kernel.org>,
-	Zhiyuan Dai <daizhiyuan@phytium.com.cn>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	s=k20201202; t=1670354862;
+	bh=Lw7xP4Yc04PzmCy078UrA43cqbrbxWLZTAM1UvQS0OU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=enGHd1j9qLJwQrgaY86qoxtRYq3MdaMJuvp++/TqAEfHO4ERoj3orahD8+n0zasxg
+	 HTJF3dPHVd3fM9lo5SVcz5AhVXMKUbSr8/nmBpimrcKtkcpDsBObAHyVIPluL1gk8P
+	 cIMpsKf1LXSwHL+w4BpKZTct7do3xMp36YELRL9NYexjBO+Zaoh4gXCMaaiXtaayNq
+	 ULomoN9dh14/GtEot6hw7J+IpVFswlSdoZ1q0khIgULQLjYgkZ4kzE8H2kHbGra0Qu
+	 q6IIg8d1g6eXet1f8Sh7moO8LzTPxgkMto9ll5Pk8Mr/33pu3sp/CrP66PmEJx6SFS
+	 6M7Qrvtk4mWdA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1p2dbP-00Av4O-T7;
+	Tue, 06 Dec 2022 19:27:39 +0000
+Date: Tue, 06 Dec 2022 19:27:39 +0000
+Message-ID: <86lenkl4d0.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Andrew Jones <andrew.jones@linux.dev>,	Andrew Morton
+ <akpm@linux-foundation.org>,	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,	Bagas Sanjaya
+ <bagasdotme@gmail.com>,	Ben Gardon <bgardon@google.com>,	Catalin Marinas
+ <catalin.marinas@arm.com>,	Cornelia Huck <cohuck@redhat.com>,	Fuad Tabba
+ <tabba@google.com>,	Gavin Shan <gshan@redhat.com>,	Jakub Kicinski
+ <kuba@kernel.org>,	James Morse <james.morse@arm.com>,
+	"Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,	Marek Szyprowski
+ <m.szyprowski@samsung.com>,	Mark Brown <broonie@kernel.org>,	Mark Rutland
+ <mark.rutland@arm.com>,	Oliver Upton <oliver.upton@linux.dev>,	Peter
+ Collingbourne <pcc@google.com>,	Peter Xu <peterx@redhat.com>,	Philippe
+ =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>,	Quentin Perret
+ <qperret@google.com>,	Reiji Watanabe <reijiw@google.com>,	Ricardo Koller
+ <ricarkol@google.com>,	Ryan Roberts <ryan.roberts@arm.com>,	Sean
+ Christopherson <seanjc@google.com>,	Steven Price <steven.price@arm.com>,
+	Usama Arif <usama.arif@bytedance.com>,	Vincent Donnefort
+ <vdonnefort@google.com>,	Will Deacon <will@kernel.org>,	Zhiyuan Dai
+ <daizhiyuan@phytium.com.cn>,	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org
+	linux-arm-kernel@lists.infradead.org,	kvmarm@lists.cs.columbia.edu,
+	kvmarm@lists.linux.dev,	kvm@vger.kernel.org
 Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
-Message-ID: <Y4+H5Vwy/aLvjqbw@sirena.org.uk>
+In-Reply-To: <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
 References: <20221205155845.233018-1-maz@kernel.org>
- <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
- <Y4+FmDM7E5WYP3zV@google.com>
+	<3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="syV9s6Ni/PXJMYNU"
-Content-Disposition: inline
-In-Reply-To: <Y4+FmDM7E5WYP3zV@google.com>
-X-Cookie: Save gas, don't use the shell.
-Message-ID: <20221206182021.g_8ImNGlhSqpS-W8h7f98yWWusRCdqS5b-7819ZOmCg@z>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, andrew.jones@linux.dev, akpm@linux-foundation.org, anshuman.khandual@arm.com, acme@kernel.org, bagasdotme@gmail.com, bgardon@google.com, catalin.marinas@arm.com, cohuck@redhat.com, tabba@google.com, gshan@redhat.com, kuba@kernel.org, james.morse@arm.com, maciej.szmigiero@oracle.com, m.szyprowski@samsung.com, broonie@kernel.org, mark.rutland@arm.com, oliver.upton@linux.dev, pcc@google.com, peterx@redhat.com, philmd@linaro.org, qperret@google.com, reijiw@google.com, ricarkol@google.com, ryan.roberts@arm.com, seanjc@google.com, steven.price@arm.com, usama.arif@bytedance.com, vdonnefort@google.com, will@kernel.org, daizhiyuan@phytium.com.cn, suzuki.poulose@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221206192739.RJaml3NbWLLFh5mrf8EUHHuck8ME45B1j1duLUxSqhM@z>
 
+On Tue, 06 Dec 2022 17:41:21 +0000,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+> On 12/5/22 16:58, Marc Zyngier wrote:
+> > - There is a lot of selftest conflicts with your own branch, see:
+> > 
+> >    https://lore.kernel.org/r/20221201112432.4cb9ae42@canb.auug.org.au
+> >    https://lore.kernel.org/r/20221201113626.438f13c5@canb.auug.org.au
+> >    https://lore.kernel.org/r/20221201115741.7de32422@canb.auug.org.au
+> >    https://lore.kernel.org/r/20221201120939.3c19f004@canb.auug.org.au
+> >    https://lore.kernel.org/r/20221201131623.18ebc8d8@canb.auug.org.au
+> > 
+> >    for a rather exhaustive collection.
+> 
+> Yeah, I saw them in Stephen's messages but missed your reply.
+> 
+> In retrospect, at least Gavin's series for memslot_perf_test should have
+> been applied by both of us with a topic branch, but there's so many
+> conflicts all over the place that it's hard to single out one series.
+> It just happens.
 
---syV9s6Ni/PXJMYNU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+I generally queue things on topic branches for my own sanity, happy to
+make them available in the future.
 
-On Tue, Dec 06, 2022 at 06:10:32PM +0000, Sean Christopherson wrote:
+> 
+> The only conflict in non-x86 code is the following one, please check
+> if I got it right.
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> index 05bb6a6369c2..0cda70bef5d5 100644
+> --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> @@ -609,6 +609,8 @@ static void setup_memslots(struct kvm_vm *vm, struct test_params *p)
+>  				    data_size / guest_page_size,
+>  				    p->test_desc->data_memslot_flags);
+>  	vm->memslots[MEM_REGION_TEST_DATA] = TEST_DATA_MEMSLOT;
+> +
+> +	ucall_init(vm, data_gpa + data_size);
+>  }
+>   static void setup_default_handlers(struct test_desc *test)
+> @@ -704,8 +706,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>   	setup_gva_maps(vm);
+>  -	ucall_init(vm, NULL);
+> -
+>  	reset_event_counts();
+>   	/*
+> 
+> 
+> Special care is needed here because the test uses ____vm_create().
+> 
+> I haven't pushed to kvm/next yet to give you time to check, so the
+> merge is currently in kvm/queue only.
 
-> Alternatively, we could have a dedicated selftests/kvm tree (or branch)?
+There has been a couple of -next failures reported by broonie:
 
-> I almost suggested doing that on multiple occasions this cycle, but ultimately
-> decided not to because it would effectively mean splitting series that touch KVM
-> and selftests into different trees, which would create a different kind of
-> dependency hell.  Or maybe a hybrid approach where series that only (or mostly?)
-> touch selftests go into a dedicated tree?
+https://lore.kernel.org/r/20221206175916.250104-1-broonie@kernel.org
+https://lore.kernel.org/r/20221206181506.252537-1-broonie@kernel.org
 
-Some other subsystems do have a separate branch for kselftests.  One
-fairly common occurrence is that the selftests branch ends up failing to
-build independently because someone adds new ABI together with a
-selftest but the patches adding the ABI don't end up on the same branch
-as the tests which try to use them.  That is of course resolvable but
-it's a common friction point.
+which I think you've received as well. The second patch is definitely
+needed, but you've already solved the first one. At least things do
+build.
 
---syV9s6Ni/PXJMYNU
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+> > - For the 6.3 cycle, we are going to experiment with Oliver taking
+> >    care of most of the patch herding. I'm sure he'll do a great job,
+> >    but if there is the odd mistake, please cut him some slack and blame
+> >    me instead.
+> 
+> Absolutely - you both have all the slack you need, synchronization
+> is harder than it seems.
 
------BEGIN PGP SIGNATURE-----
+Thanks,
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOPh+UACgkQJNaLcl1U
-h9CC7Af+MMWaPoSDO/Esk9zkroLyT2xIe855zDLbqscWMEyns5kByu5KOIbQMuI9
-SUhH+Y3GvUDFrbipnIGOlU8gxrsFFta9BlEMNiisNoSMlJv2SmKDb9HZfZBYpiOt
-GlmJZ0i3yxKFOsLjWnxgo62AJheT4sE8wADRIPAkPxAWRyz3KGFBesc5EooCxLNt
-T/jqOtoRqoakiaejBd3eMQxKlMNdOcpqSoiOjjpWgzWOEUULA7wHa1oDRwO5W6Zr
-upb+KoHtzlYfa1UHiW3+8kg9vAk8MyBnvG0Bx6Xu6/0im6Is5WpQUc9ofnR26eLZ
-6aL4C8fUDYOKXdy6pfD6XAboCNuEtA==
-=GF2/
------END PGP SIGNATURE-----
+	M.
 
---syV9s6Ni/PXJMYNU--
+-- 
+Without deviation from the norm, progress is not possible.
