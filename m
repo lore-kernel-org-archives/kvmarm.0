@@ -1,128 +1,338 @@
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343B47C
-	for <kvmarm@lists.linux.dev>; Mon,  5 Dec 2022 21:12:44 +0000 (UTC)
-Received: by mail-pf1-f173.google.com with SMTP id 21so12638824pfw.4
-        for <kvmarm@lists.linux.dev>; Mon, 05 Dec 2022 13:12:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9BS9+Fk77r2sqEaU7XwhOF5T7uvKSgLeTZbiEXUGcMo=;
-        b=Ujio/I//LxFB/K3sVL9gmNsGJ2wTNbSjKjPUCByX11FEgdEzOgOqiXg/gRqfeGF7s+
-         BRBVYIHZsjiCW+mopZZqJtOFx8R72OQ+lxd1rMhvvBVaCHky62qMT42W7ann/KH4QVEi
-         7RDo5VhBRC8pzm08UnWL1v8bR/cRgCAMAHzAeJOZ77ZAJGj5jTiVT2fPdcmD7+sDDe5A
-         MCK85CoektbMIOfXCT03EXGqxDh77jznAXbuGFlYRgsEHGnbyTN0uldNNg+81eLCMpdy
-         485zxEh+YV7agkZEO9zh/Zlc6/uD1mmvMxm2NZPEwpELq6RwwxuABQO2pRIN5lh3pL9X
-         0pWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9BS9+Fk77r2sqEaU7XwhOF5T7uvKSgLeTZbiEXUGcMo=;
-        b=0BN+OTDAepab0zKlgnlKylGdtG7ApXkvBD9WH4PpJDMR18DDO74x/sXEe8mu+eS3sL
-         MMjfhEvjyOrle7xWp1xPdlGHmsKNxrYT4jdfvQOX8mKKObuk1W3rifN+FLbCxv016Mgm
-         pa/TVkgG0Q/B2aQdL/kLtejN0SOD6ObEFKmVUPRMfdxIwCzIbcoWHMqZ0ZoVtNWmn7EJ
-         Q08uwCvlWxUGW6UqKhI9SQpOfNBaZTGz3hLi4PbbbbIeRNCRoO3CxZ8b9LjNiYSjRbFd
-         v37GhD3UhbsHYDTioyYA1G10nHqtjeEQExvfjLiEJ0i6o3ibHqgiO87pqnPcMMG6g6kz
-         5x1A==
-X-Gm-Message-State: ANoB5pnBbDG9XQEv/G54oxIKHexq35nk/P1Mb8Lv7zNC1nEZ2bLwJVzy
-	SXEueUa7sDeBuW33Psm/QorSgQ==
-X-Google-Smtp-Source: AA0mqf7NtaiQFi9maqoCvGoM6sFH0HgJLUnKLXrzCG7pSHOZoyGtCDF0ZU4oxE1QMNHHmHHaqhNDEw==
-X-Received: by 2002:aa7:91d6:0:b0:574:c543:f804 with SMTP id z22-20020aa791d6000000b00574c543f804mr49454104pfa.51.1670274763510;
-        Mon, 05 Dec 2022 13:12:43 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id nn6-20020a17090b38c600b00219f8eb271fsm131413pjb.5.2022.12.05.13.12.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Dec 2022 13:12:43 -0800 (PST)
-Date: Mon, 5 Dec 2022 21:12:39 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 069C43207
+	for <kvmarm@lists.linux.dev>; Tue,  6 Dec 2022 12:09:28 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3B94123A;
+	Tue,  6 Dec 2022 04:09:29 -0800 (PST)
+Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.159])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9F6EC3F73D;
+	Tue,  6 Dec 2022 04:09:20 -0800 (PST)
+From: Ryan Roberts <ryan.roberts@arm.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: Ryan Roberts <ryan.roberts@arm.com>,
 	James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Atish Patra <atishp@atishpatra.org>,
-	David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Yuan Yao <yuan.yao@intel.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Fabiano Rosas <farosas@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v2 31/50] KVM: x86: Do CPU compatibility checks in x86
- code
-Message-ID: <Y45ex/CyTY7jYa5D@google.com>
-References: <20221130230934.1014142-1-seanjc@google.com>
- <20221130230934.1014142-32-seanjc@google.com>
- <20221205205246.GA3630770@ls.amr.corp.intel.com>
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v1 00/12] KVM: arm64: Support FEAT_LPA2 at hyp s1 and vm s2
+Date: Tue,  6 Dec 2022 12:06:00 +0000
+Message-ID: <20221206120612.3271824-1-ryan.roberts@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221205205246.GA3630770@ls.amr.corp.intel.com>
-Message-ID: <20221205211239.k3rWDWmEcrDUq4cti-wDoN0VPVfW-Ci6D7rOdTE3Jh0@z>
+Content-Transfer-Encoding: 8bit
+Message-ID: <20221206120600.pyDF5gqVdzmC2VOnlVmr_-BQcLNCfHyTimXZP3RlLe0@z>
 
-On Mon, Dec 05, 2022, Isaku Yamahata wrote:
-> On Wed, Nov 30, 2022 at 11:09:15PM +0000,
-> > index 66f16458aa97..3571bc968cf8 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -9277,10 +9277,36 @@ static inline void kvm_ops_update(struct kvm_x86_init_ops *ops)
-> >  	kvm_pmu_ops_update(ops->pmu_ops);
-> >  }
-> >  
-> > +struct kvm_cpu_compat_check {
-> > +	struct kvm_x86_init_ops *ops;
-> > +	int *ret;
-> 
-> minor nitpick: just int ret. I don't see the necessity of the pointer.
-> Anyway overall it looks good to me.
+This is my first upstream feature submission so please go easy ;-)
 
-...
+Add support for FEAT_LPA2 to KVM for both hypervisor stage 1 (for the
+nvhe/protected modes) and the vm stage 2 translation tables. FEAT_LPA2 enables
+52 bit PAs and VAs for 4KB and 16KB granules (note this is already supported for
+64KB granules via the FEAT_LPA and FEAT_LVA extensions).
 
-> > @@ -9360,6 +9386,14 @@ static int __kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
-> >  	if (r != 0)
-> >  		goto out_mmu_exit;
-> >  
-> > +	c.ret = &r;
-> > +	c.ops = ops;
-> > +	for_each_online_cpu(cpu) {
-> > +		smp_call_function_single(cpu, kvm_x86_check_cpu_compat, &c, 1);
-> > +		if (r < 0)
-> 
-> Here it can be "c.ret < 0".
+The series does not include support for FEAT_LPA2 in the kernel stage 1. This
+support is provided separately by Ard Biesheuvel's series at [1]. Although my
+series does not rely on Ard's work and I'm posting the patches based on top of
+v6.1-rc6, I have tested with and without Ard's changes and provide the results
+below. The testing highlighted some pre-existing bugs in mainline and I have
+submitted fixes for these separately at [2], [3], [4]. You can find the tree
+without Ard's changes at [5] and a tree with Ard's changes at [6].
 
-No, because the below goto leads to "return r", i.e. "c.ret" needs to be propagated
-to "r".  That's why the code does the admittedly funky "int *ret" thing.
+The series is broken up into 3 phases; update TLBI routines, support 52-bit
+output addresses, and support 52 bit input addresses.
 
-FWIW, this gets cleanup in the end.  "struct kvm_cpu_compat_check" goes away and
-"&r" is passed directly to kvm_x86_check_cpu_compat.
+Update TLBI Routines: The update to the range-based TLBI instructions is
+technically not needed for the KVM support because KVM only uses the
+non-range-based TBLI instructions as far as I can see. But I've done both parts
+because I thought it was sensible to do all the updates together - the
+range-based stuff will be needed by Ard's patch I think. See commit message for
+details.
 
-> > +			goto out_hardware_unsetup;
+Support 52-bit Output Addresses: FEAT_LPA2 changes the format of the PTEs. The
+HW advertises support for LPA2 independently for stage 1 and stage 2, and
+therefore its possible to have it for one and not the other. I've assumed that
+there is a valid case for this if stage 1 is not supported but stage 2 is, KVM
+could still then use LPA2 at stage 2 to create a 52 bit IPA space (which could
+then be consumed by a 64KB page guest kernel with the help of FEAT_LPA). Because
+of this independence and the fact that the kvm pgtable library is used for both
+stage 1 and stage 2 tables, this means the library now has to remember the
+in-use format on a per-page-table basis. To do this, I had to rework some
+functions to take a `struct kvm_pgtable *` parameter, and as a result, there is
+a noisy patch to add this parameter.
+
+Support 52-bit Input Addresses: The main difficulty here is that at stage 1 for
+4KB pages, 52-bit IA requires a extra level of lookup, and that level is called
+'-1'. (Although stage 2 can use concatenated pages at the first level, and
+therefore still only uses 4 levels, the kvm pgtable library deals with both
+stage 1 and stage 2 tables). So there is another noisy patch to convert all
+level variables to signed.
+
+This is all tested on the FVP, using a test harness I put together, which does a
+host + guest boot test for 180 configurations, built from all the (valid)
+combinations of various FVP, host kernel and guest kernel parameters:
+
+ - hw_pa:		[48, lpa, lpa2]
+ - hw_va:		[48, 52]
+ - kvm_mode:		[vhe, nvhe, protected]
+ - host_page_size:	[4KB, 16KB, 64KB]
+ - host_pa:		[48, 52]
+ - host_va:		[48, 52]
+ - host_load_addr:	[low, high]
+ - guest_page_size:	[64KB]
+ - guest_pa:		[52]
+ - guest_va:		[52]
+ - guest_load_addr:	[low, high]
+
+I provide the results for the tree at [5] (which doesn't contain Ard's series),
+where all tests pass except the 12 cases where a 4KB or 16KB host kernel is
+attempting to boot in high memory - these are expected to fail due to the host
+kernel not supporting LPA2. When running the tests against the tree at [6]
+(which does contain Ard's series plus a few minor fixes), all tests pass.
+
+(I'm omitting guest_page_size, guest_va and guest_pa below since it is always
+64KB/52/52).
+
++-------+-------+-----------+----------------+---------+---------+----------------+-----------------+-------+
+| hw_pa | hw_va | kvm_mode  | host_page_size | host_va | host_pa | host_load_addr | guest_load_addr | pass  |
++-------+-------+-----------+----------------+---------+---------+----------------+-----------------+-------+
+|  48   |  48   |    vhe    |       4k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  48   |    vhe    |       4k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  48   |    vhe    |      16k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  48   |    vhe    |      16k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  48   |    vhe    |      64k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  48   |    vhe    |      64k       |   48    |   52    |      low       |       low       | True  |
+|  48   |  48   |    vhe    |      64k       |   52    |   48    |      low       |       low       | True  |
+|  48   |  48   |    vhe    |      64k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  48   |   nvhe    |       4k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  48   |   nvhe    |       4k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  48   |   nvhe    |      16k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  48   |   nvhe    |      16k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  48   |   nvhe    |      64k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  48   |   nvhe    |      64k       |   48    |   52    |      low       |       low       | True  |
+|  48   |  48   |   nvhe    |      64k       |   52    |   48    |      low       |       low       | True  |
+|  48   |  48   |   nvhe    |      64k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  48   | protected |       4k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  48   | protected |       4k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  48   | protected |      16k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  48   | protected |      16k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  48   | protected |      64k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  48   | protected |      64k       |   48    |   52    |      low       |       low       | True  |
+|  48   |  48   | protected |      64k       |   52    |   48    |      low       |       low       | True  |
+|  48   |  48   | protected |      64k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  52   |    vhe    |       4k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  52   |    vhe    |       4k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  52   |    vhe    |      16k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  52   |    vhe    |      16k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  52   |    vhe    |      64k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  52   |    vhe    |      64k       |   48    |   52    |      low       |       low       | True  |
+|  48   |  52   |    vhe    |      64k       |   52    |   48    |      low       |       low       | True  |
+|  48   |  52   |    vhe    |      64k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  52   |   nvhe    |       4k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  52   |   nvhe    |       4k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  52   |   nvhe    |      16k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  52   |   nvhe    |      16k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  52   |   nvhe    |      64k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  52   |   nvhe    |      64k       |   48    |   52    |      low       |       low       | True  |
+|  48   |  52   |   nvhe    |      64k       |   52    |   48    |      low       |       low       | True  |
+|  48   |  52   |   nvhe    |      64k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  52   | protected |       4k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  52   | protected |       4k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  52   | protected |      16k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  52   | protected |      16k       |   52    |   52    |      low       |       low       | True  |
+|  48   |  52   | protected |      64k       |   48    |   48    |      low       |       low       | True  |
+|  48   |  52   | protected |      64k       |   48    |   52    |      low       |       low       | True  |
+|  48   |  52   | protected |      64k       |   52    |   48    |      low       |       low       | True  |
+|  48   |  52   | protected |      64k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  48   |    vhe    |       4k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  48   |    vhe    |       4k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  48   |    vhe    |      16k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  48   |    vhe    |      16k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  48   |    vhe    |      64k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  48   |    vhe    |      64k       |   48    |   52    |      low       |       low       | True  |
+|  lpa  |  48   |    vhe    |      64k       |   52    |   48    |      low       |       low       | True  |
+|  lpa  |  48   |    vhe    |      64k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  48   |   nvhe    |       4k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  48   |   nvhe    |       4k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  48   |   nvhe    |      16k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  48   |   nvhe    |      16k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  48   |   nvhe    |      64k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  48   |   nvhe    |      64k       |   48    |   52    |      low       |       low       | True  |
+|  lpa  |  48   |   nvhe    |      64k       |   52    |   48    |      low       |       low       | True  |
+|  lpa  |  48   |   nvhe    |      64k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  48   | protected |       4k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  48   | protected |       4k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  48   | protected |      16k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  48   | protected |      16k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  48   | protected |      64k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  48   | protected |      64k       |   48    |   52    |      low       |       low       | True  |
+|  lpa  |  48   | protected |      64k       |   52    |   48    |      low       |       low       | True  |
+|  lpa  |  48   | protected |      64k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  52   |    vhe    |       4k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  52   |    vhe    |       4k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  52   |    vhe    |      16k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  52   |    vhe    |      16k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  52   |    vhe    |      64k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  52   |    vhe    |      64k       |   48    |   48    |      low       |      high       | True  |
+|  lpa  |  52   |    vhe    |      64k       |   48    |   52    |      low       |       low       | True  |
+|  lpa  |  52   |    vhe    |      64k       |   48    |   52    |      low       |      high       | True  |
+|  lpa  |  52   |    vhe    |      64k       |   52    |   48    |      low       |       low       | True  |
+|  lpa  |  52   |    vhe    |      64k       |   52    |   48    |      low       |      high       | True  |
+|  lpa  |  52   |    vhe    |      64k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  52   |    vhe    |      64k       |   52    |   52    |      low       |      high       | True  |
+|  lpa  |  52   |    vhe    |      64k       |   52    |   52    |      high      |       low       | True  |
+|  lpa  |  52   |    vhe    |      64k       |   52    |   52    |      high      |      high       | True  |
+|  lpa  |  52   |   nvhe    |       4k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  52   |   nvhe    |       4k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  52   |   nvhe    |      16k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  52   |   nvhe    |      16k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  52   |   nvhe    |      64k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  52   |   nvhe    |      64k       |   48    |   48    |      low       |      high       | True  |
+|  lpa  |  52   |   nvhe    |      64k       |   48    |   52    |      low       |       low       | True  |
+|  lpa  |  52   |   nvhe    |      64k       |   48    |   52    |      low       |      high       | True  |
+|  lpa  |  52   |   nvhe    |      64k       |   52    |   48    |      low       |       low       | True  |
+|  lpa  |  52   |   nvhe    |      64k       |   52    |   48    |      low       |      high       | True  |
+|  lpa  |  52   |   nvhe    |      64k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  52   |   nvhe    |      64k       |   52    |   52    |      low       |      high       | True  |
+|  lpa  |  52   |   nvhe    |      64k       |   52    |   52    |      high      |       low       | True  |
+|  lpa  |  52   |   nvhe    |      64k       |   52    |   52    |      high      |      high       | True  |
+|  lpa  |  52   | protected |       4k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  52   | protected |       4k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  52   | protected |      16k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  52   | protected |      16k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  52   | protected |      64k       |   48    |   48    |      low       |       low       | True  |
+|  lpa  |  52   | protected |      64k       |   48    |   48    |      low       |      high       | True  |
+|  lpa  |  52   | protected |      64k       |   48    |   52    |      low       |       low       | True  |
+|  lpa  |  52   | protected |      64k       |   48    |   52    |      low       |      high       | True  |
+|  lpa  |  52   | protected |      64k       |   52    |   48    |      low       |       low       | True  |
+|  lpa  |  52   | protected |      64k       |   52    |   48    |      low       |      high       | True  |
+|  lpa  |  52   | protected |      64k       |   52    |   52    |      low       |       low       | True  |
+|  lpa  |  52   | protected |      64k       |   52    |   52    |      low       |      high       | True  |
+|  lpa  |  52   | protected |      64k       |   52    |   52    |      high      |       low       | True  |
+|  lpa  |  52   | protected |      64k       |   52    |   52    |      high      |      high       | True  |
+| lpa2  |  52   |    vhe    |       4k       |   48    |   48    |      low       |       low       | True  |
+| lpa2  |  52   |    vhe    |       4k       |   48    |   48    |      low       |      high       | True  |
+| lpa2  |  52   |    vhe    |       4k       |   52    |   52    |      low       |       low       | True  |
+| lpa2  |  52   |    vhe    |       4k       |   52    |   52    |      low       |      high       | True  |
+| lpa2  |  52   |    vhe    |       4k       |   52    |   52    |      high      |       low       | False |
+| lpa2  |  52   |    vhe    |       4k       |   52    |   52    |      high      |      high       | False |
+| lpa2  |  52   |    vhe    |      16k       |   48    |   48    |      low       |       low       | True  |
+| lpa2  |  52   |    vhe    |      16k       |   48    |   48    |      low       |      high       | True  |
+| lpa2  |  52   |    vhe    |      16k       |   52    |   52    |      low       |       low       | True  |
+| lpa2  |  52   |    vhe    |      16k       |   52    |   52    |      low       |      high       | True  |
+| lpa2  |  52   |    vhe    |      16k       |   52    |   52    |      high      |       low       | False |
+| lpa2  |  52   |    vhe    |      16k       |   52    |   52    |      high      |      high       | False |
+| lpa2  |  52   |    vhe    |      64k       |   48    |   48    |      low       |       low       | True  |
+| lpa2  |  52   |    vhe    |      64k       |   48    |   48    |      low       |      high       | True  |
+| lpa2  |  52   |    vhe    |      64k       |   48    |   52    |      low       |       low       | True  |
+| lpa2  |  52   |    vhe    |      64k       |   48    |   52    |      low       |      high       | True  |
+| lpa2  |  52   |    vhe    |      64k       |   52    |   48    |      low       |       low       | True  |
+| lpa2  |  52   |    vhe    |      64k       |   52    |   48    |      low       |      high       | True  |
+| lpa2  |  52   |    vhe    |      64k       |   52    |   52    |      low       |       low       | True  |
+| lpa2  |  52   |    vhe    |      64k       |   52    |   52    |      low       |      high       | True  |
+| lpa2  |  52   |    vhe    |      64k       |   52    |   52    |      high      |       low       | True  |
+| lpa2  |  52   |    vhe    |      64k       |   52    |   52    |      high      |      high       | True  |
+| lpa2  |  52   |   nvhe    |       4k       |   48    |   48    |      low       |       low       | True  |
+| lpa2  |  52   |   nvhe    |       4k       |   48    |   48    |      low       |      high       | True  |
+| lpa2  |  52   |   nvhe    |       4k       |   52    |   52    |      low       |       low       | True  |
+| lpa2  |  52   |   nvhe    |       4k       |   52    |   52    |      low       |      high       | True  |
+| lpa2  |  52   |   nvhe    |       4k       |   52    |   52    |      high      |       low       | False |
+| lpa2  |  52   |   nvhe    |       4k       |   52    |   52    |      high      |      high       | False |
+| lpa2  |  52   |   nvhe    |      16k       |   48    |   48    |      low       |       low       | True  |
+| lpa2  |  52   |   nvhe    |      16k       |   48    |   48    |      low       |      high       | True  |
+| lpa2  |  52   |   nvhe    |      16k       |   52    |   52    |      low       |       low       | True  |
+| lpa2  |  52   |   nvhe    |      16k       |   52    |   52    |      low       |      high       | True  |
+| lpa2  |  52   |   nvhe    |      16k       |   52    |   52    |      high      |       low       | False |
+| lpa2  |  52   |   nvhe    |      16k       |   52    |   52    |      high      |      high       | False |
+| lpa2  |  52   |   nvhe    |      64k       |   48    |   48    |      low       |       low       | True  |
+| lpa2  |  52   |   nvhe    |      64k       |   48    |   48    |      low       |      high       | True  |
+| lpa2  |  52   |   nvhe    |      64k       |   48    |   52    |      low       |       low       | True  |
+| lpa2  |  52   |   nvhe    |      64k       |   48    |   52    |      low       |      high       | True  |
+| lpa2  |  52   |   nvhe    |      64k       |   52    |   48    |      low       |       low       | True  |
+| lpa2  |  52   |   nvhe    |      64k       |   52    |   48    |      low       |      high       | True  |
+| lpa2  |  52   |   nvhe    |      64k       |   52    |   52    |      low       |       low       | True  |
+| lpa2  |  52   |   nvhe    |      64k       |   52    |   52    |      low       |      high       | True  |
+| lpa2  |  52   |   nvhe    |      64k       |   52    |   52    |      high      |       low       | True  |
+| lpa2  |  52   |   nvhe    |      64k       |   52    |   52    |      high      |      high       | True  |
+| lpa2  |  52   | protected |       4k       |   48    |   48    |      low       |       low       | True  |
+| lpa2  |  52   | protected |       4k       |   48    |   48    |      low       |      high       | True  |
+| lpa2  |  52   | protected |       4k       |   52    |   52    |      low       |       low       | True  |
+| lpa2  |  52   | protected |       4k       |   52    |   52    |      low       |      high       | True  |
+| lpa2  |  52   | protected |       4k       |   52    |   52    |      high      |       low       | False |
+| lpa2  |  52   | protected |       4k       |   52    |   52    |      high      |      high       | False |
+| lpa2  |  52   | protected |      16k       |   48    |   48    |      low       |       low       | True  |
+| lpa2  |  52   | protected |      16k       |   48    |   48    |      low       |      high       | True  |
+| lpa2  |  52   | protected |      16k       |   52    |   52    |      low       |       low       | True  |
+| lpa2  |  52   | protected |      16k       |   52    |   52    |      low       |      high       | True  |
+| lpa2  |  52   | protected |      16k       |   52    |   52    |      high      |       low       | False |
+| lpa2  |  52   | protected |      16k       |   52    |   52    |      high      |      high       | False |
+| lpa2  |  52   | protected |      64k       |   48    |   48    |      low       |       low       | True  |
+| lpa2  |  52   | protected |      64k       |   48    |   48    |      low       |      high       | True  |
+| lpa2  |  52   | protected |      64k       |   48    |   52    |      low       |       low       | True  |
+| lpa2  |  52   | protected |      64k       |   48    |   52    |      low       |      high       | True  |
+| lpa2  |  52   | protected |      64k       |   52    |   48    |      low       |       low       | True  |
+| lpa2  |  52   | protected |      64k       |   52    |   48    |      low       |      high       | True  |
+| lpa2  |  52   | protected |      64k       |   52    |   52    |      low       |       low       | True  |
+| lpa2  |  52   | protected |      64k       |   52    |   52    |      low       |      high       | True  |
+| lpa2  |  52   | protected |      64k       |   52    |   52    |      high      |       low       | True  |
+| lpa2  |  52   | protected |      64k       |   52    |   52    |      high      |      high       | True  |
++-------+-------+-----------+----------------+---------+---------+----------------+-----------------+-------+
+
+[1] https://lore.kernel.org/linux-arm-kernel/20221124123932.2648991-1-ardb@kernel.org
+[2] https://lore.kernel.org/kvmarm/20221027120945.29679-1-ryan.roberts@arm.com
+[3] https://lore.kernel.org/kvmarm/20221103150507.32948-1-ryan.roberts@arm.com
+[4] https://lore.kernel.org/kvmarm/20221205114031.3972780-1-ryan.roberts@arm.com
+[5] https://gitlab.arm.com/linux-arm/linux-rr/-/tree/features/lpa2/kvm_lkml-v1
+[6] https://gitlab.arm.com/linux-arm/linux-rr/-/tree/features/lpa2/ardb_arm64-4k-lpa2_plus_kvm_2022-12-01
+
+Thanks,
+Ryan
+
+
+Anshuman Khandual (1):
+  arm64/mm: Add FEAT_LPA2 specific ID_AA64MMFR0.TGRAN[2]
+
+Ryan Roberts (11):
+  arm64/mm: Update tlb invalidation routines for FEAT_LPA2
+  KVM: arm64: Add new (V)TCR_EL2 field definitions for FEAT_LPA2
+  KVM: arm64: Plumbing to enable multiple pgtable formats
+  KVM: arm64: Maintain page-table format info in struct kvm_pgtable
+  KVM: arm64: Use LPA2 page-tables for stage2 if HW supports it
+  KVM: arm64: Use LPA2 page-tables for hyp stage1 if HW supports it
+  KVM: arm64: Insert PS field at TCR_EL2 assembly time
+  KVM: arm64: Convert translation level parameter to s8
+  KVM: arm64: Rework logic to en/decode VTCR_EL2.{SL0, SL2} fields
+  KVM: arm64: Support upto 5 levels of translation in kvm_pgtable
+  KVM: arm64: Allow guests with >48-bit IPA size on FEAT_LPA2 systems
+
+ arch/arm64/include/asm/kvm_arm.h        |  79 +++---
+ arch/arm64/include/asm/kvm_emulate.h    |  14 +-
+ arch/arm64/include/asm/kvm_pgtable.h    | 131 +++++++--
+ arch/arm64/include/asm/kvm_pkvm.h       |   5 +-
+ arch/arm64/include/asm/pgtable-prot.h   |   6 +
+ arch/arm64/include/asm/stage2_pgtable.h |  13 +-
+ arch/arm64/include/asm/sysreg.h         |   5 +
+ arch/arm64/include/asm/tlb.h            |  15 +-
+ arch/arm64/include/asm/tlbflush.h       |  83 ++++--
+ arch/arm64/kvm/arm.c                    |   5 +
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S      |   4 -
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c   |  21 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c         |  28 +-
+ arch/arm64/kvm/hyp/pgtable.c            | 354 +++++++++++++++---------
+ arch/arm64/kvm/mmu.c                    |  15 +-
+ arch/arm64/kvm/reset.c                  |  11 +-
+ 16 files changed, 525 insertions(+), 264 deletions(-)
+
+--
+2.25.1
+
