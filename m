@@ -1,145 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75865661
-	for <kvmarm@lists.linux.dev>; Tue,  6 Dec 2022 19:27:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D4F0C433C1;
-	Tue,  6 Dec 2022 19:27:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670354862;
-	bh=Lw7xP4Yc04PzmCy078UrA43cqbrbxWLZTAM1UvQS0OU=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF09D567E
+	for <kvmarm@lists.linux.dev>; Tue,  6 Dec 2022 20:49:13 +0000 (UTC)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4NRXZn29C4z4xGR;
+	Wed,  7 Dec 2022 07:49:05 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1670359745;
+	bh=QsqEJZkBj+bsOZmR3tCA3dJy4vZlG1oR0bu1q4PrRcA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=enGHd1j9qLJwQrgaY86qoxtRYq3MdaMJuvp++/TqAEfHO4ERoj3orahD8+n0zasxg
-	 HTJF3dPHVd3fM9lo5SVcz5AhVXMKUbSr8/nmBpimrcKtkcpDsBObAHyVIPluL1gk8P
-	 cIMpsKf1LXSwHL+w4BpKZTct7do3xMp36YELRL9NYexjBO+Zaoh4gXCMaaiXtaayNq
-	 ULomoN9dh14/GtEot6hw7J+IpVFswlSdoZ1q0khIgULQLjYgkZ4kzE8H2kHbGra0Qu
-	 q6IIg8d1g6eXet1f8Sh7moO8LzTPxgkMto9ll5Pk8Mr/33pu3sp/CrP66PmEJx6SFS
-	 6M7Qrvtk4mWdA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1p2dbP-00Av4O-T7;
-	Tue, 06 Dec 2022 19:27:39 +0000
-Date: Tue, 06 Dec 2022 19:27:39 +0000
-Message-ID: <86lenkl4d0.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Andrew Jones <andrew.jones@linux.dev>,	Andrew Morton
- <akpm@linux-foundation.org>,	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,	Bagas Sanjaya
- <bagasdotme@gmail.com>,	Ben Gardon <bgardon@google.com>,	Catalin Marinas
- <catalin.marinas@arm.com>,	Cornelia Huck <cohuck@redhat.com>,	Fuad Tabba
- <tabba@google.com>,	Gavin Shan <gshan@redhat.com>,	Jakub Kicinski
- <kuba@kernel.org>,	James Morse <james.morse@arm.com>,
-	"Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,	Marek Szyprowski
- <m.szyprowski@samsung.com>,	Mark Brown <broonie@kernel.org>,	Mark Rutland
- <mark.rutland@arm.com>,	Oliver Upton <oliver.upton@linux.dev>,	Peter
- Collingbourne <pcc@google.com>,	Peter Xu <peterx@redhat.com>,	Philippe
- =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@linaro.org>,	Quentin Perret
- <qperret@google.com>,	Reiji Watanabe <reijiw@google.com>,	Ricardo Koller
- <ricarkol@google.com>,	Ryan Roberts <ryan.roberts@arm.com>,	Sean
- Christopherson <seanjc@google.com>,	Steven Price <steven.price@arm.com>,
-	Usama Arif <usama.arif@bytedance.com>,	Vincent Donnefort
- <vdonnefort@google.com>,	Will Deacon <will@kernel.org>,	Zhiyuan Dai
- <daizhiyuan@phytium.com.cn>,	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	linux-arm-kernel@lists.infradead.org,	kvmarm@lists.cs.columbia.edu,
-	kvmarm@lists.linux.dev,	kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
-In-Reply-To: <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
-References: <20221205155845.233018-1-maz@kernel.org>
-	<3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	b=qRIcMQCwDmVZNhlpkWVRJs/nQLMVUAvL9eRaMaYyaMnnf2+sjb8aygYUii4K0LK/X
+	 auQnVEcuSDIThBsj2lR3GrRhICBC7iGHtyeKOU4frbkn5PldHfiL+A46dMPjpgX4qT
+	 +evP3xqEwcYK/aLkHWfexqzpprL0bthGEBZ4rXVB2f+crECWef27CNoXrqtK8URWLv
+	 zB48iTD79pBXqsf40UoedN11VbkE5nSFjElEyml82y9um6pLcpCePX2H1Lfy0R4cIe
+	 P+DTX/remer6Cnk4osbsipfjTRdAb6TT1oGbTDhijpNIiGUXOP/W5/QL0K3h6LMq3p
+	 eW247JDsmJILg==
+Date: Wed, 7 Dec 2022 07:49:04 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Mark Brown <broonie@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Marc
+ Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ linux-next@vger.kernel.org, linux-kselftest@vger.kernel.org, Sean
+ Christopherson <seanjc@google.com>, Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH] KVM: selftests: Fix build due to ucall_uninit() removal
+Message-ID: <20221207074904.2f9d04ed@canb.auug.org.au>
+In-Reply-To: <20221206181506.252537-1-broonie@kernel.org>
+References: <20221206181506.252537-1-broonie@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, andrew.jones@linux.dev, akpm@linux-foundation.org, anshuman.khandual@arm.com, acme@kernel.org, bagasdotme@gmail.com, bgardon@google.com, catalin.marinas@arm.com, cohuck@redhat.com, tabba@google.com, gshan@redhat.com, kuba@kernel.org, james.morse@arm.com, maciej.szmigiero@oracle.com, m.szyprowski@samsung.com, broonie@kernel.org, mark.rutland@arm.com, oliver.upton@linux.dev, pcc@google.com, peterx@redhat.com, philmd@linaro.org, qperret@google.com, reijiw@google.com, ricarkol@google.com, ryan.roberts@arm.com, seanjc@google.com, steven.price@arm.com, usama.arif@bytedance.com, vdonnefort@google.com, will@kernel.org, daizhiyuan@phytium.com.cn, suzuki.poulose@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221206192739.RJaml3NbWLLFh5mrf8EUHHuck8ME45B1j1duLUxSqhM@z>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/u+q73nYgMy+BGDygpKgn=gy";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Tue, 06 Dec 2022 17:41:21 +0000,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
-> On 12/5/22 16:58, Marc Zyngier wrote:
-> > - There is a lot of selftest conflicts with your own branch, see:
-> > 
-> >    https://lore.kernel.org/r/20221201112432.4cb9ae42@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201113626.438f13c5@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201115741.7de32422@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201120939.3c19f004@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201131623.18ebc8d8@canb.auug.org.au
-> > 
-> >    for a rather exhaustive collection.
-> 
-> Yeah, I saw them in Stephen's messages but missed your reply.
-> 
-> In retrospect, at least Gavin's series for memslot_perf_test should have
-> been applied by both of us with a topic branch, but there's so many
-> conflicts all over the place that it's hard to single out one series.
-> It just happens.
+--Sig_/u+q73nYgMy+BGDygpKgn=gy
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-I generally queue things on topic branches for my own sanity, happy to
-make them available in the future.
+Hi Mark,
 
-> 
-> The only conflict in non-x86 code is the following one, please check
-> if I got it right.
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> index 05bb6a6369c2..0cda70bef5d5 100644
+On Tue,  6 Dec 2022 18:15:06 +0000 Mark Brown <broonie@kernel.org> wrote:
+>
+> Today's -next fails to build on arm64 due to:
+>=20
+> In file included from include/kvm_util.h:11,
+>                  from aarch64/page_fault_test.c:15:
+> include/ucall_common.h:36:47: note: expected =E2=80=98vm_paddr_t=E2=80=99=
+ {aka =E2=80=98long unsigned int=E2=80=99} but argument is of type =E2=80=
+=98void *=E2=80=99
+>    36 | void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
+>       |                                    ~~~~~~~~~~~^~~~~~~~
+> aarch64/page_fault_test.c:725:2: warning: implicit declaration of functio=
+n =E2=80=98ucall_uninit=E2=80=99; did you mean =E2=80=98ucall_init=E2=80=99=
+? [-Wimplicit-function-declaration]
+>   725 |  ucall_uninit(vm);
+>       |  ^~~~~~~~~~~~
+>       |  ucall_init
+>=20
+> which is caused by commit
+>=20
+> interacting poorly with commit
+>=20
+>    28a65567acb5 ("KVM: selftests: Drop now-unnecessary ucall_uninit()")
+>=20
+> As is done for other ucall_uninit() users remove the call in the newly ad=
+ded
+> page_fault_test.c.
+>=20
+> Fixes: 28a65567acb5 ("KVM: selftests: Drop now-unnecessary ucall_uninit()=
+")
+> Fixes: 35c581015712 ("KVM: selftests: aarch64: Add aarch64/page_fault_tes=
+t")
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Ricardo Koller <ricarkol@google.com>
+> Cc: Marc Zyngier <maz@kernel.org>
+> ---
+>  tools/testing/selftests/kvm/aarch64/page_fault_test.c | 1 -
+>  1 file changed, 1 deletion(-)
+>=20
+> diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tool=
+s/testing/selftests/kvm/aarch64/page_fault_test.c
+> index 05bb6a6369c2..4ef89c57a937 100644
 > --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
 > +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> @@ -609,6 +609,8 @@ static void setup_memslots(struct kvm_vm *vm, struct test_params *p)
->  				    data_size / guest_page_size,
->  				    p->test_desc->data_memslot_flags);
->  	vm->memslots[MEM_REGION_TEST_DATA] = TEST_DATA_MEMSLOT;
-> +
-> +	ucall_init(vm, data_gpa + data_size);
->  }
->   static void setup_default_handlers(struct test_desc *test)
-> @@ -704,8 +706,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->   	setup_gva_maps(vm);
->  -	ucall_init(vm, NULL);
-> -
->  	reset_event_counts();
->   	/*
-> 
-> 
-> Special care is needed here because the test uses ____vm_create().
-> 
-> I haven't pushed to kvm/next yet to give you time to check, so the
-> merge is currently in kvm/queue only.
+> @@ -722,7 +722,6 @@ static void run_test(enum vm_guest_mode mode, void *a=
+rg)
+> =20
+>  	vcpu_run_loop(vm, vcpu, test);
+> =20
+> -	ucall_uninit(vm);
+>  	kvm_vm_free(vm);
+>  	free_uffd(test, pt_uffd, data_uffd);
+> =20
+> --=20
+> 2.30.2
+>=20
 
-There has been a couple of -next failures reported by broonie:
+Also added to my merge of the kvm-arm tree.
 
-https://lore.kernel.org/r/20221206175916.250104-1-broonie@kernel.org
-https://lore.kernel.org/r/20221206181506.252537-1-broonie@kernel.org
+--=20
+Cheers,
+Stephen Rothwell
 
-which I think you've received as well. The second patch is definitely
-needed, but you've already solved the first one. At least things do
-build.
+--Sig_/u+q73nYgMy+BGDygpKgn=gy
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-> 
-> > - For the 6.3 cycle, we are going to experiment with Oliver taking
-> >    care of most of the patch herding. I'm sure he'll do a great job,
-> >    but if there is the odd mistake, please cut him some slack and blame
-> >    me instead.
-> 
-> Absolutely - you both have all the slack you need, synchronization
-> is harder than it seems.
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmOPqsAACgkQAVBC80lX
+0Gzv6gf9HsGS9Vbvxo9vuMbxYJqAD20wjHAVefhsKNGFjF8FQp55Qv9m6GHNTbof
+Aq6BzMYB4R2R0Ey+EwAXpnIYuaC2oxfjI//BFvOzrPg7KPkAJWYro9G7nzMIJICQ
+vNB+5MPf1cbYwIFdb5uQzQ6EzvmnGXBltR9RaARRm8tUSiG2VJi6ZFRcIAt6gBFE
+DRCNGknoOu9ede/ovkWzaRA4fXAx2ngmErvqRHiDiEzLULKhpVBHI45RwOGq5KyN
+4tQZA99I5faC/i6cFk8AP0reXJj3mIniuyKMAqM+BJjoAmIR18QgFNJv1GI5bYej
+TFvYgFqcKbH2lNp3hfHwBvep2I37KQ==
+=296z
+-----END PGP SIGNATURE-----
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+--Sig_/u+q73nYgMy+BGDygpKgn=gy--
