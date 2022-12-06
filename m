@@ -1,20 +1,20 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E66A6AB3
-	for <kvmarm@lists.linux.dev>; Tue,  6 Dec 2022 13:12:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFD76C43470;
-	Tue,  6 Dec 2022 13:12:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED816AB3
+	for <kvmarm@lists.linux.dev>; Tue,  6 Dec 2022 13:12:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD0CAC433B5;
+	Tue,  6 Dec 2022 13:12:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670332341;
-	bh=BQ7I6eN+6GZ/o5t5Vk4K6cshxfRrAyFnFSi5m4uTojg=;
+	s=k20201202; t=1670332344;
+	bh=AVe3iiTcAbKWYIlJRS5PBz2jo1fL/vp6GINYGTQfy/0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CVXFCmitgr1jR7vDk5LgZNioDJXpiVxYCvhCCxyLNrmaNUd5dCzUjJnGsIrAnGaHD
-	 Sxuea4iqB9Nkm4EYIBfV1z683mTqG2GjyNY+3ERPyr102FFCi8Ca8Io6avfeXjf6c+
-	 BYdZrQ/8GnB1K4Sox4MxWl5DDs4eQ3EpGyQgUPuZ3xGssIy58JtgSN7WzpzWG3VWMu
-	 HJkr8Dswr8DzvKRtBmqFtAkww6lj4bfWPf7jdH87xuMtK3UJSacW7YkQT41rwl/qDM
-	 Y2+py5PG+saErCpqvSya3qHbLVwJs6kWnqfFGDCt4gYj2lrrGyjGeDQNONnqGUEH1z
-	 t/Jjs+96sj/xA==
+	b=a/n9oRjWp3hVoZkKoFtw44s+n8U05UfdmNuN8tUuZLtm+k/hQ6X/0Idt8++DeeMZD
+	 I3RrBj4s37ig9GtHOL9kXN8o0DW4D7wp3QztNVivIBj37uzJOLmGzqir0Ha8MzWWdm
+	 NFvf0xTgH90IRKTXXfz8oAa8F6PM2hGaadYQGs+XpJsfex5CGEccCICLOB9GobjFjq
+	 rt8IOWH1Q8IYp873GolOeDVXRMBqTPrtQbtm2RdcEsM4d/F+pE+dulmXL9TLJGIRzd
+	 1MtW1KTVkFy4tycNeVRLQv5FimvVELezUWr/1N3U6WU81Txgwcz0xW3w7sUHEUIToi
+	 6HISLorjSCvng==
 From: Mark Brown <broonie@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
@@ -22,9 +22,9 @@ To: Catalin Marinas <catalin.marinas@arm.com>,
 Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v1 2/3] arm64/sysreg: Add definition of ISR_EL1
-Date: Tue,  6 Dec 2022 13:11:43 +0000
-Message-Id: <20221206131144.115774-3-broonie@kernel.org>
+Subject: [PATCH v1 3/3] KVM: arm64: Use symbolic definition for ISR_EL1.A
+Date: Tue,  6 Dec 2022 13:11:44 +0000
+Message-Id: <20221206131144.115774-4-broonie@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20221206131144.115774-1-broonie@kernel.org>
 References: <20221206131144.115774-1-broonie@kernel.org>
@@ -34,39 +34,33 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=701; i=broonie@kernel.org; h=from:subject; bh=BQ7I6eN+6GZ/o5t5Vk4K6cshxfRrAyFnFSi5m4uTojg=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjjz+OOOLN0FUshrdiNy93qhEC4keUgDrC3s0fn6P4 8eod0BiJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY48/jgAKCRAk1otyXVSH0L/CCA CAz0XVylfIZgbfAjJ87ngX5TtMzF3DH/2utr4FxakBF+l2eMSvDFBBt9crffAnMtlF+XjVEYQusboj WUOXWCzy7RUl5fnqWcPhcV/HwGPPo1x0qIVVozd98drjZ73xM90jTGzBEeAEq5XCvww4c5/sLPT/D+ 9nfr5/HMqVwDjGEUsIwK5mRPasb/uv53doU+qixgLSj1uINbDFyCwuUf1YkIXAR4OxMDjTf7DMqEnh EAVycx2BeWVqk+BHgfEdvScto4zJ9u2u/sW9rkp8V0fdPE9BdhJ9AiCQ7LStSNgToo4Bf4Yz0helvf Z58MuuWKRjSsI+QpKvMz0CtEIkElYp
+X-Developer-Signature: v=1; a=openpgp-sha256; l=785; i=broonie@kernel.org; h=from:subject; bh=AVe3iiTcAbKWYIlJRS5PBz2jo1fL/vp6GINYGTQfy/0=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjjz+PEDbA0FWCwhiG58UgillOZPpPuoxIY+XVoNlP Zkzt/hmJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY48/jwAKCRAk1otyXVSH0J+LB/ 995JdhCfzbXIRne8vdTjY8reBTt6cnMe01V8k2YY3RYVnq3pAzL9X1kSGRujf5kvO7r1FabBUitZrT 04z8IsKj2dL1TkpPgycE15+qp2lRfHV6k6f9cMQgsBqJeA1FFaNCUIJXyH7erhvItDrc8TbIZUDkaI Ju5W71KUJiZ+8ipTvnBEvJVYWJZb8pF4JUSY+GQXr3QlaBPKWN6M3njAt7Kl5SOpqG49nusHv5bxX+ YtNO+wj59crPS2V8Dphgx5DWnzGj3vm70lu/bDQPQTwZxH502Y5lv2U9ZLcgziYM2PSO6zA7NFDMUm 1v1eWxApmk+ISBiftXyb2s4MWYHMQN
 X-Developer-Key: i=broonie@kernel.org; a=openpgp; fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 Content-Transfer-Encoding: 8bit
 
-Add a definition of ISR_EL1 as per DDI0487I.a. This register was not
-previously defined in sysreg.h, no functional changes.
+Now that we are generating ISR_EL1 we have acquired a constant for
+ISR_EL1.A, use it rather than the magic number we had been using in the KVM
+entry code.
 
+Suggested-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/tools/sysreg | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ arch/arm64/kvm/hyp/entry.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 5d0d2498c635..3660e680b7f5 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -1079,6 +1079,16 @@ Res0	15:8
- Field	7:0	LR
- EndSysreg
- 
-+Sysreg	ISR_EL1	3	0	12	1	0
-+Res0	63:11
-+Field	10	IS
-+Field	9	FS
-+Field	8	A
-+Field	7	I
-+Field	6	F
-+Res0	5:0
-+EndSysreg
-+
- Sysreg	ICC_NMIAR1_EL1	3	0	12	9	5
- Res0	63:24
- Field	23:0	INTID
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 435346ea1504..f3aa7738b477 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -171,7 +171,7 @@ alternative_else
+ 	dsb	sy		// Synchronize against in-flight ld/st
+ 	isb			// Prevent an early read of side-effect free ISR
+ 	mrs	x2, isr_el1
+-	tbnz	x2, #8, 2f	// ISR_EL1.A
++	tbnz	x2, #ISR_EL1_A_SHIFT, 2f
+ 	ret
+ 	nop
+ 2:
 -- 
 2.30.2
 
