@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8765848C
-	for <kvmarm@lists.linux.dev>; Tue,  6 Dec 2022 14:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00E38485
+	for <kvmarm@lists.linux.dev>; Tue,  6 Dec 2022 14:00:21 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3869223A;
-	Tue,  6 Dec 2022 06:00:26 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 17BDE113E;
+	Tue,  6 Dec 2022 06:00:28 -0800 (PST)
 Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.159])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D411C3F73D;
-	Tue,  6 Dec 2022 06:00:17 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B33A93F73D;
+	Tue,  6 Dec 2022 06:00:19 -0800 (PST)
 From: Ryan Roberts <ryan.roberts@arm.com>
 To: Marc Zyngier <maz@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
@@ -21,9 +21,9 @@ Cc: Ryan Roberts <ryan.roberts@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v1 09/12] KVM: arm64: Convert translation level parameter to s8
-Date: Tue,  6 Dec 2022 13:59:27 +0000
-Message-ID: <20221206135930.3277585-10-ryan.roberts@arm.com>
+Subject: [PATCH v1 10/12] KVM: arm64: Rework logic to en/decode VTCR_EL2.{SL0, SL2} fields
+Date: Tue,  6 Dec 2022 13:59:28 +0000
+Message-ID: <20221206135930.3277585-11-ryan.roberts@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20221206135930.3277585-1-ryan.roberts@arm.com>
 References: <20221206135930.3277585-1-ryan.roberts@arm.com>
@@ -34,584 +34,302 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Message-ID: <20221206135927.Ah2DdGn3fKPwkq4ACjaiA-OE3S0pDpJ4fHgV8II3tE4@z>
+Message-ID: <20221206135928.H5GGRFms7C4VbObW2cjhN2-wJfVUpwx-R6VlsZfhH1s@z>
 
-With the introduction of FEAT_LPA2, the Arm ARM adds a new level of
-translation, level -1, so levels can now be in the range [-1;3]. 3 is
-always the last level and the first level is determined based on the
-number of VA bits in use.
+In order to support 5 level translation, FEAT_LPA2 introduces the 1-bit
+SL2 field within VTCR_EL2 to extend the existing 2-bit SL0 field. The
+SL2[0]:SL0[1:0] encodings have no simple algorithmic relationship to the
+start levels they represent (that I can find, at least), so replace the
+existing macros with functions that do lookups to encode and decode the
+values. These new functions no longer make hardcoded assumptions about
+the maximum level and instead rely on KVM_PGTABLE_FIRST_LEVEL and
+KVM_PGTABLE_LAST_LEVEL.
 
-Convert level variables to use a signed type in preparation for
-supporting this new level -1.
+This is preparatory work for enabling 52-bit IPA for 4KB and 16KB pages
+with FEAT_LPA2.
 
-Since the last level is always anchored at 3, and the first level varies
-to suit the number of VA/IPA bits, take the opportunity to replace
-KVM_PGTABLE_MAX_LEVELS with the 2 macros KVM_PGTABLE_FIRST_LEVEL and
-KVM_PGTABLE_LAST_LEVEL. This removes the assumption from the code that
-levels run from 0 to KVM_PGTABLE_MAX_LEVELS - 1, which will soon no
-longer be true.
-
-No behavioral changes intended.
+No functional change intended.
 
 Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h  |  2 +-
- arch/arm64/include/asm/kvm_pgtable.h  | 21 +++---
- arch/arm64/include/asm/kvm_pkvm.h     |  5 +-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c |  6 +-
- arch/arm64/kvm/hyp/nvhe/setup.c       |  4 +-
- arch/arm64/kvm/hyp/pgtable.c          | 94 ++++++++++++++-------------
- arch/arm64/kvm/mmu.c                  | 11 ++--
- 7 files changed, 75 insertions(+), 68 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h        | 75 ++++++++++++++-----------
+ arch/arm64/include/asm/kvm_pgtable.h    | 33 +++++++++++
+ arch/arm64/include/asm/stage2_pgtable.h | 13 ++++-
+ arch/arm64/kvm/hyp/pgtable.c            | 67 +++++++++++++++++++++-
+ 4 files changed, 150 insertions(+), 38 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 9bdba47f7e14..270f49e7f29a 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -341,7 +341,7 @@ static __always_inline u8 kvm_vcpu_trap_get_fault_type(const struct kvm_vcpu *vc
- 	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC_TYPE;
- }
- 
--static __always_inline u8 kvm_vcpu_trap_get_fault_level(const struct kvm_vcpu *vcpu)
-+static __always_inline s8 kvm_vcpu_trap_get_fault_level(const struct kvm_vcpu *vcpu)
- {
- 	return kvm_vcpu_get_esr(vcpu) & ESR_ELx_FSC_LEVEL;
- }
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index d6f4dcdd00fd..a282a3d5ddbc 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -11,7 +11,8 @@
- #include <linux/kvm_host.h>
- #include <linux/types.h>
- 
--#define KVM_PGTABLE_MAX_LEVELS		4U
-+#define KVM_PGTABLE_FIRST_LEVEL		0
-+#define KVM_PGTABLE_LAST_LEVEL		3
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index f9619a10d5d9..94bbb05e348f 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -150,58 +150,65 @@
+ 				 VTCR_EL2_IRGN0_WBWA | VTCR_EL2_RES1)
  
  /*
-  * The largest supported block sizes for KVM (no 52-bit PA support):
-@@ -20,9 +21,9 @@
-  *  - 64K (level 2):	512MB
+- * VTCR_EL2:SL0 indicates the entry level for Stage2 translation.
+- * Interestingly, it depends on the page size.
+- * See D.10.2.121, VTCR_EL2, in ARM DDI 0487C.a
++ * VTCR_EL2.{SL0, SL2} indicates the entry level for Stage2 translation.
++ * Interestingly, it depends on the page size. See D17.2.157, VTCR_EL2, in ARM
++ * DDI 0487I.a
+  *
+- *	-----------------------------------------
+- *	| Entry level		|  4K  | 16K/64K |
+- *	------------------------------------------
+- *	| Level: 0		|  2   |   -     |
+- *	------------------------------------------
+- *	| Level: 1		|  1   |   2     |
+- *	------------------------------------------
+- *	| Level: 2		|  0   |   1     |
+- *	------------------------------------------
+- *	| Level: 3		|  -   |   0     |
+- *	------------------------------------------
++ *      ----------------------------------------------------------
++ *      | Entry level           |    4K    |    16K   |    64K   |
++ *      |                       |  SL2:SL0 |  SL2:SL0 |  SL2:SL0 |
++ *      ----------------------------------------------------------
++ *      | Level: -1             |  0b100   |     -    |     -    |
++ *      ----------------------------------------------------------
++ *      | Level: 0              |  0b010   |  0b011   |     -    |
++ *      ----------------------------------------------------------
++ *      | Level: 1              |  0b001   |  0b010   |  0b010   |
++ *      ----------------------------------------------------------
++ *      | Level: 2              |  0b000   |  0b001   |  0b001   |
++ *      ----------------------------------------------------------
++ *      | Level: 3              |  0b011   |  0b000   |  0b000   |
++ *      ----------------------------------------------------------
+  *
+- * The table roughly translates to :
+- *
+- *	SL0(PAGE_SIZE, Entry_level) = TGRAN_SL0_BASE - Entry_Level
+- *
+- * Where TGRAN_SL0_BASE is a magic number depending on the page size:
+- * 	TGRAN_SL0_BASE(4K) = 2
+- *	TGRAN_SL0_BASE(16K) = 3
+- *	TGRAN_SL0_BASE(64K) = 3
+- * provided we take care of ruling out the unsupported cases and
+- * Entry_Level = 4 - Number_of_levels.
++ * There is no concise algorithm to convert between the SLx encodings and the
++ * level numbers, so we implement 2 helpers kvm_vtcr_el2_sl_encode()
++ * kvm_vtcr_el2_sl_decode() which can convert between the representations. These
++ * helpers use a concatenated form of SLx: SL2[0]:SL0[1:0] as the 3 LSBs in u8.
++ * If an invalid input value is provided, VTCR_EL2_SLx_ENC_INVAL is returned. We
++ * declare the appropriate encoded values here for the compiled in page size.
+  *
++ * See kvm_pgtable.h for documentation on the helpers.
   */
- #ifdef CONFIG_ARM64_4K_PAGES
--#define KVM_PGTABLE_MIN_BLOCK_LEVEL	1U
-+#define KVM_PGTABLE_MIN_BLOCK_LEVEL	1
- #else
--#define KVM_PGTABLE_MIN_BLOCK_LEVEL	2U
-+#define KVM_PGTABLE_MIN_BLOCK_LEVEL	2
++#define VTCR_EL2_SLx_ENC_INVAL		255
++
+ #ifdef CONFIG_ARM64_64K_PAGES
+ 
+ #define VTCR_EL2_TGRAN			VTCR_EL2_TG0_64K
+-#define VTCR_EL2_TGRAN_SL0_BASE		3UL
++#define VTCR_EL2_SLx_ENC_Lm1		VTCR_EL2_SLx_ENC_INVAL
++#define VTCR_EL2_SLx_ENC_L0		VTCR_EL2_SLx_ENC_INVAL
++#define VTCR_EL2_SLx_ENC_Lp1		2
++#define VTCR_EL2_SLx_ENC_Lp2		1
++#define VTCR_EL2_SLx_ENC_Lp3		0
+ 
+ #elif defined(CONFIG_ARM64_16K_PAGES)
+ 
+ #define VTCR_EL2_TGRAN			VTCR_EL2_TG0_16K
+-#define VTCR_EL2_TGRAN_SL0_BASE		3UL
++#define VTCR_EL2_SLx_ENC_Lm1		VTCR_EL2_SLx_ENC_INVAL
++#define VTCR_EL2_SLx_ENC_L0		3
++#define VTCR_EL2_SLx_ENC_Lp1		2
++#define VTCR_EL2_SLx_ENC_Lp2		1
++#define VTCR_EL2_SLx_ENC_Lp3		0
+ 
+ #else	/* 4K */
+ 
+ #define VTCR_EL2_TGRAN			VTCR_EL2_TG0_4K
+-#define VTCR_EL2_TGRAN_SL0_BASE		2UL
++#define VTCR_EL2_SLx_ENC_Lm1		4
++#define VTCR_EL2_SLx_ENC_L0		2
++#define VTCR_EL2_SLx_ENC_Lp1		1
++#define VTCR_EL2_SLx_ENC_Lp2		0
++#define VTCR_EL2_SLx_ENC_Lp3		3
+ 
  #endif
  
- static inline bool kvm_supports_hyp_lpa2(void)
-@@ -84,18 +85,18 @@ static inline bool kvm_pte_valid(kvm_pte_t pte)
- 	return pte & KVM_PTE_VALID;
- }
+-#define VTCR_EL2_LVLS_TO_SL0(levels)	\
+-	((VTCR_EL2_TGRAN_SL0_BASE - (4 - (levels))) << VTCR_EL2_SL0_SHIFT)
+-#define VTCR_EL2_SL0_TO_LVLS(sl0)	\
+-	((sl0) + 4 - VTCR_EL2_TGRAN_SL0_BASE)
+-#define VTCR_EL2_LVLS(vtcr)		\
+-	VTCR_EL2_SL0_TO_LVLS(((vtcr) & VTCR_EL2_SL0_MASK) >> VTCR_EL2_SL0_SHIFT)
+-
+ #define VTCR_EL2_FLAGS			(VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN)
+ #define VTCR_EL2_IPA(vtcr)		(64 - ((vtcr) & VTCR_EL2_T0SZ_MASK))
  
--static inline u64 kvm_granule_shift(u32 level)
-+static inline u64 kvm_granule_shift(s8 level)
- {
--	/* Assumes KVM_PGTABLE_MAX_LEVELS is 4 */
-+	/* Assumes KVM_PGTABLE_LAST_LEVEL is 3 */
- 	return ARM64_HW_PGTABLE_LEVEL_SHIFT(level);
- }
- 
--static inline u64 kvm_granule_size(u32 level)
-+static inline u64 kvm_granule_size(s8 level)
- {
- 	return BIT(kvm_granule_shift(level));
- }
- 
--static inline bool kvm_level_supports_block_mapping(u32 level)
-+static inline bool kvm_level_supports_block_mapping(s8 level)
- {
- 	return level >= KVM_PGTABLE_MIN_BLOCK_LEVEL;
- }
-@@ -202,7 +203,7 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index a282a3d5ddbc..3e0b64052c51 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -328,6 +328,39 @@ int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
   */
- struct kvm_pgtable {
- 	u32					ia_bits;
--	u32					start_level;
-+	s8					start_level;
- 	kvm_pte_t				*pgd;
- 	struct kvm_pgtable_mm_ops		*mm_ops;
- 	bool					lpa2_ena;
-@@ -245,7 +246,7 @@ enum kvm_pgtable_walk_flags {
- };
+ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
  
- typedef int (*kvm_pgtable_visitor_fn_t)(struct kvm_pgtable *pgt,
--					u64 addr, u64 end, u32 level,
-+					u64 addr, u64 end, s8 level,
- 					kvm_pte_t *ptep,
- 					enum kvm_pgtable_walk_flags flag,
- 					void * const arg);
-@@ -581,7 +582,7 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
-  * Return: 0 on success, negative error code on failure.
-  */
- int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
--			 kvm_pte_t *ptep, u32 *level);
-+			 kvm_pte_t *ptep, s8 *level);
- 
++/**
++ * kvm_vtcr_el2_sl_encode() - Helper to encode start level for vtcr_el2.
++ * @sl_dec:     Start level to be encoded.
++ *
++ * Takes an unencoded translation start level value and returns it encoded for
++ * use in vtcr_el2 register. The returned value has SL0 (a 2 bit field) in bits
++ * [1:0] and SL2 (a 1 bit field) in bit [2]. The user is responsible for
++ * extracting and packing in the correct locations of vctr_el2.
++ *
++ * Do not call this function with a value that is out of range for the page size
++ * in operation. A warning will be output if this is detected and the function
++ * returns VTCR_EL2_SLx_ENC_INVAL. See comment in kvm_arm.h for more info.
++ *
++ * Return: 3 bit value containing SL2[0]:SL0[1:0], or VTCR_EL2_SLx_ENC_INVAL.
++ */
++u8 kvm_vtcr_el2_sl_encode(s8 sl_dec);
++
++/**
++ * kvm_vtcr_el2_sl_decode() - Helper to decode start level for vtcr_el2.
++ * @sl_enc:     Start level encoded as SL2[0]:SL0[1:0].
++ *
++ * Takes an encoded translation start level value, as used in the vtcr_el2
++ * register and returns it decoded. See kvm_vtcr_el2_sl_encode() for description
++ * of input encoding.
++ *
++ * Do not call this function with a value that is invalid for the page size in
++ * operation. A warning will be output if this is detected and the function
++ * returns VTCR_EL2_SLx_ENC_INVAL. See comment in kvm_arm.h for more info.
++ *
++ * Return: Decoded start level, or VTCR_EL2_SLx_ENC_INVAL.
++ */
++s8 kvm_vtcr_el2_sl_decode(u8 sl_enc);
++
  /**
-  * kvm_pgtable_stage2_pte_prot() - Retrieve the protection attributes of a
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 9f4ad2a8df59..addcf63cf8d5 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -16,10 +16,11 @@ extern unsigned int kvm_nvhe_sym(hyp_memblock_nr);
+  * kvm_get_vtcr() - Helper to construct VTCR_EL2
+  * @mmfr0:	Sanitized value of SYS_ID_AA64MMFR0_EL1 register.
+diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
+index c8dca8ae359c..02c5e04d4958 100644
+--- a/arch/arm64/include/asm/stage2_pgtable.h
++++ b/arch/arm64/include/asm/stage2_pgtable.h
+@@ -21,7 +21,18 @@
+  * (IPA_SHIFT - 4).
+  */
+ #define stage2_pgtable_levels(ipa)	ARM64_HW_PGTABLE_LEVELS((ipa) - 4)
+-#define kvm_stage2_levels(kvm)		VTCR_EL2_LVLS(kvm->arch.vtcr)
++static inline s8 kvm_stage2_levels(struct kvm *kvm)
++{
++	u64 vtcr = kvm->arch.vtcr;
++	u8 slx;
++	s8 start_level;
++
++	slx = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
++	slx |= FIELD_GET(VTCR_EL2_SL2_MASK, vtcr) << 2;
++	start_level = kvm_vtcr_el2_sl_decode(slx);
++
++	return KVM_PGTABLE_LAST_LEVEL + 1 - start_level;
++}
  
- static inline unsigned long __hyp_pgtable_max_pages(unsigned long nr_pages)
- {
--	unsigned long total = 0, i;
-+	unsigned long total = 0;
-+	int i;
- 
- 	/* Provision the worst case scenario */
--	for (i = 0; i < KVM_PGTABLE_MAX_LEVELS; i++) {
-+	for (i = KVM_PGTABLE_FIRST_LEVEL; i <= KVM_PGTABLE_LAST_LEVEL; i++) {
- 		nr_pages = DIV_ROUND_UP(nr_pages, PTRS_PER_PTE);
- 		total += nr_pages;
- 	}
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 43e729694deb..96a5567a9db3 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -281,7 +281,7 @@ static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
- {
- 	struct kvm_mem_range cur;
- 	kvm_pte_t pte;
--	u32 level;
-+	s8 level;
- 	int ret;
- 
- 	hyp_assert_lock_held(&host_kvm.lock);
-@@ -300,7 +300,7 @@ static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
- 		cur.start = ALIGN_DOWN(addr, granule);
- 		cur.end = cur.start + granule;
- 		level++;
--	} while ((level < KVM_PGTABLE_MAX_LEVELS) &&
-+	} while ((level <= KVM_PGTABLE_LAST_LEVEL) &&
- 			!(kvm_level_supports_block_mapping(level) &&
- 			  range_included(&cur, range)));
- 
-@@ -416,7 +416,7 @@ struct check_walk_data {
- };
- 
- static int __check_page_state_visitor(struct kvm_pgtable *pgt,
--				      u64 addr, u64 end, u32 level,
-+				      u64 addr, u64 end, s8 level,
- 				      kvm_pte_t *ptep,
- 				      enum kvm_pgtable_walk_flags flag,
- 				      void * const arg)
-diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index b44e87b9d168..0355c53b3530 100644
---- a/arch/arm64/kvm/hyp/nvhe/setup.c
-+++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -187,7 +187,7 @@ static void hpool_put_page(void *addr)
- }
- 
- static int finalize_host_mappings_walker(struct kvm_pgtable *pgt,
--					 u64 addr, u64 end, u32 level,
-+					 u64 addr, u64 end, s8 level,
- 					 kvm_pte_t *ptep,
- 					 enum kvm_pgtable_walk_flags flag,
- 					 void * const arg)
-@@ -210,7 +210,7 @@ static int finalize_host_mappings_walker(struct kvm_pgtable *pgt,
- 	if (flag != KVM_PGTABLE_WALK_LEAF)
- 		return 0;
- 
--	if (level != (KVM_PGTABLE_MAX_LEVELS - 1))
-+	if (level != KVM_PGTABLE_LAST_LEVEL)
- 		return -EINVAL;
- 
- 	phys = kvm_pte_to_phys(pgt, pte);
+ /*
+  * kvm_mmmu_cache_min_pages() is the number of pages required to install
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index cde852f91db8..274f839bd0d7 100644
+index 274f839bd0d7..8ebd9aaed2c4 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -68,7 +68,7 @@ static bool kvm_phys_is_valid(struct kvm_pgtable *pgt, u64 phys)
- }
- 
- static bool kvm_block_mapping_supported(struct kvm_pgtable *pgt,
--					u64 addr, u64 end, u64 phys, u32 level)
-+					u64 addr, u64 end, u64 phys, s8 level)
- {
- 	u64 granule = kvm_granule_size(level);
- 
-@@ -84,7 +84,7 @@ static bool kvm_block_mapping_supported(struct kvm_pgtable *pgt,
- 	return IS_ALIGNED(addr, granule);
- }
- 
--static u32 kvm_pgtable_idx(struct kvm_pgtable_walk_data *data, u32 level)
-+static u32 kvm_pgtable_idx(struct kvm_pgtable_walk_data *data, s8 level)
- {
- 	u64 shift = kvm_granule_shift(level);
- 	u64 mask = BIT(PAGE_SHIFT - 3) - 1;
-@@ -105,7 +105,7 @@ static u32 kvm_pgd_page_idx(struct kvm_pgtable_walk_data *data)
- 	return __kvm_pgd_page_idx(data->pgt, data->addr);
- }
- 
--static u32 kvm_pgd_pages(u32 ia_bits, u32 start_level)
-+static u32 kvm_pgd_pages(u32 ia_bits, s8 start_level)
- {
- 	struct kvm_pgtable pgt = {
- 		.ia_bits	= ia_bits,
-@@ -115,9 +115,9 @@ static u32 kvm_pgd_pages(u32 ia_bits, u32 start_level)
- 	return __kvm_pgd_page_idx(&pgt, -1ULL) + 1;
- }
- 
--static bool kvm_pte_table(kvm_pte_t pte, u32 level)
-+static bool kvm_pte_table(kvm_pte_t pte, s8 level)
- {
--	if (level == KVM_PGTABLE_MAX_LEVELS - 1)
-+	if (level == KVM_PGTABLE_LAST_LEVEL)
- 		return false;
- 
- 	if (!kvm_pte_valid(pte))
-@@ -166,11 +166,11 @@ static void kvm_set_table_pte(struct kvm_pgtable *pgt,
- }
- 
- static kvm_pte_t kvm_init_valid_leaf_pte(struct kvm_pgtable *pgt,
--					 u64 pa, kvm_pte_t attr, u32 level)
-+					 u64 pa, kvm_pte_t attr, s8 level)
- {
- 	kvm_pte_t pte = kvm_phys_to_pte(pgt, pa);
--	u64 type = (level == KVM_PGTABLE_MAX_LEVELS - 1) ? KVM_PTE_TYPE_PAGE :
--							   KVM_PTE_TYPE_BLOCK;
-+	u64 type = (level == KVM_PGTABLE_LAST_LEVEL) ? KVM_PTE_TYPE_PAGE :
-+						       KVM_PTE_TYPE_BLOCK;
- 
- 	pte |= attr & (KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI);
- 	pte |= FIELD_PREP(KVM_PTE_TYPE, type);
-@@ -185,7 +185,7 @@ static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
- }
- 
- static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data, u64 addr,
--				  u32 level, kvm_pte_t *ptep,
-+				  s8 level, kvm_pte_t *ptep,
- 				  enum kvm_pgtable_walk_flags flag)
- {
- 	struct kvm_pgtable_walker *walker = data->walker;
-@@ -194,10 +194,10 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data, u64 addr,
- }
- 
- static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
--			      kvm_pte_t *pgtable, u32 level);
-+			      kvm_pte_t *pgtable, s8 level);
- 
- static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
--				      kvm_pte_t *ptep, u32 level)
-+				      kvm_pte_t *ptep, s8 level)
- {
- 	int ret = 0;
- 	u64 addr = data->addr;
-@@ -241,12 +241,12 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
- }
- 
- static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
--			      kvm_pte_t *pgtable, u32 level)
-+			      kvm_pte_t *pgtable, s8 level)
- {
- 	u32 idx;
- 	int ret = 0;
- 
--	if (WARN_ON_ONCE(level >= KVM_PGTABLE_MAX_LEVELS))
-+	if (WARN_ON_ONCE(level > KVM_PGTABLE_LAST_LEVEL))
- 		return -EINVAL;
- 
- 	for (idx = kvm_pgtable_idx(data, level); idx < PTRS_PER_PTE; ++idx) {
-@@ -302,11 +302,11 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 
- struct leaf_walk_data {
- 	kvm_pte_t	pte;
--	u32		level;
-+	s8		level;
+@@ -595,12 +595,67 @@ struct stage2_map_data {
+ 	bool				force_pte;
  };
  
- static int leaf_walker(struct kvm_pgtable *pgt,
--		       u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+		       u64 addr, u64 end, s8 level, kvm_pte_t *ptep,
- 		       enum kvm_pgtable_walk_flags flag, void * const arg)
- {
- 	struct leaf_walk_data *data = arg;
-@@ -318,7 +318,7 @@ static int leaf_walker(struct kvm_pgtable *pgt,
- }
- 
- int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
--			 kvm_pte_t *ptep, u32 *level)
-+			 kvm_pte_t *ptep, s8 *level)
- {
- 	struct leaf_walk_data data;
- 	struct kvm_pgtable_walker walker = {
-@@ -399,7 +399,7 @@ enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte)
- }
- 
- static bool hyp_map_walker_try_leaf(struct kvm_pgtable *pgt,
--				    u64 addr, u64 end, u32 level,
-+				    u64 addr, u64 end, s8 level,
- 				    kvm_pte_t *ptep, struct hyp_map_data *data)
- {
- 	kvm_pte_t new, old = *ptep;
-@@ -422,7 +422,7 @@ static bool hyp_map_walker_try_leaf(struct kvm_pgtable *pgt,
- }
- 
- static int hyp_map_walker(struct kvm_pgtable *pgt,
--			  u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+			  u64 addr, u64 end, s8 level, kvm_pte_t *ptep,
- 			  enum kvm_pgtable_walk_flags flag, void * const arg)
- {
- 	kvm_pte_t *childp;
-@@ -432,7 +432,7 @@ static int hyp_map_walker(struct kvm_pgtable *pgt,
- 	if (hyp_map_walker_try_leaf(pgt, addr, end, level, ptep, data))
- 		return 0;
- 
--	if (WARN_ON(level == KVM_PGTABLE_MAX_LEVELS - 1))
-+	if (WARN_ON(level == KVM_PGTABLE_LAST_LEVEL))
- 		return -EINVAL;
- 
- 	childp = (kvm_pte_t *)mm_ops->zalloc_page(NULL);
-@@ -472,7 +472,7 @@ struct hyp_unmap_data {
- };
- 
- static int hyp_unmap_walker(struct kvm_pgtable *pgt,
--			    u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+			    u64 addr, u64 end, s8 level, kvm_pte_t *ptep,
- 			    enum kvm_pgtable_walk_flags flag, void * const arg)
- {
- 	kvm_pte_t pte = *ptep, *childp = NULL;
-@@ -531,14 +531,18 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
- int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits,
- 			 struct kvm_pgtable_mm_ops *mm_ops, bool lpa2_ena)
- {
--	u64 levels = ARM64_HW_PGTABLE_LEVELS(va_bits);
-+	s8 start_level = KVM_PGTABLE_LAST_LEVEL + 1 -
-+			 ARM64_HW_PGTABLE_LEVELS(va_bits);
-+	if (start_level < KVM_PGTABLE_FIRST_LEVEL ||
-+	    start_level > KVM_PGTABLE_LAST_LEVEL)
-+		return -EINVAL;
- 
- 	pgt->pgd = (kvm_pte_t *)mm_ops->zalloc_page(NULL);
- 	if (!pgt->pgd)
- 		return -ENOMEM;
- 
- 	pgt->ia_bits		= va_bits;
--	pgt->start_level	= KVM_PGTABLE_MAX_LEVELS - levels;
-+	pgt->start_level	= start_level;
- 	pgt->mm_ops		= mm_ops;
- 	pgt->lpa2_ena		= lpa2_ena;
- 	pgt->mmu		= NULL;
-@@ -548,7 +552,7 @@ int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits,
- }
- 
- static int hyp_free_walker(struct kvm_pgtable *pgt,
--			   u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+			   u64 addr, u64 end, s8 level, kvm_pte_t *ptep,
- 			   enum kvm_pgtable_walk_flags flag, void * const arg)
- {
- 	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
-@@ -594,7 +598,7 @@ struct stage2_map_data {
++u8 kvm_vtcr_el2_sl_encode(s8 sl_dec)
++{
++	u8 sl_enc = VTCR_EL2_SLx_ENC_INVAL;
++
++	BUILD_BUG_ON(KVM_PGTABLE_FIRST_LEVEL < -1);
++	BUILD_BUG_ON(KVM_PGTABLE_LAST_LEVEL > 3);
++
++	switch (sl_dec) {
++	case -1:
++		sl_enc = VTCR_EL2_SLx_ENC_Lm1;
++		break;
++	case 0:
++		sl_enc = VTCR_EL2_SLx_ENC_L0;
++		break;
++	case 1:
++		sl_enc = VTCR_EL2_SLx_ENC_Lp1;
++		break;
++	case 2:
++		sl_enc = VTCR_EL2_SLx_ENC_Lp2;
++		break;
++	case 3:
++		sl_enc = VTCR_EL2_SLx_ENC_Lp3;
++		break;
++	}
++
++	WARN_ON_ONCE(sl_enc == VTCR_EL2_SLx_ENC_INVAL);
++	return sl_enc;
++}
++
++s8 kvm_vtcr_el2_sl_decode(u8 sl_enc)
++{
++	s8 sl_dec = VTCR_EL2_SLx_ENC_INVAL;
++
++	BUILD_BUG_ON(KVM_PGTABLE_FIRST_LEVEL < -1);
++	BUILD_BUG_ON(KVM_PGTABLE_LAST_LEVEL > 3);
++
++	if (sl_enc == VTCR_EL2_SLx_ENC_Lm1)
++		sl_dec = -1;
++	else if (sl_enc == VTCR_EL2_SLx_ENC_L0)
++		sl_dec = 0;
++	else if (sl_enc == VTCR_EL2_SLx_ENC_Lp1)
++		sl_dec = 1;
++	else if (sl_enc == VTCR_EL2_SLx_ENC_Lp2)
++		sl_dec = 2;
++	else if (sl_enc == VTCR_EL2_SLx_ENC_Lp3)
++		sl_dec = 3;
++
++	if (WARN_ON_ONCE(sl_dec == VTCR_EL2_SLx_ENC_INVAL ||
++			 sl_enc == VTCR_EL2_SLx_ENC_INVAL))
++		sl_dec = VTCR_EL2_SLx_ENC_INVAL;
++
++	return sl_dec;
++}
++
  u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
  {
  	u64 vtcr = VTCR_EL2_FLAGS;
--	u8 lvls;
-+	s8 levels;
+ 	s8 levels;
  	u64 parange;
  	bool lpa2_ena = false;
++	u8 slx;
  
-@@ -618,10 +622,10 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
- 	 * Use a minimum 2 level page table to prevent splitting
- 	 * host PMD huge pages at stage2.
- 	 */
--	lvls = stage2_pgtable_levels(phys_shift);
--	if (lvls < 2)
--		lvls = 2;
--	vtcr |= VTCR_EL2_LVLS_TO_SL0(lvls);
-+	levels = stage2_pgtable_levels(phys_shift);
-+	if (levels < 2)
-+		levels = 2;
-+	vtcr |= VTCR_EL2_LVLS_TO_SL0(levels);
+ 	/*
+ 	 * If stage 2 reports that it supports FEAT_LPA2 for our page size, then
+@@ -625,7 +680,9 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+ 	levels = stage2_pgtable_levels(phys_shift);
+ 	if (levels < 2)
+ 		levels = 2;
+-	vtcr |= VTCR_EL2_LVLS_TO_SL0(levels);
++	slx = kvm_vtcr_el2_sl_encode(KVM_PGTABLE_LAST_LEVEL + 1 - levels);
++	vtcr |= FIELD_PREP(VTCR_EL2_SL0_MASK, slx);
++	vtcr |= FIELD_PREP(VTCR_EL2_SL2_MASK, slx >> 2);
  
  	/*
  	 * Enable the Hardware Access Flag management, unconditionally
-@@ -716,7 +720,7 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
- }
- 
- static void stage2_put_pte(kvm_pte_t *ptep, struct kvm_s2_mmu *mmu, u64 addr,
--			   u32 level, struct kvm_pgtable_mm_ops *mm_ops)
-+			   s8 level, struct kvm_pgtable_mm_ops *mm_ops)
- {
- 	/*
- 	 * Clear the existing PTE, and perform break-before-make with
-@@ -742,17 +746,17 @@ static bool stage2_pte_executable(kvm_pte_t pte)
- }
- 
- static bool stage2_leaf_mapping_allowed(struct kvm_pgtable *pgt,
--					u64 addr, u64 end, u32 level,
-+					u64 addr, u64 end, s8 level,
- 					struct stage2_map_data *data)
- {
--	if (data->force_pte && (level < (KVM_PGTABLE_MAX_LEVELS - 1)))
-+	if (data->force_pte && level < KVM_PGTABLE_LAST_LEVEL)
- 		return false;
- 
- 	return kvm_block_mapping_supported(pgt, addr, end, data->phys, level);
- }
- 
- static int stage2_map_walker_try_leaf(struct kvm_pgtable *pgt,
--				      u64 addr, u64 end, u32 level,
-+				      u64 addr, u64 end, s8 level,
- 				      kvm_pte_t *ptep,
- 				      struct stage2_map_data *data)
- {
-@@ -798,7 +802,7 @@ static int stage2_map_walker_try_leaf(struct kvm_pgtable *pgt,
- }
- 
- static int stage2_map_walk_table_pre(struct kvm_pgtable *pgt,
--				     u64 addr, u64 end, u32 level,
-+				     u64 addr, u64 end, s8 level,
- 				     kvm_pte_t *ptep,
- 				     struct stage2_map_data *data)
- {
-@@ -822,7 +826,7 @@ static int stage2_map_walk_table_pre(struct kvm_pgtable *pgt,
- }
- 
- static int stage2_map_walk_leaf(struct kvm_pgtable *pgt,
--				u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+				u64 addr, u64 end, s8 level, kvm_pte_t *ptep,
- 				struct stage2_map_data *data)
- {
- 	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
-@@ -840,7 +844,7 @@ static int stage2_map_walk_leaf(struct kvm_pgtable *pgt,
- 	if (ret != -E2BIG)
- 		return ret;
- 
--	if (WARN_ON(level == KVM_PGTABLE_MAX_LEVELS - 1))
-+	if (WARN_ON(level == KVM_PGTABLE_LAST_LEVEL))
- 		return -EINVAL;
- 
- 	if (!data->memcache)
-@@ -865,7 +869,7 @@ static int stage2_map_walk_leaf(struct kvm_pgtable *pgt,
- }
- 
- static int stage2_map_walk_table_post(struct kvm_pgtable *pgt,
--				      u64 addr, u64 end, u32 level,
-+				      u64 addr, u64 end, s8 level,
- 				      kvm_pte_t *ptep,
- 				      struct stage2_map_data *data)
- {
-@@ -911,7 +915,7 @@ static int stage2_map_walk_table_post(struct kvm_pgtable *pgt,
-  * pointer and clearing the anchor to NULL.
-  */
- static int stage2_map_walker(struct kvm_pgtable *pgt,
--			     u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+			     u64 addr, u64 end, s8 level, kvm_pte_t *ptep,
- 			     enum kvm_pgtable_walk_flags flag, void * const arg)
- {
- 	struct stage2_map_data *data = arg;
-@@ -984,7 +988,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
- }
- 
- static int stage2_unmap_walker(struct kvm_pgtable *pgt,
--			       u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+			       u64 addr, u64 end, s8 level, kvm_pte_t *ptep,
- 			       enum kvm_pgtable_walk_flags flag,
- 			       void * const arg)
- {
-@@ -1041,11 +1045,11 @@ struct stage2_attr_data {
- 	kvm_pte_t			attr_set;
- 	kvm_pte_t			attr_clr;
- 	kvm_pte_t			pte;
--	u32				level;
-+	s8				level;
- };
- 
- static int stage2_attr_walker(struct kvm_pgtable *pgt,
--			      u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+			      u64 addr, u64 end, s8 level, kvm_pte_t *ptep,
- 			      enum kvm_pgtable_walk_flags flag,
- 			      void * const arg)
- {
-@@ -1084,7 +1088,7 @@ static int stage2_attr_walker(struct kvm_pgtable *pgt,
- static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
- 				    u64 size, kvm_pte_t attr_set,
- 				    kvm_pte_t attr_clr, kvm_pte_t *orig_pte,
--				    u32 *level)
-+				    s8 *level)
- {
- 	int ret;
- 	kvm_pte_t attr_mask = KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI;
-@@ -1151,7 +1155,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
- 				   enum kvm_pgtable_prot prot)
- {
- 	int ret;
--	u32 level;
-+	s8 level;
- 	kvm_pte_t set = 0, clr = 0;
- 
- 	if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
-@@ -1173,7 +1177,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
- }
- 
- static int stage2_flush_walker(struct kvm_pgtable *pgt,
--			       u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+			       u64 addr, u64 end, s8 level, kvm_pte_t *ptep,
- 			       enum kvm_pgtable_walk_flags flag,
- 			       void * const arg)
- {
-@@ -1212,7 +1216,7 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+@@ -1215,10 +1272,14 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+ 	size_t pgd_sz;
  	u64 vtcr = mmu->arch->vtcr;
  	u32 ia_bits = VTCR_EL2_IPA(vtcr);
- 	u32 sl0 = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
--	u32 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
-+	s8 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
+-	u32 sl0 = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
+-	s8 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
++	u8 slx;
++	s8 start_level;
  	bool lpa2_ena = (vtcr & VTCR_EL2_DS) != 0;
  
++	slx = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
++	slx |= FIELD_GET(VTCR_EL2_SL2_MASK, vtcr) << 2;
++	start_level = kvm_vtcr_el2_sl_decode(slx);
++
  	pgd_sz = kvm_pgd_pages(ia_bits, start_level) * PAGE_SIZE;
-@@ -1234,7 +1238,7 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
- }
- 
- static int stage2_free_walker(struct kvm_pgtable *pgt,
--			      u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-+			      u64 addr, u64 end, s8 level, kvm_pte_t *ptep,
- 			      enum kvm_pgtable_walk_flags flag,
- 			      void * const arg)
- {
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 13e48539f022..4ce46be3f0a0 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -642,18 +642,19 @@ static int get_user_mapping_size(struct kvm *kvm, u64 addr)
- 	struct kvm_pgtable pgt = {
- 		.pgd		= (kvm_pte_t *)kvm->mm->pgd,
- 		.ia_bits	= vabits_actual,
--		.start_level	= (KVM_PGTABLE_MAX_LEVELS -
--				   CONFIG_PGTABLE_LEVELS),
-+		.start_level	= (KVM_PGTABLE_LAST_LEVEL -
-+				   CONFIG_PGTABLE_LEVELS + 1),
- 		.mm_ops		= &kvm_user_mm_ops,
- 		.lpa2_ena	= lpa2_is_enabled(),
- 	};
- 	kvm_pte_t pte = 0;	/* Keep GCC quiet... */
--	u32 level = ~0;
-+	s8 level = ~0;
- 	int ret;
- 
- 	ret = kvm_pgtable_get_leaf(&pgt, addr, &pte, &level);
- 	VM_BUG_ON(ret);
--	VM_BUG_ON(level >= KVM_PGTABLE_MAX_LEVELS);
-+	VM_BUG_ON(level > KVM_PGTABLE_LAST_LEVEL);
-+	VM_BUG_ON(level < KVM_PGTABLE_FIRST_LEVEL);
- 	VM_BUG_ON(!(pte & PTE_VALID));
- 
- 	return BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(level));
-@@ -1138,7 +1139,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	kvm_pfn_t pfn;
- 	bool logging_active = memslot_is_logging(memslot);
- 	bool use_read_lock = false;
--	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
-+	s8 fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
- 	unsigned long vma_pagesize, fault_granule;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
- 	struct kvm_pgtable *pgt;
+ 	pgt->pgd = mm_ops->zalloc_pages_exact(pgd_sz);
+ 	if (!pgt->pgd)
 -- 
 2.25.1
 
