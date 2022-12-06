@@ -2,77 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00367C352A1
-	for <kvmarm@archiver.kernel.org>; Tue,  6 Dec 2022 18:10:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7318AC352A1
+	for <kvmarm@archiver.kernel.org>; Tue,  6 Dec 2022 18:20:38 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63A5840C80;
-	Tue,  6 Dec 2022 13:10:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3DA84B27F;
+	Tue,  6 Dec 2022 13:20:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kGiYO4xdXYqS; Tue,  6 Dec 2022 13:10:40 -0500 (EST)
+	with ESMTP id rMzzAlGZA+Pn; Tue,  6 Dec 2022 13:20:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 331B54B3D0;
-	Tue,  6 Dec 2022 13:10:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90AB44B278;
+	Tue,  6 Dec 2022 13:20:36 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AEE141016
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2022 13:10:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 739C941016
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2022 13:20:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QghjjIWOM88t for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Dec 2022 13:10:37 -0500 (EST)
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com
- [209.85.214.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8CB7140C80
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2022 13:10:37 -0500 (EST)
-Received: by mail-pl1-f170.google.com with SMTP id w23so14700564ply.12
- for <kvmarm@lists.cs.columbia.edu>; Tue, 06 Dec 2022 10:10:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=gAdL/5nVVJu1FQlGTdfBjUls0ERNiH40RtP9DKw3LIs=;
- b=l9AGT4fXhM1oH7Du6wFnaTWjSCn3ASy0EdsFYwoxpz1XTmSJrI/6IYPrztRWGtgphI
- MEU1JwB6naZw7c/1ettMldjjpLk7glwpCWqV3EXpRuhUI+cM9iyuVCU+X8uFtQpMw16H
- y+VgP6Yz+mAMFxaAy3HgfBPOTFYdo5y/iogmk26sWTFOPpJyLaBDhg94MEROnHf5IE94
- nWYww6CfABnUnL1AnWY2Cgwf8IRzYPXH3CPErKTJKwYOxZqve3srRPJGRu+YDWCJOMyj
- ciVWMbA+0QFhqsdHTxv5x8llaaAKjhSyqtXi87fJCtsbFm+lXv45WSeSP6LhgyyqgED4
- rVjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=in-reply-to:content-disposition:mime-version:references:message-id
- :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
- :message-id:reply-to;
- bh=gAdL/5nVVJu1FQlGTdfBjUls0ERNiH40RtP9DKw3LIs=;
- b=cX/TTuD5nzE8mjGCJ5FViryY91NfXKhjfhuQHtUPup/mwIR+ui/UJDkwxqBoiL889X
- 9bt0wyKW67dece/Xj0MbN96gJE4ev17j08hWjKrAT1U45F9y/zrn221Hkjuo/YBSuKA9
- AJDj9FPSkgFZS3uUhU0ptlETbuUlZOkvHW/3rv/vUFSqCeT30QC3bN0zKqU+qvFt1nQ9
- S9Gdzd25JuFAAiIrGPI2rtjRHt71oXP1QtmIEYZZBH5HIUuh+qDFlmPJDR26Ah3aon6Z
- 7fvgVxYw2LOVmlXcMIo7L29pd5LyV43CeSZtni9Ovwawiwq274nA90tiTO6re6KVbNit
- jwxA==
-X-Gm-Message-State: ANoB5pko5QJ1xoUSl59GNM5lcjZ/g1hRPPXEvTgewxyIZQdAZqpvOclh
- qwg0z8Vhhvg4XQBH5FKUFy5d5A==
-X-Google-Smtp-Source: AA0mqf5SWGEOLKnaGxze9XgAsm4nFZyJ++7ROo35teN3Ikc66p+MXKu2i9uybgiJng0VsXfgkbFF9Q==
-X-Received: by 2002:a17:90a:c68d:b0:219:d415:d787 with SMTP id
- n13-20020a17090ac68d00b00219d415d787mr11690151pjt.127.1670350236316; 
- Tue, 06 Dec 2022 10:10:36 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com.
- [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
- x14-20020a170902ec8e00b001897916be2bsm12957433plg.268.2022.12.06.10.10.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 06 Dec 2022 10:10:35 -0800 (PST)
-Date: Tue, 6 Dec 2022 18:10:32 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
+ with ESMTP id jzpXap7mo2nw for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Dec 2022 13:20:34 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 52D1A40CDE
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2022 13:20:34 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 15E6561852;
+ Tue,  6 Dec 2022 18:20:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B958BC433C1;
+ Tue,  6 Dec 2022 18:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1670350832;
+ bh=T9UHAdLSg/MknZgZmsb/1izlnh+4dsvzvBWofrFnvPE=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=luoPid1iZfu97Vys9ehffT9v4D2YjnhX+hRe3Ze191e72jhYr66Qn06GryAP2duoZ
+ 1RE42tKko+FstPRliilBSUoanqmmlntF0Pwo/idQGwcxuI/UuVL9j03fZmPKxdhkk+
+ ynMXSyLih0xdWhwPts8R+zucxOoOpuza+6JtctEtRruJOu8kpnSCddjejE++z12uVw
+ oZ7vQ6u40msrAkSwhs6iSArVxG9wWO8kyPUU+6QRdWGRwUoS3ZMNnIywOsy55uXO/U
+ 3XIlwh1bM24m6SWYrLm72pJ+zUKLyiEF+XNwOwxBcjC+vo8okKnW3XIgAkS1JOL7Rg
+ GpG/RdgMc7ZGA==
+Date: Tue, 6 Dec 2022 18:20:21 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
 Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
-Message-ID: <Y4+FmDM7E5WYP3zV@google.com>
+Message-ID: <Y4+H5Vwy/aLvjqbw@sirena.org.uk>
 References: <20221205155845.233018-1-maz@kernel.org>
  <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
+ <Y4+FmDM7E5WYP3zV@google.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
+In-Reply-To: <Y4+FmDM7E5WYP3zV@google.com>
+X-Cookie: Save gas, don't use the shell.
 Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
  Andrew Jones <andrew.jones@linux.dev>, Usama Arif <usama.arif@bytedance.com>,
  Bagas Sanjaya <bagasdotme@gmail.com>, Ben Gardon <bgardon@google.com>,
@@ -82,11 +64,11 @@ Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
  Steven Price <steven.price@arm.com>, linux-arm-kernel@lists.infradead.org,
  Jakub Kicinski <kuba@kernel.org>,
  Anshuman Khandual <anshuman.khandual@arm.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Mark Brown <broonie@kernel.org>,
- kvmarm@lists.linux.dev, Peter Collingbourne <pcc@google.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>, kvmarm@lists.linux.dev,
+ Peter Collingbourne <pcc@google.com>,
  Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
  Cornelia Huck <cohuck@redhat.com>, Zhiyuan Dai <daizhiyuan@phytium.com.cn>,
- Andrew Morton <akpm@linux-foundation.org>
+ Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,41 +80,64 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============6928520888084943507=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Dec 06, 2022, Paolo Bonzini wrote:
-> On 12/5/22 16:58, Marc Zyngier wrote:
-> > - There is a lot of selftest conflicts with your own branch, see:
-> > 
-> >    https://lore.kernel.org/r/20221201112432.4cb9ae42@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201113626.438f13c5@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201115741.7de32422@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201120939.3c19f004@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201131623.18ebc8d8@canb.auug.org.au
-> > 
-> >    for a rather exhaustive collection.
-> 
-> Yeah, I saw them in Stephen's messages but missed your reply.
-> 
-> In retrospect, at least Gavin's series for memslot_perf_test should have
-> been applied by both of us with a topic branch, but there's so many
-> conflicts all over the place that it's hard to single out one series.
-> It just happens.
 
-Alternatively, we could have a dedicated selftests/kvm tree (or branch)?
+--===============6928520888084943507==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="syV9s6Ni/PXJMYNU"
+Content-Disposition: inline
 
-I almost suggested doing that on multiple occasions this cycle, but ultimately
-decided not to because it would effectively mean splitting series that touch KVM
-and selftests into different trees, which would create a different kind of
-dependency hell.  Or maybe a hybrid approach where series that only (or mostly?)
-touch selftests go into a dedicated tree?
 
-I get the feeling that I'm overthinking things though, this level of activity and
-conflicts should be relatively rare.
+--syV9s6Ni/PXJMYNU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Tue, Dec 06, 2022 at 06:10:32PM +0000, Sean Christopherson wrote:
+
+> Alternatively, we could have a dedicated selftests/kvm tree (or branch)?
+
+> I almost suggested doing that on multiple occasions this cycle, but ultimately
+> decided not to because it would effectively mean splitting series that touch KVM
+> and selftests into different trees, which would create a different kind of
+> dependency hell.  Or maybe a hybrid approach where series that only (or mostly?)
+> touch selftests go into a dedicated tree?
+
+Some other subsystems do have a separate branch for kselftests.  One
+fairly common occurrence is that the selftests branch ends up failing to
+build independently because someone adds new ABI together with a
+selftest but the patches adding the ABI don't end up on the same branch
+as the tests which try to use them.  That is of course resolvable but
+it's a common friction point.
+
+--syV9s6Ni/PXJMYNU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOPh+UACgkQJNaLcl1U
+h9CC7Af+MMWaPoSDO/Esk9zkroLyT2xIe855zDLbqscWMEyns5kByu5KOIbQMuI9
+SUhH+Y3GvUDFrbipnIGOlU8gxrsFFta9BlEMNiisNoSMlJv2SmKDb9HZfZBYpiOt
+GlmJZ0i3yxKFOsLjWnxgo62AJheT4sE8wADRIPAkPxAWRyz3KGFBesc5EooCxLNt
+T/jqOtoRqoakiaejBd3eMQxKlMNdOcpqSoiOjjpWgzWOEUULA7wHa1oDRwO5W6Zr
+upb+KoHtzlYfa1UHiW3+8kg9vAk8MyBnvG0Bx6Xu6/0im6Is5WpQUc9ofnR26eLZ
+6aL4C8fUDYOKXdy6pfD6XAboCNuEtA==
+=GF2/
+-----END PGP SIGNATURE-----
+
+--syV9s6Ni/PXJMYNU--
+
+--===============6928520888084943507==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============6928520888084943507==--
