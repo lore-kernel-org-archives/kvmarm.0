@@ -2,45 +2,45 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D7D2C352A1
-	for <kvmarm@archiver.kernel.org>; Tue,  6 Dec 2022 14:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B52BC4708C
+	for <kvmarm@archiver.kernel.org>; Tue,  6 Dec 2022 14:00:24 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 388C540397;
-	Tue,  6 Dec 2022 09:00:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0448A4B5F1;
+	Tue,  6 Dec 2022 09:00:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BgefcbxSGkyj; Tue,  6 Dec 2022 09:00:17 -0500 (EST)
+	with ESMTP id EegCjQhyni3i; Tue,  6 Dec 2022 09:00:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 881D54B3FB;
-	Tue,  6 Dec 2022 09:00:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3A314B5ED;
+	Tue,  6 Dec 2022 09:00:17 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9825E40B6C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2022 09:00:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 878B34B3F3
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2022 09:00:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aUBID1X2VAh3 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Dec 2022 09:00:10 -0500 (EST)
+ with ESMTP id E1RVJgEOLSP1 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Dec 2022 09:00:12 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A0FC4B62C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2022 09:00:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EE88B4B5EA
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2022 09:00:10 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0D9E5113E;
- Tue,  6 Dec 2022 06:00:13 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DD583139F;
+ Tue,  6 Dec 2022 06:00:16 -0800 (PST)
 Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com
  [10.1.196.159])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A8BB53F73D;
- Tue,  6 Dec 2022 06:00:04 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 699F13F73D;
+ Tue,  6 Dec 2022 06:00:08 -0800 (PST)
 From: Ryan Roberts <ryan.roberts@arm.com>
 To: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
  Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
  Suzuki K Poulose <suzuki.poulose@arm.com>,
  Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: [PATCH v1 02/12] arm64/mm: Update tlb invalidation routines for
- FEAT_LPA2
-Date: Tue,  6 Dec 2022 13:59:20 +0000
-Message-Id: <20221206135930.3277585-3-ryan.roberts@arm.com>
+Subject: [PATCH v1 04/12] KVM: arm64: Plumbing to enable multiple pgtable
+ formats
+Date: Tue,  6 Dec 2022 13:59:22 +0000
+Message-Id: <20221206135930.3277585-5-ryan.roberts@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20221206135930.3277585-1-ryan.roberts@arm.com>
 References: <20221206135930.3277585-1-ryan.roberts@arm.com>
@@ -63,279 +63,762 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-FEAT_LPA2 impacts tlb invalidation in 2 ways; Firstly, the TTL field in
-the non-range tlbi instructions can now validly take a 0 value for the
-4KB granule (this is due to the extra level of translation). Secondly,
-the BADDR field in the range tlbi instructions must be aligned to 64KB
-when LPA2 is in use (TCR.DS=1). Changes are required for tlbi to
-continue to operate correctly when LPA2 is in use.
+FEAT_LPA2 brings support for 52-bit input and output addresses for both
+stage1 and stage2 translation when using 4KB and 16KB page sizes. The
+architecture allows for the HW to support FEAT_LPA2 in one or both
+stages of translation. When FEAT_LPA2 is enabled for a given stage, it
+effectively changes the page table format; PTE bits change meaning and
+blocks can be mapped at levels that were previously not possible.
 
-We solve the first by always adding the level hint if the level is
-between [0, 3] (previously anything other than 0 was hinted, which
-breaks in the new level -1 case from kvm). When running on non-LPA2 HW,
-0 is still safe to hint as the HW will fall back to non-hinted. We also
-update kernel code to take advantage of the new hint for p4d flushing.
-While we are at it, we replace the notion of 0 being the non-hinted
-seninel with a macro, TLBI_TTL_UNKNOWN. This means callers won't need
-updating if/when translation depth increases in future.
+All of this means that KVM has to support 2 page table formats and
+decide which to use at runtime, after querying the HW. If FEAT_LPA2 is
+advertised for stage1, KVM must choose to either use the classic format
+or lpa2 format according to some policy for its hyp stage1, else it must
+use the classic format. Independently, if FEAT_LPA2 is advertised for
+stage2, KVM must which format to use for the vm stage2 tables according
+to a policy.
 
-The second problem is tricker. When LPA2 is in use, we need to use the
-non-range tlbi instructions to forward align to a 64KB boundary first,
-then we can use range-based tlbi from there on, until we have either
-invalidated all pages or we have a single page remaining. If the latter,
-that is done with non-range tlbi. (Previously we invalidated a single
-odd page first, but we can no longer do this because it could wreck our
-64KB alignment). When LPA2 is not in use, we don't need the initial
-alignemnt step. However, the bigger impact is that we can no longer use
-the previous method of iterating from smallest to largest 'scale', since
-this would likely unalign the boundary again for the LPA2 case. So
-instead we iterate from highest to lowest scale, which guarrantees that
-we remain 64KB aligned until the last op (at scale=0).
+As a first step towards enabling FEAT_LPA2, make struct kvm_pgtable
+accessible to functions that will need to take different actions
+depending on the page-table format. These functions are:
 
-The original commit (d1d3aa9 "arm64: tlb: Use the TLBI RANGE feature in
-arm64") stated this as the reason for incrementing scale:
+  - kvm_pte_to_phys()
+  - kvm_phys_to_pte()
+  - kvm_level_supports_block_mapping()
+  - hyp_set_prot_attr()
+  - stage2_set_prot_attr()
 
-  However, in most scenarios, the pages = 1 when flush_tlb_range() is
-  called. Start from scale = 3 or other proper value (such as scale
-  =ilog2(pages)), will incur extra overhead. So increase 'scale' from 0
-  to maximum, the flush order is exactly opposite to the example.
+Fix this by more consistently passing the struct kvm_pgtable around as
+the first parameter of each kvm_pgtable function call. As a result of
+always passing it to walker callbacks, we can remove some ad-hoc members
+from walker-specific data structures because those members are
+accessible through the struct kvm_pgtable (notably mmu and mm_ops).
 
-But pages=1 is already special cased by the non-range invalidation path,
-which will take care of it the first time through the loop (both in the
-original commit and in my change), so I don't think switching to
-decrement scale should have any extra performance impact after all.
+No functional changes are intended.
 
 Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 ---
- arch/arm64/include/asm/pgtable-prot.h |  6 ++
- arch/arm64/include/asm/tlb.h          | 15 +++--
- arch/arm64/include/asm/tlbflush.h     | 83 +++++++++++++++++----------
- 3 files changed, 69 insertions(+), 35 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h  |  23 ++--
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |   5 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c       |   8 +-
+ arch/arm64/kvm/hyp/pgtable.c          | 181 +++++++++++++-------------
+ 4 files changed, 109 insertions(+), 108 deletions(-)
 
-diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
-index 9b165117a454..308cc02fcdf3 100644
---- a/arch/arm64/include/asm/pgtable-prot.h
-+++ b/arch/arm64/include/asm/pgtable-prot.h
-@@ -40,6 +40,12 @@ extern bool arm64_use_ng_mappings;
- #define PTE_MAYBE_NG		(arm64_use_ng_mappings ? PTE_NG : 0)
- #define PMD_MAYBE_NG		(arm64_use_ng_mappings ? PMD_SECT_NG : 0)
- 
-+/*
-+ * For now the kernel never uses lpa2 for its stage1 tables. But kvm does and
-+ * this hook allows us to update the common tlbi code to handle lpa2.
-+ */
-+#define lpa2_is_enabled()	false
-+
- /*
-  * If we have userspace only BTI we don't want to mark kernel pages
-  * guarded even if the system does support BTI.
-diff --git a/arch/arm64/include/asm/tlb.h b/arch/arm64/include/asm/tlb.h
-index c995d1f4594f..3a189c435973 100644
---- a/arch/arm64/include/asm/tlb.h
-+++ b/arch/arm64/include/asm/tlb.h
-@@ -22,15 +22,15 @@ static void tlb_flush(struct mmu_gather *tlb);
- #include <asm-generic/tlb.h>
- 
- /*
-- * get the tlbi levels in arm64.  Default value is 0 if more than one
-- * of cleared_* is set or neither is set.
-- * Arm64 doesn't support p4ds now.
-+ * get the tlbi levels in arm64.  Default value is TLBI_TTL_UNKNOWN if more than
-+ * one of cleared_* is set or neither is set - this elides the level hinting to
-+ * the hardware.
-  */
- static inline int tlb_get_level(struct mmu_gather *tlb)
- {
- 	/* The TTL field is only valid for the leaf entry. */
- 	if (tlb->freed_tables)
--		return 0;
-+		return TLBI_TTL_UNKNOWN;
- 
- 	if (tlb->cleared_ptes && !(tlb->cleared_pmds ||
- 				   tlb->cleared_puds ||
-@@ -47,7 +47,12 @@ static inline int tlb_get_level(struct mmu_gather *tlb)
- 				   tlb->cleared_p4ds))
- 		return 1;
- 
--	return 0;
-+	if (tlb->cleared_p4ds && !(tlb->cleared_ptes ||
-+				   tlb->cleared_pmds ||
-+				   tlb->cleared_puds))
-+		return 0;
-+
-+	return TLBI_TTL_UNKNOWN;
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 3252eb50ecfe..2247ed74871a 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -47,16 +47,6 @@ static inline bool kvm_pte_valid(kvm_pte_t pte)
+ 	return pte & KVM_PTE_VALID;
  }
  
- static inline void tlb_flush(struct mmu_gather *tlb)
-diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
-index 412a3b9a3c25..903d95a4bef5 100644
---- a/arch/arm64/include/asm/tlbflush.h
-+++ b/arch/arm64/include/asm/tlbflush.h
-@@ -93,19 +93,22 @@ static inline unsigned long get_trans_granule(void)
-  * When ARMv8.4-TTL exists, TLBI operations take an additional hint for
-  * the level at which the invalidation must take place. If the level is
-  * wrong, no invalidation may take place. In the case where the level
-- * cannot be easily determined, a 0 value for the level parameter will
-- * perform a non-hinted invalidation.
-+ * cannot be easily determined, the value TLBI_TTL_UNKNOWN will perform
-+ * a non-hinted invalidation. Any provided level outside the hint range
-+ * will also cause fall-back to non-hinted invalidation.
-  *
-  * For Stage-2 invalidation, use the level values provided to that effect
-  * in asm/stage2_pgtable.h.
-  */
- #define TLBI_TTL_MASK		GENMASK_ULL(47, 44)
- 
-+#define TLBI_TTL_UNKNOWN	(-1)
-+
- #define __tlbi_level(op, addr, level) do {				\
- 	u64 arg = addr;							\
- 									\
- 	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) &&		\
--	    level) {							\
-+	    level >= 0 && level <= 3) {					\
- 		u64 ttl = level & 3;					\
- 		ttl |= get_trans_granule() << 2;			\
- 		arg &= ~TLBI_TTL_MASK;					\
-@@ -132,17 +135,22 @@ static inline unsigned long get_trans_granule(void)
-  * The address range is determined by below formula:
-  * [BADDR, BADDR + (NUM + 1) * 2^(5*SCALE + 1) * PAGESIZE)
-  *
-+ * If LPA2 is in use, BADDR holds addr[52:16]. Else BADDR holds page number.
-+ * See ARM DDI 0487I.a C5.5.21.
-+ *
-  */
--#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl)		\
--	({							\
--		unsigned long __ta = (addr) >> PAGE_SHIFT;	\
--		__ta &= GENMASK_ULL(36, 0);			\
--		__ta |= (unsigned long)(ttl) << 37;		\
--		__ta |= (unsigned long)(num) << 39;		\
--		__ta |= (unsigned long)(scale) << 44;		\
--		__ta |= get_trans_granule() << 46;		\
--		__ta |= (unsigned long)(asid) << 48;		\
--		__ta;						\
-+#define __TLBI_VADDR_RANGE(addr, asid, scale, num, ttl, lpa2_ena)		\
-+	({									\
-+		unsigned long __addr_shift = (lpa2_ena) ? 16 : PAGE_SHIFT;	\
-+		unsigned long __ttl = (ttl >= 1 && ttl <= 3) ? ttl : 0;		\
-+		unsigned long __ta = (addr) >> __addr_shift;			\
-+		__ta &= GENMASK_ULL(36, 0);					\
-+		__ta |= __ttl << 37;						\
-+		__ta |= (unsigned long)(num) << 39;				\
-+		__ta |= (unsigned long)(scale) << 44;				\
-+		__ta |= get_trans_granule() << 46;				\
-+		__ta |= (unsigned long)(asid) << 48;				\
-+		__ta;								\
- 	})
- 
- /* These macros are used by the TLBI RANGE feature. */
-@@ -215,12 +223,16 @@ static inline unsigned long get_trans_granule(void)
-  *		CPUs, ensuring that any walk-cache entries associated with the
-  *		translation are also invalidated.
-  *
-- *	__flush_tlb_range(vma, start, end, stride, last_level)
-+ *	__flush_tlb_range(vma, start, end, stride, last_level, tlb_level)
-  *		Invalidate the virtual-address range '[start, end)' on all
-  *		CPUs for the user address space corresponding to 'vma->mm'.
-  *		The invalidation operations are issued at a granularity
-  *		determined by 'stride' and only affect any walk-cache entries
-- *		if 'last_level' is equal to false.
-+ *		if 'last_level' is equal to false. tlb_level is the level at
-+ *		which the invalidation must take place. If the level is wrong,
-+ *		no invalidation may take place. In the case where the level
-+ *		cannot be easily determined, the value TLBI_TTL_UNKNOWN will
-+ *		perform a non-hinted invalidation.
-  *
-  *
-  *	Finally, take a look at asm/tlb.h to see how tlb_flush() is implemented
-@@ -284,8 +296,9 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
- 				     int tlb_level)
+-static inline u64 kvm_pte_to_phys(kvm_pte_t pte)
+-{
+-	u64 pa = pte & KVM_PTE_ADDR_MASK;
+-
+-	if (PAGE_SHIFT == 16)
+-		pa |= FIELD_GET(KVM_PTE_ADDR_51_48, pte) << 48;
+-
+-	return pa;
+-}
+-
+ static inline u64 kvm_granule_shift(u32 level)
  {
- 	int num = 0;
--	int scale = 0;
-+	int scale = 3;
- 	unsigned long asid, addr, pages;
-+	bool lpa2_ena = lpa2_is_enabled();
+ 	/* Assumes KVM_PGTABLE_MAX_LEVELS is 4 */
+@@ -184,6 +174,16 @@ struct kvm_pgtable {
+ 	kvm_pgtable_force_pte_cb_t		force_pte_cb;
+ };
  
- 	start = round_down(start, stride);
- 	end = round_up(end, stride);
-@@ -309,17 +322,25 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
++static inline u64 kvm_pte_to_phys(struct kvm_pgtable *pgt, kvm_pte_t pte)
++{
++	u64 pa = pte & KVM_PTE_ADDR_MASK;
++
++	if (PAGE_SHIFT == 16)
++		pa |= FIELD_GET(KVM_PTE_ADDR_51_48, pte) << 48;
++
++	return pa;
++}
++
+ /**
+  * enum kvm_pgtable_walk_flags - Flags to control a depth-first page-table walk.
+  * @KVM_PGTABLE_WALK_LEAF:		Visit leaf entries, including invalid
+@@ -199,7 +199,8 @@ enum kvm_pgtable_walk_flags {
+ 	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
+ };
  
- 	/*
- 	 * When the CPU does not support TLB range operations, flush the TLB
--	 * entries one by one at the granularity of 'stride'. If the TLB
--	 * range ops are supported, then:
-+	 * entries one by one at the granularity of 'stride'. If the TLB range
-+	 * ops are supported, then:
-+	 *
-+	 * 1. If FEAT_LPA2 is in use, the start address of a range operation
-+	 *    must be 64KB aligned, so flush pages one by one until the
-+	 *    alignment is reached using the non-range operations. This step is
-+	 *    skipped if LPA2 is not in use.
- 	 *
--	 * 1. If 'pages' is odd, flush the first page through non-range
--	 *    operations;
-+	 * 2. For remaining pages: the minimum range granularity is decided by
-+	 *    'scale', so multiple range TLBI operations may be required. Start
-+	 *    from scale = 3, flush the corresponding number of pages
-+	 *    ((num+1)*2^(5*scale+1) starting from 'addr'), then descrease it
-+	 *    until one or zero pages are left. We must start from highest scale
-+	 *    to ensure 64KB start alignment is maintained in the LPA2 case.
- 	 *
--	 * 2. For remaining pages: the minimum range granularity is decided
--	 *    by 'scale', so multiple range TLBI operations may be required.
--	 *    Start from scale = 0, flush the corresponding number of pages
--	 *    ((num+1)*2^(5*scale+1) starting from 'addr'), then increase it
--	 *    until no pages left.
-+	 * 3. If there is 1 page remaining, flush it through non-range
-+	 *    operations. Range operations can only span an even number of
-+	 *    pages. We save this for last to ensure 64KB start alignment is
-+	 *    maintained for the LPA2 case.
- 	 *
- 	 * Note that certain ranges can be represented by either num = 31 and
- 	 * scale or num = 0 and scale + 1. The loop below favours the latter
-@@ -327,7 +348,8 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
- 	 */
- 	while (pages > 0) {
- 		if (!system_supports_tlb_range() ||
--		    pages % 2 == 1) {
-+		    pages == 1 ||
-+		    (lpa2_ena && start != ALIGN(start, SZ_64K))) {
- 			addr = __TLBI_VADDR(start, asid);
- 			if (last_level) {
- 				__tlbi_level(vale1is, addr, tlb_level);
-@@ -344,7 +366,7 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
- 		num = __TLBI_RANGE_NUM(pages, scale);
- 		if (num >= 0) {
- 			addr = __TLBI_VADDR_RANGE(start, asid, scale,
--						  num, tlb_level);
-+						  num, tlb_level, lpa2_ena);
- 			if (last_level) {
- 				__tlbi(rvale1is, addr);
- 				__tlbi_user(rvale1is, addr);
-@@ -355,7 +377,7 @@ static inline void __flush_tlb_range(struct vm_area_struct *vma,
- 			start += __TLBI_RANGE_PAGES(num, scale) << PAGE_SHIFT;
- 			pages -= __TLBI_RANGE_PAGES(num, scale);
- 		}
--		scale++;
-+		scale--;
+-typedef int (*kvm_pgtable_visitor_fn_t)(u64 addr, u64 end, u32 level,
++typedef int (*kvm_pgtable_visitor_fn_t)(struct kvm_pgtable *pgt,
++					u64 addr, u64 end, u32 level,
+ 					kvm_pte_t *ptep,
+ 					enum kvm_pgtable_walk_flags flag,
+ 					void * const arg);
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 07f9dc9848ef..6bf54c8daffa 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -417,7 +417,8 @@ struct check_walk_data {
+ 	enum pkvm_page_state	(*get_page_state)(kvm_pte_t pte);
+ };
+ 
+-static int __check_page_state_visitor(u64 addr, u64 end, u32 level,
++static int __check_page_state_visitor(struct kvm_pgtable *pgt,
++				      u64 addr, u64 end, u32 level,
+ 				      kvm_pte_t *ptep,
+ 				      enum kvm_pgtable_walk_flags flag,
+ 				      void * const arg)
+@@ -425,7 +426,7 @@ static int __check_page_state_visitor(u64 addr, u64 end, u32 level,
+ 	struct check_walk_data *d = arg;
+ 	kvm_pte_t pte = *ptep;
+ 
+-	if (kvm_pte_valid(pte) && !addr_is_memory(kvm_pte_to_phys(pte)))
++	if (kvm_pte_valid(pte) && !addr_is_memory(kvm_pte_to_phys(pgt, pte)))
+ 		return -EINVAL;
+ 
+ 	return d->get_page_state(pte) == d->desired ? 0 : -EPERM;
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index e8d4ea2fcfa0..60a6821ae98a 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -186,12 +186,13 @@ static void hpool_put_page(void *addr)
+ 	hyp_put_page(&hpool, addr);
+ }
+ 
+-static int finalize_host_mappings_walker(u64 addr, u64 end, u32 level,
++static int finalize_host_mappings_walker(struct kvm_pgtable *pgt,
++					 u64 addr, u64 end, u32 level,
+ 					 kvm_pte_t *ptep,
+ 					 enum kvm_pgtable_walk_flags flag,
+ 					 void * const arg)
+ {
+-	struct kvm_pgtable_mm_ops *mm_ops = arg;
++	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+ 	enum kvm_pgtable_prot prot;
+ 	enum pkvm_page_state state;
+ 	kvm_pte_t pte = *ptep;
+@@ -212,7 +213,7 @@ static int finalize_host_mappings_walker(u64 addr, u64 end, u32 level,
+ 	if (level != (KVM_PGTABLE_MAX_LEVELS - 1))
+ 		return -EINVAL;
+ 
+-	phys = kvm_pte_to_phys(pte);
++	phys = kvm_pte_to_phys(pgt, pte);
+ 	if (!addr_is_memory(phys))
+ 		return -EINVAL;
+ 
+@@ -242,7 +243,6 @@ static int finalize_host_mappings(void)
+ 	struct kvm_pgtable_walker walker = {
+ 		.cb	= finalize_host_mappings_walker,
+ 		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
+-		.arg	= pkvm_pgtable.mm_ops,
+ 	};
+ 	int i, ret;
+ 
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index cdf8e76b0be1..221e0dafb149 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -59,12 +59,13 @@ struct kvm_pgtable_walk_data {
+ 
+ #define KVM_PHYS_INVALID (-1ULL)
+ 
+-static bool kvm_phys_is_valid(u64 phys)
++static bool kvm_phys_is_valid(struct kvm_pgtable *pgt, u64 phys)
+ {
+ 	return phys < BIT(id_aa64mmfr0_parange_to_phys_shift(ID_AA64MMFR0_EL1_PARANGE_MAX));
+ }
+ 
+-static bool kvm_block_mapping_supported(u64 addr, u64 end, u64 phys, u32 level)
++static bool kvm_block_mapping_supported(struct kvm_pgtable *pgt,
++					u64 addr, u64 end, u64 phys, u32 level)
+ {
+ 	u64 granule = kvm_granule_size(level);
+ 
+@@ -74,7 +75,7 @@ static bool kvm_block_mapping_supported(u64 addr, u64 end, u64 phys, u32 level)
+ 	if (granule > (end - addr))
+ 		return false;
+ 
+-	if (kvm_phys_is_valid(phys) && !IS_ALIGNED(phys, granule))
++	if (kvm_phys_is_valid(pgt, phys) && !IS_ALIGNED(phys, granule))
+ 		return false;
+ 
+ 	return IS_ALIGNED(addr, granule);
+@@ -122,7 +123,7 @@ static bool kvm_pte_table(kvm_pte_t pte, u32 level)
+ 	return FIELD_GET(KVM_PTE_TYPE, pte) == KVM_PTE_TYPE_TABLE;
+ }
+ 
+-static kvm_pte_t kvm_phys_to_pte(u64 pa)
++static kvm_pte_t kvm_phys_to_pte(struct kvm_pgtable *pgt, u64 pa)
+ {
+ 	kvm_pte_t pte = pa & KVM_PTE_ADDR_MASK;
+ 
+@@ -132,9 +133,9 @@ static kvm_pte_t kvm_phys_to_pte(u64 pa)
+ 	return pte;
+ }
+ 
+-static kvm_pte_t *kvm_pte_follow(kvm_pte_t pte, struct kvm_pgtable_mm_ops *mm_ops)
++static kvm_pte_t *kvm_pte_follow(struct kvm_pgtable *pgt, kvm_pte_t pte)
+ {
+-	return mm_ops->phys_to_virt(kvm_pte_to_phys(pte));
++	return pgt->mm_ops->phys_to_virt(kvm_pte_to_phys(pgt, pte));
+ }
+ 
+ static void kvm_clear_pte(kvm_pte_t *ptep)
+@@ -142,10 +143,11 @@ static void kvm_clear_pte(kvm_pte_t *ptep)
+ 	WRITE_ONCE(*ptep, 0);
+ }
+ 
+-static void kvm_set_table_pte(kvm_pte_t *ptep, kvm_pte_t *childp,
+-			      struct kvm_pgtable_mm_ops *mm_ops)
++static void kvm_set_table_pte(struct kvm_pgtable *pgt,
++			      kvm_pte_t *ptep, kvm_pte_t *childp)
+ {
+-	kvm_pte_t old = *ptep, pte = kvm_phys_to_pte(mm_ops->virt_to_phys(childp));
++	kvm_pte_t old = *ptep;
++	kvm_pte_t pte = kvm_phys_to_pte(pgt, pgt->mm_ops->virt_to_phys(childp));
+ 
+ 	pte |= FIELD_PREP(KVM_PTE_TYPE, KVM_PTE_TYPE_TABLE);
+ 	pte |= KVM_PTE_VALID;
+@@ -154,9 +156,10 @@ static void kvm_set_table_pte(kvm_pte_t *ptep, kvm_pte_t *childp,
+ 	smp_store_release(ptep, pte);
+ }
+ 
+-static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
++static kvm_pte_t kvm_init_valid_leaf_pte(struct kvm_pgtable *pgt,
++					 u64 pa, kvm_pte_t attr, u32 level)
+ {
+-	kvm_pte_t pte = kvm_phys_to_pte(pa);
++	kvm_pte_t pte = kvm_phys_to_pte(pgt, pa);
+ 	u64 type = (level == KVM_PGTABLE_MAX_LEVELS - 1) ? KVM_PTE_TYPE_PAGE :
+ 							   KVM_PTE_TYPE_BLOCK;
+ 
+@@ -177,7 +180,8 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data, u64 addr,
+ 				  enum kvm_pgtable_walk_flags flag)
+ {
+ 	struct kvm_pgtable_walker *walker = data->walker;
+-	return walker->cb(addr, data->end, level, ptep, flag, walker->arg);
++	return walker->cb(data->pgt,
++			  addr, data->end, level, ptep, flag, walker->arg);
+ }
+ 
+ static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
+@@ -213,7 +217,7 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+ 		goto out;
  	}
- 	dsb(ish);
- }
-@@ -366,9 +388,10 @@ static inline void flush_tlb_range(struct vm_area_struct *vma,
- 	/*
- 	 * We cannot use leaf-only invalidation here, since we may be invalidating
- 	 * table entries as part of collapsing hugepages or moving page tables.
--	 * Set the tlb_level to 0 because we can not get enough information here.
-+	 * Set the tlb_level to TLBI_TTL_UNKNOWN because we can not get enough
-+	 * information here.
- 	 */
--	__flush_tlb_range(vma, start, end, PAGE_SIZE, false, 0);
-+	__flush_tlb_range(vma, start, end, PAGE_SIZE, false, TLBI_TTL_UNKNOWN);
+ 
+-	childp = kvm_pte_follow(pte, data->pgt->mm_ops);
++	childp = kvm_pte_follow(data->pgt, pte);
+ 	ret = __kvm_pgtable_walk(data, childp, level + 1);
+ 	if (ret)
+ 		goto out;
+@@ -292,7 +296,8 @@ struct leaf_walk_data {
+ 	u32		level;
+ };
+ 
+-static int leaf_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
++static int leaf_walker(struct kvm_pgtable *pgt,
++		       u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 		       enum kvm_pgtable_walk_flags flag, void * const arg)
+ {
+ 	struct leaf_walk_data *data = arg;
+@@ -329,10 +334,10 @@ int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
+ struct hyp_map_data {
+ 	u64				phys;
+ 	kvm_pte_t			attr;
+-	struct kvm_pgtable_mm_ops	*mm_ops;
+ };
+ 
+-static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
++static int hyp_set_prot_attr(struct kvm_pgtable *pgt,
++			     enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+ {
+ 	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+ 	u32 mtype = device ? MT_DEVICE_nGnRE : MT_NORMAL;
+@@ -383,21 +388,22 @@ enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte)
+ 	return prot;
  }
  
- static inline void flush_tlb_kernel_range(unsigned long start, unsigned long end)
+-static bool hyp_map_walker_try_leaf(u64 addr, u64 end, u32 level,
++static bool hyp_map_walker_try_leaf(struct kvm_pgtable *pgt,
++				    u64 addr, u64 end, u32 level,
+ 				    kvm_pte_t *ptep, struct hyp_map_data *data)
+ {
+ 	kvm_pte_t new, old = *ptep;
+ 	u64 granule = kvm_granule_size(level), phys = data->phys;
+ 
+-	if (!kvm_block_mapping_supported(addr, end, phys, level))
++	if (!kvm_block_mapping_supported(pgt, addr, end, phys, level))
+ 		return false;
+ 
+ 	data->phys += granule;
+-	new = kvm_init_valid_leaf_pte(phys, data->attr, level);
++	new = kvm_init_valid_leaf_pte(pgt, phys, data->attr, level);
+ 	if (old == new)
+ 		return true;
+ 	if (!kvm_pte_valid(old))
+-		data->mm_ops->get_page(ptep);
++		pgt->mm_ops->get_page(ptep);
+ 	else if (WARN_ON((old ^ new) & ~KVM_PTE_LEAF_ATTR_HI_SW))
+ 		return false;
+ 
+@@ -405,14 +411,15 @@ static bool hyp_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+ 	return true;
+ }
+ 
+-static int hyp_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
++static int hyp_map_walker(struct kvm_pgtable *pgt,
++			  u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 			  enum kvm_pgtable_walk_flags flag, void * const arg)
+ {
+ 	kvm_pte_t *childp;
+ 	struct hyp_map_data *data = arg;
+-	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
++	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+ 
+-	if (hyp_map_walker_try_leaf(addr, end, level, ptep, arg))
++	if (hyp_map_walker_try_leaf(pgt, addr, end, level, ptep, data))
+ 		return 0;
+ 
+ 	if (WARN_ON(level == KVM_PGTABLE_MAX_LEVELS - 1))
+@@ -422,7 +429,7 @@ static int hyp_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 	if (!childp)
+ 		return -ENOMEM;
+ 
+-	kvm_set_table_pte(ptep, childp, mm_ops);
++	kvm_set_table_pte(pgt, ptep, childp);
+ 	mm_ops->get_page(ptep);
+ 	return 0;
+ }
+@@ -433,7 +440,6 @@ int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
+ 	int ret;
+ 	struct hyp_map_data map_data = {
+ 		.phys	= ALIGN_DOWN(phys, PAGE_SIZE),
+-		.mm_ops	= pgt->mm_ops,
+ 	};
+ 	struct kvm_pgtable_walker walker = {
+ 		.cb	= hyp_map_walker,
+@@ -441,7 +447,7 @@ int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
+ 		.arg	= &map_data,
+ 	};
+ 
+-	ret = hyp_set_prot_attr(prot, &map_data.attr);
++	ret = hyp_set_prot_attr(pgt, prot, &map_data.attr);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -453,22 +459,22 @@ int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
+ 
+ struct hyp_unmap_data {
+ 	u64				unmapped;
+-	struct kvm_pgtable_mm_ops	*mm_ops;
+ };
+ 
+-static int hyp_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
++static int hyp_unmap_walker(struct kvm_pgtable *pgt,
++			    u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 			    enum kvm_pgtable_walk_flags flag, void * const arg)
+ {
+ 	kvm_pte_t pte = *ptep, *childp = NULL;
+ 	u64 granule = kvm_granule_size(level);
+ 	struct hyp_unmap_data *data = arg;
+-	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
++	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+ 
+ 	if (!kvm_pte_valid(pte))
+ 		return -EINVAL;
+ 
+ 	if (kvm_pte_table(pte, level)) {
+-		childp = kvm_pte_follow(pte, mm_ops);
++		childp = kvm_pte_follow(pgt, pte);
+ 
+ 		if (mm_ops->page_count(childp) != 1)
+ 			return 0;
+@@ -498,9 +504,7 @@ static int hyp_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 
+ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ {
+-	struct hyp_unmap_data unmap_data = {
+-		.mm_ops	= pgt->mm_ops,
+-	};
++	struct hyp_unmap_data unmap_data = {};
+ 	struct kvm_pgtable_walker walker = {
+ 		.cb	= hyp_unmap_walker,
+ 		.arg	= &unmap_data,
+@@ -532,10 +536,11 @@ int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits,
+ 	return 0;
+ }
+ 
+-static int hyp_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
++static int hyp_free_walker(struct kvm_pgtable *pgt,
++			   u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 			   enum kvm_pgtable_walk_flags flag, void * const arg)
+ {
+-	struct kvm_pgtable_mm_ops *mm_ops = arg;
++	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+ 	kvm_pte_t pte = *ptep;
+ 
+ 	if (!kvm_pte_valid(pte))
+@@ -544,7 +549,7 @@ static int hyp_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 	mm_ops->put_page(ptep);
+ 
+ 	if (kvm_pte_table(pte, level))
+-		mm_ops->put_page(kvm_pte_follow(pte, mm_ops));
++		mm_ops->put_page(kvm_pte_follow(pgt, pte));
+ 
+ 	return 0;
+ }
+@@ -554,7 +559,6 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
+ 	struct kvm_pgtable_walker walker = {
+ 		.cb	= hyp_free_walker,
+ 		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
+-		.arg	= pgt->mm_ops,
+ 	};
+ 
+ 	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
+@@ -570,11 +574,8 @@ struct stage2_map_data {
+ 	kvm_pte_t			*anchor;
+ 	kvm_pte_t			*childp;
+ 
+-	struct kvm_s2_mmu		*mmu;
+ 	void				*memcache;
+ 
+-	struct kvm_pgtable_mm_ops	*mm_ops;
+-
+ 	/* Force mappings to page granularity */
+ 	bool				force_pte;
+ };
+@@ -708,29 +709,30 @@ static bool stage2_pte_executable(kvm_pte_t pte)
+ 	return !(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN);
+ }
+ 
+-static bool stage2_leaf_mapping_allowed(u64 addr, u64 end, u32 level,
++static bool stage2_leaf_mapping_allowed(struct kvm_pgtable *pgt,
++					u64 addr, u64 end, u32 level,
+ 					struct stage2_map_data *data)
+ {
+ 	if (data->force_pte && (level < (KVM_PGTABLE_MAX_LEVELS - 1)))
+ 		return false;
+ 
+-	return kvm_block_mapping_supported(addr, end, data->phys, level);
++	return kvm_block_mapping_supported(pgt, addr, end, data->phys, level);
+ }
+ 
+-static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
++static int stage2_map_walker_try_leaf(struct kvm_pgtable *pgt,
++				      u64 addr, u64 end, u32 level,
+ 				      kvm_pte_t *ptep,
+ 				      struct stage2_map_data *data)
+ {
+ 	kvm_pte_t new, old = *ptep;
+ 	u64 granule = kvm_granule_size(level), phys = data->phys;
+-	struct kvm_pgtable *pgt = data->mmu->pgt;
+-	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
++	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+ 
+-	if (!stage2_leaf_mapping_allowed(addr, end, level, data))
++	if (!stage2_leaf_mapping_allowed(pgt, addr, end, level, data))
+ 		return -E2BIG;
+ 
+-	if (kvm_phys_is_valid(phys))
+-		new = kvm_init_valid_leaf_pte(phys, data->attr, level);
++	if (kvm_phys_is_valid(pgt, phys))
++		new = kvm_init_valid_leaf_pte(pgt, phys, data->attr, level);
+ 	else
+ 		new = kvm_init_invalid_leaf_owner(data->owner_id);
+ 
+@@ -744,36 +746,37 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+ 		if (!stage2_pte_needs_update(old, new))
+ 			return -EAGAIN;
+ 
+-		stage2_put_pte(ptep, data->mmu, addr, level, mm_ops);
++		stage2_put_pte(ptep, pgt->mmu, addr, level, mm_ops);
+ 	}
+ 
+ 	/* Perform CMOs before installation of the guest stage-2 PTE */
+ 	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
+-		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
++		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(pgt, new),
+ 						granule);
+ 
+ 	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
+-		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
++		mm_ops->icache_inval_pou(kvm_pte_follow(pgt, new), granule);
+ 
+ 	smp_store_release(ptep, new);
+ 	if (stage2_pte_is_counted(new))
+ 		mm_ops->get_page(ptep);
+-	if (kvm_phys_is_valid(phys))
++	if (kvm_phys_is_valid(pgt, phys))
+ 		data->phys += granule;
+ 	return 0;
+ }
+ 
+-static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
++static int stage2_map_walk_table_pre(struct kvm_pgtable *pgt,
++				     u64 addr, u64 end, u32 level,
+ 				     kvm_pte_t *ptep,
+ 				     struct stage2_map_data *data)
+ {
+ 	if (data->anchor)
+ 		return 0;
+ 
+-	if (!stage2_leaf_mapping_allowed(addr, end, level, data))
++	if (!stage2_leaf_mapping_allowed(pgt, addr, end, level, data))
+ 		return 0;
+ 
+-	data->childp = kvm_pte_follow(*ptep, data->mm_ops);
++	data->childp = kvm_pte_follow(pgt, *ptep);
+ 	kvm_clear_pte(ptep);
+ 
+ 	/*
+@@ -781,15 +784,16 @@ static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
+ 	 * entries below us which would otherwise need invalidating
+ 	 * individually.
+ 	 */
+-	kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
++	kvm_call_hyp(__kvm_tlb_flush_vmid, pgt->mmu);
+ 	data->anchor = ptep;
+ 	return 0;
+ }
+ 
+-static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
++static int stage2_map_walk_leaf(struct kvm_pgtable *pgt,
++				u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 				struct stage2_map_data *data)
+ {
+-	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
++	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+ 	kvm_pte_t *childp, pte = *ptep;
+ 	int ret;
+ 
+@@ -800,7 +804,7 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 		return 0;
+ 	}
+ 
+-	ret = stage2_map_walker_try_leaf(addr, end, level, ptep, data);
++	ret = stage2_map_walker_try_leaf(pgt, addr, end, level, ptep, data);
+ 	if (ret != -E2BIG)
+ 		return ret;
+ 
+@@ -820,19 +824,20 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 	 * will be mapped lazily.
+ 	 */
+ 	if (stage2_pte_is_counted(pte))
+-		stage2_put_pte(ptep, data->mmu, addr, level, mm_ops);
++		stage2_put_pte(ptep, pgt->mmu, addr, level, mm_ops);
+ 
+-	kvm_set_table_pte(ptep, childp, mm_ops);
++	kvm_set_table_pte(pgt, ptep, childp);
+ 	mm_ops->get_page(ptep);
+ 
+ 	return 0;
+ }
+ 
+-static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
++static int stage2_map_walk_table_post(struct kvm_pgtable *pgt,
++				      u64 addr, u64 end, u32 level,
+ 				      kvm_pte_t *ptep,
+ 				      struct stage2_map_data *data)
+ {
+-	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
++	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+ 	kvm_pte_t *childp;
+ 	int ret = 0;
+ 
+@@ -843,9 +848,9 @@ static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
+ 		childp = data->childp;
+ 		data->anchor = NULL;
+ 		data->childp = NULL;
+-		ret = stage2_map_walk_leaf(addr, end, level, ptep, data);
++		ret = stage2_map_walk_leaf(pgt, addr, end, level, ptep, data);
+ 	} else {
+-		childp = kvm_pte_follow(*ptep, mm_ops);
++		childp = kvm_pte_follow(pgt, *ptep);
+ 	}
+ 
+ 	mm_ops->put_page(childp);
+@@ -873,18 +878,19 @@ static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
+  * the page-table, installing the block entry when it revisits the anchor
+  * pointer and clearing the anchor to NULL.
+  */
+-static int stage2_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
++static int stage2_map_walker(struct kvm_pgtable *pgt,
++			     u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 			     enum kvm_pgtable_walk_flags flag, void * const arg)
+ {
+ 	struct stage2_map_data *data = arg;
+ 
+ 	switch (flag) {
+ 	case KVM_PGTABLE_WALK_TABLE_PRE:
+-		return stage2_map_walk_table_pre(addr, end, level, ptep, data);
++		return stage2_map_walk_table_pre(pgt, addr, end, level, ptep, data);
+ 	case KVM_PGTABLE_WALK_LEAF:
+-		return stage2_map_walk_leaf(addr, end, level, ptep, data);
++		return stage2_map_walk_leaf(pgt, addr, end, level, ptep, data);
+ 	case KVM_PGTABLE_WALK_TABLE_POST:
+-		return stage2_map_walk_table_post(addr, end, level, ptep, data);
++		return stage2_map_walk_table_post(pgt, addr, end, level, ptep, data);
+ 	}
+ 
+ 	return -EINVAL;
+@@ -897,9 +903,7 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 	int ret;
+ 	struct stage2_map_data map_data = {
+ 		.phys		= ALIGN_DOWN(phys, PAGE_SIZE),
+-		.mmu		= pgt->mmu,
+ 		.memcache	= mc,
+-		.mm_ops		= pgt->mm_ops,
+ 		.force_pte	= pgt->force_pte_cb && pgt->force_pte_cb(addr, addr + size, prot),
+ 	};
+ 	struct kvm_pgtable_walker walker = {
+@@ -928,9 +932,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 	int ret;
+ 	struct stage2_map_data map_data = {
+ 		.phys		= KVM_PHYS_INVALID,
+-		.mmu		= pgt->mmu,
+ 		.memcache	= mc,
+-		.mm_ops		= pgt->mm_ops,
+ 		.owner_id	= owner_id,
+ 		.force_pte	= true,
+ 	};
+@@ -949,11 +951,11 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 	return ret;
+ }
+ 
+-static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
++static int stage2_unmap_walker(struct kvm_pgtable *pgt,
++			       u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 			       enum kvm_pgtable_walk_flags flag,
+ 			       void * const arg)
+ {
+-	struct kvm_pgtable *pgt = arg;
+ 	struct kvm_s2_mmu *mmu = pgt->mmu;
+ 	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+ 	kvm_pte_t pte = *ptep, *childp = NULL;
+@@ -968,7 +970,7 @@ static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 	}
+ 
+ 	if (kvm_pte_table(pte, level)) {
+-		childp = kvm_pte_follow(pte, mm_ops);
++		childp = kvm_pte_follow(pgt, pte);
+ 
+ 		if (mm_ops->page_count(childp) != 1)
+ 			return 0;
+@@ -984,7 +986,7 @@ static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 	stage2_put_pte(ptep, mmu, addr, level, mm_ops);
+ 
+ 	if (need_flush && mm_ops->dcache_clean_inval_poc)
+-		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(pte, mm_ops),
++		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(pgt, pte),
+ 					       kvm_granule_size(level));
+ 
+ 	if (childp)
+@@ -997,7 +999,6 @@ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ {
+ 	struct kvm_pgtable_walker walker = {
+ 		.cb	= stage2_unmap_walker,
+-		.arg	= pgt,
+ 		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
+ 	};
+ 
+@@ -1009,16 +1010,16 @@ struct stage2_attr_data {
+ 	kvm_pte_t			attr_clr;
+ 	kvm_pte_t			pte;
+ 	u32				level;
+-	struct kvm_pgtable_mm_ops	*mm_ops;
+ };
+ 
+-static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
++static int stage2_attr_walker(struct kvm_pgtable *pgt,
++			      u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 			      enum kvm_pgtable_walk_flags flag,
+ 			      void * const arg)
+ {
+ 	kvm_pte_t pte = *ptep;
+ 	struct stage2_attr_data *data = arg;
+-	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
++	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+ 
+ 	if (!kvm_pte_valid(pte))
+ 		return 0;
+@@ -1040,7 +1041,7 @@ static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 		 */
+ 		if (mm_ops->icache_inval_pou &&
+ 		    stage2_pte_executable(pte) && !stage2_pte_executable(*ptep))
+-			mm_ops->icache_inval_pou(kvm_pte_follow(pte, mm_ops),
++			mm_ops->icache_inval_pou(kvm_pte_follow(pgt, pte),
+ 						  kvm_granule_size(level));
+ 		WRITE_ONCE(*ptep, pte);
+ 	}
+@@ -1058,7 +1059,6 @@ static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
+ 	struct stage2_attr_data data = {
+ 		.attr_set	= attr_set & attr_mask,
+ 		.attr_clr	= attr_clr & attr_mask,
+-		.mm_ops		= pgt->mm_ops,
+ 	};
+ 	struct kvm_pgtable_walker walker = {
+ 		.cb		= stage2_attr_walker,
+@@ -1140,11 +1140,11 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+ 	return ret;
+ }
+ 
+-static int stage2_flush_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
++static int stage2_flush_walker(struct kvm_pgtable *pgt,
++			       u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 			       enum kvm_pgtable_walk_flags flag,
+ 			       void * const arg)
+ {
+-	struct kvm_pgtable *pgt = arg;
+ 	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+ 	kvm_pte_t pte = *ptep;
+ 
+@@ -1152,7 +1152,7 @@ static int stage2_flush_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 		return 0;
+ 
+ 	if (mm_ops->dcache_clean_inval_poc)
+-		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(pte, mm_ops),
++		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(pgt, pte),
+ 					       kvm_granule_size(level));
+ 	return 0;
+ }
+@@ -1162,7 +1162,6 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ 	struct kvm_pgtable_walker walker = {
+ 		.cb	= stage2_flush_walker,
+ 		.flags	= KVM_PGTABLE_WALK_LEAF,
+-		.arg	= pgt,
+ 	};
+ 
+ 	if (stage2_has_fwb(pgt))
+@@ -1200,11 +1199,12 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+ 	return 0;
+ }
+ 
+-static int stage2_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
++static int stage2_free_walker(struct kvm_pgtable *pgt,
++			      u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 			      enum kvm_pgtable_walk_flags flag,
+ 			      void * const arg)
+ {
+-	struct kvm_pgtable_mm_ops *mm_ops = arg;
++	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+ 	kvm_pte_t pte = *ptep;
+ 
+ 	if (!stage2_pte_is_counted(pte))
+@@ -1213,7 +1213,7 @@ static int stage2_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 	mm_ops->put_page(ptep);
+ 
+ 	if (kvm_pte_table(pte, level))
+-		mm_ops->put_page(kvm_pte_follow(pte, mm_ops));
++		mm_ops->put_page(kvm_pte_follow(pgt, pte));
+ 
+ 	return 0;
+ }
+@@ -1225,7 +1225,6 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
+ 		.cb	= stage2_free_walker,
+ 		.flags	= KVM_PGTABLE_WALK_LEAF |
+ 			  KVM_PGTABLE_WALK_TABLE_POST,
+-		.arg	= pgt->mm_ops,
+ 	};
+ 
+ 	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
 -- 
 2.25.1
 
