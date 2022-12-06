@@ -1,90 +1,106 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A5427727
-	for <kvmarm@lists.linux.dev>; Tue,  6 Dec 2022 18:16:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA2EAC433D6;
-	Tue,  6 Dec 2022 18:16:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337482772C
+	for <kvmarm@lists.linux.dev>; Tue,  6 Dec 2022 18:20:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B958BC433C1;
+	Tue,  6 Dec 2022 18:20:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670350609;
-	bh=macQQ74pjNjmKFm8T+wbES3REUCkFjh+lVvmQilsrUY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=dYrsTt3f5z+/AXYuybQ15f05xy/VElaugfomTFjhbLP/qg9Uti9Fls6H6JUwHL/fA
-	 fl8rendKXr2VbIz1PsCMsrkrsE1BSDM8//kKjrHtNvYkEYwriI4ufmzMvbB9IpIr5D
-	 sEYocOUvA0Ze2//cjrMT3dOv5Wjd7xRskTGS+MdNNqB/Iin2zLKyz7QV3Jtghk+9Vu
-	 mpOalcc5E1PjHjgLx9byYfihjjbSvO+kAuuvKWNFvM86dNLZBpj7kAeUiYsAmlz0Ne
-	 yDDaR8kGnUMY0Z8mSZbYxqbqwhWpX9G3gj5RfEQr2QSIPXrTxfcRH8b7hpKMiWRnYd
-	 86Z6QA5zLWnCg==
+	s=k20201202; t=1670350832;
+	bh=T9UHAdLSg/MknZgZmsb/1izlnh+4dsvzvBWofrFnvPE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=luoPid1iZfu97Vys9ehffT9v4D2YjnhX+hRe3Ze191e72jhYr66Qn06GryAP2duoZ
+	 1RE42tKko+FstPRliilBSUoanqmmlntF0Pwo/idQGwcxuI/UuVL9j03fZmPKxdhkk+
+	 ynMXSyLih0xdWhwPts8R+zucxOoOpuza+6JtctEtRruJOu8kpnSCddjejE++z12uVw
+	 oZ7vQ6u40msrAkSwhs6iSArVxG9wWO8kyPUU+6QRdWGRwUoS3ZMNnIywOsy55uXO/U
+	 3XIlwh1bM24m6SWYrLm72pJ+zUKLyiEF+XNwOwxBcjC+vo8okKnW3XIgAkS1JOL7Rg
+	 GpG/RdgMc7ZGA==
+Date: Tue, 6 Dec 2022 18:20:21 +0000
 From: Mark Brown <broonie@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-next@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Mark Brown <broonie@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Ricardo Koller <ricarkol@google.com>
-Subject: [PATCH] KVM: selftests: Fix build due to ucall_uninit() removal
-Date: Tue,  6 Dec 2022 18:15:06 +0000
-Message-Id: <20221206181506.252537-1-broonie@kernel.org>
-X-Mailer: git-send-email 2.30.2
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Ben Gardon <bgardon@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Cornelia Huck <cohuck@redhat.com>, Fuad Tabba <tabba@google.com>,
+	Gavin Shan <gshan@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	"Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Peter Collingbourne <pcc@google.com>, Peter Xu <peterx@redhat.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Quentin Perret <qperret@google.com>,
+	Reiji Watanabe <reijiw@google.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Usama Arif <usama.arif@bytedance.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Will Deacon <will@kernel.org>,
+	Zhiyuan Dai <daizhiyuan@phytium.com.cn>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org
+Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
+Message-ID: <Y4+H5Vwy/aLvjqbw@sirena.org.uk>
+References: <20221205155845.233018-1-maz@kernel.org>
+ <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
+ <Y4+FmDM7E5WYP3zV@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1809; i=broonie@kernel.org; h=from:subject; bh=macQQ74pjNjmKFm8T+wbES3REUCkFjh+lVvmQilsrUY=; b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjj4apcRMzRY/3tffeY2BaujjTzJ6CZMq8Xxzk9Awb SDUV+3GJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY4+GqQAKCRAk1otyXVSH0NlRB/ 9LWXJwFvylGOiRN1bWQfLyw9jaJOwv5Pf4HkB9GFM3Tip2CqJRRkV3sF4BQDX1PCMU7epSd0usq1T/ evWNcCpQZSFQ0bXovG4j4+cmHVim5y4EKIGWBqlR+dZ5nZsjTEf/nogWA0JoCmnG/rah6oh+SNNwsb /3NKaaDA3If0eGTSXcPe38ZWpPEd3DnNaqZYnnkyK84jVR2LE2jGep11ygv2Buq6ccxj5GAMLUa7JG 8N0gSW7ni2iwN7+IeUVEh5+X1kYgBJpufhUskYmz73ModYIPVKElZBPUxNosmzRtXGZCeXbwE18Qwf 05ADCKlxRAF18A3etfhA0+9mCFFcwR
-X-Developer-Key: i=broonie@kernel.org; a=openpgp; fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="syV9s6Ni/PXJMYNU"
+Content-Disposition: inline
+In-Reply-To: <Y4+FmDM7E5WYP3zV@google.com>
+X-Cookie: Save gas, don't use the shell.
+Message-ID: <20221206182021.g_8ImNGlhSqpS-W8h7f98yWWusRCdqS5b-7819ZOmCg@z>
 
-Today's -next fails to build on arm64 due to:
 
-In file included from include/kvm_util.h:11,
-                 from aarch64/page_fault_test.c:15:
-include/ucall_common.h:36:47: note: expected ‘vm_paddr_t’ {aka ‘long unsigned int’} but argument is of type ‘void *’
-   36 | void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
-      |                                    ~~~~~~~~~~~^~~~~~~~
-aarch64/page_fault_test.c:725:2: warning: implicit declaration of function ‘ucall_uninit’; did you mean ‘ucall_init’? [-Wimplicit-function-declaration]
-  725 |  ucall_uninit(vm);
-      |  ^~~~~~~~~~~~
-      |  ucall_init
+--syV9s6Ni/PXJMYNU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-which is caused by commit
+On Tue, Dec 06, 2022 at 06:10:32PM +0000, Sean Christopherson wrote:
 
-interacting poorly with commit
+> Alternatively, we could have a dedicated selftests/kvm tree (or branch)?
 
-   28a65567acb5 ("KVM: selftests: Drop now-unnecessary ucall_uninit()")
+> I almost suggested doing that on multiple occasions this cycle, but ultimately
+> decided not to because it would effectively mean splitting series that touch KVM
+> and selftests into different trees, which would create a different kind of
+> dependency hell.  Or maybe a hybrid approach where series that only (or mostly?)
+> touch selftests go into a dedicated tree?
 
-As is done for other ucall_uninit() users remove the call in the newly added
-page_fault_test.c.
+Some other subsystems do have a separate branch for kselftests.  One
+fairly common occurrence is that the selftests branch ends up failing to
+build independently because someone adds new ABI together with a
+selftest but the patches adding the ABI don't end up on the same branch
+as the tests which try to use them.  That is of course resolvable but
+it's a common friction point.
 
-Fixes: 28a65567acb5 ("KVM: selftests: Drop now-unnecessary ucall_uninit()")
-Fixes: 35c581015712 ("KVM: selftests: aarch64: Add aarch64/page_fault_test")
-Signed-off-by: Mark Brown <broonie@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Ricardo Koller <ricarkol@google.com>
-Cc: Marc Zyngier <maz@kernel.org>
----
- tools/testing/selftests/kvm/aarch64/page_fault_test.c | 1 -
- 1 file changed, 1 deletion(-)
+--syV9s6Ni/PXJMYNU
+Content-Type: application/pgp-signature; name="signature.asc"
 
-diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-index 05bb6a6369c2..4ef89c57a937 100644
---- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-@@ -722,7 +722,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 
- 	vcpu_run_loop(vm, vcpu, test);
- 
--	ucall_uninit(vm);
- 	kvm_vm_free(vm);
- 	free_uffd(test, pt_uffd, data_uffd);
- 
--- 
-2.30.2
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOPh+UACgkQJNaLcl1U
+h9CC7Af+MMWaPoSDO/Esk9zkroLyT2xIe855zDLbqscWMEyns5kByu5KOIbQMuI9
+SUhH+Y3GvUDFrbipnIGOlU8gxrsFFta9BlEMNiisNoSMlJv2SmKDb9HZfZBYpiOt
+GlmJZ0i3yxKFOsLjWnxgo62AJheT4sE8wADRIPAkPxAWRyz3KGFBesc5EooCxLNt
+T/jqOtoRqoakiaejBd3eMQxKlMNdOcpqSoiOjjpWgzWOEUULA7wHa1oDRwO5W6Zr
+upb+KoHtzlYfa1UHiW3+8kg9vAk8MyBnvG0Bx6Xu6/0im6Is5WpQUc9ofnR26eLZ
+6aL4C8fUDYOKXdy6pfD6XAboCNuEtA==
+=GF2/
+-----END PGP SIGNATURE-----
+
+--syV9s6Ni/PXJMYNU--
