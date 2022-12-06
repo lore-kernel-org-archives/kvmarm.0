@@ -2,45 +2,45 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D619FC4708E
-	for <kvmarm@archiver.kernel.org>; Tue,  6 Dec 2022 14:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA05BC47090
+	for <kvmarm@archiver.kernel.org>; Tue,  6 Dec 2022 14:00:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CD744B355;
-	Tue,  6 Dec 2022 09:00:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98C8F4B63A;
+	Tue,  6 Dec 2022 09:00:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RJyvnpU-LhMz; Tue,  6 Dec 2022 09:00:26 -0500 (EST)
+	with ESMTP id io5aUr7Nb6ox; Tue,  6 Dec 2022 09:00:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E0914B5E8;
-	Tue,  6 Dec 2022 09:00:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 379AA4B3CA;
+	Tue,  6 Dec 2022 09:00:24 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D7D24B3F5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2022 09:00:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 26EF240B6C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2022 09:00:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8N+tkJvxHAOv for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Dec 2022 09:00:16 -0500 (EST)
+ with ESMTP id Om3lJXEIFRlx for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  6 Dec 2022 09:00:21 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E1514B5EE
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2022 09:00:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A8A84B3CA
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Dec 2022 09:00:16 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B20C143D;
- Tue,  6 Dec 2022 06:00:20 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7A063D6E;
+ Tue,  6 Dec 2022 06:00:22 -0800 (PST)
 Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com
  [10.1.196.159])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 428383F73D;
- Tue,  6 Dec 2022 06:00:12 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 216D23F73D;
+ Tue,  6 Dec 2022 06:00:14 -0800 (PST)
 From: Ryan Roberts <ryan.roberts@arm.com>
 To: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
  Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
  Suzuki K Poulose <suzuki.poulose@arm.com>,
  Anshuman Khandual <anshuman.khandual@arm.com>
-Subject: [PATCH v1 06/12] KVM: arm64: Use LPA2 page-tables for stage2 if HW
- supports it
-Date: Tue,  6 Dec 2022 13:59:24 +0000
-Message-Id: <20221206135930.3277585-7-ryan.roberts@arm.com>
+Subject: [PATCH v1 07/12] KVM: arm64: Use LPA2 page-tables for hyp stage1 if
+ HW supports it
+Date: Tue,  6 Dec 2022 13:59:25 +0000
+Message-Id: <20221206135930.3277585-8-ryan.roberts@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20221206135930.3277585-1-ryan.roberts@arm.com>
 References: <20221206135930.3277585-1-ryan.roberts@arm.com>
@@ -64,230 +64,183 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Implement a simple policy whereby if the HW supports FEAT_LPA2 for the
-page size we are using, always use LPA2-style page-tables for stage 2,
-regardless of the VMM-requested IPA size or HW-implemented PA size. When
-in use we can now support up to 52-bit IPA and PA sizes.
+page size we are using, always use LPA2-style page-tables for hyp stage
+1, regardless of the IPA or PA size requirements. When in use we can now
+support up to 52-bit IPA and PA sizes.
 
-We use the preparitory work that tracks the page-table format in struct
-kvm_pgtable and passes the pgt pointer to all kvm_pgtable functions that
-need to modify their behavior based on the format.
-
-Note that FEAT_LPA2 brings support for bigger block mappings (512GB with
-4KB, 64GB with 16KB). We explicitly don't enable these in the library
-because stage2_apply_range() works on batch sizes of the largest used
-block mapping, and increasing the size of the batch would lead to soft
-lockups. See commit 5994bc9e05c2 ("KVM: arm64: Limit
-stage2_apply_range() batch size to largest block").
+For the protected kvm case, the host creates the initial page-tables
+using either the lpa2 or `classic` format as determined by whats
+reported in mmfr0 and also sets the TCR_EL2.DS bit in the params
+structure. The hypervisor then looks at this DS bit to determine the
+format that it should use to re-create the page-tables.
 
 Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 ---
- arch/arm64/include/asm/kvm_pgtable.h  | 42 ++++++++++++++++++++-----
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 12 +++----
- arch/arm64/kvm/hyp/pgtable.c          | 45 ++++++++++++++++++++++-----
- 3 files changed, 78 insertions(+), 21 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h | 18 +++++++++++++++++-
+ arch/arm64/kvm/arm.c                 |  2 ++
+ arch/arm64/kvm/hyp/nvhe/setup.c      | 18 +++++++++++++-----
+ arch/arm64/kvm/hyp/pgtable.c         |  7 ++++---
+ arch/arm64/kvm/mmu.c                 |  3 ++-
+ 5 files changed, 38 insertions(+), 10 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 744e224d964b..a7fd547dcc71 100644
+index a7fd547dcc71..d6f4dcdd00fd 100644
 --- a/arch/arm64/include/asm/kvm_pgtable.h
 +++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -25,12 +25,32 @@
+@@ -25,6 +25,21 @@
  #define KVM_PGTABLE_MIN_BLOCK_LEVEL	2U
  #endif
  
--static inline u64 kvm_get_parange(u64 mmfr0)
-+static inline bool kvm_supports_stage2_lpa2(u64 mmfr0)
- {
++static inline bool kvm_supports_hyp_lpa2(void)
++{
++#if defined(CONFIG_ARM64_4K_PAGES) || defined(CONFIG_ARM64_16K_PAGES)
++	u64 mmfr0;
 +	unsigned int tgran;
 +
++	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
 +	tgran = cpuid_feature_extract_unsigned_field(mmfr0,
-+						ID_AA64MMFR0_EL1_TGRAN_2_SHIFT);
-+	return (tgran == ID_AA64MMFR0_EL1_TGRAN_2_SUPPORTED_LPA2 &&
-+		PAGE_SIZE != SZ_64K);
++						ID_AA64MMFR0_EL1_TGRAN_SHIFT);
++	return (tgran == ID_AA64MMFR0_EL1_TGRAN_LPA2);
++#else
++	return false;
++#endif
 +}
 +
-+static inline u64 kvm_get_parange_max(bool lpa2_ena)
-+{
-+	if (lpa2_ena ||
-+	   (IS_ENABLED(CONFIG_ARM64_PA_BITS_52) && PAGE_SIZE == SZ_64K))
-+		return ID_AA64MMFR0_EL1_PARANGE_52;
-+	else
-+		return ID_AA64MMFR0_EL1_PARANGE_48;
-+}
-+
-+static inline u64 kvm_get_parange(u64 mmfr0, bool lpa2_ena)
-+{
-+	u64 parange_max = kvm_get_parange_max(lpa2_ena);
- 	u64 parange = cpuid_feature_extract_unsigned_field(mmfr0,
- 				ID_AA64MMFR0_EL1_PARANGE_SHIFT);
--	if (parange > ID_AA64MMFR0_EL1_PARANGE_MAX)
--		parange = ID_AA64MMFR0_EL1_PARANGE_MAX;
-+	if (parange > parange_max)
-+		parange = parange_max;
- 
- 	return parange;
- }
-@@ -41,6 +61,8 @@ typedef u64 kvm_pte_t;
- 
- #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
- #define KVM_PTE_ADDR_51_48		GENMASK(15, 12)
-+#define KVM_PTE_ADDR_MASK_LPA2		GENMASK(49, PAGE_SHIFT)
-+#define KVM_PTE_ADDR_51_50_LPA2		GENMASK(9, 8)
- 
- static inline bool kvm_pte_valid(kvm_pte_t pte)
+ static inline bool kvm_supports_stage2_lpa2(u64 mmfr0)
  {
-@@ -178,10 +200,16 @@ struct kvm_pgtable {
- 
- static inline u64 kvm_pte_to_phys(struct kvm_pgtable *pgt, kvm_pte_t pte)
- {
--	u64 pa = pte & KVM_PTE_ADDR_MASK;
-+	u64 pa;
- 
--	if (PAGE_SHIFT == 16)
--		pa |= FIELD_GET(KVM_PTE_ADDR_51_48, pte) << 48;
-+	if (pgt->lpa2_ena) {
-+		pa = pte & KVM_PTE_ADDR_MASK_LPA2;
-+		pa |= FIELD_GET(KVM_PTE_ADDR_51_50_LPA2, pte) << 50;
-+	} else {
-+		pa = pte & KVM_PTE_ADDR_MASK;
-+		if (PAGE_SHIFT == 16)
-+			pa |= FIELD_GET(KVM_PTE_ADDR_51_48, pte) << 48;
-+	}
- 
- 	return pa;
- }
-@@ -287,7 +315,7 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size);
-  * kvm_get_vtcr() - Helper to construct VTCR_EL2
-  * @mmfr0:	Sanitized value of SYS_ID_AA64MMFR0_EL1 register.
-  * @mmfr1:	Sanitized value of SYS_ID_AA64MMFR1_EL1 register.
-- * @phys_shfit:	Value to set in VTCR_EL2.T0SZ.
-+ * @phys_shift:	Value to set in VTCR_EL2.T0SZ, or 0 to infer from parange.
+ 	unsigned int tgran;
+@@ -253,11 +268,12 @@ struct kvm_pgtable_walker {
+  * @pgt:	Uninitialised page-table structure to initialise.
+  * @va_bits:	Maximum virtual address bits.
+  * @mm_ops:	Memory management callbacks.
++ * @lpa2_ena:	Whether to use the lpa2 page-table format.
   *
-  * The VTCR value is common across all the physical CPUs on the system.
-  * We use system wide sanitised values to fill in different fields,
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 6bf54c8daffa..43e729694deb 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -105,14 +105,12 @@ static int prepare_s2_pool(void *pgt_pool_base)
+  * Return: 0 on success, negative error code on failure.
+  */
+ int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits,
+-			 struct kvm_pgtable_mm_ops *mm_ops);
++			 struct kvm_pgtable_mm_ops *mm_ops, bool lpa2_ena);
  
- static void prepare_host_vtcr(void)
+ /**
+  * kvm_pgtable_hyp_destroy() - Destroy an unused hypervisor stage-1 page-table.
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 803055da3ee3..a234c6252c3c 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1537,6 +1537,8 @@ static void cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
+ 	tcr = (read_sysreg(tcr_el1) & TCR_EL2_MASK) | TCR_EL2_RES1;
+ 	tcr &= ~TCR_T0SZ_MASK;
+ 	tcr |= TCR_T0SZ(hyp_va_bits);
++	if (kvm_supports_hyp_lpa2())
++		tcr |= TCR_EL2_DS;
+ 	params->tcr_el2 = tcr;
+ 
+ 	params->pgd_pa = kvm_mmu_get_httbr();
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 60a6821ae98a..b44e87b9d168 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -56,7 +56,7 @@ static int divide_memory_pool(void *virt, unsigned long size)
+ 
+ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+ 				 unsigned long *per_cpu_base,
+-				 u32 hyp_va_bits)
++				 u32 hyp_va_bits, bool lpa2_ena)
  {
--	u32 parange, phys_shift;
--
--	/* The host stage 2 is id-mapped, so use parange for T0SZ */
--	parange = kvm_get_parange(id_aa64mmfr0_el1_sys_val);
--	phys_shift = id_aa64mmfr0_parange_to_phys_shift(parange);
--
-+	/*
-+	 * The host stage 2 is id-mapped; passing phys_shift=0 forces parange to
-+	 * be used for T0SZ.
-+	 */
- 	host_kvm.arch.vtcr = kvm_get_vtcr(id_aa64mmfr0_el1_sys_val,
--					  id_aa64mmfr1_el1_sys_val, phys_shift);
-+					  id_aa64mmfr1_el1_sys_val, 0);
- }
+ 	void *start, *end, *virt = hyp_phys_to_virt(phys);
+ 	unsigned long pgt_size = hyp_s1_pgtable_pages() << PAGE_SHIFT;
+@@ -66,7 +66,7 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+ 	/* Recreate the hyp page-table using the early page allocator */
+ 	hyp_early_alloc_init(hyp_pgt_base, pgt_size);
+ 	ret = kvm_pgtable_hyp_init(&pkvm_pgtable, hyp_va_bits,
+-				   &hyp_early_alloc_mm_ops);
++				   &hyp_early_alloc_mm_ops, lpa2_ena);
+ 	if (ret)
+ 		return ret;
  
- static bool host_stage2_force_pte_cb(u64 addr, u64 end, enum kvm_pgtable_prot prot);
+@@ -304,10 +304,11 @@ void __noreturn __pkvm_init_finalise(void)
+ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+ 		unsigned long *per_cpu_base, u32 hyp_va_bits)
+ {
+-	struct kvm_nvhe_init_params *params;
++	struct kvm_nvhe_init_params *params = this_cpu_ptr(&kvm_init_params);
+ 	void *virt = hyp_phys_to_virt(phys);
+ 	void (*fn)(phys_addr_t params_pa, void *finalize_fn_va);
+ 	int ret;
++	bool lpa2_ena;
+ 
+ 	BUG_ON(kvm_check_pvm_sysreg_table());
+ 
+@@ -321,14 +322,21 @@ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = recreate_hyp_mappings(phys, size, per_cpu_base, hyp_va_bits);
++	/*
++	 * The host has already done the hard work to figure out if LPA2 is
++	 * supported at stage 1 and passed the info in the in the DS bit of the
++	 * TCR. Extract and pass on so that the page-tables are constructed with
++	 * the correct format.
++	 */
++	lpa2_ena = (params->tcr_el2 & TCR_EL2_DS) != 0;
++	ret = recreate_hyp_mappings(phys, size, per_cpu_base,
++				    hyp_va_bits, lpa2_ena);
+ 	if (ret)
+ 		return ret;
+ 
+ 	update_nvhe_init_params();
+ 
+ 	/* Jump in the idmap page to switch to the new page-tables */
+-	params = this_cpu_ptr(&kvm_init_params);
+ 	fn = (typeof(fn))__hyp_pa(__pkvm_init_switch_pgd);
+ 	fn(__hyp_pa(params), __pkvm_init_finalise);
+ 
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index c7799cd50af8..8ed7353f07bc 100644
+index 8ed7353f07bc..cde852f91db8 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -61,7 +61,10 @@ struct kvm_pgtable_walk_data {
+@@ -369,7 +369,8 @@ static int hyp_set_prot_attr(struct kvm_pgtable *pgt,
+ 	}
  
- static bool kvm_phys_is_valid(struct kvm_pgtable *pgt, u64 phys)
- {
--	return phys < BIT(id_aa64mmfr0_parange_to_phys_shift(ID_AA64MMFR0_EL1_PARANGE_MAX));
-+	u64 parange_max = kvm_get_parange_max(pgt->lpa2_ena);
-+	u8 shift = id_aa64mmfr0_parange_to_phys_shift(parange_max);
-+
-+	return phys < BIT(shift);
- }
- 
- static bool kvm_block_mapping_supported(struct kvm_pgtable *pgt,
-@@ -125,10 +128,16 @@ static bool kvm_pte_table(kvm_pte_t pte, u32 level)
- 
- static kvm_pte_t kvm_phys_to_pte(struct kvm_pgtable *pgt, u64 pa)
- {
--	kvm_pte_t pte = pa & KVM_PTE_ADDR_MASK;
-+	kvm_pte_t pte;
- 
--	if (PAGE_SHIFT == 16)
--		pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
-+	if (pgt->lpa2_ena) {
-+		pte = pa & KVM_PTE_ADDR_MASK_LPA2;
-+		pte |= FIELD_PREP(KVM_PTE_ADDR_51_50_LPA2, pa >> 50);
-+	} else {
-+		pte = pa & KVM_PTE_ADDR_MASK;
-+		if (PAGE_SHIFT == 16)
-+			pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
-+	}
- 
- 	return pte;
- }
-@@ -585,8 +594,24 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
- {
- 	u64 vtcr = VTCR_EL2_FLAGS;
- 	u8 lvls;
-+	u64 parange;
-+	bool lpa2_ena = false;
-+
-+	/*
-+	 * If stage 2 reports that it supports FEAT_LPA2 for our page size, then
-+	 * we always use the LPA2 format regardless of IA and OA size.
-+	 */
-+	lpa2_ena = kvm_supports_stage2_lpa2(mmfr0);
-+
-+	parange = kvm_get_parange(mmfr0, lpa2_ena);
- 
--	vtcr |= kvm_get_parange(mmfr0) << VTCR_EL2_PS_SHIFT;
-+	/*
-+	 * Infer IPA size to be equal to PA size if phys_shift is 0.
-+	 */
-+	if (phys_shift == 0)
-+		phys_shift = id_aa64mmfr0_parange_to_phys_shift(parange);
-+
-+	vtcr |= parange << VTCR_EL2_PS_SHIFT;
- 	vtcr |= VTCR_EL2_T0SZ(phys_shift);
- 	/*
- 	 * Use a minimum 2 level page table to prevent splitting
-@@ -604,6 +629,9 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
- 	 */
- 	vtcr |= VTCR_EL2_HA;
- 
-+	if (lpa2_ena)
-+		vtcr |= VTCR_EL2_DS;
-+
- 	/* Set the vmid bits */
- 	vtcr |= (get_vmid_bits(mmfr1) == 16) ?
- 		VTCR_EL2_VS_16BIT :
-@@ -641,7 +669,9 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
- 	if (prot & KVM_PGTABLE_PROT_W)
- 		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
- 
--	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
+ 	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
+-	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_SH, sh);
 +	if (!pgt->lpa2_ena)
-+		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
-+
- 	attr |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
++		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_SH, sh);
+ 	attr |= KVM_PTE_LEAF_ATTR_LO_S1_AF;
  	attr |= prot & KVM_PTE_LEAF_ATTR_HI_SW;
  	*ptep = attr;
-@@ -1182,6 +1212,7 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
- 	u32 ia_bits = VTCR_EL2_IPA(vtcr);
- 	u32 sl0 = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
- 	u32 start_level = VTCR_EL2_TGRAN_SL0_BASE - sl0;
-+	bool lpa2_ena = (vtcr & VTCR_EL2_DS) != 0;
+@@ -528,7 +529,7 @@ u64 kvm_pgtable_hyp_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ }
  
- 	pgd_sz = kvm_pgd_pages(ia_bits, start_level) * PAGE_SIZE;
- 	pgt->pgd = mm_ops->zalloc_pages_exact(pgd_sz);
-@@ -1191,7 +1222,7 @@ int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
- 	pgt->ia_bits		= ia_bits;
- 	pgt->start_level	= start_level;
+ int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits,
+-			 struct kvm_pgtable_mm_ops *mm_ops)
++			 struct kvm_pgtable_mm_ops *mm_ops, bool lpa2_ena)
+ {
+ 	u64 levels = ARM64_HW_PGTABLE_LEVELS(va_bits);
+ 
+@@ -539,7 +540,7 @@ int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits,
+ 	pgt->ia_bits		= va_bits;
+ 	pgt->start_level	= KVM_PGTABLE_MAX_LEVELS - levels;
  	pgt->mm_ops		= mm_ops;
 -	pgt->lpa2_ena		= false;
 +	pgt->lpa2_ena		= lpa2_ena;
- 	pgt->mmu		= mmu;
- 	pgt->flags		= flags;
- 	pgt->force_pte_cb	= force_pte_cb;
+ 	pgt->mmu		= NULL;
+ 	pgt->force_pte_cb	= NULL;
+ 
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index e3fe3e194fd1..13e48539f022 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1684,7 +1684,8 @@ int kvm_mmu_init(u32 *hyp_va_bits)
+ 		goto out;
+ 	}
+ 
+-	err = kvm_pgtable_hyp_init(hyp_pgtable, *hyp_va_bits, &kvm_hyp_mm_ops);
++	err = kvm_pgtable_hyp_init(hyp_pgtable, *hyp_va_bits,
++				   &kvm_hyp_mm_ops, kvm_supports_hyp_lpa2());
+ 	if (err)
+ 		goto out_free_pgtable;
+ 
 -- 
 2.25.1
 
