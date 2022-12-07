@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1898BF1
-	for <kvmarm@lists.linux.dev>; Wed,  7 Dec 2022 19:15:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8979DC433C1;
-	Wed,  7 Dec 2022 19:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37C68BF1
+	for <kvmarm@lists.linux.dev>; Wed,  7 Dec 2022 19:20:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CD7EC4314C;
+	Wed,  7 Dec 2022 19:20:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670440559;
-	bh=ZPzK6q04L/2RwzpjReiIvxe9bN5AwfjCz4hPurBM3P4=;
+	s=k20201202; t=1670440818;
+	bh=sC3n0vgIAD3Um2bOLbnl9qG5sDLm9eN8+gQ1hvWU04Q=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Sbpol4z0UAZgjcs6rlWJ6c6LhxqgnbXX2zYkfGjfs8wwCeaE+bln8HMyPJLgjxFpZ
-	 o7cloxgnqnz1BEwIIK9ZuEizvCNH6xWteJl+DWrzpa/Ct9s/jLHuHEseOhIE0kTg7y
-	 3KJy2Yk0aLmsSC3jY/UW36c9XdaHm2umk45MBsdIir+enqDRDSo9YOfC47EGVQsHja
-	 YoekoJxRCiFT2mntBFPmmYz4A+U7GbwhzjgBogkzCjXT/9tvsXhspGk7mtXiRTdwxp
-	 ooHuWXUpTp9jPcerf+UJFHppxZp+3XocepFqKl7dUL76AWbG7zXrJx4twPezxh5+PF
-	 55tiuL5Dhi9Ug==
+	b=TdOUWGVjzfTCGVA7XDXJx6UTVzUmxOVgsINex6CYWK5PAjqmvbuoLjn3XTPIGcdVF
+	 sPRyKts7Nm5sDPgSltWZVu5ITOCiMBb7cg4Jm8ETKZ85xbpNysbbEaYgH4XfH1KRSW
+	 vu1YFdhnzOxsVvkgq26BajJRI7nlRMr0yTVOslmhVPjAs7A8+SXfESv24yiYkQ3kRw
+	 CB1wlZ0CWBs5XTKoe1pzc2RUlmMKhUcheymb3MYYZ9uhNJ0C7JHMpMwI8/Ff+h6dA8
+	 +Tyesrn+LdtS+qSyclT/LFaSMCa9jRs0KYy8hITOM2jZH4VtPJMiFfEaEu7ibgdQ8H
+	 tm6FZnyATVefg==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1p2ztd-00BBoa-4z;
-	Wed, 07 Dec 2022 19:15:57 +0000
-Date: Wed, 07 Dec 2022 19:14:16 +0000
-Message-ID: <87v8mnrppz.wl-maz@kernel.org>
+	id 1p2zxo-00BBqo-AA;
+	Wed, 07 Dec 2022 19:20:16 +0000
+Date: Wed, 07 Dec 2022 19:18:35 +0000
+Message-ID: <87tu27rpis.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -33,12 +33,12 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 05/14] arm64/asm: Introduce assembly macros for managing ALLINT
-In-Reply-To: <Y443SY8/lCcDQvYj@sirena.org.uk>
+Subject: Re: [PATCH v2 04/14] arm64/sysreg: Add definitions for immediate versions of MSR ALLINT
+In-Reply-To: <Y44mSokVwLHbGdN7@sirena.org.uk>
 References: <20221112151708.175147-1-broonie@kernel.org>
-	<20221112151708.175147-6-broonie@kernel.org>
-	<86tu29lpwt.wl-maz@kernel.org>
-	<Y443SY8/lCcDQvYj@sirena.org.uk>
+	<20221112151708.175147-5-broonie@kernel.org>
+	<86wn75ls9u.wl-maz@kernel.org>
+	<Y44mSokVwLHbGdN7@sirena.org.uk>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -54,25 +54,58 @@ X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 05 Dec 2022 18:24:09 +0000,
+On Mon, 05 Dec 2022 17:11:38 +0000,
 Mark Brown <broonie@kernel.org> wrote:
 > 
-> On Mon, Dec 05, 2022 at 05:29:54PM +0000, Marc Zyngier wrote:
-> > On Sat, 12 Nov 2022 15:16:59 +0000,
+> [1  <text/plain; us-ascii (7bit)>]
+> On Mon, Dec 05, 2022 at 04:38:53PM +0000, Marc Zyngier wrote:
 > > Mark Brown <broonie@kernel.org> wrote:
 > 
-> > > In order to allow assembly code to ensure that not even superpriorty
-> > > interrupts can preempt it provide macros for enabling and disabling
-> >                         ^
-> >                         \ Insert comma here
+> > >  }
+> > > +
+> > >  #endif
 > 
-> That would give ...not even superpriority interrupts can preempt, it"
-> which doesn't make sense to me?
+> > Spurious change?
+> 
+> Yes.
+> 
+> > > +++ b/arch/arm64/include/asm/nmi.h
+> > > @@ -0,0 +1,18 @@
+> > > +/* SPDX-License-Identifier: GPL-2.0-only */
+> 
+> > > +static __always_inline void _allint_set(void)
+> > > +{
+> > > +	asm volatile(__msr_s(SYS_ALLINT_SET, "xzr"));
+> > > +}
+> 
+> > If this *really* must be a separate include file, it should at least
+> > directly include its dependencies. My gut feeling is that it would be
+> > better placed in daiflags.h.
+> 
+> Yeah, I was swithering on that.  Some versions of the code have had more
+> in here at which point having the separate header made more sense.  I
+> think part of the problem here is that we should do some combination of
+> renaming daifflags.h or layering an a more abstracted API on top of it,
+> putting things that are not DAIF into daifflags.h doesn't feel great.
+> 
+> > > @@ -126,6 +126,8 @@
+> > >   * System registers, organised loosely by encoding but grouped together
+> > >   * where the architected name contains an index. e.g. ID_MMFR<n>_EL1.
+> > >   */
+> > > +#define SYS_ALLINT_CLR			sys_reg(0, 1, 4, 0, 0)
+> > > +#define SYS_ALLINT_SET			sys_reg(0, 1, 4, 1, 0)
+> 
+> > This only covers the immediate versions of ALLINT, and misses the
+> > definition for the register version, aka sys_reg(3, 0, 4, 3, 0).
+> 
+> That is already present upstream, we only need to add the immediate
+> versions which the generated header stuff doesn't have any model for
+> yet.
 
-Well, clearly the ^ is misaligned, and should probably(?) be after the
-'it'. Try reading the sentence out loud, only taking a breath when you
-encounter a punctuation sign. That should give you an idea of what is
-missing...
+Ah, missed that one, thanks.
+
+Out of curiosity, what is missing in the generator to deal with this
+stuff?
 
 	M.
 
