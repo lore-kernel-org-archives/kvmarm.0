@@ -1,60 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718D01367
-	for <kvmarm@lists.linux.dev>; Wed,  7 Dec 2022 07:50:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BC25C433C1;
-	Wed,  7 Dec 2022 07:50:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D3763C
+	for <kvmarm@lists.linux.dev>; Wed,  7 Dec 2022 11:03:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68814C433D6;
+	Wed,  7 Dec 2022 11:03:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670399452;
-	bh=5jlubpu3hv7gKSSUUnb9ZTzv2xyFMeitpywQVmBs7i4=;
+	s=k20201202; t=1670411009;
+	bh=xmexmDtxA4l+jjA3C9dNMASb9eHFC+CM3rUn77Z0q30=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TLM9PRyqlGJBPrjPNAQAgMAAoZw8XntKFdQADfLO11A8YLALVYH3JaylM16awxXPD
-	 Z1etOtXNuoKykJKkLmkTkc+C1Y5vKQkVWOz2su4/niLXjzWncQqT3kRQR6YCyWLmlu
-	 mbjUH7H4To4YIpkiqM8VPcw0q+i6sqDWoVppv0V1QGOfgKZGVQ9DMdAIXm2mcMcWkj
-	 K0n9mU58MZK3sNueC/OoJZcICPOzkpo72CStU/hAzJn/Y6d1bniYYNinyvDA0npsr3
-	 MbUSHlD1SS4ihIGkq/Ie0levx8XZVpaWPPPDv7Al8ybWUOHIzYjp/F6N7reEdkooVc
-	 cdNoQWvcv1JFA==
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+	b=mGuPrrBNV0iwRGGniJJMkIHmp5Fl3718hsctWxLA/0htEMlDa+L2EM3G/OT1FIKqS
+	 CcHHm++NDBhPsX0Am0azZHYDcK7SsYnLsVmMwkRVQsW1XZ24qqnGkG4y+7MX93Hpp3
+	 RYWTN3oattzZnWvVPAvbuIRlHhduGyMOTjgjgmcY1cT6PFXfzrtYUNQihOQS+ec4x9
+	 TfpVpFtQsUT1WYvwUjkeNC0e7f+2KgZPl6xl32O7Q2wIrh3AQCFU6iYYCtnSBsHH60
+	 9rUUoJFnuarsNZzCCSbqxBhXaRhBwUBWOUU9BMwu3BRcMaO1QqMc1BkjMy3RNKS2Lk
+	 7J1ogEV0iF22A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1p2pCb-00B1kc-4L;
-	Wed, 07 Dec 2022 07:50:49 +0000
-Date: Wed, 07 Dec 2022 07:49:08 +0000
-Message-ID: <877cz3u00b.wl-maz@kernel.org>
+	id 1p2sD1-00B4Rc-3J;
+	Wed, 07 Dec 2022 11:03:27 +0000
+Date: Wed, 07 Dec 2022 11:03:26 +0000
+Message-ID: <86k033lblt.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Mark Brown <broonie@kernel.org>,	Sean Christopherson
- <seanjc@google.com>,	Andrew Jones <andrew.jones@linux.dev>,	Andrew Morton
- <akpm@linux-foundation.org>,	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,	Bagas Sanjaya
- <bagasdotme@gmail.com>,	Ben Gardon <bgardon@google.com>,	Catalin Marinas
- <catalin.marinas@arm.com>,	Cornelia Huck <cohuck@redhat.com>,	Fuad Tabba
- <tabba@google.com>,	Gavin Shan <gshan@redhat.com>,	Jakub Kicinski
- <kuba@kernel.org>,	James Morse <james.morse@arm.com>,
-	"Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,	Marek Szyprowski
- <m.szyprowski@samsung.com>,	Mark Rutland <mark.rutland@arm.com>,	Oliver
- Upton <oliver.upton@linux.dev>,	Peter Collingbourne <pcc@google.com>,	Peter
- Xu <peterx@redhat.com>,	Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?=
- <philmd@linaro.org>,	Quentin Perret <qperret@google.com>,	Reiji Watanabe
- <reijiw@google.com>,	Ricardo Koller <ricarkol@google.com>,	Ryan Roberts
- <ryan.roberts@arm.com>,	Steven Price <steven.price@arm.com>,	Usama Arif
- <usama.arif@bytedance.com>,	Vincent Donnefort <vdonnefort@google.com>,	Will
- Deacon <will@kernel.org>,	Zhiyuan Dai <daizhiyuan@phytium.com.cn>,	Suzuki
- K Poulose <suzuki.poulose@arm.com>,	Alexandru Elisei
- <alexandru.elisei@arm.com>,	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu,	kvmarm@lists.linux.dev,	kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
-In-Reply-To: <28e7f298-972b-2cb8-df80-951076724c73@redhat.com>
-References: <20221205155845.233018-1-maz@kernel.org>
-	<3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
-	<Y4+FmDM7E5WYP3zV@google.com>
-	<Y4+H5Vwy/aLvjqbw@sirena.org.uk>
-	<28e7f298-972b-2cb8-df80-951076724c73@redhat.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Sami Mujawar <Sami.Mujawar@arm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 12/14] arm64/nmi: Add handling of superpriority interrupts as NMIs
+In-Reply-To: <20221112151708.175147-13-broonie@kernel.org>
+References: <20221112151708.175147-1-broonie@kernel.org>
+	<20221112151708.175147-13-broonie@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -62,42 +47,246 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, broonie@kernel.org, seanjc@google.com, andrew.jones@linux.dev, akpm@linux-foundation.org, anshuman.khandual@arm.com, acme@kernel.org, bagasdotme@gmail.com, bgardon@google.com, catalin.marinas@arm.com, cohuck@redhat.com, tabba@google.com, gshan@redhat.com, kuba@kernel.org, james.morse@arm.com, maciej.szmigiero@oracle.com, m.szyprowski@samsung.com, mark.rutland@arm.com, oliver.upton@linux.dev, pcc@google.com, peterx@redhat.com, philmd@linaro.org, qperret@google.com, reijiw@google.com, ricarkol@google.com, ryan.roberts@arm.com, steven.price@arm.com, usama.arif@bytedance.com, vdonnefort@google.com, will@kernel.org, daizhiyuan@phytium.com.cn, suzuki.poulose@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, lpieralisi@kernel.org, mark.rutland@arm.com, Sami.Mujawar@arm.com, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221207074908.W8i1SyxQJeasex45KiMC-arow5zcnxiu2tyQgNTaaG4@z>
 
-On Tue, 06 Dec 2022 21:43:43 +0000,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Sat, 12 Nov 2022 15:17:06 +0000,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> On 12/6/22 19:20, Mark Brown wrote:
-> >> I almost suggested doing that on multiple occasions this cycle, but ultimately
-> >> decided not to because it would effectively mean splitting series that touch KVM
-> >> and selftests into different trees, which would create a different kind of
-> >> dependency hell.  Or maybe a hybrid approach where series that only (or mostly?)
-> >> touch selftests go into a dedicated tree?
-> > 
-> > Some other subsystems do have a separate branch for kselftests.  One
-> > fairly common occurrence is that the selftests branch ends up failing to
-> > build independently because someone adds new ABI together with a
-> > selftest but the patches adding the ABI don't end up on the same branch
-> > as the tests which try to use them.  That is of course resolvable but
-> > it's a common friction point.
+> Our goal with superpriority interrupts is to use them as NMIs, taking
+> advantage of the much smaller regions where they are masked to allow
+> prompt handling of the most time critical interrupts.
 > 
-> Yeah, the right solution is simply to merge selftests changes
-> separately from the rest and use topic branches.
+> When an interrupt configured with superpriority we will enter EL1 as
+> normal for any interrupt, the presence of a superpriority interrupt is
+> indicated with a status bit in ISR_EL1. We use this to check for the
+> presence of a superpriority interrupt before we unmask anything in
+> elX_interrupt(), reporting without unmasking any interrupts. If no
+> superpriority interrupt is present then we handle normal interrupts as
+> normal, superpriority interrupts will be unmasked while doing so as a
+> result of setting DAIF_PROCCTX.
+> 
+> Both IRQs and FIQs may be configured with superpriority so we handle
+> both, passing an additional root handler into the elX_interrupt()
+> function along with the mask for the bit in ISR_EL1 which indicates the
+> presence of the relevant kind of superpriority interrupt. These root
+> handlers can be configured by the interrupt controller similarly to the
+> root handlers for normal interrupts using the newly added
+> set_handle_nmi_irq() and set_handle_nmi_fiq() functions.
+> 
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/irq.h     |  2 ++
+>  arch/arm64/kernel/entry-common.c | 55 +++++++++++++++++++++++++++-----
+>  arch/arm64/kernel/irq.c          | 32 +++++++++++++++++++
+>  3 files changed, 81 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/irq.h b/arch/arm64/include/asm/irq.h
+> index fac08e18bcd5..2ab05d899bf6 100644
+> --- a/arch/arm64/include/asm/irq.h
+> +++ b/arch/arm64/include/asm/irq.h
+> @@ -8,6 +8,8 @@
+>  
+>  struct pt_regs;
+>  
+> +int set_handle_nmi_irq(void (*handle_irq)(struct pt_regs *));
+> +int set_handle_nmi_fiq(void (*handle_fiq)(struct pt_regs *));
 
-Don't know if this is what you have in mind, but I think that we
-should use topic branches for *everything*. The only things for which
-I don't use a separate branch are the odd drive-by patches, of the
-spelling fix persuasion.
+I'm not overly keen on adding hooks that are not used, and I can't
+really foresee a use case for a FIQ NMI at the moment (there is no
+plan to use Group-0 interrupts in VMs when the GIC is enabled, and the
+only interrupt controller we have that uses FIQ doesn't even have
+priorities, let alone NMIs).
 
-That's what we do for arm64 and the IRQ subsystem. It is a bit more
-involved at queuing time, but makes dropping series from -next
-extremely easy, without affecting the history. And crucially, it gives
-everyone a hint to base their stuff on a stable commit, not a random
-"tip of kvm/queue as of three days ago".
+>  int set_handle_irq(void (*handle_irq)(struct pt_regs *));
+>  #define set_handle_irq	set_handle_irq
+>  int set_handle_fiq(void (*handle_fiq)(struct pt_regs *));
+> diff --git a/arch/arm64/kernel/entry-common.c b/arch/arm64/kernel/entry-common.c
+> index 9173fad279af..eb6fc718737e 100644
+> --- a/arch/arm64/kernel/entry-common.c
+> +++ b/arch/arm64/kernel/entry-common.c
+> @@ -278,6 +278,8 @@ static void do_interrupt_handler(struct pt_regs *regs,
+>  	set_irq_regs(old_regs);
+>  }
+>  
+> +extern void (*handle_arch_nmi_irq)(struct pt_regs *);
+> +extern void (*handle_arch_nmi_fiq)(struct pt_regs *);
+>  extern void (*handle_arch_irq)(struct pt_regs *);
+>  extern void (*handle_arch_fiq)(struct pt_regs *);
+>  
+> @@ -453,6 +455,14 @@ asmlinkage void noinstr el1h_64_sync_handler(struct pt_regs *regs)
+>  	}
+>  }
+>  
+> +static __always_inline void __el1_nmi(struct pt_regs *regs,
+> +				      void (*handler)(struct pt_regs *))
+> +{
+> +	arm64_enter_nmi(regs);
+> +	do_interrupt_handler(regs, handler);
+> +	arm64_exit_nmi(regs);
+> +}
+> +
+>  static __always_inline void __el1_pnmi(struct pt_regs *regs,
+>  				       void (*handler)(struct pt_regs *))
+>  {
+> @@ -474,9 +484,19 @@ static __always_inline void __el1_irq(struct pt_regs *regs,
+>  
+>  	exit_to_kernel_mode(regs);
+>  }
+> -static void noinstr el1_interrupt(struct pt_regs *regs,
+> -				  void (*handler)(struct pt_regs *))
+> +
+> +static void noinstr el1_interrupt(struct pt_regs *regs, u64 nmi_flag,
+> +				  void (*handler)(struct pt_regs *),
+> +				  void (*nmi_handler)(struct pt_regs *))
+>  {
+> +	if (system_uses_nmi()) {
+> +		/* Is there a NMI to handle? */
+> +		if (read_sysreg(isr_el1) & nmi_flag) {
+
+Better written as:
+
+	if (system_uses_nmi() && (read_sysreg(isr_el1) & nmi_flag)) {
+
+> +			__el1_nmi(regs, nmi_handler);
+> +			return;
+> +		}
+> +	}
+> +
+>  	write_sysreg(DAIF_PROCCTX_NOIRQ, daif);
+>  
+>  	if (IS_ENABLED(CONFIG_ARM64_PSEUDO_NMI) && !interrupts_enabled(regs))
+> @@ -487,12 +507,12 @@ static void noinstr el1_interrupt(struct pt_regs *regs,
+>  
+>  asmlinkage void noinstr el1h_64_irq_handler(struct pt_regs *regs)
+>  {
+> -	el1_interrupt(regs, handle_arch_irq);
+> +	el1_interrupt(regs, ISR_EL1_IS, handle_arch_irq, handle_arch_nmi_irq);
+>  }
+>  
+>  asmlinkage void noinstr el1h_64_fiq_handler(struct pt_regs *regs)
+>  {
+> -	el1_interrupt(regs, handle_arch_fiq);
+> +	el1_interrupt(regs, ISR_EL1_FS, handle_arch_fiq, handle_arch_nmi_fiq);
+>  }
+>  
+>  asmlinkage void noinstr el1h_64_error_handler(struct pt_regs *regs)
+> @@ -701,11 +721,30 @@ asmlinkage void noinstr el0t_64_sync_handler(struct pt_regs *regs)
+>  	}
+>  }
+>  
+> -static void noinstr el0_interrupt(struct pt_regs *regs,
+> -				  void (*handler)(struct pt_regs *))
+> +static void noinstr el0_interrupt(struct pt_regs *regs, u64 nmi_flag,
+> +				  void (*handler)(struct pt_regs *),
+> +				  void (*nmi_handler)(struct pt_regs *))
+>  {
+>  	enter_from_user_mode(regs);
+>  
+> +	if (system_uses_nmi()) {
+> +		/* Is there a NMI to handle? */
+> +		if (read_sysreg(isr_el1) & nmi_flag) {
+
+Same thing.
+
+> +			/*
+> +			 * Any system with FEAT_NMI should not be
+> +			 * affected by Spectre v2 so we don't mitigate
+> +			 * here.
+> +			 */
+
+Why? I don't see a good reason not to mitigate it, specially when the
+mitigation is guarded by cpus_have_const_cap(ARM64_SPECTRE_V2). Maybe
+you can explain what the rationale is for this.
+
+> +
+> +			arm64_enter_nmi(regs);
+> +			do_interrupt_handler(regs, nmi_handler);
+> +			arm64_exit_nmi(regs);
+> +
+> +			exit_to_user_mode(regs);
+> +			return;
+> +		}
+> +	}
+> +
+>  	write_sysreg(DAIF_PROCCTX_NOIRQ, daif);
+>  
+>  	if (regs->pc & BIT(55))
+> @@ -720,7 +759,7 @@ static void noinstr el0_interrupt(struct pt_regs *regs,
+>  
+>  static void noinstr __el0_irq_handler_common(struct pt_regs *regs)
+>  {
+> -	el0_interrupt(regs, handle_arch_irq);
+> +	el0_interrupt(regs, ISR_EL1_IS, handle_arch_irq, handle_arch_nmi_irq);
+>  }
+>  
+>  asmlinkage void noinstr el0t_64_irq_handler(struct pt_regs *regs)
+> @@ -730,7 +769,7 @@ asmlinkage void noinstr el0t_64_irq_handler(struct pt_regs *regs)
+>  
+>  static void noinstr __el0_fiq_handler_common(struct pt_regs *regs)
+>  {
+> -	el0_interrupt(regs, handle_arch_fiq);
+> +	el0_interrupt(regs, ISR_EL1_FS, handle_arch_fiq, handle_arch_nmi_fiq);
+>  }
+>  
+>  asmlinkage void noinstr el0t_64_fiq_handler(struct pt_regs *regs)
+> diff --git a/arch/arm64/kernel/irq.c b/arch/arm64/kernel/irq.c
+> index 38dbd3828f13..77a1ea90b244 100644
+> --- a/arch/arm64/kernel/irq.c
+> +++ b/arch/arm64/kernel/irq.c
+> @@ -85,6 +85,16 @@ void do_softirq_own_stack(void)
+>  }
+>  #endif
+>  
+> +static void default_handle_nmi_irq(struct pt_regs *regs)
+> +{
+> +	panic("Superpriority IRQ taken without a root NMI IRQ handler\n");
+> +}
+> +
+> +static void default_handle_nmi_fiq(struct pt_regs *regs)
+> +{
+> +	panic("Superpriority FIQ taken without a root NMI FIQ handler\n");
+> +}
+> +
+>  static void default_handle_irq(struct pt_regs *regs)
+>  {
+>  	panic("IRQ taken without a root IRQ handler\n");
+> @@ -95,9 +105,31 @@ static void default_handle_fiq(struct pt_regs *regs)
+>  	panic("FIQ taken without a root FIQ handler\n");
+>  }
+>  
+> +void (*handle_arch_nmi_irq)(struct pt_regs *) __ro_after_init = default_handle_nmi_irq;
+> +void (*handle_arch_nmi_fiq)(struct pt_regs *) __ro_after_init = default_handle_nmi_fiq;
+>  void (*handle_arch_irq)(struct pt_regs *) __ro_after_init = default_handle_irq;
+>  void (*handle_arch_fiq)(struct pt_regs *) __ro_after_init = default_handle_fiq;
+>  
+> +int __init set_handle_nmi_irq(void (*handle_nmi_irq)(struct pt_regs *))
+> +{
+> +	if (handle_arch_nmi_irq != default_handle_nmi_irq)
+> +		return -EBUSY;
+> +
+> +	handle_arch_nmi_irq = handle_nmi_irq;
+> +	pr_info("Root superpriority IRQ handler: %ps\n", handle_nmi_irq);
+> +	return 0;
+> +}
+> +
+> +int __init set_handle_nmi_fiq(void (*handle_nmi_fiq)(struct pt_regs *))
+> +{
+> +	if (handle_arch_nmi_fiq != default_handle_nmi_fiq)
+> +		return -EBUSY;
+> +
+> +	handle_arch_nmi_fiq = handle_nmi_fiq;
+> +	pr_info("Root superpriority FIQ handler: %ps\n", handle_nmi_fiq);
+> +	return 0;
+> +}
+> +
+>  int __init set_handle_irq(void (*handle_irq)(struct pt_regs *))
+>  {
+>  	if (handle_arch_irq != default_handle_irq)
+
+Thanks,
 
 	M.
 
