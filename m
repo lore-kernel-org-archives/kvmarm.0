@@ -2,67 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F732C63705
-	for <kvmarm@archiver.kernel.org>; Wed,  7 Dec 2022 21:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD64C63703
+	for <kvmarm@archiver.kernel.org>; Wed,  7 Dec 2022 23:45:10 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E407A4B796;
-	Wed,  7 Dec 2022 16:51:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54F9E4B638;
+	Wed,  7 Dec 2022 18:45:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GxqKPB6r3DiL; Wed,  7 Dec 2022 16:51:48 -0500 (EST)
+	with ESMTP id GJ7ZXAE1HxLk; Wed,  7 Dec 2022 18:45:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 384274B766;
-	Wed,  7 Dec 2022 16:51:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 17D424B285;
+	Wed,  7 Dec 2022 18:45:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 118054B6DD
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Dec 2022 16:51:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D0534B841
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Dec 2022 18:45:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AHfpEiosAgFG for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Dec 2022 16:51:45 -0500 (EST)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 798674B766
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Dec 2022 16:51:45 -0500 (EST)
-Date: Wed, 7 Dec 2022 21:51:33 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1670449904;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=f7P0kqsSYyYgMgn0HVqN0dW/Am5VL47EfwN3CgyuatQ=;
- b=FeI9pWzm2VOlZScgd6p3aQcHP+oSaSJ8yF3rH+FR4l9BzCLgT1bQYaP1BnReWiuavWfgm5
- wP7tt6CQ93A/pW4pC/diMxXscHnyX6h3ovfEmxi9hJvkDYiU61YmoUe6kLx0OfS8AUlKiI
- C8xvBmN8RR1k2bGM6KLUDDk1A5JI/zI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
-Message-ID: <Y5EK5dDBhutOQTf6@google.com>
-References: <20221205155845.233018-1-maz@kernel.org>
- <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
+ with ESMTP id yFy+CLsye7pn for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Dec 2022 18:44:58 -0500 (EST)
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com
+ [209.85.216.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 44F7B4B802
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Dec 2022 18:44:58 -0500 (EST)
+Received: by mail-pj1-f54.google.com with SMTP id
+ q17-20020a17090aa01100b002194cba32e9so2944292pjp.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 07 Dec 2022 15:44:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=6iCaSQa1HFCfJ8+bX1upEoM6MTaIn0UmKgjdPtgAjjc=;
+ b=KkMIutKijaPJLWWpORIH3M7DoEIXJXVArWkiJXMSz8T5xYL8iAo5sVXEy6sqiKL4Q6
+ GzONfdpncDOio5lHMt6K32MFchEpLDDS74m0k84wySF8/xUSWPDlRO2qHTFx5CJMTPXs
+ Pz6umlCMMEx5buAmxJt9/iKpq4sAYZrlfHRHXCB8Qi05gvNYWM87iJwBVi1GJFkHaJdf
+ ee9nlI6HgLtZD0zr9k1FZwi8siSZ1tDbxVjExGf5o7x44QyiPbec1tbcxkvIpEzPWM9t
+ c8szkfNSqQIk+eipVkW44sLAkuj6/o8y3vDsWwtHW9Cp/VMEqkIeC4CwH84SP4Y+4+N9
+ mnbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=6iCaSQa1HFCfJ8+bX1upEoM6MTaIn0UmKgjdPtgAjjc=;
+ b=Ne/QDCDbEeeWUc4zaqprMDta6cgd9dIgkUzKMUoXYWt6v+cEu+/FVatUCTFXjFXv5x
+ dYg8UWBGPOS4wk+Bhsnam5RBaoAAjCKrf3o+69mxgyRdNUPr43mOu6LUgyYS+uQCwBTY
+ wfn34qGdCnua9ouETfH2bKlAS76E4xqMmt0WBUA9IzkSaOYv1bnWzzHT9XPGgIEfJV4K
+ wjHjs61AmOl50dQ9HsA4ZeHbDPwb0cXLKbU0UQMwGyhVrVDnnXwKw/ooatlr9wo+XNzq
+ hYdw/64k0NYSB2ygbk3c7jPNYhUGIGWJlLrnF/qhbDVX+jFZKjIAj1MK7rBjW/hJZ2lh
+ tVgA==
+X-Gm-Message-State: ANoB5pk9hVOq46W6t2e98UKX1tLIE52Fsn3Ie1MkUBg9BtyUC8ZDJVgj
+ pgy+RQJToCgYZGsbU6GQK/uI9w==
+X-Google-Smtp-Source: AA0mqf5f+HSDTe/eFvdYT1KQV50ny+OsSgkb0jaUxxexfrGcapWSrpNJd+KINOsgbiEg2Rw5vCDanA==
+X-Received: by 2002:a17:90a:55c2:b0:219:f970:5119 with SMTP id
+ o2-20020a17090a55c200b00219f9705119mr590148pjm.1.1670456693817; 
+ Wed, 07 Dec 2022 15:44:53 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ w10-20020a170902e88a00b001868ed86a95sm15155465plg.174.2022.12.07.15.44.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 07 Dec 2022 15:44:53 -0800 (PST)
+Date: Wed, 7 Dec 2022 23:44:50 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 4/4] KVM: selftests: Allocate ucall pool from
+ MEM_REGION_DATA
+Message-ID: <Y5ElcibE2CubONgm@google.com>
+References: <20221207214809.489070-1-oliver.upton@linux.dev>
+ <20221207214809.489070-5-oliver.upton@linux.dev>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Andrew Jones <andrew.jones@linux.dev>, Usama Arif <usama.arif@bytedance.com>,
- Bagas Sanjaya <bagasdotme@gmail.com>, Ben Gardon <bgardon@google.com>,
- "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Marek Szyprowski <m.szyprowski@samsung.com>, Marc Zyngier <maz@kernel.org>,
- Steven Price <steven.price@arm.com>, linux-arm-kernel@lists.infradead.org,
- Jakub Kicinski <kuba@kernel.org>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Mark Brown <broonie@kernel.org>,
- kvmarm@lists.linux.dev, Peter Collingbourne <pcc@google.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>, Zhiyuan Dai <daizhiyuan@phytium.com.cn>,
- Andrew Morton <akpm@linux-foundation.org>
+In-Reply-To: <20221207214809.489070-5-oliver.upton@linux.dev>
+Cc: linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+ Andrew Jones <andrew.jones@linux.dev>, Peter Gonda <pgonda@google.com>,
+ kvmarm@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,71 +97,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Dec 06, 2022 at 06:41:21PM +0100, Paolo Bonzini wrote:
-> On 12/5/22 16:58, Marc Zyngier wrote:
-> > - There is a lot of selftest conflicts with your own branch, see:
-> > 
-> >    https://lore.kernel.org/r/20221201112432.4cb9ae42@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201113626.438f13c5@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201115741.7de32422@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201120939.3c19f004@canb.auug.org.au
-> >    https://lore.kernel.org/r/20221201131623.18ebc8d8@canb.auug.org.au
-> > 
-> >    for a rather exhaustive collection.
+On Wed, Dec 07, 2022, Oliver Upton wrote:
+> MEM_REGION_TEST_DATA is meant to hold data explicitly used by a
+> selftest, not implicit allocations due to the selftests infrastructure.
+> Allocate the ucall pool from MEM_REGION_DATA much like the rest of the
+> selftests library allocations.
 > 
-> Yeah, I saw them in Stephen's messages but missed your reply.
-> 
-> In retrospect, at least Gavin's series for memslot_perf_test should have
-> been applied by both of us with a topic branch, but there's so many
-> conflicts all over the place that it's hard to single out one series.
-> It just happens.
-> 
-> The only conflict in non-x86 code is the following one, please check
-> if I got it right.
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> index 05bb6a6369c2..0cda70bef5d5 100644
-> --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> @@ -609,6 +609,8 @@ static void setup_memslots(struct kvm_vm *vm, struct test_params *p)
->  				    data_size / guest_page_size,
->  				    p->test_desc->data_memslot_flags);
->  	vm->memslots[MEM_REGION_TEST_DATA] = TEST_DATA_MEMSLOT;
-> +
-> +	ucall_init(vm, data_gpa + data_size);
->  }
->  static void setup_default_handlers(struct test_desc *test)
-> @@ -704,8 +706,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  	setup_gva_maps(vm);
-> -	ucall_init(vm, NULL);
-> -
->  	reset_event_counts();
->  	/*
-> 
-> 
-> Special care is needed here because the test uses ____vm_create().
-> 
-> I haven't pushed to kvm/next yet to give you time to check, so the
-> merge is currently in kvm/queue only.
+> Fixes: 426729b2cf2e ("KVM: selftests: Add ucall pool based implementation")
 
-Have a look at this series, which gets things building and actually
-passing again:
+Not that it really matters because no one will backport this verbatim, but this
+is the wrong commit to blame.  As of commit 426729b2cf2e, MEM_REGION_DATA does not
+exist.  And similarly, the common ucall code didn't exist when Ricardo's series
+introduced MEM_REGION_DATA.
 
-https://lore.kernel.org/kvm/20221207214809.489070-1-oliver.upton@linux.dev/
+  $ git show 426729b2cf2e:tools/testing/selftests/kvm/include/kvm_util_base.h | grep MEM_REGION_DATA
+  $ git show 290c5b54012b7:tools/testing/selftests/kvm/lib/ucall_common.c
+  fatal: path 'tools/testing/selftests/kvm/lib/ucall_common.c' exists on disk, but not in '290c5b54012b7'
 
-> > - For the 6.3 cycle, we are going to experiment with Oliver taking
-> >    care of most of the patch herding. I'm sure he'll do a great job,
-> >    but if there is the odd mistake, please cut him some slack and blame
-> >    me instead.
-> 
-> Absolutely - you both have all the slack you need, synchronization
-> is harder than it seems.
+The commit where the two collided is:
 
-Appreciated!
+Fixes: cc7544101eec ("Merge tag 'kvmarm-6.2' of https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD")
 
---
-Thanks,
-Oliver
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+
+Fixes nit aside,
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
