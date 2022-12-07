@@ -1,92 +1,97 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E218BF1
-	for <kvmarm@lists.linux.dev>; Wed,  7 Dec 2022 19:42:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3460AC433D6;
-	Wed,  7 Dec 2022 19:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03FD38C02
+	for <kvmarm@lists.linux.dev>; Wed,  7 Dec 2022 19:57:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADDA8C43147
+	for <kvmarm@lists.linux.dev>; Wed,  7 Dec 2022 19:57:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670442141;
-	bh=iRAbXOcrhjROaOaIrUBq711kZIh9jmGIK5WOvdHRYko=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=J/VK9v2aTCrcFb4jcw59qXSCZXga5CU32GcRV2pvXE8eEzgU9EJO2WyCq7G9ypvnQ
-	 pj0NH6ElxnmP8Sg4i70saTVm0ThJP0l72G/c8/xImTbZGBV+/gmp6aZWHusKS1c3nf
-	 Mwj0IQW+sDk8l88MqxqMEW78iGzQQxz26sHL7KupzviX1r49wpqrlq4FpvVftapOhW
-	 69Gg11cghJRfnZ9NmQyeImhvUaqfB1eGmZoT6MGSHYYoBSG4qoy6vSj/Dfg75DQ/dU
-	 UkDtEHYbXLARhzEMyTWKajBFHj28X9Rue+Q0hdYTkf1yv5n6ZtBf2aEwk7JKRQWr9u
-	 Q0I+GBoKP4TBQ==
-Date: Wed, 7 Dec 2022 19:42:15 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Sami Mujawar <Sami.Mujawar@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 04/14] arm64/sysreg: Add definitions for immediate
- versions of MSR ALLINT
-Message-ID: <Y5Dsl9ayeu0Zru9m@sirena.org.uk>
-References: <20221112151708.175147-1-broonie@kernel.org>
- <20221112151708.175147-5-broonie@kernel.org>
- <86wn75ls9u.wl-maz@kernel.org>
- <Y44mSokVwLHbGdN7@sirena.org.uk>
- <87tu27rpis.wl-maz@kernel.org>
+	s=k20201202; t=1670443024;
+	bh=AvmeQtrnl7xMXtEnD6viJTvtLqEQcfiUyyyKZl/KgUI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=ObplL2g8TxTO5JJOjfNmVoA6K7NHMQs2vaoeQ8u0mEZIQu8gLeqCx6d8mgaTga/BN
+	 bc376wJENHG5Zx2mALAkvG9AD8eEcU2D2t+zU/g2gWfdHcB+YvjaUhf1eAM4ah9E6g
+	 HxlHuQI1pnrpq56qd7fAIykbUO5dDDDDSSM2TpXQ+cHruqik5wqddbEmqONurSgYoO
+	 iIs1QIs5quM6sNqIBbuV5a9PcQuIdKGKk2qlEiYFZqBY7GCJgFBA+/Q67aNSN+fjOe
+	 TkuSnoXCog3/5QBkPYZiRnsqQ73zm7umoQBu2qcR0AedfrMHeLNUMMMLfwy05q6xsL
+	 0hLaOMGk22yRw==
+Received: by mail-vk1-f170.google.com with SMTP id 6so8762988vkk.6
+        for <kvmarm@lists.linux.dev>; Wed, 07 Dec 2022 11:57:04 -0800 (PST)
+X-Gm-Message-State: ANoB5plwQOfVLLuUGbhjRDSKCwuAcRFf6fMiFO5hnv7Sohgxf8c2QPR1
+	mtd7V3Nqdyj+cA9BJOxZIx0awTZMNw69iHD2Jw==
+X-Google-Smtp-Source: AA0mqf79ttTFnrHyDKt4VUK0QUXtDvssZUfj1nXbNUgEZmKUPkzsNanut9A30xKpK3IOHRfaB9JBKoN+r9dpoMCKPpw=
+X-Received: by 2002:a1f:41ca:0:b0:3bd:ce89:f4e6 with SMTP id
+ o193-20020a1f41ca000000b003bdce89f4e6mr4493288vka.26.1670443023467; Wed, 07
+ Dec 2022 11:57:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="zrIBSTA3QKe821Fv"
-Content-Disposition: inline
-In-Reply-To: <87tu27rpis.wl-maz@kernel.org>
-X-Cookie: What!?  Me worry?
+References: <20220825-arm-spe-v8-7-v3-0-87682f78caac@kernel.org>
+ <20220825-arm-spe-v8-7-v3-7-87682f78caac@kernel.org> <20221118164943.GA4872@willie-the-truck>
+ <CAL_JsqJMxEWhqZV=yqG15zvEHrBTwRVfHA6zptu2TswxRMSR0A@mail.gmail.com>
+ <877czfujdj.fsf@ubik.fi.intel.com> <CAL_JsqKJYrEUzkzNMKMOGvzJN_EqacHZvBR6eVt35bRhhtRo=g@mail.gmail.com>
+ <Y49ttrv6W5k3ZNYw@FVFF77S0Q05N.cambridge.arm.com>
+In-Reply-To: <Y49ttrv6W5k3ZNYw@FVFF77S0Q05N.cambridge.arm.com>
+From: Rob Herring <robh@kernel.org>
+Date: Wed, 7 Dec 2022 13:56:52 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqLfZVrwFgYDwA9mz3FPp3jf0r5OOajTJ=7QvwE8P8UKyw@mail.gmail.com>
+Message-ID: <CAL_JsqLfZVrwFgYDwA9mz3FPp3jf0r5OOajTJ=7QvwE8P8UKyw@mail.gmail.com>
+Subject: Re: [PATCH v3 7/8] perf: Add perf_event_attr::config3
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Will Deacon <will@kernel.org>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Ingo Molnar <mingo@redhat.com>, Namhyung Kim <namhyung@kernel.org>, 
+	Jiri Olsa <jolsa@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, James Morse <james.morse@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, kvmarm@lists.linux.dev, 
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	James Clark <james.clark@arm.com>, Mark Brown <broonie@kernel.org>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20221207195652.OMqMNDggUzF5XwASmmtstsSh0WmL4fSkTjQwBuaP_l8@z>
 
+On Tue, Dec 6, 2022 at 10:28 AM Mark Rutland <mark.rutland@arm.com> wrote:
+>
+> Peter, it looks like this series is blocked on the below now; what would you
+> prefer out of:
+>
+> (a) Take this as is, and look add adding additional validation on top.
+>
+> (b) Add some flag to indicate a PMU driver supports config3, and have the core
+>     code check that, but leave the existing fields as-is for now (and hopefully
+>     follow up with further validation later for the existing fields).
 
---zrIBSTA3QKe821Fv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+That looks something like this:
 
-On Wed, Dec 07, 2022 at 07:18:35PM +0000, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
+diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+index 853f64b6c8c2..845162b152ea 100644
+--- a/include/linux/perf_event.h
++++ b/include/linux/perf_event.h
+@@ -286,6 +286,7 @@ struct perf_event;
+ #define PERF_PMU_CAP_NO_EXCLUDE                        0x0080
+ #define PERF_PMU_CAP_AUX_OUTPUT                        0x0100
+ #define PERF_PMU_CAP_EXTENDED_HW_TYPE          0x0200
++#define PERF_PMU_CAP_CONFIG3                   0x0400
 
-> > > > +#define SYS_ALLINT_CLR			sys_reg(0, 1, 4, 0, 0)
-> > > > +#define SYS_ALLINT_SET			sys_reg(0, 1, 4, 1, 0)
+ struct perf_output_handle;
 
-> > > This only covers the immediate versions of ALLINT, and misses the
-> > > definition for the register version, aka sys_reg(3, 0, 4, 3, 0).
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index aefc1e08e015..4414ae64432a 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -11314,6 +11314,9 @@ static int perf_try_init_event(struct pmu
+*pmu, struct perf_event *event)
+                    event_has_any_exclude_flag(event))
+                        ret = -EINVAL;
 
-> > That is already present upstream, we only need to add the immediate
-> > versions which the generated header stuff doesn't have any model for
-> > yet.
-
-> Ah, missed that one, thanks.
-
-> Out of curiosity, what is missing in the generator to deal with this
-> stuff?
-
-We'll need to teach it about registers that don't have any bitfields
-defined, at the minute it requires that all the bits in the register are
-specified but these don't have anything to specify.  Instead the value
-written is part of the register encoding and can they only be used in a
-MSR with IIRC only xzr valid as the source register.
-
---zrIBSTA3QKe821Fv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOQ7JcACgkQJNaLcl1U
-h9BcTQf8CwjOAj1ZpTAjyGkpWwlz7pYRRkIKQVn2G2njKfQMJ0Tj/KxCjpWuuc7X
-G5X1jIRjmf1t4kiRrGugJLKs6nkY3nMUil+yY2gJjAmQF6Tp8axlCTfOR5jJxxxZ
-nP6qAA1jfMGWfx7GZYrVVS0EQl+e/F9VC+MTH0s6dvyZjaJgjMa8EXJlYZBzOFHu
-RBe4lVxmmZaH62eeH/QpFx0A8WTXP0UF3gNNdYL/Z9dd9rDCzAcoRCgbLphulRQn
-NEFY9CRm8oPd364XthKvpBSOl3CvfRk9k0WGiPX50IzcxmG2797xWxb6bwjWrapi
-UwERTAWcs3J8qyHU18Yu2l+ucnIDXg==
-=dTmk
------END PGP SIGNATURE-----
-
---zrIBSTA3QKe821Fv--
++               if (!(pmu->capabilities & PERF_PMU_CAP_CONFIG3) &&
+event->attr.config3)
++                       ret = -EINVAL;
++
+                if (ret && event->destroy)
+                        event->destroy(event);
+        }
