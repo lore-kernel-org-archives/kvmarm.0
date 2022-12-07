@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9010B20F7
-	for <kvmarm@lists.linux.dev>; Wed,  7 Dec 2022 11:17:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4010DC433C1;
-	Wed,  7 Dec 2022 11:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53ED20F7
+	for <kvmarm@lists.linux.dev>; Wed,  7 Dec 2022 11:18:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 887F2C433C1;
+	Wed,  7 Dec 2022 11:18:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670411870;
-	bh=v1H9IYuQD6RBfOiZfJPeda4LN1wU8pZXl//mejtKTag=;
+	s=k20201202; t=1670411892;
+	bh=VNDFsKfFvy9gXR6yL9aC4P8tDS5rzo/FKaxsn+pX8Nk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=N5OX/TaARqwVzlSZU3n3+VxFCgQxiBpaxm3SH/kSX2bB8/UvG98gsK5X/nstPUimK
-	 Kskx0h8y7LpVgSli5cICN53sGVtJuNoUsL34Zv7QwR/9CAKW+Eo3spyHYIwKwsOXWC
-	 z3Ng0Ij1Dh0rM6+FoOgfgbEGM56TVEk9iz0TvASmXg0p8S0lXVw9wgOakok5ioEe2y
-	 SgzMHKLoX5GoaAXs6AGxZQT1BiMxNd/1WQ5QA0/7beATWoViL8KUq4v1BauLKJ5wrw
-	 yKYImRqMdGktnwF0k0AmblflAFiLmNPiSsd0+KXQ5f+owhdwLjmFux2zROqoLEydvj
-	 Kp+L/14yaU9kg==
+	b=Ldtzmeg0/8j4wnjLNNBn6e8oZv3JH8zNIkf3fteahs2y34qKP20jhWkXxz1cFsEjX
+	 PRKu4xJhNeeDVGvXxNrKtBuYlGtuU0ukLmGdZFCfgkrrtZZMXhPquUdctDKfGjx4ry
+	 IEqHlms9lAe7zuSQilZ07T4pJFlC+X3uzxrNB1tPSvvXm77Z26RFROgSuKBchly93N
+	 /eAoswkA+A8bATtnQ0g3e5MLB2QA/pxbwMEvjoK4MdUUof8OC0wxXtEswPBFiqLMGk
+	 vfkUQOKisdL1V9yPvWdVweGL+bLT/S2ppcT7jy3XH6rZjJKIfE9LHpGyqAHD2h7zYN
+	 6kigxZCVZ9Vdg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1p2sQu-00B4fW-39;
-	Wed, 07 Dec 2022 11:17:48 +0000
-Date: Wed, 07 Dec 2022 11:17:47 +0000
-Message-ID: <86edtblaxw.wl-maz@kernel.org>
+	id 1p2sRG-00B4g0-9p;
+	Wed, 07 Dec 2022 11:18:10 +0000
+Date: Wed, 07 Dec 2022 11:18:10 +0000
+Message-ID: <86cz8vlax9.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v1 2/3] arm64/sysreg: Add definition of ISR_EL1
-In-Reply-To: <20221206131144.115774-3-broonie@kernel.org>
+Subject: Re: [PATCH v1 3/3] KVM: arm64: Use symbolic definition for ISR_EL1.A
+In-Reply-To: <20221206131144.115774-4-broonie@kernel.org>
 References: <20221206131144.115774-1-broonie@kernel.org>
-	<20221206131144.115774-3-broonie@kernel.org>
+	<20221206131144.115774-4-broonie@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -48,42 +48,36 @@ X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 06 Dec 2022 13:11:43 +0000,
+On Tue, 06 Dec 2022 13:11:44 +0000,
 Mark Brown <broonie@kernel.org> wrote:
 > 
-> Add a definition of ISR_EL1 as per DDI0487I.a. This register was not
-> previously defined in sysreg.h, no functional changes.
+> Now that we are generating ISR_EL1 we have acquired a constant for
+> ISR_EL1.A, use it rather than the magic number we had been using in the KVM
+> entry code.
 > 
+> Suggested-by: Marc Zyngier <maz@kernel.org>
 > Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  arch/arm64/tools/sysreg | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  arch/arm64/kvm/hyp/entry.S | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 5d0d2498c635..3660e680b7f5 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -1079,6 +1079,16 @@ Res0	15:8
->  Field	7:0	LR
->  EndSysreg
->  
-> +Sysreg	ISR_EL1	3	0	12	1	0
-> +Res0	63:11
-> +Field	10	IS
-> +Field	9	FS
-> +Field	8	A
-> +Field	7	I
-> +Field	6	F
-> +Res0	5:0
-> +EndSysreg
-> +
->  Sysreg	ICC_NMIAR1_EL1	3	0	12	9	5
->  Res0	63:24
->  Field	23:0	INTID
+> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> index 435346ea1504..f3aa7738b477 100644
+> --- a/arch/arm64/kvm/hyp/entry.S
+> +++ b/arch/arm64/kvm/hyp/entry.S
+> @@ -171,7 +171,7 @@ alternative_else
+>  	dsb	sy		// Synchronize against in-flight ld/st
+>  	isb			// Prevent an early read of side-effect free ISR
+>  	mrs	x2, isr_el1
+> -	tbnz	x2, #8, 2f	// ISR_EL1.A
+> +	tbnz	x2, #ISR_EL1_A_SHIFT, 2f
+>  	ret
+>  	nop
+>  2:
 
 Acked-by: Marc Zyngier <maz@kernel.org>
 
-	  M.
+	M.
 
 -- 
 Without deviation from the norm, progress is not possible.
