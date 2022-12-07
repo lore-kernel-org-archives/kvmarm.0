@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44818BF1
-	for <kvmarm@lists.linux.dev>; Wed,  7 Dec 2022 18:59:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4372C433C1;
-	Wed,  7 Dec 2022 18:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4DF8BF1
+	for <kvmarm@lists.linux.dev>; Wed,  7 Dec 2022 19:05:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1579C433D6;
+	Wed,  7 Dec 2022 19:05:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670439557;
-	bh=q5IRkPLLu04px3Kj8zsDJ2uN+/UfE/2v1ijrawcRo58=;
+	s=k20201202; t=1670439910;
+	bh=4pRrfPHrYBe6IY9OjvKZNVGDF905GBv+j6LDFko/JLQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GT9crMBf9/Gxz7zZKNuxuSyUOn3h8pHx380oJCF1tUbVxwONhmndT9kSzqfwkTr2h
-	 gg3bMqT2mgcy0KpGnqnaMcRoVB1OjD84E/0cFe4nU+QfaX+M9pfJXHlTZJTyVgkcQF
-	 hI2gUYgmdCmMTwmJuLk+s4iPQFoTSAxPhy46vUJ6WbaMuWfbNs5zrf5L8Ii2lc5w4F
-	 yNeC0QdqruEg2wgWXkh8BIV1jrIJTtUTbxb9MFAQQW/zKnHbF8u4N8uhsGPA9QgOtU
-	 FD8kC72Hd5vYT3iu3T6APGXY6X+wal6bYwZkGqrCZ2cfEkFmabK3XaoZR+LJJgQ3iK
-	 0vxWEtYv01zSg==
+	b=pSG/dnMStZz1/XKIcLTjSwv0GcAw2//GNdYc1v84roDJmCWcoAwELDGrpYlmy7q4H
+	 FWDi/1BzI2c3Bz2pKl8HiKfoh4sZti//rNCKHbEQYpXQ+BjLLp3VzMXO+kk0bCgkBS
+	 E1d02JPs/xFOFhCczlBjVlxoiwvwPgrpdQ1BzOE0LpW03dCSD9/P3RjlvkYZCCWIZe
+	 obt2jZSQ/UJ/dfOtBGzzbVHX6+iN7Ul4JHk9nb3jzR0ihxbYBGjynyci/Vfcb586AM
+	 BQut5fK/Kf4uU5q+ZenPuoN8NcxKzFe6GV/3BInjvqau9Ve6zvp+dLjyUBDtbhfCRL
+	 sD8HTHVRmYhHQ==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1p2zdS-00BBeR-TE;
-	Wed, 07 Dec 2022 18:59:15 +0000
-Date: Wed, 07 Dec 2022 18:57:32 +0000
-Message-ID: <87zgbzrqhv.wl-maz@kernel.org>
+	id 1p2zjA-00BBiW-F5;
+	Wed, 07 Dec 2022 19:05:08 +0000
+Date: Wed, 07 Dec 2022 19:03:28 +0000
+Message-ID: <87y1rjrq7z.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
@@ -33,12 +33,12 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 12/14] arm64/nmi: Add handling of superpriority interrupts as NMIs
-In-Reply-To: <Y5CUA+yZDn5wqHQF@sirena.org.uk>
+Subject: Re: [PATCH v2 09/14] KVM: arm64: Hide FEAT_NMI from guests
+In-Reply-To: <Y45Aluq2zJoQ828W@sirena.org.uk>
 References: <20221112151708.175147-1-broonie@kernel.org>
-	<20221112151708.175147-13-broonie@kernel.org>
-	<86k033lblt.wl-maz@kernel.org>
-	<Y5CUA+yZDn5wqHQF@sirena.org.uk>
+	<20221112151708.175147-10-broonie@kernel.org>
+	<86pmcxlo7z.wl-maz@kernel.org>
+	<Y45Aluq2zJoQ828W@sirena.org.uk>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -54,67 +54,42 @@ X-SA-Exim-Rcpt-To: broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 07 Dec 2022 13:24:19 +0000,
+On Mon, 05 Dec 2022 19:03:50 +0000,
 Mark Brown <broonie@kernel.org> wrote:
 > 
-> On Wed, Dec 07, 2022 at 11:03:26AM +0000, Marc Zyngier wrote:
+> [1  <text/plain; us-ascii (7bit)>]
+> On Mon, Dec 05, 2022 at 06:06:24PM +0000, Marc Zyngier wrote:
 > > Mark Brown <broonie@kernel.org> wrote:
 > 
-> > > +int set_handle_nmi_irq(void (*handle_irq)(struct pt_regs *));
-> > > +int set_handle_nmi_fiq(void (*handle_fiq)(struct pt_regs *));
+> > > FEAT_NMI is not yet useful to guests pending implementation of vGIC
+> > > support. Mask out the feature from the ID register and prevent guests
+> > > creating state in ALLINT.ALLINT by activating the trap on write provided
+> > > in HCRX_EL2.TALLINT when they are running. There is no trap available
+> > > for reads from ALLINT.
 > 
-> > I'm not overly keen on adding hooks that are not used, and I can't
-> > really foresee a use case for a FIQ NMI at the moment (there is no
-> > plan to use Group-0 interrupts in VMs when the GIC is enabled, and the
-> > only interrupt controller we have that uses FIQ doesn't even have
-> > priorities, let alone NMIs).
+> > > We do not need to check for FEAT_HCRX since it is mandatory since v8.7
+> > > and FEAT_NMI is a v8.8 feature.
 > 
-> Sure, I don't care either way - I wasn't sure if people would prefer
-> symmetry/completeness or minimal usage so took a guess.  I did consider
-> that the FIQ user might decide to implement NMIs on the basis that
-> they're easier to use than priorities but it's five minutes work to add
-> the API back when needed if that does happen.
-
-The FIQ user doesn't even have such concept in the interrupt
-controller, nor does it have the corresponding CPU feature. Let's keep
-it minimal for now. As you said, bringing it back is pretty easy.
-
+> > And yet you check for it in hyp-stub.S after having checked for
+> > FEAT_NMI. What gives?
 > 
-> > > +			/*
-> > > +			 * Any system with FEAT_NMI should not be
-> > > +			 * affected by Spectre v2 so we don't mitigate
-> > > +			 * here.
-> > > +			 */
+> Being aware that you have a strong preference for not having safety
+> checks for mandatory features I didn't add any here but noted it so
+> people could see why they were omitted.  The checks in hyp-stub.S were
+> probably written before I'd checked the dependency situation out.
 > 
-> > Why? I don't see a good reason not to mitigate it, specially when the
-> > mitigation is guarded by cpus_have_const_cap(ARM64_SPECTRE_V2). Maybe
-> > you can explain what the rationale is for this.
-> 
-> Any CPU new enough to have FEAT_NMI is architecturally required to also
-> have FEAT_CSV2 since that's mandatory since v8.5 and FEAT_NMI is a v8.8
-> feature.  FEAT_CSV2 means the hardware doesn't need the mitigation, and
-> we check for it in spectre_v2_get_cpu_hw_mitigation_state().  I was
-> trying to thread the needle between doing it for a combination of
-> symmetry and defensive programming and people seeing that the test would
-> always be false and should therefore be removed, especially in a hot
-> path like this. 
+> I can remove those checks if preferred but TBH given that the failure
+> mode in hyp-stub.S is typically going to be to die with no output if
+> something goes wrong it does feel like it's worth the extra couple of
+> instructions to double check things just in case, especially with the
+> virtual platforms being so easy to misconfigure.
 
-"Hypothetically", CPUs that advertise CSV2 could subsequently be found
-to actually require extra handling, and I really wouldn't take such a
-bet.
+I'm not hell bent on it, and if we can spot the issue early, that's
+fine by me. But let's then disable the feature if the implementation
+lacks some essential dependencies.
 
-The reasoning by which CPU designers follow the ARM feature dependency
-rules doesn't hold any water either, and hasn't for years (ARM itself
-has been backporting features into CPUs that have a much older base
-architecture). You don't have to look very far to find implementations
-that cherry-pick whatever they want. The sad reality is that nobody
-gives a damn about this rule, and ultimately pick whatever they see
-fit.
-
-And given that this is only one static branch away, that the runtime
-cost is likely to be a big fat zero for non-affected platforms, for an
-event that is vanishingly rare anyway, I'd rather we stay consistent
-in the whole interrupt path and keep the mitigation code in.
+A simple check on ID_AA64MMFR1_EL1.HCX when detecting FEAT_NMI should
+do the trick.
 
 	M.
 
