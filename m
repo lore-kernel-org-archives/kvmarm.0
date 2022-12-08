@@ -1,40 +1,40 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70C28F6F
-	for <kvmarm@lists.linux.dev>; Thu,  8 Dec 2022 19:39:42 +0000 (UTC)
-Received: by mail-pl1-f201.google.com with SMTP id m13-20020a170902f64d00b001899a70c8f1so2214694plg.14
-        for <kvmarm@lists.linux.dev>; Thu, 08 Dec 2022 11:39:42 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C138F6F
+	for <kvmarm@lists.linux.dev>; Thu,  8 Dec 2022 19:39:44 +0000 (UTC)
+Received: by mail-pj1-f73.google.com with SMTP id md9-20020a17090b23c900b00218fa3308a9so1722055pjb.8
+        for <kvmarm@lists.linux.dev>; Thu, 08 Dec 2022 11:39:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Zxu59m+BC3IHN6G+DZ7Gfccf72aG4aOXJ0CWcNu+xQ=;
-        b=SdJhXds2L90YC8FNHmtWh5Fh9TEgerNWhfkuw8x3d9CBnfm/9eipZjv0gPdpJNH4I0
-         S+51SqBNWDjQiWTiQlTyu6PNy4niyZRnQhbIkbzuxQiNibwxH6mkZqPrFqBbyJTrkaSd
-         9Mn4ob8QKmJos009LfgYNnOTusdfrKp1xLSuoRmHmtBWBuBrOTTzfiu5JzBu+friunut
-         7j3QXKw2PfZd7vhhYsSAGJiGY/32mBAW8UAr3zD1WlpFMVlQcqneZ096cl3TmZsBGjzc
-         3x4d21+FAOrJhsugApLkXvPF1NkwgnZMzvQRH+9jPPL4ZLADP+yEglXH2v1r5QVynX/K
-         vjCw==
+        bh=LgQMdy+BRV6etzCdcak09K9MMPBRYTlG1+oihaFX4ek=;
+        b=HTWjIigcZ7WZjOnOg61QHaCTfbHLyHGvpSvV9l8zZQ5K6Grf0VUcQH9XdDcrgQ0qnO
+         1QAcwSASOHpForiZANO2+68V5a8rNealSQ0apW5C0hOTyqLw/F+VPLY3asRhXgPKSuVc
+         ATHZcBO/0vYL56E/Ir829fUHKApmsLZ4Axd/FvOUVfKwdR9J0BHthDhp0OlK+DWkEs9G
+         8DbJlx/DyawOHuuPdY5BhEZwMd2ETb8lHyA5mmcw6iiBiq+/CMkbN4u0OnU/XPiCWYAg
+         4c1jbNQi9nK7+jDlMHAK9qxmS0z+lVbXn90csRVgjpeYpmndVSm5rYF7D0TXl9GZ2RVc
+         4lEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Zxu59m+BC3IHN6G+DZ7Gfccf72aG4aOXJ0CWcNu+xQ=;
-        b=eM2p/SYFOD2PDwQRTLeLrQzDaNr9a0uXG6SvJN3YLHTSww6KFFOeT92dpgZv5AmRqP
-         4Xb9TcAN7MqPXtb7Zft6AN5Hv+U8dD0sob3Oph5D3ggj0PumiJpUGF5BO9vH5Dq/L5ez
-         goXUYuzzeLy6yhcWl+ycAnMIwlh70pNqQA58Aaz6YhEmx9dTnaVVaIfU827edhDK84QP
-         grrweqT+TUHQNtt8iCuByD2ZcuVwWLGpdRHOVo9TCW29N0WNA4iFMbuBXKv/cqHN1sjs
-         bVH12GicJILpSdmI+YtQz1h7otCJEHq5pxlo3ukDL4bbcbUsTVmWZ+VOpgs8VlgXtP0D
-         yOqw==
-X-Gm-Message-State: ANoB5pmSBWe02yCcRd6BiRBXVGyQ8Qaa7ujEh8AaETh/NpSpT3nYwEfq
-	LQ9U5z42fPZzR0EPCZ34wMN9DHPPQjyJiQ==
-X-Google-Smtp-Source: AA0mqf7xeoOaS0AA84SgKnbp6lpiXTBq7xMlUXV6MswQxMERGECN0IbonM/14NtNvPIycx9F8VqJbtOKzbBrCA==
+        bh=LgQMdy+BRV6etzCdcak09K9MMPBRYTlG1+oihaFX4ek=;
+        b=drMkFIyGxfwLuUh+nRU3o5bwt+WpfyQSv1Ph32+I27V1fedk0SrY1L4fSuh16PNu0M
+         +FbAl/Yup7ad01Ho5x9HkuYAhuDH3JeICTwGbZnLuhTimnGP0Tn/G8ygSw8zUyaxU0xk
+         J/x/Z69cGVQ3fgbo5Tx7mBMuWRCUNDo2gYiURBWe0X2ZlNA0z0HjvjjXFrYsauUKxxdA
+         soCXHC0nmnOMNK77WZYdSsHUiGm5Pb6bYv8CscMBWOwsj7LUnY7dZk+hgUpca3OiPCj2
+         8yPG+1H92EXBj1XdeIuOhzSa49QSnODdkMvzAQrKtG04xoRAFDG8tT/lCXfY4myOJDVY
+         lsmg==
+X-Gm-Message-State: ANoB5pkYS6E7Zr4P3x5WqjLdyci6PIKuGcEgUn087Z5XWMN75DZScIkR
+	Su4/Ooc99yD+/Q/NkjNVCp1AJzlS1La2QQ==
+X-Google-Smtp-Source: AA0mqf6s5jpCYuu3sADTa5hiPGsaDUIFXQc5seS/2ekXFn3zxyf2G6r6oJqYRkkShhh/Mij7t3AhSFvHIH2QTg==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a17:90a:d3d5:b0:218:845f:36a1 with SMTP
- id d21-20020a17090ad3d500b00218845f36a1mr97581242pjw.117.1670528382072; Thu,
- 08 Dec 2022 11:39:42 -0800 (PST)
-Date: Thu,  8 Dec 2022 11:38:41 -0800
+ (user=dmatlack job=sendgmr) by 2002:a17:90b:11d6:b0:219:ce92:17a1 with SMTP
+ id gv22-20020a17090b11d600b00219ce9217a1mr20111973pjb.235.1670528383766; Thu,
+ 08 Dec 2022 11:39:43 -0800 (PST)
+Date: Thu,  8 Dec 2022 11:38:42 -0800
 In-Reply-To: <20221208193857.4090582-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20221208193857.4090582-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221208193857.4090582-22-dmatlack@google.com>
-Subject: [RFC PATCH 21/37] KVM: Introduce CONFIG_HAVE_TDP_MMU
+Message-ID: <20221208193857.4090582-23-dmatlack@google.com>
+Subject: [RFC PATCH 22/37] KVM: x86: Select HAVE_TDP_MMU if X86_64
 From: David Matlack <dmatlack@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
@@ -67,31 +67,32 @@ Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
 	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221208193841.NTvv1y0o7PwZE4vJkJhOAwzSeUUp7oKf4gKsFZuMCM4@z>
+Message-ID: <20221208193842.cCqiVpw1MFFxAaqg_J7VnbAm7T3frvBN7nLSot_J758@z>
 
-Introduce a new config option to gate support for the common TDP MMU.
-This will be used in future commits to avoid compiling the TDP MMU code
-and avoid adding fields to common structs (e.g. struct kvm) on
-architectures that do not support the TDP MMU yet.
+In preparation for moving the TDP MMU implementation into virt/kvm/
+guarded behind HAVE_TDP_MMU, ensure that HAVE_TDP_MMU is selected in
+X86_64 builds that enable KVM. This matches the existing behavior of the
+TDP MMU in x86.
 
 No functional change intended.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- virt/kvm/Kconfig | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/x86/kvm/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index 9fb1ff6f19e5..75d86794d6cf 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -92,3 +92,6 @@ config KVM_XFER_TO_GUEST_WORK
- 
- config HAVE_KVM_PM_NOTIFIER
-        bool
-+
-+config HAVE_TDP_MMU
-+       bool
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index fbeaa9ddef59..849185d5020d 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -49,6 +49,7 @@ config KVM
+ 	select SRCU
+ 	select INTERVAL_TREE
+ 	select HAVE_KVM_PM_NOTIFIER if PM
++	select HAVE_TDP_MMU if X86_64
+ 	help
+ 	  Support hosting fully virtualized guest machines using hardware
+ 	  virtualization extensions.  You will need a fairly recent
 -- 
 2.39.0.rc1.256.g54fd8350bd-goog
 
