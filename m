@@ -2,72 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 810CBC4332F
-	for <kvmarm@archiver.kernel.org>; Thu,  8 Dec 2022 19:39:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA7C6C4167B
+	for <kvmarm@archiver.kernel.org>; Thu,  8 Dec 2022 19:39:29 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B3B84BA23;
-	Thu,  8 Dec 2022 14:39:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86BF14BA11;
+	Thu,  8 Dec 2022 14:39:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vvZ6JHdnpif3; Thu,  8 Dec 2022 14:39:22 -0500 (EST)
+	with ESMTP id c5YvB9Zr5Rdl; Thu,  8 Dec 2022 14:39:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2EA04BA5F;
-	Thu,  8 Dec 2022 14:39:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FB3E4BA2E;
+	Thu,  8 Dec 2022 14:39:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ACF84BA24
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Dec 2022 14:39:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A44E4BA1B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Dec 2022 14:39:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0Lp2RXhXKFkn for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Dec 2022 14:39:18 -0500 (EST)
+ with ESMTP id 6W6vXIug+QTq for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  8 Dec 2022 14:39:23 -0500 (EST)
 Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
  [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 392F04BA41
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Dec 2022 14:39:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 594B34BA2D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Dec 2022 14:39:22 -0500 (EST)
 Received: by mail-yb1-f201.google.com with SMTP id
- y6-20020a25b9c6000000b006c1c6161716so2533163ybj.8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 08 Dec 2022 11:39:16 -0800 (PST)
+ c188-20020a25c0c5000000b006d8eba07513so2556431ybf.17
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 08 Dec 2022 11:39:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:from:to:cc:subject:date:message-id:reply-to;
- bh=7K9ka6MUeaf4VmwASDJsBFWEG85o/chirVO+ir7DJ1k=;
- b=irP5mcGoAOYc8wosnD/TtALC0WWa+NGjhVIHJTTnr/3Z8yjzEK7JM4oiVhdZFBRQwy
- zJ2t/ttFB0YDo1jKtcssuFL71HMxb9Mn2FDYgr/S1maeH1kDPYzBK0DF9LASFH6X+Gyz
- ADGVieTHTJS3Xu0juG8XWrdDMzDZvqxucwC6VjLm3/r24BngHKVLne44DdbtStaOGGOh
- nAuOImwdaJqBcKx9C/oAm0bmd7zRXkwa5CkgPV2RFBbSGZAPdiE+y9pF0NYdTwDcUcBb
- YIWPvUTgaFvUXFehRkfrZQ4c+oYOqfGi3KvXXK7lpuBLnfpJgagtw4O5VTtpSo61tAre
- q86Q==
+ bh=HxpbJTUNlMZJd8tslVgq3JHdSPdfNWxn0UnaVUQQc0A=;
+ b=X27Fj8NMQTMpgpQSLD6fEhoU4fVXBG4FfQvE4hDE+MTeWoJhGcT5LpYCDXh1D+/w82
+ hPv1oB7AV9ecGMFLuN13hRpFiRPBuJVO9vanqpaNAxBJ4jir+35FDyU9qXPhlEpW7coO
+ /8u9arxvokXqrqKeLqz9h601trg+4wcye67rx9tVyN1axVtupBSnJ7E5BSc5oEBXMlHO
+ KSROKMtQE8+C88/p6gUIBi3yv6webYqOh7OUiLmP0ZCWyP2DF2whWsSz/1NabrWwZBVJ
+ X38Wy5/22Z5LwdqIzNX3mhOM6a0liS8P2HZHtMcipS0tuORgcla3kymZxvCrrppA0ZTX
+ 8LTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=7K9ka6MUeaf4VmwASDJsBFWEG85o/chirVO+ir7DJ1k=;
- b=orto1qcsg807wtIsyraeW69j1VRVAMfAhvv9pwdcsejFpuyuMep4r2LCfFp+O+QITQ
- JMt87Rtdcz9wNlMKYHC0+IL97S9WL8mok5eE+v6VSuU3V2JyS1cpDKkM3M9kxlcUgMq3
- r/cez1qD1Ef2QP2QpCryc6dfskqtVG/pkoisi2fZimgL7ad7I8CwvqmWHJLSQwACT+yP
- olYdYoWcoZ9NbmSIhbfaSaYVzHp5PCnycT8Rq+w+1SV8u9GI5wWpkKaIzG40OG8VFLBS
- MNKlmMPfWDIR4/48X23LEnov/oZPk+CYiCIxDU3YFcWbKsRAUMbz6gTQtoPLLiV2364e
- 0oug==
-X-Gm-Message-State: ANoB5pmmLruuMn+ujpja8GhoxrM3846m0LuKK8XTjD+ngoYR314VRLWu
- NxyMYoml9f024mEh7IJmmhVbWNyW/5PBoQ==
-X-Google-Smtp-Source: AA0mqf4/lKyQk5lKEjo3ymU4c9dqtITM1gYvYc6O/tXnyNlkcxf5NSwbnRprMsGK5JwDZSs7UsMVtOf+2DbYHA==
+ bh=HxpbJTUNlMZJd8tslVgq3JHdSPdfNWxn0UnaVUQQc0A=;
+ b=Rbz3FlaM9FFpfypnnDFKqGeezJFLTvYABDVOB5vzWwjxFRpImNS5USWC2IQ3EnoOu5
+ ZVI5AaHKbqAYUrn8c6WuiFDbGykp1iZ4hR5KDDaD/VHwyJCJhKKdrHr+CSKUYb8aum8l
+ PlyEFsuu0E97eDCzmjFsqyODjknzh+rKqnzVsu/cE1mcCWg+x5+iY/RwdpBXMNcyZB83
+ 0UpZdlEsCs5C4W8Y0O9aUNnn9ljnI+dflFtK03EDM2HU3yMNjcBFRY+1FAFWc8gRsR7Q
+ aOexXFtx7VH3O86iCNG3Kzko6fTZsaG13zbzZRvG7W3TM5Fq4XzYPtCnc2lryhFFGs3P
+ fLtA==
+X-Gm-Message-State: ANoB5pmGPPUHpWJiQzUSWvgNEpk9S75W+35uhflHEJlLb47XojMp2Aya
+ /9LxdsWRIJ+rT/hxExxvDPXKjc0VN9xzlg==
+X-Google-Smtp-Source: AA0mqf6nQ3bCSMPTn17mxc4GCVurLewt/EOjnyHvTIs/ImZGe4frb7eZXMD/Hm3cZq91ON4VNM6eRlaJXvRssg==
 X-Received: from dmatlack-n2d-128.c.googlers.com
  ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a81:120d:0:b0:3d5:ecbb:2923 with SMTP id
- 13-20020a81120d000000b003d5ecbb2923mr35023748yws.485.1670528355728; Thu, 08
- Dec 2022 11:39:15 -0800 (PST)
-Date: Thu,  8 Dec 2022 11:38:25 -0800
+ (user=dmatlack job=sendgmr) by 2002:a25:d807:0:b0:6f4:1c40:273a with SMTP id
+ p7-20020a25d807000000b006f41c40273amr52016342ybg.622.1670528361862; Thu, 08
+ Dec 2022 11:39:21 -0800 (PST)
+Date: Thu,  8 Dec 2022 11:38:29 -0800
 In-Reply-To: <20221208193857.4090582-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20221208193857.4090582-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221208193857.4090582-6-dmatlack@google.com>
-Subject: [RFC PATCH 05/37] KVM: x86/mmu: Unify TDP MMU and Shadow MMU root
- refcounts
+Message-ID: <20221208193857.4090582-10-dmatlack@google.com>
+Subject: [RFC PATCH 09/37] KVM: Move page size stats into common code
 From: David Matlack <dmatlack@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
@@ -104,173 +103,123 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Use the same field for refcounting roots in the TDP MMU and Shadow MMU.
-The atomicity provided by refcount_t is overkill for the Shadow MMU,
-since it holds the write-lock. But converging this field will enable a
-future commit to more easily move struct kvm_mmu_page to common code.
+Move the page size stats into common code. This will be used in a future
+commit to move the TDP MMU, which populates these stats, into common
+code. Architectures can also start populating these stats if they wish,
+and export different stats depending on the page size.
 
-Note, refcount_dec_and_test() returns true if the resulting refcount is
-0. Hence the check in mmu_free_root_page() is inverted to check if
-shadow root refcount is 0.
+Continue to only expose these stats on x86, since that's currently the
+only architecture that populates them.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c          | 14 +++++++-------
- arch/x86/kvm/mmu/mmu_internal.h |  6 ++----
- arch/x86/kvm/mmu/mmutrace.h     |  2 +-
- arch/x86/kvm/mmu/tdp_mmu.c      |  8 ++++----
- arch/x86/kvm/mmu/tdp_mmu.h      |  2 +-
- 5 files changed, 15 insertions(+), 17 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 8 --------
+ arch/x86/kvm/mmu.h              | 5 -----
+ arch/x86/kvm/x86.c              | 6 +++---
+ include/linux/kvm_host.h        | 5 +++++
+ include/linux/kvm_types.h       | 9 +++++++++
+ 5 files changed, 17 insertions(+), 16 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index f7668a32721d..11cef930d5ed 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2498,14 +2498,14 @@ static bool __kvm_mmu_prepare_zap_page(struct kvm *kvm,
- 
- 	if (sp->unsync)
- 		kvm_unlink_unsync_page(kvm, sp);
--	if (!sp->root_count) {
-+	if (!refcount_read(&sp->root_refcount)) {
- 		/* Count self */
- 		(*nr_zapped)++;
- 
- 		/*
- 		 * Already invalid pages (previously active roots) are not on
- 		 * the active page list.  See list_del() in the "else" case of
--		 * !sp->root_count.
-+		 * !sp->root_refcount.
- 		 */
- 		if (sp->role.invalid)
- 			list_add(&sp->link, invalid_list);
-@@ -2515,7 +2515,7 @@ static bool __kvm_mmu_prepare_zap_page(struct kvm *kvm,
- 	} else {
- 		/*
- 		 * Remove the active root from the active page list, the root
--		 * will be explicitly freed when the root_count hits zero.
-+		 * will be explicitly freed when the root_refcount hits zero.
- 		 */
- 		list_del(&sp->link);
- 
-@@ -2570,7 +2570,7 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
- 	kvm_flush_remote_tlbs(kvm);
- 
- 	list_for_each_entry_safe(sp, nsp, invalid_list, link) {
--		WARN_ON(!sp->role.invalid || sp->root_count);
-+		WARN_ON(!sp->role.invalid || refcount_read(&sp->root_refcount));
- 		kvm_mmu_free_shadow_page(sp);
- 	}
- }
-@@ -2593,7 +2593,7 @@ static unsigned long kvm_mmu_zap_oldest_mmu_pages(struct kvm *kvm,
- 		 * Don't zap active root pages, the page itself can't be freed
- 		 * and zapping it will just force vCPUs to realloc and reload.
- 		 */
--		if (sp->root_count)
-+		if (refcount_read(&sp->root_refcount))
- 			continue;
- 
- 		unstable = __kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list,
-@@ -3481,7 +3481,7 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
- 
- 	if (is_tdp_mmu_page(sp))
- 		kvm_tdp_mmu_put_root(kvm, sp, false);
--	else if (!--sp->root_count && sp->role.invalid)
-+	else if (refcount_dec_and_test(&sp->root_refcount) && sp->role.invalid)
- 		kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
- 
- 	*root_hpa = INVALID_PAGE;
-@@ -3592,7 +3592,7 @@ static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, int quadrant,
- 	WARN_ON_ONCE(role.arch.direct && role.arch.has_4_byte_gpte);
- 
- 	sp = kvm_mmu_get_shadow_page(vcpu, gfn, role);
--	++sp->root_count;
-+	refcount_inc(&sp->root_refcount);
- 
- 	return __pa(sp->spt);
- }
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index c1a379fba24d..fd4990c8b0e9 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -87,10 +87,8 @@ struct kvm_mmu_page {
- 	u64 *shadowed_translation;
- 
- 	/* Currently serving as active root */
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f5743a652e10..9cf8f956bac3 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1363,14 +1363,6 @@ struct kvm_vm_stat {
+ 	u64 mmu_recycled;
+ 	u64 mmu_cache_miss;
+ 	u64 mmu_unsync;
 -	union {
--		int root_count;
--		refcount_t tdp_mmu_root_count;
+-		struct {
+-			atomic64_t pages_4k;
+-			atomic64_t pages_2m;
+-			atomic64_t pages_1g;
+-		};
+-		atomic64_t pages[KVM_NR_PAGE_SIZES];
 -	};
-+	refcount_t root_refcount;
-+
- 	unsigned int unsync_children;
- 	union {
- 		struct kvm_rmap_head parent_ptes; /* rmap pointers to parent sptes */
-diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
-index 6a4a43b90780..ffd10ce3eae3 100644
---- a/arch/x86/kvm/mmu/mmutrace.h
-+++ b/arch/x86/kvm/mmu/mmutrace.h
-@@ -19,7 +19,7 @@
- 	__entry->mmu_valid_gen = sp->mmu_valid_gen;	\
- 	__entry->gfn = sp->gfn;				\
- 	__entry->role = sp->role.word;			\
--	__entry->root_count = sp->root_count;		\
-+	__entry->root_count = refcount_read(&sp->root_refcount);	\
- 	__entry->unsync = sp->unsync;
- 
- #define KVM_MMU_PAGE_PRINTK() ({				        \
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index fc0b87ceb1ea..34d674080170 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -130,7 +130,7 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- {
- 	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
- 
--	if (!refcount_dec_and_test(&root->tdp_mmu_root_count))
-+	if (!refcount_dec_and_test(&root->root_refcount))
- 		return;
- 
- 	/*
-@@ -158,7 +158,7 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 	 * zap the root because a root cannot go from invalid to valid.
- 	 */
- 	if (!kvm_tdp_root_mark_invalid(root)) {
--		refcount_set(&root->tdp_mmu_root_count, 1);
-+		refcount_set(&root->root_refcount, 1);
- 
- 		/*
- 		 * Zapping the root in a worker is not just "nice to have";
-@@ -316,7 +316,7 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
- 	root = tdp_mmu_alloc_sp(vcpu);
- 	tdp_mmu_init_sp(root, NULL, 0, role);
- 
--	refcount_set(&root->tdp_mmu_root_count, 1);
-+	refcount_set(&root->root_refcount, 1);
- 
- 	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
- 	list_add_rcu(&root->link, &kvm->arch.tdp_mmu_roots);
-@@ -883,7 +883,7 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 	 * and lead to use-after-free as zapping a SPTE triggers "writeback" of
- 	 * dirty accessed bits to the SPTE's associated struct page.
- 	 */
--	WARN_ON_ONCE(!refcount_read(&root->tdp_mmu_root_count));
-+	WARN_ON_ONCE(!refcount_read(&root->root_refcount));
- 
- 	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
- 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 18d3719f14ea..19d3153051a3 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -14,7 +14,7 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
- 
- __must_check static inline bool kvm_tdp_mmu_get_root(struct kvm_mmu_page *root)
- {
--	return refcount_inc_not_zero(&root->tdp_mmu_root_count);
-+	return refcount_inc_not_zero(&root->root_refcount);
+ 	u64 nx_lpage_splits;
+ 	u64 max_mmu_page_hash_collisions;
+ 	u64 max_mmu_rmap_size;
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 168c46fd8dd1..ec662108d2eb 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -261,11 +261,6 @@ kvm_mmu_slot_lpages(struct kvm_memory_slot *slot, int level)
+ 	return __kvm_mmu_slot_lpages(slot, slot->npages, level);
  }
  
- void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
+-static inline void kvm_update_page_stats(struct kvm *kvm, int level, int count)
+-{
+-	atomic64_add(count, &kvm->stat.pages[level - 1]);
+-}
+-
+ gpa_t translate_nested_gpa(struct kvm_vcpu *vcpu, gpa_t gpa, u64 access,
+ 			   struct x86_exception *exception);
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 2bfe060768fc..517c8ed33542 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -231,6 +231,9 @@ EXPORT_SYMBOL_GPL(host_xss);
+ 
+ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+ 	KVM_GENERIC_VM_STATS(),
++	STATS_DESC_ICOUNTER(VM_GENERIC, pages_4k),
++	STATS_DESC_ICOUNTER(VM_GENERIC, pages_2m),
++	STATS_DESC_ICOUNTER(VM_GENERIC, pages_1g),
+ 	STATS_DESC_COUNTER(VM, mmu_shadow_zapped),
+ 	STATS_DESC_COUNTER(VM, mmu_pte_write),
+ 	STATS_DESC_COUNTER(VM, mmu_pde_zapped),
+@@ -238,9 +241,6 @@ const struct _kvm_stats_desc kvm_vm_stats_desc[] = {
+ 	STATS_DESC_COUNTER(VM, mmu_recycled),
+ 	STATS_DESC_COUNTER(VM, mmu_cache_miss),
+ 	STATS_DESC_ICOUNTER(VM, mmu_unsync),
+-	STATS_DESC_ICOUNTER(VM, pages_4k),
+-	STATS_DESC_ICOUNTER(VM, pages_2m),
+-	STATS_DESC_ICOUNTER(VM, pages_1g),
+ 	STATS_DESC_ICOUNTER(VM, nx_lpage_splits),
+ 	STATS_DESC_PCOUNTER(VM, max_mmu_rmap_size),
+ 	STATS_DESC_PCOUNTER(VM, max_mmu_page_hash_collisions)
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index f16c4689322b..22ecb7ce4d31 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -2280,4 +2280,9 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+ /* Max number of entries allowed for each kvm dirty ring */
+ #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+ 
++static inline void kvm_update_page_stats(struct kvm *kvm, int level, int count)
++{
++	atomic64_add(count, &kvm->stat.generic.pages[level - 1]);
++}
++
+ #endif
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index 76de36e56cdf..59cf958d69df 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -20,6 +20,7 @@ enum kvm_mr_change;
+ 
+ #include <linux/bits.h>
+ #include <linux/mutex.h>
++#include <linux/pgtable.h>
+ #include <linux/types.h>
+ #include <linux/spinlock_types.h>
+ 
+@@ -105,6 +106,14 @@ struct kvm_mmu_memory_cache {
+ struct kvm_vm_stat_generic {
+ 	u64 remote_tlb_flush;
+ 	u64 remote_tlb_flush_requests;
++	union {
++		struct {
++			atomic64_t pages_4k;
++			atomic64_t pages_2m;
++			atomic64_t pages_1g;
++		};
++		atomic64_t pages[PG_LEVEL_NUM - 1];
++	};
+ };
+ 
+ struct kvm_vcpu_stat_generic {
 -- 
 2.39.0.rc1.256.g54fd8350bd-goog
 
