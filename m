@@ -1,175 +1,161 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731B58F6F
-	for <kvmarm@lists.linux.dev>; Thu,  8 Dec 2022 19:40:10 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-3dfb9d11141so24943047b3.3
-        for <kvmarm@lists.linux.dev>; Thu, 08 Dec 2022 11:40:10 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22458F6F
+	for <kvmarm@lists.linux.dev>; Thu,  8 Dec 2022 19:49:30 +0000 (UTC)
+Received: by mail-pj1-f53.google.com with SMTP id e7-20020a17090a77c700b00216928a3917so5745874pjs.4
+        for <kvmarm@lists.linux.dev>; Thu, 08 Dec 2022 11:49:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9jkEeOR+eFVYLdV/biNhqONLCqpOOeuWNQBN9kUw+a4=;
-        b=RcX1fA9WGa6w4C9PUxG4OPVBo1zxjA/xcbKeSP6a3foCAqZ7FzqI1mFwD63t1Zj64f
-         dUcsVkx5+LL+NIjjNV1LqNWVddFOpYikSd3WUTyGFLn96H50k7PwdHsttsFJt9P1ez0b
-         1mfPx6AlqK6ylftXIU2F9Nj5hSc+ikFrGZ/z1f/qPxYxfvx/OXVl/tDLZo61SUF3zvKK
-         PYv1RXX6MMcltPMtFw1Jp+095PHbtWtFgqbpJbKkr0cp5YLn1DUp9X/nB2YNG55HXF6K
-         /rKkgYv9i7/aE4/qJBLcexm7xz9bNSYN/tkjp5XaQYlxAPljLege78wWIo+X1uBQR1Re
-         /MJg==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/iRRuEpq3SHF2tTVNW+V0pd2eP3QVViktpfmGsJo8SE=;
+        b=kbZjAjJOckI+jlOCJbuKM/9hTPPtgPZftSrpNxz+6MLKgxGWvBLLNyUR+yLtAe1FHf
+         wJpg2MHXkTzpBNyZxTGd1AdsYy4ZLs6dxynTISt9vca/TyPOGTgUZjlcmzeqpYDnp/lr
+         nfbOFjW274MxXgm+RUWP24N0ybK+fuofYxDYYO/sGvPoD5lfmmfOO3tdwNjQLoMr4mpd
+         /RF/OCtj9uVDzdQiD1V8pMJXjG1PPQFii8S4PnRl+HioQe97ZvVWKQiPgKLeNQV2/HJw
+         gBUXqS7+VDy/y8Zx1/EhxyC9Yxe7Bai4askP49YC2QyLOF6z9J+4HJ7bjYXM/dfQMhAm
+         uWhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9jkEeOR+eFVYLdV/biNhqONLCqpOOeuWNQBN9kUw+a4=;
-        b=h7wpqeeUpvkwleQkxlh4fokebUNXMKLvIJ9N480R57+QgTtGRx3T6n4BoS6MfIoTO+
-         NS7Q69EPy+WNlM4bnKfc2YLRyNMiUDL2MBwEerGnXrhQ6+6zpNo1HAVtjHP0Id7HB2yW
-         YqZwFhv7Avuuv2ip4WXJQGowx3B/2CtBSaBYwajdSyRzeNvF2edV4m0XTYt3+kCoG2OU
-         S/LkLWLTfXgDmBcplrikToQvrnogkbFfrP5iS2jqEKjvtVcaUynKiOY+DuRyRbCy6hh4
-         Rx2GUgr5UTpZpYoOuVGW/lBylayXFJi5gIg0rRUaK1H34ZwF3M7VtlffRBggbTNIAsTQ
-         iEUQ==
-X-Gm-Message-State: ANoB5pkNshMYZE39frqtT6CgFpZlBf7S9h97ydWHIVwgFR+JzTJHUnbt
-	1zAMwLAdX1kBhw9ozkdckLz1NbPEF4bDpw==
-X-Google-Smtp-Source: AA0mqf5Y/oazogGX+tpbF7bdOJO4aayzIsYsnlV7zDudirQdvI5dtEVAX371oDYlEt+kHPpaNkmdcoOtQ7CEag==
-X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a25:c6c2:0:b0:6f0:b351:c300 with SMTP id
- k185-20020a25c6c2000000b006f0b351c300mr63444626ybf.102.1670528409549; Thu, 08
- Dec 2022 11:40:09 -0800 (PST)
-Date: Thu,  8 Dec 2022 11:38:57 -0800
-In-Reply-To: <20221208193857.4090582-1-dmatlack@google.com>
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/iRRuEpq3SHF2tTVNW+V0pd2eP3QVViktpfmGsJo8SE=;
+        b=mTSRsW82R0AnH0R/7gfRqLsr9bXQkZ8opLhYXB/4PmNiJ9AR25ybDf5kM2M54DZl9e
+         iEVdxRc1AHwawDrNMLSOmM3Z/sfjjxpO8WU78siDtCbYyVUoWSgCWMrOyGCal+RdIxMh
+         FeglK+VDFa8CYQe86bT+c8iNXbKcnEtvRBZiw3EslALWcWVhSdPhOrOiuZWCYjUp0gNZ
+         2PD768oID8MUb83SmVuSohBAFeDllTCrSNefoHGYkTU2cAmsiuUzLSQT53fRUjlwG/gI
+         pHUrAEWTwe/UMnMggs6QU6PIH7sBtlLDyOOL3pKCxL+JRec0vtO6yfRgFXfgWXY+y6lc
+         uCFQ==
+X-Gm-Message-State: ANoB5pkZZTtyO4UO1opfv53sOcWMwv6eO1Y0V/v7LoR4knhBdCrAe9sU
+	Pqw2vENz6UlkqDZbxA1GBYpOWw==
+X-Google-Smtp-Source: AA0mqf4+sYmN6TRhUnqm6pJbxgGCoSUwTGEipBsiO/jKS6U41yXiKghC+TQNsnXSTcuYW70TLswWgg==
+X-Received: by 2002:a17:90a:d681:b0:218:84a0:65eb with SMTP id x1-20020a17090ad68100b0021884a065ebmr1775305pju.1.1670528969909;
+        Thu, 08 Dec 2022 11:49:29 -0800 (PST)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id d15-20020a17090ac24f00b0020b7de675a4sm34718pjx.41.2022.12.08.11.49.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Dec 2022 11:49:29 -0800 (PST)
+Date: Thu, 8 Dec 2022 11:49:26 -0800
+From: Ricardo Koller <ricarkol@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] KVM: selftests: Setup ucall after loading program
+ into guest memory
+Message-ID: <Y5I/xiFMLVbpAZj+@google.com>
+References: <20221207214809.489070-1-oliver.upton@linux.dev>
+ <20221207214809.489070-3-oliver.upton@linux.dev>
+ <Y5EoZ5uwrTF3eSKw@google.com>
+ <Y5EtMWuTaJk9I3Bd@google.com>
+ <Y5EutGSjkRmdItQb@google.com>
+ <Y5Exwzr6Ibmmthl0@google.com>
+ <Y5IxNTKRnacfSsLt@google.com>
+ <Y5I0paok+dvTtrkt@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20221208193857.4090582-1-dmatlack@google.com>
-X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221208193857.4090582-38-dmatlack@google.com>
-Subject: [RFC PATCH 37/37] KVM: MMU: Move the TDP MMU to common code
-From: David Matlack <dmatlack@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Sean Christopherson <seanjc@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	David Matlack <dmatlack@google.com>, Anshuman Khandual <anshuman.khandual@arm.com>, 
-	Nadav Amit <namit@vmware.com>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, Vlastimil Babka <vbabka@suse.cz>, 
-	"Liam R. Howlett" <Liam.Howlett@Oracle.com>, Suren Baghdasaryan <surenb@google.com>, 
-	Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Yu Zhao <yuzhao@google.com>, Colin Cross <ccross@google.com>, Hugh Dickins <hughd@google.com>, 
-	Ben Gardon <bgardon@google.com>, Mingwei Zhang <mizhang@google.com>, 
-	Krish Sadhukhan <krish.sadhukhan@oracle.com>, Ricardo Koller <ricarkol@google.com>, 
-	Jing Zhang <jingzhangos@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
-	linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221208193857.pWMY3RSmvWwBZG8_86YYQxgtprZ0AbbaT2KqkCxURNY@z>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y5I0paok+dvTtrkt@google.com>
+Message-ID: <20221208194926.-0_ETMph6L7xnuvqGHKSIdhFgwDMxr7svz8DoPf7Q3A@z>
 
-Move tdp_mmu.[ch] from arch/x86 and into the common code directories.
-This will allow other architectures to use the TDP MMU in the future.
+On Thu, Dec 08, 2022 at 07:01:57PM +0000, Sean Christopherson wrote:
+> On Thu, Dec 08, 2022, Ricardo Koller wrote:
+> > On Thu, Dec 08, 2022 at 12:37:23AM +0000, Oliver Upton wrote:
+> > > On Thu, Dec 08, 2022 at 12:24:20AM +0000, Sean Christopherson wrote:
+> > > > > Even still, that's just a kludge to make ucalls work. We have other
+> > > > > MMIO devices (GIC distributor, for example) that work by chance since
+> > > > > nothing conflicts with the constant GPAs we've selected in the tests.
+> > > > > 
+> > > > > I'd rather we go down the route of having an address allocator for the
+> > > > > for both the VA and PA spaces to provide carveouts at runtime.
+> > > > 
+> > > > Aren't those two separate issues?  The PA, a.k.a. memslots space, can be solved
+> > > > by allocating a dedicated memslot, i.e. doesn't need a carve.  At worst, collisions
+> > > > will yield very explicit asserts, which IMO is better than whatever might go wrong
+> > > > with a carve out.
+> > > 
+> > > Perhaps the use of the term 'carveout' wasn't right here.
+> > > 
+> > > What I'm suggesting is we cannot rely on KVM memslots alone to act as an
+> > > allocator for the PA space. KVM can provide devices to the guest that
+> > > aren't represented as memslots. If we're trying to fix PA allocations
+> > > anyway, why not make it generic enough to suit the needs of things
+> > > beyond ucalls?
+> > 
+> > One extra bit of information: in arm, IO is any access to an address (within
+> > bounds) not backed by a memslot. Not the same as x86 where MMIO are writes to
+> > read-only memslots.  No idea what other arches do.
+> 
+> I don't think that's correct, doesn't this code turn write abort on a RO memslot
+> into an io_mem_abort()?  Specifically, the "(write_fault && !writable)" check will
+> match, and assuming none the the edge cases in the if-statement fire, KVM will
+> send the write down io_mem_abort().
 
-No functional change intended.
+You are right. In fact, page_fault_test checks precisely that: writes on
+RO memslots are sent to userspace as an mmio exit. I was just referring
+to the MMIO done for ucall.
 
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- arch/x86/kvm/Makefile                       | 2 +-
- arch/x86/kvm/mmu/mmu.c                      | 3 ++-
- {arch/x86/kvm/mmu => include/kvm}/tdp_mmu.h | 6 +++++-
- virt/kvm/Makefile.kvm                       | 1 +
- {arch/x86 => virt}/kvm/mmu/tdp_mmu.c        | 8 +++-----
- 5 files changed, 12 insertions(+), 8 deletions(-)
- rename {arch/x86/kvm/mmu => include/kvm}/tdp_mmu.h (94%)
- rename {arch/x86 => virt}/kvm/mmu/tdp_mmu.c (99%)
+Having said that, we could use ucall as writes on read-only memslots
+like what x86 does.
 
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index cb9ae306892a..06b61fdea539 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -18,7 +18,7 @@ ifdef CONFIG_HYPERV
- kvm-y			+= kvm_onhyperv.o
- endif
- 
--kvm-$(CONFIG_X86_64) += mmu/tdp_pgtable.o mmu/tdp_mmu.o
-+kvm-$(CONFIG_X86_64)	+= mmu/tdp_pgtable.o
- kvm-$(CONFIG_KVM_XEN)	+= xen.o
- kvm-$(CONFIG_KVM_SMM)	+= smm.o
- 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index f2602ee1771f..8653776bca6f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -19,7 +19,6 @@
- #include "ioapic.h"
- #include "mmu.h"
- #include "mmu_internal.h"
--#include "tdp_mmu.h"
- #include "x86.h"
- #include "kvm_cache_regs.h"
- #include "smm.h"
-@@ -27,6 +26,8 @@
- #include "cpuid.h"
- #include "spte.h"
- 
-+#include <kvm/tdp_mmu.h>
-+
- #include <linux/kvm_host.h>
- #include <linux/types.h>
- #include <linux/string.h>
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/include/kvm/tdp_mmu.h
-similarity index 94%
-rename from arch/x86/kvm/mmu/tdp_mmu.h
-rename to include/kvm/tdp_mmu.h
-index 607c1417abd1..538c848149c9 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/include/kvm/tdp_mmu.h
-@@ -5,7 +5,11 @@
- 
- #include <linux/kvm_host.h>
- 
--#include "spte.h"
-+#include <kvm/mmu_types.h>
-+#include <kvm/mmu.h>
-+#include <kvm/tdp_iter.h>
-+#include <kvm/tdp_pgtable.h>
-+#include <kvm/mmutrace.h>
- 
- int kvm_mmu_init_tdp_mmu(struct kvm *kvm);
- void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
-diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-index 58b595ac9b8d..942681308140 100644
---- a/virt/kvm/Makefile.kvm
-+++ b/virt/kvm/Makefile.kvm
-@@ -14,3 +14,4 @@ kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
- kvm-$(CONFIG_HAVE_KVM_PFNCACHE) += $(KVM)/pfncache.o
- 
- kvm-$(CONFIG_HAVE_TDP_MMU) += $(KVM)/mmu/tdp_iter.o
-+kvm-$(CONFIG_HAVE_TDP_MMU) += $(KVM)/mmu/tdp_mmu.o
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/virt/kvm/mmu/tdp_mmu.c
-similarity index 99%
-rename from arch/x86/kvm/mmu/tdp_mmu.c
-rename to virt/kvm/mmu/tdp_mmu.c
-index c950d688afea..5ca8892ebef5 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/virt/kvm/mmu/tdp_mmu.c
-@@ -1,11 +1,9 @@
- // SPDX-License-Identifier: GPL-2.0
- 
--#include "mmu.h"
--#include "mmu_internal.h"
--#include "tdp_mmu.h"
--#include "spte.h"
--
-+#include <kvm/mmu_types.h>
-+#include <kvm/mmu.h>
- #include <kvm/tdp_iter.h>
-+#include <kvm/tdp_mmu.h>
- #include <kvm/tdp_pgtable.h>
- #include <kvm/mmutrace.h>
- 
--- 
-2.39.0.rc1.256.g54fd8350bd-goog
-
+> 
+> 	gfn = fault_ipa >> PAGE_SHIFT;
+> 	memslot = gfn_to_memslot(vcpu->kvm, gfn);
+> 	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
+> 	write_fault = kvm_is_write_fault(vcpu);
+> 	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
+> 		/*
+> 		 * The guest has put either its instructions or its page-tables
+> 		 * somewhere it shouldn't have. Userspace won't be able to do
+> 		 * anything about this (there's no syndrome for a start), so
+> 		 * re-inject the abort back into the guest.
+> 		 */
+> 		if (is_iabt) {
+> 			ret = -ENOEXEC;
+> 			goto out;
+> 		}
+> 
+> 		if (kvm_vcpu_abt_iss1tw(vcpu)) {
+> 			kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> 			ret = 1;
+> 			goto out_unlock;
+> 		}
+> 
+> 		/*
+> 		 * Check for a cache maintenance operation. Since we
+> 		 * ended-up here, we know it is outside of any memory
+> 		 * slot. But we can't find out if that is for a device,
+> 		 * or if the guest is just being stupid. The only thing
+> 		 * we know for sure is that this range cannot be cached.
+> 		 *
+> 		 * So let's assume that the guest is just being
+> 		 * cautious, and skip the instruction.
+> 		 */
+> 		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
+> 			kvm_incr_pc(vcpu);
+> 			ret = 1;
+> 			goto out_unlock;
+> 		}
+> 
+> 		/*
+> 		 * The IPA is reported as [MAX:12], so we need to
+> 		 * complement it with the bottom 12 bits from the
+> 		 * faulting VA. This is always 12 bits, irrespective
+> 		 * of the page size.
+> 		 */
+> 		fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
+> 		ret = io_mem_abort(vcpu, fault_ipa);
+> 		goto out_unlock;
+> 	}
