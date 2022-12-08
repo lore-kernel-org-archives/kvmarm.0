@@ -2,64 +2,88 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3910C4708E
-	for <kvmarm@archiver.kernel.org>; Thu,  8 Dec 2022 02:15:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDBB8C4332F
+	for <kvmarm@archiver.kernel.org>; Thu,  8 Dec 2022 17:58:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 529E64B8B6;
-	Wed,  7 Dec 2022 21:15:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DF3F4B9CE;
+	Thu,  8 Dec 2022 12:58:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@ventanamicro.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZgqCaj0DHdju; Wed,  7 Dec 2022 21:15:36 -0500 (EST)
+	with ESMTP id j-RJbcOfWtdW; Thu,  8 Dec 2022 12:58:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 039734B8D7;
-	Wed,  7 Dec 2022 21:15:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F2F124B9D1;
+	Thu,  8 Dec 2022 12:58:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E761B4B8AA
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Dec 2022 21:15:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D933B4B9F7
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Dec 2022 11:23:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OZ+hH+ZjImIF for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Dec 2022 21:15:33 -0500 (EST)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B6B774018F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Dec 2022 21:15:32 -0500 (EST)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.53])
- by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NSHlw69hRzRpnZ;
- Thu,  8 Dec 2022 10:14:36 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 8 Dec 2022 10:15:27 +0800
-Subject: Re: [PATCH v14 16/39] arm64/sme: Implement traps and syscall handling
- for SME
-To: Mark Brown <broonie@kernel.org>
-References: <20220419112247.711548-1-broonie@kernel.org>
- <20220419112247.711548-17-broonie@kernel.org>
- <e57552ea-37fb-07da-8560-e26bae8205cd@huawei.com>
- <Y5CgRPbjOChpHQEJ@sirena.org.uk>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <dfcbafc2-17e1-94e8-b890-8ced1c0bcdc8@huawei.com>
-Date: Thu, 8 Dec 2022 10:15:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ with ESMTP id 93jN4C87RSGr for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  8 Dec 2022 11:23:23 -0500 (EST)
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com
+ [209.85.218.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A74EB4B9D7
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Dec 2022 11:23:23 -0500 (EST)
+Received: by mail-ej1-f43.google.com with SMTP id kw15so5236490ejc.10
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 08 Dec 2022 08:23:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ventanamicro.com; s=google;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=3ffOMrqHbGPKnX9DON08suhw00B/x5l9qlgIhBCvn1s=;
+ b=GcVbR78qgq1zGKeFap4dpyJP2ETn3kww5rg3v8dPl3tCWN0G6qxnGcbwgcX5MCo3OM
+ fKWfEFTBvO7N8XCZBPsxpIZJu/I7SUe3aPGwiRpN/CQgiksUDLrb6z4cKnWd08AfEpdZ
+ r94BbeUn5ovd//wzHhKXPJAWTKlrbHK2MlOIz3fbM4mGNb97gj9dHvVIeeiBbVWMUG83
+ kIoNpiUMsufVsm/m95AH/BSknL/IIYi4+Au5NXHpzpAF6U9MwGhYl2DJgI8UrQgHnbO0
+ 7dRNIeeoHyKJg18727lHNV+cCrVrJsiUn1rn7oMXL7Wu9l4f3Ev75gNhks+qShMbBZI8
+ WEAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=3ffOMrqHbGPKnX9DON08suhw00B/x5l9qlgIhBCvn1s=;
+ b=mJ2a1LyIcmESuo9Q0l9T/Kmz1rxzDN4KTzAqmU7BHcpHEE1WbZADJqmuq7iyTItErb
+ ZEP8+ub6B9k7/Ihy8hX3/fM8eOqMQQDWOdN+9CslXnNZ8OAc07TjMNgnoPCFtY1AjL2B
+ aWtTHorWuxPNPXEpEt02vMjgW4+CpxaSY62DutEKpBiSlj1B+BP6yJBAKoaDmsw8SeGs
+ h6lPK5FNJev62MaOY9ktBq5BuMyx02NQV+5YraBy5BTWcJk3cwJZyCE0SOpPwGe4ZUh9
+ u89f7zENi3u54BwdtUcahBu1FBaw629bCDU0SB/fiP90n+qhbEFbYhqZunQ1sikrev5a
+ 6yIw==
+X-Gm-Message-State: ANoB5pnpZgwX3suh0GpGcsexZR+rVAlQFWJBvloMCOPRdS17uvIdBwds
+ gja060TY1a0z7Ju2ExnTY39Ckg==
+X-Google-Smtp-Source: AA0mqf7cWc12/11dRI8UuaKffduEO9pgwBnCtENeaj4X4vsk2ZRqNQGH/MayWHmkzyTTju2hui+ZmA==
+X-Received: by 2002:a17:907:a426:b0:78d:f456:1ec6 with SMTP id
+ sg38-20020a170907a42600b0078df4561ec6mr3278655ejc.23.1670516602675; 
+ Thu, 08 Dec 2022 08:23:22 -0800 (PST)
+Received: from localhost (2001-1ae9-1c2-4c00-748-2a9a-a2a6-1362.ip6.tmcz.cz.
+ [2001:1ae9:1c2:4c00:748:2a9a:a2a6:1362])
+ by smtp.gmail.com with ESMTPSA id
+ i9-20020a170906698900b007bff9fb211fsm9884789ejr.57.2022.12.08.08.23.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 08 Dec 2022 08:23:22 -0800 (PST)
+Date: Thu, 8 Dec 2022 17:23:21 +0100
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 3/4] KVM: arm64: selftests: Align VA space allocator with
+ TTBR0
+Message-ID: <20221208162321.d745p2lsedxdf7v6@kamzik>
+References: <20221207214809.489070-1-oliver.upton@linux.dev>
+ <20221207214809.489070-4-oliver.upton@linux.dev>
+ <Y5EtP5z6rxSK1VUe@google.com> <Y5EvVtAoDSHvIKie@google.com>
+ <Y5E5UixcJQ4+tNYg@google.com>
 MIME-Version: 1.0
-In-Reply-To: <Y5CgRPbjOChpHQEJ@sirena.org.uk>
-Content-Language: en-US
-X-Originating-IP: [10.174.185.179]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600007.china.huawei.com (7.193.23.208)
-X-CFilter-Loop: Reflected
-Cc: Marc Zyngier <maz@kernel.org>,
- Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
- Szabolcs Nagy <szabolcs.nagy@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Alan Hayward <alan.hayward@arm.com>,
- Salil Akerkar <Salil.Akerkar@arm.com>, linux-kselftest@vger.kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Luca Salabrino <luca.scalabrino@arm.com>
+Content-Disposition: inline
+In-Reply-To: <Y5E5UixcJQ4+tNYg@google.com>
+X-Mailman-Approved-At: Thu, 08 Dec 2022 12:58:22 -0500
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kvmarm@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,67 +95,21 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2022/12/7 22:16, Mark Brown wrote:
-> On Wed, Dec 07, 2022 at 10:00:17PM +0800, Zenghui Yu wrote:
->> On 2022/4/19 19:22, Mark Brown wrote:
-> 
->>> +	/*
->>> +	 * If SME is active then exit streaming mode.  If ZA is active
->>> +	 * then flush the SVE registers but leave userspace access to
->>> +	 * both SVE and SME enabled, otherwise disable SME for the
->>> +	 * task and fall through to disabling SVE too.  This means
-> 
->> It looks a bit confusing to me that in the current implementation, if
->> ZA is *not* active, we don't actually go to disable SME for the task
->> (which IMHO can be disabled as user-space is not actively using it now).
-> 
-> Unlike SVE there's no overhead from leaving SME enabled, the enable bits
-> for SM and ZA tell us if there is extra register state to be saved so we
-> don't have to worry about the costs there like we do with SVE.  The only
-> reason for not just unconditionally enabling SME is the potentially
-> large backing storage required for the registers, if a task isn't using
-> SME there's no need to impose that overhead.  If we disable SME for
-> userspace after the storage has been allocated then we just require an
-> additional trip through EL1 to reenable it for any future usage which
-> would hurt performance but not really gain us anything otherwise.  We
-> don't want to discurage applications from disabling ZA when not in use
-> given that there's likely to be physical overheads from keeping it
-> enabled.
+On Thu, Dec 08, 2022 at 01:09:38AM +0000, Sean Christopherson wrote:
+...
+> Actually, before we do anything, we should get confirmation from the s390 and
+> RISC-V folks on whether they have a canonical hole like x86, i.e. maybe x86 is
+> the oddball.
 
-Ah, thanks a lot for the explanations. The comment itself can be
-improved though (I think).
-
->>> +		if (svcr & SYS_SVCR_EL0_SM_MASK)
->>> +			sme_smstop_sm();
-> 
->> As per the SME syscall ABI
-> 
->> | On syscall PSTATE.SM will be cleared and the SVE registers will be
->> | handled as per the standard SVE ABI.
-> 
->> and the SVE syscall ABI
-> 
->> | On syscall, V0..V31 are preserved (as without SVE).  Thus, bits
->> | [127:0] of Z0..Z31 are preserved.  All other bits of Z0..Z31, and all
->> | of P0..P15 and FFR become zero on return from a syscall.
-> 
->> Can we infer from the documentation that V0-V31 should be preserved on
->> return from a syscall? But with sme_smstop_sm(), all implemented bits of
->> Z0-Z31 are set to zero by hardware. Is this intentional?
-> 
->> Please fix me up if I've mis-read things here.
-> 
-> No, the intention is to say that we exit streaming mode and then handle
-> things as per the non-streaming ABI.  Exiting streaming mode has the
-> effect of clearing the values as you say.
+riscv splits like x86.
 
 Thanks,
-Zenghui
+drew
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
