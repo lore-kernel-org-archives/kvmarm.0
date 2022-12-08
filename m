@@ -2,91 +2,87 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0CB5C2D0CB
-	for <kvmarm@archiver.kernel.org>; Thu,  8 Dec 2022 19:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02402C4167B
+	for <kvmarm@archiver.kernel.org>; Thu,  8 Dec 2022 19:49:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DA3E4BA2A;
-	Thu,  8 Dec 2022 14:40:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 836B84BA12;
+	Thu,  8 Dec 2022 14:49:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id f4S6CvHmky5S; Thu,  8 Dec 2022 14:40:16 -0500 (EST)
+	with ESMTP id hBpnueMSKQNy; Thu,  8 Dec 2022 14:49:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 125A14BA3A;
-	Thu,  8 Dec 2022 14:40:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5ADF94BA04;
+	Thu,  8 Dec 2022 14:49:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FD064BA24
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Dec 2022 14:40:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 76EF44B9F0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Dec 2022 14:49:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IbUCMAEP-jQc for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Dec 2022 14:40:12 -0500 (EST)
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
- [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ECE9A4BA0A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Dec 2022 14:40:09 -0500 (EST)
-Received: by mail-yb1-f201.google.com with SMTP id
- y6-20020a25b9c6000000b006c1c6161716so2535607ybj.8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 08 Dec 2022 11:40:09 -0800 (PST)
+ with ESMTP id YqUA-JuZxUue for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  8 Dec 2022 14:49:31 -0500 (EST)
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com
+ [209.85.216.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3095B4B9E1
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Dec 2022 14:49:31 -0500 (EST)
+Received: by mail-pj1-f45.google.com with SMTP id
+ k88-20020a17090a4ce100b00219d0b857bcso2629230pjh.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 08 Dec 2022 11:49:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
- :date:from:to:cc:subject:date:message-id:reply-to;
- bh=9jkEeOR+eFVYLdV/biNhqONLCqpOOeuWNQBN9kUw+a4=;
- b=RcX1fA9WGa6w4C9PUxG4OPVBo1zxjA/xcbKeSP6a3foCAqZ7FzqI1mFwD63t1Zj64f
- dUcsVkx5+LL+NIjjNV1LqNWVddFOpYikSd3WUTyGFLn96H50k7PwdHsttsFJt9P1ez0b
- 1mfPx6AlqK6ylftXIU2F9Nj5hSc+ikFrGZ/z1f/qPxYxfvx/OXVl/tDLZo61SUF3zvKK
- PYv1RXX6MMcltPMtFw1Jp+095PHbtWtFgqbpJbKkr0cp5YLn1DUp9X/nB2YNG55HXF6K
- /rKkgYv9i7/aE4/qJBLcexm7xz9bNSYN/tkjp5XaQYlxAPljLege78wWIo+X1uBQR1Re
- /MJg==
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=/iRRuEpq3SHF2tTVNW+V0pd2eP3QVViktpfmGsJo8SE=;
+ b=kbZjAjJOckI+jlOCJbuKM/9hTPPtgPZftSrpNxz+6MLKgxGWvBLLNyUR+yLtAe1FHf
+ wJpg2MHXkTzpBNyZxTGd1AdsYy4ZLs6dxynTISt9vca/TyPOGTgUZjlcmzeqpYDnp/lr
+ nfbOFjW274MxXgm+RUWP24N0ybK+fuofYxDYYO/sGvPoD5lfmmfOO3tdwNjQLoMr4mpd
+ /RF/OCtj9uVDzdQiD1V8pMJXjG1PPQFii8S4PnRl+HioQe97ZvVWKQiPgKLeNQV2/HJw
+ gBUXqS7+VDy/y8Zx1/EhxyC9Yxe7Bai4askP49YC2QyLOF6z9J+4HJ7bjYXM/dfQMhAm
+ uWhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
- :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=9jkEeOR+eFVYLdV/biNhqONLCqpOOeuWNQBN9kUw+a4=;
- b=nkktge6H8qMdMhh3/69t10BctX0FnkzDKQFiufJO+I34HvQtNDWFYVH5nEfCFFWBh8
- RaUMXmX9cqPzZeSec/5mJTdoq0J8DrhuSPMKmKWVKfO6wuRCAMgmsDPewFPeQjFLKiAU
- qM1tu8ckLglJjUwh9vh/J1rhFFxecY7CWRDR5M2deobFpqhsqRqNxmoKpCAVKZ7mcgSJ
- ORId5YY4Np2VNzHyOOxTGoeI78iI5gqk9aL6HM0tSQlwUvk9FvW2dStGAolity4JmQVn
- LNISe4udwAWPI/HqRq7WySLCERlMzGRoK+elU12DSGN3suQUmwmDOppEeidZ/x3kKrzm
- LoAA==
-X-Gm-Message-State: ANoB5pmex7VVFuaM3yPpw9O5qMzMrlBwvY6H0inZAOsXqk9t75OMwot6
- J0mjG7RDXfx1f4SqnVyHALho8BzYqOzrdw==
-X-Google-Smtp-Source: AA0mqf5Y/oazogGX+tpbF7bdOJO4aayzIsYsnlV7zDudirQdvI5dtEVAX371oDYlEt+kHPpaNkmdcoOtQ7CEag==
-X-Received: from dmatlack-n2d-128.c.googlers.com
- ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a25:c6c2:0:b0:6f0:b351:c300 with SMTP id
- k185-20020a25c6c2000000b006f0b351c300mr63444626ybf.102.1670528409549; Thu, 08
- Dec 2022 11:40:09 -0800 (PST)
-Date: Thu,  8 Dec 2022 11:38:57 -0800
-In-Reply-To: <20221208193857.4090582-1-dmatlack@google.com>
-Mime-Version: 1.0
-References: <20221208193857.4090582-1-dmatlack@google.com>
-X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221208193857.4090582-38-dmatlack@google.com>
-Subject: [RFC PATCH 37/37] KVM: MMU: Move the TDP MMU to common code
-From: David Matlack <dmatlack@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
- Hugh Dickins <hughd@google.com>, Paul Walmsley <paul.walmsley@sifive.com>,
- kvmarm@lists.linux.dev, Nadav Amit <namit@vmware.com>,
- Colin Cross <ccross@google.com>, Ben Gardon <bgardon@google.com>,
- linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- Yu Zhao <yuzhao@google.com>, Marc Zyngier <maz@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- "Matthew Wilcox \(Oracle\)" <willy@infradead.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Krish Sadhukhan <krish.sadhukhan@oracle.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Mingwei Zhang <mizhang@google.com>,
- Albert Ou <aou@eecs.berkeley.edu>, xu xin <cgel.zte@gmail.com>,
- Arnd Bergmann <arnd@arndb.de>, "Liam R. Howlett" <Liam.Howlett@Oracle.com>,
- kvm@vger.kernel.org, Atish Patra <atishp@atishpatra.org>,
- David Matlack <dmatlack@google.com>, Suren Baghdasaryan <surenb@google.com>,
- Vlastimil Babka <vbabka@suse.cz>, linux-arm-kernel@lists.infradead.org,
- linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
- Andrew Morton <akpm@linux-foundation.org>
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=/iRRuEpq3SHF2tTVNW+V0pd2eP3QVViktpfmGsJo8SE=;
+ b=SuyQ/vIgNPLuA2BM8hr3dx+1tk3PMhgjz1vvTegEKNRkshP+elTV8tmQRj/HlgiPGN
+ RL4qmPasez3ctoehzww3aP9I1mXOUuy3yv+NGJeCr80lGa4D8PdIOfxoQjwCRmgYAFUJ
+ bnfjQPqJzXB56RpygiYDo15SMY+948gR2d1a+GwSmP+C8Pg/yr8nD/hP0OxDvdMP8E6s
+ hPT+outcT16L7m0dUfBiStUNCZli0GNLb8nohTPWxy7eUUhHU+sIfe4xa++x39sdvfTU
+ sR5QZkq2sUugA8P6auJ0xCoFNG8+3tMs1bksL4KxI9GkQzvJuJIUsfZSrpvfX0k2xVzH
+ kuBw==
+X-Gm-Message-State: ANoB5pnzgESFXzJjeii9VLArB/sx5vx9b1YAQkmfyfRrPk+nrmnPJaji
+ eMuTXcx6FWpsqkmwyOQ5siS0Qg==
+X-Google-Smtp-Source: AA0mqf4+sYmN6TRhUnqm6pJbxgGCoSUwTGEipBsiO/jKS6U41yXiKghC+TQNsnXSTcuYW70TLswWgg==
+X-Received: by 2002:a17:90a:d681:b0:218:84a0:65eb with SMTP id
+ x1-20020a17090ad68100b0021884a065ebmr1775305pju.1.1670528969909; 
+ Thu, 08 Dec 2022 11:49:29 -0800 (PST)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com.
+ [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
+ d15-20020a17090ac24f00b0020b7de675a4sm34718pjx.41.2022.12.08.11.49.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 08 Dec 2022 11:49:29 -0800 (PST)
+Date: Thu, 8 Dec 2022 11:49:26 -0800
+From: Ricardo Koller <ricarkol@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 2/4] KVM: selftests: Setup ucall after loading program
+ into guest memory
+Message-ID: <Y5I/xiFMLVbpAZj+@google.com>
+References: <20221207214809.489070-1-oliver.upton@linux.dev>
+ <20221207214809.489070-3-oliver.upton@linux.dev>
+ <Y5EoZ5uwrTF3eSKw@google.com> <Y5EtMWuTaJk9I3Bd@google.com>
+ <Y5EutGSjkRmdItQb@google.com> <Y5Exwzr6Ibmmthl0@google.com>
+ <Y5IxNTKRnacfSsLt@google.com> <Y5I0paok+dvTtrkt@google.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <Y5I0paok+dvTtrkt@google.com>
+Cc: Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kvmarm@lists.linux.dev,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,110 +99,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Move tdp_mmu.[ch] from arch/x86 and into the common code directories.
-This will allow other architectures to use the TDP MMU in the future.
+On Thu, Dec 08, 2022 at 07:01:57PM +0000, Sean Christopherson wrote:
+> On Thu, Dec 08, 2022, Ricardo Koller wrote:
+> > On Thu, Dec 08, 2022 at 12:37:23AM +0000, Oliver Upton wrote:
+> > > On Thu, Dec 08, 2022 at 12:24:20AM +0000, Sean Christopherson wrote:
+> > > > > Even still, that's just a kludge to make ucalls work. We have other
+> > > > > MMIO devices (GIC distributor, for example) that work by chance since
+> > > > > nothing conflicts with the constant GPAs we've selected in the tests.
+> > > > > 
+> > > > > I'd rather we go down the route of having an address allocator for the
+> > > > > for both the VA and PA spaces to provide carveouts at runtime.
+> > > > 
+> > > > Aren't those two separate issues?  The PA, a.k.a. memslots space, can be solved
+> > > > by allocating a dedicated memslot, i.e. doesn't need a carve.  At worst, collisions
+> > > > will yield very explicit asserts, which IMO is better than whatever might go wrong
+> > > > with a carve out.
+> > > 
+> > > Perhaps the use of the term 'carveout' wasn't right here.
+> > > 
+> > > What I'm suggesting is we cannot rely on KVM memslots alone to act as an
+> > > allocator for the PA space. KVM can provide devices to the guest that
+> > > aren't represented as memslots. If we're trying to fix PA allocations
+> > > anyway, why not make it generic enough to suit the needs of things
+> > > beyond ucalls?
+> > 
+> > One extra bit of information: in arm, IO is any access to an address (within
+> > bounds) not backed by a memslot. Not the same as x86 where MMIO are writes to
+> > read-only memslots.  No idea what other arches do.
+> 
+> I don't think that's correct, doesn't this code turn write abort on a RO memslot
+> into an io_mem_abort()?  Specifically, the "(write_fault && !writable)" check will
+> match, and assuming none the the edge cases in the if-statement fire, KVM will
+> send the write down io_mem_abort().
 
-No functional change intended.
+You are right. In fact, page_fault_test checks precisely that: writes on
+RO memslots are sent to userspace as an mmio exit. I was just referring
+to the MMIO done for ucall.
 
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- arch/x86/kvm/Makefile                       | 2 +-
- arch/x86/kvm/mmu/mmu.c                      | 3 ++-
- {arch/x86/kvm/mmu => include/kvm}/tdp_mmu.h | 6 +++++-
- virt/kvm/Makefile.kvm                       | 1 +
- {arch/x86 => virt}/kvm/mmu/tdp_mmu.c        | 8 +++-----
- 5 files changed, 12 insertions(+), 8 deletions(-)
- rename {arch/x86/kvm/mmu => include/kvm}/tdp_mmu.h (94%)
- rename {arch/x86 => virt}/kvm/mmu/tdp_mmu.c (99%)
+Having said that, we could use ucall as writes on read-only memslots
+like what x86 does.
 
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index cb9ae306892a..06b61fdea539 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -18,7 +18,7 @@ ifdef CONFIG_HYPERV
- kvm-y			+= kvm_onhyperv.o
- endif
- 
--kvm-$(CONFIG_X86_64) += mmu/tdp_pgtable.o mmu/tdp_mmu.o
-+kvm-$(CONFIG_X86_64)	+= mmu/tdp_pgtable.o
- kvm-$(CONFIG_KVM_XEN)	+= xen.o
- kvm-$(CONFIG_KVM_SMM)	+= smm.o
- 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index f2602ee1771f..8653776bca6f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -19,7 +19,6 @@
- #include "ioapic.h"
- #include "mmu.h"
- #include "mmu_internal.h"
--#include "tdp_mmu.h"
- #include "x86.h"
- #include "kvm_cache_regs.h"
- #include "smm.h"
-@@ -27,6 +26,8 @@
- #include "cpuid.h"
- #include "spte.h"
- 
-+#include <kvm/tdp_mmu.h>
-+
- #include <linux/kvm_host.h>
- #include <linux/types.h>
- #include <linux/string.h>
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/include/kvm/tdp_mmu.h
-similarity index 94%
-rename from arch/x86/kvm/mmu/tdp_mmu.h
-rename to include/kvm/tdp_mmu.h
-index 607c1417abd1..538c848149c9 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/include/kvm/tdp_mmu.h
-@@ -5,7 +5,11 @@
- 
- #include <linux/kvm_host.h>
- 
--#include "spte.h"
-+#include <kvm/mmu_types.h>
-+#include <kvm/mmu.h>
-+#include <kvm/tdp_iter.h>
-+#include <kvm/tdp_pgtable.h>
-+#include <kvm/mmutrace.h>
- 
- int kvm_mmu_init_tdp_mmu(struct kvm *kvm);
- void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
-diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-index 58b595ac9b8d..942681308140 100644
---- a/virt/kvm/Makefile.kvm
-+++ b/virt/kvm/Makefile.kvm
-@@ -14,3 +14,4 @@ kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
- kvm-$(CONFIG_HAVE_KVM_PFNCACHE) += $(KVM)/pfncache.o
- 
- kvm-$(CONFIG_HAVE_TDP_MMU) += $(KVM)/mmu/tdp_iter.o
-+kvm-$(CONFIG_HAVE_TDP_MMU) += $(KVM)/mmu/tdp_mmu.o
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/virt/kvm/mmu/tdp_mmu.c
-similarity index 99%
-rename from arch/x86/kvm/mmu/tdp_mmu.c
-rename to virt/kvm/mmu/tdp_mmu.c
-index c950d688afea..5ca8892ebef5 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/virt/kvm/mmu/tdp_mmu.c
-@@ -1,11 +1,9 @@
- // SPDX-License-Identifier: GPL-2.0
- 
--#include "mmu.h"
--#include "mmu_internal.h"
--#include "tdp_mmu.h"
--#include "spte.h"
--
-+#include <kvm/mmu_types.h>
-+#include <kvm/mmu.h>
- #include <kvm/tdp_iter.h>
-+#include <kvm/tdp_mmu.h>
- #include <kvm/tdp_pgtable.h>
- #include <kvm/mmutrace.h>
- 
--- 
-2.39.0.rc1.256.g54fd8350bd-goog
-
+> 
+> 	gfn = fault_ipa >> PAGE_SHIFT;
+> 	memslot = gfn_to_memslot(vcpu->kvm, gfn);
+> 	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
+> 	write_fault = kvm_is_write_fault(vcpu);
+> 	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
+> 		/*
+> 		 * The guest has put either its instructions or its page-tables
+> 		 * somewhere it shouldn't have. Userspace won't be able to do
+> 		 * anything about this (there's no syndrome for a start), so
+> 		 * re-inject the abort back into the guest.
+> 		 */
+> 		if (is_iabt) {
+> 			ret = -ENOEXEC;
+> 			goto out;
+> 		}
+> 
+> 		if (kvm_vcpu_abt_iss1tw(vcpu)) {
+> 			kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> 			ret = 1;
+> 			goto out_unlock;
+> 		}
+> 
+> 		/*
+> 		 * Check for a cache maintenance operation. Since we
+> 		 * ended-up here, we know it is outside of any memory
+> 		 * slot. But we can't find out if that is for a device,
+> 		 * or if the guest is just being stupid. The only thing
+> 		 * we know for sure is that this range cannot be cached.
+> 		 *
+> 		 * So let's assume that the guest is just being
+> 		 * cautious, and skip the instruction.
+> 		 */
+> 		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
+> 			kvm_incr_pc(vcpu);
+> 			ret = 1;
+> 			goto out_unlock;
+> 		}
+> 
+> 		/*
+> 		 * The IPA is reported as [MAX:12], so we need to
+> 		 * complement it with the bottom 12 bits from the
+> 		 * faulting VA. This is always 12 bits, irrespective
+> 		 * of the page size.
+> 		 */
+> 		fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
+> 		ret = io_mem_abort(vcpu, fault_ipa);
+> 		goto out_unlock;
+> 	}
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
