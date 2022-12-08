@@ -1,40 +1,40 @@
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBDFB8F6F
-	for <kvmarm@lists.linux.dev>; Thu,  8 Dec 2022 19:39:19 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-37360a6236fso24935417b3.12
-        for <kvmarm@lists.linux.dev>; Thu, 08 Dec 2022 11:39:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620F48F6F
+	for <kvmarm@lists.linux.dev>; Thu,  8 Dec 2022 19:39:21 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-348608c1cd3so25089097b3.10
+        for <kvmarm@lists.linux.dev>; Thu, 08 Dec 2022 11:39:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yTAZyHH91Hz9k7OZtf9gLdlJIIrZMhdblzaFwMket5k=;
-        b=GOQt4+sFqigGxf6Aa3fTvktBe1mjQiluGE/Jj6vv/IvtdV7LliPzUDKCSdDx4Qr+HY
-         SefezSHoN8FcvlmM5v70XQPk/EyYEeJUQTBJUq5h/NPog1UINNQReWUqbVEFjNE5psNx
-         aagqyJsONr1NaCPx7WLFrSAq/6+YU9H0nX9KZhJN95FCQM9/NOhRMdNzFnOuadNLctYN
-         G+xWcIxFKNvCVcBGdVMIWulIdzku3X8ojhuncsVZJ/7ZuOiqyWG7OUDtS4/fr9vosjH0
-         V6V8OE7BSYaG+WEMOpz2hhgLOVkbabsraMBHq3XN+o9hqQFkHr8FyeB1wUdGuE+kwW+d
-         bbVQ==
+        bh=SSdGxEhCr0RqVU7mTEekOKbILUbkr12FLBfwU71mUxI=;
+        b=ASwdiNISwi39e3pN7oE2KNZFMmRKqmr3VYiit4wIyv47H88t6EbCKRpQMvgIGjb8Ee
+         rJVPUEvW73NAo8aFV+BbV0Vr3OSkq29yA95vS5SMRxjzWXbnV3DZI/1DBZWOB8qdIrDl
+         W6zsADUJr9yTIozq12aJEIz0+DdiTk+hebpQwi9Spbwq0O7+Rp/AhyZ8kHc6W7GbLEQQ
+         W0hWYQM1VKgOje1FPxZ4mA6ztD8KMzpQNn+h5VJfv3SoW4uFDeXDtliLmzD104DdQ5jS
+         RPnONZy1sj8iUseTf5J8a4CjaI/8JgGCw7ZrAZK92Qp419zeHoy00JFMymW+m0ow9uJP
+         AA4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yTAZyHH91Hz9k7OZtf9gLdlJIIrZMhdblzaFwMket5k=;
-        b=K6GmW+NHRpeuo2fMiWL50ATp/0ogRjnKPRAaqo2I+u/HPqNa3gb8YTfsWe/BTE+PTq
-         L0FCZRyC53sDr5VgIjdRTLroLAMZfxO3Xw+rbk7M6uhh8N+tPzkQWSZSsQ1jVwpYcpon
-         Fty2rI8REdHSqD3curnoSRNv2fXXHbXCXw7RG3ZLanaAKuHayMrALVWxnj+OA2Nw5t3k
-         crgKb6ywkgcUPQ9BH8Ye15Frnl1AldKr5WzrugDmIyDqU0Wxy4/5prNwqN7rnSKXkgw/
-         WYGjHEZdUjiQNtBaJyYma32FzCDsNXggpDd+vVndHnn2Yv594rPT1eo4LjFQ+0/wRD/b
-         LerQ==
-X-Gm-Message-State: ANoB5pmT1KIfN2mzzxS3yHxKJxZ3a8icKNaPJCAsOBCiQSeYENt58A3T
-	hT++doedSBBfNz7QzFLasd+Cnd8A4sNf2w==
-X-Google-Smtp-Source: AA0mqf4+9oetgR3uKpdfVrPGzq2N3r/JU0sb91m8xpA2HrSBGD0IqxC3Vg4zr/dJJfrFDGejU78ci1LRJL+iRw==
+        bh=SSdGxEhCr0RqVU7mTEekOKbILUbkr12FLBfwU71mUxI=;
+        b=lt50QmNBXz5PDq8ishndu4mEPC1tubQDiw3LaO2HnxoawBSaJ9acYpoLKeOUNxXS2K
+         RCMnFad8ebf8M8JdMHzbBujPhYsaPTLFikpul0ukyBosfp47u/rPdHT1LaeXu6N2BzVs
+         XmwBGfziZsoJ3WFiRx+ZJyN9uoLttWyX/vXQMR0uHgIIFsqytQRzIJuDprwEbXQv+ZhA
+         IVWglvs+4/1c7ZJS9FAI38VpBHNDhEWxFZ9JI8jqCHqzhbz4YNhSK+PtGNe46iGMALPh
+         jvietZwMEfGgi8CgbnwFjhzSVbqAo69EaeaokMK1bl23K0527hBmqKni3IoAuv8sLYb6
+         GoAA==
+X-Gm-Message-State: ANoB5pnSnEu3tKocL/2vi//lnbrPjEDhegVlcCBLBr8bO0N6bbucAO44
+	5tEbmimTYdunTCymkUb5rhHWl9hq5NEe6Q==
+X-Google-Smtp-Source: AA0mqf47fCCsz8lLNEesw2/yjinjmb5c0Q+BVTcOByCxMnOsH1R3SmOt/A4xjy4bk2xWJgLDn+u8z1uj6TTwRA==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a25:9f85:0:b0:700:f93d:c7cd with SMTP id
- u5-20020a259f85000000b00700f93dc7cdmr16638924ybq.166.1670528358851; Thu, 08
- Dec 2022 11:39:18 -0800 (PST)
-Date: Thu,  8 Dec 2022 11:38:27 -0800
+ (user=dmatlack job=sendgmr) by 2002:a81:9943:0:b0:3b6:79b0:c10e with SMTP id
+ q64-20020a819943000000b003b679b0c10emr62215766ywg.87.1670528360357; Thu, 08
+ Dec 2022 11:39:20 -0800 (PST)
+Date: Thu,  8 Dec 2022 11:38:28 -0800
 In-Reply-To: <20221208193857.4090582-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20221208193857.4090582-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221208193857.4090582-8-dmatlack@google.com>
-Subject: [RFC PATCH 07/37] mm: Introduce architecture-neutral PG_LEVEL macros
+Message-ID: <20221208193857.4090582-9-dmatlack@google.com>
+Subject: [RFC PATCH 08/37] KVM: selftests: Stop assuming stats are contiguous
+ in kvm_binary_stats_test
 From: David Matlack <dmatlack@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
@@ -67,61 +68,56 @@ Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
 	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221208193827.7Fqn8uAiQX3uZXY9_Px_oW8EK3iYETbvp4ksmgGrReA@z>
+Message-ID: <20221208193828.k-egONQfNvdUVFEKO_7XqKZ_Wwxpo1LPxGPzMY0yEOQ@z>
 
-Introduce architecture-neutral versions of the x86 macros PG_LEVEL_4K,
-PG_LEVEL_2M, etc. The x86 macros are used extensively by KVM/x86's page
-table management code. Introducing architecture-neutral version of these
-macros paves the way for porting KVM/x86's page table management code to
-architecture-neutral code.
+From: Jing Zhang <jingzhangos@google.com>
+
+Remove the assumption from kvm_binary_stats_test that all stats are
+laid out contiguously in memory. The KVM stats ABI specifically allows
+holes in the stats data, since each stat exposes its own offset.
+
+While here drop the check that each stats' offset is less than
+size_data, as that is now always true by construction.
+
+Fixes: 0b45d58738cd ("KVM: selftests: Add selftest for KVM statistics data binary interface")
+Signed-off-by: Jing Zhang <jingzhangos@google.com>
+Signed-off-by: David Matlack <dmatlack@google.com>
+[Re-worded the commit message.]
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/include/asm/pgtable_types.h | 12 ++++--------
- include/linux/mm_types.h             |  9 +++++++++
- 2 files changed, 13 insertions(+), 8 deletions(-)
+ tools/testing/selftests/kvm/kvm_binary_stats_test.c | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
 
-diff --git a/arch/x86/include/asm/pgtable_types.h b/arch/x86/include/asm/pgtable_types.h
-index aa174fed3a71..bdf41325f089 100644
---- a/arch/x86/include/asm/pgtable_types.h
-+++ b/arch/x86/include/asm/pgtable_types.h
-@@ -518,14 +518,10 @@ extern void native_pagetable_init(void);
- struct seq_file;
- extern void arch_report_meminfo(struct seq_file *m);
+diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+index 894417c96f70..46a66ece29fd 100644
+--- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
++++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+@@ -134,7 +134,8 @@ static void stats_test(int stats_fd)
+ 				    "Bucket size of stats (%s) is not zero",
+ 				    pdesc->name);
+ 		}
+-		size_data += pdesc->size * sizeof(*stats_data);
++		size_data = max(size_data,
++			pdesc->offset + pdesc->size * sizeof(*stats_data));
+ 	}
  
--enum pg_level {
--	PG_LEVEL_NONE,
--	PG_LEVEL_4K,
--	PG_LEVEL_2M,
--	PG_LEVEL_1G,
--	PG_LEVEL_512G,
--	PG_LEVEL_NUM
--};
-+#define PG_LEVEL_4K	PG_LEVEL_PTE
-+#define PG_LEVEL_2M	PG_LEVEL_PMD
-+#define PG_LEVEL_1G	PG_LEVEL_PUD
-+#define PG_LEVEL_512G	PG_LEVEL_P4D
+ 	/*
+@@ -149,14 +150,6 @@ static void stats_test(int stats_fd)
+ 	TEST_ASSERT(size_data >= header.num_desc * sizeof(*stats_data),
+ 		    "Data size is not correct");
  
- #ifdef CONFIG_PROC_FS
- extern void update_page_count(int level, unsigned long pages);
-diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-index 500e536796ca..0445d0673afe 100644
---- a/include/linux/mm_types.h
-+++ b/include/linux/mm_types.h
-@@ -1003,4 +1003,13 @@ enum fault_flag {
- 
- typedef unsigned int __bitwise zap_flags_t;
- 
-+enum pg_level {
-+	PG_LEVEL_NONE,
-+	PG_LEVEL_PTE,
-+	PG_LEVEL_PMD,
-+	PG_LEVEL_PUD,
-+	PG_LEVEL_P4D,
-+	PG_LEVEL_NUM
-+};
-+
- #endif /* _LINUX_MM_TYPES_H */
+-	/* Check stats offset */
+-	for (i = 0; i < header.num_desc; ++i) {
+-		pdesc = get_stats_descriptor(stats_desc, i, &header);
+-		TEST_ASSERT(pdesc->offset < size_data,
+-			    "Invalid offset (%u) for stats: %s",
+-			    pdesc->offset, pdesc->name);
+-	}
+-
+ 	/* Allocate memory for stats data */
+ 	stats_data = malloc(size_data);
+ 	TEST_ASSERT(stats_data, "Allocate memory for stats data");
 -- 
 2.39.0.rc1.256.g54fd8350bd-goog
 
