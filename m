@@ -2,71 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D120EC4332F
-	for <kvmarm@archiver.kernel.org>; Thu,  8 Dec 2022 19:39:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1502C001B2
+	for <kvmarm@archiver.kernel.org>; Thu,  8 Dec 2022 19:39:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9020A4BA68;
-	Thu,  8 Dec 2022 14:39:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EC2F4BA19;
+	Thu,  8 Dec 2022 14:39:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JPj5qWHu-YVV; Thu,  8 Dec 2022 14:39:48 -0500 (EST)
+	with ESMTP id KPG3WEP9O7VI; Thu,  8 Dec 2022 14:39:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA8464BA6C;
-	Thu,  8 Dec 2022 14:39:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E27D84BA2F;
+	Thu,  8 Dec 2022 14:39:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CEA8B4BA2F
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Dec 2022 14:39:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 583274BA22
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Dec 2022 14:39:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id THNQPL6TlPgM for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Dec 2022 14:39:40 -0500 (EST)
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
- [209.85.219.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 466E94BA2B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Dec 2022 14:39:37 -0500 (EST)
-Received: by mail-yb1-f202.google.com with SMTP id
- f11-20020a5b01cb000000b0070374b66537so2541320ybp.14
- for <kvmarm@lists.cs.columbia.edu>; Thu, 08 Dec 2022 11:39:37 -0800 (PST)
+ with ESMTP id Q+SjZcCSIt8G for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  8 Dec 2022 14:39:42 -0500 (EST)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC9F34BA13
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Dec 2022 14:39:40 -0500 (EST)
+Received: by mail-yb1-f201.google.com with SMTP id
+ t5-20020a5b07c5000000b006dfa2102debso2548606ybq.4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 08 Dec 2022 11:39:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:from:to:cc:subject:date:message-id:reply-to;
- bh=IqmyM2QEYva7JW7axwbl4xIkL86pAwW/H4sjSNNkIgM=;
- b=dlUm8IzbDvKb7N133pMZbM/DFF2KBU+Uj9aLv9J4HYtcIkmIb26+E+NQc6WW5lGWbL
- gRjhF2Xtb1+eYvjvVNPz1fbza7FzGrlR1Lu4PkwObVflvo1HWtD/PdV/GtwH/OYCGqmW
- unzqYTbSQw2kEfHvH067uKfBCEte20dfejQENL3zjpmLPkBmJgJlntv4NgZXLQazrFdX
- xuOUsmX6ghWNWZUkpgBa0nNKdgiEWdVdSAmfBWBxgOuca3Crx0ITb6PP4ZfWYj0CDybH
- 3DDCzi9SmVtrCH3Ln+bCV9cJJ5HGVNrG9C8r5e5Ny4xwAEq3sPHh7YTtyJKFJzf22O7k
- p2Aw==
+ bh=CaDXua+LFbRv3ei+U1Fgv/kax6A2A04L4lM62rMK90Q=;
+ b=FQRVJBa4KRKObP8S3n7w3f2m+Bcx87+PQgURkRJCXrk7m4BdVxUrIfCvxY3dvCxGvX
+ DFNpL9OiA6gV3a7OA6rX48DXADwjzhjgTFiSwWT9yA/sZdiwLepPrDM/Dmol5FJsTFtd
+ 1z4mxGJZs7yrfwU4FQjUHnKK5PWmnwdRAprtxH5S0Ua5f0HoeWKVyWfSamiqMLNdnacf
+ wBp7G+B2Y+E/qsY0zWkyQWEjRsad/cIklCbMqtgv/ZnA3GI3slUIM7MR6Z7bKiBB5z6N
+ n2PV1n0iU9J6gxAvFUL2pGUf26H+n9zVjk4Eh4mosAVvSNZBvAGEZTWWsWyjSDwLmgGs
+ n+cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
  :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=IqmyM2QEYva7JW7axwbl4xIkL86pAwW/H4sjSNNkIgM=;
- b=RaZCS0MX3jE9PdyT9+UipxjgzweAB9O1GLYwxtKIskdTqRrgLtm+F8WH7gF960Ump2
- uqTuJ50NBM0hVO1jDAxtKwUlnbuykafjhacGmiXgVlw76u4KgH6gXWfrhamPwownhdmt
- WxSYGB9b0PiG8tihJUhndTKkcHB3kxg7PAyp56AnCRgZ1IcEGY2Nmmexn0q/0FORhGRe
- NndT6gQ1VzpUSKxKTd9iZBZpTCWtZJ9bB/DGDrVPspJydWfD04yW4uBV6psvypxArspq
- 6ML1q1NnVksfdmMhuJ5wiSv/eRidI4/B2OfvCDAr5XRQ0qZgGJ4aNQ703FlP88sQVQWJ
- ur9Q==
-X-Gm-Message-State: ANoB5pnOLyfhmT/pL/fFn5qQ9ybHW5lubyaokmjVqRtc0F7NIPh31GGh
- neUNgWCzzHYIoU7BCJ0fIqUgTr/vWkVnlA==
-X-Google-Smtp-Source: AA0mqf7z1vyD3rdlMeoQGriM43dtIzP7Gztt83Sfud7zIuPh1YZpIi0HN2kxDCnBaSlw5o2SzSSWGj7vYJ4cig==
+ bh=CaDXua+LFbRv3ei+U1Fgv/kax6A2A04L4lM62rMK90Q=;
+ b=IjPo+P5q1uPAs2a5qJkn0Zg+NM6UetZWM0/YoRdHseOtgtY5+viU4g3WRIA4qPQMQc
+ cQIoC5LyPuirICR88DmIxvRttk7uOK4XdshUJisS0opUKJCEXlqP7ItkUHLCFNlmS32i
+ 4zDd8Xp0kySBk1UTnZcsnsB7TVbC2muNxSokKVTe5xmaV3UU2rsQlcZFSXUUYr4tlRyD
+ F61gGT1dJp6Rago0KxClVV4LlGbU8QRb5uNn5xC89D1kbWUPtA3G1U3AQ3UvlqSyWBZt
+ f6O+P6U4J8v3FstOnvThjTbkKM6UuPeszNhyURa8WthFPIRC/Qr8/KOqN9EO5Kj/8Fwt
+ 42SQ==
+X-Gm-Message-State: ANoB5pkd4FiveMZTSQ40F/NrQLPnAXYzYlNogQ3nLoK6S0NuktTfKid2
+ Fpr+29xRIRGDmSC9f4+BYEHMPinp/XNK6A==
+X-Google-Smtp-Source: AA0mqf5XxSPsh1gElJLISTCH8jBxKw2l85vxM5vFZMR7VtMxrzDAz9u8B+smh4G6eaCc3YG8CKpqOh9t0eSRDA==
 X-Received: from dmatlack-n2d-128.c.googlers.com
  ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a81:7851:0:b0:3b6:e1ed:4185 with SMTP id
- t78-20020a817851000000b003b6e1ed4185mr57305022ywc.330.1670528376810; Thu, 08
- Dec 2022 11:39:36 -0800 (PST)
-Date: Thu,  8 Dec 2022 11:38:38 -0800
+ (user=dmatlack job=sendgmr) by 2002:a05:690c:b18:b0:388:7d2:587b with SMTP id
+ cj24-20020a05690c0b1800b0038807d2587bmr8897906ywb.416.1670528380375; Thu, 08
+ Dec 2022 11:39:40 -0800 (PST)
+Date: Thu,  8 Dec 2022 11:38:40 -0800
 In-Reply-To: <20221208193857.4090582-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20221208193857.4090582-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221208193857.4090582-19-dmatlack@google.com>
-Subject: [RFC PATCH 18/37] KVM: x86/mmu: Add common API for creating TDP PTEs
+Message-ID: <20221208193857.4090582-21-dmatlack@google.com>
+Subject: [RFC PATCH 20/37] KVM: x86/mmu: Abstract away computing the max
+ mapping level
 From: David Matlack <dmatlack@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
@@ -103,155 +104,73 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Introduce an API for construction of TDP PTEs.
+Abstract away kvm_mmu_max_mapping_level(), which is an x86-specific
+function for computing the max level that a given GFN can be mapped in
+KVM's page tables. This will be used in a future commit to enable moving
+the TDP MMU to common code.
 
-- tdp_mmu_make_leaf_pte()
-- tdp_mmu_make_nonleaf_pte()
-- tdp_mmu_make_huge_page_split_pte()
-- tdp_mmu_make_changed_pte_notifier_pte()
-
-This will be used in a future commit to move the TDP MMU to common code,
-while PTE construction will stay in the architecture-specific code.
-
-No functional change intended.
+Provide a default implementation for non-x86 architectures that just
+returns the max level. This will result in more zapping than necessary
+when disabling dirty logging (i.e. less than optimal performance) but no
+correctness issues.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/include/asm/kvm/tdp_pgtable.h | 10 +++++++
- arch/x86/kvm/mmu/tdp_mmu.c             | 18 +++++--------
- arch/x86/kvm/mmu/tdp_pgtable.c         | 36 ++++++++++++++++++++++++++
- 3 files changed, 52 insertions(+), 12 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c     | 14 ++++++++++----
+ arch/x86/kvm/mmu/tdp_pgtable.c |  7 +++++++
+ 2 files changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm/tdp_pgtable.h b/arch/x86/include/asm/kvm/tdp_pgtable.h
-index c5c4e4cab24a..ff2691ced38b 100644
---- a/arch/x86/include/asm/kvm/tdp_pgtable.h
-+++ b/arch/x86/include/asm/kvm/tdp_pgtable.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/types.h>
- #include <linux/kvm_types.h>
-+#include <kvm/mmu_types.h>
- 
- struct kvm_mmu_page *tdp_mmu_root(struct kvm_vcpu *vcpu);
- 
-@@ -57,4 +58,13 @@ kvm_pfn_t tdp_pte_to_pfn(u64 pte);
- 
- void tdp_pte_check_leaf_invariants(u64 pte);
- 
-+struct tdp_iter;
-+
-+u64 tdp_mmu_make_leaf_pte(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
-+			  struct tdp_iter *iter, bool *wrprot);
-+u64 tdp_mmu_make_nonleaf_pte(struct kvm_mmu_page *sp);
-+u64 tdp_mmu_make_changed_pte_notifier_pte(struct tdp_iter *iter,
-+					  struct kvm_gfn_range *range);
-+u64 tdp_mmu_make_huge_page_split_pte(struct kvm *kvm, u64 huge_spte,
-+				     struct kvm_mmu_page *sp, int index);
- #endif /* !__ASM_KVM_TDP_PGTABLE_H */
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 8155a9e79203..0172b0e44817 100644
+index 7670fbd8e72d..24d1dbd0a1ec 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1057,17 +1057,13 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
- 					  struct tdp_iter *iter)
- {
- 	struct kvm_mmu_page *sp = sptep_to_sp(rcu_dereference(iter->sptep));
--	u64 new_spte;
- 	int ret = RET_PF_FIXED;
- 	bool wrprot = false;
-+	u64 new_spte;
- 
- 	WARN_ON(sp->role.level != fault->goal_level);
--	if (unlikely(!fault->slot))
--		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
--	else
--		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
--					 fault->pfn, iter->old_spte, fault->prefetch, true,
--					 fault->map_writable, &new_spte);
-+
-+	new_spte = tdp_mmu_make_leaf_pte(vcpu, fault, iter, &wrprot);
- 
- 	if (new_spte == iter->old_spte)
- 		ret = RET_PF_SPURIOUS;
-@@ -1117,7 +1113,7 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
- static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
- 			   struct kvm_mmu_page *sp, bool shared)
- {
--	u64 spte = make_nonleaf_spte(sp->spt, !kvm_ad_enabled());
-+	u64 spte = tdp_mmu_make_nonleaf_pte(sp);
- 	int ret = 0;
- 
- 	if (shared) {
-@@ -1312,9 +1308,7 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
- 	tdp_mmu_set_spte(kvm, iter, 0);
- 
- 	if (!pte_write(range->pte)) {
--		new_spte = kvm_mmu_changed_pte_notifier_make_spte(iter->old_spte,
--								  pte_pfn(range->pte));
--
-+		new_spte = tdp_mmu_make_changed_pte_notifier_pte(iter, range);
- 		tdp_mmu_set_spte(kvm, iter, new_spte);
- 	}
- 
-@@ -1466,7 +1460,7 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
- 	 * not been linked in yet and thus is not reachable from any other CPU.
- 	 */
- 	for (i = 0; i < TDP_PTES_PER_PAGE; i++)
--		sp->spt[i] = make_huge_page_split_spte(kvm, huge_spte, sp->role, i);
-+		sp->spt[i] = tdp_mmu_make_huge_page_split_pte(kvm, huge_spte, sp, i);
- 
- 	/*
- 	 * Replace the huge spte with a pointer to the populated lower level
-diff --git a/arch/x86/kvm/mmu/tdp_pgtable.c b/arch/x86/kvm/mmu/tdp_pgtable.c
-index 97cc900e8818..e036ba0c6bee 100644
---- a/arch/x86/kvm/mmu/tdp_pgtable.c
-+++ b/arch/x86/kvm/mmu/tdp_pgtable.c
-@@ -5,6 +5,7 @@
- 
- #include "mmu.h"
- #include "spte.h"
-+#include "tdp_iter.h"
- 
- /* Removed SPTEs must not be misconstrued as shadow present PTEs. */
- static_assert(!(REMOVED_TDP_PTE & SPTE_MMU_PRESENT_MASK));
-@@ -75,3 +76,38 @@ void tdp_pte_check_leaf_invariants(u64 pte)
- 	check_spte_writable_invariants(pte);
+@@ -1696,6 +1696,13 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+ 		clear_dirty_pt_masked(kvm, root, gfn, mask, wrprot);
  }
  
-+u64 tdp_mmu_make_leaf_pte(struct kvm_vcpu *vcpu,
-+			  struct kvm_page_fault *fault,
-+			  struct tdp_iter *iter,
-+			  bool *wrprot)
++__weak int tdp_mmu_max_mapping_level(struct kvm *kvm,
++				     const struct kvm_memory_slot *slot,
++				     struct tdp_iter *iter)
 +{
-+	struct kvm_mmu_page *sp = sptep_to_sp(rcu_dereference(iter->sptep));
-+	u64 new_spte;
-+
-+	if (unlikely(!fault->slot))
-+		return make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
-+
-+	*wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
-+			    fault->pfn, iter->old_spte, fault->prefetch, true,
-+			    fault->map_writable, &new_spte);
-+
-+	return new_spte;
++	return TDP_MAX_HUGEPAGE_LEVEL;
 +}
 +
-+u64 tdp_mmu_make_nonleaf_pte(struct kvm_mmu_page *sp)
-+{
-+	return make_nonleaf_spte(sp->spt, !kvm_ad_enabled());
-+}
+ static void zap_collapsible_spte_range(struct kvm *kvm,
+ 				       struct kvm_mmu_page *root,
+ 				       const struct kvm_memory_slot *slot)
+@@ -1727,15 +1734,14 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
+ 		/*
+ 		 * If iter.gfn resides outside of the slot, i.e. the page for
+ 		 * the current level overlaps but is not contained by the slot,
+-		 * then the SPTE can't be made huge.  More importantly, trying
+-		 * to query that info from slot->arch.lpage_info will cause an
++		 * then the SPTE can't be made huge. On x86, trying to query
++		 * that info from slot->arch.lpage_info will cause an
+ 		 * out-of-bounds access.
+ 		 */
+ 		if (iter.gfn < start || iter.gfn >= end)
+ 			continue;
+ 
+-		max_mapping_level = kvm_mmu_max_mapping_level(kvm, slot,
+-							      iter.gfn, PG_LEVEL_NUM);
++		max_mapping_level = tdp_mmu_max_mapping_level(kvm, slot, &iter);
+ 		if (max_mapping_level < iter.level)
+ 			continue;
+ 
+diff --git a/arch/x86/kvm/mmu/tdp_pgtable.c b/arch/x86/kvm/mmu/tdp_pgtable.c
+index b07ed99b4ab1..840d063c45b8 100644
+--- a/arch/x86/kvm/mmu/tdp_pgtable.c
++++ b/arch/x86/kvm/mmu/tdp_pgtable.c
+@@ -163,3 +163,10 @@ void tdp_mmu_arch_unlink_sp(struct kvm *kvm, struct kvm_mmu_page *sp,
+ 	if (shared)
+ 		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+ }
 +
-+u64 tdp_mmu_make_changed_pte_notifier_pte(struct tdp_iter *iter,
-+					  struct kvm_gfn_range *range)
++int tdp_mmu_max_mapping_level(struct kvm *kvm,
++			      const struct kvm_memory_slot *slot,
++			      struct tdp_iter *iter)
 +{
-+	return kvm_mmu_changed_pte_notifier_make_spte(iter->old_spte,
-+						      pte_pfn(range->pte));
-+}
-+
-+u64 tdp_mmu_make_huge_page_split_pte(struct kvm *kvm, u64 huge_spte,
-+				     struct kvm_mmu_page *sp, int index)
-+{
-+	return make_huge_page_split_spte(kvm, huge_spte, sp->role, index);
++	return kvm_mmu_max_mapping_level(kvm, slot, iter->gfn, PG_LEVEL_NUM);
 +}
 -- 
 2.39.0.rc1.256.g54fd8350bd-goog
