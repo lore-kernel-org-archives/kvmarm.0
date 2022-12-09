@@ -1,30 +1,27 @@
-Received: from out-122.mta0.migadu.com (out-122.mta0.migadu.com [91.218.175.122])
+Received: from out-222.mta0.migadu.com (out-222.mta0.migadu.com [91.218.175.222])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37567E
-	for <kvmarm@lists.linux.dev>; Fri,  9 Dec 2022 01:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840207E
+	for <kvmarm@lists.linux.dev>; Fri,  9 Dec 2022 01:53:51 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Ricardo Koller <ricarkol@google.com>
+	Shuah Khan <shuah@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.cs.columbia.edu,
 	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	Mark Brown <broonie@kernel.org>,
+	Ricardo Koller <ricarkol@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/7] KVM: selftests: Fix build due to ucall_uninit() removal
-Date: Fri,  9 Dec 2022 01:53:00 +0000
-Message-ID: <20221209015307.1781352-2-oliver.upton@linux.dev>
+Subject: [PATCH v2 6/7] KVM: selftests: Allocate ucall pool from MEM_REGION_DATA
+Date: Fri,  9 Dec 2022 01:53:05 +0000
+Message-ID: <20221209015307.1781352-7-oliver.upton@linux.dev>
 In-Reply-To: <20221209015307.1781352-1-oliver.upton@linux.dev>
 References: <20221209015307.1781352-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -33,55 +30,32 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Message-ID: <20221209015300.8EfhZfczlKC_BlZigB9s3X0MAH5XJ9Zj91pls0pI3QU@z>
+Message-ID: <20221209015305.6u4Au9jDQx_LhRDDHKSftk2vItji0mgu75UwsnYI4dk@z>
 
-From: Mark Brown <broonie@kernel.org>
+MEM_REGION_TEST_DATA is meant to hold data explicitly used by a
+selftest, not implicit allocations due to the selftests infrastructure.
+Allocate the ucall pool from MEM_REGION_DATA much like the rest of the
+selftests library allocations.
 
-Today's -next fails to build on arm64 due to:
-
-In file included from include/kvm_util.h:11,
-                 from aarch64/page_fault_test.c:15:
-include/ucall_common.h:36:47: note: expected ‘vm_paddr_t’ {aka ‘long unsigned int’} but argument is of type ‘void *’
-   36 | void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa);
-      |                                    ~~~~~~~~~~~^~~~~~~~
-aarch64/page_fault_test.c:725:2: warning: implicit declaration of function ‘ucall_uninit’; did you mean ‘ucall_init’? [-Wimplicit-function-declaration]
-  725 |  ucall_uninit(vm);
-      |  ^~~~~~~~~~~~
-      |  ucall_init
-
-which is caused by commit
-
-interacting poorly with commit
-
-   28a65567acb5 ("KVM: selftests: Drop now-unnecessary ucall_uninit()")
-
-As is done for other ucall_uninit() users remove the call in the newly added
-page_fault_test.c.
-
-Fixes: 28a65567acb5 ("KVM: selftests: Drop now-unnecessary ucall_uninit()")
-Fixes: 35c581015712 ("KVM: selftests: aarch64: Add aarch64/page_fault_test")
-Signed-off-by: Mark Brown <broonie@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Ricardo Koller <ricarkol@google.com>
-Cc: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- tools/testing/selftests/kvm/aarch64/page_fault_test.c | 1 -
- 1 file changed, 1 deletion(-)
+ tools/testing/selftests/kvm/lib/ucall_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-index 0cda70bef5d5..92d3a91153b6 100644
---- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-@@ -722,7 +722,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
+index 820ce6c82829..0cc0971ce60e 100644
+--- a/tools/testing/selftests/kvm/lib/ucall_common.c
++++ b/tools/testing/selftests/kvm/lib/ucall_common.c
+@@ -22,7 +22,7 @@ void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
+ 	vm_vaddr_t vaddr;
+ 	int i;
  
- 	vcpu_run_loop(vm, vcpu, test);
- 
--	ucall_uninit(vm);
- 	kvm_vm_free(vm);
- 	free_uffd(test, pt_uffd, data_uffd);
+-	vaddr = vm_vaddr_alloc(vm, sizeof(*hdr), KVM_UTIL_MIN_VADDR);
++	vaddr = __vm_vaddr_alloc(vm, sizeof(*hdr), KVM_UTIL_MIN_VADDR, MEM_REGION_DATA);
+ 	hdr = (struct ucall_header *)addr_gva2hva(vm, vaddr);
+ 	memset(hdr, 0, sizeof(*hdr));
  
 -- 
 2.39.0.rc1.256.g54fd8350bd-goog
