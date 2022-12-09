@@ -1,57 +1,59 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1EA93214
-	for <kvmarm@lists.linux.dev>; Fri,  9 Dec 2022 20:45:05 +0000 (UTC)
-Received: by mail-pl1-f182.google.com with SMTP id s7so6102006plk.5
-        for <kvmarm@lists.linux.dev>; Fri, 09 Dec 2022 12:45:05 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761CC3214
+	for <kvmarm@lists.linux.dev>; Fri,  9 Dec 2022 21:03:49 +0000 (UTC)
+Received: by mail-pl1-f173.google.com with SMTP id jl24so6141919plb.8
+        for <kvmarm@lists.linux.dev>; Fri, 09 Dec 2022 13:03:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vrO0N2BhoytOAhhhHfUhdN91u6TruVaipT5ISV1vaYc=;
-        b=f95FMmTEKSCikEYcOfIHQeZ11wft/M7xtxOLWqo9ddBFll+PEIhNuP8Altnit2pg7l
-         zyRhiE+JRDfj5dB8/WxDXf1drX13fZ1eOh7rba0AIhbehJO0Y9D2Isb+V0FtO1vE8xtB
-         hYMCbXb+6k8JyDHQhnThQvX/+T5zbEXkZxYWQBSqRWCBdOVJmssGwx1Y5IXZJw/6XRzs
-         S3ZdcDYHIQuWdKlJwLHVsg5FbzwD0u0eYrShli67IQw7Q2mlLjgxmxsG0ncnWSJMMZVg
-         KepJ3JyFSc3873pExBYAY27kO9Gx8PluA0Mbdjh+rOeLvfI90C98illSL1VVYvLRtJsW
-         Xzfw==
+        bh=HqhkVKX+RdgYCWZiIceLsOHMpWv/ROuczp7qb/H7X1w=;
+        b=geRGPSQKUlIYqCU/v/MAful0c2VKh6VA6SBeijyPLtHNmaNPvdTAZRBm+8BK0vMyF7
+         oJs/xaNz1FVL8jiMpUauu2wtzHgyNFuSzbsou1/FkQDUTY5R2F/BqoUtLcz7XXJd3ZAO
+         Dmk3W82U//fL1/HxmzzBDyZ7VklM1UH74NpwkG3WyTvUXcSDELZRwL14XyE4yxNMMTiP
+         7vxNfdzUPeKjtlkEpdgj2U13i8nATEgPias3k43ZtZwrU5RjHtwlN5SiT1tERKN6A3Rk
+         WNJjSbXl0byXigqUqjfuCWVXto0wnqtwZ9BO4n+XScjq16D9RNXVrELTuGdILxKMMIaA
+         6JaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vrO0N2BhoytOAhhhHfUhdN91u6TruVaipT5ISV1vaYc=;
-        b=SJYkg+QRqEUlf5d7t+uaQuZ1DBcLfL1MAFzrkn162S1heCg6q3tuneESwSu//SvCbP
-         xD5TYqslNw5Rv1OJgEgorsLr/yBntr0IwO1vnSlQmdoJxXAcILeRL1TsGv8dW49Mb9fK
-         z5n4TSEbjeXdJPXnp+m6Sspj43cOMMYKJrSapAaiuK6sge+GmSr5LN4AlhJCLV9hP4vj
-         F+k05Yk9tK8Zbv9gnEJPxKaSpoLyTcWyOVCwIUWGhBw8YCCnxRMJNDKBDOY29VghalBj
-         MyvX773pB6rh6XDldd0kLXGKA059qVDLklM1uXby+f4DzUiPwDpPlGL2zYQKHFF2+zBe
-         s4ug==
-X-Gm-Message-State: ANoB5pkyhXtOIuYmPQrUglbDySmNZibe8PIw2uF4sHnfO2je8O22+iXW
-	PraZTWvSVdgRZ5xJK5PEvhX/sw==
-X-Google-Smtp-Source: AA0mqf5qINBTPYAP4qeg1UzaZ6wwLAd0BwvCi3JbF60z/oyrT5V6BtufJ7TAxCe0PKR19lvup9WOtA==
-X-Received: by 2002:a05:6a20:baa3:b0:9d:c38f:9bdd with SMTP id fb35-20020a056a20baa300b0009dc38f9bddmr20370pzb.2.1670618705014;
-        Fri, 09 Dec 2022 12:45:05 -0800 (PST)
+        bh=HqhkVKX+RdgYCWZiIceLsOHMpWv/ROuczp7qb/H7X1w=;
+        b=4XszexPcASkg8GIxrjjK34QYt7HQUWPo4yovvX7NvECEmEpmDbfl04lqCsojff/h2v
+         3BlAirEnluP4CwzF7nfOQjzI+WoyloMQVRHxnNiwUrz2iSKLaTmKwiH8K2oMOOBuN+/Q
+         LWgAtcip73Sv6+G71TikS8Vqdi1nHFp+0GkP5PcB40Bfayw/XC28QRaq9VpR/5m6B65Z
+         96cR6WaunG48hmvmWITCJNENnNGJ/qJgeOILHuTREGxWbQ4L7s/JxORxCdZlK44h7T6z
+         WL22k3AgYg5RpPohEwQ0Zu4awdHuqUcsP3Pz56t4Ay+kQRii5XBNoQrs09Irn6wzBGei
+         KQ7Q==
+X-Gm-Message-State: ANoB5pl5nPriapwyquQHot4p+PJYCdbDktNEgHUUdSDJX96IT2/vAhQM
+	snc9UFil/okZ+LwKArCzlJro9Xda1jhRYZY1
+X-Google-Smtp-Source: AA0mqf76S2APEPIqvhNO2xeCJ5k7zOJZF0cOVyP09wKMa17nX0r0d7TDym1CMnQt7VgOPeLCqe8Uuw==
+X-Received: by 2002:a05:6a20:7f5c:b0:9d:b8e6:d8e5 with SMTP id e28-20020a056a207f5c00b0009db8e6d8e5mr24495pzk.2.1670619828811;
+        Fri, 09 Dec 2022 13:03:48 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id y10-20020aa793ca000000b0057555d35f79sm1614631pff.101.2022.12.09.12.45.04
+        by smtp.gmail.com with ESMTPSA id c11-20020a170903234b00b001885041d7b8sm1722515plh.293.2022.12.09.13.03.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Dec 2022 12:45:04 -0800 (PST)
-Date: Fri, 9 Dec 2022 20:45:01 +0000
+        Fri, 09 Dec 2022 13:03:48 -0800 (PST)
+Date: Fri, 9 Dec 2022 21:03:45 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	Peter Gonda <pgonda@google.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
 	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 	Ricardo Koller <ricarkol@google.com>,
 	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 4/7] KVM: selftests: Correctly initialize the VA space
- for TTBR0_EL1
-Message-ID: <Y5OeTeq55OgBJbjT@google.com>
+Subject: Re: [PATCH v2 7/7] KVM: selftests: Avoid infinite loop if
+ ucall_alloc() fails
+Message-ID: <Y5OisdH5ohtr6r3j@google.com>
 References: <20221209015307.1781352-1-oliver.upton@linux.dev>
- <20221209015307.1781352-5-oliver.upton@linux.dev>
+ <20221209015307.1781352-8-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,65 +62,126 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221209015307.1781352-5-oliver.upton@linux.dev>
-Message-ID: <20221209204501.ZMmpMTuuSKcD85wR4CCJgYGvimsryNfGoR-AMrxfdtc@z>
+In-Reply-To: <20221209015307.1781352-8-oliver.upton@linux.dev>
+Message-ID: <20221209210345.GrjvX6plqQa6pg2i14Hmq5OuWB3lUM27Qyz27oquIfY@z>
 
 On Fri, Dec 09, 2022, Oliver Upton wrote:
-> An interesting feature of the Arm architecture is that the stage-1 MMU
-> supports two distinct VA regions, controlled by TTBR{0,1}_EL1. As KVM
-> selftests on arm64 only uses TTBR0_EL1, the VA space is constrained to
-> [0, 2^(va_bits)). This is different from other architectures that
-> allow for addressing low and high regions of the VA space from a single
-> page table.
+> Guest assertions depend on successfully allocating a ucall structure. As
+> such, the use of guest assertions when ucall_alloc() fails simply leads
+> to an infinite loop in guest code.
 > 
-> KVM selftests' VA space allocator presumes the valid address range is
-> split between low and high memory based the MSB, which of course is a
-> poor match for arm64's TTBR0 region.
+> Use GUEST_UCALL_NONE() to indicate failure instead. Though not
+> technically necessary, use a goto to have a single callsite and an
+> associated comment about why assertions don't work here. It isn't
+> perfect, at least the poor developer gets some signal out of the
+> guest...
 > 
-> Add a helper that correctly handles both addressing schemes with a
-> comment describing each.
-> 
+> Fixes: 426729b2cf2e ("KVM: selftests: Add ucall pool based implementation")
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
-
-Thanks much!  Looks awesome, especially the comment!
-
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-
->  .../selftests/kvm/include/kvm_util_base.h     |  1 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 49 ++++++++++++++++---
->  2 files changed, 44 insertions(+), 6 deletions(-)
+>  tools/testing/selftests/kvm/lib/ucall_common.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index 6cd86da698b3..b193863d754f 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -103,6 +103,7 @@ struct kvm_vm {
->  	struct sparsebit *vpages_mapped;
->  	bool has_irqchip;
->  	bool pgd_created;
-> +	bool has_split_va_space;
->  	vm_paddr_t ucall_mmio_addr;
->  	vm_paddr_t pgd;
->  	vm_vaddr_t gdt;
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index a256ec67aff6..53d15f32f220 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -186,6 +186,43 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
->  _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
->  	       "Missing new mode params?");
+> diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
+> index 0cc0971ce60e..e8370da3de24 100644
+> --- a/tools/testing/selftests/kvm/lib/ucall_common.c
+> +++ b/tools/testing/selftests/kvm/lib/ucall_common.c
+> @@ -41,7 +41,8 @@ static struct ucall *ucall_alloc(void)
+>  	struct ucall *uc;
+>  	int i;
 >  
-> +/*
-> + * Initializes vm->vpages_valid to match the canonical VA space of the
-> + * architecture.
-> + *
-> + * Most architectures split the range addressed by a single page table into a
-> + * low and high region based on the MSB of the VA. On architectures with this
-> + * behavior the VA region spans [0, 2^(va_bits - 1)), [-(2^(va_bits - 1), -1].
-> + *
-> + * arm64 is a bit different from the rest of the crowd, as the low and high
-> + * regions of the VA space are addressed by distinct paging structures
-> + * (TTBR{0,1}_EL1).
+> -	GUEST_ASSERT(ucall_pool);
+> +	if (!ucall_pool)
+> +		goto out;
+>  
+>  	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+>  		if (!test_and_set_bit(i, ucall_pool->in_use)) {
+> @@ -51,7 +52,14 @@ static struct ucall *ucall_alloc(void)
+>  		}
+>  	}
+>  
+> -	GUEST_ASSERT(0);
+> +out:
+> +	/*
+> +	 * If the guest cannot grab a ucall structure from the pool then the
+> +	 * only option to get out to userspace is a bare ucall. This is probably
+> +	 * a good time to mention that guest assertions depend on ucalls with
+> +	 * arguments too.
+> +	 */
+> +	GUEST_UCALL_NONE();
 
-Oooh, they're different CR3s in x86 terminology?
+UCALL_NONE isn't much better than infinite stack recursion, e.g. a test might end
+up passing by dumb luck, or go in the wrong direction because it sometimes handles
+UCALL_NONE.
+
+How about this?
+
+From: Sean Christopherson <seanjc@google.com>
+Date: Fri, 9 Dec 2022 12:55:44 -0800
+Subject: [PATCH] KVM: selftests: Use magic value to signal ucall_alloc()
+ failure
+
+Use a magic value to signal a ucall_alloc() failure instead of simply
+doing GUEST_ASSERT().  GUEST_ASSERT() relies on ucall_alloc() and so a
+failure puts the guest into an infinite loop.
+
+Use -1 as the magic value, as a real ucall struct should never wrap.
+
+Reported-by: Oliver Upton <oliver.upton@linux.dev>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/lib/ucall_common.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
+index 0cc0971ce60e..2f0e2ea941cc 100644
+--- a/tools/testing/selftests/kvm/lib/ucall_common.c
++++ b/tools/testing/selftests/kvm/lib/ucall_common.c
+@@ -4,6 +4,8 @@
+ #include "linux/bitmap.h"
+ #include "linux/atomic.h"
+ 
++#define GUEST_UCALL_FAILED -1
++
+ struct ucall_header {
+ 	DECLARE_BITMAP(in_use, KVM_MAX_VCPUS);
+ 	struct ucall ucalls[KVM_MAX_VCPUS];
+@@ -41,7 +43,8 @@ static struct ucall *ucall_alloc(void)
+ 	struct ucall *uc;
+ 	int i;
+ 
+-	GUEST_ASSERT(ucall_pool);
++	if (!ucall_pool)
++		goto ucall_failed;
+ 
+ 	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+ 		if (!test_and_set_bit(i, ucall_pool->in_use)) {
+@@ -51,7 +54,13 @@ static struct ucall *ucall_alloc(void)
+ 		}
+ 	}
+ 
+-	GUEST_ASSERT(0);
++ucall_failed:
++	/*
++	 * If the vCPU cannot grab a ucall structure, make a bare ucall with a
++	 * magic value to signal to get_ucall() that things went sideways.
++	 * GUEST_ASSERT() depends on ucall_alloc() and so cannot be used here.
++	 */
++	ucall_arch_do_ucall(GUEST_UCALL_FAILED);
+ 	return NULL;
+ }
+ 
+@@ -93,6 +102,9 @@ uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
+ 
+ 	addr = ucall_arch_get_ucall(vcpu);
+ 	if (addr) {
++		TEST_ASSERT(addr != (void *)GUEST_UCALL_FAILED,
++			    "Guest failed to allocate ucall struct");
++
+ 		memcpy(uc, addr, sizeof(*uc));
+ 		vcpu_run_complete_io(vcpu);
+ 	} else {
+
+base-commit: dc2efbe4813e0dc4368779bc36c5f0e636cb8eb2
+-- 
+
