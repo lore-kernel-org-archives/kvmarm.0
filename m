@@ -1,228 +1,135 @@
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7402621
-	for <kvmarm@lists.linux.dev>; Fri,  9 Dec 2022 02:38:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670553497; x=1702089497;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=LRIVnDgtI3pNF8EsnbjyQe3jwIxDGCQ9jKtpA9As9I8=;
-  b=LkoLYTNQoOV0mxK4EfMfYKt3E63Bhkc9yDSJEWOA8DKAloihd8wM+2FF
-   P+56ibIXnbTJ78Z8Ec1ZGDTGS36YpGk/vIDT6ppPkedK4xJzAcJYBeHws
-   FLheLgUYa6KP2lmQ1yzelMMlJbXYUuv7m4hTjlAd5DJ8KuCQdj0VISSdU
-   wbGMSJPRga7jhRQ47VuakHMUWS5BKcV0m9OeIvl4dhf0tPmrm8XCh+bdq
-   4BzrEAaDtaqkatRwo761Qny4BP+WcBlZvt1/DB+WKCiFjGBSADNA+1DGl
-   DGfAATiidH6ngqJcJgFbP0wOLd7K6fNDfsrdvexzkqG+W4ExDBvs84/J0
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="318517066"
-X-IronPort-AV: E=Sophos;i="5.96,228,1665471600"; 
-   d="scan'208";a="318517066"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 18:38:16 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="640874824"
-X-IronPort-AV: E=Sophos;i="5.96,228,1665471600"; 
-   d="scan'208";a="640874824"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga007.jf.intel.com with ESMTP; 08 Dec 2022 18:38:15 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Thu, 8 Dec 2022 18:38:15 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Thu, 8 Dec 2022 18:38:15 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Thu, 8 Dec 2022 18:38:15 -0800
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.103)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Thu, 8 Dec 2022 18:38:14 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EDY9AUWlGBZnj+XTMfYnHTlVYbbwwBopSU97XWQaNQ5mXaxspYEVtApu1TXs7BztP7EMCUMo+ChRZbDGFnKCvvkw/53uGBas66HE+q5+r6Z/GpY13V6gxyhGn+xqmigVELyINsxT9ZTl20HnHaz7JG8edbhzUxw2BoUoU7KRc+wD+tX0g5QJsHkwQcc3hKcTQYB8toM7/wty5wUNfr9XlAiGsEbpFpWoKgHKPlRn9U84Eq9lAEe9UFaJ2xKcz0fJX9UEvpjbkN6g2RP0mzFJ22oSVWQ/dpeDbSy5ME8AzDYKL1e1zGk9pozHjShJudZA+Id4H5HQfOlX0pT2iNHRVg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3Z0YDB+vzVgOHlQGauN3OImJ1wxCVp1+bavqurxmt94=;
- b=XBaiE33AuaJ85QZYNuVzqGLM6IEz72UhxxiaTWng+j9q+ODSJgnd3ivJ2Al8OfhfXbNMlPiaGebIixj1yyh52vS+HS7QDnR0QTsRhlqf9HHu6pLOXSsjLBzxu86TY3J5WTsSOMRuKFato/hJ7CBa2kVdyMLQ65RpS7S9uz8SoeDgeW1z+5NowO5MkmrzwX/UIejSn930qcKmw/odmJ/VuCx7dZjX0ktkWX6z9U6CSPKGTIHopPjkpMM85snJTY6MjwezVdpqEZcoVNjVLn+wnSWaIK9AHKrUYhOXgpVFB1cP6/nPHPYvN3KIbAcBlpZ1EyZPFSCd83VgHr8KW5Zk6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
- by DS0PR11MB6422.namprd11.prod.outlook.com (2603:10b6:8:c6::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.16; Fri, 9 Dec
- 2022 02:38:06 +0000
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::ae1a:fa3e:e36e:c2fe]) by PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::ae1a:fa3e:e36e:c2fe%3]) with mapi id 15.20.5880.016; Fri, 9 Dec 2022
- 02:38:06 +0000
-Message-ID: <22fe2332-497e-fe30-0155-e026b0eded97@intel.com>
-Date: Fri, 9 Dec 2022 10:37:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [RFC PATCH 01/37] KVM: x86/mmu: Store the address space ID
- directly in kvm_mmu_page_role
-Content-Language: en-US
-To: David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-CC: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose
-	<suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Huacai Chen
-	<chenhuacai@kernel.org>, Aleksandar Markovic
-	<aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, "Atish
- Patra" <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
-	"Christopherson,, Sean" <seanjc@google.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Anshuman Khandual <anshuman.khandual@arm.com>,
-	"Amit, Nadav" <namit@vmware.com>, "Matthew Wilcox (Oracle)"
-	<willy@infradead.org>, Vlastimil Babka <vbabka@suse.cz>, "Liam R. Howlett"
-	<Liam.Howlett@Oracle.com>, Suren Baghdasaryan <surenb@google.com>, Peter Xu
-	<peterx@redhat.com>, xu xin <cgel.zte@gmail.com>, Arnd Bergmann
-	<arnd@arndb.de>, Yu Zhao <yuzhao@google.com>, Colin Cross
-	<ccross@google.com>, Hugh Dickins <hughd@google.com>, Ben Gardon
-	<bgardon@google.com>, Mingwei Zhang <mizhang@google.com>, Krish Sadhukhan
-	<krish.sadhukhan@oracle.com>, Ricardo Koller <ricarkol@google.com>, "Jing
- Zhang" <jingzhangos@google.com>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvmarm@lists.cs.columbia.edu"
-	<kvmarm@lists.cs.columbia.edu>, "linux-mips@vger.kernel.org"
-	<linux-mips@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
-References: <20221208193857.4090582-1-dmatlack@google.com>
- <20221208193857.4090582-2-dmatlack@google.com>
-From: "Yang, Weijiang" <weijiang.yang@intel.com>
-In-Reply-To: <20221208193857.4090582-2-dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2P153CA0003.APCP153.PROD.OUTLOOK.COM (2603:1096::13) To
- PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D30AFA35
+	for <kvmarm@lists.linux.dev>; Fri,  9 Dec 2022 08:08:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1670573337;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Yu5+kKIER0XXOyMNzTciuKZhNByC/ICD1fCqGsVZ3Vc=;
+	b=QnpueKvaSpqab2fDBhbcqtdzRFGoPSMtaNcaylMylnZtCUvMcvWgBu+ASUXeTFSXA6RBxs
+	q5IoeKWradWShajuRtEfqyopkc6VvOGATsggPLgZuSSuQLmRQZzILZapy+L/+OebObEESg
+	sS0dbLgi8UMTTk5mhOQiDSl5ug3gw0w=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-532-5AoIcDCQOkmGuSbkbDLMnA-1; Fri, 09 Dec 2022 03:08:49 -0500
+X-MC-Unique: 5AoIcDCQOkmGuSbkbDLMnA-1
+Received: by mail-ej1-f70.google.com with SMTP id sh37-20020a1709076ea500b007c09b177cd1so2610809ejc.12
+        for <kvmarm@lists.linux.dev>; Fri, 09 Dec 2022 00:08:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yu5+kKIER0XXOyMNzTciuKZhNByC/ICD1fCqGsVZ3Vc=;
+        b=HjjDHhV8wsdfpsR6/2YrYq31Q4JNvZioLk1rQCRvUppRd4tRNuy5bwgXGNMFMYpxNF
+         Twvyb9G8oiyiZZVPwR6nF0WChgNOk9+CzbSNbHB7Jjj/aqzMIsNXWcK8ylEv9gPztR2n
+         qGpsT9+ylsWoKwfZ2YvRUSINisVVjKHmCsMigs0UES+axPPgLGq54/HJvr9vtK3dLqiT
+         GoWBtFj1K0eaMNynf8pxSUgR4seopgRnI4uqggLg01zSIakO3VVGouNBXC8fedcxbBwG
+         dQSvnjCHSDMxIoLmkh/2SOxwhtAt2YNujHd9skhoaKdVgCjN2e0dVKJ3NO2ImSDt9O7a
+         Na0A==
+X-Gm-Message-State: ANoB5pnBky4s/xRa9yKkzeCqXDbXr5nSfkq3vHQdFNsqYjHvvYFnvVpj
+	j9YiZ/oCMyGGDIvBb+Y+wYJxZLjY4EpaIxfVuXIpQws0CTjeTqDdn+GT8lKkGK2fCr4CggjeGIw
+	I0GW7y+DJ7fYQCoSN
+X-Received: by 2002:a05:6402:44a:b0:46c:d2f2:123d with SMTP id p10-20020a056402044a00b0046cd2f2123dmr4697632edw.40.1670573328118;
+        Fri, 09 Dec 2022 00:08:48 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5r7667C6OXmgEC5Z+6sRu7C2NkDmbkDiR1zIVIJ5e+pJLXpgHVV1OhFN2QxbJEA13QwmklDQ==
+X-Received: by 2002:a05:6402:44a:b0:46c:d2f2:123d with SMTP id p10-20020a056402044a00b0046cd2f2123dmr4697599edw.40.1670573327883;
+        Fri, 09 Dec 2022 00:08:47 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:e3ec:5559:7c5c:1928? ([2001:b07:6468:f312:e3ec:5559:7c5c:1928])
+        by smtp.googlemail.com with ESMTPSA id s10-20020a05640217ca00b0045c47b2a800sm327301edy.67.2022.12.09.00.08.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Dec 2022 00:08:47 -0800 (PST)
+Message-ID: <40f99ae8-e5c1-efba-ab1d-b8927938d34a@redhat.com>
+Date: Fri, 9 Dec 2022 09:08:45 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|DS0PR11MB6422:EE_
-X-MS-Office365-Filtering-Correlation-Id: 17bd9d23-f727-402c-8981-08dad98e66ef
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3NJPTTRtQs9AEXaoROXyWDvBS5EDkAeU0fyncUMUVOoKlGHcRn5Bma43rYexsmYI2rWv/PtSNVR9lCMBpZk/QFizTSjAfltv4z+AYmzAEsoFKaiVd8y/CW8OGclIKXy3HHDHDaU9v1Z6o1Ry8+rzByv03031m+UTBPXjMv7srmodn6ZI/xjC5KwIxMxoQUV4Vz6VdQ/LObRYG61WyddviGIHxAJx+iXYvAvQj62XoVCXn7hru5kK8GL/Zpyx0wJdQ+7nuc+2AFcRnWAheONhyHBzIVtXQWyIUNtN+k8Tm+jqfegKUN+XmYOr+DRm09CgbpPCJBpa0PDUFx2wR5LMOlKHeGW9VuBx+4H012MigDNMGHoMTHcuBqXFGl4JYxOzBzLzwtG2vIpMqNTuykRPBHmtJ92jFaKt1F84cAFdaYHgcIE+yK5f6nm9OWxPbC2vMeN/1eR59xR7gEOE5o88eXu1ahmn8IZnQPhAzIiLXYHxSh42sVpc1HqqXXzcjQ4ADtuHeIEs5vwaI1YbRj+nf9QhH/xm15NA4EHyG87+/0Rx0mrIol7pJJa6lqAQfXyXt8f5706L7YxEZbuAdbAHx7GI3p7NV+LsX7sdrQFKKOJwbqfHNsUC68+CIHKeX5wGUYZbvWaYuaRjTVrqx9xuyAepoV9oz7qN2ziFRo6LOK2pYJeeSNqkJ/3aq3fw7QaQZUPnCykJpM1Vjvdedezu3jpozlvP2sfAeTKDXKAkYx4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(346002)(39860400002)(376002)(366004)(136003)(451199015)(6666004)(6506007)(41300700001)(6486002)(7406005)(478600001)(7416002)(66556008)(36756003)(4326008)(8936002)(110136005)(54906003)(5660300002)(66476007)(8676002)(316002)(86362001)(66946007)(53546011)(31696002)(82960400001)(26005)(186003)(38100700002)(2616005)(6512007)(83380400001)(31686004)(2906002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QTZpUzlPNnNNVGlKRVd5UElsVXpiSWtsbTdTK3FTSkEvcHh2a2xXSDM3ZUJB?=
- =?utf-8?B?K2NMczFWWWVrdENIR2hUZmtxZ3BZeElvMTB0M051QXB0WlFYenhZTXJDMEt1?=
- =?utf-8?B?Qmdnc1U1RWhKcllZZGYwV3JVdnkvSERnSDAwcHZjWk1uK29INEx6enlaQXdy?=
- =?utf-8?B?TWhiVjBwMnpKYXp3ZzRXeDA5VG9sV3FCTmI3dXhUYXNtWVVWNmxMMmNkODMw?=
- =?utf-8?B?YzljY0tIbmtNbkF0aWtrdWdsd3k0VXBVWXdKTmZwL1p0L0F6bzdSamJOM3FB?=
- =?utf-8?B?Y1pxSW1RSHVDcjBxd1lRVTFqOEVXQ3FRSW1Ob04yOFhIYk5DYlZybkNETGFo?=
- =?utf-8?B?bzZlcDhnQVc4eDJESUFIK21OOE5OeVM4RmVyN2x1UE5oc3lRaHpBdi9QSFZH?=
- =?utf-8?B?SzMrOFZhVzlZWTNMRjVLWU1VQVh1Y21nWDdoYTl2WGpSRHp6a1BKM2xOajdI?=
- =?utf-8?B?aFFXbkQ0Uk5GMlZTZWU2VlZzK0RxQU5jMEFZenc4Z0hCT3ZqVGRHSkJtMFdj?=
- =?utf-8?B?elZrMlJUd3lOaFRMOFU2czd6NjF5bGVHNlBnQUlwZ1NZN3Nlc1hLN1FobUJ5?=
- =?utf-8?B?aVR2UkZzY2NkMXdyamxwZks0WmNQM2M2aVhWTDBvZmJOYTBlS3gyek5MZUpW?=
- =?utf-8?B?NnlwNlUxZG9WczZPYXZwVUVaaWNrY3lTSGcvRG5WSTY0cmdibHJSb0NmaGJ1?=
- =?utf-8?B?M3hYWVJZT3RhN2tyK2dvU0ZCR2hFNjRaOFpKR3hIcUtNdWJUK0V2Yy9pcE5h?=
- =?utf-8?B?eS9taUlELzRuMDlCLzFaVUdnMDhJRit0cTNmZjEwVXdVRWZqdHdlSzI2MDMw?=
- =?utf-8?B?S2szRnVhZzFKQ1VvMGVUdisxUlNpTkl2emxzZE9IeVZIM3k2NEpuK0I3L2xr?=
- =?utf-8?B?ZHF0OGVvd2ZZWTFMMW55cVBTRW9SVmR5QWd3NS96SmNNRFByL203RUxCZVJp?=
- =?utf-8?B?WHcwNlFJRkVPTU5BVHRTMFZ6YldXUTBuYXhDazczR1VZT1ZEQ29lbGZaNFRs?=
- =?utf-8?B?R09iZFZnc24wUi9EcXZyVUczOEJmMkJEUVRSbGZ5WkNLS1NwQXdhSktXd01a?=
- =?utf-8?B?aEVaYXhGSGVubHVFamtBOEVVMldyOGNPVm5ka0RGR25KQ2FuN1J5alFCNVdr?=
- =?utf-8?B?NDczVXVhR1EzUmVUWjFjcTFkaXN2NHdzUjBpaXR3TzVhMHJ0akVaRzNHcTMy?=
- =?utf-8?B?M3ZUa21KM3hoN0ZTcWRUMXBtV2xYcFUyOGh3M2t0SVNzVFErRGxsTFpvcGpk?=
- =?utf-8?B?Mm1pZWJSaUgwc21BZTEyOC8valc1Y0lCMHZxTk1qb090VGFNZjlRQklOTU5C?=
- =?utf-8?B?am1KOEtybnRhUkFveHJ3R3hsWWRtaWpqeDhhMFl2RXc3aDlXTmpDdGd6T0Ny?=
- =?utf-8?B?Mkd1RVdCVlB0aFc2R3pmZ0w4L25odERhVjcrOGZ0L25wWC9iUFpad25BRjBZ?=
- =?utf-8?B?S2dMWk8zTng5WXIzdHY2elhhdnB0RjA0YVdGcitnN244cGpabWJGRGlQK3l1?=
- =?utf-8?B?d2F2eXF1Vmoxc3psUU41ZUFXTTVqaldYM0hmNjhESXIzbzdDd0Z0VDA4SHJr?=
- =?utf-8?B?M0JabHBTYVpIZUl5eXJra2RESittWWpCLzAwU0pvZ1FhL2RVbFI4dW00ZWlj?=
- =?utf-8?B?Sm9iZzFVS1Y3NUNnZHRlWStrc24zK3ZQM3BkclJXWGlDakY5WCtoS21sN0VW?=
- =?utf-8?B?QWFlNHdaSXMyOTdxNXRWa1pxVjdlTlZ0ZXBGMlZIYUNDb3FnRGR2SUZpZ2tI?=
- =?utf-8?B?aGNnbGVvWjROMXdLWEsxckMrNWNFcVpOZmNIOWlDeEJzNmc0RzU4M210Wk1s?=
- =?utf-8?B?bE9rNFFFeVI2MTNZb044dzNhSGU1ZVQwZjhpT1Q1R3ZTYzNMSXdreVR4QWRz?=
- =?utf-8?B?bFY2WkpPS3U0a21hZTAzclM4d29Wb1UzbHl5TnF5TzhOMlQwRy9jZlhKRE1U?=
- =?utf-8?B?Q1E1Yjh5NmE5Q1VNbEhEcTFnR1BnK3owUVR1cTNDOEc0dHpzanB0ZEJQbzFD?=
- =?utf-8?B?aFZPT3lyVEk4WUZvcTY3TDV6Nm1kTzVjTVB5Uk0wVGN0WS9KTXBXTk1obVNk?=
- =?utf-8?B?VnovL2dIUW02Zk5lem85WC9GV3ppNnhXazd1alZPNDlueE94K016eXFIQ0x4?=
- =?utf-8?B?RlZXeVdjRnhqZTU4L2Z4d2cyL1BKRVhPSzVHa3JqeldjWWZ4V21WUVVvQk94?=
- =?utf-8?B?Q0E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 17bd9d23-f727-402c-8981-08dad98e66ef
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2022 02:38:06.6122
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LR77t8ZjqHME8AJflpMrdjarpSXuAAw6KfMLTT/GPomZDdVzOkUZXHaLPWhFg8bCXocUAk+tQ6YrSofbRm5kog==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6422
-X-OriginatorOrg: intel.com
-Message-ID: <20221209023747.cAj03G03L4g0VpbHNrROHsU4orB0P3SKI2vLX33VHJ8@z>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
+To: Marc Zyngier <maz@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>, Sean Christopherson <seanjc@google.com>,
+ Andrew Jones <andrew.jones@linux.dev>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Bagas Sanjaya <bagasdotme@gmail.com>, Ben Gardon <bgardon@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Cornelia Huck
+ <cohuck@redhat.com>, Fuad Tabba <tabba@google.com>,
+ Gavin Shan <gshan@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ James Morse <james.morse@arm.com>,
+ "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Peter Collingbourne <pcc@google.com>, Peter Xu <peterx@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+ Quentin Perret <qperret@google.com>, Reiji Watanabe <reijiw@google.com>,
+ Ricardo Koller <ricarkol@google.com>, Ryan Roberts <ryan.roberts@arm.com>,
+ Steven Price <steven.price@arm.com>, Usama Arif <usama.arif@bytedance.com>,
+ Vincent Donnefort <vdonnefort@google.com>, Will Deacon <will@kernel.org>,
+ Zhiyuan Dai <daizhiyuan@phytium.com.cn>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org
+References: <20221205155845.233018-1-maz@kernel.org>
+ <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
+ <Y4+FmDM7E5WYP3zV@google.com> <Y4+H5Vwy/aLvjqbw@sirena.org.uk>
+ <28e7f298-972b-2cb8-df80-951076724c73@redhat.com>
+ <877cz3u00b.wl-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <877cz3u00b.wl-maz@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-ID: <20221209080845.kIaGT7cNBafmaA9j5bEh-v2XvYDGjtzLDg32fqwySL8@z>
 
+On 12/7/22 08:49, Marc Zyngier wrote:
+> On Tue, 06 Dec 2022 21:43:43 +0000,
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 12/6/22 19:20, Mark Brown wrote:
+>>>> I almost suggested doing that on multiple occasions this cycle, but ultimately
+>>>> decided not to because it would effectively mean splitting series that touch KVM
+>>>> and selftests into different trees, which would create a different kind of
+>>>> dependency hell.  Or maybe a hybrid approach where series that only (or mostly?)
+>>>> touch selftests go into a dedicated tree?
+>>>
+>>> Some other subsystems do have a separate branch for kselftests.  One
+>>> fairly common occurrence is that the selftests branch ends up failing to
+>>> build independently because someone adds new ABI together with a
+>>> selftest but the patches adding the ABI don't end up on the same branch
+>>> as the tests which try to use them.  That is of course resolvable but
+>>> it's a common friction point.
+>>
+>> Yeah, the right solution is simply to merge selftests changes
+>> separately from the rest and use topic branches.
+> 
+> Don't know if this is what you have in mind, but I think that we
+> should use topic branches for *everything*. The only things for which
+> I don't use a separate branch are the odd drive-by patches, of the
+> spelling fix persuasion.
 
-On 12/9/2022 3:38 AM, David Matlack wrote:
-> Rename kvm_mmu_page_role.smm with kvm_mmu_page_role.as_id and use it
-> directly as the address space ID throughout the KVM MMU code. This
-> eliminates a needless level of indirection, kvm_mmu_role_as_id(), and
-> prepares for making kvm_mmu_page_role architecture-neutral.
->
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->   arch/x86/include/asm/kvm_host.h |  4 ++--
->   arch/x86/kvm/mmu/mmu.c          |  6 +++---
->   arch/x86/kvm/mmu/mmu_internal.h | 10 ----------
->   arch/x86/kvm/mmu/tdp_iter.c     |  2 +-
->   arch/x86/kvm/mmu/tdp_mmu.c      | 12 ++++++------
->   5 files changed, 12 insertions(+), 22 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index aa4eb8cfcd7e..0a819d40131a 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -348,7 +348,7 @@ union kvm_mmu_page_role {
->   		 * simple shift.  While there is room, give it a whole
->   		 * byte so it is also faster to load it from memory.
->   		 */
-> -		unsigned smm:8;
-> +		unsigned as_id:8;
->   	};
->   };
->   
-> @@ -2056,7 +2056,7 @@ enum {
->   # define __KVM_VCPU_MULTIPLE_ADDRESS_SPACE
->   # define KVM_ADDRESS_SPACE_NUM 2
->   # define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
-> -# define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).smm)
-> +# define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).as_id)
->   #else
->   # define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, 0)
->   #endif
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 4d188f056933..f375b719f565 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5056,7 +5056,7 @@ kvm_calc_cpu_role(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
->   	union kvm_cpu_role role = {0};
->   
->   	role.base.access = ACC_ALL;
-> -	role.base.smm = is_smm(vcpu);
-> +	role.base.as_id = is_smm(vcpu);
+Yeah, I just wish we had better tools to manage them...
 
-I'm not familiar with other architectures, is there similar conception 
-as x86 smm mode?
+Paolo
 
-If not, maybe need to re-shape is_smm() as a common helper to get the as_id.
-
-[...]
+> That's what we do for arm64 and the IRQ subsystem. It is a bit more
+> involved at queuing time, but makes dropping series from -next
+> extremely easy, without affecting the history. And crucially, it gives
+> everyone a hint to base their stuff on a stable commit, not a random
+> "tip of kvm/queue as of three days ago".
+> 
+> 	M.
+> 
 
