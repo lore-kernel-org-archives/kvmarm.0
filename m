@@ -2,81 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8076EC4167B
-	for <kvmarm@archiver.kernel.org>; Fri,  9 Dec 2022 20:45:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2EC5C4332F
+	for <kvmarm@archiver.kernel.org>; Fri,  9 Dec 2022 21:03:53 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE0D94B945;
-	Fri,  9 Dec 2022 15:45:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 660214B97D;
+	Fri,  9 Dec 2022 16:03:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id g+mROsknP8zu; Fri,  9 Dec 2022 15:45:08 -0500 (EST)
+	with ESMTP id n4l9JdZmKaJ9; Fri,  9 Dec 2022 16:03:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C75BB4B731;
-	Fri,  9 Dec 2022 15:45:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 356C94B93C;
+	Fri,  9 Dec 2022 16:03:52 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 447854B943
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2022 15:45:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AF6A4B920
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2022 16:03:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id j83D9JFd8wLh for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Dec 2022 15:45:06 -0500 (EST)
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com
- [209.85.216.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 26BC44B933
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2022 15:45:06 -0500 (EST)
-Received: by mail-pj1-f49.google.com with SMTP id
- e7-20020a17090a77c700b00216928a3917so9353219pjs.4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 09 Dec 2022 12:45:06 -0800 (PST)
+ with ESMTP id ufryqcggF-zD for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  9 Dec 2022 16:03:49 -0500 (EST)
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com
+ [209.85.214.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D53AE4B918
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2022 16:03:49 -0500 (EST)
+Received: by mail-pl1-f169.google.com with SMTP id t2so3156036ply.2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 09 Dec 2022 13:03:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=vrO0N2BhoytOAhhhHfUhdN91u6TruVaipT5ISV1vaYc=;
- b=f95FMmTEKSCikEYcOfIHQeZ11wft/M7xtxOLWqo9ddBFll+PEIhNuP8Altnit2pg7l
- zyRhiE+JRDfj5dB8/WxDXf1drX13fZ1eOh7rba0AIhbehJO0Y9D2Isb+V0FtO1vE8xtB
- hYMCbXb+6k8JyDHQhnThQvX/+T5zbEXkZxYWQBSqRWCBdOVJmssGwx1Y5IXZJw/6XRzs
- S3ZdcDYHIQuWdKlJwLHVsg5FbzwD0u0eYrShli67IQw7Q2mlLjgxmxsG0ncnWSJMMZVg
- KepJ3JyFSc3873pExBYAY27kO9Gx8PluA0Mbdjh+rOeLvfI90C98illSL1VVYvLRtJsW
- Xzfw==
+ bh=HqhkVKX+RdgYCWZiIceLsOHMpWv/ROuczp7qb/H7X1w=;
+ b=geRGPSQKUlIYqCU/v/MAful0c2VKh6VA6SBeijyPLtHNmaNPvdTAZRBm+8BK0vMyF7
+ oJs/xaNz1FVL8jiMpUauu2wtzHgyNFuSzbsou1/FkQDUTY5R2F/BqoUtLcz7XXJd3ZAO
+ Dmk3W82U//fL1/HxmzzBDyZ7VklM1UH74NpwkG3WyTvUXcSDELZRwL14XyE4yxNMMTiP
+ 7vxNfdzUPeKjtlkEpdgj2U13i8nATEgPias3k43ZtZwrU5RjHtwlN5SiT1tERKN6A3Rk
+ WNJjSbXl0byXigqUqjfuCWVXto0wnqtwZ9BO4n+XScjq16D9RNXVrELTuGdILxKMMIaA
+ 6JaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
  :message-id:reply-to;
- bh=vrO0N2BhoytOAhhhHfUhdN91u6TruVaipT5ISV1vaYc=;
- b=ruzSTa5gzWEgmnl61vsbqoyIZeifaDWQJuAeHz6qhBZAAFkcur+ZGp8mUH21M31x4T
- 9ebOdSWAsn2NXZf7muQvgd0aPCKSU04RMAAFcC6SFRsmy86wOINs8p/PM6hmZCEyyiSz
- vtYz33kXCWunc/duBYazWFs6Dap1FTLbzN2bf/fgaVf8YtACuvce6XdvlLj1I53y2ASU
- p0QAP51Tt7ypI0gV+eVAfKAYGukBiw7eGuUtf76F5suryBxFxHgXAi0Ck8bQi6KoRjoT
- iwyVW2iIvhLkUlBefpBsbYOhk6axgCWNi+xSuNckap2i9hmTMNniwp7axntqaMiCq0CQ
- XPsQ==
-X-Gm-Message-State: ANoB5plfkkyudAzaBqLaZqLk7p1fxEZccgMYwUPBzpPEZnWH7LJGHlSV
- v1GnR3RCIOvYNddJ6dZSuen5HA==
-X-Google-Smtp-Source: AA0mqf5qINBTPYAP4qeg1UzaZ6wwLAd0BwvCi3JbF60z/oyrT5V6BtufJ7TAxCe0PKR19lvup9WOtA==
-X-Received: by 2002:a05:6a20:baa3:b0:9d:c38f:9bdd with SMTP id
- fb35-20020a056a20baa300b0009dc38f9bddmr20370pzb.2.1670618705014; 
- Fri, 09 Dec 2022 12:45:05 -0800 (PST)
+ bh=HqhkVKX+RdgYCWZiIceLsOHMpWv/ROuczp7qb/H7X1w=;
+ b=JwaFng8YVuyFXUV5ZC0QpdlXKp9Y0JeN/fAgpAW8tKjdxzOm0yE0X9JrkOF8HEev6j
+ lj28EoYw/ElWBv3Yvwl102KfXvyNEHfUiPHX9nR/1TisyAKO0sEj9ddC+WjbxOUizoyZ
+ GWhd2OcikH89mNtM3RMq/JYE6lqb0agFrgpq7kbRTbf9E2tD87oLybm5qxgoEYhL0PsE
+ WGFcBpa/MeCQqGU/aN1/SR/RQVok14mL3iAZO3npzPB2uYqUTEQrv4UUzzvijc8szb3a
+ cSWVJ56t0nk8B8dO0w44uW7W991v4uAI4LR5LB7X7Kl3UdOELed46BDh4jQD+euitK9a
+ WAFQ==
+X-Gm-Message-State: ANoB5pl0DV/W8VstbtcThCxRU6kNpbAM2FL4c090NentdTpwqOgnuuZ4
+ 9FsACBdRABLbfnqV94AY8IxDoQ==
+X-Google-Smtp-Source: AA0mqf76S2APEPIqvhNO2xeCJ5k7zOJZF0cOVyP09wKMa17nX0r0d7TDym1CMnQt7VgOPeLCqe8Uuw==
+X-Received: by 2002:a05:6a20:7f5c:b0:9d:b8e6:d8e5 with SMTP id
+ e28-20020a056a207f5c00b0009db8e6d8e5mr24495pzk.2.1670619828811; 
+ Fri, 09 Dec 2022 13:03:48 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com.
  [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
- y10-20020aa793ca000000b0057555d35f79sm1614631pff.101.2022.12.09.12.45.04
+ c11-20020a170903234b00b001885041d7b8sm1722515plh.293.2022.12.09.13.03.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 09 Dec 2022 12:45:04 -0800 (PST)
-Date: Fri, 9 Dec 2022 20:45:01 +0000
+ Fri, 09 Dec 2022 13:03:48 -0800 (PST)
+Date: Fri, 9 Dec 2022 21:03:45 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v2 4/7] KVM: selftests: Correctly initialize the VA space
- for TTBR0_EL1
-Message-ID: <Y5OeTeq55OgBJbjT@google.com>
+Subject: Re: [PATCH v2 7/7] KVM: selftests: Avoid infinite loop if
+ ucall_alloc() fails
+Message-ID: <Y5OisdH5ohtr6r3j@google.com>
 References: <20221209015307.1781352-1-oliver.upton@linux.dev>
- <20221209015307.1781352-5-oliver.upton@linux.dev>
+ <20221209015307.1781352-8-oliver.upton@linux.dev>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20221209015307.1781352-5-oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+In-Reply-To: <20221209015307.1781352-8-oliver.upton@linux.dev>
+Cc: linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+ Andrew Jones <andrew.jones@linux.dev>, Peter Gonda <pgonda@google.com>,
  kvmarm@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
  Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
@@ -97,64 +97,125 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Fri, Dec 09, 2022, Oliver Upton wrote:
-> An interesting feature of the Arm architecture is that the stage-1 MMU
-> supports two distinct VA regions, controlled by TTBR{0,1}_EL1. As KVM
-> selftests on arm64 only uses TTBR0_EL1, the VA space is constrained to
-> [0, 2^(va_bits)). This is different from other architectures that
-> allow for addressing low and high regions of the VA space from a single
-> page table.
+> Guest assertions depend on successfully allocating a ucall structure. As
+> such, the use of guest assertions when ucall_alloc() fails simply leads
+> to an infinite loop in guest code.
 > 
-> KVM selftests' VA space allocator presumes the valid address range is
-> split between low and high memory based the MSB, which of course is a
-> poor match for arm64's TTBR0 region.
+> Use GUEST_UCALL_NONE() to indicate failure instead. Though not
+> technically necessary, use a goto to have a single callsite and an
+> associated comment about why assertions don't work here. It isn't
+> perfect, at least the poor developer gets some signal out of the
+> guest...
 > 
-> Add a helper that correctly handles both addressing schemes with a
-> comment describing each.
-> 
+> Fixes: 426729b2cf2e ("KVM: selftests: Add ucall pool based implementation")
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
-
-Thanks much!  Looks awesome, especially the comment!
-
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-
->  .../selftests/kvm/include/kvm_util_base.h     |  1 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 49 ++++++++++++++++---
->  2 files changed, 44 insertions(+), 6 deletions(-)
+>  tools/testing/selftests/kvm/lib/ucall_common.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index 6cd86da698b3..b193863d754f 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -103,6 +103,7 @@ struct kvm_vm {
->  	struct sparsebit *vpages_mapped;
->  	bool has_irqchip;
->  	bool pgd_created;
-> +	bool has_split_va_space;
->  	vm_paddr_t ucall_mmio_addr;
->  	vm_paddr_t pgd;
->  	vm_vaddr_t gdt;
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index a256ec67aff6..53d15f32f220 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -186,6 +186,43 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
->  _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
->  	       "Missing new mode params?");
+> diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
+> index 0cc0971ce60e..e8370da3de24 100644
+> --- a/tools/testing/selftests/kvm/lib/ucall_common.c
+> +++ b/tools/testing/selftests/kvm/lib/ucall_common.c
+> @@ -41,7 +41,8 @@ static struct ucall *ucall_alloc(void)
+>  	struct ucall *uc;
+>  	int i;
 >  
-> +/*
-> + * Initializes vm->vpages_valid to match the canonical VA space of the
-> + * architecture.
-> + *
-> + * Most architectures split the range addressed by a single page table into a
-> + * low and high region based on the MSB of the VA. On architectures with this
-> + * behavior the VA region spans [0, 2^(va_bits - 1)), [-(2^(va_bits - 1), -1].
-> + *
-> + * arm64 is a bit different from the rest of the crowd, as the low and high
-> + * regions of the VA space are addressed by distinct paging structures
-> + * (TTBR{0,1}_EL1).
+> -	GUEST_ASSERT(ucall_pool);
+> +	if (!ucall_pool)
+> +		goto out;
+>  
+>  	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+>  		if (!test_and_set_bit(i, ucall_pool->in_use)) {
+> @@ -51,7 +52,14 @@ static struct ucall *ucall_alloc(void)
+>  		}
+>  	}
+>  
+> -	GUEST_ASSERT(0);
+> +out:
+> +	/*
+> +	 * If the guest cannot grab a ucall structure from the pool then the
+> +	 * only option to get out to userspace is a bare ucall. This is probably
+> +	 * a good time to mention that guest assertions depend on ucalls with
+> +	 * arguments too.
+> +	 */
+> +	GUEST_UCALL_NONE();
 
-Oooh, they're different CR3s in x86 terminology?
+UCALL_NONE isn't much better than infinite stack recursion, e.g. a test might end
+up passing by dumb luck, or go in the wrong direction because it sometimes handles
+UCALL_NONE.
+
+How about this?
+
+From: Sean Christopherson <seanjc@google.com>
+Date: Fri, 9 Dec 2022 12:55:44 -0800
+Subject: [PATCH] KVM: selftests: Use magic value to signal ucall_alloc()
+ failure
+
+Use a magic value to signal a ucall_alloc() failure instead of simply
+doing GUEST_ASSERT().  GUEST_ASSERT() relies on ucall_alloc() and so a
+failure puts the guest into an infinite loop.
+
+Use -1 as the magic value, as a real ucall struct should never wrap.
+
+Reported-by: Oliver Upton <oliver.upton@linux.dev>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/lib/ucall_common.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
+index 0cc0971ce60e..2f0e2ea941cc 100644
+--- a/tools/testing/selftests/kvm/lib/ucall_common.c
++++ b/tools/testing/selftests/kvm/lib/ucall_common.c
+@@ -4,6 +4,8 @@
+ #include "linux/bitmap.h"
+ #include "linux/atomic.h"
+ 
++#define GUEST_UCALL_FAILED -1
++
+ struct ucall_header {
+ 	DECLARE_BITMAP(in_use, KVM_MAX_VCPUS);
+ 	struct ucall ucalls[KVM_MAX_VCPUS];
+@@ -41,7 +43,8 @@ static struct ucall *ucall_alloc(void)
+ 	struct ucall *uc;
+ 	int i;
+ 
+-	GUEST_ASSERT(ucall_pool);
++	if (!ucall_pool)
++		goto ucall_failed;
+ 
+ 	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+ 		if (!test_and_set_bit(i, ucall_pool->in_use)) {
+@@ -51,7 +54,13 @@ static struct ucall *ucall_alloc(void)
+ 		}
+ 	}
+ 
+-	GUEST_ASSERT(0);
++ucall_failed:
++	/*
++	 * If the vCPU cannot grab a ucall structure, make a bare ucall with a
++	 * magic value to signal to get_ucall() that things went sideways.
++	 * GUEST_ASSERT() depends on ucall_alloc() and so cannot be used here.
++	 */
++	ucall_arch_do_ucall(GUEST_UCALL_FAILED);
+ 	return NULL;
+ }
+ 
+@@ -93,6 +102,9 @@ uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
+ 
+ 	addr = ucall_arch_get_ucall(vcpu);
+ 	if (addr) {
++		TEST_ASSERT(addr != (void *)GUEST_UCALL_FAILED,
++			    "Guest failed to allocate ucall struct");
++
+ 		memcpy(uc, addr, sizeof(*uc));
+ 		vcpu_run_complete_io(vcpu);
+ 	} else {
+
+base-commit: dc2efbe4813e0dc4368779bc36c5f0e636cb8eb2
+-- 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
