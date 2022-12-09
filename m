@@ -2,71 +2,84 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A46C10F1B
-	for <kvmarm@archiver.kernel.org>; Fri,  9 Dec 2022 19:07:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8076EC4167B
+	for <kvmarm@archiver.kernel.org>; Fri,  9 Dec 2022 20:45:10 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E8574B9C8;
-	Fri,  9 Dec 2022 14:07:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE0D94B945;
+	Fri,  9 Dec 2022 15:45:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Bq4+sBP1cXJr; Fri,  9 Dec 2022 14:07:22 -0500 (EST)
+	with ESMTP id g+mROsknP8zu; Fri,  9 Dec 2022 15:45:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DA9B4B9CE;
-	Fri,  9 Dec 2022 14:07:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C75BB4B731;
+	Fri,  9 Dec 2022 15:45:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B2F8F4B9CB
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2022 14:07:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 447854B943
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2022 15:45:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fKM0-HlvfLlE for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Dec 2022 14:07:20 -0500 (EST)
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 216D74B9AB
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2022 14:07:20 -0500 (EST)
-Date: Fri, 9 Dec 2022 19:07:03 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1670612838;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=oWmH4e1mGrQaOKoXcB+GepAJzEfWN1IWTXh/7cR74Ow=;
- b=AswdAfd5Q+mOjP5g961Yuon0PbYZHfxSUDlGJ+/buNi7IHM9bd6ULaRiGOzBuN6ci0izSW
- B5EIV4JzGif6x12auQAsZB3J+bcstx7A9s7T7t3T4uADc2KhM2k8w4j4zr2MLJSJNCfruM
- B8PoL86EPm1zOzsehSZsoQ31jqDCN7U=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: David Matlack <dmatlack@google.com>
-Subject: Re: [RFC PATCH 00/37] KVM: Refactor the KVM/x86 TDP MMU into common
- code
-Message-ID: <Y5OHVzBSHPmAq2FO@google.com>
-References: <20221208193857.4090582-1-dmatlack@google.com>
+ with ESMTP id j83D9JFd8wLh for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  9 Dec 2022 15:45:06 -0500 (EST)
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com
+ [209.85.216.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 26BC44B933
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2022 15:45:06 -0500 (EST)
+Received: by mail-pj1-f49.google.com with SMTP id
+ e7-20020a17090a77c700b00216928a3917so9353219pjs.4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 09 Dec 2022 12:45:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=vrO0N2BhoytOAhhhHfUhdN91u6TruVaipT5ISV1vaYc=;
+ b=f95FMmTEKSCikEYcOfIHQeZ11wft/M7xtxOLWqo9ddBFll+PEIhNuP8Altnit2pg7l
+ zyRhiE+JRDfj5dB8/WxDXf1drX13fZ1eOh7rba0AIhbehJO0Y9D2Isb+V0FtO1vE8xtB
+ hYMCbXb+6k8JyDHQhnThQvX/+T5zbEXkZxYWQBSqRWCBdOVJmssGwx1Y5IXZJw/6XRzs
+ S3ZdcDYHIQuWdKlJwLHVsg5FbzwD0u0eYrShli67IQw7Q2mlLjgxmxsG0ncnWSJMMZVg
+ KepJ3JyFSc3873pExBYAY27kO9Gx8PluA0Mbdjh+rOeLvfI90C98illSL1VVYvLRtJsW
+ Xzfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=vrO0N2BhoytOAhhhHfUhdN91u6TruVaipT5ISV1vaYc=;
+ b=ruzSTa5gzWEgmnl61vsbqoyIZeifaDWQJuAeHz6qhBZAAFkcur+ZGp8mUH21M31x4T
+ 9ebOdSWAsn2NXZf7muQvgd0aPCKSU04RMAAFcC6SFRsmy86wOINs8p/PM6hmZCEyyiSz
+ vtYz33kXCWunc/duBYazWFs6Dap1FTLbzN2bf/fgaVf8YtACuvce6XdvlLj1I53y2ASU
+ p0QAP51Tt7ypI0gV+eVAfKAYGukBiw7eGuUtf76F5suryBxFxHgXAi0Ck8bQi6KoRjoT
+ iwyVW2iIvhLkUlBefpBsbYOhk6axgCWNi+xSuNckap2i9hmTMNniwp7axntqaMiCq0CQ
+ XPsQ==
+X-Gm-Message-State: ANoB5plfkkyudAzaBqLaZqLk7p1fxEZccgMYwUPBzpPEZnWH7LJGHlSV
+ v1GnR3RCIOvYNddJ6dZSuen5HA==
+X-Google-Smtp-Source: AA0mqf5qINBTPYAP4qeg1UzaZ6wwLAd0BwvCi3JbF60z/oyrT5V6BtufJ7TAxCe0PKR19lvup9WOtA==
+X-Received: by 2002:a05:6a20:baa3:b0:9d:c38f:9bdd with SMTP id
+ fb35-20020a056a20baa300b0009dc38f9bddmr20370pzb.2.1670618705014; 
+ Fri, 09 Dec 2022 12:45:05 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ y10-20020aa793ca000000b0057555d35f79sm1614631pff.101.2022.12.09.12.45.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 09 Dec 2022 12:45:04 -0800 (PST)
+Date: Fri, 9 Dec 2022 20:45:01 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 4/7] KVM: selftests: Correctly initialize the VA space
+ for TTBR0_EL1
+Message-ID: <Y5OeTeq55OgBJbjT@google.com>
+References: <20221209015307.1781352-1-oliver.upton@linux.dev>
+ <20221209015307.1781352-5-oliver.upton@linux.dev>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20221208193857.4090582-1-dmatlack@google.com>
-X-Migadu-Flow: FLOW_OUT
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
- Hugh Dickins <hughd@google.com>, Paul Walmsley <paul.walmsley@sifive.com>,
- Nadav Amit <namit@vmware.com>, Ben Gardon <bgardon@google.com>,
- linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- Yu Zhao <yuzhao@google.com>, xu xin <cgel.zte@gmail.com>,
- Huacai Chen <chenhuacai@kernel.org>,
- "Matthew Wilcox \(Oracle\)" <willy@infradead.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Krish Sadhukhan <krish.sadhukhan@oracle.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Mingwei Zhang <mizhang@google.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Arnd Bergmann <arnd@arndb.de>,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>, kvm@vger.kernel.org,
- Atish Patra <atishp@atishpatra.org>, kvmarm@lists.linux.dev,
- Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
- linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
- Colin Cross <ccross@google.com>, kvm-riscv@lists.infradead.org,
- Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>
+In-Reply-To: <20221209015307.1781352-5-oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kvmarm@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,120 +96,65 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Dec 08, 2022 at 11:38:20AM -0800, David Matlack wrote:
-> [ mm folks: You are being cc'd since this series includes a mm patch
->   ("mm: Introduce architecture-neutral PG_LEVEL macros"), but general
->   feedback is also welcome. I imagine there are a lot of lessons KVM can
->   learn from mm about sharing page table code across architectures. ]
+On Fri, Dec 09, 2022, Oliver Upton wrote:
+> An interesting feature of the Arm architecture is that the stage-1 MMU
+> supports two distinct VA regions, controlled by TTBR{0,1}_EL1. As KVM
+> selftests on arm64 only uses TTBR0_EL1, the VA space is constrained to
+> [0, 2^(va_bits)). This is different from other architectures that
+> allow for addressing low and high regions of the VA space from a single
+> page table.
 > 
-> Hello,
+> KVM selftests' VA space allocator presumes the valid address range is
+> split between low and high memory based the MSB, which of course is a
+> poor match for arm64's TTBR0 region.
 > 
-> This series refactors the KVM/x86 "TDP MMU" into common code. This is
-> the first step toward sharing TDP (aka Stage-2) page table management
-> code across architectures that support KVM. For more background on this
-> effort please see my talk from KVM Forum 2022 "Exploring an
-> architecture-neutral MMU":
+> Add a helper that correctly handles both addressing schemes with a
+> comment describing each.
 > 
->   https://youtu.be/IBhW34fCFi0
-> 
-> By the end of this series, 90% of the TDP MMU code is in common directories
-> (virt/kvm/mmu/ and include/kvm/). The only pieces that remaing in
-> arch/x86 are code that deals with constructing/inspecting/modifying PTEs
-> and arch hooks to implement NX Huge Pages (a mitigation for an
-> Intel-specific vulnerability).
-> 
-> Before:
-> 
->   180 arch/x86/kvm/mmu/tdp_iter.c
->   118 arch/x86/kvm/mmu/tdp_iter.h
->  1917 arch/x86/kvm/mmu/tdp_mmu.c
->    98 arch/x86/kvm/mmu/tdp_mmu.h
->  ----
->  2313 total
-> 
-> After:
-> 
->   178 virt/kvm/mmu/tdp_iter.c
->  1867 virt/kvm/mmu/tdp_mmu.c
->   117 include/kvm/tdp_iter.h
->    78 include/kvm/tdp_mmu.h
->    39 include/kvm/tdp_pgtable.h
->  ----
->   184 arch/x86/kvm/mmu/tdp_pgtable.c
->    76 arch/x86/include/asm/kvm/tdp_pgtable.h
->  ----
->  2539 total
-> 
-> This series is very much an RFC, but it does build (I tested x86_64 and
-> ARM64) and pass basic testing (KVM selftests and kvm-unit-tests on
-> x86_64), so it is entirely functional aside from any bugs.
-> 
-> The main areas I would like feedback are:
-> 
->  - NX Huge Pages support in the TDP MMU requires 5 arch hooks in
->    the common code, which IMO makes the NX Huge Pages implementation
->    harder to read. The alternative is to move the NX Huge Pages
->    implementation into common code, including the fields in struct
->    kvm_mmu_page and kvm_page_fault, which would increase memory usage
->    a tiny bit (for non-x86 architectures) and pollute the common code
->    with an x86-specific security mitigation. Ideas on better ways to
->    handle this would be appreciated.
-> 
->  - struct kvm_mmu_page increased by 64 bytes because the separation of
->    arch and common state eliminated the ability to use unions to
->    optimize the size of the struct. There's two things we can do to
->    reduce the size of the struct back down: (1) dynamically allocated
->    root-specific fields only for root page tables and (2) dynamically
->    allocate Shadow MMU state in kvm_mmu_page_arch only for Shadow MMU
->    pages. This should actually be a net *reduction* the size of
->    kvm_mmu_page relative today for most pages, but I have not
->    implemented it.
-> 
->    Note that an alternative approach I implemented avoided this problem
->    by creating an entirely separate struct for the common TDP MMU (e.g.
->    struct tdp_mmu_page). This however had a lot of downsides that I
->    don't think make it a good solution. Notably, it complicated a ton of
->    existing code in arch/x86/kvm/mmu/mmu.c (e.g. anything that touches
->    vcpu->arch.mmu->root and kvm_recover_nx_huge_pages()) and created a
->    new runtime failure mode in to_shadow_page().
-> 
->  - Naming. This series does not change the names of any existing code.
->    So all the KVM/x86 Shadow MMU-style terminology like
->    "shadow_page"/"sp"/"spte" persists. Should we keep that style in
->    common code or move toward something less shadow-paging-specific?
->    e.g. "page_table"/"pt"/"pte".
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
 
-I would strongly be in favor of discarding the shadow paging residue if
-x86 folks are willing to part ways with it :)
+Thanks much!  Looks awesome, especially the comment!
 
->    Also do we want to keep "TDP" or switch
->    to something more familiar across architectures (e.g. ARM and RISC-V
->    both use "Stage-2")?
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-As it relates to guest memory management I don't see much of an issue
-with it, TBH. It is sufficiently arch-generic and gets the point across.
+>  .../selftests/kvm/include/kvm_util_base.h     |  1 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 49 ++++++++++++++++---
+>  2 files changed, 44 insertions(+), 6 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index 6cd86da698b3..b193863d754f 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -103,6 +103,7 @@ struct kvm_vm {
+>  	struct sparsebit *vpages_mapped;
+>  	bool has_irqchip;
+>  	bool pgd_created;
+> +	bool has_split_va_space;
+>  	vm_paddr_t ucall_mmio_addr;
+>  	vm_paddr_t pgd;
+>  	vm_vaddr_t gdt;
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index a256ec67aff6..53d15f32f220 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -186,6 +186,43 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+>  _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
+>  	       "Missing new mode params?");
+>  
+> +/*
+> + * Initializes vm->vpages_valid to match the canonical VA space of the
+> + * architecture.
+> + *
+> + * Most architectures split the range addressed by a single page table into a
+> + * low and high region based on the MSB of the VA. On architectures with this
+> + * behavior the VA region spans [0, 2^(va_bits - 1)), [-(2^(va_bits - 1), -1].
+> + *
+> + * arm64 is a bit different from the rest of the crowd, as the low and high
+> + * regions of the VA space are addressed by distinct paging structures
+> + * (TTBR{0,1}_EL1).
 
-Beyond that I think it really depends on the scope of the common code.
-
-To replace the arm64 table walkers we will need to use it for stage-1
-tables. I'm only hand-waving at the cover letter and need to do more
-reading, but is it possible to accomplish some division:
-
- - A set of generic table walkers that implement common operations, like
-   map and unmap. Names and types at this layer wouldn't be
-   virt-specific.
-
- - Memory management for KVM guests that uses the table walker library,
-   which we can probably still call the TDP MMU.
-
-Certainly this doesn't need to be addressed in the first series, as the x86
-surgery is enough on its own. Nonetheless, it is probably worthwhile to
-get the conversation started about how this code can actually be used by
-the other arches.
-
---
-Thanks,
-Oliver
+Oooh, they're different CR3s in x86 terminology?
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
