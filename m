@@ -1,148 +1,88 @@
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA05F63C5
-	for <kvmarm@lists.linux.dev>; Fri,  9 Dec 2022 17:41:15 +0000 (UTC)
-Received: by mail-yb1-f172.google.com with SMTP id j206so6373195ybj.1
-        for <kvmarm@lists.linux.dev>; Fri, 09 Dec 2022 09:41:15 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123EE63D2
+	for <kvmarm@lists.linux.dev>; Fri,  9 Dec 2022 17:57:42 +0000 (UTC)
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-3e78d07ab4fso62052597b3.9
+        for <kvmarm@lists.linux.dev>; Fri, 09 Dec 2022 09:57:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ae7igBpi6aOVu172YIUgxS7qKV+pzUf0AUP0I5I75q8=;
-        b=N+7B9/rCWK5Sp2/p4Ir8f6MIvbqCGaqwi8Po2oncdcAwLhGA2JbFygWWQUv6V6CPMa
-         5qEu3kJoWRw2vCClh6Nppk6pcE8Gs4F+bRtzVoiff0JJsexRmVNGr2a680WUghXF5FfZ
-         hJT8t5JkmvW4LhfLt9VxecKUoVAgOFMQFaEgzYrErkPW87ek/r4P8aluMVRPjzuoCpmc
-         s8hnbdPk8IjCsgDtQ2r43eSt/10ErW7paYLAy3fVr+Nls1PaCuUT+RlvNLCKRaMhvrdb
-         84/0ge7Jjg4S3PzFHcaNOXRMWYnTQH+nKv2Q4uZnvxishqyp8n2lzRaNXljaSz/ExQZQ
-         ySPA==
+        bh=bMZ9vaUyXosUBjlo9WUDdUBep5JMYYDWXkYuJRTyBRc=;
+        b=PNNz0qgco2CC6vK8iX8A8CdQ9XYG/eiYEJI0PFBFwEDrAJkafbZh+wNNez+eyMKsNW
+         dyYIVM2JUEXFIo3AsWaRZNjWiZwyFaVdNR0pQpuSKF0S76DLKWQFl1oZGEBDU5afM86c
+         4MHyLC00G+IV14UOCOsjUR6HTn+tapMh3yj6v/QPIYSR6ep3HNH6Adic+iJisjvPkwA/
+         hLPuSxDfDTXFbxYKTocYksmV9tgslNTPcnfgAPbkxh/jMNo9/8AxKFzwYVG9ZAJJI+XR
+         ZLWDlt7dnT+fbIaDz/1md454IG3J2J19ANvQ4CvzY4M0DlboF2jrnlXjyCT1tHR69aMt
+         lUDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Ae7igBpi6aOVu172YIUgxS7qKV+pzUf0AUP0I5I75q8=;
-        b=4gLIj7ycxVvPHecOxugIDqv123PbnFsKDSmUaZjNBHC3zbyvTZDKuSfu0HIXuL0cHW
-         L5VbvSS0jmBrvVefhhfhsboMvCAjNCkf/69QYjHtE2ywR8vskakAQsnJHv2t8xCXMi9O
-         7TYAijlAsvx4RxKPxVhGLPIU74B1Nwnjxjd0hQbW0LEF2hPEWiaeu3HwqeUJfBfKto1d
-         RUtEuHtATgHdbuvSvJ4AsCQa+IAKTBxAyW/rH0/XnaeOsFy3S08ROK5ET+c+CIEWRwot
-         wmElBeKUWxedorTf1XQToOF2Eg67LQwmD9zz5mEffk7DBeo5zLmaB8bljX1Rg3/4rebN
-         SKhw==
-X-Gm-Message-State: ANoB5pkbFp3OF6MQdGHLgl7e9nLCsKsEmQSebAuez/sMjnvgRCAsxF9X
-	98Pqr//2/kmG1wPtqeWLBdoSxAoWFcxwDO5q3jLTJg==
-X-Google-Smtp-Source: AA0mqf5h6EJUa8o1mU6n0d18d5R9db+bCd1t++iK380my63/Q1gFej7B2AoWgEI4of2L90azWCjh0YyRl3fL7yBolSs=
-X-Received: by 2002:a25:742:0:b0:6fd:6aa4:82a5 with SMTP id
- 63-20020a250742000000b006fd6aa482a5mr25244378ybh.305.1670607674506; Fri, 09
- Dec 2022 09:41:14 -0800 (PST)
+        bh=bMZ9vaUyXosUBjlo9WUDdUBep5JMYYDWXkYuJRTyBRc=;
+        b=vwBbED56lsgzyYj89OQ9JNNHmhGQ/5EGzAdmklJVVrnn0ByCJh/yqVPWzttIZ11TC5
+         qeR0lbr7D7Jk+2/Pd0HEw5bdSGN1oVtNtmaLqg/ObaqVT7yoqZGmE+mHWJ6dbtR+eiPa
+         gV+vAK5Mi7TQYdFfWObj+peRv1mGu7N2KjCjrb4jhEgFV0Xvv5dcK+T8XoMPQq4ug8pG
+         m/QxPNKDyeYbpf7CpbK9yrwLqA/v9c1t1+NCLgksYJ9jtsorxJzHIsccDNYwP4qKHGuR
+         3r5KRAyott8Jll5vdnFyaBoUm2cU0yiO61qHnweF3A6ci2LbKx+T8m2Q/ZHLBqGqjbFb
+         a4nw==
+X-Gm-Message-State: ANoB5pk0QILh2wu/urL4Buaq0vsle3D1hEmpl8FNQkjHRPgPBWvo/ShL
+	IttZhNdB4qSs4eUGr8T4Nnc9OcEtxsPnDP2QT1a5Dg==
+X-Google-Smtp-Source: AA0mqf7ZLFzH7tn8G3mgBGvDrhVn7KNrvvpffIzBOW371A0vYuDJaiDqvxR+ZPRcFAJZ2LX4aVuYJ3WS6sGEmfbkAcg=
+X-Received: by 2002:a81:148d:0:b0:36a:75b3:fdda with SMTP id
+ 135-20020a81148d000000b0036a75b3fddamr7388556ywu.168.1670608661842; Fri, 09
+ Dec 2022 09:57:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20221208193857.4090582-1-dmatlack@google.com> <20221208193857.4090582-2-dmatlack@google.com>
- <22fe2332-497e-fe30-0155-e026b0eded97@intel.com> <Y5NvYmxpy6BPkmpW@google.com>
-In-Reply-To: <Y5NvYmxpy6BPkmpW@google.com>
+References: <20221208193857.4090582-1-dmatlack@google.com> <20221208193857.4090582-24-dmatlack@google.com>
+ <Y5NxCYz9XV3hgGYX@google.com>
+In-Reply-To: <Y5NxCYz9XV3hgGYX@google.com>
 From: David Matlack <dmatlack@google.com>
-Date: Fri, 9 Dec 2022 09:40:48 -0800
-Message-ID: <CALzav=eju4LYyX=ufNneSww+5sraYJ8cfQSi4LTOHfHWmddX9A@mail.gmail.com>
-Subject: Re: [RFC PATCH 01/37] KVM: x86/mmu: Store the address space ID
- directly in kvm_mmu_page_role
+Date: Fri, 9 Dec 2022 09:57:15 -0800
+Message-ID: <CALzav=f-qDqJcvPEo1ZxxVizAE77crMFsbKUVif5B-mNgGEHyQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 23/37] KVM: MMU: Move VM-level TDP MMU state to struct kvm
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: "Yang, Weijiang" <weijiang.yang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, 
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Huacai Chen <chenhuacai@kernel.org>, 
 	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, 
 	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
 	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	"Christopherson,, Sean" <seanjc@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Anshuman Khandual <anshuman.khandual@arm.com>, "Amit, Nadav" <namit@vmware.com>, 
+	Sean Christopherson <seanjc@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Anshuman Khandual <anshuman.khandual@arm.com>, Nadav Amit <namit@vmware.com>, 
 	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Vlastimil Babka <vbabka@suse.cz>, 
 	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Suren Baghdasaryan <surenb@google.com>, 
 	Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
 	Yu Zhao <yuzhao@google.com>, Colin Cross <ccross@google.com>, Hugh Dickins <hughd@google.com>, 
 	Ben Gardon <bgardon@google.com>, Mingwei Zhang <mizhang@google.com>, 
 	Krish Sadhukhan <krish.sadhukhan@oracle.com>, Ricardo Koller <ricarkol@google.com>, 
-	Jing Zhang <jingzhangos@google.com>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, 
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>, 
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+	Jing Zhang <jingzhangos@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
+	linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221209174048.789IYtZ_mFe_NW-Qq0qtxjN3qZOpb831MCqQK4nVD1g@z>
+Message-ID: <20221209175715.qWKR1FFpgpA-kZqQZZxd_fcVwyfhF9ogxjUiySGRpDc@z>
 
-On Fri, Dec 9, 2022 at 9:25 AM Oliver Upton <oliver.upton@linux.dev> wrote:
+On Fri, Dec 9, 2022 at 9:32 AM Oliver Upton <oliver.upton@linux.dev> wrote:
 >
-> On Fri, Dec 09, 2022 at 10:37:47AM +0800, Yang, Weijiang wrote:
+> Hey David,
+>
+> On Thu, Dec 08, 2022 at 11:38:43AM -0800, David Matlack wrote:
+> > Move VM-level TDP MMU state to struct kvm so it can be accessed by
+> > common code in a future commit.
 > >
-> > On 12/9/2022 3:38 AM, David Matlack wrote:
-> > > Rename kvm_mmu_page_role.smm with kvm_mmu_page_role.as_id and use it
-> > > directly as the address space ID throughout the KVM MMU code. This
-> > > eliminates a needless level of indirection, kvm_mmu_role_as_id(), and
-> > > prepares for making kvm_mmu_page_role architecture-neutral.
-> > >
-> > > Signed-off-by: David Matlack <dmatlack@google.com>
-> > > ---
-> > >   arch/x86/include/asm/kvm_host.h |  4 ++--
-> > >   arch/x86/kvm/mmu/mmu.c          |  6 +++---
-> > >   arch/x86/kvm/mmu/mmu_internal.h | 10 ----------
-> > >   arch/x86/kvm/mmu/tdp_iter.c     |  2 +-
-> > >   arch/x86/kvm/mmu/tdp_mmu.c      | 12 ++++++------
-> > >   5 files changed, 12 insertions(+), 22 deletions(-)
-> > >
-> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > index aa4eb8cfcd7e..0a819d40131a 100644
-> > > --- a/arch/x86/include/asm/kvm_host.h
-> > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > @@ -348,7 +348,7 @@ union kvm_mmu_page_role {
-> > >              * simple shift.  While there is room, give it a whole
-> > >              * byte so it is also faster to load it from memory.
-> > >              */
-> > > -           unsigned smm:8;
-> > > +           unsigned as_id:8;
-> > >     };
-> > >   };
-> > > @@ -2056,7 +2056,7 @@ enum {
-> > >   # define __KVM_VCPU_MULTIPLE_ADDRESS_SPACE
-> > >   # define KVM_ADDRESS_SPACE_NUM 2
-> > >   # define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
-> > > -# define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).smm)
-> > > +# define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).as_id)
-> > >   #else
-> > >   # define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, 0)
-> > >   #endif
-> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index 4d188f056933..f375b719f565 100644
-> > > --- a/arch/x86/kvm/mmu/mmu.c
-> > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > @@ -5056,7 +5056,7 @@ kvm_calc_cpu_role(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
-> > >     union kvm_cpu_role role = {0};
-> > >     role.base.access = ACC_ALL;
-> > > -   role.base.smm = is_smm(vcpu);
-> > > +   role.base.as_id = is_smm(vcpu);
-> >
-> > I'm not familiar with other architectures, is there similar conception as
-> > x86 smm mode?
-
-The notion of address spaces is already existing architecture-neutral
-concept in KVM (e.g. see uses of KVM_ADDRESS_SPACE_NUM in
-virt/kvm/kvm_main.c), although SMM is the only use-case I'm aware of.
-Architectures that do not use multiple address spaces will just leave
-as_id is as always 0.
-
+> > No functional change intended.
 >
-> For KVM/arm64:
->
-> No, we don't do anything like SMM emulation on x86. Architecturally
-> speaking, though, we do have a higher level of privilege typically
-> used by firmware on arm64, called EL3.
->
-> I'll need to read David's series a bit more closely, but I'm inclined to
-> think that the page role is going to be rather arch-specific.
+> Could you instead introduce a structure to hold all of the MMU state and
+> stick that in struct kvm? If the goal is to eventually supersede all
+> uses of the arm64 pgtable library we are going to need the ability to
+> operate outside of a KVM VM context.
 
-Yes most of the fields are in the arch-specific sub-role. The TDP MMU
-only needs to know about the as_id, level, and invalid bits. (See next
-patch.)
+This patch does introduce a tdp_mmu struct to hold all of the TDP MMU
+state. Did you have something else in mind?
