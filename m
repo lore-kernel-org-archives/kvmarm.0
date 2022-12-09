@@ -1,55 +1,32 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from out-253.mta0.migadu.com (out-253.mta0.migadu.com [91.218.175.253])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E552A6D24
-	for <kvmarm@lists.linux.dev>; Fri,  9 Dec 2022 19:07:20 +0000 (UTC)
-Date: Fri, 9 Dec 2022 19:07:03 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953EA6D24
+	for <kvmarm@lists.linux.dev>; Fri,  9 Dec 2022 19:16:49 +0000 (UTC)
+Date: Fri, 9 Dec 2022 17:58:31 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1670612838;
+	t=1670608715;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oWmH4e1mGrQaOKoXcB+GepAJzEfWN1IWTXh/7cR74Ow=;
-	b=AswdAfd5Q+mOjP5g961Yuon0PbYZHfxSUDlGJ+/buNi7IHM9bd6ULaRiGOzBuN6ci0izSW
-	B5EIV4JzGif6x12auQAsZB3J+bcstx7A9s7T7t3T4uADc2KhM2k8w4j4zr2MLJSJNCfruM
-	B8PoL86EPm1zOzsehSZsoQ31jqDCN7U=
+	bh=IR+jrVVuE0jVnD3pXeex+chn1g7QgKrTqJIzEs1h2fU=;
+	b=XgcgOcm1DkOKZUjSCrn+qe9RWw0h2gVpf94YOFQK3dKy2YVyyw5mpkzzmrBhWvop6GONrw
+	DU3fcIitfN0dyWC+lATNByCy5EUv/Eud1jWUJOS6SI3hhsXCdsXazyAc7HNBjPmcqpWa4T
+	PYcbxNZR+B79FzdVQPOB5jYyuAqIYQU=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: David Matlack <dmatlack@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+To: James Clark <james.clark@arm.com>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Sean Christopherson <seanjc@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Nadav Amit <namit@vmware.com>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>,
-	Arnd Bergmann <arnd@arndb.de>, Yu Zhao <yuzhao@google.com>,
-	Colin Cross <ccross@google.com>, Hugh Dickins <hughd@google.com>,
-	Ben Gardon <bgardon@google.com>, Mingwei Zhang <mizhang@google.com>,
-	Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [RFC PATCH 00/37] KVM: Refactor the KVM/x86 TDP MMU into common
- code
-Message-ID: <Y5OHVzBSHPmAq2FO@google.com>
-References: <20221208193857.4090582-1-dmatlack@google.com>
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] KVM: arm64: PMU: Fix PMCR_EL0 reset value
+Message-ID: <Y5N3R+w3GF94hxHa@google.com>
+References: <20221209164446.1972014-1-james.clark@arm.com>
+ <20221209164446.1972014-2-james.clark@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,121 +35,51 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221208193857.4090582-1-dmatlack@google.com>
+In-Reply-To: <20221209164446.1972014-2-james.clark@arm.com>
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221209190703.JsT_RZZ077FhhFdmgGj8rL-zuSd9SjuEztBHMyYJ_qY@z>
+Message-ID: <20221209175831.JXiCRhohXYoq33Lt--p2DWUpU97NM8zGONs0vbwhRlk@z>
 
-On Thu, Dec 08, 2022 at 11:38:20AM -0800, David Matlack wrote:
-> [ mm folks: You are being cc'd since this series includes a mm patch
->   ("mm: Introduce architecture-neutral PG_LEVEL macros"), but general
->   feedback is also welcome. I imagine there are a lot of lessons KVM can
->   learn from mm about sharing page table code across architectures. ]
-> 
-> Hello,
-> 
-> This series refactors the KVM/x86 "TDP MMU" into common code. This is
-> the first step toward sharing TDP (aka Stage-2) page table management
-> code across architectures that support KVM. For more background on this
-> effort please see my talk from KVM Forum 2022 "Exploring an
-> architecture-neutral MMU":
-> 
->   https://youtu.be/IBhW34fCFi0
-> 
-> By the end of this series, 90% of the TDP MMU code is in common directories
-> (virt/kvm/mmu/ and include/kvm/). The only pieces that remaing in
-> arch/x86 are code that deals with constructing/inspecting/modifying PTEs
-> and arch hooks to implement NX Huge Pages (a mitigation for an
-> Intel-specific vulnerability).
-> 
-> Before:
-> 
->   180 arch/x86/kvm/mmu/tdp_iter.c
->   118 arch/x86/kvm/mmu/tdp_iter.h
->  1917 arch/x86/kvm/mmu/tdp_mmu.c
->    98 arch/x86/kvm/mmu/tdp_mmu.h
->  ----
->  2313 total
-> 
-> After:
-> 
->   178 virt/kvm/mmu/tdp_iter.c
->  1867 virt/kvm/mmu/tdp_mmu.c
->   117 include/kvm/tdp_iter.h
->    78 include/kvm/tdp_mmu.h
->    39 include/kvm/tdp_pgtable.h
->  ----
->   184 arch/x86/kvm/mmu/tdp_pgtable.c
->    76 arch/x86/include/asm/kvm/tdp_pgtable.h
->  ----
->  2539 total
-> 
-> This series is very much an RFC, but it does build (I tested x86_64 and
-> ARM64) and pass basic testing (KVM selftests and kvm-unit-tests on
-> x86_64), so it is entirely functional aside from any bugs.
-> 
-> The main areas I would like feedback are:
-> 
->  - NX Huge Pages support in the TDP MMU requires 5 arch hooks in
->    the common code, which IMO makes the NX Huge Pages implementation
->    harder to read. The alternative is to move the NX Huge Pages
->    implementation into common code, including the fields in struct
->    kvm_mmu_page and kvm_page_fault, which would increase memory usage
->    a tiny bit (for non-x86 architectures) and pollute the common code
->    with an x86-specific security mitigation. Ideas on better ways to
->    handle this would be appreciated.
-> 
->  - struct kvm_mmu_page increased by 64 bytes because the separation of
->    arch and common state eliminated the ability to use unions to
->    optimize the size of the struct. There's two things we can do to
->    reduce the size of the struct back down: (1) dynamically allocated
->    root-specific fields only for root page tables and (2) dynamically
->    allocate Shadow MMU state in kvm_mmu_page_arch only for Shadow MMU
->    pages. This should actually be a net *reduction* the size of
->    kvm_mmu_page relative today for most pages, but I have not
->    implemented it.
-> 
->    Note that an alternative approach I implemented avoided this problem
->    by creating an entirely separate struct for the common TDP MMU (e.g.
->    struct tdp_mmu_page). This however had a lot of downsides that I
->    don't think make it a good solution. Notably, it complicated a ton of
->    existing code in arch/x86/kvm/mmu/mmu.c (e.g. anything that touches
->    vcpu->arch.mmu->root and kvm_recover_nx_huge_pages()) and created a
->    new runtime failure mode in to_shadow_page().
-> 
->  - Naming. This series does not change the names of any existing code.
->    So all the KVM/x86 Shadow MMU-style terminology like
->    "shadow_page"/"sp"/"spte" persists. Should we keep that style in
->    common code or move toward something less shadow-paging-specific?
->    e.g. "page_table"/"pt"/"pte".
+On Fri, Dec 09, 2022 at 04:44:46PM +0000, James Clark wrote:
+> ARMV8_PMU_PMCR_N_MASK is an unshifted value which results in the wrong
+> reset value for PMCR_EL0, so shift it to fix it.
 
-I would strongly be in favor of discarding the shadow paging residue if
-x86 folks are willing to part ways with it :)
+That's just mean. *_MASK tends to be a shifted mask, although it would
+appear that asm/perf_event.h does not follow this convention. Fixing
+that would be nice (as I'm sure somebody else will get burned by this),
+but for the sake of an immediate fix:
 
->    Also do we want to keep "TDP" or switch
->    to something more familiar across architectures (e.g. ARM and RISC-V
->    both use "Stage-2")?
+> This fixes the following error when running qemu:
+> 
+>   $ qemu-system-aarch64 -cpu host -machine type=virt,accel=kvm -kernel ...
+> 
+>   target/arm/helper.c:1813: pmevcntr_rawwrite: Assertion `counter < pmu_num_counters(env)' failed.
+> 
+> Fixes: 292e8f149476 ("KVM: arm64: PMU: Simplify PMCR_EL0 reset handling")
+> Signed-off-by: James Clark <james.clark@arm.com>
 
-As it relates to guest memory management I don't see much of an issue
-with it, TBH. It is sufficiently arch-generic and gets the point across.
-
-Beyond that I think it really depends on the scope of the common code.
-
-To replace the arm64 table walkers we will need to use it for stage-1
-tables. I'm only hand-waving at the cover letter and need to do more
-reading, but is it possible to accomplish some division:
-
- - A set of generic table walkers that implement common operations, like
-   map and unmap. Names and types at this layer wouldn't be
-   virt-specific.
-
- - Memory management for KVM guests that uses the table walker library,
-   which we can probably still call the TDP MMU.
-
-Certainly this doesn't need to be addressed in the first series, as the x86
-surgery is enough on its own. Nonetheless, it is probably worthwhile to
-get the conversation started about how this code can actually be used by
-the other arches.
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
 --
 Thanks,
 Oliver
+
+> ---
+>  arch/arm64/kvm/sys_regs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index d5ee52d6bf73..c6cbfe6b854b 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -646,7 +646,7 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>  		return;
+>  
+>  	/* Only preserve PMCR_EL0.N, and reset the rest to 0 */
+> -	pmcr = read_sysreg(pmcr_el0) & ARMV8_PMU_PMCR_N_MASK;
+> +	pmcr = read_sysreg(pmcr_el0) & (ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
+>  	if (!kvm_supports_32bit_el0())
+>  		pmcr |= ARMV8_PMU_PMCR_LC;
+>  
+> -- 
+> 2.25.1
+> 
