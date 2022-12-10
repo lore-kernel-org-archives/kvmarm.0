@@ -1,143 +1,123 @@
-Received: from out-8.mta0.migadu.com (out-8.mta0.migadu.com [91.218.175.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AAC93214
-	for <kvmarm@lists.linux.dev>; Fri,  9 Dec 2022 22:12:05 +0000 (UTC)
-Date: Fri, 9 Dec 2022 21:35:25 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1670621730;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=agoBlhJw/+KDy0+W1zZ2GK62ctFzKYI+xFVcrAtjBk8=;
-	b=NS3bk9bTW9yLMUQP30XiRdXGlm8TEp49GntXjwxUVIVsQeD+1YLPL1WSTesnsFRMj2C5eZ
-	W73BsYN6UvL8vHW74CeWdogfHe73GQIRS/cPcBODhsokqQ0TuoGYty61NU5wXaoRkdTPkn
-	xxWmMg1XF3PjR6O8sxtFMuAkKAxtZZY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Peter Gonda <pgonda@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Ricardo Koller <ricarkol@google.com>,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 7/7] KVM: selftests: Avoid infinite loop if
- ucall_alloc() fails
-Message-ID: <Y5OqHUxCblbiysuo@google.com>
-References: <20221209015307.1781352-1-oliver.upton@linux.dev>
- <20221209015307.1781352-8-oliver.upton@linux.dev>
- <Y5OisdH5ohtr6r3j@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C715363
+	for <kvmarm@lists.linux.dev>; Sat, 10 Dec 2022 01:07:45 +0000 (UTC)
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-3b56782b3f6so73231287b3.13
+        for <kvmarm@lists.linux.dev>; Fri, 09 Dec 2022 17:07:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=I2GE1P9MKB5IEXA78EjWjeGIw+fkI4b001mr77BECX4=;
+        b=Zz3MbiPPY1SHgc009qCyxMWHtFmspb6G3A0xzYMbttsp31nw0tSX4tppfrsPzNCIF6
+         D7iZa+LTmezBYiYDtrAmYb1oC/fxxbCFXDl2x8spANHzzlsqXtea4DYwT5ZwgelbohYZ
+         089wInVCX/E1aq3PKr5hxN9tOHp0A9lXSiHrUb2tvZFE38B1gNZClvkVFMpcr2O4jVlr
+         9bJlXy7+oFG62lvofRFDdTYYtZ7NVMOdXK6E5CeH1XdzyTgiFtvIInk1zIkAc8vPoxQI
+         9f4u+ARi+JH2GcPIweLO4Jw0BwgiylZumo9BqAOOnhTCwihz86Bnx7mwqeF8hZA9e/Yn
+         C+tQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I2GE1P9MKB5IEXA78EjWjeGIw+fkI4b001mr77BECX4=;
+        b=MMwSTY+K5YRoErDRTONyKhheeH0Pv70/q0k0VIIV6+tz1FN3awEcx+QwDidv78trzr
+         cetIUs5xqcOsxkpvaTaiAPt+TW6t1QgeVO7Sj9TlUCKJMVEe54h5BtpUQ7KXfQbWwRmA
+         z7JcZllKhTr4XMoLRDMBe56l9VJdonZHyto5zjlgdk94kNkoMGfBb2bZeIdDtw/MGK6y
+         hy2BnJ1WA1OFC6DDPASARmGel5kKyc9dRJpFGdJFUNNUQk+9ypWBbHnbO8KpoP+PNVPu
+         C05BNoEtqfb5dWHF9F6d4GGhY6EydabvRzkOQOFKGr1BsP2uAlsu/eVaEbgb0ZxCkkdm
+         /2bQ==
+X-Gm-Message-State: ANoB5pnJhS1oSONvvaEkyHTsBqGQLOo0FsrzS/pnKE7Pf5ixfVhaDI6W
+	Ol+9Hv2m72To2vHrem4hNbfF15+r0Xy+Th6zPUsSUA==
+X-Google-Smtp-Source: AA0mqf7NPTsewklw8WtJjMQ5b4Z4DLLXvnPd6MTLSGVUxVce2NMxMIFrAkSkhyQdcwqQG9PUK7aUBAXAR0abljqhaUo=
+X-Received: by 2002:a81:1401:0:b0:3b0:b9aa:46eb with SMTP id
+ 1-20020a811401000000b003b0b9aa46ebmr2248873ywu.150.1670634464404; Fri, 09 Dec
+ 2022 17:07:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y5OisdH5ohtr6r3j@google.com>
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221209213525.TX0NMOGXZMu-EDdDtGP1nJ6Q_n4Yi1Dq7zWLN2Z99zM@z>
+References: <20221208193857.4090582-1-dmatlack@google.com> <Y5OHVzBSHPmAq2FO@google.com>
+In-Reply-To: <Y5OHVzBSHPmAq2FO@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Fri, 9 Dec 2022 17:07:18 -0800
+Message-ID: <CALzav=c328M1jgApAEEnz5B6h_pr5w07VpcMx0kSg0MtJjAf2w@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/37] KVM: Refactor the KVM/x86 TDP MMU into common code
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Sean Christopherson <seanjc@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Anshuman Khandual <anshuman.khandual@arm.com>, Nadav Amit <namit@vmware.com>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Vlastimil Babka <vbabka@suse.cz>, 
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Suren Baghdasaryan <surenb@google.com>, 
+	Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Yu Zhao <yuzhao@google.com>, Colin Cross <ccross@google.com>, Hugh Dickins <hughd@google.com>, 
+	Ben Gardon <bgardon@google.com>, Mingwei Zhang <mizhang@google.com>, 
+	Krish Sadhukhan <krish.sadhukhan@oracle.com>, Ricardo Koller <ricarkol@google.com>, 
+	Jing Zhang <jingzhangos@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
+	linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20221210010718.XLA9Jka0Rwj2qqqKgvTPStnzMwNBKchq4kTVZNVY6y0@z>
 
-On Fri, Dec 09, 2022 at 09:03:45PM +0000, Sean Christopherson wrote:
+On Fri, Dec 9, 2022 at 11:07 AM Oliver Upton <oliver.upton@linux.dev> wrote:
+>
+> On Thu, Dec 08, 2022 at 11:38:20AM -0800, David Matlack wrote:
+>
+> >    Also do we want to keep "TDP" or switch
+> >    to something more familiar across architectures (e.g. ARM and RISC-V
+> >    both use "Stage-2")?
+>
+> As it relates to guest memory management I don't see much of an issue
+> with it, TBH. It is sufficiently arch-generic and gets the point across.
+>
+> Beyond that I think it really depends on the scope of the common code.
+>
+> To replace the arm64 table walkers we will need to use it for stage-1
+> tables.
 
-[...]
+Speaking of, have ARM folks ever discussed deduplicating the KVM/ARM
+stage-1 code with the Linux stage-1 table code (<linux/pgtable.h>),
+which is already architecture-neutral? It seems backwards for us to
+build out an architecture-neutral stage-1 walker in KVM when one
+already exists.
 
-> > -	GUEST_ASSERT(0);
-> > +out:
-> > +	/*
-> > +	 * If the guest cannot grab a ucall structure from the pool then the
-> > +	 * only option to get out to userspace is a bare ucall. This is probably
-> > +	 * a good time to mention that guest assertions depend on ucalls with
-> > +	 * arguments too.
-> > +	 */
-> > +	GUEST_UCALL_NONE();
-> 
-> UCALL_NONE isn't much better than infinite stack recursion, e.g. a test might end
-> up passing by dumb luck, or go in the wrong direction because it sometimes handles
-> UCALL_NONE.
+For example, arch/arm64/kvm/mmu.c:get_user_mapping_size() looks like
+it could be reimplemented using <linux/pgtable.h>, rather than using
+KVM code. In fact that's what we do for walking stage-1 page tables in
+KVM/x86. Take a look at
+arch/x86/kvm/mmu/mmu.c:host_pfn_mapping_level(). I bet we could move
+that somewhere in mm/ so that it could be shared across KVM/x86 and
+KVM/ARM.
 
-Oh, I was just seeking an end to my misery. Yeah, we can use a magic
-value to signal this instead.
+> I'm only hand-waving at the cover letter and need to do more
+> reading, but is it possible to accomplish some division:
+>
+>  - A set of generic table walkers that implement common operations, like
+>    map and unmap. Names and types at this layer wouldn't be
+>    virt-specific.
+>
+>  - Memory management for KVM guests that uses the table walker library,
+>    which we can probably still call the TDP MMU.
+>
+> Certainly this doesn't need to be addressed in the first series, as the x86
+> surgery is enough on its own. Nonetheless, it is probably worthwhile to
+> get the conversation started about how this code can actually be used by
+> the other arches.
 
-> How about this?
-
-LGTM.
-
---
-Thanks,
-Oliver
-
-> From: Sean Christopherson <seanjc@google.com>
-> Date: Fri, 9 Dec 2022 12:55:44 -0800
-> Subject: [PATCH] KVM: selftests: Use magic value to signal ucall_alloc()
->  failure
-> 
-> Use a magic value to signal a ucall_alloc() failure instead of simply
-> doing GUEST_ASSERT().  GUEST_ASSERT() relies on ucall_alloc() and so a
-> failure puts the guest into an infinite loop.
-> 
-> Use -1 as the magic value, as a real ucall struct should never wrap.
-> 
-> Reported-by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  tools/testing/selftests/kvm/lib/ucall_common.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
-> index 0cc0971ce60e..2f0e2ea941cc 100644
-> --- a/tools/testing/selftests/kvm/lib/ucall_common.c
-> +++ b/tools/testing/selftests/kvm/lib/ucall_common.c
-> @@ -4,6 +4,8 @@
->  #include "linux/bitmap.h"
->  #include "linux/atomic.h"
->  
-> +#define GUEST_UCALL_FAILED -1
-> +
->  struct ucall_header {
->  	DECLARE_BITMAP(in_use, KVM_MAX_VCPUS);
->  	struct ucall ucalls[KVM_MAX_VCPUS];
-> @@ -41,7 +43,8 @@ static struct ucall *ucall_alloc(void)
->  	struct ucall *uc;
->  	int i;
->  
-> -	GUEST_ASSERT(ucall_pool);
-> +	if (!ucall_pool)
-> +		goto ucall_failed;
->  
->  	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
->  		if (!test_and_set_bit(i, ucall_pool->in_use)) {
-> @@ -51,7 +54,13 @@ static struct ucall *ucall_alloc(void)
->  		}
->  	}
->  
-> -	GUEST_ASSERT(0);
-> +ucall_failed:
-> +	/*
-> +	 * If the vCPU cannot grab a ucall structure, make a bare ucall with a
-> +	 * magic value to signal to get_ucall() that things went sideways.
-> +	 * GUEST_ASSERT() depends on ucall_alloc() and so cannot be used here.
-> +	 */
-> +	ucall_arch_do_ucall(GUEST_UCALL_FAILED);
->  	return NULL;
->  }
->  
-> @@ -93,6 +102,9 @@ uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
->  
->  	addr = ucall_arch_get_ucall(vcpu);
->  	if (addr) {
-> +		TEST_ASSERT(addr != (void *)GUEST_UCALL_FAILED,
-> +			    "Guest failed to allocate ucall struct");
-> +
->  		memcpy(uc, addr, sizeof(*uc));
->  		vcpu_run_complete_io(vcpu);
->  	} else {
-> 
-> base-commit: dc2efbe4813e0dc4368779bc36c5f0e636cb8eb2
-> -- 
-> 
+Yup, we'll need some sort of split like that in order to integrate
+with KVM/ARM, since the hyp can't access struct kvm, work_queues, etc.
+in tdp_mmu.c. I don't think we'll need that split for KVM/RISC-V
+though. So for the sake of incremental progress I'm not planning on
+doing any of that refactoring preemptively. Plus it should be possible
+to keep the TDP MMU API constant when the internal implementation
+eventually gets split up. i.e. I don't forsee it creating a bunch of
+churn down the road.
