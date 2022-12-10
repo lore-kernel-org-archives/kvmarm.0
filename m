@@ -2,91 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87B3AC4332F
-	for <kvmarm@archiver.kernel.org>; Sat, 10 Dec 2022 01:07:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE6F9C4332F
+	for <kvmarm@archiver.kernel.org>; Sat, 10 Dec 2022 11:03:42 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 043FD4B8D3;
-	Fri,  9 Dec 2022 20:07:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 276F24BA0F;
+	Sat, 10 Dec 2022 06:03:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 27R5acJBefF5; Fri,  9 Dec 2022 20:07:47 -0500 (EST)
+	with ESMTP id kVKOh6ZuFAM5; Sat, 10 Dec 2022 06:03:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9DA04B8D2;
-	Fri,  9 Dec 2022 20:07:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D51704B9D3;
+	Sat, 10 Dec 2022 06:03:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 579624B8D2
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2022 20:07:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 60B6C4B8AE
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Dec 2022 06:03:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wpXXeQHQO+0P for <kvmarm@lists.cs.columbia.edu>;
- Fri,  9 Dec 2022 20:07:45 -0500 (EST)
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com
- [209.85.128.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 228434B845
- for <kvmarm@lists.cs.columbia.edu>; Fri,  9 Dec 2022 20:07:45 -0500 (EST)
-Received: by mail-yw1-f181.google.com with SMTP id
- 00721157ae682-3b10392c064so73967407b3.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 09 Dec 2022 17:07:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:from:to:cc:subject:date:message-id:reply-to;
- bh=I2GE1P9MKB5IEXA78EjWjeGIw+fkI4b001mr77BECX4=;
- b=Zz3MbiPPY1SHgc009qCyxMWHtFmspb6G3A0xzYMbttsp31nw0tSX4tppfrsPzNCIF6
- D7iZa+LTmezBYiYDtrAmYb1oC/fxxbCFXDl2x8spANHzzlsqXtea4DYwT5ZwgelbohYZ
- 089wInVCX/E1aq3PKr5hxN9tOHp0A9lXSiHrUb2tvZFE38B1gNZClvkVFMpcr2O4jVlr
- 9bJlXy7+oFG62lvofRFDdTYYtZ7NVMOdXK6E5CeH1XdzyTgiFtvIInk1zIkAc8vPoxQI
- 9f4u+ARi+JH2GcPIweLO4Jw0BwgiylZumo9BqAOOnhTCwihz86Bnx7mwqeF8hZA9e/Yn
- C+tQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
- :reply-to;
- bh=I2GE1P9MKB5IEXA78EjWjeGIw+fkI4b001mr77BECX4=;
- b=ZQzMZ0pofmJGYR4L8HMbBcE+QH0LXPihVPOqfVZRWcShBiQrdPxNLhVedponTJbSk/
- AWUyN46pDsyiu+rWGKyAXx5otYX9FsCH/xkLYwo0/C2AbdJklAJ+oE96wfE1DPbMnmHc
- uPH/w9W3R6jnKeJMPorlKSDg20W6HU4b4nFfsw7eY7Pj+29mKjixrQXgusFyCK1vkQu0
- yrdm0t6Tw0mE1Vve67xoqs0rSWIKa9tbHlwNRon3SGPMiCRr44tci8IR4hFwRHnTUvfH
- VL9DMZabUgyurZS41OOXgkdq534TbLtAfpjw9+MVo+xP19HpxhkOgmmUmBbJE66q1L5z
- UdfA==
-X-Gm-Message-State: ANoB5plKbwXZQlwunTrNTf0efX/nQdUfNjoE2XpTB2u5dv5ljkzOxRA6
- uFj4p2rhOus76h0TzRL/Zaf6hacukAIsTXeUHhJusQ==
-X-Google-Smtp-Source: AA0mqf7NPTsewklw8WtJjMQ5b4Z4DLLXvnPd6MTLSGVUxVce2NMxMIFrAkSkhyQdcwqQG9PUK7aUBAXAR0abljqhaUo=
-X-Received: by 2002:a81:1401:0:b0:3b0:b9aa:46eb with SMTP id
- 1-20020a811401000000b003b0b9aa46ebmr2248873ywu.150.1670634464404; Fri, 09 Dec
- 2022 17:07:44 -0800 (PST)
-MIME-Version: 1.0
-References: <20221208193857.4090582-1-dmatlack@google.com>
- <Y5OHVzBSHPmAq2FO@google.com>
-In-Reply-To: <Y5OHVzBSHPmAq2FO@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Fri, 9 Dec 2022 17:07:18 -0800
-Message-ID: <CALzav=c328M1jgApAEEnz5B6h_pr5w07VpcMx0kSg0MtJjAf2w@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/37] KVM: Refactor the KVM/x86 TDP MMU into common
- code
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
- Hugh Dickins <hughd@google.com>, Paul Walmsley <paul.walmsley@sifive.com>,
- Nadav Amit <namit@vmware.com>, Ben Gardon <bgardon@google.com>,
- linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- Yu Zhao <yuzhao@google.com>, xu xin <cgel.zte@gmail.com>,
- Huacai Chen <chenhuacai@kernel.org>,
- "Matthew Wilcox \(Oracle\)" <willy@infradead.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Krish Sadhukhan <krish.sadhukhan@oracle.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Mingwei Zhang <mizhang@google.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Arnd Bergmann <arnd@arndb.de>,
- "Liam R. Howlett" <Liam.Howlett@oracle.com>, kvm@vger.kernel.org,
- Atish Patra <atishp@atishpatra.org>, kvmarm@lists.linux.dev,
- Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
- linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
- Colin Cross <ccross@google.com>, kvm-riscv@lists.infradead.org,
- Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>
+ with ESMTP id vwhx7+cw6fa2 for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 10 Dec 2022 06:03:39 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 26B284B89D
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Dec 2022 06:03:39 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id AF5FD60B2B;
+ Sat, 10 Dec 2022 11:03:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E593C433D2;
+ Sat, 10 Dec 2022 11:03:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1670670217;
+ bh=Oc6bgUBpCXSzLCNc1FFwEecQeeVQ0ev/WIiBfYnZUmE=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=d4YOgDkygnkwA+JkltLVbXRWGG7Y/ekq494XE1Hafajd2M5iiSwasVGLwuJTMPENK
+ 0lMsBntsjFoDfVcg7gO6tvMTTfEU6jTjbajTzgHXq3/Q7lhGVAC6D0Z9uTvqaVvHJ8
+ +6+hae5B2UEZKEmPgYZq9802LC0rvg3kfmMaaOMl3PsyQpL8Q4NgMvDC6TzegVmuAp
+ gVdjucCD4CCZSfdFjPB4DtrAfxqcZ7gvo/p4pWsqnnecWbm/TcbBS8Ify17/Ot8efd
+ wvZW/Khq/DvRtlYdcHxTG8BQtaZg1y0GTzTXtgdcDwZj0M0VNEhuKR/A6OHqEzNSZT
+ 5kGmHaVb/Zqmg==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1p3xdm-00BlH2-QC;
+ Sat, 10 Dec 2022 11:03:34 +0000
+Date: Sat, 10 Dec 2022 11:01:53 +0000
+Message-ID: <87fsdnfroe.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [kvm-unit-tests PATCH 1/3] arm: pmu: Fix overflow checks for
+ PMUv3p5 long counters
+In-Reply-To: <Y5N0os7zL/BaMBa3@monolith.localdoman>
+References: <20221202045527.3646838-1-ricarkol@google.com>	<20221202045527.3646838-2-ricarkol@google.com>	<Y5N0os7zL/BaMBa3@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, ricarkol@google.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
+ eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, andrew.jones@linux.dev, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,59 +86,104 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Dec 9, 2022 at 11:07 AM Oliver Upton <oliver.upton@linux.dev> wrote:
->
-> On Thu, Dec 08, 2022 at 11:38:20AM -0800, David Matlack wrote:
->
-> >    Also do we want to keep "TDP" or switch
-> >    to something more familiar across architectures (e.g. ARM and RISC-V
-> >    both use "Stage-2")?
->
-> As it relates to guest memory management I don't see much of an issue
-> with it, TBH. It is sufficiently arch-generic and gets the point across.
->
-> Beyond that I think it really depends on the scope of the common code.
->
-> To replace the arm64 table walkers we will need to use it for stage-1
-> tables.
+On Fri, 09 Dec 2022 17:47:14 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi,
+> 
+> On Fri, Dec 02, 2022 at 04:55:25AM +0000, Ricardo Koller wrote:
+> > PMUv3p5 uses 64-bit counters irrespective of whether the PMU is configured
+> > for overflowing at 32 or 64-bits. The consequence is that tests that check
+> > the counter values after overflowing should not assume that values will be
+> > wrapped around 32-bits: they overflow into the other half of the 64-bit
+> > counters on PMUv3p5.
+> > 
+> > Fix tests by correctly checking overflowing-counters against the expected
+> > 64-bit value.
+> > 
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > ---
+> >  arm/pmu.c | 29 ++++++++++++++++++-----------
+> >  1 file changed, 18 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/arm/pmu.c b/arm/pmu.c
+> > index cd47b14..eeac984 100644
+> > --- a/arm/pmu.c
+> > +++ b/arm/pmu.c
+> > @@ -54,10 +54,10 @@
+> >  #define EXT_COMMON_EVENTS_LOW	0x4000
+> >  #define EXT_COMMON_EVENTS_HIGH	0x403F
+> >  
+> > -#define ALL_SET			0xFFFFFFFF
+> > -#define ALL_CLEAR		0x0
+> > -#define PRE_OVERFLOW		0xFFFFFFF0
+> > -#define PRE_OVERFLOW2		0xFFFFFFDC
+> > +#define ALL_SET			0x00000000FFFFFFFFULL
+> > +#define ALL_CLEAR		0x0000000000000000ULL
+> > +#define PRE_OVERFLOW		0x00000000FFFFFFF0ULL
+> > +#define PRE_OVERFLOW2		0x00000000FFFFFFDCULL
+> >  
+> >  #define PMU_PPI			23
+> >  
+> > @@ -538,6 +538,7 @@ static void test_mem_access(void)
+> >  static void test_sw_incr(void)
+> >  {
+> >  	uint32_t events[] = {SW_INCR, SW_INCR};
+> > +	uint64_t cntr0;
+> >  	int i;
+> >  
+> >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> > @@ -572,9 +573,9 @@ static void test_sw_incr(void)
+> >  		write_sysreg(0x3, pmswinc_el0);
+> >  
+> >  	isb();
+> > -	report(read_regn_el0(pmevcntr, 0)  == 84, "counter #1 after + 100 SW_INCR");
+> > -	report(read_regn_el0(pmevcntr, 1)  == 100,
+> > -		"counter #0 after + 100 SW_INCR");
+> > +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
+> 
+> Hm... in the Arm ARM it says that counters are 64-bit if PMUv3p5 is
+> implemented.  But it doesn't say anywhere that versions newer than p5 are
+> required to implement PMUv3p5.
 
-Speaking of, have ARM folks ever discussed deduplicating the KVM/ARM
-stage-1 code with the Linux stage-1 table code (<linux/pgtable.h>),
-which is already architecture-neutral? It seems backwards for us to
-build out an architecture-neutral stage-1 walker in KVM when one
-already exists.
+And I don't think it needs to say it, because there is otherwise no
+way for SW to discover whether 64bit counters are implemented or not.
 
-For example, arch/arm64/kvm/mmu.c:get_user_mapping_size() looks like
-it could be reimplemented using <linux/pgtable.h>, rather than using
-KVM code. In fact that's what we do for walking stage-1 page tables in
-KVM/x86. Take a look at
-arch/x86/kvm/mmu/mmu.c:host_pfn_mapping_level(). I bet we could move
-that somewhere in mm/ so that it could be shared across KVM/x86 and
-KVM/ARM.
+> 
+> For example, for PMUv3p7, it says that the feature is mandatory in Arm8.7
+> implementations. My interpretation of that is that it is not forbidden for
+> an implementer to cherry-pick this version on older versions of the
+> architecture where PMUv3p5 is not implemented.
 
-> I'm only hand-waving at the cover letter and need to do more
-> reading, but is it possible to accomplish some division:
->
->  - A set of generic table walkers that implement common operations, like
->    map and unmap. Names and types at this layer wouldn't be
->    virt-specific.
->
->  - Memory management for KVM guests that uses the table walker library,
->    which we can probably still call the TDP MMU.
->
-> Certainly this doesn't need to be addressed in the first series, as the x86
-> surgery is enough on its own. Nonetheless, it is probably worthwhile to
-> get the conversation started about how this code can actually be used by
-> the other arches.
+I'm sorry to have to say that, but I find your suggestion that PMUv3p7
+could be implemented without supporting the full gamut of PMUv3p5
+ludicrous.
 
-Yup, we'll need some sort of split like that in order to integrate
-with KVM/ARM, since the hyp can't access struct kvm, work_queues, etc.
-in tdp_mmu.c. I don't think we'll need that split for KVM/RISC-V
-though. So for the sake of incremental progress I'm not planning on
-doing any of that refactoring preemptively. Plus it should be possible
-to keep the TDP MMU API constant when the internal implementation
-eventually gets split up. i.e. I don't forsee it creating a bunch of
-churn down the road.
+Please look back at the ARM ARM, specially at the tiny section titled
+"Alternative ID scheme used for the Performance Monitors Extension
+version" (DDI0487I.a, D17.1.3, page 5553), and the snipped of C code
+that performs exactly this check:
+
+<quote>
+  if (value != 0xF and value >= number) {
+  	// do something that relies on version 'number' of the feature
+  }
+</quote>
+
+Replace 'value' with 7 (PMUv3p7), 'number' with 6 (PMUv3p5), and you
+get the exact property that you pretend doesn't exist, allowing you to
+rely on PMUv3p5 to be implemented when the HW has PMUv3p7.
+
+> Maybe the check should be pmu.version == ID_DFR0_PMU_V3_8_5, to match the
+> counter definitions in the architecture?
+
+No, that'd be totally wrong. You need to check your understanding of
+how the ID registers work.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
