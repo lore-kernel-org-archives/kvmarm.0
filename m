@@ -2,74 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE6F9C4332F
-	for <kvmarm@archiver.kernel.org>; Sat, 10 Dec 2022 11:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15BB7C4332F
+	for <kvmarm@archiver.kernel.org>; Sat, 10 Dec 2022 11:18:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 276F24BA0F;
-	Sat, 10 Dec 2022 06:03:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A1FC4BA20;
+	Sat, 10 Dec 2022 06:18:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kVKOh6ZuFAM5; Sat, 10 Dec 2022 06:03:40 -0500 (EST)
+	with ESMTP id 4G+bTvYobPIN; Sat, 10 Dec 2022 06:18:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D51704B9D3;
-	Sat, 10 Dec 2022 06:03:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CBCA4BA17;
+	Sat, 10 Dec 2022 06:18:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 60B6C4B8AE
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Dec 2022 06:03:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 884774BA17
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Dec 2022 06:18:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vwhx7+cw6fa2 for <kvmarm@lists.cs.columbia.edu>;
- Sat, 10 Dec 2022 06:03:39 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 26B284B89D
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Dec 2022 06:03:39 -0500 (EST)
+ with ESMTP id xJhV-eM8-ti8 for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 10 Dec 2022 06:18:19 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6BB994B896
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Dec 2022 06:18:19 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id AF5FD60B2B;
- Sat, 10 Dec 2022 11:03:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E593C433D2;
- Sat, 10 Dec 2022 11:03:37 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 12D31B829A6;
+ Sat, 10 Dec 2022 11:18:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A00BDC433D2;
+ Sat, 10 Dec 2022 11:18:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1670670217;
- bh=Oc6bgUBpCXSzLCNc1FFwEecQeeVQ0ev/WIiBfYnZUmE=;
+ s=k20201202; t=1670671096;
+ bh=2ol2CYikgIYVfVb+OZiZSB+xwMyqaLEDiIfsEIqMMHk=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=d4YOgDkygnkwA+JkltLVbXRWGG7Y/ekq494XE1Hafajd2M5iiSwasVGLwuJTMPENK
- 0lMsBntsjFoDfVcg7gO6tvMTTfEU6jTjbajTzgHXq3/Q7lhGVAC6D0Z9uTvqaVvHJ8
- +6+hae5B2UEZKEmPgYZq9802LC0rvg3kfmMaaOMl3PsyQpL8Q4NgMvDC6TzegVmuAp
- gVdjucCD4CCZSfdFjPB4DtrAfxqcZ7gvo/p4pWsqnnecWbm/TcbBS8Ify17/Ot8efd
- wvZW/Khq/DvRtlYdcHxTG8BQtaZg1y0GTzTXtgdcDwZj0M0VNEhuKR/A6OHqEzNSZT
- 5kGmHaVb/Zqmg==
+ b=IRXwJzG5tMMKaadAVZ+PcfLGh9BTuFHJX08H6Sc6kTynyxsZOMM8gw8o8kpOlLYAj
+ F1TkATzT9Jrv2AKL28Cnm+dvydIYU3RONnQ78BmIF6Mq03PpSpyKBz4qsZasO45Yo7
+ nSq5R3vNDfBybRW+arijzqeplXYbj/E1RCn9lIOjMnjkdpx7Ybt2ELEAHsBhj3EaBZ
+ GB+zNQ5a4/PovtZIvbHpHhjADiuELKffmgv7VwmrPNYxuj5iErELcWDtwy2HAgfzwo
+ OsYZCGfxebtYlG1yohwGwzDG1YeC6YypJHdPgNYPD3JIIc8Y04F/aahYlBf1Hw289z
+ ncclXffxQxU2g==
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1p3xdm-00BlH2-QC;
- Sat, 10 Dec 2022 11:03:34 +0000
-Date: Sat, 10 Dec 2022 11:01:53 +0000
-Message-ID: <87fsdnfroe.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1p3xry-00BlMm-B4;
+ Sat, 10 Dec 2022 11:18:14 +0000
+Date: Sat, 10 Dec 2022 11:16:37 +0000
+Message-ID: <87edt7fqzu.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH 1/3] arm: pmu: Fix overflow checks for
- PMUv3p5 long counters
-In-Reply-To: <Y5N0os7zL/BaMBa3@monolith.localdoman>
-References: <20221202045527.3646838-1-ricarkol@google.com>	<20221202045527.3646838-2-ricarkol@google.com>	<Y5N0os7zL/BaMBa3@monolith.localdoman>
+To: James Clark <james.clark@arm.com>, Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 1/1] KVM: arm64: PMU: Fix PMCR_EL0 reset value
+In-Reply-To: <Y5N3R+w3GF94hxHa@google.com>
+References: <20221209164446.1972014-1-james.clark@arm.com>
+ <20221209164446.1972014-2-james.clark@arm.com>
+ <Y5N3R+w3GF94hxHa@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, ricarkol@google.com,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
- eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+X-SA-Exim-Rcpt-To: james.clark@arm.com, oliver.upton@linux.dev,
+ kvmarm@lists.linux.dev, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, andrew.jones@linux.dev, kvmarm@lists.cs.columbia.edu
+Cc: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,99 +91,34 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 09 Dec 2022 17:47:14 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Fri, 09 Dec 2022 17:58:31 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Hi,
+> On Fri, Dec 09, 2022 at 04:44:46PM +0000, James Clark wrote:
+> > ARMV8_PMU_PMCR_N_MASK is an unshifted value which results in the wrong
+> > reset value for PMCR_EL0, so shift it to fix it.
 > 
-> On Fri, Dec 02, 2022 at 04:55:25AM +0000, Ricardo Koller wrote:
-> > PMUv3p5 uses 64-bit counters irrespective of whether the PMU is configured
-> > for overflowing at 32 or 64-bits. The consequence is that tests that check
-> > the counter values after overflowing should not assume that values will be
-> > wrapped around 32-bits: they overflow into the other half of the 64-bit
-> > counters on PMUv3p5.
+> That's just mean. *_MASK tends to be a shifted mask, although it would
+> appear that asm/perf_event.h does not follow this convention. Fixing
+> that would be nice (as I'm sure somebody else will get burned by this),
+> but for the sake of an immediate fix:
+
+Well, that'll teach me the usual lesson: last minute changes without
+full non-regression testing are bound to end in disaster.
+
+> 
+> > This fixes the following error when running qemu:
 > > 
-> > Fix tests by correctly checking overflowing-counters against the expected
-> > 64-bit value.
+> >   $ qemu-system-aarch64 -cpu host -machine type=virt,accel=kvm -kernel ...
 > > 
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  arm/pmu.c | 29 ++++++++++++++++++-----------
-> >  1 file changed, 18 insertions(+), 11 deletions(-)
+> >   target/arm/helper.c:1813: pmevcntr_rawwrite: Assertion `counter < pmu_num_counters(env)' failed.
 > > 
-> > diff --git a/arm/pmu.c b/arm/pmu.c
-> > index cd47b14..eeac984 100644
-> > --- a/arm/pmu.c
-> > +++ b/arm/pmu.c
-> > @@ -54,10 +54,10 @@
-> >  #define EXT_COMMON_EVENTS_LOW	0x4000
-> >  #define EXT_COMMON_EVENTS_HIGH	0x403F
-> >  
-> > -#define ALL_SET			0xFFFFFFFF
-> > -#define ALL_CLEAR		0x0
-> > -#define PRE_OVERFLOW		0xFFFFFFF0
-> > -#define PRE_OVERFLOW2		0xFFFFFFDC
-> > +#define ALL_SET			0x00000000FFFFFFFFULL
-> > +#define ALL_CLEAR		0x0000000000000000ULL
-> > +#define PRE_OVERFLOW		0x00000000FFFFFFF0ULL
-> > +#define PRE_OVERFLOW2		0x00000000FFFFFFDCULL
-> >  
-> >  #define PMU_PPI			23
-> >  
-> > @@ -538,6 +538,7 @@ static void test_mem_access(void)
-> >  static void test_sw_incr(void)
-> >  {
-> >  	uint32_t events[] = {SW_INCR, SW_INCR};
-> > +	uint64_t cntr0;
-> >  	int i;
-> >  
-> >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> > @@ -572,9 +573,9 @@ static void test_sw_incr(void)
-> >  		write_sysreg(0x3, pmswinc_el0);
-> >  
-> >  	isb();
-> > -	report(read_regn_el0(pmevcntr, 0)  == 84, "counter #1 after + 100 SW_INCR");
-> > -	report(read_regn_el0(pmevcntr, 1)  == 100,
-> > -		"counter #0 after + 100 SW_INCR");
-> > +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
+> > Fixes: 292e8f149476 ("KVM: arm64: PMU: Simplify PMCR_EL0 reset handling")
+> > Signed-off-by: James Clark <james.clark@arm.com>
 > 
-> Hm... in the Arm ARM it says that counters are 64-bit if PMUv3p5 is
-> implemented.  But it doesn't say anywhere that versions newer than p5 are
-> required to implement PMUv3p5.
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-And I don't think it needs to say it, because there is otherwise no
-way for SW to discover whether 64bit counters are implemented or not.
-
-> 
-> For example, for PMUv3p7, it says that the feature is mandatory in Arm8.7
-> implementations. My interpretation of that is that it is not forbidden for
-> an implementer to cherry-pick this version on older versions of the
-> architecture where PMUv3p5 is not implemented.
-
-I'm sorry to have to say that, but I find your suggestion that PMUv3p7
-could be implemented without supporting the full gamut of PMUv3p5
-ludicrous.
-
-Please look back at the ARM ARM, specially at the tiny section titled
-"Alternative ID scheme used for the Performance Monitors Extension
-version" (DDI0487I.a, D17.1.3, page 5553), and the snipped of C code
-that performs exactly this check:
-
-<quote>
-  if (value != 0xF and value >= number) {
-  	// do something that relies on version 'number' of the feature
-  }
-</quote>
-
-Replace 'value' with 7 (PMUv3p7), 'number' with 6 (PMUv3p5), and you
-get the exact property that you pretend doesn't exist, allowing you to
-rely on PMUv3p5 to be implemented when the HW has PMUv3p7.
-
-> Maybe the check should be pmu.version == ID_DFR0_PMU_V3_8_5, to match the
-> counter definitions in the architecture?
-
-No, that'd be totally wrong. You need to check your understanding of
-how the ID registers work.
+Thanks both. I'll queue that ASAP as a fix.
 
 	M.
 
