@@ -1,123 +1,90 @@
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C715363
-	for <kvmarm@lists.linux.dev>; Sat, 10 Dec 2022 01:07:45 +0000 (UTC)
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-3b56782b3f6so73231287b3.13
-        for <kvmarm@lists.linux.dev>; Fri, 09 Dec 2022 17:07:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=I2GE1P9MKB5IEXA78EjWjeGIw+fkI4b001mr77BECX4=;
-        b=Zz3MbiPPY1SHgc009qCyxMWHtFmspb6G3A0xzYMbttsp31nw0tSX4tppfrsPzNCIF6
-         D7iZa+LTmezBYiYDtrAmYb1oC/fxxbCFXDl2x8spANHzzlsqXtea4DYwT5ZwgelbohYZ
-         089wInVCX/E1aq3PKr5hxN9tOHp0A9lXSiHrUb2tvZFE38B1gNZClvkVFMpcr2O4jVlr
-         9bJlXy7+oFG62lvofRFDdTYYtZ7NVMOdXK6E5CeH1XdzyTgiFtvIInk1zIkAc8vPoxQI
-         9f4u+ARi+JH2GcPIweLO4Jw0BwgiylZumo9BqAOOnhTCwihz86Bnx7mwqeF8hZA9e/Yn
-         C+tQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I2GE1P9MKB5IEXA78EjWjeGIw+fkI4b001mr77BECX4=;
-        b=MMwSTY+K5YRoErDRTONyKhheeH0Pv70/q0k0VIIV6+tz1FN3awEcx+QwDidv78trzr
-         cetIUs5xqcOsxkpvaTaiAPt+TW6t1QgeVO7Sj9TlUCKJMVEe54h5BtpUQ7KXfQbWwRmA
-         z7JcZllKhTr4XMoLRDMBe56l9VJdonZHyto5zjlgdk94kNkoMGfBb2bZeIdDtw/MGK6y
-         hy2BnJ1WA1OFC6DDPASARmGel5kKyc9dRJpFGdJFUNNUQk+9ypWBbHnbO8KpoP+PNVPu
-         C05BNoEtqfb5dWHF9F6d4GGhY6EydabvRzkOQOFKGr1BsP2uAlsu/eVaEbgb0ZxCkkdm
-         /2bQ==
-X-Gm-Message-State: ANoB5pnJhS1oSONvvaEkyHTsBqGQLOo0FsrzS/pnKE7Pf5ixfVhaDI6W
-	Ol+9Hv2m72To2vHrem4hNbfF15+r0Xy+Th6zPUsSUA==
-X-Google-Smtp-Source: AA0mqf7NPTsewklw8WtJjMQ5b4Z4DLLXvnPd6MTLSGVUxVce2NMxMIFrAkSkhyQdcwqQG9PUK7aUBAXAR0abljqhaUo=
-X-Received: by 2002:a81:1401:0:b0:3b0:b9aa:46eb with SMTP id
- 1-20020a811401000000b003b0b9aa46ebmr2248873ywu.150.1670634464404; Fri, 09 Dec
- 2022 17:07:44 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3A81109
+	for <kvmarm@lists.linux.dev>; Sat, 10 Dec 2022 11:18:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A00BDC433D2;
+	Sat, 10 Dec 2022 11:18:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1670671096;
+	bh=2ol2CYikgIYVfVb+OZiZSB+xwMyqaLEDiIfsEIqMMHk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IRXwJzG5tMMKaadAVZ+PcfLGh9BTuFHJX08H6Sc6kTynyxsZOMM8gw8o8kpOlLYAj
+	 F1TkATzT9Jrv2AKL28Cnm+dvydIYU3RONnQ78BmIF6Mq03PpSpyKBz4qsZasO45Yo7
+	 nSq5R3vNDfBybRW+arijzqeplXYbj/E1RCn9lIOjMnjkdpx7Ybt2ELEAHsBhj3EaBZ
+	 GB+zNQ5a4/PovtZIvbHpHhjADiuELKffmgv7VwmrPNYxuj5iErELcWDtwy2HAgfzwo
+	 OsYZCGfxebtYlG1yohwGwzDG1YeC6YypJHdPgNYPD3JIIc8Y04F/aahYlBf1Hw289z
+	 ncclXffxQxU2g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1p3xry-00BlMm-B4;
+	Sat, 10 Dec 2022 11:18:14 +0000
+Date: Sat, 10 Dec 2022 11:16:37 +0000
+Message-ID: <87edt7fqzu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: James Clark <james.clark@arm.com>, Oliver Upton <oliver.upton@linux.dev>
+Cc: 	kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] KVM: arm64: PMU: Fix PMCR_EL0 reset value
+In-Reply-To: <Y5N3R+w3GF94hxHa@google.com>
+References: <20221209164446.1972014-1-james.clark@arm.com>
+	<20221209164446.1972014-2-james.clark@arm.com>
+	<Y5N3R+w3GF94hxHa@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20221208193857.4090582-1-dmatlack@google.com> <Y5OHVzBSHPmAq2FO@google.com>
-In-Reply-To: <Y5OHVzBSHPmAq2FO@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Fri, 9 Dec 2022 17:07:18 -0800
-Message-ID: <CALzav=c328M1jgApAEEnz5B6h_pr5w07VpcMx0kSg0MtJjAf2w@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/37] KVM: Refactor the KVM/x86 TDP MMU into common code
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Sean Christopherson <seanjc@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Anshuman Khandual <anshuman.khandual@arm.com>, Nadav Amit <namit@vmware.com>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Vlastimil Babka <vbabka@suse.cz>, 
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Suren Baghdasaryan <surenb@google.com>, 
-	Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Yu Zhao <yuzhao@google.com>, Colin Cross <ccross@google.com>, Hugh Dickins <hughd@google.com>, 
-	Ben Gardon <bgardon@google.com>, Mingwei Zhang <mizhang@google.com>, 
-	Krish Sadhukhan <krish.sadhukhan@oracle.com>, Ricardo Koller <ricarkol@google.com>, 
-	Jing Zhang <jingzhangos@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
-	linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221210010718.XLA9Jka0Rwj2qqqKgvTPStnzMwNBKchq4kTVZNVY6y0@z>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: james.clark@arm.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221210111637.M6B_jGIsg1ysz86M0fKRpjzoR4rmk4IQft1nD86AJLQ@z>
 
-On Fri, Dec 9, 2022 at 11:07 AM Oliver Upton <oliver.upton@linux.dev> wrote:
->
-> On Thu, Dec 08, 2022 at 11:38:20AM -0800, David Matlack wrote:
->
-> >    Also do we want to keep "TDP" or switch
-> >    to something more familiar across architectures (e.g. ARM and RISC-V
-> >    both use "Stage-2")?
->
-> As it relates to guest memory management I don't see much of an issue
-> with it, TBH. It is sufficiently arch-generic and gets the point across.
->
-> Beyond that I think it really depends on the scope of the common code.
->
-> To replace the arm64 table walkers we will need to use it for stage-1
-> tables.
+On Fri, 09 Dec 2022 17:58:31 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Fri, Dec 09, 2022 at 04:44:46PM +0000, James Clark wrote:
+> > ARMV8_PMU_PMCR_N_MASK is an unshifted value which results in the wrong
+> > reset value for PMCR_EL0, so shift it to fix it.
+> 
+> That's just mean. *_MASK tends to be a shifted mask, although it would
+> appear that asm/perf_event.h does not follow this convention. Fixing
+> that would be nice (as I'm sure somebody else will get burned by this),
+> but for the sake of an immediate fix:
 
-Speaking of, have ARM folks ever discussed deduplicating the KVM/ARM
-stage-1 code with the Linux stage-1 table code (<linux/pgtable.h>),
-which is already architecture-neutral? It seems backwards for us to
-build out an architecture-neutral stage-1 walker in KVM when one
-already exists.
+Well, that'll teach me the usual lesson: last minute changes without
+full non-regression testing are bound to end in disaster.
 
-For example, arch/arm64/kvm/mmu.c:get_user_mapping_size() looks like
-it could be reimplemented using <linux/pgtable.h>, rather than using
-KVM code. In fact that's what we do for walking stage-1 page tables in
-KVM/x86. Take a look at
-arch/x86/kvm/mmu/mmu.c:host_pfn_mapping_level(). I bet we could move
-that somewhere in mm/ so that it could be shared across KVM/x86 and
-KVM/ARM.
+> 
+> > This fixes the following error when running qemu:
+> > 
+> >   $ qemu-system-aarch64 -cpu host -machine type=virt,accel=kvm -kernel ...
+> > 
+> >   target/arm/helper.c:1813: pmevcntr_rawwrite: Assertion `counter < pmu_num_counters(env)' failed.
+> > 
+> > Fixes: 292e8f149476 ("KVM: arm64: PMU: Simplify PMCR_EL0 reset handling")
+> > Signed-off-by: James Clark <james.clark@arm.com>
+> 
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-> I'm only hand-waving at the cover letter and need to do more
-> reading, but is it possible to accomplish some division:
->
->  - A set of generic table walkers that implement common operations, like
->    map and unmap. Names and types at this layer wouldn't be
->    virt-specific.
->
->  - Memory management for KVM guests that uses the table walker library,
->    which we can probably still call the TDP MMU.
->
-> Certainly this doesn't need to be addressed in the first series, as the x86
-> surgery is enough on its own. Nonetheless, it is probably worthwhile to
-> get the conversation started about how this code can actually be used by
-> the other arches.
+Thanks both. I'll queue that ASAP as a fix.
 
-Yup, we'll need some sort of split like that in order to integrate
-with KVM/ARM, since the hyp can't access struct kvm, work_queues, etc.
-in tdp_mmu.c. I don't think we'll need that split for KVM/RISC-V
-though. So for the sake of incremental progress I'm not planning on
-doing any of that refactoring preemptively. Plus it should be possible
-to keep the TDP MMU API constant when the internal implementation
-eventually gets split up. i.e. I don't forsee it creating a bunch of
-churn down the road.
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
