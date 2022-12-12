@@ -2,51 +2,103 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35704C4332F
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Dec 2022 13:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E2D2C4332F
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Dec 2022 17:39:48 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C77C4B9BD;
-	Mon, 12 Dec 2022 08:56:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8C5A4B963;
+	Mon, 12 Dec 2022 12:39:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QqicoO2u+DCW; Mon, 12 Dec 2022 08:56:40 -0500 (EST)
+	with ESMTP id IfR8DgzbnYMT; Mon, 12 Dec 2022 12:39:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BAFED4B99D;
-	Mon, 12 Dec 2022 08:56:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 770404B896;
+	Mon, 12 Dec 2022 12:39:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF93D4B99D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 08:56:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 166EC4B889
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 12:39:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GSoDG8mfxtXf for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Dec 2022 08:56:38 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E1234B99B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 08:56:38 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1A5461FB;
- Mon, 12 Dec 2022 05:57:18 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 276243F71E;
- Mon, 12 Dec 2022 05:56:36 -0800 (PST)
-Date: Mon, 12 Dec 2022 13:56:33 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [kvm-unit-tests PATCH 1/3] arm: pmu: Fix overflow checks for
- PMUv3p5 long counters
-Message-ID: <Y5czEQPdsaZPlSuB@monolith.localdoman>
-References: <20221202045527.3646838-1-ricarkol@google.com>
- <20221202045527.3646838-2-ricarkol@google.com>
- <Y5N0os7zL/BaMBa3@monolith.localdoman>
- <87fsdnfroe.wl-maz@kernel.org>
- <Y5XBo6s9JQVY79Wu@monolith.localdoman>
- <867cyxq9fl.wl-maz@kernel.org>
+ with ESMTP id vW9UnqaNs4Xy for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Dec 2022 12:39:43 -0500 (EST)
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com
+ [209.85.215.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C4D64B87D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 12:39:43 -0500 (EST)
+Received: by mail-pg1-f181.google.com with SMTP id 82so8724197pgc.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 09:39:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=9QS7ynIDmKRlIs3oQp3nNRq3SgpEDJuiT7l2fKUtqJA=;
+ b=Q0nnG/dD12oshnk2CykCxq72d8uZrdzzqkuH5dft2uszejZpVFSnXayz+SB3Bwgro8
+ BRpXeeCgbqfUn2wNBfcOZyX3qyFKQJ6SczkPWVABh1mpb57722xzOrsTLiE48vG5UkwV
+ bWLck3WppDEGsIUBHKKGTEWgFtdCLpnoSQ2bevYVQ/nLcPPAgPGAlA/9ZOfUNOvgOGId
+ G76GaBjjIODSpD0MI08sPApYWZ6pYb2TgRVicuKhWCGe6JSitmtMJPjC2xPhiXqe6dk1
+ lh4RR1K4cJ0EETmdVRDXbjpYPE9b76QlJk+PQjM9eohHtNpBi7HjhEH0vhjhhqilbAjf
+ 2W6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=9QS7ynIDmKRlIs3oQp3nNRq3SgpEDJuiT7l2fKUtqJA=;
+ b=MYMNzU5O1ry6X4F71qz6+YNdIr0MBHlCZvKAqX5dLlT6ksZc6pB2KmtuiuP21LbpXs
+ uVmP9a5M2LJyJYaTUNXJvsFwzW0gqsn4xFskKXnCSWDdwOj38tgZ0vx1s4k4/9tOcfHf
+ 0bT5mxFQ9abBfH5I5wktYhj7YJyrxBff2Xi8H8yai6n4FEbxhhleANXaf4T5/VTh8D+7
+ PRYFjnJ/nzwIsTkfyq2tRFpEdBcpdV8biCtwYk4/BcGMiz6sG8/OQqYW6P2yqtEoE1N4
+ 9PEwhXvGsHcroq23mjruXQ7Ur5nOk8tWOkCgyCoNF6ViQYDg18ghwV7y3AeIroZUQzix
+ 5RRg==
+X-Gm-Message-State: ANoB5pnvRP4VmdMZfNPlfg3EeiHJx6OVZlytbtrHR8nUV/a2ndhsgH2k
+ 1UgPxn0wjjB6Z0vVMdzGmVWHJg==
+X-Google-Smtp-Source: AA0mqf4fRjcF7yqcwPoqLk9QucrmsFbaTw1SZFxx+iK6d+zjxBOpK3Jkaq0gjsaSmdZVgYI9LkA78w==
+X-Received: by 2002:a05:6a00:27a4:b0:576:22d7:fd9e with SMTP id
+ bd36-20020a056a0027a400b0057622d7fd9emr657961pfb.0.1670866782130; 
+ Mon, 12 Dec 2022 09:39:42 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ y10-20020aa793ca000000b0057555d35f79sm6092008pff.101.2022.12.12.09.39.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 12 Dec 2022 09:39:41 -0800 (PST)
+Date: Mon, 12 Dec 2022 17:39:38 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Subject: Re: [RFC PATCH 01/37] KVM: x86/mmu: Store the address space ID
+ directly in kvm_mmu_page_role
+Message-ID: <Y5dnWgJ0ine55/hN@google.com>
+References: <20221208193857.4090582-1-dmatlack@google.com>
+ <20221208193857.4090582-2-dmatlack@google.com>
+ <22fe2332-497e-fe30-0155-e026b0eded97@intel.com>
+ <Y5NvYmxpy6BPkmpW@google.com>
+ <CALzav=eju4LYyX=ufNneSww+5sraYJ8cfQSi4LTOHfHWmddX9A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <867cyxq9fl.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, andrew.jones@linux.dev, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <CALzav=eju4LYyX=ufNneSww+5sraYJ8cfQSi4LTOHfHWmddX9A@mail.gmail.com>
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+ Hugh Dickins <hughd@google.com>, Paul Walmsley <paul.walmsley@sifive.com>,
+ "Yang, Weijiang" <weijiang.yang@intel.com>, "Amit, Nadav" <namit@vmware.com>,
+ Colin Cross <ccross@google.com>, Ben Gardon <bgardon@google.com>,
+ "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ Yu Zhao <yuzhao@google.com>, Marc Zyngier <maz@kernel.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ "Matthew Wilcox \(Oracle\)" <willy@infradead.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Mingwei Zhang <mizhang@google.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, xu xin <cgel.zte@gmail.com>,
+ Arnd Bergmann <arnd@arndb.de>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ Atish Patra <atishp@atishpatra.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+ "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -63,90 +115,61 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
-
-On Mon, Dec 12, 2022 at 09:05:02AM +0000, Marc Zyngier wrote:
-> Alex,
+On Fri, Dec 09, 2022, David Matlack wrote:
+> On Fri, Dec 9, 2022 at 9:25 AM Oliver Upton <oliver.upton@linux.dev> wrote:
+> >
+> > On Fri, Dec 09, 2022 at 10:37:47AM +0800, Yang, Weijiang wrote:
+> > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > > index 4d188f056933..f375b719f565 100644
+> > > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > > @@ -5056,7 +5056,7 @@ kvm_calc_cpu_role(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
+> > > >     union kvm_cpu_role role = {0};
+> > > >     role.base.access = ACC_ALL;
+> > > > -   role.base.smm = is_smm(vcpu);
+> > > > +   role.base.as_id = is_smm(vcpu);
+> > >
+> > > I'm not familiar with other architectures, is there similar conception as
+> > > x86 smm mode?
 > 
-> On Sun, 11 Dec 2022 11:40:39 +0000,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > A simple "hey, you're wrong here, the PMU extensions do not follow the
-> > principles of the ID scheme for fields in ID registers" would have
-> > sufficed.
-> 
-> This is what I did, and saved you the hassle of looking it up.
+> The notion of address spaces is already existing architecture-neutral
+> concept in KVM (e.g. see uses of KVM_ADDRESS_SPACE_NUM in
+> virt/kvm/kvm_main.c), although SMM is the only use-case I'm aware of.
 
-The comment was about how you went about it, not about proving someone
-wrong. As expressive as it might be, I don't think that calling someone's
-suggestion "ludicrous" from the position of authority associated with being
-a maintainer is constructive; and can also be interpreted as a personal
-attack (you used **your** suggestion, not **this** suggestion). I didn't
-interpret it that way, just saying that it can be.
+Yes, SMM is currently the only use-case.
 
-> 
-> > Guess you never made a silly mistake ever, right?
-> 
-> It's not so much about making a silly mistake. I do that all the time.
-> But it is about the way you state these things, and the weight that
-> your reviews carry. You're a trusted reviewer, with a lot of
-> experience, and posting with an @arm.com address: what you say in a
-> public forum sticks. When you assert that the author is wrong, they
-> will take it at face value.
+> Architectures that do not use multiple address spaces will just leave
+> as_id is as always 0.
 
-This is how I stated things:
+My preference would be to leave .smm in x86's page role.  IMO, defining multiple
+address spaces to support SMM emulation was a mistake that should be contained to
+SMM, i.e. should never be used for any other feature.  And with CONFIG_KVM_SMM,
+even x86 can opt out.
 
-"Hm... in the Arm ARM it says that counters are 64-bit if PMUv3p5 is
-implemented.  But it doesn't say anywhere that versions newer than p5 are
-required to implement PMUv3p5." -> patently false, easily provable with the
-Arm ARM and by logic (as you did). My entire argument was based on this, so
-once this has been proven false, I would say that the rest of my argument
-falls apart.
+For all potential use cases I'm aware of, SMM included, separate address spaces
+are overkill.  The SMM use case is to define a region of guest memory that is
+accessible if and only if the vCPU is operating in SMM.  Emulating something like
+TrustZone or EL3 would be quite similar.  Ditto for Intel's TXT Private Space
+(though I can't imagine KVM ever emulating TXT :-) ).
 
-"For example, for PMUv3p7, it says that the feature is mandatory in Arm8.7
-implementations. **My interpretation** of that is that it is not forbidden
-for an implementer to cherry-pick this version on older versions of the
-architecture where PMUv3p5 is not implemented." -> emphasis on the "my
-interpretation"; also easy to prove false because PMUv3p5+ is required to
-implement PMUv3p5, as per the architecture.
+Using separate address spaces means that userspace needs to define the overlapping
+GPA areas multiple times, which is inefficient for both memory and CPU usage.
+E.g. for SMM,  userspace needs to redefine all of "regular" memory for SMM in
+addition to memory that is SMM-only.  And more bizarelly, nothing prevents userspace
+from defining completely different memslot layouts for each address space, which
+might may not add complexity in terms of code, but does make it more difficult to
+reason about KVM behavior at the boundaries between modes.
 
-"**Maybe** the check should be pmu.version == ID_DFR0_PMU_V3_8_5, to match
-the counter definitions in the architecture?" -> emphasis on the "maybe",
-and the question mark at the end.
+Unless I'm missing something, e.g. a need to map GPAs differently for SMM vs.
+non-SMM, SMM could have been implemented with a simple flag in a memslot to mark
+the memslot as SMM-only.  Or likely even better, as an overlay to track attributes,
+e.g. similar to how private vs. shared memory will be handled for protected VMs.
+That would be slightly less efficient for memslot searches for use cases where all
+memory is mutually exclusive, but simpler and more efficient overall.
 
-My intention wasn't to dictate something, my intention was to have a
-conversation about the patch, with the mindset that I might be wrong. What
-made you get the idea that I was asserting that the author is wrong? Where
-by "asserting the author is wrong" I understand framing my comment in such
-a way as to leave no room for further discussions. Or did you mean
-something else by that?
-
-Or, to put it another way, what about the way I stated things could have
-been done better (other than not being wrong, obviously)?
-
-> 
-> > Otherwise, good job encouraging people to help review KVM/arm64 patches ;)
-> 
-> What is the worse: no review? or a review that spreads confusion?
-> Think about it. I'm all for being nice, but I will call bullshit when
-
-That wasn't about calling people out on their mistakes. I was saying that
-the way you "call bullshit", as you put it, might be a put off for some
-people. Call me naive, but I like to think that not everyone that comments
-on a patch does it because they have to.
-
-> I see it asserted by people with a certain level of authority.
-> 
-> And I've long made up my mind about the state of the KVM/arm64 review
-> process -- reviews rarely come from people who have volunteered to do
-> so, but instead from those who have either a vested interest in it, or
-> an ulterior motive. Hey ho...
-
-I genuinely don't know what to make of this. I can't even tell if it's
-directed at me or not.
-
-Thanks,
-Alex
+And separate address spaces become truly nasty if the CPU can access multiple
+protected regions, e.g. if the CPU can access type X and type Y at the same time,
+then there would need to be memslots for "regular", X, Y, and X+Y.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
