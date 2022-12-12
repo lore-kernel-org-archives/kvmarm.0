@@ -2,110 +2,96 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 538D3C4332F
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Dec 2022 22:27:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7AD7C4332F
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Dec 2022 22:30:38 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B69194B953;
-	Mon, 12 Dec 2022 17:27:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F6F64B861;
+	Mon, 12 Dec 2022 17:30:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NJv0VGMloJV9; Mon, 12 Dec 2022 17:27:16 -0500 (EST)
+	with ESMTP id cZT4zTv5dScc; Mon, 12 Dec 2022 17:30:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60C464B86E;
-	Mon, 12 Dec 2022 17:27:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10F4B4B90B;
+	Mon, 12 Dec 2022 17:30:37 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C123E4B86E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 17:27:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C44FA4B88B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 17:30:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mo9PC-6U2Tth for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Dec 2022 17:27:13 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FDCB4B865
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 17:27:13 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1670884033;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zeSZwvHmFeU5UUDXCwOByZegtobcOblZc96Ym35chsE=;
- b=eibkr8klbSQncXZQFstboW32gdZU30uF/uZNuLtSCBH+qDEk1p072CAsnB4a3YkaUUN9s9
- zIk57Eph/Rcb+BxTxBPd0WcRP986anbY+D3LY3EKJPoLTo4JExUblgfjhqjtzB4gYGekxc
- ZV8bqpbprW4cjWgc61DbG8mSThkutxc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-562-Ye4I6zQIO7WRvkTKN45xcg-1; Mon, 12 Dec 2022 17:27:11 -0500
-X-MC-Unique: Ye4I6zQIO7WRvkTKN45xcg-1
-Received: by mail-wm1-f69.google.com with SMTP id
- 9-20020a1c0209000000b003d1c0a147f6so4716647wmc.4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 14:27:11 -0800 (PST)
+ with ESMTP id gUsEL3qej7Rj for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Dec 2022 17:30:35 -0500 (EST)
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com
+ [209.85.215.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 938F14B861
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 17:30:35 -0500 (EST)
+Received: by mail-pg1-f175.google.com with SMTP id v3so9211262pgh.4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 14:30:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=wDIyaaZP6Sx38V8+GZMMaiCN2LYY75lyx3Qk2zggJjY=;
+ b=AsH0HY9ES//YrqC7aVzHEC/CizcXUu59joNA74umGoNmkMvxLqS0wCffNxDluDxyKo
+ EAqtkusIPRaWsTDrdjn9/llFRUygCmGbtm2vECAI+G08t237WcwWOvji02G3iAivLRkK
+ XtmAOzz+XqYsq2GDP6d9iwh7sTltvZI9fxPTUGYZWGyPiUekYEmb0NyP6jBH0aSpM1QX
+ 0tz4LyerHFPtS+ochp41KGvy5c0kQvu3ZBbrMJ4Y8A8WkC/7Ukk+1JDMNDpCdZbv+wUw
+ sB78NjP1UXJBhqkf6gNp2CwQYVDksQEYfo+cDNGLFgrv7+7q0LQlQIxLu11hgJt4KH7o
+ 881Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=content-transfer-encoding:in-reply-to:from:references:cc:to
- :content-language:subject:user-agent:mime-version:date:message-id
- :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=zeSZwvHmFeU5UUDXCwOByZegtobcOblZc96Ym35chsE=;
- b=dCb3TgkiVWDrH/ILe4+U5Ji5u5VK9n75Zeln18W7YW79qgrHsTwg+z4t2bY/ZcVTyv
- gRmGtDtK0XKIx8+MnqRRbEzfZJfn7xZMDoG9lQ3wGv+QoJaCH/qSVJte0QOIUK8wHAVL
- e7vniW6hCcW/46HOOSNhPqw+eBBxYcnha43WLE48gSFlfP47c5ySzP0gF7PlLHq/gDt7
- ZJo2OUrtP9ZRDg9M/o+Q5HJNTYYouIBhHMSfo9Y3Itu0VowmHTQI7RX/dtdPxgolGovO
- ApUgZc4jszo0nQKHEed1UTKQOwmnXAfS97vWYCm3vh5W9tfkte85Cu2tOUFoY3L5IbN8
- a2QA==
-X-Gm-Message-State: ANoB5pn+zmX4Ytp9zDif5nkOheAJfcmtV919t4256xM/SRX+BDZXmSjW
- 70qVly5ucM0yQr0J6mm/xl6Kgno2nBDqDe7jqerYkn+SSsLVU17X4YfIuL0aGFo6e1yFYIzd6ig
- fQSOabJsE2OVFPE4f7iJ0nkur
-X-Received: by 2002:a05:600c:35cb:b0:3cf:360e:f37d with SMTP id
- r11-20020a05600c35cb00b003cf360ef37dmr14411562wmq.22.1670884030409; 
- Mon, 12 Dec 2022 14:27:10 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5dJ0ARaW77iY6LzN30Dnbz5ebYPZeA9S1gDChcfg6ar2i9lvJt/8ICiG48/nDxEpBydsoLBw==
-X-Received: by 2002:a05:600c:35cb:b0:3cf:360e:f37d with SMTP id
- r11-20020a05600c35cb00b003cf360ef37dmr14411523wmq.22.1670884030137; 
- Mon, 12 Dec 2022 14:27:10 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89?
- ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
- by smtp.googlemail.com with ESMTPSA id
- l8-20020a05600c4f0800b003cf54b77bfesm11143797wmq.28.2022.12.12.14.27.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 12 Dec 2022 14:27:09 -0800 (PST)
-Message-ID: <ce1ea196-d854-18bd-0e60-91985ed5aaea@redhat.com>
-Date: Mon, 12 Dec 2022 23:27:06 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=wDIyaaZP6Sx38V8+GZMMaiCN2LYY75lyx3Qk2zggJjY=;
+ b=x9MwG5CgX2hRMQn9cmaYFKv8XKYwgr4L710XhktILpr/0Fq+0VDoG9PCPfcZStFG7O
+ PsGRO/ZqwJy4zWZS8rmM6GdwoOBTmEgtRS9rNbwFdp4GRz2ZlKgJn7I9Jbe2hMX0GQCT
+ MPY6WM0IqsXwcfFtdH1cq8k6KHb/8uRQGX82JE2Ii1NqIJLumQkGlWlsPQtDS00tduLT
+ AaCYzXMlP0Sdw4ufrNxn2xXHNqCtzp2CVlYSj/ICLmNyk5TqMT64986hWwfjzb4mXGh0
+ Q+Kj6Piurf7lUEbvY4LCz6zUxpXKP1pDPDRD8ILdc/YRFxsq8ziVEFEW06pVeMICDZ+F
+ V0sw==
+X-Gm-Message-State: ANoB5plwFZbv70+k5BfAjxytEKkCZtqgriN1BXNHt/tZTm4oIo3Uchr2
+ DeYS7xU5aMfHPgTnSrWgj3ppyQ==
+X-Google-Smtp-Source: AA0mqf74FM6U4ztV3LqdnGXHnnnSC43RbbAIDoSZcE8bsILwNcSluJ+18YStm6rGNZYFVpgbA3RNLg==
+X-Received: by 2002:aa7:9a1c:0:b0:574:3e1d:72dd with SMTP id
+ w28-20020aa79a1c000000b005743e1d72ddmr18119342pfj.19.1670884234340; 
+ Mon, 12 Dec 2022 14:30:34 -0800 (PST)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com.
+ [34.125.103.223]) by smtp.gmail.com with ESMTPSA id
+ q13-20020aa7842d000000b0056d98e31439sm6499921pfn.140.2022.12.12.14.30.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 12 Dec 2022 14:30:33 -0800 (PST)
+Date: Mon, 12 Dec 2022 14:30:28 -0800
+From: David Matlack <dmatlack@google.com>
+To: Ben Gardon <bgardon@google.com>
 Subject: Re: [RFC PATCH 10/37] KVM: MMU: Move struct kvm_page_fault to common
  code
-To: David Matlack <dmatlack@google.com>
+Message-ID: <Y5erhA1QOBhqnO5C@google.com>
 References: <20221208193857.4090582-1-dmatlack@google.com>
  <20221208193857.4090582-11-dmatlack@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221208193857.4090582-11-dmatlack@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
+ <CANgfPd-DaxszBe6vLQGe=LKNKx8bDX-AC_30qLVAyYkQXwN7WA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <CANgfPd-DaxszBe6vLQGe=LKNKx8bDX-AC_30qLVAyYkQXwN7WA@mail.gmail.com>
 Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
  Hugh Dickins <hughd@google.com>, Paul Walmsley <paul.walmsley@sifive.com>,
  Nadav Amit <namit@vmware.com>, Colin Cross <ccross@google.com>,
- Ben Gardon <bgardon@google.com>, linux-riscv@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, Yu Zhao <yuzhao@google.com>,
- xu xin <cgel.zte@gmail.com>, Huacai Chen <chenhuacai@kernel.org>,
+ linux-riscv@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ Yu Zhao <yuzhao@google.com>, Marc Zyngier <maz@kernel.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
  "Matthew Wilcox \(Oracle\)" <willy@infradead.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  Krish Sadhukhan <krish.sadhukhan@oracle.com>,
  Palmer Dabbelt <palmer@dabbelt.com>, Mingwei Zhang <mizhang@google.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Arnd Bergmann <arnd@arndb.de>,
- "Liam R. Howlett" <Liam.Howlett@Oracle.com>, kvm@vger.kernel.org,
- Atish Patra <atishp@atishpatra.org>, kvmarm@lists.linux.dev,
- Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
- linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
- kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>
+ Albert Ou <aou@eecs.berkeley.edu>, xu xin <cgel.zte@gmail.com>,
+ Arnd Bergmann <arnd@arndb.de>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+ kvm@vger.kernel.org, Atish Patra <atishp@atishpatra.org>,
+ kvmarm@lists.linux.dev, Suren Baghdasaryan <surenb@google.com>,
+ Vlastimil Babka <vbabka@suse.cz>, linux-arm-kernel@lists.infradead.org,
+ linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -117,20 +103,93 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 12/8/22 20:38, David Matlack wrote:
-> +
-> +	/* Derived from mmu and global state.  */
-> +	const bool is_tdp;
+On Mon, Dec 12, 2022 at 10:24:31AM -0800, Ben Gardon wrote:
+> On Thu, Dec 8, 2022 at 11:39 AM David Matlack <dmatlack@google.com> wrote:
+> >
+> > Move struct kvm_page_fault to common code. This will be used in a future
+> > commit to move the TDP MMU to common code.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > ---
+[...]
+> > diff --git a/include/kvm/mmu_types.h b/include/kvm/mmu_types.h
+> > index a9da33d4baa8..9f0ca920bf68 100644
+> > --- a/include/kvm/mmu_types.h
+> > +++ b/include/kvm/mmu_types.h
+> > @@ -66,4 +66,48 @@ struct kvm_mmu_page {
+> >         struct kvm_mmu_page_arch arch;
+> >  };
+> >
+> > +struct kvm_page_fault {
+> > +       /* The raw faulting address. */
+> > +       const gpa_t addr;
+> > +
+> > +       /* Whether the fault was synthesized to prefetch a mapping. */
+> > +       const bool prefetch;
+> > +
+> > +       /* Information about the cause of the fault. */
+> > +       const bool write;
+> > +       const bool exec;
+> > +
+> > +       /* Shifted addr, or result of guest page table walk if shadow paging. */
+> > +       gfn_t gfn;
+> 
+> Is this redundant to have in common code? If we're not doing common
+> shadow paging, then this is just addr shifted. Would this be better
+> placed in the arch specific struct?
 
-I think this could stay in the architecture-independent part.
+Yes it's redundant but it is actually used by the TDP MMU, unlike @addr.
+So if anything I would rather move @addr to kvm_page_fault_arch.
 
-Paolo
+> 
+> > +
+> > +       /* The memslot that contains @gfn. May be NULL. */
+> > +       struct kvm_memory_slot *slot;
+> > +
+> > +       /* Maximum page size that can be created for this fault. */
+> > +       u8 max_level;
+> > +
+> > +       /*
+> > +        * Page size that can be created based on the max_level and the page
+> > +        * size used by the host mapping.
+> > +        */
+> > +       u8 req_level;
+> > +
+> > +       /* Final page size that will be created. */
+> > +       u8 goal_level;
+> > +
+> > +       /*
+> > +        * The value of kvm->mmu_invalidate_seq before fetching the host
+> > +        * mapping. Used to verify that the host mapping has not changed
+> > +        * after grabbing the MMU lock.
+> > +        */
+> > +       unsigned long mmu_seq;
+> 
+> Should this be ifdef'ed with  KVM_ARCH_WANT_MMU_NOTIFIER?
 
+I'll have to take a closer look, but probably yes.
+
+> 
+> > +
+> > +       /* Information about the host mapping. */
+> > +       kvm_pfn_t pfn;
+> > +       hva_t hva;
+> > +       bool map_writable;
+> > +
+> > +       struct kvm_page_fault_arch arch;
+> > +};
+> > +
+> >  #endif /* !__KVM_MMU_TYPES_H */
+> > --
+> > 2.39.0.rc1.256.g54fd8350bd-goog
+> >
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
