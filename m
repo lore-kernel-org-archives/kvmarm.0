@@ -1,153 +1,252 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215B923BD
-	for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 10:38:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1670841535;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0geoJp5y5vah58rc3h1onQRI09PobQgX5h6nKaS34UM=;
-	b=jJoxYQlScOh2WvgOPA3fGIDz0S6JEQOTgxPRNgjJU2O9UBlEUB+uAvONGncmjuTsDKmtRO
-	SMa6Fr3uT6f+vK/Gis/gYGN+GDSP1hjxw9lc+3nnYAR0xFiyoHjF7szAH6lwrXTFU+lZk+
-	2V2npXTQnG6sj2Ng/YR/gq0HO9sMeLE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-387-x-_APtkvO7eDZ63dTGNr_g-1; Mon, 12 Dec 2022 05:38:50 -0500
-X-MC-Unique: x-_APtkvO7eDZ63dTGNr_g-1
-Received: by mail-wr1-f71.google.com with SMTP id x1-20020adfbb41000000b002426b33b618so2122782wrg.7
-        for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 02:38:49 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F7F2585
+	for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 12:59:16 +0000 (UTC)
+Received: by mail-pl1-f182.google.com with SMTP id 17so4542335pll.0
+        for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 04:59:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eC2iVrhN64qx0wh1++pd8s8D/4z8tTuZKSx0qqh+jVk=;
+        b=oaByAgTh/mGEsWxXHZhNoHOBQEsZc14IJwDr2btqBiJxfwbgrsIlb9Be3eeDwVB8yn
+         8lLvfVs9DcNU69/EZpheUyDC+TWzd9tcqcRnwZu9v5yKueGX//nlPtoCp+pg1dWf2WPs
+         NeY/qq2otESM0rg3evIACrKeQazyqdSa9ZFwsl8ljsDk+OQKfpAnsnMljwczl4Kap00p
+         j0+/r0QonsHnbcSKj8O4v35+txfNyJnf9UO2dBS+7JQ8O3nL3jNb2s1suZmIwpyHJka5
+         leuOe9bT/YJY0KJ5bcpEuGjGDjy92bxqn/JQKaJi42HbpmKkn4L8mg9JH+9q8W628to0
+         LHng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0geoJp5y5vah58rc3h1onQRI09PobQgX5h6nKaS34UM=;
-        b=bfmuGXnzFBQcJ22g/5IMWJN6VzFDkG04C9AqGLIhdyZNDlwXHtRA9oKoM2sf30rP/X
-         SOF9CNEQ4pWLmDdPgTr4nq16tBxJQFPdF4PJ6uXoZhgNX9kiGPzrTcnPvLgD6Y6POuRH
-         jfWuWreggBWC47c/OCu+fzQ7TGd4tizYKPc6oJCigMDptrvI4uDN3qq02nbOZA04MfOf
-         +CTjO9wJKZXIDpVXY5e9JpIYpZc8FxRuVuabH6BTOefE98j3/wKTb+IKVSvvW47B+LGn
-         Wir5yuKAhJqjfft+Dn7E8kBM2HOgl2edBOfJ2crilpYMtGxRoVbH4Lw/DMEvx8inbWxW
-         qNEQ==
-X-Gm-Message-State: ANoB5pke5tRDKkBV44I67XjjtZgXdaIIugXD5RsqGqUiaJOM8s66ncQx
-	XsXnbh06IjNuac8wMShuG91zqkPOgW9Irl4rCWLcEIIMDANutrXSzA1qWzhlNKH7FD4/XbSfONW
-	X44UiMSwUTSaQ4+8K
-X-Received: by 2002:a05:600c:5398:b0:3cf:d0b1:8aa1 with SMTP id hg24-20020a05600c539800b003cfd0b18aa1mr12355042wmb.0.1670841528986;
-        Mon, 12 Dec 2022 02:38:48 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf43hHD3Xh/hVMzgx7AUun3dPtnLezNxJe71/MuBv74YiGy1tG1gohvB+wRobXA4W5SAS5QTYw==
-X-Received: by 2002:a05:600c:5398:b0:3cf:d0b1:8aa1 with SMTP id hg24-20020a05600c539800b003cfd0b18aa1mr12355032wmb.0.1670841528795;
-        Mon, 12 Dec 2022 02:38:48 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id iw3-20020a05600c54c300b003d220ef3232sm5442368wmb.34.2022.12.12.02.38.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Dec 2022 02:38:48 -0800 (PST)
-Message-ID: <2ce6eab8-6156-1282-bf29-87fd74e4587a@redhat.com>
-Date: Mon, 12 Dec 2022 11:38:47 +0100
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eC2iVrhN64qx0wh1++pd8s8D/4z8tTuZKSx0qqh+jVk=;
+        b=dUQiTHmd9ZvHlS8/eo6QhalYV7rTuE3e2pt86+lsFHY07qwX4gRAngisoiqlnod10P
+         hihp1Bzf3Lw32pUcm5T8ISH7i8nhq5N9SUsGEjNRPSIpix+/9Px9eAO6mNdTxgzAAqj1
+         uMAnVUVHtnkxqb0/Nhw5SmWYE/qB6WLPoDp2V1oCatBkgpzn/xrujWiU7oBvDht2houj
+         SJzvfBpLU1Igg9XoqtFD8SdsNvB7wGj2eRU+63Jo2LGmmD7bstFmajfEiWFBPt9VkpSO
+         CzsXRnmVJJg8wMPAOcH3crNw+MNxI49WwUCL9D2nRPmLJkXM0gsCvnHLFj5T5N4oD8wd
+         5AXQ==
+X-Gm-Message-State: ANoB5pmWBrtcxr3GizdU2kihgrc1vRjzZVc/9oKKIddpJQJevj3b9lbv
+	d1NMNeRzunPn58bEZ7XyCIs=
+X-Google-Smtp-Source: AA0mqf4KTmGbap+xoQWGEIBCNcnSByCIwuI9ifKJmSUv2uj5R1Bvnm7bWWoLlnJCQMM8sJMN59So0A==
+X-Received: by 2002:a17:902:ba95:b0:185:441f:7091 with SMTP id k21-20020a170902ba9500b00185441f7091mr15323679pls.22.1670849956058;
+        Mon, 12 Dec 2022 04:59:16 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id jc3-20020a17090325c300b00186f608c543sm6273927plb.304.2022.12.12.04.59.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Dec 2022 04:59:15 -0800 (PST)
+From: Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To: Peter Zijlstra <peterz@infradead.org>,
+	Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>,
+	Fenghua Yu <fenghua.yu@intel.com>,
+	kvmarm@lists.linux.dev,
+	linux-perf-users@vger.kernel.org
+Subject: [PATCH RFC 1/8] perf/core: Add *group_leader to perf_event_create_kernel_counter()
+Date: Mon, 12 Dec 2022 20:58:37 +0800
+Message-Id: <20221212125844.41157-2-likexu@tencent.com>
+X-Mailer: git-send-email 2.38.2
+In-Reply-To: <20221212125844.41157-1-likexu@tencent.com>
+References: <20221212125844.41157-1-likexu@tencent.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v2 7/7] KVM: selftests: Avoid infinite loop if
- ucall_alloc() fails
-To: Sean Christopherson <seanjc@google.com>,
- Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>, Shuah Khan <shuah@kernel.org>,
- Andrew Jones <andrew.jones@linux.dev>, Peter Gonda <pgonda@google.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Ricardo Koller <ricarkol@google.com>, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20221209015307.1781352-1-oliver.upton@linux.dev>
- <20221209015307.1781352-8-oliver.upton@linux.dev>
- <Y5OisdH5ohtr6r3j@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Y5OisdH5ohtr6r3j@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-ID: <20221212103847.PR5rwZPy_6rJd0gY3861oKcJv5nNc9B9lPvWoccb4cc@z>
+Content-Transfer-Encoding: 8bit
 
-On 12/9/22 22:03, Sean Christopherson wrote:
-> From: Sean Christopherson<seanjc@google.com>
-> Date: Fri, 9 Dec 2022 12:55:44 -0800
-> Subject: [PATCH] KVM: selftests: Use magic value to signal ucall_alloc()
->   failure
-> 
-> Use a magic value to signal a ucall_alloc() failure instead of simply
-> doing GUEST_ASSERT().  GUEST_ASSERT() relies on ucall_alloc() and so a
-> failure puts the guest into an infinite loop.
-> 
-> Use -1 as the magic value, as a real ucall struct should never wrap.
-> 
-> Reported-by: Oliver Upton<oliver.upton@linux.dev>
-> Signed-off-by: Sean Christopherson<seanjc@google.com>
-> ---
->   tools/testing/selftests/kvm/lib/ucall_common.c | 16 ++++++++++++++--
->   1 file changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
-> index 0cc0971ce60e..2f0e2ea941cc 100644
-> --- a/tools/testing/selftests/kvm/lib/ucall_common.c
-> +++ b/tools/testing/selftests/kvm/lib/ucall_common.c
-> @@ -4,6 +4,8 @@
->   #include "linux/bitmap.h"
->   #include "linux/atomic.h"
->   
-> +#define GUEST_UCALL_FAILED -1
-> +
->   struct ucall_header {
->   	DECLARE_BITMAP(in_use, KVM_MAX_VCPUS);
->   	struct ucall ucalls[KVM_MAX_VCPUS];
-> @@ -41,7 +43,8 @@ static struct ucall *ucall_alloc(void)
->   	struct ucall *uc;
->   	int i;
->   
-> -	GUEST_ASSERT(ucall_pool);
-> +	if (!ucall_pool)
-> +		goto ucall_failed;
->   
->   	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
->   		if (!test_and_set_bit(i, ucall_pool->in_use)) {
-> @@ -51,7 +54,13 @@ static struct ucall *ucall_alloc(void)
->   		}
->   	}
->   
-> -	GUEST_ASSERT(0);
-> +ucall_failed:
-> +	/*
-> +	 * If the vCPU cannot grab a ucall structure, make a bare ucall with a
-> +	 * magic value to signal to get_ucall() that things went sideways.
-> +	 * GUEST_ASSERT() depends on ucall_alloc() and so cannot be used here.
-> +	 */
-> +	ucall_arch_do_ucall(GUEST_UCALL_FAILED);
->   	return NULL;
->   }
->   
-> @@ -93,6 +102,9 @@ uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
->   
->   	addr = ucall_arch_get_ucall(vcpu);
->   	if (addr) {
-> +		TEST_ASSERT(addr != (void *)GUEST_UCALL_FAILED,
-> +			    "Guest failed to allocate ucall struct");
-> +
->   		memcpy(uc, addr, sizeof(*uc));
->   		vcpu_run_complete_io(vcpu);
->   	} else {
-> 
-> base-commit: dc2efbe4813e0dc4368779bc36c5f0e636cb8eb2
-> -- 
+From: Like Xu <likexu@tencent.com>
 
-Queued, thanks.
+Like syscalls users, kernel-space perf_event creators may also use group
+counters abstraction to gain pmu functionalities, and an in-kernel counter
+groups behave much like normal 'single' counters, following the group
+semantics-based behavior.
 
-Paolo
+No functional changes at this time. An example will be that KVM creates
+Intel slot event as group leader and other topdown metric events to emulate
+MSR_PERF_METRICS pmu capability for guests.
+
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Fenghua Yu <fenghua.yu@intel.com>
+Cc: kvmarm@lists.linux.dev
+Cc: linux-perf-users@vger.kernel.org
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ arch/arm64/kvm/pmu-emul.c                 | 4 ++--
+ arch/x86/kernel/cpu/resctrl/pseudo_lock.c | 4 ++--
+ arch/x86/kvm/pmu.c                        | 2 +-
+ arch/x86/kvm/vmx/pmu_intel.c              | 2 +-
+ include/linux/perf_event.h                | 1 +
+ kernel/events/core.c                      | 4 +++-
+ kernel/events/hw_breakpoint.c             | 4 ++--
+ kernel/events/hw_breakpoint_test.c        | 2 +-
+ kernel/watchdog_hld.c                     | 2 +-
+ 9 files changed, 14 insertions(+), 11 deletions(-)
+
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 24908400e190..11c3386bc86b 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -624,7 +624,7 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
+ 
+ 	attr.sample_period = compute_period(pmc, kvm_pmu_get_pmc_value(pmc));
+ 
+-	event = perf_event_create_kernel_counter(&attr, -1, current,
++	event = perf_event_create_kernel_counter(&attr, -1, current, NULL,
+ 						 kvm_pmu_perf_overflow, pmc);
+ 
+ 	if (IS_ERR(event)) {
+@@ -713,7 +713,7 @@ static struct arm_pmu *kvm_pmu_probe_armpmu(void)
+ 	attr.config = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
+ 	attr.sample_period = GENMASK(63, 0);
+ 
+-	event = perf_event_create_kernel_counter(&attr, -1, current,
++	event = perf_event_create_kernel_counter(&attr, -1, current, NULL,
+ 						 kvm_pmu_perf_overflow, &attr);
+ 
+ 	if (IS_ERR(event)) {
+diff --git a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c b/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
+index d961ae3ed96e..43e54bb200cd 100644
+--- a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
++++ b/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
+@@ -952,12 +952,12 @@ static int measure_residency_fn(struct perf_event_attr *miss_attr,
+ 	u64 tmp;
+ 
+ 	miss_event = perf_event_create_kernel_counter(miss_attr, plr->cpu,
+-						      NULL, NULL, NULL);
++						      NULL, NULL, NULL, NULL);
+ 	if (IS_ERR(miss_event))
+ 		goto out;
+ 
+ 	hit_event = perf_event_create_kernel_counter(hit_attr, plr->cpu,
+-						     NULL, NULL, NULL);
++						     NULL, NULL, NULL, NULL);
+ 	if (IS_ERR(hit_event))
+ 		goto out_miss;
+ 
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index eb594620dd75..f6c8180241d7 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -204,7 +204,7 @@ static int pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type, u64 config,
+ 			attr.precise_ip = 3;
+ 	}
+ 
+-	event = perf_event_create_kernel_counter(&attr, -1, current,
++	event = perf_event_create_kernel_counter(&attr, -1, current, NULL,
+ 						 kvm_perf_overflow, pmc);
+ 	if (IS_ERR(event)) {
+ 		pr_debug_ratelimited("kvm_pmu: event creation failed %ld for pmc->idx = %d\n",
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index f951dc756456..b746381307c7 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -299,7 +299,7 @@ int intel_pmu_create_guest_lbr_event(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	event = perf_event_create_kernel_counter(&attr, -1,
+-						current, NULL, NULL);
++						current, NULL, NULL, NULL);
+ 	if (IS_ERR(event)) {
+ 		pr_debug_ratelimited("%s: failed %ld\n",
+ 					__func__, PTR_ERR(event));
+diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+index 0031f7b4d9ab..5f34e1d0bff8 100644
+--- a/include/linux/perf_event.h
++++ b/include/linux/perf_event.h
+@@ -1023,6 +1023,7 @@ extern struct perf_event *
+ perf_event_create_kernel_counter(struct perf_event_attr *attr,
+ 				int cpu,
+ 				struct task_struct *task,
++				struct perf_event *group_leader,
+ 				perf_overflow_handler_t callback,
+ 				void *context);
+ extern void perf_pmu_migrate_context(struct pmu *pmu,
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index 7f04f995c975..f671b1a9a691 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -12674,12 +12674,14 @@ SYSCALL_DEFINE5(perf_event_open,
+  * @attr: attributes of the counter to create
+  * @cpu: cpu in which the counter is bound
+  * @task: task to profile (NULL for percpu)
++ * @group_leader: event group leader
+  * @overflow_handler: callback to trigger when we hit the event
+  * @context: context data could be used in overflow_handler callback
+  */
+ struct perf_event *
+ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
+ 				 struct task_struct *task,
++				 struct perf_event *group_leader,
+ 				 perf_overflow_handler_t overflow_handler,
+ 				 void *context)
+ {
+@@ -12694,7 +12696,7 @@ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
+ 	if (attr->aux_output)
+ 		return ERR_PTR(-EINVAL);
+ 
+-	event = perf_event_alloc(attr, cpu, task, NULL, NULL,
++	event = perf_event_alloc(attr, cpu, task, group_leader, NULL,
+ 				 overflow_handler, context, -1);
+ 	if (IS_ERR(event)) {
+ 		err = PTR_ERR(event);
+diff --git a/kernel/events/hw_breakpoint.c b/kernel/events/hw_breakpoint.c
+index c3797701339c..65b5b1421e62 100644
+--- a/kernel/events/hw_breakpoint.c
++++ b/kernel/events/hw_breakpoint.c
+@@ -771,7 +771,7 @@ register_user_hw_breakpoint(struct perf_event_attr *attr,
+ 			    void *context,
+ 			    struct task_struct *tsk)
+ {
+-	return perf_event_create_kernel_counter(attr, -1, tsk, triggered,
++	return perf_event_create_kernel_counter(attr, -1, tsk, NULL, triggered,
+ 						context);
+ }
+ EXPORT_SYMBOL_GPL(register_user_hw_breakpoint);
+@@ -881,7 +881,7 @@ register_wide_hw_breakpoint(struct perf_event_attr *attr,
+ 
+ 	cpus_read_lock();
+ 	for_each_online_cpu(cpu) {
+-		bp = perf_event_create_kernel_counter(attr, cpu, NULL,
++		bp = perf_event_create_kernel_counter(attr, cpu, NULL, NULL,
+ 						      triggered, context);
+ 		if (IS_ERR(bp)) {
+ 			err = PTR_ERR(bp);
+diff --git a/kernel/events/hw_breakpoint_test.c b/kernel/events/hw_breakpoint_test.c
+index c57610f52bb4..b3597df12284 100644
+--- a/kernel/events/hw_breakpoint_test.c
++++ b/kernel/events/hw_breakpoint_test.c
+@@ -39,7 +39,7 @@ static struct perf_event *register_test_bp(int cpu, struct task_struct *tsk, int
+ 	attr.bp_addr = (unsigned long)&break_vars[idx];
+ 	attr.bp_len = HW_BREAKPOINT_LEN_1;
+ 	attr.bp_type = HW_BREAKPOINT_RW;
+-	return perf_event_create_kernel_counter(&attr, cpu, tsk, NULL, NULL);
++	return perf_event_create_kernel_counter(&attr, cpu, tsk, NULL, NULL, NULL);
+ }
+ 
+ static void unregister_test_bp(struct perf_event **bp)
+diff --git a/kernel/watchdog_hld.c b/kernel/watchdog_hld.c
+index 247bf0b1582c..bb755dadba54 100644
+--- a/kernel/watchdog_hld.c
++++ b/kernel/watchdog_hld.c
+@@ -173,7 +173,7 @@ static int hardlockup_detector_event_create(void)
+ 	wd_attr->sample_period = hw_nmi_get_sample_period(watchdog_thresh);
+ 
+ 	/* Try to register using hardware perf events */
+-	evt = perf_event_create_kernel_counter(wd_attr, cpu, NULL,
++	evt = perf_event_create_kernel_counter(wd_attr, cpu, NULL, NULL,
+ 					       watchdog_overflow_callback, NULL);
+ 	if (IS_ERR(evt)) {
+ 		pr_debug("Perf event create on CPU %d failed with %ld\n", cpu,
+-- 
+2.38.2
 
