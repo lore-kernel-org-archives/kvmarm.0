@@ -1,51 +1,51 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D616A23C5
-	for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 10:36:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215B923BD
+	for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 10:38:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1670841382;
+	s=mimecast20190719; t=1670841535;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mQe1vPVAoLefYVtJgOMADA9UsAQ3Kxq8XGAB/nV1Q60=;
-	b=KlAay9MJGpxeE6NzBHN8eaGv9IigyHXkeGe5B2F4fmy9KJnp/x83LWn7mTcQEhdeCkao9I
-	aiHhPS1JQHswfErvLzQib0xsqbPx5TMvGOQqJX/ffj0TqK5XxqqGwZiciso3zmqWe/2XvM
-	HHUaIHqKfCZ0aCBckp4/zooIi3CVxbc=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=0geoJp5y5vah58rc3h1onQRI09PobQgX5h6nKaS34UM=;
+	b=jJoxYQlScOh2WvgOPA3fGIDz0S6JEQOTgxPRNgjJU2O9UBlEUB+uAvONGncmjuTsDKmtRO
+	SMa6Fr3uT6f+vK/Gis/gYGN+GDSP1hjxw9lc+3nnYAR0xFiyoHjF7szAH6lwrXTFU+lZk+
+	2V2npXTQnG6sj2Ng/YR/gq0HO9sMeLE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-612-ybnWBjsiM8CUSwpghYMuaQ-1; Mon, 12 Dec 2022 05:36:21 -0500
-X-MC-Unique: ybnWBjsiM8CUSwpghYMuaQ-1
-Received: by mail-wm1-f71.google.com with SMTP id h9-20020a1c2109000000b003cfd37aec58so3173148wmh.1
-        for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 02:36:21 -0800 (PST)
+ us-mta-387-x-_APtkvO7eDZ63dTGNr_g-1; Mon, 12 Dec 2022 05:38:50 -0500
+X-MC-Unique: x-_APtkvO7eDZ63dTGNr_g-1
+Received: by mail-wr1-f71.google.com with SMTP id x1-20020adfbb41000000b002426b33b618so2122782wrg.7
+        for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 02:38:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mQe1vPVAoLefYVtJgOMADA9UsAQ3Kxq8XGAB/nV1Q60=;
-        b=WBCbXFB2LWYAQkan2gMVNdAIi+1qVkIMau1NRYreMT0rb7SDTVcUY/HRt2KD/ficu3
-         IBV7L4y5BJbS+pxGFfhpHwDlA9afmagHMQrTjjQa+AxV5eNL6AMhLbR4BSHkJ+yYAT3L
-         jtDiYTV46I1PwdwhK5QSxXZse0NAG13Y1bp9VEQ2DHlXFs7gmhI9xOl5pO0jnqdqq9X+
-         QugFzhYPIDI+t1SV7gYnuGxatiS8u7fRhdrUgi8CVbPWHfKpN7nOPi7s/HemuJ0DRbeK
-         CS5WQQ4xJX/sRRYnprt9oH5gu1WwtSd3rTpFLBjP4dmV9ySrGFe6t0ZF4O449XudGxUc
-         +aMA==
-X-Gm-Message-State: ANoB5pnbnuJVm2LCt2AyM0gUxesqhvznsf6Hp/ECjCGmci0/gx0bt6Tk
-	+izNs9wGcQ2Jg99wKNVOD6IKsuX1rLHhQTthPFjbXz439y2yhVUeX7nAqPCAqwZQBFRLGhzFUiI
-	uvvXsaM4lXUr7EFhe
-X-Received: by 2002:a5d:564a:0:b0:24c:f1ca:b2df with SMTP id j10-20020a5d564a000000b0024cf1cab2dfmr5988131wrw.67.1670841380634;
-        Mon, 12 Dec 2022 02:36:20 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5yfwj5UnZ7QW7iYJjXIjnpYQh7U361r5HLW6PWTGWDdexdLTapuWofhSkU9q9aAnLfd+7YDA==
-X-Received: by 2002:a5d:564a:0:b0:24c:f1ca:b2df with SMTP id j10-20020a5d564a000000b0024cf1cab2dfmr5988117wrw.67.1670841380414;
-        Mon, 12 Dec 2022 02:36:20 -0800 (PST)
+        bh=0geoJp5y5vah58rc3h1onQRI09PobQgX5h6nKaS34UM=;
+        b=bfmuGXnzFBQcJ22g/5IMWJN6VzFDkG04C9AqGLIhdyZNDlwXHtRA9oKoM2sf30rP/X
+         SOF9CNEQ4pWLmDdPgTr4nq16tBxJQFPdF4PJ6uXoZhgNX9kiGPzrTcnPvLgD6Y6POuRH
+         jfWuWreggBWC47c/OCu+fzQ7TGd4tizYKPc6oJCigMDptrvI4uDN3qq02nbOZA04MfOf
+         +CTjO9wJKZXIDpVXY5e9JpIYpZc8FxRuVuabH6BTOefE98j3/wKTb+IKVSvvW47B+LGn
+         Wir5yuKAhJqjfft+Dn7E8kBM2HOgl2edBOfJ2crilpYMtGxRoVbH4Lw/DMEvx8inbWxW
+         qNEQ==
+X-Gm-Message-State: ANoB5pke5tRDKkBV44I67XjjtZgXdaIIugXD5RsqGqUiaJOM8s66ncQx
+	XsXnbh06IjNuac8wMShuG91zqkPOgW9Irl4rCWLcEIIMDANutrXSzA1qWzhlNKH7FD4/XbSfONW
+	X44UiMSwUTSaQ4+8K
+X-Received: by 2002:a05:600c:5398:b0:3cf:d0b1:8aa1 with SMTP id hg24-20020a05600c539800b003cfd0b18aa1mr12355042wmb.0.1670841528986;
+        Mon, 12 Dec 2022 02:38:48 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf43hHD3Xh/hVMzgx7AUun3dPtnLezNxJe71/MuBv74YiGy1tG1gohvB+wRobXA4W5SAS5QTYw==
+X-Received: by 2002:a05:600c:5398:b0:3cf:d0b1:8aa1 with SMTP id hg24-20020a05600c539800b003cfd0b18aa1mr12355032wmb.0.1670841528795;
+        Mon, 12 Dec 2022 02:38:48 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id bp8-20020a5d5a88000000b00241e8d00b79sm10772956wrb.54.2022.12.12.02.36.19
+        by smtp.googlemail.com with ESMTPSA id iw3-20020a05600c54c300b003d220ef3232sm5442368wmb.34.2022.12.12.02.38.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Dec 2022 02:36:19 -0800 (PST)
-Message-ID: <42dbdb4d-13da-cd6b-e2ad-95b0cb0ff04e@redhat.com>
-Date: Mon, 12 Dec 2022 11:36:18 +0100
+        Mon, 12 Dec 2022 02:38:48 -0800 (PST)
+Message-ID: <2ce6eab8-6156-1282-bf29-87fd74e4587a@redhat.com>
+Date: Mon, 12 Dec 2022 11:38:47 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,47 +54,100 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH v2 0/7] KVM: selftests: Fixes for ucall pool +
- page_fault_test
-To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
- James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+Subject: Re: [PATCH v2 7/7] KVM: selftests: Avoid infinite loop if
+ ucall_alloc() fails
+To: Sean Christopherson <seanjc@google.com>,
+ Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>, Shuah Khan <shuah@kernel.org>,
+ Andrew Jones <andrew.jones@linux.dev>, Peter Gonda <pgonda@google.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Ricardo Koller <ricarkol@google.com>, Sean Christopherson <seanjc@google.com>
+ Ricardo Koller <ricarkol@google.com>, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 References: <20221209015307.1781352-1-oliver.upton@linux.dev>
+ <20221209015307.1781352-8-oliver.upton@linux.dev>
+ <Y5OisdH5ohtr6r3j@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221209015307.1781352-1-oliver.upton@linux.dev>
+In-Reply-To: <Y5OisdH5ohtr6r3j@google.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-ID: <20221212103618.GRCCKMXxWNA6qycrkXJY-bFUb9ObV9dnUsb--PFtaRA@z>
+Message-ID: <20221212103847.PR5rwZPy_6rJd0gY3861oKcJv5nNc9B9lPvWoccb4cc@z>
 
-On 12/9/22 02:52, Oliver Upton wrote:
-> The combination of the pool-based ucall implementation + page_fault_test
-> resulted in some 'fun' bugs. As has always been the case, KVM selftests
-> is a house of cards.
+On 12/9/22 22:03, Sean Christopherson wrote:
+> From: Sean Christopherson<seanjc@google.com>
+> Date: Fri, 9 Dec 2022 12:55:44 -0800
+> Subject: [PATCH] KVM: selftests: Use magic value to signal ucall_alloc()
+>   failure
 > 
-> Small series to fix up the issues on kvm/queue. Patches 1-2 can probably
-> be squashed into Paolo's merge resolution, if desired.
+> Use a magic value to signal a ucall_alloc() failure instead of simply
+> doing GUEST_ASSERT().  GUEST_ASSERT() relies on ucall_alloc() and so a
+> failure puts the guest into an infinite loop.
 > 
-> Tested on Ampere Altra and a Skylake box, since there was a decent
-> amount of munging in architecture-generic code.
+> Use -1 as the magic value, as a real ucall struct should never wrap.
 > 
-> v1 -> v2:
->   - Collect R-b from Sean (thanks!)
->   - Use a common routine for split and contiguous VA spaces, with
->     commentary on why arm64 is different since we all get to look at it
->     now. (Sean)
->   - Don't identity map the ucall MMIO hole
->   - Fix an off-by-one issue in the accounting of virtual memory,
->     discovered in fighting with #2
->   - Fix an infinite loop in ucall_alloc(), discovered fighting with the
->     ucall_init() v. kvm_vm_elf_load() ordering issue
+> Reported-by: Oliver Upton<oliver.upton@linux.dev>
+> Signed-off-by: Sean Christopherson<seanjc@google.com>
+> ---
+>   tools/testing/selftests/kvm/lib/ucall_common.c | 16 ++++++++++++++--
+>   1 file changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
+> index 0cc0971ce60e..2f0e2ea941cc 100644
+> --- a/tools/testing/selftests/kvm/lib/ucall_common.c
+> +++ b/tools/testing/selftests/kvm/lib/ucall_common.c
+> @@ -4,6 +4,8 @@
+>   #include "linux/bitmap.h"
+>   #include "linux/atomic.h"
+>   
+> +#define GUEST_UCALL_FAILED -1
+> +
+>   struct ucall_header {
+>   	DECLARE_BITMAP(in_use, KVM_MAX_VCPUS);
+>   	struct ucall ucalls[KVM_MAX_VCPUS];
+> @@ -41,7 +43,8 @@ static struct ucall *ucall_alloc(void)
+>   	struct ucall *uc;
+>   	int i;
+>   
+> -	GUEST_ASSERT(ucall_pool);
+> +	if (!ucall_pool)
+> +		goto ucall_failed;
+>   
+>   	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+>   		if (!test_and_set_bit(i, ucall_pool->in_use)) {
+> @@ -51,7 +54,13 @@ static struct ucall *ucall_alloc(void)
+>   		}
+>   	}
+>   
+> -	GUEST_ASSERT(0);
+> +ucall_failed:
+> +	/*
+> +	 * If the vCPU cannot grab a ucall structure, make a bare ucall with a
+> +	 * magic value to signal to get_ucall() that things went sideways.
+> +	 * GUEST_ASSERT() depends on ucall_alloc() and so cannot be used here.
+> +	 */
+> +	ucall_arch_do_ucall(GUEST_UCALL_FAILED);
+>   	return NULL;
+>   }
+>   
+> @@ -93,6 +102,9 @@ uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
+>   
+>   	addr = ucall_arch_get_ucall(vcpu);
+>   	if (addr) {
+> +		TEST_ASSERT(addr != (void *)GUEST_UCALL_FAILED,
+> +			    "Guest failed to allocate ucall struct");
+> +
+>   		memcpy(uc, addr, sizeof(*uc));
+>   		vcpu_run_complete_io(vcpu);
+>   	} else {
+> 
+> base-commit: dc2efbe4813e0dc4368779bc36c5f0e636cb8eb2
+> -- 
 
-Queued 3+5, thanks.
+Queued, thanks.
 
 Paolo
 
