@@ -1,51 +1,51 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F263212
-	for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 18:07:49 +0000 (UTC)
-Received: by mail-qk1-f180.google.com with SMTP id j26so5476659qki.10
-        for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 10:07:49 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC05533D5
+	for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 18:24:43 +0000 (UTC)
+Received: by mail-qv1-f54.google.com with SMTP id pv25so2760015qvb.1
+        for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 10:24:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=lwUCyezC9ULD6XlutkVPm/3+Vv8JW2/Y3rkabll6Dho=;
-        b=LYVsnT+7IHTRQivWRpe3sDRiSKillDH5Z+Wwb+XOAlYe5pHZT6wMxkCpwmatoUdiVO
-         NAgXMUX5KWul7o2cMowupxjOBRvKhlMyB5RWD9qIeUqJQstbp4+EHbhxOduGKjkBjQBP
-         bKDe8qzso+qkdEnGZklRl5EpNImqBA/VRP44cVY/BE0NsOqFX109wba6h55z2UYk+g+I
-         hiKYm27YzWkLcSkR00Z9bModt9RSn1zm4Bb+xBiWbiBZtaenoCmwxdNGQOsKCmqIGSbq
-         MXO7nnRg5sbF2uwssgqKfneDqqoQTz6XPJ3xtTYiitvGAY6rlFGvBZ6Al89UDv9bMyJ/
-         2QHw==
+        bh=AMcXpU9xF78qNj4uAPl+XF5OMVRy/HcRZ5eu+9Qyxok=;
+        b=OwsVpfa01F6Vy1licgfoHfJAh300jir6SR8hGTbRWrx9HTeKg0xZPDCCt+5dd8pusT
+         rGbZhVXiQHmIzMeTkfc1aGvwobd/+EdNM6SkF1+VCoUAjUvpbe2hwVzUKkOJuIryOnpw
+         kLa95FwRX0IoFYtBZqP2gfUz2LRqfHCcykOPBEuMfRc4Ujt0DOtkDDvFOxcjg/diyIy0
+         gPjUEEWEcA4PXdH/TbGxgRrm5JPZ5fSs/GawoWTfeOJEebJzDbDnqJgKFGzQd/JOIVEB
+         aRc3NjkudM2tmCsD1JTWZGQLR/EoV9nXjRPHQn7ZIol/iewVFH6MQhvEfI/MCwJPODcm
+         v7xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=lwUCyezC9ULD6XlutkVPm/3+Vv8JW2/Y3rkabll6Dho=;
-        b=JYC/oG+C5x45Lu6knuATk2otP34gS1CHkejuaU7uRkgueWMl6bAb6H5zmTr/50bn+W
-         /BAfS4vwQhH7T7VLXRoVMbtaf26vr9Risq6Fzk7IvySPs6Sf+y4CKzFpW8aGs6mmoj+8
-         R0u05uUrUXy/KX6pUUAwXc2iXfCGP/N2qiXEKLrcwW25oU3FafZz455s9z1P8nass9WX
-         aiColGkLevkQ5QrydCphV6YdPX6pm5p3vs+p1N1FAbLpVbGnUjckDEBXyB+HJGhUgksV
-         m/zvLseGsKnGETkgSWlWB0lA6f7nCebW726NHw1ECanAZGPWfFAm35mJOblT0ceiSR9U
-         J/Bg==
-X-Gm-Message-State: ANoB5plvGbPlKyx9wmfOEkbD1mtuPteuQphZuQQvdzEnXseQ2XpOpLOB
-	FzcsxdIopv+m6VJG/QLQEl3CAzZrxNv2AEn2jR6FLg==
-X-Google-Smtp-Source: AA0mqf6et/Dg1HzguqAnBQiFCpHyKR8HyJ6XPuS8JQASEamAjsORPLR3RPjclIZqkz5RyNVw7tV7D7pRjVo3yW6BZpc=
-X-Received: by 2002:a05:620a:1aa3:b0:6fa:b56f:7ede with SMTP id
- bl35-20020a05620a1aa300b006fab56f7edemr84271365qkb.383.1670868468322; Mon, 12
- Dec 2022 10:07:48 -0800 (PST)
+        bh=AMcXpU9xF78qNj4uAPl+XF5OMVRy/HcRZ5eu+9Qyxok=;
+        b=akWtBEqZoLBbEUEVcMRAhwJH5lvVZEz0Zfywt/1sK97Jr3O3FwOs6q5lodnqO7GXAZ
+         ePhn5C5Vi7X2eeG3WYFaYyKiUTBJ2ngRtlZVLys7EyXiCfS3NqDMqANEGnUEs98z31mY
+         Qtev4PS2DjrJlubi0UklwAIZUrzQEYRUb5ivgy7WBaKXNKyWzf5wPFZgjhwpWaLwl1Zx
+         7BdBGqkiUAstR8fKzIbQ+hZ9sb48xei7c5dFOsV1bsOdwKMIFlL0QR30l5NUy78lHsw7
+         BDs1M4g3ptIvDmXY9fkwLpQZcD/3VnKv/TUTBk5QzjQKucV6iIgxNqVhjsKflRquc2fV
+         sWaA==
+X-Gm-Message-State: ANoB5pk5xzdyixwfV5HHYm0Y49pHMGGdOozs0ylrkfR+vx5rT6T2zGyQ
+	uYS+P8ozcweSvzNbGzzvObu8pz5cY4uc8VejOdBlIA==
+X-Google-Smtp-Source: AA0mqf6fu7BuuPFxqp6T8XG4FGosl4ytNjM6B55YI7JB6FeyGgrfnzSzOHl5Ktl+KxaL+Yjgll/5/5F5JDyyvFAZIlg=
+X-Received: by 2002:a0c:e6a9:0:b0:4bb:892a:fc11 with SMTP id
+ j9-20020a0ce6a9000000b004bb892afc11mr68548097qvn.28.1670869482342; Mon, 12
+ Dec 2022 10:24:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20221208193857.4090582-1-dmatlack@google.com> <20221208193857.4090582-7-dmatlack@google.com>
-In-Reply-To: <20221208193857.4090582-7-dmatlack@google.com>
+References: <20221208193857.4090582-1-dmatlack@google.com> <20221208193857.4090582-11-dmatlack@google.com>
+In-Reply-To: <20221208193857.4090582-11-dmatlack@google.com>
 From: Ben Gardon <bgardon@google.com>
-Date: Mon, 12 Dec 2022 10:07:36 -0800
-Message-ID: <CANgfPd_RTbwFD+9=jvfm=ZavsZZZQFQs+jn3ebGpBTbWR2dP2g@mail.gmail.com>
-Subject: Re: [RFC PATCH 06/37] KVM: MMU: Move struct kvm_mmu_page to common code
+Date: Mon, 12 Dec 2022 10:24:31 -0800
+Message-ID: <CANgfPd-DaxszBe6vLQGe=LKNKx8bDX-AC_30qLVAyYkQXwN7WA@mail.gmail.com>
+Subject: Re: [RFC PATCH 10/37] KVM: MMU: Move struct kvm_page_fault to common code
 To: David Matlack <dmatlack@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
@@ -66,864 +66,416 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
 	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221212180736.5oFu-Iyw1JmRj8Jj_4XOf1-wqmW7gsvYyjltNQo4-vs@z>
+Message-ID: <20221212182431.LDmqb7A3nCdfd2qMxyxwHBleg5Z6QyAzJZS_12vZSN4@z>
 
 On Thu, Dec 8, 2022 at 11:39 AM David Matlack <dmatlack@google.com> wrote:
 >
-> Move struct kvm_mmu_page to common code and all x86-specific fields into
-> kvm_mmu_page_arch.
->
-> This commit increases the size of struct kvm_mmu_page by 64 bytes on
-> x86_64 (184 bytes -> 248 bytes). The size of this struct can be reduced
-> in future commits by moving TDP MMU root fields into a separate struct
-> and by dynamically allocating fields only used by the Shadow MMU.
+> Move struct kvm_page_fault to common code. This will be used in a future
+> commit to move the TDP MMU to common code.
 >
 > No functional change intended.
 >
 > Signed-off-by: David Matlack <dmatlack@google.com>
-
-I haven't reviewed every line of the mechanical refactor of adding
-"arch." all over the place, but at a high level, this looks like a
-good split on struct kvm_mmu_page.
-
 > ---
->  arch/x86/include/asm/kvm/mmu_types.h |  62 ++++++++++++++
->  arch/x86/include/asm/kvm_host.h      |   4 -
->  arch/x86/kvm/mmu/mmu.c               | 122 ++++++++++++++-------------
->  arch/x86/kvm/mmu/mmu_internal.h      |  83 ------------------
->  arch/x86/kvm/mmu/mmutrace.h          |   4 +-
->  arch/x86/kvm/mmu/paging_tmpl.h       |  10 +--
->  arch/x86/kvm/mmu/tdp_mmu.c           |   8 +-
->  arch/x86/kvm/mmu/tdp_mmu.h           |   2 +-
->  include/kvm/mmu_types.h              |  32 ++++++-
->  9 files changed, 167 insertions(+), 160 deletions(-)
+>  arch/x86/include/asm/kvm/mmu_types.h | 20 +++++++
+>  arch/x86/kvm/mmu/mmu.c               | 19 +++----
+>  arch/x86/kvm/mmu/mmu_internal.h      | 79 ++++++----------------------
+>  arch/x86/kvm/mmu/mmutrace.h          |  2 +-
+>  arch/x86/kvm/mmu/paging_tmpl.h       | 14 ++---
+>  arch/x86/kvm/mmu/tdp_mmu.c           |  6 +--
+>  include/kvm/mmu_types.h              | 44 ++++++++++++++++
+>  7 files changed, 100 insertions(+), 84 deletions(-)
 >
 > diff --git a/arch/x86/include/asm/kvm/mmu_types.h b/arch/x86/include/asm/kvm/mmu_types.h
-> index 35f893ebab5a..affcb520b482 100644
+> index affcb520b482..59d1be85f4b7 100644
 > --- a/arch/x86/include/asm/kvm/mmu_types.h
 > +++ b/arch/x86/include/asm/kvm/mmu_types.h
-> @@ -2,6 +2,8 @@
->  #ifndef __ASM_KVM_MMU_TYPES_H
->  #define __ASM_KVM_MMU_TYPES_H
->
-> +#include <linux/bitmap.h>
-> +#include <linux/list.h>
+> @@ -5,6 +5,7 @@
+>  #include <linux/bitmap.h>
+>  #include <linux/list.h>
 >  #include <linux/types.h>
+> +#include <linux/kvm_types.h>
 >
 >  /*
-> @@ -53,4 +55,64 @@ struct kvm_mmu_page_role_arch {
->         u16 passthrough:1;
+>   * This is a subset of the overall kvm_cpu_role to minimize the size of
+> @@ -115,4 +116,23 @@ struct kvm_mmu_page_arch {
+>         atomic_t write_flooding_count;
 >  };
 >
-> +struct kvm_rmap_head {
-> +       unsigned long val;
-> +};
+> +struct kvm_page_fault_arch {
+> +       const u32 error_code;
 > +
-> +struct kvm_mmu_page_arch {
-> +       struct hlist_node hash_link;
+> +       /* x86-specific error code bits */
+> +       const bool present;
+> +       const bool rsvd;
+> +       const bool user;
 > +
-> +       bool shadow_mmu_page;
-> +       bool unsync;
-> +       u8 mmu_valid_gen;
-> +
-> +        /*
-> +         * The shadow page can't be replaced by an equivalent huge page
-> +         * because it is being used to map an executable page in the guest
-> +         * and the NX huge page mitigation is enabled.
-> +         */
-> +       bool nx_huge_page_disallowed;
+> +       /* Derived from mmu and global state.  */
+> +       const bool is_tdp;
+> +       const bool nx_huge_page_workaround_enabled;
 > +
 > +       /*
-> +        * Stores the result of the guest translation being shadowed by each
-> +        * SPTE.  KVM shadows two types of guest translations: nGPA -> GPA
-> +        * (shadow EPT/NPT) and GVA -> GPA (traditional shadow paging). In both
-> +        * cases the result of the translation is a GPA and a set of access
-> +        * constraints.
-> +        *
-> +        * The GFN is stored in the upper bits (PAGE_SHIFT) and the shadowed
-> +        * access permissions are stored in the lower bits. Note, for
-> +        * convenience and uniformity across guests, the access permissions are
-> +        * stored in KVM format (e.g.  ACC_EXEC_MASK) not the raw guest format.
+> +        * Whether a >4KB mapping can be created or is forbidden due to NX
+> +        * hugepages.
 > +        */
-> +       u64 *shadowed_translation;
-> +
-> +       unsigned int unsync_children;
-> +
-> +       /* Rmap pointers to all parent sptes. */
-> +       struct kvm_rmap_head parent_ptes;
-> +
-> +       DECLARE_BITMAP(unsync_child_bitmap, 512);
-> +
-> +       /*
-> +        * Tracks shadow pages that, if zapped, would allow KVM to create an NX
-> +        * huge page.  A shadow page will have nx_huge_page_disallowed set but
-> +        * not be on the list if a huge page is disallowed for other reasons,
-> +        * e.g. because KVM is shadowing a PTE at the same gfn, the memslot
-> +        * isn't properly aligned, etc...
-> +        */
-> +       struct list_head possible_nx_huge_page_link;
-> +
-> +#ifdef CONFIG_X86_32
-> +       /*
-> +        * Used out of the mmu-lock to avoid reading spte values while an
-> +        * update is in progress; see the comments in __get_spte_lockless().
-> +        */
-> +       int clear_spte_count;
-> +#endif
-> +
-> +       /* Number of writes since the last time traversal visited this page.  */
-> +       atomic_t write_flooding_count;
+> +       bool huge_page_disallowed;
 > +};
 > +
 >  #endif /* !__ASM_KVM_MMU_TYPES_H */
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index ebcd7a0dabef..f5743a652e10 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -329,10 +329,6 @@ union kvm_cpu_role {
->         };
->  };
->
-> -struct kvm_rmap_head {
-> -       unsigned long val;
-> -};
-> -
->  struct kvm_pio_request {
->         unsigned long linear_rip;
->         unsigned long count;
 > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 11cef930d5ed..e47f35878ab5 100644
+> index e47f35878ab5..0593d4a60139 100644
 > --- a/arch/x86/kvm/mmu/mmu.c
 > +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -350,7 +350,7 @@ static void count_spte_clear(u64 *sptep, u64 spte)
+> @@ -3092,7 +3092,8 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>         struct kvm_memory_slot *slot = fault->slot;
+>         kvm_pfn_t mask;
 >
->         /* Ensure the spte is completely set before we increase the count */
->         smp_wmb();
-> -       sp->clear_spte_count++;
-> +       sp->arch.clear_spte_count++;
->  }
+> -       fault->huge_page_disallowed = fault->exec && fault->nx_huge_page_workaround_enabled;
+> +       fault->arch.huge_page_disallowed =
+> +               fault->exec && fault->arch.nx_huge_page_workaround_enabled;
 >
->  static void __set_spte(u64 *sptep, u64 spte)
-> @@ -432,7 +432,7 @@ static u64 __get_spte_lockless(u64 *sptep)
->         int count;
->
->  retry:
-> -       count = sp->clear_spte_count;
-> +       count = sp->arch.clear_spte_count;
->         smp_rmb();
->
->         spte.spte_low = orig->spte_low;
-> @@ -442,7 +442,7 @@ static u64 __get_spte_lockless(u64 *sptep)
->         smp_rmb();
->
->         if (unlikely(spte.spte_low != orig->spte_low ||
-> -             count != sp->clear_spte_count))
-> +             count != sp->arch.clear_spte_count))
->                 goto retry;
->
->         return spte.spte;
-> @@ -699,7 +699,7 @@ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
->                 return sp->gfn;
->
->         if (!sp->role.arch.direct)
-> -               return sp->shadowed_translation[index] >> PAGE_SHIFT;
-> +               return sp->arch.shadowed_translation[index] >> PAGE_SHIFT;
->
->         return sp->gfn + (index << ((sp->role.level - 1) * SPTE_LEVEL_BITS));
->  }
-> @@ -713,7 +713,7 @@ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
->  static u32 kvm_mmu_page_get_access(struct kvm_mmu_page *sp, int index)
->  {
->         if (sp_has_gptes(sp))
-> -               return sp->shadowed_translation[index] & ACC_ALL;
-> +               return sp->arch.shadowed_translation[index] & ACC_ALL;
->
->         /*
->          * For direct MMUs (e.g. TDP or non-paging guests) or passthrough SPs,
-> @@ -734,7 +734,7 @@ static void kvm_mmu_page_set_translation(struct kvm_mmu_page *sp, int index,
->                                          gfn_t gfn, unsigned int access)
->  {
->         if (sp_has_gptes(sp)) {
-> -               sp->shadowed_translation[index] = (gfn << PAGE_SHIFT) | access;
-> +               sp->arch.shadowed_translation[index] = (gfn << PAGE_SHIFT) | access;
+>         if (unlikely(fault->max_level == PG_LEVEL_4K))
 >                 return;
->         }
->
-> @@ -825,18 +825,18 @@ void track_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp)
->          * on the list if KVM is reusing an existing shadow page, i.e. if KVM
->          * links a shadow page at multiple points.
+> @@ -3109,7 +3110,7 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
 >          */
-> -       if (!list_empty(&sp->possible_nx_huge_page_link))
-> +       if (!list_empty(&sp->arch.possible_nx_huge_page_link))
+>         fault->req_level = kvm_mmu_max_mapping_level(vcpu->kvm, slot,
+>                                                      fault->gfn, fault->max_level);
+> -       if (fault->req_level == PG_LEVEL_4K || fault->huge_page_disallowed)
+> +       if (fault->req_level == PG_LEVEL_4K || fault->arch.huge_page_disallowed)
 >                 return;
->
->         ++kvm->stat.nx_lpage_splits;
-> -       list_add_tail(&sp->possible_nx_huge_page_link,
-> +       list_add_tail(&sp->arch.possible_nx_huge_page_link,
->                       &kvm->arch.possible_nx_huge_pages);
->  }
->
->  static void account_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp,
->                                  bool nx_huge_page_possible)
->  {
-> -       sp->nx_huge_page_disallowed = true;
-> +       sp->arch.nx_huge_page_disallowed = true;
->
->         if (nx_huge_page_possible)
->                 track_possible_nx_huge_page(kvm, sp);
-> @@ -861,16 +861,16 @@ static void unaccount_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
->
->  void untrack_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp)
->  {
-> -       if (list_empty(&sp->possible_nx_huge_page_link))
-> +       if (list_empty(&sp->arch.possible_nx_huge_page_link))
->                 return;
->
->         --kvm->stat.nx_lpage_splits;
-> -       list_del_init(&sp->possible_nx_huge_page_link);
-> +       list_del_init(&sp->arch.possible_nx_huge_page_link);
->  }
->
->  static void unaccount_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp)
->  {
-> -       sp->nx_huge_page_disallowed = false;
-> +       sp->arch.nx_huge_page_disallowed = false;
->
->         untrack_possible_nx_huge_page(kvm, sp);
->  }
-> @@ -1720,11 +1720,11 @@ static void kvm_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
->  static void kvm_mmu_free_shadow_page(struct kvm_mmu_page *sp)
->  {
->         MMU_WARN_ON(!is_empty_shadow_page(sp->spt));
-> -       hlist_del(&sp->hash_link);
-> +       hlist_del(&sp->arch.hash_link);
->         list_del(&sp->link);
->         free_page((unsigned long)sp->spt);
->         if (!sp->role.arch.direct)
-> -               free_page((unsigned long)sp->shadowed_translation);
-> +               free_page((unsigned long)sp->arch.shadowed_translation);
->         kmem_cache_free(mmu_page_header_cache, sp);
->  }
->
-> @@ -1739,13 +1739,13 @@ static void mmu_page_add_parent_pte(struct kvm_mmu_memory_cache *cache,
->         if (!parent_pte)
->                 return;
->
-> -       pte_list_add(cache, parent_pte, &sp->parent_ptes);
-> +       pte_list_add(cache, parent_pte, &sp->arch.parent_ptes);
->  }
->
->  static void mmu_page_remove_parent_pte(struct kvm_mmu_page *sp,
->                                        u64 *parent_pte)
->  {
-> -       pte_list_remove(parent_pte, &sp->parent_ptes);
-> +       pte_list_remove(parent_pte, &sp->arch.parent_ptes);
->  }
->
->  static void drop_parent_pte(struct kvm_mmu_page *sp,
-> @@ -1761,7 +1761,7 @@ static void kvm_mmu_mark_parents_unsync(struct kvm_mmu_page *sp)
->         u64 *sptep;
->         struct rmap_iterator iter;
->
-> -       for_each_rmap_spte(&sp->parent_ptes, &iter, sptep) {
-> +       for_each_rmap_spte(&sp->arch.parent_ptes, &iter, sptep) {
->                 mark_unsync(sptep);
->         }
->  }
-> @@ -1771,9 +1771,9 @@ static void mark_unsync(u64 *spte)
->         struct kvm_mmu_page *sp;
->
->         sp = sptep_to_sp(spte);
-> -       if (__test_and_set_bit(spte_index(spte), sp->unsync_child_bitmap))
-> +       if (__test_and_set_bit(spte_index(spte), sp->arch.unsync_child_bitmap))
->                 return;
-> -       if (sp->unsync_children++)
-> +       if (sp->arch.unsync_children++)
->                 return;
->         kvm_mmu_mark_parents_unsync(sp);
->  }
-> @@ -1799,7 +1799,7 @@ static int mmu_pages_add(struct kvm_mmu_pages *pvec, struct kvm_mmu_page *sp,
->  {
->         int i;
->
-> -       if (sp->unsync)
-> +       if (sp->arch.unsync)
->                 for (i=0; i < pvec->nr; i++)
->                         if (pvec->page[i].sp == sp)
->                                 return 0;
-> @@ -1812,9 +1812,9 @@ static int mmu_pages_add(struct kvm_mmu_pages *pvec, struct kvm_mmu_page *sp,
->
->  static inline void clear_unsync_child_bit(struct kvm_mmu_page *sp, int idx)
->  {
-> -       --sp->unsync_children;
-> -       WARN_ON((int)sp->unsync_children < 0);
-> -       __clear_bit(idx, sp->unsync_child_bitmap);
-> +       --sp->arch.unsync_children;
-> +       WARN_ON((int)sp->arch.unsync_children < 0);
-> +       __clear_bit(idx, sp->arch.unsync_child_bitmap);
->  }
->
->  static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
-> @@ -1822,7 +1822,7 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
->  {
->         int i, ret, nr_unsync_leaf = 0;
->
-> -       for_each_set_bit(i, sp->unsync_child_bitmap, 512) {
-> +       for_each_set_bit(i, sp->arch.unsync_child_bitmap, 512) {
->                 struct kvm_mmu_page *child;
->                 u64 ent = sp->spt[i];
->
-> @@ -1833,7 +1833,7 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
->
->                 child = spte_to_child_sp(ent);
->
-> -               if (child->unsync_children) {
-> +               if (child->arch.unsync_children) {
->                         if (mmu_pages_add(pvec, child, i))
->                                 return -ENOSPC;
->
-> @@ -1845,7 +1845,7 @@ static int __mmu_unsync_walk(struct kvm_mmu_page *sp,
->                                 nr_unsync_leaf += ret;
->                         } else
->                                 return ret;
-> -               } else if (child->unsync) {
-> +               } else if (child->arch.unsync) {
->                         nr_unsync_leaf++;
->                         if (mmu_pages_add(pvec, child, i))
->                                 return -ENOSPC;
-> @@ -1862,7 +1862,7 @@ static int mmu_unsync_walk(struct kvm_mmu_page *sp,
->                            struct kvm_mmu_pages *pvec)
->  {
->         pvec->nr = 0;
-> -       if (!sp->unsync_children)
-> +       if (!sp->arch.unsync_children)
->                 return 0;
->
->         mmu_pages_add(pvec, sp, INVALID_INDEX);
-> @@ -1871,9 +1871,9 @@ static int mmu_unsync_walk(struct kvm_mmu_page *sp,
->
->  static void kvm_unlink_unsync_page(struct kvm *kvm, struct kvm_mmu_page *sp)
->  {
-> -       WARN_ON(!sp->unsync);
-> +       WARN_ON(!sp->arch.unsync);
->         trace_kvm_mmu_sync_page(sp);
-> -       sp->unsync = 0;
-> +       sp->arch.unsync = 0;
->         --kvm->stat.mmu_unsync;
->  }
->
-> @@ -1894,7 +1894,7 @@ static bool sp_has_gptes(struct kvm_mmu_page *sp)
->  }
->
->  #define for_each_valid_sp(_kvm, _sp, _list)                            \
-> -       hlist_for_each_entry(_sp, _list, hash_link)                     \
-> +       hlist_for_each_entry(_sp, _list, arch.hash_link)                        \
->                 if (is_obsolete_sp((_kvm), (_sp))) {                    \
->                 } else
->
-> @@ -1934,7 +1934,7 @@ static bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
->
->         /* TDP MMU pages do not use the MMU generation. */
->         return !is_tdp_mmu_page(sp) &&
-> -              unlikely(sp->mmu_valid_gen != kvm->arch.mmu_valid_gen);
-> +              unlikely(sp->arch.mmu_valid_gen != kvm->arch.mmu_valid_gen);
->  }
->
->  struct mmu_page_path {
-> @@ -2006,7 +2006,7 @@ static void mmu_pages_clear_parents(struct mmu_page_path *parents)
->                 WARN_ON(idx == INVALID_INDEX);
->                 clear_unsync_child_bit(sp, idx);
->                 level++;
-> -       } while (!sp->unsync_children);
-> +       } while (!sp->arch.unsync_children);
->  }
->
->  static int mmu_sync_children(struct kvm_vcpu *vcpu,
-> @@ -2053,7 +2053,7 @@ static int mmu_sync_children(struct kvm_vcpu *vcpu,
->
->  static void __clear_sp_write_flooding_count(struct kvm_mmu_page *sp)
->  {
-> -       atomic_set(&sp->write_flooding_count,  0);
-> +       atomic_set(&sp->arch.write_flooding_count,  0);
->  }
->
->  static void clear_sp_write_flooding_count(u64 *spte)
-> @@ -2094,7 +2094,7 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
->                          * Unsync pages must not be left as is, because the new
->                          * upper-level page will be write-protected.
->                          */
-> -                       if (role.level > PG_LEVEL_4K && sp->unsync)
-> +                       if (role.level > PG_LEVEL_4K && sp->arch.unsync)
->                                 kvm_mmu_prepare_zap_page(kvm, sp,
->                                                          &invalid_list);
->                         continue;
-> @@ -2104,7 +2104,7 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
->                 if (sp->role.arch.direct)
->                         goto out;
->
-> -               if (sp->unsync) {
-> +               if (sp->arch.unsync) {
->                         if (KVM_BUG_ON(!vcpu, kvm))
->                                 break;
->
-> @@ -2163,25 +2163,26 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
->         sp = kvm_mmu_memory_cache_alloc(caches->page_header_cache);
->         sp->spt = kvm_mmu_memory_cache_alloc(caches->shadow_page_cache);
->         if (!role.arch.direct)
-> -               sp->shadowed_translation = kvm_mmu_memory_cache_alloc(caches->shadowed_info_cache);
-> +               sp->arch.shadowed_translation =
-> +                       kvm_mmu_memory_cache_alloc(caches->shadowed_info_cache);
->
->         set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
->
-> -       INIT_LIST_HEAD(&sp->possible_nx_huge_page_link);
-> +       INIT_LIST_HEAD(&sp->arch.possible_nx_huge_page_link);
 >
 >         /*
->          * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
->          * depends on valid pages being added to the head of the list.  See
->          * comments in kvm_zap_obsolete_pages().
->          */
-> -       sp->mmu_valid_gen = kvm->arch.mmu_valid_gen;
-> +       sp->arch.mmu_valid_gen = kvm->arch.mmu_valid_gen;
->         list_add(&sp->link, &kvm->arch.active_mmu_pages);
->         kvm_account_mmu_page(kvm, sp);
->
->         sp->gfn = gfn;
->         sp->role = role;
-> -       sp->shadow_mmu_page = true;
-> -       hlist_add_head(&sp->hash_link, sp_list);
-> +       sp->arch.shadow_mmu_page = true;
-> +       hlist_add_head(&sp->arch.hash_link, sp_list);
->         if (sp_has_gptes(sp))
->                 account_shadowed(kvm, sp);
->
-> @@ -2368,7 +2369,7 @@ static void __link_shadow_page(struct kvm *kvm,
->
->         mmu_page_add_parent_pte(cache, sp, sptep);
->
-> -       if (sp->unsync_children || sp->unsync)
-> +       if (sp->arch.unsync_children || sp->arch.unsync)
->                 mark_unsync(sptep);
->  }
->
-> @@ -2421,7 +2422,8 @@ static int mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp,
->                          * avoids retaining a large number of stale nested SPs.
->                          */
->                         if (tdp_enabled && invalid_list &&
-> -                           child->role.arch.guest_mode && !child->parent_ptes.val)
-> +                           child->role.arch.guest_mode &&
-> +                           !child->arch.parent_ptes.val)
->                                 return kvm_mmu_prepare_zap_page(kvm, child,
->                                                                 invalid_list);
->                 }
-> @@ -2449,7 +2451,7 @@ static void kvm_mmu_unlink_parents(struct kvm_mmu_page *sp)
->         u64 *sptep;
->         struct rmap_iterator iter;
->
-> -       while ((sptep = rmap_get_first(&sp->parent_ptes, &iter)))
-> +       while ((sptep = rmap_get_first(&sp->arch.parent_ptes, &iter)))
->                 drop_parent_pte(sp, sptep);
->  }
->
-> @@ -2496,7 +2498,7 @@ static bool __kvm_mmu_prepare_zap_page(struct kvm *kvm,
->         if (!sp->role.invalid && sp_has_gptes(sp))
->                 unaccount_shadowed(kvm, sp);
->
-> -       if (sp->unsync)
-> +       if (sp->arch.unsync)
->                 kvm_unlink_unsync_page(kvm, sp);
->         if (!refcount_read(&sp->root_refcount)) {
->                 /* Count self */
-> @@ -2527,7 +2529,7 @@ static bool __kvm_mmu_prepare_zap_page(struct kvm *kvm,
->                 zapped_root = !is_obsolete_sp(kvm, sp);
->         }
->
-> -       if (sp->nx_huge_page_disallowed)
-> +       if (sp->arch.nx_huge_page_disallowed)
->                 unaccount_nx_huge_page(kvm, sp);
->
->         sp->role.invalid = 1;
-> @@ -2704,7 +2706,7 @@ static void kvm_unsync_page(struct kvm *kvm, struct kvm_mmu_page *sp)
->  {
->         trace_kvm_mmu_unsync_page(sp);
->         ++kvm->stat.mmu_unsync;
-> -       sp->unsync = 1;
-> +       sp->arch.unsync = 1;
->
->         kvm_mmu_mark_parents_unsync(sp);
->  }
-> @@ -2739,7 +2741,7 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
->                 if (!can_unsync)
->                         return -EPERM;
->
-> -               if (sp->unsync)
-> +               if (sp->arch.unsync)
->                         continue;
->
->                 if (prefetch)
-> @@ -2764,7 +2766,7 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
->                          * for write, i.e. unsync cannot transition from 0->1
->                          * while this CPU holds mmu_lock for read (or write).
->                          */
-> -                       if (READ_ONCE(sp->unsync))
-> +                       if (READ_ONCE(sp->arch.unsync))
->                                 continue;
->                 }
->
-> @@ -2796,8 +2798,8 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
->          *                      2.2 Guest issues TLB flush.
->          *                          That causes a VM Exit.
->          *
-> -        *                      2.3 Walking of unsync pages sees sp->unsync is
-> -        *                          false and skips the page.
-> +        *                      2.3 Walking of unsync pages sees sp->arch.unsync
-> +        *                          is false and skips the page.
->          *
->          *                      2.4 Guest accesses GVA X.
->          *                          Since the mapping in the SP was not updated,
-> @@ -2805,7 +2807,7 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
->          *                          gets used.
->          * 1.1 Host marks SP
->          *     as unsync
-> -        *     (sp->unsync = true)
-> +        *     (sp->arch.unsync = true)
->          *
->          * The write barrier below ensures that 1.1 happens before 1.2 and thus
->          * the situation in 2.4 does not arise.  It pairs with the read barrier
-> @@ -3126,7 +3128,7 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
->             cur_level == fault->goal_level &&
->             is_shadow_present_pte(spte) &&
->             !is_large_pte(spte) &&
-> -           spte_to_child_sp(spte)->nx_huge_page_disallowed) {
-> +           spte_to_child_sp(spte)->arch.nx_huge_page_disallowed) {
->                 /*
->                  * A small SPTE exists for this pfn, but FNAME(fetch),
->                  * direct_map(), or kvm_tdp_mmu_map() would like to create a
-> @@ -3902,7 +3904,7 @@ static bool is_unsync_root(hpa_t root)
->
->         /*
->          * The read barrier orders the CPU's read of SPTE.W during the page table
-> -        * walk before the reads of sp->unsync/sp->unsync_children here.
-> +        * walk before the reads of sp->arch.{unsync,unsync_children} here.
->          *
->          * Even if another CPU was marking the SP as unsync-ed simultaneously,
->          * any guest page table changes are not guaranteed to be visible anyway
-> @@ -3922,7 +3924,7 @@ static bool is_unsync_root(hpa_t root)
->         if (WARN_ON_ONCE(!sp))
->                 return false;
->
-> -       if (sp->unsync || sp->unsync_children)
-> +       if (sp->arch.unsync || sp->arch.unsync_children)
->                 return true;
->
->         return false;
-> @@ -5510,8 +5512,8 @@ static bool detect_write_flooding(struct kvm_mmu_page *sp)
->         if (sp->role.level == PG_LEVEL_4K)
->                 return false;
->
-> -       atomic_inc(&sp->write_flooding_count);
-> -       return atomic_read(&sp->write_flooding_count) >= 3;
-> +       atomic_inc(&sp->arch.write_flooding_count);
-> +       return atomic_read(&sp->arch.write_flooding_count) >= 3;
->  }
->
->  /*
-> @@ -6389,7 +6391,7 @@ static bool shadow_mmu_try_split_huge_pages(struct kvm *kvm,
->                         continue;
->
->                 /* SPs with level >PG_LEVEL_4K should never by unsync. */
-> -               if (WARN_ON_ONCE(sp->unsync))
-> +               if (WARN_ON_ONCE(sp->arch.unsync))
->                         continue;
->
->                 /* Don't bother splitting huge pages on invalid SPs. */
-> @@ -6941,8 +6943,8 @@ static void kvm_recover_nx_huge_pages(struct kvm *kvm)
+> @@ -3158,7 +3159,7 @@ static int direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>                  * We cannot overwrite existing page tables with an NX
+>                  * large page, as the leaf could be executable.
 >                  */
->                 sp = list_first_entry(&kvm->arch.possible_nx_huge_pages,
->                                       struct kvm_mmu_page,
-> -                                     possible_nx_huge_page_link);
-> -               WARN_ON_ONCE(!sp->nx_huge_page_disallowed);
-> +                                     arch.possible_nx_huge_page_link);
-> +               WARN_ON_ONCE(!sp->arch.nx_huge_page_disallowed);
->                 WARN_ON_ONCE(!sp->role.arch.direct);
+> -               if (fault->nx_huge_page_workaround_enabled)
+> +               if (fault->arch.nx_huge_page_workaround_enabled)
+>                         disallowed_hugepage_adjust(fault, *it.sptep, it.level);
 >
->                 /*
-> @@ -6977,7 +6979,7 @@ static void kvm_recover_nx_huge_pages(struct kvm *kvm)
->                         flush |= kvm_tdp_mmu_zap_sp(kvm, sp);
->                 else
->                         kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
-> -               WARN_ON_ONCE(sp->nx_huge_page_disallowed);
-> +               WARN_ON_ONCE(sp->arch.nx_huge_page_disallowed);
+>                 base_gfn = fault->gfn & ~(KVM_PAGES_PER_HPAGE(it.level) - 1);
+> @@ -3170,7 +3171,7 @@ static int direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>                         continue;
 >
->                 if (need_resched() || rwlock_needbreak(&kvm->mmu_lock)) {
->                         kvm_mmu_remote_flush_or_zap(kvm, &invalid_list, flush);
+>                 link_shadow_page(vcpu, it.sptep, sp);
+> -               if (fault->huge_page_disallowed)
+> +               if (fault->arch.huge_page_disallowed)
+>                         account_nx_huge_page(vcpu->kvm, sp,
+>                                              fault->req_level >= it.level);
+>         }
+> @@ -3221,7 +3222,7 @@ static int kvm_handle_noslot_fault(struct kvm_vcpu *vcpu,
+>                                    struct kvm_page_fault *fault,
+>                                    unsigned int access)
+>  {
+> -       gva_t gva = fault->is_tdp ? 0 : fault->addr;
+> +       gva_t gva = fault->arch.is_tdp ? 0 : fault->addr;
+>
+>         vcpu_cache_mmio_info(vcpu, gva, fault->gfn,
+>                              access & shadow_mmio_access_mask);
+> @@ -3255,7 +3256,7 @@ static bool page_fault_can_be_fast(struct kvm_page_fault *fault)
+>          * generation number.  Refreshing the MMIO generation needs to go down
+>          * the slow path.  Note, EPT Misconfigs do NOT set the PRESENT flag!
+>          */
+> -       if (fault->rsvd)
+> +       if (fault->arch.rsvd)
+>                 return false;
+>
+>         /*
+> @@ -3273,7 +3274,7 @@ static bool page_fault_can_be_fast(struct kvm_page_fault *fault)
+>          *    SPTE is MMU-writable (determined later), the fault can be fixed
+>          *    by setting the Writable bit, which can be done out of mmu_lock.
+>          */
+> -       if (!fault->present)
+> +       if (!fault->arch.present)
+>                 return !kvm_ad_enabled();
+>
+>         /*
+> @@ -4119,10 +4120,10 @@ static int handle_mmio_page_fault(struct kvm_vcpu *vcpu, u64 addr, bool direct)
+>  static bool page_fault_handle_page_track(struct kvm_vcpu *vcpu,
+>                                          struct kvm_page_fault *fault)
+>  {
+> -       if (unlikely(fault->rsvd))
+> +       if (unlikely(fault->arch.rsvd))
+>                 return false;
+>
+> -       if (!fault->present || !fault->write)
+> +       if (!fault->arch.present || !fault->write)
+>                 return false;
+>
+>         /*
 > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index fd4990c8b0e9..af2ae4887e35 100644
+> index af2ae4887e35..4abb80a3bd01 100644
 > --- a/arch/x86/kvm/mmu/mmu_internal.h
 > +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -44,89 +44,6 @@ extern bool dbg;
->  #define INVALID_PAE_ROOT       0
->  #define IS_VALID_PAE_ROOT(x)   (!!(x))
->
-> -struct kvm_mmu_page {
-> -       /*
-> -        * Note, "link" through "spt" fit in a single 64 byte cache line on
-> -        * 64-bit kernels, keep it that way unless there's a reason not to.
-> -        */
-> -       struct list_head link;
-> -       struct hlist_node hash_link;
-> -
-> -       bool shadow_mmu_page;
-> -       bool unsync;
-> -       u8 mmu_valid_gen;
-> -
-> -        /*
-> -         * The shadow page can't be replaced by an equivalent huge page
-> -         * because it is being used to map an executable page in the guest
-> -         * and the NX huge page mitigation is enabled.
-> -         */
-> -       bool nx_huge_page_disallowed;
-> -
-> -       /*
-> -        * The following two entries are used to key the shadow page in the
-> -        * hash table.
-> -        */
-> -       union kvm_mmu_page_role role;
-> -       gfn_t gfn;
-> -
-> -       u64 *spt;
-> -
-> -       /*
-> -        * Stores the result of the guest translation being shadowed by each
-> -        * SPTE.  KVM shadows two types of guest translations: nGPA -> GPA
-> -        * (shadow EPT/NPT) and GVA -> GPA (traditional shadow paging). In both
-> -        * cases the result of the translation is a GPA and a set of access
-> -        * constraints.
-> -        *
-> -        * The GFN is stored in the upper bits (PAGE_SHIFT) and the shadowed
-> -        * access permissions are stored in the lower bits. Note, for
-> -        * convenience and uniformity across guests, the access permissions are
-> -        * stored in KVM format (e.g.  ACC_EXEC_MASK) not the raw guest format.
-> -        */
-> -       u64 *shadowed_translation;
-> -
-> -       /* Currently serving as active root */
-> -       refcount_t root_refcount;
-> -
-> -       unsigned int unsync_children;
-> -       union {
-> -               struct kvm_rmap_head parent_ptes; /* rmap pointers to parent sptes */
-> -               tdp_ptep_t ptep;
-> -       };
-> -       union {
-> -               DECLARE_BITMAP(unsync_child_bitmap, 512);
-> -               struct {
-> -                       struct work_struct tdp_mmu_async_work;
-> -                       void *tdp_mmu_async_data;
-> -               };
-> -       };
-> -
-> -       /*
-> -        * Tracks shadow pages that, if zapped, would allow KVM to create an NX
-> -        * huge page.  A shadow page will have nx_huge_page_disallowed set but
-> -        * not be on the list if a huge page is disallowed for other reasons,
-> -        * e.g. because KVM is shadowing a PTE at the same gfn, the memslot
-> -        * isn't properly aligned, etc...
-> -        */
-> -       struct list_head possible_nx_huge_page_link;
-> -#ifdef CONFIG_X86_32
-> -       /*
-> -        * Used out of the mmu-lock to avoid reading spte values while an
-> -        * update is in progress; see the comments in __get_spte_lockless().
-> -        */
-> -       int clear_spte_count;
-> -#endif
-> -
-> -       /* Number of writes since the last time traversal visited this page.  */
-> -       atomic_t write_flooding_count;
-> -
-> -#ifdef CONFIG_X86_64
-> -       /* Used for freeing the page asynchronously if it is a TDP MMU page. */
-> -       struct rcu_head rcu_head;
-> -#endif
-> -};
-> -
->  extern struct kmem_cache *mmu_page_header_cache;
->
->  static inline bool kvm_mmu_page_ad_need_write_protect(struct kvm_mmu_page *sp)
-> diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
-> index ffd10ce3eae3..335f26dabdf3 100644
-> --- a/arch/x86/kvm/mmu/mmutrace.h
-> +++ b/arch/x86/kvm/mmu/mmutrace.h
-> @@ -16,11 +16,11 @@
->         __field(bool, unsync)
->
->  #define KVM_MMU_PAGE_ASSIGN(sp)                                \
-> -       __entry->mmu_valid_gen = sp->mmu_valid_gen;     \
-> +       __entry->mmu_valid_gen = sp->arch.mmu_valid_gen;        \
->         __entry->gfn = sp->gfn;                         \
->         __entry->role = sp->role.word;                  \
->         __entry->root_count = refcount_read(&sp->root_refcount);        \
-> -       __entry->unsync = sp->unsync;
-> +       __entry->unsync = sp->arch.unsync;
->
->  #define KVM_MMU_PAGE_PRINTK() ({                                       \
->         const char *saved_ptr = trace_seq_buffer_ptr(p);                \
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index e15ec1c473da..18bb92b70a01 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -671,7 +671,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
->                          * KVM_REQ_MMU_SYNC is not necessary but it
->                          * expedites the process.
->                          */
-> -                       if (sp->unsync_children &&
-> +                       if (sp->arch.unsync_children &&
->                             mmu_sync_children(vcpu, sp, false))
->                                 return RET_PF_RETRY;
->                 }
-> @@ -921,7 +921,7 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
->                         pt_element_t gpte;
->                         gpa_t pte_gpa;
->
-> -                       if (!sp->unsync)
-> +                       if (!sp->arch.unsync)
->                                 break;
->
->                         pte_gpa = FNAME(get_level1_sp_gpa)(sp);
-> @@ -942,7 +942,7 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
->                         FNAME(prefetch_gpte)(vcpu, sp, sptep, gpte, false);
->                 }
->
-> -               if (!sp->unsync_children)
-> +               if (!sp->arch.unsync_children)
->                         break;
->         }
->         write_unlock(&vcpu->kvm->mmu_lock);
-> @@ -974,8 +974,8 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+> @@ -77,60 +77,6 @@ static inline bool is_nx_huge_page_enabled(struct kvm *kvm)
+>         return READ_ONCE(nx_huge_pages) && !kvm->arch.disable_nx_huge_pages;
 >  }
 >
+> -struct kvm_page_fault {
+> -       /* arguments to kvm_mmu_do_page_fault.  */
+> -       const gpa_t addr;
+> -       const u32 error_code;
+> -       const bool prefetch;
+> -
+> -       /* Derived from error_code.  */
+> -       const bool exec;
+> -       const bool write;
+> -       const bool present;
+> -       const bool rsvd;
+> -       const bool user;
+> -
+> -       /* Derived from mmu and global state.  */
+> -       const bool is_tdp;
+> -       const bool nx_huge_page_workaround_enabled;
+> -
+> -       /*
+> -        * Whether a >4KB mapping can be created or is forbidden due to NX
+> -        * hugepages.
+> -        */
+> -       bool huge_page_disallowed;
+> -
+> -       /*
+> -        * Maximum page size that can be created for this fault; input to
+> -        * FNAME(fetch), direct_map() and kvm_tdp_mmu_map().
+> -        */
+> -       u8 max_level;
+> -
+> -       /*
+> -        * Page size that can be created based on the max_level and the
+> -        * page size used by the host mapping.
+> -        */
+> -       u8 req_level;
+> -
+> -       /*
+> -        * Page size that will be created based on the req_level and
+> -        * huge_page_disallowed.
+> -        */
+> -       u8 goal_level;
+> -
+> -       /* Shifted addr, or result of guest page table walk if addr is a gva.  */
+> -       gfn_t gfn;
+> -
+> -       /* The memslot containing gfn. May be NULL. */
+> -       struct kvm_memory_slot *slot;
+> -
+> -       /* Outputs of kvm_faultin_pfn.  */
+> -       unsigned long mmu_seq;
+> -       kvm_pfn_t pfn;
+> -       hva_t hva;
+> -       bool map_writable;
+> -};
+> -
+>  int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+>
 >  /*
-> - * Using the information in sp->shadowed_translation (kvm_mmu_page_get_gfn()) is
-> - * safe because:
-> + * Using the information in sp->arch.shadowed_translation
-> + * (kvm_mmu_page_get_gfn()) is safe because:
->   * - The spte has a reference to the struct page, so the pfn for a given gfn
->   *   can't change unless all sptes pointing to it are nuked first.
->   *
+> @@ -164,22 +110,27 @@ enum {
+>  static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>                                         u32 err, bool prefetch)
+>  {
+> +       bool is_tdp = likely(vcpu->arch.mmu->page_fault == kvm_tdp_page_fault);
+>         struct kvm_page_fault fault = {
+>                 .addr = cr2_or_gpa,
+> -               .error_code = err,
+> -               .exec = err & PFERR_FETCH_MASK,
+> -               .write = err & PFERR_WRITE_MASK,
+> -               .present = err & PFERR_PRESENT_MASK,
+> -               .rsvd = err & PFERR_RSVD_MASK,
+> -               .user = err & PFERR_USER_MASK,
+>                 .prefetch = prefetch,
+> -               .is_tdp = likely(vcpu->arch.mmu->page_fault == kvm_tdp_page_fault),
+> -               .nx_huge_page_workaround_enabled =
+> -                       is_nx_huge_page_enabled(vcpu->kvm),
+> +
+> +               .write = err & PFERR_WRITE_MASK,
+> +               .exec = err & PFERR_FETCH_MASK,
+>
+>                 .max_level = KVM_MAX_HUGEPAGE_LEVEL,
+>                 .req_level = PG_LEVEL_4K,
+>                 .goal_level = PG_LEVEL_4K,
+> +
+> +               .arch = {
+> +                       .error_code = err,
+> +                       .present = err & PFERR_PRESENT_MASK,
+> +                       .rsvd = err & PFERR_RSVD_MASK,
+> +                       .user = err & PFERR_USER_MASK,
+> +                       .is_tdp = is_tdp,
+> +                       .nx_huge_page_workaround_enabled =
+> +                               is_nx_huge_page_enabled(vcpu->kvm),
+> +               },
+>         };
+>         int r;
+>
+> @@ -196,7 +147,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>         if (!prefetch)
+>                 vcpu->stat.pf_taken++;
+>
+> -       if (IS_ENABLED(CONFIG_RETPOLINE) && fault.is_tdp)
+> +       if (IS_ENABLED(CONFIG_RETPOLINE) && fault.arch.is_tdp)
+>                 r = kvm_tdp_page_fault(vcpu, &fault);
+>         else
+>                 r = vcpu->arch.mmu->page_fault(vcpu, &fault);
+> diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
+> index 335f26dabdf3..b01767acf073 100644
+> --- a/arch/x86/kvm/mmu/mmutrace.h
+> +++ b/arch/x86/kvm/mmu/mmutrace.h
+> @@ -270,7 +270,7 @@ TRACE_EVENT(
+>         TP_fast_assign(
+>                 __entry->vcpu_id = vcpu->vcpu_id;
+>                 __entry->cr2_or_gpa = fault->addr;
+> -               __entry->error_code = fault->error_code;
+> +               __entry->error_code = fault->arch.error_code;
+>                 __entry->sptep = sptep;
+>                 __entry->old_spte = old_spte;
+>                 __entry->new_spte = *sptep;
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 18bb92b70a01..daf9c7731edc 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -698,7 +698,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>                  * We cannot overwrite existing page tables with an NX
+>                  * large page, as the leaf could be executable.
+>                  */
+> -               if (fault->nx_huge_page_workaround_enabled)
+> +               if (fault->arch.nx_huge_page_workaround_enabled)
+>                         disallowed_hugepage_adjust(fault, *it.sptep, it.level);
+>
+>                 base_gfn = fault->gfn & ~(KVM_PAGES_PER_HPAGE(it.level) - 1);
+> @@ -713,7 +713,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+>                         continue;
+>
+>                 link_shadow_page(vcpu, it.sptep, sp);
+> -               if (fault->huge_page_disallowed)
+> +               if (fault->arch.huge_page_disallowed)
+>                         account_nx_huge_page(vcpu->kvm, sp,
+>                                              fault->req_level >= it.level);
+>         }
+> @@ -793,8 +793,8 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>         int r;
+>         bool is_self_change_mapping;
+>
+> -       pgprintk("%s: addr %lx err %x\n", __func__, fault->addr, fault->error_code);
+> -       WARN_ON_ONCE(fault->is_tdp);
+> +       pgprintk("%s: addr %lx err %x\n", __func__, fault->addr, fault->arch.error_code);
+> +       WARN_ON_ONCE(fault->arch.is_tdp);
+>
+>         /*
+>          * Look up the guest pte for the faulting address.
+> @@ -802,7 +802,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>          * The bit needs to be cleared before walking guest page tables.
+>          */
+>         r = FNAME(walk_addr)(&walker, vcpu, fault->addr,
+> -                            fault->error_code & ~PFERR_RSVD_MASK);
+> +                            fault->arch.error_code & ~PFERR_RSVD_MASK);
+>
+>         /*
+>          * The page is not mapped by the guest.  Let the guest handle it.
+> @@ -830,7 +830,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>         vcpu->arch.write_fault_to_shadow_pgtable = false;
+>
+>         is_self_change_mapping = FNAME(is_self_change_mapping)(vcpu,
+> -             &walker, fault->user, &vcpu->arch.write_fault_to_shadow_pgtable);
+> +             &walker, fault->arch.user, &vcpu->arch.write_fault_to_shadow_pgtable);
+>
+>         if (is_self_change_mapping)
+>                 fault->max_level = PG_LEVEL_4K;
+> @@ -846,7 +846,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>          * we will cache the incorrect access into mmio spte.
+>          */
+>         if (fault->write && !(walker.pte_access & ACC_WRITE_MASK) &&
+> -           !is_cr0_wp(vcpu->arch.mmu) && !fault->user && fault->slot) {
+> +           !is_cr0_wp(vcpu->arch.mmu) && !fault->arch.user && fault->slot) {
+>                 walker.pte_access |= ACC_WRITE_MASK;
+>                 walker.pte_access &= ~ACC_USER_MASK;
+>
 > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 34d674080170..66231c7ed31e 100644
+> index 66231c7ed31e..4940413d3767 100644
 > --- a/arch/x86/kvm/mmu/tdp_mmu.c
 > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -270,7 +270,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
->  static void tdp_mmu_init_sp(struct kvm_mmu_page *sp, tdp_ptep_t sptep,
->                             gfn_t gfn, union kvm_mmu_page_role role)
->  {
-> -       INIT_LIST_HEAD(&sp->possible_nx_huge_page_link);
-> +       INIT_LIST_HEAD(&sp->arch.possible_nx_huge_page_link);
+> @@ -1156,7 +1156,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>         tdp_mmu_for_each_pte(iter, mmu, fault->gfn, fault->gfn + 1) {
+>                 int r;
 >
->         set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+> -               if (fault->nx_huge_page_workaround_enabled)
+> +               if (fault->arch.nx_huge_page_workaround_enabled)
+>                         disallowed_hugepage_adjust(fault, iter.old_spte, iter.level);
 >
-> @@ -385,7 +385,7 @@ static void tdp_mmu_unlink_sp(struct kvm *kvm, struct kvm_mmu_page *sp,
->  {
->         tdp_unaccount_mmu_page(kvm, sp);
->
-> -       if (!sp->nx_huge_page_disallowed)
-> +       if (!sp->arch.nx_huge_page_disallowed)
->                 return;
->
->         if (shared)
-> @@ -393,7 +393,7 @@ static void tdp_mmu_unlink_sp(struct kvm *kvm, struct kvm_mmu_page *sp,
->         else
->                 lockdep_assert_held_write(&kvm->mmu_lock);
->
-> -       sp->nx_huge_page_disallowed = false;
-> +       sp->arch.nx_huge_page_disallowed = false;
->         untrack_possible_nx_huge_page(kvm, sp);
->
->         if (shared)
+>                 if (iter.level == fault->goal_level)
 > @@ -1181,7 +1181,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
 >                 sp = tdp_mmu_alloc_sp(vcpu);
 >                 tdp_mmu_init_child_sp(sp, &iter);
 >
-> -               sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
-> +               sp->arch.nx_huge_page_disallowed = fault->huge_page_disallowed;
+> -               sp->arch.nx_huge_page_disallowed = fault->huge_page_disallowed;
+> +               sp->arch.nx_huge_page_disallowed = fault->arch.huge_page_disallowed;
 >
 >                 if (is_shadow_present_pte(iter.old_spte))
 >                         r = tdp_mmu_split_huge_page(kvm, &iter, sp, true);
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-> index 19d3153051a3..e6a929089715 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.h
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-> @@ -73,7 +73,7 @@ u64 *kvm_tdp_mmu_fast_pf_get_last_sptep(struct kvm_vcpu *vcpu, u64 addr,
->  #ifdef CONFIG_X86_64
->  static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp)
->  {
-> -       return !sp->shadow_mmu_page;
-> +       return !sp->arch.shadow_mmu_page;
->  }
->  #else
->  static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return false; }
+> @@ -1197,7 +1197,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>                         goto retry;
+>                 }
+>
+> -               if (fault->huge_page_disallowed &&
+> +               if (fault->arch.huge_page_disallowed &&
+>                     fault->req_level >= iter.level) {
+>                         spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+>                         track_possible_nx_huge_page(kvm, sp);
 > diff --git a/include/kvm/mmu_types.h b/include/kvm/mmu_types.h
-> index 14099956fdac..a9da33d4baa8 100644
+> index a9da33d4baa8..9f0ca920bf68 100644
 > --- a/include/kvm/mmu_types.h
 > +++ b/include/kvm/mmu_types.h
-> @@ -3,8 +3,11 @@
->  #define __KVM_MMU_TYPES_H
+> @@ -66,4 +66,48 @@ struct kvm_mmu_page {
+>         struct kvm_mmu_page_arch arch;
+>  };
 >
->  #include <linux/bug.h>
-> -#include <linux/types.h>
-> +#include <linux/kvm_types.h>
-> +#include <linux/refcount.h>
->  #include <linux/stddef.h>
-> +#include <linux/types.h>
-> +#include <linux/workqueue.h>
->
->  #include <asm/kvm/mmu_types.h>
->
-> @@ -36,4 +39,31 @@ static_assert(sizeof(union kvm_mmu_page_role) == sizeof_field(union kvm_mmu_page
->
->  typedef u64 __rcu *tdp_ptep_t;
->
-> +struct kvm_mmu_page {
-> +       struct list_head link;
+> +struct kvm_page_fault {
+> +       /* The raw faulting address. */
+> +       const gpa_t addr;
 > +
-> +       union kvm_mmu_page_role role;
+> +       /* Whether the fault was synthesized to prefetch a mapping. */
+> +       const bool prefetch;
 > +
-> +       /* The start of the GFN region mapped by this shadow page. */
+> +       /* Information about the cause of the fault. */
+> +       const bool write;
+> +       const bool exec;
+> +
+> +       /* Shifted addr, or result of guest page table walk if shadow paging. */
 > +       gfn_t gfn;
 
-I'd like to put in a vote for getting rid of the "shadow page" /
-"shadow page table entry" terminology through this refactor.
-I can't count the number of times folks trying to understand the MMU
-have gotten confused by the overloaded terminology.
+Is this redundant to have in common code? If we're not doing common
+shadow paging, then this is just addr shifted. Would this be better
+placed in the arch specific struct?
 
 > +
-> +       /* The page table page. */
-> +       u64 *spt;
+> +       /* The memslot that contains @gfn. May be NULL. */
+> +       struct kvm_memory_slot *slot;
 > +
-> +       /* The PTE that points to this shadow page. */
-> +       tdp_ptep_t ptep;
+> +       /* Maximum page size that can be created for this fault. */
+> +       u8 max_level;
+> +
+> +       /*
+> +        * Page size that can be created based on the max_level and the page
+> +        * size used by the host mapping.
+> +        */
+> +       u8 req_level;
+> +
+> +       /* Final page size that will be created. */
+> +       u8 goal_level;
+> +
+> +       /*
+> +        * The value of kvm->mmu_invalidate_seq before fetching the host
+> +        * mapping. Used to verify that the host mapping has not changed
+> +        * after grabbing the MMU lock.
+> +        */
+> +       unsigned long mmu_seq;
 
-Totally fine to not change this, but something like parent_ptep would
-be clearer. The Shadow MMU uses parent_pteps, which I think is much
-clearer.
-Could also change the comment to just:
-/* The PTE that points to this kvm_mmu_page. */
+Should this be ifdef'ed with  KVM_ARCH_WANT_MMU_NOTIFIER?
 
 > +
-> +       /* Used for freeing TDP MMU pages asynchronously. */
-> +       struct rcu_head rcu_head;
+> +       /* Information about the host mapping. */
+> +       kvm_pfn_t pfn;
+> +       hva_t hva;
+> +       bool map_writable;
 > +
-> +       /* The number of references to this shadow page as a root. */
-> +       refcount_t root_refcount;
-> +
-> +       /* Used for tearing down an entire page table tree. */
-> +       struct work_struct tdp_mmu_async_work;
-> +       void *tdp_mmu_async_data;
-> +
-> +       struct kvm_mmu_page_arch arch;
+> +       struct kvm_page_fault_arch arch;
 > +};
 > +
 >  #endif /* !__KVM_MMU_TYPES_H */
