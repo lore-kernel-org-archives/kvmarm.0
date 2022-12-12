@@ -1,104 +1,64 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDC228ED
-	for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 14:03:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E5F6C433EF;
-	Mon, 12 Dec 2022 14:03:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670853826;
-	bh=WMh5ZyXqeKJW6oTCT2wcbPgTDVWszL4kojbNn2ctuqc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FQsF4LgWK7KrsWUfamqD3i2IiAmLYnZ2MXHPeVk5OHMI60FCtuenj5fxagQazZrOK
-	 v3aylVLNh3G5IQdnvLOD15qS1qCOE6yYph3tULfHqQLwgApk8wp/9RVlQWLSrnDvUD
-	 AYUrRyP8V2KnVdoWqzVYZZyga0Mc7pWXx1YOYFIcpaOPkVQHSlMA5tHhyxqqbiE9f2
-	 jWt+ko46O3mmvD9eBz3MwZhrl2MYD24Ix19NfkkG3tshNgd7grWoAADyQBVD65TJ3/
-	 k+0XJqFRW6kzHeLVLdzRChaC+2/AreDbrTb2Xw575kHWSCdGtfWrR62wdPvaMI3g32
-	 E1JYQna5po/Mg==
-Date: Mon, 12 Dec 2022 14:03:33 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Lorenzo Pieralisi <lpieralisi@kernel.org>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FB5728EC
+	for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 14:40:16 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 533C61FB;
+	Mon, 12 Dec 2022 06:40:56 -0800 (PST)
+Received: from FVFF77S0Q05N (unknown [10.57.40.60])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4615D3F71E;
+	Mon, 12 Dec 2022 06:40:14 -0800 (PST)
+Date: Mon, 12 Dec 2022 14:40:08 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Mark Brown <broonie@kernel.org>
 Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
 	Sami Mujawar <Sami.Mujawar@arm.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Subject: Re: [PATCH v2 10/14] arm64/nmi: Manage masking for superpriority
  interrupts along with DAIF
-Message-ID: <Y5c0tW7sidPE0oxd@sirena.org.uk>
+Message-ID: <Y5c9SLeJacLYHmP7@FVFF77S0Q05N>
 References: <20221112151708.175147-1-broonie@kernel.org>
  <20221112151708.175147-11-broonie@kernel.org>
- <Y5IchpFrIB3y8575@lpieralisi>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="uQvl9ZFcA5HnipCs"
-Content-Disposition: inline
-In-Reply-To: <Y5IchpFrIB3y8575@lpieralisi>
-X-Cookie: It was Penguin lust... at its ugliest.
-
-
---uQvl9ZFcA5HnipCs
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20221112151708.175147-11-broonie@kernel.org>
 
-On Thu, Dec 08, 2022 at 06:19:02PM +0100, Lorenzo Pieralisi wrote:
+On Sat, Nov 12, 2022 at 03:17:04PM +0000, Mark Brown wrote:
+> As we do for pseudo NMIs add code to our DAIF management which keeps
+> superpriority interrupts unmasked when we have asynchronous exceptions
+> enabled.
 
-> I think I found a nasty spot. We are currently not handling ALLINT in
-> arch_local_irq_enable/disable(). The issue I am facing is that we might
-> end up preempting in IRQ context with ALLINT set in the exception path
-> - arm64_preempt_schedule_irq() - which means we are running with all
-> IRQs masked (that's normal; what's not normal is that local_irq_enable()
-> does not clear ALLINT, see below).
+Please, no. NAK to pretending this is part of DAIF.
 
-Right, and handling ALLINT in arch_local_irq_enable/disable() isn't
-exactly ideal since it means that whenever we mask interrupts we also
-mask NMIs which somewhat reduces the value.
+The existing hacks to bodge pseudo-NMI into the DAIF management code are
+convoluted, difficult to maintain, and they have known cases where they
+*cannot* do the right thing. Those existing hacks have proved to be more
+trouble than they're worth, and continuing down that path makes things worse.
 
-> When we schedule (preempt_schedule_irq()) we do require a
-> local_irq_enable() to enable IRQs; ALLINT is still set, so
-> local_irq_enable() does not do what is expected so we are calling
-> __schedule() with IRQs disabled, which does not seem right.
+We must clean up the existing approach *before* we add the real NMI support.
 
-> Now we need to debate what the fix for this can be but nonetheless
-> it is something to be addressed.
+As mentioned elsewhere, I think this means reworking the way we manage
+exception masks, and at least:
 
-A first pass suggests that we should be handling this like we do for
-other preemptions and returning early from arm64_preempt_schedule_irq()
-if ALLINT is masked.  If we are handling a regular IRQ then ALLINT will
-be unmasked and we'll call into preempt_schedule_irq(), if we're
-handling a NMI then ALLINT will still be masked so we don't attempt to
-schedule.  I've pushed out a change which does this but not yet properly
-tested it.
+(a) Adding entry-specific helpers to manipulate abstract exception masks
+    covering DAIF + PMR + ALLINT. Those need unmask-at-entry and mask-at-exit
+    behaviour, and today only need to manage DAIF + PMR.
 
-> Clearing and setting ALLINT in arch_local_irq_enable()/disable()
-> seems to solve the issue (now I moved on to debugging something
-> else, will post the outcome here because this fix does not seem
-> to fix the issue completely or I am hitting another bug).
+    It should be possible to do this ahead of ALLINT / NMI support.
 
-Do you have any specifics on how you're seeing problems?  You did
-mention boot stalls offline but I've not been able to to reproduce this
-locally in a way that I can identify (based on your mail now I've made
-sure I've got preemption enabled).
+(b) Adding new "logical exception mask" helpers that treat DAIF + PMR + ALLINT
+    as separate elements.
 
---uQvl9ZFcA5HnipCs
-Content-Type: application/pgp-signature; name="signature.asc"
+    This way we can always save+track all elements if we need to (e.g. for
+    irqflag tracking), but we never have to fake up a DAIF element.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOXNLUACgkQJNaLcl1U
-h9AoRgf/cIM0Mmm71guqPyvBr5Cs5le0aRw49I+IBB+L9+NAtVbjrvobckWkKXA3
-vYKQ9WUh0fxZ88qgI+my5Ktw/sQj2AwBi3AiriQVzA3NfpjtAd91PJ3rQym8oudd
-QyFnFLYOB9oYbNoyaX2rFHypCEQgX6T7tbVpRona/hYBwYKs/oXtUdEhP4OHTmhG
-DdQB5TGYajLojqeY7m+JvrT59ahUC7SDi97g/KKxCZZyJBesVWfL6qTuhaRBbrC1
-YFXTA4LVR8AAAwaEOa407LRbPGTyibr5ozYF79vTxy+BZIxRsCc9XL/ouTQUu3I4
-XMF8t56fWIwPUVrcy3wCo1CQPAFfTw==
-=wZjc
------END PGP SIGNATURE-----
-
---uQvl9ZFcA5HnipCs--
+Thanks,
+Mark.
