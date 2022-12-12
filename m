@@ -2,78 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00BDAC04FDE
-	for <kvmarm@archiver.kernel.org>; Mon, 12 Dec 2022 09:05:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27A68C04FDE
+	for <kvmarm@archiver.kernel.org>; Mon, 12 Dec 2022 09:08:24 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69E4C4B99B;
-	Mon, 12 Dec 2022 04:05:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 852F54B93E;
+	Mon, 12 Dec 2022 04:08:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vXfHo09rYD8m; Mon, 12 Dec 2022 04:05:09 -0500 (EST)
+	with ESMTP id qPLrb-ZtiD4O; Mon, 12 Dec 2022 04:08:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2773C4B9A1;
-	Mon, 12 Dec 2022 04:05:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87A5A4B99D;
+	Mon, 12 Dec 2022 04:08:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC9CC4B99B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 04:05:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E5594B99D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 04:08:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id grVWbOAxBLs5 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Dec 2022 04:05:06 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ABB544B998
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 04:05:06 -0500 (EST)
+ with ESMTP id Tmdrd4gUNGwd for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Dec 2022 04:08:20 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0AE614B99B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 04:08:19 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 9A3C460F35;
- Mon, 12 Dec 2022 09:05:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CF43C433D2;
- Mon, 12 Dec 2022 09:05:05 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id A1C06B80B67;
+ Mon, 12 Dec 2022 09:08:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E674C433D2;
+ Mon, 12 Dec 2022 09:08:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1670835905;
- bh=ufqahpMAcB+LIb2i+yx9UJwmo67U+MbnKsRVmoX94ck=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=CDh/9mWYnr0KDdCMbl1XEmwaBaKzi3JfBmKPkqqtNTDFlvA9fMLtAY55afOLiuYyZ
- QuBiCitVzcPpxumOuHJIZ/okisWEG2pcv/x2xJS6GabNp8y++Vt8DP2qV7PAgLZBEc
- TJw4xCGqZCxM5hWhi31eL6FGrQlcRbiGKzOsOe7jKo/RftxfF+/55lHFH0dJqaR3EV
- xUbkHGAaoxIQ5VGZsC6CaiziPKSPPtC6Q0VOOFlBu+JwSnzVn3unhec1GMMPJF4Cji
- qzFteM4SCzOhwL8LvrtpN3rHsKakbUcLZ82AjiaAkIHpVR/NiEGfaYYYtU7EOu6zTw
- R523+kjLGARJQ==
-Received: from sofa.misterjones.org ([185.219.108.64]
- helo=goblin-girl.misterjones.org)
+ s=k20201202; t=1670836097;
+ bh=z5HqcNfQJi1MaenD9RiDHiFMXvNXPXoJXEhKMYHhZY4=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=InVOrkT1F1aLJT+4NIgtTnatQBkkM198K5TAlHCJ8DXZyGYDgCMCcXDT0eXeJz3c2
+ OhCJHYPme4sbb5dZ565a7cKK1qaCiXEYnJXWXdWME12pIlCCH/ACPMXWctIjtXW60f
+ IuquRiVR6GDD+fIAHNt6VCVJTZdv9i9JOkl/eqcqPqxoBMDPgSI2SrFb2+v/4ERFVd
+ FwO3vmlhycWZHL/qgN6p9nBfu58Pq619zffjzAZeRkpY32bmPFV9B/0vIzup6X1FPT
+ 8XEuC6uh+1O9G054kGOYlyrFGYScTrFqJ6xZb4ApBVv5sbXNDxSuv7Ammblp9CCKKA
+ nqMt4EAnyZwyw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1p4ekA-00C3Xu-Lv;
- Mon, 12 Dec 2022 09:05:02 +0000
-Date: Mon, 12 Dec 2022 09:05:02 +0000
-Message-ID: <867cyxq9fl.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1p4enG-00C3aO-WF;
+ Mon, 12 Dec 2022 09:08:15 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH 1/3] arm: pmu: Fix overflow checks for
- PMUv3p5 long counters
-In-Reply-To: <Y5XBo6s9JQVY79Wu@monolith.localdoman>
-References: <20221202045527.3646838-1-ricarkol@google.com>
- <20221202045527.3646838-2-ricarkol@google.com>
- <Y5N0os7zL/BaMBa3@monolith.localdoman>
- <87fsdnfroe.wl-maz@kernel.org>
- <Y5XBo6s9JQVY79Wu@monolith.localdoman>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+To: kvmarm@lists.linux.dev,
+	James Clark <james.clark@arm.com>
+Subject: Re: [PATCH 0/1] KVM: arm64: PMU: Fix PMCR_EL0 reset value
+Date: Mon, 12 Dec 2022 09:08:11 +0000
+Message-Id: <167083608669.635334.13408416430959494147.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20221209164446.1972014-1-james.clark@arm.com>
+References: <20221209164446.1972014-1-james.clark@arm.com>
+MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, ricarkol@google.com,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
- eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, james.clark@arm.com,
+ catalin.marinas@arm.com, linux-kernel@vger.kernel.org, will@kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, andrew.jones@linux.dev, kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,41 +85,28 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Alex,
-
-On Sun, 11 Dec 2022 11:40:39 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Fri, 9 Dec 2022 16:44:45 +0000, James Clark wrote:
+> We noticed qemu failing to run because of an assert on our CI. I don't see the issue anymore with
+> this fix.
 > 
-> A simple "hey, you're wrong here, the PMU extensions do not follow the
-> principles of the ID scheme for fields in ID registers" would have
-> sufficed.
+> Applies to kvmarm/next (753d734f3f34)
+> 
+> Thanks
+> 
+> [...]
 
-This is what I did, and saved you the hassle of looking it up.
+Applied to fixes, thanks!
 
-> Guess you never made a silly mistake ever, right?
+[1/1] KVM: arm64: PMU: Fix PMCR_EL0 reset value
+      commit: aff234839f8b80ac101e6c2f14d0e44b236efa48
 
-It's not so much about making a silly mistake. I do that all the time.
-But it is about the way you state these things, and the weight that
-your reviews carry. You're a trusted reviewer, with a lot of
-experience, and posting with an @arm.com address: what you say in a
-public forum sticks. When you assert that the author is wrong, they
-will take it at face value.
-
-> Otherwise, good job encouraging people to help review KVM/arm64 patches ;)
-
-What is the worse: no review? or a review that spreads confusion?
-Think about it. I'm all for being nice, but I will call bullshit when
-I see it asserted by people with a certain level of authority.
-
-And I've long made up my mind about the state of the KVM/arm64 review
-process -- reviews rarely come from people who have volunteered to do
-so, but instead from those who have either a vested interest in it, or
-an ulterior motive. Hey ho...
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
