@@ -1,51 +1,51 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF6B21841
-	for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 10:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D616A23C5
+	for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 10:36:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1670841302;
+	s=mimecast20190719; t=1670841382;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KFD4bXF9HfKCTB2bqwvpTx8dBPmnhTdXw6WlgJmCRVE=;
-	b=DL7TV2Vw2lDnUZaurH+Mcneo4ZZYgueHH5sKzd24E/gcWlQ5Inf87CfYTcF9lxTt1cSdiq
-	BFCc2PlxE8cou+nQlPyYzd5rq3ssdStNd2fGB4NHLG3mdA5U+0ssNenqxPj3PUdXgMKZhf
-	b0tI7/I57ZzYOHohGuXPHPIsB+mfluw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=mQe1vPVAoLefYVtJgOMADA9UsAQ3Kxq8XGAB/nV1Q60=;
+	b=KlAay9MJGpxeE6NzBHN8eaGv9IigyHXkeGe5B2F4fmy9KJnp/x83LWn7mTcQEhdeCkao9I
+	aiHhPS1JQHswfErvLzQib0xsqbPx5TMvGOQqJX/ffj0TqK5XxqqGwZiciso3zmqWe/2XvM
+	HHUaIHqKfCZ0aCBckp4/zooIi3CVxbc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-100-a81Tu-vzMGGAzTT8USB4rw-1; Mon, 12 Dec 2022 05:34:59 -0500
-X-MC-Unique: a81Tu-vzMGGAzTT8USB4rw-1
-Received: by mail-wm1-f69.google.com with SMTP id r129-20020a1c4487000000b003d153a83d27so3185645wma.0
-        for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 02:34:59 -0800 (PST)
+ us-mta-612-ybnWBjsiM8CUSwpghYMuaQ-1; Mon, 12 Dec 2022 05:36:21 -0500
+X-MC-Unique: ybnWBjsiM8CUSwpghYMuaQ-1
+Received: by mail-wm1-f71.google.com with SMTP id h9-20020a1c2109000000b003cfd37aec58so3173148wmh.1
+        for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 02:36:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KFD4bXF9HfKCTB2bqwvpTx8dBPmnhTdXw6WlgJmCRVE=;
-        b=1jKMz4XAVE4YAtLBxqheC7c7Bbi4N1YPzs8bi6SRwNxQPRiAQmetZBB1OOwDgP9ayb
-         thBiUhKY8j9cGYol6r+/oikCOyzQ7C86I+XR7xZ3QukenyObzz/kffRQ2zgJGb8YQ8lE
-         nLQkVu2iyKJIUi1cva4uJo65/OlftFeVnEZxuxxujcBo+TXScYI3EsS4mTdh93f6bXeh
-         Eflco5EzZSAGgQF0w02Cs5waeLosfwW/E9RTt4ZOQ8aPq6IG3WptbaGFEqXqqQi7iGDl
-         r6B6ZzYjZLtbuzE7pVQRb2y19yinxOe/0hP67KmmbmvEVMzmxhG/t0/gFgOWu328l8Hk
-         4Yuw==
-X-Gm-Message-State: ANoB5pldoCMnGoxgKcZct3kyeAKTkCVbgO7ciM2SbaUmTY3fWNCs0458
-	po8crHOXE89OGeSCGg5lnvnhgZ7z732KGfClcwbkD6K6/CtMnefwA+2jUVHtPVafq6hVTvvTT/g
-	scwni4NdpmDMbUjYt
-X-Received: by 2002:a5d:4888:0:b0:232:be5d:5ecc with SMTP id g8-20020a5d4888000000b00232be5d5eccmr9224040wrq.35.1670841298284;
-        Mon, 12 Dec 2022 02:34:58 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7wvWIVuOKysZf5Mx8cCdDopdcGEnGqjatRwKG8EB36UeyRpqDFxHDI9VsIf8PVP5iD55AkPA==
-X-Received: by 2002:a5d:4888:0:b0:232:be5d:5ecc with SMTP id g8-20020a5d4888000000b00232be5d5eccmr9224016wrq.35.1670841298004;
-        Mon, 12 Dec 2022 02:34:58 -0800 (PST)
+        bh=mQe1vPVAoLefYVtJgOMADA9UsAQ3Kxq8XGAB/nV1Q60=;
+        b=WBCbXFB2LWYAQkan2gMVNdAIi+1qVkIMau1NRYreMT0rb7SDTVcUY/HRt2KD/ficu3
+         IBV7L4y5BJbS+pxGFfhpHwDlA9afmagHMQrTjjQa+AxV5eNL6AMhLbR4BSHkJ+yYAT3L
+         jtDiYTV46I1PwdwhK5QSxXZse0NAG13Y1bp9VEQ2DHlXFs7gmhI9xOl5pO0jnqdqq9X+
+         QugFzhYPIDI+t1SV7gYnuGxatiS8u7fRhdrUgi8CVbPWHfKpN7nOPi7s/HemuJ0DRbeK
+         CS5WQQ4xJX/sRRYnprt9oH5gu1WwtSd3rTpFLBjP4dmV9ySrGFe6t0ZF4O449XudGxUc
+         +aMA==
+X-Gm-Message-State: ANoB5pnbnuJVm2LCt2AyM0gUxesqhvznsf6Hp/ECjCGmci0/gx0bt6Tk
+	+izNs9wGcQ2Jg99wKNVOD6IKsuX1rLHhQTthPFjbXz439y2yhVUeX7nAqPCAqwZQBFRLGhzFUiI
+	uvvXsaM4lXUr7EFhe
+X-Received: by 2002:a5d:564a:0:b0:24c:f1ca:b2df with SMTP id j10-20020a5d564a000000b0024cf1cab2dfmr5988131wrw.67.1670841380634;
+        Mon, 12 Dec 2022 02:36:20 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5yfwj5UnZ7QW7iYJjXIjnpYQh7U361r5HLW6PWTGWDdexdLTapuWofhSkU9q9aAnLfd+7YDA==
+X-Received: by 2002:a5d:564a:0:b0:24c:f1ca:b2df with SMTP id j10-20020a5d564a000000b0024cf1cab2dfmr5988117wrw.67.1670841380414;
+        Mon, 12 Dec 2022 02:36:20 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id bn1-20020a056000060100b00242269c8b8esm8603207wrb.25.2022.12.12.02.34.56
+        by smtp.googlemail.com with ESMTPSA id bp8-20020a5d5a88000000b00241e8d00b79sm10772956wrb.54.2022.12.12.02.36.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Dec 2022 02:34:57 -0800 (PST)
-Message-ID: <322454c7-0a3b-e055-2405-f485fa149e7a@redhat.com>
-Date: Mon, 12 Dec 2022 11:34:56 +0100
+        Mon, 12 Dec 2022 02:36:19 -0800 (PST)
+Message-ID: <42dbdb4d-13da-cd6b-e2ad-95b0cb0ff04e@redhat.com>
+Date: Mon, 12 Dec 2022 11:36:18 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,65 +54,47 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH v2 4/7] KVM: selftests: Correctly initialize the VA space
- for TTBR0_EL1
+Subject: Re: [PATCH v2 0/7] KVM: selftests: Fixes for ucall pool +
+ page_fault_test
 To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>,
  James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>, Shuah Khan <shuah@kernel.org>
+ Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Ricardo Koller <ricarkol@google.com>, Sean Christopherson
- <seanjc@google.com>, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ Ricardo Koller <ricarkol@google.com>, Sean Christopherson <seanjc@google.com>
 References: <20221209015307.1781352-1-oliver.upton@linux.dev>
- <20221209015307.1781352-5-oliver.upton@linux.dev>
 From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221209015307.1781352-5-oliver.upton@linux.dev>
+In-Reply-To: <20221209015307.1781352-1-oliver.upton@linux.dev>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-ID: <20221212103456.e_yQVqQhaySrrth2Rastt087emK2YubjU9UYS716iq0@z>
+Message-ID: <20221212103618.GRCCKMXxWNA6qycrkXJY-bFUb9ObV9dnUsb--PFtaRA@z>
 
-On 12/9/22 02:53, Oliver Upton wrote:
-> @@ -268,17 +305,17 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode)
->   #ifdef __aarch64__
->   	if (vm->pa_bits != 40)
->   		vm->type = KVM_VM_TYPE_ARM_IPA_SIZE(vm->pa_bits);
-> +
-> +	/* selftests use TTBR0 only, meaning there is a single VA region. */
-> +	vm->has_split_va_space = false;
-> +#else
-> +	vm->has_split_va_space = true;
->   #endif
->   
+On 12/9/22 02:52, Oliver Upton wrote:
+> The combination of the pool-based ucall implementation + page_fault_test
+> resulted in some 'fun' bugs. As has always been the case, KVM selftests
+> is a house of cards.
+> 
+> Small series to fix up the issues on kvm/queue. Patches 1-2 can probably
+> be squashed into Paolo's merge resolution, if desired.
+> 
+> Tested on Ampere Altra and a Skylake box, since there was a decent
+> amount of munging in architecture-generic code.
+> 
+> v1 -> v2:
+>   - Collect R-b from Sean (thanks!)
+>   - Use a common routine for split and contiguous VA spaces, with
+>     commentary on why arm64 is different since we all get to look at it
+>     now. (Sean)
+>   - Don't identity map the ucall MMIO hole
+>   - Fix an off-by-one issue in the accounting of virtual memory,
+>     discovered in fighting with #2
+>   - Fix an infinite loop in ucall_alloc(), discovered fighting with the
+>     ucall_init() v. kvm_vm_elf_load() ordering issue
 
-Even though there happens to be already a suitable #ifdef, I don't
-really like them and don't think there should be a new bool unless
-something else uses it.
+Queued 3+5, thanks.
 
-However, the new comment is very useful, so I added it to kvm_util.c as
-follows:
-
-/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 759a45540108..56d5ea949cbb 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -186,6 +186,15 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
-  _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
-  	       "Missing new mode params?");
-  
-+/*
-+ * Initializes vm->vpages_valid to match the canonical VA space of the
-+ * architecture.
-+ *
-+ * The default implementation is valid for architectures which split the
-+ * range addressed by a single page table into a low and high region
-+ * based on the MSB of the VA. On architectures with this behavior
-+ * the VA region spans [0, 2^(va_bits - 1)), [-(2^(va_bits - 1), -1].
-+ */
-  __weak void vm_vaddr_populate_bitmap(struct kvm_vm *vm)
-  {
-  	sparsebit_set_num(vm->vpages_valid,
+Paolo
 
