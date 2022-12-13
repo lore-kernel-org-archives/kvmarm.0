@@ -2,87 +2,88 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 277BCC00145
-	for <kvmarm@archiver.kernel.org>; Tue, 13 Dec 2022 01:11:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07266C4332F
+	for <kvmarm@archiver.kernel.org>; Tue, 13 Dec 2022 01:18:45 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B72C4B8FD;
-	Mon, 12 Dec 2022 20:11:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79A034B8E3;
+	Mon, 12 Dec 2022 20:18:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WbKt7Xz7Jlkb; Mon, 12 Dec 2022 20:11:11 -0500 (EST)
+	with ESMTP id WHV7n7JCH7Vo; Mon, 12 Dec 2022 20:18:44 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 386CF4B925;
-	Mon, 12 Dec 2022 20:11:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 449DD4B91F;
+	Mon, 12 Dec 2022 20:18:44 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 489984B8FE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 20:11:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6EC54B922
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 20:18:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kHXTVdBG3kkD for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Dec 2022 20:11:09 -0500 (EST)
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com
- [209.85.216.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A4CB4B8FD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 20:11:09 -0500 (EST)
-Received: by mail-pj1-f45.google.com with SMTP id
- b13-20020a17090a5a0d00b0021906102d05so1865124pjd.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 17:11:09 -0800 (PST)
+ with ESMTP id ipmn-YIx7VWQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Dec 2022 20:18:41 -0500 (EST)
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com
+ [209.85.216.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9A6974B8E3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 20:18:41 -0500 (EST)
+Received: by mail-pj1-f44.google.com with SMTP id
+ z8-20020a17090abd8800b00219ed30ce47so1839780pjr.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Dec 2022 17:18:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=hinRxz3gZAj3ZK/aMCsc0q1wjnPrltO2NY/c3Ugkfq0=;
- b=BNMWSdc+G8UMrGiE9cfwTCPOtvSd4SGR5xx9j3KogRRggicjQJNSWnM6KzvI+ruZLT
- Z5/+c4GRAmzfjVgnsKmZRqnzwxy3jUi/VmUYCAee+psZ2RDnJgcc1z+MUbcUtpmBqhIZ
- n2Xll8zjiyxpmJ3nyLDrFyGmzI72Dw1KgllTInw6mNRJPlPPq+xSIjWfB9YG8CN/8PRG
- r3MG2HeXYjSqtpUEiCGlGf9/Jk4XWxaXIBwinsPc1K0QooX+vTYegu4v2wV32ww/FxE5
- 7U3ovhcjmqh4WLC5088r7J3ACzaSHYWslRMcTvYMNLnN6V4ac7AvMNHAI+noZZdCx3Mm
- 2p7A==
+ bh=65IDnHecXM4GAPku5HHW6zoqaWMBpSe6UVEVil1rUW8=;
+ b=aCbTEC5zVQHMxXGUQTyU3DWgykcdtGQYX+TMVnYfhhivfYDwUdEI2A+rvhEs/NwsaF
+ DBS7EUg/X3QUOeZSsBrnvtkOTybUx0UgHQfTJ3hA35ipZDaXqrdLdH18As7YVMN94+FU
+ E0ZAjnBtiWq0DWCLJTMY1LLhx6oaO6nTa/LCKJnCfj9cvh92FEO+h9Fh1uCxf/eAl6iw
+ 7hyDu3aUhJ3UKrfyvsiyjGIexzmF9DmyPzjASetqH/jMJK8TS5INlchOlJfnBagkkznK
+ 3XYQb4be1caEftz1e2fA0GEffMBeGMtYKiW3GQDIe6ihjILD9JWzVjZUmCWBKLdW3ozR
+ bQkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
  :message-id:reply-to;
- bh=hinRxz3gZAj3ZK/aMCsc0q1wjnPrltO2NY/c3Ugkfq0=;
- b=ZcObsth+lxn2ZzIvtvnKIYTK+c9ItzwfPENyAMmai2DqU2VmdCvpGk9faZeE94v4vK
- bpFLtq5MK3/35H10rrviWUKY6+YZsQuTIpaukHRuDPVSowfLSfmUiEcFsuLXMcbS0qoc
- mSDfAvmp6Csesb7D+/H6Y3UXLMAaTYpSoIq2MD+4Uj9CLhw28T7TWd8mO04c+QgvLrHV
- XP+dCzcmi9ZOCwuB4o7PYCllYX/y67zTApPiAEHP5WsH1qvmvkkLWfUjy7AepBAiEU1S
- Ye13jRic0LyRwgHQI0dk4QWJ+Uv+nE3jlw/NwRks6hFGp8Z0Z9wN+T/H4kNlCtPUYhTQ
- ltPw==
-X-Gm-Message-State: ANoB5pk1ZOCJGyN8cTKjh8nUqLHB7WEDoHp/Djyxnuu3MW8oawAStDlh
- I0TggZsZQLxsAX7cCez+mqTLPQ==
-X-Google-Smtp-Source: AA0mqf4K7zeWWztu3csfWQBbFCCVxqGsIhKZt6mbUg55HAzsJAXNVoEUxec6VV36cFbnYl7q+RITOA==
-X-Received: by 2002:a17:902:7001:b0:189:a208:d130 with SMTP id
- y1-20020a170902700100b00189a208d130mr18915329plk.31.1670893867860; 
- Mon, 12 Dec 2022 17:11:07 -0800 (PST)
+ bh=65IDnHecXM4GAPku5HHW6zoqaWMBpSe6UVEVil1rUW8=;
+ b=pV4t1mfHK4nX5/d+lXUePrDhnG4dF51hRpP10Hq6u7qOIu6wXRYOcOnoE7ZGsx5iTg
+ aZmRdgssE9bpSHrkkFe7gxQj6lRijasMSKWx8vmu/vhqUNSKYNZUjkMGaSJX95ztw5iz
+ Qcl8vYYrMouKeo/g09vjvO1p5gsZ0xWwoHoDbkpbPpmdvalThwDpDOavG4NnpMsVUbCQ
+ GR7W4vD1csvMv0bgFxj5zR/BrBqtaEX8QEVT+0tWiGiIwBwJeLq9eZIOHOJ/x/7lvy5w
+ p0Kwu68C34bvwtq0jAJSc/Q36MbyorK1+A5xkTV7iYrz7xvGokW4xXiHNrVfV0CGkaL7
+ qsCQ==
+X-Gm-Message-State: ANoB5pnJ7NOtzx/HcAsIfg4SUoBuDOk36quUeM8qKw9s7N8UEePscoua
+ Ve/wKmpP1TQKeiUobHgDWG2dpQ==
+X-Google-Smtp-Source: AA0mqf5INLD3H26KoHZlGz+PIVih+odmnj70wLNIiESaeaUKfnuuF7xa7n6FGQnW8NJxdar9YAD0/g==
+X-Received: by 2002:a05:6a20:2d21:b0:a4:9691:6e9 with SMTP id
+ g33-20020a056a202d2100b000a4969106e9mr23637142pzl.1.1670894320396; 
+ Mon, 12 Dec 2022 17:18:40 -0800 (PST)
 Received: from google.com (223.103.125.34.bc.googleusercontent.com.
  [34.125.103.223]) by smtp.gmail.com with ESMTPSA id
- l11-20020a170903120b00b0017f72a430adsm7043661plh.71.2022.12.12.17.11.06
+ r14-20020a63a54e000000b00460ea630c1bsm5762650pgu.46.2022.12.12.17.18.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 12 Dec 2022 17:11:07 -0800 (PST)
-Date: Mon, 12 Dec 2022 17:11:02 -0800
+ Mon, 12 Dec 2022 17:18:40 -0800 (PST)
+Date: Mon, 12 Dec 2022 17:18:35 -0800
 From: David Matlack <dmatlack@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
+To: Paolo Bonzini <pbonzini@redhat.com>
 Subject: Re: [RFC PATCH 01/37] KVM: x86/mmu: Store the address space ID
  directly in kvm_mmu_page_role
-Message-ID: <Y5fRJr34/BnsE+Dv@google.com>
+Message-ID: <Y5fS69mLXlV+cQlg@google.com>
 References: <20221208193857.4090582-1-dmatlack@google.com>
  <20221208193857.4090582-2-dmatlack@google.com>
  <22fe2332-497e-fe30-0155-e026b0eded97@intel.com>
  <Y5NvYmxpy6BPkmpW@google.com>
  <CALzav=eju4LYyX=ufNneSww+5sraYJ8cfQSi4LTOHfHWmddX9A@mail.gmail.com>
- <Y5dnWgJ0ine55/hN@google.com> <Y5dwQEJHNiTPE+jz@google.com>
+ <Y5dnWgJ0ine55/hN@google.com>
+ <01cb4882-7a06-176f-7d55-f80cca300ffd@redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <Y5dwQEJHNiTPE+jz@google.com>
+In-Reply-To: <01cb4882-7a06-176f-7d55-f80cca300ffd@redhat.com>
 Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
  Hugh Dickins <hughd@google.com>, Paul Walmsley <paul.walmsley@sifive.com>,
  "Yang, Weijiang" <weijiang.yang@intel.com>, "Amit, Nadav" <namit@vmware.com>,
- Ben Gardon <bgardon@google.com>,
+ Colin Cross <ccross@google.com>, Ben Gardon <bgardon@google.com>,
  "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
  "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
  Yu Zhao <yuzhao@google.com>, Huacai Chen <chenhuacai@kernel.org>,
@@ -98,10 +99,8 @@ Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
  Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
  "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
  "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
- Colin Cross <ccross@google.com>,
  "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
- Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>
+ Marc Zyngier <maz@kernel.org>, Andrew Morton <akpm@linux-foundation.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -118,27 +117,36 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Dec 12, 2022 at 06:17:36PM +0000, Oliver Upton wrote:
-> On Mon, Dec 12, 2022 at 05:39:38PM +0000, Sean Christopherson wrote:
-> > On Fri, Dec 09, 2022, David Matlack wrote:
-> > > On Fri, Dec 9, 2022 at 9:25 AM Oliver Upton <oliver.upton@linux.dev> wrote:
-> > My preference would be to leave .smm in x86's page role.  IMO, defining multiple
-> > address spaces to support SMM emulation was a mistake that should be contained to
-> > SMM, i.e. should never be used for any other feature.  And with CONFIG_KVM_SMM,
-> > even x86 can opt out.
+On Mon, Dec 12, 2022 at 11:50:29PM +0100, Paolo Bonzini wrote:
+> On 12/12/22 18:39, Sean Christopherson wrote:
+> > > The notion of address spaces is already existing architecture-neutral
+> > > concept in KVM (e.g. see uses of KVM_ADDRESS_SPACE_NUM in
+> > > virt/kvm/kvm_main.c), although SMM is the only use-case I'm aware of.
+> > 
+> > Yes, SMM is currently the only use-case.
 > 
-> +1
+> It's possible that in the future Hyper-V VTLs will also have per-level
+> protections.  It wouldn't use as_id, but it would likely be recorded in the
+> upper byte of the role.
 > 
-> I don't think something is architecture-neutral by virtue of it existing
-> in virt/kvm/*.
+> I'm not sure if Microsoft intends to port those to ARM as well.
+> 
+> > My preference would be to leave .smm in x86's page role
+> 
+> What about defining a byte of arch_role and a macro to build it?
 
-Put another way, just because something exists in virt/kvm/* doesn't
-mean it is used (or will be useful) to more than one architecture.
-Totally agree.  In this case, there never turned out to be any other
-usecases for memslot address spaces.
+Both would work. I went with as_id in the common role since that's how
+it's encoded in kvm_memory_slot and because, not matter what, the TDP
+MMU still has to handle multiple address spaces. i.e. Even if we hide
+SMM away in the role, the TDP MMU still has to access it with some
+wrapper e.g.  kvm_mmu_page_as_id() (that would just return 0 outside of
+x86). From that perspective, just having as_id directly in the common
+role seemed like the cleanest option.
 
-As for role.arch.smm vs role.as_id, I'll post my response on the other
-thread with Paolo. Juggling these threads is hard.
+The only way to truly shield the TDP MMU from SMM would be to disallow
+it. e.g. Disable the TDP MMU if defined(CONFIG_KVM_SMM), or something
+similar. But I don't know enough about how KVM SMM support is used to
+say if that's even worth entertaining.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
