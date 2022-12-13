@@ -1,104 +1,126 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A9615A8
-	for <kvmarm@lists.linux.dev>; Tue, 13 Dec 2022 00:17:21 +0000 (UTC)
-Received: by mail-pg1-f202.google.com with SMTP id i19-20020a63e913000000b004705d1506a6so8620663pgh.13
-        for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 16:17:21 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5A715B0
+	for <kvmarm@lists.linux.dev>; Tue, 13 Dec 2022 01:02:11 +0000 (UTC)
+Received: by mail-pl1-f181.google.com with SMTP id jn7so13902075plb.13
+        for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 17:02:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=sNSL8jiUwkIgQF+f7LKM6ExXdf/VymBG2POuUwuNLgE=;
-        b=X3XOty/l01/xeN/hKkn1EpgJ33YKq3U2qtH9GiJ5/B0nOJ0DB+hLmj4UfSSjeoJtZB
-         r3WCB8nZwf1VlN7+893cXq/5kUvyTwTDCZxL2nIPUKLALlzRPBZMfeoH0Ua0SHFxAPI3
-         /Uv3ZxCaECDcW2eeqyV8ZVWd1hAjmNuzXaMV7oaRBjF3tNInWHVE7czGbwWdAPA4Hukj
-         Vcsk24frgaF7Oql5xOx7BPdx2Nha0adydl6KmebMs/wKPMnAOgI3pEI6XB3jQLbLNFR9
-         iwyZylWx8ZK0kgB1K5whCjACIx96wIRJdQeYwYX5foAv7IbCJ4PHaibz2NHGhj7JHDYg
-         U68w==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6GqFhoQ5IFUAK9oX1MHOecDUK0USc3JCTx3X8yerj1o=;
+        b=FtjwIkrUOBV2twjG7aSDbbD70cPG5TPStSgDCsNV45Bhmz74eNy+ozucvejg73x4O1
+         Iohs4s0dpsdVjim7W9yTFCi/EcSDg8iCwzhlHWz1fotOSARecFpPQ4Hcfa3qQYCWl4fD
+         i1NYMRChruL7+5L6pSJLJXVhu8QmidC5EEUqHA/lI7bch3t3TIv1aCN57q4l7rtPFYua
+         FlWlimYfUfUgVCukMvVJuuDDKaWduMb0REZn22mFV2kYcjkEnorPqV83jL7/8bj0vUDj
+         SOGbsMyi3efvpD/4Q6/fjpBXN88wAA6q87W5qjPxSb+fHE/weIam6vo+2qT/aO85DhR1
+         U6LA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sNSL8jiUwkIgQF+f7LKM6ExXdf/VymBG2POuUwuNLgE=;
-        b=4uvosPh/1q55ahICbuk1PrPh3sohZqm3iy8VCqHwsLMTYCDGI25HOJrtX9NTZipP0D
-         n4OO2jhLe9gZLhroX70Jx6zUaxNX+dGL0XwADLO9XqgSlqLAS/DJ+3uH+q4vJps36ybV
-         /CcuK/3JLdb/x1Nwr0BF/TyYxFhD+InKJcevnk7U7B2XY1drEJCNmR/OrbVRiOKUfiTc
-         13SSnDq0z/dB101ugRa3sPqB5LJKipAaJolYU7BkGodVo6sZhWkXhesYC+8EsF6Zg2L1
-         AP6Ho0YZnVGByd3fCMSl22cn24tqTwBCTpDyR9/ppSRlCwKAuvGkOKKkUyckNcRGt7bh
-         HozA==
-X-Gm-Message-State: ANoB5plSLONp4BGo3itgfgrNh+GV+1XkzA7/aPyT6AlmATZT3L38qsGE
-	+y95gZI4n/hyXFYWOS9Fw1lzVZiUiU0=
-X-Google-Smtp-Source: AA0mqf6O/+6Xz33uYXNagfPhZfGdLb4gsoDNpenMWb9N8M3Pf/4lwZ6k3UWvF8FLs6w60jREU9TzRW9INS4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1d98:b0:578:2fb3:b373 with SMTP id
- z24-20020a056a001d9800b005782fb3b373mr577725pfw.33.1670890641355; Mon, 12 Dec
- 2022 16:17:21 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 13 Dec 2022 00:16:53 +0000
-In-Reply-To: <20221213001653.3852042-1-seanjc@google.com>
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6GqFhoQ5IFUAK9oX1MHOecDUK0USc3JCTx3X8yerj1o=;
+        b=mcNtez6jYgSBORtXnslI/oRyuWQopBh+z4vRawIcbO2Yc1wh3u1RccHz+LnMEypZmD
+         WO6MAb+ONSnu7O5aACChDchugQcouLxl1TpHLZ7v6mC7zDn10AvI479LJTrJh/eZmxGj
+         1u1GuRqLLczuvLxFw5QvWU0OBZIAShkilFKCSQ7GxcxgWtzWhxUEJiVsnhB4sdsVPmOy
+         o3oCIeI338C7J8dPnkNFQPqp14Z08QeJATozyDjPQU4pIIvW5m8tMGhUg8Abc9Itvmyk
+         UzbEiaXsIFTxMDh5JzkMdvcjKAIIDgweBDyP1xDr23C1/y8J17cGKa6Xmpqy1hScF/5R
+         PwsQ==
+X-Gm-Message-State: ANoB5pmFXc7LueitrlYbxlIjNxmfLSOjr9wq2C9CjmFMFK847CRyJDx4
+	Kiji3WW82H1dlt/mW5P64v5Zrg==
+X-Google-Smtp-Source: AA0mqf6YEPI+D/p+C5vB/eTbMi0DUTnPh+gMPudwZTqoN9JqStWe3ScZcQMFez7S1hpnK/27SYk6nw==
+X-Received: by 2002:a17:90b:394b:b0:218:7bf2:4ff2 with SMTP id oe11-20020a17090b394b00b002187bf24ff2mr62913pjb.0.1670893330943;
+        Mon, 12 Dec 2022 17:02:10 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id n15-20020a170903110f00b00186bc66d2cbsm7066219plh.73.2022.12.12.17.02.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Dec 2022 17:02:10 -0800 (PST)
+Date: Tue, 13 Dec 2022 01:02:06 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Nadav Amit <namit@vmware.com>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>, Yu Zhao <yuzhao@google.com>,
+	Colin Cross <ccross@google.com>, Hugh Dickins <hughd@google.com>,
+	Mingwei Zhang <mizhang@google.com>,
+	Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [RFC PATCH 20/37] KVM: x86/mmu: Abstract away computing the max
+ mapping level
+Message-ID: <Y5fPDqI7TBngeaj8@google.com>
+References: <20221208193857.4090582-1-dmatlack@google.com>
+ <20221208193857.4090582-21-dmatlack@google.com>
+ <CANgfPd-6LNdZ42tb0DnC21r1Z5JGR_1Lvvop8RKJJ8hEz+PUDg@mail.gmail.com>
+ <CALzav=cashgJPmeKSRQnd_kdYg2EK0G4rygSCt6GaJWSYz3juw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20221213001653.3852042-1-seanjc@google.com>
-X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221213001653.3852042-15-seanjc@google.com>
-Subject: [PATCH 14/14] KVM: selftests: Enable RSEQ test for RISC-V
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>
-Cc: James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tom Rix <trix@redhat.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
-	linux-riscv@lists.infradead.org, llvm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Ricardo Koller <ricarkol@google.com>, 
-	Sean Christopherson <seanjc@google.com>, Aaron Lewis <aaronlewis@google.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221213001653.C28EpgabhJYOgWu3VGJexsapK8tm2yRo_IlhHFchnj4@z>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALzav=cashgJPmeKSRQnd_kdYg2EK0G4rygSCt6GaJWSYz3juw@mail.gmail.com>
+Message-ID: <20221213010206.0QmLJ0pLiOuJLxt6G6D0HBipoPTUx2VOkBI-tNwGTA4@z>
 
-Enable the RSEQ test for RISC-V, which according to HAVE_RSEQ is supported
-by the kernel and thus should be tested.  The RSEQ test was added shortly
-before RISC-V selftests support landed, i.e. was likely overlooked during
-merging.
+On Mon, Dec 12, 2022, David Matlack wrote:
+> On Mon, Dec 12, 2022 at 11:32 AM Ben Gardon <bgardon@google.com> wrote:
+> >
+> > On Thu, Dec 8, 2022 at 11:39 AM David Matlack <dmatlack@google.com> wrote:
+> > >
+> > > Abstract away kvm_mmu_max_mapping_level(), which is an x86-specific
+> > > function for computing the max level that a given GFN can be mapped in
+> > > KVM's page tables. This will be used in a future commit to enable moving
+> > > the TDP MMU to common code.
+> > >
+> > > Provide a default implementation for non-x86 architectures that just
+> > > returns the max level. This will result in more zapping than necessary
+> > > when disabling dirty logging (i.e. less than optimal performance) but no
+> > > correctness issues.
+> >
+> > Apologies if you already implemented it in a later patch in this
+> > series, but would it not at least be possible to port
+> > host_pfn_mapping_level to common code and check that?
+> > I'm assuming, though I could be wrong, that all archs map GFNs with at
+> > most a host page table granularity mapping.
+> > I suppose that doesn't strictly need to be included in this series,
+> > but it would be worth addressing in the commit description.
+> 
+> It's not implemented later in this series, but I agree it's something
+> we should do. In fact, it's worth doing regardless of this series as a
+> way to share more code across architectures (e.g. KVM/ARM has it's own
+> version in arch/arm64/kvm/mmu.c:get_user_mapping_size()).
 
-Note, the RSEQ test currently doesn't compile with clang due to an issue
-in the base RSEQ test code.  Given that clang is constantly broken for KVM
-selftests, enable the RSEQ test and deal with its broken clang state in a
-separate commit/series.
+Ya, ARM converted to walking the host user page tables largely in response to
+x86's conversion.  After x86 switched, ARM was left holding the bag that was
+PageTransCompoundMap().
 
-  In file included from rseq_test.c:23:
-  In file included from ./../rseq/rseq.c:33:
-  In file included from ../rseq/rseq.h:97:
-  ../rseq/rseq-riscv.h:657:17: error: invalid input constraint 'er' in asm
-                                      [off]                       "er" (off),
-                                                                ^
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- tools/testing/selftests/kvm/rseq_test.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
-index 34c3df9b4e81..3045fdf9bdf5 100644
---- a/tools/testing/selftests/kvm/rseq_test.c
-+++ b/tools/testing/selftests/kvm/rseq_test.c
-@@ -22,8 +22,6 @@
- 
- #include "../rseq/rseq.c"
- 
--TEST_UNSUPPORTED(riscv);
--
- /*
-  * Any bug related to task migration is likely to be timing-dependent; perform
-  * a large number of migrations to reduce the odds of a false negative.
--- 
-2.39.0.rc1.256.g54fd8350bd-goog
-
+On a related topic, I'm guessing all the comments in transparent_hugepage_adjust()
+about the code working _only_ for THP are stale.  Unless ARM support for HugeTLB
+works differently, walking host user page tables should Just Work for all hugepage
+types.
