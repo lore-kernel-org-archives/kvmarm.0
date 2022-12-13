@@ -1,126 +1,127 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5A715B0
-	for <kvmarm@lists.linux.dev>; Tue, 13 Dec 2022 01:02:11 +0000 (UTC)
-Received: by mail-pl1-f181.google.com with SMTP id jn7so13902075plb.13
-        for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 17:02:11 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37F615B0
+	for <kvmarm@lists.linux.dev>; Tue, 13 Dec 2022 01:06:30 +0000 (UTC)
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-3bfd998fa53so171945657b3.5
+        for <kvmarm@lists.linux.dev>; Mon, 12 Dec 2022 17:06:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6GqFhoQ5IFUAK9oX1MHOecDUK0USc3JCTx3X8yerj1o=;
-        b=FtjwIkrUOBV2twjG7aSDbbD70cPG5TPStSgDCsNV45Bhmz74eNy+ozucvejg73x4O1
-         Iohs4s0dpsdVjim7W9yTFCi/EcSDg8iCwzhlHWz1fotOSARecFpPQ4Hcfa3qQYCWl4fD
-         i1NYMRChruL7+5L6pSJLJXVhu8QmidC5EEUqHA/lI7bch3t3TIv1aCN57q4l7rtPFYua
-         FlWlimYfUfUgVCukMvVJuuDDKaWduMb0REZn22mFV2kYcjkEnorPqV83jL7/8bj0vUDj
-         SOGbsMyi3efvpD/4Q6/fjpBXN88wAA6q87W5qjPxSb+fHE/weIam6vo+2qT/aO85DhR1
-         U6LA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pv4WCEHXWY+FV1YUq8UNcPDkKm6bq2JSRGE//Kj9vf8=;
+        b=nHZzxj7Q780CVpKNF5gPN9HC44/Nc5HxGgyb1Juqwj1LdHZaoEfIug7PLPSpIoG2yv
+         bmGt6M4gEviMg/4oleu94/zXTiZWfGijEovvaEHGgA7Eev1ScUr3lmzTjd64Mi03kCxs
+         PbGxjVHqOnyt6ZPcxJwRG/wcbDAMZUx3Xl4SiOpcV0axmJA2GnEXju4M06z4rBwHhhEb
+         yE957qAZ7PBaas2oZC443pTFXpt0xmYGnt5zUCk7Qk2H1quPnvfsIn/n2xF6RlLVxEn/
+         7qsqOx/N1UaziUkHy3R+gnhN/7hTYyhLpEA7pfvyzNtgwB54yoGqLe9EO7E5FBPlJUQ0
+         OJlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6GqFhoQ5IFUAK9oX1MHOecDUK0USc3JCTx3X8yerj1o=;
-        b=mcNtez6jYgSBORtXnslI/oRyuWQopBh+z4vRawIcbO2Yc1wh3u1RccHz+LnMEypZmD
-         WO6MAb+ONSnu7O5aACChDchugQcouLxl1TpHLZ7v6mC7zDn10AvI479LJTrJh/eZmxGj
-         1u1GuRqLLczuvLxFw5QvWU0OBZIAShkilFKCSQ7GxcxgWtzWhxUEJiVsnhB4sdsVPmOy
-         o3oCIeI338C7J8dPnkNFQPqp14Z08QeJATozyDjPQU4pIIvW5m8tMGhUg8Abc9Itvmyk
-         UzbEiaXsIFTxMDh5JzkMdvcjKAIIDgweBDyP1xDr23C1/y8J17cGKa6Xmpqy1hScF/5R
-         PwsQ==
-X-Gm-Message-State: ANoB5pmFXc7LueitrlYbxlIjNxmfLSOjr9wq2C9CjmFMFK847CRyJDx4
-	Kiji3WW82H1dlt/mW5P64v5Zrg==
-X-Google-Smtp-Source: AA0mqf6YEPI+D/p+C5vB/eTbMi0DUTnPh+gMPudwZTqoN9JqStWe3ScZcQMFez7S1hpnK/27SYk6nw==
-X-Received: by 2002:a17:90b:394b:b0:218:7bf2:4ff2 with SMTP id oe11-20020a17090b394b00b002187bf24ff2mr62913pjb.0.1670893330943;
-        Mon, 12 Dec 2022 17:02:10 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id n15-20020a170903110f00b00186bc66d2cbsm7066219plh.73.2022.12.12.17.02.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 17:02:10 -0800 (PST)
-Date: Tue, 13 Dec 2022 01:02:06 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Nadav Amit <namit@vmware.com>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>,
-	Arnd Bergmann <arnd@arndb.de>, Yu Zhao <yuzhao@google.com>,
-	Colin Cross <ccross@google.com>, Hugh Dickins <hughd@google.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [RFC PATCH 20/37] KVM: x86/mmu: Abstract away computing the max
- mapping level
-Message-ID: <Y5fPDqI7TBngeaj8@google.com>
-References: <20221208193857.4090582-1-dmatlack@google.com>
- <20221208193857.4090582-21-dmatlack@google.com>
- <CANgfPd-6LNdZ42tb0DnC21r1Z5JGR_1Lvvop8RKJJ8hEz+PUDg@mail.gmail.com>
- <CALzav=cashgJPmeKSRQnd_kdYg2EK0G4rygSCt6GaJWSYz3juw@mail.gmail.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pv4WCEHXWY+FV1YUq8UNcPDkKm6bq2JSRGE//Kj9vf8=;
+        b=um9fA14qfKqLTd4PnYbnNbTpwvE6qfR8mH24h4ms5trfo8kdzz7zq+86UFSuQgPQGY
+         Q9OQsRjOooSrMiFQcAe9rzc8iJs8W/wX7xtd4lEXCULa/yJLpxuPvdr+bjYCd/E9VrUH
+         guPoVTunaSPbH8klD0MQpFy89hYy7i3WLycMtzandm83WDTxa3hgCNET0x5RHRPzEogj
+         ff+rXuTz5MlJLHhvATs9b0XI9Pi3I6sX/apdG2fz2jO0HpUpQL6EZugX58svEegqjkiw
+         1K4+3xd+mW1BjZjnxquMet2lmVKQ+KxGKEBLZ2zLl3T8yFxrEnzTfOv90DIeHBUrY+gk
+         meYw==
+X-Gm-Message-State: ANoB5pkw8+SBUpJw5WQd8KsgIxCgYz7+4ILeBqEAe5ndJVoru6FFAvNX
+	Ag2n0oe84AU3qw2B4pTWfnzGyoAzyE01+VmVw3ms4g==
+X-Google-Smtp-Source: AA0mqf6UC/AYrRSJ+MEPYQjgdOAUYa1qq71cF4IZc0dJwhxjGVc2rf3hOO63DAbZlhHX9B51ehBcsSfwU5FzFAQu4JA=
+X-Received: by 2002:a81:4d6:0:b0:402:7be6:f265 with SMTP id
+ 205-20020a8104d6000000b004027be6f265mr4263609ywe.188.1670893589689; Mon, 12
+ Dec 2022 17:06:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALzav=cashgJPmeKSRQnd_kdYg2EK0G4rygSCt6GaJWSYz3juw@mail.gmail.com>
-Message-ID: <20221213010206.0QmLJ0pLiOuJLxt6G6D0HBipoPTUx2VOkBI-tNwGTA4@z>
+References: <20221208193857.4090582-1-dmatlack@google.com> <20221208193857.4090582-3-dmatlack@google.com>
+ <48f4df00-8ef6-042f-c9ae-4023c4f70058@redhat.com>
+In-Reply-To: <48f4df00-8ef6-042f-c9ae-4023c4f70058@redhat.com>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 12 Dec 2022 17:06:03 -0800
+Message-ID: <CALzav=crvFwCo50N5QOFD5FstrR9wJ=FmQAkYDHaKzQuatCNfw@mail.gmail.com>
+Subject: Re: [RFC PATCH 02/37] KVM: MMU: Move struct kvm_mmu_page_role into
+ common code
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Sean Christopherson <seanjc@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Anshuman Khandual <anshuman.khandual@arm.com>, Nadav Amit <namit@vmware.com>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Vlastimil Babka <vbabka@suse.cz>, 
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Suren Baghdasaryan <surenb@google.com>, 
+	Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Yu Zhao <yuzhao@google.com>, Colin Cross <ccross@google.com>, Hugh Dickins <hughd@google.com>, 
+	Ben Gardon <bgardon@google.com>, Mingwei Zhang <mizhang@google.com>, 
+	Krish Sadhukhan <krish.sadhukhan@oracle.com>, Ricardo Koller <ricarkol@google.com>, 
+	Jing Zhang <jingzhangos@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
+	linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20221213010603.VJkcpfl1Fkt1m9DwROMUegvpMJkOlEYPlbhbMMmp0DI@z>
 
-On Mon, Dec 12, 2022, David Matlack wrote:
-> On Mon, Dec 12, 2022 at 11:32 AM Ben Gardon <bgardon@google.com> wrote:
-> >
-> > On Thu, Dec 8, 2022 at 11:39 AM David Matlack <dmatlack@google.com> wrote:
-> > >
-> > > Abstract away kvm_mmu_max_mapping_level(), which is an x86-specific
-> > > function for computing the max level that a given GFN can be mapped in
-> > > KVM's page tables. This will be used in a future commit to enable moving
-> > > the TDP MMU to common code.
-> > >
-> > > Provide a default implementation for non-x86 architectures that just
-> > > returns the max level. This will result in more zapping than necessary
-> > > when disabling dirty logging (i.e. less than optimal performance) but no
-> > > correctness issues.
-> >
-> > Apologies if you already implemented it in a later patch in this
-> > series, but would it not at least be possible to port
-> > host_pfn_mapping_level to common code and check that?
-> > I'm assuming, though I could be wrong, that all archs map GFNs with at
-> > most a host page table granularity mapping.
-> > I suppose that doesn't strictly need to be included in this series,
-> > but it would be worth addressing in the commit description.
-> 
-> It's not implemented later in this series, but I agree it's something
-> we should do. In fact, it's worth doing regardless of this series as a
-> way to share more code across architectures (e.g. KVM/ARM has it's own
-> version in arch/arm64/kvm/mmu.c:get_user_mapping_size()).
+On Mon, Dec 12, 2022 at 3:11 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 12/8/22 20:38, David Matlack wrote:
+> > +/*
+> > + * kvm_mmu_page_role tracks the properties of a shadow page (where shadow page
+> > + * also includes TDP pages) to determine whether or not a page can be used in
+> > + * the given MMU context.
+> > + */
+> > +union kvm_mmu_page_role {
+> > +     u32 word;
+> > +     struct {
+> > +             struct {
+> > +                     /* The address space ID mapped by the page. */
+> > +                     u16 as_id:8;
+> > +
+> > +                     /* The level of the page in the page table hierarchy. */
+> > +                     u16 level:4;
+> > +
+> > +                     /* Whether the page is invalid, i.e. pending destruction. */
+> > +                     u16 invalid:1;
+> > +             };
+> > +
+> > +             /* Architecture-specific properties. */
+> > +             struct kvm_mmu_page_role_arch arch;
+> > +     };
+> > +};
+> > +
+>
+> Have you considered adding a tdp_mmu:1 field to the arch-independent
+> part?  I think that as long as _that_ field is the same, there's no need
+> to have any overlap between TDP MMU and shadow MMU roles.
+>
+> I'm not even sure if the x86 TDP MMU needs _any_ other role bit.  It
+> needs of course the above three, and it also needs "direct" but it is
+> used exactly to mean "is this a TDP MMU page".  So we could have
+>
+> union {
+>         struct {
+>                 u32 tdp_mmu:1;
+>                 u32 invalid:1;
+>                 u32 :6;
+>                 u32 level:8;
+>                 u32 arch:8;
+>                 u32 :8;
+>         } tdp;
+>         /* the first field must be "u32 tdp_mmu:1;" */
+>         struct kvm_mmu_page_role_arch shadow;
 
-Ya, ARM converted to walking the host user page tables largely in response to
-x86's conversion.  After x86 switched, ARM was left holding the bag that was
-PageTransCompoundMap().
+We could but then that prevents having common fields between the
+Shadow MMU and TDP MMU. For example, make_spte() and
+make_huge_page_split_spte() use sp->role.level regardless of TDP or
+Shadow MMU, and is_obsolete_sp() uses sp->role.invalid. Plus then you
+need the `arch:8` byte for SMM.
 
-On a related topic, I'm guessing all the comments in transparent_hugepage_adjust()
-about the code working _only_ for THP are stale.  Unless ARM support for HugeTLB
-works differently, walking host user page tables should Just Work for all hugepage
-types.
+It's possible to make it work, but I don't see what the benefit would be.
