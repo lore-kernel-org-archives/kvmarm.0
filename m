@@ -2,82 +2,94 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58498C4332F
-	for <kvmarm@archiver.kernel.org>; Tue, 13 Dec 2022 18:22:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22E74C10F1B
+	for <kvmarm@archiver.kernel.org>; Tue, 13 Dec 2022 20:03:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD5D54B93F;
-	Tue, 13 Dec 2022 13:22:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F30F4B93D;
+	Tue, 13 Dec 2022 15:03:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, body has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FX8lhjfQy7Pc; Tue, 13 Dec 2022 13:22:53 -0500 (EST)
+	with ESMTP id Dd7PG3ShAmDF; Tue, 13 Dec 2022 15:03:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D3544B908;
-	Tue, 13 Dec 2022 13:22:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B5E34B91C;
+	Tue, 13 Dec 2022 15:03:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 434B34B908
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2022 13:22:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C1A4A4B8DC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2022 15:03:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J3VWXHHlSxqJ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 13 Dec 2022 13:22:51 -0500 (EST)
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com
- [209.85.215.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ED6F54B839
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2022 13:22:50 -0500 (EST)
-Received: by mail-pg1-f174.google.com with SMTP id f3so419287pgc.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2022 10:22:50 -0800 (PST)
+ with ESMTP id 0uajXkCCYiKp for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 13 Dec 2022 15:03:09 -0500 (EST)
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com
+ [209.85.216.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 909004B8CC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2022 15:03:09 -0500 (EST)
+Received: by mail-pj1-f45.google.com with SMTP id
+ v13-20020a17090a6b0d00b00219c3be9830so4696449pjj.4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2022 12:03:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=vbt0meIgNn6WBG4YKbNfGi1T3PYNH2tI0RABGm6MAIY=;
- b=clVFCd5NAswd0cV5yiJ07YbrMqm/CoMDjz7XOZ2ww7a9GYyW5vk4yywNHRG5Ad+WXB
- hbq44pfn7aYqEIVVmUQsFM6Y8CxcJlw3QXr/qCvnKCNZBr8PzznZVoNkfZNbn1xITgwW
- +nBS4O9SzJ/7RuXokUHopQoBRfoB75i29p7cO2lqearialjc2gIWpVxIy1tX/nmDQgwc
- W58XTPAQZgCLDbxqZzXtl1PCpopHaxD1OtIsbXSLCYd76Ow533MgDCL5mG6/XVENGbWF
- ZfNmBf8gS0lPgVdqVkKxH6lghccfPJyKH2BL2/y9fbgiRx549qyPOE9NiT9AsmrxddrV
- KhUQ==
+ bh=SlLKeNs0EWVsu+ptfdWBNmvU18ZVhMR61XWdAxFV9XQ=;
+ b=Jgh2h70gyFoI+vZEt+HRyYhvy8YXmJruypdwVRYeOAtwakBPLsrcx6y+QvB3hUhUNm
+ v/DiIWAZ3oh+MtBheCrEL++Gyb7HLAT1gDnpqMiVuiB04sbr6RL+4HisIMlXsah7jJHs
+ BQh9UrAAjRfz+6OEQK8DW+ZocCeLgGW7E9/YuE4vDZ2U7pCZP9xxdvcW7BRNNE9/dvXk
+ UHFZHnLNmVVz3QPKDVMD9nL2tc1Un2n3p3lY72Vrrn4IEro5ne4Mp2Xd+uRIFimABqMP
+ 9hVMz9Et/jMsgOYssc4gfckHfVOAIkEUwXeMIcmjytkpiwFO3ZODSvpun/Uk3hH9yVpu
+ tYKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
  :message-id:reply-to;
- bh=vbt0meIgNn6WBG4YKbNfGi1T3PYNH2tI0RABGm6MAIY=;
- b=s2Mk746DNefLFIHMPGAave2iFDkNoKxxYDbIfxj0zO8CnmFqk234Le+b50BvC1Rs0J
- q6RA+SCw3OuTN7Nk62tME9XL6haA3AvqIKDGdc9tNW6Cnm/BjuY8Cj+V0/ZL/MPMQcGm
- ivZBsjND5dHmwCFVkdniiiSUv5HoIsAxgHKqF0vPychojL86E9ag54Nv8pF+QwILefyq
- WElB+ZujcjWKTFWJPLXbk30BYprSNb2BvQtwyJa7/v/CtYcdUBfXiM5le+oh6/E+8UO6
- eTviajuicfUsNRjm2z3Bd1l9z+7TAgbDXHPhs1qCeIRYuWatJj2IuKaIx4IIKfDpfFoN
- vUsA==
-X-Gm-Message-State: ANoB5pnHktQHPlShkRLkZ1hXVZTz2+w5aj0AqoJU9/1qbaTfzrW6y8gF
- tblDszxJ/4Gym88REjKvKnoLMA==
-X-Google-Smtp-Source: AA0mqf6Soby8rd6m9EytXXHvJpT4TDAOmpLAofqH3m8MSRCn4y3bZNlZuKdxW3txtw47z8Dx4bLf1w==
-X-Received: by 2002:aa7:9697:0:b0:576:9252:d06 with SMTP id
- f23-20020aa79697000000b0057692520d06mr371181pfk.0.1670955769814; 
- Tue, 13 Dec 2022 10:22:49 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com.
- [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
- g74-20020a62524d000000b0056bb4bbfb9bsm8195038pfb.95.2022.12.13.10.22.48
+ bh=SlLKeNs0EWVsu+ptfdWBNmvU18ZVhMR61XWdAxFV9XQ=;
+ b=QwylQdBbt4Vhead1VbynvXvfv9sn8+tqFPWdDwCRG4EsT5wUBoCj0h6WBCFJUVfvq9
+ tjUsArhAVoL0tLDuliK5UluyY/WqaXDC22NcjFqZAZ8uf6eWF1dN6XwwSni5wOOlwXLk
+ rRfXUxv861PmHw+KsdJGW+U/cGqLyWg+0bJNJOspRHarHSycurJSPlivjzjDpFzCFnLq
+ IOx5rlbdDtFN94EWGiIQcP7Z9rIqSJ35zYuxD+FTquS1fJNF0OqvED1RQGFC1syEUwkv
+ 5afRecGmxQyidOsFTQWsJWF6NTTNgzZsIX8ETRXWAzj3KmPjgkrhqAbI3YuI4vLbqkPM
+ hVOQ==
+X-Gm-Message-State: ANoB5pl+3oEGsKzAY7FRdmWVUA+kQbyOt0pvIJxOLtqMx4vB9iQ74XAL
+ OkrD4965oRLU4BA0YV21FaVgTQ==
+X-Google-Smtp-Source: AA0mqf43rfeTLye05owqv8MbDwr9r9xovoe2k6ziCGD54isSIqaMDQrLxrh/vw468kpaItrUN7BQ5g==
+X-Received: by 2002:a17:902:7b96:b0:189:858f:b5c0 with SMTP id
+ w22-20020a1709027b9600b00189858fb5c0mr428994pll.0.1670961788301; 
+ Tue, 13 Dec 2022 12:03:08 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com.
+ [34.168.104.7]) by smtp.gmail.com with ESMTPSA id
+ u5-20020a170903124500b00189667acf19sm289595plh.95.2022.12.13.12.03.06
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 13 Dec 2022 10:22:49 -0800 (PST)
-Date: Tue, 13 Dec 2022 10:22:45 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH 1/1] KVM: arm64: PMU: Fix PMCR_EL0 reset value
-Message-ID: <Y5jC9bAJ08xW1ZIA@google.com>
-References: <20221209164446.1972014-1-james.clark@arm.com>
- <20221209164446.1972014-2-james.clark@arm.com>
- <Y5N3R+w3GF94hxHa@google.com>
+ Tue, 13 Dec 2022 12:03:07 -0800 (PST)
+Date: Tue, 13 Dec 2022 20:03:03 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>,
+ James Morse <james.morse@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Tom Rix <trix@redhat.com>,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-riscv@lists.infradead.org, llvm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Ricardo Koller <ricarkol@google.com>,
+ Aaron Lewis <aaronlewis@google.com>,
+ Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH 06/14] KVM: selftests: Rename UNAME_M to ARCH_DIR, fill
+ explicitly for x86
+Message-ID: <Y5jadzKz6Qi9MiI9@google.com>
+References: <20221213001653.3852042-1-seanjc@google.com>
+ <20221213001653.3852042-7-seanjc@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <Y5N3R+w3GF94hxHa@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
- James Clark <james.clark@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20221213001653.3852042-7-seanjc@google.com>
+Cc: David Matlack <dmatlack@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,63 +106,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Dec 09, 2022 at 05:58:31PM +0000, Oliver Upton wrote:
-> On Fri, Dec 09, 2022 at 04:44:46PM +0000, James Clark wrote:
-> > ARMV8_PMU_PMCR_N_MASK is an unshifted value which results in the wrong
-> > reset value for PMCR_EL0, so shift it to fix it.
-> 
-> That's just mean. *_MASK tends to be a shifted mask, although it would
-> appear that asm/perf_event.h does not follow this convention. Fixing
-> that would be nice (as I'm sure somebody else will get burned by this),
-> but for the sake of an immediate fix:
->
++David
 
-Even kvm-unit-tests does this:
-
-arm/pmu.c:
-#define PMU_PMCR_N_SHIFT   11
-#define PMU_PMCR_N_MASK    0x1f
-
-
-> > This fixes the following error when running qemu:
-> > 
-> >   $ qemu-system-aarch64 -cpu host -machine type=virt,accel=kvm -kernel ...
-> > 
-> >   target/arm/helper.c:1813: pmevcntr_rawwrite: Assertion `counter < pmu_num_counters(env)' failed.
-> > 
-> > Fixes: 292e8f149476 ("KVM: arm64: PMU: Simplify PMCR_EL0 reset handling")
-> > Signed-off-by: James Clark <james.clark@arm.com>
+On Tue, Dec 13, 2022, Sean Christopherson wrote:
+> Rename UNAME_M to ARCH_DIR and explicitly set it directly for x86.  At
+> this point, the name of the arch directory really doesn't have anything
+> to do with `uname -m`, and UNAME_M is unnecessarily confusing given that
+> its purpose is purely to identify the arch specific directory.
 > 
-> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-> 
-> --
-> Thanks,
-> Oliver
-> 
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index d5ee52d6bf73..c6cbfe6b854b 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -646,7 +646,7 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> >  		return;
-> >  
-> >  	/* Only preserve PMCR_EL0.N, and reset the rest to 0 */
-> > -	pmcr = read_sysreg(pmcr_el0) & ARMV8_PMU_PMCR_N_MASK;
-> > +	pmcr = read_sysreg(pmcr_el0) & (ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
-> >  	if (!kvm_supports_32bit_el0())
-> >  		pmcr |= ARMV8_PMU_PMCR_LC;
-> >  
-> > -- 
-> > 2.25.1
-> > 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+> -# No change necessary for x86_64
+> -UNAME_M := $(shell uname -m)
+> -
+> -# Set UNAME_M for arm64 compile/install to work
+> -ifeq ($(ARCH),arm64)
+> -	UNAME_M := aarch64
+> -endif
+> -# Set UNAME_M s390x compile/install to work
+> -ifeq ($(ARCH),s390)
+> -	UNAME_M := s390x
+> -endif
+> -# Set UNAME_M riscv compile/install to work
+> -ifeq ($(ARCH),riscv)
+> -	UNAME_M := riscv
+> +ifeq ($(ARCH),x86)
+
+As discovered by by David, this breaks doing "ARCH=x86_64 make", which is an
+allowed/supported variant in the kernel proper, so this needs to be:
+
+  ifneq (,$(filter $(ARCH),x86 x86_64))
+
+or alternatively
+
+  ifeq ($(ARCH),x86_64)
+  ARCH := x86
+  endif
+
+Hmm, unless there's a reason to keep ARCH=x86_64, the latter appears to be the
+better option as lib.mak doesn't play nice with x86_64 either, e.g. `ARCH=x86_64
+LLVM=1 make` fails.  That's arguably a lib.mak bug, but it's trivial to handle
+in KVM's makefile so forcing lib.mak to handle both seems unnecessary.
+
+I'll also add a comment to call out that $(ARCH) follows the kernel's terminology
+for arch/*, whereas for whatever reason KVM selftests effectively uses `uname -m`
+terminology.
+
+One last thought/question, what do y'all think about renaming directories to
+follow the kernel proper?  I.e. aarch64=>arm64, s390x=>s390, and x86_64=>x86.
+Then $(ARCH_DIR) would go away.  The churn would be unfortunate, but it would be
+nice to align with arch/ and tools/arch/.
+
+> +	ARCH_DIR := x86_64
+> +else ifeq ($(ARCH),arm64)
+> +	ARCH_DIR := aarch64
+> +else ifeq ($(ARCH),s390)
+> +	ARCH_DIR := s390x
+> +else ifeq ($(ARCH),riscv)
+> +	ARCH_DIR := riscv
+> +else
+> +$(error Unknown architecture '$(ARCH)')
+>  endif
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
