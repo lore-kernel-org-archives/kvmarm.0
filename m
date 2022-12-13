@@ -1,106 +1,119 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219DA33E1
-	for <kvmarm@lists.linux.dev>; Tue, 13 Dec 2022 13:15:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2229FC433A4;
-	Tue, 13 Dec 2022 13:15:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1670937310;
-	bh=ny2LP1+qhbiF25Fg6TL6Uyqx2whwSG+lVJwxhXmWS7Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Kn5pl4xlY0nLg6Hvi6+456GuKAhO0saTMygWttz/RNLWKgC2uS5D96tIB2OtaoI4n
-	 mss0b1HEtm/My1yvnX/IfpYo9N+ds240ctHFq6dFCYbm/xkCUg2u4V+qMbTh2NJwLL
-	 YXOPX1tphUo0UOQMl4NQT/iP7w0s6Y8WIH1pwaHhSp7j8wFTjGdfWkDCcL/qJfkzR9
-	 6CFDu3GQRcgW/94o1JfilkwECoyFafvoHO0ECxCkrmG2EsXkdzw4AvtgcR07NYktPf
-	 NsHlq/piRcpRFFBOm02S4b3tNE7RbXafPr/RhBipTPx+h5rKvQysNNH2VgPm4kEfvt
-	 dEiVraSIEEfTw==
-Date: Tue, 13 Dec 2022 13:15:03 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Lorenzo Pieralisi <lpieralisi@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Sami Mujawar <Sami.Mujawar@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 10/14] arm64/nmi: Manage masking for superpriority
- interrupts along with DAIF
-Message-ID: <Y5h617/poqLRQU8H@sirena.org.uk>
-References: <20221112151708.175147-1-broonie@kernel.org>
- <20221112151708.175147-11-broonie@kernel.org>
- <Y5IchpFrIB3y8575@lpieralisi>
- <Y5c0tW7sidPE0oxd@sirena.org.uk>
- <Y5g55A3N9rXmS4LK@lpieralisi>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88FFC748C
+	for <kvmarm@lists.linux.dev>; Tue, 13 Dec 2022 18:22:50 +0000 (UTC)
+Received: by mail-pf1-f179.google.com with SMTP id x66so2798927pfx.3
+        for <kvmarm@lists.linux.dev>; Tue, 13 Dec 2022 10:22:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vbt0meIgNn6WBG4YKbNfGi1T3PYNH2tI0RABGm6MAIY=;
+        b=clVFCd5NAswd0cV5yiJ07YbrMqm/CoMDjz7XOZ2ww7a9GYyW5vk4yywNHRG5Ad+WXB
+         hbq44pfn7aYqEIVVmUQsFM6Y8CxcJlw3QXr/qCvnKCNZBr8PzznZVoNkfZNbn1xITgwW
+         +nBS4O9SzJ/7RuXokUHopQoBRfoB75i29p7cO2lqearialjc2gIWpVxIy1tX/nmDQgwc
+         W58XTPAQZgCLDbxqZzXtl1PCpopHaxD1OtIsbXSLCYd76Ow533MgDCL5mG6/XVENGbWF
+         ZfNmBf8gS0lPgVdqVkKxH6lghccfPJyKH2BL2/y9fbgiRx549qyPOE9NiT9AsmrxddrV
+         KhUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vbt0meIgNn6WBG4YKbNfGi1T3PYNH2tI0RABGm6MAIY=;
+        b=udm40L7L/MZJkcwkBqfqThg9aezD2cd8o/RvKKL5ow9p+kKqdxmMNI4wapGvKMLuD3
+         tnqcmplbBpeL2sZyopTNCNX27jUhTYQt97oZEDjrMKGukynnkPnuo6xmtUgV80l1RPWB
+         lbSkLEAQLLO4MK/p0EtPJDtkC/7DQh62poicwyJorKaDGOa4t918+/GmjNiMwbOWBPU0
+         PZyIt3u/+IKkC5D3DYHaZH8Q1fXKh210uZBfjLBKkEVVN/Bj6Is4a5zKIabcpr4DcMlQ
+         Z379oUSLYECoUiog5McVVB9GxzwbkYEfDNoNe/4BzjGvLZi1RENnaHiVqN5voul6QsGd
+         0j+w==
+X-Gm-Message-State: ANoB5pkxqZV11oRYCc1/8j9lnL++FNpFL22SYyRCEHY6G/kofpl3US+k
+	kr3TVERQPiRyslp9b+h6Z/fU3A==
+X-Google-Smtp-Source: AA0mqf6Soby8rd6m9EytXXHvJpT4TDAOmpLAofqH3m8MSRCn4y3bZNlZuKdxW3txtw47z8Dx4bLf1w==
+X-Received: by 2002:aa7:9697:0:b0:576:9252:d06 with SMTP id f23-20020aa79697000000b0057692520d06mr371181pfk.0.1670955769814;
+        Tue, 13 Dec 2022 10:22:49 -0800 (PST)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id g74-20020a62524d000000b0056bb4bbfb9bsm8195038pfb.95.2022.12.13.10.22.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Dec 2022 10:22:49 -0800 (PST)
+Date: Tue, 13 Dec 2022 10:22:45 -0800
+From: Ricardo Koller <ricarkol@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: James Clark <james.clark@arm.com>, Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 1/1] KVM: arm64: PMU: Fix PMCR_EL0 reset value
+Message-ID: <Y5jC9bAJ08xW1ZIA@google.com>
+References: <20221209164446.1972014-1-james.clark@arm.com>
+ <20221209164446.1972014-2-james.clark@arm.com>
+ <Y5N3R+w3GF94hxHa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="YwpPvNz3I82Uo82R"
-Content-Disposition: inline
-In-Reply-To: <Y5g55A3N9rXmS4LK@lpieralisi>
-X-Cookie: Edwin Meese made me wear CORDOVANS!!
-
-
---YwpPvNz3I82Uo82R
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <Y5N3R+w3GF94hxHa@google.com>
+Message-ID: <20221213182245.TQAgiYgXMDKYikD4rLqILgJw0hWiE-0ol1rcFqO6C-U@z>
 
-On Tue, Dec 13, 2022 at 09:37:56AM +0100, Lorenzo Pieralisi wrote:
-> On Mon, Dec 12, 2022 at 02:03:33PM +0000, Mark Brown wrote:
+On Fri, Dec 09, 2022 at 05:58:31PM +0000, Oliver Upton wrote:
+> On Fri, Dec 09, 2022 at 04:44:46PM +0000, James Clark wrote:
+> > ARMV8_PMU_PMCR_N_MASK is an unshifted value which results in the wrong
+> > reset value for PMCR_EL0, so shift it to fix it.
+> 
+> That's just mean. *_MASK tends to be a shifted mask, although it would
+> appear that asm/perf_event.h does not follow this convention. Fixing
+> that would be nice (as I'm sure somebody else will get burned by this),
+> but for the sake of an immediate fix:
+>
 
-> > A first pass suggests that we should be handling this like we do for
-> > other preemptions and returning early from arm64_preempt_schedule_irq()
-> > if ALLINT is masked.  If we are handling a regular IRQ then ALLINT will
-> > be unmasked and we'll call into preempt_schedule_irq(), if we're
-> > handling a NMI then ALLINT will still be masked so we don't attempt to
-> > schedule.  I've pushed out a change which does this but not yet properly
-> > tested it.
+Even kvm-unit-tests does this:
 
-> Yes that's what should happen (actually if we are handling an NMI we
-> should not even get to the point where a decision about preemption is
-> made el1_interrupt() just returns).
+arm/pmu.c:
+#define PMU_PMCR_N_SHIFT   11
+#define PMU_PMCR_N_MASK    0x1f
 
-OK, great.  It would be good to understand where the preemption is
-happening, I suspect you're hitting it from some place I'm not.  I did
-verify that I'm seeing preemptions during boot, it just wasn't stalling
-for me.
 
-> > Do you have any specifics on how you're seeing problems?  You did
-> > mention boot stalls offline but I've not been able to to reproduce this
-> > locally in a way that I can identify (based on your mail now I've made
-> > sure I've got preemption enabled).
-
-> defconfig, barebone rootfs, boot stalls (because we are scheduling with
-> IRQs off and there is nothing clearing ALLINT in the preemption path
-> so system hangs).
-
-> I don't know why you can't reproduce it don't know if it is the Kconfig
-> or file system configuration (or the FVP params - for this to show up
-> FEAT_NMI must obviously be enabled - I am testing the branch Marc posted
-> so that I can test the vGIC patches but this is definitely not a vGIC
-> bug).
-
-It might be Marc's changes I guess, I didn't pull them in but I don't
-see anything there that should be doing anything without running a guest
-either...
-
---YwpPvNz3I82Uo82R
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOYetcACgkQJNaLcl1U
-h9AtMwf/eYU5UrTg4kHnD8mnqZdBmFV15qEcuNjgzqVn5TAo3qx3zN3hxRbMO9TP
-uzvK7VzLns+JgsVJ/jNO1kcfsUqGLpBKGhHqNlDb/as7iN95QaRvQSHQTp35aOE4
-/Nnzled+t1jjJ7fK5a9y9P921hAmc4BKxUlX5KuvkHaTAtJ8TCYjh2FTBQqnZU+R
-X8uMZaqV91xkDcf4A+3Tx3MQC9KVieMpsQiyTwkOMKC6qJSZlStWrNLWXGk02oc+
-vKN31vog+sB3Qw4zeEAp2wrqcYA/mEbWEOcJlaAGmDukv656s0wo5SBuaqy/6TiO
-gw+OFTlReEsnFVCEOSS1SdUE570kUQ==
-=zZ7z
------END PGP SIGNATURE-----
-
---YwpPvNz3I82Uo82R--
+> > This fixes the following error when running qemu:
+> > 
+> >   $ qemu-system-aarch64 -cpu host -machine type=virt,accel=kvm -kernel ...
+> > 
+> >   target/arm/helper.c:1813: pmevcntr_rawwrite: Assertion `counter < pmu_num_counters(env)' failed.
+> > 
+> > Fixes: 292e8f149476 ("KVM: arm64: PMU: Simplify PMCR_EL0 reset handling")
+> > Signed-off-by: James Clark <james.clark@arm.com>
+> 
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> 
+> --
+> Thanks,
+> Oliver
+> 
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index d5ee52d6bf73..c6cbfe6b854b 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -646,7 +646,7 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> >  		return;
+> >  
+> >  	/* Only preserve PMCR_EL0.N, and reset the rest to 0 */
+> > -	pmcr = read_sysreg(pmcr_el0) & ARMV8_PMU_PMCR_N_MASK;
+> > +	pmcr = read_sysreg(pmcr_el0) & (ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
+> >  	if (!kvm_supports_32bit_el0())
+> >  		pmcr |= ARMV8_PMU_PMCR_LC;
+> >  
+> > -- 
+> > 2.25.1
+> > 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
