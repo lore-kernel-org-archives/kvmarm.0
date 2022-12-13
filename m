@@ -2,81 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8149C4332F
-	for <kvmarm@archiver.kernel.org>; Tue, 13 Dec 2022 18:04:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58498C4332F
+	for <kvmarm@archiver.kernel.org>; Tue, 13 Dec 2022 18:22:55 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 72D424B943;
-	Tue, 13 Dec 2022 13:04:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD5D54B93F;
+	Tue, 13 Dec 2022 13:22:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YDw82PFX5rRG; Tue, 13 Dec 2022 13:04:11 -0500 (EST)
+	with ESMTP id FX8lhjfQy7Pc; Tue, 13 Dec 2022 13:22:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC1034B91F;
-	Tue, 13 Dec 2022 13:04:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D3544B908;
+	Tue, 13 Dec 2022 13:22:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 711474B8CB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2022 13:04:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 434B34B908
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2022 13:22:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EYFeDMSBXk7n for <kvmarm@lists.cs.columbia.edu>;
- Tue, 13 Dec 2022 13:04:09 -0500 (EST)
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com
- [209.85.214.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C26054B8B4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2022 13:04:09 -0500 (EST)
-Received: by mail-pl1-f182.google.com with SMTP id d15so623397pls.6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2022 10:04:09 -0800 (PST)
+ with ESMTP id J3VWXHHlSxqJ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 13 Dec 2022 13:22:51 -0500 (EST)
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com
+ [209.85.215.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ED6F54B839
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2022 13:22:50 -0500 (EST)
+Received: by mail-pg1-f174.google.com with SMTP id f3so419287pgc.2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Dec 2022 10:22:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
- bh=zna4On3PuUJBAmwoHRubWmT6bHCvtS7KVwggBWzsCOk=;
- b=OuREoLN2Cqirz0KB6ELWfaGZtBwSvUKROb5gLYttkkdtmlubjzW3vhbCBU1BOw7oVv
- TQmF1WfAgSRmU0i9Qa6dqmxND0OAzVUIzPKrY9Ji/6YfG44T8PmdhSZ7iMi1D4KUGeww
- Bq4sgcDNW749viVZpvo9qkB/V/YCcxPOfIKNohA1S94Xay7M8xZZhf81R2Jiamztv2OD
- 4P/THfrVjEHPW/8krQ6f6slzZ6uVTpMxGoDcLyAosXgsLziX+bM8o+PHWIW+3UFpX4wP
- EJ9An55wJ04X85m0r4JhfPVnjm4dweB8tUNm3wb90TQtTqO4n9te66+A72Z8cveh/+9E
- fG9A==
+ bh=vbt0meIgNn6WBG4YKbNfGi1T3PYNH2tI0RABGm6MAIY=;
+ b=clVFCd5NAswd0cV5yiJ07YbrMqm/CoMDjz7XOZ2ww7a9GYyW5vk4yywNHRG5Ad+WXB
+ hbq44pfn7aYqEIVVmUQsFM6Y8CxcJlw3QXr/qCvnKCNZBr8PzznZVoNkfZNbn1xITgwW
+ +nBS4O9SzJ/7RuXokUHopQoBRfoB75i29p7cO2lqearialjc2gIWpVxIy1tX/nmDQgwc
+ W58XTPAQZgCLDbxqZzXtl1PCpopHaxD1OtIsbXSLCYd76Ow533MgDCL5mG6/XVENGbWF
+ ZfNmBf8gS0lPgVdqVkKxH6lghccfPJyKH2BL2/y9fbgiRx549qyPOE9NiT9AsmrxddrV
+ KhUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=in-reply-to:content-disposition:mime-version:references:message-id
  :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
  :message-id:reply-to;
- bh=zna4On3PuUJBAmwoHRubWmT6bHCvtS7KVwggBWzsCOk=;
- b=gt2+TkgNg3c8B/wBWajW9geqGcOMlkeKqR5VavxzhYGPiGBRxQhvqPYD3WoHPRe15T
- aPcv2aakyv8tTN+eNElkIOKkEowABMwUMr8z8GBEGTuwtXrc0SZbvu4gpYUPrxC3EBtm
- Z+ijOf97Dk5ElHKcAsR204LkdFMF8B0E18i7+PPKFA0FYBdKKXSpVFFLRi0OYaljajIU
- ppzxNRvVfOz6gmJrNnuylJznyUNHjuyHqldbkgD1yTtSppDEu/LRWyh7ozq6MiXC40qM
- EC6148KY+mJxM9jsZNDmkOQoNGhdqiVW0Oes9SlSpU7quo2lWczeCKgo0GWP1++8Rv09
- MUZA==
-X-Gm-Message-State: ANoB5pnUjqbtTw86hHjIpGqHgbMELe3oyna4UWNo/K2LjcLOxzJ8GeZT
- zjMPxtGfImsE07gqR+vXeN7Ypg==
-X-Google-Smtp-Source: AA0mqf7LYk2kci7/phZoYCC5Uk3e5Qu+LmIJ1LwdZrtCXv20be3/rkq6yCnDixnEVGB8S2atAkqq/w==
-X-Received: by 2002:a05:6a21:2d8f:b0:a7:882e:3a18 with SMTP id
- ty15-20020a056a212d8f00b000a7882e3a18mr121977pzb.1.1670954648637; 
- Tue, 13 Dec 2022 10:04:08 -0800 (PST)
+ bh=vbt0meIgNn6WBG4YKbNfGi1T3PYNH2tI0RABGm6MAIY=;
+ b=s2Mk746DNefLFIHMPGAave2iFDkNoKxxYDbIfxj0zO8CnmFqk234Le+b50BvC1Rs0J
+ q6RA+SCw3OuTN7Nk62tME9XL6haA3AvqIKDGdc9tNW6Cnm/BjuY8Cj+V0/ZL/MPMQcGm
+ ivZBsjND5dHmwCFVkdniiiSUv5HoIsAxgHKqF0vPychojL86E9ag54Nv8pF+QwILefyq
+ WElB+ZujcjWKTFWJPLXbk30BYprSNb2BvQtwyJa7/v/CtYcdUBfXiM5le+oh6/E+8UO6
+ eTviajuicfUsNRjm2z3Bd1l9z+7TAgbDXHPhs1qCeIRYuWatJj2IuKaIx4IIKfDpfFoN
+ vUsA==
+X-Gm-Message-State: ANoB5pnHktQHPlShkRLkZ1hXVZTz2+w5aj0AqoJU9/1qbaTfzrW6y8gF
+ tblDszxJ/4Gym88REjKvKnoLMA==
+X-Google-Smtp-Source: AA0mqf6Soby8rd6m9EytXXHvJpT4TDAOmpLAofqH3m8MSRCn4y3bZNlZuKdxW3txtw47z8Dx4bLf1w==
+X-Received: by 2002:aa7:9697:0:b0:576:9252:d06 with SMTP id
+ f23-20020aa79697000000b0057692520d06mr371181pfk.0.1670955769814; 
+ Tue, 13 Dec 2022 10:22:49 -0800 (PST)
 Received: from google.com (220.181.82.34.bc.googleusercontent.com.
  [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
- q9-20020a17090a064900b002192529a692sm7607348pje.9.2022.12.13.10.04.08
+ g74-20020a62524d000000b0056bb4bbfb9bsm8195038pfb.95.2022.12.13.10.22.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 13 Dec 2022 10:04:08 -0800 (PST)
-Date: Tue, 13 Dec 2022 10:04:04 -0800
+ Tue, 13 Dec 2022 10:22:49 -0800 (PST)
+Date: Tue, 13 Dec 2022 10:22:45 -0800
 From: Ricardo Koller <ricarkol@google.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH 3/3] arm: pmu: Add tests for 64-bit
- overflows
-Message-ID: <Y5i+lMQ6/2hWGM47@google.com>
-References: <20221202045527.3646838-1-ricarkol@google.com>
- <20221202045527.3646838-4-ricarkol@google.com>
- <Y5iwbJykRKFQumKi@monolith.localdoman>
+To: Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 1/1] KVM: arm64: PMU: Fix PMCR_EL0 reset value
+Message-ID: <Y5jC9bAJ08xW1ZIA@google.com>
+References: <20221209164446.1972014-1-james.clark@arm.com>
+ <20221209164446.1972014-2-james.clark@arm.com>
+ <Y5N3R+w3GF94hxHa@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <Y5iwbJykRKFQumKi@monolith.localdoman>
-Cc: kvm@vger.kernel.org, maz@kernel.org, andrew.jones@linux.dev,
- kvmarm@lists.cs.columbia.edu
+In-Reply-To: <Y5N3R+w3GF94hxHa@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
+ James Clark <james.clark@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,316 +94,63 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Dec 13, 2022 at 05:03:40PM +0000, Alexandru Elisei wrote:
-> Hi,
+On Fri, Dec 09, 2022 at 05:58:31PM +0000, Oliver Upton wrote:
+> On Fri, Dec 09, 2022 at 04:44:46PM +0000, James Clark wrote:
+> > ARMV8_PMU_PMCR_N_MASK is an unshifted value which results in the wrong
+> > reset value for PMCR_EL0, so shift it to fix it.
 > 
-> Checked that all places where ALL_SET/PRE_OVERFLOW were used are now taking
-> into account the fact that counters are programmed to be 64bit.
-> 
-> In the case of 64bit counters, the printf format specifier is %ld, which
-> means that ALL_SET_64 and PRE_OVERFLOW_64 are now displayed as negative
-> numbers. For example:
-> 
-> INFO: pmu: pmu-sw-incr: 32-bit: SW_INCR counter #0 has value 4294967280
-> PASS: pmu: pmu-sw-incr: 32-bit: PWSYNC does not increment if PMCR.E is unset
-> [..]
-> INFO: pmu: pmu-sw-incr: 64-bit: SW_INCR counter #0 has value -16
-> PASS: pmu: pmu-sw-incr: 64-bit: PWSYNC does not increment if PMCR.E is unset
-> 
+> That's just mean. *_MASK tends to be a shifted mask, although it would
+> appear that asm/perf_event.h does not follow this convention. Fixing
+> that would be nice (as I'm sure somebody else will get burned by this),
+> but for the sake of an immediate fix:
+>
 
-Argh, I didn't notice this. I think this would be more useful if it
-printed %llx in all cases.
+Even kvm-unit-tests does this:
 
-> I was thinking that the format specifiers could be changed to unsigned
-> long.  The counters only increment, they don't decrement, and I can't think
-> how printing them as signed could be useful.
-> 
-> One more comment below.
-> 
-> On Fri, Dec 02, 2022 at 04:55:27AM +0000, Ricardo Koller wrote:
-> > Modify all tests checking overflows to support both 32 (PMCR_EL0.LP == 0)
-> > and 64-bit overflows (PMCR_EL0.LP == 1). 64-bit overflows are only
-> > supported on PMUv3p5.
+arm/pmu.c:
+#define PMU_PMCR_N_SHIFT   11
+#define PMU_PMCR_N_MASK    0x1f
+
+
+> > This fixes the following error when running qemu:
 > > 
-> > Note that chained tests do not implement "overflow_at_64bits == true".
-> > That's because there are no CHAIN events when "PMCR_EL0.LP == 1" (for more
-> > details see AArch64.IncrementEventCounter() pseudocode in the ARM ARM DDI
-> > 0487H.a, J1.1.1 "aarch64/debug").
+> >   $ qemu-system-aarch64 -cpu host -machine type=virt,accel=kvm -kernel ...
 > > 
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  arm/pmu.c | 91 ++++++++++++++++++++++++++++++++++++-------------------
-> >  1 file changed, 60 insertions(+), 31 deletions(-)
+> >   target/arm/helper.c:1813: pmevcntr_rawwrite: Assertion `counter < pmu_num_counters(env)' failed.
 > > 
-> > diff --git a/arm/pmu.c b/arm/pmu.c
-> > index 59e5bfe..3cb563b 100644
-> > --- a/arm/pmu.c
-> > +++ b/arm/pmu.c
-> > @@ -28,6 +28,7 @@
-> >  #define PMU_PMCR_X         (1 << 4)
-> >  #define PMU_PMCR_DP        (1 << 5)
-> >  #define PMU_PMCR_LC        (1 << 6)
-> > +#define PMU_PMCR_LP        (1 << 7)
-> >  #define PMU_PMCR_N_SHIFT   11
-> >  #define PMU_PMCR_N_MASK    0x1f
-> >  #define PMU_PMCR_ID_SHIFT  16
-> > @@ -55,10 +56,15 @@
-> >  #define EXT_COMMON_EVENTS_HIGH	0x403F
-> >  
-> >  #define ALL_SET			0x00000000FFFFFFFFULL
-> > +#define ALL_SET_64		0xFFFFFFFFFFFFFFFFULL
-> >  #define ALL_CLEAR		0x0000000000000000ULL
-> >  #define PRE_OVERFLOW		0x00000000FFFFFFF0ULL
-> > +#define PRE_OVERFLOW_64		0xFFFFFFFFFFFFFFF0ULL
-> >  #define PRE_OVERFLOW2		0x00000000FFFFFFDCULL
-> >  
-> > +#define PRE_OVERFLOW_AT(_64b)	(_64b ? PRE_OVERFLOW_64 : PRE_OVERFLOW)
-> > +#define ALL_SET_AT(_64b)	(_64b ? ALL_SET_64 : ALL_SET)
-> > +
-> >  #define PMU_PPI			23
-> >  
-> >  struct pmu {
-> > @@ -429,8 +435,10 @@ static bool satisfy_prerequisites(uint32_t *events, unsigned int nb_events,
-> >  static void test_basic_event_count(bool overflow_at_64bits)
-> >  {
-> >  	uint32_t implemented_counter_mask, non_implemented_counter_mask;
-> > -	uint32_t counter_mask;
-> > +	uint64_t pre_overflow = PRE_OVERFLOW_AT(overflow_at_64bits);
-> > +	uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
-> >  	uint32_t events[] = {CPU_CYCLES, INST_RETIRED};
-> > +	uint32_t counter_mask;
-> >  
-> >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events),
-> >  				   overflow_at_64bits))
-> > @@ -452,13 +460,13 @@ static void test_basic_event_count(bool overflow_at_64bits)
-> >  	 * clear cycle and all event counters and allow counter enablement
-> >  	 * through PMCNTENSET. LC is RES1.
-> >  	 */
-> > -	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
-> > +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P | pmcr_lp);
-> >  	isb();
-> > -	report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC), "pmcr: reset counters");
-> > +	report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC | pmcr_lp), "pmcr: reset counters");
-> >  
-> >  	/* Preset counter #0 to pre overflow value to trigger an overflow */
-> > -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> > -	report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW,
-> > +	write_regn_el0(pmevcntr, 0, pre_overflow);
-> > +	report(read_regn_el0(pmevcntr, 0) == pre_overflow,
-> >  		"counter #0 preset to pre-overflow value");
-> >  	report(!read_regn_el0(pmevcntr, 1), "counter #1 is 0");
-> >  
-> > @@ -511,6 +519,8 @@ static void test_mem_access(bool overflow_at_64bits)
-> >  {
-> >  	void *addr = malloc(PAGE_SIZE);
-> >  	uint32_t events[] = {MEM_ACCESS, MEM_ACCESS};
-> > +	uint64_t pre_overflow = PRE_OVERFLOW_AT(overflow_at_64bits);
-> > +	uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
-> >  
-> >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events),
-> >  				   overflow_at_64bits))
-> > @@ -522,7 +532,7 @@ static void test_mem_access(bool overflow_at_64bits)
-> >  	write_regn_el0(pmevtyper, 1, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
-> >  	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> >  	isb();
-> > -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> > +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >  	report_info("counter #0 is %ld (MEM_ACCESS)", read_regn_el0(pmevcntr, 0));
-> >  	report_info("counter #1 is %ld (MEM_ACCESS)", read_regn_el0(pmevcntr, 1));
-> >  	/* We may measure more than 20 mem access depending on the core */
-> > @@ -532,11 +542,11 @@ static void test_mem_access(bool overflow_at_64bits)
-> >  
-> >  	pmu_reset();
-> >  
-> > -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> > -	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> > +	write_regn_el0(pmevcntr, 0, pre_overflow);
-> > +	write_regn_el0(pmevcntr, 1, pre_overflow);
-> >  	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> >  	isb();
-> > -	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> > +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >  	report(read_sysreg(pmovsclr_el0) == 0x3,
-> >  	       "Ran 20 mem accesses with expected overflows on both counters");
-> >  	report_info("cnt#0 = %ld cnt#1=%ld overflow=0x%lx",
-> > @@ -546,6 +556,8 @@ static void test_mem_access(bool overflow_at_64bits)
-> >  
-> >  static void test_sw_incr(bool overflow_at_64bits)
-> >  {
-> > +	uint64_t pre_overflow = PRE_OVERFLOW_AT(overflow_at_64bits);
-> > +	uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
-> >  	uint32_t events[] = {SW_INCR, SW_INCR};
-> >  	uint64_t cntr0;
-> >  	int i;
-> > @@ -561,7 +573,7 @@ static void test_sw_incr(bool overflow_at_64bits)
-> >  	/* enable counters #0 and #1 */
-> >  	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> >  
-> > -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> > +	write_regn_el0(pmevcntr, 0, pre_overflow);
-> >  	isb();
-> >  
-> >  	for (i = 0; i < 100; i++)
-> > @@ -569,21 +581,21 @@ static void test_sw_incr(bool overflow_at_64bits)
-> >  
-> >  	isb();
-> >  	report_info("SW_INCR counter #0 has value %ld", read_regn_el0(pmevcntr, 0));
-> > -	report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW,
-> > +	report(read_regn_el0(pmevcntr, 0) == pre_overflow,
-> >  		"PWSYNC does not increment if PMCR.E is unset");
-> >  
-> >  	pmu_reset();
-> >  
-> > -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> > +	write_regn_el0(pmevcntr, 0, pre_overflow);
-> >  	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> > -	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> > +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >  	isb();
-> >  
-> >  	for (i = 0; i < 100; i++)
-> >  		write_sysreg(0x3, pmswinc_el0);
-> >  
-> >  	isb();
-> > -	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
-> > +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : pre_overflow + 100;
-> >  	report(read_regn_el0(pmevcntr, 0) == cntr0, "counter #0 after + 100 SW_INCR");
-> >  	report(read_regn_el0(pmevcntr, 1) == 100, "counter #1 after + 100 SW_INCR");
-> >  	report_info("counter values after 100 SW_INCR #0=%ld #1=%ld",
-> > @@ -844,6 +856,9 @@ static bool expect_interrupts(uint32_t bitmap)
-> >  
-> >  static void test_overflow_interrupt(bool overflow_at_64bits)
-> >  {
-> > +	uint64_t pre_overflow = PRE_OVERFLOW_AT(overflow_at_64bits);
-> > +	uint64_t all_set = ALL_SET_AT(overflow_at_64bits);
-> > +	uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
-> >  	uint32_t events[] = {MEM_ACCESS, SW_INCR};
-> >  	void *addr = malloc(PAGE_SIZE);
-> >  	int i;
-> > @@ -862,16 +877,16 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> >  	write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
-> >  	write_regn_el0(pmevtyper, 1, SW_INCR | PMEVTYPER_EXCLUDE_EL0);
-> >  	write_sysreg_s(0x3, PMCNTENSET_EL0);
-> > -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> > -	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> > +	write_regn_el0(pmevcntr, 0, pre_overflow);
-> > +	write_regn_el0(pmevcntr, 1, pre_overflow);
-> >  	isb();
-> >  
-> >  	/* interrupts are disabled (PMINTENSET_EL1 == 0) */
-> >  
-> > -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-> > +	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >  	report(expect_interrupts(0), "no overflow interrupt after preset");
-> >  
-> > -	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> > +	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >  	isb();
-> >  
-> >  	for (i = 0; i < 100; i++)
-> > @@ -886,12 +901,12 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> >  
-> >  	pmu_reset_stats();
-> >  
-> > -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> > -	write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> > +	write_regn_el0(pmevcntr, 0, pre_overflow);
-> > +	write_regn_el0(pmevcntr, 1, pre_overflow);
-> >  	write_sysreg(ALL_SET, pmintenset_el1);
-> >  	isb();
-> >  
-> > -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-> > +	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> >  	for (i = 0; i < 100; i++)
-> >  		write_sysreg(0x3, pmswinc_el0);
-> >  
-> > @@ -900,25 +915,35 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> >  	report(expect_interrupts(0x3),
-> >  		"overflow interrupts expected on #0 and #1");
-> >  
-> > -	/* promote to 64-b */
-> > +	/*
-> > +	 * promote to 64-b:
-> > +	 *
-> > +	 * This only applies to the !overflow_at_64bits case, as
-> > +	 * overflow_at_64bits doesn't implement CHAIN events. The
-> > +	 * overflow_at_64bits case just checks that chained counters are
-> > +	 * not incremented when PMCR.LP == 1.
-> > +	 */
+> > Fixes: 292e8f149476 ("KVM: arm64: PMU: Simplify PMCR_EL0 reset handling")
+> > Signed-off-by: James Clark <james.clark@arm.com>
 > 
-> If this doesn't do anything for when overflow_at_64bits, and since the
-> interrupt is already tested before this part, why not exit early?
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 > 
-> Or the test could check that the CHAIN event indeed does not increment when
-> LP=1 at the end of this function.
-
-That's precisely what it's doing.
-
-Thanks!
-Ricardo
-
-> 
+> --
 > Thanks,
-> Alex
+> Oliver
 > 
-> >  
-> >  	pmu_reset_stats();
-> >  
-> >  	write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
-> > -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> > +	write_regn_el0(pmevcntr, 0, pre_overflow);
-> >  	isb();
-> > -	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-> > -	report(expect_interrupts(0x1),
-> > -		"expect overflow interrupt on 32b boundary");
-> > +	mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> > +	report(expect_interrupts(0x1), "expect overflow interrupt");
-> >  
-> >  	/* overflow on odd counter */
-> >  	pmu_reset_stats();
-> > -	write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> > -	write_regn_el0(pmevcntr, 1, ALL_SET);
-> > +	write_regn_el0(pmevcntr, 0, pre_overflow);
-> > +	write_regn_el0(pmevcntr, 1, all_set);
-> >  	isb();
-> > -	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E);
-> > -	report(expect_interrupts(0x3),
-> > -		"expect overflow interrupt on even and odd counter");
-> > +	mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> > +	if (overflow_at_64bits)
-> > +		report(expect_interrupts(0x1),
-> > +		       "expect overflow interrupt on even counter");
-> > +	else
-> > +		report(expect_interrupts(0x3),
-> > +		       "expect overflow interrupt on even and odd counter");
-> >  }
-> >  #endif
-> >  
-> > @@ -1119,10 +1144,13 @@ int main(int argc, char *argv[])
-> >  		report_prefix_pop();
-> >  	} else if (strcmp(argv[1], "pmu-basic-event-count") == 0) {
-> >  		run_test(argv[1], test_basic_event_count, false);
-> > +		run_test(argv[1], test_basic_event_count, true);
-> >  	} else if (strcmp(argv[1], "pmu-mem-access") == 0) {
-> >  		run_test(argv[1], test_mem_access, false);
-> > +		run_test(argv[1], test_mem_access, true);
-> >  	} else if (strcmp(argv[1], "pmu-sw-incr") == 0) {
-> >  		run_test(argv[1], test_sw_incr, false);
-> > +		run_test(argv[1], test_sw_incr, true);
-> >  	} else if (strcmp(argv[1], "pmu-chained-counters") == 0) {
-> >  		run_test(argv[1], test_chained_counters, false);
-> >  	} else if (strcmp(argv[1], "pmu-chained-sw-incr") == 0) {
-> > @@ -1131,6 +1159,7 @@ int main(int argc, char *argv[])
-> >  		run_test(argv[1], test_chain_promotion, false);
-> >  	} else if (strcmp(argv[1], "pmu-overflow-interrupt") == 0) {
-> >  		run_test(argv[1], test_overflow_interrupt, false);
-> > +		run_test(argv[1], test_overflow_interrupt, true);
-> >  	} else {
-> >  		report_abort("Unknown sub-test '%s'", argv[1]);
-> >  	}
-> > -- 
-> > 2.39.0.rc0.267.gcb52ba06e7-goog
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
 > > 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index d5ee52d6bf73..c6cbfe6b854b 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -646,7 +646,7 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> >  		return;
+> >  
+> >  	/* Only preserve PMCR_EL0.N, and reset the rest to 0 */
+> > -	pmcr = read_sysreg(pmcr_el0) & ARMV8_PMU_PMCR_N_MASK;
+> > +	pmcr = read_sysreg(pmcr_el0) & (ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
+> >  	if (!kvm_supports_32bit_el0())
+> >  		pmcr |= ARMV8_PMU_PMCR_LC;
+> >  
+> > -- 
+> > 2.25.1
+> > 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
