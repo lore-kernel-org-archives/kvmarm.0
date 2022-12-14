@@ -2,52 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9197C4332F
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Dec 2022 10:46:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C95EFC4332F
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Dec 2022 14:58:36 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 924AA4B947;
-	Wed, 14 Dec 2022 05:46:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 316244B99F;
+	Wed, 14 Dec 2022 09:58:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ap-HgME5N0GX; Wed, 14 Dec 2022 05:46:14 -0500 (EST)
+	with ESMTP id jo2crHTekcuF; Wed, 14 Dec 2022 09:58:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F233D4B8CC;
-	Wed, 14 Dec 2022 05:46:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED0514B951;
+	Wed, 14 Dec 2022 09:58:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 512DA4B8CC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2022 05:46:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C19954B908
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2022 09:58:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8eP2ooNbeI+I for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Dec 2022 05:46:10 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E9F74B8C4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2022 05:46:10 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C703FEC;
- Wed, 14 Dec 2022 02:46:50 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 987053F5A1;
- Wed, 14 Dec 2022 02:46:08 -0800 (PST)
-Date: Wed, 14 Dec 2022 10:46:05 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [kvm-unit-tests PATCH 1/3] arm: pmu: Fix overflow checks for
- PMUv3p5 long counters
-Message-ID: <Y5mpbWmhTi41Rmni@monolith.localdoman>
-References: <20221202045527.3646838-1-ricarkol@google.com>
- <20221202045527.3646838-2-ricarkol@google.com>
- <Y5hxvj6p+mCC2DOs@monolith.localdoman>
- <Y5imhKUIJceHDUMD@google.com>
- <Y5irunF72esHzOWj@monolith.localdoman>
- <Y5i94ojqRTJMWu8U@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Y5i94ojqRTJMWu8U@google.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, andrew.jones@linux.dev,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id 7vw3f6gHfaMP for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Dec 2022 09:58:30 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23B974B8DC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2022 09:58:30 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 4FA60B818AD;
+ Wed, 14 Dec 2022 14:58:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A82AEC433D2;
+ Wed, 14 Dec 2022 14:58:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1671029907;
+ bh=LN+yR7enZjS8cNRl0erFhR8w1KetUfyjDNbpndQiTKk=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=C32rPlmL72AwrTaoAOhODArKLG/rDtlV6p0Dl71B374jjchptiueqsaiju2Nug9oP
+ yIPm+Q+Xq2UAN8aIM4H0v8Beei6XMclNar32ZGmN+1c38fezj41es87kjl9+/FAaa/
+ JIwNWBmDaCkQSWVLXo95POnlHEFFaR88rAZjulDhCDQ5i9dytPsvyzsI3wtSr3b1pV
+ /QmFvtBgc+BrOJvlSGzlaITcLMfzD2467kylxs4qjThmDYkZf4RoHxz3yh+ldujuMS
+ Ni5SHD/E1UQXu6tiGF4cVbUmxLepxnkMMI54iuxu26Rus88v5JGLFl5/L7jJkin5SH
+ OinmHtzOvI4Ww==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1p5TDE-00Ce2b-B8;
+ Wed, 14 Dec 2022 14:58:24 +0000
+Date: Wed, 14 Dec 2022 14:58:23 +0000
+Message-ID: <864jtyqbg0.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: Normalize cache configuration
+In-Reply-To: <20221211051700.275761-4-akihiko.odaki@daynix.com>
+References: <20221211051700.275761-1-akihiko.odaki@daynix.com>
+ <20221211051700.275761-4-akihiko.odaki@daynix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: akihiko.odaki@daynix.com, linux-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, mathieu.poirier@linaro.org,
+ oliver.upton@linux.dev, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ james.morse@arm.com, will@kernel.org, catalin.marinas@arm.com,
+ asahi@lists.linux.dev, alyssa@rosenzweig.io, sven@svenpeter.dev,
+ marcan@marcan.st
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>, Will Deacon <will@kernel.org>,
+ Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
+ asahi@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -64,221 +95,647 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On Sun, 11 Dec 2022 05:17:00 +0000,
+Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+> 
+> Before this change, the cache configuration of the physical CPU was
+> exposed to vcpus. This is problematic because the cache configuration a
+> vcpu sees varies when it migrates between vcpus with different cache
+> configurations.
+> 
+> Fabricate cache configuration from arm64_ftr_reg_ctrel0.sys_val, which
 
-On Tue, Dec 13, 2022 at 10:01:06AM -0800, Ricardo Koller wrote:
-> On Tue, Dec 13, 2022 at 04:43:38PM +0000, Alexandru Elisei wrote:
-> > Hi,
-> > 
-> > On Tue, Dec 13, 2022 at 08:21:24AM -0800, Ricardo Koller wrote:
-> > > On Tue, Dec 13, 2022 at 12:36:14PM +0000, Alexandru Elisei wrote:
-> > > > Hi,
-> > > > 
-> > > > Some more comments below.
-> > > > 
-> > > > On Fri, Dec 02, 2022 at 04:55:25AM +0000, Ricardo Koller wrote:
-> > > > > PMUv3p5 uses 64-bit counters irrespective of whether the PMU is configured
-> > > > > for overflowing at 32 or 64-bits. The consequence is that tests that check
-> > > > > the counter values after overflowing should not assume that values will be
-> > > > > wrapped around 32-bits: they overflow into the other half of the 64-bit
-> > > > > counters on PMUv3p5.
-> > > > > 
-> > > > > Fix tests by correctly checking overflowing-counters against the expected
-> > > > > 64-bit value.
-> > > > > 
-> > > > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > > > > ---
-> > > > >  arm/pmu.c | 29 ++++++++++++++++++-----------
-> > > > >  1 file changed, 18 insertions(+), 11 deletions(-)
-> > > > > 
-> > > > > diff --git a/arm/pmu.c b/arm/pmu.c
-> > > > > index cd47b14..eeac984 100644
-> > > > > --- a/arm/pmu.c
-> > > > > +++ b/arm/pmu.c
-> > > > > @@ -54,10 +54,10 @@
-> > > > >  #define EXT_COMMON_EVENTS_LOW	0x4000
-> > > > >  #define EXT_COMMON_EVENTS_HIGH	0x403F
-> > > > >  
-> > > > > -#define ALL_SET			0xFFFFFFFF
-> > > > > -#define ALL_CLEAR		0x0
-> > > > > -#define PRE_OVERFLOW		0xFFFFFFF0
-> > > > > -#define PRE_OVERFLOW2		0xFFFFFFDC
-> > > > > +#define ALL_SET			0x00000000FFFFFFFFULL
-> > > > > +#define ALL_CLEAR		0x0000000000000000ULL
-> > > > > +#define PRE_OVERFLOW		0x00000000FFFFFFF0ULL
-> > > > > +#define PRE_OVERFLOW2		0x00000000FFFFFFDCULL
-> > > > >  
-> > > > >  #define PMU_PPI			23
-> > > > >  
-> > > > > @@ -538,6 +538,7 @@ static void test_mem_access(void)
-> > > > >  static void test_sw_incr(void)
-> > > > >  {
-> > > > >  	uint32_t events[] = {SW_INCR, SW_INCR};
-> > > > > +	uint64_t cntr0;
-> > > > >  	int i;
-> > > > >  
-> > > > >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> > > > > @@ -572,9 +573,9 @@ static void test_sw_incr(void)
-> > > > >  		write_sysreg(0x3, pmswinc_el0);
-> > > > >  
-> > > > >  	isb();
-> > > > > -	report(read_regn_el0(pmevcntr, 0)  == 84, "counter #1 after + 100 SW_INCR");
-> > > > > -	report(read_regn_el0(pmevcntr, 1)  == 100,
-> > > > > -		"counter #0 after + 100 SW_INCR");
-> > > > > +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
-> > > > > +	report(read_regn_el0(pmevcntr, 0) == cntr0, "counter #0 after + 100 SW_INCR");
-> > > > > +	report(read_regn_el0(pmevcntr, 1) == 100, "counter #1 after + 100 SW_INCR");
-> > > > >  	report_info("counter values after 100 SW_INCR #0=%ld #1=%ld",
-> > > > >  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
-> > > > >  	report(read_sysreg(pmovsclr_el0) == 0x1,
-> > > > > @@ -584,6 +585,7 @@ static void test_sw_incr(void)
-> > > > >  static void test_chained_counters(void)
-> > > > >  {
-> > > > >  	uint32_t events[] = {CPU_CYCLES, CHAIN};
-> > > > > +	uint64_t cntr1;
-> > > > >  
-> > > > >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> > > > >  		return;
-> > > > > @@ -618,13 +620,16 @@ static void test_chained_counters(void)
-> > > > >  
-> > > > >  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
-> > > > >  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-> > > > > -	report(!read_regn_el0(pmevcntr, 1), "CHAIN counter #1 wrapped");
-> > > > > +	cntr1 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 0 : ALL_SET + 1;
-> > > > > +	report(read_regn_el0(pmevcntr, 1) == cntr1, "CHAIN counter #1 wrapped");
-> > > > 
-> > > > It looks to me like the intention of the test was to check that the counter
-> > > > programmed with the CHAIN event wraps, judging from the report message.
-> > > > 
-> > > 
-> > > Ah, right. Yeah, that message is confusing. It should be the short
-> > > version of "Inrementing at 32-bits resulted in the right value".
-> > > 
-> > > > I think it would be interesting to keep that by programming counter #1 with
-> > > > ~0ULL when PMUv3p5 (maybe call it ALL_SET64?) and test the counter value
-> > > > against 0.
-> > > 
-> > > The last commit adds tests using ALL_SET64.  Tests can be run in two
-> > > modes: overflow_at_64bits and not.  However, this test,
-> > > test_chained_counters(), and all other chained tests only use the
-> > > !overflow_at_64bits mode (even after the last commit). The reason is
-> > > that there are no CHAIN events when overflowing at 64-bits (more details
-> > > in the commit message). But, don't worry, there are lots of tests that
-> > > check wrapping at 64-bits (overflow_at_64bits=true).
-> > 
-> > What I was suggesting is this (change on top of this series, not on top of
-> > this patch, to get access to ALL_SET_AT):
-> 
-> Ooh, I see, I agree: it would be better to check that the odd counter
-> increments from ~0ULL to 0 when using 64-bit counters.
-> 
-> > 
-> > diff --git a/arm/pmu.c b/arm/pmu.c
-> > index 3cb563b1abe4..fd7f20fc6c52 100644
-> > --- a/arm/pmu.c
-> > +++ b/arm/pmu.c
-> > @@ -607,7 +607,6 @@ static void test_sw_incr(bool overflow_at_64bits)
-> >  static void test_chained_counters(bool overflow_at_64bits)
-> >  {
-> >         uint32_t events[] = {CPU_CYCLES, CHAIN};
-> > -       uint64_t cntr1;
-> > 
-> >         if (!satisfy_prerequisites(events, ARRAY_SIZE(events),
-> >                                    overflow_at_64bits))
-> > @@ -639,12 +638,11 @@ static void test_chained_counters(bool overflow_at_64bits)
-> >         report(read_sysreg(pmovsclr_el0) == 0x1, "overflow recorded for chained incr #2");
-> > 
-> >         write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> > -       write_regn_el0(pmevcntr, 1, ALL_SET);
-> > +       write_regn_el0(pmevcntr, 1, ALL_SET_AT(overflow_at_64bits));
-> 
-> The only change is that this should be:
-> 
-> 	ALL_SET_AT(pmu.version >= ID_DFR0_PMU_V3_8_5)
-> 
-> Because "overflow_at_64bits" implies PMCR_EL0.LP = 1.
+s/arm64_ftr_reg_ctrel0.sys_val/the sanitised value/
 
-Right, and test_chained_counters() is never called with overflow_at_64bits
-== true.
+> holds the CTR_EL0 value the userspace sees regardless of which physical
+> CPU it resides on.
+> 
+> HCR_TID2 is now always set as it is troublesome to detect the difference
+> of cache configurations among physical CPUs.
+> 
+> CSSELR_EL1 is now held in the memory instead of the corresponding
+> phyisccal register as the fabricated cache configuration may have a
 
-How about renaming the parameter overflow_at_64bits -> unused (or something
-like that) to make it clear that the function does the same thing
-regardless of the value?
+nit: physical
+
+> cache level which does not exist in the physical CPU, and setting the
+> physical CSSELR_EL1 for the level results in an UNKNOWN behavior.
+
+Not quite UNKNOWN behaviour. You could get an UNKNOWN value when
+reading CCSIDR_EL1, or an UNDEF (or even the instruction executed as a
+NOP). But CSSELR_EL1 doesn't have any restriction other than returning
+an UNKNOWN value if you write crap to it and try to read it back.
+
+The different is subtle, but important: an UNKNOWN behaviour could
+result in the machine catching fire, for example, and we don't really
+want that... ;-)
+
+> 
+> CLIDR_EL1 and CCSIDR_EL1 are now writable from the userspace so that
+> the VMM can restore the values saved with the old kernel.
+> 
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h           |   3 +-
+>  arch/arm64/include/asm/kvm_emulate.h       |   4 -
+>  arch/arm64/include/asm/kvm_host.h          |   6 +-
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   2 -
+>  arch/arm64/kvm/reset.c                     |   1 +
+>  arch/arm64/kvm/sys_regs.c                  | 232 ++++++++++++---------
+>  6 files changed, 142 insertions(+), 106 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 8aa8492dafc0..44be46c280c1 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -81,11 +81,12 @@
+>   * SWIO:	Turn set/way invalidates into set/way clean+invalidate
+>   * PTW:		Take a stage2 fault if a stage1 walk steps in device memory
+>   * TID3:	Trap EL1 reads of group 3 ID registers
+> + * TID2:	Trap CTR_EL0, CCSIDR2_EL1, CLIDR_EL1, and CSSELR_EL1
+>   */
+>  #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
+>  			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
+>  			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+> -			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 )
+> +			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID2)
+>  #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+>  #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
+>  #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 9bdba47f7e14..30c4598d643b 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -88,10 +88,6 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+>  	if (vcpu_el1_is_32bit(vcpu))
+>  		vcpu->arch.hcr_el2 &= ~HCR_RW;
+>  
+> -	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
+> -	    vcpu_el1_is_32bit(vcpu))
+> -		vcpu->arch.hcr_el2 |= HCR_TID2;
+> -
+>  	if (kvm_has_mte(vcpu->kvm))
+>  		vcpu->arch.hcr_el2 |= HCR_ATA;
+>  }
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 45e2136322ba..27abf81c6910 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -178,6 +178,7 @@ struct kvm_vcpu_fault_info {
+>  enum vcpu_sysreg {
+>  	__INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+>  	MPIDR_EL1,	/* MultiProcessor Affinity Register */
+> +	CLIDR_EL1,	/* Cache Level ID Register */
+>  	CSSELR_EL1,	/* Cache Size Selection Register */
+>  	SCTLR_EL1,	/* System Control Register */
+>  	ACTLR_EL1,	/* Auxiliary Control Register */
+> @@ -417,6 +418,9 @@ struct kvm_vcpu_arch {
+>  		u64 last_steal;
+>  		gpa_t base;
+>  	} steal;
+> +
+> +	/* Per-vcpu CCSIDR override or NULL */
+> +	u32 *ccsidr;
+>  };
+>  
+>  /*
+> @@ -621,7 +625,6 @@ static inline bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
+>  		return false;
+>  
+>  	switch (reg) {
+> -	case CSSELR_EL1:	*val = read_sysreg_s(SYS_CSSELR_EL1);	break;
+>  	case SCTLR_EL1:		*val = read_sysreg_s(SYS_SCTLR_EL12);	break;
+>  	case CPACR_EL1:		*val = read_sysreg_s(SYS_CPACR_EL12);	break;
+>  	case TTBR0_EL1:		*val = read_sysreg_s(SYS_TTBR0_EL12);	break;
+> @@ -666,7 +669,6 @@ static inline bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
+>  		return false;
+>  
+>  	switch (reg) {
+> -	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	break;
+>  	case SCTLR_EL1:		write_sysreg_s(val, SYS_SCTLR_EL12);	break;
+>  	case CPACR_EL1:		write_sysreg_s(val, SYS_CPACR_EL12);	break;
+>  	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	break;
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> index baa5b9b3dde5..147cb4c846c6 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> @@ -39,7 +39,6 @@ static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
+>  
+>  static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+>  {
+> -	ctxt_sys_reg(ctxt, CSSELR_EL1)	= read_sysreg(csselr_el1);
+>  	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
+>  	ctxt_sys_reg(ctxt, CPACR_EL1)	= read_sysreg_el1(SYS_CPACR);
+>  	ctxt_sys_reg(ctxt, TTBR0_EL1)	= read_sysreg_el1(SYS_TTBR0);
+> @@ -95,7 +94,6 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
+>  static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+>  {
+>  	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
+> -	write_sysreg(ctxt_sys_reg(ctxt, CSSELR_EL1),	csselr_el1);
+>  
+>  	if (has_vhe() ||
+>  	    !cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 5ae18472205a..7980983dbad7 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -157,6 +157,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  	if (sve_state)
+>  		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
+>  	kfree(sve_state);
+> +	kfree(vcpu->arch.ccsidr);
+>  }
+>  
+>  static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index f4a7c5abcbca..e7edd9ffadc3 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -11,6 +11,7 @@
+>  
+>  #include <linux/bitfield.h>
+>  #include <linux/bsearch.h>
+> +#include <linux/cacheinfo.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/mm.h>
+>  #include <linux/printk.h>
+> @@ -81,25 +82,64 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>  	 __vcpu_sys_reg(vcpu, reg) = val;
+>  }
+>  
+> -/* 3 bits per cache level, as per CLIDR, but non-existent caches always 0 */
+> -static u32 cache_levels;
+> -
+>  /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
+>  #define CSSELR_MAX 14
+
+We should revisit this value in the light of MTE, and whether or not
+CSSELR_EL1.TnD participates in the CCSIDR indexation. If it does, then
+this value is wrong (it could go up to 21, depending on the VM
+configuration). If it doesn't, then TnD should be excluded from the
+index.
+
+This affects all the code paths that now check against this value
+instead of checking the validity of the cache level. Given that the
+architecture only specifies 7 levels and that we artificially expand
+it to 14, I'm keen on not extending the array if we can avoid it.
+
+>  
+>  /* Which cache CCSIDR represents depends on CSSELR value. */
+> -static u32 get_ccsidr(u32 csselr)
+> +static u32 get_ccsidr(struct kvm_vcpu *vcpu, u32 csselr)
+> +{
+> +	u64 ctr_el0;
+> +	int field;
+> +
+> +	if (vcpu->arch.ccsidr)
+> +		return vcpu->arch.ccsidr[csselr];
+> +
+> +	ctr_el0 = arm64_ftr_reg_ctrel0.sys_val;
+
+Prefer "ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0)" instead.
+
+> +	field = csselr & CSSELR_EL1_InD ? CTR_EL0_IminLine_SHIFT : CTR_EL0_DminLine_SHIFT;
+> +
+> +	/*
+> +	 * Fabricate a CCSIDR value as the overriding value does not exist.
+> +	 * The real CCSIDR value will not be used as it can vary by the
+> +	 * physical CPU which the vcpu currently resides in.
+> +	 *
+> +	 * The line size is determined with arm64_ftr_reg_ctrel0.sys_val, which
+> +	 * should be valid for all CPUs even if they have different cache
+> +	 * configuration.
+> +	 *
+> +	 * The associativity bits are cleared, meaning the geometry of all data
+> +	 * and unified caches (which are guaranteed to be PIPT and thus
+> +	 * non-aliasing) are 1 set and 1 way.
+> +	 * Guests should not be doing cache operations by set/way at all, and
+> +	 * for this reason, we trap them and attempt to infer the intent, so
+> +	 * that we can flush the entire guest's address space at the appropriate
+> +	 * time. The exposed geometry minimizes the number of the traps.
+> +	 * [If guests should attempt to infer aliasing properties from the
+> +	 * geometry (which is not permitted by the architecture), they would
+> +	 * only do so for virtually indexed caches.]
+> +	 */
+> +	return cpuid_feature_extract_unsigned_field(ctr_el0, field) - 2;
+> +}
+> +
+> +static int set_ccsidr(struct kvm_vcpu *vcpu, u32 csselr, u32 val)
+>  {
+> -	u32 ccsidr;
+> +	u32 i;
+> +
+> +	if (!vcpu->arch.ccsidr) {
+> +		if (val == get_ccsidr(vcpu, csselr))
+> +			return 0;
+> +
+> +		vcpu->arch.ccsidr =
+> +			kmalloc_array(CSSELR_MAX, sizeof(u32), GFP_KERNEL);
+
+nit: on a single line, please.
+
+> +		if (!vcpu->arch.ccsidr)
+> +			return -ENOMEM;
+> +
+> +		for (i = 0; i < CSSELR_MAX; i++)
+> +			vcpu->arch.ccsidr[i] = get_ccsidr(vcpu, i);
+> +	}
+
+I'm afraid this does nothing. get_ccsidr() will return
+vcpu->arch.ccsidr[i]. You need to perform the copy *before* the array
+assignment, if at all.
+
+>
+> -	/* Make sure noone else changes CSSELR during this! */
+> -	local_irq_disable();
+> -	write_sysreg(csselr, csselr_el1);
+> -	isb();
+> -	ccsidr = read_sysreg(ccsidr_el1);
+> -	local_irq_enable();
+> +	vcpu->arch.ccsidr[csselr] = val;
+
+This value needs sanitising before being written. At least the UNKNOWN
+bits should be zeroed, just in case, and the line size checked against
+CTR_EL0.{I,D}minLine -- we shouldn't accept a line size smaller than
+the minimum.
+
+But it also begs the question whether we should allow cache levels
+that do not exist in CLIDR_EL1 (keeping in mind that we may restore
+registers in an arbitrary order).
+
+>  
+> -	return ccsidr;
+> +	return 0;
+>  }
+>  
+>  /*
+> @@ -1124,6 +1164,12 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
+>  						      ID_DFR0_PERFMON_SHIFT,
+>  						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
+>  		break;
+> +	case SYS_ID_AA64MMFR2_EL1:
+> +		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
+> +		break;
+> +	case SYS_ID_MMFR4_EL1:
+> +		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_CCIDX);
+> +		break;
+
+Please make this a separate patch that can come before this one. We
+never supported CCIDX, so nothing will break anyway.
+
+>  	}
+>  
+>  	return val;
+> @@ -1275,10 +1321,64 @@ static bool access_clidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	if (p->is_write)
+>  		return write_to_read_only(vcpu, p, r);
+>  
+> -	p->regval = read_sysreg(clidr_el1);
+> +	p->regval = __vcpu_sys_reg(vcpu, r->reg);
+>  	return true;
+>  }
+>  
+> +/*
+> + * Fabricate a CLIDR_EL1 value instead of using the real value, which can vary
+> + * by the physical CPU which the vcpu currently resides in.
+> + */
+> +static void reset_clidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	u64 dic = arm64_ftr_reg_ctrel0.sys_val & CTR_EL0_DIC;
+> +	u64 idc = arm64_ftr_reg_ctrel0.sys_val & CTR_EL0_IDC;
+
+Same remark as above about the use of the relevant accessor.
+
+> +	u64 clidr;
+> +
+> +	if (dic && idc) {
+> +		/*
+> +		 * No cache maintenance required to ensure the PoU so have only
+> +		 * one unified cache level for LoC.
+> +		 */
+> +		clidr = 1 << CLIDR_LOC_SHIFT;
+> +		clidr |= CACHE_TYPE_UNIFIED << CLIDR_CTYPE_SHIFT(1);
+> +	} else {
+> +		/*
+> +		 * Cache maintenance required to ensure the PoU. Let L1 be a
+> +		 * separate cache to be invalidated or cleaned when ensuring
+> +		 * the PoU.
+> +		 */
+> +		clidr = (1 << CLIDR_LOUU_SHIFT) | (1 << CLIDR_LOUIS_SHIFT);
+
+On a system with FWB, these two fields should be 0, even if
+CTR_EL0.IDC is not set.
+
+> +
+> +		/*
+> +		 * Instruction cache invalidation to the PoU is required so
+> +		 * let L1 have an instruction cache.
+> +		 */
+> +		if (!dic)
+> +			clidr |= CACHE_TYPE_INST << CLIDR_CTYPE_SHIFT(1);
+> +
+> +		if (idc) {
+> +			/*
+> +			 * Data cache clean to the PoU is not required so
+> +			 * L1 will not have data cache. Let L2 be a unified
+> +			 * cache for LoC.
+> +			 */
+> +			clidr |= 2 << CLIDR_LOC_SHIFT;
+> +			clidr |= CACHE_TYPE_UNIFIED << CLIDR_CTYPE_SHIFT(2);
+> +		} else {
+> +			/*
+> +			 * Data cache clean to the PoU is required so let L1
+> +			 * have a data cache. As L1 has a data cache, it can
+> +			 * be marked as LoC too.
+> +			 */
+> +			clidr |= 1 << CLIDR_LOC_SHIFT;
+> +			clidr |= CACHE_TYPE_DATA << CLIDR_CTYPE_SHIFT(1);
+
+This may deserve a comment to indicate that (CACHE_TYPE_INST |
+CACHE_TYPE_INST) is a valid combination distinct of
+CACHE_TYPE_UNIFIED (CACHE_TYPE_SEPARATE).
+
+> +		}
+> +	}
+
+What is missing here is the MTE tag handling if the feature is
+enabled, as I don't think we can report "No Tag Cache". 0b11 (Unified
+Allocation Tag and Data cache, Allocation Tags and Data in separate
+lines) looks like the best option.
+
+> +
+> +	__vcpu_sys_reg(vcpu, r->reg) = clidr;
+> +}
+> +
+>  static bool access_csselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  			  const struct sys_reg_desc *r)
+>  {
+> @@ -1300,25 +1400,19 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  		return write_to_read_only(vcpu, p, r);
+>  
+>  	csselr = vcpu_read_sys_reg(vcpu, CSSELR_EL1);
+> -	p->regval = get_ccsidr(csselr);
+> +	if (csselr >= CSSELR_MAX)
+> +		return undef_access(vcpu, p, r);
+
+I don't think injecting an UNDEF is legal here. The extra bits are
+RES0, and should simply be excluded at the point where we handle the
+access to CSSELR_EL1. You're also missing the handling of TnD, as
+mentioned earlier.
+
+The only case where we are allowed to inject an UNDEF is when
+accessing CCSIDR_EL1 for a cache level that isn't implemented. But
+even that feels a bit extreme. We're better off restoring an UNKNOWN
+value (which is what happens here).
+
+>  
+> -	/*
+> -	 * Guests should not be doing cache operations by set/way at all, and
+> -	 * for this reason, we trap them and attempt to infer the intent, so
+> -	 * that we can flush the entire guest's address space at the appropriate
+> -	 * time.
+> -	 * To prevent this trapping from causing performance problems, let's
+> -	 * expose the geometry of all data and unified caches (which are
+> -	 * guaranteed to be PIPT and thus non-aliasing) as 1 set and 1 way.
+> -	 * [If guests should attempt to infer aliasing properties from the
+> -	 * geometry (which is not permitted by the architecture), they would
+> -	 * only do so for virtually indexed caches.]
+> -	 */
+> -	if (!(csselr & 1)) // data or unified cache
+> -		p->regval &= ~GENMASK(27, 3);
+> +	p->regval = get_ccsidr(vcpu, csselr);
+>  	return true;
+>  }
+>  
+> +static void reset_ccsidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	kfree(vcpu->arch.ccsidr);
+> +	vcpu->arch.ccsidr = NULL;
+
+Err, no. Resetting the vcpu should never result in RO registers being
+discarded. Otherwise, the cache topology will be reset across a reboot
+of the VM (or a PSCI CPU_OFF/ON), which is obviously not acceptable.
+
+> +}
+> +
+>  static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
+>  				   const struct sys_reg_desc *rd)
+>  {
+> @@ -1603,8 +1697,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	{ SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
+>  
+> -	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
+> -	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr },
+> +	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr, reset_ccsidr },
+> +	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr, reset_clidr, CLIDR_EL1 },
+> +	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
+>  	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
+>  	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
+>  	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
+> @@ -2106,6 +2201,7 @@ static const struct sys_reg_desc cp15_regs[] = {
+>  
+>  	{ Op1(1), CRn( 0), CRm( 0), Op2(0), access_ccsidr },
+>  	{ Op1(1), CRn( 0), CRm( 0), Op2(1), access_clidr },
+> +	{ Op1(1), CRn(0),  CRm(0),  Op2(2), undef_access },
+
+Please add a comment indicating which CP15 register this is, and
+preserve the existing alignment (the useless space in the CRn/CRm
+macros).
+
+>  	{ Op1(2), CRn( 0), CRm( 0), Op2(0), access_csselr, NULL, CSSELR_EL1 },
+>  };
+>  
+> @@ -2611,7 +2707,6 @@ id_to_sys_reg_desc(struct kvm_vcpu *vcpu, u64 id,
+>  
+>  FUNCTION_INVARIANT(midr_el1)
+>  FUNCTION_INVARIANT(revidr_el1)
+> -FUNCTION_INVARIANT(clidr_el1)
+>  FUNCTION_INVARIANT(aidr_el1)
+>  
+>  static void get_ctr_el0(struct kvm_vcpu *v, const struct sys_reg_desc *r)
+> @@ -2623,7 +2718,6 @@ static void get_ctr_el0(struct kvm_vcpu *v, const struct sys_reg_desc *r)
+>  static struct sys_reg_desc invariant_sys_regs[] = {
+>  	{ SYS_DESC(SYS_MIDR_EL1), NULL, get_midr_el1 },
+>  	{ SYS_DESC(SYS_REVIDR_EL1), NULL, get_revidr_el1 },
+> -	{ SYS_DESC(SYS_CLIDR_EL1), NULL, get_clidr_el1 },
+>  	{ SYS_DESC(SYS_AIDR_EL1), NULL, get_aidr_el1 },
+>  	{ SYS_DESC(SYS_CTR_EL0), NULL, get_ctr_el0 },
+
+At some point, we should be able to tolerate the restoring of a
+CTR_EL0 value that isn't incompatible with the HW we run on. Maybe not
+for this patch though.
+
+>  };
+> @@ -2660,33 +2754,7 @@ static int set_invariant_sys_reg(u64 id, u64 __user *uaddr)
+>  	return 0;
+>  }
+>  
+> -static bool is_valid_cache(u32 val)
+> -{
+> -	u32 level, ctype;
+> -
+> -	if (val >= CSSELR_MAX)
+> -		return false;
+> -
+> -	/* Bottom bit is Instruction or Data bit.  Next 3 bits are level. */
+> -	level = (val >> 1);
+> -	ctype = (cache_levels >> (level * 3)) & 7;
+> -
+> -	switch (ctype) {
+> -	case 0: /* No cache */
+> -		return false;
+> -	case 1: /* Instruction cache only */
+> -		return (val & 1);
+> -	case 2: /* Data cache only */
+> -	case 4: /* Unified cache */
+> -		return !(val & 1);
+> -	case 3: /* Separate instruction and data caches */
+> -		return true;
+> -	default: /* Reserved: we can't know instruction or data. */
+> -		return false;
+> -	}
+> -}
+> -
+> -static int demux_c15_get(u64 id, void __user *uaddr)
+> +static int demux_c15_get(struct kvm_vcpu *vcpu, u64 id, void __user *uaddr)
+>  {
+>  	u32 val;
+>  	u32 __user *uval = uaddr;
+> @@ -2702,16 +2770,16 @@ static int demux_c15_get(u64 id, void __user *uaddr)
+>  			return -ENOENT;
+>  		val = (id & KVM_REG_ARM_DEMUX_VAL_MASK)
+>  			>> KVM_REG_ARM_DEMUX_VAL_SHIFT;
+> -		if (!is_valid_cache(val))
+> +		if (val >= CSSELR_MAX)
+
+This is a change in behaviour, as the number of CCSIDR_EL1 values that
+can be returned isn't a function of what is in CLIDR_EL1 anymore, and
+we return UNKNOWN values (which is allowed by the architecture).
+
+Not sure anything will break, but worth thinking about it.
+
+>  			return -ENOENT;
+>  
+> -		return put_user(get_ccsidr(val), uval);
+> +		return put_user(get_ccsidr(vcpu, val), uval);
+>  	default:
+>  		return -ENOENT;
+>  	}
+>  }
+>  
+> -static int demux_c15_set(u64 id, void __user *uaddr)
+> +static int demux_c15_set(struct kvm_vcpu *vcpu, u64 id, void __user *uaddr)
+>  {
+>  	u32 val, newval;
+>  	u32 __user *uval = uaddr;
+> @@ -2727,16 +2795,13 @@ static int demux_c15_set(u64 id, void __user *uaddr)
+>  			return -ENOENT;
+>  		val = (id & KVM_REG_ARM_DEMUX_VAL_MASK)
+>  			>> KVM_REG_ARM_DEMUX_VAL_SHIFT;
+> -		if (!is_valid_cache(val))
+> +		if (val >= CSSELR_MAX)
+>  			return -ENOENT;
+>  
+>  		if (get_user(newval, uval))
+>  			return -EFAULT;
+>  
+> -		/* This is also invariant: you can't change it. */
+> -		if (newval != get_ccsidr(val))
+> -			return -EINVAL;
+> -		return 0;
+> +		return set_ccsidr(vcpu, val, newval);
+>  	default:
+>  		return -ENOENT;
+>  	}
+> @@ -2773,7 +2838,7 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+>  	int err;
+>  
+>  	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
+> -		return demux_c15_get(reg->id, uaddr);
+> +		return demux_c15_get(vcpu, reg->id, uaddr);
+>  
+>  	err = get_invariant_sys_reg(reg->id, uaddr);
+>  	if (err != -ENOENT)
+> @@ -2817,7 +2882,7 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+>  	int err;
+>  
+>  	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
+> -		return demux_c15_set(reg->id, uaddr);
+> +		return demux_c15_set(vcpu, reg->id, uaddr);
+>  
+>  	err = set_invariant_sys_reg(reg->id, uaddr);
+>  	if (err != -ENOENT)
+> @@ -2829,13 +2894,7 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
+>  
+>  static unsigned int num_demux_regs(void)
+>  {
+> -	unsigned int i, count = 0;
+> -
+> -	for (i = 0; i < CSSELR_MAX; i++)
+> -		if (is_valid_cache(i))
+> -			count++;
+> -
+> -	return count;
+> +	return CSSELR_MAX;
+>  }
+>  
+>  static int write_demux_regids(u64 __user *uindices)
+> @@ -2845,8 +2904,6 @@ static int write_demux_regids(u64 __user *uindices)
+>  
+>  	val |= KVM_REG_ARM_DEMUX_ID_CCSIDR;
+>  	for (i = 0; i < CSSELR_MAX; i++) {
+> -		if (!is_valid_cache(i))
+> -			continue;
+>  		if (put_user(val | i, uindices))
+>  			return -EFAULT;
+>  		uindices++;
+> @@ -2948,7 +3005,6 @@ int kvm_sys_reg_table_init(void)
+>  {
+>  	bool valid = true;
+>  	unsigned int i;
+> -	struct sys_reg_desc clidr;
+>  
+>  	/* Make sure tables are unique and in order. */
+>  	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
+> @@ -2965,23 +3021,5 @@ int kvm_sys_reg_table_init(void)
+>  	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
+>  		invariant_sys_regs[i].reset(NULL, &invariant_sys_regs[i]);
+>  
+> -	/*
+> -	 * CLIDR format is awkward, so clean it up.  See ARM B4.1.20:
+> -	 *
+> -	 *   If software reads the Cache Type fields from Ctype1
+> -	 *   upwards, once it has seen a value of 0b000, no caches
+> -	 *   exist at further-out levels of the hierarchy. So, for
+> -	 *   example, if Ctype3 is the first Cache Type field with a
+> -	 *   value of 0b000, the values of Ctype4 to Ctype7 must be
+> -	 *   ignored.
+> -	 */
+> -	get_clidr_el1(NULL, &clidr); /* Ugly... */
+> -	cache_levels = clidr.val;
+> -	for (i = 0; i < 7; i++)
+> -		if (((cache_levels >> (i*3)) & 7) == 0)
+> -			break;
+> -	/* Clear all higher bits. */
+> -	cache_levels &= (1 << (i*3))-1;
+> -
+>  	return 0;
+>  }
+
+OK, that was a lot of comments, but I really like the overall shape of
+this patch. I've taken it for a ride on a single machine, and nothing
+exploded, so something must be good here... ;-)
+
+Looking forward to the next version.
 
 Thanks,
-Alex
 
-> 
-> > 
-> >         precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
-> >         report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-> > -       cntr1 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 0 : ALL_SET + 1;
-> > -       report(read_regn_el0(pmevcntr, 1) == cntr1, "CHAIN counter #1 wrapped");
-> > +       report(read_regn_el0(pmevcntr, 1) == 0, "CHAIN counter #1 wrapped");
-> > 
-> >         report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
-> >  }
-> > 
-> > The counters are 64bit, but the CHAIN event should still work because
-> > PMCR_EL0.LP is 0, according to the event description in the Arm ARM (ARM
-> > DDI 0487I.a, page D17-6461).
-> > 
-> > Thanks,
-> > Alex
-> > 
-> > > 
-> > > > Alternatively, the report message can be modified, and "wrapped"
-> > > > replaced with "incremented" (or something like that), to avoid confusion.
-> > > > 
-> > > > > +
-> > > > >  	report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
-> > > > >  }
-> > > > >  
-> > > > >  static void test_chained_sw_incr(void)
-> > > > >  {
-> > > > >  	uint32_t events[] = {SW_INCR, CHAIN};
-> > > > > +	uint64_t cntr0, cntr1;
-> > > > >  	int i;
-> > > > >  
-> > > > >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> > > > > @@ -665,10 +670,12 @@ static void test_chained_sw_incr(void)
-> > > > >  		write_sysreg(0x1, pmswinc_el0);
-> > > > >  
-> > > > >  	isb();
-> > > > > +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 0 : ALL_SET + 1;
-> > > > > +	cntr1 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
-> > > > >  	report((read_sysreg(pmovsclr_el0) == 0x3) &&
-> > > > > -		(read_regn_el0(pmevcntr, 1) == 0) &&
-> > > > > -		(read_regn_el0(pmevcntr, 0) == 84),
-> > > > > -		"expected overflows and values after 100 SW_INCR/CHAIN");
-> > > > > +	       (read_regn_el0(pmevcntr, 1) == cntr0) &&
-> > > > > +	       (read_regn_el0(pmevcntr, 0) == cntr1),
-> > > > 
-> > > > This is hard to parse, it would be better if counter 0 is compared against
-> > > > cntr0 and counter 1 against cntr1.
-> > > 
-> > > Ah, yes, code is correct but that's indeed confusing.
-> > > 
-> > > > 
-> > > > Also, same suggestion here, looks like the test wants to check that the
-> > > > odd-numbered counter wraps around when counting the CHAIN event.
-> > > 
-> > > Ack. Will update for v2.
-> > > 
-> > > Thanks!
-> > > Ricardo
-> > > 
-> > > > 
-> > > > Thanks,
-> > > > Alex
-> > > > 
-> > > > > +	       "expected overflows and values after 100 SW_INCR/CHAIN");
-> > > > >  	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
-> > > > >  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
-> > > > >  }
-> > > > > -- 
-> > > > > 2.39.0.rc0.267.gcb52ba06e7-goog
-> > > > > 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
