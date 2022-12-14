@@ -2,98 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15359C4332F
-	for <kvmarm@archiver.kernel.org>; Wed, 14 Dec 2022 17:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C985C4332F
+	for <kvmarm@archiver.kernel.org>; Wed, 14 Dec 2022 18:07:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DD784B970;
-	Wed, 14 Dec 2022 12:08:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EE214B970;
+	Wed, 14 Dec 2022 13:07:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 078DiDDHSkar; Wed, 14 Dec 2022 12:08:22 -0500 (EST)
+	with ESMTP id ayvVq-hGqTdf; Wed, 14 Dec 2022 13:07:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 273134B971;
-	Wed, 14 Dec 2022 12:08:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99DC44B968;
+	Wed, 14 Dec 2022 13:07:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E0A84B960
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2022 04:50:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F2AA4B968
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2022 13:07:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TUy6g6tjbhHX for <kvmarm@lists.cs.columbia.edu>;
- Wed, 14 Dec 2022 04:50:21 -0500 (EST)
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com
- [209.85.210.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 223FA43C6F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2022 04:50:21 -0500 (EST)
-Received: by mail-pf1-f176.google.com with SMTP id t18so4031236pfq.13
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2022 01:50:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:from:to:cc:subject:date:message-id:reply-to;
- bh=Jbas8k53VpTFWCNrs3oRHT/Z65GCtCU2WQLZf0mUIGE=;
- b=afwPx6LdFoKaH5nf+ag3bcmEMnN8QxYCsgHz0tCKFfNGbcAhKAKWcHJS4u0Xa02rh9
- 1zx4dWkTQ16/1Xq2qNjpEn/3zEiV+mVtkVWXwDxrtry3ggQwYtHlzleK+hm+POGHPrEa
- VR30Iiq3fwVosu3uFcFlghm/CQnobNW0jBUmqmTqKDJ18p6Vv3nTnv+YJd9Q5V9R2qRW
- rK3qglYycZi9MnKCpxTmAdk5enZysYESnQUsKy4Dui9/9KOMamkgsKJVkSAwwlSq3qfb
- OyhJNSoWvttRx7SrdvyCvHkwHTBdaB7W4Z0D/jUtQ/E84c2kEM0PIZMnID4mjv788Xgs
- gp0Q==
+ with ESMTP id gRqgrQV2o5tJ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 14 Dec 2022 13:07:17 -0500 (EST)
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com
+ [209.85.214.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D375E4B941
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2022 13:07:17 -0500 (EST)
+Received: by mail-pl1-f176.google.com with SMTP id w23so4136545ply.12
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2022 10:07:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+ bh=cI8YTtXtSllR0ZWQ1/hAxymikjU5SZ/BDOowwrdoNdI=;
+ b=HQGukH33fF4QVzgSvQb36OEWRw/3gZKm63tARYNYf4TQrsB8GTXCrMzvmCE/5O7Soc
+ pVq6ak2OLhxtKFkSc6KJ82YMXkgzWywqXCnFc005GMb+UWNSZFkE6UqIYtlJLdMT698Z
+ s9oSWMSvf9mjdmEhv/+4U5CCv6jhZgOcu1YZARXjx5/tkkRYwftxkBMnrH3KZD3d1Rdv
+ R+eZkOiFXdXKi0pRnTSLHhcivbdmtq2MMyyyBm7GwmIrg1UJmM//+QL3eBhGWXd1iOIu
+ H/1r3O9wsBLEFieA+5wYY2lS6rLKH6TVFlHl/wNa4bh69ZbtZqwvtQrhVrKXEfAymjz9
+ zbPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
- :reply-to;
- bh=Jbas8k53VpTFWCNrs3oRHT/Z65GCtCU2WQLZf0mUIGE=;
- b=30KrATCCDYlZtp7dn4u9WRRPh8QLmuSS16y4A/+UBzyM7Pzp58cubllWho7vq6weof
- Cg2eSQdsclXdUiuP/JLtzp5/d2urJMef4zfTJn0afX3YoBSuIvAwdjrAEFeWQRRYLEyb
- FNAZCLkoIY7uTmMk2w6xbPmyaRlTWg+5p++U8hjshEGhq9g+o/aSb3iL41DeYZkM7XlG
- /k5v91cdhsenB9DVzaTSULojfVn1k8OxV6A4nCAovQQDIKzQnCAjzF0CLyFKtChsoQP+
- bOwa5JCYF6r9dsVBL6pZ1aXbgR/YHNzDcymL+pykaIcttav3XKmPKZbysJDUinpAkGx2
- FdWQ==
-X-Gm-Message-State: ANoB5pl2vyrCiwPMXuV7CQlU+H/javN5CmBt2R9xTXyhOGzsJq+lUkZa
- YpBn3P7YsHZnhZsAB2ZEnfJXqVmT9IMDrn86FN0=
-X-Google-Smtp-Source: AA0mqf7w8TIU6K2l/8MuGzXNAAZ9FRqdURji/6nctthseH2MSfKX1yiUw7Qrbh0D1Res/crh8T4uAxCut4Jl7FykNkI=
-X-Received: by 2002:a63:e4a:0:b0:477:6cd0:9a04 with SMTP id
- 10-20020a630e4a000000b004776cd09a04mr75781850pgo.433.1671011420030; Wed, 14
- Dec 2022 01:50:20 -0800 (PST)
+ h=in-reply-to:content-disposition:mime-version:references:message-id
+ :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+ :message-id:reply-to;
+ bh=cI8YTtXtSllR0ZWQ1/hAxymikjU5SZ/BDOowwrdoNdI=;
+ b=vK8XIYAJNMnFCaZaSGBJlvIYlM8k3eeX3mx7LUGa7ES6Y76GnKGJoLHw+plandpNTZ
+ LWCE4y6NNvJ5ti21HGkyWuNyhvZeCAmcdNJh8Y7o8vSiAPpAaIVQmFCWcp9iDyMlXhQM
+ 1T1OX1pYQQT5fg9C4U5tzGkaGessqHq28WfVNm9U1FaeDed4giQylQbIuYBCFgcjiP1N
+ 8eFSQzoDjIGQK2gETZShXdTLaSULc6H5XomLE2nNYwg0pk626n9hFcycnZpb3U1IO09L
+ fjIBnoZEywuRbA5qMp7gJFUsxBN+ZCk/MJF+DxRnnISLLVv7UoKU6q7PDzsRKYielQsz
+ G1Mw==
+X-Gm-Message-State: ANoB5plZL+ZpiVBdqXvw6rUcjZdTXKzQ9IJqeMmNDU/Z0KmYv4eRNWOw
+ wJCj65DDlSD7Odo7XMV/L/YoIg==
+X-Google-Smtp-Source: AA0mqf6Nv0wgvDSv0mEjitXi1b9M/rFWfd6EeMjprH01S1k7tVdrxI4JW3vcLRGoev0rw/t7QI22aA==
+X-Received: by 2002:a17:902:da8d:b0:189:3a04:4466 with SMTP id
+ j13-20020a170902da8d00b001893a044466mr950432plx.2.1671041236705; 
+ Wed, 14 Dec 2022 10:07:16 -0800 (PST)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com.
+ [34.82.181.220]) by smtp.gmail.com with ESMTPSA id
+ o1-20020a170902bcc100b0017c37a5a2fdsm2141073pls.216.2022.12.14.10.07.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 14 Dec 2022 10:07:16 -0800 (PST)
+Date: Wed, 14 Dec 2022 10:07:12 -0800
+From: Ricardo Koller <ricarkol@google.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [kvm-unit-tests PATCH 1/3] arm: pmu: Fix overflow checks for
+ PMUv3p5 long counters
+Message-ID: <Y5oQ0KpDFHJoM0uh@google.com>
+References: <20221202045527.3646838-1-ricarkol@google.com>
+ <20221202045527.3646838-2-ricarkol@google.com>
+ <Y5hxvj6p+mCC2DOs@monolith.localdoman>
+ <Y5imhKUIJceHDUMD@google.com>
+ <Y5irunF72esHzOWj@monolith.localdoman>
+ <Y5i94ojqRTJMWu8U@google.com>
+ <Y5mpbWmhTi41Rmni@monolith.localdoman>
 MIME-Version: 1.0
-References: <20221208193857.4090582-1-dmatlack@google.com>
- <20221208193857.4090582-2-dmatlack@google.com>
- <22fe2332-497e-fe30-0155-e026b0eded97@intel.com> <Y5NvYmxpy6BPkmpW@google.com>
- <CALzav=eju4LYyX=ufNneSww+5sraYJ8cfQSi4LTOHfHWmddX9A@mail.gmail.com>
- <Y5dnWgJ0ine55/hN@google.com>
-In-Reply-To: <Y5dnWgJ0ine55/hN@google.com>
-From: Lai Jiangshan <jiangshanlai@gmail.com>
-Date: Wed, 14 Dec 2022 17:50:07 +0800
-Message-ID: <CAJhGHyBbjyKVEv3KcoOcPGQ28753FjR_rc9uNDEF3Dd-gNTRGQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 01/37] KVM: x86/mmu: Store the address space ID
- directly in kvm_mmu_page_role
-To: Sean Christopherson <seanjc@google.com>
-X-Mailman-Approved-At: Wed, 14 Dec 2022 12:08:20 -0500
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
- Hugh Dickins <hughd@google.com>, Paul Walmsley <paul.walmsley@sifive.com>,
- "Yang, Weijiang" <weijiang.yang@intel.com>, "Amit, Nadav" <namit@vmware.com>,
- Colin Cross <ccross@google.com>, Ben Gardon <bgardon@google.com>,
- "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- Yu Zhao <yuzhao@google.com>, Marc Zyngier <maz@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- "Matthew Wilcox \(Oracle\)" <willy@infradead.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Krish Sadhukhan <krish.sadhukhan@oracle.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Mingwei Zhang <mizhang@google.com>,
- Albert Ou <aou@eecs.berkeley.edu>, xu xin <cgel.zte@gmail.com>,
- Arnd Bergmann <arnd@arndb.de>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- Atish Patra <atishp@atishpatra.org>, David Matlack <dmatlack@google.com>,
- Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
- "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>
+Content-Disposition: inline
+In-Reply-To: <Y5mpbWmhTi41Rmni@monolith.localdoman>
+Cc: kvm@vger.kernel.org, maz@kernel.org, andrew.jones@linux.dev,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -110,35 +97,225 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Dec 13, 2022 at 1:47 AM Sean Christopherson <seanjc@google.com> wrote:
+On Wed, Dec 14, 2022 at 10:46:05AM +0000, Alexandru Elisei wrote:
+> Hi,
+> 
+> On Tue, Dec 13, 2022 at 10:01:06AM -0800, Ricardo Koller wrote:
+> > On Tue, Dec 13, 2022 at 04:43:38PM +0000, Alexandru Elisei wrote:
+> > > Hi,
+> > > 
+> > > On Tue, Dec 13, 2022 at 08:21:24AM -0800, Ricardo Koller wrote:
+> > > > On Tue, Dec 13, 2022 at 12:36:14PM +0000, Alexandru Elisei wrote:
+> > > > > Hi,
+> > > > > 
+> > > > > Some more comments below.
+> > > > > 
+> > > > > On Fri, Dec 02, 2022 at 04:55:25AM +0000, Ricardo Koller wrote:
+> > > > > > PMUv3p5 uses 64-bit counters irrespective of whether the PMU is configured
+> > > > > > for overflowing at 32 or 64-bits. The consequence is that tests that check
+> > > > > > the counter values after overflowing should not assume that values will be
+> > > > > > wrapped around 32-bits: they overflow into the other half of the 64-bit
+> > > > > > counters on PMUv3p5.
+> > > > > > 
+> > > > > > Fix tests by correctly checking overflowing-counters against the expected
+> > > > > > 64-bit value.
+> > > > > > 
+> > > > > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > > > > > ---
+> > > > > >  arm/pmu.c | 29 ++++++++++++++++++-----------
+> > > > > >  1 file changed, 18 insertions(+), 11 deletions(-)
+> > > > > > 
+> > > > > > diff --git a/arm/pmu.c b/arm/pmu.c
+> > > > > > index cd47b14..eeac984 100644
+> > > > > > --- a/arm/pmu.c
+> > > > > > +++ b/arm/pmu.c
+> > > > > > @@ -54,10 +54,10 @@
+> > > > > >  #define EXT_COMMON_EVENTS_LOW	0x4000
+> > > > > >  #define EXT_COMMON_EVENTS_HIGH	0x403F
+> > > > > >  
+> > > > > > -#define ALL_SET			0xFFFFFFFF
+> > > > > > -#define ALL_CLEAR		0x0
+> > > > > > -#define PRE_OVERFLOW		0xFFFFFFF0
+> > > > > > -#define PRE_OVERFLOW2		0xFFFFFFDC
+> > > > > > +#define ALL_SET			0x00000000FFFFFFFFULL
+> > > > > > +#define ALL_CLEAR		0x0000000000000000ULL
+> > > > > > +#define PRE_OVERFLOW		0x00000000FFFFFFF0ULL
+> > > > > > +#define PRE_OVERFLOW2		0x00000000FFFFFFDCULL
+> > > > > >  
+> > > > > >  #define PMU_PPI			23
+> > > > > >  
+> > > > > > @@ -538,6 +538,7 @@ static void test_mem_access(void)
+> > > > > >  static void test_sw_incr(void)
+> > > > > >  {
+> > > > > >  	uint32_t events[] = {SW_INCR, SW_INCR};
+> > > > > > +	uint64_t cntr0;
+> > > > > >  	int i;
+> > > > > >  
+> > > > > >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> > > > > > @@ -572,9 +573,9 @@ static void test_sw_incr(void)
+> > > > > >  		write_sysreg(0x3, pmswinc_el0);
+> > > > > >  
+> > > > > >  	isb();
+> > > > > > -	report(read_regn_el0(pmevcntr, 0)  == 84, "counter #1 after + 100 SW_INCR");
+> > > > > > -	report(read_regn_el0(pmevcntr, 1)  == 100,
+> > > > > > -		"counter #0 after + 100 SW_INCR");
+> > > > > > +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
+> > > > > > +	report(read_regn_el0(pmevcntr, 0) == cntr0, "counter #0 after + 100 SW_INCR");
+> > > > > > +	report(read_regn_el0(pmevcntr, 1) == 100, "counter #1 after + 100 SW_INCR");
+> > > > > >  	report_info("counter values after 100 SW_INCR #0=%ld #1=%ld",
+> > > > > >  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+> > > > > >  	report(read_sysreg(pmovsclr_el0) == 0x1,
+> > > > > > @@ -584,6 +585,7 @@ static void test_sw_incr(void)
+> > > > > >  static void test_chained_counters(void)
+> > > > > >  {
+> > > > > >  	uint32_t events[] = {CPU_CYCLES, CHAIN};
+> > > > > > +	uint64_t cntr1;
+> > > > > >  
+> > > > > >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> > > > > >  		return;
+> > > > > > @@ -618,13 +620,16 @@ static void test_chained_counters(void)
+> > > > > >  
+> > > > > >  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+> > > > > >  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+> > > > > > -	report(!read_regn_el0(pmevcntr, 1), "CHAIN counter #1 wrapped");
+> > > > > > +	cntr1 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 0 : ALL_SET + 1;
+> > > > > > +	report(read_regn_el0(pmevcntr, 1) == cntr1, "CHAIN counter #1 wrapped");
+> > > > > 
+> > > > > It looks to me like the intention of the test was to check that the counter
+> > > > > programmed with the CHAIN event wraps, judging from the report message.
+> > > > > 
+> > > > 
+> > > > Ah, right. Yeah, that message is confusing. It should be the short
+> > > > version of "Inrementing at 32-bits resulted in the right value".
+> > > > 
+> > > > > I think it would be interesting to keep that by programming counter #1 with
+> > > > > ~0ULL when PMUv3p5 (maybe call it ALL_SET64?) and test the counter value
+> > > > > against 0.
+> > > > 
+> > > > The last commit adds tests using ALL_SET64.  Tests can be run in two
+> > > > modes: overflow_at_64bits and not.  However, this test,
+> > > > test_chained_counters(), and all other chained tests only use the
+> > > > !overflow_at_64bits mode (even after the last commit). The reason is
+> > > > that there are no CHAIN events when overflowing at 64-bits (more details
+> > > > in the commit message). But, don't worry, there are lots of tests that
+> > > > check wrapping at 64-bits (overflow_at_64bits=true).
+> > > 
+> > > What I was suggesting is this (change on top of this series, not on top of
+> > > this patch, to get access to ALL_SET_AT):
+> > 
+> > Ooh, I see, I agree: it would be better to check that the odd counter
+> > increments from ~0ULL to 0 when using 64-bit counters.
+> > 
+> > > 
+> > > diff --git a/arm/pmu.c b/arm/pmu.c
+> > > index 3cb563b1abe4..fd7f20fc6c52 100644
+> > > --- a/arm/pmu.c
+> > > +++ b/arm/pmu.c
+> > > @@ -607,7 +607,6 @@ static void test_sw_incr(bool overflow_at_64bits)
+> > >  static void test_chained_counters(bool overflow_at_64bits)
+> > >  {
+> > >         uint32_t events[] = {CPU_CYCLES, CHAIN};
+> > > -       uint64_t cntr1;
+> > > 
+> > >         if (!satisfy_prerequisites(events, ARRAY_SIZE(events),
+> > >                                    overflow_at_64bits))
+> > > @@ -639,12 +638,11 @@ static void test_chained_counters(bool overflow_at_64bits)
+> > >         report(read_sysreg(pmovsclr_el0) == 0x1, "overflow recorded for chained incr #2");
+> > > 
+> > >         write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> > > -       write_regn_el0(pmevcntr, 1, ALL_SET);
+> > > +       write_regn_el0(pmevcntr, 1, ALL_SET_AT(overflow_at_64bits));
+> > 
+> > The only change is that this should be:
+> > 
+> > 	ALL_SET_AT(pmu.version >= ID_DFR0_PMU_V3_8_5)
+> > 
+> > Because "overflow_at_64bits" implies PMCR_EL0.LP = 1.
+> 
+> Right, and test_chained_counters() is never called with overflow_at_64bits
+> == true.
+> 
+> How about renaming the parameter overflow_at_64bits -> unused (or something
+> like that) to make it clear that the function does the same thing
+> regardless of the value?
 
->
-> My preference would be to leave .smm in x86's page role.  IMO, defining multiple
-> address spaces to support SMM emulation was a mistake that should be contained to
-> SMM, i.e. should never be used for any other feature.  And with CONFIG_KVM_SMM,
-> even x86 can opt out.
->
+Sounds good, will do for v2.
 
-
-I think the name ASID in kvm/x86 should be used for vmcb's ASID,
-vmcs's VPID, and PCID. Using the name ASID for other purposes
-would only result in unnecessary confusion.
-
-There is a bug for shadow paging when it uses two separate sets
-of memslots which are using two sets of rmap and page-tracking.
-
-When SMM world is writing to a non-SMM page which happens to be
-a guest pagetable in the non-SMM world, the write operation will
-go smoothly without specially handled and the shadow page for the guest
-pagetable is neither unshadowed nor marked unsync.  The shadow paging
-code is unaware that the shadow page has deviated from the guest
-pagetable.
-
-It means when SMM is enabled, shadow paging should be disabled,
-which also means it has to use tdp and not to use nested tdp.
-
-Thanks
-Lai
+> 
+> Thanks,
+> Alex
+> 
+> > 
+> > > 
+> > >         precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+> > >         report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+> > > -       cntr1 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 0 : ALL_SET + 1;
+> > > -       report(read_regn_el0(pmevcntr, 1) == cntr1, "CHAIN counter #1 wrapped");
+> > > +       report(read_regn_el0(pmevcntr, 1) == 0, "CHAIN counter #1 wrapped");
+> > > 
+> > >         report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
+> > >  }
+> > > 
+> > > The counters are 64bit, but the CHAIN event should still work because
+> > > PMCR_EL0.LP is 0, according to the event description in the Arm ARM (ARM
+> > > DDI 0487I.a, page D17-6461).
+> > > 
+> > > Thanks,
+> > > Alex
+> > > 
+> > > > 
+> > > > > Alternatively, the report message can be modified, and "wrapped"
+> > > > > replaced with "incremented" (or something like that), to avoid confusion.
+> > > > > 
+> > > > > > +
+> > > > > >  	report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
+> > > > > >  }
+> > > > > >  
+> > > > > >  static void test_chained_sw_incr(void)
+> > > > > >  {
+> > > > > >  	uint32_t events[] = {SW_INCR, CHAIN};
+> > > > > > +	uint64_t cntr0, cntr1;
+> > > > > >  	int i;
+> > > > > >  
+> > > > > >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> > > > > > @@ -665,10 +670,12 @@ static void test_chained_sw_incr(void)
+> > > > > >  		write_sysreg(0x1, pmswinc_el0);
+> > > > > >  
+> > > > > >  	isb();
+> > > > > > +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 0 : ALL_SET + 1;
+> > > > > > +	cntr1 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
+> > > > > >  	report((read_sysreg(pmovsclr_el0) == 0x3) &&
+> > > > > > -		(read_regn_el0(pmevcntr, 1) == 0) &&
+> > > > > > -		(read_regn_el0(pmevcntr, 0) == 84),
+> > > > > > -		"expected overflows and values after 100 SW_INCR/CHAIN");
+> > > > > > +	       (read_regn_el0(pmevcntr, 1) == cntr0) &&
+> > > > > > +	       (read_regn_el0(pmevcntr, 0) == cntr1),
+> > > > > 
+> > > > > This is hard to parse, it would be better if counter 0 is compared against
+> > > > > cntr0 and counter 1 against cntr1.
+> > > > 
+> > > > Ah, yes, code is correct but that's indeed confusing.
+> > > > 
+> > > > > 
+> > > > > Also, same suggestion here, looks like the test wants to check that the
+> > > > > odd-numbered counter wraps around when counting the CHAIN event.
+> > > > 
+> > > > Ack. Will update for v2.
+> > > > 
+> > > > Thanks!
+> > > > Ricardo
+> > > > 
+> > > > > 
+> > > > > Thanks,
+> > > > > Alex
+> > > > > 
+> > > > > > +	       "expected overflows and values after 100 SW_INCR/CHAIN");
+> > > > > >  	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
+> > > > > >  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+> > > > > >  }
+> > > > > > -- 
+> > > > > > 2.39.0.rc0.267.gcb52ba06e7-goog
+> > > > > > 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
