@@ -2,99 +2,156 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4FE7C25B04
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Dec 2022 07:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBDD5C00145
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Dec 2022 09:33:37 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3225C4B95D;
-	Thu, 15 Dec 2022 02:20:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 25BDF4B93E;
+	Thu, 15 Dec 2022 04:33:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
+	(fail, message has been altered) header.i=@armh.onmicrosoft.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@armh.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id o2gykv2R14ts; Thu, 15 Dec 2022 02:20:26 -0500 (EST)
+	with ESMTP id FxMYmzYhLD20; Thu, 15 Dec 2022 04:33:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B55804B91F;
-	Thu, 15 Dec 2022 02:20:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ADE874B8D8;
+	Thu, 15 Dec 2022 04:33:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 905CF4B91F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Dec 2022 02:20:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 15CE54B8D8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Dec 2022 04:33:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bN62pYqMDRC3 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Dec 2022 02:20:23 -0500 (EST)
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com
- [209.85.214.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E83554B89E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Dec 2022 02:20:22 -0500 (EST)
-Received: by mail-pl1-f180.google.com with SMTP id a9so5930154pld.7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 14 Dec 2022 23:20:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:from:to:cc:subject:date:message-id:reply-to;
- bh=O4uLeHcZtzofTghZFHPOPuZ9VgdcE81MAIlKpIRuDJg=;
- b=IwzHNMOm4TvS7kkfFEjAJOWMP9YW2EYrO0MMRKT/jg27AsW0WlwRdcLD96qzPSJcfX
- pQKKTmr2X2RKIg/BhprlLIqDSoy1+iDp+dtLOqJrP/d7w7qcX7t+OgShWHND/7vTjG4Y
- Q6Roz1gbwEqC99XkPSrYrtLbCtGCzHEEHyy32bhQJJq29mDQK92h4JXK/pWXTr63KQqu
- uPGNZzq+TfPKjunZyG//wCHotmbf1a1dg0+rp5OhtojJ9U0XP0ycqNaWuvhj2ywByGMJ
- ephbpBk6dUwYjaM5jwk8Gg9A/g2U11YxQ9214Uq5KuTh8BUANseKHXTsBT2mFG/2xi52
- +F7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=cc:to:subject:message-id:date:from:in-reply-to:references
- :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
- :reply-to;
- bh=O4uLeHcZtzofTghZFHPOPuZ9VgdcE81MAIlKpIRuDJg=;
- b=tcYJN1eYJlYRwerU2ljvxIAqqdWLjjFQZnoB6kX79AL0FKSTsSoTkSlu76H/9dDqr7
- 5eBftDFE+MlXYKNRZgm7aELPXt3ffXfLex01/5SNlPWZIFrIbyjuFHP0xAs/YQiJ529j
- OumphseIINpJJy529cDwzL4V8Mnsyvf2OqNjUJUI8fyF2Y0MHnqqMwzr4/w8XFQGq4Ev
- 4nW8/TlkX9EdvcGlye+h9tzmE0Ywx9EoJShsz7T62mW67AtGorkBzdSyaiLhbPxe2J3s
- ESMxhEZ8YvnqAT7vl7hRg8xZDw9ySL+MVf3Z7Z1rB1EOoTHYGJICK7l7mKBN3m3FbkmV
- pnWw==
-X-Gm-Message-State: ANoB5plgEqL27m0nHMvugo6xkG/eJR9Tt9x3N7i8lQP/1/IFyub2saJF
- d0Mb+ze/Sz7IeQDCeYg66UWpkT0szfVBEsYnBZs=
-X-Google-Smtp-Source: AA0mqf70UYNX/pPo/w6ANwfR+n34rLQhoD2MXPvsGPOcNr9eDBW5vpBxbT/XZ+XrXkJH0q3VVxI89RaN33bsL4wogUY=
-X-Received: by 2002:a17:903:3052:b0:189:651c:f023 with SMTP id
- u18-20020a170903305200b00189651cf023mr64145214pla.78.1671088821805; Wed, 14
- Dec 2022 23:20:21 -0800 (PST)
+ with ESMTP id LDRVqwwcoEGd for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Dec 2022 04:33:32 -0500 (EST)
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com
+ (mail-am0eur02on2086.outbound.protection.outlook.com [40.107.247.86])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2C3EF4B88E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Dec 2022 04:33:32 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oOCOhlPZ5fudmvJIEMTg4K/J6y8qHbc2Ur94DbvGlpY=;
+ b=oTQHRXOlwtdJ2GVMLCI+vTTwJsP9BqU39F/M2wonqrttyz0ePBGtV/pxDv+JI4CaflbQD8paYNb+8lBe0DkP7p82pGxJOAUtWa02epbFJtdxAP2gOx/mt+8RIOS59tDAiIXsiF1rxSlsso4/bogjREPFlxdaQzA+afZYv93x3rM=
+Received: from AS9P251CA0002.EURP251.PROD.OUTLOOK.COM (2603:10a6:20b:50f::10)
+ by DB5PR08MB10287.eurprd08.prod.outlook.com (2603:10a6:10:4a5::5)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.11; Thu, 15 Dec
+ 2022 09:33:29 +0000
+Received: from AM7EUR03FT064.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:20b:50f:cafe::eb) by AS9P251CA0002.outlook.office365.com
+ (2603:10a6:20b:50f::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.12 via Frontend
+ Transport; Thu, 15 Dec 2022 09:33:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+ pr=C
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ AM7EUR03FT064.mail.protection.outlook.com (100.127.140.127) with
+ Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5924.11 via Frontend Transport; Thu, 15 Dec 2022 09:33:28 +0000
+Received: ("Tessian outbound 58faf9791229:v130");
+ Thu, 15 Dec 2022 09:33:28 +0000
+X-CheckRecipientChecked: true
+X-CR-MTA-CID: 39bf6614655f3c73
+X-CR-MTA-TID: 64aa7808
+Received: from aaef675a5efc.1
+ by 64aa7808-outbound-1.mta.getcheckrecipient.com id
+ 3DEB4FFA-D153-49FA-A608-F94F09E553B2.1; 
+ Thu, 15 Dec 2022 09:33:22 +0000
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com
+ by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id aaef675a5efc.1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+ Thu, 15 Dec 2022 09:33:22 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=baL46U/3VulJ04h/H0vOYgHynOl8C/thCPMBcB1F/DxO9TK+MNvEorQBznGdOKpFMhKe7YAsP3f1hq5BHsDigX5RZPkwQjfcqGP5qH1obyoZ3WudSwrq5Li/RWsCKSS13e6whmru1EXJBX5f1IyAwndPxXUwccRgxI7HfOGux2lxwk603S6PsIfMjobmOT69f2Ty7JgRrpSoooz8/cgcG35dqjMCGoB5skms3ffnWa3Fuit0UCL+RR/3vOk6GJf+qRlTZFooEhJZFMe92CLJkFTFHQGKfIYbuohCSiPqjk8Vo0/oq3jR1+mN587F5q7WevBd4hHFkQjY5U0jLUej4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oOCOhlPZ5fudmvJIEMTg4K/J6y8qHbc2Ur94DbvGlpY=;
+ b=mtoRtnw3fuviLBHBVtdazYnasJyiqHDBGtS28gq8TbC2L0/2/3I58wGxgwnhz6v32sS7d77Cxq18lUIX7/JMLIdgWk45GYq9UODzEmYEwponRuQNxSUpy1m00At0TI19wMdiKyyoJhLOJY7qCJBcJPsgvFFRXL4sBtP3B51CDhbMY1xL3KWWTwzQ2fFqEIF8mTldhVudM5wmM4jyyvf13YIA69fGZ23k6qXnes1efVALnPLpHFwKxYuwqeN32YtfHp+GKCkCjIdZPeYYt3x6bH9AlEy6Lib67Y3L6mq7cqWlA+qs/LEuXB6XgFZ/13HLE1N5PUXH3l4TxIXdN6veHw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oOCOhlPZ5fudmvJIEMTg4K/J6y8qHbc2Ur94DbvGlpY=;
+ b=oTQHRXOlwtdJ2GVMLCI+vTTwJsP9BqU39F/M2wonqrttyz0ePBGtV/pxDv+JI4CaflbQD8paYNb+8lBe0DkP7p82pGxJOAUtWa02epbFJtdxAP2gOx/mt+8RIOS59tDAiIXsiF1rxSlsso4/bogjREPFlxdaQzA+afZYv93x3rM=
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+Received: from AS8PR08MB6995.eurprd08.prod.outlook.com (2603:10a6:20b:34d::13)
+ by DB8PR08MB5404.eurprd08.prod.outlook.com (2603:10a6:10:117::10)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.11; Thu, 15 Dec
+ 2022 09:33:20 +0000
+Received: from AS8PR08MB6995.eurprd08.prod.outlook.com
+ ([fe80::e825:ff01:1f8:4c1f]) by AS8PR08MB6995.eurprd08.prod.outlook.com
+ ([fe80::e825:ff01:1f8:4c1f%5]) with mapi id 15.20.5924.012; Thu, 15 Dec 2022
+ 09:33:20 +0000
+Message-ID: <c19594a6-358b-c0de-b1f5-84de38015379@arm.com>
+Date: Thu, 15 Dec 2022 09:33:17 +0000
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.0
+Subject: Re: [PATCH v1 00/12] KVM: arm64: Support FEAT_LPA2 at hyp s1 and vm s2
+To: Oliver Upton <oliver.upton@linux.dev>
+References: <20221206135930.3277585-1-ryan.roberts@arm.com>
+ <Y5pvzKYdZK79nyZw@google.com>
+Content-Language: en-US
+From: Ryan Roberts <ryan.roberts@arm.com>
+In-Reply-To: <Y5pvzKYdZK79nyZw@google.com>
+X-ClientProxiedBy: LO2P265CA0469.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:a2::25) To AS8PR08MB6995.eurprd08.prod.outlook.com
+ (2603:10a6:20b:34d::13)
 MIME-Version: 1.0
-References: <20221208193857.4090582-1-dmatlack@google.com>
- <20221208193857.4090582-2-dmatlack@google.com>
- <22fe2332-497e-fe30-0155-e026b0eded97@intel.com> <Y5NvYmxpy6BPkmpW@google.com>
- <CALzav=eju4LYyX=ufNneSww+5sraYJ8cfQSi4LTOHfHWmddX9A@mail.gmail.com>
- <Y5dnWgJ0ine55/hN@google.com>
- <CAJhGHyBbjyKVEv3KcoOcPGQ28753FjR_rc9uNDEF3Dd-gNTRGQ@mail.gmail.com>
- <Y5onJulY3UQJNrmW@google.com>
-In-Reply-To: <Y5onJulY3UQJNrmW@google.com>
-From: Lai Jiangshan <jiangshanlai@gmail.com>
-Date: Thu, 15 Dec 2022 15:20:09 +0800
-Message-ID: <CAJhGHyBKttit3okKbBsG2U7y4Fr8TjVWHVTQWrcCr8JcUcgtSQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 01/37] KVM: x86/mmu: Store the address space ID
- directly in kvm_mmu_page_role
-To: Sean Christopherson <seanjc@google.com>
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
- Hugh Dickins <hughd@google.com>, Paul Walmsley <paul.walmsley@sifive.com>,
- "Yang, Weijiang" <weijiang.yang@intel.com>, "Amit, Nadav" <namit@vmware.com>,
- Colin Cross <ccross@google.com>, Ben Gardon <bgardon@google.com>,
- "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- Yu Zhao <yuzhao@google.com>, Marc Zyngier <maz@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- "Matthew Wilcox \(Oracle\)" <willy@infradead.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Krish Sadhukhan <krish.sadhukhan@oracle.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Mingwei Zhang <mizhang@google.com>,
- Albert Ou <aou@eecs.berkeley.edu>, xu xin <cgel.zte@gmail.com>,
- Arnd Bergmann <arnd@arndb.de>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- Atish Patra <atishp@atishpatra.org>, David Matlack <dmatlack@google.com>,
- Suren Baghdasaryan <surenb@google.com>, Vlastimil Babka <vbabka@suse.cz>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
- "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>
+X-MS-TrafficTypeDiagnostic: AS8PR08MB6995:EE_|DB8PR08MB5404:EE_|AM7EUR03FT064:EE_|DB5PR08MB10287:EE_
+X-MS-Office365-Filtering-Correlation-Id: d26a2fae-96c6-47ab-10b8-08dade7f6c68
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: /73afesSXSclbXBbFfzGQ5MvW8uPtM9TMlj+UmXCR1wdghPoWbXFJXN1hnPDpcGaMqRY0LxvDnQ+JnX6eNTTlCD2+LqtrWd9HhdB0u6wNyhnJbeIYDuveEQEDTEk7QwNTy3lHQTmFFwtWgd+et1/dO73e5P7VAshtDjHwZ+RII+p3DtEM/NqHLCf0xYZzA2dFtSWFzG+1gwYXfD6MkMhPiaFfRdyPQ99EeXBbzdGhUQS9ADhyUtdg6m52fw99Notb9wVUAw8Jc0pSz6OHQGJURN6nUlSFBL3i1azblZfoewXkjRPAhM8AU/agj3I5PjyhTOWrhio+lHahV11c3mG9Efy7Ou4+ovhPFnaCtaMn1IASt6QrmimGvVefPwy9YJlmzO8gi0ShjAAal8A0vF6+kdZwQmghQOfiF02fWNVv71I0wEC3aD8Q72jXoJzZOHzzebxaKXNw/Fvu32ZWpbIOIdSSZLmjUhJfqVaZAgYGnLLXGYV44OkkpuUNkZlkdfblanDaWnWXSCYObRIjOAVpSS03xmQsuxQ3ZHjF/NmSncfJkoXSS44yVQPKtocs9YCB+9DEgcksR2zPpgsIsq1jH40FZweKdzhSv2Vi4cbA1WmJBYcJEpcuKshzZOi0j00HC0pZwP2ckOvXwvBu6GV0Ak+6n1CXrS9h//pXB+/zPdXSDvng0JEYTeMXsFIS3zELy5a8PNv52PB0tdZxajBRppnFKagi17+KRkZZiGesf8=
+X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255; CTRY:; LANG:en;
+ SCL:1; SRV:; IPV:NLI; SFV:NSPM; H:AS8PR08MB6995.eurprd08.prod.outlook.com;
+ PTR:; CAT:NONE;
+ SFS:(13230022)(4636009)(136003)(396003)(366004)(39860400002)(376002)(346002)(451199015)(5660300002)(66476007)(2616005)(53546011)(26005)(8676002)(6512007)(6666004)(6506007)(31696002)(38100700002)(186003)(4326008)(41300700001)(86362001)(66946007)(8936002)(2906002)(478600001)(36756003)(44832011)(54906003)(6486002)(66556008)(6916009)(316002)(66899015)(31686004)(45980500001)(43740500002);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5404
+Original-Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM7EUR03FT064.eop-EUR03.prod.protection.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs: 34592840-c1ef-4b9b-3c67-08dade7f674a
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bHwV1Bot7ZvufXz0kMfPY12WpSdp6HVFqP8uZnAKsF6XTVmGxco+POASPgGdLbODfqBWCxccUUsWlUzfO8nQB/Jv92U02oLUKd36DDlOActgutetWzzH366puq5mk1gLQdUcug76g0BE5Qp0uME91Ow/konfv0IA7ucEE8M7vF0qrfD/lJ4K0uY5rsthQ6Ug5pb9vb60B7lKYs5s5tNIW/OEQlLA6Ij20VUWzgeL5HuYuqpNkbKFigyW9hDuXMXQfv0DTBo9MdHZZabjqpDtfDAMnGDALy8enVVWw//MnRtJAAV+wka/y2jX4vF4JGpahQiCAhNcOpxiBr8yEfmex4t4UF8u3RCtzuz4b0zYCxaHy4ZkuKQkCSt0jZWA/lWbAyjJ25LI2OaOvBbcnOzgaGNw6h/hq0zG3v5EcZoLiDov9cGXmX4KBau8pX4Z7ifihjCvSQoKKIRuzc6zO7k/bxi0g2EDCREPx2Hm+ILYIX9t+XHh+/E2pYkLpJGoH+BLIJSohe01/WAmwub0H6lSKUs1KHxrzqW3iaboFsQN6WZIzkAOztD4qwJ6LHpz5OlaLdJVyeZv+tMd25+/admrpM53xNv02X7KxzfOy/EWI8UtFdMOj2kXlY76HSeFOqm9E6zKWai+EM4zh3PXIS07cDchw40JBIR8CppJo+if9fOHTvg3YZMWWKNoSDcBjIaoCfPC3t6eXQUreh3EWXbt97E5IhZlGtq52hUqOaez8CQ=
+X-Forefront-Antispam-Report: CIP:63.35.35.123; CTRY:IE; LANG:en; SCL:1; SRV:;
+ IPV:CAL; SFV:NSPM; H:64aa7808-outbound-1.mta.getcheckrecipient.com;
+ PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com; CAT:NONE;
+ SFS:(13230022)(4636009)(376002)(346002)(136003)(39860400002)(396003)(451199015)(46966006)(40470700004)(36840700001)(54906003)(36860700001)(2616005)(336012)(40460700003)(41300700001)(44832011)(2906002)(47076005)(8936002)(5660300002)(316002)(40480700001)(36756003)(6862004)(186003)(8676002)(4326008)(86362001)(70206006)(70586007)(31696002)(82310400005)(31686004)(66899015)(6666004)(356005)(26005)(6512007)(82740400003)(6506007)(53546011)(81166007)(478600001)(6486002)(43740500002);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2022 09:33:28.6693 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d26a2fae-96c6-47ab-10b8-08dade7f6c68
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d; Ip=[63.35.35.123];
+ Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-AuthSource: AM7EUR03FT064.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB5PR08MB10287
+Cc: Marc Zyngier <maz@kernel.org>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
+ Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -111,212 +168,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Dec 15, 2022 at 3:42 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Dec 14, 2022, Lai Jiangshan wrote:
-> > On Tue, Dec 13, 2022 at 1:47 AM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > >
-> > > My preference would be to leave .smm in x86's page role.  IMO, defining multiple
-> > > address spaces to support SMM emulation was a mistake that should be contained to
-> > > SMM, i.e. should never be used for any other feature.  And with CONFIG_KVM_SMM,
-> > > even x86 can opt out.
-> > >
-> >
-> >
-> > I think the name ASID in kvm/x86 should be used for vmcb's ASID,
-> > vmcs's VPID, and PCID. Using the name ASID for other purposes
-> > would only result in unnecessary confusion.
->
-> I agree in principle, but at this point fixing the problem would require a lot of
-> churn since "as_id" is pervasive throughout the memslots code.
->
-> It should be possible though, as I don't think anything in KVM's uAPI explicitly
-> takes an as_id, i.e. it's KVM-internal terminology for the most part.
->
-> > There is a bug for shadow paging when it uses two separate sets
-> > of memslots which are using two sets of rmap and page-tracking.
-> >
-> > When SMM world is writing to a non-SMM page which happens to be
-> > a guest pagetable in the non-SMM world, the write operation will
-> > go smoothly without specially handled and the shadow page for the guest
-> > pagetable is neither unshadowed nor marked unsync.  The shadow paging
-> > code is unaware that the shadow page has deviated from the guest
-> > pagetable.
->
-> Won't the unsync code work as intended?  for_each_gfn_valid_sp_with_gptes()
-> doesn't consume the slot and I don't see any explicit filtering on role.smm,
-> i.e. should unsync all SPTEs for the gfn.
->
-> Addressing the page-track case is a bit gross, but doesn't appear to be too
-> difficult.  I wouldn't be surprised if there are other SMM => non-SMM bugs lurking
-> though.
->
-> ---
->  arch/x86/include/asm/kvm_page_track.h |  2 +-
->  arch/x86/kvm/mmu/mmu.c                |  7 +++---
->  arch/x86/kvm/mmu/mmu_internal.h       |  3 ++-
->  arch/x86/kvm/mmu/page_track.c         | 32 +++++++++++++++++++--------
->  arch/x86/kvm/mmu/spte.c               |  2 +-
->  5 files changed, 31 insertions(+), 15 deletions(-)
+On 15/12/2022 00:52, Oliver Upton wrote:
+> On Tue, Dec 06, 2022 at 01:59:18PM +0000, Ryan Roberts wrote:
+>> (appologies, I'm resending this series as I managed to send the cover letter to
+>> all but the following patches only to myself on first attempt).
+>>
+>> This is my first upstream feature submission so please go easy ;-)
+> 
+> Welcome :)
+> 
+>> Support 52-bit Output Addresses: FEAT_LPA2 changes the format of the PTEs. The
+>> HW advertises support for LPA2 independently for stage 1 and stage 2, and
+>> therefore its possible to have it for one and not the other. I've assumed that
+>> there is a valid case for this if stage 1 is not supported but stage 2 is, KVM
+>> could still then use LPA2 at stage 2 to create a 52 bit IPA space (which could
+>> then be consumed by a 64KB page guest kernel with the help of FEAT_LPA). Because
+>> of this independence and the fact that the kvm pgtable library is used for both
+>> stage 1 and stage 2 tables, this means the library now has to remember the
+>> in-use format on a per-page-table basis. To do this, I had to rework some
+>> functions to take a `struct kvm_pgtable *` parameter, and as a result, there is
+>> a noisy patch to add this parameter.
+> 
+> Mismatch between the translation stages is an interesting problem...
+> 
+> Given that userspace is responsible for setting up the IPA space, I
+> can't really think of a strong use case for 52 bit IPAs with a 48 bit
+> VA. Sure, the VMM could construct a sparse IPA space or remap the same
+> HVA at multiple IPAs to artificially saturate the address space, but
+> neither seems terribly compelling.
+> 
+> Nonetheless, AFAICT we already allow this sort of mismatch on LPA &&
+> !LVA systems. A 48 bit userspace could construct a 52 bit IPA space for
+> its guest.
 
-Could you send the patch in a new thread, please?
+I guess a simpler approach would be to only use LPA2 if its supported by both
+stage1 and stage2. Then the code could just use a static key in the few required
+places. However, there is also a place where kvm_pgtable walks the user space s1
+page table that is constructed by the kernel. For this to keep working, the
+kernel would need to decide whether to use LPA2 based on the same criteria. But
+it feels odd to have the kernel depend on LPA2 support at stage2. I'll wait for
+your fuller review.
 
-I will add my reviewed-by then.
+> 
+> Marc, is there any real reason for this or is it just a byproduct of how
+> LPA support was added to KVM?
+> 
+>> Support 52-bit Input Addresses: The main difficulty here is that at stage 1 for
+>> 4KB pages, 52-bit IA requires a extra level of lookup, and that level is called
+>> '-1'. (Although stage 2 can use concatenated pages at the first level, and
+>> therefore still only uses 4 levels, the kvm pgtable library deals with both
+>> stage 1 and stage 2 tables). So there is another noisy patch to convert all
+>> level variables to signed.
+>>
+>> This is all tested on the FVP, using a test harness I put together, which does a
+>> host + guest boot test for 180 configurations, built from all the (valid)
+>> combinations of various FVP, host kernel and guest kernel parameters:
+>>
+>>  - hw_pa:		[48, lpa, lpa2]
+>>  - hw_va:		[48, 52]
+>>  - kvm_mode:		[vhe, nvhe, protected]
+>>  - host_page_size:	[4KB, 16KB, 64KB]
+>>  - host_pa:		[48, 52]
+>>  - host_va:		[48, 52]
+>>  - host_load_addr:	[low, high]
+>>  - guest_page_size:	[64KB]
+>>  - guest_pa:		[52]
+>>  - guest_va:		[52]
+>>  - guest_load_addr:	[low, high]
+> 
+> Wow, what a matrix!
+> 
+> In a later revision of this series it might be good to add support for
+> LPA2 guests in KVM selftests. We currently constrain the IPA size to
+> 48bits on !64K kernels.
 
-It still lacks the parts that do write protection for sp->gfn.
-kvm_vcpu_write_protect_gfn() has to handle the two worlds.
-account_shadowed() and kvm_slot_page_track_add_page() have also
-to handle the two worlds.
+Ahh - I did have a quick look at kselftests and kvm-unit-tests but it looked
+like they were hard-coded for 48-bit IPA and it looked like quite an effort to
+rework. I guess if it already supports 52 bit IPA for 64K kernels then I missed
+something. I'll take another look and aim to get some tests implemented for a
+future revision.
+> 
+> I'll have a deeper look at this series in the coming days.
 
-And I don't think there is any page-table in SMM-world, so
-kvm_slot_page_track_is_active() can just skip the SMM-world
-and check the non-SMM world only.
+Thanks!
 
-Thanks
-Lai
-
->
-> diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
-> index eb186bc57f6a..fdd9de31e160 100644
-> --- a/arch/x86/include/asm/kvm_page_track.h
-> +++ b/arch/x86/include/asm/kvm_page_track.h
-> @@ -63,7 +63,7 @@ void kvm_slot_page_track_add_page(struct kvm *kvm,
->  void kvm_slot_page_track_remove_page(struct kvm *kvm,
->                                      struct kvm_memory_slot *slot, gfn_t gfn,
->                                      enum kvm_page_track_mode mode);
-> -bool kvm_slot_page_track_is_active(struct kvm *kvm,
-> +bool kvm_slot_page_track_is_active(struct kvm_vcpu *vcpu,
->                                    const struct kvm_memory_slot *slot,
->                                    gfn_t gfn, enum kvm_page_track_mode mode);
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 254bc46234e0..1c2200042133 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2715,9 +2715,10 @@ static void kvm_unsync_page(struct kvm *kvm, struct kvm_mmu_page *sp)
->   * were marked unsync (or if there is no shadow page), -EPERM if the SPTE must
->   * be write-protected.
->   */
-> -int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
-> +int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
->                             gfn_t gfn, bool can_unsync, bool prefetch)
->  {
-> +       struct kvm *kvm = vcpu->kvm;
->         struct kvm_mmu_page *sp;
->         bool locked = false;
->
-> @@ -2726,7 +2727,7 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
->          * track machinery is used to write-protect upper-level shadow pages,
->          * i.e. this guards the role.level == 4K assertion below!
->          */
-> -       if (kvm_slot_page_track_is_active(kvm, slot, gfn, KVM_PAGE_TRACK_WRITE))
-> +       if (kvm_slot_page_track_is_active(vcpu, slot, gfn, KVM_PAGE_TRACK_WRITE))
->                 return -EPERM;
->
->         /*
-> @@ -4127,7 +4128,7 @@ static bool page_fault_handle_page_track(struct kvm_vcpu *vcpu,
->          * guest is writing the page which is write tracked which can
->          * not be fixed by page fault handler.
->          */
-> -       if (kvm_slot_page_track_is_active(vcpu->kvm, fault->slot, fault->gfn, KVM_PAGE_TRACK_WRITE))
-> +       if (kvm_slot_page_track_is_active(vcpu, fault->slot, fault->gfn, KVM_PAGE_TRACK_WRITE))
->                 return true;
->
->         return false;
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> index ac00bfbf32f6..38040ab27986 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -156,7 +156,8 @@ static inline bool kvm_mmu_page_ad_need_write_protect(struct kvm_mmu_page *sp)
->         return kvm_x86_ops.cpu_dirty_log_size && sp->role.guest_mode;
->  }
->
-> -int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
-> +int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu,
-> +                           const struct kvm_memory_slot *slot,
->                             gfn_t gfn, bool can_unsync, bool prefetch);
->
->  void kvm_mmu_gfn_disallow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
-> diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-> index 2e09d1b6249f..0e9bc837257e 100644
-> --- a/arch/x86/kvm/mmu/page_track.c
-> +++ b/arch/x86/kvm/mmu/page_track.c
-> @@ -18,6 +18,7 @@
->
->  #include "mmu.h"
->  #include "mmu_internal.h"
-> +#include "smm.h"
->
->  bool kvm_page_track_write_tracking_enabled(struct kvm *kvm)
->  {
-> @@ -171,27 +172,40 @@ void kvm_slot_page_track_remove_page(struct kvm *kvm,
->  }
->  EXPORT_SYMBOL_GPL(kvm_slot_page_track_remove_page);
->
-> +static bool __kvm_slot_page_track_is_active(const struct kvm_memory_slot *slot,
-> +                                           gfn_t gfn, enum kvm_page_track_mode mode)
-> +{
-> +       int index;
-> +
-> +       if (!slot)
-> +               return false;
-> +
-> +       index = gfn_to_index(gfn, slot->base_gfn, PG_LEVEL_4K);
-> +       return !!READ_ONCE(slot->arch.gfn_track[mode][index]);
-> +}
-> +
->  /*
->   * check if the corresponding access on the specified guest page is tracked.
->   */
-> -bool kvm_slot_page_track_is_active(struct kvm *kvm,
-> +bool kvm_slot_page_track_is_active(struct kvm_vcpu *vcpu,
->                                    const struct kvm_memory_slot *slot,
->                                    gfn_t gfn, enum kvm_page_track_mode mode)
->  {
-> -       int index;
-> -
->         if (WARN_ON(!page_track_mode_is_valid(mode)))
->                 return false;
->
-> -       if (!slot)
-> -               return false;
-> -
->         if (mode == KVM_PAGE_TRACK_WRITE &&
-> -           !kvm_page_track_write_tracking_enabled(kvm))
-> +           !kvm_page_track_write_tracking_enabled(vcpu->kvm))
->                 return false;
->
-> -       index = gfn_to_index(gfn, slot->base_gfn, PG_LEVEL_4K);
-> -       return !!READ_ONCE(slot->arch.gfn_track[mode][index]);
-> +       if (__kvm_slot_page_track_is_active(slot, gfn, mode))
-> +               return true;
-> +
-> +       if (!is_smm(vcpu))
-> +               return false;
-> +
-> +       return __kvm_slot_page_track_is_active(gfn_to_memslot(vcpu->kvm, gfn),
-> +                                              gfn, mode);
->  }
->
->  void kvm_page_track_cleanup(struct kvm *kvm)
-> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-> index c0fd7e049b4e..89ddd113c1b9 100644
-> --- a/arch/x86/kvm/mmu/spte.c
-> +++ b/arch/x86/kvm/mmu/spte.c
-> @@ -220,7 +220,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
->                  * e.g. it's write-tracked (upper-level SPs) or has one or more
->                  * shadow pages and unsync'ing pages is not allowed.
->                  */
-> -               if (mmu_try_to_unsync_pages(vcpu->kvm, slot, gfn, can_unsync, prefetch)) {
-> +               if (mmu_try_to_unsync_pages(vcpu, slot, gfn, can_unsync, prefetch)) {
->                         pgprintk("%s: found shadow page for %llx, marking ro\n",
->                                  __func__, gfn);
->                         wrprot = true;
->
-> base-commit: e0ef1f14e97ff65adf6e2157952dbbd1e482065c
+> 
 > --
->
+> Thanks,
+> Oliver
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
