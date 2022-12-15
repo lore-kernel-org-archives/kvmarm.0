@@ -1,119 +1,81 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02352F33
-	for <kvmarm@lists.linux.dev>; Thu, 15 Dec 2022 13:11:42 +0000 (UTC)
-Received: by mail-pf1-f179.google.com with SMTP id w26so6661344pfj.6
-        for <kvmarm@lists.linux.dev>; Thu, 15 Dec 2022 05:11:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xrhxzhT9JV75VSnaY6V+UjS1o2AP1XliAK6PLs2zUKw=;
-        b=K82I9xquXsJALwGCLg6UdItvZ8v7s0Ng25dK+emcTTUN+4zpDpFAB46u6D8vumSLnm
-         HPQqijmUVXmdF+eLzLe2lNKFzYg1rV+Pdg5+1ebOPFNnEgj0ZMK2zQbxbDuBcTgwVNZ3
-         WaRbvLpYIcAG3SEzV7miDks3kDSwxoJe1klpQAobGWRIu4RUT4/DJDITx+2CO4GCxR5U
-         TtnAVtzFAQoY+mHA2c9Vq+w3L3SGtn912iFCpPtDQT+OGT6adHBe8aYHVAIpUpgwgS+Q
-         eOO7pCJ+hRGaZs1UXYh9IaCNz3qp/NvZhs0CAy/MBdJMsJyTn82m8HtdhjpvtS300CQk
-         3bBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xrhxzhT9JV75VSnaY6V+UjS1o2AP1XliAK6PLs2zUKw=;
-        b=63b1319sJbwy+pBblLKuaqG+nQFxKNUf75i1u212NVcEQSomD7CwyF/RbLV5OS2O0b
-         m+kfzMnctF1+Bu35eP1JLNW/9yxSqjc8UntriEKysyqakgPKg1VqmeoHoZqXZic3LgCY
-         ey97hf+MhhBO3dQOaYJktlc8kOe7Ey45JJAgdIM+GKh/tDEJZpe63AEq2vG29XYYtnQW
-         5YozOBOU9EQD2lanXTXBClVK+MSuI967oxRSXCgx8XCiBoFCsBNZFnTGvJj8aiWg/2O4
-         UEbpTOq9RywXssZ6hIGlAp/y+548R07DHbL/D0+6nUWDzEQztmbzRzoznaZxa8hwExuh
-         iVJA==
-X-Gm-Message-State: ANoB5plorGQiQV8UzttemsmcNNi6v1Ehq4RoOwrZefttnBS0Gpww2DSG
-	BCbIwbaKPuLTbPgSTvxOrNA=
-X-Google-Smtp-Source: AA0mqf5VkVNrnq7BXWVl6agz2NTf0dp+cDI3caC2isY08mPSkEWovHU/5eLtZ0qtr+s+nWE/TaW+SA==
-X-Received: by 2002:aa7:924c:0:b0:573:a0a0:c5d2 with SMTP id 12-20020aa7924c000000b00573a0a0c5d2mr28952655pfp.7.1671109902254;
-        Thu, 15 Dec 2022 05:11:42 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id 9-20020a621609000000b005745788f44csm1684079pfw.124.2022.12.15.05.11.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Dec 2022 05:11:41 -0800 (PST)
-Message-ID: <e8278857-1d30-877a-5c8d-329d3cba755b@gmail.com>
-Date: Thu, 15 Dec 2022 21:11:32 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69EE72F33
+	for <kvmarm@lists.linux.dev>; Thu, 15 Dec 2022 13:21:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10AB6C433D2;
+	Thu, 15 Dec 2022 13:21:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1671110483;
+	bh=+CxRf97wKw5LZIy3L7qadCeea3KfzKiwi/UZlTglQt0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MWdAn2Z8H3skxtEsZe+M6i5sp+w58R0QFQY1okL/ZHQkjDTyECg7azxap2eGkoCv5
+	 F6u4jVPr7K6ERZAtYZPtvk/NUL37YcIRtHEEonyfF3Z+PUKXKKvqkcYPVCfCCKmsWo
+	 63pnUJ0lhXtS7pzo915/Jg7DEzLO6rrUuXD5JJY2/PtiZCYn6vDEg/ohr5RofbN4q5
+	 IS8VJK5ti+iP16tOz3ty7aPZWLGx0Ay64mmeMyAQ3r4u/7oHv3KAWzkzBIsGSXtYnZ
+	 sULfNocW1wb9/jfrfp16TYBXzrFW/jzgDCwx/yyiEbW4BLajJnPUcrNtWxs9H/kr2I
+	 cBgrFCklmbmJA==
+Date: Thu, 15 Dec 2022 13:21:17 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Sami Mujawar <Sami.Mujawar@arm.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 10/14] arm64/nmi: Manage masking for superpriority
+ interrupts along with DAIF
+Message-ID: <Y5sfTaKuaXhX0io9@sirena.org.uk>
+References: <20221112151708.175147-1-broonie@kernel.org>
+ <20221112151708.175147-11-broonie@kernel.org>
+ <Y5c9SLeJacLYHmP7@FVFF77S0Q05N>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.5.1
-Subject: Re: [PATCH RFC 1/8] perf/core: Add *group_leader to
- perf_event_create_kernel_counter()
-To: Marc Zyngier <maz@kernel.org>
-Cc: Peter Zijlstra <peterz@infradead.org>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- Fenghua Yu <fenghua.yu@intel.com>, kvmarm@lists.linux.dev,
- linux-perf-users@vger.kernel.org
-References: <20221212125844.41157-1-likexu@tencent.com>
- <20221212125844.41157-2-likexu@tencent.com> <865yegrc23.wl-maz@kernel.org>
-Content-Language: en-US
-From: Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <865yegrc23.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="KCOqecMlU6no7mXW"
+Content-Disposition: inline
+In-Reply-To: <Y5c9SLeJacLYHmP7@FVFF77S0Q05N>
+X-Cookie: Today is what happened to yesterday.
 
-On 12/12/2022 9:23 pm, Marc Zyngier wrote:
-> On Mon, 12 Dec 2022 12:58:37 +0000,
-> Like Xu <like.xu.linux@gmail.com> wrote:
->>
->> From: Like Xu <likexu@tencent.com>
->>
->> Like syscalls users, kernel-space perf_event creators may also use group
->> counters abstraction to gain pmu functionalities, and an in-kernel counter
->> groups behave much like normal 'single' counters, following the group
->> semantics-based behavior.
->>
->> No functional changes at this time. An example will be that KVM creates
->> Intel slot event as group leader and other topdown metric events to emulate
->> MSR_PERF_METRICS pmu capability for guests.
->>
->> Cc: Peter Zijlstra <peterz@infradead.org>
->> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: Fenghua Yu <fenghua.yu@intel.com>
->> Cc: kvmarm@lists.linux.dev
->> Cc: linux-perf-users@vger.kernel.org
->> Signed-off-by: Like Xu <likexu@tencent.com>
->> ---
->>   arch/arm64/kvm/pmu-emul.c                 | 4 ++--
->>   arch/x86/kernel/cpu/resctrl/pseudo_lock.c | 4 ++--
->>   arch/x86/kvm/pmu.c                        | 2 +-
->>   arch/x86/kvm/vmx/pmu_intel.c              | 2 +-
->>   include/linux/perf_event.h                | 1 +
->>   kernel/events/core.c                      | 4 +++-
->>   kernel/events/hw_breakpoint.c             | 4 ++--
->>   kernel/events/hw_breakpoint_test.c        | 2 +-
->>   kernel/watchdog_hld.c                     | 2 +-
->>   9 files changed, 14 insertions(+), 11 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
->> index 24908400e190..11c3386bc86b 100644
->> --- a/arch/arm64/kvm/pmu-emul.c
->> +++ b/arch/arm64/kvm/pmu-emul.c
->> @@ -624,7 +624,7 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
->>   
->>   	attr.sample_period = compute_period(pmc, kvm_pmu_get_pmc_value(pmc));
->>   
->> -	event = perf_event_create_kernel_counter(&attr, -1, current,
->> +	event = perf_event_create_kernel_counter(&attr, -1, current, NULL,
->>   						 kvm_pmu_perf_overflow, pmc);
-> 
-> Wouldn't it be better to have a separate helper that takes the group leader
-> as a parameter, and reimplement perf_event_create_kernel_counter() in term
-> of this helper?
-> 
-> 	M.
-> 
 
-Applied. It makes changes more concise, thank you.
+--KCOqecMlU6no7mXW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Mon, Dec 12, 2022 at 02:40:08PM +0000, Mark Rutland wrote:
+
+> Please, no. NAK to pretending this is part of DAIF.
+
+> The existing hacks to bodge pseudo-NMI into the DAIF management code are
+> convoluted, difficult to maintain, and they have known cases where they
+> *cannot* do the right thing. Those existing hacks have proved to be more
+> trouble than they're worth, and continuing down that path makes things worse.
+
+As discussed elsehwere I do agree that the current "DAIF is an
+abstraction" approach isn't great and cleanup is needed but have a hard
+time seeing these changes as making things appreciably worse than they
+already are with pseudo NMI.  In any case there was some demand for the
+patches to be out there, and for collaboration on the GIC parts so I'll
+keep posting the patches in parallel with the refactoring.
+
+--KCOqecMlU6no7mXW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmObH0wACgkQJNaLcl1U
+h9CNqgf/XR9+Ops3ZVM0iyqSZV26wNG8n4C4vKx5+G4qpgn7iTnnrOTpZf9ekCac
+k+XF+UbFvDQIajTP2d5119dYLcmhYbQgceqjjJFzoeGpHlZAtWm15Z4dt+DDlaWv
+DAbmYbfAaMzu9RfHI0D6n4d38oYxpto+Ssdj2Qdcjta0q/V80tJlbLbEfh5iX9V7
+WhCoeNaFX6e9e4Aggf0GH9P7Unn0BGnGhRqXygaJv+Pm/CPDZIzwXxMjsWoaMSVR
+B5CpT7/32fQyXo5R5TO0U5LimRCM0N8uj1eA3KzAix2SUFLlLUzRupCED/L+sLqn
+FXQInLmAkae3nseNdgYvB43zROTHGg==
+=Mj2W
+-----END PGP SIGNATURE-----
+
+--KCOqecMlU6no7mXW--
