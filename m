@@ -1,81 +1,70 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69EE72F33
-	for <kvmarm@lists.linux.dev>; Thu, 15 Dec 2022 13:21:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10AB6C433D2;
-	Thu, 15 Dec 2022 13:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9DD3234
+	for <kvmarm@lists.linux.dev>; Thu, 15 Dec 2022 13:32:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5224CC433D2;
+	Thu, 15 Dec 2022 13:32:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1671110483;
-	bh=+CxRf97wKw5LZIy3L7qadCeea3KfzKiwi/UZlTglQt0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MWdAn2Z8H3skxtEsZe+M6i5sp+w58R0QFQY1okL/ZHQkjDTyECg7azxap2eGkoCv5
-	 F6u4jVPr7K6ERZAtYZPtvk/NUL37YcIRtHEEonyfF3Z+PUKXKKvqkcYPVCfCCKmsWo
-	 63pnUJ0lhXtS7pzo915/Jg7DEzLO6rrUuXD5JJY2/PtiZCYn6vDEg/ohr5RofbN4q5
-	 IS8VJK5ti+iP16tOz3ty7aPZWLGx0Ay64mmeMyAQ3r4u/7oHv3KAWzkzBIsGSXtYnZ
-	 sULfNocW1wb9/jfrfp16TYBXzrFW/jzgDCwx/yyiEbW4BLajJnPUcrNtWxs9H/kr2I
-	 cBgrFCklmbmJA==
-Date: Thu, 15 Dec 2022 13:21:17 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Sami Mujawar <Sami.Mujawar@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 10/14] arm64/nmi: Manage masking for superpriority
- interrupts along with DAIF
-Message-ID: <Y5sfTaKuaXhX0io9@sirena.org.uk>
-References: <20221112151708.175147-1-broonie@kernel.org>
- <20221112151708.175147-11-broonie@kernel.org>
- <Y5c9SLeJacLYHmP7@FVFF77S0Q05N>
+	s=k20201202; t=1671111126;
+	bh=9Pc/Oa81r/SyJaABgX1OKgnJyICVpKTQ1XBBUC7rpGQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Re6/CY9Yxwi2Oye59SA5KSMHnxCPzuFRy3m4nbzaAodwx17B8YadHZ3CHHhf0ZXux
+	 R3crWqomEz811wMRMSYe6XT5DB78r43h6BoE54fCTf6sSGeYC+K6KSrrtmwsWLFdrh
+	 oBr7O69DBJCMcJ6k79eljZl3OT/ob5S6/6N0ifpEVyrLwjqede5qKO9PeIqP5uw4YD
+	 uOgtYULuYCXJbSoe0qYAwtPOeuu5l3LgSXu3BKys+xU+vftZ5VlFj0J6eGQBmBJyfn
+	 C2qNNlRE1fmO4TT75QfZVAarvwHm2XqNXZOFJ6MaFPcRYUc6y9eWYiydaHZ5U6sFKI
+	 kcbxlLy7YZRRA==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1p5oLD-00Cr9p-Up;
+	Thu, 15 Dec 2022 13:32:04 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="KCOqecMlU6no7mXW"
-Content-Disposition: inline
-In-Reply-To: <Y5c9SLeJacLYHmP7@FVFF77S0Q05N>
-X-Cookie: Today is what happened to yesterday.
+Date: Thu, 15 Dec 2022 13:32:03 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Lorenzo Pieralisi <lpieralisi@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Mark Rutland
+ <mark.rutland@arm.com>, Sami Mujawar <Sami.Mujawar@arm.com>, Thomas Gleixner
+ <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 10/14] arm64/nmi: Manage masking for superpriority
+ interrupts along with DAIF
+In-Reply-To: <Y5h617/poqLRQU8H@sirena.org.uk>
+References: <20221112151708.175147-1-broonie@kernel.org>
+ <20221112151708.175147-11-broonie@kernel.org> <Y5IchpFrIB3y8575@lpieralisi>
+ <Y5c0tW7sidPE0oxd@sirena.org.uk> <Y5g55A3N9rXmS4LK@lpieralisi>
+ <Y5h617/poqLRQU8H@sirena.org.uk>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <c4bbc7bb6c9e0f7bf7fea185727945d0@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: broonie@kernel.org, lpieralisi@kernel.org, catalin.marinas@arm.com, will@kernel.org, mark.rutland@arm.com, Sami.Mujawar@arm.com, tglx@linutronix.de, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On 2022-12-13 13:15, Mark Brown wrote:
+> On Tue, Dec 13, 2022 at 09:37:56AM +0100, Lorenzo Pieralisi wrote:
+>> On Mon, Dec 12, 2022 at 02:03:33PM +0000, Mark Brown wrote:
+> 
+> It might be Marc's changes I guess, I didn't pull them in but I don't
+> see anything there that should be doing anything without running a 
+> guest
+> either...
 
---KCOqecMlU6no7mXW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Quite. And even with that, the virtual state is, by definition,
+isolated from the the physical state.
 
-On Mon, Dec 12, 2022 at 02:40:08PM +0000, Mark Rutland wrote:
-
-> Please, no. NAK to pretending this is part of DAIF.
-
-> The existing hacks to bodge pseudo-NMI into the DAIF management code are
-> convoluted, difficult to maintain, and they have known cases where they
-> *cannot* do the right thing. Those existing hacks have proved to be more
-> trouble than they're worth, and continuing down that path makes things worse.
-
-As discussed elsehwere I do agree that the current "DAIF is an
-abstraction" approach isn't great and cleanup is needed but have a hard
-time seeing these changes as making things appreciably worse than they
-already are with pseudo NMI.  In any case there was some demand for the
-patches to be out there, and for collaboration on the GIC parts so I'll
-keep posting the patches in parallel with the refactoring.
-
---KCOqecMlU6no7mXW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmObH0wACgkQJNaLcl1U
-h9CNqgf/XR9+Ops3ZVM0iyqSZV26wNG8n4C4vKx5+G4qpgn7iTnnrOTpZf9ekCac
-k+XF+UbFvDQIajTP2d5119dYLcmhYbQgceqjjJFzoeGpHlZAtWm15Z4dt+DDlaWv
-DAbmYbfAaMzu9RfHI0D6n4d38oYxpto+Ssdj2Qdcjta0q/V80tJlbLbEfh5iX9V7
-WhCoeNaFX6e9e4Aggf0GH9P7Unn0BGnGhRqXygaJv+Pm/CPDZIzwXxMjsWoaMSVR
-B5CpT7/32fQyXo5R5TO0U5LimRCM0N8uj1eA3KzAix2SUFLlLUzRupCED/L+sLqn
-FXQInLmAkae3nseNdgYvB43zROTHGg==
-=Mj2W
------END PGP SIGNATURE-----
-
---KCOqecMlU6no7mXW--
+         M.
+-- 
+Jazz is not dead. It just smells funny...
