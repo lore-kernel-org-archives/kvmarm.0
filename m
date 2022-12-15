@@ -1,116 +1,93 @@
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B0D3234
-	for <kvmarm@lists.linux.dev>; Thu, 15 Dec 2022 13:36:33 +0000 (UTC)
-Received: by mail-ej1-f50.google.com with SMTP id tz12so29642154ejc.9
-        for <kvmarm@lists.linux.dev>; Thu, 15 Dec 2022 05:36:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jT7HJVIoupmg5Y21QSuOncD3NDSjnYDNv89SW9beZ/U=;
-        b=fq7i2oQ4kCQIvyyCM2oJDTi5KBfjXOU5mODFRLAI90+YnBCM1rr1s7NbIi5I6vOy2h
-         iH6FFu8de9yxfk5Uji5GsMY3TEzTgJLkUsjLIrA9Hs+ZG0IY93f33EWh4+HjgzZvomBr
-         TtwGWWZ2QnFQ/Gp2woOKcVM67pr8OkE9Q07CMuc34US4AfkN0YU9W0+Jbai5L7kpzoxm
-         WXIwJ4RnMfvWa6JLFOjiB2LEEDEbQ1xyIEG7gkTB1wD3YIvVzgINSGZMTW+DyCOa2ce9
-         tuYyzT279ljDfbVS9LvWAx/dukSBSkCiRqtVAzIA714/V4xC4+f16RB2kWFQlidCaWi+
-         P8sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jT7HJVIoupmg5Y21QSuOncD3NDSjnYDNv89SW9beZ/U=;
-        b=NYpgh9unlWBz5DBC1Uh5K0y52GcEnZ+m8vzyaR9xaSHYOTp2495Fat+hYZJYCss3eU
-         1HMOBmmOEKddU3g5HKtijfW8xOfq0QnP7zuuUtlt2LlZQUCAEQ6DZi9QmeUtKwZp/+Le
-         42T6JzEDvPFauANnsgFy5Zfq8di8D7C5cxUD8h4an2uIm2DSqCS1TSlymH8lkzGQX8Pm
-         P3gNcKjGAZbPT8dXvMqlPZUt6Wu53JVGk+3rs7izRUnCgJtthhUUDKuEEOCISCv/c2+P
-         ULYzsBzpW6Obr8rGn8JH0twbKM/MuJipmSGsATfNsLKKfUl5aPWChVa2Bo7diujny/Hs
-         zjPw==
-X-Gm-Message-State: ANoB5plq7S4An8fY96h0RhEkZe1g4O4cbLcShvnm84PIHDiR7fhoY/Ky
-	47U6m1Vam0N+eNsz5RkL4Iw=
-X-Google-Smtp-Source: AA0mqf5UqnGI8UrmD8MiKudLAv9QQswJ7jkGOHAc+i4PkeipEyUbgd8djmZl9G7Q8dQDDdx+KvnmjQ==
-X-Received: by 2002:a17:907:a782:b0:7c1:6e82:35fc with SMTP id vx2-20020a170907a78200b007c16e8235fcmr25025941ejc.40.1671111392045;
-        Thu, 15 Dec 2022 05:36:32 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id l9-20020a1709060cc900b007b5903e595bsm7031780ejh.84.2022.12.15.05.36.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Dec 2022 05:36:31 -0800 (PST)
-Message-ID: <90b640af-1d81-64bf-96f7-24aa44cca2dd@gmail.com>
-Date: Thu, 15 Dec 2022 21:36:19 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F91F569B
+	for <kvmarm@lists.linux.dev>; Thu, 15 Dec 2022 18:12:27 +0000 (UTC)
+Date: Thu, 15 Dec 2022 18:12:14 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1671127939;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NR0RL3zpixZswsWefFQZYtOaaPkMaQgei0oRBq1daFM=;
+	b=hLEvw7pLYE0dgSwnXDsnPKUS/uso1iZ7ESDgITzTMi7HhtQpedIxSSY9l8NGreYhOa95Wh
+	Y6Qibd87eoQzB6BqcrAwtwJOw/KYydgFlCGkjGuBaw/dAc/htmNEZhlb/rik0/OKLVI/wR
+	sHdAsAC00DylzFzKaZ+tZRm0pxM3oMw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v1 00/12] KVM: arm64: Support FEAT_LPA2 at hyp s1 and vm
+ s2
+Message-ID: <Y5tjfmJRFY2pFlr4@google.com>
+References: <20221206135930.3277585-1-ryan.roberts@arm.com>
+ <Y5pvzKYdZK79nyZw@google.com>
+ <c19594a6-358b-c0de-b1f5-84de38015379@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.5.1
-Subject: Re: [PATCH RFC 1/8] perf/core: Add *group_leader to
- perf_event_create_kernel_counter()
-Content-Language: en-US
-To: Ravi Bangoria <ravi.bangoria@amd.com>,
- Peter Zijlstra <peterz@infradead.org>
-Cc: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Fenghua Yu <fenghua.yu@intel.com>, kvmarm@lists.linux.dev,
- linux-perf-users@vger.kernel.org
-References: <20221212125844.41157-1-likexu@tencent.com>
- <20221212125844.41157-2-likexu@tencent.com>
- <4990ef71-734a-10cf-e7dc-51b33b26fd18@amd.com>
-From: Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <4990ef71-734a-10cf-e7dc-51b33b26fd18@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c19594a6-358b-c0de-b1f5-84de38015379@arm.com>
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <20221215181214.jEqhJVytqc56jGF7zHRx069Dq_LYI7-AffPKfxi3lB0@z>
 
-On 14/12/2022 11:52 am, Ravi Bangoria wrote:
->> diff --git a/kernel/events/core.c b/kernel/events/core.c
->> index 7f04f995c975..f671b1a9a691 100644
->> --- a/kernel/events/core.c
->> +++ b/kernel/events/core.c
->> @@ -12674,12 +12674,14 @@ SYSCALL_DEFINE5(perf_event_open,
->>    * @attr: attributes of the counter to create
->>    * @cpu: cpu in which the counter is bound
->>    * @task: task to profile (NULL for percpu)
->> + * @group_leader: event group leader
->>    * @overflow_handler: callback to trigger when we hit the event
->>    * @context: context data could be used in overflow_handler callback
->>    */
->>   struct perf_event *
->>   perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
->>   				 struct task_struct *task,
->> +				 struct perf_event *group_leader,
->>   				 perf_overflow_handler_t overflow_handler,
->>   				 void *context)
->>   {
->> @@ -12694,7 +12696,7 @@ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
->>   	if (attr->aux_output)
->>   		return ERR_PTR(-EINVAL);
->>   
->> -	event = perf_event_alloc(attr, cpu, task, NULL, NULL,
->> +	event = perf_event_alloc(attr, cpu, task, group_leader, NULL,
->>   				 overflow_handler, context, -1);
+On Thu, Dec 15, 2022 at 09:33:17AM +0000, Ryan Roberts wrote:
+> On 15/12/2022 00:52, Oliver Upton wrote:
+> > On Tue, Dec 06, 2022 at 01:59:18PM +0000, Ryan Roberts wrote:
+> >> (appologies, I'm resending this series as I managed to send the cover letter to
+> >> all but the following patches only to myself on first attempt).
+> >>
+> >> This is my first upstream feature submission so please go easy ;-)
+> > 
+> > Welcome :)
+> > 
+> >> Support 52-bit Output Addresses: FEAT_LPA2 changes the format of the PTEs. The
+> >> HW advertises support for LPA2 independently for stage 1 and stage 2, and
+> >> therefore its possible to have it for one and not the other. I've assumed that
+> >> there is a valid case for this if stage 1 is not supported but stage 2 is, KVM
+> >> could still then use LPA2 at stage 2 to create a 52 bit IPA space (which could
+> >> then be consumed by a 64KB page guest kernel with the help of FEAT_LPA). Because
+> >> of this independence and the fact that the kvm pgtable library is used for both
+> >> stage 1 and stage 2 tables, this means the library now has to remember the
+> >> in-use format on a per-page-table basis. To do this, I had to rework some
+> >> functions to take a `struct kvm_pgtable *` parameter, and as a result, there is
+> >> a noisy patch to add this parameter.
+> > 
+> > Mismatch between the translation stages is an interesting problem...
+> > 
+> > Given that userspace is responsible for setting up the IPA space, I
+> > can't really think of a strong use case for 52 bit IPAs with a 48 bit
+> > VA. Sure, the VMM could construct a sparse IPA space or remap the same
+> > HVA at multiple IPAs to artificially saturate the address space, but
+> > neither seems terribly compelling.
+> > 
+> > Nonetheless, AFAICT we already allow this sort of mismatch on LPA &&
+> > !LVA systems. A 48 bit userspace could construct a 52 bit IPA space for
+> > its guest.
 > 
-> Grouping involves lot of complexities. Setting group_leader won't be sufficient.
-> Please see perf_event_open() syscall code for more detail.
-> 
-> Thanks,
-> Ravi
+> I guess a simpler approach would be to only use LPA2 if its supported by both
+> stage1 and stage2. Then the code could just use a static key in the few required
+> places.
 
-This is the main reason why the RFC tag is added. More detailed professional 
-reviews is encouraged.
+Ah, you caught on quick to what I was thinking :-)
 
-AFAI, there does exist a number of code gaps here to support grouped events in 
-the kernel,
-but there are also opportunities, as there may be other new use cases bringing 
-innovation.
+What I'm groaning about in particular is the changes to the TLB
+invalidation path, as it feels like a static key is warranted there.
+Nonetheless, it is all a bit of a mess depending on LPA2 support in both
+the kernel and KVM.
 
-I have to confirm this idea with maintainers first, the alternative is to create 
-yet another special
-perf_event similar to PMC_IDX_FIXED_VLBR, which schedules perf_metrics MSR for 
-KVM stuff.
-
-PeterZ, any input ?
+--
+Thanks,
+Oliver
