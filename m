@@ -2,79 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA1E2C4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 15 Dec 2022 09:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14C18C4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 15 Dec 2022 18:12:27 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A6E84B99E;
-	Thu, 15 Dec 2022 04:35:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 811304B7FC;
+	Thu, 15 Dec 2022 13:12:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZXFphIv2jBK2; Thu, 15 Dec 2022 04:35:52 -0500 (EST)
+	with ESMTP id Dp4O3n7riSDS; Thu, 15 Dec 2022 13:12:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22C7A4B8EC;
-	Thu, 15 Dec 2022 04:35:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 680D74B82B;
+	Thu, 15 Dec 2022 13:12:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAD284B8D5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Dec 2022 04:35:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 777814B828
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Dec 2022 13:12:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BvnRciQ8Qrf8 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Dec 2022 04:35:50 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 512AF4B8D1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Dec 2022 04:35:50 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 940F6B8169B;
- Thu, 15 Dec 2022 09:35:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37E7CC433EF;
- Thu, 15 Dec 2022 09:35:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1671096947;
- bh=rLFesypilBrGnzbTCpHcHD3EFyvffkyej22PhZqXN2g=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=iEt1o047x3244dDOObFe5Q9vnB/j2CjEWFFT9jp1G2G7MGAqLlQnbHBVfsVwRrlqI
- Mof2r+180bPGwjZwvaGQlKcTcwoSbLNaO6rC69UjNCzD7QnrDqhXOi7miqnanfxX98
- reTiiT/9aqjPBGLGysryw4rdzH3zBxZUyOXiYN2A/zxf0BwdxVrzUffemLdu2wrxe3
- 3k7u+yDUv7SjspMaST26q/MgRRmW5IYEyuLYrOvktgFIVTiGIUGlmxsizriR/PDj1e
- fIODM7uky1QuQfgnG85BfQZNXf25pPO09H0mQNf0DKVfjXhZiV8BqK2X6DKpophDls
- 9wNh2l2MeYBsQ==
-Received: from sofa.misterjones.org ([185.219.108.64]
- helo=goblin-girl.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1p5keW-00Co8M-OZ;
- Thu, 15 Dec 2022 09:35:44 +0000
-Date: Thu, 15 Dec 2022 09:35:44 +0000
-Message-ID: <86zgbpovpr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
+ with ESMTP id ZM0SE-cazSes for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Dec 2022 13:12:21 -0500 (EST)
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F16F34B825
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Dec 2022 13:12:20 -0500 (EST)
+Date: Thu, 15 Dec 2022 18:12:14 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1671127939;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=NR0RL3zpixZswsWefFQZYtOaaPkMaQgei0oRBq1daFM=;
+ b=hLEvw7pLYE0dgSwnXDsnPKUS/uso1iZ7ESDgITzTMi7HhtQpedIxSSY9l8NGreYhOa95Wh
+ Y6Qibd87eoQzB6BqcrAwtwJOw/KYydgFlCGkjGuBaw/dAc/htmNEZhlb/rik0/OKLVI/wR
+ sHdAsAC00DylzFzKaZ+tZRm0pxM3oMw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Ryan Roberts <ryan.roberts@arm.com>
 Subject: Re: [PATCH v1 00/12] KVM: arm64: Support FEAT_LPA2 at hyp s1 and vm s2
-In-Reply-To: <Y5pvzKYdZK79nyZw@google.com>
+Message-ID: <Y5tjfmJRFY2pFlr4@google.com>
 References: <20221206135930.3277585-1-ryan.roberts@arm.com>
  <Y5pvzKYdZK79nyZw@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, ryan.roberts@arm.com,
- catalin.marinas@arm.com, will@kernel.org, ardb@kernel.org,
- suzuki.poulose@arm.com, anshuman.khandual@arm.com, james.morse@arm.com,
- alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu,
- kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
- linux-arm-kernel@lists.infradead.org
+ <c19594a6-358b-c0de-b1f5-84de38015379@arm.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <c19594a6-358b-c0de-b1f5-84de38015379@arm.com>
+X-Migadu-Flow: FLOW_OUT
+Cc: Marc Zyngier <maz@kernel.org>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
+ Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,64 +70,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 15 Dec 2022 00:52:28 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Tue, Dec 06, 2022 at 01:59:18PM +0000, Ryan Roberts wrote:
-> > (appologies, I'm resending this series as I managed to send the cover letter to
-> > all but the following patches only to myself on first attempt).
+On Thu, Dec 15, 2022 at 09:33:17AM +0000, Ryan Roberts wrote:
+> On 15/12/2022 00:52, Oliver Upton wrote:
+> > On Tue, Dec 06, 2022 at 01:59:18PM +0000, Ryan Roberts wrote:
+> >> (appologies, I'm resending this series as I managed to send the cover letter to
+> >> all but the following patches only to myself on first attempt).
+> >>
+> >> This is my first upstream feature submission so please go easy ;-)
 > > 
-> > This is my first upstream feature submission so please go easy ;-)
+> > Welcome :)
+> > 
+> >> Support 52-bit Output Addresses: FEAT_LPA2 changes the format of the PTEs. The
+> >> HW advertises support for LPA2 independently for stage 1 and stage 2, and
+> >> therefore its possible to have it for one and not the other. I've assumed that
+> >> there is a valid case for this if stage 1 is not supported but stage 2 is, KVM
+> >> could still then use LPA2 at stage 2 to create a 52 bit IPA space (which could
+> >> then be consumed by a 64KB page guest kernel with the help of FEAT_LPA). Because
+> >> of this independence and the fact that the kvm pgtable library is used for both
+> >> stage 1 and stage 2 tables, this means the library now has to remember the
+> >> in-use format on a per-page-table basis. To do this, I had to rework some
+> >> functions to take a `struct kvm_pgtable *` parameter, and as a result, there is
+> >> a noisy patch to add this parameter.
+> > 
+> > Mismatch between the translation stages is an interesting problem...
+> > 
+> > Given that userspace is responsible for setting up the IPA space, I
+> > can't really think of a strong use case for 52 bit IPAs with a 48 bit
+> > VA. Sure, the VMM could construct a sparse IPA space or remap the same
+> > HVA at multiple IPAs to artificially saturate the address space, but
+> > neither seems terribly compelling.
+> > 
+> > Nonetheless, AFAICT we already allow this sort of mismatch on LPA &&
+> > !LVA systems. A 48 bit userspace could construct a 52 bit IPA space for
+> > its guest.
 > 
-> Welcome :)
-> 
-> > Support 52-bit Output Addresses: FEAT_LPA2 changes the format of
-> > the PTEs. The HW advertises support for LPA2 independently for
-> > stage 1 and stage 2, and therefore its possible to have it for one
-> > and not the other. I've assumed that there is a valid case for
-> > this if stage 1 is not supported but stage 2 is, KVM could still
-> > then use LPA2 at stage 2 to create a 52 bit IPA space (which could
-> > then be consumed by a 64KB page guest kernel with the help of
-> > FEAT_LPA). Because of this independence and the fact that the kvm
-> > pgtable library is used for both stage 1 and stage 2 tables, this
-> > means the library now has to remember the in-use format on a
-> > per-page-table basis. To do this, I had to rework some functions
-> > to take a `struct kvm_pgtable *` parameter, and as a result, there
-> > is a noisy patch to add this parameter.
-> 
-> Mismatch between the translation stages is an interesting problem...
-> 
-> Given that userspace is responsible for setting up the IPA space, I
-> can't really think of a strong use case for 52 bit IPAs with a 48 bit
-> VA. Sure, the VMM could construct a sparse IPA space or remap the same
-> HVA at multiple IPAs to artificially saturate the address space, but
-> neither seems terribly compelling.
-> 
-> Nonetheless, AFAICT we already allow this sort of mismatch on LPA &&
-> !LVA systems. A 48 bit userspace could construct a 52 bit IPA space for
-> its guest.
-> 
-> Marc, is there any real reason for this or is it just a byproduct of how
-> LPA support was added to KVM?
+> I guess a simpler approach would be to only use LPA2 if its supported by both
+> stage1 and stage2. Then the code could just use a static key in the few required
+> places.
 
-My recollection is hazy, but LPA came first, and LVA only landed much
-later (because the two features were made independent in the
-architecture, something that was later abandoned for LPA2, which
-implies large VAs as well).
+Ah, you caught on quick to what I was thinking :-)
 
-So yes, the VMM can place memory wherever it wants in the 52bit IPA
-space, even if its own VA space is limited to 48 bits. And it doesn't
-have to be memory, by the way. You could place all the emulated MMIO
-above the 48bit limit, for example, and that doesn't require any trick
-other than the HW supporting 52bit PAs, and VTCR_EL2 being correctly
-configured.
+What I'm groaning about in particular is the changes to the TLB
+invalidation path, as it feels like a static key is warranted there.
+Nonetheless, it is all a bit of a mess depending on LPA2 support in both
+the kernel and KVM.
 
+--
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
