@@ -2,76 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 238BEC4332F
-	for <kvmarm@archiver.kernel.org>; Sun, 18 Dec 2022 05:15:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 401C0C4332F
+	for <kvmarm@archiver.kernel.org>; Sun, 18 Dec 2022 05:15:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3DE641021;
-	Sun, 18 Dec 2022 00:15:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D509E4A105;
+	Sun, 18 Dec 2022 00:15:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered)
 	header.i=@daynix-com.20210112.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xyZbzAgoXMgC; Sun, 18 Dec 2022 00:15:35 -0500 (EST)
+	with ESMTP id hYb45LQHg4Gt; Sun, 18 Dec 2022 00:15:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CA144A105;
-	Sun, 18 Dec 2022 00:15:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B578843482;
+	Sun, 18 Dec 2022 00:15:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DA9B4B3F5
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Dec 2022 00:15:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 296B143482
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Dec 2022 00:15:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cMXWtOvwGHQf for <kvmarm@lists.cs.columbia.edu>;
- Sun, 18 Dec 2022 00:15:33 -0500 (EST)
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com
- [209.85.216.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 250854B5ED
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Dec 2022 00:15:33 -0500 (EST)
-Received: by mail-pj1-f41.google.com with SMTP id
- e7-20020a17090a77c700b00216928a3917so9946501pjs.4
- for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Dec 2022 21:15:33 -0800 (PST)
+ with ESMTP id 8zMIEbSYx3AO for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 18 Dec 2022 00:15:37 -0500 (EST)
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com
+ [209.85.216.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C2B7410FF
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Dec 2022 00:15:37 -0500 (EST)
+Received: by mail-pj1-f46.google.com with SMTP id js9so6155381pjb.2
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Dec 2022 21:15:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=daynix-com.20210112.gappssmtp.com; s=20210112;
  h=content-transfer-encoding:mime-version:references:in-reply-to
  :message-id:date:subject:cc:to:from:from:to:cc:subject:date
  :message-id:reply-to;
- bh=fOI4ejQZZiODftrBSHrXI1yj065pP5UP36eyaXzR3dw=;
- b=5vOoY2ROQYHTbYM3+RnIE9hlmPwzzQgFUeowIh+C/4V9gTf+l5bnTa2QzkNUnqQwxr
- 3GgkF6GUjCXw9MZFqkdBaBeMYIL59Cc0WtqAI9/oj1HmwjGy3flLLlS8WOMO6Pbob/Gx
- jfGlhJe3VFYnBiWMGf8du0YwYHYTQB0gnZUmWqLr2GwB9S6eTRGdZdtbF+a+mxGQ8lVb
- 8Mj1VU5avG7zyE24Rk/OHZnHGBhit9avvW+NyeY4DKssVug5N7YvvKNSYQPL3FBzsHI8
- 0DgZwsBfWfirRYsZFPZKwCAEOdbAIL0GAH+UYx221RmJDoHsYlz8pxB7RMqDMZ1rho4b
- 1x3g==
+ bh=4WsGIW0prujF8xnGwWysGoOLhN4qrtpWJqnT9WJSTvs=;
+ b=20KqTZ7p9hZYfryC+Vfixvt3usjH4QB21HhVNGKbyBUuo9FRcdt5pDtUHZ0C4OB00k
+ Pxkb4TBy4j5Ucx4LvEqYvxz/DBSczM93egGac/fvIai58XcwYxQmzbaOaTH5tfndBTxj
+ JRi/iiyrq7N9LEDYbMOd0d/shMofzgLH7ExucYoWaDUQvs4RFnTKTKgOLHcox3BCkcz/
+ qlDlCjh4+wKxwbqjTtDSlSaAePBt7ceu4mPvnka+GHbiTPbBdhbiA/SQ5rGpvs+PtiGm
+ YBbNd2hkCWttAqwAgUDSjtnqR+YIhmIQXXDUneGSDReHXU81LIFM9OiZ2/6KYcqPMIQp
+ yPwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=content-transfer-encoding:mime-version:references:in-reply-to
  :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
  :subject:date:message-id:reply-to;
- bh=fOI4ejQZZiODftrBSHrXI1yj065pP5UP36eyaXzR3dw=;
- b=cIYyLhlFn8DGuEFRueqcXuGsO7QDK5zVQ6btXvcHY2BsgAbLmKJpcOCnym/bP9wJVG
- wy8Gbzcx0Nb2zWZ9RKVCujINI4tXTX0+W0ppPZx84BtZBz+zWFJcor2Y/OOVyjQScYSz
- Ig9GgkD/WyyQil1vf4rlRPdn6Hq7i5tUnJ1PCkH/cSEH++4qERyT21h3TavOwA2Bz4tV
- DAC0pBedB94WU1N3UtVo3LaJARcWvC99grKf+2rrb8PgWcgE7Vxs9H/CqJ4iSHMXSoyw
- iZDpE0gls+ZJhtIMIOdvQ2VVpMyY9KaHbG2GFkrh8sfwAR2KD54n1LTykoCD8bwSRKDD
- 1c9Q==
-X-Gm-Message-State: ANoB5plC2tm6ljQGHDzEAhEdmP6VOaDJscVLCXcvN7xL+k2nAlY5ZqPi
- aBt5nXMXZ4Np0o3q3A0ZSa88wA==
-X-Google-Smtp-Source: AA0mqf40ve5metyNeR9pqP85whi8pYrughaxn166zWUj52zuKSORgShjFuv3JDhVbBqfLRVYmrDThQ==
-X-Received: by 2002:a17:90a:f681:b0:219:6bf0:9861 with SMTP id
- cl1-20020a17090af68100b002196bf09861mr39034573pjb.10.1671340532431; 
- Sat, 17 Dec 2022 21:15:32 -0800 (PST)
+ bh=4WsGIW0prujF8xnGwWysGoOLhN4qrtpWJqnT9WJSTvs=;
+ b=j7C/99utLY41QAzyMcDF09vOLynip879Gik3rwM2gRiNOR7LiNDlwtPfdNS2ufNrt1
+ R+VvQM9mAPN1uGVCyF89Kjo4/H+Foj04XYXqT9jaVAjJ7XmdUP3XYPo4OimEdRmCSgz5
+ 2FqN2kHClXwT4kkUHpEULSVka8H6Iy2zq1VC4E/OvsPIo4QaIrXNbngARJI/5PXFpHc/
+ EGHr1lwKqt9dQjMp7asStIL60AnRsSp9KJUXtP6/4qtphMPL+WgPs7bOr39LjJ1sQmKX
+ rpNhtqZioDxH1DJZZk313EW5UX6Lp/rYFq+4ae4MJ+e6KqOnJPrl7Za20fV8Glbfisa7
+ rSOg==
+X-Gm-Message-State: AFqh2kqCOsodmMhFCW0TXtBI+t5W5Y+K6lGK9xI5kH7BmwaLsrH2sPUv
+ d7S9SafZv3xHD+IboccT8zGLow==
+X-Google-Smtp-Source: AMrXdXtRnhfNE+X0n0H526OoGg60rNUh3zsQ7HI3r0L3dVAMmDfmA+k1y46jlVAC89lTx/mkAJPjBw==
+X-Received: by 2002:a17:90a:2eca:b0:223:b920:28df with SMTP id
+ h10-20020a17090a2eca00b00223b92028dfmr1736781pjs.29.1671340536313; 
+ Sat, 17 Dec 2022 21:15:36 -0800 (PST)
 Received: from fedora.flets-east.jp ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
  by smtp.gmail.com with ESMTPSA id
- b1-20020a17090a6ac100b002139459e121sm7002417pjm.27.2022.12.17.21.15.28
+ b1-20020a17090a6ac100b002139459e121sm7002417pjm.27.2022.12.17.21.15.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 17 Dec 2022 21:15:32 -0800 (PST)
+ Sat, 17 Dec 2022 21:15:35 -0800 (PST)
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
 To: 
-Subject: [PATCH v3 2/7] arm64/sysreg: Add CCSIDR2_EL1
-Date: Sun, 18 Dec 2022 14:14:07 +0900
-Message-Id: <20221218051412.384657-3-akihiko.odaki@daynix.com>
+Subject: [PATCH v3 3/7] arm64/cache: Move CLIDR macro definitions
+Date: Sun, 18 Dec 2022 14:14:08 +0900
+Message-Id: <20221218051412.384657-4-akihiko.odaki@daynix.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221218051412.384657-1-akihiko.odaki@daynix.com>
 References: <20221218051412.384657-1-akihiko.odaki@daynix.com>
@@ -99,29 +98,48 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-CCSIDR2_EL1 was added with FEAT_CCIDX.
+The macros are useful for KVM which needs to manage how CLIDR is exposed
+to vcpu so move them to include/asm/cache.h, which KVM can refer to.
 
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 ---
- arch/arm64/tools/sysreg | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm64/include/asm/cache.h | 6 ++++++
+ arch/arm64/kernel/cacheinfo.c  | 5 -----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index acc79b5ccf92..0a302b4e6d7a 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -898,6 +898,11 @@ Field	5:3	Ctype2
- Field	2:0	Ctype1
- EndSysreg
+diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
+index c0b178d1bb4f..ab7133654a72 100644
+--- a/arch/arm64/include/asm/cache.h
++++ b/arch/arm64/include/asm/cache.h
+@@ -16,6 +16,12 @@
+ #define CLIDR_LOC(clidr)	(((clidr) >> CLIDR_LOC_SHIFT) & 0x7)
+ #define CLIDR_LOUIS(clidr)	(((clidr) >> CLIDR_LOUIS_SHIFT) & 0x7)
  
-+Sysreg	CCSIDR2_EL1	3	1	0	0	2
-+Res0	63:24
-+Field	23:0	NumSets
-+EndSysreg
++/* Ctypen, bits[3(n - 1) + 2 : 3(n - 1)], for n = 1 to 7 */
++#define CLIDR_CTYPE_SHIFT(level)	(3 * (level - 1))
++#define CLIDR_CTYPE_MASK(level)		(7 << CLIDR_CTYPE_SHIFT(level))
++#define CLIDR_CTYPE(clidr, level)	\
++	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
 +
- Sysreg	GMID_EL1	3	1	0	0	4
- Res0	63:4
- Field	3:0	BS
+ /*
+  * Memory returned by kmalloc() may be used for DMA, so we must make
+  * sure that all such allocations are cache aligned. Otherwise,
+diff --git a/arch/arm64/kernel/cacheinfo.c b/arch/arm64/kernel/cacheinfo.c
+index 97c42be71338..daa7b3f55997 100644
+--- a/arch/arm64/kernel/cacheinfo.c
++++ b/arch/arm64/kernel/cacheinfo.c
+@@ -11,11 +11,6 @@
+ #include <linux/of.h>
+ 
+ #define MAX_CACHE_LEVEL			7	/* Max 7 level supported */
+-/* Ctypen, bits[3(n - 1) + 2 : 3(n - 1)], for n = 1 to 7 */
+-#define CLIDR_CTYPE_SHIFT(level)	(3 * (level - 1))
+-#define CLIDR_CTYPE_MASK(level)		(7 << CLIDR_CTYPE_SHIFT(level))
+-#define CLIDR_CTYPE(clidr, level)	\
+-	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
+ 
+ int cache_line_size(void)
+ {
 -- 
 2.38.1
 
