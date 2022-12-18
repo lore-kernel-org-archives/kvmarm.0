@@ -1,152 +1,257 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE57EA5
-	for <kvmarm@lists.linux.dev>; Sun, 18 Dec 2022 11:35:18 +0000 (UTC)
-Received: by mail-pj1-f41.google.com with SMTP id u15-20020a17090a3fcf00b002191825cf02so6464368pjm.2
-        for <kvmarm@lists.linux.dev>; Sun, 18 Dec 2022 03:35:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rty+gpqd+eA6AphifEAmmJ4M709v9JxSpj7F1QZvTIc=;
-        b=rX1F2dWgXZwxuIDJaP6FADhEdITe6iLUWSgTYipr1uRJNKw7uwoOTxiZvmH5N4m2SF
-         vwLh8iOkGzm1i0EJpfLfyK10qF2lfES2JC93yZliwxDFMUsA1qasbEHIUJppUrhwyxiX
-         V1OEK/wWL6fLDtsMPy5vuoY6nv4UtQRi9EpZ1PCQaWGIQiaVpEiVPlW8ag8XpfrV58WG
-         Dk8jBOQuJFSnHaK9DTGyqLY13fzpkO71ksuD53JkP7CCwiiQJPIU2b5+WSzUSKXLla6P
-         zGgJCMicombA2/LP6pYJPuXeY/qsFTYfMpla0OvqwTcZ6WyZLI4e0PJVfMUl4HceKn5l
-         57ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rty+gpqd+eA6AphifEAmmJ4M709v9JxSpj7F1QZvTIc=;
-        b=qaw3DrD/DK8Y+EYOp/9RKPuejx7nwNST8qwoyDcfzPvNwIqRFKireE5Tsj73XJtD0w
-         H8INeOEU3OAnW42iuci9W1ABa9hXSzB1OJTRzMnD123aCmbldSgCBFlJw5Wjt7l2tWVa
-         HDfK8i1omw6+Nmh/+sbeW29sTo5862SPFGf8P49/DZ6KL1e0lHr7j2mBirn6uwyRKw42
-         iKhvElf4/nfTE+dowFJ3YDPRRGoEDKWSqdou/GNs9sqpuOfiWLsYZoet5BWZIssvXsGl
-         97fJa0nD4tgw3BIA8Cxkc5Es5bAz/vwDcr0P5ybhWkwlBy49iKdptXCU7PiRyOWfZi8e
-         z2SQ==
-X-Gm-Message-State: ANoB5pktLxtqeiIdnumEkbc1izKRp20J4zMw6iCqXLoggyXWAWbqbsR2
-	4PniYi3+bBpFB7Iz6CxSEOikPw==
-X-Google-Smtp-Source: AA0mqf74k04nAvEcKiP5y4JIHLcCk6t+UInE5HPcz0u12pjKwMJYmzyuAUgg9V5xtJ6hJ6Zw9pRPnw==
-X-Received: by 2002:a17:90a:20e:b0:213:18f3:68d1 with SMTP id c14-20020a17090a020e00b0021318f368d1mr40701969pjc.29.1671363318359;
-        Sun, 18 Dec 2022 03:35:18 -0800 (PST)
-Received: from ?IPV6:2400:4050:c360:8200:8ae8:3c4:c0da:7419? ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
-        by smtp.gmail.com with ESMTPSA id s92-20020a17090a2f6500b002191873187dsm7562502pjd.33.2022.12.18.03.35.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 18 Dec 2022 03:35:17 -0800 (PST)
-Message-ID: <1ef32b0c-6cee-75f7-e1e0-ede1f5b9a016@daynix.com>
-Date: Sun, 18 Dec 2022 20:35:12 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C60510E3;
+	Sun, 18 Dec 2022 13:13:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D71DFC433EF;
+	Sun, 18 Dec 2022 13:13:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1671369218;
+	bh=0hPFIoqG1pb5r61Kc7fAqelgV4PDptfCI2Zixp9Czww=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=O728Eyg27YQRWVtfaRew+4AvR3pwX0ixk0HZrFoBGhHOMVQeWYkF6NwcLBbuB48//
+	 GUFIIaXp/ib7Gf3k03s+l10ggGZH6ZgF+DcKyLSz+zI8w/J/qCP6/jK2JG1NtXR0LO
+	 UfZTcyt4XuJ6zhpar+la/pcUc9Apdl508e1Z72eBPZ/1tOcBpowyqRZS5U19nCUzNN
+	 9i9U2afJjODUm2eT/pvXUezEt9Q8Layrv6WtZL5G3sf1jXAPGox7gSCL8lJgYScqfu
+	 W22dYPT4gKbKKXC5oiqNsa9SRqZlEQsIQyI1ok5wiZXvVlftc/ZQ0FQb8uxr1Zfcms
+	 XYn6PbADXMNKA==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1p6tU0-00DR6V-83;
+	Sun, 18 Dec 2022 13:13:36 +0000
+Date: Sun, 18 Dec 2022 13:11:01 +0000
+Message-ID: <87bko0g8m2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	linux-arm-kernel@lists.infradead.org,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	asahi@lists.linux.dev,
+	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+	Sven Peter <sven@svenpeter.dev>,
+	Hector Martin <marcan@marcan.st>
+Subject: Re: [PATCH v3 1/7] arm64/sysreg: Convert CCSIDR_EL1 to automatic generation
+In-Reply-To: <1ef32b0c-6cee-75f7-e1e0-ede1f5b9a016@daynix.com>
+References: <20221218051412.384657-1-akihiko.odaki@daynix.com>
+	<20221218051412.384657-2-akihiko.odaki@daynix.com>
+	<87cz8hez0i.wl-maz@kernel.org>
+	<1ef32b0c-6cee-75f7-e1e0-ede1f5b9a016@daynix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: [PATCH v3 1/7] arm64/sysreg: Convert CCSIDR_EL1 to automatic
- generation
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- James Morse <james.morse@arm.com>, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, asahi@lists.linux.dev,
- Alyssa Rosenzweig <alyssa@rosenzweig.io>, Sven Peter <sven@svenpeter.dev>,
- Hector Martin <marcan@marcan.st>
-References: <20221218051412.384657-1-akihiko.odaki@daynix.com>
- <20221218051412.384657-2-akihiko.odaki@daynix.com>
- <87cz8hez0i.wl-maz@kernel.org>
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <87cz8hez0i.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-ID: <20221218113512.pI6Q2f2u1kYQx0N9rMjayiHLdngSHL38ehjXbj7YL1Q@z>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: akihiko.odaki@daynix.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, mathieu.poirier@linaro.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, alexandru.elisei@arm.com, james.morse@arm.com, will@kernel.org, catalin.marinas@arm.com, asahi@lists.linux.dev, alyssa@rosenzweig.io, sven@svenpeter.dev, marcan@marcan.st
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221218131101.o9Zvn45LkkWzNnTZTHVmct_f_2ujwkr2ktNwbuUkZcI@z>
 
-On 2022/12/18 20:23, Marc Zyngier wrote:
-> On Sun, 18 Dec 2022 05:14:06 +0000,
-> Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> Convert CCSIDR_EL1 to automatic generation as per DDI0487I.a. The field
->> definition is for case when FEAT_CCIDX is not implemented. Fields WT,
->> WB, RA and WA are defined as per A.j since they are now reserved and
->> may have UNKNOWN values in I.a, which the file format cannot represent.
->>
->> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->> ---
->>   arch/arm64/include/asm/sysreg.h |  1 -
->>   arch/arm64/tools/sysreg         | 11 +++++++++++
->>   2 files changed, 11 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
->> index 7d301700d1a9..910e960661d3 100644
->> --- a/arch/arm64/include/asm/sysreg.h
->> +++ b/arch/arm64/include/asm/sysreg.h
->> @@ -425,7 +425,6 @@
->>   
->>   #define SYS_CNTKCTL_EL1			sys_reg(3, 0, 14, 1, 0)
->>   
->> -#define SYS_CCSIDR_EL1			sys_reg(3, 1, 0, 0, 0)
->>   #define SYS_AIDR_EL1			sys_reg(3, 1, 0, 0, 7)
->>   
->>   #define SYS_RNDR_EL0			sys_reg(3, 3, 2, 4, 0)
->> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
->> index 384757a7eda9..acc79b5ccf92 100644
->> --- a/arch/arm64/tools/sysreg
->> +++ b/arch/arm64/tools/sysreg
->> @@ -871,6 +871,17 @@ Sysreg	SCXTNUM_EL1	3	0	13	0	7
->>   Field	63:0	SoftwareContextNumber
->>   EndSysreg
->>   
->> +Sysreg	CCSIDR_EL1	3	1	0	0	0
->> +Res0	63:32
->> +Field	31:31	WT
->> +Field	30:30	WB
->> +Field	29:29	RA
->> +Field	28:28	WA
-> 
-> For fields described as a single bit, the tool supports simply
-> indicating the bit number (28 rather than 28:28).
-> 
-> However, I strongly recommend against describing fields that have been
-> dropped from the architecture.  This only happens when these fields
-> are never used by any implementation, so describing them is at best
-> useless.
+On Sun, 18 Dec 2022 11:35:12 +0000,
+Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>=20
+> On 2022/12/18 20:23, Marc Zyngier wrote:
+> > On Sun, 18 Dec 2022 05:14:06 +0000,
+> > Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+> >>=20
+> >> Convert CCSIDR_EL1 to automatic generation as per DDI0487I.a. The field
+> >> definition is for case when FEAT_CCIDX is not implemented. Fields WT,
+> >> WB, RA and WA are defined as per A.j since they are now reserved and
+> >> may have UNKNOWN values in I.a, which the file format cannot represent.
+> >>=20
+> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >> ---
+> >>   arch/arm64/include/asm/sysreg.h |  1 -
+> >>   arch/arm64/tools/sysreg         | 11 +++++++++++
+> >>   2 files changed, 11 insertions(+), 1 deletion(-)
+> >>=20
+> >> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/=
+sysreg.h
+> >> index 7d301700d1a9..910e960661d3 100644
+> >> --- a/arch/arm64/include/asm/sysreg.h
+> >> +++ b/arch/arm64/include/asm/sysreg.h
+> >> @@ -425,7 +425,6 @@
+> >>     #define SYS_CNTKCTL_EL1			sys_reg(3, 0, 14, 1,
+> >> 0)
+> >>   -#define SYS_CCSIDR_EL1			sys_reg(3, 1, 0, 0, 0)
+> >>   #define SYS_AIDR_EL1			sys_reg(3, 1, 0, 0, 7)
+> >>     #define SYS_RNDR_EL0			sys_reg(3, 3, 2, 4, 0)
+> >> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> >> index 384757a7eda9..acc79b5ccf92 100644
+> >> --- a/arch/arm64/tools/sysreg
+> >> +++ b/arch/arm64/tools/sysreg
+> >> @@ -871,6 +871,17 @@ Sysreg	SCXTNUM_EL1	3	0	13	0	7
+> >>   Field	63:0	SoftwareContextNumber
+> >>   EndSysreg
+> >>   +Sysreg	CCSIDR_EL1	3	1	0	0	0
+> >> +Res0	63:32
+> >> +Field	31:31	WT
+> >> +Field	30:30	WB
+> >> +Field	29:29	RA
+> >> +Field	28:28	WA
+> >=20
+> > For fields described as a single bit, the tool supports simply
+> > indicating the bit number (28 rather than 28:28).
+> >=20
+> > However, I strongly recommend against describing fields that have been
+> > dropped from the architecture.  This only happens when these fields
+> > are never used by any implementation, so describing them is at best
+> > useless.
+>=20
+> arch/arm64/tools/gen-sysreg.awk does not allow a hole and requires all
+> bits are described hence these descriptions. If you have an
+> alternative idea I'd like to hear.
 
-arch/arm64/tools/gen-sysreg.awk does not allow a hole and requires all 
-bits are described hence these descriptions. If you have an alternative 
-idea I'd like to hear.
+I'd simply suggest creating an UNKNOWN field encompassing bits
+[21:28]. Alternatively, feel free to try the patch below, which allows
+you to describe these 4 bits as "Unkn	31:28", similar to Res0/Res1.
 
-> 
->> +Field	27:13	NumSets
->> +Field	12:3	Associavity
->> +Field	2:0	LineSize
->> +EndSysreg
->> +
-> 
-> I don't think we have a good solution for overlapping fields that
-> depend on other factors, either contextual (such as a mode that
-> changes the layout of a sysreg), or architecture warts such as
-> FEAT_CCIDX (which changes the layout of a well-known sysreg).
-> 
-> At least, put a comment here that indicates the context of the
-> description.
+>
+> >=20
+> >> +Field	27:13	NumSets
+> >> +Field	12:3	Associavity
 
-Sounds good. I'll do so with the next version.
+Also, you may want to fix the typo here (Associativity).
 
-Regards,
-Akihiko Odaki
+Thanks,
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
+	M.
+
+=46rom 3112be25ec785de4c92d11d5964d54f216a2289c Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Sun, 18 Dec 2022 12:55:23 +0000
+Subject: [PATCH] arm64: Allow the definition of UNKNOWN system register fie=
+lds
+
+The CCSIDR_EL1 register contains an UNKNOWN field (which replaces
+fields that were actually defined in previous revisions of the
+architecture).
+
+Define an 'Unkn' field type modeled after the Res0/Res1 types
+to allow such description. This allows the generation of
+
+  #define CCSIDR_EL1_UNKN     (UL(0) | GENMASK_ULL(31, 28))
+
+which may have its use one day. Hopefully the architecture doesn't
+add too many of those in the future.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/tools/gen-sysreg.awk | 20 +++++++++++++++++++-
+ arch/arm64/tools/sysreg         |  2 ++
+ 2 files changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.=
+awk
+index c350164a3955..e1df4b956596 100755
+--- a/arch/arm64/tools/gen-sysreg.awk
++++ b/arch/arm64/tools/gen-sysreg.awk
+@@ -98,6 +98,7 @@ END {
+=20
+ 	res0 =3D "UL(0)"
+ 	res1 =3D "UL(0)"
++	unkn =3D "UL(0)"
+=20
+ 	next_bit =3D 63
+=20
+@@ -112,11 +113,13 @@ END {
+=20
+ 	define(reg "_RES0", "(" res0 ")")
+ 	define(reg "_RES1", "(" res1 ")")
++	define(reg "_UNKN", "(" unkn ")")
+ 	print ""
+=20
+ 	reg =3D null
+ 	res0 =3D null
+ 	res1 =3D null
++	unkn =3D null
+=20
+ 	next
+ }
+@@ -134,6 +137,7 @@ END {
+=20
+ 	res0 =3D "UL(0)"
+ 	res1 =3D "UL(0)"
++	unkn =3D "UL(0)"
+=20
+ 	define("REG_" reg, "S" op0 "_" op1 "_C" crn "_C" crm "_" op2)
+ 	define("SYS_" reg, "sys_reg(" op0 ", " op1 ", " crn ", " crm ", " op2 ")")
+@@ -161,7 +165,9 @@ END {
+ 		define(reg "_RES0", "(" res0 ")")
+ 	if (res1 !=3D null)
+ 		define(reg "_RES1", "(" res1 ")")
+-	if (res0 !=3D null || res1 !=3D null)
++	if (unkn !=3D null)
++		define(reg "_UNKN", "(" unkn ")")
++	if (res0 !=3D null || res1 !=3D null || unkn !=3D null)
+ 		print ""
+=20
+ 	reg =3D null
+@@ -172,6 +178,7 @@ END {
+ 	op2 =3D null
+ 	res0 =3D null
+ 	res1 =3D null
++	unkn =3D null
+=20
+ 	next
+ }
+@@ -190,6 +197,7 @@ END {
+         next_bit =3D 0
+ 	res0 =3D null
+ 	res1 =3D null
++	unkn =3D null
+=20
+ 	next
+ }
+@@ -215,6 +223,16 @@ END {
+ 	next
+ }
+=20
++/^Unkn/ && (block =3D=3D "Sysreg" || block =3D=3D "SysregFields") {
++	expect_fields(2)
++	parse_bitdef(reg, "UNKN", $2)
++	field =3D "UNKN_" msb "_" lsb
++
++	unkn =3D unkn " | GENMASK_ULL(" msb ", " lsb ")"
++
++	next
++}
++
+ /^Field/ && (block =3D=3D "Sysreg" || block =3D=3D "SysregFields") {
+ 	expect_fields(3)
+ 	field =3D $3
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index bd5fceb26c54..472f68f020d9 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -15,6 +15,8 @@
+=20
+ # Res1	<msb>[:<lsb>]
+=20
++# Unkn	<msb>[:<lsb>]
++
+ # Field	<msb>[:<lsb>]	<name>
+=20
+ # Enum	<msb>[:<lsb>]	<name>
+--=20
+2.34.1
+
+
+--=20
+Without deviation from the norm, progress is not possible.
