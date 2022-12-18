@@ -2,70 +2,67 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55F79C4332F
-	for <kvmarm@archiver.kernel.org>; Sun, 18 Dec 2022 13:13:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A70C7C4332F
+	for <kvmarm@archiver.kernel.org>; Sun, 18 Dec 2022 21:18:32 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C91324B1B7;
-	Sun, 18 Dec 2022 08:13:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E01944B24D;
+	Sun, 18 Dec 2022 16:18:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5hkwze1SMTdB; Sun, 18 Dec 2022 08:13:44 -0500 (EST)
+	with ESMTP id izH+-G4tcYgb; Sun, 18 Dec 2022 16:18:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D80D4B27F;
-	Sun, 18 Dec 2022 08:13:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 877134B269;
+	Sun, 18 Dec 2022 16:18:30 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F3D54B1B7
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Dec 2022 08:13:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6993A4B24D
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Dec 2022 16:18:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 39i34EzXtj4D for <kvmarm@lists.cs.columbia.edu>;
- Sun, 18 Dec 2022 08:13:41 -0500 (EST)
+ with ESMTP id moFfvTRV42zz for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 18 Dec 2022 16:18:28 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 93FB043399
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Dec 2022 08:13:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D2C3943C58
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Dec 2022 16:18:27 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 3AA9BB80A26;
- Sun, 18 Dec 2022 13:13:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D71DFC433EF;
- Sun, 18 Dec 2022 13:13:38 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 807F4B80BEA;
+ Sun, 18 Dec 2022 21:18:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0039DC433D2;
+ Sun, 18 Dec 2022 21:18:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1671369218;
- bh=0hPFIoqG1pb5r61Kc7fAqelgV4PDptfCI2Zixp9Czww=;
+ s=k20201202; t=1671398305;
+ bh=qLS0rSzcRsrXELdh8lmseiGlAPNnrqeSC/zlmeZ4MmI=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=O728Eyg27YQRWVtfaRew+4AvR3pwX0ixk0HZrFoBGhHOMVQeWYkF6NwcLBbuB48//
- GUFIIaXp/ib7Gf3k03s+l10ggGZH6ZgF+DcKyLSz+zI8w/J/qCP6/jK2JG1NtXR0LO
- UfZTcyt4XuJ6zhpar+la/pcUc9Apdl508e1Z72eBPZ/1tOcBpowyqRZS5U19nCUzNN
- 9i9U2afJjODUm2eT/pvXUezEt9Q8Layrv6WtZL5G3sf1jXAPGox7gSCL8lJgYScqfu
- W22dYPT4gKbKKXC5oiqNsa9SRqZlEQsIQyI1ok5wiZXvVlftc/ZQ0FQb8uxr1Zfcms
- XYn6PbADXMNKA==
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29]
+ b=UFtwRkNV+FvyAvbN5wkROFPPPf5ex2bKaFI+B3griikv6/g21UROYm+iu5mZWhGmp
+ VVjCkbnxLGzKH3vKPXB4xWrp1LhNV6yup97xMu3t8xm/N1eS8oIasjHAWe4qxKKwpD
+ x8cHv4sIZ7oGIhQoRFsz9fv8fcHtQg4f+l7HmcdIyUuoQueBVxPI8wHJtQYm0xlhuF
+ 2PsIEuo1FHMi1a3UqCPA6vOsks8E1Nbk+fopjQ315nAMIoRSLLrckn4dvcJ7yNGi9r
+ TfbNKZvfIzQkQdJRfwyFcb4MkBe3bmtt8JredyOeoxc11BExg1B/6Vduquj9HSJINv
+ yYmPoZ5mKOPNg==
+Received: from sofa.misterjones.org ([185.219.108.64]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1p6tU0-00DR6V-83;
- Sun, 18 Dec 2022 13:13:36 +0000
-Date: Sun, 18 Dec 2022 13:11:01 +0000
-Message-ID: <87bko0g8m2.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1p7138-00DWZl-JL;
+ Sun, 18 Dec 2022 21:18:22 +0000
+Date: Sun, 18 Dec 2022 21:16:53 +0000
+Message-ID: <87a63kfm4a.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: Re: [PATCH v3 1/7] arm64/sysreg: Convert CCSIDR_EL1 to automatic
- generation
-In-Reply-To: <1ef32b0c-6cee-75f7-e1e0-ede1f5b9a016@daynix.com>
+Subject: Re: [PATCH v3 5/7] KVM: arm64: Allow user to set CCSIDR_EL1
+In-Reply-To: <20221218051412.384657-6-akihiko.odaki@daynix.com>
 References: <20221218051412.384657-1-akihiko.odaki@daynix.com>
- <20221218051412.384657-2-akihiko.odaki@daynix.com>
- <87cz8hez0i.wl-maz@kernel.org>
- <1ef32b0c-6cee-75f7-e1e0-ede1f5b9a016@daynix.com>
+ <20221218051412.384657-6-akihiko.odaki@daynix.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: akihiko.odaki@daynix.com, linux-kernel@vger.kernel.org,
  kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org, mathieu.poirier@linaro.org,
@@ -98,192 +95,182 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, 18 Dec 2022 11:35:12 +0000,
+On Sun, 18 Dec 2022 05:14:10 +0000,
 Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
 > 
-> On 2022/12/18 20:23, Marc Zyngier wrote:
-> > On Sun, 18 Dec 2022 05:14:06 +0000,
-> > Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
-> >> 
-> >> Convert CCSIDR_EL1 to automatic generation as per DDI0487I.a. The field
-> >> definition is for case when FEAT_CCIDX is not implemented. Fields WT,
-> >> WB, RA and WA are defined as per A.j since they are now reserved and
-> >> may have UNKNOWN values in I.a, which the file format cannot represent.
-> >> 
-> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> >> ---
-> >>   arch/arm64/include/asm/sysreg.h |  1 -
-> >>   arch/arm64/tools/sysreg         | 11 +++++++++++
-> >>   2 files changed, 11 insertions(+), 1 deletion(-)
-> >> 
-> >> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> >> index 7d301700d1a9..910e960661d3 100644
-> >> --- a/arch/arm64/include/asm/sysreg.h
-> >> +++ b/arch/arm64/include/asm/sysreg.h
-> >> @@ -425,7 +425,6 @@
-> >>     #define SYS_CNTKCTL_EL1			sys_reg(3, 0, 14, 1,
-> >> 0)
-> >>   -#define SYS_CCSIDR_EL1			sys_reg(3, 1, 0, 0, 0)
-> >>   #define SYS_AIDR_EL1			sys_reg(3, 1, 0, 0, 7)
-> >>     #define SYS_RNDR_EL0			sys_reg(3, 3, 2, 4, 0)
-> >> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> >> index 384757a7eda9..acc79b5ccf92 100644
-> >> --- a/arch/arm64/tools/sysreg
-> >> +++ b/arch/arm64/tools/sysreg
-> >> @@ -871,6 +871,17 @@ Sysreg	SCXTNUM_EL1	3	0	13	0	7
-> >>   Field	63:0	SoftwareContextNumber
-> >>   EndSysreg
-> >>   +Sysreg	CCSIDR_EL1	3	1	0	0	0
-> >> +Res0	63:32
-> >> +Field	31:31	WT
-> >> +Field	30:30	WB
-> >> +Field	29:29	RA
-> >> +Field	28:28	WA
-> > 
-> > For fields described as a single bit, the tool supports simply
-> > indicating the bit number (28 rather than 28:28).
-> > 
-> > However, I strongly recommend against describing fields that have been
-> > dropped from the architecture.  This only happens when these fields
-> > are never used by any implementation, so describing them is at best
-> > useless.
+> Allow the userspace to set CCSIDR_EL1 so that if the kernel changes the
+> default values of CCSIDR_EL1, the userspace can restore the old values
+> from an old saved VM context.
 > 
-> arch/arm64/tools/gen-sysreg.awk does not allow a hole and requires all
-> bits are described hence these descriptions. If you have an
-> alternative idea I'd like to hear.
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |   3 +
+>  arch/arm64/kvm/reset.c            |   1 +
+>  arch/arm64/kvm/sys_regs.c         | 116 ++++++++++++++++++++----------
+>  3 files changed, 83 insertions(+), 37 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index cc2ede0eaed4..cfc6930efe1b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -417,6 +417,9 @@ struct kvm_vcpu_arch {
+>  		u64 last_steal;
+>  		gpa_t base;
+>  	} steal;
+> +
+> +	/* Per-vcpu CCSIDR override or NULL */
+> +	u32 *ccsidr;
+>  };
+>  
+>  /*
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 5ae18472205a..7980983dbad7 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -157,6 +157,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  	if (sve_state)
+>  		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
+>  	kfree(sve_state);
+> +	kfree(vcpu->arch.ccsidr);
+>  }
+>  
+>  static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index f4a7c5abcbca..f48a3cc38d24 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -87,11 +87,27 @@ static u32 cache_levels;
+>  /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
+>  #define CSSELR_MAX 14
+>  
+> +static u8 get_min_cache_line_size(u32 csselr)
+> +{
+> +	u64 ctr_el0;
+> +	int field;
+> +
+> +	ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
+> +	field = csselr & CSSELR_EL1_InD ? CTR_EL0_IminLine_SHIFT : CTR_EL0_DminLine_SHIFT;
+> +
+> +	return cpuid_feature_extract_unsigned_field(ctr_el0, field) - 2;
+> +}
+> +
+>  /* Which cache CCSIDR represents depends on CSSELR value. */
+> -static u32 get_ccsidr(u32 csselr)
+> +static u32 get_ccsidr(struct kvm_vcpu *vcpu, u32 csselr)
+>  {
+> +	u32 ccsidr_index = csselr & (CSSELR_EL1_Level | CSSELR_EL1_InD);
+>  	u32 ccsidr;
+>  
+> +	if (vcpu->arch.ccsidr && is_valid_cache(ccsidr_index) &&
+> +	    !(kvm_has_mte(vcpu->kvm) && (csselr & CSSELR_EL1_TnD)))
+> +		return vcpu->arch.ccsidr[ccsidr_index];
+> +
 
-I'd simply suggest creating an UNKNOWN field encompassing bits
-[21:28]. Alternatively, feel free to try the patch below, which allows
-you to describe these 4 bits as "Unkn	31:28", similar to Res0/Res1.
+I really don't understand this logic. If the requested cache level is
+invalid, or the MTE setup doesn't match, you return something that is
+the part of the HW hierarchy, despite having a userspace-provided
+hierarchy.
 
->
-> > 
-> >> +Field	27:13	NumSets
-> >> +Field	12:3	Associavity
+The other problem I can see here is that you're still relying on the
+host CLIDR_EL1 (aka cache_levels), while restoring a guest cache
+hierarchy must include a CLIDR_EL1. Otherwise, you cannot really
+evaluate the validity of that hierarchy, nor return consistent
+results.
 
-Also, you may want to fix the typo here (Associativity).
+I was expecting something like (totally untested, but you'll get what
+I mean):
+
+	if (vcpu->arch.cssidr) {
+		if (!is_valid_cache(vcpu, csselr))
+			return 0; // UNKNOWN value
+
+		return vcpu->arch.ccsidr[ccsidr_index];
+	}
+
+and with is_valid_cache() written as:
+
+bool is_valid_cache(struct kvm_vcpu *vcpu, u64 csselr)
+{
+	u64 clidr = __vcpu_sys_reg(vcpu, CLIDR_EL1);
+	u64 idx = FIELD_GET(CSSELR_EL1_Level, csselr);
+	u64 ttype = FIELD_GET(GENMASK(CLIDR_EL1_Ttypen_SHIFT + idx * 2 + 1,
+				      CLIDR_EL1_Ttypen_SHIFT + idx * 2),
+			      clidr);
+	u64 ctype = FIELD_GET(CLIDR_EL1_Ctype1 << (idx * 3), clidr);
+
+	// !MTE or InD make TnD RES0
+	if (!kvm_has_mte(vcpu->kvm) || (csselr & CSSELR_EL1_InD))
+		csselr &= ~CSSELR_EL1_TnD;
+
+	// If TnD is set, the cache level must be purely for tags
+	if (csselr & CSSELR_EL1_TnD)
+		return (ttype == 0b01);
+
+	// Otherwise, check for a match against the InD value
+	switch (ctype) {
+	case 0: /* No cache */
+		return false;
+	case 1: /* Instruction cache only */
+		return (csselr & CSSELR_EL1_InD);
+	case 2: /* Data cache only */
+	case 4: /* Unified cache */
+		return !(csselr & CSSELR_EL1_InD);
+	case 3: /* Separate instruction and data caches */
+		return true;
+	default: /* Reserved: we can't know instruction or data. */
+		return false;
+	}
+}
+
+which implies that CLIDR_EL1 isn't an invariant anymore. You have that
+in your last patch, but this needs to be brought in this one.
+
+It should be validated on userspace write, making sure that
+LoU/LoUIS/LoC are compatible with the state of CTR+FWB+CLIDR on the
+host.
+
+And then cache_levels disappears totally here.
+
+[...]
+
+> +static int set_ccsidr(struct kvm_vcpu *vcpu, u32 csselr, u32 val)
+> +{
+> +	u8 line_size = (val & CCSIDR_EL1_LineSize) >> CCSIDR_EL1_LineSize_SHIFT;
+
+Better written as
+
+	u8 line_size = FIELD_GET(CCSIDR_EL1_LineSize, val);
+
+> +	u32 *ccsidr = vcpu->arch.ccsidr;
+> +	u32 i;
+> +
+> +	if ((val & CCSIDR_EL1_RES0) || line_size < get_min_cache_line_size(csselr))
+> +		return -EINVAL;
+> +
+> +	if (!ccsidr) {
+> +		if (val == get_ccsidr(vcpu, csselr))
+> +			return 0;
+> +
+> +		ccsidr = kmalloc_array(CSSELR_MAX, sizeof(u32), GFP_KERNEL);
+> +		if (!ccsidr)
+> +			return -ENOMEM;
+> +
+> +		for (i = 0; i < CSSELR_MAX; i++)
+> +			if (is_valid_cache(i))
+> +				ccsidr[i] = get_ccsidr(vcpu, i);
+> +
+> +		vcpu->arch.ccsidr = ccsidr;
+> +	}
+> +
+> +	ccsidr[csselr] = val;
+> +
+> +	return 0;
+> +}
 
 Thanks,
 
 	M.
-
-From 3112be25ec785de4c92d11d5964d54f216a2289c Mon Sep 17 00:00:00 2001
-From: Marc Zyngier <maz@kernel.org>
-Date: Sun, 18 Dec 2022 12:55:23 +0000
-Subject: [PATCH] arm64: Allow the definition of UNKNOWN system register fields
-
-The CCSIDR_EL1 register contains an UNKNOWN field (which replaces
-fields that were actually defined in previous revisions of the
-architecture).
-
-Define an 'Unkn' field type modeled after the Res0/Res1 types
-to allow such description. This allows the generation of
-
-  #define CCSIDR_EL1_UNKN     (UL(0) | GENMASK_ULL(31, 28))
-
-which may have its use one day. Hopefully the architecture doesn't
-add too many of those in the future.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/tools/gen-sysreg.awk | 20 +++++++++++++++++++-
- arch/arm64/tools/sysreg         |  2 ++
- 2 files changed, 21 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/tools/gen-sysreg.awk b/arch/arm64/tools/gen-sysreg.awk
-index c350164a3955..e1df4b956596 100755
---- a/arch/arm64/tools/gen-sysreg.awk
-+++ b/arch/arm64/tools/gen-sysreg.awk
-@@ -98,6 +98,7 @@ END {
- 
- 	res0 = "UL(0)"
- 	res1 = "UL(0)"
-+	unkn = "UL(0)"
- 
- 	next_bit = 63
- 
-@@ -112,11 +113,13 @@ END {
- 
- 	define(reg "_RES0", "(" res0 ")")
- 	define(reg "_RES1", "(" res1 ")")
-+	define(reg "_UNKN", "(" unkn ")")
- 	print ""
- 
- 	reg = null
- 	res0 = null
- 	res1 = null
-+	unkn = null
- 
- 	next
- }
-@@ -134,6 +137,7 @@ END {
- 
- 	res0 = "UL(0)"
- 	res1 = "UL(0)"
-+	unkn = "UL(0)"
- 
- 	define("REG_" reg, "S" op0 "_" op1 "_C" crn "_C" crm "_" op2)
- 	define("SYS_" reg, "sys_reg(" op0 ", " op1 ", " crn ", " crm ", " op2 ")")
-@@ -161,7 +165,9 @@ END {
- 		define(reg "_RES0", "(" res0 ")")
- 	if (res1 != null)
- 		define(reg "_RES1", "(" res1 ")")
--	if (res0 != null || res1 != null)
-+	if (unkn != null)
-+		define(reg "_UNKN", "(" unkn ")")
-+	if (res0 != null || res1 != null || unkn != null)
- 		print ""
- 
- 	reg = null
-@@ -172,6 +178,7 @@ END {
- 	op2 = null
- 	res0 = null
- 	res1 = null
-+	unkn = null
- 
- 	next
- }
-@@ -190,6 +197,7 @@ END {
-         next_bit = 0
- 	res0 = null
- 	res1 = null
-+	unkn = null
- 
- 	next
- }
-@@ -215,6 +223,16 @@ END {
- 	next
- }
- 
-+/^Unkn/ && (block == "Sysreg" || block == "SysregFields") {
-+	expect_fields(2)
-+	parse_bitdef(reg, "UNKN", $2)
-+	field = "UNKN_" msb "_" lsb
-+
-+	unkn = unkn " | GENMASK_ULL(" msb ", " lsb ")"
-+
-+	next
-+}
-+
- /^Field/ && (block == "Sysreg" || block == "SysregFields") {
- 	expect_fields(3)
- 	field = $3
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index bd5fceb26c54..472f68f020d9 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -15,6 +15,8 @@
- 
- # Res1	<msb>[:<lsb>]
- 
-+# Unkn	<msb>[:<lsb>]
-+
- # Field	<msb>[:<lsb>]	<name>
- 
- # Enum	<msb>[:<lsb>]	<name>
--- 
-2.34.1
-
 
 -- 
 Without deviation from the norm, progress is not possible.
