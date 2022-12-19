@@ -1,75 +1,139 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A73C33F2;
-	Mon, 19 Dec 2022 15:04:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E09E8C433F1;
-	Mon, 19 Dec 2022 15:04:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE8046AB;
+	Mon, 19 Dec 2022 15:27:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D110BC433EF;
+	Mon, 19 Dec 2022 15:27:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1671462282;
-	bh=5OqadNzH/oenTwhkmzAVTiVeDE+niXDCzBuMzq7fF1E=;
+	s=k20201202; t=1671463640;
+	bh=JMW0b8vWlwPAZKdyQQxW3qognqY1rfXtk72EWUCOkXo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l2KE0ccvde0ofkGKBLrVmp9c5mEbXLH8E3qPX0GG3OWEsice9PeKHJSU5htahMUnG
-	 NblaCDhkScOmpF4PumQ/G9nKBukdmwtOX/FuisoxF1oR8qBWIwhc9PXgkup54A8Pgu
-	 ZLAu/RU3bGyRoWkzflgQFw/Tnbe18aq6BbwoBdhgtTDmz1BH2uT713YDG9kOk2V5Y9
-	 jq/F/WEKVwO55b5jUs0LflWV3DHRAg+i8Y2UPSlngxamoU0i0S1DHLbRVne7rC0SEq
-	 HFybllk1NoormH0imR3vW/3CzKUsz5EZTf+Gj6j5iXVE4HM5YBgyWPOE24uiP2IPEg
-	 M5jyg3RFBSrIw==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+	b=aPk4RHrGseOyH9skuJulVohV+CFyLrm+dOlxl0w8315MBSQSCHaW0XXH3pbwSIsA3
+	 7xe8mcgfOWEO9fQGfYgZ+Eg4x+v2TPw8GxAsmri0r5ofYbEJV8hdmTfObcKUpGLnpy
+	 LAfECG1u9g6UbaD7atsRqh/1KqNqxwHMmcqOaT0Q3sZDyWMqhuZ7I9S8azAtrx009t
+	 YuxzvceHLMkWp0I+mCvPDeX4gEDsWSDB0e2jkvST63IpWfLauI35bYOJmBYHZagq2c
+	 uAlfD2VE6H2r0v9kBEh05Na55SW9US+6EHavCLR9umx4B9xcGihvWR0QXBxg6nhoH4
+	 JJIxCY0tDw3SA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1p7Hh2-00DgV2-Eb;
-	Mon, 19 Dec 2022 15:04:40 +0000
+	id 1p7I2v-00DglG-TZ;
+	Mon, 19 Dec 2022 15:27:18 +0000
+Date: Mon, 19 Dec 2022 15:27:17 +0000
+Message-ID: <86o7rzpg6i.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Akihiko Odaki <akihiko.odaki@daynix.com>,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	linux-arm-kernel@lists.infradead.org,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	asahi@lists.linux.dev,
+	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+	Sven Peter <sven@svenpeter.dev>,
+	Hector Martin <marcan@marcan.st>
+Subject: Re: [PATCH v3 1/7] arm64/sysreg: Convert CCSIDR_EL1 to automatic generation
+In-Reply-To: <Y6B8fzaFSwmJ5VC1@sirena.org.uk>
+References: <20221218051412.384657-1-akihiko.odaki@daynix.com>
+	<20221218051412.384657-2-akihiko.odaki@daynix.com>
+	<87cz8hez0i.wl-maz@kernel.org>
+	<1ef32b0c-6cee-75f7-e1e0-ede1f5b9a016@daynix.com>
+	<87bko0g8m2.wl-maz@kernel.org>
+	<Y6B8fzaFSwmJ5VC1@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Date: Mon, 19 Dec 2022 15:04:40 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Akihiko Odaki <akihiko.odaki@daynix.com>, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Mathieu Poirier
- <mathieu.poirier@linaro.org>, Oliver Upton <oliver.upton@linux.dev>, Suzuki
- K Poulose <suzuki.poulose@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, James Morse <james.morse@arm.com>, Will Deacon
- <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- asahi@lists.linux.dev, Alyssa Rosenzweig <alyssa@rosenzweig.io>, Sven Peter
- <sven@svenpeter.dev>, Hector Martin <marcan@marcan.st>
-Subject: Re: [PATCH 1/3] arm64/sysreg: Add CCSIDR2_EL1
-In-Reply-To: <Y6B6SNADJQkNRoLO@sirena.org.uk>
-References: <20221211051700.275761-1-akihiko.odaki@daynix.com>
- <20221211051700.275761-2-akihiko.odaki@daynix.com>
- <Y6BjQiR5gUhIAyIS@sirena.org.uk>
- <6363f9d0979be5aedfb04db4810b71a4@kernel.org>
- <Y6B6SNADJQkNRoLO@sirena.org.uk>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <71c20a843550a71b3a0a745bc428eb29@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: broonie@kernel.org, akihiko.odaki@daynix.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, mathieu.poirier@linaro.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, alexandru.elisei@arm.com, james.morse@arm.com, will@kernel.org, catalin.marinas@arm.com, asahi@lists.linux.dev, alyssa@rosenzweig.io, sven@svenpeter.dev, marcan@marcan.st
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20221219150440.6Sm6ZZe-2b6vHCsSvIxcyiy7g_b9DRp0kS5CtP1kfVM@z>
+Message-ID: <20221219152717.ilSW723NEkqqRvIDNDjx_PNqQbfgUV0yUO8-ZIVAmnU@z>
 
-On 2022-12-19 14:50, Mark Brown wrote:
-> On Mon, Dec 19, 2022 at 02:47:25PM +0000, Marc Zyngier wrote:
+On Mon, 19 Dec 2022 15:00:15 +0000,
+Mark Brown <broonie@kernel.org> wrote:
 > 
->> Since you're reviewing some of this, please have a look at v3[1],
->> which outlined a limitation of the sysreg generation tool as well
->> as a potential fix.
+> [1  <text/plain; us-ascii (7bit)>]
+> On Sun, Dec 18, 2022 at 01:11:01PM +0000, Marc Zyngier wrote:
+> > Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
 > 
-> Hrm, would've been nice to be CCed on stuff for the tool :/
+> > > arch/arm64/tools/gen-sysreg.awk does not allow a hole and requires all
+> > > bits are described hence these descriptions. If you have an
+> > > alternative idea I'd like to hear.
+> 
+> > I'd simply suggest creating an UNKNOWN field encompassing bits
+> > [21:28]. Alternatively, feel free to try the patch below, which allows
+> > you to describe these 4 bits as "Unkn	31:28", similar to Res0/Res1.
+> 
+> I agree, where practical we should add new field types and other
+> features as needed rather than trying to shoehorn things into what the
+> tool currently supports.  It is very much a work in progress which can't
+> fully represent everything in the spec yet.  For things like the
+> registers with multiple possible views it's much more effort which
+> shouldn't get in the way of progress on features but with something like
+> this just updating the tool so we can match the architecture spec is the
+> right thing.
 
-Apologies for missing the Cc update. I'll add you to the list
-next time.
+I was tempted to add a Namespace tag that wouldn't generate the sysreg
+#defines, but only generate the fields with a feature-specific
+namespace. For example:
 
-         M.
+Sysreg	CCSIDR_EL1	3	1	0	0	0
+Res0	63:32
+Unkn	31:28
+Field	27:13	NumSets
+Field	12:3	Associativity
+Field	2:0	LineSize
+EndSysreg
+
+Namespace CCIDX CCSIDR_EL1
+Res0	63:56
+Field	55:32	NumSets
+Res0	31:25
+Field	24:3	Associativity
+Field	2:0	LineSize
+EndSysreg
+
+the later generating:
+
+#define CCIDR_EL1_CCIDX_RES0		(GENMASK(63, 56) | GENMASK(31, 25))
+#define	CCIDR_EL1_CCIDX_NumSets		GENMASK(55, 32)
+#define	CCIDR_EL1_CCIDX_Associativity	GENMASK(24, 3)
+#define CCIDR_EL1_CCIDX_LineSize	GENMASK(2, 0)
+
+Thoughts?
+
+> 
+> > Define an 'Unkn' field type modeled after the Res0/Res1 types
+> > to allow such description. This allows the generation of
+> 
+> I'd be tempted to spell out Unknown fully since Unkn is not such a
+> common abbreviation but I can see the desire to keep the name shorter
+> and it doesn't really matter so either way:
+> 
+> Reviewed-by: Mark Brown <broonie@kernel.org>
+
+Yeah, this stuff is write-only most of the time, and I like my fields
+aligned if at all possible.
+
+Thanks,
+
+	M.
+
 -- 
-Jazz is not dead. It just smells funny...
+Without deviation from the norm, progress is not possible.
