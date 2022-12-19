@@ -1,76 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F186187A;
-	Mon, 19 Dec 2022 13:12:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7697AC433EF;
-	Mon, 19 Dec 2022 13:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48D923B1;
+	Mon, 19 Dec 2022 14:47:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46683C433F0;
+	Mon, 19 Dec 2022 14:47:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1671455560;
-	bh=SiMFS9SNL7VYiasdR0xL2Aevm/BpT8USH6YhYIrsfUY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eqVew1bp3uy/a0JBIUl09xCTjov+uyF9y0VHQcgJTkpUQV3Q9yatct81MNxAI6T5Q
-	 vqC5Uzm8fN9jkotNS2GHIOMbxubhBhvMwCS7IcvKSoQQmrb5Lrvn53xI1qe3i19px9
-	 bFnaWGIXiCD5Fkg9bGm+IBx5AF7xN7f2AbQCgVfZYicHzaR9mXwE8NnjHUtLFtt1Qz
-	 9hkaYwOQS09wuZjjqWStfEUD0SWSo/jAHT1+6B96bohPEkFg+45+qusvXF9PBx2hPO
-	 06F12uVmyVUudH1tYGHATZt2qIviIWwx0O/LEKf+AASEGwxRa1owTJdMeAiJIdv31d
-	 nMchHFhuc1xBA==
-Date: Mon, 19 Dec 2022 13:12:34 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-	linux-arm-kernel@lists.infradead.org,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	James Morse <james.morse@arm.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>, asahi@lists.linux.dev,
-	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-	Sven Peter <sven@svenpeter.dev>, Hector Martin <marcan@marcan.st>
-Subject: Re: [PATCH 1/3] arm64/sysreg: Add CCSIDR2_EL1
-Message-ID: <Y6BjQiR5gUhIAyIS@sirena.org.uk>
-References: <20221211051700.275761-1-akihiko.odaki@daynix.com>
- <20221211051700.275761-2-akihiko.odaki@daynix.com>
+	s=k20201202; t=1671461248;
+	bh=MENjf6lY8GK2GTH2tECqFbt7ss1GMvxx+PbZHvnU7iw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=V4A3elTQRGlZEYtd8MKwSTgMymarhRIwCKt7XgdZbGmedeaWmDNJFT/GQYN8coL1I
+	 0l0lSITSPwMxU8GqiD2Gss7nE6WY5J0Ft054QnUj/Rm//pwxZ16Ry6tfRtN9hFZHZU
+	 EPT/+yhrXcSLK1dT23iU2QkUnDxqt1BcK8712esWHHYi5/pEwpITKuZU2AGm4r60Kf
+	 Gq9s8qcIPnyuaH4ccRUTKTB57DXM3BsvOMn1XdRy+2HWGjcAGPvhiFFCL6yhvfec48
+	 FPRuqjMnUDbdl6pexjynquwVAEdXlDghZ7X3Kvgk9blfVSFTJI15Dvgjt+5xjEsNEP
+	 I37YDyepK0MgA==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1p7HQL-00DgCo-Sg;
+	Mon, 19 Dec 2022 14:47:25 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="oTrc6UTzbBTSf7fh"
-Content-Disposition: inline
-In-Reply-To: <20221211051700.275761-2-akihiko.odaki@daynix.com>
-X-Cookie: Pay toll ahead.
-Message-ID: <20221219131234.N9nBZoL8-93DhigcMNzwfXe8cRd2MBnbNhkZtc2rUZk@z>
+Date: Mon, 19 Dec 2022 14:47:25 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Akihiko Odaki <akihiko.odaki@daynix.com>, linux-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Mathieu Poirier
+ <mathieu.poirier@linaro.org>, Oliver Upton <oliver.upton@linux.dev>, Suzuki
+ K Poulose <suzuki.poulose@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, James Morse <james.morse@arm.com>, Will Deacon
+ <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ asahi@lists.linux.dev, Alyssa Rosenzweig <alyssa@rosenzweig.io>, Sven Peter
+ <sven@svenpeter.dev>, Hector Martin <marcan@marcan.st>
+Subject: Re: [PATCH 1/3] arm64/sysreg: Add CCSIDR2_EL1
+In-Reply-To: <Y6BjQiR5gUhIAyIS@sirena.org.uk>
+References: <20221211051700.275761-1-akihiko.odaki@daynix.com>
+ <20221211051700.275761-2-akihiko.odaki@daynix.com>
+ <Y6BjQiR5gUhIAyIS@sirena.org.uk>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <6363f9d0979be5aedfb04db4810b71a4@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: broonie@kernel.org, akihiko.odaki@daynix.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, mathieu.poirier@linaro.org, oliver.upton@linux.dev, suzuki.poulose@arm.com, alexandru.elisei@arm.com, james.morse@arm.com, will@kernel.org, catalin.marinas@arm.com, asahi@lists.linux.dev, alyssa@rosenzweig.io, sven@svenpeter.dev, marcan@marcan.st
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221219144725.lqVV0dJTMb6VdN6ZkpqAg7ZklSOn8jkUIqD80NY26nk@z>
 
+On 2022-12-19 13:12, Mark Brown wrote:
+> On Sun, Dec 11, 2022 at 02:16:58PM +0900, Akihiko Odaki wrote:
+>> CCSIDR2_EL1 was added with FEAT_CCIDX.
+> 
+> This corresponds to the definition in DDI0487I.a.
+> 
+> Reviewed-by: Mark Brown <broonie@kernel.org>
 
---oTrc6UTzbBTSf7fh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Since you're reviewing some of this, please have a look at v3[1],
+which outlined a limitation of the sysreg generation tool as well
+as a potential fix.
 
-On Sun, Dec 11, 2022 at 02:16:58PM +0900, Akihiko Odaki wrote:
-> CCSIDR2_EL1 was added with FEAT_CCIDX.
+Thanks,
 
-This corresponds to the definition in DDI0487I.a.
+         M.
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
-
---oTrc6UTzbBTSf7fh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOgY0EACgkQJNaLcl1U
-h9AhTQf/SdZDrzwS6EDB4hBMBmeYOfYy8tMZjCFZ05VY8WKbOIpl2TpdAOUOVINE
-mqpmP7yEg56sP+rldgR+KjcL0T1AF5pyKZ2kU+HQdzo11FiFg6e2ulTSl+VFG4Fn
-ztcTgaWLUqTyttNyiBo7Suadzo/T7SsNIh7s5Rnd1USz4yvvtCasI3C/btgVGZIs
-HLBhVNOdRhLP6HyuTi43qMAaIT+UO4I78tEtt+NABG1fCx0jlMdzaxZG+JyQtaeX
-6yMxIOCHnc86P2vK1FeopSTYD2ZJbUy+LcX50HCKp/4OsU6SscxZ8t8MjOA8EgkW
-AZw9As6VAbETFTDokR+8/RmJLt4BGg==
-=6/73
------END PGP SIGNATURE-----
-
---oTrc6UTzbBTSf7fh--
+[1] 
+https://lore.kernel.org/r/20221218051412.384657-2-akihiko.odaki@daynix.com
+-- 
+Jazz is not dead. It just smells funny...
