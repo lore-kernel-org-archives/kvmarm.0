@@ -2,72 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 866DDC10F1B
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Dec 2022 18:53:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40E36C4332F
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Dec 2022 19:45:55 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D12354B919;
-	Mon, 19 Dec 2022 13:53:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD03B4B7D2;
+	Mon, 19 Dec 2022 14:45:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 709lFaYuhbgQ; Mon, 19 Dec 2022 13:53:39 -0500 (EST)
+	with ESMTP id t+QUiYnNDZ2J; Mon, 19 Dec 2022 14:45:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2D074B90A;
-	Mon, 19 Dec 2022 13:53:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B4CE4B636;
+	Mon, 19 Dec 2022 14:45:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 792AD4B8F8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 13:53:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ECB494B62A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 14:45:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oCbKGt8+gde4 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Dec 2022 13:53:33 -0500 (EST)
-Received: from mail-io1-f74.google.com (mail-io1-f74.google.com
- [209.85.166.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 499974B8B9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 13:53:33 -0500 (EST)
-Received: by mail-io1-f74.google.com with SMTP id
- y24-20020a5ec818000000b006e2c0847835so4453458iol.12
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 10:53:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
- :date:message-id:reply-to;
- bh=wppcRybhsa1D+MJGf2QRd6LwePVql2vPJWBF38NpA2o=;
- b=qEwnyZz/kHeIYiGoGUWihIfAToGNVAmjadbU4bRC9mw4aGqSfL51V6XugfXpXYo2vL
- oxv7EX2Ogam4Gb0R00I1vlGmkyzrgvo9ryON4vAYxur3cKetpUvv2SZgFLIKPfZIX9jE
- HJR4CweyC4G5TIcV47oDdUmpLgYkl4f8PgRfcm5q3a88Nb+Rpi/F2IFzJ3JDSu6JdodJ
- RB2m8JkCFTUsQymEBF4VSWEtM1taphQm4hAd5N6XtTzKQaNT9HlMIQhNbZwH6F7M+03O
- VZJeDM0gorwOIg14NJA7faq5RiMOwPWQyqBjkDN1zRqhjI1yTa/8XGpP6v/am6jepacJ
- 1NCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
- :from:to:cc:subject:date:message-id:reply-to;
- bh=wppcRybhsa1D+MJGf2QRd6LwePVql2vPJWBF38NpA2o=;
- b=yEuZPQvL3mA+WtiBBV16Hmr+BpwVogcEZD5mpJNGgXIHqkK/QxBBPqW6F5SRaKWiq2
- Lhkfjc8d7t/75UvMeiuKEdHkVIeXvWJj1jzLz1JlAxOJ4isKF9Dd1GzjQiXjq+e2jFyy
- XmrH2HMOq2UAToLUaQNOvY3hSvCUtj88wMS5zGbLIDwb3M1gBxvdRNsaXtcgnVDOES4M
- CQxeR1E1aPFvjLHNWMYJsy1Meff+IZFnXJrsVbaXvGLHUOkM8rn2QfIM7NflYVrIL7z/
- NMIT5REKrGj3GkXQh8+9WJxHlc28qFpYrh/8nSBPA8y4NlDOpgFBd1D2xupWrrnSVdyq
- UVOQ==
-X-Gm-Message-State: ANoB5pmKFvYmZf/vE9BYVyzCYMEZxmFooaBiGyYZQ9drKQf7I/MRXvBm
- tMSBK3MsA2opyvbz29evnvVbbwSZzAkV0GCJ+A==
-X-Google-Smtp-Source: AA0mqf7DiaNp0GrKsEOujv+Oe9vnA2Oz5I9BmoWs05G430VgNfQjwF62tfkDu6k1XPiRniP1sus+oHYjvW02y7EWFg==
-X-Received: from coltonlewis-kvm.c.googlers.com
- ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6638:1901:b0:389:d4f3:216f with
- SMTP id p1-20020a056638190100b00389d4f3216fmr30745147jal.92.1671476012739;
- Mon, 19 Dec 2022 10:53:32 -0800 (PST)
-Date: Mon, 19 Dec 2022 18:52:50 +0000
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221219185250.631503-1-coltonlewis@google.com>
-Subject: [kvm-unit-tests PATCH] arm: Remove MAX_SMP probe loop
-From: Colton Lewis <coltonlewis@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev
-Cc: maz@kernel.org, Colton Lewis <coltonlewis@google.com>
+ with ESMTP id g851If0JfcHp for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Dec 2022 14:45:50 -0500 (EST)
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C60B4B4D7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 14:45:50 -0500 (EST)
+Date: Mon, 19 Dec 2022 19:45:44 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1671479149;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=KILJmguHjqQ6SByYTuCuINiGP5uaLk6cxMS8sOPjn0c=;
+ b=UfsgUfhaKwCbijceLCFVlsniHw9mVLe92O73X3euqvwK/tvJJ2CqD8V/7eFD4ARw29WQR1
+ pTc5kpTexZK235ggECEhD+EDZob46yI6/gEiSer2XrUOMQdRojyFehkN6it7ws5H3BlvPc
+ slZRldJaA9A8izfOqzfwYG+BqoQpzK8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Ryan Roberts <ryan.roberts@arm.com>
+Subject: Re: [PATCH v1 05/12] KVM: arm64: Maintain page-table format info in
+ struct kvm_pgtable
+Message-ID: <Y6C/aACDK8rrF6df@google.com>
+References: <20221206135930.3277585-1-ryan.roberts@arm.com>
+ <20221206135930.3277585-6-ryan.roberts@arm.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20221206135930.3277585-6-ryan.roberts@arm.com>
+X-Migadu-Flow: FLOW_OUT
+Cc: Marc Zyngier <maz@kernel.org>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
+ Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,46 +70,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This loop logic is broken for machines with a number of CPUs that
-isn't a power of two. A machine with 8 CPUs will test with MAX_SMP=8
-but a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 2 ==
-6. This can, in rare circumstances, lead to different test results
-depending only on the number of CPUs the machine has.
+Hi Ryan,
 
-The loop is safe to remove with no side effects. It has an explanitory
-comment explaining that it only applies to kernels <=v4.3 on arm and
-suggestion deletion when it becomes tiresome to maintain.
+On Tue, Dec 06, 2022 at 01:59:23PM +0000, Ryan Roberts wrote:
+> As the next step on the journey to supporting FEAT_LPA2 in KVM, add a
+> flag to struct kvm_pgtable, which functions can then use to select the
+> approprate behavior for either the `classic` or `lpa2` page-table
+> formats. For now, all page-tables remain in the `classic` format.
+> 
+> No functional changes are intended.
+> 
+> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h | 2 ++
+>  arch/arm64/kvm/hyp/pgtable.c         | 2 ++
+>  arch/arm64/kvm/mmu.c                 | 1 +
+>  3 files changed, 5 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 2247ed74871a..744e224d964b 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -157,6 +157,7 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
+>   * @start_level:	Level at which the page-table walk starts.
+>   * @pgd:		Pointer to the first top-level entry of the page-table.
+>   * @mm_ops:		Memory management callbacks.
+> + * @lpa2_ena:		Format used for page-table; false->classic, true->lpa2.
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- scripts/runtime.bash | 14 --------------
- 1 file changed, 14 deletions(-)
+I'd prefer that we describe the paging structure purely in terms of
+input and output address. If you add the latter it should be possible to
+decide if LPA2 is actually in use.
 
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index f8794e9..18a8dd7 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -183,17 +183,3 @@ function run()
- 
-     return $ret
- }
--
--#
--# Probe for MAX_SMP, in case it's less than the number of host cpus.
--#
--# This probing currently only works for ARM, as x86 bails on another
--# error first. Also, this probing isn't necessary for any ARM hosts
--# running kernels later than v4.3, i.e. those including ef748917b52
--# "arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'". So, at some
--# point when maintaining the while loop gets too tiresome, we can
--# just remove it...
--while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
--		|& grep -qi 'exceeds max CPUs'; do
--	MAX_SMP=$((MAX_SMP >> 1))
--done
--- 
-2.39.0.314.g84b9a713c41-goog
+(i.e. PAGE_SIZE != SZ_64K && pgt->oa_bits > 48)
 
+--
+Thanks,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
