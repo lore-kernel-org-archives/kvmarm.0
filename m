@@ -2,70 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DEFDC4332F
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Dec 2022 17:52:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 866DDC10F1B
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Dec 2022 18:53:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C41114B90B;
-	Mon, 19 Dec 2022 12:52:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D12354B919;
+	Mon, 19 Dec 2022 13:53:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id z7qUw7gy5pad; Mon, 19 Dec 2022 12:52:17 -0500 (EST)
+	with ESMTP id 709lFaYuhbgQ; Mon, 19 Dec 2022 13:53:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 88C774B906;
-	Mon, 19 Dec 2022 12:52:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2D074B90A;
+	Mon, 19 Dec 2022 13:53:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 658324B901
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 12:52:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 792AD4B8F8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 13:53:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x3IxiD7Dc8uY for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Dec 2022 12:52:15 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 34BC64B8D3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 12:52:15 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 34A1E61093;
- Mon, 19 Dec 2022 17:52:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33C2AC433EF;
- Mon, 19 Dec 2022 17:52:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1671472333;
- bh=omnk1EvftJxQZKK4tFNl78eH7ggIgQG8DRMsnWyBp38=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=dHRiMbVZ3RofwcmucbbxHiWnKKCyyOlCx1ztiN1W8TWZJOMTSy1A8lM0131J+SQ4W
- IxEGB9p/fKEijrcT6ntjOGiRswr1zujSVUh+YQEJdmumqVwAeUsBJmICp/UsuJkavX
- neDh1bJ96fNh9J0+Dmv7ienF2yJzvbtnWe8Eph8gmqL4zYZHu+mY7Wv4jqC3tGJJy3
- vbvQ1Al9FdpIzb8iUWRSx6pnHhjHoQI84bUndWDGGTZkFoatbWKorzyiZcyvgbaDRq
- 296Dh4cd60qnYK1Aaj5DeZwFua1efEq4UtKkR/xxPFlL51pKUCHcdVcqffqN6RlBiV
- e51q1ZLqj90uA==
-Date: Mon, 19 Dec 2022 17:52:06 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 1/7] arm64/sysreg: Convert CCSIDR_EL1 to automatic
- generation
-Message-ID: <Y6CkxueMwWPBMV7h@sirena.org.uk>
-References: <20221218051412.384657-1-akihiko.odaki@daynix.com>
- <20221218051412.384657-2-akihiko.odaki@daynix.com>
- <87cz8hez0i.wl-maz@kernel.org>
- <1ef32b0c-6cee-75f7-e1e0-ede1f5b9a016@daynix.com>
- <87bko0g8m2.wl-maz@kernel.org> <Y6B8fzaFSwmJ5VC1@sirena.org.uk>
- <86o7rzpg6i.wl-maz@kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <86o7rzpg6i.wl-maz@kernel.org>
-X-Cookie: Pay toll ahead.
-Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
- Akihiko Odaki <akihiko.odaki@daynix.com>,
- Mathieu Poirier <mathieu.poirier@linaro.org>, Will Deacon <will@kernel.org>,
- Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
- asahi@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id oCbKGt8+gde4 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Dec 2022 13:53:33 -0500 (EST)
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com
+ [209.85.166.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 499974B8B9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 13:53:33 -0500 (EST)
+Received: by mail-io1-f74.google.com with SMTP id
+ y24-20020a5ec818000000b006e2c0847835so4453458iol.12
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 10:53:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+ :date:message-id:reply-to;
+ bh=wppcRybhsa1D+MJGf2QRd6LwePVql2vPJWBF38NpA2o=;
+ b=qEwnyZz/kHeIYiGoGUWihIfAToGNVAmjadbU4bRC9mw4aGqSfL51V6XugfXpXYo2vL
+ oxv7EX2Ogam4Gb0R00I1vlGmkyzrgvo9ryON4vAYxur3cKetpUvv2SZgFLIKPfZIX9jE
+ HJR4CweyC4G5TIcV47oDdUmpLgYkl4f8PgRfcm5q3a88Nb+Rpi/F2IFzJ3JDSu6JdodJ
+ RB2m8JkCFTUsQymEBF4VSWEtM1taphQm4hAd5N6XtTzKQaNT9HlMIQhNbZwH6F7M+03O
+ VZJeDM0gorwOIg14NJA7faq5RiMOwPWQyqBjkDN1zRqhjI1yTa/8XGpP6v/am6jepacJ
+ 1NCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+ :from:to:cc:subject:date:message-id:reply-to;
+ bh=wppcRybhsa1D+MJGf2QRd6LwePVql2vPJWBF38NpA2o=;
+ b=yEuZPQvL3mA+WtiBBV16Hmr+BpwVogcEZD5mpJNGgXIHqkK/QxBBPqW6F5SRaKWiq2
+ Lhkfjc8d7t/75UvMeiuKEdHkVIeXvWJj1jzLz1JlAxOJ4isKF9Dd1GzjQiXjq+e2jFyy
+ XmrH2HMOq2UAToLUaQNOvY3hSvCUtj88wMS5zGbLIDwb3M1gBxvdRNsaXtcgnVDOES4M
+ CQxeR1E1aPFvjLHNWMYJsy1Meff+IZFnXJrsVbaXvGLHUOkM8rn2QfIM7NflYVrIL7z/
+ NMIT5REKrGj3GkXQh8+9WJxHlc28qFpYrh/8nSBPA8y4NlDOpgFBd1D2xupWrrnSVdyq
+ UVOQ==
+X-Gm-Message-State: ANoB5pmKFvYmZf/vE9BYVyzCYMEZxmFooaBiGyYZQ9drKQf7I/MRXvBm
+ tMSBK3MsA2opyvbz29evnvVbbwSZzAkV0GCJ+A==
+X-Google-Smtp-Source: AA0mqf7DiaNp0GrKsEOujv+Oe9vnA2Oz5I9BmoWs05G430VgNfQjwF62tfkDu6k1XPiRniP1sus+oHYjvW02y7EWFg==
+X-Received: from coltonlewis-kvm.c.googlers.com
+ ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6638:1901:b0:389:d4f3:216f with
+ SMTP id p1-20020a056638190100b00389d4f3216fmr30745147jal.92.1671476012739;
+ Mon, 19 Dec 2022 10:53:32 -0800 (PST)
+Date: Mon, 19 Dec 2022 18:52:50 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
+Message-ID: <20221219185250.631503-1-coltonlewis@google.com>
+Subject: [kvm-unit-tests PATCH] arm: Remove MAX_SMP probe loop
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev
+Cc: maz@kernel.org, Colton Lewis <coltonlewis@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,103 +79,52 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0323513121143038458=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+This loop logic is broken for machines with a number of CPUs that
+isn't a power of two. A machine with 8 CPUs will test with MAX_SMP=8
+but a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 2 ==
+6. This can, in rare circumstances, lead to different test results
+depending only on the number of CPUs the machine has.
 
---===============0323513121143038458==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="oz/pzyR4HiMnUm6B"
-Content-Disposition: inline
+The loop is safe to remove with no side effects. It has an explanitory
+comment explaining that it only applies to kernels <=v4.3 on arm and
+suggestion deletion when it becomes tiresome to maintain.
 
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+---
+ scripts/runtime.bash | 14 --------------
+ 1 file changed, 14 deletions(-)
 
---oz/pzyR4HiMnUm6B
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Dec 19, 2022 at 03:27:17PM +0000, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
-
-> > fully represent everything in the spec yet.  For things like the
-> > registers with multiple possible views it's much more effort which
-> > shouldn't get in the way of progress on features but with something like
-> > this just updating the tool so we can match the architecture spec is the
-> > right thing.
-
-> I was tempted to add a Namespace tag that wouldn't generate the sysreg
-> #defines, but only generate the fields with a feature-specific
-> namespace. For example:
-
-I think this is roughly where we'd end up - I was using the term view
-when thinking about it but that's just bikeshed.
-
-> Sysreg	CCSIDR_EL1	3	1	0	0	0
-> Res0	63:32
-> Unkn	31:28
-> Field	27:13	NumSets
-> Field	12:3	Associativity
-> Field	2:0	LineSize
-> EndSysreg
->=20
-> Namespace CCIDX CCSIDR_EL1
-> Res0	63:56
-> Field	55:32	NumSets
-> Res0	31:25
-> Field	24:3	Associativity
-> Field	2:0	LineSize
-> EndSysreg
-
-Yeah, something like that.  I think we also want a way to label bits in
-the root register as only existing in namespaces/views for things where
-there's no default (eg, where a feature adds two views at once or things
-have been there since the base architecture), and I wasn't sure if it
-made sense to nest the declaration of the views inside the Sysreg (I'm
-tempted to think it's more trouble than it's worth especially on the
-tooling side).
-
-I also wanted to go through and do an audit of all the current registers
-to make sure there were no nasty cases that'd complicate things.  I
-don't think there'd be anything but...
-
-> the later generating:
-
-> #define CCIDR_EL1_CCIDX_RES0		(GENMASK(63, 56) | GENMASK(31, 25))
-> #define	CCIDR_EL1_CCIDX_NumSets		GENMASK(55, 32)
-> #define	CCIDR_EL1_CCIDX_Associativity	GENMASK(24, 3)
-> #define CCIDR_EL1_CCIDX_LineSize	GENMASK(2, 0)
-
-> Thoughts?
-
-Definitely that for the output.
-
---oz/pzyR4HiMnUm6B
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOgpMYACgkQJNaLcl1U
-h9DU0Af/SvoqDYexlOme2j0EORslcib1fD+HrBcMgXD/y5b//5a3p3SAmFlAd4P3
-pITNOWvrGAqXP/YLGgwMnnHaZqSk/lHr5+FvqNJPuYPesoqDVIC7essCYZxx/7Oj
-A1/UNsvXnMc8PctXZwv8zUPDYv0K3kgr6Tyh/gkeCU1MSzoKLoSTBQ7R3fa2KkC1
-RTjeUddshIpTQwHmB+I6YNKCAirDHOs4oF6A5fyrh+lOIyUXmer7tMTX0SEKkbtz
-zdHKY0Ul8u0P0IQm65LWYBeC1pz8rwp7RBhKkWbGMORv24PaeI5t1yzxeJhdFYLN
-yYJbS34/t/gl9viuV6jBiFvnr3meVA==
-=Gj9m
------END PGP SIGNATURE-----
-
---oz/pzyR4HiMnUm6B--
-
---===============0323513121143038458==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+index f8794e9..18a8dd7 100644
+--- a/scripts/runtime.bash
++++ b/scripts/runtime.bash
+@@ -183,17 +183,3 @@ function run()
+ 
+     return $ret
+ }
+-
+-#
+-# Probe for MAX_SMP, in case it's less than the number of host cpus.
+-#
+-# This probing currently only works for ARM, as x86 bails on another
+-# error first. Also, this probing isn't necessary for any ARM hosts
+-# running kernels later than v4.3, i.e. those including ef748917b52
+-# "arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'". So, at some
+-# point when maintaining the while loop gets too tiresome, we can
+-# just remove it...
+-while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
+-		|& grep -qi 'exceeds max CPUs'; do
+-	MAX_SMP=$((MAX_SMP >> 1))
+-done
+-- 
+2.39.0.314.g84b9a713c41-goog
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============0323513121143038458==--
