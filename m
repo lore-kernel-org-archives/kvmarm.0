@@ -2,83 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A70C7C4332F
-	for <kvmarm@archiver.kernel.org>; Sun, 18 Dec 2022 21:18:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AB7CC4332F
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Dec 2022 13:12:49 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E01944B24D;
-	Sun, 18 Dec 2022 16:18:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D247F4B895;
+	Mon, 19 Dec 2022 08:12:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id izH+-G4tcYgb; Sun, 18 Dec 2022 16:18:30 -0500 (EST)
+	with ESMTP id jg92HGHLQ49l; Mon, 19 Dec 2022 08:12:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 877134B269;
-	Sun, 18 Dec 2022 16:18:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95F3F4B897;
+	Mon, 19 Dec 2022 08:12:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6993A4B24D
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Dec 2022 16:18:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 11C8A4B895
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 08:12:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id moFfvTRV42zz for <kvmarm@lists.cs.columbia.edu>;
- Sun, 18 Dec 2022 16:18:28 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D2C3943C58
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Dec 2022 16:18:27 -0500 (EST)
+ with ESMTP id Afj+khQ3gH5a for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Dec 2022 08:12:42 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C91AB4B894
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 08:12:42 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 807F4B80BEA;
- Sun, 18 Dec 2022 21:18:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0039DC433D2;
- Sun, 18 Dec 2022 21:18:24 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 7717F60D54;
+ Mon, 19 Dec 2022 13:12:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7697AC433EF;
+ Mon, 19 Dec 2022 13:12:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1671398305;
- bh=qLS0rSzcRsrXELdh8lmseiGlAPNnrqeSC/zlmeZ4MmI=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=UFtwRkNV+FvyAvbN5wkROFPPPf5ex2bKaFI+B3griikv6/g21UROYm+iu5mZWhGmp
- VVjCkbnxLGzKH3vKPXB4xWrp1LhNV6yup97xMu3t8xm/N1eS8oIasjHAWe4qxKKwpD
- x8cHv4sIZ7oGIhQoRFsz9fv8fcHtQg4f+l7HmcdIyUuoQueBVxPI8wHJtQYm0xlhuF
- 2PsIEuo1FHMi1a3UqCPA6vOsks8E1Nbk+fopjQ315nAMIoRSLLrckn4dvcJ7yNGi9r
- TfbNKZvfIzQkQdJRfwyFcb4MkBe3bmtt8JredyOeoxc11BExg1B/6Vduquj9HSJINv
- yYmPoZ5mKOPNg==
-Received: from sofa.misterjones.org ([185.219.108.64]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1p7138-00DWZl-JL;
- Sun, 18 Dec 2022 21:18:22 +0000
-Date: Sun, 18 Dec 2022 21:16:53 +0000
-Message-ID: <87a63kfm4a.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+ s=k20201202; t=1671455560;
+ bh=SiMFS9SNL7VYiasdR0xL2Aevm/BpT8USH6YhYIrsfUY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=eqVew1bp3uy/a0JBIUl09xCTjov+uyF9y0VHQcgJTkpUQV3Q9yatct81MNxAI6T5Q
+ vqC5Uzm8fN9jkotNS2GHIOMbxubhBhvMwCS7IcvKSoQQmrb5Lrvn53xI1qe3i19px9
+ bFnaWGIXiCD5Fkg9bGm+IBx5AF7xN7f2AbQCgVfZYicHzaR9mXwE8NnjHUtLFtt1Qz
+ 9hkaYwOQS09wuZjjqWStfEUD0SWSo/jAHT1+6B96bohPEkFg+45+qusvXF9PBx2hPO
+ 06F12uVmyVUudH1tYGHATZt2qIviIWwx0O/LEKf+AASEGwxRa1owTJdMeAiJIdv31d
+ nMchHFhuc1xBA==
+Date: Mon, 19 Dec 2022 13:12:34 +0000
+From: Mark Brown <broonie@kernel.org>
 To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: Re: [PATCH v3 5/7] KVM: arm64: Allow user to set CCSIDR_EL1
-In-Reply-To: <20221218051412.384657-6-akihiko.odaki@daynix.com>
-References: <20221218051412.384657-1-akihiko.odaki@daynix.com>
- <20221218051412.384657-6-akihiko.odaki@daynix.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: akihiko.odaki@daynix.com, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, mathieu.poirier@linaro.org,
- oliver.upton@linux.dev, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
- james.morse@arm.com, will@kernel.org, catalin.marinas@arm.com,
- asahi@lists.linux.dev, alyssa@rosenzweig.io, sven@svenpeter.dev,
- marcan@marcan.st
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+Subject: Re: [PATCH 1/3] arm64/sysreg: Add CCSIDR2_EL1
+Message-ID: <Y6BjQiR5gUhIAyIS@sirena.org.uk>
+References: <20221211051700.275761-1-akihiko.odaki@daynix.com>
+ <20221211051700.275761-2-akihiko.odaki@daynix.com>
+MIME-Version: 1.0
+In-Reply-To: <20221211051700.275761-2-akihiko.odaki@daynix.com>
+X-Cookie: Pay toll ahead.
 Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
- Mathieu Poirier <mathieu.poirier@linaro.org>, Will Deacon <will@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>, Marc Zyngier <maz@kernel.org>,
  Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
- asahi@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ Will Deacon <will@kernel.org>, asahi@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,191 +71,54 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============1506932292999279636=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, 18 Dec 2022 05:14:10 +0000,
-Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
-> 
-> Allow the userspace to set CCSIDR_EL1 so that if the kernel changes the
-> default values of CCSIDR_EL1, the userspace can restore the old values
-> from an old saved VM context.
-> 
-> Suggested-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |   3 +
->  arch/arm64/kvm/reset.c            |   1 +
->  arch/arm64/kvm/sys_regs.c         | 116 ++++++++++++++++++++----------
->  3 files changed, 83 insertions(+), 37 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index cc2ede0eaed4..cfc6930efe1b 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -417,6 +417,9 @@ struct kvm_vcpu_arch {
->  		u64 last_steal;
->  		gpa_t base;
->  	} steal;
-> +
-> +	/* Per-vcpu CCSIDR override or NULL */
-> +	u32 *ccsidr;
->  };
->  
->  /*
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 5ae18472205a..7980983dbad7 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -157,6 +157,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
->  	if (sve_state)
->  		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
->  	kfree(sve_state);
-> +	kfree(vcpu->arch.ccsidr);
->  }
->  
->  static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index f4a7c5abcbca..f48a3cc38d24 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -87,11 +87,27 @@ static u32 cache_levels;
->  /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
->  #define CSSELR_MAX 14
->  
-> +static u8 get_min_cache_line_size(u32 csselr)
-> +{
-> +	u64 ctr_el0;
-> +	int field;
-> +
-> +	ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
-> +	field = csselr & CSSELR_EL1_InD ? CTR_EL0_IminLine_SHIFT : CTR_EL0_DminLine_SHIFT;
-> +
-> +	return cpuid_feature_extract_unsigned_field(ctr_el0, field) - 2;
-> +}
-> +
->  /* Which cache CCSIDR represents depends on CSSELR value. */
-> -static u32 get_ccsidr(u32 csselr)
-> +static u32 get_ccsidr(struct kvm_vcpu *vcpu, u32 csselr)
->  {
-> +	u32 ccsidr_index = csselr & (CSSELR_EL1_Level | CSSELR_EL1_InD);
->  	u32 ccsidr;
->  
-> +	if (vcpu->arch.ccsidr && is_valid_cache(ccsidr_index) &&
-> +	    !(kvm_has_mte(vcpu->kvm) && (csselr & CSSELR_EL1_TnD)))
-> +		return vcpu->arch.ccsidr[ccsidr_index];
-> +
 
-I really don't understand this logic. If the requested cache level is
-invalid, or the MTE setup doesn't match, you return something that is
-the part of the HW hierarchy, despite having a userspace-provided
-hierarchy.
+--===============1506932292999279636==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="oTrc6UTzbBTSf7fh"
+Content-Disposition: inline
 
-The other problem I can see here is that you're still relying on the
-host CLIDR_EL1 (aka cache_levels), while restoring a guest cache
-hierarchy must include a CLIDR_EL1. Otherwise, you cannot really
-evaluate the validity of that hierarchy, nor return consistent
-results.
 
-I was expecting something like (totally untested, but you'll get what
-I mean):
+--oTrc6UTzbBTSf7fh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-	if (vcpu->arch.cssidr) {
-		if (!is_valid_cache(vcpu, csselr))
-			return 0; // UNKNOWN value
+On Sun, Dec 11, 2022 at 02:16:58PM +0900, Akihiko Odaki wrote:
+> CCSIDR2_EL1 was added with FEAT_CCIDX.
 
-		return vcpu->arch.ccsidr[ccsidr_index];
-	}
+This corresponds to the definition in DDI0487I.a.
 
-and with is_valid_cache() written as:
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
-bool is_valid_cache(struct kvm_vcpu *vcpu, u64 csselr)
-{
-	u64 clidr = __vcpu_sys_reg(vcpu, CLIDR_EL1);
-	u64 idx = FIELD_GET(CSSELR_EL1_Level, csselr);
-	u64 ttype = FIELD_GET(GENMASK(CLIDR_EL1_Ttypen_SHIFT + idx * 2 + 1,
-				      CLIDR_EL1_Ttypen_SHIFT + idx * 2),
-			      clidr);
-	u64 ctype = FIELD_GET(CLIDR_EL1_Ctype1 << (idx * 3), clidr);
+--oTrc6UTzbBTSf7fh
+Content-Type: application/pgp-signature; name="signature.asc"
 
-	// !MTE or InD make TnD RES0
-	if (!kvm_has_mte(vcpu->kvm) || (csselr & CSSELR_EL1_InD))
-		csselr &= ~CSSELR_EL1_TnD;
+-----BEGIN PGP SIGNATURE-----
 
-	// If TnD is set, the cache level must be purely for tags
-	if (csselr & CSSELR_EL1_TnD)
-		return (ttype == 0b01);
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOgY0EACgkQJNaLcl1U
+h9AhTQf/SdZDrzwS6EDB4hBMBmeYOfYy8tMZjCFZ05VY8WKbOIpl2TpdAOUOVINE
+mqpmP7yEg56sP+rldgR+KjcL0T1AF5pyKZ2kU+HQdzo11FiFg6e2ulTSl+VFG4Fn
+ztcTgaWLUqTyttNyiBo7Suadzo/T7SsNIh7s5Rnd1USz4yvvtCasI3C/btgVGZIs
+HLBhVNOdRhLP6HyuTi43qMAaIT+UO4I78tEtt+NABG1fCx0jlMdzaxZG+JyQtaeX
+6yMxIOCHnc86P2vK1FeopSTYD2ZJbUy+LcX50HCKp/4OsU6SscxZ8t8MjOA8EgkW
+AZw9As6VAbETFTDokR+8/RmJLt4BGg==
+=6/73
+-----END PGP SIGNATURE-----
 
-	// Otherwise, check for a match against the InD value
-	switch (ctype) {
-	case 0: /* No cache */
-		return false;
-	case 1: /* Instruction cache only */
-		return (csselr & CSSELR_EL1_InD);
-	case 2: /* Data cache only */
-	case 4: /* Unified cache */
-		return !(csselr & CSSELR_EL1_InD);
-	case 3: /* Separate instruction and data caches */
-		return true;
-	default: /* Reserved: we can't know instruction or data. */
-		return false;
-	}
-}
+--oTrc6UTzbBTSf7fh--
 
-which implies that CLIDR_EL1 isn't an invariant anymore. You have that
-in your last patch, but this needs to be brought in this one.
+--===============1506932292999279636==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-It should be validated on userspace write, making sure that
-LoU/LoUIS/LoC are compatible with the state of CTR+FWB+CLIDR on the
-host.
-
-And then cache_levels disappears totally here.
-
-[...]
-
-> +static int set_ccsidr(struct kvm_vcpu *vcpu, u32 csselr, u32 val)
-> +{
-> +	u8 line_size = (val & CCSIDR_EL1_LineSize) >> CCSIDR_EL1_LineSize_SHIFT;
-
-Better written as
-
-	u8 line_size = FIELD_GET(CCSIDR_EL1_LineSize, val);
-
-> +	u32 *ccsidr = vcpu->arch.ccsidr;
-> +	u32 i;
-> +
-> +	if ((val & CCSIDR_EL1_RES0) || line_size < get_min_cache_line_size(csselr))
-> +		return -EINVAL;
-> +
-> +	if (!ccsidr) {
-> +		if (val == get_ccsidr(vcpu, csselr))
-> +			return 0;
-> +
-> +		ccsidr = kmalloc_array(CSSELR_MAX, sizeof(u32), GFP_KERNEL);
-> +		if (!ccsidr)
-> +			return -ENOMEM;
-> +
-> +		for (i = 0; i < CSSELR_MAX; i++)
-> +			if (is_valid_cache(i))
-> +				ccsidr[i] = get_ccsidr(vcpu, i);
-> +
-> +		vcpu->arch.ccsidr = ccsidr;
-> +	}
-> +
-> +	ccsidr[csselr] = val;
-> +
-> +	return 0;
-> +}
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============1506932292999279636==--
