@@ -2,60 +2,62 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34FFEC4332F
-	for <kvmarm@archiver.kernel.org>; Mon, 19 Dec 2022 14:51:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59634C4332F
+	for <kvmarm@archiver.kernel.org>; Mon, 19 Dec 2022 15:00:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6D134B8A0;
-	Mon, 19 Dec 2022 09:51:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA0AE4B882;
+	Mon, 19 Dec 2022 10:00:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id s3t6smwPAxnc; Mon, 19 Dec 2022 09:51:01 -0500 (EST)
+	with ESMTP id 4QLZCnSnRCc2; Mon, 19 Dec 2022 10:00:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B39814B8A3;
-	Mon, 19 Dec 2022 09:51:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F2304B89D;
+	Mon, 19 Dec 2022 10:00:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 18AA44B89F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 09:51:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E8CA24B882
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 10:00:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id u1GYqyebUmMu for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Dec 2022 09:50:57 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C74384B887
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 09:50:57 -0500 (EST)
+ with ESMTP id s8mxKB3BnfwX for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Dec 2022 10:00:33 -0500 (EST)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1FE7B4B889
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 10:00:33 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 689F0B80E4F;
- Mon, 19 Dec 2022 14:50:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0526C433D2;
- Mon, 19 Dec 2022 14:50:51 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 0415FCE0F5D;
+ Mon, 19 Dec 2022 15:00:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDE70C433D2;
+ Mon, 19 Dec 2022 15:00:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1671461455;
- bh=QxVPwZP8m+jsCHTTeqcdIpyCXjsptf4gIKs8BSGJBL4=;
+ s=k20201202; t=1671462024;
+ bh=JbD1CERCvAqPiTchVboz7aWPTf4CqkVZl5hSSLWV8+Y=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Fly9y9GIhJwybfs+jroXKqdVzCJpHS4TqdxKwymyTZFKCIMk0mi2eb8IXsa1IZUFB
- 7+N+Hv2jidaCNb+0CgIDr+p5cXuRXnCNPRwrY3Lad7uXROxpPf2m0t0wvJ+JEYoktP
- jUoI2CdzAkou6aamyEzAUZPpNMsY8icPDBWhpyL0SASaXMFRNrbrfHoOVFypoR6loJ
- ZQDnsNIP2VEhwT+0l0Kro4cXki1gCwCE3zegD+ucmls7eITliIHHuWXq7cZsK8yisN
- 4uWwNj4weUVrPQXC0R2wpDweNqgjFdQK+JYM9wF5u6M3Utnyhs5KJhr0SK7qJd30Jg
- KKM2Kjx3NLJ8w==
-Date: Mon, 19 Dec 2022 14:50:48 +0000
+ b=TWOHbnn13mEX9dougL+e1l5NCO4uC1JocxLiRTSuLMFPPooSOsduPqT9WpQeOtG6O
+ w2zJBKPFa+CLq98BUmfOJTMjK7bvGLBCpvveQ1ekQ8bR2LmWkgnufJ4Obi/Awvwz3M
+ n7qP1lNleQHNul8coOBFRf32nkDXxU7wxe4tfgcU8ogUOrPfC1Itbs9hxlkmwndsXj
+ 2rBH/FnRTPol7uGGixifpUdUvmPnbyxy+o72SDzNKVoOPR7m7cPSHLft1yAfwpc1h5
+ lGiwqAGg8ay3BTPXtyoQlRsnMWvSY6wtMMPNexp2/Kzyu25GTC7kKoU8xhzOMlmWgc
+ 3GMADB2IG5MTQ==
+Date: Mon, 19 Dec 2022 15:00:15 +0000
 From: Mark Brown <broonie@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 1/3] arm64/sysreg: Add CCSIDR2_EL1
-Message-ID: <Y6B6SNADJQkNRoLO@sirena.org.uk>
-References: <20221211051700.275761-1-akihiko.odaki@daynix.com>
- <20221211051700.275761-2-akihiko.odaki@daynix.com>
- <Y6BjQiR5gUhIAyIS@sirena.org.uk>
- <6363f9d0979be5aedfb04db4810b71a4@kernel.org>
+Subject: Re: [PATCH v3 1/7] arm64/sysreg: Convert CCSIDR_EL1 to automatic
+ generation
+Message-ID: <Y6B8fzaFSwmJ5VC1@sirena.org.uk>
+References: <20221218051412.384657-1-akihiko.odaki@daynix.com>
+ <20221218051412.384657-2-akihiko.odaki@daynix.com>
+ <87cz8hez0i.wl-maz@kernel.org>
+ <1ef32b0c-6cee-75f7-e1e0-ede1f5b9a016@daynix.com>
+ <87bko0g8m2.wl-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <6363f9d0979be5aedfb04db4810b71a4@kernel.org>
-X-Cookie: Pay toll ahead.
+In-Reply-To: <87bko0g8m2.wl-maz@kernel.org>
+X-Cookie: I brake for chezlogs!
 Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
  Akihiko Odaki <akihiko.odaki@daynix.com>,
  Mathieu Poirier <mathieu.poirier@linaro.org>, Will Deacon <will@kernel.org>,
@@ -74,47 +76,68 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============8554060694131463434=="
+Content-Type: multipart/mixed; boundary="===============2612328144419890194=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
---===============8554060694131463434==
+--===============2612328144419890194==
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="mYp6zYSC3VWc2bxT"
+	protocol="application/pgp-signature"; boundary="u5kU4UMJcC0W4wyS"
 Content-Disposition: inline
 
 
---mYp6zYSC3VWc2bxT
+--u5kU4UMJcC0W4wyS
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Mon, Dec 19, 2022 at 02:47:25PM +0000, Marc Zyngier wrote:
+On Sun, Dec 18, 2022 at 01:11:01PM +0000, Marc Zyngier wrote:
+> Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
 
-> Since you're reviewing some of this, please have a look at v3[1],
-> which outlined a limitation of the sysreg generation tool as well
-> as a potential fix.
+> > arch/arm64/tools/gen-sysreg.awk does not allow a hole and requires all
+> > bits are described hence these descriptions. If you have an
+> > alternative idea I'd like to hear.
 
-Hrm, would've been nice to be CCed on stuff for the tool :/
+> I'd simply suggest creating an UNKNOWN field encompassing bits
+> [21:28]. Alternatively, feel free to try the patch below, which allows
+> you to describe these 4 bits as "Unkn	31:28", similar to Res0/Res1.
 
---mYp6zYSC3VWc2bxT
+I agree, where practical we should add new field types and other
+features as needed rather than trying to shoehorn things into what the
+tool currently supports.  It is very much a work in progress which can't
+fully represent everything in the spec yet.  For things like the
+registers with multiple possible views it's much more effort which
+shouldn't get in the way of progress on features but with something like
+this just updating the tool so we can match the architecture spec is the
+right thing.
+
+> Define an 'Unkn' field type modeled after the Res0/Res1 types
+> to allow such description. This allows the generation of
+
+I'd be tempted to spell out Unknown fully since Unkn is not such a
+common abbreviation but I can see the desire to keep the name shorter
+and it doesn't really matter so either way:
+
+Reviewed-by: Mark Brown <broonie@kernel.org>
+
+--u5kU4UMJcC0W4wyS
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOgekcACgkQJNaLcl1U
-h9ATOwf+M1ng9YlS25c373o/kUeoQ5yAyHdggFm6EfdGWuWfd556L8Rr9T/1HCUR
-mFg67pwzlcmhBwX/BHbdjzAjYWvNmP5LzKO7G46uEksPmxNc4WCriBBR8jlsOvR1
-dj0JsWF58BWDZg8jcnuotHTUNcDvU5RfLG8T9jcmN4dUXOz0xa/fh02oQfnbr8vE
-f4jcRljPZGpF6pWNdAfKDJSvjrSq5QBU1gwo88nKXnuY1gq3GI6aLNFun/CP4iVm
-1msraBt+TC6A2S09vcA6jaGW2bfgZGmWIS27Y3ZN+IzNlwKZ1YfsezF4EiLk/BmG
-OeaDj3aqNy6h8EgioVkCGVZ8EyRisA==
-=epbW
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmOgfH4ACgkQJNaLcl1U
+h9BsAgf/SbrRls2l2YJ4ke3IATlZrBSMsZVI98FuGsLwHeKknHxUHGkJKrMfdbk4
+diEmW0Bk69Cn4VAzsMwg7l0x8JMGJwE94sMyUwX0DOC0r1xI/KrAxhS/PetsIlVv
+tJQPP9FYO33oJmjDsAqCwaO90Qkdk4I7QrDos/eO+yucA6tISgrM95FSufMwTZqX
+9pu8j5CizDnf77pZIXVUjhDMVzdqJsiGg3YTuHZpDXdfXq/COW4ECCMKB25GmCSh
+/pB2NEvWJoX6ZiDoyi7XxokmMv8nOPnMYyahTM1jO2N5tEcav9E4t9levchdQ5n0
+PTo3pY7o2LisFYorkFn5o4eys9hYRw==
+=BwsC
 -----END PGP SIGNATURE-----
 
---mYp6zYSC3VWc2bxT--
+--u5kU4UMJcC0W4wyS--
 
---===============8554060694131463434==
+--===============2612328144419890194==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -125,4 +148,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---===============8554060694131463434==--
+--===============2612328144419890194==--
