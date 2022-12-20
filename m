@@ -1,72 +1,183 @@
-Received: from out-18.mta0.migadu.com (out-18.mta0.migadu.com [91.218.175.18])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2070.outbound.protection.outlook.com [40.107.22.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405A37E
-	for <kvmarm@lists.linux.dev>; Tue, 20 Dec 2022 02:59:34 +0000 (UTC)
-Date: Tue, 20 Dec 2022 00:06:49 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1671494814;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=foi+cM9gEI1JlVJgipQwf5m4Su0pKjKEMr5jntc/8X4=;
-	b=FEA5Zx40ThQP3Y+aileQBqtWae2jAdWjSK9yyTnmOMbwatS5Kprq0K0HMUDAPCinU4n1qd
-	dMWsHrxEbTE/SD3HHfKK9dsdzUwrPFsaEj/4Fnc4/Zj+TXLgmqu0wcwLDEkwYmYnx64cIO
-	3cvJSQ3d0B/XcfXFOPWRY7eBF6GsT08=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820601876
+	for <kvmarm@lists.linux.dev>; Tue, 20 Dec 2022 09:01:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=erx/Ghq+9aXgjlqISqKVDfbk7awv/dz6FqUmcmeoisw=;
+ b=vmvISCY6G2l/lS6FEfKOmBKeFrQl8wc37NnX6uIKQx8JM+IN/YrmgRpiUg5DDhhJGNoXkrp4YYuesv48VuZEQJiovLuSbOtDzdA/lf73CfuuBTsbUG4i/UzHfnV7/G1zlXzD62L8vVRMgrLNLj2G6YayC788W5ck/qQzR3Okj9E=
+Received: from AS9PR01CA0021.eurprd01.prod.exchangelabs.com
+ (2603:10a6:20b:540::27) by DU0PR08MB7662.eurprd08.prod.outlook.com
+ (2603:10a6:10:318::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.6; Tue, 20 Dec
+ 2022 09:01:30 +0000
+Received: from AM7EUR03FT024.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:20b:540:cafe::6) by AS9PR01CA0021.outlook.office365.com
+ (2603:10a6:20b:540::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.21 via Frontend
+ Transport; Tue, 20 Dec 2022 09:01:30 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+ pr=C
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ AM7EUR03FT024.mail.protection.outlook.com (100.127.140.238) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5924.16 via Frontend Transport; Tue, 20 Dec 2022 09:01:30 +0000
+Received: ("Tessian outbound 3ad958cd7492:v132"); Tue, 20 Dec 2022 09:01:29 +0000
+X-CheckRecipientChecked: true
+X-CR-MTA-CID: 1cd2692adfec9aba
+X-CR-MTA-TID: 64aa7808
+Received: from b19e76653062.1
+	by 64aa7808-outbound-1.mta.getcheckrecipient.com id 88204C9D-70F8-4098-B967-343D521A065E.1;
+	Tue, 20 Dec 2022 09:01:22 +0000
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id b19e76653062.1
+    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+    Tue, 20 Dec 2022 09:01:22 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Bio7Bvmg3yKDpAtRIOKJIVuUj6hOgNkuOtr6kr/qhvSrs2/9qd6N0I6Scds8xNfYRoSytEo+DuEzbpU032SwuO5Kowwdp41f39bm8b1BXoJ0mQdKpIU5X1ZKPUiCK2MVH4HiXjm5WJ3eJByVEcEJR3+2wQhI80TxGjWkry61Rk0Dpe0v/ZPrB55WJG04zuCrWLqc19cMj7NbS+vndD1SLUdp5o0bwT8mUfpOIzMHLm/x7KRSHNSuVy6gNPj+WdNJlVbhMntOJ10d2BS/q2FOgmD5DNNA2Kk+EQ83dKww/FhjXbpbZOk00XJKvSE1CHeYBCmiHAdvGTToKCdmmMnHtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=erx/Ghq+9aXgjlqISqKVDfbk7awv/dz6FqUmcmeoisw=;
+ b=Yjor2YRlkQfrqxG8zSF1IaD9oCdeus7iEi/IY0u3y+fIxbpG++Vta5wPNQBM+fQilsqQ2WYjd8xpOteHjmVzHvfSkmTzDiddFONyb1zdKJAmQ+uWpNxpbCUCVaxPG7CCBd5mo5lGsZczwEtes1nf+0xMQ1ukjzoPG/nqfYu8tuvr3iUIittDQdYl00WD/qrTKLrvHtdybvqbmoncCMVQpyNZCF1/r7LaTZJrPtu7EBJEY4kZQ23jBeW+nbbgV3Uhla3DJJF2rozE1XEP5gw+PjsDk8VP7c5Jh45WSV5sGr927CMYDVOYz1/NW+/GwPjW3IiZVMrfammY/dkNdY855g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=erx/Ghq+9aXgjlqISqKVDfbk7awv/dz6FqUmcmeoisw=;
+ b=vmvISCY6G2l/lS6FEfKOmBKeFrQl8wc37NnX6uIKQx8JM+IN/YrmgRpiUg5DDhhJGNoXkrp4YYuesv48VuZEQJiovLuSbOtDzdA/lf73CfuuBTsbUG4i/UzHfnV7/G1zlXzD62L8vVRMgrLNLj2G6YayC788W5ck/qQzR3Okj9E=
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+Received: from AS8PR08MB6995.eurprd08.prod.outlook.com (2603:10a6:20b:34d::13)
+ by AM8PR08MB5859.eurprd08.prod.outlook.com (2603:10a6:20b:1c6::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.6; Tue, 20 Dec
+ 2022 09:01:21 +0000
+Received: from AS8PR08MB6995.eurprd08.prod.outlook.com
+ ([fe80::e825:ff01:1f8:4c1f]) by AS8PR08MB6995.eurprd08.prod.outlook.com
+ ([fe80::e825:ff01:1f8:4c1f%6]) with mapi id 15.20.5944.006; Tue, 20 Dec 2022
+ 09:01:21 +0000
+Message-ID: <94981e1e-4e88-caa1-222a-7ba336bcd156@arm.com>
+Date: Tue, 20 Dec 2022 09:01:19 +0000
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.0
 Subject: Re: [PATCH v1 10/12] KVM: arm64: Rework logic to en/decode
  VTCR_EL2.{SL0, SL2} fields
-Message-ID: <Y6D8mYpSY0K8EGO4@google.com>
+Content-Language: en-US
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>,
+ James Morse <james.morse@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu
 References: <20221206135930.3277585-1-ryan.roberts@arm.com>
  <20221206135930.3277585-11-ryan.roberts@arm.com>
+ <Y6D8mYpSY0K8EGO4@google.com>
+From: Ryan Roberts <ryan.roberts@arm.com>
+In-Reply-To: <Y6D8mYpSY0K8EGO4@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0320.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:197::19) To AS8PR08MB6995.eurprd08.prod.outlook.com
+ (2603:10a6:20b:34d::13)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221206135930.3277585-11-ryan.roberts@arm.com>
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221220000649.OXI_VLlpnj5AaWMvE7C8tWijiSZ6rJpsvF_JkwZVL78@z>
+X-MS-TrafficTypeDiagnostic:
+	AS8PR08MB6995:EE_|AM8PR08MB5859:EE_|AM7EUR03FT024:EE_|DU0PR08MB7662:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9a19bda2-0565-4e97-6829-08dae268c8f5
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original:
+ rQj0rL6wj21kZNLjVQaml9Bw27rRICeeR2L4LgAo4l7AoEQztkF8V9TVM+10EJzRLCgg1M4pQbZyiAxT8CkJGYaNZsMZ49/+5CUNDlggqQvAOoc7UYkU3+JKl/21Cu0KYNmmKwwwgTbh0hZC5aUiNMjq/Qw0WthilBKftLTSHmT8jS7kii/BWfVjL7vyz122Yf6FPBZkFio9YGrJpz+wSE4WlieA4Ld70EzWqwjzdMwoclKIX8i07/uvgksaBbTc4wD9v6uAeccy5YV9+xEqhxfr0pRWYfODLx9pzOu1E23aXd0L2h+oyfkVt1gHFC3JZ1E7498oTaqlAbnZvzED0fQK1DNNZzw7qW2lfiXDCKzU/AAaC0re6v0lAivXWwEchs3H8D8pFtuv3777yc6/ZAqZw1LUjW9DvVjTF3x3UTkRfGLi6WSeBYKn8BH9cVAJajKTtOqafmzREmK20oqwpfZwBPtJNYEZUoZdQnxMd6/ktbYi1UcfZWEtH6U1gousGE/vnMypfCvKbEPbEhy84jcNTxYMopYKpOVBtNFfiNMxVP+VKNXkZikYYwV3SjjoFr3g0kaTF+PaQ10LHgAvZ3kyV8iUxbydnHyNdiuCYbWz0hKRbLdrveI3sPc5q6aIxMDUF07HNWwxyh8iCjZ1OmwO10iAhNoLum/5NtqAx01TQo7UvqMuEj6o2T3CWoAZpPR/77KaP9Do7CYFiNKRBkQNhwgtN3niIfUeggrXtHs=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR08MB6995.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(396003)(136003)(376002)(346002)(366004)(451199015)(38100700002)(2906002)(86362001)(6486002)(478600001)(31696002)(54906003)(6916009)(316002)(66946007)(41300700001)(66556008)(66476007)(2616005)(31686004)(83380400001)(36756003)(8676002)(4326008)(6512007)(53546011)(6506007)(8936002)(26005)(186003)(5660300002)(44832011)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR08MB5859
+Original-Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ AM7EUR03FT024.eop-EUR03.prod.protection.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	0449982a-dd8b-48b4-0ccd-08dae268c37d
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	W83LJ51iBMEjl87bcxIhUeoazj9ZnmbDavVP04a7l0Jx63GYRn7K3qat/KnM01wEnsLMFvNytehdLsGwlxugVUFhSngmfMyIjPay94nP+xvaF69qaKV3I7KzcBSY9Nd+U6iIPmRF7rcAIJl2BECOop+IA1zOVw3tEjeSxN1arCGwZi+EaZiBPZT9c07hcOmO0CM2UnAvc08udclOBvBF1No6RTZRiP7QxuicXpV81+gxeU5EDpBaekrQ6ZjWIEG2i6S6PpGsNDR0TtOkQ6q5lAWyvwQV+52GEfo7USc/wCNs4Vbr3CQ9pTG8F1O8t62Dt7jtFj1L9+yYcndlGzTwMfrOHIHhgcs68OZ4DMQacrEWn5IhDIfqwanglINjimCHHktgXgzVaPgPwm+n+6d2ApXkBR74pZhziXk2Qpfjtw3T9yeg9cJkiXy03pCYXTVSSis3j+hSxdiTTIH1aa50ygwOeRF0Fbn6rNOHcaPqSIRc/cEgJzDw+UPmRzwk+PTKRIdpcdDGKuIThDYH6UbOdWwsLR5OqjM9Q6KkIP4NUYdIFJiU9fGFMjDV1RRS/9oKtKVkFzpUNj5aQhkNpLJxJRKihm3ZC+ZmZaNLEZrwMhv+BAbrGpQl4cDonzYMU2IUhbTwuMr25sMkllrynIRTX7F3yFKg23LesSLVSpDat2Wg7dR9MQCy9OPFYNswM1mVhR99t4PMEoy3FndtvVPxoi4dDXeMtaGn4YpKppmwskc=
+X-Forefront-Antispam-Report:
+	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230022)(4636009)(376002)(396003)(346002)(39860400002)(136003)(451199015)(36840700001)(40470700004)(46966006)(31686004)(81166007)(6862004)(36756003)(2906002)(86362001)(31696002)(40460700003)(44832011)(8936002)(41300700001)(70586007)(8676002)(70206006)(4326008)(5660300002)(40480700001)(54906003)(478600001)(82310400005)(356005)(6486002)(82740400003)(316002)(36860700001)(53546011)(47076005)(83380400001)(6506007)(6512007)(336012)(2616005)(26005)(107886003)(186003)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2022 09:01:30.1723
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a19bda2-0565-4e97-6829-08dae268c8f5
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM7EUR03FT024.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB7662
+Message-ID: <20221220090119.MwclxGCUcFPAIfvQH4ijXiSg1BvbUmPMa3nMZd_IU8s@z>
 
-Hi Ryan,
-
-On Tue, Dec 06, 2022 at 01:59:28PM +0000, Ryan Roberts wrote:
-> In order to support 5 level translation, FEAT_LPA2 introduces the 1-bit
-> SL2 field within VTCR_EL2 to extend the existing 2-bit SL0 field. The
-> SL2[0]:SL0[1:0] encodings have no simple algorithmic relationship to the
-> start levels they represent (that I can find, at least), so replace the
-> existing macros with functions that do lookups to encode and decode the
-> values. These new functions no longer make hardcoded assumptions about
-> the maximum level and instead rely on KVM_PGTABLE_FIRST_LEVEL and
-> KVM_PGTABLE_LAST_LEVEL.
+On 20/12/2022 00:06, Oliver Upton wrote:
+> Hi Ryan,
 > 
-> This is preparatory work for enabling 52-bit IPA for 4KB and 16KB pages
-> with FEAT_LPA2.
+> On Tue, Dec 06, 2022 at 01:59:28PM +0000, Ryan Roberts wrote:
+>> In order to support 5 level translation, FEAT_LPA2 introduces the 1-bit
+>> SL2 field within VTCR_EL2 to extend the existing 2-bit SL0 field. The
+>> SL2[0]:SL0[1:0] encodings have no simple algorithmic relationship to the
+>> start levels they represent (that I can find, at least), so replace the
+>> existing macros with functions that do lookups to encode and decode the
+>> values. These new functions no longer make hardcoded assumptions about
+>> the maximum level and instead rely on KVM_PGTABLE_FIRST_LEVEL and
+>> KVM_PGTABLE_LAST_LEVEL.
+>>
+>> This is preparatory work for enabling 52-bit IPA for 4KB and 16KB pages
+>> with FEAT_LPA2.
+>>
+>> No functional change intended.
+>>
+>> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 > 
-> No functional change intended.
+> Why do we need to support 5-level paging at stage-2?
 > 
-> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+> A configuration of start_level = 0, T0SZ = 12 with 4K paging would
+> result in 16 concatenated tables at level 0, avoiding the level -1
+> lookup altogether.
 
-Why do we need to support 5-level paging at stage-2?
+Yes, agreed. And that's exactly what the code does. So we could remove this
+patch from the series and everything would continue to function correctly. But I
+was trying to make things more consistent and maintainable (this now works in
+terms of KVM_PGTABLE_FIRST_LEVEL and KVM_PGTABLE_LAST_LEVEL for example).
 
-A configuration of start_level = 0, T0SZ = 12 with 4K paging would
-result in 16 concatenated tables at level 0, avoiding the level -1
-lookup altogether.
+That said, I haven't exactly been consistent in my refactoring; patch 11 just
+adds a comment to kvm_vcpu_trap_get_fault_level() explaining that the new -1
+level encodings will never be seen due to stage2 never using 5 levels of
+translation.
 
---
-Thanks,
-Oliver
+So happy to remove this and replace with a comment describing the limitations if
+that's your preference?
+
+> 
+> --
+> Thanks,
+> Oliver
+
