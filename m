@@ -1,80 +1,74 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF0416FB4
-	for <kvmarm@lists.linux.dev>; Mon, 19 Dec 2022 19:45:56 +0000 (UTC)
-Date: Mon, 19 Dec 2022 19:45:44 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1671479149;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KILJmguHjqQ6SByYTuCuINiGP5uaLk6cxMS8sOPjn0c=;
-	b=UfsgUfhaKwCbijceLCFVlsniHw9mVLe92O73X3euqvwK/tvJJ2CqD8V/7eFD4ARw29WQR1
-	pTc5kpTexZK235ggECEhD+EDZob46yI6/gEiSer2XrUOMQdRojyFehkN6it7ws5H3BlvPc
-	slZRldJaA9A8izfOqzfwYG+BqoQpzK8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Ryan Roberts <ryan.roberts@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH v1 05/12] KVM: arm64: Maintain page-table format info in
- struct kvm_pgtable
-Message-ID: <Y6C/aACDK8rrF6df@google.com>
-References: <20221206135930.3277585-1-ryan.roberts@arm.com>
- <20221206135930.3277585-6-ryan.roberts@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1A37E
+	for <kvmarm@lists.linux.dev>; Tue, 20 Dec 2022 02:50:22 +0000 (UTC)
+Received: from dggpemm500002.china.huawei.com (unknown [172.30.72.57])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NbgyC1tz5zmWZg;
+	Tue, 20 Dec 2022 10:49:07 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.246) by
+ dggpemm500002.china.huawei.com (7.185.36.229) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.34; Tue, 20 Dec 2022 10:50:13 +0800
+From: Dong Bo <dongbo4@huawei.com>
+To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <kvmarm@lists.cs.columbia.edu>
+CC: Nianyao Tang <tangnianyao@huawei.com>, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>, Alexandru Elisei
+	<alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver
+ Upton <oliver.upton@linux.dev>, Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: [PATCH] KVM: arm64: Synchronize SMEN on vcpu schedule out
+Date: Tue, 20 Dec 2022 18:50:24 +0800
+Message-ID: <20221220105024.13484-1-dongbo4@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221206135930.3277585-6-ryan.roberts@arm.com>
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20221219194544.EHR3D_KYT9_oLT1sR0Z56gaytEIU8Cp8xmYhn9CBGIA@z>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.246]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500002.china.huawei.com (7.185.36.229)
+X-CFilter-Loop: Reflected
+Message-ID: <20221220105024.lvYtjiMoUx25lMtJnM6DHZz_fB46OtumR5ptKNGtUto@z>
 
-Hi Ryan,
+From: Nianyao Tang <tangnianyao@huawei.com>
 
-On Tue, Dec 06, 2022 at 01:59:23PM +0000, Ryan Roberts wrote:
-> As the next step on the journey to supporting FEAT_LPA2 in KVM, add a
-> flag to struct kvm_pgtable, which functions can then use to select the
-> approprate behavior for either the `classic` or `lpa2` page-table
-> formats. For now, all page-tables remain in the `classic` format.
-> 
-> No functional changes are intended.
-> 
-> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 2 ++
->  arch/arm64/kvm/hyp/pgtable.c         | 2 ++
->  arch/arm64/kvm/mmu.c                 | 1 +
->  3 files changed, 5 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 2247ed74871a..744e224d964b 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -157,6 +157,7 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
->   * @start_level:	Level at which the page-table walk starts.
->   * @pgd:		Pointer to the first top-level entry of the page-table.
->   * @mm_ops:		Memory management callbacks.
-> + * @lpa2_ena:		Format used for page-table; false->classic, true->lpa2.
+If we have VHE and need to reenable SME for host in
+kvm_arch_vcpu_put_fp, CPACR.SMEN is modified from 0 to 1. Trap
+control for reading SVCR is modified from enable to disable.
+Synchronization is needed before reading SVCR later in
+fpsimd_save, or it may cause sync exception which can not be
+handled by host.
 
-I'd prefer that we describe the paging structure purely in terms of
-input and output address. If you add the latter it should be possible to
-decide if LPA2 is actually in use.
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Signed-off-by: Nianyao Tang <tangnianyao@huawei.com>
+---
+ arch/arm64/kvm/fpsimd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-(i.e. PAGE_SIZE != SZ_64K && pgt->oa_bits > 48)
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index 02dd7e9ebd39..f5799f571317 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -184,6 +184,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+ 			sysreg_clear_set(CPACR_EL1,
+ 					 CPACR_EL1_SMEN_EL0EN,
+ 					 CPACR_EL1_SMEN_EL1EN);
++		isb();
+ 	}
+ 
+ 	if (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED) {
+-- 
+1.8.3.1
 
---
-Thanks,
-Oliver
