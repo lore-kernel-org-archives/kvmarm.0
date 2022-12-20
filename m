@@ -1,74 +1,72 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from out-18.mta0.migadu.com (out-18.mta0.migadu.com [91.218.175.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1A37E
-	for <kvmarm@lists.linux.dev>; Tue, 20 Dec 2022 02:50:22 +0000 (UTC)
-Received: from dggpemm500002.china.huawei.com (unknown [172.30.72.57])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NbgyC1tz5zmWZg;
-	Tue, 20 Dec 2022 10:49:07 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.246) by
- dggpemm500002.china.huawei.com (7.185.36.229) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Tue, 20 Dec 2022 10:50:13 +0800
-From: Dong Bo <dongbo4@huawei.com>
-To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <kvmarm@lists.cs.columbia.edu>
-CC: Nianyao Tang <tangnianyao@huawei.com>, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>, Alexandru Elisei
-	<alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver
- Upton <oliver.upton@linux.dev>, Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: [PATCH] KVM: arm64: Synchronize SMEN on vcpu schedule out
-Date: Tue, 20 Dec 2022 18:50:24 +0800
-Message-ID: <20221220105024.13484-1-dongbo4@huawei.com>
-X-Mailer: git-send-email 2.30.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405A37E
+	for <kvmarm@lists.linux.dev>; Tue, 20 Dec 2022 02:59:34 +0000 (UTC)
+Date: Tue, 20 Dec 2022 00:06:49 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1671494814;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=foi+cM9gEI1JlVJgipQwf5m4Su0pKjKEMr5jntc/8X4=;
+	b=FEA5Zx40ThQP3Y+aileQBqtWae2jAdWjSK9yyTnmOMbwatS5Kprq0K0HMUDAPCinU4n1qd
+	dMWsHrxEbTE/SD3HHfKK9dsdzUwrPFsaEj/4Fnc4/Zj+TXLgmqu0wcwLDEkwYmYnx64cIO
+	3cvJSQ3d0B/XcfXFOPWRY7eBF6GsT08=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v1 10/12] KVM: arm64: Rework logic to en/decode
+ VTCR_EL2.{SL0, SL2} fields
+Message-ID: <Y6D8mYpSY0K8EGO4@google.com>
+References: <20221206135930.3277585-1-ryan.roberts@arm.com>
+ <20221206135930.3277585-11-ryan.roberts@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.246]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500002.china.huawei.com (7.185.36.229)
-X-CFilter-Loop: Reflected
-Message-ID: <20221220105024.lvYtjiMoUx25lMtJnM6DHZz_fB46OtumR5ptKNGtUto@z>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221206135930.3277585-11-ryan.roberts@arm.com>
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <20221220000649.OXI_VLlpnj5AaWMvE7C8tWijiSZ6rJpsvF_JkwZVL78@z>
 
-From: Nianyao Tang <tangnianyao@huawei.com>
+Hi Ryan,
 
-If we have VHE and need to reenable SME for host in
-kvm_arch_vcpu_put_fp, CPACR.SMEN is modified from 0 to 1. Trap
-control for reading SVCR is modified from enable to disable.
-Synchronization is needed before reading SVCR later in
-fpsimd_save, or it may cause sync exception which can not be
-handled by host.
+On Tue, Dec 06, 2022 at 01:59:28PM +0000, Ryan Roberts wrote:
+> In order to support 5 level translation, FEAT_LPA2 introduces the 1-bit
+> SL2 field within VTCR_EL2 to extend the existing 2-bit SL0 field. The
+> SL2[0]:SL0[1:0] encodings have no simple algorithmic relationship to the
+> start levels they represent (that I can find, at least), so replace the
+> existing macros with functions that do lookups to encode and decode the
+> values. These new functions no longer make hardcoded assumptions about
+> the maximum level and instead rely on KVM_PGTABLE_FIRST_LEVEL and
+> KVM_PGTABLE_LAST_LEVEL.
+> 
+> This is preparatory work for enabling 52-bit IPA for 4KB and 16KB pages
+> with FEAT_LPA2.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Signed-off-by: Nianyao Tang <tangnianyao@huawei.com>
----
- arch/arm64/kvm/fpsimd.c | 1 +
- 1 file changed, 1 insertion(+)
+Why do we need to support 5-level paging at stage-2?
 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 02dd7e9ebd39..f5799f571317 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -184,6 +184,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 			sysreg_clear_set(CPACR_EL1,
- 					 CPACR_EL1_SMEN_EL0EN,
- 					 CPACR_EL1_SMEN_EL1EN);
-+		isb();
- 	}
- 
- 	if (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED) {
--- 
-1.8.3.1
+A configuration of start_level = 0, T0SZ = 12 with 4K paging would
+result in 16 concatenated tables at level 0, avoiding the level -1
+lookup altogether.
 
+--
+Thanks,
+Oliver
