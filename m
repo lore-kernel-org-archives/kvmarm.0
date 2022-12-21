@@ -2,75 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32AFEC10F1B
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Dec 2022 20:40:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E422C4332F
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Dec 2022 20:40:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAB8F4B920;
-	Wed, 21 Dec 2022 15:40:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDBBD4B91F;
+	Wed, 21 Dec 2022 15:40:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered)
 	header.i=@daynix-com.20210112.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id B2D6xsfzx87q; Wed, 21 Dec 2022 15:40:45 -0500 (EST)
+	with ESMTP id wELatKFcpp4s; Wed, 21 Dec 2022 15:40:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 587A14B8DD;
-	Wed, 21 Dec 2022 15:40:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 787B94B845;
+	Wed, 21 Dec 2022 15:40:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA7F44B894
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 15:40:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D98224B894
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 15:40:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id U7sfZgUmuMTy for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Dec 2022 15:40:42 -0500 (EST)
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com
- [209.85.215.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E57D4B858
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 15:40:42 -0500 (EST)
-Received: by mail-pg1-f179.google.com with SMTP id 79so11134029pgf.11
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 12:40:42 -0800 (PST)
+ with ESMTP id Fk3t77Zp8sKo for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Dec 2022 15:40:46 -0500 (EST)
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com
+ [209.85.215.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AB8B44B931
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 15:40:46 -0500 (EST)
+Received: by mail-pg1-f176.google.com with SMTP id r18so11130685pgr.12
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 12:40:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=daynix-com.20210112.gappssmtp.com; s=20210112;
  h=content-transfer-encoding:mime-version:references:in-reply-to
  :message-id:date:subject:cc:to:from:from:to:cc:subject:date
  :message-id:reply-to;
- bh=4WsGIW0prujF8xnGwWysGoOLhN4qrtpWJqnT9WJSTvs=;
- b=5BNXcx+yVcvjVST07KdLCwlGojojI6xGkRm4KeY/o+eAzJQ0jMUF3Fdwf77uRZ3bLP
- 3PgWtnxnFNfngQMa4EYpwEJAXndL+F6WHN53P6g1XCO+iQCQ3AFv6Z4jtP6R2TytJycv
- k5MblYDaS5RrONaYWAFw9HzXVerlr4oaybDnxAbDj7obSkXdz97+I4FKN75zL+J7+bcH
- xpJMBRlsNL+NQPNE/gFjVMCaSJ5IPyCk3/O4ys70IIktO+HU8yeoPLUkupJsa56MgzLI
- vMSPAcVKaSHL8WoVix7haxr/bHy+ka/se9IX0UWFfFNCYWHWGBQdt6ReGNnSw2cG6rmc
- ++CQ==
+ bh=TArwYxCFrSBrMRpJqgmbgk8qp38LFtviL46odPa8HP0=;
+ b=joriG+cv4G5IognI3D2VfQaRffHhYNEnG6/gPgyrUznSUi6vU+pa4uUmMWuPboXkYq
+ c9HYtU4HP0Fk18kzdGs1p3UFz08iLnDBwg9+8AraBsq73XGCnW47Z/MjTEg/xTDz5lC1
+ bda4D9u/1UiBSc8gUR5LVXpfVoOSXBtCK5crRUKDBimqyODd2vz5/j2QqvAoWeerafbn
+ 6KgwTFCAf9YbSuXNCFxtrNGqPFU5NApCnDJRem3m8MUuFJJ0vNXswOT5dKDUhyot0cCo
+ 5N8E5DiA1r559Fyk9UWJdoA2/l5Gl0rXrNxQt23l+Axks7hy+2sHjTJ1KwGaW4sCKqfE
+ Z7SQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=content-transfer-encoding:mime-version:references:in-reply-to
  :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
  :subject:date:message-id:reply-to;
- bh=4WsGIW0prujF8xnGwWysGoOLhN4qrtpWJqnT9WJSTvs=;
- b=Dzs5P79f8Ta3+CpKZjfSmUYj0JoGQUUuMm7F1wMOtv0YAffkEriOn1lWdfVXUvX5t+
- KD9j+HrGjgrpZArnPWePyuK9qz/KPliL4nV9ZHSy8Lik5QEAvX9o0IUJhNCpiD9Nz5O5
- lzGQb1hJ2R2SHlPbV/Y7V3nYcdEm6PkupD6ja8BRG0yTMm6QIi2xRgIiCa/9dbmTmLL7
- Aul4QdfJVfTef9rNyD4b1uFN7fQecrOmsHs9wI54Q4tQfX9lNXXUj4rzvDbCoUTU4Ho0
- qLt+SbFmK35qVwnxlJoqA1iE5zne05xnvOT8rIv+zhdKEvI3349nlcBwY/cefSq1dNkT
- HGmQ==
-X-Gm-Message-State: AFqh2kqUPEVgSAj+vMV905nwP0YgZQCx6lYom1GmEjAlZakiMthv8n36
- 5TxGTWuAr/MoQ9aE9tdsDmQoRw==
-X-Google-Smtp-Source: AMrXdXv7CZYsyHTYocefuPTzARxhO0WGgu2LfUtC7x0rzE47hkCIXZKXxT/E/wO/l1Z5CSyjB6pSZA==
-X-Received: by 2002:a62:1d87:0:b0:572:8b7d:f350 with SMTP id
- d129-20020a621d87000000b005728b7df350mr3510660pfd.26.1671655241787; 
- Wed, 21 Dec 2022 12:40:41 -0800 (PST)
+ bh=TArwYxCFrSBrMRpJqgmbgk8qp38LFtviL46odPa8HP0=;
+ b=VIFRQE/3NYxhMDz3q7CJm7CKM5GuPcZ3b9RlklMoFb1uNjWNVh69qmJMGr6/wifdQd
+ gx2Or3qatUOwtMTmEKVFEI9vaIIKzPp3bl+dOJ7re40UunSZvQOzJ1eDczIJOZ5BPlcJ
+ jUBmLWf2nKPrY2BBW1opAIgTOz3ZRGufnU+OudnrrUnWWMS8jDo/DGv7VVCUtZBK87gD
+ PnUjmO0t2U5kBYhvWWE7+iOStofNbUiGpun5q3VlWRIghZMz5ryWWtrOZt2txQZORvOq
+ l7gOng2Yu7dvJHUd0rywc9KxrpK6JSqvuF2UL3ZFpPbWRX+hmDbBrjJOFtw/GLCy4Av7
+ Gtcw==
+X-Gm-Message-State: AFqh2koh8meLuUuG5TXJn1Y7/vU3o1/wCW3+42aX3X1UoZqXxgWCyQyf
+ WaegInbnFV2P926k5GHCl+0uke6XXl+mjiOppN0=
+X-Google-Smtp-Source: AMrXdXus/NjT2aljajPMuDhUWGdmwEHymPPCIX/Qo0dfF4EdNhn1nOcKImr59bbVgkeHDh9Zm3ksbw==
+X-Received: by 2002:a05:6a00:1c9f:b0:577:8c7e:7489 with SMTP id
+ y31-20020a056a001c9f00b005778c7e7489mr3110757pfw.10.1671655245905; 
+ Wed, 21 Dec 2022 12:40:45 -0800 (PST)
 Received: from fedora.flets-east.jp ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
  by smtp.gmail.com with ESMTPSA id
- r4-20020aa79884000000b005763c22ea07sm11017784pfl.74.2022.12.21.12.40.37
+ r4-20020aa79884000000b005763c22ea07sm11017784pfl.74.2022.12.21.12.40.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Dec 2022 12:40:41 -0800 (PST)
+ Wed, 21 Dec 2022 12:40:45 -0800 (PST)
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
 To: 
-Subject: [PATCH v4 4/7] arm64/cache: Move CLIDR macro definitions
-Date: Thu, 22 Dec 2022 05:40:13 +0900
-Message-Id: <20221221204016.658874-5-akihiko.odaki@daynix.com>
+Subject: [PATCH v4 5/7] KVM: arm64: Always set HCR_TID2
+Date: Thu, 22 Dec 2022 05:40:14 +0900
+Message-Id: <20221221204016.658874-6-akihiko.odaki@daynix.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221221204016.658874-1-akihiko.odaki@daynix.com>
 References: <20221221204016.658874-1-akihiko.odaki@daynix.com>
@@ -99,48 +99,93 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The macros are useful for KVM which needs to manage how CLIDR is exposed
-to vcpu so move them to include/asm/cache.h, which KVM can refer to.
+Always set HCR_TID2 to trap CTR_EL0, CCSIDR2_EL1, CLIDR_EL1, and
+CSSELR_EL1. This saves a few lines of code and allows to employ their
+access trap handlers for more purposes anticipated by the old
+condition for setting HCR_TID2.
 
+Suggested-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 ---
- arch/arm64/include/asm/cache.h | 6 ++++++
- arch/arm64/kernel/cacheinfo.c  | 5 -----
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h           | 3 ++-
+ arch/arm64/include/asm/kvm_emulate.h       | 4 ----
+ arch/arm64/include/asm/kvm_host.h          | 2 --
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 2 --
+ 4 files changed, 2 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
-index c0b178d1bb4f..ab7133654a72 100644
---- a/arch/arm64/include/asm/cache.h
-+++ b/arch/arm64/include/asm/cache.h
-@@ -16,6 +16,12 @@
- #define CLIDR_LOC(clidr)	(((clidr) >> CLIDR_LOC_SHIFT) & 0x7)
- #define CLIDR_LOUIS(clidr)	(((clidr) >> CLIDR_LOUIS_SHIFT) & 0x7)
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 8aa8492dafc0..44be46c280c1 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -81,11 +81,12 @@
+  * SWIO:	Turn set/way invalidates into set/way clean+invalidate
+  * PTW:		Take a stage2 fault if a stage1 walk steps in device memory
+  * TID3:	Trap EL1 reads of group 3 ID registers
++ * TID2:	Trap CTR_EL0, CCSIDR2_EL1, CLIDR_EL1, and CSSELR_EL1
+  */
+ #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
+ 			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
+ 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
+-			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 )
++			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID2)
+ #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
+ #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
+ #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 9bdba47f7e14..30c4598d643b 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -88,10 +88,6 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 	if (vcpu_el1_is_32bit(vcpu))
+ 		vcpu->arch.hcr_el2 &= ~HCR_RW;
  
-+/* Ctypen, bits[3(n - 1) + 2 : 3(n - 1)], for n = 1 to 7 */
-+#define CLIDR_CTYPE_SHIFT(level)	(3 * (level - 1))
-+#define CLIDR_CTYPE_MASK(level)		(7 << CLIDR_CTYPE_SHIFT(level))
-+#define CLIDR_CTYPE(clidr, level)	\
-+	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
-+
- /*
-  * Memory returned by kmalloc() may be used for DMA, so we must make
-  * sure that all such allocations are cache aligned. Otherwise,
-diff --git a/arch/arm64/kernel/cacheinfo.c b/arch/arm64/kernel/cacheinfo.c
-index 97c42be71338..daa7b3f55997 100644
---- a/arch/arm64/kernel/cacheinfo.c
-+++ b/arch/arm64/kernel/cacheinfo.c
-@@ -11,11 +11,6 @@
- #include <linux/of.h>
+-	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
+-	    vcpu_el1_is_32bit(vcpu))
+-		vcpu->arch.hcr_el2 |= HCR_TID2;
+-
+ 	if (kvm_has_mte(vcpu->kvm))
+ 		vcpu->arch.hcr_el2 |= HCR_ATA;
+ }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 45e2136322ba..cc2ede0eaed4 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -621,7 +621,6 @@ static inline bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
+ 		return false;
  
- #define MAX_CACHE_LEVEL			7	/* Max 7 level supported */
--/* Ctypen, bits[3(n - 1) + 2 : 3(n - 1)], for n = 1 to 7 */
--#define CLIDR_CTYPE_SHIFT(level)	(3 * (level - 1))
--#define CLIDR_CTYPE_MASK(level)		(7 << CLIDR_CTYPE_SHIFT(level))
--#define CLIDR_CTYPE(clidr, level)	\
--	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
+ 	switch (reg) {
+-	case CSSELR_EL1:	*val = read_sysreg_s(SYS_CSSELR_EL1);	break;
+ 	case SCTLR_EL1:		*val = read_sysreg_s(SYS_SCTLR_EL12);	break;
+ 	case CPACR_EL1:		*val = read_sysreg_s(SYS_CPACR_EL12);	break;
+ 	case TTBR0_EL1:		*val = read_sysreg_s(SYS_TTBR0_EL12);	break;
+@@ -666,7 +665,6 @@ static inline bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
+ 		return false;
  
- int cache_line_size(void)
+ 	switch (reg) {
+-	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	break;
+ 	case SCTLR_EL1:		write_sysreg_s(val, SYS_SCTLR_EL12);	break;
+ 	case CPACR_EL1:		write_sysreg_s(val, SYS_CPACR_EL12);	break;
+ 	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	break;
+diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+index baa5b9b3dde5..147cb4c846c6 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+@@ -39,7 +39,6 @@ static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
+ 
+ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
  {
+-	ctxt_sys_reg(ctxt, CSSELR_EL1)	= read_sysreg(csselr_el1);
+ 	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
+ 	ctxt_sys_reg(ctxt, CPACR_EL1)	= read_sysreg_el1(SYS_CPACR);
+ 	ctxt_sys_reg(ctxt, TTBR0_EL1)	= read_sysreg_el1(SYS_TTBR0);
+@@ -95,7 +94,6 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
+ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ {
+ 	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
+-	write_sysreg(ctxt_sys_reg(ctxt, CSSELR_EL1),	csselr_el1);
+ 
+ 	if (has_vhe() ||
+ 	    !cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
 -- 
 2.38.1
 
