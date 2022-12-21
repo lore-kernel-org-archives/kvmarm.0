@@ -2,76 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77637C10F1B
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Dec 2022 20:40:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0ADC4332F
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Dec 2022 20:40:45 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1371C4B8F4;
-	Wed, 21 Dec 2022 15:40:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 415584B858;
+	Wed, 21 Dec 2022 15:40:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered)
 	header.i=@daynix-com.20210112.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0+Q6eaygEW4E; Wed, 21 Dec 2022 15:40:35 -0500 (EST)
+	with ESMTP id UHPlYqngadvI; Wed, 21 Dec 2022 15:40:44 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFD4A4B91E;
-	Wed, 21 Dec 2022 15:40:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31B7E4B894;
+	Wed, 21 Dec 2022 15:40:44 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 35E034B8DD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 15:40:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FC034B824
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 15:40:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RxbI4Qw0HBOV for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Dec 2022 15:40:34 -0500 (EST)
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com
- [209.85.215.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 22E134B937
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 15:40:34 -0500 (EST)
-Received: by mail-pg1-f175.google.com with SMTP id e190so6707138pgc.9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 12:40:34 -0800 (PST)
+ with ESMTP id sVPHcZOGriW8 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Dec 2022 15:40:39 -0500 (EST)
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com
+ [209.85.210.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BB7B4B922
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 15:40:38 -0500 (EST)
+Received: by mail-pf1-f179.google.com with SMTP id k79so11508150pfd.7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 12:40:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=daynix-com.20210112.gappssmtp.com; s=20210112;
  h=content-transfer-encoding:mime-version:references:in-reply-to
  :message-id:date:subject:cc:to:from:from:to:cc:subject:date
  :message-id:reply-to;
- bh=cbFQ+J5fs5BdCa+m7U3HiXNal18DTSvVi/iSf3zznx4=;
- b=18h10GUg0vVIZjuVhPGsjv6haTyX1xXm0fs1oK6cXpMzO9Q+tV38Yokj9e74NrYojp
- FeNHxIzWBf2ySgHYIzgLjcGesUuvFH6a+Srq4hqQsWy/p97WPv3c0gdTH2FOIwmniMkW
- zv6O5Skz7TQf3tDU07Vh8+ZcGaFBCwx7+ORX3ryJurzUZALXh29abwAuL/ZuNcxeD+U/
- HVOlKOv3qgi2G+b14vQqmHWCfjxGnohvzeC4FJ2DiYjDFjMv3NLr1MYlyP6M/s1/MD7C
- hOwrViSfyFkVVjfiCbn4+COqzMKTLuMnlpTg4C6KlTqKKSKr8v/hd1Z+0ijSgB39FxNe
- JI3A==
+ bh=Pmk4xq5A3rzrlj2+ophiAaZi/UXmP/mo3GRVdbl+68c=;
+ b=rBZZZQ+6jmJ0L8kt2AAAyWKDYURGWgg2jYIvzhfsZvZvEtJZOEgaefc6924ldak9C4
+ bGIi/87uhR4CkdUNv1Y9HrDcs8qRvip5lwN+kTe6HxiJSTKRPaovQ74xU513HQJ7wu7o
+ DlowDD5mS9cCTp4yxhmu5/vCAZTJNw43eJjxbHD4DLmXp9oZYLJNY0QVLUcO2DHQ6uWv
+ wHqRsl/XD2RLPWzKnNegucX6kUSMsfIQ67qE4GDKweu2IX1UQY2CSR53j7q6XnjAloNt
+ 3exq48ddIwSK7doMeHFKrwOlWhTnOgAD5nuGqynto1ETtEPVFhDmV/oIeKa3IBb91CIG
+ eyMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=content-transfer-encoding:mime-version:references:in-reply-to
  :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
  :subject:date:message-id:reply-to;
- bh=cbFQ+J5fs5BdCa+m7U3HiXNal18DTSvVi/iSf3zznx4=;
- b=gszOjm1GC2d0hMnnc8iRYFqprcWgClVGmhMoaR2OJG7FoasEa5hS2i63gI1hEc0Wz6
- plXBGtOAz68laHnTQctv2WENfIltDCEjB4rADx2XwJrACy07VKlBb7lLg8byAlPUSxQb
- Ji0HethiwtyVLjhNJz6GjPtDZZZU61Gwfe83tq5uvmQqdCdTYun7VW9EQHng2V8TZjEG
- +jTp41yMev3jnU43tEzYLpV0v8BMSSD2DTz8hM7eqxXK9/lDu6mxLTDXAA2oBa1F/rzn
- vNqqJEfgdy4KSFiNqed3sVKB8USD1DiJWXAXHCYt+uF8oV5qJoWeWJfebSpPkn4uBoCz
- yreA==
-X-Gm-Message-State: AFqh2krS0dkL65lSgdoHxa17D95zu9PA7Ms18nbshlGKiPKIjMh1yIVL
- fdtprjuiS3+foNLUXoNHzra8Og==
-X-Google-Smtp-Source: AMrXdXvlAmSAHNGVh71PvP1fhyI+g3oX+xufwQp6Y95KtVUC/TBW27Yvk+rzxZQ57dE++5uVHJO1jA==
-X-Received: by 2002:a05:6a00:26ee:b0:578:777e:7f18 with SMTP id
- p46-20020a056a0026ee00b00578777e7f18mr3088234pfw.3.1671655233393; 
- Wed, 21 Dec 2022 12:40:33 -0800 (PST)
+ bh=Pmk4xq5A3rzrlj2+ophiAaZi/UXmP/mo3GRVdbl+68c=;
+ b=YcoJbRJ3U4OsPOzZiOtPwUpehfE0kKTMwLsA2Dio6Ejblo0sL7l3d9yEPNh6Ck3Fo0
+ o9enZWid44CTuQspQD2hK1JO7xlk/pgCc/RV/IqQgI9rjJql7BqUi4FLWdQpW90ui8Xh
+ gpthEGfQFPRtBJgnrE6TmCd+rh3XKrpCshsUYkjZH2ZX5xn+jCLJzSiD0rragqGdKux/
+ TxO5r47Q7gvxXzDo1Ne3/MO7o7SMCoxgXOkElAERE6I1USn5svYw7ecZKjlQSmOfO8L0
+ eRkUqxVQb91YgGIvtIHlo3mFYY59MzXv7ebytlZVVAA3gIYqIPZk/5uXKacVdOhLiwKH
+ 4z7Q==
+X-Gm-Message-State: AFqh2krNAOhf2LF2+SUofHqrtAVQikquxcquocTHpYjg2f+dr+VFk97B
+ X5qup5FZ7S3gQEy2Qe8EigRB5Q==
+X-Google-Smtp-Source: AMrXdXsax/iqZklqdXP5/90X5ExMF635ed0bL4vX13zR5gG19L2ERgmig6NZK0frHLvyHdzzrJLAXA==
+X-Received: by 2002:aa7:9514:0:b0:57f:1da7:a781 with SMTP id
+ b20-20020aa79514000000b0057f1da7a781mr3809463pfp.25.1671655237614; 
+ Wed, 21 Dec 2022 12:40:37 -0800 (PST)
 Received: from fedora.flets-east.jp ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
  by smtp.gmail.com with ESMTPSA id
- r4-20020aa79884000000b005763c22ea07sm11017784pfl.74.2022.12.21.12.40.29
+ r4-20020aa79884000000b005763c22ea07sm11017784pfl.74.2022.12.21.12.40.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Dec 2022 12:40:33 -0800 (PST)
+ Wed, 21 Dec 2022 12:40:37 -0800 (PST)
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
 To: 
-Subject: [PATCH v4 2/7] arm64/sysreg: Convert CCSIDR_EL1 to automatic
- generation
-Date: Thu, 22 Dec 2022 05:40:11 +0900
-Message-Id: <20221221204016.658874-3-akihiko.odaki@daynix.com>
+Subject: [PATCH v4 3/7] arm64/sysreg: Add CCSIDR2_EL1
+Date: Thu, 22 Dec 2022 05:40:12 +0900
+Message-Id: <20221221204016.658874-4-akihiko.odaki@daynix.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221221204016.658874-1-akihiko.odaki@daynix.com>
 References: <20221221204016.658874-1-akihiko.odaki@daynix.com>
@@ -100,47 +99,31 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Convert CCSIDR_EL1 to automatic generation as per DDI0487I.a.
+CCSIDR2_EL1 is available if FEAT_CCIDX is implemented as per
+DDI0487I.a.
 
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+Reviewed-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/sysreg.h |  1 -
- arch/arm64/tools/sysreg         | 10 ++++++++++
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ arch/arm64/tools/sysreg | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 7d301700d1a9..910e960661d3 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -425,7 +425,6 @@
- 
- #define SYS_CNTKCTL_EL1			sys_reg(3, 0, 14, 1, 0)
- 
--#define SYS_CCSIDR_EL1			sys_reg(3, 1, 0, 0, 0)
- #define SYS_AIDR_EL1			sys_reg(3, 1, 0, 0, 7)
- 
- #define SYS_RNDR_EL0			sys_reg(3, 3, 2, 4, 0)
 diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 8f26fe1bedc6..097d6faafc87 100644
+index 097d6faafc87..01d592cbc0ba 100644
 --- a/arch/arm64/tools/sysreg
 +++ b/arch/arm64/tools/sysreg
-@@ -873,6 +873,16 @@ Sysreg	SCXTNUM_EL1	3	0	13	0	7
- Field	63:0	SoftwareContextNumber
+@@ -899,6 +899,11 @@ Field	5:3	Ctype2
+ Field	2:0	Ctype1
  EndSysreg
  
-+# The bit layout for CCSIDR_EL1 depends on whether FEAT_CCIDX is implemented.
-+# The following is for case when FEAT_CCIDX is not implemented.
-+Sysreg	CCSIDR_EL1	3	1	0	0	0
-+Res0	63:32
-+Unkn	31:28
-+Field	27:13	NumSets
-+Field	12:3	Associativity
-+Field	2:0	LineSize
++Sysreg	CCSIDR2_EL1	3	1	0	0	2
++Res0	63:24
++Field	23:0	NumSets
 +EndSysreg
 +
- Sysreg	CLIDR_EL1	3	1	0	0	1
- Res0	63:47
- Field	46:33	Ttypen
+ Sysreg	GMID_EL1	3	1	0	0	4
+ Res0	63:4
+ Field	3:0	BS
 -- 
 2.38.1
 
