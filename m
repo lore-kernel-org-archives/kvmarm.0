@@ -2,57 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B3E6C4332F
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Dec 2022 18:26:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 737FEC4332F
+	for <kvmarm@archiver.kernel.org>; Wed, 21 Dec 2022 20:40:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3BC64B8A9;
-	Wed, 21 Dec 2022 13:26:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C67474B858;
+	Wed, 21 Dec 2022 15:40:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered)
+	header.i=@daynix-com.20210112.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id U1d2kuwri7Tj; Wed, 21 Dec 2022 13:26:57 -0500 (EST)
+	with ESMTP id wCVbU+Oir8Ny; Wed, 21 Dec 2022 15:40:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 52FE54B8BB;
-	Wed, 21 Dec 2022 13:26:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D4824B91F;
+	Wed, 21 Dec 2022 15:40:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E9964B8A9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 13:26:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 75CA64B8FD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 15:40:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IfMPGU-9w6Z4 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Dec 2022 13:26:54 -0500 (EST)
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com
- [91.218.175.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E7494B84A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 13:26:54 -0500 (EST)
-Date: Wed, 21 Dec 2022 18:26:47 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1671647212;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=oCiAxJiKxcSU5UorQx7uMbenKIARcOlfI4FuMp6UPQI=;
- b=XYkz2RtIvG63Ms5qZ0nHvVbllVtrnrqKun6b7hlGxdceeiZSsaJ6GT9MGFJZReWHwcRqtV
- Hj7s/l4rLk+Ahr4+sh5zi7jaq0HCx4nbkWXoWOeGfJMfVraw6WQUGERd2oUWtkIN7jxxJp
- ZY+b0NUaxImbzey19b2CT36oAshvQ04=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 1/3] KVM: arm64: Fix S1PTW handling on RO memslots
-Message-ID: <Y6NP54MjCW/doZYS@google.com>
-References: <20221220200923.1532710-1-maz@kernel.org>
- <20221220200923.1532710-2-maz@kernel.org>
- <Y6IteDoK406o9pM+@google.com> <86pmcdaylx.wl-maz@kernel.org>
- <Y6M5Vh+EGOhkR5hd@google.com> <86k02kbq2x.wl-maz@kernel.org>
+ with ESMTP id MeAbK6YAIxAw for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 21 Dec 2022 15:40:26 -0500 (EST)
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com
+ [209.85.210.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 159E94B858
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 15:40:26 -0500 (EST)
+Received: by mail-pf1-f181.google.com with SMTP id c13so11510884pfp.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 12:40:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20210112.gappssmtp.com; s=20210112;
+ h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+ :to:from:from:to:cc:subject:date:message-id:reply-to;
+ bh=46KJ5714UULj+WdfQJdjJQGrRLK9Woox/C1y7Qhoy2g=;
+ b=b7pzq/wrJe+N+sYe0BI4+oHft0dyRVTtGA/7MXQ9g7N85VS0xZRYMon3Sb3oXzkJm9
+ 7dMZnXr5DNUuug64ZrjUUWKQwsrX9ErROhWl/859Rw2hS5lCOrid3gjRl+tIHv70KOk7
+ qMijkbXr9o2A4KspnQapBxQCJvcXHDil02e0tZjkHILGyQaG5IhLCMXq8d9/k7gNlbWO
+ sDXeBldQxtbCbhspG3r9DnJvC4hEULpPr8QBJT2tSX/xdN6wGGewBE0V9eBG4faitRhk
+ r/ivw40L42LGGY8d8Dw0z8eX+uVhBG5K+SsbxCt4tyO6kv0AL0xYCH5zWQmnXCaYLv7m
+ mUGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+ :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+ :reply-to;
+ bh=46KJ5714UULj+WdfQJdjJQGrRLK9Woox/C1y7Qhoy2g=;
+ b=qcaIviIG7aGQOtJw7NQHM11Krh5yNKTlBZUXlOHVLo/o9TPMOrjcQiA6MS9jD113CW
+ exE+Ta4cnW2EUUigadxAyJGqABV+x5dZgdgUcidZdWJtgDpMagS+lBfcUZWrvIH4/1oD
+ KDek2Lu6IkmdVRuJ2URoi+QT5zgUc0aCiQN3JIZOFQ7OFbYdgJv3PEGhXc6ZvSVdrk6z
+ HbkrGxKeL/BYIbHLMA4cHgVRWe3J8w+1FHAQvFqKQ8iQgXCvZnuLkdEzxErsKSH0c3Vq
+ lss9JXJWkRAPBPkoakeLuw1LLK+NURZahg4axaXvmB4GCIyON8Yg56Bu/6NcVurtvibK
+ e0tw==
+X-Gm-Message-State: AFqh2kpwX4023sKeMO4eDIIIDM8jlT6mP1zf0w1sWda2UyfGC3/GKSGp
+ sDRHvaKkn5y2tw75f07Ra3h4QQ==
+X-Google-Smtp-Source: AMrXdXs2wb7SfTWVOx0D5KHi10IfGT9eumUAALKjwFYtEgDmphXRkUTVayIt5zwFZw6zsdsFbsyt9g==
+X-Received: by 2002:a05:6a00:1d9d:b0:566:900d:5af2 with SMTP id
+ z29-20020a056a001d9d00b00566900d5af2mr3772325pfw.34.1671655224959; 
+ Wed, 21 Dec 2022 12:40:24 -0800 (PST)
+Received: from fedora.flets-east.jp ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
+ by smtp.gmail.com with ESMTPSA id
+ r4-20020aa79884000000b005763c22ea07sm11017784pfl.74.2022.12.21.12.40.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 21 Dec 2022 12:40:24 -0800 (PST)
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+To: 
+Subject: [PATCH v4 0/7] KVM: arm64: Normalize cache configuration
+Date: Thu, 22 Dec 2022 05:40:09 +0900
+Message-Id: <20221221204016.658874-1-akihiko.odaki@daynix.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <86k02kbq2x.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>, stable@vger.kernel.org,
+Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>, Marc Zyngier <maz@kernel.org>,
+ Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
+ asahi@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
  kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -71,81 +96,68 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Dec 21, 2022 at 05:53:58PM +0000, Marc Zyngier wrote:
-> On Wed, 21 Dec 2022 16:50:30 +0000,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > On Wed, Dec 21, 2022 at 09:35:06AM +0000, Marc Zyngier wrote:
-> > 
-> > [...]
-> > 
-> > > > > +	if (kvm_vcpu_abt_iss1tw(vcpu)) {
-> > > > > +		/*
-> > > > > +		 * Only a permission fault on a S1PTW should be
-> > > > > +		 * considered as a write. Otherwise, page tables baked
-> > > > > +		 * in a read-only memslot will result in an exception
-> > > > > +		 * being delivered in the guest.
-> > > > 
-> > > > Somewhat of a tangent, but:
-> > > > 
-> > > > Aren't we somewhat unaligned with the KVM UAPI by injecting an
-> > > > exception in this case? I know we've been doing it for a while, but it
-> > > > flies in the face of the rules outlined in the
-> > > > KVM_SET_USER_MEMORY_REGION documentation.
-> > > 
-> > > That's an interesting point, and I certainly haven't considered that
-> > > for faults introduced by page table walks.
-> > > 
-> > > I'm not sure what userspace can do with that though. The problem is
-> > > that this is a write for which we don't have useful data: although we
-> > > know it is a page-table walker access, we don't know what it was about
-> > > to write. The instruction that caused the write is meaningless (it
-> > > could either be a load, a store, or an instruction fetch). How do you
-> > > populate the data[] field then?
-> > > 
-> > > If anything, this is closer to KVM_EXIT_ARM_NISV, for which we give
-> > > userspace the full ESR and ask it to sort it out. I doubt it will be
-> > > able to, but hey, maybe it is worth a shot. This would need to be a
-> > > different exit reason though, as NISV is explicitly for non-memslot
-> > > stuff.
-> > > 
-> > > In any case, the documentation for KVM_SET_USER_MEMORY_REGION needs to
-> > > reflect the fact that KVM_EXIT_MMIO cannot represent a fault due to a
-> > > S1 PTW.
-> > 
-> > Oh I completely agree with you here. I probably should have said before,
-> > I think the exit would be useless anyway. Getting the documentation in
-> > line with the intended behavior seems to be the best fix.
-> 
-> Right. How about something like this?
+Before this change, the cache configuration of the physical CPU was
+exposed to vcpus. This is problematic because the cache configuration a
+vcpu sees varies when it migrates between vcpus with different cache
+configurations.
 
-Looks good to me, thanks!
+Fabricate cache configuration from the sanitized value, which holds the
+CTR_EL0 value the userspace sees regardless of which physical CPU it
+resides on.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+V3 -> V4:
+- Implemented UNKNOWN system register definition for CCSIDR_EL1
+- Added a comment about the relation between CCSIDR_EL1 and FEAT_CCIDX
+- Squashed "Normalize cache configuration" and "Allow user to set
+  CCSIDR_EL1"
+  The intermediate state between them did not make much sense.
+- Introduced FIELD_GET to extract CCSIDR_EL1_LineSize.
 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 226b40baffb8..72abd018a618 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -1381,6 +1381,14 @@ It is recommended to use this API instead of the KVM_SET_MEMORY_REGION ioctl.
->  The KVM_SET_MEMORY_REGION does not allow fine grained control over memory
->  allocation and is deprecated.
->  
-> +Note: On arm64, a write generated by the page-table walker (to update
-> +the Access and Dirty flags, for example) never results in a
-> +KVM_EXIT_MMIO exit when the slot has the KVM_MEM_READONLY flag. This
-> +is because KVM cannot provide the data that would be written by the
-> +page-table walker, making it impossible to emulate the access.
-> +Instead, an abort (data abort if the cause of the page-table update
-> +was a load or a store, instruction abort if it was an instruction
-> +fetch) is injected in the guest.
->  
->  4.36 KVM_SET_TSS_ADDR
->  ---------------------
+V2 -> V3:
+- Corrected message for patch "Normalize cache configuration"
+- Split patch "Normalize cache configuration"
+- Added handling for CSSELR_EL1.TnD
+- Added code to ignore RES0 in CSSELR_EL1
+- Replaced arm64_ftr_reg_ctrel0.sys_val with
+  read_sanitised_ftr_reg(SYS_CTR_EL0)
+- Fixed vcpu->arch.ccsidr initialziation
+- Added CCSIDR_EL1 sanitization
+- Added FWB check
+- Added a comment for CACHE_TYPE_SEPARATE
+- Added MTE tag cache creation code for CLIDR_EL1 fabrication
+- Removed CLIDR_EL1 reset code for reset caused by guest
+- Added a comment for CCSIDR2
 
---
-Best,
-Oliver
+V2: https://lore.kernel.org/lkml/20221211051700.275761-2-akihiko.odaki@daynix.com/
+V1: https://lore.kernel.org/lkml/525ff263-90b3-5b12-da31-171b09f9ad1b@daynix.com/
+
+Akihiko Odaki (6):
+  arm64/sysreg: Convert CCSIDR_EL1 to automatic generation
+  arm64/sysreg: Add CCSIDR2_EL1
+  arm64/cache: Move CLIDR macro definitions
+  KVM: arm64: Always set HCR_TID2
+  KVM: arm64: Mask FEAT_CCIDX
+  KVM: arm64: Normalize cache configuration
+
+Marc Zyngier (1):
+  arm64: Allow the definition of UNKNOWN system register fields
+
+ arch/arm64/include/asm/cache.h             |   9 +
+ arch/arm64/include/asm/kvm_arm.h           |   3 +-
+ arch/arm64/include/asm/kvm_emulate.h       |   4 -
+ arch/arm64/include/asm/kvm_host.h          |   6 +-
+ arch/arm64/include/asm/sysreg.h            |   1 -
+ arch/arm64/kernel/cacheinfo.c              |   5 -
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   2 -
+ arch/arm64/kvm/reset.c                     |   1 +
+ arch/arm64/kvm/sys_regs.c                  | 240 ++++++++++++---------
+ arch/arm64/tools/gen-sysreg.awk            |  20 +-
+ arch/arm64/tools/sysreg                    |  17 ++
+ 11 files changed, 196 insertions(+), 112 deletions(-)
+
+-- 
+2.38.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
