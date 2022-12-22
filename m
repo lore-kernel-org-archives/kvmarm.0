@@ -2,87 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC490C4332F
-	for <kvmarm@archiver.kernel.org>; Wed, 21 Dec 2022 20:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38BEEC4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Dec 2022 09:01:26 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98A4E4B8C7;
-	Wed, 21 Dec 2022 15:40:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A5774BA8E;
+	Thu, 22 Dec 2022 04:01:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered)
-	header.i=@daynix-com.20210112.gappssmtp.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 57BnK0CMGSPE; Wed, 21 Dec 2022 15:40:57 -0500 (EST)
+	with ESMTP id hdrhaMLWrIh2; Thu, 22 Dec 2022 04:01:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D14904B936;
-	Wed, 21 Dec 2022 15:40:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31A274BA84;
+	Thu, 22 Dec 2022 04:01:25 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 22C534B824
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 15:40:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 506414BA80
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Dec 2022 04:01:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0yDtXlxUxY+A for <kvmarm@lists.cs.columbia.edu>;
- Wed, 21 Dec 2022 15:40:55 -0500 (EST)
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com
- [209.85.215.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 188004B936
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 15:40:55 -0500 (EST)
-Received: by mail-pg1-f172.google.com with SMTP id v3so2664pgh.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 21 Dec 2022 12:40:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20210112.gappssmtp.com; s=20210112;
- h=content-transfer-encoding:mime-version:references:in-reply-to
- :message-id:date:subject:cc:to:from:from:to:cc:subject:date
- :message-id:reply-to;
- bh=RdySMQgwDyA7J4mrqpXKUT5H+jrT1E2iskg+0CBNPN0=;
- b=wmF2DDKbuB8pja8OGB8LlO+BnVffQ/bnQ64zAQSkiAtx4co/c5SvnMJKYOmtAl8gRY
- Cj/ivxHoTWeDtkR6A53u0cQbw1i+e0RJDLirhFDAQFrmQyUCMYNM4iYy6uivLrRhSyZc
- 1YxLXngdx2CsduuzTgPBIsVFjoN/UJEqGZNcNPTWxJMQ3tazmXRURV+81EDI0al12RPs
- mwgnvtUDiVe3rF7gpPbq0NJiLsdtBkkKPuKb0JMTXSq8LxFkBiQiGXiStm5JgXG1jfUj
- 0k4uo24c8rkwH3GSwxrvCI7a0LxymFr/vjRRwmF44oi+WkmJNYQYC1B2Yo0AaNJqFSvl
- xXzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=content-transfer-encoding:mime-version:references:in-reply-to
- :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
- :subject:date:message-id:reply-to;
- bh=RdySMQgwDyA7J4mrqpXKUT5H+jrT1E2iskg+0CBNPN0=;
- b=4iyu8wr2BUlZBxf9NPsuq4VEhTUnuT2tYRYI3QIXIjOhwpvT+OeFOt7+g581uw4VV9
- I78F5X3GvA/9avJZoqi9ZF1xSy+C5KiwUnBSe9Ek2lRQKPohaQi+pTHGevvTgY6AYzUJ
- JiDEOsxYjlHIlFwMMveUanS3LDw2AiG8v5nS3TM2OUnlWfusdVRjV1Oq2LmMWc122oX8
- WYGpckm9+qLmR5qQcz5JWctI1rEib3Jm025x1vMYatOD87DQhRNdjXK7SS/9nI94ZMCy
- G6FD6A4yOqTuK//WadbWJxXvZwrUDnsSDYmayyxF7WjuoMPrtyH4a6NVkGF3yeTJGGnY
- HBMg==
-X-Gm-Message-State: AFqh2kop/0FYaWumGfn6a6dqpFSG/D9yEm+UxiPkzCnpnmnbjy83ohHA
- uRL7/16xhPG7z0rrg+QkKR7Qxg==
-X-Google-Smtp-Source: AMrXdXtY+4bs0wf3hgkaxqwp8mu+wLw+8K5wP2eDY7CaFzW3JoMe6uEr6A8+X+dqMfJBi/IwCCvkAg==
-X-Received: by 2002:aa7:9631:0:b0:57a:9a7f:7896 with SMTP id
- r17-20020aa79631000000b0057a9a7f7896mr18247025pfg.28.1671655254173; 
- Wed, 21 Dec 2022 12:40:54 -0800 (PST)
-Received: from fedora.flets-east.jp ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
- by smtp.gmail.com with ESMTPSA id
- r4-20020aa79884000000b005763c22ea07sm11017784pfl.74.2022.12.21.12.40.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Dec 2022 12:40:53 -0800 (PST)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-To: 
-Subject: [PATCH v4 7/7] KVM: arm64: Normalize cache configuration
-Date: Thu, 22 Dec 2022 05:40:16 +0900
-Message-Id: <20221221204016.658874-8-akihiko.odaki@daynix.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221221204016.658874-1-akihiko.odaki@daynix.com>
-References: <20221221204016.658874-1-akihiko.odaki@daynix.com>
-MIME-Version: 1.0
-Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
- Akihiko Odaki <akihiko.odaki@daynix.com>,
- Mathieu Poirier <mathieu.poirier@linaro.org>, Marc Zyngier <maz@kernel.org>,
- Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
- asahi@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id A-LXXkecGQfV for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Dec 2022 04:01:22 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 062784BA6A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Dec 2022 04:01:21 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id A1E78B81CB5;
+ Thu, 22 Dec 2022 09:01:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ADB6C433F0;
+ Thu, 22 Dec 2022 09:01:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1671699679;
+ bh=ReKgCYVMU0fpHo9ze2q5t+tzd2M1R5louYV6HlhKykg=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=K3EoC8oVVMd180JnK8wlfqqXrRU9pl3C+A9OqnRxP9m+fsED6HPf/xu1NTrGW7ay4
+ YIG/BIl5SpAs4md/d21goElhP76tmavHluID2fY5qmdhILdGBATelfssv2Ra0dLiDE
+ iWd4pXnrtzjRCTkDUtsOm1IqLeyJdtXk5ybr/JqM1VtOpC3nf0ZGc2D6PxqRI7AO1T
+ p6AEI/g2wCzy/3nq1jl6Sx2XOCOUPUoF6bNfja/14+8pNyUjE10lKDoUO+6k2fCRa8
+ 76l7q0yDe8NH7Vm0GYglLsm8XoxmYqDt7Z1sRL4FlBQbfaBpp5h7/61Kk83639M30h
+ P2Sm4zGjziHGw==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1p8HS0-00EKZt-4s;
+ Thu, 22 Dec 2022 09:01:16 +0000
+Date: Thu, 22 Dec 2022 09:01:15 +0000
+Message-ID: <86ili3byn8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 2/3] KVM: arm64: Handle S1PTW translation with TCR_HA set
+ as a write
+In-Reply-To: <Y6NGcFXLtwOt0+d6@google.com>
+References: <20221220200923.1532710-1-maz@kernel.org>
+ <20221220200923.1532710-3-maz@kernel.org>
+ <Y6M4TqvJytAEq2ID@google.com> <Y6NGcFXLtwOt0+d6@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, ricarkol@google.com,
+ kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,445 +89,86 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Before this change, the cache configuration of the physical CPU was
-exposed to vcpus. This is problematic because the cache configuration a
-vcpu sees varies when it migrates between vcpus with different cache
-configurations.
+On Wed, 21 Dec 2022 17:46:24 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Wed, Dec 21, 2022 at 08:46:06AM -0800, Ricardo Koller wrote:
+> 
+> [...]
+> 
+> > > -			return false;
+> > > +			/* Can't introspect TCR_EL1 with pKVM */
+> > > +			if (kvm_vm_is_protected(vcpu->kvm))
+> > > +				return false;
+> > > +
+> > > +			mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+> > > +			afdb = cpuid_feature_extract_unsigned_field(mmfr1, ID_AA64MMFR1_EL1_HAFDBS_SHIFT);
+> > > +
+> > > +			if (afdb == ID_AA64MMFR1_EL1_HAFDBS_NI)
+> > > +				return false;
+> > > +
+> > > +			return (vcpu_read_sys_reg(vcpu, TCR_EL1) & TCR_HA);
+> > 
+> > Also tested this specific case using page_fault_test when the PT page is
+> > marked for dirty logging with and without AF. In both cases there's a
+> > single _FSC_FAULT (no PERM_FAUT) as expected, and the PT page is marked dirty
+> > in the AF case. The RO and UFFD cases also work as expected.
+> > 
+> > Need to send some changes for page_fault_test as many tests assume that
+> > any S1PTW is always a PT write, and are failing. Also need to add some new
+> > tests for PTs in RO memslots (as it didn't make much sense before this
+> > change).
+> 
+> So I actually wanted to bring up the issue of user visibility, glad your
+> test picked up something.
+> 
+> This has two implications, which are rather odd.
+> 
+>  - When UFFD is in use, translation faults are reported to userspace as
+>    writes when from a RW memslot and reads when from an RO memslot.
 
-Fabricate cache configuration from the sanitized value, which holds the
-CTR_EL0 value the userspace sees regardless of which physical CPU it
-resides on.
+Not quite: translation faults are reported as reads if TCR_EL1.HA
+isn't set, and as writes if it is. Ignoring TCR_EL1.HD for a moment,
+this matches exactly the behaviour of the page-table walker, which
+will update the S1 PTs only if this bit is set.
 
-CLIDR_EL1 and CCSIDR_EL1 are now writable from the userspace so that
-the VMM can restore the values saved with the old kernel.
+Or is it what userfaultfd does on its own? That'd be confusing...
 
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
----
- arch/arm64/include/asm/cache.h    |   3 +
- arch/arm64/include/asm/kvm_host.h |   4 +
- arch/arm64/kvm/reset.c            |   1 +
- arch/arm64/kvm/sys_regs.c         | 229 +++++++++++++++++-------------
- 4 files changed, 141 insertions(+), 96 deletions(-)
+> 
+>  - S1 page table memory is spuriously marked as dirty, as we presume a
+>    write immediately follows the translation fault. That isn't entirely
+>    senseless, as it would mean both the target page and the S1 PT that
+>    maps it are both old. This is nothing new I suppose, just weird.
 
-diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
-index ab7133654a72..a51e6e8f3171 100644
---- a/arch/arm64/include/asm/cache.h
-+++ b/arch/arm64/include/asm/cache.h
-@@ -22,6 +22,9 @@
- #define CLIDR_CTYPE(clidr, level)	\
- 	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
- 
-+/* Ttypen, bits [2(n - 1) + 34 : 2(n - 1) + 33], for n = 1 to 7 */
-+#define CLIDR_TTYPE_SHIFT(level)	(2 * ((level) - 1) + CLIDR_EL1_Ttypen_SHIFT)
-+
- /*
-  * Memory returned by kmalloc() may be used for DMA, so we must make
-  * sure that all such allocations are cache aligned. Otherwise,
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index cc2ede0eaed4..27abf81c6910 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -178,6 +178,7 @@ struct kvm_vcpu_fault_info {
- enum vcpu_sysreg {
- 	__INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
- 	MPIDR_EL1,	/* MultiProcessor Affinity Register */
-+	CLIDR_EL1,	/* Cache Level ID Register */
- 	CSSELR_EL1,	/* Cache Size Selection Register */
- 	SCTLR_EL1,	/* System Control Register */
- 	ACTLR_EL1,	/* Auxiliary Control Register */
-@@ -417,6 +418,9 @@ struct kvm_vcpu_arch {
- 		u64 last_steal;
- 		gpa_t base;
- 	} steal;
-+
-+	/* Per-vcpu CCSIDR override or NULL */
-+	u32 *ccsidr;
- };
- 
- /*
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 5ae18472205a..7980983dbad7 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -157,6 +157,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	if (sve_state)
- 		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
- 	kfree(sve_state);
-+	kfree(vcpu->arch.ccsidr);
- }
- 
- static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index aeabf1f3370b..bc875cda51e3 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -11,6 +11,7 @@
- 
- #include <linux/bitfield.h>
- #include <linux/bsearch.h>
-+#include <linux/cacheinfo.h>
- #include <linux/kvm_host.h>
- #include <linux/mm.h>
- #include <linux/printk.h>
-@@ -81,25 +82,75 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 	 __vcpu_sys_reg(vcpu, reg) = val;
- }
- 
--/* 3 bits per cache level, as per CLIDR, but non-existent caches always 0 */
--static u32 cache_levels;
--
- /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
- #define CSSELR_MAX 14
- 
-+static u8 get_min_cache_line_size(u32 csselr)
-+{
-+	u64 ctr_el0;
-+	int field;
-+
-+	ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
-+	field = csselr & CSSELR_EL1_InD ? CTR_EL0_IminLine_SHIFT : CTR_EL0_DminLine_SHIFT;
-+
-+	return cpuid_feature_extract_unsigned_field(ctr_el0, field) - 2;
-+}
-+
- /* Which cache CCSIDR represents depends on CSSELR value. */
--static u32 get_ccsidr(u32 csselr)
-+static u32 get_ccsidr(struct kvm_vcpu *vcpu, u32 csselr)
-+{
-+	if (vcpu->arch.ccsidr)
-+		return vcpu->arch.ccsidr[csselr];
-+
-+	/*
-+	 * Fabricate a CCSIDR value as the overriding value does not exist.
-+	 * The real CCSIDR value will not be used as it can vary by the
-+	 * physical CPU which the vcpu currently resides in.
-+	 *
-+	 * The line size is determined with get_min_cache_line_size(), which
-+	 * should be valid for all CPUs even if they have different cache
-+	 * configuration.
-+	 *
-+	 * The associativity bits are cleared, meaning the geometry of all data
-+	 * and unified caches (which are guaranteed to be PIPT and thus
-+	 * non-aliasing) are 1 set and 1 way.
-+	 * Guests should not be doing cache operations by set/way at all, and
-+	 * for this reason, we trap them and attempt to infer the intent, so
-+	 * that we can flush the entire guest's address space at the appropriate
-+	 * time. The exposed geometry minimizes the number of the traps.
-+	 * [If guests should attempt to infer aliasing properties from the
-+	 * geometry (which is not permitted by the architecture), they would
-+	 * only do so for virtually indexed caches.]
-+	 */
-+	return get_min_cache_line_size(csselr) << CCSIDR_EL1_LineSize_SHIFT;
-+}
-+
-+static int set_ccsidr(struct kvm_vcpu *vcpu, u32 csselr, u32 val)
- {
--	u32 ccsidr;
-+	u8 line_size = FIELD_GET(CCSIDR_EL1_LineSize, val);
-+	u32 *ccsidr = vcpu->arch.ccsidr;
-+	u32 i;
-+
-+	if ((val & CCSIDR_EL1_RES0) || line_size < get_min_cache_line_size(csselr))
-+		return -EINVAL;
-+
-+	if (!ccsidr) {
-+		if (val == get_ccsidr(vcpu, csselr))
-+			return 0;
-+
-+		ccsidr = kmalloc_array(CSSELR_MAX, sizeof(u32), GFP_KERNEL);
-+		if (!ccsidr)
-+			return -ENOMEM;
-+
-+		for (i = 0; i < CSSELR_MAX; i++)
-+			ccsidr[i] = get_ccsidr(vcpu, i);
-+
-+		vcpu->arch.ccsidr = ccsidr;
-+	}
- 
--	/* Make sure noone else changes CSSELR during this! */
--	local_irq_disable();
--	write_sysreg(csselr, csselr_el1);
--	isb();
--	ccsidr = read_sysreg(ccsidr_el1);
--	local_irq_enable();
-+	ccsidr[csselr] = val;
- 
--	return ccsidr;
-+	return 0;
- }
- 
- /*
-@@ -1281,10 +1332,64 @@ static bool access_clidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	if (p->is_write)
- 		return write_to_read_only(vcpu, p, r);
- 
--	p->regval = read_sysreg(clidr_el1);
-+	p->regval = __vcpu_sys_reg(vcpu, r->reg);
- 	return true;
- }
- 
-+/*
-+ * Fabricate a CLIDR_EL1 value instead of using the real value, which can vary
-+ * by the physical CPU which the vcpu currently resides in.
-+ */
-+static void reset_clidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+{
-+	u64 ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
-+	u64 clidr;
-+	u8 loc;
-+
-+	if ((ctr_el0 & CTR_EL0_IDC) || cpus_have_const_cap(ARM64_HAS_STAGE2_FWB)) {
-+		/*
-+		 * Data cache clean to the PoU is not required so LoUU and LoUIS
-+		 * will not be set and a unified cache, which will be marked as
-+		 * LoC, will be added.
-+		 *
-+		 * If not DIC, let the unified cache L2 so that an instruction
-+		 * cache can be added as L1 later.
-+		 */
-+		loc = (ctr_el0 & CTR_EL0_DIC) ? 1 : 2;
-+		clidr = CACHE_TYPE_UNIFIED << CLIDR_CTYPE_SHIFT(loc);
-+	} else {
-+		/*
-+		 * Data cache clean to the PoU is required so let L1 have a data
-+		 * cache and mark it as LoUU and LoUIS. As L1 has a data cache,
-+		 * it can be marked as LoC too.
-+		 */
-+		loc = 1;
-+		clidr = 1 << CLIDR_LOUU_SHIFT;
-+		clidr |= 1 << CLIDR_LOUIS_SHIFT;
-+		clidr |= CACHE_TYPE_DATA << CLIDR_CTYPE_SHIFT(1);
-+	}
-+
-+	/*
-+	 * Instruction cache invalidation to the PoU is required so let L1 have
-+	 * an instruction cache. If L1 already has a data cache, it will be
-+	 * CACHE_TYPE_SEPARATE.
-+	 */
-+	if (!(ctr_el0 & CTR_EL0_DIC))
-+		clidr |= CACHE_TYPE_INST << CLIDR_CTYPE_SHIFT(1);
-+
-+	clidr |= loc << CLIDR_LOC_SHIFT;
-+
-+	/*
-+	 * Add tag cache unified to data cache. Allocation tags and data are
-+	 * unified in a cache line so that it looks valid even if there is only
-+	 * one cache line.
-+	 */
-+	if (kvm_has_mte(vcpu->kvm))
-+		clidr |= 2 << CLIDR_TTYPE_SHIFT(loc);
-+
-+	__vcpu_sys_reg(vcpu, r->reg) = clidr;
-+}
-+
- static bool access_csselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r)
- {
-@@ -1306,22 +1411,12 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 		return write_to_read_only(vcpu, p, r);
- 
- 	csselr = vcpu_read_sys_reg(vcpu, CSSELR_EL1);
--	p->regval = get_ccsidr(csselr);
-+	csselr &= CSSELR_EL1_Level | CSSELR_EL1_InD;
-+	if (csselr >= CSSELR_MAX)
-+		return undef_access(vcpu, p, r);
-+
-+	p->regval = get_ccsidr(vcpu, csselr);
- 
--	/*
--	 * Guests should not be doing cache operations by set/way at all, and
--	 * for this reason, we trap them and attempt to infer the intent, so
--	 * that we can flush the entire guest's address space at the appropriate
--	 * time.
--	 * To prevent this trapping from causing performance problems, let's
--	 * expose the geometry of all data and unified caches (which are
--	 * guaranteed to be PIPT and thus non-aliasing) as 1 set and 1 way.
--	 * [If guests should attempt to infer aliasing properties from the
--	 * geometry (which is not permitted by the architecture), they would
--	 * only do so for virtually indexed caches.]
--	 */
--	if (!(csselr & 1)) // data or unified cache
--		p->regval &= ~GENMASK(27, 3);
- 	return true;
- }
- 
-@@ -1610,7 +1705,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
- 
- 	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
--	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr },
-+	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr, reset_clidr, CLIDR_EL1 },
- 	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
- 	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
- 	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
-@@ -2622,7 +2717,6 @@ id_to_sys_reg_desc(struct kvm_vcpu *vcpu, u64 id,
- 
- FUNCTION_INVARIANT(midr_el1)
- FUNCTION_INVARIANT(revidr_el1)
--FUNCTION_INVARIANT(clidr_el1)
- FUNCTION_INVARIANT(aidr_el1)
- 
- static void get_ctr_el0(struct kvm_vcpu *v, const struct sys_reg_desc *r)
-@@ -2634,7 +2728,6 @@ static void get_ctr_el0(struct kvm_vcpu *v, const struct sys_reg_desc *r)
- static struct sys_reg_desc invariant_sys_regs[] = {
- 	{ SYS_DESC(SYS_MIDR_EL1), NULL, get_midr_el1 },
- 	{ SYS_DESC(SYS_REVIDR_EL1), NULL, get_revidr_el1 },
--	{ SYS_DESC(SYS_CLIDR_EL1), NULL, get_clidr_el1 },
- 	{ SYS_DESC(SYS_AIDR_EL1), NULL, get_aidr_el1 },
- 	{ SYS_DESC(SYS_CTR_EL0), NULL, get_ctr_el0 },
- };
-@@ -2671,33 +2764,7 @@ static int set_invariant_sys_reg(u64 id, u64 __user *uaddr)
- 	return 0;
- }
- 
--static bool is_valid_cache(u32 val)
--{
--	u32 level, ctype;
--
--	if (val >= CSSELR_MAX)
--		return false;
--
--	/* Bottom bit is Instruction or Data bit.  Next 3 bits are level. */
--	level = (val >> 1);
--	ctype = (cache_levels >> (level * 3)) & 7;
--
--	switch (ctype) {
--	case 0: /* No cache */
--		return false;
--	case 1: /* Instruction cache only */
--		return (val & 1);
--	case 2: /* Data cache only */
--	case 4: /* Unified cache */
--		return !(val & 1);
--	case 3: /* Separate instruction and data caches */
--		return true;
--	default: /* Reserved: we can't know instruction or data. */
--		return false;
--	}
--}
--
--static int demux_c15_get(u64 id, void __user *uaddr)
-+static int demux_c15_get(struct kvm_vcpu *vcpu, u64 id, void __user *uaddr)
- {
- 	u32 val;
- 	u32 __user *uval = uaddr;
-@@ -2713,16 +2780,16 @@ static int demux_c15_get(u64 id, void __user *uaddr)
- 			return -ENOENT;
- 		val = (id & KVM_REG_ARM_DEMUX_VAL_MASK)
- 			>> KVM_REG_ARM_DEMUX_VAL_SHIFT;
--		if (!is_valid_cache(val))
-+		if (val >= CSSELR_MAX)
- 			return -ENOENT;
- 
--		return put_user(get_ccsidr(val), uval);
-+		return put_user(get_ccsidr(vcpu, val), uval);
- 	default:
- 		return -ENOENT;
- 	}
- }
- 
--static int demux_c15_set(u64 id, void __user *uaddr)
-+static int demux_c15_set(struct kvm_vcpu *vcpu, u64 id, void __user *uaddr)
- {
- 	u32 val, newval;
- 	u32 __user *uval = uaddr;
-@@ -2738,16 +2805,13 @@ static int demux_c15_set(u64 id, void __user *uaddr)
- 			return -ENOENT;
- 		val = (id & KVM_REG_ARM_DEMUX_VAL_MASK)
- 			>> KVM_REG_ARM_DEMUX_VAL_SHIFT;
--		if (!is_valid_cache(val))
-+		if (val >= CSSELR_MAX)
- 			return -ENOENT;
- 
- 		if (get_user(newval, uval))
- 			return -EFAULT;
- 
--		/* This is also invariant: you can't change it. */
--		if (newval != get_ccsidr(val))
--			return -EINVAL;
--		return 0;
-+		return set_ccsidr(vcpu, val, newval);
- 	default:
- 		return -ENOENT;
- 	}
-@@ -2784,7 +2848,7 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 	int err;
- 
- 	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
--		return demux_c15_get(reg->id, uaddr);
-+		return demux_c15_get(vcpu, reg->id, uaddr);
- 
- 	err = get_invariant_sys_reg(reg->id, uaddr);
- 	if (err != -ENOENT)
-@@ -2828,7 +2892,7 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 	int err;
- 
- 	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
--		return demux_c15_set(reg->id, uaddr);
-+		return demux_c15_set(vcpu, reg->id, uaddr);
- 
- 	err = set_invariant_sys_reg(reg->id, uaddr);
- 	if (err != -ENOENT)
-@@ -2840,13 +2904,7 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 
- static unsigned int num_demux_regs(void)
- {
--	unsigned int i, count = 0;
--
--	for (i = 0; i < CSSELR_MAX; i++)
--		if (is_valid_cache(i))
--			count++;
--
--	return count;
-+	return CSSELR_MAX;
- }
- 
- static int write_demux_regids(u64 __user *uindices)
-@@ -2856,8 +2914,6 @@ static int write_demux_regids(u64 __user *uindices)
- 
- 	val |= KVM_REG_ARM_DEMUX_ID_CCSIDR;
- 	for (i = 0; i < CSSELR_MAX; i++) {
--		if (!is_valid_cache(i))
--			continue;
- 		if (put_user(val | i, uindices))
- 			return -EFAULT;
- 		uindices++;
-@@ -2959,7 +3015,6 @@ int kvm_sys_reg_table_init(void)
- {
- 	bool valid = true;
- 	unsigned int i;
--	struct sys_reg_desc clidr;
- 
- 	/* Make sure tables are unique and in order. */
- 	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
-@@ -2976,23 +3031,5 @@ int kvm_sys_reg_table_init(void)
- 	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
- 		invariant_sys_regs[i].reset(NULL, &invariant_sys_regs[i]);
- 
--	/*
--	 * CLIDR format is awkward, so clean it up.  See ARM B4.1.20:
--	 *
--	 *   If software reads the Cache Type fields from Ctype1
--	 *   upwards, once it has seen a value of 0b000, no caches
--	 *   exist at further-out levels of the hierarchy. So, for
--	 *   example, if Ctype3 is the first Cache Type field with a
--	 *   value of 0b000, the values of Ctype4 to Ctype7 must be
--	 *   ignored.
--	 */
--	get_clidr_el1(NULL, &clidr); /* Ugly... */
--	cache_levels = clidr.val;
--	for (i = 0; i < 7; i++)
--		if (((cache_levels >> (i*3)) & 7) == 0)
--			break;
--	/* Clear all higher bits. */
--	cache_levels &= (1 << (i*3))-1;
--
- 	return 0;
- }
+s/old/young/ ?
+
+I think you're confusing the PT access with the access that caused the
+PT access (I'll have that printed on a t-shirt, thank you very much).
+
+Here, we're not considering the cause of the PT access anymore. If
+TCR_EL1.HA is set, the S1 PT page will be marked as accessed even on a
+read, and only that page.
+
+TCR_EL1.HD is what muddies the waters a bit. If it is set without HA
+being set, we still handle the translation fault as a read, followed
+by a write permission fault. But again, that's solely for the purpose
+of the S1 PT. What happens for the mapped page is completely
+independent.
+
+> Marc, do you have any concerns about leaving this as-is for the time
+> being? At least before we were doing the same thing (write fault) every
+> time.
+
+I have the ugly feeling we're talking at cross purpose here, mostly
+because I don't get how userfaultfd fits in that picture. Can you shed
+some light here?
+
+Thanks,
+
+	M.
+
 -- 
-2.38.1
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
