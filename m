@@ -2,51 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 966ACC4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Dec 2022 12:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FDFCC4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Dec 2022 12:23:57 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EDF6A4BA81;
-	Thu, 22 Dec 2022 07:11:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87A324BA91;
+	Thu, 22 Dec 2022 07:23:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7LlUz7LXDXn0; Thu, 22 Dec 2022 07:11:58 -0500 (EST)
+	with ESMTP id 0nxeOuQ84jsw; Thu, 22 Dec 2022 07:23:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42CBA4BA82;
-	Thu, 22 Dec 2022 07:11:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5927C4BA25;
+	Thu, 22 Dec 2022 07:23:56 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 898154B646
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 21:50:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0102E4B9EA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Dec 2022 07:23:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4v+EMUqyI0Lq for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Dec 2022 21:50:17 -0500 (EST)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 072864B63F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Dec 2022 21:50:16 -0500 (EST)
-Received: from dggpemm500002.china.huawei.com (unknown [172.30.72.57])
- by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NbgyC1tz5zmWZg;
- Tue, 20 Dec 2022 10:49:07 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.246) by
- dggpemm500002.china.huawei.com (7.185.36.229) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Tue, 20 Dec 2022 10:50:13 +0800
-From: Dong Bo <dongbo4@huawei.com>
-To: <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <kvmarm@lists.linux.dev>, <kvmarm@lists.cs.columbia.edu>
-Subject: [PATCH] KVM: arm64: Synchronize SMEN on vcpu schedule out
-Date: Tue, 20 Dec 2022 18:50:24 +0800
-Message-ID: <20221220105024.13484-1-dongbo4@huawei.com>
-X-Mailer: git-send-email 2.30.0
-MIME-Version: 1.0
-X-Originating-IP: [10.69.192.246]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500002.china.huawei.com (7.185.36.229)
-X-CFilter-Loop: Reflected
-X-Mailman-Approved-At: Thu, 22 Dec 2022 07:11:57 -0500
-Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>
+ with ESMTP id yvKfGZznwQnN for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Dec 2022 07:23:54 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ED3DD4BA25
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Dec 2022 07:23:53 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 0904D61AAF;
+ Thu, 22 Dec 2022 12:23:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65329C433D2;
+ Thu, 22 Dec 2022 12:23:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1671711832;
+ bh=ub1l/0iM010zyPkMwuC5cprfkrYFEiJ/6duRHQ7gLP0=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Qsx2KqYbiwDRCgsNrK135M+6sHIp8T78Kj8DOFlnx31F+x00m2sLHpWlj0UB/tn9B
+ 022L4tqz3pCnQJKLbSSeFNuXPDqolzwrsoneP2hOwzgoURbXBHrHRMRiyGsHLJXR81
+ Oqp49gj7fJGvxPQTFfzM3ANigCCBj1lCC1JOdzNUa+97ZjZDVHwiuuwVcoBMZYfWVH
+ pZuEg6Bjge0T0tQVrStohBaM+6BnShgfNg8qN/8VcrBzey3uVQ06HkmbpDABUPaZVq
+ vOgP/iGUILxBrZTCbD802dGA40umqKRTt+L4oum1j99gw2yy0E1eEFhvygfuRQSzqM
+ EzogaH3deVkuQ==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1p8Kc1-00ENKb-TG;
+ Thu, 22 Dec 2022 12:23:49 +0000
+Date: Thu, 22 Dec 2022 12:23:49 +0000
+Message-ID: <86h6xnbp9m.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH 2/2] KVM: arm64: Remove use of ARM64_FEATURE_MASK()
+In-Reply-To: <20221221-kvm-sysreg-cleanup-v1-2-112ddb14fb4e@kernel.org>
+References: <20221221-kvm-sysreg-cleanup-v1-0-112ddb14fb4e@kernel.org>
+ <20221221-kvm-sysreg-cleanup-v1-2-112ddb14fb4e@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev,
+ catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -63,42 +90,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Nianyao Tang <tangnianyao@huawei.com>
+On Wed, 21 Dec 2022 18:06:10 +0000,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> The KVM code makes extensive use of ARM64_FEATURE_MASK() to generate a
+> mask for fields in the ID registers. This macro has the assumption that
+> all feature fields are 4 bits wide but the architecture has evolved to
+> add fields with other widths, such as the 1 bit fields in ID_AA64SMFR0_EL1,
+> so we need to adjust the
+> 
+> We could fix this by making ARM64_FEATURE_MASK() use the generated macros
+> that we have now but since one of these is a direct _MASK constant the
+> result is something that's more verbose and less direct than just updating
+> the users to directly use the generated mask macros, writing
+> 
+> 	#define ARM64_FEATURE_MASK(x)	(x##_MASK)
+> 
+> obviously looks redundant and if we look at the users updating them turns
+> 
+> 	val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_EL1_CSV3);
+> 
+> into the more direct
+> 
+> 	val &= ~ID_AA64PFR0_EL1_CSV3_MASK;
 
-If we have VHE and need to reenable SME for host in
-kvm_arch_vcpu_put_fp, CPACR.SMEN is modified from 0 to 1. Trap
-control for reading SVCR is modified from enable to disable.
-Synchronization is needed before reading SVCR later in
-fpsimd_save, or it may cause sync exception which can not be
-handled by host.
+If the two are strictly equivalent, then let's use the former as it
+results in a tiny diff.
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Signed-off-by: Nianyao Tang <tangnianyao@huawei.com>
----
- arch/arm64/kvm/fpsimd.c | 1 +
- 1 file changed, 1 insertion(+)
+Constantly repainting these files causes no end of conflicts when
+rebasing large series (pKVM, NV...), and makes backporting of fixes
+much harder than it should be. Specially considering that there is a
+single occcurence of an ID register with non-4bit fields.
 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 02dd7e9ebd39..f5799f571317 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -184,6 +184,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 			sysreg_clear_set(CPACR_EL1,
- 					 CPACR_EL1_SMEN_EL0EN,
- 					 CPACR_EL1_SMEN_EL1EN);
-+		isb();
- 	}
- 
- 	if (vcpu->arch.fp_state == FP_STATE_GUEST_OWNED) {
+Just put a FIXME in the various files so that people do the repainting
+as they change this code.
+
+Thanks,
+
+	M.
+
 -- 
-1.8.3.1
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
