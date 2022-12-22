@@ -2,69 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3126C3DA7C
-	for <kvmarm@archiver.kernel.org>; Thu, 22 Dec 2022 13:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55141C4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 22 Dec 2022 20:58:49 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CF184BA93;
-	Thu, 22 Dec 2022 08:02:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C46634BAD0;
+	Thu, 22 Dec 2022 15:58:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FkHHabvEgetg; Thu, 22 Dec 2022 08:02:15 -0500 (EST)
+	with ESMTP id j4qVXLWrL5LK; Thu, 22 Dec 2022 15:58:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09C4A4BA6C;
-	Thu, 22 Dec 2022 08:02:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C2AD4BAD2;
+	Thu, 22 Dec 2022 15:58:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E63CA4B9E2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Dec 2022 08:02:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D3D5F4BACF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Dec 2022 15:58:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4h6ykgGbamie for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Dec 2022 08:02:11 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 826F44BA1E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Dec 2022 08:02:11 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id DB1BCB81D2D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Dec 2022 13:02:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DFB9C433F1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Dec 2022 13:02:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1671714128;
- bh=+il+SxtPaF4c4xhIERSlV2b3ebbMTBDe+tDbOlWavI0=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=LjgSe3GSP0mW8adQgzLeMLPnwVygpphDdWa+BPcD1ECfJRmzzdQJjvMPGXRjo9Udq
- 8yC8XbmXvUuAjZyXWQt1cDBVqNrCk8WX8GP+xSa96IS49fN/H9ezA/DTkcBx4BWAHS
- u+SkG8R7qYRHRwXJ0j/L8lq6qVVnBUetpboBeWYbQ6eNlBnWZcT9BrcJKJKEfOrEoN
- 67gMnoIyBGXwnc6x0TVUrg+4KWDVsbQag6/LVhpsuks5bQqbBHaGZGs4bF+XwciDqB
- wcskYfV+uiM4ggb7efsnRqFMETthrIyjUj8AoO7eIlbFZaRLh8wi5E8D0a58vfJJyv
- 2s4JEZ0af1Y0A==
-Received: by mail-lf1-f42.google.com with SMTP id x11so2688939lfn.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Dec 2022 05:02:08 -0800 (PST)
-X-Gm-Message-State: AFqh2krW/SZwEWhuwA52jINCvTj/s6otBBgNOrzB//1WWzXnpzCzgIQs
- dScvD2f69XgJHs2vrSkemKiqqI4TgblrmqOhDpc=
-X-Google-Smtp-Source: AMrXdXs/FbXEMKkikcQh2g0G6KKTqaNtxuHVOptoJqHyWe59cAaGZyR/wktYEyC/Z4h8imqHqegrkCH7cW9DCXyG+z0=
-X-Received: by 2002:ac2:5d4e:0:b0:4b5:964d:49a4 with SMTP id
- w14-20020ac25d4e000000b004b5964d49a4mr572665lfd.637.1671714126548; Thu, 22
- Dec 2022 05:02:06 -0800 (PST)
-MIME-Version: 1.0
-References: <20221220200923.1532710-1-maz@kernel.org>
- <20221220200923.1532710-2-maz@kernel.org>
-In-Reply-To: <20221220200923.1532710-2-maz@kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 22 Dec 2022 14:01:55 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXE57xTzkmdhQzxOBSePVzUCS5GW7PAVvx+iF+3UHv0OrA@mail.gmail.com>
-Message-ID: <CAMj1kXE57xTzkmdhQzxOBSePVzUCS5GW7PAVvx+iF+3UHv0OrA@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Fix S1PTW handling on RO memslots
+ with ESMTP id LrYMHxIlWw-D for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Dec 2022 15:58:45 -0500 (EST)
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7442C4BAD0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Dec 2022 15:58:45 -0500 (EST)
+Date: Thu, 22 Dec 2022 20:58:40 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+ t=1671742723;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=A88a6NfVRxL2PmsR2uHcF7koD63KKHfsrryyz7ZbEMg=;
+ b=GekcJjmcwCN5+4BBYAHuPzx/0eHRDr/6uMj/rLY5V7n/nDqPNtjolNlKTFHkvjtLIniNdY
+ vpIKoEq20i0FGbhEfYB680aJy35ShWn5ABv2Hkdk2De4Wzrun0IaLOpqgiL8ZKst+985cy
+ kAJCgpn9XrNKfaHQP/CR316ctF9WGvo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
+ include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>, stable@vger.kernel.org,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 2/3] KVM: arm64: Handle S1PTW translation with TCR_HA set
+ as a write
+Message-ID: <Y6TFAClKlJgkFKef@google.com>
+References: <20221220200923.1532710-1-maz@kernel.org>
+ <20221220200923.1532710-3-maz@kernel.org>
+ <Y6M4TqvJytAEq2ID@google.com> <Y6NGcFXLtwOt0+d6@google.com>
+ <86ili3byn8.wl-maz@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <86ili3byn8.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,102 +70,101 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 20 Dec 2022 at 21:09, Marc Zyngier <maz@kernel.org> wrote:
->
-> A recent development on the EFI front has resulted in guests having
-> their page tables baked in the firmware binary, and mapped into
-> the IPA space as part as a read-only memslot.
->
-> Not only this is legitimate, but it also results in added security,
-> so thumbs up. However, this clashes mildly with our handling of a S1PTW
-> as a write to correctly handle AF/DB updates to the S1 PTs, and results
-> in the guest taking an abort it won't recover from (the PTs mapping the
-> vectors will suffer freom the same problem...).
->
-> So clearly our handling is... wrong.
->
-> Instead, switch to a two-pronged approach:
->
-> - On S1PTW translation fault, handle the fault as a read
->
-> - On S1PTW permission fault, handle the fault as a write
->
-> This is of no consequence to SW that *writes* to its PTs (the write
-> will trigger a non-S1PTW fault), and SW that uses RO PTs will not
-> use AF/DB anyway, as that'd be wrong.
->
-> Only in the case described in c4ad98e4b72c ("KVM: arm64: Assume write
-> fault on S1PTW permission fault on instruction fetch") do we end-up
-> with two back-to-back faults (page being evicted and faulted back).
-> I don't think this is a case worth optimising for.
->
-> Fixes: c4ad98e4b72c ("KVM: arm64: Assume write fault on S1PTW permission fault on instruction fetch")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org
+On Thu, Dec 22, 2022 at 09:01:15AM +0000, Marc Zyngier wrote:
+> On Wed, 21 Dec 2022 17:46:24 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
+> >  - When UFFD is in use, translation faults are reported to userspace as
+> >    writes when from a RW memslot and reads when from an RO memslot.
+> 
+> Not quite: translation faults are reported as reads if TCR_EL1.HA
+> isn't set, and as writes if it is. Ignoring TCR_EL1.HD for a moment,
+> this matches exactly the behaviour of the page-table walker, which
+> will update the S1 PTs only if this bit is set.
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+My bad, yes you're right. I conflated the use case here with the
+architectural state.
 
-I have tested this patch on my TX2 with one of the EFI builds in
-question, and everything works as before (I never observed the issue
-itself)
+I'm probably being way too pedantic, but I just wanted to make sure we
+agree about the ensuing subtlety. More below:
 
-Regression-tested-by: Ard Biesheuvel <ardb@kernel.org>
+> Or is it what userfaultfd does on its own? That'd be confusing...
+> 
+> > 
+> >  - S1 page table memory is spuriously marked as dirty, as we presume a
+> >    write immediately follows the translation fault. That isn't entirely
+> >    senseless, as it would mean both the target page and the S1 PT that
+> >    maps it are both old. This is nothing new I suppose, just weird.
+> 
+> s/old/young/ ?
+> 
+> I think you're confusing the PT access with the access that caused the
+> PT access (I'll have that printed on a t-shirt, thank you very much).
 
-For the record, the EFI build in question targets QEMU/mach-virt and
-switches to a set of read-only page tables in emulated NOR flash
-straight out of reset, so it can create and populate the real page
-tables with MMU and caches enabled. EFI does not use virtual memory or
-paging so managing access flags or dirty bits in hardware is unlikely
-to add any value, and it is not being used at the moment. And given
-that this is emulated NOR flash, any ordinary write to it tears down
-the r/o memslot altogether, and kicks the NOR flash emulation in QEMU
-into programming mode, which is fully based on MMIO emulation and does
-not use a memslot at all. IOW, even if we could figure out what store
-the PTW was attempting to do, it is always going to be rejected since
-the r/o page tables can only be modified by 'programming' the NOR
-flash sector.
+I'd buy it!
 
+> Here, we're not considering the cause of the PT access anymore. If
+> TCR_EL1.HA is set, the S1 PT page will be marked as accessed even on a
+> read, and only that page.
 
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 22 ++++++++++++++++++++--
->  1 file changed, 20 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 9bdba47f7e14..fd6ad8b21f85 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -373,8 +373,26 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
->
->  static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
->  {
-> -       if (kvm_vcpu_abt_iss1tw(vcpu))
-> -               return true;
-> +       if (kvm_vcpu_abt_iss1tw(vcpu)) {
-> +               /*
-> +                * Only a permission fault on a S1PTW should be
-> +                * considered as a write. Otherwise, page tables baked
-> +                * in a read-only memslot will result in an exception
-> +                * being delivered in the guest.
-> +                *
-> +                * The drawback is that we end-up fauling twice if the
-> +                * guest is using any of HW AF/DB: a translation fault
-> +                * to map the page containing the PT (read only at
-> +                * first), then a permission fault to allow the flags
-> +                * to be set.
-> +                */
-> +               switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
-> +               case ESR_ELx_FSC_PERM:
-> +                       return true;
-> +               default:
-> +                       return false;
-> +               }
-> +       }
->
->         if (kvm_vcpu_trap_is_iabt(vcpu))
->                 return false;
-> --
-> 2.34.1
->
+I think this is where the disconnect might be. TCR_EL1.HA == 1 suggests
+a write could possibly follow, but I don't think it requires it. The
+page table walker must first load the S1 PTE before writing to it.
+
+From AArch64.S1Translate() (DDI0487H.a):
+
+    (fault, descaddress, walkstate, descriptor) = AArch64.S1Walk(fault, walkparams, va, regime,
+								 ss, acctype, iswrite, ispriv);
+
+    [...]
+
+    new_desc = descriptor;
+    if walkparams.ha == '1' && AArch64.FaultAllowsSetAccessFlag(fault) then
+      // Set descriptor AF bit
+      new_desc<10> = '1';
+
+    [...]
+
+    // Either the access flag was clear or AP<2> is set
+    if new_desc != descriptor then
+      if regime == Regime_EL10 && EL2Enabled() then
+        s1aarch64 = TRUE;
+	s2fs1walk = TRUE;
+	aligned = TRUE;
+	iswrite = TRUE;
+	(s2fault, descupdateaddress) = AArch64.S2Translate(fault, descaddress, s1aarch64,
+							   ss, s2fs1walk, AccType_ATOMICRW,
+							   aligned, iswrite, ispriv);
+
+    if s2fault.statuscode != Fault_None then
+      return (s2fault, AddressDescriptor UNKNOWN);
+    else
+      descupdateaddress = descaddress;
+
+    (fault, mem_desc) = AArch64.MemSwapTableDesc(fault, descriptor, new_desc,
+    						 walkparams.ee, descupdateaddress)
+
+Buried in AArch64.S1Walk() is a stage-2 walk for a read to fetch the
+descriptor. The second stage-2 walk for write is conditioned on having
+already fetched the stage-1 descriptor and determining the AF needs
+to be set.
+
+Relating back to UFFD: if we expect KVM to do exactly what hardware
+does, UFFD should see an attempted read when the first walk fails
+because of an S2 translation fault. Based on this patch, though, we'd
+promote it to a write if TCR_EL1.HA == 1.
+
+This has the additional nuance of marking the S1 PT's IPA as dirty, even
+though it might not actually have been written to. Having said that,
+the false positive rate should be negligible given that S1 PTs ought to
+account for a small amount of guest memory.
+
+Like I said before, I'm probably being unnecessarily pedantic :) It just
+seems to me that the view we're giving userspace of S1PTW aborts isn't
+exactly architectural and I want to make sure that is explicitly
+intentional.
+
+--
+Thanks,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
