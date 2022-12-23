@@ -1,55 +1,57 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54169195
-	for <kvmarm@lists.linux.dev>; Fri, 23 Dec 2022 00:33:36 +0000 (UTC)
-Received: by mail-pj1-f41.google.com with SMTP id o31-20020a17090a0a2200b00223fedffb30so3508684pjo.3
-        for <kvmarm@lists.linux.dev>; Thu, 22 Dec 2022 16:33:36 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0996F15A3
+	for <kvmarm@lists.linux.dev>; Fri, 23 Dec 2022 01:00:07 +0000 (UTC)
+Received: by mail-pj1-f45.google.com with SMTP id q17-20020a17090aa01100b002194cba32e9so7405257pjp.1
+        for <kvmarm@lists.linux.dev>; Thu, 22 Dec 2022 17:00:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3SnnWK2Yn0kyk7GHu2M0DJEtHKPpePG30TC/rB02220=;
-        b=pux3Eczt9o7v57Vha09NoD0CZwgZukOQ8CNR88RBhCONIrU7gn+hgrP53dVZpTYpgB
-         XNsOnhlwYkKxxLuz3iR6gtBOwCK2JAjhhB195u2s1pykEt0IUu1A0MAZ/iT86mPgmroV
-         R5jkXUOJf0oiDWOfuhnqYka5nAhY5MVcVET556Nh/gqIOeCADwVXiPUz5Rubz+ZCZkRG
-         KhTeq9+TBch7q0lzkGmMRS/CoXRJlfE7w+qVkeKudJuEeCp54JdqnEp+pptDc54VBMxL
-         l3fcx3TkbRihSBQGeuFp2OM8CbeaaXWJVKyeiJ6SjQi7m/76MA5gxQUWa0Z4cM3v8TLy
-         ueFw==
+        bh=9fNngnnpE2StonojfqQey1eQCIEtpFm3j4CmrqaN8gA=;
+        b=bqqhyt59RZ5/7uexDzRRAXepjZVuBZumLQVNbYyYwnmJdFK5uPPDp136NtYUkMl8go
+         ETJ/ONXb/ZNy3XuM0z+SLweQdxyzTr2v2qvLkD8QmYr7hwB4ah5TedSe+7a4byts+8fR
+         AUWCsJEPQEtoT7H+WF27A2LC9+h/fp8rHpITGkFHCfcUKDnGlWmi0YS9sZ0KVL+ZvcCl
+         8aBhox831l2QBwyqKlHZizYh+NMC9xTjjkXtZRYt8NiTVkXn/TEmpDsxCgQj9629oAeh
+         xNcnNXpCv4lrcogZAoUdn3ob2yDSRnWdYWCUAYnAuD81ohkCSwmDlKPPh3YOQ2hmUB6j
+         jTew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3SnnWK2Yn0kyk7GHu2M0DJEtHKPpePG30TC/rB02220=;
-        b=h+aALvwPQmidyS0eBRZ7VhCvx4DIZxAbZz/wRB1u3SIDDzY+gtcm98HtwjHgFtSe5v
-         UjYOPz4O6NJcCWuPD+q6oOoWIx1p3lR/geUwtAZ/oTNZfpeu0d46KOklZI30ajoXOCAa
-         1liCtiSn8mfE3x3cbJ/tHUQdNdbbHdk8joIEFY3dxT55oxmvuB13q6At2UhIhr36Hrvi
-         QBECZz/F9B2I6jYUKPeZFvGpQ7LRGuAa+163oaoCywqur20/oJ3z9EWDGGYkA1bkYgdb
-         YobLD05qKvItUH+oiwEJRiFB+ohV3NWjVt7Jdix8zw91xSL5jhVuRP7ZaUz1vWh/ghew
-         a7Rw==
-X-Gm-Message-State: AFqh2krDprT4kTRfBQa7ntrsiejyNRaap/lhg9EzlkSnKIsQ6VlqXeoh
-	ixUcbXW/qV3jnWEps9OYdWhakQ==
-X-Google-Smtp-Source: AMrXdXvQgA5PcrwGJ6ExX4g/wBYdgRBMgQzBvslBOJ24nda1rowog9Yon9hIjf2jj7oDDELe19sSmg==
-X-Received: by 2002:a05:6a20:2a9f:b0:a4:efde:2ed8 with SMTP id v31-20020a056a202a9f00b000a4efde2ed8mr1644018pzh.0.1671755615505;
-        Thu, 22 Dec 2022 16:33:35 -0800 (PST)
+        bh=9fNngnnpE2StonojfqQey1eQCIEtpFm3j4CmrqaN8gA=;
+        b=bIX7JHzA0eCi6Ky7Esmtp0487PrQYJdP2ebqKdZteqxW45Xcn/4RtJWwGIsMNy0dOH
+         GntyT3VFe34lXCLXNnEDqpqKtuA6FWSUJASu4cQheCmR9eFt0ERL2V9HfACI+RPx0bkC
+         QF8ICR+ZCCkp6bIBRVnIMj4RMZv8+TOahQdS+v4IxmE/YOtOWplDUwiijAgICpyrVxej
+         DIvbytEXxS3BwN95iy3nsP1AnbsZ10QjBHA323ealmg5NLbf69GPoYjBf0jSL3h3JiJX
+         /lTSygJYktm8ibiFTTJsxhxGZHgc0IQCLml9wxjDHwklkbs+LozKgsFrkxXDP6Aqv3PH
+         layg==
+X-Gm-Message-State: AFqh2koqbrJozQCMf23B9r59Fk4Wohg77R45Jf5cZ+1mtJY/hkKxkUql
+	5JXwVQlzbTCvJeXk7FmDvQAxtw==
+X-Google-Smtp-Source: AMrXdXtKUNrR6zj/7PH2VEbsItoUuVA4yZcHcLe5RCHjCNX53q/K79iy62BAlgWiKIhyuf9E98mKsQ==
+X-Received: by 2002:a17:902:a608:b0:189:b910:c6d2 with SMTP id u8-20020a170902a60800b00189b910c6d2mr1164911plq.1.1671757207187;
+        Thu, 22 Dec 2022 17:00:07 -0800 (PST)
 Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id d6-20020a170902654600b0019255ab4dc8sm1118649pln.66.2022.12.22.16.33.34
+        by smtp.gmail.com with ESMTPSA id s7-20020a170902988700b0018f6e4e425dsm1088195plp.198.2022.12.22.17.00.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Dec 2022 16:33:34 -0800 (PST)
-Date: Thu, 22 Dec 2022 16:33:31 -0800
+        Thu, 22 Dec 2022 17:00:06 -0800 (PST)
+Date: Thu, 22 Dec 2022 17:00:03 -0800
 From: Ricardo Koller <ricarkol@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Will Deacon <will@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>
 Subject: Re: [PATCH 2/3] KVM: arm64: Handle S1PTW translation with TCR_HA set
  as a write
-Message-ID: <Y6T3W9qtA3v42d0z@google.com>
+Message-ID: <Y6T9kxfCo86q13Iq@google.com>
 References: <20221220200923.1532710-1-maz@kernel.org>
  <20221220200923.1532710-3-maz@kernel.org>
  <Y6M4TqvJytAEq2ID@google.com>
- <86len0bql4.wl-maz@kernel.org>
+ <Y6NGcFXLtwOt0+d6@google.com>
+ <86ili3byn8.wl-maz@kernel.org>
+ <Y6TFAClKlJgkFKef@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,181 +60,106 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86len0bql4.wl-maz@kernel.org>
-Message-ID: <20221223003331.KK9lOzn63LZcIDsZ0TiUKdTKIgg2Sc-7QWCLuxREMUo@z>
+In-Reply-To: <Y6TFAClKlJgkFKef@google.com>
+Message-ID: <20221223010003.31r_OBgdPPxGqgfn24JgiySoMbVDZOIX82lhUgj7Nnw@z>
 
-Hi Marc,
+On Thu, Dec 22, 2022 at 08:58:40PM +0000, Oliver Upton wrote:
+> On Thu, Dec 22, 2022 at 09:01:15AM +0000, Marc Zyngier wrote:
+> > On Wed, 21 Dec 2022 17:46:24 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > >  - When UFFD is in use, translation faults are reported to userspace as
+> > >    writes when from a RW memslot and reads when from an RO memslot.
+> > 
+> > Not quite: translation faults are reported as reads if TCR_EL1.HA
+> > isn't set, and as writes if it is. Ignoring TCR_EL1.HD for a moment,
+> > this matches exactly the behaviour of the page-table walker, which
+> > will update the S1 PTs only if this bit is set.
+> 
+> My bad, yes you're right. I conflated the use case here with the
+> architectural state.
+> 
+> I'm probably being way too pedantic, but I just wanted to make sure we
+> agree about the ensuing subtlety. More below:
+> 
+> > Or is it what userfaultfd does on its own? That'd be confusing...
+> > 
+> > > 
+> > >  - S1 page table memory is spuriously marked as dirty, as we presume a
+> > >    write immediately follows the translation fault. That isn't entirely
+> > >    senseless, as it would mean both the target page and the S1 PT that
+> > >    maps it are both old. This is nothing new I suppose, just weird.
+> > 
+> > s/old/young/ ?
+> > 
+> > I think you're confusing the PT access with the access that caused the
+> > PT access (I'll have that printed on a t-shirt, thank you very much).
+> 
+> I'd buy it!
+> 
+> > Here, we're not considering the cause of the PT access anymore. If
+> > TCR_EL1.HA is set, the S1 PT page will be marked as accessed even on a
+> > read, and only that page.
+> 
+> I think this is where the disconnect might be. TCR_EL1.HA == 1 suggests
+> a write could possibly follow, but I don't think it requires it. The
+> page table walker must first load the S1 PTE before writing to it.
+> 
+> From AArch64.S1Translate() (DDI0487H.a):
+> 
+>     (fault, descaddress, walkstate, descriptor) = AArch64.S1Walk(fault, walkparams, va, regime,
+> 								 ss, acctype, iswrite, ispriv);
+> 
+>     [...]
+> 
+>     new_desc = descriptor;
+>     if walkparams.ha == '1' && AArch64.FaultAllowsSetAccessFlag(fault) then
+>       // Set descriptor AF bit
+>       new_desc<10> = '1';
+> 
+>     [...]
+> 
+>     // Either the access flag was clear or AP<2> is set
+>     if new_desc != descriptor then
+>       if regime == Regime_EL10 && EL2Enabled() then
+>         s1aarch64 = TRUE;
+> 	s2fs1walk = TRUE;
+> 	aligned = TRUE;
+> 	iswrite = TRUE;
+> 	(s2fault, descupdateaddress) = AArch64.S2Translate(fault, descaddress, s1aarch64,
+> 							   ss, s2fs1walk, AccType_ATOMICRW,
+> 							   aligned, iswrite, ispriv);
+> 
+>     if s2fault.statuscode != Fault_None then
+>       return (s2fault, AddressDescriptor UNKNOWN);
+>     else
+>       descupdateaddress = descaddress;
+> 
+>     (fault, mem_desc) = AArch64.MemSwapTableDesc(fault, descriptor, new_desc,
+>     						 walkparams.ee, descupdateaddress)
+> 
+> Buried in AArch64.S1Walk() is a stage-2 walk for a read to fetch the
+> descriptor. The second stage-2 walk for write is conditioned on having
+> already fetched the stage-1 descriptor and determining the AF needs
+> to be set.
+> 
+> Relating back to UFFD: if we expect KVM to do exactly what hardware
+> does, UFFD should see an attempted read when the first walk fails
+> because of an S2 translation fault. Based on this patch, though, we'd
+> promote it to a write if TCR_EL1.HA == 1.
+> 
+> This has the additional nuance of marking the S1 PT's IPA as dirty, even
+> though it might not actually have been written to. Having said that,
+> the false positive rate should be negligible given that S1 PTs ought to
+> account for a small amount of guest memory.
 
-On Wed, Dec 21, 2022 at 05:43:03PM +0000, Marc Zyngier wrote:
-> Hi Ricardo,
+Another false positive is TCR_EL1.HA == 1 and having the AF bit set in
+the PTE. This results on a write, when I don't think it should.
+
 > 
-> On Wed, 21 Dec 2022 16:46:06 +0000,
-> Ricardo Koller <ricarkol@google.com> wrote:
-> > 
-> > Hello,
-> > 
-> > On Tue, Dec 20, 2022 at 08:09:22PM +0000, Marc Zyngier wrote:
-> > > As a minor optimisation, we can retrofit the "S1PTW is a write
-> > > even on translation fault" concept *if* the vcpu is using the
-> > > HW-managed Access Flag, as setting TCR_EL1.HA is guaranteed
-> > > to result in an update of the PTE.
-> > > 
-> > > However, we cannot do the same thing for DB, as it would require
-> > > us to parse the PTs to find out if the DBM bit is set there.
-> > > This is not going to happen.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_emulate.h | 20 +++++++++++++++++++-
-> > >  1 file changed, 19 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > > index fd6ad8b21f85..4ee467065042 100644
-> > > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > > @@ -374,6 +374,9 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
-> > >  static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
-> > >  {
-> > >  	if (kvm_vcpu_abt_iss1tw(vcpu)) {
-> > > +		unsigned int afdb;
-> > > +		u64 mmfr1;
-> > > +
-> > >  		/*
-> > >  		 * Only a permission fault on a S1PTW should be
-> > >  		 * considered as a write. Otherwise, page tables baked
-> > > @@ -385,12 +388,27 @@ static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
-> > >  		 * to map the page containing the PT (read only at
-> > >  		 * first), then a permission fault to allow the flags
-> > >  		 * to be set.
-> > > +		 *
-> > > +		 * We can improve things if the guest uses AF, as this
-> > > +		 * is guaranteed to result in a write to the PTE. For
-> > > +		 * DB, however, we'd need to parse the guest's PTs,
-> > > +		 * and that's not on. DB is crap anyway.
-> > >  		 */
-> > >  		switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
-> > 
-> > Nit: fault_status is calculated once when taking the fault, and passed
-> > around to all users (like user_mem_abort()). Not sure if this is because
-> > of the extra cycles needed to get it, or just style. Anyway, maybe it
-> > applies here.
-> 
-> All these things are just fields in ESR_EL2, which we keep looking at
-> all the time. The compiler actually does a pretty good job at keeping
-> that around, specially considering that this function is inlined (at
-> least here, kvm_handle_guest_abort and kvm_user_mem_abort are merged
-> into a single monster).
-> 
-> So passing the parameter wouldn't change a thing, and I find the above
-> more readable (I know that all the information in this function are
-> derived from the same data structure).
+> Like I said before, I'm probably being unnecessarily pedantic :) It just
+> seems to me that the view we're giving userspace of S1PTW aborts isn't
+> exactly architectural and I want to make sure that is explicitly
+> intentional.
 >
-
-Got it, thanks for the info.
-
-> > 
-> > >  		case ESR_ELx_FSC_PERM:
-> > >  			return true;
-> > >  		default:
-> > > -			return false;
-> > > +			/* Can't introspect TCR_EL1 with pKVM */
-> > > +			if (kvm_vm_is_protected(vcpu->kvm))
-> > > +				return false;
-> > > +
-> > > +			mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> > > +			afdb = cpuid_feature_extract_unsigned_field(mmfr1, ID_AA64MMFR1_EL1_HAFDBS_SHIFT);
-> > > +
-> > > +			if (afdb == ID_AA64MMFR1_EL1_HAFDBS_NI)
-> > > +				return false;
-> > > +
-> > > +			return (vcpu_read_sys_reg(vcpu, TCR_EL1) & TCR_HA);
-> > 
-> > Also tested this specific case using page_fault_test when the PT page is
-> > marked for dirty logging with and without AF. In both cases there's a
-> > single _FSC_FAULT (no PERM_FAUT) as expected, and the PT page is marked dirty
-> > in the AF case. The RO and UFFD cases also work as expected.
-> 
-> Ah, thanks for checking this.
-> 
-> > 
-> > Need to send some changes for page_fault_test as many tests assume that
-> > any S1PTW is always a PT write, and are failing. Also need to add some new
-> > tests for PTs in RO memslots (as it didn't make much sense before this
-> > change).
-> 
-> I think this is what I really quite didn't grok in these tests. They
-> seem to verify the KVM behaviour, which is not what we should check
-> for.
-> 
-> Instead, we should check for the architectural behaviour, which is
-> that if HAFDBS is enabled, we can observe updates to the PTs even when
-> we do not write to them directly.
-
-There are some tests checking that case (e.g., AF set by HW), but they
-also do it while interacting with dirty-logging, userfaultfd, and/or RO
-memslots. Some checks are clearly dealing with architectural behavior,
-while others are not that clear. Let me use this sample test to get more
-specific.  This test deals with HW setting the AF bit on a punched hole
-backed by userfaultfd:
-
-TEST_UFFD(guest_exec, with_af, CMD_HOLE_PT, ...):
-	1. set TCR_EL1.HA and clear the AF in the test-data PTE,
-	2. punch a hole on the test-data PTE page, and register it for
-	   userfaultfd,
-	3. execute code in the test-data page; this triggers a S1PTW,
-	4. assert that there is a userfaultfd _write_ fault on the PT page,
-	5. assert that the test-data instruction was executed,
-	6. assert that the AF is set on the test-data PTE,
-
-IIUC, only checking for architectural behavior implies skipping step 4.
-And I agree, it might be a good idea to skip 4, as it actually depends
-on whether the kernel has only the previous commit, or both the previous
-and this one. The fault is a _write_ at this commit, and a _read_ at the
-previous.
-
-The issue is that there are some cases where checking KVM behavior could
-be useful. For example, this dirty_logging test can also help (besides
-testing dirty-logging) for checking regressions of commit c4ad98e4b72c
-("KVM: arm64: Assume write fault on S1PTW permission fault on
-instruction fetch"):
-
-TEST_DIRTY_LOG(guest_exec, with_af, ...)
-	1. set TCR_EL1.HA and clear the AF in the test-data PTE,
-	2. enable dirty logging on the PT memslot,
-	3. execute code in the test-data page; this triggers a S1PTW,
-	4. assert that the test-data PTE page is dirty on the log,
-	5. assert that the test-data instruction was executed,
-	6. assert that the AF is set on the test-data PTE,
-
-Step 4 above is not exactly checking architectural behavior, but I think
-it's still useful.
-
-So, regarding what to do with page_fault_test. As a start, I need to go
-through all tests and make sure they pass at both this and the previous
-commit. Next, I have to identify other tests that also need to be
-relaxed a bit (removing some test asserts).
-
-Thanks,
-Ricardo
-
-> 
-> > 
-> > >  		}
-> > >  	}
-> > >  
-> > > -- 
-> > > 2.34.1
-> > > 
-> > > _______________________________________________
-> > > kvmarm mailing list
-> > > kvmarm@lists.cs.columbia.edu
-> > > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> > 
-> > Reviewed-by: Ricardo Koller <ricarkol@google.com>
-> 
-> Thanks!
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+> --
+> Thanks,
+> Oliver
