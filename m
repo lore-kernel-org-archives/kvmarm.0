@@ -1,93 +1,198 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D86210A
-	for <kvmarm@lists.linux.dev>; Sat, 24 Dec 2022 09:24:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1671873842;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cQUoO4G6sdzLrmUADt2hv9AJA1j16aHhp8BOh9XyH3Y=;
-	b=CZBoYWAy6Z5RBAWnvdnyWFuYL2HcefczTyu05FYC19uc2jlNr+paRq58bkJuJaAuvF2e3I
-	R1reaewZCxioBnU2dHsH8dS6QYUSFl4Jk9864ePBdKrNoZMdYGmMfyk71g2byGORYJB+mc
-	tvYYGTM3jXQHulCMLta+IdQDIItMIXA=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-371-oY85SNIvPxyD1B340sZQrA-1; Sat, 24 Dec 2022 04:24:01 -0500
-X-MC-Unique: oY85SNIvPxyD1B340sZQrA-1
-Received: by mail-ed1-f70.google.com with SMTP id y20-20020a056402271400b0046c9a6ec30fso4945563edd.14
-        for <kvmarm@lists.linux.dev>; Sat, 24 Dec 2022 01:24:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cQUoO4G6sdzLrmUADt2hv9AJA1j16aHhp8BOh9XyH3Y=;
-        b=MsFfcHAdb2X8QMt8gLNeScYjHgexXjyxGXzakVHwt6263WRELpE4tB0q++d4Niqw1H
-         kbZ205ZLYh9iN0oo8XF+lBGPR5c3/UzTWu+ncp6XHM1tHNV9nlgq1DgGOHhytP/49JBA
-         huxhSsu5FBDD7I1u2twwm6WcIgwCvQNH6L1oVmqxkyDUHqbuw7a2Ak3d7arxAN6BWan2
-         csVHCs5i39knyOkddLBlTRVCAgBEm4NtdPSOGLh/lJV7fabx8KhfwppVXwWJAhKBooCC
-         BKyi4wF6zu6cGGWQx3+xU0mpQFwJL3adcgq1kfnzeraPWPfJ5cy1fLiFkKr1p3yucZcD
-         dUGA==
-X-Gm-Message-State: AFqh2kpi0MQ583amlJrDWZamTFFNU+uEtqWJeBfez5sLDcjYeF1e+pDO
-	REAiRxxPprxQUhXgFIv1HlSjEMYoSfy860k27B2Z43HM6LK47/RqqYMDf/HP0fEnm43bklpWMbf
-	XXHXSN6wDgCOBoKDb
-X-Received: by 2002:a17:907:c084:b0:7c1:22a6:818f with SMTP id st4-20020a170907c08400b007c122a6818fmr9962693ejc.25.1671873840059;
-        Sat, 24 Dec 2022 01:24:00 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXu5yag+Wn0Qcys8xdIlgtscsBUCyajRo/QuR9Np12zFtuRKH0vsauC+7pwndJ75MH59prtGFQ==
-X-Received: by 2002:a17:907:c084:b0:7c1:22a6:818f with SMTP id st4-20020a170907c08400b007c122a6818fmr9962684ejc.25.1671873839849;
-        Sat, 24 Dec 2022 01:23:59 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id u18-20020a1709061db200b007c073be0127sm2305389ejh.202.2022.12.24.01.23.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 24 Dec 2022 01:23:59 -0800 (PST)
-Message-ID: <363f4713-6105-82d1-351e-423d07470cdf@redhat.com>
-Date: Sat, 24 Dec 2022 10:23:57 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8295828E3
+	for <kvmarm@lists.linux.dev>; Sat, 24 Dec 2022 12:00:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 093F5C433D2;
+	Sat, 24 Dec 2022 12:00:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1671883245;
+	bh=m2EiFEyisQ9bmq/xgqzbRGVb+gogXJXymw1uS+HVbo4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JbF9kr9jYH1y/IzjuATj80ZAE6QwqcRuvDkqjjwbrEHnHKZyLzaT5RsRODWlThPIF
+	 a3hsfQK7uMzvFrpIcapk330TcJ1ElBElbnTE3N9IdaQ/0S5rrfaC9hGhpo8EWItBot
+	 RkLcFd9fZ4WHeJS9XfVZRgfJtK97E3K98j/+oK0PiA3ufVsshd1CczVjwWNorkBkse
+	 /yJsyA+BRFvaxsFfgyrwJGqqFAde1ZfS9Od944deiTwLwJ+HpcxVxfQjjQ3So+77Yt
+	 R1/0q6IE0Xmzhj5mX7OCfG5frOdG+ro/AVffjLixpUzO3yn71I0sufQ6rAfI5lTubL
+	 z2nVa8jP2FzPQ==
+Received: from host81-132-227-111.range81-132.btcentralplus.com ([81.132.227.111] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1p93Ck-00EuJg-L8;
+	Sat, 24 Dec 2022 12:00:42 +0000
+Date: Sat, 24 Dec 2022 11:59:19 +0000
+Message-ID: <878rixf1wo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Ricardo Koller <ricarkol@google.com>,
+	kvmarm@lists.cs.columbia.edu,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 2/3] KVM: arm64: Handle S1PTW translation with TCR_HA set as a write
+In-Reply-To: <Y6TFAClKlJgkFKef@google.com>
+References: <20221220200923.1532710-1-maz@kernel.org>
+	<20221220200923.1532710-3-maz@kernel.org>
+	<Y6M4TqvJytAEq2ID@google.com>
+	<Y6NGcFXLtwOt0+d6@google.com>
+	<86ili3byn8.wl-maz@kernel.org>
+	<Y6TFAClKlJgkFKef@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH 12/14] KVM: selftests: Use wildcards to find library
- source files
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <ndesaulniers@google.com>
-Cc: James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Tom Rix <trix@redhat.com>,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-riscv@lists.infradead.org, llvm@lists.linux.dev,
- linux-kernel@vger.kernel.org, Ricardo Koller <ricarkol@google.com>,
- Aaron Lewis <aaronlewis@google.com>,
- Raghavendra Rao Ananta <rananta@google.com>
-References: <20221213001653.3852042-1-seanjc@google.com>
- <20221213001653.3852042-13-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221213001653.3852042-13-seanjc@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-ID: <20221224092357._hbxcRh5yM2DybHzGjEftEAAS1eOXNKMTu5hXPq-BpQ@z>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 81.132.227.111
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, ricarkol@google.com, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221224115919.FqXMGlpGXAYudo7K9mXgFQqJmx81pfu_NG4z4smHRf0@z>
 
-On 12/13/22 01:16, Sean Christopherson wrote:
-> Use $(wildcard ...) to find the library source files instead of manually
-> defining the inputs, which is a maintenance burden and error prone.
+On Thu, 22 Dec 2022 20:58:40 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Thu, Dec 22, 2022 at 09:01:15AM +0000, Marc Zyngier wrote:
+> > On Wed, 21 Dec 2022 17:46:24 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > >  - When UFFD is in use, translation faults are reported to userspace as
+> > >    writes when from a RW memslot and reads when from an RO memslot.
+> > 
+> > Not quite: translation faults are reported as reads if TCR_EL1.HA
+> > isn't set, and as writes if it is. Ignoring TCR_EL1.HD for a moment,
+> > this matches exactly the behaviour of the page-table walker, which
+> > will update the S1 PTs only if this bit is set.
+> 
+> My bad, yes you're right. I conflated the use case here with the
+> architectural state.
+> 
+> I'm probably being way too pedantic, but I just wanted to make sure we
+> agree about the ensuing subtlety. More below:
+> 
+> > Or is it what userfaultfd does on its own? That'd be confusing...
+> > 
+> > > 
+> > >  - S1 page table memory is spuriously marked as dirty, as we presume a
+> > >    write immediately follows the translation fault. That isn't entirely
+> > >    senseless, as it would mean both the target page and the S1 PT that
+> > >    maps it are both old. This is nothing new I suppose, just weird.
+> > 
+> > s/old/young/ ?
+> > 
+> > I think you're confusing the PT access with the access that caused the
+> > PT access (I'll have that printed on a t-shirt, thank you very much).
+> 
+> I'd buy it!
+> 
+> > Here, we're not considering the cause of the PT access anymore. If
+> > TCR_EL1.HA is set, the S1 PT page will be marked as accessed even on a
+> > read, and only that page.
+> 
+> I think this is where the disconnect might be. TCR_EL1.HA == 1 suggests
+> a write could possibly follow, but I don't think it requires it. The
+> page table walker must first load the S1 PTE before writing to it.
 
-No, please don't.  This leads to weird errors, for example when "git 
-checkout" is interrupted with ^C.   I have applied patches 1-11.
+Ah, you're talking of the write to the PTE. Too many writes!
 
-Paolo
+My reasoning is based on Rule LFTXR in DDI0487I.a, which says:
 
+"When the PE performs a hardware update of the AF, it sets the AF to 1
+ in the corresponding descriptor in memory, in a coherent manner,
+ using an atomic read-modify-write of that descriptor."
+
+An atomic-or operation fits this description, and I cannot see
+anything in the architecture that would prevent the write of a PTE
+even if AF is already set, such as mandating something like a
+test-and-set or compare-and-swap.
+
+I'm not saying this is the only possible implementation, or even a
+good one. But I don't think this is incompatible with what the
+architecture mandates.
+
+> 
+> From AArch64.S1Translate() (DDI0487H.a):
+> 
+>     (fault, descaddress, walkstate, descriptor) = AArch64.S1Walk(fault, walkparams, va, regime,
+> 								 ss, acctype, iswrite, ispriv);
+> 
+>     [...]
+> 
+>     new_desc = descriptor;
+>     if walkparams.ha == '1' && AArch64.FaultAllowsSetAccessFlag(fault) then
+>       // Set descriptor AF bit
+>       new_desc<10> = '1';
+> 
+>     [...]
+> 
+>     // Either the access flag was clear or AP<2> is set
+>     if new_desc != descriptor then
+>       if regime == Regime_EL10 && EL2Enabled() then
+>         s1aarch64 = TRUE;
+> 	s2fs1walk = TRUE;
+> 	aligned = TRUE;
+> 	iswrite = TRUE;
+> 	(s2fault, descupdateaddress) = AArch64.S2Translate(fault, descaddress, s1aarch64,
+> 							   ss, s2fs1walk, AccType_ATOMICRW,
+> 							   aligned, iswrite, ispriv);
+> 
+>     if s2fault.statuscode != Fault_None then
+>       return (s2fault, AddressDescriptor UNKNOWN);
+>     else
+>       descupdateaddress = descaddress;
+> 
+>     (fault, mem_desc) = AArch64.MemSwapTableDesc(fault, descriptor, new_desc,
+>     						 walkparams.ee, descupdateaddress)
+> 
+> Buried in AArch64.S1Walk() is a stage-2 walk for a read to fetch the
+> descriptor. The second stage-2 walk for write is conditioned on having
+> already fetched the stage-1 descriptor and determining the AF needs
+> to be set.
+
+The question is whether this is one possible implementation, or the
+only possible implementation. My bet is on the former.
+
+> Relating back to UFFD: if we expect KVM to do exactly what hardware
+> does, UFFD should see an attempted read when the first walk fails
+> because of an S2 translation fault. Based on this patch, though, we'd
+> promote it to a write if TCR_EL1.HA == 1.
+> 
+> This has the additional nuance of marking the S1 PT's IPA as dirty, even
+> though it might not actually have been written to. Having said that,
+> the false positive rate should be negligible given that S1 PTs ought to
+> account for a small amount of guest memory.
+> 
+> Like I said before, I'm probably being unnecessarily pedantic :) It just
+> seems to me that the view we're giving userspace of S1PTW aborts isn't
+> exactly architectural and I want to make sure that is explicitly
+> intentional.
+
+I think it is perfectly fine to be pedantic about these things,
+because they really matter.
+
+I still think that this change doesn't violate the architecture. But
+at the same time, I see some value in strictly following what the HW
+does, specially given that this only optimises the case where:
+
+- S1 PTs do not have a pre-existing S2 mapping (either placed there by
+  the VMM, or swapped out)
+
+- TCR_EL1.HA==1
+
+which is such a corner case that nobody will loose any sleep over it
+(and I'll buy beer to anyone who can come up with a real workload
+where this optimisation actually matters).
+
+So my suggestion is to drop the change altogether, and stick with the
+original fix.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
