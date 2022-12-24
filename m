@@ -1,165 +1,126 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0996F15A3
-	for <kvmarm@lists.linux.dev>; Fri, 23 Dec 2022 01:00:07 +0000 (UTC)
-Received: by mail-pj1-f45.google.com with SMTP id q17-20020a17090aa01100b002194cba32e9so7405257pjp.1
-        for <kvmarm@lists.linux.dev>; Thu, 22 Dec 2022 17:00:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9fNngnnpE2StonojfqQey1eQCIEtpFm3j4CmrqaN8gA=;
-        b=bqqhyt59RZ5/7uexDzRRAXepjZVuBZumLQVNbYyYwnmJdFK5uPPDp136NtYUkMl8go
-         ETJ/ONXb/ZNy3XuM0z+SLweQdxyzTr2v2qvLkD8QmYr7hwB4ah5TedSe+7a4byts+8fR
-         AUWCsJEPQEtoT7H+WF27A2LC9+h/fp8rHpITGkFHCfcUKDnGlWmi0YS9sZ0KVL+ZvcCl
-         8aBhox831l2QBwyqKlHZizYh+NMC9xTjjkXtZRYt8NiTVkXn/TEmpDsxCgQj9629oAeh
-         xNcnNXpCv4lrcogZAoUdn3ob2yDSRnWdYWCUAYnAuD81ohkCSwmDlKPPh3YOQ2hmUB6j
-         jTew==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC8C210A
+	for <kvmarm@lists.linux.dev>; Sat, 24 Dec 2022 09:12:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1671873143;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=K/8A/i9y6rIvKCnypgiTdopbEh62sIZ4224f2Kvswms=;
+	b=SQEbp+wAX3Iz2zBTlRZXno/jf3xP8zgWso1HLoyFAb1mnTUQyTO7qW+V01RShqqjRok3gA
+	OHuCUrpNmnO9NWrzdnV2N8kEUtezqnDnImyLk7a2GRCHsKm4lLCYaGRtHCACIWdpJlBed7
+	WSCX5k54dvxRhUEH/fm4ynfSU3DA/10=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-226-etgWO2WYNm6Tqiu8ZcXIow-1; Sat, 24 Dec 2022 04:12:22 -0500
+X-MC-Unique: etgWO2WYNm6Tqiu8ZcXIow-1
+Received: by mail-ej1-f70.google.com with SMTP id qf33-20020a1709077f2100b007c155ab74e9so4680944ejc.18
+        for <kvmarm@lists.linux.dev>; Sat, 24 Dec 2022 01:12:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9fNngnnpE2StonojfqQey1eQCIEtpFm3j4CmrqaN8gA=;
-        b=bIX7JHzA0eCi6Ky7Esmtp0487PrQYJdP2ebqKdZteqxW45Xcn/4RtJWwGIsMNy0dOH
-         GntyT3VFe34lXCLXNnEDqpqKtuA6FWSUJASu4cQheCmR9eFt0ERL2V9HfACI+RPx0bkC
-         QF8ICR+ZCCkp6bIBRVnIMj4RMZv8+TOahQdS+v4IxmE/YOtOWplDUwiijAgICpyrVxej
-         DIvbytEXxS3BwN95iy3nsP1AnbsZ10QjBHA323ealmg5NLbf69GPoYjBf0jSL3h3JiJX
-         /lTSygJYktm8ibiFTTJsxhxGZHgc0IQCLml9wxjDHwklkbs+LozKgsFrkxXDP6Aqv3PH
-         layg==
-X-Gm-Message-State: AFqh2koqbrJozQCMf23B9r59Fk4Wohg77R45Jf5cZ+1mtJY/hkKxkUql
-	5JXwVQlzbTCvJeXk7FmDvQAxtw==
-X-Google-Smtp-Source: AMrXdXtKUNrR6zj/7PH2VEbsItoUuVA4yZcHcLe5RCHjCNX53q/K79iy62BAlgWiKIhyuf9E98mKsQ==
-X-Received: by 2002:a17:902:a608:b0:189:b910:c6d2 with SMTP id u8-20020a170902a60800b00189b910c6d2mr1164911plq.1.1671757207187;
-        Thu, 22 Dec 2022 17:00:07 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id s7-20020a170902988700b0018f6e4e425dsm1088195plp.198.2022.12.22.17.00.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Dec 2022 17:00:06 -0800 (PST)
-Date: Thu, 22 Dec 2022 17:00:03 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 2/3] KVM: arm64: Handle S1PTW translation with TCR_HA set
- as a write
-Message-ID: <Y6T9kxfCo86q13Iq@google.com>
-References: <20221220200923.1532710-1-maz@kernel.org>
- <20221220200923.1532710-3-maz@kernel.org>
- <Y6M4TqvJytAEq2ID@google.com>
- <Y6NGcFXLtwOt0+d6@google.com>
- <86ili3byn8.wl-maz@kernel.org>
- <Y6TFAClKlJgkFKef@google.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=K/8A/i9y6rIvKCnypgiTdopbEh62sIZ4224f2Kvswms=;
+        b=xiauTF0zo5XentPX+kTisqvPnMkXzdmpLa+SQEwyRXxlFrdkuPw5ls1kohFWm0+rpN
+         +3RFKLyihef2jQDvhA2TSoxARoQozg2zJtBDAHW8o2XE2G5WevnfzbByXnvY5fnRa5V5
+         db1CT8+tLoJYF9oDwryq038EQI5rfOR6UYfaPtZ4JXkxbAfZa8jtXjpFDiiL2u2pztMP
+         awKct8sTm8cZOfPHHKMycblaPSdwi42gES7M5AuJMT4Hqk2yFs1xW/bRB4dZ9/h618HC
+         +56kzmEezwlcWevUOd1+UKubu4NeNrJUQfmoRNOUtXlWVSHa5Lrmj1FtVvVSnkzhTW/n
+         2UGg==
+X-Gm-Message-State: AFqh2kpQ7b1eD8E/gCM3Q97iPtypoxg3xOapnP1EQa/y37fKyBjv7iaG
+	/ec1NoApClGLiQECQBzeF2FIowWxpY+tSPDpjqdgQqYFadluG2EZMbR4QOHT8PT2GRVjFBQiIZj
+	HNJSyDN5Tn/3X1bAs
+X-Received: by 2002:a17:906:4894:b0:7c0:beee:2f06 with SMTP id v20-20020a170906489400b007c0beee2f06mr10450184ejq.52.1671873141000;
+        Sat, 24 Dec 2022 01:12:21 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXvlm/vA6G01U45Ww3rRE/hpJxyrrrVFeI3NtGzIAEN1d8PbapEpyn4qgCdB7ow6B9vpaz9eng==
+X-Received: by 2002:a17:906:4894:b0:7c0:beee:2f06 with SMTP id v20-20020a170906489400b007c0beee2f06mr10450165ejq.52.1671873140745;
+        Sat, 24 Dec 2022 01:12:20 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id 10-20020a170906218a00b0073d796a1043sm2321829eju.123.2022.12.24.01.12.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 24 Dec 2022 01:12:19 -0800 (PST)
+Message-ID: <a03fb002-ef66-e9ea-7447-baf3d3aff1d9@redhat.com>
+Date: Sat, 24 Dec 2022 10:12:09 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y6TFAClKlJgkFKef@google.com>
-Message-ID: <20221223010003.31r_OBgdPPxGqgfn24JgiySoMbVDZOIX82lhUgj7Nnw@z>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH 06/14] KVM: selftests: Rename UNAME_M to ARCH_DIR, fill
+ explicitly for x86
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>
+Cc: James Morse <james.morse@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Tom Rix <trix@redhat.com>,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ linux-riscv@lists.infradead.org, llvm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Ricardo Koller <ricarkol@google.com>,
+ Aaron Lewis <aaronlewis@google.com>,
+ Raghavendra Rao Ananta <rananta@google.com>
+References: <20221213001653.3852042-1-seanjc@google.com>
+ <20221213001653.3852042-7-seanjc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20221213001653.3852042-7-seanjc@google.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-ID: <20221224091209.w6VR4EUZDO0uJSP0iVBiTLbyQ-WmcrPQyzr6zEcmZpk@z>
 
-On Thu, Dec 22, 2022 at 08:58:40PM +0000, Oliver Upton wrote:
-> On Thu, Dec 22, 2022 at 09:01:15AM +0000, Marc Zyngier wrote:
-> > On Wed, 21 Dec 2022 17:46:24 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
-> > >  - When UFFD is in use, translation faults are reported to userspace as
-> > >    writes when from a RW memslot and reads when from an RO memslot.
-> > 
-> > Not quite: translation faults are reported as reads if TCR_EL1.HA
-> > isn't set, and as writes if it is. Ignoring TCR_EL1.HD for a moment,
-> > this matches exactly the behaviour of the page-table walker, which
-> > will update the S1 PTs only if this bit is set.
-> 
-> My bad, yes you're right. I conflated the use case here with the
-> architectural state.
-> 
-> I'm probably being way too pedantic, but I just wanted to make sure we
-> agree about the ensuing subtlety. More below:
-> 
-> > Or is it what userfaultfd does on its own? That'd be confusing...
-> > 
-> > > 
-> > >  - S1 page table memory is spuriously marked as dirty, as we presume a
-> > >    write immediately follows the translation fault. That isn't entirely
-> > >    senseless, as it would mean both the target page and the S1 PT that
-> > >    maps it are both old. This is nothing new I suppose, just weird.
-> > 
-> > s/old/young/ ?
-> > 
-> > I think you're confusing the PT access with the access that caused the
-> > PT access (I'll have that printed on a t-shirt, thank you very much).
-> 
-> I'd buy it!
-> 
-> > Here, we're not considering the cause of the PT access anymore. If
-> > TCR_EL1.HA is set, the S1 PT page will be marked as accessed even on a
-> > read, and only that page.
-> 
-> I think this is where the disconnect might be. TCR_EL1.HA == 1 suggests
-> a write could possibly follow, but I don't think it requires it. The
-> page table walker must first load the S1 PTE before writing to it.
-> 
-> From AArch64.S1Translate() (DDI0487H.a):
-> 
->     (fault, descaddress, walkstate, descriptor) = AArch64.S1Walk(fault, walkparams, va, regime,
-> 								 ss, acctype, iswrite, ispriv);
-> 
->     [...]
-> 
->     new_desc = descriptor;
->     if walkparams.ha == '1' && AArch64.FaultAllowsSetAccessFlag(fault) then
->       // Set descriptor AF bit
->       new_desc<10> = '1';
-> 
->     [...]
-> 
->     // Either the access flag was clear or AP<2> is set
->     if new_desc != descriptor then
->       if regime == Regime_EL10 && EL2Enabled() then
->         s1aarch64 = TRUE;
-> 	s2fs1walk = TRUE;
-> 	aligned = TRUE;
-> 	iswrite = TRUE;
-> 	(s2fault, descupdateaddress) = AArch64.S2Translate(fault, descaddress, s1aarch64,
-> 							   ss, s2fs1walk, AccType_ATOMICRW,
-> 							   aligned, iswrite, ispriv);
-> 
->     if s2fault.statuscode != Fault_None then
->       return (s2fault, AddressDescriptor UNKNOWN);
->     else
->       descupdateaddress = descaddress;
-> 
->     (fault, mem_desc) = AArch64.MemSwapTableDesc(fault, descriptor, new_desc,
->     						 walkparams.ee, descupdateaddress)
-> 
-> Buried in AArch64.S1Walk() is a stage-2 walk for a read to fetch the
-> descriptor. The second stage-2 walk for write is conditioned on having
-> already fetched the stage-1 descriptor and determining the AF needs
-> to be set.
-> 
-> Relating back to UFFD: if we expect KVM to do exactly what hardware
-> does, UFFD should see an attempted read when the first walk fails
-> because of an S2 translation fault. Based on this patch, though, we'd
-> promote it to a write if TCR_EL1.HA == 1.
-> 
-> This has the additional nuance of marking the S1 PT's IPA as dirty, even
-> though it might not actually have been written to. Having said that,
-> the false positive rate should be negligible given that S1 PTs ought to
-> account for a small amount of guest memory.
+On 12/13/22 01:16, Sean Christopherson wrote:
+> -ifeq ($(ARCH),riscv)
+> -	UNAME_M := riscv
+> +ifeq ($(ARCH),x86)
+> +	ARCH_DIR := x86_64
+> +else ifeq ($(ARCH),arm64)
+> +	ARCH_DIR := aarch64
+> +else ifeq ($(ARCH),s390)
+> +	ARCH_DIR := s390x
+> +else ifeq ($(ARCH),riscv)
+> +	ARCH_DIR := riscv
+> +else
+> +$(error Unknown architecture '$(ARCH)')
+>   endif
 
-Another false positive is TCR_EL1.HA == 1 and having the AF bit set in
-the PTE. This results on a write, when I don't think it should.
+$(error) would break compiling via tools/testing/selftests/Makefile, so 
+I am squashing this:
 
-> 
-> Like I said before, I'm probably being unnecessarily pedantic :) It just
-> seems to me that the view we're giving userspace of S1PTW aborts isn't
-> exactly architectural and I want to make sure that is explicitly
-> intentional.
->
-> --
-> Thanks,
-> Oliver
+diff --git a/tools/testing/selftests/kvm/Makefile 
+b/tools/testing/selftests/kvm/Makefile
+index d761a77c3a80..59f3eb53c932 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -13,10 +13,8 @@ else ifeq ($(ARCH),arm64)
+  	ARCH_DIR := aarch64
+  else ifeq ($(ARCH),s390)
+  	ARCH_DIR := s390x
+-else ifeq ($(ARCH),riscv)
+-	ARCH_DIR := riscv
+  else
+-$(error Unknown architecture '$(ARCH)')
++	ARCH_DIR := $(ARCH)
+  endif
+
+  LIBKVM += lib/assert.c
+
+Then the aarch64 and s390x directories can be renamed---x86 too, but the 
+ifeq needs to stay (just changed to do x86_64->x86 instead of the other 
+way round).
+
+Paolo
+
