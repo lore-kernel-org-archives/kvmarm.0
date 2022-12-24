@@ -2,94 +2,94 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2055EC4332F
-	for <kvmarm@archiver.kernel.org>; Sat, 24 Dec 2022 09:12:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 031A6C4332F
+	for <kvmarm@archiver.kernel.org>; Sat, 24 Dec 2022 09:17:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9172A4BA8A;
-	Sat, 24 Dec 2022 04:12:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 882574BA3D;
+	Sat, 24 Dec 2022 04:17:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id u6IL+srXbfF4; Sat, 24 Dec 2022 04:12:26 -0500 (EST)
+	with ESMTP id cKWYMBvFqyWZ; Sat, 24 Dec 2022 04:17:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AA714BA1C;
-	Sat, 24 Dec 2022 04:12:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 70DFC4BA78;
+	Sat, 24 Dec 2022 04:17:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F2B34BA15
- for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Dec 2022 04:12:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E61B84BA1C
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Dec 2022 04:17:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hxySLjZqJhCQ for <kvmarm@lists.cs.columbia.edu>;
- Sat, 24 Dec 2022 04:12:24 -0500 (EST)
+ with ESMTP id 0vDMO1W3U-Dg for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 24 Dec 2022 04:17:03 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 590004B9C0
- for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Dec 2022 04:12:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A804D4B9BC
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Dec 2022 04:17:03 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1671873143;
+ s=mimecast20190719; t=1671873423;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=K/8A/i9y6rIvKCnypgiTdopbEh62sIZ4224f2Kvswms=;
- b=SQEbp+wAX3Iz2zBTlRZXno/jf3xP8zgWso1HLoyFAb1mnTUQyTO7qW+V01RShqqjRok3gA
- OHuCUrpNmnO9NWrzdnV2N8kEUtezqnDnImyLk7a2GRCHsKm4lLCYaGRtHCACIWdpJlBed7
- WSCX5k54dvxRhUEH/fm4ynfSU3DA/10=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=1WJ5IG512JK4HdlC/w+MEPT5hs4wW6eIO1tcvJBoFHE=;
+ b=F90mZhlT6A4P/+WBvMOsTfUQRosPffV66Drf29IkT+UX9MUmQ9g/eIT8fbMd+eICKynE4k
+ UCrEnwBkD7+8QJEjb/bsx72dapi6ixfbEA4nWwpj2mc+7Oz/s0VsvfXXRH5Y3A+4BifQQB
+ UpjU7T1r5bBMs7kvfBqBZEQQvb27Y/M=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-240-9KRF6q-KMy-n4PqPmIpPsw-1; Sat, 24 Dec 2022 04:12:22 -0500
-X-MC-Unique: 9KRF6q-KMy-n4PqPmIpPsw-1
-Received: by mail-ej1-f72.google.com with SMTP id
- xh12-20020a170906da8c00b007413144e87fso4673703ejb.14
- for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Dec 2022 01:12:21 -0800 (PST)
+ us-mta-224-M6K4QprmN3uX1IeJeozeDQ-1; Sat, 24 Dec 2022 04:16:59 -0500
+X-MC-Unique: M6K4QprmN3uX1IeJeozeDQ-1
+Received: by mail-ej1-f70.google.com with SMTP id
+ sg39-20020a170907a42700b007c19b10a747so4691539ejc.11
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Dec 2022 01:16:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=content-transfer-encoding:in-reply-to:from:references:cc:to
  :content-language:subject:user-agent:mime-version:date:message-id
  :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
- bh=K/8A/i9y6rIvKCnypgiTdopbEh62sIZ4224f2Kvswms=;
- b=XnL4eFOk6xxxkvjNlBTn6KQKwRbiOGzcb6TMvyXGJKp/lrIYzyH0IdeSpcu42aclRx
- NjBBQMbrKB3QXXDjIeGo/i6X6HvUFMVmRRZxwqeteCYN9CX8a9OjqK8SDb/kHoMKktfM
- Tf/agW/AKC8jY2BO96TkI+g6jv+LZcxIhmZNadlTqIweDzDaV7enIGxtS4kP8Z/xAL8D
- RNvKh0B/iVIMaG5mPREe69gg9PCmpjFc0s8A0qETox0ZbDlT86hD2LzM5It+CYy+m5/l
- CneHH8JHFwiVy0qARC4KY6Fw9hHVBuCJ9Czx+RQRbHxmpfML+G05S8BVIT0JnhPOJSnu
- qvCg==
-X-Gm-Message-State: AFqh2krts5Q8E2n/r+tSQ1xuLW7z6YLPJMorznggp4dNkK6VvJ5aHraG
- PP1QBVLmEZ9oT5OTQNfXLWohCOuO1NVP2U//mRD9NyHHQL+YDMxK8y8u5DW9GhuKYAjSpVZ1WQt
- LrniLoZoCozRKWD/7JBG3Va4n
-X-Received: by 2002:a17:906:4894:b0:7c0:beee:2f06 with SMTP id
- v20-20020a170906489400b007c0beee2f06mr10450187ejq.52.1671873141001; 
- Sat, 24 Dec 2022 01:12:21 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXvlm/vA6G01U45Ww3rRE/hpJxyrrrVFeI3NtGzIAEN1d8PbapEpyn4qgCdB7ow6B9vpaz9eng==
-X-Received: by 2002:a17:906:4894:b0:7c0:beee:2f06 with SMTP id
- v20-20020a170906489400b007c0beee2f06mr10450165ejq.52.1671873140745; 
- Sat, 24 Dec 2022 01:12:20 -0800 (PST)
+ bh=1WJ5IG512JK4HdlC/w+MEPT5hs4wW6eIO1tcvJBoFHE=;
+ b=KNR8nuXT5o4VzBieHs6Zc8qLGIQW/xNIae9Jjln/dS/avg62DFuI5MEBxDQHauuJBE
+ CYZq5e2Gn9GZN6ZUxUdawPIhqD2mjWM4OQHITULi9JTknfNvLzjic5I51xMqleQIlNfS
+ KMfXg8EQeSnwwTEPxxWz46b55VBMmxS2qxXdEB/3+FyLLGOkhmkS8w9lVMHmJtd9yeYS
+ XaZi18VWHcnGY7qe1bi22ikcyvawDuCgE9Es9QNjgirxm/LtzP1cMyXyeMgeh17Q9U4o
+ DjTLX3SWEl1t5tdD77N7rQwXY8AmNnldSfgXLhrqCxDKGZOVMMEIdYrF2z/Z74MpaJxr
+ x9BQ==
+X-Gm-Message-State: AFqh2kpudFFr8iJZVdLhNb0/VGtdxbnIQdTmGtxXYblxuF84FstnHI4W
+ 1ZxFZDFlwYP+7NIOvkCjIF/20Y0j1Bcpc5TzVfzSZQ3hpl9uxJt85lhFkxxxakRTNWkdTnfBmMV
+ wZ/Vw+SqxOorYhEObnb0afB/q
+X-Received: by 2002:a17:906:2813:b0:7c0:f9ef:23a2 with SMTP id
+ r19-20020a170906281300b007c0f9ef23a2mr12170074ejc.30.1671873418375; 
+ Sat, 24 Dec 2022 01:16:58 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXvxPdiaG4E8UewTBDKGwk+RrHY5iIcLLbOD+rhwdwS97aEIalcuCrM4uQvmfbCxpmo46L3Qww==
+X-Received: by 2002:a17:906:2813:b0:7c0:f9ef:23a2 with SMTP id
+ r19-20020a170906281300b007c0f9ef23a2mr12170039ejc.30.1671873418109; 
+ Sat, 24 Dec 2022 01:16:58 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045?
  ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
  by smtp.googlemail.com with ESMTPSA id
- 10-20020a170906218a00b0073d796a1043sm2321829eju.123.2022.12.24.01.12.18
+ gf3-20020a170906e20300b007bff9fb211fsm2323104ejb.57.2022.12.24.01.16.55
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 24 Dec 2022 01:12:19 -0800 (PST)
-Message-ID: <a03fb002-ef66-e9ea-7447-baf3d3aff1d9@redhat.com>
-Date: Sat, 24 Dec 2022 10:12:09 +0100
+ Sat, 24 Dec 2022 01:16:57 -0800 (PST)
+Message-ID: <f53ed5b9-156c-e809-08e2-050217a970a5@redhat.com>
+Date: Sat, 24 Dec 2022 10:16:55 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.1
-Subject: Re: [PATCH 06/14] KVM: selftests: Rename UNAME_M to ARCH_DIR, fill
- explicitly for x86
+Subject: Re: [PATCH 09/14] KVM: selftests: Explicitly disable builtins for
+ mem*() overrides
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
  <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
  Nathan Chancellor <nathan@kernel.org>,
  Nick Desaulniers <ndesaulniers@google.com>
 References: <20221213001653.3852042-1-seanjc@google.com>
- <20221213001653.3852042-7-seanjc@google.com>
+ <20221213001653.3852042-10-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221213001653.3852042-7-seanjc@google.com>
+In-Reply-To: <20221213001653.3852042-10-seanjc@google.com>
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
@@ -114,44 +114,18 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 12/13/22 01:16, Sean Christopherson wrote:
-> -ifeq ($(ARCH),riscv)
-> -	UNAME_M := riscv
-> +ifeq ($(ARCH),x86)
-> +	ARCH_DIR := x86_64
-> +else ifeq ($(ARCH),arm64)
-> +	ARCH_DIR := aarch64
-> +else ifeq ($(ARCH),s390)
-> +	ARCH_DIR := s390x
-> +else ifeq ($(ARCH),riscv)
-> +	ARCH_DIR := riscv
-> +else
-> +$(error Unknown architecture '$(ARCH)')
->   endif
+> Explicitly disable the compiler's builtin memcmp(), memcpy(), and
+> memset().  Because only lib/string_override.c is built with -ffreestanding,
+> the compiler reserves the right to do what it wants and can try to link the
+> non-freestanding code to its own crud.
+> 
+>    /usr/bin/x86_64-linux-gnu-ld: /lib/x86_64-linux-gnu/libc.a(memcmp.o): in function `memcmp_ifunc':
+>    (.text+0x0): multiple definition of `memcmp'; tools/testing/selftests/kvm/lib/string_override.o:
+>    tools/testing/selftests/kvm/lib/string_override.c:15: first defined here
+>    clang: error: linker command failed with exit code 1 (use -v to see invocation)
 
-$(error) would break compiling via tools/testing/selftests/Makefile, so 
-I am squashing this:
-
-diff --git a/tools/testing/selftests/kvm/Makefile 
-b/tools/testing/selftests/kvm/Makefile
-index d761a77c3a80..59f3eb53c932 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -13,10 +13,8 @@ else ifeq ($(ARCH),arm64)
-  	ARCH_DIR := aarch64
-  else ifeq ($(ARCH),s390)
-  	ARCH_DIR := s390x
--else ifeq ($(ARCH),riscv)
--	ARCH_DIR := riscv
-  else
--$(error Unknown architecture '$(ARCH)')
-+	ARCH_DIR := $(ARCH)
-  endif
-
-  LIBKVM += lib/assert.c
-
-Then the aarch64 and s390x directories can be renamed---x86 too, but the 
-ifeq needs to stay (just changed to do x86_64->x86 instead of the other 
-way round).
+Hmm, that's weird though.  I think it's an effect of ifunc and maybe 
+even a linker bug.  The patch makes sense anyway.
 
 Paolo
 
