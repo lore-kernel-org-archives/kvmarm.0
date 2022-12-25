@@ -2,71 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8298C4167B
-	for <kvmarm@archiver.kernel.org>; Sat, 24 Dec 2022 13:10:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 107A2C4332F
+	for <kvmarm@archiver.kernel.org>; Sun, 25 Dec 2022 13:47:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F4F84BA91;
-	Sat, 24 Dec 2022 08:10:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E1724BCD9;
+	Sun, 25 Dec 2022 08:47:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sUe1pzf2tQKd; Sat, 24 Dec 2022 08:10:00 -0500 (EST)
+	with ESMTP id dWRbCypQfSQC; Sun, 25 Dec 2022 08:47:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB7954B9E2;
-	Sat, 24 Dec 2022 08:10:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD33D4BD08;
+	Sun, 25 Dec 2022 08:47:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 05C394B97F
- for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Dec 2022 08:10:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A12F64BCD0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 25 Dec 2022 08:47:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id of+6OhN46QaH for <kvmarm@lists.cs.columbia.edu>;
- Sat, 24 Dec 2022 08:09:57 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9A9634B936
- for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Dec 2022 08:09:57 -0500 (EST)
+ with ESMTP id k4aJ7Vh3AAXY for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 25 Dec 2022 08:47:09 -0500 (EST)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A861B4BCCE
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 25 Dec 2022 08:47:08 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 3DD4AB81E11
- for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Dec 2022 13:09:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF615C433EF
- for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Dec 2022 13:09:54 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 2FFF3CE068A;
+ Sun, 25 Dec 2022 13:47:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 583DDC433EF;
+ Sun, 25 Dec 2022 13:47:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1671887395;
- bh=1KAD3La7ae36+389O+98UCvX9OlY6/zJI9OrSau1bJE=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=Glwxh4vHrRtMXdFRp2W8FakdI2s4AoO1Ic0njgIusQMZtyKupJUvbtTqWYmCt8Olg
- DpKTBXKR4DISv+bdMbneVMksD2AjcM1ZtvWUvP7cwj7MSTA5Wj/rtm4QpzLb6JAWnN
- Uxwm1ggmug4Nkqj/FMH0fb9U1Y7jR0ot1avKpA7AfK9uraXPFVCa8svudffWWGC9uj
- H0Zo0EJUnWeE4TYp3T6O7QCT82UOnhtrxf0l/OHzqIHrG47mgEQd6JxaqKCfhsWmM9
- eQcgYnFabGqEmWyhLwTeaXZ01FXPDufFwC4WC4Osx/YmzKHIc0lzQ4HSFObWFwndA+
- SrhFJXJSxTxnw==
-Received: by mail-lf1-f54.google.com with SMTP id g13so10357402lfv.7
- for <kvmarm@lists.cs.columbia.edu>; Sat, 24 Dec 2022 05:09:54 -0800 (PST)
-X-Gm-Message-State: AFqh2kpU7ya8K9rzUwOK+m02LpP1R319FdkRecUOKxVmPVll3z9grJsz
- QDdVHVLtD0S5Cnck6QG4KyKMxfrUXtV8TEQ0ZPs=
-X-Google-Smtp-Source: AMrXdXsrYvZLeJidxouIlemfUek/dfoOHZis6FsZAm0Ua3lh36yDaSUDGPVSKz3CZBVcXeLzD4BqCZxMP6aPSvrBga4=
-X-Received: by 2002:ac2:5dfa:0:b0:4b7:3a0:45d2 with SMTP id
- z26-20020ac25dfa000000b004b703a045d2mr647494lfq.228.1671887392928; Sat, 24
- Dec 2022 05:09:52 -0800 (PST)
-MIME-Version: 1.0
-References: <20221220200923.1532710-1-maz@kernel.org>
- <20221220200923.1532710-2-maz@kernel.org>
- <CAMj1kXE57xTzkmdhQzxOBSePVzUCS5GW7PAVvx+iF+3UHv0OrA@mail.gmail.com>
- <877cyhf113.wl-maz@kernel.org>
-In-Reply-To: <877cyhf113.wl-maz@kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Sat, 24 Dec 2022 14:09:41 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXFiiSr+8wgCYZ5iZme6HV1_=dRaiNcjgkEitPcu6u3VBQ@mail.gmail.com>
-Message-ID: <CAMj1kXFiiSr+8wgCYZ5iZme6HV1_=dRaiNcjgkEitPcu6u3VBQ@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Fix S1PTW handling on RO memslots
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>, stable@vger.kernel.org,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ s=k20201202; t=1671976022;
+ bh=PY1bLPnS7e394SC/ISRUmzLJPCq1gI47uGpbqTIctsA=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Jb4J/Z54ttWtnmW8Sl2PzpqJaHFF0fRPo0rUZsgH+W4bQnrYrA6q+NPUFmuaeeg5/
+ lh7xUs/L4q+Wn95e8gdhayUXI6+M+Ikao/w/IxCmnRhU1s4MFimYXfyhbwISg3Gf5q
+ UxIhEQKHNNSMCzk9L+78YfeMNfENLDooyY0t4Mb6qSCzBEyAeD5yW+tdXcD65xIJd3
+ 50R9HNd5Ckyi9bzuv+/nem2m94Qwz4bTobHyXFCpsfBSl0wb/bWHq5WftaNvpqMJYE
+ ixmwxvhaZwhxvJ5+8fOTK0DBy9jYqMpWl8wpZB8+7IrQ60xELVPZwonS2W1Ut/NJTn
+ n9C9JRw3RBOXQ==
+Received: from host81-132-227-111.range81-132.btcentralplus.com
+ ([81.132.227.111] helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1p9RLA-00F58P-1f;
+ Sun, 25 Dec 2022 13:47:00 +0000
+Date: Sun, 25 Dec 2022 13:45:36 +0000
+Message-ID: <875ydzfvgf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: Re: [PATCH v4 7/7] KVM: arm64: Normalize cache configuration
+In-Reply-To: <20221221204016.658874-8-akihiko.odaki@daynix.com>
+References: <20221221204016.658874-1-akihiko.odaki@daynix.com>
+ <20221221204016.658874-8-akihiko.odaki@daynix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 81.132.227.111
+X-SA-Exim-Rcpt-To: akihiko.odaki@daynix.com, broonie@kernel.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ mathieu.poirier@linaro.org, oliver.upton@linux.dev, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, james.morse@arm.com, will@kernel.org,
+ catalin.marinas@arm.com, asahi@lists.linux.dev, alyssa@rosenzweig.io,
+ sven@svenpeter.dev, marcan@marcan.st
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>, Will Deacon <will@kernel.org>,
+ Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
+ Mark Brown <broonie@kernel.org>, asahi@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,84 +95,244 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, 24 Dec 2022 at 13:19, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Thu, 22 Dec 2022 13:01:55 +0000,
-> Ard Biesheuvel <ardb@kernel.org> wrote:
-> >
-> > On Tue, 20 Dec 2022 at 21:09, Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > A recent development on the EFI front has resulted in guests having
-> > > their page tables baked in the firmware binary, and mapped into
-> > > the IPA space as part as a read-only memslot.
-> > >
-> > > Not only this is legitimate, but it also results in added security,
-> > > so thumbs up. However, this clashes mildly with our handling of a S1PTW
-> > > as a write to correctly handle AF/DB updates to the S1 PTs, and results
-> > > in the guest taking an abort it won't recover from (the PTs mapping the
-> > > vectors will suffer freom the same problem...).
-> > >
-> > > So clearly our handling is... wrong.
-> > >
-> > > Instead, switch to a two-pronged approach:
-> > >
-> > > - On S1PTW translation fault, handle the fault as a read
-> > >
-> > > - On S1PTW permission fault, handle the fault as a write
-> > >
-> > > This is of no consequence to SW that *writes* to its PTs (the write
-> > > will trigger a non-S1PTW fault), and SW that uses RO PTs will not
-> > > use AF/DB anyway, as that'd be wrong.
-> > >
-> > > Only in the case described in c4ad98e4b72c ("KVM: arm64: Assume write
-> > > fault on S1PTW permission fault on instruction fetch") do we end-up
-> > > with two back-to-back faults (page being evicted and faulted back).
-> > > I don't think this is a case worth optimising for.
-> > >
-> > > Fixes: c4ad98e4b72c ("KVM: arm64: Assume write fault on S1PTW permission fault on instruction fetch")
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > Cc: stable@vger.kernel.org
-> >
-> > Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-> >
-> > I have tested this patch on my TX2 with one of the EFI builds in
-> > question, and everything works as before (I never observed the issue
-> > itself)
->
-> If you get the chance, could you try with non-4kB page sizes? Here, I
-> could only reproduce it with 16kB pages. It was firing like clockwork
-> on Cortex-A55 with that.
->
+On Wed, 21 Dec 2022 20:40:16 +0000,
+Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+> 
+> Before this change, the cache configuration of the physical CPU was
+> exposed to vcpus. This is problematic because the cache configuration a
+> vcpu sees varies when it migrates between vcpus with different cache
+> configurations.
+> 
+> Fabricate cache configuration from the sanitized value, which holds the
+> CTR_EL0 value the userspace sees regardless of which physical CPU it
+> resides on.
+> 
+> CLIDR_EL1 and CCSIDR_EL1 are now writable from the userspace so that
+> the VMM can restore the values saved with the old kernel.
+> 
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+>  arch/arm64/include/asm/cache.h    |   3 +
+>  arch/arm64/include/asm/kvm_host.h |   4 +
+>  arch/arm64/kvm/reset.c            |   1 +
+>  arch/arm64/kvm/sys_regs.c         | 229 +++++++++++++++++-------------
+>  4 files changed, 141 insertions(+), 96 deletions(-)
 
-I'll try on 64k but I don't have access to a 16k capable machine that
-runs KVM atm (I'm still enjoying working wifi and GPU etc on my M1
-Macbook Air)
+[...]
 
-> >
-> > Regression-tested-by: Ard Biesheuvel <ardb@kernel.org>
-> >
-> > For the record, the EFI build in question targets QEMU/mach-virt and
-> > switches to a set of read-only page tables in emulated NOR flash
-> > straight out of reset, so it can create and populate the real page
-> > tables with MMU and caches enabled. EFI does not use virtual memory or
-> > paging so managing access flags or dirty bits in hardware is unlikely
-> > to add any value, and it is not being used at the moment. And given
-> > that this is emulated NOR flash, any ordinary write to it tears down
-> > the r/o memslot altogether, and kicks the NOR flash emulation in QEMU
-> > into programming mode, which is fully based on MMIO emulation and does
-> > not use a memslot at all. IOW, even if we could figure out what store
-> > the PTW was attempting to do, it is always going to be rejected since
-> > the r/o page tables can only be modified by 'programming' the NOR
-> > flash sector.
->
-> Indeed, and this would be a pretty dodgy setup anyway.
->
-> Thanks for having had a look,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+>  /* Which cache CCSIDR represents depends on CSSELR value. */
+> -static u32 get_ccsidr(u32 csselr)
+> +static u32 get_ccsidr(struct kvm_vcpu *vcpu, u32 csselr)
+> +{
+> +	if (vcpu->arch.ccsidr)
+> +		return vcpu->arch.ccsidr[csselr];
+> +
+> +	/*
+> +	 * Fabricate a CCSIDR value as the overriding value does not exist.
+> +	 * The real CCSIDR value will not be used as it can vary by the
+> +	 * physical CPU which the vcpu currently resides in.
+> +	 *
+> +	 * The line size is determined with get_min_cache_line_size(), which
+> +	 * should be valid for all CPUs even if they have different cache
+> +	 * configuration.
+> +	 *
+> +	 * The associativity bits are cleared, meaning the geometry of all data
+> +	 * and unified caches (which are guaranteed to be PIPT and thus
+> +	 * non-aliasing) are 1 set and 1 way.
+> +	 * Guests should not be doing cache operations by set/way at all, and
+> +	 * for this reason, we trap them and attempt to infer the intent, so
+> +	 * that we can flush the entire guest's address space at the appropriate
+> +	 * time. The exposed geometry minimizes the number of the traps.
+> +	 * [If guests should attempt to infer aliasing properties from the
+> +	 * geometry (which is not permitted by the architecture), they would
+> +	 * only do so for virtually indexed caches.]
+> +	 */
+> +	return get_min_cache_line_size(csselr) << CCSIDR_EL1_LineSize_SHIFT;
+
+It'd be nice to have a comment that says this relies on CCSIDR_EL1
+being allowed to return an UNKNOWN value when CSSELR_EL1 does not
+specify an implemented cache level (you always return something with
+the I or D line-size).
+
+> +}
+> +
+> +static int set_ccsidr(struct kvm_vcpu *vcpu, u32 csselr, u32 val)
+>  {
+> -	u32 ccsidr;
+> +	u8 line_size = FIELD_GET(CCSIDR_EL1_LineSize, val);
+> +	u32 *ccsidr = vcpu->arch.ccsidr;
+> +	u32 i;
+> +
+> +	if ((val & CCSIDR_EL1_RES0) || line_size < get_min_cache_line_size(csselr))
+> +		return -EINVAL;
+> +
+> +	if (!ccsidr) {
+> +		if (val == get_ccsidr(vcpu, csselr))
+> +			return 0;
+> +
+> +		ccsidr = kmalloc_array(CSSELR_MAX, sizeof(u32), GFP_KERNEL);
+> +		if (!ccsidr)
+> +			return -ENOMEM;
+> +
+> +		for (i = 0; i < CSSELR_MAX; i++)
+> +			ccsidr[i] = get_ccsidr(vcpu, i);
+> +
+> +		vcpu->arch.ccsidr = ccsidr;
+> +	}
+>  
+> -	/* Make sure noone else changes CSSELR during this! */
+> -	local_irq_disable();
+> -	write_sysreg(csselr, csselr_el1);
+> -	isb();
+> -	ccsidr = read_sysreg(ccsidr_el1);
+> -	local_irq_enable();
+> +	ccsidr[csselr] = val;
+>  
+> -	return ccsidr;
+> +	return 0;
+>  }
+>  
+>  /*
+> @@ -1281,10 +1332,64 @@ static bool access_clidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	if (p->is_write)
+>  		return write_to_read_only(vcpu, p, r);
+>  
+> -	p->regval = read_sysreg(clidr_el1);
+> +	p->regval = __vcpu_sys_reg(vcpu, r->reg);
+>  	return true;
+>  }
+>  
+> +/*
+> + * Fabricate a CLIDR_EL1 value instead of using the real value, which can vary
+> + * by the physical CPU which the vcpu currently resides in.
+> + */
+> +static void reset_clidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	u64 ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
+> +	u64 clidr;
+> +	u8 loc;
+> +
+> +	if ((ctr_el0 & CTR_EL0_IDC) || cpus_have_const_cap(ARM64_HAS_STAGE2_FWB)) {
+
+Having looked into this again, I *think* we can drop the FWB check, as
+the above read_sanitised_ftr_reg() is populated from
+read_cpuid_effective_cachetype(), which factors in the *effects* of
+FWB.
+
+Please check though, as I only had a cursory look.
+
+> +		/*
+> +		 * Data cache clean to the PoU is not required so LoUU and LoUIS
+> +		 * will not be set and a unified cache, which will be marked as
+> +		 * LoC, will be added.
+> +		 *
+> +		 * If not DIC, let the unified cache L2 so that an instruction
+> +		 * cache can be added as L1 later.
+> +		 */
+> +		loc = (ctr_el0 & CTR_EL0_DIC) ? 1 : 2;
+> +		clidr = CACHE_TYPE_UNIFIED << CLIDR_CTYPE_SHIFT(loc);
+> +	} else {
+> +		/*
+> +		 * Data cache clean to the PoU is required so let L1 have a data
+> +		 * cache and mark it as LoUU and LoUIS. As L1 has a data cache,
+> +		 * it can be marked as LoC too.
+> +		 */
+> +		loc = 1;
+> +		clidr = 1 << CLIDR_LOUU_SHIFT;
+> +		clidr |= 1 << CLIDR_LOUIS_SHIFT;
+> +		clidr |= CACHE_TYPE_DATA << CLIDR_CTYPE_SHIFT(1);
+> +	}
+> +
+> +	/*
+> +	 * Instruction cache invalidation to the PoU is required so let L1 have
+> +	 * an instruction cache. If L1 already has a data cache, it will be
+> +	 * CACHE_TYPE_SEPARATE.
+> +	 */
+> +	if (!(ctr_el0 & CTR_EL0_DIC))
+> +		clidr |= CACHE_TYPE_INST << CLIDR_CTYPE_SHIFT(1);
+> +
+> +	clidr |= loc << CLIDR_LOC_SHIFT;
+> +
+> +	/*
+> +	 * Add tag cache unified to data cache. Allocation tags and data are
+> +	 * unified in a cache line so that it looks valid even if there is only
+> +	 * one cache line.
+> +	 */
+> +	if (kvm_has_mte(vcpu->kvm))
+> +		clidr |= 2 << CLIDR_TTYPE_SHIFT(loc);
+> +
+> +	__vcpu_sys_reg(vcpu, r->reg) = clidr;
+> +}
+> +
+>  static bool access_csselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  			  const struct sys_reg_desc *r)
+>  {
+> @@ -1306,22 +1411,12 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  		return write_to_read_only(vcpu, p, r);
+>  
+>  	csselr = vcpu_read_sys_reg(vcpu, CSSELR_EL1);
+> -	p->regval = get_ccsidr(csselr);
+> +	csselr &= CSSELR_EL1_Level | CSSELR_EL1_InD;
+> +	if (csselr >= CSSELR_MAX)
+> +		return undef_access(vcpu, p, r);
+
+I really dislike this UNDEF injection. Yes, this is allowed, but this
+is also inconsistent, as you can still set random values of TnD and
+not suffer an UNDEF. It also doesn't check for the values that have
+been advertised in CLIDR_EL1. I'd rather you return something without
+creating havoc.
+
+> +
+> +	p->regval = get_ccsidr(vcpu, csselr);
+>  
+> -	/*
+> -	 * Guests should not be doing cache operations by set/way at all, and
+> -	 * for this reason, we trap them and attempt to infer the intent, so
+> -	 * that we can flush the entire guest's address space at the appropriate
+> -	 * time.
+> -	 * To prevent this trapping from causing performance problems, let's
+> -	 * expose the geometry of all data and unified caches (which are
+> -	 * guaranteed to be PIPT and thus non-aliasing) as 1 set and 1 way.
+> -	 * [If guests should attempt to infer aliasing properties from the
+> -	 * geometry (which is not permitted by the architecture), they would
+> -	 * only do so for virtually indexed caches.]
+> -	 */
+> -	if (!(csselr & 1)) // data or unified cache
+> -		p->regval &= ~GENMASK(27, 3);
+>  	return true;
+>  }
+>  
+> @@ -1610,7 +1705,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
+>  
+>  	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
+> -	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr },
+> +	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr, reset_clidr, CLIDR_EL1 },
+
+Maybe I wasn't clear enough in my previous reviews, so allow me to put
+it bluntly: you MUST validate CLIDR_EL1 as it is written from
+userspace, and refuse CLIDR_EL1.{LoUU,LoC,LoUIS} values that cannot be
+safely handled on this host.
+
+For example, restoring CLIDR_EL1.LoC=0, which implies a CTR_EL0.IDC
+behaviour, cannot be restored on a host that cannot offer the IDC
+behaviour. This is a critical aspect, as the guest will otherwise
+observe something that looks like memory corruption.
+
+So these 3 values must be checked across the board, and you must not
+accept a zero value if the HW has a non-zero value for the same
+field.  The main difficultly I can see is that this needs to be
+tracked on all CPUs, probably as some boot-time information, and
+result in a sanitised version of CLIDR_EL1, just like we do for
+CTR_EL0.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
