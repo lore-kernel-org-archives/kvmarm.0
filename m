@@ -1,23 +1,24 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29C4D28FA
-	for <kvmarm@lists.linux.dev>; Tue, 27 Dec 2022 14:34:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F315DC43396;
-	Tue, 27 Dec 2022 14:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E1528FA
+	for <kvmarm@lists.linux.dev>; Tue, 27 Dec 2022 14:34:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AECEC43392;
+	Tue, 27 Dec 2022 14:34:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1672151650;
-	bh=sG9v2Kt6FCDopacILFBaWr43bInSjVesEWi3vJNnqW4=;
+	s=k20201202; t=1672151652;
+	bh=0VmPixv/z9MoX7dbPQe6Ks2ec3GEJnabG7fqOP9O8EU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ql5BiyIX48YzftPSFqt6JMm9s+SE9cyeMtoJj8ABqFWIT8glzycmauwdBDpRoucfq
-	 KLOJfrpdIUVeOll/uL4x5gTwlJICF24BIrrum5cthr9kgujRusajhsklEIolz9YnGA
-	 5F4t/Y0VT7fglOvQir3yoBesSKjvvToPHEFtzMHTZjMThuMKYgxAbYp2/MOKU1Dciu
-	 HIqEsW/k29bMwK+rU+l6UIcny0IYHacEct+Z1vKUhLKuJ/2fQzjpoDkS+CPj7OcnvD
-	 v1eYQAb+aGKQXKvo9AvsfzLhF5f00aM8tznKN3yeKYh3MDN6GnRge4uvxmgUT1FI/Z
-	 36pN7qx1cugOQ==
+	b=MetYWfq4dijiRiamm3h2fWX6aSVLc3XMJBVhdkJbW52Q5zKsmImob1jtFsQdnA0PK
+	 8+6joeeGf8/xa/1YQWSRvmrso9ne1ID76SvU7Kxu4O9EZCUK8AGYO+KXKj+hEh3mWx
+	 4yCmuRMpkK6ricVcEJlO8Qccd4PRH8Qogkfr91VZEkT5SiS0Kuxq19lI7ej53kNeT/
+	 zHklPLp49f+ITgH6kJAkRrDzBbazr6arzsW+HTVOiYC3zeO0x9CYXwY81NnWvCUfHe
+	 WNPVjFFMJG1o7AN/tEjMk3GGMtzRob8VQM44e8ATR/a4qJ8VKeO7Y+pwVw3CyFU9BJ
+	 FE8sgGXgCeW+A==
 From: Mark Brown <broonie@kernel.org>
-Date: Tue, 27 Dec 2022 14:33:38 +0000
-Subject: [PATCH 1/3] KVM: arm64: Document check for TIF_FOREIGN_FPSTATE
+Date: Tue, 27 Dec 2022 14:33:39 +0000
+Subject:
+ [PATCH 2/3] KVM: arm64: Restructure check for SVE support in FP trap handler
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,7 +28,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Message-Id:
- <20221214-kvm-arm64-sme-context-switch-v1-1-383b4699de06@kernel.org>
+ <20221214-kvm-arm64-sme-context-switch-v1-2-383b4699de06@kernel.org>
 References:
  <20221214-kvm-arm64-sme-context-switch-v1-0-383b4699de06@kernel.org>
 In-Reply-To:
@@ -40,46 +41,53 @@ To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
  Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.12-dev-7ab1d
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1080; i=broonie@kernel.org;
- h=from:subject:message-id; bh=sG9v2Kt6FCDopacILFBaWr43bInSjVesEWi3vJNnqW4=;
- b=owGbwMvMwMWocq27KDak/QLjabUkhuTVTFG+b5jjFj36tUB09rTe2eG1H++/KroWfVNXqvipTb7X
- 9NqLnYzGLAyMXAyyYoosa59lrEoPl9g6/9H8VzCDWJlApjBwcQrARDz2s/+VOKDNxvzHOOqFfkx46o
- TlTC+27urdcoK3Ol3qoF1hgzvjc9Od9lYTLFf6hLBOlw3anVx14eK6v5EFM1zmNonwm/BX+P28OXFz
- 0PEZfXJWm0u/6ts+kpNdaS+Rt9eC8XBIjPJvkZBDbXa5rBvjijJFCqW3POy5WzZ7anCtYv16gbK3D4
- 23L7aX7AmfIPb42lbhbS42CxuFt2QWS7o++HNyszLP5LgGJz3ZbzZJRsskJvqeiJ/At0rT2OjmvdRs
- zwv5Hoc8K/l0c1b21rjczS7QO7ns1LLunvVGTafOdSRysMUo2RW6slXHdX8SvDn9rmZ4hjVH4T8lmd
- Lcv7/09BecWLm/wMjmxKwY1ZZaAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1296; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=0VmPixv/z9MoX7dbPQe6Ks2ec3GEJnabG7fqOP9O8EU=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjqwJbtUGSKmaVpocHwkyMsGn5Kc/N1KwOsVsjL+9v
+ uss1GyWJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY6sCWwAKCRAk1otyXVSH0ObpB/
+ 9o5V9dqtOgOLPlcmYP4Izi6mlT9RNEQqK2LkHEGBVDWvUT8vmT+0dACkjYZo61ew1K2Xx/MkuWin0i
+ CLJaSSVkZjJXyoZcCseLKmaTfup0wDTsrtxB2UlRQFyt7n3bOU1COngpPHpoEYlq920K6GTxRclRBJ
+ SgXEQQcQURk9Pqi0HTVIN3ecSGFCqPCfGp4AkTJh6XWtyz0SQ+DsrMSO9HTu5MYejaUhwneaeTHeFq
+ qjhn5FOJnhTD1HcytsJNf6fYXwcxfvOzD8o04EjQoRCxHE+XXSvGLacbzyUu0Tu+3FdQNm09QhzsPn
+ vbxPTSQ8SQgEofwKvvPljGSgoqmaBq
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-In kvm_arch_vcpu_load_fp() we unconditionally set the current FP state
-to FP_STATE_HOST_OWNED, this will be overridden to FP_STATE_NONE if
-TIF_FOREIGN_FPSTATE is set but the check is deferred until
-kvm_arch_vcpu_ctxflush_fp() where we are no longer preemptable. Add a
-comment to this effect to help avoid people being concerned about the
-lack of a check and discover where the check is done.
+We share the same handler for general floating point and SVE traps with a
+check to make sure we don't handle any SVE traps if the system doesn't
+have SVE support. Since we will be adding SME support and wishing to handle
+that along with other FP related traps rewrite the check to be more scalable
+and a bit clearer too.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/kvm/fpsimd.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 02dd7e9ebd39..6c1cb945c777 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -81,6 +81,11 @@ void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 3330d1b76bdd..009f4ce6c691 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -176,9 +176,17 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	sve_guest = vcpu_has_sve(vcpu);
+ 	esr_ec = kvm_vcpu_trap_get_class(vcpu);
  
- 	fpsimd_kvm_prepare();
+-	/* Don't handle SVE traps for non-SVE vcpus here: */
+-	if (!sve_guest && esr_ec != ESR_ELx_EC_FP_ASIMD)
++	/* Only handle traps the vCPU can support here: */
++	switch (esr_ec) {
++	case ESR_ELx_EC_FP_ASIMD:
++		break;
++	case ESR_ELx_EC_SVE:
++		if (!sve_guest)
++			return false;
++		break;
++	default:
+ 		return false;
++	}
  
-+	/*
-+	 * We will check TIF_FOREIGN_FPSTATE just before entering the
-+	 * guest in kvm_arch_vcpu_ctxflush_fp() and override this to
-+	 * FP_STATE_FREE if the flag set.
-+	 */
- 	vcpu->arch.fp_state = FP_STATE_HOST_OWNED;
+ 	/* Valid trap.  Switch the context: */
  
- 	vcpu_clear_flag(vcpu, HOST_SVE_ENABLED);
 
 -- 
 2.30.2
