@@ -2,54 +2,86 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51999C4167B
-	for <kvmarm@archiver.kernel.org>; Mon, 26 Dec 2022 18:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9A1C4332F
+	for <kvmarm@archiver.kernel.org>; Tue, 27 Dec 2022 13:03:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B43C34BB5E;
-	Mon, 26 Dec 2022 13:22:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D15F74B843;
+	Tue, 27 Dec 2022 08:03:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linux.dev
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rXUtrvupVfb0; Mon, 26 Dec 2022 13:22:04 -0500 (EST)
+	with ESMTP id CL02awXeZe7o; Tue, 27 Dec 2022 08:03:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 88B764BB25;
-	Mon, 26 Dec 2022 13:22:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A11AF4B886;
+	Tue, 27 Dec 2022 08:03:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FE774BAC0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2022 13:22:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 84DD04B879
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Dec 2022 08:03:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BEivaXbhAd03 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Dec 2022 13:22:02 -0500 (EST)
-Received: from out-67.mta0.migadu.com (out-67.mta0.migadu.com [91.218.175.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E51A74BAB4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Dec 2022 13:22:01 -0500 (EST)
-Date: Mon, 26 Dec 2022 19:21:58 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1672078920;
+ with ESMTP id jzusoxWFi-aT for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Dec 2022 08:03:47 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 267274B843
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Dec 2022 08:03:47 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1672146226;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cj8fvcXIPRKjdcbdoKyucOKTny9ACesRtz6BgpVcVkM=;
- b=EIWyG69G/AZtzcWq5XIyBUSNRlQZDkyfc0U20LTF9fEMJl0FX0uOlJ/eAr9rqya/camTUG
- P+2F4Zq12xJ+DnTU/groB8gJHKmz/EnZ7/Oqqa66FkhngYxN7a/rJrXobamlTZBnn8glVM
- +7T7V3/Iiag3Ym7nSyg49j/ThSgmh2M=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
- include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Colton Lewis <coltonlewis@google.com>
-Subject: Re: [kvm-unit-tests PATCH] arm: Remove MAX_SMP probe loop
-Message-ID: <20221226182158.3azk5zwvl2vsy36h@orel>
-References: <Y6GRXreBu56PqCyG@monolith.localdoman>
- <gsnt8rj2ghof.fsf@coltonlewis-kvm.c.googlers.com>
+ bh=itmwXqUo01mTV85no/9ZNLho2BNM+XUgesQju+SpFwM=;
+ b=UeITphuNzGnkuWLOPV2kIiLlXY5SgMJ5WGlM/3Ak+hJ9JTqJI6ot9OmW8vTIXWJAcpLMKy
+ sac0GMq8kiZZe9v4S7Kl2EBD5a9ad8IIKsgohjKa1T+TzuosgLjpzN0S2aNcoXmw8nVdHi
+ 9Vg7d8eyz8Z+GnSIjDVkF5UYObD/uH8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-359-al1j6ULROiyc5y_rGIER3A-1; Tue, 27 Dec 2022 08:03:41 -0500
+X-MC-Unique: al1j6ULROiyc5y_rGIER3A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.8])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C26A0101A521;
+ Tue, 27 Dec 2022 13:03:38 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2C14DC15BA0;
+ Tue, 27 Dec 2022 13:03:37 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v2 00/50] KVM: Rework kvm_init() and hardware enabling
+Date: Tue, 27 Dec 2022 08:02:50 -0500
+Message-Id: <20221227130249.1650197-1-pbonzini@redhat.com>
+In-Reply-To: <20221130230934.1014142-1-seanjc@google.com>
+References: 
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <gsnt8rj2ghof.fsf@coltonlewis-kvm.c.googlers.com>
-X-Migadu-Flow: FLOW_OUT
-Cc: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Cc: Matthew Rosato <mjrosato@linux.ibm.com>, Paul Durrant <paul@xen.org>,
+ Yuan Yao <yuan.yao@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>,
+ David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
+ Kai Huang <kai.huang@intel.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ linux-riscv@lists.infradead.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
+ Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Chao Gao <chao.gao@intel.com>, Eric Farman <farman@linux.ibm.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org,
+ Atish Patra <atishp@atishpatra.org>, kvmarm@lists.linux.dev,
+ Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
+ Isaku Yamahata <isaku.yamahata@intel.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Fabiano Rosas <farosas@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+ Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, David Woodhouse <dwmw2@infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,34 +98,13 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Dec 20, 2022 at 04:32:00PM +0000, Colton Lewis wrote:
-> Alexandru Elisei <alexandru.elisei@arm.com> writes:
-> 
-> > Though I'm not sure how you managed to get MAX_SMP to go down to 6 cores
-> > on
-> > a 12 core machine. MAX_SMP is initialized to $(getconf _NPROCESSORS_ONLN),
-> > so the body of the loop should never execute. I also tried it on a 6 core
-> > machine, and MAX_SMP was 6, not 3.
-> 
-> > Am I missing something?
-> 
-> To be clear, 12 cores was a simplified example I did not directly
-> verify. What happened to me was 152 cores being cut down to 4. I was
-> confused why one machine was running a test with 4 cores when my other
-> machines were running with 8 and traced it to that loop. In effect the
-> loop was doing MAX_SMP=floor(MAX_SMP / 2) until MAX_SMP <= 8. I printed
-> the iterations and MAX_SMP followed the sequence 152->76->38->19->9->4.
+Queued, thanks.  I will leave this in kvm/queue after testing everything
+else and moving it to kvm/next; this way, we can wait for test results
+on other architectures.
 
-Ah, I think I understand now. Were you running 32-bit arm tests? If so,
-it'd be good to point that out explicitly in the commit message (the
-'arm:' prefix in the summary is ambiguous).
+Paolo
 
-Assuming the loop body was running because it needed to reduce MAX_SMP to
-8 or lower for 32-bit arm tests, then we should be replacing the loop with
-something that caps MAX_SMP at 8 for 32-bit arm tests instead.
 
-Thanks,
-drew
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
