@@ -2,85 +2,102 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9A1C4332F
-	for <kvmarm@archiver.kernel.org>; Tue, 27 Dec 2022 13:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C622C3DA7A
+	for <kvmarm@archiver.kernel.org>; Wed, 28 Dec 2022 11:22:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D15F74B843;
-	Tue, 27 Dec 2022 08:03:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4DA94B81C;
+	Wed, 28 Dec 2022 06:22:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CL02awXeZe7o; Tue, 27 Dec 2022 08:03:49 -0500 (EST)
+	with ESMTP id PmDr4tvBQ9P6; Wed, 28 Dec 2022 06:22:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A11AF4B886;
-	Tue, 27 Dec 2022 08:03:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D55C74B835;
+	Wed, 28 Dec 2022 06:22:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 84DD04B879
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Dec 2022 08:03:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FFCC4B81C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Dec 2022 06:22:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jzusoxWFi-aT for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Dec 2022 08:03:47 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 267274B843
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Dec 2022 08:03:47 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1672146226;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=itmwXqUo01mTV85no/9ZNLho2BNM+XUgesQju+SpFwM=;
- b=UeITphuNzGnkuWLOPV2kIiLlXY5SgMJ5WGlM/3Ak+hJ9JTqJI6ot9OmW8vTIXWJAcpLMKy
- sac0GMq8kiZZe9v4S7Kl2EBD5a9ad8IIKsgohjKa1T+TzuosgLjpzN0S2aNcoXmw8nVdHi
- 9Vg7d8eyz8Z+GnSIjDVkF5UYObD/uH8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-359-al1j6ULROiyc5y_rGIER3A-1; Tue, 27 Dec 2022 08:03:41 -0500
-X-MC-Unique: al1j6ULROiyc5y_rGIER3A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com
- [10.11.54.8])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id EAugmy4TajFb for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Dec 2022 06:22:15 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC38E4B803
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Dec 2022 06:22:15 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C26A0101A521;
- Tue, 27 Dec 2022 13:03:38 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2C14DC15BA0;
- Tue, 27 Dec 2022 13:03:37 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v2 00/50] KVM: Rework kvm_init() and hardware enabling
-Date: Tue, 27 Dec 2022 08:02:50 -0500
-Message-Id: <20221227130249.1650197-1-pbonzini@redhat.com>
-In-Reply-To: <20221130230934.1014142-1-seanjc@google.com>
-References: 
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 1D2C46136E;
+ Wed, 28 Dec 2022 11:22:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C988C433EF;
+ Wed, 28 Dec 2022 11:22:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1672226533;
+ bh=g/ko60RCUy62mgwJX+BHqh4+FybNochgcGqfnbFgn1s=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=bkySoNrEPygYgl5QF2mbRvdQP90/TfV81MHuS96aaZXlQcngUJ3MnPH6eA7QDx4Th
+ 9qys9DmCGwyeY+hU2x+2CaIsq4ffMaWs2Andkc5MUnCRyhe2gJL1UT52VEPs78jq5D
+ 4F1Tuo0nQj1sMGDBh/MID5iNoErPu3cmtJOLrAi9mragNuaOC3UExlhvrMtXFgnRzt
+ wrjQrwIdzHmXG2C/xHTzuK1MlUOE4h7gPaZmWOD7ADqmpxfpX3FjjQu/1lKSa6NQ2/
+ OpnrZhXA+oWI8B3m33i+IQsklsKqkL22FNLezHwLuMeZmbP3lDV+wqKLg9C8uYzdJ+
+ KTTyjywJXPOvw==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1pAUVf-00FXTE-4f;
+ Wed, 28 Dec 2022 11:22:11 +0000
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Date: Wed, 28 Dec 2022 11:22:10 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 00/50] KVM: Rework kvm_init() and hardware enabling
+In-Reply-To: <20221227130249.1650197-1-pbonzini@redhat.com>
+References: <20221227130249.1650197-1-pbonzini@redhat.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <9acea262dec3511e9cf63081506f0bd7@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, seanjc@google.com,
+ chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org,
+ paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+ borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
+ mjrosato@linux.ibm.com, farman@linux.ibm.com, vkuznets@redhat.com,
+ dwmw2@infradead.org, paul@xen.org, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev,
+ atishp@atishpatra.org, david@redhat.com, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yuan.yao@intel.com, cohuck@redhat.com,
+ isaku.yamahata@intel.com, philmd@linaro.org, farosas@linux.ibm.com,
+ mpe@ellerman.id.au, kai.huang@intel.com, chao.gao@intel.com,
+ tglx@linutronix.de
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: Matthew Rosato <mjrosato@linux.ibm.com>, Paul Durrant <paul@xen.org>,
  Yuan Yao <yuan.yao@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>,
  David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
- Kai Huang <kai.huang@intel.com>, Michael Ellerman <mpe@ellerman.id.au>,
- linux-riscv@lists.infradead.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
+ Kai Huang <kai.huang@intel.com>, linux-riscv@lists.infradead.org,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
  Huacai Chen <chenhuacai@kernel.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  Christian Borntraeger <borntraeger@linux.ibm.com>,
  Chao Gao <chao.gao@intel.com>, Eric Farman <farman@linux.ibm.com>,
- Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org,
- Atish Patra <atishp@atishpatra.org>, kvmarm@lists.linux.dev,
- Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
+ Albert Ou <aou@eecs.berkeley.edu>, linuxppc-dev@lists.ozlabs.org,
+ kvm@vger.kernel.org, Atish Patra <atishp@atishpatra.org>,
+ kvmarm@lists.linux.dev, Thomas Gleixner <tglx@linutronix.de>,
+ linux-arm-kernel@lists.infradead.org,
  Isaku Yamahata <isaku.yamahata@intel.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Fabiano Rosas <farosas@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
- Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
- Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Fabiano Rosas <farosas@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ linux-mips@vger.kernel.org, Palmer Dabbelt <palmer@dabbelt.com>,
+ kvm-riscv@lists.infradead.org, Michael Ellerman <mpe@ellerman.id.au>,
  Vitaly Kuznetsov <vkuznets@redhat.com>, David Woodhouse <dwmw2@infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -93,18 +110,25 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Queued, thanks.  I will leave this in kvm/queue after testing everything
-else and moving it to kvm/next; this way, we can wait for test results
-on other architectures.
+On 2022-12-27 13:02, Paolo Bonzini wrote:
+> Queued, thanks.  I will leave this in kvm/queue after testing 
+> everything
+> else and moving it to kvm/next; this way, we can wait for test results
+> on other architectures.
 
-Paolo
+Can you please make this a topic branch, and if possible based
+on a released -rc? It would make it a lot easier for everyone.
 
+Thanks,
 
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
