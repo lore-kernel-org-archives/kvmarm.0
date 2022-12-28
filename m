@@ -1,74 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE7A33D9
-	for <kvmarm@lists.linux.dev>; Tue, 27 Dec 2022 17:05:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58521C433F0;
-	Tue, 27 Dec 2022 17:05:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7801117
+	for <kvmarm@lists.linux.dev>; Wed, 28 Dec 2022 11:22:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C988C433EF;
+	Wed, 28 Dec 2022 11:22:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1672160736;
-	bh=qsXdvuxsIsQ0RJ6r2ryN12iEQ7awbL7XBJ6twbWpy0M=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=RTzNt5SubQ47XEdE5i7Db6/ySJ1yGTUKnJiCtI8gw3GvvEkKJSSBuzPeC2D/SFbPk
-	 UGyYP71hECx1vR5R/NHUHwQmOJXWsDvYczcFHmjiKS0Rc21S5hRwaYCPfw10bwF8YT
-	 KY6qE+yOSev5u8C+mmur8XZpRn3StznZ4jwqq85hVrid/5vfbvhr1CxUcKjM6vhL76
-	 WHfTVrLgCQNSVX0SYmbfirTLic6d9GFC3CfIt1TEnxasNXqepcuTB8TVjBSC2g30Cw
-	 VpVoEZIAEHILQYsF3jHH29qi8aOc7YGzb7e2abpkqGVpJZDXcKzkUBF0C6LPjDop8i
-	 IsRP3+9eEAuHg==
-From: Mark Brown <broonie@kernel.org>
-Date: Tue, 27 Dec 2022 17:05:05 +0000
-Subject: [PATCH v2 3/3] KVM: arm64: Use symbolic definition for ISR_EL1.A
+	s=k20201202; t=1672226533;
+	bh=g/ko60RCUy62mgwJX+BHqh4+FybNochgcGqfnbFgn1s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bkySoNrEPygYgl5QF2mbRvdQP90/TfV81MHuS96aaZXlQcngUJ3MnPH6eA7QDx4Th
+	 9qys9DmCGwyeY+hU2x+2CaIsq4ffMaWs2Andkc5MUnCRyhe2gJL1UT52VEPs78jq5D
+	 4F1Tuo0nQj1sMGDBh/MID5iNoErPu3cmtJOLrAi9mragNuaOC3UExlhvrMtXFgnRzt
+	 wrjQrwIdzHmXG2C/xHTzuK1MlUOE4h7gPaZmWOD7ADqmpxfpX3FjjQu/1lKSa6NQ2/
+	 OpnrZhXA+oWI8B3m33i+IQsklsKqkL22FNLezHwLuMeZmbP3lDV+wqKLg9C8uYzdJ+
+	 KTTyjywJXPOvw==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pAUVf-00FXTE-4f;
+	Wed, 28 Dec 2022 11:22:11 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Date: Wed, 28 Dec 2022 11:22:10 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, Huacai Chen
+ <chenhuacai@kernel.org>, Aleksandar Markovic
+ <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, Paul
+ Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, Claudio
+ Imbrenda <imbrenda@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
+ Eric Farman <farman@linux.ibm.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>, James
+ Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton
+ <oliver.upton@linux.dev>, Atish Patra <atishp@atishpatra.org>, David
+ Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Yuan Yao <yuan.yao@intel.com>, Cornelia Huck
+ <cohuck@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>, Fabiano Rosas
+ <farosas@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, Kai Huang
+ <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>, Thomas Gleixner
+ <tglx@linutronix.de>
+Subject: Re: [PATCH v2 00/50] KVM: Rework kvm_init() and hardware enabling
+In-Reply-To: <20221227130249.1650197-1-pbonzini@redhat.com>
+References: <20221227130249.1650197-1-pbonzini@redhat.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <9acea262dec3511e9cf63081506f0bd7@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20221208-arm64-isr-el1-v2-3-89f7073a1ca9@kernel.org>
-References: <20221208-arm64-isr-el1-v2-0-89f7073a1ca9@kernel.org>
-In-Reply-To: <20221208-arm64-isr-el1-v2-0-89f7073a1ca9@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.12-dev-7ab1d
-X-Developer-Signature: v=1; a=openpgp-sha256; l=828; i=broonie@kernel.org;
- h=from:subject:message-id; bh=qsXdvuxsIsQ0RJ6r2ryN12iEQ7awbL7XBJ6twbWpy0M=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjqyXZUsFPCghBp31WO9f0pNOe2wRT/ucx6EDQktXG
- T6JCrbWJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY6sl2QAKCRAk1otyXVSH0EdqB/
- 9EaUv/a5mcIA/DKN3fXJ7Ys2HkyT9PsDW4sMLQlXG2KVRjxdZl0z1iDNJaIt5bdbQRAfMIEgmUCpHh
- 2mfXlWzQ4ApSGJko43miI2obvGop0OVpQWAg6JsvUr/nKcEkVHT2GhhPeeEzDGE3Br6qi1AbXnbpQ2
- 6cbd0gOTLhRE6Fz7DO2O5TWR7Z5L7uyh+jX6JPY6eX4QcOfC3AAklZ6wm2yQhJrob9vy3WEw4uA0XZ
- ScCZzH4LwJrHLHpwfnFUqo28rHt0/eL/3HkEEJ7VXIy3At1V9Dla6TOZusrN7PdecWafh6epJY2kNz
- SDd+19xEflwN+lK2ean5XRt8W7dt7N
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, seanjc@google.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, mjrosato@linux.ibm.com, farman@linux.ibm.com, vkuznets@redhat.com, dwmw2@infradead.org, paul@xen.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, atishp@atishpatra.org, david@redhat.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, yuan.yao@intel.com, cohuck@redhat.com, isaku.yamahata@intel.com, philmd@linaro.org, farosas@linux.ibm.com, mpe@ellerman.id.au, kai.huang@intel.com, chao.gao@intel.com, tglx@linutronix.de
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Message-ID: <20221228112210.0EYa26fdp6IQIxyYylLj_LFtykY3vR9eZJ_L2vw0lGA@z>
 
-Now that we are generating ISR_EL1 we have acquired a constant for
-ISR_EL1.A, use it rather than the magic number we had been using in the KVM
-entry code.
+On 2022-12-27 13:02, Paolo Bonzini wrote:
+> Queued, thanks.  I will leave this in kvm/queue after testing 
+> everything
+> else and moving it to kvm/next; this way, we can wait for test results
+> on other architectures.
 
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Acked-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- arch/arm64/kvm/hyp/entry.S | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Can you please make this a topic branch, and if possible based
+on a released -rc? It would make it a lot easier for everyone.
 
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 435346ea1504..f3aa7738b477 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -171,7 +171,7 @@ alternative_else
- 	dsb	sy		// Synchronize against in-flight ld/st
- 	isb			// Prevent an early read of side-effect free ISR
- 	mrs	x2, isr_el1
--	tbnz	x2, #8, 2f	// ISR_EL1.A
-+	tbnz	x2, #ISR_EL1_A_SHIFT, 2f
- 	ret
- 	nop
- 2:
+Thanks,
 
+         M.
 -- 
-2.30.2
+Jazz is not dead. It just smells funny...
