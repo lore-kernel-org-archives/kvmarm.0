@@ -2,63 +2,63 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7700C4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 29 Dec 2022 13:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51F9CC3DA79
+	for <kvmarm@archiver.kernel.org>; Thu, 29 Dec 2022 17:44:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BFFE4B803;
-	Thu, 29 Dec 2022 08:54:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B49534B76D;
+	Thu, 29 Dec 2022 12:44:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UxpDGCFkZ0Eg; Thu, 29 Dec 2022 08:54:40 -0500 (EST)
+	with ESMTP id GOOGrhTDqMuB; Thu, 29 Dec 2022 12:44:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F5924B7B5;
-	Thu, 29 Dec 2022 08:54:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91B934B73E;
+	Thu, 29 Dec 2022 12:44:00 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83B224B643
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Dec 2022 08:54:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E710B4B643
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Dec 2022 12:43:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id j3Vzvf3vp1m1 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Dec 2022 08:54:38 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 64F7040796
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Dec 2022 08:54:38 -0500 (EST)
+ with ESMTP id H545ztCY59NO for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Dec 2022 12:43:58 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9B2CB4B4D7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Dec 2022 12:43:58 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 86D7061718;
- Thu, 29 Dec 2022 13:54:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4317C433EF;
- Thu, 29 Dec 2022 13:54:35 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 26B24B81A10;
+ Thu, 29 Dec 2022 17:43:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C476EC433D2;
+ Thu, 29 Dec 2022 17:43:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1672322075;
- bh=cluGXPOR4SegMfJZlmuHjl3pxFZULPPadZDrzZNHRNE=;
+ s=k20201202; t=1672335835;
+ bh=0zUp+fYSboly8+3UmtFNqfIjlBnD7OkrbQa+vn0tC9s=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=RMzTcEXzWbgoSKBDGd3S9lQJFrTiMblFXZJqChIw/m8KHYqcFgsICC6jbO8/qEGJK
- dg34LF/o2wNt3csRIOaAIlLoElP/E+x4C0o0ZircSujyE8SW5niJ7Qjf0vdxzDPXOJ
- thBa9sCmbsIcTXQ41Ijzr7nClMJ57hr8CdMud6p+6l3ISoSOuwFb4ktdEhbh65hbXh
- zMwP1hJFp/2TWtMpGWpNTqxyWv8SwET29S2JQYmSwTQJx8cTnfesOSHQHjNY3d9h1k
- Cg8vc+rDNFve4Pj/5uqozlVgNVuWW1DnXV7wVkno8BST6c12DDtDAy8PYSjE8g0mAa
- n9AcI3vQlJPvQ==
+ b=DYvMWD2mjSmEIkjREzwavaZh0Ms4a2zNBTf7Y431IlU/3ynD+x87SMiXkjyfx45lV
+ 18mfk3l8jUHNf8dIjbUyB4je0jTpZZ29jzkm8w90ga+bzF4jB2ragTbBwsmI5F7SFY
+ WEOhDPHPrZspPMth73fNKyVIPo0Q6s5axvybLqJyutrQnPm91YkYIEuSJlQJJWrSY0
+ Sxy6aG86mMpSksNFNT1ggtkVKeXm1dOOWV6PQVAhUSgICcSUQSX6ux1E+ljArfA/Pj
+ to8Mvx+ZhgM3NVRwS4d9H22aPDHneL9AtukY0sAfN8Du4bnMN7+V+ON4U6eQkhE5Cl
+ 0E5YqjNVx6ISg==
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1pAtMf-00FiN4-Lp;
- Thu, 29 Dec 2022 13:54:33 +0000
-Date: Thu, 29 Dec 2022 13:53:15 +0000
-Message-ID: <87y1qqe2pg.wl-maz@kernel.org>
+ (envelope-from <maz@kernel.org>) id 1pAwwb-00FkJB-Eb;
+ Thu, 29 Dec 2022 17:43:53 +0000
+Date: Thu, 29 Dec 2022 17:42:34 +0000
+Message-ID: <87wn6ads39.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH 2/3] KVM: arm64: nv: Emulate ISTATUS when emulated timers
- are fired.
-In-Reply-To: <20220824060304.21128-3-gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: nv: Avoid block mapping if max_map_size
+ is smaller than block size.
+In-Reply-To: <20220824060304.21128-4-gankulkarni@os.amperecomputing.com>
 References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
- <20220824060304.21128-3-gankulkarni@os.amperecomputing.com>
+ <20220824060304.21128-4-gankulkarni@os.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -90,75 +90,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 24 Aug 2022 07:03:03 +0100,
+On Wed, 24 Aug 2022 07:03:04 +0100,
 Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> Guest-Hypervisor forwards the timer interrupt to Guest-Guest, if it is
-> enabled, unmasked and ISTATUS bit of register CNTV_CTL_EL0 is set for a
-> loaded timer.
+> In NV case, Shadow stage 2 page table is created using host hypervisor
+> page table configuration like page size, block size etc. Also, the shadow
+> stage 2 table uses block level mapping if the Guest Hypervisor IPA is
+> backed by the THP pages. However, this is resulting in illegal mapping of
+> NestedVM IPA to Host Hypervisor PA, when Guest Hypervisor and Host
+> hypervisor are configured with different pagesize.
 > 
-> For NV2 implementation, the Host-Hypervisor is not emulating the ISTATUS
-> bit while forwarding the Emulated Vtimer Interrupt to Guest-Hypervisor.
-> This results in the drop of interrupt from Guest-Hypervisor, where as
-> Host Hypervisor marked it as an active interrupt and expecting Guest-Guest
-> to consume and acknowledge. Due to this, some of the Guest-Guest vCPUs
-> are stuck in Idle thread and rcu soft lockups are seen.
-> 
-> This issue is not seen with NV1 case since the register CNTV_CTL_EL0 read
-> trap handler is emulating the ISTATUS bit.
-> 
-> Adding code to set/emulate the ISTATUS when the emulated timers are fired.
+> Adding fix to avoid block level mapping in stage 2 mapping if
+> max_map_size is smaller than the block size.
 > 
 > Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 > ---
->  arch/arm64/kvm/arch_timer.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  arch/arm64/kvm/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 27a6ec46803a..0b32d943d2d5 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -63,6 +63,7 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
->  			      struct arch_timer_context *timer,
->  			      enum kvm_arch_timer_regs treg);
->  static bool kvm_arch_timer_get_input_level(int vintid);
-> +static u64 read_timer_ctl(struct arch_timer_context *timer);
->  
->  static struct irq_ops arch_timer_irq_ops = {
->  	.get_input_level = kvm_arch_timer_get_input_level,
-> @@ -356,6 +357,8 @@ static enum hrtimer_restart kvm_hrtimer_expire(struct hrtimer *hrt)
->  		return HRTIMER_RESTART;
->  	}
->  
-> +	/* Timer emulated, emulate ISTATUS also */
-> +	timer_set_ctl(ctx, read_timer_ctl(ctx));
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 6caa48da1b2e..3d4b53f153a1 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1304,7 +1304,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	 * backed by a THP and thus use block mapping if possible.
+>  	 */
+>  	if (vma_pagesize == PAGE_SIZE &&
+> -	    !(max_map_size == PAGE_SIZE || device)) {
+> +	    !(max_map_size < PMD_SIZE || device)) {
+>  		if (fault_status == FSC_PERM && fault_granule > PAGE_SIZE)
+>  			vma_pagesize = fault_granule;
+>  		else
 
-Why should we do that for non-NV2 configurations?
+That's quite a nice catch. I guess this was the main issue with
+running 64kB L1 on a 4kB L0? Now, I'm not that fond of the fix itself,
+and I think max_map_size should always represent something that is a
+valid size *on the host*, specially when outside of NV-specific code.
 
->  	kvm_timer_update_irq(vcpu, true, ctx);
->  	return HRTIMER_NORESTART;
->  }
-> @@ -458,6 +461,8 @@ static void timer_emulate(struct arch_timer_context *ctx)
->  	trace_kvm_timer_emulate(ctx, should_fire);
->  
->  	if (should_fire != ctx->irq.level) {
-> +		/* Timer emulated, emulate ISTATUS also */
-> +		timer_set_ctl(ctx, read_timer_ctl(ctx));
->  		kvm_timer_update_irq(ctx->vcpu, should_fire, ctx);
->  		return;
->  	}
+How about something like this instead:
 
-I'm not overly keen on this. Yes, we can set the status bit there. But
-conversely, the bit will not get cleared when the guest reprograms the
-timer, and will take a full exit/entry cycle for it to appear.
+@@ -1346,6 +1346,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		 * table uses at least as big a mapping.
+ 		 */
+ 		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
++
++		if (max_map_size >= PMD_SIZE && max_map_size < PUD_SIZE)
++			max_map_size = PMD_SIZE;
++		else if (max_map_size >= PAGE_SIZE && max_map_size < PMD_SIZE)
++			max_map_size = PAGE_SIZE;
+ 	}
+ 
+ 	vma_pagesize = min(vma_pagesize, max_map_size);
 
-Ergo, the architecture is buggy as memory (the VNCR page) cannot be
-used to emulate something as dynamic as a timer.
 
-It is only with FEAT_ECV that we can solve this correctly by trapping
-the counter/timer accesses and emulate them for the guest hypervisor.
-I'd rather we add support for that, as I expect all the FEAT_NV2
-implementations to have it (and hopefully FEAT_FGT as well).
+Admittedly, this is a lot uglier than your fix. But it keep the nested
+horror localised, and doesn't risk being reverted by accident by
+people who would not take NV into account (can't blame them, really).
+
+Can you please give it a go?
 
 Thanks,
 
