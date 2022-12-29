@@ -1,51 +1,51 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC20E1117
-	for <kvmarm@lists.linux.dev>; Wed, 28 Dec 2022 11:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF6BC3201
+	for <kvmarm@lists.linux.dev>; Thu, 29 Dec 2022 20:52:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1672228721;
+	s=mimecast20190719; t=1672347148;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KYdiyUW7v3jDVb1QwzZWNab9jTsMpMxmysun3BoXT8E=;
-	b=BUmrbtzLHXKgoS2cqq0PXGvKWAC5e997bHYtEwEZOPPY6zk7DsT/+SPsXE6A6fPtiiXYhA
-	uyHReXcNu9XqL42bARoWjCMgaenQqa8jNDHYzG9cijSu0VK/eSeq7ZmFHbXk8Cha1R6yly
-	zEs0Zs6zSvzH6xkrIgVz+EL76A54CIw=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=DeG05ASAQvY/FceYSGJdKCGQ3OFwx25lz4jlpRPWbnU=;
+	b=CyydvGwzPP3fLVYWpVliXmXQqCrkO5vFWqD2G/eF6WnvrzLE9bE4odPOFEByCJPXx1zK7N
+	3CW4NLlm4xL0AqHnTqMhsk9cWBJ6Uuhsic1loBCpqEVeOVsFEOTwngBg+tn14ERoLM33Ac
+	yUygSuFg7+aLVxGsIqRVpizKmEoGM14=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-74-4PzMybwbMhiRr7S01K7SIg-1; Wed, 28 Dec 2022 06:58:39 -0500
-X-MC-Unique: 4PzMybwbMhiRr7S01K7SIg-1
-Received: by mail-ed1-f69.google.com with SMTP id f15-20020a056402354f00b00485864db618so4555189edd.13
-        for <kvmarm@lists.linux.dev>; Wed, 28 Dec 2022 03:58:39 -0800 (PST)
+ us-mta-177-kVXGLA35N76z9sSRBxK3KA-1; Thu, 29 Dec 2022 15:52:27 -0500
+X-MC-Unique: kVXGLA35N76z9sSRBxK3KA-1
+Received: by mail-ed1-f72.google.com with SMTP id i8-20020a05640242c800b004852914ce42so7259303edc.6
+        for <kvmarm@lists.linux.dev>; Thu, 29 Dec 2022 12:52:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KYdiyUW7v3jDVb1QwzZWNab9jTsMpMxmysun3BoXT8E=;
-        b=zkZXG8fvrzr/v3clx/v8E3NzKKLlCicTMoJt6TJ9HncDFlOZvrbc+C5T93kZzzg5Xh
-         NiH6LJJ59yvfpAhG9xsMJtlVpe2rl3mGbSn//Ntti/Kton5V0f7frX5LqgPeyI6R1EMs
-         XfjX7krG8JE3PE/almEx56Bzc/6ZyTh/M2CMyMTKX7slj+J9cGJjyXHcgYWGWXl6YU50
-         tUqDYFzG62v0qwrUjr5u1UdMc7r3ZJj2srVqQo3DLSonOjwkNuas9sq1HwPBYJNxTCrR
-         U11BKLum84yqzTHjldjz7EsARCOhp9DXaPDRfIdfXACcpIfk1xIYbXU2hd7ASCslRtzU
-         9GeA==
-X-Gm-Message-State: AFqh2kqbLiTStE7z/iR9gwJr/Y4VpO4z+Ortv1GHlcH8rlsCjDbKC78C
-	tmDmMKiSJN6L3KZ4OGIzJ/utYRmDMMMKffpTJlHYCf02+vyI6mx/LfxwMThCNK20rQhYw86wtGL
-	M3RM7FOLZyjpbCB6p
-X-Received: by 2002:aa7:de15:0:b0:483:30d7:f9ac with SMTP id h21-20020aa7de15000000b0048330d7f9acmr12028248edv.19.1672228718682;
-        Wed, 28 Dec 2022 03:58:38 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXtrIO5srJBbY8oizuyf5Q39Hr1tveD2PqIx/4KuqYlJNhV9zI7izo96N6ps5dxKil3bsWjXNA==
-X-Received: by 2002:aa7:de15:0:b0:483:30d7:f9ac with SMTP id h21-20020aa7de15000000b0048330d7f9acmr12028204edv.19.1672228718422;
-        Wed, 28 Dec 2022 03:58:38 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id h25-20020aa7de19000000b00463b9d47e1fsm7031261edv.71.2022.12.28.03.58.34
+        bh=DeG05ASAQvY/FceYSGJdKCGQ3OFwx25lz4jlpRPWbnU=;
+        b=cPBLIY1ibZooJmO4l//ZikKr0Wy3T0cf3p1gCDH5IHF5h05jP/jfxFxFVItWxcWSCk
+         FdibKb8su6ASc55WKESeb8SBOv9bJ4YfZC2n2Nuno+jnBWOW8CGoGxINsE+wno1PT9SF
+         0NPauiK7KYlD4+mDGGkrVJOk0wbyszoiIzs/HvGLo1XNRH3TI9GsAON44fVpGY7Tv4SN
+         onuuJ0/xnYmi3SaY/OiaSxIB3h/ZzzSd/W84qYW2MKm5qq36iyV4vEpCE9ypWB26AR6Y
+         FP3SdqauRb7va3WtfrcJr6jwwnI+dCmiFlYyz/knEZNk8r31maHCrpRqPIytTrVwZI4C
+         gw0w==
+X-Gm-Message-State: AFqh2ko2pAcv7WYsBo8z6wc8vnEH4+1Fl3ZCHov43Fv4SA0Zgakxr2e3
+	bqsoyHnvurXtMhaKUuUQ/3Un8FXmmN5qru535fRFHV/syqPjxwlCm+9JW6Pf2bPhj7bxcilTyba
+	96uE8opFFDUKX4R9b
+X-Received: by 2002:a17:907:6f09:b0:7c1:37:6d5e with SMTP id sy9-20020a1709076f0900b007c100376d5emr4872262ejc.2.1672347146329;
+        Thu, 29 Dec 2022 12:52:26 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXuAZx8SHyajJmJ++QT23AGJAvs5IxosEfN11APvih7Pbj5KPIpkonmPHiwyMLfqMEbO8Dqn3Q==
+X-Received: by 2002:a17:907:6f09:b0:7c1:37:6d5e with SMTP id sy9-20020a1709076f0900b007c100376d5emr4872244ejc.2.1672347146101;
+        Thu, 29 Dec 2022 12:52:26 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312::529? ([2001:b07:6468:f312::529])
+        by smtp.googlemail.com with ESMTPSA id 23-20020a170906301700b0084c90164a56sm1096571ejz.29.2022.12.29.12.52.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Dec 2022 03:58:37 -0800 (PST)
-Message-ID: <55a31d67-b9d0-1a62-1c60-f86b48a34a8b@redhat.com>
-Date: Wed, 28 Dec 2022 12:58:33 +0100
+        Thu, 29 Dec 2022 12:52:25 -0800 (PST)
+Message-ID: <4d73d1b9-2c28-ab6a-2963-579bcc7a9e67@redhat.com>
+Date: Thu, 29 Dec 2022 21:52:21 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -91,7 +91,7 @@ X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Message-ID: <20221228115833.7YUuZ9DX7qvm8MTZ-0IIMgIjG0Y0LKxBA095tNvCFJE@z>
+Message-ID: <20221229205221.CZkN3thMLZGXrAXVFHYGcODIvzCgVrSbzOLD88_nLtg@z>
 
 On 12/28/22 12:22, Marc Zyngier wrote:
 > 
@@ -102,8 +102,10 @@ On 12/28/22 12:22, Marc Zyngier wrote:
 > Can you please make this a topic branch, and if possible based
 > on a released -rc? It would make it a lot easier for everyone.
 
-Yes, I will (it will be based on 6.2-rc1 + pull request for rc2 that I'm 
-preparing + x86 changes that this conflicts with).
+This is now refs/heads/kvm-hw-enable-refactor in 
+https://git.kernel.org/pub/scm/virt/kvm/kvm.git.
+
+The commits for this series start at hash fc471e831016.
 
 Paolo
 
