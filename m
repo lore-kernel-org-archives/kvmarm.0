@@ -2,76 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BFFAC3DA7C
-	for <kvmarm@archiver.kernel.org>; Fri, 30 Dec 2022 09:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4264DC10F1B
+	for <kvmarm@archiver.kernel.org>; Fri, 30 Dec 2022 09:55:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB2AA4B492;
-	Fri, 30 Dec 2022 04:55:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C97864B633;
+	Fri, 30 Dec 2022 04:55:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered)
 	header.i=@daynix-com.20210112.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6nCLIOEHRBor; Fri, 30 Dec 2022 04:55:22 -0500 (EST)
+	with ESMTP id uvNQxf0az1KD; Fri, 30 Dec 2022 04:55:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8406C4B5E9;
-	Fri, 30 Dec 2022 04:55:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B75684B5E9;
+	Fri, 30 Dec 2022 04:55:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE3C24B3E0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Dec 2022 04:55:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A06464B286
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Dec 2022 04:55:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id g7QbGM+-k74S for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Dec 2022 04:55:20 -0500 (EST)
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com
- [209.85.216.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8AB794B628
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Dec 2022 04:55:20 -0500 (EST)
-Received: by mail-pj1-f49.google.com with SMTP id
- o8-20020a17090a9f8800b00223de0364beso25337079pjp.4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Dec 2022 01:55:20 -0800 (PST)
+ with ESMTP id hMdvYBm-q2Wp for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Dec 2022 04:55:24 -0500 (EST)
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com
+ [209.85.216.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 85EAD4B628
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Dec 2022 04:55:24 -0500 (EST)
+Received: by mail-pj1-f50.google.com with SMTP id v23so21789599pju.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Dec 2022 01:55:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=daynix-com.20210112.gappssmtp.com; s=20210112;
  h=content-transfer-encoding:mime-version:references:in-reply-to
  :message-id:date:subject:cc:to:from:from:to:cc:subject:date
  :message-id:reply-to;
- bh=TArwYxCFrSBrMRpJqgmbgk8qp38LFtviL46odPa8HP0=;
- b=V2PPlMtIYzvmjTJcM3MvXUYStMJqQopldJARZAwRv+FVYRzKxm8EdA+RLIqYUME/Hm
- KaLh1Hru7NsccKthnioIq8xgC8HtSTaiYaLEchA1erIpB4E4X6kKPYwGeysBXNGNUgTJ
- PAsx5OLLBNNwZcX4sPd0A8ExO/quD4GN+oC9qkWRszdG7UjrUcyobgeQ81TgAwNonXEj
- HiOXauWJkUMAI9tqsTCCKyyr3L6nW3kE/ENC0TVF9GeqnrK6zhnpuAIJ7Ihg/3pH5tHU
- yFUicSZAxYWNp1OtEPhMsQG3yijRRKISF2DaK/k5PpB3Gi7kJu3OkTzVHggsE+cX/AVl
- Vyew==
+ bh=DlWUJTvQq+dZLt1EiuVf3fldzhye5smOXD/qjtYfqYw=;
+ b=q8gfFC2rx20mZ8f21CGm8m6P3RgItI4xjQEcG4ZFyFoA1/rqgjhzRZGPTQQOsGaq0w
+ JLVSBYqLkrlkfVmySikCPck0cjomgaAd+gpSF3PXEP5Uyin0foTd7CIyHB5EBCIJ+9d5
+ rZZkzquT1bvA7a7iomZBitMmehYHU62TgrFJ3Qrb5WN2tHd4195cyEt76t/WkKdvy9t0
+ bvZ43yf7TcFmdi6Uc5jbVuZHjp4JSNcM7Z/SdUNg19uu/PfKC0EIxdqL3QFS4fZA/HSY
+ DZ/q0pnYUJaHcQ6tqhxxwbs6bSdWWasEQ6DF74zPw8uM/Ai1/lew+a/Wv8mRoVQ5rR/K
+ vS7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=content-transfer-encoding:mime-version:references:in-reply-to
  :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
  :subject:date:message-id:reply-to;
- bh=TArwYxCFrSBrMRpJqgmbgk8qp38LFtviL46odPa8HP0=;
- b=4ssciMfXrd0C9onVwUVox3K+r9eUy0M++N2rphpQ/L+xXAHI8UBJbjTl64JcHqU9yr
- qii/hMO6y2iq20NRxa+NkMl4eFXloM2vrxAqMseP5DB+1BvwSYuzB2Gr35VZW6270Osu
- 70GYYX9Utp6y6gEeJqLiPCd6o7gz78FjFVBbzeclyoI7t0jckkS+mL1OoOlCJkM7bzsl
- +bamLYjeusSyFKj9njhE1Av0DVLY03+DWebce73S+KY71XgGD/iuhL2Puj4axfuDo+TW
- fCihxi5sfLamEAiPrPaHacG1RPElhymRVu7h+KMmmOwg1AQSLUPKYfSWvSer2HgJQ7TK
- VAEg==
-X-Gm-Message-State: AFqh2kr8916venL3jPl6ZpOURTv+hpp9pdvxZRMfXCbncYbqk+DAOdyL
- PzeavJ30sQU2FO3wP0yruE2/Yw==
-X-Google-Smtp-Source: AMrXdXspaJ3vzRPB7+tbTBg5dQm4cj1J+UupdkoXbHJZ8PRRvxXXsuCCZcu+swH+OAPkleWIX3ymKQ==
-X-Received: by 2002:a17:902:b207:b0:189:e3d0:daf8 with SMTP id
- t7-20020a170902b20700b00189e3d0daf8mr30780379plr.55.1672394120198; 
- Fri, 30 Dec 2022 01:55:20 -0800 (PST)
+ bh=DlWUJTvQq+dZLt1EiuVf3fldzhye5smOXD/qjtYfqYw=;
+ b=EOeWJ1L1IQCmhJk/pdIBNMJL5Plmm17+e1uIL5SfBlqypPk+rIfeFQvzWKVJztzHTi
+ qqG9k/3BWXITlHSAT7OTUVT1kXumRy4c0DOyXhvx8Y+tqmcggNQsfwnnrv+pD1KuJbbO
+ AmfLRz37VALT+wkxdYUm+bHNmL+FmyWNTJvWocPnbqXSieqeKqgp+0T/5gd3l8VmBb4e
+ mXxp3VxG+Njv5WwEdlW6PaVcnDEINVZPWFu3YQr2oTmiI37Hjd1eo6lrf/gi3rSp58n1
+ KCcQU+YmbuLIWdyS/ETQqcT9V2dQrqO4ejdhkajTy17aUXAlc10/DRCShgfHeeXLdosB
+ MMOw==
+X-Gm-Message-State: AFqh2kqL8GpdIjR4CD4ZAUetN8lYklbcWC6hLHvZ4aafCv7rDNZgE0Tu
+ lyJIqDzFbjD5P3W1850MDwWEHA==
+X-Google-Smtp-Source: AMrXdXt2wFAYM+BYT46pbundxQWM4pSsWH6zvrxdrN1FlBVVyA/LCeYCxWgdfk9ZZzLdSfoQsWgauA==
+X-Received: by 2002:a17:903:1306:b0:192:5ec4:c439 with SMTP id
+ iy6-20020a170903130600b001925ec4c439mr24986835plb.16.1672394124246; 
+ Fri, 30 Dec 2022 01:55:24 -0800 (PST)
 Received: from fedora.flets-east.jp ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
  by smtp.gmail.com with ESMTPSA id
- b7-20020a170902650700b00189c536c72asm14487719plk.148.2022.12.30.01.55.16
+ b7-20020a170902650700b00189c536c72asm14487719plk.148.2022.12.30.01.55.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 30 Dec 2022 01:55:19 -0800 (PST)
+ Fri, 30 Dec 2022 01:55:23 -0800 (PST)
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
 To: 
-Subject: [PATCH v5 5/7] KVM: arm64: Always set HCR_TID2
-Date: Fri, 30 Dec 2022 18:54:50 +0900
-Message-Id: <20221230095452.181764-6-akihiko.odaki@daynix.com>
+Subject: [PATCH v5 6/7] KVM: arm64: Mask FEAT_CCIDX
+Date: Fri, 30 Dec 2022 18:54:51 +0900
+Message-Id: <20221230095452.181764-7-akihiko.odaki@daynix.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221230095452.181764-1-akihiko.odaki@daynix.com>
 References: <20221230095452.181764-1-akihiko.odaki@daynix.com>
@@ -100,93 +99,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Always set HCR_TID2 to trap CTR_EL0, CCSIDR2_EL1, CLIDR_EL1, and
-CSSELR_EL1. This saves a few lines of code and allows to employ their
-access trap handlers for more purposes anticipated by the old
-condition for setting HCR_TID2.
+The CCSIDR access handler masks the associativity bits according to the
+bit layout for processors without FEAT_CCIDX. KVM also assumes CCSIDR is
+32-bit where it will be 64-bit if FEAT_CCIDX is enabled. Mask FEAT_CCIDX
+so that these assumptions hold.
 
 Suggested-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 ---
- arch/arm64/include/asm/kvm_arm.h           | 3 ++-
- arch/arm64/include/asm/kvm_emulate.h       | 4 ----
- arch/arm64/include/asm/kvm_host.h          | 2 --
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 2 --
- 4 files changed, 2 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 8aa8492dafc0..44be46c280c1 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -81,11 +81,12 @@
-  * SWIO:	Turn set/way invalidates into set/way clean+invalidate
-  * PTW:		Take a stage2 fault if a stage1 walk steps in device memory
-  * TID3:	Trap EL1 reads of group 3 ID registers
-+ * TID2:	Trap CTR_EL0, CCSIDR2_EL1, CLIDR_EL1, and CSSELR_EL1
-  */
- #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
- 			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
--			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 )
-+			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID2)
- #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
- #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
- #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 9bdba47f7e14..30c4598d643b 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -88,10 +88,6 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	if (vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 &= ~HCR_RW;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index f4a7c5abcbca..aeabf1f3370b 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1124,6 +1124,12 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
+ 						      ID_DFR0_PERFMON_SHIFT,
+ 						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
+ 		break;
++	case SYS_ID_AA64MMFR2_EL1:
++		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
++		break;
++	case SYS_ID_MMFR4_EL1:
++		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_CCIDX);
++		break;
+ 	}
  
--	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
--	    vcpu_el1_is_32bit(vcpu))
--		vcpu->arch.hcr_el2 |= HCR_TID2;
--
- 	if (kvm_has_mte(vcpu->kvm))
- 		vcpu->arch.hcr_el2 |= HCR_ATA;
- }
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 45e2136322ba..cc2ede0eaed4 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -621,7 +621,6 @@ static inline bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
- 		return false;
+ 	return val;
+@@ -1605,6 +1611,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
  
- 	switch (reg) {
--	case CSSELR_EL1:	*val = read_sysreg_s(SYS_CSSELR_EL1);	break;
- 	case SCTLR_EL1:		*val = read_sysreg_s(SYS_SCTLR_EL12);	break;
- 	case CPACR_EL1:		*val = read_sysreg_s(SYS_CPACR_EL12);	break;
- 	case TTBR0_EL1:		*val = read_sysreg_s(SYS_TTBR0_EL12);	break;
-@@ -666,7 +665,6 @@ static inline bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
- 		return false;
+ 	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
+ 	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr },
++	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
+ 	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
+ 	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
+ 	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
+@@ -2106,6 +2113,10 @@ static const struct sys_reg_desc cp15_regs[] = {
  
- 	switch (reg) {
--	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	break;
- 	case SCTLR_EL1:		write_sysreg_s(val, SYS_SCTLR_EL12);	break;
- 	case CPACR_EL1:		write_sysreg_s(val, SYS_CPACR_EL12);	break;
- 	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	break;
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index baa5b9b3dde5..147cb4c846c6 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -39,7 +39,6 @@ static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
+ 	{ Op1(1), CRn( 0), CRm( 0), Op2(0), access_ccsidr },
+ 	{ Op1(1), CRn( 0), CRm( 0), Op2(1), access_clidr },
++
++	/* CCSIDR2 */
++	{ Op1(1), CRn( 0), CRm( 0),  Op2(2), undef_access },
++
+ 	{ Op1(2), CRn( 0), CRm( 0), Op2(0), access_csselr, NULL, CSSELR_EL1 },
+ };
  
- static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- {
--	ctxt_sys_reg(ctxt, CSSELR_EL1)	= read_sysreg(csselr_el1);
- 	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
- 	ctxt_sys_reg(ctxt, CPACR_EL1)	= read_sysreg_el1(SYS_CPACR);
- 	ctxt_sys_reg(ctxt, TTBR0_EL1)	= read_sysreg_el1(SYS_TTBR0);
-@@ -95,7 +94,6 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
- static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- {
- 	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
--	write_sysreg(ctxt_sys_reg(ctxt, CSSELR_EL1),	csselr_el1);
- 
- 	if (has_vhe() ||
- 	    !cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
 -- 
 2.38.1
 
