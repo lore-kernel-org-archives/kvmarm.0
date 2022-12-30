@@ -1,260 +1,145 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF0F1C04
-	for <kvmarm@lists.linux.dev>; Fri, 30 Dec 2022 04:01:29 +0000 (UTC)
-Received: by mail-pg1-f201.google.com with SMTP id 69-20020a630148000000b00478118684c4so9949694pgb.20
-        for <kvmarm@lists.linux.dev>; Thu, 29 Dec 2022 20:01:29 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E791FD4
+	for <kvmarm@lists.linux.dev>; Fri, 30 Dec 2022 09:55:00 +0000 (UTC)
+Received: by mail-pl1-f173.google.com with SMTP id d15so21373102pls.6
+        for <kvmarm@lists.linux.dev>; Fri, 30 Dec 2022 01:55:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TF6mtXCSZiwAgtARbQ5xLSrPWgFz4SHEJ+nKUXLPeJ8=;
-        b=sU5Q2FZB1j3zoL2IyByPHp4XXlV347Lgzl2S/dL8FIDS6Q2Gk5gLVaYY0mql2Dp6Ou
-         KisxGHgGXlWLqy0KrCm2jzMx6MW2DUdsSKYrvTMRQzTkIP9n++TZxJNW5O7MKxr4/+u1
-         y5AtwhDj5bQkpOMw4Rt3TEsg9R3+Nx3N5SwHtOOOHaLq+xbJBQ7qymHu5n5oPGJsFhZD
-         JZltvpqhshV0s0u4yV8AiKaVmx6dZd0jT75t4Jl9ACLOcRVNz/c6KlNj8gwquqeyYcTq
-         5YaMYUnKjoDopeUfn2jtR5j+bKqWjhgC2qrimfQn1WGUUn8dqPl3crbncgC3P1Un3vGK
-         fC2A==
+        d=daynix-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2HDTeomnMfOdczuT9/F20bMQlAjaFMXCpRqH1kdgIVY=;
+        b=P9Ljo6kGW+xXABlWTHQolBfJ92OlshrKeGbeNt/GrqH7QUYhjfdCECOnQT6TSUHFt0
+         BVmVAq9orDdtalAj8cJy59Toe8NUXr9mGDh5YSq6U1hQ4izys8arYQcQqgrYPJ+4oGUv
+         tfh8nq+ILIaVR6vyApuEdCU+iykOlI1TNZoH4EmL3i6GAEoB/f93QGDdJYs7qpx+xeO+
+         MCRrEDYCS5hmzgdV4mkghCCVsttFUg698w4d2Tf3VrgLBGjy+lqA+OzLmYca/7Ukj0tU
+         1SInCBY3SYEfYv27cTfv2QjJSvZOLF+bC/YDogY+/KIVKqRZfkRIz9G1a6largSAZw1Q
+         rHcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TF6mtXCSZiwAgtARbQ5xLSrPWgFz4SHEJ+nKUXLPeJ8=;
-        b=bIUUoi7IKMBDSrBY8+sJ8wqe5RnI1SaeA4cMXPy4H0M+taYFRVr6K+ZjcjvKHunSly
-         GezBQR9QwRdiXPCa97waey8hoKlap2S/z9r+smNElGQelee4HjyrU/aLhqa9DH1Imngn
-         fX/BRiNidjZF4q8Fy87eHBDJy+YSJiFK4J6ogwisEprlh51caywNDIcarNYuQ7e1oD/K
-         pXrgqu5BzRHYunIyUdX9w5jwmUVaUXkPmBgSuZex1uvxEvfuL4+iOTKi/b75jfI5V4YU
-         2o5zkWJCmbtfV9hGNg9z+7QeB22fw1McKTG/QHh164F3NeZkFhN7Ri1j184BwzUIlL9q
-         6usQ==
-X-Gm-Message-State: AFqh2koL2HGH8RSQKSMvBMQVReG7OJYrCTgkfBuBL2PrqMheRjVX+CMU
-	N+8WK4n3VScBvcXaIOqPEBabwl3ibOo=
-X-Google-Smtp-Source: AMrXdXu5U/lKBFXfJCQ+vyRfT4vdWYzYWTLMDKD8zziBxUMakTgcKuR9JnE7SThBpiyZZGBEQxkoI0dzeRs=
-X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a17:90b:4d83:b0:220:1f03:129b with SMTP id
- oj3-20020a17090b4d8300b002201f03129bmr181538pjb.0.1672372888381; Thu, 29 Dec
- 2022 20:01:28 -0800 (PST)
-Date: Thu, 29 Dec 2022 19:59:28 -0800
-In-Reply-To: <20221230035928.3423990-1-reijiw@google.com>
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2HDTeomnMfOdczuT9/F20bMQlAjaFMXCpRqH1kdgIVY=;
+        b=nlfmnPJkEemFUGtD4H3an+TT8O0FBjngYMiJ01pXMXmR1psqZcRhae9vUTBV76OcPq
+         FPeNoWbWOHDJ+PfrUAg7K22Ywn+aGym1vOa7tmoy+p3ZJX4l4vebKEhTCjV0//B02a9a
+         5AEk9eTNQTmpWj0U2hl6hBc90yinudg22doK7o9K3zmbTlxIHIfd6/wmk2wxTWsf6dWK
+         kvMZEjHaMtwzZJwnr30aD4/IO4DSBxKWHE8dq5+Q6xiya1vX+hhWEsDAG3AwIaMwrbn5
+         W7By8to3V9V0ZMqv4SyYeO1rWQo5vcPgDfXfR6ZWdD7XlgtLcwFsiVPOJz71VetxJtoJ
+         6kYg==
+X-Gm-Message-State: AFqh2krtSLM+U43Et4Y1QBYLygLbcQvoINQ+MtH3eCgk89nai53o2RaQ
+	/Eg/brGhq9ovGLYbQBBYS2pjuQ==
+X-Google-Smtp-Source: AMrXdXt/fAe2lXnpbEVPcBDmkZY6Wl4VVcSk141fejrUaMn53mFyxFW3jXXtZ/DXOfhybJVp3n0G3w==
+X-Received: by 2002:a17:903:2312:b0:192:8c7f:2654 with SMTP id d18-20020a170903231200b001928c7f2654mr16330645plh.0.1672394099989;
+        Fri, 30 Dec 2022 01:54:59 -0800 (PST)
+Received: from fedora.flets-east.jp ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
+        by smtp.gmail.com with ESMTPSA id b7-20020a170902650700b00189c536c72asm14487719plk.148.2022.12.30.01.54.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Dec 2022 01:54:59 -0800 (PST)
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+To: 
+Cc: Mark Brown <broonie@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	linux-arm-kernel@lists.infradead.org,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	asahi@lists.linux.dev,
+	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+	Sven Peter <sven@svenpeter.dev>,
+	Hector Martin <marcan@marcan.st>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH v5 0/7] KVM: arm64: Normalize cache configuration
+Date: Fri, 30 Dec 2022 18:54:45 +0900
+Message-ID: <20221230095452.181764-1-akihiko.odaki@daynix.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20221230035928.3423990-1-reijiw@google.com>
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221230035928.3423990-8-reijiw@google.com>
-Subject: [PATCH 7/7] KVM: selftests: aarch64: vPMU register test for
- unimplemented counters
-From: Reiji Watanabe <reijiw@google.com>
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ricardo Koller <ricarkol@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Jing Zhang <jingzhangos@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
-	Reiji Watanabe <reijiw@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Message-ID: <20221230035928.P9_o9Um9aoyka4Iq0GPnBlL5nrIGLVEzha43Nlq-7kA@z>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Message-ID: <20221230095445.j2GoT5o6WaxFSPJvtpFx0l3UPkvKf3iWE5WlLh-7pwM@z>
 
-Add a new test case to the vpmu_counter_access test to check
-if PMU registers or their bits for unimplemented counters are not
-accessible or are RAZ, as expected.
+Before this change, the cache configuration of the physical CPU was
+exposed to vcpus. This is problematic because the cache configuration a
+vcpu sees varies when it migrates between vcpus with different cache
+configurations.
 
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
----
- .../kvm/aarch64/vpmu_counter_access.c         | 103 +++++++++++++++++-
- .../selftests/kvm/include/aarch64/processor.h |   1 +
- 2 files changed, 98 insertions(+), 6 deletions(-)
+Fabricate cache configuration from the sanitized value, which holds the
+CTR_EL0 value the userspace sees regardless of which physical CPU it
+resides on.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-index 5b9d837f903a..af1abdfa2be2 100644
---- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-+++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-@@ -5,8 +5,8 @@
-  * Copyright (c) 2022 Google LLC.
-  *
-  * This test checks if the guest can see the same number of the PMU event
-- * counters (PMCR_EL1.N) that userspace sets, and if the guest can access
-- * those counters.
-+ * counters (PMCR_EL1.N) that userspace sets, if the guest can access
-+ * those counters, and if the guest cannot access any other counters.
-  * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
-  */
- #include <kvm_util.h>
-@@ -179,6 +179,51 @@ struct pmc_accessor pmc_accessors[] = {
- 	{ read_sel_evcntr, write_pmevcntrn, read_sel_evtyper, write_pmevtypern },
- };
- 
-+#define INVALID_EC	(-1ul)
-+uint64_t expected_ec = INVALID_EC;
-+uint64_t op_end_addr;
-+
-+static void guest_sync_handler(struct ex_regs *regs)
-+{
-+	uint64_t esr, ec;
-+
-+	esr = read_sysreg(esr_el1);
-+	ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
-+	GUEST_ASSERT_4(op_end_addr && (expected_ec == ec),
-+		       regs->pc, esr, ec, expected_ec);
-+
-+	/* Will go back to op_end_addr after the handler exits */
-+	regs->pc = op_end_addr;
-+
-+	/*
-+	 * Clear op_end_addr, and setting expected_ec to INVALID_EC
-+	 * as a sign that an exception has occurred.
-+	 */
-+	op_end_addr = 0;
-+	expected_ec = INVALID_EC;
-+}
-+
-+/*
-+ * Run the given operation that should trigger an exception with the
-+ * given exception class. The exception handler (guest_sync_handler)
-+ * will reset op_end_addr to 0, and expected_ec to INVALID_EC, and
-+ * will come back to the instruction at the @done_label.
-+ * The @done_label must be a unique label in this test program.
-+ */
-+#define TEST_EXCEPTION(ec, ops, done_label)		\
-+{							\
-+	extern int done_label;				\
-+							\
-+	WRITE_ONCE(op_end_addr, (uint64_t)&done_label);	\
-+	GUEST_ASSERT(ec != INVALID_EC);			\
-+	WRITE_ONCE(expected_ec, ec);			\
-+	dsb(ish);					\
-+	ops;						\
-+	asm volatile(#done_label":");			\
-+	GUEST_ASSERT(!op_end_addr);			\
-+	GUEST_ASSERT(expected_ec == INVALID_EC);	\
-+}
-+
- static void pmu_disable_reset(void)
- {
- 	uint64_t pmcr = read_sysreg(pmcr_el0);
-@@ -352,16 +397,38 @@ static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
- 		       pmc_idx, acc, read_data, read_data_prev);
- }
- 
-+/*
-+ * Tests for reading/writing registers for the unimplemented event counter
-+ * specified by @pmc_idx (>= PMCR_EL1.N).
-+ */
-+static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
-+{
-+	/*
-+	 * Reading/writing the event count/type registers should cause
-+	 * an UNDEFINED exception.
-+	 */
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_cntr(pmc_idx), inv_rd_cntr);
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0), inv_wr_cntr);
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_typer(pmc_idx), inv_rd_typer);
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_typer(pmc_idx, 0), inv_wr_typer);
-+	/*
-+	 * The bit corresponding to the (unimplemented) counter in
-+	 * {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers should be RAZ.
-+	 */
-+	test_bitmap_pmu_regs(pmc_idx, 1);
-+	test_bitmap_pmu_regs(pmc_idx, 0);
-+}
-+
- /*
-  * The guest is configured with PMUv3 with @expected_pmcr_n number of
-  * event counters.
-  * Check if @expected_pmcr_n is consistent with PMCR_EL0.N, and
-- * if reading/writing PMU registers for implemented counters can work
-- * as expected.
-+ * if reading/writing PMU registers for implemented or unimplemented
-+ * counters can work as expected.
-  */
- static void guest_code(uint64_t expected_pmcr_n)
- {
--	uint64_t pmcr, pmcr_n;
-+	uint64_t pmcr, pmcr_n, unimp_mask;
- 	int i, pmc;
- 
- 	GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS);
-@@ -372,6 +439,14 @@ static void guest_code(uint64_t expected_pmcr_n)
- 	/* Make sure that PMCR_EL0.N indicates the value userspace set */
- 	GUEST_ASSERT_2(pmcr_n == expected_pmcr_n, pmcr_n, expected_pmcr_n);
- 
-+	/*
-+	 * Make sure that (RAZ) bits corresponding to unimplemented event
-+	 * counters in {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers are reset to zero.
-+	 * (NOTE: bits for implemented event counters are reset to UNKNOWN)
-+	 */
-+	unimp_mask = GENMASK_ULL(ARMV8_PMU_MAX_GENERAL_COUNTERS - 1, pmcr_n);
-+	check_bitmap_pmu_regs(unimp_mask, false);
-+
- 	/*
- 	 * Tests for reading/writing PMU registers for implemented counters.
- 	 * Use each combination of PMEVT{CNTR,TYPER}<n>_EL0 accessor functions.
-@@ -381,6 +456,14 @@ static void guest_code(uint64_t expected_pmcr_n)
- 			test_access_pmc_regs(&pmc_accessors[i], pmc);
- 	}
- 
-+	/*
-+	 * Tests for reading/writing PMU registers for unimplemented counters.
-+	 * Use each combination of PMEVT{CNTR,TYPER}<n>_EL0 accessor functions.
-+	 */
-+	for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
-+		for (pmc = pmcr_n; pmc < ARMV8_PMU_MAX_GENERAL_COUNTERS; pmc++)
-+			test_access_invalid_pmc_regs(&pmc_accessors[i], pmc);
-+	}
- 	GUEST_DONE();
- }
- 
-@@ -394,7 +477,7 @@ static struct kvm_vm *create_vpmu_vm(void *guest_code, struct kvm_vcpu **vcpup,
- 	struct kvm_vm *vm;
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_vcpu_init init;
--	uint8_t pmuver;
-+	uint8_t pmuver, ec;
- 	uint64_t dfr0, irq = 23;
- 	struct kvm_device_attr irq_attr = {
- 		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-@@ -408,11 +491,18 @@ static struct kvm_vm *create_vpmu_vm(void *guest_code, struct kvm_vcpu **vcpup,
- 
- 	vm = vm_create(1);
- 	ucall_init(vm, NULL);
-+	vm_init_descriptor_tables(vm);
-+	/* Catch exceptions for easier debugging */
-+	for (ec = 0; ec < ESR_EC_NUM; ec++) {
-+		vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ec,
-+					guest_sync_handler);
-+	}
- 
- 	/* Create vCPU with PMUv3 */
- 	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
- 	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
- 	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-+	vcpu_init_descriptor_tables(vcpu);
- 	*gic_fd = vgic_v3_setup(vm, 1, 64, GICD_BASE_GPA, GICR_BASE_GPA);
- 
- 	/* Make sure that PMUv3 support is indicated in the ID register */
-@@ -481,6 +571,7 @@ static void run_test(uint64_t pmcr_n)
- 	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
- 	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
- 	aarch64_vcpu_setup(vcpu, &init);
-+	vcpu_init_descriptor_tables(vcpu);
- 	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), sp);
- 	vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
- 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index 5f977528e09c..52d87809356c 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -104,6 +104,7 @@ enum {
- #define ESR_EC_SHIFT		26
- #define ESR_EC_MASK		(ESR_EC_NUM - 1)
- 
-+#define ESR_EC_UNKNOWN		0x0
- #define ESR_EC_SVC64		0x15
- #define ESR_EC_IABT		0x21
- #define ESR_EC_DABT		0x25
+V4 -> V5:
+- Noted why cache level existence check is unnecessary when fabricating
+  CCSIDR_EL1 value.
+- Removed FWB check. It is necessary as CLIDR_EL1.{LoUU, LoIUS} on the
+  host are {0, 0} if FWB is enabled, and such a CLIDR_EL1 value sets
+  the IDC bit of the sanitized CTR_EL0 value, which is already checked.
+- Removed UNDEF injection when reading CCSIDR_EL1 with an invalid
+  CSSELR_EL1 value.
+- Added a check for CLIDR_EL1.{LoUU,LoC,LoUIS} values set from the
+  userspace.
+
+V3 -> V4:
+- Implemented UNKNOWN system register definition for CCSIDR_EL1
+- Added a comment about the relation between CCSIDR_EL1 and FEAT_CCIDX
+- Squashed "Normalize cache configuration" and "Allow user to set
+  CCSIDR_EL1"
+  The intermediate state between them did not make much sense.
+- Introduced FIELD_GET to extract CCSIDR_EL1_LineSize.
+
+V2 -> V3:
+- Corrected message for patch "Normalize cache configuration"
+- Split patch "Normalize cache configuration"
+- Added handling for CSSELR_EL1.TnD
+- Added code to ignore RES0 in CSSELR_EL1
+- Replaced arm64_ftr_reg_ctrel0.sys_val with
+  read_sanitised_ftr_reg(SYS_CTR_EL0)
+- Fixed vcpu->arch.ccsidr initialziation
+- Added CCSIDR_EL1 sanitization
+- Added FWB check
+- Added a comment for CACHE_TYPE_SEPARATE
+- Added MTE tag cache creation code for CLIDR_EL1 fabrication
+- Removed CLIDR_EL1 reset code for reset caused by guest
+- Added a comment for CCSIDR2
+
+V2: https://lore.kernel.org/lkml/20221211051700.275761-2-akihiko.odaki@daynix.com/
+V1: https://lore.kernel.org/lkml/525ff263-90b3-5b12-da31-171b09f9ad1b@daynix.com/
+
+Akihiko Odaki (6):
+  arm64/sysreg: Convert CCSIDR_EL1 to automatic generation
+  arm64/sysreg: Add CCSIDR2_EL1
+  arm64/cache: Move CLIDR macro definitions
+  KVM: arm64: Always set HCR_TID2
+  KVM: arm64: Mask FEAT_CCIDX
+  KVM: arm64: Normalize cache configuration
+
+Marc Zyngier (1):
+  arm64: Allow the definition of UNKNOWN system register fields
+
+ arch/arm64/include/asm/cache.h             |   9 +
+ arch/arm64/include/asm/kvm_arm.h           |   3 +-
+ arch/arm64/include/asm/kvm_emulate.h       |   4 -
+ arch/arm64/include/asm/kvm_host.h          |   6 +-
+ arch/arm64/include/asm/sysreg.h            |   1 -
+ arch/arm64/kernel/cacheinfo.c              |   5 -
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   2 -
+ arch/arm64/kvm/reset.c                     |   1 +
+ arch/arm64/kvm/sys_regs.c                  | 256 +++++++++++++--------
+ arch/arm64/tools/gen-sysreg.awk            |  20 +-
+ arch/arm64/tools/sysreg                    |  17 ++
+ 11 files changed, 212 insertions(+), 112 deletions(-)
+
 -- 
-2.39.0.314.g84b9a713c41-goog
+2.38.1
 
