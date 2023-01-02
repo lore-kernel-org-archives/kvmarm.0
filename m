@@ -2,86 +2,88 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8C2BC4167B
-	for <kvmarm@archiver.kernel.org>; Fri, 30 Dec 2022 09:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83414C4332F
+	for <kvmarm@archiver.kernel.org>; Mon,  2 Jan 2023 00:43:54 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91B494B2A1;
-	Fri, 30 Dec 2022 04:55:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5A1F4B933;
+	Sun,  1 Jan 2023 19:43:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered)
-	header.i=@daynix-com.20210112.gappssmtp.com
+	header.i=@ozlabs-ru.20210112.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lSECNjftmeWY; Fri, 30 Dec 2022 04:55:31 -0500 (EST)
+	with ESMTP id 7KuV0IQLUJRW; Sun,  1 Jan 2023 19:43:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBFD74A0D6;
-	Fri, 30 Dec 2022 04:55:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 47A4E4B926;
+	Sun,  1 Jan 2023 19:43:52 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D68B2410FF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Dec 2022 04:55:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A1BAC4B926
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  1 Jan 2023 19:43:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3nlRQlEXSG26 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Dec 2022 04:55:29 -0500 (EST)
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com
- [209.85.214.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F6C64A0D6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Dec 2022 04:55:29 -0500 (EST)
-Received: by mail-pl1-f179.google.com with SMTP id s7so21370754plk.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Dec 2022 01:55:29 -0800 (PST)
+ with ESMTP id pFC9USMdLC-L for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  1 Jan 2023 19:43:48 -0500 (EST)
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com
+ [209.85.214.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8CF684B918
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  1 Jan 2023 19:43:48 -0500 (EST)
+Received: by mail-pl1-f182.google.com with SMTP id n4so28071900plp.1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 01 Jan 2023 16:43:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20210112.gappssmtp.com; s=20210112;
- h=content-transfer-encoding:mime-version:references:in-reply-to
- :message-id:date:subject:cc:to:from:from:to:cc:subject:date
- :message-id:reply-to;
- bh=EZMHpVjirLyiPXdcj3AftH3acrrQIEI0GAhijs+zwd8=;
- b=1+JPGWftJlbkh3gilkmrCEShAyfFef5Qi3++XQaMyqoIIyDyEUBLdTx1RqW/m41YwV
- fxV/aXP2uX+ysBxo9/fXqWUgXnNMdRXP+wwRWTsT87X7P3BsvVpUhjdoqCODHaN0o/Hx
- mT0Fg5QPi361iSMpWgI/zNKWdkvOP7iY8So6TBB5IxBwm4M/8dBgexvRozboA3OOitsa
- EqAO9Zjh4U5n7DYnysfQ93vdSc4/iaRnFKyfMMxj7vzw+P9syRGTQzHodwnIUpFDfmN8
- 9viFl7efhAirp3UrHV5FTIF8xakCdGb6umQ6DxDBh9LGQju0AYB8/RbxTbapfXQbRvk4
- vlFQ==
+ d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
+ h=content-transfer-encoding:in-reply-to:references:cc:to:from
+ :content-language:subject:user-agent:mime-version:date:message-id
+ :from:to:cc:subject:date:message-id:reply-to;
+ bh=F4QoSb/fWOPAg1k5IeIPrqcXyDvMYgELY/nQCzCaUW8=;
+ b=eJCM1tGrNRNxUZMWE16lv0C43iH8oRjPiOFPEamdTYzMDfga5XZEd5nmaHr7jaf5NW
+ s36laxaSoVzQlwOOkJ5mVEopFkkwEeR8t33XG9/opwTCRRdF64XKl8irzjtvfBjZt1zL
+ MJYVBgnA10x8/iIWTZzoMvT1aYtGqsNtnliKTvTDPSlBLbM2ic+pdrXFn0fQsUEQfl+D
+ KH9tUAPzqLjZb3TgzPzieK7AwVGuBTvDCN+zZzNoLxvzLxZBwDyOKz+IP79udYDapC3F
+ Y8FM0az53iVf+SQHFnXOA7AVqLFjr2bT0SHdykl5DxmX3oZiDdaQwrrzUWaO/WWNJqzE
+ dxOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=content-transfer-encoding:mime-version:references:in-reply-to
- :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
- :subject:date:message-id:reply-to;
- bh=EZMHpVjirLyiPXdcj3AftH3acrrQIEI0GAhijs+zwd8=;
- b=4b67GZETSoVxq2F4/SAfppry1zAIoP5jtydv6coROlSG2oELsPllW0gPGD1u5fLqjB
- VMtuWkHeHYDAal13412B2gYD5QspwaxG7m3QUj5/MTqfqdVXg21PGE3yBDSPmJrwIWa+
- NNPlqF0mQbjd+3SBsw/diCGoVKFhlaeBH9O9Vz0mdgyaiA6TGHYB8dHph8QPXC275s/f
- YFfzISlAzN5aNJawPbGNBdwfcdYM8V9fMjdrAiFoYVVDs2qM225PbFJGA+35ZMdENnuv
- 1MZrJXhk9nYZS1Fm0z3zhSvmUo6Z9kDzvfMxvWV+Iir2eqrf8wwcxwVDhmV05/3P63GU
- lUXQ==
-X-Gm-Message-State: AFqh2kqPrnHIHu25eGzlYrQ0X0Q7zhEAYto10Yqoxo8TsbQg3dxE93uC
- j78cl5Y4B+GR256QdABOxK4TiA==
-X-Google-Smtp-Source: AMrXdXtIgGPiJEotzBfNinM/x3ly5wXoQTeKKSK/kZPXWkunQENUHj2vS2ezmcCAwmq+TE8vOq09VA==
-X-Received: by 2002:a17:902:a717:b0:18d:d954:5f24 with SMTP id
- w23-20020a170902a71700b0018dd9545f24mr33794168plq.6.1672394128215; 
- Fri, 30 Dec 2022 01:55:28 -0800 (PST)
-Received: from fedora.flets-east.jp ([2400:4050:c360:8200:8ae8:3c4:c0da:7419])
- by smtp.gmail.com with ESMTPSA id
- b7-20020a170902650700b00189c536c72asm14487719plk.148.2022.12.30.01.55.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 30 Dec 2022 01:55:27 -0800 (PST)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-To: 
-Subject: [PATCH v5 7/7] KVM: arm64: Normalize cache configuration
-Date: Fri, 30 Dec 2022 18:54:52 +0900
-Message-Id: <20221230095452.181764-8-akihiko.odaki@daynix.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221230095452.181764-1-akihiko.odaki@daynix.com>
-References: <20221230095452.181764-1-akihiko.odaki@daynix.com>
+ h=content-transfer-encoding:in-reply-to:references:cc:to:from
+ :content-language:subject:user-agent:mime-version:date:message-id
+ :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+ bh=F4QoSb/fWOPAg1k5IeIPrqcXyDvMYgELY/nQCzCaUW8=;
+ b=ft4rYmKGSmrf16XBHI34dmDeNZ+iKDsRfHVNCuAN5UdFoNjQaEU2b12+zAc/uJWKBN
+ +t3eU795m5+cQaJw6gRHjeA+LgJzRiJfKQXN6x83KW/DkcTDWA1LoK8Nqvh4g2xWSx87
+ SemwDdhmMp/v/gpL/suZFNgPITsib4bhNMs8Z3+fQPN/1R9YDMwRD0A0mIpI/gOmPsUl
+ A26bQheI+UTCftW7NEnPVdLD12jjrjSBTrCrv1j/uFyGliaqfVyePhtHIOaKDmXUiw04
+ yFcaQUR/9tXBZFICO4XwiAakn0zlrtnVorOzBQUGJ35T7++WCHqZwP0wOfrz+rX8mEoI
+ yHUg==
+X-Gm-Message-State: AFqh2kr4yI6H2/jGlpe647DvsrCAEaWHzVJnx6ql5X9So5FzSRFS56GG
+ mkiJ7ywNGVhFUQPLQsdXz7aBFA==
+X-Google-Smtp-Source: AMrXdXuzvP/wwe5AzmqaqFsffygkIQ5oV5ALsfR8HbJvtvgLYjKM+6MTfu/2jdgg5Elbz4z4xDI7BA==
+X-Received: by 2002:a17:90a:f309:b0:219:9e19:8259 with SMTP id
+ ca9-20020a17090af30900b002199e198259mr42358873pjb.46.1672620227617; 
+ Sun, 01 Jan 2023 16:43:47 -0800 (PST)
+Received: from [192.168.10.153]
+ (ppp118-208-188-115.cbr-trn-nor-bras39.tpg.internode.on.net.
+ [118.208.188.115]) by smtp.gmail.com with ESMTPSA id
+ u7-20020a17090a1d4700b00225bc0e5f19sm15834468pju.1.2023.01.01.16.43.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 01 Jan 2023 16:43:46 -0800 (PST)
+Message-ID: <cea59fc2-1052-53fd-42b0-ac53f5699aa9@ozlabs.ru>
+Date: Mon, 2 Jan 2023 11:43:40 +1100
 MIME-Version: 1.0
-Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
- Akihiko Odaki <akihiko.odaki@daynix.com>,
- Mathieu Poirier <mathieu.poirier@linaro.org>, Marc Zyngier <maz@kernel.org>,
- Sven Peter <sven@svenpeter.dev>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
- asahi@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:108.0) Gecko/20100101
+ Thunderbird/108.0
+Subject: Re: [PATCH kernel v4] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support
+ platform dependent
+Content-Language: en-US
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Paolo Bonzini <pbonzini@redhat.com>
+References: <20221003235722.2085145-1-aik@ozlabs.ru>
+ <7a790aa8-c643-1098-4d28-bd3b10399fcd@ozlabs.ru>
+ <5178485f-60d8-0f16-558b-05207102a37e@ozlabs.ru>
+In-Reply-To: <5178485f-60d8-0f16-558b-05207102a37e@ozlabs.ru>
+Cc: kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ Nicholas Piggin <npiggin@gmail.com>, kvm-riscv@lists.infradead.org,
+ Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -94,467 +96,84 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Before this change, the cache configuration of the physical CPU was
-exposed to vcpus. This is problematic because the cache configuration a
-vcpu sees varies when it migrates between vcpus with different cache
-configurations.
-
-Fabricate cache configuration from the sanitized value, which holds the
-CTR_EL0 value the userspace sees regardless of which physical CPU it
-resides on.
-
-CLIDR_EL1 and CCSIDR_EL1 are now writable from the userspace so that
-the VMM can restore the values saved with the old kernel.
-
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
----
- arch/arm64/include/asm/cache.h    |   3 +
- arch/arm64/include/asm/kvm_host.h |   4 +
- arch/arm64/kvm/reset.c            |   1 +
- arch/arm64/kvm/sys_regs.c         | 245 ++++++++++++++++++------------
- 4 files changed, 157 insertions(+), 96 deletions(-)
-
-diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
-index ab7133654a72..a51e6e8f3171 100644
---- a/arch/arm64/include/asm/cache.h
-+++ b/arch/arm64/include/asm/cache.h
-@@ -22,6 +22,9 @@
- #define CLIDR_CTYPE(clidr, level)	\
- 	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
- 
-+/* Ttypen, bits [2(n - 1) + 34 : 2(n - 1) + 33], for n = 1 to 7 */
-+#define CLIDR_TTYPE_SHIFT(level)	(2 * ((level) - 1) + CLIDR_EL1_Ttypen_SHIFT)
-+
- /*
-  * Memory returned by kmalloc() may be used for DMA, so we must make
-  * sure that all such allocations are cache aligned. Otherwise,
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index cc2ede0eaed4..27abf81c6910 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -178,6 +178,7 @@ struct kvm_vcpu_fault_info {
- enum vcpu_sysreg {
- 	__INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
- 	MPIDR_EL1,	/* MultiProcessor Affinity Register */
-+	CLIDR_EL1,	/* Cache Level ID Register */
- 	CSSELR_EL1,	/* Cache Size Selection Register */
- 	SCTLR_EL1,	/* System Control Register */
- 	ACTLR_EL1,	/* Auxiliary Control Register */
-@@ -417,6 +418,9 @@ struct kvm_vcpu_arch {
- 		u64 last_steal;
- 		gpa_t base;
- 	} steal;
-+
-+	/* Per-vcpu CCSIDR override or NULL */
-+	u32 *ccsidr;
- };
- 
- /*
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 5ae18472205a..7980983dbad7 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -157,6 +157,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	if (sve_state)
- 		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
- 	kfree(sve_state);
-+	kfree(vcpu->arch.ccsidr);
- }
- 
- static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index aeabf1f3370b..47601806636a 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -11,6 +11,7 @@
- 
- #include <linux/bitfield.h>
- #include <linux/bsearch.h>
-+#include <linux/cacheinfo.h>
- #include <linux/kvm_host.h>
- #include <linux/mm.h>
- #include <linux/printk.h>
-@@ -81,25 +82,78 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 	 __vcpu_sys_reg(vcpu, reg) = val;
- }
- 
--/* 3 bits per cache level, as per CLIDR, but non-existent caches always 0 */
--static u32 cache_levels;
--
- /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
- #define CSSELR_MAX 14
- 
-+static u8 get_min_cache_line_size(u32 csselr)
-+{
-+	u64 ctr_el0;
-+	int field;
-+
-+	ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
-+	field = csselr & CSSELR_EL1_InD ? CTR_EL0_IminLine_SHIFT : CTR_EL0_DminLine_SHIFT;
-+
-+	return cpuid_feature_extract_unsigned_field(ctr_el0, field) - 2;
-+}
-+
- /* Which cache CCSIDR represents depends on CSSELR value. */
--static u32 get_ccsidr(u32 csselr)
-+static u32 get_ccsidr(struct kvm_vcpu *vcpu, u32 csselr)
- {
--	u32 ccsidr;
-+	if (vcpu->arch.ccsidr)
-+		return vcpu->arch.ccsidr[csselr];
- 
--	/* Make sure noone else changes CSSELR during this! */
--	local_irq_disable();
--	write_sysreg(csselr, csselr_el1);
--	isb();
--	ccsidr = read_sysreg(ccsidr_el1);
--	local_irq_enable();
-+	/*
-+	 * Fabricate a CCSIDR value as the overriding value does not exist.
-+	 * The real CCSIDR value will not be used as it can vary by the
-+	 * physical CPU which the vcpu currently resides in.
-+	 *
-+	 * The line size is determined with get_min_cache_line_size(), which
-+	 * should be valid for all CPUs even if they have different cache
-+	 * configuration.
-+	 *
-+	 * The associativity bits are cleared, meaning the geometry of all data
-+	 * and unified caches (which are guaranteed to be PIPT and thus
-+	 * non-aliasing) are 1 set and 1 way.
-+	 * Guests should not be doing cache operations by set/way at all, and
-+	 * for this reason, we trap them and attempt to infer the intent, so
-+	 * that we can flush the entire guest's address space at the appropriate
-+	 * time. The exposed geometry minimizes the number of the traps.
-+	 * [If guests should attempt to infer aliasing properties from the
-+	 * geometry (which is not permitted by the architecture), they would
-+	 * only do so for virtually indexed caches.]
-+	 *
-+	 * We don't check if the cache level exists as it is allowed to return
-+	 * an UNKNOWN value if not.
-+	 */
-+	return get_min_cache_line_size(csselr) << CCSIDR_EL1_LineSize_SHIFT;
-+}
- 
--	return ccsidr;
-+static int set_ccsidr(struct kvm_vcpu *vcpu, u32 csselr, u32 val)
-+{
-+	u8 line_size = FIELD_GET(CCSIDR_EL1_LineSize, val);
-+	u32 *ccsidr = vcpu->arch.ccsidr;
-+	u32 i;
-+
-+	if ((val & CCSIDR_EL1_RES0) || line_size < get_min_cache_line_size(csselr))
-+		return -EINVAL;
-+
-+	if (!ccsidr) {
-+		if (val == get_ccsidr(vcpu, csselr))
-+			return 0;
-+
-+		ccsidr = kmalloc_array(CSSELR_MAX, sizeof(u32), GFP_KERNEL);
-+		if (!ccsidr)
-+			return -ENOMEM;
-+
-+		for (i = 0; i < CSSELR_MAX; i++)
-+			ccsidr[i] = get_ccsidr(vcpu, i);
-+
-+		vcpu->arch.ccsidr = ccsidr;
-+	}
-+
-+	ccsidr[csselr] = val;
-+
-+	return 0;
- }
- 
- /*
-@@ -1281,10 +1335,78 @@ static bool access_clidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	if (p->is_write)
- 		return write_to_read_only(vcpu, p, r);
- 
--	p->regval = read_sysreg(clidr_el1);
-+	p->regval = __vcpu_sys_reg(vcpu, r->reg);
- 	return true;
- }
- 
-+/*
-+ * Fabricate a CLIDR_EL1 value instead of using the real value, which can vary
-+ * by the physical CPU which the vcpu currently resides in.
-+ */
-+static void reset_clidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+{
-+	u64 ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
-+	u64 clidr;
-+	u8 loc;
-+
-+	if ((ctr_el0 & CTR_EL0_IDC)) {
-+		/*
-+		 * Data cache clean to the PoU is not required so LoUU and LoUIS
-+		 * will not be set and a unified cache, which will be marked as
-+		 * LoC, will be added.
-+		 *
-+		 * If not DIC, let the unified cache L2 so that an instruction
-+		 * cache can be added as L1 later.
-+		 */
-+		loc = (ctr_el0 & CTR_EL0_DIC) ? 1 : 2;
-+		clidr = CACHE_TYPE_UNIFIED << CLIDR_CTYPE_SHIFT(loc);
-+	} else {
-+		/*
-+		 * Data cache clean to the PoU is required so let L1 have a data
-+		 * cache and mark it as LoUU and LoUIS. As L1 has a data cache,
-+		 * it can be marked as LoC too.
-+		 */
-+		loc = 1;
-+		clidr = 1 << CLIDR_LOUU_SHIFT;
-+		clidr |= 1 << CLIDR_LOUIS_SHIFT;
-+		clidr |= CACHE_TYPE_DATA << CLIDR_CTYPE_SHIFT(1);
-+	}
-+
-+	/*
-+	 * Instruction cache invalidation to the PoU is required so let L1 have
-+	 * an instruction cache. If L1 already has a data cache, it will be
-+	 * CACHE_TYPE_SEPARATE.
-+	 */
-+	if (!(ctr_el0 & CTR_EL0_DIC))
-+		clidr |= CACHE_TYPE_INST << CLIDR_CTYPE_SHIFT(1);
-+
-+	clidr |= loc << CLIDR_LOC_SHIFT;
-+
-+	/*
-+	 * Add tag cache unified to data cache. Allocation tags and data are
-+	 * unified in a cache line so that it looks valid even if there is only
-+	 * one cache line.
-+	 */
-+	if (kvm_has_mte(vcpu->kvm))
-+		clidr |= 2 << CLIDR_TTYPE_SHIFT(loc);
-+
-+	__vcpu_sys_reg(vcpu, r->reg) = clidr;
-+}
-+
-+static int set_clidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-+		      u64 val)
-+{
-+	u64 ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
-+	u64 idc = !CLIDR_LOC(val) || (!CLIDR_LOUIS(val) && !CLIDR_LOUU(val));
-+
-+	if ((val & CLIDR_EL1_RES0) || (!(ctr_el0 & CTR_EL0_IDC) && idc))
-+		return -EINVAL;
-+
-+	__vcpu_sys_reg(vcpu, rd->reg) = val;
-+
-+	return 0;
-+}
-+
- static bool access_csselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r)
- {
-@@ -1306,22 +1428,10 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 		return write_to_read_only(vcpu, p, r);
- 
- 	csselr = vcpu_read_sys_reg(vcpu, CSSELR_EL1);
--	p->regval = get_ccsidr(csselr);
-+	csselr &= CSSELR_EL1_Level | CSSELR_EL1_InD;
-+	if (csselr < CSSELR_MAX)
-+		p->regval = get_ccsidr(vcpu, csselr);
- 
--	/*
--	 * Guests should not be doing cache operations by set/way at all, and
--	 * for this reason, we trap them and attempt to infer the intent, so
--	 * that we can flush the entire guest's address space at the appropriate
--	 * time.
--	 * To prevent this trapping from causing performance problems, let's
--	 * expose the geometry of all data and unified caches (which are
--	 * guaranteed to be PIPT and thus non-aliasing) as 1 set and 1 way.
--	 * [If guests should attempt to infer aliasing properties from the
--	 * geometry (which is not permitted by the architecture), they would
--	 * only do so for virtually indexed caches.]
--	 */
--	if (!(csselr & 1)) // data or unified cache
--		p->regval &= ~GENMASK(27, 3);
- 	return true;
- }
- 
-@@ -1610,7 +1720,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_CNTKCTL_EL1), NULL, reset_val, CNTKCTL_EL1, 0},
- 
- 	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
--	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr },
-+	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr, reset_clidr, CLIDR_EL1,
-+	  .set_user = set_clidr },
- 	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
- 	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
- 	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
-@@ -2622,7 +2733,6 @@ id_to_sys_reg_desc(struct kvm_vcpu *vcpu, u64 id,
- 
- FUNCTION_INVARIANT(midr_el1)
- FUNCTION_INVARIANT(revidr_el1)
--FUNCTION_INVARIANT(clidr_el1)
- FUNCTION_INVARIANT(aidr_el1)
- 
- static void get_ctr_el0(struct kvm_vcpu *v, const struct sys_reg_desc *r)
-@@ -2634,7 +2744,6 @@ static void get_ctr_el0(struct kvm_vcpu *v, const struct sys_reg_desc *r)
- static struct sys_reg_desc invariant_sys_regs[] = {
- 	{ SYS_DESC(SYS_MIDR_EL1), NULL, get_midr_el1 },
- 	{ SYS_DESC(SYS_REVIDR_EL1), NULL, get_revidr_el1 },
--	{ SYS_DESC(SYS_CLIDR_EL1), NULL, get_clidr_el1 },
- 	{ SYS_DESC(SYS_AIDR_EL1), NULL, get_aidr_el1 },
- 	{ SYS_DESC(SYS_CTR_EL0), NULL, get_ctr_el0 },
- };
-@@ -2671,33 +2780,7 @@ static int set_invariant_sys_reg(u64 id, u64 __user *uaddr)
- 	return 0;
- }
- 
--static bool is_valid_cache(u32 val)
--{
--	u32 level, ctype;
--
--	if (val >= CSSELR_MAX)
--		return false;
--
--	/* Bottom bit is Instruction or Data bit.  Next 3 bits are level. */
--	level = (val >> 1);
--	ctype = (cache_levels >> (level * 3)) & 7;
--
--	switch (ctype) {
--	case 0: /* No cache */
--		return false;
--	case 1: /* Instruction cache only */
--		return (val & 1);
--	case 2: /* Data cache only */
--	case 4: /* Unified cache */
--		return !(val & 1);
--	case 3: /* Separate instruction and data caches */
--		return true;
--	default: /* Reserved: we can't know instruction or data. */
--		return false;
--	}
--}
--
--static int demux_c15_get(u64 id, void __user *uaddr)
-+static int demux_c15_get(struct kvm_vcpu *vcpu, u64 id, void __user *uaddr)
- {
- 	u32 val;
- 	u32 __user *uval = uaddr;
-@@ -2713,16 +2796,16 @@ static int demux_c15_get(u64 id, void __user *uaddr)
- 			return -ENOENT;
- 		val = (id & KVM_REG_ARM_DEMUX_VAL_MASK)
- 			>> KVM_REG_ARM_DEMUX_VAL_SHIFT;
--		if (!is_valid_cache(val))
-+		if (val >= CSSELR_MAX)
- 			return -ENOENT;
- 
--		return put_user(get_ccsidr(val), uval);
-+		return put_user(get_ccsidr(vcpu, val), uval);
- 	default:
- 		return -ENOENT;
- 	}
- }
- 
--static int demux_c15_set(u64 id, void __user *uaddr)
-+static int demux_c15_set(struct kvm_vcpu *vcpu, u64 id, void __user *uaddr)
- {
- 	u32 val, newval;
- 	u32 __user *uval = uaddr;
-@@ -2738,16 +2821,13 @@ static int demux_c15_set(u64 id, void __user *uaddr)
- 			return -ENOENT;
- 		val = (id & KVM_REG_ARM_DEMUX_VAL_MASK)
- 			>> KVM_REG_ARM_DEMUX_VAL_SHIFT;
--		if (!is_valid_cache(val))
-+		if (val >= CSSELR_MAX)
- 			return -ENOENT;
- 
- 		if (get_user(newval, uval))
- 			return -EFAULT;
- 
--		/* This is also invariant: you can't change it. */
--		if (newval != get_ccsidr(val))
--			return -EINVAL;
--		return 0;
-+		return set_ccsidr(vcpu, val, newval);
- 	default:
- 		return -ENOENT;
- 	}
-@@ -2784,7 +2864,7 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 	int err;
- 
- 	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
--		return demux_c15_get(reg->id, uaddr);
-+		return demux_c15_get(vcpu, reg->id, uaddr);
- 
- 	err = get_invariant_sys_reg(reg->id, uaddr);
- 	if (err != -ENOENT)
-@@ -2828,7 +2908,7 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 	int err;
- 
- 	if ((reg->id & KVM_REG_ARM_COPROC_MASK) == KVM_REG_ARM_DEMUX)
--		return demux_c15_set(reg->id, uaddr);
-+		return demux_c15_set(vcpu, reg->id, uaddr);
- 
- 	err = set_invariant_sys_reg(reg->id, uaddr);
- 	if (err != -ENOENT)
-@@ -2840,13 +2920,7 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
- 
- static unsigned int num_demux_regs(void)
- {
--	unsigned int i, count = 0;
--
--	for (i = 0; i < CSSELR_MAX; i++)
--		if (is_valid_cache(i))
--			count++;
--
--	return count;
-+	return CSSELR_MAX;
- }
- 
- static int write_demux_regids(u64 __user *uindices)
-@@ -2856,8 +2930,6 @@ static int write_demux_regids(u64 __user *uindices)
- 
- 	val |= KVM_REG_ARM_DEMUX_ID_CCSIDR;
- 	for (i = 0; i < CSSELR_MAX; i++) {
--		if (!is_valid_cache(i))
--			continue;
- 		if (put_user(val | i, uindices))
- 			return -EFAULT;
- 		uindices++;
-@@ -2959,7 +3031,6 @@ int kvm_sys_reg_table_init(void)
- {
- 	bool valid = true;
- 	unsigned int i;
--	struct sys_reg_desc clidr;
- 
- 	/* Make sure tables are unique and in order. */
- 	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
-@@ -2976,23 +3047,5 @@ int kvm_sys_reg_table_init(void)
- 	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
- 		invariant_sys_regs[i].reset(NULL, &invariant_sys_regs[i]);
- 
--	/*
--	 * CLIDR format is awkward, so clean it up.  See ARM B4.1.20:
--	 *
--	 *   If software reads the Cache Type fields from Ctype1
--	 *   upwards, once it has seen a value of 0b000, no caches
--	 *   exist at further-out levels of the hierarchy. So, for
--	 *   example, if Ctype3 is the first Cache Type field with a
--	 *   value of 0b000, the values of Ctype4 to Ctype7 must be
--	 *   ignored.
--	 */
--	get_clidr_el1(NULL, &clidr); /* Ugly... */
--	cache_levels = clidr.val;
--	for (i = 0; i < 7; i++)
--		if (((cache_levels >> (i*3)) & 7) == 0)
--			break;
--	/* Clear all higher bits. */
--	cache_levels &= (1 << (i*3))-1;
--
- 	return 0;
- }
--- 
-2.38.1
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+UGFvbG8sIHBpbmc/CgoKT24gMDYvMTIvMjAyMiAxNTozOSwgQWxleGV5IEthcmRhc2hldnNraXkg
+d3JvdGU6Cj4gUGFvbG8sIHBpbmc/IDopCj4gCj4gCj4gT24gMjcvMTAvMjAyMiAxODozOCwgQWxl
+eGV5IEthcmRhc2hldnNraXkgd3JvdGU6Cj4+IFBhb2xvLCBwaW5nPwo+Pgo+Pgo+PiBPbiAwNC8x
+MC8yMDIyIDEwOjU3LCBBbGV4ZXkgS2FyZGFzaGV2c2tpeSB3cm90ZToKPj4+IFdoZW4gaW50cm9k
+dWNlZCwgSVJRRkQgcmVzYW1wbGluZyB3b3JrZWQgb24gUE9XRVI4IHdpdGggWElDUy4gSG93ZXZl
+cgo+Pj4gS1ZNIG9uIFBPV0VSOSBoYXMgbmV2ZXIgaW1wbGVtZW50ZWQgaXQgLSB0aGUgY29tcGF0
+aWJpbGl0eSBtb2RlIGNvZGUKPj4+ICgiWElDUy1vbi1YSVZFIikgbWlzc2VzIHRoZSBrdm1fbm90
+aWZ5X2Fja2VkX2lycSgpIGNhbGwgYW5kIHRoZSBuYXRpdmUKPj4+IFhJVkUgbW9kZSBkb2VzIG5v
+dCBoYW5kbGUgSU5UeCBpbiBLVk0gYXQgYWxsLgo+Pj4KPj4+IFRoaXMgbW92ZWQgdGhlIGNhcGFi
+aWxpdHkgc3VwcG9ydCBhZHZlcnRpc2luZyB0byBwbGF0Zm9ybXMgYW5kIHN0b3BzCj4+PiBhZHZl
+cnRpc2luZyBpdCBvbiBYSVZFLCBpLmUuIFBPV0VSOSBhbmQgbGF0ZXIuCj4+Pgo+Pj4gVGhpcyBz
+aG91bGQgY2F1c2Ugbm8gYmVoYXZpb3VyYWwgY2hhbmdlIGZvciBvdGhlciBhcmNoaXRlY3R1cmVz
+Lgo+Pj4KPj4+IFNpZ25lZC1vZmYtYnk6IEFsZXhleSBLYXJkYXNoZXZza2l5IDxhaWtAb3psYWJz
+LnJ1Pgo+Pj4gQWNrZWQtYnk6IE5pY2hvbGFzIFBpZ2dpbiA8bnBpZ2dpbkBnbWFpbC5jb20+Cj4+
+PiBBY2tlZC1ieTogTWFyYyBaeW5naWVyIDxtYXpAa2VybmVsLm9yZz4KPj4+IC0tLQo+Pj4gQ2hh
+bmdlczoKPj4+IHY0Ogo+Pj4gKiByZW1vdmVkIGluY29ycmVjdCBjbGF1c2UgYWJvdXQgY2hhbmdp
+bmcgYmVoYXZvaXIgb24gTUlQUyBhbmQgUklTQ1YKPj4+Cj4+PiB2MzoKPj4+ICogcmVtb3ZlZCBh
+bGwgaWZkZWZlcnJ5Cj4+PiAqIHJlbW92ZWQgdGhlIGNhcGFiaWxpdHkgZm9yIE1JUFMgYW5kIFJJ
+U0NWCj4+PiAqIGFkanVzdGVkIHRoZSBjb21taXQgbG9nIGFib3V0IE1JUFMgYW5kIFJJU0NWCj4+
+Pgo+Pj4gdjI6Cj4+PiAqIHJlbW92ZWQgaWZkZWYgZm9yIEFSTTY0Lgo+Pj4gLS0tCj4+PiDCoCBh
+cmNoL2FybTY0L2t2bS9hcm0uY8KgwqDCoMKgwqDCoCB8IDEgKwo+Pj4gwqAgYXJjaC9wb3dlcnBj
+L2t2bS9wb3dlcnBjLmMgfCA2ICsrKysrKwo+Pj4gwqAgYXJjaC9zMzkwL2t2bS9rdm0tczM5MC5j
+wqDCoCB8IDEgKwo+Pj4gwqAgYXJjaC94ODYva3ZtL3g4Ni5jwqDCoMKgwqDCoMKgwqDCoCB8IDEg
+Kwo+Pj4gwqAgdmlydC9rdm0va3ZtX21haW4uY8KgwqDCoMKgwqDCoMKgIHwgMSAtCj4+PiDCoCA1
+IGZpbGVzIGNoYW5nZWQsIDkgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQo+Pj4KPj4+IGRp
+ZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9hcm0uYyBiL2FyY2gvYXJtNjQva3ZtL2FybS5jCj4+
+PiBpbmRleCAyZmYwZWY2MmFiYWQuLmQyZGFhNGQzNzViNSAxMDA2NDQKPj4+IC0tLSBhL2FyY2gv
+YXJtNjQva3ZtL2FybS5jCj4+PiArKysgYi9hcmNoL2FybTY0L2t2bS9hcm0uYwo+Pj4gQEAgLTIx
+OCw2ICsyMTgsNyBAQCBpbnQga3ZtX3ZtX2lvY3RsX2NoZWNrX2V4dGVuc2lvbihzdHJ1Y3Qga3Zt
+ICprdm0sIAo+Pj4gbG9uZyBleHQpCj4+PiDCoMKgwqDCoMKgIGNhc2UgS1ZNX0NBUF9WQ1BVX0FU
+VFJJQlVURVM6Cj4+PiDCoMKgwqDCoMKgIGNhc2UgS1ZNX0NBUF9QVFBfS1ZNOgo+Pj4gwqDCoMKg
+wqDCoCBjYXNlIEtWTV9DQVBfQVJNX1NZU1RFTV9TVVNQRU5EOgo+Pj4gK8KgwqDCoCBjYXNlIEtW
+TV9DQVBfSVJRRkRfUkVTQU1QTEU6Cj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgciA9IDE7Cj4+PiDC
+oMKgwqDCoMKgwqDCoMKgwqAgYnJlYWs7Cj4+PiDCoMKgwqDCoMKgIGNhc2UgS1ZNX0NBUF9TRVRf
+R1VFU1RfREVCVUcyOgo+Pj4gZGlmZiAtLWdpdCBhL2FyY2gvcG93ZXJwYy9rdm0vcG93ZXJwYy5j
+IGIvYXJjaC9wb3dlcnBjL2t2bS9wb3dlcnBjLmMKPj4+IGluZGV4IGZiMTQ5MDc2MWM4Ny4uOTA4
+Y2U4YmQ5MWM5IDEwMDY0NAo+Pj4gLS0tIGEvYXJjaC9wb3dlcnBjL2t2bS9wb3dlcnBjLmMKPj4+
+ICsrKyBiL2FyY2gvcG93ZXJwYy9rdm0vcG93ZXJwYy5jCj4+PiBAQCAtNTkzLDYgKzU5MywxMiBA
+QCBpbnQga3ZtX3ZtX2lvY3RsX2NoZWNrX2V4dGVuc2lvbihzdHJ1Y3Qga3ZtIAo+Pj4gKmt2bSwg
+bG9uZyBleHQpCj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgYnJlYWs7Cj4+PiDCoCAjZW5kaWYKPj4+
+ICsjaWZkZWYgQ09ORklHX0hBVkVfS1ZNX0lSUUZECj4+PiArwqDCoMKgIGNhc2UgS1ZNX0NBUF9J
+UlFGRF9SRVNBTVBMRToKPj4+ICvCoMKgwqDCoMKgwqDCoCByID0gIXhpdmVfZW5hYmxlZCgpOwo+
+Pj4gK8KgwqDCoMKgwqDCoMKgIGJyZWFrOwo+Pj4gKyNlbmRpZgo+Pj4gKwo+Pj4gwqDCoMKgwqDC
+oCBjYXNlIEtWTV9DQVBfUFBDX0FMTE9DX0hUQUI6Cj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgciA9
+IGh2X2VuYWJsZWQ7Cj4+PiDCoMKgwqDCoMKgwqDCoMKgwqAgYnJlYWs7Cj4+PiBkaWZmIC0tZ2l0
+IGEvYXJjaC9zMzkwL2t2bS9rdm0tczM5MC5jIGIvYXJjaC9zMzkwL2t2bS9rdm0tczM5MC5jCj4+
+PiBpbmRleCBlZGZkNGJiZDBjYmEuLjc1MjFhZGFkYjgxYiAxMDA2NDQKPj4+IC0tLSBhL2FyY2gv
+czM5MC9rdm0va3ZtLXMzOTAuYwo+Pj4gKysrIGIvYXJjaC9zMzkwL2t2bS9rdm0tczM5MC5jCj4+
+PiBAQCAtNTc3LDYgKzU3Nyw3IEBAIGludCBrdm1fdm1faW9jdGxfY2hlY2tfZXh0ZW5zaW9uKHN0
+cnVjdCBrdm0gKmt2bSwgCj4+PiBsb25nIGV4dCkKPj4+IMKgwqDCoMKgwqAgY2FzZSBLVk1fQ0FQ
+X1NFVF9HVUVTVF9ERUJVRzoKPj4+IMKgwqDCoMKgwqAgY2FzZSBLVk1fQ0FQX1MzOTBfRElBRzMx
+ODoKPj4+IMKgwqDCoMKgwqAgY2FzZSBLVk1fQ0FQX1MzOTBfTUVNX09QX0VYVEVOU0lPTjoKPj4+
+ICvCoMKgwqAgY2FzZSBLVk1fQ0FQX0lSUUZEX1JFU0FNUExFOgo+Pj4gwqDCoMKgwqDCoMKgwqDC
+oMKgIHIgPSAxOwo+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgIGJyZWFrOwo+Pj4gwqDCoMKgwqDCoCBj
+YXNlIEtWTV9DQVBfU0VUX0dVRVNUX0RFQlVHMjoKPj4+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9r
+dm0veDg2LmMgYi9hcmNoL3g4Ni9rdm0veDg2LmMKPj4+IGluZGV4IDQzYTZhN2VmYzZlYy4uMmQ2
+YzVhOGZkZjE0IDEwMDY0NAo+Pj4gLS0tIGEvYXJjaC94ODYva3ZtL3g4Ni5jCj4+PiArKysgYi9h
+cmNoL3g4Ni9rdm0veDg2LmMKPj4+IEBAIC00Mzk1LDYgKzQzOTUsNyBAQCBpbnQga3ZtX3ZtX2lv
+Y3RsX2NoZWNrX2V4dGVuc2lvbihzdHJ1Y3Qga3ZtIAo+Pj4gKmt2bSwgbG9uZyBleHQpCj4+PiDC
+oMKgwqDCoMKgIGNhc2UgS1ZNX0NBUF9WQVBJQzoKPj4+IMKgwqDCoMKgwqAgY2FzZSBLVk1fQ0FQ
+X0VOQUJMRV9DQVA6Cj4+PiDCoMKgwqDCoMKgIGNhc2UgS1ZNX0NBUF9WTV9ESVNBQkxFX05YX0hV
+R0VfUEFHRVM6Cj4+PiArwqDCoMKgIGNhc2UgS1ZNX0NBUF9JUlFGRF9SRVNBTVBMRToKPj4+IMKg
+wqDCoMKgwqDCoMKgwqDCoCByID0gMTsKPj4+IMKgwqDCoMKgwqDCoMKgwqDCoCBicmVhazsKPj4+
+IMKgwqDCoMKgwqAgY2FzZSBLVk1fQ0FQX0VYSVRfSFlQRVJDQUxMOgo+Pj4gZGlmZiAtLWdpdCBh
+L3ZpcnQva3ZtL2t2bV9tYWluLmMgYi92aXJ0L2t2bS9rdm1fbWFpbi5jCj4+PiBpbmRleCA1ODRh
+NWJhYjNhZjMuLjA1Y2Y5NDAxM2YwMiAxMDA2NDQKPj4+IC0tLSBhL3ZpcnQva3ZtL2t2bV9tYWlu
+LmMKPj4+ICsrKyBiL3ZpcnQva3ZtL2t2bV9tYWluLmMKPj4+IEBAIC00NDQ3LDcgKzQ0NDcsNiBA
+QCBzdGF0aWMgbG9uZyAKPj4+IGt2bV92bV9pb2N0bF9jaGVja19leHRlbnNpb25fZ2VuZXJpYyhz
+dHJ1Y3Qga3ZtICprdm0sIGxvbmcgYXJnKQo+Pj4gwqAgI2VuZGlmCj4+PiDCoCAjaWZkZWYgQ09O
+RklHX0hBVkVfS1ZNX0lSUUZECj4+PiDCoMKgwqDCoMKgIGNhc2UgS1ZNX0NBUF9JUlFGRDoKPj4+
+IC3CoMKgwqAgY2FzZSBLVk1fQ0FQX0lSUUZEX1JFU0FNUExFOgo+Pj4gwqAgI2VuZGlmCj4+PiDC
+oMKgwqDCoMKgIGNhc2UgS1ZNX0NBUF9JT0VWRU5URkRfQU5ZX0xFTkdUSDoKPj4+IMKgwqDCoMKg
+wqAgY2FzZSBLVk1fQ0FQX0NIRUNLX0VYVEVOU0lPTl9WTToKPj4KPiAKCi0tIApBbGV4ZXkKX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxp
+bmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29s
+dW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
