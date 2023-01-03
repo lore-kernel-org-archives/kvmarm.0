@@ -2,59 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A51F8C53210
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Jan 2023 10:13:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC8EFC46467
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Jan 2023 10:13:17 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 109DC4BB8E;
-	Tue,  3 Jan 2023 05:13:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71DA44BBA3;
+	Tue,  3 Jan 2023 05:13:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LzXI08a-Gq87; Tue,  3 Jan 2023 05:13:13 -0500 (EST)
+	with ESMTP id 0QqmnXu4hbgC; Tue,  3 Jan 2023 05:13:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE54F4BB7D;
-	Tue,  3 Jan 2023 05:13:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08D2F4BB8D;
+	Tue,  3 Jan 2023 05:13:16 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E39BD40E25
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 05:13:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2B5D4BB50
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 05:13:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tTq3m71bLKN4 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Jan 2023 05:13:11 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C130E40BB5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 05:13:11 -0500 (EST)
+ with ESMTP id 7reQvwSMYKdB for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 Jan 2023 05:13:13 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C20B40E25
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 05:13:13 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 25B3661232;
- Tue,  3 Jan 2023 10:13:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 790A3C433D2;
+ by ams.source.kernel.org (Postfix) with ESMTPS id 27923B80E63;
+ Tue,  3 Jan 2023 10:13:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2D27C433F2;
  Tue,  3 Jan 2023 10:13:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=k20201202; t=1672740790;
- bh=9OKqpjCDRd3C36Nqs8Q17tIqDdDxTiYwlP2yAWpmOsM=;
+ bh=/36RZNkiPAxwtJXfCBhVvkMEDyUrBPHpASIPH0DBj1M=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=HAVJ5bFqx589bVX+ta4DzcoNpOYa8X4yM3FdrkuGA4BPgI2eE8UXFpJzJM63g5gp5
- nsX3pyPQUFcPY3nYm/0NGdSmCDj5+XfTsJzG3YSZaiYLTfp5mVfxC5flkS/0/8B44+
- ZWWNhAtifkPM0vZMiVWJlHr52bMrcz5rbzCelSjKJLwE/Jg/i31vxU6fYb/0OXfnoh
- GhM9+8ta+6pOf8Ns7oLbx6JWiqzQ8GJl2XwG4lUZmxxvB9zlOKZqqWPakj2+9gq+W8
- Jk0lS2osrMJUvfjKezTJaggYU4gAcT9BSJ4xmSD+ko1wopemqMwT6ZOQ3/EeniR2KS
- XP3P+sNN5m/aA==
+ b=pjT73yj6JSjz9uV37Vt7kNnqDBn5vDcYZPWPHHY8okMHqMl58/pj+yEoowL2ZnUnp
+ IyreHta2bDrXSA7fjsnD9hJ9q5KEtTQ+MICXlxjye81rVv3VQF6tGzHlarwUgvaMC/
+ EU7nVXWVA74sWsrYTvq39WCAKJ4jUdXdgkv34AhbaiZJVq4G2MZnMrj684yJ5bMthC
+ +qusl0brQvqmTfRtFWxLiPWpt5KG4IKRve/bcGoZFRU6NMcVCyCppxnNDjlNvI6PlX
+ A5R2NUOLP3kpTifk/hwBmutO7zCGewpOrEKv1MwMF1bw8ILRk+RQLMGSoOj2nCUI94
+ FjUTi680ybQAw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1pCeGC-00GTpw-Ap;
+ (envelope-from <maz@kernel.org>) id 1pCeI8-00GTpw-Sk;
  Tue, 03 Jan 2023 10:13:08 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: <kvmarm@lists.cs.columbia.edu>, <kvmarm@lists.linux.dev>,
  kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 1/3] KVM: arm64: Fix S1PTW handling on RO memslots
-Date: Tue,  3 Jan 2023 10:09:02 +0000
-Message-Id: <20230103100904.3232426-2-maz@kernel.org>
+Subject: [PATCH v2 2/3] KVM: arm64: Document the behaviour of S1PTW faults on
+ RO memslots
+Date: Tue,  3 Jan 2023 10:09:03 +0000
+Message-Id: <20230103100904.3232426-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230103100904.3232426-1-maz@kernel.org>
 References: <20230103100904.3232426-1-maz@kernel.org>
@@ -63,12 +64,11 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev,
  kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
  suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev,
- ardb@kernel.org, will@kernel.org, qperret@google.com, ricarkol@google.com,
- stable@vger.kernel.org
+ ardb@kernel.org, will@kernel.org, qperret@google.com, ricarkol@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Will Deacon <will@kernel.org>, stable@vger.kernel.org
+Cc: Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,79 +85,41 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-A recent development on the EFI front has resulted in guests having
-their page tables baked in the firmware binary, and mapped into the
-IPA space as part of a read-only memslot. Not only is this legitimate,
-but it also results in added security, so thumbs up.
+Although the KVM API says that a write to a RO memslot must result
+in a KVM_EXIT_MMIO describing the write, the arm64 architecture
+doesn't provide the *data* written by a Stage-1 page table walk
+(we only get the address).
 
-It is possible to take an S1PTW translation fault if the S1 PTs are
-unmapped at stage-2. However, KVM unconditionally treats S1PTW as a
-write to correctly handle hardware AF/DB updates to the S1 PTs.
-Furthermore, KVM injects an exception into the guest for S1PTW writes.
-In the aforementioned case this results in the guest taking an abort
-it won't recover from, as the S1 PTs mapping the vectors suffer from
-the same problem.
+Since there isn't much userspace can do with so little information
+anyway, document the fact that such an access results in a guest
+exception, not an exit. This is consistent with the guest being
+terminally broken anyway.
 
-So clearly our handling is... wrong.
-
-Instead, switch to a two-pronged approach:
-
-- On S1PTW translation fault, handle the fault as a read
-
-- On S1PTW permission fault, handle the fault as a write
-
-This is of no consequence to SW that *writes* to its PTs (the write
-will trigger a non-S1PTW fault), and SW that uses RO PTs will not
-use HW-assisted AF/DB anyway, as that'd be wrong.
-
-Only in the case described in c4ad98e4b72c ("KVM: arm64: Assume write
-fault on S1PTW permission fault on instruction fetch") do we end-up
-with two back-to-back faults (page being evicted and faulted back).
-I don't think this is a case worth optimising for.
-
-Fixes: c4ad98e4b72c ("KVM: arm64: Assume write fault on S1PTW permission fault on instruction fetch")
 Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-Regression-tested-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
 ---
- arch/arm64/include/asm/kvm_emulate.h | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+ Documentation/virt/kvm/api.rst | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 9bdba47f7e14..0d40c48d8132 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -373,8 +373,26 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 0dd5d8733dd5..42db72a0cbe6 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -1354,6 +1354,14 @@ the memory region are automatically reflected into the guest.  For example, an
+ mmap() that affects the region will be made visible immediately.  Another
+ example is madvise(MADV_DROP).
  
- static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
- {
--	if (kvm_vcpu_abt_iss1tw(vcpu))
--		return true;
-+	if (kvm_vcpu_abt_iss1tw(vcpu)) {
-+		/*
-+		 * Only a permission fault on a S1PTW should be
-+		 * considered as a write. Otherwise, page tables baked
-+		 * in a read-only memslot will result in an exception
-+		 * being delivered in the guest.
-+		 *
-+		 * The drawback is that we end-up faulting twice if the
-+		 * guest is using any of HW AF/DB: a translation fault
-+		 * to map the page containing the PT (read only at
-+		 * first), then a permission fault to allow the flags
-+		 * to be set.
-+		 */
-+		switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
-+		case ESR_ELx_FSC_PERM:
-+			return true;
-+		default:
-+			return false;
-+		}
-+	}
++Note: On arm64, a write generated by the page-table walker (to update
++the Access and Dirty flags, for example) never results in a
++KVM_EXIT_MMIO exit when the slot has the KVM_MEM_READONLY flag. This
++is because KVM cannot provide the data that would be written by the
++page-table walker, making it impossible to emulate the access.
++Instead, an abort (data abort if the cause of the page-table update
++was a load or a store, instruction abort if it was an instruction
++fetch) is injected in the guest.
  
- 	if (kvm_vcpu_trap_is_iabt(vcpu))
- 		return false;
+ 4.36 KVM_SET_TSS_ADDR
+ ---------------------
 -- 
 2.34.1
 
