@@ -2,59 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F4AC3DA7D
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Jan 2023 09:50:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58236C46467
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Jan 2023 09:50:47 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 180204BB84;
-	Tue,  3 Jan 2023 04:50:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B099E4BB71;
+	Tue,  3 Jan 2023 04:50:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pHVr-k7cpQaK; Tue,  3 Jan 2023 04:50:16 -0500 (EST)
+	with ESMTP id 5de5fQP3R70f; Tue,  3 Jan 2023 04:50:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9BC24BB86;
-	Tue,  3 Jan 2023 04:50:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53BE14BB89;
+	Tue,  3 Jan 2023 04:50:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FCE84BB82
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 04:50:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 35B874BB59
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 04:50:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Dq0smeNCOw4U for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Jan 2023 04:50:14 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6628A4BB7E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 04:50:14 -0500 (EST)
+ with ESMTP id Ikc7mHa7cXTn for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 Jan 2023 04:50:44 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 009BE40FBB
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 04:50:43 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id B429B61229;
- Tue,  3 Jan 2023 09:50:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A0DAC433D2;
- Tue,  3 Jan 2023 09:50:13 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 92183B80E70;
+ Tue,  3 Jan 2023 09:50:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B188C433F0;
+ Tue,  3 Jan 2023 09:50:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1672739413;
+ s=k20201202; t=1672739441;
  bh=ksABWOILjZpEH8g2g2MW4ZIXOmX06sjGYHgn9lXfTFo=;
  h=From:To:Cc:Subject:Date:From;
- b=ntAogpfdgc+AQKbqXTyAGwrZhVfC8jfZVkb7vMmvM7M3ahQE/MIr5gsx22X///eHL
- SpC5JwU8WeS91c+uHIcZVWEWY+U7Isa6FjPMqLJ7gpFu0ByDcQ6YF5rZwupH0bEBsR
- Bi3+9/GgWYgnVjM0WI+HFv6KRszTSfKVvfMMsM8F3pNt3VtPO+2Im7ynCpTwJEbjhX
- wNEmhj6LGLYWazn4vOd3UE0VqdhWnFDEPX6sfbI3eDMyFn9S+/wO0SdTUJBuzE0VXg
- anZo9ysYztrn765Ssi2pEOIdIFFma6a1UGObSRsfUEdRba3lcNK0BGAQEQoQKYZdAk
- g7NKe4qC/Mmlg==
+ b=g5Jw+NnWDK6lM4inBLft9cmxDjeWejVbQgxI9tg+L9zjH/A2ju3GT3zmewDQMwA5C
+ 2OHIMEGvSdwMUDNI2gC+CY5H/AzwwgysbSbDOA/WCj7qlomkDH/xEwztbYMWf4qZB4
+ +5chikFtIqXyNNgv8fHVb6t+iNdY6ufSM6sT7XB019cZjKFJvn3AhLZxLrQOFqC3fh
+ AFnHFoUsQz+8Af5JhNts8kcktDUBEiC7tb/O1YKEWD0JHWk9bb1oJb7ry5iQzNo2Yp
+ 6aRt8kRsrVlcGrnnHG2o7Uba3VyafAHdM2u+KdtC6qXC8vhxIc+uaEv3Ji/TOyoxIg
+ H62E2CzfWVPHg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1pCdvu-00GTbx-Nu;
- Tue, 03 Jan 2023 09:50:10 +0000
+ (envelope-from <maz@kernel.org>) id 1pCdwN-00GTcP-3O;
+ Tue, 03 Jan 2023 09:50:39 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: <kvmarm@lists.cs.columbia.edu>,
 	<kvmarm@lists.linux.dev>
 Subject: [PATCH 0/3] KVM: arm64: M2 vgic maintenance interrupt rework pre-NV
-Date: Tue,  3 Jan 2023 09:49:50 +0000
-Message-Id: <20230103094950.3230912-1-maz@kernel.org>
+Date: Tue,  3 Jan 2023 09:50:19 +0000
+Message-Id: <20230103095022.3230946-1-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
