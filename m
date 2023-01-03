@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937D520E4
-	for <kvmarm@lists.linux.dev>; Tue,  3 Jan 2023 10:11:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20F3DC433D2;
-	Tue,  3 Jan 2023 10:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3776320E4
+	for <kvmarm@lists.linux.dev>; Tue,  3 Jan 2023 10:13:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2D27C433F2;
+	Tue,  3 Jan 2023 10:13:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1672740670;
-	bh=WIRV9KeB+qBR1jtRqfl+nRZmcaTal+PfFn3fayW3MbA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=aD+3j0aGED8xAJEtKKQsSDWuHJH5cdS2wOM0FGzxKFLLYw9R+EQwt1g4O+1a/RK3f
-	 7N47+cdsKzrhBzz1XYSyVl6YgbfvK3/keai+86uJ3SDsG8Nld9ybVkiZ7k9MQsaeyC
-	 qaMtL+EFKi3b7gV+XgbP5MD7cijBDXqMjnFIqzi0LY/SM8uZUqO47XSkuUGckA8t0t
-	 hkJRpma3Y4rR6MERm2vkraygD9tkM/+R5pwu90YN1PQ83yVkiqOJ+kWvyVMFtRE0jm
-	 +fMVxCQA/Q2yOWpeWiFQ6xsTmvdCHOR6hvp1qYBpv9WO4P5WybpUhij6CRLEstREHK
-	 J9uXF/S3RWz2A==
+	s=k20201202; t=1672740790;
+	bh=/36RZNkiPAxwtJXfCBhVvkMEDyUrBPHpASIPH0DBj1M=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=pjT73yj6JSjz9uV37Vt7kNnqDBn5vDcYZPWPHHY8okMHqMl58/pj+yEoowL2ZnUnp
+	 IyreHta2bDrXSA7fjsnD9hJ9q5KEtTQ+MICXlxjye81rVv3VQF6tGzHlarwUgvaMC/
+	 EU7nVXWVA74sWsrYTvq39WCAKJ4jUdXdgkv34AhbaiZJVq4G2MZnMrj684yJ5bMthC
+	 +qusl0brQvqmTfRtFWxLiPWpt5KG4IKRve/bcGoZFRU6NMcVCyCppxnNDjlNvI6PlX
+	 A5R2NUOLP3kpTifk/hwBmutO7zCGewpOrEKv1MwMF1bw8ILRk+RQLMGSoOj2nCUI94
+	 FjUTi680ybQAw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pCeEF-00GTpw-PU;
-	Tue, 03 Jan 2023 10:11:08 +0000
+	id 1pCeI8-00GTpw-Sk;
+	Tue, 03 Jan 2023 10:13:08 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: <kvmarm@lists.cs.columbia.edu>,
 	<kvmarm@lists.linux.dev>,
@@ -34,10 +34,12 @@ Cc: James Morse <james.morse@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Quentin Perret <qperret@google.com>,
 	Ricardo Koller <ricarkol@google.com>
-Subject: [PATCH v2 0/3] KVM: arm64: Fix handling of S1PTW S2 fault on RO memslots
-Date: Tue,  3 Jan 2023 10:09:01 +0000
-Message-ID: <20230103100904.3232426-1-maz@kernel.org>
+Subject: [PATCH v2 2/3] KVM: arm64: Document the behaviour of S1PTW faults on RO memslots
+Date: Tue,  3 Jan 2023 10:09:03 +0000
+Message-ID: <20230103100904.3232426-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230103100904.3232426-1-maz@kernel.org>
+References: <20230103100904.3232426-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,51 +51,43 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ardb@kernel.org, will@kernel.org, qperret@google.com, ricarkol@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20230103100901.NnXeaglXptfh67A2IJ8EFKnUYIYoGCPEglwDFHWSLbg@z>
+Message-ID: <20230103100903.oWKb0jWTQiOtz8PCkyNSz3X8ZWHkeW0Mt_j7LBsGw5E@z>
 
-Recent developments on the EFI front have resulted in guests that
-simply won't boot if the page tables are in a read-only memslot and
-that you're a bit unlucky in the way S2 gets paged in... The core
-issue is related to the fact that we treat a S1PTW as a write, which
-is close enough to what needs to be done. Until to get to RO memslots.
+Although the KVM API says that a write to a RO memslot must result
+in a KVM_EXIT_MMIO describing the write, the arm64 architecture
+doesn't provide the *data* written by a Stage-1 page table walk
+(we only get the address).
 
-The first patch fixes this and is definitely a stable candidate. It
-splits the faulting of page tables in two steps (RO translation fault,
-followed by a writable permission fault -- should it even happen).
-The second one documents the slightly odd behaviour of PTW writes to
-RO memslot, which do not result in a KVM_MMIO exit. The last patch is
-totally optional, only tangentially related, and randomly repainting
-stuff (maybe that's contagious, who knows).
+Since there isn't much userspace can do with so little information
+anyway, document the fact that such an access results in a guest
+exception, not an exit. This is consistent with the guest being
+terminally broken anyway.
 
-The whole thing is on top of v6.1-rc2.
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ Documentation/virt/kvm/api.rst | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-I plan to take this in as a fix shortly.
-
-	M.
-
-* From v1:
-
-  - Added the documentation patch
-
-  - Dropped the AF micro-optimisation, as it was creating more
-    confusion, was hard to test, and was of dubious value
-
-  - Collected RBs, with thanks
-
-Marc Zyngier (3):
-  KVM: arm64: Fix S1PTW handling on RO memslots
-  KVM: arm64: Document the behaviour of S1PTW faults on RO memslots
-  KVM: arm64: Convert FSC_* over to ESR_ELx_FSC_*
-
- Documentation/virt/kvm/api.rst          |  8 +++++
- arch/arm64/include/asm/esr.h            |  9 ++++++
- arch/arm64/include/asm/kvm_arm.h        | 15 ---------
- arch/arm64/include/asm/kvm_emulate.h    | 42 ++++++++++++++++++-------
- arch/arm64/kvm/hyp/include/hyp/fault.h  |  2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
- arch/arm64/kvm/mmu.c                    | 21 +++++++------
- 7 files changed, 61 insertions(+), 38 deletions(-)
-
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 0dd5d8733dd5..42db72a0cbe6 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -1354,6 +1354,14 @@ the memory region are automatically reflected into the guest.  For example, an
+ mmap() that affects the region will be made visible immediately.  Another
+ example is madvise(MADV_DROP).
+ 
++Note: On arm64, a write generated by the page-table walker (to update
++the Access and Dirty flags, for example) never results in a
++KVM_EXIT_MMIO exit when the slot has the KVM_MEM_READONLY flag. This
++is because KVM cannot provide the data that would be written by the
++page-table walker, making it impossible to emulate the access.
++Instead, an abort (data abort if the cause of the page-table update
++was a load or a store, instruction abort if it was an instruction
++fetch) is injected in the guest.
+ 
+ 4.36 KVM_SET_TSS_ADDR
+ ---------------------
 -- 
 2.34.1
 
