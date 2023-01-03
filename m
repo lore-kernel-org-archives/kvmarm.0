@@ -2,53 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14375C46467
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Jan 2023 12:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF492C3DA7D
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Jan 2023 12:47:31 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CE764B6B9;
-	Tue,  3 Jan 2023 07:40:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C8584BB4A;
+	Tue,  3 Jan 2023 07:47:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CWO5y3qY9VWx; Tue,  3 Jan 2023 07:40:41 -0500 (EST)
+	with ESMTP id g8lAAfMx9wVH; Tue,  3 Jan 2023 07:47:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1992640683;
-	Tue,  3 Jan 2023 07:40:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FD584BB4F;
+	Tue,  3 Jan 2023 07:47:30 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF08E4BB65
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 07:40:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C5D34BB13
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 07:47:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Mv9x8qlZfuNM for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Jan 2023 07:40:38 -0500 (EST)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com
- [185.176.79.56])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E1F684BB67
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 07:40:37 -0500 (EST)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.207])
- by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4NmXJr05nbz6HJj0;
- Tue,  3 Jan 2023 20:35:55 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Tue, 3 Jan
- 2023 12:40:34 +0000
-Date: Tue, 3 Jan 2023 12:40:34 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 0/7] KVM: arm64: PMU: Allow userspace to limit the
- number of PMCs on vCPU
-Message-ID: <20230103124034.000027aa@Huawei.com>
-In-Reply-To: <20221230035928.3423990-1-reijiw@google.com>
+ with ESMTP id MtfjOX4v+MKq for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 Jan 2023 07:47:24 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 22D5D4BA12
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 07:47:24 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id C27C7B80E50;
+ Tue,  3 Jan 2023 12:47:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AF2DC433EF;
+ Tue,  3 Jan 2023 12:47:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1672750041;
+ bh=fmL8KjCcvKRY2xHo4keozvHeaPX7SCsSBhRNSxlj99U=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=M0G1INN85CDvLDcTCnOedHctGvxW1od+1e0XGvX9RwTKH4oagjlWh0ZHc+B5J6Mnr
+ bxV8YCFXhzzEj+XKdxj0LHNIsQ6bktT0Ch1ybgKkd+5HR0C8J8rSzFK0F4p+ANKop2
+ WIfheMQFG1O2oNCdRANO66mwoHoBDtchkV3ria5qRJwAPXoTdpKPe1wrhxLylcb9sE
+ teUJaPSaJiTSrKDtWw++g/Cikbpq9nGuz3NJjUfH+ItoEkiQFOI4LjI0WAFzZeoBJy
+ bFmMDgBDjeLX4rEx9mT17SuIGqVxoeVDWnue8QAzZ7y5qbWorLywMqSmYEl38D6q0x
+ 0xP/kS2KaYUFA==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=goblin-girl.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
+ (envelope-from <maz@kernel.org>) id 1pCghL-00GVWW-7K;
+ Tue, 03 Jan 2023 12:47:19 +0000
+Date: Tue, 03 Jan 2023 12:47:18 +0000
+Message-ID: <86y1qj7pk9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+Subject: Re: [PATCH 0/7] KVM: arm64: PMU: Allow userspace to limit the number
+ of PMCs on vCPU
+In-Reply-To: <20230103124034.000027aa@Huawei.com>
 References: <20221230035928.3423990-1-reijiw@google.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
-MIME-Version: 1.0
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ <20230103124034.000027aa@Huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Jonathan.Cameron@Huawei.com, reijiw@google.com,
+ kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com,
+ ricarkol@google.com, oliver.upton@linux.dev, jingzhangos@google.com,
+ rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
  Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -67,80 +92,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 29 Dec 2022 19:59:21 -0800
-Reiji Watanabe <reijiw@google.com> wrote:
+On Tue, 03 Jan 2023 12:40:34 +0000,
+Jonathan Cameron <Jonathan.Cameron@Huawei.com> wrote:
+> 
+> On Thu, 29 Dec 2022 19:59:21 -0800
+> Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> > The goal of this series is to allow userspace to limit the number
+> > of PMU event counters on the vCPU.
+> 
+> Hi Rieji,
+> 
+> Why do you want to do this?
+> 
+> I can conjecture a bunch of possible reasons, but they may not
+> match up with your use case. It would be useful to have that information
+> in the cover letter.
 
-> The goal of this series is to allow userspace to limit the number
-> of PMU event counters on the vCPU.
+The most obvious use case is to support migration across systems that
+implement different numbers of counters. Similar reasoning could also
+apply to the debug infrastructure (watchpoints, breakpoints).
 
-Hi Rieji,
+In any case, being able to decouple the VM from the underlying HW
+within the extent that the architecture permits it seems like a
+valuable goal.
 
-Why do you want to do this?
+Thanks,
 
-I can conjecture a bunch of possible reasons, but they may not
-match up with your use case. It would be useful to have that information
-in the cover letter.
+	M.
 
-Jonathan
-
-> 
-> The number of PMU event counters is indicated in PMCR_EL0.N.
-> For a vCPU with PMUv3 configured, its value will be the same as
-> the host value by default. Userspace can set PMCR_EL0.N for the
-> vCPU to a lower value than the host value, using KVM_SET_ONE_REG.
-> However, it is practically unsupported, as KVM resets PMCR_EL0.N
-> to the host value on vCPU reset and some KVM code uses the host
-> value to identify (un)implemented event counters on the vCPU.
-> 
-> This series will ensure that the PMCR_EL0.N value is preserved
-> on vCPU reset and that KVM doesn't use the host value
-> to identify (un)implemented event counters on the vCPU.
-> This allows userspace to limit the number of the PMU event
-> counters on the vCPU.
-> 
-> Patch 1 fixes reset_pmu_reg() to ensure that (RAZ) bits of
-> {PMCNTEN,PMOVS}{SET,CLR}_EL1 corresponding to unimplemented event
-> counters on the vCPU are reset to zero even when PMCR_EL0.N for
-> the vCPU is different from the host.
-> 
-> Patch 2 is a minor refactoring to use the default PMU register reset
-> function (reset_pmu_reg()) for PMUSERENR_EL0 and PMCCFILTR_EL0.
-> (With the Patch 1 change, reset_pmu_reg() can now be used for
-> those registers)
-> 
-> Patch 3 fixes reset_pmcr() to preserve PMCR_EL0.N for the vCPU on
-> vCPU reset.
-> 
-> Patch 4-7 adds a selftest to verify reading and writing PMU registers
-> for implemented or unimplemented PMU event counters on the vCPU.
-> 
-> The series is based on kvmarm/fixes at the following commit:
->   commit aff234839f8b ("KVM: arm64: PMU: Fix PMCR_EL0 reset value")
-> 
-> Reiji Watanabe (7):
->   KVM: arm64: PMU: Have reset_pmu_reg() to clear a register
->   KVM: arm64: PMU: Use reset_pmu_reg() for PMUSERENR_EL0 and
->     PMCCFILTR_EL0
->   KVM: arm64: PMU: Preserve vCPU's PMCR_EL0.N value on vCPU reset
->   tools: arm64: Import perf_event.h
->   KVM: selftests: aarch64: Introduce vpmu_counter_access test
->   KVM: selftests: aarch64: vPMU register test for implemented counters
->   KVM: selftests: aarch64: vPMU register test for unimplemented counters
-> 
->  arch/arm64/kvm/pmu-emul.c                     |   6 +
->  arch/arm64/kvm/sys_regs.c                     |  18 +-
->  tools/arch/arm64/include/asm/perf_event.h     | 258 ++++++++
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../kvm/aarch64/vpmu_counter_access.c         | 613 ++++++++++++++++++
->  .../selftests/kvm/include/aarch64/processor.h |   1 +
->  7 files changed, 886 insertions(+), 12 deletions(-)
->  create mode 100644 tools/arch/arm64/include/asm/perf_event.h
->  create mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> 
-> 
-> base-commit: aff234839f8b80ac101e6c2f14d0e44b236efa48
-
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
