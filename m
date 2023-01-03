@@ -1,117 +1,126 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9EC79C5
-	for <kvmarm@lists.linux.dev>; Tue,  3 Jan 2023 12:57:21 +0000 (UTC)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.207])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4NmXJr05nbz6HJj0;
-	Tue,  3 Jan 2023 20:35:55 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Tue, 3 Jan
- 2023 12:40:34 +0000
-Date: Tue, 3 Jan 2023 12:40:34 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Reiji Watanabe <reijiw@google.com>
-CC: Marc Zyngier <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>,
-	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose
-	<suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Ricardo
- Koller" <ricarkol@google.com>, Oliver Upton <oliver.upton@linux.dev>, "Jing
- Zhang" <jingzhangos@google.com>, Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [PATCH 0/7] KVM: arm64: PMU: Allow userspace to limit the
- number of PMCs on vCPU
-Message-ID: <20230103124034.000027aa@Huawei.com>
-In-Reply-To: <20221230035928.3423990-1-reijiw@google.com>
-References: <20221230035928.3423990-1-reijiw@google.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC51F79FA
+	for <kvmarm@lists.linux.dev>; Tue,  3 Jan 2023 14:28:04 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 98DDE152B;
+	Tue,  3 Jan 2023 06:28:45 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 617043F587;
+	Tue,  3 Jan 2023 06:28:02 -0800 (PST)
+Date: Tue, 3 Jan 2023 14:27:59 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: will@kernel.org, mark.rutland@arm.com,
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org,
+	james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev,
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu
+Subject: Re: KVM: arm64: A new approach for SPE support
+Message-ID: <Y7Q7b7+BKKBajIo2@monolith.localdoman>
+References: <Y34GvXY/xMpev39K@monolith.localdoman>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
-Message-ID: <20230103124034.Kq-t2pRdc51kYqqEpLdxTqIQVhuVUeWzkub7bGcWzpg@z>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y34GvXY/xMpev39K@monolith.localdoman>
+Message-ID: <20230103142759.a3hPLd8EW4QFmcs9dfZuFmdPFwNxxxfkpIE3lkS7FX4@z>
 
-On Thu, 29 Dec 2022 19:59:21 -0800
-Reiji Watanabe <reijiw@google.com> wrote:
+Hi,
 
-> The goal of this series is to allow userspace to limit the number
-> of PMU event counters on the vCPU.
+Gentle ping regarding this.
 
-Hi Rieji,
+Thanks,
+Alex
 
-Why do you want to do this?
-
-I can conjecture a bunch of possible reasons, but they may not
-match up with your use case. It would be useful to have that information
-in the cover letter.
-
-Jonathan
-
+On Wed, Nov 23, 2022 at 11:40:45AM +0000, Alexandru Elisei wrote:
+> The previous discussion about how best to add SPE support to KVM [1] is
+> heading in the direction of pinning at EL2 only the buffer, when the guest
+> enables profiling, instead of pinning the entire VM memory. Although better
+> than pinning the entire VM at EL2, it still has some disadvantages:
 > 
-> The number of PMU event counters is indicated in PMCR_EL0.N.
-> For a vCPU with PMUv3 configured, its value will be the same as
-> the host value by default. Userspace can set PMCR_EL0.N for the
-> vCPU to a lower value than the host value, using KVM_SET_ONE_REG.
-> However, it is practically unsupported, as KVM resets PMCR_EL0.N
-> to the host value on vCPU reset and some KVM code uses the host
-> value to identify (un)implemented event counters on the vCPU.
+> 1. Pinning memory at stage 2 goes against the design principle of secondary
+> MMUs, which must reflect all changes in the primary (host's stage 1) page
+> tables. This means a mechanism by which to pin VM memory at stage 2 must be
+> created from scratch just for SPE. Although I haven't done this yet, I'm a
+> bit concerned that this will turn out to be fragile and/or complicated.
 > 
-> This series will ensure that the PMCR_EL0.N value is preserved
-> on vCPU reset and that KVM doesn't use the host value
-> to identify (un)implemented event counters on the vCPU.
-> This allows userspace to limit the number of the PMU event
-> counters on the vCPU.
+> 2. The architecture allows software to change the VA to IPA translations
+> for the profiling buffer when the buffer is enabled if profiling is
+> disabled (the buffer is enabled, but sampling is disabled). Since SPE can
+> be programmed to profile EL0 only, and there is no easy way for KVM to trap
+> the exact moment when profiling becomes enabled in this scenario to
+> translate the buffer's guest VAs to IPA, to pin the IPAs at stage 2, it is
+> required for KVM impose limitations on how a guest uses SPE for emulation
+> to work.
 > 
-> Patch 1 fixes reset_pmu_reg() to ensure that (RAZ) bits of
-> {PMCNTEN,PMOVS}{SET,CLR}_EL1 corresponding to unimplemented event
-> counters on the vCPU are reset to zero even when PMCR_EL0.N for
-> the vCPU is different from the host.
+> I've prototyped a new approach [2] which eliminates both disadvantages, but
+> comes with its own set of drawbacks. The approach I've been working on is
+> to have KVM allocate a buffer in the kernel address space to profile the
+> guest, and when the buffer becomes full (or profiling is disabled for other
+> reasons), to copy the contents of the buffer to guest memory.
 > 
-> Patch 2 is a minor refactoring to use the default PMU register reset
-> function (reset_pmu_reg()) for PMUSERENR_EL0 and PMCCFILTR_EL0.
-> (With the Patch 1 change, reset_pmu_reg() can now be used for
-> those registers)
+> I'll start with the advantages:
 > 
-> Patch 3 fixes reset_pmcr() to preserve PMCR_EL0.N for the vCPU on
-> vCPU reset.
+> 1. No memory pinning at stage 2.
 > 
-> Patch 4-7 adds a selftest to verify reading and writing PMU registers
-> for implemented or unimplemented PMU event counters on the vCPU.
+> 2. No meaningful restrictions on how the guest programs SPE, since the
+> translation of the guest VAs to IPAs is done by KVM when profiling has been
+> completed.
 > 
-> The series is based on kvmarm/fixes at the following commit:
->   commit aff234839f8b ("KVM: arm64: PMU: Fix PMCR_EL0 reset value")
+> 3. Neoverse N1 errata 1978083 ("Incorrect programming of PMBPTR_EL1 might
+> result in a deadlock") [6] is handled without any extra work.
 > 
-> Reiji Watanabe (7):
->   KVM: arm64: PMU: Have reset_pmu_reg() to clear a register
->   KVM: arm64: PMU: Use reset_pmu_reg() for PMUSERENR_EL0 and
->     PMCCFILTR_EL0
->   KVM: arm64: PMU: Preserve vCPU's PMCR_EL0.N value on vCPU reset
->   tools: arm64: Import perf_event.h
->   KVM: selftests: aarch64: Introduce vpmu_counter_access test
->   KVM: selftests: aarch64: vPMU register test for implemented counters
->   KVM: selftests: aarch64: vPMU register test for unimplemented counters
+> As I see it, there are two main disadvantages:
 > 
->  arch/arm64/kvm/pmu-emul.c                     |   6 +
->  arch/arm64/kvm/sys_regs.c                     |  18 +-
->  tools/arch/arm64/include/asm/perf_event.h     | 258 ++++++++
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../kvm/aarch64/vpmu_counter_access.c         | 613 ++++++++++++++++++
->  .../selftests/kvm/include/aarch64/processor.h |   1 +
->  7 files changed, 886 insertions(+), 12 deletions(-)
->  create mode 100644 tools/arch/arm64/include/asm/perf_event.h
->  create mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+> 1. The contents of the KVM buffer must be copied to the guest. In the
+> prototype this is done all at once, when profiling is stopped [3].
+> Presumably this can be amortized by unmapping the pages corresponding to
+> the guest buffer from stage 2 (or marking them as invalid) and copying the
+> data when the guest reads from those pages. Needs investigating.
 > 
+> 2. When KVM profiles the guest, the KVM buffer owning exception level must
+> necessarily be EL2. This means that while profiling is happening,
+> PMBIDR_EL1.P = 1 (programming of the buffer is not allowed). PMBIDR_EL1
+> cannot be trapped without FEAT_FGT, so a guest that reads the register
+> after profiling becomes enabled will read the P bit as 1. I cannot think of
+> any valid reason for a guest to look at the bit after enabling profiling.
+> With FEAT_FGT, KVM would be able to trap accesses to the register.
 > 
-> base-commit: aff234839f8b80ac101e6c2f14d0e44b236efa48
-
+> 3. In the worst case scenario, when the entire VM memory is mapped in the
+> host, this approach consumes more memory because the memory for the buffer
+> is separate from the memory allocated to the VM. On the plus side, there
+> will always be less memory pinned in the host for the VM process, since
+> only the buffer has to be pinned, instead of the buffer plus the guest's
+> stage 1 translation tables (to avoid SPE encountering a stage 2 fault on a
+> stage 1 translation table walk). Could be mitigated by providing an ioctl
+> to userspace to set the maximum size for the buffer.
+> 
+> I prefer this new approach instead of pinning the buffer at stage 2. It is
+> straightforward, less fragile and doesn't limit how a guest can program
+> SPE.
+> 
+> As for the prototype, I wrote it as a quick way to check if this approach
+> is viable. Does not have SPE support for the nVHE case because I would have
+> had to figure out how to map a continuous VA range in the EL2's translation
+> tables; supporting only the VHE case was a lot easier.  The prototype
+> doesn't have a stage 1 walker, so it's limited to guests that use id-mapped
+> addresses from TTBR0_EL1 for the buffer (although it would be trivial to
+> modify it to accept addresses from TTBR1_EL1) - I've used kvm-unit-tests
+> for testing [4]. I've tested the prototype on the model and on an Ampere
+> Altra.
+> 
+> For those interested, kvmtool support to run the prototype has also been
+> added [5] (add --spe to the command line to run a VM).
+> 
+> [1] https://lore.kernel.org/all/Yl6+JWaP+mq2Nc0b@monolith.localdoman/
+> [2] https://gitlab.arm.com/linux-arm/linux-ae/-/tree/kvm-spe-v6-copy-buffer-wip4-without-nvhe
+> [3] https://gitlab.arm.com/linux-arm/linux-ae/-/blob/kvm-spe-v6-copy-buffer-wip4-without-nvhe/arch/arm64/kvm/spe.c#L197
+> [4] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/kvm-spe-v6-copy-buffer-wip4
+> [5] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/kvm-spe-v6-copy-buffer-wip4
+> [6] https://developer.arm.com/documentation/SDEN885747/latest
+> 
+> Thanks,
+> Alex
+> 
