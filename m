@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF62BC46467
-	for <kvmarm@archiver.kernel.org>; Tue,  3 Jan 2023 09:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A0C3C3DA7D
+	for <kvmarm@archiver.kernel.org>; Tue,  3 Jan 2023 09:50:55 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87FB74BB8C;
-	Tue,  3 Jan 2023 04:50:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 073C84BB11;
+	Tue,  3 Jan 2023 04:50:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 23ipOz0NyX+v; Tue,  3 Jan 2023 04:50:48 -0500 (EST)
+	with ESMTP id lwOVnIrPgTlJ; Tue,  3 Jan 2023 04:50:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A2C6411D3;
-	Tue,  3 Jan 2023 04:50:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A57D84BB7E;
+	Tue,  3 Jan 2023 04:50:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FF1740F30
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 04:50:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 19EA34BB11
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 04:50:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Arh5LqBrgZQj for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Jan 2023 04:50:43 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 09988411D3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 04:50:42 -0500 (EST)
+ with ESMTP id rZw81r1wlgIZ for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 Jan 2023 04:50:51 -0500 (EST)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 407D140FBB
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 04:50:50 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 7FF4A6122B;
- Tue,  3 Jan 2023 09:50:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8E3DC43392;
+ by sin.source.kernel.org (Postfix) with ESMTPS id AC3EACE0FED;
+ Tue,  3 Jan 2023 09:50:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDAB6C43396;
  Tue,  3 Jan 2023 09:50:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=k20201202; t=1672739441;
- bh=ARLfbpBM69dXDtUx7JEBSy4KWdTmviEfk9qRcpSeYPM=;
+ bh=LnbPmwBFwRROsH14ElnGWhQ/uokKwoNdvE7Mu57CUW4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=GdQr+NHPQAJ+Ij1jsH782ej6DuZ5M8bl5ceEdI/mosMJn2peIBgjl6D0kygQrEENF
- DsFyhme9/k7cYXWf04r1jjTRFsX0YtAEV9Or2S8q479OhNynAfZkrD1VP/ehs3h+7E
- ytfNGEs5Kl6ZreIkkH/9CCfkjLkCJveo/dgYrzWct0stsioYg6ES1HNn5vLe7GLloI
- djxp8FssKWatHN5BshdArNm0pRLOyTxq30Nyb6/V/hgoxAFcL7yOiyS0CBR62gxF4i
- OLZvTYaFHF/kAQFZRGg5aNAYcgtiRnpTN0piWe1QsED3pPvSAIfpeOX8jFFe2cnPsO
- AeJptl9eUoRNA==
+ b=g/1Lt9wY022EX/9bDOLcEczP2G1XtOC8yV+cAWjmsb0VHhszxYOnyAkFNiYHf27HC
+ sur0mUwSGRZNXrMKVGP8zvO8ppzI0YGrmQ64TO6L/uzmUx8Y0IB6wrmNejxZsovdWO
+ jnoyPhNQHgMIf0Og3/B9p8E14y8PpDb22e9J/lsmKohPHQSkv8RM79d42iNrsZAxdV
+ 7ALMvk1CWTFSpIyUBaYKYsG76Fk/M7EMkQGAk1ThpHBjAz4DOLNGl/KAvWi6/LV+m9
+ 2HMlKVDcoV1WCTxlU8gnJmtoxNw8IUcJmZZLWQwssedPkddaojICuXNJOX4P3WFDVi
+ 8fF6SzreYk0Sw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.95)
- (envelope-from <maz@kernel.org>) id 1pCdwN-00GTcP-M8;
- Tue, 03 Jan 2023 09:50:39 +0000
+ (envelope-from <maz@kernel.org>) id 1pCdwN-00GTcP-Ts;
+ Tue, 03 Jan 2023 09:50:40 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: <kvmarm@lists.cs.columbia.edu>,
 	<kvmarm@lists.linux.dev>
-Subject: [PATCH 2/3] KVM: arm64: vgic: Allow registration of a non-maskable
- maintenance interrupt
-Date: Tue,  3 Jan 2023 09:50:21 +0000
-Message-Id: <20230103095022.3230946-3-maz@kernel.org>
+Subject: [PATCH 3/3] irqchip/apple-aic: Register vgic maintenance interrupt
+ with KVM
+Date: Tue,  3 Jan 2023 09:50:22 +0000
+Message-Id: <20230103095022.3230946-4-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230103095022.3230946-1-maz@kernel.org>
 References: <20230103095022.3230946-1-maz@kernel.org>
@@ -91,31 +91,103 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Our Apple M1/M2 friends do have a per-CPU maintenance interrupt,
-but no mask to make use of it in the standard Linux framework.
-
-Given that KVM directly drives the *source* of the interrupt and
-leaves the GIC interrupt always enabled, there is no harm in tolerating
-such a setup. It will become useful once we enable NV on M2 HW.
+In order to deliver vgic maintenance interrupts that Nested Virt
+requires, hook it into the FIQ space, even if it is delivered
+as an IRQ (we don't distinguish between the two anyway).
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-init.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/irqchip/irq-apple-aic.c | 55 +++++++++++++++++++++++++--------
+ 1 file changed, 42 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index f6d4f4052555..e61d9ca01768 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -572,7 +572,7 @@ int kvm_vgic_hyp_init(void)
- 	if (ret)
- 		return ret;
+diff --git a/drivers/irqchip/irq-apple-aic.c b/drivers/irqchip/irq-apple-aic.c
+index ae3437f03e6c..09fd52d91e45 100644
+--- a/drivers/irqchip/irq-apple-aic.c
++++ b/drivers/irqchip/irq-apple-aic.c
+@@ -210,7 +210,6 @@
+ 				 FIELD_PREP(AIC_EVENT_NUM, x))
+ #define AIC_HWIRQ_IRQ(x)	FIELD_GET(AIC_EVENT_NUM, x)
+ #define AIC_HWIRQ_DIE(x)	FIELD_GET(AIC_EVENT_DIE, x)
+-#define AIC_NR_FIQ		6
+ #define AIC_NR_SWIPI		32
  
--	if (!has_mask)
-+	if (!has_mask && !kvm_vgic_global_state.maint_irq)
- 		return 0;
+ /*
+@@ -222,11 +221,18 @@
+  * running at EL2 (with VHE). When the kernel is running at EL1, the
+  * mapping differs and aic_irq_domain_translate() performs the remapping.
+  */
+-
+-#define AIC_TMR_EL0_PHYS	AIC_TMR_HV_PHYS
+-#define AIC_TMR_EL0_VIRT	AIC_TMR_HV_VIRT
+-#define AIC_TMR_EL02_PHYS	AIC_TMR_GUEST_PHYS
+-#define AIC_TMR_EL02_VIRT	AIC_TMR_GUEST_VIRT
++enum fiq_hwirq {
++	/* Must be ordered as in apple-aic.h */
++	AIC_TMR_EL0_PHYS	= AIC_TMR_HV_PHYS,
++	AIC_TMR_EL0_VIRT	= AIC_TMR_HV_VIRT,
++	AIC_TMR_EL02_PHYS	= AIC_TMR_GUEST_PHYS,
++	AIC_TMR_EL02_VIRT	= AIC_TMR_GUEST_VIRT,
++	AIC_CPU_PMU_Effi	= AIC_CPU_PMU_E,
++	AIC_CPU_PMU_Perf	= AIC_CPU_PMU_P,
++	/* No need for this to be discovered from DT */
++	AIC_VGIC_MI,
++	AIC_NR_FIQ
++};
  
- 	ret = request_percpu_irq(kvm_vgic_global_state.maint_irq,
+ static DEFINE_STATIC_KEY_TRUE(use_fast_ipi);
+ 
+@@ -384,14 +390,20 @@ static void __exception_irq_entry aic_handle_irq(struct pt_regs *regs)
+ 
+ 	/*
+ 	 * vGIC maintenance interrupts end up here too, so we need to check
+-	 * for them separately. This should never trigger if KVM is working
+-	 * properly, because it will have already taken care of clearing it
+-	 * on guest exit before this handler runs.
++	 * for them separately. It should however only trigger when NV is
++	 * in use, and be cleared when coming back from the handler.
+ 	 */
+-	if (is_kernel_in_hyp_mode() && (read_sysreg_s(SYS_ICH_HCR_EL2) & ICH_HCR_EN) &&
+-		read_sysreg_s(SYS_ICH_MISR_EL2) != 0) {
+-		pr_err_ratelimited("vGIC IRQ fired and not handled by KVM, disabling.\n");
+-		sysreg_clear_set_s(SYS_ICH_HCR_EL2, ICH_HCR_EN, 0);
++	if (is_kernel_in_hyp_mode() &&
++	    (read_sysreg_s(SYS_ICH_HCR_EL2) & ICH_HCR_EN) &&
++	    read_sysreg_s(SYS_ICH_MISR_EL2) != 0) {
++		generic_handle_domain_irq(aic_irqc->hw_domain,
++					  AIC_FIQ_HWIRQ(AIC_VGIC_MI));
++
++		if (unlikely((read_sysreg_s(SYS_ICH_HCR_EL2) & ICH_HCR_EN) &&
++			     read_sysreg_s(SYS_ICH_MISR_EL2))) {
++			pr_err_ratelimited("vGIC IRQ fired and not handled by KVM, disabling.\n");
++			sysreg_clear_set_s(SYS_ICH_HCR_EL2, ICH_HCR_EN, 0);
++		}
+ 	}
+ }
+ 
+@@ -1178,6 +1190,23 @@ static int __init aic_of_ic_init(struct device_node *node, struct device_node *p
+ 			  "irqchip/apple-aic/ipi:starting",
+ 			  aic_init_cpu, NULL);
+ 
++	if (is_kernel_in_hyp_mode()) {
++		struct irq_fwspec mi = {
++			.fwnode		= of_node_to_fwnode(node),
++			.param_count	= 3,
++			.param		= {
++				[0]	= AIC_FIQ, /* This is a lie */
++				[1]	= AIC_VGIC_MI,
++				[2]	= IRQ_TYPE_LEVEL_HIGH,
++			},
++		};
++
++		vgic_info.maint_irq = irq_domain_alloc_irqs(irqc->hw_domain,
++							    1, NUMA_NO_NODE,
++							    &mi);
++		WARN_ON(!vgic_info.maint_irq);
++	}
++
+ 	vgic_set_kvm_info(&vgic_info);
+ 
+ 	pr_info("Initialized with %d/%d IRQs * %d/%d die(s), %d FIQs, %d vIPIs",
 -- 
 2.34.1
 
