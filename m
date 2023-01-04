@@ -1,134 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A578F47;
-	Tue,  3 Jan 2023 18:09:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A666C433EF;
-	Tue,  3 Jan 2023 18:09:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1672769391;
-	bh=wQbkIKESYWax/laoInd6DKOdDsdq7q+29rZEh5GwHOs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RVwSE4PnNi48ujVwGRD9zBR80eRryE5pMiSgcTocnildT/U1XvKOPEMBkMvyC9EQN
-	 EvLqZZpi7s4/rEzx/Ov2A/uGONArsC0Sz80GJpgIu5iNbWeZPM+m3vYIZdqzR0LRit
-	 DiUxLGpNtIj/eVtakrNYdxAsjeLShLMZr7fycJBhRlHCa3LTsU95shyo4OuYMozCLp
-	 7XhecoT3Iwf5RT9V3cVf924KtvnbxjbpWuMOQ1CK5Mgn0rde5tMj0f0w06ESGmKDxk
-	 qPO3kkxREPsIs5hHnqphlF30HdVU5Aijj55LImaOTosagWAHRCAfiPyjhd+741naOF
-	 VRyVxy8yQU0sg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pCljQ-00GaOg-73;
-	Tue, 03 Jan 2023 18:09:48 +0000
-Date: Tue, 03 Jan 2023 18:09:47 +0000
-Message-ID: <86tu177ams.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: kvmarm@lists.cs.columbia.edu,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Sven Peter <sven@svenpeter.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Hector Martin <marcan@marcan.st>,
-	linux-kernel@vger.kernel.org,
-	asahi@lists.linux.dev,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Will Deacon <will@kernel.org>,
-	Alyssa Rosenzweig <alyssa@rosenzweig.io>
-Subject: Re: [PATCH 1/3] KVM: arm64: vgic: Add Apple M2 cpus to the list of broken SEIS implementations
-In-Reply-To: <Y7Rs8Lc5u6L2Bz6o@dev-arch.thelio-3990X>
-References: <20230103095022.3230946-1-maz@kernel.org>
-	<20230103095022.3230946-2-maz@kernel.org>
-	<Y7Rs8Lc5u6L2Bz6o@dev-arch.thelio-3990X>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708BC7F
+	for <kvmarm@lists.linux.dev>; Wed,  4 Jan 2023 01:09:40 +0000 (UTC)
+Received: by mail-pl1-f179.google.com with SMTP id jl4so28169630plb.8
+        for <kvmarm@lists.linux.dev>; Tue, 03 Jan 2023 17:09:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2VT5QZhcZZeDbsiEz/fllfSXONvy51XdiSS8QokpwQg=;
+        b=Q4DEfeoNUsJnujmG5WDcxlCAMaEfhBmMWAS7aUzEC2GW3ofbkRwZ22ZYFjITsxmo6K
+         bb0vjmVJXZL0G/l4TGKr3KMTIDcdwQUeKoeFnx6I8MLcodY9TVH6AGEpkz9x9GWI5hwx
+         k7R0UjHzbUt2Ai1wJRy2IFQHhF6DWYLx8cxQAFMWDWI6Xgrug2FARlR3RiNRVi4rCbo9
+         AP/OLiZNnuV7UvZFm8qEsAphMEm93ULbKnV9d+A7rgWdhM6aiDUP6a5tWQx2bF/ggq6A
+         f7JPgRzWEeYZPXHV5Lm4ZgFljKv8WtzXvID2mUUKGwqdRm31BuBbvKfhkRXpKAhdOylW
+         Zj3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2VT5QZhcZZeDbsiEz/fllfSXONvy51XdiSS8QokpwQg=;
+        b=KI7eoMiuWhaUMBMNiSn4fqzoPnPH7BclkBM3XyniWIu8/3qhsVd82JCB3SMvY30t/Z
+         buiIM+J6bcZqhozAuYWzQgD6Q2QSkucyf207SCDRE9PuAfQpFzGt925NzowSUsIgU5/i
+         cBSO1qUxBFMVzqQJe10SrgTyqIwhgEQhpYe3qRLLvtZZT/oc1JXRBOEspyUKm1yzmuFQ
+         WpNX8Rm+/JjVg4OVHHCeqtmGcY5HamLRvzcM1ekEpKqPuUWJp418Qm+3Y6BHw3npgSsN
+         k7+LZbf0gUJD9oxG8B9GoE3QQTeFtrJWX4eLzL6/DYCW2PmKtNbe3GoIUbAtnk4ASk6+
+         JBfw==
+X-Gm-Message-State: AFqh2kpAGXlCuEyjYJYEujwYUu9JXkpvAWl54MS+B01gOCq+y46BSvu1
+	2nqz+RK7hv7Az6hEpu2BlCGOYQ==
+X-Google-Smtp-Source: AMrXdXt4xHOajqscKlKaEpBiTyEw5HpxcS2+BmkjFSTy1AWvaTA2O2HtoOh9s0+BdQR2dE8QR1delA==
+X-Received: by 2002:a17:90a:9912:b0:219:f970:5119 with SMTP id b18-20020a17090a991200b00219f9705119mr3677621pjp.1.1672794579775;
+        Tue, 03 Jan 2023 17:09:39 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id dw6-20020a17090b094600b00223f495dc28sm19707506pjb.14.2023.01.03.17.09.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Jan 2023 17:09:39 -0800 (PST)
+Date: Wed, 4 Jan 2023 01:09:35 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>, Tom Rix <trix@redhat.com>,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+	linux-riscv@lists.infradead.org, llvm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Ricardo Koller <ricarkol@google.com>,
+	Aaron Lewis <aaronlewis@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH 12/14] KVM: selftests: Use wildcards to find library
+ source files
+Message-ID: <Y7TRz1AY95SlKOHv@google.com>
+References: <20221213001653.3852042-1-seanjc@google.com>
+ <20221213001653.3852042-13-seanjc@google.com>
+ <363f4713-6105-82d1-351e-423d07470cdf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: nathan@kernel.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, sven@svenpeter.dev, catalin.marinas@arm.com, marcan@marcan.st, linux-kernel@vger.kernel.org, asahi@lists.linux.dev, tglx@linutronix.de, will@kernel.org, alyssa@rosenzweig.io
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-Message-ID: <20230103180947.jRJJb5CoeBgKLTCSXzQaX6ZDeC5v9cSqgZmKs22agOM@z>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <363f4713-6105-82d1-351e-423d07470cdf@redhat.com>
+Message-ID: <20230104010935.OittzE1-dme_v1v55J9jhfG4yIFexRG6PDbl8vSi-7Q@z>
 
-Hi Nathan,
-
-On Tue, 03 Jan 2023 17:59:12 +0000,
-Nathan Chancellor <nathan@kernel.org> wrote:
+On Sat, Dec 24, 2022, Paolo Bonzini wrote:
+> On 12/13/22 01:16, Sean Christopherson wrote:
+> > Use $(wildcard ...) to find the library source files instead of manually
+> > defining the inputs, which is a maintenance burden and error prone.
 > 
-> Hi Marc,
-> 
-> I have only been lurking on the kvmarm mailing list for a little bit and
-> it has mainly just been reading patches/review to get more familiar with
-> various virtualization concepts so I apologize if the following review
-> is rather shallow but...
+> No, please don't.  This leads to weird errors, for example when "git
+> checkout" is interrupted with ^C.
 
-No need to apologise. Any extra pair of eye is welcome, specially when
-the idiot behind the keyboard writes stuff like the patch below...
+Well, don't do that ;-)
 
-> 
-> On Tue, Jan 03, 2023 at 09:50:20AM +0000, Marc Zyngier wrote:
-> > I really hoped that Apple had fixed their not-quite-a-vgic implementation
-> > when moving from M1 to M2. Alas, it seems they didn't, and running
-> > a buggy EFI version results in the vgic generating SErrors outside
-> > of the guest and taking the host down.
-> > 
-> > Apply the same workaround as for M1. Yes, this is all a bit crap.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/cputype.h | 4 ++++
-> >  arch/arm64/kvm/vgic/vgic-v3.c    | 3 ++-
-> >  2 files changed, 6 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
-> > index 4e8b66c74ea2..683ca3af4084 100644
-> > --- a/arch/arm64/include/asm/cputype.h
-> > +++ b/arch/arm64/include/asm/cputype.h
-> > @@ -124,6 +124,8 @@
-> >  #define APPLE_CPU_PART_M1_FIRESTORM_PRO	0x025
-> >  #define APPLE_CPU_PART_M1_ICESTORM_MAX	0x028
-> >  #define APPLE_CPU_PART_M1_FIRESTORM_MAX	0x029
-> > +#define APPLE_CPU_PART_M2_BLIZZARD	0x032
-> > +#define APPLE_CPU_PART_M2_AVALANCHE	0x033
-> >  
-> >  #define AMPERE_CPU_PART_AMPERE1		0xAC3
-> >  
-> > @@ -177,6 +179,8 @@
-> >  #define MIDR_APPLE_M1_FIRESTORM_PRO MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM_PRO)
-> >  #define MIDR_APPLE_M1_ICESTORM_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM_MAX)
-> >  #define MIDR_APPLE_M1_FIRESTORM_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM_MAX)
-> > +#define MIDR_APPLE_M2_BLIZZARD MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_BLIZZARD)
-> > +#define MIDR_APPLE_M2_AVALANCHE MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_AVALANCHE)
-> >  #define MIDR_AMPERE1 MIDR_CPU_MODEL(ARM_CPU_IMP_AMPERE, AMPERE_CPU_PART_AMPERE1)
-> >  
-> >  /* Fujitsu Erratum 010001 affects A64FX 1.0 and 1.1, (v0r0 and v1r0) */
-> > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> > index 826ff6f2a4e7..c6442b08fe80 100644
-> > --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> > @@ -615,7 +615,8 @@ static const struct midr_range broken_seis[] = {
-> >  	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_PRO),
-> >  	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_PRO),
-> >  	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_MAX),
-> > -	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_MAX),
-> 
-> The commit message makes no note of this removal, was it intentional?
-> MIDR_APPLE_M1_FIRESTORM_MAX is only used here so I assume it is not.
-
-Absolutely not intentional :-/ Thanks a lot for spotting this!
-
-I'll fix this immediately (good thing I didn't send the fixes PR!).
-
-Thanks again,
-
-       M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Are there concerns beyond having an incomplete and/or modified git working tree?
+E.g. could we do something crazy like fail the build by default if the working
+tree isn't pristine?  The library files aren't terrible, but the number of tests
+is getting unwieldy, to say the least.
