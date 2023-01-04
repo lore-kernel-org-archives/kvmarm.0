@@ -2,64 +2,47 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A70C46467
-	for <kvmarm@archiver.kernel.org>; Wed,  4 Jan 2023 11:03:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B4B2C4332F
+	for <kvmarm@archiver.kernel.org>; Wed,  4 Jan 2023 11:04:59 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBBF34BAB1;
-	Wed,  4 Jan 2023 06:03:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AADA94BB00;
+	Wed,  4 Jan 2023 06:04:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GR4m1U-5vn4J; Wed,  4 Jan 2023 06:03:30 -0500 (EST)
+	with ESMTP id rdSeLCo4MwnF; Wed,  4 Jan 2023 06:04:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 930BD4BAE2;
-	Wed,  4 Jan 2023 06:03:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 008BE4BAE2;
+	Wed,  4 Jan 2023 06:04:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2106A4BB65
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 12:59:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 58B664BACD
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Jan 2023 06:04:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sEHD5nI+Ap33 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Jan 2023 12:59:18 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CF7B84B906
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Jan 2023 12:59:17 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 80847B81082;
- Tue,  3 Jan 2023 17:59:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B243C433EF;
- Tue,  3 Jan 2023 17:59:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1672768755;
- bh=BQBoYvfeaYrZ/ZnQHX8h/k1Ir4dAZykoRUflCWLpJfA=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=RkCE0jAhiVPssH7l8lOr8dQjbEUrpGkUrth2kWwRPYN1I+NLfcClNKp1sqla6Me7o
- SMHzi91kte32ChBAoysjwEBkuOuEy4DVBMIKXOyU+TJpc4t7nwPYbcH/ZF/dyYFrpO
- jp1FgiyAZPCQ7aBzo2V7BbfzWv/sc37DTDzyfNQ3yiETANpZV8/qT++PEHJChb13Fw
- DdBMt5VuYcUfHleNL8O95sq/f1YUwky4n9BmSJC/qIS1O2IeghkDvMhZGltZVeDLxu
- 5SxNY1YP3++6tX/FGXkBkaJlPg0hcvEB+dmH39TvLUCIiEDj1XKHgmqXV46P01TNpQ
- 5LBiMveMr6/bQ==
-Date: Tue, 3 Jan 2023 10:59:12 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 1/3] KVM: arm64: vgic: Add Apple M2 cpus to the list of
- broken SEIS implementations
-Message-ID: <Y7Rs8Lc5u6L2Bz6o@dev-arch.thelio-3990X>
-References: <20230103095022.3230946-1-maz@kernel.org>
- <20230103095022.3230946-2-maz@kernel.org>
+ with ESMTP id pETD-wgHWiTP for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Jan 2023 06:04:54 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A3864BAB1
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Jan 2023 06:04:54 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8DF901FB;
+ Wed,  4 Jan 2023 03:05:35 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4E8FD3F587;
+ Wed,  4 Jan 2023 03:04:52 -0800 (PST)
+Date: Wed, 4 Jan 2023 11:04:41 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: KVM: arm64: A new approach for SPE support
+Message-ID: <Y7VdSUmUgcgHsKuw@monolith.localdoman>
+References: <Y34GvXY/xMpev39K@monolith.localdoman>
+ <Y7Q7b7+BKKBajIo2@monolith.localdoman>
+ <Y7VEkaSf4LXCnMBI@FVFF77S0Q05N>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20230103095022.3230946-2-maz@kernel.org>
-X-Mailman-Approved-At: Wed, 04 Jan 2023 06:03:29 -0500
-Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Sven Peter <sven@svenpeter.dev>,
- Catalin Marinas <catalin.marinas@arm.com>, Hector Martin <marcan@marcan.st>,
- linux-kernel@vger.kernel.org, asahi@lists.linux.dev, kvmarm@lists.linux.dev,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+In-Reply-To: <Y7VEkaSf4LXCnMBI@FVFF77S0Q05N>
+Cc: maz@kernel.org, kvmarm@lists.linux.dev, will@kernel.org,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -77,73 +60,188 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Mark,
 
-I have only been lurking on the kvmarm mailing list for a little bit and
-it has mainly just been reading patches/review to get more familiar with
-various virtualization concepts so I apologize if the following review
-is rather shallow but...
+Thank you for having a look!
 
-On Tue, Jan 03, 2023 at 09:50:20AM +0000, Marc Zyngier wrote:
-> I really hoped that Apple had fixed their not-quite-a-vgic implementation
-> when moving from M1 to M2. Alas, it seems they didn't, and running
-> a buggy EFI version results in the vgic generating SErrors outside
-> of the guest and taking the host down.
+On Wed, Jan 04, 2023 at 09:19:25AM +0000, Mark Rutland wrote:
+> On Tue, Jan 03, 2023 at 02:27:59PM +0000, Alexandru Elisei wrote:
+> > Hi,
+> > 
+> > Gentle ping regarding this.
 > 
-> Apply the same workaround as for M1. Yes, this is all a bit crap.
+> Hi Alexandru,
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/cputype.h | 4 ++++
->  arch/arm64/kvm/vgic/vgic-v3.c    | 3 ++-
->  2 files changed, 6 insertions(+), 1 deletion(-)
+> Sorry for the delay; things were a bit hectic at the end of last year, and this
+> is still on my queue of things to look at.
 > 
-> diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
-> index 4e8b66c74ea2..683ca3af4084 100644
-> --- a/arch/arm64/include/asm/cputype.h
-> +++ b/arch/arm64/include/asm/cputype.h
-> @@ -124,6 +124,8 @@
->  #define APPLE_CPU_PART_M1_FIRESTORM_PRO	0x025
->  #define APPLE_CPU_PART_M1_ICESTORM_MAX	0x028
->  #define APPLE_CPU_PART_M1_FIRESTORM_MAX	0x029
-> +#define APPLE_CPU_PART_M2_BLIZZARD	0x032
-> +#define APPLE_CPU_PART_M2_AVALANCHE	0x033
->  
->  #define AMPERE_CPU_PART_AMPERE1		0xAC3
->  
-> @@ -177,6 +179,8 @@
->  #define MIDR_APPLE_M1_FIRESTORM_PRO MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM_PRO)
->  #define MIDR_APPLE_M1_ICESTORM_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_ICESTORM_MAX)
->  #define MIDR_APPLE_M1_FIRESTORM_MAX MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M1_FIRESTORM_MAX)
-> +#define MIDR_APPLE_M2_BLIZZARD MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_BLIZZARD)
-> +#define MIDR_APPLE_M2_AVALANCHE MIDR_CPU_MODEL(ARM_CPU_IMP_APPLE, APPLE_CPU_PART_M2_AVALANCHE)
->  #define MIDR_AMPERE1 MIDR_CPU_MODEL(ARM_CPU_IMP_AMPERE, AMPERE_CPU_PART_AMPERE1)
->  
->  /* Fujitsu Erratum 010001 affects A64FX 1.0 and 1.1, (v0r0 and v1r0) */
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 826ff6f2a4e7..c6442b08fe80 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -615,7 +615,8 @@ static const struct midr_range broken_seis[] = {
->  	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_PRO),
->  	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_PRO),
->  	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_MAX),
-> -	MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_MAX),
-
-The commit message makes no note of this removal, was it intentional?
-MIDR_APPLE_M1_FIRESTORM_MAX is only used here so I assume it is not.
-
-> +	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD),
-> +	MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE),
->  	{},
->  };
->  
-> -- 
-> 2.34.1
+> > Thanks,
+> > Alex
+> > 
+> > On Wed, Nov 23, 2022 at 11:40:45AM +0000, Alexandru Elisei wrote:
+> > > The previous discussion about how best to add SPE support to KVM [1] is
+> > > heading in the direction of pinning at EL2 only the buffer, when the guest
+> > > enables profiling, instead of pinning the entire VM memory. Although better
+> > > than pinning the entire VM at EL2, it still has some disadvantages:
+> > > 
+> > > 1. Pinning memory at stage 2 goes against the design principle of secondary
+> > > MMUs, which must reflect all changes in the primary (host's stage 1) page
+> > > tables. This means a mechanism by which to pin VM memory at stage 2 must be
+> > > created from scratch just for SPE. Although I haven't done this yet, I'm a
+> > > bit concerned that this will turn out to be fragile and/or complicated.
+> > > 
+> > > 2. The architecture allows software to change the VA to IPA translations
+> > > for the profiling buffer when the buffer is enabled if profiling is
+> > > disabled (the buffer is enabled, but sampling is disabled). Since SPE can
+> > > be programmed to profile EL0 only, and there is no easy way for KVM to trap
+> > > the exact moment when profiling becomes enabled in this scenario to
+> > > translate the buffer's guest VAs to IPA, to pin the IPAs at stage 2, it is
+> > > required for KVM impose limitations on how a guest uses SPE for emulation
+> > > to work.
+> > > 
+> > > I've prototyped a new approach [2] which eliminates both disadvantages, but
+> > > comes with its own set of drawbacks. The approach I've been working on is
+> > > to have KVM allocate a buffer in the kernel address space to profile the
+> > > guest, and when the buffer becomes full (or profiling is disabled for other
+> > > reasons), to copy the contents of the buffer to guest memory.
 > 
+> This sounds neat!
+> 
+> I have a few comments below, I'll try to take a more in-depth look shortly.
+> 
+> > > I'll start with the advantages:
+> > > 
+> > > 1. No memory pinning at stage 2.
+> > > 
+> > > 2. No meaningful restrictions on how the guest programs SPE, since the
+> > > translation of the guest VAs to IPAs is done by KVM when profiling has been
+> > > completed.
+> > > 
+> > > 3. Neoverse N1 errata 1978083 ("Incorrect programming of PMBPTR_EL1 might
+> > > result in a deadlock") [6] is handled without any extra work.
+> > > 
+> > > As I see it, there are two main disadvantages:
+> > > 
+> > > 1. The contents of the KVM buffer must be copied to the guest. In the
+> > > prototype this is done all at once, when profiling is stopped [3].
+> > > Presumably this can be amortized by unmapping the pages corresponding to
+> > > the guest buffer from stage 2 (or marking them as invalid) and copying the
+> > > data when the guest reads from those pages. Needs investigating.
+> 
+> I don't think we need to mess with the translation tables here; for a guest to
+> look at the buffer it's going to have to look at PMBPTR_EL1 (and a guest could
+> poll that and issue barriers without ever stopping SPE), so we could also force
+> writebacks when the guest reads PMBPTR_EL1.
 
-Cheers,
-Nathan
+I'm confused about this statement: are you saying that the guest must
+necessarily read PMBPTR_EL1 before accessing the buffer, and therefore KVM
+can defer all writebacks when PMBPTR_EL1 is read, or are you saying that
+KVM could write back the buffer in two cases, when the buffer is full and
+when the guest reads PMBPTR_EL1?
+
+If it's the former, I just can't figure out why a guest must read
+PMBPTR_EL1 before reading the buffer. Isn't a buffer full event all that's
+needed to signal to the OS that the buffer contains valid records?
+
+If it's the latter, then yes, that's a good idea.
+
+> 
+> > > 2. When KVM profiles the guest, the KVM buffer owning exception level must
+> > > necessarily be EL2. This means that while profiling is happening,
+> > > PMBIDR_EL1.P = 1 (programming of the buffer is not allowed). PMBIDR_EL1
+> > > cannot be trapped without FEAT_FGT, so a guest that reads the register
+> > > after profiling becomes enabled will read the P bit as 1. I cannot think of
+> > > any valid reason for a guest to look at the bit after enabling profiling.
+> > > With FEAT_FGT, KVM would be able to trap accesses to the register.
+> 
+> This is unfortunate. :/
+
+It really is.
+
+> 
+> I agree it's unlikely the a guest would look at this, but I could imagine some
+> OSs doing this as a sanity-check, since they never expect this to change, and
+> if it suddenly becomes 1 they might treat this as an error.
+> 
+> Can we require FGT for guest SPE usage?
+
+All the machine that have SPE that I'm aware of don't have FGT. We could
+document this as a limitiation of KVM's SPE emulation on machines that
+don't have FEAT_FGT.
+
+> 
+> > > 3. In the worst case scenario, when the entire VM memory is mapped in the
+> > > host, this approach consumes more memory because the memory for the buffer
+> > > is separate from the memory allocated to the VM. On the plus side, there
+> > > will always be less memory pinned in the host for the VM process, since
+> > > only the buffer has to be pinned, instead of the buffer plus the guest's
+> > > stage 1 translation tables (to avoid SPE encountering a stage 2 fault on a
+> > > stage 1 translation table walk). Could be mitigated by providing an ioctl
+> > > to userspace to set the maximum size for the buffer.
+> 
+> It's a shame we don't have a mechanism to raise an interrupt prior to the SPE
+> buffer becoming full, or we could force a writeback each time we hit a
+> watermark.
+
+We do have a mechanism for that, use a smaller buffer :) Also, I think KVM
+should try to avoid SPE interrupts before the guest buffer is filled,
+because that means blackout windows.
+
+> 
+> I suspect having a maximum size set ahead of time (and pre-allocating the
+> buffer?) is the right thing to do. As long as it's set to a reasonably large
+> value we can treat filling the buffer as a collision.
+
+Or, when the KVM buffer fills, KVM could copy the contents of the buffer to
+the guest, advance guest PMBPTR_EL1 accordingly, then check if the guest's
+buffer pointer reached the buffer limit. If not, restart profiling by
+reusing the same KVM buffer. Repeat until the guest buffer limit is
+reached. This way KVM also avoids copying a big buffer all at once. But
+introduces blackout windows which are not present on baremetal.
+
+That's why I'm thinking that the ioctl to allow userspace to set a maximum
+KVM buffer size should be optional. Might be worth adding the option for
+userspace to choose what happens when the guest programs a buffer larger
+than the KVM buffer size specified with the ioctl.
+
+> 
+> > > I prefer this new approach instead of pinning the buffer at stage 2. It is
+> > > straightforward, less fragile and doesn't limit how a guest can program
+> > > SPE.
+> 
+> Likewise, aside from the PMBIDR_EL1.P issue, this sounds very nice to me!
+
+Thanks!
+
+Alex
+
+> 
+> Thanks,
+> Mark.
+> 
+> > > As for the prototype, I wrote it as a quick way to check if this approach
+> > > is viable. Does not have SPE support for the nVHE case because I would have
+> > > had to figure out how to map a continuous VA range in the EL2's translation
+> > > tables; supporting only the VHE case was a lot easier.  The prototype
+> > > doesn't have a stage 1 walker, so it's limited to guests that use id-mapped
+> > > addresses from TTBR0_EL1 for the buffer (although it would be trivial to
+> > > modify it to accept addresses from TTBR1_EL1) - I've used kvm-unit-tests
+> > > for testing [4]. I've tested the prototype on the model and on an Ampere
+> > > Altra.
+> > > 
+> > > For those interested, kvmtool support to run the prototype has also been
+> > > added [5] (add --spe to the command line to run a VM).
+> > > 
+> > > [1] https://lore.kernel.org/all/Yl6+JWaP+mq2Nc0b@monolith.localdoman/
+> > > [2] https://gitlab.arm.com/linux-arm/linux-ae/-/tree/kvm-spe-v6-copy-buffer-wip4-without-nvhe
+> > > [3] https://gitlab.arm.com/linux-arm/linux-ae/-/blob/kvm-spe-v6-copy-buffer-wip4-without-nvhe/arch/arm64/kvm/spe.c#L197
+> > > [4] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/kvm-spe-v6-copy-buffer-wip4
+> > > [5] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/kvm-spe-v6-copy-buffer-wip4
+> > > [6] https://developer.arm.com/documentation/SDEN885747/latest
+> > > 
+> > > Thanks,
+> > > Alex
+> > > 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
