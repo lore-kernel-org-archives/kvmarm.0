@@ -2,52 +2,52 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82239C3DA7D
-	for <kvmarm@archiver.kernel.org>; Thu,  5 Jan 2023 20:46:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1FFAC3DA7A
+	for <kvmarm@archiver.kernel.org>; Thu,  5 Jan 2023 20:48:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D081C40FF0;
-	Thu,  5 Jan 2023 15:46:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71C0E4B3E8;
+	Thu,  5 Jan 2023 15:48:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linux.dev
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wK-7J9bqsuaK; Thu,  5 Jan 2023 15:46:02 -0500 (EST)
+	with ESMTP id HPVubBF+b6fu; Thu,  5 Jan 2023 15:48:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78AE64B282;
-	Thu,  5 Jan 2023 15:46:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5105C4B3D7;
+	Thu,  5 Jan 2023 15:48:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5202D4B248
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Jan 2023 15:46:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B95B54B3F5
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Jan 2023 15:48:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FFMzyU9aJ9rz for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Jan 2023 15:46:00 -0500 (EST)
+ with ESMTP id L-Li2Zv2UMaG for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Jan 2023 15:48:30 -0500 (EST)
 Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F067640FF0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Jan 2023 15:45:59 -0500 (EST)
-Date: Thu, 5 Jan 2023 20:45:53 +0000
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96BAA4B3F3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Jan 2023 15:48:30 -0500 (EST)
+Date: Thu, 5 Jan 2023 20:48:25 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
- t=1672951558;
+ t=1672951709;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=Y4b9wTbh87t22aFi+3L9dW176/vHidmEESsgPe8VPi4=;
- b=SJmgLwjvfvfaFKHy4HbjBuzhn3gsxl/+g8469WZ4uM6A5tb1hH1B2ynXfDuasamnqU3Y+x
- O4RUrLGR8EiM1REe4FgsKJFauz0F/KtwiMPNx2w5L3Xqb5k3g8RLSftNxrbTCia6b3Sdca
- 7Z83rmv7+PrkSnL91Ls7XfbvlHdb8u4=
+ bh=aYVWC4sBVgWrlftRY/Wjwf7HrIxSM4JPLvpreSFfkAc=;
+ b=LgjU7AxU13CeHxxXWLLpwOOH5ZSC/3yZk+Yl//JoD5VDml1Sy6Yh3KLVvULVDKlvJXIKb/
+ tmKISIzCGNty273PY3SF6qOSJCq9HRNTKXvytFIAPNgHG5U4XiQXojMUv9cwj5/CyyOoN2
+ bGdRhh/FGQo/Uo6dCrNYdHW1xt1nOSQ=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and
  include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: Re: [PATCH v5 7/7] KVM: arm64: Normalize cache configuration
-Message-ID: <Y7c3AZJhlxKcc7y2@google.com>
-References: <20221230095452.181764-1-akihiko.odaki@daynix.com>
- <20221230095452.181764-8-akihiko.odaki@daynix.com>
+Subject: Re: [PATCH v4 6/7] KVM: arm64: Mask FEAT_CCIDX
+Message-ID: <Y7c3mQS1zqw0UATF@google.com>
+References: <20221221204016.658874-1-akihiko.odaki@daynix.com>
+ <20221221204016.658874-7-akihiko.odaki@daynix.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20221230095452.181764-8-akihiko.odaki@daynix.com>
+In-Reply-To: <20221221204016.658874-7-akihiko.odaki@daynix.com>
 X-Migadu-Flow: FLOW_OUT
 Cc: Alyssa Rosenzweig <alyssa@rosenzweig.io>, Hector Martin <marcan@marcan.st>,
  Mathieu Poirier <mathieu.poirier@linaro.org>, Marc Zyngier <maz@kernel.org>,
@@ -74,98 +74,39 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Akihiko,
 
-On Fri, Dec 30, 2022 at 06:54:52PM +0900, Akihiko Odaki wrote:
+On Thu, Dec 22, 2022 at 05:40:15AM +0900, Akihiko Odaki wrote:
+> The CCSIDR access handler masks the associativity bits according to the
+> bit layout for processors without FEAT_CCIDX. KVM also assumes CCSIDR is
+> 32-bit where it will be 64-bit if FEAT_CCIDX is enabled. Mask FEAT_CCIDX
+> so that these assumptions hold.
+> 
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index f4a7c5abcbca..aeabf1f3370b 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1124,6 +1124,12 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
+>  						      ID_DFR0_PERFMON_SHIFT,
+>  						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
+>  		break;
+> +	case SYS_ID_AA64MMFR2_EL1:
+> +		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
+> +		break;
+> +	case SYS_ID_MMFR4_EL1:
+> +		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_CCIDX);
+> +		break;
 
-[...]
+Not that it is necessarily worth addressing, but I wanted to point
+something out.
 
-> @@ -417,6 +418,9 @@ struct kvm_vcpu_arch {
->  		u64 last_steal;
->  		gpa_t base;
->  	} steal;
-> +
-> +	/* Per-vcpu CCSIDR override or NULL */
-> +	u32 *ccsidr;
-
-I don't believe we need to store this per-vCPU. Of course, it is
-possible to userspace to observe heterogeneous cache topologies
-depending on what core the KVM_GET_ONE_REG ioctl is handled on.
-
-WDYT about keeping track of this per-VM? The value should be whatever
-was last written by userspace. To avoid breaking userspace this would
-also need to allow mismatched writes (i.e. vCPU0 has a different
-configuration than vCPU1).
-
-[...]
-
-> +static u8 get_min_cache_line_size(u32 csselr)
-
-It would be nice to have a comment indicating that it returns
-Log2(line_size), not line size outright.
-
-> +{
-> +	u64 ctr_el0;
-> +	int field;
-> +
-> +	ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
-> +	field = csselr & CSSELR_EL1_InD ? CTR_EL0_IminLine_SHIFT : CTR_EL0_DminLine_SHIFT;
-> +
-> +	return cpuid_feature_extract_unsigned_field(ctr_el0, field) - 2;
-
-This probably deserves a comment describing that CTR_EL0 represents line
-size in units of words, not bytes. Furthermore, a subtle reminder on the
-log transformation being done here would help also.
-
-> +}
-> +
->  /* Which cache CCSIDR represents depends on CSSELR value. */
-> -static u32 get_ccsidr(u32 csselr)
-> +static u32 get_ccsidr(struct kvm_vcpu *vcpu, u32 csselr)
->  {
-> -	u32 ccsidr;
-> +	if (vcpu->arch.ccsidr)
-> +		return vcpu->arch.ccsidr[csselr];
->  
-> -	/* Make sure noone else changes CSSELR during this! */
-> -	local_irq_disable();
-> -	write_sysreg(csselr, csselr_el1);
-> -	isb();
-> -	ccsidr = read_sysreg(ccsidr_el1);
-> -	local_irq_enable();
-> +	/*
-> +	 * Fabricate a CCSIDR value as the overriding value does not exist.
-> +	 * The real CCSIDR value will not be used as it can vary by the
-> +	 * physical CPU which the vcpu currently resides in.
-> +	 *
-> +	 * The line size is determined with get_min_cache_line_size(), which
-> +	 * should be valid for all CPUs even if they have different cache
-> +	 * configuration.
-> +	 *
-> +	 * The associativity bits are cleared, meaning the geometry of all data
-> +	 * and unified caches (which are guaranteed to be PIPT and thus
-> +	 * non-aliasing) are 1 set and 1 way.
-> +	 * Guests should not be doing cache operations by set/way at all, and
-> +	 * for this reason, we trap them and attempt to infer the intent, so
-> +	 * that we can flush the entire guest's address space at the appropriate
-> +	 * time. The exposed geometry minimizes the number of the traps.
-> +	 * [If guests should attempt to infer aliasing properties from the
-> +	 * geometry (which is not permitted by the architecture), they would
-> +	 * only do so for virtually indexed caches.]
-> +	 *
-> +	 * We don't check if the cache level exists as it is allowed to return
-> +	 * an UNKNOWN value if not.
-> +	 */
-> +	return get_min_cache_line_size(csselr) << CCSIDR_EL1_LineSize_SHIFT;
-
-I don't believe this is correct. The value of CCSIDR_EL1.LineSize is
-actually:
-
-   Log2(Number of bytes in cache line) - 4 (from DDI0487I.a D17.2.26)
-
-
-With that, I'd expect the following instead:
-
-	line_size = get_min_cache_line_size(csselr);
-	return FIELD_PREP(CCSIDR_EL1_LineSize_MASK, line_size - 4);
+This change breaks migration from older kernels on implementations w/
+FEAT_CCIDX. There is most likely exactly 0 of those in the wild, but
+we need to be careful changing user-visible stuff like this.
 
 --
 Thanks,
