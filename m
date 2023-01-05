@@ -1,142 +1,57 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6162320B;
-	Thu,  5 Jan 2023 20:52:13 +0000 (UTC)
-Date: Thu, 5 Jan 2023 20:45:53 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1672951558;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y4b9wTbh87t22aFi+3L9dW176/vHidmEESsgPe8VPi4=;
-	b=SJmgLwjvfvfaFKHy4HbjBuzhn3gsxl/+g8469WZ4uM6A5tb1hH1B2ynXfDuasamnqU3Y+x
-	O4RUrLGR8EiM1REe4FgsKJFauz0F/KtwiMPNx2w5L3Xqb5k3g8RLSftNxrbTCia6b3Sdca
-	7Z83rmv7+PrkSnL91Ls7XfbvlHdb8u4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	James Morse <james.morse@arm.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>, asahi@lists.linux.dev,
-	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-	Sven Peter <sven@svenpeter.dev>, Hector Martin <marcan@marcan.st>
-Subject: Re: [PATCH v5 7/7] KVM: arm64: Normalize cache configuration
-Message-ID: <Y7c3AZJhlxKcc7y2@google.com>
-References: <20221230095452.181764-1-akihiko.odaki@daynix.com>
- <20221230095452.181764-8-akihiko.odaki@daynix.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6BAB33C0
+	for <kvmarm@lists.linux.dev>; Thu,  5 Jan 2023 21:48:31 +0000 (UTC)
+Received: by mail-qv1-f49.google.com with SMTP id d13so26423038qvj.8
+        for <kvmarm@lists.linux.dev>; Thu, 05 Jan 2023 13:48:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google;
+        h=content-disposition:mime-version:message-id:subject:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fe+gGPB5dV5QpThZtXGj+L3VR53amPF8Y92ESPgSHoI=;
+        b=E6tIeJWWX3njOeFIFDhdzgUe8McsOkJuwxAbMqXNKLkUvJHTZp54V8CDp6DbgYSDjv
+         LLC25+B7G7IzVndk2WdZvI3rj+6aCapAM0ObCEXTK+xrJK4bppqgkIqMfZYHwOWUUeTC
+         wxpN6RPEuHjzoghv52wBUDsW2Mx9cfjCQ51SI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-disposition:mime-version:message-id:subject:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fe+gGPB5dV5QpThZtXGj+L3VR53amPF8Y92ESPgSHoI=;
+        b=mf4Ko/RIcMlxs5vIaL9HBLRgAP5khGfyUC5nrgOATpRKkIqSra+UiUlCHY0mSLbte3
+         TPOzgH58jpQBDKY17q3WmC1AFlJpPe4S4TGiKse77j+cMCQqA8SUx+E/oDSTe22bcnMu
+         WqUMOxEqjNBJXp5Uawh8ToJFtew6gJ4H8hahFx0fi9TldaGC4/3aYPIElVPc91hPPX/d
+         nJIU9GPUqjcRK+BFV0IPii4gXCaSR51mHjg/v8VAjg4kGFr44CT9CyMYCwh7HsRKwNTf
+         Qf++8VzkANo4DZT/DakX6fNwD60CI3ElYdtWy+/UoI2ULBMd74a5EBu3BOtk0S9UW0Ys
+         1Ryw==
+X-Gm-Message-State: AFqh2kqop5nUc1yG17ALCl61sHCYbMOqiypGOc3QksH40Mp4YaHjzPAE
+	rr1zca6MN2kLNRSJ4aY4YkxsdIUg6ikrptmT
+X-Google-Smtp-Source: AMrXdXu4jfFc+oiYR6euM2fcEmLJwDAemZRWHNcMYVgKFrDhZuZKdN1LCethkgsdau8Fq77BZ8VYpQ==
+X-Received: by 2002:a0c:ee2b:0:b0:4e3:6abf:ddb4 with SMTP id l11-20020a0cee2b000000b004e36abfddb4mr59377309qvs.23.1672955310453;
+        Thu, 05 Jan 2023 13:48:30 -0800 (PST)
+Received: from meerkat.local (bras-base-mtrlpq5031w-grc-30-209-226-106-7.dsl.bell.ca. [209.226.106.7])
+        by smtp.gmail.com with ESMTPSA id h17-20020a05620a401100b006ce9e880c6fsm26976494qko.111.2023.01.05.13.48.29
+        for <kvmarm@lists.linux.dev>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Jan 2023 13:48:30 -0800 (PST)
+Date: Thu, 5 Jan 2023 16:48:28 -0500
+From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+To: kvmarm@lists.linux.dev
+Subject: Test archive migration
+Message-ID: <20230105214828.4ifp75dmp6idk6gy@meerkat.local>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221230095452.181764-8-akihiko.odaki@daynix.com>
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <20230105204553.dCS4N3lakDGJXAfVsCUor8LTxGeH2HZkG648GkzQ9QA@z>
 
-Hi Akihiko,
+Hello:
 
-On Fri, Dec 30, 2022 at 06:54:52PM +0900, Akihiko Odaki wrote:
+This message is to test the archive migration and replication. If everything
+worked correctly, this message should shortly show up on
+https://lore.kernel.org/kvmarm/.
 
-[...]
-
-> @@ -417,6 +418,9 @@ struct kvm_vcpu_arch {
->  		u64 last_steal;
->  		gpa_t base;
->  	} steal;
-> +
-> +	/* Per-vcpu CCSIDR override or NULL */
-> +	u32 *ccsidr;
-
-I don't believe we need to store this per-vCPU. Of course, it is
-possible to userspace to observe heterogeneous cache topologies
-depending on what core the KVM_GET_ONE_REG ioctl is handled on.
-
-WDYT about keeping track of this per-VM? The value should be whatever
-was last written by userspace. To avoid breaking userspace this would
-also need to allow mismatched writes (i.e. vCPU0 has a different
-configuration than vCPU1).
-
-[...]
-
-> +static u8 get_min_cache_line_size(u32 csselr)
-
-It would be nice to have a comment indicating that it returns
-Log2(line_size), not line size outright.
-
-> +{
-> +	u64 ctr_el0;
-> +	int field;
-> +
-> +	ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
-> +	field = csselr & CSSELR_EL1_InD ? CTR_EL0_IminLine_SHIFT : CTR_EL0_DminLine_SHIFT;
-> +
-> +	return cpuid_feature_extract_unsigned_field(ctr_el0, field) - 2;
-
-This probably deserves a comment describing that CTR_EL0 represents line
-size in units of words, not bytes. Furthermore, a subtle reminder on the
-log transformation being done here would help also.
-
-> +}
-> +
->  /* Which cache CCSIDR represents depends on CSSELR value. */
-> -static u32 get_ccsidr(u32 csselr)
-> +static u32 get_ccsidr(struct kvm_vcpu *vcpu, u32 csselr)
->  {
-> -	u32 ccsidr;
-> +	if (vcpu->arch.ccsidr)
-> +		return vcpu->arch.ccsidr[csselr];
->  
-> -	/* Make sure noone else changes CSSELR during this! */
-> -	local_irq_disable();
-> -	write_sysreg(csselr, csselr_el1);
-> -	isb();
-> -	ccsidr = read_sysreg(ccsidr_el1);
-> -	local_irq_enable();
-> +	/*
-> +	 * Fabricate a CCSIDR value as the overriding value does not exist.
-> +	 * The real CCSIDR value will not be used as it can vary by the
-> +	 * physical CPU which the vcpu currently resides in.
-> +	 *
-> +	 * The line size is determined with get_min_cache_line_size(), which
-> +	 * should be valid for all CPUs even if they have different cache
-> +	 * configuration.
-> +	 *
-> +	 * The associativity bits are cleared, meaning the geometry of all data
-> +	 * and unified caches (which are guaranteed to be PIPT and thus
-> +	 * non-aliasing) are 1 set and 1 way.
-> +	 * Guests should not be doing cache operations by set/way at all, and
-> +	 * for this reason, we trap them and attempt to infer the intent, so
-> +	 * that we can flush the entire guest's address space at the appropriate
-> +	 * time. The exposed geometry minimizes the number of the traps.
-> +	 * [If guests should attempt to infer aliasing properties from the
-> +	 * geometry (which is not permitted by the architecture), they would
-> +	 * only do so for virtually indexed caches.]
-> +	 *
-> +	 * We don't check if the cache level exists as it is allowed to return
-> +	 * an UNKNOWN value if not.
-> +	 */
-> +	return get_min_cache_line_size(csselr) << CCSIDR_EL1_LineSize_SHIFT;
-
-I don't believe this is correct. The value of CCSIDR_EL1.LineSize is
-actually:
-
-   Log2(Number of bytes in cache line) - 4 (from DDI0487I.a D17.2.26)
-
-
-With that, I'd expect the following instead:
-
-	line_size = get_min_cache_line_size(csselr);
-	return FIELD_PREP(CCSIDR_EL1_LineSize_MASK, line_size - 4);
-
---
-Thanks,
-Oliver
+-K
