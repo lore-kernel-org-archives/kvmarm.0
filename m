@@ -1,29 +1,61 @@
-Received: from out-241.mta0.migadu.com (out-241.mta0.migadu.com [91.218.175.241])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2956523A3
-	for <kvmarm@lists.linux.dev>; Mon,  9 Jan 2023 22:37:15 +0000 (UTC)
-Date: Mon, 9 Jan 2023 21:43:54 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1673300638;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xbCLhBUzavGvG6c3ScGTHtSjvbga3hu28++gvcUxwl8=;
-	b=IhklmKxUzNJ2e4QpxD/W8OMcGp0a3IW5OMC1sGupanX/e1/QFm7yotMJqNQH29goylwigJ
-	39N107C5oISicBdIdMKHJL1+LSlFTQMm0hqUOrSf+7eMpZK/wwAxDZu77ts9oPbcrTniTt
-	E2viycKhsStBMASDzut8GxmLOk/x4VM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Ricardo Koller <ricarkol@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev,
-	maz@kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com,
-	reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH v3 4/4] arm: pmu: Print counter values as
- hexadecimals
-Message-ID: <Y7yKmr3pGnIJyxdX@google.com>
-References: <20230109211754.67144-1-ricarkol@google.com>
- <20230109211754.67144-5-ricarkol@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E07323A3
+	for <kvmarm@lists.linux.dev>; Mon,  9 Jan 2023 23:41:11 +0000 (UTC)
+Received: by mail-pl1-f174.google.com with SMTP id g16so11314790plq.12
+        for <kvmarm@lists.linux.dev>; Mon, 09 Jan 2023 15:41:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yJ7r4VJ0GFzUkp84DlniKC/ADesB2+RyryWjunDppAY=;
+        b=YvL/R5uN59b8Oco6nvSc4oNoDO3miEM4rJitbnSySSpJWFkVPZEOlTHZLYh6w8RdnL
+         ipIQI0SijUmLEM1TZ+LdgAlDYUpFz6vlQDI23WfcJ+NE1oAYSPB+xkO2+m3O7wdJLOqo
+         Do897VYzZORy/Iby0sJ0/6DZJ61HL0Nnpf9vcegPR2CZ0abKcMSZ9hoirzi+WbHbhHLJ
+         H/EEpaVjTESLuuMG+SbEeSAvJc4zGVYq2YddpPE/+fzVgcMKYRSIvsXrG6/C56aT73g8
+         gpbPKJh3ATQVASmPXVAJvkpVKffENsxvgh5UnPhJ6mJjBRQ7/EWwnEavRdgOuGof4OIX
+         0ZIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yJ7r4VJ0GFzUkp84DlniKC/ADesB2+RyryWjunDppAY=;
+        b=l8W+eJxs0O6laYjSC7icyzSWANlOwIpt04ydkznEoKJ1q7U9ZIuiemM80Lselbd/Bb
+         QB88WlrqIers5r6T1zRDKcR3QLIUuu10dI9FDHSrnQd5gRgmMu5xT8fK/tjD8JnmfCV9
+         YkjHUgRAeF45k6SVVcZIDv5pGg2P0kZDfZ7xjdxB/danupQJoZLGtwmyunOLjOsSbvDI
+         WqJ/cE7LLRFf6Bm03WFgcDCw5nC4F8kEp6EqUjTnHN8AeGSQfqB/OLI4Ywdyqxyzit9h
+         SpJPW394pYBQryiJLkMyISpP2CfUv1oxKwZpsDWNgWuldZbEWiBWpPLvPwrm1BDjkJJv
+         6s+w==
+X-Gm-Message-State: AFqh2kouI2gpCeRB/vzwouFP5+eKQIEwpAxWcFPfZSd4gisiHOp7ddlw
+	K+SqwckAKW/N+Fdc+M+vdfn4RA==
+X-Google-Smtp-Source: AMrXdXu6spkhFc1u6USGxG9WJvsK4rqSAtSutoxwGglqpclqT4M1fyXN+pidEm9POsve9oQG7e472A==
+X-Received: by 2002:a05:6a20:e61a:b0:ac:a4fd:f5bf with SMTP id my26-20020a056a20e61a00b000aca4fdf5bfmr82389323pzb.50.1673307671315;
+        Mon, 09 Jan 2023 15:41:11 -0800 (PST)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id z7-20020a63e547000000b00476d1385265sm5605289pgj.25.2023.01.09.15.41.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Jan 2023 15:41:10 -0800 (PST)
+Date: Mon, 9 Jan 2023 15:41:06 -0800
+From: David Matlack <dmatlack@google.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
+	Ricardo Koller <ricarkol@google.com>,
+	Reiji Watanabe <reijiw@google.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jing Zhang <jingzhangos@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 3/6] KVM: Define kvm_flush_remote_tlbs_range
+Message-ID: <Y7ymEiU1ZC/gzs9s@google.com>
+References: <20230109215347.3119271-1-rananta@google.com>
+ <20230109215347.3119271-4-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -32,21 +64,99 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230109211754.67144-5-ricarkol@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20230109215347.3119271-4-rananta@google.com>
 
-On Mon, Jan 09, 2023 at 09:17:54PM +0000, Ricardo Koller wrote:
-> The arm/pmu test prints the value of counters as %ld.  Most tests start
-> with counters around 0 or UINT_MAX, so having something like -16 instead of
-> 0xffff_fff0 is not very useful.
+On Mon, Jan 09, 2023 at 09:53:44PM +0000, Raghavendra Rao Ananta wrote:
+> Define kvm_flush_remote_tlbs_range() to limit the TLB flush only
+> to a certain range of addresses. Replace this with the existing
+> call to kvm_flush_remote_tlbs() in the MMU notifier path.
+> Architectures such as arm64 can define this to flush only the
+> necessary addresses, instead of the entire range.
 > 
-> Report counter values as hexadecimals.
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/kvm/mmu.c     | 10 ++++++++++
+>  include/linux/kvm_host.h |  1 +
+>  virt/kvm/kvm_main.c      |  7 ++++++-
+>  3 files changed, 17 insertions(+), 1 deletion(-)
 > 
-> Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 39d9a334efb57..70f76bc909c5d 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -91,6 +91,16 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+>  	kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
+>  }
+>  
+> +void kvm_flush_remote_tlbs_range(struct kvm *kvm, unsigned long start, unsigned long end)
+> +{
+> +	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
+> +
+> +	if (system_supports_tlb_range())
+> +		kvm_call_hyp(__kvm_tlb_flush_range_vmid_ipa, mmu, start, end, 0);
+> +	else
+> +		kvm_flush_remote_tlbs(kvm);
+> +}
+> +
+>  static bool kvm_is_device_pfn(unsigned long pfn)
+>  {
+>  	return !pfn_is_map_memory(pfn);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index f51eb9419bfc3..a76cede9dc3bb 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1359,6 +1359,7 @@ int kvm_vcpu_yield_to(struct kvm_vcpu *target);
+>  void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool usermode_vcpu_not_eligible);
+>  
+>  void kvm_flush_remote_tlbs(struct kvm *kvm);
+> +void kvm_flush_remote_tlbs_range(struct kvm *kvm, unsigned long start, unsigned long end);
+>  
+>  #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
+>  int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 03e6a38094c17..f538ecc984f5b 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -376,6 +376,11 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+>  		++kvm->stat.generic.remote_tlb_flush;
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_flush_remote_tlbs);
+> +
+> +void kvm_flush_remote_tlbs_range(struct kvm *kvm, unsigned long start, unsigned long end)
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+It's ambiguous what start/end represent. Case in point,
+__kvm_handle_hva_range() is passing in HVAs but then patch 4 passes in
+GFNs.
 
---
-Thanks,
-Oliver
+Probably kvm_flush_tlbs_range() should accept GFN and there can be a
+helper wrapper that does the HVA-to-GFN conversion.
+
+> +{
+> +	kvm_flush_remote_tlbs(kvm);
+> +}
+
+FYI I also proposed a common kvm_flush_remote_tlbs() in my Common MMU
+series [1].
+
+Could I interest you in grabbing patches 29-33 from that series, which
+has the same end result (common kvm_flush_remote_tlbs_range()) but also
+hooks up the KVM/x86 range-based flushing, and folding them into this
+series?
+
+[1] https://lore.kernel.org/kvm/20221208193857.4090582-33-dmatlack@google.com/
+
+>  #endif
+>  
+>  static void kvm_flush_shadow_all(struct kvm *kvm)
+> @@ -637,7 +642,7 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+>  	}
+>  
+>  	if (range->flush_on_ret && ret)
+> -		kvm_flush_remote_tlbs(kvm);
+> +		kvm_flush_remote_tlbs_range(kvm, range->start, range->end - 1);
+>  
+>  	if (locked) {
+>  		KVM_MMU_UNLOCK(kvm);
+> -- 
+> 2.39.0.314.g84b9a713c41-goog
+> 
