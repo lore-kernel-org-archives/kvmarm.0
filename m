@@ -1,100 +1,95 @@
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2720F8C09
-	for <kvmarm@lists.linux.dev>; Mon,  9 Jan 2023 19:26:46 +0000 (UTC)
-Received: by mail-oi1-f175.google.com with SMTP id o66so8051518oia.6
-        for <kvmarm@lists.linux.dev>; Mon, 09 Jan 2023 11:26:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jYXNYZPoEZW+cpasaK2qS1x4BldwPdfg2ohHEnkw8tk=;
-        b=r3rnQv1WOAcZvSgLDe+wi5Sl6OgPhzdvw23gf+2TXHryZr6ZdVogK88+pjehOXQFWe
-         kPv9EEQEOe+0aC+FghgL7sf12llehpXf6CrLaSJGSk84yA6MqLuI+ii1qqdEvvFDdtHG
-         M96vdoPlq2HBmTF9GwMgbSLUmGoEYQAqNY17To30hqf86TM66iX9UX7iNTOFxTHra+20
-         LvwCI3/bFnKuELsYk8hWOVJxJc/UQKWjL7hqGn59R6mPPFJjz7pjG1wAM99WRI2JR3ze
-         y6Gfxo84542chZkwMxK4qh3bySALR/IXhcB7Q4zys5Swdt3lcafX+MhIwxBsLoMBZ9je
-         P5nQ==
-X-Gm-Message-State: AFqh2kra25Qp8j9K+lAG0cvUrbcCbsqI4cqMUghDNsYKXrf8mi8VyU/L
-	O66auiY2Nc29+99m+lr1TcFfnBQsPQ==
-X-Google-Smtp-Source: AMrXdXuWN6s2Ip6alGnEK9Y77CLyDy7KYWq7dZYuDLZi9RmEcarrAkz9gBXHZpKxv9AwTjYuASRn7g==
-X-Received: by 2002:a05:6808:190e:b0:35c:b79:8cf8 with SMTP id bf14-20020a056808190e00b0035c0b798cf8mr38989203oib.6.1673292405102;
-        Mon, 09 Jan 2023 11:26:45 -0800 (PST)
-Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id bg31-20020a056808179f00b00363b5a6bc9esm4343635oib.12.2023.01.09.11.26.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jan 2023 11:26:44 -0800 (PST)
-Received: (nullmailer pid 1483616 invoked by uid 1000);
-	Mon, 09 Jan 2023 19:26:31 -0000
-From: Rob Herring <robh@kernel.org>
-Date: Mon, 09 Jan 2023 13:26:22 -0600
-Subject:
- [PATCH v4 6/8] perf: arm_spe: Support new SPEv1.2/v8.7 'not taken' event
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC708C09
+	for <kvmarm@lists.linux.dev>; Mon,  9 Jan 2023 19:33:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7220DC433EF;
+	Mon,  9 Jan 2023 19:33:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1673292820;
+	bh=bTSoMPcMcmLPaD3oxUR9mFEaflJdAiTqYCb5O5A+MJM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Lv3cEa/aSGwho+07n//aR6cSlJsY/GTswOJlakzLyZPXAPlWbnXN8oSQaDd6nsm7x
+	 vBJczEXe3POhwslvIc0HxQOFU42+bL/DhgnpBwPNOpUbx5/rNkDZMT7icCEsb3KasW
+	 gyIG7LdHNzG3zJyCFnxCKnC0972eylTGpPlavnLdwrZawxKKOfVmSxgY8y+PMmAc3Y
+	 9gy/nHWJ1Mvk0CuErrlMgunN8O67pJbLydqMZIlL9p38G466X0Jskf+xFwhqsdVwAE
+	 keYy2jTyJKLgeplPwQ2tieYgL+fyzoAa+NmTOJQ8AbsPAkH1bZnxW9/9Dxg4C3VMiU
+	 6o9a9CC3yrJOQ==
+Date: Mon, 9 Jan 2023 19:33:33 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>, Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
+	James Clark <james.clark@arm.com>
+Subject: Re: [PATCH v4 3/8] arm64/sysreg: Convert SPE registers to automatic
+ generation
+Message-ID: <Y7xsDXFlNjiQ1AIe@sirena.org.uk>
+References: <20220825-arm-spe-v8-7-v4-0-327f860daf28@kernel.org>
+ <20220825-arm-spe-v8-7-v4-3-327f860daf28@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20220825-arm-spe-v8-7-v4-6-327f860daf28@kernel.org>
-References: <20220825-arm-spe-v8-7-v4-0-327f860daf28@kernel.org>
-In-Reply-To: <20220825-arm-spe-v8-7-v4-0-327f860daf28@kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>, Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, James Clark <james.clark@arm.com>
-X-Mailer: b4 0.12-dev
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="+R5R38EZaqmBSfGK"
+Content-Disposition: inline
+In-Reply-To: <20220825-arm-spe-v8-7-v4-3-327f860daf28@kernel.org>
+X-Cookie: Editing is a rewording activity.
 
-Arm SPEv1.2 (Armv8.7/v9.2) adds a new event, 'not taken', in bit 6 of
-the PMSEVFR_EL1 register. Update arm_spe_pmsevfr_res0() to support the
-additional event.
 
-Tested-by: James Clark <james.clark@arm.com>
-Signed-off-by: Rob Herring <robh@kernel.org>
----
-v4:
- - Rebase on v6.2-rc1
-v3:
- - No change
-v2:
- - Update for v6.1 sysreg generated header changes
----
- arch/arm64/include/asm/sysreg.h | 2 ++
- drivers/perf/arm_spe_pmu.c      | 4 +++-
- 2 files changed, 5 insertions(+), 1 deletion(-)
+--+R5R38EZaqmBSfGK
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index db269eda7c1c..fc8787727792 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -221,6 +221,8 @@
- 	 BIT_ULL(6) | BIT_ULL(4) | BIT_ULL(2) | BIT_ULL(0))
- #define PMSEVFR_EL1_RES0_V1P1	\
- 	(PMSEVFR_EL1_RES0_IMP & ~(BIT_ULL(18) | BIT_ULL(17) | BIT_ULL(11)))
-+#define PMSEVFR_EL1_RES0_V1P2	\
-+	(PMSEVFR_EL1_RES0_V1P1 & ~BIT_ULL(6))
- 
- /* Buffer error reporting */
- #define PMBSR_EL1_FAULT_FSC_SHIFT	PMBSR_EL1_MSS_SHIFT
-diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
-index af6d3867c3e7..82f67e941bc4 100644
---- a/drivers/perf/arm_spe_pmu.c
-+++ b/drivers/perf/arm_spe_pmu.c
-@@ -677,9 +677,11 @@ static u64 arm_spe_pmsevfr_res0(u16 pmsver)
- 	case ID_AA64DFR0_EL1_PMSVer_IMP:
- 		return PMSEVFR_EL1_RES0_IMP;
- 	case ID_AA64DFR0_EL1_PMSVer_V1P1:
-+		return PMSEVFR_EL1_RES0_V1P1;
-+	case ID_AA64DFR0_EL1_PMSVer_V1P2:
- 	/* Return the highest version we support in default */
- 	default:
--		return PMSEVFR_EL1_RES0_V1P1;
-+		return PMSEVFR_EL1_RES0_V1P2;
- 	}
- }
- 
+On Mon, Jan 09, 2023 at 01:26:19PM -0600, Rob Herring wrote:
+> Convert all the SPE register defines to automatic generation. No
+> functional changes.
+>=20
+> New registers and fields for SPEv1.2 are added with the conversion.
+>=20
+> Some of the PMBSR MSS field defines are kept as the automatic generation
+> has no way to create multiple names for the same register bits. The
+> meaning of the MSS field depends on other bits.
+>=20
+> Tested-by: James Clark <james.clark@arm.com>
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
+> v4:
+>  - Rebase on v6.2-rc1
+> v3:
+>  - Make some fields enums and add some missing fields
 
--- 
-2.39.0
+What changed to invalidate my Reviewed-by?
+
+   https://lore.kernel.org/all/Y2kgC9QlBwvXTLe6@sirena.org.uk/
+
+--+R5R38EZaqmBSfGK
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmO8bAwACgkQJNaLcl1U
+h9DxNAf/WsewNj2Jsxe561AMAVfSZGGTeD3cxMiIkJu7/i6seiPbUAVmRQAU/3AO
+hWLnAE0qdAZHyp47NwC6fd04WBq7W2910I+Sx7ESUbrXKciJqp1lpG2DBauU4HpZ
+Hu8Ak7/eEe2gHvooa2ku3X1jFK59X9jKjXtTJLkky0jxXqZV0DhAWEhRukPLEen/
+GAx9GzqacaRbZ0d6e95U9F/WyvmMLzv5J8NkuT97Ue+AD37691GJ1ECeb/WsrdOV
+wPAqZ0l0BVqnMxBPzVa0SpMXL0uooYlvfyLzvFotPrilxwgMoQ3WI6ULCM7fj5O4
+nxuNXWR2kEZuo4b0jsXjvfYIQJfNTg==
+=hyzN
+-----END PGP SIGNATURE-----
+
+--+R5R38EZaqmBSfGK--
