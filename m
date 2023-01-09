@@ -1,88 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244DC2F32
-	for <kvmarm@lists.linux.dev>; Mon,  9 Jan 2023 20:40:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5239C433D2;
-	Mon,  9 Jan 2023 20:40:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673296854;
-	bh=ntZPimoI5coAlKdMrcaOdpUwrWa2LY/Q3irbWCzsKCA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VKiqNBM4dBxXJWJ9FWSUyjYaLt41JtbYn6uU7S8SNsi2XnOXsxUuLGvoEIAC2k7tw
-	 Bdqa6//ADO6mol2VUQ6zUFJ2M3ngayBPb3TDgH8PdN9BvfO3noxTuonocu5LFPy+LM
-	 oqDcGN2OpC9sl5TvxLoHrZdj827WjB3C/+A05Jmduz1q0ERm+R4vZLB8WXIuh+0N7M
-	 /XChEh2GtBiXguiAiCCgQQbcDm1UVVIJ0kr4JSoHUuPqik42xExbA2Rid020IVIasN
-	 khTFmZy2mfZfX4194aBCmyd5gwo+2gle/4DcyFBab2pu2XnMZiAE7agSGJOagGjkqP
-	 hh1nLFXHiWSAQ==
-Date: Mon, 9 Jan 2023 20:40:47 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Rob Herring <robh@kernel.org>
-Cc: Peter Zijlstra <peterz@infradead.org>, Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
-	James Clark <james.clark@arm.com>
-Subject: Re: [PATCH v4 3/8] arm64/sysreg: Convert SPE registers to automatic
- generation
-Message-ID: <Y7x7z3C+voadToys@sirena.org.uk>
-References: <20220825-arm-spe-v8-7-v4-0-327f860daf28@kernel.org>
- <20220825-arm-spe-v8-7-v4-3-327f860daf28@kernel.org>
- <Y7xsDXFlNjiQ1AIe@sirena.org.uk>
- <CAL_JsqLFSMzmTSAjtWWotzFy=JLr+rjim4F_X5thWK9ji6z22g@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53E25221
+	for <kvmarm@lists.linux.dev>; Mon,  9 Jan 2023 21:17:57 +0000 (UTC)
+Received: by mail-pj1-f74.google.com with SMTP id o8-20020a17090a9f8800b002260d01b221so7890488pjp.8
+        for <kvmarm@lists.linux.dev>; Mon, 09 Jan 2023 13:17:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=C+A/7tP9mvR5o1GtT1H6KbVlKl608UdMee+76BtuWKY=;
+        b=NYrhvrbbfkSmHLJAY5CoZsw9Z3pb8ZX1ARyBNHXSy5UxUbbLAOboQMst98y0xabMqe
+         muJWrH8SW/zai8ix/V5vd6Cvvd1FxWt2qsVrDAqaHmBhUC7E8K2daLlkiKTBZLmKRxts
+         Y4sY6z61Q50T9kyRSJ9hReFHU2j8uWDaU3tdwAvts5+Op/7tQdP79goWGPgDMFXlEUvG
+         mZluVz0K5AgRFjdLSJ1yyRBwriqOmg5Gd1XlQgnk8PvYQbVlC639wCpvg2lL29nylI2c
+         HrsRFjRvlHfutZtzuOq8hXnm1DeeKK1aMK+sUlKxGsWeQ9GnYz3ewoJvu7z/ruRqZ8RX
+         qS0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=C+A/7tP9mvR5o1GtT1H6KbVlKl608UdMee+76BtuWKY=;
+        b=LKD6i51NsC9OIp+rP3xIqGuc5NV9oFuUw2FbgxVDxJvPDv+2RqfgMvOvNQhQQENROh
+         IJNHmgNOjZE1COM1P6f9LcAtvJd7J7Ky7XEqNT5/8+tdhIMJVuYNgEwTBJD3qHdGfPAb
+         ZXbDEZZR4tOqQOzCh6X/IVjBG3FLRdDts5HCu7GjHGpA8UcwvA6V1k7cnq7IUZB6yV2Y
+         58AXSy1k/eleJ8uo5nYzQaiw2vnQbCgHgdpwQFQ59CWKweNRHGNca87g70Y9Nj/Fa/BS
+         o6N9DquAiOvaIc76lQBh/6KZeLYlGXyiS2oB/i4dxqGTJlrQEqt/U4I0/4bqH9JPwOnT
+         8LTw==
+X-Gm-Message-State: AFqh2kqlSEoXqMYYVZjRNfNr2mRBjC9eOCtTp1kFLlYKpYhRYNNtTXjj
+	5AM4k6+kSaeaTdmUxl/HzyD/X930ZXnV6g==
+X-Google-Smtp-Source: AMrXdXsuzGhN57hreYNDB9W34vnllmBsMvmdjRf6dJryLCkM6AVR0IfSHN4dMqg2O1uk8SFEEXOTG7dfKPg2wg==
+X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
+ (user=ricarkol job=sendgmr) by 2002:a62:5f87:0:b0:57f:ef13:63aa with SMTP id
+ t129-20020a625f87000000b0057fef1363aamr4334401pfb.42.1673299077120; Mon, 09
+ Jan 2023 13:17:57 -0800 (PST)
+Date: Mon,  9 Jan 2023 21:17:50 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="1XIdtARmznQkOCwl"
-Content-Disposition: inline
-In-Reply-To: <CAL_JsqLFSMzmTSAjtWWotzFy=JLr+rjim4F_X5thWK9ji6z22g@mail.gmail.com>
-X-Cookie: Editing is a rewording activity.
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
+Message-ID: <20230109211754.67144-1-ricarkol@google.com>
+Subject: [kvm-unit-tests PATCH v3 0/4] arm: pmu: Add support for PMUv3p5
+From: Ricardo Koller <ricarkol@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
+Cc: maz@kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com, 
+	oliver.upton@linux.dev, reijiw@google.com, 
+	Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+The first commit fixes the tests when running on PMUv3p5. The issue is that
+PMUv3p5 uses 64-bit counters irrespective of whether the PMU is configured
+for overflowing at 32 or 64-bits. Tests are currently failing [0] on
+PMUv3p5 because of this. They wrongly assume that values will be wrapped
+around 32-bits, but they overflow into the other half of the 64-bit
+counters.
 
---1XIdtARmznQkOCwl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+The second and third commits add new tests for 64-bit overflows, a feature
+added with PMUv3p5 (PMCR_EL0.LP == 1). This is done by running all
+overflow-related tests in two modes: with 32-bit and 64-bit overflows.
+The fourt commit changes the value reporting to use %lx instead of %ld.
 
-On Mon, Jan 09, 2023 at 02:18:41PM -0600, Rob Herring wrote:
-> On Mon, Jan 9, 2023 at 1:33 PM Mark Brown <broonie@kernel.org> wrote:
+This series was tested on PMUv3p5 and PMUv3p4 using the ARM Fast Model and
+kvmtool.  All tests pass on both PMUv3p5 and PMUv3p4 when using Marc's
+PMUv3p5 series [0], plus the suggestion made at [1]. Didn't test AArch32.
 
-> > What changed to invalidate my Reviewed-by?
+Changes from v2:
+- used Oliver's suggestion of using pmevcntr_mask() for masking counters to
+  32 or 64 bits, instead of casting to uint32_t or uint64_t.
+- removed ALL_SET_AT() in favor of pmevcntr_mask(). (Oliver)
+- moved the change to have odd counter overflows at 64-bits from first to
+  third commit.
+- renamed PRE_OVERFLOW macro to PRE_OVERFLOW_32, and PRE_OVERFLOW_AT() to
+  PRE_OVERFLOW().
 
-> >    https://lore.kernel.org/all/Y2kgC9QlBwvXTLe6@sirena.org.uk/
+Changes from v1 (all suggested by Alexandru):
+- report counter values in hexadecimal
+- s/overflow_at_64bits/unused for all chained tests
+- check that odd counters do not increment when using overflow_at_64bits
+  (pmcr.LP=1)
+- test 64-bit odd counters overflows
+- switch confusing var names in test_chained_sw_incr(): cntr0 <-> cntr1
 
-> Ugg, sorry. Nothing changed, I just forgot to add it.
+[0] https://lore.kernel.org/kvmarm/20221113163832.3154370-1-maz@kernel.org/
+[1] https://lore.kernel.org/kvmarm/Y4jasyxvFRNvvmox@google.com/
 
-Ah, no worries, glad I asked before redoing the review - I'll add one
-here for the benefit of the bots:
+Ricardo Koller (4):
+  arm: pmu: Fix overflow checks for PMUv3p5 long counters
+  arm: pmu: Prepare for testing 64-bit overflows
+  arm: pmu: Add tests for 64-bit overflows
+  arm: pmu: Print counter values as hexadecimals
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+ arm/pmu.c | 260 ++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 163 insertions(+), 97 deletions(-)
 
---1XIdtARmznQkOCwl
-Content-Type: application/pgp-signature; name="signature.asc"
+-- 
+2.39.0.314.g84b9a713c41-goog
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmO8e84ACgkQJNaLcl1U
-h9CpzAf7BoOwriuFtR17xQbp7rTn/cRof+X5gGKrd6Tu8F5Yu5rNxhiWewqU091n
-8NwzucxAPyhzP6NsCnijhrHB2yh8qv7a+z1OoDKqfkwMaZV+B9e0+DeenN2w3trL
-+fJVGjIJBLBIjM/3ExIp6OszN+Qs7Rmf1seL9DV0msIlPGKUoSDwdaDMHgeI7He5
-H6qsid510KHNcKfT06nGQC/e0hTA1k/65TsDtguxqrc4wEiFniTO3QCY1GcQ4aBX
-icbGJDuc27FMFrgYHsI8/gWorlPkki8ABGuHyEywhDIQlvyX/LIx0+GiFs2sZ8C/
-O4JqNcC8Z3FIGtXv13qYTsgwa2Hq9g==
-=GN38
------END PGP SIGNATURE-----
-
---1XIdtARmznQkOCwl--
