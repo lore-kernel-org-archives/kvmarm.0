@@ -1,40 +1,40 @@
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD94A5233
-	for <kvmarm@lists.linux.dev>; Mon,  9 Jan 2023 21:54:10 +0000 (UTC)
-Received: by mail-io1-f73.google.com with SMTP id y24-20020a5ec818000000b006e2c0847835so5754787iol.12
-        for <kvmarm@lists.linux.dev>; Mon, 09 Jan 2023 13:54:10 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D145233
+	for <kvmarm@lists.linux.dev>; Mon,  9 Jan 2023 21:54:13 +0000 (UTC)
+Received: by mail-io1-f74.google.com with SMTP id y23-20020a056602201700b006e408c1d2a1so5750815iod.1
+        for <kvmarm@lists.linux.dev>; Mon, 09 Jan 2023 13:54:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BjMR5IMZCP3wwXGcrrOi/YjnHWAxQ/J3ysDtq7OdZIc=;
-        b=QFiqc5zB4Ezhsqh0uJctnxBIZ06ZL1uMn/Q6xiIlBq5mgzNSVfWobcWpl+XMH2a1ZB
-         dyTqEaOqhGBhJi7TVqx9StbjModEQJPT51Fp+zKoDaVSyWWwvkyuhXL0k9HyZODKS15w
-         9JlfwdWOMTUVfOEYqSMJLThOAGQxLoYB8ZW/Avt5hEjhYd0eK3JbsAvOQXV9NpGxcwRz
-         lghVpihiMlnlLlYNqfMsVhO5Zpa6QT6bvsGvCsxj/WPp3DYK/2EnM1p3hEFKreLXtScE
-         jGL0g9SEPsYvYkF7UxjUTJ9ghGVXrlOWYd3EPOYn4m5JgjcjbfoXOFdcf4QsUodhmm6m
-         Uvhw==
+        bh=QnWQSYtdYbIpMuZp6LkKgpjLfcHlUZmLQRKHyPWiT+U=;
+        b=SoQHKoORituEmv9rUcL664DtdyreklZiFGEKpPbMIqEEDHQRWBI7SRr3f7cEoqCsvZ
+         1e7IZZ836ejawXXum/N1EwK5B4IqD2gR6GsFJWCf92qXR9lLgyBN3G4c5l9JL/DOIgzd
+         5SoZlkxgAJogZrpvMLXlxuFB6zLuebhc5CnJ3Lvd6tWm5FooSJa7Awa5clf+HtqEP2aG
+         eQESQnMpMQOrH2ch9tyF4Sn5bZVnHYL9cgG5M0HGBrBLO1SgEiQFRQ0FQspsxC0pC7hs
+         ur+0YtUUCtgQF8i/Lg4Oe9SZDzJBgNK97UxeExA2fo2dWsRWc7G5+liOox0x9OsztI9W
+         /J9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BjMR5IMZCP3wwXGcrrOi/YjnHWAxQ/J3ysDtq7OdZIc=;
-        b=G9NMBedl9s+SDI5WinzI+6Ipl5n5Yq71Zg53cRS3cRxSGg+thIj94TToTPndgOQFMZ
-         Q6aZtf0QFeV/40d8nuMO/Ixna9bwRDsrgeeE6AZOusNvoQC5tLWT8HnHfPD1+YjNUN/+
-         IRgSkKDDlhOW5/bTZETGjps0SseagZLKu2bwprnEpJK0JbKi1yfFli1XP2AW20dtoCxK
-         J3vtVU6vhO5Glyu5RJn4Zv4D0R0qWcLTQrtoBeSRtIjJewttamnZcRflKOMsavQisOHH
-         j9rnb3dcOvROMd/H0ZN/cS7QHTDiGUaYAKHxZZHaCpJ4EtbQdt+OIxRyV2IyNNmb+bCC
-         yM8A==
-X-Gm-Message-State: AFqh2komehzrAoe6tAry8n3VXZEe0pLX096JzjLqdNkP4naUVepxmqTl
-	AjO5Leksq0/aD9sw9ubvCGNTuEx1O1n5
-X-Google-Smtp-Source: AMrXdXveLZ+wlH5ggK1nS8geCa3M7PI/cZSvzt5mjAy3d14vsfPB1eAi+vunpQHd5SoWZ396qOqlx95aAAQc
+        bh=QnWQSYtdYbIpMuZp6LkKgpjLfcHlUZmLQRKHyPWiT+U=;
+        b=cGyeW33/M0PQ7pRPT/QFQifMXAPj7C+Ik+7IM/h+k9qyIWBathDLjYpkh21d7FiIiL
+         8mjaXZtB+vfhQrzZ6DGLVDx7CafLV1Wow64UE5CZRFhWeRatKEY4xO5kUjYXhdfIYob5
+         hrtwo+GjSIvBN4SOmBZ/763vZu8ZrAjWwN/M6qGKw78aVrdKbpGSvYkPUlXLtdCGIhWm
+         bj+ePf4Ww8b9yKKMUaMb5V6WVA0xwsl8c0Fsc12Br+JWg64ZPPH1P1L5SFIJHlD6Pu2L
+         EMCZzUKo5c99qMJWrjh94aXADBN7iF8ztSf5lQtFGwgKOjo4GGMzFn7Ad4tc2woNZlwg
+         CsMg==
+X-Gm-Message-State: AFqh2koGm43FqQgwLendIDoolKJHZ/iajW+hbZwI/ntKrAXsWfs2XbfW
+	pypKxusTi4z9CCLsRMXHbY9FSrCvqDD+
+X-Google-Smtp-Source: AMrXdXuEKpemaG/E8lRrZNDz8BRpwdnTj1XFG2QPwNU3UfWi6vqI2Uo/p3n228o5g0euwm8Gw3DaqOUCn3p1
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a05:6e02:2206:b0:30c:3823:2907 with SMTP
- id j6-20020a056e02220600b0030c38232907mr4744567ilf.304.1673301250053; Mon, 09
- Jan 2023 13:54:10 -0800 (PST)
-Date: Mon,  9 Jan 2023 21:53:46 +0000
+ (user=rananta job=sendgmr) by 2002:a92:4a11:0:b0:300:e879:8094 with SMTP id
+ m17-20020a924a11000000b00300e8798094mr6116771ilf.153.1673301252929; Mon, 09
+ Jan 2023 13:54:12 -0800 (PST)
+Date: Mon,  9 Jan 2023 21:53:47 +0000
 In-Reply-To: <20230109215347.3119271-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,9 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230109215347.3119271-1-rananta@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230109215347.3119271-6-rananta@google.com>
-Subject: [RFC PATCH 5/6] KVM: arm64: Optimize the stage2 map path with TLBI
- range instructions
+Message-ID: <20230109215347.3119271-7-rananta@google.com>
+Subject: [RFC PATCH 6/6] KVM: arm64: Create a fast stage-2 unmap path
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>, 
 	Ricardo Koller <ricarkol@google.com>, Reiji Watanabe <reijiw@google.com>, 
@@ -59,96 +58,84 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Catalin Marinas <catalin.marinas@arm.co
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Currently, when the map path of stage2 page-table coalesces a
-bunch of pages into a hugepage, KVM invalidates the entire
-VM's TLB entries. This would cause a perforamance penality for
-the guest whose pages have already been coalesced earlier as they
-would have to refill their TLB entries unnecessarily again.
+The current implementation of the stage-2 unmap walker
+traverses the entire page-table to clear and flush the TLBs
+for each entry. This could be very expensive if the VM
+is not backed by hugepages. The unmap operation could be
+made efficient by disconnecting the table at the very
+top (level at which the largest block mapping can be hosted)
+and do the rest of the unmapping using free_removed_table().
+If the system supports FEAT_TLBIRANGE, flush the entire range
+that has been disconnected from the rest of the page-table.
 
-Hence, if the system supports it, use __kvm_tlb_flush_range_vmid_ipa()
-to flush only the range of pages that have been combined into
-a hugepage, while leaving other TLB entries alone.
-
+Suggested-by: Ricardo Koller <ricarkol@google.com>
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 29 +++++++++++++++++++++++++----
- 1 file changed, 25 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 44 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index b11cf2c618a6c..099032bb01bce 100644
+index 099032bb01bce..7bcd898de2805 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -686,6 +686,22 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
- 	return cmpxchg(ctx->ptep, ctx->old, new) == ctx->old;
+@@ -1021,6 +1021,49 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
+ 	return 0;
  }
  
-+static void kvm_table_pte_flush(struct kvm_s2_mmu *mmu, u64 addr, u32 level, u32 tlb_level)
++/*
++ * The fast walker executes only if the unmap size is exactly equal to the
++ * largest block mapping supported (i.e. at KVM_PGTABLE_MIN_BLOCK_LEVEL),
++ * such that the underneath hierarchy at KVM_PGTABLE_MIN_BLOCK_LEVEL can
++ * be disconnected from the rest of the page-table without the need to
++ * traverse all the PTEs, at all the levels, and unmap each and every one
++ * of them. The disconnected table can be freed using free_removed_table().
++ */
++static int fast_stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
++			       enum kvm_pgtable_walk_flags visit)
 +{
-+	if (system_supports_tlb_range()) {
-+		u64 end = addr + kvm_granule_size(level);
++	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
++	kvm_pte_t *childp = kvm_pte_follow(ctx->old, mm_ops);
++	struct kvm_s2_mmu *mmu = ctx->arg;
 +
-+		kvm_call_hyp(__kvm_tlb_flush_range_vmid_ipa, mmu, addr, end, tlb_level);
-+	} else {
-+		/*
-+		 * Invalidate the whole stage-2, as we may have numerous leaf
-+		 * entries below us which would otherwise need invalidating
-+		 * individually.
-+		 */
-+		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-+	}
++	if (!kvm_pte_valid(ctx->old) || ctx->level != KVM_PGTABLE_MIN_BLOCK_LEVEL)
++		return 0;
++
++	if (!stage2_try_break_pte(ctx, mmu, 0))
++		return -EAGAIN;
++
++	/*
++	 * Gain back a reference for stage2_unmap_walker() to free
++	 * this table entry from KVM_PGTABLE_MIN_BLOCK_LEVEL - 1.
++	 */
++	mm_ops->get_page(ctx->ptep);
++
++	mm_ops->free_removed_table(childp, ctx->level);
++	return 0;
 +}
 +
- /**
-  * stage2_try_break_pte() - Invalidates a pte according to the
-  *			    'break-before-make' requirements of the
-@@ -693,6 +709,7 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
-  *
-  * @ctx: context of the visited pte.
-  * @mmu: stage-2 mmu
-+ * @tlb_level: The level at which the leaf pages are expected (for FEAT_TTL hint)
-  *
-  * Returns: true if the pte was successfully broken.
-  *
-@@ -701,7 +718,7 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
-  * on the containing table page.
-  */
- static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
--				 struct kvm_s2_mmu *mmu)
-+				 struct kvm_s2_mmu *mmu, u32 tlb_level)
++static void kvm_pgtable_try_fast_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
++{
++	struct kvm_pgtable_walker walker = {
++		.cb	= fast_stage2_unmap_walker,
++		.arg	= pgt->mmu,
++		.flags	= KVM_PGTABLE_WALK_TABLE_PRE,
++	};
++
++	if (size == kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL))
++		kvm_pgtable_walk(pgt, addr, size, &walker);
++}
++
+ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
  {
- 	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+ 	struct kvm_pgtable_walker walker = {
+@@ -1029,6 +1072,7 @@ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ 		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
+ 	};
  
-@@ -722,7 +739,7 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
- 	 * value (if any).
- 	 */
- 	if (kvm_pte_table(ctx->old, ctx->level))
--		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-+		kvm_table_pte_flush(mmu, ctx->addr, ctx->level, tlb_level);
- 	else if (kvm_pte_valid(ctx->old))
- 		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
++	kvm_pgtable_try_fast_stage2_unmap(pgt, addr, size);
+ 	return kvm_pgtable_walk(pgt, addr, size, &walker);
+ }
  
-@@ -804,7 +821,7 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 	if (!stage2_pte_needs_update(ctx->old, new))
- 		return -EAGAIN;
- 
--	if (!stage2_try_break_pte(ctx, data->mmu))
-+	if (!stage2_try_break_pte(ctx, data->mmu, ctx->level))
- 		return -EAGAIN;
- 
- 	/* Perform CMOs before installation of the guest stage-2 PTE */
-@@ -861,7 +878,11 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 	if (!childp)
- 		return -ENOMEM;
- 
--	if (!stage2_try_break_pte(ctx, data->mmu)) {
-+	/*
-+	 * As the table will be replaced with a block, one level down would
-+	 * be the current page entries held by the table.
-+	 */
-+	if (!stage2_try_break_pte(ctx, data->mmu, ctx->level + 1)) {
- 		mm_ops->put_page(childp);
- 		return -EAGAIN;
- 	}
 -- 
 2.39.0.314.g84b9a713c41-goog
 
