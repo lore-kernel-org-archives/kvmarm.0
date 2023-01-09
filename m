@@ -1,145 +1,54 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E695221
-	for <kvmarm@lists.linux.dev>; Mon,  9 Jan 2023 21:18:05 +0000 (UTC)
-Received: by mail-pj1-f74.google.com with SMTP id o8-20020a17090a9f8800b002260d01b221so7890609pjp.8
-        for <kvmarm@lists.linux.dev>; Mon, 09 Jan 2023 13:18:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1fGw/0OCsAgcLKqcxRg8B1wba5pl1dSM4UJ7whQhNus=;
-        b=XIHoEXJsLKggrCYm8dMw9CNWMw+6PgaeLRrWr9vnCxdQwaLVhfKERDtO9l2H6EW1Dh
-         1nCcgnxRtUxlqUoT74tSTXoy1tdTLSLhk2U6erKXX0uz3126OIqHnG6mZEM7dfBAIdXr
-         qyH5Ti18HNXAjpdvVp0SiyLg0ZWJIuu3CrFYWBpJcdUCPCnnwnxDvhkwHzJ5KtlNof3T
-         HTAiYKcBq1r5R2lwJcvKHK3N3uBQD+RtrpfzSTDDcTVukREwv51yZd44Wdn0hnFMeiYC
-         ME6s84fW5I6gF9F6oevKpf399e+GcuIEZTtF6FttB+Kno5YPnoqigmUj2/aL8sq1/FWH
-         PEbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1fGw/0OCsAgcLKqcxRg8B1wba5pl1dSM4UJ7whQhNus=;
-        b=kTMEzoIqiSSwLaJv3BUBkSJo7D7+VswNiT19+yiI6N+lKduRGSxHhPFpEH6HyMvAkW
-         o8j8uErSDU7aA9VzS3K2E17ltxVWxfViIG3NEyFO4au/GZa1/lAYFC1AJrr+ROBUGvNz
-         vRhDNams1CED8KlpKTdcPkcBfAb1NPG3TIqDdf+XxtJ5ElsxhoMe1SBa8Fs1rASag5/M
-         y69qHIywASJa4ZQ1l4E0VZbwoZoZGCFIHX+zcPfF4E5fuee28mHfhONiROYMX1TBQUlb
-         zv2Lxh0+mSzHsi5jiZD+cpGnzsnx5Cr1p/KCZatpWdSPb49kNFZv/iwfO8vJE+z9L5vv
-         BHBg==
-X-Gm-Message-State: AFqh2kpOlDVp8uAOdFWgnSAeytvMOQdI3h6efygI5KZDfWxAa71zf7pG
-	wyEHmwvgGAKvJFtfjJJDpE3GljhHypvItQ==
-X-Google-Smtp-Source: AMrXdXt5UcDfVynd4OKNMj0k6WlhLXtUrkn7P6bTiWJ+MhnH6xSPLbuWkfTsO35fZsz8XEeqtP3U5Vw9SaKa6Q==
-X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a17:902:a588:b0:188:5c52:83e1 with SMTP
- id az8-20020a170902a58800b001885c5283e1mr5417601plb.128.1673299085698; Mon,
- 09 Jan 2023 13:18:05 -0800 (PST)
-Date: Mon,  9 Jan 2023 21:17:54 +0000
-In-Reply-To: <20230109211754.67144-1-ricarkol@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5555221
+	for <kvmarm@lists.linux.dev>; Mon,  9 Jan 2023 21:42:15 +0000 (UTC)
+Date: Mon, 9 Jan 2023 21:42:04 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1673300528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PpqONOelb/4WFMSICcyp4oeONFQwc1P6ct10ZznkhDM=;
+	b=Q5kFqH5okr/ceLAYL9gUYXZyYyVMdF4baPjIBag9JppXXX/M1SOD9phKJ/QlgEyyDzpJPz
+	wqpW1HFtQH+iIaU7OXuJ1PG+9ZQxiFHJah+80Gsq7hiq7Tbevuy/7Md87LZOScqQlZsS3O
+	hWDaKwCpiXcqxbVn/At0C8Q0RBexf5w=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Ricardo Koller <ricarkol@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev,
+	maz@kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com,
+	reijiw@google.com
+Subject: Re: [kvm-unit-tests PATCH v3 1/4] arm: pmu: Fix overflow checks for
+ PMUv3p5 long counters
+Message-ID: <Y7yKLI2m+SL1BNgg@google.com>
+References: <20230109211754.67144-1-ricarkol@google.com>
+ <20230109211754.67144-2-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230109211754.67144-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230109211754.67144-5-ricarkol@google.com>
-Subject: [kvm-unit-tests PATCH v3 4/4] arm: pmu: Print counter values as hexadecimals
-From: Ricardo Koller <ricarkol@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
-Cc: maz@kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com, 
-	oliver.upton@linux.dev, reijiw@google.com, 
-	Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230109211754.67144-2-ricarkol@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-The arm/pmu test prints the value of counters as %ld.  Most tests start
-with counters around 0 or UINT_MAX, so having something like -16 instead of
-0xffff_fff0 is not very useful.
+On Mon, Jan 09, 2023 at 09:17:51PM +0000, Ricardo Koller wrote:
+> PMUv3p5 uses 64-bit counters irrespective of whether the PMU is configured
+> for overflowing at 32 or 64-bits. The consequence is that tests that check
+> the counter values after overflowing should not assume that values will be
+> wrapped around 32-bits: they overflow into the other half of the 64-bit
+> counters on PMUv3p5.
+> 
+> Fix tests by correctly checking overflowing-counters against the expected
+> 64-bit value.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
 
-Report counter values as hexadecimals.
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- arm/pmu.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
-
-diff --git a/arm/pmu.c b/arm/pmu.c
-index 72d0f50..77b0a70 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -552,8 +552,8 @@ static void test_mem_access(bool overflow_at_64bits)
- 	write_sysreg_s(0x3, PMCNTENSET_EL0);
- 	isb();
- 	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
--	report_info("counter #0 is %ld (MEM_ACCESS)", read_regn_el0(pmevcntr, 0));
--	report_info("counter #1 is %ld (MEM_ACCESS)", read_regn_el0(pmevcntr, 1));
-+	report_info("counter #0 is 0x%lx (MEM_ACCESS)", read_regn_el0(pmevcntr, 0));
-+	report_info("counter #1 is 0x%lx (MEM_ACCESS)", read_regn_el0(pmevcntr, 1));
- 	/* We may measure more than 20 mem access depending on the core */
- 	report((read_regn_el0(pmevcntr, 0) == read_regn_el0(pmevcntr, 1)) &&
- 	       (read_regn_el0(pmevcntr, 0) >= 20) && !read_sysreg(pmovsclr_el0),
-@@ -568,7 +568,7 @@ static void test_mem_access(bool overflow_at_64bits)
- 	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
- 	report(read_sysreg(pmovsclr_el0) == 0x3,
- 	       "Ran 20 mem accesses with expected overflows on both counters");
--	report_info("cnt#0 = %ld cnt#1=%ld overflow=0x%lx",
-+	report_info("cnt#0=0x%lx cnt#1=0x%lx overflow=0x%lx",
- 			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1),
- 			read_sysreg(pmovsclr_el0));
- }
-@@ -599,7 +599,7 @@ static void test_sw_incr(bool overflow_at_64bits)
- 		write_sysreg(0x1, pmswinc_el0);
- 
- 	isb();
--	report_info("SW_INCR counter #0 has value %ld", read_regn_el0(pmevcntr, 0));
-+	report_info("SW_INCR counter #0 has value 0x%lx", read_regn_el0(pmevcntr, 0));
- 	report(read_regn_el0(pmevcntr, 0) == pre_overflow,
- 		"PWSYNC does not increment if PMCR.E is unset");
- 
-@@ -616,7 +616,7 @@ static void test_sw_incr(bool overflow_at_64bits)
- 	isb();
- 	report(read_regn_el0(pmevcntr, 0) == cntr0, "counter #0 after + 100 SW_INCR");
- 	report(read_regn_el0(pmevcntr, 1) == 100, "counter #1 after + 100 SW_INCR");
--	report_info("counter values after 100 SW_INCR #0=%ld #1=%ld",
-+	report_info("counter values after 100 SW_INCR #0=0x%lx #1=0x%lx",
- 		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
- 	report(read_sysreg(pmovsclr_el0) == 0x1,
- 		"overflow on counter #0 after 100 SW_INCR");
-@@ -692,7 +692,7 @@ static void test_chained_sw_incr(bool unused)
- 	report((read_sysreg(pmovsclr_el0) == 0x1) &&
- 		(read_regn_el0(pmevcntr, 1) == 1),
- 		"overflow and chain counter incremented after 100 SW_INCR/CHAIN");
--	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
-+	report_info("overflow=0x%lx, #0=0x%lx #1=0x%lx", read_sysreg(pmovsclr_el0),
- 		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
- 
- 	/* 64b SW_INCR and overflow on CHAIN counter*/
-@@ -713,7 +713,7 @@ static void test_chained_sw_incr(bool unused)
- 	       (read_regn_el0(pmevcntr, 0) == cntr0) &&
- 	       (read_regn_el0(pmevcntr, 1) == cntr1),
- 	       "expected overflows and values after 100 SW_INCR/CHAIN");
--	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
-+	report_info("overflow=0x%lx, #0=0x%lx #1=0x%lx", read_sysreg(pmovsclr_el0),
- 		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
- }
- 
-@@ -745,11 +745,11 @@ static void test_chain_promotion(bool unused)
- 	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
- 	report(!read_regn_el0(pmevcntr, 1) && (read_sysreg(pmovsclr_el0) == 0x1),
- 		"odd counter did not increment on overflow if disabled");
--	report_info("MEM_ACCESS counter #0 has value %ld",
-+	report_info("MEM_ACCESS counter #0 has value 0x%lx",
- 		    read_regn_el0(pmevcntr, 0));
--	report_info("CHAIN counter #1 has value %ld",
-+	report_info("CHAIN counter #1 has value 0x%lx",
- 		    read_regn_el0(pmevcntr, 1));
--	report_info("overflow counter %ld", read_sysreg(pmovsclr_el0));
-+	report_info("overflow counter 0x%lx", read_sysreg(pmovsclr_el0));
- 
- 	/* start at 0xFFFFFFDC, +20 with CHAIN enabled, +20 with CHAIN disabled */
- 	pmu_reset();
--- 
-2.39.0.314.g84b9a713c41-goog
-
+--
+Thanks,
+Oliver
