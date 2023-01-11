@@ -1,109 +1,82 @@
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C1917EA
-	for <kvmarm@lists.linux.dev>; Wed, 11 Jan 2023 21:55:26 +0000 (UTC)
-Received: by mail-io1-f73.google.com with SMTP id z9-20020a6be009000000b006e0577c3686so9852396iog.0
-        for <kvmarm@lists.linux.dev>; Wed, 11 Jan 2023 13:55:26 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493EC2560
+	for <kvmarm@lists.linux.dev>; Wed, 11 Jan 2023 22:46:20 +0000 (UTC)
+Received: by mail-yb1-f172.google.com with SMTP id 203so16675113yby.10
+        for <kvmarm@lists.linux.dev>; Wed, 11 Jan 2023 14:46:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5+Lc80XI6+/XFtzqxxXoccg5ZlmmZp+XMvjzGNjlgdY=;
-        b=pr0T7+PBBqvw8ZDsfjBgUZvMxddbqCU2+hLCUXb5Q/KNZ5wGdziczOEwtEzvV4FSxp
-         Bl7Jra9HhzQ7/NUopse/UBLr5cK8fb8aRnbZB4+PDoHIJaOxwmc8kNpy76z7d2wd8su8
-         l+I2M3eQ+g5rzaSJvRtvE8KU+d2Up0JrW5+6yhGfU8i/lZ+Mk/yuaUyDYMeIlsEWzmwz
-         E+1q8xjwP0deCiIJ9yVWd7lyka48i5ZQ1jYV9CcEC95pHA8TopwNRc2BfRi+ExZmVDce
-         DL2JkDQnLsjTrP/O58FSpAlsql0DlR91nWEuYFn3KMiALJYfBbu7/RPhPlfbJZzt88IK
-         Bevw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=7XUNRQSkmgxBwPtlFe+tY4O7Zk2hAxIaFzmJ+ZbBo5g=;
+        b=FlburyiZ8GT2QW0nv2OtZ0LUE1v2vF0Y/pHEWD9oGzHjZ4h/FjWKkwyFdBbDcaNnUP
+         2Ie9tt3h4rkQPD0tXq/TDTvxnd6ZigemFV6kwDmtr8N+ST9EWS/PCcr60+Ix/1/nGs5f
+         AsS3qP6KlbbwLtD/WwC5f8YbOx3QguruaU1rcVfGrW/ie+zf83l970YFUufIsjbNIiUq
+         sOpWBWkriYTJY68Ckrn/LOIFaYAJD092cfmRDNVLZVBMwe/94H2PMXzYvDpzZX5913qn
+         pafqeUDZuj3eeU+GBKGCKPCf9+dxdSStYgPnHgAplUUBx6hqL3oUwA4GwRhTGZB6hRam
+         i74Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5+Lc80XI6+/XFtzqxxXoccg5ZlmmZp+XMvjzGNjlgdY=;
-        b=yNCtiC5I1cXXc9QDkZKXYfOgu9gs4osa2BydK3vZS4l3rwed9SmGR7I/+oCNRWv0jx
-         r3RFS9OahYGQxmN7mbbcoheknSJd5bPcJuXos9atAL7qAv5ERXXgD8JidAF3xBjVe/Yc
-         12fDroxzcw/yf8YxERhxUXqG2E7jGTOsxsi5fIfO6kEGQ0HagDvLb/lADKSBNj4jJCqH
-         hXC7WQSt9lY1fMXYf0uixMOyzoVXYzcruA4DDSc48f0ylDFKtSz2rO4HhapQDQ25FDrR
-         21UxYrdL/BcO1YJma8ssMsZqUbEPgxIzCcVRrzT2irYABG7NAtfBW9WjVrONjCgiM7V4
-         GOrQ==
-X-Gm-Message-State: AFqh2kqkWMPFvyLJr4FUOIesTuTnDhLNRnElHjSaIaDWAkgjjqKDYl9d
-	bVH9QFwIg69QUBUQJhoUwTsqFuRAVNA03Wl+Yg==
-X-Google-Smtp-Source: AMrXdXulAe/2ABqltLbTgZW1LSdHJugjxwY87bzglaZvzTwnfUG6Pl+BSLM/nDkAXj74lzq+bOcj5pSZe+zjuAIXNw==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a92:d6cd:0:b0:30d:b0fe:852f with SMTP
- id z13-20020a92d6cd000000b0030db0fe852fmr1171090ilp.126.1673474126135; Wed,
- 11 Jan 2023 13:55:26 -0800 (PST)
-Date: Wed, 11 Jan 2023 21:54:22 +0000
-In-Reply-To: <20230111215422.2153645-1-coltonlewis@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7XUNRQSkmgxBwPtlFe+tY4O7Zk2hAxIaFzmJ+ZbBo5g=;
+        b=c2BnP8d24rAAVyUHs5VKtW9rPsyamiIoBi46PqNulEyg0hLTG+yO806KFRe+8vfts+
+         y7GUE7Ws58xd6xosz/ZHJg/xb/WHVo/huSUesos6ThT44w71RqjsdaWwMt1VokH9AJqT
+         42ZWzs4BOjQTbnu4ru8UCSURKdOBUFrNkcx+dPI3biScNs0EPgVCqxOgPZ+1ZxeEzJzq
+         f+EuQREt+h8AyylK6fUGjmPpMUg5cuc+53NgYGmbfOAy9D7bZX/UXeN+HVeXJRuDISwW
+         2KhaPL+AGysTF46aK9+Vk/0aztdEs0ptKru4QcBvG9xJf022ul4nVwtv+uEYYWRFk4UW
+         unqA==
+X-Gm-Message-State: AFqh2kpcHTQqTIXGVa9kTC5Tnh3Y2zbFHSV/6dFpC/dz42rWW+JQ0Taj
+	Q2hfc+IXSDjCzc3NWRFr7glKZJizyACLODdEoB+nWQ==
+X-Google-Smtp-Source: AMrXdXvjcRQ0s93N60oB4UG+s8wkaJANmmRe0uXkJseN3DOope/rh00sX6ExARGo71QZgK8ljnJFa82hwhnRQq3QYv0=
+X-Received: by 2002:a5b:189:0:b0:723:96ad:6761 with SMTP id
+ r9-20020a5b0189000000b0072396ad6761mr8600316ybl.326.1673477179137; Wed, 11
+ Jan 2023 14:46:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230111215422.2153645-1-coltonlewis@google.com>
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230111215422.2153645-2-coltonlewis@google.com>
-Subject: [kvm-unit-tests PATCH v2 1/1] arm: Replace MAX_SMP probe loop in
- favor of reading directly
-From: Colton Lewis <coltonlewis@google.com>
-To: thuth@redhat.com, pbonzini@redhat.com, nrb@linux.ibm.com, 
-	andrew.jones@linux.dev, imbrenda@linux.ibm.com, marcorr@google.com, 
-	alexandru.elisei@arm.com, oliver.upton@linux.dev
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Colton Lewis <coltonlewis@google.com>
+MIME-Version: 1.0
+References: <20221208193857.4090582-1-dmatlack@google.com> <20221208193857.4090582-5-dmatlack@google.com>
+ <b0e8eb55-c2ee-ce13-8806-9d0184678984@redhat.com>
+In-Reply-To: <b0e8eb55-c2ee-ce13-8806-9d0184678984@redhat.com>
+From: David Matlack <dmatlack@google.com>
+Date: Wed, 11 Jan 2023 14:45:53 -0800
+Message-ID: <CALzav=eQVLAH2coTU1FaOFstFp-AqQBb0JCycrRcP5qjqfMwEg@mail.gmail.com>
+Subject: Re: [RFC PATCH 04/37] KVM: x86/mmu: Invert sp->tdp_mmu_page to sp->shadow_mmu_page
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
+	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Sean Christopherson <seanjc@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Anshuman Khandual <anshuman.khandual@arm.com>, Nadav Amit <namit@vmware.com>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Vlastimil Babka <vbabka@suse.cz>, 
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Suren Baghdasaryan <surenb@google.com>, 
+	Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Yu Zhao <yuzhao@google.com>, Colin Cross <ccross@google.com>, Hugh Dickins <hughd@google.com>, 
+	Ben Gardon <bgardon@google.com>, Mingwei Zhang <mizhang@google.com>, 
+	Krish Sadhukhan <krish.sadhukhan@oracle.com>, Ricardo Koller <ricarkol@google.com>, 
+	Jing Zhang <jingzhangos@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
+	linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 
-Replace the MAX_SMP probe loop in favor of reading a number directly
-from the QEMU error message. This is equally safe as the existing code
-because the error message has had the same format as long as it has
-existed, since QEMU v2.10. The final number before the end of the
-error message line indicates the max QEMU supports. A short awk
-program is used to extract the number, which becomes the new MAX_SMP
-value.
+On Mon, Dec 12, 2022 at 3:15 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 12/8/22 20:38, David Matlack wrote:
+> > Invert the meaning of sp->tdp_mmu_page and rename it accordingly. This
+> > allows the TDP MMU code to not care about this field, which will be used
+> > in a subsequent commit to move the TDP MMU to common code.
+> >
+> > No functional change intended.
+>
+> Let's use a bit of the role instead.
 
-This loop logic is broken for machines with a number of CPUs that
-isn't a power of two. A machine with 8 CPUs will test with MAX_SMP=8
-but a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 2 ==
-6. This can, in rare circumstances, lead to different test results
-depending only on the number of CPUs the machine has.
-
-A previous comment explains the loop should only apply to kernels
-<=v4.3 on arm and suggests deletion when it becomes tiresome to
-maintian. However, it is always theoretically possible to test on a
-machine that has more CPUs than QEMU supports, so it makes sense to
-leave some check in place.
-
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- scripts/runtime.bash | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
-
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index f8794e9..4377e75 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -188,12 +188,10 @@ function run()
- # Probe for MAX_SMP, in case it's less than the number of host cpus.
- #
- # This probing currently only works for ARM, as x86 bails on another
--# error first. Also, this probing isn't necessary for any ARM hosts
--# running kernels later than v4.3, i.e. those including ef748917b52
--# "arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'". So, at some
--# point when maintaining the while loop gets too tiresome, we can
--# just remove it...
--while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
--		|& grep -qi 'exceeds max CPUs'; do
--	MAX_SMP=$((MAX_SMP >> 1))
--done
-+# error first. The awk program takes the last number from the QEMU
-+# error message, which gives the allowable MAX_SMP.
-+if $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
-+      |& grep -qi 'exceeds max CPUs'; then
-+	GET_LAST_NUM='/exceeds max CPUs/ {match($0, /[[:digit:]]+)$/); print substr($0, RSTART, RLENGTH-1)}'
-+	MAX_SMP=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP |& awk "$GET_LAST_NUM")
-+fi
--- 
-2.39.0.314.g84b9a713c41-goog
-
+Will do in v2, thanks.
