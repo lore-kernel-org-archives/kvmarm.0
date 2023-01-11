@@ -1,32 +1,35 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from out-10.mta0.migadu.com (out-10.mta0.migadu.com [91.218.175.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F62E3209
-	for <kvmarm@lists.linux.dev>; Wed, 11 Jan 2023 17:21:25 +0000 (UTC)
-Date: Wed, 11 Jan 2023 17:21:13 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A38A92A
+	for <kvmarm@lists.linux.dev>; Wed, 11 Jan 2023 20:00:17 +0000 (UTC)
+Date: Wed, 11 Jan 2023 18:25:30 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1673457677;
+	t=1673461535;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0u88J8dfNU/RPu9uPZMrpaWbNvv2e1iTrIGnk2QU/9w=;
-	b=nvB5jx+uUEkws3/iF6IjxUL148/2RzcGcXevvD09meuO4lcVvjJwtZ8midJ3jIc6OZUCXd
-	b+R8/0BSh8QhWpPgM8b4I4QVqhSzNAhQsiy/tKTwF6uGyr6I3ywvMnQo3rO8WDEgIJ7wNO
-	MViTeRhLbPSxrYAZC6bzIJOASbkuBCc=
+	bh=hAs7LUynKbLq5T1v0UqKm3yOvkRnDNP7tzZTR0H+taQ=;
+	b=NqZq6497DO/W7iQJ4P2g+Cej/89CLOjShG4+NPInRAducOx5h40SVY6Ov197WHklT/QLkf
+	wUNl+HcsZI6LVTdimfaZalC6esS6PEbunmMtMh/w60PMFbeWdWt5krHHDD1CJyeMrRvswK
+	mu5Y4S3E+NA6l/NWYLilEoNVTDDqS+k=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, Quentin Perret <qperret@google.com>,
-	Will Deacon <will@kernel.org>, Reiji Watanabe <reijiw@google.com>,
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 3/5] KVM: arm64: Only return attributes from
- stage2_update_leaf_attrs()
-Message-ID: <Y77wCeSYo7POSs3z@google.com>
-References: <20230111000300.2034799-1-oliver.upton@linux.dev>
- <20230111000300.2034799-4-oliver.upton@linux.dev>
- <87ilhde9me.wl-maz@kernel.org>
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	James Morse <james.morse@arm.com>, Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>, asahi@lists.linux.dev,
+	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+	Sven Peter <sven@svenpeter.dev>, Hector Martin <marcan@marcan.st>
+Subject: Re: [PATCH v6 7/7] KVM: arm64: Normalize cache configuration
+Message-ID: <Y77/Gi+193u+YvwX@google.com>
+References: <20230107094629.181236-1-akihiko.odaki@daynix.com>
+ <20230107094629.181236-8-akihiko.odaki@daynix.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,59 +38,204 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87ilhde9me.wl-maz@kernel.org>
+In-Reply-To: <20230107094629.181236-8-akihiko.odaki@daynix.com>
 X-Migadu-Flow: FLOW_OUT
 
-Hey Marc,
-
-On Wed, Jan 11, 2023 at 08:52:25AM +0000, Marc Zyngier wrote:
-> [+ Suzuki and Zenghui who are missing from the Cc list]
-
-Doh! Just switched over to working out of a new git tree and didn't move
-over my cc-cmd. Apologies to you two.
-
-> On Wed, 11 Jan 2023 00:02:58 +0000,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > Returning a single PTE from stage2_update_leaf_attrs() doesn't make a
-> > great deal of sense given that the function could be used to apply a
-> > change to a range of PTEs. Instead, return a bitwise OR of attributes
-> > from all the visited PTEs.
+On Sat, Jan 07, 2023 at 06:46:29PM +0900, Akihiko Odaki wrote:
+> Before this change, the cache configuration of the physical CPU was
+> exposed to vcpus. This is problematic because the cache configuration a
+> vcpu sees varies when it migrates between vcpus with different cache
+> configurations.
 > 
-> I find this amalgamation of attributes quite confusing, and I have a
-> hard time attaching semantics to the resulting collection of bits.
+> Fabricate cache configuration from the sanitized value, which holds the
+> CTR_EL0 value the userspace sees regardless of which physical CPU it
+> resides on.
 > 
-> It also means that you cannot reason about a particular attribute
-> being 0 if any of the neighbour PTEs has this bit set.
+> CLIDR_EL1 and CCSIDR_EL1 are now writable from the userspace so that
+> the VMM can restore the values saved with the old kernel.
+> 
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+>  arch/arm64/include/asm/cache.h    |   3 +
+>  arch/arm64/include/asm/kvm_host.h |   4 +
+>  arch/arm64/kvm/reset.c            |   1 +
+>  arch/arm64/kvm/sys_regs.c         | 252 ++++++++++++++++++------------
+>  4 files changed, 164 insertions(+), 96 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
+> index ab7133654a72..a51e6e8f3171 100644
+> --- a/arch/arm64/include/asm/cache.h
+> +++ b/arch/arm64/include/asm/cache.h
+> @@ -22,6 +22,9 @@
+>  #define CLIDR_CTYPE(clidr, level)	\
+>  	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
+>  
+> +/* Ttypen, bits [2(n - 1) + 34 : 2(n - 1) + 33], for n = 1 to 7 */
+> +#define CLIDR_TTYPE_SHIFT(level)	(2 * ((level) - 1) + CLIDR_EL1_Ttypen_SHIFT)
+> +
+>  /*
+>   * Memory returned by kmalloc() may be used for DMA, so we must make
+>   * sure that all such allocations are cache aligned. Otherwise,
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 374390a9212e..496602e0b299 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -252,6 +252,7 @@ struct kvm_vcpu_fault_info {
+>  enum vcpu_sysreg {
+>  	__INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+>  	MPIDR_EL1,	/* MultiProcessor Affinity Register */
+> +	CLIDR_EL1,	/* Cache Level ID Register */
+>  	CSSELR_EL1,	/* Cache Size Selection Register */
+>  	SCTLR_EL1,	/* System Control Register */
+>  	ACTLR_EL1,	/* Auxiliary Control Register */
+> @@ -501,6 +502,9 @@ struct kvm_vcpu_arch {
+>  		u64 last_steal;
+>  		gpa_t base;
+>  	} steal;
+> +
+> +	/* Per-vcpu CCSIDR override or NULL */
+> +	u32 *ccsidr;
+>  };
+>  
+>  /*
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index e0267f672b8a..dc235ddc6172 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -157,6 +157,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  	if (sve_state)
+>  		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
+>  	kfree(sve_state);
+> +	kfree(vcpu->arch.ccsidr);
+>  }
+>  
+>  static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 5617de916c80..e789f9dea277 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -11,6 +11,7 @@
+>  
+>  #include <linux/bitfield.h>
+>  #include <linux/bsearch.h>
+> +#include <linux/cacheinfo.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/mm.h>
+>  #include <linux/printk.h>
+> @@ -81,25 +82,85 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>  	 __vcpu_sys_reg(vcpu, reg) = val;
+>  }
+>  
+> -/* 3 bits per cache level, as per CLIDR, but non-existent caches always 0 */
+> -static u32 cache_levels;
+> -
+>  /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
+>  #define CSSELR_MAX 14
+>  
+> +static u8 get_min_cache_line_size(u32 csselr)
+> +{
+> +	u64 ctr_el0;
+> +	int field;
+> +
+> +	ctr_el0 = read_sanitised_ftr_reg(SYS_CTR_EL0);
+> +	field = csselr & CSSELR_EL1_InD ? CTR_EL0_IminLine_SHIFT : CTR_EL0_DminLine_SHIFT;
+> +
+> +	/*
+> +	 * Determine Log2(Number of bytes) - 4, which is the encoding of cache
+> +	 * line size in CCSIDR_EL0. In CTR_EL0, the cache line size is
+> +	 * represented with:
+> +	 * Log2(Number of words) = Log2((Number of bytes) / 4)
+> +	 *                       = Log2(Number of bytes) - 2
+> +	 */
+> +	return cpuid_feature_extract_unsigned_field(ctr_el0, field) - 2;
+> +}
 
-Very true. What I had really wanted to do was make a walker that allows
-software to check the state of specific attribute bit(s) within a range
-of memory instead of returning all of them. I decided against it because
-it would put more churn on other callers or require a new walker
-entirely.
+So I definitely got my math wrong when I was reading this the first
+time, apologies.
 
-Anyway, I can go about that change to make this a bit easier to reason
-about. Thoughts?
+Nonetheless, I still find the return value confusing here. It would be
+better to just return Log2(bytes) outright (i.e. no offset) and document
+that. I worry that the next user of this function will miss that detail.
 
-> > 
-> > As the walker is no longer returning the full PTE, drop the check for a
-> > valid PTE in kvm_age_gfn().
-> 
-> But then what does it mean to check for a potentially invalid PTE?
-> 
-> The helpers explicitly say:
-> 
-> /*
->  * The following only work if pte_present(). Undefined behaviour otherwise.
->  */
-> #define pte_present(pte)	(!!(pte_val(pte) & (PTE_VALID | PTE_PROT_NONE)))
-> #define pte_young(pte)		(!!(pte_val(pte) & PTE_AF))
-> 
-> and you seem to be violating this requirement.
+While at it we should probably convert to the new sysreg field helpers
+too.
 
-Indeed I have. It all still works because the call returns 0 if no valid
-PTE was found in the walk but that's nowhere near as obvious as what we
-had before.
+  /*
+   * Returns the minimum line size for the selected cache, expressed as
+   * Log2(bytes).
+   */
+  static u8 get_min_cache_line_size(bool icache)
+  {
+  	u64 ctr = read_sanitised_ftr_reg(SYS_CTR_EL0);
+	u8 field;
+
+	if (icache)
+		field = SYS_FIELD_GET(CTR_EL0, IminSize, ctr);
+	else
+		field = SYS_FIELD_GET(CTR_EL0, DminSize, ctr);
+
+	/*
+	 * Cache line size is represented as Log2(words) in CTR_EL0.
+	 * Log2(bytes) can be derived with the following:
+	 *
+	 * Log2(words) + 2 = Log2(bytes / 4) + 2
+	 * 		   = Log2(bytes) - 2 + 2
+	 * 		   = Log2(bytes)
+	 */
+	return field + 2;
+  }
+
+> +
+>  /* Which cache CCSIDR represents depends on CSSELR value. */
+> -static u32 get_ccsidr(u32 csselr)
+> +static u32 get_ccsidr(struct kvm_vcpu *vcpu, u32 csselr)
+>  {
+> -	u32 ccsidr;
+> +	if (vcpu->arch.ccsidr)
+> +		return vcpu->arch.ccsidr[csselr];
+>  
+> -	/* Make sure noone else changes CSSELR during this! */
+> -	local_irq_disable();
+> -	write_sysreg(csselr, csselr_el1);
+> -	isb();
+> -	ccsidr = read_sysreg(ccsidr_el1);
+> -	local_irq_enable();
+> +	/*
+> +	 * Fabricate a CCSIDR value as the overriding value does not exist.
+> +	 * The real CCSIDR value will not be used as it can vary by the
+> +	 * physical CPU which the vcpu currently resides in.
+> +	 *
+> +	 * The line size is determined with get_min_cache_line_size(), which
+> +	 * should be valid for all CPUs even if they have different cache
+> +	 * configuration.
+> +	 *
+> +	 * The associativity bits are cleared, meaning the geometry of all data
+> +	 * and unified caches (which are guaranteed to be PIPT and thus
+> +	 * non-aliasing) are 1 set and 1 way.
+> +	 * Guests should not be doing cache operations by set/way at all, and
+> +	 * for this reason, we trap them and attempt to infer the intent, so
+> +	 * that we can flush the entire guest's address space at the appropriate
+> +	 * time. The exposed geometry minimizes the number of the traps.
+> +	 * [If guests should attempt to infer aliasing properties from the
+> +	 * geometry (which is not permitted by the architecture), they would
+> +	 * only do so for virtually indexed caches.]
+> +	 *
+> +	 * We don't check if the cache level exists as it is allowed to return
+> +	 * an UNKNOWN value if not.
+> +	 */
+> +	return get_min_cache_line_size(csselr) << CCSIDR_EL1_LineSize_SHIFT;
+
+So with the above change, this would become:
+
+	u8 line_size = get_min_cache_line_size(csselr & CSSELR_EL1_InD);
+
+	return SYS_FIELD_PREP(CSSELR_EL1, LineSize, line_size - 4);
+
+Which I find slightly more readable because it moves the -4 offset to
+where the relevant field is initialized. Adding an extra bit of
+information to your comment explaining the offset is likely worthwhile
+too.
 
 --
 Thanks,
