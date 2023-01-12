@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60FCD8476
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:21:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3038BC433D2;
-	Thu, 12 Jan 2023 19:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3098476
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:21:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 624AFC433D2;
+	Thu, 12 Jan 2023 19:21:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551272;
-	bh=bqx6jidbc2f+LQLxjJDORJmIUTqcTIYjVPiIBgFGjyA=;
+	s=k20201202; t=1673551274;
+	bh=ITfwjvL0S3gE00JRlFGIpEAas7Z3sYDkpINzgiBIE1s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=D35SiJ5qO+6sOQcBUYIMu59oly1r5exZdxt0apcO5I4g/DFmwwZv3cX/771Zh8YYV
-	 F4CgGxPicEbH75M+Jl3uwjxJD1h5Gq0N2i1c53sfusNs3zyVZdFCnjA2NZfLBJZAPX
-	 wuDYDOTHTZsV5+8zYUQSXxb0fF71P+0zPDoIPVeBPM7UosTD0khSP4NJCET612T0WW
-	 s2K1FixLwLqqzEnN0jJHLkaOBmbxFVu5YIVFu+ozV/kwFKn/Sb+MW47MtHlVy5ggtW
-	 2Dl8qnVOM3vri3dME/x7RrZ2uKktQJRNSMg86NuQHDlsBKRcXlFMGGE2AAhLnOOh8j
-	 YOlQ92a7FGe1g==
+	b=qZr8HnX9Ed/maGas1H2S/WMPVMi5UNEI3v5ulFrRpgFfFQcuOV9J+TaGd426fi/V0
+	 6ElahqA29pkiZwOLUIcq1LEBOkiZri4u955MA6QGWFPyo6UI5VksJg2HPLn71C3dF1
+	 3wNU3kx8Q96PtN51WuEE+Zc6EapgiiLxlferSr8MGzAm96/Nii4ov1KV+L2iw8GjqQ
+	 mO74kH/a4NBGqxj9uyfvpXh1W8hBiBJJgGmfi4TEymKrMc+wLWC1QeYZOtdeNvhcyc
+	 FXpdihaLCAlKe1FwnM13n4zVTuycj/TN/L3u6Xv/pRT8Jn8y61QWrgaUmId4rccEiG
+	 YEhlLaJgKwgZw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG36y-001IWu-7M;
-	Thu, 12 Jan 2023 19:19:40 +0000
+	id 1pG37T-001IWu-5a;
+	Thu, 12 Jan 2023 19:20:11 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 12/68] KVM: arm64: nv: Add non-VHE-EL2->EL1 translation helpers
-Date: Thu, 12 Jan 2023 19:18:31 +0000
-Message-Id: <20230112191927.1814989-13-maz@kernel.org>
+Subject: [PATCH v7 62/68] KVM: arm64: nv: Publish emulated timer interrupt state in the in-memory state
+Date: Thu, 12 Jan 2023 19:19:21 +0000
+Message-Id: <20230112191927.1814989-63-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,85 +54,52 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Some EL2 system registers immediately affect the current execution
-of the system, so we need to use their respective EL1 counterparts.
-For this we need to define a mapping between the two. In general,
-this only affects non-VHE guest hypervisors, as VHE system registers
-are compatible with the EL1 counterparts.
+With FEAT_NV2, the EL0 timer state is entirely stored in memory,
+meaning that the hypervisor can only provide a very poor emulation.
 
-These helpers will get used in subsequent patches.
+The only thing we can really do is to publish the interrupt state
+in the guest view of CNT{P,V}_CTL_EL0, and defer everything else
+to the next exit.
 
-Co-developed-by: Andre Przywara <andre.przywara@arm.com>
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Only FEAT_ECV will allow us to fix it, at the cost of extra trapping.
+
+Suggested-by: Chase Conklin <chase.conklin@arm.com>
+Suggested-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h | 48 +++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ arch/arm64/kvm/arch_timer.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index fd601ea68d13..f7bb1f0d0954 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -2,6 +2,7 @@
- #ifndef __ARM64_KVM_NESTED_H
- #define __ARM64_KVM_NESTED_H
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index c01277e8bd4a..71d2f1902de9 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -450,6 +450,25 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ {
+ 	int ret;
  
-+#include <linux/bitfield.h>
- #include <linux/kvm_host.h>
- 
- static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
-@@ -11,4 +12,51 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
- 		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
- }
- 
-+/* Translation helpers from non-VHE EL2 to EL1 */
-+static inline u64 tcr_el2_ps_to_tcr_el1_ips(u64 tcr_el2)
-+{
-+	return (u64)FIELD_GET(TCR_EL2_PS_MASK, tcr_el2) << TCR_IPS_SHIFT;
-+}
++	/*
++	 * Paper over NV2 brokenness by publishing the interrupt status
++	 * bit. This still results in a poor quality of emulation (guest
++	 * writes will have no effect until the next exit).
++	 *
++	 * But hey, it's fast, right?
++	 */
++	if (vcpu_has_nv2(vcpu) && is_hyp_ctxt(vcpu) &&
++	    (timer_ctx == vcpu_vtimer(vcpu) || timer_ctx == vcpu_ptimer(vcpu))) {
++		u32 ctl = timer_get_ctl(timer_ctx);
 +
-+static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
-+{
-+	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
-+	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
-+	       tcr_el2_ps_to_tcr_el1_ips(tcr) |
-+	       (tcr & TCR_EL2_TG0_MASK) |
-+	       (tcr & TCR_EL2_ORGN0_MASK) |
-+	       (tcr & TCR_EL2_IRGN0_MASK) |
-+	       (tcr & TCR_EL2_T0SZ_MASK);
-+}
++		if (new_level)
++			ctl |= ARCH_TIMER_CTRL_IT_STAT;
++		else
++			ctl &= ~ARCH_TIMER_CTRL_IT_STAT;
 +
-+static inline u64 translate_cptr_el2_to_cpacr_el1(u64 cptr_el2)
-+{
-+	u64 cpacr_el1 = 0;
++		timer_set_ctl(timer_ctx, ctl);
++	}
 +
-+	if (cptr_el2 & CPTR_EL2_TTA)
-+		cpacr_el1 |= CPACR_ELx_TTA;
-+	if (!(cptr_el2 & CPTR_EL2_TFP))
-+		cpacr_el1 |= CPACR_ELx_FPEN;
-+	if (!(cptr_el2 & CPTR_EL2_TZ))
-+		cpacr_el1 |= CPACR_ELx_ZEN;
-+
-+	return cpacr_el1;
-+}
-+
-+static inline u64 translate_sctlr_el2_to_sctlr_el1(u64 val)
-+{
-+	/* Only preserve the minimal set of bits we support */
-+	val &= (SCTLR_ELx_M | SCTLR_ELx_A | SCTLR_ELx_C | SCTLR_ELx_SA |
-+		SCTLR_ELx_I | SCTLR_ELx_IESB | SCTLR_ELx_WXN | SCTLR_ELx_EE);
-+	val |= SCTLR_EL1_RES1;
-+
-+	return val;
-+}
-+
-+static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
-+{
-+	/* Clear the ASID field */
-+	return ttbr0 & ~GENMASK_ULL(63, 48);
-+}
-+
- #endif /* __ARM64_KVM_NESTED_H */
+ 	timer_ctx->irq.level = new_level;
+ 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
+ 				   timer_ctx->irq.level);
 -- 
 2.34.1
 
