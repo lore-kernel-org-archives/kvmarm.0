@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004C9847C
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:19:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B927C433F1;
-	Thu, 12 Jan 2023 19:19:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71425847A
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:19:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D438C43398;
+	Thu, 12 Jan 2023 19:19:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551179;
-	bh=TGN/kx23WPPf/qh7QHqU9g0rW5CS/brhHQX6CSmzF54=;
+	s=k20201202; t=1673551180;
+	bh=bDxJtBbv3EPtICbhn9EntHIP/DYyRvi5Hb9bcUYfVhk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kiM/mR03ghC4wpAtQudIT7INmRGjdzyAcVR0hrBR+sd0YX0KImw5vw3dbwW1zb851
-	 bKM7w53/BkeA+mBOmcDhlztgVGK6YAHyxLoKzbGYBECj45FJt0AIrV+okQWVHBBX0U
-	 5Pb0w4HjoY+xDjStBwIteU/1ef5temH0K4qQomYBIx/XXOI1a8vs8xqxzDzqdYwoMQ
-	 z9h5AElmODoKczlZqZzOlAgVdVi1kxR6s2JU+s9CMCnHyIg6b93fe1K2xSMNViFDv1
-	 QocYQM7sU8taK3spv8XJ2sfOm+uLRW+aY5y04Idrjm0mZbvWIRTR9Vn0TrWSkyisyq
-	 0erJeEHucjZvw==
+	b=IdOYUgkUk4ntlP5Vl2qW2xaaK6D94ImptcUSc4uBBfMiKxObyFjSp6kg+eFUZkIHc
+	 9s+b+f5QkE4+PUA85lowuw6TlLANucE278PXiPSJRxAQDxn0Jsa55AOMlDi+0STjB4
+	 IvhZgv0KMVK4LzvHs/k0Gcwuuy1a0vGqb4+VuzAQCSZ7okY6yE675BTdt9T+kZuXAn
+	 JJjEF692rX5yb4geiLubVStrGNhhOMenR+8/2NyzYnXvF/4fqDKVIUbs8ublKsj8Kk
+	 Zx7jg5VaURvCQ1NPrt5MnlwrZWh4xj2YhRrlmPXmFbigo94iMXnmLgKEiD2P5KzUDJ
+	 cO3jyPu0FZm8Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG36v-001IWu-Qk;
-	Thu, 12 Jan 2023 19:19:37 +0000
+	id 1pG36w-001IWu-IS;
+	Thu, 12 Jan 2023 19:19:38 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 03/68] KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
-Date: Thu, 12 Jan 2023 19:18:22 +0000
-Message-Id: <20230112191927.1814989-4-maz@kernel.org>
+Subject: [PATCH v7 06/68] KVM: arm64: nv: Add nested virt VCPU primitives for vEL2 VCPU state
+Date: Thu, 12 Jan 2023 19:18:25 +0000
+Message-Id: <20230112191927.1814989-7-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -56,73 +56,86 @@ X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to 
 
 From: Christoffer Dall <christoffer.dall@arm.com>
 
-Reset the VCPU with PSTATE.M = EL2h when the nested virtualization
-feature is enabled on the VCPU.
+When running a nested hypervisor we commonly have to figure out if
+the VCPU mode is running in the context of a guest hypervisor or guest
+guest, or just a normal guest.
+
+Add convenient primitives for this.
 
 Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-[maz: rework register reset not to use empty data structures]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/reset.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ arch/arm64/include/asm/kvm_emulate.h | 56 ++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index e0267f672b8a..d061dcc21578 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -27,6 +27,7 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_nested.h>
- #include <asm/virt.h>
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 193583df2d9c..e5d826dc0b63 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -183,6 +183,62 @@ static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
+ 		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
+ }
  
- /* Maximum phys_shift supported for any VM on this host */
-@@ -38,6 +39,9 @@ static u32 kvm_ipa_limit;
- #define VCPU_RESET_PSTATE_EL1	(PSR_MODE_EL1h | PSR_A_BIT | PSR_I_BIT | \
- 				 PSR_F_BIT | PSR_D_BIT)
- 
-+#define VCPU_RESET_PSTATE_EL2	(PSR_MODE_EL2h | PSR_A_BIT | PSR_I_BIT | \
-+				 PSR_F_BIT | PSR_D_BIT)
-+
- #define VCPU_RESET_PSTATE_SVC	(PSR_AA32_MODE_SVC | PSR_AA32_A_BIT | \
- 				 PSR_AA32_I_BIT | PSR_AA32_F_BIT)
- 
-@@ -220,6 +224,10 @@ static int kvm_set_vm_width(struct kvm_vcpu *vcpu)
- 	if (kvm_has_mte(kvm) && is32bit)
- 		return -EINVAL;
- 
-+	/* NV is incompatible with AArch32 */
-+	if (vcpu_has_nv(vcpu) && is32bit)
-+		return -EINVAL;
-+
- 	if (is32bit)
- 		set_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
- 
-@@ -272,6 +280,12 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	if (loaded)
- 		kvm_arch_vcpu_put(vcpu);
- 
-+	/* Disallow NV+SVE for the time being */
-+	if (vcpu_has_nv(vcpu) && vcpu_has_feature(vcpu, KVM_ARM_VCPU_SVE)) {
-+		ret = -EINVAL;
-+		goto out;
++static inline bool vcpu_is_el2_ctxt(const struct kvm_cpu_context *ctxt)
++{
++	switch (ctxt->regs.pstate & (PSR_MODE32_BIT | PSR_MODE_MASK)) {
++	case PSR_MODE_EL2h:
++	case PSR_MODE_EL2t:
++		return true;
++	default:
++		return false;
 +	}
++}
 +
- 	if (!kvm_arm_vcpu_sve_finalized(vcpu)) {
- 		if (test_bit(KVM_ARM_VCPU_SVE, vcpu->arch.features)) {
- 			ret = kvm_vcpu_enable_sve(vcpu);
-@@ -294,6 +308,8 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	default:
- 		if (vcpu_el1_is_32bit(vcpu)) {
- 			pstate = VCPU_RESET_PSTATE_SVC;
-+		} else if (vcpu_has_nv(vcpu)) {
-+			pstate = VCPU_RESET_PSTATE_EL2;
- 		} else {
- 			pstate = VCPU_RESET_PSTATE_EL1;
- 		}
++static inline bool vcpu_is_el2(const struct kvm_vcpu *vcpu)
++{
++	return vcpu_is_el2_ctxt(&vcpu->arch.ctxt);
++}
++
++static inline bool __vcpu_el2_e2h_is_set(const struct kvm_cpu_context *ctxt)
++{
++	return ctxt_sys_reg(ctxt, HCR_EL2) & HCR_E2H;
++}
++
++static inline bool vcpu_el2_e2h_is_set(const struct kvm_vcpu *vcpu)
++{
++	return __vcpu_el2_e2h_is_set(&vcpu->arch.ctxt);
++}
++
++static inline bool __vcpu_el2_tge_is_set(const struct kvm_cpu_context *ctxt)
++{
++	return ctxt_sys_reg(ctxt, HCR_EL2) & HCR_TGE;
++}
++
++static inline bool vcpu_el2_tge_is_set(const struct kvm_vcpu *vcpu)
++{
++	return __vcpu_el2_tge_is_set(&vcpu->arch.ctxt);
++}
++
++static inline bool __is_hyp_ctxt(const struct kvm_cpu_context *ctxt)
++{
++	/*
++	 * We are in a hypervisor context if the vcpu mode is EL2 or
++	 * E2H and TGE bits are set. The latter means we are in the user space
++	 * of the VHE kernel. ARMv8.1 ARM describes this as 'InHost'
++	 *
++	 * Note that the HCR_EL2.{E2H,TGE}={0,1} isn't really handled in the
++	 * rest of the KVM code, and will result in a misbehaving guest.
++	 */
++	return vcpu_is_el2_ctxt(ctxt) ||
++		(__vcpu_el2_e2h_is_set(ctxt) && __vcpu_el2_tge_is_set(ctxt)) ||
++		__vcpu_el2_tge_is_set(ctxt);
++}
++
++static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
++{
++	return __is_hyp_ctxt(&vcpu->arch.ctxt);
++}
++
+ /*
+  * The layout of SPSR for an AArch32 state is different when observed from an
+  * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
 -- 
 2.34.1
 
