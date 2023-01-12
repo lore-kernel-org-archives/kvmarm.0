@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96972847A
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:21:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6774AC433EF;
-	Thu, 12 Jan 2023 19:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7295E8476
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:21:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A03EC433D2;
+	Thu, 12 Jan 2023 19:21:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551281;
-	bh=VeVmk02bzFFIbU65iNM/EuLGxs1o717vKwo7VgCMURs=;
+	s=k20201202; t=1673551283;
+	bh=VcE5R6SmkNiedouhMzGZSI0/6/cU30SgVaBgzhk/R6s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mrnrva0pcuxiCn0/RD+9p65gTcWIucojfHNu120ltLt1lOJD5hRrOAp/kJvsvlEXH
-	 91fyDqiVZZTCAgeqcAnZWhHKmERhLYGo4uM62Jyh9L1Or2qs0ItpYuBe5BjT4u/q8z
-	 agASbASa9LjQzJpSucxxTDms800esQ0X0PL3eF8pV6zYHxUT7UYyaSTiOFdGgvdTVH
-	 wvQ+QpVX3zYuJgfixUtgVmXJMXkfqXyqqi5a75WQ6LY78w5IfmmbZTb9y7r4ar3uq2
-	 Tuo5fvwIjl423kzzEs19o/Uf8B7Wzm9O3T3QbbldpcH0L2D6gMlmPD3Qp7icBxEG65
-	 3LG332zI82tzQ==
+	b=KbcVL4forIydBURuGZpe1zlPPispwaBO1FWAaX4d3xtSjHknf5sReruwSQt2zaEbI
+	 ItPmadsDEia9UTMzaH9h67PjPL1A5eO6j55T5Zt71LuOBxCR/Kh7uzQTrygZ5Wgutf
+	 E07xmJ5KN6VArJCMDLp+ZeLgL/MVpF4Awp6mDTE6RvPPlTkTzEDvh/cyjpGPyKfMer
+	 pgv7+8lqrbJSmyJkXIRoD1jg8SSgHdsw1KdCT2NI/t4yDNRXaBPKxPUElknDNXAji1
+	 NNi3H/mWHMB14646Y20X077kWh02ehTdqzoFsoWDa2oaRgb0nCe7BG8loB1x4Tmjr+
+	 +M5hgIDYvPz/w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG36y-001IWu-Mm;
-	Thu, 12 Jan 2023 19:19:40 +0000
+	id 1pG374-001IWu-4J;
+	Thu, 12 Jan 2023 19:19:46 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 14/68] KVM: arm64: nv: Handle SPSR_EL2 specially
-Date: Thu, 12 Jan 2023 19:18:33 +0000
-Message-Id: <20230112191927.1814989-15-maz@kernel.org>
+Subject: [PATCH v7 27/68] KVM: arm64: nv: Allow a sysreg to be hidden from userspace only
+Date: Thu, 12 Jan 2023 19:18:46 +0000
+Message-Id: <20230112191927.1814989-28-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,131 +54,89 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-SPSR_EL2 needs special attention when running nested on ARMv8.3:
+So far, we never needed to distinguish between registers hidden
+from userspace and being hidden from a guest (they are always
+either visible to both, or hidden from both).
 
-If taking an exception while running at vEL2 (actually EL1), the
-HW will update the SPSR_EL1 register with the EL1 mode. We need
-to track this in order to make sure that accesses to the virtual
-view of SPSR_EL2 is correct.
+With NV, we have the ugly case of the EL02 and EL12 registers,
+which are only a view on the EL0 and EL1 registers. It makes
+absolutely no sense to expose them to userspace, since it
+already has the canonical view.
 
-To do so, we place an illegal value in SPSR_EL1.M, and patch it
-accordingly if required when accessing it.
+Add a new visibility flag (REG_HIDDEN_USER) and a new helper that
+checks for it and REG_HIDDEN when checking whether to expose
+a sysreg to userspace. Subsequent patches will make use of it.
 
 Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 37 ++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c            | 23 +++++++++++++++--
- 2 files changed, 58 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c |  6 +++---
+ arch/arm64/kvm/sys_regs.h | 14 ++++++++++++--
+ 2 files changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 7e3fa8b387f6..0636475693ec 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -249,6 +249,43 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
- 	return __is_hyp_ctxt(&vcpu->arch.ctxt);
- }
- 
-+static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
-+{
-+	if (!__vcpu_el2_e2h_is_set(ctxt)) {
-+		/*
-+		 * Clear the .M field when writing SPSR to the CPU, so that we
-+		 * can detect when the CPU clobbered our SPSR copy during a
-+		 * local exception.
-+		 */
-+		val &= ~0xc;
-+	}
-+
-+	return val;
-+}
-+
-+static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
-+{
-+	if (__vcpu_el2_e2h_is_set(ctxt))
-+		return val;
-+
-+	/*
-+	 * SPSR.M == 0 means the CPU has not touched the SPSR, so the
-+	 * register has still the value we saved on the last write.
-+	 */
-+	if ((val & 0xc) == 0)
-+		return ctxt_sys_reg(ctxt, SPSR_EL2);
-+
-+	/*
-+	 * Otherwise there was a "local" exception on the CPU,
-+	 * which from the guest's point of view was being taken from
-+	 * EL2 to EL2, although it actually happened to be from
-+	 * EL1 to EL1.
-+	 * So we need to fix the .M field in SPSR, to make it look
-+	 * like EL2, which is what the guest would expect.
-+	 */
-+	return (val & ~0x0c) | CurrentEL_EL2;
-+}
-+
- /*
-  * The layout of SPSR for an AArch32 state is different when observed from an
-  * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index eb3eea71f370..c9a2f4861395 100644
+index 86b8d0c14d26..152b2e52ea47 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -129,11 +129,14 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
- 			goto memory_read;
+@@ -3231,7 +3231,7 @@ int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
+ 	int ret;
  
- 		/*
--		 * ELR_EL2 is special cased for now.
-+		 * ELR_EL2 and SPSR_EL2 are special cased for now.
- 		 */
- 		switch (reg) {
- 		case ELR_EL2:
- 			return read_sysreg_el1(SYS_ELR);
-+		case SPSR_EL2:
-+			val = read_sysreg_el1(SYS_SPSR);
-+			return __fixup_spsr_el2_read(&vcpu->arch.ctxt, val);
- 		}
+ 	r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
+-	if (!r)
++	if (!r || sysreg_hidden_user(vcpu, r))
+ 		return -ENOENT;
  
- 		/*
-@@ -190,6 +193,10 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 		case ELR_EL2:
- 			write_sysreg_el1(val, SYS_ELR);
- 			return;
-+		case SPSR_EL2:
-+			val = __fixup_spsr_el2_write(&vcpu->arch.ctxt, val);
-+			write_sysreg_el1(val, SYS_SPSR);
-+			return;
- 		}
+ 	if (r->get_user) {
+@@ -3275,7 +3275,7 @@ int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
+ 		return -EFAULT;
  
- 		/* No EL1 counterpart? We're done here.? */
-@@ -1690,6 +1697,18 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
- 	return true;
+ 	r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
+-	if (!r)
++	if (!r || sysreg_hidden_user(vcpu, r))
+ 		return -ENOENT;
+ 
+ 	if (sysreg_user_write_ignore(vcpu, r))
+@@ -3369,7 +3369,7 @@ static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
+ 	if (!(rd->reg || rd->get_user))
+ 		return 0;
+ 
+-	if (sysreg_hidden(vcpu, rd))
++	if (sysreg_hidden_user(vcpu, rd))
+ 		return 0;
+ 
+ 	if (!copy_reg_to_user(rd, uind))
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index e4ebb3a379fd..6b11f2cc7146 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -85,8 +85,9 @@ struct sys_reg_desc {
+ };
+ 
+ #define REG_HIDDEN		(1 << 0) /* hidden from userspace and guest */
+-#define REG_RAZ			(1 << 1) /* RAZ from userspace and guest */
+-#define REG_USER_WI		(1 << 2) /* WI from userspace only */
++#define REG_HIDDEN_USER		(1 << 1) /* hidden from userspace only */
++#define REG_RAZ			(1 << 2) /* RAZ from userspace and guest */
++#define REG_USER_WI		(1 << 3) /* WI from userspace only */
+ 
+ static __printf(2, 3)
+ inline void print_sys_reg_msg(const struct sys_reg_params *p,
+@@ -152,6 +153,15 @@ static inline bool sysreg_hidden(const struct kvm_vcpu *vcpu,
+ 	return sysreg_visibility(vcpu, r) & REG_HIDDEN;
  }
  
-+static bool access_spsr_el2(struct kvm_vcpu *vcpu,
-+			    struct sys_reg_params *p,
-+			    const struct sys_reg_desc *r)
++static inline bool sysreg_hidden_user(const struct kvm_vcpu *vcpu,
++				      const struct sys_reg_desc *r)
 +{
-+	if (p->is_write)
-+		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
-+	else
-+		p->regval = vcpu_read_sys_reg(vcpu, SPSR_EL2);
++	if (likely(!r->visibility))
++		return false;
 +
-+	return true;
++	return r->visibility(vcpu, r) & (REG_HIDDEN | REG_HIDDEN_USER);
 +}
 +
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -2130,7 +2149,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
- 
- 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
--	EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(SPSR_EL2, access_spsr_el2, reset_val, 0),
- 	EL2_REG(ELR_EL2, access_rw, reset_val, 0),
- 	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
- 
+ static inline bool sysreg_visible_as_raz(const struct kvm_vcpu *vcpu,
+ 					 const struct sys_reg_desc *r)
+ {
 -- 
 2.34.1
 
