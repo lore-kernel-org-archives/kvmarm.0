@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A3B8476
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:21:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 022FDC433D2;
-	Thu, 12 Jan 2023 19:21:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B430C8476
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:21:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A35CC433F0;
+	Thu, 12 Jan 2023 19:21:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551294;
-	bh=ycJQTa90vNc+zMPsmHdkSUMnSh/e/B8/iWuzQP1sK/U=;
+	s=k20201202; t=1673551296;
+	bh=BqWGGG6P0Q1EZNUaobu4OneFEfRFSI4gFWADamGwyEI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PjmywGKOw91A58AHnpEiYGp5YrytDitDIBDuZrVelxd7AHcJAQy9eKwloKPmUNXBk
-	 3YLFvwtnJRoVz/e/p3qtjq8jKUUJV03/5FiHqZQUlL6xoz9YfdxTnwUEo9wiL6VmUM
-	 dlg34OVaeA0cAeTpfmt3bPbbvpe8YhNNfT4AK3PFQ37JLGwMpJGfzzWhlXXPsZ87/t
-	 zhrRRMcQhyIGUTBdiqdqyeMtzHfKuZGu8olVUxk7XHYSsZz4NCFLPovey1QVzLL1wb
-	 xYH01mkn6q0+srdGdtfdyqkZAZrJQNgx1DRj1B5jInazMRTRiodu2orxxiI4EoPBz8
-	 O7c+6fQlEaPGQ==
+	b=cAJJCaDO1xuBMYsLbDKPklbapRpvW2mgsHbKa50loImDohEZg1fSM9yAo3xAiWaqG
+	 E3zGPJVltUJPeVqnKANoJ7vf3RLS+yC+OPHx7zNHtNePWpFTpvObPO7PxeSVShyaud
+	 1iwNeZngYhDq59jfmhOgJTc9hR3kVDDyV5frsiwJtMPnhUgwLBrs/XpD83wgvKWH/m
+	 mSQeyO201zkr0qULDVy6OdGvg8NKFUjHDDQvfMWqmA9w3scxbf4rUeh53NXvm1fbWy
+	 WTc52wwxuRj6Stc+16LIAjCG/ot4rxxUaR6fWYx8tb+jxgSOWL8O2gqJ8+zwVN7bLB
+	 HpxqhoMuadWFw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG36x-001IWu-KI;
-	Thu, 12 Jan 2023 19:19:39 +0000
+	id 1pG37N-001IWu-T4;
+	Thu, 12 Jan 2023 19:20:05 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 10/68] KVM: arm64: nv: Inject HVC exceptions to the virtual EL2
-Date: Thu, 12 Jan 2023 19:18:29 +0000
-Message-Id: <20230112191927.1814989-11-maz@kernel.org>
+Subject: [PATCH v7 42/68] KVM: arm64: nv: Fold guest's HCR_EL2 configuration into the host's
+Date: Thu, 12 Jan 2023 19:19:01 +0000
+Message-Id: <20230112191927.1814989-43-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,53 +54,33 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Jintack Lim <jintack.lim@linaro.org>
+When entering a L2 guest (nested virt enabled, but not in hypervisor
+context), we need to honor the traps the L1 guest has asked enabled.
 
-As we expect all PSCI calls from the L1 hypervisor to be performed
-using SMC when nested virtualization is enabled, it is clear that
-all HVC instruction from the VM (including from the virtual EL2)
-are supposed to handled in the virtual EL2.
+For now, just OR the guest's HCR_EL2 into the host's. We may have to do
+some filtering in the future though.
 
-Forward these to EL2 as required.
-
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-[maz: add handling of HCR_EL2.HCD]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/handle_exit.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ arch/arm64/kvm/hyp/vhe/switch.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index e778eefcf214..2d8c09cf3e49 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -16,6 +16,7 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_nested.h>
- #include <asm/debug-monitors.h>
- #include <asm/stacktrace/nvhe.h>
- #include <asm/traps.h>
-@@ -41,6 +42,16 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
- 			    kvm_vcpu_hvc_get_imm(vcpu));
- 	vcpu->stat.hvc_exit_stat++;
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index a17bf261d501..ff77b37b6f45 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -81,6 +81,11 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 			if (!vcpu_el2_tge_is_set(vcpu))
+ 				hcr |= HCR_AT | HCR_TTLB;
+ 		}
++	} else if (vcpu_has_nv(vcpu)) {
++		u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
++
++		vhcr_el2 &= ~HCR_GUEST_NV_FILTER_FLAGS;
++		hcr |= vhcr_el2;
+ 	}
  
-+	/* Forward hvc instructions to the virtual EL2 if the guest has EL2. */
-+	if (vcpu_has_nv(vcpu)) {
-+		if (vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_HCD)
-+			kvm_inject_undefined(vcpu);
-+		else
-+			kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+
-+		return 1;
-+	}
-+
- 	ret = kvm_hvc_call_handler(vcpu);
- 	if (ret < 0) {
- 		vcpu_set_reg(vcpu, 0, ~0UL);
+ 	___activate_traps(vcpu, hcr);
 -- 
 2.34.1
 
