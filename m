@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF7B8476
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:21:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EA92C433D2;
-	Thu, 12 Jan 2023 19:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5768476
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:21:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4C3AC433F0;
+	Thu, 12 Jan 2023 19:21:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551260;
-	bh=syQByszwka9QViSKc9lIvSE/1xt+pFd88l2tUwTevMs=;
+	s=k20201202; t=1673551262;
+	bh=pbEG0FCZSrnlfMDab4YQ3+ySn4ulryXB0WgYpMNtNGI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kEvs/GmwubVTtJITXPMRDvuW5mWlVHwExspfrMaikwCYuiMLt1wymhWSt5MocOc2f
-	 Ooj4dVfKNq9UvbVARxavQt3Xup22fxECgZMCjBV1s+M2dXS+Wt71zxzxglMmBWATku
-	 8Bv7MjCrYIHRxLBdBcgqPNGzxpg+ImxA5JtBQ//nMxsMP1uDTskX7BJmyRlNVClhiu
-	 +p+WwPNybskjucB3oyxcbJkMkGYHz+ANwFdvyDeZbSjl+jUNbaqQAEu+ecZKfR1G5s
-	 L352po2PAC+cYrxB5YWtKLFfUn3DOJAIk5CsnBfw0LxZCT5BGbPNqViGt1TdXBNBiD
-	 XQb3BfDRmqMsg==
+	b=Jks4EdZdpuu+0WQC8qXD2pvlb0eBfbuLkvOESDl1XxT0HSYc/QUtDGtDnGC1UhZv6
+	 2MnoFs/csJx9OuaH2o8rc1igYFPX7IRkGHq3OUCiKAdj18kBmsN+XAcn6F+sCSgzS5
+	 vir85Q8SjvuKcE7PBeVar17fX5WG5bxk+dFHDg9/zzoBma4Oydy8k85GbeXcBjLduV
+	 BI4JUlPjmdL2y5QK/rwzuNTpAjWTbXo6PMu29LC65MxdTr/2OvT0h4yEaCbVOVgGvs
+	 +JcKPCPQHT4LcnYUIpc3jfIsJ6W8U+MpdDDMkerdrNB59/XDeoZKhORy4E8c7MQ1jx
+	 S8hZts1xRXaQw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG37I-001IWu-7Z;
-	Thu, 12 Jan 2023 19:20:02 +0000
+	id 1pG370-001IWu-2O;
+	Thu, 12 Jan 2023 19:19:42 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 39/68] KVM: arm64: nv: Set a handler for the system instruction traps
-Date: Thu, 12 Jan 2023 19:18:58 +0000
-Message-Id: <20230112191927.1814989-40-maz@kernel.org>
+Subject: [PATCH v7 19/68] KVM: arm64: nv: Add accessors for SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
+Date: Thu, 12 Jan 2023 19:18:38 +0000
+Message-Id: <20230112191927.1814989-20-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,120 +54,75 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When HCR.NV bit is set, execution of the EL2 translation regime address
-aranslation instructions and TLB maintenance instructions are trapped to
-EL2. In addition, execution of the EL1 translation regime address
-aranslation instructions and TLB maintenance instructions that are only
-accessible from EL2 and above are trapped to EL2. In these cases,
-ESR_EL2.EC will be set to 0x18.
+From: Jintack Lim <jintack.lim@linaro.org>
 
-Rework the system instruction emulation framework to handle potentially
-all system instruction traps other than MSR/MRS instructions. Those
-system instructions would be AT and TLBI instructions controlled by
-HCR_EL2.NV, AT, and TTLB bits.
+For the same reason we trap virtual memory register accesses at virtual
+EL2, we need to trap SPSR_EL1, ELR_EL1 and VBAR_EL1 accesses. ARM v8.3
+introduces the HCR_EL2.NV1 bit to be able to trap on those register
+accesses in EL1. Do not set this bit until the whole nesting support is
+completed, which happens further down the line...
 
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-[maz: squashed two patches together, redispatched various bits around]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 47 +++++++++++++++++++++++++++++++--------
- 1 file changed, 38 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 23c457cbccda..9ab90791e849 100644
+index 1558bf6d9a68..4eb402fcc8ef 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1853,10 +1853,6 @@ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
-  * guest...
-  */
- static const struct sys_reg_desc sys_reg_descs[] = {
--	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
--	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
--	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
--
- 	DBG_BCR_BVR_WCR_WVR_EL1(0),
- 	DBG_BCR_BVR_WCR_WVR_EL1(1),
- 	{ SYS_DESC(SYS_MDCCINT_EL1), trap_debug_regs, reset_val, MDCCINT_EL1, 0 },
-@@ -2331,6 +2327,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
- };
- 
-+static struct sys_reg_desc sys_insn_descs[] = {
-+	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
-+	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
-+	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
-+};
-+
- static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
- 			struct sys_reg_params *p,
- 			const struct sys_reg_desc *r)
-@@ -3015,6 +3017,24 @@ static bool emulate_sys_reg(struct kvm_vcpu *vcpu,
- 	return false;
+@@ -1730,6 +1730,30 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
-+static int emulate_sys_instr(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
++static bool access_elr(struct kvm_vcpu *vcpu,
++		       struct sys_reg_params *p,
++		       const struct sys_reg_desc *r)
 +{
-+	const struct sys_reg_desc *r;
++	if (p->is_write)
++		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
++	else
++		p->regval = vcpu_read_sys_reg(vcpu, ELR_EL1);
 +
-+	/* Search from the system instruction table. */
-+	r = find_reg(p, sys_insn_descs, ARRAY_SIZE(sys_insn_descs));
-+
-+	if (likely(r)) {
-+		perform_access(vcpu, p, r);
-+	} else {
-+		kvm_err("Unsupported guest sys instruction at: %lx\n",
-+			*vcpu_pc(vcpu));
-+		print_sys_reg_instr(p);
-+		kvm_inject_undefined(vcpu);
-+	}
-+	return 1;
++	return true;
 +}
 +
- /**
-  * kvm_reset_sys_regs - sets system registers to reset value
-  * @vcpu: The VCPU pointer
-@@ -3032,7 +3052,8 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
- }
- 
- /**
-- * kvm_handle_sys_reg -- handles a mrs/msr trap on a guest sys_reg access
-+ * kvm_handle_sys_reg -- handles a system instruction or mrs/msr instruction
-+ *			 trap on a guest execution
-  * @vcpu: The VCPU pointer
-  */
- int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
-@@ -3046,12 +3067,19 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
- 	params = esr_sys64_to_params(esr);
- 	params.regval = vcpu_get_reg(vcpu, Rt);
- 
--	if (!emulate_sys_reg(vcpu, &params))
-+	/* System register? */
-+	if (params.Op0 == 2 || params.Op0 == 3) {
-+		if (!emulate_sys_reg(vcpu, &params))
-+			return 1;
++static bool access_spsr(struct kvm_vcpu *vcpu,
++			struct sys_reg_params *p,
++			const struct sys_reg_desc *r)
++{
++	if (p->is_write)
++		__vcpu_sys_reg(vcpu, SPSR_EL1) = p->regval;
++	else
++		p->regval = __vcpu_sys_reg(vcpu, SPSR_EL1);
 +
-+		if (!params.is_write)
-+			vcpu_set_reg(vcpu, Rt, params.regval);
++	return true;
++}
 +
- 		return 1;
-+	}
+ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
+ 			    struct sys_reg_params *p,
+ 			    const struct sys_reg_desc *r)
+@@ -1898,6 +1922,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	PTRAUTH_KEY(APDB),
+ 	PTRAUTH_KEY(APGA),
  
--	if (!params.is_write)
--		vcpu_set_reg(vcpu, Rt, params.regval);
--	return 1;
-+	/* Hints, PSTATE (Op0 == 0) and System instructions (Op0 == 1) */
-+	return emulate_sys_instr(vcpu, &params);
- }
++	{ SYS_DESC(SYS_SPSR_EL1), access_spsr},
++	{ SYS_DESC(SYS_ELR_EL1), access_elr},
++
+ 	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
+ 	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
+ 	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
+@@ -1945,7 +1972,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
+ 	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
  
- /******************************************************************************
-@@ -3483,6 +3511,7 @@ int kvm_sys_reg_table_init(void)
- 	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true);
- 	valid &= check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true);
- 	valid &= check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false);
-+	valid &= check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs), false);
+-	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
++	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
+ 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
  
- 	if (!valid)
- 		return -EINVAL;
+ 	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
 -- 
 2.34.1
 
