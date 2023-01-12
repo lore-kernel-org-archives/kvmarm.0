@@ -1,318 +1,113 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-238.mta0.migadu.com (out-238.mta0.migadu.com [91.218.175.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C980162F
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 05:57:02 +0000 (UTC)
-Received: by mail-pj1-f46.google.com with SMTP id w4-20020a17090ac98400b002186f5d7a4cso22531211pjt.0
-        for <kvmarm@lists.linux.dev>; Wed, 11 Jan 2023 21:57:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FccKUfbHyylDDoPjn7qZyrSP0H0soQqxoVXZoIBm/II=;
-        b=CwSk/D/LJm0WdN/2/A/0NIkigAlM5tSw4X4uoxtnodtBoRqVjrnJ5JFyzHM0jDa2lt
-         z1SEeB1/qTeMHDv4pO8I2Xu8vLVdCbyYtufeZU8oefg8KP2LtDSna7+7DRHS5ir0zhmC
-         F1Ks1iqJJKC0KJ87JIrCJbICYdbKtRqEQVjB3g/GrLTDWJh+gtiD1py/X0ouEJtoXFE+
-         Y4DKfcZYwK+FKW4ArQomr0undnrxxUKp8o4tqe08e0qTpK/AmVnaIH2vz6hH4dSm6fFr
-         2SbdtCpYQqleult/37UdGDUs4MAJ9l4qfk008AbqxeNANgMAyTxKlRK2rji3YDAFQbkM
-         ZJ3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FccKUfbHyylDDoPjn7qZyrSP0H0soQqxoVXZoIBm/II=;
-        b=k99FTbzh700o10x0ohG81QODr6GB1kBuR1/xq1siIQB8DfRVdkj4DxA/FplNY1e7nr
-         ksPLpvI03O2mRaKkBSoDLflJvtaTR7a1DgC8kcHLtiJG+h6bg2RmU7JsJvLNVSeqxnsW
-         wknXJm7J4RP/vC8zzMGu98aTXKVf8n1aV2fS3lIHW3tZHXyBTf3HLjAoD+NewLqeQcBF
-         oKnMCaALOj5TRGSgEV4OwwCHbPNSqDl+V6UITpNy67S+yc5UFldZXiQU1T8u2NK763RU
-         CKQU9wmbxZW3NJZpi1I8+o8eCQ6eFfL4Y9Ha8bIzoIvnE7sKCfoz6QRfRHdS+UZpCkFG
-         T9Yw==
-X-Gm-Message-State: AFqh2koI723Z4MLQBIwwIhj28PXn204DvPO2kS8CCUjnDGmnG/n5Y2RW
-	jZsIV0UQdsJ0fmSSm3sfx3qwfhyaAcI/62XDxLyDSA==
-X-Google-Smtp-Source: AMrXdXu5en3bHy4+sUUjgbsYsBC/X8naWSSFyF6Sd/zJH1PscFq+D0rEAEwSVGJ5hUHrEQBC2IyH7pEhHZwGABFc984=
-X-Received: by 2002:a17:902:bf07:b0:194:5c63:363b with SMTP id
- bi7-20020a170902bf0700b001945c63363bmr144776plb.154.1673503021915; Wed, 11
- Jan 2023 21:57:01 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17EFB137A
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 09:00:10 +0000 (UTC)
+Date: Thu, 12 Jan 2023 09:53:07 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1673513590;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ih3LoD0rr1Vt0JqEH5DJCm0WVPskqNFudmLXTQa+hLM=;
+	b=kl8Qi78H5E2mlUNfvcOzOb91mMuA5UySzjp03yZ737+IndlqzNzVO+w3N2qxSeCpgVGM/a
+	/WV58mcmGtbss196wYSrlYY4ijnlu1ot2xHwR2x+8fUFjQAmwM1GPO9IKfh4foxNz/crKl
+	AykQzCTED73HdgGzjhagvW0q2ZZJ3pc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: thuth@redhat.com, pbonzini@redhat.com, nrb@linux.ibm.com,
+	imbrenda@linux.ibm.com, marcorr@google.com,
+	alexandru.elisei@arm.com, oliver.upton@linux.dev,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [kvm-unit-tests PATCH v2 1/1] arm: Replace MAX_SMP probe loop in
+ favor of reading directly
+Message-ID: <20230112085307.jvx5px2b3pfmwd6v@orel>
+References: <20230111215422.2153645-1-coltonlewis@google.com>
+ <20230111215422.2153645-2-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230109211754.67144-1-ricarkol@google.com> <20230109211754.67144-3-ricarkol@google.com>
-In-Reply-To: <20230109211754.67144-3-ricarkol@google.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Wed, 11 Jan 2023 21:56:45 -0800
-Message-ID: <CAAeT=Fz1PHytw2rhn7pxbr1aFuvWLTJGnr9vidUqNt=tCKpvuw@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v3 2/4] arm: pmu: Prepare for testing
- 64-bit overflows
-To: Ricardo Koller <ricarkol@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev, 
-	maz@kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com, 
-	oliver.upton@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230111215422.2153645-2-coltonlewis@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Ricardo,
+On Wed, Jan 11, 2023 at 09:54:22PM +0000, Colton Lewis wrote:
+> Replace the MAX_SMP probe loop in favor of reading a number directly
+> from the QEMU error message. This is equally safe as the existing code
+> because the error message has had the same format as long as it has
+> existed, since QEMU v2.10. The final number before the end of the
+> error message line indicates the max QEMU supports. A short awk
+> program is used to extract the number, which becomes the new MAX_SMP
+> value.
+> 
+> This loop logic is broken for machines with a number of CPUs that
+> isn't a power of two. A machine with 8 CPUs will test with MAX_SMP=8
+> but a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 2 ==
+                                                                    ^ 1
 
-On Mon, Jan 9, 2023 at 1:18 PM Ricardo Koller <ricarkol@google.com> wrote:
->
-> PMUv3p5 adds a knob, PMCR_EL0.LP == 1, that allows overflowing at 64-bits
-> instead of 32. Prepare by doing these 3 things:
->
-> 1. Add a "bool overflow_at_64bits" argument to all tests checking
->    overflows.
-> 2. Extend satisfy_prerequisites() to check if the machine supports
->    "overflow_at_64bits".
-> 3. Refactor the test invocations to use the new "run_test()" which adds a
->    report prefix indicating whether the test uses 64 or 32-bit overflows.
->
-> A subsequent commit will actually add the 64-bit overflow tests.
->
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> 6. This can, in rare circumstances, lead to different test results
+> depending only on the number of CPUs the machine has.
+
+I guess that problem doesn't go away if we don't set the number of CPUs
+to be the same, regardless of machine, i.e. we're still picking a
+machine-specific value when we pick MAX_SMP. I think I know what you
+mean though. For gicv2 tests on machines that support non-power-of-2
+CPUs greater than 8 it's possible to end up with less than 8 for
+MAX_SMP, which is surprising. Maybe while fixing the shift above you
+can change the text to be more in line with that?
+
+> 
+> A previous comment explains the loop should only apply to kernels
+> <=v4.3 on arm and suggests deletion when it becomes tiresome to
+> maintian. However, it is always theoretically possible to test on a
+> machine that has more CPUs than QEMU supports, so it makes sense to
+> leave some check in place.
+> 
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
 > ---
->  arm/pmu.c | 92 ++++++++++++++++++++++++++++++++-----------------------
->  1 file changed, 53 insertions(+), 39 deletions(-)
->
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 7f0794d..0d06b59 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -164,13 +164,13 @@ static void pmu_reset(void)
->  /* event counter tests only implemented for aarch64 */
->  static void test_event_introspection(void) {}
->  static void test_event_counter_config(void) {}
-> -static void test_basic_event_count(void) {}
-> -static void test_mem_access(void) {}
-> -static void test_sw_incr(void) {}
-> -static void test_chained_counters(void) {}
-> -static void test_chained_sw_incr(void) {}
-> -static void test_chain_promotion(void) {}
-> -static void test_overflow_interrupt(void) {}
-> +static void test_basic_event_count(bool overflow_at_64bits) {}
-> +static void test_mem_access(bool overflow_at_64bits) {}
-> +static void test_sw_incr(bool overflow_at_64bits) {}
-> +static void test_chained_counters(bool unused) {}
-> +static void test_chained_sw_incr(bool unused) {}
-> +static void test_chain_promotion(bool unused) {}
-> +static void test_overflow_interrupt(bool overflow_at_64bits) {}
->
->  #elif defined(__aarch64__)
->  #define ID_AA64DFR0_PERFMON_SHIFT 8
-> @@ -416,6 +416,7 @@ static bool satisfy_prerequisites(uint32_t *events, unsigned int nb_events)
->                         return false;
->                 }
->         }
-> +
+>  scripts/runtime.bash | 16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
+> 
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index f8794e9..4377e75 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -188,12 +188,10 @@ function run()
+>  # Probe for MAX_SMP, in case it's less than the number of host cpus.
+>  #
+>  # This probing currently only works for ARM, as x86 bails on another
+> -# error first. Also, this probing isn't necessary for any ARM hosts
+> -# running kernels later than v4.3, i.e. those including ef748917b52
+> -# "arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'". So, at some
+> -# point when maintaining the while loop gets too tiresome, we can
+> -# just remove it...
+> -while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
+> -		|& grep -qi 'exceeds max CPUs'; do
+> -	MAX_SMP=$((MAX_SMP >> 1))
+> -done
+> +# error first. The awk program takes the last number from the QEMU
+> +# error message, which gives the allowable MAX_SMP.
+> +if $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
+> +      |& grep -qi 'exceeds max CPUs'; then
 
-Nit: Unnecessary addition of the line.
+If the message has always been the same then the -i on grep shouldn't be
+necessary.
 
->         return true;
->  }
->
-> @@ -435,13 +436,24 @@ static uint64_t pmevcntr_mask(void)
->         return (uint32_t)~0;
->  }
->
-> -static void test_basic_event_count(void)
-> +static bool check_overflow_prerequisites(bool overflow_at_64bits)
-> +{
-> +       if (overflow_at_64bits && pmu.version < ID_DFR0_PMU_V3_8_5) {
-> +               report_skip("Skip test as 64 overflows need FEAT_PMUv3p5");
-> +               return false;
-> +       }
-> +
-> +       return true;
-> +}
-> +
-> +static void test_basic_event_count(bool overflow_at_64bits)
->  {
->         uint32_t implemented_counter_mask, non_implemented_counter_mask;
->         uint32_t counter_mask;
->         uint32_t events[] = {CPU_CYCLES, INST_RETIRED};
->
-> -       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> +       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
-> +           !check_overflow_prerequisites(overflow_at_64bits))
->                 return;
->
->         implemented_counter_mask = BIT(pmu.nb_implemented_counters) - 1;
-> @@ -515,12 +527,13 @@ static void test_basic_event_count(void)
->                 "check overflow happened on #0 only");
->  }
->
-> -static void test_mem_access(void)
-> +static void test_mem_access(bool overflow_at_64bits)
->  {
->         void *addr = malloc(PAGE_SIZE);
->         uint32_t events[] = {MEM_ACCESS, MEM_ACCESS};
->
-> -       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> +       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
-> +           !check_overflow_prerequisites(overflow_at_64bits))
->                 return;
->
->         pmu_reset();
-> @@ -551,13 +564,14 @@ static void test_mem_access(void)
->                         read_sysreg(pmovsclr_el0));
->  }
->
-> -static void test_sw_incr(void)
-> +static void test_sw_incr(bool overflow_at_64bits)
->  {
->         uint32_t events[] = {SW_INCR, SW_INCR};
->         uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
->         int i;
->
-> -       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> +       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
-> +           !check_overflow_prerequisites(overflow_at_64bits))
->                 return;
->
->         pmu_reset();
-> @@ -597,7 +611,7 @@ static void test_sw_incr(void)
->                 "overflow on counter #0 after 100 SW_INCR");
->  }
->
-> -static void test_chained_counters(void)
-> +static void test_chained_counters(bool unused)
->  {
->         uint32_t events[] = {CPU_CYCLES, CHAIN};
->
-> @@ -638,7 +652,7 @@ static void test_chained_counters(void)
->         report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
->  }
->
-> -static void test_chained_sw_incr(void)
-> +static void test_chained_sw_incr(bool unused)
->  {
->         uint32_t events[] = {SW_INCR, CHAIN};
->         uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
-> @@ -691,7 +705,7 @@ static void test_chained_sw_incr(void)
->                     read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
->  }
->
-> -static void test_chain_promotion(void)
-> +static void test_chain_promotion(bool unused)
->  {
->         uint32_t events[] = {MEM_ACCESS, CHAIN};
->         void *addr = malloc(PAGE_SIZE);
-> @@ -840,13 +854,14 @@ static bool expect_interrupts(uint32_t bitmap)
->         return true;
->  }
->
-> -static void test_overflow_interrupt(void)
-> +static void test_overflow_interrupt(bool overflow_at_64bits)
->  {
->         uint32_t events[] = {MEM_ACCESS, SW_INCR};
->         void *addr = malloc(PAGE_SIZE);
->         int i;
->
-> -       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> +       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
-> +           !check_overflow_prerequisites(overflow_at_64bits))
->                 return;
->
->         gic_enable_defaults();
-> @@ -1070,6 +1085,19 @@ static bool pmu_probe(void)
->         return true;
->  }
->
-> +static void run_test(char *name, void (*test)(bool), bool overflow_at_64bits)
-> +{
-> +       const char *prefix = overflow_at_64bits ? "64-bit overflows" : "32-bit overflows";
-> +
-> +       report_prefix_push(name);
-> +       report_prefix_push(prefix);
-> +
-> +       test(overflow_at_64bits);
-> +
-> +       report_prefix_pop();
-> +       report_prefix_pop();
-> +}
-> +
->  int main(int argc, char *argv[])
->  {
->         int cpi = 0;
-> @@ -1102,33 +1130,19 @@ int main(int argc, char *argv[])
->                 test_event_counter_config();
->                 report_prefix_pop();
->         } else if (strcmp(argv[1], "pmu-basic-event-count") == 0) {
-> -               report_prefix_push(argv[1]);
-> -               test_basic_event_count();
-> -               report_prefix_pop();
-> +               run_test(argv[1], test_basic_event_count, false);
->         } else if (strcmp(argv[1], "pmu-mem-access") == 0) {
-> -               report_prefix_push(argv[1]);
-> -               test_mem_access();
-> -               report_prefix_pop();
-> +               run_test(argv[1], test_mem_access, false);
->         } else if (strcmp(argv[1], "pmu-sw-incr") == 0) {
-> -               report_prefix_push(argv[1]);
-> -               test_sw_incr();
-> -               report_prefix_pop();
-> +               run_test(argv[1], test_sw_incr, false);
->         } else if (strcmp(argv[1], "pmu-chained-counters") == 0) {
-> -               report_prefix_push(argv[1]);
-> -               test_chained_counters();
-> -               report_prefix_pop();
-> +               run_test(argv[1], test_chained_counters, false);
->         } else if (strcmp(argv[1], "pmu-chained-sw-incr") == 0) {
-> -               report_prefix_push(argv[1]);
-> -               test_chained_sw_incr();
-> -               report_prefix_pop();
-> +               run_test(argv[1], test_chained_sw_incr, false);
->         } else if (strcmp(argv[1], "pmu-chain-promotion") == 0) {
-> -               report_prefix_push(argv[1]);
-> -               test_chain_promotion();
-> -               report_prefix_pop();
-> +               run_test(argv[1], test_chain_promotion, false);
->         } else if (strcmp(argv[1], "pmu-overflow-interrupt") == 0) {
-> -               report_prefix_push(argv[1]);
-> -               test_overflow_interrupt();
-> -               report_prefix_pop();
-> +               run_test(argv[1], test_overflow_interrupt, false);
->         } else {
->                 report_abort("Unknown sub-test '%s'", argv[1]);
->         }
+> +	GET_LAST_NUM='/exceeds max CPUs/ {match($0, /[[:digit:]]+)$/); print substr($0, RSTART, RLENGTH-1)}'
+> +	MAX_SMP=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP |& awk "$GET_LAST_NUM")
 
-Perhaps it might be useful to generalize run_test() a bit more so that it
-can be used for other existing test cases as well ?
-(e.g. "pmu-event-counter-config", etc)
----
-i.e (The following are not all of the changes though).
+We should restructure this so we only have to invoke QEMU once and I
+think we can do it with just bash and grep. Something like
 
--static void run_test(char *name, void (*test)(bool), bool overflow_at_64bits)
-+static void run_test(const char *name, const char *prefix, void
-(*test)(bool), void *arg)
- {
--       const char *prefix = overflow_at_64bits ? "64-bit overflows" :
-"32-bit overflows";
--
-        report_prefix_push(name);
-        report_prefix_push(prefix);
+ if smp=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP |& grep 'exceeds max CPUs'); then
+     smp=${smp##*\(}
+     MAX_SMP=${smp:0:-1}
+ fi
 
--       test(overflow_at_64bits);
-+       test(arg);
-
-        report_prefix_pop();
-        report_prefix_pop();
- }
-
-+static void run_event_test(char *name, void (*test)(bool), bool
-overflow_at_64bits)
-+{
-+       const char *prefix = overflow_at_64bits ? "64-bit overflows" :
-"32-bit overflows";
-+
-+       run_test(name, prefix, test, (void *)overflow_at_64bits);
-+}
----
-
-Having said that, the patch already improves the code,
-and I don't see any issue.
-
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
-
-Thank you,
-Reiji
+Thanks,
+drew
