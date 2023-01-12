@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727468476
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:22:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A6E0C433D2;
-	Thu, 12 Jan 2023 19:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4928F8476
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:22:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E84AC433EF;
+	Thu, 12 Jan 2023 19:22:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551374;
-	bh=YbxxZ5lRfnwbbRG0VbaHGOSVQotbfIj6jGxL9LmQf7s=;
+	s=k20201202; t=1673551377;
+	bh=ZdF0Vi6WI55UG43SPoot4i4lR4nOp/RpjK2vQ6Aryck=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=c7qUiG8aQCMsIVMxxzk7mgi99I3RqBAVkfp/KEJwwAZe8m/FRkXsNNHWq7ZYvrjuG
-	 UrLOozZNl4LkhICLlToMtRa0xEkXxztsjwPmO3bRUwKpk7NPypxohfwLnibBRFgyuG
-	 lwmRKgpaG0NSjZrakNfXXDhdLSSPlKanbWXHdlzEvLRGytLvGrYu1eBk1o+DkWii+t
-	 smRNH95d6BZEjOVkV7aHWWkBqK3iU6K9xXsPw9DWbv9NiL0v4cnrg64kYxh7ob5646
-	 KTPhSzo05nEmJehGb8PYbP2cSeH274vdprEJrV08wsh70v3TDoriZLALYMGKB+UivC
-	 NN+EkXKRYnOmA==
+	b=KF50l1xQOMFczylBkxG1rKwv/SSrw+tmP260usTgw86os2aA0OOZiaz5O6rOr+LN7
+	 C0fjIDmB/HSoU4U/pbcV4uMHe+rOqX4KQ8JovOZhlxEK/OeLZMMsR9BU52xS4Jj8rI
+	 e+FUC2JMToobDxODTb6taw401yvw9sTTsTauCOE471nABLhfX2IgN6WpJUSEYWCfyo
+	 PjMG7VA5MI5Wp/RVD/t0YlpqwZ2fr0ps8Ke4uC176RH0ME/BlT5LZcNk/tIYwwCS4N
+	 QlgHhNOsWlpK6chtcx8mJk2/ZeFaT2sJdmBytF8fiaqkUcZbwOaDX0N10qWc8HatDX
+	 yVLe9nvLtGn5g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG36z-001IWu-I0;
-	Thu, 12 Jan 2023 19:19:41 +0000
+	id 1pG373-001IWu-EP;
+	Thu, 12 Jan 2023 19:19:45 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 17/68] KVM: arm64: nv: Emulate PSTATE.M for a guest hypervisor
-Date: Thu, 12 Jan 2023 19:18:36 +0000
-Message-Id: <20230112191927.1814989-18-maz@kernel.org>
+Subject: [PATCH v7 24/68] KVM: arm64: nv: Respect the virtual HCR_EL2.NV bit setting
+Date: Thu, 12 Jan 2023 19:18:43 +0000
+Message-Id: <20230112191927.1814989-25-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,110 +54,182 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We can no longer blindly copy the VCPU's PSTATE into SPSR_EL2 and return
-to the guest and vice versa when taking an exception to the hypervisor,
-because we emulate virtual EL2 in EL1 and therefore have to translate
-the mode field from EL2 to EL1 and vice versa.
+From: Jintack Lim <jintack.lim@linaro.org>
 
-This requires keeping track of the state we enter the guest, for which
-we transiently use a dedicated flag.
+Forward traps due to HCR_EL2.NV bit to the virtual EL2 if they are not
+coming from the virtual EL2 and the virtual HCR_EL2.NV bit is set.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+In addition to EL2 register accesses, setting NV bit will also make EL12
+register accesses trap to EL2. To emulate this for the virtual EL2,
+forword traps due to EL12 register accessses to the virtual EL2 if the
+virtual HCR_EL2.NV bit is set. Same thing is done for SMCs issued by
+a guest and trapped by the virtual EL2.
+
+This is for recursive nested virtualization.
+
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+[Moved code to emulate-nested.c]
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h          |  2 ++
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 19 ++++++++++++++++-
- arch/arm64/kvm/hyp/vhe/switch.c            | 24 ++++++++++++++++++++++
- 3 files changed, 44 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_arm.h    |  1 +
+ arch/arm64/include/asm/kvm_nested.h |  3 +++
+ arch/arm64/kvm/emulate-nested.c     | 27 +++++++++++++++++++++++++++
+ arch/arm64/kvm/handle_exit.c        |  7 +++++++
+ arch/arm64/kvm/sys_regs.c           | 21 +++++++++++++++++++++
+ 5 files changed, 59 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 1b585a4dd122..70eab7a6386b 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -645,6 +645,8 @@ struct kvm_vcpu_arch {
- #define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
- /* Save TRBE context if active  */
- #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
-+/* vcpu running in HYP context */
-+#define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
- 
- /* SVE enabled for host EL0 */
- #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index fb6a5299771a..90d57fbf7e7f 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -157,9 +157,26 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, SPSR_EL1),	SYS_SPSR);
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index d86c0050b69d..3f98c115d029 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -20,6 +20,7 @@
+ #define HCR_AMVOFFEN	(UL(1) << 51)
+ #define HCR_FIEN	(UL(1) << 47)
+ #define HCR_FWB		(UL(1) << 46)
++#define HCR_NV		(UL(1) << 42)
+ #define HCR_API		(UL(1) << 41)
+ #define HCR_APK		(UL(1) << 40)
+ #define HCR_TEA		(UL(1) << 37)
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index f7bb1f0d0954..befd2501d5ba 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -59,4 +59,7 @@ static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
+ 	return ttbr0 & ~GENMASK_ULL(63, 48);
  }
  
-+/* Read the VCPU state's PSTATE, but translate (v)EL2 to EL1. */
-+static inline u64 to_hw_pstate(const struct kvm_cpu_context *ctxt)
++extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
++extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
++
+ #endif /* __ARM64_KVM_NESTED_H */
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index b96662029fb1..75cf6f15accc 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -14,6 +14,26 @@
+ 
+ #include "trace.h"
+ 
++bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
 +{
-+	u64 mode = ctxt->regs.pstate & (PSR_MODE_MASK | PSR_MODE32_BIT);
++	bool control_bit_set;
 +
-+	switch (mode) {
-+	case PSR_MODE_EL2t:
-+		mode = PSR_MODE_EL1t;
-+		break;
-+	case PSR_MODE_EL2h:
-+		mode = PSR_MODE_EL1h;
-+		break;
++	if (!vcpu_has_nv(vcpu))
++		return false;
++
++	control_bit_set = __vcpu_sys_reg(vcpu, HCR_EL2) & control_bit;
++	if (!vcpu_is_el2(vcpu) && control_bit_set) {
++		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
++		return true;
 +	}
-+
-+	return (ctxt->regs.pstate & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
++	return false;
 +}
 +
- static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
++bool forward_nv_traps(struct kvm_vcpu *vcpu)
++{
++	return forward_traps(vcpu, HCR_NV);
++}
++
+ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
  {
--	u64 pstate = ctxt->regs.pstate;
-+	u64 pstate = to_hw_pstate(ctxt);
- 	u64 mode = pstate & PSR_AA32_MODE_MASK;
+ 	u64 mode = spsr & PSR_MODE_MASK;
+@@ -52,6 +72,13 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ 	u64 spsr, elr, mode;
+ 	bool direct_eret;
  
- 	/*
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 81bf236d9c27..cd3f3117bf16 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -120,6 +120,25 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
- 
- static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
 +	/*
-+	 * If we were in HYP context on entry, adjust the PSTATE view
-+	 * so that the usual helpers work correctly.
++	 * Forward this trap to the virtual EL2 if the virtual
++	 * HCR_EL2.NV bit is set and this is coming from !EL2.
 +	 */
-+	if (unlikely(vcpu_get_flag(vcpu, VCPU_HYP_CONTEXT))) {
-+		u64 mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
++	if (forward_nv_traps(vcpu))
++		return;
 +
-+		switch (mode) {
-+		case PSR_MODE_EL1t:
-+			mode = PSR_MODE_EL2t;
-+			break;
-+		case PSR_MODE_EL1h:
-+			mode = PSR_MODE_EL2h;
-+			break;
-+		}
+ 	/*
+ 	 * Going through the whole put/load motions is a waste of time
+ 	 * if this is a VHE guest hypervisor returning to its own
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 2aefe35409c9..cfc50d67a6bc 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -65,6 +65,13 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+ {
+ 	int ret;
+ 
++	/*
++	 * Forward this trapped smc instruction to the virtual EL2 if
++	 * the guest has asked for it.
++	 */
++	if (forward_traps(vcpu, HCR_TSC))
++		return 1;
 +
-+		*vcpu_cpsr(vcpu) &= ~(PSR_MODE_MASK | PSR_MODE32_BIT);
-+		*vcpu_cpsr(vcpu) |= mode;
-+	}
+ 	/*
+ 	 * "If an SMC instruction executed at Non-secure EL1 is
+ 	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 27fb2d8f29ca..934341a1df2e 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -263,10 +263,19 @@ static u32 get_ccsidr(u32 csselr)
+ 	return ccsidr;
  }
  
- /* Switch to the guest for VHE systems running in EL2 */
-@@ -154,6 +173,11 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	sysreg_restore_guest_state_vhe(guest_ctxt);
- 	__debug_switch_to_guest(vcpu);
- 
-+	if (is_hyp_ctxt(vcpu))
-+		vcpu_set_flag(vcpu, VCPU_HYP_CONTEXT);
-+	else
-+		vcpu_clear_flag(vcpu, VCPU_HYP_CONTEXT);
++static bool el12_reg(struct sys_reg_params *p)
++{
++	/* All *_EL12 registers have Op1=5. */
++	return (p->Op1 == 5);
++}
 +
- 	do {
- 		/* Jump in the fire! */
- 		exit_code = __guest_enter(vcpu);
+ static bool access_rw(struct kvm_vcpu *vcpu,
+ 		      struct sys_reg_params *p,
+ 		      const struct sys_reg_desc *r)
+ {
++	if (el12_reg(p) && forward_nv_traps(vcpu))
++		return false;
++
+ 	if (p->is_write)
+ 		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
+ 	else
+@@ -335,6 +344,9 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
+ 	u64 val, mask, shift;
+ 
++	if (el12_reg(p) && forward_nv_traps(vcpu))
++		return false;
++
+ 	/* We don't expect TRVM on the host */
+ 	BUG_ON(!vcpu_is_el2(vcpu) && !p->is_write);
+ 
+@@ -1734,6 +1746,9 @@ static bool access_elr(struct kvm_vcpu *vcpu,
+ 		       struct sys_reg_params *p,
+ 		       const struct sys_reg_desc *r)
+ {
++	if (el12_reg(p) && forward_nv_traps(vcpu))
++		return false;
++
+ 	if (p->is_write)
+ 		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
+ 	else
+@@ -1746,6 +1761,9 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
+ 			struct sys_reg_params *p,
+ 			const struct sys_reg_desc *r)
+ {
++	if (el12_reg(p) && forward_nv_traps(vcpu))
++		return false;
++
+ 	if (p->is_write)
+ 		__vcpu_sys_reg(vcpu, SPSR_EL1) = p->regval;
+ 	else
+@@ -1758,6 +1776,9 @@ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
+ 			    struct sys_reg_params *p,
+ 			    const struct sys_reg_desc *r)
+ {
++	if (el12_reg(p) && forward_nv_traps(vcpu))
++		return false;
++
+ 	if (p->is_write)
+ 		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
+ 	else
 -- 
 2.34.1
 
