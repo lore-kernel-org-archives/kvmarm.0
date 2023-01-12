@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 679F26AB8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222A16AB7
 	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 12:38:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2239FC433EF;
-	Thu, 12 Jan 2023 12:38:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1B71C433F1;
+	Thu, 12 Jan 2023 12:38:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673527135;
-	bh=TEld5/eWLZ8WYi+kitrePlcWShsqcZJpPVEOUZjvFFI=;
+	s=k20201202; t=1673527134;
+	bh=kutdzrND1pid6FPUYt9eecsxom0FpIqL/qLgOv8lCl4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=vEM1wAB4VmrHlB3wy0Rl6rFU9Q5d1dk8qZ8H/1COQWeuz/uTsY4AqHBPLc5qxJqdH
-	 zg9aHY6D3oLFdaLLf60jHj/h6CEVYyALEH4cYmu+pwQPkO2bGib6Bj68zkHSF7K5vd
-	 HB/o4GO4S1E/j5JEg25mPHY0qUq2I3y121JgFQPPXIgb2wLbSZuhsnCMnwxc5/PGyE
-	 4iHua27VRt3fNhd1ixu78U58BWS8PVrlQcBcOW6Srg59Mw3F3uxWcdX3xt+Jl4NH92
-	 qJj3wBJtlnyeHDSP3syEF8tuU2dAHx0udVR3pRoiBf7YA85VZ4+dXJiG1OKQa1sGPH
-	 6Zg2uUJGW82hg==
+	b=TED+bZMqOLy54eykQ0yuNM2Wt30FHtUyr64JzcKaM9YYOVthRasNEAoKqAjf+LVxV
+	 sGvjKsScjNDNRkHVJMI9J18zK394OBFvxqf6UUVxM7ema50HICVOLJrYHYBoTEKIJr
+	 vU0anSZHrY+xH0I36bHeK+GZu4OE8J/C8vER2AkIm2IBQ4NDBLMwp0cPH06qAz1tea
+	 RrS98p6yEJGryzeCMiROEhr3pcFSk9gakHvKAUuzGVdYTzroNUJIKxVuaHifndfCD/
+	 Rl7+Kjg34lHFEFva+u1asWFpMC7lk9usTJlWYKaeC/yjq7gVaH8C9lDLzYRl392huM
+	 c1iHwcPopZ9Aw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pFwr7-001BBa-3w;
-	Thu, 12 Jan 2023 12:38:53 +0000
+	id 1pFwr6-001BBa-N4;
+	Thu, 12 Jan 2023 12:38:52 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	<kvmarm@lists.cs.columbia.edu>,
@@ -32,9 +32,9 @@ Cc: D Scott Phillips <scott@os.amperecomputing.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 3/3] KVM: arm64: timers: Don't BUG() on unhandled timer trap
-Date: Thu, 12 Jan 2023 12:38:29 +0000
-Message-Id: <20230112123829.458912-4-maz@kernel.org>
+Subject: [PATCH 1/3] KVM: arm64: Don't arm a hrtimer for an already pending timer
+Date: Thu, 12 Jan 2023 12:38:27 +0000
+Message-Id: <20230112123829.458912-2-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112123829.458912-1-maz@kernel.org>
 References: <20230112123829.458912-1-maz@kernel.org>
@@ -50,34 +50,45 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbi
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Although not handling a trap is a pretty bad situation to be in,
-panicing the kernel isn't useful and provides no valuable
-information to help debugging the situation.
+When fully emulating a timer, we back it with a hrtimer that is
+armver on vcpu_load(). However, we do this even if the timer is
+already pending.
 
-Instead, dump the encoding of the unhandled sysreg, and inject
-an UNDEF in the guest. At least, this gives a user an opportunity
-to report the issue with some information to help debugging it.
+This causes spurious interrupts to be taken, though the guest
+doesn't observe them (the interrupt is already pending).
 
+Although this is a waste of precious cycles, this isn't the
+end of the world with the current state of KVM. However, this
+can lead to a situation where a guest doesn't make forward
+progress anymore with NV.
+
+Fix it by checking that if the timer is already pending
+before arming a new hrtimer. Also drop the hrtimer cancelling,
+which is useless, by construction.
+
+Reported-by: D Scott Phillips <scott@os.amperecomputing.com>
+Fixes: bee038a67487 ("KVM: arm/arm64: Rework the timer code to use a timer_map")
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/arch_timer.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d5ee52d6bf73..32f4e424b9a5 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1049,7 +1049,9 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
- 		treg = TIMER_REG_CVAL;
- 		break;
- 	default:
--		BUG();
-+		print_sys_reg_msg(p, "%s", "Unhandled trapped timer register");
-+		kvm_inject_undefined(vcpu);
-+		return false;
- 	}
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index bb24a76b4224..587d87aec33f 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -428,10 +428,8 @@ static void timer_emulate(struct arch_timer_context *ctx)
+ 	 * scheduled for the future.  If the timer cannot fire at all,
+ 	 * then we also don't need a soft timer.
+ 	 */
+-	if (!kvm_timer_irq_can_fire(ctx)) {
+-		soft_timer_cancel(&ctx->hrtimer);
++	if (should_fire || !kvm_timer_irq_can_fire(ctx))
+ 		return;
+-	}
  
- 	if (p->is_write)
+ 	soft_timer_start(&ctx->hrtimer, kvm_timer_compute_delta(ctx));
+ }
 -- 
 2.34.1
 
