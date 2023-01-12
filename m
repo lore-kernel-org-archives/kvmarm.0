@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC448476
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:21:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65E7FC433D2;
-	Thu, 12 Jan 2023 19:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166BE8476
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:21:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C37A0C433D2;
+	Thu, 12 Jan 2023 19:21:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551302;
-	bh=m9BmyoS2Qv2dWLBdLJEfeLqtDvXjT7Peo6vd23SAo90=;
+	s=k20201202; t=1673551304;
+	bh=VuNXutmixGrigENDAWh4xcOZ1P+J8v17NsHrHKS1Th0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZQgRFZHnBHP6MUXuHxqfX6kWq9WxYWlJBnoXgUsRTywQMEcGm1XpWx4e4wL87Y2Hl
-	 HQRS1Yd+tDGgBLOrHE23f8L7l7s3y2kByR0E0QfE+JFNUNrJ1/KW3L9oaMt52dLX3S
-	 OVYrlE4aOkDPG5CVLJB3BDB3iYEwL1cDNy8YhOCnq8vrZa3YDnzuSItrZVrW5SS34V
-	 vZbL+vZ7m6K4Wisd+j3O6XCN5IBCe11b+nsiPPBQsddPgl6lTVF3Z2jXMb4UAqiOc8
-	 +5qSDFO9yNn+ugM9dsT2EmCaTYiekC42iKfDpoG5PqUC7KnSnfa1MOsSRUE33gmkdm
-	 /Fr1Gsthrzs5A==
+	b=oBarCylI/foEIUhq4TosH3NwZhAwtsHITy2d5EPeNHr1LjWrbnRKNTo8pGl3Kzu9k
+	 laMqNoJqay7P76FuGsPr5jzepPWkhmfFPyfOIW89ijUgIh3+QSCwYSlVKYioqqAOb6
+	 SdpWtq0l/bT3w4vSBqSb5oCRZvCXw4q01xuK/J+PkYdutZOcHvqQjPMsZ3QDuoC+WN
+	 PQqYAT7CyPLQ+b1PhAqCAtb8NpZFb5ivsPSndAY3elpqH1lGLtDMRiDvog96E3kBm0
+	 u1SHQTayMCKIZRKnPoUTU7ABubJ7CJTvtjFEYbNtZKRv+Ar0ChXUD025FQ/g0g/muR
+	 9JLv0otWAA+Nw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG37U-001IWu-5Y;
-	Thu, 12 Jan 2023 19:20:12 +0000
+	id 1pG37Q-001IWu-MK;
+	Thu, 12 Jan 2023 19:20:08 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 66/68] KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
-Date: Thu, 12 Jan 2023 19:19:25 +0000
-Message-Id: <20230112191927.1814989-67-maz@kernel.org>
+Subject: [PATCH v7 52/68] KVM: arm64: nv: Add nested GICv3 tracepoints
+Date: Thu, 12 Jan 2023 19:19:11 +0000
+Message-Id: <20230112191927.1814989-53-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,155 +54,208 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Due to the way ARMv8.4-NV suppresses traps when accessing EL2
-system registers, we can't track when the guest changes its
-HCR_EL2.TGE setting. This means we always trap EL1 TLBIs,
-even if they don't affect any guest.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-This obviously has a huge impact on performance, as we handle
-TLBI traps as a normal exit, and a normal VHE host issues
-thousands of TLBIs when booting (and quite a few when running
-userspace).
+Adding tracepoints to be able to peek into the shadow LRs used when
+running a guest guest.
 
-A cheap way to reduce the overhead is to handle the limited
-case of {E2H,TGE}=={1,1} as a guest fixup, as we already have
-the right mmu configuration in place. Just execute the decoded
-instruction right away and return to the guest.
-
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vhe/switch.c | 43 ++++++++++++++++++++++++++++++++-
- arch/arm64/kvm/hyp/vhe/tlb.c    |  6 +++--
- arch/arm64/kvm/sys_regs.c       | 25 ++++++-------------
- 3 files changed, 54 insertions(+), 20 deletions(-)
+ arch/arm64/kvm/vgic/vgic-nested-trace.h | 137 ++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-v3-nested.c    |  13 ++-
+ 2 files changed, 149 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/kvm/vgic/vgic-nested-trace.h
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 238c6613cf47..a3555b90d9e1 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -168,6 +168,47 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
- 	__deactivate_traps_common(vcpu);
+diff --git a/arch/arm64/kvm/vgic/vgic-nested-trace.h b/arch/arm64/kvm/vgic/vgic-nested-trace.h
+new file mode 100644
+index 000000000000..f1a074c791a6
+--- /dev/null
++++ b/arch/arm64/kvm/vgic/vgic-nested-trace.h
+@@ -0,0 +1,137 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#if !defined(_TRACE_VGIC_NESTED_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _TRACE_VGIC_NESTED_H
++
++#include <linux/tracepoint.h>
++
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM kvm
++
++#define SLR_ENTRY_VALS(x)							\
++	" ",									\
++	!!(__entry->lrs[x] & ICH_LR_HW),		   			\
++	!!(__entry->lrs[x] & ICH_LR_PENDING_BIT),	   			\
++	!!(__entry->lrs[x] & ICH_LR_ACTIVE_BIT),	   			\
++	__entry->lrs[x] & ICH_LR_VIRTUAL_ID_MASK,				\
++	(__entry->lrs[x] & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT,	\
++	(__entry->orig_lrs[x] & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT
++
++TRACE_EVENT(vgic_create_shadow_lrs,
++	TP_PROTO(struct kvm_vcpu *vcpu, int nr_lr, u64 *lrs, u64 *orig_lrs),
++	TP_ARGS(vcpu, nr_lr, lrs, orig_lrs),
++
++	TP_STRUCT__entry(
++		__field(	int,	nr_lr			)
++		__array(	u64,	lrs,		16	)
++		__array(	u64,	orig_lrs,	16	)
++	),
++
++	TP_fast_assign(
++		__entry->nr_lr		= nr_lr;
++		memcpy(__entry->lrs, lrs, 16 * sizeof(u64));
++		memcpy(__entry->orig_lrs, orig_lrs, 16 * sizeof(u64));
++	),
++
++	TP_printk("nr_lr: %d\n"
++		  "%50sLR[ 0]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 1]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 2]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 3]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 4]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 5]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 6]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 7]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 8]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[ 9]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[10]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[11]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[12]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[13]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[14]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
++		  "%50sLR[15]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)",
++		  __entry->nr_lr,
++		  SLR_ENTRY_VALS(0), SLR_ENTRY_VALS(1), SLR_ENTRY_VALS(2),
++		  SLR_ENTRY_VALS(3), SLR_ENTRY_VALS(4), SLR_ENTRY_VALS(5),
++		  SLR_ENTRY_VALS(6), SLR_ENTRY_VALS(7), SLR_ENTRY_VALS(8),
++		  SLR_ENTRY_VALS(9), SLR_ENTRY_VALS(10), SLR_ENTRY_VALS(11),
++		  SLR_ENTRY_VALS(12), SLR_ENTRY_VALS(13), SLR_ENTRY_VALS(14),
++		  SLR_ENTRY_VALS(15))
++);
++
++#define LR_ENTRY_VALS(x)							\
++	" ",									\
++	!!(__entry->lrs[x] & ICH_LR_HW),		   			\
++	!!(__entry->lrs[x] & ICH_LR_PENDING_BIT),	   			\
++	!!(__entry->lrs[x] & ICH_LR_ACTIVE_BIT),	   			\
++	__entry->lrs[x] & ICH_LR_VIRTUAL_ID_MASK,				\
++	(__entry->lrs[x] & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT
++
++TRACE_EVENT(vgic_put_nested,
++	TP_PROTO(struct kvm_vcpu *vcpu, int nr_lr, u64 *lrs),
++	TP_ARGS(vcpu, nr_lr, lrs),
++
++	TP_STRUCT__entry(
++		__field(	int,	nr_lr			)
++		__array(	u64,	lrs,		16	)
++	),
++
++	TP_fast_assign(
++		__entry->nr_lr		= nr_lr;
++		memcpy(__entry->lrs, lrs, 16 * sizeof(u64));
++	),
++
++	TP_printk("nr_lr: %d\n"
++		  "%50sLR[ 0]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 1]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 2]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 3]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 4]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 5]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 6]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 7]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 8]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[ 9]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[10]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[11]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[12]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[13]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[14]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
++		  "%50sLR[15]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu",
++		  __entry->nr_lr,
++		  LR_ENTRY_VALS(0), LR_ENTRY_VALS(1), LR_ENTRY_VALS(2),
++		  LR_ENTRY_VALS(3), LR_ENTRY_VALS(4), LR_ENTRY_VALS(5),
++		  LR_ENTRY_VALS(6), LR_ENTRY_VALS(7), LR_ENTRY_VALS(8),
++		  LR_ENTRY_VALS(9), LR_ENTRY_VALS(10), LR_ENTRY_VALS(11),
++		  LR_ENTRY_VALS(12), LR_ENTRY_VALS(13), LR_ENTRY_VALS(14),
++		  LR_ENTRY_VALS(15))
++);
++
++TRACE_EVENT(vgic_nested_hw_emulate,
++	TP_PROTO(int lr, u64 lr_val, u32 l1_intid),
++	TP_ARGS(lr, lr_val, l1_intid),
++
++	TP_STRUCT__entry(
++		__field(	int,	lr		)
++		__field(	u64,	lr_val		)
++		__field(	u32,	l1_intid	)
++	),
++
++	TP_fast_assign(
++		__entry->lr		= lr;
++		__entry->lr_val		= lr_val;
++		__entry->l1_intid	= l1_intid;
++	),
++
++	TP_printk("lr: %d LR %llx L1 INTID: %u\n",
++		  __entry->lr, __entry->lr_val, __entry->l1_intid)
++);
++
++#endif /* _TRACE_VGIC_NESTED_H */
++
++#undef TRACE_INCLUDE_PATH
++#define TRACE_INCLUDE_PATH vgic/
++#undef TRACE_INCLUDE_FILE
++#define TRACE_INCLUDE_FILE vgic-nested-trace
++
++/* This part must be outside protection */
++#include <trace/define_trace.h>
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index 919275b94625..98b21adb6e9b 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -15,6 +15,9 @@
+ 
+ #include "vgic.h"
+ 
++#define CREATE_TRACE_POINTS
++#include "vgic-nested-trace.h"
++
+ static inline struct vgic_v3_cpu_if *vcpu_nested_if(struct kvm_vcpu *vcpu)
+ {
+ 	return &vcpu->arch.vgic_cpu.nested_vgic_v3;
+@@ -121,6 +124,9 @@ static void vgic_v3_create_shadow_lr(struct kvm_vcpu *vcpu)
+ 		used_lrs = i + 1;
+ 	}
+ 
++	trace_vgic_create_shadow_lrs(vcpu, kvm_vgic_global_state.nr_lr,
++				     s_cpu_if->vgic_lr, cpu_if->vgic_lr);
++
+ 	s_cpu_if->used_lrs = used_lrs;
  }
  
-+static bool kvm_hyp_handle_tlbi_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	u32 instr;
-+	u64 val;
-+
-+	/*
-+	 * Ideally, we would never trap on EL1 TLB invalidations when the
-+	 * guest's HCR_EL2.{E2H,TGE} == {1,1}. But "thanks" to ARMv8.4, we
-+	 * don't trap writes to HCR_EL2, meaning that we can't track
-+	 * changes to the virtual TGE bit. So we leave HCR_EL2.TTLB set on
-+	 * the host. Oopsie...
-+	 *
-+	 * In order to speed-up EL1 TLBIs from the vEL2 guest when TGE is
-+	 * set, try and handle these invalidation as quickly as possible,
-+	 * without fully exiting (unless this needs forwarding).
-+	 */
-+	if (!vcpu_has_nv2(vcpu) ||
-+	    !vcpu_is_el2(vcpu) ||
-+	    (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE))
-+		return false;
-+
-+	instr = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
-+	if (sys_reg_Op0(instr) != TLBI_Op0 ||
-+	    sys_reg_Op1(instr) != TLBI_Op1_EL1)
-+		return false;
-+
-+	val = vcpu_get_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu));
-+	__kvm_tlb_el1_instr(NULL, val, instr);
-+	__kvm_skip_instr(vcpu);
-+
-+	return true;
-+}
-+
-+static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	if (kvm_hyp_handle_tlbi_el1(vcpu, exit_code))
-+		return true;
-+
-+	return kvm_hyp_handle_sysreg(vcpu, exit_code);
-+}
-+
- static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-@@ -216,7 +257,7 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
- static const exit_handler_fn hyp_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]		= NULL,
- 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
--	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
-+	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg_vhe,
- 	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
- 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
- 	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index c4389db4cc22..beb162468c0b 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -201,7 +201,8 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
- 	dsb(ishst);
+@@ -165,8 +171,10 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
+ 			continue; /* oh well, the guest hyp is broken */
  
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt);
-+	if (mmu)
-+		__tlb_switch_to_guest(mmu, &cxt);
+ 		lr = __gic_v3_get_lr(i);
+-		if (!(lr & ICH_LR_STATE))
++		if (!(lr & ICH_LR_STATE)) {
++			trace_vgic_nested_hw_emulate(i, lr, l1_irq);
+ 			irq->active = false;
++		}
  
+ 		vgic_put_irq(vcpu->kvm, irq);
+ 	}
+@@ -197,6 +205,9 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ 
+ 	__vgic_v3_save_state(vcpu_shadow_if(vcpu));
+ 
++	trace_vgic_put_nested(vcpu, kvm_vgic_global_state.nr_lr,
++			      vcpu_shadow_if(vcpu)->vgic_lr);
++
  	/*
- 	 * Execute the same instruction as the guest hypervisor did,
-@@ -240,5 +241,6 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
- 	dsb(ish);
- 	isb();
- 
--	__tlb_switch_to_host(&cxt);
-+	if (mmu)
-+		__tlb_switch_to_host(&cxt);
- }
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b296bf932e18..f0b72df119d1 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2973,6 +2973,8 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r)
- {
- 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-+	u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-+	struct kvm_s2_mmu *mmu;
- 
- 	if (vcpu_has_nv(vcpu) && forward_traps(vcpu, HCR_TTLB))
- 		return false;
-@@ -2994,24 +2996,13 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 
- 	mutex_lock(&vcpu->kvm->lock);
- 
--	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
--		u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
--		struct kvm_s2_mmu *mmu;
--
--		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
--		if (mmu)
--			__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
-+	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
-+	if (mmu)
-+		__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
- 
--		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
--		if (mmu)
--			__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
--	} else {
--		/*
--		 * ARMv8.4-NV allows the guest to change TGE behind
--		 * our back, so we always trap EL1 TLBIs from vEL2...
--		 */
--		__kvm_tlb_el1_instr(&vcpu->kvm->arch.mmu, p->regval, sys_encoding);
--	}
-+	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
-+	if (mmu)
-+		__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
- 
- 	mutex_unlock(&vcpu->kvm->lock);
- 
+ 	 * Translate the shadow state HW fields back to the virtual ones
+ 	 * before copying the shadow struct back to the nested one.
 -- 
 2.34.1
 
