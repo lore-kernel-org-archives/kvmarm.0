@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5548476
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:22:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82B0AC433EF;
-	Thu, 12 Jan 2023 19:22:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EA68476
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:22:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8353C433D2;
+	Thu, 12 Jan 2023 19:22:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551363;
-	bh=ZEg4zb/9ebtpMhM86pt1jo0QNpWAR3VBYwPDnl2tHXA=;
+	s=k20201202; t=1673551365;
+	bh=rtr8+WmlMdoh7pq76B8pS/gPa5yiQGrkAY7j/4xqzfY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=luMuNf2gwSnXkIt5mcNpoOo7WDBvoLSXDgzuX+1T+iK3jE64ksq8sAuDCOcK9M0k7
-	 RRPM0pzte1JKCY+X1To9G83Y1UhFfE1mlUBzQZxo4rpEDpCY80PIAVNOsZ+BekrWey
-	 DrFPKP8N34wAEftbPE0AKge26Dvo4Zacn6qe2HIlFXAmMb2h0Hf/UxSBPE3l1NpiuC
-	 y0KcWx7ubnMhTPcaER48FpAt6UPZuhpsntFwItqaOM3CBC6qydynBW7azIKb2aUdgz
-	 G5k79rlWyMN61ZYfoiVgrrwS0AxoU/nrGJmVg2DwwpFwIuqMeJ2w+LHTMT/Gzqe4jA
-	 Y1Gs76fBvIGaA==
+	b=k+/YpDMFC8CUCDNbJ6RwctA4UlPehLZzxAu8STWWAtbY8XregZlzdEfsvHs7utRfe
+	 Eofqk9xTEy7Ih6LjTUB0d4B/7ev/iaFv79GgphSFzZgiNV+8xM2WL78gvCbxIp8H92
+	 O5pR+R9ZhGr6/65kcpNEZ0D7fGSBUlz+xQNpfGCywzt28mBQHo9GWrqB95kJlqJC+1
+	 FB2IFL1+70ewUUWIHCqlhwqHd1Sg+NHbhQ3lPrFe/dmemeUz/s/fiPB/tEbQs2Z/2G
+	 HuCQWlJLz1Ac+dABrNXM3EI1Sjah0hh7ujb9tfesm7o6V81lA6ANu+/ELJ6ATVP10U
+	 WpWajhKbNaP7w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG37G-001IWu-Ly;
-	Thu, 12 Jan 2023 19:19:59 +0000
+	id 1pG37R-001IWu-FG;
+	Thu, 12 Jan 2023 19:20:09 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 37/68] KVM: arm64: nv: Restrict S2 RD/WR permissions to match the guest's
-Date: Thu, 12 Jan 2023 19:18:56 +0000
-Message-Id: <20230112191927.1814989-38-maz@kernel.org>
+Subject: [PATCH v7 55/68] KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like information
+Date: Thu, 12 Jan 2023 19:19:14 +0000
+Message-Id: <20230112191927.1814989-56-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,89 +54,184 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When mapping a page in a shadow stage-2, special care must be
-taken not to be more permissive than the guest is (writable or
-readable page when the guest hasn't set that permission).
+In order to be able to make S2 TLB invalidations more performant on NV,
+let's use a scheme derived from the ARMv8.4 TTL extension.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+If bits [56:55] in the descriptor are non-zero, they indicate a level
+which can be used as an invalidation range.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h | 15 +++++++++++++++
- arch/arm64/kvm/mmu.c                | 14 +++++++++++++-
- arch/arm64/kvm/nested.c             |  2 +-
- 3 files changed, 29 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h |  4 ++
+ arch/arm64/kvm/nested.c             | 99 +++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           |  9 ++-
+ 3 files changed, 109 insertions(+), 3 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 80371dea3652..fc96873b6dfe 100644
+index c5b661517cb6..63bb4898e2d9 100644
 --- a/arch/arm64/include/asm/kvm_nested.h
 +++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -91,6 +91,21 @@ static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
- 	return trans->esr;
- }
+@@ -122,6 +122,8 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+ extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+ extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+ extern bool forward_nv1_traps(struct kvm_vcpu *vcpu);
++u8 get_guest_mapping_ttl(struct kvm_vcpu *vcpu, struct kvm_s2_mmu *mmu,
++			 u64 addr);
+ unsigned int ttl_to_size(u8 ttl);
  
-+static inline bool kvm_s2_trans_readable(struct kvm_s2_trans *trans)
-+{
-+	return trans->readable;
-+}
+ struct sys_reg_params;
+@@ -130,4 +132,6 @@ struct sys_reg_desc;
+ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+ 			  const struct sys_reg_desc *r);
+ 
++#define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
 +
-+static inline bool kvm_s2_trans_writable(struct kvm_s2_trans *trans)
-+{
-+	return trans->writable;
-+}
-+
-+static inline bool kvm_s2_trans_executable(struct kvm_s2_trans *trans)
-+{
-+	return !(trans->upper_attr & BIT(54));
-+}
-+
- extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- 			      struct kvm_s2_trans *result);
- 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index cb64e52b6cc5..0392c47f1fcd 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1402,6 +1402,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (exec_fault && device)
- 		return -ENOEXEC;
- 
-+	/*
-+	 * Potentially reduce shadow S2 permissions to match the guest's own
-+	 * S2. For exec faults, we'd only reach this point if the guest
-+	 * actually allowed it (see kvm_s2_handle_perm_fault).
-+	 */
-+	if (nested) {
-+		writable &= kvm_s2_trans_writable(nested);
-+		if (!kvm_s2_trans_readable(nested))
-+			prot &= ~KVM_PGTABLE_PROT_R;
-+	}
-+
- 	read_lock(&kvm->mmu_lock);
- 	pgt = vcpu->arch.hw_mmu->pgt;
- 	if (mmu_invalidate_retry(kvm, mmu_seq))
-@@ -1439,7 +1450,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 
- 	if (device)
- 		prot |= KVM_PGTABLE_PROT_DEVICE;
--	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
-+	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC) &&
-+		 (!nested || kvm_s2_trans_executable(nested)))
- 		prot |= KVM_PGTABLE_PROT_X;
- 
- 	/*
+ #endif /* __ARM64_KVM_NESTED_H */
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 5fb5e93248c1..dc74c9b8db89 100644
+index 8b22984a3112..f93f4248c6f3 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -488,7 +488,7 @@ int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
- 		return 0;
+@@ -4,6 +4,7 @@
+  * Author: Jintack Lim <jintack.lim@linaro.org>
+  */
  
- 	if (kvm_vcpu_trap_is_iabt(vcpu)) {
--		forward_fault = (trans->upper_attr & BIT(54));
-+		forward_fault = !kvm_s2_trans_executable(trans);
- 	} else {
- 		bool write_fault = kvm_is_write_fault(vcpu);
++#include <linux/bitfield.h>
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
  
+@@ -357,6 +358,30 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 	return ret;
+ }
+ 
++static int read_host_s2_desc(phys_addr_t pa, u64 *desc, void *data)
++{
++	u64 *va = phys_to_virt(pa);
++
++	*desc = *va;
++
++	return 0;
++}
++
++static int kvm_walk_shadow_s2(struct kvm_s2_mmu *mmu, phys_addr_t gipa,
++			      struct kvm_s2_trans *result)
++{
++	struct s2_walk_info wi = { };
++
++	wi.read_desc = read_host_s2_desc;
++	wi.baddr = mmu->pgd_phys;
++
++	vtcr_to_walk_info(mmu->arch->vtcr, &wi);
++
++	wi.be = IS_ENABLED(CONFIG_CPU_BIG_ENDIAN);
++
++	return walk_nested_s2_pgd(gipa, &wi, result);
++}
++
+ unsigned int ttl_to_size(u8 ttl)
+ {
+ 	int level = ttl & 3;
+@@ -413,6 +438,80 @@ unsigned int ttl_to_size(u8 ttl)
+ 	return max_size;
+ }
+ 
++/*
++ * Compute the equivalent of the TTL field by parsing the shadow PT.
++ * The granule size is extracted from VTCR_EL2.TG0 while the level is
++ * retrieved from first entry carrying the level as a tag.
++ */
++u8 get_guest_mapping_ttl(struct kvm_vcpu *vcpu, struct kvm_s2_mmu *mmu,
++			 u64 addr)
++{
++	u64 tmp, sz = 0, vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
++	struct kvm_s2_trans out;
++	u8 ttl, level;
++
++	switch (vtcr & VTCR_EL2_TG0_MASK) {
++	case VTCR_EL2_TG0_4K:
++		ttl = (1 << 2);
++		break;
++	case VTCR_EL2_TG0_16K:
++		ttl = (2 << 2);
++		break;
++	case VTCR_EL2_TG0_64K:
++		ttl = (3 << 2);
++		break;
++	default:
++		BUG();
++	}
++
++	tmp = addr;
++
++again:
++	/* Iteratively compute the block sizes for a particular granule size */
++	switch (vtcr & VTCR_EL2_TG0_MASK) {
++	case VTCR_EL2_TG0_4K:
++		if	(sz < SZ_4K)	sz = SZ_4K;
++		else if (sz < SZ_2M)	sz = SZ_2M;
++		else if (sz < SZ_1G)	sz = SZ_1G;
++		else			sz = 0;
++		break;
++	case VTCR_EL2_TG0_16K:
++		if	(sz < SZ_16K)	sz = SZ_16K;
++		else if (sz < SZ_32M)	sz = SZ_32M;
++		else			sz = 0;
++		break;
++	case VTCR_EL2_TG0_64K:
++		if	(sz < SZ_64K)	sz = SZ_64K;
++		else if (sz < SZ_512M)	sz = SZ_512M;
++		else			sz = 0;
++		break;
++	default:
++		BUG();
++	}
++
++	if (sz == 0)
++		return 0;
++
++	tmp &= ~(sz - 1);
++	out = (struct kvm_s2_trans) { };
++	kvm_walk_shadow_s2(mmu, tmp, &out);
++	level = FIELD_GET(KVM_NV_GUEST_MAP_SZ, out.upper_attr);
++	if (!level)
++		goto again;
++
++	ttl |= level;
++
++	/*
++	 * We now have found some level information in the shadow S2. Check
++	 * that the resulting range is actually including the original IPA.
++	 */
++	sz = ttl_to_size(ttl);
++	if (addr < (tmp + sz))
++		return ttl;
++
++	return 0;
++}
++
+ /* Must be called with kvm->mmu_lock held */
+ struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
+ {
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index aa15cf3b29eb..89fc11024786 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2870,10 +2870,13 @@ static unsigned long compute_tlb_inval_range(struct kvm_vcpu *vcpu,
+ 					     u64 val)
+ {
+ 	unsigned long max_size;
+-	u8 ttl = 0;
++	u8 ttl;
+ 
+-	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL)) {
+-		ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
++	ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
++
++	if (!(cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) && ttl)) {
++		u64 addr = (val & GENMASK_ULL(35, 0)) << 12;
++		ttl = get_guest_mapping_ttl(vcpu, mmu, addr);
+ 	}
+ 
+ 	max_size = ttl_to_size(ttl);
 -- 
 2.34.1
 
