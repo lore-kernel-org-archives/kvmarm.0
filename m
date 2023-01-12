@@ -1,159 +1,151 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31D1BD33
-	for <kvmarm@lists.linux.dev>; Wed, 11 Jan 2023 22:52:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1673477543;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1vvFOlgZcmbBXel/bkUj30X9nLvjQk+79xN6sEwmowg=;
-	b=holkbhl3EX8cUpINkTS57m2VvfZQlJeO0e1mw5OJ08oIqUeZTLNg0FizLdc/JtsKGJIzWn
-	h6KR61RYNALg1/n9w3iZsiF3yJ2DK557F9KrTPufgKVyrVrx7hXR2f5/RimN1ZtM9tKZSv
-	iHNrxRruI/xSQ47SzQaIVGMwaoqPWP0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-173-GTEKgwbqP_qAvxgD8gOtAA-1; Wed, 11 Jan 2023 17:52:20 -0500
-X-MC-Unique: GTEKgwbqP_qAvxgD8gOtAA-1
-Received: by mail-wm1-f69.google.com with SMTP id f20-20020a7bc8d4000000b003d1cda5bd6fso3809489wml.9
-        for <kvmarm@lists.linux.dev>; Wed, 11 Jan 2023 14:52:20 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3150C386
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 02:39:07 +0000 (UTC)
+Received: by mail-pl1-f174.google.com with SMTP id b17so11304405pld.7
+        for <kvmarm@lists.linux.dev>; Wed, 11 Jan 2023 18:39:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=k83D4cHet6xxSauwnXBAG2POGQDSG6eAKHoaOWKO0ZM=;
+        b=HBHPRSkefxSL8v/u0WI3RXGK8TGWvBs9nWl0eAN6b2r3P/L5A0AHOW8k+WNlNXljiA
+         xcBm7wjPg/EbuBJAaGK6fXmY1J99aLHf2ygMD4Ckkm5bZqFjjM6jm6yr1tg9BHpFyBU0
+         r3SZWa5xMt7w6fSPXq70t5UyNqDOUpXK5fucMnX+sRjFj6OGzvUeZKRJtYA4imZdpC15
+         RiJw9c0KYYLbr6ilHj99I/BGqslESPEHZM66/T1Uxls26qk4KKAZzb4XrwUYzsiXMGct
+         N7ocX5rmVHAANjUVEMpylwE/OwUabgBkdVPmqiw4HmJxTNN7/PpzCgckFbi7PsfJA76L
+         wbMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1vvFOlgZcmbBXel/bkUj30X9nLvjQk+79xN6sEwmowg=;
-        b=rU9pAc6V+8R1Nb6K41eaTaQYtpxQNz63eV7o7vhBVc3ToHOQF6k0UjzqcWx5u3qdgX
-         OysDqe5pq6F0bLJR+JYS/xd6zGAp6x2AXaksJm886yLrEnccXCGG3UntM2kWrd05Uapc
-         xBuV7g1vKSFM4jgM0fBsCNiZE6e514SDh5KEXYQ0jvrqKhoGrPaV1nXnB5E1hxvk1uLs
-         iDTKU9seqhY+NfeeTzTMjNZ3BDYt0OdJWArXSGqMrsvq3rlqxFJPWtDrTXNPkA4w+AJt
-         nf2UTxRp32XMPk+RR8Dburv5mf8IMm1/4Pvomu7Y7YwXPyDkDzqugi38usgx1fmFT8nW
-         Fgfw==
-X-Gm-Message-State: AFqh2kqlulVbHaPsXM4Af2WOudNC8RTHTs3HJN/9sxkfc15xSz0VJ25R
-	stibQJkyZ4sBsooPR2Ech2rWbTnAm7ngwdMVqssz7MwEKPbGUInc/SAPoc51hv/TkOTKvkvj9H1
-	Bfa0SH3vZm5pPToCP
-X-Received: by 2002:a05:600c:a51:b0:3d3:513c:240b with SMTP id c17-20020a05600c0a5100b003d3513c240bmr53612351wmq.7.1673477539346;
-        Wed, 11 Jan 2023 14:52:19 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXtmGyt8JKlWBfzQGmhaL765SxJvgXCn4igxgfJhH5h0b9S1PIkRIsbexrIgfCr7o9RQxEZJ1g==
-X-Received: by 2002:a05:600c:a51:b0:3d3:513c:240b with SMTP id c17-20020a05600c0a5100b003d3513c240bmr53612337wmq.7.1673477539106;
-        Wed, 11 Jan 2023 14:52:19 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:4783:a68:c1ee:15c5? ([2001:b07:6468:f312:4783:a68:c1ee:15c5])
-        by smtp.googlemail.com with ESMTPSA id m17-20020a05600c3b1100b003cfbbd54178sm7547260wms.2.2023.01.11.14.52.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Jan 2023 14:52:18 -0800 (PST)
-Message-ID: <24954c55-84c0-2d06-22b7-5345fd4e0731@redhat.com>
-Date: Wed, 11 Jan 2023 23:52:17 +0100
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=k83D4cHet6xxSauwnXBAG2POGQDSG6eAKHoaOWKO0ZM=;
+        b=ITJzkR6DD/BXNZvjrXRakGjT8ya/dUM/a47nu4v98TXreZxmI+2tBjQFT1UlgLex4y
+         YYjXZRs2tBT2ExMMpyZif7mTbVX27oneP7MlG6mMFHtCZC0/lpCwYmHO6Rl/zB7oyRCU
+         06ZFV0dUnhItUgB0WT2UqtMds4P0kTgnIrSITaa71l82b+dA170i+2Ou3K+Ef+rJOvDe
+         0vEiw2xRtvXfk0oO4TGenmjwRHJn2kRZS6VELGlwCHWM2gDueMLI0w67dQI7MgKpuJeg
+         YuyaA4MZGwACOMaAvgW3CkjgzmF5gtt65+0QGlqFF/Ij34CmGwECQlkByuyq3HyL8DLh
+         b/eQ==
+X-Gm-Message-State: AFqh2kp8Z5/RAZHUENWswC5dUBSALvuU3rw3Ah0DoJLeNHgSnI/Bzz/e
+	BuRFe9swhoTrtVdtWZ7JX6+pnrpImrSl0Ywq
+X-Google-Smtp-Source: AMrXdXuarUuj+dnpfbLqlXdbjMkbC9/UcAPU+8TqzLcL101PU3o/EcvUpOQA1ixTQMd2bjFz7Yttag==
+X-Received: by 2002:a17:902:c102:b0:192:8e05:1505 with SMTP id 2-20020a170902c10200b001928e051505mr57871834pli.31.1673491146515;
+        Wed, 11 Jan 2023 18:39:06 -0800 (PST)
+Received: from fedora.flets-east.jp ([2400:4050:a840:1e00:d54:e521:8bac:7bed])
+        by smtp.gmail.com with ESMTPSA id w7-20020a1709027b8700b001944b1285easm2310331pll.198.2023.01.11.18.39.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jan 2023 18:39:05 -0800 (PST)
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+To: 
+Cc: Mark Brown <broonie@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	linux-arm-kernel@lists.infradead.org,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	asahi@lists.linux.dev,
+	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+	Sven Peter <sven@svenpeter.dev>,
+	Hector Martin <marcan@marcan.st>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH v7 0/7] KVM: arm64: Normalize cache configuration
+Date: Thu, 12 Jan 2023 11:38:45 +0900
+Message-Id: <20230112023852.42012-1-akihiko.odaki@daynix.com>
+X-Mailer: git-send-email 2.39.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.2, take #1
-To: Marc Zyngier <maz@kernel.org>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
- Ard Biesheuvel <ardb@kernel.org>, James Clark <james.clark@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, kvmarm@lists.cs.columbia.edu,
- kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org
-References: <20230105154250.660145-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20230105154250.660145-1-maz@kernel.org>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/5/23 16:42, Marc Zyngier wrote:
-> Hi Paolo,
-> 
-> Happy new year!
-> 
-> Here's the first batch of fixes for KVM/arm64 for 6.2. We have two
-> important fixes this time around, one for the PMU emulation, and the
-> other for guest page table walks in read-only memslots, something that
-> EFI has started doing...
-> 
-> The rest is mostly documentation updates, cleanups, and an update to
-> the list of reviewers (Alexandru stepping down, and Zenghui joining
-> the fun).
-> 
-> Please pull,
+Before this change, the cache configuration of the physical CPU was
+exposed to vcpus. This is problematic because the cache configuration a
+vcpu sees varies when it migrates between vcpus with different cache
+configurations.
 
-Pulled (though not pushed yet because I still have some x86 tests 
-running), thanks.
+Fabricate cache configuration from the sanitized value, which holds the
+CTR_EL0 value the userspace sees regardless of which physical CPU it
+resides on.
 
-Paolo
+V6 -> V7:
+- Make the code to determine cache line more readable.
+  Based on Oliver Upton's suggestion.
 
-> 	M.
-> 
-> 
-> The following changes since commit 88603b6dc419445847923fcb7fe5080067a30f98:
-> 
->    Linux 6.2-rc2 (2023-01-01 13:53:16 -0800)
-> 
-> are available in the Git repository at:
-> 
->    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.2-1
-> 
-> for you to fetch changes up to de535c0234dd2dbd9c790790f2ca1c4ec8a52d2b:
-> 
->    Merge branch kvm-arm64/MAINTAINERS into kvmarm-master/fixes (2023-01-05 15:26:53 +0000)
-> 
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 6.2, take #1
-> 
-> - Fix the PMCR_EL0 reset value after the PMU rework
-> 
-> - Correctly handle S2 fault triggered by a S1 page table walk
->    by not always classifying it as a write, as this breaks on
->    R/O memslots
-> 
-> - Document why we cannot exit with KVM_EXIT_MMIO when taking
->    a write fault from a S1 PTW on a R/O memslot
-> 
-> - Put the Apple M2 on the naughty step for not being able to
->    correctly implement the vgic SEIS feature, just liek the M1
->    before it
-> 
-> - Reviewer updates: Alex is stepping down, replaced by Zenghui
-> 
-> ----------------------------------------------------------------
-> Alexandru Elisei (1):
->        MAINTAINERS: Remove myself as a KVM/arm64 reviewer
-> 
-> James Clark (1):
->        KVM: arm64: PMU: Fix PMCR_EL0 reset value
-> 
-> Marc Zyngier (8):
->        KVM: arm64: Fix S1PTW handling on RO memslots
->        KVM: arm64: Document the behaviour of S1PTW faults on RO memslots
->        KVM: arm64: Convert FSC_* over to ESR_ELx_FSC_*
->        KVM: arm64: vgic: Add Apple M2 cpus to the list of broken SEIS implementations
->        Merge branch kvm-arm64/pmu-fixes-6.2 into kvmarm-master/fixes
->        Merge branch kvm-arm64/s1ptw-write-fault into kvmarm-master/fixes
->        MAINTAINERS: Add Zenghui Yu as a KVM/arm64 reviewer
->        Merge branch kvm-arm64/MAINTAINERS into kvmarm-master/fixes
-> 
->   Documentation/virt/kvm/api.rst          |  8 +++++++
->   MAINTAINERS                             |  2 +-
->   arch/arm64/include/asm/cputype.h        |  4 ++++
->   arch/arm64/include/asm/esr.h            |  9 +++++++
->   arch/arm64/include/asm/kvm_arm.h        | 15 ------------
->   arch/arm64/include/asm/kvm_emulate.h    | 42 +++++++++++++++++++++++----------
->   arch/arm64/kvm/hyp/include/hyp/fault.h  |  2 +-
->   arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
->   arch/arm64/kvm/mmu.c                    | 21 ++++++++++-------
->   arch/arm64/kvm/sys_regs.c               |  2 +-
->   arch/arm64/kvm/vgic/vgic-v3.c           |  2 ++
->   11 files changed, 69 insertions(+), 40 deletions(-)
-	````````
+V5 -> V6:
+- Add a comment to get_min_cache_line_size()
+
+V4 -> V5:
+- Noted why cache level existence check is unnecessary when fabricating
+  CCSIDR_EL1 value.
+- Removed FWB check. It is necessary as CLIDR_EL1.{LoUU, LoIUS} on the
+  host are {0, 0} if FWB is enabled, and such a CLIDR_EL1 value sets
+  the IDC bit of the sanitized CTR_EL0 value, which is already checked.
+- Removed UNDEF injection when reading CCSIDR_EL1 with an invalid
+  CSSELR_EL1 value.
+- Added a check for CLIDR_EL1.{LoUU,LoC,LoUIS} values set from the
+  userspace.
+
+V3 -> V4:
+- Implemented UNKNOWN system register definition for CCSIDR_EL1
+- Added a comment about the relation between CCSIDR_EL1 and FEAT_CCIDX
+- Squashed "Normalize cache configuration" and "Allow user to set
+  CCSIDR_EL1"
+  The intermediate state between them did not make much sense.
+- Introduced FIELD_GET to extract CCSIDR_EL1_LineSize.
+
+V2 -> V3:
+- Corrected message for patch "Normalize cache configuration"
+- Split patch "Normalize cache configuration"
+- Added handling for CSSELR_EL1.TnD
+- Added code to ignore RES0 in CSSELR_EL1
+- Replaced arm64_ftr_reg_ctrel0.sys_val with
+  read_sanitised_ftr_reg(SYS_CTR_EL0)
+- Fixed vcpu->arch.ccsidr initialziation
+- Added CCSIDR_EL1 sanitization
+- Added FWB check
+- Added a comment for CACHE_TYPE_SEPARATE
+- Added MTE tag cache creation code for CLIDR_EL1 fabrication
+- Removed CLIDR_EL1 reset code for reset caused by guest
+- Added a comment for CCSIDR2
+
+V2: https://lore.kernel.org/lkml/20221211051700.275761-2-akihiko.odaki@daynix.com/
+V1: https://lore.kernel.org/lkml/525ff263-90b3-5b12-da31-171b09f9ad1b@daynix.com/
+
+Akihiko Odaki (6):
+  arm64/sysreg: Convert CCSIDR_EL1 to automatic generation
+  arm64/sysreg: Add CCSIDR2_EL1
+  arm64/cache: Move CLIDR macro definitions
+  KVM: arm64: Always set HCR_TID2
+  KVM: arm64: Mask FEAT_CCIDX
+  KVM: arm64: Normalize cache configuration
+
+Marc Zyngier (1):
+  arm64: Allow the definition of UNKNOWN system register fields
+
+ arch/arm64/include/asm/cache.h             |   9 +
+ arch/arm64/include/asm/kvm_arm.h           |   3 +-
+ arch/arm64/include/asm/kvm_emulate.h       |   4 -
+ arch/arm64/include/asm/kvm_host.h          |   6 +-
+ arch/arm64/include/asm/sysreg.h            |   1 -
+ arch/arm64/kernel/cacheinfo.c              |   5 -
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   2 -
+ arch/arm64/kvm/reset.c                     |   1 +
+ arch/arm64/kvm/sys_regs.c                  | 274 +++++++++++++--------
+ arch/arm64/tools/gen-sysreg.awk            |  20 +-
+ arch/arm64/tools/sysreg                    |  17 ++
+ 11 files changed, 230 insertions(+), 112 deletions(-)
+
+-- 
+2.39.0
 
