@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094AD8476
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:22:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5299C433F1;
-	Thu, 12 Jan 2023 19:22:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D9498476
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:22:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04BB3C433D2;
+	Thu, 12 Jan 2023 19:22:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551346;
-	bh=YNMtW6qYRgKEUFaPKzZRjN4rCL/DaY441LVttCXbAOM=;
+	s=k20201202; t=1673551349;
+	bh=mV9rhgr8Zj5w/yvHD9XGsJnaYYXyVdoar2Qf78gKDvs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dwlecoCytOLWONq6+gHt78Dzq1zToL1fDjq4/ogfOrlGBe+PGrkEtzJrbGMSAC6ME
-	 Ug9IuBL5l4k25JftmI2T5sPl+pZrSAez6wemSpU+D+iPJLiV0tLNuNa83Ct+OgOPc9
-	 //Lf71VLmYjkaTdKNPFBChj8cJ7fJKgHdaTTOe+Olzskvfncga1ugP/hzD99LTr2+m
-	 OqVvk4cpsVg1W7eGmLk8VnfWqRUTeYDJGXjq0Pk4NVktyuuC1UjYi6GbPfoIdClF04
-	 eambVvEsBBr4/O9nRHmKSp92LSH28+O56tCO/YjTMqCQX/6wlhGTysmW67cM7ckYBB
-	 JYu7NJtoHr95g==
+	b=MJYav8ME8iXFPS5/yCdx28gUj9Y531T9XUrbgLGEVXQrIUy/uKmmeWw2E2YRINeVo
+	 hx3Ojy/yIxbYdTmOvhT5IQzEgLPYMaUuknB3h+Y0xyVtorPgGTLDlaztQ6M7u3OgTf
+	 uYF0xrmhT9G0SEmiecCTa4x0Q8FKqtbv6CooDETYXYbZvSYX4ZMnevuishTCVny8M5
+	 hlsASMp8PmqouksmFPAR3YKI47XT50K0Eaer84dGFdjbA6Fa9V3MH92mpHER6saMTi
+	 a6Zp+yRdoWUge5NbeHlpGnivPseAE6A70Atzrzf7larJoE1XBaZQHZOouInl7fLR09
+	 kESkcuOJF9krg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG372-001IWu-Tf;
-	Thu, 12 Jan 2023 19:19:45 +0000
+	id 1pG36z-001IWu-Pl;
+	Thu, 12 Jan 2023 19:19:41 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 22/68] KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
-Date: Thu, 12 Jan 2023 19:18:41 +0000
-Message-Id: <20230112191927.1814989-23-maz@kernel.org>
+Subject: [PATCH v7 18/68] KVM: arm64: nv: Trap EL1 VM register accesses in virtual EL2
+Date: Thu, 12 Jan 2023 19:18:37 +0000
+Message-Id: <20230112191927.1814989-19-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,68 +54,116 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Jintack Lim <jintack.lim@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
-they are not coming from the virtual EL2 and virtual HCR_EL2.TWX is set.
+When running in virtual EL2 mode, we actually run the hardware in EL1
+and therefore have to use the EL1 registers to ensure correct operation.
 
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+By setting the HCR.TVM and HCR.TVRM we ensure that the virtual EL2 mode
+doesn't shoot itself in the foot when setting up what it believes to be
+a different mode's system register state (for example when preparing to
+switch to a VM).
+
+We can leverage the existing sysregs infrastructure to support trapped
+accesses to these registers.
+
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 14 ++++++++++++++
- arch/arm64/kvm/handle_exit.c         |  6 +++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  4 +---
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c         |  7 ++++++-
+ arch/arm64/kvm/sys_regs.c               | 19 ++++++++++++++++---
+ 4 files changed, 24 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 0636475693ec..ea73377693af 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -17,6 +17,7 @@
- #include <asm/esr.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_nested.h>
- #include <asm/ptrace.h>
- #include <asm/cputype.h>
- #include <asm/virt.h>
-@@ -337,6 +338,19 @@ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
- 	return vcpu->arch.fault.esr_el2;
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 07d37ff88a3f..e0bcaf000251 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -118,10 +118,8 @@ static inline void __deactivate_traps_common(struct kvm_vcpu *vcpu)
+ 	}
  }
  
-+static inline bool guest_hyp_wfx_traps_enabled(const struct kvm_vcpu *vcpu)
-+{
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
-+	bool is_wfe = !!(esr & ESR_ELx_WFx_ISS_WFE);
-+	u64 hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
-+
-+	if (!vcpu_has_nv(vcpu) || vcpu_is_el2(vcpu))
-+		return false;
-+
-+	return ((is_wfe && (hcr_el2 & HCR_TWE)) ||
-+		(!is_wfe && (hcr_el2 & HCR_TWI)));
-+}
-+
- static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
+-static inline void ___activate_traps(struct kvm_vcpu *vcpu)
++static inline void ___activate_traps(struct kvm_vcpu *vcpu, u64 hcr)
  {
- 	u64 esr = kvm_vcpu_get_esr(vcpu);
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index b0c343c4e062..ea73b47b99ac 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -124,8 +124,12 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu)
- static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
- {
- 	u64 esr = kvm_vcpu_get_esr(vcpu);
-+	bool is_wfe = !!(esr & ESR_ELx_WFx_ISS_WFE);
+-	u64 hcr = vcpu->arch.hcr_el2;
+-
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM))
+ 		hcr |= HCR_TVM;
  
--	if (esr & ESR_ELx_WFx_ISS_WFE) {
-+	if (guest_hyp_wfx_traps_enabled(vcpu))
-+		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index c2cb46ca4fb6..efac8fbe0b20 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -40,7 +40,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val;
+ 
+-	___activate_traps(vcpu);
++	___activate_traps(vcpu, vcpu->arch.hcr_el2);
+ 	__activate_traps_common(vcpu);
+ 
+ 	val = vcpu->arch.cptr_el2;
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index cd3f3117bf16..c8da8d350453 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -35,9 +35,14 @@ DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+ 
+ static void __activate_traps(struct kvm_vcpu *vcpu)
+ {
++	u64 hcr = vcpu->arch.hcr_el2;
+ 	u64 val;
+ 
+-	___activate_traps(vcpu);
++	/* Trap VM sysreg accesses if an EL2 guest is not using VHE. */
++	if (vcpu_is_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
++		hcr |= HCR_TVM | HCR_TRVM;
 +
-+	if (is_wfe) {
- 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
- 		vcpu->stat.wfe_exit_stat++;
- 	} else {
++	___activate_traps(vcpu, hcr);
+ 
+ 	val = read_sysreg(cpacr_el1);
+ 	val |= CPACR_ELx_TTA;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 0d1b02701524..1558bf6d9a68 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -318,8 +318,15 @@ static void get_access_mask(const struct sys_reg_desc *r, u64 *mask, u64 *shift)
+ 
+ /*
+  * Generic accessor for VM registers. Only called as long as HCR_TVM
+- * is set. If the guest enables the MMU, we stop trapping the VM
+- * sys_regs and leave it in complete control of the caches.
++ * is set.
++ *
++ * This is set in two cases: either (1) we're running at vEL2, or (2)
++ * we're running at EL1 and the guest has its MMU off.
++ *
++ * (1) TVM/TRVM is set, as we need to virtualise some of the VM
++ * registers for the guest hypervisor
++ * (2) Once the guest enables the MMU, we stop trapping the VM sys_regs
++ * and leave it in complete control of the caches.
+  */
+ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 			  struct sys_reg_params *p,
+@@ -328,7 +335,13 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
+ 	u64 val, mask, shift;
+ 
+-	BUG_ON(!p->is_write);
++	/* We don't expect TRVM on the host */
++	BUG_ON(!vcpu_is_el2(vcpu) && !p->is_write);
++
++	if (!p->is_write) {
++		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
++		return true;
++	}
+ 
+ 	get_access_mask(r, &mask, &shift);
+ 
 -- 
 2.34.1
 
