@@ -1,43 +1,43 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C289378
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 02:39:19 +0000 (UTC)
-Received: by mail-pl1-f172.google.com with SMTP id 17so18851073pll.0
-        for <kvmarm@lists.linux.dev>; Wed, 11 Jan 2023 18:39:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698DB378
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 02:39:23 +0000 (UTC)
+Received: by mail-pj1-f41.google.com with SMTP id o1-20020a17090a678100b00219cf69e5f0so22119014pjj.2
+        for <kvmarm@lists.linux.dev>; Wed, 11 Jan 2023 18:39:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=daynix-com.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4yHUC+FGbuzxyoJZZC/oBJ6Z9AMmMcVj10+sB33bo44=;
-        b=G/FOM0msaVTnwbw4qK7VT0i0xMSkmfkyRGDTsBaISva6prL+2i+MtiYYTrs6j81RKE
-         Xu2bDqDgZaVkxuFejICevS6TtnB35IfREiU/iajqcizWkJNlb3WijoSa/TRdfPGqKADw
-         LyX2WIBosI7Qxneyp8J/C/YzlAYTTyFZxfemeY9cax1oeuZHYaQ3M7EtZpFS+m7nIX8F
-         OMiYaX1MTQLZKsNoGCEKifkw6Gr4hiKXTXgrQ+o6c4Vm21ou2Djgx/gQ4EpbSneqoemn
-         fzxVnXZ8pbFBPME0FGlPWdx8OQjR3r4+z9jq7Ijx4k0q4ItH5HXwWvC/0BfRLm+i6Y2o
-         k8jA==
+        bh=Q11Z4l9+meOu0rzmEtmKXYHwkGk1nv/AXC1xA1NUM9A=;
+        b=oL3TZ2dQxMBhcKitnoQhS1LoJ6uR2+zkvR8Eqz84efKSa0hVT8TfnGnO7R6drx+20E
+         PNdOLie+7x4MOuZr4VI87moTqvVmPRKURVNWr4Bat8BBueScZjuYH75Gtesd8J3U4nO9
+         GCepPYEPp5As+lhcQeDXihSh7ny+enh8oSYTD/gX02dL5gB5mEIUvU/0icGTXJv3zChb
+         LMcriZSgeA8hD0Vo1yXV3I+l3jAmqvNG/ho1FaTbgR/GDFbZWEPEBU++O8Pz6S4LahrU
+         yesMbxzBcKMRmwjElahvrCSTJk+uKumdCYCyGCbhxdd92RGq2+lJQShqQLS+0lM/u15Q
+         JaKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4yHUC+FGbuzxyoJZZC/oBJ6Z9AMmMcVj10+sB33bo44=;
-        b=hUoNOUxvB1q31qXYtlEbH3ps38wY9POynGCBOHehebDXJxz6fVP22nj4O3dxSsxy/y
-         x80JDRlFnC4Uohln/BH7wgFRxIE8YXRA4d8+3caLKMNrMK9C3OoJdnDX58uHEr0+CPMp
-         QjJqVo6bbL8U5ubfRsUVgvczDbhtKgJskcecmZWtsPNrA+sQ+pSQLB57P0oWflpAWkp8
-         Xq6td93QqClbctpthZrj7lYLl0ELhrJaXGusfCWzEHQSYVZETXY9LmHj9lajFuTCvkQs
-         VulfrDSJuGZ6cqYAv82FT58O+zWwmjA3oLXPsQpeNB3PjjYDMJkLXESadwUAwQSMYbuF
-         /TtQ==
-X-Gm-Message-State: AFqh2krpkBj8pE2m59QHg2YBCOAmEjApZIlVrc98oG+G2pd1tgtScBY2
-	wJGR8ANs8IYaQrV8kZsIX01DgQ==
-X-Google-Smtp-Source: AMrXdXue0xJ4HI4ans4UT8lvfrGxwgsi/5eRclODGohFrlmU4bptOcxuvjj7ju88KrgTJpZTkJnbGg==
-X-Received: by 2002:a17:902:7889:b0:192:6bc9:47ba with SMTP id q9-20020a170902788900b001926bc947bamr63652434pll.31.1673491158898;
-        Wed, 11 Jan 2023 18:39:18 -0800 (PST)
+        bh=Q11Z4l9+meOu0rzmEtmKXYHwkGk1nv/AXC1xA1NUM9A=;
+        b=FzQ4m9qKPn9y3rteZwwS8WwBqnGeGXuWXAVIqjbp0H11Pq+HzxCSAvmYwgsz/hffSo
+         o2m1P7OJuf9O8Y1gsEf6xHdmEe3NZsQ3romtL5cXqpg00hbf7s9LjnBkDQGMFvNTT6NM
+         7TNGlKOnkWjxk/vIqvB5vX56W7fvlK09B9A/X+yqWnew7MYryt6AMq2SxOLYNgNw5q3b
+         QKhHVcPpoofev7jj0ZWZ6u4Jbl8QkDBjYLXne1diKgkbAqJY/03Vl98xpjyAAOuA3wJH
+         EZFRwYwesORLPC/gv8AwQkbdCV6ohXrxHm4vx/Arj4jL2MWFdubZG7E6KhRZ74gZTi4u
+         roVw==
+X-Gm-Message-State: AFqh2krHsfStVvSeOxt8IYvKDG/9NJxREIr8rDwFPgdTwRUblZ2nCaue
+	OJI8EZvolSNzrzcZ1iFQmpMr+w==
+X-Google-Smtp-Source: AMrXdXs4JCW4EgJN6T2CnYFlcBDqDu57etx9LSqwZ4HIj1zhBxa77MgspzOEkuOdlzRn/jHdjb+kuQ==
+X-Received: by 2002:a17:902:cd0e:b0:193:37a7:cc1c with SMTP id g14-20020a170902cd0e00b0019337a7cc1cmr12189330ply.56.1673491162975;
+        Wed, 11 Jan 2023 18:39:22 -0800 (PST)
 Received: from fedora.flets-east.jp ([2400:4050:a840:1e00:d54:e521:8bac:7bed])
-        by smtp.gmail.com with ESMTPSA id w7-20020a1709027b8700b001944b1285easm2310331pll.198.2023.01.11.18.39.15
+        by smtp.gmail.com with ESMTPSA id w7-20020a1709027b8700b001944b1285easm2310331pll.198.2023.01.11.18.39.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jan 2023 18:39:18 -0800 (PST)
+        Wed, 11 Jan 2023 18:39:22 -0800 (PST)
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
 To: 
 Cc: Mark Brown <broonie@kernel.org>,
@@ -58,9 +58,9 @@ Cc: Mark Brown <broonie@kernel.org>,
 	Sven Peter <sven@svenpeter.dev>,
 	Hector Martin <marcan@marcan.st>,
 	Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: [PATCH v7 3/7] arm64/sysreg: Add CCSIDR2_EL1
-Date: Thu, 12 Jan 2023 11:38:48 +0900
-Message-Id: <20230112023852.42012-4-akihiko.odaki@daynix.com>
+Subject: [PATCH v7 4/7] arm64/cache: Move CLIDR macro definitions
+Date: Thu, 12 Jan 2023 11:38:49 +0900
+Message-Id: <20230112023852.42012-5-akihiko.odaki@daynix.com>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230112023852.42012-1-akihiko.odaki@daynix.com>
 References: <20230112023852.42012-1-akihiko.odaki@daynix.com>
@@ -72,31 +72,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-CCSIDR2_EL1 is available if FEAT_CCIDX is implemented as per
-DDI0487I.a.
+The macros are useful for KVM which needs to manage how CLIDR is exposed
+to vcpu so move them to include/asm/cache.h, which KVM can refer to.
 
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-Reviewed-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/tools/sysreg | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm64/include/asm/cache.h | 6 ++++++
+ arch/arm64/kernel/cacheinfo.c  | 5 -----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 45648fa89be8..90b64697345f 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -1663,6 +1663,11 @@ Field	5:3	Ctype2
- Field	2:0	Ctype1
- EndSysreg
+diff --git a/arch/arm64/include/asm/cache.h b/arch/arm64/include/asm/cache.h
+index c0b178d1bb4f..ab7133654a72 100644
+--- a/arch/arm64/include/asm/cache.h
++++ b/arch/arm64/include/asm/cache.h
+@@ -16,6 +16,12 @@
+ #define CLIDR_LOC(clidr)	(((clidr) >> CLIDR_LOC_SHIFT) & 0x7)
+ #define CLIDR_LOUIS(clidr)	(((clidr) >> CLIDR_LOUIS_SHIFT) & 0x7)
  
-+Sysreg	CCSIDR2_EL1	3	1	0	0	2
-+Res0	63:24
-+Field	23:0	NumSets
-+EndSysreg
++/* Ctypen, bits[3(n - 1) + 2 : 3(n - 1)], for n = 1 to 7 */
++#define CLIDR_CTYPE_SHIFT(level)	(3 * (level - 1))
++#define CLIDR_CTYPE_MASK(level)		(7 << CLIDR_CTYPE_SHIFT(level))
++#define CLIDR_CTYPE(clidr, level)	\
++	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
 +
- Sysreg	GMID_EL1	3	1	0	0	4
- Res0	63:4
- Field	3:0	BS
+ /*
+  * Memory returned by kmalloc() may be used for DMA, so we must make
+  * sure that all such allocations are cache aligned. Otherwise,
+diff --git a/arch/arm64/kernel/cacheinfo.c b/arch/arm64/kernel/cacheinfo.c
+index 97c42be71338..daa7b3f55997 100644
+--- a/arch/arm64/kernel/cacheinfo.c
++++ b/arch/arm64/kernel/cacheinfo.c
+@@ -11,11 +11,6 @@
+ #include <linux/of.h>
+ 
+ #define MAX_CACHE_LEVEL			7	/* Max 7 level supported */
+-/* Ctypen, bits[3(n - 1) + 2 : 3(n - 1)], for n = 1 to 7 */
+-#define CLIDR_CTYPE_SHIFT(level)	(3 * (level - 1))
+-#define CLIDR_CTYPE_MASK(level)		(7 << CLIDR_CTYPE_SHIFT(level))
+-#define CLIDR_CTYPE(clidr, level)	\
+-	(((clidr) & CLIDR_CTYPE_MASK(level)) >> CLIDR_CTYPE_SHIFT(level))
+ 
+ int cache_line_size(void)
+ {
 -- 
 2.39.0
 
