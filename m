@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA948476
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:21:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52509C433EF;
-	Thu, 12 Jan 2023 19:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3ED8476
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:21:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E77F0C433D2;
+	Thu, 12 Jan 2023 19:21:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551307;
-	bh=k1zDe7oR/UnAUYcmV9CjPWkfdr1XUdDQDVVT/wQ4xYE=;
+	s=k20201202; t=1673551309;
+	bh=Ty9wl8RuBz6TjD0nfZDKZIoHW+EKEClHgdfGX+yD7mo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HEeN7wV4r2dWjwhY29IstnWFhMfyBcu19SfUepn6lzf4gsngOmxjZYp6Uq8KFQa+r
-	 QEicUsHDw/PRAzDz6UFZtCMF3LAEm4ARuI/BcJVAuQxs0BPOtT0D8mZebXg67WwSTW
-	 GzRGiMKTT9kbM6lxfvxEzSBDUsaks1WS88my+jBq6AbcWkEUz0y9apx8+KqI1dXPP5
-	 GeOdja7R17Sm3dQWksiWT2iac30SeonA0L2Vh1VRWOdPSyUpxX32ejzqglFlxfZbYk
-	 w/2j3Lw1aJ3nZhwOdoAXrhg8+Emvof/Eov1foQPaZbuqi17ap5mvrU6u784u38gtiJ
-	 Yrmq5JXnK+7QQ==
+	b=Usl+s0F2oz5SwDwOBGNTeIbgZ1e3MEwGhFxGCLJg2FECCsmAbrGoklHmQM+rhFIpk
+	 ncZPOXK3RRNaet5jnZgiI4orc4YcadoCbywCltEVck4LrGzKtMh3dmFMoykoeV1JQt
+	 c3YWR3pHn+xZeY7X1MmvgmodDPx8pkbG89phYeZi1u80fhICnAraNBtl4LC3WW+r/5
+	 INVjf9yiVUMcuA3p/tc3ciwk3+wib3HJwTWiu8xXbdDsgug5h+uuG7Iyu6XoOEBsWa
+	 qflLZfkq7u7A2rtH+jOnNC+TMOEU/JlYRErNnZkEmz8jzmKMxukIBnbT3+YGWs67uo
+	 f/plLztEf/zLw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG37R-001IWu-6s;
-	Thu, 12 Jan 2023 19:20:09 +0000
+	id 1pG36x-001IWu-VK;
+	Thu, 12 Jan 2023 19:19:40 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 54/68] KVM: arm64: nv: Add handling of FEAT_TTL TLB invalidation
-Date: Thu, 12 Jan 2023 19:19:13 +0000
-Message-Id: <20230112191927.1814989-55-maz@kernel.org>
+Subject: [PATCH v7 11/68] KVM: arm64: nv: Handle trapped ERET from virtual EL2
+Date: Thu, 12 Jan 2023 19:18:30 +0000
+Message-Id: <20230112191927.1814989-12-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,210 +54,78 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Support guest-provided information information to find out about
-the range of required invalidation.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
+When a guest hypervisor running virtual EL2 in EL1 executes an ERET
+instruction, we will have set HCR_EL2.NV which traps ERET to EL2, so
+that we can emulate the exception return in software.
+
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  1 +
- arch/arm64/kvm/nested.c             | 56 +++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c           | 78 ++++++++++++++++++-----------
- 3 files changed, 107 insertions(+), 28 deletions(-)
+ arch/arm64/include/asm/esr.h     |  4 ++++
+ arch/arm64/include/asm/kvm_arm.h |  2 +-
+ arch/arm64/kvm/handle_exit.c     | 10 ++++++++++
+ 3 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 6e44a01403dc..c5b661517cb6 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -122,6 +122,7 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
- extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
- extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
- extern bool forward_nv1_traps(struct kvm_vcpu *vcpu);
-+unsigned int ttl_to_size(u8 ttl);
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 206de10524e3..d4dd949b921e 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -272,6 +272,10 @@
+ 		(((e) & ESR_ELx_SYS64_ISS_OP2_MASK) >>		\
+ 		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
  
- struct sys_reg_params;
- struct sys_reg_desc;
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 981a4ff75da6..8b22984a3112 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -357,6 +357,62 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- 	return ret;
++/* ISS field definitions for ERET/ERETAA/ERETAB trapping */
++#define ESR_ELx_ERET_ISS_ERET		0x2
++#define ESR_ELx_ERET_ISS_ERETA		0x1
++
+ /*
+  * ISS field definitions for floating-point exception traps
+  * (FP_EXC_32/FP_EXC_64).
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index f87c4eaa0410..d86c0050b69d 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -344,7 +344,7 @@
+ 	ECN(SP_ALIGN), ECN(FP_EXC32), ECN(FP_EXC64), ECN(SERROR), \
+ 	ECN(BREAKPT_LOW), ECN(BREAKPT_CUR), ECN(SOFTSTP_LOW), \
+ 	ECN(SOFTSTP_CUR), ECN(WATCHPT_LOW), ECN(WATCHPT_CUR), \
+-	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64)
++	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64), ECN(ERET)
+ 
+ #define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |\
+ 				 CPACR_EL1_ZEN_EL1EN)
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 2d8c09cf3e49..e75101f2aa6c 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -207,6 +207,15 @@ static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
+ 	return 1;
  }
  
-+unsigned int ttl_to_size(u8 ttl)
++static int kvm_handle_eret(struct kvm_vcpu *vcpu)
 +{
-+	int level = ttl & 3;
-+	int gran = (ttl >> 2) & 3;
-+	unsigned int max_size = 0;
++	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
++		return kvm_handle_ptrauth(vcpu);
 +
-+	switch (gran) {
-+	case TLBI_TTL_TG_4K:
-+		switch (level) {
-+		case 0:
-+			break;
-+		case 1:
-+			max_size = SZ_1G;
-+			break;
-+		case 2:
-+			max_size = SZ_2M;
-+			break;
-+		case 3:
-+			max_size = SZ_4K;
-+			break;
-+		}
-+		break;
-+	case TLBI_TTL_TG_16K:
-+		switch (level) {
-+		case 0:
-+		case 1:
-+			break;
-+		case 2:
-+			max_size = SZ_32M;
-+			break;
-+		case 3:
-+			max_size = SZ_16K;
-+			break;
-+		}
-+		break;
-+	case TLBI_TTL_TG_64K:
-+		switch (level) {
-+		case 0:
-+		case 1:
-+			/* No 52bit IPA support */
-+			break;
-+		case 2:
-+			max_size = SZ_512M;
-+			break;
-+		case 3:
-+			max_size = SZ_64K;
-+			break;
-+		}
-+		break;
-+	default:			/* No size information */
-+		break;
-+	}
-+
-+	return max_size;
++	kvm_emulate_nested_eret(vcpu);
++	return 1;
 +}
 +
- /* Must be called with kvm->mmu_lock held */
- struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
- {
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 7e7b13a57fc3..aa15cf3b29eb 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2865,14 +2865,54 @@ static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	return true;
- }
- 
-+static unsigned long compute_tlb_inval_range(struct kvm_vcpu *vcpu,
-+					     struct kvm_s2_mmu *mmu,
-+					     u64 val)
-+{
-+	unsigned long max_size;
-+	u8 ttl = 0;
-+
-+	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL)) {
-+		ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
-+	}
-+
-+	max_size = ttl_to_size(ttl);
-+
-+	if (!max_size) {
-+		u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
-+
-+		/* Compute the maximum extent of the invalidation */
-+		switch ((vtcr & VTCR_EL2_TG0_MASK)) {
-+		case VTCR_EL2_TG0_4K:
-+			max_size = SZ_1G;
-+			break;
-+		case VTCR_EL2_TG0_16K:
-+			max_size = SZ_32M;
-+			break;
-+		case VTCR_EL2_TG0_64K:
-+			/*
-+			 * No, we do not support 52bit IPA in nested yet. Once
-+			 * we do, this should be 4TB.
-+			 */
-+			/* FIXME: remove the 52bit PA support from the IDregs */
-+			max_size = SZ_512M;
-+			break;
-+		default:
-+			BUG();
-+		}
-+	}
-+
-+	WARN_ON(!max_size);
-+	return max_size;
-+}
-+
- static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			     const struct sys_reg_desc *r)
- {
- 	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
--	u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
- 	struct kvm_s2_mmu *mmu;
- 	u64 base_addr;
--	int max_size;
-+	unsigned long max_size;
- 
- 	if (vcpu_has_nv(vcpu) && forward_nv_traps(vcpu))
- 		return false;
-@@ -2882,45 +2922,27 @@ static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	 *
- 	 * - NS bit: we're non-secure only.
- 	 *
--	 * - TTL field: We already have the granule size from the
--	 *   VTCR_EL2.TG0 field, and the level is only relevant to the
--	 *   guest's S2PT.
--	 *
- 	 * - IPA[51:48]: We don't support 52bit IPA just yet...
- 	 *
- 	 * And of course, adjust the IPA to be on an actual address.
- 	 */
- 	base_addr = (p->regval & GENMASK_ULL(35, 0)) << 12;
- 
--	/* Compute the maximum extent of the invalidation */
--	switch ((vtcr & VTCR_EL2_TG0_MASK)) {
--	case VTCR_EL2_TG0_4K:
--		max_size = SZ_1G;
--		break;
--	case VTCR_EL2_TG0_16K:
--		max_size = SZ_32M;
--		break;
--	case VTCR_EL2_TG0_64K:
--		/*
--		 * No, we do not support 52bit IPA in nested yet. Once
--		 * we do, this should be 4TB.
--		 */
--		/* FIXME: remove the 52bit PA support from the IDregs */
--		max_size = SZ_512M;
--		break;
--	default:
--		BUG();
--	}
--
- 	write_lock(&vcpu->kvm->mmu_lock);
- 
- 	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
--	if (mmu)
-+	if (mmu) {
-+		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
-+		base_addr &= ~(max_size - 1);
- 		kvm_unmap_stage2_range(mmu, base_addr, max_size);
-+	}
- 
- 	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, 0);
--	if (mmu)
-+	if (mmu) {
-+		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
-+		base_addr &= ~(max_size - 1);
- 		kvm_unmap_stage2_range(mmu, base_addr, max_size);
-+	}
- 
- 	write_unlock(&vcpu->kvm->mmu_lock);
- 
+ static exit_handle_fn arm_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+ 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
+@@ -222,6 +231,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+ 	[ESR_ELx_EC_SMC64]	= handle_smc,
+ 	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
+ 	[ESR_ELx_EC_SVE]	= handle_sve,
++	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
+ 	[ESR_ELx_EC_IABT_LOW]	= kvm_handle_guest_abort,
+ 	[ESR_ELx_EC_DABT_LOW]	= kvm_handle_guest_abort,
+ 	[ESR_ELx_EC_SOFTSTP_LOW]= kvm_handle_guest_debug,
 -- 
 2.34.1
 
