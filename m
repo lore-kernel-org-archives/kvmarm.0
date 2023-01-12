@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40ACB847A
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:21:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16DC2C433F0;
-	Thu, 12 Jan 2023 19:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96972847A
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:21:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6774AC433EF;
+	Thu, 12 Jan 2023 19:21:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551279;
-	bh=0+x8a75H3r0fPSCwDaK+BksXhGwjUMksH8OoCMJE0Dk=;
+	s=k20201202; t=1673551281;
+	bh=VeVmk02bzFFIbU65iNM/EuLGxs1o717vKwo7VgCMURs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZQjWZP9qEu3iGLaf+GJ64NV3dQU5ruAWfkVWxsTlD1SGMQsnBoEyI0kCs+AONAkr8
-	 gl+xTO9OSkgU+EM4aeHYLE9ytbh5eUQZ0Ne0OLCw6mdMMRHY7TjxtO+4NMDHYpK95J
-	 25ucXNRs3Kd5QEBhXauP8Po3UuDOD87lGzeN3dy8mwaMwGcKZYJAAFiB1YeUcxvCC9
-	 V96uVXJyBZUSTD93JcWDEssjgKBzOQfHsZFpIX1AMZFr+FkGSCYGT5OeL+09ocW0oi
-	 W40sTUwhizZCi3G1cUFLtOI3Iy+DYdvB5ExZNewlsHu2XqeGV4iAjn1U2r5+9ZBHZE
-	 2of6tPg3y3O8g==
+	b=mrnrva0pcuxiCn0/RD+9p65gTcWIucojfHNu120ltLt1lOJD5hRrOAp/kJvsvlEXH
+	 91fyDqiVZZTCAgeqcAnZWhHKmERhLYGo4uM62Jyh9L1Or2qs0ItpYuBe5BjT4u/q8z
+	 agASbASa9LjQzJpSucxxTDms800esQ0X0PL3eF8pV6zYHxUT7UYyaSTiOFdGgvdTVH
+	 wvQ+QpVX3zYuJgfixUtgVmXJMXkfqXyqqi5a75WQ6LY78w5IfmmbZTb9y7r4ar3uq2
+	 Tuo5fvwIjl423kzzEs19o/Uf8B7Wzm9O3T3QbbldpcH0L2D6gMlmPD3Qp7icBxEG65
+	 3LG332zI82tzQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG37U-001IWu-Cy;
-	Thu, 12 Jan 2023 19:20:12 +0000
+	id 1pG36y-001IWu-Mm;
+	Thu, 12 Jan 2023 19:19:40 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 67/68] KVM: arm64: nv: Use FEAT_ECV to trap access to EL0 timers
-Date: Thu, 12 Jan 2023 19:19:26 +0000
-Message-Id: <20230112191927.1814989-68-maz@kernel.org>
+Subject: [PATCH v7 14/68] KVM: arm64: nv: Handle SPSR_EL2 specially
+Date: Thu, 12 Jan 2023 19:18:33 +0000
+Message-Id: <20230112191927.1814989-15-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,117 +54,131 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Although FEAT_NV2 makes most things fast, it also makes it impossible
-to correctly emulate the timers, as the sysreg accesses are redirected
-to memory.
+SPSR_EL2 needs special attention when running nested on ARMv8.3:
 
-FEAT_ECV addresses this by giving a hypervisor the ability to trap
-the EL02 sysregs as well as the virtual timer.
+If taking an exception while running at vEL2 (actually EL1), the
+HW will update the SPSR_EL1 register with the EL1 mode. We need
+to track this in order to make sure that accesses to the virtual
+view of SPSR_EL2 is correct.
 
-Add the required trap setting to make use of the feature, allowing
-us to elide the ugly resync in the middle of the run loop.
+To do so, we place an illegal value in SPSR_EL1.M, and patch it
+accordingly if required when accessing it.
 
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arch_timer.c          | 54 +++++++++++++++++++++++++++-
- include/clocksource/arm_arch_timer.h |  4 +++
- 2 files changed, 57 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_emulate.h | 37 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            | 23 +++++++++++++++--
+ 2 files changed, 58 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 71d2f1902de9..6295883f4223 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -740,6 +740,44 @@ static void kvm_timer_vcpu_load_nested_switch(struct kvm_vcpu *vcpu,
- 		WARN_ON_ONCE(ret);
- 	}
- 
-+	/*
-+	 * NV2 badly breaks the timer semantics by redirecting accesses to
-+	 * the EL0 timer state to memory, so let's call ECV to the rescue if
-+	 * available: we trap all CNT{P,V}_{CTL,CVAL,TVAL}_EL0 accesses.
-+	 *
-+	 * The treatment slightly varies depending whether we run a nVHE or
-+	 * VHE guest: nVHE will use the _EL0 registers directly, while VHE
-+	 * will use the _EL02 accessors. This translates in different trap
-+	 * bits.
-+	 *
-+	 * None of the trapping is engaged when running in non-HYP context,
-+	 * unless required by the L1 hypervisor settings once we advertise
-+	 * ECV+NV in the guest.
-+	 */
-+	if (vcpu_has_nv2(vcpu) && cpus_have_const_cap(ARM64_HAS_ECV)) {
-+		u64 clr = 0, set = 0;
-+
-+		if (vcpu_el2_e2h_is_set(vcpu)) {
-+			set |= CNTHCTL_EL1NVVCT | CNTHCTL_EL1NVPCT;
-+		} else {
-+			/*
-+			 * Only trap the timers, not the counters, as they
-+			 * are in the "direct" state for nVHE.
-+			 */
-+			clr |= CNTHCTL_EL1PCEN << 10;
-+			set |= CNTHCTL_EL1TVT;
-+		}
-+
-+		/*
-+		 * Apply these values for HYP context, and reverse them
-+		 * otherwise
-+		 */
-+		if (is_hyp_ctxt(vcpu))
-+			sysreg_clear_set(cntkctl_el1, clr, set);
-+		else
-+			sysreg_clear_set(cntkctl_el1, set, clr);
-+	}
-+
- 	/*
- 	 * Apply the trapping bits that the guest hypervisor has
- 	 * requested for its own guest.
-@@ -838,6 +876,16 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 
- 	if (kvm_vcpu_is_blocking(vcpu))
- 		kvm_timer_blocking(vcpu);
-+
-+	/*
-+	 * Restore the standard, non-nested configuration so that we're
-+	 * ready to run a non-NV vcpu.
-+	 */
-+	if (vcpu_has_nv2(vcpu))
-+		sysreg_clear_set(cntkctl_el1,
-+				 (CNTHCTL_EL1NVPCT | CNTHCTL_EL1NVVCT |
-+				  CNTHCTL_EL1TVT | CNTHCTL_EL1TVCT),
-+				 (CNTHCTL_EL1PCEN | CNTHCTL_EL1PCTEN) << 10);
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 7e3fa8b387f6..0636475693ec 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -249,6 +249,43 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
+ 	return __is_hyp_ctxt(&vcpu->arch.ctxt);
  }
  
- void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
-@@ -847,8 +895,12 @@ void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
- 	 * accesses redirected to the VNCR page. Any guest action taken on
- 	 * the timer is postponed until the next exit, leading to a very
- 	 * poor quality of emulation.
-+	 *
-+	 * This is an unmitigated disaster, only papered over by FEAT_ECV,
-+	 * which allows trapping of the timer registers even with NV2.
-+	 * Still, this is still worse than FEAT_NV on its own. Meh.
- 	 */
--	if (!is_hyp_ctxt(vcpu))
-+	if (cpus_have_const_cap(ARM64_HAS_ECV) || !is_hyp_ctxt(vcpu))
- 		return;
++static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
++{
++	if (!__vcpu_el2_e2h_is_set(ctxt)) {
++		/*
++		 * Clear the .M field when writing SPSR to the CPU, so that we
++		 * can detect when the CPU clobbered our SPSR copy during a
++		 * local exception.
++		 */
++		val &= ~0xc;
++	}
++
++	return val;
++}
++
++static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
++{
++	if (__vcpu_el2_e2h_is_set(ctxt))
++		return val;
++
++	/*
++	 * SPSR.M == 0 means the CPU has not touched the SPSR, so the
++	 * register has still the value we saved on the last write.
++	 */
++	if ((val & 0xc) == 0)
++		return ctxt_sys_reg(ctxt, SPSR_EL2);
++
++	/*
++	 * Otherwise there was a "local" exception on the CPU,
++	 * which from the guest's point of view was being taken from
++	 * EL2 to EL2, although it actually happened to be from
++	 * EL1 to EL1.
++	 * So we need to fix the .M field in SPSR, to make it look
++	 * like EL2, which is what the guest would expect.
++	 */
++	return (val & ~0x0c) | CurrentEL_EL2;
++}
++
+ /*
+  * The layout of SPSR for an AArch32 state is different when observed from an
+  * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index eb3eea71f370..c9a2f4861395 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -129,11 +129,14 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+ 			goto memory_read;
  
- 	if (!vcpu_el2_e2h_is_set(vcpu)) {
-diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
-index 057c8964aefb..e3c3816d19ba 100644
---- a/include/clocksource/arm_arch_timer.h
-+++ b/include/clocksource/arm_arch_timer.h
-@@ -21,6 +21,10 @@
- #define CNTHCTL_EVNTEN			(1 << 2)
- #define CNTHCTL_EVNTDIR			(1 << 3)
- #define CNTHCTL_EVNTI			(0xF << 4)
-+#define CNTHCTL_EL1TVT			(1 << 13)
-+#define CNTHCTL_EL1TVCT			(1 << 14)
-+#define CNTHCTL_EL1NVPCT		(1 << 15)
-+#define CNTHCTL_EL1NVVCT		(1 << 16)
+ 		/*
+-		 * ELR_EL2 is special cased for now.
++		 * ELR_EL2 and SPSR_EL2 are special cased for now.
+ 		 */
+ 		switch (reg) {
+ 		case ELR_EL2:
+ 			return read_sysreg_el1(SYS_ELR);
++		case SPSR_EL2:
++			val = read_sysreg_el1(SYS_SPSR);
++			return __fixup_spsr_el2_read(&vcpu->arch.ctxt, val);
+ 		}
  
- enum arch_timer_reg {
- 	ARCH_TIMER_REG_CTRL,
+ 		/*
+@@ -190,6 +193,10 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+ 		case ELR_EL2:
+ 			write_sysreg_el1(val, SYS_ELR);
+ 			return;
++		case SPSR_EL2:
++			val = __fixup_spsr_el2_write(&vcpu->arch.ctxt, val);
++			write_sysreg_el1(val, SYS_SPSR);
++			return;
+ 		}
+ 
+ 		/* No EL1 counterpart? We're done here.? */
+@@ -1690,6 +1697,18 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
+ 
++static bool access_spsr_el2(struct kvm_vcpu *vcpu,
++			    struct sys_reg_params *p,
++			    const struct sys_reg_desc *r)
++{
++	if (p->is_write)
++		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
++	else
++		p->regval = vcpu_read_sys_reg(vcpu, SPSR_EL2);
++
++	return true;
++}
++
+ /*
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -2130,7 +2149,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
+ 
+ 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
+-	EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
++	EL2_REG(SPSR_EL2, access_spsr_el2, reset_val, 0),
+ 	EL2_REG(ELR_EL2, access_rw, reset_val, 0),
+ 	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
+ 
 -- 
 2.34.1
 
