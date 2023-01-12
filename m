@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FFE62F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084556AB6
 	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 12:38:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5A6DC433D2;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA016C433F0;
 	Thu, 12 Jan 2023 12:38:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1673527134;
-	bh=+LEeLMYkd9RkMQSIuh1SSyTKV795y+lqyBKTQSXPkNA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=b42dJms9soLm/YDE2LeMzTf4lI5WlvRJ96yQfMOuoPnmjY2QXoomjBnc/9Gu797U9
-	 zbDCKso8jzmby21abrxmUhzzE9WPOHPw8U/nNUQdx4DXy1lNIvSJpzmuvZ9UOjeqQ4
-	 ZwbAGlgVU8c0QdsnmCXLqx+3LKIDvo5Ljpkd8urk51rai4MFkovdgoCuabIIuYhSzU
-	 xf2tmzMHKP0p8xSdCWFDbvKw1j9ONIi4caM7IwB7HA9zwrsHg3TcEvTSE6h0rNqI+H
-	 VbmouXa09RwN/m0qnVv+8BFapYbYOQDk8Wtg2GEL/+bhb/8i/di7YcVzUKMoTVIPGU
-	 aF1nBpbTGnDJA==
+	bh=QuIuSKe9BuOyhqawV9dcZNTeA/CmLCt8kn8h7pV5oaI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=acgsMkEjh8QKqnh2cuwadHbb4yl8y5ty0LuiVviZKQ/oHTxgo+A/liLeGuX8Q/osi
+	 BGq+3UZyMVOkDcOs6XYAnibun6s16Hyt5XRxGr2zxAkzn4DV4oag1srgJqOYrMoCzj
+	 vDjaaAZG9YltT2s7riMaiwMgnOrOqbyFNLICKsNAilBvlgL6e0TaTWtsTPFQLocC8q
+	 hndLOTuVHIOMbhLoxeS2lUQpnQjaothczFaBZQL18ENylv6XonhtY4SZkVYIY6igx5
+	 JdqZIj51epDo3/qjjNtcEjvVJtcve+jBjscpClg4p7izek1cfPfJ7yuFP+nLOLIgWx
+	 Z0GEkHZeP8MfA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pFwr6-001BBa-F2;
+	id 1pFwr6-001BBa-Tz;
 	Thu, 12 Jan 2023 12:38:52 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
@@ -32,10 +32,12 @@ Cc: D Scott Phillips <scott@os.amperecomputing.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 0/3] KVM: arm64: timer fixes and optimisations
-Date: Thu, 12 Jan 2023 12:38:26 +0000
-Message-Id: <20230112123829.458912-1-maz@kernel.org>
+Subject: [PATCH 2/3] KVM: arm64: Reduce overhead of trapped timer sysreg accesses
+Date: Thu, 12 Jan 2023 12:38:28 +0000
+Message-Id: <20230112123829.458912-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230112123829.458912-1-maz@kernel.org>
+References: <20230112123829.458912-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,31 +50,164 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbi
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Having been busy on the NV front the past few weeks, I collected a
-small set of fixes/improvements that make sense even outside of NV.
+Each read/write to a trapped timer system register results
+in a whole kvm_timer_vcpu_put/load() cycle which affects all
+of the timers, and a bit more.
 
-The first one is an interesting fix (actually a regression introduced
-by the initial set of NV-related patches) reported by Scott and
-Ganapatrao, where we fail to recognise that a timer that has fired
-doesn't need to fire again. And again.
+There is no need for such a thing, and we can limit the impact
+to the timer being affected, and only this one.
 
-The second patch is a definite performance improvement on nVHE systems
-when accessing the emulated physical timer. It also makes NV bearable
-in some conditions (with FEAT_ECV, for example).
+This drastically simplifies the emulated case, and limits the
+damage for trapped accesses. This also brings some performance
+back for NV.
 
-The last patch is more of a sanity check. There is no reason to BUG()
-if we can avoid it at all and kill the guest instead!
+Whilst we're at it, fix a comment that didn't quite capture why
+we always set CNTVOFF_EL2 to 0 when disabling the virtual timer.
 
-These patches are 6.3 candidates, although the first one could be a
-6.2 fix.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/arch_timer.c | 73 ++++++++++++++++++++++++-------------
+ 1 file changed, 48 insertions(+), 25 deletions(-)
 
-	M.
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 587d87aec33f..1a1d7e258aba 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -434,6 +434,11 @@ static void timer_emulate(struct arch_timer_context *ctx)
+ 	soft_timer_start(&ctx->hrtimer, kvm_timer_compute_delta(ctx));
+ }
+ 
++static void set_cntvoff(u64 cntvoff)
++{
++	kvm_call_hyp(__kvm_timer_set_cntvoff, cntvoff);
++}
++
+ static void timer_save_state(struct arch_timer_context *ctx)
+ {
+ 	struct arch_timer_cpu *timer = vcpu_timer(ctx->vcpu);
+@@ -457,6 +462,22 @@ static void timer_save_state(struct arch_timer_context *ctx)
+ 		write_sysreg_el0(0, SYS_CNTV_CTL);
+ 		isb();
+ 
++		/*
++		 * The kernel may decide to run userspace after
++		 * calling vcpu_put, so we reset cntvoff to 0 to
++		 * ensure a consistent read between user accesses to
++		 * the virtual counter and kernel access to the
++		 * physical counter of non-VHE case.
++		 *
++		 * For VHE, the virtual counter uses a fixed virtual
++		 * offset of zero, so no need to zero CNTVOFF_EL2
++		 * register, but this is actually useful when switching
++		 * between EL1/vEL2 with NV.
++		 *
++		 * Do it unconditionally, as this is either unavoidable
++		 * or dirt cheap.
++		 */
++		set_cntvoff(0);
+ 		break;
+ 	case TIMER_PTIMER:
+ 		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTP_CTL));
+@@ -530,6 +551,7 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+ 
+ 	switch (index) {
+ 	case TIMER_VTIMER:
++		set_cntvoff(timer_get_offset(ctx));
+ 		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTV_CVAL);
+ 		isb();
+ 		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTV_CTL);
+@@ -550,11 +572,6 @@ static void timer_restore_state(struct arch_timer_context *ctx)
+ 	local_irq_restore(flags);
+ }
+ 
+-static void set_cntvoff(u64 cntvoff)
+-{
+-	kvm_call_hyp(__kvm_timer_set_cntvoff, cntvoff);
+-}
+-
+ static inline void set_timer_irq_phys_active(struct arch_timer_context *ctx, bool active)
+ {
+ 	int r;
+@@ -629,8 +646,6 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+ 		kvm_timer_vcpu_load_nogic(vcpu);
+ 	}
+ 
+-	set_cntvoff(timer_get_offset(map.direct_vtimer));
+-
+ 	kvm_timer_unblocking(vcpu);
+ 
+ 	timer_restore_state(map.direct_vtimer);
+@@ -686,15 +701,6 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+ 
+ 	if (kvm_vcpu_is_blocking(vcpu))
+ 		kvm_timer_blocking(vcpu);
+-
+-	/*
+-	 * The kernel may decide to run userspace after calling vcpu_put, so
+-	 * we reset cntvoff to 0 to ensure a consistent read between user
+-	 * accesses to the virtual counter and kernel access to the physical
+-	 * counter of non-VHE case. For VHE, the virtual counter uses a fixed
+-	 * virtual offset of zero, so no need to zero CNTVOFF_EL2 register.
+-	 */
+-	set_cntvoff(0);
+ }
+ 
+ /*
+@@ -924,14 +930,22 @@ u64 kvm_arm_timer_read_sysreg(struct kvm_vcpu *vcpu,
+ 			      enum kvm_arch_timers tmr,
+ 			      enum kvm_arch_timer_regs treg)
+ {
++	struct arch_timer_context *timer;
++	struct timer_map map;
+ 	u64 val;
+ 
++	get_timer_map(vcpu, &map);
++	timer = vcpu_get_timer(vcpu, tmr);
++
++	if (timer == map.emul_ptimer)
++		return kvm_arm_timer_read(vcpu, timer, treg);
++
+ 	preempt_disable();
+-	kvm_timer_vcpu_put(vcpu);
++	timer_save_state(timer);
+ 
+-	val = kvm_arm_timer_read(vcpu, vcpu_get_timer(vcpu, tmr), treg);
++	val = kvm_arm_timer_read(vcpu, timer, treg);
+ 
+-	kvm_timer_vcpu_load(vcpu);
++	timer_restore_state(timer);
+ 	preempt_enable();
+ 
+ 	return val;
+@@ -965,13 +979,22 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *vcpu,
+ 				enum kvm_arch_timer_regs treg,
+ 				u64 val)
+ {
+-	preempt_disable();
+-	kvm_timer_vcpu_put(vcpu);
+-
+-	kvm_arm_timer_write(vcpu, vcpu_get_timer(vcpu, tmr), treg, val);
++	struct arch_timer_context *timer;
++	struct timer_map map;
+ 
+-	kvm_timer_vcpu_load(vcpu);
+-	preempt_enable();
++	get_timer_map(vcpu, &map);
++	timer = vcpu_get_timer(vcpu, tmr);
++	if (timer == map.emul_ptimer) {
++		soft_timer_cancel(&timer->hrtimer);
++		kvm_arm_timer_write(vcpu, timer, treg, val);
++		timer_emulate(timer);
++	} else {
++		preempt_disable();
++		timer_save_state(timer);
++		kvm_arm_timer_write(vcpu, timer, treg, val);
++		timer_restore_state(timer);
++		preempt_enable();
++	}
+ }
+ 
+ static int kvm_timer_starting_cpu(unsigned int cpu)
+-- 
+2.34.1
 
-Marc Zyngier (3):
-  KVM: arm64: Don't arm a hrtimer for an already pending timer
-  KVM: arm64: Reduce overhead of trapped timer sysreg accesses
-  KVM: arm64: timers: Don't BUG() on unhandled timer trap
-
- arch/arm64/kvm/arch_timer.c | 77 +++++++++++++++++++++++--------------
- arch/arm64/kvm/sys_regs.c   |  4 +-
- 2 files changed, 52 insertions(+), 29 deletions(-)
