@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80DC7847F
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:19:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FF5AC433F2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780AF8476
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:19:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D24AFC4339C;
 	Thu, 12 Jan 2023 19:19:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1673551180;
-	bh=tzWKgTRp6aGDHs1UrJIOpDzstSP+fi5dGowkonXSLHI=;
+	bh=VN8FgM11WrsDzj5DbshbSdhuf675FgKDTFEV5EVLWUc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Wq0IxD+jQ23AC9+KVv4bqynQ0bzLLC+8yR7F7ZXYziuXphOoYDFvNfOEm3cZhl8aw
-	 c2WVyZiQ1OCvykEmY7soqrr9X31RqzNotf+9Pz3mG6Fh4vt8kkKIvFXV+OJ5BpDA6z
-	 yPO/1aRBbc6kILqfn1sjM6tfURATTPk+dYusrfT/dCA85SgdKmcb6PszbVwOoVMRT1
-	 e+ni7ucdr0egmMTQPLvhlyY6cAAuwoliD9Z/US12YUXJMMLCTdSwKsbeM2LhxMLiIk
-	 Xxd48M714VJmooR+l7Nr41wuiqsBqnAkBtZ0STjab5XQBAWauCRCfeg8mocYNCGXKZ
-	 ljz4nTXNDI1cg==
+	b=AKNzHQMl73+uRfkgShN0dhO7dPVFJcBSNkFrwHvORyXO+1VZaLVrlrKKXwc8ms/HT
+	 nijNDt3mUb92gm6/651vN+PWS19nyG3JNK7Sc0RZhCjsqRvxwLG+d1bbftiWxgo9QR
+	 QUffaBY1FZexgRm48xvpJdeNwjrmdTZiYnD9kN7Qw+9OtmaYMmJBQMtDo5EZ0nyyDq
+	 t4opYLitkKg2NKPlcOpWC5T2zO0BEo9fsgse/3JepWtnOF0W1X6lMAgZ7hsdq+UODh
+	 NQTP5F/lMOwrYRq8d6IxMJU5Ue0DuTYa+nQ575O/I/JQaOubnKGg8c9otgGpqgoWoq
+	 Xn8OHwlOS2uvw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG36w-001IWu-Ao;
-	Thu, 12 Jan 2023 19:19:38 +0000
+	id 1pG36x-001IWu-3A;
+	Thu, 12 Jan 2023 19:19:39 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 05/68] KVM: arm64: nv: Add EL2 system registers to vcpu context
-Date: Thu, 12 Jan 2023 19:18:24 +0000
-Message-Id: <20230112191927.1814989-6-maz@kernel.org>
+Subject: [PATCH v7 08/68] KVM: arm64: nv: Reset VMPIDR_EL2 and VPIDR_EL2 to sane values
+Date: Thu, 12 Jan 2023 19:18:27 +0000
+Message-Id: <20230112191927.1814989-9-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,65 +54,69 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the minimal set of EL2 system registers to the vcpu context.
-Nothing uses them just yet.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+The VMPIDR_EL2 and VPIDR_EL2 are architecturally UNKNOWN at reset, but
+let's be nice to a guest hypervisor behaving foolishly and reset these
+to something reasonable anyway.
+
 Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 33 ++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 25 +++++++++++++++++++++----
+ 1 file changed, 21 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8919e971abdf..f53473071bcb 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -325,12 +325,43 @@ enum vcpu_sysreg {
- 	TFSR_EL1,	/* Tag Fault Status Register (EL1) */
- 	TFSRE0_EL1,	/* Tag Fault Status Register (EL0) */
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2e1543fec51e..654d43df3e95 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -594,7 +594,7 @@ static void reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	vcpu_write_sys_reg(vcpu, actlr, ACTLR_EL1);
+ }
  
--	/* 32bit specific registers. Keep them at the end of the range */
-+	/* 32bit specific registers. */
- 	DACR32_EL2,	/* Domain Access Control Register */
- 	IFSR32_EL2,	/* Instruction Fault Status Register */
- 	FPEXC32_EL2,	/* Floating-Point Exception Control Register */
- 	DBGVCR32_EL2,	/* Debug Vector Catch Register */
+-static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++static u64 compute_reset_mpidr(struct kvm_vcpu *vcpu)
+ {
+ 	u64 mpidr;
  
-+	/* EL2 registers */
-+	VPIDR_EL2,	/* Virtualization Processor ID Register */
-+	VMPIDR_EL2,	/* Virtualization Multiprocessor ID Register */
-+	SCTLR_EL2,	/* System Control Register (EL2) */
-+	ACTLR_EL2,	/* Auxiliary Control Register (EL2) */
-+	HCR_EL2,	/* Hypervisor Configuration Register */
-+	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
-+	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
-+	HSTR_EL2,	/* Hypervisor System Trap Register */
-+	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
-+	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
-+	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
-+	TCR_EL2,	/* Translation Control Register (EL2) */
-+	VTTBR_EL2,	/* Virtualization Translation Table Base Register */
-+	VTCR_EL2,	/* Virtualization Translation Control Register */
-+	SPSR_EL2,	/* EL2 saved program status register */
-+	ELR_EL2,	/* EL2 exception link register */
-+	AFSR0_EL2,	/* Auxiliary Fault Status Register 0 (EL2) */
-+	AFSR1_EL2,	/* Auxiliary Fault Status Register 1 (EL2) */
-+	ESR_EL2,	/* Exception Syndrome Register (EL2) */
-+	FAR_EL2,	/* Fault Address Register (EL2) */
-+	HPFAR_EL2,	/* Hypervisor IPA Fault Address Register */
-+	MAIR_EL2,	/* Memory Attribute Indirection Register (EL2) */
-+	AMAIR_EL2,	/* Auxiliary Memory Attribute Indirection Register (EL2) */
-+	VBAR_EL2,	/* Vector Base Address Register (EL2) */
-+	RVBAR_EL2,	/* Reset Vector Base Address Register */
-+	CONTEXTIDR_EL2,	/* Context ID Register (EL2) */
-+	TPIDR_EL2,	/* EL2 Software Thread ID Register */
-+	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
-+	SP_EL2,		/* EL2 Stack Pointer */
+@@ -608,7 +608,24 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
+ 	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
+ 	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
+-	vcpu_write_sys_reg(vcpu, (1ULL << 31) | mpidr, MPIDR_EL1);
++	mpidr |= (1ULL << 31);
 +
- 	NR_SYS_REGS	/* Nothing after this line! */
- };
++	return mpidr;
++}
++
++static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++{
++	vcpu_write_sys_reg(vcpu, compute_reset_mpidr(vcpu), MPIDR_EL1);
++}
++
++static void reset_vmpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++{
++	vcpu_write_sys_reg(vcpu, compute_reset_mpidr(vcpu), VMPIDR_EL2);
++}
++
++static void reset_vpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++{
++	vcpu_write_sys_reg(vcpu, read_cpuid_id(), VPIDR_EL2);
+ }
  
+ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+@@ -1963,8 +1980,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ PMU_SYS_REG(SYS_PMCCFILTR_EL0), .access = access_pmu_evtyper,
+ 	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
+ 
+-	EL2_REG(VPIDR_EL2, access_rw, reset_val, 0),
+-	EL2_REG(VMPIDR_EL2, access_rw, reset_val, 0),
++	EL2_REG(VPIDR_EL2, access_rw, reset_vpidr, 0),
++	EL2_REG(VMPIDR_EL2, access_rw, reset_vmpidr, 0),
+ 	EL2_REG(SCTLR_EL2, access_rw, reset_val, SCTLR_EL2_RES1),
+ 	EL2_REG(ACTLR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(HCR_EL2, access_rw, reset_val, 0),
 -- 
 2.34.1
 
