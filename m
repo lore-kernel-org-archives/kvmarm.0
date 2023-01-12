@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3154E8476
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:22:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ACA6C433D2;
-	Thu, 12 Jan 2023 19:22:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A348476
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:22:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB9DAC433D2;
+	Thu, 12 Jan 2023 19:22:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551328;
-	bh=xIn67oeEcRZXTINWOZbHlbBDtWXVrZxsjZ4xyGShEXM=;
+	s=k20201202; t=1673551330;
+	bh=B/M6lxxsxpCU9eGC+7JvpNjTQ6Y14PwCnEPqKVvjPss=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tBoR0r7l7SyDoVlaF2WmP0bfcVJlMc3FHpgl+lnUxThRdfysDiMAeqbXSwnYZEviI
-	 c6zTYNN9FHxaQ3D50WH/7ZgBSF4UL3c6N6C1FEbp4sYvMY5cuee0ME/LyPTiNkN61Q
-	 bfA8f8PpeNmQKzhBdgGHi69su0C7p82q+GQaREhozkBJC7BPNJZGnuMeBeIJwVYaNw
-	 iZ1A7jHvKfc0NBnyZe1SSHO8AYYbSVTf95wqgLztNCoM0zGqL2Gcv3GjhvtdZEwNFN
-	 4kfd95ntmXGbi941DUeIIlWfPOl/mODzQXYlw7k2PVAyGox2tEAWaBiDGnTRJpWa1C
-	 jSck2G505M+Sw==
+	b=AgIgZd2Bw6o6qeX6ZHBsOX34XAVXnJLaM0A9rkatDqanImTiDcIcRClx/LeJpP7D8
+	 KIWNzNnFm+CiEivatPRFqY9/XSAyHo2dwK5q2ADz9/WO0kMgLsV287s6t1AudvANcc
+	 StTrobAy1+ipiA+nRltRD3urCWQq+8lCwl3XPqYWnfc5qgoTIIdaF/cCe5CcEiU2QI
+	 KJezZi7YMRq0mLsNFqMq/y21nQew4hcxvPZkfk7nQjcbKukcB9AtgSU9cGUm5EA4zc
+	 nQBnNwvzvQxl5rxpymAK+eQ0CSosiVedflVfAH80kbFGH/e4zvahOXR4sgpX/T3/d8
+	 992BBafum3RhA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG37R-001IWu-Me;
-	Thu, 12 Jan 2023 19:20:09 +0000
+	id 1pG37P-001IWu-KC;
+	Thu, 12 Jan 2023 19:20:07 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 56/68] KVM: arm64: nv: Tag shadow S2 entries with nested level
-Date: Thu, 12 Jan 2023 19:19:15 +0000
-Message-Id: <20230112191927.1814989-57-maz@kernel.org>
+Subject: [PATCH v7 48/68] KVM: arm64: nv: vgic: Emulate the HW bit in software
+Date: Thu, 12 Jan 2023 19:19:07 +0000
+Message-Id: <20230112191927.1814989-49-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,81 +54,123 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Populate bits [56:55] of the leaf entry with the level provided
-by the guest's S2 translation.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
+Should the guest hypervisor use the HW bit in the LRs, we need to
+emulate the deactivation from the L2 guest into the L1 distributor
+emulation, which is handled by L0.
+
+It's all good fun.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  7 +++++++
- arch/arm64/kvm/mmu.c                | 16 ++++++++++++++--
- 2 files changed, 21 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h     |  2 ++
+ arch/arm64/kvm/hyp/vgic-v3-sr.c      |  2 +-
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 32 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic.c           |  6 ++++--
+ include/kvm/arm_vgic.h               |  1 +
+ 5 files changed, 40 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 63bb4898e2d9..5dd6b12b6ec0 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -5,6 +5,8 @@
- #include <linux/bitfield.h>
- #include <linux/kvm_host.h>
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 6797eafe7890..bd4ef970ecfa 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -57,6 +57,8 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
  
-+#include <asm/kvm_pgtable.h>
+ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
+ 
++u64 __gic_v3_get_lr(unsigned int lr);
 +
- static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if);
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 6cb638b184b1..75152c1ce646 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -18,7 +18,7 @@
+ #define vtr_to_nr_pre_bits(v)		((((u32)(v) >> 26) & 7) + 1)
+ #define vtr_to_nr_apr_regs(v)		(1 << (vtr_to_nr_pre_bits(v) - 5))
+ 
+-static u64 __gic_v3_get_lr(unsigned int lr)
++u64 __gic_v3_get_lr(unsigned int lr)
  {
- 	return (!__is_defined(__KVM_NVHE_HYPERVISOR__) &&
-@@ -134,4 +136,9 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+ 	switch (lr & 0xf) {
+ 	case 0:
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index ab8ddf490b31..e88c75e79010 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -140,6 +140,38 @@ static void vgic_v3_fixup_shadow_lr_state(struct kvm_vcpu *vcpu)
+ 	}
+ }
  
- #define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
- 
-+static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
++void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
 +{
-+	return FIELD_PREP(KVM_NV_GUEST_MAP_SZ, trans->level);
++	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
++	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
++	struct vgic_irq *irq;
++	int i;
++
++	for (i = 0; i < s_cpu_if->used_lrs; i++) {
++		u64 lr = cpu_if->vgic_lr[i];
++		int l1_irq;
++
++		if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
++			continue;
++
++		/*
++		 * If we had a HW lr programmed by the guest hypervisor, we
++		 * need to emulate the HW effect between the guest hypervisor
++		 * and the nested guest.
++		 */
++		l1_irq = (lr & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT;
++		irq = vgic_get_irq(vcpu->kvm, vcpu, l1_irq);
++		if (!irq)
++			continue; /* oh well, the guest hyp is broken */
++
++		lr = __gic_v3_get_lr(i);
++		if (!(lr & ICH_LR_STATE))
++			irq->active = false;
++
++		vgic_put_irq(vcpu->kvm, irq);
++	}
 +}
 +
- #endif /* __ARM64_KVM_NESTED_H */
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 68975a602faa..160bc994a47f 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1436,11 +1436,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * Potentially reduce shadow S2 permissions to match the guest's own
- 	 * S2. For exec faults, we'd only reach this point if the guest
- 	 * actually allowed it (see kvm_s2_handle_perm_fault).
-+	 *
-+	 * Also encode the level of the nested translation in the SW bits of
-+	 * the PTE/PMD/PUD. This will be retrived on TLB invalidation from
-+	 * the guest.
- 	 */
- 	if (nested) {
- 		writable &= kvm_s2_trans_writable(nested);
- 		if (!kvm_s2_trans_readable(nested))
- 			prot &= ~KVM_PGTABLE_PROT_R;
-+
-+		prot |= kvm_encode_nested_level(nested);
- 	}
+ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 2c5a4bb6b2f9..05809462e199 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -876,9 +876,11 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ {
+ 	int used_lrs;
  
- 	read_lock(&kvm->mmu_lock);
-@@ -1489,12 +1495,18 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
- 	 * kvm_pgtable_stage2_map() should be called to change block size.
- 	 */
--	if (fault_status == ESR_ELx_FSC_PERM && vma_pagesize == fault_granule)
-+	if (fault_status == ESR_ELx_FSC_PERM && vma_pagesize == fault_granule) {
-+		/*
-+		 * Drop the SW bits in favour of those stored in the
-+		 * PTE, which will be preserved.
-+		 */
-+		prot &= ~KVM_NV_GUEST_MAP_SZ;
- 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
--	else
-+	} else {
- 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
- 					     __pfn_to_phys(pfn), prot,
- 					     memcache, KVM_PGTABLE_WALK_SHARED);
+-	/* If nesting, this is a load/put affair, not flush/sync. */
+-	if (vgic_state_is_nested(vcpu))
++	/* If nesting, emulate the HW effect from L0 to L1 */
++	if (vgic_state_is_nested(vcpu)) {
++		vgic_v3_sync_nested(vcpu);
+ 		return;
 +	}
  
- 	/* Mark the page dirty only if the fault is handled successfully */
- 	if (writable && !ret) {
+ 	/* An empty ap_list_head implies used_lrs == 0 */
+ 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index a499ae3c2ce8..e2fb1ca89d10 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -398,6 +398,7 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu);
+ void kvm_vgic_put(struct kvm_vcpu *vcpu);
+ void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu);
+ 
++void vgic_v3_sync_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_load_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_put_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu);
 -- 
 2.34.1
 
