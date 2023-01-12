@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76CAC8476
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:20:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D9ACC433EF;
-	Thu, 12 Jan 2023 19:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8038E8476
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:20:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36CC6C433D2;
+	Thu, 12 Jan 2023 19:20:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551256;
-	bh=v0xUXSkvA8UFADe9goP0Q0Yv3lxmCpw+hpkfToViz8Y=;
+	s=k20201202; t=1673551258;
+	bh=VL4xLu71i4RFt+hY9iomcETQiuYx+UcpFwhY44hinnQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=U4iGsl2qlth402tmOCZULQXhVMV18tSOSEM52PFWNxGzrNfrh1v9WvY9ykwQMVnBl
-	 npD33FYTUmrB+F652LCrBPO7A3czxRPR1xk7alGN7zUaw3QMZOzlSdDvINSeXkudMe
-	 1Vvf25w2fZLYPmETMDNPDT9ZlqGwdW1VGZ60WVkj4tey2VzzeAmpOS4jEfAKKmq4ZV
-	 cFHDJMzItZhkiO5wKi9eEpbfweX3l7at5aBoClPaTW7YQ/c1PQTCPUISOysOVyabku
-	 O0WQiQ9sTZqcJawfy4XUbopRctjjomefVJI0eR+8oWLbLVV2ZHsLcsNgUvsadY/OyA
-	 FacCaJIKRPbdQ==
+	b=evVak96A3e0rknlklhfg0RAjDRcxXQ9ru5F/BDRdaOwXrOlSg1Hp5Hd1IK+hSo3np
+	 DvFTrQRttOAbA9aY7R+66sPC3o+0TNiZVZI1YvhjruuHP3L0MGX1Cx7MFgOOd4iFAp
+	 0cdVe/r5bfIPANXvho9/x5ceoIMamhP46f/Yz9l5GSnIPSxyjvQO3DgdjUpF1C4aAg
+	 bOUxMiN7imY7HFNGKCrC9k6jK5ced7+DpRRImkNDiRxhJJx/CmDX00p3B6v3YmsBKe
+	 e/gzmnryV3YDH7/9HUYGvDJTiF48ZsukbXB/uDmBZJXBNadrhnvcpch6Jt6SaUao1U
+	 Bi+V+EfShANkA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG37T-001IWu-Lk;
-	Thu, 12 Jan 2023 19:20:11 +0000
+	id 1pG375-001IWu-Fc;
+	Thu, 12 Jan 2023 19:19:48 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 64/68] KVM: arm64: nv: Enable ARMv8.4-NV support
-Date: Thu, 12 Jan 2023 19:19:23 +0000
-Message-Id: <20230112191927.1814989-65-maz@kernel.org>
+Subject: [PATCH v7 32/68] KVM: arm64: nv: Filter out unsupported features from ID regs
+Date: Thu, 12 Jan 2023 19:18:51 +0000
+Message-Id: <20230112191927.1814989-33-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,112 +54,232 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As all the VNCR-capable system registers are nicely separated
-from the rest of the crowd, let's set HCR_EL2.NV2 on and let
-the ball rolling.
+As there is a number of features that we either can't support,
+or don't want to support right away with NV, let's add some
+basic filtering so that we don't advertize silly things to the
+EL2 guest.
 
+Whilst we are at it, advertize ARMv8.4-TTL as well as ARMv8.5-GTG.
+
+Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h     |  1 +
- arch/arm64/include/asm/kvm_emulate.h | 23 +++++++++++++----------
- arch/arm64/include/asm/sysreg.h      |  1 +
- arch/arm64/kvm/hyp/vhe/switch.c      | 14 +++++++++++++-
- 4 files changed, 28 insertions(+), 11 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h |   6 ++
+ arch/arm64/kvm/Makefile             |   2 +-
+ arch/arm64/kvm/nested.c             | 162 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           |   3 +
+ 4 files changed, 172 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/kvm/nested.c
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 9ad86e07ce2f..0cdc02fe5e88 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -20,6 +20,7 @@
- #define HCR_AMVOFFEN	(UL(1) << 51)
- #define HCR_FIEN	(UL(1) << 47)
- #define HCR_FWB		(UL(1) << 46)
-+#define HCR_NV2		(UL(1) << 45)
- #define HCR_AT		(UL(1) << 44)
- #define HCR_NV1		(UL(1) << 43)
- #define HCR_NV		(UL(1) << 42)
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 0437387e0d22..c558d08c0a3a 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -253,21 +253,24 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 2fe5847b401f..f2820c82e956 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -65,4 +65,10 @@ extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+ extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+ extern bool forward_nv1_traps(struct kvm_vcpu *vcpu);
  
- static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
- {
--	if (!__vcpu_el2_e2h_is_set(ctxt)) {
--		/*
--		 * Clear the .M field when writing SPSR to the CPU, so that we
--		 * can detect when the CPU clobbered our SPSR copy during a
--		 * local exception.
--		 */
--		val &= ~0xc;
--	}
-+	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
++struct sys_reg_params;
++struct sys_reg_desc;
 +
-+	if (vcpu_has_nv2(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
-+		return val;
- 
--	return val;
-+	/*
-+	 * Clear the .M field when writing SPSR to the CPU, so that we
-+	 * can detect when the CPU clobbered our SPSR copy during a
-+	 * local exception.
-+	 */
-+	return val &= ~0xc;
- }
- 
- static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
- {
--	if (__vcpu_el2_e2h_is_set(ctxt))
-+	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
++void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
++			  const struct sys_reg_desc *r);
 +
-+	if (vcpu_has_nv2(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
- 		return val;
- 
- 	/*
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 4f27f7732766..23abbd4814fb 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -511,6 +511,7 @@
- #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
- #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
- #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
-+#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
- 
- #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
- #define SYS_HDFGRTR_EL2			sys_reg(3, 4, 3, 1, 4)
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index ff77b37b6f45..7682d2f13eaa 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -47,7 +47,13 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 			 * the EL1 virtual memory control register accesses
- 			 * as well as the AT S1 operations.
- 			 */
--			hcr |= HCR_TVM | HCR_TRVM | HCR_AT | HCR_TTLB | HCR_NV1;
-+			if (vcpu_has_nv2(vcpu)) {
-+				hcr &= ~HCR_TVM;
-+			} else {
-+				hcr |= HCR_TVM | HCR_TRVM | HCR_TTLB;
-+			}
+ #endif /* __ARM64_KVM_NESTED_H */
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 31b07f2b2186..c0c050e53157 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -14,7 +14,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+ 	 inject_fault.o va_layout.o handle_exit.o \
+ 	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
+ 	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
+-	 arch_timer.o trng.o vmid.o emulate-nested.o \
++	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o \
+ 	 vgic/vgic.o vgic/vgic-init.o \
+ 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+ 	 vgic/vgic-v3.o vgic/vgic-v4.o \
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+new file mode 100644
+index 000000000000..f7ec27c27a4f
+--- /dev/null
++++ b/arch/arm64/kvm/nested.c
+@@ -0,0 +1,162 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2017 - Columbia University and Linaro Ltd.
++ * Author: Jintack Lim <jintack.lim@linaro.org>
++ */
 +
-+			hcr |= HCR_AT | HCR_NV1;
- 		} else {
- 			/*
- 			 * For a guest hypervisor on v8.1 (VHE), allow to
-@@ -81,6 +87,12 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 			if (!vcpu_el2_tge_is_set(vcpu))
- 				hcr |= HCR_AT | HCR_TTLB;
- 		}
++#include <linux/kvm.h>
++#include <linux/kvm_host.h>
 +
-+		if (vcpu_has_nv2(vcpu)) {
-+			hcr |= HCR_AT | HCR_TTLB | HCR_NV2;
-+			write_sysreg_s(vcpu->arch.ctxt.vncr_array,
-+				       SYS_VNCR_EL2);
++#include <asm/kvm_emulate.h>
++#include <asm/kvm_nested.h>
++#include <asm/sysreg.h>
++
++#include "sys_regs.h"
++
++/* Protection against the sysreg repainting madness... */
++#define NV_FTR(r, f)		ID_AA64##r##_EL1_##f
++
++/*
++ * Our emulated CPU doesn't support all the possible features. For the
++ * sake of simplicity (and probably mental sanity), wipe out a number
++ * of feature bits we don't intend to support for the time being.
++ * This list should get updated as new features get added to the NV
++ * support, and new extension to the architecture.
++ */
++void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
++			  const struct sys_reg_desc *r)
++{
++	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
++			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
++	u64 val, tmp;
++
++	val = p->regval;
++
++	switch (id) {
++	case SYS_ID_AA64ISAR0_EL1:
++		/* Support everything but TME, O.S. and Range TLBIs */
++		val &= ~(NV_FTR(ISAR0, TLB)		|
++			 NV_FTR(ISAR0, TME));
++		break;
++
++	case SYS_ID_AA64ISAR1_EL1:
++		/* Support everything but PtrAuth and Spec Invalidation */
++		val &= ~(GENMASK_ULL(63, 56)	|
++			 NV_FTR(ISAR1, SPECRES)	|
++			 NV_FTR(ISAR1, GPI)	|
++			 NV_FTR(ISAR1, GPA)	|
++			 NV_FTR(ISAR1, API)	|
++			 NV_FTR(ISAR1, APA));
++		break;
++
++	case SYS_ID_AA64PFR0_EL1:
++		/* No AMU, MPAM, S-EL2, RAS or SVE */
++		val &= ~(GENMASK_ULL(55, 52)	|
++			 NV_FTR(PFR0, AMU)	|
++			 NV_FTR(PFR0, MPAM)	|
++			 NV_FTR(PFR0, SEL2)	|
++			 NV_FTR(PFR0, RAS)	|
++			 NV_FTR(PFR0, SVE)	|
++			 NV_FTR(PFR0, EL3)	|
++			 NV_FTR(PFR0, EL2)	|
++			 NV_FTR(PFR0, EL1));
++		/* 64bit EL1/EL2/EL3 only */
++		val |= FIELD_PREP(NV_FTR(PFR0, EL1), 0b0001);
++		val |= FIELD_PREP(NV_FTR(PFR0, EL2), 0b0001);
++		val |= FIELD_PREP(NV_FTR(PFR0, EL3), 0b0001);
++		break;
++
++	case SYS_ID_AA64PFR1_EL1:
++		/* Only support SSBS */
++		val &= NV_FTR(PFR1, SSBS);
++		break;
++
++	case SYS_ID_AA64MMFR0_EL1:
++		/* Hide ECV, FGT, ExS, Secure Memory */
++		val &= ~(GENMASK_ULL(63, 43)		|
++			 NV_FTR(MMFR0, TGRAN4_2)	|
++			 NV_FTR(MMFR0, TGRAN16_2)	|
++			 NV_FTR(MMFR0, TGRAN64_2)	|
++			 NV_FTR(MMFR0, SNSMEM));
++
++		/* Disallow unsupported S2 page sizes */
++		switch (PAGE_SIZE) {
++		case SZ_64K:
++			val |= FIELD_PREP(NV_FTR(MMFR0, TGRAN16_2), 0b0001);
++			fallthrough;
++		case SZ_16K:
++			val |= FIELD_PREP(NV_FTR(MMFR0, TGRAN4_2), 0b0001);
++			fallthrough;
++		case SZ_4K:
++			/* Support everything */
++			break;
 +		}
- 	} else if (vcpu_has_nv(vcpu)) {
- 		u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
++		/*
++		 * Since we can't support a guest S2 page size smaller than
++		 * the host's own page size (due to KVM only populating its
++		 * own S2 using the kernel's page size), advertise the
++		 * limitation using FEAT_GTG.
++		 */
++		switch (PAGE_SIZE) {
++		case SZ_4K:
++			val |= FIELD_PREP(NV_FTR(MMFR0, TGRAN4_2), 0b0010);
++			fallthrough;
++		case SZ_16K:
++			val |= FIELD_PREP(NV_FTR(MMFR0, TGRAN16_2), 0b0010);
++			fallthrough;
++		case SZ_64K:
++			val |= FIELD_PREP(NV_FTR(MMFR0, TGRAN64_2), 0b0010);
++			break;
++		}
++		/* Cap PARange to 48bits */
++		tmp = FIELD_GET(NV_FTR(MMFR0, PARANGE), val);
++		if (tmp > 0b0101) {
++			val &= ~NV_FTR(MMFR0, PARANGE);
++			val |= FIELD_PREP(NV_FTR(MMFR0, PARANGE), 0b0101);
++		}
++		break;
++
++	case SYS_ID_AA64MMFR1_EL1:
++		val &= (NV_FTR(MMFR1, PAN)	|
++			NV_FTR(MMFR1, LO)	|
++			NV_FTR(MMFR1, HPDS)	|
++			NV_FTR(MMFR1, VH)	|
++			NV_FTR(MMFR1, VMIDBits));
++		break;
++
++	case SYS_ID_AA64MMFR2_EL1:
++		val &= ~(NV_FTR(MMFR2, EVT)	|
++			 NV_FTR(MMFR2, BBM)	|
++			 NV_FTR(MMFR2, TTL)	|
++			 GENMASK_ULL(47, 44)	|
++			 NV_FTR(MMFR2, ST)	|
++			 NV_FTR(MMFR2, CCIDX)	|
++			 NV_FTR(MMFR2, VARange));
++
++		/* Force TTL support */
++		val |= FIELD_PREP(NV_FTR(MMFR2, TTL), 0b0001);
++		break;
++
++	case SYS_ID_AA64DFR0_EL1:
++		/* Only limited support for PMU, Debug, BPs and WPs */
++		val &= (NV_FTR(DFR0, PMUVer)	|
++			NV_FTR(DFR0, WRPs)	|
++			NV_FTR(DFR0, BRPs)	|
++			NV_FTR(DFR0, DebugVer));
++
++		/* Cap Debug to ARMv8.1 */
++		tmp = FIELD_GET(NV_FTR(DFR0, DebugVer), val);
++		if (tmp > 0b0111) {
++			val &= ~NV_FTR(DFR0, DebugVer);
++			val |= FIELD_PREP(NV_FTR(DFR0, DebugVer), 0b0111);
++		}
++		break;
++
++	default:
++		/* Unknown register, just wipe it clean */
++		val = 0;
++		break;
++	}
++
++	p->regval = val;
++}
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index dd18ae004007..b1dc62dc894d 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1449,6 +1449,9 @@ static bool access_id_reg(struct kvm_vcpu *vcpu,
+ 		return write_to_read_only(vcpu, p, r);
+ 
+ 	p->regval = read_id_reg(vcpu, r);
++	if (vcpu_has_nv(vcpu))
++		access_nested_id_reg(vcpu, p, r);
++
+ 	return true;
+ }
  
 -- 
 2.34.1
