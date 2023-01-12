@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F330847B
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:22:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04CD8C433F0;
-	Thu, 12 Jan 2023 19:22:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094AD8476
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:22:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5299C433F1;
+	Thu, 12 Jan 2023 19:22:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551345;
-	bh=PHs4gaxAaWQmUmtjbLODLMqbuuO3t58QTS/ww8BSn6A=;
+	s=k20201202; t=1673551346;
+	bh=YNMtW6qYRgKEUFaPKzZRjN4rCL/DaY441LVttCXbAOM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bYs9/gP3qsCxlAFgXV7QNCsu1xADV2YqvOsSgInE2sREBR88oOJVPpjeAyzXJasC+
-	 KBNZN5qROnNrxVlm//mQ19mHMMIaWdLmTiItAlrEZJ395Y0hw/bpYRg1Un3YxeMjYx
-	 ujFbAk/jDanNEk2/GTyjj90AzUfExqzTH9kGRsWzeguiYbvjwuOsl0CSS4iF7StyQX
-	 goJeh0SQ2pkQeZfeaUGmFyJpSFPUfBtNpXGsTEX0fHhsCZC6nZi0FnzlqQZQsnd9FF
-	 aewrliBto+jHUy6Bn8itY4zhgQh2HiqJXwVOY8csFhAEFy7bGKjpbcao73OSv2GQbc
-	 tTIErD96PBrSQ==
+	b=dwlecoCytOLWONq6+gHt78Dzq1zToL1fDjq4/ogfOrlGBe+PGrkEtzJrbGMSAC6ME
+	 Ug9IuBL5l4k25JftmI2T5sPl+pZrSAez6wemSpU+D+iPJLiV0tLNuNa83Ct+OgOPc9
+	 //Lf71VLmYjkaTdKNPFBChj8cJ7fJKgHdaTTOe+Olzskvfncga1ugP/hzD99LTr2+m
+	 OqVvk4cpsVg1W7eGmLk8VnfWqRUTeYDJGXjq0Pk4NVktyuuC1UjYi6GbPfoIdClF04
+	 eambVvEsBBr4/O9nRHmKSp92LSH28+O56tCO/YjTMqCQX/6wlhGTysmW67cM7ckYBB
+	 JYu7NJtoHr95g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG37R-001IWu-Tu;
-	Thu, 12 Jan 2023 19:20:09 +0000
+	id 1pG372-001IWu-Tf;
+	Thu, 12 Jan 2023 19:19:45 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 57/68] KVM: arm64: nv: Add include containing the VNCR_EL2 offsets
-Date: Thu, 12 Jan 2023 19:19:16 +0000
-Message-Id: <20230112191927.1814989-58-maz@kernel.org>
+Subject: [PATCH v7 22/68] KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
+Date: Thu, 12 Jan 2023 19:18:41 +0000
+Message-Id: <20230112191927.1814989-23-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,98 +54,68 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-VNCR_EL2 points to a page containing a number of system registers
-accessed by a guest hypervisor when ARMv8.4-NV is enabled.
+From: Jintack Lim <jintack.lim@linaro.org>
 
-Let's document the offsets in that page, as we are going to use
-this layout.
+Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
+they are not coming from the virtual EL2 and virtual HCR_EL2.TWX is set.
 
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/vncr_mapping.h | 74 +++++++++++++++++++++++++++
- 1 file changed, 74 insertions(+)
- create mode 100644 arch/arm64/include/asm/vncr_mapping.h
+ arch/arm64/include/asm/kvm_emulate.h | 14 ++++++++++++++
+ arch/arm64/kvm/handle_exit.c         |  6 +++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
-new file mode 100644
-index 000000000000..c0a2acd5045c
---- /dev/null
-+++ b/arch/arm64/include/asm/vncr_mapping.h
-@@ -0,0 +1,74 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * System register offsets in the VNCR page
-+ * All offsets are *byte* displacements!
-+ */
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 0636475693ec..ea73377693af 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -17,6 +17,7 @@
+ #include <asm/esr.h>
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_hyp.h>
++#include <asm/kvm_nested.h>
+ #include <asm/ptrace.h>
+ #include <asm/cputype.h>
+ #include <asm/virt.h>
+@@ -337,6 +338,19 @@ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.fault.esr_el2;
+ }
+ 
++static inline bool guest_hyp_wfx_traps_enabled(const struct kvm_vcpu *vcpu)
++{
++	u64 esr = kvm_vcpu_get_esr(vcpu);
++	bool is_wfe = !!(esr & ESR_ELx_WFx_ISS_WFE);
++	u64 hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
 +
-+#ifndef __ARM64_VNCR_MAPPING_H__
-+#define __ARM64_VNCR_MAPPING_H__
++	if (!vcpu_has_nv(vcpu) || vcpu_is_el2(vcpu))
++		return false;
 +
-+#define VNCR_VTTBR_EL2          0x020
-+#define VNCR_VTCR_EL2           0x040
-+#define VNCR_VMPIDR_EL2         0x050
-+#define VNCR_CNTVOFF_EL2        0x060
-+#define VNCR_HCR_EL2            0x078
-+#define VNCR_HSTR_EL2           0x080
-+#define VNCR_VPIDR_EL2          0x088
-+#define VNCR_TPIDR_EL2          0x090
-+#define VNCR_VNCR_EL2           0x0B0
-+#define VNCR_CPACR_EL1          0x100
-+#define VNCR_CONTEXTIDR_EL1     0x108
-+#define VNCR_SCTLR_EL1          0x110
-+#define VNCR_ACTLR_EL1          0x118
-+#define VNCR_TCR_EL1            0x120
-+#define VNCR_AFSR0_EL1          0x128
-+#define VNCR_AFSR1_EL1          0x130
-+#define VNCR_ESR_EL1            0x138
-+#define VNCR_MAIR_EL1           0x140
-+#define VNCR_AMAIR_EL1          0x148
-+#define VNCR_MDSCR_EL1          0x158
-+#define VNCR_SPSR_EL1           0x160
-+#define VNCR_CNTV_CVAL_EL0      0x168
-+#define VNCR_CNTV_CTL_EL0       0x170
-+#define VNCR_CNTP_CVAL_EL0      0x178
-+#define VNCR_CNTP_CTL_EL0       0x180
-+#define VNCR_SCXTNUM_EL1        0x188
-+#define VNCR_TFSR_EL1		0x190
-+#define VNCR_ZCR_EL1            0x1E0
-+#define VNCR_TTBR0_EL1          0x200
-+#define VNCR_TTBR1_EL1          0x210
-+#define VNCR_FAR_EL1            0x220
-+#define VNCR_ELR_EL1            0x230
-+#define VNCR_SP_EL1             0x240
-+#define VNCR_VBAR_EL1           0x250
-+#define VNCR_ICH_LR0_EL2        0x400
-+//      VNCR_ICH_LRN_EL2(n)     VNCR_ICH_LR0_EL2+8*((n) & 7)
-+#define VNCR_ICH_AP0R0_EL2      0x480
-+//      VNCR_ICH_AP0RN_EL2(n)   VNCR_ICH_AP0R0_EL2+8*((n) & 3)
-+#define VNCR_ICH_AP1R0_EL2      0x4A0
-+//      VNCR_ICH_AP1RN_EL2(n)   VNCR_ICH_AP1R0_EL2+8*((n) & 3)
-+#define VNCR_ICH_HCR_EL2        0x4C0
-+#define VNCR_ICH_VMCR_EL2       0x4C8
-+#define VNCR_VDISR_EL2          0x500
-+#define VNCR_PMBLIMITR_EL1      0x800
-+#define VNCR_PMBPTR_EL1         0x810
-+#define VNCR_PMBSR_EL1          0x820
-+#define VNCR_PMSCR_EL1          0x828
-+#define VNCR_PMSEVFR_EL1        0x830
-+#define VNCR_PMSICR_EL1         0x838
-+#define VNCR_PMSIRR_EL1         0x840
-+#define VNCR_PMSLATFR_EL1       0x848
-+#define VNCR_TRFCR_EL1          0x880
-+#define VNCR_MPAM1_EL1          0x900
-+#define VNCR_MPAMHCR_EL2        0x930
-+#define VNCR_MPAMVPMV_EL2       0x938
-+#define VNCR_MPAMVPM0_EL2       0x940
-+#define VNCR_MPAMVPM1_EL2       0x948
-+#define VNCR_MPAMVPM2_EL2       0x950
-+#define VNCR_MPAMVPM3_EL2       0x958
-+#define VNCR_MPAMVPM4_EL2       0x960
-+#define VNCR_MPAMVPM5_EL2       0x968
-+#define VNCR_MPAMVPM6_EL2       0x970
-+#define VNCR_MPAMVPM7_EL2       0x978
++	return ((is_wfe && (hcr_el2 & HCR_TWE)) ||
++		(!is_wfe && (hcr_el2 & HCR_TWI)));
++}
 +
-+#endif /* __ARM64_VNCR_MAPPING_H__ */
+ static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
+ {
+ 	u64 esr = kvm_vcpu_get_esr(vcpu);
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index b0c343c4e062..ea73b47b99ac 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -124,8 +124,12 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu)
+ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
+ {
+ 	u64 esr = kvm_vcpu_get_esr(vcpu);
++	bool is_wfe = !!(esr & ESR_ELx_WFx_ISS_WFE);
+ 
+-	if (esr & ESR_ELx_WFx_ISS_WFE) {
++	if (guest_hyp_wfx_traps_enabled(vcpu))
++		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
++
++	if (is_wfe) {
+ 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
+ 		vcpu->stat.wfe_exit_stat++;
+ 	} else {
 -- 
 2.34.1
 
