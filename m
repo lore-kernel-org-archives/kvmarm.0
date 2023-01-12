@@ -1,43 +1,43 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105A7386
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 02:39:27 +0000 (UTC)
-Received: by mail-pl1-f170.google.com with SMTP id v23so13898895plo.1
-        for <kvmarm@lists.linux.dev>; Wed, 11 Jan 2023 18:39:27 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFD28378
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 02:39:31 +0000 (UTC)
+Received: by mail-pl1-f172.google.com with SMTP id 17so18851418pll.0
+        for <kvmarm@lists.linux.dev>; Wed, 11 Jan 2023 18:39:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=daynix-com.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cYxegMlY1FatV7PXb3AA4EIUSYjnPjYmvybwh7FATNs=;
-        b=Sy0ffk1iTCqZGcuYn5rZ3dO6Ms9tShAHrSFiHHl5vs2VNkzzu6x1RHRpNXHVKSIPUP
-         vUXSos1w82yUCL7pURE0eojiMVE+VacPMDsom+mmPgWIP39tqJiHqX7unjUM9oiH15NF
-         ramVsXzn2WJiyhi4u3AcWLVz1GZhnybocvnC7yfTuSKmoob+47+s0W32P2Law/pPPK3f
-         Jk2QedXfFDIdz84KxpZp7c42v+k6CAzQkXwCYKuZsZUdaHrDD2Asz+Ot8J3tO+awDpzy
-         0+nPcKkEkITBa5mzuowYHwAu4Bb+fmujjGgzo2+nzM9N5UtqxxITqAi0EY324kei7rF+
-         KnZg==
+        bh=Fyn0GdRRcwP8sEkoul8xRTQW4/xqEE84/pUO6q4jry4=;
+        b=IEddBWfA0qPNO00OxgfoK4CKV9d09Bd4y54847jAwbFweYO9DneeymijJHbgA3Jx4M
+         2T2ydzmm155UbNYt6KLnGDT23A5GegwW3WRjMDpuumJ7X2twAkq0s5wKQsrtcq5omnqy
+         jFR2k1rNMMafgVv/HSyBj9ixCUBDkGE/AOoBXLz6ldxULtCiueCt4Qjz+IYE3USFmAOc
+         RgFbc6lryzDLUurHPMtFT7e0Ae0v1TKRU7jFkNcZVpxrME3wERrB8eIWcArpbrQt2Kur
+         VOly5rWj35eNold4uK02f8N1LQ0nbKBGHe+IqwgOx1RZg5jqP2uU9BFnbKSrHzFt1PQO
+         TaQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cYxegMlY1FatV7PXb3AA4EIUSYjnPjYmvybwh7FATNs=;
-        b=FiTTEWdtdC7UUXEvdwOn/rzJrLVXYSyKJhEaDOSC1SR4P/g3hilU6WqTCQr/2HWiyT
-         dkNU0QFrqCev6keVoe2GPyc9KyXrJUJmIEYawN4nKrnfJbg0xTLQvDU3DDetQFviJDeB
-         87FYMbL6TmCeqERWMyC2yDXqqsqTHlYmYyNhEEJe/xbyA6ZYRVjYbG6QFFZYgBWMyvuF
-         By4De+UpOT3kAYMhQSeEOkkqWA/uyx2H8cyWur/4suGmHQSq6yJjKSt9IW9QqOA6KE9o
-         8uh7qp1r7jsmt+NSUpddHMp7fgDb29nLUlV8l9soTMB03wD+9gZJAazMyYwyaiKGkXJE
-         4FWA==
-X-Gm-Message-State: AFqh2krJGe6FPYFlt4JeByALdJLHQqzyGrF4wd9Mj3tFmzMmb3LoXXQg
-	AdlDmJk35/VySW2xuRDzm19dCw==
-X-Google-Smtp-Source: AMrXdXvzd+9YaK0Yxaag9ZE+WtW19B54jo7JfBlw7YuCMMKzJ8HxIkwQ7dhnJswPkOgqU9uuM8WQDw==
-X-Received: by 2002:a17:902:6b08:b0:191:3c6:1748 with SMTP id o8-20020a1709026b0800b0019103c61748mr75203524plk.11.1673491167559;
-        Wed, 11 Jan 2023 18:39:27 -0800 (PST)
+        bh=Fyn0GdRRcwP8sEkoul8xRTQW4/xqEE84/pUO6q4jry4=;
+        b=vxZiviabQdTJO88P2d4gNqb41itGFbk4youKeE11YZWyIJ1I+8w9mU6SYHlPDQzvNE
+         3vLxwQmZBYMENZjLbI1yCmQxM/afUZj+AKggf5XQdqFUc3brhoM10Hkxau2P4D/mgCSk
+         raZWvRmEGqZ5G6FsK0x+kxd52jXAX/XtiAiaQXWHMMHrm9DlNaL2Z6XUgdASnZYS55PS
+         sUl+YyY500EgI3uo8qyzSoxktpneRGa79EAch7Yqamk4GVVDbdVN+CK4YkSQdug70Vhh
+         ImKBnrnV+rpd31Ex+1MMnX+mXyFH4QxTuzhaSBUWfPrA2XQ/ktnS5en09I9hLchqR1Bc
+         +CWA==
+X-Gm-Message-State: AFqh2koMGW/U8Qz164z9fTpcsGEIVfJTqAiUV6AMxNDTleMx4a55DeAl
+	Lyxt1YI4JqVkIMFFWmgzygipQA==
+X-Google-Smtp-Source: AMrXdXt+iyoWsGiLhm+hoj5To9SC8IuRrcK65ARRd+UXWQWO66EDPKTi8SA1qcl9YCgAUIAMBKs0dw==
+X-Received: by 2002:a17:902:b58a:b0:186:def0:66f2 with SMTP id a10-20020a170902b58a00b00186def066f2mr75597838pls.11.1673491171565;
+        Wed, 11 Jan 2023 18:39:31 -0800 (PST)
 Received: from fedora.flets-east.jp ([2400:4050:a840:1e00:d54:e521:8bac:7bed])
-        by smtp.gmail.com with ESMTPSA id w7-20020a1709027b8700b001944b1285easm2310331pll.198.2023.01.11.18.39.23
+        by smtp.gmail.com with ESMTPSA id w7-20020a1709027b8700b001944b1285easm2310331pll.198.2023.01.11.18.39.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jan 2023 18:39:26 -0800 (PST)
+        Wed, 11 Jan 2023 18:39:31 -0800 (PST)
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
 To: 
 Cc: Mark Brown <broonie@kernel.org>,
@@ -57,11 +57,10 @@ Cc: Mark Brown <broonie@kernel.org>,
 	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
 	Sven Peter <sven@svenpeter.dev>,
 	Hector Martin <marcan@marcan.st>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Reiji Watanabe <reijiw@google.com>
-Subject: [PATCH v7 5/7] KVM: arm64: Always set HCR_TID2
-Date: Thu, 12 Jan 2023 11:38:50 +0900
-Message-Id: <20230112023852.42012-6-akihiko.odaki@daynix.com>
+	Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH v7 6/7] KVM: arm64: Mask FEAT_CCIDX
+Date: Thu, 12 Jan 2023 11:38:51 +0900
+Message-Id: <20230112023852.42012-7-akihiko.odaki@daynix.com>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230112023852.42012-1-akihiko.odaki@daynix.com>
 References: <20230112023852.42012-1-akihiko.odaki@daynix.com>
@@ -73,94 +72,53 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Always set HCR_TID2 to trap CTR_EL0, CCSIDR2_EL1, CLIDR_EL1, and
-CSSELR_EL1. This saves a few lines of code and allows to employ their
-access trap handlers for more purposes anticipated by the old
-condition for setting HCR_TID2.
+The CCSIDR access handler masks the associativity bits according to the
+bit layout for processors without FEAT_CCIDX. KVM also assumes CCSIDR is
+32-bit where it will be 64-bit if FEAT_CCIDX is enabled. Mask FEAT_CCIDX
+so that these assumptions hold.
 
 Suggested-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/include/asm/kvm_arm.h           | 3 ++-
- arch/arm64/include/asm/kvm_emulate.h       | 4 ----
- arch/arm64/include/asm/kvm_host.h          | 2 --
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 2 --
- 4 files changed, 2 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 0df3fc3a0173..158f2033fde9 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -81,11 +81,12 @@
-  * SWIO:	Turn set/way invalidates into set/way clean+invalidate
-  * PTW:		Take a stage2 fault if a stage1 walk steps in device memory
-  * TID3:	Trap EL1 reads of group 3 ID registers
-+ * TID2:	Trap CTR_EL0, CCSIDR2_EL1, CLIDR_EL1, and CSSELR_EL1
-  */
- #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
- 			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
--			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 )
-+			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID2)
- #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
- #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
- #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 9bdba47f7e14..30c4598d643b 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -88,10 +88,6 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	if (vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 &= ~HCR_RW;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index d5ee52d6bf73..5617de916c80 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1155,6 +1155,12 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu, struct sys_reg_desc const *r
+ 		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon),
+ 				  pmuver_to_perfmon(vcpu_pmuver(vcpu)));
+ 		break;
++	case SYS_ID_AA64MMFR2_EL1:
++		val &= ~ID_AA64MMFR2_EL1_CCIDX_MASK;
++		break;
++	case SYS_ID_MMFR4_EL1:
++		val &= ~ARM64_FEATURE_MASK(ID_MMFR4_EL1_CCIDX);
++		break;
+ 	}
  
--	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
--	    vcpu_el1_is_32bit(vcpu))
--		vcpu->arch.hcr_el2 |= HCR_TID2;
--
- 	if (kvm_has_mte(vcpu->kvm))
- 		vcpu->arch.hcr_el2 |= HCR_ATA;
- }
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 35a159d131b5..374390a9212e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -705,7 +705,6 @@ static inline bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
- 		return false;
+ 	return val;
+@@ -1718,6 +1724,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
  
- 	switch (reg) {
--	case CSSELR_EL1:	*val = read_sysreg_s(SYS_CSSELR_EL1);	break;
- 	case SCTLR_EL1:		*val = read_sysreg_s(SYS_SCTLR_EL12);	break;
- 	case CPACR_EL1:		*val = read_sysreg_s(SYS_CPACR_EL12);	break;
- 	case TTBR0_EL1:		*val = read_sysreg_s(SYS_TTBR0_EL12);	break;
-@@ -750,7 +749,6 @@ static inline bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
- 		return false;
+ 	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
+ 	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr },
++	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
+ 	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
+ 	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
+ 	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
+@@ -2219,6 +2226,10 @@ static const struct sys_reg_desc cp15_regs[] = {
  
- 	switch (reg) {
--	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	break;
- 	case SCTLR_EL1:		write_sysreg_s(val, SYS_SCTLR_EL12);	break;
- 	case CPACR_EL1:		write_sysreg_s(val, SYS_CPACR_EL12);	break;
- 	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	break;
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index baa5b9b3dde5..147cb4c846c6 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -39,7 +39,6 @@ static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
+ 	{ Op1(1), CRn( 0), CRm( 0), Op2(0), access_ccsidr },
+ 	{ Op1(1), CRn( 0), CRm( 0), Op2(1), access_clidr },
++
++	/* CCSIDR2 */
++	{ Op1(1), CRn( 0), CRm( 0),  Op2(2), undef_access },
++
+ 	{ Op1(2), CRn( 0), CRm( 0), Op2(0), access_csselr, NULL, CSSELR_EL1 },
+ };
  
- static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- {
--	ctxt_sys_reg(ctxt, CSSELR_EL1)	= read_sysreg(csselr_el1);
- 	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
- 	ctxt_sys_reg(ctxt, CPACR_EL1)	= read_sysreg_el1(SYS_CPACR);
- 	ctxt_sys_reg(ctxt, TTBR0_EL1)	= read_sysreg_el1(SYS_TTBR0);
-@@ -95,7 +94,6 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
- static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- {
- 	write_sysreg(ctxt_sys_reg(ctxt, MPIDR_EL1),	vmpidr_el2);
--	write_sysreg(ctxt_sys_reg(ctxt, CSSELR_EL1),	csselr_el1);
- 
- 	if (has_vhe() ||
- 	    !cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
 -- 
 2.39.0
 
