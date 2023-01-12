@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A348476
-	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:22:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB9DAC433D2;
-	Thu, 12 Jan 2023 19:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A3738476
+	for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:22:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02B62C433EF;
+	Thu, 12 Jan 2023 19:22:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673551330;
-	bh=B/M6lxxsxpCU9eGC+7JvpNjTQ6Y14PwCnEPqKVvjPss=;
+	s=k20201202; t=1673551333;
+	bh=qX6kFn4drXf+CIvAA1Y06km8c3x99tuygfzIwXioExs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AgIgZd2Bw6o6qeX6ZHBsOX34XAVXnJLaM0A9rkatDqanImTiDcIcRClx/LeJpP7D8
-	 KIWNzNnFm+CiEivatPRFqY9/XSAyHo2dwK5q2ADz9/WO0kMgLsV287s6t1AudvANcc
-	 StTrobAy1+ipiA+nRltRD3urCWQq+8lCwl3XPqYWnfc5qgoTIIdaF/cCe5CcEiU2QI
-	 KJezZi7YMRq0mLsNFqMq/y21nQew4hcxvPZkfk7nQjcbKukcB9AtgSU9cGUm5EA4zc
-	 nQBnNwvzvQxl5rxpymAK+eQ0CSosiVedflVfAH80kbFGH/e4zvahOXR4sgpX/T3/d8
-	 992BBafum3RhA==
+	b=lXR2PMNBj2rqaNQLIIn7vjusVUQmauGJSMmzEU8v6jJ4RQFGyFWEwHSJzK9NxYUXK
+	 1wfy9nu0NUM1WLdHwPz6LY7SJlvKObj7opYtk9Rkk8BjXw+U4+O4ZiYw7OMHIXv9QE
+	 wOox0rhDKwlFCM5RJNaoFcVLORA8IG6FVaTaixkxA3fr3R+CAOmXckemJELkonOCUW
+	 Api8BpZiXN7Tia6/Gb+zXGdGDH22xCRFQD+woj2frT8NLd3HRDf3Rc8Vmd07AI1PTU
+	 h0fBohRKAdJ58aX5LmIHwTYLTZwqeSRfkAKhAQznlRCh5vbyOG2FYYhC8yFSVIyqiJ
+	 9uagdh2vw6DoQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pG37P-001IWu-KC;
-	Thu, 12 Jan 2023 19:20:07 +0000
+	id 1pG375-001IWu-53;
+	Thu, 12 Jan 2023 19:19:47 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 48/68] KVM: arm64: nv: vgic: Emulate the HW bit in software
-Date: Thu, 12 Jan 2023 19:19:07 +0000
-Message-Id: <20230112191927.1814989-49-maz@kernel.org>
+Subject: [PATCH v7 31/68] KVM: arm64: nv: Only toggle cache for virtual EL2 when SCTLR_EL2 changes
+Date: Thu, 12 Jan 2023 19:18:50 +0000
+Message-Id: <20230112191927.1814989-32-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -54,123 +54,55 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Should the guest hypervisor use the HW bit in the LRs, we need to
-emulate the deactivation from the L2 guest into the L1 distributor
-emulation, which is handled by L0.
+So far we were flushing almost the entire universe whenever a VM would
+load/unload the SCTLR_EL1 and the two versions of that register had
+different MMU enabled settings.  This turned out to be so slow that it
+prevented forward progress for a nested VM, because a scheduler timer
+tick interrupt would always be pending when we reached the nested VM.
 
-It's all good fun.
+To avoid this problem, we consider the SCTLR_EL2 when evaluating if
+caches are on or off when entering virtual EL2 (because this is the
+value that we end up shadowing onto the hardware EL1 register).
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h     |  2 ++
- arch/arm64/kvm/hyp/vgic-v3-sr.c      |  2 +-
- arch/arm64/kvm/vgic/vgic-v3-nested.c | 32 ++++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic.c           |  6 ++++--
- include/kvm/arm_vgic.h               |  1 +
- 5 files changed, 40 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_mmu.h | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 6797eafe7890..bd4ef970ecfa 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -57,6 +57,8 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index e4a7e6369499..2890d57bec30 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -115,6 +115,7 @@ alternative_cb_end
+ #include <asm/cache.h>
+ #include <asm/cacheflush.h>
+ #include <asm/mmu_context.h>
++#include <asm/kvm_emulate.h>
+ #include <asm/kvm_host.h>
  
- int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
+ void kvm_update_va_mask(struct alt_instr *alt,
+@@ -192,7 +193,15 @@ struct kvm;
  
-+u64 __gic_v3_get_lr(unsigned int lr);
-+
- void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if);
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 6cb638b184b1..75152c1ce646 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -18,7 +18,7 @@
- #define vtr_to_nr_pre_bits(v)		((((u32)(v) >> 26) & 7) + 1)
- #define vtr_to_nr_apr_regs(v)		(1 << (vtr_to_nr_pre_bits(v) - 5))
- 
--static u64 __gic_v3_get_lr(unsigned int lr)
-+u64 __gic_v3_get_lr(unsigned int lr)
+ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
  {
- 	switch (lr & 0xf) {
- 	case 0:
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index ab8ddf490b31..e88c75e79010 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -140,6 +140,38 @@ static void vgic_v3_fixup_shadow_lr_state(struct kvm_vcpu *vcpu)
- 	}
+-	return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
++	u64 cache_bits = SCTLR_ELx_M | SCTLR_ELx_C;
++	int reg;
++
++	if (vcpu_is_el2(vcpu))
++		reg = SCTLR_EL2;
++	else
++		reg = SCTLR_EL1;
++
++	return (vcpu_read_sys_reg(vcpu, reg) & cache_bits) == cache_bits;
  }
  
-+void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
-+	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
-+	struct vgic_irq *irq;
-+	int i;
-+
-+	for (i = 0; i < s_cpu_if->used_lrs; i++) {
-+		u64 lr = cpu_if->vgic_lr[i];
-+		int l1_irq;
-+
-+		if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
-+			continue;
-+
-+		/*
-+		 * If we had a HW lr programmed by the guest hypervisor, we
-+		 * need to emulate the HW effect between the guest hypervisor
-+		 * and the nested guest.
-+		 */
-+		l1_irq = (lr & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT;
-+		irq = vgic_get_irq(vcpu->kvm, vcpu, l1_irq);
-+		if (!irq)
-+			continue; /* oh well, the guest hyp is broken */
-+
-+		lr = __gic_v3_get_lr(i);
-+		if (!(lr & ICH_LR_STATE))
-+			irq->active = false;
-+
-+		vgic_put_irq(vcpu->kvm, irq);
-+	}
-+}
-+
- void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 2c5a4bb6b2f9..05809462e199 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -876,9 +876,11 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- {
- 	int used_lrs;
- 
--	/* If nesting, this is a load/put affair, not flush/sync. */
--	if (vgic_state_is_nested(vcpu))
-+	/* If nesting, emulate the HW effect from L0 to L1 */
-+	if (vgic_state_is_nested(vcpu)) {
-+		vgic_v3_sync_nested(vcpu);
- 		return;
-+	}
- 
- 	/* An empty ap_list_head implies used_lrs == 0 */
- 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index a499ae3c2ce8..e2fb1ca89d10 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -398,6 +398,7 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu);
- void kvm_vgic_put(struct kvm_vcpu *vcpu);
- void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu);
- 
-+void vgic_v3_sync_nested(struct kvm_vcpu *vcpu);
- void vgic_v3_load_nested(struct kvm_vcpu *vcpu);
- void vgic_v3_put_nested(struct kvm_vcpu *vcpu);
- void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu);
+ static inline void __clean_dcache_guest_page(void *va, size_t size)
 -- 
 2.34.1
 
