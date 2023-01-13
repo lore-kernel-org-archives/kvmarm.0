@@ -1,25 +1,25 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8583AD4A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16685AD4B
 	for <kvmarm@lists.linux.dev>; Fri, 13 Jan 2023 17:25:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BDDBC433F0;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6567C43392;
 	Fri, 13 Jan 2023 17:25:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1673630732;
-	bh=GLsGai/HaLX4rlQF1y+E+eiiJYqVXPvgiCUVO/iODC0=;
+	bh=LoXncN3HqQOIHm9k1BnKZI/cl3RYXnqq+AXVtd8dOYs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TzmhEF9Dtrwr2Wgs5zPIv+FcdFKirg2OCG3DDBEaTWvW2XahQnc+0Pg2UdVutjuXi
-	 gkt3xDri07c7khkZhvWeffUeVVZDBeeoYE4Y3aU7LwyfLqmU8ZWF/97aBu7ba6aAqD
-	 c94Q2HJwLlgQK+ODsDJUxRmG1XpfNTPZKfkNi+qDyqOKx9ChlCKQOSQAeEiCND1gIK
-	 /iavORKQo9MRf/9KPHbeFsXyEu5FzlrQj4ZRyVy/zu+AtLz4FZQtk7Ca0T039mIBoN
-	 0ddl4fwkl4Qi6vjae5aENV4EswKkt70pWz7zVYeAomg9OhbIrCFUfUasdN22OeHhhg
-	 3t0ioO51D15hQ==
+	b=dzMKli9jERs4P3P0RkMXNDItMoYsKClau/cuXc57RXU77Mt0pJjFlnq9poeNqkNF7
+	 IE9LQ3jWygyh+GHM5//mdcJ+OWHsh42WwOz9LmVP+Mg83TWh/2Firv7slpuio5THOY
+	 vLgbGXkdql2a8IBz81qBdxFTVJW7/vGLpmCiM6SSJ6+ihebeFU2ZAfn5XiQpaiXP3x
+	 TNslJJ/vRBKhTSGxRQfB8wJJGPdB/94WUJQ01suKyuxrfFECWSmjQN4WrzKdYKsVTc
+	 U642MyaWJOyVQFQSywrCyMxGKL4ettWs5ba5y932ltiALkCK9T8kQdALfnoiBs/4sf
+	 tphZGLmRIJ4zg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pGNo2-001bBu-Do;
+	id 1pGNo2-001bBu-ME;
 	Fri, 13 Jan 2023 17:25:30 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -32,9 +32,9 @@ Cc: Will Deacon <will@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 1/2] KVM: arm64: Disable KVM on systems with a VPIPT i-cache
-Date: Fri, 13 Jan 2023 17:25:22 +0000
-Message-Id: <20230113172523.2063867-2-maz@kernel.org>
+Subject: [PATCH 2/2] KVM: arm64: Remove VPIPT I-cache handling
+Date: Fri, 13 Jan 2023 17:25:23 +0000
+Message-Id: <20230113172523.2063867-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230113172523.2063867-1-maz@kernel.org>
 References: <20230113172523.2063867-1-maz@kernel.org>
@@ -50,34 +50,105 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Systems with a VMID-tagged PIPT i-cache have been supported for
-a while by Linux and KVM. However, these systems never appeared
-on our side of the multiverse.
-
-Refuse to initialise KVM on such a machine, should then ever appear.
-Following changes will drop the support from the hypervisor.
+We have some special handling for VPIPT I-cache in critical parts
+of the cache and TLB maintenance. Remove it.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm64/include/asm/kvm_mmu.h |  3 +--
+ arch/arm64/kvm/hyp/nvhe/tlb.c    | 35 --------------------------------
+ arch/arm64/kvm/hyp/vhe/tlb.c     | 13 ------------
+ 3 files changed, 1 insertion(+), 50 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 9c5573bc4614..508deed213a2 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2195,6 +2195,11 @@ int kvm_arch_init(void *opaque)
- 	int err;
- 	bool in_hyp_mode;
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index e4a7e6369499..e79a37e22801 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -214,8 +214,7 @@ static inline void __invalidate_icache_guest_page(void *va, size_t size)
+ 	if (icache_is_aliasing()) {
+ 		/* any kind of VIPT cache */
+ 		icache_inval_all_pou();
+-	} else if (is_kernel_in_hyp_mode() || !icache_is_vpipt()) {
+-		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
++	} else {
+ 		icache_inval_pou((unsigned long)va, (unsigned long)va + size);
+ 	}
+ }
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index d296d617f589..291789df24e3 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -84,28 +84,6 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
+ 	dsb(ish);
+ 	isb();
  
-+	if (icache_is_vpipt()) {
-+		kvm_info("Incompatible VPIPT I-Cache policy\n");
-+		return -ENODEV;
-+	}
-+
- 	if (!is_hyp_mode_available()) {
- 		kvm_info("HYP mode not available\n");
- 		return -ENODEV;
+-	/*
+-	 * If the host is running at EL1 and we have a VPIPT I-cache,
+-	 * then we must perform I-cache maintenance at EL2 in order for
+-	 * it to have an effect on the guest. Since the guest cannot hit
+-	 * I-cache lines allocated with a different VMID, we don't need
+-	 * to worry about junk out of guest reset (we nuke the I-cache on
+-	 * VMID rollover), but we do need to be careful when remapping
+-	 * executable pages for the same guest. This can happen when KSM
+-	 * takes a CoW fault on an executable page, copies the page into
+-	 * a page that was previously mapped in the guest and then needs
+-	 * to invalidate the guest view of the I-cache for that page
+-	 * from EL1. To solve this, we invalidate the entire I-cache when
+-	 * unmapping a page from a guest if we have a VPIPT I-cache but
+-	 * the host is running at EL1. As above, we could do better if
+-	 * we had the VA.
+-	 *
+-	 * The moral of this story is: if you have a VPIPT I-cache, then
+-	 * you should be running with VHE enabled.
+-	 */
+-	if (icache_is_vpipt())
+-		icache_inval_all_pou();
+-
+ 	__tlb_switch_to_host(&cxt);
+ }
+ 
+@@ -144,18 +122,5 @@ void __kvm_flush_vm_context(void)
+ {
+ 	dsb(ishst);
+ 	__tlbi(alle1is);
+-
+-	/*
+-	 * VIPT and PIPT caches are not affected by VMID, so no maintenance
+-	 * is necessary across a VMID rollover.
+-	 *
+-	 * VPIPT caches constrain lookup and maintenance to the active VMID,
+-	 * so we need to invalidate lines with a stale VMID to avoid an ABA
+-	 * race after multiple rollovers.
+-	 *
+-	 */
+-	if (icache_is_vpipt())
+-		asm volatile("ic ialluis");
+-
+ 	dsb(ish);
+ }
+diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+index 24cef9b87f9e..fc3fcd29ccc3 100644
+--- a/arch/arm64/kvm/hyp/vhe/tlb.c
++++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+@@ -146,18 +146,5 @@ void __kvm_flush_vm_context(void)
+ {
+ 	dsb(ishst);
+ 	__tlbi(alle1is);
+-
+-	/*
+-	 * VIPT and PIPT caches are not affected by VMID, so no maintenance
+-	 * is necessary across a VMID rollover.
+-	 *
+-	 * VPIPT caches constrain lookup and maintenance to the active VMID,
+-	 * so we need to invalidate lines with a stale VMID to avoid an ABA
+-	 * race after multiple rollovers.
+-	 *
+-	 */
+-	if (icache_is_vpipt())
+-		asm volatile("ic ialluis");
+-
+ 	dsb(ish);
+ }
 -- 
 2.34.1
 
