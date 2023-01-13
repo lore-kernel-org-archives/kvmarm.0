@@ -1,57 +1,58 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA785628
-	for <kvmarm@lists.linux.dev>; Fri, 13 Jan 2023 03:42:57 +0000 (UTC)
-Received: by mail-pf1-f169.google.com with SMTP id s3so12758042pfd.12
-        for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:42:57 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C891628
+	for <kvmarm@lists.linux.dev>; Fri, 13 Jan 2023 03:44:47 +0000 (UTC)
+Received: by mail-pj1-f49.google.com with SMTP id z9-20020a17090a468900b00226b6e7aeeaso23159399pjf.1
+        for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:44:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Xtd0yvioh58Ye+tRzyHugBT38/BBqw05Bz+SnnNowI=;
-        b=fWNz1tk/5zycuFu/grWRS1t90X+SaGc2Wh3baOpYcrkSHE1YU41eznUDNBRKboV1km
-         md12F8z0ly6VJR6bF9Gpt9EskoXK7vFBGa7uD05jIt2yv5sR7SixQ4+oVDZksLlM1H3h
-         HCUOCS0+tmOCuULORoj/DUjpbt/5oT8evxJxM7/FErxdCHBJxFrOCctn4h+fe1eBNruo
-         DLPj3UOZGWKAHtZcEm2wgLa0Xg/OAXrKTU+I8P39bt+UtBfKAdg3kQpgE3YkrRZquTij
-         9RtwDUy5Kir0hlyko8SRJZZZ7re0qBB8zXJrsCd4oA8aD9RuMjLmH0xdIIU2IN9QkyIq
-         mVcA==
+        bh=P4oRV9JDfOgkyA//zYsWLGmWXmqofSnQQ80rC6HMhzw=;
+        b=qC7eHjKK0+1rkgrY4flbpuQ2Gn3x8fT9r2804GDecvxWkSjplomS1Amjqvhi0j+XyS
+         VfLZxQmWc9rVqLALMFTeeczwxFjywNYRToV7d53Q7MtMtaHg7Y/9LdmRdV4BCWweDxXE
+         idqsH31ct5JJF9PVDxA9G7ybandl+Jif01yGsC9DlBcYx0vcnv9Obqv1NOLsMK4UylL9
+         WMRuqTLQNMN2anFK/bg+wBKxIbWC27TXq/KrtQctdJTZWFjp+Na3Wc02TUyjcVqykFxl
+         rsVTMYraMTbpXb6kb/o+Eu0URzr7LJ5fhBeApCcluVzxN6cwHiIx8YxD+sj/bK7ntsZT
+         TnGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4Xtd0yvioh58Ye+tRzyHugBT38/BBqw05Bz+SnnNowI=;
-        b=NfFPBh1WXio965R+mecczYu/aW8oOVl96OMP76jdhCdGwcdsL26BM+TPp786mhP02U
-         /IvarMPmNu5xSXz1wkOR8i0UDaHT3kQbt9EIooYcZIX6n6abtA3v4qkkbg7F0vad0wEp
-         OacqoVNeD3q3pI+TY/z4sTetVEtnFIqXvbXK2AVA5bIWFNYGlmXHMhkDf30P3kVqPY9Y
-         aLszrHLMW8UjAU3/4Scwnd5VBBpF4QcA4dMaU4MIx0C0QLDYYxCmhPCjXjV9Uz0M1vfp
-         k7Eu20g+nNTLme8SHb/U8rFSBvct8EQ3GL7QVw2x2EXLoc6bqr4Wcy+xfqcV/97euvx7
-         2YAw==
-X-Gm-Message-State: AFqh2krHKTgJ78Sig4gpJOoXSZcvj8jTrNAVpyeGfXAP/QYigIYHnrV9
-	BM0qim+WVCmeTtQ8b66H1bs+vQ==
-X-Google-Smtp-Source: AMrXdXsfHWFCsnl0TlcNERzD11sqDYuTKKUnd2zMn16BJ2CGKBjt2rA+cp26y/YEl+NjxFfBekXwbg==
-X-Received: by 2002:a05:6a00:a87:b0:582:13b5:d735 with SMTP id b7-20020a056a000a8700b0058213b5d735mr1168802pfl.0.1673581376966;
-        Thu, 12 Jan 2023 19:42:56 -0800 (PST)
+        bh=P4oRV9JDfOgkyA//zYsWLGmWXmqofSnQQ80rC6HMhzw=;
+        b=vt3v0NJtdDvIJ7YCyxhygNnG3BPY+MRO3X6K1fdZhniRqg/GRuG1IFgJUT9qIU7IAy
+         kHBrEh72M22opgyPUPfzZwRxQak8XIE7oYSj3OksUNGVRuFt5f6R19JmFFYRaWC2yR4X
+         /nmV7gOUBbMbSRQMHl0ezVC44KGagGQ4Jp8rx408rFs1yxxl2CSdPwLaZc/bBJxCiunW
+         EXCIpxeKRW3TexS7sdN906+iu/9ExKPIx1Ua+PALu/8Bz+lksjIQVW1XvQOUVpEddfdo
+         rHV0dSbTzpgCpV2bJr2jrYiyMy7c2b3eqmgE4FFQRkaMMQGWynQCmtRf2JrHXAGWv0Sa
+         92Gg==
+X-Gm-Message-State: AFqh2kr3XfcbON8hJECI/GLb+VRXceJ61cbupqQllPXlC+HYKcAXYfb/
+	5YFy68504nTxPgHeNjUkeeumfA==
+X-Google-Smtp-Source: AMrXdXuAnFXhZM0FTFiqIljYeLNe5lkdqTnd84rfecdRSjYAQv64CfFah2yZZMqjqdoBRgxybGH9Iw==
+X-Received: by 2002:a17:902:c189:b0:191:1543:6b2f with SMTP id d9-20020a170902c18900b0019115436b2fmr1315193pld.3.1673581486910;
+        Thu, 12 Jan 2023 19:44:46 -0800 (PST)
 Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id u14-20020a63ef0e000000b0046feca0883fsm10777204pgh.64.2023.01.12.19.42.56
+        by smtp.gmail.com with ESMTPSA id q6-20020a17090311c600b00186985198a4sm12961654plh.169.2023.01.12.19.44.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jan 2023 19:42:56 -0800 (PST)
-Date: Thu, 12 Jan 2023 19:42:52 -0800
+        Thu, 12 Jan 2023 19:44:46 -0800 (PST)
+Date: Thu, 12 Jan 2023 19:44:43 -0800
 From: Ricardo Koller <ricarkol@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: pbonzini@redhat.com, maz@kernel.org, dmatlack@google.com,
 	qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev,
 	seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
 	eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-	rananta@google.com, bgardon@google.com, kvmarm@lists.linux.dev,
-	ricarkol@gmail.com, kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 00/12] KVM: arm64: Eager huge-page splitting for
- dirty-logging
-Message-ID: <Y8DTPPv+c7injA1b@google.com>
+	rananta@google.com, bgardon@google.com, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+	ricarkol@gmail.com
+Subject: Re: [RFC PATCH 02/12] KVM: arm64: Allow visiting block PTEs in
+ post-order
+Message-ID: <Y8DTqxdY/h4f0q4a@google.com>
 References: <20221112081714.2169495-1-ricarkol@google.com>
- <Y3KMHGvIEuwhU1wS@google.com>
+ <20221112081714.2169495-3-ricarkol@google.com>
+ <Y3KNZCLVqnFeg7hi@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,84 +61,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y3KMHGvIEuwhU1wS@google.com>
+In-Reply-To: <Y3KNZCLVqnFeg7hi@google.com>
 
-On Mon, Nov 14, 2022 at 06:42:36PM +0000, Oliver Upton wrote:
-> Hi Ricardo,
+On Mon, Nov 14, 2022 at 06:48:04PM +0000, Oliver Upton wrote:
+> On Sat, Nov 12, 2022 at 08:17:04AM +0000, Ricardo Koller wrote:
+> > The page table walker does not visit block PTEs in post-order. But there
+> > are some cases where doing so would be beneficial, for example: breaking a
+> > 1G block PTE into a full tree in post-order avoids visiting the new tree.
+> > 
+> > Allow post order visits of block PTEs. This will be used in a subsequent
+> > commit for eagerly breaking huge pages.
+> > 
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h |  4 ++--
+> >  arch/arm64/kvm/hyp/nvhe/setup.c      |  2 +-
+> >  arch/arm64/kvm/hyp/pgtable.c         | 25 ++++++++++++-------------
+> >  3 files changed, 15 insertions(+), 16 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index e2edeed462e8..d2e4a5032146 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -255,7 +255,7 @@ struct kvm_pgtable {
+> >   *					entries.
+> >   * @KVM_PGTABLE_WALK_TABLE_PRE:		Visit table entries before their
+> >   *					children.
+> > - * @KVM_PGTABLE_WALK_TABLE_POST:	Visit table entries after their
+> > + * @KVM_PGTABLE_WALK_POST:		Visit leaf or table entries after their
+> >   *					children.
 > 
-> On Sat, Nov 12, 2022 at 08:17:02AM +0000, Ricardo Koller wrote:
-> > Hi,
-> > 
-> > I'm sending this RFC mainly to get some early feedback on the approach used
-> > for implementing "Eager Page Splitting" on ARM.  "Eager Page Splitting"
-> > improves the performance of dirty-logging (used in live migrations) when
-> > guest memory is backed by huge-pages.  It's an optimization used in Google
-> > Cloud since 2016 on x86, and for the last couple of months on ARM.
-> > 
-> > I tried multiple ways of implementing this optimization on ARM: from
-> > completely reusing the stage2 mapper, to implementing a new walker from
-> > scratch, and some versions in between. This RFC is one of those in
-> > between. They all have similar performance benefits, based on some light
-> > performance testing (mainly dirty_log_perf_test).
-> > 
-> > Background and motivation
-> > =========================
-> > Dirty logging is typically used for live-migration iterative copying.  KVM
-> > implements dirty-logging at the PAGE_SIZE granularity (will refer to 4K
-> > pages from now on).  It does it by faulting on write-protected 4K pages.
-> > Therefore, enabling dirty-logging on a huge-page requires breaking it into
-> > 4K pages in the first place.  KVM does this breaking on fault, and because
-> > it's in the critical path it only maps the 4K page that faulted; every
-> > other 4K page is left unmapped.  This is not great for performance on ARM
-> > for a couple of reasons:
-> > 
-> > - Splitting on fault can halt vcpus for milliseconds in some
-> >   implementations. Splitting a block PTE requires using a broadcasted TLB
-> >   invalidation (TLBI) for every huge-page (due to the break-before-make
-> >   requirement). Note that x86 doesn't need this. We observed some
-> >   implementations that take millliseconds to complete broadcasted TLBIs
-> >   when done in parallel from multiple vcpus.  And that's exactly what
-> >   happens when doing it on fault: multiple vcpus fault at the same time
-> >   triggering TLBIs in parallel.
-> > 
-> > - Read intensive guest workloads end up paying for dirty-logging.  Only
-> >   mapping the faulting 4K page means that all the other pages that were
-> >   part of the huge-page will now be unmapped. The effect is that any
-> >   access, including reads, now has to fault.
-> > 
-> > Eager Page Splitting (on ARM)
-> > =============================
-> > Eager Page Splitting fixes the above two issues by eagerly splitting
-> > huge-pages when enabling dirty logging. The goal is to avoid doing it while
-> > faulting on write-protected pages. This is what the TDP MMU does for x86
-> > [0], except that x86 does it for different reasons: to avoid grabbing the
-> > MMU lock on fault. Note that taking care of write-protection faults still
-> > requires grabbing the MMU lock on ARM, but not on x86 (with the
-> > fast_page_fault path).
-> > 
-> > An additional benefit of eagerly splitting huge-pages is that it can be
-> > done in a controlled way (e.g., via an IOCTL). This series provides two
-> > knobs for doing it, just like its x86 counterpart: when enabling dirty
-> > logging, and when using the KVM_CLEAR_DIRTY_LOG ioctl. The benefit of doing
-> > it on KVM_CLEAR_DIRTY_LOG is that this ioctl takes ranges, and not complete
-> > memslots like when enabling dirty logging. This means that the cost of
-> > splitting (mainly broadcasted TLBIs) can be throttled: split a range, wait
-> > for a bit, split another range, etc. The benefits of this approach were
-> > presented by Oliver Upton at KVM Forum 2022 [1].
-> > 
-> > Implementation
-> > ==============
-> > Patches 1-4 add a pgtable utility function for splitting huge block PTEs:
-> > kvm_pgtable_stage2_split(). Patches 5-6 add support for not doing
-> > break-before-make on huge-page breaking when FEAT_BBM level 2 is supported.
+> It is not immediately obvious from this change alone that promoting the
+> post-order traversal of every walker to cover leaf + table PTEs is safe.
 > 
-> I would suggest you split up FEAT_BBM=2 and eager page splitting into
-> two separate series, if possible. IMO, the eager page split is easier to
-> reason about if it follows the existing pattern of break-before-make.
+> Have you considered using a flag for just leaf post-order visits?
+> 
 
-Dropping these changes in v1.
+Not using this commit in v1. There's no (noticeable) perf benefit from
+avoiding visiting the new split tree.
 
-> 
+Thanks,
+Ricardo
+
 > --
 > Thanks,
 > Oliver
