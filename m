@@ -1,256 +1,73 @@
-Received: from mail-oa1-f74.google.com (mail-oa1-f74.google.com [209.85.160.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A85A628
-	for <kvmarm@lists.linux.dev>; Fri, 13 Jan 2023 03:50:17 +0000 (UTC)
-Received: by mail-oa1-f74.google.com with SMTP id 586e51a60fabf-15ea42992f4so3103137fac.13
-        for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:50:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hbzanLh7pJc2dr4z027O7I/0B3G+NEkna+fAGs8Wjw0=;
-        b=B6TbjRCZH4GEguyyIU/4c8chBAHZR6FNJQxuwVv3YbmMpBPbku5u3A9D+bFKHJUFyF
-         hQwDaMV8NA450eyaYqD8YR2ur/Jh+B9oDhSC/SFKpciuCTQpkhjAf6gk/dWoItiHyUXW
-         iWQR8uaNyImh5PkQ/fzxvczmg5Ka1x5XnaOWaG8JGUqHCyGTwYaa59e4JjE6vYi/aML2
-         KmNB1bEZ0/RRSnh2/a8l2ngJuglfbjFibifJbrhJdlOU/ao+anCG7iEfuf/Gyy56du8Z
-         Ejkk6A4rIhQ9DsET+hKJ0PBW6ZNpKy3uInig7yycjlS+ePeeX7jS1fhVjtX389tcbshL
-         VQGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hbzanLh7pJc2dr4z027O7I/0B3G+NEkna+fAGs8Wjw0=;
-        b=NXljt/VYfS6NzIxTQEvkEphodc8w4Bl//cxAmasiEpFfUt5Z14L1pgrcH40ZHrLnVH
-         ZOoVWGu3Ud+qlnJCbnvu3w9LkvOoJcHNBtTUPr2uab7MB4V5+mr7WVtg2idmZHCjPSLU
-         TOj6iV5Q6DWiqQUjqpuGjx4L1ZJETrQP829gh8rCQ48RE4IzcteR9VEXlF7gZPIVt3qb
-         2UQw1RwkxRHdDMUjGGOUIkakDpQdffcSNig1l/PGx5r8TCLMTbGcqMv7TJSZshScZt+8
-         zJvk1XtYdp9RqGm8574q19nZHqWp8UeZn57PQhvM5XbUk83Aw4hogZjVa6OQzTAY9uh5
-         u2bQ==
-X-Gm-Message-State: AFqh2krf6kcwygUM6j4yfW8FvOrqI/lpZCwa95Ia2P+AiSHO4FG3BBr2
-	zNxkqEVJx2OgcjiYXob8RfH6jlPi9aT5AQ==
-X-Google-Smtp-Source: AMrXdXv6ZBj69dDqx+ohh1LywVQGoT/+OOB5r6zNe09ZWC/QPPAi3gM64mtMaIHUmNspgolZBYFMIHmRFUQxwg==
-X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a05:6870:63aa:b0:15e:dca1:7fd4 with SMTP
- id t42-20020a05687063aa00b0015edca17fd4mr141342oap.170.1673581816475; Thu, 12
- Jan 2023 19:50:16 -0800 (PST)
-Date: Fri, 13 Jan 2023 03:50:00 +0000
-In-Reply-To: <20230113035000.480021-1-ricarkol@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1F879CE
+	for <kvmarm@lists.linux.dev>; Fri, 13 Jan 2023 13:28:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24E4CC433D2;
+	Fri, 13 Jan 2023 13:28:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1673616497;
+	bh=p0imUzLtfN9VVvFHx51VODYdDfWqho2b57JiDvRO62k=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tvkjA53rvtl38GhbLyIwUnmaBSUXtSQFTj6a8uhOgvm7kpJgxdiEEZMeWIB1kLC5I
+	 gRaDW+cRVyqO10K0ywxnrEk8XFPpFVpYGsl8/PhaK9aPvQYKsxmItukkwFi5iIfcFk
+	 vJNqOy+zEAgsan6p4IB9CerrCedRw7Ee0jVbdUvMR2gDbZuf0aK3Rzsj777AzuxK4i
+	 lvVpXa3LDf7oUDaLd3Y2vx1VfgdKNuOGXaX/Wn3mtSxiqMbLKvZpmqiqSy0N7k4Kg2
+	 1+1AMNE3HAmtIMtd3H8mOc5UCGhVj72TbJS/4giyyFTzzerVEdmuJJQEE3/NM+PheO
+	 JI0MnuKfgjdJQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pGK6P-001WXZ-9H;
+	Fri, 13 Jan 2023 13:28:14 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] KVM: arm64: Drop Columbia-hosted mailing list
+Date: Fri, 13 Jan 2023 13:28:09 +0000
+Message-Id: <20230113132809.1979119-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230113035000.480021-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230113035000.480021-10-ricarkol@google.com>
-Subject: [PATCH 9/9] KVM: arm64: Use local TLBI on permission relaxation
-From: Ricardo Koller <ricarkol@google.com>
-To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
-	yuzenghui@huawei.com, dmatlack@google.com
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, 
-	catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, 
-	alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, 
-	gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, 
-	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Marc Zyngier <maz@kernel.org>
+After many years of awesome service, the kvmarm mailing list hosted by
+Columbia is being decommissioned, and replaced by kvmarm@lists.linux.dev.
 
-Broadcasted TLB invalidations (TLBI) are usually less performant than their
-local variant. In particular, we observed some implementations that take
-millliseconds to complete parallel broadcasted TLBIs.
-
-It's safe to use local, non-shareable, TLBIs when relaxing permissions on a
-PTE in the KVM case for a couple of reasons. First, according to the ARM
-Arm (DDI 0487H.a D5-4913), permission relaxation does not need
-break-before-make.  Second, KVM does not set the VTTBR_EL2.CnP bit, so each
-PE has its own TLB entry for the same page. KVM could tolerate that when
-doing permission relaxation (i.e., not having changes broadcasted to all
-PEs).
+Many thanks to Columbia for having hosted us for so long, and to the
+kernel.org folks for giving us a new home.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/include/asm/kvm_asm.h   |  4 +++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 10 ++++++
- arch/arm64/kvm/hyp/nvhe/tlb.c      | 54 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/pgtable.c       |  2 +-
- arch/arm64/kvm/hyp/vhe/tlb.c       | 32 ++++++++++++++++++
- 5 files changed, 101 insertions(+), 1 deletion(-)
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 43c3bc0f9544..bb17b2ead4c7 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -68,6 +68,7 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
-+	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa_nsh,
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
-@@ -225,6 +226,9 @@ extern void __kvm_flush_vm_context(void);
- extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
- 				     int level);
-+extern void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+					 phys_addr_t ipa,
-+					 int level);
- extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
- 
- extern void __kvm_timer_set_cntvoff(u64 cntvoff);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 728e01d4536b..c6bf1e49ca93 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -125,6 +125,15 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
- 	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
- }
- 
-+static void handle___kvm_tlb_flush_vmid_ipa_nsh(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-+	DECLARE_REG(phys_addr_t, ipa, host_ctxt, 2);
-+	DECLARE_REG(int, level, host_ctxt, 3);
-+
-+	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va(mmu), ipa, level);
-+}
-+
- static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-@@ -315,6 +324,7 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__kvm_vcpu_run),
- 	HANDLE_FUNC(__kvm_flush_vm_context),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
-+	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa_nsh),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid),
- 	HANDLE_FUNC(__kvm_flush_cpu_context),
- 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index d296d617f589..ef2b70587f93 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -109,6 +109,60 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	__tlb_switch_to_host(&cxt);
- }
- 
-+void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+				  phys_addr_t ipa, int level)
-+{
-+	struct tlb_inv_context cxt;
-+
-+	dsb(nshst);
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(mmu, &cxt);
-+
-+	/*
-+	 * We could do so much better if we had the VA as well.
-+	 * Instead, we invalidate Stage-2 for this IPA, and the
-+	 * whole of Stage-1. Weep...
-+	 */
-+	ipa >>= 12;
-+	__tlbi_level(ipas2e1, ipa, level);
-+
-+	/*
-+	 * We have to ensure completion of the invalidation at Stage-2,
-+	 * since a table walk on another CPU could refill a TLB with a
-+	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-+	 * the Stage-1 invalidation happened first.
-+	 */
-+	dsb(nsh);
-+	__tlbi(vmalle1);
-+	dsb(nsh);
-+	isb();
-+
-+	/*
-+	 * If the host is running at EL1 and we have a VPIPT I-cache,
-+	 * then we must perform I-cache maintenance at EL2 in order for
-+	 * it to have an effect on the guest. Since the guest cannot hit
-+	 * I-cache lines allocated with a different VMID, we don't need
-+	 * to worry about junk out of guest reset (we nuke the I-cache on
-+	 * VMID rollover), but we do need to be careful when remapping
-+	 * executable pages for the same guest. This can happen when KSM
-+	 * takes a CoW fault on an executable page, copies the page into
-+	 * a page that was previously mapped in the guest and then needs
-+	 * to invalidate the guest view of the I-cache for that page
-+	 * from EL1. To solve this, we invalidate the entire I-cache when
-+	 * unmapping a page from a guest if we have a VPIPT I-cache but
-+	 * the host is running at EL1. As above, we could do better if
-+	 * we had the VA.
-+	 *
-+	 * The moral of this story is: if you have a VPIPT I-cache, then
-+	 * you should be running with VHE enabled.
-+	 */
-+	if (icache_is_vpipt())
-+		icache_inval_all_pou();
-+
-+	__tlb_switch_to_host(&cxt);
-+}
-+
- void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- {
- 	struct tlb_inv_context cxt;
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index db9d1a28769b..7d694d12b5c4 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1148,7 +1148,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
- 	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level,
- 				       KVM_PGTABLE_WALK_SHARED);
- 	if (!ret)
--		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
-+		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, pgt->mmu, addr, level);
- 	return ret;
- }
- 
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index 24cef9b87f9e..e69da550cdc5 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -111,6 +111,38 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	__tlb_switch_to_host(&cxt);
- }
- 
-+void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+				  phys_addr_t ipa, int level)
-+{
-+	struct tlb_inv_context cxt;
-+
-+	dsb(nshst);
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(mmu, &cxt);
-+
-+	/*
-+	 * We could do so much better if we had the VA as well.
-+	 * Instead, we invalidate Stage-2 for this IPA, and the
-+	 * whole of Stage-1. Weep...
-+	 */
-+	ipa >>= 12;
-+	__tlbi_level(ipas2e1, ipa, level);
-+
-+	/*
-+	 * We have to ensure completion of the invalidation at Stage-2,
-+	 * since a table walk on another CPU could refill a TLB with a
-+	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-+	 * the Stage-1 invalidation happened first.
-+	 */
-+	dsb(nsh);
-+	__tlbi(vmalle1);
-+	dsb(nsh);
-+	isb();
-+
-+	__tlb_switch_to_host(&cxt);
-+}
-+
- void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- {
- 	struct tlb_inv_context cxt;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6a0fc23455bd..d9a359a65d0f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -11361,7 +11361,6 @@ R:	Oliver Upton <oliver.upton@linux.dev>
+ R:	Zenghui Yu <yuzenghui@huawei.com>
+ L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+ L:	kvmarm@lists.linux.dev
+-L:	kvmarm@lists.cs.columbia.edu (deprecated, moderated for non-subscribers)
+ S:	Maintained
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git
+ F:	arch/arm64/include/asm/kvm*
 -- 
-2.39.0.314.g84b9a713c41-goog
+2.34.1
 
