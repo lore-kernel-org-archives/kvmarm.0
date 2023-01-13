@@ -1,40 +1,40 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-oa1-f74.google.com (mail-oa1-f74.google.com [209.85.160.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0026638
-	for <kvmarm@lists.linux.dev>; Fri, 13 Jan 2023 03:50:15 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-4dedc46e2d5so1620667b3.21
-        for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:50:15 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A85A628
+	for <kvmarm@lists.linux.dev>; Fri, 13 Jan 2023 03:50:17 +0000 (UTC)
+Received: by mail-oa1-f74.google.com with SMTP id 586e51a60fabf-15ea42992f4so3103137fac.13
+        for <kvmarm@lists.linux.dev>; Thu, 12 Jan 2023 19:50:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JVcZViDTJ/Xiw4oMrZSedmVu2/tzeU9wThwbdEKpe08=;
-        b=tePKvf6EmWYEBoYG9dRY4Kc8Qa6b9fp4S9s+0RT8gROI7YwOZchFJ5EsJVYghMGX+x
-         WBc8oMtmtcO4PQPQlfnA/XSMktZ3rue8sW2/gapg4HbgqZLi/j3ND5J4QHgPpPTk0OEt
-         LLKbhbWwmeMkA4BB20XBwkrg5Uaw3EWSIMGU8AHp/KrJ3s/+fP4zbE+gZhWjfmh++4yR
-         KA1WImaDcpohYUoQtSG+BJMBt0cSgVRPfy3EWDC7oDJo4hCZRYxIAYWJJoZV12T8h6i5
-         aJGw4oFdJSkc/5JMHgpTkvdhVyFww+Hc+Kgi/5tq/0sA3pvuTKqHdjiQfth3a5fozvBP
-         YLzg==
+        bh=hbzanLh7pJc2dr4z027O7I/0B3G+NEkna+fAGs8Wjw0=;
+        b=B6TbjRCZH4GEguyyIU/4c8chBAHZR6FNJQxuwVv3YbmMpBPbku5u3A9D+bFKHJUFyF
+         hQwDaMV8NA450eyaYqD8YR2ur/Jh+B9oDhSC/SFKpciuCTQpkhjAf6gk/dWoItiHyUXW
+         iWQR8uaNyImh5PkQ/fzxvczmg5Ka1x5XnaOWaG8JGUqHCyGTwYaa59e4JjE6vYi/aML2
+         KmNB1bEZ0/RRSnh2/a8l2ngJuglfbjFibifJbrhJdlOU/ao+anCG7iEfuf/Gyy56du8Z
+         Ejkk6A4rIhQ9DsET+hKJ0PBW6ZNpKy3uInig7yycjlS+ePeeX7jS1fhVjtX389tcbshL
+         VQGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JVcZViDTJ/Xiw4oMrZSedmVu2/tzeU9wThwbdEKpe08=;
-        b=XrrNfH++1uF9autHRmJb3rtM5DakgXU9XBbJ0kAXB3CdKP2wgK2pcPMCtRqIepvhdn
-         j8K6wro6X6gje5rkytsYLplV1xlCvUBrWT3gW8V2c4deiXR0zEjY44zoQtqmCBbg4mgs
-         p3xvpiTqop6wdliIlSoKsgQ2QvRQz1OqENs5kZ16u9pvlgWQItBRhqupSQrjovjeTZxV
-         kpp0XR65DfHN9E0TVlSgBUN4Rbi71+q7nMAHveKEF8GD9lZgG+TVQV882yD06dXwTxu3
-         1AiFyH7c0OrGhxZQoGw8fT/bxCnn6kDXxCen3r7mMcOKtyynZ/R/TneB1cPITUU71/L7
-         YE6A==
-X-Gm-Message-State: AFqh2kp+eGrOvE9xh8/f84Ow54yebxSjMhrzF0tJNs/UMVB7j5Q1lVgq
-	e8mQ1jfEuYDcy9Wle2v5EtDLtaAa/ZUt4w==
-X-Google-Smtp-Source: AMrXdXurHATa35Vs0camgUzuMOcgp363aVN8cu0eKnDnrIA6eR0vdxPzlHA3NYSk3s3xZZQ5OWqvfp1tYgEdyQ==
+        bh=hbzanLh7pJc2dr4z027O7I/0B3G+NEkna+fAGs8Wjw0=;
+        b=NXljt/VYfS6NzIxTQEvkEphodc8w4Bl//cxAmasiEpFfUt5Z14L1pgrcH40ZHrLnVH
+         ZOoVWGu3Ud+qlnJCbnvu3w9LkvOoJcHNBtTUPr2uab7MB4V5+mr7WVtg2idmZHCjPSLU
+         TOj6iV5Q6DWiqQUjqpuGjx4L1ZJETrQP829gh8rCQ48RE4IzcteR9VEXlF7gZPIVt3qb
+         2UQw1RwkxRHdDMUjGGOUIkakDpQdffcSNig1l/PGx5r8TCLMTbGcqMv7TJSZshScZt+8
+         zJvk1XtYdp9RqGm8574q19nZHqWp8UeZn57PQhvM5XbUk83Aw4hogZjVa6OQzTAY9uh5
+         u2bQ==
+X-Gm-Message-State: AFqh2krf6kcwygUM6j4yfW8FvOrqI/lpZCwa95Ia2P+AiSHO4FG3BBr2
+	zNxkqEVJx2OgcjiYXob8RfH6jlPi9aT5AQ==
+X-Google-Smtp-Source: AMrXdXv6ZBj69dDqx+ohh1LywVQGoT/+OOB5r6zNe09ZWC/QPPAi3gM64mtMaIHUmNspgolZBYFMIHmRFUQxwg==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a0d:d087:0:b0:3c7:38d8:798f with SMTP id
- s129-20020a0dd087000000b003c738d8798fmr3727770ywd.489.1673581814930; Thu, 12
- Jan 2023 19:50:14 -0800 (PST)
-Date: Fri, 13 Jan 2023 03:49:59 +0000
+ (user=ricarkol job=sendgmr) by 2002:a05:6870:63aa:b0:15e:dca1:7fd4 with SMTP
+ id t42-20020a05687063aa00b0015edca17fd4mr141342oap.170.1673581816475; Thu, 12
+ Jan 2023 19:50:16 -0800 (PST)
+Date: Fri, 13 Jan 2023 03:50:00 +0000
 In-Reply-To: <20230113035000.480021-1-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230113035000.480021-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230113035000.480021-9-ricarkol@google.com>
-Subject: [PATCH 8/9] KVM: arm64: Split huge pages during KVM_CLEAR_DIRTY_LOG
+Message-ID: <20230113035000.480021-10-ricarkol@google.com>
+Subject: [PATCH 9/9] KVM: arm64: Use local TLBI on permission relaxation
 From: Ricardo Koller <ricarkol@google.com>
 To: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
 	yuzenghui@huawei.com, dmatlack@google.com
@@ -56,61 +56,201 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
 	ricarkol@gmail.com, Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This is the arm64 counterpart of commit cb00a70bd4b7 ("KVM: x86/mmu:
-Split huge pages mapped by the TDP MMU during KVM_CLEAR_DIRTY_LOG"),
-which has the benefit of splitting the cost of splitting a memslot
-across multiple ioctls.
+From: Marc Zyngier <maz@kernel.org>
 
-Split huge pages on the range specified using KVM_CLEAR_DIRTY_LOG.
-And do not split when enabling dirty logging if
-KVM_DIRTY_LOG_INITIALLY_SET is set.
+Broadcasted TLB invalidations (TLBI) are usually less performant than their
+local variant. In particular, we observed some implementations that take
+millliseconds to complete parallel broadcasted TLBIs.
 
+It's safe to use local, non-shareable, TLBIs when relaxing permissions on a
+PTE in the KVM case for a couple of reasons. First, according to the ARM
+Arm (DDI 0487H.a D5-4913), permission relaxation does not need
+break-before-make.  Second, KVM does not set the VTTBR_EL2.CnP bit, so each
+PE has its own TLB entry for the same page. KVM could tolerate that when
+doing permission relaxation (i.e., not having changes broadcasted to all
+PEs).
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/kvm/mmu.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h   |  4 +++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 10 ++++++
+ arch/arm64/kvm/hyp/nvhe/tlb.c      | 54 ++++++++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/pgtable.c       |  2 +-
+ arch/arm64/kvm/hyp/vhe/tlb.c       | 32 ++++++++++++++++++
+ 5 files changed, 101 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 009468822bca..08f28140c4a9 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1076,8 +1076,8 @@ static void kvm_mmu_split_memory_region(struct kvm *kvm, int slot)
-  * @mask:	The mask of pages at offset 'gfn_offset' in this memory
-  *		slot to enable dirty logging on
-  *
-- * Writes protect selected pages to enable dirty logging for them. Caller must
-- * acquire kvm->mmu_lock.
-+ * Splits selected pages to PAGE_SIZE and then writes protect them to enable
-+ * dirty logging for them. Caller must acquire kvm->mmu_lock.
-  */
- void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 		struct kvm_memory_slot *slot,
-@@ -1090,6 +1090,14 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 	lockdep_assert_held_write(&kvm->mmu_lock);
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 43c3bc0f9544..bb17b2ead4c7 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -68,6 +68,7 @@ enum __kvm_host_smccc_func {
+ 	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
++	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa_nsh,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
+@@ -225,6 +226,9 @@ extern void __kvm_flush_vm_context(void);
+ extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
+ extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
+ 				     int level);
++extern void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
++					 phys_addr_t ipa,
++					 int level);
+ extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
  
- 	stage2_wp_range(&kvm->arch.mmu, start, end);
-+
-+	/*
-+	 * If initially-all-set mode is not set, then huge-pages were already
-+	 * split when enabling dirty logging: no need to do it again.
-+	 */
-+	if (kvm_dirty_log_manual_protect_and_init_set(kvm) &&
-+	    READ_ONCE(eager_page_split))
-+		kvm_mmu_split_huge_pages(kvm, start, end);
+ extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 728e01d4536b..c6bf1e49ca93 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -125,6 +125,15 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
+ 	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
  }
  
- static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
-@@ -1875,7 +1883,9 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 		 * this when deleting, moving, disabling dirty logging, or
- 		 * creating the memslot (a nop). Doing it for deletes makes
- 		 * sure we don't leak memory, and there's no need to keep the
--		 * cache around for any of the other cases.
-+		 * cache around for any of the other cases. Keeping the cache
-+		 * is useful for succesive KVM_CLEAR_DIRTY_LOG calls, which is
-+		 * not handled in this function.
- 		 */
- 		kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
- 	}
++static void handle___kvm_tlb_flush_vmid_ipa_nsh(struct kvm_cpu_context *host_ctxt)
++{
++	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
++	DECLARE_REG(phys_addr_t, ipa, host_ctxt, 2);
++	DECLARE_REG(int, level, host_ctxt, 3);
++
++	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va(mmu), ipa, level);
++}
++
+ static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
+ {
+ 	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
+@@ -315,6 +324,7 @@ static const hcall_t host_hcall[] = {
+ 	HANDLE_FUNC(__kvm_vcpu_run),
+ 	HANDLE_FUNC(__kvm_flush_vm_context),
+ 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
++	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa_nsh),
+ 	HANDLE_FUNC(__kvm_tlb_flush_vmid),
+ 	HANDLE_FUNC(__kvm_flush_cpu_context),
+ 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index d296d617f589..ef2b70587f93 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -109,6 +109,60 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
+ 	__tlb_switch_to_host(&cxt);
+ }
+ 
++void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
++				  phys_addr_t ipa, int level)
++{
++	struct tlb_inv_context cxt;
++
++	dsb(nshst);
++
++	/* Switch to requested VMID */
++	__tlb_switch_to_guest(mmu, &cxt);
++
++	/*
++	 * We could do so much better if we had the VA as well.
++	 * Instead, we invalidate Stage-2 for this IPA, and the
++	 * whole of Stage-1. Weep...
++	 */
++	ipa >>= 12;
++	__tlbi_level(ipas2e1, ipa, level);
++
++	/*
++	 * We have to ensure completion of the invalidation at Stage-2,
++	 * since a table walk on another CPU could refill a TLB with a
++	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
++	 * the Stage-1 invalidation happened first.
++	 */
++	dsb(nsh);
++	__tlbi(vmalle1);
++	dsb(nsh);
++	isb();
++
++	/*
++	 * If the host is running at EL1 and we have a VPIPT I-cache,
++	 * then we must perform I-cache maintenance at EL2 in order for
++	 * it to have an effect on the guest. Since the guest cannot hit
++	 * I-cache lines allocated with a different VMID, we don't need
++	 * to worry about junk out of guest reset (we nuke the I-cache on
++	 * VMID rollover), but we do need to be careful when remapping
++	 * executable pages for the same guest. This can happen when KSM
++	 * takes a CoW fault on an executable page, copies the page into
++	 * a page that was previously mapped in the guest and then needs
++	 * to invalidate the guest view of the I-cache for that page
++	 * from EL1. To solve this, we invalidate the entire I-cache when
++	 * unmapping a page from a guest if we have a VPIPT I-cache but
++	 * the host is running at EL1. As above, we could do better if
++	 * we had the VA.
++	 *
++	 * The moral of this story is: if you have a VPIPT I-cache, then
++	 * you should be running with VHE enabled.
++	 */
++	if (icache_is_vpipt())
++		icache_inval_all_pou();
++
++	__tlb_switch_to_host(&cxt);
++}
++
+ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+ {
+ 	struct tlb_inv_context cxt;
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index db9d1a28769b..7d694d12b5c4 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -1148,7 +1148,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+ 	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level,
+ 				       KVM_PGTABLE_WALK_SHARED);
+ 	if (!ret)
+-		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
++		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, pgt->mmu, addr, level);
+ 	return ret;
+ }
+ 
+diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+index 24cef9b87f9e..e69da550cdc5 100644
+--- a/arch/arm64/kvm/hyp/vhe/tlb.c
++++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+@@ -111,6 +111,38 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
+ 	__tlb_switch_to_host(&cxt);
+ }
+ 
++void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
++				  phys_addr_t ipa, int level)
++{
++	struct tlb_inv_context cxt;
++
++	dsb(nshst);
++
++	/* Switch to requested VMID */
++	__tlb_switch_to_guest(mmu, &cxt);
++
++	/*
++	 * We could do so much better if we had the VA as well.
++	 * Instead, we invalidate Stage-2 for this IPA, and the
++	 * whole of Stage-1. Weep...
++	 */
++	ipa >>= 12;
++	__tlbi_level(ipas2e1, ipa, level);
++
++	/*
++	 * We have to ensure completion of the invalidation at Stage-2,
++	 * since a table walk on another CPU could refill a TLB with a
++	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
++	 * the Stage-1 invalidation happened first.
++	 */
++	dsb(nsh);
++	__tlbi(vmalle1);
++	dsb(nsh);
++	isb();
++
++	__tlb_switch_to_host(&cxt);
++}
++
+ void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
+ {
+ 	struct tlb_inv_context cxt;
 -- 
 2.39.0.314.g84b9a713c41-goog
 
