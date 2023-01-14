@@ -1,43 +1,31 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16685AD4B
-	for <kvmarm@lists.linux.dev>; Fri, 13 Jan 2023 17:25:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6567C43392;
-	Fri, 13 Jan 2023 17:25:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673630732;
-	bh=LoXncN3HqQOIHm9k1BnKZI/cl3RYXnqq+AXVtd8dOYs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dzMKli9jERs4P3P0RkMXNDItMoYsKClau/cuXc57RXU77Mt0pJjFlnq9poeNqkNF7
-	 IE9LQ3jWygyh+GHM5//mdcJ+OWHsh42WwOz9LmVP+Mg83TWh/2Firv7slpuio5THOY
-	 vLgbGXkdql2a8IBz81qBdxFTVJW7/vGLpmCiM6SSJ6+ihebeFU2ZAfn5XiQpaiXP3x
-	 TNslJJ/vRBKhTSGxRQfB8wJJGPdB/94WUJQ01suKyuxrfFECWSmjQN4WrzKdYKsVTc
-	 U642MyaWJOyVQFQSywrCyMxGKL4ettWs5ba5y932ltiALkCK9T8kQdALfnoiBs/4sf
-	 tphZGLmRIJ4zg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pGNo2-001bBu-ME;
-	Fri, 13 Jan 2023 17:25:30 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
+Received: from smtp.smtpout.orange.fr (smtp-28.smtpout.orange.fr [80.12.242.28])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146A080A
+	for <kvmarm@lists.linux.dev>; Sat, 14 Jan 2023 13:34:01 +0000 (UTC)
+Received: from pop-os.home ([86.243.2.178])
+	by smtp.orange.fr with ESMTPA
+	id GgY7pvKxtsfAHGgY7pSjYQ; Sat, 14 Jan 2023 14:26:23 +0100
+X-ME-Helo: pop-os.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sat, 14 Jan 2023 14:26:23 +0100
+X-ME-IP: 86.243.2.178
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: Marc Zyngier <maz@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 2/2] KVM: arm64: Remove VPIPT I-cache handling
-Date: Fri, 13 Jan 2023 17:25:23 +0000
-Message-Id: <20230113172523.2063867-3-maz@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu
+Subject: [PATCH v2] KVM: arm64: vgic-v3: Use kstrtobool() instead of strtobool()
+Date: Sat, 14 Jan 2023 14:26:15 +0100
+Message-Id: <f546e636c6d2bbcc0d8c4191ab98ce892fce4584.1673702763.git.christophe.jaillet@wanadoo.fr>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230113172523.2063867-1-maz@kernel.org>
-References: <20230113172523.2063867-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -45,110 +33,75 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We have some special handling for VPIPT I-cache in critical parts
-of the cache and TLB maintenance. Remove it.
+strtobool() is the same as kstrtobool().
+However, the latter is more used within the kernel.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+In order to remove strtobool() and slightly simplify kstrtox.h, switch to
+the other function name.
+
+While at it, include the corresponding header file (<linux/kstrtox.h>)
+
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 ---
- arch/arm64/include/asm/kvm_mmu.h |  3 +--
- arch/arm64/kvm/hyp/nvhe/tlb.c    | 35 --------------------------------
- arch/arm64/kvm/hyp/vhe/tlb.c     | 13 ------------
- 3 files changed, 1 insertion(+), 50 deletions(-)
+This patch was already sent as a part of a serie ([1]) that axed all usages
+of strtobool().
+Most of the patches have been merged in -next.
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index e4a7e6369499..e79a37e22801 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -214,8 +214,7 @@ static inline void __invalidate_icache_guest_page(void *va, size_t size)
- 	if (icache_is_aliasing()) {
- 		/* any kind of VIPT cache */
- 		icache_inval_all_pou();
--	} else if (is_kernel_in_hyp_mode() || !icache_is_vpipt()) {
--		/* PIPT or VPIPT at EL2 (see comment in __kvm_tlb_flush_vmid_ipa) */
-+	} else {
- 		icache_inval_pou((unsigned long)va, (unsigned long)va + size);
- 	}
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index d296d617f589..291789df24e3 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -84,28 +84,6 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	dsb(ish);
- 	isb();
+I synch'ed with latest -next and re-send the remaining ones as individual
+patches.
+
+Changes in v2:
+  - now compile tested with make.cross, ARCH=arm64 and compiler from
+    https://cdn.kernel.org/pub/tools/crosstool/files/bin/x86_64/
+
+[1]: https://lore.kernel.org/all/cover.1667336095.git.christophe.jaillet@wanadoo.fr/
+---
+ arch/arm64/kvm/vgic/vgic-v3.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 2074521d4a8c..9d63149d9e53 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -3,6 +3,7 @@
+ #include <linux/irqchip/arm-gic-v3.h>
+ #include <linux/irq.h>
+ #include <linux/irqdomain.h>
++#include <linux/kstrtox.h>
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ #include <kvm/arm_vgic.h>
+@@ -587,25 +588,25 @@ DEFINE_STATIC_KEY_FALSE(vgic_v3_cpuif_trap);
  
--	/*
--	 * If the host is running at EL1 and we have a VPIPT I-cache,
--	 * then we must perform I-cache maintenance at EL2 in order for
--	 * it to have an effect on the guest. Since the guest cannot hit
--	 * I-cache lines allocated with a different VMID, we don't need
--	 * to worry about junk out of guest reset (we nuke the I-cache on
--	 * VMID rollover), but we do need to be careful when remapping
--	 * executable pages for the same guest. This can happen when KSM
--	 * takes a CoW fault on an executable page, copies the page into
--	 * a page that was previously mapped in the guest and then needs
--	 * to invalidate the guest view of the I-cache for that page
--	 * from EL1. To solve this, we invalidate the entire I-cache when
--	 * unmapping a page from a guest if we have a VPIPT I-cache but
--	 * the host is running at EL1. As above, we could do better if
--	 * we had the VA.
--	 *
--	 * The moral of this story is: if you have a VPIPT I-cache, then
--	 * you should be running with VHE enabled.
--	 */
--	if (icache_is_vpipt())
--		icache_inval_all_pou();
--
- 	__tlb_switch_to_host(&cxt);
+ static int __init early_group0_trap_cfg(char *buf)
+ {
+-	return strtobool(buf, &group0_trap);
++	return kstrtobool(buf, &group0_trap);
  }
+ early_param("kvm-arm.vgic_v3_group0_trap", early_group0_trap_cfg);
  
-@@ -144,18 +122,5 @@ void __kvm_flush_vm_context(void)
+ static int __init early_group1_trap_cfg(char *buf)
  {
- 	dsb(ishst);
- 	__tlbi(alle1is);
--
--	/*
--	 * VIPT and PIPT caches are not affected by VMID, so no maintenance
--	 * is necessary across a VMID rollover.
--	 *
--	 * VPIPT caches constrain lookup and maintenance to the active VMID,
--	 * so we need to invalidate lines with a stale VMID to avoid an ABA
--	 * race after multiple rollovers.
--	 *
--	 */
--	if (icache_is_vpipt())
--		asm volatile("ic ialluis");
--
- 	dsb(ish);
+-	return strtobool(buf, &group1_trap);
++	return kstrtobool(buf, &group1_trap);
  }
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index 24cef9b87f9e..fc3fcd29ccc3 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -146,18 +146,5 @@ void __kvm_flush_vm_context(void)
+ early_param("kvm-arm.vgic_v3_group1_trap", early_group1_trap_cfg);
+ 
+ static int __init early_common_trap_cfg(char *buf)
  {
- 	dsb(ishst);
- 	__tlbi(alle1is);
--
--	/*
--	 * VIPT and PIPT caches are not affected by VMID, so no maintenance
--	 * is necessary across a VMID rollover.
--	 *
--	 * VPIPT caches constrain lookup and maintenance to the active VMID,
--	 * so we need to invalidate lines with a stale VMID to avoid an ABA
--	 * race after multiple rollovers.
--	 *
--	 */
--	if (icache_is_vpipt())
--		asm volatile("ic ialluis");
--
- 	dsb(ish);
+-	return strtobool(buf, &common_trap);
++	return kstrtobool(buf, &common_trap);
  }
+ early_param("kvm-arm.vgic_v3_common_trap", early_common_trap_cfg);
+ 
+ static int __init early_gicv4_enable(char *buf)
+ {
+-	return strtobool(buf, &gicv4_enable);
++	return kstrtobool(buf, &gicv4_enable);
+ }
+ early_param("kvm-arm.vgic_v4_enable", early_gicv4_enable);
+ 
 -- 
 2.34.1
 
