@@ -1,23 +1,24 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B39C46B7
-	for <kvmarm@lists.linux.dev>; Mon, 16 Jan 2023 16:05:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 628CAC4339C;
-	Mon, 16 Jan 2023 16:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE95046B5
+	for <kvmarm@lists.linux.dev>; Mon, 16 Jan 2023 16:05:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88228C433EF;
+	Mon, 16 Jan 2023 16:05:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1673885124;
-	bh=IwlP1zTtdDEXP13nca0TcxuYokqwXTKVt5zvoPFvoIE=;
+	s=k20201202; t=1673885130;
+	bh=BRfk0WOJMVJQ0g6gzb8bzQbO/L/4/GqYQAhZHV+SWIg=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=lwcn2jHzgNL0/r4m83r0COpclgwtGlvCKLVJuHfYT/tuoeJyfSMv/1rnw9vUXtwuv
-	 0xW17WqjCEeOzv6UqLKnx7EhCqscCQ4dKUNgc8523ysGTtLaifX52bqM5RqRxz/u7b
-	 iRDp4ftvb63f/aL4lb1KBS19B/h2cr1LyF5KGdkYywevNziMLaywbzm7L10lRo1MAi
-	 T/myfLMB1qWexG6WVwYQGXA0ldNlYFGkGnzNpySLWP/eXuHPvNsXXI4CYhvaaQd0Xc
-	 UkWLzGq0BgDwjvtbnSQQrfkilift+w7Nk9ROCBJrPLp6uch/oWLcSZ2tL4Ge89j5mi
-	 w50KjSvJ9R+fg==
+	b=Ch1sF2XHZse7Ty/yGLrjCrku7Q9y/IpOI1twzw7JGrPwJpozxfcRMfLpDGP5yVKED
+	 EzTczLO+c5qcLtpCcpMPeBGb9srvY9LGiB5hkoprKd03koTcpahLPx/p1nMuh1mqq6
+	 L+WKCh0kp5TaI98f8gXjdOJUfkSgsDCqCCMBJsi+qsch4PkgyMx4fIjgoTd0yax0Rv
+	 VjCExTE9f/aJiMpRfu5IRin8ctApJXe4A26QuLIpEHmzLvL2i/MaC0kO2gLR4GELVY
+	 TqllPXC/iTQYQWoQgqSGVnlC8yYcToCwiGb0GCvYzK0aV/FUUc+j8im3bPXmrPy1bx
+	 XX7ckP2jPHW1g==
 From: Mark Brown <broonie@kernel.org>
-Date: Mon, 16 Jan 2023 16:04:37 +0000
-Subject: [PATCH v4 02/21] arm64: Document boot requirements for SME 2
+Date: Mon, 16 Jan 2023 16:04:38 +0000
+Subject: [PATCH v4 03/21] arm64/sysreg: Update system registers for SME 2
+ and 2.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -26,7 +27,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20221208-arm64-sme2-v4-2-f2fa0aef982f@kernel.org>
+Message-Id: <20221208-arm64-sme2-v4-3-f2fa0aef982f@kernel.org>
 References: <20221208-arm64-sme2-v4-0-f2fa0aef982f@kernel.org>
 In-Reply-To: <20221208-arm64-sme2-v4-0-f2fa0aef982f@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, 
@@ -41,47 +42,93 @@ Cc: Alan Hayward <alan.hayward@arm.com>,
  kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, 
  Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.12-dev-77e06
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1168; i=broonie@kernel.org;
- h=from:subject:message-id; bh=IwlP1zTtdDEXP13nca0TcxuYokqwXTKVt5zvoPFvoIE=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjxXWjhCRnkVL1FiHVSNT2JrW2P727WtfisQJsrvsx
- wmHTCi6JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY8V1owAKCRAk1otyXVSH0HgKB/
- 9BIM601dAgC7dKMiDgZyoQEGBDqxcPOLCcre8NszUJ5sMgRessyzdfezjGlHrjUTGJvziU5J39n+a/
- ARxYOYrPWJPlKxusEBj6RYTxZhPXKoCkatSMJr19oLmFmHUcUGh+ChlUqLORLQe8BSEbx+KNqNvug3
- Q0gfD3HUEj7VLKWY5WwzHhisemYovrMi984J+aVqDYN1XBznaE4fqx1kYmbogzWCM3LX9vKEaMGffd
- d42He29MGLC8oaFF4AVTtwOS8LS4Ez6ediUl2PKLe9wwWOm4ajuGOc7V2ofgkgJfnM8tnReDl6oTri
- K89HutEtc0I4Q/xKTg4CNCKVQQcnIk
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1507; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=BRfk0WOJMVJQ0g6gzb8bzQbO/L/4/GqYQAhZHV+SWIg=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjxXWkESxtnGjNFkNhM7rHCgefRvsjIDZTnxQOibp6
+ ekyJS2+JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY8V1pAAKCRAk1otyXVSH0JFfB/
+ 96NjdQ6gCljpAd/nlKb214gbriT1C0eTzfcAbiaRXjE858AqHLE5xyTY4B3KNCRKVM0FzmOiAKWk3O
+ zbGUOVXNW1DADOqg/xFV6jWDuOE3kMkTgnhOlrgc0JUT9D8p/Nl+wHZdrKHJbzsake9aCvekoqGh7L
+ FWrlR4HLsJMZoY3DY2r72X5UM7a7A09swSKOXXzXg3YA1dFvTjs98GSlKX0cW8EMdzpPVotm2H4nSy
+ dAUOroxsRzJh13OGg/A+aKlLjItnqyW/FrLesE6f3WPsci0IjksXlcHkkWXVFYxp5CQlIJniOMm/py
+ OXaTcHcVENoEIm6rUBkXUkjSyXPZFk
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-SME 2 introduces the new ZT0 register, we require that access to this
-reigster is not trapped when we identify that the feature is supported.
+FEAT_SME2 and FEAT_SME2P1 introduce several new SME features which can
+be enumerated via ID_AA64SMFR0_EL1 and a new register ZT0 access to
+which is controlled via SMCR_ELn, add the relevant register description.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- Documentation/arm64/booting.rst | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ arch/arm64/tools/sysreg | 27 +++++++++++++++++++++++----
+ 1 file changed, 23 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/arm64/booting.rst b/Documentation/arm64/booting.rst
-index 96fe10ec6c24..f8d0a7288c73 100644
---- a/Documentation/arm64/booting.rst
-+++ b/Documentation/arm64/booting.rst
-@@ -369,6 +369,16 @@ Before jumping into the kernel, the following conditions must be met:
- 
-     - HCR_EL2.ATA (bit 56) must be initialised to 0b1.
- 
-+  For CPUs with the Scalable Matrix Extension version 2 (FEAT_SME2):
-+
-+  - If EL3 is present:
-+
-+    - SMCR_EL3.EZT0 (bit 30) must be initialised to 0b1.
-+
-+ - If the kernel is entered at EL1 and EL2 is present:
-+
-+    - SMCR_EL2.EZT0 (bit 30) must be initialised to 0b1.
-+
- The requirements described above for CPU mode, caches, MMUs, architected
- timers, coherency and system registers apply to all CPUs.  All CPUs must
- enter the kernel in the same exception level.  Where the values documented
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 184e58fd5631..13c87d8a42f1 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -894,6 +894,7 @@ EndEnum
+ Enum	27:24	SME
+ 	0b0000	NI
+ 	0b0001	IMP
++	0b0010	SME2
+ EndEnum
+ Res0	23:20
+ Enum	19:16	MPAM_frac
+@@ -975,7 +976,9 @@ Enum	63	FA64
+ EndEnum
+ Res0	62:60
+ Enum	59:56	SMEver
+-	0b0000	IMP
++	0b0000	SME
++	0b0001	SME2
++	0b0010	SME2p1
+ EndEnum
+ Enum	55:52	I16I64
+ 	0b0000	NI
+@@ -986,7 +989,19 @@ Enum	48	F64F64
+ 	0b0	NI
+ 	0b1	IMP
+ EndEnum
+-Res0	47:40
++Enum	47:44	I16I32
++	0b0000	NI
++	0b0101	IMP
++EndEnum
++Enum	43	B16B16
++	0b0	NI
++	0b1	IMP
++EndEnum
++Enum	42	F16F16
++	0b0	NI
++	0b1	IMP
++EndEnum
++Res0	41:40
+ Enum	39:36	I8I32
+ 	0b0000	NI
+ 	0b1111	IMP
+@@ -999,7 +1014,10 @@ Enum	34	B16F32
+ 	0b0	NI
+ 	0b1	IMP
+ EndEnum
+-Res0	33
++Enum	33	BI32I32
++	0b0	NI
++	0b1	IMP
++EndEnum
+ Enum	32	F32F32
+ 	0b0	NI
+ 	0b1	IMP
+@@ -1599,7 +1617,8 @@ EndSysreg
+ SysregFields	SMCR_ELx
+ Res0	63:32
+ Field	31	FA64
+-Res0	30:9
++Field	30	EZT0
++Res0	29:9
+ Raz	8:4
+ Field	3:0	LEN
+ EndSysregFields
 
 -- 
 2.34.1
