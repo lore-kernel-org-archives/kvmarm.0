@@ -1,58 +1,34 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279FA4C9A
-	for <kvmarm@lists.linux.dev>; Tue, 17 Jan 2023 15:42:09 +0000 (UTC)
-Received: by mail-pj1-f54.google.com with SMTP id u1-20020a17090a450100b0022936a63a21so11075987pjg.4
-        for <kvmarm@lists.linux.dev>; Tue, 17 Jan 2023 07:42:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=raIP5zSqF/STW+kTCBVQJ+PuTh0fIF3QkrpzqbxnVwM=;
-        b=Fboqqh9dagbWo2L8wq1Lo26iSaSU57WhxjC/fOz7ecCUNGGEDVLeXoK5K/pHZwcsFV
-         N9jlLxyCR6qNXQQ4U7mpMErHB3ZrEWyqQtK2JQndhA0MmCFiGJ+4PPhTRD0Wix0EL65j
-         MsYHUDHxtRNkvOQ0WUDga80seOuHKWPkpKj+FGWEAdrMpGI0dVnRWM5khsCPm4X7lwaH
-         x+1LaU365neNHCMM/NnCQEGLIUB0p9uhI/3oVwVMGYmas44XJFXRd2YVZkXp0yoqHUtJ
-         ciWpysAmyUCCthwpSIl7KFTDHsYIFtORoQMrRwss/5rncAUrPaGaZx9iAg7bu43XjA0x
-         fYcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=raIP5zSqF/STW+kTCBVQJ+PuTh0fIF3QkrpzqbxnVwM=;
-        b=ltckeYXCamFobI+lF/xU7/7jHTzKprACTs08++q5tv7IHCkCorYcSF2O2WKXeM2jeQ
-         Dvdy+LzEX0mQyotK9Ye21mmxqX5RCobPhidIAz9rmx36Mp3Sw4FPHtiO9PHPmPhbNmmE
-         IYhhqEiNzYacJZkwSwBgs+Ymutoyfms1bm2MrL4e248tAH77qeUp3p7rlSjByAqrDvOL
-         wZpaOG0MhefbTGDfvTpnV8JmTfLPu4m5/phXihNsjJWITIjuuQTUQZJnfc/WMNyMNM1V
-         uo8YKekvVagzkQ9B2fNIZXbfAjeJf0T0/a+qUsFXmdWl7Fnl8akxNLpdQ2hXP+JmcXjv
-         jXaA==
-X-Gm-Message-State: AFqh2krk5/3txA8Q0YWUhx2Ww7kAZBpSnbGoHczpGzekBu7BMBAxNuz+
-	puVY1aWtYj6SD4zrBV8+JLlZew==
-X-Google-Smtp-Source: AMrXdXtc4FtedAeo9e0ZaQ0CoHayTm55NeSTXxytLBxVQsTrdtckjUUE0ev7gjaj6X6vcVC1fBOKfQ==
-X-Received: by 2002:a05:6a20:a883:b0:a4:efde:2ed8 with SMTP id ca3-20020a056a20a88300b000a4efde2ed8mr2357042pzb.0.1673970128358;
-        Tue, 17 Jan 2023 07:42:08 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id p10-20020a17090a348a00b00218d894fac3sm20692438pjb.3.2023.01.17.07.42.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 07:42:07 -0800 (PST)
-Date: Tue, 17 Jan 2023 15:42:04 +0000
-From: Sean Christopherson <seanjc@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEC7EB0C
+	for <kvmarm@lists.linux.dev>; Tue, 17 Jan 2023 20:51:28 +0000 (UTC)
+Date: Tue, 17 Jan 2023 20:51:13 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1673988680;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tBfVFTcOroevwU21TT12BjG/YfB4gGjHAdUTut1zEfE=;
+	b=k3SfH990JxjLMD1azdUqAYV3qH2dpILCHNOUpFvPnnEGaH4o8DSODDMapBT1XqN7p/g17I
+	FDQg2C1oQtzrxNeH/+hJZ80tH9djmqM9cQTroEfpGdJahiPMqM3ol6tXjLcSH6C9cycGBq
+	tq4cav0IOHAblnomIdYMP6zRzfCCFw4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
 To: Gavin Shan <gshan@redhat.com>
 Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
 	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	pbonzini@redhat.com, maz@kernel.org, corbet@lwn.net,
-	james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev,
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
-	ricarkol@google.com, eric.auger@redhat.com, yuzhe@nfschina.com,
-	renzhengeek@gmail.com, ardb@kernel.org, peterx@redhat.com,
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, ricarkol@google.com,
+	eric.auger@redhat.com, yuzhe@nfschina.com, renzhengeek@gmail.com,
+	ardb@kernel.org, peterx@redhat.com, seanjc@google.com,
 	shan.gavin@gmail.com
-Subject: Re: [PATCH 4/4] KVM: Improve warning report in
- mark_page_dirty_in_slot()
-Message-ID: <Y8bBzKF17IdZP9eF@google.com>
+Subject: Re: [PATCH 1/4] KVM: arm64: Allow saving vgic3 LPI pending status in
+ no running vcpu context
+Message-ID: <Y8cKQRIbpLWVcdcw@google.com>
 References: <20230116040405.260935-1-gshan@redhat.com>
- <20230116040405.260935-5-gshan@redhat.com>
+ <20230116040405.260935-2-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -61,21 +37,107 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230116040405.260935-5-gshan@redhat.com>
+In-Reply-To: <20230116040405.260935-2-gshan@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jan 16, 2023, Gavin Shan wrote:
-> There are two warning reports about the dirty ring in the function.
-> We have the wrong assumption that the dirty ring is always enabled when
-> CONFIG_HAVE_KVM_DIRTY_RING is selected.
+Hi Gavin,
 
-No, it's not a wrong assumption, becuase it's not an assumption.  The intent is
-to warn irrespective of dirty ring/log enabling.  The orignal code actually warned
-irrespective of dirty ring support[1], again intentionally.  The
-CONFIG_HAVE_KVM_DIRTY_RING check was added because s390 can mark pages dirty from
-an worker thread[2] and s390 has no plans to support the dirty ring.
+On Mon, Jan 16, 2023 at 12:04:02PM +0800, Gavin Shan wrote:
+> When dirty ring is enabled, the dirty page information is pushed to
+> the dirty ring if there is a running VCPU context. Otherwise, the
+> dirty page information is still tracked by the backup dirty bitmap.
+> In order to detect if there is a running VCPU context when a guest
+> page becomes dirty, kvm_arch_allow_write_without_running_vcpu() was
+> introduced to warn when no running VCPU context exists on unknown
+> cases.
+> 
+> Other than the site of saving ITS tables, it's possible to save vgic3
+> LPI pending status in no running vcpu context because it can happen when
+> ITS ITE is restored through the command KVM_DEV_ARM_ITS_RESTORE_TABLES
+> on 'kvm-arm-vgic-its' device.
+> 
+> Fix it by allowing to save vgic3 LPI pending status in no running
+> vcpu context.
+> 
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 5 +++--
+>  arch/arm64/kvm/vgic/vgic-its.c | 3 ++-
+>  arch/arm64/kvm/vgic/vgic-v3.c  | 3 +++
+>  include/kvm/arm_vgic.h         | 1 +
+>  4 files changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 9807b05a1b57..18b245a0ba02 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8071,8 +8071,9 @@ state is final and avoid missing dirty pages from another ioctl ordered
+>  after the bitmap collection.
+>  
+>  NOTE: One example of using the backup bitmap is saving arm64 vgic/its
+> -tables through KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} command on
+> -KVM device "kvm-arm-vgic-its" when dirty ring is enabled.
+> +tables and vgic3 LPI pending status through KVM_DEV_ARM_{VGIC_GRP_CTRL,
+> +ITS_SAVE_TABLES} and KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_RESTORE_TABLES}
+> +command on KVM device "kvm-arm-vgic-its" when dirty ring is enabled.
+>  
+>  8.30 KVM_CAP_XEN_HVM
+>  --------------------
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 94a666dd1443..119a9c7a0a52 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -2792,7 +2792,8 @@ bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
+>  {
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>  
+> -	return dist->save_its_tables_in_progress;
+> +	return dist->save_vgic_v3_tables_in_progress ||
+> +	       dist->save_its_tables_in_progress;
 
-The reason for warning even if dirty ring isn't enabled is so that bots can catch
-potential KVM bugs without having to set up a dirty ring or enable dirty logging.
+I'd much prefer using a single bool to keep track of this, i.e:
 
-[1] 2efd61a608b0 ("KVM: Warn if mark_page_dirty() is called without an active vCPU")
-[2] e09fccb5435d ("KVM: avoid warning on s390 in mark_page_dirty")
+	return dist->save_tables_in_progress;
+
+>  }
+>  
+>  static int vgic_its_set_attr(struct kvm_device *dev,
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> index 2074521d4a8c..32998c8587a8 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> @@ -304,6 +304,7 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+>  int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
+>  {
+>  	struct kvm_vcpu *vcpu;
+> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>  	int byte_offset, bit_nr;
+>  	gpa_t pendbase, ptr;
+>  	bool status;
+> @@ -339,7 +340,9 @@ int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
+>  	if (status) {
+>  		/* clear consumed data */
+>  		val &= ~(1 << bit_nr);
+> +		dist->save_vgic_v3_tables_in_progress = true;
+>  		ret = kvm_write_guest_lock(kvm, ptr, &val, 1);
+> +		dist->save_vgic_v3_tables_in_progress = false;
+
+With the above suggestion of using a bool, this should become a helper
+used at all the affected callsites:
+
+  static int vgic_write_guest_lock(struct kvm *kvm, gpa_t gpa,
+  				   const void *data, unsigned long len)
+  {
+  	struct vgic_dist *dist = &kvm->arch.vgic;
+	int ret;
+
+	dist->save_tables_in_progress = true;
+	ret = kvm_write_guest_lock(kvm, gpa, data, len);
+	dist->save_tables_in_progress = false;
+
+	return ret;
+  }
+
+--
+Thanks,
+Oliver
