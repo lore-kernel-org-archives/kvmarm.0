@@ -1,40 +1,40 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685AA15A0
-	for <kvmarm@lists.linux.dev>; Tue, 17 Jan 2023 01:38:26 +0000 (UTC)
-Received: by mail-pl1-f201.google.com with SMTP id n14-20020a170902d2ce00b00194a2301b10so978505plc.8
-        for <kvmarm@lists.linux.dev>; Mon, 16 Jan 2023 17:38:26 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769F215A0
+	for <kvmarm@lists.linux.dev>; Tue, 17 Jan 2023 01:38:46 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id k204-20020a256fd5000000b007b8b040bc50so30494701ybc.1
+        for <kvmarm@lists.linux.dev>; Mon, 16 Jan 2023 17:38:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SDhGZMGcl/+rCpQW7EzsP5A7EK7uMx6I717AP5BdSVE=;
-        b=g3A+F2lovTBusknN04Pspphh2sOZEygyJHo6g0SrJ2qVG/CZS9TOHepUiFMEbeu2P7
-         +pbgUZcUYF9GlDu2Noju5TPTZatLo7dvV3wDHPHHLXd7YJ9d+17CzdZGeEHU0NL4BMYF
-         rcTYh00PPwtNgsZ5yVDHHXSEHB5qB5IITaq2PmI67NCedEepfxXkNWDlmZrX+EBPgqAI
-         pIGKaWKriMwjqFxECsiRor9wGaYSvU1+JKqrYzRyYHNVdGAb8aiO6l5y2aoYhYKiNmyz
-         GLk9+y/dlVZ3Ae67oQRNlOcxe92GGHLfiG6kT5OlPZtVfxpx1K9Mty5YY4ISn/Piwj1A
-         DtIg==
+        bh=qn3YPHvbxT5N4Qy2asilovtHbC32P/cAZl7ccVXdKtc=;
+        b=ps90UF8Ft99WylNXrWYNE4MO7zDTBu3M8Mp96CZR8egM3fLE17D15LqeAJkTHATWE5
+         UbIYTnfoCORb9HozFsTP2fkKyFsiW6V+M13Ha46nzxSfzs6RRD8NexKa4s82DCuOQ4/a
+         f5N5m9MW0QxrSfh4gI+sUmRaPT9kYLVY5XwWxaKrMaY3a6qzopj6bBGJowzJJ+QxKKOD
+         Uju6RKz90mZgMiTllO/MGekdro5+M8KmKaUlZ/W1WT7M2TgVksdTo0ARv17fj6SHUEYX
+         Q+OkXg1OxXdx/cduLwWVsia0lBgSOSEYb/gvQhfd4ulMjbiTXxx0b9dru6zzuRDNLm2p
+         vS2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SDhGZMGcl/+rCpQW7EzsP5A7EK7uMx6I717AP5BdSVE=;
-        b=YZsF8iEUmPKdrpkY5Vj1V0qiiUg0bJ3zHxWD+PglVFxoQD1D6wQdXeG6o/aMuGTI24
-         AMebVgszgJpha9/q3PnpsMxpXnmx3KljuobeDm1HrpXfMB0ccO4hGKQ6vTi1X3nP3mJf
-         eY5If2TItunIAHiUO8Ed7To65WF34sMwNnV6f6gbq0fdfzSA0vsHTcW8rOlD0Y6g8pr5
-         pxG4+AhFWTUKz8BJBku4Y9tyU57xv/Iwolachq33o4z7CEFlbQAnrMDf3l6glVWC2iWl
-         dJ5H46WGOcbtj+62JpdjDGh+CuqR0cnB9rugTvXMGkQs90uY6Ds8Wn8VwjVxAKfyLj1K
-         XqKg==
-X-Gm-Message-State: AFqh2koednsTXNM56c9on4FeN8zHkPUE4riaffQ8JaLWZu+1wBC2TshL
-	n/iy5HqPYW7gafLniDs80Mz+EX1h/KA=
-X-Google-Smtp-Source: AMrXdXuVU/+Elb5Rp0AHcmNgcHCXEJox4jaCx2mUWqCwLJEwmIXLFTyN3/3HemE7+V5HT6N4PiGUjHLD8m8=
+        bh=qn3YPHvbxT5N4Qy2asilovtHbC32P/cAZl7ccVXdKtc=;
+        b=0HYX8P9X9QGIh02OoewxGBZzYacRAB/0fb4HwQn/SvJHVcXYkhYpcEVNJlF++9sb4o
+         aFcipyVkpeovtJhme8viCfixOMLxGysPM7+h6oxNfXW3j6bbizvHFAta2uXEFHjyitJb
+         d0YD3oGepOfSShyIIW5zpkOEs5WoKSopPT00mn4Qmz/est69wmr6BuDZ3GgYcEamt0qG
+         7q/H64RCvyJ0rx4zHyq9QKr4Jty2bFO3rMof7Z0nhLDJXkTNwr2gx66LcNBqS8m1sRvG
+         lg/GQBgG/K3jgopEbOg08TVb5cJwYSC0DsvaiESAW2p7apdEOlL+7RcAoevh/5v4K1Yi
+         HLMA==
+X-Gm-Message-State: AFqh2krhYC85fQrlp9S/sjmyDKb4xSMOD+rmH/73sg2a3yJdxcDRPgRf
+	Nl/ZRp6A/xMsQTRjXzktZkERu9Kdc6w=
+X-Google-Smtp-Source: AMrXdXsNmOW0DXYrD3lYCFSF5n4KYrY9S7FyZUF591lYQr5SPkh2y/F4l353CfQXDs9MBDKj4CwubdSUs8g=
 X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:aa7:9f95:0:b0:578:1e16:f788 with SMTP id
- z21-20020aa79f95000000b005781e16f788mr134098pfr.12.1673919505841; Mon, 16 Jan
- 2023 17:38:25 -0800 (PST)
-Date: Mon, 16 Jan 2023 17:35:38 -0800
+ (user=reijiw job=sendgmr) by 2002:a25:f305:0:b0:7b4:c646:6ad9 with SMTP id
+ c5-20020a25f305000000b007b4c6466ad9mr137830ybs.68.1673919525543; Mon, 16 Jan
+ 2023 17:38:45 -0800 (PST)
+Date: Mon, 16 Jan 2023 17:35:39 -0800
 In-Reply-To: <20230117013542.371944-1-reijiw@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,9 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230117013542.371944-1-reijiw@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230117013542.371944-5-reijiw@google.com>
-Subject: [PATCH v2 4/8] KVM: arm64: PMU: Disallow userspace to set PMCR.N
- greater than the host value
+Message-ID: <20230117013542.371944-6-reijiw@google.com>
+Subject: [PATCH v2 5/8] tools: arm64: Import perf_event.h
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
@@ -57,86 +56,279 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Raghavendra Rao Anata <rananta@google.com>, Reiji Watanabe <reijiw@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Currently, KVM allows userspace to set PMCR_EL0 to any values
-with KVM_SET_ONE_REG for a vCPU with PMUv3 configured.
-
-Disallow userspace to set PMCR_EL0.N to a value that is greater
-than the host value (KVM_SET_ONE_REG will fail), as KVM doesn't
-support more event counters than the host HW implements.
-Although this is an ABI change, this change only affects
-userspace setting PMCR_EL0.N to a larger value than the host.
-As accesses to unadvertised event counters indices is CONSTRAINED
-UNPREDICTABLE behavior, and PMCR_EL0.N was reset to the host value
-on every vCPU reset before this series, I can't think of any
-use case where a user space would do that.
-
-Also, ignore writes to read-only bits that are cleared on vCPU reset,
-and RES{0,1} bits (including writable bits that KVM doesn't support
-yet), as those bits shouldn't be modified (at least with
-the current KVM).
+Copy perf_event.h from the kernel's arch/arm64/include/asm/perf_event.h.
+The following patches will use macros defined in this header.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 39 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 38 insertions(+), 1 deletion(-)
+ tools/arch/arm64/include/asm/perf_event.h | 258 ++++++++++++++++++++++
+ 1 file changed, 258 insertions(+)
+ create mode 100644 tools/arch/arm64/include/asm/perf_event.h
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 67c1bd39b478..e4bff9621473 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -958,6 +958,43 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	return true;
- }
- 
-+static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
-+		    u64 val)
-+{
-+	u64 host_pmcr, host_n, new_n, mutable_mask;
+diff --git a/tools/arch/arm64/include/asm/perf_event.h b/tools/arch/arm64/include/asm/perf_event.h
+new file mode 100644
+index 000000000000..b2ae51f5f93d
+--- /dev/null
++++ b/tools/arch/arm64/include/asm/perf_event.h
+@@ -0,0 +1,258 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2012 ARM Ltd.
++ */
 +
-+	new_n = (val >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
++#ifndef __ASM_PERF_EVENT_H
++#define __ASM_PERF_EVENT_H
 +
-+	host_pmcr = read_sysreg(pmcr_el0);
-+	host_n = (host_pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
++#define	ARMV8_PMU_MAX_COUNTERS	32
++#define	ARMV8_PMU_COUNTER_MASK	(ARMV8_PMU_MAX_COUNTERS - 1)
 +
-+	/* The vCPU can't have more counters than the host have. */
-+	if (new_n > host_n)
-+		return -EINVAL;
++/*
++ * Common architectural and microarchitectural event numbers.
++ */
++#define ARMV8_PMUV3_PERFCTR_SW_INCR				0x0000
++#define ARMV8_PMUV3_PERFCTR_L1I_CACHE_REFILL			0x0001
++#define ARMV8_PMUV3_PERFCTR_L1I_TLB_REFILL			0x0002
++#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_REFILL			0x0003
++#define ARMV8_PMUV3_PERFCTR_L1D_CACHE				0x0004
++#define ARMV8_PMUV3_PERFCTR_L1D_TLB_REFILL			0x0005
++#define ARMV8_PMUV3_PERFCTR_LD_RETIRED				0x0006
++#define ARMV8_PMUV3_PERFCTR_ST_RETIRED				0x0007
++#define ARMV8_PMUV3_PERFCTR_INST_RETIRED			0x0008
++#define ARMV8_PMUV3_PERFCTR_EXC_TAKEN				0x0009
++#define ARMV8_PMUV3_PERFCTR_EXC_RETURN				0x000A
++#define ARMV8_PMUV3_PERFCTR_CID_WRITE_RETIRED			0x000B
++#define ARMV8_PMUV3_PERFCTR_PC_WRITE_RETIRED			0x000C
++#define ARMV8_PMUV3_PERFCTR_BR_IMMED_RETIRED			0x000D
++#define ARMV8_PMUV3_PERFCTR_BR_RETURN_RETIRED			0x000E
++#define ARMV8_PMUV3_PERFCTR_UNALIGNED_LDST_RETIRED		0x000F
++#define ARMV8_PMUV3_PERFCTR_BR_MIS_PRED				0x0010
++#define ARMV8_PMUV3_PERFCTR_CPU_CYCLES				0x0011
++#define ARMV8_PMUV3_PERFCTR_BR_PRED				0x0012
++#define ARMV8_PMUV3_PERFCTR_MEM_ACCESS				0x0013
++#define ARMV8_PMUV3_PERFCTR_L1I_CACHE				0x0014
++#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_WB			0x0015
++#define ARMV8_PMUV3_PERFCTR_L2D_CACHE				0x0016
++#define ARMV8_PMUV3_PERFCTR_L2D_CACHE_REFILL			0x0017
++#define ARMV8_PMUV3_PERFCTR_L2D_CACHE_WB			0x0018
++#define ARMV8_PMUV3_PERFCTR_BUS_ACCESS				0x0019
++#define ARMV8_PMUV3_PERFCTR_MEMORY_ERROR			0x001A
++#define ARMV8_PMUV3_PERFCTR_INST_SPEC				0x001B
++#define ARMV8_PMUV3_PERFCTR_TTBR_WRITE_RETIRED			0x001C
++#define ARMV8_PMUV3_PERFCTR_BUS_CYCLES				0x001D
++#define ARMV8_PMUV3_PERFCTR_CHAIN				0x001E
++#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_ALLOCATE			0x001F
++#define ARMV8_PMUV3_PERFCTR_L2D_CACHE_ALLOCATE			0x0020
++#define ARMV8_PMUV3_PERFCTR_BR_RETIRED				0x0021
++#define ARMV8_PMUV3_PERFCTR_BR_MIS_PRED_RETIRED			0x0022
++#define ARMV8_PMUV3_PERFCTR_STALL_FRONTEND			0x0023
++#define ARMV8_PMUV3_PERFCTR_STALL_BACKEND			0x0024
++#define ARMV8_PMUV3_PERFCTR_L1D_TLB				0x0025
++#define ARMV8_PMUV3_PERFCTR_L1I_TLB				0x0026
++#define ARMV8_PMUV3_PERFCTR_L2I_CACHE				0x0027
++#define ARMV8_PMUV3_PERFCTR_L2I_CACHE_REFILL			0x0028
++#define ARMV8_PMUV3_PERFCTR_L3D_CACHE_ALLOCATE			0x0029
++#define ARMV8_PMUV3_PERFCTR_L3D_CACHE_REFILL			0x002A
++#define ARMV8_PMUV3_PERFCTR_L3D_CACHE				0x002B
++#define ARMV8_PMUV3_PERFCTR_L3D_CACHE_WB			0x002C
++#define ARMV8_PMUV3_PERFCTR_L2D_TLB_REFILL			0x002D
++#define ARMV8_PMUV3_PERFCTR_L2I_TLB_REFILL			0x002E
++#define ARMV8_PMUV3_PERFCTR_L2D_TLB				0x002F
++#define ARMV8_PMUV3_PERFCTR_L2I_TLB				0x0030
++#define ARMV8_PMUV3_PERFCTR_REMOTE_ACCESS			0x0031
++#define ARMV8_PMUV3_PERFCTR_LL_CACHE				0x0032
++#define ARMV8_PMUV3_PERFCTR_LL_CACHE_MISS			0x0033
++#define ARMV8_PMUV3_PERFCTR_DTLB_WALK				0x0034
++#define ARMV8_PMUV3_PERFCTR_ITLB_WALK				0x0035
++#define ARMV8_PMUV3_PERFCTR_LL_CACHE_RD				0x0036
++#define ARMV8_PMUV3_PERFCTR_LL_CACHE_MISS_RD			0x0037
++#define ARMV8_PMUV3_PERFCTR_REMOTE_ACCESS_RD			0x0038
++#define ARMV8_PMUV3_PERFCTR_L1D_CACHE_LMISS_RD			0x0039
++#define ARMV8_PMUV3_PERFCTR_OP_RETIRED				0x003A
++#define ARMV8_PMUV3_PERFCTR_OP_SPEC				0x003B
++#define ARMV8_PMUV3_PERFCTR_STALL				0x003C
++#define ARMV8_PMUV3_PERFCTR_STALL_SLOT_BACKEND			0x003D
++#define ARMV8_PMUV3_PERFCTR_STALL_SLOT_FRONTEND			0x003E
++#define ARMV8_PMUV3_PERFCTR_STALL_SLOT				0x003F
 +
-+	/*
-+	 * Ignore writes to RES0 bits, read only bits that are cleared on
-+	 * vCPU reset, and writable bits that KVM doesn't support yet.
-+	 * (i.e. only PMCR.N and bits [7:0] are mutable from userspace)
-+	 * The LP bit is RES0 when FEAT_PMUv3p5 is not supported on the vCPU.
-+	 * But, we leave the bit as it is here, as the vCPU's PMUver might
-+	 * be changed later (NOTE: the bit will be cleared on first vCPU run
-+	 * if necessary).
-+	 */
-+	mutable_mask = (ARMV8_PMU_PMCR_MASK |
-+			(ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT));
-+	val &= mutable_mask;
-+	val |= (__vcpu_sys_reg(vcpu, r->reg) & ~mutable_mask);
++/* Statistical profiling extension microarchitectural events */
++#define	ARMV8_SPE_PERFCTR_SAMPLE_POP				0x4000
++#define	ARMV8_SPE_PERFCTR_SAMPLE_FEED				0x4001
++#define	ARMV8_SPE_PERFCTR_SAMPLE_FILTRATE			0x4002
++#define	ARMV8_SPE_PERFCTR_SAMPLE_COLLISION			0x4003
 +
-+	/* The LC bit is RES1 when AArch32 is not supported */
-+	if (!kvm_supports_32bit_el0())
-+		val |= ARMV8_PMU_PMCR_LC;
++/* AMUv1 architecture events */
++#define	ARMV8_AMU_PERFCTR_CNT_CYCLES				0x4004
++#define	ARMV8_AMU_PERFCTR_STALL_BACKEND_MEM			0x4005
 +
-+	__vcpu_sys_reg(vcpu, r->reg) = val;
++/* long-latency read miss events */
++#define	ARMV8_PMUV3_PERFCTR_L1I_CACHE_LMISS			0x4006
++#define	ARMV8_PMUV3_PERFCTR_L2D_CACHE_LMISS_RD			0x4009
++#define	ARMV8_PMUV3_PERFCTR_L2I_CACHE_LMISS			0x400A
++#define	ARMV8_PMUV3_PERFCTR_L3D_CACHE_LMISS_RD			0x400B
 +
-+	return 0;
-+}
++/* Trace buffer events */
++#define ARMV8_PMUV3_PERFCTR_TRB_WRAP				0x400C
++#define ARMV8_PMUV3_PERFCTR_TRB_TRIG				0x400E
 +
- /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
- #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
- 	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
-@@ -1718,7 +1755,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_SVCR), undef_access },
- 
- 	{ PMU_SYS_REG(SYS_PMCR_EL0), .access = access_pmcr,
--	  .reset = reset_pmcr, .reg = PMCR_EL0 },
-+	  .reset = reset_pmcr, .reg = PMCR_EL0, .set_user = set_pmcr },
- 	{ PMU_SYS_REG(SYS_PMCNTENSET_EL0),
- 	  .access = access_pmcnten, .reg = PMCNTENSET_EL0 },
- 	{ PMU_SYS_REG(SYS_PMCNTENCLR_EL0),
++/* Trace unit events */
++#define ARMV8_PMUV3_PERFCTR_TRCEXTOUT0				0x4010
++#define ARMV8_PMUV3_PERFCTR_TRCEXTOUT1				0x4011
++#define ARMV8_PMUV3_PERFCTR_TRCEXTOUT2				0x4012
++#define ARMV8_PMUV3_PERFCTR_TRCEXTOUT3				0x4013
++#define ARMV8_PMUV3_PERFCTR_CTI_TRIGOUT4			0x4018
++#define ARMV8_PMUV3_PERFCTR_CTI_TRIGOUT5			0x4019
++#define ARMV8_PMUV3_PERFCTR_CTI_TRIGOUT6			0x401A
++#define ARMV8_PMUV3_PERFCTR_CTI_TRIGOUT7			0x401B
++
++/* additional latency from alignment events */
++#define	ARMV8_PMUV3_PERFCTR_LDST_ALIGN_LAT			0x4020
++#define	ARMV8_PMUV3_PERFCTR_LD_ALIGN_LAT			0x4021
++#define	ARMV8_PMUV3_PERFCTR_ST_ALIGN_LAT			0x4022
++
++/* Armv8.5 Memory Tagging Extension events */
++#define	ARMV8_MTE_PERFCTR_MEM_ACCESS_CHECKED			0x4024
++#define	ARMV8_MTE_PERFCTR_MEM_ACCESS_CHECKED_RD			0x4025
++#define	ARMV8_MTE_PERFCTR_MEM_ACCESS_CHECKED_WR			0x4026
++
++/* ARMv8 recommended implementation defined event types */
++#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_RD			0x0040
++#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WR			0x0041
++#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_RD		0x0042
++#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_WR		0x0043
++#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_INNER		0x0044
++#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_REFILL_OUTER		0x0045
++#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WB_VICTIM		0x0046
++#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_WB_CLEAN			0x0047
++#define ARMV8_IMPDEF_PERFCTR_L1D_CACHE_INVAL			0x0048
++
++#define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_RD			0x004C
++#define ARMV8_IMPDEF_PERFCTR_L1D_TLB_REFILL_WR			0x004D
++#define ARMV8_IMPDEF_PERFCTR_L1D_TLB_RD				0x004E
++#define ARMV8_IMPDEF_PERFCTR_L1D_TLB_WR				0x004F
++#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_RD			0x0050
++#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_WR			0x0051
++#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_REFILL_RD		0x0052
++#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_REFILL_WR		0x0053
++
++#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_WB_VICTIM		0x0056
++#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_WB_CLEAN			0x0057
++#define ARMV8_IMPDEF_PERFCTR_L2D_CACHE_INVAL			0x0058
++
++#define ARMV8_IMPDEF_PERFCTR_L2D_TLB_REFILL_RD			0x005C
++#define ARMV8_IMPDEF_PERFCTR_L2D_TLB_REFILL_WR			0x005D
++#define ARMV8_IMPDEF_PERFCTR_L2D_TLB_RD				0x005E
++#define ARMV8_IMPDEF_PERFCTR_L2D_TLB_WR				0x005F
++#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_RD			0x0060
++#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_WR			0x0061
++#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_SHARED			0x0062
++#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_NOT_SHARED		0x0063
++#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_NORMAL			0x0064
++#define ARMV8_IMPDEF_PERFCTR_BUS_ACCESS_PERIPH			0x0065
++#define ARMV8_IMPDEF_PERFCTR_MEM_ACCESS_RD			0x0066
++#define ARMV8_IMPDEF_PERFCTR_MEM_ACCESS_WR			0x0067
++#define ARMV8_IMPDEF_PERFCTR_UNALIGNED_LD_SPEC			0x0068
++#define ARMV8_IMPDEF_PERFCTR_UNALIGNED_ST_SPEC			0x0069
++#define ARMV8_IMPDEF_PERFCTR_UNALIGNED_LDST_SPEC		0x006A
++
++#define ARMV8_IMPDEF_PERFCTR_LDREX_SPEC				0x006C
++#define ARMV8_IMPDEF_PERFCTR_STREX_PASS_SPEC			0x006D
++#define ARMV8_IMPDEF_PERFCTR_STREX_FAIL_SPEC			0x006E
++#define ARMV8_IMPDEF_PERFCTR_STREX_SPEC				0x006F
++#define ARMV8_IMPDEF_PERFCTR_LD_SPEC				0x0070
++#define ARMV8_IMPDEF_PERFCTR_ST_SPEC				0x0071
++#define ARMV8_IMPDEF_PERFCTR_LDST_SPEC				0x0072
++#define ARMV8_IMPDEF_PERFCTR_DP_SPEC				0x0073
++#define ARMV8_IMPDEF_PERFCTR_ASE_SPEC				0x0074
++#define ARMV8_IMPDEF_PERFCTR_VFP_SPEC				0x0075
++#define ARMV8_IMPDEF_PERFCTR_PC_WRITE_SPEC			0x0076
++#define ARMV8_IMPDEF_PERFCTR_CRYPTO_SPEC			0x0077
++#define ARMV8_IMPDEF_PERFCTR_BR_IMMED_SPEC			0x0078
++#define ARMV8_IMPDEF_PERFCTR_BR_RETURN_SPEC			0x0079
++#define ARMV8_IMPDEF_PERFCTR_BR_INDIRECT_SPEC			0x007A
++
++#define ARMV8_IMPDEF_PERFCTR_ISB_SPEC				0x007C
++#define ARMV8_IMPDEF_PERFCTR_DSB_SPEC				0x007D
++#define ARMV8_IMPDEF_PERFCTR_DMB_SPEC				0x007E
++
++#define ARMV8_IMPDEF_PERFCTR_EXC_UNDEF				0x0081
++#define ARMV8_IMPDEF_PERFCTR_EXC_SVC				0x0082
++#define ARMV8_IMPDEF_PERFCTR_EXC_PABORT				0x0083
++#define ARMV8_IMPDEF_PERFCTR_EXC_DABORT				0x0084
++
++#define ARMV8_IMPDEF_PERFCTR_EXC_IRQ				0x0086
++#define ARMV8_IMPDEF_PERFCTR_EXC_FIQ				0x0087
++#define ARMV8_IMPDEF_PERFCTR_EXC_SMC				0x0088
++
++#define ARMV8_IMPDEF_PERFCTR_EXC_HVC				0x008A
++#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_PABORT			0x008B
++#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_DABORT			0x008C
++#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_OTHER			0x008D
++#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_IRQ			0x008E
++#define ARMV8_IMPDEF_PERFCTR_EXC_TRAP_FIQ			0x008F
++#define ARMV8_IMPDEF_PERFCTR_RC_LD_SPEC				0x0090
++#define ARMV8_IMPDEF_PERFCTR_RC_ST_SPEC				0x0091
++
++#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_RD			0x00A0
++#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_WR			0x00A1
++#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_REFILL_RD		0x00A2
++#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_REFILL_WR		0x00A3
++
++#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_WB_VICTIM		0x00A6
++#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_WB_CLEAN			0x00A7
++#define ARMV8_IMPDEF_PERFCTR_L3D_CACHE_INVAL			0x00A8
++
++/*
++ * Per-CPU PMCR: config reg
++ */
++#define ARMV8_PMU_PMCR_E	(1 << 0) /* Enable all counters */
++#define ARMV8_PMU_PMCR_P	(1 << 1) /* Reset all counters */
++#define ARMV8_PMU_PMCR_C	(1 << 2) /* Cycle counter reset */
++#define ARMV8_PMU_PMCR_D	(1 << 3) /* CCNT counts every 64th cpu cycle */
++#define ARMV8_PMU_PMCR_X	(1 << 4) /* Export to ETM */
++#define ARMV8_PMU_PMCR_DP	(1 << 5) /* Disable CCNT if non-invasive debug*/
++#define ARMV8_PMU_PMCR_LC	(1 << 6) /* Overflow on 64 bit cycle counter */
++#define ARMV8_PMU_PMCR_LP	(1 << 7) /* Long event counter enable */
++#define	ARMV8_PMU_PMCR_N_SHIFT	11	 /* Number of counters supported */
++#define	ARMV8_PMU_PMCR_N_MASK	0x1f
++#define	ARMV8_PMU_PMCR_MASK	0xff	 /* Mask for writable bits */
++
++/*
++ * PMOVSR: counters overflow flag status reg
++ */
++#define	ARMV8_PMU_OVSR_MASK		0xffffffff	/* Mask for writable bits */
++#define	ARMV8_PMU_OVERFLOWED_MASK	ARMV8_PMU_OVSR_MASK
++
++/*
++ * PMXEVTYPER: Event selection reg
++ */
++#define	ARMV8_PMU_EVTYPE_MASK	0xc800ffff	/* Mask for writable bits */
++#define	ARMV8_PMU_EVTYPE_EVENT	0xffff		/* Mask for EVENT bits */
++
++/*
++ * Event filters for PMUv3
++ */
++#define	ARMV8_PMU_EXCLUDE_EL1	(1U << 31)
++#define	ARMV8_PMU_EXCLUDE_EL0	(1U << 30)
++#define	ARMV8_PMU_INCLUDE_EL2	(1U << 27)
++
++/*
++ * PMUSERENR: user enable reg
++ */
++#define ARMV8_PMU_USERENR_MASK	0xf		/* Mask for writable bits */
++#define ARMV8_PMU_USERENR_EN	(1 << 0) /* PMU regs can be accessed at EL0 */
++#define ARMV8_PMU_USERENR_SW	(1 << 1) /* PMSWINC can be written at EL0 */
++#define ARMV8_PMU_USERENR_CR	(1 << 2) /* Cycle counter can be read at EL0 */
++#define ARMV8_PMU_USERENR_ER	(1 << 3) /* Event counter can be read at EL0 */
++
++/* PMMIR_EL1.SLOTS mask */
++#define ARMV8_PMU_SLOTS_MASK	0xff
++
++#define ARMV8_PMU_BUS_SLOTS_SHIFT 8
++#define ARMV8_PMU_BUS_SLOTS_MASK 0xff
++#define ARMV8_PMU_BUS_WIDTH_SHIFT 16
++#define ARMV8_PMU_BUS_WIDTH_MASK 0xf
++
++#endif /* __ASM_PERF_EVENT_H */
 -- 
 2.39.0.314.g84b9a713c41-goog
 
