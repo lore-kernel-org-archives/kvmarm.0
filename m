@@ -1,113 +1,122 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1C1A93E
-	for <kvmarm@lists.linux.dev>; Thu, 19 Jan 2023 17:24:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0EE7C433EF;
-	Thu, 19 Jan 2023 17:24:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1674149068;
-	bh=esmAuiMb4cE5hZfqa2pdZ4JKU4zWFBBvjoAoXwc+zAk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FItgwmM67QScUUENZ8Zwtagr5mIdG5cEHxPFfSNuC1jM6dBrsQGhnCtdKL1v4Yf0w
-	 dW3PN2nS8nWYwK6BvAjRYCRs1jNPqcxP6UwIOvTzzQ9T/wZ6VcEzgDHqur2z3W0vff
-	 Q1U6HgQ7VMeTq9MX32okWCpOlh8xJ8QfczraVmhyB125dZQ7bsUFjHD48Lr2RB1Xwn
-	 dCD05u76MAQiAcbWsup1KSQa2MZ/UMnuWZVUxW8VbUZw7v99qBSmYLqsbt+GBlaRNB
-	 uIlEinXfjpAehqjV461mc7XifGdWsWw6VTkhkWgCHrf79SoBq2+sYdBD1CdMnGEwy+
-	 8vQzGzULTP5uQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pIYeI-003A4j-5l;
-	Thu, 19 Jan 2023 17:24:26 +0000
-Date: Thu, 19 Jan 2023 17:24:25 +0000
-Message-ID: <86tu0mmo8m.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: David Matlack <dmatlack@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Sean Christopherson <seanjc@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Nadav Amit <namit@vmware.com>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Peter Xu <peterx@redhat.com>,
-	xu xin <cgel.zte@gmail.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Yu Zhao <yuzhao@google.com>,
-	Colin Cross <ccross@google.com>,
-	Hugh Dickins <hughd@google.com>,
-	Ben Gardon <bgardon@google.com>,
-	Mingwei Zhang <mizhang@google.com>,
-	Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu,
-	linux-mips@vger.kernel.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	Alexandre Ghiti <alexghiti@rivosinc.com>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [RFC PATCH 00/37] KVM: Refactor the KVM/x86 TDP MMU into common code
-In-Reply-To: <Y8l6egh2wWN7BUlZ@google.com>
-References: <20221208193857.4090582-1-dmatlack@google.com>
-	<Y8l6egh2wWN7BUlZ@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED092A93E
+	for <kvmarm@lists.linux.dev>; Thu, 19 Jan 2023 17:36:09 +0000 (UTC)
+Received: by mail-pl1-f202.google.com with SMTP id b9-20020a170903228900b00194a0110d7bso1733496plh.6
+        for <kvmarm@lists.linux.dev>; Thu, 19 Jan 2023 09:36:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YXwKcERxaLuVKb5nhPV+CPBgH/1CDOfYUJatcNI9Lps=;
+        b=OTqsYX12neD7rYwEWRn8ph1+Ivtv7Ny3gNRUzRN4gpl2Eo4fWlPbPU6In/4jxn719a
+         2slMyQuQUGYeMW/mBJE87s2KFofWL2A+b2t0AGtJWafNEsGMAYWeQipZoQ1wuc/AwP98
+         q6x1X0TMG1Ad+kT9cWeSraqE2aVQjTFYY8XrvpXdV5XrOCH5Z0/4P8kT8Gk2C8Whx2FG
+         81gR4+aJciehqPLB3q7y9lYytTmBxQ2kqUF/pcLWKVy8x5Z3rc4oYcrFbsLGgX3dj310
+         jjv6aYJuXYmn/PCkMZw8+4RuZGYn5ZS3Cw5swhmMDgbV/Bu5G0pBJ9SOJXuv6t7ZXXHT
+         rVTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YXwKcERxaLuVKb5nhPV+CPBgH/1CDOfYUJatcNI9Lps=;
+        b=mxvA8R7iUkIfLKWjfFJto8fqvRGXwQI78nvxJR/O9YpXUJXZxOG08Yrfvu8mrRscLs
+         1EBJXRJdAJLNDDiklj00lPD3/fiXohC4CLeHc8sIIvYn65dbAxXdduJZveTS8VqxXPDW
+         +eokMTujbawOH1I+sN/77WKuIE/nsXzbaoG5uHhurO2yzFFQQLCajNpAnmLz8hMs5B/y
+         oSMqrxyswm6/+IA8AHS1j2Y5KJ1DEgHyL3PrDZgRu7JMBhuBJwlXiWTI2YcJtToVfpqb
+         GMeZ2b7bav2xgtgIT4djrJv10FHt725oUQ/KkgyIgG3Y2mq34h9ruws535u5q7WPkr+a
+         +ihQ==
+X-Gm-Message-State: AFqh2kprb3aUlr+ZlZ+HQxV9F1w7etfrrO4qQUhDjD+op2bcOtR1wWz/
+	kkA2UTJyDCNNjeay7xXPc6syR8MZviMB2g==
+X-Google-Smtp-Source: AMrXdXuXExC+O9r6ly79uchmV3y9bAojfkYhjynfBp2nNUiPyiTU/esa3EM+EgTfMCGZFP3dGppk25OULxh7DA==
+X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
+ (user=dmatlack job=sendgmr) by 2002:a05:6a00:24d4:b0:58b:a320:29b9 with SMTP
+ id d20-20020a056a0024d400b0058ba32029b9mr1062701pfv.38.1674149769306; Thu, 19
+ Jan 2023 09:36:09 -0800 (PST)
+Date: Thu, 19 Jan 2023 09:35:52 -0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dmatlack@google.com, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, akpm@linux-foundation.org, anshuman.khandual@arm.com, namit@vmware.com, willy@infradead.org, vbabka@suse.cz, Liam.Howlett@oracle.com, surenb@google.com, peterx@redhat.com, cgel.zte@gmail.com, arnd@arndb.de, yuzhao@google.com, ccross@google.com, hughd@google.com, bgardon@google.com, mizhang@google.com, krish.sadhukhan@oracle.com, ricarkol@google.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, alexghiti@rivosinc.com, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.246.g2a6d74b583-goog
+Message-ID: <20230119173559.2517103-1-dmatlack@google.com>
+Subject: [PATCH 0/7] KVM: Add a common API for range-based TLB invalidation
+From: David Matlack <dmatlack@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Sean Christopherson <seanjc@google.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
+	linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	David Matlack <dmatlack@google.com>, Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 19 Jan 2023 17:14:34 +0000,
-David Matlack <dmatlack@google.com> wrote:
-> 
-> On Thu, Dec 08, 2022 at 11:38:20AM -0800, David Matlack wrote:
-> > 
-> > Hello,
-> > 
-> > This series refactors the KVM/x86 "TDP MMU" into common code. This is
-> > the first step toward sharing TDP (aka Stage-2) page table management
-> > code across architectures that support KVM.
-> 
-> Thank you everyone for the feedback on this RFC. I have a couple of
-> updates to share and a question at the end.
-> 
-> First, Alexandre Ghiti from Rivos is going to work on the RISC-V port.
-> I'd like to target RISC-V first, since it has significantly lower risk
-> and complexity than e.g. ARM (which has pKVM, stage-1 walkers, and
-> [soon] nested virtualization to deal with).
+This series introduces a common API for performing range-based TLB
+invalidation. This is then used to supplant
+kvm_arch_flush_remote_tlbs_memslot() and pave the way for two other
+patch series:
 
-And (joy, happiness), the upcoming 128bit page table support[1].
+1. https://lore.kernel.org/kvm/20230109215347.3119271-1-rananta@google.com/
 
-	M.
+  Adds ARM support for range-based TLB invalidation and needs a
+  mechanism to invoke it from common code. This series provides such a
+  mechanism via kvm_arch_flush_remote_tlbs_range().
 
-[1] https://developer.arm.com/documentation/ddi0601/2022-12/AArch64-Registers/TTBR0-EL1--Translation-Table-Base-Register-0--EL1-?lang=en
+2. https://lore.kernel.org/kvm/20221208193857.4090582-1-dmatlack@google.com/
 
+  Refactors the TDP MMU into common code, which requires an API for
+  range-based TLB invaliation.
+
+This series is based on patches 29-33 from (2.), but I made some further
+cleanups after looking at it a second time.
+
+Tested on x86_64 and ARM64 using KVM selftests.
+
+Cc: Raghavendra Rao Ananta <rananta@google.com>
+
+David Matlack (7):
+  KVM: Rename kvm_arch_flush_remote_tlb() to
+    kvm_arch_flush_remote_tlbs()
+  KVM: arm64: Use kvm_arch_flush_remote_tlbs()
+  KVM: x86/mmu: Collapse kvm_flush_remote_tlbs_with_{range,address}()
+    together
+  KVM: x86/mmu: Rename kvm_flush_remote_tlbs_with_address()
+  KVM: x86/MMU: Use gfn_t in kvm_flush_remote_tlbs_range()
+  KVM: Allow range-based TLB invalidation from common code
+  KVM: Move kvm_arch_flush_remote_tlbs_memslot() to common code
+
+ arch/arm64/include/asm/kvm_host.h |  3 ++
+ arch/arm64/kvm/Kconfig            |  1 -
+ arch/arm64/kvm/arm.c              |  6 ---
+ arch/arm64/kvm/mmu.c              |  6 +--
+ arch/mips/include/asm/kvm_host.h  |  4 +-
+ arch/mips/kvm/mips.c              | 12 ++----
+ arch/riscv/kvm/mmu.c              |  6 ---
+ arch/x86/include/asm/kvm_host.h   |  7 +++-
+ arch/x86/kvm/mmu/mmu.c            | 68 ++++++++++---------------------
+ arch/x86/kvm/mmu/mmu_internal.h   |  2 -
+ arch/x86/kvm/mmu/paging_tmpl.h    |  4 +-
+ arch/x86/kvm/mmu/tdp_mmu.c        |  7 ++--
+ arch/x86/kvm/x86.c                |  2 +-
+ include/linux/kvm_host.h          | 20 ++++++---
+ virt/kvm/kvm_main.c               | 35 +++++++++++++---
+ 15 files changed, 87 insertions(+), 96 deletions(-)
+
+
+base-commit: de60733246ff4545a0483140c1f21426b8d7cb7f
+prerequisite-patch-id: 42a76ce7cec240776c21f674e99e893a3a6bee58
+prerequisite-patch-id: c5ef6bbef252706b7e65b76dc9bd92cf320828f5
+prerequisite-patch-id: c6e662cb6c369a47a027c25d3ccc7138a19b17f5
+prerequisite-patch-id: 15a58bec64bf1537e6c9e2f52179fac652d441f7
+prerequisite-patch-id: d5b6fea4724f4f2c3408b95d7ce5acdd4b528b10
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.0.246.g2a6d74b583-goog
+
