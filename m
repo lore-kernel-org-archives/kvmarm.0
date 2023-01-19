@@ -1,87 +1,113 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19352A93E
-	for <kvmarm@lists.linux.dev>; Thu, 19 Jan 2023 17:24:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1674149045;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7ZLCun6ndTUYHIhway+dCjRST8plu+DLSlmudJ+9iGA=;
-	b=CehysE+TUacqwSdjT82SO7EuPi9Xnh72N3GAGX2k/RNneWP02MHvdGKgi5uXk6qnIvapol
-	aIUa2hYdrCIPZPsmYMspX6gJr6cM4LOB8+wUIBdBiGyFeylOs0AelfTEEjd44GSA6i9QaW
-	feAMvzDuLRTjMlesbCl7mgDrUSmAN+c=
-Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
- [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-377-rhyelC-QMCGal3sM4viNOQ-1; Thu, 19 Jan 2023 12:24:02 -0500
-X-MC-Unique: rhyelC-QMCGal3sM4viNOQ-1
-Received: by mail-ua1-f72.google.com with SMTP id y10-20020ab0560a000000b003af33bfa8c4so736547uaa.21
-        for <kvmarm@lists.linux.dev>; Thu, 19 Jan 2023 09:24:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7ZLCun6ndTUYHIhway+dCjRST8plu+DLSlmudJ+9iGA=;
-        b=vvQAbvKsfvDRa7tuYgXgW8zfIxqUmpx2OsJXR2t0WTcvr5JyF5txmvsCWSwsqM3FsZ
-         b+R1z90fIKVEjoxPG8rIDfK78yLl2s6XN272TL/8rWGjFgD5pdCnMOk4gkQp3+DAsDCO
-         tGBfmRfZlwl5PGca/uG1f/sPMIHOxSLV4QxtpudGZvgCJ5XvyAYeDAmAcGI8wP7vQLG+
-         5n5mIycHCao7rIP9mVNyFyJ57ztGkIBkefVmh+3TQqWmtJ0TO5Z842ghGr3y/s6AHyXE
-         izq+iLjkwFM3mjRBETM9mZdTWvuti7lDYJn7lFKYHLyOBBECaDFh2UcQbZQDAlMy96K4
-         yegg==
-X-Gm-Message-State: AFqh2koryd7U8FyXfKCCGW1wpump/jTrS4+Q91UN34IW0QJc4EgzsMsZ
-	Bpa9MaeL/951kTQlbHjuFOjnXcQ9JtBnxZbJggg97XrM+ePR56+5Ka1OyLRqC0nm/Ud5SkbTvDj
-	m1sCeFCOpJQDomLjg5Gn89qCg5lgK0LDR
-X-Received: by 2002:a05:6102:3d14:b0:3b5:2762:568b with SMTP id i20-20020a0561023d1400b003b52762568bmr1578192vsv.62.1674149041479;
-        Thu, 19 Jan 2023 09:24:01 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXtKcbEgINpJzFLAqIx7zgVheHf3U2vYRZ/ijgft8zgf2upp0swiwUYbMZZIryC08LRzFEnE4XMqgG5fhaMKrn4=
-X-Received: by 2002:a05:6102:3d14:b0:3b5:2762:568b with SMTP id
- i20-20020a0561023d1400b003b52762568bmr1578157vsv.62.1674149041226; Thu, 19
- Jan 2023 09:24:01 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1C1A93E
+	for <kvmarm@lists.linux.dev>; Thu, 19 Jan 2023 17:24:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0EE7C433EF;
+	Thu, 19 Jan 2023 17:24:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1674149068;
+	bh=esmAuiMb4cE5hZfqa2pdZ4JKU4zWFBBvjoAoXwc+zAk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FItgwmM67QScUUENZ8Zwtagr5mIdG5cEHxPFfSNuC1jM6dBrsQGhnCtdKL1v4Yf0w
+	 dW3PN2nS8nWYwK6BvAjRYCRs1jNPqcxP6UwIOvTzzQ9T/wZ6VcEzgDHqur2z3W0vff
+	 Q1U6HgQ7VMeTq9MX32okWCpOlh8xJ8QfczraVmhyB125dZQ7bsUFjHD48Lr2RB1Xwn
+	 dCD05u76MAQiAcbWsup1KSQa2MZ/UMnuWZVUxW8VbUZw7v99qBSmYLqsbt+GBlaRNB
+	 uIlEinXfjpAehqjV461mc7XifGdWsWw6VTkhkWgCHrf79SoBq2+sYdBD1CdMnGEwy+
+	 8vQzGzULTP5uQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pIYeI-003A4j-5l;
+	Thu, 19 Jan 2023 17:24:26 +0000
+Date: Thu, 19 Jan 2023 17:24:25 +0000
+Message-ID: <86tu0mmo8m.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Matlack <dmatlack@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Sean Christopherson <seanjc@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Nadav Amit <namit@vmware.com>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Peter Xu <peterx@redhat.com>,
+	xu xin <cgel.zte@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Yu Zhao <yuzhao@google.com>,
+	Colin Cross <ccross@google.com>,
+	Hugh Dickins <hughd@google.com>,
+	Ben Gardon <bgardon@google.com>,
+	Mingwei Zhang <mizhang@google.com>,
+	Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	linux-mips@vger.kernel.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	Alexandre Ghiti <alexghiti@rivosinc.com>,
+	Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [RFC PATCH 00/37] KVM: Refactor the KVM/x86 TDP MMU into common code
+In-Reply-To: <Y8l6egh2wWN7BUlZ@google.com>
+References: <20221208193857.4090582-1-dmatlack@google.com>
+	<Y8l6egh2wWN7BUlZ@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20221208193857.4090582-1-dmatlack@google.com> <Y8l6egh2wWN7BUlZ@google.com>
-In-Reply-To: <Y8l6egh2wWN7BUlZ@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 19 Jan 2023 18:23:49 +0100
-Message-ID: <CABgObfaTEZ1_SaQ9ThbeMe8gX2y35ZGTFzgb9K9yZwz8dbOYdQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/37] KVM: Refactor the KVM/x86 TDP MMU into common code
-To: David Matlack <dmatlack@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>, 
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Sean Christopherson <seanjc@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Anshuman Khandual <anshuman.khandual@arm.com>, Nadav Amit <namit@vmware.com>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Vlastimil Babka <vbabka@suse.cz>, 
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>, Suren Baghdasaryan <surenb@google.com>, 
-	Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Yu Zhao <yuzhao@google.com>, Colin Cross <ccross@google.com>, Hugh Dickins <hughd@google.com>, 
-	Ben Gardon <bgardon@google.com>, Mingwei Zhang <mizhang@google.com>, 
-	Krish Sadhukhan <krish.sadhukhan@oracle.com>, Ricardo Koller <ricarkol@google.com>, 
-	Jing Zhang <jingzhangos@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
-	linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	Alexandre Ghiti <alexghiti@rivosinc.com>, Raghavendra Rao Ananta <rananta@google.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dmatlack@google.com, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, akpm@linux-foundation.org, anshuman.khandual@arm.com, namit@vmware.com, willy@infradead.org, vbabka@suse.cz, Liam.Howlett@oracle.com, surenb@google.com, peterx@redhat.com, cgel.zte@gmail.com, arnd@arndb.de, yuzhao@google.com, ccross@google.com, hughd@google.com, bgardon@google.com, mizhang@google.com, krish.sadhukhan@oracle.com, ricarkol@google.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, alexghiti@rivosinc.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Jan 19, 2023 at 6:14 PM David Matlack <dmatlack@google.com> wrote:
-> Paolo and Sean, what are your thoughts on merging the Common MMU
-> refactor without RISC-V support?
+On Thu, 19 Jan 2023 17:14:34 +0000,
+David Matlack <dmatlack@google.com> wrote:
+> 
+> On Thu, Dec 08, 2022 at 11:38:20AM -0800, David Matlack wrote:
+> > 
+> > Hello,
+> > 
+> > This series refactors the KVM/x86 "TDP MMU" into common code. This is
+> > the first step toward sharing TDP (aka Stage-2) page table management
+> > code across architectures that support KVM.
+> 
+> Thank you everyone for the feedback on this RFC. I have a couple of
+> updates to share and a question at the end.
+> 
+> First, Alexandre Ghiti from Rivos is going to work on the RISC-V port.
+> I'd like to target RISC-V first, since it has significantly lower risk
+> and complexity than e.g. ARM (which has pKVM, stage-1 walkers, and
+> [soon] nested virtualization to deal with).
 
-I have no objection. We know what the long-term plan is, and it's not
-so long-term anyway.
+And (joy, happiness), the upcoming 128bit page table support[1].
 
-Paolo
+	M.
 
+[1] https://developer.arm.com/documentation/ddi0601/2022-12/AArch64-Registers/TTBR0-EL1--Translation-Table-Base-Register-0--EL1-?lang=en
+
+-- 
+Without deviation from the norm, progress is not possible.
