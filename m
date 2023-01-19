@@ -1,192 +1,184 @@
-Received: from out-106.mta0.migadu.com (out-106.mta0.migadu.com [91.218.175.106])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB878BF4
-	for <kvmarm@lists.linux.dev>; Wed, 18 Jan 2023 20:50:51 +0000 (UTC)
-Date: Wed, 18 Jan 2023 19:48:21 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1674067703;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD4815A3
+	for <kvmarm@lists.linux.dev>; Thu, 19 Jan 2023 01:11:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1674090718;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wrnMfvqHg1QKur3G2dv42qbg74ikci7ZEQclhCr2Z6M=;
-	b=XY4gnXtDPXlp6arUKF5WJcNTOBmT9KAu02hUUy1/GNl63kkHbRLIvIqcw9j//TEqXcAtrI
-	ZZ6pav2iHIlPkOv29Nhp6uW/bKjVaqb5AHBzNeqpUgn7jYUUY1gBzZlOtmhM8eG/ChHhrb
-	JOWTdxsWza9Zcg6oCd0OG5u3SI2yB2E=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [kvm-unit-tests PATCH v4 2/2] arm/psci: Add PSCI CPU_OFF test
- case
-Message-ID: <20230118184821.frpeemjwt4ey6m7v@orel>
-References: <20230118144912.32049-1-alexandru.elisei@arm.com>
- <20230118144912.32049-3-alexandru.elisei@arm.com>
+	bh=1s/focwXYH9ypammfY4jmkagsBW5DWFSgWPXj6TkN40=;
+	b=TbJbZPtwY/NaTDB/sWLYzPV9HSa9s2e+g6/P5TjTg5ySsp27b/PktzcQ4n26Yc3O4pfmzN
+	IglCTJIRyBGszt0pv8vSnrMl87W2eqLqXtmnoTgQl3fV5xev6h2DGE6TjTQ7rlxySqTxqA
+	Zm2B0ItAqXR7JPLVAL3IehxjmxXNhOI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-462-g-IkxgauOgGNQSydGKEIsg-1; Wed, 18 Jan 2023 20:11:56 -0500
+X-MC-Unique: g-IkxgauOgGNQSydGKEIsg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CECDD101A521;
+	Thu, 19 Jan 2023 01:11:55 +0000 (UTC)
+Received: from [10.64.54.98] (vpn2-54-98.bne.redhat.com [10.64.54.98])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E18D40C2064;
+	Thu, 19 Jan 2023 01:11:47 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH 1/4] KVM: arm64: Allow saving vgic3 LPI pending status in
+ no running vcpu context
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+ maz@kernel.org, corbet@lwn.net, james.morse@arm.com, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
+ ricarkol@google.com, eric.auger@redhat.com, yuzhe@nfschina.com,
+ renzhengeek@gmail.com, ardb@kernel.org, peterx@redhat.com,
+ seanjc@google.com, shan.gavin@gmail.com
+References: <20230116040405.260935-1-gshan@redhat.com>
+ <20230116040405.260935-2-gshan@redhat.com> <Y8cKQRIbpLWVcdcw@google.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <0626e135-5d6b-8d09-ccd1-068e42a052f6@redhat.com>
+Date: Thu, 19 Jan 2023 12:11:44 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230118144912.32049-3-alexandru.elisei@arm.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <Y8cKQRIbpLWVcdcw@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 
-On Wed, Jan 18, 2023 at 02:49:12PM +0000, Alexandru Elisei wrote:
-> From: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-> 
-> The test uses the following method.
-> 
-> The primary CPU brings up all the secondary CPUs, which are held in a wait
-> loop. Once the primary releases the CPUs, each of the secondary CPUs
-> proceed to issue PSCI_CPU_OFF. This is indicated by a cpumask and also the
-> status of the call is updated by the secondary CPU in cpu_off_done[].
-> 
-> The primary CPU waits for all the secondary CPUs to update the cpumask and
-> then proceeds to check for the status of the individual CPU CPU_OFF
-> request. There is a chance that some CPUs might fail at the CPU_OFF request
-> and come back and update the status once the primary CPU has finished the
-> scan. There is no fool proof method to handle this. As of now, we add a
-> 1sec delay between the cpumask check and the scan for the status.
-> 
-> Signed-off-by: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-> [ Alex E: Skip CPU_OFF test if CPU_ON failed ]
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arm/psci.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 66 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arm/psci.c b/arm/psci.c
-> index e96be941953b..d045616bfcd4 100644
-> --- a/arm/psci.c
-> +++ b/arm/psci.c
-> @@ -15,6 +15,8 @@
->  #include <asm/psci.h>
->  #include <asm/smp.h>
->  
-> +#define CPU_OFF_TEST_WAIT_TIME 1000
-> +
->  static bool invalid_function_exception;
->  
->  #ifdef __arm__
-> @@ -71,8 +73,10 @@ static bool psci_affinity_info_off(void)
->  }
->  
->  static int cpu_on_ret[NR_CPUS];
-> -static cpumask_t cpu_on_ready, cpu_on_done;
-> +static bool cpu_off_success[NR_CPUS];
-> +static cpumask_t cpu_on_ready, cpu_on_done, cpu_off_done;
->  static volatile int cpu_on_start;
-> +static volatile int cpu_off_start;
->  
->  extern void secondary_entry(void);
->  static void cpu_on_do_wake_target(void)
-> @@ -94,6 +98,20 @@ static void cpu_on_target(void)
->  	cpumask_set_cpu(cpu, &cpu_on_done);
->  }
->  
-> +static void cpu_off_secondary_entry(void *data)
-> +{
-> +	int cpu = smp_processor_id();
-> +
-> +	while (!cpu_off_start)
-> +		cpu_relax();
-> +	/* On to the CPU off test */
-> +	cpu_off_success[cpu] = true;
-> +	cpumask_set_cpu(cpu, &cpu_off_done);
-> +	cpu_psci_cpu_die();
-> +	/* The CPU shouldn't execute the next steps. */
-> +	cpu_off_success[cpu] = false;
-> +}
-> +
->  static bool psci_cpu_on_test(void)
->  {
->  	bool failed = false;
-> @@ -162,9 +180,45 @@ out:
->  	return !failed;
->  }
->  
-> -int main(void)
-> +static bool psci_cpu_off_test(void)
-> +{
-> +	bool failed = false;
-> +	int cpu;
-> +
-> +	for_each_present_cpu(cpu) {
-> +		if (cpu == 0)
-> +			continue;
-> +		on_cpu_async(cpu, cpu_off_secondary_entry, NULL);
-> +	}
-> +
-> +	cpumask_set_cpu(0, &cpu_off_done);
+Hi Oliver,
 
-Since we're setting cpu_off_done for cpu0, then we could also set
-cpu_off_success[0] = true and not have to skip it in the check loop
-below.
-
-> +
-> +	report_info("starting CPU_OFF test...");
-> +
-> +	cpu_off_start = 1;
-> +	while (!cpumask_full(&cpu_off_done))
-> +		cpu_relax();
-> +
-> +	/* Allow all the other CPUs to complete the operation */
-> +	mdelay(CPU_OFF_TEST_WAIT_TIME);
-
-Don't really need the define, just the numbers work for stuff
-like this, but OK.
-
-> +
-> +	for_each_present_cpu(cpu) {
-> +		if (cpu == 0)
-> +			continue;
-> +
-> +		if (!cpu_off_success[cpu]) {
-> +			report_info("CPU%d could not be turned off", cpu);
-> +			failed = true;
-> +		}
-> +	}
-> +
-> +	return !failed;
-> +}
-> +
-> +int main(int argc, char **argv)
->  {
->  	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-> +	bool cpu_on_success = true;
->  
->  	report_prefix_push("psci");
->  
-> @@ -179,10 +233,17 @@ int main(void)
->  	report(psci_affinity_info_on(), "affinity-info-on");
->  	report(psci_affinity_info_off(), "affinity-info-off");
->  
-> -	if (ERRATA(6c7a5dce22b3))
-> -		report(psci_cpu_on_test(), "cpu-on");
-> -	else
-> +	if (ERRATA(6c7a5dce22b3)) {
-> +		cpu_on_success = psci_cpu_on_test();
-> +		report(cpu_on_success, "cpu-on");
-> +	} else {
->  		report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
-> +	}
-> +
-> +	if (!cpu_on_success)
-> +		report_skip("Skipping cpu-off test because the cpu-on test failed");
-> +	else
-> +		report(psci_cpu_off_test(), "cpu-off");
->  
->  done:
->  #if 0
-> -- 
-> 2.25.1
+On 1/18/23 7:51 AM, Oliver Upton wrote:
+> On Mon, Jan 16, 2023 at 12:04:02PM +0800, Gavin Shan wrote:
+>> When dirty ring is enabled, the dirty page information is pushed to
+>> the dirty ring if there is a running VCPU context. Otherwise, the
+>> dirty page information is still tracked by the backup dirty bitmap.
+>> In order to detect if there is a running VCPU context when a guest
+>> page becomes dirty, kvm_arch_allow_write_without_running_vcpu() was
+>> introduced to warn when no running VCPU context exists on unknown
+>> cases.
+>>
+>> Other than the site of saving ITS tables, it's possible to save vgic3
+>> LPI pending status in no running vcpu context because it can happen when
+>> ITS ITE is restored through the command KVM_DEV_ARM_ITS_RESTORE_TABLES
+>> on 'kvm-arm-vgic-its' device.
+>>
+>> Fix it by allowing to save vgic3 LPI pending status in no running
+>> vcpu context.
+>>
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>>   Documentation/virt/kvm/api.rst | 5 +++--
+>>   arch/arm64/kvm/vgic/vgic-its.c | 3 ++-
+>>   arch/arm64/kvm/vgic/vgic-v3.c  | 3 +++
+>>   include/kvm/arm_vgic.h         | 1 +
+>>   4 files changed, 9 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>> index 9807b05a1b57..18b245a0ba02 100644
+>> --- a/Documentation/virt/kvm/api.rst
+>> +++ b/Documentation/virt/kvm/api.rst
+>> @@ -8071,8 +8071,9 @@ state is final and avoid missing dirty pages from another ioctl ordered
+>>   after the bitmap collection.
+>>   
+>>   NOTE: One example of using the backup bitmap is saving arm64 vgic/its
+>> -tables through KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} command on
+>> -KVM device "kvm-arm-vgic-its" when dirty ring is enabled.
+>> +tables and vgic3 LPI pending status through KVM_DEV_ARM_{VGIC_GRP_CTRL,
+>> +ITS_SAVE_TABLES} and KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_RESTORE_TABLES}
+>> +command on KVM device "kvm-arm-vgic-its" when dirty ring is enabled.
+>>   
+>>   8.30 KVM_CAP_XEN_HVM
+>>   --------------------
+>> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+>> index 94a666dd1443..119a9c7a0a52 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-its.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+>> @@ -2792,7 +2792,8 @@ bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
+>>   {
+>>   	struct vgic_dist *dist = &kvm->arch.vgic;
+>>   
+>> -	return dist->save_its_tables_in_progress;
+>> +	return dist->save_vgic_v3_tables_in_progress ||
+>> +	       dist->save_its_tables_in_progress;
+> 
+> I'd much prefer using a single bool to keep track of this, i.e:
 > 
 
-Besides the nits,
+Yes, it's clean to have 'dist->save_tables_in_progress' for all
+3 cases. One more concern like below.
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+> 	return dist->save_tables_in_progress;
+> 
+>>   }
+>>   
+>>   static int vgic_its_set_attr(struct kvm_device *dev,
+>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+>> index 2074521d4a8c..32998c8587a8 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+>> @@ -304,6 +304,7 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+>>   int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
+>>   {
+>>   	struct kvm_vcpu *vcpu;
+>> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>>   	int byte_offset, bit_nr;
+>>   	gpa_t pendbase, ptr;
+>>   	bool status;
+>> @@ -339,7 +340,9 @@ int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
+>>   	if (status) {
+>>   		/* clear consumed data */
+>>   		val &= ~(1 << bit_nr);
+>> +		dist->save_vgic_v3_tables_in_progress = true;
+>>   		ret = kvm_write_guest_lock(kvm, ptr, &val, 1);
+>> +		dist->save_vgic_v3_tables_in_progress = false;
+> 
+> With the above suggestion of using a bool, this should become a helper
+> used at all the affected callsites:
+> 
+>    static int vgic_write_guest_lock(struct kvm *kvm, gpa_t gpa,
+>    				   const void *data, unsigned long len)
+>    {
+>    	struct vgic_dist *dist = &kvm->arch.vgic;
+> 	int ret;
+> 
+> 	dist->save_tables_in_progress = true;
+> 	ret = kvm_write_guest_lock(kvm, gpa, data, len);
+> 	dist->save_tables_in_progress = false;
+> 
+> 	return ret;
+>    }
+> 
+
+I will have vgic_write_guest_lock() in v2. Note that those 3 paths can't be
+running in parallel since one switch is shared by them. Alternatively, we
+extend struct vgic_dist::save_tables_in_progress from 'bool' to 'unsigned long'.
+Several bit is defined for each site as below. In this way, the 3 paths can be
+running in parallel:
+
+   unsigned long struct vgic_dist::save_tables_in_progress
+
+   #define VGIC_DIST_SAVE_ITS_ITE		0	/* ITS Translation Entry */
+   #define VGIC_DIST_SAVE_ITS_DTE		1	/* ITS Device Table Entry */
+   #define VGIC_DIST_SAVE_ITS_CTE		2	/* ITS Collection Table Entry */
+   #define VGIC_DIST_SAVE_ITS_CT			3	/* ITS Collection Table */
+   #define VGIC_DIST_SAVE_VGIC3_LPI		4	/* VGIC3 LPI Pending Status */
+   #define VGIC_DIST_SAVE_VGIC3_PENDING_TABLE	5	/* VGIC3 Pending Table */
+
+The drawback is the calls are limited to 64. If those 3 paths can't be running
+in parallel, we needn't the extension at all.
 
 Thanks,
-drew
+Gavin
+
