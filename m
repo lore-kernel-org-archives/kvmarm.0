@@ -1,102 +1,97 @@
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32600B43E;
-	Thu, 19 Jan 2023 19:46:23 +0000 (UTC)
-Date: Thu, 19 Jan 2023 19:46:16 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1674157581;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA61C2F29
+	for <kvmarm@lists.linux.dev>; Thu, 19 Jan 2023 23:05:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1674169506;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ny5pbFcUDicEKi2kQlKMNoopMQxdvl4TAC0NXH0FWZc=;
-	b=lQclnKO49SxNR+ip+srDOZF4ojQRaxsKsDP61gap4s4i2v1bZmFg0XsAF39r6FsaTjUS3V
-	V6lZh7A2hzM1Jefk9R1hMMoYohp4/1i8UM7GYMSopzrNUMbfTn5BqZ8vkBY4ajH8SrOu8l
-	7N7ix/3EhvbqAfTJqoe1qdMbq6iKJKE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	James Morse <james.morse@arm.com>, Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>, asahi@lists.linux.dev,
-	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-	Sven Peter <sven@svenpeter.dev>, Hector Martin <marcan@marcan.st>
-Subject: Re: [PATCH v7 7/7] KVM: arm64: Normalize cache configuration
-Message-ID: <Y8meCFkrVXurXlTk@google.com>
-References: <20230112023852.42012-1-akihiko.odaki@daynix.com>
- <20230112023852.42012-8-akihiko.odaki@daynix.com>
+	bh=zOEJRVUCnaSTu3apvVVhayxrqQN65NFZYiVFw16tleY=;
+	b=Gcv4vxYN5rHb0/LhARRi8OAml4chv1vYrXSTh2PlxyMnQ9gkRRe0iGeP6e3JTuzs4RIJPo
+	f1OMSu1PoX6Gh7/9aCrHCziX4I/0pXQpKSz/POmv9Zw5TAfpFWrnbtrtTQlI9kt8H1467D
+	Cevlly6YFgwopjk6LFxKE9ik9pEhk7c=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-507-QQjCKQRFPT6Xs2gyRAdLDA-1; Thu, 19 Jan 2023 18:05:01 -0500
+X-MC-Unique: QQjCKQRFPT6Xs2gyRAdLDA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 69B7D1C05154;
+	Thu, 19 Jan 2023 23:05:00 +0000 (UTC)
+Received: from [10.64.54.98] (vpn2-54-98.bne.redhat.com [10.64.54.98])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 33EED40C6EC4;
+	Thu, 19 Jan 2023 23:04:52 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH 1/4] KVM: arm64: Allow saving vgic3 LPI pending status in
+ no running vcpu context
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
+ james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ catalin.marinas@arm.com, will@kernel.org, ricarkol@google.com,
+ eric.auger@redhat.com, yuzhe@nfschina.com, renzhengeek@gmail.com,
+ ardb@kernel.org, peterx@redhat.com, seanjc@google.com, shan.gavin@gmail.com
+References: <20230116040405.260935-1-gshan@redhat.com>
+ <20230116040405.260935-2-gshan@redhat.com> <Y8cKQRIbpLWVcdcw@google.com>
+ <0626e135-5d6b-8d09-ccd1-068e42a052f6@redhat.com>
+ <86v8l2msqk.wl-maz@kernel.org>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <685ae61a-951f-e611-7491-948f19f1827e@redhat.com>
+Date: Fri, 20 Jan 2023 10:04:50 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230112023852.42012-8-akihiko.odaki@daynix.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <86v8l2msqk.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 
-Hi Akihiko,
+Hi Marc,
 
-On Thu, Jan 12, 2023 at 11:38:52AM +0900, Akihiko Odaki wrote:
-> Before this change, the cache configuration of the physical CPU was
-> exposed to vcpus. This is problematic because the cache configuration a
-> vcpu sees varies when it migrates between vcpus with different cache
-> configurations.
+On 1/20/23 2:47 AM, Marc Zyngier wrote:
+> On Thu, 19 Jan 2023 01:11:44 +0000,
+> Gavin Shan <gshan@redhat.com> wrote:
+>>
+>> I will have vgic_write_guest_lock() in v2. Note that those 3 paths can't be
+>> running in parallel since one switch is shared by them. Alternatively, we
+>> extend struct vgic_dist::save_tables_in_progress from 'bool' to 'unsigned long'.
+>> Several bit is defined for each site as below. In this way, the 3 paths can be
+>> running in parallel:
+>>
+>>    unsigned long struct vgic_dist::save_tables_in_progress
+>>
+>>    #define VGIC_DIST_SAVE_ITS_ITE		0	/* ITS Translation Entry */
+>>    #define VGIC_DIST_SAVE_ITS_DTE		1	/* ITS Device Table Entry */
+>>    #define VGIC_DIST_SAVE_ITS_CTE		2	/* ITS Collection Table Entry */
+>>    #define VGIC_DIST_SAVE_ITS_CT			3	/* ITS Collection Table */
+>>    #define VGIC_DIST_SAVE_VGIC3_LPI		4	/* VGIC3 LPI Pending Status */
+>>    #define VGIC_DIST_SAVE_VGIC3_PENDING_TABLE	5	/* VGIC3 Pending Table */
+>>
+>> The drawback is the calls are limited to 64. If those 3 paths can't be running
+>> in parallel, we needn't the extension at all.
 > 
-> Fabricate cache configuration from the sanitized value, which holds the
-> CTR_EL0 value the userspace sees regardless of which physical CPU it
-> resides on.
+> It should all be completely sequential. KVM_DEV_ARM_ITS_SAVE_TABLES
+> runs in a context where everything is locked, and so is
+> VGIC_DIST_SAVE_VGIC3_PENDING_TABLE.
 > 
-> CLIDR_EL1 and CCSIDR_EL1 are now writable from the userspace so that
-> the VMM can restore the values saved with the old kernel.
-> 
-> Suggested-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 
-I needed to squash in the patch below to get all of this working.
-Writing back the value read for a given cache level was failing, which I
-caught with the get-reg-list selftest.
+Thanks for your confirm. Yeah, it's sequential because 'kvm->lock' is
+hold on KVM_DEV_ARM_ITS_SAVE_TABLES and VGIC_DIST_SAVE_VGIC3_PENDING_TABLE.
+So all good to have one shared switch. v2 will be posted pretty soon.
 
-Pushed the result here if you want to have a look:
-
-  https://github.com/oupton/linux/tree/kvm-arm64/virtual-cache-geometry
-
---
 Thanks,
-Oliver
+Gavin
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 459e6d358dab..b6228f7d1d8d 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -148,17 +148,19 @@ static u32 get_ccsidr(struct kvm_vcpu *vcpu, u32 csselr)
- 
- static int set_ccsidr(struct kvm_vcpu *vcpu, u32 csselr, u32 val)
- {
--	u8 line_size = FIELD_GET(CCSIDR_EL1_LineSize, val);
-+	u8 line_size = SYS_FIELD_GET(CCSIDR_EL1, LineSize, val);
-+	u32 cur = get_ccsidr(vcpu, csselr);
-+	u8 min_line_size = SYS_FIELD_GET(CCSIDR_EL1, LineSize, cur);
- 	u32 *ccsidr = vcpu->arch.ccsidr;
- 	u32 i;
- 
--	if ((val & CCSIDR_EL1_RES0) || line_size < get_min_cache_line_size(csselr))
-+	if (cur == val)
-+		return 0;
-+
-+	if ((val & CCSIDR_EL1_RES0) || line_size < min_line_size)
- 		return -EINVAL;
- 
- 	if (!ccsidr) {
--		if (val == get_ccsidr(vcpu, csselr))
--			return 0;
--
- 		ccsidr = kmalloc_array(CSSELR_MAX, sizeof(u32), GFP_KERNEL);
- 		if (!ccsidr)
- 			return -ENOMEM;
