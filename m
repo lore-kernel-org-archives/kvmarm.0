@@ -1,50 +1,50 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA61C2F29
-	for <kvmarm@lists.linux.dev>; Thu, 19 Jan 2023 23:05:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3651A2F29
+	for <kvmarm@lists.linux.dev>; Thu, 19 Jan 2023 23:07:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1674169506;
+	s=mimecast20190719; t=1674169626;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zOEJRVUCnaSTu3apvVVhayxrqQN65NFZYiVFw16tleY=;
-	b=Gcv4vxYN5rHb0/LhARRi8OAml4chv1vYrXSTh2PlxyMnQ9gkRRe0iGeP6e3JTuzs4RIJPo
-	f1OMSu1PoX6Gh7/9aCrHCziX4I/0pXQpKSz/POmv9Zw5TAfpFWrnbtrtTQlI9kt8H1467D
-	Cevlly6YFgwopjk6LFxKE9ik9pEhk7c=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=OzQ8d1jXdJYzLh2FRotyWLcD3ZyAJ/HLipvCJpGF0Y8=;
+	b=DXVjiBH5wW6LtC47B8WmWwfda1rz3EUkEDrF2W6aVdTjf9+7jr+o9Qxu52piB9H8SsPukk
+	UOa4vQJhmNqscg6fJZjWd3jpDWJtYNilhDDPOCYGabAkuGLI+JWv1YrhdnjQgE0EcaTMjV
+	gjFe/S2Zyzmb/7Urd/LaO20ycs5XIUw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-507-QQjCKQRFPT6Xs2gyRAdLDA-1; Thu, 19 Jan 2023 18:05:01 -0500
-X-MC-Unique: QQjCKQRFPT6Xs2gyRAdLDA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-126-UKGCTogHM4yg4Ko8tyN4xQ-1; Thu, 19 Jan 2023 18:07:02 -0500
+X-MC-Unique: UKGCTogHM4yg4Ko8tyN4xQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 69B7D1C05154;
-	Thu, 19 Jan 2023 23:05:00 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 75A75830F4F;
+	Thu, 19 Jan 2023 23:07:01 +0000 (UTC)
 Received: from [10.64.54.98] (vpn2-54-98.bne.redhat.com [10.64.54.98])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 33EED40C6EC4;
-	Thu, 19 Jan 2023 23:04:52 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C1CB12166B2A;
+	Thu, 19 Jan 2023 23:06:54 +0000 (UTC)
 Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 1/4] KVM: arm64: Allow saving vgic3 LPI pending status in
- no running vcpu context
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
- james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- catalin.marinas@arm.com, will@kernel.org, ricarkol@google.com,
- eric.auger@redhat.com, yuzhe@nfschina.com, renzhengeek@gmail.com,
- ardb@kernel.org, peterx@redhat.com, seanjc@google.com, shan.gavin@gmail.com
+Subject: Re: [PATCH 4/4] KVM: Improve warning report in
+ mark_page_dirty_in_slot()
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+ maz@kernel.org, corbet@lwn.net, james.morse@arm.com, suzuki.poulose@arm.com,
+ oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com,
+ will@kernel.org, ricarkol@google.com, eric.auger@redhat.com,
+ yuzhe@nfschina.com, renzhengeek@gmail.com, ardb@kernel.org,
+ peterx@redhat.com, shan.gavin@gmail.com
 References: <20230116040405.260935-1-gshan@redhat.com>
- <20230116040405.260935-2-gshan@redhat.com> <Y8cKQRIbpLWVcdcw@google.com>
- <0626e135-5d6b-8d09-ccd1-068e42a052f6@redhat.com>
- <86v8l2msqk.wl-maz@kernel.org>
+ <20230116040405.260935-5-gshan@redhat.com> <Y8bBzKF17IdZP9eF@google.com>
+ <d8e63ad9-e0e3-dbb1-b646-a1b5771d4c4b@redhat.com>
+ <Y8lfdgcjLvtgII2a@google.com>
 From: Gavin Shan <gshan@redhat.com>
-Message-ID: <685ae61a-951f-e611-7491-948f19f1827e@redhat.com>
-Date: Fri, 20 Jan 2023 10:04:50 +1100
+Message-ID: <4bc6857d-662c-cee4-01af-c441fb4ed623@redhat.com>
+Date: Fri, 20 Jan 2023 10:06:52 +1100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 Precedence: bulk
@@ -53,44 +53,55 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <86v8l2msqk.wl-maz@kernel.org>
+In-Reply-To: <Y8lfdgcjLvtgII2a@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 
-Hi Marc,
+Hi Sean,
 
-On 1/20/23 2:47 AM, Marc Zyngier wrote:
-> On Thu, 19 Jan 2023 01:11:44 +0000,
-> Gavin Shan <gshan@redhat.com> wrote:
+On 1/20/23 2:19 AM, Sean Christopherson wrote:
+> On Thu, Jan 19, 2023, Gavin Shan wrote:
+>> On 1/18/23 2:42 AM, Sean Christopherson wrote:
+>>> On Mon, Jan 16, 2023, Gavin Shan wrote:
+>>>> There are two warning reports about the dirty ring in the function.
+>>>> We have the wrong assumption that the dirty ring is always enabled when
+>>>> CONFIG_HAVE_KVM_DIRTY_RING is selected.
+>>>
+>>> No, it's not a wrong assumption, becuase it's not an assumption.  The intent is
+>>> to warn irrespective of dirty ring/log enabling.  The orignal code actually warned
+>>> irrespective of dirty ring support[1], again intentionally.  The
+>>> CONFIG_HAVE_KVM_DIRTY_RING check was added because s390 can mark pages dirty from
+>>> an worker thread[2] and s390 has no plans to support the dirty ring.
+>>>
+>>> The reason for warning even if dirty ring isn't enabled is so that bots can catch
+>>> potential KVM bugs without having to set up a dirty ring or enable dirty logging.
+>>>
+>>> [1] 2efd61a608b0 ("KVM: Warn if mark_page_dirty() is called without an active vCPU")
+>>> [2] e09fccb5435d ("KVM: avoid warning on s390 in mark_page_dirty")
+>>>
 >>
->> I will have vgic_write_guest_lock() in v2. Note that those 3 paths can't be
->> running in parallel since one switch is shared by them. Alternatively, we
->> extend struct vgic_dist::save_tables_in_progress from 'bool' to 'unsigned long'.
->> Several bit is defined for each site as below. In this way, the 3 paths can be
->> running in parallel:
+>> Thanks for the linker. I was confused when looking at the code, but now it's clear to
+>> me. Thanks for your explanation. How about to add a comment there?
 >>
->>    unsigned long struct vgic_dist::save_tables_in_progress
->>
->>    #define VGIC_DIST_SAVE_ITS_ITE		0	/* ITS Translation Entry */
->>    #define VGIC_DIST_SAVE_ITS_DTE		1	/* ITS Device Table Entry */
->>    #define VGIC_DIST_SAVE_ITS_CTE		2	/* ITS Collection Table Entry */
->>    #define VGIC_DIST_SAVE_ITS_CT			3	/* ITS Collection Table */
->>    #define VGIC_DIST_SAVE_VGIC3_LPI		4	/* VGIC3 LPI Pending Status */
->>    #define VGIC_DIST_SAVE_VGIC3_PENDING_TABLE	5	/* VGIC3 Pending Table */
->>
->> The drawback is the calls are limited to 64. If those 3 paths can't be running
->> in parallel, we needn't the extension at all.
+>>    /*
+>>     * The warning is expected when the dirty ring is configured,
+>>     * but not enabled.
+>>     */
 > 
-> It should all be completely sequential. KVM_DEV_ARM_ITS_SAVE_TABLES
-> runs in a context where everything is locked, and so is
-> VGIC_DIST_SAVE_VGIC3_PENDING_TABLE.
+> That's not correct either.  By design, the warning can also fire if the dirty ring
+> is enabled.  KVM's rule is that writes to guest memory always need to be done in
+> the context of a running vCPU, with the recently added exception of
+> kvm_arch_allow_write_without_running_vcpu().  That intent of the warning is to
+> enforce that rule regardless of the state of the VM.
+> 
+> Concretely, I think you can just drop patches 3 and 4, and just fix the arm64 issues.
 > 
 
-Thanks for your confirm. Yeah, it's sequential because 'kvm->lock' is
-hold on KVM_DEV_ARM_ITS_SAVE_TABLES and VGIC_DIST_SAVE_VGIC3_PENDING_TABLE.
-So all good to have one shared switch. v2 will be posted pretty soon.
+Right, the warning report is still expected when dirty ring is enabled. My attempt
+was to have comment for the confused case. Anyway, it's not a big deal. I will drop
+PATCH[3] and PATCH[4] in v2.
 
 Thanks,
 Gavin
