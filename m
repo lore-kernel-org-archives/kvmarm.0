@@ -1,420 +1,161 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53B1257E
-	for <kvmarm@lists.linux.dev>; Thu, 19 Jan 2023 05:58:56 +0000 (UTC)
-Received: by mail-pg1-f176.google.com with SMTP id 141so726039pgc.0
-        for <kvmarm@lists.linux.dev>; Wed, 18 Jan 2023 21:58:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=JbVMnqUlIZgwpFUhBO/Bav1hYnoypeCQfNbPaXGsQX4=;
-        b=TB/tmy9tc8qQAyic8f7WOB0ZVtkf3j6lATCYF/kET4SuzhcBa2wF2cysSHGuhlZQjs
-         fOifCbhFeRdQpiG2HSPZbklTtG3+Rf4q60EKRIOcqlbKRlm6EKTGnjH91OZniECo+UlR
-         6rjjRkC+gy81qTA4aVUjCj0lNnJWGGq9KKaSIlN2OIbHjlzl2H9qUnglFsZP4EPUZxKS
-         rsgi3ERLGGKalCiPP1JA7pwim3LcMSPEDsHvP2HziBcR/OVSAKqo8O/LQpSRZqgGighH
-         Jv4t/51iZJ2lrYZugVNU4U0N8x7yg8eEyiL4ZIse0GVCKaMBqn0eIVTa3L6gH9PXAmkw
-         PuwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JbVMnqUlIZgwpFUhBO/Bav1hYnoypeCQfNbPaXGsQX4=;
-        b=v9GKWWgtA1nuve7q2b5qebujjVWYIegFsjH1ZZEZDkyCKLGyym0mGxZ6t6bdN5YwRu
-         gUytP4y+9FeA09ZptGacgjVacovyuVsB9VnOWf/NUx7Z59rEbfzADbwGQUQ1uED2PyoB
-         DC5CVVyTHmt9hqLt49aGtrCtQGMgczANTAMwqoCki9m2xayjeD6flQMpYmjtunBHx12I
-         piFFGf9gJnYmN0XA9jrZjIah3N1Y00qRhXQhP6qAajgc3QtuwpUBRJplpj9fJVvTLeVW
-         TY3sWum4ZnCyN17XMC34/mqrFcay4l6EgeEAZROI+dhttMntqRJxpBAuCjhWAeglvbZ2
-         VHVA==
-X-Gm-Message-State: AFqh2kqNTQHtMYYI+oQj01tuuQ5z2APybR+M9XdXyzRcfSqKQPPCH4yv
-	61dD1OMQvpdB5qE9Y2rpvFBNNy0bFLIhzDNxbxLUNw==
-X-Google-Smtp-Source: AMrXdXutlwhX+7hle/4xEnH+H7o8kZXjptYKN2/7q+nDzqngyXgl5UmnwyN8prK5LlYj4IhRodyXhhXvzajHDNNRs7M=
-X-Received: by 2002:a05:6a00:9aa:b0:576:a748:8fa3 with SMTP id
- u42-20020a056a0009aa00b00576a7488fa3mr1000265pfg.37.1674107935747; Wed, 18
- Jan 2023 21:58:55 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346112905
+	for <kvmarm@lists.linux.dev>; Thu, 19 Jan 2023 07:12:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2A8FC433EF;
+	Thu, 19 Jan 2023 07:12:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1674112342;
+	bh=ppCaKUMocfObxQmoemgltocCkqn+mmzyJALotudKBys=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=L1Frc4CLCNnwEaRoKRcsZSHweWOGCOh8V2cEPqf5hfWfY2bA/5RRZTobxNeRPVVLE
+	 20vWPnnb/olFBOaBKpP6eF2DbJtE3zdBUY/jvOjsWluM9x4pM8S/RfvpMVU+QyUJP+
+	 S8ruxNw8ythX6P1zyg+2MM+StI8NqXJcXL55IVYD8XvW/8CStNH6RzIpkhBsrz0yNa
+	 IcRRyhbV12LkGFHova9iXVR0r6ZBMX68f1hlMSCHDjbs7iKweA6KGhcyeV+sV+GIis
+	 nCXo1iT6DTWdpbB6eTDHdT5nj8bc7XlNilmXxxsAqiP6kbjJIGzL4hotchmbkQ23Nt
+	 A6I9c7agvx5VA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pIP5w-0030D7-GT;
+	Thu, 19 Jan 2023 07:12:20 +0000
+Date: Thu, 19 Jan 2023 07:11:21 +0000
+Message-ID: <87bkmvdmna.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Shanker Donthineni <sdonthineni@nvidia.com>
+Cc: James Morse <james.morse@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Vikram Sethi <vsethi@nvidia.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: vgic: Fix soft lockup during VM teardown
+In-Reply-To: <28061ceb-a7ce-0aca-a97d-8227dcfe6800@nvidia.com>
+References: <20230118022348.4137094-1-sdonthineni@nvidia.com>
+	<863588njmt.wl-maz@kernel.org>
+	<28061ceb-a7ce-0aca-a97d-8227dcfe6800@nvidia.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230109211754.67144-1-ricarkol@google.com> <20230109211754.67144-4-ricarkol@google.com>
-In-Reply-To: <20230109211754.67144-4-ricarkol@google.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Wed, 18 Jan 2023 21:58:38 -0800
-Message-ID: <CAAeT=FxoS2-cmMe-3FeXPXcvE4wNosZeZy2RGPXz5xisq5fj7A@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v3 3/4] arm: pmu: Add tests for 64-bit overflows
-To: Ricardo Koller <ricarkol@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev, 
-	maz@kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com, 
-	oliver.upton@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sdonthineni@nvidia.com, james.morse@arm.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, vsethi@nvidia.com, yuzenghui@huawei.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, ardb@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Ricardo,
+[dropping the now dead old kvmarm list]
 
-On Mon, Jan 9, 2023 at 1:18 PM Ricardo Koller <ricarkol@google.com> wrote:
->
-> Modify all tests checking overflows to support both 32 (PMCR_EL0.LP == 0)
-> and 64-bit overflows (PMCR_EL0.LP == 1). 64-bit overflows are only
-> supported on PMUv3p5.
->
-> Note that chained tests do not implement "overflow_at_64bits == true".
-> That's because there are no CHAIN events when "PMCR_EL0.LP == 1" (for more
-> details see AArch64.IncrementEventCounter() pseudocode in the ARM ARM DDI
-> 0487H.a, J1.1.1 "aarch64/debug").
->
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+On Wed, 18 Jan 2023 19:24:01 +0000,
+Shanker Donthineni <sdonthineni@nvidia.com> wrote:
+> 
+> 
+> 
+> On 1/18/23 05:54, Marc Zyngier wrote:
+> > External email: Use caution opening links or attachments
+> > 
+> > 
+> > Shanker,
+> > 
+> > Please Cc all the KVM/arm64 reviewers when sending KVM/arm64 patches.
+> > 
+> > On Wed, 18 Jan 2023 02:23:48 +0000,
+> > Shanker Donthineni <sdonthineni@nvidia.com> wrote:
+> >> 
+> >> Getting intermittent CPU soft lockups during the virtual machines
+> >> teardown on a system with GICv4 features enabled. The function
+> >> __synchronize_hardirq() has been waiting for IRQD_IRQ_INPROGRESS
+> >> to be cleared forever as per the current implementation.
+> >> 
+> >> CPU stuck here for a long time leads to soft lockup:
+> >>    while (irqd_irq_inprogress(&desc->irq_data))
+> >>        cpu_relax();
+> > 
+> > Is it a soft-lockup from which the system recovers? or a livelock
+> > which leaves the system dead?
+> > 
+> The system is not recovering, did a power cycle to recover.
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+This isn't a soft-lockup then. This is at best a livelock.
 
-I have a few nits below.
+> > Are these two traces an indication of concurrent events? Or are they
+> > far apart?
+> > 
+> Concurrent.
 
-> ---
->  arm/pmu.c | 116 +++++++++++++++++++++++++++++++++++-------------------
->  1 file changed, 75 insertions(+), 41 deletions(-)
->
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 0d06b59..72d0f50 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -28,6 +28,7 @@
->  #define PMU_PMCR_X         (1 << 4)
->  #define PMU_PMCR_DP        (1 << 5)
->  #define PMU_PMCR_LC        (1 << 6)
-> +#define PMU_PMCR_LP        (1 << 7)
->  #define PMU_PMCR_N_SHIFT   11
->  #define PMU_PMCR_N_MASK    0x1f
->  #define PMU_PMCR_ID_SHIFT  16
-> @@ -56,9 +57,13 @@
->
->  #define ALL_SET                        0x00000000FFFFFFFFULL
+So you can see the VM being torn down while the vgic save sequence is
+still in progress?
 
-Nit: Perhaps renaming this to ALL_SET_32 might be more clear.
-Since the test is now aware of 64 bit counters, the name 'ALL_SET'
-makes me think that all 64 bits are set.
+If you can actually see that, then this is a much bigger bug than the
+simple race you are describing, and we're missing a reference on the
+kvm structure. This would be a *MAJOR* bug.
 
->  #define ALL_CLEAR              0x0000000000000000ULL
-> -#define PRE_OVERFLOW           0x00000000FFFFFFF0ULL
-> +#define PRE_OVERFLOW_32                0x00000000FFFFFFF0ULL
-> +#define PRE_OVERFLOW_64                0xFFFFFFFFFFFFFFF0ULL
->  #define PRE_OVERFLOW2          0x00000000FFFFFFDCULL
->
-> +#define PRE_OVERFLOW(__overflow_at_64bits)                             \
-> +       (__overflow_at_64bits ? PRE_OVERFLOW_64 : PRE_OVERFLOW_32)
-> +
->  #define PMU_PPI                        23
->
->  struct pmu {
-> @@ -449,8 +454,10 @@ static bool check_overflow_prerequisites(bool overflow_at_64bits)
->  static void test_basic_event_count(bool overflow_at_64bits)
->  {
->         uint32_t implemented_counter_mask, non_implemented_counter_mask;
-> -       uint32_t counter_mask;
-> +       uint64_t pre_overflow = PRE_OVERFLOW(overflow_at_64bits);
-> +       uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
->         uint32_t events[] = {CPU_CYCLES, INST_RETIRED};
-> +       uint32_t counter_mask;
->
->         if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
->             !check_overflow_prerequisites(overflow_at_64bits))
-> @@ -472,13 +479,13 @@ static void test_basic_event_count(bool overflow_at_64bits)
->          * clear cycle and all event counters and allow counter enablement
->          * through PMCNTENSET. LC is RES1.
->          */
-> -       set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
-> +       set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P | pmcr_lp);
->         isb();
-> -       report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC), "pmcr: reset counters");
-> +       report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC | pmcr_lp), "pmcr: reset counters");
->
->         /* Preset counter #0 to pre overflow value to trigger an overflow */
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -       report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW,
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
-> +       report(read_regn_el0(pmevcntr, 0) == pre_overflow,
->                 "counter #0 preset to pre-overflow value");
->         report(!read_regn_el0(pmevcntr, 1), "counter #1 is 0");
->
-> @@ -531,6 +538,8 @@ static void test_mem_access(bool overflow_at_64bits)
->  {
->         void *addr = malloc(PAGE_SIZE);
->         uint32_t events[] = {MEM_ACCESS, MEM_ACCESS};
-> +       uint64_t pre_overflow = PRE_OVERFLOW(overflow_at_64bits);
-> +       uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
->
->         if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
->             !check_overflow_prerequisites(overflow_at_64bits))
-> @@ -542,7 +551,7 @@ static void test_mem_access(bool overflow_at_64bits)
->         write_regn_el0(pmevtyper, 1, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
->         isb();
-> -       mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +       mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->         report_info("counter #0 is %ld (MEM_ACCESS)", read_regn_el0(pmevcntr, 0));
->         report_info("counter #1 is %ld (MEM_ACCESS)", read_regn_el0(pmevcntr, 1));
->         /* We may measure more than 20 mem access depending on the core */
-> @@ -552,11 +561,11 @@ static void test_mem_access(bool overflow_at_64bits)
->
->         pmu_reset();
->
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -       write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
-> +       write_regn_el0(pmevcntr, 1, pre_overflow);
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
->         isb();
-> -       mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +       mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->         report(read_sysreg(pmovsclr_el0) == 0x3,
->                "Ran 20 mem accesses with expected overflows on both counters");
->         report_info("cnt#0 = %ld cnt#1=%ld overflow=0x%lx",
-> @@ -566,8 +575,10 @@ static void test_mem_access(bool overflow_at_64bits)
->
->  static void test_sw_incr(bool overflow_at_64bits)
->  {
-> +       uint64_t pre_overflow = PRE_OVERFLOW(overflow_at_64bits);
-> +       uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
->         uint32_t events[] = {SW_INCR, SW_INCR};
-> -       uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
-> +       uint64_t cntr0 = (pre_overflow + 100) & pmevcntr_mask();
->         int i;
->
->         if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
-> @@ -581,7 +592,7 @@ static void test_sw_incr(bool overflow_at_64bits)
->         /* enable counters #0 and #1 */
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
->
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
->         isb();
->
->         for (i = 0; i < 100; i++)
-> @@ -589,14 +600,14 @@ static void test_sw_incr(bool overflow_at_64bits)
->
->         isb();
->         report_info("SW_INCR counter #0 has value %ld", read_regn_el0(pmevcntr, 0));
-> -       report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW,
-> +       report(read_regn_el0(pmevcntr, 0) == pre_overflow,
->                 "PWSYNC does not increment if PMCR.E is unset");
->
->         pmu_reset();
->
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
-> -       set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> +       set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->         isb();
->
->         for (i = 0; i < 100; i++)
-> @@ -614,6 +625,7 @@ static void test_sw_incr(bool overflow_at_64bits)
->  static void test_chained_counters(bool unused)
->  {
->         uint32_t events[] = {CPU_CYCLES, CHAIN};
-> +       uint64_t all_set = pmevcntr_mask();
->
->         if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
->                 return;
-> @@ -624,7 +636,7 @@ static void test_chained_counters(bool unused)
->         write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
->         /* enable counters #0 and #1 */
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->
->         precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
->
-> @@ -636,26 +648,26 @@ static void test_chained_counters(bool unused)
->         pmu_reset();
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
->
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->         write_regn_el0(pmevcntr, 1, 0x1);
->         precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
->         report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
->         report(read_regn_el0(pmevcntr, 1) == 2, "CHAIN counter #1 set to 2");
->         report(read_sysreg(pmovsclr_el0) == 0x1, "overflow recorded for chained incr #2");
->
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -       write_regn_el0(pmevcntr, 1, ALL_SET);
-> +       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
-> +       write_regn_el0(pmevcntr, 1, all_set);
->
->         precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
->         report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-> -       report(!read_regn_el0(pmevcntr, 1), "CHAIN counter #1 wrapped");
-> +       report(read_regn_el0(pmevcntr, 1) == 0, "CHAIN counter #1 wrapped");
->         report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
->  }
->
->  static void test_chained_sw_incr(bool unused)
->  {
->         uint32_t events[] = {SW_INCR, CHAIN};
-> -       uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
-> +       uint64_t cntr0 = (PRE_OVERFLOW_32 + 100) & pmevcntr_mask();
->         uint64_t cntr1 = (ALL_SET + 1) & pmevcntr_mask();
->         int i;
->
-> @@ -669,7 +681,7 @@ static void test_chained_sw_incr(bool unused)
->         /* enable counters #0 and #1 */
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
->
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->         set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
->         isb();
->
-> @@ -687,7 +699,7 @@ static void test_chained_sw_incr(bool unused)
->         pmu_reset();
->
->         write_regn_el0(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->         write_regn_el0(pmevcntr, 1, ALL_SET);
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
->         set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> @@ -726,7 +738,7 @@ static void test_chain_promotion(bool unused)
->
->         /* Only enable even counter */
->         pmu_reset();
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->         write_sysreg_s(0x1, PMCNTENSET_EL0);
->         isb();
->
-> @@ -856,6 +868,9 @@ static bool expect_interrupts(uint32_t bitmap)
->
->  static void test_overflow_interrupt(bool overflow_at_64bits)
->  {
-> +       uint64_t pre_overflow = PRE_OVERFLOW(overflow_at_64bits);
-> +       uint64_t all_set = pmevcntr_mask();
-> +       uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
->         uint32_t events[] = {MEM_ACCESS, SW_INCR};
->         void *addr = malloc(PAGE_SIZE);
->         int i;
-> @@ -874,16 +889,16 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->         write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
->         write_regn_el0(pmevtyper, 1, SW_INCR | PMEVTYPER_EXCLUDE_EL0);
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -       write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
-> +       write_regn_el0(pmevcntr, 1, pre_overflow);
->         isb();
->
->         /* interrupts are disabled (PMINTENSET_EL1 == 0) */
->
-> -       mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-> +       mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->         report(expect_interrupts(0), "no overflow interrupt after preset");
->
-> -       set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> +       set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->         isb();
->
->         for (i = 0; i < 100; i++)
-> @@ -898,12 +913,12 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->
->         pmu_reset_stats();
+Please post the full traces, not snippets. The absolutely full kernel
+log, the configuration, what you run, how you run it, *EVERYTHING*. I
+need to be able to reproduce this.
 
-This isn't directly related to the patch.
-But, as bits of pmovsclr_el0 are already set (although interrupts
-are disabled), I would think it's good to clear pmovsclr_el0 here.
+> 
+> >> 
+> >> irqreturn_t handle_irq_event(struct irq_desc *desc)
+> >> {
+> >>      irqd_set(&desc->irq_data, IRQD_IRQ_INPROGRESS);
+> >>      raw_spin_unlock(&desc->lock);
+> >> 
+> >>      ret = handle_irq_event_percpu(desc);
+> >> 
+> >>      raw_spin_lock(&desc->lock);
+> >>      irqd_clear(&desc->irq_data, IRQD_IRQ_INPROGRESS);
+> >> }
+> > 
+> > How is that relevant to this trace? Do you see this function running
+> > concurrently with the teardown? If it matters here, it must be a VPE
+> > doorbell, right? But you claim that this is on a GICv4 platform, while
+> > this would only affect GICv4.1... Or are you using GICv4.1?
+> > 
+> handle_irq_event() is running concurrently with irq_domain_activate_irq()
+> which happens before free_irq() called. Corruption at [78.983544] and
+> teardown started at [87.360891].
 
-Thank you,
-Reiji
+But that doesn't match the description you made of concurrent
+events. Does it take more than 9 seconds for the vgic state to be
+saved to memory?
 
+> 
+> [   78.983544] irqd_set_activated: lost IRQD_IRQ_INPROGRESS old=0x10401400, new=0x10441600
+> 
+> [   87.360891]  __synchronize_hardirq+0x48/0x140
+> 
+> Yes, I'm using GICv4.1, used these 2 functions to trace the issue.
 
+Then *please* be precise in your descriptions. You send people in the
+wrong direction.
 
->
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -       write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
-> +       write_regn_el0(pmevcntr, 1, pre_overflow);
->         write_sysreg(ALL_SET, pmintenset_el1);
->         isb();
->
-> -       mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-> +       mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->         for (i = 0; i < 100; i++)
->                 write_sysreg(0x3, pmswinc_el0);
->
-> @@ -912,25 +927,40 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->         report(expect_interrupts(0x3),
->                 "overflow interrupts expected on #0 and #1");
->
-> -       /* promote to 64-b */
-> +       /*
-> +        * promote to 64-b:
-> +        *
-> +        * This only applies to the !overflow_at_64bits case, as
-> +        * overflow_at_64bits doesn't implement CHAIN events. The
-> +        * overflow_at_64bits case just checks that chained counters are
-> +        * not incremented when PMCR.LP == 1.
-> +        */
->
->         pmu_reset_stats();
->
->         write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
->         isb();
-> -       mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-> -       report(expect_interrupts(0x1),
-> -               "expect overflow interrupt on 32b boundary");
-> +       mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> +       report(expect_interrupts(0x1), "expect overflow interrupt");
->
->         /* overflow on odd counter */
->         pmu_reset_stats();
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -       write_regn_el0(pmevcntr, 1, ALL_SET);
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
-> +       write_regn_el0(pmevcntr, 1, all_set);
->         isb();
-> -       mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E);
-> -       report(expect_interrupts(0x3),
-> -               "expect overflow interrupt on even and odd counter");
-> +       mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> +       if (overflow_at_64bits) {
-> +               report(expect_interrupts(0x1),
-> +                      "expect overflow interrupt on even counter");
-> +               report(read_regn_el0(pmevcntr, 1) == all_set,
-> +                      "Odd counter did not change");
-> +       } else {
-> +               report(expect_interrupts(0x3),
-> +                      "expect overflow interrupt on even and odd counter");
-> +               report(read_regn_el0(pmevcntr, 1) != all_set,
-> +                      "Odd counter wrapped");
-> +       }
->  }
->  #endif
->
-> @@ -1131,10 +1161,13 @@ int main(int argc, char *argv[])
->                 report_prefix_pop();
->         } else if (strcmp(argv[1], "pmu-basic-event-count") == 0) {
->                 run_test(argv[1], test_basic_event_count, false);
-> +               run_test(argv[1], test_basic_event_count, true);
->         } else if (strcmp(argv[1], "pmu-mem-access") == 0) {
->                 run_test(argv[1], test_mem_access, false);
-> +               run_test(argv[1], test_mem_access, true);
->         } else if (strcmp(argv[1], "pmu-sw-incr") == 0) {
->                 run_test(argv[1], test_sw_incr, false);
-> +               run_test(argv[1], test_sw_incr, true);
->         } else if (strcmp(argv[1], "pmu-chained-counters") == 0) {
->                 run_test(argv[1], test_chained_counters, false);
->         } else if (strcmp(argv[1], "pmu-chained-sw-incr") == 0) {
-> @@ -1143,6 +1176,7 @@ int main(int argc, char *argv[])
->                 run_test(argv[1], test_chain_promotion, false);
->         } else if (strcmp(argv[1], "pmu-overflow-interrupt") == 0) {
->                 run_test(argv[1], test_overflow_interrupt, false);
-> +               run_test(argv[1], test_overflow_interrupt, true);
->         } else {
->                 report_abort("Unknown sub-test '%s'", argv[1]);
->         }
-> --
-> 2.39.0.314.g84b9a713c41-goog
->
+[...]
+
+> I ran stress test launch/teardown multiple VMs for 3hrs. The issue
+> is not reproducible. The same test fails in 10-30min without code
+> changes.
+
+That doesn't add up with the earlier description of concurrent events,
+with the VM teardown and the vgic saving running in parallel. My patch
+doesn't prevent this.
+
+So either your testing is insufficient, or your description of
+concurrent events is inaccurate.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
