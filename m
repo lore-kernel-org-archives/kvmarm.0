@@ -1,278 +1,101 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D7E107A7
-	for <kvmarm@lists.linux.dev>; Thu, 19 Jan 2023 23:45:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1674171932;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D70119B
+	for <kvmarm@lists.linux.dev>; Fri, 20 Jan 2023 00:30:41 +0000 (UTC)
+Date: Fri, 20 Jan 2023 00:30:33 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1674174638;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tqz4YUxIF6mVdgsevg0bA/YI9z+lThvJUzjOoBDwe0o=;
-	b=dKZcKDYs9V1bpwg8qaAHD7bNeEnY6wFCu/xCyOboul0OyJvjEBxu6d9SZS4JgyBT4JJoMg
-	bvqw1ha/6aMgJaM/rfSA387pDSpPlowWocxn8mQvPvXPgMdGLiYKUA8+oSKv9xgm+6VxI6
-	URPr7TXPn9DdRzmQoAUxONE7lDsrFXw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-502-AYbP35NZNt-BE4ogkexjGg-1; Thu, 19 Jan 2023 18:45:03 -0500
-X-MC-Unique: AYbP35NZNt-BE4ogkexjGg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9A50B811E9C;
-	Thu, 19 Jan 2023 23:45:02 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-98.bne.redhat.com [10.64.54.98])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A86CD2166B2A;
-	Thu, 19 Jan 2023 23:44:55 +0000 (UTC)
-From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.linux.dev
-Cc: kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	pbonzini@redhat.com,
-	corbet@lwn.net,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	will@kernel.org,
-	gshan@redhat.com,
-	ricarkol@google.com,
-	eric.auger@redhat.com,
-	yuzhe@nfschina.com,
-	renzhengeek@gmail.com,
-	reijiw@google.com,
-	ardb@kernel.org,
-	Julia.Lawall@inria.fr,
-	yuzenghui@huawei.com,
-	seanjc@google.com,
-	shan.gavin@gmail.com
-Subject: [PATCH v2 1/3] KVM: arm64: Add helper vgic_write_guest_lock()
-Date: Fri, 20 Jan 2023 07:44:03 +0800
-Message-Id: <20230119234405.349644-2-gshan@redhat.com>
-In-Reply-To: <20230119234405.349644-1-gshan@redhat.com>
-References: <20230119234405.349644-1-gshan@redhat.com>
+	bh=W/vUFgjfb6X+FqyAmeIxFK5cLI9LeCRTehmKQ0lRZDc=;
+	b=rcAoQPvkwz2Bai8lDy5e6ktQyY9+tnTRAuLq2LSzW+VKfjxSb+mgolQn55wCUSAFEE9oAo
+	N0WykfebaJAeAZA7FuYy+42T08yRwlGqIlzO8slGvoh/PMypxbO0nSmeI/acwrpcMIsRr7
+	VnscjFqlsjPLCQhIB6dNFr+FYqnGlLU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Reiji Watanabe <reijiw@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Jing Zhang <jingzhangos@google.com>,
+	Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [PATCH v2 3/8] KVM: arm64: PMU: Preserve vCPU's PMCR_EL0.N value
+ on vCPU reset
+Message-ID: <Y8ngqRHhiXHjc0vA@google.com>
+References: <20230117013542.371944-1-reijiw@google.com>
+ <20230117013542.371944-4-reijiw@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230117013542.371944-4-reijiw@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Currently, the unknown no-running-vcpu sites are reported when a
-dirty page is tracked by mark_page_dirty_in_slot(). Until now, the
-only known no-running-vcpu site is saving vgic/its tables through
-KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} command on KVM device
-"kvm-arm-vgic-its". Unfortunately, there are more unknown sites to
-be handled and no-running-vcpu context will be allowed in these
-sites: (1) KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_RESTORE_TABLES} command
-on KVM device "kvm-arm-vgic-its" to restore vgic/its tables. The
-vgic3 LPI pending status could be restored. (2) Save vgic3 pending
-table through KVM_DEV_ARM_{VGIC_GRP_CTRL, VGIC_SAVE_PENDING_TABLES}
-command on KVM device "kvm-arm-vgic-v3".
+On Mon, Jan 16, 2023 at 05:35:37PM -0800, Reiji Watanabe wrote:
+> The number of PMU event counters is indicated in PMCR_EL0.N.
+> For a vCPU with PMUv3 configured, its value will be the same as
+> the host value by default. Userspace can set PMCR_EL0.N for the
+> vCPU to a lower value than the host value using KVM_SET_ONE_REG.
+> However, it is practically unsupported, as reset_pmcr() resets
+> PMCR_EL0.N to the host value on vCPU reset.
+> 
+> Change reset_pmcr() to preserve the vCPU's PMCR_EL0.N value on
+> vCPU reset so that userspace can limit the number of the PMU
+> event counter on the vCPU.
+> 
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> ---
+>  arch/arm64/kvm/pmu-emul.c | 6 ++++++
+>  arch/arm64/kvm/sys_regs.c | 4 +++-
+>  2 files changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 24908400e190..937a272b00a5 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -213,6 +213,12 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
+>  
+>  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
+>  		pmu->pmc[i].idx = i;
+> +
+> +	/*
+> +	 * Initialize PMCR_EL0 for the vCPU with the host value so that
+> +	 * the value is available at the very first vCPU reset.
+> +	 */
+> +	__vcpu_sys_reg(vcpu, PMCR_EL0) = read_sysreg(pmcr_el0);
 
-In order to handle those unknown cases, we need a unified helper
-vgic_write_guest_lock(). struct vgic_dist::save_its_tables_in_progress
-is also renamed to struct vgic_dist::save_tables_in_progress. Besides,
-"asm/kvm_mmu.h" needs to be included for "vgic.h" for the definition
-of kvm_write_guest_lock().
+I think we need to derive a sanitised value for PMCR_EL0.N, as I believe
+nothing in the architecture prevents implementers from gluing together
+cores with varying numbers of PMCs. We probably haven't noticed it yet
+since it would appear all Arm designs have had 6 PMCs.
 
-No functional change intended.
+>  }
+>  
+>  /**
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 4959658b502c..67c1bd39b478 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -637,8 +637,10 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>  	if (!kvm_arm_support_pmu_v3())
+>  		return;
+>  
+> +	/* PMCR_EL0 for the vCPU is set to the host value at vCPU creation. */
+> +
 
-Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- arch/arm64/kvm/vgic-sys-reg-v3.c   |  1 +
- arch/arm64/kvm/vgic/vgic-irqfd.c   |  1 +
- arch/arm64/kvm/vgic/vgic-its.c     | 13 +++++--------
- arch/arm64/kvm/vgic/vgic-mmio-v2.c |  1 +
- arch/arm64/kvm/vgic/vgic-mmio.c    |  1 +
- arch/arm64/kvm/vgic/vgic-v4.c      |  1 +
- arch/arm64/kvm/vgic/vgic.c         |  1 +
- arch/arm64/kvm/vgic/vgic.h         | 13 +++++++++++++
- include/kvm/arm_vgic.h             |  2 +-
- 9 files changed, 25 insertions(+), 9 deletions(-)
+nit: I think we can do without the floating comment here.
 
-diff --git a/arch/arm64/kvm/vgic-sys-reg-v3.c b/arch/arm64/kvm/vgic-sys-reg-v3.c
-index 9e7c486b48c2..215ce2dbdb7b 100644
---- a/arch/arm64/kvm/vgic-sys-reg-v3.c
-+++ b/arch/arm64/kvm/vgic-sys-reg-v3.c
-@@ -7,6 +7,7 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <asm/kvm_emulate.h>
-+#include <asm/kvm_mmu.h>
- #include "vgic/vgic.h"
- #include "sys_regs.h"
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
-index 475059bacedf..f2581fe6620c 100644
---- a/arch/arm64/kvm/vgic/vgic-irqfd.c
-+++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
-@@ -7,6 +7,7 @@
- #include <linux/kvm_host.h>
- #include <trace/events/kvm.h>
- #include <kvm/arm_vgic.h>
-+#include <asm/kvm_mmu.h>
- #include "vgic.h"
- 
- /**
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 94a666dd1443..2fe2922533ad 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -2187,7 +2187,7 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
- 	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
- 		ite->collection->collection_id;
- 	val = cpu_to_le64(val);
--	return kvm_write_guest_lock(kvm, gpa, &val, ite_esz);
-+	return vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
- }
- 
- /**
-@@ -2339,7 +2339,7 @@ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
- 	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
- 		(dev->num_eventid_bits - 1));
- 	val = cpu_to_le64(val);
--	return kvm_write_guest_lock(kvm, ptr, &val, dte_esz);
-+	return vgic_write_guest_lock(kvm, ptr, &val, dte_esz);
- }
- 
- /**
-@@ -2526,7 +2526,7 @@ static int vgic_its_save_cte(struct vgic_its *its,
- 	       ((u64)collection->target_addr << KVM_ITS_CTE_RDBASE_SHIFT) |
- 	       collection->collection_id);
- 	val = cpu_to_le64(val);
--	return kvm_write_guest_lock(its->dev->kvm, gpa, &val, esz);
-+	return vgic_write_guest_lock(its->dev->kvm, gpa, &val, esz);
- }
- 
- /*
-@@ -2607,7 +2607,7 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
- 	 */
- 	val = 0;
- 	BUG_ON(cte_esz > sizeof(val));
--	ret = kvm_write_guest_lock(its->dev->kvm, gpa, &val, cte_esz);
-+	ret = vgic_write_guest_lock(its->dev->kvm, gpa, &val, cte_esz);
- 	return ret;
- }
- 
-@@ -2743,7 +2743,6 @@ static int vgic_its_has_attr(struct kvm_device *dev,
- static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
- {
- 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
--	struct vgic_dist *dist = &kvm->arch.vgic;
- 	int ret = 0;
- 
- 	if (attr == KVM_DEV_ARM_VGIC_CTRL_INIT) /* Nothing to do */
-@@ -2763,9 +2762,7 @@ static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
- 		vgic_its_reset(kvm, its);
- 		break;
- 	case KVM_DEV_ARM_ITS_SAVE_TABLES:
--		dist->save_its_tables_in_progress = true;
- 		ret = abi->save_tables(its);
--		dist->save_its_tables_in_progress = false;
- 		break;
- 	case KVM_DEV_ARM_ITS_RESTORE_TABLES:
- 		ret = abi->restore_tables(its);
-@@ -2792,7 +2789,7 @@ bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 
--	return dist->save_its_tables_in_progress;
-+	return dist->save_tables_in_progress;
- }
- 
- static int vgic_its_set_attr(struct kvm_device *dev,
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-index e070cda86e12..90502ce5a97f 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-@@ -10,6 +10,7 @@
- 
- #include <kvm/iodev.h>
- #include <kvm/arm_vgic.h>
-+#include <asm/kvm_mmu.h>
- 
- #include "vgic.h"
- #include "vgic-mmio.h"
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
-index b32d434c1d4a..36d851ee02d8 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio.c
-@@ -12,6 +12,7 @@
- #include <kvm/iodev.h>
- #include <kvm/arm_arch_timer.h>
- #include <kvm/arm_vgic.h>
-+#include <asm/kvm_mmu.h>
- 
- #include "vgic.h"
- #include "vgic-mmio.h"
-diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
-index ad06ba6c9b00..3396ad1b0f17 100644
---- a/arch/arm64/kvm/vgic/vgic-v4.c
-+++ b/arch/arm64/kvm/vgic/vgic-v4.c
-@@ -9,6 +9,7 @@
- #include <linux/irqdomain.h>
- #include <linux/kvm_host.h>
- #include <linux/irqchip/arm-gic-v3.h>
-+#include <asm/kvm_mmu.h>
- 
- #include "vgic.h"
- 
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index d97e6080b421..a17a40802af7 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -11,6 +11,7 @@
- #include <linux/nospec.h>
- 
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
- 
- #include "vgic.h"
- 
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 0c8da72953f0..d16180eb1a92 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -131,6 +131,19 @@ static inline bool vgic_irq_is_multi_sgi(struct vgic_irq *irq)
- 	return vgic_irq_get_lr_count(irq) > 1;
- }
- 
-+static inline int vgic_write_guest_lock(struct kvm *kvm, gpa_t gpa,
-+					const void *data, unsigned long len)
-+{
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+	int ret;
-+
-+	dist->save_tables_in_progress = true;
-+	ret = kvm_write_guest_lock(kvm, gpa, data, len);
-+	dist->save_tables_in_progress = false;
-+
-+	return ret;
-+}
-+
- /*
-  * This struct provides an intermediate representation of the fields contained
-  * in the GICH_VMCR and ICH_VMCR registers, such that code exporting the GIC
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 9270cd87da3f..a0be53bc5703 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -263,7 +263,7 @@ struct vgic_dist {
- 	struct vgic_io_device	dist_iodev;
- 
- 	bool			has_its;
--	bool			save_its_tables_in_progress;
-+	bool			save_tables_in_progress;
- 
- 	/*
- 	 * Contains the attributes and gpa of the LPI configuration table.
--- 
-2.23.0
-
+--
+Thanks,
+Oliver
