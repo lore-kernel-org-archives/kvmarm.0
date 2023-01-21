@@ -1,141 +1,160 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B80020EF
-	for <kvmarm@lists.linux.dev>; Fri, 20 Jan 2023 18:53:20 +0000 (UTC)
-Received: by mail-pf1-f180.google.com with SMTP id c85so4655609pfc.8
-        for <kvmarm@lists.linux.dev>; Fri, 20 Jan 2023 10:53:20 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A0236E
+	for <kvmarm@lists.linux.dev>; Sat, 21 Jan 2023 05:19:05 +0000 (UTC)
+Received: by mail-pf1-f175.google.com with SMTP id a184so5412588pfa.9
+        for <kvmarm@lists.linux.dev>; Fri, 20 Jan 2023 21:19:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=hbVkhmbwrxHdRnc6988uVhgGX0OwIVVngeM3AP0vwwM=;
-        b=YyZ2GQPJLnmNMqIOhj29cQEAc2wXHLAdR8q265VO2GVcMv9W4doftcJuxezu6FeMMd
-         AmvJJde8mojg96TsP8yugvRvdUMypU+170DfXgEIIODZznKsXIv7KjhdxJtQQfUna4ml
-         r8xVDRNxdf+XoQ1l7NSaB7kXGnsHTw+Hk8AtKsulhEEphZeUm0ozgiFovnLOOkFAuYF/
-         /Tf2H5rNtukMv2qaQXMg6PMeICYvsx3baVQ4CeuzEiQYTpGAJhgli2+abXL+xZp8BgT3
-         IG+5Kx8QsAJv0F31/SIIce3oLwYRLcg57DTbur3J+NT5ab+qdmwGwrp5vH9XG3ECQqwC
-         TX5A==
+        bh=DyNpUeP8LrX5RTwoNViuIdizAXn2TYK/TN88PZlHTfc=;
+        b=a0fYojZF7lirCo5wfVMb07njosq2rsx8vmW9S+Ldb9CYDS2cTtGYzKjmEtuEEdk0al
+         3u8Tb+qvEb7mbGw2KmB2yPHO9nbCFbtA3OB4UNkmA+LYjqt7dI9eLgcEG6JckmU1qqG9
+         wS+n0Pd6LPYvn7cpE1Im0a1K8TjqkNfm4pBTU3aJqUxIQOQArev6ubYCwwknCFxPX4g1
+         PJRu+mc4aTzBhBJqp0FVZG1xQuuwb6aniCkg5bw8HLur4i9mK40Gfd+SKrbGkGbqVhqK
+         GZW8frOghj8bS+zND3q8QMpk3hLQEGfcWJM245l/GobI1T1fR9SmRKNsY9B4lSPcCLcJ
+         eoog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=hbVkhmbwrxHdRnc6988uVhgGX0OwIVVngeM3AP0vwwM=;
-        b=0dEzlXVQ3E6AaEhmI4zhkYJQXFS0OS57e0IW9ZS7bcaiNyOHUu8v/9wiuDnGI+gO5c
-         N4xi/3DPsRWxgy2T3JYIDan7TQzRB7bK/kj0FWpwrPlmqcQqu5rp9z4lRDHdLnNuBXZ1
-         2NYl4rX1nS+CzvjMmjcYHCVievdlnLS+RuFEgOWVieAW3uCGs850esW5BKNev3ZZgB2u
-         2ibhoKS4n8DRWLVkhJRdeYWGDGTYXYqDRjhskKeGUQYkUIZN2uqkOlk6Ith5WeCD7rRe
-         akicSchTfj7+FIJQpCd4Vz/aSGodP5IE6X6eVQakrjvLt7Wcu3Mpcg0traTWVTppo3rg
-         2pwA==
-X-Gm-Message-State: AFqh2krxFdPl5SM00y9EN/UJBBgpaP4wzJg+kyMCvGAX11Z3QSVgFbGZ
-	GKfVPIOx+pLRpFu4YqL0TtvDi3lsawaO4KDzd5+TaQ==
-X-Google-Smtp-Source: AMrXdXtaABkqdOaqTa0aNwcY5jjakms9UPj5X9miquUpJAfFjmwpqsB8bwMVYIqvgg7fGfBCNdeZ9t7RkQfzzZfa1Aw=
-X-Received: by 2002:a62:6084:0:b0:582:392e:8bbf with SMTP id
- u126-20020a626084000000b00582392e8bbfmr1484138pfb.75.1674240799468; Fri, 20
- Jan 2023 10:53:19 -0800 (PST)
+        bh=DyNpUeP8LrX5RTwoNViuIdizAXn2TYK/TN88PZlHTfc=;
+        b=hPTJ781U0Wg0G+REvktvp6w6WRR9SL734nbkf6PO4muCWlVpXvh3kw49Rif9h7V09k
+         nrlMgK/TAX5hzSDfbCoEQ6khLkxTNWMV8dlztZLFUAfQnKHduWOfKUSJPHUJzXZGShCl
+         s/Y9/p7WXeY+B1LYGdqPTjF0eP4FHSa1AKIruHRV17ziB48R1jyuirt16ncd/2Nh5Wqa
+         sBc1TAjljbGiRimZtw4oqT87KK6K9ZhEc1XwEa5wvgEZeQXe3ogne1jZEVTW50y88OkJ
+         j8t5LSjUUBK+H6TTUB6x66rEWNpRBby7y1Je/OsjqDlDen9pLv8jp1Sniwspj4dg5t6l
+         AI+w==
+X-Gm-Message-State: AFqh2koIL+bHNcGLYbuzzt5hHUgOoBNrC22yGmROozy1r+HmHQbNt5A+
+	XUetCsZAUoa/31i3C9HPdAnrqpCht8qmDhuK0h/fQA==
+X-Google-Smtp-Source: AMrXdXsCYe+DDcM1fqeylveJWp68gFcL6rYdmUqbu1E4MOLTTk+dPezFm4XJ0IIPLgsSzECTRLBax6SYWJKxqolSJho=
+X-Received: by 2002:a05:6a00:2992:b0:58d:b26a:6238 with SMTP id
+ cj18-20020a056a00299200b0058db26a6238mr2033501pfb.84.1674278344660; Fri, 20
+ Jan 2023 21:19:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230117013542.371944-1-reijiw@google.com> <20230117013542.371944-4-reijiw@google.com>
- <Y8ngqRHhiXHjc0vA@google.com> <86pmb9mmkv.wl-maz@kernel.org> <Y8rXx+7EUob7qPXh@google.com>
-In-Reply-To: <Y8rXx+7EUob7qPXh@google.com>
+References: <20230117013542.371944-1-reijiw@google.com> <20230117013542.371944-2-reijiw@google.com>
+ <86o7qtmher.wl-maz@kernel.org> <86mt6dmh2q.wl-maz@kernel.org>
+In-Reply-To: <86mt6dmh2q.wl-maz@kernel.org>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Fri, 20 Jan 2023 10:53:02 -0800
-Message-ID: <CAAeT=FyYspSieevHO3gD_Snvn19HXdzbUD3z-Q=1qQ1BBX-Jjw@mail.gmail.com>
-Subject: Re: [PATCH v2 3/8] KVM: arm64: PMU: Preserve vCPU's PMCR_EL0.N value
- on vCPU reset
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+Date: Fri, 20 Jan 2023 21:18:48 -0800
+Message-ID: <CAAeT=Fx9024AEjKoROWMPxvShfGKijMgKsK4oUB=wbv-iq43BQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/8] KVM: arm64: PMU: Have reset_pmu_reg() to clear a register
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, James Morse <james.morse@arm.com>, 
 	Alexandru Elisei <alexandru.elisei@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ricardo Koller <ricarkol@google.com>, Jing Zhang <jingzhangos@google.com>, 
-	Raghavendra Rao Anata <rananta@google.com>
+	Ricardo Koller <ricarkol@google.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Jing Zhang <jingzhangos@google.com>, Raghavendra Rao Anata <rananta@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Oliver, Marc,
+Hi Marc,
 
-Thank you for the review!
-
-On Fri, Jan 20, 2023 at 10:05 AM Oliver Upton <oliver.upton@linux.dev> wrote:
+On Fri, Jan 20, 2023 at 6:11 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Hey Marc,
->
-> On Fri, Jan 20, 2023 at 12:12:32PM +0000, Marc Zyngier wrote:
-> > On Fri, 20 Jan 2023 00:30:33 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > I think we need to derive a sanitised value for PMCR_EL0.N, as I believe
-> > > nothing in the architecture prevents implementers from gluing together
-> > > cores with varying numbers of PMCs. We probably haven't noticed it yet
-> > > since it would appear all Arm designs have had 6 PMCs.
+> On Fri, 20 Jan 2023 14:04:12 +0000,
+> Marc Zyngier <maz@kernel.org> wrote:
 > >
-> > This brings back the question of late onlining. How do you cope with
-> > with the onlining of such a CPU that has a smaller set of counters
-> > than its online counterparts? This is at odds with the way the PMU
-> > code works.
->
-> You're absolutely right, any illusion we derived from the online set of
-> CPUs could fall apart with a late onlining of a different core.
->
-> > If you have a different set of counters, you are likely to have a
-> > different PMU altogether:
+> > On Tue, 17 Jan 2023 01:35:35 +0000,
+> > Reiji Watanabe <reijiw@google.com> wrote:
+> > >
+> > > On vCPU reset, PMCNTEN{SET,CLR}_EL0, PMINTEN{SET,CLR}_EL1, and
+> > > PMOVS{SET,CLR}_EL1 for a vCPU are reset by reset_pmu_reg().
+> > > This function clears RAZ bits of those registers corresponding
+> > > to unimplemented event counters on the vCPU, and sets bits
+> > > corresponding to implemented event counters to a predefined
+> > > pseudo UNKNOWN value (some bits are set to 1).
+> > >
+> > > The function identifies (un)implemented event counters on the
+> > > vCPU based on the PMCR_EL1.N value on the host. Using the host
+> > > value for this would be problematic when KVM supports letting
+> > > userspace set PMCR_EL1.N to a value different from the host value
+> > > (some of the RAZ bits of those registers could end up being set to 1).
+> > >
+> > > Fix reset_pmu_reg() to clear the registers so that it can ensure
+> > > that all the RAZ bits are cleared even when the PMCR_EL1.N value
+> > > for the vCPU is different from the host value.
+> > >
+> > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > ---
+> > >  arch/arm64/kvm/sys_regs.c | 10 +---------
+> > >  1 file changed, 1 insertion(+), 9 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index c6cbfe6b854b..ec4bdaf71a15 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -604,19 +604,11 @@ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+> > >
+> > >  static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> > >  {
+> > > -   u64 n, mask = BIT(ARMV8_PMU_CYCLE_IDX);
+> > > -
+> > >     /* No PMU available, any PMU reg may UNDEF... */
+> > >     if (!kvm_arm_support_pmu_v3())
+> > >             return;
 > >
-> > [    1.192606] hw perfevents: enabled with armv8_cortex_a57 PMU driver, 7 counters available
-> > [    1.201254] hw perfevents: enabled with armv8_cortex_a53 PMU driver, 7 counters available
+> > Is this still true? We remove the PMCR_EL0 access just below.
 > >
-> > This isn't a broken system, but it has two set of cores which are
-> > massively different, and two PMUs.
+> > >
+> > > -   n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+> > > -   n &= ARMV8_PMU_PMCR_N_MASK;
+> > > -   if (n)
+> > > -           mask |= GENMASK(n - 1, 0);
+> > > -
+> > > -   reset_unknown(vcpu, r);
+> > > -   __vcpu_sys_reg(vcpu, r->reg) &= mask;
+> > > +   __vcpu_sys_reg(vcpu, r->reg) = 0;
+> > >  }
 > >
-> > This really should tie back to the PMU type we're counting on, and to
-> > the set of CPUs that implements it. We already have some
-> > infrastructure to check for the affinity of the PMU vs the CPU we're
-> > running on, and this is already visible to userspace.
+> > At the end of the day, this function has no dependency on the host at
+> > all, and only writes 0 to the per-vcpu register.
 > >
-> > Can't we just leave this responsibility to userspace?
+> > So why not get rid of it altogether and have:
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index c6cbfe6b854b..1d1514b89d75 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -976,7 +976,7 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> >         trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
+> >
+> >  #define PMU_SYS_REG(r)                                               \
+> > -     SYS_DESC(r), .reset = reset_pmu_reg, .visibility = pmu_visibility
+> > +     SYS_DESC(r), .visibility = pmu_visibility
+> >
+> >  /* Macro to expand the PMEVCNTRn_EL0 register */
+> >  #define PMU_PMEVCNTR_EL0(n)                                          \
+> >
+> > which would fall-back the specified reset value (zero by default)?
 >
-> Believe me, I'm always a fan of offloading things to userspace :)
+> Scratch that, we need:
 >
-> If the VMM is privy to the details of the system it is on then the
-> differing PMUs can be passed through to the guest w/ pinned vCPU
-> threads. I just worry about the case of a naive VMM that assumes a
-> homogenous system. I don't think I could entirely blame the VMM in this
-> case either as we've gone to lengths to sanitise the feature set
-> exposed to userspace.
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index c6cbfe6b854b..6f6a928c92ec 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -976,7 +976,7 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>           trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
 >
-> What happens when a vCPU gets scheduled on a core where the vPMU
-> doesn't match? Ignoring other incongruences, it is not possible to
-> virtualize more counters than are supported by the vPMU of the core.
+>  #define PMU_SYS_REG(r)                                         \
+> -       SYS_DESC(r), .reset = reset_pmu_reg, .visibility = pmu_visibility
+> +       SYS_DESC(r), .reset = reset_val, .visibility = pmu_visibility
+>
+>  /* Macro to expand the PMEVCNTRn_EL0 register */
+>  #define PMU_PMEVCNTR_EL0(n)                                            \
+>
+> But otherwise, this should be enough.
 
-I believe KVM_RUN will fail with KVM_EXIT_FAIL_ENTRY (Please see
-the code that handles ON_UNSUPPORTED_CPU).
+Yes, that's true.  I will fix that in v3.
 
-> Stopping short of any major hacks in the kernel to fudge around the
-> problem, I believe we may need to provide better documentation of how
-> heterogeneous CPUs are handled in KVM and what userspace can do about
-> it.
-
-Documentation/virt/kvm/devices/vcpu.rstDocumentation/virt/kvm/devices/vcpu.rst
-for KVM_ARM_VCPU_PMU_V3_SET_PMU
-has some description for the current behavior at least.
-(perhaps we may need to update documents for this though)
-
-Now I'm a bit worried about the validation code for PMCR_EL0.N
-as well, as setting (restoring) PMCR_EL0 could be done on any
-pCPUs (even before using KVM_ARM_VCPU_PMU_V3_SET_PMU).
-
-What I am currently looking at is something like this:
- - Set the sanitised (min) value of PMCR_EL0.N among all PMUs
-   for vCPUs by default.
- - Validate the PMCR_EL0.N value that userspace tries to set
-   against the max value on the system (this is to ensure that
-   restoring PMCR_EL0 for a vCPU works on any pCPUs)
- - Make KVM_RUN fail when PMCR_EL0.N for the vCPU indicates
-   more counters than the PMU that is set for the vCPU.
-
-What do you think ?
-
-Thank you,
+Thank you!
 Reiji
