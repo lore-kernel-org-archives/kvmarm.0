@@ -1,54 +1,57 @@
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB468BE8
-	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 16:26:12 +0000 (UTC)
-Received: by mail-pj1-f53.google.com with SMTP id h5-20020a17090a9c0500b0022bb85eb35dso10118478pjp.3
-        for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 08:26:12 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6BA10E9
+	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 16:30:37 +0000 (UTC)
+Received: by mail-pl1-f169.google.com with SMTP id jl3so15226144plb.8
+        for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 08:30:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WkQDrNHkzQEYlziy8zbZPHrgO5IZjZ5aKuZXPjg7coA=;
-        b=mWEMd0E3VSo+2vbyZ9jiYWqigQjgyQjQkehCzOktqTh7FGHTiI7SiZO8Dn/LaD5q6M
-         B0Ks3H3j/nNgvmdsIyQ1EPLDq43FXDKoQ/k9rzxMvrXBJ3j1JnNcTzENi3vq/qnkiVDR
-         nGs8fkF0zkj1+IwBMa+fNL8o8frZZ6tourUdePnZeKXcEo8nCJLG18Nhb6GBBcK95L8k
-         SZq4C+iVaclLb767ipIMNPQmNXacqHf+x7JiLKCCulmX/CB4Cna3rnafW1eUFWEkMP/O
-         DM6NeDwZqvlfVuFdA7yzoHEBF0pOAe5HuH5kwq5zYoeI7oa2cGVIkkqJhhamulbHUgEM
-         xK1A==
+        bh=WH8dogHFrbtrUPEbTBAkEB7mODqHtTEzSy6ZDTyFYCI=;
+        b=WqiILCejXByq7mamwSjvTiYhIhl53/a2879xufNpHveZ8AIUNVb+4zlySeCSihVmSm
+         gJf66uxD1WRxyv/4BCgTGAqbglO6dw8+pTFOPnclDIc+YSPpQB57ZAy33aD13BdzzPI1
+         dInQeQMWl3qD/4PKwtrmTJa5ing9r20v+i372/Nfy49LOkBayOWmfA5WmeWivFXZxYP2
+         1AHUKId0tUghQm3anOW//uwwdVWqPmqsNCcVSZ0RM2A1nFyWRQdkiGbHsSytDqdkGzUC
+         3tzXB4DQntgwPvMNUXciOpDlA5KWVPh1AU9Qx3B9BYntzBmHvB5il8FiQFoj11LlVFKR
+         wFZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WkQDrNHkzQEYlziy8zbZPHrgO5IZjZ5aKuZXPjg7coA=;
-        b=NtSVQoWXwfBRON6RLecQDSyvgHxtvUvESHIK816ud0qVnpipFJpULLWsU4QhR0paV2
-         rcXNaUVsvl1hsBlFR2TfKyJjXbaba9ZLzFileETxXEgo8CcNKiZXFN+i7IrJul7kJQ47
-         ngJ6CwTGpjW5IFlziTCOUnvphsHnJ1G4fesbm7jX3pM/WYr7wRLvvfoZoXBf+Tg3o/sg
-         tzf/eObGi/v/RqHYWq4aFh5p9RYlH04PlTwfyZK/48+cm2bDR66MxTGtmCAd+ncxpM3r
-         0aoWIYIjcT6t9tkZDF2nal51NAUlxjiiMEcMgIZALcOhUdZm+gFmxMNBdIocJnT6FDMB
-         HYfA==
-X-Gm-Message-State: AO0yUKXeBeHoEq7rzRD9m+c80oC/xNRI3rTD6hXHbDUOsWC4h580+m0t
-	kDU6pqR7B8CXW66nMD9gw8tsDg==
-X-Google-Smtp-Source: AK7set87Z+xAX+LShw1w7Qvxlm6Z/5hW8cKt7niIXFKSURg7nkilnDsuF3JwTuAv8xQJM5bJcWPomA==
-X-Received: by 2002:a05:6a21:998a:b0:b8:c859:7fc4 with SMTP id ve10-20020a056a21998a00b000b8c8597fc4mr275210pzb.1.1674577571942;
-        Tue, 24 Jan 2023 08:26:11 -0800 (PST)
+        bh=WH8dogHFrbtrUPEbTBAkEB7mODqHtTEzSy6ZDTyFYCI=;
+        b=Wm5g+ydN1oGTKK3wbZhd39MLUgoJwWWPBbQkKuHB6cSXigfoap0bQM42mYGmKxUK41
+         aSAeeJjMMSu3QPaiyr2BV3Wsrso0E+PlAjJM7BHNNdffrXgIcXZE2fK/kwI8/KdUrnvf
+         77Ee5/pIsGHnb9JhdYLGoatELm2PqZe4U1/mNEVoVrHRxUSN6dbc8uJlqnf3Pro/xAR8
+         wDTHCvO2r8JmN1Q0gAlo2ogkGrVORLNRYYk25yyvCAXND3Enx3x9mAlaLm4SXxCnQGi+
+         wIj6WY8LGweCJXI1qBsy+lUZR33ftJ+32r9xRv4llMZKNRd3EwVbane2buaFBpmaafmM
+         W1Xg==
+X-Gm-Message-State: AO0yUKVOrPCFbE1t9Yqh91MojsJ7+OFuQeIRoXFgk3Cm8FSGRoRGy8WE
+	Q5wV+SPWDuxZS1arUOkCv3iyWA==
+X-Google-Smtp-Source: AK7set9UXN5qqN6aG70o6t5zKAA4Z3NA/q+UNHRg2aZrGkThFvPzI7xb17REn2KRR4XlOebyQhldiw==
+X-Received: by 2002:a17:90a:300e:b0:227:679:17df with SMTP id g14-20020a17090a300e00b00227067917dfmr231535pjb.0.1674577836722;
+        Tue, 24 Jan 2023 08:30:36 -0800 (PST)
 Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id f23-20020a656297000000b0047063eb4098sm1627708pgv.37.2023.01.24.08.26.06
+        by smtp.gmail.com with ESMTPSA id nm1-20020a17090b19c100b0022717d8d835sm8814272pjb.16.2023.01.24.08.30.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jan 2023 08:26:06 -0800 (PST)
-Date: Tue, 24 Jan 2023 08:26:02 -0800
+        Tue, 24 Jan 2023 08:30:36 -0800 (PST)
+Date: Tue, 24 Jan 2023 08:30:32 -0800
 From: Ricardo Koller <ricarkol@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev,
-	pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com,
-	eric.auger@redhat.com, yuzenghui@huawei.com
-Subject: Re: [PATCH 4/4] KVM: selftests: aarch64: Test read-only PT memory
- regions
-Message-ID: <Y9AGmn0CM/lNX6w/@google.com>
-References: <20230110022432.330151-1-ricarkol@google.com>
- <20230110022432.330151-5-ricarkol@google.com>
- <Y88aFBBcsx7v/2qh@google.com>
+To: Ben Gardon <bgardon@google.com>
+Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
+	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com,
+	andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com,
+	suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com,
+	reijiw@google.com, rananta@google.com, ricarkol@gmail.com
+Subject: Re: [PATCH 1/9] KVM: arm64: Add KVM_PGTABLE_WALK_REMOVED into
+ ctx->flags
+Message-ID: <Y9AHqM2eYM11gIB9@google.com>
+References: <20230113035000.480021-1-ricarkol@google.com>
+ <20230113035000.480021-2-ricarkol@google.com>
+ <CANgfPd9gMoR=F3uKhDtjsUV0efuoNvCLV0o0WoJKm9zx_PaKsQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,52 +60,25 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y88aFBBcsx7v/2qh@google.com>
+In-Reply-To: <CANgfPd9gMoR=F3uKhDtjsUV0efuoNvCLV0o0WoJKm9zx_PaKsQ@mail.gmail.com>
 
-On Mon, Jan 23, 2023 at 11:36:52PM +0000, Oliver Upton wrote:
-> On Tue, Jan 10, 2023 at 02:24:32AM +0000, Ricardo Koller wrote:
-> > Extend the read-only memslot tests in page_fault_test to test read-only PT
-> > (Page table) memslots. Note that this was not allowed before commit "KVM:
-> > arm64: Fix handling of S1PTW S2 fault on RO memslots" as all S1PTW faults
-> > were treated as writes which resulted in an (unrecoverable) exception
-> > inside the guest.
+On Mon, Jan 23, 2023 at 04:51:16PM -0800, Ben Gardon wrote:
+> On Thu, Jan 12, 2023 at 7:50 PM Ricardo Koller <ricarkol@google.com> wrote:
+> >
+> > Add a flag to kvm_pgtable_visit_ctx, KVM_PGTABLE_WALK_REMOVED, to
+> > indicate that the walk is on a removed table not accesible to the HW
+> > page-table walker. Then use it to avoid doing break-before-make or
+> > performing CMOs (Cache Maintenance Operations) when mapping a removed
 > 
-> Do we need an additional test that the guest gets nuked if TCR_EL1.HA =
-> 0b1 and AF is clear in one of the stage-1 PTEs?
-> 
+> Nit: Should this say unmapping? Or are we actually going to use this
+> to map memory ?
 
-That should be easy to add. The only issue is whether that's also a case
-of checking for very specific KVM behavior that could change in the
-future. It's unlikely, but what if KVM emulated the page table walker
-behavior to give userspace all the info it needed to fix the fault.
-Although it's so unlikely that I think I will add the exception check.
-
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  .../selftests/kvm/aarch64/page_fault_test.c        | 14 +++++++++-----
-> >  1 file changed, 9 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> > index 2e2178a7d0d8..2f81d68e876c 100644
-> > --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> > +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> > @@ -831,6 +831,7 @@ static void help(char *name)
-> >  {										\
-> >  	.name			= SCAT3(ro_memslot, _access, _with_af),		\
-> 
-> Does the '_with_af' actually belong here? The macro doesn't take such a
-> parameter. AFAICT the access flag is already set in all S1 PTEs for this
-> case and TCR_EL1.HA = 0b0.
-
-Good catch. That name would have been very confusing when debugging.
+As you mentioned in the next commit, this will be clearer if I use
+"unliked" instead of "removed". Might end up rewriting this message as
+well, as I will be using Oliver's suggestion of using multiple flags,
+one for each operation to elide.
 
 > 
-> >  	.data_memslot_flags	= KVM_MEM_READONLY,				\
-> > +	.pt_memslot_flags	= KVM_MEM_READONLY,				\
-> >  	.guest_prepare		= { _PREPARE(_access) },			\
-> >  	.guest_test		= _access,					\
-> >  	.mmio_handler		= _mmio_handler,				\
-> 
-> --
-> Thanks,
-> Oliver
+> > table. This is safe as these removed tables are not visible to the HW
+> > page-table walker. This will be used in a subsequent commit for
+> ...
