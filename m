@@ -1,38 +1,33 @@
-Received: from out-24.mta0.migadu.com (out-24.mta0.migadu.com [91.218.175.24])
+Received: from out-35.mta0.migadu.com (out-35.mta0.migadu.com [91.218.175.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5260A958
-	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 23:31:42 +0000 (UTC)
-Date: Tue, 24 Jan 2023 15:25:42 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAE0A31
+	for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 00:37:12 +0000 (UTC)
+Date: Tue, 24 Jan 2023 14:45:10 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1674602749;
+	t=1674600318;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=c74+f/E81sUW5vwqR4R5i42L30Py8ifaBoFNS256FLc=;
-	b=DY6oY/iylKNyk7k7siN12oc3f6brxvNO05K/H869hJ8xZAiaE7YqpP72oXE86llGUFEe1O
-	1mZi+lfR4ZQbbSw3ILPGX0KEGFAA+qZm8QG7CFU4Ng+uzkdIhGom4q5q7r8SMljdvrLkXo
-	eMFUkv6hAz+FW8i4zMpGIlIcoJYa2XU=
+	bh=r7xAwQqOViIPIbFOgbEmxHA89gnRCPmHiReekx02zYo=;
+	b=gqVNplnJiiQSNbmR1Z2PZ9RlfCFvzRDLUSmOkPsnWtSchOapjiZUA2JN3+vKXnqE9hWw4X
+	1bJyn3OF9vg3uMoA4HZwTdHtSLq+RCrnk7bgln9qZH4loupQyNJ+YB6JST03fsHwm/FcYG
+	T4WZQHGasDiRH0ivEEn0iBv1EErrM4g=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
-	Ricardo Koller <ricarkol@google.com>,
-	Reiji Watanabe <reijiw@google.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Jing Zhang <jingzhangos@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 5/6] KVM: arm64: Optimize the stage2 map path with
- TLBI range instructions
-Message-ID: <Y9Bo9qwJhs3KK6jR@thinky-boi>
-References: <20230109215347.3119271-1-rananta@google.com>
- <20230109215347.3119271-6-rananta@google.com>
+To: Ricardo Koller <ricarkol@google.com>
+Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
+	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com,
+	andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com,
+	suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com,
+	reijiw@google.com, rananta@google.com, bgardon@google.com,
+	ricarkol@gmail.com
+Subject: Re: [PATCH 6/9] KVM: arm64: Split huge pages when dirty logging is
+ enabled
+Message-ID: <Y9BfdgL+JSYCirvm@thinky-boi>
+References: <20230113035000.480021-1-ricarkol@google.com>
+ <20230113035000.480021-7-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,125 +36,193 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230109215347.3119271-6-rananta@google.com>
+In-Reply-To: <20230113035000.480021-7-ricarkol@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-Hi Raghavendra,
+Hi Ricardo,
 
-My comment from the previous change also applies here:
-
-  KVM: arm64: Use range-based TLBIs when collapsing hugepages
-
-On Mon, Jan 09, 2023 at 09:53:46PM +0000, Raghavendra Rao Ananta wrote:
-> Currently, when the map path of stage2 page-table coalesces a
-> bunch of pages into a hugepage, KVM invalidates the entire
-> VM's TLB entries. This would cause a perforamance penality for
-> the guest whose pages have already been coalesced earlier as they
-> would have to refill their TLB entries unnecessarily again.
-
-It is also problematic that we do this on every single fault where we
-collapse a hugepage.
-
-> Hence, if the system supports it, use __kvm_tlb_flush_range_vmid_ipa()
-> to flush only the range of pages that have been combined into
-> a hugepage, while leaving other TLB entries alone.
+On Fri, Jan 13, 2023 at 03:49:57AM +0000, Ricardo Koller wrote:
+> Split huge pages eagerly when enabling dirty logging. The goal is to
+> avoid doing it while faulting on write-protected pages, which
+> negatively impacts guest performance.
 > 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> A memslot marked for dirty logging is split in 1GB pieces at a time.
+> This is in order to release the mmu_lock and give other kernel threads
+> the opportunity to run, and also in order to allocate enough pages to
+> split a 1GB range worth of huge pages (or a single 1GB huge page).
+> Note that these page allocations can fail, so eager page splitting is
+> best-effort.  This is not a correctness issue though, as huge pages
+> can still be split on write-faults.
+> 
+> The benefits of eager page splitting are the same as in x86, added
+> with commit a3fe5dbda0a4 ("KVM: x86/mmu: Split huge pages mapped by
+> the TDP MMU when dirty logging is enabled"). For example, when running
+> dirty_log_perf_test with 64 virtual CPUs (Ampere Altra), 1GB per vCPU,
+> 50% reads, and 2MB HugeTLB memory, the time it takes vCPUs to access
+> all of their memory after dirty logging is enabled decreased by 44%
+> from 2.58s to 1.42s.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > ---
->  arch/arm64/kvm/hyp/pgtable.c | 29 +++++++++++++++++++++++++----
->  1 file changed, 25 insertions(+), 4 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h |  30 ++++++++
+>  arch/arm64/kvm/mmu.c              | 110 +++++++++++++++++++++++++++++-
+>  2 files changed, 138 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index b11cf2c618a6c..099032bb01bce 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -686,6 +686,22 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
->  	return cmpxchg(ctx->ptep, ctx->old, new) == ctx->old;
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 35a159d131b5..6ab37209b1d1 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -153,6 +153,36 @@ struct kvm_s2_mmu {
+>  	/* The last vcpu id that ran on each physical CPU */
+>  	int __percpu *last_vcpu_ran;
+>  
+> +	/*
+> +	 * Memory cache used to split EAGER_PAGE_SPLIT_CHUNK_SIZE worth of huge
+> +	 * pages. It is used to allocate stage2 page tables while splitting
+> +	 * huge pages. Its capacity should be EAGER_PAGE_SPLIT_CACHE_CAPACITY.
+> +	 * Note that the choice of EAGER_PAGE_SPLIT_CHUNK_SIZE influences both
+> +	 * the capacity of the split page cache (CACHE_CAPACITY), and how often
+> +	 * KVM reschedules. Be wary of raising CHUNK_SIZE too high.
+> +	 *
+> +	 * A good heuristic to pick CHUNK_SIZE is that it should be larger than
+> +	 * all the available huge-page sizes, and be a multiple of all the
+> +	 * other ones; for example, 1GB when all the available huge-page sizes
+> +	 * are (1GB, 2MB, 32MB, 512MB).
+> +	 *
+> +	 * CACHE_CAPACITY should have enough pages to cover CHUNK_SIZE; for
+> +	 * example, 1GB requires the following number of PAGE_SIZE-pages:
+> +	 * - 512 when using 2MB hugepages with 4KB granules (1GB / 2MB).
+> +	 * - 513 when using 1GB hugepages with 4KB granules (1 + (1GB / 2MB)).
+> +	 * - 32 when using 32MB hugepages with 16KB granule (1GB / 32MB).
+> +	 * - 2 when using 512MB hugepages with 64KB granules (1GB / 512MB).
+> +	 * CACHE_CAPACITY below assumes the worst case: 1GB hugepages with 4KB
+> +	 * granules.
+> +	 *
+> +	 * Protected by kvm->slots_lock.
+> +	 */
+> +#define EAGER_PAGE_SPLIT_CHUNK_SIZE		       SZ_1G
+> +#define EAGER_PAGE_SPLIT_CACHE_CAPACITY					\
+> +	(DIV_ROUND_UP_ULL(EAGER_PAGE_SPLIT_CHUNK_SIZE, SZ_1G) +		\
+> +	 DIV_ROUND_UP_ULL(EAGER_PAGE_SPLIT_CHUNK_SIZE, SZ_2M))
+
+Could you instead make use of the existing KVM_PGTABLE_MIN_BLOCK_LEVEL
+as the batch size? 513 pages across all page sizes is a non-negligible
+amount of memory that goes largely unused when PAGE_SIZE != 4K.
+
+With that change it is a lot easier to correctly match the cache
+capacity to the selected page size. Additionally, we continue to have a
+single set of batching logic that we can improve later on.
+
+> +	struct kvm_mmu_memory_cache split_page_cache;
+> +
+>  	struct kvm_arch *arch;
+>  };
+>  
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 700c5774b50d..41ee330edae3 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -31,14 +31,24 @@ static phys_addr_t hyp_idmap_vector;
+>  
+>  static unsigned long io_map_base;
+>  
+> -static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
+> +bool __read_mostly eager_page_split = true;
+> +module_param(eager_page_split, bool, 0644);
+> +
+
+Unless someone is really begging for it I'd prefer we not add a module
+parameter for this.
+
+> +static phys_addr_t __stage2_range_addr_end(phys_addr_t addr, phys_addr_t end,
+> +					   phys_addr_t size)
+>  {
+> -	phys_addr_t size = kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL);
+>  	phys_addr_t boundary = ALIGN_DOWN(addr + size, size);
+>  
+>  	return (boundary - 1 < end - 1) ? boundary : end;
 >  }
 >  
-> +static void kvm_table_pte_flush(struct kvm_s2_mmu *mmu, u64 addr, u32 level, u32 tlb_level)
-
-Could you call this something like kvm_pgtable_flush_range() and take an
-address range as an argument? TLBIRANGE can be used outside the context
-of a table (i.e. a subset of PTEs).
-
+> +static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
 > +{
-> +	if (system_supports_tlb_range()) {
-> +		u64 end = addr + kvm_granule_size(level);
+> +	phys_addr_t size = kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL);
 > +
-> +		kvm_call_hyp(__kvm_tlb_flush_range_vmid_ipa, mmu, addr, end, tlb_level);
-> +	} else {
-> +		/*
-> +		 * Invalidate the whole stage-2, as we may have numerous leaf
-> +		 * entries below us which would otherwise need invalidating
-> +		 * individually.
-> +		 */
-> +		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> +	}
+> +	return __stage2_range_addr_end(addr, end, size);
 > +}
 > +
->  /**
->   * stage2_try_break_pte() - Invalidates a pte according to the
->   *			    'break-before-make' requirements of the
-> @@ -693,6 +709,7 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
->   *
->   * @ctx: context of the visited pte.
->   * @mmu: stage-2 mmu
-> + * @tlb_level: The level at which the leaf pages are expected (for FEAT_TTL hint)
-
-Do we need the caller to provide the TTL hint? We already have
-ctx->level, and stage2_try_break_pte() also knows what the removed PTE
-contained (i.e. a table or a block/page).
-
->   * Returns: true if the pte was successfully broken.
->   *
-> @@ -701,7 +718,7 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
->   * on the containing table page.
->   */
->  static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
-> -				 struct kvm_s2_mmu *mmu)
-> +				 struct kvm_s2_mmu *mmu, u32 tlb_level)
->  {
->  	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+>  /*
+>   * Release kvm_mmu_lock periodically if the memory region is large. Otherwise,
+>   * we may see kernel panics with CONFIG_DETECT_HUNG_TASK,
+> @@ -71,6 +81,64 @@ static int stage2_apply_range(struct kvm *kvm, phys_addr_t addr,
+>  	return ret;
+>  }
 >  
-> @@ -722,7 +739,7 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
->  	 * value (if any).
->  	 */
->  	if (kvm_pte_table(ctx->old, ctx->level))
-> -		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> +		kvm_table_pte_flush(mmu, ctx->addr, ctx->level, tlb_level);
+> +static inline bool need_topup(struct kvm_mmu_memory_cache *cache, int min)
+> +{
+> +	return kvm_mmu_memory_cache_nr_free_objects(cache) < min;
+> +}
 
-I don't think we should provide a TTL hint for a removed table. It is
-entirely possible for the unlinked table to contain a mix of blocks and
-pages, meaning there isn't a uniform table level for the whole range.
+I don't think the helper is adding too much here.
 
->  	else if (kvm_pte_valid(ctx->old))
->  		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
->  
-> @@ -804,7 +821,7 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->  	if (!stage2_pte_needs_update(ctx->old, new))
->  		return -EAGAIN;
->  
-> -	if (!stage2_try_break_pte(ctx, data->mmu))
-> +	if (!stage2_try_break_pte(ctx, data->mmu, ctx->level))
->  		return -EAGAIN;
->  
->  	/* Perform CMOs before installation of the guest stage-2 PTE */
-> @@ -861,7 +878,11 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
->  	if (!childp)
->  		return -ENOMEM;
->  
-> -	if (!stage2_try_break_pte(ctx, data->mmu)) {
-> +	/*
-> +	 * As the table will be replaced with a block, one level down would
-> +	 * be the current page entries held by the table.
-> +	 */
+> +static bool need_topup_split_page_cache_or_resched(struct kvm *kvm)
+> +{
+> +	struct kvm_mmu_memory_cache *cache;
+> +
+> +	if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
+> +		return true;
+> +
+> +	cache = &kvm->arch.mmu.split_page_cache;
+> +	return need_topup(cache, EAGER_PAGE_SPLIT_CACHE_CAPACITY);
+> +}
+> +
+> +static int kvm_mmu_split_huge_pages(struct kvm *kvm, phys_addr_t addr,
+> +			      phys_addr_t end)
+> +{
+> +	struct kvm_mmu_memory_cache *cache;
+> +	struct kvm_pgtable *pgt;
+> +	int ret;
+> +	u64 next;
+> +	int cache_capacity = EAGER_PAGE_SPLIT_CACHE_CAPACITY;
+> +
+> +	lockdep_assert_held_write(&kvm->mmu_lock);
 
-This isn't necessarily true. Ignoring mixed block/pages for a moment,
-Collapsing a PUD entry into a block after dirty logging (where we mapped
-at PTE level) would imply a TTL of ctx->level + 2.
+Rather than having the caller acquire the lock, can you instead do it
+here? It would appear that the entire critical section is enclosed
+within this function.
 
-But again, I think it is best to provide no hint in this case.
+> +	lockdep_assert_held(&kvm->slots_lock);
+
+This function doesn't depend on anything guarded by the slots_lock, can
+you move this to kvm_mmu_split_memory_region()?
+
+> +	cache = &kvm->arch.mmu.split_page_cache;
+> +
+> +	do {
+> +		if (need_topup_split_page_cache_or_resched(kvm)) {
+> +			write_unlock(&kvm->mmu_lock);
+> +			cond_resched();
+> +			/* Eager page splitting is best-effort. */
+> +			ret = __kvm_mmu_topup_memory_cache(cache,
+> +							   cache_capacity,
+> +							   cache_capacity);
+> +			write_lock(&kvm->mmu_lock);
+> +			if (ret)
+> +				break;
+> +		}
+> +
+> +		pgt = kvm->arch.mmu.pgt;
+> +		if (!pgt)
+> +			return -EINVAL;
+> +
+> +		next = __stage2_range_addr_end(addr, end,
+> +					       EAGER_PAGE_SPLIT_CHUNK_SIZE);
+> +		ret = kvm_pgtable_stage2_split(pgt, addr, next - addr, cache);
+> +		if (ret)
+> +			break;
+> +	} while (addr = next, addr != end);
+> +
+> +	return ret;
+> +}
 
 --
 Thanks,
