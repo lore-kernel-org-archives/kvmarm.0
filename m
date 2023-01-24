@@ -1,51 +1,51 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 423CF7C
-	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 00:51:30 +0000 (UTC)
-Received: by mail-ed1-f52.google.com with SMTP id s3so16666712edd.4
-        for <kvmarm@lists.linux.dev>; Mon, 23 Jan 2023 16:51:30 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97287C
+	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 00:55:53 +0000 (UTC)
+Received: by mail-ej1-f41.google.com with SMTP id vw16so35040764ejc.12
+        for <kvmarm@lists.linux.dev>; Mon, 23 Jan 2023 16:55:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=M2kD3GwOu1cuqUDf6v9BDb+wpn8NSWwJtfH+fWMIGrs=;
-        b=TEQYkWqdmsV7t1y8yvJ2IfOpQzMb6o/P7CXThq+2vLZEIqTjY9ANhiIt4ZN75UgF2C
-         xGxPUvHzVvqWxS+vETbzDygQr2QpPAx1+6BNR7Fdz4HrOxvOuoX6PhKRHZ/vqseZiJjP
-         fOwlq5NoNxAf/z6tGp42Gi5zejvAW8ehUZG6l+47liPkYH2KE3KVkrqJnvPPFLSzK8he
-         ZOfJ70E8RJG0D5wfccS8HETnYX/gVUBkGhsypQmNi8tg2z+kAgCpfbs/dao1EpK5fGb0
-         Vi80bBcrGSiAisd87Wf1r3zHql2bMJAnWynWect2boedk+Zaf8y7rdGRRsiShs+fwvqF
-         xcEA==
+        bh=HCywdVt2XRGX+2M8xTCi0BXcDhuvXKwGd7VD7ATsG8E=;
+        b=R5aWagTnYS+CEfEdJcB6D34J1WdyrjuKyfcF1CyWk7jMVp7Z7TZ31nswYjaHQOglM9
+         LpqY7vIoDYQ5sMiIftx8EUiC7rPhFlEyb8Uc8EVlj1/oSF6ITQUmPpdH5U2QRgLqMv1o
+         4ucQYp22d1a7lEYgfHPEsycINL/kwHuTuTBCyjUedZvtRFvG4DKY0ZU2dLCHMcn8h2Qb
+         SdoYk3tY2gQz7bw822ZDSTQshXxSwrBw27FpT2t3HIYLtvAOR3krS3UvVRl7LnL9IN9C
+         eUbgcRgM+uHdoHZ5x1oqbV947JkHNJFTX1Zq47OdF9phNkjxxB1HVgL3quo2/GCSjARf
+         /xFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=M2kD3GwOu1cuqUDf6v9BDb+wpn8NSWwJtfH+fWMIGrs=;
-        b=AYBAHq+qBaPWBssGKiY3vGnwrvRzvAqVd0d4D812ZLQFpzh9co4fLdjFAMzkiHKwkq
-         I7Sm1x3ObkdpQ/NoLjPxxV11muUBZEzjqvJSQ2MK/1gsE9VP76KRXiAnqiBH3eyEcbpc
-         wTrgG9LLiX8qe85UV8kq3iEUnj5d5DA+FRK0LtIm8h+N0W3/dAhEAn9ca9akE4Js43yh
-         jAe+RGnilOD2XbW97his7O9GIUW92/zzBIH0gwULWJaz85p9MiugSX7y1BneqnXvl+7n
-         sZ5pMi88KzKCzALKfT+rCJbo+ASXtWUeBQEGAintJJpQ/p+d86eCMvLDot+W52KqBC+Z
-         03PQ==
-X-Gm-Message-State: AFqh2krhlNLg4BAJ0J0hSH4jJVF4izGpAf/NrWb8zXyU3wlfT7rodU6o
-	r4MgENWJ4UX3HXasTKnr5Jy6rDK2ZQ5nOmYEEa/BuA==
-X-Google-Smtp-Source: AMrXdXuiR2zDQjQTwOKPYxYiv6nBQxYDOm6Uo5rrXeXJwtr1kC3DgQfxY5fX74WNUq+cFZTNBOgpsUR83oMPt3dcFxI=
-X-Received: by 2002:a50:ee12:0:b0:499:7efc:1d78 with SMTP id
- g18-20020a50ee12000000b004997efc1d78mr2851639eds.81.1674521488275; Mon, 23
- Jan 2023 16:51:28 -0800 (PST)
+        bh=HCywdVt2XRGX+2M8xTCi0BXcDhuvXKwGd7VD7ATsG8E=;
+        b=J3pLeQYQxgsp1N35NTKFX2akRTPxmb5CzgCSmIqyDYHqo9ydeHtO8c5nHjtN1Uakwh
+         y6Kz3Xu7ho0U+OGrfcpWJrKr6OAt21i8m5ZzrUEn0cVU1owXD20c7Juq+Ms1OLyfYgOS
+         q9JnhpG6Xf8OF2JWE0vo5ZCaaWsTAKp4DhcnD8XPaT/j3kY48hI402P2EVzcz9UE9aEi
+         pQswa+RDtBHcLBj05ZYwUQ1FIOkmv2Q1zBTw52zlxbUgvKj/4YT5dGWs7H4EWWhV4/6k
+         onrPuFSBKQbJ9zrfXOD7O/+cWTtX9HxXGT2ooCFJcl2A6DFaouUPH6x3BdrQpu6x3/Wf
+         8dpg==
+X-Gm-Message-State: AFqh2kosT8V5RnPdiGka3k1/gIcz3OR7EPNnRRe5HOD3fzKH3HRkICNa
+	WWcM1ui/LF5Nj/dZmasNZ42udkgXlTj6Bw/DXxUWNA==
+X-Google-Smtp-Source: AMrXdXtbJf86/aYud+ZHNkaChxTmnpKPeYPUuB87/JypdyEMk76ABkYRlnYxJfkr6EIA8dd4K/AzrdPotjanepnOR4A=
+X-Received: by 2002:a17:906:2e94:b0:84d:ac8:ec37 with SMTP id
+ o20-20020a1709062e9400b0084d0ac8ec37mr2843846eji.138.1674521751761; Mon, 23
+ Jan 2023 16:55:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230113035000.480021-1-ricarkol@google.com> <20230113035000.480021-2-ricarkol@google.com>
-In-Reply-To: <20230113035000.480021-2-ricarkol@google.com>
+References: <20230113035000.480021-1-ricarkol@google.com> <20230113035000.480021-3-ricarkol@google.com>
+In-Reply-To: <20230113035000.480021-3-ricarkol@google.com>
 From: Ben Gardon <bgardon@google.com>
-Date: Mon, 23 Jan 2023 16:51:16 -0800
-Message-ID: <CANgfPd9gMoR=F3uKhDtjsUV0efuoNvCLV0o0WoJKm9zx_PaKsQ@mail.gmail.com>
-Subject: Re: [PATCH 1/9] KVM: arm64: Add KVM_PGTABLE_WALK_REMOVED into ctx->flags
+Date: Mon, 23 Jan 2023 16:55:40 -0800
+Message-ID: <CANgfPd-KSX=NOhjyoAQRrLyHArQ=Sw3uMjmdh5J0yrogUN8mbg@mail.gmail.com>
+Subject: Re: [PATCH 2/9] KVM: arm64: Add helper for creating removed stage2 subtrees
 To: Ricardo Koller <ricarkol@google.com>
 Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
 	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, 
@@ -57,14 +57,123 @@ Content-Type: text/plain; charset="UTF-8"
 
 On Thu, Jan 12, 2023 at 7:50 PM Ricardo Koller <ricarkol@google.com> wrote:
 >
-> Add a flag to kvm_pgtable_visit_ctx, KVM_PGTABLE_WALK_REMOVED, to
-> indicate that the walk is on a removed table not accesible to the HW
-> page-table walker. Then use it to avoid doing break-before-make or
-> performing CMOs (Cache Maintenance Operations) when mapping a removed
+> Add a stage2 helper, kvm_pgtable_stage2_create_removed(), for creating
+> removed tables (the opposite of kvm_pgtable_stage2_free_removed()).
+> Creating a removed table is useful for splitting block PTEs into
+> subtrees of 4K PTEs.  For example, a 1G block PTE can be split into 4K
+> PTEs by first creating a fully populated tree, and then use it to
+> replace the 1G PTE in a single step.  This will be used in a
+> subsequent commit for eager huge-page splitting (a dirty-logging
+> optimization).
+>
+> No functional change intended. This new function will be used in a
+> subsequent commit.
+>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h | 25 +++++++++++++++
+>  arch/arm64/kvm/hyp/pgtable.c         | 47 ++++++++++++++++++++++++++++
+>  2 files changed, 72 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 84a271647007..8ad78d61af7f 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -450,6 +450,31 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
+>   */
+>  void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, u32 level);
+>
+> +/**
+> + * kvm_pgtable_stage2_free_removed() - Create a removed stage-2 paging structure.
+> + * @pgt:       Page-table structure initialised by kvm_pgtable_stage2_init*().
+> + * @new:       Unlinked stage-2 paging structure to be created.
 
-Nit: Should this say unmapping? Or are we actually going to use this
-to map memory ?
+Oh, I see so the "removed" page table is actually a new page table
+that has never been part of the paging structure. In that case I would
+find it much more intuitive to call it "unlinked" or similar.
 
-> table. This is safe as these removed tables are not visible to the HW
-> page-table walker. This will be used in a subsequent commit for
-...
+> + * @phys:      Physical address of the memory to map.
+> + * @level:     Level of the stage-2 paging structure to be created.
+> + * @prot:      Permissions and attributes for the mapping.
+> + * @mc:                Cache of pre-allocated and zeroed memory from which to allocate
+> + *             page-table pages.
+> + *
+> + * Create a removed page-table tree of PAGE_SIZE leaf PTEs under *new.
+> + * This new page-table tree is not reachable (i.e., it is removed) from the
+> + * root pgd and it's therefore unreachableby the hardware page-table
+> + * walker. No TLB invalidation or CMOs are performed.
+> + *
+> + * If device attributes are not explicitly requested in @prot, then the
+> + * mapping will be normal, cacheable.
+> + *
+> + * Return: 0 only if a fully populated tree was created, negative error
+> + * code on failure. No partially-populated table can be returned.
+> + */
+> +int kvm_pgtable_stage2_create_removed(struct kvm_pgtable *pgt,
+> +                                     kvm_pte_t *new, u64 phys, u32 level,
+> +                                     enum kvm_pgtable_prot prot, void *mc);
+> +
+>  /**
+>   * kvm_pgtable_stage2_map() - Install a mapping in a guest stage-2 page-table.
+>   * @pgt:       Page-table structure initialised by kvm_pgtable_stage2_init*().
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 87fd40d09056..0dee13007776 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -1181,6 +1181,53 @@ int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>         return kvm_pgtable_walk(pgt, addr, size, &walker);
+>  }
+>
+> +/*
+> + * map_data->force_pte is true in order to force creating PAGE_SIZE PTEs.
+> + * data->addr is 0 because the IPA is irrelevant for a removed table.
+> + */
+> +int kvm_pgtable_stage2_create_removed(struct kvm_pgtable *pgt,
+> +                                     kvm_pte_t *new, u64 phys, u32 level,
+> +                                     enum kvm_pgtable_prot prot, void *mc)
+> +{
+> +       struct stage2_map_data map_data = {
+> +               .phys           = phys,
+> +               .mmu            = pgt->mmu,
+> +               .memcache       = mc,
+> +               .force_pte      = true,
+> +       };
+> +       struct kvm_pgtable_walker walker = {
+> +               .cb             = stage2_map_walker,
+> +               .flags          = KVM_PGTABLE_WALK_LEAF |
+> +                                 KVM_PGTABLE_WALK_REMOVED,
+> +               .arg            = &map_data,
+> +       };
+> +       struct kvm_pgtable_walk_data data = {
+> +               .walker = &walker,
+> +               .addr   = 0,
+> +               .end    = kvm_granule_size(level),
+> +       };
+> +       struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+> +       kvm_pte_t *pgtable;
+> +       int ret;
+> +
+> +       ret = stage2_set_prot_attr(pgt, prot, &map_data.attr);
+> +       if (ret)
+> +               return ret;
+> +
+> +       pgtable = mm_ops->zalloc_page(mc);
+> +       if (!pgtable)
+> +               return -ENOMEM;
+> +
+> +       ret = __kvm_pgtable_walk(&data, mm_ops, pgtable, level + 1);
+> +       if (ret) {
+> +               kvm_pgtable_stage2_free_removed(mm_ops, pgtable, level);
+> +               mm_ops->put_page(pgtable);
+> +               return ret;
+> +       }
+> +
+> +       *new = kvm_init_table_pte(pgtable, mm_ops);
+> +       return 0;
+> +}
+>
+>  int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>                               struct kvm_pgtable_mm_ops *mm_ops,
+> --
+> 2.39.0.314.g84b9a713c41-goog
+>
