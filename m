@@ -1,30 +1,34 @@
-Received: from out-96.mta0.migadu.com (out-96.mta0.migadu.com [91.218.175.96])
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264DF8F63
-	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 21:28:55 +0000 (UTC)
-Date: Tue, 24 Jan 2023 21:18:10 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6C08F70
+	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 22:20:15 +0000 (UTC)
+Date: Tue, 24 Jan 2023 14:19:59 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1674595095;
+	t=1674598806;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CnSq4mBbw8yIBMhIRKayETuEHeib8k7L9ZTqOeYi3PI=;
-	b=MgrUEDLCALpdGP50oLgldB4thgGtzyIH2dBkSuxkTLVU9dFZOdt4boNR1m6wbC7ZVk08LO
-	huugRiBeVoC41yib++Q7KKxT/txti822KALNGV+56GxuLP5E37h9HOEsfpzxoQicWYkoUY
-	Qz0ak+yrCJ0K2x15ayvuCIBYWMIgJpE=
+	bh=OCBfEODFKSWyFeydGUGZ0cHcrxRDh9Y42D13cNqLF3I=;
+	b=o1bDdDnULIjx6lxzCDdwdLZ5d8nAricJW94EasG8LIbNXdaC5bRZHNyqLlYzloocUsM2YX
+	sKcfAnhLo+u9yICx8suxzizTBHW45BFYmGTDGVpo5QyPijKrYU4BRnijE3EMyw76ztUFJH
+	nwFsmP2REJfmV2zhToPyugEuA//7amU=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Will Deacon <will@kernel.org>
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-	seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH] MAINTAINERS: Add Oliver Upton as co-maintainer of
- KVM/arm64
-Message-ID: <Y9BLEj+/doAKmXzP@google.com>
-References: <20230123210256.2728218-1-oliver.upton@linux.dev>
- <20230124093728.GA26080@willie-the-truck>
+To: Ben Gardon <bgardon@google.com>
+Cc: Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
+	maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
+	dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev,
+	seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+	eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+	rananta@google.com, ricarkol@gmail.com
+Subject: Re: [PATCH 6/9] KVM: arm64: Split huge pages when dirty logging is
+ enabled
+Message-ID: <Y9BZj7i+R7E9Vhy+@thinky-boi>
+References: <20230113035000.480021-1-ricarkol@google.com>
+ <20230113035000.480021-7-ricarkol@google.com>
+ <CANgfPd9B0GcDST6-GHgPTv3j=EBqUYjkNUuAuiB2Ei3nLYaSEQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -33,48 +37,81 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230124093728.GA26080@willie-the-truck>
+In-Reply-To: <CANgfPd9B0GcDST6-GHgPTv3j=EBqUYjkNUuAuiB2Ei3nLYaSEQ@mail.gmail.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jan 24, 2023 at 09:37:29AM +0000, Will Deacon wrote:
-> On Mon, Jan 23, 2023 at 09:02:56PM +0000, Oliver Upton wrote:
-> > Going forward I intend to help Marc with maintaining KVM/arm64. We've
-> > spoken about this quite a bit and he has been a tremendous help in
-> > ramping up to the task (thank you!). We haven't worked out the exact
-> > details of how the process will work, but the goal is to even out the
-> > maintenance responsibilities to give us both ample time for development.
-> > 
-> > To that end, updating the maintainers entry to reflect the change.
-> > 
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+On Tue, Jan 24, 2023 at 09:52:49AM -0800, Ben Gardon wrote:
+> On Thu, Jan 12, 2023 at 7:50 PM Ricardo Koller <ricarkol@google.com> wrote:
+> >
+> > Split huge pages eagerly when enabling dirty logging. The goal is to
+> > avoid doing it while faulting on write-protected pages, which
+> > negatively impacts guest performance.
+> >
+> > A memslot marked for dirty logging is split in 1GB pieces at a time.
+> > This is in order to release the mmu_lock and give other kernel threads
+> > the opportunity to run, and also in order to allocate enough pages to
+> > split a 1GB range worth of huge pages (or a single 1GB huge page).
+> > Note that these page allocations can fail, so eager page splitting is
+> > best-effort.  This is not a correctness issue though, as huge pages
+> > can still be split on write-faults.
+> >
+> > The benefits of eager page splitting are the same as in x86, added
+> > with commit a3fe5dbda0a4 ("KVM: x86/mmu: Split huge pages mapped by
+> > the TDP MMU when dirty logging is enabled"). For example, when running
+> > dirty_log_perf_test with 64 virtual CPUs (Ampere Altra), 1GB per vCPU,
+> > 50% reads, and 2MB HugeTLB memory, the time it takes vCPUs to access
+> > all of their memory after dirty logging is enabled decreased by 44%
+> > from 2.58s to 1.42s.
+> >
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > > ---
-> >  MAINTAINERS | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 42fc47c6edfd..7323efcc1270 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -11355,9 +11355,9 @@ F:	virt/kvm/*
-> >  
-> >  KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)
-> >  M:	Marc Zyngier <maz@kernel.org>
-> > +M:	Oliver Upton <oliver.upton@linux.dev>
+> >  arch/arm64/include/asm/kvm_host.h |  30 ++++++++
+> >  arch/arm64/kvm/mmu.c              | 110 +++++++++++++++++++++++++++++-
+> >  2 files changed, 138 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 35a159d131b5..6ab37209b1d1 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -153,6 +153,36 @@ struct kvm_s2_mmu {
+> >         /* The last vcpu id that ran on each physical CPU */
+> >         int __percpu *last_vcpu_ran;
+> >
+> > +       /*
+> > +        * Memory cache used to split EAGER_PAGE_SPLIT_CHUNK_SIZE worth of huge
+> > +        * pages. It is used to allocate stage2 page tables while splitting
+> > +        * huge pages. Its capacity should be EAGER_PAGE_SPLIT_CACHE_CAPACITY.
+> > +        * Note that the choice of EAGER_PAGE_SPLIT_CHUNK_SIZE influences both
+> > +        * the capacity of the split page cache (CACHE_CAPACITY), and how often
+> > +        * KVM reschedules. Be wary of raising CHUNK_SIZE too high.
+> > +        *
+> > +        * A good heuristic to pick CHUNK_SIZE is that it should be larger than
+> > +        * all the available huge-page sizes, and be a multiple of all the
+> > +        * other ones; for example, 1GB when all the available huge-page sizes
+> > +        * are (1GB, 2MB, 32MB, 512MB).
 > 
-> Ya know, alphabetical order tends to put Mr Z at the bottom of the list,
-> but I can understand why you don't necessarily want to be first in the
-> pack just yet!
+> This feels a little fragile to link scheduling decisions into the
+> batch size.
 
-I think you may've spotted my intentions here :-) Short of any
-objections, I'll shamelessly leave Marc in the direct line of fire until
-someone alphabetizes it.
+Completely agree.
 
-> In any case, this is really great to see:
-> 
-> Acked-by: Will Deacon <will@kernel.org>
+> (I'm not saying we don't do the same thing on x86, but
+> it's a mistake in either case.) I'd prefer if we could yield more
+> granularly in a way that's not tied to splitting a whole
+> EAGER_PAGE_SPLIT_CHUNK_SIZE worth of pages.
+> Tuning the chunk size to balance memory overhead with batch
+> performance makes sense, but it becomes more difficult to also balance
+> with the needs of the scheduler. Could we add some yield point in
+> kvm_pgtable_stage2_split or give it an early return path or something?
 
-Thanks!
+We definitely need to move in the direction of early returns, but I'd
+rather not build it purely for the sake of eager page spliting. A better
+approach would likely be to add it to the core page table walker code
+such that all walkers that operate on a swath of memory can use it.
 
--- 
+In the interest of keeping this series manageable, I'd prefer yielding
+walkers be done in a separate series.
+
+--
 Thanks,
 Oliver
