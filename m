@@ -1,56 +1,33 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2603663DD
-	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 16:50:26 +0000 (UTC)
-Received: by mail-pj1-f50.google.com with SMTP id z1-20020a17090a66c100b00226f05b9595so14620417pjl.0
-        for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 08:50:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SXUs7GAqNqJPG2nIfuCmTwdMZLfZBxygcYraNjWRyZI=;
-        b=LkCOS9933Uk1hwgRR6zGDCGzyPu1rQYDKTNLbdlUrvqITGrp2QEgc13kuskTQ4kO6W
-         QtafYUaXp8IADS4oC1GUHKyEQLrqXqBdqukFO7mEbdeCBdemx7B5nHS5NiWy5vQLmkix
-         RYnsDRw+mkLLFJS/KuCO/HKec7oZkIsTvujVrOd6eLcrgcgkjeShOQ3Ts6GUfbTG3hoN
-         Emeg/vqyfCpx08/iAotXJOaF8kyQQRVnuxF+adzLB/ILMxWo1eVCUQaF7rkqNeyvgGOG
-         ggMKqCk4a8lYZz9yh3JjRVPXIMLIQ1cG8Dm6NPHPozoUbOvg4XISIE64HYFtc+fYlHnX
-         6L6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SXUs7GAqNqJPG2nIfuCmTwdMZLfZBxygcYraNjWRyZI=;
-        b=Y1zg1lyF13ZCNJoJC8tmLq4C/wxAP43esXVzNvKeaBJOhfjGDznMVhwfRvT/67/JtQ
-         bzD0XtAnm8G8fcweYfA3BjYgJ9iW7FzM/8Fc2g8iOZbZNVKIfBGSYK7iACSJKqU1R6ny
-         o5Rf7OZ/5YknFI0bGhrQIKFwzYB1Y/mrJvQitGCayTQE8ujG+lD5rkUrm7+hw840xJQF
-         8o+TK/rJ9sDNqCZXn55xzfxVgXSgO4x+F+iidoKv+bLWUClOhR2BydmdhcsLdN02VO9z
-         SqskyGX4KL37yWsxEAd+gtf25Yrd2W/XergnSQhU5k6ONjYrnM8j/NqG+WIN07zUOpNv
-         XfrA==
-X-Gm-Message-State: AO0yUKXu8E/1q3Wx5mgvha0/cc7j6Umb/8dMjMn1nVYzmx+b78P1XJcw
-	AJ7mP/IppByYth3CBXllo6BbhQ==
-X-Google-Smtp-Source: AK7set9GirGnwwlFtvzSkauQVN0c+DI0q+KdVL6cpbO93rLClrnDUy33SVzX0MV80tF3j69IH1JXiA==
-X-Received: by 2002:a17:90a:300e:b0:227:679:17df with SMTP id g14-20020a17090a300e00b00227067917dfmr237681pjb.0.1674579025317;
-        Tue, 24 Jan 2023 08:50:25 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id nk19-20020a17090b195300b002295298a2e4sm8780786pjb.36.2023.01.24.08.50.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jan 2023 08:50:24 -0800 (PST)
-Date: Tue, 24 Jan 2023 08:50:21 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Ben Gardon <bgardon@google.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C2D8BEC
+	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 17:11:27 +0000 (UTC)
+Date: Tue, 24 Jan 2023 17:11:19 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1674580285;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TyJQjATPh0tKJCEQcnqCvNrxjQJk0MT7om7mPRXWyqo=;
+	b=K6k1kVS1Du6EUufjWRtLZ6pyq5z7L5toFFB0wjYBKLsHWX/X2G1T8qoTnjx+3zY86JYpXJ
+	t+B/69mWrcXtYfGJDFh1VEo8gjU/xD6IbastSk0602xBrvKfJMuTNMZIhDKU2GktgEjuMl
+	AZE0kp/oaUgMm9lUZ3cmHlXn25YIwuw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Ricardo Koller <ricarkol@google.com>
+Cc: Ben Gardon <bgardon@google.com>, pbonzini@redhat.com, maz@kernel.org,
 	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com,
 	andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com,
 	suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com,
 	reijiw@google.com, rananta@google.com, ricarkol@gmail.com
-Subject: Re: [PATCH 0/9] KVM: arm64: Eager Huge-page splitting for
- dirty-logging
-Message-ID: <Y9AMTVJbVDMsrdv6@google.com>
+Subject: Re: [PATCH 3/9] KVM: arm64: Add kvm_pgtable_stage2_split()
+Message-ID: <Y9ARN5hWlAYVFBoK@google.com>
 References: <20230113035000.480021-1-ricarkol@google.com>
- <CANgfPd-zjCcV08qPVpbvqT+aYaaaWsdGuDbiFyYS9HM-KaDKug@mail.gmail.com>
+ <20230113035000.480021-4-ricarkol@google.com>
+ <CANgfPd_PgrZ_4oRDT3ZaqX=3jboD=2qEUKefp4TsKM36p187gw@mail.gmail.com>
+ <Y9ALgtnd+h9ivn90@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,188 +36,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANgfPd-zjCcV08qPVpbvqT+aYaaaWsdGuDbiFyYS9HM-KaDKug@mail.gmail.com>
+In-Reply-To: <Y9ALgtnd+h9ivn90@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jan 23, 2023 at 04:48:02PM -0800, Ben Gardon wrote:
-> On Thu, Jan 12, 2023 at 7:50 PM Ricardo Koller <ricarkol@google.com> wrote:
-> >
-> > Implement Eager Page Splitting for ARM.
-> >
-> > Eager Page Splitting improves the performance of dirty-logging (used
-> > in live migrations) when guest memory is backed by huge-pages.  It's
-> > an optimization used in Google Cloud since 2016 on x86, and for the
-> > last couple of months on ARM.
-> >
-> > Background and motivation
-> > =========================
-> > Dirty logging is typically used for live-migration iterative copying.
-> > KVM implements dirty-logging at the PAGE_SIZE granularity (will refer
-> > to 4K pages from now on).  It does it by faulting on write-protected
-> > 4K pages.  Therefore, enabling dirty-logging on a huge-page requires
-> > breaking it into 4K pages in the first place.  KVM does this breaking
-> > on fault, and because it's in the critical path it only maps the 4K
-> > page that faulted; every other 4K page is left unmapped.  This is not
-> > great for performance on ARM for a couple of reasons:
-> >
-> > - Splitting on fault can halt vcpus for milliseconds in some
-> >   implementations. Splitting a block PTE requires using a broadcasted
-> >   TLB invalidation (TLBI) for every huge-page (due to the
-> >   break-before-make requirement). Note that x86 doesn't need this. We
-> >   observed some implementations that take millliseconds to complete
-> >   broadcasted TLBIs when done in parallel from multiple vcpus.  And
-> >   that's exactly what happens when doing it on fault: multiple vcpus
-> >   fault at the same time triggering TLBIs in parallel.
-> >
-> > - Read intensive guest workloads end up paying for dirty-logging.
-> >   Only mapping the faulting 4K page means that all the other pages
-> >   that were part of the huge-page will now be unmapped. The effect is
-> >   that any access, including reads, now has to fault.
-> >
-> > Eager Page Splitting (on ARM)
-> > =============================
-> > Eager Page Splitting fixes the above two issues by eagerly splitting
-> > huge-pages when enabling dirty logging. The goal is to avoid doing it
-> > while faulting on write-protected pages. This is what the TDP MMU does
-> > for x86 [0], except that x86 does it for different reasons: to avoid
-> > grabbing the MMU lock on fault. Note that taking care of
-> > write-protection faults still requires grabbing the MMU lock on ARM,
-> > but not on x86 (with the fast_page_fault path).
-> >
-> > An additional benefit of eagerly splitting huge-pages is that it can
-> > be done in a controlled way (e.g., via an IOCTL). This series provides
-> > two knobs for doing it, just like its x86 counterpart: when enabling
-> > dirty logging, and when using the KVM_CLEAR_DIRTY_LOG ioctl. The
-> > benefit of doing it on KVM_CLEAR_DIRTY_LOG is that this ioctl takes
-> > ranges, and not complete memslots like when enabling dirty logging.
-> > This means that the cost of splitting (mainly broadcasted TLBIs) can
-> > be throttled: split a range, wait for a bit, split another range, etc.
-> > The benefits of this approach were presented by Oliver Upton at KVM
-> > Forum 2022 [1].
-> >
-> > Implementation
-> > ==============
-> > Patches 1-3 add a pgtable utility function for splitting huge block
-> > PTEs: kvm_pgtable_stage2_split(). Patches 4-8 add support for eagerly
-> > splitting huge-pages when enabling dirty-logging and when using the
-> > KVM_CLEAR_DIRTY_LOG ioctl. Note that this is just like what x86 does,
-> > and the code is actually based on it.  And finally, patch 9:
-> >
-> >         KVM: arm64: Use local TLBI on permission relaxation
-> >
-> > adds support for using local TLBIs instead of broadcasts when doing
-> > permission relaxation. This last patch is key to achieving good
-> > performance during dirty-logging, as eagerly breaking huge-pages
-> > replaces mapping new pages with permission relaxation. Got this patch
-> > (indirectly) from Marc Z.  and took the liberty of adding a commit
-> > message.
-> >
-> > Note: this applies on top of 6.2-rc3.
-> >
-> > Performance evaluation
-> > ======================
-> > The performance benefits were tested using the dirty_log_perf_test
-> > selftest with 2M huge-pages.
-> >
-> > The first test uses a write-only sequential workload where the stride
-> > is 2M instead of 4K [2]. The idea with this experiment is to emulate a
-> > random access pattern writing a different huge-page at every access.
-> > Observe that the benefit increases with the number of vcpus: up to
-> > 5.76x for 152 vcpus.
-> >
-> > ./dirty_log_perf_test_sparse -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2
-> >
-> >         +-------+----------+------------------+
-> >         | vCPUs | 6.2-rc3  | 6.2-rc3 + series |
-> >         |       |    (ms)  |             (ms) |
-> >         +-------+----------+------------------+
-> >         |    1  |    2.63  |          1.66    |
-> >         |    2  |    2.95  |          1.70    |
-> >         |    4  |    3.21  |          1.71    |
-> >         |    8  |    4.97  |          1.78    |
-> >         |   16  |    9.51  |          1.82    |
-> >         |   32  |   20.15  |          3.03    |
-> >         |   64  |   40.09  |          5.80    |
-> >         |  128  |   80.08  |         12.24    |
-> >         |  152  |  109.81  |         15.14    |
-> >         +-------+----------+------------------+
+On Tue, Jan 24, 2023 at 08:46:58AM -0800, Ricardo Koller wrote:
+> On Mon, Jan 23, 2023 at 05:03:23PM -0800, Ben Gardon wrote:
+
+[...]
+
+> > Would it be accurate to say:
+> > /* No huge pages can exist at the root level, so there's nothing to
+> > split here. */
+> > 
+> > I think of "last level" as the lowest/leaf/4k level but
+> > KVM_PGTABLE_MAX_LEVELS - 1 is 3? 
 > 
-> This is the average pass time I assume? Or the total or last? Or whole
-> test runtime?
-
-Oops, forgot to provide any detail, sorry for that. This is the length
-of the first guest pass ("Iteration 2 dirty memory time").
-
-> Was this run with MANUAL_PROTECT or do the split during the CLEAR
-> IOCTL or with the splitting at enable time?
-
-The CLEAR IOCTL (with MANUAL_PROTECT). Just to double check, without the
-'-g' argument.
-
+> Right, this is the 4k level.
 > 
-> >
-> > This second test measures the benefit of eager page splitting on read
-> > intensive workloads (1 write for every 10 reads). As in the other
-> > test, the benefit increases with the number of vcpus, up to 8.82x for
-> > 152 vcpus.
-> >
-> > ./dirty_log_perf_test -s anonymous_hugetlb_2mb -b 1G -v $i -i 3 -m 2 -f 10
-> >
-> >         +-------+----------+------------------+
-> >         | vCPUs | 6.2-rc3  | 6.2-rc3 + series |
-> >         |       |   (sec)  |            (sec) |
-> >         +-------+----------+------------------+
-> >         |    1  |    0.65  |          0.07    |
-> >         |    2  |    0.70  |          0.08    |
-> >         |    4  |    0.71  |          0.08    |
-> >         |    8  |    0.72  |          0.08    |
-> >         |   16  |    0.76  |          0.08    |
-> >         |   32  |    1.61  |          0.14    |
-> >         |   64  |    3.46  |          0.30    |
-> >         |  128  |    5.49  |          0.64    |
-> >         |  152  |    6.44  |          0.63    |
-> >         +-------+----------+------------------+
-> >
-> > Changes from the RFC:
-> > https://lore.kernel.org/kvmarm/20221112081714.2169495-1-ricarkol@google.com/
-> > - dropped the changes to split on POST visits. No visible perf
-> >   benefit.
-> > - changed the kvm_pgtable_stage2_free_removed() implementation to
-> >   reuse the stage2 mapper.
-> > - dropped the FEAT_BBM changes and optimization. Will send this on a
-> >   different series.
-> >
-> > Thanks,
-> > Ricardo
-> >
-> > [0] https://lore.kernel.org/kvm/20220119230739.2234394-1-dmatlack@google.com/
-> > [1] https://kvmforum2022.sched.com/event/15jJq/kvmarm-at-scale-improvements-to-the-mmu-in-the-face-of-hardware-growing-pains-oliver-upton-google
-> > [2] https://github.com/ricarkol/linux/commit/f78e9102b2bff4fb7f30bee810d7d611a537b46d
-> > [3] https://lore.kernel.org/kvmarm/20221107215644.1895162-1-oliver.upton@linux.dev/
-> >
-> > Marc Zyngier (1):
-> >   KVM: arm64: Use local TLBI on permission relaxation
-> >
-> > Ricardo Koller (8):
-> >   KVM: arm64: Add KVM_PGTABLE_WALK_REMOVED into ctx->flags
-> >   KVM: arm64: Add helper for creating removed stage2 subtrees
-> >   KVM: arm64: Add kvm_pgtable_stage2_split()
-> >   KVM: arm64: Refactor kvm_arch_commit_memory_region()
-> >   KVM: arm64: Add kvm_uninit_stage2_mmu()
-> >   KVM: arm64: Split huge pages when dirty logging is enabled
-> >   KVM: arm64: Open-code kvm_mmu_write_protect_pt_masked()
-> >   KVM: arm64: Split huge pages during KVM_CLEAR_DIRTY_LOG
-> >
-> >  arch/arm64/include/asm/kvm_asm.h     |   4 +
-> >  arch/arm64/include/asm/kvm_host.h    |  30 +++++
-> >  arch/arm64/include/asm/kvm_mmu.h     |   1 +
-> >  arch/arm64/include/asm/kvm_pgtable.h |  62 ++++++++++
-> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c   |  10 ++
-> >  arch/arm64/kvm/hyp/nvhe/tlb.c        |  54 +++++++++
-> >  arch/arm64/kvm/hyp/pgtable.c         | 143 +++++++++++++++++++++--
-> >  arch/arm64/kvm/hyp/vhe/tlb.c         |  32 +++++
-> >  arch/arm64/kvm/mmu.c                 | 168 ++++++++++++++++++++++-----
-> >  9 files changed, 466 insertions(+), 38 deletions(-)
-> >
-> > --
-> > 2.39.0.314.g84b9a713c41-goog
-> >
+> > Does ARM do the level numbering in
+> > reverse order to x86?
+> 
+> Yes, it does. Interesting, x86 does
+> 
+> 	iter->level--;
+> 
+> while arm does:
+> 
+> 	ret = __kvm_pgtable_walk(data, mm_ops, childp, level + 1);
+> 
+> I don't think this numbering scheme is encoded anywhere in the PTEs, so
+> either architecture could use the other.
+
+The numbering we use in the page table walkers is deliberate, as it
+directly matches the Arm ARM. While we can certainly use either scheme
+I'd prefer we keep aligned with the architecture.
+
+--
+Thanks,
+Oliver
