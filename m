@@ -1,18 +1,18 @@
-Received: from out-106.mta0.migadu.com (out-106.mta0.migadu.com [91.218.175.106])
+Received: from out-24.mta0.migadu.com (out-24.mta0.migadu.com [91.218.175.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF26322A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5260A958
 	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 23:31:42 +0000 (UTC)
-Date: Tue, 24 Jan 2023 14:54:00 -0800
+Date: Tue, 24 Jan 2023 15:25:42 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1674600847;
+	t=1674602749;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=89LHdp2iidBYEJxIivMbaQf8lDKjYIbRHtNpIRtucvg=;
-	b=fnj/snkgDOwjWEdnayZeLkkYSrAgCDx9UY78BuX1gquOv8FWgO4XYZHlQH+yWFOgEW2cPx
-	UU0et3Z9AqS7glL1qv0VQ3eTk+LcVOoZXJ1/fqEiaT4HkIExSu5s/SIX/V64fFMLB9R2Bv
-	wtg9E+/6mrcp+RKIdQtOW+Mv3fPAotE=
+	bh=c74+f/E81sUW5vwqR4R5i42L30Py8ifaBoFNS256FLc=;
+	b=DY6oY/iylKNyk7k7siN12oc3f6brxvNO05K/H869hJ8xZAiaE7YqpP72oXE86llGUFEe1O
+	1mZi+lfR4ZQbbSw3ILPGX0KEGFAA+qZm8QG7CFU4Ng+uzkdIhGom4q5q7r8SMljdvrLkXo
+	eMFUkv6hAz+FW8i4zMpGIlIcoJYa2XU=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Raghavendra Rao Ananta <rananta@google.com>
@@ -28,11 +28,11 @@ Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
 	Colton Lewis <coltonlewis@google.com>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 4/6] KVM: arm64: Optimize TLBIs in the dirty logging
- path
-Message-ID: <Y9BhiOyvMvu/L0J4@thinky-boi>
+Subject: Re: [RFC PATCH 5/6] KVM: arm64: Optimize the stage2 map path with
+ TLBI range instructions
+Message-ID: <Y9Bo9qwJhs3KK6jR@thinky-boi>
 References: <20230109215347.3119271-1-rananta@google.com>
- <20230109215347.3119271-5-rananta@google.com>
+ <20230109215347.3119271-6-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,69 +41,126 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230109215347.3119271-5-rananta@google.com>
+In-Reply-To: <20230109215347.3119271-6-rananta@google.com>
 X-Migadu-Flow: FLOW_OUT
 
 Hi Raghavendra,
 
-I find the commit title rather ambiguous. May I suggest:
+My comment from the previous change also applies here:
 
-  KVM: arm64: Use range-based TLBIs for write protection
+  KVM: arm64: Use range-based TLBIs when collapsing hugepages
 
-On Mon, Jan 09, 2023 at 09:53:45PM +0000, Raghavendra Rao Ananta wrote:
-> Currently the dirty-logging paths, including
-> kvm_arch_flush_remote_tlbs_memslot() and kvm_mmu_wp_memory_region()
-> ivalidates the entire VM's TLB entries using kvm_flush_remote_tlbs().
-> As the range of IPAs is provided by these functions, this is highly
-> inefficient on the systems which support FEAT_TLBIRANGE. Hence,
-> use kvm_flush_remote_tlbs_range() to flush the TLBs instead.
+On Mon, Jan 09, 2023 at 09:53:46PM +0000, Raghavendra Rao Ananta wrote:
+> Currently, when the map path of stage2 page-table coalesces a
+> bunch of pages into a hugepage, KVM invalidates the entire
+> VM's TLB entries. This would cause a perforamance penality for
+> the guest whose pages have already been coalesced earlier as they
+> would have to refill their TLB entries unnecessarily again.
 
-This commit message gives a rather mechanical description of the commit.
-Instead of describing the change, could you describe _why_ this is an
-improvement over the VM-wide invalidation?
+It is also problematic that we do this on every single fault where we
+collapse a hugepage.
+
+> Hence, if the system supports it, use __kvm_tlb_flush_range_vmid_ipa()
+> to flush only the range of pages that have been combined into
+> a hugepage, while leaving other TLB entries alone.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/kvm/hyp/pgtable.c | 29 +++++++++++++++++++++++++----
+>  1 file changed, 25 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index b11cf2c618a6c..099032bb01bce 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -686,6 +686,22 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
+>  	return cmpxchg(ctx->ptep, ctx->old, new) == ctx->old;
+>  }
+>  
+> +static void kvm_table_pte_flush(struct kvm_s2_mmu *mmu, u64 addr, u32 level, u32 tlb_level)
+
+Could you call this something like kvm_pgtable_flush_range() and take an
+address range as an argument? TLBIRANGE can be used outside the context
+of a table (i.e. a subset of PTEs).
+
+> +{
+> +	if (system_supports_tlb_range()) {
+> +		u64 end = addr + kvm_granule_size(level);
+> +
+> +		kvm_call_hyp(__kvm_tlb_flush_range_vmid_ipa, mmu, addr, end, tlb_level);
+> +	} else {
+> +		/*
+> +		 * Invalidate the whole stage-2, as we may have numerous leaf
+> +		 * entries below us which would otherwise need invalidating
+> +		 * individually.
+> +		 */
+> +		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> +	}
+> +}
+> +
+>  /**
+>   * stage2_try_break_pte() - Invalidates a pte according to the
+>   *			    'break-before-make' requirements of the
+> @@ -693,6 +709,7 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
+>   *
+>   * @ctx: context of the visited pte.
+>   * @mmu: stage-2 mmu
+> + * @tlb_level: The level at which the leaf pages are expected (for FEAT_TTL hint)
+
+Do we need the caller to provide the TTL hint? We already have
+ctx->level, and stage2_try_break_pte() also knows what the removed PTE
+contained (i.e. a table or a block/page).
+
+>   * Returns: true if the pte was successfully broken.
+>   *
+> @@ -701,7 +718,7 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
+>   * on the containing table page.
+>   */
+>  static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+> -				 struct kvm_s2_mmu *mmu)
+> +				 struct kvm_s2_mmu *mmu, u32 tlb_level)
+>  {
+>  	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+>  
+> @@ -722,7 +739,7 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+>  	 * value (if any).
+>  	 */
+>  	if (kvm_pte_table(ctx->old, ctx->level))
+> -		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> +		kvm_table_pte_flush(mmu, ctx->addr, ctx->level, tlb_level);
+
+I don't think we should provide a TTL hint for a removed table. It is
+entirely possible for the unlinked table to contain a mix of blocks and
+pages, meaning there isn't a uniform table level for the whole range.
+
+>  	else if (kvm_pte_valid(ctx->old))
+>  		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
+>  
+> @@ -804,7 +821,7 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>  	if (!stage2_pte_needs_update(ctx->old, new))
+>  		return -EAGAIN;
+>  
+> -	if (!stage2_try_break_pte(ctx, data->mmu))
+> +	if (!stage2_try_break_pte(ctx, data->mmu, ctx->level))
+>  		return -EAGAIN;
+>  
+>  	/* Perform CMOs before installation of the guest stage-2 PTE */
+> @@ -861,7 +878,11 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>  	if (!childp)
+>  		return -ENOMEM;
+>  
+> -	if (!stage2_try_break_pte(ctx, data->mmu)) {
+> +	/*
+> +	 * As the table will be replaced with a block, one level down would
+> +	 * be the current page entries held by the table.
+> +	 */
+
+This isn't necessarily true. Ignoring mixed block/pages for a moment,
+Collapsing a PUD entry into a block after dirty logging (where we mapped
+at PTE level) would imply a TTL of ctx->level + 2.
+
+But again, I think it is best to provide no hint in this case.
 
 --
 Thanks,
 Oliver
-
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->  arch/arm64/kvm/arm.c | 7 ++++++-
->  arch/arm64/kvm/mmu.c | 2 +-
->  2 files changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 00da570ed72bd..179520888c697 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1433,7 +1433,12 @@ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
->  void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
->  					const struct kvm_memory_slot *memslot)
->  {
-> -	kvm_flush_remote_tlbs(kvm);
-> +	phys_addr_t start, end;
-> +
-> +	start = memslot->base_gfn << PAGE_SHIFT;
-> +	end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
-> +
-> +	kvm_flush_remote_tlbs_range(kvm, start, end);
->  }
->  
->  static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 70f76bc909c5d..e34b81f5922ce 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -976,7 +976,7 @@ static void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
->  	write_lock(&kvm->mmu_lock);
->  	stage2_wp_range(&kvm->arch.mmu, start, end);
->  	write_unlock(&kvm->mmu_lock);
-> -	kvm_flush_remote_tlbs(kvm);
-> +	kvm_flush_remote_tlbs_range(kvm, start, end);
->  }
->  
->  /**
-> -- 
-> 2.39.0.314.g84b9a713c41-goog
-> 
-> 
