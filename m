@@ -1,37 +1,30 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from out-96.mta0.migadu.com (out-96.mta0.migadu.com [91.218.175.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0198F4B
-	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 20:29:04 +0000 (UTC)
-Date: Tue, 24 Jan 2023 12:28:50 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264DF8F63
+	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 21:28:55 +0000 (UTC)
+Date: Tue, 24 Jan 2023 21:18:10 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1674592137;
+	t=1674595095;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/73jyguC+09XrXALkeeQcLu9/HGBWgVwVY/mjTKders=;
-	b=woDgSpregoLNsOVwUQdBXD0Vl+FpzkusPWIX5UQqTUW4HffQhV9MLoWH3z5cmC6vBFuyxl
-	9hcF052WTTUoXEFRSZPvwV6QSKQqGuPDEXgE1X0LwhJZZcbV8HNm+YkLURlZXgXaQOlIDT
-	2eHjfRN1VFHKZ9+Q1NE6CSyveAbmj30=
+	bh=CnSq4mBbw8yIBMhIRKayETuEHeib8k7L9ZTqOeYi3PI=;
+	b=MgrUEDLCALpdGP50oLgldB4thgGtzyIH2dBkSuxkTLVU9dFZOdt4boNR1m6wbC7ZVk08LO
+	huugRiBeVoC41yib++Q7KKxT/txti822KALNGV+56GxuLP5E37h9HOEsfpzxoQicWYkoUY
+	Qz0ak+yrCJ0K2x15ayvuCIBYWMIgJpE=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: David Matlack <dmatlack@google.com>
-Cc: Ricardo Koller <ricarkol@google.com>, Ben Gardon <bgardon@google.com>,
-	pbonzini@redhat.com, maz@kernel.org, yuzenghui@huawei.com,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
-	catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-	alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-	eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-	rananta@google.com, ricarkol@gmail.com
-Subject: Re: [PATCH 3/9] KVM: arm64: Add kvm_pgtable_stage2_split()
-Message-ID: <Y9A/gk0uAdNbbmbE@thinky-boi>
-References: <20230113035000.480021-1-ricarkol@google.com>
- <20230113035000.480021-4-ricarkol@google.com>
- <CANgfPd_PgrZ_4oRDT3ZaqX=3jboD=2qEUKefp4TsKM36p187gw@mail.gmail.com>
- <Y9ALgtnd+h9ivn90@google.com>
- <Y9ARN5hWlAYVFBoK@google.com>
- <CAOHnOrxGu2sU2+-M8+-nMiRc01BQvRug+S2rnBbK6HiCP_BMVw@mail.gmail.com>
- <Y9AZ7ORdmIPQ1YGL@google.com>
+To: Will Deacon <will@kernel.org>
+Cc: maz@kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+	seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] MAINTAINERS: Add Oliver Upton as co-maintainer of
+ KVM/arm64
+Message-ID: <Y9BLEj+/doAKmXzP@google.com>
+References: <20230123210256.2728218-1-oliver.upton@linux.dev>
+ <20230124093728.GA26080@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -40,53 +33,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y9AZ7ORdmIPQ1YGL@google.com>
+In-Reply-To: <20230124093728.GA26080@willie-the-truck>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jan 24, 2023 at 09:48:28AM -0800, David Matlack wrote:
-> On Tue, Jan 24, 2023 at 09:18:33AM -0800, Ricardo Koller wrote:
-> > On Tue, Jan 24, 2023 at 9:11 AM Oliver Upton <oliver.upton@linux.dev> wrote:
-
-[...]
-
-> > > The numbering we use in the page table walkers is deliberate, as it
-> > > directly matches the Arm ARM. While we can certainly use either scheme
-> > > I'd prefer we keep aligned with the architecture.
+On Tue, Jan 24, 2023 at 09:37:29AM +0000, Will Deacon wrote:
+> On Mon, Jan 23, 2023 at 09:02:56PM +0000, Oliver Upton wrote:
+> > Going forward I intend to help Marc with maintaining KVM/arm64. We've
+> > spoken about this quite a bit and he has been a tremendous help in
+> > ramping up to the task (thank you!). We haven't worked out the exact
+> > details of how the process will work, but the goal is to even out the
+> > maintenance responsibilities to give us both ample time for development.
 > > 
-> > hehe, I was actually subtly suggesting our x86 friends to change their side.
+> > To that end, updating the maintainers entry to reflect the change.
+> > 
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  MAINTAINERS | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 42fc47c6edfd..7323efcc1270 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -11355,9 +11355,9 @@ F:	virt/kvm/*
+> >  
+> >  KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)
+> >  M:	Marc Zyngier <maz@kernel.org>
+> > +M:	Oliver Upton <oliver.upton@linux.dev>
 > 
-> Yeah KVM/x86 and KVM/ARM use basically opposite numbering schemes for
-> page table levels.
+> Ya know, alphabetical order tends to put Mr Z at the bottom of the list,
+> but I can understand why you don't necessarily want to be first in the
+> pack just yet!
+
+I think you may've spotted my intentions here :-) Short of any
+objections, I'll shamelessly leave Marc in the direct line of fire until
+someone alphabetizes it.
+
+> In any case, this is really great to see:
 > 
-> Level | KVM/ARM | KVM/x86
-> ----- | ------- | ---------------
-> pte   | 3       | 1 (PG_LEVEL_4K)
-> pmd   | 2       | 2 (PG_LEVEL_2M)
-> pud   | 1       | 3 (PG_LEVEL_1G)
-> p4d   | 0       | 4
->       | -1      | 5
-> 
-> The ARM levels come from the architecture, whereas the x86 levels are
-> arbitrary.
-> 
-> I do think it would be valuable to standardize on one leveling scheme at
-> some point. Otherwise, mixing level schemes is bound to be a source of
-> bugs if and when we are sharing more MMU code across architectures.
+> Acked-by: Will Deacon <will@kernel.org>
 
-That could work, so long as the respective ISAs don't depend on any
-specific numbering scheme. For arm64 the level hints encoded in TLBIs
-match our numbering scheme, which is quite valuable. We are definitely
-at odds with RISC-V's numbering scheme (descending order, starting from
-root), but AFAICT there doesn't appear to be any portion of the ISA that
-depends on it (yet).
+Thanks!
 
-Sure, we could add some glue code to transform KVM's common leveling
-scheme into an architecture-specific one for these use cases, but I
-worry that'll be incredibly error-prone.
-
-In any case I'd prefer we not make any changes at this point, as they'd
-be purely cosmetic.
-
---
+-- 
 Thanks,
 Oliver
