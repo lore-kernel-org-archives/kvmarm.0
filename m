@@ -1,54 +1,54 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E35B8BE8
-	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 16:17:54 +0000 (UTC)
-Received: by mail-pj1-f48.google.com with SMTP id z9-20020a17090a468900b00226b6e7aeeaso14499794pjf.1
-        for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 08:17:54 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB468BE8
+	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 16:26:12 +0000 (UTC)
+Received: by mail-pj1-f53.google.com with SMTP id h5-20020a17090a9c0500b0022bb85eb35dso10118478pjp.3
+        for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 08:26:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K4gUZ8QoPMsgmVIH22hnGP5ly+yceMbFGnzKyjd0wdY=;
-        b=UPp4JufSwtRNp94ONl0EC5nVMDyjAWSpwPgAbGkByDhx7r76dLXrdK0dQ/NGJgTyYy
-         4+gkDBE0A+5vVppVUkX2ll2vSZZ+zQQBhbnuQCeK5Zay5OWKvKIG80gKKrhlAextTHHX
-         jHtyuiTOjVPNNdLn845YcIbkIPp/NZMqMEcflWogAU5rGTAcycx3ffDsEhBXf+6TPtYr
-         mXi5MQotYa5/GTRAbX54CxxFuZzc6Zz4NqIo9ZVxaxmehr/Omwam2ZbRZU0f9X22rTle
-         z1W3M8paOpBXYay59HMe3u0g0X94tWF3TmcYkUUt5fMt6Vg9opxWw3d+fg+6ZP/ELFRW
-         9E8Q==
+        bh=WkQDrNHkzQEYlziy8zbZPHrgO5IZjZ5aKuZXPjg7coA=;
+        b=mWEMd0E3VSo+2vbyZ9jiYWqigQjgyQjQkehCzOktqTh7FGHTiI7SiZO8Dn/LaD5q6M
+         B0Ks3H3j/nNgvmdsIyQ1EPLDq43FXDKoQ/k9rzxMvrXBJ3j1JnNcTzENi3vq/qnkiVDR
+         nGs8fkF0zkj1+IwBMa+fNL8o8frZZ6tourUdePnZeKXcEo8nCJLG18Nhb6GBBcK95L8k
+         SZq4C+iVaclLb767ipIMNPQmNXacqHf+x7JiLKCCulmX/CB4Cna3rnafW1eUFWEkMP/O
+         DM6NeDwZqvlfVuFdA7yzoHEBF0pOAe5HuH5kwq5zYoeI7oa2cGVIkkqJhhamulbHUgEM
+         xK1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K4gUZ8QoPMsgmVIH22hnGP5ly+yceMbFGnzKyjd0wdY=;
-        b=mGVKQREAxS2i4IJ0Ixhbj6ux45iRX0UOwzHCmWl9xVvmuHhsfKnR5jFvg1ZTGzoD7g
-         IMQ6/behQDi0dJqlBgPUI/2s+FOv4bleRfjTBH23rVT9UALZ5q0wmOBSaf+UTR/QgFKC
-         BzCdySKhMMDuibrTUVYY0sV5KEUnwvbL5QdOEgCj5PcUbkio+CSKmMvHYmlfWepIzmIT
-         qNazPv6TMf0o3Qc08KP8jt4wFFUAOrXF98GBJdAYpmYU/s+eiTjnuZGp+oL1OxKrXUyg
-         jPJcn/Bp4QFDUbGIEJSsfwBte3ws5pfDuVjjYZ/EDHhXu6YeYqRWKcIHng/OxeC4/IcS
-         2Ppg==
-X-Gm-Message-State: AO0yUKUhMkro8Uph9MBFLc0mv/FvnHi/G+Hq1e1rbhKDEz6s3sya7wm3
-	sb5ZQD6GVC2AD+Sq6Pt3w+8+zg==
-X-Google-Smtp-Source: AK7set8FFTNIfErrcpZvHzozOWX3Xx1vcflIUxA+YhAImZ7s/xPIH9xo1Ps0QCaPnRHW+42pHVm8IQ==
-X-Received: by 2002:a05:6a20:9d90:b0:b8:e33c:f160 with SMTP id mu16-20020a056a209d9000b000b8e33cf160mr302472pzb.0.1674577073692;
-        Tue, 24 Jan 2023 08:17:53 -0800 (PST)
+        bh=WkQDrNHkzQEYlziy8zbZPHrgO5IZjZ5aKuZXPjg7coA=;
+        b=NtSVQoWXwfBRON6RLecQDSyvgHxtvUvESHIK816ud0qVnpipFJpULLWsU4QhR0paV2
+         rcXNaUVsvl1hsBlFR2TfKyJjXbaba9ZLzFileETxXEgo8CcNKiZXFN+i7IrJul7kJQ47
+         ngJ6CwTGpjW5IFlziTCOUnvphsHnJ1G4fesbm7jX3pM/WYr7wRLvvfoZoXBf+Tg3o/sg
+         tzf/eObGi/v/RqHYWq4aFh5p9RYlH04PlTwfyZK/48+cm2bDR66MxTGtmCAd+ncxpM3r
+         0aoWIYIjcT6t9tkZDF2nal51NAUlxjiiMEcMgIZALcOhUdZm+gFmxMNBdIocJnT6FDMB
+         HYfA==
+X-Gm-Message-State: AO0yUKXeBeHoEq7rzRD9m+c80oC/xNRI3rTD6hXHbDUOsWC4h580+m0t
+	kDU6pqR7B8CXW66nMD9gw8tsDg==
+X-Google-Smtp-Source: AK7set87Z+xAX+LShw1w7Qvxlm6Z/5hW8cKt7niIXFKSURg7nkilnDsuF3JwTuAv8xQJM5bJcWPomA==
+X-Received: by 2002:a05:6a21:998a:b0:b8:c859:7fc4 with SMTP id ve10-20020a056a21998a00b000b8c8597fc4mr275210pzb.1.1674577571942;
+        Tue, 24 Jan 2023 08:26:11 -0800 (PST)
 Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id x15-20020a62860f000000b0056b4c5dde61sm1846386pfd.98.2023.01.24.08.17.53
+        by smtp.gmail.com with ESMTPSA id f23-20020a656297000000b0047063eb4098sm1627708pgv.37.2023.01.24.08.26.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jan 2023 08:17:53 -0800 (PST)
-Date: Tue, 24 Jan 2023 08:17:49 -0800
+        Tue, 24 Jan 2023 08:26:06 -0800 (PST)
+Date: Tue, 24 Jan 2023 08:26:02 -0800
 From: Ricardo Koller <ricarkol@google.com>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev,
 	pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com,
 	eric.auger@redhat.com, yuzenghui@huawei.com
-Subject: Re: [PATCH 1/4] KVM: selftests: aarch64: Relax userfaultfd read vs.
- write checks
-Message-ID: <Y9AErXchOZFuKL05@google.com>
+Subject: Re: [PATCH 4/4] KVM: selftests: aarch64: Test read-only PT memory
+ regions
+Message-ID: <Y9AGmn0CM/lNX6w/@google.com>
 References: <20230110022432.330151-1-ricarkol@google.com>
- <20230110022432.330151-2-ricarkol@google.com>
- <Y88TLcuetXMSYyfD@google.com>
+ <20230110022432.330151-5-ricarkol@google.com>
+ <Y88aFBBcsx7v/2qh@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,29 +57,51 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y88TLcuetXMSYyfD@google.com>
+In-Reply-To: <Y88aFBBcsx7v/2qh@google.com>
 
-On Mon, Jan 23, 2023 at 11:07:25PM +0000, Oliver Upton wrote:
-> On Tue, Jan 10, 2023 at 02:24:29AM +0000, Ricardo Koller wrote:
-> > Only Stage1 Page table walks (S1PTW) writing a PTE on an unmapped page
-> > should result in a userfaultfd write. However, the userfaultfd tests in
-> > page_fault_test wrongly assert that any S1PTW is a PTE write.
-> > 
-> > Fix this by relaxing the read vs. write checks in all userfaultfd handlers.
-> > Note that this is also an attempt to focus less on KVM (and userfaultfd)
-> > behavior, and more on architectural behavior. Also note that after commit
-> > "KVM: arm64: Fix S1PTW handling on RO memslots" the userfaultfd fault
-> > (S1PTW with AF on an unmaped PTE page) is actually a read: the translation
-> > fault that comes before the permission fault.
+On Mon, Jan 23, 2023 at 11:36:52PM +0000, Oliver Upton wrote:
+> On Tue, Jan 10, 2023 at 02:24:32AM +0000, Ricardo Koller wrote:
+> > Extend the read-only memslot tests in page_fault_test to test read-only PT
+> > (Page table) memslots. Note that this was not allowed before commit "KVM:
+> > arm64: Fix handling of S1PTW S2 fault on RO memslots" as all S1PTW faults
+> > were treated as writes which resulted in an (unrecoverable) exception
+> > inside the guest.
 > 
-> I certainly agree that we cannot make assertions about read v. write
-> when registering uffd in 'missing' mode. We probably need another test
-> to assert that we get write faults for hardware AF updates when using
-> uffd in write protect mode.
+> Do we need an additional test that the guest gets nuked if TCR_EL1.HA =
+> 0b1 and AF is clear in one of the stage-1 PTEs?
+> 
 
-I can do that. Only question, do you prefer having them in this series
-with fixes, or another one?
+That should be easy to add. The only issue is whether that's also a case
+of checking for very specific KVM behavior that could change in the
+future. It's unlikely, but what if KVM emulated the page table walker
+behavior to give userspace all the info it needed to fix the fault.
+Although it's so unlikely that I think I will add the exception check.
 
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > ---
+> >  .../selftests/kvm/aarch64/page_fault_test.c        | 14 +++++++++-----
+> >  1 file changed, 9 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> > index 2e2178a7d0d8..2f81d68e876c 100644
+> > --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> > +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> > @@ -831,6 +831,7 @@ static void help(char *name)
+> >  {										\
+> >  	.name			= SCAT3(ro_memslot, _access, _with_af),		\
+> 
+> Does the '_with_af' actually belong here? The macro doesn't take such a
+> parameter. AFAICT the access flag is already set in all S1 PTEs for this
+> case and TCR_EL1.HA = 0b0.
+
+Good catch. That name would have been very confusing when debugging.
+
+> 
+> >  	.data_memslot_flags	= KVM_MEM_READONLY,				\
+> > +	.pt_memslot_flags	= KVM_MEM_READONLY,				\
+> >  	.guest_prepare		= { _PREPARE(_access) },			\
+> >  	.guest_test		= _access,					\
+> >  	.mmio_handler		= _mmio_handler,				\
 > 
 > --
 > Thanks,
