@@ -1,34 +1,38 @@
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+Received: from out-106.mta0.migadu.com (out-106.mta0.migadu.com [91.218.175.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6C08F70
-	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 22:20:15 +0000 (UTC)
-Date: Tue, 24 Jan 2023 14:19:59 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF26322A
+	for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 23:31:42 +0000 (UTC)
+Date: Tue, 24 Jan 2023 14:54:00 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1674598806;
+	t=1674600847;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OCBfEODFKSWyFeydGUGZ0cHcrxRDh9Y42D13cNqLF3I=;
-	b=o1bDdDnULIjx6lxzCDdwdLZ5d8nAricJW94EasG8LIbNXdaC5bRZHNyqLlYzloocUsM2YX
-	sKcfAnhLo+u9yICx8suxzizTBHW45BFYmGTDGVpo5QyPijKrYU4BRnijE3EMyw76ztUFJH
-	nwFsmP2REJfmV2zhToPyugEuA//7amU=
+	bh=89LHdp2iidBYEJxIivMbaQf8lDKjYIbRHtNpIRtucvg=;
+	b=fnj/snkgDOwjWEdnayZeLkkYSrAgCDx9UY78BuX1gquOv8FWgO4XYZHlQH+yWFOgEW2cPx
+	UU0et3Z9AqS7glL1qv0VQ3eTk+LcVOoZXJ1/fqEiaT4HkIExSu5s/SIX/V64fFMLB9R2Bv
+	wtg9E+/6mrcp+RKIdQtOW+Mv3fPAotE=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Ben Gardon <bgardon@google.com>
-Cc: Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
-	maz@kernel.org, oupton@google.com, yuzenghui@huawei.com,
-	dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev,
-	seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-	eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-	rananta@google.com, ricarkol@gmail.com
-Subject: Re: [PATCH 6/9] KVM: arm64: Split huge pages when dirty logging is
- enabled
-Message-ID: <Y9BZj7i+R7E9Vhy+@thinky-boi>
-References: <20230113035000.480021-1-ricarkol@google.com>
- <20230113035000.480021-7-ricarkol@google.com>
- <CANgfPd9B0GcDST6-GHgPTv3j=EBqUYjkNUuAuiB2Ei3nLYaSEQ@mail.gmail.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
+	Ricardo Koller <ricarkol@google.com>,
+	Reiji Watanabe <reijiw@google.com>,
+	James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Jing Zhang <jingzhangos@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 4/6] KVM: arm64: Optimize TLBIs in the dirty logging
+ path
+Message-ID: <Y9BhiOyvMvu/L0J4@thinky-boi>
+References: <20230109215347.3119271-1-rananta@google.com>
+ <20230109215347.3119271-5-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,81 +41,69 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANgfPd9B0GcDST6-GHgPTv3j=EBqUYjkNUuAuiB2Ei3nLYaSEQ@mail.gmail.com>
+In-Reply-To: <20230109215347.3119271-5-rananta@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jan 24, 2023 at 09:52:49AM -0800, Ben Gardon wrote:
-> On Thu, Jan 12, 2023 at 7:50 PM Ricardo Koller <ricarkol@google.com> wrote:
-> >
-> > Split huge pages eagerly when enabling dirty logging. The goal is to
-> > avoid doing it while faulting on write-protected pages, which
-> > negatively impacts guest performance.
-> >
-> > A memslot marked for dirty logging is split in 1GB pieces at a time.
-> > This is in order to release the mmu_lock and give other kernel threads
-> > the opportunity to run, and also in order to allocate enough pages to
-> > split a 1GB range worth of huge pages (or a single 1GB huge page).
-> > Note that these page allocations can fail, so eager page splitting is
-> > best-effort.  This is not a correctness issue though, as huge pages
-> > can still be split on write-faults.
-> >
-> > The benefits of eager page splitting are the same as in x86, added
-> > with commit a3fe5dbda0a4 ("KVM: x86/mmu: Split huge pages mapped by
-> > the TDP MMU when dirty logging is enabled"). For example, when running
-> > dirty_log_perf_test with 64 virtual CPUs (Ampere Altra), 1GB per vCPU,
-> > 50% reads, and 2MB HugeTLB memory, the time it takes vCPUs to access
-> > all of their memory after dirty logging is enabled decreased by 44%
-> > from 2.58s to 1.42s.
-> >
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  30 ++++++++
-> >  arch/arm64/kvm/mmu.c              | 110 +++++++++++++++++++++++++++++-
-> >  2 files changed, 138 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 35a159d131b5..6ab37209b1d1 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -153,6 +153,36 @@ struct kvm_s2_mmu {
-> >         /* The last vcpu id that ran on each physical CPU */
-> >         int __percpu *last_vcpu_ran;
-> >
-> > +       /*
-> > +        * Memory cache used to split EAGER_PAGE_SPLIT_CHUNK_SIZE worth of huge
-> > +        * pages. It is used to allocate stage2 page tables while splitting
-> > +        * huge pages. Its capacity should be EAGER_PAGE_SPLIT_CACHE_CAPACITY.
-> > +        * Note that the choice of EAGER_PAGE_SPLIT_CHUNK_SIZE influences both
-> > +        * the capacity of the split page cache (CACHE_CAPACITY), and how often
-> > +        * KVM reschedules. Be wary of raising CHUNK_SIZE too high.
-> > +        *
-> > +        * A good heuristic to pick CHUNK_SIZE is that it should be larger than
-> > +        * all the available huge-page sizes, and be a multiple of all the
-> > +        * other ones; for example, 1GB when all the available huge-page sizes
-> > +        * are (1GB, 2MB, 32MB, 512MB).
-> 
-> This feels a little fragile to link scheduling decisions into the
-> batch size.
+Hi Raghavendra,
 
-Completely agree.
+I find the commit title rather ambiguous. May I suggest:
 
-> (I'm not saying we don't do the same thing on x86, but
-> it's a mistake in either case.) I'd prefer if we could yield more
-> granularly in a way that's not tied to splitting a whole
-> EAGER_PAGE_SPLIT_CHUNK_SIZE worth of pages.
-> Tuning the chunk size to balance memory overhead with batch
-> performance makes sense, but it becomes more difficult to also balance
-> with the needs of the scheduler. Could we add some yield point in
-> kvm_pgtable_stage2_split or give it an early return path or something?
+  KVM: arm64: Use range-based TLBIs for write protection
 
-We definitely need to move in the direction of early returns, but I'd
-rather not build it purely for the sake of eager page spliting. A better
-approach would likely be to add it to the core page table walker code
-such that all walkers that operate on a swath of memory can use it.
+On Mon, Jan 09, 2023 at 09:53:45PM +0000, Raghavendra Rao Ananta wrote:
+> Currently the dirty-logging paths, including
+> kvm_arch_flush_remote_tlbs_memslot() and kvm_mmu_wp_memory_region()
+> ivalidates the entire VM's TLB entries using kvm_flush_remote_tlbs().
+> As the range of IPAs is provided by these functions, this is highly
+> inefficient on the systems which support FEAT_TLBIRANGE. Hence,
+> use kvm_flush_remote_tlbs_range() to flush the TLBs instead.
 
-In the interest of keeping this series manageable, I'd prefer yielding
-walkers be done in a separate series.
+This commit message gives a rather mechanical description of the commit.
+Instead of describing the change, could you describe _why_ this is an
+improvement over the VM-wide invalidation?
 
 --
 Thanks,
 Oliver
+
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  arch/arm64/kvm/arm.c | 7 ++++++-
+>  arch/arm64/kvm/mmu.c | 2 +-
+>  2 files changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 00da570ed72bd..179520888c697 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1433,7 +1433,12 @@ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+>  void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+>  					const struct kvm_memory_slot *memslot)
+>  {
+> -	kvm_flush_remote_tlbs(kvm);
+> +	phys_addr_t start, end;
+> +
+> +	start = memslot->base_gfn << PAGE_SHIFT;
+> +	end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
+> +
+> +	kvm_flush_remote_tlbs_range(kvm, start, end);
+>  }
+>  
+>  static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 70f76bc909c5d..e34b81f5922ce 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -976,7 +976,7 @@ static void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
+>  	write_lock(&kvm->mmu_lock);
+>  	stage2_wp_range(&kvm->arch.mmu, start, end);
+>  	write_unlock(&kvm->mmu_lock);
+> -	kvm_flush_remote_tlbs(kvm);
+> +	kvm_flush_remote_tlbs_range(kvm, start, end);
+>  }
+>  
+>  /**
+> -- 
+> 2.39.0.314.g84b9a713c41-goog
+> 
+> 
