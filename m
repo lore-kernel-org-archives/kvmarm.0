@@ -1,126 +1,131 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E891381
-	for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 07:55:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1674633356;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O27zZx2fjGXVLntPmy1wi4nf/LLllnmjmtwtEs3YlHs=;
-	b=JnLAoHIf7RlSpIElwFwD8HjwA6VOK/KQ4vt/idtcMVfiNnGmGiD6cFXztysiN9fXVcTNDZ
-	aU0f7JBZj1dYQoW8iklNAGiFIOGdyl7588ea4NkPIGezJlVwygocrW1tW6zl8FCfxwVTfq
-	GOSTnb869rzKNwhKEq4AnpTTd9zbevg=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-540-FDHuoO2WO7OxMzATWqvqJQ-1; Wed, 25 Jan 2023 02:55:55 -0500
-X-MC-Unique: FDHuoO2WO7OxMzATWqvqJQ-1
-Received: by mail-qv1-f70.google.com with SMTP id mi16-20020a056214559000b005346c5c1f81so8875174qvb.15
-        for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 23:55:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=O27zZx2fjGXVLntPmy1wi4nf/LLllnmjmtwtEs3YlHs=;
-        b=VZVHM6U8oDv5L4uF36C8BHlMH1X/ZNGfIWmrZlot7k7PbshWoaa3fOlHUaFSdZ6wqn
-         0YyYSxCGfXAJrWSC/FdEGvr3qI5lTsgUBsZagWsnglJSVRswmnbwWBWprtTzXW2Qb0VE
-         ZCPcZMzBG+iWk7xPgvJcAxAC6y2WGgMtqln3R5V1bqbilx+6Wi9NwPqwD4+hKMo/g4yL
-         CqzA8XDqTN1OEkigy4K3IJW8vr7dVKi5wHCGfepV/scunBs3uzXuqADnH78u/Tz3MnDr
-         Z0MYgjVkUeyg8UVSzhOxm+AyykNjz9z/rJ05gtiSjmVQspfe+WIBjCbPMubysAyT79Nk
-         8U7w==
-X-Gm-Message-State: AFqh2kq4SXtdm8S+fbAr2LR7uNkTaMP8nYmBiXfyRtfvyWDYKJf39i58
-	FotkYTDCiwiQK8GP9JIl5DSiLejSEBVzG54GvJTULJ33jU5PemD9mUFm846l/mfbRxNh4esVtgo
-	7SYzEZEDQLVE1CMN2
-X-Received: by 2002:a05:622a:1a08:b0:3b6:340b:fb29 with SMTP id f8-20020a05622a1a0800b003b6340bfb29mr61433311qtb.15.1674633354473;
-        Tue, 24 Jan 2023 23:55:54 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXsDVwkxMfe/xtSrhm+NVGpcvVkFVI2tHJ6Kil61r+JE9vARpW1B0Sdxlz2Zbz7Fgdm0B+8Slg==
-X-Received: by 2002:a05:622a:1a08:b0:3b6:340b:fb29 with SMTP id f8-20020a05622a1a0800b003b6340bfb29mr61433289qtb.15.1674633354226;
-        Tue, 24 Jan 2023 23:55:54 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id m15-20020aed27cf000000b003afbf704c7csm2865980qtg.24.2023.01.24.23.55.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Jan 2023 23:55:53 -0800 (PST)
-Message-ID: <12974616-10ac-e44b-7bd2-0db68fb63eb5@redhat.com>
-Date: Wed, 25 Jan 2023 08:55:50 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3771FB4
+	for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 12:26:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C314C433EF;
+	Wed, 25 Jan 2023 12:26:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1674649564;
+	bh=geIy2jesgl0ClCMWVshKtkhxTn6roKmoUeAjL9Nce90=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NrQzDLtUEXN/9hkombWvbcieaqguLtyeJ+/C+5z3T6JXNwbis3bgoPeftXT775uKD
+	 NU1a2p5xsi3fw823FGUnU9wzRGbzUfZqeCfqiTPKHf9qq/cwDIFoQFquIT8xmRE04f
+	 7OWthbEw4BsDDXq5yX9ZZ1eIDcZj4Qab/dpXmds/UBBmEsEUXYRXPzAPs1ubYDE2zw
+	 EGPTECCrW1rwE7jJ3PFLZTq1zYKP9NxcUA4InVDMjcU5CeJHI63Vg9WD2IJ+Fx4/rt
+	 1BQejyZXFt+23yJyT+7zcBv4VzVXvfefRXY2vXp492UIB4IzNTYEp6ePVD61Nc3WHK
+	 hzcl5jX1FcjmQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pKeqn-004X2x-MX;
+	Wed, 25 Jan 2023 12:26:01 +0000
+Date: Wed, 25 Jan 2023 12:26:01 +0000
+Message-ID: <864jsen6li.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Ricardo Koller <ricarkol@google.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	andrew.jones@linux.dev,
+	pbonzini@redhat.com,
+	alexandru.elisei@arm.com,
+	eric.auger@redhat.com,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH 4/4] KVM: selftests: aarch64: Test read-only PT memory regions
+In-Reply-To: <Y9A3kVCnVgl+x5UJ@thinky-boi>
+References: <20230110022432.330151-1-ricarkol@google.com>
+	<20230110022432.330151-5-ricarkol@google.com>
+	<Y88aFBBcsx7v/2qh@google.com>
+	<Y9AGmn0CM/lNX6w/@google.com>
+	<Y9A3kVCnVgl+x5UJ@thinky-boi>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 3/4] arm: pmu: Add tests for 64-bit
- overflows
-To: Reiji Watanabe <reijiw@google.com>, Ricardo Koller <ricarkol@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev,
- maz@kernel.org, alexandru.elisei@arm.com, oliver.upton@linux.dev
-References: <20230109211754.67144-1-ricarkol@google.com>
- <20230109211754.67144-4-ricarkol@google.com>
- <CAAeT=FxoS2-cmMe-3FeXPXcvE4wNosZeZy2RGPXz5xisq5fj7A@mail.gmail.com>
- <Y9CRxb2YvPtX340D@google.com>
- <CAAeT=FyP0658CNXT6csZpvMvZ4n+X5igLw4W9z0jQTs12y3aCQ@mail.gmail.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <CAAeT=FyP0658CNXT6csZpvMvZ4n+X5igLw4W9z0jQTs12y3aCQ@mail.gmail.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev, pbonzini@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi,
+On Tue, 24 Jan 2023 19:54:57 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Tue, Jan 24, 2023 at 08:26:02AM -0800, Ricardo Koller wrote:
+> > On Mon, Jan 23, 2023 at 11:36:52PM +0000, Oliver Upton wrote:
+> > > On Tue, Jan 10, 2023 at 02:24:32AM +0000, Ricardo Koller wrote:
+> > > > Extend the read-only memslot tests in page_fault_test to test read-only PT
+> > > > (Page table) memslots. Note that this was not allowed before commit "KVM:
+> > > > arm64: Fix handling of S1PTW S2 fault on RO memslots" as all S1PTW faults
+> > > > were treated as writes which resulted in an (unrecoverable) exception
+> > > > inside the guest.
+> > > 
+> > > Do we need an additional test that the guest gets nuked if TCR_EL1.HA =
+> > > 0b1 and AF is clear in one of the stage-1 PTEs?
+> > > 
+> > 
+> > That should be easy to add. The only issue is whether that's also a case
+> > of checking for very specific KVM behavior that could change in the
+> > future.
+> 
+> From the perspective of the guest I believe this to match the
+> architecture. An external abort is appropriate if the hardware update to
+> a descriptor failed.
+> 
+> I believe that the current implementation of this in KVM is slightly
+> wrong, though. AFAICT, we encode the abort with an FSC of 0x10, which
+> indicates an SEA occurred outside of a table walk. The other nuance of
+> reporting SEAs due to a TTW is that the FSC encodes the level at which
+> the external abort occurred. Nonetheless, I think we can hide behind
+> R_BGPQR of DDI0487I.a and always encode a level of 0:
+> 
+> """
+>   If a synchronous External abort is generated due to a TLB or
+>   intermediate TLB caching structure, including parity or ECC errors,
+>   then all of the following are permitted:
+>    - If the PE cannot precisely determine the translation stage at which
+>      the error occurred, then it is reported and prioritized as a stage 1
+>      fault.
+>    - If the PE cannot precisely determine the lookup level at which the
+>      error occurred, then the lookup level is reported and prioritized
+>      as one of the following:
+>      - The lowest-numbered lookup level that could have caused the error.
+>      - If the PE cannot determine any information about the lookup level,
+>      then level 0.
+> """
+> 
+> Thoughts?
 
-On 1/25/23 05:11, Reiji Watanabe wrote:
-> On Tue, Jan 24, 2023 at 6:19 PM Ricardo Koller <ricarkol@google.com> wrote:
->> On Wed, Jan 18, 2023 at 09:58:38PM -0800, Reiji Watanabe wrote:
->>> Hi Ricardo,
->>>
->>> On Mon, Jan 9, 2023 at 1:18 PM Ricardo Koller <ricarkol@google.com> wrote:
->>>> @@ -898,12 +913,12 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->>>>
->>>>         pmu_reset_stats();
->>> This isn't directly related to the patch.
->>> But, as bits of pmovsclr_el0 are already set (although interrupts
->>> are disabled), I would think it's good to clear pmovsclr_el0 here.
->>>
->>> Thank you,
->>> Reiji
->>>
->> There's no need in this case as there's this immediately before the
->> pmu_reset_stats();
->>
->>         report(expect_interrupts(0), "no overflow interrupt after counting");
->>
->> so pmovsclr_el0 should be clear.
-> In my understanding, it means that no overflow *interrupt* was reported,
-> as the interrupt is not enabled yet (pmintenset_el1 is not set).
-> But, (as far as I checked the test case,) the both counters should be
-> overflowing here. So, pmovsclr_el0 must be 0x3.
+Indeed, the abort injection has always been on the dodgy side of
+things. I remember Christoffer and I writing this, saying that it was
+something we'd have to eventually fix. 10 years down the line, this
+code is, unsurprisingly, still dodgy.
 
-I would tend to agree with Reiji.  The PMOVSSET_EL0<idx> will impact the
-next test according to aarch64/debug/pmu/AArch64.CheckForPMUOverflow and
-I think the overflow reg should be reset.
+My vote would be to slightly extend the API to take a set of
+KVM-specific flags to give context to the injection helpers (such as
+SEA during a TTW), and bring the KVM behaviour in line with the
+architecture.
 
-Eric
->
-> Or am I misunderstanding something?
->
-> Thank you,
-> Reiji
->
->
->>>> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
->>>> -       write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
->>>> +       write_regn_el0(pmevcntr, 0, pre_overflow);
->>>> +       write_regn_el0(pmevcntr, 1, pre_overflow);
->>>>         write_sysreg(ALL_SET, pmintenset_el1);
->>>>         isb();
->>>>
+Reporting 0 in the FSC is probably OK, but we should also be able to
+determine which level this fails at:
 
+- Sample FAR_EL2[55] to derive which TTBR this translates from (n)
+- From TCR_EL1.{TnSZ,TGn}, you can determine the number of levels
+
+There is a bunch of tables for this in the ARM ARM, and it is possible
+to come up with a decent formula that encompass all the possible
+combinations.
+
+But as I said, 0 is probably fine... ;-)
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
