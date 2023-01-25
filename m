@@ -1,120 +1,89 @@
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13EA033F0
-	for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 14:17:13 +0000 (UTC)
-Received: by mail-pg1-f177.google.com with SMTP id b6so13462984pgi.7
-        for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 06:17:13 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397856FA1
+	for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 17:22:02 +0000 (UTC)
+Received: by mail-yb1-f178.google.com with SMTP id u72so3230137ybi.7
+        for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 09:22:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ReVu+PCJ9uQlg1KFmeKSSoqjffPWvxnjud26226RPUY=;
-        b=Gh8M3v5k6vXk2RSjppLMe5XCwjVnLXy0HtEDSA7jZPbSalQNCvggk5+LhpuDExEIkz
-         sYZro5sKMmqoL4gSzvnVuQ2n1G7UyDUEGCPkupuJewluCCwEbHPeiC8JkX3npGCGJJUg
-         PbmB1MWAi8fKqLf0WCvj6sk4HpTJn1NMlax5AbUNuGT3+eAGHX56ZZTYUbzPQNs7jYif
-         9wWRLo5ZUQaqE2dXeOOvzPu8oZdYJjn0aox1MqBdfaDaD4yiAYlOowlSn5juGPv/jkO8
-         SqgVxJm/fO3pUxmJaYk/dgyP+o+JrWnYJgTg0wD7LZsGsGIZBUZ213DKAkg94md7qSPH
-         cHpw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+NF7WOwKXStbVcCBmnQTR8aAYHjwReQdf6MvWz/ieQE=;
+        b=G/sP0Ge2BbmLK5C1fYqIhHmfO9YiRHy87eRqbWpmlZctgb1Mjd3hQa4bOwD180MWX6
+         N9m5BZ5ghS2tzwTNr12nV3VeSN0+z9yP0c4kJa8fVHf0liLZpx9LSNTEL28uc4R/m8Xd
+         DTt9dY/swPExNObKMFXnORILtXrqvfvPIy7kzOUkT25jJo53AbsZlXcJaaoY0pxtCLXS
+         qgm7XaZfzBEKVqNPbBdF0AhzVYtmjGNYtzFnqQUr3odJs29myMNgBOQe8LMz9PeTVJLp
+         7+pVgI1I+vSb3zqVmxeKhnMsVmNFvn/PsYcbOlBZDilIwwcmDqrHgsUVs8ak5XGd8/tq
+         3RgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ReVu+PCJ9uQlg1KFmeKSSoqjffPWvxnjud26226RPUY=;
-        b=AGZ0uImn5mFOz0XP7mhR4ylv7yPBw4jmKa9lZGi1h4UOsr3S7BhJn75POejYoZ/nLY
-         67ZA8idWjUzle+iHIMur4NpPaq/Nshq8glHdXImt5VFsol/iwa51S+900NTVnz71BAGt
-         hq6wrX6/2C90ZYrkeoY4DfgUFR2X7PrUVzk4TGDYmRFYhBx9Yrx88tuZa56tKO1Wv1X0
-         aMIZc7FFcZVUh1Bh1eaFrVOUFX7PtA2Ng7otku9MHsU7ZR4I0mMEh53AYUdQVCKyuT5G
-         sauqs51AxS+hXsLW9U754t/YKJrMJlIgQP9MwBX6ALf7Sd8Q3CCXObxK00cjKBmmIbJT
-         AW0w==
-X-Gm-Message-State: AO0yUKXsx3FfxXfDQAy7cFeoaSkzukqGKoTWYb4r/D5AzmGgVX4miR06
-	GBMtNZ7VOGQVkpjQRnfXNsA8xg==
-X-Google-Smtp-Source: AK7set/7+CxnNLwdtSUfIvLtR83xajY7Nn9O4wzHZvSigazZuAvJSODKrHXtx0pV/2V5NDrnnbmbEw==
-X-Received: by 2002:a05:6a00:23cb:b0:581:bfac:7a52 with SMTP id g11-20020a056a0023cb00b00581bfac7a52mr725774pfc.1.1674656233189;
-        Wed, 25 Jan 2023 06:17:13 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id z28-20020a056a001d9c00b00580cc63dce8sm799363pfw.77.2023.01.25.06.17.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jan 2023 06:17:12 -0800 (PST)
-Date: Wed, 25 Jan 2023 06:17:09 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Reiji Watanabe <reijiw@google.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, andrew.jones@linux.dev, maz@kernel.org,
-	alexandru.elisei@arm.com, oliver.upton@linux.dev
-Subject: Re: [kvm-unit-tests PATCH v3 3/4] arm: pmu: Add tests for 64-bit
- overflows
-Message-ID: <Y9E55cTs+iAK31ns@google.com>
-References: <20230109211754.67144-1-ricarkol@google.com>
- <20230109211754.67144-4-ricarkol@google.com>
- <CAAeT=FxoS2-cmMe-3FeXPXcvE4wNosZeZy2RGPXz5xisq5fj7A@mail.gmail.com>
- <Y9CRxb2YvPtX340D@google.com>
- <CAAeT=FyP0658CNXT6csZpvMvZ4n+X5igLw4W9z0jQTs12y3aCQ@mail.gmail.com>
- <12974616-10ac-e44b-7bd2-0db68fb63eb5@redhat.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+NF7WOwKXStbVcCBmnQTR8aAYHjwReQdf6MvWz/ieQE=;
+        b=15icLpEsxFQ39YZ7cZ6I4GfqY2Lk25imL1AivZGGPYyeUxk9/gEBKJPxszmLsBANCU
+         lN1m79dm0h9mB4BgPvE1lVRUV7VsrOBGDDIwF2UIqI3eCiXIVtSh4gqGUBM47rvE2c3D
+         Tmh043Low0MU/UcPWt+H9WK2PxU/NlxsHnoNs1n/qLv9qoJqVoXsy0OhSEhyoLkuH8er
+         CenmwKKCfp/dokY05SW6BUaWsb/L75oEDUySTS54TXXrvd6RnDwux6BpVPtGJtyc557R
+         hE7THpOTApLOEBCDatq26bW+ZixT5iDJH1hVtOShxaHKnrK4BMD9fYJTMI0OIuCjLpGd
+         aa/g==
+X-Gm-Message-State: AFqh2koGTbVKA9c3L/4ZcPvoALEnAJ8I23moEVupeCynhg2tOVd7ln6J
+	q0M7Peo+l/JJui7x3p3DGh+wzqdf/+ebbX2RhZ0e4w==
+X-Google-Smtp-Source: AMrXdXu3jKBxFWKV9U7HEoc8nZkdzpu/vB3yVyIUHmWHNLUO+5YjJYHaG1m9/rmSDsx5131N51uq+J+p+rywDrfAr5Q=
+X-Received: by 2002:a25:1984:0:b0:7fe:e7f5:e228 with SMTP id
+ 126-20020a251984000000b007fee7f5e228mr1798951ybz.582.1674667320995; Wed, 25
+ Jan 2023 09:22:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <12974616-10ac-e44b-7bd2-0db68fb63eb5@redhat.com>
+References: <20230119173559.2517103-1-dmatlack@google.com> <Y9B8A+/FSPCrAANT@google.com>
+ <Y9B9FZReDVwdNNrS@google.com>
+In-Reply-To: <Y9B9FZReDVwdNNrS@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Wed, 25 Jan 2023 09:21:34 -0800
+Message-ID: <CALzav=fAVF5VDj76Pd9m+G+-A+UdvCS1tTVGCyvnvtgq4eFOSg@mail.gmail.com>
+Subject: Re: [PATCH 0/7] KVM: Add a common API for range-based TLB invalidation
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, 
+	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Jan 25, 2023 at 08:55:50AM +0100, Eric Auger wrote:
-> Hi,
-> 
-> On 1/25/23 05:11, Reiji Watanabe wrote:
-> > On Tue, Jan 24, 2023 at 6:19 PM Ricardo Koller <ricarkol@google.com> wrote:
-> >> On Wed, Jan 18, 2023 at 09:58:38PM -0800, Reiji Watanabe wrote:
-> >>> Hi Ricardo,
-> >>>
-> >>> On Mon, Jan 9, 2023 at 1:18 PM Ricardo Koller <ricarkol@google.com> wrote:
-> >>>> @@ -898,12 +913,12 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
-> >>>>
-> >>>>         pmu_reset_stats();
-> >>> This isn't directly related to the patch.
-> >>> But, as bits of pmovsclr_el0 are already set (although interrupts
-> >>> are disabled), I would think it's good to clear pmovsclr_el0 here.
-> >>>
-> >>> Thank you,
-> >>> Reiji
-> >>>
-> >> There's no need in this case as there's this immediately before the
-> >> pmu_reset_stats();
-> >>
-> >>         report(expect_interrupts(0), "no overflow interrupt after counting");
-> >>
-> >> so pmovsclr_el0 should be clear.
-> > In my understanding, it means that no overflow *interrupt* was reported,
-> > as the interrupt is not enabled yet (pmintenset_el1 is not set).
-> > But, (as far as I checked the test case,) the both counters should be
-> > overflowing here. So, pmovsclr_el0 must be 0x3.
-> 
-> I would tend to agree with Reiji.  The PMOVSSET_EL0<idx> will impact the
-> next test according to aarch64/debug/pmu/AArch64.CheckForPMUOverflow and
-> I think the overflow reg should be reset.
+On Tue, Jan 24, 2023 at 4:51 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> On Wed, Jan 25, 2023 at 12:46:59AM +0000, Sean Christopherson wrote:
+> > On Thu, Jan 19, 2023, David Matlack wrote:
+> >
+> > Did a quick read through, didn't see anything I disagree with.
+>
+> LGTM for the tiny amount of arm64 changes, though I imagine David will
+> do a v2 to completely get rid of the affected Kconfig.
 
-Ahh, right. The overflow interrupt could fire as soon as they are
-enabled again. OK, will add a fix in the next version.
+Thanks both for taking a look.
 
-> 
-> Eric
-> >
-> > Or am I misunderstanding something?
-> >
-> > Thank you,
-> > Reiji
-> >
-> >
-> >>>> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> >>>> -       write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> >>>> +       write_regn_el0(pmevcntr, 0, pre_overflow);
-> >>>> +       write_regn_el0(pmevcntr, 1, pre_overflow);
-> >>>>         write_sysreg(ALL_SET, pmintenset_el1);
-> >>>>         isb();
-> >>>>
-> 
+> > Is there any urgency to getting this merged?  If not, due to the dependencies
+> > with x86 stuff queued for 6.3, and because of the cross-architecture changes, it
+> > might be easiest to plan on landing this in 6.4.  That would allow Paolo to create
+> > an immutable topic branch fairly early on.
+>
+> +1, that buys us some time to go through the rounds on the arm64 side
+> such that we could possibly stack the TLBIRANGE work on top.
+
+The main benefit of merging in 6.3 would be to make Raghavendra's life
+simpler/easier so he can build the next version of his arm64 TLBI
+series on top. But I guess he can still do that with a topic branch.
+
+I'll go ahead and send a v2 on top of the changes from Hou you queued
+for 6.3, Sean, and we can plan on landing that in 6.4 (barring any
+further feedback or conflicts).
