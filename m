@@ -1,94 +1,102 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC08E10E5
-	for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 02:19:54 +0000 (UTC)
-Received: by mail-pj1-f46.google.com with SMTP id y3-20020a17090a390300b00229add7bb36so590546pjb.4
-        for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 18:19:54 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3ED10ED
+	for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 04:11:25 +0000 (UTC)
+Received: by mail-pf1-f178.google.com with SMTP id 20so12593553pfu.13
+        for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 20:11:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sxlIvtDzxqsw9xKk15YZymubLIPz2ce8m4nZ6o2rlno=;
-        b=QrISVRH/ok+70p7lcmGUQ3rxG+VIiPRW9lTxKzlScvIb963BD+BQPe13i3qbUkNQnV
-         V88oRqKVkl2o3REbPASeDrot+TLJdDuZcPqrC/Q/N/2Mkz+KYK3NrpKawx9zYSuqSh70
-         1SjEAjqHMr77AMQo9pw4lWcS0WZfMhfImWP+X8jGenxNl+acf/mowRb1DVECft3DZDu8
-         RewTYA7y2SA8Pt5qJZtbc3Ab4wQ0+90+0rEuvLNhmXC39E6eeldUxbqzqgofhaAHtZp3
-         Lk+xuxEW+bmrlWLnuf1RGxZ+D9ERcpIJ+52oIa37SN+V1cPxs4wZFb8GY4BBu/40uSqU
-         85Fw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=CJabib5NbUBwMrm5oU+0ZoPWuUCQhccu6rUbctVZbq8=;
+        b=MJ66DxyKI49VCwmPR+axwQH0y85wmlFVSq9TUPPAnHXRAV8vX851P4gtGWmxNHNDeq
+         bS1amqDX26pXVTiqFrtxNIi6hdGKcq4/VehjRISxME7zSA4XdJ2dZH3n3SveQF1AQSw1
+         nCFDJQxzVRihLQeUEuYWkPr/F3BM0PM9YKvOwAypAhcLPv1jzJ6WxjrHtlINRIbmcb49
+         uJMegsDmsI04npoSPRMONp2QbUbn1cLrDxZH1LXLMpH21OvyfPCJ3B4h1h1Jzs7z/cCx
+         wMVoW3whFO+aQY+/rJUtzcaMn4RV3qA0S9RObUkkkVf65euA2kBuCb8i/N9yg2a0B9NX
+         z8ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sxlIvtDzxqsw9xKk15YZymubLIPz2ce8m4nZ6o2rlno=;
-        b=3l3/xQSNtfuTsIycOiT+ruzKBQxGRHg0C8HxBqKWPsXTL24endVXgMD4rbQowSIyQ9
-         nQU4b/1wZE+KbwFPjIByHk9XC5EvvFDyeI8W7CXjFzhfkN7dlgIR7dVifg+GKzMCUQ9u
-         eExqYBigOUdZveAaiGT604p7mp85YXPM3qxIvo/mi/DbLGDZ50svZ/RcU9Ftp7slQlaM
-         +ejiEG8p204dDiz50Lh7dEWs2tZ4M5WQAJTGFp5Tlv4tU/K0j2AKwwHZV1lTfDRVCkCc
-         v6UNHerR2Eg3uZBczeVafAQX5CV1A+ovgwyYDxYhbmnvG/e09U/bWMJvQ4FNkAX94BeB
-         VaNg==
-X-Gm-Message-State: AO0yUKU0lwddDutO4FXsYmj9/S/D1jt+f/FHOgIOdKY4Js9lKPFeNqFJ
-	4G1HASY8gJuU1iO/f6Qy+5tJgg==
-X-Google-Smtp-Source: AK7set8AKxJM1PHSBKVE6deFS0mz7/47MnLQ9LeR0ToWCL/gcMgJ4IQX8zQF+B+FrRtJTG2JR3Dy1w==
-X-Received: by 2002:a17:90b:1955:b0:229:f4e9:75c7 with SMTP id nk21-20020a17090b195500b00229f4e975c7mr482766pjb.0.1674613193803;
-        Tue, 24 Jan 2023 18:19:53 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id l11-20020a17090a384b00b00226369149cesm256246pjf.21.2023.01.24.18.19.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jan 2023 18:19:53 -0800 (PST)
-Date: Tue, 24 Jan 2023 18:19:49 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Reiji Watanabe <reijiw@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev,
-	maz@kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com,
-	oliver.upton@linux.dev
-Subject: Re: [kvm-unit-tests PATCH v3 3/4] arm: pmu: Add tests for 64-bit
- overflows
-Message-ID: <Y9CRxb2YvPtX340D@google.com>
-References: <20230109211754.67144-1-ricarkol@google.com>
- <20230109211754.67144-4-ricarkol@google.com>
- <CAAeT=FxoS2-cmMe-3FeXPXcvE4wNosZeZy2RGPXz5xisq5fj7A@mail.gmail.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CJabib5NbUBwMrm5oU+0ZoPWuUCQhccu6rUbctVZbq8=;
+        b=dnM5xwB2J1W3OZcyYXYpsh3Cz3l88LcO0FE6hOPBH9OXvnBF14dXmRkAKtwreGffPQ
+         xBkAxAU47hn7XFPNteGr3yTabZWbozZkvyJJTomjMbBjowo6iN5tiYhuMgkDWgwFU1rf
+         FZF5eDYE1LwVslRmFBCPFGbR5+675Rtgko3g5sHpi/cDVFa2r31RVPVFPYPNfhIwxk3j
+         gsQMKBdWCqb8nAzWz1clCHX8f4FyE9l7ZtTFWX+VHaxCZcxGeA519ZybVZHidDf+GD04
+         QeHmhTwKS1pa4br6+mfPbThk0H0DqnhkN976+vMuwq3pHNZ/ym1hzBWBO8bWddvWORar
+         djcQ==
+X-Gm-Message-State: AFqh2kp4C4H7JWIqmALxM+BSaTOYmirIoA4TiXWRJP81GXOvWHlMQaLl
+	HSsigGRkb+yIMn5XrsDM6sF6BRrV0MVqmzA+g7pdxQ==
+X-Google-Smtp-Source: AMrXdXs3GPep6mt4hQqbDAb5KAIILk+feJKO4chYHRNTzVLCZFDczi5HHfp9XecXGhiiD5HVLbFbgqOWgKYeDjxV8f0=
+X-Received: by 2002:a05:6a00:2992:b0:58d:b26a:6238 with SMTP id
+ cj18-20020a056a00299200b0058db26a6238mr3885279pfb.84.1674619884776; Tue, 24
+ Jan 2023 20:11:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeT=FxoS2-cmMe-3FeXPXcvE4wNosZeZy2RGPXz5xisq5fj7A@mail.gmail.com>
+References: <20230109211754.67144-1-ricarkol@google.com> <20230109211754.67144-4-ricarkol@google.com>
+ <CAAeT=FxoS2-cmMe-3FeXPXcvE4wNosZeZy2RGPXz5xisq5fj7A@mail.gmail.com> <Y9CRxb2YvPtX340D@google.com>
+In-Reply-To: <Y9CRxb2YvPtX340D@google.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Tue, 24 Jan 2023 20:11:08 -0800
+Message-ID: <CAAeT=FyP0658CNXT6csZpvMvZ4n+X5igLw4W9z0jQTs12y3aCQ@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v3 3/4] arm: pmu: Add tests for 64-bit overflows
+To: Ricardo Koller <ricarkol@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev, 
+	maz@kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com, 
+	oliver.upton@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Jan 18, 2023 at 09:58:38PM -0800, Reiji Watanabe wrote:
-> Hi Ricardo,
-> 
-> On Mon, Jan 9, 2023 at 1:18 PM Ricardo Koller <ricarkol@google.com> wrote:
-> > @@ -898,12 +913,12 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+On Tue, Jan 24, 2023 at 6:19 PM Ricardo Koller <ricarkol@google.com> wrote:
+>
+> On Wed, Jan 18, 2023 at 09:58:38PM -0800, Reiji Watanabe wrote:
+> > Hi Ricardo,
 > >
-> >         pmu_reset_stats();
-> 
-> This isn't directly related to the patch.
-> But, as bits of pmovsclr_el0 are already set (although interrupts
-> are disabled), I would think it's good to clear pmovsclr_el0 here.
-> 
-> Thank you,
-> Reiji
-> 
-
-There's no need in this case as there's this immediately before the
-pmu_reset_stats();
-
-	report(expect_interrupts(0), "no overflow interrupt after counting");
-
-so pmovsclr_el0 should be clear.
-
-> 
+> > On Mon, Jan 9, 2023 at 1:18 PM Ricardo Koller <ricarkol@google.com> wrote:
+> > > @@ -898,12 +913,12 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+> > >
+> > >         pmu_reset_stats();
 > >
-> > -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> > -       write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> > +       write_regn_el0(pmevcntr, 0, pre_overflow);
-> > +       write_regn_el0(pmevcntr, 1, pre_overflow);
-> >         write_sysreg(ALL_SET, pmintenset_el1);
-> >         isb();
+> > This isn't directly related to the patch.
+> > But, as bits of pmovsclr_el0 are already set (although interrupts
+> > are disabled), I would think it's good to clear pmovsclr_el0 here.
 > >
+> > Thank you,
+> > Reiji
+> >
+>
+> There's no need in this case as there's this immediately before the
+> pmu_reset_stats();
+>
+>         report(expect_interrupts(0), "no overflow interrupt after counting");
+>
+> so pmovsclr_el0 should be clear.
 
+In my understanding, it means that no overflow *interrupt* was reported,
+as the interrupt is not enabled yet (pmintenset_el1 is not set).
+But, (as far as I checked the test case,) the both counters should be
+overflowing here. So, pmovsclr_el0 must be 0x3.
+
+Or am I misunderstanding something?
+
+Thank you,
+Reiji
+
+
+>
+> >
+> > >
+> > > -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> > > -       write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
+> > > +       write_regn_el0(pmevcntr, 0, pre_overflow);
+> > > +       write_regn_el0(pmevcntr, 1, pre_overflow);
+> > >         write_sysreg(ALL_SET, pmintenset_el1);
+> > >         isb();
+> > >
+>
