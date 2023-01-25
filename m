@@ -1,33 +1,66 @@
-Received: from out-35.mta0.migadu.com (out-35.mta0.migadu.com [91.218.175.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAE0A31
-	for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 00:37:12 +0000 (UTC)
-Date: Tue, 24 Jan 2023 14:45:10 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1674600318;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r7xAwQqOViIPIbFOgbEmxHA89gnRCPmHiReekx02zYo=;
-	b=gqVNplnJiiQSNbmR1Z2PZ9RlfCFvzRDLUSmOkPsnWtSchOapjiZUA2JN3+vKXnqE9hWw4X
-	1bJyn3OF9vg3uMoA4HZwTdHtSLq+RCrnk7bgln9qZH4loupQyNJ+YB6JST03fsHwm/FcYG
-	T4WZQHGasDiRH0ivEEn0iBv1EErrM4g=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Ricardo Koller <ricarkol@google.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com,
-	andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com,
-	suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com,
-	reijiw@google.com, rananta@google.com, bgardon@google.com,
-	ricarkol@gmail.com
-Subject: Re: [PATCH 6/9] KVM: arm64: Split huge pages when dirty logging is
- enabled
-Message-ID: <Y9BfdgL+JSYCirvm@thinky-boi>
-References: <20230113035000.480021-1-ricarkol@google.com>
- <20230113035000.480021-7-ricarkol@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E936EC3
+	for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 00:47:04 +0000 (UTC)
+Received: by mail-pf1-f169.google.com with SMTP id z31so9308193pfw.4
+        for <kvmarm@lists.linux.dev>; Tue, 24 Jan 2023 16:47:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ghxIETXzFs7vJZ8k07wa7GlexKAzC+rzARYUkXCHQHs=;
+        b=LvjZfwXCe3mA6H4AGCqGyzVKFBo5GWM8FdhLXaayHykpzPCuRAjaElAT5Hk2ey/F40
+         Bh0dvjNSUfqTGb2iuj7q1O/PTP7W4gatjaXfhcEVTR9wjA0tLBMoJ0VwCZFubj/cVP55
+         Ivatyfw6YQ7PGbADo/BVU9RK987h/uMS90RV4WjpCsfklzdPKAdTHudb41fHEoV/AC4t
+         QA+JdfzzdjDGfYBlxMFkykCYVfgF1+Lcr4tMwizCyX8BReSbwOSOFa9HKtzdOfc+/Z4x
+         VkMk2QpFyvQFvDavS06hVgLrLbNgjoiC6/78xM6uAk2D8AhY1zohmPXNMphYinnluuYY
+         oCeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ghxIETXzFs7vJZ8k07wa7GlexKAzC+rzARYUkXCHQHs=;
+        b=7q9PpQ/I/cUSV68nntdaowVDEG14PkHYaJH1DXSfcsmYXnru/qNuCYJd4akGK3f0Q2
+         yRwsDbYNKlr7VPuN+qjWmTgTDhfA6r71jV4AImGPau/aQBcjaxmL5luVIuDFzxBMj5Zt
+         f3K6vAOjzYZrtwLzlKsryyR1jp0DvcTMipi2np7pRVHxJO/7noBgKO4gHaPvVb7U3hrM
+         zEMych4A6Wj4JHV8r/vAugszyr3LQlFwI7MEvlwCW3CRUyGPU3737P2sB7G74mQ6gGl1
+         yTxhS1jOeruZK5mJxDNj6gAQPgN6/ARHmBdU/1N3VZHb1IA4Con1Rbuh2cnGRMS5LTfm
+         oc5A==
+X-Gm-Message-State: AO0yUKXr3YgXfVlVOjI06dSEjvu2QSUcFqI9qMvra+PPEj3XDDvklMY1
+	N9Dou4VNuG7YNRozU4/nLoMhkA==
+X-Google-Smtp-Source: AK7set9F5NYwCkfGKD1bo/mJyqFfAsir2nkFX4eO7dXf2tZvBxGZyFTFZ2Lda5ZK6A3xZU2rNxPYBg==
+X-Received: by 2002:a62:7988:0:b0:58b:cb1b:978f with SMTP id u130-20020a627988000000b0058bcb1b978fmr382182pfc.1.1674607623688;
+        Tue, 24 Jan 2023 16:47:03 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id z6-20020aa791c6000000b005884d68d54fsm2242952pfa.1.2023.01.24.16.47.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Jan 2023 16:47:03 -0800 (PST)
+Date: Wed, 25 Jan 2023 00:46:59 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH 0/7] KVM: Add a common API for range-based TLB
+ invalidation
+Message-ID: <Y9B8A+/FSPCrAANT@google.com>
+References: <20230119173559.2517103-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -36,194 +69,33 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230113035000.480021-7-ricarkol@google.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20230119173559.2517103-1-dmatlack@google.com>
 
-Hi Ricardo,
-
-On Fri, Jan 13, 2023 at 03:49:57AM +0000, Ricardo Koller wrote:
-> Split huge pages eagerly when enabling dirty logging. The goal is to
-> avoid doing it while faulting on write-protected pages, which
-> negatively impacts guest performance.
+On Thu, Jan 19, 2023, David Matlack wrote:
+> This series introduces a common API for performing range-based TLB
+> invalidation. This is then used to supplant
+> kvm_arch_flush_remote_tlbs_memslot() and pave the way for two other
+> patch series:
 > 
-> A memslot marked for dirty logging is split in 1GB pieces at a time.
-> This is in order to release the mmu_lock and give other kernel threads
-> the opportunity to run, and also in order to allocate enough pages to
-> split a 1GB range worth of huge pages (or a single 1GB huge page).
-> Note that these page allocations can fail, so eager page splitting is
-> best-effort.  This is not a correctness issue though, as huge pages
-> can still be split on write-faults.
+> 1. https://lore.kernel.org/kvm/20230109215347.3119271-1-rananta@google.com/
 > 
-> The benefits of eager page splitting are the same as in x86, added
-> with commit a3fe5dbda0a4 ("KVM: x86/mmu: Split huge pages mapped by
-> the TDP MMU when dirty logging is enabled"). For example, when running
-> dirty_log_perf_test with 64 virtual CPUs (Ampere Altra), 1GB per vCPU,
-> 50% reads, and 2MB HugeTLB memory, the time it takes vCPUs to access
-> all of their memory after dirty logging is enabled decreased by 44%
-> from 2.58s to 1.42s.
+>   Adds ARM support for range-based TLB invalidation and needs a
+>   mechanism to invoke it from common code. This series provides such a
+>   mechanism via kvm_arch_flush_remote_tlbs_range().
 > 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  30 ++++++++
->  arch/arm64/kvm/mmu.c              | 110 +++++++++++++++++++++++++++++-
->  2 files changed, 138 insertions(+), 2 deletions(-)
+> 2. https://lore.kernel.org/kvm/20221208193857.4090582-1-dmatlack@google.com/
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 35a159d131b5..6ab37209b1d1 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -153,6 +153,36 @@ struct kvm_s2_mmu {
->  	/* The last vcpu id that ran on each physical CPU */
->  	int __percpu *last_vcpu_ran;
->  
-> +	/*
-> +	 * Memory cache used to split EAGER_PAGE_SPLIT_CHUNK_SIZE worth of huge
-> +	 * pages. It is used to allocate stage2 page tables while splitting
-> +	 * huge pages. Its capacity should be EAGER_PAGE_SPLIT_CACHE_CAPACITY.
-> +	 * Note that the choice of EAGER_PAGE_SPLIT_CHUNK_SIZE influences both
-> +	 * the capacity of the split page cache (CACHE_CAPACITY), and how often
-> +	 * KVM reschedules. Be wary of raising CHUNK_SIZE too high.
-> +	 *
-> +	 * A good heuristic to pick CHUNK_SIZE is that it should be larger than
-> +	 * all the available huge-page sizes, and be a multiple of all the
-> +	 * other ones; for example, 1GB when all the available huge-page sizes
-> +	 * are (1GB, 2MB, 32MB, 512MB).
-> +	 *
-> +	 * CACHE_CAPACITY should have enough pages to cover CHUNK_SIZE; for
-> +	 * example, 1GB requires the following number of PAGE_SIZE-pages:
-> +	 * - 512 when using 2MB hugepages with 4KB granules (1GB / 2MB).
-> +	 * - 513 when using 1GB hugepages with 4KB granules (1 + (1GB / 2MB)).
-> +	 * - 32 when using 32MB hugepages with 16KB granule (1GB / 32MB).
-> +	 * - 2 when using 512MB hugepages with 64KB granules (1GB / 512MB).
-> +	 * CACHE_CAPACITY below assumes the worst case: 1GB hugepages with 4KB
-> +	 * granules.
-> +	 *
-> +	 * Protected by kvm->slots_lock.
-> +	 */
-> +#define EAGER_PAGE_SPLIT_CHUNK_SIZE		       SZ_1G
-> +#define EAGER_PAGE_SPLIT_CACHE_CAPACITY					\
-> +	(DIV_ROUND_UP_ULL(EAGER_PAGE_SPLIT_CHUNK_SIZE, SZ_1G) +		\
-> +	 DIV_ROUND_UP_ULL(EAGER_PAGE_SPLIT_CHUNK_SIZE, SZ_2M))
+>   Refactors the TDP MMU into common code, which requires an API for
+>   range-based TLB invaliation.
+> 
+> This series is based on patches 29-33 from (2.), but I made some further
+> cleanups after looking at it a second time.
+> 
+> Tested on x86_64 and ARM64 using KVM selftests.
 
-Could you instead make use of the existing KVM_PGTABLE_MIN_BLOCK_LEVEL
-as the batch size? 513 pages across all page sizes is a non-negligible
-amount of memory that goes largely unused when PAGE_SIZE != 4K.
+Did a quick read through, didn't see anything I disagree with.
 
-With that change it is a lot easier to correctly match the cache
-capacity to the selected page size. Additionally, we continue to have a
-single set of batching logic that we can improve later on.
-
-> +	struct kvm_mmu_memory_cache split_page_cache;
-> +
->  	struct kvm_arch *arch;
->  };
->  
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 700c5774b50d..41ee330edae3 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -31,14 +31,24 @@ static phys_addr_t hyp_idmap_vector;
->  
->  static unsigned long io_map_base;
->  
-> -static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
-> +bool __read_mostly eager_page_split = true;
-> +module_param(eager_page_split, bool, 0644);
-> +
-
-Unless someone is really begging for it I'd prefer we not add a module
-parameter for this.
-
-> +static phys_addr_t __stage2_range_addr_end(phys_addr_t addr, phys_addr_t end,
-> +					   phys_addr_t size)
->  {
-> -	phys_addr_t size = kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL);
->  	phys_addr_t boundary = ALIGN_DOWN(addr + size, size);
->  
->  	return (boundary - 1 < end - 1) ? boundary : end;
->  }
->  
-> +static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
-> +{
-> +	phys_addr_t size = kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL);
-> +
-> +	return __stage2_range_addr_end(addr, end, size);
-> +}
-> +
->  /*
->   * Release kvm_mmu_lock periodically if the memory region is large. Otherwise,
->   * we may see kernel panics with CONFIG_DETECT_HUNG_TASK,
-> @@ -71,6 +81,64 @@ static int stage2_apply_range(struct kvm *kvm, phys_addr_t addr,
->  	return ret;
->  }
->  
-> +static inline bool need_topup(struct kvm_mmu_memory_cache *cache, int min)
-> +{
-> +	return kvm_mmu_memory_cache_nr_free_objects(cache) < min;
-> +}
-
-I don't think the helper is adding too much here.
-
-> +static bool need_topup_split_page_cache_or_resched(struct kvm *kvm)
-> +{
-> +	struct kvm_mmu_memory_cache *cache;
-> +
-> +	if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
-> +		return true;
-> +
-> +	cache = &kvm->arch.mmu.split_page_cache;
-> +	return need_topup(cache, EAGER_PAGE_SPLIT_CACHE_CAPACITY);
-> +}
-> +
-> +static int kvm_mmu_split_huge_pages(struct kvm *kvm, phys_addr_t addr,
-> +			      phys_addr_t end)
-> +{
-> +	struct kvm_mmu_memory_cache *cache;
-> +	struct kvm_pgtable *pgt;
-> +	int ret;
-> +	u64 next;
-> +	int cache_capacity = EAGER_PAGE_SPLIT_CACHE_CAPACITY;
-> +
-> +	lockdep_assert_held_write(&kvm->mmu_lock);
-
-Rather than having the caller acquire the lock, can you instead do it
-here? It would appear that the entire critical section is enclosed
-within this function.
-
-> +	lockdep_assert_held(&kvm->slots_lock);
-
-This function doesn't depend on anything guarded by the slots_lock, can
-you move this to kvm_mmu_split_memory_region()?
-
-> +	cache = &kvm->arch.mmu.split_page_cache;
-> +
-> +	do {
-> +		if (need_topup_split_page_cache_or_resched(kvm)) {
-> +			write_unlock(&kvm->mmu_lock);
-> +			cond_resched();
-> +			/* Eager page splitting is best-effort. */
-> +			ret = __kvm_mmu_topup_memory_cache(cache,
-> +							   cache_capacity,
-> +							   cache_capacity);
-> +			write_lock(&kvm->mmu_lock);
-> +			if (ret)
-> +				break;
-> +		}
-> +
-> +		pgt = kvm->arch.mmu.pgt;
-> +		if (!pgt)
-> +			return -EINVAL;
-> +
-> +		next = __stage2_range_addr_end(addr, end,
-> +					       EAGER_PAGE_SPLIT_CHUNK_SIZE);
-> +		ret = kvm_pgtable_stage2_split(pgt, addr, next - addr, cache);
-> +		if (ret)
-> +			break;
-> +	} while (addr = next, addr != end);
-> +
-> +	return ret;
-> +}
-
---
-Thanks,
-Oliver
+Is there any urgency to getting this merged?  If not, due to the dependencies
+with x86 stuff queued for 6.3, and because of the cross-architecture changes, it
+might be easiest to plan on landing this in 6.4.  That would allow Paolo to create
+an immutable topic branch fairly early on.
