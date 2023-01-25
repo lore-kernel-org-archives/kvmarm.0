@@ -1,89 +1,135 @@
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397856FA1
-	for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 17:22:02 +0000 (UTC)
-Received: by mail-yb1-f178.google.com with SMTP id u72so3230137ybi.7
-        for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 09:22:02 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED9E4C83
+	for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 21:53:08 +0000 (UTC)
+Received: by mail-oi1-f177.google.com with SMTP id r9so17534233oie.13
+        for <kvmarm@lists.linux.dev>; Wed, 25 Jan 2023 13:53:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+NF7WOwKXStbVcCBmnQTR8aAYHjwReQdf6MvWz/ieQE=;
-        b=G/sP0Ge2BbmLK5C1fYqIhHmfO9YiRHy87eRqbWpmlZctgb1Mjd3hQa4bOwD180MWX6
-         N9m5BZ5ghS2tzwTNr12nV3VeSN0+z9yP0c4kJa8fVHf0liLZpx9LSNTEL28uc4R/m8Xd
-         DTt9dY/swPExNObKMFXnORILtXrqvfvPIy7kzOUkT25jJo53AbsZlXcJaaoY0pxtCLXS
-         qgm7XaZfzBEKVqNPbBdF0AhzVYtmjGNYtzFnqQUr3odJs29myMNgBOQe8LMz9PeTVJLp
-         7+pVgI1I+vSb3zqVmxeKhnMsVmNFvn/PsYcbOlBZDilIwwcmDqrHgsUVs8ak5XGd8/tq
-         3RgQ==
+        bh=FK/9T29iODZ59+f1JESHnd65s/n5b9dY4UEOyjBbcEU=;
+        b=b04tS0O7N/N1riUBFoYctrcBokH18TCZYDw1crIuvH0vRs3879TSHEHgIYpJgN5F7U
+         l6Jvb3DA4UinIge9ko3eVA0xGQHU/uFDSYnYurZwwqFI2AmIpZSSocg5RGf+8+mc+8sV
+         L8DB35lMrp8eE6dvbKuMCDfVIiMcgKd4dGPIYs5WmEiTDMhjBfteqeUec9/NjkWf3cfb
+         cZZf6uoj67288SzlA199jUnie2PlaoqF/cmhPelc8hT+i8pnnicf7PuRk4eIkM+ghbbO
+         WFlwthEy/nIjyTXPxryFyDoa3HERXQBXaP4bnVLTULy5jajJf20OH+UJh+OkucXazIlm
+         JlLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+NF7WOwKXStbVcCBmnQTR8aAYHjwReQdf6MvWz/ieQE=;
-        b=15icLpEsxFQ39YZ7cZ6I4GfqY2Lk25imL1AivZGGPYyeUxk9/gEBKJPxszmLsBANCU
-         lN1m79dm0h9mB4BgPvE1lVRUV7VsrOBGDDIwF2UIqI3eCiXIVtSh4gqGUBM47rvE2c3D
-         Tmh043Low0MU/UcPWt+H9WK2PxU/NlxsHnoNs1n/qLv9qoJqVoXsy0OhSEhyoLkuH8er
-         CenmwKKCfp/dokY05SW6BUaWsb/L75oEDUySTS54TXXrvd6RnDwux6BpVPtGJtyc557R
-         hE7THpOTApLOEBCDatq26bW+ZixT5iDJH1hVtOShxaHKnrK4BMD9fYJTMI0OIuCjLpGd
-         aa/g==
-X-Gm-Message-State: AFqh2koGTbVKA9c3L/4ZcPvoALEnAJ8I23moEVupeCynhg2tOVd7ln6J
-	q0M7Peo+l/JJui7x3p3DGh+wzqdf/+ebbX2RhZ0e4w==
-X-Google-Smtp-Source: AMrXdXu3jKBxFWKV9U7HEoc8nZkdzpu/vB3yVyIUHmWHNLUO+5YjJYHaG1m9/rmSDsx5131N51uq+J+p+rywDrfAr5Q=
-X-Received: by 2002:a25:1984:0:b0:7fe:e7f5:e228 with SMTP id
- 126-20020a251984000000b007fee7f5e228mr1798951ybz.582.1674667320995; Wed, 25
- Jan 2023 09:22:00 -0800 (PST)
+        bh=FK/9T29iODZ59+f1JESHnd65s/n5b9dY4UEOyjBbcEU=;
+        b=WqH5bFJeA1OX31jL6uUZPSFvgIPEDFNN/Nn6hC7CV28BX9njDN/cdN9pps5jnYqIrE
+         XjOy48DxG+H0baHWHf8ioouwT4yEhjed5HYpCEA7Wr6FhJucrm1X18awnDfu+hOJRNXV
+         kXjqJ5NLLeaWIoVbNwsp2VfKG8aAgo8k+6h6B4KgTTSpbubm2B7WKDJbP6wzQXixIxn3
+         iNG35fsnFqLZeGcKyMBWUyphgO4GeimFAUMz2scchVxFjJuiUddRf9JznT0gDg7XRId/
+         e1zXZh6w9jnV9YeQLqQymrEHMWp/Ye/PXASpunCsn1mhR0v/zBrCxswB/c7mdnVHQ0cY
+         ugSQ==
+X-Gm-Message-State: AFqh2kohMabqmOz4Vin6WDxKJMbp64wAE4IyVQkB6vq53Kn0NOMfJeZ0
+	2Et2+1dqCNGWHYlxYReX6oryyHHZrCwPY2FJI7flsA==
+X-Google-Smtp-Source: AMrXdXuyaO7b1tJc+dr7mmKNnVfcM8OpbeMgqTOB+gTbqM/Ybvjftr2ysl8nBnAGotjaDqCxGVWxb8sYOYxE2fh8ark=
+X-Received: by 2002:aca:2b16:0:b0:364:4a32:d98a with SMTP id
+ i22-20020aca2b16000000b003644a32d98amr1363175oik.157.1674683586013; Wed, 25
+ Jan 2023 13:53:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230119173559.2517103-1-dmatlack@google.com> <Y9B8A+/FSPCrAANT@google.com>
- <Y9B9FZReDVwdNNrS@google.com>
-In-Reply-To: <Y9B9FZReDVwdNNrS@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Wed, 25 Jan 2023 09:21:34 -0800
-Message-ID: <CALzav=fAVF5VDj76Pd9m+G+-A+UdvCS1tTVGCyvnvtgq4eFOSg@mail.gmail.com>
-Subject: Re: [PATCH 0/7] KVM: Add a common API for range-based TLB invalidation
+References: <20230109215347.3119271-1-rananta@google.com> <20230109215347.3119271-5-rananta@google.com>
+ <Y9BhiOyvMvu/L0J4@thinky-boi>
+In-Reply-To: <Y9BhiOyvMvu/L0J4@thinky-boi>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Wed, 25 Jan 2023 13:52:54 -0800
+Message-ID: <CAJHc60yPWrry_+g=rxJs26SBW4oz-ovrBZ=OyzbBieTaA=36gQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 4/6] KVM: arm64: Optimize TLBIs in the dirty logging path
 To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, 
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+Cc: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Ricardo Koller <ricarkol@google.com>, Reiji Watanabe <reijiw@google.com>, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	Raghavendra Rao Ananta <rananta@google.com>
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jan 24, 2023 at 4:51 PM Oliver Upton <oliver.upton@linux.dev> wrote:
-> On Wed, Jan 25, 2023 at 12:46:59AM +0000, Sean Christopherson wrote:
-> > On Thu, Jan 19, 2023, David Matlack wrote:
+Hi Oliver,
+
+On Tue, Jan 24, 2023 at 2:54 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+>
+> Hi Raghavendra,
+>
+> I find the commit title rather ambiguous. May I suggest:
+>
+>   KVM: arm64: Use range-based TLBIs for write protection
+>
+> On Mon, Jan 09, 2023 at 09:53:45PM +0000, Raghavendra Rao Ananta wrote:
+> > Currently the dirty-logging paths, including
+> > kvm_arch_flush_remote_tlbs_memslot() and kvm_mmu_wp_memory_region()
+> > ivalidates the entire VM's TLB entries using kvm_flush_remote_tlbs().
+> > As the range of IPAs is provided by these functions, this is highly
+> > inefficient on the systems which support FEAT_TLBIRANGE. Hence,
+> > use kvm_flush_remote_tlbs_range() to flush the TLBs instead.
+>
+> This commit message gives a rather mechanical description of the commit.
+> Instead of describing the change, could you describe _why_ this is an
+> improvement over the VM-wide invalidation?
+>
+Of course. I assumed the optimization would be obvious, but sure,
+it'll be better to describe it.
+FYI, thanks to David's common code for range-based TLBI, this patch
+shrunk to just one line, and would impact only the flush after
+write-protect.
+
+Thanks,
+Raghavendra
+> --
+> Thanks,
+> Oliver
+>
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  arch/arm64/kvm/arm.c | 7 ++++++-
+> >  arch/arm64/kvm/mmu.c | 2 +-
+> >  2 files changed, 7 insertions(+), 2 deletions(-)
 > >
-> > Did a quick read through, didn't see anything I disagree with.
->
-> LGTM for the tiny amount of arm64 changes, though I imagine David will
-> do a v2 to completely get rid of the affected Kconfig.
-
-Thanks both for taking a look.
-
-> > Is there any urgency to getting this merged?  If not, due to the dependencies
-> > with x86 stuff queued for 6.3, and because of the cross-architecture changes, it
-> > might be easiest to plan on landing this in 6.4.  That would allow Paolo to create
-> > an immutable topic branch fairly early on.
->
-> +1, that buys us some time to go through the rounds on the arm64 side
-> such that we could possibly stack the TLBIRANGE work on top.
-
-The main benefit of merging in 6.3 would be to make Raghavendra's life
-simpler/easier so he can build the next version of his arm64 TLBI
-series on top. But I guess he can still do that with a topic branch.
-
-I'll go ahead and send a v2 on top of the changes from Hou you queued
-for 6.3, Sean, and we can plan on landing that in 6.4 (barring any
-further feedback or conflicts).
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 00da570ed72bd..179520888c697 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -1433,7 +1433,12 @@ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+> >  void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
+> >                                       const struct kvm_memory_slot *memslot)
+> >  {
+> > -     kvm_flush_remote_tlbs(kvm);
+> > +     phys_addr_t start, end;
+> > +
+> > +     start = memslot->base_gfn << PAGE_SHIFT;
+> > +     end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
+> > +
+> > +     kvm_flush_remote_tlbs_range(kvm, start, end);
+> >  }
+> >
+> >  static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 70f76bc909c5d..e34b81f5922ce 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -976,7 +976,7 @@ static void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
+> >       write_lock(&kvm->mmu_lock);
+> >       stage2_wp_range(&kvm->arch.mmu, start, end);
+> >       write_unlock(&kvm->mmu_lock);
+> > -     kvm_flush_remote_tlbs(kvm);
+> > +     kvm_flush_remote_tlbs_range(kvm, start, end);
+> >  }
+> >
+> >  /**
+> > --
+> > 2.39.0.314.g84b9a713c41-goog
+> >
+> >
