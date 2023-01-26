@@ -1,88 +1,108 @@
-Received: from out-210.mta0.migadu.com (out-210.mta0.migadu.com [91.218.175.210])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5BB74C9B
-	for <kvmarm@lists.linux.dev>; Thu, 26 Jan 2023 20:21:02 +0000 (UTC)
-Date: Thu, 26 Jan 2023 20:20:54 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1674764460;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P8JRB0ZTuKzOcaN6t/zgZzy2q4XicQ9675yPHBbKAJE=;
-	b=SEN0QyX13UyBorIsbpCTmG6er5954SCoAlZj9H4TrOI9Nkx8Rb4eX1Yk3Wop+Juk4BdXCI
-	KZSOnhA+XQMdFLD6T42NDwp1hJPi4m9ftdbLg58+OLgaMIyzGLKRAnggcD29NcTStHoyGv
-	KCtNbNIQ8a2NffR4AX4B8uTKrsedhgQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Gavin Shan <gshan@redhat.com>
-Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
-	maz@kernel.org, will@kernel.org, ricarkol@google.com,
-	eric.auger@redhat.com, yuzhe@nfschina.com, renzhengeek@gmail.com,
-	reijiw@google.com, ardb@kernel.org, Julia.Lawall@inria.fr,
-	yuzenghui@huawei.com, seanjc@google.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v2 1/3] KVM: arm64: Add helper vgic_write_guest_lock()
-Message-ID: <Y9LgplvWZtdjXCEE@google.com>
-References: <20230119234405.349644-1-gshan@redhat.com>
- <20230119234405.349644-2-gshan@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCCE1854
+	for <kvmarm@lists.linux.dev>; Thu, 26 Jan 2023 20:44:52 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id n8-20020a258d08000000b007facaf67acfso3188137ybl.0
+        for <kvmarm@lists.linux.dev>; Thu, 26 Jan 2023 12:44:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=j9eMGsuOboeDFLvBXbf4EoVuBvplDzjiR8R35kRzRzk=;
+        b=cQMw6FAyg6mYnU7VIMqrgDwFxLs3c6Kcg0P38Z+Sg43jVxky6lvNicUFY568YhVD3h
+         geRQGIU7S03l1YTAZxjjbutQ49edTKuPIY8miJd7qbBgwJ+MPl5LZnYUfzGCJRZmJk+4
+         qDE0VWTF35oajtWZ5Zl+pazWx+IQjQBxJjREDohEa5TEf05b0EvBRyT+YJaAwNk7OAGV
+         NWsCw4Ya2caGs5rfbN1+UcSZi9jzqO2PSxD3XSumV+QUlO4R77YNCBsOAnZ4CF3Q0wfg
+         K4FMpUmHtmmEf9l1bhupZMqZ65fzTTljYHVLYRI3nJqvR3Xtu/Yxs0Ng/WvpqqfdsPjM
+         AHEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=j9eMGsuOboeDFLvBXbf4EoVuBvplDzjiR8R35kRzRzk=;
+        b=SSjFnlJA1oB4xx7PQ8LeoCkygfbHaRpG0CU+0aJdu21oFQtwHg4R3BJaWDpFIVdupX
+         AZiymMVlj9kX+EILuDgJ/K03fVcswob0AN46vCi/RNtFHAuzklLQ7ufNz6ZBvD9TFyd0
+         rlClmLxoGhcO9K+dKGr9TBHqZF9/ECTpRSqZLtd5XTIu1pbxoXC56NotL0jhfCs1HccE
+         TsNnAxQhCEFjxW/aZXMAhvLFHvA188V2n+Tg5DDMQMyzSHME5rdQQ1AKuzAS2vNBVYdR
+         LEroMmhsVHlLYBKkp7E7+vwguzq90ceW0RzQ9f9QXk+6J2LeevTkaoLVs1GuZXAtoHEL
+         svpg==
+X-Gm-Message-State: AFqh2koL5mhC+rQ6k+Cfob0qo7NuVdpbs4xoDFFuVusvmJrkJB0yxgKJ
+	cIjpgcvQ4uU3+Mhj7f6m7B4m7M7kp3WEBUo=
+X-Google-Smtp-Source: AMrXdXvqgrjYC0YYc4Slv5mogwPRxgYozsZ3TTkpden02y5nqgY7MNNJj+RJ44bjJRb/eYtnJkbmDMOppy9uU7M=
+X-Received: from zaidcloud.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5325])
+ (user=zalbassam job=sendgmr) by 2002:a25:3c82:0:b0:7e2:76a6:a641 with SMTP id
+ j124-20020a253c82000000b007e276a6a641mr4484003yba.645.1674765891585; Thu, 26
+ Jan 2023 12:44:51 -0800 (PST)
+Date: Thu, 26 Jan 2023 15:44:36 -0500
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230119234405.349644-2-gshan@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.456.gfc5497dd1b-goog
+Message-ID: <20230126204444.2204061-1-zalbassam@google.com>
+Subject: [PATCH 0/8] perf: arm: Make PMUv3 driver available for aarch32
+From: Zaid Al-Bassam <zalbassam@google.com>
+To: Jesus Sanchez-Palencia <jesussanp@google.com>, Russell King <linux@armlinux.org.uk>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Namhyung Kim <namhyung@kernel.org>, Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu
+Cc: Zaid Al-Bassam <zalbassam@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Gavin,
+Currently, PMUv3 driver is only available for ARMv8 aarch64
+platforms, ARMv8 running in aarch32 mode dont have access to
+the driver. This is, especially, a problem for ARMv8 platforms
+that only have aarch32 support, like the Cortex-A32.
 
-On Fri, Jan 20, 2023 at 07:44:03AM +0800, Gavin Shan wrote:
-> Currently, the unknown no-running-vcpu sites are reported when a
-> dirty page is tracked by mark_page_dirty_in_slot(). Until now, the
-> only known no-running-vcpu site is saving vgic/its tables through
-> KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} command on KVM device
-> "kvm-arm-vgic-its". Unfortunately, there are more unknown sites to
-> be handled and no-running-vcpu context will be allowed in these
-> sites: (1) KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_RESTORE_TABLES} command
-> on KVM device "kvm-arm-vgic-its" to restore vgic/its tables. The
-> vgic3 LPI pending status could be restored. (2) Save vgic3 pending
-> table through KVM_DEV_ARM_{VGIC_GRP_CTRL, VGIC_SAVE_PENDING_TABLES}
-> command on KVM device "kvm-arm-vgic-v3".
-> 
-> In order to handle those unknown cases, we need a unified helper
-> vgic_write_guest_lock(). struct vgic_dist::save_its_tables_in_progress
-> is also renamed to struct vgic_dist::save_tables_in_progress. Besides,
-> "asm/kvm_mmu.h" needs to be included for "vgic.h" for the definition
-> of kvm_write_guest_lock().
-> 
-> No functional change intended.
-> 
-> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> ---
->  arch/arm64/kvm/vgic-sys-reg-v3.c   |  1 +
->  arch/arm64/kvm/vgic/vgic-irqfd.c   |  1 +
->  arch/arm64/kvm/vgic/vgic-its.c     | 13 +++++--------
->  arch/arm64/kvm/vgic/vgic-mmio-v2.c |  1 +
->  arch/arm64/kvm/vgic/vgic-mmio.c    |  1 +
->  arch/arm64/kvm/vgic/vgic-v4.c      |  1 +
->  arch/arm64/kvm/vgic/vgic.c         |  1 +
->  arch/arm64/kvm/vgic/vgic.h         | 13 +++++++++++++
->  include/kvm/arm_vgic.h             |  2 +-
->  9 files changed, 25 insertions(+), 9 deletions(-)
+Make the PMUv3 driver available to arm arch (ARMv8 aarch32) by
+moving the PMUv3 driver from arm64 to drivers, that makes the
+driver common to both arm and arm64 architectures, then add
+PMUv3 arm Support.
 
-You wouldn't have to add the include all around the shop if you instead
-just stuck it in vgic.h...
+The main work in this patchset was made a while back by Marc
+Zyngier on a private branch. This patchset rebases Marc's
+patches to the latest kernel revision and adds additional
+patches to accommodate the changes in the kernel since Marc
+wrote the patches.
 
-Having said that, we really ought to get a fix in for this sooner rather
-than later. I just hit it myself testing kvmarm/next.
+Marc Zyngier (5):
+  arm64: perf: Move PMUv3 driver to drivers/perf
+  arm64: perf: Abstract system register accesses away
+  ARM: Make CONFIG_CPU_V7 valid for 32bit ARMv8 implementations
+  ARM: perf: Allow the use of the PMUv3 driver on 32bit ARM
+  ARM: mach-virt: Select PMUv3 driver by default
 
-Marc, could you take care of the include fix when applying?
+Zaid Al-Bassam (3):
+  perf: pmuv3: Add common defines for the PMU version
+  perf: pmuv3: Add wrappers for KVM accesses
+  perf: pmuv3: Change GENMASK to GENMASK_ULL
+
+ arch/arm/Kconfig                              |   1 +
+ arch/arm/include/asm/arm_pmuv3.h              | 238 +++++++++++++++
+ arch/arm/mm/Kconfig                           |   2 +-
+ arch/arm64/include/asm/arm_pmuv3.h            | 210 +++++++++++++
+ arch/arm64/include/asm/perf_event.h           | 249 ----------------
+ arch/arm64/kernel/Makefile                    |   1 -
+ drivers/perf/Kconfig                          |  10 +
+ drivers/perf/Makefile                         |   1 +
+ .../perf_event.c => drivers/perf/arm_pmuv3.c  | 139 +++------
+ include/kvm/arm_pmu.h                         |   2 +-
+ include/linux/perf/arm_pmuv3.h                | 276 ++++++++++++++++++
+ 11 files changed, 773 insertions(+), 356 deletions(-)
+ create mode 100644 arch/arm/include/asm/arm_pmuv3.h
+ create mode 100644 arch/arm64/include/asm/arm_pmuv3.h
+ rename arch/arm64/kernel/perf_event.c => drivers/perf/arm_pmuv3.c (92%)
+ create mode 100644 include/linux/perf/arm_pmuv3.h
 
 -- 
-Thanks,
-Oliver
+2.39.0.246.g2a6d74b583-goog
+
