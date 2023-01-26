@@ -1,40 +1,40 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF875393
-	for <kvmarm@lists.linux.dev>; Thu, 26 Jan 2023 20:44:57 +0000 (UTC)
-Received: by mail-pf1-f202.google.com with SMTP id c75-20020a621c4e000000b00592501ac524so856063pfc.6
-        for <kvmarm@lists.linux.dev>; Thu, 26 Jan 2023 12:44:57 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C045390
+	for <kvmarm@lists.linux.dev>; Thu, 26 Jan 2023 20:44:59 +0000 (UTC)
+Received: by mail-pf1-f201.google.com with SMTP id j1-20020aa78001000000b0057d28e11cb6so1416433pfi.11
+        for <kvmarm@lists.linux.dev>; Thu, 26 Jan 2023 12:44:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pc5TcYpRDFD/GaxSdX4EpKqW7yOnqCnFySLcXs5p0NE=;
-        b=XG/5RPIOY2xbpHWiZxLnjhSxlO2Lo/RmpmNDlnnM9SEq8+RevL/W4QoiizuPnqWhfy
-         zj3x8N3DHPDVKTm8sv0RNFXAYhexNhLAEJsooNK5dTdMKW+TDX6meEp79ls8tqv4VVpF
-         uhN37iG6WgVhJYK9KJkmka9EKycN5ez8ZHpxgiWwMBEQOay66JmNaYFm5SG2ArlE2AuM
-         FhDTr4dr5yEcNMV7Pomy1P9Y8/6IgSEr1qlrsKhqcRsxObWavTTLL7WxpSEq7FVMGuid
-         bVz8p5nPA56iEgtJ8M5AQ46OwX2z9EOMCct6jR0hWAXrDHqjBeXh4UaCHD21gPMkh/0n
-         HCtA==
+        bh=zqM3/Ci1lx/2tZr3NWii0Dt8IoCFwVmRmktSfadot+Y=;
+        b=AtzLjLuseZj5IfJaGcz67eE/oecjONgYbERTV8bTih9QC+A3oBltmK9MFkMSv0YccD
+         Vw87R9XzDLU6QOsDcXPrwnpEUShrgOoSmlwEzG4VLi2GH/5W5IO9jtvAyAc4dHaDA5kq
+         rgbBknjoQ2mz7cj0vEBOP4NlV8qLF9qbw16CSCWzVcV3WnJ5kzpnwenW51IT+fqGjhgJ
+         n86IW6+2o6lszwEHosMm0M6IX/XEgMWkU7X6yqL6zgUgsEXBBbq1tZgTn+ewksV0asbq
+         mw2tJ5/S885VrDiPzj2IMoJ78LSNJNsYe8+guRMwppiw9mLfe57EgxXGqIYtzaCSrkpB
+         IXWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pc5TcYpRDFD/GaxSdX4EpKqW7yOnqCnFySLcXs5p0NE=;
-        b=pdiRPcQ9R0eHm6oqrJsK+7jI4mi/HfHBE3Zgoebkft8rMIwPkeIlTuO7XOjj07dH5/
-         oWF+nnIREs8DSiq9P/FIJLYsCPdBlxiiqGY+dTna8uvB6ukXGhcvL9RrH55Oc8pqzPKY
-         0JrdVPiWm5afEsjUdQHndjCbeeTuuPamW3Bgff60UIDHowzIHXCGEZe6xZ+Taaj2Bp5b
-         Bekfi42zVAg6NAlixcxWCl8CP2FBXeeIOiW3hRjfp4KIPD2b7Kx1AbyH5lpOsmzkjMlA
-         Tl0QpNbTH4HaCDqHDuQTwFW+mzM5VZD4Y9vsXbVxBcuBoxVpJlCSC1IyUk90LtllVd55
-         /swg==
-X-Gm-Message-State: AFqh2kriyxR6gOFtapw6UwXHquv0LVz4MnyHDAiPQyZj3AJXhWDNhb4a
-	nsIeTmndsFtuT9yEjpXYNjMWChBKEMIgEP0=
-X-Google-Smtp-Source: AMrXdXtNVs+moL/C/rg64NpGxn6FuIRzJANIZDss/dvz6sXSl/S/nyoLU+SxIFVuRzEA+DcjK28wODOWXS1A/rk=
+        bh=zqM3/Ci1lx/2tZr3NWii0Dt8IoCFwVmRmktSfadot+Y=;
+        b=qZDHxgEheG9+9RZJhNpRTKUPQ16Rb0EgJ2FuZgFuVNCx/cd9lMJsROUaj6KvHVDKLl
+         oW40YNws8dAHoxWvLB5bGMdsFH0+Bjo1sIPSTCPDedL6ci5DgIit/Lcb/TgA79QLQj9v
+         AuaIdgHPvM4qTbuTNFh9kqq0yxN1UfxrGAMMSCQSnrT7m25YTqciHIsyeU3OQfuygfDp
+         CECjPnePrqribj0RL88dSIX8+H4muCvPRJ6cNUc+TTCFoNMBi2oRC22EZqDKRnp1m4y5
+         y0IGd0hGcXSfzNzcCPyHJqcc7qh9QuOV93f/8DqQZSiIFJdOn1Gr3Dd3cxMxOkHbuIJH
+         1XiQ==
+X-Gm-Message-State: AFqh2krR5h4wtu1TnfUmLzTfjhlYZLwuHUcSeeWawv7wwxtxelfQnlcg
+	xgT94NvZdggix67CS6PRzHBZ38qCl4B4oP4=
+X-Google-Smtp-Source: AMrXdXuVOgVY7AWhbaZGyoii9f0mMWnbNgHUxwPn2DnS6IBBl2DP1jJc+mNdVEgrvBEVDl6hSca4Y8riumJsGwg=
 X-Received: from zaidcloud.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5325])
- (user=zalbassam job=sendgmr) by 2002:a17:902:b111:b0:189:a50d:2a23 with SMTP
- id q17-20020a170902b11100b00189a50d2a23mr4276826plr.32.1674765897138; Thu, 26
- Jan 2023 12:44:57 -0800 (PST)
-Date: Thu, 26 Jan 2023 15:44:39 -0500
+ (user=zalbassam job=sendgmr) by 2002:a17:902:968f:b0:193:e89:f610 with SMTP
+ id n15-20020a170902968f00b001930e89f610mr4137596plp.31.1674765899077; Thu, 26
+ Jan 2023 12:44:59 -0800 (PST)
+Date: Thu, 26 Jan 2023 15:44:40 -0500
 In-Reply-To: <20230126204444.2204061-1-zalbassam@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230126204444.2204061-1-zalbassam@google.com>
 X-Mailer: git-send-email 2.39.1.456.gfc5497dd1b-goog
-Message-ID: <20230126204444.2204061-4-zalbassam@google.com>
-Subject: [PATCH 3/8] perf: pmuv3: Add common defines for the PMU version
+Message-ID: <20230126204444.2204061-5-zalbassam@google.com>
+Subject: [PATCH 4/8] perf: pmuv3: Add wrappers for KVM accesses
 From: Zaid Al-Bassam <zalbassam@google.com>
 To: Jesus Sanchez-Palencia <jesussanp@google.com>, Russell King <linux@armlinux.org.uk>, 
 	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
@@ -60,65 +60,95 @@ To: Jesus Sanchez-Palencia <jesussanp@google.com>, Russell King <linux@armlinux.
 Cc: Zaid Al-Bassam <zalbassam@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The current PMU version defines are available for arm64 only,
-As we want to add PMUv3 support to arm (32-bit), this patch makes
-these defines available for both arm/arm64 by defining them in
-the common arm_pmuv3.h header.
+KVM host support is available only on arm64. This patch adds wrappers
+to the KVM host function references in the arm_pmuv3.c, so that it is
+up to architecture to populate these wrappers if supported.
 
 Signed-off-by: Zaid Al-Bassam <zalbassam@google.com>
 ---
- drivers/perf/arm_pmuv3.c       | 8 ++++----
- include/linux/perf/arm_pmuv3.h | 6 ++++++
- 2 files changed, 10 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/arm_pmuv3.h | 16 ++++++++++++++++
+ drivers/perf/arm_pmuv3.c           | 11 +++++------
+ 2 files changed, 21 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-index 94e4098b662d..505f0758260c 100644
---- a/drivers/perf/arm_pmuv3.c
-+++ b/drivers/perf/arm_pmuv3.c
-@@ -392,7 +392,7 @@ static const struct attribute_group armv8_pmuv3_caps_attr_group = {
-  */
- static bool armv8pmu_has_long_event(struct arm_pmu *cpu_pmu)
- {
--	return (cpu_pmu->pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P5);
-+	return (cpu_pmu->pmuver >= ARMV8_PMU_DFR_VER_V3P5);
+diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
+index f41a354d1022..9f2a48f5340c 100644
+--- a/arch/arm64/include/asm/arm_pmuv3.h
++++ b/arch/arm64/include/asm/arm_pmuv3.h
+@@ -20,6 +20,7 @@
+ 
+ #include <asm/cpufeature.h>
+ #include <asm/sysreg.h>
++#include <linux/kvm_host.h>
+ 
+ /*
+  * This code is really good
+@@ -191,4 +192,19 @@ static inline u32 read_pmceid1(void)
+ 	return read_sysreg(pmceid1_el0);
  }
  
- static inline bool armv8pmu_event_has_user_read(struct perf_event *event)
-@@ -1082,8 +1082,8 @@ static void __armv8pmu_probe_pmu(void *info)
- 	int pmuver;
- 
- 	pmuver = read_pmuver();
--	if (pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF ||
--	    pmuver == ID_AA64DFR0_EL1_PMUVer_NI)
-+	if (pmuver == ARMV8_PMU_DFR_VER_IMP_DEF ||
-+	    pmuver == ARMV8_PMU_DFR_VER_NI)
- 		return;
- 
- 	cpu_pmu->pmuver = pmuver;
-@@ -1109,7 +1109,7 @@ static void __armv8pmu_probe_pmu(void *info)
- 			     pmceid, ARMV8_PMUV3_MAX_COMMON_EVENTS);
- 
- 	/* store PMMIR register for sysfs */
--	if (pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P4 && (pmceid_raw[1] & BIT(31)))
-+	if (pmuver >= ARMV8_PMU_DFR_VER_V3P4 && (pmceid_raw[1] & BIT(31)))
- 		cpu_pmu->reg_pmmir = read_pmmir();
- 	else
- 		cpu_pmu->reg_pmmir = 0;
-diff --git a/include/linux/perf/arm_pmuv3.h b/include/linux/perf/arm_pmuv3.h
-index 5bc9cd6826ea..18b29fde27fa 100644
---- a/include/linux/perf/arm_pmuv3.h
-+++ b/include/linux/perf/arm_pmuv3.h
-@@ -267,4 +267,10 @@
- #define ARMV8_PMU_BUS_WIDTH_SHIFT 16
- #define ARMV8_PMU_BUS_WIDTH_MASK 0xf
- 
-+/* PMU Version in DFR Register */
-+#define ARMV8_PMU_DFR_VER_NI        0
-+#define ARMV8_PMU_DFR_VER_V3P4      0x5
-+#define ARMV8_PMU_DFR_VER_V3P5      0x6
-+#define ARMV8_PMU_DFR_VER_IMP_DEF   0xF
++static inline void armv8pmu_kvm_set_events(u32 set, struct perf_event_attr *attr)
++{
++	kvm_set_pmu_events(set, attr);
++}
++
++static inline void armv8pmu_kvm_clr_events(u32 clr)
++{
++	kvm_clr_pmu_events(clr);
++}
++
++static inline bool armv8pmu_kvm_counter_deferred(struct perf_event_attr *attr)
++{
++	return kvm_pmu_counter_deferred(attr);
++}
 +
  #endif
+diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+index 505f0758260c..d7063dd52827 100644
+--- a/drivers/perf/arm_pmuv3.c
++++ b/drivers/perf/arm_pmuv3.c
+@@ -16,7 +16,6 @@
+ 
+ #include <linux/acpi.h>
+ #include <linux/clocksource.h>
+-#include <linux/kvm_host.h>
+ #include <linux/of.h>
+ #include <linux/perf/arm_pmu.h>
+ #include <linux/perf/arm_pmuv3.h>
+@@ -607,10 +606,10 @@ static inline void armv8pmu_enable_event_counter(struct perf_event *event)
+ 	struct perf_event_attr *attr = &event->attr;
+ 	u32 mask = armv8pmu_event_cnten_mask(event);
+ 
+-	kvm_set_pmu_events(mask, attr);
++	armv8pmu_kvm_set_events(mask, attr);
+ 
+ 	/* We rely on the hypervisor switch code to enable guest counters */
+-	if (!kvm_pmu_counter_deferred(attr))
++	if (!armv8pmu_kvm_counter_deferred(attr))
+ 		armv8pmu_enable_counter(mask);
+ }
+ 
+@@ -629,10 +628,10 @@ static inline void armv8pmu_disable_event_counter(struct perf_event *event)
+ 	struct perf_event_attr *attr = &event->attr;
+ 	u32 mask = armv8pmu_event_cnten_mask(event);
+ 
+-	kvm_clr_pmu_events(mask);
++	armv8pmu_kvm_clr_events(mask);
+ 
+ 	/* We rely on the hypervisor switch code to disable guest counters */
+-	if (!kvm_pmu_counter_deferred(attr))
++	if (!armv8pmu_kvm_counter_deferred(attr))
+ 		armv8pmu_disable_counter(mask);
+ }
+ 
+@@ -974,7 +973,7 @@ static void armv8pmu_reset(void *info)
+ 	armv8pmu_disable_intens(U32_MAX);
+ 
+ 	/* Clear the counters we flip at guest entry/exit */
+-	kvm_clr_pmu_events(U32_MAX);
++	armv8pmu_kvm_clr_events(U32_MAX);
+ 
+ 	/*
+ 	 * Initialize & Reset PMNC. Request overflow interrupt for
 -- 
 2.39.0.246.g2a6d74b583-goog
 
