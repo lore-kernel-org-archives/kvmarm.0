@@ -1,84 +1,169 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568767B
-	for <kvmarm@lists.linux.dev>; Fri, 27 Jan 2023 00:08:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1674778131;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y8tu4FUXrv8fAcstYpX6IME70IzdWPt02A+oJYgnvh0=;
-	b=HELxyHqukSmIaA9hUTGaOJ7iuPGqfZMVhbnA1fT3e9LHaHawzpziVzENF5+r6xVsU950l3
-	feVGcEP4HOLuJUp6K3o3EPZ7eHspoq1I0o8r6jtdkFFIIH1lkEWpFInGo0N9dbBUzKGfVd
-	UKWcLIsGkR/Dxe90dRt0z5rCfzPC8g0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-451-YFNY7T9aOOyBrsh6G2wukA-1; Thu, 26 Jan 2023 19:08:46 -0500
-X-MC-Unique: YFNY7T9aOOyBrsh6G2wukA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D2FFA802C1D;
-	Fri, 27 Jan 2023 00:08:45 +0000 (UTC)
-Received: from [10.64.54.98] (vpn2-54-98.bne.redhat.com [10.64.54.98])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5950F2026D4B;
-	Fri, 27 Jan 2023 00:08:42 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: selftests: Remove duplicate VM in
- memslot_perf_test
-To: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org, maz@kernel.org,
- oliver.upton@linux.dev, seanjc@google.com, shan.gavin@gmail.com
-References: <20230118092133.320003-1-gshan@redhat.com>
- <20230118092133.320003-2-gshan@redhat.com>
- <b5a6f902-2d43-a7d6-5840-669760b6c9d7@maciej.szmigiero.name>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <844b0302-ddb4-22b4-e807-08eca9ac8dee@redhat.com>
-Date: Fri, 27 Jan 2023 11:08:39 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAAC47B;
+	Fri, 27 Jan 2023 11:28:11 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 48E572F;
+	Fri, 27 Jan 2023 03:28:53 -0800 (PST)
+Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.35.16])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 761C33F64C;
+	Fri, 27 Jan 2023 03:28:08 -0800 (PST)
+From: Steven Price <steven.price@arm.com>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev
+Subject: [RFC PATCH 00/14] arm64: Support for running as a guest in Arm CCA
+Date: Fri, 27 Jan 2023 11:27:44 +0000
+Message-Id: <20230127112758.37891-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230127112248.136810-1-suzuki.poulose@arm.com>
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <b5a6f902-2d43-a7d6-5840-669760b6c9d7@maciej.szmigiero.name>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Transfer-Encoding: 8bit
 
-Hi Maciej,
+This series is an RFC adding support for running Linux in a protected
+VM under the new Arm Confidential Compute Architecture (CCA). The
+purpose of this series is to gather feedback on the proposed changes to
+the architecture code for CCA.
 
-On 1/24/23 10:56 AM, Maciej S. Szmigiero wrote:
-> On 18.01.2023 10:21, Gavin Shan wrote:
->> There are two VMs created in prepare_vm(), which isn't necessary.
->> To remove the second created and unnecessary VM.
->>
->> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> 
-> It's weird that we ended with two __vm_create_with_one_vcpu() calls,
-> it looks like the second one was accidentally (re-)introduced during
-> 'kvmarm-6.2' merge, so maybe?:
-> Fixes: eb5618911af0 ("Merge tag 'kvmarm-6.2' of https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD")
-> 
-> Anyway, thanks for spotting this:
-> Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> 
+The ABI to the RMM from a realm (the RSI) is based on the Beta 0
+specification[2] and will be updated in the future when a final version
+of the specification is published.
 
-Thanks for your review. Right, it'd better to have the fix tag as your suggested.
-I think I probably needn't respin. I guess Paolo, Marc or Oliver may help
-to add the fix tag when it's merged.
+This series is based on v6.2-rc1. It is also available as a git
+repository:
 
-Thanks,
-Gavin
+https://gitlab.arm.com/linux-arm/linux-cca cca-guest/rfc-v1
 
+Introduction
+============
+A more general introduction to Arm CCA is available on the Arm
+website[3], and links to the other components involved are available in
+the overall cover letter[4].
 
+Arm Confidential Compute Architecture adds two new 'worlds' to the
+architecture: Root and Realm. A new software component known as the RMM
+(Realm Management Monitor) runs in Realm EL2 and is trusted by both the
+Normal World and VMs running within Realms. This enables mutual
+distrust between the Realm VMs and the Normal World.
 
+Virtual machines running within a Realm can decide on a (4k)
+page-by-page granularity whether to share a page with the (Normal World)
+host or to keep it private (protected). This protection is provided by
+the hardware and attempts to access a page which isn't shared by the
+Normal World will trigger a Granule Protection Fault.
+
+Realm VMs can communicate with the RMM via another SMC interface known
+as RSI (Realm Services Interface). This series adds wrappers for the
+full set of RSI commands and uses them to manage the Realm IPA State
+(RIPAS) and to discover the configuration of the realm.
+
+The VM running within the Realm needs to ensure that memory that is
+going to use is marked as 'RIPAS_RAM' (i.e. protected memory accessible
+only to the guest). This could be provided by the VMM (and subject to
+measurement to ensure it is setup correctly) or the VM can set it
+itself.  This series includes a patch which will iterate over all
+described RAM and set the RIPAS. An alternative would be to update
+booting.rst and state this as a requirement, but this would reduce the
+flexibility of the VMM to manage the available memory to the guest (as
+the initial RIPAS state is part of the guest's measurement).
+
+Within the Realm the most-significant active bit of the IPA is used to
+select whether the access is to protected memory or to memory shared
+with the host. This series treats this bit as if it is attribute bit in
+the page tables and will modify it when sharing/unsharing memory with
+the host.
+
+This top bit usage also necessitates that the IPA width is made more
+dynamic in the guest. The VMM will choose a width (and therefore which
+bit controls the shared flag) and the guest must be able to identify
+this bit to mask it out when necessary. PHYS_MASK_SHIFT/PHYS_MASK are
+therefore made dynamic.
+
+To allow virtio to communicate with the host the shared buffers must be
+placed in memory which has this top IPA bit set. This is achieved by
+implementating the set_memory_{encrypted,decrypted} APIs for arm64 and
+forcing the use of bounce buffers. For now all device access is
+considered to required the memory to be shared, at this stage there is
+no support for real devices to be assigned to a realm guest - obviously
+if device assignment is added this will have to change.
+
+Finally the GIC is (largely) emulated by the (untrusted) host. The RMM
+provides some management (including register save/restore) but the
+ITS buffers must be placed into shared memory for the host to emulate.
+There is likely to be future work to harden the GIC driver against a
+malicious host (along with any other drivers used within a Realm guest).
+
+[1] https://lore.kernel.org/r/20221202061347.1070246-1-chao.p.peng%40linux.intel.com
+[2] https://developer.arm.com/documentation/den0137/1-0bet0/
+[3] https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
+[4] https://lore.kernel.org/r/20230127112248.136810-1-suzuki.poulose%40arm.com
+
+Steven Price (9):
+  arm64: remove redundant 'extern'
+  arm64: Detect if in a realm and set RIPAS RAM
+  arm64: realm: Query IPA size from the RMM
+  arm64: Mark all I/O as non-secure shared
+  arm64: Make the PHYS_MASK_SHIFT dynamic
+  arm64: Enforce bounce buffers for realm DMA
+  arm64: Enable memory encrypt for Realms
+  arm64: realm: Support nonsecure ITS emulation shared
+  HACK: Accept prototype RSI version
+
+Suzuki K Poulose (5):
+  arm64: rsi: Add RSI definitions
+  fixmap: Allow architecture overriding set_fixmap_io
+  arm64: Override set_fixmap_io
+  arm64: Force device mappings to be non-secure shared
+  efi: arm64: Map Device with Prot Shared
+
+ arch/arm64/Kconfig                     |   3 +
+ arch/arm64/include/asm/fixmap.h        |   4 +-
+ arch/arm64/include/asm/io.h            |   6 +-
+ arch/arm64/include/asm/kvm_arm.h       |   2 +-
+ arch/arm64/include/asm/mem_encrypt.h   |  19 ++++
+ arch/arm64/include/asm/pgtable-hwdef.h |   4 +-
+ arch/arm64/include/asm/pgtable-prot.h  |   2 +
+ arch/arm64/include/asm/pgtable.h       |   7 +-
+ arch/arm64/include/asm/rsi.h           |  46 +++++++++
+ arch/arm64/include/asm/rsi_cmds.h      |  71 +++++++++++++
+ arch/arm64/include/asm/rsi_smc.h       | 132 +++++++++++++++++++++++++
+ arch/arm64/kernel/Makefile             |   2 +-
+ arch/arm64/kernel/efi.c                |   2 +-
+ arch/arm64/kernel/head.S               |   2 +-
+ arch/arm64/kernel/rsi.c                |  82 +++++++++++++++
+ arch/arm64/kernel/setup.c              |   3 +
+ arch/arm64/kvm/Kconfig                 |   8 ++
+ arch/arm64/mm/init.c                   |  10 +-
+ arch/arm64/mm/mmu.c                    |  13 +++
+ arch/arm64/mm/pageattr.c               |  48 ++++++++-
+ drivers/irqchip/irq-gic-v3-its.c       |  95 +++++++++++++-----
+ include/asm-generic/fixmap.h           |   2 +
+ 22 files changed, 523 insertions(+), 40 deletions(-)
+ create mode 100644 arch/arm64/include/asm/mem_encrypt.h
+ create mode 100644 arch/arm64/include/asm/rsi.h
+ create mode 100644 arch/arm64/include/asm/rsi_cmds.h
+ create mode 100644 arch/arm64/include/asm/rsi_smc.h
+ create mode 100644 arch/arm64/kernel/rsi.c
+
+-- 
+2.34.1
 
