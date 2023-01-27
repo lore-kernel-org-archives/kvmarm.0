@@ -1,166 +1,87 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEEC3C02
-	for <kvmarm@lists.linux.dev>; Fri, 27 Jan 2023 17:59:31 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C916415BF;
-	Fri, 27 Jan 2023 10:00:12 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 301B63F5A1;
-	Fri, 27 Jan 2023 09:59:30 -0800 (PST)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: andrew.jones@linux.dev,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: [kvm-unit-tests PATCH v5 2/2] arm/psci: Add PSCI CPU_OFF test case
-Date: Fri, 27 Jan 2023 17:59:16 +0000
-Message-Id: <20230127175916.65389-3-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230127175916.65389-1-alexandru.elisei@arm.com>
-References: <20230127175916.65389-1-alexandru.elisei@arm.com>
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D5AE290D
+	for <kvmarm@lists.linux.dev>; Fri, 27 Jan 2023 21:43:57 +0000 (UTC)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-434eb7c6fa5so68792197b3.14
+        for <kvmarm@lists.linux.dev>; Fri, 27 Jan 2023 13:43:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=m/RabSljBhZ9UUQSJRI1BylATrQl4vx1wTwVBab6KOg=;
+        b=hnYIO1DqcXYmL4VaGlmbSIyGBXMwCCofyp10m1F/jucbrsquWi8yL40rOVZz+GqF3H
+         s+MgTBvwSlgCYzu8ZykTISF2X/PuamkdRYBuOBoHqk53eo2AK/6CYD3CDsRvcPmdUdZF
+         N+fx6+4UiHhw9sFeCx9WWzStdvDs4jSFXwGfIcDobyuu4WhGgTHS/WFcDGdcSA1zL40s
+         xTc86+vu09iirLZzNugpZ+rjXWRqX2sTRBq83eafJyCbK4jL81r4h5KCWJnmIgoXyER6
+         RHNzt1H8VXwsTk/rfPpTmtvC3nHpOmME2XD+Tq+LNX6TRuM4Hd275MuOi36bS0iKvVVg
+         uGsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=m/RabSljBhZ9UUQSJRI1BylATrQl4vx1wTwVBab6KOg=;
+        b=8A6+qY1eryW3ajvLVvk+kWjq4OzYSzDz9U8QsgjNPzQ/Ocb+Jm9W22NweMRv6IvGBC
+         3plTrMdFeYczC/w0LANTMy69rWjzEfR9cUhONVml/nuNmDB6LkxUS4RagOCo64tkDmVc
+         YJNjpWXFdPaoVC+FZMtvCCNA/4g2KlGVRnMf+c6Wvc35I+cgTRDE28BCqvDF31+4Jk4e
+         P15x1ykG6UlZeJCr/XM8qco0kl33k4NwmF6ZRKlcP/FypBULZ+QQ4egka1t0L7n3JFPT
+         SI4PPbv3VlQvNYMveKZtqKtau0/ZDW51ow7LYKaxE2SN4i6opETKhmsWZ2fP/wvTKuXW
+         14wA==
+X-Gm-Message-State: AFqh2kq6jKLotc1NqKOMkNelTphhVR3u0gnTdsEbiSD0pWLT4pfvsQr2
+	CKKDydbldVs6ttdMj8Sk1siLdKzJsInmvg==
+X-Google-Smtp-Source: AMrXdXuZFCRsF43mKJP/JrWWay+JHAtZ0w0wGfXsDCq5zzUMO++Q+S7T4cqFlsYVwbhQhkI+936g7Kn62LNPsg==
+X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
+ (user=ricarkol job=sendgmr) by 2002:a25:7589:0:b0:7dc:116c:8499 with SMTP id
+ q131-20020a257589000000b007dc116c8499mr4440641ybc.9.1674855835993; Fri, 27
+ Jan 2023 13:43:55 -0800 (PST)
+Date: Fri, 27 Jan 2023 21:43:49 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.456.gfc5497dd1b-goog
+Message-ID: <20230127214353.245671-1-ricarkol@google.com>
+Subject: [PATCH v2 0/4] KVM: selftests: aarch64: page_fault_test S1PTW related fixes
+From: Ricardo Koller <ricarkol@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
+Cc: pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com, 
+	eric.auger@redhat.com, oupton@google.com, yuzenghui@huawei.com, 
+	Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
+Commit 406504c7b040 ("KVM: arm64: Fix S1PTW handling on RO memslots")
+changed the way S1PTW faults were handled by KVM.  Before this fix,
+KVM treated any fault due to any S1PTW as a write, even S1PTW that
+didn't update the PTE.  Some tests in page_fault_test mistakenly check
+for this KVM behavior and are currently failing.  For example, there's
+a dirty log test that asserts that a S1PTW without AF or DA results in
+the PTE page getting dirty.
 
-The test uses the following method.
+The first commit fixes the userfaultfd check by relaxing all read vs.
+write checks.  The second commit fixes the dirtylog tests by only
+asserting dirty bits when the AF bit is set.  The third commit fixes
+an issue found after fixing the previous two: the dirty log test was
+checking for the first page in the PT region.  Finally, commit "KVM:
+arm64: Fix S1PTW handling on RO memslots" allows for having readonly
+memslots holding page tables, so commit 4 add tests for it.
 
-The primary CPU brings up all the secondary CPUs, which are held in a wait
-loop. Once the primary releases the CPUs, each of the secondary CPUs
-proceed to issue CPU_OFF.
+Changes from v1:
+- added sha1's for commit "KVM: arm64: Fix S1PTW handling on RO
+  memslots" in all messages. (Oliver)
+- removed _with_af from RO macro. (Oliver)
 
-The primary CPU then checks for the status of the individual CPU_OFF
-request. There is a chance that some CPUs might return from the CPU_OFF
-function call after the primary CPU has finished the scan. There is no
-foolproof method to handle this, but the test tries its best to
-eliminate these false positives by introducing an extra delay if all the
-CPUs are reported offline after the initial scan.
+Ricardo Koller (4):
+  KVM: selftests: aarch64: Relax userfaultfd read vs. write checks
+  KVM: selftests: aarch64: Do not default to dirty PTE pages on all
+    S1PTWs
+  KVM: selftests: aarch64: Fix check of dirty log PT write
+  KVM: selftests: aarch64: Test read-only PT memory regions
 
-Signed-off-by: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-[ Alex E: Skip CPU_OFF test if CPU_ON failed, drop cpu_off_success in
-	  favour of checking AFFINITY_INFO, commit message tweaking ]
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
+ .../selftests/kvm/aarch64/page_fault_test.c   | 187 ++++++++++--------
+ 1 file changed, 103 insertions(+), 84 deletions(-)
 
-Decided to drop Drew's Reviewed-by tag because the changes are not trivial
-from the previous version.
-
- arm/psci.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 75 insertions(+), 5 deletions(-)
-
-diff --git a/arm/psci.c b/arm/psci.c
-index f7238f8e0bbd..7034d8ebe6e1 100644
---- a/arm/psci.c
-+++ b/arm/psci.c
-@@ -72,8 +72,9 @@ static bool psci_affinity_info_off(void)
- }
- 
- static int cpu_on_ret[NR_CPUS];
--static cpumask_t cpu_on_ready, cpu_on_done;
-+static cpumask_t cpu_on_ready, cpu_on_done, cpu_off_done;
- static volatile int cpu_on_start;
-+static volatile int cpu_off_start;
- 
- extern void secondary_entry(void);
- static void cpu_on_do_wake_target(void)
-@@ -171,9 +172,71 @@ static bool psci_cpu_on_test(void)
- 	return !failed;
- }
- 
--int main(void)
-+static void cpu_off_secondary_entry(void *data)
-+{
-+	int cpu = smp_processor_id();
-+
-+	while (!cpu_off_start)
-+		cpu_relax();
-+	cpumask_set_cpu(cpu, &cpu_off_done);
-+	cpu_psci_cpu_die();
-+}
-+
-+static bool psci_cpu_off_test(void)
-+{
-+	bool failed = false;
-+	int i, count, cpu;
-+
-+	for_each_present_cpu(cpu) {
-+		if (cpu == 0)
-+			continue;
-+		on_cpu_async(cpu, cpu_off_secondary_entry, NULL);
-+	}
-+
-+	cpumask_set_cpu(0, &cpu_off_done);
-+
-+	cpu_off_start = 1;
-+	report_info("waiting for the CPUs to be offlined...");
-+	while (!cpumask_full(&cpu_off_done))
-+		cpu_relax();
-+
-+	/* Allow all the other CPUs to complete the operation */
-+	for (i = 0; i < 100; i++) {
-+		mdelay(10);
-+
-+		count = 0;
-+		for_each_present_cpu(cpu) {
-+			if (cpu == 0)
-+				continue;
-+			if (psci_affinity_info(cpus[cpu], 0) != PSCI_0_2_AFFINITY_LEVEL_OFF)
-+				count++;
-+		}
-+		if (count > 0)
-+			continue;
-+	}
-+
-+	/* Try to catch CPUs that return from CPU_OFF. */
-+	if (count == 0)
-+		mdelay(100);
-+
-+	for_each_present_cpu(cpu) {
-+		if (cpu == 0)
-+			continue;
-+		if (cpu_idle(cpu)) {
-+			report_info("CPU%d failed to be offlined", cpu);
-+			if (psci_affinity_info(cpus[cpu], 0) == PSCI_0_2_AFFINITY_LEVEL_OFF)
-+				report_info("AFFINITY_INFO incorrectly reports CPU%d as offline", cpu);
-+			failed = true;
-+		}
-+	}
-+
-+	return !failed;
-+}
-+
-+int main(int argc, char **argv)
- {
- 	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-+	bool cpu_on_success = true;
- 
- 	report_prefix_push("psci");
- 
-@@ -188,10 +251,17 @@ int main(void)
- 	report(psci_affinity_info_on(), "affinity-info-on");
- 	report(psci_affinity_info_off(), "affinity-info-off");
- 
--	if (ERRATA(6c7a5dce22b3))
--		report(psci_cpu_on_test(), "cpu-on");
--	else
-+	if (ERRATA(6c7a5dce22b3)) {
-+		cpu_on_success = psci_cpu_on_test();
-+		report(cpu_on_success, "cpu-on");
-+	} else {
- 		report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
-+	}
-+
-+	if (!cpu_on_success)
-+		report_skip("Skipping cpu-off test because the cpu-on test failed");
-+	else
-+		report(psci_cpu_off_test(), "cpu-off");
- 
- done:
- #if 0
 -- 
-2.39.0
+2.39.1.456.gfc5497dd1b-goog
 
