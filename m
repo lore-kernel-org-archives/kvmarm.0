@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B6028EF;
-	Fri, 27 Jan 2023 11:28:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB33D28E8;
+	Fri, 27 Jan 2023 11:28:27 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C9BDF15BF;
-	Fri, 27 Jan 2023 03:29:06 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3D7DB15DB;
+	Fri, 27 Jan 2023 03:29:09 -0800 (PST)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.35.16])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6CF793F64C;
-	Fri, 27 Jan 2023 03:28:22 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 297B53F64C;
+	Fri, 27 Jan 2023 03:28:25 -0800 (PST)
 From: Steven Price <steven.price@arm.com>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org
@@ -25,9 +25,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	linux-coco@lists.linux.dev
-Subject: [RFC PATCH 05/14] arm64: Mark all I/O as non-secure shared
-Date: Fri, 27 Jan 2023 11:27:49 +0000
-Message-Id: <20230127112758.37891-6-steven.price@arm.com>
+Subject: [RFC PATCH 06/14] fixmap: Allow architecture overriding set_fixmap_io
+Date: Fri, 27 Jan 2023 11:27:50 +0000
+Message-Id: <20230127112758.37891-7-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230127112758.37891-1-steven.price@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
@@ -40,36 +40,34 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-All I/O is by default considered non-secure for realms. As such
-mark them as shared with the host.
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+For a realm guest it will be necessary to ensure IO mappings are shared
+so that the VMM can emulate the device. The following patch will provide
+an implementation of set_fixmap_io for arm64 setting the shared bit (if
+in a realm).
+
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/include/asm/io.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ include/asm-generic/fixmap.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
-index 877495a0fd0c..b1a9c22aed72 100644
---- a/arch/arm64/include/asm/io.h
-+++ b/arch/arm64/include/asm/io.h
-@@ -142,12 +142,12 @@ extern void __memset_io(volatile void __iomem *, int, size_t);
- bool ioremap_allowed(phys_addr_t phys_addr, size_t size, unsigned long prot);
- #define ioremap_allowed ioremap_allowed
- 
--#define _PAGE_IOREMAP PROT_DEVICE_nGnRE
-+#define _PAGE_IOREMAP (PROT_DEVICE_nGnRE | PROT_NS_SHARED)
- 
- #define ioremap_wc(addr, size)	\
--	ioremap_prot((addr), (size), PROT_NORMAL_NC)
-+	ioremap_prot((addr), (size), (PROT_NORMAL_NC | PROT_NS_SHARED))
- #define ioremap_np(addr, size)	\
--	ioremap_prot((addr), (size), PROT_DEVICE_nGnRnE)
-+	ioremap_prot((addr), (size), (PROT_DEVICE_nGnRnE | PROT_NS_SHARED))
- 
+diff --git a/include/asm-generic/fixmap.h b/include/asm-generic/fixmap.h
+index 8cc7b09c1bc7..c5ce0368c1ee 100644
+--- a/include/asm-generic/fixmap.h
++++ b/include/asm-generic/fixmap.h
+@@ -94,8 +94,10 @@ static inline unsigned long virt_to_fix(const unsigned long vaddr)
  /*
-  * io{read,write}{16,32,64}be() macros
+  * Some fixmaps are for IO
+  */
++#ifndef set_fixmap_io
+ #define set_fixmap_io(idx, phys) \
+ 	__set_fixmap(idx, phys, FIXMAP_PAGE_IO)
++#endif
+ 
+ #define set_fixmap_offset_io(idx, phys) \
+ 	__set_fixmap_offset(idx, phys, FIXMAP_PAGE_IO)
 -- 
 2.34.1
 
