@@ -1,135 +1,97 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058B35234
-	for <kvmarm@lists.linux.dev>; Fri, 27 Jan 2023 23:37:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1674862650;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E68o1y4L945Wpu1FM7AdpeIAFjXV27retH64u9thADA=;
-	b=fc0ZCfg2Upo1ZRC/GKywp3zqz3v/VR8yLAJw8UY2XVY1oGXtDu5X8lCSvBh5JiXmdtbLPj
-	4xyyi5SMno8xXLyCoeJVYEhBmf3Kiv0135Qs/SXU6m2Ewba9LryflcjIvrmSUkOBsP+Mz0
-	GlRu48gO2cDEk0cgDl+yuKlhLGP8CxY=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-195-uPcJREtdPg6EVDUOUklaEg-1; Fri, 27 Jan 2023 18:37:26 -0500
-X-MC-Unique: uPcJREtdPg6EVDUOUklaEg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 575D61C04320;
-	Fri, 27 Jan 2023 23:37:25 +0000 (UTC)
-Received: from [10.64.54.64] (vpn2-54-64.bne.redhat.com [10.64.54.64])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id CBED7492C14;
-	Fri, 27 Jan 2023 23:37:16 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v3 4/4] KVM: arm64: Allow no running vcpu on saving vgic3
- pending table
-To: Zenghui Yu <zenghui.yu@linux.dev>, kvmarm@lists.linux.dev
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, corbet@lwn.net,
- maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
- oliver.upton@linux.dev, yuzenghui@huawei.com, catalin.marinas@arm.com,
- will@kernel.org, yuzhe@nfschina.com, isaku.yamahata@intel.com,
- seanjc@google.com, ricarkol@google.com, eric.auger@redhat.com,
- renzhengeek@gmail.com, reijiw@google.com, shan.gavin@gmail.com
-References: <20230126235451.469087-1-gshan@redhat.com>
- <20230126235451.469087-5-gshan@redhat.com>
- <713a3e22-6327-875e-072d-e916f75d5239@linux.dev>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <46612147-9e36-1981-8fdc-e205610a4bc9@redhat.com>
-Date: Sat, 28 Jan 2023 10:37:14 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE8D5234
+	for <kvmarm@lists.linux.dev>; Fri, 27 Jan 2023 23:38:37 +0000 (UTC)
+Received: by mail-qk1-f181.google.com with SMTP id f23so3054522qkg.1
+        for <kvmarm@lists.linux.dev>; Fri, 27 Jan 2023 15:38:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=r3p/T/C5LEjZklM/3McjmH+nwXiuvZ9AZNDnHBso/wI=;
+        b=LvPpqflUiyzNIOBtF7ovVHDoam5nkOWs7FwK65q1MQ6uvVWAF23RlNqpLDYoyvsLtc
+         SSfyr0GPJ7bFYVrOik+cQjyeO6GED86cC4GDj+OPpjKACcpLC5DsJBghDxZ1eaGEnJM4
+         ud53ek8zV1JEZILhRxrYxQEkj9eDxo+6MWhkTzLWIwSj2MNMUJQzZbgqLWYJZ0i3e6Hh
+         XyCDym/pvD2zhV4Kyv1RqgfCrZWDIP6wPGcofH3xEocTAoV721FxGal/pY+6IVSFEnau
+         2CWs7CA9zSsGY/Rvo+4sVwIOvGArveMa86D6S1fYg09sAmW3NlPmEXS9Yson/kL3GUHi
+         xPgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r3p/T/C5LEjZklM/3McjmH+nwXiuvZ9AZNDnHBso/wI=;
+        b=t/vaBIG8gikXzHiX37UZ+3vdbJ4syQKZz7AugfOLCh0Q9u82tVnaO+PaCQ7wDU45V1
+         30nJQjU4q+AmO+Z6svttBoM4k4R3B1/G5uIfEWFoUYw+ok6IkJb/aluxPP1bfUvym2Jr
+         KpYxo8hljQtz+oOrPIHlA6rmoAfJIBgdVrorqTOHxTH+oITTAA/1P9IljA7Jyd6jDyjE
+         8LUkZxX065xE2HgAbkuCjf9t6Hb91xHZOSQHFjkwajCH12q4L2gJ6fdNsT2/Ksbkvd7b
+         F7H2+vWz/gBK72xe0aJYQqNBRhc0GuRWMRDheExCNbtaIYHZffI5GHRWZhb6s74icCDo
+         TWkQ==
+X-Gm-Message-State: AO0yUKVA/sfSRBzEU8x+yp2FRq1hI4FqQ1vS2OIvfWJvqSa1NMtNiEGs
+	AyERf6fIKPm/jjFt+Lyx1rGTvbpLF4EX5l2VH7SITQ==
+X-Google-Smtp-Source: AK7set9MfTU7CQFxRLAhgQucoy0y3vpnRRQ9+J1NriTODEPbSGW1cQOL8vN3HkxIljjuJtsgbKngsx0hXiWyABVodmw=
+X-Received: by 2002:a05:620a:1426:b0:71b:8e29:18fb with SMTP id
+ k6-20020a05620a142600b0071b8e2918fbmr424qkj.230.1674862716796; Fri, 27 Jan
+ 2023 15:38:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <713a3e22-6327-875e-072d-e916f75d5239@linux.dev>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+References: <20230127214353.245671-1-ricarkol@google.com> <20230127214353.245671-5-ricarkol@google.com>
+ <Y9RXfxCiKGZNNV3h@google.com>
+In-Reply-To: <Y9RXfxCiKGZNNV3h@google.com>
+From: Ricardo Koller <ricarkol@google.com>
+Date: Fri, 27 Jan 2023 15:38:25 -0800
+Message-ID: <CAOHnOrwGbLfS_w_R79-bSUDyARnNKiU5r6afC7sQf_mYtAjdLQ@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] KVM: selftests: aarch64: Test read-only PT memory regions
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev, 
+	pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com, 
+	eric.auger@redhat.com, yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Zenghui,
+On Fri, Jan 27, 2023 at 3:00 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+>
+> Hi Ricardo,
+>
+> On Fri, Jan 27, 2023 at 09:43:53PM +0000, Ricardo Koller wrote:
+> > Extend the read-only memslot tests in page_fault_test to test
+> > read-only PT (Page table) memslots. Note that this was not allowed
+> > before commit 406504c7b040 ("KVM: arm64: Fix S1PTW handling on RO
+> > memslots") as all S1PTW faults were treated as writes which resulted
+> > in an (unrecoverable) exception inside the guest.
+>
+> More of a style nit going forward (don't bother respinning):
+>
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > ---
+> >  .../selftests/kvm/aarch64/page_fault_test.c    | 18 +++++++++++-------
+> >  1 file changed, 11 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> > index 2e2178a7d0d8..54680dc5887f 100644
+> > --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> > +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> > @@ -829,8 +829,9 @@ static void help(char *name)
+> >
+> >  #define TEST_RO_MEMSLOT(_access, _mmio_handler, _mmio_exits)                 \
+> >  {                                                                            \
+> > -     .name                   = SCAT3(ro_memslot, _access, _with_af),         \
+> > +     .name                   = SCAT2(ro_memslot, _access),                   \
+>
+> You should explicitly call out these sort of drive-by/opportunistic
+> changes in the commit message as being just that reviewers don't get
+> lost figuring out how it relates to the functional change of this
+> patch.
 
-On 1/28/23 2:57 AM, Zenghui Yu wrote:
-> On 2023/1/27 07:54, Gavin Shan wrote:
->> We don't have a running VCPU context to save vgic3 pending table due
->> to KVM_DEV_ARM_VGIC_{GRP_CTRL, SAVE_PENDING_TABLES} command on KVM
->> device "kvm-arm-vgic-v3". The unknown case is caught by kvm-unit-tests.
->>
->>    # ./kvm-unit-tests/tests/its-pending-migration
->>    WARNING: CPU: 120 PID: 7973 at arch/arm64/kvm/../../../virt/kvm/kvm_main.c:3325 \
->>    mark_page_dirty_in_slot+0x60/0xe0
->>     :
->>    mark_page_dirty_in_slot+0x60/0xe0
->>    __kvm_write_guest_page+0xcc/0x100
->>    kvm_write_guest+0x7c/0xb0
->>    vgic_v3_save_pending_tables+0x148/0x2a0
->>    vgic_set_common_attr+0x158/0x240
->>    vgic_v3_set_attr+0x4c/0x5c
->>    kvm_device_ioctl+0x100/0x160
->>    __arm64_sys_ioctl+0xa8/0xf0
->>    invoke_syscall.constprop.0+0x7c/0xd0
->>    el0_svc_common.constprop.0+0x144/0x160
->>    do_el0_svc+0x34/0x60
->>    el0_svc+0x3c/0x1a0
->>    el0t_64_sync_handler+0xb4/0x130
->>    el0t_64_sync+0x178/0x17c
->>
->> Use vgic_write_guest_lock() to save vgic3 pending table.
->>
->> Reported-by: Zenghui Yu <yuzenghui@huawei.com>
->> Signed-off-by: Gavin Shan <gshan@redhat.com>
->> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
->> ---
->>  Documentation/virt/kvm/api.rst | 4 +++-
->>  arch/arm64/kvm/vgic/vgic-v3.c  | 2 +-
->>  2 files changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->> index 40ada313faa3..07f07668995e 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -8074,7 +8074,9 @@ NOTE: Multiple examples of using the backup bitmap: (1) save vgic/its
->>  tables through command KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} on
->>  KVM device "kvm-arm-vgic-its". (2) restore vgic/its tables through
->>  command KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_RESTORE_TABLES} on KVM device
->> -"kvm-arm-vgic-its". vgic3 LPI pending status is restored.
->> +"kvm-arm-vgic-its". vgic3 LPI pending status is restored. (3) save
->> +vgic3 pending table through KVM_DEV_ARM_VGIC_{GRP_CTRL, SAVE_PENDING_TABLES}
->> +command on KVM device "kvm-arm-vgic-v3".
-> 
-> Can we summarize these 3 examples with something like: "when the guest
-> memory (pending tables, ITS tables, etc) is dirtied by the virtual GIC
-> or ITS, which is typically triggered by a userspace request (e.g.,
-> KVM_DEV_ARM_ITS_SAVE_TABLES) and doesn't require a running VCPU
-> context"? In case there will be more no-running-vcpu
-> kvm_write_guest_lock() cases in the VGIC emulation code in future and we
-> have to extend the documentation..
-> 
-> But I don't have objection to your writing and the whole series looks
-> good.
-> 
+Ah, sorry for that. Forgot about mentioning this in the commit message.
 
-There are discussions about the documentation when dirty ring is enabled
-on ARM64. We prefer to keep the layout where the KVM devices and commands
-are explicitly documented. The application developer can identify them
-easily and to enable the backup bitmap when those KVM devices have been
-used.
+Ricardo
 
-By the way, 'vgic3' will be replaced with 'VGICv3' as you suggested in
-another reply.
-
-Thanks,
-Gavin
-
+>
+> --
+> Thanks,
+> Oliver
