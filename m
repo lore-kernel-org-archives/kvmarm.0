@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA19928F7;
-	Fri, 27 Jan 2023 11:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CBA928F7;
+	Fri, 27 Jan 2023 11:30:54 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 884A41756;
-	Fri, 27 Jan 2023 03:31:33 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED163175A;
+	Fri, 27 Jan 2023 03:31:35 -0800 (PST)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.35.16])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 86C463F64C;
-	Fri, 27 Jan 2023 03:30:49 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DA7843F64C;
+	Fri, 27 Jan 2023 03:30:51 -0800 (PST)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -25,9 +25,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	linux-coco@lists.linux.dev
-Subject: [RFC PATCH 27/28] arm64: RME: Always use 4k pages for realms
-Date: Fri, 27 Jan 2023 11:29:31 +0000
-Message-Id: <20230127112932.38045-28-steven.price@arm.com>
+Subject: [RFC PATCH 28/28] HACK: Accept prototype RMI versions
+Date: Fri, 27 Jan 2023 11:29:32 +0000
+Message-Id: <20230127112932.38045-29-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230127112932.38045-1-steven.price@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
@@ -40,59 +40,75 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Always split up huge pages to avoid problems managing huge pages. There
-are two issues currently:
+The upstream RMM currently advertises the major version of an internal
+prototype (v56.0) rather than the expected version from the RMM
+architecture specification (v1.0).
 
-1. The uABI for the VMM allows populating memory on 4k boundaries even
-   if the underlying allocator (e.g. hugetlbfs) is using a larger page
-   size. Using a memfd for private allocations will push this issue onto
-   the VMM as it will need to respect the granularity of the allocator.
-
-2. The guest is able to request arbitrary ranges to be remapped as
-   shared. Again with a memfd approach it will be up to the VMM to deal
-   with the complexity and either overmap (need the huge mapping and add
-   an additional 'overlapping' shared mapping) or reject the request as
-   invalid due to the use of a huge page allocator.
-
-For now just break everything down to 4k pages in the RMM controlled
-stage 2.
+Add a config option to enable support for the prototype RMI v56.0.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/kvm/mmu.c | 4 ++++
- arch/arm64/kvm/rme.c | 4 +++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/rmi_smc.h | 7 +++++++
+ arch/arm64/kvm/Kconfig           | 8 ++++++++
+ arch/arm64/kvm/rme.c             | 8 ++++++++
+ 3 files changed, 23 insertions(+)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 5417c273861b..b5fc8d8f7049 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1278,6 +1278,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (logging_active) {
- 		force_pte = true;
- 		vma_shift = PAGE_SHIFT;
-+	} else if (kvm_is_realm(kvm)) {
-+		// Force PTE level mappings for realms
-+		force_pte = true;
-+		vma_shift = PAGE_SHIFT;
- 	} else {
- 		vma_shift = get_vma_page_shift(vma, hva);
- 	}
+diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+index 16ff65090f3a..d6bbd7d92b8f 100644
+--- a/arch/arm64/include/asm/rmi_smc.h
++++ b/arch/arm64/include/asm/rmi_smc.h
+@@ -6,6 +6,13 @@
+ #ifndef __ASM_RME_SMC_H
+ #define __ASM_RME_SMC_H
+ 
++#ifdef CONFIG_RME_USE_PROTOTYPE_HACKS
++
++// Allow the prototype RMI version
++#define PROTOTYPE_RMI_ABI_MAJOR_VERSION  56
++
++#endif /* CONFIG_RME_USE_PROTOTYPE_HACKS */
++
+ #include <linux/arm-smccc.h>
+ 
+ #define SMC_RxI_CALL(func)				\
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 05da3c8f7e88..13858a5047fd 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -58,6 +58,14 @@ config NVHE_EL2_DEBUG
+ 
+ 	  If unsure, say N.
+ 
++config RME_USE_PROTOTYPE_HACKS
++	bool "Allow RMM prototype version numbers"
++	default y
++	help
++	  For compatibility with the the current RMM code allow versions
++	  numbers from a prototype implementation as well as the expected
++	  version number from the RMM specification.
++
+ config PROTECTED_NVHE_STACKTRACE
+ 	bool "Protected KVM hypervisor stacktraces"
+ 	depends on NVHE_EL2_DEBUG
 diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-index 6ae7871aa6ed..1eb76cbee267 100644
+index 1eb76cbee267..894060635226 100644
 --- a/arch/arm64/kvm/rme.c
 +++ b/arch/arm64/kvm/rme.c
-@@ -730,7 +730,9 @@ static int populate_par_region(struct kvm *kvm,
- 			break;
- 		}
+@@ -67,6 +67,14 @@ static int rmi_check_version(void)
+ 	version_major = RMI_ABI_VERSION_GET_MAJOR(res.a0);
+ 	version_minor = RMI_ABI_VERSION_GET_MINOR(res.a0);
  
--		if (is_vm_hugetlb_page(vma))
-+		// FIXME: To avoid the overmapping issue (see below comment)
-+		// force the use of 4k pages
-+		if (is_vm_hugetlb_page(vma) && 0)
- 			vma_shift = huge_page_shift(hstate_vma(vma));
- 		else
- 			vma_shift = PAGE_SHIFT;
++#ifdef PROTOTYPE_RMI_ABI_MAJOR_VERSION
++	// Support the prototype
++	if (version_major == PROTOTYPE_RMI_ABI_MAJOR_VERSION) {
++		kvm_err("Using prototype RMM support (version %d.%d)\n",
++			version_major, version_minor);
++		return 0;
++	}
++#endif
+ 	if (version_major != RMI_ABI_MAJOR_VERSION) {
+ 		kvm_err("Unsupported RMI ABI (version %d.%d) we support %d\n",
+ 			version_major, version_minor,
 -- 
 2.34.1
 
