@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8DBE28F2;
-	Fri, 27 Jan 2023 11:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C65D728F0;
+	Fri, 27 Jan 2023 11:40:00 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 68AA515DB;
-	Fri, 27 Jan 2023 03:40:39 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 415CD1650;
+	Fri, 27 Jan 2023 03:40:42 -0800 (PST)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D6A303F64C;
-	Fri, 27 Jan 2023 03:39:54 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B89653F64C;
+	Fri, 27 Jan 2023 03:39:57 -0800 (PST)
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -30,9 +30,9 @@ Cc: suzuki.poulose@arm.com,
 	kvmarm@lists.cs.columbia.edu,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [RFC kvmtool 03/31] hw: cfi flash: Handle errors in memory transitions
-Date: Fri, 27 Jan 2023 11:39:04 +0000
-Message-Id: <20230127113932.166089-4-suzuki.poulose@arm.com>
+Subject: [RFC kvmtool 04/31] Add --nocompat option to disable compat warnings
+Date: Fri, 27 Jan 2023 11:39:05 +0000
+Message-Id: <20230127113932.166089-5-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230127113932.166089-1-suzuki.poulose@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
@@ -45,41 +45,79 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Handle failures in creating the memory maps and back in
-transitioning the CFI flash. e.g., with MTE enabled, CFI
-flash emulation breaks with the map operation, silently.
-And we later hit unhandled aborts in the guest.
+From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-To avoid such issues, let us make sure we catch the error
-and handle it right at source.
+Commit e66942073035 ("kvm tools: Guest kernel compatability") added the
+functionality that enables devices to print a warning message if the device
+hasn't been initialized by the time the VM is destroyed. The purpose of
+these messages is to let the user know if the kernel hasn't been built with
+the correct Kconfig options to take advantage of the said devices (all
+using virtio).
 
+Since then, kvmtool has evolved and now supports loading different payloads
+(like firmware images), and having those warnings even when it is entirely
+intentional for the payload not to touch the devices can be confusing for
+the user and makes the output unnecessarily verbose in those cases.
+
+Add the --nocompat option to disable the warnings; the warnings are still
+enabled by default.
+
+Reported-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- hw/cfi_flash.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ builtin-run.c            | 5 ++++-
+ guest_compat.c           | 1 +
+ include/kvm/kvm-config.h | 1 +
+ 3 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/hw/cfi_flash.c b/hw/cfi_flash.c
-index 7faecdfb..bce546bc 100644
---- a/hw/cfi_flash.c
-+++ b/hw/cfi_flash.c
-@@ -455,6 +455,8 @@ static int map_flash_memory(struct kvm *kvm, struct cfi_flash_device *sfdev)
- 				KVM_MEM_TYPE_RAM | KVM_MEM_TYPE_READONLY);
- 	if (!ret)
- 		sfdev->is_mapped = true;
-+	else
-+		die("CFI Flash: ERROR: Unable to map memory: %d\n", ret);
+diff --git a/builtin-run.c b/builtin-run.c
+index bb7e6e8d..f8edfb3f 100644
+--- a/builtin-run.c
++++ b/builtin-run.c
+@@ -183,6 +183,8 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
+ 	OPT_BOOLEAN('\0', "nodefaults", &(cfg)->nodefaults, "Disable"   \
+ 			" implicit configuration that cannot be"	\
+ 			" disabled otherwise"),				\
++	OPT_BOOLEAN('\0', "nocompat", &(cfg)->nocompat, "Disable"	\
++			" compat warnings"),				\
+ 	OPT_CALLBACK('\0', "9p", NULL, "dir_to_share,tag_name",		\
+ 		     "Enable virtio 9p to share files between host and"	\
+ 		     " guest", virtio_9p_rootdir_parser, kvm),		\
+@@ -797,7 +799,8 @@ static int kvm_cmd_run_work(struct kvm *kvm)
  
- 	return ret;
- }
-@@ -472,6 +474,8 @@ static int unmap_flash_memory(struct kvm *kvm, struct cfi_flash_device *sfdev)
+ static void kvm_cmd_run_exit(struct kvm *kvm, int guest_ret)
+ {
+-	compat__print_all_messages();
++	if (!kvm->cfg.nocompat)
++		compat__print_all_messages();
  
- 	if (!ret)
- 		sfdev->is_mapped = false;
-+	else
-+		die("CFI Flash: Failed to unmap Flash %d", ret);
+ 	init_list__exit(kvm);
  
- 	return ret;
- }
+diff --git a/guest_compat.c b/guest_compat.c
+index fd4704b2..a413c12c 100644
+--- a/guest_compat.c
++++ b/guest_compat.c
+@@ -88,6 +88,7 @@ int compat__print_all_messages(void)
+ 
+ 		printf("\n  # KVM compatibility warning.\n\t%s\n\t%s\n",
+ 			msg->title, msg->desc);
++		printf("\tTo stop seeing this warning, use the --nocompat option.\n");
+ 
+ 		list_del(&msg->list);
+ 		compat__free(msg);
+diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+index 368e6c7d..88df7cc2 100644
+--- a/include/kvm/kvm-config.h
++++ b/include/kvm/kvm-config.h
+@@ -30,6 +30,7 @@ struct kvm_config {
+ 	u64 vsock_cid;
+ 	bool virtio_rng;
+ 	bool nodefaults;
++	bool nocompat;
+ 	int active_console;
+ 	int debug_iodelay;
+ 	int nrcpus;
 -- 
 2.34.1
 
