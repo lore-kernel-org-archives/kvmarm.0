@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B547259C;
-	Fri, 27 Jan 2023 11:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38B6028EF;
+	Fri, 27 Jan 2023 11:28:25 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 01B031576;
-	Fri, 27 Jan 2023 03:29:04 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C9BDF15BF;
+	Fri, 27 Jan 2023 03:29:06 -0800 (PST)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.35.16])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F1EC93F64C;
-	Fri, 27 Jan 2023 03:28:19 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6CF793F64C;
+	Fri, 27 Jan 2023 03:28:22 -0800 (PST)
 From: Steven Price <steven.price@arm.com>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org
@@ -25,9 +25,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	linux-coco@lists.linux.dev
-Subject: [RFC PATCH 04/14] arm64: realm: Query IPA size from the RMM
-Date: Fri, 27 Jan 2023 11:27:48 +0000
-Message-Id: <20230127112758.37891-5-steven.price@arm.com>
+Subject: [RFC PATCH 05/14] arm64: Mark all I/O as non-secure shared
+Date: Fri, 27 Jan 2023 11:27:49 +0000
+Message-Id: <20230127112758.37891-6-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230127112758.37891-1-steven.price@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
@@ -40,78 +40,36 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The top bit of the configured IPA size is used as an attribute to
-control whether the address is protected or shared. Query the
-configuration from the RMM to assertain which bit this is.
+All I/O is by default considered non-secure for realms. As such
+mark them as shared with the host.
 
 Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/include/asm/pgtable-prot.h | 2 ++
- arch/arm64/include/asm/rsi_cmds.h     | 8 ++++++++
- arch/arm64/kernel/rsi.c               | 8 ++++++++
- 3 files changed, 18 insertions(+)
+ arch/arm64/include/asm/io.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
-index 9b165117a454..3f24080d6cc9 100644
---- a/arch/arm64/include/asm/pgtable-prot.h
-+++ b/arch/arm64/include/asm/pgtable-prot.h
-@@ -33,7 +33,9 @@
- #include <asm/pgtable-types.h>
+diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
+index 877495a0fd0c..b1a9c22aed72 100644
+--- a/arch/arm64/include/asm/io.h
++++ b/arch/arm64/include/asm/io.h
+@@ -142,12 +142,12 @@ extern void __memset_io(volatile void __iomem *, int, size_t);
+ bool ioremap_allowed(phys_addr_t phys_addr, size_t size, unsigned long prot);
+ #define ioremap_allowed ioremap_allowed
  
- extern bool arm64_use_ng_mappings;
-+extern unsigned long prot_ns_shared;
+-#define _PAGE_IOREMAP PROT_DEVICE_nGnRE
++#define _PAGE_IOREMAP (PROT_DEVICE_nGnRE | PROT_NS_SHARED)
  
-+#define PROT_NS_SHARED		((prot_ns_shared))
- #define _PROT_DEFAULT		(PTE_TYPE_PAGE | PTE_AF | PTE_SHARED)
- #define _PROT_SECT_DEFAULT	(PMD_TYPE_SECT | PMD_SECT_AF | PMD_SECT_S)
+ #define ioremap_wc(addr, size)	\
+-	ioremap_prot((addr), (size), PROT_NORMAL_NC)
++	ioremap_prot((addr), (size), (PROT_NORMAL_NC | PROT_NS_SHARED))
+ #define ioremap_np(addr, size)	\
+-	ioremap_prot((addr), (size), PROT_DEVICE_nGnRnE)
++	ioremap_prot((addr), (size), (PROT_DEVICE_nGnRnE | PROT_NS_SHARED))
  
-diff --git a/arch/arm64/include/asm/rsi_cmds.h b/arch/arm64/include/asm/rsi_cmds.h
-index ee0df00efd87..e13f702de6c2 100644
---- a/arch/arm64/include/asm/rsi_cmds.h
-+++ b/arch/arm64/include/asm/rsi_cmds.h
-@@ -46,6 +46,14 @@ static inline void invoke_rsi_fn_smc_with_res(unsigned long function_id,
- 	arm_smccc_smc(function_id, arg0, arg1, arg2, arg3, 0, 0, 0, res);
- }
- 
-+static inline unsigned long rsi_get_realm_config(struct realm_config *cfg)
-+{
-+	struct arm_smccc_res res;
-+
-+	invoke_rsi_fn_smc_with_res(SMC_RSI_REALM_CONFIG, virt_to_phys(cfg), 0, 0, 0, &res);
-+	return res.a0;
-+}
-+
- static inline unsigned long rsi_set_addr_range_state(phys_addr_t start,
- 						     phys_addr_t end,
- 						     enum ripas state,
-diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-index b354ac661c9d..9c63ee1c6979 100644
---- a/arch/arm64/kernel/rsi.c
-+++ b/arch/arm64/kernel/rsi.c
-@@ -7,6 +7,11 @@
- #include <linux/memblock.h>
- #include <asm/rsi.h>
- 
-+struct realm_config __attribute((aligned(PAGE_SIZE))) config;
-+
-+unsigned long prot_ns_shared;
-+EXPORT_SYMBOL(prot_ns_shared);
-+
- DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
- 
- static bool rsi_version_matches(void)
-@@ -45,6 +50,9 @@ void __init arm64_rsi_init(void)
- {
- 	if (!rsi_version_matches())
- 		return;
-+	if (rsi_get_realm_config(&config))
-+		return;
-+	prot_ns_shared = BIT(config.ipa_bits - 1);
- 
- 	static_branch_enable(&rsi_present);
- }
+ /*
+  * io{read,write}{16,32,64}be() macros
 -- 
 2.34.1
 
