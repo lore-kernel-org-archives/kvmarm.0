@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5FEF28F2;
-	Fri, 27 Jan 2023 11:30:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2091C28F2;
+	Fri, 27 Jan 2023 11:30:44 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5808B16F2;
-	Fri, 27 Jan 2023 03:31:23 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B09E016F3;
+	Fri, 27 Jan 2023 03:31:25 -0800 (PST)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.35.16])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F1DA3F64C;
-	Fri, 27 Jan 2023 03:30:39 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A98B13F64C;
+	Fri, 27 Jan 2023 03:30:41 -0800 (PST)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -25,9 +25,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	linux-coco@lists.linux.dev
-Subject: [RFC PATCH 23/28] KVM: arm64: Allow activating realms
-Date: Fri, 27 Jan 2023 11:29:27 +0000
-Message-Id: <20230127112932.38045-24-steven.price@arm.com>
+Subject: [RFC PATCH 24/28] arm64: rme: allow userspace to inject aborts
+Date: Fri, 27 Jan 2023 11:29:28 +0000
+Message-Id: <20230127112932.38045-25-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230127112932.38045-1-steven.price@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
@@ -40,58 +40,66 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the ioctl to activate a realm and set the static branch to enable
-access to the realm functionality if the RMM is detected.
+From: Joey Gouly <joey.gouly@arm.com>
 
+Extend KVM_SET_VCPU_EVENTS to support realms, where KVM cannot set the
+system registers, and the RMM must perform it on next REC entry.
+
+Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/kvm/rme.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ Documentation/virt/kvm/api.rst |  2 ++
+ arch/arm64/kvm/guest.c         | 24 ++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-index 6ac50481a138..543e8d10f532 100644
---- a/arch/arm64/kvm/rme.c
-+++ b/arch/arm64/kvm/rme.c
-@@ -1000,6 +1000,20 @@ static int kvm_init_ipa_range_realm(struct kvm *kvm,
- 	return ret;
- }
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index f1a59d6fb7fc..18a8ddaf31d8 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -1238,6 +1238,8 @@ User space may need to inject several types of events to the guest.
+ Set the pending SError exception state for this VCPU. It is not possible to
+ 'cancel' an Serror that has been made pending.
  
-+static int kvm_activate_realm(struct kvm *kvm)
-+{
-+	struct realm *realm = &kvm->arch.realm;
++User space cannot inject SErrors into Realms.
 +
-+	if (kvm_realm_state(kvm) != REALM_STATE_NEW)
-+		return -EBUSY;
-+
-+	if (rmi_realm_activate(virt_to_phys(realm->rd)))
-+		return -ENXIO;
-+
-+	WRITE_ONCE(realm->state, REALM_STATE_ACTIVE);
-+	return 0;
-+}
-+
- /* Protects access to rme_vmid_bitmap */
- static DEFINE_SPINLOCK(rme_vmid_lock);
- static unsigned long *rme_vmid_bitmap;
-@@ -1175,6 +1189,9 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
- 		r = kvm_populate_realm(kvm, &args);
- 		break;
- 	}
-+	case KVM_CAP_ARM_RME_ACTIVATE_REALM:
-+		r = kvm_activate_realm(kvm);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -1415,7 +1432,7 @@ int kvm_init_rme(void)
+ If the guest performed an access to I/O memory which could not be handled by
+ userspace, for example because of missing instruction syndrome decode
+ information or because there is no device mapped at the accessed IPA, then
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 93468bbfb50e..6e53e0ef2fba 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -851,6 +851,30 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+ 	bool has_esr = events->exception.serror_has_esr;
+ 	bool ext_dabt_pending = events->exception.ext_dabt_pending;
  
- 	WARN_ON(rmi_features(0, &rmm_feat_reg0));
- 
--	/* Future patch will enable static branch kvm_rme_is_available */
-+	static_branch_enable(&kvm_rme_is_available);
- 
- 	return 0;
- }
++	if (vcpu_is_rec(vcpu)) {
++		/* Cannot inject SError into a Realm. */
++		if (serror_pending)
++			return -EINVAL;
++
++		/*
++		 * If a data abort is pending, set the flag and let the RMM
++		 * inject an SEA when the REC is scheduled to be run.
++		 */
++		if (ext_dabt_pending) {
++			/*
++			 * Can only inject SEA into a Realm if the previous exit
++			 * was due to a data abort of an Unprotected IPA.
++			 */
++			if (!(vcpu->arch.rec.run->entry.flags & RMI_EMULATED_MMIO))
++				return -EINVAL;
++
++			vcpu->arch.rec.run->entry.flags &= ~RMI_EMULATED_MMIO;
++			vcpu->arch.rec.run->entry.flags |= RMI_INJECT_SEA;
++		}
++
++		return 0;
++	}
++
+ 	if (serror_pending && has_esr) {
+ 		if (!cpus_have_const_cap(ARM64_HAS_RAS_EXTN))
+ 			return -EINVAL;
 -- 
 2.34.1
 
