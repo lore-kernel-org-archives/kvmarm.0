@@ -1,35 +1,66 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A33928EF;
-	Fri, 27 Jan 2023 12:19:37 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E0ED2B;
-	Fri, 27 Jan 2023 04:20:18 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7D43A3F5A1;
-	Fri, 27 Jan 2023 04:19:33 -0800 (PST)
-Date: Fri, 27 Jan 2023 12:19:22 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8172F55
+	for <kvmarm@lists.linux.dev>; Fri, 27 Jan 2023 15:26:34 +0000 (UTC)
+Received: by mail-wr1-f44.google.com with SMTP id m7so5285208wru.8
+        for <kvmarm@lists.linux.dev>; Fri, 27 Jan 2023 07:26:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1tjEUzLFjJmxfniuCdsNKzTQp/eXm9sRTYtnzkPTRGE=;
+        b=KUexmgRu5iOOfgI9R349Jd8L2TyoFbY1EsZAokQ3a/7AM3waZn4yATTO1YrXdP8Kkx
+         z/0f4L+QJcoDx5Jc2YiSJDMPuTJ8B0SXLJYGhAos7+7yimV3ZtsDMFRmIYhi7FSEGK0Y
+         0B+2LfXh35sh1pdV9VUXz7s1hPuuZWjSLwlxaL61ndTEOwewE8naS+Pd3OlyBQ1zracL
+         G67VJ+/oXtHG3eqDbpQiGSLl0vkaz+vnpH11xG7Wniomm6Pe5ayefFZsoihv6HZzdawf
+         LIxM+KFl8helJIKHG11992tvJf6aFjAuN8VirRkVvAePOWtSP4Qj3mwuE446HVJWsbHR
+         GCOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1tjEUzLFjJmxfniuCdsNKzTQp/eXm9sRTYtnzkPTRGE=;
+        b=Wc4UcebRBH/40Rf5awq2n9JFtrrSQJTwSlGPXflN7wgyGz1Tv7M3n+ExrNN5wGD33o
+         Q6D2fIQPRfsV46yudQaXQ6MW5uAsEuz/c2Noz83/r09yT9cufksuUgQnqaOJdLrVu0Ws
+         OZqsviBQ3DEfx5ejFhmFGU2ojLZNGOURoRFP9pyITM6/SwPReVjWcF7NtJNKDylW6SsN
+         OhlfmtAvCV5+xp5OQCWF6jJFPqjRxQFuqax8CbmYc3rrFEkf613hs0knhU/FY6WAyuJY
+         B2uxBxOAsowa/tvAgk2iNvdGoSmecN+ewrYVH8+9WUtBzzjkZWdjIBu4YzNp+kcrAPAb
+         Xfvw==
+X-Gm-Message-State: AFqh2kpHqlwT4MtVSDBWDn4/s3wfgx85udJomUyDjMQfjKb70JUZn5/c
+	yKMSrU+IdQzfEtCEQFC2WESUzg==
+X-Google-Smtp-Source: AMrXdXva7H5XWHDFiLRxpONdNSBqnohgqBGHD8HwUdzNKwIZrLMJ1OzcPdG5hlDJpM6rYIT+Ntu+kQ==
+X-Received: by 2002:a5d:5083:0:b0:2be:546c:4663 with SMTP id a3-20020a5d5083000000b002be546c4663mr23900328wrt.45.1674833192983;
+        Fri, 27 Jan 2023 07:26:32 -0800 (PST)
+Received: from myrica (054592b0.skybroadband.com. [5.69.146.176])
+        by smtp.gmail.com with ESMTPSA id e7-20020adfe387000000b002be15ee1377sm4265350wrm.22.2023.01.27.07.26.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Jan 2023 07:26:32 -0800 (PST)
+Date: Fri, 27 Jan 2023 15:26:32 +0000
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+Cc: linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Andrew Jones <andrew.jones@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Fuad Tabba <tabba@google.com>, James Morse <james.morse@arm.com>,
 	Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Quentin Perret <qperret@google.com>,
+	Sean Christopherson <seanjc@google.com>,
 	Steven Price <steven.price@arm.com>, Thomas Huth <thuth@redhat.com>,
 	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	linux-coco@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC kvmtool 04/31] Add --nocompat option to disable compat
- warnings
-Message-ID: <Y9PBGK2JblgyNTlc@monolith.localdoman>
+	kvmarm@lists.cs.columbia.edu
+Subject: Re: [RFC] Support for Arm CCA VMs on Linux
+Message-ID: <Y9PtKJ3Wicc19JF1@myrica>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
- <20230127113932.166089-1-suzuki.poulose@arm.com>
- <20230127113932.166089-5-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,92 +69,19 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230127113932.166089-5-suzuki.poulose@arm.com>
+In-Reply-To: <20230127112248.136810-1-suzuki.poulose@arm.com>
 
-Hi,
+On Fri, Jan 27, 2023 at 11:22:48AM +0000, Suzuki K Poulose wrote:
+> We are happy to announce the early RFC version of the Arm
+> Confidential Compute Architecture (CCA) support for the Linux
+> stack. The intention is to seek early feedback in the following areas:
+>  * KVM integration of the Arm CCA
+>  * KVM UABI for managing the Realms, seeking to generalise the operations
+>    wherever possible with other Confidential Compute solutions.
 
-On Fri, Jan 27, 2023 at 11:39:05AM +0000, Suzuki K Poulose wrote:
-> From: Alexandru Elisei <alexandru.elisei@arm.com>
-> 
-> Commit e66942073035 ("kvm tools: Guest kernel compatability") added the
-> functionality that enables devices to print a warning message if the device
-> hasn't been initialized by the time the VM is destroyed. The purpose of
-> these messages is to let the user know if the kernel hasn't been built with
-> the correct Kconfig options to take advantage of the said devices (all
-> using virtio).
-> 
-> Since then, kvmtool has evolved and now supports loading different payloads
-> (like firmware images), and having those warnings even when it is entirely
-> intentional for the payload not to touch the devices can be confusing for
-> the user and makes the output unnecessarily verbose in those cases.
-> 
-> Add the --nocompat option to disable the warnings; the warnings are still
-> enabled by default.
-
-I had a conversation with Will regarding this some time ago, we settled on
-a different approach, by using --loglevel=<level>, similar to what Linux
-does.  I'll put that on my TODO list and try to send patches soon-ish.
+A prototype for launching Realm VMs with QEMU is available at:
+https://lore.kernel.org/qemu-devel/20230127150727.612594-1-jean-philippe@linaro.org/
 
 Thanks,
-Alex
+Jean
 
-> 
-> Reported-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  builtin-run.c            | 5 ++++-
->  guest_compat.c           | 1 +
->  include/kvm/kvm-config.h | 1 +
->  3 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/builtin-run.c b/builtin-run.c
-> index bb7e6e8d..f8edfb3f 100644
-> --- a/builtin-run.c
-> +++ b/builtin-run.c
-> @@ -183,6 +183,8 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
->  	OPT_BOOLEAN('\0', "nodefaults", &(cfg)->nodefaults, "Disable"   \
->  			" implicit configuration that cannot be"	\
->  			" disabled otherwise"),				\
-> +	OPT_BOOLEAN('\0', "nocompat", &(cfg)->nocompat, "Disable"	\
-> +			" compat warnings"),				\
->  	OPT_CALLBACK('\0', "9p", NULL, "dir_to_share,tag_name",		\
->  		     "Enable virtio 9p to share files between host and"	\
->  		     " guest", virtio_9p_rootdir_parser, kvm),		\
-> @@ -797,7 +799,8 @@ static int kvm_cmd_run_work(struct kvm *kvm)
->  
->  static void kvm_cmd_run_exit(struct kvm *kvm, int guest_ret)
->  {
-> -	compat__print_all_messages();
-> +	if (!kvm->cfg.nocompat)
-> +		compat__print_all_messages();
->  
->  	init_list__exit(kvm);
->  
-> diff --git a/guest_compat.c b/guest_compat.c
-> index fd4704b2..a413c12c 100644
-> --- a/guest_compat.c
-> +++ b/guest_compat.c
-> @@ -88,6 +88,7 @@ int compat__print_all_messages(void)
->  
->  		printf("\n  # KVM compatibility warning.\n\t%s\n\t%s\n",
->  			msg->title, msg->desc);
-> +		printf("\tTo stop seeing this warning, use the --nocompat option.\n");
->  
->  		list_del(&msg->list);
->  		compat__free(msg);
-> diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
-> index 368e6c7d..88df7cc2 100644
-> --- a/include/kvm/kvm-config.h
-> +++ b/include/kvm/kvm-config.h
-> @@ -30,6 +30,7 @@ struct kvm_config {
->  	u64 vsock_cid;
->  	bool virtio_rng;
->  	bool nodefaults;
-> +	bool nocompat;
->  	int active_console;
->  	int debug_iodelay;
->  	int nrcpus;
-> -- 
-> 2.34.1
-> 
