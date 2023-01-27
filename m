@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA56328F2;
-	Fri, 27 Jan 2023 11:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43DE928F2;
+	Fri, 27 Jan 2023 11:30:39 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43CBB169C;
-	Fri, 27 Jan 2023 03:31:18 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D3FBD16A3;
+	Fri, 27 Jan 2023 03:31:20 -0800 (PST)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.35.16])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 311753F64C;
-	Fri, 27 Jan 2023 03:30:34 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A3DDA3F8D6;
+	Fri, 27 Jan 2023 03:30:36 -0800 (PST)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -25,9 +25,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	linux-coco@lists.linux.dev
-Subject: [RFC PATCH 21/28] KVM: arm64: WARN on injected undef exceptions
-Date: Fri, 27 Jan 2023 11:29:25 +0000
-Message-Id: <20230127112932.38045-22-steven.price@arm.com>
+Subject: [RFC PATCH 22/28] arm64: Don't expose stolen time for realm guests
+Date: Fri, 27 Jan 2023 11:29:26 +0000
+Message-Id: <20230127112932.38045-23-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230127112932.38045-1-steven.price@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
@@ -40,27 +40,30 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The RMM doesn't allow injection of a undefined exception into a realm
-guest. Add a WARN to catch if this ever happens.
+It doesn't make much sense and with the ABI as it is it's a footgun for
+the VMM which makes fatal granule protection faults easy to trigger.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/kvm/inject_fault.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/kvm/arm.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index f32f4a2a347f..29966a3e5a71 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -175,6 +175,8 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
-  */
- void kvm_inject_undefined(struct kvm_vcpu *vcpu)
- {
-+	if (vcpu_is_rec(vcpu))
-+		WARN(1, "Cannot inject undefined exception into REC. Continuing with unknown behaviour");
- 	if (vcpu_el1_is_32bit(vcpu))
- 		inject_undef32(vcpu);
- 	else
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 46c152a9a150..645df5968e1e 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -302,7 +302,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = system_supports_mte();
+ 		break;
+ 	case KVM_CAP_STEAL_TIME:
+-		r = kvm_arm_pvtime_supported();
++		if (kvm && kvm_is_realm(kvm))
++			r = 0;
++		else
++			r = kvm_arm_pvtime_supported();
+ 		break;
+ 	case KVM_CAP_ARM_EL1_32BIT:
+ 		r = cpus_have_const_cap(ARM64_HAS_32BIT_EL1);
 -- 
 2.34.1
 
