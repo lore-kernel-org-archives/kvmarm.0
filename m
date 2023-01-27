@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 318EE28E8;
-	Fri, 27 Jan 2023 11:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6DF28E8;
+	Fri, 27 Jan 2023 11:41:15 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AC9DC1688;
-	Fri, 27 Jan 2023 03:41:53 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A914E1691;
+	Fri, 27 Jan 2023 03:41:56 -0800 (PST)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 14CAB3F64C;
-	Fri, 27 Jan 2023 03:41:08 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 08A9B3F64C;
+	Fri, 27 Jan 2023 03:41:11 -0800 (PST)
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -31,9 +31,9 @@ Cc: suzuki.poulose@arm.com,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Joey Gouly <joey.gouly@arm.com>
-Subject: [RFC kvmtool 29/31] mmio: add arch hook for an unhandled MMIO access
-Date: Fri, 27 Jan 2023 11:39:30 +0000
-Message-Id: <20230127113932.166089-30-suzuki.poulose@arm.com>
+Subject: [RFC kvmtool 30/31] arm64: realm: inject an abort on an unhandled MMIO access
+Date: Fri, 27 Jan 2023 11:39:31 +0000
+Message-Id: <20230127113932.166089-31-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230127113932.166089-1-suzuki.poulose@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
@@ -48,106 +48,33 @@ Content-Transfer-Encoding: 8bit
 
 From: Joey Gouly <joey.gouly@arm.com>
 
-Add a hook that allows an architecture to run some code on an
-unhandled MMIO access.
+For Realms, inject a synchronous external abort, instead of ignoring unknown
+MMIO accesses.
 
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arm/kvm-cpu.c         | 4 ++++
- include/kvm/kvm-cpu.h | 2 ++
- mips/kvm-cpu.c        | 4 ++++
- mmio.c                | 3 +++
- powerpc/kvm-cpu.c     | 4 ++++
- riscv/kvm-cpu.c       | 4 ++++
- x86/kvm-cpu.c         | 4 ++++
- 7 files changed, 25 insertions(+)
+ arm/kvm-cpu.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index 98bc5fdf..90a15ae9 100644
+index 90a15ae9..c96d75eb 100644
 --- a/arm/kvm-cpu.c
 +++ b/arm/kvm-cpu.c
-@@ -152,3 +152,7 @@ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
- void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
+@@ -155,4 +155,13 @@ void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
+ 
+ void kvm_cpu__arch_unhandled_mmio(struct kvm_cpu *vcpu)
  {
++	struct kvm_vcpu_events events = { };
++
++	if (!vcpu->kvm->cfg.arch.is_realm)
++		return;
++
++	events.exception.ext_dabt_pending = 1;
++
++	if (ioctl(vcpu->vcpu_fd, KVM_SET_VCPU_EVENTS, &events) < 0)
++		die_perror("KVM_SET_VCPU_EVENTS failed");
  }
-+
-+void kvm_cpu__arch_unhandled_mmio(struct kvm_cpu *vcpu)
-+{
-+}
-diff --git a/include/kvm/kvm-cpu.h b/include/kvm/kvm-cpu.h
-index 0f16f8d6..d0c40598 100644
---- a/include/kvm/kvm-cpu.h
-+++ b/include/kvm/kvm-cpu.h
-@@ -29,4 +29,6 @@ void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu);
- void kvm_cpu__arch_nmi(struct kvm_cpu *cpu);
- void kvm_cpu__run_on_all_cpus(struct kvm *kvm, struct kvm_cpu_task *task);
- 
-+void kvm_cpu__arch_unhandled_mmio(struct kvm_cpu *cpu);
-+
- #endif /* KVM__KVM_CPU_H */
-diff --git a/mips/kvm-cpu.c b/mips/kvm-cpu.c
-index 30a3de18..0ce88ac3 100644
---- a/mips/kvm-cpu.c
-+++ b/mips/kvm-cpu.c
-@@ -217,3 +217,7 @@ void kvm_cpu__show_code(struct kvm_cpu *vcpu)
- void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
- {
- }
-+
-+void kvm_cpu__arch_unhandled_mmio(struct kvm_cpu *cpu)
-+{
-+}
-diff --git a/mmio.c b/mmio.c
-index 5a114e99..7e31079b 100644
---- a/mmio.c
-+++ b/mmio.c
-@@ -206,6 +206,9 @@ bool kvm__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
- 			fprintf(stderr,	"Warning: Ignoring MMIO %s at %016llx (length %u)\n",
- 				to_direction(is_write),
- 				(unsigned long long)phys_addr, len);
-+
-+		kvm_cpu__arch_unhandled_mmio(vcpu);
-+
- 		goto out;
- 	}
- 
-diff --git a/powerpc/kvm-cpu.c b/powerpc/kvm-cpu.c
-index 461e0a90..e0c20f9d 100644
---- a/powerpc/kvm-cpu.c
-+++ b/powerpc/kvm-cpu.c
-@@ -288,3 +288,7 @@ void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
- {
- 	/* Does nothing yet */
- }
-+
-+void kvm_cpu__arch_unhandled_mmio(struct kvm_cpu *cpu)
-+{
-+}
-diff --git a/riscv/kvm-cpu.c b/riscv/kvm-cpu.c
-index f98bd7ae..8417e361 100644
---- a/riscv/kvm-cpu.c
-+++ b/riscv/kvm-cpu.c
-@@ -461,3 +461,7 @@ void kvm_cpu__show_registers(struct kvm_cpu *vcpu)
- 
- 	kvm_cpu__show_csrs(vcpu);
- }
-+
-+void kvm_cpu__arch_unhandled_mmio(struct kvm_cpu *cpu)
-+{
-+}
-diff --git a/x86/kvm-cpu.c b/x86/kvm-cpu.c
-index b02ff65e..ac075ee4 100644
---- a/x86/kvm-cpu.c
-+++ b/x86/kvm-cpu.c
-@@ -444,3 +444,7 @@ void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
- 
- 	ioctl(cpu->vcpu_fd, KVM_NMI);
- }
-+
-+void kvm_cpu__arch_unhandled_mmio(struct kvm_cpu *cpu)
-+{
-+}
 -- 
 2.34.1
 
