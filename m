@@ -1,23 +1,23 @@
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2071.outbound.protection.outlook.com [40.107.249.71])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2083.outbound.protection.outlook.com [40.107.22.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E274F28F7;
-	Fri, 27 Jan 2023 11:42:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2B628EF;
+	Fri, 27 Jan 2023 11:42:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7LPirvCS090ii8x00q60vC8CmR1XvwhXOu0GKUUIIY0=;
- b=MNceCef5xhcEzMv0CP9yefRYmetyvnhJdaUwaBbgQ4DH/2wahnVWzrkyzpQDsCw1RXqYA9uMRSL6QqHX7wzl5GWE7cnfbrZiEmzpnVOUTv0mvBi9qO0IkZsMxmTy1LSexHAOf1Jh4JqhI3M7AKaa+YTsVp9V3KetY4YX5onLnGw=
-Received: from AM6PR08CA0048.eurprd08.prod.outlook.com (2603:10a6:20b:c0::36)
- by AS8PR08MB9551.eurprd08.prod.outlook.com (2603:10a6:20b:61c::14) with
+ bh=F5Ov8UacraSFcK4tBbryQ4GhcjU0UFGydGtdRDc/yk8=;
+ b=H1mbAO0JWyIuRp45Odg3qfVfwOnblw/CCrAC+s3Ds+QRtOUN2BERE0aBVozwV1qxwpSIyy7mSd4lRQM0yngu2LmN9RmJRmtYW38kIjL04Myy/HlUDFOwy4HgQ/opcuu+nb3wDVnUMUXL6fnSieeSRXaBvLS8SC5mOiIFEpMTPIM=
+Received: from DU2PR04CA0316.eurprd04.prod.outlook.com (2603:10a6:10:2b5::21)
+ by AS8PR08MB6214.eurprd08.prod.outlook.com (2603:10a6:20b:29f::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.22; Fri, 27 Jan
- 2023 11:42:20 +0000
-Received: from AM7EUR03FT053.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:20b:c0::4) by AM6PR08CA0048.outlook.office365.com
- (2603:10a6:20b:c0::36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.23 via Frontend
- Transport; Fri, 27 Jan 2023 11:42:20 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.23; Fri, 27 Jan
+ 2023 11:42:41 +0000
+Received: from DBAEUR03FT004.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:10:2b5:cafe::2f) by DU2PR04CA0316.outlook.office365.com
+ (2603:10a6:10:2b5::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.22 via Frontend
+ Transport; Fri, 27 Jan 2023 11:42:41 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
@@ -26,27 +26,27 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
  pr=C
 Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM7EUR03FT053.mail.protection.outlook.com (100.127.140.202) with Microsoft
+ DBAEUR03FT004.mail.protection.outlook.com (100.127.142.103) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6043.22 via Frontend Transport; Fri, 27 Jan 2023 11:42:20 +0000
-Received: ("Tessian outbound 43b0faad5a68:v132"); Fri, 27 Jan 2023 11:42:20 +0000
+ 15.20.6043.21 via Frontend Transport; Fri, 27 Jan 2023 11:42:41 +0000
+Received: ("Tessian outbound 6e565e48ed4a:v132"); Fri, 27 Jan 2023 11:42:41 +0000
 X-CheckRecipientChecked: true
-X-CR-MTA-CID: 9bd9ecc9dc87ca10
+X-CR-MTA-CID: 777ec3250e38b21b
 X-CR-MTA-TID: 64aa7808
-Received: from 3b00719e383c.1
-	by 64aa7808-outbound-1.mta.getcheckrecipient.com id 3F85915E-32AB-4BCC-946B-18C3739F12DB.1;
-	Fri, 27 Jan 2023 11:42:13 +0000
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 3b00719e383c.1
+Received: from df16ff2c3f36.1
+	by 64aa7808-outbound-1.mta.getcheckrecipient.com id 525DFB33-F18D-4234-B437-F18678B6C84F.1;
+	Fri, 27 Jan 2023 11:42:34 +0000
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id df16ff2c3f36.1
     (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Fri, 27 Jan 2023 11:42:13 +0000
+    Fri, 27 Jan 2023 11:42:34 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HrAvJ0Bo6Nd6TvUrqElZBwAhjYSS09Ch+IatBKizTGWo3iMmLJche31ZuUg8LR3nTIIJJLj/igPVkU6NRI2alqITDgX6ECpcTM9GYfmxd5RQYOwDzTVQqWs7U8o0WRTrpz4jcYM55Bsf3mGei4fC1nWX2oHTQ/J8YLvnhy4gFviupnwU+uzQVeCuMqVG+zzx40Oj0QolGcOu6+BMAvOgNsmxYSzbsbdcNP1usWPbjb/K+g/heiLrznBggCCP43W2Cq0i2c37nFzQ/G0aiNOaHyZ3VWE6RI/nvgfVwPQM4TH5aOzZUCIf5qxaaisTm6yw7CzLEFXD2R7afsmfUM8+Mg==
+ b=Uo5lSDVOx3t7Y8y8msRL73p01q83AHzaBILaGaO51ydjjhWvC/vD2KxUaTxL304UzM98kgG8FjatzoBuzZCyG17ZlidG3a3+Djq9n4Y7w+LNzTHF3vE43RNn0OhELZiUopnOLD74kpHmV4DYOIwb32u/G2rEfhFd9/u9pN+u3lH+NQhExn5rX235otvNUh4K0qpVdlsfWOnudLOa9LF0lr1Z3vrzHIn68uPTbFKAglC7hZKVCvimJTSN/0lQ0fYqstVhf1enJ5Ab5fRrqZer/ClQOjZLLQ6e718SNga7Uc2fs1gQV3fVJ/II7gJDDUJlLhbTF24kKplNfD8+m7yoKg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7LPirvCS090ii8x00q60vC8CmR1XvwhXOu0GKUUIIY0=;
- b=TCGoGqauAJNz1KM73ynZRh22GYMnAanTSEylvR4S6I9vMzaPMll8p1rTQGShmTByYIfpHXRmmZNeEcO7GyAYJU2a6wnMHSKrouzJ9x7Iliz+BRLH2DcITgHBqtjyDa9ImrhIZQODKfSWAKM1KlKPRvOVG5rKcVvSFv/+6r7pOQRwraPR1dkuVQFcm8+cOfOJnHuSvYqB86YbCBzIanYtToFRD1V99AtWL7+Al8UjZD2/wRezlWVFn9uTXvHUvSbjfMEl5xK2nRNXw6tc1eGDqJ9L4ooiA3tfVV3B/1Kx8Zxbv6XbGI5aiovTjXxR1+j1Iq4f8kB+5wsWPQ7wADgufw==
+ bh=F5Ov8UacraSFcK4tBbryQ4GhcjU0UFGydGtdRDc/yk8=;
+ b=BOJ/SjvJLzoNmhokB2jIHzhBXHnP5Tqo2H0LaAjkCzcTVOMnSWTzDVP/yOOZCyFjQ+tXxurNgXfg0Kl2q/kzkO5CfiYKYI8OS+Gx/yL8JHm5H4XDu8oDhzwv9e/CYvBiF7kmcgoHYrZ4p+/+hyHD36xUGBNFr5sU6uCdDJS60d9NORpGOaEls6U1sxiAmZf3HiBFokin9fmpH8dgt99mN9ive1ehPBu/Zx2vyGCzo/M/BEfc/eitUCN9xFBwLXm6HGWnZzdLqeCKxJ6RnLeQUBH/ZIZiQWNItcHmtQuQDHrkhzVtbx8tbm3JAUTFlBeIG/88i2oA+9p8QL0y52kJGA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  40.67.248.234) smtp.rcpttodomain=linux.dev smtp.mailfrom=arm.com; dmarc=pass
  (p=none sp=none pct=100) action=none header.from=arm.com; dkim=none (message
@@ -54,18 +54,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7LPirvCS090ii8x00q60vC8CmR1XvwhXOu0GKUUIIY0=;
- b=MNceCef5xhcEzMv0CP9yefRYmetyvnhJdaUwaBbgQ4DH/2wahnVWzrkyzpQDsCw1RXqYA9uMRSL6QqHX7wzl5GWE7cnfbrZiEmzpnVOUTv0mvBi9qO0IkZsMxmTy1LSexHAOf1Jh4JqhI3M7AKaa+YTsVp9V3KetY4YX5onLnGw=
-Received: from AS9PR06CA0718.eurprd06.prod.outlook.com (2603:10a6:20b:49f::33)
- by DU0PR08MB9079.eurprd08.prod.outlook.com (2603:10a6:10:470::13) with
+ bh=F5Ov8UacraSFcK4tBbryQ4GhcjU0UFGydGtdRDc/yk8=;
+ b=H1mbAO0JWyIuRp45Odg3qfVfwOnblw/CCrAC+s3Ds+QRtOUN2BERE0aBVozwV1qxwpSIyy7mSd4lRQM0yngu2LmN9RmJRmtYW38kIjL04Myy/HlUDFOwy4HgQ/opcuu+nb3wDVnUMUXL6fnSieeSRXaBvLS8SC5mOiIFEpMTPIM=
+Received: from AS8P189CA0016.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:31f::7)
+ by DU0PR08MB7567.eurprd08.prod.outlook.com (2603:10a6:10:317::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.22; Fri, 27 Jan
- 2023 11:42:08 +0000
-Received: from AM7EUR03FT048.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:20b:49f:cafe::f8) by AS9PR06CA0718.outlook.office365.com
- (2603:10a6:20b:49f::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33; Fri, 27 Jan
+ 2023 11:42:30 +0000
+Received: from AM7EUR03FT056.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:20b:31f:cafe::ab) by AS8P189CA0016.outlook.office365.com
+ (2603:10a6:20b:31f::7) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.23 via Frontend
- Transport; Fri, 27 Jan 2023 11:42:08 +0000
+ Transport; Fri, 27 Jan 2023 11:42:30 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 40.67.248.234)
  smtp.mailfrom=arm.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=arm.com;
@@ -73,20 +73,16 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  40.67.248.234 as permitted sender) receiver=protection.outlook.com;
  client-ip=40.67.248.234; helo=nebula.arm.com; pr=C
 Received: from nebula.arm.com (40.67.248.234) by
- AM7EUR03FT048.mail.protection.outlook.com (100.127.140.86) with Microsoft
+ AM7EUR03FT056.mail.protection.outlook.com (100.127.140.107) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6043.23 via Frontend Transport; Fri, 27 Jan 2023 11:42:08 +0000
-Received: from AZ-NEU-EX02.Emea.Arm.com (10.251.26.5) by AZ-NEU-EX03.Arm.com
+ 15.20.6043.22 via Frontend Transport; Fri, 27 Jan 2023 11:42:30 +0000
+Received: from AZ-NEU-EX03.Arm.com (10.251.24.31) by AZ-NEU-EX03.Arm.com
  (10.251.24.31) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Fri, 27 Jan
- 2023 11:42:07 +0000
-Received: from AZ-NEU-EX03.Arm.com (10.251.24.31) by AZ-NEU-EX02.Emea.Arm.com
- (10.251.26.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Fri, 27 Jan
- 2023 11:42:06 +0000
+ 2023 11:42:29 +0000
 Received: from e124191.cambridge.arm.com (10.1.197.45) by mail.arm.com
  (10.251.24.31) with Microsoft SMTP Server id 15.1.2507.16 via Frontend
- Transport; Fri, 27 Jan 2023 11:42:01 +0000
+ Transport; Fri, 27 Jan 2023 11:42:24 +0000
 From: Joey Gouly <joey.gouly@arm.com>
 To: Andrew Jones <andrew.jones@linux.dev>, <kvmarm@lists.linux.dev>,
 	<kvm@vger.kernel.org>
@@ -101,9 +97,9 @@ CC: <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
 	<yuzenghui@huawei.com>, <linux-coco@lists.linux.dev>,
 	<kvmarm@lists.cs.columbia.edu>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: [RFC kvm-unit-tests 09/27] arm: realm: Add support for changing the state of memory
-Date: Fri, 27 Jan 2023 11:40:50 +0000
-Message-ID: <20230127114108.10025-10-joey.gouly@arm.com>
+Subject: [RFC kvm-unit-tests 13/27] arm: selftest: realm: skip pabt test when running in a realm
+Date: Fri, 27 Jan 2023 11:40:54 +0000
+Message-ID: <20230127114108.10025-14-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230127114108.10025-1-joey.gouly@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
@@ -117,152 +113,81 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-EOPAttributedMessage: 1
 X-MS-TrafficTypeDiagnostic:
-	AM7EUR03FT048:EE_|DU0PR08MB9079:EE_|AM7EUR03FT053:EE_|AS8PR08MB9551:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0961a88a-6b37-4481-3aae-08db005b8cc1
+	AM7EUR03FT056:EE_|DU0PR08MB7567:EE_|DBAEUR03FT004:EE_|AS8PR08MB6214:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c2bbc97-77cf-42cf-a8f7-08db005b994d
 x-checkrecipientrouted: true
 NoDisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted: BCL:0;
 X-Microsoft-Antispam-Message-Info-Original:
- rheXZgf8s9vM0JR+2yCi7Tl5zJkej8a2aTYURTHqrXgT5cudKFEHmXNQuv0Jyd5KyOP8qfcb45HSVfrDz0RZVytOq+XFlmAI+Ynipl1YS9UcvUvZ40bDBmDlEEEfuyYbcaNXmvlwDNkCqsZXifivrT+AMgvkVn031kRF8N5vcUXUVxTI4Ak1CwRvWp86vjRlQw51CCkGjsrZAir0c0EQrRa8xcA4toNqwbwxsnYUnhCOwsoUUog5ae/Yfud70Hx6eickmijPR9yB/FFIYi8zC8cASeQy5qIAVWJepNRvhtJRSb8EuFoWLrrqM8bHZF2Mhsyyo0fvDs4m7/XWv+ltQCuwBWsK8G5PI/qPj/Rk9KwSdacUdgix0nhjje61kwnOb0612iEUi2gbYCSGRfuQVHrMVTtZ2lWgZjyGVV1y8yrX1a7AUuripHEPJ5+SzY6ZNEPoactivURJd6Nrl9po4uZ/Zpy2fvzvMvWuKZ8rSUnTGCSKPgxr2Ra7UAy12VsnKLcCHXKATTJZ48nITcIEof5p1H0tWzgW7u0ai1GhdXw2leGB0XLWmxhW09Apiw43SpoBJCvBd0RAu/vEbmeteD4MaSrNiSxx7Zt0J9UwHwHiXMixoT0but71Kph2euez2Wa9dzIFfa7Yro6DMetmczZ9GwkYY0RMhH+x/HK5Z6eWSznaXJDCnch94tEFUHUg2EN1nCpGVg8gLhvWolfBwXcSefl7p5K78RoSNDaWipgAqaHVTa3hIwmrSEl1/IqT
+ GM+2rLl8SvWoCrMdjKGsxxMJjukxumKihhfsqUwk2q/dogQIvCbwcId3KUu92gsTFnipgdSAG2Gr6u6moEcm1PzPShkshQUjeV1aDak0AfBHUDOVOgROWpKGd9NzunRTWai9Ayqk9ya6qABdtnjMIxfvLF3lSlbMkIf20cSVfMArM5+/BhRvQSfcCsodcxVuieNDAkWQGcoCwoN7q8CsyEbFq8OvLlcFQi4618CD6si/llK0Evq9OhgsbsPjXOQwHZrhUsN9AxRIUMsZWwjd7ZaDPo0g9ppDESHcHi+IBPeukjvNScPfcQ1zROSJY8le1FZuhlBmGzl8P2qcssy7MHelBBD1w76p8i7XjWPhf83dsheRpWFeWmA9iXRq3wS5dxEpHoMDTExYyYvmiwEfmwAXffqEO0utPRnDEyYvZGJM+eKBbW5DkmQwNroWbRcM1f9PWBdGhfRXKgobc98qrBPcr0ZVl7PDjzP1ggf31qiol45RnZua8+47chk2rKgLcStgTPEKuiSqwo4dcag9wKNBDlsVfa0R9unD2KGpzQrOGwSsWiMSpQXbPsE8ak8WuSe/gnvXZUcVfrzRC1x1LCcNEt2t9LTI6DNgj4KRrKIKEhhz3e+S3Kh9KkLfcBVBbgXEI7maMvnel2oFGcC3t8xUtbkTfSEiG5sqWgTNpZNSh10htU0r6EmNZUoohNqDfebb30P4kor05r0TuKOm3DJTuvemodMAWJakULA//Y50n6eHQjcl/9d6t0gfu87V
 X-Forefront-Antispam-Report-Untrusted:
- CIP:40.67.248.234;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:nebula.arm.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(346002)(39860400002)(376002)(396003)(136003)(451199018)(36840700001)(40470700004)(46966006)(2906002)(26005)(1076003)(41300700001)(186003)(110136005)(426003)(54906003)(47076005)(4326008)(83380400001)(70206006)(8676002)(70586007)(36860700001)(356005)(6666004)(316002)(86362001)(44832011)(82310400005)(40480700001)(40460700003)(82740400003)(81166007)(478600001)(7416002)(2616005)(336012)(8936002)(5660300002)(7696005)(36756003)(2101003)(36900700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB9079
+ CIP:40.67.248.234;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:nebula.arm.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(376002)(346002)(396003)(136003)(451199018)(46966006)(36840700001)(40470700004)(186003)(8936002)(4326008)(70586007)(5660300002)(70206006)(8676002)(2616005)(316002)(81166007)(426003)(40480700001)(41300700001)(110136005)(36860700001)(7696005)(1076003)(6666004)(356005)(2906002)(82310400005)(44832011)(4744005)(40460700003)(82740400003)(36756003)(7416002)(47076005)(478600001)(336012)(86362001)(54906003)(26005)(36900700001)(2101003);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB7567
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM7EUR03FT053.eop-EUR03.prod.protection.outlook.com
+ DBAEUR03FT004.eop-EUR03.prod.protection.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	db2a54ca-f8cc-4e96-1ae6-08db005b85a3
+	34a0317f-0b2c-4df5-e67e-08db005b9290
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	szVZKIAVJSsFClggMd6Ej1G9LvJKiDGoKg73+DK3OqmS9argdshpVIubJ96FyIK0XuwdmwjclMaZ4xjVxCgaFBwPlaCwSKQxel9tqcaXCqA8c8YzdY0c6CHhXJ1V4481kXzKGQqXt1H3XThuF0TeZacV9LbMyzmNtXaJuMkSH8LcL1OFWd1YDroXlLAnbZF1nG/eTdYKQnlIoNyLOsAtEuI6wLoUGCOLSaDpuw5NaqGQ2Ih+FQQRiYwNJFJ/uhZiEUc/NVm3uxIp4/QAks1Q1Rqz/HMxxKVtrR6FQZHCnQG6pV2nStZbidf4+8CSCYTavUD2QrNsmNu+Xr4G0/SeW8gCp5Fv7+85HZic0WOw+s9Uf10/SLGRAS3PE4CcROWJKdNb/sqWFootUVHPDHL6Paje2Z33dAzAL6OI+UCRTGH3kkCvER3OX0RmGPCHp6E9KD5J8f09LMAdhb5q/yiWd9mQlRg+QRIHVSyrUcQjDwPvft2d0L/NPwoc7j8lxgbYqPgcDjVd1m+jN5nlFZCUkxf5qTlBIoAe00omGd7QSr9k5/Wi4BU1bg4zWAuOLI708hamJn8D0T23PXRlCi+QZHdackPw6KbV8Vs+SZnPYiotLVzWf8AHa9pSKc8rWLq1/4GjNTilL+Y4smIiwxLgyjtr0QiV5LeXvZPTD5toquLEWUhUxuzuAQ2Al1KzERSyrlSEC0FJD1zsy1lWuFMdfDcjhgrxqW8JzgojFtfpYSM=
+	ZT2djVOQQIFIf2iZJsJ6WbRAYkVVuwu2zMg4TiDKZYdSbZysqPEttUIqzjkfmpzj+Ezvikg7SUWfa9q42FwoCLpgzDpbK/CtRiZCkgQR/zePJLn0kzcZkIFPu9dWqws186H/2Gw1Bp3V7UCqBzX4RUzurVQePX739xZwUoosv54yCykwkIbNNs5csjfpo5Jz3iHG9F8WTjJkFyo6p/mfgYMdsVt52rf7yTUAl4jdRLRgzaX41MCJI8cgCUpQRRtigQm7+XY+VJcPFu+VC0WoqgZbDcYkrFz2YWjUO05gHAf+UQGRPjifgjqjlF0bFTV744rXGSKf4Fqu1ijxi3PI/JYlxQ+FboPBTEOdb2pusyvti/NQMpShxPFnn06OcIdcpi1Mw0EumZ9B3DPwKJDT2KdRNbxlELDwbQ9dSL3x5pUfEmf6acEslCw68BQ84gk2A9/CUr2EOq4r/L5WEkHFNenPz/TYgDK9EWcZoxWXThXnjQP0opVd76ulH+Ud57v8DOTm197TMe3izeVrc/0fqCKQ1834qsD0eh4DZwKqg4mgJzAngb0xYkyvXrnbvOAI+BNpfNlgh9UGMHRfyfZKNQh6cKPERq3pT3mlQVskTokpIugE5S1xq1dHowpsevBRwP+oePo6GQJhCjc0krTk09wrywmdbdKIMl80o+OWZYTBs7APhUbimHiD9I4mx6VQHHtq2g1HH2sXXS6eghcJkwB6WXfFGWxjo2Zqn4TiFEg=
 X-Forefront-Antispam-Report:
-	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230025)(4636009)(396003)(39860400002)(136003)(346002)(376002)(451199018)(36840700001)(40470700004)(46966006)(1076003)(107886003)(6666004)(82740400003)(40460700003)(5660300002)(186003)(26005)(36860700001)(8936002)(81166007)(41300700001)(83380400001)(2616005)(44832011)(2906002)(478600001)(7696005)(336012)(450100002)(82310400005)(70206006)(54906003)(70586007)(47076005)(426003)(316002)(36756003)(8676002)(40480700001)(4326008)(86362001)(110136005)(2101003);DIR:OUT;SFP:1101;
+	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230025)(4636009)(396003)(346002)(136003)(39860400002)(376002)(451199018)(36840700001)(46966006)(40470700004)(47076005)(2616005)(426003)(4744005)(44832011)(5660300002)(2906002)(36756003)(6666004)(86362001)(7696005)(26005)(40460700003)(186003)(70206006)(70586007)(1076003)(107886003)(478600001)(82740400003)(81166007)(336012)(40480700001)(316002)(54906003)(110136005)(8676002)(82310400005)(8936002)(36860700001)(41300700001)(450100002)(4326008)(2101003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2023 11:42:20.5773
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2023 11:42:41.6303
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0961a88a-6b37-4481-3aae-08db005b8cc1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c2bbc97-77cf-42cf-a8f7-08db005b994d
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	AM7EUR03FT053.eop-EUR03.prod.protection.outlook.com
+	DBAEUR03FT004.eop-EUR03.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB9551
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB6214
 
-For a Realm, the guest physical address (in reality the IPA/GPA of the VM)
-has an associated state (Realm IPA State, RIPAS) which is either of :
-   RIPAS_RAM
-   RIPAS_EMPTY
+From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-The state of the physical address decides certain behaviors. e.g., any access
-to a RIPAS_EMPTY PA will generate a Synchronous External Abort back to the Realm,
-from the RMM.
+The realm manager treats instruction aborts as fatal errors, skip this
+test.
 
-All "PA" that represents RAM for the Realm, must be set to RIPAS_RAM before
-an access is made. When the initial image (e.g., test, DTB) of a Realm is
-loaded, the hypervisor/VMM can transition the state of the loaded "area" to
-RIPAS_RAM. The rest of the "RAM" must be transitioned by the test payload
-before any access is made.
-
-Similarly, a Realm could set an "IPA" to RIPAS_EMPTY, when it is about to use
-the "unprotected" alias of the IPA. This is a hint for the host to reclaim the
-page from the protected "IPA.
-
-This patchs adds supporting helpers for setting the IPA state from Realm. These
-will be used later for the Realm.
-
-Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 ---
- lib/arm/mmu.c       |  1 +
- lib/arm64/asm/rsi.h |  8 ++++++++
- lib/arm64/rsi.c     | 44 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 53 insertions(+)
+ arm/selftest.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-index 6f1f42f5..2b5a7141 100644
---- a/lib/arm/mmu.c
-+++ b/lib/arm/mmu.c
-@@ -12,6 +12,7 @@
- #include <asm/setup.h>
- #include <asm/page.h>
- #include <asm/io.h>
+diff --git a/arm/selftest.c b/arm/selftest.c
+index 6f825add..174f2ebc 100644
+--- a/arm/selftest.c
++++ b/arm/selftest.c
+@@ -18,6 +18,7 @@
+ #include <asm/smp.h>
+ #include <asm/mmu.h>
+ #include <asm/barrier.h>
 +#include <asm/rsi.h>
  
- #include "alloc_page.h"
- #include "vmalloc.h"
-diff --git a/lib/arm64/asm/rsi.h b/lib/arm64/asm/rsi.h
-index 8b9b91b2..c8179341 100644
---- a/lib/arm64/asm/rsi.h
-+++ b/lib/arm64/asm/rsi.h
-@@ -33,4 +33,12 @@ static inline bool is_realm(void)
- 	return rsi_present;
+ static cpumask_t ready, valid;
+ 
+@@ -392,11 +393,17 @@ static void check_vectors(void *arg __unused)
+ 					  user_psci_system_off);
+ #endif
+ 	} else {
++		if (is_realm()) {
++			report_skip("pabt test not supported in a realm");
++			goto out;
++		}
++
+ 		if (!check_pabt_init())
+ 			report_skip("Couldn't guess an invalid physical address");
+ 		else
+ 			report(check_pabt(), "pabt");
+ 	}
++out:
+ 	exit(report_summary());
  }
  
-+enum ripas_t {
-+	RIPAS_EMPTY,
-+	RIPAS_RAM,
-+};
-+
-+void arm_set_memory_protected(unsigned long va, size_t size);
-+void arm_set_memory_shared(unsigned long va, size_t size);
-+
- #endif /* __ASMARM64_RSI_H_ */
-diff --git a/lib/arm64/rsi.c b/lib/arm64/rsi.c
-index 23a4e963..08c77889 100644
---- a/lib/arm64/rsi.c
-+++ b/lib/arm64/rsi.c
-@@ -65,3 +65,47 @@ void arm_rsi_init(void)
- 	/* Set the upper bit of the IPA as the NS_SHARED pte attribute */
- 	prot_ns_shared = (1UL << phys_mask_shift);
- }
-+
-+static unsigned rsi_set_addr_range_state(unsigned long start, unsigned long size,
-+					 enum ripas_t state, unsigned long *top)
-+{
-+	struct smccc_result res;
-+
-+	rsi_invoke(SMC_RSI_IPA_STATE_SET, start, size, state, 0, 0, 0, 0, 0, 0, 0, 0, &res);
-+	*top = res.r1;
-+	return res.r0;
-+}
-+
-+static void arm_set_memory_state(unsigned long start,
-+				 unsigned long size,
-+				 unsigned int ripas)
-+{
-+	int ret;
-+	unsigned long end, top;
-+	unsigned long old_start = start;
-+
-+	if (!is_realm())
-+		return;
-+
-+	start = ALIGN_DOWN(start, RSI_GRANULE_SIZE);
-+	if (start != old_start)
-+		size += old_start - start;
-+	end = ALIGN(start + size, RSI_GRANULE_SIZE);
-+	while (start != end) {
-+		ret = rsi_set_addr_range_state(start, (end - start),
-+					       ripas, &top);
-+		assert(!ret);
-+		assert(top <= end);
-+		start = top;
-+	}
-+}
-+
-+void arm_set_memory_protected(unsigned long start, unsigned long size)
-+{
-+	arm_set_memory_state(start, size, RIPAS_RAM);
-+}
-+
-+void arm_set_memory_shared(unsigned long start, unsigned long size)
-+{
-+	arm_set_memory_state(start, size, RIPAS_EMPTY);
-+}
 -- 
 2.17.1
 
