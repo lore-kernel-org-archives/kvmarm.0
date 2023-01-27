@@ -1,23 +1,23 @@
-Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-db5eur01on2059.outbound.protection.outlook.com [40.107.15.59])
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2070.outbound.protection.outlook.com [40.107.105.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819C928E8;
-	Fri, 27 Jan 2023 11:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623DA28E8;
+	Fri, 27 Jan 2023 11:42:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mfmG/SscmSCGgdmMDRai/tE1Awu1KRQPqX/oIQCKwoM=;
- b=+JqUBo/jsRhua9s3PCNyd9sDD1dh2ja9Z4UAwuyOhQT2SIck9DFVGzkhC/3MNT5RZyGEgFD/n2xveKp/HfsxLVXFM6+uJgPh5LEtrZPpHJt/X5tN5uYi01rt1V/DX4TsJn809sSe2cSPC3VQkEkqQc9APcVMF1Gowb45DSlNjWA=
-Received: from AS8P189CA0025.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:31f::26)
- by GV2PR08MB7955.eurprd08.prod.outlook.com (2603:10a6:150:7f::21) with
+ bh=SYzPSw73nqKSU8OhYrjVNXKg3dYyCW6HR+r91vpgRZI=;
+ b=0rcSzAS2O6vh2ccQf3/wOqkjhAtByy4jyA8gm56RXovtyCCrbszOgILf+u6LLRBIt72b4UNw4zd1wEnNG8U4e6XK6OmHf3Vf/5IxGswe21OfFQ0RP+C30kMRfxkztrZ2JqMhmjSbl+TO0trFyz7XpI4S54fQhZTSiCZxuQIWOpA=
+Received: from AM5P194CA0002.EURP194.PROD.OUTLOOK.COM (2603:10a6:203:8f::12)
+ by AS4PR08MB7688.eurprd08.prod.outlook.com (2603:10a6:20b:507::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33; Fri, 27 Jan
- 2023 11:41:45 +0000
-Received: from AM7EUR03FT056.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:20b:31f:cafe::eb) by AS8P189CA0025.outlook.office365.com
- (2603:10a6:20b:31f::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.22 via Frontend
- Transport; Fri, 27 Jan 2023 11:41:45 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.22; Fri, 27 Jan
+ 2023 11:42:03 +0000
+Received: from AM7EUR03FT028.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:203:8f:cafe::52) by AM5P194CA0002.outlook.office365.com
+ (2603:10a6:203:8f::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.23 via Frontend
+ Transport; Fri, 27 Jan 2023 11:42:02 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
@@ -26,27 +26,27 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
  pr=C
 Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM7EUR03FT056.mail.protection.outlook.com (100.127.140.107) with Microsoft
+ AM7EUR03FT028.mail.protection.outlook.com (100.127.140.192) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6043.22 via Frontend Transport; Fri, 27 Jan 2023 11:41:44 +0000
-Received: ("Tessian outbound 0d7b2ab0f13d:v132"); Fri, 27 Jan 2023 11:41:44 +0000
+ 15.20.6043.22 via Frontend Transport; Fri, 27 Jan 2023 11:42:02 +0000
+Received: ("Tessian outbound 8038f0863a52:v132"); Fri, 27 Jan 2023 11:42:02 +0000
 X-CheckRecipientChecked: true
-X-CR-MTA-CID: 01b30c8a8973a124
+X-CR-MTA-CID: 77784d72f3ea9004
 X-CR-MTA-TID: 64aa7808
-Received: from 414c00eca92b.1
-	by 64aa7808-outbound-1.mta.getcheckrecipient.com id 2C600D57-46FD-4933-9EA1-500F83CBE8BA.1;
-	Fri, 27 Jan 2023 11:41:38 +0000
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 414c00eca92b.1
+Received: from 44e899167353.1
+	by 64aa7808-outbound-1.mta.getcheckrecipient.com id D44DE00C-0BF8-454E-8529-A3E63B0D0CC9.1;
+	Fri, 27 Jan 2023 11:41:55 +0000
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 44e899167353.1
     (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Fri, 27 Jan 2023 11:41:38 +0000
+    Fri, 27 Jan 2023 11:41:55 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TzosGICsOKX23lXJIKzEiVxLH5VYcjXf+BDei8VgB9tLNgdfs7T4M62DnARQ3lTnaSuJwTQn13ohiJ5V50ipTcbIF4J8BepBHx8yd1/hBTL110uHt+6lZoZRFuZUO687xHPMOCuoI+hu9NLkO57f6gegPpmaVsepjLhzZvKu/ehtTcE5CsVF/j1CsJYwO4E2Usg2X+5Ck9ZFLX3x38JhvsWPsbLYxZO4O51etbNYcQZ+bh/ns00av++eZkIPrMLCC20baIti4zyNaZqqSyiHKv5K0W0uCYo9O/DGi5KiqJnPn0pyyd7vO90k8l7DUQsJBOzf+ajIlxXwiKg6bbwFCA==
+ b=nEn2RLLbP5bpOeUfueR5cKF8j6ftxy5Ug9egrz5aQZHzQvxbnY4iIy6KomwH7yOr/iSWe6jx6adBgUURJNVXQnjtxXr/Ago1fjjB/mj1n3SZkgc8pgsGC6hoTs5lX5oPNAn2RnMsuaTm0tYv7dnHTncQhA+DVMmRKxgIaBv4aFp4clexqQxoEYQ1+O4yfv/rf06NUuNm4z48ZSM9csv2xAohukEMGEGWGSbRg19CmerMrTKJHsBQj3hw0NLrUpoCAKWkqOlUER1B7LnomJoLoh6SoI9jR9rZBqQcNB2TfCmTgC3hz3Kr9Kj3Igt19TRHr+MYRiUquvGWK/QEQCItwg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mfmG/SscmSCGgdmMDRai/tE1Awu1KRQPqX/oIQCKwoM=;
- b=Q6xI2j/TbAR+DvXnakWyFxmv6cBI+KQ5UBYpK6/64AfUPDbvyiVKn/yrX08zRX/ptSiOgFb/qJP0RZOrjqfAAL1laLL0DGYj/FuHRKKPMQN1c+qxLI5qQRlYa3Mcjg7FF3qiPBaVe0euLhnNg8+9IS3qLo/EQlLwY4P8jEh0gXOGhZw9rzNKE70MwsO//GE9l5/En4DZxyAHrkFTBzmJzw8aIxUsoeQWsDrOHW00foE9hzBMNDgkKW57yEyIck6DZbvN0/dOjw8ZiDW3h6eDR4TmwM+VKiT4gbrlBhyj4QzvUZdfwR9QRQmeIbZixPhg4+70juGfRDOquVMmKPmbzA==
+ bh=SYzPSw73nqKSU8OhYrjVNXKg3dYyCW6HR+r91vpgRZI=;
+ b=UpCxtzJC0O2vfYDfs43Lk8uQ6TAGWeooYG417tkxmDfLTURjrAvOoYWZOqlC367l21+Sljsh70I2pICZljDuPNKApF5o1Jh8MHl0V6VahQPSGWZogAG7IeRvncsHzw7FkfQEY70Y9pY9O19WfNVWfF/f8pCswiCG5Z7CFuTZq2F+6I9PYJXVTUZc5jR/uvcKJt8n55DQ9pVbTWv28JIh1deZKOlN+6U2MK0V4mhPeIez8vl3Jbe9E2wU+bii1j9yimVpEZn4sbiZKIudfEZ+4N+wJtaL6PTn2LKlk61U5gX7RHc3Rgtj36ahzOIA40oqd9UHvwiTbouOxcwkVdCbzw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  40.67.248.234) smtp.rcpttodomain=linux.dev smtp.mailfrom=arm.com; dmarc=pass
  (p=none sp=none pct=100) action=none header.from=arm.com; dkim=none (message
@@ -54,18 +54,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mfmG/SscmSCGgdmMDRai/tE1Awu1KRQPqX/oIQCKwoM=;
- b=+JqUBo/jsRhua9s3PCNyd9sDD1dh2ja9Z4UAwuyOhQT2SIck9DFVGzkhC/3MNT5RZyGEgFD/n2xveKp/HfsxLVXFM6+uJgPh5LEtrZPpHJt/X5tN5uYi01rt1V/DX4TsJn809sSe2cSPC3VQkEkqQc9APcVMF1Gowb45DSlNjWA=
-Received: from AM5PR0101CA0004.eurprd01.prod.exchangelabs.com
- (2603:10a6:206:16::17) by DU0PR08MB7637.eurprd08.prod.outlook.com
- (2603:10a6:10:31c::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.28; Fri, 27 Jan
- 2023 11:41:34 +0000
-Received: from AM7EUR03FT061.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:206:16:cafe::55) by AM5PR0101CA0004.outlook.office365.com
- (2603:10a6:206:16::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.34 via Frontend
- Transport; Fri, 27 Jan 2023 11:41:33 +0000
+ bh=SYzPSw73nqKSU8OhYrjVNXKg3dYyCW6HR+r91vpgRZI=;
+ b=0rcSzAS2O6vh2ccQf3/wOqkjhAtByy4jyA8gm56RXovtyCCrbszOgILf+u6LLRBIt72b4UNw4zd1wEnNG8U4e6XK6OmHf3Vf/5IxGswe21OfFQ0RP+C30kMRfxkztrZ2JqMhmjSbl+TO0trFyz7XpI4S54fQhZTSiCZxuQIWOpA=
+Received: from DU2P251CA0003.EURP251.PROD.OUTLOOK.COM (2603:10a6:10:230::13)
+ by PAXPR08MB7491.eurprd08.prod.outlook.com (2603:10a6:102:2b6::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.23; Fri, 27 Jan
+ 2023 11:41:50 +0000
+Received: from DBAEUR03FT024.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:10:230:cafe::86) by DU2P251CA0003.outlook.office365.com
+ (2603:10a6:10:230::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.25 via Frontend
+ Transport; Fri, 27 Jan 2023 11:41:50 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 40.67.248.234)
  smtp.mailfrom=arm.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=arm.com;
@@ -73,16 +73,20 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  40.67.248.234 as permitted sender) receiver=protection.outlook.com;
  client-ip=40.67.248.234; helo=nebula.arm.com; pr=C
 Received: from nebula.arm.com (40.67.248.234) by
- AM7EUR03FT061.mail.protection.outlook.com (100.127.140.72) with Microsoft
+ DBAEUR03FT024.mail.protection.outlook.com (100.127.142.163) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6043.23 via Frontend Transport; Fri, 27 Jan 2023 11:41:33 +0000
-Received: from AZ-NEU-EX03.Arm.com (10.251.24.31) by AZ-NEU-EX03.Arm.com
- (10.251.24.31) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.6043.21 via Frontend Transport; Fri, 27 Jan 2023 11:41:50 +0000
+Received: from AZ-NEU-EX02.Emea.Arm.com (10.251.26.5) by AZ-NEU-EX04.Arm.com
+ (10.251.24.32) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Fri, 27 Jan
- 2023 11:41:32 +0000
+ 2023 11:41:50 +0000
+Received: from AZ-NEU-EX03.Arm.com (10.251.24.31) by AZ-NEU-EX02.Emea.Arm.com
+ (10.251.26.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Fri, 27 Jan
+ 2023 11:41:49 +0000
 Received: from e124191.cambridge.arm.com (10.1.197.45) by mail.arm.com
  (10.251.24.31) with Microsoft SMTP Server id 15.1.2507.16 via Frontend
- Transport; Fri, 27 Jan 2023 11:41:27 +0000
+ Transport; Fri, 27 Jan 2023 11:41:44 +0000
 From: Joey Gouly <joey.gouly@arm.com>
 To: Andrew Jones <andrew.jones@linux.dev>, <kvmarm@lists.linux.dev>,
 	<kvm@vger.kernel.org>
@@ -97,9 +101,9 @@ CC: <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
 	<yuzenghui@huawei.com>, <linux-coco@lists.linux.dev>,
 	<kvmarm@lists.cs.columbia.edu>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: [RFC kvm-unit-tests 03/27] arm: realm: Add RSI interface header
-Date: Fri, 27 Jan 2023 11:40:44 +0000
-Message-ID: <20230127114108.10025-4-joey.gouly@arm.com>
+Subject: [RFC kvm-unit-tests 06/27] arm: Move io_init after vm initialization
+Date: Fri, 27 Jan 2023 11:40:47 +0000
+Message-ID: <20230127114108.10025-7-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230127114108.10025-1-joey.gouly@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
@@ -113,194 +117,80 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-EOPAttributedMessage: 1
 X-MS-TrafficTypeDiagnostic:
-	AM7EUR03FT061:EE_|DU0PR08MB7637:EE_|AM7EUR03FT056:EE_|GV2PR08MB7955:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2f372225-4338-4830-215a-08db005b7788
+	DBAEUR03FT024:EE_|PAXPR08MB7491:EE_|AM7EUR03FT028:EE_|AS4PR08MB7688:EE_
+X-MS-Office365-Filtering-Correlation-Id: 32a38bdb-c76e-4914-6bca-08db005b8233
 x-checkrecipientrouted: true
 NoDisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted: BCL:0;
 X-Microsoft-Antispam-Message-Info-Original:
- BVjsYobxHabxc5fQduZYXdoGRTBp3BtDg2neAkTMmuIleelJgyk/pxf4dD6HOmq13+BqmX1UHjDVNDSgeSjM0YdUSmpsAOGyOkx1V/VdgUXh5rZe5S7QkdDaBTBKz4SFwHfjK44Yu3D09nd7bIJ7BRryJfJgWypWaUrGpM+jgvr0Sc4Q9FLIRSA/xoxRIEiR0HO/J8dUUAaZY1zx0Cv8trl8hQIMBEUbDwA9IJaD6WRXnqk2ufFmoki493X7/s4t0cIus6V8cdYCxPjkPByTzDXFE1+zSSIGzT4DfgEpH6bwFjtECAMUo2shhVVamNnQJ0xfNRNyxccbkdnxhsMOhobCJtwXDMMzUf4yAertjJeym07VT+MdPz69jAI3PimRANNor6j1qQzlZPnz0cQck7Jlnvj12K/n8+PE1yhaFyqP36LD3E2dB8zbv0A8qe1buOrvmrCY5w6Tjwdy/u6/63qR/maNlLDlDAuQtjoghM3RjzCpCYH/yfNdJpXZi7fppbxBXZykVc6PmqJhOK4vdMLTz16+w7F3R0uJdasdbs0ADjE0tmoG0/3MCg/T7mT2g+q8KSJKm4QaXf6k7bQyy70tHjODHMm+Bh89eLbmRZJ22/6BnE6Fdwrkp/ztfVpTmPbBm51dLhw7IE8SATvHMSwZ7Fu8ouVoR0J0ddXgoKXVulwh7cMHeS9EXxjn6femrS5CNkw0VQPhQQOF+SJTFIUYTRb7IKUzbSLxcqdVR1HRKa5eF5RxNwpVm3b7fdG/
+ hhxDnclshnX25RNw37UaJ6Bq5plaxqtvfEi/qSoa/Tim7E0yWsug7K/p0omEoD40wA2Br0iQ6bD5JHfoCbo46PI1vHkZeRFBorN9wl2sG8+08+AVL+W1AcXUZLVlTe+qkeJCaP48cJp5gbY2qmnbAE3kbCfTGZh2HRMRr4j4zsEQifRG6o7zoM7/qJ2B/rpNB5gh17nRDhs7jbdyswjqI2CInQJyVRoWJR1W6DCbVY5PrDY/im5t2lasVyDIyxevpfz8rUwwhE9Y2JDpGqVSepkCBZBH2Mtz4cVoKFoDL8vzADx08hH/ZOwI1s9D0Fu5Jm2kc786lR3GQiIYTC7ixPX4Hxwa22tFMSMyel1fahDELJk88K0QoCQTtGt1baKQd5pqB+O8COt1Dbqbvxbd9aDG6ZHzsUJcOuqBC+f/xwfuBWE21+uzI0i35EqK1Wi9YnWwS1ip1uB0u0lf0Oif1OFMZB4h57fBwIukdSlzJL9alutczRM/89VlpYQPyZ+e9RUd+bd0L6LkxAu177v9evodF1lf60u+D2mrDezP+1/l9lpgVeuxaAC0oVTdJbB786rogMCiaCcWED1AfkKxTcT6S5CtQ6cqvmu3CPAjOaJ+4XJBG3ZIrtT/6lwZZ2AxZ2rgIMp2QxMFCCxsGJ8CwVaiVH02wDhEhNpPFFJT+KpTJVv1Dnj+t36iNoe9abjFBKdOGunXmp3AFMW7Wp+UORQd7NLavVZi+dVvTKyC0H4Txy1YCatsB2Gq3wEsom41
 X-Forefront-Antispam-Report-Untrusted:
- CIP:40.67.248.234;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:nebula.arm.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(396003)(376002)(39860400002)(346002)(136003)(451199018)(46966006)(36840700001)(40470700004)(36756003)(336012)(70206006)(41300700001)(478600001)(70586007)(82310400005)(4326008)(26005)(2616005)(316002)(1076003)(7696005)(81166007)(426003)(7416002)(54906003)(83380400001)(356005)(6666004)(5660300002)(40460700003)(110136005)(8676002)(40480700001)(82740400003)(44832011)(36860700001)(86362001)(186003)(47076005)(8936002)(2906002)(2101003)(36900700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB7637
+ CIP:40.67.248.234;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:nebula.arm.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(346002)(39860400002)(376002)(136003)(396003)(451199018)(36840700001)(46966006)(40470700004)(44832011)(7416002)(2906002)(40480700001)(82310400005)(36756003)(110136005)(47076005)(426003)(7696005)(54906003)(83380400001)(186003)(1076003)(40460700003)(336012)(26005)(2616005)(478600001)(86362001)(70586007)(70206006)(81166007)(356005)(8676002)(8936002)(5660300002)(4326008)(41300700001)(316002)(36860700001)(82740400003)(2101003)(36900700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR08MB7491
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM7EUR03FT056.eop-EUR03.prod.protection.outlook.com
+ AM7EUR03FT028.eop-EUR03.prod.protection.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	51920a98-4f0b-4763-9801-08db005b70de
+	a6b2f3e3-fb2e-496a-00cb-08db005b7ae3
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	9uTL0wnF4dhaYsSXT1dbUw4BZHapqKKG9Mg+sohy1Al4CO4PdEM6c71M+w+Zdvod3KtCvSWaaLdtzvkFs8U32uuNvqKyk+f9ljdc5pE70bTcPkS9yrGj2+kx8DseyUJNmaD1xWd7KZaYc32aGPN96yoAjlgWOGGDhegMDRT8rr7JlRR14GvVDOSXRsUMniJxi9B+7QeYGOxzrZ0Teo5LpHwS0nHBBL2onuYN6khI+JKJpnQTQyWxVCDH3/GloML+jd7jQlLUlQJcIxPZDaiB0hLv/F9eP6jDpsPQAe/qLowWJ79k1GGzawO6p9ns89R/vf8V+ayk1gyMWHXWGExADeHprmgTh55q/0xKK46Y3rXTGawXXz1p2rjlGs4SWm5ZFV2PWo3E56yOoC82tsEzkBdd8jH6wwPWwhGZVSoYwP8qjRkG+XgsuAwTh2SxuHlohK471LdD1n7+S6ekWst4tcAc2Z/3mbU6y+tfZXqd9LPZHTOWkCHa7s8pjVGiWu8//a7q6NVsbvmjrMg7Qm6Rw39LzI2lINHhF2lZ1VM10H+sBSM4C2GJajnjjl/4LenfQZ8n2T8AFSSgJFTKKJTBA16vpT5hWHmpiBXcJE+bukGz2A977TJ3tSBFC2CrLcTUxMcE/bxpfYz9YpiSnRw92c87fuSQ2bvyF2glP39ITQDsq8wTonFwDoT2ccjtrQlXeXcqMri1734Kq9HaWV/opUuAmc0FdTeA1Ulc54WEacw=
+	rfIUaz2B/hjTtHQD2ArnqWacdq1IsuLTw5gjxdHg55dfFnUMaxal7lCK6BGDszo+NjuHgomKGr70u1Gd7QriTS49IXtesuVVLLYsyWqEmc1MScECRimDDloiavcUJZbYPYPKPp/A0bzg8B9GfrO8psZER8yNhvjRsXD2HQzOSWgKATI7WoJzKqemgHh0SpxBMV3ubEAtfGNcGH4KEMfOXO6pgmANlthj8vZpzwi9xOOeH1tERUUETLfl52gZ8F7P1ueqN1EcwsBcDRxAH6xkt/i5ppnI3kV/HlxVCBMEQsB3ROvF9tCPrBOpQ8ENM4TiYVXBRpeID0U9oMng/cLlCKTO80jiJs5O7mMn5vGZKattA3p1YMHT/bBWbqar4/vBom7GckIaeDSqINeWCv/tY6QWNZJSwd81dVDxUn0pOIAZueoGeB5CCZm9BkJmUl+xT09udo55JkkI9pGTjn+rAEV9EMy1mIv4fyV+XrOLegcvVcQ90P/wjRqy3l20ICndCxI58CJwqo9uPeuMq6l4UWFYJGPZfyhAUpfTSmq1dTXQozlgkFCD8bFAmmaNgZdqGWb5NN6/g+EDO7L+QI6Sk8Oy83n+oerKPZ/aD5/nqw/YDk2oPJ+qtnQsip8K0LmV4dbQ9+O17Bf1s1MCbaWUnL/HVk/HI3kT7XhRX2NlFxxJLBKyeod6X+IvKyPRqh04SLCsUJVElFcupqGAiIxJhyiBBOX8SVUQdhnzaRVJ138=
 X-Forefront-Antispam-Report:
-	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230025)(4636009)(346002)(136003)(396003)(39860400002)(376002)(451199018)(36840700001)(40470700004)(46966006)(36756003)(36860700001)(86362001)(5660300002)(316002)(82740400003)(426003)(47076005)(83380400001)(1076003)(26005)(110136005)(6666004)(478600001)(186003)(107886003)(8936002)(44832011)(450100002)(7696005)(336012)(4326008)(81166007)(2906002)(70206006)(2616005)(70586007)(41300700001)(54906003)(8676002)(40480700001)(82310400005)(40460700003)(2101003);DIR:OUT;SFP:1101;
+	CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(396003)(346002)(376002)(136003)(451199018)(46966006)(36840700001)(40470700004)(107886003)(1076003)(5660300002)(82740400003)(40460700003)(26005)(186003)(81166007)(8936002)(41300700001)(83380400001)(2906002)(336012)(44832011)(2616005)(7696005)(478600001)(36860700001)(450100002)(426003)(70586007)(4326008)(82310400005)(86362001)(316002)(40480700001)(36756003)(47076005)(8676002)(110136005)(54906003)(70206006)(2101003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2023 11:41:44.9710
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2023 11:42:02.8707
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f372225-4338-4830-215a-08db005b7788
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32a38bdb-c76e-4914-6bca-08db005b8233
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	AM7EUR03FT056.eop-EUR03.prod.protection.outlook.com
+	AM7EUR03FT028.eop-EUR03.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR08MB7955
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR08MB7688
 
-Add the defintions for the Realm Service Interface (RSI). RSI calls are a way
-for the Realm to communicate with the RMM and request information/services.
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
+To create shared pages, the NS_SHARED bit must be written into the
+idmap. Before VM initializations, idmap hasn't necessarily been created.
+To write shared pages, access must be done on a IPA with the NS_SHARED
+bit. When the stage-1 MMU is enabled, that bit is set in the PTE. But
+when the stage-1 MMU is disabled, then the realm must write to the IPA
+with NS_SHARED directly.
+
+To avoid changing the whole virtio infrastructure to support pre-MMU in
+a realm, move the IO initialization after MMU enablement.
+
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 ---
- lib/arm64/asm/smc-rsi.h | 139 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 139 insertions(+)
- create mode 100644 lib/arm64/asm/smc-rsi.h
+ lib/arm/setup.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/lib/arm64/asm/smc-rsi.h b/lib/arm64/asm/smc-rsi.h
-new file mode 100644
-index 00000000..cd05e9c6
---- /dev/null
-+++ b/lib/arm64/asm/smc-rsi.h
-@@ -0,0 +1,139 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) 2022 Arm Limited.
-+ * All rights reserved.
-+ */
-+#ifndef __SMC_RSI_H_
-+#define __SMC_RSI_H_
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index 81052a3d..65d98e97 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -274,9 +274,6 @@ void setup(const void *fdt, phys_addr_t freemem_start)
+ 	/* cpu_init must be called before thread_info_init */
+ 	thread_info_init(current_thread_info(), 0);
+ 
+-	/* mem_init must be called before io_init */
+-	io_init();
+-
+ 	timer_save_state();
+ 
+ 	ret = dt_get_bootargs(&bootargs);
+@@ -292,4 +289,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
+ 
+ 	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
+ 		setup_vm();
 +
-+/*
-+ * This file describes the Realm Services Interface (RSI) Application Binary
-+ * Interface (ABI) for SMC calls made from within the Realm to the RMM and
-+ * serviced by the RMM.
-+ */
-+
-+#define SMC_RSI_CALL_BASE		0xC4000000
-+
-+/*
-+ * The major version number of the RSI implementation.  Increase this whenever
-+ * the binary format or semantics of the SMC calls change.
-+ */
-+#define RSI_ABI_VERSION_MAJOR		12
-+
-+/*
-+ * The minor version number of the RSI implementation.  Increase this when
-+ * a bug is fixed, or a feature is added without breaking binary compatibility.
-+ */
-+#define RSI_ABI_VERSION_MINOR		0
-+
-+#define RSI_ABI_VERSION			((RSI_ABI_VERSION_MAJOR << 16) | \
-+					 RSI_ABI_VERSION_MINOR)
-+
-+#define RSI_ABI_VERSION_GET_MAJOR(_version) ((_version) >> 16)
-+#define RSI_ABI_VERSION_GET_MINOR(_version) ((_version) & 0xFFFF)
-+
-+#define RSI_SUCCESS			0
-+#define RSI_ERROR_INPUT			1
-+#define RSI_ERROR_STATE			2
-+#define RSI_INCOMPLETE			3
-+#define RSI_ERROR_MEMORY		4
-+
-+#define SMC_RSI_FID(_x)			(SMC_RSI_CALL_BASE + (_x))
-+
-+#define SMC_RSI_ABI_VERSION			SMC_RSI_FID(0x190)
-+
-+/*
-+ * arg1 == The IPA of token buffer
-+ * arg2 == Challenge value, bytes:  0 -  7
-+ * arg3 == Challenge value, bytes:  7 - 15
-+ * arg4 == Challenge value, bytes: 16 - 23
-+ * arg5 == Challenge value, bytes: 24 - 31
-+ * arg6 == Challenge value, bytes: 32 - 39
-+ * arg7 == Challenge value, bytes: 40 - 47
-+ * arg8 == Challenge value, bytes: 48 - 55
-+ * arg9 == Challenge value, bytes: 56 - 63
-+ * ret0 == Status / error
-+ */
-+#define SMC_RSI_ATTEST_TOKEN_INIT	SMC_RSI_FID(0x194)
-+
-+/*
-+ * arg1 == The IPA of token buffer
-+ * ret0 == Status / error
-+ * ret1 == Size of completed token in bytes
-+ */
-+#define SMC_RSI_ATTEST_TOKEN_CONTINUE	SMC_RSI_FID(0x195)
-+
-+/*
-+ * arg1  == Index (1..4), which measurement (REM) to extend
-+ * arg2  == Size of realm measurement in bytes, max 64 bytes
-+ * arg3  == Measurement value, bytes:  0 -  7
-+ * arg4  == Measurement value, bytes:  7 - 15
-+ * arg5  == Measurement value, bytes: 16 - 23
-+ * arg6  == Measurement value, bytes: 24 - 31
-+ * arg7  == Measurement value, bytes: 32 - 39
-+ * arg8  == Measurement value, bytes: 40 - 47
-+ * arg9  == Measurement value, bytes: 48 - 55
-+ * arg10 == Measurement value, bytes: 56 - 63
-+ * ret0  == Status / error
-+ */
-+#define SMC_RSI_MEASUREMENT_EXTEND	SMC_RSI_FID(0x193)
-+
-+/*
-+ * arg1 == Index (0..4), which measurement (RIM or REM) to read
-+ * ret0 == Status / error
-+ * ret1 == Measurement value, bytes:  0 -  7
-+ * ret2 == Measurement value, bytes:  7 - 15
-+ * ret3 == Measurement value, bytes: 16 - 23
-+ * ret4 == Measurement value, bytes: 24 - 31
-+ * ret5 == Measurement value, bytes: 32 - 39
-+ * ret6 == Measurement value, bytes: 40 - 47
-+ * ret7 == Measurement value, bytes: 48 - 55
-+ * ret8 == Measurement value, bytes: 56 - 63
-+ */
-+#define SMC_RSI_MEASUREMENT_READ	SMC_RSI_FID(0x192)
-+
-+#ifndef __ASSEMBLY__
-+
-+struct rsi_realm_config {
-+	union {
-+		struct {
-+			unsigned long ipa_width; /* Width of IPA in bits */
-+		};
-+		unsigned char __reserved0[0x1000];
-+	};
-+	/* Offset 0x1000 */
-+};
-+
-+#endif /* __ASSEMBLY__ */
-+
-+/*
-+ * arg0 == struct rsi_realm_config addr
-+ */
-+#define SMC_RSI_REALM_CONFIG		SMC_RSI_FID(0x196)
-+
-+/*
-+ * arg0 == IPA address of target region
-+ * arg1 == size of target region in bytes
-+ * arg2 == RIPAS value
-+ * ret0 == Status / error
-+ * ret1 == Top of modified IPA range
-+ */
-+#define SMC_RSI_IPA_STATE_SET		SMC_RSI_FID(0x197)
-+
-+#define RSI_HOST_CALL_NR_GPRS		31
-+
-+#ifndef __ASSEMBLY__
-+
-+struct rsi_host_call {
-+	unsigned int imm;
-+	unsigned long gprs[RSI_HOST_CALL_NR_GPRS];
-+};
-+
-+#endif /* __ASSEMBLY__ */
-+
-+/*
-+ * arg0 == struct rsi_host_call addr
-+ */
-+#define SMC_RSI_HOST_CALL		SMC_RSI_FID(0x199)
-+
-+#endif /* __SMC_RSI_H_ */
++	/* mem_init and setup_vm must be called before io_init */
++	io_init();
+ }
 -- 
 2.17.1
 
