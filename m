@@ -1,132 +1,66 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4EC95238
-	for <kvmarm@lists.linux.dev>; Fri, 27 Jan 2023 23:53:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1674863585;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD9217E
+	for <kvmarm@lists.linux.dev>; Sat, 28 Jan 2023 00:14:40 +0000 (UTC)
+Date: Sat, 28 Jan 2023 00:14:32 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1674864878;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sjBzs7p6VyjLsfM9jF7Ude6+5lIZi52fmgqYqe8YS6Q=;
-	b=X9BWAJt5ElvDjnfvirDakwWNZwdsvFavpIhKnH/JtTtY36Fl30seoNrAIT6EAq8Neejtsc
-	/CqhlcTU8saxl5mVIpPczhAoln3Wz2glZDEV7puvY/voC/nzpjArt5tYX4HVM/0TH4pN3N
-	r2vP1/t2Yhdtgj8zu7HZLR/MNDvWqBc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-100-yzl2-LN_P2eNkgdWM9jZag-1; Fri, 27 Jan 2023 18:53:01 -0500
-X-MC-Unique: yzl2-LN_P2eNkgdWM9jZag-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 115E4811E6E;
-	Fri, 27 Jan 2023 23:53:00 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-64.bne.redhat.com [10.64.54.64])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 74A44400DE84;
-	Fri, 27 Jan 2023 23:52:52 +0000 (UTC)
-From: Gavin Shan <gshan@redhat.com>
-To: kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu
-Cc: pbonzini@redhat.com,
-	corbet@lwn.net,
-	maz@kernel.org,
-	james.morse@arm.com,
-	suzuki.poulose@arm.com,
-	oliver.upton@linux.dev,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	yuzhe@nfschina.com,
-	gshan@redhat.com,
-	seanjc@google.com,
-	isaku.yamahata@intel.com,
-	ricarkol@google.com,
-	eric.auger@redhat.com,
-	renzhengeek@gmail.com,
-	reijiw@google.com,
+	bh=AGaeFUGsY+6rt83U5mh2TKehFjF1vFRLmfOY7UCFQ/I=;
+	b=pNhbow7uuLKcjf8GjIlH4ZXZVFW+eGn1TQv6s84utXqrl5IMaqY0MLjFWh+RPOCyb8ix/m
+	t/xU3YchLxx9v6anaCF0TsOqK3YFH9+e1fUV3Gao6b4JXfJrZqFPEpWdet4D0vLvfsmi3l
+	JZoapCY84ZSz8/qDRs6AmgJQp0ei5c4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+	pbonzini@redhat.com, corbet@lwn.net, maz@kernel.org,
+	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, yuzhe@nfschina.com,
+	seanjc@google.com, isaku.yamahata@intel.com, ricarkol@google.com,
+	eric.auger@redhat.com, renzhengeek@gmail.com, reijiw@google.com,
 	shan.gavin@gmail.com
-Subject: [PATCH v4 4/4] KVM: arm64: Allow no running vcpu on saving VGICv3 pending table
-Date: Sat, 28 Jan 2023 07:51:50 +0800
-Message-Id: <20230127235150.17025-5-gshan@redhat.com>
-In-Reply-To: <20230127235150.17025-1-gshan@redhat.com>
+Subject: Re: [PATCH v4 1/4] KVM: arm64: Include kvm_mmu.h from vgic.h
+Message-ID: <Y9Ro6IEjPVeQfmUQ@google.com>
 References: <20230127235150.17025-1-gshan@redhat.com>
+ <20230127235150.17025-2-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230127235150.17025-2-gshan@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-We don't have a running VCPU context to save VGICv3 pending table due
-to KVM_DEV_ARM_VGIC_{GRP_CTRL, SAVE_PENDING_TABLES} command on KVM
-device "kvm-arm-vgic-v3". The unknown case is caught by kvm-unit-tests.
+On Sat, Jan 28, 2023 at 07:51:47AM +0800, Gavin Shan wrote:
+> We need a unified helper in 'kvm/vgic/vgic.h' to write guest memory. In
+> the helper, the check of no-running-vcpu context for dirty ring will be
+> applied. kvm_write_guest_lock(), defined in 'include/asm/kvm_mmu.h', is
+> going to be dereferenced by the unified helper.
+> 
+> Include 'include/asm/kvm_mmu.h' to 'kvm/vgic/vgic.h' to avoid including
+> the former header file when the later one is needed. With the change,
+> the duplicate inclusions of 'include/asm/kvm_mmu.h' are removed.
+> 
+> No functional change intended.
+> 
+> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
 
-   # ./kvm-unit-tests/tests/its-pending-migration
-   WARNING: CPU: 120 PID: 7973 at arch/arm64/kvm/../../../virt/kvm/kvm_main.c:3325 \
-   mark_page_dirty_in_slot+0x60/0xe0
-    :
-   mark_page_dirty_in_slot+0x60/0xe0
-   __kvm_write_guest_page+0xcc/0x100
-   kvm_write_guest+0x7c/0xb0
-   vgic_v3_save_pending_tables+0x148/0x2a0
-   vgic_set_common_attr+0x158/0x240
-   vgic_v3_set_attr+0x4c/0x5c
-   kvm_device_ioctl+0x100/0x160
-   __arm64_sys_ioctl+0xa8/0xf0
-   invoke_syscall.constprop.0+0x7c/0xd0
-   el0_svc_common.constprop.0+0x144/0x160
-   do_el0_svc+0x34/0x60
-   el0_svc+0x3c/0x1a0
-   el0t_64_sync_handler+0xb4/0x130
-   el0t_64_sync+0x178/0x17c
+No, I did not suggest for you to do this. I had suggested you just
+include asm/kvm_mmu.h from the vgic header, not to go and remove it from
+all the files that include vgic.h.
 
-Use vgic_write_guest_lock() to save VGICv3 pending table.
+Who cares if kvm_mmu.h gets included twice? Include guards exist for this
+exact reason.
 
-Reported-by: Zenghui Yu <yuzenghui@huawei.com>
-Signed-off-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
----
- Documentation/virt/kvm/api.rst | 4 +++-
- arch/arm64/kvm/vgic/vgic-v3.c  | 2 +-
- 2 files changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 5dc3598afbe2..d653e13954d9 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8074,7 +8074,9 @@ NOTE: Multiple examples of using the backup bitmap: (1) save vgic/its
- tables through command KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} on
- KVM device "kvm-arm-vgic-its". (2) restore vgic/its tables through
- command KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_RESTORE_TABLES} on KVM device
--"kvm-arm-vgic-its". VGICv3 LPI pending status is restored.
-+"kvm-arm-vgic-its". VGICv3 LPI pending status is restored. (3) save
-+VGICv3 pending table through KVM_DEV_ARM_VGIC_{GRP_CTRL, SAVE_PENDING_TABLES}
-+command on KVM device "kvm-arm-vgic-v3".
- 
- 8.30 KVM_CAP_XEN_HVM
- --------------------
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index c94e4d7520fc..558ccc805fff 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -436,7 +436,7 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
- 		else
- 			val &= ~(1 << bit_nr);
- 
--		ret = kvm_write_guest_lock(kvm, ptr, &val, 1);
-+		ret = vgic_write_guest_lock(kvm, ptr, &val, 1);
- 		if (ret)
- 			goto out;
- 	}
 -- 
-2.23.0
-
+Thanks,
+Oliver
