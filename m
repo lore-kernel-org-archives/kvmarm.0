@@ -1,91 +1,72 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9184017E
-	for <kvmarm@lists.linux.dev>; Sat, 28 Jan 2023 00:18:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1674865101;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C7B5CBA
+	for <kvmarm@lists.linux.dev>; Sat, 28 Jan 2023 15:13:27 +0000 (UTC)
+Message-ID: <2bf4523a-ae8a-1fe2-32b1-25c7e3ae7092@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1674918805;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UFSxdYO5nDtftBiB4L6W7S5MGdfu2Qx9OX4YoB+ycGk=;
-	b=FoD6ysQXZ3GL76WGWYTeGT8vJBogQ4dS47JFO5aubNo7ly0u4NKFOerh+Ehncv/zXRVx0P
-	uNH32ebhN8eGhS9rojHbxHtL/rcVbdHrFAuhqHX5i02Jv/Ioj3yLvaHPuSw3auYMCu1vbA
-	I6sJyxxfVzMRwIpgBhHuCG8MZbaUtig=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-435-vEU1w1AuP9u29RJkzCLK-A-1; Fri, 27 Jan 2023 19:18:16 -0500
-X-MC-Unique: vEU1w1AuP9u29RJkzCLK-A-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1A839858F0E;
-	Sat, 28 Jan 2023 00:18:15 +0000 (UTC)
-Received: from [10.64.54.64] (vpn2-54-64.bne.redhat.com [10.64.54.64])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E0A67492C18;
-	Sat, 28 Jan 2023 00:18:07 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v4 1/4] KVM: arm64: Include kvm_mmu.h from vgic.h
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com,
- corbet@lwn.net, maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org,
- yuzhe@nfschina.com, seanjc@google.com, isaku.yamahata@intel.com,
- ricarkol@google.com, eric.auger@redhat.com, renzhengeek@gmail.com,
- reijiw@google.com, shan.gavin@gmail.com
-References: <20230127235150.17025-1-gshan@redhat.com>
- <20230127235150.17025-2-gshan@redhat.com> <Y9Ro6IEjPVeQfmUQ@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <be359c63-fbbb-0ced-d023-0df9dc6b3527@redhat.com>
-Date: Sat, 28 Jan 2023 11:18:05 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+	bh=E9bS3BnZ6WdEi1IEG6Dt2LIop6JFZjAkpCsRjTjS4xo=;
+	b=jt3z+BQBkKlHupD4cZv/rULpNLuG3ljKqRTWB2BhKhINtWzcn2jFHlPNdLWWeqV1aXBjXw
+	d2+VhlurXz3cxfOsajAxP1JiFFkAky0fH6g+e6459Yil+Grinzf3IRQ4giMhEF4jt5OFvw
+	Hyy0M3x+hbhOHjehN6Hu1b0aqdcMfKY=
+Date: Sat, 28 Jan 2023 23:12:50 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <Y9Ro6IEjPVeQfmUQ@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Subject: Re: [PATCH v2 2/7] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
 Content-Language: en-US
+To: David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Sean Christopherson <seanjc@google.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, Raghavendra Rao Ananta <rananta@google.com>
+References: <20230126184025.2294823-1-dmatlack@google.com>
+ <20230126184025.2294823-3-dmatlack@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zenghui Yu <zenghui.yu@linux.dev>
+In-Reply-To: <20230126184025.2294823-3-dmatlack@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Migadu-Flow: FLOW_OUT
 
-Hi Oliver,
-
-On 1/28/23 11:14 AM, Oliver Upton wrote:
-> On Sat, Jan 28, 2023 at 07:51:47AM +0800, Gavin Shan wrote:
->> We need a unified helper in 'kvm/vgic/vgic.h' to write guest memory. In
->> the helper, the check of no-running-vcpu context for dirty ring will be
->> applied. kvm_write_guest_lock(), defined in 'include/asm/kvm_mmu.h', is
->> going to be dereferenced by the unified helper.
->>
->> Include 'include/asm/kvm_mmu.h' to 'kvm/vgic/vgic.h' to avoid including
->> the former header file when the later one is needed. With the change,
->> the duplicate inclusions of 'include/asm/kvm_mmu.h' are removed.
->>
->> No functional change intended.
->>
->> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+On 2023/1/27 02:40, David Matlack wrote:
+> Use kvm_arch_flush_remote_tlbs() instead of
+> CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL. The two mechanisms solve the same
+> problem, allowing architecture-specific code to provide a non-IPI
+> implementation of remote TLB flushing.
 > 
-> No, I did not suggest for you to do this. I had suggested you just
-> include asm/kvm_mmu.h from the vgic header, not to go and remove it from
-> all the files that include vgic.h.
+> Dropping CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL allows KVM to standardize
+> all architectures on kvm_arch_flush_remote_tlbs() instead of maintaining
+> two mechanisms.
 > 
-> Who cares if kvm_mmu.h gets included twice? Include guards exist for this
-> exact reason.
+> Opt to standardize on kvm_arch_flush_remote_tlbs() since it avoids
+> duplicating the generic TLB stats across architectures that implement
+> their own remote TLB flush.
 > 
+> This adds an extra function call to the ARM64 kvm_flush_remote_tlbs()
+> path, but that is a small cost in comparison to flushing remote TLBs.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
 
-Ok, I misundertood your suggestion. Could you drop PATCH[v4 1/4] and include
-'kvm_mmu.h' to 'vgic.h'? Otherwise, I need to respin for v5. Please let me
-know your preference.
+Looks good,
 
-Thanks,
-Gavin
-
+Reviewed-by: Zenghui Yu <zenghui.yu@linux.dev>
