@@ -1,56 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F1428EA
-	for <kvmarm@lists.linux.dev>; Sun, 29 Jan 2023 18:54:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA032C433EF;
-	Sun, 29 Jan 2023 18:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3CA2FB2
+	for <kvmarm@lists.linux.dev>; Sun, 29 Jan 2023 18:54:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A9BFC433D2;
+	Sun, 29 Jan 2023 18:54:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675018456;
-	bh=I7OWZpIexMPfCriDmT6tX4hVWNcJ0a14P9vHmErgqiI=;
+	s=k20201202; t=1675018473;
+	bh=ebOSirCFEDGOZLFrWoVgpUQkTKHhvgyDudrNEvfsQ5k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hzVIl+okQLi+gn0pb5zM1bLR8OlapQIWh8SR+njowGQ+fQohh2pHsHuQNXKBzotO4
-	 YOi/IUvzN9dTu1fuqm1H6lXw+rHMCoAA0sVjl+TvQJyR90PrZN3inhi46GjZltPgiB
-	 /Ojvn3udXkK2WYgcfsCfHWEzxpLYXOCA/GMTB6+B+5uqTdmq+tGUI99DhztjxVWt/v
-	 BU4u3ToWPj4Yz6n2S3cWZzL0mENVWyvP7vtyOcDK7Njck4ixQAK2kiOM1jBxSJwTrJ
-	 PM6kzA4GnZfPshdCC9MnSp65sYQTmEAqD3AtXZX51YU6tL33mg9wUfV3oz0SFsjTV6
-	 AeLQaTdWufqZw==
+	b=QAkZCyq/Po7VFmbYI5vI4zmmIekOjNo1UAU++xhDe21FSDrfDXHLf/ID6RkoClR4U
+	 gyD9zuCwMIMKB7w71yAGNtK5H02tMKZGAEUKpEU1i1ADFHHebj8TNlvcJX0rj3Z5yH
+	 2sU2TZ/73FS2Oh6Oxip8weT4brR2XGsejwgkRy4Grcym87fmTK1oU+wx6YyjuowsjG
+	 gt4BnTfaMg3awMMVX5NnElqeafHX8q5GHn0QHv6AbIM1xUdOjbsphe+cSj6TButVry
+	 UQAmeYB73a4+h4gDkajLYfvW8b0A38GQGbyVg5Ypaye35Zt9svFwQg6M5svBAXrS/c
+	 aFhlVvly6zNpQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pMCog-005eZQ-4U;
-	Sun, 29 Jan 2023 18:54:14 +0000
+	id 1pMCox-005eaG-7H;
+	Sun, 29 Jan 2023 18:54:31 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Gavin Shan <gshan@redhat.com>,
-	kvmarm@lists.linux.dev
-Cc: linux-kernel@vger.kernel.org,
-	will@kernel.org,
-	reijiw@google.com,
-	kvm@vger.kernel.org,
-	isaku.yamahata@intel.com,
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Ricardo Koller <ricarkol@google.com>,
+	andrew.jones@linux.dev
+Cc: oupton@google.com,
 	pbonzini@redhat.com,
-	suzuki.poulose@arm.com,
+	alexandru.elisei@arm.com,
 	eric.auger@redhat.com,
-	yuzhe@nfschina.com,
-	yuzenghui@huawei.com,
-	linux-doc@vger.kernel.org,
-	james.morse@arm.com,
-	renzhengeek@gmail.com,
-	corbet@lwn.net,
-	oliver.upton@linux.dev,
-	kvmarm@lists.cs.columbia.edu,
-	shan.gavin@gmail.com,
-	seanjc@google.com,
-	catalin.marinas@arm.com,
-	linux-arm-kernel@lists.infradead.org,
-	ricarkol@google.com
-Subject: Re: [PATCH v3 0/4] Improve dirty ring warning report
-Date: Sun, 29 Jan 2023 18:54:10 +0000
-Message-Id: <167501840046.2480538.4084679017095353524.b4-ty@kernel.org>
+	yuzenghui@huawei.com
+Subject: Re: [PATCH v2 0/4] KVM: selftests: aarch64: page_fault_test S1PTW related fixes
+Date: Sun, 29 Jan 2023 18:54:28 +0000
+Message-Id: <167501840046.2480538.131170578621947209.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230126235451.469087-1-gshan@redhat.com>
-References: <20230126235451.469087-1-gshan@redhat.com>
+In-Reply-To: <20230127214353.245671-1-ricarkol@google.com>
+References: <20230127214353.245671-1-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,30 +46,31 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, will@kernel.org, reijiw@google.com, kvm@vger.kernel.org, isaku.yamahata@intel.com, pbonzini@redhat.com, suzuki.poulose@arm.com, eric.auger@redhat.com, yuzhe@nfschina.com, yuzenghui@huawei.com, linux-doc@vger.kernel.org, james.morse@arm.com, renzhengeek@gmail.com, corbet@lwn.net, oliver.upton@linux.dev, kvmarm@lists.cs.columbia.edu, shan.gavin@gmail.com, seanjc@google.com, catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, ricarkol@google.com
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, ricarkol@google.com, andrew.jones@linux.dev, oupton@google.com, pbonzini@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 27 Jan 2023 07:54:47 +0800, Gavin Shan wrote:
-> It has been known case where no running VCPU context exists when the
-> vgic/its tables are saved. There are other two unknown cases where we
-> don't have the running VCPU context: (a) restore vgic3 LPI pending
-> status. (b) restoring vgic3 pending tables.
-> 
-> PATCH[1]     includes 'kvm_mmu.h' to 'vgic.h'
-> PATCH[2]     adds unified helper vgic_write_guest_lock()
-> PATCH[3 - 4] allows no-running-vcpu context for (a) and (b)
+On Fri, 27 Jan 2023 21:43:49 +0000, Ricardo Koller wrote:
+> Commit 406504c7b040 ("KVM: arm64: Fix S1PTW handling on RO memslots")
+> changed the way S1PTW faults were handled by KVM.  Before this fix,
+> KVM treated any fault due to any S1PTW as a write, even S1PTW that
+> didn't update the PTE.  Some tests in page_fault_test mistakenly check
+> for this KVM behavior and are currently failing.  For example, there's
+> a dirty log test that asserts that a S1PTW without AF or DA results in
+> the PTE page getting dirty.
 > 
 > [...]
 
 Applied to fixes, thanks!
 
-[2/4] KVM: arm64: Add helper vgic_write_guest_lock()
-      commit: a23eaf9368aafa4defcc8904b20391b6ea07bb1e
-[3/4] KVM: arm64: Allow no running vcpu on restoring vgic3 LPI pending status
-      commit: 2f8b1ad2228a7f1f1e2458864f4bfc1cbdf511ed
-[4/4] KVM: arm64: Allow no running vcpu on saving vgic3 pending table
-      commit: 6028acbe3a5f2119a2a6ddd3e06453c87c09cae0
+[1/4] KVM: selftests: aarch64: Relax userfaultfd read vs. write checks
+      commit: 0dd8d22a887a473f6f11abf556c4f7944ab5ef1d
+[2/4] KVM: selftests: aarch64: Do not default to dirty PTE pages on all S1PTWs
+      commit: 42561751ea918d8f3f54412622735e1f887cb360
+[3/4] KVM: selftests: aarch64: Fix check of dirty log PT write
+      commit: 8b03c97fa6fd442b949b71aeb7545b970b968fe3
+[4/4] KVM: selftests: aarch64: Test read-only PT memory regions
+      commit: 08ddbbdf0b55839ca93a12677a30a1ef24634969
 
 Cheers,
 
