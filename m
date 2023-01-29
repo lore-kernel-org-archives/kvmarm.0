@@ -1,72 +1,94 @@
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13C7B5CBA
-	for <kvmarm@lists.linux.dev>; Sat, 28 Jan 2023 15:13:27 +0000 (UTC)
-Message-ID: <2bf4523a-ae8a-1fe2-32b1-25c7e3ae7092@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1674918805;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E9bS3BnZ6WdEi1IEG6Dt2LIop6JFZjAkpCsRjTjS4xo=;
-	b=jt3z+BQBkKlHupD4cZv/rULpNLuG3ljKqRTWB2BhKhINtWzcn2jFHlPNdLWWeqV1aXBjXw
-	d2+VhlurXz3cxfOsajAxP1JiFFkAky0fH6g+e6459Yil+Grinzf3IRQ4giMhEF4jt5OFvw
-	Hyy0M3x+hbhOHjehN6Hu1b0aqdcMfKY=
-Date: Sat, 28 Jan 2023 23:12:50 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F1428EA
+	for <kvmarm@lists.linux.dev>; Sun, 29 Jan 2023 18:54:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA032C433EF;
+	Sun, 29 Jan 2023 18:54:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1675018456;
+	bh=I7OWZpIexMPfCriDmT6tX4hVWNcJ0a14P9vHmErgqiI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=hzVIl+okQLi+gn0pb5zM1bLR8OlapQIWh8SR+njowGQ+fQohh2pHsHuQNXKBzotO4
+	 YOi/IUvzN9dTu1fuqm1H6lXw+rHMCoAA0sVjl+TvQJyR90PrZN3inhi46GjZltPgiB
+	 /Ojvn3udXkK2WYgcfsCfHWEzxpLYXOCA/GMTB6+B+5uqTdmq+tGUI99DhztjxVWt/v
+	 BU4u3ToWPj4Yz6n2S3cWZzL0mENVWyvP7vtyOcDK7Njck4ixQAK2kiOM1jBxSJwTrJ
+	 PM6kzA4GnZfPshdCC9MnSp65sYQTmEAqD3AtXZX51YU6tL33mg9wUfV3oz0SFsjTV6
+	 AeLQaTdWufqZw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pMCog-005eZQ-4U;
+	Sun, 29 Jan 2023 18:54:14 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Gavin Shan <gshan@redhat.com>,
+	kvmarm@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org,
+	will@kernel.org,
+	reijiw@google.com,
+	kvm@vger.kernel.org,
+	isaku.yamahata@intel.com,
+	pbonzini@redhat.com,
+	suzuki.poulose@arm.com,
+	eric.auger@redhat.com,
+	yuzhe@nfschina.com,
+	yuzenghui@huawei.com,
+	linux-doc@vger.kernel.org,
+	james.morse@arm.com,
+	renzhengeek@gmail.com,
+	corbet@lwn.net,
+	oliver.upton@linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	shan.gavin@gmail.com,
+	seanjc@google.com,
+	catalin.marinas@arm.com,
+	linux-arm-kernel@lists.infradead.org,
+	ricarkol@google.com
+Subject: Re: [PATCH v3 0/4] Improve dirty ring warning report
+Date: Sun, 29 Jan 2023 18:54:10 +0000
+Message-Id: <167501840046.2480538.4084679017095353524.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230126235451.469087-1-gshan@redhat.com>
+References: <20230126235451.469087-1-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 2/7] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
-Content-Language: en-US
-To: David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- Huacai Chen <chenhuacai@kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Sean Christopherson <seanjc@google.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, Raghavendra Rao Ananta <rananta@google.com>
-References: <20230126184025.2294823-1-dmatlack@google.com>
- <20230126184025.2294823-3-dmatlack@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zenghui Yu <zenghui.yu@linux.dev>
-In-Reply-To: <20230126184025.2294823-3-dmatlack@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, will@kernel.org, reijiw@google.com, kvm@vger.kernel.org, isaku.yamahata@intel.com, pbonzini@redhat.com, suzuki.poulose@arm.com, eric.auger@redhat.com, yuzhe@nfschina.com, yuzenghui@huawei.com, linux-doc@vger.kernel.org, james.morse@arm.com, renzhengeek@gmail.com, corbet@lwn.net, oliver.upton@linux.dev, kvmarm@lists.cs.columbia.edu, shan.gavin@gmail.com, seanjc@google.com, catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2023/1/27 02:40, David Matlack wrote:
-> Use kvm_arch_flush_remote_tlbs() instead of
-> CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL. The two mechanisms solve the same
-> problem, allowing architecture-specific code to provide a non-IPI
-> implementation of remote TLB flushing.
+On Fri, 27 Jan 2023 07:54:47 +0800, Gavin Shan wrote:
+> It has been known case where no running VCPU context exists when the
+> vgic/its tables are saved. There are other two unknown cases where we
+> don't have the running VCPU context: (a) restore vgic3 LPI pending
+> status. (b) restoring vgic3 pending tables.
 > 
-> Dropping CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL allows KVM to standardize
-> all architectures on kvm_arch_flush_remote_tlbs() instead of maintaining
-> two mechanisms.
+> PATCH[1]     includes 'kvm_mmu.h' to 'vgic.h'
+> PATCH[2]     adds unified helper vgic_write_guest_lock()
+> PATCH[3 - 4] allows no-running-vcpu context for (a) and (b)
 > 
-> Opt to standardize on kvm_arch_flush_remote_tlbs() since it avoids
-> duplicating the generic TLB stats across architectures that implement
-> their own remote TLB flush.
-> 
-> This adds an extra function call to the ARM64 kvm_flush_remote_tlbs()
-> path, but that is a small cost in comparison to flushing remote TLBs.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
+> [...]
 
-Looks good,
+Applied to fixes, thanks!
 
-Reviewed-by: Zenghui Yu <zenghui.yu@linux.dev>
+[2/4] KVM: arm64: Add helper vgic_write_guest_lock()
+      commit: a23eaf9368aafa4defcc8904b20391b6ea07bb1e
+[3/4] KVM: arm64: Allow no running vcpu on restoring vgic3 LPI pending status
+      commit: 2f8b1ad2228a7f1f1e2458864f4bfc1cbdf511ed
+[4/4] KVM: arm64: Allow no running vcpu on saving vgic3 pending table
+      commit: 6028acbe3a5f2119a2a6ddd3e06453c87c09cae0
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
