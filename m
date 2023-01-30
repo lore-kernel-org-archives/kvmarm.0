@@ -1,103 +1,252 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C96D28EA
-	for <kvmarm@lists.linux.dev>; Sun, 29 Jan 2023 19:01:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 057AAC433D2;
-	Sun, 29 Jan 2023 19:01:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675018919;
-	bh=YnpKJqKcLnIwJIkX7NoOfZ/16Cr2rgVctiBXbHOFcx0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=PV/JZF/q5kNb0JtHeSXCmk3eV8BMA/So5Lehm0SyjuJ6vGganDjWN0+OkR7PW5uVJ
-	 1MMb0zKUEhm1ZpEp5IdZhXiJkEafW3hSDo+MG1c3/b5nfFz5eFdNzj9wYSDIEE4ake
-	 9MV/tjmqQ8Yz+7H2DmZEu+byP2AXeyZ9UB8oZyMF0Q7OHdBB4cm86PZYeiR2VAB5g9
-	 +lXAN/DsYPc7CezuCBeQsY1zC10ENSGjLGqt9OfNtKP8hrcb+r2Eo3Z1KN0UYRpuNN
-	 NaAO7KB6V9HL6+A65NQWeGCWYqIMq91h8+Nl8nOJfLBwca6PWJ0j0C6I7wY80r6ODs
-	 BpDC0kgf2eegg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pMCw8-005edw-Ru;
-	Sun, 29 Jan 2023 19:01:57 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Gavin Shan <gshan@redhat.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Ricardo Koller <ricarkol@google.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] kvm/arm64 fixes for 6.2, take #3
-Date: Sun, 29 Jan 2023 19:01:42 +0000
-Message-Id: <20230129190142.2481354-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626016AA3
+	for <kvmarm@lists.linux.dev>; Mon, 30 Jan 2023 18:19:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675102760; x=1706638760;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=DRtzzOgVDPKFkGC1t3GTlTEe2UUizuLp1A0OwFAaQkY=;
+  b=DHC0MpF+OrQ0/CzM79PtMOD5C9Swz9QCZdo46OVY01PhqzMRar4zykc4
+   uzW0r8hCDDu8jnniMahmZCzWJp8wtIaPZw8xl+IcH8QumsSsIUrCCGByt
+   nBRJt+SwNmc0iCeqPwshvwzqq+xWtDoaCZ6Qg77VY3GjhJayR+FqyfZZg
+   /2qcTepRTdJK4qsJxgwUIC6xrYsooaPagPqrkrSL2nrWHHulzIT4GWClz
+   qtLTeXMjiIL2CDEOwGEnYaJdc6JGK1Zbh6XLVuRpMEI2TZeXnBZmJQZ9c
+   NmAOkEm3RZRurw9wCsQt6MzLycwOWUGyyc2Q1SEEvn4r3ciEqbToDkh+C
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10606"; a="392181529"
+X-IronPort-AV: E=Sophos;i="5.97,258,1669104000"; 
+   d="scan'208";a="392181529"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2023 10:19:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10606"; a="788117174"
+X-IronPort-AV: E=Sophos;i="5.97,258,1669104000"; 
+   d="scan'208";a="788117174"
+Received: from lkp-server01.sh.intel.com (HELO ffa7f14d1d0f) ([10.239.97.150])
+  by orsmga004.jf.intel.com with ESMTP; 30 Jan 2023 10:19:15 -0800
+Received: from kbuild by ffa7f14d1d0f with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1pMYkM-0003oM-2b;
+	Mon, 30 Jan 2023 18:19:14 +0000
+Date: Tue, 31 Jan 2023 02:18:18 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-trace-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ intel-gfx@lists.freedesktop.org, amd-gfx@lists.freedesktop.org,
+ Linux Memory Management List <linux-mm@kvack.org>
+Subject: [linux-next:master] BUILD REGRESSION
+ ae0c77e1bc6963c67c6c09e8c72959fcb1ed8d5f
+Message-ID: <63d809ea.gvDoFQVzTVK4NFiz%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, gshan@redhat.com, oliver.upton@linux.dev, ricarkol@google.com, yuzenghui@huawei.com, james.morse@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-Paolo,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: ae0c77e1bc6963c67c6c09e8c72959fcb1ed8d5f  Add linux-next specific files for 20230130
 
-Here's the (hopefully) last batch of fixes for KVM/arm64 on 6.2. The
-really important one addresses yet another non-CPU access to the vgic
-memory, which needs to be suitably identified to avoid generating a
-scary warning. The second half of the series fixes a bunch of
-page-table walk tests after the kernel fix that went in earlier in
-6.2.
+Error/Warning reports:
 
-Please pull,
+https://lore.kernel.org/oe-kbuild-all/202301230743.Xnut0Zvc-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301300743.bp7Dpazv-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301301722.6fghRppL-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301301801.y5O08tQx-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301302110.mEtNwkBD-lkp@intel.com
 
-	M.
+Error/Warning: (recently discovered and may have been fixed)
 
-The following changes since commit ef3691683d7bfd0a2acf48812e4ffe894f10bfa8:
+Documentation/riscv/uabi.rst:24: WARNING: Enumerated list ends without a blank line; unexpected unindent.
+ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/fsl-edma.ko] undefined!
+ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/idma64.ko] undefined!
+arch/arm64/kvm/arm.c:2211: warning: expecting prototype for Initialize Hyp(). Prototype was for kvm_arm_init() instead
+drivers/clk/qcom/gcc-sa8775p.c:313:32: warning: unused variable 'gcc_parent_map_10' [-Wunused-const-variable]
+drivers/clk/qcom/gcc-sa8775p.c:318:37: warning: unused variable 'gcc_parent_data_10' [-Wunused-const-variable]
+drivers/clk/qcom/gcc-sa8775p.c:333:32: warning: unused variable 'gcc_parent_map_12' [-Wunused-const-variable]
+drivers/clk/qcom/gcc-sa8775p.c:338:37: warning: unused variable 'gcc_parent_data_12' [-Wunused-const-variable]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:148:6: warning: no previous prototype for 'link_dp_trace_set_edp_power_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:158:10: warning: no previous prototype for 'link_dp_trace_get_edp_poweron_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:163:10: warning: no previous prototype for 'link_dp_trace_get_edp_poweroff_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_capability.c:1295:32: warning: variable 'result_write_min_hblank' set but not used [-Wunused-but-set-variable]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_capability.c:279:42: warning: variable 'ds_port' set but not used [-Wunused-but-set-variable]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_training.c:1585:38: warning: variable 'result' set but not used [-Wunused-but-set-variable]
+kismet: WARNING: unmet direct dependencies detected for VFIO_MDEV when selected by SAMPLE_VFIO_MDEV_MTTY
+libbpf: failed to find '.BTF' ELF section in vmlinux
 
-  KVM: arm64: GICv4.1: Fix race with doorbell on VPE activation/deactivation (2023-01-21 11:02:19 +0000)
+Unverified Error/Warning (likely false positive, please contact us if interested):
 
-are available in the Git repository at:
+drivers/nvmem/imx-ocotp.c:599:21: sparse: sparse: symbol 'imx_ocotp_layout' was not declared. Should it be static?
+drivers/nvmem/layouts/sl28vpd.c:143:21: sparse: sparse: symbol 'sl28vpd_layout' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:106:40: sparse: sparse: symbol 'tsens_9607_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:26:40: sparse: sparse: symbol 'tsens_8916_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:42:40: sparse: sparse: symbol 'tsens_8939_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:62:40: sparse: sparse: symbol 'tsens_8974_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:84:40: sparse: sparse: symbol 'tsens_8974_backup_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v1.c:24:40: sparse: sparse: symbol 'tsens_qcs404_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v1.c:45:40: sparse: sparse: symbol 'tsens_8976_nvmem' was not declared. Should it be static?
+pahole: .tmp_vmlinux.btf: No such file or directory
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.2-3
+Error/Warning ids grouped by kconfigs:
 
-for you to fetch changes up to 08ddbbdf0b55839ca93a12677a30a1ef24634969:
+gcc_recent_errors
+|-- alpha-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- alpha-randconfig-r016-20230130
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- alpha-randconfig-s032-20230129
+|   `-- drivers-nvmem-layouts-sl28vpd.c:sparse:sparse:symbol-sl28vpd_layout-was-not-declared.-Should-it-be-static
+|-- arc-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- arm-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- arm64-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- arm64-buildonly-randconfig-r005-20230130
+|   `-- arch-arm64-kvm-arm.c:warning:expecting-prototype-for-Initialize-Hyp().-Prototype-was-for-kvm_arm_init()-instead
+|-- arm64-randconfig-s053-20230129
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   |-- drivers-nvmem-imx-ocotp.c:sparse:sparse:symbol-imx_ocotp_layout-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8916_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8939_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8974_backup_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8974_nvmem-was-not-declared.-Should-it-be-static
+clang_recent_errors
+`-- mips-randconfig-r036-20230129
+    |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_data_10
+    |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_data_12
+    |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_map_10
+    `-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_map_12
 
-  KVM: selftests: aarch64: Test read-only PT memory regions (2023-01-29 18:49:08 +0000)
+elapsed time: 730m
 
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.2, take #3
+configs tested: 83
+configs skipped: 5
 
-- Yet another fix for non-CPU accesses to the memory backing
-  the VGICv3 subsystem
+gcc tested configs:
+powerpc                           allnoconfig
+x86_64                            allnoconfig
+um                             i386_defconfig
+um                           x86_64_defconfig
+arc                                 defconfig
+alpha                               defconfig
+x86_64                              defconfig
+x86_64               randconfig-a001-20230130
+x86_64                               rhel-8.3
+x86_64               randconfig-a003-20230130
+i386                 randconfig-a002-20230130
+x86_64               randconfig-a004-20230130
+i386                 randconfig-a001-20230130
+x86_64               randconfig-a002-20230130
+x86_64               randconfig-a006-20230130
+i386                 randconfig-a004-20230130
+x86_64               randconfig-a005-20230130
+i386                 randconfig-a003-20230130
+x86_64                           allyesconfig
+i386                 randconfig-a005-20230130
+i386                 randconfig-a006-20230130
+sh                          kfr2r09_defconfig
+s390                             allmodconfig
+arm                                 defconfig
+s390                                defconfig
+x86_64                           rhel-8.3-syz
+x86_64                         rhel-8.3-kunit
+x86_64                           rhel-8.3-kvm
+sh                           se7705_defconfig
+arm64                            allyesconfig
+s390                             allyesconfig
+i386                                defconfig
+x86_64                           rhel-8.3-bpf
+arm                              allyesconfig
+m68k                             allyesconfig
+i386                             allyesconfig
+m68k                             allmodconfig
+x86_64                    rhel-8.3-kselftests
+x86_64                          rhel-8.3-func
+arc                              allyesconfig
+m68k                       m5249evb_defconfig
+alpha                            allyesconfig
+sh                        apsh4ad0a_defconfig
+arc                  randconfig-r043-20230129
+arm                  randconfig-r046-20230129
+i386                          randconfig-c001
+riscv                             allnoconfig
+riscv                    nommu_virt_defconfig
+i386                   debian-10.3-kselftests
+sh                               allmodconfig
+i386                              debian-10.3
+mips                             allyesconfig
+riscv                    nommu_k210_defconfig
+riscv                          rv32_defconfig
+powerpc                          allmodconfig
+powerpc                     tqm8548_defconfig
+m68k                          amiga_defconfig
+m68k                            mac_defconfig
+sh                           se7724_defconfig
+parisc                              defconfig
+mips                  maltasmvp_eva_defconfig
+sh                         ecovec24_defconfig
+xtensa                         virt_defconfig
 
-- A set of fixes for the setlftest checking for the S1PTW
-  behaviour after the fix that went in ealier in the cycle
+clang tested configs:
+i386                 randconfig-a013-20230130
+i386                 randconfig-a012-20230130
+i386                 randconfig-a014-20230130
+i386                 randconfig-a011-20230130
+i386                 randconfig-a015-20230130
+x86_64                          rhel-8.3-rust
+i386                 randconfig-a016-20230130
+x86_64               randconfig-a012-20230130
+powerpc                      pmac32_defconfig
+x86_64               randconfig-a013-20230130
+x86_64               randconfig-a014-20230130
+x86_64               randconfig-a011-20230130
+i386                              allnoconfig
+mips                      maltaaprp_defconfig
+x86_64               randconfig-a015-20230130
+x86_64               randconfig-a016-20230130
+hexagon              randconfig-r045-20230129
+riscv                randconfig-r042-20230129
+s390                 randconfig-r044-20230129
+hexagon              randconfig-r041-20230129
 
-----------------------------------------------------------------
-Gavin Shan (3):
-      KVM: arm64: Add helper vgic_write_guest_lock()
-      KVM: arm64: Allow no running vcpu on restoring vgic3 LPI pending status
-      KVM: arm64: Allow no running vcpu on saving vgic3 pending table
-
-Ricardo Koller (4):
-      KVM: selftests: aarch64: Relax userfaultfd read vs. write checks
-      KVM: selftests: aarch64: Do not default to dirty PTE pages on all S1PTWs
-      KVM: selftests: aarch64: Fix check of dirty log PT write
-      KVM: selftests: aarch64: Test read-only PT memory regions
-
- Documentation/virt/kvm/api.rst                     |  10 +-
- arch/arm64/kvm/vgic/vgic-its.c                     |  13 +-
- arch/arm64/kvm/vgic/vgic-v3.c                      |   4 +-
- arch/arm64/kvm/vgic/vgic.h                         |  14 ++
- include/kvm/arm_vgic.h                             |   2 +-
- .../selftests/kvm/aarch64/page_fault_test.c        | 187 ++++++++++++---------
- 6 files changed, 132 insertions(+), 98 deletions(-)
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
