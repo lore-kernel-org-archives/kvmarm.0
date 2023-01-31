@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C6A808
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:42:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58548C433EF;
-	Tue, 31 Jan 2023 09:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67029808
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:42:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 417F2C433D2;
+	Tue, 31 Jan 2023 09:42:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675158173;
-	bh=VxmRcf1P6efLkPjQVx9LunzmqtSb81ioZU+Jf+6ji0k=;
+	s=k20201202; t=1675158175;
+	bh=PPX1R4dKA2pD7SNKEyWdQQpgFAbK3cl/QLyVGGXHwPw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rTVE5nDEKUP0Q1BcjJj+CsVYJLt+OuemeegeEkGeNrwA0IuELFjwBcP32a16t7X5H
-	 vKhdVE+tum2D2XwxYhxOukDk7+IZmu7HEpJMeXpD/qacEph5ugzy9JAxsh9lkvJGfl
-	 4+EM9B4oi7prIk/vwMMYA/2DOh+EEHOTwYTlT1xhHbipHAfRooZsJvwqT66Eexj032
-	 i7MPDHZjowp13Ap0Md78Jcaq/Z4eN1ttirz/s9lUNalJv9hFGDSgEF0AQbMsEhPxGp
-	 II1G9OYW6CJNa1mDIMsYPCRWqbRYkJItOAgZb8JVaiDM+UPacNSJyWLDGNpjUhGQ+Z
-	 XpN3gEMFlLERg==
+	b=ud+xfjbctmnU/YTbbr8m3Xn72Eyv7VLLjxSafSZUVACfVb97qc+tD2C4ZBS1co0q0
+	 N4mbNS22DTgfBZz3Kq6ndwsXkglHMmfznKGOGLjps0P1BjaYpPNVqcW1YCm5BT/46R
+	 mkJBUgj85pZF5Q40b37li3QQYr9Yl5J6KnbZkpS7B5yekvYFYEwLtaSgMhzv8CKbwy
+	 dO4+J2WCLUzmL88XRDErmKjnaOO0xugrMRmuohPBaWHw0msrVawkcrfw92Tf7AU6Vg
+	 dFRXFo3gFF2rjIamN1bliKJRlAB1A0A+eBOeBS1nB+vx1ShKlLCgAHQtMeIkGXy158
+	 kUQPlAaPNooHg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pMmtg-0067U2-RA;
-	Tue, 31 Jan 2023 09:25:52 +0000
+	id 1pMmtx-0067U2-70;
+	Tue, 31 Jan 2023 09:26:05 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 38/69] KVM: arm64: nv: Restrict S2 RD/WR permissions to match the guest's
-Date: Tue, 31 Jan 2023 09:24:33 +0000
-Message-Id: <20230131092504.2880505-39-maz@kernel.org>
+Subject: [PATCH v8 67/69] KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
+Date: Tue, 31 Jan 2023 09:25:02 +0000
+Message-Id: <20230131092504.2880505-68-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230131092504.2880505-1-maz@kernel.org>
 References: <20230131092504.2880505-1-maz@kernel.org>
@@ -54,88 +54,154 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When mapping a page in a shadow stage-2, special care must be
-taken not to be more permissive than the guest is (writable or
-readable page when the guest hasn't set that permission).
+Due to the way ARMv8.4-NV suppresses traps when accessing EL2
+system registers, we can't track when the guest changes its
+HCR_EL2.TGE setting. This means we always trap EL1 TLBIs,
+even if they don't affect any guest.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+This obviously has a huge impact on performance, as we handle
+TLBI traps as a normal exit, and a normal VHE host issues
+thousands of TLBIs when booting (and quite a few when running
+userspace).
+
+A cheap way to reduce the overhead is to handle the limited
+case of {E2H,TGE}=={1,1} as a guest fixup, as we already have
+the right mmu configuration in place. Just execute the decoded
+instruction right away and return to the guest.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h | 15 +++++++++++++++
- arch/arm64/kvm/mmu.c                | 14 +++++++++++++-
- arch/arm64/kvm/nested.c             |  2 +-
- 3 files changed, 29 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/vhe/switch.c | 43 ++++++++++++++++++++++++++++++++-
+ arch/arm64/kvm/hyp/vhe/tlb.c    |  6 +++--
+ arch/arm64/kvm/sys_regs.c       | 25 ++++++-------------
+ 3 files changed, 54 insertions(+), 20 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 80371dea3652..fc96873b6dfe 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -91,6 +91,21 @@ static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
- 	return trans->esr;
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 238c6613cf47..a3555b90d9e1 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -168,6 +168,47 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
+ 	__deactivate_traps_common(vcpu);
  }
  
-+static inline bool kvm_s2_trans_readable(struct kvm_s2_trans *trans)
++static bool kvm_hyp_handle_tlbi_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
 +{
-+	return trans->readable;
-+}
++	u32 instr;
++	u64 val;
 +
-+static inline bool kvm_s2_trans_writable(struct kvm_s2_trans *trans)
-+{
-+	return trans->writable;
-+}
-+
-+static inline bool kvm_s2_trans_executable(struct kvm_s2_trans *trans)
-+{
-+	return !(trans->upper_attr & BIT(54));
-+}
-+
- extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- 			      struct kvm_s2_trans *result);
- 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 7865acd4b924..a42e7dc2be51 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1402,6 +1402,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (exec_fault && device)
- 		return -ENOEXEC;
- 
 +	/*
-+	 * Potentially reduce shadow S2 permissions to match the guest's own
-+	 * S2. For exec faults, we'd only reach this point if the guest
-+	 * actually allowed it (see kvm_s2_handle_perm_fault).
++	 * Ideally, we would never trap on EL1 TLB invalidations when the
++	 * guest's HCR_EL2.{E2H,TGE} == {1,1}. But "thanks" to ARMv8.4, we
++	 * don't trap writes to HCR_EL2, meaning that we can't track
++	 * changes to the virtual TGE bit. So we leave HCR_EL2.TTLB set on
++	 * the host. Oopsie...
++	 *
++	 * In order to speed-up EL1 TLBIs from the vEL2 guest when TGE is
++	 * set, try and handle these invalidation as quickly as possible,
++	 * without fully exiting (unless this needs forwarding).
 +	 */
-+	if (nested) {
-+		writable &= kvm_s2_trans_writable(nested);
-+		if (!kvm_s2_trans_readable(nested))
-+			prot &= ~KVM_PGTABLE_PROT_R;
-+	}
++	if (!vcpu_has_nv2(vcpu) ||
++	    !vcpu_is_el2(vcpu) ||
++	    (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE))
++		return false;
 +
- 	read_lock(&kvm->mmu_lock);
- 	pgt = vcpu->arch.hw_mmu->pgt;
- 	if (mmu_invalidate_retry(kvm, mmu_seq))
-@@ -1439,7 +1450,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
++	instr = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
++	if (sys_reg_Op0(instr) != TLBI_Op0 ||
++	    sys_reg_Op1(instr) != TLBI_Op1_EL1)
++		return false;
++
++	val = vcpu_get_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu));
++	__kvm_tlb_el1_instr(NULL, val, instr);
++	__kvm_skip_instr(vcpu);
++
++	return true;
++}
++
++static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	if (kvm_hyp_handle_tlbi_el1(vcpu, exit_code))
++		return true;
++
++	return kvm_hyp_handle_sysreg(vcpu, exit_code);
++}
++
+ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
+ 	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
+@@ -216,7 +257,7 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
+-	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
++	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg_vhe,
+ 	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
+ 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
+ 	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
+diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+index c4389db4cc22..beb162468c0b 100644
+--- a/arch/arm64/kvm/hyp/vhe/tlb.c
++++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+@@ -201,7 +201,8 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
+ 	dsb(ishst);
  
- 	if (device)
- 		prot |= KVM_PGTABLE_PROT_DEVICE;
--	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
-+	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC) &&
-+		 (!nested || kvm_s2_trans_executable(nested)))
- 		prot |= KVM_PGTABLE_PROT_X;
+ 	/* Switch to requested VMID */
+-	__tlb_switch_to_guest(mmu, &cxt);
++	if (mmu)
++		__tlb_switch_to_guest(mmu, &cxt);
  
  	/*
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 5fb5e93248c1..dc74c9b8db89 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -488,7 +488,7 @@ int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
- 		return 0;
+ 	 * Execute the same instruction as the guest hypervisor did,
+@@ -240,5 +241,6 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
+ 	dsb(ish);
+ 	isb();
  
- 	if (kvm_vcpu_trap_is_iabt(vcpu)) {
--		forward_fault = (trans->upper_attr & BIT(54));
-+		forward_fault = !kvm_s2_trans_executable(trans);
- 	} else {
- 		bool write_fault = kvm_is_write_fault(vcpu);
+-	__tlb_switch_to_host(&cxt);
++	if (mmu)
++		__tlb_switch_to_host(&cxt);
+ }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 1a1ae7ff218e..924afc40ab8b 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3110,6 +3110,8 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			    const struct sys_reg_desc *r)
+ {
+ 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
++	u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
++	struct kvm_s2_mmu *mmu;
+ 
+ 	if (vcpu_has_nv(vcpu) && forward_traps(vcpu, HCR_TTLB))
+ 		return false;
+@@ -3131,24 +3133,13 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 
+ 	mutex_lock(&vcpu->kvm->lock);
+ 
+-	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
+-		u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+-		struct kvm_s2_mmu *mmu;
+-
+-		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
+-		if (mmu)
+-			__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
++	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
++	if (mmu)
++		__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
+ 
+-		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
+-		if (mmu)
+-			__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
+-	} else {
+-		/*
+-		 * ARMv8.4-NV allows the guest to change TGE behind
+-		 * our back, so we always trap EL1 TLBIs from vEL2...
+-		 */
+-		__kvm_tlb_el1_instr(&vcpu->kvm->arch.mmu, p->regval, sys_encoding);
+-	}
++	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
++	if (mmu)
++		__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
+ 
+ 	mutex_unlock(&vcpu->kvm->lock);
  
 -- 
 2.34.1
