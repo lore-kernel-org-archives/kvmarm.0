@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCFD81A
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:25:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34552C4339B;
-	Tue, 31 Jan 2023 09:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D322102
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:25:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0AD4C433A7;
+	Tue, 31 Jan 2023 09:25:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675157132;
-	bh=t4xEJAO5BfLuaX8mjpeucO4oU7Eyo3etANQIAyyRnTk=;
+	s=k20201202; t=1675157133;
+	bh=mQifo5ColVaTyS46g1UPvijlpz/VgvuSAnasRmnAFuU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LTyqvKlSOe2+bczruOsTReb9ysevGCLqjz0Y3HaTYUzbN94xU4XsSvSSyLxRakQDi
-	 f+NFJFahx0Wgr8i+XhEjP+41SUFBH/+koahZ+/ObnlDxfb9tdxZkY2KP74jFT5VZbF
-	 iRD2rbxXDUwSLp1UBDvImhxeAftXKhI7X7cGICAGbAk1YFB7sJvR/2oYjE29v/pe9c
-	 835I/BYID6gNRwJ7ZJWBy0jh1OTFWIfP7+C48QXejXYFWMXLVSsYnmlKq4t43YmfIX
-	 UY7dCIFU6NJJ1o/3QsDZab7t2kEjbs+1EsZHWezw83GgBSAQiRDdO6XxPjSP9XjrgY
-	 b3+TyJHZ/NA5g==
+	b=qSMVG0zoP42WIXCNPniPSqt5ky5LwAafUok5NOp4lu/Ce9YDWDUGp7kgsvVsD2zXt
+	 AZYuyqkEZbdeqGx4gZt12rwm7cUrt2HrWsFOmnS7ww5xm94OZjSLKw5PpwOnMNTs8Q
+	 CmhXfubmcNfFz79t/tZVFNBF55BTjMaZreR8+cZTF7i/KW2oO40RXlTT5de44qUa6B
+	 77hVkk2QhpnE41m7evSVHvNiJe0LJkWiyz8PFUEg401vS9Gl0iHZLKwHjO6qIPJpyK
+	 zrVO8eiRwUHezdv52S4pPqDFAHZpLC41wPsW66Fp8tyhZLlOE07D4jQ5IAOWmnnsBm
+	 tVqu+317QEeFA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pMmtN-0067U2-T4;
-	Tue, 31 Jan 2023 09:25:29 +0000
+	id 1pMmtQ-0067U2-1C;
+	Tue, 31 Jan 2023 09:25:32 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 01/69] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
-Date: Tue, 31 Jan 2023 09:23:56 +0000
-Message-Id: <20230131092504.2880505-2-maz@kernel.org>
+Subject: [PATCH v8 09/69] KVM: arm64: nv: Reset VMPIDR_EL2 and VPIDR_EL2 to sane values
+Date: Tue, 31 Jan 2023 09:24:04 +0000
+Message-Id: <20230131092504.2880505-10-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230131092504.2880505-1-maz@kernel.org>
 References: <20230131092504.2880505-1-maz@kernel.org>
@@ -54,138 +54,69 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Jintack Lim <jintack.lim@linaro.org>
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-Add a new ARM64_HAS_NESTED_VIRT feature to indicate that the
-CPU has the ARMv8.3 nested virtualization capability, together
-with the 'kvm-arm.mode=nested' command line option.
-
-This will be used to support nested virtualization in KVM.
+The VMPIDR_EL2 and VPIDR_EL2 are architecturally UNKNOWN at reset, but
+let's be nice to a guest hypervisor behaving foolishly and reset these
+to something reasonable anyway.
 
 Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-[maz: moved the command-line option to kvm-arm.mode]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- .../admin-guide/kernel-parameters.txt         |  7 +++++-
- arch/arm64/include/asm/kvm_host.h             |  5 ++++
- arch/arm64/kernel/cpufeature.c                | 25 +++++++++++++++++++
- arch/arm64/kvm/arm.c                          |  5 ++++
- arch/arm64/tools/cpucaps                      |  1 +
- 5 files changed, 42 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 25 +++++++++++++++++++++----
+ 1 file changed, 21 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 6cfa6e3996cf..b7b0704e360e 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2553,9 +2553,14 @@
- 			protected: nVHE-based mode with support for guests whose
- 				   state is kept private from the host.
- 
-+			nested: VHE-based mode with support for nested
-+				virtualization. Requires at least ARMv8.3
-+				hardware.
-+
- 			Defaults to VHE/nVHE based on hardware support. Setting
- 			mode to "protected" will disable kexec and hibernation
--			for the host.
-+			for the host. "nested" is experimental and should be
-+			used with extreme caution.
- 
- 	kvm-arm.vgic_v3_group0_trap=
- 			[KVM,ARM] Trap guest accesses to GICv3 group-0
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index b14a0199eba4..186f1b759763 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -60,9 +60,14 @@
- enum kvm_mode {
- 	KVM_MODE_DEFAULT,
- 	KVM_MODE_PROTECTED,
-+	KVM_MODE_NV,
- 	KVM_MODE_NONE,
- };
-+#ifdef CONFIG_KVM
- enum kvm_mode kvm_get_mode(void);
-+#else
-+static inline enum kvm_mode kvm_get_mode(void) { return KVM_MODE_NONE; };
-+#endif
- 
- DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
- 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index a77315b338e6..3fc14ee86239 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -1956,6 +1956,20 @@ static void cpu_copy_el2regs(const struct arm64_cpu_capabilities *__unused)
- 		write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index d11c9c4c177a..2a1e8f77b56c 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -667,7 +667,7 @@ static void reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	vcpu_write_sys_reg(vcpu, actlr, ACTLR_EL1);
  }
  
-+static bool has_nested_virt_support(const struct arm64_cpu_capabilities *cap,
-+				    int scope)
-+{
-+	if (kvm_get_mode() != KVM_MODE_NV)
-+		return false;
+-static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++static u64 compute_reset_mpidr(struct kvm_vcpu *vcpu)
+ {
+ 	u64 mpidr;
+ 
+@@ -681,7 +681,24 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
+ 	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
+ 	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
+-	vcpu_write_sys_reg(vcpu, (1ULL << 31) | mpidr, MPIDR_EL1);
++	mpidr |= (1ULL << 31);
 +
-+	if (!has_cpuid_feature(cap, scope)) {
-+		pr_warn("unavailable: %s\n", cap->desc);
-+		return false;
-+	}
-+
-+	return true;
++	return mpidr;
 +}
 +
- #ifdef CONFIG_ARM64_PAN
- static void cpu_enable_pan(const struct arm64_cpu_capabilities *__unused)
- {
-@@ -2215,6 +2229,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.matches = runs_at_el2,
- 		.cpu_enable = cpu_copy_el2regs,
- 	},
-+	{
-+		.desc = "Nested Virtualization Support",
-+		.capability = ARM64_HAS_NESTED_VIRT,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.matches = has_nested_virt_support,
-+		.sys_reg = SYS_ID_AA64MMFR2_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64MMFR2_EL1_NV_SHIFT,
-+		.field_width = 4,
-+		.min_field_value = ID_AA64MMFR2_EL1_NV_IMP,
-+	},
- 	{
- 		.capability = ARM64_HAS_32BIT_EL0_DO_NOT_USE,
- 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 698787ed87e9..4e1943e3aa42 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2325,6 +2325,11 @@ static int __init early_kvm_mode_cfg(char *arg)
- 		return 0;
- 	}
- 
-+	if (strcmp(arg, "nested") == 0 && !WARN_ON(!is_kernel_in_hyp_mode())) {
-+		kvm_mode = KVM_MODE_NV;
-+		return 0;
-+	}
++static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++{
++	vcpu_write_sys_reg(vcpu, compute_reset_mpidr(vcpu), MPIDR_EL1);
++}
 +
- 	return -EINVAL;
++static void reset_vmpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++{
++	vcpu_write_sys_reg(vcpu, compute_reset_mpidr(vcpu), VMPIDR_EL2);
++}
++
++static void reset_vpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++{
++	vcpu_write_sys_reg(vcpu, read_cpuid_id(), VPIDR_EL2);
  }
- early_param("kvm-arm.mode", early_kvm_mode_cfg);
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index dfeb2c51e257..1af77a3657f7 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -31,6 +31,7 @@ HAS_GENERIC_AUTH_IMP_DEF
- HAS_IRQ_PRIO_MASKING
- HAS_LDAPR
- HAS_LSE_ATOMICS
-+HAS_NESTED_VIRT
- HAS_NO_FPSIMD
- HAS_NO_HW_PREFETCH
- HAS_PAN
+ 
+ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+@@ -2100,8 +2117,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ PMU_SYS_REG(SYS_PMCCFILTR_EL0), .access = access_pmu_evtyper,
+ 	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
+ 
+-	EL2_REG(VPIDR_EL2, access_rw, reset_val, 0),
+-	EL2_REG(VMPIDR_EL2, access_rw, reset_val, 0),
++	EL2_REG(VPIDR_EL2, access_rw, reset_vpidr, 0),
++	EL2_REG(VMPIDR_EL2, access_rw, reset_vmpidr, 0),
+ 	EL2_REG(SCTLR_EL2, access_rw, reset_val, SCTLR_EL2_RES1),
+ 	EL2_REG(ACTLR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(HCR_EL2, access_rw, reset_val, 0),
 -- 
 2.34.1
 
