@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50140808
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:41:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FB0BC433D2;
-	Tue, 31 Jan 2023 09:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C09A81A
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:41:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8D0CC433EF;
+	Tue, 31 Jan 2023 09:41:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675158067;
-	bh=xBhjj6OSLXZCK722O+yY3j4d+austxISjMyQn27kvjI=;
+	s=k20201202; t=1675158068;
+	bh=zIBjd6J+UmxYLNdtehRAaCh+NDaHVqX+rFHMmdOT+Uk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=a8LARrqCKSD/43xVEGLlmbmIpsKSaY3PaoONEIy1xkF8LYw+B1cftPEp2/bridyw5
-	 2XbahgkGl1pZJ8/YgufHVAoqO4Yq/w8XowPIlyM+h1x09zbIECiaSWrA96dhVYbx+R
-	 JKZZlyj17tSpvr5/7CWZSSXgVGdyu8TYC6+B0bgADCOWRpoS/awGnhkQMbx1Y/K8lF
-	 3QT5IFHJyT75jfRkAIUvRDo12GOf6wKijs16UuU2DxEYu4o8vtrkalpfkxJpPwvVLh
-	 EyV8MSWscrxzHulAJpn3dEbabGWIe/CnxY6BEsgTneCAGuEIDdhvPMF6UNzn/V5Ypl
-	 Y2k1DXIF0BKTA==
+	b=BL3U7P3ltb9X9443gNLgyIa9OQlwTXrL9C6tolP9i3ocp+H5HadE0meo9ZFnnuh1s
+	 qIR5oBZhducmAtgc2eatJ7tElul1FIGCcXpVLXJnYqQVM1xnZuB5FTWkcptpNNg5aU
+	 MKOmLeUo/J+lAZMW+WCIh709Gna2Tou/RiRyPjfEb9LsWj/SdiI2Wt1a1j71fHP4p+
+	 Bi2w4bjTok+zk2KLNh6oiyKzmKVWhzctF0tJruX+oQe0glZL3NEaq5vKbxVqgL9vJi
+	 X3geC2u2KTbX+CJuFN6euamVnKlWFRjR3l8ev8gTwfqX+OgWWzRt2+VQzXfOXtsFbi
+	 VyBMnxFb2rfjA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pMmtS-0067U2-IH;
-	Tue, 31 Jan 2023 09:25:34 +0000
+	id 1pMmtV-0067U2-9A;
+	Tue, 31 Jan 2023 09:25:37 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 18/69] KVM: arm64: nv: Emulate PSTATE.M for a guest hypervisor
-Date: Tue, 31 Jan 2023 09:24:13 +0000
-Message-Id: <20230131092504.2880505-19-maz@kernel.org>
+Subject: [PATCH v8 28/69] KVM: arm64: nv: Allow a sysreg to be hidden from userspace only
+Date: Tue, 31 Jan 2023 09:24:23 +0000
+Message-Id: <20230131092504.2880505-29-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230131092504.2880505-1-maz@kernel.org>
 References: <20230131092504.2880505-1-maz@kernel.org>
@@ -54,110 +54,89 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We can no longer blindly copy the VCPU's PSTATE into SPSR_EL2 and return
-to the guest and vice versa when taking an exception to the hypervisor,
-because we emulate virtual EL2 in EL1 and therefore have to translate
-the mode field from EL2 to EL1 and vice versa.
+So far, we never needed to distinguish between registers hidden
+from userspace and being hidden from a guest (they are always
+either visible to both, or hidden from both).
 
-This requires keeping track of the state we enter the guest, for which
-we transiently use a dedicated flag.
+With NV, we have the ugly case of the EL02 and EL12 registers,
+which are only a view on the EL0 and EL1 registers. It makes
+absolutely no sense to expose them to userspace, since it
+already has the canonical view.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Add a new visibility flag (REG_HIDDEN_USER) and a new helper that
+checks for it and REG_HIDDEN when checking whether to expose
+a sysreg to userspace. Subsequent patches will make use of it.
+
 Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h          |  2 ++
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 19 ++++++++++++++++-
- arch/arm64/kvm/hyp/vhe/switch.c            | 24 ++++++++++++++++++++++
- 3 files changed, 44 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c |  6 +++---
+ arch/arm64/kvm/sys_regs.h | 14 ++++++++++++--
+ 2 files changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 640997251724..a1892a8f6032 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -649,6 +649,8 @@ struct kvm_vcpu_arch {
- #define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
- /* Save TRBE context if active  */
- #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
-+/* vcpu running in HYP context */
-+#define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 732d622f5fab..eff4d41bf1bb 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3341,7 +3341,7 @@ int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
+ 	int ret;
  
- /* SVE enabled for host EL0 */
- #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index c506eabc4e21..d67c620f2af7 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -155,9 +155,26 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, SPSR_EL1),	SYS_SPSR);
+ 	r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
+-	if (!r)
++	if (!r || sysreg_hidden_user(vcpu, r))
+ 		return -ENOENT;
+ 
+ 	if (r->get_user) {
+@@ -3385,7 +3385,7 @@ int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
+ 		return -EFAULT;
+ 
+ 	r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
+-	if (!r)
++	if (!r || sysreg_hidden_user(vcpu, r))
+ 		return -ENOENT;
+ 
+ 	if (sysreg_user_write_ignore(vcpu, r))
+@@ -3471,7 +3471,7 @@ static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
+ 	if (!(rd->reg || rd->get_user))
+ 		return 0;
+ 
+-	if (sysreg_hidden(vcpu, rd))
++	if (sysreg_hidden_user(vcpu, rd))
+ 		return 0;
+ 
+ 	if (!copy_reg_to_user(rd, uind))
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index e4ebb3a379fd..6b11f2cc7146 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -85,8 +85,9 @@ struct sys_reg_desc {
+ };
+ 
+ #define REG_HIDDEN		(1 << 0) /* hidden from userspace and guest */
+-#define REG_RAZ			(1 << 1) /* RAZ from userspace and guest */
+-#define REG_USER_WI		(1 << 2) /* WI from userspace only */
++#define REG_HIDDEN_USER		(1 << 1) /* hidden from userspace only */
++#define REG_RAZ			(1 << 2) /* RAZ from userspace and guest */
++#define REG_USER_WI		(1 << 3) /* WI from userspace only */
+ 
+ static __printf(2, 3)
+ inline void print_sys_reg_msg(const struct sys_reg_params *p,
+@@ -152,6 +153,15 @@ static inline bool sysreg_hidden(const struct kvm_vcpu *vcpu,
+ 	return sysreg_visibility(vcpu, r) & REG_HIDDEN;
  }
  
-+/* Read the VCPU state's PSTATE, but translate (v)EL2 to EL1. */
-+static inline u64 to_hw_pstate(const struct kvm_cpu_context *ctxt)
++static inline bool sysreg_hidden_user(const struct kvm_vcpu *vcpu,
++				      const struct sys_reg_desc *r)
 +{
-+	u64 mode = ctxt->regs.pstate & (PSR_MODE_MASK | PSR_MODE32_BIT);
++	if (likely(!r->visibility))
++		return false;
 +
-+	switch (mode) {
-+	case PSR_MODE_EL2t:
-+		mode = PSR_MODE_EL1t;
-+		break;
-+	case PSR_MODE_EL2h:
-+		mode = PSR_MODE_EL1h;
-+		break;
-+	}
-+
-+	return (ctxt->regs.pstate & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
++	return r->visibility(vcpu, r) & (REG_HIDDEN | REG_HIDDEN_USER);
 +}
 +
- static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
+ static inline bool sysreg_visible_as_raz(const struct kvm_vcpu *vcpu,
+ 					 const struct sys_reg_desc *r)
  {
--	u64 pstate = ctxt->regs.pstate;
-+	u64 pstate = to_hw_pstate(ctxt);
- 	u64 mode = pstate & PSR_AA32_MODE_MASK;
- 
- 	/*
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 81bf236d9c27..cd3f3117bf16 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -120,6 +120,25 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
- 
- static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
-+	/*
-+	 * If we were in HYP context on entry, adjust the PSTATE view
-+	 * so that the usual helpers work correctly.
-+	 */
-+	if (unlikely(vcpu_get_flag(vcpu, VCPU_HYP_CONTEXT))) {
-+		u64 mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
-+
-+		switch (mode) {
-+		case PSR_MODE_EL1t:
-+			mode = PSR_MODE_EL2t;
-+			break;
-+		case PSR_MODE_EL1h:
-+			mode = PSR_MODE_EL2h;
-+			break;
-+		}
-+
-+		*vcpu_cpsr(vcpu) &= ~(PSR_MODE_MASK | PSR_MODE32_BIT);
-+		*vcpu_cpsr(vcpu) |= mode;
-+	}
- }
- 
- /* Switch to the guest for VHE systems running in EL2 */
-@@ -154,6 +173,11 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	sysreg_restore_guest_state_vhe(guest_ctxt);
- 	__debug_switch_to_guest(vcpu);
- 
-+	if (is_hyp_ctxt(vcpu))
-+		vcpu_set_flag(vcpu, VCPU_HYP_CONTEXT);
-+	else
-+		vcpu_clear_flag(vcpu, VCPU_HYP_CONTEXT);
-+
- 	do {
- 		/* Jump in the fire! */
- 		exit_code = __guest_enter(vcpu);
 -- 
 2.34.1
 
