@@ -1,62 +1,30 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-59.mta1.migadu.com (out-59.mta1.migadu.com [95.215.58.59])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7536373
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 01:18:20 +0000 (UTC)
-Received: by mail-pg1-f176.google.com with SMTP id v3so8970542pgh.4
-        for <kvmarm@lists.linux.dev>; Mon, 30 Jan 2023 17:18:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nnGMVzde5byvHYv17zn6FGm6u3wHPxyGxlsrl0lhE4k=;
-        b=gS0UsTJncWvJRfQYP2inbr0w8Mu5L22CyzmfbiAUp4QGhqcYv8bfopuKXmpnPhn60D
-         j7Dp9z24RyPgxOKgbgXGB+7ucB1mepqL6e6kBB3mG/4prdlzc55q5buz/8HMzcfC4JH/
-         gbvvzqjuqYmQuezVRVJ61lOEwbGna5b+/05CTJuZ+gahL0an2W1MckQeEF0wZ2C1TrYu
-         1/wf+9L9E1vXfLPWqlXVklOubKKHzRRNn6fSe81pA375Z1fkulDNSG2RDWalOdATwxNY
-         nQj3gDyIuAteYyGe/zpDLMzrsSVDJYAXrxmeeKi5q5jf+hii7FkGWgIu3Wb9YE/L0amr
-         /0nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nnGMVzde5byvHYv17zn6FGm6u3wHPxyGxlsrl0lhE4k=;
-        b=d4qENQjN/jiedKMREg4/3hy7WvyKQdJmxX98beYNFhwlv7UXN5CE7zjMu7StSuDn+F
-         WvLjYBLb9w0F/zJ6+RRE46lV4rmEkf8Gg3LsvmJKQ+Tauj/K3JUF8lFWQQah9Rt91EPT
-         bPPzQxjhxC1q7F5cPr0YDxthcxf9pyUhJ/p0iMZ9f6Z3g6OQeSdkoDb6YsSOvh5dPSMi
-         1cnFPCrO3RFsWMBzFTfiBaysG85oMuj96fB6VLzKb93i1QrdHIG5jCXxSpyoCZ4egFuy
-         cvhgnPOqbFJ+IStKCL0Vk2XLh0j4U8pxKJ2eGh+6CGjlSsRTDiC5KbgiVhElNIcZGIiA
-         H4gw==
-X-Gm-Message-State: AO0yUKWcNiuQpWgZzwaUeCKIVNCNMFeEuoChr+mqM+bJXvt7yDNHHt6e
-	wcwFDgg/iPL/ABVpiBV+Nw66Ug==
-X-Google-Smtp-Source: AK7set84RIWN7hVEPNjMKdYDJlU9OE3wecVWlKxUY5LLjtg26d7CD6T9yaGuw2Qq10wRBRGhv6rL6w==
-X-Received: by 2002:aa7:858a:0:b0:576:9252:d06 with SMTP id w10-20020aa7858a000000b0057692520d06mr1040361pfn.0.1675127899947;
-        Mon, 30 Jan 2023 17:18:19 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id f18-20020a056a00229200b0058bca264253sm8040903pfe.126.2023.01.30.17.18.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 17:18:19 -0800 (PST)
-Date: Tue, 31 Jan 2023 01:18:15 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Ricardo Koller <ricarkol@google.com>, Marc Zyngier <maz@kernel.org>,
-	pbonzini@redhat.com, yuzenghui@huawei.com, dmatlack@google.com,
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
-	catalin.marinas@arm.com, andrew.jones@linux.dev,
-	alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-	eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-	rananta@google.com, bgardon@google.com, ricarkol@gmail.com
-Subject: Re: [PATCH 6/9] KVM: arm64: Split huge pages when dirty logging is
- enabled
-Message-ID: <Y9hsV02TpQeoB0oN@google.com>
-References: <20230113035000.480021-1-ricarkol@google.com>
- <20230113035000.480021-7-ricarkol@google.com>
- <Y9BfdgL+JSYCirvm@thinky-boi>
- <CAOHnOrysMhp_8Kdv=Pe-O8ZGDbhN5HiHWVhBv795_E6+4RAzPw@mail.gmail.com>
- <86v8ktkqfx.wl-maz@kernel.org>
- <CAOHnOrx-vvuZ9n8xDRmJTBCZNiqvcqURVyrEt2tDpw5bWT0qew@mail.gmail.com>
- <Y9g0KGmsZqAZiTSP@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54736659
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 06:38:34 +0000 (UTC)
+Date: Tue, 31 Jan 2023 07:32:03 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1675146724;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=x8Kn2qeJM1klhLG/HhjicUBVZSX/GZZVoTBt/Rvyd2E=;
+	b=xxKybRY1ykRSEdudXEQS2ucWfFEh/LyCFhGW7F4W+nqF8YNTdCCoOiGZxR5VovBqsWv0rG
+	Al6UCOKMpmaAXHNNId1taW5DKnvnXvrkebJr6b9ZyB38czKut1ckVcsx/HYrFrzvtpd0Cw
+	MH3+ojnjLTYZqsvmCBL2JS/4e9GfsSw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: thuth@redhat.com, pbonzini@redhat.com, nrb@linux.ibm.com,
+	imbrenda@linux.ibm.com, marcorr@google.com,
+	alexandru.elisei@arm.com, oliver.upton@linux.dev,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [kvm-unit-tests PATCH v3 1/1] arm: Replace MAX_SMP probe loop in
+ favor of reading directly
+Message-ID: <20230131063203.67qgjf2ispi2k6hd@orel>
+References: <20230130195700.729498-1-coltonlewis@google.com>
+ <20230130195700.729498-2-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -65,30 +33,74 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y9g0KGmsZqAZiTSP@google.com>
+In-Reply-To: <20230130195700.729498-2-coltonlewis@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jan 30, 2023, Oliver Upton wrote:
-> I think that Marc's suggestion of having userspace configure this is
-> sound. After all, userspace _should_ know the granularity of the backing
-> source it chose for guest memory.
+On Mon, Jan 30, 2023 at 07:57:00PM +0000, Colton Lewis wrote:
+> Replace the MAX_SMP probe loop in favor of reading a number directly
+> from the QEMU error message. This is equally safe as the existing code
+> because the error message has had the same format as long as it has
+> existed, since QEMU v2.10. The final number before the end of the
+> error message line indicates the max QEMU supports. A short awk
+
+awk is not used, despite the comment also being updated to say it's
+being used.
+
+> program is used to extract the number, which becomes the new MAX_SMP
+> value.
 > 
-> We could also interpret a cache size of 0 to signal that userspace wants
-> to disable eager page split for a VM altogether. It is entirely possible that
-> the user will want a differing QoS between slice-of-hardware and
-> overcommitted VMs.
+> This loop logic is broken for machines with a number of CPUs that
+> isn't a power of two. This problem was noticed for gicv2 tests on
+> machines with a non-power-of-two number of CPUs greater than 8 because
+> tests were running with MAX_SMP less than 8. As a hypthetical example,
+> a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 1 ==
+> 6. This can, in rare circumstances, lead to different test results
+> depending only on the number of CPUs the machine has.
+> 
+> A previous comment explains the loop should only apply to kernels
+> <=v4.3 on arm and suggests deletion when it becomes tiresome to
+> maintian. However, it is always theoretically possible to test on a
+> machine that has more CPUs than QEMU supports, so it makes sense to
+> leave some check in place.
+> 
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  scripts/runtime.bash | 16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
+> 
+> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+> index f8794e9a..587ffe30 100644
+> --- a/scripts/runtime.bash
+> +++ b/scripts/runtime.bash
+> @@ -188,12 +188,10 @@ function run()
+>  # Probe for MAX_SMP, in case it's less than the number of host cpus.
+>  #
+>  # This probing currently only works for ARM, as x86 bails on another
 
-Maybe.  It's also entirely possible that QoS is never factored in, e.g. if QoS
-guarantees for all VMs on a system are better met by enabling eager splitting
-across the board.
+It just occurred to me that this code runs on all architectures, even
+though it only works for Arm. We should wrap this code in $ARCH
+checks or put it in a function which only Arm calls. That change
+should be a separate patch though.
 
-There are other reasons to use module/kernel params beyond what Marc listed, e.g.
-to let the user opt out even when something is on by default.  x86's TDP MMU has
-benefited greatly from downstream users being able to do A/B performance testing
-this way.  I suspect x86's eager_page_split knob was added largely for this
-reason, e.g. to easily see how a specific workload is affected by eager splitting.
-That seems like a reasonable fit on the ARM side as well.
+> -# error first. Also, this probing isn't necessary for any ARM hosts
+> -# running kernels later than v4.3, i.e. those including ef748917b52
+> -# "arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'". So, at some
+> -# point when maintaining the while loop gets too tiresome, we can
+> -# just remove it...
+> -while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
+> -		|& grep -qi 'exceeds max CPUs'; do
+> -	MAX_SMP=$((MAX_SMP >> 1))
+> -done
+> +# error first. The awk program takes the last number from the QEMU
+> +# error message, which gives the allowable MAX_SMP.
+> +if smp=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
+> +      |& grep 'exceeds max CPUs'); then
+> +	smp=${smp##*(}
+> +	MAX_SMP=${smp:0:-1}
+> +fi
+> -- 
+> 2.39.1.456.gfc5497dd1b-goog
+>
 
-IMO, we should try to avoid new uAPI without a proven need, especially if we're
-considering throwing something into memslots.  AFAIK, module params, at least on
-the x86 side of things, aren't considered immutable ABI (or maybe it's just that
-we haven't modified/removed one recently that folks care about).
+Thanks,
+drew
