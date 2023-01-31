@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6F4808
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:41:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A65A1C433D2;
-	Tue, 31 Jan 2023 09:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B215A808
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:41:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A5D0C433D2;
+	Tue, 31 Jan 2023 09:41:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675158102;
-	bh=dhvTz42JuyazXpHz1ww4ODtTIeXpTYgqJ/HxgzVe05I=;
+	s=k20201202; t=1675158104;
+	bh=NQLd+kx2LypSnl9dYhw+RFVUBmaP9stvi5I5iXIIKUQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=n3bxXxfv1nzA7Q3ssHo+NQw0xe1S0gZuLWQAF9Y1zz7Yl1CCVPhrpV8CJy2C0Fl6M
-	 Kcz3CS/KQ8i8w3UlZn3FSeXML/7tVyU7Brq+f+FLNk8hE1Y/uxTIMQMgtNh/Pqktij
-	 8fi76IpMBi3ftiJTD2euN11U496HzLmw+Y+au9KHlPFpcmPBxEbgWE8S8PSAGfv0wo
-	 PQtx1wdjJ7bwOAo1nHUX8FNVfQm6C2yEST6qJhlYABiTS2kzY9O4thNzwVm/i0tdjF
-	 emeUGGFyhV3SKQkLGjsBXl7rYzihXol6st7JCH4Lh0sWx+sbG8rjXddc6DgcmPxwIW
-	 9GCWxZREMwnfQ==
+	b=UUjSto7JkCOi6T85SzTiaOjWe2d/JMgCVe647t0KCMo6VEIz6NUt4kbsvFRQXm1UI
+	 su7aU1rkqm2UnMGFY8BdByZElYjC+qfgTbtLCNrx+FMmspjP6e20ygOBooAEosmGW3
+	 KDgThZlDH/sz4EWcVHuJatEmCLLH+CNnJKl+8DrUezAPCnKTljGT6YUkwWdggfVDt4
+	 6SDp6JYsfaekJhQCokt2zEBJsd0AkKEanP5yffBhnGFp/xd16snbp2+PPsdUEmoilE
+	 UGF7SA9f4WKQz6W9fjrDdZBRysK3EZ4sWZfmjgWVOqP0hm0WzOiojSUIHYRedR4+JQ
+	 UnrRRj5vwjtWg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pMmtT-0067U2-LQ;
-	Tue, 31 Jan 2023 09:25:35 +0000
+	id 1pMmts-0067U2-Cp;
+	Tue, 31 Jan 2023 09:26:00 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 22/69] KVM: arm64: nv: Handle PSCI call via smc from the guest
-Date: Tue, 31 Jan 2023 09:24:17 +0000
-Message-Id: <20230131092504.2880505-23-maz@kernel.org>
+Subject: [PATCH v8 50/69] KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
+Date: Tue, 31 Jan 2023 09:24:45 +0000
+Message-Id: <20230131092504.2880505-51-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230131092504.2880505-1-maz@kernel.org>
 References: <20230131092504.2880505-1-maz@kernel.org>
@@ -54,71 +54,177 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Jintack Lim <jintack.lim@linaro.org>
+From: Andre Przywara <andre.przywara@arm.com>
 
-VMs used to execute hvc #0 for the psci call if EL3 is not implemented.
-However, when we come to provide the virtual EL2 mode to the VM, the
-host OS inside the VM calls kvm_call_hyp() which is also hvc #0. So,
-it's hard to differentiate between them from the host hypervisor's point
-of view.
+The VGIC maintenance IRQ signals various conditions about the LRs, when
+the GIC's virtualization extension is used.
+So far we didn't need it, but nested virtualization needs to know about
+this interrupt, so add a userland interface to setup the IRQ number.
+The architecture mandates that it must be a PPI, on top of that this code
+only exports a per-device option, so the PPI is the same on all VCPUs.
 
-So, let the VM execute smc instruction for the psci call. On ARMv8.3,
-even if EL3 is not implemented, a smc instruction executed at non-secure
-EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than being treated as
-UNDEFINED. So, the host hypervisor can handle this psci call without any
-confusion.
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+[added some bits of documentation]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/handle_exit.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ .../virt/kvm/devices/arm-vgic-v3.rst          | 12 +++++++-
+ arch/arm64/include/uapi/asm/kvm.h             |  1 +
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         | 29 +++++++++++++++++--
+ include/kvm/arm_vgic.h                        |  3 ++
+ tools/arch/arm/include/uapi/asm/kvm.h         |  1 +
+ 5 files changed, 43 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index e75101f2aa6c..b0c343c4e062 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -63,6 +63,8 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
+diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
+index 51e5e5762571..1901e651cc00 100644
+--- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
++++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
+@@ -284,8 +284,18 @@ Groups:
+       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
  
- static int handle_smc(struct kvm_vcpu *vcpu)
- {
-+	int ret;
+   Errors:
+-
+     =======  =============================================
+     -EINVAL  vINTID is not multiple of 32 or info field is
+ 	     not VGIC_LEVEL_INFO_LINE_LEVEL
+     =======  =============================================
 +
- 	/*
- 	 * "If an SMC instruction executed at Non-secure EL1 is
- 	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
-@@ -70,10 +72,28 @@ static int handle_smc(struct kvm_vcpu *vcpu)
- 	 *
- 	 * We need to advance the PC after the trap, as it would
- 	 * otherwise return to the same address...
-+	 *
-+	 * If imm is non-zero, it's not defined, so just skip it.
-+	 */
-+	if (kvm_vcpu_hvc_get_imm(vcpu)) {
-+		vcpu_set_reg(vcpu, 0, ~0UL);
-+		kvm_incr_pc(vcpu);
-+		return 1;
++  KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ
++   Attributes:
++
++    The attr field of kvm_device_attr encodes the following values:
++
++      bits:     | 31   ....    5 | 4  ....  0 |
++      values:   |      RES0      |   vINTID   |
++
++    The vINTID specifies which interrupt is generated when the vGIC
++    must generate a maintenance interrupt. This must be a PPI.
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index f8129c624b07..8bf7b1a62e23 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -390,6 +390,7 @@ enum {
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+ #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+ #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
++#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ  9
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+ 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+index edeac2380591..0cc40b492ee1 100644
+--- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
++++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+@@ -288,6 +288,12 @@ static int vgic_get_common_attr(struct kvm_device *dev,
+ 			     VGIC_NR_PRIVATE_IRQS, uaddr);
+ 		break;
+ 	}
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
++		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++
++		r = put_user(dev->kvm->arch.vgic.maint_irq, uaddr);
++		break;
 +	}
-+
-+	/*
-+	 * If imm is zero, it's a psci call.
-+	 * Note that on ARMv8.3, even if EL3 is not implemented, SMC executed
-+	 * at Non-secure EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than
-+	 * being treated as UNDEFINED.
- 	 */
--	vcpu_set_reg(vcpu, 0, ~0UL);
-+	ret = kvm_hvc_call_handler(vcpu);
-+	if (ret < 0)
-+		vcpu_set_reg(vcpu, 0, ~0UL);
-+
- 	kvm_incr_pc(vcpu);
--	return 1;
-+
-+	return ret;
- }
+ 	}
  
- /*
+ 	return r;
+@@ -541,7 +547,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 	struct vgic_reg_attr reg_attr;
+ 	gpa_t addr;
+ 	struct kvm_vcpu *vcpu;
+-	bool uaccess;
++	bool uaccess, post_init = true;
+ 	u32 val;
+ 	int ret;
+ 
+@@ -557,6 +563,9 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 		/* Sysregs uaccess is performed by the sysreg handling code */
+ 		uaccess = false;
+ 		break;
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
++		post_init = false;
++		fallthrough;
+ 	default:
+ 		uaccess = true;
+ 	}
+@@ -569,7 +578,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 
+ 	mutex_lock(&dev->kvm->lock);
+ 
+-	if (unlikely(!vgic_initialized(dev->kvm))) {
++	if (post_init != vgic_initialized(dev->kvm)) {
+ 		ret = -EBUSY;
+ 		goto out;
+ 	}
+@@ -604,6 +613,19 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+ 		}
+ 		break;
+ 	}
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
++		if (!is_write) {
++			val = dev->kvm->arch.vgic.maint_irq;
++			ret = 0;
++			break;
++		}
++
++		ret = -EINVAL;
++		if ((val < VGIC_NR_PRIVATE_IRQS) && (val >= VGIC_NR_SGIS)) {
++			dev->kvm->arch.vgic.maint_irq = val;
++			ret = 0;
++		}
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 		break;
+@@ -629,6 +651,7 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
+ 	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+ 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
+ 		return vgic_v3_attr_regs_access(dev, attr, true);
+ 	default:
+ 		return vgic_set_common_attr(dev, attr);
+@@ -643,6 +666,7 @@ static int vgic_v3_get_attr(struct kvm_device *dev,
+ 	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+ 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO:
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
+ 		return vgic_v3_attr_regs_access(dev, attr, false);
+ 	default:
+ 		return vgic_get_common_attr(dev, attr);
+@@ -666,6 +690,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+ 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
+ 		return vgic_v3_has_attr_regs(dev, attr);
+ 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
++	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
+ 		return 0;
+ 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
+ 		if (((attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index a466cda3a739..38643d9b3813 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -243,6 +243,9 @@ struct vgic_dist {
+ 
+ 	int			nr_spis;
+ 
++	/* The GIC maintenance IRQ for nested hypervisors. */
++	u32			maint_irq;
++
+ 	/* base addresses in guest physical address space: */
+ 	gpa_t			vgic_dist_base;		/* distributor */
+ 	union {
+diff --git a/tools/arch/arm/include/uapi/asm/kvm.h b/tools/arch/arm/include/uapi/asm/kvm.h
+index 03cd7c19a683..d5dd96902817 100644
+--- a/tools/arch/arm/include/uapi/asm/kvm.h
++++ b/tools/arch/arm/include/uapi/asm/kvm.h
+@@ -246,6 +246,7 @@ struct kvm_vcpu_events {
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+ #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
+ #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
++#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ	9
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+ 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
 -- 
 2.34.1
 
