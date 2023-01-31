@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8402A94F
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 22:16:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 763E9C433EF;
-	Tue, 31 Jan 2023 22:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781C3A94F
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 22:20:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F3B1C433D2;
+	Tue, 31 Jan 2023 22:20:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675203398;
-	bh=Wolu3XhvZe+9nNY9wveQYWc3XVj4s/qvU+aEBr2FzQw=;
+	s=k20201202; t=1675203611;
+	bh=pcQEza3KoPbNfnJt045HxC3XZVo55Y4oxHZSt1l4mBM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KnrdNzr0nB7m9IvMhey7MLntrx8MGXJP0nJgmnVwv1PltRKAnC+v09mletqP3j2tb
-	 gX+mriyG89Fj9UDs7QodYrNYqHs9Cmcu192TMrWK33e8XGkjK8woT/t6mvpCb86klG
-	 Vfm6kV+BJzwiupiqRxgxd+6kcy+Ddf65jJG1532ZRN69bFW7AX2ZuRuBI+i1M45pKj
-	 0jozpHcaDsliR3u5rS+6XnHUAjTIQFSrhauFcHxgn3UR5TuA2oo5yPkjNKa0Dr0/cn
-	 SkE19wx2lZ3HPeDlbixdgby3pJgeTJD5KXOFV+12MSDMm2A0Qba6nlyTkrUvSOoPJN
-	 X9pIDBn5O16Sg==
+	b=j/EuQ6nGqKNzj8C/8BW/U8WNsTEHlMGJ5eQ2jDUJlVGDfU/o/CWZXz8m9APcJtQ6b
+	 j59nFTNVdhInhWw91temfQrNRVp0j/jIizK8dRx4X3xuGPsKtDNG9UBvyjUSh3N96g
+	 XhmY8FnybQj7SI5vuIvU+9baH/7ObsOq5V+yAXjZrvx1eb71UNinbYdSosrAX6QzC0
+	 4GS7WbQb7LYhSnDXLL3m7C1chEmVws77eiNVik/nBAi7As4iUCUoIXm89aKhNxT4Ir
+	 KRdCIcfPYw/k6JY0FI7qG/8hHdICMXEsTusVgELZquAwlP/CEDdCeNORihI4OVvqow
+	 psBKvEGWwbz5w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pMyvb-006KxO-Ub;
-	Tue, 31 Jan 2023 22:16:36 +0000
-Date: Tue, 31 Jan 2023 22:16:35 +0000
-Message-ID: <87y1picpto.wl-maz@kernel.org>
+	id 1pMyz2-006L1j-I2;
+	Tue, 31 Jan 2023 22:20:08 +0000
+Date: Tue, 31 Jan 2023 22:20:08 +0000
+Message-ID: <87wn52cpnr.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -38,13 +38,10 @@ Cc: kvmarm@lists.linux.dev,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v8 09/69] KVM: arm64: nv: Reset VMPIDR_EL2 and VPIDR_EL2 to sane values
-In-Reply-To: <Y9mRsWbKVi4sEit5@google.com>
+Subject: Re: [PATCH v8 00/69] KVM: arm64: ARMv8.3/8.4 Nested Virtualization support
+In-Reply-To: <Y9mSkdPFYotXWklH@google.com>
 References: <20230131092504.2880505-1-maz@kernel.org>
-	<20230131092504.2880505-10-maz@kernel.org>
-	<Y9l3bofl5nMWy3wZ@google.com>
-	<87zg9ycqdj.wl-maz@kernel.org>
-	<Y9mRsWbKVi4sEit5@google.com>
+	<Y9mSkdPFYotXWklH@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,41 +57,28 @@ X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kern
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 31 Jan 2023 22:09:53 +0000,
+On Tue, 31 Jan 2023 22:13:37 +0000,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> On Tue, Jan 31, 2023 at 10:04:40PM +0000, Marc Zyngier wrote:
-> > On Tue, 31 Jan 2023 20:17:50 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > 
-> > > On Tue, Jan 31, 2023 at 09:24:04AM +0000, Marc Zyngier wrote:
-> > > > From: Christoffer Dall <christoffer.dall@arm.com>
-> > > > 
-> > > > The VMPIDR_EL2 and VPIDR_EL2 are architecturally UNKNOWN at reset, but
-> > > > let's be nice to a guest hypervisor behaving foolishly and reset these
-> > > > to something reasonable anyway.
-> > > 
-> > > Must we be so kind? :)
-> > > 
-> > > In all seriousness, I've found the hexspeak value of reset_unknown() to
-> > > be a rather useful debugging aid. And I can promise you that I'll use NV
-> > > to debug my own crap changes!
-> > > 
-> > > Any particular reason against just using reset_unknown()?
-> > 
-> > Because debugging NV itself is hell when all you have is a model!
+> On Tue, Jan 31, 2023 at 09:23:55AM +0000, Marc Zyngier wrote:
+> > - I would suggest that the first 12 patches are in a mergeable
+> >   state. Only patch #2 hasn't been reviewed yet (because it is new),
+> >   but it doesn't affect anything non-NV and makes NV work. I really
+> >   want this in before CCA! :D
 > 
-> Blech!
-> 
-> > As we were trying to debug the early code base, we really wanted to
-> > make it easy to run tiny guests without much setup, and work out of
-> > the box. That's how this sort of changes came about.
-> > 
-> > In any case, something like this the hack below works as well (I just
-> > booted an L1 and a couple of L2s with it, and nothing caught fire).
-> 
-> LGTM, mind squashing it into the previous patch?
+> Sounds like a reasonable plan to me. I'm still chewing through these
+> patches, but after they've soaked for a bit on the mailing list could
+> you repost the set destined for immediate inclusion?
 
-Sure thing.
+Yup, no problem. Probably 11 patches, maybe a couple more if I manage
+to reorder the series.
+
+> OTOH, if you feel like dropping another patch bomb for the hell of it I
+> can just grab the subset. But please don't :)
+
+Hey, now you know what it feels like! :D
+
+Thanks,
 
 	M.
 
