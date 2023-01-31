@@ -1,155 +1,260 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-138.mta0.migadu.com (out-138.mta0.migadu.com [91.218.175.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9264A20E4
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 11:00:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1675162852;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE2120E4
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 11:02:37 +0000 (UTC)
+Date: Tue, 31 Jan 2023 11:46:10 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1675161978;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/vEsADki5Q+vuh8+dW4Sfzn1JKelRrET+KVQthmdvnY=;
-	b=AkFmtlyqbxpqQtzQ6M9XztLMoVJwRNvngyXjCgyAr5fi0CHW3GmMhZachd0MUHqY/Pxwc8
-	bgzcXPJoGu9NNVspBBQf109OwoW63oGeEJJS8+9T32GLZLZMYBYbjrw40fDuRUJz2W/IzC
-	21eVtARkes3OrTQwRRRVUz+r4FC+3Ug=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-189-C7BOgeRUMu2LWCnI0-T60w-1; Tue, 31 Jan 2023 06:00:49 -0500
-X-MC-Unique: C7BOgeRUMu2LWCnI0-T60w-1
-Received: by mail-qk1-f198.google.com with SMTP id g22-20020a05620a13d600b00726e7ad3f44so428352qkl.8
-        for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 03:00:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/vEsADki5Q+vuh8+dW4Sfzn1JKelRrET+KVQthmdvnY=;
-        b=ZjBUaVear8hs5VrTQunz1MZ332sjQyLxdiL3OJzK4liTODpRQ1PKn4rohr1HDZTCIb
-         1VqicKcbH7PmSrEbLwTPk0A4ypbfjzShxdDpKvqanHJ5Y/UvOPEFhHeEx1ql7SjmKczZ
-         2C40Pj/dYKJLtzxOh6AhM2YaLRxr8FQx7Rh4oyKJaY84lP1KUohi0RygnqF381frDHPt
-         7Gt+G2cuMYEvLMt2Aia8fmKyFiELckhLyYdiWxRZRXt9FROPc2v3pvfhrr2sVCLcnDSp
-         Af2i9sp9jWUroryvbnAJ5gL54qkrPqGdxgnojfmRHFBF+EH1yzPksraVxu6Jqw9jbcHS
-         U5UQ==
-X-Gm-Message-State: AO0yUKVJESeFtnuzi2ksn61HK019yMNoegsomWnheadYq+vaeKbla33V
-	gNCNWkFRqeohRWzajwqkwctjHw7Rq9uE8ytrRm6N510U4qeAZ7B7nY1Ib5qmdlKMVThZJvt0jR3
-	uCJ3mMqzdvpcP585O
-X-Received: by 2002:a05:622a:15c5:b0:3b8:6d92:bf62 with SMTP id d5-20020a05622a15c500b003b86d92bf62mr8431743qty.46.1675162848827;
-        Tue, 31 Jan 2023 03:00:48 -0800 (PST)
-X-Google-Smtp-Source: AK7set/mF94pWQd+qQNFN9TC5e4kLKvyGLJUhAz/q6EAFVu/nFoMdMZzTxlkBcszPUc11acZsafETg==
-X-Received: by 2002:a05:622a:15c5:b0:3b8:6d92:bf62 with SMTP id d5-20020a05622a15c500b003b86d92bf62mr8431703qty.46.1675162848602;
-        Tue, 31 Jan 2023 03:00:48 -0800 (PST)
-Received: from [192.168.0.2] (ip-109-43-176-155.web.vodafone.de. [109.43.176.155])
-        by smtp.gmail.com with ESMTPSA id o11-20020ac8428b000000b003b63b8df24asm2119653qtl.36.2023.01.31.03.00.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Jan 2023 03:00:48 -0800 (PST)
-Message-ID: <0fac7f76-d74d-0ed1-f810-617e9e80165f@redhat.com>
-Date: Tue, 31 Jan 2023 12:00:45 +0100
+	bh=GgHvToSNVg48//jjmZMSmXdmzAOVR/wJLuyWxt4m46M=;
+	b=gzXcQcBPkuNejCDVF5j4eP/4zEk+OLJWMje5GPgtcZmTIzqNAZ9hZZIOSkO1+B1OrKgsq5
+	KEWI9aGT6azZ/oKbkbAjfSsbjh2mTgIxtqveEAeqXsayM6ThtLNhmikaiLzmLsZ9cCyeUJ
+	34O8xqoJMsOF0/Tfzax/I8ejJiViUBQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [kvm-unit-tests PATCH v5 2/2] arm/psci: Add PSCI CPU_OFF test
+ case
+Message-ID: <20230131104610.v3n2gxmime32ae3r@orel>
+References: <20230127175916.65389-1-alexandru.elisei@arm.com>
+ <20230127175916.65389-3-alexandru.elisei@arm.com>
+ <20230131065623.7jj4a2hp44vphw5t@orel>
+ <Y9jk+MVEPYNC1heb@monolith.localdoman>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [kvm-unit-tests PATCH v3 1/1] arm: Replace MAX_SMP probe loop in
- favor of reading directly
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: Colton Lewis <coltonlewis@google.com>, pbonzini@redhat.com,
- nrb@linux.ibm.com, imbrenda@linux.ibm.com, marcorr@google.com,
- alexandru.elisei@arm.com, oliver.upton@linux.dev, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-References: <20230130195700.729498-1-coltonlewis@google.com>
- <20230130195700.729498-2-coltonlewis@google.com>
- <20230131063203.67qgjf2ispi2k6hd@orel>
- <03662bf9-1c92-085b-7418-f3a218093051@redhat.com>
- <20230131105746.yypnggzz7ifjmp4d@orel>
-From: Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230131105746.yypnggzz7ifjmp4d@orel>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y9jk+MVEPYNC1heb@monolith.localdoman>
+X-Migadu-Flow: FLOW_OUT
 
-On 31/01/2023 11.57, Andrew Jones wrote:
-> On Tue, Jan 31, 2023 at 08:41:39AM +0100, Thomas Huth wrote:
->> On 31/01/2023 07.32, Andrew Jones wrote:
->>> On Mon, Jan 30, 2023 at 07:57:00PM +0000, Colton Lewis wrote:
->>>> Replace the MAX_SMP probe loop in favor of reading a number directly
->>>> from the QEMU error message. This is equally safe as the existing code
->>>> because the error message has had the same format as long as it has
->>>> existed, since QEMU v2.10. The final number before the end of the
->>>> error message line indicates the max QEMU supports. A short awk
->>>
->>> awk is not used, despite the comment also being updated to say it's
->>> being used.
->>>
->>>> program is used to extract the number, which becomes the new MAX_SMP
->>>> value.
->>>>
->>>> This loop logic is broken for machines with a number of CPUs that
->>>> isn't a power of two. This problem was noticed for gicv2 tests on
->>>> machines with a non-power-of-two number of CPUs greater than 8 because
->>>> tests were running with MAX_SMP less than 8. As a hypthetical example,
->>
->> s/hypthetical/hypothetical/
->>
->>>> a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 1 ==
->>>> 6. This can, in rare circumstances, lead to different test results
->>>> depending only on the number of CPUs the machine has.
->>>>
->>>> A previous comment explains the loop should only apply to kernels
->>>> <=v4.3 on arm and suggests deletion when it becomes tiresome to
->>>> maintian. However, it is always theoretically possible to test on a
->>
->> s/maintian/maintain/
->>
->>>> machine that has more CPUs than QEMU supports, so it makes sense to
->>>> leave some check in place.
->>>>
->>>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
->>>> ---
->>>>    scripts/runtime.bash | 16 +++++++---------
->>>>    1 file changed, 7 insertions(+), 9 deletions(-)
->>>>
->>>> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
->>>> index f8794e9a..587ffe30 100644
->>>> --- a/scripts/runtime.bash
->>>> +++ b/scripts/runtime.bash
->>>> @@ -188,12 +188,10 @@ function run()
->>>>    # Probe for MAX_SMP, in case it's less than the number of host cpus.
->>>>    #
->>>>    # This probing currently only works for ARM, as x86 bails on another
->>>
->>> It just occurred to me that this code runs on all architectures, even
->>> though it only works for Arm. We should wrap this code in $ARCH
->>> checks or put it in a function which only Arm calls. That change
->>> should be a separate patch though.
->>
->> Or we just grep for "max CPUs", since this seems to be used on other
->> architectures, too:
->>
->> $ qemu-system-x86_64 -smp 12345
->> qemu-system-x86_64: Invalid SMP CPUs 12345. The max CPUs supported by
->> machine 'pc-i440fx-8.0' is 255
->>
->> ?
->>
+On Tue, Jan 31, 2023 at 09:52:56AM +0000, Alexandru Elisei wrote:
+> Hi Drew,
 > 
-> Yes, if we can find an arch-common way to set MAX_SMP, then the variable
-> could be used in their test configs and gitlab-ci scripts. For example,
-> afaict, x86 doesn't have any tests that run with more than 4 cpus at the
-> moment. Being able to bump that up for some tests might increase test
-> coverage. That said, it might be stretching the scope of this patch a bit
-> much. How about we keep the grep the same for now and guard with $ARCH.
-> Other architectures can either share Arm's grep, tweak the grep and share
-> it, or add their own grep, when/if they want to start using MAX_SMP.
+> On Tue, Jan 31, 2023 at 07:56:23AM +0100, Andrew Jones wrote:
+> > On Fri, Jan 27, 2023 at 05:59:16PM +0000, Alexandru Elisei wrote:
+> > > From: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
+> > > 
+> > > The test uses the following method.
+> > > 
+> > > The primary CPU brings up all the secondary CPUs, which are held in a wait
+> > > loop. Once the primary releases the CPUs, each of the secondary CPUs
+> > > proceed to issue CPU_OFF.
+> > > 
+> > > The primary CPU then checks for the status of the individual CPU_OFF
+> > > request. There is a chance that some CPUs might return from the CPU_OFF
+> > > function call after the primary CPU has finished the scan. There is no
+> > > foolproof method to handle this, but the test tries its best to
+> > > eliminate these false positives by introducing an extra delay if all the
+> > > CPUs are reported offline after the initial scan.
+> > > 
+> > > Signed-off-by: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
+> > > [ Alex E: Skip CPU_OFF test if CPU_ON failed, drop cpu_off_success in
+> > > 	  favour of checking AFFINITY_INFO, commit message tweaking ]
+> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > ---
+> > > 
+> > > Decided to drop Drew's Reviewed-by tag because the changes are not trivial
+> > > from the previous version.
+> > > 
+> > >  arm/psci.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+> > >  1 file changed, 75 insertions(+), 5 deletions(-)
+> > > 
+> > > diff --git a/arm/psci.c b/arm/psci.c
+> > > index f7238f8e0bbd..7034d8ebe6e1 100644
+> > > --- a/arm/psci.c
+> > > +++ b/arm/psci.c
+> > > @@ -72,8 +72,9 @@ static bool psci_affinity_info_off(void)
+> > >  }
+> > >  
+> > >  static int cpu_on_ret[NR_CPUS];
+> > > -static cpumask_t cpu_on_ready, cpu_on_done;
+> > > +static cpumask_t cpu_on_ready, cpu_on_done, cpu_off_done;
+> > >  static volatile int cpu_on_start;
+> > > +static volatile int cpu_off_start;
+> > >  
+> > >  extern void secondary_entry(void);
+> > >  static void cpu_on_do_wake_target(void)
+> > > @@ -171,9 +172,71 @@ static bool psci_cpu_on_test(void)
+> > >  	return !failed;
+> > >  }
+> > >  
+> > > -int main(void)
+> > > +static void cpu_off_secondary_entry(void *data)
+> > > +{
+> > > +	int cpu = smp_processor_id();
+> > > +
+> > > +	while (!cpu_off_start)
+> > > +		cpu_relax();
+> > > +	cpumask_set_cpu(cpu, &cpu_off_done);
+> > > +	cpu_psci_cpu_die();
+> > > +}
+> > > +
+> > > +static bool psci_cpu_off_test(void)
+> > > +{
+> > > +	bool failed = false;
+> > > +	int i, count, cpu;
+> > > +
+> > > +	for_each_present_cpu(cpu) {
+> > > +		if (cpu == 0)
+> > > +			continue;
+> > > +		on_cpu_async(cpu, cpu_off_secondary_entry, NULL);
+> > > +	}
+> > > +
+> > > +	cpumask_set_cpu(0, &cpu_off_done);
+> > > +
+> > > +	cpu_off_start = 1;
+> > > +	report_info("waiting for the CPUs to be offlined...");
+> > > +	while (!cpumask_full(&cpu_off_done))
+> > > +		cpu_relax();
+> > > +
+> > > +	/* Allow all the other CPUs to complete the operation */
+> > > +	for (i = 0; i < 100; i++) {
+> > > +		mdelay(10);
+> > > +
+> > > +		count = 0;
+> > > +		for_each_present_cpu(cpu) {
+> > > +			if (cpu == 0)
+> > > +				continue;
+> > > +			if (psci_affinity_info(cpus[cpu], 0) != PSCI_0_2_AFFINITY_LEVEL_OFF)
+> > > +				count++;
+> > > +		}
+> > > +		if (count > 0)
+> > > +			continue;
+> > 
+> > This should be
+> > 
+> > if (count == 0)
+> >    break;
+> > 
+> > otherwise we never leave the loop early.
+> 
+> Duh, don't know what I was thinking. Thanks for noticing it.
+> 
+> > 
+> > > +	}
+> > > +
+> > > +	/* Try to catch CPUs that return from CPU_OFF. */
+> > > +	if (count == 0)
+> > > +		mdelay(100);
+> > > +
+> > > +	for_each_present_cpu(cpu) {
+> > > +		if (cpu == 0)
+> > > +			continue;
+> > > +		if (cpu_idle(cpu)) {
+> > > +			report_info("CPU%d failed to be offlined", cpu);
+> > > +			if (psci_affinity_info(cpus[cpu], 0) == PSCI_0_2_AFFINITY_LEVEL_OFF)
+> > > +				report_info("AFFINITY_INFO incorrectly reports CPU%d as offline", cpu);
+> > > +			failed = true;
+> > > +		}
+> > > +	}
+> > > +
+> > > +	return !failed;
+> > > +}
+> > > +
+> > > +int main(int argc, char **argv)
 
-Ok, fair point, we still can adjust later.
+I just noticed we're adding argc,argv in this patch, but not using them.
 
-  Thomas
+> > >  {
+> > >  	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
+> > > +	bool cpu_on_success = true;
+> > >  
+> > >  	report_prefix_push("psci");
+> > >  
+> > > @@ -188,10 +251,17 @@ int main(void)
+> > >  	report(psci_affinity_info_on(), "affinity-info-on");
+> > >  	report(psci_affinity_info_off(), "affinity-info-off");
+> > >  
+> > > -	if (ERRATA(6c7a5dce22b3))
+> > > -		report(psci_cpu_on_test(), "cpu-on");
+> > > -	else
+> > > +	if (ERRATA(6c7a5dce22b3)) {
+> > > +		cpu_on_success = psci_cpu_on_test();
+> > > +		report(cpu_on_success, "cpu-on");
+> > > +	} else {
+> > >  		report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
+> > > +	}
+> > > +
+> > > +	if (!cpu_on_success)
+> > > +		report_skip("Skipping cpu-off test because the cpu-on test failed");
+> > 
+> > We should output "was skipped" when the cpu-on test was skipped, rather
+> > than always reporting "failed". We need two booleans, try_cpu_on_test and
+> > cpu_on_success.
+> 
+> This is not about cpu-on being a precondition for cpu-off. cpu-off makes
+> only one assumption, and that is that all secondaries can be onlined
+> successfully. Even if cpu-on is never run, cpu-off calls on_cpu_async,
+> which will online a secondary. This is safe even if the errata is not
+> present, because the errata is about concurrent CPU_ON calls for the same
+> VCPU, not for different VCPUs.
+> 
+> The cpu-off test is skipped here because it can hang indefinitely if
+> onlining CPU1 was not successful:
+> 
+> [..]
+>         for_each_present_cpu(cpu) {
+>                 if (cpu == 0)
+>                         continue;
+>                 on_cpu_async(cpu, cpu_off_secondary_entry, NULL);
+>         }
+> 
+>         cpumask_set_cpu(0, &cpu_off_done);
+> 
+>         cpu_off_start = 1;
+>         report_info("waiting for the CPUs to be offlined...");
+>         while (!cpumask_full(&cpu_off_done))	// infinite loop if CPU1
+>                 cpu_relax();			// cannot be onlined.
+> 
+> Does that make sense? Should I add a comment to make it clear why cpu-off
+> is skipped when cpu-on fails?
+
+I missed that cpu_on_success was initialized to true. Seeing that now, I
+understand how the only time it's false is if the cpu-on test failed. When
+I thought it was initialized to false it had two ways to be false, failure
+or skip. I think it's a bit confusing to set a 'success' variable to true
+when the test is skipped. Also, we can relax the condition as to whether
+or not we try cpu-off by simply checking that all cpus, other than cpu0,
+are in idle. How about
+
+ if (ERRATA(6c7a5dce22b3))
+     report(psci_cpu_on_test(), "cpu-on");
+ else
+     report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
+
+ assert(!cpu_idle(0));
+
+ if (!ERRATA(6c7a5dce22b3) || cpumask_weight(&cpu_idle_mask) == nr_cpus - 1)
+     report(psci_cpu_off_test(), "cpu-off");
+ else
+     report_skip("Skipping cpu-off test because the cpu-on test failed");
 
 
+Thanks,
+drew
+
+
+> 
+> Thanks,
+> Alex
+> 
+> > 
+> > > +	else
+> > > +		report(psci_cpu_off_test(), "cpu-off");
+> > >  
+> > >  done:
+> > >  #if 0
+> > > -- 
+> > > 2.39.0
+> > > 
+> > 
+> > Thanks,
+> > drew
