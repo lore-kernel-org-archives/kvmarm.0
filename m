@@ -1,191 +1,106 @@
-Received: from out-29.mta1.migadu.com (out-29.mta1.migadu.com [95.215.58.29])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256AC81A
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:41:19 +0000 (UTC)
-Date: Tue, 31 Jan 2023 07:56:23 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1675148184;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sWID8ti8DVCLp0zi0ZTfUQyrTwlHOgzWWaJWeVBi0eg=;
-	b=CkCu1Ez13qTGLZLLqCN+jtWn77hMWUFP5XRN9IWvjNkbu/O/qMP60J9IH2i1Lm/gicersP
-	c983mrNhgQ6ESsXDxyvMNDQvLoMFGkwGuTZ5xzRrYvZToiQhO0yx/cWkPZJ/DiMGxa9Iny
-	/JEezWkVbzVsRynW+hMLzELH+whz/DY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [kvm-unit-tests PATCH v5 2/2] arm/psci: Add PSCI CPU_OFF test
- case
-Message-ID: <20230131065623.7jj4a2hp44vphw5t@orel>
-References: <20230127175916.65389-1-alexandru.elisei@arm.com>
- <20230127175916.65389-3-alexandru.elisei@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3DF381A
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:41:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCBDDC433D2;
+	Tue, 31 Jan 2023 09:41:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1675158084;
+	bh=ycJQTa90vNc+zMPsmHdkSUMnSh/e/B8/iWuzQP1sK/U=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=eW1KAYTImXH4uKcG50l+3lzAf+qP+IcoWswxpH+ZhKTG5Bfi3Gd31I/pVgMc0Jatd
+	 s7SyMVT1BvQMLjDJ6te0nZcf/h30TutFLflJZJT/ny/v0fPZGzIyuNB6+nHUNjRy4N
+	 BUEL12QfPQzU4R3bpOXvj+ZGEuebunB4F6/m5z9g7KDZ6MiKTCCOT5yvViovu4g0sr
+	 VHg/i+Ru1LzlxO4w/3Yviogbg1LKraWDy4NKn79Rlv0XaEU+k9YFr2ihbuS8Xue5pX
+	 26dl3mT+Cqgu2SWkfiZGjXBqfLp9rixYbWuc0fMzMblLOcroLtxfQqxnV4wV3x1dwZ
+	 9SLCLshDkVLyQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pMmtQ-0067U2-Jt;
+	Tue, 31 Jan 2023 09:25:32 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v8 11/69] KVM: arm64: nv: Inject HVC exceptions to the virtual EL2
+Date: Tue, 31 Jan 2023 09:24:06 +0000
+Message-Id: <20230131092504.2880505-12-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230131092504.2880505-1-maz@kernel.org>
+References: <20230131092504.2880505-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230127175916.65389-3-alexandru.elisei@arm.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Jan 27, 2023 at 05:59:16PM +0000, Alexandru Elisei wrote:
-> From: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-> 
-> The test uses the following method.
-> 
-> The primary CPU brings up all the secondary CPUs, which are held in a wait
-> loop. Once the primary releases the CPUs, each of the secondary CPUs
-> proceed to issue CPU_OFF.
-> 
-> The primary CPU then checks for the status of the individual CPU_OFF
-> request. There is a chance that some CPUs might return from the CPU_OFF
-> function call after the primary CPU has finished the scan. There is no
-> foolproof method to handle this, but the test tries its best to
-> eliminate these false positives by introducing an extra delay if all the
-> CPUs are reported offline after the initial scan.
-> 
-> Signed-off-by: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-> [ Alex E: Skip CPU_OFF test if CPU_ON failed, drop cpu_off_success in
-> 	  favour of checking AFFINITY_INFO, commit message tweaking ]
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
-> 
-> Decided to drop Drew's Reviewed-by tag because the changes are not trivial
-> from the previous version.
-> 
->  arm/psci.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 75 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arm/psci.c b/arm/psci.c
-> index f7238f8e0bbd..7034d8ebe6e1 100644
-> --- a/arm/psci.c
-> +++ b/arm/psci.c
-> @@ -72,8 +72,9 @@ static bool psci_affinity_info_off(void)
->  }
->  
->  static int cpu_on_ret[NR_CPUS];
-> -static cpumask_t cpu_on_ready, cpu_on_done;
-> +static cpumask_t cpu_on_ready, cpu_on_done, cpu_off_done;
->  static volatile int cpu_on_start;
-> +static volatile int cpu_off_start;
->  
->  extern void secondary_entry(void);
->  static void cpu_on_do_wake_target(void)
-> @@ -171,9 +172,71 @@ static bool psci_cpu_on_test(void)
->  	return !failed;
->  }
->  
-> -int main(void)
-> +static void cpu_off_secondary_entry(void *data)
-> +{
-> +	int cpu = smp_processor_id();
-> +
-> +	while (!cpu_off_start)
-> +		cpu_relax();
-> +	cpumask_set_cpu(cpu, &cpu_off_done);
-> +	cpu_psci_cpu_die();
-> +}
-> +
-> +static bool psci_cpu_off_test(void)
-> +{
-> +	bool failed = false;
-> +	int i, count, cpu;
-> +
-> +	for_each_present_cpu(cpu) {
-> +		if (cpu == 0)
-> +			continue;
-> +		on_cpu_async(cpu, cpu_off_secondary_entry, NULL);
-> +	}
-> +
-> +	cpumask_set_cpu(0, &cpu_off_done);
-> +
-> +	cpu_off_start = 1;
-> +	report_info("waiting for the CPUs to be offlined...");
-> +	while (!cpumask_full(&cpu_off_done))
-> +		cpu_relax();
-> +
-> +	/* Allow all the other CPUs to complete the operation */
-> +	for (i = 0; i < 100; i++) {
-> +		mdelay(10);
-> +
-> +		count = 0;
-> +		for_each_present_cpu(cpu) {
-> +			if (cpu == 0)
-> +				continue;
-> +			if (psci_affinity_info(cpus[cpu], 0) != PSCI_0_2_AFFINITY_LEVEL_OFF)
-> +				count++;
-> +		}
-> +		if (count > 0)
-> +			continue;
+From: Jintack Lim <jintack.lim@linaro.org>
 
-This should be
+As we expect all PSCI calls from the L1 hypervisor to be performed
+using SMC when nested virtualization is enabled, it is clear that
+all HVC instruction from the VM (including from the virtual EL2)
+are supposed to handled in the virtual EL2.
 
-if (count == 0)
-   break;
+Forward these to EL2 as required.
 
-otherwise we never leave the loop early.
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+[maz: add handling of HCR_EL2.HCD]
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/handle_exit.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-> +	}
-> +
-> +	/* Try to catch CPUs that return from CPU_OFF. */
-> +	if (count == 0)
-> +		mdelay(100);
-> +
-> +	for_each_present_cpu(cpu) {
-> +		if (cpu == 0)
-> +			continue;
-> +		if (cpu_idle(cpu)) {
-> +			report_info("CPU%d failed to be offlined", cpu);
-> +			if (psci_affinity_info(cpus[cpu], 0) == PSCI_0_2_AFFINITY_LEVEL_OFF)
-> +				report_info("AFFINITY_INFO incorrectly reports CPU%d as offline", cpu);
-> +			failed = true;
-> +		}
-> +	}
-> +
-> +	return !failed;
-> +}
-> +
-> +int main(int argc, char **argv)
->  {
->  	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-> +	bool cpu_on_success = true;
->  
->  	report_prefix_push("psci");
->  
-> @@ -188,10 +251,17 @@ int main(void)
->  	report(psci_affinity_info_on(), "affinity-info-on");
->  	report(psci_affinity_info_off(), "affinity-info-off");
->  
-> -	if (ERRATA(6c7a5dce22b3))
-> -		report(psci_cpu_on_test(), "cpu-on");
-> -	else
-> +	if (ERRATA(6c7a5dce22b3)) {
-> +		cpu_on_success = psci_cpu_on_test();
-> +		report(cpu_on_success, "cpu-on");
-> +	} else {
->  		report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
-> +	}
-> +
-> +	if (!cpu_on_success)
-> +		report_skip("Skipping cpu-off test because the cpu-on test failed");
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index e778eefcf214..2d8c09cf3e49 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -16,6 +16,7 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_mmu.h>
++#include <asm/kvm_nested.h>
+ #include <asm/debug-monitors.h>
+ #include <asm/stacktrace/nvhe.h>
+ #include <asm/traps.h>
+@@ -41,6 +42,16 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
+ 			    kvm_vcpu_hvc_get_imm(vcpu));
+ 	vcpu->stat.hvc_exit_stat++;
+ 
++	/* Forward hvc instructions to the virtual EL2 if the guest has EL2. */
++	if (vcpu_has_nv(vcpu)) {
++		if (vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_HCD)
++			kvm_inject_undefined(vcpu);
++		else
++			kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
++
++		return 1;
++	}
++
+ 	ret = kvm_hvc_call_handler(vcpu);
+ 	if (ret < 0) {
+ 		vcpu_set_reg(vcpu, 0, ~0UL);
+-- 
+2.34.1
 
-We should output "was skipped" when the cpu-on test was skipped, rather
-than always reporting "failed". We need two booleans, try_cpu_on_test and
-cpu_on_success.
-
-> +	else
-> +		report(psci_cpu_off_test(), "cpu-off");
->  
->  done:
->  #if 0
-> -- 
-> 2.39.0
-> 
-
-Thanks,
-drew
