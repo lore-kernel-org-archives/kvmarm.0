@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8AC1808
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:42:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F488C433A1;
-	Tue, 31 Jan 2023 09:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E8B808
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:42:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B095C433EF;
+	Tue, 31 Jan 2023 09:42:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675158162;
-	bh=h1J6OM3LavEJHyI9EDArAeIgKAt25X6tuhGyuMdntGg=;
+	s=k20201202; t=1675158165;
+	bh=dHvQMGh1EyBj7A6q5y/oVjPmQ6OuDbClXpT6HV6dj3U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lMXT0eNAcMcouv79m9l0sidh0hY/YEhh6SR+OViOmkA+w2oDhDYdlCXg/cSb0xJiI
-	 iQPQvxspCZSxjoim3dyVisBznrcjXqn7fMsbvK++mQnrq56KurpeMY83fLT0w+Akqd
-	 DSpccikrNmm9u/3wvFqIjE2ZTCMJCZDq9yNAX0AHl+SYfn8AHLMF7j6Qx7HVz2ybcz
-	 9VoZ/wz/wbhgIOQkak4XKdBaM4NYIrkf0XWUf9GTzNYWbPLFiV8arEtQ9vsmXsciEc
-	 0kkXXMDVqcLVKYtVvgsqoFT7OVIuMV4LQ4cXSCW4QBWLsi6j0X66mghHUIjdV/IyYK
-	 Gd4GHIZkD5ASQ==
+	b=IIOz5kMC1gXJpQhnx9uX2uxR5gxFZ+8I1wTIiqmjzPkKKC/cQMZHTmEsS11lwZENn
+	 I15lelHxpibhXUpHktzKc1BAaqIgCjHPXTnxkS3HVoeNrra6uJF4T6XCP59RLETEL+
+	 CZMEQ8bAWTMfdblDIg1sM9jwAcuq8GB9dXp1EiGkGvMqiwfZkV7AA0OmcZP6fxpBtL
+	 6ZjUn2jaArWzFHoCi2NtQSXBqEyPgonq17s7vQYXrAhQang4Zthfhf++KkL7iD3eCC
+	 tjtalFu/MBfPIQ720XA4N0EmxDVBm7D8ekne0uZG4O3k176t2+CrCg7Xz3zC+QLJWO
+	 cWhiEnmQHLiew==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pMmtU-0067U2-Nq;
-	Tue, 31 Jan 2023 09:25:36 +0000
+	id 1pMmts-0067U2-4X;
+	Tue, 31 Jan 2023 09:26:00 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 26/69] KVM: arm64: nv: Respect virtual HCR_EL2.TVM and TRVM settings
-Date: Tue, 31 Jan 2023 09:24:21 +0000
-Message-Id: <20230131092504.2880505-27-maz@kernel.org>
+Subject: [PATCH v8 49/69] KVM: arm64: nv: vgic: Emulate the HW bit in software
+Date: Tue, 31 Jan 2023 09:24:44 +0000
+Message-Id: <20230131092504.2880505-50-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230131092504.2880505-1-maz@kernel.org>
 References: <20230131092504.2880505-1-maz@kernel.org>
@@ -54,39 +54,123 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Jintack Lim <jintack.lim@linaro.org>
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-Forward the EL1 virtual memory register traps to the virtual EL2 if they
-are not coming from the virtual EL2 and the virtual HCR_EL2.TVM or TRVM
-bit is set.
+Should the guest hypervisor use the HW bit in the LRs, we need to
+emulate the deactivation from the L2 guest into the L1 distributor
+emulation, which is handled by L0.
 
-This is for recursive nested virtualization.
+It's all good fun.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/arm64/include/asm/kvm_hyp.h     |  2 ++
+ arch/arm64/kvm/hyp/vgic-v3-sr.c      |  2 +-
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 32 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic.c           |  6 ++++--
+ include/kvm/arm_vgic.h               |  1 +
+ 5 files changed, 40 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 58c0c0eed28b..35ed217e39d8 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -420,6 +420,13 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
- 	if (el12_reg(p) && forward_nv_traps(vcpu))
- 		return false;
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 6797eafe7890..bd4ef970ecfa 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -57,6 +57,8 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
  
-+	if (!el12_reg(p)) {
-+		u64 bit = p->is_write ? HCR_TVM : HCR_TRVM;
+ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
+ 
++u64 __gic_v3_get_lr(unsigned int lr);
 +
-+		if (forward_traps(vcpu, bit))
-+			return false;
+ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if);
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 6cb638b184b1..75152c1ce646 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -18,7 +18,7 @@
+ #define vtr_to_nr_pre_bits(v)		((((u32)(v) >> 26) & 7) + 1)
+ #define vtr_to_nr_apr_regs(v)		(1 << (vtr_to_nr_pre_bits(v) - 5))
+ 
+-static u64 __gic_v3_get_lr(unsigned int lr)
++u64 __gic_v3_get_lr(unsigned int lr)
+ {
+ 	switch (lr & 0xf) {
+ 	case 0:
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index ab8ddf490b31..e88c75e79010 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -140,6 +140,38 @@ static void vgic_v3_fixup_shadow_lr_state(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
++void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
++{
++	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
++	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
++	struct vgic_irq *irq;
++	int i;
++
++	for (i = 0; i < s_cpu_if->used_lrs; i++) {
++		u64 lr = cpu_if->vgic_lr[i];
++		int l1_irq;
++
++		if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
++			continue;
++
++		/*
++		 * If we had a HW lr programmed by the guest hypervisor, we
++		 * need to emulate the HW effect between the guest hypervisor
++		 * and the nested guest.
++		 */
++		l1_irq = (lr & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT;
++		irq = vgic_get_irq(vcpu->kvm, vcpu, l1_irq);
++		if (!irq)
++			continue; /* oh well, the guest hyp is broken */
++
++		lr = __gic_v3_get_lr(i);
++		if (!(lr & ICH_LR_STATE))
++			irq->active = false;
++
++		vgic_put_irq(vcpu->kvm, irq);
 +	}
++}
 +
- 	/* We don't expect TRVM on the host */
- 	BUG_ON(!vcpu_is_el2(vcpu) && !p->is_write);
+ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 2c5a4bb6b2f9..05809462e199 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -876,9 +876,11 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ {
+ 	int used_lrs;
  
+-	/* If nesting, this is a load/put affair, not flush/sync. */
+-	if (vgic_state_is_nested(vcpu))
++	/* If nesting, emulate the HW effect from L0 to L1 */
++	if (vgic_state_is_nested(vcpu)) {
++		vgic_v3_sync_nested(vcpu);
+ 		return;
++	}
+ 
+ 	/* An empty ap_list_head implies used_lrs == 0 */
+ 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index c8af6642450d..a466cda3a739 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -398,6 +398,7 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu);
+ void kvm_vgic_put(struct kvm_vcpu *vcpu);
+ void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu);
+ 
++void vgic_v3_sync_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_load_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_put_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu);
 -- 
 2.34.1
 
