@@ -1,242 +1,61 @@
-Received: from out-91.mta1.migadu.com (out-91.mta1.migadu.com [95.215.58.91])
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7AC7EC
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 07:57:18 +0000 (UTC)
-Date: Tue, 31 Jan 2023 07:43:37 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1675147418;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b0E0PMaFQR5dXV1ymlnmzh8YVAA9azRsiP173rD9u2c=;
-	b=Urxn+yy9CWLz4OeLnVgpnXwb4CV5eSQi/kvEOJW5ieR0YvjWMeIN2Z5se/57dmiZogNj7P
-	MuV4hIJ/QjU+zaEsIxoNvZjHktw6an4WlgbFBMvQ4ITDOu6bHkcDLzDKm8PTiEjeVrC4nM
-	JFpV/Ksfgtxx7mws92CFe53lWbLYzD4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [kvm-unit-tests PATCH v5 1/2] arm/psci: Test that CPU 1 has been
- successfully brought online
-Message-ID: <20230131064337.6w73gj3inijbo3yb@orel>
-References: <20230127175916.65389-1-alexandru.elisei@arm.com>
- <20230127175916.65389-2-alexandru.elisei@arm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8EAB7EC
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 08:27:25 +0000 (UTC)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=jiapeng.chong@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0VaW1EEc_1675153625;
+Received: from localhost(mailfrom:jiapeng.chong@linux.alibaba.com fp:SMTPD_---0VaW1EEc_1675153625)
+          by smtp.aliyun-inc.com;
+          Tue, 31 Jan 2023 16:27:16 +0800
+From: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+To: maz@kernel.org
+Cc: oliver.upton@linux.dev,
+	james.morse@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+	Abaci Robot <abaci@linux.alibaba.com>
+Subject: [PATCH] arm64/sysreg: clean up some inconsistent indenting
+Date: Tue, 31 Jan 2023 16:27:03 +0800
+Message-Id: <20230131082703.118101-1-jiapeng.chong@linux.alibaba.com>
+X-Mailer: git-send-email 2.20.1.7.g153144c
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230127175916.65389-2-alexandru.elisei@arm.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 27, 2023 at 05:59:15PM +0000, Alexandru Elisei wrote:
-> For the PSCI CPU_ON function test, all other CPUs perform a CPU_ON call
-> that target CPU 1. The test is considered a success if CPU_ON returns PSCI
-> SUCCESS exactly once, and for the rest of the calls PSCI ALREADY_ON.
-> 
-> Enhance the test by checking that CPU 1 is actually online and able to
-> execute code. Also make the test more robust by checking that the CPU_ON
-> call returns, instead of assuming that it will always succeed and
-> hanging indefinitely if it doesn't.
-> 
-> Since the CPU 1 thread is now being set up properly by kvm-unit-tests
-> when being brought online, it becomes possible to add other tests in the
-> future that require all CPUs.
-> 
-> The include header order in arm/psci.c has been changed to be in
-> alphabetic order. This means moving the errata.h include before
-> libcflat.h, which causes compilation to fail because of missing includes
-> in errata.h. Fix that also by including the needed header in errata.h.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arm/psci.c        | 67 ++++++++++++++++++++++++++++++++++++++---------
->  lib/arm/asm/smp.h |  9 ++++++-
->  lib/arm/smp.c     |  4 ---
->  lib/errata.h      |  2 ++
->  4 files changed, 64 insertions(+), 18 deletions(-)
-> 
-> diff --git a/arm/psci.c b/arm/psci.c
-> index efa0722c0566..f7238f8e0bbd 100644
-> --- a/arm/psci.c
-> +++ b/arm/psci.c
-> @@ -7,11 +7,14 @@
->   *
->   * This work is licensed under the terms of the GNU LGPL, version 2.
->   */
-> -#include <libcflat.h>
->  #include <errata.h>
-> +#include <libcflat.h>
-> +
-> +#include <asm/delay.h>
-> +#include <asm/mmu.h>
->  #include <asm/processor.h>
-> -#include <asm/smp.h>
->  #include <asm/psci.h>
-> +#include <asm/smp.h>
->  
->  static bool invalid_function_exception;
->  
-> @@ -72,46 +75,84 @@ static int cpu_on_ret[NR_CPUS];
->  static cpumask_t cpu_on_ready, cpu_on_done;
->  static volatile int cpu_on_start;
->  
-> -static void cpu_on_secondary_entry(void)
-> +extern void secondary_entry(void);
-> +static void cpu_on_do_wake_target(void)
->  {
->  	int cpu = smp_processor_id();
->  
->  	cpumask_set_cpu(cpu, &cpu_on_ready);
->  	while (!cpu_on_start)
->  		cpu_relax();
-> -	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(halt));
-> +	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(secondary_entry));
->  	cpumask_set_cpu(cpu, &cpu_on_done);
->  }
->  
-> +static void cpu_on_target(void)
-> +{
-> +	int cpu = smp_processor_id();
-> +
-> +	cpumask_set_cpu(cpu, &cpu_on_done);
-> +}
-> +
-> +extern struct secondary_data secondary_data;
-> +
-> +/* Open code the setup part from smp_boot_secondary(). */
-> +static void psci_cpu_on_prepare_secondary(int cpu, secondary_entry_fn entry)
-> +{
-> +	secondary_data.stack = thread_stack_alloc();
-> +	secondary_data.entry = entry;
-> +	mmu_mark_disabled(cpu);
-> +}
-> +
->  static bool psci_cpu_on_test(void)
->  {
->  	bool failed = false;
->  	int ret_success = 0;
-> -	int cpu;
-> -
-> -	cpumask_set_cpu(1, &cpu_on_ready);
-> -	cpumask_set_cpu(1, &cpu_on_done);
-> +	int i, cpu;
->  
->  	for_each_present_cpu(cpu) {
->  		if (cpu < 2)
->  			continue;
-> -		smp_boot_secondary(cpu, cpu_on_secondary_entry);
-> +		smp_boot_secondary(cpu, cpu_on_do_wake_target);
->  	}
->  
->  	cpumask_set_cpu(0, &cpu_on_ready);
-> +	cpumask_set_cpu(1, &cpu_on_ready);
->  	while (!cpumask_full(&cpu_on_ready))
->  		cpu_relax();
->  
-> +	/*
-> +	 * Configure CPU 1 after all secondaries are online to avoid
-> +	 * secondary_data being overwritten.
-> +	 */
-> +	psci_cpu_on_prepare_secondary(1, cpu_on_target);
-> +
->  	cpu_on_start = 1;
->  	smp_mb();
->  
-> -	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(halt));
-> +	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(secondary_entry));
->  	cpumask_set_cpu(0, &cpu_on_done);
->  
-> -	while (!cpumask_full(&cpu_on_done))
-> -		cpu_relax();
-> +	report_info("waiting for CPU1 to come online...");
-> +	for (i = 0; i < 100; i++) {
-> +		mdelay(10);
-> +		if (cpumask_full(&cpu_on_done))
-> +			break;
-> +	}
->  
-> -	for_each_present_cpu(cpu) {
-> +	if (!cpumask_full(&cpu_on_done)) {
-> +		for_each_present_cpu(cpu) {
-> +			if (!cpumask_test_cpu(cpu, &cpu_on_done)) {
-> +				if (cpu == 1)
-> +					report_info("CPU1 failed to come online");
-> +				else
-> +					report_info("CPU%d failed to online CPU1", cpu);
-> +			}
-> +		}
-> +		failed = true;
-> +	}
-> +
-> +	for_each_cpu(cpu, &cpu_on_done) {
->  		if (cpu == 1)
->  			continue;
->  		if (cpu_on_ret[cpu] == PSCI_RET_SUCCESS) {
-> diff --git a/lib/arm/asm/smp.h b/lib/arm/asm/smp.h
-> index 077afde85520..dee4c1a883e7 100644
-> --- a/lib/arm/asm/smp.h
-> +++ b/lib/arm/asm/smp.h
-> @@ -10,6 +10,14 @@
->  
->  #define smp_processor_id()		(current_thread_info()->cpu)
->  
-> +typedef void (*secondary_entry_fn)(void);
-> +
-> +struct secondary_data {
-> +	void *stack;            /* must be first member of struct */
-> +	secondary_entry_fn entry;
-> +};
-> +extern struct secondary_data secondary_data;
-> +
->  extern bool cpu0_calls_idle;
->  
->  extern void halt(void);
-> @@ -48,7 +56,6 @@ static inline void set_cpu_idle(int cpu, bool idle)
->  		cpumask_clear_cpu(cpu, &cpu_idle_mask);
->  }
->  
-> -typedef void (*secondary_entry_fn)(void);
->  extern void smp_boot_secondary(int cpu, secondary_entry_fn entry);
->  extern void on_cpu_async(int cpu, void (*func)(void *data), void *data);
->  extern void on_cpu(int cpu, void (*func)(void *data), void *data);
-> diff --git a/lib/arm/smp.c b/lib/arm/smp.c
-> index 98a5054e039b..1d470d1aab45 100644
-> --- a/lib/arm/smp.c
-> +++ b/lib/arm/smp.c
-> @@ -21,10 +21,6 @@ cpumask_t cpu_present_mask;
->  cpumask_t cpu_online_mask;
->  cpumask_t cpu_idle_mask;
->  
-> -struct secondary_data {
-> -	void *stack;            /* must be first member of struct */
-> -	secondary_entry_fn entry;
-> -};
->  struct secondary_data secondary_data;
->  static struct spinlock lock;
->  
-> diff --git a/lib/errata.h b/lib/errata.h
-> index 5af0eb3bf8e2..de8205d8b370 100644
-> --- a/lib/errata.h
-> +++ b/lib/errata.h
-> @@ -6,6 +6,8 @@
->   */
->  #ifndef _ERRATA_H_
->  #define _ERRATA_H_
-> +#include <libcflat.h>
-> +
->  #include "config.h"
->  
->  #ifndef CONFIG_ERRATA_FORCE
-> -- 
-> 2.39.0
->
+No functional modification involved.
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+./arch/arm64/kvm/sys_regs.c:80:2-9: code aligned with following code on line 82.
 
-Thanks,
-drew
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Link: https://bugzilla.openanolis.cn/show_bug.cgi?id=3897
+Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+---
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 8d2747ad50ba..78dc507de757 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -79,7 +79,7 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+ 	    __vcpu_write_sys_reg_to_cpu(val, reg))
+ 		return;
+ 
+-	 __vcpu_sys_reg(vcpu, reg) = val;
++	__vcpu_sys_reg(vcpu, reg) = val;
+ }
+ 
+ /* CSSELR values; used to index KVM_REG_ARM_DEMUX_ID_CCSIDR */
+-- 
+2.20.1.7.g153144c
+
