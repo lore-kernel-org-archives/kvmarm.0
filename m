@@ -1,105 +1,245 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F628C04
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 14:43:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1675176202;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LAtdCvaYcBjQla+NfgEkiJO+riIsmgiBoPP1Uy0xazs=;
-	b=PNppBzgKtEeV2bhcg9WjBqwpVSrH/RzBd6kgDPtP3Vv9nj09rlao0mj2YyMXNIMwPLgCXs
-	1yegoP2J2dPfNRtHxolSkuUh6cpsPnRMGDA5+aNXBsieMLypzsSNY6x2hX2MYVVQlvnshC
-	U+f8DwNOMlsAxeljGaxwVBNGDm6Rov0=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-625-CI7tsavAP_WNeGkR03Rmgg-1; Tue, 31 Jan 2023 09:43:20 -0500
-X-MC-Unique: CI7tsavAP_WNeGkR03Rmgg-1
-Received: by mail-qt1-f199.google.com with SMTP id a24-20020ac84d98000000b003b9a4958f0cso1817305qtw.3
-        for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 06:43:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LAtdCvaYcBjQla+NfgEkiJO+riIsmgiBoPP1Uy0xazs=;
-        b=tQ/ABasS/De0Qo99aLwPyt1PJDern4zFGOwP4+jLD/GSOWadB+YNKQKifVtVSnvH9n
-         u4ifB+Ck0xOGbcVBKKW5ECEezvKyGtEtEkHDxq/UhSkDgeGKyGoyU8nYGzeuQqOs1Qsi
-         q9oKbbovm6usVKjqsCED83fkBZN4F7msu6pAsG4N0CZjWiSQ718h7mZEZNd1W5xeBj5w
-         v3I+QC4aEbg0wg138lFBCGXlLZ+VpoMKv2Yz8u3i5nm6c1BuYsQ6Suj6iwnEoctcHkxm
-         YHOL5dUN4SKuSPi7ysRq7s8zueXzfk+2NPEQRkZAcktAYGDbFI0jxvEiqY1+K31RKNey
-         rMYg==
-X-Gm-Message-State: AFqh2kpZ7wBM8VC5T/o3q9gAAe6mfPTnAu+ZlFA9GRlfxf8dkdjREANZ
-	4nIP3zUO9mfSZaAezC3pcr3Sylgz5VDPmU5gdL7ntVrtdaJIdv9LM4WYdFGBImdgKsctRz5fvh7
-	4lMk4EwJ8+RhaUcsf
-X-Received: by 2002:ac8:7ec4:0:b0:3b6:3c9c:59f0 with SMTP id x4-20020ac87ec4000000b003b63c9c59f0mr75200611qtj.15.1675176199682;
-        Tue, 31 Jan 2023 06:43:19 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXuXH7IzWL307K632kUG5faoKR8tSdHwFt5EW1IhyhwYmM3PlJhpLhToOa2tJxLyWOWsmCmU4Q==
-X-Received: by 2002:ac8:7ec4:0:b0:3b6:3c9c:59f0 with SMTP id x4-20020ac87ec4000000b003b63c9c59f0mr75200586qtj.15.1675176199464;
-        Tue, 31 Jan 2023 06:43:19 -0800 (PST)
-Received: from [192.168.0.2] (ip-109-43-176-155.web.vodafone.de. [109.43.176.155])
-        by smtp.gmail.com with ESMTPSA id z20-20020ac84314000000b003b960aad697sm2448545qtm.9.2023.01.31.06.43.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Jan 2023 06:43:18 -0800 (PST)
-Message-ID: <16e95056-919a-47dc-3ed7-50c29d39b6ae@redhat.com>
-Date: Tue, 31 Jan 2023 15:43:13 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE4E8F4B
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 17:22:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675185731; x=1706721731;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=bpvJgwwe71sy+pvgY/I6hCatJa+6nAncMTfShycDUFo=;
+  b=UAC7P6616YNkbornukrK2ujkgX6tyvQGAZ/4RPL2KzYp4BvG0XJcK7y9
+   vs7KOQxHmaO4bMPjR/JwCmFp8nGdwoTk4NXubjrNjNVnj4cBqxcu8L9wi
+   soAIVEWvN5KN1tIeTohh0M/HgBRaQCP7a59zW4e9c0ST2DCuYuytFSoUA
+   sGMiQFv6c4xu7wzX6ODyDx7Zb7FCNyR0JpZV+StOH7fJ8qBF7d2seyiF3
+   7aMxswORNii1JGNe6KNYTEmPDKlzhXANSQhM84FJ79WR9fLkrSrgZ2A7P
+   VYJTcCuoLcOhgr/6y/NSbFdGzWpgsn7MNWVp2HT/S5io2kgS65gJ2bh0j
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10607"; a="355228111"
+X-IronPort-AV: E=Sophos;i="5.97,261,1669104000"; 
+   d="scan'208";a="355228111"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2023 09:22:09 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10607"; a="728019117"
+X-IronPort-AV: E=Sophos;i="5.97,261,1669104000"; 
+   d="scan'208";a="728019117"
+Received: from lkp-server01.sh.intel.com (HELO ffa7f14d1d0f) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 31 Jan 2023 09:22:06 -0800
+Received: from kbuild by ffa7f14d1d0f with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1pMuKb-0004a6-2P;
+	Tue, 31 Jan 2023 17:22:05 +0000
+Date: Wed, 01 Feb 2023 01:21:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-trace-kernel@vger.kernel.org, linux-tegra@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, intel-gfx@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, amd-gfx@lists.freedesktop.org,
+ Linux Memory Management List <linux-mm@kvack.org>
+Subject: [linux-next:master] BUILD REGRESSION
+ 80bd9028fecadae4e8e3a278cd32d74badc2a6e0
+Message-ID: <63d94e2e.jzxGzbcXl36Z5WOi%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [RFC kvm-unit-tests 01/27] lib/string: include stddef.h for
- size_t
-To: Joey Gouly <joey.gouly@arm.com>, Andrew Jones <andrew.jones@linux.dev>,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
- Quentin Perret <qperret@google.com>, Steven Price <steven.price@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-coco@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
- <20230127114108.10025-1-joey.gouly@arm.com>
- <20230127114108.10025-2-joey.gouly@arm.com>
-From: Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230127114108.10025-2-joey.gouly@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-On 27/01/2023 12.40, Joey Gouly wrote:
-> Don't implicitly rely on this header being included.
-> 
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> ---
->   lib/string.h | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/lib/string.h b/lib/string.h
-> index b07763ea..758dca8a 100644
-> --- a/lib/string.h
-> +++ b/lib/string.h
-> @@ -7,6 +7,8 @@
->   #ifndef _STRING_H_
->   #define _STRING_H_
->   
-> +#include <stddef.h>  /* For size_t */
-> +
->   extern size_t strlen(const char *buf);
->   extern size_t strnlen(const char *buf, size_t maxlen);
->   extern char *strcat(char *dest, const char *src);
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: 80bd9028fecadae4e8e3a278cd32d74badc2a6e0  Add linux-next specific files for 20230131
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Error/Warning reports:
 
+https://lore.kernel.org/oe-kbuild-all/202301230743.Xnut0Zvc-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301300743.bp7Dpazv-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301301801.y5O08tQx-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301302110.mEtNwkBD-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301310227.SeMvYeta-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301310939.TAgCOEZb-lkp@intel.com
+
+Error/Warning: (recently discovered and may have been fixed)
+
+Documentation/riscv/uabi.rst:24: WARNING: Enumerated list ends without a blank line; unexpected unindent.
+ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/fsl-edma.ko] undefined!
+ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/idma64.ko] undefined!
+arch/arm64/kvm/arm.c:2206: warning: expecting prototype for Initialize Hyp(). Prototype was for kvm_arm_init() instead
+drivers/clk/qcom/gcc-sa8775p.c:313:32: warning: unused variable 'gcc_parent_map_10' [-Wunused-const-variable]
+drivers/clk/qcom/gcc-sa8775p.c:318:37: warning: unused variable 'gcc_parent_data_10' [-Wunused-const-variable]
+drivers/clk/qcom/gcc-sa8775p.c:333:32: warning: unused variable 'gcc_parent_map_12' [-Wunused-const-variable]
+drivers/clk/qcom/gcc-sa8775p.c:338:37: warning: unused variable 'gcc_parent_data_12' [-Wunused-const-variable]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:148:6: warning: no previous prototype for 'link_dp_trace_set_edp_power_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:158:10: warning: no previous prototype for 'link_dp_trace_get_edp_poweron_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:163:10: warning: no previous prototype for 'link_dp_trace_get_edp_poweroff_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_capability.c:1295:32: warning: variable 'result_write_min_hblank' set but not used [-Wunused-but-set-variable]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_capability.c:279:42: warning: variable 'ds_port' set but not used [-Wunused-but-set-variable]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_training.c:1585:38: warning: variable 'result' set but not used [-Wunused-but-set-variable]
+drivers/gpu/host1x/dev.c:520:6: warning: variable 'syncpt_irq' is uninitialized when used here [-Wuninitialized]
+ftrace-ops.c:(.init.text+0x2cb): undefined reference to `__udivdi3'
+
+Unverified Error/Warning (likely false positive, please contact us if interested):
+
+drivers/nvmem/imx-ocotp.c:599:21: sparse: sparse: symbol 'imx_ocotp_layout' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:106:40: sparse: sparse: symbol 'tsens_9607_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:26:40: sparse: sparse: symbol 'tsens_8916_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:42:40: sparse: sparse: symbol 'tsens_8939_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:62:40: sparse: sparse: symbol 'tsens_8974_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:84:40: sparse: sparse: symbol 'tsens_8974_backup_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v1.c:24:40: sparse: sparse: symbol 'tsens_qcs404_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v1.c:45:40: sparse: sparse: symbol 'tsens_8976_nvmem' was not declared. Should it be static?
+
+Error/Warning ids grouped by kconfigs:
+
+gcc_recent_errors
+|-- alpha-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- alpha-randconfig-s052-20230129
+|   |-- drivers-nvmem-imx-ocotp.c:sparse:sparse:symbol-imx_ocotp_layout-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8916_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8939_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8974_backup_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8974_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_9607_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v1.c:sparse:sparse:symbol-tsens_8976_nvmem-was-not-declared.-Should-it-be-static
+|   `-- drivers-thermal-qcom-tsens-v1.c:sparse:sparse:symbol-tsens_qcs404_nvmem-was-not-declared.-Should-it-be-static
+|-- arc-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- arm-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- arm-randconfig-s032-20230129
+|   `-- drivers-nvmem-imx-ocotp.c:sparse:sparse:symbol-imx_ocotp_layout-was-not-declared.-Should-it-be-static
+|-- arm-randconfig-s041-20230129
+|   `-- drivers-nvmem-imx-ocotp.c:sparse:sparse:symbol-imx_ocotp_layout-was-not-declared.-Should-it-be-static
+|-- arm64-allyesconfig
+|   |-- arch-arm64-kvm-arm.c:warning:expecting-prototype-for-Initialize-Hyp().-Prototype-was-for-kvm_arm_init()-instead
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- arm64-buildonly-randconfig-r005-20230130
+|   `-- arch-arm64-kvm-arm.c:warning:expecting-prototype-for-Initialize-Hyp().-Prototype-was-for-kvm_arm_init()-instead
+|-- csky-randconfig-c44-20230131
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+clang_recent_errors
+|-- arm-randconfig-r001-20230129
+|   `-- drivers-gpu-host1x-dev.c:warning:variable-syncpt_irq-is-uninitialized-when-used-here
+|-- mips-buildonly-randconfig-r006-20230129
+|   |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_data_10
+|   |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_data_12
+|   |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_map_10
+|   `-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_map_12
+`-- mips-randconfig-r036-20230129
+    |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_data_10
+    |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_data_12
+    |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_map_10
+    `-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_map_12
+
+elapsed time: 723m
+
+configs tested: 69
+configs skipped: 2
+
+gcc tested configs:
+um                             i386_defconfig
+um                           x86_64_defconfig
+x86_64                            allnoconfig
+arc                                 defconfig
+s390                             allmodconfig
+alpha                               defconfig
+s390                                defconfig
+x86_64               randconfig-a001-20230130
+i386                                defconfig
+s390                             allyesconfig
+x86_64               randconfig-a003-20230130
+powerpc                           allnoconfig
+x86_64               randconfig-a004-20230130
+i386                 randconfig-a002-20230130
+x86_64               randconfig-a002-20230130
+x86_64                    rhel-8.3-kselftests
+i386                 randconfig-a001-20230130
+x86_64                          rhel-8.3-func
+i386                 randconfig-a004-20230130
+x86_64               randconfig-a006-20230130
+i386                 randconfig-a003-20230130
+x86_64                              defconfig
+i386                 randconfig-a005-20230130
+x86_64               randconfig-a005-20230130
+ia64                             allmodconfig
+i386                 randconfig-a006-20230130
+x86_64                               rhel-8.3
+i386                             allyesconfig
+arm                                 defconfig
+x86_64                           rhel-8.3-syz
+x86_64                         rhel-8.3-kunit
+x86_64                           allyesconfig
+alpha                            allyesconfig
+arc                  randconfig-r043-20230129
+x86_64                           rhel-8.3-kvm
+m68k                             allyesconfig
+m68k                             allmodconfig
+x86_64                           rhel-8.3-bpf
+arc                              allyesconfig
+arm                  randconfig-r046-20230129
+arm                  randconfig-r046-20230130
+sh                               allmodconfig
+arc                  randconfig-r043-20230130
+i386                          randconfig-c001
+mips                             allyesconfig
+arm64                            allyesconfig
+powerpc                          allmodconfig
+arm                              allyesconfig
+
+clang tested configs:
+x86_64                          rhel-8.3-rust
+x86_64               randconfig-a014-20230130
+x86_64               randconfig-a012-20230130
+x86_64               randconfig-a013-20230130
+x86_64               randconfig-a011-20230130
+x86_64               randconfig-a015-20230130
+hexagon              randconfig-r041-20230129
+x86_64               randconfig-a016-20230130
+riscv                randconfig-r042-20230129
+i386                 randconfig-a013-20230130
+riscv                randconfig-r042-20230130
+i386                 randconfig-a012-20230130
+hexagon              randconfig-r045-20230130
+i386                 randconfig-a014-20230130
+hexagon              randconfig-r041-20230130
+hexagon              randconfig-r045-20230129
+i386                 randconfig-a015-20230130
+i386                 randconfig-a011-20230130
+s390                 randconfig-r044-20230129
+i386                 randconfig-a016-20230130
+s390                 randconfig-r044-20230130
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
