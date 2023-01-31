@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E30808
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:43:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65C4CC4339B;
-	Tue, 31 Jan 2023 09:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC84808
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:43:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 585BAC433D2;
+	Tue, 31 Jan 2023 09:43:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675158180;
-	bh=A8APb/ShbfEk/49VtpSdFlMSQpzv8xpXTIJI/KZaCbQ=;
+	s=k20201202; t=1675158182;
+	bh=IUtvb7PsSsSK+uHDS4ibr2J82DAxYycRjntArVr2heY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=t4eliMzL9aXBNN+dY8khuA2nxK5Bsxq7JJEq51BbGVlU68h4Hbu8KpXdfyXLcMiWo
-	 Avu3VlKFwQFnF9rch+przGe2q10cHfcTwNXNWYctFXgAn2euIU92ABFLSiPG9HAGPS
-	 ULNNENv+Qk1RPgo75JdfFko+TG6QWs+sdmR+FoOTINN0HQWx9oMQunAzzRIBwTL8Fz
-	 Q7BlGz4IGOEMBwjy9ju5Zi1oTyqr44tduoEpp3EnSid10brVpEXkQWTFxCQQBomoWE
-	 eXjl0mC27EN+I5JRBWihZYzFY//2gtQvoC7YVdC799sekT0EBOeURA/i6tkzZUvGOR
-	 rI25RZc37uqRg==
+	b=pKwmkyatO7alq8CrJ3jxxn3OETU6xf6bVvh0PWfJUajZHxoERY3HznMvtyC/rurdC
+	 2wtJUx4TqcyDgEUYkmL9m2e/XpMhdtJbxrDlpxlKAIvGIiwMN9SuR+ULCernnLIodK
+	 KbvuQnkemM4Cv25hYsF7l7ywkfy9UCSQprFVyNyUwIUyB/C7geHcB+iY2wcYh5V3M7
+	 kL4tqovMhWjk/SyjYIpPyyM2JNgkxXakgFa2Z9wNU6nDxF0Npacg9VsN2ZhYBYhxEw
+	 tCLNZt/xRcnC6fg6YeXxj2dmKVwFOxmZRV9NqNB7r5zROvPwlbiT21wefxDhAiPNBh
+	 FGj9/gSJ5atlQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pMmts-0067U2-LD;
-	Tue, 31 Jan 2023 09:26:00 +0000
+	id 1pMmtR-0067U2-Fv;
+	Tue, 31 Jan 2023 09:25:33 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 51/69] KVM: arm64: nv: Implement maintenance interrupt forwarding
-Date: Tue, 31 Jan 2023 09:24:46 +0000
-Message-Id: <20230131092504.2880505-52-maz@kernel.org>
+Subject: [PATCH v8 14/69] KVM: arm64: nv: Handle virtual EL2 registers in vcpu_read/write_sys_reg()
+Date: Tue, 31 Jan 2023 09:24:09 +0000
+Message-Id: <20230131092504.2880505-15-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230131092504.2880505-1-maz@kernel.org>
 References: <20230131092504.2880505-1-maz@kernel.org>
@@ -54,149 +54,209 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When we take a maintenance interrupt, we need to decide whether
-it is generated on an action from the guest, or if it is something
-that needs to be forwarded to the guest hypervisor.
+KVM internally uses accessor functions when reading or writing the
+guest's system registers. This takes care of accessing either the stored
+copy or using the "live" EL1 system registers when the host uses VHE.
 
+With the introduction of virtual EL2 we add a bunch of EL2 system
+registers, which now must also be taken care of:
+- If the guest is running in vEL2, and we access an EL1 sysreg, we must
+  revert to the stored version of that, and not use the CPU's copy.
+- If the guest is running in vEL1, and we access an EL2 sysreg, we must
+  also use the stored version, since the CPU carries the EL1 copy.
+- Some EL2 system registers are supposed to affect the current execution
+  of the system, so we need to put them into their respective EL1
+  counterparts. For this we need to define a mapping between the two.
+  This is done using the newly introduced struct el2_sysreg_map.
+- Some EL2 system registers have a different format than their EL1
+  counterpart, so we need to translate them before writing them to the
+  CPU. This is done using an (optional) translate function in the map.
+- There are the three special registers SP_EL2, SPSR_EL2 and ELR_EL2,
+  which need some separate handling (SPSR_EL2 is being handled in a
+  separate patch).
+
+All of these cases are now wrapped into the existing accessor functions,
+so KVM users wouldn't need to care whether they access EL2 or EL1
+registers and also which state the guest is in.
+
+This handles what was formerly known as the "shadow state" dynamically,
+without requiring a separate copy for each vCPU EL.
+
+Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Co-developed-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-init.c      | 33 ++++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic-v3-nested.c | 28 ++++++++++++++++++-----
- 2 files changed, 55 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 141 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 137 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index cd134db41a57..a97279f82bbd 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -6,10 +6,12 @@
- #include <linux/uaccess.h>
- #include <linux/interrupt.h>
- #include <linux/cpu.h>
-+#include <linux/irq.h>
- #include <linux/kvm_host.h>
- #include <kvm/arm_vgic.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_nested.h>
- #include "vgic.h"
- 
- /*
-@@ -222,6 +224,16 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
- 	if (!irqchip_in_kernel(vcpu->kvm))
- 		return 0;
- 
-+	if (vcpu_has_nv(vcpu)) {
-+		/* Cope with vintage userspace. Maybe we should fail instead */
-+		if (vcpu->kvm->arch.vgic.maint_irq == 0)
-+			vcpu->kvm->arch.vgic.maint_irq = kvm_vgic_global_state.maint_irq;
-+		ret = kvm_vgic_set_owner(vcpu, vcpu->kvm->arch.vgic.maint_irq,
-+					 vcpu);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	/*
- 	 * If we are creating a VCPU with a GICv3 we must also register the
- 	 * KVM io device for the redistributor that belongs to this VCPU.
-@@ -478,12 +490,23 @@ void kvm_vgic_cpu_down(void)
- 
- static irqreturn_t vgic_maintenance_handler(int irq, void *data)
- {
-+	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)data;
-+
- 	/*
- 	 * We cannot rely on the vgic maintenance interrupt to be
- 	 * delivered synchronously. This means we can only use it to
- 	 * exit the VM, and we perform the handling of EOIed
- 	 * interrupts on the exit path (see vgic_fold_lr_state).
- 	 */
-+
-+	/* If not nested, deactivate */
-+	if (!vcpu || !vgic_state_is_nested(vcpu)) {
-+		irq_set_irqchip_state(irq, IRQCHIP_STATE_ACTIVE, false);
-+		return IRQ_HANDLED;
-+	}
-+
-+	/* Assume nested from now */
-+	vgic_v3_handle_nested_maint_irq(vcpu);
- 	return IRQ_HANDLED;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 2a1e8f77b56c..6704b64e3982 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -63,23 +63,156 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
+ 	return false;
  }
  
-@@ -582,6 +605,16 @@ int kvm_vgic_hyp_init(void)
- 		return ret;
- 	}
++#define PURE_EL2_SYSREG(el2)						\
++	case el2: {							\
++		*el1r = el2;						\
++		return true;						\
++	}
++
++#define MAPPED_EL2_SYSREG(el2, el1, fn)					\
++	case el2: {							\
++		*xlate = fn;						\
++		*el1r = el1;						\
++		return true;						\
++	}
++
++static bool get_el2_to_el1_mapping(unsigned int reg,
++				   unsigned int *el1r, u64 (**xlate)(u64))
++{
++	switch (reg) {
++		PURE_EL2_SYSREG(  VPIDR_EL2	);
++		PURE_EL2_SYSREG(  VMPIDR_EL2	);
++		PURE_EL2_SYSREG(  ACTLR_EL2	);
++		PURE_EL2_SYSREG(  HCR_EL2	);
++		PURE_EL2_SYSREG(  MDCR_EL2	);
++		PURE_EL2_SYSREG(  HSTR_EL2	);
++		PURE_EL2_SYSREG(  HACR_EL2	);
++		PURE_EL2_SYSREG(  VTTBR_EL2	);
++		PURE_EL2_SYSREG(  VTCR_EL2	);
++		PURE_EL2_SYSREG(  RVBAR_EL2	);
++		PURE_EL2_SYSREG(  TPIDR_EL2	);
++		PURE_EL2_SYSREG(  HPFAR_EL2	);
++		PURE_EL2_SYSREG(  ELR_EL2	);
++		PURE_EL2_SYSREG(  SPSR_EL2	);
++		PURE_EL2_SYSREG(  CNTHCTL_EL2	);
++		MAPPED_EL2_SYSREG(SCTLR_EL2,   SCTLR_EL1,
++				  translate_sctlr_el2_to_sctlr_el1	     );
++		MAPPED_EL2_SYSREG(CPTR_EL2,    CPACR_EL1,
++				  translate_cptr_el2_to_cpacr_el1	     );
++		MAPPED_EL2_SYSREG(TTBR0_EL2,   TTBR0_EL1,
++				  translate_ttbr0_el2_to_ttbr0_el1	     );
++		MAPPED_EL2_SYSREG(TTBR1_EL2,   TTBR1_EL1,   NULL	     );
++		MAPPED_EL2_SYSREG(TCR_EL2,     TCR_EL1,
++				  translate_tcr_el2_to_tcr_el1		     );
++		MAPPED_EL2_SYSREG(VBAR_EL2,    VBAR_EL1,    NULL	     );
++		MAPPED_EL2_SYSREG(AFSR0_EL2,   AFSR0_EL1,   NULL	     );
++		MAPPED_EL2_SYSREG(AFSR1_EL2,   AFSR1_EL1,   NULL	     );
++		MAPPED_EL2_SYSREG(ESR_EL2,     ESR_EL1,     NULL	     );
++		MAPPED_EL2_SYSREG(FAR_EL2,     FAR_EL1,     NULL	     );
++		MAPPED_EL2_SYSREG(MAIR_EL2,    MAIR_EL1,    NULL	     );
++		MAPPED_EL2_SYSREG(AMAIR_EL2,   AMAIR_EL1,   NULL	     );
++	default:
++		return false;
++	}
++}
++
+ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+ {
+ 	u64 val = 0x8badf00d8badf00d;
++	u64 (*xlate)(u64) = NULL;
++	unsigned int el1r;
  
-+	if (has_mask) {
-+		ret = irq_set_vcpu_affinity(kvm_vgic_global_state.maint_irq,
-+					    kvm_get_running_vcpus());
-+		if (ret) {
-+			kvm_err("Error setting vcpu affinity\n");
-+			free_percpu_irq(kvm_vgic_global_state.maint_irq, kvm_get_running_vcpus());
-+			return ret;
+-	if (vcpu_get_flag(vcpu, SYSREGS_ON_CPU) &&
+-	    __vcpu_read_sys_reg_from_cpu(reg, &val))
++	if (!vcpu_get_flag(vcpu, SYSREGS_ON_CPU))
++		goto memory_read;
++
++	if (unlikely(get_el2_to_el1_mapping(reg, &el1r, &xlate))) {
++		if (!is_hyp_ctxt(vcpu))
++			goto memory_read;
++
++		/*
++		 * ELR_EL2 is special cased for now.
++		 */
++		switch (reg) {
++		case ELR_EL2:
++			return read_sysreg_el1(SYS_ELR);
 +		}
++
++		/*
++		 * If this register does not have an EL1 counterpart,
++		 * then read the stored EL2 version.
++		 */
++		if (reg == el1r)
++			goto memory_read;
++
++		/*
++		 * If we have a non-VHE guest and that the sysreg
++		 * requires translation to be used at EL1, use the
++		 * in-memory copy instead.
++		 */
++		if (!vcpu_el2_e2h_is_set(vcpu) && xlate)
++			goto memory_read;
++
++		/* Get the current version of the EL1 counterpart. */
++		WARN_ON(!__vcpu_read_sys_reg_from_cpu(el1r, &val));
++		return val;
 +	}
 +
- 	kvm_info("vgic interrupt IRQ%d\n", kvm_vgic_global_state.maint_irq);
- 	return 0;
++	/* EL1 register can't be on the CPU if the guest is in vEL2. */
++	if (unlikely(is_hyp_ctxt(vcpu)))
++		goto memory_read;
++
++	if (__vcpu_read_sys_reg_from_cpu(reg, &val))
+ 		return val;
+ 
++memory_read:
+ 	return __vcpu_sys_reg(vcpu, reg);
  }
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index e88c75e79010..755e4819603a 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -175,10 +175,20 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
- void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
+ 
+ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
  {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	struct vgic_irq *irq;
-+	unsigned long flags;
- 
- 	vgic_cpu->shadow_vgic_v3 = vgic_cpu->nested_vgic_v3;
- 	vgic_v3_create_shadow_lr(vcpu);
- 	__vgic_v3_restore_state(vcpu_shadow_if(vcpu));
+-	if (vcpu_get_flag(vcpu, SYSREGS_ON_CPU) &&
+-	    __vcpu_write_sys_reg_to_cpu(val, reg))
++	u64 (*xlate)(u64) = NULL;
++	unsigned int el1r;
 +
-+	irq = vgic_get_irq(vcpu->kvm, vcpu, vcpu->kvm->arch.vgic.maint_irq);
-+	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-+	if (irq->line_level || irq->active)
-+		irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
-+				      IRQCHIP_STATE_ACTIVE, true);
-+	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-+	vgic_put_irq(vcpu->kvm, irq);
- }
- 
- void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
-@@ -193,20 +203,26 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
- 	 */
- 	vgic_v3_fixup_shadow_lr_state(vcpu);
- 	vgic_cpu->nested_vgic_v3 = vgic_cpu->shadow_vgic_v3;
-+	irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
-+			      IRQCHIP_STATE_ACTIVE, false);
- }
- 
- void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
- {
--	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
--
- 	/*
- 	 * If we exit a nested VM with a pending maintenance interrupt from the
- 	 * GIC, then we need to forward this to the guest hypervisor so that it
- 	 * can re-sync the appropriate LRs and sample level triggered interrupts
- 	 * again.
- 	 */
--	if (vgic_state_is_nested(vcpu) &&
--	    (cpu_if->vgic_hcr & ICH_HCR_EN) &&
--	    vgic_v3_get_misr(vcpu))
--		kvm_inject_nested_irq(vcpu);
-+	if (vgic_state_is_nested(vcpu)) {
-+		struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
-+		bool state;
++	if (!vcpu_get_flag(vcpu, SYSREGS_ON_CPU))
++		goto memory_write;
 +
-+		state  = cpu_if->vgic_hcr & ICH_HCR_EN;
-+		state &= vgic_v3_get_misr(vcpu);
++	if (unlikely(get_el2_to_el1_mapping(reg, &el1r, &xlate))) {
++		if (!is_hyp_ctxt(vcpu))
++			goto memory_write;
 +
-+		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-+				    vcpu->kvm->arch.vgic.maint_irq, state, vcpu);
++		/*
++		 * Always store a copy of the write to memory to avoid having
++		 * to reverse-translate virtual EL2 system registers for a
++		 * non-VHE guest hypervisor.
++		 */
++		__vcpu_sys_reg(vcpu, reg) = val;
++
++		switch (reg) {
++		case ELR_EL2:
++			write_sysreg_el1(val, SYS_ELR);
++			return;
++		}
++
++		/* No EL1 counterpart? We're done here.? */
++		if (reg == el1r)
++			return;
++
++		if (!vcpu_el2_e2h_is_set(vcpu) && xlate)
++			val = xlate(val);
++
++		/* Redirect this to the EL1 version of the register. */
++		WARN_ON(!__vcpu_write_sys_reg_to_cpu(val, el1r));
++		return;
 +	}
++
++	/* EL1 register can't be on the CPU if the guest is in vEL2. */
++	if (unlikely(is_hyp_ctxt(vcpu)))
++		goto memory_write;
++
++	if (__vcpu_write_sys_reg_to_cpu(val, reg))
+ 		return;
+ 
++memory_write:
+ 	 __vcpu_sys_reg(vcpu, reg) = val;
  }
+ 
 -- 
 2.34.1
 
