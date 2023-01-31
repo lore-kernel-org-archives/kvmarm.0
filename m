@@ -1,26 +1,30 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E7833E7
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 11:49:58 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 679FF175A;
-	Tue, 31 Jan 2023 03:50:40 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 80ACC3FA27;
-	Tue, 31 Jan 2023 03:49:57 -0800 (PST)
-Date: Tue, 31 Jan 2023 11:49:50 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [kvm-unit-tests PATCH v5 2/2] arm/psci: Add PSCI CPU_OFF test
- case
-Message-ID: <Y9kAXuOfgHgMJEN+@monolith.localdoman>
-References: <20230127175916.65389-1-alexandru.elisei@arm.com>
- <20230127175916.65389-3-alexandru.elisei@arm.com>
- <20230131065623.7jj4a2hp44vphw5t@orel>
- <Y9jk+MVEPYNC1heb@monolith.localdoman>
- <20230131104610.v3n2gxmime32ae3r@orel>
- <Y9j3D9Ft4mWSoK7G@monolith.localdoman>
- <20230131114549.jnvn7g3vk4r2fyt6@orel>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731F733E7
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 12:03:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C025C433EF;
+	Tue, 31 Jan 2023 12:03:55 +0000 (UTC)
+Date: Tue, 31 Jan 2023 12:03:52 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Chase Conklin <chase.conklin@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Jintack Lim <jintack@cs.columbia.edu>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v8 01/69] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+Message-ID: <Y9kDqLqAwm9BR45J@arm.com>
+References: <20230131092504.2880505-1-maz@kernel.org>
+ <20230131092504.2880505-2-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -29,66 +33,24 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230131114549.jnvn7g3vk4r2fyt6@orel>
+In-Reply-To: <20230131092504.2880505-2-maz@kernel.org>
 
-Hi Drew,
+On Tue, Jan 31, 2023 at 09:23:56AM +0000, Marc Zyngier wrote:
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index 6cfa6e3996cf..b7b0704e360e 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -2553,9 +2553,14 @@
+>  			protected: nVHE-based mode with support for guests whose
+>  				   state is kept private from the host.
+>  
+> +			nested: VHE-based mode with support for nested
+> +				virtualization. Requires at least ARMv8.3
+> +				hardware.
 
-On Tue, Jan 31, 2023 at 12:45:49PM +0100, Andrew Jones wrote:
-> On Tue, Jan 31, 2023 at 11:16:22AM +0000, Alexandru Elisei wrote:
-> ...
-> > > > Does that make sense? Should I add a comment to make it clear why cpu-off
-> > > > is skipped when cpu-on fails?
-> > > 
-> > > I missed that cpu_on_success was initialized to true. Seeing that now, I
-> > > understand how the only time it's false is if the cpu-on test failed. When
-> > > I thought it was initialized to false it had two ways to be false, failure
-> > > or skip. I think it's a bit confusing to set a 'success' variable to true
-> > > when the test is skipped. Also, we can relax the condition as to whether
-> > > or not we try cpu-off by simply checking that all cpus, other than cpu0,
-> > > are in idle. How about
-> > > 
-> > >  if (ERRATA(6c7a5dce22b3))
-> > >      report(psci_cpu_on_test(), "cpu-on");
-> > >  else
-> > >      report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
-> > > 
-> > >  assert(!cpu_idle(0));
-> > 
-> > cpu0 is the boot CPU, I don't see how cpu0 can execute this line of code
-> > and be in idle at the same time.
-> 
-> That's why it's an assert and not an if, i.e. it should never happen. It
-> could happen if things are messed up in the lib code, a previous test
-> mucked with cpu_idle_mask, or a previous test idled cpu0 and manipulated
-> another cpu into executing this line.
-> 
-> > Unless this is done for documenting
-> > purposes, to explain why we compare the number of cpus in idle to nr_cpus
-> > -1 below.
-> 
-> Exactly, and furthermore that we expect the missing cpu to be cpu0.
-> 
-> > But I still find it confusing, especially considering (almost)
-> > the same assert is in smp.c:
-> > 
-> > void on_cpu_async(int cpu, void (*func)(void *data), void *data)
-> > {
-> > 	[..]
-> >         assert_msg(cpu != 0 || cpu0_calls_idle, "Waiting on CPU0, which is unlikely to idle. "
-> >                                                 "If this is intended set cpu0_calls_idle=1");
-> > 
-> > I know, it's a different scenario, but the point I'm trying to make is that
-> > kvm-unit-tests really doesn't expect cpu0 to be in idle. I would prefer not
-> > to have the assert here.
-> 
-> asserts are for things we assume, but also want to ensure, as other code
-> depends on the assumptions. Please keep the assert. It doesn't hurt :-)
+So we can't have protected + nested at the same time? ;) (I guess once
+you make the protected mode use VHE, this could be revisited)
 
-I'm keeping the assert then :)
+In the hope that this averts another post of the series:
 
-Thanks,
-Alex
-
-> 
-> Thanks,
-> drew
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
