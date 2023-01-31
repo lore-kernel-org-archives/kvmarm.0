@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77CDF81B
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:42:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F2C1C433EF;
-	Tue, 31 Jan 2023 09:42:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19B7881A
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:42:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3581C433EF;
+	Tue, 31 Jan 2023 09:42:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675158124;
-	bh=g54Lb44ynwGN1CfXwVNqV8s+ncgc24jCGSUiaf50FVc=;
+	s=k20201202; t=1675158126;
+	bh=vfQcisVUfTNZ+XKnX7cBnUV8pycWE/NPonanGcXhsp8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=e5ObThjNsSk4YzsHDNwSBqVG8eElmddG7rXBr9fsCEzeo88uvJCH1qTPNHyms7Sx0
-	 sSMuO7Vasc+O2dZUUa6o93NYM3LKV1kvLCe/8hfCCdGybgqEUJn4ca5jEdym6ZKMeS
-	 YOZkfLx/4ythPm7SBz+3WRTeDbycoykD9gTK+41vuHktI48R1DnLsSe5D3iGNi7hlt
-	 3dbV6nunELHsMP6lUqhxuaz+YPeXEcxKqh7tdPeZfsIlb926/ZqzjkPrMTIQtlP8+2
-	 9ObkGrSJvftp74OPW8adcspD0Gt6eIECMxE1OvTqyyzaQQ3fJjU/RodO03RWkAap+c
-	 a0FhJ09V+I0lQ==
+	b=tcESIQVhPFNu2DoOzPrEl4R/63x8a52JeZOMd1IUDBUx6UEpnkVtcMl9NV4ayyZHS
+	 GHclYWSMbzejrtp1ljlVzHjMopbYuLeXTQ0dWe4DPYK2ARBw0frlmOX1jNO3CYoBpp
+	 LbNMZtx40DkJUrKMgoklo0EZbj8K5o3uZzG2bwR6XBeAtHsq/bgRs4+vVH2lkKjC1G
+	 n6VkyMXUTrzDv1y4jHcqI+jTU9/iDFs+5IgKZbxWt4RsTWXL9UfETT/mBW6feRospA
+	 VqUS0XvDbb4hk4fcxw6jHCB5UPPnWgvmof0wueDbD+Hxm5pfTEzO9yU2NdJQfZtcVB
+	 ez/nLfBOyF4FA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pMmtU-0067U2-6I;
-	Tue, 31 Jan 2023 09:25:36 +0000
+	id 1pMmtu-0067U2-Vs;
+	Tue, 31 Jan 2023 09:26:03 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 24/69] KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,FPEN} settings
-Date: Tue, 31 Jan 2023 09:24:19 +0000
-Message-Id: <20230131092504.2880505-25-maz@kernel.org>
+Subject: [PATCH v8 59/69] KVM: arm64: nv: Map VNCR-capable registers to a separate page
+Date: Tue, 31 Jan 2023 09:24:54 +0000
+Message-Id: <20230131092504.2880505-60-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230131092504.2880505-1-maz@kernel.org>
 References: <20230131092504.2880505-1-maz@kernel.org>
@@ -54,121 +54,223 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Jintack Lim <jintack.lim@linaro.org>
+With ARMv8.4-NV, registers that can be directly accessed in memory
+by the guest have to live at architected offsets in a special page.
 
-Forward traps due to FP/ASIMD register accesses to the virtual EL2
-if virtual CPTR_EL2.TFP is set (with HCR_EL2.E2H == 0) or
-CPTR_EL2.FPEN is configure to do so (with HCR_EL2.E2h == 1).
+Let's annotate the sysreg enum to reflect the offset at which they
+are in this page, whith a little twist:
 
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-[maz: account for HCR_EL2.E2H when testing for TFP/FPEN, with
- all the hard work actually being done by Chase Conklin]
+If running on HW that doesn't have the ARMv8.4-NV feature, or even
+a VM that doesn't use NV, we store all the system registers in the
+usual sys_regs array. The only difference with the pre-8.4
+situation is that VNCR-capable registers are at a "similar" offset
+as in the VNCR page (we can compute the actual offset at compile
+time), and that the sys_regs array is both bigger and sparse.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h    | 25 +++++++++++++++++++++++++
- arch/arm64/kvm/handle_exit.c            | 16 ++++++++++++----
- arch/arm64/kvm/hyp/include/hyp/switch.h |  8 ++++++--
- 3 files changed, 43 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 104 ++++++++++++++++++++----------
+ arch/arm64/tools/cpucaps          |   1 +
+ 2 files changed, 70 insertions(+), 35 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 6e9c0d76a818..fe4b4b893fb8 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -11,6 +11,7 @@
- #ifndef __ARM64_KVM_EMULATE_H__
- #define __ARM64_KVM_EMULATE_H__
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index a1fc3b893af8..f58e953d6845 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -26,6 +26,7 @@
+ #include <asm/fpsimd.h>
+ #include <asm/kvm.h>
+ #include <asm/kvm_asm.h>
++#include <asm/vncr_mapping.h>
  
-+#include <linux/bitfield.h>
- #include <linux/kvm_host.h>
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
  
- #include <asm/debug-monitors.h>
-@@ -329,6 +330,30 @@ static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
- 	return mode != PSR_MODE_EL0t;
- }
- 
-+static inline bool guest_hyp_fpsimd_traps_enabled(const struct kvm_vcpu *vcpu)
-+{
-+	u64 val;
-+
-+	if (!vcpu_has_nv(vcpu))
-+		return false;
-+
-+	val = vcpu_read_sys_reg(vcpu, CPTR_EL2);
-+
-+	if (!vcpu_el2_e2h_is_set(vcpu))
-+		return (val & CPTR_EL2_TFP);
-+
-+	switch (FIELD_GET(CPACR_ELx_FPEN, val)) {
-+	case 0b00:
-+	case 0b10:
-+		return true;
-+	case 0b01:
-+		return vcpu_el2_tge_is_set(vcpu) && !vcpu_is_el2(vcpu);
-+	case 0b11:
-+	default:		/* GCC is dumb */
-+		return false;
-+	}
-+}
-+
- static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
- {
- 	return vcpu->arch.fault.esr_el2;
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index ea73b47b99ac..2aefe35409c9 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -97,11 +97,19 @@ static int handle_smc(struct kvm_vcpu *vcpu)
- }
- 
- /*
-- * Guest access to FP/ASIMD registers are routed to this handler only
-- * when the system doesn't support FP/ASIMD.
-+ * This handles the cases where the system does not support FP/ASIMD or when
-+ * we are running nested virtualization and the guest hypervisor is trapping
-+ * FP/ASIMD accesses by its guest guest.
-+ *
-+ * All other handling of guest vs. host FP/ASIMD register state is handled in
-+ * fixup_guest_exit().
-  */
--static int handle_no_fpsimd(struct kvm_vcpu *vcpu)
-+static int kvm_handle_fpasimd(struct kvm_vcpu *vcpu)
- {
-+	if (guest_hyp_fpsimd_traps_enabled(vcpu))
-+		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+
-+	/* This is the case when the system doesn't support FP/ASIMD. */
- 	kvm_inject_undefined(vcpu);
- 	return 1;
- }
-@@ -263,7 +271,7 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_BREAKPT_LOW]= kvm_handle_guest_debug,
- 	[ESR_ELx_EC_BKPT32]	= kvm_handle_guest_debug,
- 	[ESR_ELx_EC_BRK64]	= kvm_handle_guest_debug,
--	[ESR_ELx_EC_FP_ASIMD]	= handle_no_fpsimd,
-+	[ESR_ELx_EC_FP_ASIMD]	= kvm_handle_fpasimd,
- 	[ESR_ELx_EC_PAC]	= kvm_handle_ptrauth,
+@@ -290,32 +291,33 @@ struct kvm_vcpu_fault_info {
+ 	u64 disr_el1;		/* Deferred [SError] Status Register */
  };
  
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index e0bcaf000251..f458c2439271 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -174,8 +174,12 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	sve_guest = vcpu_has_sve(vcpu);
- 	esr_ec = kvm_vcpu_trap_get_class(vcpu);
++/*
++ * VNCR() just places the VNCR_capable registers in the enum after
++ * __VNCR_START__, and the value (after correction) to be an 8-byte offset
++ * from the VNCR base. As we don't require the enum to be otherwise ordered,
++ * we need the terrible hack below to ensure that we correctly size the
++ * sys_regs array, no matter what.
++ *
++ * The __MAX__ macro has been lifted from Sean Eron Anderson's wonderful
++ * treasure trove of bit hacks:
++ * https://graphics.stanford.edu/~seander/bithacks.html#IntegerMinOrMax
++ */
++#define __MAX__(x,y)	((x) ^ (((x) ^ (y)) & -((x) < (y))))
++#define VNCR(r)						\
++	__before_##r,					\
++	r = __VNCR_START__ + ((VNCR_ ## r) / 8),	\
++	__after_##r = __MAX__(__before_##r - 1, r)
++
+ enum vcpu_sysreg {
+ 	__INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+ 	MPIDR_EL1,	/* MultiProcessor Affinity Register */
+ 	CLIDR_EL1,	/* Cache Level ID Register */
+ 	CSSELR_EL1,	/* Cache Size Selection Register */
+-	SCTLR_EL1,	/* System Control Register */
+-	ACTLR_EL1,	/* Auxiliary Control Register */
+-	CPACR_EL1,	/* Coprocessor Access Control */
+-	ZCR_EL1,	/* SVE Control */
+-	TTBR0_EL1,	/* Translation Table Base Register 0 */
+-	TTBR1_EL1,	/* Translation Table Base Register 1 */
+-	TCR_EL1,	/* Translation Control Register */
+-	ESR_EL1,	/* Exception Syndrome Register */
+-	AFSR0_EL1,	/* Auxiliary Fault Status Register 0 */
+-	AFSR1_EL1,	/* Auxiliary Fault Status Register 1 */
+-	FAR_EL1,	/* Fault Address Register */
+-	MAIR_EL1,	/* Memory Attribute Indirection Register */
+-	VBAR_EL1,	/* Vector Base Address Register */
+-	CONTEXTIDR_EL1,	/* Context ID Register */
+ 	TPIDR_EL0,	/* Thread ID, User R/W */
+ 	TPIDRRO_EL0,	/* Thread ID, User R/O */
+ 	TPIDR_EL1,	/* Thread ID, Privileged */
+-	AMAIR_EL1,	/* Aux Memory Attribute Indirection Register */
+ 	CNTKCTL_EL1,	/* Timer Control Register (EL1) */
+ 	PAR_EL1,	/* Physical Address Register */
+-	MDSCR_EL1,	/* Monitor Debug System Control Register */
+ 	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
+ 	OSLSR_EL1,	/* OS Lock Status Register */
+ 	DISR_EL1,	/* Deferred Interrupt Status Register */
+@@ -346,20 +348,9 @@ enum vcpu_sysreg {
+ 	APGAKEYLO_EL1,
+ 	APGAKEYHI_EL1,
  
--	/* Don't handle SVE traps for non-SVE vcpus here: */
--	if (!sve_guest && esr_ec != ESR_ELx_EC_FP_ASIMD)
-+	/*
-+	 * Don't handle SVE traps for non-SVE vcpus here. This
-+	 * includes NV guests for the time being.
-+	 */
-+	if (!sve_guest && (esr_ec != ESR_ELx_EC_FP_ASIMD ||
-+			   guest_hyp_fpsimd_traps_enabled(vcpu)))
- 		return false;
+-	ELR_EL1,
+-	SP_EL1,
+-	SPSR_EL1,
+-
+-	CNTVOFF_EL2,
+-	CNTV_CVAL_EL0,
+-	CNTV_CTL_EL0,
+-	CNTP_CVAL_EL0,
+-	CNTP_CTL_EL0,
+-
+ 	/* Memory Tagging Extension registers */
+ 	RGSR_EL1,	/* Random Allocation Tag Seed Register */
+ 	GCR_EL1,	/* Tag Control Register */
+-	TFSR_EL1,	/* Tag Fault Status Register (EL1) */
+ 	TFSRE0_EL1,	/* Tag Fault Status Register (EL0) */
  
- 	/* Valid trap.  Switch the context: */
+ 	/* 32bit specific registers. */
+@@ -369,20 +360,14 @@ enum vcpu_sysreg {
+ 	DBGVCR32_EL2,	/* Debug Vector Catch Register */
+ 
+ 	/* EL2 registers */
+-	VPIDR_EL2,	/* Virtualization Processor ID Register */
+-	VMPIDR_EL2,	/* Virtualization Multiprocessor ID Register */
+ 	SCTLR_EL2,	/* System Control Register (EL2) */
+ 	ACTLR_EL2,	/* Auxiliary Control Register (EL2) */
+-	HCR_EL2,	/* Hypervisor Configuration Register */
+ 	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
+ 	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
+-	HSTR_EL2,	/* Hypervisor System Trap Register */
+ 	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
+ 	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
+ 	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
+ 	TCR_EL2,	/* Translation Control Register (EL2) */
+-	VTTBR_EL2,	/* Virtualization Translation Table Base Register */
+-	VTCR_EL2,	/* Virtualization Translation Control Register */
+ 	SPSR_EL2,	/* EL2 saved program status register */
+ 	ELR_EL2,	/* EL2 exception link register */
+ 	AFSR0_EL2,	/* Auxiliary Fault Status Register 0 (EL2) */
+@@ -395,7 +380,6 @@ enum vcpu_sysreg {
+ 	VBAR_EL2,	/* Vector Base Address Register (EL2) */
+ 	RVBAR_EL2,	/* Reset Vector Base Address Register */
+ 	CONTEXTIDR_EL2,	/* Context ID Register (EL2) */
+-	TPIDR_EL2,	/* EL2 Software Thread ID Register */
+ 	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
+ 	SP_EL2,		/* EL2 Stack Pointer */
+ 	CNTHP_CTL_EL2,
+@@ -403,6 +387,42 @@ enum vcpu_sysreg {
+ 	CNTHV_CTL_EL2,
+ 	CNTHV_CVAL_EL2,
+ 
++	__VNCR_START__,	/* Any VNCR-capable reg goes after this point */
++
++	VNCR(SCTLR_EL1),/* System Control Register */
++	VNCR(ACTLR_EL1),/* Auxiliary Control Register */
++	VNCR(CPACR_EL1),/* Coprocessor Access Control */
++	VNCR(ZCR_EL1),	/* SVE Control */
++	VNCR(TTBR0_EL1),/* Translation Table Base Register 0 */
++	VNCR(TTBR1_EL1),/* Translation Table Base Register 1 */
++	VNCR(TCR_EL1),	/* Translation Control Register */
++	VNCR(ESR_EL1),	/* Exception Syndrome Register */
++	VNCR(AFSR0_EL1),/* Auxiliary Fault Status Register 0 */
++	VNCR(AFSR1_EL1),/* Auxiliary Fault Status Register 1 */
++	VNCR(FAR_EL1),	/* Fault Address Register */
++	VNCR(MAIR_EL1),	/* Memory Attribute Indirection Register */
++	VNCR(VBAR_EL1),	/* Vector Base Address Register */
++	VNCR(CONTEXTIDR_EL1),	/* Context ID Register */
++	VNCR(AMAIR_EL1),/* Aux Memory Attribute Indirection Register */
++	VNCR(MDSCR_EL1),/* Monitor Debug System Control Register */
++	VNCR(ELR_EL1),
++	VNCR(SP_EL1),
++	VNCR(SPSR_EL1),
++	VNCR(TFSR_EL1),	/* Tag Fault Status Register (EL1) */
++	VNCR(VPIDR_EL2),/* Virtualization Processor ID Register */
++	VNCR(VMPIDR_EL2),/* Virtualization Multiprocessor ID Register */
++	VNCR(HCR_EL2),	/* Hypervisor Configuration Register */
++	VNCR(HSTR_EL2),	/* Hypervisor System Trap Register */
++	VNCR(VTTBR_EL2),/* Virtualization Translation Table Base Register */
++	VNCR(VTCR_EL2),	/* Virtualization Translation Control Register */
++	VNCR(TPIDR_EL2),/* EL2 Software Thread ID Register */
++
++	VNCR(CNTVOFF_EL2),
++	VNCR(CNTV_CVAL_EL0),
++	VNCR(CNTV_CTL_EL0),
++	VNCR(CNTP_CVAL_EL0),
++	VNCR(CNTP_CTL_EL0),
++
+ 	NR_SYS_REGS	/* Nothing after this line! */
+ };
+ 
+@@ -419,6 +439,9 @@ struct kvm_cpu_context {
+ 	u64 sys_regs[NR_SYS_REGS];
+ 
+ 	struct kvm_vcpu *__hyp_running_vcpu;
++
++	/* This pointer has to be 4kB aligned. */
++	u64 *vncr_array;
+ };
+ 
+ struct kvm_host_data {
+@@ -760,8 +783,19 @@ struct kvm_vcpu_arch {
+  * accessed by a running VCPU.  For example, for userspace access or
+  * for system registers that are never context switched, but only
+  * emulated.
++ *
++ * Don't bother with VNCR-based accesses in the nVHE code, it has no
++ * business dealing with NV.
+  */
+-#define __ctxt_sys_reg(c,r)	(&(c)->sys_regs[(r)])
++static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
++{
++#if !defined (__KVM_NVHE_HYPERVISOR__)
++	if (unlikely(cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT) &&
++		     r >= __VNCR_START__ && ctxt->vncr_array))
++		return &ctxt->vncr_array[r - __VNCR_START__];
++#endif
++	return (u64 *)&ctxt->sys_regs[r];
++}
+ 
+ #define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
+ 
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index 1af77a3657f7..e17d0f8f4182 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -23,6 +23,7 @@ HAS_DCPOP
+ HAS_DIT
+ HAS_E0PD
+ HAS_ECV
++HAS_ENHANCED_NESTED_VIRT
+ HAS_EPAN
+ HAS_GENERIC_AUTH
+ HAS_GENERIC_AUTH_ARCH_QARMA3
 -- 
 2.34.1
 
