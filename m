@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF441808
-	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:42:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BFC6C4339B;
-	Tue, 31 Jan 2023 09:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742F6808
+	for <kvmarm@lists.linux.dev>; Tue, 31 Jan 2023 09:42:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A852C4339C;
+	Tue, 31 Jan 2023 09:42:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675158152;
-	bh=XSH31bwQC/eV4T+wcxcgHsBjPTHFZSaxim9E8WZPu3c=;
+	s=k20201202; t=1675158155;
+	bh=Rkcxe5kU0tMZeWRSHUAEUvKkAP9dJ5NOUWFsfN+/6s4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MiFW2QrGQzYz3W2/PVXlRhpx9dsc83iXC1C7TA61PK3/vj35xBfuMFBoR/kj9pzEh
-	 Mpot9Ho0yFVw+rZBJuRZvr3EW6Q9xBQUtJN9nYF4Oue5TEBLuUYs7XLDMAVyg/k6k/
-	 +RvbgcDzsEz+y3Hok2yMse3JyRxt7VLT8OPpv0096eYdf42qDT8v+4GWySANkB1PEJ
-	 NGu8Ht1PspoubpHH4g22gBJ5A6BBBJXMeQmoviYtczDJ0whUDkygE1eoLjN8ckdod0
-	 xA5Oe/uy2Tzs8VO8bSrRpqo6yY5GZzQUk4GmTtRP4Badc5EGLqQIGqkfaKyrAO6FZa
-	 8LrjOBId0foTg==
+	b=Zc2wpfB00uaPS36ztlgCBIuBAI6FGOdG1Gb1Ck0ZVVYdtlrNM/Jbo3l/LluRXtcO1
+	 sjq7V6AjvI+CnYss2hqX4eH8dUrHGVAeBWOpjlFBWpI9tiZDgaEtACnjt5/+wP20Jd
+	 ml2OQ+8ESukG68IHYmoTOzenJauSs9z5Znh7mLdbByIEsRdlipx3LMLjAbjuxGaev/
+	 tVbgtjd8G+WeXfsFoBtUUnS0tZfJHG4IYdTXDhrp6cctRKZySpTx2xtIspGxy6zwdU
+	 ClZz04UHM53jgjUQHDekgq2DCby9Qnv5ykkZpxhlXwPlNwsUMDXUos3ujEOmu9VC+d
+	 KGPzGSwcZepTw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pMmtf-0067U2-Hh;
-	Tue, 31 Jan 2023 09:25:48 +0000
+	id 1pMmtV-0067U2-00;
+	Tue, 31 Jan 2023 09:25:37 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -36,9 +36,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 37/69] KVM: arm64: nv: Handle shadow stage 2 page faults
-Date: Tue, 31 Jan 2023 09:24:32 +0000
-Message-Id: <20230131092504.2880505-38-maz@kernel.org>
+Subject: [PATCH v8 27/69] KVM: arm64: nv: Respect the virtual HCR_EL2.NV1 bit setting
+Date: Tue, 31 Jan 2023 09:24:22 +0000
+Message-Id: <20230131092504.2880505-28-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230131092504.2880505-1-maz@kernel.org>
 References: <20230131092504.2880505-1-maz@kernel.org>
@@ -54,308 +54,121 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-If we are faulting on a shadow stage 2 translation, we first walk the
-guest hypervisor's stage 2 page table to see if it has a mapping. If
-not, we inject a stage 2 page fault to the virtual EL2. Otherwise, we
-create a mapping in the shadow stage 2 page table.
+From: Jintack Lim <jintack@cs.columbia.edu>
 
-Note that we have to deal with two IPAs when we got a shadow stage 2
-page fault. One is the address we faulted on, and is in the L2 guest
-phys space. The other is from the guest stage-2 page table walk, and is
-in the L1 guest phys space.  To differentiate them, we rename variables
-so that fault_ipa is used for the former and ipa is used for the latter.
+Forward ELR_EL1, SPSR_EL1 and VBAR_EL1 traps to the virtual EL2 if the
+virtual HCR_EL2.{NV,NV1}={1,1}.
 
-Co-developed-by: Christoffer Dall <christoffer.dall@linaro.org>
-Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-[maz: rewrote this multiple times...]
+This is for recursive nested virtualization.
+
+Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h |  6 ++
- arch/arm64/include/asm/kvm_nested.h  | 19 ++++++
- arch/arm64/kvm/mmu.c                 | 90 ++++++++++++++++++++++++----
- arch/arm64/kvm/nested.c              | 48 +++++++++++++++
- 4 files changed, 153 insertions(+), 10 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h    |  1 +
+ arch/arm64/include/asm/kvm_nested.h |  1 +
+ arch/arm64/kvm/emulate-nested.c     |  5 +++++
+ arch/arm64/kvm/sys_regs.c           | 21 ++++++++++++++++++++-
+ 4 files changed, 27 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index fe4b4b893fb8..1aa059ebb569 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -646,4 +646,10 @@ static inline bool vcpu_has_feature(struct kvm_vcpu *vcpu, int feature)
- 	return test_bit(feature, vcpu->arch.features);
- }
- 
-+static inline bool kvm_is_shadow_s2_fault(struct kvm_vcpu *vcpu)
-+{
-+	return (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu &&
-+		vcpu->arch.hw_mmu->nested_stage2_enabled);
-+}
-+
- #endif /* __ARM64_KVM_EMULATE_H__ */
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index e47faadbfde1..8e2b0bf1f484 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -20,6 +20,7 @@
+ #define HCR_AMVOFFEN	(UL(1) << 51)
+ #define HCR_FIEN	(UL(1) << 47)
+ #define HCR_FWB		(UL(1) << 46)
++#define HCR_NV1		(UL(1) << 43)
+ #define HCR_NV		(UL(1) << 42)
+ #define HCR_API		(UL(1) << 41)
+ #define HCR_APK		(UL(1) << 40)
 diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 77badf494a9d..80371dea3652 100644
+index befd2501d5ba..7633a8c845c4 100644
 --- a/arch/arm64/include/asm/kvm_nested.h
 +++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -76,9 +76,28 @@ struct kvm_s2_trans {
- 	u64 upper_attr;
- };
+@@ -61,5 +61,6 @@ static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
  
-+static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans *trans)
-+{
-+	return trans->output;
-+}
-+
-+static inline unsigned long kvm_s2_trans_size(struct kvm_s2_trans *trans)
-+{
-+	return trans->block_size;
-+}
-+
-+static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
-+{
-+	return trans->esr;
-+}
-+
- extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- 			      struct kvm_s2_trans *result);
- 
-+extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
-+				    struct kvm_s2_trans *trans);
-+extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
-+int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
- extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
- 			    u64 control_bit);
  extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9637049f74ae..7865acd4b924 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1225,14 +1225,16 @@ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+ extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
++extern bool forward_nv1_traps(struct kvm_vcpu *vcpu);
+ 
+ #endif /* __ARM64_KVM_NESTED_H */
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 75cf6f15accc..7c06844a5113 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -34,6 +34,11 @@ bool forward_nv_traps(struct kvm_vcpu *vcpu)
+ 	return forward_traps(vcpu, HCR_NV);
  }
  
- static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
--			  struct kvm_memory_slot *memslot, unsigned long hva,
--			  unsigned long fault_status)
-+			  struct kvm_s2_trans *nested,
-+			  struct kvm_memory_slot *memslot,
-+			  unsigned long hva, unsigned long fault_status)
++bool forward_nv1_traps(struct kvm_vcpu *vcpu)
++{
++	return forward_traps(vcpu, HCR_NV1);
++}
++
+ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
  {
- 	int ret = 0;
- 	bool write_fault, writable, force_pte = false;
- 	bool exec_fault;
- 	bool device = false;
- 	unsigned long mmu_seq;
-+	phys_addr_t ipa = fault_ipa;
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
- 	struct vm_area_struct *vma;
-@@ -1303,10 +1305,39 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	}
+ 	u64 mode = spsr & PSR_MODE_MASK;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 35ed217e39d8..732d622f5fab 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -357,6 +357,16 @@ static bool access_rw(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
  
- 	vma_pagesize = 1UL << vma_shift;
++static bool access_vbar_el1(struct kvm_vcpu *vcpu,
++			    struct sys_reg_params *p,
++			    const struct sys_reg_desc *r)
++{
++	if (forward_nv1_traps(vcpu))
++		return false;
 +
-+	if (nested) {
-+		unsigned long max_map_size;
++	return access_rw(vcpu, p, r);
++}
 +
-+		max_map_size = force_pte ? PUD_SIZE : PAGE_SIZE;
-+
-+		ipa = kvm_s2_trans_output(nested);
-+
-+		/*
-+		 * If we're about to create a shadow stage 2 entry, then we
-+		 * can only create a block mapping if the guest stage 2 page
-+		 * table uses at least as big a mapping.
-+		 */
-+		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
-+
-+		/*
-+		 * Be careful that if the mapping size falls between
-+		 * two host sizes, take the smallest of the two.
-+		 */
-+		if (max_map_size >= PMD_SIZE && max_map_size < PUD_SIZE)
-+			max_map_size = PMD_SIZE;
-+		else if (max_map_size >= PAGE_SIZE && max_map_size < PMD_SIZE)
-+			max_map_size = PAGE_SIZE;
-+
-+		force_pte = (max_map_size == PAGE_SIZE);
-+		vma_pagesize = min(vma_pagesize, max_map_size);
-+	}
-+
- 	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
- 		fault_ipa &= ~(vma_pagesize - 1);
- 
--	gfn = fault_ipa >> PAGE_SHIFT;
-+	gfn = ipa >> PAGE_SHIFT;
-+
- 	mmap_read_unlock(current->mm);
- 
- 	/*
-@@ -1468,8 +1499,10 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ /*
+  * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
   */
- int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- {
-+	struct kvm_s2_trans nested_trans, *nested = NULL;
- 	unsigned long fault_status;
--	phys_addr_t fault_ipa;
-+	phys_addr_t fault_ipa; /* The address we faulted on */
-+	phys_addr_t ipa; /* Always the IPA in the L1 guest phys space */
- 	struct kvm_memory_slot *memslot;
- 	unsigned long hva;
- 	bool is_iabt, write_fault, writable;
-@@ -1478,7 +1511,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+@@ -1891,6 +1901,9 @@ static bool access_elr(struct kvm_vcpu *vcpu,
+ 	if (el12_reg(p) && forward_nv_traps(vcpu))
+ 		return false;
  
- 	fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
++	if (!el12_reg(p) && forward_nv1_traps(vcpu))
++		return false;
++
+ 	if (p->is_write)
+ 		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
+ 	else
+@@ -1906,6 +1919,9 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
+ 	if (el12_reg(p) && forward_nv_traps(vcpu))
+ 		return false;
  
--	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
-+	ipa = fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
- 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
++	if (!el12_reg(p) && forward_nv1_traps(vcpu))
++		return false;
++
+ 	if (p->is_write)
+ 		__vcpu_sys_reg(vcpu, SPSR_EL1) = p->regval;
+ 	else
+@@ -1921,6 +1937,9 @@ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
+ 	if (el12_reg(p) && forward_nv_traps(vcpu))
+ 		return false;
  
- 	if (fault_status == ESR_ELx_FSC_FAULT) {
-@@ -1519,6 +1552,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	if (fault_status != ESR_ELx_FSC_FAULT &&
- 	    fault_status != ESR_ELx_FSC_PERM &&
- 	    fault_status != ESR_ELx_FSC_ACCESS) {
-+		/*
-+		 * We must never see an address size fault on shadow stage 2
-+		 * page table walk, because we would have injected an addr
-+		 * size fault when we walked the nested s2 page and not
-+		 * create the shadow entry.
-+		 */
- 		kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
- 			kvm_vcpu_trap_get_class(vcpu),
- 			(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
-@@ -1528,7 +1567,37 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
++	if (!el12_reg(p) && forward_nv1_traps(vcpu))
++		return false;
++
+ 	if (p->is_write)
+ 		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
+ 	else
+@@ -2135,7 +2154,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
+ 	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
  
- 	idx = srcu_read_lock(&vcpu->kvm->srcu);
+-	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
++	{ SYS_DESC(SYS_VBAR_EL1), access_vbar_el1, reset_val, VBAR_EL1, 0 },
+ 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
  
--	gfn = fault_ipa >> PAGE_SHIFT;
-+	/*
-+	 * We may have faulted on a shadow stage 2 page table if we are
-+	 * running a nested guest.  In this case, we have to resolve the L2
-+	 * IPA to the L1 IPA first, before knowing what kind of memory should
-+	 * back the L1 IPA.
-+	 *
-+	 * If the shadow stage 2 page table walk faults, then we simply inject
-+	 * this to the guest and carry on.
-+	 */
-+	if (kvm_is_shadow_s2_fault(vcpu)) {
-+		u32 esr;
-+
-+		ret = kvm_walk_nested_s2(vcpu, fault_ipa, &nested_trans);
-+		if (ret) {
-+			esr = kvm_s2_trans_esr(&nested_trans);
-+			kvm_inject_s2_fault(vcpu, esr);
-+			goto out_unlock;
-+		}
-+
-+		ret = kvm_s2_handle_perm_fault(vcpu, &nested_trans);
-+		if (ret) {
-+			esr = kvm_s2_trans_esr(&nested_trans);
-+			kvm_inject_s2_fault(vcpu, esr);
-+			goto out_unlock;
-+		}
-+
-+		ipa = kvm_s2_trans_output(&nested_trans);
-+		nested = &nested_trans;
-+	}
-+
-+	gfn = ipa >> PAGE_SHIFT;
- 	memslot = gfn_to_memslot(vcpu->kvm, gfn);
- 	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
- 	write_fault = kvm_is_write_fault(vcpu);
-@@ -1572,13 +1641,13 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		 * faulting VA. This is always 12 bits, irrespective
- 		 * of the page size.
- 		 */
--		fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
--		ret = io_mem_abort(vcpu, fault_ipa);
-+		ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
-+		ret = io_mem_abort(vcpu, ipa);
- 		goto out_unlock;
- 	}
- 
- 	/* Userspace should not be able to register out-of-bounds IPAs */
--	VM_BUG_ON(fault_ipa >= kvm_phys_size(vcpu->kvm));
-+	VM_BUG_ON(ipa >= kvm_phys_size(vcpu->kvm));
- 
- 	if (fault_status == ESR_ELx_FSC_ACCESS) {
- 		handle_access_fault(vcpu, fault_ipa);
-@@ -1586,7 +1655,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 		goto out_unlock;
- 	}
- 
--	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
-+	ret = user_mem_abort(vcpu, fault_ipa, nested,
-+			     memslot, hva, fault_status);
- 	if (ret == 0)
- 		ret = 1;
- out:
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 3ac3a0f334b0..5fb5e93248c1 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -112,6 +112,15 @@ static u32 compute_fsc(int level, u32 fsc)
- 	return fsc | (level & 0x3);
- }
- 
-+static int esr_s2_fault(struct kvm_vcpu *vcpu, int level, u32 fsc)
-+{
-+	u32 esr;
-+
-+	esr = kvm_vcpu_get_esr(vcpu) & ~ESR_ELx_FSC;
-+	esr |= compute_fsc(level, fsc);
-+	return esr;
-+}
-+
- static int check_base_s2_limits(struct s2_walk_info *wi,
- 				int level, int input_size, int stride)
- {
-@@ -464,6 +473,45 @@ void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu)
- 	}
- }
- 
-+/*
-+ * Returns non-zero if permission fault is handled by injecting it to the next
-+ * level hypervisor.
-+ */
-+int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
-+{
-+	unsigned long fault_status = kvm_vcpu_trap_get_fault_type(vcpu);
-+	bool forward_fault = false;
-+
-+	trans->esr = 0;
-+
-+	if (fault_status != ESR_ELx_FSC_PERM)
-+		return 0;
-+
-+	if (kvm_vcpu_trap_is_iabt(vcpu)) {
-+		forward_fault = (trans->upper_attr & BIT(54));
-+	} else {
-+		bool write_fault = kvm_is_write_fault(vcpu);
-+
-+		forward_fault = ((write_fault && !trans->writable) ||
-+				 (!write_fault && !trans->readable));
-+	}
-+
-+	if (forward_fault) {
-+		trans->esr = esr_s2_fault(vcpu, trans->level, ESR_ELx_FSC_PERM);
-+		return 1;
-+	}
-+
-+	return 0;
-+}
-+
-+int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2)
-+{
-+	vcpu_write_sys_reg(vcpu, vcpu->arch.fault.far_el2, FAR_EL2);
-+	vcpu_write_sys_reg(vcpu, vcpu->arch.fault.hpfar_el2, HPFAR_EL2);
-+
-+	return kvm_inject_nested_sync(vcpu, esr_el2);
-+}
-+
- void kvm_arch_flush_shadow_all(struct kvm *kvm)
- {
- 	int i;
+ 	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
 -- 
 2.34.1
 
