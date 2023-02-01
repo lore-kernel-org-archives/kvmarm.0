@@ -1,43 +1,43 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F1A63CA
-	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 12:59:41 +0000 (UTC)
-Received: by mail-wr1-f52.google.com with SMTP id t7so8870247wrp.5
-        for <kvmarm@lists.linux.dev>; Wed, 01 Feb 2023 04:59:41 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5455F63C7
+	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 12:59:40 +0000 (UTC)
+Received: by mail-wr1-f42.google.com with SMTP id a3so10534380wrt.6
+        for <kvmarm@lists.linux.dev>; Wed, 01 Feb 2023 04:59:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k/GDOaMle8fCK10H5aUfKS5834jy6OqVt1je6uaYFNc=;
-        b=a/ySk0jxxFQ5Umd321G1J6ggbfnZENu3LP6l8nOj0kuQsqnkHyvy58UCJ+6Y3R86Y7
-         qciFJoPzshScME2lHsL8LXXpKOGBlcO3vHzloNhsQQctl2aHlghvudN8rptx4J0zWIB2
-         1qwhgBKnKOUj8Juft52uvLCjLPPDy7lDrmB7mf8R+WC6xa3VSuMx10HbRza3O7DFYYpH
-         r241/v3swxNAnpVjvfgtneMgbEDMBZEM165wWObwT7MD9w8WsNl7qICdc5JE1p5kllaz
-         ZXs7X0SbZ9zAQx0yk03oJFCzCjVSvJ6GCipFrVzA49yvnVsSGuWFKjDlktjL1Z//lDua
-         wYsA==
+        bh=BKjgmaDxLkmrQ0mpxwx2r9pGg6x4GEO3iHZz6Uf5p3w=;
+        b=li73nmc1UxwrkMWjkGKFFhTVQtrHociEVH9aYlHsY9ZKApJNsJx7aTCpI2BzVQGSVB
+         hBkwUB/RWJWUZ4yqLIl2Y9KPBcRezlTjL3RAB9Ztcn9gHLHOEgjY5BU9iKVYIqN+oZxW
+         musGWcucKajPIP8AF4AZ8MbembXZgbejsfKvMg4DodT/iPV3e4bUFnrqmOCnuq0p/wg/
+         2NkB3jwUmyzAg4RRPrK7FpYWu7SEPYM6DT0Wd4jgqd6vATEZkchKW5bNFyCSKBPtm8/S
+         5JQki4YOGVI2Wz77ZTbUBm1ss/Oms4VhtxdJklLOIydXox4fVdVJ8VbwnbRuehbT4YZz
+         7J5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=k/GDOaMle8fCK10H5aUfKS5834jy6OqVt1je6uaYFNc=;
-        b=rv0SlZ8xB1BKXYagSXq1Srm7SdxG+RZNwWjlaDZ5BaMQ6U7fGx/lvByJv85GM99fSv
-         TpbAHzaMJXGhNj/DdUhjS13chX4aecoS/v2+4WVCPhA4sF95bqDWxwZY+3q4dkzeRxhw
-         0OF4O6wAO9OkAgIjTiEfBjv+Le8SVJRCeJe954LPCCSmJiikAcvt0GC7NHLQ8BTxnkqR
-         lGIc2qMFMUYfJcxDAQDDaXK7FJvfAM+hgEg8OYsBMViMpJoY4gOJGIcVJtnmHXat81Ns
-         bmJbMtqXP7rjO6TmyXnRvkW7W4d/VG4RudCXWT+Poa4srHQ30bhhXAL6BYBrfdpXgwWB
-         34sg==
-X-Gm-Message-State: AO0yUKWt/sjrdWBsFly2iPCelFnSyxAyi/GTnlveiz9nVAxlAgHdJS/r
-	0O61ifoTOyAFggMXh71wu9vI7w==
-X-Google-Smtp-Source: AK7set/PuZ0iGJgAqsm7rVA84kvYeOepxjawaRC1mJFoy/KL6sqcM9J5i+g+Fl43K/IxMpuWhh+0Hg==
-X-Received: by 2002:a5d:514d:0:b0:2bf:ae1e:84d2 with SMTP id u13-20020a5d514d000000b002bfae1e84d2mr2263196wrt.12.1675256380688;
-        Wed, 01 Feb 2023 04:59:40 -0800 (PST)
+        bh=BKjgmaDxLkmrQ0mpxwx2r9pGg6x4GEO3iHZz6Uf5p3w=;
+        b=ACbu/iYedH4NkEavxb83B+6SP5uXysZ0TX/xcRrED9ZCtnSg/yBavWfgkokTB47xep
+         yHF0HVYTYXGDisex6nvsmMlJ0xF4HgnylfMp76COIIiSt65Y1R6W/Gdge9rTpsoOAot+
+         fnxGWC2RDnG2wUJo3bJiq66ng7LTx4rU/gyC4gcpw2CnxjIIyrDbWCoMPZZfbfVLzDSG
+         S2DyGdP7YQdVIE4alwi69uNZxGgDLFymP2MN2DPWVsDgDDHHY+VzhVNyfoLPlo58zsrE
+         FBTqJpRKxNvwQOwPzL6LqTJRexMaNR5LUcL3PUF9GYZIc5czGpza4PCvwFW4m+es51M7
+         NfZQ==
+X-Gm-Message-State: AO0yUKXFeXelqRlIFQvei9XrbE1nw9VlsdQMEaiNKNErMUWY4BZ73MUZ
+	cYe9t2iA6+OQgQc+mDALgTGoyA==
+X-Google-Smtp-Source: AK7set929JCQtOsi6+aIpV+17WDiEBZh7VrjLqph/lKy2FUykdpHt3ALamuIzZ3nT3DrqEwV0ZjE+A==
+X-Received: by 2002:a5d:47a2:0:b0:2bf:b5bd:8f60 with SMTP id 2-20020a5d47a2000000b002bfb5bd8f60mr1982390wrb.61.1675256379854;
+        Wed, 01 Feb 2023 04:59:39 -0800 (PST)
 Received: from localhost.localdomain (054592b0.skybroadband.com. [5.69.146.176])
         by smtp.gmail.com with ESMTPSA id m15-20020a056000024f00b002bfae16ee2fsm17972811wrz.111.2023.02.01.04.59.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Feb 2023 04:59:40 -0800 (PST)
+        Wed, 01 Feb 2023 04:59:39 -0800 (PST)
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: maz@kernel.org,
 	catalin.marinas@arm.com,
@@ -55,9 +55,9 @@ Cc: robin.murphy@arm.com,
 	kvmarm@lists.linux.dev,
 	iommu@lists.linux.dev,
 	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [RFC PATCH 27/45] KVM: arm64: smmu-v3: Setup domains and page table configuration
-Date: Wed,  1 Feb 2023 12:53:11 +0000
-Message-Id: <20230201125328.2186498-28-jean-philippe@linaro.org>
+Subject: [RFC PATCH 26/45] KVM: arm64: smmu-v3: Support io-pgtable
+Date: Wed,  1 Feb 2023 12:53:10 +0000
+Message-Id: <20230201125328.2186498-27-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230201125328.2186498-1-jean-philippe@linaro.org>
 References: <20230201125328.2186498-1-jean-philippe@linaro.org>
@@ -69,269 +69,174 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Setup the stream table entries when the host issues the attach_dev() and
-detach_dev() hypercalls. The driver holds one io-pgtable configuration
-for all domains.
+Implement the hypervisor version of io-pgtable allocation functions,
+mirroring drivers/iommu/io-pgtable-arm.c. Page allocation uses the IOMMU
+memcache filled by the host, except for the PGD which may be larger than
+a page.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
- include/kvm/arm_smmu_v3.h                   |   2 +
- arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c | 178 +++++++++++++++++++-
- 2 files changed, 177 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/Makefile              |  2 +
+ arch/arm64/kvm/hyp/include/nvhe/iommu.h       |  7 ++
+ include/linux/io-pgtable-arm.h                |  6 ++
+ .../arm64/kvm/hyp/nvhe/iommu/io-pgtable-arm.c | 97 +++++++++++++++++++
+ 4 files changed, 112 insertions(+)
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/iommu/io-pgtable-arm.c
 
-diff --git a/include/kvm/arm_smmu_v3.h b/include/kvm/arm_smmu_v3.h
-index fc67a3bf5709..ed139b0e9612 100644
---- a/include/kvm/arm_smmu_v3.h
-+++ b/include/kvm/arm_smmu_v3.h
-@@ -3,6 +3,7 @@
- #define __KVM_ARM_SMMU_V3_H
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index 349c874762c8..8359909bd796 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -30,6 +30,8 @@ hyp-obj-y += $(lib-objs)
  
- #include <asm/kvm_asm.h>
-+#include <linux/io-pgtable-arm.h>
- #include <kvm/iommu.h>
+ hyp-obj-$(CONFIG_KVM_IOMMU) += iommu/iommu.o
+ hyp-obj-$(CONFIG_ARM_SMMU_V3_PKVM) += iommu/arm-smmu-v3.o
++hyp-obj-$(CONFIG_ARM_SMMU_V3_PKVM) += iommu/io-pgtable-arm.o \
++	../../../../../drivers/iommu/io-pgtable-arm-common.o
+ 
+ ##
+ ## Build rules for compiling nVHE hyp code
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/iommu.h b/arch/arm64/kvm/hyp/include/nvhe/iommu.h
+index 0ba59d20bef3..c7744cca6e13 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/iommu.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/iommu.h
+@@ -6,7 +6,14 @@
+ #include <linux/io-pgtable.h>
  
  #if IS_ENABLED(CONFIG_ARM_SMMU_V3_PKVM)
-@@ -28,6 +29,7 @@ struct hyp_arm_smmu_v3_device {
- 	size_t			strtab_num_entries;
- 	size_t			strtab_num_l1_entries;
- 	u8			strtab_split;
-+	struct arm_lpae_io_pgtable pgtable;
- };
- 
- extern size_t kvm_nvhe_sym(kvm_hyp_arm_smmu_v3_count);
-diff --git a/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c b/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-index 81040339ccfe..56e313203a16 100644
---- a/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-+++ b/arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
-@@ -152,7 +152,6 @@ static int smmu_send_cmd(struct hyp_arm_smmu_v3_device *smmu,
- 	return smmu_sync_cmd(smmu);
- }
- 
--__maybe_unused
- static int smmu_sync_ste(struct hyp_arm_smmu_v3_device *smmu, u32 sid)
++#include <linux/io-pgtable-arm.h>
++
+ int kvm_arm_smmu_v3_register(void);
++
++int kvm_arm_io_pgtable_init(struct io_pgtable_cfg *cfg,
++			    struct arm_lpae_io_pgtable *data);
++int kvm_arm_io_pgtable_alloc(struct io_pgtable *iop, unsigned long pgd_hva);
++int kvm_arm_io_pgtable_free(struct io_pgtable *iop);
+ #else /* CONFIG_ARM_SMMU_V3_PKVM */
+ static inline int kvm_arm_smmu_v3_register(void)
  {
- 	struct arm_smmu_cmdq_ent cmd = {
-@@ -194,7 +193,6 @@ static int smmu_alloc_l2_strtab(struct hyp_arm_smmu_v3_device *smmu, u32 idx)
- 	return 0;
+diff --git a/include/linux/io-pgtable-arm.h b/include/linux/io-pgtable-arm.h
+index 2b3e69386d08..b89b8ec57721 100644
+--- a/include/linux/io-pgtable-arm.h
++++ b/include/linux/io-pgtable-arm.h
+@@ -161,8 +161,14 @@ static inline bool iopte_leaf(arm_lpae_iopte pte, int lvl,
+ 	return iopte_type(pte) == ARM_LPAE_PTE_TYPE_BLOCK;
  }
  
--__maybe_unused
- static u64 *smmu_get_ste_ptr(struct hyp_arm_smmu_v3_device *smmu, u32 sid)
- {
- 	u32 idx;
-@@ -382,6 +380,68 @@ static int smmu_reset_device(struct hyp_arm_smmu_v3_device *smmu)
- 	return smmu_write_cr0(smmu, 0);
- }
++#ifdef __KVM_NVHE_HYPERVISOR__
++#include <nvhe/memory.h>
++#define __arm_lpae_virt_to_phys	hyp_virt_to_phys
++#define __arm_lpae_phys_to_virt	hyp_phys_to_virt
++#else
+ #define __arm_lpae_virt_to_phys	__pa
+ #define __arm_lpae_phys_to_virt	__va
++#endif
  
-+static struct hyp_arm_smmu_v3_device *to_smmu(struct kvm_hyp_iommu *iommu)
+ /* Generic functions */
+ void __arm_lpae_free_pgtable(struct arm_lpae_io_pgtable *data, int lvl,
+diff --git a/arch/arm64/kvm/hyp/nvhe/iommu/io-pgtable-arm.c b/arch/arm64/kvm/hyp/nvhe/iommu/io-pgtable-arm.c
+new file mode 100644
+index 000000000000..a46490acb45c
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/nvhe/iommu/io-pgtable-arm.c
+@@ -0,0 +1,97 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2022 Arm Ltd.
++ */
++#include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
++#include <kvm/arm_smmu_v3.h>
++#include <linux/types.h>
++#include <linux/gfp_types.h>
++#include <linux/io-pgtable-arm.h>
++
++#include <nvhe/iommu.h>
++#include <nvhe/mem_protect.h>
++
++bool __ro_after_init selftest_running;
++
++void *__arm_lpae_alloc_pages(size_t size, gfp_t gfp, struct io_pgtable_cfg *cfg)
 +{
-+	return container_of(iommu, struct hyp_arm_smmu_v3_device, iommu);
++	void *addr = kvm_iommu_donate_page();
++
++	BUG_ON(size != PAGE_SIZE);
++
++	if (addr && !cfg->coherent_walk)
++		kvm_flush_dcache_to_poc(addr, size);
++
++	return addr;
 +}
 +
-+static void smmu_tlb_flush_all(void *cookie)
++void __arm_lpae_free_pages(void *addr, size_t size, struct io_pgtable_cfg *cfg)
 +{
-+	struct kvm_iommu_tlb_cookie *data = cookie;
-+	struct hyp_arm_smmu_v3_device *smmu = to_smmu(data->iommu);
-+	struct arm_smmu_cmdq_ent cmd = {
-+		.opcode = CMDQ_OP_TLBI_S12_VMALL,
-+		.tlbi.vmid = data->domain_id,
-+	};
++	BUG_ON(size != PAGE_SIZE);
 +
-+	WARN_ON(smmu_send_cmd(smmu, &cmd));
++	if (!cfg->coherent_walk)
++		kvm_flush_dcache_to_poc(addr, size);
++
++	kvm_iommu_reclaim_page(addr);
 +}
 +
-+static void smmu_tlb_inv_range(struct kvm_iommu_tlb_cookie *data,
-+			       unsigned long iova, size_t size, size_t granule,
-+			       bool leaf)
++void __arm_lpae_sync_pte(arm_lpae_iopte *ptep, int num_entries,
++			 struct io_pgtable_cfg *cfg)
 +{
-+	struct hyp_arm_smmu_v3_device *smmu = to_smmu(data->iommu);
-+	unsigned long end = iova + size;
-+	struct arm_smmu_cmdq_ent cmd = {
-+		.opcode = CMDQ_OP_TLBI_S2_IPA,
-+		.tlbi.vmid = data->domain_id,
-+		.tlbi.leaf = leaf,
-+	};
++	if (!cfg->coherent_walk)
++		kvm_flush_dcache_to_poc(ptep, sizeof(*ptep) * num_entries);
++}
 +
++int kvm_arm_io_pgtable_init(struct io_pgtable_cfg *cfg,
++			    struct arm_lpae_io_pgtable *data)
++{
++	int ret = arm_lpae_init_pgtable_s2(cfg, data);
++
++	if (ret)
++		return ret;
++
++	data->iop.cfg = *cfg;
++	return 0;
++}
++
++int kvm_arm_io_pgtable_alloc(struct io_pgtable *iopt, unsigned long pgd_hva)
++{
++	size_t pgd_size, alignment;
++	struct arm_lpae_io_pgtable *data = io_pgtable_ops_to_data(iopt->ops);
++
++	pgd_size = ARM_LPAE_PGD_SIZE(data);
 +	/*
-+	 * There are no mappings at high addresses since we don't use TTB1, so
-+	 * no overflow possible.
++	 * If it has eight or more entries, the table must be aligned on
++	 * its size. Otherwise 64 bytes.
 +	 */
-+	BUG_ON(end < iova);
-+
-+	while (iova < end) {
-+		cmd.tlbi.addr = iova;
-+		WARN_ON(smmu_send_cmd(smmu, &cmd));
-+		BUG_ON(iova + granule < iova);
-+		iova += granule;
-+	}
-+}
-+
-+static void smmu_tlb_flush_walk(unsigned long iova, size_t size,
-+				size_t granule, void *cookie)
-+{
-+	smmu_tlb_inv_range(cookie, iova, size, granule, false);
-+}
-+
-+static void smmu_tlb_add_page(struct iommu_iotlb_gather *gather,
-+			      unsigned long iova, size_t granule,
-+			      void *cookie)
-+{
-+	smmu_tlb_inv_range(cookie, iova, granule, granule, true);
-+}
-+
-+static const struct iommu_flush_ops smmu_tlb_ops = {
-+	.tlb_flush_all	= smmu_tlb_flush_all,
-+	.tlb_flush_walk = smmu_tlb_flush_walk,
-+	.tlb_add_page	= smmu_tlb_add_page,
-+};
-+
- static int smmu_init_device(struct hyp_arm_smmu_v3_device *smmu)
- {
- 	int ret;
-@@ -394,6 +454,14 @@ static int smmu_init_device(struct hyp_arm_smmu_v3_device *smmu)
- 	if (IS_ERR(smmu->base))
- 		return PTR_ERR(smmu->base);
- 
-+	smmu->iommu.pgtable_cfg.tlb = &smmu_tlb_ops;
-+
-+	ret = kvm_arm_io_pgtable_init(&smmu->iommu.pgtable_cfg, &smmu->pgtable);
-+	if (ret)
-+		return ret;
-+
-+	smmu->iommu.pgtable = &smmu->pgtable.iop;
-+
- 	ret = smmu_init_registers(smmu);
- 	if (ret)
- 		return ret;
-@@ -406,7 +474,11 @@ static int smmu_init_device(struct hyp_arm_smmu_v3_device *smmu)
- 	if (ret)
- 		return ret;
- 
--	return smmu_reset_device(smmu);
-+	ret = smmu_reset_device(smmu);
-+	if (ret)
-+		return ret;
-+
-+	return kvm_iommu_init_device(&smmu->iommu);
- }
- 
- static int smmu_init(void)
-@@ -414,6 +486,10 @@ static int smmu_init(void)
- 	int ret;
- 	struct hyp_arm_smmu_v3_device *smmu;
- 
-+	ret = kvm_iommu_init();
-+	if (ret)
-+		return ret;
-+
- 	ret = pkvm_create_mappings(kvm_hyp_arm_smmu_v3_smmus,
- 				   kvm_hyp_arm_smmu_v3_smmus +
- 				   kvm_hyp_arm_smmu_v3_count,
-@@ -430,8 +506,104 @@ static int smmu_init(void)
- 	return 0;
- }
- 
-+static struct kvm_hyp_iommu *smmu_id_to_iommu(pkvm_handle_t smmu_id)
-+{
-+	if (smmu_id >= kvm_hyp_arm_smmu_v3_count)
-+		return NULL;
-+	smmu_id = array_index_nospec(smmu_id, kvm_hyp_arm_smmu_v3_count);
-+
-+	return &kvm_hyp_arm_smmu_v3_smmus[smmu_id].iommu;
-+}
-+
-+static int smmu_attach_dev(struct kvm_hyp_iommu *iommu, pkvm_handle_t domain_id,
-+			   struct kvm_hyp_iommu_domain *domain, u32 sid)
-+{
-+	int i;
-+	int ret;
-+	u64 *dst;
-+	struct io_pgtable_cfg *cfg;
-+	u64 ts, sl, ic, oc, sh, tg, ps;
-+	u64 ent[STRTAB_STE_DWORDS] = {};
-+	struct hyp_arm_smmu_v3_device *smmu = to_smmu(iommu);
-+
-+	dst = smmu_get_ste_ptr(smmu, sid);
-+	if (!dst || dst[0])
++	alignment = max(pgd_size, 8 * sizeof(arm_lpae_iopte));
++	if (!IS_ALIGNED(pgd_hva, alignment))
 +		return -EINVAL;
 +
-+	cfg = &smmu->pgtable.iop.cfg;
-+	ps = cfg->arm_lpae_s2_cfg.vtcr.ps;
-+	tg = cfg->arm_lpae_s2_cfg.vtcr.tg;
-+	sh = cfg->arm_lpae_s2_cfg.vtcr.sh;
-+	oc = cfg->arm_lpae_s2_cfg.vtcr.orgn;
-+	ic = cfg->arm_lpae_s2_cfg.vtcr.irgn;
-+	sl = cfg->arm_lpae_s2_cfg.vtcr.sl;
-+	ts = cfg->arm_lpae_s2_cfg.vtcr.tsz;
++	iopt->pgd = pkvm_map_donated_memory(pgd_hva, pgd_size);
++	if (!iopt->pgd)
++		return -ENOMEM;
 +
-+	ent[0] = STRTAB_STE_0_V |
-+		 FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_S2_TRANS);
-+	ent[2] = FIELD_PREP(STRTAB_STE_2_VTCR,
-+			FIELD_PREP(STRTAB_STE_2_VTCR_S2PS, ps) |
-+			FIELD_PREP(STRTAB_STE_2_VTCR_S2TG, tg) |
-+			FIELD_PREP(STRTAB_STE_2_VTCR_S2SH0, sh) |
-+			FIELD_PREP(STRTAB_STE_2_VTCR_S2OR0, oc) |
-+			FIELD_PREP(STRTAB_STE_2_VTCR_S2IR0, ic) |
-+			FIELD_PREP(STRTAB_STE_2_VTCR_S2SL0, sl) |
-+			FIELD_PREP(STRTAB_STE_2_VTCR_S2T0SZ, ts)) |
-+		 FIELD_PREP(STRTAB_STE_2_S2VMID, domain_id) |
-+		 STRTAB_STE_2_S2AA64;
-+	ent[3] = hyp_virt_to_phys(domain->pgd) & STRTAB_STE_3_S2TTB_MASK;
++	if (!data->iop.cfg.coherent_walk)
++		kvm_flush_dcache_to_poc(iopt->pgd, pgd_size);
 +
-+	/*
-+	 * The SMMU may cache a disabled STE.
-+	 * Initialize all fields, sync, then enable it.
-+	 */
-+	for (i = 1; i < STRTAB_STE_DWORDS; i++)
-+		dst[i] = cpu_to_le64(ent[i]);
++	/* Ensure the empty pgd is visible before any actual TTBR write */
++	wmb();
 +
-+	ret = smmu_sync_ste(smmu, sid);
-+	if (ret)
-+		return ret;
-+
-+	WRITE_ONCE(dst[0], cpu_to_le64(ent[0]));
-+	ret = smmu_sync_ste(smmu, sid);
-+	if (ret)
-+		dst[0] = 0;
-+
-+	return ret;
++	return 0;
 +}
 +
-+static int smmu_detach_dev(struct kvm_hyp_iommu *iommu, pkvm_handle_t domain_id,
-+			   struct kvm_hyp_iommu_domain *domain, u32 sid)
++int kvm_arm_io_pgtable_free(struct io_pgtable *iopt)
 +{
-+	u64 ttb;
-+	u64 *dst;
-+	int i, ret;
-+	struct hyp_arm_smmu_v3_device *smmu = to_smmu(iommu);
++	struct arm_lpae_io_pgtable *data = io_pgtable_ops_to_data(iopt->ops);
++	size_t pgd_size = ARM_LPAE_PGD_SIZE(data);
 +
-+	dst = smmu_get_ste_ptr(smmu, sid);
-+	if (!dst)
-+		return -ENODEV;
++	if (!data->iop.cfg.coherent_walk)
++		kvm_flush_dcache_to_poc(iopt->pgd, pgd_size);
 +
-+	ttb = dst[3] & STRTAB_STE_3_S2TTB_MASK;
-+
-+	dst[0] = 0;
-+	ret = smmu_sync_ste(smmu, sid);
-+	if (ret)
-+		return ret;
-+
-+	for (i = 1; i < STRTAB_STE_DWORDS; i++)
-+		dst[i] = 0;
-+
-+	return smmu_sync_ste(smmu, sid);
++	/* Free all tables but the pgd */
++	__arm_lpae_free_pgtable(data, data->start_level, iopt->pgd, true);
++	pkvm_unmap_donated_memory(iopt->pgd, pgd_size);
++	return 0;
 +}
-+
- static struct kvm_iommu_ops smmu_ops = {
- 	.init				= smmu_init,
-+	.get_iommu_by_id		= smmu_id_to_iommu,
-+	.alloc_iopt			= kvm_arm_io_pgtable_alloc,
-+	.free_iopt			= kvm_arm_io_pgtable_free,
-+	.attach_dev			= smmu_attach_dev,
-+	.detach_dev			= smmu_detach_dev,
- };
- 
- int kvm_arm_smmu_v3_register(void)
 -- 
 2.39.0
 
