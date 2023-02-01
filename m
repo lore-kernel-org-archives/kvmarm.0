@@ -1,43 +1,43 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACA863CF
-	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 12:59:45 +0000 (UTC)
-Received: by mail-wr1-f42.google.com with SMTP id t7so8870431wrp.5
-        for <kvmarm@lists.linux.dev>; Wed, 01 Feb 2023 04:59:45 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA80846E
+	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 12:59:44 +0000 (UTC)
+Received: by mail-wr1-f54.google.com with SMTP id q5so17272263wrv.0
+        for <kvmarm@lists.linux.dev>; Wed, 01 Feb 2023 04:59:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+zOq2rLtD1YPFldzTAQlw7NyDrjfoS45oyn9F6B1b8s=;
-        b=aNGPAFo2QKGeiRP5S5IH7xD7mskfsJdtbRW+20Bv+RmyiyxyCq2QbNzd/p4ud8dL71
-         2clglqcQlUZsX+DdlDGVOeXwo4LKP8WX8Ta0Mg2gbAN2H4dvoVB84P8hg2hapAAqUcZw
-         BYYg8mMY1ePI+J8iL2xyozLfJc+Nim3Tx9NkA26QTNpDAMx6xebA044v+p2gqibEx2Wh
-         7nOUuQHMLK8yf2LC4uW6bNg5hP4vzKvP6/p4NEyyU5mrCgrSfBiS/wvn/dTXWM2dIRIs
-         eTJq3Xd+YQsEF/IsVuqdRrdKTkxT1Rwuut/DLKd18BdqyKdS74/8xQEtN6nWCXLvagsu
-         ypSA==
+        bh=k6RVVU/cDR30+b5v6ryQ9Qt2Qe/cZnMA4vlAa66b2Ys=;
+        b=mu2lBA0BxxQukvTi9iYO7jhBZ8zYvtylLgUP8D/nnzbjtu9Fu04DCXo+9J1OplFloM
+         2mj2s/TUMEjjGh7q8zbfwjap7eipolwiOV2dAJNt542PBtjSN3gAJiCFlbpAKAN8x236
+         0URl9fMplXSkkpdd7gl6Id5htSLQPE1CjcYNrCeA6Fka/TxJwWHtJbfqwNRLX/svQ2S+
+         B7OKZ2fBCpZKe2E0IftP4GTip2tljs8v5kjvZ8IbyV/HNVDtWAt58/uEsW1xrYXxPore
+         SCYiHi/EwNvHSShyXk2rFhXByNJD7hnOTg0itBO2+7QQuUJF8kqLN/fplMCLxCQWJjPB
+         r54g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+zOq2rLtD1YPFldzTAQlw7NyDrjfoS45oyn9F6B1b8s=;
-        b=4dJGPU+dZX/SD2Bg3J46XnQc+DaFkQRFKYW2PJUzG8oJ7J0BamsYExMidO3Gt9xYW+
-         SzcrWE5MGa2XvTx4ZMiickAiNRcB83t8mXW5A6EeAURmKx4f6fs9vO/wHy/nc6A/xwul
-         7QgbTYXqihitYONKg/rnIKtjifb0jZ465mKK+UqyMGJ8zIyhhbD4JpjuzqCZ9L9vGqIB
-         b9YKiXUMhfmGtj6yG+sy7IvMNsa1jrMiJcu1hcdBKCU98FESnYrshQYbtsuS8+OSKfz/
-         bqzb0wu0emhGZ/GqLh8UoSR4eUKTFXWIXm6S+sHcGvqhLSMf1U7Tt/aU++KHCOh64PtC
-         eUNw==
-X-Gm-Message-State: AO0yUKVcpaV8tTHW/sSXMF+V0ZSMRRQg/Df0MFuYicx/zfHIzxNhHXwz
-	TGc0J9cXDaLBhMLbgBGtgvaZTw==
-X-Google-Smtp-Source: AK7set9KtmjqqwgFLZB2FNx7zyl09FQwFd6hG2Sf0+3Gpskf/K+qKqsqUvXHqew395vtDLCSbNyrtA==
-X-Received: by 2002:a05:6000:1706:b0:2be:5366:8cdf with SMTP id n6-20020a056000170600b002be53668cdfmr2833558wrc.20.1675256384693;
-        Wed, 01 Feb 2023 04:59:44 -0800 (PST)
+        bh=k6RVVU/cDR30+b5v6ryQ9Qt2Qe/cZnMA4vlAa66b2Ys=;
+        b=57gY0EEg5K/J7ksqEjnNr+xB5RPzQJmbTfY4rLGtbOKWsfbMiE9BBpi2YnGB/Zm64k
+         eCdaGQcmpJWHc25m1Zmp886S4/shOwJuuPDWYhom1DxPIPTT3fQ48Fas1dHX74aAByq2
+         hBmEsdatfj1yTZl0DI+LLDA71Nl9zI9vBJAtP047jXIoNcyIcOlJx23lqAAR/dwWtIyF
+         iB+mIu4pjnEt8uCcNPy67aOaeOpR39v7Mswf529W6Q54pjLkcADnmLFE/x0VnSexjPPJ
+         9v25WZE1xee0iBoerAH7eeet6ahiQJ2rsP5zy8+7ApmPcUvSCkIkA3aaifG/0d286yO6
+         btCQ==
+X-Gm-Message-State: AO0yUKUnrnl5oyoqBGuaHREzx9wSF1Ka57vXkqgLlMljG8QXsa4aQu5J
+	Z0uwHAGH+DUowiFzpY5/kcxH1g==
+X-Google-Smtp-Source: AK7set9KZvY706CH4tuKx5S8bX1dcbZP46wQLmL4WsIGvMixGthlW8NKXtzmya0mXpXaEnKYzEH3wA==
+X-Received: by 2002:a5d:5e81:0:b0:2be:c41:4758 with SMTP id ck1-20020a5d5e81000000b002be0c414758mr2211733wrb.38.1675256383907;
+        Wed, 01 Feb 2023 04:59:43 -0800 (PST)
 Received: from localhost.localdomain (054592b0.skybroadband.com. [5.69.146.176])
-        by smtp.gmail.com with ESMTPSA id m15-20020a056000024f00b002bfae16ee2fsm17972811wrz.111.2023.02.01.04.59.44
+        by smtp.gmail.com with ESMTPSA id m15-20020a056000024f00b002bfae16ee2fsm17972811wrz.111.2023.02.01.04.59.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Feb 2023 04:59:44 -0800 (PST)
+        Wed, 01 Feb 2023 04:59:43 -0800 (PST)
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: maz@kernel.org,
 	catalin.marinas@arm.com,
@@ -55,9 +55,9 @@ Cc: robin.murphy@arm.com,
 	kvmarm@lists.linux.dev,
 	iommu@lists.linux.dev,
 	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [RFC PATCH 32/45] iommu/arm-smmu-v3: Move IOMMU registration to arm-smmu-v3-common.c
-Date: Wed,  1 Feb 2023 12:53:16 +0000
-Message-Id: <20230201125328.2186498-33-jean-philippe@linaro.org>
+Subject: [RFC PATCH 31/45] iommu/arm-smmu-v3: Move firmware probe to arm-smmu-v3-common
+Date: Wed,  1 Feb 2023 12:53:15 +0000
+Message-Id: <20230201125328.2186498-32-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230201125328.2186498-1-jean-philippe@linaro.org>
 References: <20230201125328.2186498-1-jean-philippe@linaro.org>
@@ -69,114 +69,306 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The KVM driver will need to implement a few IOMMU ops, so move the
-helpers to arm-smmu-v3-common.
+Move the FW probe functions to the common source, and take the
+opportunity to clean up the 'bypass' behaviour a bit (see dc87a98db751
+("iommu/arm-smmu: Fall back to global bypass"))
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |  4 +++
- .../arm/arm-smmu-v3/arm-smmu-v3-common.c      | 34 +++++++++++++++++++
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 17 ++--------
- 3 files changed, 40 insertions(+), 15 deletions(-)
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |   4 +
+ .../arm/arm-smmu-v3/arm-smmu-v3-common.c      | 107 ++++++++++++++++++
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 106 +----------------
+ 3 files changed, 114 insertions(+), 103 deletions(-)
 
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-index 345aac378712..87034da361ca 100644
+index 8ab84282f62a..345aac378712 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
-@@ -290,6 +290,10 @@ int arm_smmu_init_one_queue(struct arm_smmu_device *smmu,
- int arm_smmu_init_l2_strtab(struct arm_smmu_device *smmu, u32 sid);
- int arm_smmu_init_strtab(struct arm_smmu_device *smmu);
- 
-+int arm_smmu_register_iommu(struct arm_smmu_device *smmu,
-+			    struct iommu_ops *ops, phys_addr_t ioaddr);
-+void arm_smmu_unregister_iommu(struct arm_smmu_device *smmu);
+@@ -276,6 +276,10 @@ int arm_smmu_device_disable(struct arm_smmu_device *smmu);
+ bool arm_smmu_capable(struct device *dev, enum iommu_cap cap);
+ struct iommu_group *arm_smmu_device_group(struct device *dev);
+ int arm_smmu_of_xlate(struct device *dev, struct of_phandle_args *args);
 +
- int arm_smmu_write_ctx_desc(struct arm_smmu_domain *smmu_domain, int ssid,
- 			    struct arm_smmu_ctx_desc *cd);
- void arm_smmu_tlb_inv_asid(struct arm_smmu_device *smmu, u16 asid);
++struct platform_device;
++int arm_smmu_fw_probe(struct platform_device *pdev,
++		      struct arm_smmu_device *smmu, bool *bypass);
+ int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu);
+ int arm_smmu_init_one_queue(struct arm_smmu_device *smmu,
+ 			    struct arm_smmu_queue *q,
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common.c
-index 4e945df5d64f..7faf28c5a8b4 100644
+index 9226971b6e53..4e945df5d64f 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common.c
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common.c
-@@ -112,6 +112,13 @@ int arm_smmu_fw_probe(struct platform_device *pdev,
- 		return arm_smmu_device_acpi_probe(pdev, smmu, bypass);
- }
+@@ -1,10 +1,117 @@
+ // SPDX-License-Identifier: GPL-2.0
++#include <linux/acpi.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/iopoll.h>
++#include <linux/of.h>
++#include <linux/of_address.h>
++#include <linux/of_platform.h>
+ #include <linux/pci.h>
  
-+#ifdef CONFIG_ARM_SMMU_V3_SVA
-+bool __weak arm_smmu_sva_supported(struct arm_smmu_device *smmu)
+ #include "arm-smmu-v3.h"
+ 
++struct arm_smmu_option_prop {
++	u32 opt;
++	const char *prop;
++};
++
++static struct arm_smmu_option_prop arm_smmu_options[] = {
++	{ ARM_SMMU_OPT_SKIP_PREFETCH, "hisilicon,broken-prefetch-cmd" },
++	{ ARM_SMMU_OPT_PAGE0_REGS_ONLY, "cavium,cn9900-broken-page1-regspace"},
++	{ 0, NULL},
++};
++
++static void parse_driver_options(struct arm_smmu_device *smmu)
 +{
-+	return false;
++	int i = 0;
++
++	do {
++		if (of_property_read_bool(smmu->dev->of_node,
++						arm_smmu_options[i].prop)) {
++			smmu->options |= arm_smmu_options[i].opt;
++			dev_notice(smmu->dev, "option %s\n",
++				arm_smmu_options[i].prop);
++		}
++	} while (arm_smmu_options[++i].opt);
 +}
-+#endif
 +
- int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
- {
- 	u32 reg;
-@@ -591,3 +598,30 @@ int arm_smmu_init_strtab(struct arm_smmu_device *smmu)
- 	set_bit(0, smmu->vmid_map);
- 	return 0;
- }
-+
-+int arm_smmu_register_iommu(struct arm_smmu_device *smmu,
-+			    struct iommu_ops *ops, phys_addr_t ioaddr)
++static int arm_smmu_device_dt_probe(struct platform_device *pdev,
++				    struct arm_smmu_device *smmu,
++				    bool *bypass)
 +{
-+	int ret;
-+	struct device *dev = smmu->dev;
++	struct device *dev = &pdev->dev;
++	u32 cells;
 +
-+	ret = iommu_device_sysfs_add(&smmu->iommu, dev, NULL,
-+				     "smmu3.%pa", &ioaddr);
-+	if (ret)
-+		return ret;
++	*bypass = true;
++	if (of_property_read_u32(dev->of_node, "#iommu-cells", &cells))
++		dev_err(dev, "missing #iommu-cells property\n");
++	else if (cells != 1)
++		dev_err(dev, "invalid #iommu-cells value (%d)\n", cells);
++	else
++		*bypass = false;
 +
-+	ret = iommu_device_register(&smmu->iommu, ops, dev);
-+	if (ret) {
-+		dev_err(dev, "Failed to register iommu\n");
-+		iommu_device_sysfs_remove(&smmu->iommu);
-+		return ret;
-+	}
++	parse_driver_options(smmu);
++
++	if (of_dma_is_coherent(dev->of_node))
++		smmu->features |= ARM_SMMU_FEAT_COHERENCY;
 +
 +	return 0;
 +}
 +
-+void arm_smmu_unregister_iommu(struct arm_smmu_device *smmu)
++#ifdef CONFIG_ACPI
++static void acpi_smmu_get_options(u32 model, struct arm_smmu_device *smmu)
 +{
-+	iommu_device_unregister(&smmu->iommu);
-+	iommu_device_sysfs_remove(&smmu->iommu);
++	switch (model) {
++	case ACPI_IORT_SMMU_V3_CAVIUM_CN99XX:
++		smmu->options |= ARM_SMMU_OPT_PAGE0_REGS_ONLY;
++		break;
++	case ACPI_IORT_SMMU_V3_HISILICON_HI161X:
++		smmu->options |= ARM_SMMU_OPT_SKIP_PREFETCH;
++		break;
++	}
++
++	dev_notice(smmu->dev, "option mask 0x%x\n", smmu->options);
 +}
++
++static int arm_smmu_device_acpi_probe(struct platform_device *pdev,
++				      struct arm_smmu_device *smmu,
++				      bool *bypass)
++{
++	struct acpi_iort_smmu_v3 *iort_smmu;
++	struct device *dev = smmu->dev;
++	struct acpi_iort_node *node;
++
++	node = *(struct acpi_iort_node **)dev_get_platdata(dev);
++
++	/* Retrieve SMMUv3 specific data */
++	iort_smmu = (struct acpi_iort_smmu_v3 *)node->node_data;
++
++	acpi_smmu_get_options(iort_smmu->model, smmu);
++
++	if (iort_smmu->flags & ACPI_IORT_SMMU_V3_COHACC_OVERRIDE)
++		smmu->features |= ARM_SMMU_FEAT_COHERENCY;
++
++	*bypass = false;
++	return 0;
++}
++
++#else
++static inline int arm_smmu_device_acpi_probe(struct platform_device *pdev,
++					     struct arm_smmu_device *smmu,
++					     bool *bypass)
++{
++	return -ENODEV;
++}
++#endif
++
++int arm_smmu_fw_probe(struct platform_device *pdev,
++		      struct arm_smmu_device *smmu, bool *bypass)
++{
++	if (smmu->dev->of_node)
++		return arm_smmu_device_dt_probe(pdev, smmu, bypass);
++	else
++		return arm_smmu_device_acpi_probe(pdev, smmu, bypass);
++}
++
+ int arm_smmu_device_hw_probe(struct arm_smmu_device *smmu)
+ {
+ 	u32 reg;
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-index 7cb171304953..a972c00700cc 100644
+index 2baaf064a324..7cb171304953 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-@@ -3257,27 +3257,14 @@ static int arm_smmu_device_probe(struct platform_device *pdev)
- 		return ret;
+@@ -9,7 +9,6 @@
+  * This driver is powered by bad coffee and bombay mix.
+  */
  
- 	/* And we're up. Go go go! */
--	ret = iommu_device_sysfs_add(&smmu->iommu, dev, NULL,
--				     "smmu3.%pa", &ioaddr);
--	if (ret)
--		return ret;
+-#include <linux/acpi.h>
+ #include <linux/acpi_iort.h>
+ #include <linux/bitops.h>
+ #include <linux/crash_dump.h>
+@@ -19,9 +18,6 @@
+ #include <linux/io-pgtable.h>
+ #include <linux/module.h>
+ #include <linux/msi.h>
+-#include <linux/of.h>
+-#include <linux/of_address.h>
+-#include <linux/of_platform.h>
+ #include <linux/pci-ats.h>
+ #include <linux/platform_device.h>
+ 
+@@ -64,11 +60,6 @@ static phys_addr_t arm_smmu_msi_cfg[ARM_SMMU_MAX_MSIS][3] = {
+ 	},
+ };
+ 
+-struct arm_smmu_option_prop {
+-	u32 opt;
+-	const char *prop;
+-};
 -
--	ret = iommu_device_register(&smmu->iommu, &arm_smmu_ops, dev);
--	if (ret) {
--		dev_err(dev, "Failed to register iommu\n");
--		iommu_device_sysfs_remove(&smmu->iommu);
--		return ret;
--	}
+ DEFINE_XARRAY_ALLOC1(arm_smmu_asid_xa);
+ DEFINE_MUTEX(arm_smmu_asid_lock);
+ 
+@@ -78,26 +69,6 @@ DEFINE_MUTEX(arm_smmu_asid_lock);
+  */
+ struct arm_smmu_ctx_desc quiet_cd = { 0 };
+ 
+-static struct arm_smmu_option_prop arm_smmu_options[] = {
+-	{ ARM_SMMU_OPT_SKIP_PREFETCH, "hisilicon,broken-prefetch-cmd" },
+-	{ ARM_SMMU_OPT_PAGE0_REGS_ONLY, "cavium,cn9900-broken-page1-regspace"},
+-	{ 0, NULL},
+-};
 -
--	return 0;
-+	return arm_smmu_register_iommu(smmu, &arm_smmu_ops, ioaddr);
+-static void parse_driver_options(struct arm_smmu_device *smmu)
+-{
+-	int i = 0;
+-
+-	do {
+-		if (of_property_read_bool(smmu->dev->of_node,
+-						arm_smmu_options[i].prop)) {
+-			smmu->options |= arm_smmu_options[i].opt;
+-			dev_notice(smmu->dev, "option %s\n",
+-				arm_smmu_options[i].prop);
+-		}
+-	} while (arm_smmu_options[++i].opt);
+-}
+-
+ /* Low-level queue manipulation functions */
+ static bool queue_has_space(struct arm_smmu_ll_queue *q, u32 n)
+ {
+@@ -3147,70 +3118,6 @@ static int arm_smmu_device_reset(struct arm_smmu_device *smmu, bool bypass)
+ 	return 0;
  }
  
- static int arm_smmu_device_remove(struct platform_device *pdev)
+-#ifdef CONFIG_ACPI
+-static void acpi_smmu_get_options(u32 model, struct arm_smmu_device *smmu)
+-{
+-	switch (model) {
+-	case ACPI_IORT_SMMU_V3_CAVIUM_CN99XX:
+-		smmu->options |= ARM_SMMU_OPT_PAGE0_REGS_ONLY;
+-		break;
+-	case ACPI_IORT_SMMU_V3_HISILICON_HI161X:
+-		smmu->options |= ARM_SMMU_OPT_SKIP_PREFETCH;
+-		break;
+-	}
+-
+-	dev_notice(smmu->dev, "option mask 0x%x\n", smmu->options);
+-}
+-
+-static int arm_smmu_device_acpi_probe(struct platform_device *pdev,
+-				      struct arm_smmu_device *smmu)
+-{
+-	struct acpi_iort_smmu_v3 *iort_smmu;
+-	struct device *dev = smmu->dev;
+-	struct acpi_iort_node *node;
+-
+-	node = *(struct acpi_iort_node **)dev_get_platdata(dev);
+-
+-	/* Retrieve SMMUv3 specific data */
+-	iort_smmu = (struct acpi_iort_smmu_v3 *)node->node_data;
+-
+-	acpi_smmu_get_options(iort_smmu->model, smmu);
+-
+-	if (iort_smmu->flags & ACPI_IORT_SMMU_V3_COHACC_OVERRIDE)
+-		smmu->features |= ARM_SMMU_FEAT_COHERENCY;
+-
+-	return 0;
+-}
+-#else
+-static inline int arm_smmu_device_acpi_probe(struct platform_device *pdev,
+-					     struct arm_smmu_device *smmu)
+-{
+-	return -ENODEV;
+-}
+-#endif
+-
+-static int arm_smmu_device_dt_probe(struct platform_device *pdev,
+-				    struct arm_smmu_device *smmu)
+-{
+-	struct device *dev = &pdev->dev;
+-	u32 cells;
+-	int ret = -EINVAL;
+-
+-	if (of_property_read_u32(dev->of_node, "#iommu-cells", &cells))
+-		dev_err(dev, "missing #iommu-cells property\n");
+-	else if (cells != 1)
+-		dev_err(dev, "invalid #iommu-cells value (%d)\n", cells);
+-	else
+-		ret = 0;
+-
+-	parse_driver_options(smmu);
+-
+-	if (of_dma_is_coherent(dev->of_node))
+-		smmu->features |= ARM_SMMU_FEAT_COHERENCY;
+-
+-	return ret;
+-}
+-
+ static unsigned long arm_smmu_resource_size(struct arm_smmu_device *smmu)
  {
- 	struct arm_smmu_device *smmu = platform_get_drvdata(pdev);
+ 	if (smmu->options & ARM_SMMU_OPT_PAGE0_REGS_ONLY)
+@@ -3271,16 +3178,9 @@ static int arm_smmu_device_probe(struct platform_device *pdev)
+ 		return -ENOMEM;
+ 	smmu->dev = dev;
  
--	iommu_device_unregister(&smmu->iommu);
--	iommu_device_sysfs_remove(&smmu->iommu);
-+	arm_smmu_unregister_iommu(smmu);
- 	arm_smmu_device_disable(smmu);
- 	iopf_queue_free(smmu->evtq.iopf);
+-	if (dev->of_node) {
+-		ret = arm_smmu_device_dt_probe(pdev, smmu);
+-	} else {
+-		ret = arm_smmu_device_acpi_probe(pdev, smmu);
+-		if (ret == -ENODEV)
+-			return ret;
+-	}
+-
+-	/* Set bypass mode according to firmware probing result */
+-	bypass = !!ret;
++	ret = arm_smmu_fw_probe(pdev, smmu, &bypass);
++	if (ret)
++		return ret;
  
+ 	/* Base address */
+ 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 -- 
 2.39.0
 
