@@ -1,49 +1,57 @@
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0188483
-	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 16:48:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675270120; x=1706806120;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=w8u8eB3i+g2hkKrWZ3XNuqr4Dla5g1T+NGLU/nuIyQE=;
-  b=PrtaoZX8ZCJ7x2Cyton289gVADuuPoQasiq0/j0dJwSZjWLmUcRqXNbK
-   d7Sn3+K2KV9d+DvIMv5jTG/9tWGUu6BnJxRtFUS9NrStOum4YCt1O6yrC
-   Jpm6HvCgfWqKYk2W8nlMIQkbT2lan3e7EP3/xPdu8Wwme21FOz8eYyrMm
-   CajGgTNe/TKxnIn/jVzAqFdBh4qUd5n2WlZF/cAgfQeEydUSPFHOUVWEf
-   OcR1HaB3coJiVupkeQu9Q4sP7grBl5M98G2BuHYiJP1Sm7ueSIRYWyxTt
-   OFkah9x+PoHQnlaRPQcvog5YTanaE5Q7x42EUDy6dSy7u0sx2A2TmaArO
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10608"; a="328211396"
-X-IronPort-AV: E=Sophos;i="5.97,263,1669104000"; 
-   d="scan'208";a="328211396"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2023 08:48:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10608"; a="733637729"
-X-IronPort-AV: E=Sophos;i="5.97,263,1669104000"; 
-   d="scan'208";a="733637729"
-Received: from lkp-server01.sh.intel.com (HELO ffa7f14d1d0f) ([10.239.97.150])
-  by fmsmga004.fm.intel.com with ESMTP; 01 Feb 2023 08:48:36 -0800
-Received: from kbuild by ffa7f14d1d0f with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1pNGHj-0005aq-35;
-	Wed, 01 Feb 2023 16:48:35 +0000
-Date: Thu, 02 Feb 2023 00:47:49 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-trace-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-aspeed@lists.ozlabs.org, linux-arm-msm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvmarm@lists.cs.columbia.edu, devicetree@vger.kernel.org,
- amd-gfx@lists.freedesktop.org,
- Linux Memory Management List <linux-mm@kvack.org>
-Subject: [linux-next:master] BUILD REGRESSION
- 66eee64b235411d512bed4d672c2d00683239daf
-Message-ID: <63da97b5.3V1HSQEat507LFIr%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3818483
+	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 16:57:16 +0000 (UTC)
+Received: by mail-ej1-f48.google.com with SMTP id mc11so30781568ejb.10
+        for <kvmarm@lists.linux.dev>; Wed, 01 Feb 2023 08:57:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5QwLG2T0p0/wJ6lz+hF7UZawl4kCGwRAecIdikVjtEo=;
+        b=FjiELNOx4rVbcVrAuGwCv258MtT3ykNsIol/GqUpI0nt+Edk0r1icdxutjlmTcXBWW
+         GZ0V9voJ08dFm3E2wMYq6E7SMJ9cZWjL2ObcTY7C1ggoWR7sihQ/Afp4BDOKJGDCotPv
+         D4Jdlut/yMLyzF9tvIMo4sXDiX9IdrBmHptId5qYX8Q6tKdFCufPLxz/0/jSaarruZ9e
+         YftF69lT280fZq2surf4jBOozRQOl8Huf+8cVVp6k6pCXbi5EQQp6IZJW+2J3x1TTvJZ
+         Q7GuvvU7UTTVyyvsoKlHyf1jcZMugXO52qvphTuNl2WtYU2DriOkvH0D53/yQc8Vwpeb
+         CIKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5QwLG2T0p0/wJ6lz+hF7UZawl4kCGwRAecIdikVjtEo=;
+        b=D9lW+Vq1OA4hfXwUV308jjtgH8Dvt2/uymh/x1+Q8P/zk1Wqck7MnuLAqhRVPt7F2U
+         Rmtxkm+xltW9e/CD80yc5OhFXm2HaVX5Js3Ht0vpXPwAZ0QAHa71kluQX0FWFEdrJyq8
+         rY1pUE63KetOdom1mP/XTtS+Pv+fGqYW7k9a/1g+++t1E1PsEGoAGMvpRoe+hTBeoZ3Z
+         7+P6a1t7aFeFCvh5kDzFC4jwAicv2zs1n5DRSpzqS7uyGDbrgOa6r5meMyS88i+CHlf5
+         SPaUbe/UY6H9AUR4HDwNb7l99nOPOb3UpxSofKg/ZuzrnQliXluGTco3gdN/Smff2HKa
+         o47g==
+X-Gm-Message-State: AO0yUKViwDhXJ3ESEimcZzoA97QLTiw1qqHEr1Fa5Hu7LCvQ5R3eFnWN
+	OYT8ZeWMAZoFiAZKombXN9j0WQ==
+X-Google-Smtp-Source: AK7set9KH3KAy6EZVpBWgeg+qNgCuSj1hLv7Q2CPEU+vYqF8yGOPPNkySgRFVjuyZvEfvpW8fknKDg==
+X-Received: by 2002:a17:906:2c6:b0:887:87e2:5102 with SMTP id 6-20020a17090602c600b0088787e25102mr7004327ejk.13.1675270634684;
+        Wed, 01 Feb 2023 08:57:14 -0800 (PST)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
+        by smtp.gmail.com with ESMTPSA id d13-20020a170906344d00b0088385cd6166sm7094168ejb.195.2023.02.01.08.57.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Feb 2023 08:57:13 -0800 (PST)
+Date: Wed, 1 Feb 2023 16:57:09 +0000
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Mark Brown <broonie@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+	kernel-team@android.com
+Subject: Re: [PATCH 0/4] KVM: arm64: Fix CPU resume/on with pKVM
+Message-ID: <Y9qZ5XoXW1XQ70eE@google.com>
+References: <20230201103755.1398086-1-qperret@google.com>
+ <86bkmd1ly4.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,183 +59,46 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <86bkmd1ly4.wl-maz@kernel.org>
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: 66eee64b235411d512bed4d672c2d00683239daf  Add linux-next specific files for 20230201
+On Wednesday 01 Feb 2023 at 14:48:03 (+0000), Marc Zyngier wrote:
+> On Wed, 01 Feb 2023 10:37:50 +0000,
+> Quentin Perret <qperret@google.com> wrote:
+> > 
+> > When using pKVM, we do not reset the EL2 exception vectors back to the
+> > stubs for e.g. Power Management or CPU hotplug as we normally do in KVM.
+> > As consequence, the initialisation perfomed by __finalise_el2 is missing
+> > on e.g. the CPU_RESUME path with pKVM, hence leaving certain registers
+> > in an incorrect state.
+> > 
+> > One such example is ZCR_EL2 which remains configured with SVE traps
+> > enabled. And so using SVE on a CPU that has gone through a hotplug
+> > off/on cycle leads to a hyp panic. Not good.
+> > 
+> > This series fixes this by macroizing the first half of __finalise_el2
+> > (that is, the part that is not specific to VHE) to allow its re-use
+> > from pKVM's PSCI relay.
+> 
+> For the series:
+> 
+> Reviewed-by: Marc Zyngier <maz@kernel.org>
+> 
+> I think it might be a bit late to send this as fixes for 6.2 (my
+> latest pull request for kvmarm-fixes-6.2-3 is still in limbo), so I'd
+> suggest we take it for 6.3.
 
-Error/Warning reports:
+Works for me.
 
-https://lore.kernel.org/oe-kbuild-all/202301300743.bp7Dpazv-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202301301801.y5O08tQx-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202301302110.mEtNwkBD-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202301310939.TAgCOEZb-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202302011836.kA3BxqdY-lkp@intel.com
+> How do you want to deal with the backports? None of the patches have a
+> Cc: stable, and only the last one has a Fixes: tag, but cannot be
+> applied standalone.
 
-Error/Warning: (recently discovered and may have been fixed)
+Right, I wasn't sure what was best -- the first patches aren't really
+fixing anything per se but yeah, we kinda need them...
 
-Documentation/riscv/uabi.rst:24: WARNING: Enumerated list ends without a blank line; unexpected unindent.
-ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/fsl-edma.ko] undefined!
-ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/idma64.ko] undefined!
-arch/arm64/kvm/arm.c:2206: warning: expecting prototype for Initialize Hyp(). Prototype was for kvm_arm_init() instead
-drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm.h:62:10: fatal error: mod_info_packet.h: No such file or directory
-drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:148:6: warning: no previous prototype for 'link_dp_trace_set_edp_power_timestamp' [-Wmissing-prototypes]
-drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:158:10: warning: no previous prototype for 'link_dp_trace_get_edp_poweron_timestamp' [-Wmissing-prototypes]
-drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:163:10: warning: no previous prototype for 'link_dp_trace_get_edp_poweroff_timestamp' [-Wmissing-prototypes]
-drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_capability.c:1295:32: warning: variable 'result_write_min_hblank' set but not used [-Wunused-but-set-variable]
-drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_capability.c:279:42: warning: variable 'ds_port' set but not used [-Wunused-but-set-variable]
-drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_training.c:1585:38: warning: variable 'result' set but not used [-Wunused-but-set-variable]
-ftrace-ops.c:(.init.text+0x2c3): undefined reference to `__udivdi3'
-idma64.c:(.text+0x1696): undefined reference to `devm_platform_ioremap_resource'
+Happy to re-post a version with the same 'Fixes:' tag on all patches and
+'Cc: stable' everywhere if that makes things easier. Wdyt?
 
-Unverified Error/Warning (likely false positive, please contact us if interested):
-
-drivers/crypto/aspeed/aspeed-acry.c:295:37: sparse: sparse: incorrect type in assignment (different base types)
-drivers/crypto/aspeed/aspeed-acry.c:305:28: sparse: sparse: cast removes address space '__iomem' of expression
-drivers/crypto/aspeed/aspeed-acry.c:606:24: sparse: sparse: symbol 'aspeed_acry_akcipher_algs' was not declared. Should it be static?
-drivers/nvmem/imx-ocotp.c:599:21: sparse: sparse: symbol 'imx_ocotp_layout' was not declared. Should it be static?
-drivers/nvmem/layouts/sl28vpd.c:143:21: sparse: sparse: symbol 'sl28vpd_layout' was not declared. Should it be static?
-drivers/of/platform.c:570:2-23: WARNING: Function "for_each_node_by_type" should have of_node_put() before break around line 575.
-drivers/thermal/qcom/tsens-v0_1.c:106:40: sparse: sparse: symbol 'tsens_9607_nvmem' was not declared. Should it be static?
-drivers/thermal/qcom/tsens-v0_1.c:26:40: sparse: sparse: symbol 'tsens_8916_nvmem' was not declared. Should it be static?
-drivers/thermal/qcom/tsens-v0_1.c:42:40: sparse: sparse: symbol 'tsens_8939_nvmem' was not declared. Should it be static?
-drivers/thermal/qcom/tsens-v0_1.c:62:40: sparse: sparse: symbol 'tsens_8974_nvmem' was not declared. Should it be static?
-drivers/thermal/qcom/tsens-v0_1.c:84:40: sparse: sparse: symbol 'tsens_8974_backup_nvmem' was not declared. Should it be static?
-drivers/thermal/qcom/tsens-v1.c:24:40: sparse: sparse: symbol 'tsens_qcs404_nvmem' was not declared. Should it be static?
-drivers/thermal/qcom/tsens-v1.c:45:40: sparse: sparse: symbol 'tsens_8976_nvmem' was not declared. Should it be static?
-
-Error/Warning ids grouped by kconfigs:
-
-gcc_recent_errors
-|-- alpha-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
-|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
-|-- alpha-randconfig-r026-20230129
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
-|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
-|-- alpha-randconfig-s032-20230129
-|   `-- drivers-nvmem-layouts-sl28vpd.c:sparse:sparse:symbol-sl28vpd_layout-was-not-declared.-Should-it-be-static
-|-- arc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
-|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
-|-- arc-randconfig-r001-20230130
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
-|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
-|-- arm-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
-|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
-|-- arm64-allyesconfig
-|   |-- arch-arm64-kvm-arm.c:warning:expecting-prototype-for-Initialize-Hyp().-Prototype-was-for-kvm_arm_init()-instead
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
-|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
-|-- i386-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
-
-elapsed time: 722m
-
-configs tested: 69
-configs skipped: 2
-
-gcc tested configs:
-x86_64                          rhel-8.3-func
-x86_64                    rhel-8.3-kselftests
-ia64                             allmodconfig
-x86_64                            allnoconfig
-um                             i386_defconfig
-um                           x86_64_defconfig
-arc                                 defconfig
-i386                                defconfig
-x86_64                              defconfig
-alpha                               defconfig
-arm                                 defconfig
-mips                             allyesconfig
-x86_64                           rhel-8.3-syz
-x86_64               randconfig-a001-20230130
-x86_64                         rhel-8.3-kunit
-x86_64               randconfig-a003-20230130
-x86_64                           rhel-8.3-bpf
-powerpc                           allnoconfig
-x86_64               randconfig-a004-20230130
-x86_64                               rhel-8.3
-x86_64               randconfig-a002-20230130
-powerpc                          allmodconfig
-sh                               allmodconfig
-x86_64               randconfig-a006-20230130
-x86_64                           allyesconfig
-i386                          randconfig-a001
-x86_64                           rhel-8.3-kvm
-i386                          randconfig-a003
-x86_64               randconfig-a005-20230130
-arm64                            allyesconfig
-i386                             allyesconfig
-i386                          randconfig-a005
-arc                  randconfig-r043-20230129
-i386                          randconfig-c001
-arm                              allyesconfig
-s390                                defconfig
-s390                             allmodconfig
-arm                  randconfig-r046-20230129
-arm                  randconfig-r046-20230130
-s390                             allyesconfig
-arc                  randconfig-r043-20230130
-m68k                             allyesconfig
-m68k                             allmodconfig
-alpha                            allyesconfig
-arc                              allyesconfig
-
-clang tested configs:
-x86_64                          rhel-8.3-rust
-x86_64               randconfig-a012-20230130
-x86_64               randconfig-a013-20230130
-x86_64               randconfig-a011-20230130
-x86_64               randconfig-a014-20230130
-i386                 randconfig-a013-20230130
-i386                          randconfig-a002
-i386                 randconfig-a012-20230130
-i386                 randconfig-a014-20230130
-i386                          randconfig-a004
-x86_64               randconfig-a015-20230130
-i386                 randconfig-a015-20230130
-x86_64               randconfig-a016-20230130
-i386                 randconfig-a011-20230130
-hexagon              randconfig-r041-20230129
-i386                 randconfig-a016-20230130
-riscv                randconfig-r042-20230129
-i386                          randconfig-a006
-riscv                randconfig-r042-20230130
-hexagon              randconfig-r045-20230130
-hexagon              randconfig-r041-20230130
-hexagon              randconfig-r045-20230129
-s390                 randconfig-r044-20230129
-s390                 randconfig-r044-20230130
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Cheers,
+Quentin
