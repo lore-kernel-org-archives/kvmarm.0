@@ -1,43 +1,43 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58BC02F32
-	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 12:59:27 +0000 (UTC)
-Received: by mail-wr1-f41.google.com with SMTP id bk16so17209889wrb.11
-        for <kvmarm@lists.linux.dev>; Wed, 01 Feb 2023 04:59:27 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242E52F50
+	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 12:59:28 +0000 (UTC)
+Received: by mail-wm1-f47.google.com with SMTP id k16so12615595wms.2
+        for <kvmarm@lists.linux.dev>; Wed, 01 Feb 2023 04:59:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mpqAxnbuSEle+b4ZozqvuRbtg84sOU2wLsHHXy60Xf4=;
-        b=H8N6t8azgmWBH886NvtNIa/88xftg/d47CN1lNWpwQY8g41X2dJULDBUt8RWJTJeSI
-         WThReSjvqRrR6PVFUKbeH+UFULZSwESdu2a/Lm9dDMa5lpETn4ZZ/+Opu68LiZmqq9sN
-         7P/93+ZxvEA2KO5Usrr4b/D33b6zAhssqHN/jocvhOTGBVp9C2dmRhMkotIsbkaCIu35
-         VlkRPDQbg9E1wdVnf/L6ySFyOuxkCqSpAFTCvU8t7w+YTqswvLQFx7+ljAE9t0xAPWKe
-         1n4xTnAPGdVNWDKH/odBfQ6RBeJ1YG99BQDMs9ceNFwJeIzOmly9KiYRBCORoZE+neG/
-         rcxQ==
+        bh=RLOTGdIX5XzH+Jwl3kF9DSu2jc0/WXz1kG1OARrYJNM=;
+        b=Q3d2qtJCq3BIVZGKfu+1IbjBWHzFBo5/Xb5HFUtbvMJiuz3cAPjEqCHt3UwOffYZxE
+         TMFUSJOltSsIXD8YBlXzzMeEB3fEpiE9zUaiuEEPBVru2iH+3SS3201GANWWtgrCmLfp
+         yp/r96OfA0uSfjIy1uIBj8EViI4HE3mP0t4qaiaKs8CSwJRo9psQTTID6YbKjjmjvw5I
+         ecCHZjebTzN1f6avWcf8CrPIb6hGrng7Q4dsF98hbcyuENPsy9HlSYBL62deV6Pt96s+
+         aDVggipAu4GpMD4mgFQZmn9cMcZnEDM6Akk5nC8sqLdcDYZCpkG4NS3wVlZ2x/Lpsq6r
+         WDGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mpqAxnbuSEle+b4ZozqvuRbtg84sOU2wLsHHXy60Xf4=;
-        b=Jkee/DLiVhcntH4Xx+bsgFj21yAn0wcLEhHhfp+zpln4LFSjVT9syxnAOhojSbYtSC
-         C+6vXXS2b0fKOhCfbPKmVe2AvS1Yk3jK+8ObWL7T+QSEn0zJNTJT9uPsdHqqv/ef62lw
-         DgL7poUDWksEmEsk9P8EIg6kQxqFyEC58HzuwRmxFkmETIpR2zV/tq+BmQ+HEZGq4O94
-         su+bDR1MxFtVvbzraVVlmnZ+UMKi6A4YZNu06n6Hw7+XJBbMdF7wSPDIaTjs/URBQCfq
-         ASt+EwFX/66Ay8iDpWH8KjOrNIiRZUzWkSP7PLEjJ7+vRG2ru3TA2jHAjOW0SFcpcPgB
-         yYig==
-X-Gm-Message-State: AO0yUKVbxPXAm5biBhWFXupfPwm/CJPMdsWe+Y7IKKdXc5tLwIFhD7k7
-	SaJjpVVZNApY9cmby9rGJokykA==
-X-Google-Smtp-Source: AK7set8PyrVNoe2MKjwL7WkMsO801xwUwupVDKmMI+GE07B0RcxtODTmVsZbmKSEFKICiI5L55zPfQ==
-X-Received: by 2002:adf:e181:0:b0:2bd:c4ea:3b59 with SMTP id az1-20020adfe181000000b002bdc4ea3b59mr2690988wrb.0.1675256365691;
-        Wed, 01 Feb 2023 04:59:25 -0800 (PST)
+        bh=RLOTGdIX5XzH+Jwl3kF9DSu2jc0/WXz1kG1OARrYJNM=;
+        b=ns8lJyHSK5hpOnrr5iMDfJ5dVC6HOPcQ7gMfko5kKns5DT06547zAc/RG1LRbTAIAr
+         PZu6UbvDwn47Bco31gtzTzGqyxGbmKX69aUlrkAX3wE6VYhI9nzOrafXT1pNeUJOXtAA
+         +IYSnabWl+Z4kO2xNH3DXF66C6nIL7X64PLUKVkUpcSLQE4w1pSvgg+8C1yhcjrgF342
+         Hh2IMMTfig311fagvx6oJE4lcYCYz8UQe9ywCEseOgCB9c74W8Prz/tmS529MYVo6Eyp
+         50aImc0t3T/hcAtmv7yw4kI1UCgANSD/A+qTcRMkyI6G6hrIO+q5/t1savkyKNyWVqpK
+         Aohg==
+X-Gm-Message-State: AO0yUKX5vZ/M2LiLPvL+NdCpWNWV8oHFmTHeUbz9RpK9a0uJLYZzm0Ni
+	A/847unC22MRu310gmczvSpq9Q==
+X-Google-Smtp-Source: AK7set/rYkvZAy6++0J4vjVN94POb8/wXVqA/8/v2lPmHrVQwzFxOEu9D5CiFkQiJcSsOv/7hSdgVQ==
+X-Received: by 2002:a05:600c:1989:b0:3db:2d7e:1204 with SMTP id t9-20020a05600c198900b003db2d7e1204mr2027422wmq.27.1675256366507;
+        Wed, 01 Feb 2023 04:59:26 -0800 (PST)
 Received: from localhost.localdomain (054592b0.skybroadband.com. [5.69.146.176])
-        by smtp.gmail.com with ESMTPSA id m15-20020a056000024f00b002bfae16ee2fsm17972811wrz.111.2023.02.01.04.59.24
+        by smtp.gmail.com with ESMTPSA id m15-20020a056000024f00b002bfae16ee2fsm17972811wrz.111.2023.02.01.04.59.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Feb 2023 04:59:25 -0800 (PST)
+        Wed, 01 Feb 2023 04:59:26 -0800 (PST)
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: maz@kernel.org,
 	catalin.marinas@arm.com,
@@ -55,9 +55,9 @@ Cc: robin.murphy@arm.com,
 	kvmarm@lists.linux.dev,
 	iommu@lists.linux.dev,
 	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [RFC PATCH 08/45] KVM: arm64: pkvm: Add pkvm_udelay()
-Date: Wed,  1 Feb 2023 12:52:52 +0000
-Message-Id: <20230201125328.2186498-9-jean-philippe@linaro.org>
+Subject: [RFC PATCH 09/45] KVM: arm64: pkvm: Add pkvm_create_hyp_device_mapping()
+Date: Wed,  1 Feb 2023 12:52:53 +0000
+Message-Id: <20230201125328.2186498-10-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230201125328.2186498-1-jean-philippe@linaro.org>
 References: <20230201125328.2186498-1-jean-philippe@linaro.org>
@@ -69,106 +69,55 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a simple delay loop for drivers.
-
-This could use more work. It should be possible to insert a wfe and save
-power, but I haven't studied whether it is safe to do so with the host
-in control of the event stream. The SMMU driver will use wfe anyway for
-frequent waits (provided the implementation can send command queue
-events).
+Add a function to map a MMIO region in the hypervisor and remove it from
+the host. Hypervisor device drivers use this to reserve their regions
+during setup.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  3 ++
- arch/arm64/kvm/hyp/nvhe/setup.c        |  4 +++
- arch/arm64/kvm/hyp/nvhe/timer-sr.c     | 43 ++++++++++++++++++++++++++
- 3 files changed, 50 insertions(+)
+ arch/arm64/kvm/hyp/include/nvhe/mm.h |  1 +
+ arch/arm64/kvm/hyp/nvhe/setup.c      | 17 +++++++++++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index 6160d1a34fa2..746dc1c05a8e 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -109,4 +109,7 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code);
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+index d5ec972b5c1e..84db840f2057 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+@@ -27,5 +27,6 @@ int __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
+ 				  enum kvm_pgtable_prot prot,
+ 				  unsigned long *haddr);
+ int pkvm_alloc_private_va_range(size_t size, unsigned long *haddr);
++int pkvm_create_hyp_device_mapping(u64 base, u64 size, void __iomem *haddr);
  
- struct pkvm_hyp_vcpu *pkvm_mpidr_to_hyp_vcpu(struct pkvm_hyp_vm *vm, u64 mpidr);
- 
-+int pkvm_timer_init(void);
-+void pkvm_udelay(unsigned long usecs);
-+
- #endif /* __ARM64_KVM_NVHE_PKVM_H__ */
+ #endif /* __KVM_HYP_MM_H */
 diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-index 8a357637ce81..629e74c46b35 100644
+index 629e74c46b35..de7d60c3c20b 100644
 --- a/arch/arm64/kvm/hyp/nvhe/setup.c
 +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-@@ -300,6 +300,10 @@ void __noreturn __pkvm_init_finalise(void)
- 	};
- 	pkvm_pgtable.mm_ops = &pkvm_pgtable_mm_ops;
- 
-+	ret = pkvm_timer_init();
-+	if (ret)
-+		goto out;
-+
- 	ret = fix_host_ownership();
- 	if (ret)
- 		goto out;
-diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-index 9072e71693ba..202df9003a0d 100644
---- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-@@ -10,6 +10,10 @@
- 
- #include <asm/kvm_hyp.h>
- 
-+#include <nvhe/pkvm.h>
-+
-+static u32 timer_freq;
-+
- void __kvm_timer_set_cntvoff(u64 cntvoff)
- {
- 	write_sysreg(cntvoff, cntvoff_el2);
-@@ -46,3 +50,42 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
- 	val |= CNTHCTL_EL1PCTEN;
- 	write_sysreg(val, cnthctl_el2);
+@@ -259,6 +259,23 @@ static int fix_host_ownership(void)
+ 	return 0;
  }
-+
-+static u64 pkvm_ticks_get(void)
+ 
++/* Map the MMIO region into the hypervisor and remove it from host */
++int pkvm_create_hyp_device_mapping(u64 base, u64 size, void __iomem *haddr)
 +{
-+	return __arch_counter_get_cntvct();
++	int ret;
++
++	ret = __pkvm_create_private_mapping(base, size, PAGE_HYP_DEVICE, haddr);
++	if (ret)
++		return ret;
++
++	/* lock not needed during setup */
++	ret = host_stage2_set_owner_locked(base, size, PKVM_ID_HYP);
++	if (ret)
++		return ret;
++
++	return ret;
 +}
 +
-+#define SEC_TO_US 1000000
-+
-+int pkvm_timer_init(void)
-+{
-+	timer_freq = read_sysreg(cntfrq_el0);
-+	/*
-+	 * TODO: The highest privileged level is supposed to initialize this
-+	 * register. But on some systems (which?), this information is only
-+	 * contained in the device-tree, so we'll need to find it out some other
-+	 * way.
-+	 */
-+	if (!timer_freq || timer_freq < SEC_TO_US)
-+		return -ENODEV;
-+	return 0;
-+}
-+
-+
-+#define pkvm_time_us_to_ticks(us) ((u64)(us) * timer_freq / SEC_TO_US)
-+
-+void pkvm_udelay(unsigned long usecs)
-+{
-+	u64 ticks = pkvm_time_us_to_ticks(usecs);
-+	u64 start = pkvm_ticks_get();
-+
-+	while (true) {
-+		u64 cur = pkvm_ticks_get();
-+
-+		if ((cur - start) >= ticks || cur < start)
-+			break;
-+		/* TODO wfe */
-+		cpu_relax();
-+	}
-+}
+ static int fix_hyp_pgtable_refcnt(void)
+ {
+ 	struct kvm_pgtable_walker walker = {
 -- 
 2.39.0
 
