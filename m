@@ -1,43 +1,43 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87CEE320B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC7763A7
 	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 12:59:34 +0000 (UTC)
-Received: by mail-wr1-f53.google.com with SMTP id a3so10534083wrt.6
+Received: by mail-wr1-f44.google.com with SMTP id q10so17233118wrm.4
         for <kvmarm@lists.linux.dev>; Wed, 01 Feb 2023 04:59:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zbZLsQb0xg2PPl0XoduEhMIm9PR89tvM6CYFFsggaVQ=;
-        b=EJPFEmmztrvIgrDqJ3MkjHOSDg10LW20VhEO2fXjPBvc6j5UWEZd1MsrLv1vfwRpiT
-         cc62+AK11q+MLrLeHagED0GqHtTtgNMbjWYdLu4JQS8/BN8YkB9FYd7h4PIS2zdC3+vu
-         2iKKBnOpCcuwH0AbFAob7chGyqYiAxwVQoA8kDen4hca8LfZn6MGq5be+PVb9L4jZd3j
-         tjp9gmImOJ77dnwKcjQL6qp+oB8pN7DPKOFoIDuuRYA4K2SsX9UQuEM4INZKmw/TnRgF
-         b4/t3kcPLOY61LKoEA8twExnhgN2rtn+rPvfdcRIIP5T/5EdnDPr5LLk3KfRf/5YLi0y
-         gqFw==
+        bh=Z3Yg+/pxswLQbPunG2DXR1JjAIQ1RbfjYcFDMPdwdzM=;
+        b=p/nK7+wPjP1LcWDKxtBPABr2lvORJQGF5cwCSAMD9DwVZ1FAJ1dTpxTJnepxujM7dA
+         7xQceH6A7so/6YM33Q33Mid751l1L4aK2IopzI9FvOZ3a9nkxXtSGU1H2/eYx/BUoYMQ
+         UKO3pbv+TuYBp3+FIBmvd3sWSps62WaMrbgik6YBvQ6tfGN03HHekQv2+FHK0wZPY2ZT
+         p2FyzuY7awvCU5Qa8sxG9yFr5i9HClCJY7Say468qpHde3oyJ5myuMq2RCBmdFkGpgT0
+         HplkULNe7KeFKAnOw2uPphLzQUETd5b6CoDDJugCRT+WgAmzvgEfX12JL991faA7cPii
+         Omgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zbZLsQb0xg2PPl0XoduEhMIm9PR89tvM6CYFFsggaVQ=;
-        b=sXSiNBG2DEZRL6oo0Zs9wLlxXRX2gVKY4y83ycKSlZ6GsVlEtPQT0D7cuxuXWU5SeZ
-         YE05FjKCPrqoeidcIF/4lk1uHFIYSTc/XEb6nD/z9FIr1U36q9YeiqzNunWQ31E1UG6L
-         eoR35od5bZRi/Fs4Ne3IInl1p5ftOWTQJpWyhZts6Ms1S5rryCSPPqZhJpjDYNCvofH7
-         NZo/7zI2VjfBGJGLQfp4fC2ErtsySW7bfmU/kNtUEND6nUbj5v9xX20SV3UpXrYACu0B
-         pzaRzNi/4MxTxQp+KIji9taN70dJ4KcoBqMpNloVbf/qqWSw2FxVnpoctwj/R4Zrv2j/
-         DjSg==
-X-Gm-Message-State: AO0yUKWGndconavR6GYfk3Pa5d8xr2S+cjf5YMEChBhj+S0nuSx7ZxYC
-	Hs0IhfoEDfVCYip+UWMFWCZa8g==
-X-Google-Smtp-Source: AK7set9gMQhL6pt9dp/2vtz2l2umJOa+pYslGi7ef3uzOBfAa+HuE2R6nT4pVnYJgiPfcb1UxI1NgA==
-X-Received: by 2002:a5d:6b89:0:b0:2bf:b571:1f18 with SMTP id n9-20020a5d6b89000000b002bfb5711f18mr2573727wrx.61.1675256372895;
-        Wed, 01 Feb 2023 04:59:32 -0800 (PST)
+        bh=Z3Yg+/pxswLQbPunG2DXR1JjAIQ1RbfjYcFDMPdwdzM=;
+        b=52LsKdgkjf/NQWnDRVhrSnnMqM4Go+KAlpKY+sn2TyLq6VYhwjdQOY++tWnm5w3ob7
+         zTXrQfE0utVWcTT0jEFp2j65doLccgRqGKfRLntaITiFZjp7fG/mBZJEGeLkYlzgHmpV
+         i5HgAyx8QiA/IijXVrd6BciDJAp++Dh0ollV5NXhu/X8L2UB1cS5Tay1HKBYHW0vV10U
+         gyZBceFQOh4xJfLV5T+Iyp/cht/UnHgex4AzZzSYYsXUgo1RMLwqPMTQTdlwPfEceiWk
+         0pRSaHXpkWeH2juUgNbfLm2zxNqdwkrrxP6LyT8h+jYOKXOygNxbBqU0Tdv0ltpxCvya
+         LVgg==
+X-Gm-Message-State: AO0yUKXwigvU5zUBGoXzB9Mw1gc4EdCxlpdJ/R+p3hLjharMCJYe6uxJ
+	MX49iVpSa+8MM0Mson7ivDb3og==
+X-Google-Smtp-Source: AK7set+yLNu0DSsphBd0SuP5yvH+awkiyKJcWCgw8Jnpd5g9PXARhY0JjXD6HP7p0G4o7WR+j5r/4Q==
+X-Received: by 2002:adf:c713:0:b0:2bf:b8f0:f6c6 with SMTP id k19-20020adfc713000000b002bfb8f0f6c6mr2542639wrg.45.1675256374468;
+        Wed, 01 Feb 2023 04:59:34 -0800 (PST)
 Received: from localhost.localdomain (054592b0.skybroadband.com. [5.69.146.176])
-        by smtp.gmail.com with ESMTPSA id m15-20020a056000024f00b002bfae16ee2fsm17972811wrz.111.2023.02.01.04.59.32
+        by smtp.gmail.com with ESMTPSA id m15-20020a056000024f00b002bfae16ee2fsm17972811wrz.111.2023.02.01.04.59.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Feb 2023 04:59:32 -0800 (PST)
+        Wed, 01 Feb 2023 04:59:34 -0800 (PST)
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: maz@kernel.org,
 	catalin.marinas@arm.com,
@@ -55,9 +55,9 @@ Cc: robin.murphy@arm.com,
 	kvmarm@lists.linux.dev,
 	iommu@lists.linux.dev,
 	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [RFC PATCH 17/45] KVM: arm64: pkvm: Add IOMMU hypercalls
-Date: Wed,  1 Feb 2023 12:53:01 +0000
-Message-Id: <20230201125328.2186498-18-jean-philippe@linaro.org>
+Subject: [RFC PATCH 19/45] KVM: arm64: iommu: Add domains
+Date: Wed,  1 Feb 2023 12:53:03 +0000
+Message-Id: <20230201125328.2186498-20-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230201125328.2186498-1-jean-philippe@linaro.org>
 References: <20230201125328.2186498-1-jean-philippe@linaro.org>
@@ -69,223 +69,319 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The unprivileged host IOMMU driver forwards some of the IOMMU API calls
-to the hypervisor, which installs and populates the page tables.
+The IOMMU domain abstraction allows to share the same page tables
+between multiple devices. That may be necessary due to hardware
+constraints, if multiple devices cannot be isolated by the IOMMU
+(conventional PCI bus for example). It may also help with optimizing
+resource or TLB use. For pKVM in particular, it may be useful to reduce
+the amount of memory required for page tables. All devices owned by the
+host kernel could be attached to the same domain (though that requires
+host changes).
 
-Note that this is not a stable ABI. Those hypercalls change with the
-kernel just like internal function calls.
+Each IOMMU device holds an array of domains, and the host allocates
+domain IDs that index this array. The alloc() operation initializes the
+domain and prepares the page tables. The attach() operation initializes
+the device table that holds the PGD and its configuration.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
- virt/kvm/Kconfig                        |  3 +
- arch/arm64/include/asm/kvm_asm.h        |  7 +++
- arch/arm64/kvm/hyp/include/nvhe/iommu.h | 68 ++++++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 77 +++++++++++++++++++++++++
- 4 files changed, 155 insertions(+)
+ arch/arm64/kvm/hyp/include/nvhe/iommu.h |  16 +++
+ include/kvm/iommu.h                     |  55 ++++++++
+ arch/arm64/kvm/hyp/nvhe/iommu/iommu.c   | 161 ++++++++++++++++++++++++
+ 3 files changed, 232 insertions(+)
 
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index 9fb1ff6f19e5..99b0ddc50443 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -92,3 +92,6 @@ config KVM_XFER_TO_GUEST_WORK
- 
- config HAVE_KVM_PM_NOTIFIER
-        bool
-+
-+config KVM_IOMMU
-+       bool
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 12aa0ccc3b3d..e2ced352b49c 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -81,6 +81,13 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_sync_state,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_iommu_alloc_domain,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_iommu_free_domain,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_iommu_attach_dev,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_iommu_detach_dev,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_iommu_map_pages,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_iommu_unmap_pages,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_iommu_iova_to_phys,
- };
- 
- #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
 diff --git a/arch/arm64/kvm/hyp/include/nvhe/iommu.h b/arch/arm64/kvm/hyp/include/nvhe/iommu.h
-index c728c8e913da..26a95717b613 100644
+index 4959c30977b8..76d3fa6ce331 100644
 --- a/arch/arm64/kvm/hyp/include/nvhe/iommu.h
 +++ b/arch/arm64/kvm/hyp/include/nvhe/iommu.h
-@@ -2,6 +2,74 @@
+@@ -2,8 +2,12 @@
  #ifndef __ARM64_KVM_NVHE_IOMMU_H__
  #define __ARM64_KVM_NVHE_IOMMU_H__
  
-+#if IS_ENABLED(CONFIG_KVM_IOMMU)
-+/* Hypercall handlers */
-+int kvm_iommu_alloc_domain(pkvm_handle_t iommu_id, pkvm_handle_t domain_id,
-+			   unsigned long pgd_hva);
-+int kvm_iommu_free_domain(pkvm_handle_t iommu_id, pkvm_handle_t domain_id);
-+int kvm_iommu_attach_dev(pkvm_handle_t iommu_id, pkvm_handle_t domain_id,
-+			 u32 endpoint_id);
-+int kvm_iommu_detach_dev(pkvm_handle_t iommu_id, pkvm_handle_t domain_id,
-+			 u32 endpoint_id);
-+int kvm_iommu_map_pages(pkvm_handle_t iommu_id, pkvm_handle_t domain_id,
-+			unsigned long iova, phys_addr_t paddr, size_t pgsize,
-+			size_t pgcount, int prot);
-+int kvm_iommu_unmap_pages(pkvm_handle_t iommu_id, pkvm_handle_t domain_id,
-+			  unsigned long iova, size_t pgsize, size_t pgcount);
-+phys_addr_t kvm_iommu_iova_to_phys(pkvm_handle_t iommu_id,
-+				   pkvm_handle_t domain_id, unsigned long iova);
-+#else /* !CONFIG_KVM_IOMMU */
-+static inline int kvm_iommu_alloc_domain(pkvm_handle_t iommu_id,
-+					 pkvm_handle_t domain_id,
-+					 unsigned long pgd_hva)
-+{
-+	return -ENODEV;
-+}
++#include <kvm/iommu.h>
++#include <linux/io-pgtable.h>
 +
-+static inline int kvm_iommu_free_domain(pkvm_handle_t iommu_id,
-+					pkvm_handle_t domain_id)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline int kvm_iommu_attach_dev(pkvm_handle_t iommu_id,
-+				       pkvm_handle_t domain_id,
-+				       u32 endpoint_id)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline int kvm_iommu_detach_dev(pkvm_handle_t iommu_id,
-+				       pkvm_handle_t domain_id,
-+				       u32 endpoint_id)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline int kvm_iommu_map_pages(pkvm_handle_t iommu_id,
-+				      pkvm_handle_t domain_id,
-+				      unsigned long iova, phys_addr_t paddr,
-+				      size_t pgsize, size_t pgcount, int prot)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline int kvm_iommu_unmap_pages(pkvm_handle_t iommu_id,
-+					pkvm_handle_t domain_id,
-+					unsigned long iova, size_t pgsize,
-+					size_t pgcount)
-+{
-+	return 0;
-+}
-+
-+static inline phys_addr_t kvm_iommu_iova_to_phys(pkvm_handle_t iommu_id,
-+						 pkvm_handle_t domain_id,
-+						 unsigned long iova)
-+{
-+	return 0;
-+}
-+#endif /* CONFIG_KVM_IOMMU */
+ #if IS_ENABLED(CONFIG_KVM_IOMMU)
+ int kvm_iommu_init(void);
++int kvm_iommu_init_device(struct kvm_hyp_iommu *iommu);
+ void *kvm_iommu_donate_page(void);
+ void kvm_iommu_reclaim_page(void *p);
+ 
+@@ -74,8 +78,20 @@ static inline phys_addr_t kvm_iommu_iova_to_phys(pkvm_handle_t iommu_id,
+ }
+ #endif /* CONFIG_KVM_IOMMU */
+ 
++struct kvm_iommu_tlb_cookie {
++	struct kvm_hyp_iommu	*iommu;
++	pkvm_handle_t		domain_id;
++};
 +
  struct kvm_iommu_ops {
  	int (*init)(void);
++	struct kvm_hyp_iommu *(*get_iommu_by_id)(pkvm_handle_t smmu_id);
++	int (*alloc_iopt)(struct io_pgtable *iopt, unsigned long pgd_hva);
++	int (*free_iopt)(struct io_pgtable *iopt);
++	int (*attach_dev)(struct kvm_hyp_iommu *iommu, pkvm_handle_t domain_id,
++			  struct kvm_hyp_iommu_domain *domain, u32 endpoint_id);
++	int (*detach_dev)(struct kvm_hyp_iommu *iommu, pkvm_handle_t domain_id,
++			  struct kvm_hyp_iommu_domain *domain, u32 endpoint_id);
  };
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 37e308337fec..34ec46b890f0 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -1059,6 +1059,76 @@ static void handle___pkvm_teardown_vm(struct kvm_cpu_context *host_ctxt)
- 	cpu_reg(host_ctxt, 1) = __pkvm_teardown_vm(handle);
+ 
+ extern struct kvm_iommu_ops kvm_iommu_ops;
+diff --git a/include/kvm/iommu.h b/include/kvm/iommu.h
+index 12b06a5df889..2bbe5f7bf726 100644
+--- a/include/kvm/iommu.h
++++ b/include/kvm/iommu.h
+@@ -3,6 +3,23 @@
+ #define __KVM_IOMMU_H
+ 
+ #include <asm/kvm_host.h>
++#include <linux/io-pgtable.h>
++
++/*
++ * Parameters from the trusted host:
++ * @pgtable_cfg:	page table configuration
++ * @domains:		root domain table
++ * @nr_domains:		max number of domains (exclusive)
++ *
++ * Other members are filled and used at runtime by the IOMMU driver.
++ */
++struct kvm_hyp_iommu {
++	struct io_pgtable_cfg		pgtable_cfg;
++	void				**domains;
++	size_t				nr_domains;
++
++	struct io_pgtable_params	*pgtable;
++};
+ 
+ struct kvm_hyp_iommu_memcache {
+ 	struct kvm_hyp_memcache	pages;
+@@ -12,4 +29,42 @@ struct kvm_hyp_iommu_memcache {
+ extern struct kvm_hyp_iommu_memcache *kvm_nvhe_sym(kvm_hyp_iommu_memcaches);
+ #define kvm_hyp_iommu_memcaches kvm_nvhe_sym(kvm_hyp_iommu_memcaches)
+ 
++struct kvm_hyp_iommu_domain {
++	void			*pgd;
++	u32			refs;
++};
++
++/*
++ * At the moment the number of domains is limited by the ASID and VMID size on
++ * Arm. With single-stage translation, that size is 2^8 or 2^16. On a lot of
++ * platforms the number of devices is actually the limiting factor and we'll
++ * only need a handful of domains, but with PASID or SR-IOV support that limit
++ * can be reached.
++ *
++ * In practice we're rarely going to need a lot of domains. To avoid allocating
++ * a large domain table, we use a two-level table, indexed by domain ID. With
++ * 4kB pages and 16-bytes domains, the leaf table contains 256 domains, and the
++ * root table 256 pointers. With 64kB pages, the leaf table contains 4096
++ * domains and the root table 16 pointers. In this case, or when using 8-bit
++ * VMIDs, it may be more advantageous to use a single level. But using two
++ * levels allows to easily extend the domain size.
++ */
++#define KVM_IOMMU_MAX_DOMAINS	(1 << 16)
++
++/* Number of entries in the level-2 domain table */
++#define KVM_IOMMU_DOMAINS_PER_PAGE \
++	(PAGE_SIZE / sizeof(struct kvm_hyp_iommu_domain))
++
++/* Number of entries in the root domain table */
++#define KVM_IOMMU_DOMAINS_ROOT_ENTRIES \
++	(KVM_IOMMU_MAX_DOMAINS / KVM_IOMMU_DOMAINS_PER_PAGE)
++
++#define KVM_IOMMU_DOMAINS_ROOT_SIZE \
++	(KVM_IOMMU_DOMAINS_ROOT_ENTRIES * sizeof(void *))
++
++/* Bits [16:split] index the root table, bits [split-1:0] index the leaf table */
++#define KVM_IOMMU_DOMAIN_ID_SPLIT	ilog2(KVM_IOMMU_DOMAINS_PER_PAGE)
++
++#define KVM_IOMMU_DOMAIN_ID_LEAF_MASK	((1 << KVM_IOMMU_DOMAIN_ID_SPLIT) - 1)
++
+ #endif /* __KVM_IOMMU_H */
+diff --git a/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c b/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
+index 1a9184fbbd27..7404ea77ed9f 100644
+--- a/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
++++ b/arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
+@@ -13,6 +13,22 @@
+ 
+ struct kvm_hyp_iommu_memcache __ro_after_init *kvm_hyp_iommu_memcaches;
+ 
++/*
++ * Serialize access to domains and IOMMU driver internal structures (command
++ * queue, device tables)
++ */
++static hyp_spinlock_t iommu_lock;
++
++#define domain_to_iopt(_iommu, _domain, _domain_id)		\
++	(struct io_pgtable) {					\
++		.ops = &(_iommu)->pgtable->ops,			\
++		.pgd = (_domain)->pgd,				\
++		.cookie = &(struct kvm_iommu_tlb_cookie) {	\
++			.iommu		= (_iommu),		\
++			.domain_id	= (_domain_id),		\
++		},						\
++	}
++
+ void *kvm_iommu_donate_page(void)
+ {
+ 	void *p;
+@@ -41,10 +57,155 @@ void kvm_iommu_reclaim_page(void *p)
+ 				     PAGE_SIZE);
  }
  
-+static void handle___pkvm_host_iommu_alloc_domain(struct kvm_cpu_context *host_ctxt)
++static struct kvm_hyp_iommu_domain *
++handle_to_domain(pkvm_handle_t iommu_id, pkvm_handle_t domain_id,
++		 struct kvm_hyp_iommu **out_iommu)
 +{
-+	DECLARE_REG(pkvm_handle_t, iommu, host_ctxt, 1);
-+	DECLARE_REG(pkvm_handle_t, domain, host_ctxt, 2);
-+	DECLARE_REG(unsigned long, pgd_hva, host_ctxt, 3);
++	int idx;
++	struct kvm_hyp_iommu *iommu;
++	struct kvm_hyp_iommu_domain *domains;
 +
-+	cpu_reg(host_ctxt, 1) = kvm_iommu_alloc_domain(iommu, domain, pgd_hva);
++	iommu = kvm_iommu_ops.get_iommu_by_id(iommu_id);
++	if (!iommu)
++		return NULL;
++
++	if (domain_id >= iommu->nr_domains)
++		return NULL;
++	domain_id = array_index_nospec(domain_id, iommu->nr_domains);
++
++	idx = domain_id >> KVM_IOMMU_DOMAIN_ID_SPLIT;
++	domains = iommu->domains[idx];
++	if (!domains) {
++		domains = kvm_iommu_donate_page();
++		if (!domains)
++			return NULL;
++		iommu->domains[idx] = domains;
++	}
++
++	*out_iommu = iommu;
++	return &domains[domain_id & KVM_IOMMU_DOMAIN_ID_LEAF_MASK];
 +}
 +
-+static void handle___pkvm_host_iommu_free_domain(struct kvm_cpu_context *host_ctxt)
++int kvm_iommu_alloc_domain(pkvm_handle_t iommu_id, pkvm_handle_t domain_id,
++			   unsigned long pgd_hva)
 +{
-+	DECLARE_REG(pkvm_handle_t, iommu, host_ctxt, 1);
-+	DECLARE_REG(pkvm_handle_t, domain, host_ctxt, 2);
++	int ret = -EINVAL;
++	struct io_pgtable iopt;
++	struct kvm_hyp_iommu *iommu;
++	struct kvm_hyp_iommu_domain *domain;
 +
-+	cpu_reg(host_ctxt, 1) = kvm_iommu_free_domain(iommu, domain);
++	hyp_spin_lock(&iommu_lock);
++	domain = handle_to_domain(iommu_id, domain_id, &iommu);
++	if (!domain)
++		goto out_unlock;
++
++	if (domain->refs)
++		goto out_unlock;
++
++	iopt = domain_to_iopt(iommu, domain, domain_id);
++	ret = kvm_iommu_ops.alloc_iopt(&iopt, pgd_hva);
++	if (ret)
++		goto out_unlock;
++
++	domain->refs = 1;
++	domain->pgd = iopt.pgd;
++out_unlock:
++	hyp_spin_unlock(&iommu_lock);
++	return ret;
 +}
 +
-+static void handle___pkvm_host_iommu_attach_dev(struct kvm_cpu_context *host_ctxt)
++int kvm_iommu_free_domain(pkvm_handle_t iommu_id, pkvm_handle_t domain_id)
 +{
-+	DECLARE_REG(pkvm_handle_t, iommu, host_ctxt, 1);
-+	DECLARE_REG(pkvm_handle_t, domain, host_ctxt, 2);
-+	DECLARE_REG(unsigned int, endpoint, host_ctxt, 3);
++	int ret = -EINVAL;
++	struct io_pgtable iopt;
++	struct kvm_hyp_iommu *iommu;
++	struct kvm_hyp_iommu_domain *domain;
 +
-+	cpu_reg(host_ctxt, 1) = kvm_iommu_attach_dev(iommu, domain, endpoint);
++	hyp_spin_lock(&iommu_lock);
++	domain = handle_to_domain(iommu_id, domain_id, &iommu);
++	if (!domain)
++		goto out_unlock;
++
++	if (domain->refs != 1)
++		goto out_unlock;
++
++	iopt = domain_to_iopt(iommu, domain, domain_id);
++	ret = kvm_iommu_ops.free_iopt(&iopt);
++
++	memset(domain, 0, sizeof(*domain));
++
++out_unlock:
++	hyp_spin_unlock(&iommu_lock);
++	return ret;
 +}
 +
-+static void handle___pkvm_host_iommu_detach_dev(struct kvm_cpu_context *host_ctxt)
++int kvm_iommu_attach_dev(pkvm_handle_t iommu_id, pkvm_handle_t domain_id,
++			 u32 endpoint_id)
 +{
-+	DECLARE_REG(pkvm_handle_t, iommu, host_ctxt, 1);
-+	DECLARE_REG(pkvm_handle_t, domain, host_ctxt, 2);
-+	DECLARE_REG(unsigned int, endpoint, host_ctxt, 3);
++	int ret = -EINVAL;
++	struct kvm_hyp_iommu *iommu;
++	struct kvm_hyp_iommu_domain *domain;
 +
-+	cpu_reg(host_ctxt, 1) = kvm_iommu_detach_dev(iommu, domain, endpoint);
++	hyp_spin_lock(&iommu_lock);
++	domain = handle_to_domain(iommu_id, domain_id, &iommu);
++	if (!domain || !domain->refs || domain->refs == UINT_MAX)
++		goto out_unlock;
++
++	ret = kvm_iommu_ops.attach_dev(iommu, domain_id, domain, endpoint_id);
++	if (ret)
++		goto out_unlock;
++
++	domain->refs++;
++out_unlock:
++	hyp_spin_unlock(&iommu_lock);
++	return ret;
 +}
 +
-+static void handle___pkvm_host_iommu_map_pages(struct kvm_cpu_context *host_ctxt)
++int kvm_iommu_detach_dev(pkvm_handle_t iommu_id, pkvm_handle_t domain_id,
++			 u32 endpoint_id)
 +{
-+	DECLARE_REG(pkvm_handle_t, iommu, host_ctxt, 1);
-+	DECLARE_REG(pkvm_handle_t, domain, host_ctxt, 2);
-+	DECLARE_REG(unsigned long, iova, host_ctxt, 3);
-+	DECLARE_REG(phys_addr_t, paddr, host_ctxt, 4);
-+	DECLARE_REG(size_t, pgsize, host_ctxt, 5);
-+	DECLARE_REG(size_t, pgcount, host_ctxt, 6);
-+	DECLARE_REG(unsigned int, prot, host_ctxt, 7);
++	int ret = -EINVAL;
++	struct kvm_hyp_iommu *iommu;
++	struct kvm_hyp_iommu_domain *domain;
 +
-+	cpu_reg(host_ctxt, 1) = kvm_iommu_map_pages(iommu, domain, iova, paddr,
-+						    pgsize, pgcount, prot);
++	hyp_spin_lock(&iommu_lock);
++	domain = handle_to_domain(iommu_id, domain_id, &iommu);
++	if (!domain || domain->refs <= 1)
++		goto out_unlock;
++
++	ret = kvm_iommu_ops.detach_dev(iommu, domain_id, domain, endpoint_id);
++	if (ret)
++		goto out_unlock;
++
++	domain->refs--;
++out_unlock:
++	hyp_spin_unlock(&iommu_lock);
++	return ret;
 +}
 +
-+static void handle___pkvm_host_iommu_unmap_pages(struct kvm_cpu_context *host_ctxt)
++int kvm_iommu_init_device(struct kvm_hyp_iommu *iommu)
 +{
-+	DECLARE_REG(pkvm_handle_t, iommu, host_ctxt, 1);
-+	DECLARE_REG(pkvm_handle_t, domain, host_ctxt, 2);
-+	DECLARE_REG(unsigned long, iova, host_ctxt, 3);
-+	DECLARE_REG(size_t, pgsize, host_ctxt, 4);
-+	DECLARE_REG(size_t, pgcount, host_ctxt, 5);
++	void *domains;
 +
-+	cpu_reg(host_ctxt, 1) = kvm_iommu_unmap_pages(iommu, domain, iova,
-+						      pgsize, pgcount);
++	domains = iommu->domains;
++	iommu->domains = kern_hyp_va(domains);
++	return pkvm_create_mappings(iommu->domains, iommu->domains +
++				    KVM_IOMMU_DOMAINS_ROOT_ENTRIES, PAGE_HYP);
 +}
 +
-+static void handle___pkvm_host_iommu_iova_to_phys(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(pkvm_handle_t, iommu, host_ctxt, 1);
-+	DECLARE_REG(pkvm_handle_t, domain, host_ctxt, 2);
-+	DECLARE_REG(unsigned long, iova, host_ctxt, 3);
-+
-+	cpu_reg(host_ctxt, 1) = kvm_iommu_iova_to_phys(iommu, domain, iova);
-+}
-+
- typedef void (*hcall_t)(struct kvm_cpu_context *);
+ int kvm_iommu_init(void)
+ {
+ 	enum kvm_pgtable_prot prot;
  
- #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
-@@ -1093,6 +1163,13 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__pkvm_vcpu_load),
- 	HANDLE_FUNC(__pkvm_vcpu_put),
- 	HANDLE_FUNC(__pkvm_vcpu_sync_state),
-+	HANDLE_FUNC(__pkvm_host_iommu_alloc_domain),
-+	HANDLE_FUNC(__pkvm_host_iommu_free_domain),
-+	HANDLE_FUNC(__pkvm_host_iommu_attach_dev),
-+	HANDLE_FUNC(__pkvm_host_iommu_detach_dev),
-+	HANDLE_FUNC(__pkvm_host_iommu_map_pages),
-+	HANDLE_FUNC(__pkvm_host_iommu_unmap_pages),
-+	HANDLE_FUNC(__pkvm_host_iommu_iova_to_phys),
- };
- 
- static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
++	hyp_spin_lock_init(&iommu_lock);
++
++	if (WARN_ON(!kvm_iommu_ops.get_iommu_by_id ||
++		    !kvm_iommu_ops.alloc_iopt ||
++		    !kvm_iommu_ops.free_iopt ||
++		    !kvm_iommu_ops.attach_dev ||
++		    !kvm_iommu_ops.detach_dev))
++		return -ENODEV;
++
+ 	/* The memcache is shared with the host */
+ 	prot = pkvm_mkstate(PAGE_HYP, PKVM_PAGE_SHARED_OWNED);
+ 	return pkvm_create_mappings(kvm_hyp_iommu_memcaches,
 -- 
 2.39.0
 
