@@ -1,42 +1,43 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B60259D
-	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 12:59:19 +0000 (UTC)
-Received: by mail-wr1-f41.google.com with SMTP id q5so17271156wrv.0
-        for <kvmarm@lists.linux.dev>; Wed, 01 Feb 2023 04:59:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B2A29B2
+	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 12:59:21 +0000 (UTC)
+Received: by mail-wr1-f49.google.com with SMTP id m7so17221992wru.8
+        for <kvmarm@lists.linux.dev>; Wed, 01 Feb 2023 04:59:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VLwwDnyRxUIk04LctYlJIiJXPDb99zDQ0mkniPbimTE=;
-        b=U9RLp3as5sbiG9ImsyZYSkygJF2rsCmvkgMOTFbfS57BJjrA2J23dp5xfYe4goWGRB
-         klpnEfv0qB3H6gdPd8jWI+GjAUpu3O5dzLIWod0Ye148672tK8t4MrJZWmZ6hdNPwzpv
-         C6+qUk5BWgkqkCWMvueVFC6odlvcK2vuQM/4EeLuf9txuzKomdsuP8ki2zMzLVzrB8Rt
-         YrF0oQAAtNk3rfOGFOi+c3crBGWFiWZ0iYSqCbwln35SbgcpQJWkgD17EySDcc2yYV2j
-         BLGF0NZJMasSkbiXnfjQnQRKwmr5usVJF7wS10W9bRxg2Nnp340vufW10kDmM+A2T369
-         KlwQ==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ziphhZcJPXJLC+5r9d0l9f2mVBvLXVVKVfJ7Fj2IsgE=;
+        b=k8mo9d1Qi6hHRkH5orJsmAv6IfDHKIWlBl94/SUu6jGGDAGcQxqxEOc0QHjQsoUzk1
+         iEN9dRic5h79s9FfRaM8xgguH5bf+Ao53VfPb56TR27Lt505QImnErcWRM7ZHn79qmof
+         F6rXcSfeMOp66lGADyZP69TnStr4hXdPRVdbst7cYjkw1ezAMne05FTQ8u/2ua9OUuDg
+         2VMLiAGNg3iqoMRuyqqTREQ4eQ7RF+V+p9DvA+Yp8UarFNFhxeEdBqV/Gc4lZotD5oj3
+         SG4lCtJiUziUp2uLZjv7gfFgV4PqAJ6U0kzGAlZoZIv5/Dr58/+NTw4f7xhwzmsEb4oM
+         ZpQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VLwwDnyRxUIk04LctYlJIiJXPDb99zDQ0mkniPbimTE=;
-        b=hZa2jjHpkePg6+tKxHmA1NJe8cSUhE5GnEwZ2aHxgAw3jgWW4gzmS9tYG0Ngrjm2KJ
-         osrBJPVZGT4MTw+K+Mx/BfLgzi7PlIrvJowCRNktdXBSW0IAtQq2jxAmBGPglEMEnEIu
-         NF3p9FP3BbLr1OcOUSiZjvFlUGLQSE9E2DJNymgMzI39HoSbxuZIw8KHBfw22yIr7TOp
-         3VLpHA6aKHBB8yJ1FklDZv89HuEkVS2tMUq+gBhxbkxQkbWWT59FEClOcsFGxO96d9Fh
-         pW59wGUEYyMFrd/bwe1ufuEcAPJnD/sqGZ2IMTXymede/Uo66q/xHHdr2Ao/o4I/koWx
-         oONg==
-X-Gm-Message-State: AO0yUKVib7IYcRIlZ2PjhZY/yzfcjS+mHUU9PNfx3yjvsw4oGK36AcB2
-	qY4TrtZM7Vg8M3ak4VezDQ4Oag==
-X-Google-Smtp-Source: AK7set+0MVYoW/tl+4fxD0uxWT3sNMcCa/0flt96XdghvR/Hw02VWtwdBqXKUzbsDZD9oTmFAwALnQ==
-X-Received: by 2002:adf:c754:0:b0:2bf:e533:3158 with SMTP id b20-20020adfc754000000b002bfe5333158mr2556951wrh.20.1675256358203;
-        Wed, 01 Feb 2023 04:59:18 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ziphhZcJPXJLC+5r9d0l9f2mVBvLXVVKVfJ7Fj2IsgE=;
+        b=mCz31goYGAbqqVqLGjFBL5LR5bg6FbiIVi7JOQ4EXOghSO19Y1T9/EpQYl0+nD6PQR
+         JAUZ67Np89Wc3UGiplN0BKjYCgB8dmnShSqox3jxeFggctXYgkA679H/ciYXGnlY7Dna
+         Qk82dlTG18s8NOnjtSWiTK1/NT3svQ8wyPyL0AZPNgQAJR0SiOvZ7+QzNonoQiuuTQwa
+         HYc0hNSK2HPzyoKQ7BnL+0JWfEm/Td0pwMBqa4k+84Ival/bFyk/ZKS5e3UKNsqancB+
+         S4vgJkZeYN09GymJ+AoNNMNChPMKidqFCSWtHSTCfNRiaqlLXSutd8gMmxqXIb77Xbe+
+         lKbg==
+X-Gm-Message-State: AO0yUKXp2WbOFmbej1F2uKXqNWCQyYwfk2n2pViW1ml/FB/Dfv8XpduH
+	oX4VbPB95tBBUfH8EylM9gx4Dg==
+X-Google-Smtp-Source: AK7set/3uCsXVIhxNwxZFCKcMQw1Q27U2Ycj8zW5qSODTxIAbq/oiQ9HDm+qezJoKiQ5iAd9qQe8MA==
+X-Received: by 2002:a05:6000:1085:b0:2bf:f7c9:327c with SMTP id y5-20020a056000108500b002bff7c9327cmr2191461wrw.27.1675256359902;
+        Wed, 01 Feb 2023 04:59:19 -0800 (PST)
 Received: from localhost.localdomain (054592b0.skybroadband.com. [5.69.146.176])
-        by smtp.gmail.com with ESMTPSA id m15-20020a056000024f00b002bfae16ee2fsm17972811wrz.111.2023.02.01.04.59.17
+        by smtp.gmail.com with ESMTPSA id m15-20020a056000024f00b002bfae16ee2fsm17972811wrz.111.2023.02.01.04.59.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Feb 2023 04:59:17 -0800 (PST)
+        Wed, 01 Feb 2023 04:59:19 -0800 (PST)
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: maz@kernel.org,
 	catalin.marinas@arm.com,
@@ -54,299 +55,624 @@ Cc: robin.murphy@arm.com,
 	kvmarm@lists.linux.dev,
 	iommu@lists.linux.dev,
 	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [RFC PATCH 00/45] KVM: Arm SMMUv3 driver for pKVM
-Date: Wed,  1 Feb 2023 12:52:44 +0000
-Message-Id: <20230201125328.2186498-1-jean-philippe@linaro.org>
+Subject: [RFC PATCH 02/45] iommu/io-pgtable-arm: Split initialization
+Date: Wed,  1 Feb 2023 12:52:46 +0000
+Message-Id: <20230201125328.2186498-3-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.39.0
+In-Reply-To: <20230201125328.2186498-1-jean-philippe@linaro.org>
+References: <20230201125328.2186498-1-jean-philippe@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The pKVM hypervisor, recently introduced on arm64, provides a separation
-of privileges between the host and hypervisor parts of KVM, where the
-hypervisor is trusted by guests but the host is not [1]. The host is
-initially trusted during boot, but its privileges are reduced after KVM
-is initialized so that, if an adversary later gains access to the large
-attack surface of the host, it cannot access guest data.
+Extract the configuration part from io-pgtable-arm.c, move it to
+io-pgtable-arm-common.c.
 
-Currently with pKVM, the host can still instruct DMA-capable devices
-like the GPU to access guest and hypervisor memory, which undermines
-this isolation. Preventing DMA attacks requires an IOMMU, owned by the
-hypervisor.
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+---
+ include/linux/io-pgtable-arm.h        |  15 +-
+ drivers/iommu/io-pgtable-arm-common.c | 255 ++++++++++++++++++++++++++
+ drivers/iommu/io-pgtable-arm.c        | 245 +------------------------
+ 3 files changed, 270 insertions(+), 245 deletions(-)
 
-This series adds a hypervisor driver for the Arm SMMUv3 IOMMU. Since the
-hypervisor part of pKVM (called nVHE here) is minimal, moving the whole
-host SMMU driver into nVHE isn't really an option. It is too large and
-complex and requires infrastructure from all over the kernel. We add a
-reduced nVHE driver that deals with populating the SMMU tables and the
-command queue, and the host driver still deals with probing and some
-initialization.
-
-
-Patch overview
-==============
-
-A significant portion of this series just moves and factors code to
-avoid duplications. Things get interesting only around patch 15, which
-adds two helpers that track pages mapped in the IOMMU, and ensure those
-pages are not donated to guests. Then patches 16-27 add the hypervisor
-IOMMU driver, split into a generic part that can be reused by other
-drivers, and code specific to SMMUv3.
-
-Patches 34-40 introduce the host component of the pKVM SMMUv3 driver,
-which initializes the configuration and forwards mapping requests to the
-hypervisor. Ideally there would be a single host driver with two sets of
-IOMMU ops, and while I believe more code can still be shared, the
-initialization is very different and having separate driver entry points
-seems clearer.
-
-Patches 41-45 provide a rough example of power management through SCMI.
-Although the host decides on power management policies, the hypervisor
-must at least be aware of power changes, so that it doesn't access powered
-down interfaces. We expect that the platform controller enforces
-dependencies so that DMA doesn't bypass a powered down IOMMU. But these
-things are unfortunately platform dependent and the SCMI patches are
-only illustrative.
-
-These patches in particular are best reviewed with git's --color-moved:
-1,2	iommu/io-pgtable-arm: Split*
-7,29-32	iommu/arm-smmu-v3: Move*
-
-A development branch is available at
-https://jpbrucker.net/git/linux pkvm/smmu
-
-
-Design
-======
-
-We've explored three solutions so far. This posting implements the third
-one, slightly more invasive in the hypervisor but the most flexible.
-
-1. Sharing stage-2 page tables
-
-This is the simplest solution, sharing the stage-2 page tables (which
-translates host physical address -> system physical address) between CPU
-and SMMU. Whatever the host can access on the CPU, it can also access with
-DMA. Memory that is not accessible to the host because donated to the
-hypervisor or guests, DMA cannot access either.
-
-pKVM normally populates the host stage-2 page tables lazily, when the host
-first accesses them. However this relies on CPU page faults, and DMA
-generally cannot fault. The whole stage-2 must therefore be populated at
-boot. That's easy to do because the HPA->PA mapping for the host is an
-identity.
-
-It gets more complicated when donating some pages to guests, which
-involves removing those pages from the host stage-2. To save memory and be
-TLB efficient, the stage-2 is mapped with block mappings (1G or 2MB
-contiguous range, rather than individual 4k units). When donating a page
-from that range, the hypervisor must remove the block mapping, and replace
-it with a table that excludes the donated page. Since a device may be
-simultaneously performing DMA on other pages in the range, this
-replacement operation must be atomic. Otherwise DMA may reach the SMMU
-during a small period of time where the mapping is invalid, and fatally
-abort.
-
-The Arm architecture supports atomic replacement of block mappings only
-since version 8.4 (FEAT_BBM), and it is optional. So this solution, while
-tempting, is not sufficient.
-
-2. Pinning DMA mappings in the shared stage-2
-
-Building on the first solution, we can let the host notify the hypervisor
-about pages used for DMA. This way block mappings are broken into tables
-when the host sets up DMA, and donating neighbouring pages to guests won't
-cause block replacement.
-
-This solution adds runtime overhead because calls the DMA API are now
-forwarded to the hypervisor, which needs to update the stage-2 mappings.
-
-All in all, I believe this is a good solution if the hardware is up to the
-task. But sharing page tables requires matching capabilities between the
-stage-2 MMU and SMMU, and we don't expect all platforms to support the
-required features, especially on mobile platforms where chip area is
-costly.
-
-3. Private I/O page tables
-
-A flexible alternative uses private page tables in the SMMU, entirely
-disconnected from the CPU page tables. With this the SMMU can implement a
-reduced set of features, even shed a stage of translation. This also
-provides a virtual I/O address space to the host, which allows more
-efficient memory allocation for large buffers, and for devices with
-limited addressing abilities.
-
-This is the solution implemented in this series. The host creates
-IOVA->HPA mappings with two hypercalls map_pages() and unmap_pages(), and
-the hypervisor populates the page tables. Page tables are abstracted into
-IOMMU domains, which allow multiple devices to share the same address
-space. Another four hypercalls, alloc_domain(), attach_dev(), detach_dev()
-and free_domain(), manage the domains.
-
-Although the hypervisor already has pgtable.c to populate CPU page tables,
-we import the io-pgtable library because it is more suited to IOMMU page
-tables. It supports arbitrary page and address sizes, non-coherent page
-walks, quirks and errata workarounds specific to IOMMU implementations,
-and atomically switching between tables and blocks without lazy remapping.
-
-
-Performance
-===========
-
-Both solutions 2 and 3 add overhead to DMA mappings, and since the
-hypervisor relies on global locks at the moment, they scale poorly.
-Interestingly solution 3 can be optimized to scale really well on the
-map() path. We can remove the hypervisor IOMMU lock in map()/unmap() by
-holding domain references, and then use the hyp vmemmap to track DMA state
-of pages atomically, without updating the CPU stage-2 tables. Donation and
-sharing would then need to inspect the vmemmap. On the unmap() path, the
-single command queue for TLB invalidations still requires locking.
-
-To give a rough idea, these are dma_map_benchmark results on a 96-core
-server (4 NUMA nodes, SMMU on node 0). I'm adding these because I found
-the magnitudes interesting but do take them with a grain of salt, my
-methodology wasn't particularly thorough (although the numbers seem
-repeatable). Numbers represent the average time needed for one
-dma_map/dma_unmap call in μs, lower is better.
-
-			1 thread	16 threads (node 0)	96 threads
-host only		0.2/0.7		0.4/3.5			1.7/81
-pkvm (this series)	0.5/2.2		28/51			291/542
-pkvm (+optimizations)	0.3/1.9		0.4/38			0.8/304
-
-
-[1] https://lore.kernel.org/kvmarm/20220519134204.5379-1-will@kernel.org/
-
-
-David Brazdil (1):
-  KVM: arm64: Introduce IOMMU driver infrastructure
-
-Jean-Philippe Brucker (44):
-  iommu/io-pgtable-arm: Split the page table driver
-  iommu/io-pgtable-arm: Split initialization
-  iommu/io-pgtable: Move fmt into io_pgtable_cfg
-  iommu/io-pgtable: Add configure() operation
-  iommu/io-pgtable: Split io_pgtable structure
-  iommu/io-pgtable-arm: Extend __arm_lpae_free_pgtable() to only free
-    child tables
-  iommu/arm-smmu-v3: Move some definitions to arm64 include/
-  KVM: arm64: pkvm: Add pkvm_udelay()
-  KVM: arm64: pkvm: Add pkvm_create_hyp_device_mapping()
-  KVM: arm64: pkvm: Expose pkvm_map/unmap_donated_memory()
-  KVM: arm64: pkvm: Expose pkvm_admit_host_page()
-  KVM: arm64: pkvm: Unify pkvm_pkvm_teardown_donated_memory()
-  KVM: arm64: pkvm: Add hyp_page_ref_inc_return()
-  KVM: arm64: pkvm: Prevent host donation of device memory
-  KVM: arm64: pkvm: Add __pkvm_host_share/unshare_dma()
-  KVM: arm64: pkvm: Add IOMMU hypercalls
-  KVM: arm64: iommu: Add per-cpu page queue
-  KVM: arm64: iommu: Add domains
-  KVM: arm64: iommu: Add map() and unmap() operations
-  KVM: arm64: iommu: Add SMMUv3 driver
-  KVM: arm64: smmu-v3: Initialize registers
-  KVM: arm64: smmu-v3: Setup command queue
-  KVM: arm64: smmu-v3: Setup stream table
-  KVM: arm64: smmu-v3: Reset the device
-  KVM: arm64: smmu-v3: Support io-pgtable
-  KVM: arm64: smmu-v3: Setup domains and page table configuration
-  iommu/arm-smmu-v3: Extract driver-specific bits from probe function
-  iommu/arm-smmu-v3: Move some functions to arm-smmu-v3-common.c
-  iommu/arm-smmu-v3: Move queue and table allocation to
-    arm-smmu-v3-common.c
-  iommu/arm-smmu-v3: Move firmware probe to arm-smmu-v3-common
-  iommu/arm-smmu-v3: Move IOMMU registration to arm-smmu-v3-common.c
-  iommu/arm-smmu-v3: Use single pages for level-2 stream tables
-  iommu/arm-smmu-v3: Add host driver for pKVM
-  iommu/arm-smmu-v3-kvm: Pass a list of SMMU devices to the hypervisor
-  iommu/arm-smmu-v3-kvm: Validate device features
-  iommu/arm-smmu-v3-kvm: Allocate structures and reset device
-  iommu/arm-smmu-v3-kvm: Add per-cpu page queue
-  iommu/arm-smmu-v3-kvm: Initialize page table configuration
-  iommu/arm-smmu-v3-kvm: Add IOMMU ops
-  KVM: arm64: pkvm: Add __pkvm_host_add_remove_page()
-  KVM: arm64: pkvm: Support SCMI power domain
-  KVM: arm64: smmu-v3: Support power management
-  iommu/arm-smmu-v3-kvm: Support power management with SCMI SMC
-  iommu/arm-smmu-v3-kvm: Enable runtime PM
-
- drivers/iommu/Kconfig                         |   10 +
- virt/kvm/Kconfig                              |    3 +
- arch/arm64/kvm/hyp/nvhe/Makefile              |    6 +
- drivers/iommu/Makefile                        |    2 +-
- drivers/iommu/arm/arm-smmu-v3/Makefile        |    6 +
- arch/arm64/include/asm/arm-smmu-v3-regs.h     |  478 ++++++++
- arch/arm64/include/asm/kvm_asm.h              |    7 +
- arch/arm64/include/asm/kvm_host.h             |    5 +
- arch/arm64/include/asm/kvm_hyp.h              |    4 +-
- arch/arm64/kvm/hyp/include/nvhe/iommu.h       |  115 ++
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   11 +-
- arch/arm64/kvm/hyp/include/nvhe/memory.h      |   15 +-
- arch/arm64/kvm/hyp/include/nvhe/mm.h          |    2 +
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |   29 +
- .../arm64/kvm/hyp/include/nvhe/trap_handler.h |    2 +
- drivers/gpu/drm/panfrost/panfrost_device.h    |    2 +-
- drivers/iommu/amd/amd_iommu_types.h           |   17 +-
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |  510 +-------
- drivers/iommu/arm/arm-smmu/arm-smmu.h         |    2 +-
- drivers/iommu/io-pgtable-arm.h                |   30 -
- include/kvm/arm_smmu_v3.h                     |   61 +
- include/kvm/iommu.h                           |   74 ++
- include/kvm/power_domain.h                    |   22 +
- include/linux/io-pgtable-arm.h                |  190 +++
- include/linux/io-pgtable.h                    |  114 +-
- arch/arm64/kvm/arm.c                          |   41 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  101 +-
- arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c   |  625 ++++++++++
- .../arm64/kvm/hyp/nvhe/iommu/io-pgtable-arm.c |   97 ++
- arch/arm64/kvm/hyp/nvhe/iommu/iommu.c         |  393 ++++++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  209 +++-
- arch/arm64/kvm/hyp/nvhe/mm.c                  |   27 +-
- arch/arm64/kvm/hyp/nvhe/pkvm.c                |   66 +-
- arch/arm64/kvm/hyp/nvhe/power/scmi.c          |  233 ++++
- arch/arm64/kvm/hyp/nvhe/setup.c               |   47 +-
- arch/arm64/kvm/hyp/nvhe/timer-sr.c            |   43 +
- drivers/gpu/drm/msm/msm_iommu.c               |   22 +-
- drivers/gpu/drm/panfrost/panfrost_mmu.c       |   22 +-
- drivers/iommu/amd/io_pgtable.c                |   26 +-
- drivers/iommu/amd/io_pgtable_v2.c             |   43 +-
- drivers/iommu/amd/iommu.c                     |   29 +-
- drivers/iommu/apple-dart.c                    |   38 +-
- .../arm/arm-smmu-v3/arm-smmu-v3-common.c      |  632 ++++++++++
- .../iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c   |  864 +++++++++++++
- .../iommu/arm/arm-smmu-v3/arm-smmu-v3-sva.c   |    2 +-
- drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   |  679 +----------
- drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c    |    7 +-
- drivers/iommu/arm/arm-smmu/arm-smmu.c         |   41 +-
- drivers/iommu/arm/arm-smmu/qcom_iommu.c       |   41 +-
- drivers/iommu/io-pgtable-arm-common.c         |  766 ++++++++++++
- drivers/iommu/io-pgtable-arm-v7s.c            |  190 +--
- drivers/iommu/io-pgtable-arm.c                | 1082 ++---------------
- drivers/iommu/io-pgtable-dart.c               |  105 +-
- drivers/iommu/io-pgtable.c                    |   57 +-
- drivers/iommu/ipmmu-vmsa.c                    |   20 +-
- drivers/iommu/msm_iommu.c                     |   18 +-
- drivers/iommu/mtk_iommu.c                     |   14 +-
- 57 files changed, 5743 insertions(+), 2554 deletions(-)
- create mode 100644 arch/arm64/include/asm/arm-smmu-v3-regs.h
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/iommu.h
- delete mode 100644 drivers/iommu/io-pgtable-arm.h
- create mode 100644 include/kvm/arm_smmu_v3.h
- create mode 100644 include/kvm/iommu.h
- create mode 100644 include/kvm/power_domain.h
- create mode 100644 include/linux/io-pgtable-arm.h
- create mode 100644 arch/arm64/kvm/hyp/nvhe/iommu/arm-smmu-v3.c
- create mode 100644 arch/arm64/kvm/hyp/nvhe/iommu/io-pgtable-arm.c
- create mode 100644 arch/arm64/kvm/hyp/nvhe/iommu/iommu.c
- create mode 100644 arch/arm64/kvm/hyp/nvhe/power/scmi.c
- create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-common.c
- create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
- create mode 100644 drivers/iommu/io-pgtable-arm-common.c
-
+diff --git a/include/linux/io-pgtable-arm.h b/include/linux/io-pgtable-arm.h
+index 594b5030b450..42202bc0ffa2 100644
+--- a/include/linux/io-pgtable-arm.h
++++ b/include/linux/io-pgtable-arm.h
+@@ -167,17 +167,16 @@ static inline bool iopte_leaf(arm_lpae_iopte pte, int lvl,
+ #define __arm_lpae_phys_to_virt	__va
+ 
+ /* Generic functions */
+-int arm_lpae_map_pages(struct io_pgtable_ops *ops, unsigned long iova,
+-		       phys_addr_t paddr, size_t pgsize, size_t pgcount,
+-		       int iommu_prot, gfp_t gfp, size_t *mapped);
+-size_t arm_lpae_unmap_pages(struct io_pgtable_ops *ops, unsigned long iova,
+-			    size_t pgsize, size_t pgcount,
+-			    struct iommu_iotlb_gather *gather);
+-phys_addr_t arm_lpae_iova_to_phys(struct io_pgtable_ops *ops,
+-				  unsigned long iova);
+ void __arm_lpae_free_pgtable(struct arm_lpae_io_pgtable *data, int lvl,
+ 			     arm_lpae_iopte *ptep);
+ 
++int arm_lpae_init_pgtable(struct io_pgtable_cfg *cfg,
++			  struct arm_lpae_io_pgtable *data);
++int arm_lpae_init_pgtable_s1(struct io_pgtable_cfg *cfg,
++			     struct arm_lpae_io_pgtable *data);
++int arm_lpae_init_pgtable_s2(struct io_pgtable_cfg *cfg,
++			     struct arm_lpae_io_pgtable *data);
++
+ /* Host/hyp-specific functions */
+ void *__arm_lpae_alloc_pages(size_t size, gfp_t gfp, struct io_pgtable_cfg *cfg);
+ void __arm_lpae_free_pages(void *pages, size_t size, struct io_pgtable_cfg *cfg);
+diff --git a/drivers/iommu/io-pgtable-arm-common.c b/drivers/iommu/io-pgtable-arm-common.c
+index 74d962712d15..7340b5096499 100644
+--- a/drivers/iommu/io-pgtable-arm-common.c
++++ b/drivers/iommu/io-pgtable-arm-common.c
+@@ -15,6 +15,9 @@
+ 
+ #define iopte_deref(pte, d) __arm_lpae_phys_to_virt(iopte_to_paddr(pte, d))
+ 
++#define ARM_LPAE_MAX_ADDR_BITS		52
++#define ARM_LPAE_S2_MAX_CONCAT_PAGES	16
++
+ static arm_lpae_iopte paddr_to_iopte(phys_addr_t paddr,
+ 				     struct arm_lpae_io_pgtable *data)
+ {
+@@ -498,3 +501,255 @@ phys_addr_t arm_lpae_iova_to_phys(struct io_pgtable_ops *ops,
+ 	iova &= (ARM_LPAE_BLOCK_SIZE(lvl, data) - 1);
+ 	return iopte_to_paddr(pte, data) | iova;
+ }
++
++static void arm_lpae_restrict_pgsizes(struct io_pgtable_cfg *cfg)
++{
++	unsigned long granule, page_sizes;
++	unsigned int max_addr_bits = 48;
++
++	/*
++	 * We need to restrict the supported page sizes to match the
++	 * translation regime for a particular granule. Aim to match
++	 * the CPU page size if possible, otherwise prefer smaller sizes.
++	 * While we're at it, restrict the block sizes to match the
++	 * chosen granule.
++	 */
++	if (cfg->pgsize_bitmap & PAGE_SIZE)
++		granule = PAGE_SIZE;
++	else if (cfg->pgsize_bitmap & ~PAGE_MASK)
++		granule = 1UL << __fls(cfg->pgsize_bitmap & ~PAGE_MASK);
++	else if (cfg->pgsize_bitmap & PAGE_MASK)
++		granule = 1UL << __ffs(cfg->pgsize_bitmap & PAGE_MASK);
++	else
++		granule = 0;
++
++	switch (granule) {
++	case SZ_4K:
++		page_sizes = (SZ_4K | SZ_2M | SZ_1G);
++		break;
++	case SZ_16K:
++		page_sizes = (SZ_16K | SZ_32M);
++		break;
++	case SZ_64K:
++		max_addr_bits = 52;
++		page_sizes = (SZ_64K | SZ_512M);
++		if (cfg->oas > 48)
++			page_sizes |= 1ULL << 42; /* 4TB */
++		break;
++	default:
++		page_sizes = 0;
++	}
++
++	cfg->pgsize_bitmap &= page_sizes;
++	cfg->ias = min(cfg->ias, max_addr_bits);
++	cfg->oas = min(cfg->oas, max_addr_bits);
++}
++
++int arm_lpae_init_pgtable(struct io_pgtable_cfg *cfg,
++			  struct arm_lpae_io_pgtable *data)
++{
++	int levels, va_bits, pg_shift;
++
++	arm_lpae_restrict_pgsizes(cfg);
++
++	if (!(cfg->pgsize_bitmap & (SZ_4K | SZ_16K | SZ_64K)))
++		return -EINVAL;
++
++	if (cfg->ias > ARM_LPAE_MAX_ADDR_BITS)
++		return -E2BIG;
++
++	if (cfg->oas > ARM_LPAE_MAX_ADDR_BITS)
++		return -E2BIG;
++
++	pg_shift = __ffs(cfg->pgsize_bitmap);
++	data->bits_per_level = pg_shift - ilog2(sizeof(arm_lpae_iopte));
++
++	va_bits = cfg->ias - pg_shift;
++	levels = DIV_ROUND_UP(va_bits, data->bits_per_level);
++	data->start_level = ARM_LPAE_MAX_LEVELS - levels;
++
++	/* Calculate the actual size of our pgd (without concatenation) */
++	data->pgd_bits = va_bits - (data->bits_per_level * (levels - 1));
++
++	data->iop.ops = (struct io_pgtable_ops) {
++		.map_pages	= arm_lpae_map_pages,
++		.unmap_pages	= arm_lpae_unmap_pages,
++		.iova_to_phys	= arm_lpae_iova_to_phys,
++	};
++
++	return 0;
++}
++
++int arm_lpae_init_pgtable_s1(struct io_pgtable_cfg *cfg,
++			     struct arm_lpae_io_pgtable *data)
++{
++	u64 reg;
++	int ret;
++	typeof(&cfg->arm_lpae_s1_cfg.tcr) tcr = &cfg->arm_lpae_s1_cfg.tcr;
++	bool tg1;
++
++	if (cfg->quirks & ~(IO_PGTABLE_QUIRK_ARM_NS |
++			    IO_PGTABLE_QUIRK_ARM_TTBR1 |
++			    IO_PGTABLE_QUIRK_ARM_OUTER_WBWA))
++		return -EINVAL;
++
++	ret = arm_lpae_init_pgtable(cfg, data);
++	if (ret)
++		return ret;
++
++	/* TCR */
++	if (cfg->coherent_walk) {
++		tcr->sh = ARM_LPAE_TCR_SH_IS;
++		tcr->irgn = ARM_LPAE_TCR_RGN_WBWA;
++		tcr->orgn = ARM_LPAE_TCR_RGN_WBWA;
++		if (cfg->quirks & IO_PGTABLE_QUIRK_ARM_OUTER_WBWA)
++			return -EINVAL;
++	} else {
++		tcr->sh = ARM_LPAE_TCR_SH_OS;
++		tcr->irgn = ARM_LPAE_TCR_RGN_NC;
++		if (!(cfg->quirks & IO_PGTABLE_QUIRK_ARM_OUTER_WBWA))
++			tcr->orgn = ARM_LPAE_TCR_RGN_NC;
++		else
++			tcr->orgn = ARM_LPAE_TCR_RGN_WBWA;
++	}
++
++	tg1 = cfg->quirks & IO_PGTABLE_QUIRK_ARM_TTBR1;
++	switch (ARM_LPAE_GRANULE(data)) {
++	case SZ_4K:
++		tcr->tg = tg1 ? ARM_LPAE_TCR_TG1_4K : ARM_LPAE_TCR_TG0_4K;
++		break;
++	case SZ_16K:
++		tcr->tg = tg1 ? ARM_LPAE_TCR_TG1_16K : ARM_LPAE_TCR_TG0_16K;
++		break;
++	case SZ_64K:
++		tcr->tg = tg1 ? ARM_LPAE_TCR_TG1_64K : ARM_LPAE_TCR_TG0_64K;
++		break;
++	}
++
++	switch (cfg->oas) {
++	case 32:
++		tcr->ips = ARM_LPAE_TCR_PS_32_BIT;
++		break;
++	case 36:
++		tcr->ips = ARM_LPAE_TCR_PS_36_BIT;
++		break;
++	case 40:
++		tcr->ips = ARM_LPAE_TCR_PS_40_BIT;
++		break;
++	case 42:
++		tcr->ips = ARM_LPAE_TCR_PS_42_BIT;
++		break;
++	case 44:
++		tcr->ips = ARM_LPAE_TCR_PS_44_BIT;
++		break;
++	case 48:
++		tcr->ips = ARM_LPAE_TCR_PS_48_BIT;
++		break;
++	case 52:
++		tcr->ips = ARM_LPAE_TCR_PS_52_BIT;
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	tcr->tsz = 64ULL - cfg->ias;
++
++	/* MAIRs */
++	reg = (ARM_LPAE_MAIR_ATTR_NC
++	       << ARM_LPAE_MAIR_ATTR_SHIFT(ARM_LPAE_MAIR_ATTR_IDX_NC)) |
++	      (ARM_LPAE_MAIR_ATTR_WBRWA
++	       << ARM_LPAE_MAIR_ATTR_SHIFT(ARM_LPAE_MAIR_ATTR_IDX_CACHE)) |
++	      (ARM_LPAE_MAIR_ATTR_DEVICE
++	       << ARM_LPAE_MAIR_ATTR_SHIFT(ARM_LPAE_MAIR_ATTR_IDX_DEV)) |
++	      (ARM_LPAE_MAIR_ATTR_INC_OWBRWA
++	       << ARM_LPAE_MAIR_ATTR_SHIFT(ARM_LPAE_MAIR_ATTR_IDX_INC_OCACHE));
++
++	cfg->arm_lpae_s1_cfg.mair = reg;
++	return 0;
++}
++
++int arm_lpae_init_pgtable_s2(struct io_pgtable_cfg *cfg,
++			     struct arm_lpae_io_pgtable *data)
++{
++	u64 sl;
++	int ret;
++	typeof(&cfg->arm_lpae_s2_cfg.vtcr) vtcr = &cfg->arm_lpae_s2_cfg.vtcr;
++
++	/* The NS quirk doesn't apply at stage 2 */
++	if (cfg->quirks)
++		return -EINVAL;
++
++	ret = arm_lpae_init_pgtable(cfg, data);
++	if (ret)
++		return ret;
++
++	/*
++	 * Concatenate PGDs at level 1 if possible in order to reduce
++	 * the depth of the stage-2 walk.
++	 */
++	if (data->start_level == 0) {
++		unsigned long pgd_pages;
++
++		pgd_pages = ARM_LPAE_PGD_SIZE(data) / sizeof(arm_lpae_iopte);
++		if (pgd_pages <= ARM_LPAE_S2_MAX_CONCAT_PAGES) {
++			data->pgd_bits += data->bits_per_level;
++			data->start_level++;
++		}
++	}
++
++	/* VTCR */
++	if (cfg->coherent_walk) {
++		vtcr->sh = ARM_LPAE_TCR_SH_IS;
++		vtcr->irgn = ARM_LPAE_TCR_RGN_WBWA;
++		vtcr->orgn = ARM_LPAE_TCR_RGN_WBWA;
++	} else {
++		vtcr->sh = ARM_LPAE_TCR_SH_OS;
++		vtcr->irgn = ARM_LPAE_TCR_RGN_NC;
++		vtcr->orgn = ARM_LPAE_TCR_RGN_NC;
++	}
++
++	sl = data->start_level;
++
++	switch (ARM_LPAE_GRANULE(data)) {
++	case SZ_4K:
++		vtcr->tg = ARM_LPAE_TCR_TG0_4K;
++		sl++; /* SL0 format is different for 4K granule size */
++		break;
++	case SZ_16K:
++		vtcr->tg = ARM_LPAE_TCR_TG0_16K;
++		break;
++	case SZ_64K:
++		vtcr->tg = ARM_LPAE_TCR_TG0_64K;
++		break;
++	}
++
++	switch (cfg->oas) {
++	case 32:
++		vtcr->ps = ARM_LPAE_TCR_PS_32_BIT;
++		break;
++	case 36:
++		vtcr->ps = ARM_LPAE_TCR_PS_36_BIT;
++		break;
++	case 40:
++		vtcr->ps = ARM_LPAE_TCR_PS_40_BIT;
++		break;
++	case 42:
++		vtcr->ps = ARM_LPAE_TCR_PS_42_BIT;
++		break;
++	case 44:
++		vtcr->ps = ARM_LPAE_TCR_PS_44_BIT;
++		break;
++	case 48:
++		vtcr->ps = ARM_LPAE_TCR_PS_48_BIT;
++		break;
++	case 52:
++		vtcr->ps = ARM_LPAE_TCR_PS_52_BIT;
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	vtcr->tsz = 64ULL - cfg->ias;
++	vtcr->sl = ~sl & ARM_LPAE_VTCR_SL0_MASK;
++	return 0;
++}
+diff --git a/drivers/iommu/io-pgtable-arm.c b/drivers/iommu/io-pgtable-arm.c
+index db42aed6ad7b..b2b188bb86b3 100644
+--- a/drivers/iommu/io-pgtable-arm.c
++++ b/drivers/iommu/io-pgtable-arm.c
+@@ -21,9 +21,6 @@
+ 
+ #include <asm/barrier.h>
+ 
+-#define ARM_LPAE_MAX_ADDR_BITS		52
+-#define ARM_LPAE_S2_MAX_CONCAT_PAGES	16
+-
+ bool selftest_running = false;
+ 
+ static dma_addr_t __arm_lpae_dma_addr(void *pages)
+@@ -91,174 +88,17 @@ static void arm_lpae_free_pgtable(struct io_pgtable *iop)
+ 	kfree(data);
+ }
+ 
+-static void arm_lpae_restrict_pgsizes(struct io_pgtable_cfg *cfg)
+-{
+-	unsigned long granule, page_sizes;
+-	unsigned int max_addr_bits = 48;
+-
+-	/*
+-	 * We need to restrict the supported page sizes to match the
+-	 * translation regime for a particular granule. Aim to match
+-	 * the CPU page size if possible, otherwise prefer smaller sizes.
+-	 * While we're at it, restrict the block sizes to match the
+-	 * chosen granule.
+-	 */
+-	if (cfg->pgsize_bitmap & PAGE_SIZE)
+-		granule = PAGE_SIZE;
+-	else if (cfg->pgsize_bitmap & ~PAGE_MASK)
+-		granule = 1UL << __fls(cfg->pgsize_bitmap & ~PAGE_MASK);
+-	else if (cfg->pgsize_bitmap & PAGE_MASK)
+-		granule = 1UL << __ffs(cfg->pgsize_bitmap & PAGE_MASK);
+-	else
+-		granule = 0;
+-
+-	switch (granule) {
+-	case SZ_4K:
+-		page_sizes = (SZ_4K | SZ_2M | SZ_1G);
+-		break;
+-	case SZ_16K:
+-		page_sizes = (SZ_16K | SZ_32M);
+-		break;
+-	case SZ_64K:
+-		max_addr_bits = 52;
+-		page_sizes = (SZ_64K | SZ_512M);
+-		if (cfg->oas > 48)
+-			page_sizes |= 1ULL << 42; /* 4TB */
+-		break;
+-	default:
+-		page_sizes = 0;
+-	}
+-
+-	cfg->pgsize_bitmap &= page_sizes;
+-	cfg->ias = min(cfg->ias, max_addr_bits);
+-	cfg->oas = min(cfg->oas, max_addr_bits);
+-}
+-
+-static struct arm_lpae_io_pgtable *
+-arm_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg)
+-{
+-	struct arm_lpae_io_pgtable *data;
+-	int levels, va_bits, pg_shift;
+-
+-	arm_lpae_restrict_pgsizes(cfg);
+-
+-	if (!(cfg->pgsize_bitmap & (SZ_4K | SZ_16K | SZ_64K)))
+-		return NULL;
+-
+-	if (cfg->ias > ARM_LPAE_MAX_ADDR_BITS)
+-		return NULL;
+-
+-	if (cfg->oas > ARM_LPAE_MAX_ADDR_BITS)
+-		return NULL;
+-
+-	data = kmalloc(sizeof(*data), GFP_KERNEL);
+-	if (!data)
+-		return NULL;
+-
+-	pg_shift = __ffs(cfg->pgsize_bitmap);
+-	data->bits_per_level = pg_shift - ilog2(sizeof(arm_lpae_iopte));
+-
+-	va_bits = cfg->ias - pg_shift;
+-	levels = DIV_ROUND_UP(va_bits, data->bits_per_level);
+-	data->start_level = ARM_LPAE_MAX_LEVELS - levels;
+-
+-	/* Calculate the actual size of our pgd (without concatenation) */
+-	data->pgd_bits = va_bits - (data->bits_per_level * (levels - 1));
+-
+-	data->iop.ops = (struct io_pgtable_ops) {
+-		.map_pages	= arm_lpae_map_pages,
+-		.unmap_pages	= arm_lpae_unmap_pages,
+-		.iova_to_phys	= arm_lpae_iova_to_phys,
+-	};
+-
+-	return data;
+-}
+-
+ static struct io_pgtable *
+ arm_64_lpae_alloc_pgtable_s1(struct io_pgtable_cfg *cfg, void *cookie)
+ {
+-	u64 reg;
+ 	struct arm_lpae_io_pgtable *data;
+-	typeof(&cfg->arm_lpae_s1_cfg.tcr) tcr = &cfg->arm_lpae_s1_cfg.tcr;
+-	bool tg1;
+-
+-	if (cfg->quirks & ~(IO_PGTABLE_QUIRK_ARM_NS |
+-			    IO_PGTABLE_QUIRK_ARM_TTBR1 |
+-			    IO_PGTABLE_QUIRK_ARM_OUTER_WBWA))
+-		return NULL;
+ 
+-	data = arm_lpae_alloc_pgtable(cfg);
++	data = kzalloc(sizeof(*data), GFP_KERNEL);
+ 	if (!data)
+ 		return NULL;
+ 
+-	/* TCR */
+-	if (cfg->coherent_walk) {
+-		tcr->sh = ARM_LPAE_TCR_SH_IS;
+-		tcr->irgn = ARM_LPAE_TCR_RGN_WBWA;
+-		tcr->orgn = ARM_LPAE_TCR_RGN_WBWA;
+-		if (cfg->quirks & IO_PGTABLE_QUIRK_ARM_OUTER_WBWA)
+-			goto out_free_data;
+-	} else {
+-		tcr->sh = ARM_LPAE_TCR_SH_OS;
+-		tcr->irgn = ARM_LPAE_TCR_RGN_NC;
+-		if (!(cfg->quirks & IO_PGTABLE_QUIRK_ARM_OUTER_WBWA))
+-			tcr->orgn = ARM_LPAE_TCR_RGN_NC;
+-		else
+-			tcr->orgn = ARM_LPAE_TCR_RGN_WBWA;
+-	}
+-
+-	tg1 = cfg->quirks & IO_PGTABLE_QUIRK_ARM_TTBR1;
+-	switch (ARM_LPAE_GRANULE(data)) {
+-	case SZ_4K:
+-		tcr->tg = tg1 ? ARM_LPAE_TCR_TG1_4K : ARM_LPAE_TCR_TG0_4K;
+-		break;
+-	case SZ_16K:
+-		tcr->tg = tg1 ? ARM_LPAE_TCR_TG1_16K : ARM_LPAE_TCR_TG0_16K;
+-		break;
+-	case SZ_64K:
+-		tcr->tg = tg1 ? ARM_LPAE_TCR_TG1_64K : ARM_LPAE_TCR_TG0_64K;
+-		break;
+-	}
+-
+-	switch (cfg->oas) {
+-	case 32:
+-		tcr->ips = ARM_LPAE_TCR_PS_32_BIT;
+-		break;
+-	case 36:
+-		tcr->ips = ARM_LPAE_TCR_PS_36_BIT;
+-		break;
+-	case 40:
+-		tcr->ips = ARM_LPAE_TCR_PS_40_BIT;
+-		break;
+-	case 42:
+-		tcr->ips = ARM_LPAE_TCR_PS_42_BIT;
+-		break;
+-	case 44:
+-		tcr->ips = ARM_LPAE_TCR_PS_44_BIT;
+-		break;
+-	case 48:
+-		tcr->ips = ARM_LPAE_TCR_PS_48_BIT;
+-		break;
+-	case 52:
+-		tcr->ips = ARM_LPAE_TCR_PS_52_BIT;
+-		break;
+-	default:
++	if (arm_lpae_init_pgtable_s1(cfg, data))
+ 		goto out_free_data;
+-	}
+-
+-	tcr->tsz = 64ULL - cfg->ias;
+-
+-	/* MAIRs */
+-	reg = (ARM_LPAE_MAIR_ATTR_NC
+-	       << ARM_LPAE_MAIR_ATTR_SHIFT(ARM_LPAE_MAIR_ATTR_IDX_NC)) |
+-	      (ARM_LPAE_MAIR_ATTR_WBRWA
+-	       << ARM_LPAE_MAIR_ATTR_SHIFT(ARM_LPAE_MAIR_ATTR_IDX_CACHE)) |
+-	      (ARM_LPAE_MAIR_ATTR_DEVICE
+-	       << ARM_LPAE_MAIR_ATTR_SHIFT(ARM_LPAE_MAIR_ATTR_IDX_DEV)) |
+-	      (ARM_LPAE_MAIR_ATTR_INC_OWBRWA
+-	       << ARM_LPAE_MAIR_ATTR_SHIFT(ARM_LPAE_MAIR_ATTR_IDX_INC_OCACHE));
+-
+-	cfg->arm_lpae_s1_cfg.mair = reg;
+ 
+ 	/* Looking good; allocate a pgd */
+ 	data->pgd = __arm_lpae_alloc_pages(ARM_LPAE_PGD_SIZE(data),
+@@ -281,86 +121,14 @@ arm_64_lpae_alloc_pgtable_s1(struct io_pgtable_cfg *cfg, void *cookie)
+ static struct io_pgtable *
+ arm_64_lpae_alloc_pgtable_s2(struct io_pgtable_cfg *cfg, void *cookie)
+ {
+-	u64 sl;
+ 	struct arm_lpae_io_pgtable *data;
+-	typeof(&cfg->arm_lpae_s2_cfg.vtcr) vtcr = &cfg->arm_lpae_s2_cfg.vtcr;
+-
+-	/* The NS quirk doesn't apply at stage 2 */
+-	if (cfg->quirks)
+-		return NULL;
+ 
+-	data = arm_lpae_alloc_pgtable(cfg);
++	data = kzalloc(sizeof(*data), GFP_KERNEL);
+ 	if (!data)
+ 		return NULL;
+ 
+-	/*
+-	 * Concatenate PGDs at level 1 if possible in order to reduce
+-	 * the depth of the stage-2 walk.
+-	 */
+-	if (data->start_level == 0) {
+-		unsigned long pgd_pages;
+-
+-		pgd_pages = ARM_LPAE_PGD_SIZE(data) / sizeof(arm_lpae_iopte);
+-		if (pgd_pages <= ARM_LPAE_S2_MAX_CONCAT_PAGES) {
+-			data->pgd_bits += data->bits_per_level;
+-			data->start_level++;
+-		}
+-	}
+-
+-	/* VTCR */
+-	if (cfg->coherent_walk) {
+-		vtcr->sh = ARM_LPAE_TCR_SH_IS;
+-		vtcr->irgn = ARM_LPAE_TCR_RGN_WBWA;
+-		vtcr->orgn = ARM_LPAE_TCR_RGN_WBWA;
+-	} else {
+-		vtcr->sh = ARM_LPAE_TCR_SH_OS;
+-		vtcr->irgn = ARM_LPAE_TCR_RGN_NC;
+-		vtcr->orgn = ARM_LPAE_TCR_RGN_NC;
+-	}
+-
+-	sl = data->start_level;
+-
+-	switch (ARM_LPAE_GRANULE(data)) {
+-	case SZ_4K:
+-		vtcr->tg = ARM_LPAE_TCR_TG0_4K;
+-		sl++; /* SL0 format is different for 4K granule size */
+-		break;
+-	case SZ_16K:
+-		vtcr->tg = ARM_LPAE_TCR_TG0_16K;
+-		break;
+-	case SZ_64K:
+-		vtcr->tg = ARM_LPAE_TCR_TG0_64K;
+-		break;
+-	}
+-
+-	switch (cfg->oas) {
+-	case 32:
+-		vtcr->ps = ARM_LPAE_TCR_PS_32_BIT;
+-		break;
+-	case 36:
+-		vtcr->ps = ARM_LPAE_TCR_PS_36_BIT;
+-		break;
+-	case 40:
+-		vtcr->ps = ARM_LPAE_TCR_PS_40_BIT;
+-		break;
+-	case 42:
+-		vtcr->ps = ARM_LPAE_TCR_PS_42_BIT;
+-		break;
+-	case 44:
+-		vtcr->ps = ARM_LPAE_TCR_PS_44_BIT;
+-		break;
+-	case 48:
+-		vtcr->ps = ARM_LPAE_TCR_PS_48_BIT;
+-		break;
+-	case 52:
+-		vtcr->ps = ARM_LPAE_TCR_PS_52_BIT;
+-		break;
+-	default:
++	if (arm_lpae_init_pgtable_s2(cfg, data))
+ 		goto out_free_data;
+-	}
+-
+-	vtcr->tsz = 64ULL - cfg->ias;
+-	vtcr->sl = ~sl & ARM_LPAE_VTCR_SL0_MASK;
+ 
+ 	/* Allocate pgd pages */
+ 	data->pgd = __arm_lpae_alloc_pages(ARM_LPAE_PGD_SIZE(data),
+@@ -414,10 +182,13 @@ arm_mali_lpae_alloc_pgtable(struct io_pgtable_cfg *cfg, void *cookie)
+ 
+ 	cfg->pgsize_bitmap &= (SZ_4K | SZ_2M | SZ_1G);
+ 
+-	data = arm_lpae_alloc_pgtable(cfg);
++	data = kzalloc(sizeof(*data), GFP_KERNEL);
+ 	if (!data)
+ 		return NULL;
+ 
++	if (arm_lpae_init_pgtable(cfg, data))
++		return NULL;
++
+ 	/* Mali seems to need a full 4-level table regardless of IAS */
+ 	if (data->start_level > 0) {
+ 		data->start_level = 0;
 -- 
 2.39.0
 
