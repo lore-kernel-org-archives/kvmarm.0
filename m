@@ -1,43 +1,43 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DFC2F46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58BC02F32
 	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 12:59:27 +0000 (UTC)
-Received: by mail-wr1-f44.google.com with SMTP id h12so17212663wrv.10
+Received: by mail-wr1-f41.google.com with SMTP id bk16so17209889wrb.11
         for <kvmarm@lists.linux.dev>; Wed, 01 Feb 2023 04:59:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JL+q7powKXjRQBM9aUxd/Ixujr3/xsGD0eW5qeS08kg=;
-        b=XvIuhKnbdaSJmJH8iDjgXLwNO9bmY/agjJa9GYHK5fvNc0rbxK9E8+MePeO1hYYVkj
-         BLoKe4FnYGZ+IcTOkZe7A/26QsSpzsLPFCxLtdFiID61kSy1LAZHhSepPc/I0WjajANX
-         zqcV2727uc8XO/ZvNCcb3Dwjpmq+TZk1Mq07dsMCgGcMTplN5QoiX9TyV73FJGwuWPl5
-         VVfuWMPqHgHHXae2ZU0wPy/5nRKQ4LHuLzsStjXWsObRhMnAWkK+9/ljtH6QUPqObP0o
-         1KVNZv0lWLfSW5q9HV60q+XYtLC9dKPNWlqVRI8Ylf60E6JZU9bJG0pBGfBHyapeYBxY
-         IujA==
+        bh=mpqAxnbuSEle+b4ZozqvuRbtg84sOU2wLsHHXy60Xf4=;
+        b=H8N6t8azgmWBH886NvtNIa/88xftg/d47CN1lNWpwQY8g41X2dJULDBUt8RWJTJeSI
+         WThReSjvqRrR6PVFUKbeH+UFULZSwESdu2a/Lm9dDMa5lpETn4ZZ/+Opu68LiZmqq9sN
+         7P/93+ZxvEA2KO5Usrr4b/D33b6zAhssqHN/jocvhOTGBVp9C2dmRhMkotIsbkaCIu35
+         VlkRPDQbg9E1wdVnf/L6ySFyOuxkCqSpAFTCvU8t7w+YTqswvLQFx7+ljAE9t0xAPWKe
+         1n4xTnAPGdVNWDKH/odBfQ6RBeJ1YG99BQDMs9ceNFwJeIzOmly9KiYRBCORoZE+neG/
+         rcxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JL+q7powKXjRQBM9aUxd/Ixujr3/xsGD0eW5qeS08kg=;
-        b=fbkh78C45L/YXeVrCqi6gQcvM3zy5Ydf4E9mNLXZX+lNXLAUhHwcIRXn15uGdg/LiS
-         hazuzrbfO3LO8RIKEX8uWTlEkwUetftB8+mhvaC0UY8PZazQX0DUbqOAxqZqvYEWhFB6
-         x7jxCr/3icAq/i41QI3L5GA3y4QMus1c+v9tX1aPoWzEAnRbbpUD0UKQaIAJOccztSXR
-         tI0gLPozfEQee9vYChlVGV0kT8wZB1P8sThjn+IMmAXRdbGzT9K9gG0EbZAUS1TjCSCU
-         XBgkboGFBLTFl7x/9Y0lidQRbKygfTe7767yLB86GA2Ekg9p8xisBFvErnsKjJhGZDsx
-         mS6Q==
-X-Gm-Message-State: AO0yUKUCiS6NDP9a9xTFLZEM/k9ljN+qWqLFIM0rZJGOy02eQ3+FYr3f
-	KV+2cXquV3Ztg9g3AMs6RZAZfw==
-X-Google-Smtp-Source: AK7set/b2J59uvwFQEz7jZcXjC6ArgctU3mXzzUT7UxY8LgLmGH7l73VT4ZIMiNBTG1OX7/4xi4JWw==
-X-Received: by 2002:a05:6000:188f:b0:2bf:cb6a:a7e with SMTP id a15-20020a056000188f00b002bfcb6a0a7emr2957190wri.42.1675256367258;
-        Wed, 01 Feb 2023 04:59:27 -0800 (PST)
+        bh=mpqAxnbuSEle+b4ZozqvuRbtg84sOU2wLsHHXy60Xf4=;
+        b=Jkee/DLiVhcntH4Xx+bsgFj21yAn0wcLEhHhfp+zpln4LFSjVT9syxnAOhojSbYtSC
+         C+6vXXS2b0fKOhCfbPKmVe2AvS1Yk3jK+8ObWL7T+QSEn0zJNTJT9uPsdHqqv/ef62lw
+         DgL7poUDWksEmEsk9P8EIg6kQxqFyEC58HzuwRmxFkmETIpR2zV/tq+BmQ+HEZGq4O94
+         su+bDR1MxFtVvbzraVVlmnZ+UMKi6A4YZNu06n6Hw7+XJBbMdF7wSPDIaTjs/URBQCfq
+         ASt+EwFX/66Ay8iDpWH8KjOrNIiRZUzWkSP7PLEjJ7+vRG2ru3TA2jHAjOW0SFcpcPgB
+         yYig==
+X-Gm-Message-State: AO0yUKVbxPXAm5biBhWFXupfPwm/CJPMdsWe+Y7IKKdXc5tLwIFhD7k7
+	SaJjpVVZNApY9cmby9rGJokykA==
+X-Google-Smtp-Source: AK7set8PyrVNoe2MKjwL7WkMsO801xwUwupVDKmMI+GE07B0RcxtODTmVsZbmKSEFKICiI5L55zPfQ==
+X-Received: by 2002:adf:e181:0:b0:2bd:c4ea:3b59 with SMTP id az1-20020adfe181000000b002bdc4ea3b59mr2690988wrb.0.1675256365691;
+        Wed, 01 Feb 2023 04:59:25 -0800 (PST)
 Received: from localhost.localdomain (054592b0.skybroadband.com. [5.69.146.176])
-        by smtp.gmail.com with ESMTPSA id m15-20020a056000024f00b002bfae16ee2fsm17972811wrz.111.2023.02.01.04.59.26
+        by smtp.gmail.com with ESMTPSA id m15-20020a056000024f00b002bfae16ee2fsm17972811wrz.111.2023.02.01.04.59.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Feb 2023 04:59:26 -0800 (PST)
+        Wed, 01 Feb 2023 04:59:25 -0800 (PST)
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: maz@kernel.org,
 	catalin.marinas@arm.com,
@@ -55,9 +55,9 @@ Cc: robin.murphy@arm.com,
 	kvmarm@lists.linux.dev,
 	iommu@lists.linux.dev,
 	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [RFC PATCH 10/45] KVM: arm64: pkvm: Expose pkvm_map/unmap_donated_memory()
-Date: Wed,  1 Feb 2023 12:52:54 +0000
-Message-Id: <20230201125328.2186498-11-jean-philippe@linaro.org>
+Subject: [RFC PATCH 08/45] KVM: arm64: pkvm: Add pkvm_udelay()
+Date: Wed,  1 Feb 2023 12:52:52 +0000
+Message-Id: <20230201125328.2186498-9-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230201125328.2186498-1-jean-philippe@linaro.org>
 References: <20230201125328.2186498-1-jean-philippe@linaro.org>
@@ -69,95 +69,106 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow the IOMMU driver to use pkvm_map/unmap_donated memory()
+Add a simple delay loop for drivers.
+
+This could use more work. It should be possible to insert a wfe and save
+power, but I haven't studied whether it is safe to do so with the host
+in control of the event stream. The SMMU driver will use wfe anyway for
+frequent waits (provided the implementation can send command queue
+events).
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  3 +++
- arch/arm64/kvm/hyp/nvhe/pkvm.c                | 18 +++++++++---------
- 2 files changed, 12 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  3 ++
+ arch/arm64/kvm/hyp/nvhe/setup.c        |  4 +++
+ arch/arm64/kvm/hyp/nvhe/timer-sr.c     | 43 ++++++++++++++++++++++++++
+ 3 files changed, 50 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index 38e5e9b259fc..40decbe4cc70 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -86,6 +86,9 @@ void reclaim_guest_pages(struct pkvm_hyp_vm *vm, struct kvm_hyp_memcache *mc);
- int refill_memcache(struct kvm_hyp_memcache *mc, unsigned long min_pages,
- 		    struct kvm_hyp_memcache *host_mc);
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+index 6160d1a34fa2..746dc1c05a8e 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+@@ -109,4 +109,7 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code);
  
-+void *pkvm_map_donated_memory(unsigned long host_va, size_t size);
-+void pkvm_unmap_donated_memory(void *va, size_t size);
+ struct pkvm_hyp_vcpu *pkvm_mpidr_to_hyp_vcpu(struct pkvm_hyp_vm *vm, u64 mpidr);
+ 
++int pkvm_timer_init(void);
++void pkvm_udelay(unsigned long usecs);
 +
- static __always_inline void __load_host_stage2(void)
- {
- 	if (static_branch_likely(&kvm_protected_mode_initialized))
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 905c05c7e9bf..a3711979bbd3 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -592,7 +592,7 @@ static void *map_donated_memory_noclear(unsigned long host_va, size_t size)
- 	return va;
- }
+ #endif /* __ARM64_KVM_NVHE_PKVM_H__ */
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 8a357637ce81..629e74c46b35 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -300,6 +300,10 @@ void __noreturn __pkvm_init_finalise(void)
+ 	};
+ 	pkvm_pgtable.mm_ops = &pkvm_pgtable_mm_ops;
  
--static void *map_donated_memory(unsigned long host_va, size_t size)
-+void *pkvm_map_donated_memory(unsigned long host_va, size_t size)
- {
- 	void *va = map_donated_memory_noclear(host_va, size);
- 
-@@ -608,7 +608,7 @@ static void __unmap_donated_memory(void *va, size_t size)
- 				       PAGE_ALIGN(size) >> PAGE_SHIFT));
- }
- 
--static void unmap_donated_memory(void *va, size_t size)
-+void pkvm_unmap_donated_memory(void *va, size_t size)
- {
- 	if (!va)
- 		return;
-@@ -668,11 +668,11 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
- 
- 	ret = -ENOMEM;
- 
--	hyp_vm = map_donated_memory(vm_hva, vm_size);
-+	hyp_vm = pkvm_map_donated_memory(vm_hva, vm_size);
- 	if (!hyp_vm)
- 		goto err_remove_mappings;
- 
--	last_ran = map_donated_memory(last_ran_hva, last_ran_size);
-+	last_ran = pkvm_map_donated_memory(last_ran_hva, last_ran_size);
- 	if (!last_ran)
- 		goto err_remove_mappings;
- 
-@@ -699,9 +699,9 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
- err_unlock:
- 	hyp_spin_unlock(&vm_table_lock);
- err_remove_mappings:
--	unmap_donated_memory(hyp_vm, vm_size);
--	unmap_donated_memory(last_ran, last_ran_size);
--	unmap_donated_memory(pgd, pgd_size);
-+	pkvm_unmap_donated_memory(hyp_vm, vm_size);
-+	pkvm_unmap_donated_memory(last_ran, last_ran_size);
-+	pkvm_unmap_donated_memory(pgd, pgd_size);
- err_unpin_kvm:
- 	hyp_unpin_shared_mem(host_kvm, host_kvm + 1);
- 	return ret;
-@@ -726,7 +726,7 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
- 	unsigned int idx;
- 	int ret;
- 
--	hyp_vcpu = map_donated_memory(vcpu_hva, sizeof(*hyp_vcpu));
-+	hyp_vcpu = pkvm_map_donated_memory(vcpu_hva, sizeof(*hyp_vcpu));
- 	if (!hyp_vcpu)
- 		return -ENOMEM;
- 
-@@ -754,7 +754,7 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
- 	hyp_spin_unlock(&vm_table_lock);
- 
++	ret = pkvm_timer_init();
++	if (ret)
++		goto out;
++
+ 	ret = fix_host_ownership();
  	if (ret)
--		unmap_donated_memory(hyp_vcpu, sizeof(*hyp_vcpu));
-+		pkvm_unmap_donated_memory(hyp_vcpu, sizeof(*hyp_vcpu));
+ 		goto out;
+diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+index 9072e71693ba..202df9003a0d 100644
+--- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
++++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
+@@ -10,6 +10,10 @@
  
- 	return ret;
+ #include <asm/kvm_hyp.h>
+ 
++#include <nvhe/pkvm.h>
++
++static u32 timer_freq;
++
+ void __kvm_timer_set_cntvoff(u64 cntvoff)
+ {
+ 	write_sysreg(cntvoff, cntvoff_el2);
+@@ -46,3 +50,42 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
+ 	val |= CNTHCTL_EL1PCTEN;
+ 	write_sysreg(val, cnthctl_el2);
  }
++
++static u64 pkvm_ticks_get(void)
++{
++	return __arch_counter_get_cntvct();
++}
++
++#define SEC_TO_US 1000000
++
++int pkvm_timer_init(void)
++{
++	timer_freq = read_sysreg(cntfrq_el0);
++	/*
++	 * TODO: The highest privileged level is supposed to initialize this
++	 * register. But on some systems (which?), this information is only
++	 * contained in the device-tree, so we'll need to find it out some other
++	 * way.
++	 */
++	if (!timer_freq || timer_freq < SEC_TO_US)
++		return -ENODEV;
++	return 0;
++}
++
++
++#define pkvm_time_us_to_ticks(us) ((u64)(us) * timer_freq / SEC_TO_US)
++
++void pkvm_udelay(unsigned long usecs)
++{
++	u64 ticks = pkvm_time_us_to_ticks(usecs);
++	u64 start = pkvm_ticks_get();
++
++	while (true) {
++		u64 cur = pkvm_ticks_get();
++
++		if ((cur - start) >= ticks || cur < start)
++			break;
++		/* TODO wfe */
++		cpu_relax();
++	}
++}
 -- 
 2.39.0
 
