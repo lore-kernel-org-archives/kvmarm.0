@@ -1,104 +1,67 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3818483
-	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 16:57:16 +0000 (UTC)
-Received: by mail-ej1-f48.google.com with SMTP id mc11so30781568ejb.10
-        for <kvmarm@lists.linux.dev>; Wed, 01 Feb 2023 08:57:16 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C46B8483
+	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 17:21:35 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id u106-20020a25ab73000000b00843e2d6a2c8so3407642ybi.3
+        for <kvmarm@lists.linux.dev>; Wed, 01 Feb 2023 09:21:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5QwLG2T0p0/wJ6lz+hF7UZawl4kCGwRAecIdikVjtEo=;
-        b=FjiELNOx4rVbcVrAuGwCv258MtT3ykNsIol/GqUpI0nt+Edk0r1icdxutjlmTcXBWW
-         GZ0V9voJ08dFm3E2wMYq6E7SMJ9cZWjL2ObcTY7C1ggoWR7sihQ/Afp4BDOKJGDCotPv
-         D4Jdlut/yMLyzF9tvIMo4sXDiX9IdrBmHptId5qYX8Q6tKdFCufPLxz/0/jSaarruZ9e
-         YftF69lT280fZq2surf4jBOozRQOl8Huf+8cVVp6k6pCXbi5EQQp6IZJW+2J3x1TTvJZ
-         Q7GuvvU7UTTVyyvsoKlHyf1jcZMugXO52qvphTuNl2WtYU2DriOkvH0D53/yQc8Vwpeb
-         CIKg==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dAwj5/lXzInaS9jfWyz64yLKr8tCxS9Z5jRLKFKML64=;
+        b=raB/NA4dIkmnR516pfEwm0knT2JV3hTjtNysGUJa+oNJCoRdQNCWT+eWHWDUkGMp1z
+         nemcgwGweS+1PvCf03HlnV+zFsGcHKROEKijvWQ6tXXQdNKDFPFV0uhc9DTBJ2WxkUnD
+         l8nczlgz1IRMAsISGk4zS4qd0+zKNSxMN5LrFP3E/aHtvMyOBmqt0QPtMeh9+LQLuhE7
+         YA5VQbnuD2vUKPAmUuc71aFHIb2NospTr7b8PdI0iObEnZamBeIldmxT4Juqt4e9/VgS
+         JCl/b9x1rvanRMgnH5/Iy264T9XmSpOsVQQ89FjS50NRWwDF1s1oZFokADOfd5bCDQTj
+         IGOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5QwLG2T0p0/wJ6lz+hF7UZawl4kCGwRAecIdikVjtEo=;
-        b=D9lW+Vq1OA4hfXwUV308jjtgH8Dvt2/uymh/x1+Q8P/zk1Wqck7MnuLAqhRVPt7F2U
-         Rmtxkm+xltW9e/CD80yc5OhFXm2HaVX5Js3Ht0vpXPwAZ0QAHa71kluQX0FWFEdrJyq8
-         rY1pUE63KetOdom1mP/XTtS+Pv+fGqYW7k9a/1g+++t1E1PsEGoAGMvpRoe+hTBeoZ3Z
-         7+P6a1t7aFeFCvh5kDzFC4jwAicv2zs1n5DRSpzqS7uyGDbrgOa6r5meMyS88i+CHlf5
-         SPaUbe/UY6H9AUR4HDwNb7l99nOPOb3UpxSofKg/ZuzrnQliXluGTco3gdN/Smff2HKa
-         o47g==
-X-Gm-Message-State: AO0yUKViwDhXJ3ESEimcZzoA97QLTiw1qqHEr1Fa5Hu7LCvQ5R3eFnWN
-	OYT8ZeWMAZoFiAZKombXN9j0WQ==
-X-Google-Smtp-Source: AK7set9KH3KAy6EZVpBWgeg+qNgCuSj1hLv7Q2CPEU+vYqF8yGOPPNkySgRFVjuyZvEfvpW8fknKDg==
-X-Received: by 2002:a17:906:2c6:b0:887:87e2:5102 with SMTP id 6-20020a17090602c600b0088787e25102mr7004327ejk.13.1675270634684;
-        Wed, 01 Feb 2023 08:57:14 -0800 (PST)
-Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id d13-20020a170906344d00b0088385cd6166sm7094168ejb.195.2023.02.01.08.57.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Feb 2023 08:57:13 -0800 (PST)
-Date: Wed, 1 Feb 2023 16:57:09 +0000
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Mark Brown <broonie@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-	kernel-team@android.com
-Subject: Re: [PATCH 0/4] KVM: arm64: Fix CPU resume/on with pKVM
-Message-ID: <Y9qZ5XoXW1XQ70eE@google.com>
-References: <20230201103755.1398086-1-qperret@google.com>
- <86bkmd1ly4.wl-maz@kernel.org>
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dAwj5/lXzInaS9jfWyz64yLKr8tCxS9Z5jRLKFKML64=;
+        b=LExcmYCoExvau+LlbpZeXg/S31UITElwO9gTJ7saCd6OWuCXwYtaNRdCdLKTuWVHot
+         2Io24kfSp3BGB5FBOoMwlem6kOisCCHkidNSsigEAy/a2CvMlq1XJc2Xa/sa9GYXgWIL
+         XnKBcQ5SiZ3eDyY0FT6L8oYTWAt3ddic9+7noZQaOoUHY+o0pur2uFn8fo+C8yk70Zc1
+         KVhskyuMPL3NgFhW+Ssy/au6t5ptLWOJTQ0vBWJybPaBHHZ1743DAdBDvDTSZX36W7KT
+         9P5iHm4ee2b3cDCwr607ouf/R3iT1KPaashkkM/PClFS0FbhTqsbcHuPiG5/8cERz0Mx
+         E4OA==
+X-Gm-Message-State: AO0yUKVrdQh+htS3ASXrxiNhaBzxnL86WzzLQH0JQd54jSgl3pd2WBA6
+	Dt6hd4hMQ/+J0yRH2UZsVcQRxVk3Q9prTdbZzQ==
+X-Google-Smtp-Source: AK7set9VoaOQ2sAxqOHh49EW15OK6oX7ZpblUNowiUpwgVsH4yb9krf7pPPf6epwC9xHunRGiv1kYyw7qr6muap8xA==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:690c:a84:b0:4ff:1141:f621 with
+ SMTP id ci4-20020a05690c0a8400b004ff1141f621mr284480ywb.224.1675272094212;
+ Wed, 01 Feb 2023 09:21:34 -0800 (PST)
+Date: Wed,  1 Feb 2023 17:21:09 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86bkmd1ly4.wl-maz@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.456.gfc5497dd1b-goog
+Message-ID: <20230201172110.1970980-1-coltonlewis@google.com>
+Subject: [kvm-unit-tests PATCH v4 0/1] arm: Replace MAX_SMP probe loop
+From: Colton Lewis <coltonlewis@google.com>
+To: thuth@redhat.com, pbonzini@redhat.com, nrb@linux.ibm.com, 
+	andrew.jones@linux.dev, imbrenda@linux.ibm.com, marcorr@google.com, 
+	alexandru.elisei@arm.com, oliver.upton@linux.dev
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wednesday 01 Feb 2023 at 14:48:03 (+0000), Marc Zyngier wrote:
-> On Wed, 01 Feb 2023 10:37:50 +0000,
-> Quentin Perret <qperret@google.com> wrote:
-> > 
-> > When using pKVM, we do not reset the EL2 exception vectors back to the
-> > stubs for e.g. Power Management or CPU hotplug as we normally do in KVM.
-> > As consequence, the initialisation perfomed by __finalise_el2 is missing
-> > on e.g. the CPU_RESUME path with pKVM, hence leaving certain registers
-> > in an incorrect state.
-> > 
-> > One such example is ZCR_EL2 which remains configured with SVE traps
-> > enabled. And so using SVE on a CPU that has gone through a hotplug
-> > off/on cycle leads to a hyp panic. Not good.
-> > 
-> > This series fixes this by macroizing the first half of __finalise_el2
-> > (that is, the part that is not specific to VHE) to allow its re-use
-> > from pKVM's PSCI relay.
-> 
-> For the series:
-> 
-> Reviewed-by: Marc Zyngier <maz@kernel.org>
-> 
-> I think it might be a bit late to send this as fixes for 6.2 (my
-> latest pull request for kvmarm-fixes-6.2-3 is still in limbo), so I'd
-> suggest we take it for 6.3.
+v4:
 
-Works for me.
+Remove last mention of awk and fix spelling mistakes in commit
+message.
 
-> How do you want to deal with the backports? None of the patches have a
-> Cc: stable, and only the last one has a Fixes: tag, but cannot be
-> applied standalone.
+Colton Lewis (1):
+  arm: Replace MAX_SMP probe loop in favor of reading directly
 
-Right, I wasn't sure what was best -- the first patches aren't really
-fixing anything per se but yeah, we kinda need them...
+ scripts/runtime.bash | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-Happy to re-post a version with the same 'Fixes:' tag on all patches and
-'Cc: stable' everywhere if that makes things easier. Wdyt?
-
-Cheers,
-Quentin
+--
+2.39.1.456.gfc5497dd1b-goog
