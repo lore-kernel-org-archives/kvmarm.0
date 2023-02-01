@@ -1,43 +1,43 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481318481
-	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 12:59:48 +0000 (UTC)
-Received: by mail-wr1-f54.google.com with SMTP id o18so7754445wrj.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A43D8486
+	for <kvmarm@lists.linux.dev>; Wed,  1 Feb 2023 12:59:49 +0000 (UTC)
+Received: by mail-wm1-f47.google.com with SMTP id k16so12616255wms.2
         for <kvmarm@lists.linux.dev>; Wed, 01 Feb 2023 04:59:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=T1XbjFRROGqTsKVaKlJ9OMpS1XHI6QRbg+Uxdf993wI=;
-        b=vGASOMbylysHRfrGLv6YhTO7WEjv6c1RwzKjV7XsdcywE+jEFIsdsb5w+2OghxLS9/
-         qXlv60FR7L4TDsiNTkGc7CFP9sOBBSMgFZJP6RehQWKk+xblpDCkv+NdoiRZJc4lo+MB
-         OHZI/Ska0NQGQp6sf6XYaGIC4f/Sqp2c09J4jQvzaOnijt2sBekilaucOj/jUKSNd/AX
-         5pRusIs+/gQ0kDODgdeueanv2yN6KNe+s7ycRNU9ypbQUkV21yxob/1nlBgVHMhIfud/
-         OgRirqcvdAhkcPaU2A0Q77RWKieLbANDuuIfIpzi/IVRF8f+n9FVapUusjVNOE82ZS44
-         c4Sw==
+        bh=DAR858KRQvKPg9d8btbK56RFwJ6U3P1FOrADuTdQSiU=;
+        b=Ggyb3+Q97jwaq1nLUdEGCN/DmIa9T+TVIlNdQsa9leOlAfSvRNt1uXcyTN1GD+135G
+         R77p3qJrpFcF9f5i8a0xPRilpSW6r6jSZeWNj5JfGc7ve7E9J0dCL9QoWw6rHLjBJhMA
+         l+yjZVQR/gIfvs29AwC7zMLP2kmS34HW6UiaOlED2PTNOSPOcLJa65+ozh4XI3tOYbPh
+         ybxXFnOfIvQ2gh3mm+WWi1Y5RYjUZY9QPb3v90eB/lCy2CilYg/1B9N+AZKXfR+eNB76
+         cmC8MG7IxBkKv/RY7OILPUPSV/AOHj4cLG9vAlzQqkHcuLxlwSO5PajbdTbxsob4IR/y
+         QfLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=T1XbjFRROGqTsKVaKlJ9OMpS1XHI6QRbg+Uxdf993wI=;
-        b=jG6w1bLhkunRj/NA+gzbpuZxiZAKrINlYEkFpe5o6d7Q9VwSO/F5uVwjj00BkAPgmR
-         MRhilg4xDC8iTsQZDFRcrlL0eJWd0dqdnp71c8yz/BJsmSYm161vvSaNpOqGtFGGaUe9
-         EdC12wQhdbYdgysYZGddYfmcuPzAxskFfvkPtjz8sNy0GarNgTZ2ex4JBSMJWx9Z3r+q
-         68heu10USmaGFy8Qm42vc/bs9srNrGoW5l2jMVXc5j5bUbuvK3EzoYNU1dkV0LaHt9uu
-         aTparu2pn+dQKWStof5YB64dbfrXnq/vfdchmqG3aTv+mIw/SP1vsfi6C8e1Ubq3fgVt
-         rvNA==
-X-Gm-Message-State: AO0yUKVP21OL2Kidp2ENTR+yIqsHHG0r/CEjUNM4togWRam8sde9zKEx
-	CabDwclklhUnqmJ/OMSZNZof5w==
-X-Google-Smtp-Source: AK7set/A9Wvge/x9I0c0N1VcVRmzSfGiz2QGPnhn/EemCOX5Ccigvrx/7k9pg7r6kMkCHM3qkXEWvg==
-X-Received: by 2002:a5d:6b48:0:b0:2bf:963a:f266 with SMTP id x8-20020a5d6b48000000b002bf963af266mr1586152wrw.27.1675256387822;
-        Wed, 01 Feb 2023 04:59:47 -0800 (PST)
+        bh=DAR858KRQvKPg9d8btbK56RFwJ6U3P1FOrADuTdQSiU=;
+        b=Tw6jqmz1mKSwvcaq/q7JDI9cF/sBOJR8dXQX0eQPU/HUg81eoydsGxP9nbC6BpLUTw
+         Evr8Rhg/T+H8icwbTjm6ZWu8RA7rMbCdadjorYdCkwuQ1Hpmg9IRepccGUUShZxQFDEp
+         zFEhpEv0iTBCdxjQXv1ISF/MAByVldMkrPDXO6Di3zX8K7WE1oeY46ceJnP7or+0lSo1
+         IpZTzRz6A1UwoA2tlSEUGsbInKIZIExVpJU4X5gi602kTNRjbCb/gAlJv2RdNvXchfvW
+         31C1ugQYlTLBDj+IJn2cLysdYxhXH2vm8xzPdUnPXzUO9ckyzJtlwzPGS+z7OAfTUIku
+         ClZA==
+X-Gm-Message-State: AO0yUKW5jaIGVFOytw3aCIO6yz7PDs7b5cPK611UcfOFk8gomeSHErR1
+	i6yd0x8l/YZ0L7UQJ3IZFMbupQ==
+X-Google-Smtp-Source: AK7set+iGCoWOT606yNywkv2PHuH9O8/l5rQaiMO8pv3IURPxlu09QCKUnSrv4mv91hqJwJ7knQZYQ==
+X-Received: by 2002:a05:600c:4f07:b0:3da:fd06:a6f1 with SMTP id l7-20020a05600c4f0700b003dafd06a6f1mr1937037wmq.31.1675256388617;
+        Wed, 01 Feb 2023 04:59:48 -0800 (PST)
 Received: from localhost.localdomain (054592b0.skybroadband.com. [5.69.146.176])
         by smtp.gmail.com with ESMTPSA id m15-20020a056000024f00b002bfae16ee2fsm17972811wrz.111.2023.02.01.04.59.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Feb 2023 04:59:47 -0800 (PST)
+        Wed, 01 Feb 2023 04:59:48 -0800 (PST)
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: maz@kernel.org,
 	catalin.marinas@arm.com,
@@ -55,9 +55,9 @@ Cc: robin.murphy@arm.com,
 	kvmarm@lists.linux.dev,
 	iommu@lists.linux.dev,
 	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [RFC PATCH 36/45] iommu/arm-smmu-v3-kvm: Validate device features
-Date: Wed,  1 Feb 2023 12:53:20 +0000
-Message-Id: <20230201125328.2186498-37-jean-philippe@linaro.org>
+Subject: [RFC PATCH 37/45] iommu/arm-smmu-v3-kvm: Allocate structures and reset device
+Date: Wed,  1 Feb 2023 12:53:21 +0000
+Message-Id: <20230201125328.2186498-38-jean-philippe@linaro.org>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230201125328.2186498-1-jean-philippe@linaro.org>
 References: <20230201125328.2186498-1-jean-philippe@linaro.org>
@@ -69,94 +69,104 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The KVM hypervisor driver supports a small subset of features. Ensure
-the implementation is compatible, and disable some unused features.
+Allocate the structures that will be shared between hypervisor and SMMU:
+command queue and stream table. Install them in the MMIO registers,
+along with some configuration bits. After hyp initialization, the host
+won't have access to those pages anymore.
 
 Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 ---
- .../iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c   | 57 +++++++++++++++++++
- 1 file changed, 57 insertions(+)
+ .../iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c   | 56 +++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
 diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
-index 1e0daf9ea4ac..2cc632f6b256 100644
+index 2cc632f6b256..8808890f4dc0 100644
 --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
 +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
-@@ -23,6 +23,59 @@ static size_t				kvm_arm_smmu_cur;
- static size_t				kvm_arm_smmu_count;
- static struct hyp_arm_smmu_v3_device	*kvm_arm_smmu_array;
+@@ -14,6 +14,7 @@
+ struct host_arm_smmu_device {
+ 	struct arm_smmu_device		smmu;
+ 	pkvm_handle_t			id;
++	u32				boot_gbpa;
+ };
  
-+static bool kvm_arm_smmu_validate_features(struct arm_smmu_device *smmu)
+ #define smmu_to_host(_smmu) \
+@@ -76,6 +77,38 @@ static bool kvm_arm_smmu_validate_features(struct arm_smmu_device *smmu)
+ 	return true;
+ }
+ 
++static int kvm_arm_smmu_device_reset(struct host_arm_smmu_device *host_smmu)
 +{
-+	unsigned long oas;
-+	unsigned int required_features =
-+		ARM_SMMU_FEAT_TRANS_S2 |
-+		ARM_SMMU_FEAT_TT_LE;
-+	unsigned int forbidden_features =
-+		ARM_SMMU_FEAT_STALL_FORCE;
-+	unsigned int keep_features =
-+		ARM_SMMU_FEAT_2_LVL_STRTAB	|
-+		ARM_SMMU_FEAT_2_LVL_CDTAB	|
-+		ARM_SMMU_FEAT_TT_LE		|
-+		ARM_SMMU_FEAT_SEV		|
-+		ARM_SMMU_FEAT_COHERENCY		|
-+		ARM_SMMU_FEAT_TRANS_S1		|
-+		ARM_SMMU_FEAT_TRANS_S2		|
-+		ARM_SMMU_FEAT_VAX		|
-+		ARM_SMMU_FEAT_RANGE_INV;
++	int ret;
++	u32 reg;
++	struct arm_smmu_device *smmu = &host_smmu->smmu;
 +
-+	if (smmu->options & ARM_SMMU_OPT_PAGE0_REGS_ONLY) {
-+		dev_err(smmu->dev, "unsupported layout\n");
-+		return false;
-+	}
++	reg = readl_relaxed(smmu->base + ARM_SMMU_CR0);
++	if (reg & CR0_SMMUEN)
++		dev_warn(smmu->dev, "SMMU currently enabled! Resetting...\n");
 +
-+	if ((smmu->features & required_features) != required_features) {
-+		dev_err(smmu->dev, "missing features 0x%x\n",
-+			required_features & ~smmu->features);
-+		return false;
-+	}
++	/* Disable bypass */
++	host_smmu->boot_gbpa = readl_relaxed(smmu->base + ARM_SMMU_GBPA);
++	ret = arm_smmu_update_gbpa(smmu, GBPA_ABORT, 0);
++	if (ret)
++		return ret;
 +
-+	if (smmu->features & forbidden_features) {
-+		dev_err(smmu->dev, "features 0x%x forbidden\n",
-+			smmu->features & forbidden_features);
-+		return false;
-+	}
++	ret = arm_smmu_device_disable(smmu);
++	if (ret)
++		return ret;
 +
-+	smmu->features &= keep_features;
++	/* Stream table */
++	writeq_relaxed(smmu->strtab_cfg.strtab_base,
++		       smmu->base + ARM_SMMU_STRTAB_BASE);
++	writel_relaxed(smmu->strtab_cfg.strtab_base_cfg,
++		       smmu->base + ARM_SMMU_STRTAB_BASE_CFG);
 +
-+	/*
-+	 * This can be relaxed (although the spec says that OAS "must match
-+	 * the system physical address size."), but requires some changes. All
-+	 * table and queue allocations must use GFP_DMA* to ensure the SMMU can
-+	 * access them.
-+	 */
-+	oas = get_kvm_ipa_limit();
-+	if (smmu->oas < oas) {
-+		dev_err(smmu->dev, "incompatible address size\n");
-+		return false;
-+	}
++	/* Command queue */
++	writeq_relaxed(smmu->cmdq.q.q_base, smmu->base + ARM_SMMU_CMDQ_BASE);
 +
-+	return true;
++	return 0;
 +}
 +
  static int kvm_arm_smmu_probe(struct platform_device *pdev)
  {
  	int ret;
-@@ -68,11 +121,15 @@ static int kvm_arm_smmu_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
+@@ -124,6 +157,20 @@ static int kvm_arm_smmu_probe(struct platform_device *pdev)
+ 	if (!kvm_arm_smmu_validate_features(smmu))
+ 		return -ENODEV;
  
-+	if (!kvm_arm_smmu_validate_features(smmu))
-+		return -ENODEV;
++	ret = arm_smmu_init_one_queue(smmu, &smmu->cmdq.q, smmu->base,
++				      ARM_SMMU_CMDQ_PROD, ARM_SMMU_CMDQ_CONS,
++				      CMDQ_ENT_DWORDS, "cmdq");
++	if (ret)
++		return ret;
++
++	ret = arm_smmu_init_strtab(smmu);
++	if (ret)
++		return ret;
++
++	ret = kvm_arm_smmu_device_reset(host_smmu);
++	if (ret)
++		return ret;
 +
  	platform_set_drvdata(pdev, host_smmu);
  
  	/* Hypervisor parameters */
- 	hyp_smmu->mmio_addr = ioaddr;
- 	hyp_smmu->mmio_size = size;
-+	hyp_smmu->features = smmu->features;
- 	kvm_arm_smmu_cur++;
+@@ -137,6 +184,15 @@ static int kvm_arm_smmu_probe(struct platform_device *pdev)
  
+ static int kvm_arm_smmu_remove(struct platform_device *pdev)
+ {
++	struct host_arm_smmu_device *host_smmu = platform_get_drvdata(pdev);
++	struct arm_smmu_device *smmu = &host_smmu->smmu;
++
++	/*
++	 * There was an error during hypervisor setup. The hyp driver may
++	 * have already enabled the device, so disable it.
++	 */
++	arm_smmu_device_disable(smmu);
++	arm_smmu_update_gbpa(smmu, host_smmu->boot_gbpa, GBPA_ABORT);
  	return 0;
+ }
+ 
 -- 
 2.39.0
 
