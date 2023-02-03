@@ -1,108 +1,104 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38BDA29A8
-	for <kvmarm@lists.linux.dev>; Fri,  3 Feb 2023 15:36:50 +0000 (UTC)
-Received: by mail-qk1-f178.google.com with SMTP id j22so2604770qka.0
-        for <kvmarm@lists.linux.dev>; Fri, 03 Feb 2023 07:36:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=0UYvq70HDOIo75wjd1El9PDilVQmMcpF6t7PglLrXVk=;
-        b=aImhPd9bN9VE0QHO2Wh3L0dRlzz/G7Mg5KgY08aAtSrX5GFGgWzJxU14VO3K4aUR6X
-         P6lPl+9M5liDXnrk9eSEotRi6kIjns9vgxW60OKwQLIFIyuJR7c62c6qgXqY+IsKi4W+
-         gwJD5LJHNJ5jkLo80VpZ6R+K8wKBTFNvhkjSGE7GGPXVYVqY4LJ2yZlQA1i4uvqSeSzC
-         x/JOhiLjefi0yKjCb4vwyiiuRtsKBfRiPDBFUY11QGqFipEuKHRJ7b2B82l081QHHT1n
-         hTWZz+td3a1PJRVi1uFNzZySjUnnPdigafLZqK3YLC9Y5n/cyIkJH9/fzJou0cZpwQoc
-         fB+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0UYvq70HDOIo75wjd1El9PDilVQmMcpF6t7PglLrXVk=;
-        b=pUpiD8KMfkEBM/32kMZ1rZDDCGQ0tvFgyL2jUTO6lG3y5EST9Vr+YbAEFmPwTAxqJE
-         Dyf6RSWycqgrM9MtvCFQIkCidn9BWB/5Bh/agKYRS+D0SO2ZyyQv2Sig2pE7ePch0xUo
-         ySBbxKOf9mV42opQutngFfrDhvsDC/nMiFh3rl4Vdm6eibZLkLSYKMrgqyaUHNJTTMGN
-         reLyqSziQ4r9GKRQNtCJ5PQUC/Bv+YSCccSF8YokqoxLuo/bPwA3w2LEDb9pTXG6SJqd
-         Df2ylqly448X099hmxyYKGhKppQdNIkSntv+rfvENqu+aPpmFQluMpkCxOQrsPT2JMyV
-         2Gjw==
-X-Gm-Message-State: AO0yUKXLtLthTJPYA6nAbAquog09K4LvK30kvga8xh7+LQXIpqlN0iwE
-	izhobmRh6qsuD8I4gx9/A5MxuHjFjIstsgk5zG+QNA==
-X-Google-Smtp-Source: AK7set+6xViBuxHQLgOv2161oDQ6P1Qe7Y0fSJLUVbtwcqJ+NT3AkubfrnFLGVU3QaU7FnFN9EHsLun7O6EkWM/fbsk=
-X-Received: by 2002:a05:620a:13d3:b0:706:8588:513c with SMTP id
- g19-20020a05620a13d300b007068588513cmr743433qkl.390.1675438608985; Fri, 03
- Feb 2023 07:36:48 -0800 (PST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF18B79C6
+	for <kvmarm@lists.linux.dev>; Fri,  3 Feb 2023 16:24:09 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4BD6BC14;
+	Fri,  3 Feb 2023 08:24:51 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3AC873F71E;
+	Fri,  3 Feb 2023 08:24:08 -0800 (PST)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: andrew.jones@linux.dev,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: [kvm-unit-tests PATCH v6 0/2] arm: Add PSCI CPU_OFF test
+Date: Fri,  3 Feb 2023 16:23:51 +0000
+Message-Id: <20230203162353.34876-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.39.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20221017195834.2295901-1-ricarkol@google.com> <Y90e4IluvCYSnShh@sirena.org.uk>
-In-Reply-To: <Y90e4IluvCYSnShh@sirena.org.uk>
-From: Ricardo Koller <ricarkol@google.com>
-Date: Fri, 3 Feb 2023 07:36:37 -0800
-Message-ID: <CAOHnOrwqJ+K4vcyzV7z=BcC-J=ZyFj8wZYSdJO7Kk=kJ=4kKOw@mail.gmail.com>
-Subject: Re: [PATCH v10 00/14] KVM: selftests: Add aarch64/page_fault_test
-To: Mark Brown <broonie@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, 
-	andrew.jones@linux.dev, pbonzini@redhat.com, maz@kernel.org, 
-	seanjc@google.com, alexandru.elisei@arm.com, eric.auger@redhat.com, 
-	oupton@google.com, reijiw@google.com, rananta@google.com, bgardon@google.com, 
-	dmatlack@google.com, axelrasmussen@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Mark,
+The series adds a test for the PSCI function CPU_OFF. The test is
+implemented in patch #2, "arm/psci: Add PSCI CPU_OFF test case".  Patch #1,
+"arm/psci: Test that CPU 1 has been successfully brought online" is a
+preparatory patch to allow the CPU_OFF test to run after the CPU_ON test.
+Executing the CPU_OFF test after the CPU_ON test makes the most sense,
+since CPU_OFF requires all the CPUs to be brought online before the test
+can execute, and this is exactly what the CPU_ON test does.
 
-On Fri, Feb 3, 2023 at 6:49 AM Mark Brown <broonie@kernel.org> wrote:
->
-> On Mon, Oct 17, 2022 at 07:58:20PM +0000, Ricardo Koller wrote:
-> > This series adds a new aarch64 selftest for testing stage 2 fault handling
-> > for various combinations of guest accesses (e.g., write, S1PTW), backing
-> > sources (e.g., anon), and types of faults (e.g., read on hugetlbfs with a
-> > hole, write on a readonly memslot). Each test tries a different combination
-> > and then checks that the access results in the right behavior (e.g., uffd
-> > faults with the right address and write/read flag). Some interesting
-> > combinations are:
->
-> I'm seeing issues with the page_fault_test tests in both -next and
-> mainline all the way back to v6.1 when they were introduced running on
-> both the fast model and hardware.  With -next the reports come back as:
->
-> # selftests: kvm: page_fault_test
-> # ==== Test Assertion Failure ====
-> #   aarch64/page_fault_test.c:316: __a == __b
-> #   pid=851 tid=860 errno=0 - Success
-> #      1        0x0000000000402253: uffd_generic_handler at page_fault_test.c:316
-> #      2        0x000000000040be07: uffd_handler_thread_fn at userfaultfd_util.c:97
-> #      3        0x0000ffff8b39edd7: ?? ??:0
-> #      4        0x0000ffff8b407e9b: ?? ??:0
-> #   ASSERT_EQ(!!(flags & UFFD_PAGEFAULT_FLAG_WRITE), expect_write) failed.
-> #       !!(flags & UFFD_PAGEFAULT_FLAG_WRITE) is 0
-> #       expect_write is 0x1
-> not ok 6 selftests: kvm: page_fault_test # exit=254
->
-> (addr2line seemed to be not doing much, I've not poked too hard at
-> that).  I've been unable to find any case where the program passes.
-> Is this expected?
->
-> Some random full runs on hardware:
+I believe that proving that a CPU has been successfully offlined is an
+undecidable problem - it might just be that the CPU is stuck at a higher
+exception level doing something else entirely, and if the test were to wait
+long enough, the CPU would return from the CPU_OFF call and start executing
+code, thus failing to be offlined. Right now, the test waits for 100ms
+after checking that all the other CPUs are offline. I thought this was a
+good balance between making the test fast and being reasonably sure that
+the offline succeeded. I'm open to suggestions here if anyone thinks
+otherwise.
 
-That failure was fixed with this series:
-"KVM: selftests: aarch64: page_fault_test S1PTW related fixes"
-https://lore.kernel.org/kvmarm/20230127214353.245671-1-ricarkol@google.com/
+Tested for both the arm and arm64 architectures: on an x86 machine (qemu
+with TCG), and a rockpro64 (qemu and kvmtool).
 
-which made it into kvmarm/fixes and should get into 6.2:
-https://lore.kernel.org/kvmarm/20230129190142.2481354-1-maz@kernel.org/
+And Nikita is not longer at Arm, and I don't have a new email address where
+she can be reached, so I didn't CC her.
 
-Note that the failing assert does not exist after the mentioned series:
-> #   ASSERT_EQ(!!(flags & UFFD_PAGEFAULT_FLAG_WRITE), expect_write) failed.
+Changelog:
 
->
-> 4xA53: https://lava.sirena.org.uk/scheduler/job/244678
-> 4xA72: https://lkft.validation.linaro.org/scheduler/job/6114427
+v5 -> v6:
+- Added Reviewed-by tag to #1 (Drew).
+- Fixed the unintended change that added the argc/argv arguments to main()
+  in #2 (Drew).
+- Fixed bailing early when all secondaries are offline in #2 (Drew).
+- Run the cpu-off test only if some of the secondaries are not idling
+  instead if cpu-on has failed (cpu-on can fail for other reasons too)
+  (Drew).
 
-Thanks,
-Ricardo
+v4 -> v5:
+- Open code smp_prepare_secondary in psci.c instead of exposing it as a
+  library function in the cpu_on test (Drew).
+- Don't return early if a CPU failed to online CPU1 in the cpu_on test, and
+  check the return values for the CPUs that succeeded to online CPU 1
+  (Drew).
+- Drop cpu_off_success in the cpu_off test in favour of checking
+  AFFINITY_INFO and the cpu idle mask (Drew).
+- Hopefully made the cpu_off test faster (Drew).
+
+v3 -> v4:
+- Moved ownership of the series to Alexandru Elisei. All bugs are mine.
+- Moved the timeout for the CPU_ON test to patch #1.
+- Changed the include order for arm/psic.c in patch #1 to order the headers
+  alphabetically.
+- Run the CPU_OFF test only if CPU_ON succeeds, because CPU_OFF expects all
+  CPUs to be online, the test would otherwise hang forever.
+- Minor style changes here and there.
+
+v2 -> v3:
+- Add timeout so that test does not hang if CPU1 fails to come online
+- Remove unnecessary call of on_cpus() in the condition where target CPU is not online.
+
+v1 -> v2:
+- Modify PSCI CPU_ON test to ensure CPU 1 remains online after the execution of the test.
+- Addition of PSCI CPU_OFF test and calling it after PSCI CPU_ON test has been executed.
+
+Alexandru Elisei (1):
+  arm/psci: Test that CPU 1 has been successfully brought online
+
+Nikita Venkatesh (1):
+  arm/psci: Add PSCI CPU_OFF test case
+
+ arm/psci.c        | 138 +++++++++++++++++++++++++++++++++++++++++-----
+ lib/arm/asm/smp.h |   9 ++-
+ lib/arm/smp.c     |   4 --
+ lib/errata.h      |   2 +
+ 4 files changed, 134 insertions(+), 19 deletions(-)
+
+
+base-commit: 2480430a36102f8ea276b3bfb1d64d5dacc23b8f
+-- 
+2.39.1
+
