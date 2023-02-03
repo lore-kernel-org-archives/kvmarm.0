@@ -1,97 +1,114 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B581C29
-	for <kvmarm@lists.linux.dev>; Fri,  3 Feb 2023 09:44:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1675417447;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B/oxBv4GyMlmg4LCOb2+pqMxLhVHvEGbOFN4G7DG1xk=;
-	b=CTtUQEQww0u+PShsySYCy4VfkwtdhlXxsjT+7lj2MDxOHTwZbLhPmuyjmirZni7ZWgqcv/
-	vCtsuky/2D/cgk+kCREdUMYp0A9MQzGXxMVsNJBcHXfyYOogtO51OWp/kz5udtRZfI3Fzz
-	8C/ct8R7WPJejdtMn7lmKxZuCFSVHpc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-513-UD1PGtHHOTCTHRED0JEgqA-1; Fri, 03 Feb 2023 04:42:44 -0500
-X-MC-Unique: UD1PGtHHOTCTHRED0JEgqA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6FA2929AB3F9;
-	Fri,  3 Feb 2023 09:42:43 +0000 (UTC)
-Received: from thuth.com (unknown [10.39.192.204])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B902140168BF;
-	Fri,  3 Feb 2023 09:42:40 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH 1/7] KVM: Standardize on "int" return types instead of "long" in kvm_main.c
-Date: Fri,  3 Feb 2023 10:42:24 +0100
-Message-Id: <20230203094230.266952-2-thuth@redhat.com>
-In-Reply-To: <20230203094230.266952-1-thuth@redhat.com>
-References: <20230203094230.266952-1-thuth@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF4A1FB9
+	for <kvmarm@lists.linux.dev>; Fri,  3 Feb 2023 10:16:55 +0000 (UTC)
+Received: by mail-pj1-f43.google.com with SMTP id n20-20020a17090aab9400b00229ca6a4636so8387009pjq.0
+        for <kvmarm@lists.linux.dev>; Fri, 03 Feb 2023 02:16:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0ZbAUGn0r6doN6zThP1Zquzlxw14avp8efmj05+Io/4=;
+        b=Ywh4mnPVN3Y4k0f4DuulkG2miIzAXD2MOag6AoE9aqI4lk2/oCohsrtf8Gr8EPviVM
+         w5YHMEJEeyxv4Kxv5i6v3b/lUpqXFNx1osYHGwcvd5Y6A4ASt/XYopzNc7ULMCnsOI6d
+         IrSWoKHqFH3ZA9JFOpulvON/sgxK8lIDCGcFdofh7TQct/4Basch9lONK7Jz9jH6b2l5
+         lG9ZdPMIFHQYLtBy4nRdrdwKqfTKG98jS03kSpv/G7uTjB62apnvK8P8uUgwZxEBoWt6
+         TcPvwy+n7no1gkpCj3JC/uJM6ahYRPgSN0IO8wEZNDBK6v4Lg/AjhsnsKmGHKgxXIauL
+         JR8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0ZbAUGn0r6doN6zThP1Zquzlxw14avp8efmj05+Io/4=;
+        b=kC+C8gX9C64dC/XPbahchSt3s5CFyHxEzpx6mxPNdZxx7BI778eL8IyFWruVIu5N1W
+         UjgZQmTeSU2LHxjFLJrdUfKF+ZwUzuLqnNSY219FNscLelnlKHAJ6dcmmjPEezmkAyk4
+         TbvYcoH/V41eovgDBJ87UIMqBSE2Eqw4v/Z3/uMVMf1NSRQyu9dN/EtwOJ3+k5/6Zy/p
+         vhwQbFB3yW78LQaxa2gBaPaq2QHLvtVQw1ndVkxPRj0SBoSyGbgClFFSBRWd7bnFSTV6
+         HdfXZtEReZ4l6v5wcNMLBHD4pE2Zad9BVELRtHWOdkwTGqKTJ0V/aNS1+N1fxiYCNUch
+         YGww==
+X-Gm-Message-State: AO0yUKUoPd7yeXkLTVCFfsLnP4oexzAJaB71X5z9ngXyNPPOAzhU3DJ3
+	pkBCDPAfU/RZCYa07WgQThc=
+X-Google-Smtp-Source: AK7set8WbQ1iPrN5HSlN4f706F1IqNht5RVf+MEFDgPYm7h/efSiL2BKY4uYWAK+N6jAmo/6Qh0viw==
+X-Received: by 2002:a17:902:da92:b0:196:5839:b36a with SMTP id j18-20020a170902da9200b001965839b36amr11622683plx.8.1675419414829;
+        Fri, 03 Feb 2023 02:16:54 -0800 (PST)
+Received: from localhost (193-116-117-77.tpgi.com.au. [193.116.117.77])
+        by smtp.gmail.com with ESMTPSA id n19-20020a170902969300b00198e03c3ad4sm1002403plp.278.2023.02.03.02.16.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Feb 2023 02:16:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 03 Feb 2023 20:16:45 +1000
+Message-Id: <CQ8UM1FTPEUZ.3F2RONR3AJ5YP@bobo>
+From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Thomas Huth" <thuth@redhat.com>, <kvm@vger.kernel.org>, "Paolo Bonzini"
+ <pbonzini@redhat.com>, "Sean Christopherson" <seanjc@google.com>
+Cc: "Claudio Imbrenda" <imbrenda@linux.ibm.com>, "Janosch Frank"
+ <frankja@linux.ibm.com>, "Suzuki K Poulose" <suzuki.poulose@arm.com>, "Marc
+ Zyngier" <maz@kernel.org>, "David Hildenbrand" <david@redhat.com>,
+ <linux-kernel@vger.kernel.org>, "Oliver Upton" <oliver.upton@linux.dev>,
+ "Zenghui Yu" <yuzenghui@huawei.com>, "James Morse" <james.morse@arm.com>,
+ <kvm-riscv@lists.infradead.org>, <kvmarm@lists.linux.dev>, "Christian
+ Borntraeger" <borntraeger@linux.ibm.com>, <linuxppc-dev@lists.ozlabs.org>
+Subject: Re: [PATCH 3/7] KVM: Move KVM_GET_NR_MMU_PAGES into the deprecation
+ section
+X-Mailer: aerc 0.13.0
+References: <20230203094230.266952-1-thuth@redhat.com>
+ <20230203094230.266952-4-thuth@redhat.com>
+In-Reply-To: <20230203094230.266952-4-thuth@redhat.com>
 
-KVM functions use "long" return values for functions that are wired up
-to "struct file_operations", but otherwise use "int" return values for
-functions that can return 0/-errno in order to avoid unintentional
-divergences between 32-bit and 64-bit kernels.
-Some code still uses "long" in unnecessary spots, though, which can
-cause a little bit of confusion and unnecessary size casts. Let's
-change these spots to use "int" types, too.
+On Fri Feb 3, 2023 at 7:42 PM AEST, Thomas Huth wrote:
+> The KVM_GET_NR_MMU_PAGES ioctl is quite questionable on 64-bit hosts
+> since it fails to return the full 64 bits of the value that can be
+> set with the corresponding KVM_SET_NR_MMU_PAGES call. This ioctl
+> likely has also never really been used by userspace applications
+> (at least not by QEMU and kvmtool which I checked), so it's better
+> to move it to the deprecation section in kvm.h to make it clear for
+> developers that this also should not be used in new code in the
+> future anymore.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- virt/kvm/kvm_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Did this get included in the series inadvertently?
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9c60384b5ae0..cd46467252a9 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4475,7 +4475,7 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
- 	return 0;
- }
- 
--static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
-+static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- {
- 	switch (arg) {
- 	case KVM_CAP_USER_MEMORY:
-@@ -5053,7 +5053,7 @@ static int kvm_dev_ioctl_create_vm(unsigned long type)
- static long kvm_dev_ioctl(struct file *filp,
- 			  unsigned int ioctl, unsigned long arg)
- {
--	long r = -EINVAL;
-+	int r = -EINVAL;
- 
- 	switch (ioctl) {
- 	case KVM_GET_API_VERSION:
--- 
-2.31.1
+Thanks,
+Nick
+
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  include/uapi/linux/kvm.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 55155e262646..f55965a4cec7 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -83,6 +83,8 @@ struct kvm_debug_guest {
+> =20
+>  #define __KVM_DEPRECATED_VCPU_W_0x87 _IOW(KVMIO, 0x87, struct kvm_debug_=
+guest)
+> =20
+> +#define KVM_GET_NR_MMU_PAGES _IO(KVMIO, 0x45)
+> +
+>  /* *** End of deprecated interfaces *** */
+> =20
+> =20
+> @@ -1442,7 +1444,6 @@ struct kvm_vfio_spapr_tce {
+>  #define KVM_CREATE_VCPU           _IO(KVMIO,   0x41)
+>  #define KVM_GET_DIRTY_LOG         _IOW(KVMIO,  0x42, struct kvm_dirty_lo=
+g)
+>  #define KVM_SET_NR_MMU_PAGES      _IO(KVMIO,   0x44)
+> -#define KVM_GET_NR_MMU_PAGES      _IO(KVMIO,   0x45)
+>  #define KVM_SET_USER_MEMORY_REGION _IOW(KVMIO, 0x46, \
+>  					struct kvm_userspace_memory_region)
+>  #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
+> --=20
+> 2.31.1
 
