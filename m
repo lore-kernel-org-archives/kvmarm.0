@@ -1,61 +1,47 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A79AD3A
-	for <kvmarm@lists.linux.dev>; Fri,  3 Feb 2023 17:48:55 +0000 (UTC)
-Received: by mail-pj1-f42.google.com with SMTP id o13so5759642pjg.2
-        for <kvmarm@lists.linux.dev>; Fri, 03 Feb 2023 09:48:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1t48P/jVd6+3dhw3pck4JM1odaqwThYt8bjKIe9FySY=;
-        b=YUGCo4ZbvxduWRBHH9xOGxUv8LoaXyN+VOL8K8Kve/u16uDaalEXH+kBO1C3PAOZdM
-         U2FdeDmTEYvv/Khm9Hp1pGOcZfLi1gl8qmki4SmGN3WfKIsCemaDy6HsGXS8a2DwuvSq
-         p7nNVpP/rnqBe+1jiPBY7eVjGaGnTjSVk5H8VHlpO4DlQHD7k1TC35BcdqTcy2ZQRaSF
-         4md/KQ7IeYFOS2FYZ+qMRDUx2NMJplrAtBdVvGxGX0DbpsM7eAfg2iIiZtKPhF8ngclz
-         nFNAH/NrZwg3lKNjgzMI4QsgFt81DdqqGb/JrZPeZ3VqGuwxbqlyijT98K4d4Jb58ATa
-         yKNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1t48P/jVd6+3dhw3pck4JM1odaqwThYt8bjKIe9FySY=;
-        b=ABbK1KlZhSFPoMg3HN7bjcAqG4Vyfp2a9XYeK6qHJQhax4PfZca8cimJRy2JGLP8CV
-         IkngKP54Wv34baHnGDFciaKVjxfvuQ7wsWDi7weowpyKcRfBNYQFvOcF7XGY57yRo+Rl
-         ViTykI/6HaFSI/T8gi/MTOQRr1W2qccoyLy7fRBmSBE8d44HQr6vyBxa7VNd6lam8Uo/
-         dc8vkpEkVas2pgaHQEf83MVhTS0gq15EtJvGIJFW/9Ap78c2a8SJZDcpKZLJmb9DL+fu
-         x1cZOqQ5vgU78J/qGPPjcoUv/AGYQS/OsnMLaS4Jheh1g3W+SABXAM/OrHNMBUgIpPPW
-         EZzg==
-X-Gm-Message-State: AO0yUKWQvwvh5VAvQhl8YS0iIBzPl87vEsfg+h5+9TljvDsdgsQhWiZm
-	nsicNzQqYxaTHoC3br+brD+i0g==
-X-Google-Smtp-Source: AK7set8NtYpsGJ6byRewhpDzAYHCL4kVnwYOuRswQz6j6iO+lQNMoz+KA+gf7NkDr7m6tVMm7U3Fmg==
-X-Received: by 2002:a17:902:d1d5:b0:198:d5cc:44a8 with SMTP id g21-20020a170902d1d500b00198d5cc44a8mr260726plb.19.1675446534414;
-        Fri, 03 Feb 2023 09:48:54 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id b2-20020a1709027e0200b00194b3a7853esm1865998plm.181.2023.02.03.09.48.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Feb 2023 09:48:53 -0800 (PST)
-Date: Fri, 3 Feb 2023 17:48:49 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH 2/7] KVM: x86: Improve return type handling in
- kvm_vm_ioctl_get_nr_mmu_pages()
-Message-ID: <Y91JAb0kKBYQjO8a@google.com>
-References: <20230203094230.266952-1-thuth@redhat.com>
- <20230203094230.266952-3-thuth@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000B62CA4
+	for <kvmarm@lists.linux.dev>; Fri,  3 Feb 2023 18:36:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675449398; x=1706985398;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=sBr4gbtJ0rHs80U4nER/Ux24bKez/zclcRpEf7y7Qs8=;
+  b=bz+gLvOiMqFY2Lf5JN47p7Gs0FQUTa2+f3vTcu4R11oLe1pHTAR9vGMk
+   HWf0yC2BOktlF6Jutb60wVg1l95NfUr+Vo7nq6AUb4Zzh+PfWbrSHcPFm
+   vTcxV4eExMdXPl2LMVRRVIOJwvBAsbYh2Tp8griolob/ixzKN+L5Te6U3
+   vR0qSDEDySTCF35hbJXkAM71T9zva2Mf5d4jsG0oqk9tw3cZ3RxAkXEvu
+   sMGxdFIoOb9zavfpwRY0wDC8oIZl26OWQzkhC4e/2dycyjJtXs5rDUPUQ
+   vLLhZ4OiH74YQ6X8SdC8J/NDo6Cv2P2OwpTroev2nmKzifyAcup9CJDds
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10610"; a="391212839"
+X-IronPort-AV: E=Sophos;i="5.97,271,1669104000"; 
+   d="scan'208";a="391212839"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2023 10:36:15 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10610"; a="667731283"
+X-IronPort-AV: E=Sophos;i="5.97,271,1669104000"; 
+   d="scan'208";a="667731283"
+Received: from lkp-server01.sh.intel.com (HELO 4455601a8d94) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 03 Feb 2023 10:36:12 -0800
+Received: from kbuild by 4455601a8d94 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1pO0uy-0000hV-07;
+	Fri, 03 Feb 2023 18:36:12 +0000
+Date: Sat, 04 Feb 2023 02:35:52 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-trace-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvmarm@lists.cs.columbia.edu, amd-gfx@lists.freedesktop.org,
+ Linux Memory Management List <linux-mm@kvack.org>
+Subject: [linux-next:master] BUILD REGRESSION
+ 4fafd96910add124586b549ad005dcd179de8a18
+Message-ID: <63dd5408.DXu9FfX9ZxM1BSRX%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -63,41 +49,161 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230203094230.266952-3-thuth@redhat.com>
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 03, 2023, Thomas Huth wrote:
-> kvm_vm_ioctl_get_nr_mmu_pages() tries to return a "unsigned long" value,
-> but its caller only stores ther return value in an "int" - which is also
-> what all the other kvm_vm_ioctl_*() functions are returning. So returning
-> values that do not fit into a 32-bit integer anymore does not work here.
-> It's better to adjust the return type, add a sanity check and return an
-> error instead if the value is too big.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  arch/x86/kvm/x86.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index da4bbd043a7b..caa2541833dd 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6007,8 +6007,11 @@ static int kvm_vm_ioctl_set_nr_mmu_pages(struct kvm *kvm,
->  	return 0;
->  }
->  
-> -static unsigned long kvm_vm_ioctl_get_nr_mmu_pages(struct kvm *kvm)
-> +static int kvm_vm_ioctl_get_nr_mmu_pages(struct kvm *kvm)
->  {
-> +	if (kvm->arch.n_max_mmu_pages > INT_MAX)
-> +		return -EOVERFLOW;
-> +
->  	return kvm->arch.n_max_mmu_pages;
->  }
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: 4fafd96910add124586b549ad005dcd179de8a18  Add linux-next specific files for 20230203
 
-My vote is to skip this patch, skip deprecation, and go straight to deleting
-KVM_GET_NR_MMU_PAGES.  The ioctl() has never worked[*], and none of the VMMs I
-checked use it (QEMU, Google's internal VMM, kvmtool, CrosVM).
+Error/Warning reports:
 
-[*] https://lore.kernel.org/all/YpZu6%2Fk+8EydfBKf@google.com
+https://lore.kernel.org/oe-kbuild-all/202301301801.y5O08tQx-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301302110.mEtNwkBD-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301310939.TAgCOEZb-lkp@intel.com
+
+Error/Warning: (recently discovered and may have been fixed)
+
+ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/fsl-edma.ko] undefined!
+ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/idma64.ko] undefined!
+FAILED: load BTF from vmlinux: No data available
+arch/arm64/kvm/arm.c:2206: warning: expecting prototype for Initialize Hyp(). Prototype was for kvm_arm_init() instead
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:148:6: warning: no previous prototype for 'link_dp_trace_set_edp_power_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:158:10: warning: no previous prototype for 'link_dp_trace_get_edp_poweron_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:163:10: warning: no previous prototype for 'link_dp_trace_get_edp_poweroff_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_capability.c:1295:32: warning: variable 'result_write_min_hblank' set but not used [-Wunused-but-set-variable]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_capability.c:279:42: warning: variable 'ds_port' set but not used [-Wunused-but-set-variable]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_training.c:1585:38: warning: variable 'result' set but not used [-Wunused-but-set-variable]
+ftrace-ops.c:(.init.text+0x2c3): undefined reference to `__udivdi3'
+libbpf: failed to find '.BTF' ELF section in vmlinux
+
+Unverified Error/Warning (likely false positive, please contact us if interested):
+
+drivers/clk/ingenic/jz4760-cgu.c:80 jz4760_cgu_calc_m_n_od() error: uninitialized symbol 'od'.
+
+Error/Warning ids grouped by kconfigs:
+
+gcc_recent_errors
+|-- alpha-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- arc-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- arc-randconfig-r003-20230202
+|   |-- FAILED:load-BTF-from-vmlinux:No-data-available
+|   `-- libbpf:failed-to-find-.BTF-ELF-section-in-vmlinux
+|-- arm-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- arm64-allyesconfig
+|   |-- arch-arm64-kvm-arm.c:warning:expecting-prototype-for-Initialize-Hyp().-Prototype-was-for-kvm_arm_init()-instead
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- i386-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|   `-- ftrace-ops.c:(.init.text):undefined-reference-to-__udivdi3
+|-- i386-randconfig-m021
+|   `-- kernel-trace-trace_events_synth.c-trace_event_raw_event_synth()-warn:inconsistent-indenting
+|-- ia64-allmodconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- ia64-randconfig-r026-20230202
+
+elapsed time: 920m
+
+configs tested: 62
+configs skipped: 2
+
+gcc tested configs:
+x86_64                            allnoconfig
+um                           x86_64_defconfig
+um                             i386_defconfig
+arc                                 defconfig
+s390                             allmodconfig
+alpha                               defconfig
+s390                                defconfig
+s390                             allyesconfig
+i386                          randconfig-a001
+i386                          randconfig-a003
+powerpc                          allmodconfig
+i386                          randconfig-a005
+powerpc                           allnoconfig
+i386                                defconfig
+x86_64                              defconfig
+arm                                 defconfig
+x86_64                        randconfig-a013
+x86_64                               rhel-8.3
+x86_64                        randconfig-a011
+x86_64                          rhel-8.3-func
+x86_64                    rhel-8.3-kselftests
+x86_64                        randconfig-a015
+x86_64                        randconfig-a004
+i386                             allyesconfig
+x86_64                        randconfig-a002
+i386                          randconfig-a014
+ia64                             allmodconfig
+arm64                            allyesconfig
+i386                          randconfig-a012
+arm                              allyesconfig
+x86_64                           allyesconfig
+i386                          randconfig-a016
+x86_64                        randconfig-a006
+riscv                randconfig-r042-20230202
+s390                 randconfig-r044-20230202
+arc                  randconfig-r043-20230202
+x86_64                           rhel-8.3-syz
+x86_64                         rhel-8.3-kunit
+x86_64                           rhel-8.3-kvm
+x86_64                           rhel-8.3-bpf
+alpha                            allyesconfig
+arc                              allyesconfig
+m68k                             allyesconfig
+sh                               allmodconfig
+mips                             allyesconfig
+m68k                             allmodconfig
+
+clang tested configs:
+x86_64                          rhel-8.3-rust
+i386                          randconfig-a002
+i386                          randconfig-a004
+i386                          randconfig-a006
+x86_64                        randconfig-a012
+x86_64                        randconfig-a014
+i386                          randconfig-a013
+x86_64                        randconfig-a016
+x86_64                        randconfig-a001
+arm                  randconfig-r046-20230202
+x86_64                        randconfig-a003
+hexagon              randconfig-r045-20230202
+hexagon              randconfig-r041-20230202
+i386                          randconfig-a015
+x86_64                        randconfig-a005
+i386                          randconfig-a011
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
