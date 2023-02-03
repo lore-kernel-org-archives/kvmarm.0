@@ -1,151 +1,90 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1849979D9
-	for <kvmarm@lists.linux.dev>; Fri,  3 Feb 2023 16:24:12 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CA93E1596;
-	Fri,  3 Feb 2023 08:24:53 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 939073F71E;
-	Fri,  3 Feb 2023 08:24:10 -0800 (PST)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: andrew.jones@linux.dev,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-Subject: [kvm-unit-tests PATCH v6 2/2] arm/psci: Add PSCI CPU_OFF test case
-Date: Fri,  3 Feb 2023 16:23:53 +0000
-Message-Id: <20230203162353.34876-3-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230203162353.34876-1-alexandru.elisei@arm.com>
-References: <20230203162353.34876-1-alexandru.elisei@arm.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC2CAD3A
+	for <kvmarm@lists.linux.dev>; Fri,  3 Feb 2023 17:27:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D69DC433D2;
+	Fri,  3 Feb 2023 17:27:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1675445258;
+	bh=qdqKMVmXQtSnLdnllNZlXQSVBcFFRutZxBy0MxqaLbs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eauXkYx93nDSIcnS9EMKqtGPCaZhXr6UmZLAzGmYBBR+HJbU+8G8cGZM8/lq0FVS6
+	 jCCobH/+EK9jpRI469JJkZUahe8HTwSblm/8Qu1yhYAHp21QG4NN8/zz+cqDciq9f/
+	 I9EV/upAfgDxXO0MjTww5QwVOqe20Za1oYKwb7PfLGgy+hsGkNLKuNLk+epMZMYU1i
+	 HirbCvmz1FkSRyPXZbQqumC3yCCGeQrczYuXCiMeICLG8PGIFV2V136EQDdVW4kv/R
+	 tHbViNX2I9fLnrxTqVGu2J6eJbWqxSz4gDQwIllmJ5SsBPYlnSCbqx13dUKskCCbBg
+	 DhxHaMZqzP3Rg==
+Date: Fri, 3 Feb 2023 17:27:31 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Ricardo Koller <ricarkol@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
+	pbonzini@redhat.com, maz@kernel.org, seanjc@google.com,
+	alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
+	reijiw@google.com, rananta@google.com, bgardon@google.com,
+	dmatlack@google.com, axelrasmussen@google.com
+Subject: Re: [PATCH v10 00/14] KVM: selftests: Add aarch64/page_fault_test
+Message-ID: <Y91EAxIv7lwSMQ5g@sirena.org.uk>
+References: <20221017195834.2295901-1-ricarkol@google.com>
+ <Y90e4IluvCYSnShh@sirena.org.uk>
+ <CAOHnOrwqJ+K4vcyzV7z=BcC-J=ZyFj8wZYSdJO7Kk=kJ=4kKOw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="/gTOaUC39ON2rc/4"
+Content-Disposition: inline
+In-Reply-To: <CAOHnOrwqJ+K4vcyzV7z=BcC-J=ZyFj8wZYSdJO7Kk=kJ=4kKOw@mail.gmail.com>
+X-Cookie: No animals were injured.
 
-From: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
 
-The test uses the following method.
+--/gTOaUC39ON2rc/4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-The primary CPU brings up all the secondary CPUs, which are held in a wait
-loop. Once the primary releases the CPUs, each of the secondary CPUs
-proceed to issue CPU_OFF.
+On Fri, Feb 03, 2023 at 07:36:37AM -0800, Ricardo Koller wrote:
+> On Fri, Feb 3, 2023 at 6:49 AM Mark Brown <broonie@kernel.org> wrote:
+> > On Mon, Oct 17, 2022 at 07:58:20PM +0000, Ricardo Koller wrote:
 
-The primary CPU then checks for the status of the individual CPU_OFF
-request. There is a chance that some CPUs might return from the CPU_OFF
-function call after the primary CPU has finished the scan. There is no
-foolproof method to handle this, but the test tries its best to
-eliminate these false positives by introducing an extra delay if all the
-CPUs are reported offline after the initial scan.
+> > # ==== Test Assertion Failure ====
+> > #   aarch64/page_fault_test.c:316: __a == __b
+> > #   pid=851 tid=860 errno=0 - Success
 
-Signed-off-by: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-[ Alex E: Skip CPU_OFF test if cpu onlining failed, drop cpu_off_success in
-          favour of checking AFFINITY_INFO, commit message tweaking ]
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arm/psci.c | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 70 insertions(+), 1 deletion(-)
+> > #   ASSERT_EQ(!!(flags & UFFD_PAGEFAULT_FLAG_WRITE), expect_write) failed.
+> > #       !!(flags & UFFD_PAGEFAULT_FLAG_WRITE) is 0
+> > #       expect_write is 0x1
 
-diff --git a/arm/psci.c b/arm/psci.c
-index f7238f8e0bbd..55308c8f4766 100644
---- a/arm/psci.c
-+++ b/arm/psci.c
-@@ -72,8 +72,9 @@ static bool psci_affinity_info_off(void)
- }
- 
- static int cpu_on_ret[NR_CPUS];
--static cpumask_t cpu_on_ready, cpu_on_done;
-+static cpumask_t cpu_on_ready, cpu_on_done, cpu_off_done;
- static volatile int cpu_on_start;
-+static volatile int cpu_off_start;
- 
- extern void secondary_entry(void);
- static void cpu_on_do_wake_target(void)
-@@ -171,6 +172,67 @@ static bool psci_cpu_on_test(void)
- 	return !failed;
- }
- 
-+static void cpu_off_secondary_entry(void *data)
-+{
-+	int cpu = smp_processor_id();
-+
-+	while (!cpu_off_start)
-+		cpu_relax();
-+	cpumask_set_cpu(cpu, &cpu_off_done);
-+	cpu_psci_cpu_die();
-+}
-+
-+static bool psci_cpu_off_test(void)
-+{
-+	bool failed = false;
-+	int i, count, cpu;
-+
-+	for_each_present_cpu(cpu) {
-+		if (cpu == 0)
-+			continue;
-+		on_cpu_async(cpu, cpu_off_secondary_entry, NULL);
-+	}
-+
-+	cpumask_set_cpu(0, &cpu_off_done);
-+
-+	cpu_off_start = 1;
-+	report_info("waiting for the CPUs to be offlined...");
-+	while (!cpumask_full(&cpu_off_done))
-+		cpu_relax();
-+
-+	/* Allow all the other CPUs to complete the operation */
-+	for (i = 0; i < 100; i++) {
-+		mdelay(10);
-+
-+		count = 0;
-+		for_each_present_cpu(cpu) {
-+			if (cpu == 0)
-+				continue;
-+			if (psci_affinity_info(cpus[cpu], 0) != PSCI_0_2_AFFINITY_LEVEL_OFF)
-+				count++;
-+		}
-+		if (count == 0)
-+			break;
-+	}
-+
-+	/* Try to catch CPUs that return from CPU_OFF. */
-+	if (count == 0)
-+		mdelay(100);
-+
-+	for_each_present_cpu(cpu) {
-+		if (cpu == 0)
-+			continue;
-+		if (cpu_idle(cpu)) {
-+			report_info("CPU%d failed to be offlined", cpu);
-+			if (psci_affinity_info(cpus[cpu], 0) == PSCI_0_2_AFFINITY_LEVEL_OFF)
-+				report_info("AFFINITY_INFO incorrectly reports CPU%d as offline", cpu);
-+			failed = true;
-+		}
-+	}
-+
-+	return !failed;
-+}
-+
- int main(void)
- {
- 	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-@@ -193,6 +255,13 @@ int main(void)
- 	else
- 		report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
- 
-+	assert(!cpu_idle(0));
-+
-+	if (!ERRATA(6c7a5dce22b3) || cpumask_weight(&cpu_idle_mask) == nr_cpus - 1)
-+		report(psci_cpu_off_test(), "cpu-off");
-+	else
-+		report_skip("Skipping cpu-off test because the cpu-on test failed");
-+
- done:
- #if 0
- 	report_summary();
--- 
-2.39.1
+> That failure was fixed with this series:
+> "KVM: selftests: aarch64: page_fault_test S1PTW related fixes"
+> https://lore.kernel.org/kvmarm/20230127214353.245671-1-ricarkol@google.com/
 
+> which made it into kvmarm/fixes and should get into 6.2:
+> https://lore.kernel.org/kvmarm/20230129190142.2481354-1-maz@kernel.org/
+
+> Note that the failing assert does not exist after the mentioned series:
+> > #   ASSERT_EQ(!!(flags & UFFD_PAGEFAULT_FLAG_WRITE), expect_write) failed.
+
+Ah, good.  That's not made it into -next yet unfortunately so far as I
+can see but hopefully it'll turn up shortly and everything will start
+passing.  Thanks!
+
+--/gTOaUC39ON2rc/4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmPdRAMACgkQJNaLcl1U
+h9DgmQf+Jt2Bqov2Wwmed1KWEf4KZU0PQ51xIYStHyM2AjsGZTFwCHUA8PAA8WV+
+Ky4x+iKYjP1/WOIfKJocaBrD+uZaTSA7EsMlkaBkckxX+XS39ifnH0nsdtQWIQ7T
+AJzwsB3F5B/RIGGaf4kbDPkTDKzXqlWhVw/r4kWkDWCwd741X6DVf2h51ClHIvYf
+7VbN0tY1+Sh7zSRcOt45Tw6OlpJ41fpRrne6gV8yQXNMLJSp/Luk9a9PmJSCv5rz
+t/Bx2yhBkKAAPQBEybFXUesEsJ7BAfs0NFr7Xhl0sfMetMJpPdAhwqZY35RgJai7
+ZNzJGZ6Vgk2MPu5MeI6EJnCaJ5NO6g==
+=yMQh
+-----END PGP SIGNATURE-----
+
+--/gTOaUC39ON2rc/4--
