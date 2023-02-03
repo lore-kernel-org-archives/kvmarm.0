@@ -1,223 +1,97 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8D8E4C60;
-	Fri,  3 Feb 2023 13:54:12 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B7B641650;
-	Fri,  3 Feb 2023 05:54:54 -0800 (PST)
-Received: from eglon.cambridge.arm.com (eglon.cambridge.arm.com [10.1.196.177])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E8CA33F71E;
-	Fri,  3 Feb 2023 05:54:08 -0800 (PST)
-From: James Morse <james.morse@arm.com>
-To: linux-pm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-acpi@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	linux-ia64@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	x86@kernel.org
-Cc: Marc Zyngier <maz@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Borislav Petkov <bp@alien8.de>,
-	H Peter Anvin <hpa@zytor.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Len Brown <lenb@kernel.org>,
-	Rafael Wysocki <rafael@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: [RFC PATCH 32/32] cpumask: Add enabled cpumask for present CPUs that can be brought online
-Date: Fri,  3 Feb 2023 13:50:43 +0000
-Message-Id: <20230203135043.409192-33-james.morse@arm.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230203135043.409192-1-james.morse@arm.com>
-References: <20230203135043.409192-1-james.morse@arm.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8B929A8
+	for <kvmarm@lists.linux.dev>; Fri,  3 Feb 2023 14:49:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95DA9C433D2;
+	Fri,  3 Feb 2023 14:49:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1675435750;
+	bh=t52WNbigMsu1xdZ9Xsrfgwd5bZv6hgeD/DpkiTQjQjk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Hv/zdG/mrzVzwPHwFNAMrfOEyD1QqzfVCGct2zQit8OdBQSprEyAHWt2DJOA4KOWT
+	 gptShfk4rLUJ/GP7nGWK9et+KyrpbYJwoT0LFY+g9RXecNmq3zxAdRhTH/lTRw1TXB
+	 PzX9lKZyjxCKKGB5bJmz+9ZgpDHX7apXUi+p+dyDFq03V7kvCMfCbkSTlIfl3GdeMg
+	 TfIOeCr6LdsiQef2bGUPP2of0/hyn9oNj2fRnCMmC3C88vVn4StsJ82KXrUjzQrRh+
+	 qoYV9RKLLicQkr0MqdzVUxPUiYujodmeCGjqjRf2bTBVqNAsdzlV9PKNPFrOyVZjCI
+	 /2V/4Dc0qpITA==
+Date: Fri, 3 Feb 2023 14:49:04 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Ricardo Koller <ricarkol@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
+	pbonzini@redhat.com, maz@kernel.org, seanjc@google.com,
+	alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
+	reijiw@google.com, rananta@google.com, bgardon@google.com,
+	dmatlack@google.com, axelrasmussen@google.com
+Subject: Re: [PATCH v10 00/14] KVM: selftests: Add aarch64/page_fault_test
+Message-ID: <Y90e4IluvCYSnShh@sirena.org.uk>
+References: <20221017195834.2295901-1-ricarkol@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Wp5b5pNXdJZ10V7t"
+Content-Disposition: inline
+In-Reply-To: <20221017195834.2295901-1-ricarkol@google.com>
+X-Cookie: Colorless green ideas sleep furiously.
 
-The 'offline' file in sysfs shows all offline CPUs, including those
-that aren't present. User-space is expected to remove not-present CPUs
-from thie list to learn which CPUs could be brought online.
 
-CPUs can be present but not-enabled. These CPUs can't be brought online
-until the firmware policy changes, which comes with an ACPI notification
-that will register the CPUs.
+--Wp5b5pNXdJZ10V7t
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-With only the offline and present files, user-space is unable to
-determine which CPUs it can try to bring online. Add a new CPU mask
-that shows this based on all the registered CPUs.
+On Mon, Oct 17, 2022 at 07:58:20PM +0000, Ricardo Koller wrote:
+> This series adds a new aarch64 selftest for testing stage 2 fault handling
+> for various combinations of guest accesses (e.g., write, S1PTW), backing
+> sources (e.g., anon), and types of faults (e.g., read on hugetlbfs with a
+> hole, write on a readonly memslot). Each test tries a different combination
+> and then checks that the access results in the right behavior (e.g., uffd
+> faults with the right address and write/read flag). Some interesting
+> combinations are:
 
-Signed-off-by: James Morse <james.morse@arm.com>
----
- drivers/base/cpu.c      | 10 ++++++++++
- include/linux/cpumask.h | 25 +++++++++++++++++++++++++
- kernel/cpu.c            |  3 +++
- 3 files changed, 38 insertions(+)
+I'm seeing issues with the page_fault_test tests in both -next and
+mainline all the way back to v6.1 when they were introduced running on
+both the fast model and hardware.  With -next the reports come back as:
 
-diff --git a/drivers/base/cpu.c b/drivers/base/cpu.c
-index bc2ce8c7f383..3cc06f9fd230 100644
---- a/drivers/base/cpu.c
-+++ b/drivers/base/cpu.c
-@@ -76,6 +76,7 @@ void unregister_cpu(struct cpu *cpu)
- {
- 	int logical_cpu = cpu->dev.id;
- 
-+	set_cpu_enabled(logical_cpu, false);
- 	unregister_cpu_under_node(logical_cpu, cpu_to_node(logical_cpu));
- 
- 	device_unregister(&cpu->dev);
-@@ -265,6 +266,13 @@ static ssize_t print_cpus_offline(struct device *dev,
- }
- static DEVICE_ATTR(offline, 0444, print_cpus_offline, NULL);
- 
-+static ssize_t print_cpus_enabled(struct device *dev,
-+				  struct device_attribute *attr, char *buf)
-+{
-+	return sysfs_emit(buf, "%*pbl\n", cpumask_pr_args(cpu_enabled_mask));
-+}
-+static DEVICE_ATTR(enabled, 0444, print_cpus_enabled, NULL);
-+
- static ssize_t print_cpus_isolated(struct device *dev,
- 				  struct device_attribute *attr, char *buf)
- {
-@@ -384,6 +392,7 @@ int register_cpu(struct cpu *cpu, int num)
- 	register_cpu_under_node(num, cpu_to_node(num));
- 	dev_pm_qos_expose_latency_limit(&cpu->dev,
- 					PM_QOS_RESUME_LATENCY_NO_CONSTRAINT);
-+	set_cpu_enabled(num, true);
- 
- 	return 0;
- }
-@@ -465,6 +474,7 @@ static struct attribute *cpu_root_attrs[] = {
- 	&cpu_attrs[2].attr.attr,
- 	&dev_attr_kernel_max.attr,
- 	&dev_attr_offline.attr,
-+	&dev_attr_enabled.attr,
- 	&dev_attr_isolated.attr,
- #ifdef CONFIG_NO_HZ_FULL
- 	&dev_attr_nohz_full.attr,
-diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
-index c2aa0aa26b45..1513bb00dee4 100644
---- a/include/linux/cpumask.h
-+++ b/include/linux/cpumask.h
-@@ -59,6 +59,7 @@ static inline void set_nr_cpu_ids(unsigned int nr)
-  *
-  *     cpu_possible_mask- has bit 'cpu' set iff cpu is populatable
-  *     cpu_present_mask - has bit 'cpu' set iff cpu is populated
-+ *     cpu_enabled_mask  - has bit 'cpu' set iff cpu can be brought online
-  *     cpu_online_mask  - has bit 'cpu' set iff cpu available to scheduler
-  *     cpu_active_mask  - has bit 'cpu' set iff cpu available to migration
-  *
-@@ -91,11 +92,13 @@ static inline void set_nr_cpu_ids(unsigned int nr)
- 
- extern struct cpumask __cpu_possible_mask;
- extern struct cpumask __cpu_online_mask;
-+extern struct cpumask __cpu_enabled_mask;
- extern struct cpumask __cpu_present_mask;
- extern struct cpumask __cpu_active_mask;
- extern struct cpumask __cpu_dying_mask;
- #define cpu_possible_mask ((const struct cpumask *)&__cpu_possible_mask)
- #define cpu_online_mask   ((const struct cpumask *)&__cpu_online_mask)
-+#define cpu_enabled_mask   ((const struct cpumask *)&__cpu_enabled_mask)
- #define cpu_present_mask  ((const struct cpumask *)&__cpu_present_mask)
- #define cpu_active_mask   ((const struct cpumask *)&__cpu_active_mask)
- #define cpu_dying_mask    ((const struct cpumask *)&__cpu_dying_mask)
-@@ -921,6 +924,7 @@ extern const DECLARE_BITMAP(cpu_all_bits, NR_CPUS);
- #else
- #define for_each_possible_cpu(cpu) for_each_cpu((cpu), cpu_possible_mask)
- #define for_each_online_cpu(cpu)   for_each_cpu((cpu), cpu_online_mask)
-+#define for_each_enabled_cpu(cpu)   for_each_cpu((cpu), cpu_enabled_mask)
- #define for_each_present_cpu(cpu)  for_each_cpu((cpu), cpu_present_mask)
- #endif
- 
-@@ -943,6 +947,15 @@ set_cpu_possible(unsigned int cpu, bool possible)
- 		cpumask_clear_cpu(cpu, &__cpu_possible_mask);
- }
- 
-+static inline void
-+set_cpu_enabled(unsigned int cpu, bool can_be_onlined)
-+{
-+	if (can_be_onlined)
-+		cpumask_set_cpu(cpu, &__cpu_enabled_mask);
-+	else
-+		cpumask_clear_cpu(cpu, &__cpu_enabled_mask);
-+}
-+
- static inline void
- set_cpu_present(unsigned int cpu, bool present)
- {
-@@ -1022,6 +1035,7 @@ static inline unsigned int num_online_cpus(void)
- 	return atomic_read(&__num_online_cpus);
- }
- #define num_possible_cpus()	cpumask_weight(cpu_possible_mask)
-+#define num_enabled_cpus()	cpumask_weight(cpu_enabled_mask)
- #define num_present_cpus()	cpumask_weight(cpu_present_mask)
- #define num_active_cpus()	cpumask_weight(cpu_active_mask)
- 
-@@ -1030,6 +1044,11 @@ static inline bool cpu_online(unsigned int cpu)
- 	return cpumask_test_cpu(cpu, cpu_online_mask);
- }
- 
-+static inline bool cpu_enabled(unsigned int cpu)
-+{
-+	return cpumask_test_cpu(cpu, cpu_enabled_mask);
-+}
-+
- static inline bool cpu_possible(unsigned int cpu)
- {
- 	return cpumask_test_cpu(cpu, cpu_possible_mask);
-@@ -1054,6 +1073,7 @@ static inline bool cpu_dying(unsigned int cpu)
- 
- #define num_online_cpus()	1U
- #define num_possible_cpus()	1U
-+#define num_enabled_cpus()	1U
- #define num_present_cpus()	1U
- #define num_active_cpus()	1U
- 
-@@ -1067,6 +1087,11 @@ static inline bool cpu_possible(unsigned int cpu)
- 	return cpu == 0;
- }
- 
-+static inline bool cpu_enabled(unsigned int cpu)
-+{
-+	return cpu == 0;
-+}
-+
- static inline bool cpu_present(unsigned int cpu)
- {
- 	return cpu == 0;
-diff --git a/kernel/cpu.c b/kernel/cpu.c
-index 6c0a92ca6bb5..6f4febf0142e 100644
---- a/kernel/cpu.c
-+++ b/kernel/cpu.c
-@@ -2639,6 +2639,9 @@ EXPORT_SYMBOL(__cpu_possible_mask);
- struct cpumask __cpu_online_mask __read_mostly;
- EXPORT_SYMBOL(__cpu_online_mask);
- 
-+struct cpumask __cpu_enabled_mask __read_mostly;
-+EXPORT_SYMBOL(__cpu_enabled_mask);
-+
- struct cpumask __cpu_present_mask __read_mostly;
- EXPORT_SYMBOL(__cpu_present_mask);
- 
--- 
-2.30.2
+# selftests: kvm: page_fault_test
+# ==== Test Assertion Failure ====
+#   aarch64/page_fault_test.c:316: __a == __b
+#   pid=851 tid=860 errno=0 - Success
+#      1	0x0000000000402253: uffd_generic_handler at page_fault_test.c:316
+#      2	0x000000000040be07: uffd_handler_thread_fn at userfaultfd_util.c:97
+#      3	0x0000ffff8b39edd7: ?? ??:0
+#      4	0x0000ffff8b407e9b: ?? ??:0
+#   ASSERT_EQ(!!(flags & UFFD_PAGEFAULT_FLAG_WRITE), expect_write) failed.
+# 	!!(flags & UFFD_PAGEFAULT_FLAG_WRITE) is 0
+# 	expect_write is 0x1
+not ok 6 selftests: kvm: page_fault_test # exit=254
 
+(addr2line seemed to be not doing much, I've not poked too hard at
+that).  I've been unable to find any case where the program passes.
+Is this expected?
+
+Some random full runs on hardware:
+
+4xA53: https://lava.sirena.org.uk/scheduler/job/244678
+4xA72: https://lkft.validation.linaro.org/scheduler/job/6114427
+
+--Wp5b5pNXdJZ10V7t
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmPdHt8ACgkQJNaLcl1U
+h9DHpgf/SSO7Y9qBYH/EO0C504/xjrEXbYwmL/VfTQ4PylF1AWCcorRiDlfVyaAd
+//4RErLun4RDmVH+qH7cZenIop3gUDG6rXINxwVdlqy2tkvHQzynEQ9a/PhB7ptz
+ZtIM1hV02RMfIvtd4nGP5yzRiz5jUpdzjbKE4bXXfeo66IX+aFyKMSdbZel7Atas
+vSehH7PRAwgxfmzTFTcyTomDSfnS6XzwPLw1PEP1i28EtwG78/7SE9BszVamBqjE
+xYsUxwhuolk3nE868Y+TucUs+oQicSDiP3C4+/8NbcHMwN1cO/WMRCwCeSb5d1GV
+grGQNh47n/UE8Se0CLc4tpBOz/GU/Q==
+=DlC0
+-----END PGP SIGNATURE-----
+
+--Wp5b5pNXdJZ10V7t--
