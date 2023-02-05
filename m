@@ -1,124 +1,156 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EDA97B
-	for <kvmarm@lists.linux.dev>; Sun,  5 Feb 2023 08:28:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1675585705;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UO1EdFuMkkVyfac3fwD45cLw5uizYsR9A5gP2egekTM=;
-	b=Lls9GBzXUjlwN2P59THSuGw3Rmi+MwkiORMoVNn7ApJ+vdna9j9qI0BTbekfH0FQNYRuF1
-	Ow0NnnTRGKkgmHVfe0DUZ36L0dkggrG9IfH+urieAzzSL77woRWTZ6BaLbU+OQWkDFJtzl
-	ehByqnHLDTqQYL4wvbZChsPYRc9zV9o=
-Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
- [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-423-Dr_tDXujNDmJ-gbeI5P3xg-1; Sun, 05 Feb 2023 03:28:23 -0500
-X-MC-Unique: Dr_tDXujNDmJ-gbeI5P3xg-1
-Received: by mail-ua1-f70.google.com with SMTP id z42-20020ab0492d000000b00423b333ff7dso4019920uac.22
-        for <kvmarm@lists.linux.dev>; Sun, 05 Feb 2023 00:28:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UO1EdFuMkkVyfac3fwD45cLw5uizYsR9A5gP2egekTM=;
-        b=hBiUjliRqgpDXGyIAqwd7Sql8qHGq5Yb848c2KvypTlrTMyf72FRiV7FVbiTfFy4Kh
-         rUr5bs9oB/3oBDgYDfM+z7afTyv/T8tL9ZeEAXAFjOTSHVycnSpQ4wMzisF9DzpmZNAQ
-         KC9wbb7mhMK74yylLfg0NXPEOgJHo6CMz1U1JLagSg2ffVo2uj2PlRLbWM0kdAcQeRLb
-         DmTVO9XFq1313JCLmlnWDS9XNlqKkMJvVuWbHFST3G2MFzyuilaH9x/OKz3KLJa2ZZsj
-         wQippY2g+6lqWmd670ean4KWRi84FVj84t9R2abexQ4ZlweaxNUDohH3Z6WBFRVEk4j1
-         JUlQ==
-X-Gm-Message-State: AO0yUKWytqgVmPHfVnHtieE7pkNfd0g1WbtnmuE8LZc4M6LlqJKhhNye
-	zVer/7ZL0Ur65hkWGCv1ulp7stmLQG5S/mXK4q/4EaO8P5mbYTlVNPiVlWDXAbVaYtYJsJiY212
-	oXLeqwzXKdW1JSfhU78a88fN1P+4hCASo
-X-Received: by 2002:a05:6122:2ba:b0:3dd:f386:1bca with SMTP id 26-20020a05612202ba00b003ddf3861bcamr2447221vkq.33.1675585702930;
-        Sun, 05 Feb 2023 00:28:22 -0800 (PST)
-X-Google-Smtp-Source: AK7set832lmgFJb3yUv2cp0W6x43Si9vq2XdDLN1vzJ5ohOPqMdf2reOo+DXHos/4J9Y9xTmZ3nf0MRQvstms53rCJA=
-X-Received: by 2002:a05:6122:2ba:b0:3dd:f386:1bca with SMTP id
- 26-20020a05612202ba00b003ddf3861bcamr2447215vkq.33.1675585702650; Sun, 05 Feb
- 2023 00:28:22 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A3E23B4;
+	Sun,  5 Feb 2023 10:12:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C7B5C433EF;
+	Sun,  5 Feb 2023 10:12:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1675591972;
+	bh=07vseOO+bkMKl0Rl1FzCfpn6EqMSEMLBKqQXGh3SEPk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DoOsgC0qRgto2YORcUBWvV6iOdL3uElZk9c1nP4vdvnW7UJ0cfOzO3KFQKeGO+VoT
+	 lG5o4CEP2bYQB54SUPK+LBFo7FMjbKUplHCl4bDIwWpTzEouuKsF0rpYgMtLrj6WDp
+	 H9n6I/CA4cHgLaFDNCbQYTT7vcyhGFJmYijImsPsI/4Q5uIWFpOnPAJAD6OWCAYpbq
+	 XW4C2a1Bp+bMsIAU2ZYwpWCbNJq7RPvEn3rPCgoAGbT4jFAUAilaaXkOZe3H9OPJI5
+	 ENvwnY/2trtsxGYReAVlXWGJZfv291skBc8Gm3ylJfKUd99TlZf+kkTBtBIuHPTHhY
+	 1rRJCG3l8FGQA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pOc0w-007W73-29;
+	Sun, 05 Feb 2023 10:12:50 +0000
+Date: Sun, 05 Feb 2023 10:12:49 +0000
+Message-ID: <865ycg1kv2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: James Morse <james.morse@arm.com>
+Cc: linux-pm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-acpi@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	linux-ia64@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	x86@kernel.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Borislav Petkov <bp@alien8.de>,
+	H Peter Anvin <hpa@zytor.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Len Brown <lenb@kernel.org>,
+	Rafael Wysocki <rafael@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>
+Subject: Re: [RFC PATCH 29/32] KVM: arm64: Pass hypercalls to userspace
+In-Reply-To: <20230203135043.409192-30-james.morse@arm.com>
+References: <20230203135043.409192-1-james.morse@arm.com>
+	<20230203135043.409192-30-james.morse@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20230129190142.2481354-1-maz@kernel.org>
-In-Reply-To: <20230129190142.2481354-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 5 Feb 2023 09:28:11 +0100
-Message-ID: <CABgObfa=++RCcf=5A2DW5YqEq40VfeGoewZ2LXKk+3gS=x-VpQ@mail.gmail.com>
-Subject: Re: [GIT PULL] kvm/arm64 fixes for 6.2, take #3
-To: Marc Zyngier <maz@kernel.org>
-Cc: Gavin Shan <gshan@redhat.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Ricardo Koller <ricarkol@google.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-pm@vger.kernel.org, loongarch@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, tglx@linutronix.de, lpieralisi@kernel.org, mark.rutland@arm.com, sudeep.holla@arm.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com, will@kernel.org, catalin.marinas@arm.com, chenhuacai@kernel.org, suzuki.poulose@arm.com, oliver.upton@linux.dev, lenb@kernel.org, rafael@kernel.org, kernel@xen0n.name, salil.mehta@huawei.com, linux@armlinux.org.uk, jean-philippe@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Pulled, thanks.
+On Fri, 03 Feb 2023 13:50:40 +0000,
+James Morse <james.morse@arm.com> wrote:
+> 
+> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> 
+> When capability KVM_CAP_ARM_HVC_TO_USER is available, userspace can
+> request to handle all hypercalls that aren't handled by KVM. With the
+> help of another capability, this will allow userspace to handle PSCI
+> calls.
+> 
+> Suggested-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Signed-off-by: James Morse <james.morse@arm.com>
+> 
+> ---
+> 
 
-Paolo
+On top of Oliver's ask not to make this a blanket "steal everything",
+but instead to have an actual request for ranges of forwarded
+hypercalls:
 
-On Sun, Jan 29, 2023 at 8:02 PM Marc Zyngier <maz@kernel.org> wrote:
->
-> Paolo,
->
-> Here's the (hopefully) last batch of fixes for KVM/arm64 on 6.2. The
-> really important one addresses yet another non-CPU access to the vgic
-> memory, which needs to be suitably identified to avoid generating a
-> scary warning. The second half of the series fixes a bunch of
-> page-table walk tests after the kernel fix that went in earlier in
-> 6.2.
->
-> Please pull,
->
->         M.
->
-> The following changes since commit ef3691683d7bfd0a2acf48812e4ffe894f10bfa8:
->
->   KVM: arm64: GICv4.1: Fix race with doorbell on VPE activation/deactivation (2023-01-21 11:02:19 +0000)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.2-3
->
-> for you to fetch changes up to 08ddbbdf0b55839ca93a12677a30a1ef24634969:
->
->   KVM: selftests: aarch64: Test read-only PT memory regions (2023-01-29 18:49:08 +0000)
->
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 6.2, take #3
->
-> - Yet another fix for non-CPU accesses to the memory backing
->   the VGICv3 subsystem
->
-> - A set of fixes for the setlftest checking for the S1PTW
->   behaviour after the fix that went in ealier in the cycle
->
-> ----------------------------------------------------------------
-> Gavin Shan (3):
->       KVM: arm64: Add helper vgic_write_guest_lock()
->       KVM: arm64: Allow no running vcpu on restoring vgic3 LPI pending status
->       KVM: arm64: Allow no running vcpu on saving vgic3 pending table
->
-> Ricardo Koller (4):
->       KVM: selftests: aarch64: Relax userfaultfd read vs. write checks
->       KVM: selftests: aarch64: Do not default to dirty PTE pages on all S1PTWs
->       KVM: selftests: aarch64: Fix check of dirty log PT write
->       KVM: selftests: aarch64: Test read-only PT memory regions
->
->  Documentation/virt/kvm/api.rst                     |  10 +-
->  arch/arm64/kvm/vgic/vgic-its.c                     |  13 +-
->  arch/arm64/kvm/vgic/vgic-v3.c                      |   4 +-
->  arch/arm64/kvm/vgic/vgic.h                         |  14 ++
->  include/kvm/arm_vgic.h                             |   2 +-
->  .../selftests/kvm/aarch64/page_fault_test.c        | 187 ++++++++++++---------
->  6 files changed, 132 insertions(+), 98 deletions(-)
->
+> Notes on this implementation:
+> 
+> * A similar mechanism was proposed for SDEI some time ago [1]. This RFC
+>   generalizes the idea to all hypercalls, since that was suggested on
+>   the list [2, 3].
+> 
+> * We're reusing kvm_run.hypercall. I copied x0-x5 into
+>   kvm_run.hypercall.args[] to help userspace but I'm tempted to remove
+>   this, because:
+>   - Most user handlers will need to write results back into the
+>     registers (x0-x3 for SMCCC), so if we keep this shortcut we should
+>     go all the way and read them back on return to kernel.
+>   - QEMU doesn't care about this shortcut, it pulls all vcpu regs before
+>     handling the call.
+>   - SMCCC uses x0-x16 for parameters.
+>   x0 does contain the SMCCC function ID and may be useful for fast
+>   dispatch, we could keep that plus the immediate number.
+> 
+> * Add a flag in the kvm_run.hypercall telling whether this is HVC or
+>   SMC?  Can be added later in those bottom longmode and pad fields.
 
+We definitely need this. A nested hypervisor can (and does) use SMCs
+as the conduit. The question is whether they represent two distinct
+namespaces or not. I *think* we can unify them, but someone should
+check and maybe get clarification from the owners of the SMCCC spec.
+
+>
+> * On top of this we could share with userspace which HVC ranges are
+>   available and which ones are handled by KVM. That can actually be added
+>   independently, through a vCPU/VM device attribute which doesn't consume
+>   a new ioctl:
+>   - userspace issues HAS_ATTR ioctl on the vcpu fd to query whether this
+>     feature is available.
+>   - userspace queries the number N of HVC ranges using one GET_ATTR.
+>   - userspace passes an array of N ranges using another GET_ATTR. The
+>     array is filled and returned by KVM.
+
+As mentioned above, I think this interface should go both ways.
+Userspace should request the forwarding of a certain range of
+hypercalls via a similar SET_ATTR interface.
+
+Another question is how we migrate VMs that have these forwarding
+requirements. Do we expect the VMM to replay the forwarding as part of
+the setting up on the other side? Or do we save/restore this via a
+firmware pseudo-register?
+
+> 
+> * Enabling this using a vCPU arch feature rather than the whole-VM
+>   capability would be fine, but it would be difficult to do the same for
+>   the following psci-in-user capability. So let's enable everything at
+>   the VM scope.
+
+Absolutely.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
