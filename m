@@ -1,91 +1,228 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C4C3220
-	for <kvmarm@lists.linux.dev>; Mon,  6 Feb 2023 13:02:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1556C433EF;
-	Mon,  6 Feb 2023 13:02:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675688560;
-	bh=tJmujHmJcFdKVliYWHuZ3IFNjgrhKrrGtfsWmEgSqkc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d8HW7sAH0SbCtcMu0ADg7/fZAnIawCqxfE9Om4v+vWLAzpnp2qannalR338lhxoTi
-	 Ej6THKSMlLieGy9PVuUxRIy/KVhgeUhhbHW/2boQUxLYRpZY8cVHVojvpSrZ45An+V
-	 OuyPq8qnIO8VFA7nmvYLOiVSzYNnLVoYOV7s53bH3A7kBMyWwrhGr+VXt1g9MfhoBx
-	 gHMUmghNkiwpAW2u48OQ9oacXygl0Bs38F1br3WjPxakY+VEtd3RcmyM5X6TclEZm9
-	 kSlfWTALaUoAtwuc6fWT3EBHqLU8z5HgLChBYTMc/Ed8GxHsKQKZx1crlYHoem1+2K
-	 Dy72Kd/cN9YnQ==
-Date: Mon, 6 Feb 2023 13:02:33 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Oleg Nesterov <oleg@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Shuah Khan <shuah@kernel.org>, Alan Hayward <alan.hayward@arm.com>,
-	Luis Machado <luis.machado@arm.com>,
-	Szabolcs Nagy <szabolcs.nagy@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v4 07/21] arm64/sme: Enable host kernel to access ZT0
-Message-ID: <Y+D6afdDp6St079z@sirena.org.uk>
-References: <20221208-arm64-sme2-v4-0-f2fa0aef982f@kernel.org>
- <20221208-arm64-sme2-v4-7-f2fa0aef982f@kernel.org>
- <86y1pbywbb.wl-maz@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413FD53A2
+	for <kvmarm@lists.linux.dev>; Mon,  6 Feb 2023 16:28:40 +0000 (UTC)
+Received: by mail-qk1-f182.google.com with SMTP id p16so5529517qki.9
+        for <kvmarm@lists.linux.dev>; Mon, 06 Feb 2023 08:28:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GsYXRrrozy1Y6bByTyL/QEQBzvwU4NP0DVeauv7JHVo=;
+        b=PyrE+NbJPLiIf/5JN0tHX/r9jZH6PpBUlPc1wPOi/HN3yduaaGZTOVQI7q+PsSYIzr
+         X3+SMYQtWHyP3QD7vM/BtM2BBHCLbBD/cWolg7B4kGtAb0b5rgj2A856XRzAur+e6Xf5
+         j02OcPgg7bvJAEqAS11RQwyvmngQir+dB9IDlXtZga61ZIHiE1Orc9kVhzxW5rRG7zq1
+         sWoLuoIxyaPJGkc+I7uzaoiFvPM/IcGdkgAgFddQyJM+63snIPTkNbmXNE+qlnoD3RCg
+         QuzmpwuetOzEiL7dwsQhCOgtYkrsUI0lRe3xKdMhWLmbpgVJ4252QH4+CUKFbuSaewFb
+         2nGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GsYXRrrozy1Y6bByTyL/QEQBzvwU4NP0DVeauv7JHVo=;
+        b=aZCSHSdpJrkRy4JArVZmdCrFKJrTeKWtlIA7kkqQAcf1pl0+BHI3bx5CsTciPtEZ5L
+         LJpXEj870Qaih4WdmHdVn+3L9C/mSj1Sfy5CyZD9pBs8/VemCpOfqLwjZBEqpj8REhOt
+         Tugn5C+mswbdkLc4Ms9il103aY0veMBb+4tu45hOQ2HBgaqre38gfTeTG04a5ZMFlfDL
+         W7lD19CqCG4GfFXxv3vXaOZa9Zh0gnrDyOp3ID/BGBSL4PkpGmwWwb9/LVcjS+1rAeUd
+         Bg6rt5eIK4i/KK36JGOw9T6Y0wo9WGV5Pk6XhvW068zui3XB2SsEfV3H5sHUfmwf2oEz
+         s/Dw==
+X-Gm-Message-State: AO0yUKX/g5fUPGL6Hat4doqrKd6ZDyB9jHS6AfZiMElXi4zjECu8M4D2
+	/zUgGvow7MNHnHCtfq15JdLgoq8VCSVoomXsXgi0Lg==
+X-Google-Smtp-Source: AK7set+Is1Am6YXWwW05Tb0uG6N5+i/m82QjceMYk7c4ZbDQIJ4gzCa1XcyEHzVZC3zCoir1wrW7TTG92QYmJnmli6g=
+X-Received: by 2002:a05:620a:4483:b0:72b:ada6:1295 with SMTP id
+ x3-20020a05620a448300b0072bada61295mr1062720qkp.211.1675700918954; Mon, 06
+ Feb 2023 08:28:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="pxpYawn5NK0KvypX"
-Content-Disposition: inline
-In-Reply-To: <86y1pbywbb.wl-maz@kernel.org>
-X-Cookie: Hope is a waking dream.
+References: <20230113035000.480021-1-ricarkol@google.com> <20230113035000.480021-4-ricarkol@google.com>
+ <59f0d41e-d8ac-dab3-9136-af48efe55578@huawei.com>
+In-Reply-To: <59f0d41e-d8ac-dab3-9136-af48efe55578@huawei.com>
+From: Ricardo Koller <ricarkol@google.com>
+Date: Mon, 6 Feb 2023 08:28:27 -0800
+Message-ID: <CAOHnOryTynkFo9qhtVwfjDAnzUPjz-WipWBpaxCg0N2ARtrF6Q@mail.gmail.com>
+Subject: Re: [PATCH 3/9] KVM: arm64: Add kvm_pgtable_stage2_split()
+To: Zheng Chuan <zhengchuan@huawei.com>
+Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
+	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, 
+	andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, 
+	suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com, 
+	reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com, 
+	Xiexiangyou <xiexiangyou@huawei.com>, yezhenyu2@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
+Hi Zheng,
 
---pxpYawn5NK0KvypX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Mon, Feb 6, 2023 at 1:21 AM Zheng Chuan <zhengchuan@huawei.com> wrote:
+>
+> Hi, Ricardo
+>
+> On 2023/1/13 11:49, Ricardo Koller wrote:
+> > Add a new stage2 function, kvm_pgtable_stage2_split(), for splitting a
+> > range of huge pages. This will be used for eager-splitting huge pages
+> > into PAGE_SIZE pages. The goal is to avoid having to split huge pages
+> > on write-protection faults, and instead use this function to do it
+> > ahead of time for large ranges (e.g., all guest memory in 1G chunks at
+> > a time).
+> >
+> > No functional change intended. This new function will be used in a
+> > subsequent commit.
+> >
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h | 29 ++++++++++++
+> >  arch/arm64/kvm/hyp/pgtable.c         | 67 ++++++++++++++++++++++++++++
+> >  2 files changed, 96 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index 8ad78d61af7f..5fbdc1f259fd 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -644,6 +644,35 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
+> >   */
+> >  int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
+> >
+> > +/**
+> > + * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
+> > + *                           to PAGE_SIZE guest pages.
+> > + * @pgt:     Page-table structure initialised by kvm_pgtable_stage2_init*().
+> > + * @addr:    Intermediate physical address from which to split.
+> > + * @size:    Size of the range.
+> > + * @mc:              Cache of pre-allocated and zeroed memory from which to allocate
+> > + *           page-table pages.
+> > + *
+> > + * @addr and the end (@addr + @size) are effectively aligned down and up to
+> > + * the top level huge-page block size. This is an exampe using 1GB
+> > + * huge-pages and 4KB granules.
+> > + *
+> > + *                          [---input range---]
+> > + *                          :                 :
+> > + * [--1G block pte--][--1G block pte--][--1G block pte--][--1G block pte--]
+> > + *                          :                 :
+> > + *                   [--2MB--][--2MB--][--2MB--][--2MB--]
+> > + *                          :                 :
+> > + *                   [ ][ ][:][ ][ ][ ][ ][ ][:][ ][ ][ ]
+> > + *                          :                 :
+> > + *
+> > + * Return: 0 on success, negative error code on failure. Note that
+> > + * kvm_pgtable_stage2_split() is best effort: it tries to break as many
+> > + * blocks in the input range as allowed by the size of the memcache. It
+> > + * will fail it wasn't able to break any block.
+> > + */
+> > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size, void *mc);
+> > +
+> >  /**
+> >   * kvm_pgtable_walk() - Walk a page-table.
+> >   * @pgt:     Page-table structure initialised by kvm_pgtable_*_init().
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 0dee13007776..db9d1a28769b 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -1229,6 +1229,73 @@ int kvm_pgtable_stage2_create_removed(struct kvm_pgtable *pgt,
+> >       return 0;
+> >  }
+> >
+> > +struct stage2_split_data {
+> > +     struct kvm_s2_mmu               *mmu;
+> > +     void                            *memcache;
+> > +};
+> > +
+> > +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> > +                            enum kvm_pgtable_walk_flags visit)
+> > +{
+> > +     struct stage2_split_data *data = ctx->arg;
+> > +     struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> > +     kvm_pte_t pte = ctx->old, new, *childp;
+> > +     enum kvm_pgtable_prot prot;
+> > +     void *mc = data->memcache;
+> > +     u32 level = ctx->level;
+> > +     u64 phys;
+> > +     int ret;
+> > +
+> > +     /* Nothing to split at the last level */
+> > +     if (level == KVM_PGTABLE_MAX_LEVELS - 1)
+> > +             return 0;
+> > +
+> > +     /* We only split valid block mappings */
+> > +     if (!kvm_pte_valid(pte) || kvm_pte_table(pte, ctx->level))
+> > +             return 0;
+> > +
+> IIUC, It should be !kvm_pte_table(pte, ctx->level)?
 
-On Mon, Feb 06, 2023 at 09:31:20AM +0000, Marc Zyngier wrote:
+It's the other way around; if the current PTE is a table then there's
+nothing to split
+(it's already a table), and we leave early.
 
-> __check_override assumes that the ID_AA64SMFR0_EL1 value is in x1, and
-> I guess that the intent of the code is to reuse value read a few lines
-> above. But as the comment says at the beginning of the macro, x1 will
-> be clobbered, and the checks always fails.
+> also, the kvm_pte_table includes the level check and kvm_pte_valid, so, it just be like:
+> -       /* Nothing to split at the last level */
+> -       if (level == KVM_PGTABLE_MAX_LEVELS - 1)
+> -               return 0;
+> -
+> -       /* We only split valid block mappings */
+> +       if (!kvm_pte_table(pte, ctx->level))
+> +               return 0;
 
-Yes, it looks like this is a victim of rebasing - I didn't spot the
-change to make x1 clobbered when the override checking was refactored.
-Thanks for spotting this.
+Still need the kvm_pte_valid() check because !kvm_pte_table() does not imply
+that the pte is valid. Same with the level check.
 
-> I presume we're just lucky that sme2_kernel_enable() does the same
-> thing unconditionally, which probably means this was only ever tested
-> with a VHE kernel (it'd otherwise catch fire).
+Thanks for taking a look at the patch,
+Ricardo
 
-Yes, I'd not be surprised if I'd never run this in nVHE.
-
-> The easiest fix is just to reload the id register before checking it,
-> something like the patch below, compile-tested only.
-
-Reviewed-by: Mark Brown <broonie@kernel.org>
-
---pxpYawn5NK0KvypX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmPg+mgACgkQJNaLcl1U
-h9CWoAf/autA/Mi++TtM0WfDO989RWtfdQeyfjo68JI2KAfuOS+EZzXsBI0tGWfa
-ZJekC2WlIZbo6gBAtDHT/+LspDthG2hQJXawXHy0bpG/YvLnjJvxo7KWTvO9szI3
-m2BP5wL0O2McHI5RAbVvyCZS8VCvP0OeC5X5G9uYX7Plh51tNb/lMZUbTyJvxkTg
-WderG8+izuMhAYMSi7M5wuceSY+QO2sVLv/f2cFTVXFqDYpjmfyjhjhGi0zOGlUd
-XOk9iR9mg6PHs/RB4beUsxNJj5JQT9Du28JXmyG7iuLqrZN45TK3VqXKNk2dC+dV
-vwknsBbQvGLhcNCwsvb9DNCZS6g5pQ==
-=ajB9
------END PGP SIGNATURE-----
-
---pxpYawn5NK0KvypX--
+>
+> > +     phys = kvm_pte_to_phys(pte);
+> > +     prot = kvm_pgtable_stage2_pte_prot(pte);
+> > +
+> > +     ret = kvm_pgtable_stage2_create_removed(data->mmu->pgt, &new, phys,
+> > +                                             level, prot, mc);
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     if (!stage2_try_break_pte(ctx, data->mmu)) {
+> > +             childp = kvm_pte_follow(new, mm_ops);
+> > +             kvm_pgtable_stage2_free_removed(mm_ops, childp, level);
+> > +             mm_ops->put_page(childp);
+> > +             return -EAGAIN;
+> > +     }
+> > +
+> > +     /*
+> > +      * Note, the contents of the page table are guaranteed to be
+> > +      * made visible before the new PTE is assigned because
+> > +      * stage2_make_pte() writes the PTE using smp_store_release().
+> > +      */
+> > +     stage2_make_pte(ctx, new);
+> > +     dsb(ishst);
+> > +     return 0;
+> > +}
+> > +
+> > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt,
+> > +                          u64 addr, u64 size, void *mc)
+> > +{
+> > +     struct stage2_split_data split_data = {
+> > +             .mmu            = pgt->mmu,
+> > +             .memcache       = mc,
+> > +     };
+> > +
+> > +     struct kvm_pgtable_walker walker = {
+> > +             .cb     = stage2_split_walker,
+> > +             .flags  = KVM_PGTABLE_WALK_LEAF,
+> > +             .arg    = &split_data,
+> > +     };
+> > +
+> > +     return kvm_pgtable_walk(pgt, addr, size, &walker);
+> > +}
+> > +
+> >  int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+> >                             struct kvm_pgtable_mm_ops *mm_ops,
+> >                             enum kvm_pgtable_stage2_flags flags,
+> >
+>
+> --
+> Regards.
+> Chuan
+>
