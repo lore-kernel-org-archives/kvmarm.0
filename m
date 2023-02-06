@@ -1,228 +1,149 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413FD53A2
-	for <kvmarm@lists.linux.dev>; Mon,  6 Feb 2023 16:28:40 +0000 (UTC)
-Received: by mail-qk1-f182.google.com with SMTP id p16so5529517qki.9
-        for <kvmarm@lists.linux.dev>; Mon, 06 Feb 2023 08:28:40 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E35517B
+	for <kvmarm@lists.linux.dev>; Mon,  6 Feb 2023 16:35:56 +0000 (UTC)
+Received: by mail-qk1-f171.google.com with SMTP id 206so2593619qkl.12
+        for <kvmarm@lists.linux.dev>; Mon, 06 Feb 2023 08:35:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=GsYXRrrozy1Y6bByTyL/QEQBzvwU4NP0DVeauv7JHVo=;
-        b=PyrE+NbJPLiIf/5JN0tHX/r9jZH6PpBUlPc1wPOi/HN3yduaaGZTOVQI7q+PsSYIzr
-         X3+SMYQtWHyP3QD7vM/BtM2BBHCLbBD/cWolg7B4kGtAb0b5rgj2A856XRzAur+e6Xf5
-         j02OcPgg7bvJAEqAS11RQwyvmngQir+dB9IDlXtZga61ZIHiE1Orc9kVhzxW5rRG7zq1
-         sWoLuoIxyaPJGkc+I7uzaoiFvPM/IcGdkgAgFddQyJM+63snIPTkNbmXNE+qlnoD3RCg
-         QuzmpwuetOzEiL7dwsQhCOgtYkrsUI0lRe3xKdMhWLmbpgVJ4252QH4+CUKFbuSaewFb
-         2nGA==
+        bh=pJSM6kqcjnSPjdSGT0HvLgqZqIrYtsqkRhyhi3guF6Y=;
+        b=M8+isMLu4lCdK/uvwHfbX/fOotVlr1yruayEoQUgKnNaOGMLDziT9zDXJpoVntYJut
+         fQ6DA2ivKUK+tizCdVMVyFHkU43S+tObzACC8H6Ck3D8SxJpp/LDxVJCnY8zxwN2ioTI
+         OtVRmCVpmsqRloSdebgZ5Jp5A4s9zXmS3Gngx3PxOl0sqsr43y54olC3X6I3b0bllfbY
+         ouDtBIzfDhxy7y8LSYgYAzBfPmgwW8WwUZoQGQap18dHdLdULV9DKSGUtabZSYHhXWRl
+         yL/2NEnAg2yP8LwaDvFngm0hpLeyFyV12IsZEvE5inx1HWUE8iAUxaow5syqzRgCwfO7
+         rlLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=GsYXRrrozy1Y6bByTyL/QEQBzvwU4NP0DVeauv7JHVo=;
-        b=aZCSHSdpJrkRy4JArVZmdCrFKJrTeKWtlIA7kkqQAcf1pl0+BHI3bx5CsTciPtEZ5L
-         LJpXEj870Qaih4WdmHdVn+3L9C/mSj1Sfy5CyZD9pBs8/VemCpOfqLwjZBEqpj8REhOt
-         Tugn5C+mswbdkLc4Ms9il103aY0veMBb+4tu45hOQ2HBgaqre38gfTeTG04a5ZMFlfDL
-         W7lD19CqCG4GfFXxv3vXaOZa9Zh0gnrDyOp3ID/BGBSL4PkpGmwWwb9/LVcjS+1rAeUd
-         Bg6rt5eIK4i/KK36JGOw9T6Y0wo9WGV5Pk6XhvW068zui3XB2SsEfV3H5sHUfmwf2oEz
-         s/Dw==
-X-Gm-Message-State: AO0yUKX/g5fUPGL6Hat4doqrKd6ZDyB9jHS6AfZiMElXi4zjECu8M4D2
-	/zUgGvow7MNHnHCtfq15JdLgoq8VCSVoomXsXgi0Lg==
-X-Google-Smtp-Source: AK7set+Is1Am6YXWwW05Tb0uG6N5+i/m82QjceMYk7c4ZbDQIJ4gzCa1XcyEHzVZC3zCoir1wrW7TTG92QYmJnmli6g=
+        bh=pJSM6kqcjnSPjdSGT0HvLgqZqIrYtsqkRhyhi3guF6Y=;
+        b=QTtIABpHQhrKAXw1jUJPDgz8eHWkCnzY2fpcYG48BUmShuN4GY/MApKYwspkGMEJ9J
+         r2NXLnZMYwSMn6Y4xWF3P+RaRMOYVjuFJJx1rQm7uUirMZXSJNmpbNM45bSiWRLx5irH
+         4WBIlT7vafekTXFiDsxdBoqfWYQ+7knltf/soucQ9+k/rRMrn8HGBHHAwSFtzw176NBs
+         tZlMaqSB4FpdEOR9HQBpyGFfkOJpqsXpiz/NW/dXgIzJTkZne737ms6xIJzPNDPmbD4J
+         lmtccNOdqQV0OU+1oi5Z7nBrLMsmUXfYV8/5JHeBQajja7JjFFwrIdJz/LrzJy90vQT0
+         EyRQ==
+X-Gm-Message-State: AO0yUKWX6TfzvE2fo3ReOsDJFy53wQ3jac6wRt+RcWn2MdgwN0+4GIOh
+	91KHoz73NTqUjP58aMVDvRbLT6AYTvz4dPcNXgiZdg==
+X-Google-Smtp-Source: AK7set+s81reoHeglIfhP5y+W2Szu/NtmUcpv6g11YSkDaoDhJKIr+ZuCmsC1PlOUu+GJvolTPPl29WIZKJgLEb07bA=
 X-Received: by 2002:a05:620a:4483:b0:72b:ada6:1295 with SMTP id
- x3-20020a05620a448300b0072bada61295mr1062720qkp.211.1675700918954; Mon, 06
- Feb 2023 08:28:38 -0800 (PST)
+ x3-20020a05620a448300b0072bada61295mr1064250qkp.211.1675701355731; Mon, 06
+ Feb 2023 08:35:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230113035000.480021-1-ricarkol@google.com> <20230113035000.480021-4-ricarkol@google.com>
- <59f0d41e-d8ac-dab3-9136-af48efe55578@huawei.com>
-In-Reply-To: <59f0d41e-d8ac-dab3-9136-af48efe55578@huawei.com>
+References: <20230113035000.480021-1-ricarkol@google.com> <20230113035000.480021-7-ricarkol@google.com>
+ <Y9BfdgL+JSYCirvm@thinky-boi> <CAOHnOrysMhp_8Kdv=Pe-O8ZGDbhN5HiHWVhBv795_E6+4RAzPw@mail.gmail.com>
+ <86v8ktkqfx.wl-maz@kernel.org> <CAOHnOrx-vvuZ9n8xDRmJTBCZNiqvcqURVyrEt2tDpw5bWT0qew@mail.gmail.com>
+ <86h6w70zhc.wl-maz@kernel.org>
+In-Reply-To: <86h6w70zhc.wl-maz@kernel.org>
 From: Ricardo Koller <ricarkol@google.com>
-Date: Mon, 6 Feb 2023 08:28:27 -0800
-Message-ID: <CAOHnOryTynkFo9qhtVwfjDAnzUPjz-WipWBpaxCg0N2ARtrF6Q@mail.gmail.com>
-Subject: Re: [PATCH 3/9] KVM: arm64: Add kvm_pgtable_stage2_split()
-To: Zheng Chuan <zhengchuan@huawei.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
+Date: Mon, 6 Feb 2023 08:35:44 -0800
+Message-ID: <CAOHnOrzQz14MHtnL3_vdbKxhjM66AEBXL4ujMGn_nwfRg3D1cg@mail.gmail.com>
+Subject: Re: [PATCH 6/9] KVM: arm64: Split huge pages when dirty logging is enabled
+To: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>, pbonzini@redhat.com, oupton@google.com, 
 	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, 
 	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, 
 	andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, 
 	suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com, 
-	reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com, 
-	Xiexiangyou <xiexiangyou@huawei.com>, yezhenyu2@huawei.com
+	reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Zheng,
+Hi Marc,
 
-On Mon, Feb 6, 2023 at 1:21 AM Zheng Chuan <zhengchuan@huawei.com> wrote:
+On Tue, Jan 31, 2023 at 2:28 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Hi, Ricardo
+> On Fri, 27 Jan 2023 15:45:15 +0000,
+> Ricardo Koller <ricarkol@google.com> wrote:
+> >
+> > > The one thing that would convince me to make it an option is the
+> > > amount of memory this thing consumes. 512+ pages is a huge amount, and
+> > > I'm not overly happy about that. Why can't this be a userspace visible
+> > > option, selectable on a per VM (or memslot) basis?
+> > >
+> >
+> > It should be possible.  I am exploring a couple of ideas that could
+> > help when the hugepages are not 1G (e.g., 2M).  However, they add
+> > complexity and I'm not sure they help much.
+> >
+> > (will be using PAGE_SIZE=4K to make things simpler)
+> >
+> > This feature pre-allocates 513 pages before splitting every 1G range.
+> > For example, it converts 1G block PTEs into trees made of 513 pages.
+> > When not using this feature, the same 513 pages would be allocated,
+> > but lazily over a longer period of time.
 >
-> On 2023/1/13 11:49, Ricardo Koller wrote:
-> > Add a new stage2 function, kvm_pgtable_stage2_split(), for splitting a
-> > range of huge pages. This will be used for eager-splitting huge pages
-> > into PAGE_SIZE pages. The goal is to avoid having to split huge pages
-> > on write-protection faults, and instead use this function to do it
-> > ahead of time for large ranges (e.g., all guest memory in 1G chunks at
-> > a time).
+> This is an important difference. It avoids the upfront allocation
+> "thermal shock", giving time to the kernel to reclaim memory from
+> somewhere else. Doing it upfront means you *must* have 2MB+ of
+> immediately available memory for each GB of RAM you guest uses.
+>
 > >
-> > No functional change intended. This new function will be used in a
-> > subsequent commit.
+> > Eager-splitting pre-allocates those pages in order to split huge-pages
+> > into fully populated trees.  Which is needed in order to use FEAT_BBM
+> > and skipping the expensive TLBI broadcasts.  513 is just the number of
+> > pages needed to break a 1G huge-page.
+>
+> I understand that. But it also clear that 1GB huge pages are unlikely
+> to be THPs, and I wonder if we should treat the two differently. Using
+> HugeTLBFS pages is significant here.
+>
 > >
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h | 29 ++++++++++++
-> >  arch/arm64/kvm/hyp/pgtable.c         | 67 ++++++++++++++++++++++++++++
-> >  2 files changed, 96 insertions(+)
+> > We could optimize for smaller huge-pages, like 2M by splitting 1
+> > huge-page at a time: only preallocate one 4K page at a time.  The
+> > trick is how to know that we are splitting 2M huge-pages.  We could
+> > either get the vma pagesize or use hints from userspace.  I'm not sure
+> > that this is worth it though.  The user will most likely want to split
+> > big ranges of memory (>1G), so optimizing for smaller huge-pages only
+> > converts the left into the right:
 > >
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index 8ad78d61af7f..5fbdc1f259fd 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -644,6 +644,35 @@ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr);
-> >   */
-> >  int kvm_pgtable_stage2_flush(struct kvm_pgtable *pgt, u64 addr, u64 size);
+> > alloc 1 page            |    |  alloc 512 pages
+> > split 2M huge-page      |    |  split 2M huge-page
+> > alloc 1 page            |    |  split 2M huge-page
+> > split 2M huge-page      | => |  split 2M huge-page
+> >                         ...
+> > alloc 1 page            |    |  split 2M huge-page
+> > split 2M huge-page      |    |  split 2M huge-page
 > >
-> > +/**
-> > + * kvm_pgtable_stage2_split() - Split a range of huge pages into leaf PTEs pointing
-> > + *                           to PAGE_SIZE guest pages.
-> > + * @pgt:     Page-table structure initialised by kvm_pgtable_stage2_init*().
-> > + * @addr:    Intermediate physical address from which to split.
-> > + * @size:    Size of the range.
-> > + * @mc:              Cache of pre-allocated and zeroed memory from which to allocate
-> > + *           page-table pages.
-> > + *
-> > + * @addr and the end (@addr + @size) are effectively aligned down and up to
-> > + * the top level huge-page block size. This is an exampe using 1GB
-> > + * huge-pages and 4KB granules.
-> > + *
-> > + *                          [---input range---]
-> > + *                          :                 :
-> > + * [--1G block pte--][--1G block pte--][--1G block pte--][--1G block pte--]
-> > + *                          :                 :
-> > + *                   [--2MB--][--2MB--][--2MB--][--2MB--]
-> > + *                          :                 :
-> > + *                   [ ][ ][:][ ][ ][ ][ ][ ][:][ ][ ][ ]
-> > + *                          :                 :
-> > + *
-> > + * Return: 0 on success, negative error code on failure. Note that
-> > + * kvm_pgtable_stage2_split() is best effort: it tries to break as many
-> > + * blocks in the input range as allowed by the size of the memcache. It
-> > + * will fail it wasn't able to break any block.
-> > + */
-> > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size, void *mc);
-> > +
-> >  /**
-> >   * kvm_pgtable_walk() - Walk a page-table.
-> >   * @pgt:     Page-table structure initialised by kvm_pgtable_*_init().
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 0dee13007776..db9d1a28769b 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -1229,6 +1229,73 @@ int kvm_pgtable_stage2_create_removed(struct kvm_pgtable *pgt,
-> >       return 0;
-> >  }
-> >
-> > +struct stage2_split_data {
-> > +     struct kvm_s2_mmu               *mmu;
-> > +     void                            *memcache;
-> > +};
-> > +
-> > +static int stage2_split_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> > +                            enum kvm_pgtable_walk_flags visit)
-> > +{
-> > +     struct stage2_split_data *data = ctx->arg;
-> > +     struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-> > +     kvm_pte_t pte = ctx->old, new, *childp;
-> > +     enum kvm_pgtable_prot prot;
-> > +     void *mc = data->memcache;
-> > +     u32 level = ctx->level;
-> > +     u64 phys;
-> > +     int ret;
-> > +
-> > +     /* Nothing to split at the last level */
-> > +     if (level == KVM_PGTABLE_MAX_LEVELS - 1)
-> > +             return 0;
-> > +
-> > +     /* We only split valid block mappings */
-> > +     if (!kvm_pte_valid(pte) || kvm_pte_table(pte, ctx->level))
-> > +             return 0;
-> > +
-> IIUC, It should be !kvm_pte_table(pte, ctx->level)?
+> > Still thinking of what else to do.
+>
+> I think the 1G case fits your own use case, but I doubt this covers
+> the majority of the users. Most people rely on the kernel ability to
+> use THPs, which are capped at the first level of block mapping.
+>
+> 2MB (and 32MB for 16kB base pages) are the most likely mappings in my
+> experience (512MB with 64kB pages are vanishingly rare).
+>
+> Having to pay an upfront cost for HugeTLBFS doesn't shock me, and it
+> fits the model. For THPs, where everything is opportunistic and the
+> user not involved, this is a lot more debatable.
+>
+> This is why I'd like this behaviour to be a buy-in, either directly (a
+> first class userspace API) or indirectly (the provenance of the
+> memory).
 
-It's the other way around; if the current PTE is a table then there's
-nothing to split
-(it's already a table), and we leave early.
+This all makes sense, thanks for the explanation. I decided to implement
+something for both cases: small caches (~1 page) where the PUDs are
+split one PMD at a time, and bigger caches (>513) where the PUDs can
+be split with a single replacement. The user specifies the size of the cache
+via a capability, and size of 0 implies no eager splitting (the feature is off).
 
-> also, the kvm_pte_table includes the level check and kvm_pte_valid, so, it just be like:
-> -       /* Nothing to split at the last level */
-> -       if (level == KVM_PGTABLE_MAX_LEVELS - 1)
-> -               return 0;
-> -
-> -       /* We only split valid block mappings */
-> +       if (!kvm_pte_table(pte, ctx->level))
-> +               return 0;
-
-Still need the kvm_pte_valid() check because !kvm_pte_table() does not imply
-that the pte is valid. Same with the level check.
-
-Thanks for taking a look at the patch,
+Thanks,
 Ricardo
 
 >
-> > +     phys = kvm_pte_to_phys(pte);
-> > +     prot = kvm_pgtable_stage2_pte_prot(pte);
-> > +
-> > +     ret = kvm_pgtable_stage2_create_removed(data->mmu->pgt, &new, phys,
-> > +                                             level, prot, mc);
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     if (!stage2_try_break_pte(ctx, data->mmu)) {
-> > +             childp = kvm_pte_follow(new, mm_ops);
-> > +             kvm_pgtable_stage2_free_removed(mm_ops, childp, level);
-> > +             mm_ops->put_page(childp);
-> > +             return -EAGAIN;
-> > +     }
-> > +
-> > +     /*
-> > +      * Note, the contents of the page table are guaranteed to be
-> > +      * made visible before the new PTE is assigned because
-> > +      * stage2_make_pte() writes the PTE using smp_store_release().
-> > +      */
-> > +     stage2_make_pte(ctx, new);
-> > +     dsb(ishst);
-> > +     return 0;
-> > +}
-> > +
-> > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt,
-> > +                          u64 addr, u64 size, void *mc)
-> > +{
-> > +     struct stage2_split_data split_data = {
-> > +             .mmu            = pgt->mmu,
-> > +             .memcache       = mc,
-> > +     };
-> > +
-> > +     struct kvm_pgtable_walker walker = {
-> > +             .cb     = stage2_split_walker,
-> > +             .flags  = KVM_PGTABLE_WALK_LEAF,
-> > +             .arg    = &split_data,
-> > +     };
-> > +
-> > +     return kvm_pgtable_walk(pgt, addr, size, &walker);
-> > +}
-> > +
-> >  int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
-> >                             struct kvm_pgtable_mm_ops *mm_ops,
-> >                             enum kvm_pgtable_stage2_flags flags,
-> >
+> Thanks,
+>
+>         M.
 >
 > --
-> Regards.
-> Chuan
->
+> Without deviation from the norm, progress is not possible.
