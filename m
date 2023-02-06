@@ -1,140 +1,229 @@
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E3D7B
-	for <kvmarm@lists.linux.dev>; Mon,  6 Feb 2023 17:23:55 +0000 (UTC)
-Received: by mail-yb1-f202.google.com with SMTP id s8-20020a25aa08000000b0088fdf6f199aso3949259ybi.9
-        for <kvmarm@lists.linux.dev>; Mon, 06 Feb 2023 09:23:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xe2d5VCHL8knVkIvOOdANfJnEofFJGQpmqgs9ZySRtc=;
-        b=sbrP00/Yk9tKJfGQc4FLq70ucmYmbgy5/lzyIAHSS74GMLHYKuVcEW7frbq41WNd7X
-         O3J9Iifetr3zZa/9AgWSpTNIta3332QfCY58JHRG52qqRnCLTofCIe7Vvk+6CD5vy0tH
-         q/pPLvD9In0+0piPhUnB5gPX5M8nCI1OkVYBDfXwFXyySn2nGpsn3y+Qxe9jDa2s576B
-         tzcD+5DLiJSCgawG0L6rfscpHPOIDdvEB96UGjKAqynaNJju6eHOT/CFpjW8mVqdatcC
-         BNHbAP6Fv21oQE4k9kPEXfVZmc3lrDgDAehHqXKLQ4X1k8i7N1i+CheT9X0b3tSlsNRX
-         3N9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xe2d5VCHL8knVkIvOOdANfJnEofFJGQpmqgs9ZySRtc=;
-        b=t7aAVTneLtI6ionvadqAKlBa04KnUgzGO/MiL+6KMQWTSZTC3ZVVuazTY2uvp3e3KZ
-         tm3Cfi1hFIx5Cm5N4U7kUKnKoF7BA5j9DsisPqd/KcD+fuO6kIA2iYDocPXZXPuoOGfo
-         TMiD+Gve3PvfMDWKA9br9DQCG3Z9WbSmcfmW3L3XAuC4JvqMghT5jWKwFm8B4zpqSyQa
-         Qvca5SZNgSjjQKDXZ6E74mAzYhKagMcYWvDOTGYYthmrjE3OzBYNUlEYA0P6c5XidndY
-         TJKSGNwzWZcY6MFqMTRaqv0ffrs3TRIWAMetrv7YjXPw0rN5N5eeB47s8iigB8gscBib
-         zLmA==
-X-Gm-Message-State: AO0yUKXNxslxhOhRmlgFs7XD0CQAcqnrQtLmQQJwYnr7p7xwAXotTB5U
-	A2UzlUersz3QKlMOs4pczAGgxRp09fbI
-X-Google-Smtp-Source: AK7set/7ERS8QZmp236U3VvlNKmAF4kQJ8IiQT3dBm5M8Gtg+WXeMrtq2ewrkogC8KUiVC864iRmNaPt/E6o
-X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a05:690c:29d:b0:521:db02:1011 with SMTP id
- bf29-20020a05690c029d00b00521db021011mr0ywb.1.1675704234298; Mon, 06 Feb 2023
- 09:23:54 -0800 (PST)
-Date: Mon,  6 Feb 2023 17:23:40 +0000
-In-Reply-To: <20230206172340.2639971-1-rananta@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729C57B
+	for <kvmarm@lists.linux.dev>; Mon,  6 Feb 2023 17:34:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675704852; x=1707240852;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=E6FtT1y0csBMH/T1ALlQnJ2NG23R3sXvASuze+beOxk=;
+  b=ghOa+fsj74GWxDO+TunyD3eX7C1+LJBI2olXdXRpk3+Irjbw/4ZM59cy
+   XREfYYjJ6L104lTGjAMvrZF3jMpqm2AbNATPBTZVIAZLR1JaEPfta1c6x
+   Hd8vUlcBQdFimgmo7W1yLhRgb3l04PZyIqN43QrCyTEdZCiBAMLJfywoD
+   HMhH2Oo7jH5eun8mFhT+nimaC6wdOiAkBKUXISMyMup3smrpKIHSeJj+V
+   cfdSiMOk0esYj8bD8QEGgfnyh5UefLrrI1COL4L/jbAVfN0/4E8ZBX2jR
+   PpR/jRQzCpWTN0BFIQMs9CFEsF0B+M8oGJj58MgpXc9TK27dVjKZD2Bn/
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10613"; a="393863232"
+X-IronPort-AV: E=Sophos;i="5.97,276,1669104000"; 
+   d="scan'208";a="393863232"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2023 09:34:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10613"; a="644114477"
+X-IronPort-AV: E=Sophos;i="5.97,276,1669104000"; 
+   d="scan'208";a="644114477"
+Received: from lkp-server01.sh.intel.com (HELO 4455601a8d94) ([10.239.97.150])
+  by orsmga006.jf.intel.com with ESMTP; 06 Feb 2023 09:34:07 -0800
+Received: from kbuild by 4455601a8d94 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1pP5NX-0002hc-0q;
+	Mon, 06 Feb 2023 17:34:07 +0000
+Date: Tue, 07 Feb 2023 01:33:21 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-trace-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ intel-gfx@lists.freedesktop.org, amd-gfx@lists.freedesktop.org,
+ Linux Memory Management List <linux-mm@kvack.org>
+Subject: [linux-next:master] BUILD REGRESSION
+ 129af770823407ee115a56c69a04b440fd2fbe61
+Message-ID: <63e139e1.J5AHO6vmxaALh7xv%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230206172340.2639971-1-rananta@google.com>
-X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
-Message-ID: <20230206172340.2639971-8-rananta@google.com>
-Subject: [PATCH v2 7/7] KVM: arm64: Create a fast stage-2 unmap path
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Ricardo Koller <ricarkol@google.com>, Reiji Watanabe <reijiw@google.com>, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Jing Zhang <jingzhangos@google.com>, Colton Lewis <coltonlewis@google.com>, 
-	Raghavendra Rao Anata <rananta@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-The current implementation of the stage-2 unmap walker
-traverses the entire page-table to clear and flush the TLBs
-for each entry. This could be very expensive, especially if
-the VM is not backed by hugepages. The unmap operation could be
-made efficient by disconnecting the table at the very
-top (level at which the largest block mapping can be hosted)
-and do the rest of the unmapping using free_removed_table().
-If the system supports FEAT_TLBIRANGE, flush the entire range
-that has been disconnected from the rest of the page-table.
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: 129af770823407ee115a56c69a04b440fd2fbe61  Add linux-next specific files for 20230206
 
-Suggested-by: Ricardo Koller <ricarkol@google.com>
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- arch/arm64/kvm/hyp/pgtable.c | 44 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+Error/Warning reports:
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 0858d1fa85d6b..af3729d0971f2 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1017,6 +1017,49 @@ static int stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	return 0;
- }
- 
-+/*
-+ * The fast walker executes only if the unmap size is exactly equal to the
-+ * largest block mapping supported (i.e. at KVM_PGTABLE_MIN_BLOCK_LEVEL),
-+ * such that the underneath hierarchy at KVM_PGTABLE_MIN_BLOCK_LEVEL can
-+ * be disconnected from the rest of the page-table without the need to
-+ * traverse all the PTEs, at all the levels, and unmap each and every one
-+ * of them. The disconnected table is freed using free_removed_table().
-+ */
-+static int fast_stage2_unmap_walker(const struct kvm_pgtable_visit_ctx *ctx,
-+			       enum kvm_pgtable_walk_flags visit)
-+{
-+	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-+	kvm_pte_t *childp = kvm_pte_follow(ctx->old, mm_ops);
-+	struct kvm_s2_mmu *mmu = ctx->arg;
-+
-+	if (!kvm_pte_valid(ctx->old) || ctx->level != KVM_PGTABLE_MIN_BLOCK_LEVEL)
-+		return 0;
-+
-+	if (!stage2_try_break_pte(ctx, mmu))
-+		return -EAGAIN;
-+
-+	/*
-+	 * Gain back a reference for stage2_unmap_walker() to free
-+	 * this table entry from KVM_PGTABLE_MIN_BLOCK_LEVEL - 1.
-+	 */
-+	mm_ops->get_page(ctx->ptep);
-+
-+	mm_ops->free_removed_table(childp, ctx->level);
-+	return 0;
-+}
-+
-+static void kvm_pgtable_try_fast_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
-+{
-+	struct kvm_pgtable_walker walker = {
-+		.cb	= fast_stage2_unmap_walker,
-+		.arg	= pgt->mmu,
-+		.flags	= KVM_PGTABLE_WALK_TABLE_PRE,
-+	};
-+
-+	if (size == kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL))
-+		kvm_pgtable_walk(pgt, addr, size, &walker);
-+}
-+
- int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
- {
- 	struct kvm_pgtable_walker walker = {
-@@ -1025,6 +1068,7 @@ int kvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
- 		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
- 	};
- 
-+	kvm_pgtable_try_fast_stage2_unmap(pgt, addr, size);
- 	return kvm_pgtable_walk(pgt, addr, size, &walker);
- }
- 
+https://lore.kernel.org/oe-kbuild-all/202301230743.Xnut0Zvc-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301300743.bp7Dpazv-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301301801.y5O08tQx-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301302110.mEtNwkBD-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202302011836.kA3BxqdY-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202302061911.C7xvHX9v-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202302062223.7F7gv80M-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202302062224.ByzeTXh1-lkp@intel.com
+
+Error/Warning: (recently discovered and may have been fixed)
+
+Documentation/riscv/uabi.rst:24: WARNING: Enumerated list ends without a blank line; unexpected unindent.
+ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/fsl-edma.ko] undefined!
+ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/idma64.ko] undefined!
+FAILED: load BTF from vmlinux: No data available
+arch/arm64/kvm/arm.c:2207: warning: expecting prototype for Initialize Hyp(). Prototype was for kvm_arm_init() instead
+drivers/clk/qcom/gcc-sa8775p.c:313:32: warning: unused variable 'gcc_parent_map_10' [-Wunused-const-variable]
+drivers/clk/qcom/gcc-sa8775p.c:318:37: warning: unused variable 'gcc_parent_data_10' [-Wunused-const-variable]
+drivers/clk/qcom/gcc-sa8775p.c:333:32: warning: unused variable 'gcc_parent_map_12' [-Wunused-const-variable]
+drivers/clk/qcom/gcc-sa8775p.c:338:37: warning: unused variable 'gcc_parent_data_12' [-Wunused-const-variable]
+drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm.h:62:10: fatal error: mod_info_packet.h: No such file or directory
+drivers/gpu/drm/amd/amdgpu/../display/dc/dcn31/dcn31_hubbub.c:1011:6: warning: no previous prototype for 'hubbub31_init' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/dcn32/dcn32_hubbub.c:948:6: warning: no previous prototype for 'hubbub32_init' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/dcn32/dcn32_hubp.c:158:6: warning: no previous prototype for 'hubp32_init' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/dcn32/dcn32_resource_helpers.c:62:18: warning: variable 'cursor_bpp' set but not used [-Wunused-but-set-variable]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:148:6: warning: no previous prototype for 'link_dp_trace_set_edp_power_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:158:10: warning: no previous prototype for 'link_dp_trace_get_edp_poweron_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:163:10: warning: no previous prototype for 'link_dp_trace_get_edp_poweroff_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_capability.c:1295:32: warning: variable 'result_write_min_hblank' set but not used [-Wunused-but-set-variable]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_capability.c:279:42: warning: variable 'ds_port' set but not used [-Wunused-but-set-variable]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_training.c:1585:38: warning: variable 'result' set but not used [-Wunused-but-set-variable]
+libbpf: failed to find '.BTF' ELF section in vmlinux
+
+Unverified Error/Warning (likely false positive, please contact us if interested):
+
+drivers/thermal/qcom/tsens-v0_1.c:106:40: sparse: sparse: symbol 'tsens_9607_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:26:40: sparse: sparse: symbol 'tsens_8916_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:42:40: sparse: sparse: symbol 'tsens_8939_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:62:40: sparse: sparse: symbol 'tsens_8974_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:84:40: sparse: sparse: symbol 'tsens_8974_backup_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v1.c:24:40: sparse: sparse: symbol 'tsens_qcs404_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v1.c:45:40: sparse: sparse: symbol 'tsens_8976_nvmem' was not declared. Should it be static?
+
+Error/Warning ids grouped by kconfigs:
+
+gcc_recent_errors
+|-- alpha-randconfig-r022-20230205
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.h:fatal-error:mod_info_packet.h:No-such-file-or-directory
+|-- alpha-randconfig-s042-20230204
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.h:fatal-error:mod_info_packet.h:No-such-file-or-directory
+|-- arm64-allyesconfig
+|   |-- arch-arm64-kvm-arm.c:warning:expecting-prototype-for-Initialize-Hyp().-Prototype-was-for-kvm_arm_init()-instead
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn31-dcn31_hubbub.c:warning:no-previous-prototype-for-hubbub31_init
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn32-dcn32_hubbub.c:warning:no-previous-prototype-for-hubbub32_init
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn32-dcn32_hubp.c:warning:no-previous-prototype-for-hubp32_init
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- arm64-buildonly-randconfig-r006-20230205
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|-- arm64-randconfig-c023-20230205
+|   `-- arch-arm64-kvm-arm.c:warning:expecting-prototype-for-Initialize-Hyp().-Prototype-was-for-kvm_arm_init()-instead
+|-- arm64-randconfig-r011-20230206
+|   |-- arch-arm64-kvm-arm.c:warning:expecting-prototype-for-Initialize-Hyp().-Prototype-was-for-kvm_arm_init()-instead
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn31-dcn31_hubbub.c:warning:no-previous-prototype-for-hubbub31_init
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn32-dcn32_hubbub.c:warning:no-previous-prototype-for-hubbub32_init
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn32-dcn32_hubp.c:warning:no-previous-prototype-for-hubp32_init
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn32-dcn32_resource_helpers.c:warning:variable-cursor_bpp-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|-- arm64-randconfig-s041-20230206
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.h:fatal-error:mod_info_packet.h:No-such-file-or-directory
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8916_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8939_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8974_backup_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8974_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_9607_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v1.c:sparse:sparse:symbol-tsens_8976_nvmem-was-not-declared.-Should-it-be-static
+|   `-- drivers-thermal-qcom-tsens-v1.c:sparse:sparse:symbol-tsens_qcs404_nvmem-was-not-declared.-Should-it-be-static
+|-- i386-randconfig-m021
+|   `-- kernel-trace-trace_events_synth.c-trace_event_raw_event_synth()-warn:inconsistent-indenting
+|-- i386-randconfig-s001
+|   `-- drivers-gpu-drm-i915-gem-i915_gem_ttm.c:sparse:sparse:incorrect-type-in-assignment-(different-base-types)-expected-restricted-vm_fault_t-assigned-usertype-ret-got-int
+|-- i386-randconfig-s002
+|   `-- drivers-gpu-drm-i915-gem-i915_gem_ttm.c:sparse:sparse:incorrect-type-in-assignment-(different-base-types)-expected-restricted-vm_fault_t-assigned-usertype-ret-got-int
+|-- ia64-allmodconfig
+clang_recent_errors
+`-- riscv-randconfig-r003-20230204
+    |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_data_10
+    |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_data_12
+    |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_map_10
+    `-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_map_12
+
+elapsed time: 721m
+
+configs tested: 55
+configs skipped: 28
+
+gcc tested configs:
+powerpc                           allnoconfig
+i386                 randconfig-a011-20230206
+i386                 randconfig-a014-20230206
+x86_64                              defconfig
+i386                 randconfig-a012-20230206
+i386                 randconfig-a013-20230206
+i386                 randconfig-a015-20230206
+i386                 randconfig-a016-20230206
+x86_64               randconfig-a013-20230206
+x86_64               randconfig-a011-20230206
+x86_64                               rhel-8.3
+x86_64                            allnoconfig
+x86_64               randconfig-a012-20230206
+x86_64               randconfig-a015-20230206
+x86_64                           allyesconfig
+x86_64               randconfig-a016-20230206
+x86_64               randconfig-a014-20230206
+sh                               allmodconfig
+mips                             allyesconfig
+s390                 randconfig-r044-20230206
+arc                  randconfig-r043-20230205
+arm                  randconfig-r046-20230205
+powerpc                          allmodconfig
+mips                  maltasmvp_eva_defconfig
+riscv                randconfig-r042-20230206
+mips                    maltaup_xpa_defconfig
+arm                           sunxi_defconfig
+arm                           tegra_defconfig
+arc                  randconfig-r043-20230206
+sh                 kfr2r09-romimage_defconfig
+m68k                           virt_defconfig
+arm64                            allyesconfig
+
+clang tested configs:
+x86_64               randconfig-a001-20230206
+x86_64               randconfig-a005-20230206
+x86_64               randconfig-a002-20230206
+i386                 randconfig-a002-20230206
+x86_64               randconfig-a004-20230206
+i386                 randconfig-a004-20230206
+x86_64               randconfig-a003-20230206
+i386                 randconfig-a003-20230206
+i386                 randconfig-a001-20230206
+hexagon              randconfig-r041-20230205
+x86_64               randconfig-a006-20230206
+riscv                randconfig-r042-20230205
+i386                 randconfig-a005-20230206
+hexagon              randconfig-r045-20230206
+hexagon              randconfig-r041-20230206
+i386                 randconfig-a006-20230206
+arm                  randconfig-r046-20230206
+s390                 randconfig-r044-20230205
+hexagon              randconfig-r045-20230205
+powerpc                      acadia_defconfig
+mips                          rm200_defconfig
+arm                          sp7021_defconfig
+x86_64                        randconfig-k001
+
 -- 
-2.39.1.519.gcb327c4b5f-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
