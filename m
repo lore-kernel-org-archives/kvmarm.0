@@ -1,149 +1,57 @@
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E35517B
-	for <kvmarm@lists.linux.dev>; Mon,  6 Feb 2023 16:35:56 +0000 (UTC)
-Received: by mail-qk1-f171.google.com with SMTP id 206so2593619qkl.12
-        for <kvmarm@lists.linux.dev>; Mon, 06 Feb 2023 08:35:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=pJSM6kqcjnSPjdSGT0HvLgqZqIrYtsqkRhyhi3guF6Y=;
-        b=M8+isMLu4lCdK/uvwHfbX/fOotVlr1yruayEoQUgKnNaOGMLDziT9zDXJpoVntYJut
-         fQ6DA2ivKUK+tizCdVMVyFHkU43S+tObzACC8H6Ck3D8SxJpp/LDxVJCnY8zxwN2ioTI
-         OtVRmCVpmsqRloSdebgZ5Jp5A4s9zXmS3Gngx3PxOl0sqsr43y54olC3X6I3b0bllfbY
-         ouDtBIzfDhxy7y8LSYgYAzBfPmgwW8WwUZoQGQap18dHdLdULV9DKSGUtabZSYHhXWRl
-         yL/2NEnAg2yP8LwaDvFngm0hpLeyFyV12IsZEvE5inx1HWUE8iAUxaow5syqzRgCwfO7
-         rlLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pJSM6kqcjnSPjdSGT0HvLgqZqIrYtsqkRhyhi3guF6Y=;
-        b=QTtIABpHQhrKAXw1jUJPDgz8eHWkCnzY2fpcYG48BUmShuN4GY/MApKYwspkGMEJ9J
-         r2NXLnZMYwSMn6Y4xWF3P+RaRMOYVjuFJJx1rQm7uUirMZXSJNmpbNM45bSiWRLx5irH
-         4WBIlT7vafekTXFiDsxdBoqfWYQ+7knltf/soucQ9+k/rRMrn8HGBHHAwSFtzw176NBs
-         tZlMaqSB4FpdEOR9HQBpyGFfkOJpqsXpiz/NW/dXgIzJTkZne737ms6xIJzPNDPmbD4J
-         lmtccNOdqQV0OU+1oi5Z7nBrLMsmUXfYV8/5JHeBQajja7JjFFwrIdJz/LrzJy90vQT0
-         EyRQ==
-X-Gm-Message-State: AO0yUKWX6TfzvE2fo3ReOsDJFy53wQ3jac6wRt+RcWn2MdgwN0+4GIOh
-	91KHoz73NTqUjP58aMVDvRbLT6AYTvz4dPcNXgiZdg==
-X-Google-Smtp-Source: AK7set+s81reoHeglIfhP5y+W2Szu/NtmUcpv6g11YSkDaoDhJKIr+ZuCmsC1PlOUu+GJvolTPPl29WIZKJgLEb07bA=
-X-Received: by 2002:a05:620a:4483:b0:72b:ada6:1295 with SMTP id
- x3-20020a05620a448300b0072bada61295mr1064250qkp.211.1675701355731; Mon, 06
- Feb 2023 08:35:55 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB30F53AF
+	for <kvmarm@lists.linux.dev>; Mon,  6 Feb 2023 16:44:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA53CC433EF;
+	Mon,  6 Feb 2023 16:44:08 +0000 (UTC)
+Date: Mon, 6 Feb 2023 16:44:05 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
+	Oleg Nesterov <oleg@redhat.com>, James Morse <james.morse@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Shuah Khan <shuah@kernel.org>, Alan Hayward <alan.hayward@arm.com>,
+	Luis Machado <luis.machado@arm.com>,
+	Szabolcs Nagy <szabolcs.nagy@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 07/21] arm64/sme: Enable host kernel to access ZT0
+Message-ID: <Y+EuVbkpQJk6z+Zu@arm.com>
+References: <20221208-arm64-sme2-v4-0-f2fa0aef982f@kernel.org>
+ <20221208-arm64-sme2-v4-7-f2fa0aef982f@kernel.org>
+ <86y1pbywbb.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230113035000.480021-1-ricarkol@google.com> <20230113035000.480021-7-ricarkol@google.com>
- <Y9BfdgL+JSYCirvm@thinky-boi> <CAOHnOrysMhp_8Kdv=Pe-O8ZGDbhN5HiHWVhBv795_E6+4RAzPw@mail.gmail.com>
- <86v8ktkqfx.wl-maz@kernel.org> <CAOHnOrx-vvuZ9n8xDRmJTBCZNiqvcqURVyrEt2tDpw5bWT0qew@mail.gmail.com>
- <86h6w70zhc.wl-maz@kernel.org>
-In-Reply-To: <86h6w70zhc.wl-maz@kernel.org>
-From: Ricardo Koller <ricarkol@google.com>
-Date: Mon, 6 Feb 2023 08:35:44 -0800
-Message-ID: <CAOHnOrzQz14MHtnL3_vdbKxhjM66AEBXL4ujMGn_nwfRg3D1cg@mail.gmail.com>
-Subject: Re: [PATCH 6/9] KVM: arm64: Split huge pages when dirty logging is enabled
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, pbonzini@redhat.com, oupton@google.com, 
-	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, 
-	andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, 
-	suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com, 
-	reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86y1pbywbb.wl-maz@kernel.org>
 
-Hi Marc,
+On Mon, Feb 06, 2023 at 09:31:20AM +0000, Marc Zyngier wrote:
+> From a6c4aaccd33e453ffc8d8ea23a4dd4d9a263cc89 Mon Sep 17 00:00:00 2001
+> From: Marc Zyngier <maz@kernel.org>
+> Date: Mon, 6 Feb 2023 09:24:40 +0000
+> Subject: [PATCH] arm64/sme: Fix __finalise_el2 SMEver check
+> 
+> When checking for ID_AA64SMFR0_EL1.SMEver, __check_override assumes
+> that the ID_AA64SMFR0_EL1 value is in x1, and the intent of the code
+> is to reuse value read a few lines above.
+> 
+> However, as the comment says at the beginning of the macro, x1 will
+> be clobbered, and the checks always fails.
+> 
+> The easiest fix is just to reload the id register before checking it.
+> 
+> Fixes: f122576f3533 ("arm64/sme: Enable host kernel to access ZT0")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-On Tue, Jan 31, 2023 at 2:28 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Fri, 27 Jan 2023 15:45:15 +0000,
-> Ricardo Koller <ricarkol@google.com> wrote:
-> >
-> > > The one thing that would convince me to make it an option is the
-> > > amount of memory this thing consumes. 512+ pages is a huge amount, and
-> > > I'm not overly happy about that. Why can't this be a userspace visible
-> > > option, selectable on a per VM (or memslot) basis?
-> > >
-> >
-> > It should be possible.  I am exploring a couple of ideas that could
-> > help when the hugepages are not 1G (e.g., 2M).  However, they add
-> > complexity and I'm not sure they help much.
-> >
-> > (will be using PAGE_SIZE=4K to make things simpler)
-> >
-> > This feature pre-allocates 513 pages before splitting every 1G range.
-> > For example, it converts 1G block PTEs into trees made of 513 pages.
-> > When not using this feature, the same 513 pages would be allocated,
-> > but lazily over a longer period of time.
->
-> This is an important difference. It avoids the upfront allocation
-> "thermal shock", giving time to the kernel to reclaim memory from
-> somewhere else. Doing it upfront means you *must* have 2MB+ of
-> immediately available memory for each GB of RAM you guest uses.
->
-> >
-> > Eager-splitting pre-allocates those pages in order to split huge-pages
-> > into fully populated trees.  Which is needed in order to use FEAT_BBM
-> > and skipping the expensive TLBI broadcasts.  513 is just the number of
-> > pages needed to break a 1G huge-page.
->
-> I understand that. But it also clear that 1GB huge pages are unlikely
-> to be THPs, and I wonder if we should treat the two differently. Using
-> HugeTLBFS pages is significant here.
->
-> >
-> > We could optimize for smaller huge-pages, like 2M by splitting 1
-> > huge-page at a time: only preallocate one 4K page at a time.  The
-> > trick is how to know that we are splitting 2M huge-pages.  We could
-> > either get the vma pagesize or use hints from userspace.  I'm not sure
-> > that this is worth it though.  The user will most likely want to split
-> > big ranges of memory (>1G), so optimizing for smaller huge-pages only
-> > converts the left into the right:
-> >
-> > alloc 1 page            |    |  alloc 512 pages
-> > split 2M huge-page      |    |  split 2M huge-page
-> > alloc 1 page            |    |  split 2M huge-page
-> > split 2M huge-page      | => |  split 2M huge-page
-> >                         ...
-> > alloc 1 page            |    |  split 2M huge-page
-> > split 2M huge-page      |    |  split 2M huge-page
-> >
-> > Still thinking of what else to do.
->
-> I think the 1G case fits your own use case, but I doubt this covers
-> the majority of the users. Most people rely on the kernel ability to
-> use THPs, which are capped at the first level of block mapping.
->
-> 2MB (and 32MB for 16kB base pages) are the most likely mappings in my
-> experience (512MB with 64kB pages are vanishingly rare).
->
-> Having to pay an upfront cost for HugeTLBFS doesn't shock me, and it
-> fits the model. For THPs, where everything is opportunistic and the
-> user not involved, this is a lot more debatable.
->
-> This is why I'd like this behaviour to be a buy-in, either directly (a
-> first class userspace API) or indirectly (the provenance of the
-> memory).
+Thanks Marc. I queued it on top of the for-next/sme2 branch.
 
-This all makes sense, thanks for the explanation. I decided to implement
-something for both cases: small caches (~1 page) where the PUDs are
-split one PMD at a time, and bigger caches (>513) where the PUDs can
-be split with a single replacement. The user specifies the size of the cache
-via a capability, and size of 0 implies no eager splitting (the feature is off).
-
-Thanks,
-Ricardo
-
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+-- 
+Catalin
