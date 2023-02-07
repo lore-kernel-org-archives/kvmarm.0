@@ -1,128 +1,113 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B27182
-	for <kvmarm@lists.linux.dev>; Tue,  7 Feb 2023 00:09:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1675728595;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZgIvx9a/Uji2IqDErHvY4UDPIdQLSSPtFLzNxB0bpXM=;
-	b=FCFcrdWS2lOOKW+VAbGk0Mybk7oqga+Om1se2POztW10/iFGi4t3zvvdHEZI4QcYY4fkWB
-	g6vcXeLhx+iWm7Fn1Imh1AtZUUHyS7Qb32IW8Q4G+sYyK8kVmODke4Qqem6Q2S+fLUbGup
-	O9IVFTzC7J3A5FUhycizdFHOk9PNJgw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-539-jcP-7hMSNQCwZpi9Zc845g-1; Mon, 06 Feb 2023 19:09:49 -0500
-X-MC-Unique: jcP-7hMSNQCwZpi9Zc845g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9A1CE1869B0D;
-	Tue,  7 Feb 2023 00:09:48 +0000 (UTC)
-Received: from [10.64.54.63] (vpn2-54-63.bne.redhat.com [10.64.54.63])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 561062166B29;
-	Tue,  7 Feb 2023 00:09:42 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 6/7] KVM: arm64: Change return type of
- kvm_vm_ioctl_mte_copy_tags() to "int"
-To: Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
- kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, linuxppc-dev@lists.ozlabs.org
-References: <20230203094230.266952-1-thuth@redhat.com>
- <20230203094230.266952-7-thuth@redhat.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <c6e605fe-f251-d8b6-64ed-bd1e17e79512@redhat.com>
-Date: Tue, 7 Feb 2023 11:09:39 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD66F182
+	for <kvmarm@lists.linux.dev>; Tue,  7 Feb 2023 00:18:41 +0000 (UTC)
+Received: by mail-pj1-f42.google.com with SMTP id ge21-20020a17090b0e1500b002308aac5b5eso7078050pjb.4
+        for <kvmarm@lists.linux.dev>; Mon, 06 Feb 2023 16:18:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=x/7PdMLaXHDLj7F9Rrke1LN37FEe/EfG9IrL310L28c=;
+        b=3AJs34FF4z9joiTglEW9N708pFeB6Q1kRuQLot/tfpr7fCw6b1cL/2BJTrickstHMb
+         /7go1Unah0q3BGWipACDJirygqsIS4UtKLUh4hr2h3SWYPTzQgPkfvIBGwX1sw1uKOc7
+         J/zXzItkXOjynvnnhYLeM1IKCWP6sw6v6junt54etpXFYxkTxN/b24eeVHvKaH9Phghr
+         m7DLzDP8ygWGvjdRSYGwXETsNgK9NzzkJf9yEjMFfWctMhNX6THpDoK5sKxyN9fFwS3y
+         ON5LK+RGaatjXNqwY8uuXnFqVKd/DpMAx6MeQ1oPOqsRel2reOF2HOgjNx558shhb3sc
+         BfYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=x/7PdMLaXHDLj7F9Rrke1LN37FEe/EfG9IrL310L28c=;
+        b=m62Uo1o3FUWPIe5G2C7T9/YGNJfm4B3l4XHAeCwNi/xzcoW8OnjvQYi4/EqPZdZ9QE
+         CUHZdQZdxt+ocDTkxuLj1i6E0/QL1FyrMly2mz1ZV8sKGnHI636POIBElKli19wa0xQq
+         VU+ZJVku020udt6xnrD4AyBD1jEdQAnTgcOA3WLTEbq+cyEWOGQmoQW7vVM/eSCvq24L
+         gGp/IUupf/ULqS7m/OzGmMvwDVOT52/WSD6z6XMnATGZv816XORzU0pDb8trzT41nQXC
+         gsVQD2YZoNGxeCfCCbeaKoiyty1OtUQ9cX0/+ubVeuNLsxeoLpjDYRsMrLf9JfCHvTxr
+         350A==
+X-Gm-Message-State: AO0yUKUIaAWrIyTvq617G1+6aryr0kOLfxm6RWuEKf5yV0ML0unAyM8E
+	8WdQ/XuYO1mx/+C8H9vs7099cQ==
+X-Google-Smtp-Source: AK7set/eMsMrMib/fk7JUw8VBrW4I8GlRLeRPxf2i6pzofN+yWrUHjH/Wnz/gcV2qORq3rr54xd1PQ==
+X-Received: by 2002:a17:902:d2ce:b0:198:b284:c2ca with SMTP id n14-20020a170902d2ce00b00198b284c2camr908523plc.51.1675729121162;
+        Mon, 06 Feb 2023 16:18:41 -0800 (PST)
+Received: from ?IPV6:2400:4050:a840:1e00:4457:c267:5e09:481b? ([2400:4050:a840:1e00:4457:c267:5e09:481b])
+        by smtp.gmail.com with ESMTPSA id 12-20020a170902c24c00b00188fc6766d6sm7455321plg.219.2023.02.06.16.18.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Feb 2023 16:18:40 -0800 (PST)
+Message-ID: <264d1607-8c10-3ef7-7b8b-83b8b3a1cc11@daynix.com>
+Date: Tue, 7 Feb 2023 09:18:37 +0900
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <20230203094230.266952-7-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.0
+Subject: Re: [PATCH] KVM: arm64: Mark some VM-scoped allocations as
+ __GFP_ACCOUNT
+To: Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev,
+ Zenghui Yu <yuzenghui@huawei.com>
+References: <20230206235229.4174711-1-oliver.upton@linux.dev>
 Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <20230206235229.4174711-1-oliver.upton@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 
-Hi Thomas,
-
-On 2/3/23 8:42 PM, Thomas Huth wrote:
-> This function only returns normal integer values, so there is
-> no need to declare its return value as "long".
+On 2023/02/07 8:52, Oliver Upton wrote:
+> Generally speaking, any memory allocations that can be associated with a
+> particular VM should be charged to the cgroup of its process.
+> Nonetheless, there are a couple spots in KVM/arm64 that aren't currently
+> accounted:
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>   - the ccsidr array containing the virtualized cache hierarchy
+> 
+>   - the cpumask of supported cpus, for use of the vPMU on heterogeneous
+>     systems
+> 
+> Go ahead and set __GFP_ACCOUNT for these allocations.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->   arch/arm64/include/asm/kvm_host.h | 4 ++--
->   arch/arm64/kvm/guest.c            | 4 ++--
->   2 files changed, 4 insertions(+), 4 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 35a159d131b5..b1a16343767f 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -963,8 +963,8 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
->   int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->   			       struct kvm_device_attr *attr);
->   
-> -long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> -				struct kvm_arm_copy_mte_tags *copy_tags);
-> +int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> +			       struct kvm_arm_copy_mte_tags *copy_tags);
->   
->   /* Guest/host FPSIMD coordination helpers */
->   int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index cf4c495a4321..80e530549c34 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -1013,8 +1013,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->   	return ret;
->   }
->   
-> -long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> -				struct kvm_arm_copy_mte_tags *copy_tags)
-> +int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> +			       struct kvm_arm_copy_mte_tags *copy_tags)
->   {
->   	gpa_t guest_ipa = copy_tags->guest_ipa;
->   	size_t length = copy_tags->length;
+>   Applies to github.com/oupton/linux kvm-arm64/virtual-cache-geometry
 > 
+>   arch/arm64/kvm/arm.c      | 2 +-
+>   arch/arm64/kvm/sys_regs.c | 2 +-
+>   2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 9c5573bc4614..3619f1e472f5 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -146,7 +146,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>   	if (ret)
+>   		goto err_unshare_kvm;
+>   
+> -	if (!zalloc_cpumask_var(&kvm->arch.supported_cpus, GFP_KERNEL)) {
+> +	if (!zalloc_cpumask_var(&kvm->arch.supported_cpus, GFP_KERNEL_ACCOUNT)) {
+>   		ret = -ENOMEM;
+>   		goto err_unshare_kvm;
+>   	}
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 6a742af8010f..5dc13d02721e 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -160,7 +160,7 @@ static int set_ccsidr(struct kvm_vcpu *vcpu, u32 csselr, u32 val)
+>   		if (val == get_ccsidr(vcpu, csselr))
+>   			return 0;
+>   
+> -		ccsidr = kmalloc_array(CSSELR_MAX, sizeof(u32), GFP_KERNEL);
+> +		ccsidr = kmalloc_array(CSSELR_MAX, sizeof(u32), GFP_KERNEL_ACCOUNT);
+>   		if (!ccsidr)
+>   			return -ENOMEM;
+>   
 
-It's possible for the function to return number of bytes have been copied.
-Its type is 'size_t', same to 'unsigned long'. So 'int' doesn't have sufficient
-space for it if I'm correct.
-
-long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-                                 struct kvm_arm_copy_mte_tags *copy_tags)
-{
-         gpa_t guest_ipa = copy_tags->guest_ipa;
-         size_t length = copy_tags->length;
-         :
-         :
-out:
-         mutex_unlock(&kvm->slots_lock);
-         /* If some data has been copied report the number of bytes copied */
-         if (length != copy_tags->length)
-                 return copy_tags->length - length;
-         return ret;
-}
-
-Thanks,
-Gavin
-
+Reviewed-by: Akihiko Odaki <akihiko.odaki@daynix.com>
