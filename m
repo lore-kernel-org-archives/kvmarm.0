@@ -1,129 +1,145 @@
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8F22101
-	for <kvmarm@lists.linux.dev>; Tue,  7 Feb 2023 10:39:53 +0000 (UTC)
-Received: by mail-wr1-f43.google.com with SMTP id g6so5099064wrv.1
-        for <kvmarm@lists.linux.dev>; Tue, 07 Feb 2023 02:39:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ezuf8zIGtjTbwprIBH3RkeiO7eWB8R8vQxUpLhGnoGw=;
-        b=xUgt49eDesXWBFfzjD7n4TFdFOPbhMqmAkmaDcQH1O33LN7B2lcB7F1wc4hYi3wmv1
-         r2hEgVKt/oPCqgxpok1UG2a0ILNWdzHuypas15hOUaPavVxoc6ea7c757XOj7HTgh72S
-         SmzjrczVxPKuzed5ze9dxd6V65pu9+h88/y/cb558ytu5qjDB3sp8PWJ3f0xJ9ha5PoJ
-         vRED/uIoGf3O3sYnGYRWy0aXnDYNOfJzjQKTK/Tj9AwqXAfmokk6dcuWJeJGFgpneV/y
-         gxrskFJsHWVoQwdjj0VD0pYzcmP+cVivQO5tZnPknSFZbcsDxbpR9drG7X5LP2UPL2K/
-         3h3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ezuf8zIGtjTbwprIBH3RkeiO7eWB8R8vQxUpLhGnoGw=;
-        b=ubM0/DEhhPe8W6zWOTYsJHkO2Kw5N4DIZc3j6GjwCRmev3S42fWNq/JFdlYKdueZsQ
-         7yl3fCIx2AJPHRJJNeY5Ev/fPMkxkRWQqU7jqN1trxcGVvIyTWll1NRBbEZvi5ZtRj+s
-         fv52ErActQ4xTywlPF3URxP5VqSCGspSPzkalhtk42XoFNMy7hnT1uSX/nM3rzHa9Jr4
-         RFNUWAv1WAS89OW/gQRU0tiewbNQ4f0lXL06MEw2xlxVevaq2gTizLD8i8LsrBBhxix9
-         SGvbzvreRI059lNPsu6d8w4yMsfgPB0SchgO4qmvJPJH8SxqBeZsikshq6bakZryzfTu
-         qXFA==
-X-Gm-Message-State: AO0yUKVlXKqiZf/IO/MkIzJuQUEsNdJuHwDNYCFcc4jxioLT6bFvK1Ze
-	BPY7MNuPf/uA+Ae2AumvkPW94Q==
-X-Google-Smtp-Source: AK7set8URL8FZwsSiW+sDnFANc5QHMcYb6CW6VXqlAe361UtKx/EnW5TcnLZYj/p4W5+PO6ACStkBw==
-X-Received: by 2002:adf:f712:0:b0:2bf:b281:1bbb with SMTP id r18-20020adff712000000b002bfb2811bbbmr2244453wrp.36.1675766391394;
-        Tue, 07 Feb 2023 02:39:51 -0800 (PST)
-Received: from myrica (054592b0.skybroadband.com. [5.69.146.176])
-        by smtp.gmail.com with ESMTPSA id l5-20020adfe585000000b002c3e3ee7d1asm6290379wrm.79.2023.02.07.02.39.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Feb 2023 02:39:51 -0800 (PST)
-Date: Tue, 7 Feb 2023 10:39:46 +0000
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: "tina.zhang" <tina.zhang@intel.com>
-Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
-	joro@8bytes.org, robin.murphy@arm.com, james.morse@arm.com,
-	suzuki.poulose@arm.com, oliver.upton@linux.dev,
-	yuzenghui@huawei.com, smostafa@google.com, dbrazdil@google.com,
-	ryan.roberts@arm.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev
-Subject: Re: [RFC PATCH 15/45] KVM: arm64: pkvm: Add
- __pkvm_host_share/unshare_dma()
-Message-ID: <Y+Iqcm3Do00Jj6vb@myrica>
-References: <20230201125328.2186498-1-jean-philippe@linaro.org>
- <20230201125328.2186498-16-jean-philippe@linaro.org>
- <dec54922-37cf-89df-477e-eed1e9461db3@intel.com>
- <Y+Du0fZetGVdPVW2@myrica>
- <c06440b2-1ce6-b2c2-59b7-6ccdfd8b5ab4@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB2420FC;
+	Tue,  7 Feb 2023 11:23:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC5D8C433D2;
+	Tue,  7 Feb 2023 11:23:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1675769023;
+	bh=3ODqaHBZp5FJ22eMEpdVmf5CP3x7xF2WSgLTgVHOmlM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iSpHwSAeY4ZzLuVXGHdbTfKlE2wIuw6Pe+OwOVybmGLbecytzJUeBRzZK0hqyG4MR
+	 Y5VuFx5KV6yuy6orKAmWmIIBl+5UdbMlzNUvqtG2GsTm7Oto87hB6Fi45Cowvelyj9
+	 9IVVLLszQ7gDFSYn3VdXCIYWPxZJIbUmwXwRYLK5POPVSB9alI3mauLkiqJY7FCgRL
+	 0wQPRN1V1nAMobXMMsrv2vIxONuHECBC2VVm57o1QZbajZr+hRPuuxvjx4AI/D7Fzb
+	 TlsDR08XaeKhYHKpPGPXHEx00C5zXz8tPjppXSkKTapQA6MZXz/emapV1Sjs7mg9Hu
+	 Rwccvkc4286NQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pPM4a-008J4O-KK;
+	Tue, 07 Feb 2023 11:23:40 +0000
+Date: Tue, 07 Feb 2023 11:23:40 +0000
+Message-ID: <86sffhzpkz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: James Morse <james.morse@arm.com>,
+	linux-pm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-acpi@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	linux-ia64@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	x86@kernel.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Borislav Petkov <bp@alien8.de>,
+	H Peter Anvin <hpa@zytor.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Len Brown <lenb@kernel.org>,
+	Rafael Wysocki <rafael@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>
+Subject: Re: [RFC PATCH 29/32] KVM: arm64: Pass hypercalls to userspace
+In-Reply-To: <985abd9c-b3f9-3f9d-eec7-df1f26733762@arm.com>
+References: <20230203135043.409192-1-james.morse@arm.com>
+	<20230203135043.409192-30-james.morse@arm.com>
+	<865ycg1kv2.wl-maz@kernel.org>
+	<cffde8a1-74e4-9b61-1eea-544ba3405ed4@arm.com>
+	<86wn4vynyr.wl-maz@kernel.org>
+	<985abd9c-b3f9-3f9d-eec7-df1f26733762@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c06440b2-1ce6-b2c2-59b7-6ccdfd8b5ab4@intel.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, james.morse@arm.com, linux-pm@vger.kernel.org, loongarch@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, tglx@linutronix.de, lpieralisi@kernel.org, mark.rutland@arm.com, sudeep.holla@arm.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com, will@kernel.org, catalin.marinas@arm.com, chenhuacai@kernel.org, oliver.upton@linux.dev, lenb@kernel.org, rafael@kernel.org, kernel@xen0n.name, salil.mehta@huawei.com, linux@armlinux.org.uk, jean-philippe@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Feb 07, 2023 at 10:37:51AM +0800, tina.zhang wrote:
-> Hi Jean,
+On Tue, 07 Feb 2023 09:41:54 +0000,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > 
-> On 2/6/23 20:13, Jean-Philippe Brucker wrote:
-> > Hi Tina,
+> Hi Marc,
+> 
+> On 06/02/2023 12:31, Marc Zyngier wrote:
+> > On Mon, 06 Feb 2023 10:10:41 +0000,
+> > Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+> >> 
+> >> This may not be always possible, e.g., for Realms. GET_ONE_REG is
+> >> not supported. So using an explicit passing down of the args is
+> >> preferrable.
 > > 
-> > On Sat, Feb 04, 2023 at 08:51:38PM +0800, tina.zhang wrote:
-> > > > +int __pkvm_host_share_dma(phys_addr_t phys_addr, size_t size, bool is_ram)
-> > > > +{
-> > > > +	int i;
-> > > > +	int ret;
-> > > > +	size_t nr_pages = size >> PAGE_SHIFT;
-> > > > +
-> > > > +	if (WARN_ON(!PAGE_ALIGNED(phys_addr | size)))
-> > > > +		return -EINVAL;
-> > > > +
-> > > > +	host_lock_component();
-> > > > +	hyp_lock_component();
-> > > > +
-> > > > +	for (i = 0; i < nr_pages; i++) {
-> > > > +		ret = __pkvm_host_share_dma_page(phys_addr + i * PAGE_SIZE,
-> > > > +						 is_ram);
-> > > Hi Jean,
-> > > 
-> > > I'm not familiar with ARM arch. Just out of curiosity. If pKVM-ARM populates
-> > > the host stage-2 page table lazily, would there be a case that device driver
-> > > in host triggers DMA with pages which have not been mapped to the host
-> > > stage-2 page table yet? How do we handle this situation?
+> > What is the blocker for CCA to use GET_ONE_REG? The value obviously
+> > exists and is made available to the host. pKVM is perfectly able to
+> > use GET_ONE_REG and gets a bunch of zeroes for things that the
+> > hypervisor has decided to hide from the host.
 > > 
-> > It's possible that the host asks the hypervisor to map on the IOMMU side
-> > a page that is not yet mapped on the CPU side. In general before calling
-> > map_pages() the host zero-initializes the page, triggering a page fault
-> > which creates the mapping, so this case is rare. But if it happens,
-> > __pkvm_host_share_dma() will create the CPU stage-2 mapping:
-> > 
-> >   __pkvm_host_share_dma()
-> >    do_share()
-> >     host_initiate_share()
-> >      host_stage2_idmap_locked()
-> > 
-> > which creates a valid identity mapping, along with the ownership
-> > information PVKM_PAGE_SHARED_OWNED. That ownership info is really all we
-> > need here, to prevent future donations to guests or hyp. Since the SMMU
-> > side uses separate stage-2 page tables, we don't actually need to create a
-> > valid mapping on the CPU side yet, that's just how pKVM's mem_protect
-> > currently works. But I don't think it hurts to create the mapping right
-> > away instead of waiting for the CPU page fault, because the host will
-> > likely access the page soon to read what the device wrote there.
-> Right. I was thinking if stage-2 lazy mapping method is being adopted,
-> whether there would be a case that the check_share() couldn't pass, as the
-> pte might not be valid at that time. After checking the logic, I see we
-> check kvm_pte_valid(pte) as well as the value of pte. So I guess the
-> check_share() can return successfully even w/o having triggered host CPU
-> page fault.
+> 
+> It is not impossible. On a "HOST CALL" (explicit calls to the Host
+> from Realm), the GPRs are made available to the host and can be
+> stashed into the vcpu reg state and the request can be
+> serviced. However, it is a bit odd, to make this exception - "the
+> GET_ONE_REG is valid now", while in almost all other cases it is
+> invalid (exception of MMIO).
 
-Yes, during check_share(), host_get_page_state() allows disabled PTE
-unless the PTE already contains ownership information (in particular, if
-the page has been donated to a guest or to the hypervisor, the PTE is
-invalid and contains the non-zero owner ID.)
+But that's an RMM decision. If the RMM decides to forward the
+hypercall to the host (irrespective of the potential forwarding to
+userspace), it makes the GPRs available.
+
+If the hypercall is forwarded to userspace, then the host is
+responsible to check with the RMM that it will be willing to provide
+the required information (passed as GPRs or not).
+
+> Of course we could always return what is stashed in the vcpu state,
+> which is may be invalid/ 0. But given the construct of "host doesn't
+> have access to the register state", it may be a good idea to say,
+> request always fails, to indicate that the Host is probably doing
+> something wrong, than silently passing on incorrect information.
+
+I disagree. Either you fail at the delegation point, or you don't. On
+getting a hypercall exit to userspace, you are guaranteed that the
+GPRs are valid.
+
+> > Of course, it requires that the hypervisor (the RMM in your case)
+> > knows about the semantics of the hypercall, but that's obviously
+> 
+> RMM doesn't care about the semantics of hypercall, other than
+> considering it just like an SMCCC compliant call. The hypercall
+> arguments/results are passed down/up by the Realm in a separate
+> structure.
+
+That's because the RMM doesn't use registers to pass the data. But at
+the end of the day, this is the same thing. The host gets the data
+from the RMM, stashes it in the GPRs, and exit to userspace.
+
+The important thing here is that GET_ONE_REG is valid in the context
+where it matters. If the VMM tries to use it outside of the context of
+a hypercall, it gets junk. It's not a bug, it's a feature.
 
 Thanks,
-Jean
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
