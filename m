@@ -1,107 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9AFBD33
-	for <kvmarm@lists.linux.dev>; Tue,  7 Feb 2023 14:56:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4056BC4339B;
-	Tue,  7 Feb 2023 14:56:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675781812;
-	bh=fk+5VsNRPv8WZZS1NH04wxVwjAGJtruHmvu1fbvRLSQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i3t5Cw8mdHW1zAVBWvpSBLbDIeVSzDt5XTsX8n7CgwfD0pYQ3vzvnBNgzS27QEuG3
-	 qZdvS+c97/hQvHupN6EH05Z9yYe9x3pBnayWdRyCfctVReeydoHPL71nZ154t8Ccce
-	 zLDaXfG7HVfylnFplvR5bSdWQ+rPO/BEP+WeJfeku+IeyUFJxa1Rm1FhYpLoHqUHgP
-	 ZjUvw9OW2JNz0JENKGhQ530bcvis889jN7rNwhuCEvxr2Rfpzulfn4acM1phkHfZEU
-	 NeRlf+/vi82NeJq6G3X9OVocaFLHCATHNhjohvyflJci/gF4mgyo6xGy9DdPuj1RJx
-	 dKrr1W3D4xoQw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pPPOr-008OSf-Sd;
-	Tue, 07 Feb 2023 14:56:49 +0000
-Date: Tue, 07 Feb 2023 14:56:49 +0000
-Message-ID: <86r0v1zfpq.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: James Morse <james.morse@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Quentin Perret <qperret@google.com>,
-	Will Deacon <will@kernel.org>,
-	Reiji Watanabe <reijiw@google.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 3/5] KVM: arm64: Only return attributes from stage2_update_leaf_attrs()
-In-Reply-To: <Y9w0ZYVXRgpTKuFD@google.com>
-References: <20230111000300.2034799-1-oliver.upton@linux.dev>
-	<20230111000300.2034799-4-oliver.upton@linux.dev>
-	<87ilhde9me.wl-maz@kernel.org>
-	<Y77wCeSYo7POSs3z@google.com>
-	<Y9w0ZYVXRgpTKuFD@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59C9F4439
+	for <kvmarm@lists.linux.dev>; Tue,  7 Feb 2023 15:36:44 +0000 (UTC)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 317FHYDG029274;
+	Tue, 7 Feb 2023 15:36:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=1THnRWeDL5EycU0KSF5rNw1gmtsHkkvviicj+5+IlfI=;
+ b=gOZf7ZXZ8dplyODS3aGlH+TLt485eAuYKKaAAXObqznZqnA006AKZCcN5KKkN/rNhxW6
+ 5THM8sU8hL2sr76rhF/wy0B0fPRbkIvFfraAem5qXSr0em4emDNG2alSu3aUueWaVO2N
+ OnJMf1VQpmAwrlLIu8ocx/5Fx1uVWG4Jp2DYdPXCcB1uXLubA8aL36PHEuWXVyrdDfpk
+ JtF57C3dXxFUUPG+dBna1WxARpnp9phG/YauTJkSKZmlmK/TeUWpx3t3dSJzYug8fzPu
+ L6a4j26d9HkRy4aXq9qnPAOMQ+2s1wzcuDPeW2/eCcWK8YoCvp6wFl7cMEG+dL3jtTkx bw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nks5f8hka-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 Feb 2023 15:36:16 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 317FJQdM005425;
+	Tue, 7 Feb 2023 15:36:16 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nks5f8hhu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 Feb 2023 15:36:15 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+	by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3172fI09017256;
+	Tue, 7 Feb 2023 15:36:13 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3nhf06tpa9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 Feb 2023 15:36:13 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 317Fa9UW15925584
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 7 Feb 2023 15:36:09 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CB11F20063;
+	Tue,  7 Feb 2023 15:36:09 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6D21A2004B;
+	Tue,  7 Feb 2023 15:36:09 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  7 Feb 2023 15:36:09 +0000 (GMT)
+Date: Tue, 7 Feb 2023 16:36:07 +0100
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean
+ Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        Marc Zyngier
+ <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose
+ <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu
+ <yuzenghui@huawei.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand
+ <david@redhat.com>, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH 5/7] KVM: s390: Use "int" as return type for
+ kvm_s390_get/set_skeys()
+Message-ID: <20230207163607.4cf6739c@p-imbrenda>
+In-Reply-To: <20230203094230.266952-6-thuth@redhat.com>
+References: <20230203094230.266952-1-thuth@redhat.com>
+	<20230203094230.266952-6-thuth@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, james.morse@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, qperret@google.com, will@kernel.org, reijiw@google.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: h1QNOgTrAn4DjVcRnfzpjxJfKWNrvq6W
+X-Proofpoint-GUID: 90LiL_K4VkqoTHGkM7gQCTWyDwGtHxR-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-07_07,2023-02-06_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ bulkscore=0 spamscore=0 lowpriorityscore=0 adultscore=0 suspectscore=0
+ mlxlogscore=999 phishscore=0 clxscore=1011 priorityscore=1501
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302070138
 
-On Thu, 02 Feb 2023 22:08:37 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Fri,  3 Feb 2023 10:42:28 +0100
+Thomas Huth <thuth@redhat.com> wrote:
+
+> These two functions only return normal integers, so it does not
+> make sense to declare the return type as "long" here.
 > 
-> On Wed, Jan 11, 2023 at 05:21:13PM +0000, Oliver Upton wrote:
-> > Hey Marc,
-> > 
-> > On Wed, Jan 11, 2023 at 08:52:25AM +0000, Marc Zyngier wrote:
-> > > [+ Suzuki and Zenghui who are missing from the Cc list]
-> > 
-> > Doh! Just switched over to working out of a new git tree and didn't move
-> > over my cc-cmd. Apologies to you two.
-> > 
-> > > On Wed, 11 Jan 2023 00:02:58 +0000,
-> > > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > > 
-> > > > Returning a single PTE from stage2_update_leaf_attrs() doesn't make a
-> > > > great deal of sense given that the function could be used to apply a
-> > > > change to a range of PTEs. Instead, return a bitwise OR of attributes
-> > > > from all the visited PTEs.
-> > > 
-> > > I find this amalgamation of attributes quite confusing, and I have a
-> > > hard time attaching semantics to the resulting collection of bits.
-> > > 
-> > > It also means that you cannot reason about a particular attribute
-> > > being 0 if any of the neighbour PTEs has this bit set.
-> > 
-> > Very true. What I had really wanted to do was make a walker that allows
-> > software to check the state of specific attribute bit(s) within a range
-> > of memory instead of returning all of them. I decided against it because
-> > it would put more churn on other callers or require a new walker
-> > entirely.
-> > 
-> > Anyway, I can go about that change to make this a bit easier to reason
-> > about. Thoughts?
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  arch/s390/kvm/kvm-s390.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> LOL, I thought I hadn't replied which is why I didn't hear anything
-> back. Ball is in your court, Marc, any thoughts?
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index e4890e04b210..8ad1972b8a73 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -1992,7 +1992,7 @@ static int kvm_s390_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+>  	return ret;
+>  }
+>  
+> -static long kvm_s390_get_skeys(struct kvm *kvm, struct kvm_s390_skeys *args)
+> +static int kvm_s390_get_skeys(struct kvm *kvm, struct kvm_s390_skeys *args)
+>  {
+>  	uint8_t *keys;
+>  	uint64_t hva;
+> @@ -2040,7 +2040,7 @@ static long kvm_s390_get_skeys(struct kvm *kvm, struct kvm_s390_skeys *args)
+>  	return r;
+>  }
+>  
+> -static long kvm_s390_set_skeys(struct kvm *kvm, struct kvm_s390_skeys *args)
+> +static int kvm_s390_set_skeys(struct kvm *kvm, struct kvm_s390_skeys *args)
+>  {
+>  	uint8_t *keys;
+>  	uint64_t hva;
 
-Huh, I clearly missed that email. Sorry about the delay.
-
-Having a separate walker doesn't strike me as unreasonable. This
-clearly is something different from the existing walkers, and it is
-bound to be very little code anyway.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
