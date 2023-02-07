@@ -1,130 +1,268 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD3137468;
-	Tue,  7 Feb 2023 17:51:16 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B6F651762;
-	Tue,  7 Feb 2023 09:51:58 -0800 (PST)
-Received: from [10.1.196.177] (eglon.cambridge.arm.com [10.1.196.177])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BDD593FA32;
-	Tue,  7 Feb 2023 09:51:11 -0800 (PST)
-Message-ID: <7462738f-e837-cd99-f441-8e7c29d250cd@arm.com>
-Date: Tue, 7 Feb 2023 17:50:58 +0000
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDE77470
+	for <kvmarm@lists.linux.dev>; Tue,  7 Feb 2023 18:18:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675793927; x=1707329927;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=zwoDr1wPKNYQiCl8mRwM1UPgx4ddKwyU+8/uwG8BezI=;
+  b=Z2GJ6J049nbjy91fcovMjraVgAIIpZaYwqzrTeo3RHRnOqllQtjL39PT
+   6lsgBiModWihnSw34bKReP/CjB6V9yTH/bwX0MCQK8ntFAbvAappuYyLM
+   pvLWTiasWcm5p7cWeTY65jA6Q2pER0W+4DG8LZ9XRGDreaPi5gfPq6Wdy
+   sKEzE4R7db97bUx3h+cX4MWc5pWiNvbwElRZNCckygfz0uMal8xzkZdF3
+   fiB3IsELkSybSm6O/B22OTqW9DhG7OF6FYi6Y0yTIQeI2Jo7IG0Ll/4gh
+   TP9WDXuG0Y5myz3wvWAPrOZyE8LZ1tkg2DoKThDa6Ju+RCVUTuLkcwk4E
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10614"; a="391983045"
+X-IronPort-AV: E=Sophos;i="5.97,278,1669104000"; 
+   d="scan'208";a="391983045"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2023 10:18:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10614"; a="730547125"
+X-IronPort-AV: E=Sophos;i="5.97,278,1669104000"; 
+   d="scan'208";a="730547125"
+Received: from lkp-server01.sh.intel.com (HELO 4455601a8d94) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 07 Feb 2023 10:18:26 -0800
+Received: from kbuild by 4455601a8d94 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1pPSXx-0003li-1E;
+	Tue, 07 Feb 2023 18:18:25 +0000
+Date: Wed, 08 Feb 2023 02:18:24 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-usb@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-media@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+ amd-gfx@lists.freedesktop.org, alsa-devel@alsa-project.org,
+ Linux Memory Management List <linux-mm@kvack.org>
+Subject: [linux-next:master] BUILD REGRESSION
+ 49a8133221c71b935f36a7c340c0271c2a9ee2db
+Message-ID: <63e295f0.u1bD0VjqG0iQsm1w%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [RFC PATCH 29/32] KVM: arm64: Pass hypercalls to userspace
-Content-Language: en-GB
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-pm@vger.kernel.org, loongarch@lists.linux.dev,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-acpi@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Sudeep Holla <sudeep.holla@arm.com>,
- Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Huacai Chen <chenhuacai@kernel.org>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Len Brown <lenb@kernel.org>,
- Rafael Wysocki <rafael@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
- Salil Mehta <salil.mehta@huawei.com>, Russell King <linux@armlinux.org.uk>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20230203135043.409192-1-james.morse@arm.com>
- <20230203135043.409192-30-james.morse@arm.com> <865ycg1kv2.wl-maz@kernel.org>
-From: James Morse <james.morse@arm.com>
-In-Reply-To: <865ycg1kv2.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-Hi Marc,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: 49a8133221c71b935f36a7c340c0271c2a9ee2db  Add linux-next specific files for 20230207
 
-On 05/02/2023 10:12, Marc Zyngier wrote:
-> On Fri, 03 Feb 2023 13:50:40 +0000,
-> James Morse <james.morse@arm.com> wrote:
->>
->> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
->>
->> When capability KVM_CAP_ARM_HVC_TO_USER is available, userspace can
->> request to handle all hypercalls that aren't handled by KVM. With the
->> help of another capability, this will allow userspace to handle PSCI
->> calls.
+Error/Warning reports:
 
-> On top of Oliver's ask not to make this a blanket "steal everything",
-> but instead to have an actual request for ranges of forwarded
-> hypercalls:
-> 
->> Notes on this implementation:
->>
->> * A similar mechanism was proposed for SDEI some time ago [1]. This RFC
->>   generalizes the idea to all hypercalls, since that was suggested on
->>   the list [2, 3].
->>
->> * We're reusing kvm_run.hypercall. I copied x0-x5 into
->>   kvm_run.hypercall.args[] to help userspace but I'm tempted to remove
->>   this, because:
->>   - Most user handlers will need to write results back into the
->>     registers (x0-x3 for SMCCC), so if we keep this shortcut we should
->>     go all the way and read them back on return to kernel.
->>   - QEMU doesn't care about this shortcut, it pulls all vcpu regs before
->>     handling the call.
->>   - SMCCC uses x0-x16 for parameters.
->>   x0 does contain the SMCCC function ID and may be useful for fast
->>   dispatch, we could keep that plus the immediate number.
->>
->> * Add a flag in the kvm_run.hypercall telling whether this is HVC or
->>   SMC?  Can be added later in those bottom longmode and pad fields.
+https://lore.kernel.org/oe-kbuild-all/202301230743.Xnut0Zvc-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301300743.bp7Dpazv-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301301801.y5O08tQx-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301302110.mEtNwkBD-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202301310939.TAgCOEZb-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202302011836.kA3BxqdY-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202302061911.C7xvHX9v-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202302062224.ByzeTXh1-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202302072055.odjDVd5V-lkp@intel.com
 
-> We definitely need this. A nested hypervisor can (and does) use SMCs
-> as the conduit.
+Error/Warning: (recently discovered and may have been fixed)
 
-Christoffer's comments last time round on this was that EL2 guests get SMC with this,
-and EL1 guests get HVC. The VMM could never get both...
+Documentation/riscv/uabi.rst:24: WARNING: Enumerated list ends without a blank line; unexpected unindent.
+ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/fsl-edma.ko] undefined!
+ERROR: modpost: "devm_platform_ioremap_resource" [drivers/dma/idma64.ko] undefined!
+FAILED: load BTF from vmlinux: No data available
+arch/arm64/kvm/arm.c:2207: warning: expecting prototype for Initialize Hyp(). Prototype was for kvm_arm_init() instead
+drivers/clk/qcom/gcc-sa8775p.c:313:32: warning: unused variable 'gcc_parent_map_10' [-Wunused-const-variable]
+drivers/clk/qcom/gcc-sa8775p.c:318:37: warning: unused variable 'gcc_parent_data_10' [-Wunused-const-variable]
+drivers/clk/qcom/gcc-sa8775p.c:333:32: warning: unused variable 'gcc_parent_map_12' [-Wunused-const-variable]
+drivers/clk/qcom/gcc-sa8775p.c:338:37: warning: unused variable 'gcc_parent_data_12' [-Wunused-const-variable]
+drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm.h:62:10: fatal error: mod_info_packet.h: No such file or directory
+drivers/gpu/drm/amd/amdgpu/../display/dc/dcn31/dcn31_hubbub.c:1011:6: warning: no previous prototype for 'hubbub31_init' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/dcn32/dcn32_hubbub.c:948:6: warning: no previous prototype for 'hubbub32_init' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/dcn32/dcn32_hubp.c:158:6: warning: no previous prototype for 'hubp32_init' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/dcn32/dcn32_resource_helpers.c:62:18: warning: variable 'cursor_bpp' set but not used [-Wunused-but-set-variable]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:148:6: warning: no previous prototype for 'link_dp_trace_set_edp_power_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:158:10: warning: no previous prototype for 'link_dp_trace_get_edp_poweron_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/accessories/link_dp_trace.c:163:10: warning: no previous prototype for 'link_dp_trace_get_edp_poweroff_timestamp' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_capability.c:1295:32: warning: variable 'result_write_min_hblank' set but not used [-Wunused-but-set-variable]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_capability.c:279:42: warning: variable 'ds_port' set but not used [-Wunused-but-set-variable]
+drivers/gpu/drm/amd/amdgpu/../display/dc/link/protocols/link_dp_training.c:1585:38: warning: variable 'result' set but not used [-Wunused-but-set-variable]
+ftrace-ops.c:(.init.text+0x2c3): undefined reference to `__udivdi3'
+libbpf: failed to find '.BTF' ELF section in vmlinux
 
+Unverified Error/Warning (likely false positive, please contact us if interested):
 
-> The question is whether they represent two distinct
-> namespaces or not. I *think* we can unify them, but someone should
-> check and maybe get clarification from the owners of the SMCCC spec.
+drivers/media/i2c/max9286.c:802 max9286_s_stream() error: buffer overflow 'priv->fmt' 4 <= 32
+drivers/thermal/qcom/tsens-v0_1.c:106:40: sparse: sparse: symbol 'tsens_9607_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:26:40: sparse: sparse: symbol 'tsens_8916_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:42:40: sparse: sparse: symbol 'tsens_8939_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:62:40: sparse: sparse: symbol 'tsens_8974_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v0_1.c:84:40: sparse: sparse: symbol 'tsens_8974_backup_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v1.c:24:40: sparse: sparse: symbol 'tsens_qcs404_nvmem' was not declared. Should it be static?
+drivers/thermal/qcom/tsens-v1.c:45:40: sparse: sparse: symbol 'tsens_8976_nvmem' was not declared. Should it be static?
+drivers/usb/gadget/composite.c:2082:33: sparse: sparse: restricted __le16 degrades to integer
+sound/firewire/amdtp-stream.c:1187 process_rx_packets() error: uninitialized symbol 'curr_cycle_time'.
 
-i.e. the VMM requests 0xC400_0000:0xC400_001F regardless of SMC/HVC?
+Error/Warning ids grouped by kconfigs:
 
-I don't yet see how a VMM could get HVC out of a virtual-EL2 guest....
+gcc_recent_errors
+|-- alpha-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- arc-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- arm-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- arm64-allyesconfig
+|   |-- arch-arm64-kvm-arm.c:warning:expecting-prototype-for-Initialize-Hyp().-Prototype-was-for-kvm_arm_init()-instead
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn31-dcn31_hubbub.c:warning:no-previous-prototype-for-hubbub31_init
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn32-dcn32_hubbub.c:warning:no-previous-prototype-for-hubbub32_init
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn32-dcn32_hubp.c:warning:no-previous-prototype-for-hubp32_init
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn32-dcn32_resource_helpers.c:warning:variable-cursor_bpp-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_training.c:warning:variable-result-set-but-not-used
+|-- arm64-randconfig-c023-20230205
+|   `-- arch-arm64-kvm-arm.c:warning:expecting-prototype-for-Initialize-Hyp().-Prototype-was-for-kvm_arm_init()-instead
+|-- arm64-randconfig-s042-20230205
+|   |-- arch-arm64-kvm-arm.c:warning:expecting-prototype-for-Initialize-Hyp().-Prototype-was-for-kvm_arm_init()-instead
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn31-dcn31_hubbub.c:warning:no-previous-prototype-for-hubbub31_init
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn32-dcn32_hubbub.c:warning:no-previous-prototype-for-hubbub32_init
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn32-dcn32_hubp.c:warning:no-previous-prototype-for-hubp32_init
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn32-dcn32_resource_helpers.c:warning:variable-cursor_bpp-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweroff_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_get_edp_poweron_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-accessories-link_dp_trace.c:warning:no-previous-prototype-for-link_dp_trace_set_edp_power_timestamp
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-ds_port-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-link-protocols-link_dp_capability.c:warning:variable-result_write_min_hblank-set-but-not-used
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8916_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8939_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8974_backup_nvmem-was-not-declared.-Should-it-be-static
+|   |-- drivers-thermal-qcom-tsens-v0_1.c:sparse:sparse:symbol-tsens_8974_nvmem-was-not-declared.-Should-it-be-static
+clang_recent_errors
+`-- riscv-randconfig-r003-20230204
+    |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_data_10
+    |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_data_12
+    |-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_map_10
+    `-- drivers-clk-qcom-gcc-sa8775p.c:warning:unused-variable-gcc_parent_map_12
 
+elapsed time: 726m
 
->> * On top of this we could share with userspace which HVC ranges are
->>   available and which ones are handled by KVM. That can actually be added
->>   independently, through a vCPU/VM device attribute which doesn't consume
->>   a new ioctl:
->>   - userspace issues HAS_ATTR ioctl on the vcpu fd to query whether this
->>     feature is available.
->>   - userspace queries the number N of HVC ranges using one GET_ATTR.
->>   - userspace passes an array of N ranges using another GET_ATTR. The
->>     array is filled and returned by KVM.
+configs tested: 87
+configs skipped: 3
 
-> As mentioned above, I think this interface should go both ways.
-> Userspace should request the forwarding of a certain range of
-> hypercalls via a similar SET_ATTR interface.
+gcc tested configs:
+x86_64                            allnoconfig
+x86_64                          rhel-8.3-func
+x86_64                    rhel-8.3-kselftests
+um                             i386_defconfig
+i386                                defconfig
+um                           x86_64_defconfig
+powerpc                           allnoconfig
+x86_64                              defconfig
+arc                                 defconfig
+s390                             allmodconfig
+i386                 randconfig-a011-20230206
+sh                               allmodconfig
+i386                             allyesconfig
+x86_64               randconfig-a014-20230206
+x86_64                               rhel-8.3
+alpha                               defconfig
+ia64                             allmodconfig
+mips                             allyesconfig
+x86_64                           rhel-8.3-bpf
+m68k                             allyesconfig
+x86_64                           rhel-8.3-syz
+m68k                             allmodconfig
+x86_64                         rhel-8.3-kunit
+arc                              allyesconfig
+x86_64               randconfig-a013-20230206
+powerpc                          allmodconfig
+x86_64                           rhel-8.3-kvm
+i386                 randconfig-a014-20230206
+x86_64               randconfig-a011-20230206
+i386                 randconfig-a012-20230206
+i386                 randconfig-a016-20230206
+alpha                            allyesconfig
+sh                          rsk7203_defconfig
+arm                                 defconfig
+s390                                defconfig
+x86_64               randconfig-a015-20230206
+s390                             allyesconfig
+m68k                          amiga_defconfig
+x86_64               randconfig-a012-20230206
+x86_64                           allyesconfig
+i386                 randconfig-a013-20230206
+xtensa                           alldefconfig
+i386                 randconfig-a015-20230206
+x86_64               randconfig-a016-20230206
+s390                 randconfig-r044-20230206
+arc                  randconfig-r043-20230205
+arm64                            allyesconfig
+arm                  randconfig-r046-20230205
+arc                  randconfig-r043-20230206
+arm                              allyesconfig
+riscv                randconfig-r042-20230206
+arm                            mps2_defconfig
+arm                           h3600_defconfig
+m68k                       bvme6000_defconfig
+sh                            hp6xx_defconfig
+powerpc                      tqm8xx_defconfig
+sh                        sh7785lcr_defconfig
+sh                          urquell_defconfig
+arm                         nhk8815_defconfig
+powerpc                     rainier_defconfig
+arm                         axm55xx_defconfig
+powerpc                       maple_defconfig
+sh                           se7705_defconfig
+i386                          randconfig-c001
 
-Yup, I'll sync up with Oliver about that.
+clang tested configs:
+x86_64                          rhel-8.3-rust
+x86_64               randconfig-a001-20230206
+x86_64               randconfig-a005-20230206
+x86_64               randconfig-a002-20230206
+x86_64               randconfig-a004-20230206
+x86_64               randconfig-a003-20230206
+hexagon              randconfig-r041-20230205
+x86_64               randconfig-a006-20230206
+arm                         mv78xx0_defconfig
+riscv                randconfig-r042-20230205
+hexagon              randconfig-r045-20230206
+i386                 randconfig-a005-20230206
+hexagon              randconfig-r041-20230206
+i386                 randconfig-a004-20230206
+i386                 randconfig-a003-20230206
+i386                 randconfig-a001-20230206
+i386                 randconfig-a002-20230206
+arm                  randconfig-r046-20230206
+s390                 randconfig-r044-20230205
+hexagon              randconfig-r045-20230205
+i386                 randconfig-a006-20230206
+powerpc                 mpc8315_rdb_defconfig
+x86_64                        randconfig-k001
 
-
-> Another question is how we migrate VMs that have these forwarding
-> requirements. Do we expect the VMM to replay the forwarding as part of
-> the setting up on the other side? Or do we save/restore this via a
-> firmware pseudo-register?
-
-Pfff. VMMs problem. Enabling these things means it has its own internal state to migrate.
-(is this vCPU on or off?), I doubt it needs reminding that the state exists.
-
-That said, Salil is looking at making this work with migration in Qemu.
-
-
-Thanks,
-
-James
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
