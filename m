@@ -1,154 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287C78BF1
-	for <kvmarm@lists.linux.dev>; Tue,  7 Feb 2023 22:16:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1675808211;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mDzj9wY10naxVKPq3dw471YFh0Oey/zqoDGX1F3TBV0=;
-	b=ZuaJ/62rUQ1xHlWodH7Nt87xRjxw2f6Ndrf7Q4pvFJI2xt4QNamvEnlq8/vpae4gfU5P+d
-	nf84YH1PmRPfQcqsAHAr2NgRSH3qvUFlZ52Ngd8zSnPYJSYpsaaTF3/f73PHHaSa+iXn6O
-	k0p4AlWdoRRFGJMHI8XY3jpXAcoWU5c=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-572-RK1-NUkyMxK1ld44RDxq2g-1; Tue, 07 Feb 2023 17:16:46 -0500
-X-MC-Unique: RK1-NUkyMxK1ld44RDxq2g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6B99329AA2CE;
-	Tue,  7 Feb 2023 22:16:45 +0000 (UTC)
-Received: from [10.64.54.63] (vpn2-54-63.bne.redhat.com [10.64.54.63])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 59D56C15BA0;
-	Tue,  7 Feb 2023 22:16:39 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 6/7] KVM: arm64: Change return type of
- kvm_vm_ioctl_mte_copy_tags() to "int"
-To: Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
- <seanjc@google.com>, Steven Price <steven.price@arm.com>,
- Cornelia Huck <cohuck@redhat.com>
-Cc: kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
- kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, linuxppc-dev@lists.ozlabs.org,
- Eric Auger <eric.auger@redhat.com>
-References: <20230203094230.266952-1-thuth@redhat.com>
- <20230203094230.266952-7-thuth@redhat.com>
- <c6e605fe-f251-d8b6-64ed-bd1e17e79512@redhat.com>
- <7b32d58b-846f-b8d7-165b-9f505e5f00f0@redhat.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <d0b3a1e7-0864-f169-cdea-60ad95951b3f@redhat.com>
-Date: Wed, 8 Feb 2023 09:16:36 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A991E19B
+	for <kvmarm@lists.linux.dev>; Tue,  7 Feb 2023 23:33:07 +0000 (UTC)
+Received: by mail-il1-f201.google.com with SMTP id d2-20020a056e021c4200b00313bdffad9aso6171040ilg.1
+        for <kvmarm@lists.linux.dev>; Tue, 07 Feb 2023 15:33:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=N6h618a8IiC/nGqLszjY9LqsjtRfc/MrCQyIIfIRceU=;
+        b=kKnQH6i3lSpXOlPwaSR1R49mnXTs6pFalqV3F1N2sYxJBIymUDjZovHWsHbY0T6aEI
+         FiN1OTfFRVrjs6cdJBMAb7c1ENszzTCF/oe6vqMi3JCn45OE6qWv6Gz8I6+wWC9VLqF0
+         uPntNR9b2YP3br1S6wbHaGWYOo2ccRXK0GDxow3dXHGkej/ItybydTdY7EBFA2Aq0tCo
+         EXGDy5JGs5J0kcRuzJ2Koyo+j4R1P1UnXcEqyg02N7dedpr0XKQcFOGiM7oO4uDNQemp
+         HaZ2vCzk0u0v4G7KvlHno3j5lt4+zzaK7FO81YzBhx6f42eFh179ybgHVIP+iGpt5lfb
+         spzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=N6h618a8IiC/nGqLszjY9LqsjtRfc/MrCQyIIfIRceU=;
+        b=P7MAI5za9TdbjVB+sc1szRbzIXTxWkFIpBdffSO8YL3A1mDxRpvQRui62frKUAWls6
+         Mpfo5WIhDtaH5ncSJ89YC1EwpHw7CDUnwuaD3FTPisqWte9yypWhcMfh8nAmDgDyka9q
+         wHKQVwaDAkSKnyum2HkGUPkMs2xxppiGZAN8betzXZkMXMpZWxlpQfGoHU0lHUfKvg9R
+         +S7k9+9SqHAIJqmaeqL8h1CPT5z7L5f6pf1wwAknfK5OFh51ByYt5yWekmN3Wc3/0Z7B
+         5FCg1AQdvLcgBd0hlYaTbEqXy2kTAWb/fGMI+fsXUkH1AlZ7AE/al7kcelKu2b1Dw4XB
+         G1Rg==
+X-Gm-Message-State: AO0yUKXcjLGBrLfuGLD088WhMuifI7IBftMCj+oaZASJevbyjgbtpoCE
+	ufOpKhaG18fJ4HVFnz2ZMDQcRW98T83iY0Juvw==
+X-Google-Smtp-Source: AK7set+k/u2kIySuEIR0kebO9mmsun3MYIoosq2YGY/w2M2IQl+7JdSKgUbauDGYTzIKCDoA322OA+aSPUaU28+RSw==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a02:b691:0:b0:3b1:92c0:ac28 with SMTP
+ id i17-20020a02b691000000b003b192c0ac28mr3685028jam.74.1675812786710; Tue, 07
+ Feb 2023 15:33:06 -0800 (PST)
+Date: Tue,  7 Feb 2023 23:32:56 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <7b32d58b-846f-b8d7-165b-9f505e5f00f0@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
+Message-ID: <20230207233256.3791424-1-coltonlewis@google.com>
+Subject: [kvm-unit-tests PATCH v5] arm: Replace MAX_SMP probe loop in favor of
+ reading directly
+From: Colton Lewis <coltonlewis@google.com>
+To: thuth@redhat.com, pbonzini@redhat.com, nrb@linux.ibm.com, 
+	andrew.jones@linux.dev, imbrenda@linux.ibm.com, marcorr@google.com, 
+	alexandru.elisei@arm.com, oliver.upton@linux.dev
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 2/7/23 9:09 PM, Thomas Huth wrote:
-> On 07/02/2023 01.09, Gavin Shan wrote:
->> Hi Thomas,
->>
->> On 2/3/23 8:42 PM, Thomas Huth wrote:
->>> This function only returns normal integer values, so there is
->>> no need to declare its return value as "long".
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>   arch/arm64/include/asm/kvm_host.h | 4 ++--
->>>   arch/arm64/kvm/guest.c            | 4 ++--
->>>   2 files changed, 4 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>> index 35a159d131b5..b1a16343767f 100644
->>> --- a/arch/arm64/include/asm/kvm_host.h
->>> +++ b/arch/arm64/include/asm/kvm_host.h
->>> @@ -963,8 +963,8 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
->>>   int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->>>                      struct kvm_device_attr *attr);
->>> -long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->>> -                struct kvm_arm_copy_mte_tags *copy_tags);
->>> +int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->>> +                   struct kvm_arm_copy_mte_tags *copy_tags);
->>>   /* Guest/host FPSIMD coordination helpers */
->>>   int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
->>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
->>> index cf4c495a4321..80e530549c34 100644
->>> --- a/arch/arm64/kvm/guest.c
->>> +++ b/arch/arm64/kvm/guest.c
->>> @@ -1013,8 +1013,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
->>>       return ret;
->>>   }
->>> -long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->>> -                struct kvm_arm_copy_mte_tags *copy_tags)
->>> +int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->>> +                   struct kvm_arm_copy_mte_tags *copy_tags)
->>>   {
->>>       gpa_t guest_ipa = copy_tags->guest_ipa;
->>>       size_t length = copy_tags->length;
->>>
->>
->> It's possible for the function to return number of bytes have been copied.
->> Its type is 'size_t', same to 'unsigned long'. So 'int' doesn't have sufficient
->> space for it if I'm correct.
->>
->> long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->>                                  struct kvm_arm_copy_mte_tags *copy_tags)
->> {
->>          gpa_t guest_ipa = copy_tags->guest_ipa;
->>          size_t length = copy_tags->length;
->>          :
->>          :
->> out:
->>          mutex_unlock(&kvm->slots_lock);
->>          /* If some data has been copied report the number of bytes copied */
->>          if (length != copy_tags->length)
->>                  return copy_tags->length - length;
->>          return ret;
->> }
-> 
-> Oh, drat, I thought I had checked all return statements ... this must have fallen through the cracks, sorry!
-> 
-> Anyway, this is already a problem now: The function is called from kvm_arch_vm_ioctl() (which still returns a long), which in turn is called from kvm_vm_ioctl() in virt/kvm/kvm_main.c. And that functions stores the return value in an "int r" variable. So the upper bits are already lost there.
-> 
-> Also, how is this supposed to work from user space? The normal "ioctl()" libc function just returns an "int" ? Is this ioctl already used in a userspace application somewhere? ... at least in QEMU, I didn't spot it yet...
-> 
+Replace the MAX_SMP probe loop in favor of reading a number directly
+from the QEMU error message. This is equally safe as the existing code
+because the error message has had the same format as long as it has
+existed, since QEMU v2.10. The final number before the end of the
+error message line indicates the max QEMU supports.
 
-The ioctl command KVM_ARM_MTE_COPY_TAGS was merged recently and not used
-by QEMU yet. I think struct kvm_arm_copy_mte_tags::length needs to be
-'__u32' instead of '__u64' in order to standardize the return value.
-Something like below. Documentation/virt/kvm/api.rst::section-4.130
-needs update accordingly.
+This loop logic is broken for machines with a number of CPUs that
+isn't a power of two. This problem was noticed for gicv2 tests on
+machines with a non-power-of-two number of CPUs greater than 8 because
+tests were running with MAX_SMP less than 8. As a hypothetical example,
+a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 1 ==
+6. This can, in rare circumstances, lead to different test results
+depending only on the number of CPUs the machine has.
 
-    struct kvm_arm_copy_mte_tags {
-         __u64 guest_ipa;
-         __u32 pad;
-         __u32 length;
-         void __user *addr;
-         __u64 flags;
-         __u64 reserved[2];
-   };
+A previous comment explains the loop should only apply to kernels
+<=v4.3 on arm and suggests deletion when it becomes tiresome to
+maintain. However, it is always theoretically possible to test on a
+machine that has more CPUs than QEMU supports, so it makes sense to
+leave some check in place.
 
-Thanks,
-Gavin
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+---
+ scripts/runtime.bash | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
+v5: Remove the last awk reference and guard the probing code with a
+check that ARCH = arm or arm64.
+
+v4: https://lore.kernel.org/kvm/20230201172110.1970980-1-coltonlewis@google.com/
+
+v3: https://lore.kernel.org/kvm/20230130195700.729498-1-coltonlewis@google.com/
+
+v2: https://lore.kernel.org/kvm/20230111215422.2153645-1-coltonlewis@google.com/
+
+v1: https://lore.kernel.org/kvm/20221219185250.631503-1-coltonlewis@google.com/
+
+diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+index f8794e9a..fb64e855 100644
+--- a/scripts/runtime.bash
++++ b/scripts/runtime.bash
+@@ -188,12 +188,11 @@ function run()
+ # Probe for MAX_SMP, in case it's less than the number of host cpus.
+ #
+ # This probing currently only works for ARM, as x86 bails on another
+-# error first. Also, this probing isn't necessary for any ARM hosts
+-# running kernels later than v4.3, i.e. those including ef748917b52
+-# "arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'". So, at some
+-# point when maintaining the while loop gets too tiresome, we can
+-# just remove it...
+-while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
+-		|& grep -qi 'exceeds max CPUs'; do
+-	MAX_SMP=$((MAX_SMP >> 1))
+-done
++# error first, so this check is only run for ARM and ARM64. The
++# parameter expansion takes the last number from the QEMU error
++# message, which gives the allowable MAX_SMP.
++if [ "${ARCH%64}" = arm ] && smp=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
++      |& grep 'exceeds max CPUs'); then
++	smp=${smp##*(}
++	MAX_SMP=${smp:0:-1}
++fi
+--
+2.39.1.519.gcb327c4b5f-goog
