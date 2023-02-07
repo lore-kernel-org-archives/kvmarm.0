@@ -1,133 +1,191 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D67728E7;
-	Tue,  7 Feb 2023 12:47:01 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F4C6106F;
-	Tue,  7 Feb 2023 04:47:43 -0800 (PST)
-Received: from [10.57.75.57] (unknown [10.57.75.57])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4589B3F71E;
-	Tue,  7 Feb 2023 04:46:56 -0800 (PST)
-Message-ID: <7a88cefe-c817-3bca-f3e1-88254a144e3e@arm.com>
-Date: Tue, 7 Feb 2023 12:46:54 +0000
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01FB628E7
+	for <kvmarm@lists.linux.dev>; Tue,  7 Feb 2023 12:54:03 +0000 (UTC)
+Received: by mail-wm1-f43.google.com with SMTP id l37-20020a05600c1d2500b003dfe46a9801so9891865wms.0
+        for <kvmarm@lists.linux.dev>; Tue, 07 Feb 2023 04:54:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4QuannVmSHFP8CTOkjD+KCXiZMHzjfWOZhA9rSOUw4Y=;
+        b=H7C/fJovnRJnlsdgMORYCoeKTFtNuLWBmwFh7QdY4vyHJuvsudMTreHQinBwNgAsqa
+         VYYYx7w27CtvciflkFbVfKkajtCN0zqzX1baUn5QLSNcTiN3tzPbLcx4ifDiZlB1U9ws
+         nB+Hs02PX1pVWwELBKdnqoCpUMiChTJ3uGGDBfGvyf52TzMizq3AxNOcToZBUzMdgB2Y
+         3kaW1WQPe/VZm7+vS+py8mIM1cRac1Y4kKdTcXpoTwXWwkk1MgS6kcHXbQ1YDBN9PZpb
+         myJa+kTd0dSTynOvOr8dg/BQZNZGzPKNPk7OBfzdCwxKgwbMzLl1dLjROf8kIoemTSE+
+         a8rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4QuannVmSHFP8CTOkjD+KCXiZMHzjfWOZhA9rSOUw4Y=;
+        b=YSremaWSpAOJAUlZ4Y5i+CJW/pM706fFPjDQVnlstzLwbgdpRLYJn/nrI1oRXPm5qV
+         L7F2ePOqHM9y1d4lhxI4w6AOVT39pIB32xSkm2/O5T28KVTq+IQEtwRQkPiD1+1ADSLz
+         AvRMnF8X8NjBMME95FfXqYTAih2N+U/Pm2B6tVLxQhv6m8VqoT8SvE0eTptYzRsVTaRK
+         gCFa7KyJfCVcN66MoSieBef0Rtq+eSui67eakmn/U5IM4AtF8x4CHfgxBdCkD/xsqmPU
+         M3BkfZLV4KysHy1Lp7ZyJHCftACfO3ryG+91E3ihI61PmIMJiXMUY6qlJ64UF0k2vCuC
+         1iDQ==
+X-Gm-Message-State: AO0yUKWVGmyILtjv5vhvxhUrv7p74vZEUq3OJWBuRNiQpNhru1p8Xytn
+	1nbDMS0uRLFnGTHZX7iVn+MPeg==
+X-Google-Smtp-Source: AK7set+oJx+kB+cL+65FcAkL6WDKujzT+Yv9c9twshHVe5WdW4BsLtqePLR+qGveuyEBE6Ayp8umgg==
+X-Received: by 2002:a05:600c:468e:b0:3dc:434b:39b4 with SMTP id p14-20020a05600c468e00b003dc434b39b4mr167184wmo.2.1675774442255;
+        Tue, 07 Feb 2023 04:54:02 -0800 (PST)
+Received: from google.com (44.232.78.34.bc.googleusercontent.com. [34.78.232.44])
+        by smtp.gmail.com with ESMTPSA id p16-20020a5d4e10000000b002c3e4bec4dbsm6269840wrt.89.2023.02.07.04.54.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Feb 2023 04:54:01 -0800 (PST)
+Date: Tue, 7 Feb 2023 12:53:56 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+	joro@8bytes.org, robin.murphy@arm.com, james.morse@arm.com,
+	suzuki.poulose@arm.com, oliver.upton@linux.dev,
+	yuzenghui@huawei.com, dbrazdil@google.com, ryan.roberts@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	iommu@lists.linux.dev
+Subject: Re: [RFC PATCH 15/45] KVM: arm64: pkvm: Add
+ __pkvm_host_share/unshare_dma()
+Message-ID: <Y+JJ5HJpKGy3P04V@google.com>
+References: <20230201125328.2186498-1-jean-philippe@linaro.org>
+ <20230201125328.2186498-16-jean-philippe@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-Subject: Re: [RFC PATCH 29/32] KVM: arm64: Pass hypercalls to userspace
-To: Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
- loongarch@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
- linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, x86@kernel.org,
- Thomas Gleixner <tglx@linutronix.de>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Sudeep Holla <sudeep.holla@arm.com>,
- Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Huacai Chen <chenhuacai@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Len Brown <lenb@kernel.org>, Rafael Wysocki <rafael@kernel.org>,
- WANG Xuerui <kernel@xen0n.name>, Salil Mehta <salil.mehta@huawei.com>,
- Russell King <linux@armlinux.org.uk>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>
-References: <20230203135043.409192-1-james.morse@arm.com>
- <20230203135043.409192-30-james.morse@arm.com> <865ycg1kv2.wl-maz@kernel.org>
- <cffde8a1-74e4-9b61-1eea-544ba3405ed4@arm.com> <86wn4vynyr.wl-maz@kernel.org>
- <985abd9c-b3f9-3f9d-eec7-df1f26733762@arm.com> <86sffhzpkz.wl-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86sffhzpkz.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230201125328.2186498-16-jean-philippe@linaro.org>
 
-On 07/02/2023 11:23, Marc Zyngier wrote:
-> On Tue, 07 Feb 2023 09:41:54 +0000,
-> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>
->> Hi Marc,
->>
->> On 06/02/2023 12:31, Marc Zyngier wrote:
->>> On Mon, 06 Feb 2023 10:10:41 +0000,
->>> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>>>
->>>> This may not be always possible, e.g., for Realms. GET_ONE_REG is
->>>> not supported. So using an explicit passing down of the args is
->>>> preferrable.
->>>
->>> What is the blocker for CCA to use GET_ONE_REG? The value obviously
->>> exists and is made available to the host. pKVM is perfectly able to
->>> use GET_ONE_REG and gets a bunch of zeroes for things that the
->>> hypervisor has decided to hide from the host.
->>>
->>
->> It is not impossible. On a "HOST CALL" (explicit calls to the Host
->> from Realm), the GPRs are made available to the host and can be
->> stashed into the vcpu reg state and the request can be
->> serviced. However, it is a bit odd, to make this exception - "the
->> GET_ONE_REG is valid now", while in almost all other cases it is
->> invalid (exception of MMIO).
-> 
-> But that's an RMM decision. If the RMM decides to forward the
-> hypercall to the host (irrespective of the potential forwarding to
-> userspace), it makes the GPRs available.
-> 
-> If the hypercall is forwarded to userspace, then the host is
-> responsible to check with the RMM that it will be willing to provide
-> the required information (passed as GPRs or not).
+Hi Jean,
 
-Just to be clear, on a hypercall, all the arguments are provided to
-the host. And it is always possible for the host to sync the vcpu
-GPR state with those arguments and make them available via the 
-GET_ONE_REG call.
-
+On Wed, Feb 01, 2023 at 12:52:59PM +0000, Jean-Philippe Brucker wrote:
+> Host pages mapped in the SMMU must not be donated to the guest or
+> hypervisor, since the host could then use DMA to break confidentiality.
+> Mark them shared in the host stage-2 page tables, and keep a refcount in
+> the hyp vmemmap.
 > 
->> Of course we could always return what is stashed in the vcpu state,
->> which is may be invalid/ 0. But given the construct of "host doesn't
->> have access to the register state", it may be a good idea to say,
->> request always fails, to indicate that the Host is probably doing
->> something wrong, than silently passing on incorrect information.
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> ---
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   3 +
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 185 ++++++++++++++++++
+>  2 files changed, 188 insertions(+)
 > 
-> I disagree. Either you fail at the delegation point, or you don't. On
-> getting a hypercall exit to userspace, you are guaranteed that the
-> GPRs are valid.
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> index 021825aee854..a363d58a998b 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -58,6 +58,7 @@ enum pkvm_component_id {
+>  	PKVM_ID_HOST,
+>  	PKVM_ID_HYP,
+>  	PKVM_ID_GUEST,
+> +	PKVM_ID_IOMMU,
+>  };
+>  
+>  extern unsigned long hyp_nr_cpus;
+> @@ -72,6 +73,8 @@ int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu);
+>  int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu);
+>  int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *hyp_vcpu, u64 ipa);
+>  int __pkvm_guest_unshare_host(struct pkvm_hyp_vcpu *hyp_vcpu, u64 ipa);
+> +int __pkvm_host_share_dma(u64 phys_addr, size_t size, bool is_ram);
+> +int __pkvm_host_unshare_dma(u64 phys_addr, size_t size);
+>  
+>  bool addr_is_memory(phys_addr_t phys);
+>  int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 856673291d70..dcf08ce03790 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -1148,6 +1148,9 @@ static int check_share(struct pkvm_mem_share *share)
+>  	case PKVM_ID_GUEST:
+>  		ret = guest_ack_share(completer_addr, tx, share->completer_prot);
+>  		break;
+> +	case PKVM_ID_IOMMU:
+> +		ret = 0;
+> +		break;
+>  	default:
+>  		ret = -EINVAL;
+>  	}
+> @@ -1185,6 +1188,9 @@ static int __do_share(struct pkvm_mem_share *share)
+>  	case PKVM_ID_GUEST:
+>  		ret = guest_complete_share(completer_addr, tx, share->completer_prot);
+>  		break;
+> +	case PKVM_ID_IOMMU:
+> +		ret = 0;
+> +		break;
+>  	default:
+>  		ret = -EINVAL;
+>  	}
+> @@ -1239,6 +1245,9 @@ static int check_unshare(struct pkvm_mem_share *share)
+>  	case PKVM_ID_HYP:
+>  		ret = hyp_ack_unshare(completer_addr, tx);
+>  		break;
+> +	case PKVM_ID_IOMMU:
+> +		ret = 0;
+> +		break;
+>  	default:
+>  		ret = -EINVAL;
+>  	}
+> @@ -1273,6 +1282,9 @@ static int __do_unshare(struct pkvm_mem_share *share)
+>  	case PKVM_ID_HYP:
+>  		ret = hyp_complete_unshare(completer_addr, tx);
+>  		break;
+> +	case PKVM_ID_IOMMU:
+> +		ret = 0;
+> +		break;
+>  	default:
+>  		ret = -EINVAL;
+>  	}
+> @@ -1633,6 +1645,179 @@ void hyp_unpin_shared_mem(void *from, void *to)
+>  	host_unlock_component();
+>  }
+>  
+> +static int __host_check_page_dma_shared(phys_addr_t phys_addr)
+> +{
+> +	int ret;
+> +	u64 hyp_addr;
+> +
+> +	/*
+> +	 * The page is already refcounted. Make sure it's owned by the host, and
+> +	 * not part of the hyp pool.
+> +	 */
+> +	ret = __host_check_page_state_range(phys_addr, PAGE_SIZE,
+> +					    PKVM_PAGE_SHARED_OWNED);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/*
+> +	 * Refcounted and owned by host, means it's either mapped in the
+> +	 * SMMU, or it's some VM/VCPU state shared with the hypervisor.
+> +	 * The host has no reason to use a page for both.
+> +	 */
+> +	hyp_addr = (u64)hyp_phys_to_virt(phys_addr);
+> +	return __hyp_check_page_state_range(hyp_addr, PAGE_SIZE, PKVM_NOPAGE);
 
-This is possible, as I mentioned below, the question is bug vs feature.
+This works for hyp-host sharing, I am worried about scalability of this.
+For example FFA(still on the list) adds a new entity that can share data
+with host, and we would need an extra check for it.
+https://lore.kernel.org/kvmarm/20221116170335.2341003-1-qperret@google.com/
 
-> 
->>> Of course, it requires that the hypervisor (the RMM in your case)
->>> knows about the semantics of the hypercall, but that's obviously
->>
->> RMM doesn't care about the semantics of hypercall, other than
->> considering it just like an SMCCC compliant call. The hypercall
->> arguments/results are passed down/up by the Realm in a separate
->> structure.
-> 
-> That's because the RMM doesn't use registers to pass the data. But at
-> the end of the day, this is the same thing. The host gets the data
-> from the RMM, stashes it in the GPRs, and exit to userspace.
+One way I can think about this, is to use the SW bits in SMMU page table to
+represent ownership, for example for PKVM_ID_IOMMU
+do_share:
+-completer: set SW bits in the SMMU page table to
+PKVM_PAGE_SHARED_BORROWED
 
-True.
+do_unshare:
+-completer: set SW bit back to PKVM_PAGE_OWNED(I think this is good
+enough for host ownership)
 
-> 
-> The important thing here is that GET_ONE_REG is valid in the context
-> where it matters. If the VMM tries to use it outside of the context of
-> a hypercall, it gets junk. It's not a bug, it's a feature.
+In __pkvm_host_share_dma_page
+If page refcount > 1, it succeeds if only the page was borrowed in the
+SMMU page table and shared in the host page table.
 
-This is what I was concerned about.  As long as this "For any exit
-other than hypercall (at least for now), you get junk values when using
-GET_ONE_REG for confidential guests" is an acceptable feature, that 
-should be alright.
 
-Thanks
-Suzuki
-
-> 
-> Thanks,
-> 
-> 	M.
-> 
+Thanks,
+Mostafa
 
