@@ -1,87 +1,133 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0721C28E7
-	for <kvmarm@lists.linux.dev>; Tue,  7 Feb 2023 12:42:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0853DC433EF;
-	Tue,  7 Feb 2023 12:42:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675773778;
-	bh=JVybZG/af25FtT5MIn8vwGANiFyx3YmRZsIluskfyi4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V5/W1xnxs1ZmPu/CLYT6v+6ppZS1ZtONnX/OGJjnqE4/ATQoY0qPJbGFg7Duc7WWa
-	 ZriJFVwo95o/jKuBCYdlQt+NMWPyjjUanDvOMTktIZQnf1AMQwQb0Uy7z4DxG3YzmV
-	 PdVFpHQFo3yAhpHwE65VfOZ1Eq86VVGFdAQ8dBSjjL3VIbEns1jlxEloRZiyJyLoOY
-	 ESZl8hXM3PTViqlwBKSS6uL/iWdFWh1BuSXDLaTp9oqUqs97+1cqqVsrkHXV9Yd80s
-	 IKyGKdyWwitqfIes/7M7H9sbwfdN7PUJDI5q4/CsJWhWnExFtsGEN+zvX5NXW0BS+Z
-	 Kb8lxOzKop6Iw==
-Date: Tue, 7 Feb 2023 12:42:51 +0000
-From: Will Deacon <will@kernel.org>
-To: Ingo Molnar <mingo@redhat.com>, James Morse <james.morse@arm.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Rob Herring <robh@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Marc Zyngier <maz@kernel.org>
-Cc: kernel-team@android.com, Mark Brown <broonie@kernel.org>,
-	linux-kernel@vger.kernel.org, James Clark <james.clark@arm.com>,
-	kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 0/8] perf: Arm SPEv1.2 support
-Message-ID: <20230207124250.GA12385@willie-the-truck>
-References: <20220825-arm-spe-v8-7-v4-0-327f860daf28@kernel.org>
- <167577072188.364892.17496441030141801452.b4-ty@kernel.org>
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D67728E7;
+	Tue,  7 Feb 2023 12:47:01 +0000 (UTC)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F4C6106F;
+	Tue,  7 Feb 2023 04:47:43 -0800 (PST)
+Received: from [10.57.75.57] (unknown [10.57.75.57])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4589B3F71E;
+	Tue,  7 Feb 2023 04:46:56 -0800 (PST)
+Message-ID: <7a88cefe-c817-3bca-f3e1-88254a144e3e@arm.com>
+Date: Tue, 7 Feb 2023 12:46:54 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <167577072188.364892.17496441030141801452.b4-ty@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: [RFC PATCH 29/32] KVM: arm64: Pass hypercalls to userspace
+To: Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>, linux-pm@vger.kernel.org,
+ loongarch@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, x86@kernel.org,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Lorenzo Pieralisi <lpieralisi@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Sudeep Holla <sudeep.holla@arm.com>,
+ Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, Ingo Molnar <mingo@redhat.com>,
+ Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Huacai Chen <chenhuacai@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Len Brown <lenb@kernel.org>, Rafael Wysocki <rafael@kernel.org>,
+ WANG Xuerui <kernel@xen0n.name>, Salil Mehta <salil.mehta@huawei.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <20230203135043.409192-1-james.morse@arm.com>
+ <20230203135043.409192-30-james.morse@arm.com> <865ycg1kv2.wl-maz@kernel.org>
+ <cffde8a1-74e4-9b61-1eea-544ba3405ed4@arm.com> <86wn4vynyr.wl-maz@kernel.org>
+ <985abd9c-b3f9-3f9d-eec7-df1f26733762@arm.com> <86sffhzpkz.wl-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <86sffhzpkz.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 07, 2023 at 12:39:43PM +0000, Will Deacon wrote:
-> On Mon, 09 Jan 2023 13:26:17 -0600, Rob Herring wrote:
-> > Peter, this series is blocked on an ack from you on patch 7. There was
-> > some discussion on validation of the 'config3' attr. The options where
-> > laid out by Mark here[0]. Please chime in on your preference.
-> > 
-> > Will, can you pick up patches 1-6 at least if there's no progress on
-> > 'config3'.
-> > 
-> > [...]
+On 07/02/2023 11:23, Marc Zyngier wrote:
+> On Tue, 07 Feb 2023 09:41:54 +0000,
+> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+>>
+>> Hi Marc,
+>>
+>> On 06/02/2023 12:31, Marc Zyngier wrote:
+>>> On Mon, 06 Feb 2023 10:10:41 +0000,
+>>> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+>>>>
+>>>> This may not be always possible, e.g., for Realms. GET_ONE_REG is
+>>>> not supported. So using an explicit passing down of the args is
+>>>> preferrable.
+>>>
+>>> What is the blocker for CCA to use GET_ONE_REG? The value obviously
+>>> exists and is made available to the host. pKVM is perfectly able to
+>>> use GET_ONE_REG and gets a bunch of zeroes for things that the
+>>> hypervisor has decided to hide from the host.
+>>>
+>>
+>> It is not impossible. On a "HOST CALL" (explicit calls to the Host
+>> from Realm), the GPRs are made available to the host and can be
+>> stashed into the vcpu reg state and the request can be
+>> serviced. However, it is a bit odd, to make this exception - "the
+>> GET_ONE_REG is valid now", while in almost all other cases it is
+>> invalid (exception of MMIO).
 > 
-> Applied to will (for-next/perf), thanks!
+> But that's an RMM decision. If the RMM decides to forward the
+> hypercall to the host (irrespective of the potential forwarding to
+> userspace), it makes the GPRs available.
 > 
-> [1/8] perf: arm_spe: Use feature numbering for PMSEVFR_EL1 defines
->       (no commit info)
-> [2/8] arm64: Drop SYS_ from SPE register defines
->       (no commit info)
-> [3/8] arm64/sysreg: Convert SPE registers to automatic generation
->       (no commit info)
-> [4/8] perf: arm_spe: Drop BIT() and use FIELD_GET/PREP accessors
->       (no commit info)
-> [5/8] perf: arm_spe: Use new PMSIDR_EL1 register enums
->       (no commit info)
-> [6/8] perf: arm_spe: Support new SPEv1.2/v8.7 'not taken' event
->       (no commit info)
-> [7/8] perf: Add perf_event_attr::config3
->       https://git.kernel.org/will/c/09519ec3b19e
-> [8/8] perf: arm_spe: Add support for SPEv1.2 inverted event filtering
->       https://git.kernel.org/will/c/8d9190f00a97
+> If the hypercall is forwarded to userspace, then the host is
+> responsible to check with the RMM that it will be willing to provide
+> the required information (passed as GPRs or not).
 
-I should've trimmed this, but just in case of confusion: I'd already picked
-up 1-6 prior to Peter's ack on the UAPI change. So now the whole series
-should be in tomorrow's -next with any luck.
+Just to be clear, on a hypercall, all the arguments are provided to
+the host. And it is always possible for the host to sync the vcpu
+GPR state with those arguments and make them available via the 
+GET_ONE_REG call.
 
-Thanks!
+> 
+>> Of course we could always return what is stashed in the vcpu state,
+>> which is may be invalid/ 0. But given the construct of "host doesn't
+>> have access to the register state", it may be a good idea to say,
+>> request always fails, to indicate that the Host is probably doing
+>> something wrong, than silently passing on incorrect information.
+> 
+> I disagree. Either you fail at the delegation point, or you don't. On
+> getting a hypercall exit to userspace, you are guaranteed that the
+> GPRs are valid.
 
-Will
+This is possible, as I mentioned below, the question is bug vs feature.
+
+> 
+>>> Of course, it requires that the hypervisor (the RMM in your case)
+>>> knows about the semantics of the hypercall, but that's obviously
+>>
+>> RMM doesn't care about the semantics of hypercall, other than
+>> considering it just like an SMCCC compliant call. The hypercall
+>> arguments/results are passed down/up by the Realm in a separate
+>> structure.
+> 
+> That's because the RMM doesn't use registers to pass the data. But at
+> the end of the day, this is the same thing. The host gets the data
+> from the RMM, stashes it in the GPRs, and exit to userspace.
+
+True.
+
+> 
+> The important thing here is that GET_ONE_REG is valid in the context
+> where it matters. If the VMM tries to use it outside of the context of
+> a hypercall, it gets junk. It's not a bug, it's a feature.
+
+This is what I was concerned about.  As long as this "For any exit
+other than hypercall (at least for now), you get junk values when using
+GET_ONE_REG for confidential guests" is an acceptable feature, that 
+should be alright.
+
+Thanks
+Suzuki
+
+> 
+> Thanks,
+> 
+> 	M.
+> 
+
