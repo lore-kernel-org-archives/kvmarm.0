@@ -1,28 +1,28 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE071946B
-	for <kvmarm@lists.linux.dev>; Wed,  8 Feb 2023 11:20:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C1E4C433D2;
-	Wed,  8 Feb 2023 11:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38AF02560
+	for <kvmarm@lists.linux.dev>; Wed,  8 Feb 2023 11:24:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6AF1C433D2;
+	Wed,  8 Feb 2023 11:24:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675855219;
-	bh=B6zrD3MUb4KtKj9xfIe7UkOC0UIDN9V3CX8L2Her3GU=;
+	s=k20201202; t=1675855495;
+	bh=wsd1S5kOu4Opqg5TZyZpc4u1xf28GoANoypPqb/j024=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aWxLzIYYde9IiprCgOyv9OMXKegfvQyUEOixFqlEkX2XfCCFIGDz4bmWGktTPsikQ
-	 E5/kt7GfLGfuqb9ld8GSk74tHMWQ2se+9SVmO9xsiW9XUtJa/k/D8UGcvA3Xo8t4So
-	 lh+aiOr7TChS/1mdrm3zVIGf6eX/TyC0HNRG629pi+Y13pVPbVuo5w6Bhm2g72pAZL
-	 msu+rL/AXB1bDzTFdMUliSA0quO2kp+rxCp4Q0EJtZJA+X0qNS9X05rZzfKBMpzaW4
-	 mkWPEKQGNS9CcvvT3l5ACVcJVR3mIqrodWR33V+FEAfhGKhydboVL4rCAoODRawMBw
-	 NqHT970latq/w==
+	b=jOnVSS1ZAfBcPLH4eEhAWHHxZEUnlmuTa8O2ug/bOvrb3pEEUd1dyrloNXZwhNaoJ
+	 hG40ih4ERo7hGsDK2KcpXhmGHhcsI7ZR556JncaUxizvMHhgI3eWiYv7AAuDprYnWq
+	 JDuArNISeHBw2PwXDZxrg4YxX3PJBYsnWlYCs1dA0cckcdt+1wGIKrUPLM/3Ju6iUc
+	 cysrUMMefKmdmUaa+GJcScL2ovIvQV7KPJiL0w/oe7SjjBQicNh4NAusoIiscu2Lu9
+	 l4e5nN+quZnFkKWCfqqNCrHMO7X16j+/LBhOhLmmCjXX9Dh3hOVzqwYnY1nJWXKBkk
+	 /YnXIdk19cLBw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pPiUr-008dkz-Ci;
-	Wed, 08 Feb 2023 11:20:17 +0000
-Date: Wed, 08 Feb 2023 11:20:16 +0000
-Message-ID: <86mt5oz9n3.wl-maz@kernel.org>
+	id 1pPiZJ-008dpq-Id;
+	Wed, 08 Feb 2023 11:24:53 +0000
+Date: Wed, 08 Feb 2023 11:24:53 +0000
+Message-ID: <86lel8z9fe.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Zaid Al-Bassam <zalbassam@google.com>
 Cc: Jesus Sanchez-Palencia <jesussanp@google.com>,
@@ -45,10 +45,10 @@ Cc: Jesus Sanchez-Palencia <jesussanp@google.com>,
 	linux-perf-users@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH 3/8] perf: pmuv3: Add common defines for the PMU version
-In-Reply-To: <20230126204444.2204061-4-zalbassam@google.com>
+Subject: Re: [PATCH 4/8] perf: pmuv3: Add wrappers for KVM accesses
+In-Reply-To: <20230126204444.2204061-5-zalbassam@google.com>
 References: <20230126204444.2204061-1-zalbassam@google.com>
-	<20230126204444.2204061-4-zalbassam@google.com>
+	<20230126204444.2204061-5-zalbassam@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,48 +64,79 @@ X-SA-Exim-Rcpt-To: zalbassam@google.com, jesussanp@google.com, linux@armlinux.or
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 26 Jan 2023 20:44:39 +0000,
+On Thu, 26 Jan 2023 20:44:40 +0000,
 Zaid Al-Bassam <zalbassam@google.com> wrote:
 > 
-> The current PMU version defines are available for arm64 only,
-> As we want to add PMUv3 support to arm (32-bit), this patch makes
-> these defines available for both arm/arm64 by defining them in
-> the common arm_pmuv3.h header.
+> KVM host support is available only on arm64. This patch adds wrappers
+> to the KVM host function references in the arm_pmuv3.c, so that it is
+> up to architecture to populate these wrappers if supported.
 > 
 > Signed-off-by: Zaid Al-Bassam <zalbassam@google.com>
 > ---
->  drivers/perf/arm_pmuv3.c       | 8 ++++----
->  include/linux/perf/arm_pmuv3.h | 6 ++++++
->  2 files changed, 10 insertions(+), 4 deletions(-)
+>  arch/arm64/include/asm/arm_pmuv3.h | 16 ++++++++++++++++
+>  drivers/perf/arm_pmuv3.c           | 11 +++++------
+>  2 files changed, 21 insertions(+), 6 deletions(-)
 > 
+> diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
+> index f41a354d1022..9f2a48f5340c 100644
+> --- a/arch/arm64/include/asm/arm_pmuv3.h
+> +++ b/arch/arm64/include/asm/arm_pmuv3.h
+> @@ -20,6 +20,7 @@
+>  
+>  #include <asm/cpufeature.h>
+>  #include <asm/sysreg.h>
+> +#include <linux/kvm_host.h>
+
+"linux" includes must be placed before the "asm" ones.
+
+>  
+>  /*
+>   * This code is really good
+> @@ -191,4 +192,19 @@ static inline u32 read_pmceid1(void)
+>  	return read_sysreg(pmceid1_el0);
+>  }
+>  
+> +static inline void armv8pmu_kvm_set_events(u32 set, struct perf_event_attr *attr)
+> +{
+> +	kvm_set_pmu_events(set, attr);
+> +}
+> +
+> +static inline void armv8pmu_kvm_clr_events(u32 clr)
+> +{
+> +	kvm_clr_pmu_events(clr);
+> +}
+> +
+> +static inline bool armv8pmu_kvm_counter_deferred(struct perf_event_attr *attr)
+> +{
+> +	return kvm_pmu_counter_deferred(attr);
+> +}
+> +
+>  #endif
 > diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-> index 94e4098b662d..505f0758260c 100644
+> index 505f0758260c..d7063dd52827 100644
 > --- a/drivers/perf/arm_pmuv3.c
 > +++ b/drivers/perf/arm_pmuv3.c
-> @@ -392,7 +392,7 @@ static const struct attribute_group armv8_pmuv3_caps_attr_group = {
->   */
->  static bool armv8pmu_has_long_event(struct arm_pmu *cpu_pmu)
->  {
-> -	return (cpu_pmu->pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P5);
-> +	return (cpu_pmu->pmuver >= ARMV8_PMU_DFR_VER_V3P5);
+> @@ -16,7 +16,6 @@
+>  
+>  #include <linux/acpi.h>
+>  #include <linux/clocksource.h>
+> -#include <linux/kvm_host.h>
+>  #include <linux/of.h>
+>  #include <linux/perf/arm_pmu.h>
+>  #include <linux/perf/arm_pmuv3.h>
+> @@ -607,10 +606,10 @@ static inline void armv8pmu_enable_event_counter(struct perf_event *event)
+>  	struct perf_event_attr *attr = &event->attr;
+>  	u32 mask = armv8pmu_event_cnten_mask(event);
+>  
+> -	kvm_set_pmu_events(mask, attr);
+> +	armv8pmu_kvm_set_events(mask, attr);
 
-This doesn't really makes any sense. As per the architecture spec,
-PMUv3p5 on AArch32 cannot expose the top 32 bits (DDI0487I.a, G8.4.10
-"PMEVCNTR<n>, Performance Monitors Event Count Registers, n = 0 -
-30"):
+Why the change of name? given that you will implement empty helpers in
+the AArch32 code, you might as well keep the names and reduce the churn.
 
-<quote>
-There is no means to access bits [63:32] directly from AArch32 state.
-</quote>
-
-So on AArch32, this should always return false, no ifs, no buts.
-
-Also, turning the architectural symbols (ID_AA64DFR0_EL1_*) into
-custom stuff is a total non-starter. We generate these names and want
-to use them everywhere.
-
-Either you abstract them in the architecture specific headers, or you
-define the AArch64 name in the AArch32 code.
+At the end of the day, the only thing you need to do in this patch is
+to move the "#include <linux/kvm_host.h>" from this file into the
+arch-specific file. Nothing else.
 
 Thanks,
 
