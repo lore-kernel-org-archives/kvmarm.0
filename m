@@ -1,221 +1,96 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171A66AAD
-	for <kvmarm@lists.linux.dev>; Wed,  8 Feb 2023 17:36:25 +0000 (UTC)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 318HHkOQ007083;
-	Wed, 8 Feb 2023 17:35:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=w8wjwMlgb9GsgoiOCFXp4yyLA2K11B5J/RaqzGmUZsQ=;
- b=iQlyfdDmDN5+8c2FxTO+NZYAeS/32r3k5LjX151TY4iQU9gpQ99bLxRJslWjYLg3Rbcs
- SpZ4AJFF+3LwRWYlp3/s9lheOrup6+zAmmHeDYSOj+pILxxke92luvi+GfifAo/eCkO1
- 9aOia16dX6fPgAT1Uq0FAB4wC607DPSAZ4nqeqAlT4Zrmn8s9GrJebzbbC5vsMkfb/vA
- prZjUimKOH7MCsmq9k73JDwg3TWQk+30/+9x9TMH0QxL1CyVqXYGeFl65u20XSbzl7VD
- NiDSIgGc9W0MphwU07hg9Z8nsAmQEs/4bGFuKrjTaPh6LR+NzKkdkvbISlH4ga3wxB0+ Zw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nmfx08w5m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Feb 2023 17:35:58 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 318HI5Pn008839;
-	Wed, 8 Feb 2023 17:35:57 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nmfx08w4a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Feb 2023 17:35:57 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-	by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3185ag5Q024247;
-	Wed, 8 Feb 2023 17:35:55 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3nhf06w746-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Feb 2023 17:35:54 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 318HZpH743647422
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 8 Feb 2023 17:35:51 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 686DE2004B;
-	Wed,  8 Feb 2023 17:35:51 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E311C20040;
-	Wed,  8 Feb 2023 17:35:50 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  8 Feb 2023 17:35:50 +0000 (GMT)
-Date: Wed, 8 Feb 2023 18:35:49 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean
- Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        Marc Zyngier
- <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose
- <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu
- <yuzenghui@huawei.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand
- <david@redhat.com>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH 7/7] KVM: Change return type of kvm_arch_vm_ioctl() to
- "int"
-Message-ID: <20230208183549.145b708d@p-imbrenda>
-In-Reply-To: <20230203094230.266952-8-thuth@redhat.com>
-References: <20230203094230.266952-1-thuth@redhat.com>
-	<20230203094230.266952-8-thuth@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D096AAD
+	for <kvmarm@lists.linux.dev>; Wed,  8 Feb 2023 18:01:14 +0000 (UTC)
+Received: by mail-wr1-f43.google.com with SMTP id j23so2430006wra.0
+        for <kvmarm@lists.linux.dev>; Wed, 08 Feb 2023 10:01:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QsaledRgqtR8MThisrbwNQQMiogQzEIa1ri2xN8U5x4=;
+        b=cg0MVG6I6Y76rF/CZvC25sdPVewyNWnsbfa7pgSc2FzuvBEF1nJRYSbvtTtvCpyBYJ
+         HVLVtYnuT2OXWBj247C60aUx18fMk60nfUTiPvyx4vWWIhhiFEXg1o5dZyYT2/CaBTHP
+         Rk2W5EmObgDHnqXG6uH8g+U60GFuUN5xmPtLp+yaC9KRyVxJF0lsGEdkb3hXs1k4BBWs
+         iXNRGDCeD6nJQ4LykFmzgC8UAm19GyMoUamSPNDWn8i1D9ZOfuf2RdGy1ji+r3lnwDIr
+         AagVGYdSSv5vJlQaz0Ywkho2nGWBLCoeb1NwcamBM2qwdKm8oT1IJM430mbbdShhBRYB
+         BaSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QsaledRgqtR8MThisrbwNQQMiogQzEIa1ri2xN8U5x4=;
+        b=E3zYipQNa19vLEV5mL2KpQVZvwVtR+xff2aX4ZIcvP+sj+G2wFwkmEzqftWqQKHANw
+         Kitd4bfVdAdApiAY0DweEOyT0cNHdeVhTmUn5Cl2i+HwXSutsnRnFhsy7lHZpnRBzvnQ
+         2hiBlxc2KP133DdpCK9XVXhwjfWkkVru/oAj3/sky1OoVovjBgKQzfGoB+3zd47qIXfn
+         Ojp4QdHr4jPuzqKB3A/n7U07WNtpgAEKveqllBbgyuc/tltC53glc5S3bxauvnMA/wpU
+         LoTtsbbq4zj7NOBRX5Tru3SRzCD8k62uledgmeJzezoAFBxl34vG3EV8wjxehSGNaQcS
+         Fr+g==
+X-Gm-Message-State: AO0yUKVOOQEj1vmjpheA1Ghhgqi6TzggRsoLq0J/S4MVhyO+G3Eu1ApT
+	Vh48IJfkLDdH46OVyDvbhMsA4g==
+X-Google-Smtp-Source: AK7set+3IM5sAOEuhaAPwVF0OVGRlrlPx7WqR8A8ToS+qIOpKQFwoXaZmbDkTQkIZJClDWGbpxR0/g==
+X-Received: by 2002:adf:e80e:0:b0:2bf:f44b:7a29 with SMTP id o14-20020adfe80e000000b002bff44b7a29mr7118746wrm.40.1675879273302;
+        Wed, 08 Feb 2023 10:01:13 -0800 (PST)
+Received: from myrica (054592b0.skybroadband.com. [5.69.146.176])
+        by smtp.gmail.com with ESMTPSA id l13-20020adffe8d000000b002bfbda53b98sm11081478wrr.35.2023.02.08.10.01.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Feb 2023 10:01:12 -0800 (PST)
+Date: Wed, 8 Feb 2023 18:01:07 +0000
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+	joro@8bytes.org, robin.murphy@arm.com, james.morse@arm.com,
+	suzuki.poulose@arm.com, oliver.upton@linux.dev,
+	yuzenghui@huawei.com, dbrazdil@google.com, ryan.roberts@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	iommu@lists.linux.dev, Abhinav Kumar <quic_abhinavk@quicinc.com>,
+	Alyssa Rosenzweig <alyssa.rosenzweig@collabora.com>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Daniel Vetter <daniel@ffwll.ch>, David Airlie <airlied@gmail.com>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	Hector Martin <marcan@marcan.st>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Rob Clark <robdclark@gmail.com>, Rob Herring <robh@kernel.org>,
+	Sean Paul <sean@poorly.run>, Steven Price <steven.price@arm.com>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Sven Peter <sven@svenpeter.dev>,
+	Tomeu Vizoso <tomeu.vizoso@collabora.com>,
+	Yong Wu <yong.wu@mediatek.com>
+Subject: Re: [RFC PATCH 05/45] iommu/io-pgtable: Split io_pgtable structure
+Message-ID: <Y+PjY34M9M4cQRg3@myrica>
+References: <20230201125328.2186498-1-jean-philippe@linaro.org>
+ <20230201125328.2186498-6-jean-philippe@linaro.org>
+ <Y+JBDIF+IaEPiwR8@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 5z7FZjk3Eq_9afR6qjVBjFisFOAsYUoj
-X-Proofpoint-GUID: rTE80i3B1iv3R7DqYEkof08grhL3yDR7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-08_08,2023-02-08_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 adultscore=0 clxscore=1015 priorityscore=1501
- impostorscore=0 phishscore=0 malwarescore=0 spamscore=0 mlxlogscore=960
- mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302080153
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y+JBDIF+IaEPiwR8@google.com>
 
-On Fri,  3 Feb 2023 10:42:30 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+Hi Mostafa,
 
-> All kvm_arch_vm_ioctl() implementations now only deal with "int"
-> types as return values, so we can change the return type of these
-> functions to use "int" instead of "long".
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On Tue, Feb 07, 2023 at 12:16:12PM +0000, Mostafa Saleh wrote:
+> > +static inline size_t
+> > +iopt_unmap_pages(struct io_pgtable *iop, unsigned long iova, size_t pgsize,
+> > +		 size_t pgcount, struct iommu_iotlb_gather *gather)
+> > +{
+> > +	if (!iop->ops || !iop->ops->map_pages)
+> Should this be !iop->ops->unmap_pages?
 
-Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Oh right, good catch!
 
-> ---
->  arch/arm64/kvm/arm.c       | 3 +--
->  arch/mips/kvm/mips.c       | 4 ++--
->  arch/powerpc/kvm/powerpc.c | 5 ++---
->  arch/riscv/kvm/vm.c        | 3 +--
->  arch/s390/kvm/kvm-s390.c   | 3 +--
->  arch/x86/kvm/x86.c         | 3 +--
->  include/linux/kvm_host.h   | 3 +--
->  7 files changed, 9 insertions(+), 15 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 9c5573bc4614..e791ad6137b8 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1449,8 +1449,7 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
->  	}
->  }
->  
-> -long kvm_arch_vm_ioctl(struct file *filp,
-> -		       unsigned int ioctl, unsigned long arg)
-> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->  {
->  	struct kvm *kvm = filp->private_data;
->  	void __user *argp = (void __user *)arg;
-> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> index a25e0b73ee70..84cadaa2c2d3 100644
-> --- a/arch/mips/kvm/mips.c
-> +++ b/arch/mips/kvm/mips.c
-> @@ -1003,9 +1003,9 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
->  	kvm_flush_remote_tlbs(kvm);
->  }
->  
-> -long kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
-> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->  {
-> -	long r;
-> +	int r;
->  
->  	switch (ioctl) {
->  	default:
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index 04494a4fb37a..6f6ba55c224f 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -2386,12 +2386,11 @@ static int kvmppc_get_cpu_char(struct kvm_ppc_cpu_char *cp)
->  }
->  #endif
->  
-> -long kvm_arch_vm_ioctl(struct file *filp,
-> -                       unsigned int ioctl, unsigned long arg)
-> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->  {
->  	struct kvm *kvm __maybe_unused = filp->private_data;
->  	void __user *argp = (void __user *)arg;
-> -	long r;
-> +	int r;
->  
->  	switch (ioctl) {
->  	case KVM_PPC_GET_PVINFO: {
-> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-> index 65a964d7e70d..c13130ab459a 100644
-> --- a/arch/riscv/kvm/vm.c
-> +++ b/arch/riscv/kvm/vm.c
-> @@ -87,8 +87,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	return r;
->  }
->  
-> -long kvm_arch_vm_ioctl(struct file *filp,
-> -		       unsigned int ioctl, unsigned long arg)
-> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->  {
->  	return -EINVAL;
->  }
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 8ad1972b8a73..86ca49814983 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2850,8 +2850,7 @@ static int kvm_s390_vm_mem_op(struct kvm *kvm, struct kvm_s390_mem_op *mop)
->  	return r;
->  }
->  
-> -long kvm_arch_vm_ioctl(struct file *filp,
-> -		       unsigned int ioctl, unsigned long arg)
-> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->  {
->  	struct kvm *kvm = filp->private_data;
->  	void __user *argp = (void __user *)arg;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index caa2541833dd..c03363efc774 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6653,8 +6653,7 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, void __user *argp)
->  	return 0;
->  }
->  
-> -long kvm_arch_vm_ioctl(struct file *filp,
-> -		       unsigned int ioctl, unsigned long arg)
-> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->  {
->  	struct kvm *kvm = filp->private_data;
->  	void __user *argp = (void __user *)arg;
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 4f26b244f6d0..ed2f1f02976b 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1398,8 +1398,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
->  			bool line_status);
->  int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->  			    struct kvm_enable_cap *cap);
-> -long kvm_arch_vm_ioctl(struct file *filp,
-> -		       unsigned int ioctl, unsigned long arg);
-> +int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg);
->  long kvm_arch_vm_compat_ioctl(struct file *filp, unsigned int ioctl,
->  			      unsigned long arg);
->  
+Sorry about the size of this patch by the way. If we decide to keep this
+change I'll reduce it by first introducing these helpers and then
+splitting the structure in another patch.
+
+Thanks,
+Jean
 
