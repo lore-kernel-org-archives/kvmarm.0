@@ -1,410 +1,220 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A002560
-	for <kvmarm@lists.linux.dev>; Wed,  8 Feb 2023 12:51:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33005C433D2;
-	Wed,  8 Feb 2023 12:51:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675860673;
-	bh=ED3jEsHpcPRDR2VkBWCs/EDUJygUg2ZwMy2zEQr5ZXc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=J0sls3kmHK2eMPgKBtPlHuRtghZqUF9ocG41OEXRsahxag7lvUTDuaaruoOi+fPSj
-	 MsBp1F/ho+RK2jrPkUoWp8vFTt9+47FkcQOdbu5bIFmbqdIMv/oOpWVzphbqTxYnJa
-	 GmF4Q4CfWbNchXeL1X83POxbVjiFVjwqaHgZlXdch5eFS6SAlvTNmP8vgwsMPLmX/U
-	 kZAjHvH+ILzFPy+XVGxTYhg7MFbx4xPiw9IICIQxYqoGJYsp/hlih21wI1+QEKotWD
-	 yxDXqZcjTOs/1vndubdeZ1XRPaAaP4NOk06OKiSAkOEpUZwFJTx8Jb9guf71J7o44/
-	 SE3qYXagZE64g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pPjuo-008ewv-NA;
-	Wed, 08 Feb 2023 12:51:10 +0000
-Date: Wed, 08 Feb 2023 12:51:10 +0000
-Message-ID: <86ilgcz5fl.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Zaid Al-Bassam <zalbassam@google.com>
-Cc: Jesus Sanchez-Palencia <jesussanp@google.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A802581
+	for <kvmarm@lists.linux.dev>; Wed,  8 Feb 2023 14:01:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1675864891;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xaX8AFU4eXpjF5vFLIr2G/vAGGTB312aKfxgXhyjr+Q=;
+	b=fO8bdoKLTyX+xQxx0Y+iXhXvrixZZT4FYlppxtn8iEcgRMF2z5Md3Vliy1ZZzuo6I/7Xba
+	AM9vjoLfrsPFlFGj+EB9ESjC4pXhuVX3nhEeCnwjGPen3UtVDcXqFWJdZ6WQP1L+R2F92N
+	I6/xfS9KtKHG5WinmdiW/UF4BOjrfWU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-626-ewBUSS54Nx6yfoiILEwowg-1; Wed, 08 Feb 2023 09:01:28 -0500
+X-MC-Unique: ewBUSS54Nx6yfoiILEwowg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EF29F824018;
+	Wed,  8 Feb 2023 14:01:23 +0000 (UTC)
+Received: from thuth.com (unknown [10.39.193.64])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 146481415113;
+	Wed,  8 Feb 2023 14:01:19 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	Marc Zyngier <maz@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu,
-	Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 7/8] ARM: perf: Allow the use of the PMUv3 driver on 32bit ARM
-In-Reply-To: <20230126204444.2204061-8-zalbassam@google.com>
-References: <20230126204444.2204061-1-zalbassam@google.com>
-	<20230126204444.2204061-8-zalbassam@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Steven Price <steven.price@arm.com>,
+	Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH v2 1/6] KVM: PPC: Standardize on "int" return types in the powerpc KVM code
+Date: Wed,  8 Feb 2023 15:01:00 +0100
+Message-Id: <20230208140105.655814-2-thuth@redhat.com>
+In-Reply-To: <20230208140105.655814-1-thuth@redhat.com>
+References: <20230208140105.655814-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: zalbassam@google.com, jesussanp@google.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, namhyung@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 
-On Thu, 26 Jan 2023 20:44:43 +0000,
-Zaid Al-Bassam <zalbassam@google.com> wrote:
-> 
-> From: Marc Zyngier <marc.zyngier@arm.com>
-> 
-> The only thing stopping the PMUv3 driver from compiling on 32bit
-> is the lack of defined system registers names. This is easily
-> solved by providing the sysreg accessors and updating the Kconfig entry.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> Co-developed-by: Zaid Al-Bassam <zalbassam@google.com>
-> Signed-off-by: Zaid Al-Bassam <zalbassam@google.com>
-> ---
->  arch/arm/include/asm/arm_pmuv3.h | 238 +++++++++++++++++++++++++++++++
->  drivers/perf/Kconfig             |   5 +-
->  2 files changed, 240 insertions(+), 3 deletions(-)
->  create mode 100644 arch/arm/include/asm/arm_pmuv3.h
-> 
-> diff --git a/arch/arm/include/asm/arm_pmuv3.h b/arch/arm/include/asm/arm_pmuv3.h
-> new file mode 100644
-> index 000000000000..816873c74eda
-> --- /dev/null
-> +++ b/arch/arm/include/asm/arm_pmuv3.h
-> @@ -0,0 +1,238 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2012 ARM Ltd.
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef __ASM_PMUV3_H
-> +#define __ASM_PMUV3_H
-> +
-> +#include <asm/cp15.h>
-> +#include <asm/cputype.h>
-> +
-> +#define PMCCNTR			__ACCESS_CP15_64(0, c9)
-> +
-> +#define PMCR			__ACCESS_CP15(c9,  0, c12, 0)
-> +#define PMCNTENSET		__ACCESS_CP15(c9,  0, c12, 1)
-> +#define PMCNTENCLR		__ACCESS_CP15(c9,  0, c12, 2)
-> +#define PMOVSR			__ACCESS_CP15(c9,  0, c12, 3)
-> +#define PMSELR			__ACCESS_CP15(c9,  0, c12, 5)
-> +#define PMCEID0			__ACCESS_CP15(c9,  0, c12, 6)
-> +#define PMCEID1			__ACCESS_CP15(c9,  0, c12, 7)
-> +#define PMXEVTYPER		__ACCESS_CP15(c9,  0, c13, 1)
-> +#define PMXEVCNTR		__ACCESS_CP15(c9,  0, c13, 2)
-> +#define PMUSERENR		__ACCESS_CP15(c9,  0, c14, 0)
-> +#define PMINTENSET		__ACCESS_CP15(c9,  0, c14, 1)
-> +#define PMINTENCLR		__ACCESS_CP15(c9,  0, c14, 2)
-> +#define PMMIR			__ACCESS_CP15(c9,  0, c14, 6)
-> +#define PMCCFILTR		__ACCESS_CP15(c14, 0, c15, 7)
-> +#define PMEVCNTR0(n)	__ACCESS_CP15(c14, 0, c8, n)
-> +#define PMEVCNTR1(n)	__ACCESS_CP15(c14, 0, c9, n)
-> +#define PMEVCNTR2(n)	__ACCESS_CP15(c14, 0, c10, n)
-> +#define PMEVCNTR3(n)	__ACCESS_CP15(c14, 0, c11, n)
-> +#define PMEVTYPER0(n)	__ACCESS_CP15(c14, 0, c12, n)
-> +#define PMEVTYPER1(n)	__ACCESS_CP15(c14, 0, c13, n)
-> +#define PMEVTYPER2(n)	__ACCESS_CP15(c14, 0, c14, n)
-> +#define PMEVTYPER3(n)	__ACCESS_CP15(c14, 0, c15, n)
-> +
-> +#define PMEV_EVENTS_PER_REG		8
-> +#define PMEV_REGISTER(n)		(n / PMEV_EVENTS_PER_REG)
-> +#define PMEV_EVENT(n)			(n % PMEV_EVENTS_PER_REG)
-> +
-> +#define PMEV_CASE(reg, ev, case_macro)	\
-> +	case ev:							\
-> +		case_macro(reg, ev);			\
-> +		break
-> +
-> +#define PMEV_EV_SWITCH(reg, ev, case_macro)	\
-> +	do {									\
-> +		switch (ev) {						\
-> +		PMEV_CASE(reg, 0, case_macro);		\
-> +		PMEV_CASE(reg, 1, case_macro);		\
-> +		PMEV_CASE(reg, 2, case_macro);		\
-> +		PMEV_CASE(reg, 3, case_macro);		\
-> +		PMEV_CASE(reg, 4, case_macro);		\
-> +		PMEV_CASE(reg, 5, case_macro);		\
-> +		PMEV_CASE(reg, 6, case_macro);		\
-> +		PMEV_CASE(reg, 7, case_macro);		\
-> +		default:	\
-> +			WARN(1, "Invalid PMEV* event index\n");	\
-> +		}									\
-> +	} while (0)
+Most functions that are related to kvm_arch_vm_ioctl() already use
+"int" as return type to pass error values back to the caller. Some
+outlier functions use "long" instead for no good reason (they do not
+really require long values here). Let's standardize on "int" here to
+avoid casting the values back and forth between the two types.
 
-Please fix your editor, the indentation of the "\" is totally wrong.
+Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ arch/powerpc/include/asm/kvm_ppc.h  | 14 +++++++-------
+ arch/powerpc/kvm/book3s_64_mmu_hv.c | 14 +++++++-------
+ arch/powerpc/kvm/book3s_64_vio.c    |  4 ++--
+ arch/powerpc/kvm/book3s_hv.c        |  6 +++---
+ arch/powerpc/kvm/book3s_pr.c        |  4 ++--
+ 5 files changed, 21 insertions(+), 21 deletions(-)
 
-> +
-> +#define PMEV_REG_SWITCH(reg, ev, case_macro)	\
-> +	do {										\
-> +		switch (reg) {							\
-> +		case 0:									\
-> +			PMEV_EV_SWITCH(0, ev, case_macro);	\
-> +			break;								\
-> +		case 1:									\
-> +			PMEV_EV_SWITCH(1, ev, case_macro);	\
-> +			break;								\
-> +		case 2:									\
-> +			PMEV_EV_SWITCH(2, ev, case_macro);	\
-> +			break;								\
-> +		case 3:									\
-> +			PMEV_EV_SWITCH(3, ev, case_macro);	\
-> +			break;								\
-> +		default:								\
-> +			WARN(1, "Invalid PMEV* register index\n");	\
-> +		}										\
-> +	} while (0)
-
-No, please don't do that. This makes the whole thing unmaintainable to
-macro abuse. It also makes the code generation absolutely horrible,
-due to the switch nesting. Just look at the disassembly.
-
-The right way to do that is to declare the registers, one after the
-other, all 60 of them, and then use the arm64 big switch
-*unchanged*. You could even share it between the two
-architectures. The codegen is slightly bad (one big switch), and it is
-now trivial to read.
-
-See below for the actual change.
-
-	M.
-
-diff --git a/arch/arm/include/asm/arm_pmuv3.h b/arch/arm/include/asm/arm_pmuv3.h
-index 816873c74eda..4d483e055519 100644
---- a/arch/arm/include/asm/arm_pmuv3.h
-+++ b/arch/arm/include/asm/arm_pmuv3.h
-@@ -37,89 +37,132 @@
- #define PMINTENCLR		__ACCESS_CP15(c9,  0, c14, 2)
- #define PMMIR			__ACCESS_CP15(c9,  0, c14, 6)
- #define PMCCFILTR		__ACCESS_CP15(c14, 0, c15, 7)
--#define PMEVCNTR0(n)	__ACCESS_CP15(c14, 0, c8, n)
--#define PMEVCNTR1(n)	__ACCESS_CP15(c14, 0, c9, n)
--#define PMEVCNTR2(n)	__ACCESS_CP15(c14, 0, c10, n)
--#define PMEVCNTR3(n)	__ACCESS_CP15(c14, 0, c11, n)
--#define PMEVTYPER0(n)	__ACCESS_CP15(c14, 0, c12, n)
--#define PMEVTYPER1(n)	__ACCESS_CP15(c14, 0, c13, n)
--#define PMEVTYPER2(n)	__ACCESS_CP15(c14, 0, c14, n)
--#define PMEVTYPER3(n)	__ACCESS_CP15(c14, 0, c15, n)
--
--#define PMEV_EVENTS_PER_REG		8
--#define PMEV_REGISTER(n)		(n / PMEV_EVENTS_PER_REG)
--#define PMEV_EVENT(n)			(n % PMEV_EVENTS_PER_REG)
--
--#define PMEV_CASE(reg, ev, case_macro)	\
--	case ev:							\
--		case_macro(reg, ev);			\
--		break
--
--#define PMEV_EV_SWITCH(reg, ev, case_macro)	\
--	do {									\
--		switch (ev) {						\
--		PMEV_CASE(reg, 0, case_macro);		\
--		PMEV_CASE(reg, 1, case_macro);		\
--		PMEV_CASE(reg, 2, case_macro);		\
--		PMEV_CASE(reg, 3, case_macro);		\
--		PMEV_CASE(reg, 4, case_macro);		\
--		PMEV_CASE(reg, 5, case_macro);		\
--		PMEV_CASE(reg, 6, case_macro);		\
--		PMEV_CASE(reg, 7, case_macro);		\
--		default:	\
--			WARN(1, "Invalid PMEV* event index\n");	\
--		}									\
--	} while (0)
+diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+index eae9619b6190..41ab4ebdc1ee 100644
+--- a/arch/powerpc/include/asm/kvm_ppc.h
++++ b/arch/powerpc/include/asm/kvm_ppc.h
+@@ -157,7 +157,7 @@ extern void kvmppc_map_magic(struct kvm_vcpu *vcpu);
  
--#define PMEV_REG_SWITCH(reg, ev, case_macro)	\
--	do {										\
--		switch (reg) {							\
--		case 0:									\
--			PMEV_EV_SWITCH(0, ev, case_macro);	\
--			break;								\
--		case 1:									\
--			PMEV_EV_SWITCH(1, ev, case_macro);	\
--			break;								\
--		case 2:									\
--			PMEV_EV_SWITCH(2, ev, case_macro);	\
--			break;								\
--		case 3:									\
--			PMEV_EV_SWITCH(3, ev, case_macro);	\
--			break;								\
--		default:								\
--			WARN(1, "Invalid PMEV* register index\n");	\
--		}										\
-+#define PMEVCNTR0		__ACCESS_CP15(c14, 0, c8, 0)
-+#define PMEVCNTR1		__ACCESS_CP15(c14, 0, c8, 1)
-+#define PMEVCNTR2		__ACCESS_CP15(c14, 0, c8, 2)
-+#define PMEVCNTR3		__ACCESS_CP15(c14, 0, c8, 3)
-+#define PMEVCNTR4		__ACCESS_CP15(c14, 0, c8, 4)
-+#define PMEVCNTR5		__ACCESS_CP15(c14, 0, c8, 5)
-+#define PMEVCNTR6		__ACCESS_CP15(c14, 0, c8, 6)
-+#define PMEVCNTR7		__ACCESS_CP15(c14, 0, c8, 7)
-+#define PMEVCNTR8		__ACCESS_CP15(c14, 0, c9, 0)
-+#define PMEVCNTR9		__ACCESS_CP15(c14, 0, c9, 1)
-+#define PMEVCNTR10		__ACCESS_CP15(c14, 0, c9, 2)
-+#define PMEVCNTR11		__ACCESS_CP15(c14, 0, c9, 3)
-+#define PMEVCNTR12		__ACCESS_CP15(c14, 0, c9, 4)
-+#define PMEVCNTR13		__ACCESS_CP15(c14, 0, c9, 5)
-+#define PMEVCNTR14		__ACCESS_CP15(c14, 0, c9, 6)
-+#define PMEVCNTR15		__ACCESS_CP15(c14, 0, c9, 7)
-+#define PMEVCNTR16		__ACCESS_CP15(c14, 0, c10, 0)
-+#define PMEVCNTR17		__ACCESS_CP15(c14, 0, c10, 1)
-+#define PMEVCNTR18		__ACCESS_CP15(c14, 0, c10, 2)
-+#define PMEVCNTR19		__ACCESS_CP15(c14, 0, c10, 3)
-+#define PMEVCNTR20		__ACCESS_CP15(c14, 0, c10, 4)
-+#define PMEVCNTR21		__ACCESS_CP15(c14, 0, c10, 5)
-+#define PMEVCNTR22		__ACCESS_CP15(c14, 0, c10, 6)
-+#define PMEVCNTR23		__ACCESS_CP15(c14, 0, c10, 7)
-+#define PMEVCNTR24		__ACCESS_CP15(c14, 0, c11, 0)
-+#define PMEVCNTR25		__ACCESS_CP15(c14, 0, c11, 1)
-+#define PMEVCNTR26		__ACCESS_CP15(c14, 0, c11, 2)
-+#define PMEVCNTR27		__ACCESS_CP15(c14, 0, c11, 3)
-+#define PMEVCNTR28		__ACCESS_CP15(c14, 0, c11, 4)
-+#define PMEVCNTR29		__ACCESS_CP15(c14, 0, c11, 5)
-+#define PMEVCNTR30		__ACCESS_CP15(c14, 0, c11, 6)
-+
-+#define PMEVTYPER0		__ACCESS_CP15(c14, 0, c12, 0)
-+#define PMEVTYPER1		__ACCESS_CP15(c14, 0, c12, 1)
-+#define PMEVTYPER2		__ACCESS_CP15(c14, 0, c12, 2)
-+#define PMEVTYPER3		__ACCESS_CP15(c14, 0, c12, 3)
-+#define PMEVTYPER4		__ACCESS_CP15(c14, 0, c12, 4)
-+#define PMEVTYPER5		__ACCESS_CP15(c14, 0, c12, 5)
-+#define PMEVTYPER6		__ACCESS_CP15(c14, 0, c12, 6)
-+#define PMEVTYPER7		__ACCESS_CP15(c14, 0, c12, 7)
-+#define PMEVTYPER8		__ACCESS_CP15(c14, 0, c13, 0)
-+#define PMEVTYPER9		__ACCESS_CP15(c14, 0, c13, 1)
-+#define PMEVTYPER10		__ACCESS_CP15(c14, 0, c13, 2)
-+#define PMEVTYPER11		__ACCESS_CP15(c14, 0, c13, 3)
-+#define PMEVTYPER12		__ACCESS_CP15(c14, 0, c13, 4)
-+#define PMEVTYPER13		__ACCESS_CP15(c14, 0, c13, 5)
-+#define PMEVTYPER14		__ACCESS_CP15(c14, 0, c13, 6)
-+#define PMEVTYPER15		__ACCESS_CP15(c14, 0, c13, 7)
-+#define PMEVTYPER16		__ACCESS_CP15(c14, 0, c14, 0)
-+#define PMEVTYPER17		__ACCESS_CP15(c14, 0, c14, 1)
-+#define PMEVTYPER18		__ACCESS_CP15(c14, 0, c14, 2)
-+#define PMEVTYPER19		__ACCESS_CP15(c14, 0, c14, 3)
-+#define PMEVTYPER20		__ACCESS_CP15(c14, 0, c14, 4)
-+#define PMEVTYPER21		__ACCESS_CP15(c14, 0, c14, 5)
-+#define PMEVTYPER22		__ACCESS_CP15(c14, 0, c14, 6)
-+#define PMEVTYPER23		__ACCESS_CP15(c14, 0, c14, 7)
-+#define PMEVTYPER24		__ACCESS_CP15(c14, 0, c15, 0)
-+#define PMEVTYPER25		__ACCESS_CP15(c14, 0, c15, 1)
-+#define PMEVTYPER26		__ACCESS_CP15(c14, 0, c15, 2)
-+#define PMEVTYPER27		__ACCESS_CP15(c14, 0, c15, 3)
-+#define PMEVTYPER28		__ACCESS_CP15(c14, 0, c15, 4)
-+#define PMEVTYPER29		__ACCESS_CP15(c14, 0, c15, 5)
-+#define PMEVTYPER30		__ACCESS_CP15(c14, 0, c15, 6)
-+
-+#define PMEVN_CASE(n, case_macro) \
-+	case n: case_macro(n); break
-+
-+#define PMEVN_SWITCH(x, case_macro)				\
-+	do {							\
-+		switch (x) {					\
-+		PMEVN_CASE(0,  case_macro);			\
-+		PMEVN_CASE(1,  case_macro);			\
-+		PMEVN_CASE(2,  case_macro);			\
-+		PMEVN_CASE(3,  case_macro);			\
-+		PMEVN_CASE(4,  case_macro);			\
-+		PMEVN_CASE(5,  case_macro);			\
-+		PMEVN_CASE(6,  case_macro);			\
-+		PMEVN_CASE(7,  case_macro);			\
-+		PMEVN_CASE(8,  case_macro);			\
-+		PMEVN_CASE(9,  case_macro);			\
-+		PMEVN_CASE(10, case_macro);			\
-+		PMEVN_CASE(11, case_macro);			\
-+		PMEVN_CASE(12, case_macro);			\
-+		PMEVN_CASE(13, case_macro);			\
-+		PMEVN_CASE(14, case_macro);			\
-+		PMEVN_CASE(15, case_macro);			\
-+		PMEVN_CASE(16, case_macro);			\
-+		PMEVN_CASE(17, case_macro);			\
-+		PMEVN_CASE(18, case_macro);			\
-+		PMEVN_CASE(19, case_macro);			\
-+		PMEVN_CASE(20, case_macro);			\
-+		PMEVN_CASE(21, case_macro);			\
-+		PMEVN_CASE(22, case_macro);			\
-+		PMEVN_CASE(23, case_macro);			\
-+		PMEVN_CASE(24, case_macro);			\
-+		PMEVN_CASE(25, case_macro);			\
-+		PMEVN_CASE(26, case_macro);			\
-+		PMEVN_CASE(27, case_macro);			\
-+		PMEVN_CASE(28, case_macro);			\
-+		PMEVN_CASE(29, case_macro);			\
-+		PMEVN_CASE(30, case_macro);			\
-+		default: WARN(1, "Invalid PMEV* index\n");	\
-+		}						\
- 	} while (0)
+ extern int kvmppc_allocate_hpt(struct kvm_hpt_info *info, u32 order);
+ extern void kvmppc_set_hpt(struct kvm *kvm, struct kvm_hpt_info *info);
+-extern long kvmppc_alloc_reset_hpt(struct kvm *kvm, int order);
++extern int kvmppc_alloc_reset_hpt(struct kvm *kvm, int order);
+ extern void kvmppc_free_hpt(struct kvm_hpt_info *info);
+ extern void kvmppc_rmap_reset(struct kvm *kvm);
+ extern void kvmppc_map_vrma(struct kvm_vcpu *vcpu,
+@@ -171,7 +171,7 @@ extern int kvmppc_switch_mmu_to_hpt(struct kvm *kvm);
+ extern int kvmppc_switch_mmu_to_radix(struct kvm *kvm);
+ extern void kvmppc_setup_partition_table(struct kvm *kvm);
  
--#define RETURN_READ_PMEVCNTR(reg, ev) \
--	return read_sysreg(PMEVCNTR##reg(ev))
-+#define RETURN_READ_PMEVCNTRN(n) \
-+	return read_sysreg(PMEVCNTR##n)
- static unsigned long read_pmevcntrn(int n)
+-extern long kvm_vm_ioctl_create_spapr_tce(struct kvm *kvm,
++extern int kvm_vm_ioctl_create_spapr_tce(struct kvm *kvm,
+ 				struct kvm_create_spapr_tce_64 *args);
+ #define kvmppc_ioba_validate(stt, ioba, npages)                         \
+ 		(iommu_tce_check_ioba((stt)->page_shift, (stt)->offset, \
+@@ -212,10 +212,10 @@ extern void kvmppc_bookehv_exit(void);
+ extern int kvmppc_prepare_to_enter(struct kvm_vcpu *vcpu);
+ 
+ extern int kvm_vm_ioctl_get_htab_fd(struct kvm *kvm, struct kvm_get_htab_fd *);
+-extern long kvm_vm_ioctl_resize_hpt_prepare(struct kvm *kvm,
+-					    struct kvm_ppc_resize_hpt *rhpt);
+-extern long kvm_vm_ioctl_resize_hpt_commit(struct kvm *kvm,
++extern int kvm_vm_ioctl_resize_hpt_prepare(struct kvm *kvm,
+ 					   struct kvm_ppc_resize_hpt *rhpt);
++extern int kvm_vm_ioctl_resize_hpt_commit(struct kvm *kvm,
++					  struct kvm_ppc_resize_hpt *rhpt);
+ 
+ int kvm_vcpu_ioctl_interrupt(struct kvm_vcpu *vcpu, struct kvm_interrupt *irq);
+ 
+@@ -287,8 +287,8 @@ struct kvmppc_ops {
+ 	int (*emulate_mtspr)(struct kvm_vcpu *vcpu, int sprn, ulong spr_val);
+ 	int (*emulate_mfspr)(struct kvm_vcpu *vcpu, int sprn, ulong *spr_val);
+ 	void (*fast_vcpu_kick)(struct kvm_vcpu *vcpu);
+-	long (*arch_vm_ioctl)(struct file *filp, unsigned int ioctl,
+-			      unsigned long arg);
++	int (*arch_vm_ioctl)(struct file *filp, unsigned int ioctl,
++			     unsigned long arg);
+ 	int (*hcall_implemented)(unsigned long hcall);
+ 	int (*irq_bypass_add_producer)(struct irq_bypass_consumer *,
+ 				       struct irq_bypass_producer *);
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+index 7006bcbc2e37..1f4896de58ca 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+@@ -124,9 +124,9 @@ void kvmppc_set_hpt(struct kvm *kvm, struct kvm_hpt_info *info)
+ 		 info->virt, (long)info->order, kvm->arch.lpid);
+ }
+ 
+-long kvmppc_alloc_reset_hpt(struct kvm *kvm, int order)
++int kvmppc_alloc_reset_hpt(struct kvm *kvm, int order)
  {
--	const int reg = PMEV_REGISTER(n);
--	const int event = PMEV_EVENT(n);
--
--	PMEV_REG_SWITCH(reg, event, RETURN_READ_PMEVCNTR);
-+	PMEVN_SWITCH(n, RETURN_READ_PMEVCNTRN);
+-	long err = -EBUSY;
++	int err = -EBUSY;
+ 	struct kvm_hpt_info info;
+ 
+ 	mutex_lock(&kvm->arch.mmu_setup_lock);
+@@ -1468,8 +1468,8 @@ static void resize_hpt_prepare_work(struct work_struct *work)
+ 	mutex_unlock(&kvm->arch.mmu_setup_lock);
+ }
+ 
+-long kvm_vm_ioctl_resize_hpt_prepare(struct kvm *kvm,
+-				     struct kvm_ppc_resize_hpt *rhpt)
++int kvm_vm_ioctl_resize_hpt_prepare(struct kvm *kvm,
++				    struct kvm_ppc_resize_hpt *rhpt)
+ {
+ 	unsigned long flags = rhpt->flags;
+ 	unsigned long shift = rhpt->shift;
+@@ -1534,13 +1534,13 @@ static void resize_hpt_boot_vcpu(void *opaque)
+ 	/* Nothing to do, just force a KVM exit */
+ }
+ 
+-long kvm_vm_ioctl_resize_hpt_commit(struct kvm *kvm,
+-				    struct kvm_ppc_resize_hpt *rhpt)
++int kvm_vm_ioctl_resize_hpt_commit(struct kvm *kvm,
++				   struct kvm_ppc_resize_hpt *rhpt)
+ {
+ 	unsigned long flags = rhpt->flags;
+ 	unsigned long shift = rhpt->shift;
+ 	struct kvm_resize_hpt *resize;
+-	long ret;
++	int ret;
+ 
+ 	if (flags != 0 || kvm_is_radix(kvm))
+ 		return -EINVAL;
+diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
+index 95e738ef9062..93b695b289e9 100644
+--- a/arch/powerpc/kvm/book3s_64_vio.c
++++ b/arch/powerpc/kvm/book3s_64_vio.c
+@@ -288,8 +288,8 @@ static const struct file_operations kvm_spapr_tce_fops = {
+ 	.release	= kvm_spapr_tce_release,
+ };
+ 
+-long kvm_vm_ioctl_create_spapr_tce(struct kvm *kvm,
+-				   struct kvm_create_spapr_tce_64 *args)
++int kvm_vm_ioctl_create_spapr_tce(struct kvm *kvm,
++				  struct kvm_create_spapr_tce_64 *args)
+ {
+ 	struct kvmppc_spapr_tce_table *stt = NULL;
+ 	struct kvmppc_spapr_tce_table *siter;
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 6ba68dd6190b..cd139a1edc67 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -5779,12 +5779,12 @@ static void kvmppc_irq_bypass_del_producer_hv(struct irq_bypass_consumer *cons,
+ }
+ #endif
+ 
+-static long kvm_arch_vm_ioctl_hv(struct file *filp,
+-				 unsigned int ioctl, unsigned long arg)
++static int kvm_arch_vm_ioctl_hv(struct file *filp,
++				unsigned int ioctl, unsigned long arg)
+ {
+ 	struct kvm *kvm __maybe_unused = filp->private_data;
+ 	void __user *argp = (void __user *)arg;
+-	long r;
++	int r;
+ 
+ 	switch (ioctl) {
+ 
+diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
+index 9fc4dd8f66eb..5908b514bfb6 100644
+--- a/arch/powerpc/kvm/book3s_pr.c
++++ b/arch/powerpc/kvm/book3s_pr.c
+@@ -2042,8 +2042,8 @@ static int kvmppc_core_check_processor_compat_pr(void)
  	return 0;
  }
  
--#define WRITE_PMEVCNTR(reg, ev) \
--	write_sysreg(val, PMEVCNTR##reg(ev))
-+#define WRITE_PMEVCNTRN(n) \
-+	write_sysreg(val, PMEVCNTR##n)
- static void write_pmevcntrn(int n, unsigned long val)
+-static long kvm_arch_vm_ioctl_pr(struct file *filp,
+-				 unsigned int ioctl, unsigned long arg)
++static int kvm_arch_vm_ioctl_pr(struct file *filp,
++				unsigned int ioctl, unsigned long arg)
  {
--	const int reg = PMEV_REGISTER(n);
--	const int event = PMEV_EVENT(n);
--
--	PMEV_REG_SWITCH(reg, event, WRITE_PMEVCNTR);
-+	PMEVN_SWITCH(n, WRITE_PMEVCNTRN);
+ 	return -ENOTTY;
  }
- 
--#define WRITE_PMEVTYPER(reg, ev) \
--	write_sysreg(val, PMEVTYPER##reg(ev))
-+#define WRITE_PMEVTYPERN(n) \
-+	write_sysreg(val, PMEVTYPER##n)
- static void write_pmevtypern(int n, unsigned long val)
- {
--	const int reg = PMEV_REGISTER(n);
--	const int event = PMEV_EVENT(n);
--
--	PMEV_REG_SWITCH(reg, event, WRITE_PMEVTYPER);
-+	PMEVN_SWITCH(n, WRITE_PMEVTYPERN);
- }
- 
- static inline unsigned long read_pmmir(void)
-
 -- 
-Without deviation from the norm, progress is not possible.
+2.31.1
+
