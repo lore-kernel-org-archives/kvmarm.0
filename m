@@ -1,193 +1,201 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5D2945C
-	for <kvmarm@lists.linux.dev>; Wed,  8 Feb 2023 10:00:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99653C433EF;
-	Wed,  8 Feb 2023 10:00:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675850410;
-	bh=s4vaxrnc1mvUSnF8N75rkyowNIgbPMRpjaPxjxZkNdA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X6aQJuDLJ8b0xyWlTxlWTqJluGbIRsWyhr0yE99EhnqK64aGHk5SplHb3ADAuxb9I
-	 o7DkMUvAeYEwlXRfj1uSn00lrZWZErjXZfs3IyR9hLdwM8mNgae0qDwf7AmUQBPHQp
-	 CZYblt4ABUbD2odM8Po7srQVHiRqdWBx0Bgz8TUKR+uWgCxY7qoV+v1SGx9hob3vXa
-	 Tb4Zo14DqDmL2RBpsPVwV4KlL8vhxPOdnyf3ZRvQmyeFd2O/vwBu6/eoa672voZI02
-	 IpiG6dFe3aoxTS+WXFA0IbjccXU9LBG8AYQS4mV2enjY1awcs0z4cLIKiPrmViGvDs
-	 JgHcm3sag7j3g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pPhFG-008cXn-Rw;
-	Wed, 08 Feb 2023 10:00:08 +0000
-Date: Wed, 08 Feb 2023 10:00:06 +0000
-Message-ID: <86o7q4zdcp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: David Matlack <dmatlack@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Sean Christopherson <seanjc@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvmarm@lists.cs.columbia.edu,
-	linux-mips@vger.kernel.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v2 2/7] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
-In-Reply-To: <20230126184025.2294823-3-dmatlack@google.com>
-References: <20230126184025.2294823-1-dmatlack@google.com>
-	<20230126184025.2294823-3-dmatlack@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BDF2560
+	for <kvmarm@lists.linux.dev>; Wed,  8 Feb 2023 11:05:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1675854352;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ddn3ZHKD3Y1fAHYFvdUXFlfh/V/xujs0Wif2Rwk78Bg=;
+	b=cJRVycbcvUpY78KTLnJFl1W9RCTPVtTZ29k4tCzerTL7sm8wlfnvjyNtClPr4D0iN5OZdx
+	+zMVXUw14DKaNd9UocN3TIKBeevlmRB2qZkYbNzoN2qpwlsMQdliop2Kux2LVvfx46fNGE
+	iYumA8j34m3H5y8Z6W2UkfG80lkBI6E=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-615-AsEauE5EPruvmEn019oLcw-1; Wed, 08 Feb 2023 06:05:48 -0500
+X-MC-Unique: AsEauE5EPruvmEn019oLcw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CBE4029A9D42;
+	Wed,  8 Feb 2023 11:05:47 +0000 (UTC)
+Received: from [10.64.54.63] (vpn2-54-63.bne.redhat.com [10.64.54.63])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id EC1CA1121314;
+	Wed,  8 Feb 2023 11:05:40 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v2 08/12] KVM: arm64: Add
+ KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+To: Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
+ maz@kernel.org, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+ catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com,
+ reijiw@google.com, rananta@google.com, bgardon@google.com,
+ ricarkol@gmail.com, Oliver Upton <oliver.upton@linux.dev>
+References: <20230206165851.3106338-1-ricarkol@google.com>
+ <20230206165851.3106338-9-ricarkol@google.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <58151bf0-1f56-3887-fa22-479c9b84bd4a@redhat.com>
+Date: Wed, 8 Feb 2023 22:05:37 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dmatlack@google.com, pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+In-Reply-To: <20230206165851.3106338-9-ricarkol@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 
-On Thu, 26 Jan 2023 18:40:20 +0000,
-David Matlack <dmatlack@google.com> wrote:
+Hi Ricardo,
+
+On 2/7/23 3:58 AM, Ricardo Koller wrote:
+> Add a capability for userspace to specify the eager split chunk size.
+> The chunk size specifies how many pages to break at a time, using a
+> single allocation. Bigger the chunk size, more pages need to be
+> allocated ahead of time.
 > 
-> Use kvm_arch_flush_remote_tlbs() instead of
-> CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL. The two mechanisms solve the same
-> problem, allowing architecture-specific code to provide a non-IPI
-> implementation of remote TLB flushing.
-> 
-> Dropping CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL allows KVM to standardize
-> all architectures on kvm_arch_flush_remote_tlbs() instead of maintaining
-> two mechanisms.
-> 
-> Opt to standardize on kvm_arch_flush_remote_tlbs() since it avoids
-> duplicating the generic TLB stats across architectures that implement
-> their own remote TLB flush.
-> 
-> This adds an extra function call to the ARM64 kvm_flush_remote_tlbs()
-> path, but that is a small cost in comparison to flushing remote TLBs.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
+> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h | 3 +++
->  arch/arm64/kvm/Kconfig            | 1 -
->  arch/arm64/kvm/mmu.c              | 6 +++---
->  virt/kvm/Kconfig                  | 3 ---
->  virt/kvm/kvm_main.c               | 2 --
->  5 files changed, 6 insertions(+), 9 deletions(-)
+>   Documentation/virt/kvm/api.rst    | 26 ++++++++++++++++++++++++++
+>   arch/arm64/include/asm/kvm_host.h |  2 ++
+>   arch/arm64/kvm/arm.c              | 22 ++++++++++++++++++++++
+>   arch/arm64/kvm/mmu.c              |  3 +++
+>   include/uapi/linux/kvm.h          |  1 +
+>   5 files changed, 54 insertions(+)
 > 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 9807b05a1b57..a9332e331cce 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8284,6 +8284,32 @@ structure.
+>   When getting the Modified Change Topology Report value, the attr->addr
+>   must point to a byte where the value will be stored or retrieved from.
+>   
+> +8.40 KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+> +---------------------------------------
+> +
+> +:Capability: KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
+> +:Architectures: arm64
+> +:Type: vm
+> +:Parameters: arg[0] is the new chunk size.
+> +:Returns: 0 on success, -EINVAL if any memslot has been created.
+> +
+> +This capability sets the chunk size used in Eager Page Splitting.
+> +
+> +Eager Page Splitting improves the performance of dirty-logging (used
+> +in live migrations) when guest memory is backed by huge-pages.  This
+> +optimization is enabled by default on arm64. It avoids splitting
+> +huge-pages (into PAGE_SIZE pages) on fault, by doing it eagerly when
+> +enabling dirty logging (with the KVM_MEM_LOG_DIRTY_PAGES flag for a
+> +memory region), or when using KVM_CLEAR_DIRTY_LOG.
+> +
+> +The chunk size specifies how many pages to break at a time, using a
+> +single allocation for each chunk. Bigger the chunk size, more pages
+> +need to be allocated ahead of time. A good heuristic is to pick the
+> +size of the huge-pages as the chunk size.
+> +
+> +If the chunk size (arg[0]) is zero, then no eager page splitting is
+> +performed. The default value PMD size (e.g., 2M when PAGE_SIZE is 4K).
+> +
+>   9. Known KVM API problems
+>   =========================
+>   
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 113e20fdbb56..062800f1dc54 100644
+> index 35a159d131b5..a69a815719cf 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -998,6 +998,9 @@ int __init kvm_set_ipa_limit(void);
->  #define __KVM_HAVE_ARCH_VM_ALLOC
->  struct kvm *kvm_arch_alloc_vm(void);
->  
-> +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
-> +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> @@ -153,6 +153,8 @@ struct kvm_s2_mmu {
+>   	/* The last vcpu id that ran on each physical CPU */
+>   	int __percpu *last_vcpu_ran;
+>   
+> +#define KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT	PMD_SIZE
 > +
->  static inline bool kvm_vm_is_protected(struct kvm *kvm)
->  {
->  	return false;
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index ca6eadeb7d1a..e9ac57098a0b 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -25,7 +25,6 @@ menuconfig KVM
->  	select MMU_NOTIFIER
->  	select PREEMPT_NOTIFIERS
->  	select HAVE_KVM_CPU_RELAX_INTERCEPT
-> -	select HAVE_KVM_ARCH_TLB_FLUSH_ALL
->  	select KVM_MMIO
->  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
->  	select KVM_XFER_TO_GUEST_WORK
+>   	struct kvm_arch *arch;
+>   };
+>   
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 9c5573bc4614..c80617ced599 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -101,6 +101,22 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>   		r = 0;
+>   		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
+>   		break;
+> +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
+> +		mutex_lock(&kvm->lock);
+> +		mutex_lock(&kvm->slots_lock);
+> +		/*
+> +		 * To keep things simple, allow changing the chunk
+> +		 * size only if there are no memslots created.
+> +		 */
+> +		if (!kvm_are_all_memslots_empty(kvm)) {
+> +			r = -EINVAL;
+> +		} else {
+> +			r = 0;
+> +			kvm->arch.mmu.split_page_chunk_size = cap->args[0];
+> +		}
+> +		mutex_unlock(&kvm->slots_lock);
+> +		mutex_unlock(&kvm->lock);
+> +		break;
+>   	default:
+>   		r = -EINVAL;
+>   		break;
+> @@ -298,6 +314,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+>   		r = system_has_full_ptr_auth();
+>   		break;
+> +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
+> +		if (kvm)
+> +			r = kvm->arch.mmu.split_page_chunk_size;
+> +		else
+> +			r = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> +		break;
+>   	default:
+>   		r = 0;
+>   	}
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 01352f5838a0..8840f65e0e40 100644
+> index 812633a75e74..e2ada6588017 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -80,15 +80,15 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
->  }
->  
->  /**
-> - * kvm_flush_remote_tlbs() - flush all VM TLB entries for v7/8
-> + * kvm_arch_flush_remote_tlbs() - flush all VM TLB entries for v7/8
->   * @kvm:	pointer to kvm structure.
->   *
->   * Interface to HYP function to flush all VM TLB entries
->   */
-> -void kvm_flush_remote_tlbs(struct kvm *kvm)
-> +int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
->  {
-> -	++kvm->stat.generic.remote_tlb_flush_requests;
->  	kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
-> +	return 0;
->  }
->  
->  static bool kvm_is_device_pfn(unsigned long pfn)
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index b74916de5183..484d0873061c 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -62,9 +62,6 @@ config HAVE_KVM_CPU_RELAX_INTERCEPT
->  config KVM_VFIO
->         bool
->  
-> -config HAVE_KVM_ARCH_TLB_FLUSH_ALL
-> -       bool
-> -
->  config HAVE_KVM_INVALID_WAKEUPS
->         bool
->  
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 277507463678..fefd3e3c8fe1 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -347,7 +347,6 @@ bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req)
->  }
->  EXPORT_SYMBOL_GPL(kvm_make_all_cpus_request);
->  
-> -#ifndef CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
->  void kvm_flush_remote_tlbs(struct kvm *kvm)
->  {
->  	++kvm->stat.generic.remote_tlb_flush_requests;
-> @@ -368,7 +367,6 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
->  		++kvm->stat.generic.remote_tlb_flush;
->  }
+> @@ -755,6 +755,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+>   	for_each_possible_cpu(cpu)
+>   		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
+>   
+> +	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
+> +	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
+> +
+>   	mmu->pgt = pgt;
+>   	mmu->pgd_phys = __pa(pgt->pgd);
+>   	return 0;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 55155e262646..02e05f7918e2 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1175,6 +1175,7 @@ struct kvm_ppc_resize_hpt {
+>   #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
+>   #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
+>   #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
+> +#define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 226
+>   
+>   #ifdef KVM_CAP_IRQ_ROUTING
+>   
+> 
 
-For context, we currently have this:
-
-	if (!kvm_arch_flush_remote_tlb(kvm)
-	    || kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH))
-		++kvm->stat.generic.remote_tlb_flush;
-
-Is there any reason why we shouldn't move the KVM_REQ_TLB_FLUSH call
-into the arch-specific helpers? This is architecture specific, even if
-the majority of the supported architecture cannot do broadcast
-invalidation like arm64 does.
+mmu->split_page_cache and mmu->split_page_chunk_size are defined in PATCH[09/12].
+I think you need move the definitions to PATCH[08/12] instead. Otherwise, git-bisect
+is broken.
 
 Thanks,
+Gavin
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
