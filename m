@@ -1,201 +1,115 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BDF2560
-	for <kvmarm@lists.linux.dev>; Wed,  8 Feb 2023 11:05:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1675854352;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ddn3ZHKD3Y1fAHYFvdUXFlfh/V/xujs0Wif2Rwk78Bg=;
-	b=cJRVycbcvUpY78KTLnJFl1W9RCTPVtTZ29k4tCzerTL7sm8wlfnvjyNtClPr4D0iN5OZdx
-	+zMVXUw14DKaNd9UocN3TIKBeevlmRB2qZkYbNzoN2qpwlsMQdliop2Kux2LVvfx46fNGE
-	iYumA8j34m3H5y8Z6W2UkfG80lkBI6E=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-615-AsEauE5EPruvmEn019oLcw-1; Wed, 08 Feb 2023 06:05:48 -0500
-X-MC-Unique: AsEauE5EPruvmEn019oLcw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CBE4029A9D42;
-	Wed,  8 Feb 2023 11:05:47 +0000 (UTC)
-Received: from [10.64.54.63] (vpn2-54-63.bne.redhat.com [10.64.54.63])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EC1CA1121314;
-	Wed,  8 Feb 2023 11:05:40 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v2 08/12] KVM: arm64: Add
- KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-To: Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
- maz@kernel.org, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
- catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com,
- reijiw@google.com, rananta@google.com, bgardon@google.com,
- ricarkol@gmail.com, Oliver Upton <oliver.upton@linux.dev>
-References: <20230206165851.3106338-1-ricarkol@google.com>
- <20230206165851.3106338-9-ricarkol@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <58151bf0-1f56-3887-fa22-479c9b84bd4a@redhat.com>
-Date: Wed, 8 Feb 2023 22:05:37 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE071946B
+	for <kvmarm@lists.linux.dev>; Wed,  8 Feb 2023 11:20:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C1E4C433D2;
+	Wed,  8 Feb 2023 11:20:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1675855219;
+	bh=B6zrD3MUb4KtKj9xfIe7UkOC0UIDN9V3CX8L2Her3GU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aWxLzIYYde9IiprCgOyv9OMXKegfvQyUEOixFqlEkX2XfCCFIGDz4bmWGktTPsikQ
+	 E5/kt7GfLGfuqb9ld8GSk74tHMWQ2se+9SVmO9xsiW9XUtJa/k/D8UGcvA3Xo8t4So
+	 lh+aiOr7TChS/1mdrm3zVIGf6eX/TyC0HNRG629pi+Y13pVPbVuo5w6Bhm2g72pAZL
+	 msu+rL/AXB1bDzTFdMUliSA0quO2kp+rxCp4Q0EJtZJA+X0qNS9X05rZzfKBMpzaW4
+	 mkWPEKQGNS9CcvvT3l5ACVcJVR3mIqrodWR33V+FEAfhGKhydboVL4rCAoODRawMBw
+	 NqHT970latq/w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pPiUr-008dkz-Ci;
+	Wed, 08 Feb 2023 11:20:17 +0000
+Date: Wed, 08 Feb 2023 11:20:16 +0000
+Message-ID: <86mt5oz9n3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Zaid Al-Bassam <zalbassam@google.com>
+Cc: Jesus Sanchez-Palencia <jesussanp@google.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH 3/8] perf: pmuv3: Add common defines for the PMU version
+In-Reply-To: <20230126204444.2204061-4-zalbassam@google.com>
+References: <20230126204444.2204061-1-zalbassam@google.com>
+	<20230126204444.2204061-4-zalbassam@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <20230206165851.3106338-9-ricarkol@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: zalbassam@google.com, jesussanp@google.com, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, peterz@infradead.org, mingo@redhat.com, acme@kernel.org, mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, namhyung@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Ricardo,
-
-On 2/7/23 3:58 AM, Ricardo Koller wrote:
-> Add a capability for userspace to specify the eager split chunk size.
-> The chunk size specifies how many pages to break at a time, using a
-> single allocation. Bigger the chunk size, more pages need to be
-> allocated ahead of time.
+On Thu, 26 Jan 2023 20:44:39 +0000,
+Zaid Al-Bassam <zalbassam@google.com> wrote:
 > 
-> Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> The current PMU version defines are available for arm64 only,
+> As we want to add PMUv3 support to arm (32-bit), this patch makes
+> these defines available for both arm/arm64 by defining them in
+> the common arm_pmuv3.h header.
+> 
+> Signed-off-by: Zaid Al-Bassam <zalbassam@google.com>
 > ---
->   Documentation/virt/kvm/api.rst    | 26 ++++++++++++++++++++++++++
->   arch/arm64/include/asm/kvm_host.h |  2 ++
->   arch/arm64/kvm/arm.c              | 22 ++++++++++++++++++++++
->   arch/arm64/kvm/mmu.c              |  3 +++
->   include/uapi/linux/kvm.h          |  1 +
->   5 files changed, 54 insertions(+)
+>  drivers/perf/arm_pmuv3.c       | 8 ++++----
+>  include/linux/perf/arm_pmuv3.h | 6 ++++++
+>  2 files changed, 10 insertions(+), 4 deletions(-)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 9807b05a1b57..a9332e331cce 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8284,6 +8284,32 @@ structure.
->   When getting the Modified Change Topology Report value, the attr->addr
->   must point to a byte where the value will be stored or retrieved from.
->   
-> +8.40 KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-> +---------------------------------------
-> +
-> +:Capability: KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE
-> +:Architectures: arm64
-> +:Type: vm
-> +:Parameters: arg[0] is the new chunk size.
-> +:Returns: 0 on success, -EINVAL if any memslot has been created.
-> +
-> +This capability sets the chunk size used in Eager Page Splitting.
-> +
-> +Eager Page Splitting improves the performance of dirty-logging (used
-> +in live migrations) when guest memory is backed by huge-pages.  This
-> +optimization is enabled by default on arm64. It avoids splitting
-> +huge-pages (into PAGE_SIZE pages) on fault, by doing it eagerly when
-> +enabling dirty logging (with the KVM_MEM_LOG_DIRTY_PAGES flag for a
-> +memory region), or when using KVM_CLEAR_DIRTY_LOG.
-> +
-> +The chunk size specifies how many pages to break at a time, using a
-> +single allocation for each chunk. Bigger the chunk size, more pages
-> +need to be allocated ahead of time. A good heuristic is to pick the
-> +size of the huge-pages as the chunk size.
-> +
-> +If the chunk size (arg[0]) is zero, then no eager page splitting is
-> +performed. The default value PMD size (e.g., 2M when PAGE_SIZE is 4K).
-> +
->   9. Known KVM API problems
->   =========================
->   
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 35a159d131b5..a69a815719cf 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -153,6 +153,8 @@ struct kvm_s2_mmu {
->   	/* The last vcpu id that ran on each physical CPU */
->   	int __percpu *last_vcpu_ran;
->   
-> +#define KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT	PMD_SIZE
-> +
->   	struct kvm_arch *arch;
->   };
->   
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 9c5573bc4614..c80617ced599 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -101,6 +101,22 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->   		r = 0;
->   		set_bit(KVM_ARCH_FLAG_SYSTEM_SUSPEND_ENABLED, &kvm->arch.flags);
->   		break;
-> +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
-> +		mutex_lock(&kvm->lock);
-> +		mutex_lock(&kvm->slots_lock);
-> +		/*
-> +		 * To keep things simple, allow changing the chunk
-> +		 * size only if there are no memslots created.
-> +		 */
-> +		if (!kvm_are_all_memslots_empty(kvm)) {
-> +			r = -EINVAL;
-> +		} else {
-> +			r = 0;
-> +			kvm->arch.mmu.split_page_chunk_size = cap->args[0];
-> +		}
-> +		mutex_unlock(&kvm->slots_lock);
-> +		mutex_unlock(&kvm->lock);
-> +		break;
->   	default:
->   		r = -EINVAL;
->   		break;
-> @@ -298,6 +314,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_ARM_PTRAUTH_GENERIC:
->   		r = system_has_full_ptr_auth();
->   		break;
-> +	case KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE:
-> +		if (kvm)
-> +			r = kvm->arch.mmu.split_page_chunk_size;
-> +		else
-> +			r = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-> +		break;
->   	default:
->   		r = 0;
->   	}
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 812633a75e74..e2ada6588017 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -755,6 +755,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
->   	for_each_possible_cpu(cpu)
->   		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
->   
-> +	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
-> +	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-> +
->   	mmu->pgt = pgt;
->   	mmu->pgd_phys = __pa(pgt->pgd);
->   	return 0;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 55155e262646..02e05f7918e2 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1175,6 +1175,7 @@ struct kvm_ppc_resize_hpt {
->   #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
->   #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
->   #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
-> +#define KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE 226
->   
->   #ifdef KVM_CAP_IRQ_ROUTING
->   
-> 
+> diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
+> index 94e4098b662d..505f0758260c 100644
+> --- a/drivers/perf/arm_pmuv3.c
+> +++ b/drivers/perf/arm_pmuv3.c
+> @@ -392,7 +392,7 @@ static const struct attribute_group armv8_pmuv3_caps_attr_group = {
+>   */
+>  static bool armv8pmu_has_long_event(struct arm_pmu *cpu_pmu)
+>  {
+> -	return (cpu_pmu->pmuver >= ID_AA64DFR0_EL1_PMUVer_V3P5);
+> +	return (cpu_pmu->pmuver >= ARMV8_PMU_DFR_VER_V3P5);
 
-mmu->split_page_cache and mmu->split_page_chunk_size are defined in PATCH[09/12].
-I think you need move the definitions to PATCH[08/12] instead. Otherwise, git-bisect
-is broken.
+This doesn't really makes any sense. As per the architecture spec,
+PMUv3p5 on AArch32 cannot expose the top 32 bits (DDI0487I.a, G8.4.10
+"PMEVCNTR<n>, Performance Monitors Event Count Registers, n = 0 -
+30"):
+
+<quote>
+There is no means to access bits [63:32] directly from AArch32 state.
+</quote>
+
+So on AArch32, this should always return false, no ifs, no buts.
+
+Also, turning the architectural symbols (ID_AA64DFR0_EL1_*) into
+custom stuff is a total non-starter. We generate these names and want
+to use them everywhere.
+
+Either you abstract them in the architecture specific headers, or you
+define the AArch64 name in the AArch32 code.
 
 Thanks,
-Gavin
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
