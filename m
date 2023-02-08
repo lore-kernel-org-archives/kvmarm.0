@@ -1,68 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FF79452;
-	Wed,  8 Feb 2023 09:02:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 778D4C433A0;
-	Wed,  8 Feb 2023 09:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5D2945C
+	for <kvmarm@lists.linux.dev>; Wed,  8 Feb 2023 10:00:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99653C433EF;
+	Wed,  8 Feb 2023 10:00:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675846933;
-	bh=Au9MWvR8WSilVR5o+G1SBG0j1tkJGbQ1BYt+vNhmIjE=;
+	s=k20201202; t=1675850410;
+	bh=s4vaxrnc1mvUSnF8N75rkyowNIgbPMRpjaPxjxZkNdA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RzQiZ9P6NDDC6vH0trcQ+X2uILhWWJkrt7w+rg5sjO3axMWd9ufymHHtAWCV7eUqM
-	 fjAVNVi0+LTcNRR/9g4MpfdnptHZaX9SFbjlPF7S/NDq6hsgVkqHzcWmVNnqaNzrMD
-	 MSkofGRklN9fhQfkxl7z7jeZmJqtZRcSCZjdWnHZzr3MpC+TtmwHuRNNS8tDu6i7yz
-	 D0ShsgTgsIGKOHCWr2jWrCUf8c6PPX6NLy/tGbT6kWGgYUWy8gDNUwjdBdslnJe24f
-	 hj2PWLvbvaqv/tKaepwKx9+ywYeFCX/gY1aRb3iikq4ryc4DBq8BCLhh/NFh6gIMQ3
-	 z2Qv8NH9XA0Nw==
-Received: from [104.132.45.110] (helo=wait-a-minute.misterjones.org)
+	b=X6aQJuDLJ8b0xyWlTxlWTqJluGbIRsWyhr0yE99EhnqK64aGHk5SplHb3ADAuxb9I
+	 o7DkMUvAeYEwlXRfj1uSn00lrZWZErjXZfs3IyR9hLdwM8mNgae0qDwf7AmUQBPHQp
+	 CZYblt4ABUbD2odM8Po7srQVHiRqdWBx0Bgz8TUKR+uWgCxY7qoV+v1SGx9hob3vXa
+	 Tb4Zo14DqDmL2RBpsPVwV4KlL8vhxPOdnyf3ZRvQmyeFd2O/vwBu6/eoa672voZI02
+	 IpiG6dFe3aoxTS+WXFA0IbjccXU9LBG8AYQS4mV2enjY1awcs0z4cLIKiPrmViGvDs
+	 JgHcm3sag7j3g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pPgLD-008bNL-4P;
-	Wed, 08 Feb 2023 09:02:11 +0000
-Date: Wed, 08 Feb 2023 09:02:09 +0000
-Message-ID: <877cws1qem.wl-maz@kernel.org>
+	id 1pPhFG-008cXn-Rw;
+	Wed, 08 Feb 2023 10:00:08 +0000
+Date: Wed, 08 Feb 2023 10:00:06 +0000
+Message-ID: <86o7q4zdcp.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: James Morse <james.morse@arm.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	linux-pm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-acpi@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	linux-ia64@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	x86@kernel.org,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Borislav Petkov <bp@alien8.de>,
-	H Peter Anvin <hpa@zytor.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
+To: David Matlack <dmatlack@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Len Brown <lenb@kernel.org>,
-	Rafael Wysocki <rafael@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: Re: [RFC PATCH 29/32] KVM: arm64: Pass hypercalls to userspace
-In-Reply-To: <0621bf8e-06f2-70f2-6d2b-f311c5a4ffce@arm.com>
-References: <20230203135043.409192-1-james.morse@arm.com>
-	<20230203135043.409192-30-james.morse@arm.com>
-	<Y913sIqWxmf4O5oG@google.com>
-	<0621bf8e-06f2-70f2-6d2b-f311c5a4ffce@arm.com>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Sean Christopherson <seanjc@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvmarm@lists.cs.columbia.edu,
+	linux-mips@vger.kernel.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v2 2/7] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
+In-Reply-To: <20230126184025.2294823-3-dmatlack@google.com>
+References: <20230126184025.2294823-1-dmatlack@google.com>
+	<20230126184025.2294823-3-dmatlack@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -70,49 +60,132 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 104.132.45.110
-X-SA-Exim-Rcpt-To: james.morse@arm.com, oliver.upton@linux.dev, linux-pm@vger.kernel.org, loongarch@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, tglx@linutronix.de, lpieralisi@kernel.org, mark.rutland@arm.com, sudeep.holla@arm.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com, will@kernel.org, catalin.marinas@arm.com, chenhuacai@kernel.org, suzuki.poulose@arm.com, lenb@kernel.org, rafael@kernel.org, kernel@xen0n.name, salil.mehta@huawei.com, linux@armlinux.org.uk, jean-philippe@linaro.org
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dmatlack@google.com, pbonzini@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, rananta@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 07 Feb 2023 17:50:59 +0000,
-James Morse <james.morse@arm.com> wrote:
+On Thu, 26 Jan 2023 18:40:20 +0000,
+David Matlack <dmatlack@google.com> wrote:
 > 
-> Hi Oliver,
+> Use kvm_arch_flush_remote_tlbs() instead of
+> CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL. The two mechanisms solve the same
+> problem, allowing architecture-specific code to provide a non-IPI
+> implementation of remote TLB flushing.
 > 
-> On 03/02/2023 21:08, Oliver Upton wrote:
-> > On Fri, Feb 03, 2023 at 01:50:40PM +0000, James Morse wrote:
-> >> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> >>
-> >> When capability KVM_CAP_ARM_HVC_TO_USER is available, userspace can
-> >> request to handle all hypercalls that aren't handled by KVM.
+> Dropping CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL allows KVM to standardize
+> all architectures on kvm_arch_flush_remote_tlbs() instead of maintaining
+> two mechanisms.
 > 
-> > I would very much prefer we not go down this route. This capability
-> > effectively constructs an ABI out of what KVM presently does not
-> > implement. What would happen if KVM decides to implement a new set
-> > of hypercalls later down the road that were previously forwarded to
-> > userspace?
+> Opt to standardize on kvm_arch_flush_remote_tlbs() since it avoids
+> duplicating the generic TLB stats across architectures that implement
+> their own remote TLB flush.
 > 
-> The user-space support would never get called. If we have a
-> wild-west allocation of IDs in this area we have bigger
-> problems. I'd hope in this example it would be a VMM or an in-kernel
-> implementation of the same feature.
+> This adds an extra function call to the ARM64 kvm_flush_remote_tlbs()
+> path, but that is a small cost in comparison to flushing remote TLBs.
 > 
-> When I floated something like this before for supporting SDEI in
-> guests, Christoffer didn't like tie-ing KVM to SMC-CC - hence the
-> all or nothing.
+> No functional change intended.
 > 
-> Since then we've had things like Spectre, which I don't think the
-> VMM should ever be allowed to handle, which makes the whole thing
-> much murkier.
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 3 +++
+>  arch/arm64/kvm/Kconfig            | 1 -
+>  arch/arm64/kvm/mmu.c              | 6 +++---
+>  virt/kvm/Kconfig                  | 3 ---
+>  virt/kvm/kvm_main.c               | 2 --
+>  5 files changed, 6 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 113e20fdbb56..062800f1dc54 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -998,6 +998,9 @@ int __init kvm_set_ipa_limit(void);
+>  #define __KVM_HAVE_ARCH_VM_ALLOC
+>  struct kvm *kvm_arch_alloc_vm(void);
+>  
+> +#define __KVM_HAVE_ARCH_FLUSH_REMOTE_TLBS
+> +int kvm_arch_flush_remote_tlbs(struct kvm *kvm);
+> +
+>  static inline bool kvm_vm_is_protected(struct kvm *kvm)
+>  {
+>  	return false;
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index ca6eadeb7d1a..e9ac57098a0b 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -25,7 +25,6 @@ menuconfig KVM
+>  	select MMU_NOTIFIER
+>  	select PREEMPT_NOTIFIERS
+>  	select HAVE_KVM_CPU_RELAX_INTERCEPT
+> -	select HAVE_KVM_ARCH_TLB_FLUSH_ALL
+>  	select KVM_MMIO
+>  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>  	select KVM_XFER_TO_GUEST_WORK
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 01352f5838a0..8840f65e0e40 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -80,15 +80,15 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+>  }
+>  
+>  /**
+> - * kvm_flush_remote_tlbs() - flush all VM TLB entries for v7/8
+> + * kvm_arch_flush_remote_tlbs() - flush all VM TLB entries for v7/8
+>   * @kvm:	pointer to kvm structure.
+>   *
+>   * Interface to HYP function to flush all VM TLB entries
+>   */
+> -void kvm_flush_remote_tlbs(struct kvm *kvm)
+> +int kvm_arch_flush_remote_tlbs(struct kvm *kvm)
+>  {
+> -	++kvm->stat.generic.remote_tlb_flush_requests;
+>  	kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
+> +	return 0;
+>  }
+>  
+>  static bool kvm_is_device_pfn(unsigned long pfn)
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index b74916de5183..484d0873061c 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -62,9 +62,6 @@ config HAVE_KVM_CPU_RELAX_INTERCEPT
+>  config KVM_VFIO
+>         bool
+>  
+> -config HAVE_KVM_ARCH_TLB_FLUSH_ALL
+> -       bool
+> -
+>  config HAVE_KVM_INVALID_WAKEUPS
+>         bool
+>  
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 277507463678..fefd3e3c8fe1 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -347,7 +347,6 @@ bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_make_all_cpus_request);
+>  
+> -#ifndef CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL
+>  void kvm_flush_remote_tlbs(struct kvm *kvm)
+>  {
+>  	++kvm->stat.generic.remote_tlb_flush_requests;
+> @@ -368,7 +367,6 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+>  		++kvm->stat.generic.remote_tlb_flush;
+>  }
 
-That ship has sailed a long time ago. We also have grown a bunch of
-in-kernel SMCCC services that are KVM specific (the silly PTP stuff,
-for example, not to mention all the pKVM hypercalls...).
+For context, we currently have this:
 
-It is also likely that these ranges will grow over time (it has been a
-long time since the last drop of Spectre-like crap, and something must
-be brewing somewhere), so a level of discrimination is important.
+	if (!kvm_arch_flush_remote_tlb(kvm)
+	    || kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH))
+		++kvm->stat.generic.remote_tlb_flush;
+
+Is there any reason why we shouldn't move the KVM_REQ_TLB_FLUSH call
+into the arch-specific helpers? This is architecture specific, even if
+the majority of the supported architecture cannot do broadcast
+invalidation like arm64 does.
+
+Thanks,
 
 	M.
 
