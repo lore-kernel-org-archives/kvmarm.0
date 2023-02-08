@@ -1,145 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A879028E3;
-	Wed,  8 Feb 2023 14:25:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5819EC433EF;
-	Wed,  8 Feb 2023 14:25:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675866341;
-	bh=t5jw1fCX4NoFeI2EPmYRhXOtkcVOIpQY0b9/jl5R8zA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QgNyeqlpCi/SBDeCi1TjNEdCqZoJFbgr2WJlBzhmFCZPBDl+FvwZLFuUoEtRHiVbv
-	 uS4uK4r0XCkRineIPNNP9oNxBtbjMeBbnPgCgvwNC+24iI018JePzQOYQtTUyIy/Mp
-	 /qg/12O4pWuU4Ph2uCYFfSRaCoExuPkTdS6885J4+z8cV91aO0N0MHwBMlJryvG9OZ
-	 X0le3Z/bcdQT3Q9bcuXnQc0LtSfZRuA6mh3CZD/9kvJpn4wp9UOAU86Mdp+1pChhIx
-	 M/bUit0KIlLfw8FTXVwGO//F6H/bwcRj6WGI2Aj+ovZgdrJEnNUillAjBfdPPc/tmo
-	 KNXBaoR+knFdw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1pPlOF-008gAy-0C;
-	Wed, 08 Feb 2023 14:25:39 +0000
-Date: Wed, 08 Feb 2023 14:25:38 +0000
-Message-ID: <86h6vwz125.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: James Morse <james.morse@arm.com>
-Cc: linux-pm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-acpi@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	linux-ia64@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	x86@kernel.org,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Borislav Petkov <bp@alien8.de>,
-	H Peter Anvin <hpa@zytor.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62702257B
+	for <kvmarm@lists.linux.dev>; Wed,  8 Feb 2023 14:48:56 +0000 (UTC)
+Received: by mail-pl1-f169.google.com with SMTP id be8so19497179plb.7
+        for <kvmarm@lists.linux.dev>; Wed, 08 Feb 2023 06:48:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FFBEpHVyO7uaEXohEkZMXZFRiWaMnYer0SJSyNE2OQo=;
+        b=hMOdPggyeGwA8nIQGyI3lk8r6madEiHE1tfQILTzxCiy1S7kUMUVaOhyHsVp06goap
+         xu3OTi4hYwWjZUQvyadbZEP3tCnJkNTADf3pcXG10U3Bg6jMDXlkGMHqGqVwwoskxqZD
+         tawgXU9UGZ0cqOWkVEH3kiqEmuD8kla7MXmbwv9628VLynYNqSAJDTBK375CkOiEJXju
+         sdjTjOye77/aoufgQyQHZ+ZVVxHUrUPnqxX8duSqU938FVPItqp/CwL5e/cVkwmZk/MT
+         owWkEI8ueZFmAdHcW1jyYhtr52ME/ScfkE4iQ6i34E9szGx+u+4lnFOthBjNQywWGZ1M
+         jM5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FFBEpHVyO7uaEXohEkZMXZFRiWaMnYer0SJSyNE2OQo=;
+        b=4oOWmDY9GtEHQC8eUBf+X/r9j2dRr8t6rXa1LviQxom3OGOBqCAfIxBGheHXlIVxXq
+         btp7jZzoXjpJItfbdw8qn2T3Fk8bbPZRKbces9K1PT73s5pGh0SguGdPRpXJSyY0BvkM
+         t6tL29JeOcz3MVz84Lb7wtfaDfgxRaazIiJBvQ8PCZ7UdgI8jV9nG4TpZiSQnaLz9EIm
+         T90hlhOuEqCkFl0nEp19ei0YiDRRUD3+Ag+GOJPZMqs4we+uy9duPuMJwdhDTlfvifKI
+         oaDsRCy9Kql1MoQLhl8ai1U54sySLlOaYTSYaS8w1xsITK21jzaau+rDa2ZEbj95ZOVW
+         FO8A==
+X-Gm-Message-State: AO0yUKVCPkr/rw6Jf+uh5mftuaZSObJ7XoGUMOdvTskC963wDvMLiTB2
+	eGqWXZ2BmGbm8ILu6kioCqCc7Q==
+X-Google-Smtp-Source: AK7set+p35lGTvN8xsFLL4fqhMTQyitTRsLEsTPZ+gHzxMmxq7tY2+fV/RaR4t2O3sr/KKtToUrGwQ==
+X-Received: by 2002:a17:902:e74e:b0:198:af50:e4e9 with SMTP id p14-20020a170902e74e00b00198af50e4e9mr240153plf.15.1675867735657;
+        Wed, 08 Feb 2023 06:48:55 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id l2-20020a170902ec0200b00199019e247csm7680677pld.207.2023.02.08.06.48.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Feb 2023 06:48:55 -0800 (PST)
+Date: Wed, 8 Feb 2023 14:48:51 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Len Brown <lenb@kernel.org>,
-	Rafael Wysocki <rafael@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: Re: [RFC PATCH 29/32] KVM: arm64: Pass hypercalls to userspace
-In-Reply-To: <878rh81rfa.wl-maz@kernel.org>
-References: <20230203135043.409192-1-james.morse@arm.com>
-	<20230203135043.409192-30-james.morse@arm.com>
-	<865ycg1kv2.wl-maz@kernel.org>
-	<7462738f-e837-cd99-f441-8e7c29d250cd@arm.com>
-	<878rh81rfa.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>, Gavin Shan <gshan@redhat.com>,
+	Steven Price <steven.price@arm.com>,
+	Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v2 3/6] KVM: x86: Remove the KVM_GET_NR_MMU_PAGES ioctl
+Message-ID: <Y+O2U/x7zHzeVV6e@google.com>
+References: <20230208140105.655814-1-thuth@redhat.com>
+ <20230208140105.655814-4-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: james.morse@arm.com, linux-pm@vger.kernel.org, loongarch@lists.linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-acpi@vger.kernel.org, linux-arch@vger.kernel.org, linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, tglx@linutronix.de, lpieralisi@kernel.org, mark.rutland@arm.com, sudeep.holla@arm.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com, will@kernel.org, catalin.marinas@arm.com, chenhuacai@kernel.org, suzuki.poulose@arm.com, oliver.upton@linux.dev, lenb@kernel.org, rafael@kernel.org, kernel@xen0n.name, salil.mehta@huawei.com, linux@armlinux.org.uk, jean-philippe@linaro.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230208140105.655814-4-thuth@redhat.com>
 
-On Wed, 08 Feb 2023 08:40:09 +0000,
-Marc Zyngier <maz@kernel.org> wrote:
+On Wed, Feb 08, 2023, Thomas Huth wrote:
+> The KVM_GET_NR_MMU_PAGES ioctl is quite questionable on 64-bit hosts
+> since it fails to return the full 64 bits of the value that can be
+> set with the corresponding KVM_SET_NR_MMU_PAGES call. Its "long" return
+> value is truncated into an "int" in the kvm_arch_vm_ioctl() function.
 > 
-> On Tue, 07 Feb 2023 17:50:58 +0000,
-> James Morse <james.morse@arm.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > On 05/02/2023 10:12, Marc Zyngier wrote:
-> > > On Fri, 03 Feb 2023 13:50:40 +0000,
-> > > James Morse <james.morse@arm.com> wrote:
-> > >>
-> > >> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > >>
-> > >> When capability KVM_CAP_ARM_HVC_TO_USER is available, userspace can
-> > >> request to handle all hypercalls that aren't handled by KVM. With the
-> > >> help of another capability, this will allow userspace to handle PSCI
-> > >> calls.
-> > 
-> > > On top of Oliver's ask not to make this a blanket "steal everything",
-> > > but instead to have an actual request for ranges of forwarded
-> > > hypercalls:
-> > > 
-> > >> Notes on this implementation:
-> > >>
-> > >> * A similar mechanism was proposed for SDEI some time ago [1]. This RFC
-> > >>   generalizes the idea to all hypercalls, since that was suggested on
-> > >>   the list [2, 3].
-> > >>
-> > >> * We're reusing kvm_run.hypercall. I copied x0-x5 into
-> > >>   kvm_run.hypercall.args[] to help userspace but I'm tempted to remove
-> > >>   this, because:
-> > >>   - Most user handlers will need to write results back into the
-> > >>     registers (x0-x3 for SMCCC), so if we keep this shortcut we should
-> > >>     go all the way and read them back on return to kernel.
-> > >>   - QEMU doesn't care about this shortcut, it pulls all vcpu regs before
-> > >>     handling the call.
-> > >>   - SMCCC uses x0-x16 for parameters.
-> > >>   x0 does contain the SMCCC function ID and may be useful for fast
-> > >>   dispatch, we could keep that plus the immediate number.
-> > >>
-> > >> * Add a flag in the kvm_run.hypercall telling whether this is HVC or
-> > >>   SMC?  Can be added later in those bottom longmode and pad fields.
-> > 
-> > > We definitely need this. A nested hypervisor can (and does) use SMCs
-> > > as the conduit.
-> > 
-> > Christoffer's comments last time round on this was that EL2 guests
-> > get SMC with this, and EL1 guests get HVC. The VMM could never get
-> > both...
+> Since this ioctl also never has been used by userspace applications
+> (QEMU, Google's internal VMM, kvmtool and CrosVM have been checked),
+> it's likely the best if we remove this badly designed ioctl before
+> anybody really tries to use it.
 > 
-> I agree with the first half of the statement (EL2 guest using SMC),
-> but limiting EL1 guests to HVC is annoying. On systems that have a
-> secure side, it would make sense to be able to route the guest's SMC
-> calls to userspace and allow it to emulate/proxy/deny such calls.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
 
-You also want to look at the TRNG firmware spec (aka DEN0098), which
-explicitly calls out for the use of SMC when EL2 and EL3 are
-implemented (see 1.5 "Invocation considerations").
-
-Is it mad? Yes. But madness seems to be the direction of travel these
-days.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Reviewed-by: Sean Christopherson <seanjc@google.com>
