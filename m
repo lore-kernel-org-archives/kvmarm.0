@@ -1,166 +1,124 @@
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F3E6D1B
-	for <kvmarm@lists.linux.dev>; Thu,  9 Feb 2023 16:17:44 +0000 (UTC)
-Received: by mail-qk1-f177.google.com with SMTP id e19so1048392qkm.2
-        for <kvmarm@lists.linux.dev>; Thu, 09 Feb 2023 08:17:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=l1q8uW0wC/1vWAZXokeTVo9Y4zK7AFLn1ur6xrYX4nk=;
-        b=fIa9y6cFDGARPrJ6HuTtffnePwOxRbuOWLC7qFX5a3jiIz3aI3ik+3aUq0Lo3y6atO
-         AsjYsS14l156jUjaWZM8li0qXoZcJi4T1gHhuBcrwYMS3Lk+rU2D3u2e51rNdn3xtWww
-         FdtZtUHr4rErjRJy8kQ1UG63mCdK5f3LhvgEAtP3A1NWcM53pg1m4LsM5O4+xnBzmd5S
-         HZvdz3j1Vhn46syiQjSd3BTPQ5vs6GQObiIbyqgmRY3DYP3fCUA1/7vsSdz4p7URcBRu
-         /V9e3SbYscRQk8e83DzI375nR2V+5BCXmZOm2Fg7ugFWp27urhJxUeAngTbvXI5cYAFI
-         8foA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l1q8uW0wC/1vWAZXokeTVo9Y4zK7AFLn1ur6xrYX4nk=;
-        b=j1jhEAr12G4cjj+15lmgiyTgJM17aDlmHruZrzHYqFOS/sVRc/UXfwTJI9OVe96Wb9
-         Qup0nA9VI7tE3HC16eCKnZI3EIoEbgZVq2TIABiblHO3NjYp03cZujNopSuOJiU6W20U
-         +RlANVd8HXaShxRx9aRuH7NMTe2lNGXeHrKA6scWq1zRjqWPI2fDSsyV1qDGPZI3VbcW
-         txJivkNsSqPAOXf94VuvRzVyhbHP+wRfk1dCR3Eq1If1SR1aMXetSf2zOiq0iZdrZN13
-         75rTVLZEldsso9CKclbsMn36umdkPiKrkBu8fiqxeoFscURJ9t7rjL5SjX0ZO+sGZzbA
-         C03Q==
-X-Gm-Message-State: AO0yUKVkdddytr6FlEpfbQnpsM5qmlUzkJMXberznWO5EgYC/2xXqBFR
-	TqgDBrUe5WHIqLR38DwPUh9hKA0VG+7zG6YNnN8nYw==
-X-Google-Smtp-Source: AK7set+q5rR8zs3pDnPffpgGO74oRQG7dg4owyQaCmgIY+opp5dyvSdYVuNeefYP2QHG8fZFj8OPgv4nwH550N7P0zs=
-X-Received: by 2002:a37:c8e:0:b0:735:274f:816e with SMTP id
- 136-20020a370c8e000000b00735274f816emr989957qkm.390.1675959463346; Thu, 09
- Feb 2023 08:17:43 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A30A921
+	for <kvmarm@lists.linux.dev>; Thu,  9 Feb 2023 17:58:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C18A4C433D2;
+	Thu,  9 Feb 2023 17:58:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1675965527;
+	bh=2KRNVETxyXEtrTIEUnDJDzge0zGfEtAgWGQPFgH8d5c=;
+	h=From:To:Cc:Subject:Date:From;
+	b=YT8SV1Sz1qP3PQRCd1ojFsQmmzfTNOr2oFDImiffjh0C/tiK0hqmBj/PLRQ783xLH
+	 4uKPeoRIFmYrMqc7pCyQV19ENvWYqrqtm9XcfYfnw4jLm7R4yzMlgt6asA5HBYLdIM
+	 rdIuPxfy9yDM5TTpzs00WynOESv98pIsWcjVgvPQPL+BwXjePSpueZW/uyPuV1Hfno
+	 CWCJlg3N345APhVAuRXe//FEWVCrg/yTzXacy1tZKO09P0a+75gLJ+mECr1DQaCoVC
+	 92TjQSoC8XXf+k6EOcVA5T0zml8UDBqxNEmZqxHTtYQS6yt/GLXnrpVBoDJTbzdb9D
+	 gEPBhmd1xKKlA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1pQBC1-0093r7-FG;
+	Thu, 09 Feb 2023 17:58:45 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH 00/18] KVM: arm64: Prefix patches for NV support
+Date: Thu,  9 Feb 2023 17:58:02 +0000
+Message-Id: <20230209175820.1939006-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230206165851.3106338-1-ricarkol@google.com> <20230206165851.3106338-5-ricarkol@google.com>
- <cae4a1d9-b5c2-2929-6d88-5a3fbe719651@redhat.com> <CAOHnOrxqEsbRD302Wwn9N06d6xj5NWy4p+C9DBjEm6Z4z2FvXg@mail.gmail.com>
-In-Reply-To: <CAOHnOrxqEsbRD302Wwn9N06d6xj5NWy4p+C9DBjEm6Z4z2FvXg@mail.gmail.com>
-From: Ricardo Koller <ricarkol@google.com>
-Date: Thu, 9 Feb 2023 08:17:31 -0800
-Message-ID: <CAOHnOrwprM8v3xXCA5sEVD1cHVQRS6vsPvdXiC1NocrzyQcoYw@mail.gmail.com>
-Subject: Re: [PATCH v2 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
-To: Gavin Shan <gshan@redhat.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
-	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, 
-	andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, 
-	suzuki.poulose@arm.com, eric.auger@redhat.com, reijiw@google.com, 
-	rananta@google.com, bgardon@google.com, ricarkol@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, catalin.marinas@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-"(> > > +     if (data->mc_capacity < nr_pages)
-> > > +             return -ENOMEM;
-> > > +
-> > > +     phys = kvm_pte_to_phys(pte);
-> > > +     prot = kvm_pgtable_stage2_pte_prot(pte);
-> > > +
-> > > +     ret = kvm_pgtable_stage2_create_unlinked(data->mmu->pgt, &new, phys,
-> > > +                                              level, prot, mc, force_pte);
-> > > +     if (ret)
-> > > +             return ret;
-> > > +
-> > > +     if (!stage2_try_break_pte(ctx, data->mmu)) {
-> > > +             childp = kvm_pte_follow(new, mm_ops);
-> > > +             kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
-> > > +             mm_ops->put_page(childp);
-> > > +             return -EAGAIN;
-> > > +     }
-> > > +
-> > > +     /*
-> > > +      * Note, the contents of the page table are guaranteed to be made
-> > > +      * visible before the new PTE is assigned because stage2_make_pte()
-> > > +      * writes the PTE using smp_store_release().
-> > > +      */
-> > > +     stage2_make_pte(ctx, new);
-> > > +     dsb(ishst);
-> > > +     data->mc_capacity -= nr_pages;
-> > > +     return 0;
-> > > +}
-> > > +
-> >
-> > I think it's possible 'data->mc_capability' to be replaced by 'mc->nobjs'
-> > because they're same thing. With this, we needn't to maintain a duplicate
-> > 'data->mc_capability' since 'data->mc' has been existing.
->
-> Ah, nice, yes. That would be simpler.
->
+As a bunch of the NV patches have had a decent amount of review, and
+given that they do very little on their own, I've put together a
+prefix series that gets the most mundane stuff out of the way.
 
-Actually, there's a complication. The memcache details are hidden
-inside of pgtable.c,
-so different types of memcaches (for vhe and nvhe) can be used for allocations.
-Specifically, the memcache objects are passed as an opaque pointer ("void *")
-and can be used with "struct hyp_pool" and "struct kvm_mmu_memory_cache".
-
-So, here are all the options that I can think of:
-
-        1. stage2_split_walker() is just used on the VHE case with the
-        "struct kvm_mmu_memory_cache" memcache, so we could just use it
-        instead of a "void *":
-
-                kvm_pgtable_stage2_split(..., struct kvm_mmu_memory_cache *mc);
-
-        However, it could be used for the NVHE case as well, plus
-        this would go against the overall design of pgtable.c which tries
-        to use opaque objects for most things.
-
-        2. add a "get_nobjs()" method to both memcaches. This is tricky
-        because "struct hyp_pool" doesn't directly track its capacity. I
-        would rather not mess with it.
-
-        3. This whole accounting of available pages in the memcache is
-        needed because of the way I implemented stage2_split_walker() and
-        the memcache interface.  stage2_split_walker() tries to allocate
-        as many pages for the new table as allowed by the capacity of the
-        memcache. The issue with blindingly trying until the allocation
-        fails is that kvm_mmu_memory_cache_alloc() WARNs and tries to
-        allocate using GFP_ATOMIC when !nobjs. We don't want to do that,
-        so we could extend kvm_pgtable_mm_ops.zalloc_page() with a
-        NO_GFP_ATOMIC_ON_EMPTY (or similar). This flag would have to be
-        ignored on the hyp side.
-
-        4. what this patch is currently doing: tracking the capacity by
-        hand.
-
-I prefer options 4 and 3. WDYT?
+Of course, nothing is functional, but nothing gets used either. In a
+way, this is pretty similar to the current state of pKVM! ;-)
 
 Thanks,
-Ricardo
 
-> Thanks!
-> Ricardo
->
-> >
-> > > +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > > +                          void *mc, u64 mc_capacity)
-> > > +{
-> > > +     struct stage2_split_data split_data = {
-> > > +             .mmu            = pgt->mmu,
-> > > +             .memcache       = mc,
-> > > +             .mc_capacity    = mc_capacity,
-> > > +     };
-> > > +
-> > > +     struct kvm_pgtable_walker walker = {
-> > > +             .cb     = stage2_split_walker,
-> > > +             .flags  = KVM_PGTABLE_WALK_LEAF,
-> > > +             .arg    = &split_data,
-> > > +     };
-> > > +
-> > > +     return kvm_pgtable_walk(pgt, addr, size, &walker);
-> > > +}
-> > > +
-> > >   int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
-> > >                             struct kvm_pgtable_mm_ops *mm_ops,
-> > >                             enum kvm_pgtable_stage2_flags flags,
-> > >
-> >
-> > Thanks,
-> > Gavin
-> >
+	M.
+
+Christoffer Dall (6):
+  KVM: arm64: nv: Introduce nested virtualization VCPU feature
+  KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
+  KVM: arm64: nv: Allow userspace to set PSR_MODE_EL2x
+  KVM: arm64: nv: Add nested virt VCPU primitives for vEL2 VCPU state
+  KVM: arm64: nv: Handle trapped ERET from virtual EL2
+  KVM: arm64: nv: Only toggle cache for virtual EL2 when SCTLR_EL2
+    changes
+
+Jintack Lim (7):
+  arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+  KVM: arm64: nv: Handle HCR_EL2.NV system register traps
+  KVM: arm64: nv: Support virtual EL2 exceptions
+  KVM: arm64: nv: Inject HVC exceptions to the virtual EL2
+  KVM: arm64: nv: Handle PSCI call via smc from the guest
+  KVM: arm64: nv: Add accessors for SPSR_EL1, ELR_EL1 and VBAR_EL1 from
+    virtual EL2
+  KVM: arm64: nv: Emulate EL12 register accesses from the virtual EL2
+
+Marc Zyngier (5):
+  KVM: arm64: Use the S2 MMU context to iterate over S2 table
+  KVM: arm64: nv: Add EL2 system registers to vcpu context
+  KVM: arm64: nv: Emulate PSTATE.M for a guest hypervisor
+  KVM: arm64: nv: Allow a sysreg to be hidden from userspace only
+  KVM: arm64: nv: Filter out unsupported features from ID regs
+
+ .../admin-guide/kernel-parameters.txt         |   7 +-
+ arch/arm64/include/asm/esr.h                  |   4 +
+ arch/arm64/include/asm/kvm_arm.h              |  19 +-
+ arch/arm64/include/asm/kvm_emulate.h          |  66 ++++++
+ arch/arm64/include/asm/kvm_host.h             |  42 +++-
+ arch/arm64/include/asm/kvm_mmu.h              |  11 +-
+ arch/arm64/include/asm/kvm_nested.h           |  20 ++
+ arch/arm64/include/asm/sysreg.h               |  38 +++-
+ arch/arm64/include/uapi/asm/kvm.h             |   1 +
+ arch/arm64/kernel/cpufeature.c                |  25 +++
+ arch/arm64/kvm/Makefile                       |   2 +-
+ arch/arm64/kvm/arm.c                          |   5 +
+ arch/arm64/kvm/emulate-nested.c               | 203 ++++++++++++++++++
+ arch/arm64/kvm/guest.c                        |   6 +
+ arch/arm64/kvm/handle_exit.c                  |  45 +++-
+ arch/arm64/kvm/hyp/exception.c                |  48 +++--
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |  19 +-
+ arch/arm64/kvm/hyp/vhe/switch.c               |  24 +++
+ arch/arm64/kvm/inject_fault.c                 |  61 +++++-
+ arch/arm64/kvm/mmu.c                          |  16 +-
+ arch/arm64/kvm/nested.c                       | 162 ++++++++++++++
+ arch/arm64/kvm/reset.c                        |  16 ++
+ arch/arm64/kvm/sys_regs.c                     | 174 ++++++++++++++-
+ arch/arm64/kvm/sys_regs.h                     |  14 +-
+ arch/arm64/kvm/trace_arm.h                    |  59 +++++
+ arch/arm64/tools/cpucaps                      |   1 +
+ 26 files changed, 1041 insertions(+), 47 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_nested.h
+ create mode 100644 arch/arm64/kvm/emulate-nested.c
+ create mode 100644 arch/arm64/kvm/nested.c
+
+-- 
+2.34.1
+
