@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BD7A920
-	for <kvmarm@lists.linux.dev>; Thu,  9 Feb 2023 18:10:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED9B1C433EF;
-	Thu,  9 Feb 2023 18:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C672A920
+	for <kvmarm@lists.linux.dev>; Thu,  9 Feb 2023 18:10:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A9FAC433EF;
+	Thu,  9 Feb 2023 18:10:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675966247;
-	bh=63G65G4kKpV78b/xJgCMPnoBNVxki0iqhY1uoJjShRU=;
+	s=k20201202; t=1675966249;
+	bh=OuJG/rdKTfeQlbg9mRAxYjZVA+98+bLvjJSETqMitfw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pzE7pl0Y2Cbb7l06vLrYMLzHI0Kp4H0EM5gwtxw8W4K2EJfc9rjYm8JMw3dTwjdrV
-	 KtNmWdRQPyV08A4gRifkA48bhW99VWZPFnabP7UBxmcyNW/Rdn3Hvnh4sfIT6eYTE7
-	 YR2GfCF/29WUZ1b7sXF6VdivFXKdmvYJRCWU87zWlOlUWtm+7AfcxQuEsYT6I+3/9u
-	 1h7aRdYACaDFNOAt+03CPmznSeGWmCM0/MrGpN5hhpa0OydIa6M1zhc9/xGHEpgT4a
-	 PXWHaZAPttoDp3HA1q4lj/IheQcPXuHh7Pjx0uLg/kn2Ewg4rCJku7IGpeuAzghFyJ
-	 cKg1G/nxTaZSQ==
+	b=sr5PihT4DUNh/PGxzjq8gyQ7MIhtcrrYuOqzmN//KVBRkn1Qm8R+t9cPZKIm2qH9b
+	 /Uh7ZDF46WrfTqTAhJP8OpwZcKbFfydhzXgmIerfduOFgMaaAKeK4gnxFhbGqbozRi
+	 yrjHRjHmCJiLTqrOHp9pZ4usPA5Pc7B3e9DO6WWU0szzgYvuvcmxpcDp+gKeBMup2l
+	 8yEvd305nPKWY6eoj4JTDcmDQXMaXudn7zr4yBojshMXAIMs7O93SFFhjhyQBTVl1F
+	 +lAoOXi3aWok83fgaJogJdKbm0sye3nuD5Y4vGuwC+IZiyTNh1d0vk1mwJi1TWd06z
+	 8Ukmkl1AWfKvw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pQBC4-0093r7-GU;
-	Thu, 09 Feb 2023 17:58:48 +0000
+	id 1pQBC5-0093r7-9o;
+	Thu, 09 Feb 2023 17:58:49 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 11/18] KVM: arm64: nv: Handle trapped ERET from virtual EL2
-Date: Thu,  9 Feb 2023 17:58:13 +0000
-Message-Id: <20230209175820.1939006-12-maz@kernel.org>
+Subject: [PATCH 14/18] KVM: arm64: nv: Emulate PSTATE.M for a guest hypervisor
+Date: Thu,  9 Feb 2023 17:58:16 +0000
+Message-Id: <20230209175820.1939006-15-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230209175820.1939006-1-maz@kernel.org>
 References: <20230209175820.1939006-1-maz@kernel.org>
@@ -53,78 +53,110 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+We can no longer blindly copy the VCPU's PSTATE into SPSR_EL2 and return
+to the guest and vice versa when taking an exception to the hypervisor,
+because we emulate virtual EL2 in EL1 and therefore have to translate
+the mode field from EL2 to EL1 and vice versa.
 
-When a guest hypervisor running virtual EL2 in EL1 executes an ERET
-instruction, we will have set HCR_EL2.NV which traps ERET to EL2, so
-that we can emulate the exception return in software.
+This requires keeping track of the state we enter the guest, for which
+we transiently use a dedicated flag.
 
 Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/esr.h     |  4 ++++
- arch/arm64/include/asm/kvm_arm.h |  2 +-
- arch/arm64/kvm/handle_exit.c     | 10 ++++++++++
- 3 files changed, 15 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h          |  2 ++
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 19 ++++++++++++++++-
+ arch/arm64/kvm/hyp/vhe/switch.c            | 24 ++++++++++++++++++++++
+ 3 files changed, 44 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 206de10524e3..d4dd949b921e 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -272,6 +272,10 @@
- 		(((e) & ESR_ELx_SYS64_ISS_OP2_MASK) >>		\
- 		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 1b585a4dd122..70eab7a6386b 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -645,6 +645,8 @@ struct kvm_vcpu_arch {
+ #define DEBUG_STATE_SAVE_SPE	__vcpu_single_flag(iflags, BIT(5))
+ /* Save TRBE context if active  */
+ #define DEBUG_STATE_SAVE_TRBE	__vcpu_single_flag(iflags, BIT(6))
++/* vcpu running in HYP context */
++#define VCPU_HYP_CONTEXT	__vcpu_single_flag(iflags, BIT(7))
  
-+/* ISS field definitions for ERET/ERETAA/ERETAB trapping */
-+#define ESR_ELx_ERET_ISS_ERET		0x2
-+#define ESR_ELx_ERET_ISS_ERETA		0x1
-+
- /*
-  * ISS field definitions for floating-point exception traps
-  * (FP_EXC_32/FP_EXC_64).
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index bea827b76c22..e24825dcda6b 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -344,7 +344,7 @@
- 	ECN(SP_ALIGN), ECN(FP_EXC32), ECN(FP_EXC64), ECN(SERROR), \
- 	ECN(BREAKPT_LOW), ECN(BREAKPT_CUR), ECN(SOFTSTP_LOW), \
- 	ECN(SOFTSTP_CUR), ECN(WATCHPT_LOW), ECN(WATCHPT_CUR), \
--	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64)
-+	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64), ECN(ERET)
- 
- #define CPACR_EL1_TTA		(1 << 28)
- #define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |\
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 2d8c09cf3e49..e75101f2aa6c 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -207,6 +207,15 @@ static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
- 	return 1;
+ /* SVE enabled for host EL0 */
+ #define HOST_SVE_ENABLED	__vcpu_single_flag(sflags, BIT(0))
+diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+index baa5b9b3dde5..0fbbf2870b7b 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+@@ -156,9 +156,26 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg_el1(ctxt_sys_reg(ctxt, SPSR_EL1),	SYS_SPSR);
  }
  
-+static int kvm_handle_eret(struct kvm_vcpu *vcpu)
++/* Read the VCPU state's PSTATE, but translate (v)EL2 to EL1. */
++static inline u64 to_hw_pstate(const struct kvm_cpu_context *ctxt)
 +{
-+	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
-+		return kvm_handle_ptrauth(vcpu);
++	u64 mode = ctxt->regs.pstate & (PSR_MODE_MASK | PSR_MODE32_BIT);
 +
-+	kvm_emulate_nested_eret(vcpu);
-+	return 1;
++	switch (mode) {
++	case PSR_MODE_EL2t:
++		mode = PSR_MODE_EL1t;
++		break;
++	case PSR_MODE_EL2h:
++		mode = PSR_MODE_EL1h;
++		break;
++	}
++
++	return (ctxt->regs.pstate & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
 +}
 +
- static exit_handle_fn arm_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
- 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
-@@ -222,6 +231,7 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_SMC64]	= handle_smc,
- 	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
- 	[ESR_ELx_EC_SVE]	= handle_sve,
-+	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
- 	[ESR_ELx_EC_IABT_LOW]	= kvm_handle_guest_abort,
- 	[ESR_ELx_EC_DABT_LOW]	= kvm_handle_guest_abort,
- 	[ESR_ELx_EC_SOFTSTP_LOW]= kvm_handle_guest_debug,
+ static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
+ {
+-	u64 pstate = ctxt->regs.pstate;
++	u64 pstate = to_hw_pstate(ctxt);
+ 	u64 mode = pstate & PSR_AA32_MODE_MASK;
+ 
+ 	/*
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 1a97391fedd2..76ea9392363d 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -120,6 +120,25 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
+ 
+ static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
++	/*
++	 * If we were in HYP context on entry, adjust the PSTATE view
++	 * so that the usual helpers work correctly.
++	 */
++	if (unlikely(vcpu_get_flag(vcpu, VCPU_HYP_CONTEXT))) {
++		u64 mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
++
++		switch (mode) {
++		case PSR_MODE_EL1t:
++			mode = PSR_MODE_EL2t;
++			break;
++		case PSR_MODE_EL1h:
++			mode = PSR_MODE_EL2h;
++			break;
++		}
++
++		*vcpu_cpsr(vcpu) &= ~(PSR_MODE_MASK | PSR_MODE32_BIT);
++		*vcpu_cpsr(vcpu) |= mode;
++	}
+ }
+ 
+ /* Switch to the guest for VHE systems running in EL2 */
+@@ -154,6 +173,11 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	sysreg_restore_guest_state_vhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
+ 
++	if (is_hyp_ctxt(vcpu))
++		vcpu_set_flag(vcpu, VCPU_HYP_CONTEXT);
++	else
++		vcpu_clear_flag(vcpu, VCPU_HYP_CONTEXT);
++
+ 	do {
+ 		/* Jump in the fire! */
+ 		exit_code = __guest_enter(vcpu);
 -- 
 2.34.1
 
