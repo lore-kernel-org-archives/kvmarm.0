@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44F6A920
-	for <kvmarm@lists.linux.dev>; Thu,  9 Feb 2023 18:10:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97B59C433EF;
-	Thu,  9 Feb 2023 18:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5009A920
+	for <kvmarm@lists.linux.dev>; Thu,  9 Feb 2023 18:11:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96623C433D2;
+	Thu,  9 Feb 2023 18:11:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675966258;
-	bh=WJPCYY2c/OhaFz74HjwwJLhRnNzspuQFPtdNf5ZWa/g=;
+	s=k20201202; t=1675966260;
+	bh=dhvTz42JuyazXpHz1ww4ODtTIeXpTYgqJ/HxgzVe05I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CXNqAu7RFElvUdtRsoi6V+a5Kjh/IepwTHp0WJ6SXijc2ExYptM3M3mvGPK86n2Bl
-	 X+Yxi0j65vCtfMp9uCeFtY8Vxae/dv9S7Zz//ejQ/Y1WqMIkoP9nsR9bud66Mg5RQj
-	 zpLM48kUfFu8gchJTSH81qTU6JrRv4PKm9HsABXF8JNjx8Mi0l/GX9NS5zkmC1vxh6
-	 xWuSLJhdrPK8Mm0qMx+tm5VG/V+5RA7mQvB7/br5BmeAc2Odg/A8HHTNacBboxrsCY
-	 f60/+hn0BYNm66b/+dNXusB+zC2PIb8uTefu+OB0L69VrfuZowL9O0zzpOm+dFyLzL
-	 yXdulCKNp8jEg==
+	b=OaVQz2x/WZHPL6lBqz8xI6GAIW3KYdxMg3ZbUtg9Ma7lC1tUg9lJv5KSuFtOsapxz
+	 rCmjHREwoCQqrJqazmtKdwWZuJDWpfAGVdTL5rf8VyEZr61WHVlqZvvJudgG5bmVvz
+	 cVU3kLgXEHB4js0sY0aW29w1ruQWNlyslvgKhqBwSP2Xs8mREpDSOtUHxxHabj7BNx
+	 JXg4900uGr4bcdbwDc50+Krvnrh/1/EsTeXxTmLNU3CdphbyqmJ0N3v/LUVRVQKnib
+	 Oz29rU8qTUx5dk31092Yb00TUnIQ6ya8zWpwzWJwO+JwuBBP5rTakrB+FutFaD8LAJ
+	 32tm/8Zdjl+KA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pQBC5-0093r7-1I;
-	Thu, 09 Feb 2023 17:58:49 +0000
+	id 1pQBC4-0093r7-P6;
+	Thu, 09 Feb 2023 17:58:48 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 13/18] KVM: arm64: nv: Add accessors for SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
-Date: Thu,  9 Feb 2023 17:58:15 +0000
-Message-Id: <20230209175820.1939006-14-maz@kernel.org>
+Subject: [PATCH 12/18] KVM: arm64: nv: Handle PSCI call via smc from the guest
+Date: Thu,  9 Feb 2023 17:58:14 +0000
+Message-Id: <20230209175820.1939006-13-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230209175820.1939006-1-maz@kernel.org>
 References: <20230209175820.1939006-1-maz@kernel.org>
@@ -55,73 +55,69 @@ X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to 
 
 From: Jintack Lim <jintack.lim@linaro.org>
 
-For the same reason we trap virtual memory register accesses at virtual
-EL2, we need to trap SPSR_EL1, ELR_EL1 and VBAR_EL1 accesses. ARM v8.3
-introduces the HCR_EL2.NV1 bit to be able to trap on those register
-accesses in EL1. Do not set this bit until the whole nesting support is
-completed, which happens further down the line...
+VMs used to execute hvc #0 for the psci call if EL3 is not implemented.
+However, when we come to provide the virtual EL2 mode to the VM, the
+host OS inside the VM calls kvm_call_hyp() which is also hvc #0. So,
+it's hard to differentiate between them from the host hypervisor's point
+of view.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+So, let the VM execute smc instruction for the psci call. On ARMv8.3,
+even if EL3 is not implemented, a smc instruction executed at non-secure
+EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than being treated as
+UNDEFINED. So, the host hypervisor can handle this psci call without any
+confusion.
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/handle_exit.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 1e6ae3b2e6dd..de209059fd34 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1538,6 +1538,30 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
- 	return true;
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index e75101f2aa6c..b0c343c4e062 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -63,6 +63,8 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
+ 
+ static int handle_smc(struct kvm_vcpu *vcpu)
+ {
++	int ret;
++
+ 	/*
+ 	 * "If an SMC instruction executed at Non-secure EL1 is
+ 	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
+@@ -70,10 +72,28 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+ 	 *
+ 	 * We need to advance the PC after the trap, as it would
+ 	 * otherwise return to the same address...
++	 *
++	 * If imm is non-zero, it's not defined, so just skip it.
++	 */
++	if (kvm_vcpu_hvc_get_imm(vcpu)) {
++		vcpu_set_reg(vcpu, 0, ~0UL);
++		kvm_incr_pc(vcpu);
++		return 1;
++	}
++
++	/*
++	 * If imm is zero, it's a psci call.
++	 * Note that on ARMv8.3, even if EL3 is not implemented, SMC executed
++	 * at Non-secure EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than
++	 * being treated as UNDEFINED.
+ 	 */
+-	vcpu_set_reg(vcpu, 0, ~0UL);
++	ret = kvm_hvc_call_handler(vcpu);
++	if (ret < 0)
++		vcpu_set_reg(vcpu, 0, ~0UL);
++
+ 	kvm_incr_pc(vcpu);
+-	return 1;
++
++	return ret;
  }
  
-+static bool access_elr(struct kvm_vcpu *vcpu,
-+		       struct sys_reg_params *p,
-+		       const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
-+	else
-+		p->regval = vcpu_read_sys_reg(vcpu, ELR_EL1);
-+
-+	return true;
-+}
-+
-+static bool access_spsr(struct kvm_vcpu *vcpu,
-+			struct sys_reg_params *p,
-+			const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		__vcpu_sys_reg(vcpu, SPSR_EL1) = p->regval;
-+	else
-+		p->regval = __vcpu_sys_reg(vcpu, SPSR_EL1);
-+
-+	return true;
-+}
-+
  /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -1694,6 +1718,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	PTRAUTH_KEY(APDB),
- 	PTRAUTH_KEY(APGA),
- 
-+	{ SYS_DESC(SYS_SPSR_EL1), access_spsr},
-+	{ SYS_DESC(SYS_ELR_EL1), access_elr},
-+
- 	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
- 	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
- 	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
-@@ -1741,7 +1768,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
- 	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
- 
--	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
-+	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
- 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
- 
- 	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
 -- 
 2.34.1
 
