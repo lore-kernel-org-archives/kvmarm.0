@@ -1,211 +1,173 @@
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3CF5A94B
-	for <kvmarm@lists.linux.dev>; Thu,  9 Feb 2023 21:25:42 +0000 (UTC)
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-1636eae256cso4406675fac.0
-        for <kvmarm@lists.linux.dev>; Thu, 09 Feb 2023 13:25:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=soi/E10bKl+siivxYjQDcpqRCeXIw67hW77tJUG3+EI=;
-        b=o7TS/eNpZTaEAPw707aweOPv3ToZHiVB/1UBCAi20FLlwlBn8kWm2CeeZ4Qe4xSOgz
-         CJuA94pB5XSsLDNCsYo3CbfG3aV9YymG5GpxnogfzbvuWno75r171yFQToji78RJGn3l
-         ecZzVaIqLPocsqiOsVR0BxmfL6gkZwFHEemcSrtgt0dN6n4FTW5RP5+aDos63WWRk8c+
-         O2Qj8rqEz02rb6jjCtPHqVenQPTkB8TPWyOymtAUD4VOF2izKox+jb6riVaBvKvX57ZS
-         U72xES6wJ/nQtLi07dPOsH9xIqKAnPBRSy7oiYPZ/xUcHq0cSaDjEB+IMWZYQBUAtj3g
-         5jgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=soi/E10bKl+siivxYjQDcpqRCeXIw67hW77tJUG3+EI=;
-        b=tlwBHCQFtomFa3RVg4FITCNubngB+AgrD35tp46IbT0STVU4loWcsGcLNt2GWdfuw4
-         MmUJSac9u7Xm+v01OBfi2g7V3YmkDbAAeAOeT3vnyWs32hmbs21BRH8pwwipbM6ZkBkB
-         z51u9J7J00/6f1vHs6GJXobuvtbIkHKBiHiKPeQ7Xw2EiFMyFYyMwUczs1q+5zYozhuh
-         muhemLpDR6gEV9iLqsNHsRB/Hiw0LJG3kmo8cpX2DtgSyxwKwQIBVGZt6lbGA6A6OjFG
-         bdUS7H+XxM7VY59XgrxYmXz4fpzIWpReNtEAGhZPVG7EuKcv0NtZiRpAeJ0L/BrOROnh
-         vhOQ==
-X-Gm-Message-State: AO0yUKWwOl4v/3ZfNpeDbmN8Hri2i5mih4EaIoJ7QOL2kdxa4x5dFKH6
-	qpocAD2dH/rlI6V0d4qN3Kn07MTvOi69j/dr9Ys5EA==
-X-Google-Smtp-Source: AK7set/G+9Yt0BIs14f04yAChy8QA4NC722vI49AWI3t6UxMiZcKu7cbun9xpy8jKEox48dpLkaBWxVsV+5K/bWhmpI=
-X-Received: by 2002:a05:6870:b38e:b0:16a:ad40:1840 with SMTP id
- w14-20020a056870b38e00b0016aad401840mr1111944oap.236.1675977941765; Thu, 09
- Feb 2023 13:25:41 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0339128E1
+	for <kvmarm@lists.linux.dev>; Thu,  9 Feb 2023 22:48:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1675982904;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WZaDBzx58JAMjEn7EDEgD2XWnnJnFhK/yUPI3hFd8g8=;
+	b=M1sqeiCjC/xRdQo2hJgn4O+CneCzC2aJqkkyAWiRaonceq8gp5k2lymKDF9p11xQ8Uu9qD
+	9oKG9cW41Fw+2LaBvwvMav7wbd3SaglpXXxiJIIoUEhz55eTzE5OZe9OYFQpxEn5xsFXYd
+	tw1mzQ3+Dt1NDLBkc2j2hNkmfKPa3fQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-137-vfsIj0iqMe-BmbPY66kaMw-1; Thu, 09 Feb 2023 17:48:22 -0500
+X-MC-Unique: vfsIj0iqMe-BmbPY66kaMw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D490585A588;
+	Thu,  9 Feb 2023 22:48:20 +0000 (UTC)
+Received: from [10.64.54.63] (vpn2-54-63.bne.redhat.com [10.64.54.63])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 563582166B29;
+	Thu,  9 Feb 2023 22:48:14 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v2 04/12] KVM: arm64: Add kvm_pgtable_stage2_split()
+To: Ricardo Koller <ricarkol@google.com>
+Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
+ yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com,
+ andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, eric.auger@redhat.com, reijiw@google.com,
+ rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+References: <20230206165851.3106338-1-ricarkol@google.com>
+ <20230206165851.3106338-5-ricarkol@google.com>
+ <cae4a1d9-b5c2-2929-6d88-5a3fbe719651@redhat.com>
+ <CAOHnOrxqEsbRD302Wwn9N06d6xj5NWy4p+C9DBjEm6Z4z2FvXg@mail.gmail.com>
+ <CAOHnOrwprM8v3xXCA5sEVD1cHVQRS6vsPvdXiC1NocrzyQcoYw@mail.gmail.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <e8513463-75cc-ca11-2fe8-1ba1b32411d8@redhat.com>
+Date: Fri, 10 Feb 2023 09:48:11 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230201025048.205820-1-jingzhangos@google.com>
- <20230201025048.205820-5-jingzhangos@google.com> <CAAeT=Fy8PN3i-FTMN+c8dauP8qToXZM_toaUx=34Y4hima8teQ@mail.gmail.com>
-In-Reply-To: <CAAeT=Fy8PN3i-FTMN+c8dauP8qToXZM_toaUx=34Y4hima8teQ@mail.gmail.com>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Thu, 9 Feb 2023 13:25:30 -0800
-Message-ID: <CAAdAUthcEuKB8UG_zR4bFjn9eSJx2m2xNQgPO+7+iZVtmrhk_Q@mail.gmail.com>
-Subject: Re: [PATCH v1 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
-To: Reiji Watanabe <reijiw@google.com>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@google.com>, Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
-	Ricardo Koller <ricarkol@google.com>, Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAOHnOrwprM8v3xXCA5sEVD1cHVQRS6vsPvdXiC1NocrzyQcoYw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 
-On Mon, Feb 6, 2023 at 9:30 PM Reiji Watanabe <reijiw@google.com> wrote:
->
-> Hi Jing,
->
-> On Tue, Jan 31, 2023 at 6:51 PM Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > With per guest ID registers, PMUver settings from userspace
-> > can be stored in its corresponding ID register.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  5 -----
-> >  arch/arm64/kvm/arm.c              |  6 ------
-> >  arch/arm64/kvm/id_regs.c          | 33 ++++++++++++++++++++-----------
-> >  include/kvm/arm_pmu.h             |  6 ++++--
-> >  4 files changed, 25 insertions(+), 25 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index fabb30185a4a..1ab443b52c46 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -225,11 +225,6 @@ struct kvm_arch {
-> >
-> >         cpumask_var_t supported_cpus;
-> >
-> > -       struct {
-> > -               u8 imp:4;
-> > -               u8 unimp:4;
-> > -       } dfr0_pmuver;
-> > -
-> >         /* Hypercall features firmware registers' descriptor */
-> >         struct kvm_smccc_features smccc_feat;
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index d8ba5106bf51..25bd95650223 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -138,12 +138,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> >         kvm_arm_set_default_id_regs(kvm);
-> >         kvm_arm_init_hypercalls(kvm);
-> >
-> > -       /*
-> > -        * Initialise the default PMUver before there is a chance to
-> > -        * create an actual PMU.
-> > -        */
-> > -       kvm->arch.dfr0_pmuver.imp = kvm_arm_pmu_get_pmuver_limit();
-> > -
-> >         return 0;
-> >
-> >  err_free_cpumask:
-> > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-> > index bc5d9bc84eb1..5eade7d380af 100644
-> > --- a/arch/arm64/kvm/id_regs.c
-> > +++ b/arch/arm64/kvm/id_regs.c
-> > @@ -19,10 +19,12 @@
-> >
-> >  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
-> >  {
-> > -       if (kvm_vcpu_has_pmu(vcpu))
-> > -               return vcpu->kvm->arch.dfr0_pmuver.imp;
-> > -
-> > -       return vcpu->kvm->arch.dfr0_pmuver.unimp;
-> > +       u8 pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-> > +                       IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1));
-> > +       if (kvm_vcpu_has_pmu(vcpu) || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
-> > +               return pmuver;
-> > +       else
-> > +               return 0;
-> >  }
-> >
-> >  static u8 perfmon_to_pmuver(u8 perfmon)
-> > @@ -263,10 +265,9 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> >         if (val)
-> >                 return -EINVAL;
-> >
-> > -       if (valid_pmu)
-> > -               vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
-> > -       else
-> > -               vcpu->kvm->arch.dfr0_pmuver.unimp = pmuver;
-> > +       IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> > +       IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |=
-> > +               FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), pmuver);
->
-> Did you consider there could be guests that have vCPUs with and
-> without PMU ? It looks like the code doesn't work for such guests.
-> (e.g. for such guests, if setting the register is done for vCPUs
->  without PMU, this code seems to make PMUVer zero or 0xf
->  even for vCPUs with PMU)
-Yes, I did. The PMUVer field is a per-VCPU field, whose value was
-determined on the fly in the get_user function. Check the function
-kvm_arm_read_id_reg_with_encoding, vcpu_pmuver is called to set the
-real value for the VCPU.
-The perVM ID registers array we put in the kvm structure save
-correctly only for those perVM field, for those pre-VCPU filed, their
-real value is determined on the fly during the register reading
-(get_user).
->
-> Thanks,
-> Reiji
->
-> >
-> >         return 0;
-> >  }
-> > @@ -303,10 +304,9 @@ static int set_id_dfr0_el1(struct kvm_vcpu *vcpu,
-> >         if (val)
-> >                 return -EINVAL;
-> >
-> > -       if (valid_pmu)
-> > -               vcpu->kvm->arch.dfr0_pmuver.imp = perfmon_to_pmuver(perfmon);
-> > -       else
-> > -               vcpu->kvm->arch.dfr0_pmuver.unimp = perfmon_to_pmuver(perfmon);
-> > +       IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon);
-> > +       IDREG(vcpu->kvm, SYS_ID_DFR0_EL1) |=
-> > +               FIELD_PREP(ARM64_FEATURE_MASK(ID_DFR0_EL1_PerfMon), perfmon_to_pmuver(perfmon));
-> >
-> >         return 0;
-> >  }
-> > @@ -530,4 +530,13 @@ void kvm_arm_set_default_id_regs(struct kvm *kvm)
-> >         }
-> >
-> >         IDREG(kvm, SYS_ID_AA64PFR0_EL1) = val;
-> > +
-> > +       /*
-> > +        * Initialise the default PMUver before there is a chance to
-> > +        * create an actual PMU.
-> > +        */
-> > +       IDREG(kvm, SYS_ID_AA64DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> > +       IDREG(kvm, SYS_ID_AA64DFR0_EL1) |=
-> > +               FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-> > +                          kvm_arm_pmu_get_pmuver_limit());
-> >  }
-> > diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> > index 628775334d5e..eef67b7d9751 100644
-> > --- a/include/kvm/arm_pmu.h
-> > +++ b/include/kvm/arm_pmu.h
-> > @@ -92,8 +92,10 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
-> >  /*
-> >   * Evaluates as true when emulating PMUv3p5, and false otherwise.
-> >   */
-> > -#define kvm_pmu_is_3p5(vcpu)                                           \
-> > -       (vcpu->kvm->arch.dfr0_pmuver.imp >= ID_AA64DFR0_EL1_PMUVer_V3P5)
-> > +#define kvm_pmu_is_3p5(vcpu)                                                                   \
-> > +       (kvm_vcpu_has_pmu(vcpu) &&                                                              \
-> > +        FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),                                  \
-> > +                IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1)) >= ID_AA64DFR0_EL1_PMUVer_V3P5)
-> >
-> >  u8 kvm_arm_pmu_get_pmuver_limit(void);
-> >
-> > --
-> > 2.39.1.456.gfc5497dd1b-goog
-> >
+On 2/10/23 3:17 AM, Ricardo Koller wrote:
+> "(> > > +     if (data->mc_capacity < nr_pages)
+>>>> +             return -ENOMEM;
+>>>> +
+>>>> +     phys = kvm_pte_to_phys(pte);
+>>>> +     prot = kvm_pgtable_stage2_pte_prot(pte);
+>>>> +
+>>>> +     ret = kvm_pgtable_stage2_create_unlinked(data->mmu->pgt, &new, phys,
+>>>> +                                              level, prot, mc, force_pte);
+>>>> +     if (ret)
+>>>> +             return ret;
+>>>> +
+>>>> +     if (!stage2_try_break_pte(ctx, data->mmu)) {
+>>>> +             childp = kvm_pte_follow(new, mm_ops);
+>>>> +             kvm_pgtable_stage2_free_unlinked(mm_ops, childp, level);
+>>>> +             mm_ops->put_page(childp);
+>>>> +             return -EAGAIN;
+>>>> +     }
+>>>> +
+>>>> +     /*
+>>>> +      * Note, the contents of the page table are guaranteed to be made
+>>>> +      * visible before the new PTE is assigned because stage2_make_pte()
+>>>> +      * writes the PTE using smp_store_release().
+>>>> +      */
+>>>> +     stage2_make_pte(ctx, new);
+>>>> +     dsb(ishst);
+>>>> +     data->mc_capacity -= nr_pages;
+>>>> +     return 0;
+>>>> +}
+>>>> +
+>>>
+>>> I think it's possible 'data->mc_capability' to be replaced by 'mc->nobjs'
+>>> because they're same thing. With this, we needn't to maintain a duplicate
+>>> 'data->mc_capability' since 'data->mc' has been existing.
+>>
+>> Ah, nice, yes. That would be simpler.
+>>
+> 
+> Actually, there's a complication. The memcache details are hidden
+> inside of pgtable.c,
+> so different types of memcaches (for vhe and nvhe) can be used for allocations.
+> Specifically, the memcache objects are passed as an opaque pointer ("void *")
+> and can be used with "struct hyp_pool" and "struct kvm_mmu_memory_cache".
+> 
+> So, here are all the options that I can think of:
+> 
+>          1. stage2_split_walker() is just used on the VHE case with the
+>          "struct kvm_mmu_memory_cache" memcache, so we could just use it
+>          instead of a "void *":
+> 
+>                  kvm_pgtable_stage2_split(..., struct kvm_mmu_memory_cache *mc);
+> 
+>          However, it could be used for the NVHE case as well, plus
+>          this would go against the overall design of pgtable.c which tries
+>          to use opaque objects for most things.
+> 
+>          2. add a "get_nobjs()" method to both memcaches. This is tricky
+>          because "struct hyp_pool" doesn't directly track its capacity. I
+>          would rather not mess with it.
+> 
+>          3. This whole accounting of available pages in the memcache is
+>          needed because of the way I implemented stage2_split_walker() and
+>          the memcache interface.  stage2_split_walker() tries to allocate
+>          as many pages for the new table as allowed by the capacity of the
+>          memcache. The issue with blindingly trying until the allocation
+>          fails is that kvm_mmu_memory_cache_alloc() WARNs and tries to
+>          allocate using GFP_ATOMIC when !nobjs. We don't want to do that,
+>          so we could extend kvm_pgtable_mm_ops.zalloc_page() with a
+>          NO_GFP_ATOMIC_ON_EMPTY (or similar). This flag would have to be
+>          ignored on the hyp side.
+> 
+>          4. what this patch is currently doing: tracking the capacity by
+>          hand.
+> 
+> I prefer options 4 and 3. WDYT?
+> 
+
+Yeah, stage2_split_walker() is currently only used by VHE and it calls to
+stage2_map_walker() to create the unlinked page table, which is shared by
+VHE and nVHE. I think option 3 would be better than 4 because we generally
+just want to fetch the pre-allocated page table, instead of allocating a
+new page table with GFP_ATOMIC. However, I'm also fine with option 4. I
+think this can be improved in the future if you agree.
+
+>>
+>>>
+>>>> +int kvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>>>> +                          void *mc, u64 mc_capacity)
+>>>> +{
+>>>> +     struct stage2_split_data split_data = {
+>>>> +             .mmu            = pgt->mmu,
+>>>> +             .memcache       = mc,
+>>>> +             .mc_capacity    = mc_capacity,
+>>>> +     };
+>>>> +
+>>>> +     struct kvm_pgtable_walker walker = {
+>>>> +             .cb     = stage2_split_walker,
+>>>> +             .flags  = KVM_PGTABLE_WALK_LEAF,
+>>>> +             .arg    = &split_data,
+>>>> +     };
+>>>> +
+>>>> +     return kvm_pgtable_walk(pgt, addr, size, &walker);
+>>>> +}
+>>>> +
+>>>>    int __kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+>>>>                              struct kvm_pgtable_mm_ops *mm_ops,
+>>>>                              enum kvm_pgtable_stage2_flags flags,
+>>>>
+>>>
+
+Thanks,
+Gavin
+
