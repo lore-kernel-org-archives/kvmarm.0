@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BF3A920
-	for <kvmarm@lists.linux.dev>; Thu,  9 Feb 2023 18:10:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A597C433EF;
-	Thu,  9 Feb 2023 18:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DB1A920
+	for <kvmarm@lists.linux.dev>; Thu,  9 Feb 2023 18:10:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8970EC433D2;
+	Thu,  9 Feb 2023 18:10:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675966253;
-	bh=qX6kFn4drXf+CIvAA1Y06km8c3x99tuygfzIwXioExs=;
+	s=k20201202; t=1675966255;
+	bh=bvKB/niBnOc/ZdVNTmvtXUHucGexqrHDsffJo0FAtc0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lg3gysq8fY6GKtY44yFb6b5BPzlSQsTsXkbcEZIF7zXp+s6XtUlfWVXC7D6mo2LFz
-	 cuRKzOPK/RjAluqAygTsyyLhzIpdyOSlj2Far3kNhBrhcn2ti+vEnuydD5hAh5h6ro
-	 Fuv0I7ZA4qDej0dA19gZe+dH8iS+hDPBqhk9YRpDHM20GDYg/lAoiC7cWZv0V6viZ8
-	 C+N2HG0nlM4kY/sluxV1VQd6XZb4KD6+FxIqS+vSNHvoK4HSByFfBUCsn2nDct4T7e
-	 XkFz5puJcRLEwiNm1UGrZh3MJ98B2rS9XomQ4Jyhifa8A9be03g4fEmFM5v4iBnBTc
-	 En4n7SocGchhQ==
+	b=huSAXsO2Wv3N74QsMv5iyqWVl7npB8kYX6xKvrSijYrqLTHoM2vyh41TBb6/llXxS
+	 NdRV871PwWkOXw4IDoLONMBH0FNcDZ7ZapC7Vc8x2zRCBXppzUGyxX2jFsr7N0oqzR
+	 Dtr4B1CCgGsqj866QnugN2fmHrlb24DCd9NDMomoXrN/0nHPlgFKCVlb4ZO/uta0dr
+	 x1GqtuobfMu/b4qnEMYAwMmmUHXKX9mjH3joWp5tk+D3uTrwL7BaRKpy3b916F1+6t
+	 xicJ73mtz5IjRq33/KAXAfGKfdZqP4Nut4zFNSWzz82C33JDCecN+UID6qseqS2461
+	 LDtAMZXRTm+EQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pQBC6-0093r7-BX;
-	Thu, 09 Feb 2023 17:58:50 +0000
+	id 1pQBC5-0093r7-Qe;
+	Thu, 09 Feb 2023 17:58:49 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 18/18] KVM: arm64: nv: Only toggle cache for virtual EL2 when SCTLR_EL2 changes
-Date: Thu,  9 Feb 2023 17:58:20 +0000
-Message-Id: <20230209175820.1939006-19-maz@kernel.org>
+Subject: [PATCH 16/18] KVM: arm64: nv: Emulate EL12 register accesses from the virtual EL2
+Date: Thu,  9 Feb 2023 17:58:18 +0000
+Message-Id: <20230209175820.1939006-17-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230209175820.1939006-1-maz@kernel.org>
 References: <20230209175820.1939006-1-maz@kernel.org>
@@ -53,55 +53,83 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+From: Jintack Lim <jintack.lim@linaro.org>
 
-So far we were flushing almost the entire universe whenever a VM would
-load/unload the SCTLR_EL1 and the two versions of that register had
-different MMU enabled settings.  This turned out to be so slow that it
-prevented forward progress for a nested VM, because a scheduler timer
-tick interrupt would always be pending when we reached the nested VM.
+With HCR_EL2.NV bit set, accesses to EL12 registers in the virtual EL2
+trap to EL2. Handle those traps just like we do for EL1 registers.
 
-To avoid this problem, we consider the SCTLR_EL2 when evaluating if
-caches are on or off when entering virtual EL2 (because this is the
-value that we end up shadowing onto the hardware EL1 register).
+One exception is CNTKCTL_EL12. We don't trap on CNTKCTL_EL1 for non-VHE
+virtual EL2 because we don't have to. However, accessing CNTKCTL_EL12
+will trap since it's one of the EL12 registers controlled by HCR_EL2.NV
+bit.  Therefore, add a handler for it and don't treat it as a
+non-trap-registers when preparing a shadow context.
+
+These registers, being only a view on their EL1 counterpart, are
+permanently hidden from userspace.
 
 Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+[maz: EL12_REG(), register visibility]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index e4a7e6369499..2890d57bec30 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -115,6 +115,7 @@ alternative_cb_end
- #include <asm/cache.h>
- #include <asm/cacheflush.h>
- #include <asm/mmu_context.h>
-+#include <asm/kvm_emulate.h>
- #include <asm/kvm_host.h>
- 
- void kvm_update_va_mask(struct alt_instr *alt,
-@@ -192,7 +193,15 @@ struct kvm;
- 
- static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
- {
--	return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
-+	u64 cache_bits = SCTLR_ELx_M | SCTLR_ELx_C;
-+	int reg;
-+
-+	if (vcpu_is_el2(vcpu))
-+		reg = SCTLR_EL2;
-+	else
-+		reg = SCTLR_EL1;
-+
-+	return (vcpu_read_sys_reg(vcpu, reg) & cache_bits) == cache_bits;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 55a14c86a455..f5dd4f4eaaf0 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1482,6 +1482,26 @@ static unsigned int el2_visibility(const struct kvm_vcpu *vcpu,
+ 	.val = v,				\
  }
  
- static inline void __clean_dcache_guest_page(void *va, size_t size)
++/*
++ * EL{0,1}2 registers are the EL2 view on an EL0 or EL1 register when
++ * HCR_EL2.E2H==1, and only in the sysreg table for convenience of
++ * handling traps. Given that, they are always hidden from userspace.
++ */
++static unsigned int elx2_visibility(const struct kvm_vcpu *vcpu,
++				    const struct sys_reg_desc *rd)
++{
++	return REG_HIDDEN_USER;
++}
++
++#define EL12_REG(name, acc, rst, v) {		\
++	SYS_DESC(SYS_##name##_EL12),		\
++	.access = acc,				\
++	.reset = rst,				\
++	.reg = name##_EL1,			\
++	.val = v,				\
++	.visibility = elx2_visibility,		\
++}
++
+ /* sys_reg_desc initialiser for known cpufeature ID registers */
+ #define ID_SANITISED(name) {			\
+ 	SYS_DESC(SYS_##name),			\
+@@ -2031,6 +2051,23 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(CNTVOFF_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(CNTHCTL_EL2, access_rw, reset_val, 0),
+ 
++	EL12_REG(SCTLR, access_vm_reg, reset_val, 0x00C50078),
++	EL12_REG(CPACR, access_rw, reset_val, 0),
++	EL12_REG(TTBR0, access_vm_reg, reset_unknown, 0),
++	EL12_REG(TTBR1, access_vm_reg, reset_unknown, 0),
++	EL12_REG(TCR, access_vm_reg, reset_val, 0),
++	{ SYS_DESC(SYS_SPSR_EL12), access_spsr},
++	{ SYS_DESC(SYS_ELR_EL12), access_elr},
++	EL12_REG(AFSR0, access_vm_reg, reset_unknown, 0),
++	EL12_REG(AFSR1, access_vm_reg, reset_unknown, 0),
++	EL12_REG(ESR, access_vm_reg, reset_unknown, 0),
++	EL12_REG(FAR, access_vm_reg, reset_unknown, 0),
++	EL12_REG(MAIR, access_vm_reg, reset_unknown, 0),
++	EL12_REG(AMAIR, access_vm_reg, reset_amair_el1, 0),
++	EL12_REG(VBAR, access_rw, reset_val, 0),
++	EL12_REG(CONTEXTIDR, access_vm_reg, reset_val, 0),
++	EL12_REG(CNTKCTL, access_rw, reset_val, 0),
++
+ 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
+ };
+ 
 -- 
 2.34.1
 
