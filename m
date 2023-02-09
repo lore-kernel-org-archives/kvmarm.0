@@ -1,26 +1,26 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F65A920
-	for <kvmarm@lists.linux.dev>; Thu,  9 Feb 2023 18:10:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7B21C433EF;
-	Thu,  9 Feb 2023 18:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BD7A920
+	for <kvmarm@lists.linux.dev>; Thu,  9 Feb 2023 18:10:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED9B1C433EF;
+	Thu,  9 Feb 2023 18:10:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1675966244;
-	bh=6XseaYrWthAt8FZx/5o+YR98uLeMrF9a6yo8YPl3f80=;
+	s=k20201202; t=1675966247;
+	bh=63G65G4kKpV78b/xJgCMPnoBNVxki0iqhY1uoJjShRU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=c3H4kdN0/fszS2dOPvPwvPxvgOzizXZp76Oq+8FEf8/T+s09wH+u8JocNHbNfj7eg
-	 PcHuC/HEoo8l7MtuZVw6vhqal2FZROOe5qM6HMXYmT250qxdv3Mf28nsL4P2KAJSRN
-	 q4eWlzQ83HqV00TRK7axCmR3eWjz0VjdPQAM/yxx8fGUFE2AfDEa/PzlNSR+9QrKpX
-	 mMwdhn/CWaVweyeX8OsPugBDClCq9xagKDJLeSrMyXnn1uDr7hnC+0mdFAzmdYhK/s
-	 rtzQ/ISQrl8gb0CnCqhd17p06UquMiD0ealcTIO40t87olxS2b0KvngQ1yBbvuUsVl
-	 /hxyLGXLLzOog==
+	b=pzE7pl0Y2Cbb7l06vLrYMLzHI0Kp4H0EM5gwtxw8W4K2EJfc9rjYm8JMw3dTwjdrV
+	 KtNmWdRQPyV08A4gRifkA48bhW99VWZPFnabP7UBxmcyNW/Rdn3Hvnh4sfIT6eYTE7
+	 YR2GfCF/29WUZ1b7sXF6VdivFXKdmvYJRCWU87zWlOlUWtm+7AfcxQuEsYT6I+3/9u
+	 1h7aRdYACaDFNOAt+03CPmznSeGWmCM0/MrGpN5hhpa0OydIa6M1zhc9/xGHEpgT4a
+	 PXWHaZAPttoDp3HA1q4lj/IheQcPXuHh7Pjx0uLg/kn2Ewg4rCJku7IGpeuAzghFyJ
+	 cKg1G/nxTaZSQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1pQBC5-0093r7-IA;
-	Thu, 09 Feb 2023 17:58:49 +0000
+	id 1pQBC4-0093r7-GU;
+	Thu, 09 Feb 2023 17:58:48 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 15/18] KVM: arm64: nv: Allow a sysreg to be hidden from userspace only
-Date: Thu,  9 Feb 2023 17:58:17 +0000
-Message-Id: <20230209175820.1939006-16-maz@kernel.org>
+Subject: [PATCH 11/18] KVM: arm64: nv: Handle trapped ERET from virtual EL2
+Date: Thu,  9 Feb 2023 17:58:13 +0000
+Message-Id: <20230209175820.1939006-12-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230209175820.1939006-1-maz@kernel.org>
 References: <20230209175820.1939006-1-maz@kernel.org>
@@ -53,89 +53,78 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-So far, we never needed to distinguish between registers hidden
-from userspace and being hidden from a guest (they are always
-either visible to both, or hidden from both).
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-With NV, we have the ugly case of the EL02 and EL12 registers,
-which are only a view on the EL0 and EL1 registers. It makes
-absolutely no sense to expose them to userspace, since it
-already has the canonical view.
+When a guest hypervisor running virtual EL2 in EL1 executes an ERET
+instruction, we will have set HCR_EL2.NV which traps ERET to EL2, so
+that we can emulate the exception return in software.
 
-Add a new visibility flag (REG_HIDDEN_USER) and a new helper that
-checks for it and REG_HIDDEN when checking whether to expose
-a sysreg to userspace. Subsequent patches will make use of it.
-
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c |  6 +++---
- arch/arm64/kvm/sys_regs.h | 14 ++++++++++++--
- 2 files changed, 15 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/esr.h     |  4 ++++
+ arch/arm64/include/asm/kvm_arm.h |  2 +-
+ arch/arm64/kvm/handle_exit.c     | 10 ++++++++++
+ 3 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index de209059fd34..55a14c86a455 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2980,7 +2980,7 @@ int kvm_sys_reg_get_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
- 	int ret;
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 206de10524e3..d4dd949b921e 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -272,6 +272,10 @@
+ 		(((e) & ESR_ELx_SYS64_ISS_OP2_MASK) >>		\
+ 		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
  
- 	r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
--	if (!r)
-+	if (!r || sysreg_hidden_user(vcpu, r))
- 		return -ENOENT;
++/* ISS field definitions for ERET/ERETAA/ERETAB trapping */
++#define ESR_ELx_ERET_ISS_ERET		0x2
++#define ESR_ELx_ERET_ISS_ERETA		0x1
++
+ /*
+  * ISS field definitions for floating-point exception traps
+  * (FP_EXC_32/FP_EXC_64).
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index bea827b76c22..e24825dcda6b 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -344,7 +344,7 @@
+ 	ECN(SP_ALIGN), ECN(FP_EXC32), ECN(FP_EXC64), ECN(SERROR), \
+ 	ECN(BREAKPT_LOW), ECN(BREAKPT_CUR), ECN(SOFTSTP_LOW), \
+ 	ECN(SOFTSTP_CUR), ECN(WATCHPT_LOW), ECN(WATCHPT_CUR), \
+-	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64)
++	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64), ECN(ERET)
  
- 	if (r->get_user) {
-@@ -3024,7 +3024,7 @@ int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
- 		return -EFAULT;
- 
- 	r = id_to_sys_reg_desc(vcpu, reg->id, table, num);
--	if (!r)
-+	if (!r || sysreg_hidden_user(vcpu, r))
- 		return -ENOENT;
- 
- 	if (sysreg_user_write_ignore(vcpu, r))
-@@ -3118,7 +3118,7 @@ static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
- 	if (!(rd->reg || rd->get_user))
- 		return 0;
- 
--	if (sysreg_hidden(vcpu, rd))
-+	if (sysreg_hidden_user(vcpu, rd))
- 		return 0;
- 
- 	if (!copy_reg_to_user(rd, uind))
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index e4ebb3a379fd..6b11f2cc7146 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -85,8 +85,9 @@ struct sys_reg_desc {
- };
- 
- #define REG_HIDDEN		(1 << 0) /* hidden from userspace and guest */
--#define REG_RAZ			(1 << 1) /* RAZ from userspace and guest */
--#define REG_USER_WI		(1 << 2) /* WI from userspace only */
-+#define REG_HIDDEN_USER		(1 << 1) /* hidden from userspace only */
-+#define REG_RAZ			(1 << 2) /* RAZ from userspace and guest */
-+#define REG_USER_WI		(1 << 3) /* WI from userspace only */
- 
- static __printf(2, 3)
- inline void print_sys_reg_msg(const struct sys_reg_params *p,
-@@ -152,6 +153,15 @@ static inline bool sysreg_hidden(const struct kvm_vcpu *vcpu,
- 	return sysreg_visibility(vcpu, r) & REG_HIDDEN;
+ #define CPACR_EL1_TTA		(1 << 28)
+ #define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |\
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 2d8c09cf3e49..e75101f2aa6c 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -207,6 +207,15 @@ static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
+ 	return 1;
  }
  
-+static inline bool sysreg_hidden_user(const struct kvm_vcpu *vcpu,
-+				      const struct sys_reg_desc *r)
++static int kvm_handle_eret(struct kvm_vcpu *vcpu)
 +{
-+	if (likely(!r->visibility))
-+		return false;
++	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
++		return kvm_handle_ptrauth(vcpu);
 +
-+	return r->visibility(vcpu, r) & (REG_HIDDEN | REG_HIDDEN_USER);
++	kvm_emulate_nested_eret(vcpu);
++	return 1;
 +}
 +
- static inline bool sysreg_visible_as_raz(const struct kvm_vcpu *vcpu,
- 					 const struct sys_reg_desc *r)
- {
+ static exit_handle_fn arm_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+ 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
+@@ -222,6 +231,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+ 	[ESR_ELx_EC_SMC64]	= handle_smc,
+ 	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
+ 	[ESR_ELx_EC_SVE]	= handle_sve,
++	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
+ 	[ESR_ELx_EC_IABT_LOW]	= kvm_handle_guest_abort,
+ 	[ESR_ELx_EC_DABT_LOW]	= kvm_handle_guest_abort,
+ 	[ESR_ELx_EC_SOFTSTP_LOW]= kvm_handle_guest_debug,
 -- 
 2.34.1
 
