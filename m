@@ -1,302 +1,294 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454DE33ED
-	for <kvmarm@lists.linux.dev>; Thu,  9 Feb 2023 12:50:14 +0000 (UTC)
-Received: by mail-qt1-f173.google.com with SMTP id w3so1657604qts.7
-        for <kvmarm@lists.linux.dev>; Thu, 09 Feb 2023 04:50:14 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0904370
+	for <kvmarm@lists.linux.dev>; Thu,  9 Feb 2023 14:59:16 +0000 (UTC)
+Received: by mail-qv1-f52.google.com with SMTP id k28so1489944qve.5
+        for <kvmarm@lists.linux.dev>; Thu, 09 Feb 2023 06:59:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=OLq5d0Pb0Y9i2q1HCXjq3v1rbBIMKf6zWjvZjjEj3No=;
-        b=rAa47yiy5g5gSok0BA/CUqGYGKCvor6m3O3jROUTSQn1hKEXjUvAuNZkj1ZtpJSLEA
-         SgkTDica7CnzjGR8Fe7mEmSsWWhghULZgWt1Dea+3s2PGnfc99OqnN8SOs7Ld0/SoITm
-         kdTnqEhxdx8ankfh1XW7QnM5C64zq0kJX5z26vJ1GCSbG7GOQb71SxoYTXvq0vDmP/qE
-         5AVWE5Fs68Wh6TfYkER1koTrdAG4wByz9/Tfpe/iywMGrOHulXgx1jszYn8BniD+nkSu
-         VN5+ZuVvYxvvthMYekqXYBFuh+Ntf0v9fye8qFNY+WCQI2GqFH3Ke9T8Tu+cl1qg0cDR
-         8xMQ==
+        bh=enXepIK1TxuVVTxdvoBrFqlHMmgJSEONjriFyLc0Erc=;
+        b=dxfaJlQ0WprHoxZXNo4Z0qZDrHPfx+rheIO1FgS2yv8VDpzjhG8/OcTML637JTy3Wt
+         HzdVFILRdyve0nfJ9HpM88Fqt+ouKz5QPFiJ4VStNgS/nFKXqta8E6iTImcLPs+Reh6b
+         QxeUtc9nuxKqbEl3nfN24pnljPshlc4LdZU4x+VWO6aK0MuuLyNoLOBwENyv1FHKbuzE
+         HU/p9mV2ABfzyRCqh+Jj6zxZu5BqY7+W9JgOCQM21y2li6ip1HDWggeVTtIFGMYbmCXK
+         Hwq01hBdC0TCU0NRPZ3wXlNWxMVP5yeoJAzj3WeLEpE2/eApbOrcVF2mcWMsG/mV2IdO
+         bboQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=OLq5d0Pb0Y9i2q1HCXjq3v1rbBIMKf6zWjvZjjEj3No=;
-        b=JWaYIIc1xvatUqFfufmzeccHRArWbb3X1KNe8dTgKIY0QguAjmDfG1IDXpNzwWjH9E
-         qMmBH3l799zOBW+5aErDCWqO9FczEIz97k7buCLFz0LnOlOU1Dr44OjXYFs8t4mn5SSx
-         H5fZtzJvRpVnkWhAEnYKLp4zfEufObdf4JO1C3YSIvHWy3FFdzzPL6cBHVwK/OdYmnJC
-         zJiW8HEsvOgZDq2c5qUJU9ajgHGTzgIr8AQE5y7pqxRidLH+D8cOOgOw4U4r2IlwigTc
-         NUTb1wLf7fDh8zU0toOcAmosSEY5c3ihJlZ24QkOmh9pmFERpTu6FJifzD94CeUWfkBa
-         bzxw==
-X-Gm-Message-State: AO0yUKX0ISxaPWTaitVVL4zqsDAJOXa4FTBHul5UjzqYRrfXOCOAyuL3
-	kg2alyowWo6pILmiDw62hbOazc4UangmoIpiWnyStA==
-X-Google-Smtp-Source: AK7set/+aBnibfuQ/eDV6HeKJU0GYyiKfY5h7F23IRHVIhcLrx0TlpalbjK6oyD7YG9T7wZRM2LfUOz4Ka16yoI/jtg=
-X-Received: by 2002:ac8:7c4e:0:b0:3ab:6bd6:d3bb with SMTP id
- o14-20020ac87c4e000000b003ab6bd6d3bbmr1601287qtv.6.1675947012934; Thu, 09 Feb
- 2023 04:50:12 -0800 (PST)
+        bh=enXepIK1TxuVVTxdvoBrFqlHMmgJSEONjriFyLc0Erc=;
+        b=Ln2xee1WKaGNIiJisiSFXCXU3KxAQFObsXbTV9EIEFn0gzgweXk7yRGB1/2rUrVOgz
+         i6RK9NTkvZaSoQBsN+CNRxLrOMvr10/hPVdWLTgTT6SMT5e+C8aNc1YKZAd8f+tc7Oqa
+         MT/MawHiLKeGZynVH9t7tqUAu3k6vZcb4Ai9l5c1ClaMO1pKjSY7fTgqMbg2W3VRMdyf
+         TSVJLPY7yR8OU8iq1Z4E7W64vydVrdan7GxtOeJP/Vm/RoF/cylge39AljAxBTORpXnV
+         84kdQ3CrCg6taQNNi6/d965/u6ciC4iU2EVOe0lzg5HMU8Ugd49tibVse/JH3PNBO0xS
+         O01Q==
+X-Gm-Message-State: AO0yUKVxx5Uwa9tnBx+v3EYaEyDMH5l2dNJGsql4kjKY5VhpBRuOtf7G
+	ADH6nX0xE+w3zRhZ0Qosxwhnd6C328wmuPcRves4VHKm3l5YvRBnIv0=
+X-Google-Smtp-Source: AK7set9YBn00AUBBW5+UE0rCednnLjgrfinrFi7T3Fj6eZYgDYk0W6xK87HKNY8nGwTGhG+KaPovOjyZXNAY8Yp+Q+A=
+X-Received: by 2002:a0c:f20e:0:b0:56c:25fe:d37c with SMTP id
+ h14-20020a0cf20e000000b0056c25fed37cmr158051qvk.3.1675954755436; Thu, 09 Feb
+ 2023 06:59:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230206165851.3106338-1-ricarkol@google.com> <20230206165851.3106338-10-ricarkol@google.com>
- <9201764f-baa1-250a-39ac-0305bce789a3@redhat.com>
-In-Reply-To: <9201764f-baa1-250a-39ac-0305bce789a3@redhat.com>
+References: <20230126165351.2561582-1-ricarkol@google.com> <20230126165351.2561582-3-ricarkol@google.com>
+ <e119c970-8c3f-5d24-08a0-9dfb44fe4679@redhat.com>
+In-Reply-To: <e119c970-8c3f-5d24-08a0-9dfb44fe4679@redhat.com>
 From: Ricardo Koller <ricarkol@google.com>
-Date: Thu, 9 Feb 2023 04:50:02 -0800
-Message-ID: <CAOHnOrzGXU29JK+8aRq0SnMe6Ske04YWffJhPU6iUXjGyyoQtA@mail.gmail.com>
-Subject: Re: [PATCH v2 09/12] KVM: arm64: Split huge pages when dirty logging
- is enabled
-To: Gavin Shan <gshan@redhat.com>
-Cc: pbonzini@redhat.com, maz@kernel.org, oupton@google.com, 
-	yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, 
-	andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, 
-	suzuki.poulose@arm.com, eric.auger@redhat.com, reijiw@google.com, 
-	rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+Date: Thu, 9 Feb 2023 06:59:05 -0800
+Message-ID: <CAOHnOry8qWvQi-HHJ3Vx1Yz7ZEBArnZwP6WO6hD8iOZuKwFHDg@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v4 2/6] arm: pmu: Prepare for testing
+ 64-bit overflows
+To: eric.auger@redhat.com
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev, 
+	maz@kernel.org, alexandru.elisei@arm.com, oliver.upton@linux.dev, 
+	reijiw@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Feb 8, 2023 at 10:26 PM Gavin Shan <gshan@redhat.com> wrote:
+On Tue, Feb 7, 2023 at 7:46 AM Eric Auger <eric.auger@redhat.com> wrote:
 >
 > Hi Ricardo,
 >
-> On 2/7/23 3:58 AM, Ricardo Koller wrote:
-> > Split huge pages eagerly when enabling dirty logging. The goal is to
-> > avoid doing it while faulting on write-protected pages, which
-> > negatively impacts guest performance.
+> On 1/26/23 17:53, Ricardo Koller wrote:
+> > PMUv3p5 adds a knob, PMCR_EL0.LP == 1, that allows overflowing at 64-bits
+> > instead of 32. Prepare by doing these 3 things:
 > >
-> > A memslot marked for dirty logging is split in 1GB pieces at a time.
-> > This is in order to release the mmu_lock and give other kernel threads
-> > the opportunity to run, and also in order to allocate enough pages to
-> > split a 1GB range worth of huge pages (or a single 1GB huge page).
-> > Note that these page allocations can fail, so eager page splitting is
-> > best-effort.  This is not a correctness issue though, as huge pages
-> > can still be split on write-faults.
+> > 1. Add a "bool overflow_at_64bits" argument to all tests checking
+> >    overflows.
+> Actually test_chained_sw_incr() and test_chained_counters() also test
+> overflows but they feature CHAIN events. I guess that's why you don't
+> need the LP flag. Just tweek the commit msg if you need to respin.
+> > 2. Extend satisfy_prerequisites() to check if the machine supports
+> >    "overflow_at_64bits".
+> > 3. Refactor the test invocations to use the new "run_test()" which adds a
+> >    report prefix indicating whether the test uses 64 or 32-bit overflows.
 > >
-> > The benefits of eager page splitting are the same as in x86, added
-> > with commit a3fe5dbda0a4 ("KVM: x86/mmu: Split huge pages mapped by
-> > the TDP MMU when dirty logging is enabled"). For example, when running
-> > dirty_log_perf_test with 64 virtual CPUs (Ampere Altra), 1GB per vCPU,
-> > 50% reads, and 2MB HugeTLB memory, the time it takes vCPUs to access
-> > all of their memory after dirty logging is enabled decreased by 44%
-> > from 2.58s to 1.42s.
+> > A subsequent commit will actually add the 64-bit overflow tests.
 > >
 > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > Reviewed-by: Reiji Watanabe <reijiw@google.com>
+> Besides
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks for the reviews, I'll respin the series with the changes you suggest.
+
+Thanks,
+Ricardo
+
+>
+> Thanks
+>
+> Eric
+>
 > > ---
-> >   arch/arm64/include/asm/kvm_host.h |  16 +++++
-> >   arch/arm64/kvm/mmu.c              | 113 +++++++++++++++++++++++++++++-
-> >   2 files changed, 127 insertions(+), 2 deletions(-)
+> >  arm/pmu.c | 99 +++++++++++++++++++++++++++++++++----------------------
+> >  1 file changed, 60 insertions(+), 39 deletions(-)
 > >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index a69a815719cf..eab62d8b3ad4 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -154,6 +154,22 @@ struct kvm_s2_mmu {
-> >       int __percpu *last_vcpu_ran;
+> > diff --git a/arm/pmu.c b/arm/pmu.c
+> > index 7f0794d..06cbd73 100644
+> > --- a/arm/pmu.c
+> > +++ b/arm/pmu.c
+> > @@ -164,13 +164,13 @@ static void pmu_reset(void)
+> >  /* event counter tests only implemented for aarch64 */
+> >  static void test_event_introspection(void) {}
+> >  static void test_event_counter_config(void) {}
+> > -static void test_basic_event_count(void) {}
+> > -static void test_mem_access(void) {}
+> > -static void test_sw_incr(void) {}
+> > -static void test_chained_counters(void) {}
+> > -static void test_chained_sw_incr(void) {}
+> > -static void test_chain_promotion(void) {}
+> > -static void test_overflow_interrupt(void) {}
+> > +static void test_basic_event_count(bool overflow_at_64bits) {}
+> > +static void test_mem_access(bool overflow_at_64bits) {}
+> > +static void test_sw_incr(bool overflow_at_64bits) {}
+> > +static void test_chained_counters(bool unused) {}
+> > +static void test_chained_sw_incr(bool unused) {}
+> > +static void test_chain_promotion(bool unused) {}
+> > +static void test_overflow_interrupt(bool overflow_at_64bits) {}
 > >
-> >   #define KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT      PMD_SIZE
-> > +     /*
-> > +      * Memory cache used to split
-> > +      * KVM_CAP_ARM_EAGER_SPLIT_CHUNK_SIZE worth of huge pages. It
-> > +      * is used to allocate stage2 page tables while splitting huge
-> > +      * pages. Note that the choice of EAGER_PAGE_SPLIT_CHUNK_SIZE
-> > +      * influences both the capacity of the split page cache, and
-> > +      * how often KVM reschedules. Be wary of raising CHUNK_SIZE
-> > +      * too high.
-> > +      *
-> > +      * A good heuristic to pick CHUNK_SIZE is that it should be
-> > +      * the size of huge-page to be split.
-> > +      *
-> > +      * Protected by kvm->slots_lock.
-> > +      */
-> > +     struct kvm_mmu_memory_cache split_page_cache;
-> > +     uint64_t split_page_chunk_size;
+> >  #elif defined(__aarch64__)
+> >  #define ID_AA64DFR0_PERFMON_SHIFT 8
+> > @@ -435,13 +435,24 @@ static uint64_t pmevcntr_mask(void)
+> >       return (uint32_t)~0;
+> >  }
 > >
-> >       struct kvm_arch *arch;
-> >   };
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index e2ada6588017..73f8b3953f6a 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -31,14 +31,21 @@ static phys_addr_t hyp_idmap_vector;
-> >
-> >   static unsigned long io_map_base;
-> >
-> > -static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
-> > +static phys_addr_t __stage2_range_addr_end(phys_addr_t addr, phys_addr_t end,
-> > +                                        phys_addr_t size)
-> >   {
-> > -     phys_addr_t size = kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL);
-> >       phys_addr_t boundary = ALIGN_DOWN(addr + size, size);
-> >
-> >       return (boundary - 1 < end - 1) ? boundary : end;
-> >   }
-> >
-> > +static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
+> > -static void test_basic_event_count(void)
+> > +static bool check_overflow_prerequisites(bool overflow_at_64bits)
 > > +{
-> > +     phys_addr_t size = kvm_granule_size(KVM_PGTABLE_MIN_BLOCK_LEVEL);
+> > +     if (overflow_at_64bits && pmu.version < ID_DFR0_PMU_V3_8_5) {
+> > +             report_skip("Skip test as 64 overflows need FEAT_PMUv3p5");
+> > +             return false;
+> > +     }
 > > +
-> > +     return __stage2_range_addr_end(addr, end, size);
+> > +     return true;
 > > +}
 > > +
-> >   /*
-> >    * Release kvm_mmu_lock periodically if the memory region is large. Otherwise,
-> >    * we may see kernel panics with CONFIG_DETECT_HUNG_TASK,
-> > @@ -71,6 +78,72 @@ static int stage2_apply_range(struct kvm *kvm, phys_addr_t addr,
-> >       return ret;
-> >   }
+> > +static void test_basic_event_count(bool overflow_at_64bits)
+> >  {
+> >       uint32_t implemented_counter_mask, non_implemented_counter_mask;
+> >       uint32_t counter_mask;
+> >       uint32_t events[] = {CPU_CYCLES, INST_RETIRED};
 > >
-> > +static bool need_topup_split_page_cache_or_resched(struct kvm *kvm, uint64_t min)
+> > -     if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> > +     if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
+> > +         !check_overflow_prerequisites(overflow_at_64bits))
+> >               return;
+> >
+> >       implemented_counter_mask = BIT(pmu.nb_implemented_counters) - 1;
+> > @@ -515,12 +526,13 @@ static void test_basic_event_count(void)
+> >               "check overflow happened on #0 only");
+> >  }
+> >
+> > -static void test_mem_access(void)
+> > +static void test_mem_access(bool overflow_at_64bits)
+> >  {
+> >       void *addr = malloc(PAGE_SIZE);
+> >       uint32_t events[] = {MEM_ACCESS, MEM_ACCESS};
+> >
+> > -     if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> > +     if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
+> > +         !check_overflow_prerequisites(overflow_at_64bits))
+> >               return;
+> >
+> >       pmu_reset();
+> > @@ -551,13 +563,14 @@ static void test_mem_access(void)
+> >                       read_sysreg(pmovsclr_el0));
+> >  }
+> >
+> > -static void test_sw_incr(void)
+> > +static void test_sw_incr(bool overflow_at_64bits)
+> >  {
+> >       uint32_t events[] = {SW_INCR, SW_INCR};
+> >       uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
+> >       int i;
+> >
+> > -     if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> > +     if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
+> > +         !check_overflow_prerequisites(overflow_at_64bits))
+> >               return;
+> >
+> >       pmu_reset();
+> > @@ -597,7 +610,7 @@ static void test_sw_incr(void)
+> >               "overflow on counter #0 after 100 SW_INCR");
+> >  }
+> >
+> > -static void test_chained_counters(void)
+> > +static void test_chained_counters(bool unused)
+> >  {
+> >       uint32_t events[] = {CPU_CYCLES, CHAIN};
+> >
+> > @@ -638,7 +651,7 @@ static void test_chained_counters(void)
+> >       report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
+> >  }
+> >
+> > -static void test_chained_sw_incr(void)
+> > +static void test_chained_sw_incr(bool unused)
+> >  {
+> >       uint32_t events[] = {SW_INCR, CHAIN};
+> >       uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
+> > @@ -691,7 +704,7 @@ static void test_chained_sw_incr(void)
+> >                   read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+> >  }
+> >
+> > -static void test_chain_promotion(void)
+> > +static void test_chain_promotion(bool unused)
+> >  {
+> >       uint32_t events[] = {MEM_ACCESS, CHAIN};
+> >       void *addr = malloc(PAGE_SIZE);
+> > @@ -840,13 +853,14 @@ static bool expect_interrupts(uint32_t bitmap)
+> >       return true;
+> >  }
+> >
+> > -static void test_overflow_interrupt(void)
+> > +static void test_overflow_interrupt(bool overflow_at_64bits)
+> >  {
+> >       uint32_t events[] = {MEM_ACCESS, SW_INCR};
+> >       void *addr = malloc(PAGE_SIZE);
+> >       int i;
+> >
+> > -     if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> > +     if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
+> > +         !check_overflow_prerequisites(overflow_at_64bits))
+> >               return;
+> >
+> >       gic_enable_defaults();
+> > @@ -1070,6 +1084,27 @@ static bool pmu_probe(void)
+> >       return true;
+> >  }
+> >
+> > +static void run_test(const char *name, const char *prefix,
+> > +                  void (*test)(bool), void *arg)
 > > +{
-> > +     struct kvm_mmu_memory_cache *cache;
+> > +     report_prefix_push(name);
+> > +     report_prefix_push(prefix);
 > > +
-> > +     if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
-> > +             return true;
+> > +     test(arg);
 > > +
-> > +     cache = &kvm->arch.mmu.split_page_cache;
-> > +     return kvm_mmu_memory_cache_nr_free_objects(cache) < min;
+> > +     report_prefix_pop();
+> > +     report_prefix_pop();
 > > +}
 > > +
-> > +static int kvm_mmu_split_nr_page_tables(u64 range)
+> > +static void run_event_test(char *name, void (*test)(bool),
+> > +                        bool overflow_at_64bits)
 > > +{
-> > +     int n = 0;
+> > +     const char *prefix = overflow_at_64bits ? "64-bit overflows"
+> > +                                             : "32-bit overflows";
 > > +
-> > +     if (KVM_PGTABLE_MIN_BLOCK_LEVEL < 2)
-> > +             n += DIV_ROUND_UP_ULL(range, PUD_SIZE);
-> > +     n += DIV_ROUND_UP_ULL(range, PMD_SIZE);
-> > +     return n;
+> > +     run_test(name, prefix, test, (void *)overflow_at_64bits);
 > > +}
 > > +
->
-> I think it needs comments to explain how the number of page tables are calculated,
-> similar to what have been done for stage2_block_get_nr_page_tables() in pgtable.c
-
-Will add a comment.
-
->
-> > +static int kvm_mmu_split_huge_pages(struct kvm *kvm, phys_addr_t addr,
-> > +                                 phys_addr_t end)
-> > +{
-> > +     struct kvm_mmu_memory_cache *cache;
-> > +     struct kvm_pgtable *pgt;
-> > +     int ret;
-> > +     u64 next;
-> > +     u64 chunk_size = kvm->arch.mmu.split_page_chunk_size;
-> > +     int cache_capacity = kvm_mmu_split_nr_page_tables(chunk_size);
-> > +
-> > +     if (chunk_size == 0)
-> > +             return 0;
-> > +
-> > +     lockdep_assert_held_write(&kvm->mmu_lock);
-> > +
-> > +     cache = &kvm->arch.mmu.split_page_cache;
-> > +
-> > +     do {
-> > +             if (need_topup_split_page_cache_or_resched(kvm,
-> > +                                                        cache_capacity)) {
-> > +                     write_unlock(&kvm->mmu_lock);
-> > +                     cond_resched();
-> > +                     /* Eager page splitting is best-effort. */
-> > +                     ret = __kvm_mmu_topup_memory_cache(cache,
-> > +                                                        cache_capacity,
-> > +                                                        cache_capacity);
-> > +                     write_lock(&kvm->mmu_lock);
-> > +                     if (ret)
-> > +                             break;
-> > +             }
-> > +
-> > +             pgt = kvm->arch.mmu.pgt;
-> > +             if (!pgt)
-> > +                     return -EINVAL;
->
-> I don't think the check to see @pgt is existing or not because the VM can't be
-> created with its page-table isn't allocated and set in kvm_init_stage2_mmu().
-
-GIven that the lock is released/acquired every chunk, the intent was to check
-that the page-table wasn't freed in between.
-
->
-> > +
-> > +             next = __stage2_range_addr_end(addr, end, chunk_size);
-> > +             ret = kvm_pgtable_stage2_split(pgt, addr, next - addr,
-> > +                                            cache, cache_capacity);
-> > +             if (ret)
-> > +                     break;
-> > +     } while (addr = next, addr != end);
-> > +
-> > +     return ret;
-> > +}
-> > +
-> >   #define stage2_apply_range_resched(kvm, addr, end, fn)                      \
-> >       stage2_apply_range(kvm, addr, end, fn, true)
-> >
->
-> I'm wandering if stage2_apply_range() can be reused to avoid invent another similar
-> function. the gap are the granularity and conditions to reschedule.
-
-Will try and see what it looks like and report back.
-
->
-> > @@ -772,6 +845,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
-> >   void kvm_uninit_stage2_mmu(struct kvm *kvm)
-> >   {
-> >       kvm_free_stage2_pgd(&kvm->arch.mmu);
-> > +     kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
-> >   }
-> >
-> >   static void stage2_unmap_memslot(struct kvm *kvm,
-> > @@ -999,6 +1073,31 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
-> >       stage2_wp_range(&kvm->arch.mmu, start, end);
-> >   }
-> >
-> > +/**
-> > + * kvm_mmu_split_memory_region() - split the stage 2 blocks into PAGE_SIZE
-> > + *                              pages for memory slot
-> > + * @kvm:     The KVM pointer
-> > + * @slot:    The memory slot to split
-> > + *
-> > + * Acquires kvm->mmu_lock. Called with kvm->slots_lock mutex acquired,
-> > + * serializing operations for VM memory regions.
-> > + */
-> > +static void kvm_mmu_split_memory_region(struct kvm *kvm, int slot)
-> > +{
-> > +     struct kvm_memslots *slots = kvm_memslots(kvm);
-> > +     struct kvm_memory_slot *memslot = id_to_memslot(slots, slot);
-> > +     phys_addr_t start, end;
-> > +
-> > +     lockdep_assert_held(&kvm->slots_lock);
-> > +
-> > +     start = memslot->base_gfn << PAGE_SHIFT;
-> > +     end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
-> > +
-> > +     write_lock(&kvm->mmu_lock);
-> > +     kvm_mmu_split_huge_pages(kvm, start, end);
-> > +     write_unlock(&kvm->mmu_lock);
-> > +}
-> > +
-> >   /*
-> >    * kvm_arch_mmu_enable_log_dirty_pt_masked - enable dirty logging for selected
-> >    * dirty pages.
-> > @@ -1790,6 +1889,16 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
-> >                       return;
-> >
-> >               kvm_mmu_wp_memory_region(kvm, new->id);
-> > +             kvm_mmu_split_memory_region(kvm, new->id);
-> > +     } else {
-> > +             /*
-> > +              * Free any leftovers from the eager page splitting cache. Do
-> > +              * this when deleting, moving, disabling dirty logging, or
-> > +              * creating the memslot (a nop). Doing it for deletes makes
-> > +              * sure we don't leak memory, and there's no need to keep the
-> > +              * cache around for any of the other cases.
-> > +              */
-> > +             kvm_mmu_free_memory_cache(&kvm->arch.mmu.split_page_cache);
+> >  int main(int argc, char *argv[])
+> >  {
+> >       int cpi = 0;
+> > @@ -1102,33 +1137,19 @@ int main(int argc, char *argv[])
+> >               test_event_counter_config();
+> >               report_prefix_pop();
+> >       } else if (strcmp(argv[1], "pmu-basic-event-count") == 0) {
+> > -             report_prefix_push(argv[1]);
+> > -             test_basic_event_count();
+> > -             report_prefix_pop();
+> > +             run_event_test(argv[1], test_basic_event_count, false);
+> >       } else if (strcmp(argv[1], "pmu-mem-access") == 0) {
+> > -             report_prefix_push(argv[1]);
+> > -             test_mem_access();
+> > -             report_prefix_pop();
+> > +             run_event_test(argv[1], test_mem_access, false);
+> >       } else if (strcmp(argv[1], "pmu-sw-incr") == 0) {
+> > -             report_prefix_push(argv[1]);
+> > -             test_sw_incr();
+> > -             report_prefix_pop();
+> > +             run_event_test(argv[1], test_sw_incr, false);
+> >       } else if (strcmp(argv[1], "pmu-chained-counters") == 0) {
+> > -             report_prefix_push(argv[1]);
+> > -             test_chained_counters();
+> > -             report_prefix_pop();
+> > +             run_event_test(argv[1], test_chained_counters, false);
+> >       } else if (strcmp(argv[1], "pmu-chained-sw-incr") == 0) {
+> > -             report_prefix_push(argv[1]);
+> > -             test_chained_sw_incr();
+> > -             report_prefix_pop();
+> > +             run_event_test(argv[1], test_chained_sw_incr, false);
+> >       } else if (strcmp(argv[1], "pmu-chain-promotion") == 0) {
+> > -             report_prefix_push(argv[1]);
+> > -             test_chain_promotion();
+> > -             report_prefix_pop();
+> > +             run_event_test(argv[1], test_chain_promotion, false);
+> >       } else if (strcmp(argv[1], "pmu-overflow-interrupt") == 0) {
+> > -             report_prefix_push(argv[1]);
+> > -             test_overflow_interrupt();
+> > -             report_prefix_pop();
+> > +             run_event_test(argv[1], test_overflow_interrupt, false);
+> >       } else {
+> >               report_abort("Unknown sub-test '%s'", argv[1]);
 > >       }
-> >   }
-> >
-> >
->
-> Thanks,
-> Gavin
 >
