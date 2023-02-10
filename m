@@ -1,146 +1,188 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF35663AB
-	for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 17:46:48 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B3A532F4;
-	Fri, 10 Feb 2023 09:47:30 -0800 (PST)
-Received: from [192.168.122.164] (unknown [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 24D4B3F71E;
-	Fri, 10 Feb 2023 09:46:43 -0800 (PST)
-Message-ID: <f6452cdd-65ff-34b8-bab0-5c06416da5f6@arm.com>
-Date: Fri, 10 Feb 2023 11:46:36 -0600
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E561E63AB
+	for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 17:56:57 +0000 (UTC)
+Received: by mail-oi1-f176.google.com with SMTP id n132so5081097oih.7
+        for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 09:56:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZU0DTR2jkb6BgDEFwVxRI9QZqgszPA2FbK1oe+H0PD0=;
+        b=VA76dp6+OuYPBS18rf5xv6Ux9MptM92IX3o62MiLMWYngoDBylS/hHVYd1aMzReDgE
+         hZUXpH/uZG08n1OwMiMfvn94OqDtJmw+rHnUaIslSN56xy0S7tyxrOLM2F2wuGFceN4+
+         QNr4jg9Q/ie3Tkox5/fz5R7H2kI1t4ZcrD7GypVgMYTHg/g7pOsNTis3jlSpfq3utWAC
+         1+ES5h383fmwvKqIIvZKqNs94gcl+REKw/N8G+dDLfdc69lfUY7Rum9e1A6K2lMbVRgK
+         +Ar161VjNzswIBrPMnHdA7D4ZaPtBGUlYnPrggI3FHdy7yEZHUjboVHgkWWCA8STzkFm
+         G0pA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZU0DTR2jkb6BgDEFwVxRI9QZqgszPA2FbK1oe+H0PD0=;
+        b=Qd5MpP+MxPYNdbfCS+yUwXm5ZsJkJUq3KevLjVr+g1WqjcHHVh6VFDLXKZYTVDby4y
+         MlnJfMNmtdCHCYOyr6yHERumd11BO93ihhIRjTM6Sh+BBioefN9tNgoYsIzSgXOUVXfp
+         sln67UbMTt5JY9d6F/H6c71vk/ynYOs4swETbRt4/cjbwdngMdrtrkNINqHMFYs+5MDh
+         PkZdcsB+Po6ANxWZEFNqPnl5iwvlHTkBGRutJ4NkJBeULx0HrifrCcFytQJxkc+vqZGF
+         mZo24v7tTCyiIoDjF7NKrQLuQCceBBk/Zs+SmNpG5ZioSrpxoaWnFlYXs3bXhJxE++Io
+         lA3w==
+X-Gm-Message-State: AO0yUKV1tOOVKgGBfBL/FGw2C1XCUVdZhT9kSBKlGk3ZoA7QXr2tgg71
+	idE/FqdDLoJLH4dUtbCBOS5StP8cLWModsovECsXsg==
+X-Google-Smtp-Source: AK7set/2Jam/yTqYxsoy0TFU+P+8+KchIrgjR/8cM+Z+RIPwBKZrN3bDSHSfkgI6escJzSwXxywzRNH2A400Q/NQOLg=
+X-Received: by 2002:aca:b9c2:0:b0:364:80bf:a3a8 with SMTP id
+ j185-20020acab9c2000000b0036480bfa3a8mr1018623oif.243.1676051816639; Fri, 10
+ Feb 2023 09:56:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Content-Language: en-US
-To: "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>
-Cc: kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- David Woodhouse <dwmw@amazon.co.uk>, Marc Zyngier <marc.zyngier@arm.com>
-From: Jeremy Linton <jeremy.linton@arm.com>
-Subject: Circular lockdep in kvm_reset_vcpu() ?
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230201025048.205820-1-jingzhangos@google.com>
+ <20230201025048.205820-5-jingzhangos@google.com> <CAAeT=Fy8PN3i-FTMN+c8dauP8qToXZM_toaUx=34Y4hima8teQ@mail.gmail.com>
+ <CAAdAUthcEuKB8UG_zR4bFjn9eSJx2m2xNQgPO+7+iZVtmrhk_Q@mail.gmail.com> <CAAeT=Fy+0vs1X_fotjf0zstNyjdJtYUYvr-wa=jXShovQ-idqA@mail.gmail.com>
+In-Reply-To: <CAAeT=Fy+0vs1X_fotjf0zstNyjdJtYUYvr-wa=jXShovQ-idqA@mail.gmail.com>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Fri, 10 Feb 2023 09:56:44 -0800
+Message-ID: <CAAdAUti7h4DcLydwXobuJ_TEjLPzQQpwk7gj+kUvyw541RCVnQ@mail.gmail.com>
+Subject: Re: [PATCH v1 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
+To: Reiji Watanabe <reijiw@google.com>
+Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
+	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@google.com>, Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Ricardo Koller <ricarkol@google.com>, Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+Hi Reiji,
 
-I saw this pop yesterday:
-
-[   78.333360] ======================================================
-[   78.339541] WARNING: possible circular locking dependency detected
-[   78.345721] 6.2.0-rc7+ #19 Not tainted
-[   78.349470] ------------------------------------------------------
-[   78.355647] qemu-system-aar/859 is trying to acquire lock:
-[   78.361130] ffff5aa69269eba0 (&host_kvm->lock){+.+.}-{3:3}, at: 
-kvm_reset_vcpu+0x34/0x274
-[   78.369344]
-[   78.369344] but task is already holding lock:
-[   78.375182] ffff5aa68768c0b8 (&vcpu->mutex){+.+.}-{3:3}, at: 
-kvm_vcpu_ioctl+0x8c/0xba0
-[   78.383133]
-[   78.383133] which lock already depends on the new lock.
-[   78.383133]
-[   78.391318]
-[   78.391318] the existing dependency chain (in reverse order) is:
-[   78.398811]
-[   78.398811] -> #1 (&vcpu->mutex){+.+.}-{3:3}:
-[   78.404682]        __lock_acquire+0x480/0x9c0
-[   78.409068]        lock_acquire.part.0+0xf0/0x240
-[   78.413806]        lock_acquire+0xa8/0x204
-[   78.417934]        __mutex_lock+0xac/0x460
-[   78.422053]        mutex_lock_nested+0x34/0x40
-[   78.426517]        kvm_vm_ioctl_create_vcpu+0x17c/0x474
-[   78.431768]        kvm_vm_ioctl+0x67c/0xb00
-[   78.435966]        __arm64_sys_ioctl+0xb4/0x100
-[   78.440516]        invoke_syscall+0x78/0xfc
-[   78.444714]        el0_svc_common.constprop.0+0x68/0x124
-[   78.450044]        do_el0_svc+0x34/0x4c
-[   78.453892]        el0_svc+0x50/0x140
-[   78.457571]        el0t_64_sync_handler+0xf4/0x120
-[   78.462381]        el0t_64_sync+0x194/0x198
-[   78.466580]
-[   78.466580] -> #0 (&host_kvm->lock){+.+.}-{3:3}:
-[   78.472714]        check_prev_add+0xa4/0x8d4
-[   78.477005]        validate_chain+0x420/0x590
-[   78.481381]        __lock_acquire+0x480/0x9c0
-[   78.485759]        lock_acquire.part.0+0xf0/0x240
-[   78.490483]        lock_acquire+0xa8/0x204
-[   78.494598]        __mutex_lock+0xac/0x460
-[   78.498711]        mutex_lock_nested+0x34/0x40
-[   78.503171]        kvm_reset_vcpu+0x34/0x274
-[   78.507461]        kvm_vcpu_set_target+0x10c/0x154
-[   78.512274]        kvm_arch_vcpu_ioctl_vcpu_init+0x20/0xf0
-[   78.517782]        kvm_arch_vcpu_ioctl+0x398/0x550
-[   78.522595]        kvm_vcpu_ioctl+0x5f8/0xba0
-[   78.526973]        __arm64_sys_ioctl+0xb4/0x100
-[   78.531522]        invoke_syscall+0x78/0xfc
-[   78.535719]        el0_svc_common.constprop.0+0x68/0x124
-[   78.541048]        do_el0_svc+0x34/0x4c
-[   78.544897]        el0_svc+0x50/0x140
-[   78.548574]        el0t_64_sync_handler+0xf4/0x120
-[   78.553384]        el0t_64_sync+0x194/0x198
-[   78.557581]
-[   78.557581] other info that might help us debug this:
-[   78.557581]
-[   78.565606]  Possible unsafe locking scenario:
-[   78.565606]
-[   78.571541]        CPU0                    CPU1
-[   78.576080]        ----                    ----
-[   78.580606]   lock(&vcpu->mutex);
-[   78.583922]                                lock(&host_kvm->lock);
-[   78.590017]                                lock(&vcpu->mutex);
-[   78.595851]   lock(&host_kvm->lock);
-[   78.599426]
-[   78.599426]  *** DEADLOCK ***
-[   78.599426]
-[   78.605344] 1 lock held by qemu-system-aar/859:
-[   78.609873]  #0: ffff5aa68768c0b8 (&vcpu->mutex){+.+.}-{3:3}, at: 
-kvm_vcpu_ioctl+0x8c/0xba0
-[   78.618245]
-[   78.618245] stack backtrace:
-[   78.622599] CPU: 1 PID: 859 Comm: qemu-system-aar Not tainted 
-6.2.0-rc7+ #19
-[   78.629650] Hardware name: Raspberry Pi Foundation Raspberry Pi 4 
-Model B/Raspberry Pi 4 Model B, BIOS EDK2-DEV 11/07/2022
-[   78.640696] Call trace:
-[   78.643137]  dump_backtrace+0xe8/0x140
-[   78.646885]  show_stack+0x20/0x30
-[   78.650197]  dump_stack_lvl+0x88/0xb4
-[   78.653858]  dump_stack+0x18/0x34
-[   78.657171]  print_circular_bug+0x1f8/0x200
-[   78.661355]  check_noncircular+0x13c/0x150
-[   78.665451]  check_prev_add+0xa4/0x8d4
-[   78.669199]  validate_chain+0x420/0x590
-[   78.673035]  __lock_acquire+0x480/0x9c0
-[   78.676871]  lock_acquire.part.0+0xf0/0x240
-[   78.681055]  lock_acquire+0xa8/0x204
-[   78.684629]  __mutex_lock+0xac/0x460
-[   78.688203]  mutex_lock_nested+0x34/0x40
-[   78.692124]  kvm_reset_vcpu+0x34/0x274
-[   78.695873]  kvm_vcpu_set_target+0x10c/0x154
-[   78.700144]  kvm_arch_vcpu_ioctl_vcpu_init+0x20/0xf0
-[   78.705110]  kvm_arch_vcpu_ioctl+0x398/0x550
-[   78.709380]  kvm_vcpu_ioctl+0x5f8/0xba0
-[   78.713217]  __arm64_sys_ioctl+0xb4/0x100
-[   78.717225]  invoke_syscall+0x78/0xfc
-[   78.720885]  el0_svc_common.constprop.0+0x68/0x124
-[   78.725674]  do_el0_svc+0x34/0x4c
-[   78.728986]  el0_svc+0x50/0x140
-[   78.732126]  el0t_64_sync_handler+0xf4/0x120
-[   78.736395]  el0t_64_sync+0x194/0x198
-
-
-It appears to be triggered by the new commit 42a90008f890a ('KVM: Ensure 
-lockdep knows about kvm->lock vs. vcpu->mutex ordering rule') which is 
-detecting the vcpu lock grabbed by kvm_vcpu_ioctl() and then the kvm 
-mutext grabbed by kvm_reset_vcpu().
-
-This is 6.2rc7 configured for fedora-debug and qemu on the rpi4.
-
-Thanks,
+On Thu, Feb 9, 2023 at 10:16 PM Reiji Watanabe <reijiw@google.com> wrote:
+>
+> Hi Jing,
+>
+> On Thu, Feb 9, 2023 at 1:25 PM Jing Zhang <jingzhangos@google.com> wrote:
+> >
+> > On Mon, Feb 6, 2023 at 9:30 PM Reiji Watanabe <reijiw@google.com> wrote:
+> > >
+> > > Hi Jing,
+> > >
+> > > On Tue, Jan 31, 2023 at 6:51 PM Jing Zhang <jingzhangos@google.com> wrote:
+> > > >
+> > > > With per guest ID registers, PMUver settings from userspace
+> > > > can be stored in its corresponding ID register.
+> > > >
+> > > > No functional change intended.
+> > > >
+> > > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> > > > ---
+> > > >  arch/arm64/include/asm/kvm_host.h |  5 -----
+> > > >  arch/arm64/kvm/arm.c              |  6 ------
+> > > >  arch/arm64/kvm/id_regs.c          | 33 ++++++++++++++++++++-----------
+> > > >  include/kvm/arm_pmu.h             |  6 ++++--
+> > > >  4 files changed, 25 insertions(+), 25 deletions(-)
+> > > >
+> > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > > index fabb30185a4a..1ab443b52c46 100644
+> > > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > > @@ -225,11 +225,6 @@ struct kvm_arch {
+> > > >
+> > > >         cpumask_var_t supported_cpus;
+> > > >
+> > > > -       struct {
+> > > > -               u8 imp:4;
+> > > > -               u8 unimp:4;
+> > > > -       } dfr0_pmuver;
+> > > > -
+> > > >         /* Hypercall features firmware registers' descriptor */
+> > > >         struct kvm_smccc_features smccc_feat;
+> > > >
+> > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > > index d8ba5106bf51..25bd95650223 100644
+> > > > --- a/arch/arm64/kvm/arm.c
+> > > > +++ b/arch/arm64/kvm/arm.c
+> > > > @@ -138,12 +138,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+> > > >         kvm_arm_set_default_id_regs(kvm);
+> > > >         kvm_arm_init_hypercalls(kvm);
+> > > >
+> > > > -       /*
+> > > > -        * Initialise the default PMUver before there is a chance to
+> > > > -        * create an actual PMU.
+> > > > -        */
+> > > > -       kvm->arch.dfr0_pmuver.imp = kvm_arm_pmu_get_pmuver_limit();
+> > > > -
+> > > >         return 0;
+> > > >
+> > > >  err_free_cpumask:
+> > > > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
+> > > > index bc5d9bc84eb1..5eade7d380af 100644
+> > > > --- a/arch/arm64/kvm/id_regs.c
+> > > > +++ b/arch/arm64/kvm/id_regs.c
+> > > > @@ -19,10 +19,12 @@
+> > > >
+> > > >  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
+> > > >  {
+> > > > -       if (kvm_vcpu_has_pmu(vcpu))
+> > > > -               return vcpu->kvm->arch.dfr0_pmuver.imp;
+> > > > -
+> > > > -       return vcpu->kvm->arch.dfr0_pmuver.unimp;
+> > > > +       u8 pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
+> > > > +                       IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1));
+> > > > +       if (kvm_vcpu_has_pmu(vcpu) || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
+> > > > +               return pmuver;
+> > > > +       else
+> > > > +               return 0;
+> > > >  }
+> > > >
+> > > >  static u8 perfmon_to_pmuver(u8 perfmon)
+> > > > @@ -263,10 +265,9 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
+> > > >         if (val)
+> > > >                 return -EINVAL;
+> > > >
+> > > > -       if (valid_pmu)
+> > > > -               vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
+> > > > -       else
+> > > > -               vcpu->kvm->arch.dfr0_pmuver.unimp = pmuver;
+> > > > +       IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
+> > > > +       IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |=
+> > > > +               FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), pmuver);
+> > >
+> > > Did you consider there could be guests that have vCPUs with and
+> > > without PMU ? It looks like the code doesn't work for such guests.
+> > > (e.g. for such guests, if setting the register is done for vCPUs
+> > >  without PMU, this code seems to make PMUVer zero or 0xf
+> > >  even for vCPUs with PMU)
+> > Yes, I did. The PMUVer field is a per-VCPU field, whose value was
+> > determined on the fly in the get_user function. Check the function
+> > kvm_arm_read_id_reg_with_encoding, vcpu_pmuver is called to set the
+> > real value for the VCPU.
+> > The perVM ID registers array we put in the kvm structure save
+> > correctly only for those perVM field, for those pre-VCPU filed, their
+> > real value is determined on the fly during the register reading
+> > (get_user).
+>
+> Yes, I understand that part.
+> But, if a guest has 2 VCPUs, one of which has a PMU and the other
+> does not, the PMUVer for them will be different.  Which value do
+> you try to save in the per VM field ?
+>
+> It appears that the code always saves the last value set by
+> userspace in the per VM field, regardless of whether the vCPU
+> has PMU or not.
+> If the last value is set for the vCPU without PMU, the per VM
+> field will be either 0 or 0xf.  Since the per VM field is always
+> used by vcpu_pmuver() for vCPUs with PMU, I would think the
+> PMUVer for the vCPU with PMU will end up being 0 or 0xf in this
+> case (NOTE: the PMUVer for vCPUs with PMU should not be 0 or 0xf).
+>
+> Or am I missing something??
+Thanks for the clarification. You are right about the issue. I'll fix
+it in the next version by utilizing a bit in kvm->arch.flags to
+indicate the IMPDEF PMU. The value stored in id_regs would be the one
+for vCPU with PMU support.
+>
+> Thanks,
+> Reiji
