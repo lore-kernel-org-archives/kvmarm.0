@@ -1,111 +1,114 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E186D1B
-	for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 19:23:39 +0000 (UTC)
-Received: by mail-wm1-f52.google.com with SMTP id c4-20020a1c3504000000b003d9e2f72093so6994421wma.1
-        for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 11:23:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125328808
+	for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 22:03:15 +0000 (UTC)
+Received: by mail-qt1-f174.google.com with SMTP id ch10so6361284qtb.11
+        for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 14:03:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lKfwFWPx0mrSaDUSu+IwD5rq4TMnBt0i+kbnmd2g5/o=;
-        b=fKOFy+nxE2mxy+0q4b3+SYDPuE4uFMODmK1JmAKI2/Nk498QHkmjMLG1xKbT7lDMxU
-         WxcT2uc8nwtbsNxkhcXQVlLpZp0tcmKK5G/FTqSxr2bvnq5hQ4xMDcqr+5DbHOJgw0ZC
-         pCtBxHz1JGtDBnaEJ0GBulsNhJnI7n1DeEBu0LNBbum2CAZofI7qLbdfQj5LbJaw+zdo
-         HQcsF8FWmO7quEzsA9FWhKm9A7Bci4VWehUxYVx4zwBebKmZusFljhmFD+Xj1YE+wpnQ
-         W+SaLU+E8mh9Tg98ERLKvg9bOS974FB7MNZtL/IYLRoPbv5uM2K2qAKApcQq6An4KCa6
-         wAWQ==
+        d=google.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Id2+UsrVYKoKh+v2gTwy3GQbNktc9GS1SBwYfNKmfZk=;
+        b=iqtd9Kec5IJph3ZTrG8aQ9XA8blKN8EHZeUno7ZWq0Z74T/ZFpvFUAI6XOOFsTmA+m
+         rwX4VSVwFgKG8++rIsb1NW+uwc20/oMmEguoB1q+abQT6HtYJ8zcOy86uB+rZ8vVmRld
+         2ONCeJrkJs+1bJKW5qNSOuxc0l3Dq+MJAP89YqTRGA3SLzYY2WI9GZ5/n1vyx8Hb9I6K
+         g6dceqVSlv7QHhSyY3OjMwlusWa/Dq/WWiaDmeEmV9/JziIURezkSEHg6LZWQ0IvbAHe
+         Wb8vXjAFl6FrlH8LF4jBZCY1SxXhNRje/gAIV0F5rBtBGYv4x3oZkaGae96O34RyiNO3
+         gbjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lKfwFWPx0mrSaDUSu+IwD5rq4TMnBt0i+kbnmd2g5/o=;
-        b=Qwj8YJ6PjIj01dVSiRWgjCFTXXgvPnGXKWUvsRol6f6s7YTIAk0ubfDYTHP2lYg2mS
-         P/mWV0qwDMjPfC3cZBDtunH0fTJTo5m+NS9gP0WnXawXvgaipAUVofWe4zV3iDV5guk7
-         IS/YOknAb47SMf6HFt6rt/sbAdL4o7+rzONyF9mSGe2yI4H2aN+tJN474ruz+a4SnLu0
-         r2BEYoiHCZHO5ok2F401p0PWDRczJzapo8HdbnLnW99/60Icznm6BXX9EbcTYYlp8Hch
-         P7ZhJ6uDzdR3ZKHZjfdQX7hIYlVKvHdpDlWb/VcMRQSGPjifncRCK6/LXackziIL9Nfv
-         KRqw==
-X-Gm-Message-State: AO0yUKX5fpetUBFVN4PdK/jXmtHv1CFXFvNBXZERh43AX1mePRmNw4Cr
-	oChPHlgyfSWoHzYqBRWTb/lAKA==
-X-Google-Smtp-Source: AK7set/tV2rdWgmvhNxuUBbH5Kp+VjGk9gubEi8GFZRRtNk7BxFlPuMUDMhx4sndvqkKHAXXt1J4sw==
-X-Received: by 2002:a05:600c:b58:b0:3df:e752:35ca with SMTP id k24-20020a05600c0b5800b003dfe75235camr17613840wmr.32.1676057017763;
-        Fri, 10 Feb 2023 11:23:37 -0800 (PST)
-Received: from myrica (054592b0.skybroadband.com. [5.69.146.176])
-        by smtp.gmail.com with ESMTPSA id t15-20020a05600c198f00b003ddc781b1d4sm6466877wmq.33.2023.02.10.11.23.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Feb 2023 11:23:37 -0800 (PST)
-Date: Fri, 10 Feb 2023 19:23:29 +0000
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
-	joro@8bytes.org, robin.murphy@arm.com, james.morse@arm.com,
-	suzuki.poulose@arm.com, oliver.upton@linux.dev,
-	yuzenghui@huawei.com, dbrazdil@google.com, ryan.roberts@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	iommu@lists.linux.dev
-Subject: Re: [RFC PATCH 42/45] KVM: arm64: pkvm: Support SCMI power domain
-Message-ID: <Y+aZsYDYUGuhTVrh@myrica>
-References: <20230201125328.2186498-1-jean-philippe@linaro.org>
- <20230201125328.2186498-43-jean-philippe@linaro.org>
- <Y+JRl3WRwzDJOe2J@google.com>
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Id2+UsrVYKoKh+v2gTwy3GQbNktc9GS1SBwYfNKmfZk=;
+        b=LKXuY5qyfeXd/4A/zSWnmeZ5J/9CyrF7EJd38a0+f5r+1w2YPEGJhcu5a96GhUIlWE
+         82w04HNKip3XzefHXQ9N0w8vVEIkOKoK4YNFQGVvbgEh1dpYC1FbcrOxU1+9+9cdPJy7
+         rqtq3OJMMPCWnBrYCLcD6oW1foD6YgrbMTSrtcjxrX7F+rW2iwtYocHxyI+MvrmcN68x
+         x0RFg4vHKq753Y3K1esKO2Kbz+g3jrgPqKii14B6juoBqMlm2dz71eRJCNmCtzzlSAap
+         0bMrmwjRnum9XQbD/P1mpxhgRV2G1jAuqMIEBdGufs6mM6gDBeZtrlPzcZU+1ah59ySp
+         lk9Q==
+X-Gm-Message-State: AO0yUKVz/lEUOQNGKjoQBTEcBXEvZOY+09wpIPCZNiHUKdKd79NLvZbR
+	xov5Yp4npNIkK3SlDZJUQE5Zj2gAX0hPeEWda5jz5g==
+X-Google-Smtp-Source: AK7set+a2IupuOe1iheQ8otTvVtY3AqFS2GYaIMQsbCA6aSlPzZqYmefbzH5B1fbTNFe1V6Vb61IH3YUyWK6KZqlu0U=
+X-Received: by 2002:ac8:584e:0:b0:3ba:1f09:94b5 with SMTP id
+ h14-20020ac8584e000000b003ba1f0994b5mr2106266qth.358.1676066593926; Fri, 10
+ Feb 2023 14:03:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y+JRl3WRwzDJOe2J@google.com>
+References: <20230201125328.2186498-1-jean-philippe@linaro.org>
+ <20230201125328.2186498-20-jean-philippe@linaro.org> <Y+JOhEfi8mu1RuOt@google.com>
+ <CAFgf54q+R6nQBUAz9Quj8pQiTgKe7R_7BdQ=PWWay0WqDVzL1Q@mail.gmail.com> <Y+PkUKe72Q2WJGlp@myrica>
+In-Reply-To: <Y+PkUKe72Q2WJGlp@myrica>
+From: Mostafa Saleh <smostafa@google.com>
+Date: Fri, 10 Feb 2023 22:03:03 +0000
+Message-ID: <CAFgf54r6r8n6wYQqHuCqeuTiOp4h0PehR4yFaJLa0cchAbRTtw@mail.gmail.com>
+Subject: Re: [RFC PATCH 19/45] KVM: arm64: iommu: Add domains
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org, joro@8bytes.org, 
+	robin.murphy@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, 
+	oliver.upton@linux.dev, yuzenghui@huawei.com, dbrazdil@google.com, 
+	ryan.roberts@arm.com, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 07, 2023 at 01:27:17PM +0000, Mostafa Saleh wrote:
-> Hi Jean,
-> 
-> > +bool kvm_host_scmi_handler(struct kvm_cpu_context *host_ctxt)
-> > +{
-> > +	DECLARE_REG(u64, func_id, host_ctxt, 0);
-> > +
-> > +	if (!scmi_channel.shmem || func_id != scmi_channel.smc_id)
-> > +		return false; /* Unhandled */
-> > +
-> > +	/*
-> > +	 * Prevent the host from modifying the request while it is in flight.
-> > +	 * One page is enough, SCMI messages are smaller than that.
-> > +	 *
-> > +	 * FIXME: the host is allowed to poll the shmem while the request is in
-> > +	 * flight, or read shmem when receiving the SCMI interrupt. Although
-> > +	 * it's unlikely with the SMC-based transport, this too requires some
-> > +	 * tightening in the spec.
-> > +	 */
-> > +	if (WARN_ON(__pkvm_host_add_remove_page(scmi_channel.shmem_pfn, true)))
-> > +		return true;
-> > +
-> > +	__kvm_host_scmi_handler(host_ctxt);
-> > +
-> > +	WARN_ON(__pkvm_host_add_remove_page(scmi_channel.shmem_pfn, false));
-> > +	return true; /* Handled */
-> > +}
-> 
-> I am not sure what a typical SCMI channel shmem_size would be.
+On Wed, Feb 8, 2023 at 6:05 PM Jean-Philippe Brucker
+<jean-philippe@linaro.org> wrote:
+>
+> On Wed, Feb 08, 2023 at 12:31:15PM +0000, Mostafa Saleh wrote:
+> > On Tue, Feb 7, 2023 at 1:13 PM Mostafa Saleh <smostafa@google.com> wrot=
+e:
+> >
+> > > I was wondering about the need for pre-allocation of the domain array=
+.
+> > >
+> > > An alternative way I see:
+> > > - We don=E2=80=99t pre-allocate any domain.
+> > >
+> > > - When the EL1 driver has a request to domain_alloc, it will allocate
+> > > both kernel(iommu_domain) and hypervisor domains(kvm_hyp_iommu_domain=
+).
+> > >
+> > > - In __pkvm_host_iommu_alloc_domain, it will take over the hyp struct
+> > > from the kernel (via donation).
+>
+> That also requires an entire page for each domain no?  I guess this domai=
+n
+> table would only be worse in memory use if we have fewer than 2 domains,
+> since it costs one page for the root table, and then stores 256 domains
+> per leaf page.
 
-shmem_size is large but a SCMI message isn't bigger than 128 bytes at the
-moment, so copying would certainly be more performant.
+Yes, that would require a page for a domain also, which is inefficient.
 
-> But would map/unmap be more performant than
-> memcpy(hyp_local_copy,scmi_channel.pfn,scmi_channel.shmem_size ); ?
+> What I've been trying to avoid with this table is introducing a malloc in
+> the hypervisor, but we might have to bite the bullet eventually (although
+> with a malloc, access will probably worse than O(1)).
 
-The problem is that we're forwarding this to the SCMI server, which
-expects to find the command in the shmem.
+An alternative approach,
 
-I took the easy route here, but a more efficient way to support SCMI would
-be for the hypervisor to own the channel permanently, and the host<->hyp
-communication would use a separate shared page. The hypervisor could then
-copy from one channel to the other. It requires more support in the host
-driver so I'd like to see if there is any interest in supporting SCMI
-before working on this.
+1- At SMMU init, it will alloc va range which is not backed by any memory
+(via pkvm_alloc_private_va_range) that is contiguous with the max size
+of domains.
+2- This will be like a large array indexed by domain id, and it would
+be filled on demand
+from memcache.
+3-alloc_domain will make sure that the new domain_id has a page and
+then any other
+access from map and unmap would just index this memory.
+
+This can save the extra page in the root table, handle_to_domain would
+slightly be
+more efficient.
+But this can cause page faults in EL2 if domain_id was not correct (allocat=
+ed in
+EL2 before). So I am not sure if it is worth it.
+
 
 Thanks,
-Jean
+Mostafa
