@@ -1,188 +1,140 @@
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E561E63AB
-	for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 17:56:57 +0000 (UTC)
-Received: by mail-oi1-f176.google.com with SMTP id n132so5081097oih.7
-        for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 09:56:57 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A34B8483
+	for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 19:21:25 +0000 (UTC)
+Received: by mail-wr1-f47.google.com with SMTP id o15so2732489wrc.9
+        for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 11:21:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZU0DTR2jkb6BgDEFwVxRI9QZqgszPA2FbK1oe+H0PD0=;
-        b=VA76dp6+OuYPBS18rf5xv6Ux9MptM92IX3o62MiLMWYngoDBylS/hHVYd1aMzReDgE
-         hZUXpH/uZG08n1OwMiMfvn94OqDtJmw+rHnUaIslSN56xy0S7tyxrOLM2F2wuGFceN4+
-         QNr4jg9Q/ie3Tkox5/fz5R7H2kI1t4ZcrD7GypVgMYTHg/g7pOsNTis3jlSpfq3utWAC
-         1+ES5h383fmwvKqIIvZKqNs94gcl+REKw/N8G+dDLfdc69lfUY7Rum9e1A6K2lMbVRgK
-         +Ar161VjNzswIBrPMnHdA7D4ZaPtBGUlYnPrggI3FHdy7yEZHUjboVHgkWWCA8STzkFm
-         G0pA==
+        d=linaro.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1Tz1WhSiDyiHb7swgsfraxGg6wWStHRX2Amb3b1VcmU=;
+        b=WKCPMt8G4P6kglvBEYuR6Y8VGe4vLKREbo46B1FzP36qdC9o/gXh5YU6gEW7L3708X
+         lrxXAzEPB1j3pGDdzQh1aduk3Z9ZrGueXQk2asJVFXfbphcdAajT2cuL8SDpesGlCuT5
+         zP27G5KvohxP/B+J2p8XFakN/0ZUkhWnnBrHWiIoZRCeISeKJDx0vx5qCieGs4EnxLMv
+         DR+bECwo2Frc9+Tg0Sq3Y8jMTdALTUIhprnoG8OmKK9vaJW9Bl1ofg1Vnea3kae6KK3A
+         RYJiA29h4m4QGtT3sklUElmYPdchtrnZQvS2mzkuO+xv8NS8SwBva8yxv2T57qImR1fr
+         WyNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZU0DTR2jkb6BgDEFwVxRI9QZqgszPA2FbK1oe+H0PD0=;
-        b=Qd5MpP+MxPYNdbfCS+yUwXm5ZsJkJUq3KevLjVr+g1WqjcHHVh6VFDLXKZYTVDby4y
-         MlnJfMNmtdCHCYOyr6yHERumd11BO93ihhIRjTM6Sh+BBioefN9tNgoYsIzSgXOUVXfp
-         sln67UbMTt5JY9d6F/H6c71vk/ynYOs4swETbRt4/cjbwdngMdrtrkNINqHMFYs+5MDh
-         PkZdcsB+Po6ANxWZEFNqPnl5iwvlHTkBGRutJ4NkJBeULx0HrifrCcFytQJxkc+vqZGF
-         mZo24v7tTCyiIoDjF7NKrQLuQCceBBk/Zs+SmNpG5ZioSrpxoaWnFlYXs3bXhJxE++Io
-         lA3w==
-X-Gm-Message-State: AO0yUKV1tOOVKgGBfBL/FGw2C1XCUVdZhT9kSBKlGk3ZoA7QXr2tgg71
-	idE/FqdDLoJLH4dUtbCBOS5StP8cLWModsovECsXsg==
-X-Google-Smtp-Source: AK7set/2Jam/yTqYxsoy0TFU+P+8+KchIrgjR/8cM+Z+RIPwBKZrN3bDSHSfkgI6escJzSwXxywzRNH2A400Q/NQOLg=
-X-Received: by 2002:aca:b9c2:0:b0:364:80bf:a3a8 with SMTP id
- j185-20020acab9c2000000b0036480bfa3a8mr1018623oif.243.1676051816639; Fri, 10
- Feb 2023 09:56:56 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1Tz1WhSiDyiHb7swgsfraxGg6wWStHRX2Amb3b1VcmU=;
+        b=JQsxUv+9sK2O+H4iIVaRAAxdvob/WxrUHkQHoJcJ01RBfwXpDuFPEAhC7B2APTNgSj
+         xK1rpjAtLrCWswQH5zSt54E+q4GP0OobiZzpNt0qduMbdBXef3+hFQMQMPjQtwpeNcx4
+         ep1FttewPeR612WScOIS5qC2jv0eKZ6d/aWhsc7BCSRnvyRlYnTI6q//VHH04NBvG7eS
+         JBz1xCzaFNVotMkjuypw12+tXmCtuE9OnEuDVOFPnQY5fcWWeHrtoVtHtPKrKmyJY22B
+         RogomNx5k8leDNywPYKM+EwGBkzOpwCBRch6w0MEP3VbXallhO7E5eG1dxjleqsF95M4
+         oA7g==
+X-Gm-Message-State: AO0yUKVU5cH1L1/zGowTKpQux+/BudE7UDyHzYMJQMpexTpN9UKBVD1b
+	MizN13ORXORmIfDqv+w9UmnSJQ==
+X-Google-Smtp-Source: AK7set81Xt2KccZQRdMWDTRiY2Gd0tbVvECaL276b9b5J5FRXHU0WwGuCEaGmrLLiiQcY/fFP5oI7g==
+X-Received: by 2002:adf:f212:0:b0:2c3:dbe0:58ea with SMTP id p18-20020adff212000000b002c3dbe058eamr16025908wro.47.1676056883588;
+        Fri, 10 Feb 2023 11:21:23 -0800 (PST)
+Received: from myrica (054592b0.skybroadband.com. [5.69.146.176])
+        by smtp.gmail.com with ESMTPSA id y1-20020a5d6201000000b002c3ea5ebc73sm4253499wru.101.2023.02.10.11.21.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Feb 2023 11:21:23 -0800 (PST)
+Date: Fri, 10 Feb 2023 19:21:14 +0000
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+	joro@8bytes.org, robin.murphy@arm.com, james.morse@arm.com,
+	suzuki.poulose@arm.com, oliver.upton@linux.dev,
+	yuzenghui@huawei.com, dbrazdil@google.com, ryan.roberts@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	iommu@lists.linux.dev
+Subject: Re: [RFC PATCH 15/45] KVM: arm64: pkvm: Add
+ __pkvm_host_share/unshare_dma()
+Message-ID: <Y+aZKmXJAVwpPbF0@myrica>
+References: <20230201125328.2186498-1-jean-philippe@linaro.org>
+ <20230201125328.2186498-16-jean-philippe@linaro.org>
+ <Y+JJ5HJpKGy3P04V@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230201025048.205820-1-jingzhangos@google.com>
- <20230201025048.205820-5-jingzhangos@google.com> <CAAeT=Fy8PN3i-FTMN+c8dauP8qToXZM_toaUx=34Y4hima8teQ@mail.gmail.com>
- <CAAdAUthcEuKB8UG_zR4bFjn9eSJx2m2xNQgPO+7+iZVtmrhk_Q@mail.gmail.com> <CAAeT=Fy+0vs1X_fotjf0zstNyjdJtYUYvr-wa=jXShovQ-idqA@mail.gmail.com>
-In-Reply-To: <CAAeT=Fy+0vs1X_fotjf0zstNyjdJtYUYvr-wa=jXShovQ-idqA@mail.gmail.com>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Fri, 10 Feb 2023 09:56:44 -0800
-Message-ID: <CAAdAUti7h4DcLydwXobuJ_TEjLPzQQpwk7gj+kUvyw541RCVnQ@mail.gmail.com>
-Subject: Re: [PATCH v1 4/6] KVM: arm64: Use per guest ID register for ID_AA64DFR0_EL1.PMUVer
-To: Reiji Watanabe <reijiw@google.com>
-Cc: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>, 
-	ARMLinux <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@google.com>, Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>, 
-	Ricardo Koller <ricarkol@google.com>, Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y+JJ5HJpKGy3P04V@google.com>
 
-Hi Reiji,
+On Tue, Feb 07, 2023 at 12:53:56PM +0000, Mostafa Saleh wrote:
+> > +static int __host_check_page_dma_shared(phys_addr_t phys_addr)
+> > +{
+> > +	int ret;
+> > +	u64 hyp_addr;
+> > +
+> > +	/*
+> > +	 * The page is already refcounted. Make sure it's owned by the host, and
+> > +	 * not part of the hyp pool.
+> > +	 */
+> > +	ret = __host_check_page_state_range(phys_addr, PAGE_SIZE,
+> > +					    PKVM_PAGE_SHARED_OWNED);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	/*
+> > +	 * Refcounted and owned by host, means it's either mapped in the
+> > +	 * SMMU, or it's some VM/VCPU state shared with the hypervisor.
+> > +	 * The host has no reason to use a page for both.
+> > +	 */
+> > +	hyp_addr = (u64)hyp_phys_to_virt(phys_addr);
+> > +	return __hyp_check_page_state_range(hyp_addr, PAGE_SIZE, PKVM_NOPAGE);
+> 
+> This works for hyp-host sharing, I am worried about scalability of this.
+> For example FFA(still on the list) adds a new entity that can share data
+> with host, and we would need an extra check for it.
+> https://lore.kernel.org/kvmarm/20221116170335.2341003-1-qperret@google.com/
 
-On Thu, Feb 9, 2023 at 10:16 PM Reiji Watanabe <reijiw@google.com> wrote:
->
-> Hi Jing,
->
-> On Thu, Feb 9, 2023 at 1:25 PM Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > On Mon, Feb 6, 2023 at 9:30 PM Reiji Watanabe <reijiw@google.com> wrote:
-> > >
-> > > Hi Jing,
-> > >
-> > > On Tue, Jan 31, 2023 at 6:51 PM Jing Zhang <jingzhangos@google.com> wrote:
-> > > >
-> > > > With per guest ID registers, PMUver settings from userspace
-> > > > can be stored in its corresponding ID register.
-> > > >
-> > > > No functional change intended.
-> > > >
-> > > > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > > > ---
-> > > >  arch/arm64/include/asm/kvm_host.h |  5 -----
-> > > >  arch/arm64/kvm/arm.c              |  6 ------
-> > > >  arch/arm64/kvm/id_regs.c          | 33 ++++++++++++++++++++-----------
-> > > >  include/kvm/arm_pmu.h             |  6 ++++--
-> > > >  4 files changed, 25 insertions(+), 25 deletions(-)
-> > > >
-> > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > > index fabb30185a4a..1ab443b52c46 100644
-> > > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > > @@ -225,11 +225,6 @@ struct kvm_arch {
-> > > >
-> > > >         cpumask_var_t supported_cpus;
-> > > >
-> > > > -       struct {
-> > > > -               u8 imp:4;
-> > > > -               u8 unimp:4;
-> > > > -       } dfr0_pmuver;
-> > > > -
-> > > >         /* Hypercall features firmware registers' descriptor */
-> > > >         struct kvm_smccc_features smccc_feat;
-> > > >
-> > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > > index d8ba5106bf51..25bd95650223 100644
-> > > > --- a/arch/arm64/kvm/arm.c
-> > > > +++ b/arch/arm64/kvm/arm.c
-> > > > @@ -138,12 +138,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> > > >         kvm_arm_set_default_id_regs(kvm);
-> > > >         kvm_arm_init_hypercalls(kvm);
-> > > >
-> > > > -       /*
-> > > > -        * Initialise the default PMUver before there is a chance to
-> > > > -        * create an actual PMU.
-> > > > -        */
-> > > > -       kvm->arch.dfr0_pmuver.imp = kvm_arm_pmu_get_pmuver_limit();
-> > > > -
-> > > >         return 0;
-> > > >
-> > > >  err_free_cpumask:
-> > > > diff --git a/arch/arm64/kvm/id_regs.c b/arch/arm64/kvm/id_regs.c
-> > > > index bc5d9bc84eb1..5eade7d380af 100644
-> > > > --- a/arch/arm64/kvm/id_regs.c
-> > > > +++ b/arch/arm64/kvm/id_regs.c
-> > > > @@ -19,10 +19,12 @@
-> > > >
-> > > >  static u8 vcpu_pmuver(const struct kvm_vcpu *vcpu)
-> > > >  {
-> > > > -       if (kvm_vcpu_has_pmu(vcpu))
-> > > > -               return vcpu->kvm->arch.dfr0_pmuver.imp;
-> > > > -
-> > > > -       return vcpu->kvm->arch.dfr0_pmuver.unimp;
-> > > > +       u8 pmuver = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer),
-> > > > +                       IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1));
-> > > > +       if (kvm_vcpu_has_pmu(vcpu) || pmuver == ID_AA64DFR0_EL1_PMUVer_IMP_DEF)
-> > > > +               return pmuver;
-> > > > +       else
-> > > > +               return 0;
-> > > >  }
-> > > >
-> > > >  static u8 perfmon_to_pmuver(u8 perfmon)
-> > > > @@ -263,10 +265,9 @@ static int set_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> > > >         if (val)
-> > > >                 return -EINVAL;
-> > > >
-> > > > -       if (valid_pmu)
-> > > > -               vcpu->kvm->arch.dfr0_pmuver.imp = pmuver;
-> > > > -       else
-> > > > -               vcpu->kvm->arch.dfr0_pmuver.unimp = pmuver;
-> > > > +       IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer);
-> > > > +       IDREG(vcpu->kvm, SYS_ID_AA64DFR0_EL1) |=
-> > > > +               FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), pmuver);
-> > >
-> > > Did you consider there could be guests that have vCPUs with and
-> > > without PMU ? It looks like the code doesn't work for such guests.
-> > > (e.g. for such guests, if setting the register is done for vCPUs
-> > >  without PMU, this code seems to make PMUVer zero or 0xf
-> > >  even for vCPUs with PMU)
-> > Yes, I did. The PMUVer field is a per-VCPU field, whose value was
-> > determined on the fly in the get_user function. Check the function
-> > kvm_arm_read_id_reg_with_encoding, vcpu_pmuver is called to set the
-> > real value for the VCPU.
-> > The perVM ID registers array we put in the kvm structure save
-> > correctly only for those perVM field, for those pre-VCPU filed, their
-> > real value is determined on the fly during the register reading
-> > (get_user).
->
-> Yes, I understand that part.
-> But, if a guest has 2 VCPUs, one of which has a PMU and the other
-> does not, the PMUVer for them will be different.  Which value do
-> you try to save in the per VM field ?
->
-> It appears that the code always saves the last value set by
-> userspace in the per VM field, regardless of whether the vCPU
-> has PMU or not.
-> If the last value is set for the vCPU without PMU, the per VM
-> field will be either 0 or 0xf.  Since the per VM field is always
-> used by vcpu_pmuver() for vCPUs with PMU, I would think the
-> PMUVer for the vCPU with PMU will end up being 0 or 0xf in this
-> case (NOTE: the PMUVer for vCPUs with PMU should not be 0 or 0xf).
->
-> Or am I missing something??
-Thanks for the clarification. You are right about the issue. I'll fix
-it in the next version by utilizing a bit in kvm->arch.flags to
-indicate the IMPDEF PMU. The value stored in id_regs would be the one
-for vCPU with PMU support.
->
-> Thanks,
-> Reiji
+Right, although it looks like the ff-a support doesn't need a refcount at
+the moment so passing such a page to iommu_map() would fail at
+check_share() (but I may be wrong, I'll need another look). Even if it did
+use a refcount, I think it may be fine to share it between different
+entities: the refcount ensures that every sharing is undone before the
+page can be donated to another entity, and a separate tracking ensures
+that the host undoes the right thing (the io-pgtable mappings for pages
+shared with the IOMMU, and the secure world for ff-a)
+
+Regardless I agree that this doesn't scale, it gets too complex and I'd
+prefer if tracking the page state was less subtle. I'll try to find
+something more generic.
+
+> 
+> One way I can think about this, is to use the SW bits in SMMU page table to
+> represent ownership, for example for PKVM_ID_IOMMU
+> do_share:
+> -completer: set SW bits in the SMMU page table to
+> PKVM_PAGE_SHARED_BORROWED
+
+I'm not sure I understand, would we add this in order to share a page that
+is already mapped in the SMMU with another entity (e.g. ff-a)?  Doing it
+this way would be difficult because there may be a lot of different SMMU
+page tables mapping the page.
+
+The fact that a page is mapped in the SMMU page table already indicates
+that it's borrowed from the host so the SW bits seem redundant.
+
+> 
+> do_unshare:
+> -completer: set SW bit back to PKVM_PAGE_OWNED(I think this is good
+> enough for host ownership)
+> 
+> In __pkvm_host_share_dma_page
+> If page refcount > 1, it succeeds if only the page was borrowed in the
+> SMMU page table and shared in the host page table.
+
+We could also move more information into the vmemmap, because struct
+hyp_page still has some space for page state. It has six free bits at the
+moment, which is enough for both owner ID and share state, and maybe we
+could steal a couple more from the refcount and order fields if necessary.
+
+With that the iommu_map() and unmap() path could also be made a lot more
+scalable because they wouldn't need to take any page table locks when
+updating page state, a cmpxchg may be sufficient.
+
+Thanks,
+Jean
