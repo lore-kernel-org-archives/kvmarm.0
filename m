@@ -1,114 +1,166 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125328808
-	for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 22:03:15 +0000 (UTC)
-Received: by mail-qt1-f174.google.com with SMTP id ch10so6361284qtb.11
-        for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 14:03:14 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722B62F41;
+	Fri, 10 Feb 2023 22:53:21 +0000 (UTC)
+Received: by mail-pf1-f176.google.com with SMTP id t17so4521409pfj.0;
+        Fri, 10 Feb 2023 14:53:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Id2+UsrVYKoKh+v2gTwy3GQbNktc9GS1SBwYfNKmfZk=;
-        b=iqtd9Kec5IJph3ZTrG8aQ9XA8blKN8EHZeUno7ZWq0Z74T/ZFpvFUAI6XOOFsTmA+m
-         rwX4VSVwFgKG8++rIsb1NW+uwc20/oMmEguoB1q+abQT6HtYJ8zcOy86uB+rZ8vVmRld
-         2ONCeJrkJs+1bJKW5qNSOuxc0l3Dq+MJAP89YqTRGA3SLzYY2WI9GZ5/n1vyx8Hb9I6K
-         g6dceqVSlv7QHhSyY3OjMwlusWa/Dq/WWiaDmeEmV9/JziIURezkSEHg6LZWQ0IvbAHe
-         Wb8vXjAFl6FrlH8LF4jBZCY1SxXhNRje/gAIV0F5rBtBGYv4x3oZkaGae96O34RyiNO3
-         gbjw==
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5C7mT14sIcQvZGqVI82PDB3oIpwvIfrZYj8GQKRk2hw=;
+        b=P/Tr0QaVTqrmzTX9y2izxlfHtpFEpelXkhC8PrVRQIjIVTa77U5WVEXpobrw1wVXOt
+         ec2pULGZcCu1Q7QhlKmTHf6rsvSMr7NgLeQyrTQW3dBUJ/1d7BguZLWiBIlUibtR1yfm
+         Saq9iljFRa5en+DF9HAaDWUvOYQJzIpAdoW9S9GWKt7stpbuanfGr2xP6Xp9h1KCP+6V
+         waRMfWEy2EzM3N2uDUoOm4I4jtsWp7/YssULyHh3pMg+vhuP4liovJurTHrijef6L1f3
+         IbO/b56MVFY+bZnP2Nuu4dBpl9z7BiZl1gfPc0+aAXV6+KVD5otUeFJKwhSG8pjWX2pL
+         8hjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Id2+UsrVYKoKh+v2gTwy3GQbNktc9GS1SBwYfNKmfZk=;
-        b=LKXuY5qyfeXd/4A/zSWnmeZ5J/9CyrF7EJd38a0+f5r+1w2YPEGJhcu5a96GhUIlWE
-         82w04HNKip3XzefHXQ9N0w8vVEIkOKoK4YNFQGVvbgEh1dpYC1FbcrOxU1+9+9cdPJy7
-         rqtq3OJMMPCWnBrYCLcD6oW1foD6YgrbMTSrtcjxrX7F+rW2iwtYocHxyI+MvrmcN68x
-         x0RFg4vHKq753Y3K1esKO2Kbz+g3jrgPqKii14B6juoBqMlm2dz71eRJCNmCtzzlSAap
-         0bMrmwjRnum9XQbD/P1mpxhgRV2G1jAuqMIEBdGufs6mM6gDBeZtrlPzcZU+1ah59ySp
-         lk9Q==
-X-Gm-Message-State: AO0yUKVz/lEUOQNGKjoQBTEcBXEvZOY+09wpIPCZNiHUKdKd79NLvZbR
-	xov5Yp4npNIkK3SlDZJUQE5Zj2gAX0hPeEWda5jz5g==
-X-Google-Smtp-Source: AK7set+a2IupuOe1iheQ8otTvVtY3AqFS2GYaIMQsbCA6aSlPzZqYmefbzH5B1fbTNFe1V6Vb61IH3YUyWK6KZqlu0U=
-X-Received: by 2002:ac8:584e:0:b0:3ba:1f09:94b5 with SMTP id
- h14-20020ac8584e000000b003ba1f0994b5mr2106266qth.358.1676066593926; Fri, 10
- Feb 2023 14:03:13 -0800 (PST)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5C7mT14sIcQvZGqVI82PDB3oIpwvIfrZYj8GQKRk2hw=;
+        b=F3dBRSc9Pz255iiPzQ8uCCo6d4An4QxpswCK6daoo6DPaTrFpj4Mly1U04q8cr/hvv
+         QvEqwYzqpRW9aQAUUca5Ab6Gd43d/SOH65EtpXJFNstFcXDw6OOYpMeSlN9dfve6UEIC
+         EXmrzoqfO+YoKo57GGQcTS5fF2/Nx++9sRfmmDeOLqrFokB3oXxtXGg40NyPorPmLLzd
+         HmKKlebukNQWu66tVqqCRNdp3tGJhNh0ik4SWl4G3HfoiSc8P6MKjvZu+7fut0ZZK3hD
+         /RiU8yWwRmlyXVQ5hGH42iXrMe4zyplQo5Q+PZf4xX6lc7WoVJc3FwBwnbqGfDs7QjiG
+         bvZw==
+X-Gm-Message-State: AO0yUKXqXLr/NpL+qdAzstXZzZtar5s4yglxSPHTwwO0bYZbPwu/ECWk
+	UJeyPDFFk2jDCufcZXpTfhR758PftxfSe2+3WNQ=
+X-Google-Smtp-Source: AK7set/GNEl9KMH8Zwkoa7+0XItH/dxabtmg2DZlqpwxk0lC0z5W8yfttgTmQiqIMrBuECnEJk6/1mNLzLdb19oPgIs=
+X-Received: by 2002:a62:17c3:0:b0:5a8:6aeb:e95e with SMTP id
+ 186-20020a6217c3000000b005a86aebe95emr1009703pfx.33.1676069600452; Fri, 10
+ Feb 2023 14:53:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20230201125328.2186498-1-jean-philippe@linaro.org>
- <20230201125328.2186498-20-jean-philippe@linaro.org> <Y+JOhEfi8mu1RuOt@google.com>
- <CAFgf54q+R6nQBUAz9Quj8pQiTgKe7R_7BdQ=PWWay0WqDVzL1Q@mail.gmail.com> <Y+PkUKe72Q2WJGlp@myrica>
-In-Reply-To: <Y+PkUKe72Q2WJGlp@myrica>
-From: Mostafa Saleh <smostafa@google.com>
-Date: Fri, 10 Feb 2023 22:03:03 +0000
-Message-ID: <CAFgf54r6r8n6wYQqHuCqeuTiOp4h0PehR4yFaJLa0cchAbRTtw@mail.gmail.com>
-Subject: Re: [RFC PATCH 19/45] KVM: arm64: iommu: Add domains
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc: maz@kernel.org, catalin.marinas@arm.com, will@kernel.org, joro@8bytes.org, 
-	robin.murphy@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, 
-	oliver.upton@linux.dev, yuzenghui@huawei.com, dbrazdil@google.com, 
-	ryan.roberts@arm.com, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev
+References: <20230127112248.136810-1-suzuki.poulose@arm.com> <cfb0292c-e84d-0a7c-be74-ae5508779502@arm.com>
+In-Reply-To: <cfb0292c-e84d-0a7c-be74-ae5508779502@arm.com>
+From: Itaru Kitayama <itaru.kitayama@gmail.com>
+Date: Sat, 11 Feb 2023 07:53:09 +0900
+Message-ID: <CANW9uyvXofhGGuhGzk_0Et-w8CHT2y35WSu5+hno6Qm8K4R4ug@mail.gmail.com>
+Subject: Re: [RFC] Support for Arm CCA VMs on Linux
+To: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-coco@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Andrew Jones <andrew.jones@linux.dev>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>, 
+	James Morse <james.morse@arm.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Quentin Perret <qperret@google.com>, Sean Christopherson <seanjc@google.com>, 
+	Steven Price <steven.price@arm.com>, Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 8, 2023 at 6:05 PM Jean-Philippe Brucker
-<jean-philippe@linaro.org> wrote:
+On Sat, Feb 11, 2023 at 1:56 AM Ryan Roberts <ryan.roberts@arm.com> wrote:
 >
-> On Wed, Feb 08, 2023 at 12:31:15PM +0000, Mostafa Saleh wrote:
-> > On Tue, Feb 7, 2023 at 1:13 PM Mostafa Saleh <smostafa@google.com> wrot=
-e:
+> On 27/01/2023 11:22, Suzuki K Poulose wrote:
+> > [...]
+>
+> > Running the stack
+> > ====================
 > >
-> > > I was wondering about the need for pre-allocation of the domain array=
-.
-> > >
-> > > An alternative way I see:
-> > > - We don=E2=80=99t pre-allocate any domain.
-> > >
-> > > - When the EL1 driver has a request to domain_alloc, it will allocate
-> > > both kernel(iommu_domain) and hypervisor domains(kvm_hyp_iommu_domain=
-).
-> > >
-> > > - In __pkvm_host_iommu_alloc_domain, it will take over the hyp struct
-> > > from the kernel (via donation).
+> > To run/test the stack, you would need the following components :
+> >
+> > 1) FVP Base AEM RevC model with FEAT_RME support [4]
+> > 2) TF-A firmware for EL3 [5]
+> > 3) TF-A RMM for R-EL2 [3]
+> > 4) Linux Kernel [6]
+> > 5) kvmtool [7]
+> > 6) kvm-unit-tests [8]
+> >
+> > Instructions for building the firmware components and running the model are
+> > available here [9]. Once, the host kernel is booted, a Realm can be launched by
+> > invoking the `lkvm` commad as follows:
+> >
+> >  $ lkvm run --realm                            \
+> >        --measurement-algo=["sha256", "sha512"] \
+> >        --disable-sve                           \
+> >        <normal-vm-options>
+> >
+> > Where:
+> >  * --measurement-algo (Optional) specifies the algorithm selected for creating the
+> >    initial measurements by the RMM for this Realm (defaults to sha256).
+> >  * GICv3 is mandatory for the Realms.
+> >  * SVE is not yet supported in the TF-RMM, and thus must be disabled using
+> >    --disable-sve
+> >
+> > You may also run the kvm-unit-tests inside the Realm world, using the similar
+> > options as above.
 >
-> That also requires an entire page for each domain no?  I guess this domai=
-n
-> table would only be worse in memory use if we have fewer than 2 domains,
-> since it costs one page for the root table, and then stores 256 domains
-> per leaf page.
+> Building all of these components and configuring the FVP correctly can be quite
+> tricky, so I thought I would plug a tool we have called Shrinkwrap, which can
+> simplify all of this.
+>
+> The tool accepts a yaml input configuration that describes how a set of
+> components should be built and packaged, and how the FVP should be configured
+> and booted. And by default, it uses a Docker container on its backend, which
+> contains all the required tools, including the FVP. You can optionally use
+> Podman or have it run on your native system if you prefer. It supports both
+> x86_64 and aarch64. And you can even run it in --dry-run mode to see the set of
+> shell commands that would have been executed.
+>
+> It comes with two CCA configs out-of-the-box; cca-3world.yaml builds TF-A, RMM,
+> Linux (for both host and guest), kvmtool and kvm-unit-tests. cca-4world.yaml
+> adds Hafnium and some demo SPs for the secure world (although since Hafnium
+> requires x86_64 to build, cca-4world.yaml doesn't currently work on an aarch64
+> build host).
+>
+> See the documentation [1] and repository [2] for more info.
+>
+> Brief instructions to get you up and running:
+>
+>   # Install shrinkwrap. (I assume you have Docker installed):
+>   sudo pip3 install pyyaml termcolor tuxmake
+>   git clone https://git.gitlab.arm.com/tooling/shrinkwrap.git
+>   export PATH=$PWD/shrinkwrap/shrinkwrap:$PATH
+>
+>   # If running Python < 3.9:
+>   sudo pip3 install graphlib-backport
+>
+>   # Build all the CCA components:
+>   shrinkwrap build cca-3world.yaml [--dry-run]
 
-Yes, that would require a page for a domain also, which is inefficient.
-
-> What I've been trying to avoid with this table is introducing a malloc in
-> the hypervisor, but we might have to bite the bullet eventually (although
-> with a malloc, access will probably worse than O(1)).
-
-An alternative approach,
-
-1- At SMMU init, it will alloc va range which is not backed by any memory
-(via pkvm_alloc_private_va_range) that is contiguous with the max size
-of domains.
-2- This will be like a large array indexed by domain id, and it would
-be filled on demand
-from memcache.
-3-alloc_domain will make sure that the new domain_id has a page and
-then any other
-access from map and unmap would just index this memory.
-
-This can save the extra page in the root table, handle_to_domain would
-slightly be
-more efficient.
-But this can cause page faults in EL2 if domain_id was not correct (allocat=
-ed in
-EL2 before). So I am not sure if it is worth it.
-
+This has been working on my Multipass instance on M1, thanks for the tool.
 
 Thanks,
-Mostafa
+Itaru.
+
+>
+>   # Run the stack in the FVP:
+>   shrinkwrap run cca-3world.yaml -r ROOTFS=<my_rootfs.ext4> [--dry-run]
+>
+> By default, building is done at ~/.shrinkwrap/build/cca-3world and the package
+> is created at ~/.shrinkwrap/package/cca-3world (this can be changed with
+> envvars).
+>
+> The 'run' command will boot TF-A, RMM and host Linux kernel in the FVP, and
+> mount the provided rootfs. You will likely want to have copied the userspace
+> pieces into the rootfs before running, so you can create realms:
+>
+> - ~/.shrinkwrap/package/cca-3world/Image (kernel with RMI and RSI support)
+> - ~/.shrinkwrap/package/cca-3world/lkvm (kvmtool able to launch realms)
+> - ~/.shrinkwrap/package/cca-3world/kvm-unit-tests.tgz (built kvm-unit-tests)
+>
+> Once the FVP is booted to a shell, you can do something like this to launch a
+> Linux guest in a realm:
+>
+>   lkvm run --realm --disable-sve -c 1 -m 256 -k Image
+>
+> [1] https://shrinkwrap.docs.arm.com
+> [2] https://gitlab.arm.com/tooling/shrinkwrap
+>
+>
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
