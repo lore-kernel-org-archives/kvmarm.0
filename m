@@ -1,40 +1,40 @@
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2FE63B6
-	for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 16:55:24 +0000 (UTC)
-Received: by mail-pf1-f201.google.com with SMTP id j14-20020aa7928e000000b00593bca77b0dso2903121pfa.9
-        for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 08:55:24 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97EE63B6
+	for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 16:55:26 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-527501b56ffso54308597b3.15
+        for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 08:55:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1676048124;
+        d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2+p08AfrdrQMfpJn1ylcvtO2Ig9cnBH4qygeKLOxyr4=;
-        b=SJJd0x95oNZ+eJQfXnvXcpugz/a/cJ+t9ikkLVEfVtRWYvweJlyL3WsO4eM7MJcg/c
-         AvuIkRDYmJfWt6mBsXaQDLbUYUv3iGwzyNiSTYdCbjk5NTtwPRCibsiHvcZPRYnkKCNj
-         4vFEqat3l1uNf6/MAVgldhCHeMCpAWjiqKddoQZ2bu07652Sv7UUo0O9PZ7XLU0YGlhH
-         o8+55/RBTztktn9Vpf63AFfTrFUym6cc66WxvRBEQgxqBxunk42UE7pYxOTFK/lysFhk
-         1s4Osm/IfUcqfAnVjhZii9KLaMfHR7HFObkNzRTMRYTPuqXC64V60/lqDTHenBHt6+kd
-         GPyw==
+        bh=EO6j55oy/7Ai9ABZKCWhv0W9Kemf/0xaKUwrsinlv10=;
+        b=pmg8YuVuutfwzk67a6fQ0thz/qO1HJ+AiUNB8ypdHPX3sPaYKhE+A4EISldV27ciY1
+         Y7reHJNL+7uHbu35hXy/I9PemRIyodRKwdmcQEFKvankBQjwaBXw4VDHV+jQlSb5LafG
+         rkx2BUzCminsA5HZQMxh7EMMoG3hPh20I3XxYVzKMcrjLB96sHySriCB54E3vU2+HuVS
+         bMG5ycpz4mF7kuLAfLQTEgoTmEPIUx1RqTCd2Mmaygc6qTlvyO5VufPYiUKCFkzrjzgN
+         r4MR++CUiNJiuqFFvkJQBjXqPNtRqMxoBswFpox3JuuHEfGvSBra5vH2tMOZf2z3+pNN
+         zI+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676048124;
+        d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2+p08AfrdrQMfpJn1ylcvtO2Ig9cnBH4qygeKLOxyr4=;
-        b=XPXZynPnO6tzaa+gnbT3wW09558Pj2aNA8b1jfRlRC/tUSY+TqBAhwJ3Kd3I22VB1w
-         2k1uVmCl4kFZq++9F87WFOJcuexS+T215Lf2rDbEJBY/6ySnCBPFs3yB8krDlgX1U214
-         mxI7RCZcaqZrP1flGCQjNOp2aD40jr74WM6hv1PNiKUr8DeG0WP8WQEj0OQoOhfLLEYv
-         sXLApB8/HpQ8TyXsxL/IB1AmBCF5tN+fWm3O65v+nOySmkX/PE466+HFxeVQQgnUNO+5
-         ik26XIh1zJ5yGisPqSz2KErCls7x2qq24Vh6DOfKsqFMk/rKrT21+G4lDZd/HXzOuW9O
-         I8BA==
-X-Gm-Message-State: AO0yUKXnahL7vSScgsqim+wh/SvVZTDLE2f9ovG4pSjZp55P4mzzzspE
-	XIHaQMrS4N7XcpbWmaK3rONLa8yM0AjG4MI=
-X-Google-Smtp-Source: AK7set/PQpe51rDPvh02XY2GdXIh+tKbGt2sc7iL1OsES4twfuke9JZKzmdezrhfCssa+/AlaHlxPxaE7ZVOG9U=
+        bh=EO6j55oy/7Ai9ABZKCWhv0W9Kemf/0xaKUwrsinlv10=;
+        b=0oynjestiozoqYnSjI2T0bePKglvYir+oRpoW7VwyM0G/Cr1L6Sw03ivzsNJD0oAQ8
+         kexRCIw3Mdh7Alj/8pXE2N3y2jmqZ1GRilddbhBR2MzO82GeUDAutlGMb8P+oLAYjYjE
+         2aJ0kp7lgYpjG0xKqS0k0vOMcfHTNMBcJsi1sHj9FldSJunmKKEIw8+a1dNj8FWa41ai
+         few0ZMR8MbOvumGLtjDrzgzdcmeT1xs05NJ5FHChMhJmfP8PO4TlBjqy9WzYDbPZZCcz
+         Y4nlavc+VllNyf90HZmUO9I0jo1c5GIcnwdwX4J236RqyHTkGVUM1oVDKf17TH4OsFEn
+         2nLA==
+X-Gm-Message-State: AO0yUKXljrA4Rm86SIwy6dWt8AkynDWaVnuNyjbbmDAD7oE7IzjBTD+2
+	nHdSXrK0XKpKMcaO9r319vp5kcKcUk9q9g4=
+X-Google-Smtp-Source: AK7set9S/i/zSZYwD8sZLxL0uhpI93QJizSijAGISTAM9LeCfv59AIMQxCXfhWUDZ04AgqxYON6CtRVYX0VEe0Q=
 X-Received: from zaidcloud.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5325])
- (user=zalbassam job=sendgmr) by 2002:a17:902:ea0e:b0:196:64bf:ed7a with SMTP
- id s14-20020a170902ea0e00b0019664bfed7amr3779552plg.29.1676048124218; Fri, 10
- Feb 2023 08:55:24 -0800 (PST)
-Date: Fri, 10 Feb 2023 11:54:57 -0500
+ (user=zalbassam job=sendgmr) by 2002:a5b:1c3:0:b0:80b:72cc:3967 with SMTP id
+ f3-20020a5b01c3000000b0080b72cc3967mr1793786ybp.123.1676048125892; Fri, 10
+ Feb 2023 08:55:25 -0800 (PST)
+Date: Fri, 10 Feb 2023 11:54:58 -0500
 In-Reply-To: <20230210165500.2292608-1-zalbassam@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230210165500.2292608-1-zalbassam@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230210165500.2292608-6-zalbassam@google.com>
-Subject: [PATCH v2 5/8] perf: pmuv3: Change GENMASK to GENMASK_ULL
+Message-ID: <20230210165500.2292608-7-zalbassam@google.com>
+Subject: [PATCH v2 6/8] ARM: Make CONFIG_CPU_V7 valid for 32bit ARMv8 implementations
 From: Zaid Al-Bassam <zalbassam@google.com>
 To: Jesus Sanchez-Palencia <jesussanp@google.com>, Russell King <linux@armlinux.org.uk>, 
 	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
@@ -57,45 +57,39 @@ To: Jesus Sanchez-Palencia <jesussanp@google.com>, Russell King <linux@armlinux.
 	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
 	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
 	kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu
-Cc: Zaid Al-Bassam <zalbassam@google.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Zaid Al-Bassam <zalbassam@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-GENMASK macro uses "unsigned long" (32-bit wide on arm and 64-bit
-on arm64), This causes build issues when enabling PMUv3 on arm as
-it tries to access bits > 31. This patch switches the GENMASK to
-GENMASK_ULL, which uses "unsigned long long" (64-bit on both arm
-and arm64).
+From: Marc Zyngier <marc.zyngier@arm.com>
 
+ARMv8 is a superset of ARMv7, and all the ARMv8 features are
+discoverable with a set of ID registers. It means that we can
+use CPU_V7 to guard ARMv8 features at compile time.
+
+This commit simply amends the CPU_V7 configuration symbol comment
+to reflect that CPU_V7 also covers ARMv8.
+
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Zaid Al-Bassam <zalbassam@google.com>
-Acked-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20230126204444.2204061-6-zalbassam@google.com
+Link: https://lore.kernel.org/r/20230126204444.2204061-7-zalbassam@google.com
 ---
- drivers/perf/arm_pmuv3.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm/mm/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/perf/arm_pmuv3.c b/drivers/perf/arm_pmuv3.c
-index b3683fdf8d0b9..dc8b8c8f1b3ed 100644
---- a/drivers/perf/arm_pmuv3.c
-+++ b/drivers/perf/arm_pmuv3.c
-@@ -489,7 +489,7 @@ static bool armv8pmu_event_needs_bias(struct perf_event *event)
- static u64 armv8pmu_bias_long_counter(struct perf_event *event, u64 value)
- {
- 	if (armv8pmu_event_needs_bias(event))
--		value |= GENMASK(63, 32);
-+		value |= GENMASK_ULL(63, 32);
+diff --git a/arch/arm/mm/Kconfig b/arch/arm/mm/Kconfig
+index e949e84a2decd..b77f4a0d9072e 100644
+--- a/arch/arm/mm/Kconfig
++++ b/arch/arm/mm/Kconfig
+@@ -403,7 +403,7 @@ config CPU_V6K
+ 	select CPU_THUMB_CAPABLE
+ 	select CPU_TLB_V6 if MMU
  
- 	return value;
- }
-@@ -497,7 +497,7 @@ static u64 armv8pmu_bias_long_counter(struct perf_event *event, u64 value)
- static u64 armv8pmu_unbias_long_counter(struct perf_event *event, u64 value)
- {
- 	if (armv8pmu_event_needs_bias(event))
--		value &= ~GENMASK(63, 32);
-+		value &= ~GENMASK_ULL(63, 32);
- 
- 	return value;
- }
+-# ARMv7
++# ARMv7 and ARMv8 architectures
+ config CPU_V7
+ 	bool
+ 	select CPU_32v6K
 -- 
 2.39.1.581.gbfd45094c4-goog
 
