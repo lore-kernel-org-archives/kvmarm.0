@@ -1,19 +1,18 @@
 Received: from out-111.mta1.migadu.com (out-111.mta1.migadu.com [95.215.58.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54CB80D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B087F4
 	for <kvmarm@lists.linux.dev>; Sat, 11 Feb 2023 01:41:17 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1676079497;
+	t=1676079490;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gFpL4/I0DKoGOSnQFmuQKeZGgj9YF7hQjBRrKkFy/9E=;
-	b=Za7rPboJuAbzjZWqisIAVCCAQcTNcQbe6okC/6DzyKnfV/WJ/vNoVCEcWIIz+aOnjowTrF
-	Vhv+MoJnu2lCt2vN5Wl41fV+28eD3x1DGbT4ASOC9fOzKxfzn/x5wf3AATJwWGi/nOw2wR
-	5lPTvubDMDxX8sK7WJUC1eCTpCxu3Jw=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CMpXcUxTJHME2L8ab5mbFCTDbU8oDNM5KqKoXrCQa4Q=;
+	b=msWQK+owJSCbSpuZ4H6t5EN3riogirr0cEDp0WE2ZxZCc5w9qJUYj0sbkLj2GKC38vkMC4
+	fd/8J1hYaG/zN4ZrqVcoH11aaQkmKnCygnSMGxl5Lxvfuz1SK0UDmI4ylFhfO5M4FpluDV
+	b6yMRsGnO5Qraixg+/V91GvP4lTQjyA=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
 Cc: James Morse <james.morse@arm.com>,
@@ -25,11 +24,9 @@ Cc: James Morse <james.morse@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	Salil Mehta <salil.mehta@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [RFC PATCH v2 3/6] KVM: arm64: Refactor hvc filtering to support different actions
-Date: Sat, 11 Feb 2023 01:37:56 +0000
-Message-Id: <20230211013759.3556016-4-oliver.upton@linux.dev>
-In-Reply-To: <20230211013759.3556016-1-oliver.upton@linux.dev>
-References: <20230211013759.3556016-1-oliver.upton@linux.dev>
+Subject: [RFC PATCH v2 0/6] KVM: arm64: Userspace SMCCC call filtering
+Date: Sat, 11 Feb 2023 01:37:53 +0000
+Message-Id: <20230211013759.3556016-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -39,99 +36,76 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-KVM presently allows userspace to filter guest hypercalls with bitmaps
-expressed via pseudo-firmware registers. These bitmaps have a narrow
-scope and, of course, can only allow/deny a particular call. A
-subsequent change to KVM will introduce a generalized UAPI for filtering
-hypercalls, allowing functions to be forwarded to userspace.
+The Arm SMCCC is rather prescriptive in regards to the allocation of
+SMCCC function ID ranges. Many of the hypercall ranges have an
+associated specification from Arm (FF-A, PSCI, SDEI, etc.) with some
+room for vendor-specific implementations.
 
-Refactor the existing hypercall filtering logic to make room for more
-than two actions. While at it, generalize the function names around
-SMCCC as it is the basis for the upcoming UAPI.
+The ever-expanding SMCCC surface leaves a lot of work within KVM for
+providing new features. Furthermore, KVM implements its own
+vendor-specific ABI, with little room for other implementations (like
+Hyper-V, for example).
 
-No functional change intended.
+Not only that, it would appear that vCPU hotplug [1] has a legitimate
+use case for something like this, sending PSCI calls to userspace (where
+they should have gone in the first place).
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/uapi/asm/kvm.h |  9 +++++++++
- arch/arm64/kvm/hypercalls.c       | 19 +++++++++++++++----
- 2 files changed, 24 insertions(+), 4 deletions(-)
+=> We have these new hypercall bitmap registers, why not use that?
 
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index a7a857f1784d..e298574a45ea 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -468,6 +468,15 @@ enum {
- /* run->fail_entry.hardware_entry_failure_reason codes. */
- #define KVM_EXIT_FAIL_ENTRY_CPU_UNSUPPORTED	(1ULL << 0)
- 
-+enum kvm_smccc_filter_action {
-+	KVM_SMCCC_FILTER_ALLOW = 0,
-+	KVM_SMCCC_FILTER_DENY,
-+
-+#ifdef __KERNEL__
-+	NR_SMCCC_FILTER_ACTIONS
-+#endif
-+};
-+
- #endif
- 
- #endif /* __ARM_KVM_H__ */
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index c9f401fa01a9..980546b295b3 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -65,7 +65,7 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
- 	val[3] = lower_32_bits(cycles);
- }
- 
--static bool kvm_hvc_call_default_allowed(u32 func_id)
-+static bool kvm_smccc_default_call(u32 func_id)
- {
- 	switch (func_id) {
- 	/*
-@@ -93,7 +93,7 @@ static bool kvm_hvc_call_default_allowed(u32 func_id)
- 	}
- }
- 
--static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
-+static bool kvm_smccc_test_fw_bmap(struct kvm_vcpu *vcpu, u32 func_id)
- {
- 	struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
- 
-@@ -117,19 +117,30 @@ static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
- 		return test_bit(KVM_REG_ARM_VENDOR_HYP_BIT_PTP,
- 				&smccc_feat->vendor_hyp_bmap);
- 	default:
--		return kvm_hvc_call_default_allowed(func_id);
-+		return false;
- 	}
- }
- 
-+static u8 kvm_hvc_get_action(struct kvm_vcpu *vcpu, u32 func_id)
-+{
-+	if (kvm_smccc_default_call(func_id) ||
-+	    kvm_smccc_test_fw_bmap(vcpu, func_id))
-+		return KVM_SMCCC_FILTER_ALLOW;
-+
-+	return KVM_SMCCC_FILTER_DENY;
-+}
-+
- int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
- 	u32 func_id = smccc_get_function(vcpu);
- 	u64 val[4] = {SMCCC_RET_NOT_SUPPORTED};
- 	u32 feature;
-+	u8 action;
- 	gpa_t gpa;
- 
--	if (!kvm_hvc_call_allowed(vcpu, func_id))
-+	action = kvm_hvc_get_action(vcpu, func_id);
-+	if (action == KVM_SMCCC_FILTER_DENY)
- 		goto out;
- 
- 	switch (func_id) {
+The hypercall bitmap registers aren't necessarily aimed at the same
+problem. The bitmap registers allow a VMM to preserve the ABI the guest
+gets from KVM by default when migrating between hosts. By default KVM
+exposes the entire feature set to the guest, whereas user SMCCC calls
+need explicit opt-in from userspace.
+
+Applies to 6.2-rc3.
+
+TODO:
+ - Reject the ranges of hypercalls we don't want userspace to handle.
+   Spectre crud mainly, any others?
+
+   I plan on using the invariant of the maple tree to reject filters
+   that intersect with a reserved range.
+
+ - Should exits for SMC calls have the PC pre-incremented to align with
+   HVC? Go read the comment in handle_smc() if you aren't following.
+
+   I think the answer is 'yes', but opinions welcome as always :)
+
+ - This series unifies the SMCCC space for HVCs and SMCs but this
+   requires a lot more thought. Otherwise, we can add support for two
+   separate namespaces.
+
+ - Testing! I only got as far as compiling this on my machine. At
+   minimum a decent selftest is requried considering the UAPI here is
+   rather involved.
+
+RFC v1 -> v2:
+ - Use a range-based interface instead of filtering entire services
+ - Stop using the braindead term of 'trapping' in relation to userspace.
+
+Oliver Upton (6):
+  KVM: arm64: Add a helper to check if a VM has ran once
+  KVM: arm64: Add vm fd device attribute accessors
+  KVM: arm64: Refactor hvc filtering to support different actions
+  KVM: arm64: Use a maple tree to represent the SMCCC filter
+  KVM: arm64: Add support for KVM_EXIT_HYPERCALL
+  KVM: arm64: Indroduce support for userspace SMCCC filtering
+
+ Documentation/virt/kvm/api.rst        |  24 +++-
+ Documentation/virt/kvm/devices/vm.rst |  67 ++++++++++
+ arch/arm64/include/asm/kvm_host.h     |   8 +-
+ arch/arm64/include/uapi/asm/kvm.h     |  31 +++++
+ arch/arm64/kvm/arm.c                  |  35 +++++
+ arch/arm64/kvm/handle_exit.c          |  12 +-
+ arch/arm64/kvm/hypercalls.c           | 176 +++++++++++++++++++++++++-
+ arch/arm64/kvm/pmu-emul.c             |   4 +-
+ include/kvm/arm_hypercalls.h          |   5 +
+ include/uapi/linux/kvm.h              |   2 +-
+ 10 files changed, 350 insertions(+), 14 deletions(-)
+
+
+base-commit: b7bfaa761d760e72a969d116517eaa12e404c262
 -- 
 2.39.1.581.gbfd45094c4-goog
 
