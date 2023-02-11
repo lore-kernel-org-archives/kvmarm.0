@@ -1,19 +1,19 @@
-Received: from out-248.mta1.migadu.com (out-248.mta1.migadu.com [95.215.58.248])
+Received: from out-251.mta1.migadu.com (out-251.mta1.migadu.com [95.215.58.251])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8907F4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B62813
 	for <kvmarm@lists.linux.dev>; Sat, 11 Feb 2023 01:47:26 +0000 (UTC)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1676079492;
+	t=1676079494;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SnleMSFb+rskKwYj4g6FPeijRBKlwpY8LmQKrkG/ANo=;
-	b=nztVWU9+Q7ym6nSUBYzgYeAyrMBfd/c406v3xQtei5pQdZ5jHcvInPraLAwgYvWjDqcp0r
-	3jpX3ODaav/lhtF4UZ9wggAIPTlux0040sD5Ln0AzT+BBNJra8aGXU4jjPi7esbr1TqsJ3
-	+ODX5l8KYfXXQWPJgjE0MVW7NR/xbI8=
+	bh=uYKcrnYt5tqTigyH3lLK4W3VAbMxWX7++cvj3eUL8OA=;
+	b=lOAAqD0vQEau104DxzBl5UeQ5ic6uEJOS06NzyWZhUFdOZriFHXvb22Avzooyb0wMOImdw
+	jK7Ggub1wCbPfbnf8wy8rMiqwS75DFADbWLPPD29XXWByPC2g/9F5QBNcMoSKUgNg8Vr4y
+	3YXNoB8WemcB7I6oGfgHWsTFrQCbu4k=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: Marc Zyngier <maz@kernel.org>
 Cc: James Morse <james.morse@arm.com>,
@@ -25,9 +25,9 @@ Cc: James Morse <james.morse@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	Salil Mehta <salil.mehta@huawei.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [RFC PATCH v2 1/6] KVM: arm64: Add a helper to check if a VM has ran once
-Date: Sat, 11 Feb 2023 01:37:54 +0000
-Message-Id: <20230211013759.3556016-2-oliver.upton@linux.dev>
+Subject: [RFC PATCH v2 2/6] KVM: arm64: Add vm fd device attribute accessors
+Date: Sat, 11 Feb 2023 01:37:55 +0000
+Message-Id: <20230211013759.3556016-3-oliver.upton@linux.dev>
 In-Reply-To: <20230211013759.3556016-1-oliver.upton@linux.dev>
 References: <20230211013759.3556016-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -39,53 +39,67 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The test_bit(...) pattern is quite a lot of keystrokes. Replace
-existing callsites with a helper.
-
-No functional change intended.
+A subsequent change will allow userspace to convey a filter for
+hypercalls through a vm device attribute. Add the requisite boilerplate
+for vm attribute accessors.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_host.h | 3 +++
- arch/arm64/kvm/pmu-emul.c         | 4 ++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/arm.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 35a159d131b5..012e94bc9e4a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1019,6 +1019,9 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
- 	(system_supports_32bit_el0() &&				\
- 	 !static_branch_unlikely(&arm64_mismatched_32bit_el0))
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 9c5573bc4614..09efa893e03a 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1449,11 +1449,28 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+ 	}
+ }
  
-+#define kvm_vm_has_ran_once(kvm)					\
-+	(test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &(kvm)->arch.flags))
++static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
++{
++	switch (attr->group) {
++	default:
++		return -ENXIO;
++	}
++}
 +
- int kvm_trng_call(struct kvm_vcpu *vcpu);
- #ifdef CONFIG_KVM
- extern phys_addr_t hyp_mem_base;
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 24908400e190..a0fc569fdbca 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -880,7 +880,7 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
- 	list_for_each_entry(entry, &arm_pmus, entry) {
- 		arm_pmu = entry->arm_pmu;
- 		if (arm_pmu->pmu.type == pmu_id) {
--			if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags) ||
-+			if (kvm_vm_has_ran_once(kvm) ||
- 			    (kvm->arch.pmu_filter && kvm->arch.arm_pmu != arm_pmu)) {
- 				ret = -EBUSY;
- 				break;
-@@ -963,7 +963,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
++static int kvm_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
++{
++	switch (attr->group) {
++	default:
++		return -ENXIO;
++	}
++}
++
+ long kvm_arch_vm_ioctl(struct file *filp,
+ 		       unsigned int ioctl, unsigned long arg)
+ {
+ 	struct kvm *kvm = filp->private_data;
+ 	void __user *argp = (void __user *)arg;
++	struct kvm_device_attr attr;
  
- 		mutex_lock(&kvm->lock);
- 
--		if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
-+		if (kvm_vm_has_ran_once(kvm)) {
- 			mutex_unlock(&kvm->lock);
- 			return -EBUSY;
- 		}
+ 	switch (ioctl) {
+ 	case KVM_CREATE_IRQCHIP: {
+@@ -1489,6 +1506,18 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 			return -EFAULT;
+ 		return kvm_vm_ioctl_mte_copy_tags(kvm, &copy_tags);
+ 	}
++	case KVM_HAS_DEVICE_ATTR: {
++		if (copy_from_user(&attr, argp, sizeof(attr)))
++			return -EFAULT;
++
++		return kvm_vm_has_attr(kvm, &attr);
++	}
++	case KVM_SET_DEVICE_ATTR: {
++		if (copy_from_user(&attr, argp, sizeof(attr)))
++			return -EFAULT;
++
++		return kvm_vm_set_attr(kvm, &attr);
++	}
+ 	default:
+ 		return -EINVAL;
+ 	}
 -- 
 2.39.1.581.gbfd45094c4-goog
 
