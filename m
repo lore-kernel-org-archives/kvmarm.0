@@ -1,283 +1,242 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-129.mta1.migadu.com (out-129.mta1.migadu.com [95.215.58.129])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7907FA23
-	for <kvmarm@lists.linux.dev>; Sat, 11 Feb 2023 03:16:58 +0000 (UTC)
-Received: by mail-pj1-f74.google.com with SMTP id y4-20020a17090a2b4400b002310ecae757so5647014pjc.1
-        for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 19:16:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1n1ZSSh2wSAgJw7Cln005IkKja5FB1PRSIQF1orA4kI=;
-        b=F8eM/g390Z7UuzXCu0stoOL5UzNNd2eT6QtL2krL67nCYf2HDd2eDD39n9H88Edncr
-         5m0J6/gdEkFWhdxPVU26zjXOhJI2j/9oFSqwu4fLOHX2k+yw9hn5b6t9yw4mJ+ifg80M
-         ZwsoaibJRQhjj8RvoBRq3mD9+Z4nQ0vesFT3rF1xwl3t4Ge1Is/bQsQnksiK59Eb4Yt2
-         i/s+mz0bM0oHXa3P6zzhIIplJJ8Wgv9OTVtbVJTFseT21sD3UPOWkOCvUFnMGVtatWGQ
-         Jaifgva43tVx9b4AjA6mn5eRu15uSfGQrw6beIH6dqbtKw33ouM4J4JmEnMyigUPyBg7
-         qShg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1n1ZSSh2wSAgJw7Cln005IkKja5FB1PRSIQF1orA4kI=;
-        b=QwFSaiXaoO5TbS8n1noVtJSfcMai1WLoGNHspR9teFHPt2CXSGiiLa6WPSkIaXLK1b
-         mA41UaIG6d3mpGHW6T55+ZsAyPvmkZLxcXo1GJeGcHZpXtdCBX1y8N9eMOR9FMprNVen
-         EbxQkeUgj5qO7RBems6cLOAS5xZ9rT3w2056cle8zTuaURqCuN3WUGD2NfTns0cK7Nj4
-         +OfN53g3hS++R+sulg1RxJrzr3Lq+3ieUlycCRtkiE4IGICvu3KkN1iyVAWPe55mG1MP
-         VYxd0KvX9lGVy0GTYkqHK2RcjYAGZ085rYQfmqSYATw4ZbUTzg5FP17IFp6OVEO7957I
-         NWqA==
-X-Gm-Message-State: AO0yUKXRgv+gL7tqunuqE05TVjxCbPJG6bsplW83LxwGvWsM4CFov9sh
-	eOcTyt29JuSek/ue9eFoST5Dfx0ax1A=
-X-Google-Smtp-Source: AK7set9zThTklPx2Okak1Tl1pXqreEEJ8mHT05dSHksc7gy1kyPl6zFtcKyzMrGsT5nx5oj1BwT2Bj4Whzc=
-X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a63:7304:0:b0:4da:d745:98dd with SMTP id
- o4-20020a637304000000b004dad74598ddmr3358702pgc.62.1676085417846; Fri, 10 Feb
- 2023 19:16:57 -0800 (PST)
-Date: Fri, 10 Feb 2023 19:15:06 -0800
-In-Reply-To: <20230211031506.4159098-1-reijiw@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64CC5A23
+	for <kvmarm@lists.linux.dev>; Sat, 11 Feb 2023 04:20:22 +0000 (UTC)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1676079501;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XMHylM3w6c4OLWhS6cH5kkFUnRyYPx005aFa1ArQdjA=;
+	b=WWkeWl7sjI1Gpg8qoCkjEUHiGV2dAqXuKmNZm7O2cbD8OEAlTS+xPvSCJO73OHBMz8sbah
+	cH6d/k09iT21iO6Lqcne7ZP/AnV5Lw5W/67EajnpaGalghi5njhXajNU9CO2iuI8WOj02I
+	QWMIxRS6rgcnZpbTnr8K8WLhCm0OhwU=
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	kvmarm@lists.linux.dev,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [RFC PATCH v2 5/6] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
+Date: Sat, 11 Feb 2023 01:37:58 +0000
+Message-Id: <20230211013759.3556016-6-oliver.upton@linux.dev>
+In-Reply-To: <20230211013759.3556016-1-oliver.upton@linux.dev>
+References: <20230211013759.3556016-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230211031506.4159098-1-reijiw@google.com>
-X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230211031506.4159098-15-reijiw@google.com>
-Subject: [PATCH v4 14/14] KVM: selftests: aarch64: vPMU register test for
- unimplemented counters
-From: Reiji Watanabe <reijiw@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ricardo Koller <ricarkol@google.com>, 
-	Jing Zhang <jingzhangos@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Reiji Watanabe <reijiw@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Add a new test case to the vpmu_counter_access test to check
-if PMU registers or their bits for unimplemented counters are not
-accessible or are RAZ, as expected.
+In anticipation of user hypercall filters, add the necessary plumbing to
+get SMCCC calls out to userspace. Even though the exit structure has
+space for KVM to pass register arguments, let's just avoid it altogether
+and let userspace poke at the registers via KVM_GET_ONE_REG.
 
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
+This deliberately stretches the definition of a 'hypercall' to cover
+SMCs from EL1 in addition to the HVCs we know and love. KVM doesn't
+support EL1 calls into secure services, but now we can paint that as a
+userspace problem and be done with it.
+
+Finally, we need a flag to let userspace know what conduit instruction
+was used (i.e. SMC vs. HVC). Redefine the remaining padding in
+kvm_run::hypercall to accomplish this. Let's all take a moment
+to admire the flowers and see how 'longmode' tied up a full u32 in the
+UAPI. Weep.
+
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- .../kvm/aarch64/vpmu_counter_access.c         | 111 ++++++++++++++++--
- .../selftests/kvm/include/aarch64/processor.h |   1 +
- 2 files changed, 102 insertions(+), 10 deletions(-)
+ Documentation/virt/kvm/api.rst    | 24 +++++++++++++++++++++---
+ arch/arm64/include/uapi/asm/kvm.h |  4 ++++
+ arch/arm64/kvm/handle_exit.c      | 12 +++++++++---
+ arch/arm64/kvm/hypercalls.c       | 31 +++++++++++++++++++++++++++++++
+ include/kvm/arm_hypercalls.h      |  1 +
+ include/uapi/linux/kvm.h          |  2 +-
+ 6 files changed, 67 insertions(+), 7 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-index b6593eee2be3..453f0dd240f4 100644
---- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-+++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-@@ -5,8 +5,8 @@
-  * Copyright (c) 2022 Google LLC.
-  *
-  * This test checks if the guest can see the same number of the PMU event
-- * counters (PMCR_EL0.N) that userspace sets, and if the guest can access
-- * those counters.
-+ * counters (PMCR_EL0.N) that userspace sets, if the guest can access
-+ * those counters, and if the guest cannot access any other counters.
-  * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
-  */
- #include <kvm_util.h>
-@@ -20,7 +20,7 @@
- #define ARMV8_PMU_MAX_GENERAL_COUNTERS	(ARMV8_PMU_MAX_COUNTERS - 1)
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index deb494f759ed..c82da1a84590 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6119,14 +6119,32 @@ to the byte array.
+ 			__u64 args[6];
+ 			__u64 ret;
+ 			__u32 longmode;
+-			__u32 pad;
++			__u32 flags;
+ 		} hypercall;
  
- /*
-- * The macros and functions below for reading/writing PMEVT{CNTR,TYPER}<n>_EL0
-+ * The macros and functions below for reading/writing PMEV{CNTR,TYPER}<n>_EL0
-  * were basically copied from arch/arm64/kernel/perf_event.c.
-  */
- #define PMEVN_CASE(n, case_macro) \
-@@ -148,9 +148,9 @@ static inline void disable_counter(int idx)
- }
+-Unused.  This was once used for 'hypercall to userspace'.  To implement
+-such functionality, use KVM_EXIT_IO (x86) or KVM_EXIT_MMIO (all except s390).
++
++It is strongly recommended that userspace use ``KVM_EXIT_IO`` (x86) or
++``KVM_EXIT_MMIO`` (all except s390) to implement functionality that
++requires a guest to interact with host userpace.
  
- /*
-- * The pmc_accessor structure has pointers to PMEVT{CNTR,TYPER}<n>_EL0
-+ * The pmc_accessor structure has pointers to PMEV{CNTR,TYPER}<n>_EL0
-  * accessors that test cases will use. Each of the accessors will
-- * either directly reads/writes PMEVT{CNTR,TYPER}<n>_EL0
-+ * either directly reads/writes PMEV{CNTR,TYPER}<n>_EL0
-  * (i.e. {read,write}_pmev{cnt,type}rn()), or reads/writes them through
-  * PMXEV{CNTR,TYPER}_EL0 (i.e. {read,write}_sel_ev{cnt,type}r()).
-  *
-@@ -179,6 +179,51 @@ struct pmc_accessor pmc_accessors[] = {
- 	{ read_sel_evcntr, write_pmevcntrn, read_sel_evtyper, write_pmevtypern },
+ .. note:: KVM_EXIT_IO is significantly faster than KVM_EXIT_MMIO.
+ 
++For arm64:
++----------
++
++SMCCC exits can be enabled depending on the configuration of the SMCCC
++filter. See the Documentation/virt/kvm/devices/vm.rst
++``KVM_ARM_SMCCC_FILTER`` for more details.
++
++``nr`` contains the function ID of the guest's SMCCC call. Userspace is
++expected to use the ``KVM_GET_ONE_REG`` ioctl to retrieve the call
++parameters from the vCPU's GPRs.
++
++Definition of ``flags``:
++ - ``KVM_HYPERCALL_EXIT_SMC``: Indicates that the guest used the SMC
++   conduit to initiate the SMCCC call. If this bit is 0 then the guest
++   used the HVC conduit for the SMCCC call.
++
+ ::
+ 
+ 		/* KVM_EXIT_TPR_ACCESS */
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index e298574a45ea..5c98e7c39ba1 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -471,12 +471,16 @@ enum {
+ enum kvm_smccc_filter_action {
+ 	KVM_SMCCC_FILTER_ALLOW = 0,
+ 	KVM_SMCCC_FILTER_DENY,
++	KVM_SMCCC_FILTER_FWD_TO_USER,
+ 
+ #ifdef __KERNEL__
+ 	NR_SMCCC_FILTER_ACTIONS
+ #endif
  };
  
-+#define INVALID_EC	(-1ul)
-+uint64_t expected_ec = INVALID_EC;
-+uint64_t op_end_addr;
++/* arm64-specific KVM_EXIT_HYPERCALL flags */
++#define KVM_HYPERCALL_EXIT_SMC	(1U << 0)
 +
-+static void guest_sync_handler(struct ex_regs *regs)
-+{
-+	uint64_t esr, ec;
-+
-+	esr = read_sysreg(esr_el1);
-+	ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
-+	GUEST_ASSERT_4(op_end_addr && (expected_ec == ec),
-+		       regs->pc, esr, ec, expected_ec);
-+
-+	/* Will go back to op_end_addr after the handler exits */
-+	regs->pc = op_end_addr;
-+
-+	/*
-+	 * Clear op_end_addr, and setting expected_ec to INVALID_EC
-+	 * as a sign that an exception has occurred.
-+	 */
-+	op_end_addr = 0;
-+	expected_ec = INVALID_EC;
-+}
-+
-+/*
-+ * Run the given operation that should trigger an exception with the
-+ * given exception class. The exception handler (guest_sync_handler)
-+ * will reset op_end_addr to 0, and expected_ec to INVALID_EC, and
-+ * will come back to the instruction at the @done_label.
-+ * The @done_label must be a unique label in this test program.
-+ */
-+#define TEST_EXCEPTION(ec, ops, done_label)		\
-+{							\
-+	extern int done_label;				\
-+							\
-+	WRITE_ONCE(op_end_addr, (uint64_t)&done_label);	\
-+	GUEST_ASSERT(ec != INVALID_EC);			\
-+	WRITE_ONCE(expected_ec, ec);			\
-+	dsb(ish);					\
-+	ops;						\
-+	asm volatile(#done_label":");			\
-+	GUEST_ASSERT(!op_end_addr);			\
-+	GUEST_ASSERT(expected_ec == INVALID_EC);	\
-+}
-+
- static void pmu_disable_reset(void)
+ #endif
+ 
+ #endif /* __ARM_KVM_H__ */
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index e778eefcf214..d15ff6c795e1 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -52,6 +52,8 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
+ 
+ static int handle_smc(struct kvm_vcpu *vcpu)
  {
- 	uint64_t pmcr = read_sysreg(pmcr_el0);
-@@ -350,16 +395,38 @@ static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
- 		       pmc_idx, acc, read_data, read_data_prev);
- }
- 
-+/*
-+ * Tests for reading/writing registers for the unimplemented event counter
-+ * specified by @pmc_idx (>= PMCR_EL0.N).
-+ */
-+static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
-+{
-+	/*
-+	 * Reading/writing the event count/type registers should cause
-+	 * an UNDEFINED exception.
-+	 */
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_cntr(pmc_idx), inv_rd_cntr);
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0), inv_wr_cntr);
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_typer(pmc_idx), inv_rd_typer);
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_typer(pmc_idx, 0), inv_wr_typer);
-+	/*
-+	 * The bit corresponding to the (unimplemented) counter in
-+	 * {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers should be RAZ.
-+	 */
-+	test_bitmap_pmu_regs(pmc_idx, 1);
-+	test_bitmap_pmu_regs(pmc_idx, 0);
-+}
-+
- /*
-  * The guest is configured with PMUv3 with @expected_pmcr_n number of
-  * event counters.
-  * Check if @expected_pmcr_n is consistent with PMCR_EL0.N, and
-- * if reading/writing PMU registers for implemented counters can work
-- * as expected.
-+ * if reading/writing PMU registers for implemented or unimplemented
-+ * counters can work as expected.
-  */
- static void guest_code(uint64_t expected_pmcr_n)
- {
--	uint64_t pmcr, pmcr_n;
-+	uint64_t pmcr, pmcr_n, unimp_mask;
- 	int i, pmc;
- 
- 	GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS);
-@@ -370,15 +437,31 @@ static void guest_code(uint64_t expected_pmcr_n)
- 	/* Make sure that PMCR_EL0.N indicates the value userspace set */
- 	GUEST_ASSERT_2(pmcr_n == expected_pmcr_n, pmcr_n, expected_pmcr_n);
- 
-+	/*
-+	 * Make sure that (RAZ) bits corresponding to unimplemented event
-+	 * counters in {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers are reset to zero.
-+	 * (NOTE: bits for implemented event counters are reset to UNKNOWN)
-+	 */
-+	unimp_mask = GENMASK_ULL(ARMV8_PMU_MAX_GENERAL_COUNTERS - 1, pmcr_n);
-+	check_bitmap_pmu_regs(unimp_mask, false);
++	int ret = kvm_smc_call_handler(vcpu);
 +
  	/*
- 	 * Tests for reading/writing PMU registers for implemented counters.
--	 * Use each combination of PMEVT{CNTR,TYPER}<n>_EL0 accessor functions.
-+	 * Use each combination of PMEV{CNTR,TYPER}<n>_EL0 accessor functions.
+ 	 * "If an SMC instruction executed at Non-secure EL1 is
+ 	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
+@@ -60,9 +62,13 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+ 	 * We need to advance the PC after the trap, as it would
+ 	 * otherwise return to the same address...
  	 */
- 	for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
- 		for (pmc = 0; pmc < pmcr_n; pmc++)
- 			test_access_pmc_regs(&pmc_accessors[i], pmc);
- 	}
- 
-+	/*
-+	 * Tests for reading/writing PMU registers for unimplemented counters.
-+	 * Use each combination of PMEV{CNTR,TYPER}<n>_EL0 accessor functions.
-+	 */
-+	for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
-+		for (pmc = pmcr_n; pmc < ARMV8_PMU_MAX_GENERAL_COUNTERS; pmc++)
-+			test_access_invalid_pmc_regs(&pmc_accessors[i], pmc);
+-	vcpu_set_reg(vcpu, 0, ~0UL);
+-	kvm_incr_pc(vcpu);
+-	return 1;
++	if (ret < 0) {
++		vcpu_set_reg(vcpu, 0, ~0UL);
++		kvm_incr_pc(vcpu);
++		return 1;
 +	}
- 	GUEST_DONE();
++
++	return ret;
  }
  
-@@ -392,7 +475,7 @@ static struct kvm_vm *create_vpmu_vm(void *guest_code, struct kvm_vcpu **vcpup,
- 	struct kvm_vm *vm;
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_vcpu_init init;
--	uint8_t pmuver;
-+	uint8_t pmuver, ec;
- 	uint64_t dfr0, irq = 23;
- 	struct kvm_device_attr irq_attr = {
- 		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-@@ -405,11 +488,18 @@ static struct kvm_vm *create_vpmu_vm(void *guest_code, struct kvm_vcpu **vcpup,
- 	};
+ /*
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 45b8371816fd..f095c048730a 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -161,6 +161,17 @@ static u8 kvm_hvc_get_action(struct kvm_vcpu *vcpu, u32 func_id)
+ 	return KVM_SMCCC_FILTER_DENY;
+ }
  
- 	vm = vm_create(1);
-+	vm_init_descriptor_tables(vm);
-+	/* Catch exceptions for easier debugging */
-+	for (ec = 0; ec < ESR_EC_NUM; ec++) {
-+		vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ec,
-+					guest_sync_handler);
++static void kvm_prepare_hypercall_exit(struct kvm_vcpu *vcpu, u32 func_id, bool smc)
++{
++	struct kvm_run *run = vcpu->run;
++
++	run->exit_reason = KVM_EXIT_HYPERCALL;
++	run->hypercall.nr = func_id;
++
++	if (smc)
++		run->hypercall.flags = KVM_HYPERCALL_EXIT_SMC;
++}
++
+ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
+@@ -173,6 +184,10 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 	action = kvm_hvc_get_action(vcpu, func_id);
+ 	if (action == KVM_SMCCC_FILTER_DENY)
+ 		goto out;
++	if (action == KVM_SMCCC_FILTER_FWD_TO_USER) {
++		kvm_prepare_hypercall_exit(vcpu, func_id, false);
++		return 0;
 +	}
  
- 	/* Create vCPU with PMUv3 */
- 	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
- 	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
- 	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-+	vcpu_init_descriptor_tables(vcpu);
- 	*gic_fd = vgic_v3_setup(vm, 1, 64, GICD_BASE_GPA, GICR_BASE_GPA);
+ 	switch (func_id) {
+ 	case ARM_SMCCC_VERSION_FUNC_ID:
+@@ -270,6 +285,22 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 	return 1;
+ }
  
- 	/* Make sure that PMUv3 support is indicated in the ID register */
-@@ -478,6 +568,7 @@ static void run_test(uint64_t pmcr_n)
- 	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
- 	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
- 	aarch64_vcpu_setup(vcpu, &init);
-+	vcpu_init_descriptor_tables(vcpu);
- 	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), sp);
- 	vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
++int kvm_smc_call_handler(struct kvm_vcpu *vcpu)
++{
++	u32 func_id = smccc_get_function(vcpu);
++	u8 action = kvm_smccc_filter_get_action(vcpu->kvm, func_id);
++
++	/*
++	 * KVM doesn't support SMCs from EL1, so reject the call if userspace
++	 * doesn't want it.
++	 */
++	if (action != KVM_SMCCC_FILTER_FWD_TO_USER)
++		return -ENOSYS;
++
++	kvm_prepare_hypercall_exit(vcpu, func_id, true);
++	return 0;
++}
++
+ static const u64 kvm_arm_fw_reg_ids[] = {
+ 	KVM_REG_ARM_PSCI_VERSION,
+ 	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
+diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
+index ae1ada68cdc2..4707aa206c4e 100644
+--- a/include/kvm/arm_hypercalls.h
++++ b/include/kvm/arm_hypercalls.h
+@@ -7,6 +7,7 @@
+ #include <asm/kvm_emulate.h>
  
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index 5f977528e09c..52d87809356c 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -104,6 +104,7 @@ enum {
- #define ESR_EC_SHIFT		26
- #define ESR_EC_MASK		(ESR_EC_NUM - 1)
+ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
++int kvm_smc_call_handler(struct kvm_vcpu *vcpu);
  
-+#define ESR_EC_UNKNOWN		0x0
- #define ESR_EC_SVC64		0x15
- #define ESR_EC_IABT		0x21
- #define ESR_EC_DABT		0x25
+ static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
+ {
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 55155e262646..0ae7cf8ca2db 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -342,7 +342,7 @@ struct kvm_run {
+ 			__u64 args[6];
+ 			__u64 ret;
+ 			__u32 longmode;
+-			__u32 pad;
++			__u32 flags;
+ 		} hypercall;
+ 		/* KVM_EXIT_TPR_ACCESS */
+ 		struct {
 -- 
 2.39.1.581.gbfd45094c4-goog
 
