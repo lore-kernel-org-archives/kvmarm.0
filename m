@@ -1,40 +1,40 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D846DA23
-	for <kvmarm@lists.linux.dev>; Sat, 11 Feb 2023 03:16:48 +0000 (UTC)
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-52ecbe73389so34628027b3.0
-        for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 19:16:48 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C62DA3F
+	for <kvmarm@lists.linux.dev>; Sat, 11 Feb 2023 03:16:50 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id y125-20020a25c883000000b0086349255277so6711151ybf.8
+        for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 19:16:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ccQ/Ep4gPvxWBDmSHprpIitRzQFtxgmXhrKz1ZUM8F0=;
-        b=saFiY3eQDW9h1ujzAmebXz7d0tN5Me0CI3vySrQb5DdV8WJiSKAIWd1/a6JeMk2NDI
-         aXG/BRX2P5JvGH21rgdC9LHTwPHLZnJVYRt210tmPz9hIyQVVJ6n+x68GaNaY2rkEEpe
-         AeLbUxd1NWB70/ziaCQJwCCxQ+E+hiKn2+TAURRVG0OLNsWLaRoE/neA/ai9aBLPngrn
-         FzJamKdsg5U2HadGr2KWLrnX7Ch9yAYcvNB8lbsTWN8mFk81TtBqLHyMY3KY30uZN2zb
-         uHhJ/CiyziIZ8V3zaby9x+PRyeXZOvj33mMfhHN3GzEf6IF93nNlLais0HSkNyKmNobs
-         2hxg==
+        bh=GkyY7Gx/s8/i/TTD/6iIAVcAbXfz7PChndlkN6KcDWs=;
+        b=aWCxlbutS6tvx8ncRgPUNTg+LVzebZ1TcLsZxcBSxShSo03wp7fKLrArqZLzMdxZys
+         DO8mf9PdL/hZ7JFCSICilphiRaxR3c6JlqdJ8bP3dZORlTV04KW/aSO0lqTh1SjMS4tD
+         5wHDaOagoNYvde9C1vA4KMFTFLnZ7IXl/V1pxvVH4iZG+ySBN+Y67MnhBW661eh3LzTB
+         DkCMPrW3bTZXfamUKqawUlyzRUKN75i1vUE6eVs8ASsoVa2P/1rUch4MPbEe3g0QVuev
+         V/LmN1kHy+vQ0EiLlOPacse0QRWmQRlH62H/ys4htod44MA5bitDXdeuQj3LByMLQCjp
+         7ADg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ccQ/Ep4gPvxWBDmSHprpIitRzQFtxgmXhrKz1ZUM8F0=;
-        b=abWlmVG1dkICf2Np8XtWlTJ86dDd+lzzRFnLxfCN5cT7pNQIe3fnVEd6tUEfY3/iPg
-         IlApjbBwGqWoPJbxmnVy3R0tyZkljNd5UEMS6ifm+U/Ay6VhIrUOAR+3+in/sdQG43Jw
-         0t9OcatshGNbODMFBxBh91VG5+8+KUlXE511NwcO6ehh3BY2tQPMAHa94hCZQ6isYpyX
-         oPdKGAQ5FaO8K84FnuaStWC3J3EDpzJm8wGNnFroECiD5NPzrbkG6kkE0pHN13VCXhGV
-         xzH49ti1EjJaM/+neBGqdbsx0ZSbyYnNF25ebbDWCGrZoMhil881fSnN1+AafWa3HVao
-         5G1A==
-X-Gm-Message-State: AO0yUKVde/LMz5PwTv0e/TNUGDEnn/ugI2Z4vAx4M1uIm3lOADELy6YU
-	cfKlC8KHZJN+I1KOct1X0pQm/VmS/gA=
-X-Google-Smtp-Source: AK7set8Q2cZNeiYkK1Z5DUJcwC9OR6/Ty3Qwh1Pk3dSsKY/QDZR0QR6wjDIfVRFF/5zaxynxKBFZmNBsGdc=
+        bh=GkyY7Gx/s8/i/TTD/6iIAVcAbXfz7PChndlkN6KcDWs=;
+        b=NZX2sS+mDd0SG4vn7SYrkUrR6F7roYegpszJJm2BLDcVgYt+wwIwGfTVj+ipg9ewZC
+         rqKfTqFpQqum1n27CiV/LwlR6PGqg84TL5LM5ONjFc8Ajgmtww+Jf67Tf+GKSfm+Nnnl
+         YmFz/Ggl0NAIsyLBFJWd0tbDCXfZ0DvOdxbU01Q4twucKE3EC1TFIWPn4gJi/AZ1jiLv
+         Ln54JRbS1HGIdq/YvID9mWN+D80h2RJzvp6aTj3FcGUAQAGWgApvSSKpP22/4lEf18j1
+         N1jzBwKZIDLHmzHCiRHDQ9mRNVYEp8yot43x8wrWGNemUM6jxc6KkdjGf83rcYNy+vFm
+         cKaQ==
+X-Gm-Message-State: AO0yUKWq1JSaqwnJGGpo5pThbxlP4kdsusHg+5wy2Y+E/4xFZ8qB446U
+	urju5bAs2An86ODPiCZOoCfoxYXrIZc=
+X-Google-Smtp-Source: AK7set9TyxqyB3MrEE0xni9aCszn1JDl4djoMf7oBNVJBOZaZF/s+PPLMNvAAkPhEZEamhabR+JIQEZKZHA=
 X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a0d:eb8a:0:b0:52e:e972:ca5d with SMTP id
- u132-20020a0deb8a000000b0052ee972ca5dmr83887ywe.7.1676085407993; Fri, 10 Feb
- 2023 19:16:47 -0800 (PST)
-Date: Fri, 10 Feb 2023 19:15:00 -0800
+ (user=reijiw job=sendgmr) by 2002:a81:5e43:0:b0:4e3:f87:8c24 with SMTP id
+ s64-20020a815e43000000b004e30f878c24mr2050846ywb.248.1676085409706; Fri, 10
+ Feb 2023 19:16:49 -0800 (PST)
+Date: Fri, 10 Feb 2023 19:15:01 -0800
 In-Reply-To: <20230211031506.4159098-1-reijiw@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230211031506.4159098-1-reijiw@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230211031506.4159098-9-reijiw@google.com>
-Subject: [PATCH v4 08/14] KVM: arm64: PMU: Add a helper to read a vCPU's PMCR_EL0
+Message-ID: <20230211031506.4159098-10-reijiw@google.com>
+Subject: [PATCH v4 09/14] KVM: arm64: PMU: Set PMCR_EL0.N for vCPU based on
+ the associated PMU
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
@@ -56,161 +57,122 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Shaoqin Huang <shahuang@redhat.com>, Reiji Watanabe <reijiw@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a helper to read a vCPU's PMCR_EL0, and use it when KVM
-reads a vCPU's PMCR_EL0.
+The number of PMU event counters is indicated in PMCR_EL0.N.
+For a vCPU with PMUv3 configured, the value is set to the same
+value as the current PE on every vCPU reset.  Unless the vCPU is
+pinned to PEs that has the PMU associated to the guest from the
+initial vCPU reset, the value might be different from the PMU's
+PMCR_EL0.N on heterogeneous PMU systems.
 
-The PMCR_EL0 value is tracked by a sysreg file per each vCPU.
-The following patches will make (only) PMCR_EL0.N track per guest.
-Having the new helper will be useful to combine the PMCR_EL0.N
-field (tracked per guest) and the other fields (tracked per vCPU)
-to provide the value of PMCR_EL0.
+Fix this by setting the vCPU's PMCR_EL0.N to the PMU's PMCR_EL0.N
+value. Track the PMCR_EL0.N per guest, as only one PMU can be set
+for the guest (PMCR_EL0.N must be the same for all vCPUs of the
+guest), and it is convenient for updating the value.
 
-No functional change intended.
+KVM does not yet support userspace modifying PMCR_EL0.N.
+The following patch will add support for that.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/arm.c      |  3 +--
- arch/arm64/kvm/pmu-emul.c | 17 +++++++++++------
- arch/arm64/kvm/sys_regs.c |  6 +++---
- include/kvm/arm_pmu.h     |  6 ++++++
- 4 files changed, 21 insertions(+), 11 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  3 +++
+ arch/arm64/kvm/pmu-emul.c         | 14 +++++++++++++-
+ arch/arm64/kvm/sys_regs.c         | 17 ++++++++++-------
+ 3 files changed, 26 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 41f478344a4d..ee3df098a75e 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -753,8 +753,7 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
- 		}
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 33839077a95c..734f1b6f7468 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -233,6 +233,9 @@ struct kvm_arch {
+ 		u8 imp_limit;
+ 	} dfr0_pmuver;
  
- 		if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
--			kvm_pmu_handle_pmcr(vcpu,
--					    __vcpu_sys_reg(vcpu, PMCR_EL0));
-+			kvm_pmu_handle_pmcr(vcpu, kvm_vcpu_read_pmcr(vcpu));
++	/* PMCR_EL0.N value for the guest */
++	u8 pmcr_n;
++
+ 	/* Hypercall features firmware registers' descriptor */
+ 	struct kvm_smccc_features smccc_feat;
  
- 		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
- 			return kvm_vcpu_suspend(vcpu);
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 9dbf532e264e..5ff44224148f 100644
+index 5ff44224148f..3053c06db7a9 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -68,7 +68,7 @@ static bool kvm_pmc_is_64bit(struct kvm_pmc *pmc)
+@@ -680,6 +680,9 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
+ 	if (!entry)
+ 		goto out_unlock;
  
- static bool kvm_pmc_has_64bit_overflow(struct kvm_pmc *pmc)
- {
--	u64 val = __vcpu_sys_reg(kvm_pmc_to_vcpu(pmc), PMCR_EL0);
-+	u64 val = kvm_vcpu_read_pmcr(kvm_pmc_to_vcpu(pmc));
- 
- 	return (pmc->idx < ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LP)) ||
- 	       (pmc->idx == ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LC));
-@@ -246,7 +246,7 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
- 
- u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
- {
--	u64 val = FIELD_GET(ARMV8_PMU_PMCR_N, __vcpu_sys_reg(vcpu, PMCR_EL0));
-+	u64 val = FIELD_GET(ARMV8_PMU_PMCR_N, kvm_vcpu_read_pmcr(vcpu));
- 
- 	if (val == 0)
- 		return BIT(ARMV8_PMU_CYCLE_IDX);
-@@ -267,7 +267,7 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
- 	if (!kvm_vcpu_has_pmu(vcpu))
- 		return;
- 
--	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) || !val)
-+	if (!(kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E) || !val)
- 		return;
- 
- 	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
-@@ -319,7 +319,7 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
- {
- 	u64 reg = 0;
- 
--	if ((__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E)) {
-+	if ((kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E)) {
- 		reg = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
- 		reg &= __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
- 		reg &= __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
-@@ -421,7 +421,7 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
- {
- 	int i;
- 
--	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
-+	if (!(kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E))
- 		return;
- 
- 	/* Weed out disabled counters */
-@@ -562,7 +562,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc)
- {
- 	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
--	return (__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) &&
-+	return (kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E) &&
- 	       (__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & BIT(pmc->idx));
- }
- 
-@@ -1071,3 +1071,8 @@ u8 kvm_arm_pmu_get_pmuver_limit(void)
- 					      ID_AA64DFR0_EL1_PMUVer_V3P5);
- 	return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), tmp);
- }
++	WARN_ON((pmu->num_events <= 0) &&
++		(pmu->num_events > ARMV8_PMU_MAX_COUNTERS));
 +
-+u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu)
-+{
-+	return __vcpu_sys_reg(vcpu, PMCR_EL0);
-+}
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 9b410a2ea20c..9f8c25e49a5a 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -680,7 +680,7 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 		 * Only update writeable bits of PMCR (continuing into
- 		 * kvm_pmu_handle_pmcr() as well)
- 		 */
--		val = __vcpu_sys_reg(vcpu, PMCR_EL0);
-+		val = kvm_vcpu_read_pmcr(vcpu);
- 		val &= ~ARMV8_PMU_PMCR_MASK;
- 		val |= p->regval & ARMV8_PMU_PMCR_MASK;
- 		if (!kvm_supports_32bit_el0())
-@@ -689,7 +689,7 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 		kvm_vcpu_pmu_restore_guest(vcpu);
- 	} else {
- 		/* PMCR.P & PMCR.C are RAZ */
--		val = __vcpu_sys_reg(vcpu, PMCR_EL0)
-+		val = kvm_vcpu_read_pmcr(vcpu)
- 		      & ~(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C);
- 		p->regval = val;
- 	}
-@@ -738,7 +738,7 @@ static bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
- {
- 	u64 val;
+ 	entry->arm_pmu = pmu;
+ 	list_add_tail(&entry->entry, &arm_pmus);
  
--	val = FIELD_GET(ARMV8_PMU_PMCR_N, __vcpu_sys_reg(vcpu, PMCR_EL0));
-+	val = FIELD_GET(ARMV8_PMU_PMCR_N, kvm_vcpu_read_pmcr(vcpu));
- 	if (idx >= val && idx != ARMV8_PMU_CYCLE_IDX) {
- 		kvm_inject_undefined(vcpu);
- 		return false;
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index c7da46c7377e..8f55c9055058 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -97,6 +97,7 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+@@ -881,6 +884,13 @@ int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
+ 	kvm->arch.dfr0_pmuver.imp_limit = min_t(u8, arm_pmu->pmuver, ID_AA64DFR0_EL1_PMUVer_V3P5);
+ 	kvm->arch.dfr0_pmuver.imp = kvm->arch.dfr0_pmuver.imp_limit;
  
- int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu);
- 
-+u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu);
- #else
- struct kvm_pmu {
- };
-@@ -173,6 +174,11 @@ static inline int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
++	/*
++	 * Both the num_events and PMCR_EL0.N indicates the number of
++	 * PMU event counters, but the former includes the cycle counter
++	 * while the latter does not.
++	 */
++	kvm->arch.pmcr_n = arm_pmu->num_events - 1;
++
  	return 0;
  }
  
-+static inline u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu)
+@@ -1074,5 +1084,7 @@ u8 kvm_arm_pmu_get_pmuver_limit(void)
+ 
+ u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu)
+ {
+-	return __vcpu_sys_reg(vcpu, PMCR_EL0);
++	u64 pmcr = __vcpu_sys_reg(vcpu, PMCR_EL0) & ~ARMV8_PMU_PMCR_N;
++
++	return pmcr | ((u64)vcpu->kvm->arch.pmcr_n << ARMV8_PMU_PMCR_N_SHIFT);
+ }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 9f8c25e49a5a..aba93db29697 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -624,12 +624,8 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ {
+ 	u64 pmcr;
+ 
+-	/* No PMU available, PMCR_EL0 may UNDEF... */
+-	if (!kvm_arm_support_pmu_v3())
+-		return;
+-
+ 	/* Only preserve PMCR_EL0.N, and reset the rest to 0 */
+-	pmcr = read_sysreg(pmcr_el0) & ARMV8_PMU_PMCR_N;
++	pmcr = kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_N;
+ 	if (!kvm_supports_32bit_el0())
+ 		pmcr |= ARMV8_PMU_PMCR_LC;
+ 
+@@ -946,6 +942,13 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
+ }
+ 
++static int get_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
++		    u64 *val)
 +{
++	*val = kvm_vcpu_read_pmcr(vcpu);
 +	return 0;
 +}
 +
- #endif
+ /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+ #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+ 	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
+@@ -1719,8 +1722,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
+ 	{ SYS_DESC(SYS_SVCR), undef_access },
  
- #endif
+-	{ PMU_SYS_REG(SYS_PMCR_EL0), .access = access_pmcr,
+-	  .reset = reset_pmcr, .reg = PMCR_EL0 },
++	{ PMU_SYS_REG(SYS_PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
++	  .reg = PMCR_EL0, .get_user = get_pmcr },
+ 	{ PMU_SYS_REG(SYS_PMCNTENSET_EL0),
+ 	  .access = access_pmcnten, .reg = PMCNTENSET_EL0 },
+ 	{ PMU_SYS_REG(SYS_PMCNTENCLR_EL0),
 -- 
 2.39.1.581.gbfd45094c4-goog
 
