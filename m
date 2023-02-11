@@ -1,40 +1,40 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F938A3F
-	for <kvmarm@lists.linux.dev>; Sat, 11 Feb 2023 03:16:47 +0000 (UTC)
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-52ec987d600so40503017b3.21
-        for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 19:16:47 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D846DA23
+	for <kvmarm@lists.linux.dev>; Sat, 11 Feb 2023 03:16:48 +0000 (UTC)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-52ecbe73389so34628027b3.0
+        for <kvmarm@lists.linux.dev>; Fri, 10 Feb 2023 19:16:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MCXnOb6jcGTB9kCRmfw+USzftBG5GbuvoabNuXgoEVU=;
-        b=bcxD3LvkYnFpmSe0OOL5FnK+rcgRPLQvdZMgoUbwJlzTZUXvvFht0hWOAbfD7fwzMO
-         PPIKczBG/uxBejjRAsvzVLhSrjdI/XfTYxwnP54eZLr49fS9EJoBG2Q0MH5dW24sYWqG
-         5rNeWjkrE89NWC6RTldgbiiFH+NAgkp8riAo/SLTdV1FyPQVQLJCttGqfcgxpaqUrr3A
-         zzSkEHZfzAhjy+YE86HtZC6EYQg14ZzQWfWsNvBgBFvWVMG6eabvewT9/VQlVz2wn8gw
-         AOW9WnUeK+JJvztH/lgimLiRkf8TPFLh5nIwD42T3+mLmJ5BUTDG3Y2uZhctSzK+p8u7
-         IR8w==
+        bh=ccQ/Ep4gPvxWBDmSHprpIitRzQFtxgmXhrKz1ZUM8F0=;
+        b=saFiY3eQDW9h1ujzAmebXz7d0tN5Me0CI3vySrQb5DdV8WJiSKAIWd1/a6JeMk2NDI
+         aXG/BRX2P5JvGH21rgdC9LHTwPHLZnJVYRt210tmPz9hIyQVVJ6n+x68GaNaY2rkEEpe
+         AeLbUxd1NWB70/ziaCQJwCCxQ+E+hiKn2+TAURRVG0OLNsWLaRoE/neA/ai9aBLPngrn
+         FzJamKdsg5U2HadGr2KWLrnX7Ch9yAYcvNB8lbsTWN8mFk81TtBqLHyMY3KY30uZN2zb
+         uHhJ/CiyziIZ8V3zaby9x+PRyeXZOvj33mMfhHN3GzEf6IF93nNlLais0HSkNyKmNobs
+         2hxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MCXnOb6jcGTB9kCRmfw+USzftBG5GbuvoabNuXgoEVU=;
-        b=7uks7jAgsqnENbyqVYApS2fPdjF3dX+rohncxNN78pJW0Z77feyZDOgGtBja0rnEh1
-         d3ry4hiJghMHPcElRQ3JiGRXSgSKbP11uTCe+d9KCt/Ad1l7QWBwgTdcT8GOVHLbw3vY
-         GZTi998s2tn27AXBe4+UgVrDilFRgvuAb+li4+VNfUWltkXILcOIAlml7ymlh0mkmFfC
-         eprs1WFC4epnse9XV6FpvAjB38aUCbz4xaA+rKzd4t9oZHiVIcPH4HceSYto9oZqHxQz
-         EA+2TTTaca/VYZzWrRazkX4CxZaHZgNMqDhdOVUKa4wAwZMDG6OURbZV4fu0sXMRCbC3
-         53Ng==
-X-Gm-Message-State: AO0yUKVaThIAY5N9dlA8Zx3YlF2cJwFFcJ2/zOkdNvIGjwd78mswcWYO
-	UVm8vL5+QHWBv5dJHZmY6ozEEQ7EK44=
-X-Google-Smtp-Source: AK7set9ycbZcIhKY2lEr5PmnL1aLgmVOCXQ7NCzmiSMYPzzadl1xbEaheY9neKH5tD47DeO3FkS/ZiIqyJc=
+        bh=ccQ/Ep4gPvxWBDmSHprpIitRzQFtxgmXhrKz1ZUM8F0=;
+        b=abWlmVG1dkICf2Np8XtWlTJ86dDd+lzzRFnLxfCN5cT7pNQIe3fnVEd6tUEfY3/iPg
+         IlApjbBwGqWoPJbxmnVy3R0tyZkljNd5UEMS6ifm+U/Ay6VhIrUOAR+3+in/sdQG43Jw
+         0t9OcatshGNbODMFBxBh91VG5+8+KUlXE511NwcO6ehh3BY2tQPMAHa94hCZQ6isYpyX
+         oPdKGAQ5FaO8K84FnuaStWC3J3EDpzJm8wGNnFroECiD5NPzrbkG6kkE0pHN13VCXhGV
+         xzH49ti1EjJaM/+neBGqdbsx0ZSbyYnNF25ebbDWCGrZoMhil881fSnN1+AafWa3HVao
+         5G1A==
+X-Gm-Message-State: AO0yUKVde/LMz5PwTv0e/TNUGDEnn/ugI2Z4vAx4M1uIm3lOADELy6YU
+	cfKlC8KHZJN+I1KOct1X0pQm/VmS/gA=
+X-Google-Smtp-Source: AK7set8Q2cZNeiYkK1Z5DUJcwC9OR6/Ty3Qwh1Pk3dSsKY/QDZR0QR6wjDIfVRFF/5zaxynxKBFZmNBsGdc=
 X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a25:69c2:0:b0:8b4:7955:9223 with SMTP id
- e185-20020a2569c2000000b008b479559223mr8ybc.8.1676085405916; Fri, 10 Feb 2023
- 19:16:45 -0800 (PST)
-Date: Fri, 10 Feb 2023 19:14:59 -0800
+ (user=reijiw job=sendgmr) by 2002:a0d:eb8a:0:b0:52e:e972:ca5d with SMTP id
+ u132-20020a0deb8a000000b0052ee972ca5dmr83887ywe.7.1676085407993; Fri, 10 Feb
+ 2023 19:16:47 -0800 (PST)
+Date: Fri, 10 Feb 2023 19:15:00 -0800
 In-Reply-To: <20230211031506.4159098-1-reijiw@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230211031506.4159098-1-reijiw@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230211031506.4159098-8-reijiw@google.com>
-Subject: [PATCH v4 07/14] KVM: arm64: PMU: Simplify extracting PMCR_EL0.N
+Message-ID: <20230211031506.4159098-9-reijiw@google.com>
+Subject: [PATCH v4 08/14] KVM: arm64: PMU: Add a helper to read a vCPU's PMCR_EL0
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
@@ -56,89 +56,161 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Shaoqin Huang <shahuang@redhat.com>, Reiji Watanabe <reijiw@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Some code extracts PMCR_EL0.N using ARMV8_PMU_PMCR_N_SHIFT and
-ARMV8_PMU_PMCR_N_MASK. Define ARMV8_PMU_PMCR_N (0x1f << 11),
-and simplify those codes using FIELD_GET() and/or ARMV8_PMU_PMCR_N.
-The following patches will also use these macros to extract PMCR_EL0.N.
+Add a helper to read a vCPU's PMCR_EL0, and use it when KVM
+reads a vCPU's PMCR_EL0.
+
+The PMCR_EL0 value is tracked by a sysreg file per each vCPU.
+The following patches will make (only) PMCR_EL0.N track per guest.
+Having the new helper will be useful to combine the PMCR_EL0.N
+field (tracked per guest) and the other fields (tracked per vCPU)
+to provide the value of PMCR_EL0.
 
 No functional change intended.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/include/asm/perf_event.h | 2 +-
- arch/arm64/kernel/perf_event.c      | 3 +--
- arch/arm64/kvm/pmu-emul.c           | 3 +--
- arch/arm64/kvm/sys_regs.c           | 7 +++----
- 4 files changed, 6 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/arm.c      |  3 +--
+ arch/arm64/kvm/pmu-emul.c | 17 +++++++++++------
+ arch/arm64/kvm/sys_regs.c |  6 +++---
+ include/kvm/arm_pmu.h     |  6 ++++++
+ 4 files changed, 21 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
-index 3eaf462f5752..eeef8d56d9c8 100644
---- a/arch/arm64/include/asm/perf_event.h
-+++ b/arch/arm64/include/asm/perf_event.h
-@@ -219,7 +219,7 @@
- #define ARMV8_PMU_PMCR_LC	(1 << 6) /* Overflow on 64 bit cycle counter */
- #define ARMV8_PMU_PMCR_LP	(1 << 7) /* Long event counter enable */
- #define	ARMV8_PMU_PMCR_N_SHIFT	11	 /* Number of counters supported */
--#define	ARMV8_PMU_PMCR_N_MASK	0x1f
-+#define	ARMV8_PMU_PMCR_N	(0x1f << ARMV8_PMU_PMCR_N_SHIFT)
- #define	ARMV8_PMU_PMCR_MASK	0xff	 /* Mask for writable bits */
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 41f478344a4d..ee3df098a75e 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -753,8 +753,7 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+ 		}
  
- /*
-diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-index a5193f2146a6..1775d89a9144 100644
---- a/arch/arm64/kernel/perf_event.c
-+++ b/arch/arm64/kernel/perf_event.c
-@@ -1158,8 +1158,7 @@ static void __armv8pmu_probe_pmu(void *info)
- 	probe->present = true;
+ 		if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
+-			kvm_pmu_handle_pmcr(vcpu,
+-					    __vcpu_sys_reg(vcpu, PMCR_EL0));
++			kvm_pmu_handle_pmcr(vcpu, kvm_vcpu_read_pmcr(vcpu));
  
- 	/* Read the nb of CNTx counters supported from PMNC */
--	cpu_pmu->num_events = (armv8pmu_pmcr_read() >> ARMV8_PMU_PMCR_N_SHIFT)
--		& ARMV8_PMU_PMCR_N_MASK;
-+	cpu_pmu->num_events = FIELD_GET(ARMV8_PMU_PMCR_N, armv8pmu_pmcr_read());
- 
- 	/* Add the CPU cycles counter */
- 	cpu_pmu->num_events += 1;
+ 		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+ 			return kvm_vcpu_suspend(vcpu);
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 701728ad78d6..9dbf532e264e 100644
+index 9dbf532e264e..5ff44224148f 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -246,9 +246,8 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
+@@ -68,7 +68,7 @@ static bool kvm_pmc_is_64bit(struct kvm_pmc *pmc)
+ 
+ static bool kvm_pmc_has_64bit_overflow(struct kvm_pmc *pmc)
+ {
+-	u64 val = __vcpu_sys_reg(kvm_pmc_to_vcpu(pmc), PMCR_EL0);
++	u64 val = kvm_vcpu_read_pmcr(kvm_pmc_to_vcpu(pmc));
+ 
+ 	return (pmc->idx < ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LP)) ||
+ 	       (pmc->idx == ARMV8_PMU_CYCLE_IDX && (val & ARMV8_PMU_PMCR_LC));
+@@ -246,7 +246,7 @@ void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
  
  u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
  {
--	u64 val = __vcpu_sys_reg(vcpu, PMCR_EL0) >> ARMV8_PMU_PMCR_N_SHIFT;
-+	u64 val = FIELD_GET(ARMV8_PMU_PMCR_N, __vcpu_sys_reg(vcpu, PMCR_EL0));
+-	u64 val = FIELD_GET(ARMV8_PMU_PMCR_N, __vcpu_sys_reg(vcpu, PMCR_EL0));
++	u64 val = FIELD_GET(ARMV8_PMU_PMCR_N, kvm_vcpu_read_pmcr(vcpu));
  
--	val &= ARMV8_PMU_PMCR_N_MASK;
  	if (val == 0)
  		return BIT(ARMV8_PMU_CYCLE_IDX);
- 	else
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 790f028a1686..9b410a2ea20c 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -629,7 +629,7 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+@@ -267,7 +267,7 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
+ 	if (!kvm_vcpu_has_pmu(vcpu))
  		return;
  
- 	/* Only preserve PMCR_EL0.N, and reset the rest to 0 */
--	pmcr = read_sysreg(pmcr_el0) & (ARMV8_PMU_PMCR_N_MASK << ARMV8_PMU_PMCR_N_SHIFT);
-+	pmcr = read_sysreg(pmcr_el0) & ARMV8_PMU_PMCR_N;
- 	if (!kvm_supports_32bit_el0())
- 		pmcr |= ARMV8_PMU_PMCR_LC;
+-	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) || !val)
++	if (!(kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E) || !val)
+ 		return;
  
-@@ -736,10 +736,9 @@ static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 
- static bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
+ 	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
+@@ -319,7 +319,7 @@ static u64 kvm_pmu_overflow_status(struct kvm_vcpu *vcpu)
  {
--	u64 pmcr, val;
-+	u64 val;
+ 	u64 reg = 0;
  
--	pmcr = __vcpu_sys_reg(vcpu, PMCR_EL0);
--	val = (pmcr >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
-+	val = FIELD_GET(ARMV8_PMU_PMCR_N, __vcpu_sys_reg(vcpu, PMCR_EL0));
+-	if ((__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E)) {
++	if ((kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E)) {
+ 		reg = __vcpu_sys_reg(vcpu, PMOVSSET_EL0);
+ 		reg &= __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
+ 		reg &= __vcpu_sys_reg(vcpu, PMINTENSET_EL1);
+@@ -421,7 +421,7 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
+ {
+ 	int i;
+ 
+-	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
++	if (!(kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E))
+ 		return;
+ 
+ 	/* Weed out disabled counters */
+@@ -562,7 +562,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+ static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc)
+ {
+ 	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+-	return (__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) &&
++	return (kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E) &&
+ 	       (__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & BIT(pmc->idx));
+ }
+ 
+@@ -1071,3 +1071,8 @@ u8 kvm_arm_pmu_get_pmuver_limit(void)
+ 					      ID_AA64DFR0_EL1_PMUVer_V3P5);
+ 	return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_EL1_PMUVer), tmp);
+ }
++
++u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu)
++{
++	return __vcpu_sys_reg(vcpu, PMCR_EL0);
++}
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 9b410a2ea20c..9f8c25e49a5a 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -680,7 +680,7 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 		 * Only update writeable bits of PMCR (continuing into
+ 		 * kvm_pmu_handle_pmcr() as well)
+ 		 */
+-		val = __vcpu_sys_reg(vcpu, PMCR_EL0);
++		val = kvm_vcpu_read_pmcr(vcpu);
+ 		val &= ~ARMV8_PMU_PMCR_MASK;
+ 		val |= p->regval & ARMV8_PMU_PMCR_MASK;
+ 		if (!kvm_supports_32bit_el0())
+@@ -689,7 +689,7 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 		kvm_vcpu_pmu_restore_guest(vcpu);
+ 	} else {
+ 		/* PMCR.P & PMCR.C are RAZ */
+-		val = __vcpu_sys_reg(vcpu, PMCR_EL0)
++		val = kvm_vcpu_read_pmcr(vcpu)
+ 		      & ~(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C);
+ 		p->regval = val;
+ 	}
+@@ -738,7 +738,7 @@ static bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
+ {
+ 	u64 val;
+ 
+-	val = FIELD_GET(ARMV8_PMU_PMCR_N, __vcpu_sys_reg(vcpu, PMCR_EL0));
++	val = FIELD_GET(ARMV8_PMU_PMCR_N, kvm_vcpu_read_pmcr(vcpu));
  	if (idx >= val && idx != ARMV8_PMU_CYCLE_IDX) {
  		kvm_inject_undefined(vcpu);
  		return false;
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index c7da46c7377e..8f55c9055058 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -97,6 +97,7 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+ 
+ int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu);
+ 
++u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu);
+ #else
+ struct kvm_pmu {
+ };
+@@ -173,6 +174,11 @@ static inline int kvm_arm_set_vm_pmu(struct kvm *kvm, struct arm_pmu *arm_pmu)
+ 	return 0;
+ }
+ 
++static inline u64 kvm_vcpu_read_pmcr(struct kvm_vcpu *vcpu)
++{
++	return 0;
++}
++
+ #endif
+ 
+ #endif
 -- 
 2.39.1.581.gbfd45094c4-goog
 
