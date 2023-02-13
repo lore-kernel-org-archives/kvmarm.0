@@ -1,302 +1,134 @@
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0163A945;
-	Mon, 13 Feb 2023 17:44:28 +0000 (UTC)
-Received: by mail-il1-f181.google.com with SMTP id h29so3667711ila.8;
-        Mon, 13 Feb 2023 09:44:28 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDDDA945
+	for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 18:02:40 +0000 (UTC)
+Received: by mail-yb1-f202.google.com with SMTP id r17-20020a258291000000b008ee1c76c25dso10047971ybk.11
+        for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 10:02:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1676310268;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WO1hACTWD9TkfT3XqpHu1+7pGePhroyoHGGrfkv/TRs=;
-        b=juRJjlzGdYd+WtkMFpIChn0B2aMPgg5Ow4gNyNNMjrj0fgKR+evfY9H/VNuK/hRalt
-         XkGE1pwDOMHBtwWRDaF6qwLochoxdxmUr4+9NTXFrnyWz4CEl25v7Pp8Jf2kMoZfWmMy
-         KN5a0eQTFkWj8T1Ft03Knw3NSD/NeJUd/MgUwFWiTAgbTb7iT3SUSOjHliy+Ma6wO0aq
-         Ji0il2q6SglWPCa4ZKB6k6DEPtWN26jwPTIZkbDHAgLdqxN3BVEJCAXyy1GaEhCgWB0u
-         6tH4Gvz8Bo/d1EcmOwW6575/hQyn2POvRVSkuHNQ/4hODno9bRlYv+orc2+B78TGJrOq
-         dPow==
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BpleHRiVR4EUSpy/SWqcPhyAa33jUi6Ury6G4Iecv4I=;
+        b=Xf3x5NE/w0sBajJO3lIF+XcSeulIsiq+JSti1HsFZcXt9W4UF2WVlmRhqxG/gZ4UM4
+         qns1ntOHn+JM4vvit1JNLjZFCpZ7ThpyP3LXL8gzx7Kg+Leg+He8VDFKIbzRj9cEcZgn
+         EPTe5LF1kSPWeNQwzNcJcO5xluJtBkeK4mK+OsCgcYA707gAIflOAip21tDSOCd9Erk8
+         7du3jqOVX4IHd2gsXAmzSDU+nxexaMDkt3fquTHsOhl7GEQYk0n3TIa7Wez9A/mmG8+J
+         Gj3XOcBCsyWC17uTlFOP9fU8qfipyYTust95sZiU/T6lYjT1tc9AKLDaN94w6cjZVa43
+         J8vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1676310268;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WO1hACTWD9TkfT3XqpHu1+7pGePhroyoHGGrfkv/TRs=;
-        b=wM2xokLTpalMdWfUODJWMgO8qs50eRtWw8+WRjoSayOW5C9nlBNdXXsSuT/Bk5VW8U
-         CFgSYz4oSjP9T7bLL0Kpk52DqOaQ5WJ45gWmn07bfdiye1qBZY6URUeQfHSr0Jx14D0l
-         K9sYbYaHZH5TJp3H3fQa5i4h5/E6GzlgVDHLenJWRafGODGaehizZXFqJ+UAHrS0u+B+
-         +eAqEy3enZxaEIMNs1VHk/Q0E8Lt7mf9ZKgywEEcJYmLgF5qfg+9yECna1BSHRfEwwlR
-         Fd4nZl4iKGTrA/rGKl/Kr5SkFdol+V0kxDU0Ayv0ld4gL2qRyYY3JR1DqzApSDgWtcXN
-         7sKA==
-X-Gm-Message-State: AO0yUKWUv2AurL/v7xPfpWElez4ElmdtdzGQ7qpdoy3XxJAWYcLbd0Ut
-	NfXo2WyMMsO+21xwdsCcSUI=
-X-Google-Smtp-Source: AK7set/k4sh3/04FvwQWRHosk0TQoOS+cEMhUVusKNMzUv8iN+8kXC+AoLHmF47IvSh49GN6/DNBFQ==
-X-Received: by 2002:a92:cd8d:0:b0:314:6968:ed8d with SMTP id r13-20020a92cd8d000000b003146968ed8dmr11081309ilb.3.1676310267984;
-        Mon, 13 Feb 2023 09:44:27 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id e23-20020a02cab7000000b003af2cdde559sm4013564jap.35.2023.02.13.09.44.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Feb 2023 09:44:27 -0800 (PST)
-Date: Mon, 13 Feb 2023 19:44:21 +0200
-From: Zhi Wang <zhi.wang.linux@gmail.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Catalin Marinas
- <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
- <will@kernel.org>, James Morse <james.morse@arm.com>, Oliver Upton
- <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, Alexandru
- Elisei <alexandru.elisei@arm.com>, Christoffer Dall
- <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev
-Subject: Re: [RFC PATCH 09/28] arm64: RME: RTT handling
-Message-ID: <20230213194421.00005f7b@gmail.com>
-In-Reply-To: <20230127112932.38045-10-steven.price@arm.com>
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
-	<20230127112932.38045-1-steven.price@arm.com>
-	<20230127112932.38045-10-steven.price@arm.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BpleHRiVR4EUSpy/SWqcPhyAa33jUi6Ury6G4Iecv4I=;
+        b=Xh5XBViMmBpm4dOgh30P6shRmS8ladALT8p8U98pE4ql1qvOO0sano9WAkm7rNmWUs
+         U5UtDH/8SAcTlV0J3m71tXt8RB2MuP2GB2TbXG7W4vM/xk+zDfhGwI1ig4uIz85Ikn8y
+         sUOJAFsllkkpT7F2xHIh8i5gLuqMVMcLCNCzJOJnEXlYB0rJPcbIBy1daZoT/UY3SNBK
+         GtqTQuvo/kmTV0xCYo4CHaJCzddUXLJs5auyoJdYRgVyxEYGs/JiTVEXxUm1sQfwSRjB
+         obwNBfFX+6dFNy7D2cFJtOqKxljfuXv7WUNBn0b6tiabmdBLTxo9LzJIOBN+cIu9V71p
+         oA9w==
+X-Gm-Message-State: AO0yUKVx2DhDT92IEL3S6S+OOamCqsNqL/82E/mUR/L6ZpS9cMtrNyam
+	bj4/Q6d9Dqv+NuCVOC/dQQ0YT6riOXUP
+X-Google-Smtp-Source: AK7set/E/zEcaIXNhXkditxiEul+rHVKptXA3M+YkUOhAM/c0OQ93NwxXrM31UBY8F1i9LkGUIOld31yR0Y0
+X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
+ (user=rananta job=sendgmr) by 2002:a81:6d91:0:b0:52e:b80e:f0a9 with SMTP id
+ i139-20020a816d91000000b0052eb80ef0a9mr16ywc.10.1676311359266; Mon, 13 Feb
+ 2023 10:02:39 -0800 (PST)
+Date: Mon, 13 Feb 2023 18:02:21 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
+Message-ID: <20230213180234.2885032-1-rananta@google.com>
+Subject: [PATCH 00/13] Extend the vPMU selftest
+From: Raghavendra Rao Ananta <rananta@google.com>
+To: Oliver Upton <oupton@google.com>, Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Ricardo Koller <ricarkol@google.com>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jing Zhang <jingzhangos@google.com>, 
+	Colton Lewis <coltonlewis@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 27 Jan 2023 11:29:13 +0000
-Steven Price <steven.price@arm.com> wrote:
+Hello,
 
-> The RMM owns the stage 2 page tables for a realm, and KVM must request
-> that the RMM creates/destroys entries as necessary. The physical pages
-> to store the page tables are delegated to the realm as required, and can
-> be undelegated when no longer used.
-> 
+This vPMU KVM selftest series is an extension to the selftests
+introduced by Reiji Watanabe in his series aims to limit the number
+of PMCs on vCPU from userspace [1].
 
-This is only an introduction to RTT handling. While this patch is mostly like
-RTT teardown, better add more introduction to this patch. Also maybe refine
-the tittle to reflect what this patch is actually doing.
+The idea behind this series is to expand the test coverage to include
+the tests that validates actions from userspace, such as allowing or
+denying certain events via KVM_ARM_VCPU_PMU_V3_FILTER attribute, KVM's
+guarding of the PMU attributes to count EL2/EL3 events, and formal KVM
+behavior that enables PMU emulation. The last part validates the guest
+expectations of the vPMU by setting up a stress test that force-migrates
+multiple vCPUs frequently across random pCPUs in the system, thus
+ensuring KVM's management of vCPU PMU contexts correctly.
 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_rme.h |  19 +++++
->  arch/arm64/kvm/mmu.c             |   7 +-
->  arch/arm64/kvm/rme.c             | 139 +++++++++++++++++++++++++++++++
->  3 files changed, 162 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-> index a6318af3ed11..eea5118dfa8a 100644
-> --- a/arch/arm64/include/asm/kvm_rme.h
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -35,5 +35,24 @@ u32 kvm_realm_ipa_limit(void);
->  int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
->  int kvm_init_realm_vm(struct kvm *kvm);
->  void kvm_destroy_realm(struct kvm *kvm);
-> +void kvm_realm_destroy_rtts(struct realm *realm, u32 ia_bits, u32 start_level);
-> +
-> +#define RME_RTT_BLOCK_LEVEL	2
-> +#define RME_RTT_MAX_LEVEL	3
-> +
-> +#define RME_PAGE_SHIFT		12
-> +#define RME_PAGE_SIZE		BIT(RME_PAGE_SHIFT)
-> +/* See ARM64_HW_PGTABLE_LEVEL_SHIFT() */
-> +#define RME_RTT_LEVEL_SHIFT(l)	\
-> +	((RME_PAGE_SHIFT - 3) * (4 - (l)) + 3)
-> +#define RME_L2_BLOCK_SIZE	BIT(RME_RTT_LEVEL_SHIFT(2))
-> +
-> +static inline unsigned long rme_rtt_level_mapsize(int level)
-> +{
-> +	if (WARN_ON(level > RME_RTT_MAX_LEVEL))
-> +		return RME_PAGE_SIZE;
-> +
-> +	return (1UL << RME_RTT_LEVEL_SHIFT(level));
-> +}
->  
->  #endif
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 22c00274884a..f29558c5dcbc 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -834,16 +834,17 @@ void stage2_unmap_vm(struct kvm *kvm)
->  void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->  {
->  	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
-> -	struct kvm_pgtable *pgt = NULL;
-> +	struct kvm_pgtable *pgt;
->  
->  	write_lock(&kvm->mmu_lock);
-> +	pgt = mmu->pgt;
->  	if (kvm_is_realm(kvm) &&
->  	    kvm_realm_state(kvm) != REALM_STATE_DYING) {
-> -		/* TODO: teardown rtts */
->  		write_unlock(&kvm->mmu_lock);
-> +		kvm_realm_destroy_rtts(&kvm->arch.realm, pgt->ia_bits,
-> +				       pgt->start_level);
->  		return;
->  	}
-> -	pgt = mmu->pgt;
->  	if (pgt) {
->  		mmu->pgd_phys = 0;
->  		mmu->pgt = NULL;
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index 0c9d70e4d9e6..f7b0e5a779f8 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -73,6 +73,28 @@ static int rmi_check_version(void)
->  	return 0;
->  }
->  
-> +static void realm_destroy_undelegate_range(struct realm *realm,
-> +					   unsigned long ipa,
-> +					   unsigned long addr,
-> +					   ssize_t size)
-> +{
-> +	unsigned long rd = virt_to_phys(realm->rd);
-> +	int ret;
-> +
-> +	while (size > 0) {
-> +		ret = rmi_data_destroy(rd, ipa);
-> +		WARN_ON(ret);
-> +		ret = rmi_granule_undelegate(addr);
-> +
-As the return value is not documented, what will happen if a page undelegate
-failed? Leaked? Some explanation is required here.
-> +		if (ret)
-> +			get_page(phys_to_page(addr));
-> +
-> +		addr += PAGE_SIZE;
-> +		ipa += PAGE_SIZE;
-> +		size -= PAGE_SIZE;
-> +	}
-> +}
-> +
->  static unsigned long create_realm_feat_reg0(struct kvm *kvm)
->  {
->  	unsigned long ia_bits = VTCR_EL2_IPA(kvm->arch.vtcr);
-> @@ -170,6 +192,123 @@ static int realm_create_rd(struct kvm *kvm)
->  	return r;
->  }
->  
-> +static int realm_rtt_destroy(struct realm *realm, unsigned long addr,
-> +			     int level, phys_addr_t rtt_granule)
-> +{
-> +	addr = ALIGN_DOWN(addr, rme_rtt_level_mapsize(level - 1));
-> +	return rmi_rtt_destroy(rtt_granule, virt_to_phys(realm->rd), addr,
-> +			level);
-> +}
-> +
-> +static int realm_destroy_free_rtt(struct realm *realm, unsigned long addr,
-> +				  int level, phys_addr_t rtt_granule)
-> +{
-> +	if (realm_rtt_destroy(realm, addr, level, rtt_granule))
-> +		return -ENXIO;
-> +	if (!WARN_ON(rmi_granule_undelegate(rtt_granule)))
-> +		put_page(phys_to_page(rtt_granule));
-> +
-> +	return 0;
-> +}
-> +
-> +static int realm_rtt_create(struct realm *realm,
-> +			    unsigned long addr,
-> +			    int level,
-> +			    phys_addr_t phys)
-> +{
-> +	addr = ALIGN_DOWN(addr, rme_rtt_level_mapsize(level - 1));
-> +	return rmi_rtt_create(phys, virt_to_phys(realm->rd), addr, level);
-> +}
-> +
-> +static int realm_tear_down_rtt_range(struct realm *realm, int level,
-> +				     unsigned long start, unsigned long end)
-> +{
-> +	phys_addr_t rd = virt_to_phys(realm->rd);
-> +	ssize_t map_size = rme_rtt_level_mapsize(level);
-> +	unsigned long addr, next_addr;
-> +	bool failed = false;
-> +
-> +	for (addr = start; addr < end; addr = next_addr) {
-> +		phys_addr_t rtt_addr, tmp_rtt;
-> +		struct rtt_entry rtt;
-> +		unsigned long end_addr;
-> +
-> +		next_addr = ALIGN(addr + 1, map_size);
-> +
-> +		end_addr = min(next_addr, end);
-> +
-> +		if (rmi_rtt_read_entry(rd, ALIGN_DOWN(addr, map_size),
-> +				       level, &rtt)) {
-> +			failed = true;
-> +			continue;
-> +		}
-> +
-> +		rtt_addr = rmi_rtt_get_phys(&rtt);
-> +		WARN_ON(level != rtt.walk_level);
-> +
-> +		switch (rtt.state) {
-> +		case RMI_UNASSIGNED:
-> +		case RMI_DESTROYED:
-> +			break;
-> +		case RMI_TABLE:
-> +			if (realm_tear_down_rtt_range(realm, level + 1,
-> +						      addr, end_addr)) {
-> +				failed = true;
-> +				break;
-> +			}
-> +			if (IS_ALIGNED(addr, map_size) &&
-> +			    next_addr <= end &&
-> +			    realm_destroy_free_rtt(realm, addr, level + 1,
-> +						   rtt_addr))
-> +				failed = true;
-> +			break;
-> +		case RMI_ASSIGNED:
-> +			WARN_ON(!rtt_addr);
-> +			/*
-> +			 * If there is a block mapping, break it now, using the
-> +			 * spare_page. We are sure to have a valid delegated
-> +			 * page at spare_page before we enter here, otherwise
-> +			 * WARN once, which will be followed by further
-> +			 * warnings.
-> +			 */
-> +			tmp_rtt = realm->spare_page;
-> +			if (level == 2 &&
-> +			    !WARN_ON_ONCE(tmp_rtt == PHYS_ADDR_MAX) &&
-> +			    realm_rtt_create(realm, addr,
-> +					     RME_RTT_MAX_LEVEL, tmp_rtt)) {
-> +				WARN_ON(1);
-> +				failed = true;
-> +				break;
-> +			}
-> +			realm_destroy_undelegate_range(realm, addr,
-> +						       rtt_addr, map_size);
-> +			/*
-> +			 * Collapse the last level table and make the spare page
-> +			 * reusable again.
-> +			 */
-> +			if (level == 2 &&
-> +			    realm_rtt_destroy(realm, addr, RME_RTT_MAX_LEVEL,
-> +					      tmp_rtt))
-> +				failed = true;
-> +			break;
-> +		case RMI_VALID_NS:
-> +			WARN_ON(rmi_rtt_unmap_unprotected(rd, addr, level));
-> +			break;
-> +		default:
-> +			WARN_ON(1);
-> +			failed = true;
-> +			break;
-> +		}
-> +	}
-> +
-> +	return failed ? -EINVAL : 0;
-> +}
-> +
-> +void kvm_realm_destroy_rtts(struct realm *realm, u32 ia_bits, u32 start_level)
-> +{
-> +	realm_tear_down_rtt_range(realm, start_level, 0, (1UL << ia_bits));
-> +}
-> +
->  /* Protects access to rme_vmid_bitmap */
->  static DEFINE_SPINLOCK(rme_vmid_lock);
->  static unsigned long *rme_vmid_bitmap;
+Patch-1 renames the test file to be more generic.
+
+Patch-2 refactors the existing tests for plugging-in the upcoming tests
+easily.
+
+Patch-3 and 4 add helper macros and functions respectively to interact
+with the cycle counter.
+
+Patch-5 extends create_vpmu_vm() to accept an array of event filters
+as an argument that are to be applied to the VM.
+
+Patch-6 tests the KVM_ARM_VCPU_PMU_V3_FILTER attribute by scripting
+various combinations of events that are to be allowed or denied to
+the guest and verifying guest's behavior.
+
+Patch-7 adds test to validate KVM's handling of guest requests to count
+events in EL2/EL3.
+
+Patch-8 introduces the vCPU migration stress testing by validating cycle
+counter and general purpose counter's behavior across vCPU migrations.
+
+Patch-9, 10, and 11 expands the tests in patch-8 to validate
+overflow/IRQ functionality, chained events, and occupancy of all the PMU
+counters, respectively.
+
+Patch-12 extends create_vpmu_vm() to create multiple vCPUs for the VM.
+
+Patch-13 expands the stress tests for multiple vCPUs.
+
+The series has been tested on hardwares with PMUv8p1 and PMUvp5.
+
+Thank you.
+Raghavendra
+
+[1]: https://lore.kernel.org/all/20230203040242.1792453-1-reijiw@google.com/
+
+
+Raghavendra Rao Ananta (13):
+  selftests: KVM: aarch64: Rename vpmu_counter_access.c to vpmu_test.c
+  selftests: KVM: aarch64: Refactor the vPMU counter access tests
+  tools: arm64: perf_event: Define Cycle counter enable/overflow bits
+  selftests: KVM: aarch64: Add PMU cycle counter helpers
+  selftests: KVM: aarch64: Consider PMU event filters for VM creation
+  selftests: KVM: aarch64: Add KVM PMU event filter test
+  selftests: KVM: aarch64: Add KVM EVTYPE filter PMU test
+  selftests: KVM: aarch64: Add vCPU migration test for PMU
+  selftests: KVM: aarch64: Test PMU overflow/IRQ functionality
+  selftests: KVM: aarch64: Test chained events for PMU
+  selftests: KVM: aarch64: Add PMU test to chain all the counters
+  selftests: KVM: aarch64: Add multi-vCPU support for vPMU VM creation
+  selftests: KVM: aarch64: Extend the vCPU migration test to multi-vCPUs
+
+ tools/arch/arm64/include/asm/perf_event.h     |    7 +
+ tools/testing/selftests/kvm/Makefile          |    2 +-
+ .../kvm/aarch64/vpmu_counter_access.c         |  642 -------
+ .../testing/selftests/kvm/aarch64/vpmu_test.c | 1710 +++++++++++++++++
+ 4 files changed, 1718 insertions(+), 643 deletions(-)
+ delete mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+ create mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_test.c
+
+-- 
+2.39.1.581.gbfd45094c4-goog
 
