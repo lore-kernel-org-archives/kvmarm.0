@@ -1,12 +1,12 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B9FD256F
-	for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 10:18:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2182A256A
+	for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 10:18:14 +0000 (UTC)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7A7B11CE0;
-	Mon, 13 Feb 2023 02:18:55 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9080C1CE2;
+	Mon, 13 Feb 2023 02:18:56 -0800 (PST)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 041833F703;
-	Mon, 13 Feb 2023 02:18:11 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1CBF43F703;
+	Mon, 13 Feb 2023 02:18:13 -0800 (PST)
 From: Nikos Nikoleris <nikos.nikoleris@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
@@ -14,9 +14,9 @@ To: kvm@vger.kernel.org,
 Cc: pbonzini@redhat.com,
 	alexandru.elisei@arm.com,
 	ricarkol@google.com
-Subject: [PATCH v4 07/30] x86: Avoid references to fields of ACPI tables
-Date: Mon, 13 Feb 2023 10:17:36 +0000
-Message-Id: <20230213101759.2577077-8-nikos.nikoleris@arm.com>
+Subject: [PATCH v4 08/30] lib/acpi: Ensure all struct definition for ACPI tables are packed
+Date: Mon, 13 Feb 2023 10:17:37 +0000
+Message-Id: <20230213101759.2577077-9-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
 References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
@@ -29,55 +29,42 @@ MIME-Version: 1.0
 X-ARM-No-Footer: FoSSMail
 Content-Transfer-Encoding: 8bit
 
-ACPI table definitions in <acpi.h> have to be packed.  However, once
-we do that, direct references to members of the packed struct might
-result in unaligned pointers and gcc complains about them. This change
-modifies the code to avoid such references in preparation for making
-the APCI table definitions packed.
+All ACPI table definitions are provided with precise definitions of
+field sizes and offsets, make sure that no compiler optimization can
+interfere with the memory layout of the corresponding structs.
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- x86/s3.c | 17 +++++------------
- 1 file changed, 5 insertions(+), 12 deletions(-)
+ lib/acpi.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/x86/s3.c b/x86/s3.c
-index 96db728c..910c57fb 100644
---- a/x86/s3.c
-+++ b/x86/s3.c
-@@ -2,15 +2,6 @@
- #include "acpi.h"
- #include "asm/io.h"
+diff --git a/lib/acpi.h b/lib/acpi.h
+index 229a6391..67d12942 100644
+--- a/lib/acpi.h
++++ b/lib/acpi.h
+@@ -3,6 +3,12 @@
  
--static u32* find_resume_vector_addr(void)
--{
--    struct acpi_table_facs_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
--    if (!facs)
--        return 0;
--    printf("FACS is at %p\n", facs);
--    return &facs->firmware_waking_vector;
--}
--
- #define RTC_SECONDS_ALARM       1
- #define RTC_MINUTES_ALARM       3
- #define RTC_HOURS_ALARM         5
-@@ -40,12 +31,14 @@ extern char resume_start, resume_end;
- int main(int argc, char **argv)
- {
- 	struct acpi_table_fadt_rev1 *fadt = find_acpi_table_addr(FACP_SIGNATURE);
--	volatile u32 *resume_vector_ptr = find_resume_vector_addr();
-+	struct acpi_table_facs_rev1 *facs = find_acpi_table_addr(FACS_SIGNATURE);
- 	char *addr, *resume_vec = (void*)0x1000;
+ #include "libcflat.h"
  
--	*resume_vector_ptr = (u32)(ulong)resume_vec;
-+	assert(facs);
-+	facs->firmware_waking_vector = (u32)(ulong)resume_vec;
++/*
++ * All tables and structures must be byte-packed to match the ACPI
++ * specification, since the tables are provided by the system firmware.
++ */
++#pragma pack(1)
++
+ #define ACPI_SIGNATURE(c1, c2, c3, c4) \
+ 	((c1) | ((c2) << 8) | ((c3) << 16) | ((c4) << 24))
  
--	printf("resume vector addr is %p\n", resume_vector_ptr);
-+	printf("FACS is at %p\n", facs);
-+	printf("resume vector addr is %p\n", &facs->firmware_waking_vector);
- 	for (addr = &resume_start; addr < &resume_end; addr++)
- 		*resume_vec++ = *addr;
- 	printf("copy resume code from %p\n", &resume_start);
+@@ -103,6 +109,8 @@ struct acpi_table_facs_rev1 {
+ 	u8 reserved3[40];	/* Reserved - must be zero */
+ };
+ 
++#pragma pack(0)
++
+ void set_efi_rsdp(struct acpi_table_rsdp *rsdp);
+ void *find_acpi_table_addr(u32 sig);
+ 
 -- 
 2.25.1
 
