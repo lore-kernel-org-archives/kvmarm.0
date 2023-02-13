@@ -1,40 +1,40 @@
-Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD31EA945
-	for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 18:02:44 +0000 (UTC)
-Received: by mail-il1-f201.google.com with SMTP id k8-20020a056e02156800b003152ca1c48aso4522350ilu.21
-        for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 10:02:44 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2ACAD21
+	for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 18:02:45 +0000 (UTC)
+Received: by mail-yb1-f201.google.com with SMTP id p7-20020a257407000000b0091b90b20cd9so4647125ybc.6
+        for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 10:02:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m5yslkEpatxEcn+ZjK5j+e94Zo++KRDXawZarevQP94=;
-        b=lcEuCEa97ssf+wWD9q1X2jC8NG6WwfI+HwutzvJgCa6Uq+ZlQvO6nZ4fTZ1DOuWvCH
-         QYfQMES86DFpGnJNaCKSYUITRt/fnbFRlV24rRk/9s+HJOK4uK3HUoXbUfKpYuWWbdGM
-         JAkmmiPtglLKasxoEqGau0AV+ap1NMUKKv6f9Q0J6+GYYOqy5tXTw0cA3vI0PsY+8Ti9
-         6DRHzCp9lRTmscj+OMpjzyRj19bIqkMSdns7IbL4DdWskvbfqjdhHYeYx/pEtPAC/xpy
-         7SX2rfvXEDyQVkwgmKnDgLQKOy/Rc39ynIF8Wwbekx9vLgo9IWDVOMuK3NLGvfW1CAvj
-         N/RA==
+        bh=9BAtKaaHohTEAYMjD0cR4uj3MWVe56GuEhp9bvwPfa4=;
+        b=Jx3a++ruGoXrcWcT9j3/ApaAyQ82DXdYanaDr7ST0XpE2Zdzv5xTJY/Gfvi9n0sUxT
+         IAGJgL1CX6Hf5UbNZQlM9snWEB7yQtiJ3BksENLZKNl8tmSdopEGil1x1IoShWafjen4
+         62pvkCMKN/mE+1i0nSy4KestzSs7XPOtO/tu5mcO3NEE1o7l/6XD/mvfDRZctpTX5k1/
+         1ymQj+IpyTb/3m2LR+/32yyqg07hGCAIxxTKNNPGOEavERroNb6chMCoBWYWytMMWT+T
+         SVF11S0EQueuF/zePtphljd/7Lqh6rJXqYpNcY3OAqPtQRWYbKLek3BlYIVi3Lowxvff
+         lneA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m5yslkEpatxEcn+ZjK5j+e94Zo++KRDXawZarevQP94=;
-        b=KSnagLjx1SBv+G8yaZsUugm573VOgzfkdoUWeaKars01Bp+eTSWug1QvhLUr4//w3X
-         vhVu590QeNo5YtUgZOoO1fWEhEKfI3by+u4E8sAHTbGMRMVnNV5UA1prVAOVcB7UMTfe
-         Q+avJ2M0Qqcjs+Zoj6cli2q0pctFUY/dbmPXocTkT3yPL0PS8PAh0krZz4br/lFdGS38
-         yXRF05k4LuCACObEHqwTOiZg3xuiQKOaf3Adw9TcpiYjaejNAkM7IkR98vPyO/TBbPJ4
-         PeJ6oTT/ljHg+qDMU2NF/u6tqLf2KketKa1jl0NttWwoJcNNf7cecPsN49otI2rUjpIS
-         lcww==
-X-Gm-Message-State: AO0yUKXVD3hXQCK5u2cRlNV0FV9qYo/oStPKBgr/L/D9TNRixyk8wRPj
-	ZChMIb6AggQcxM4nl8CAOb3z9gyfZnhi
-X-Google-Smtp-Source: AK7set/0edXrdMAO+nSquBaytN7bLQuBx2MZ7S0viOK1DwWUM7ZNzi/YO3vgRtPP1oEgxZM2YSawlRvX5KHR
+        bh=9BAtKaaHohTEAYMjD0cR4uj3MWVe56GuEhp9bvwPfa4=;
+        b=laqmR1MVa9BTB9OeDvOiyySDgptpIiYps4Qy9dAg3difUfhPoDGCVZwgCdS3e9Nn6x
+         xj2I/V2D2AZukf/s6cDAtug76jneG7AE6H+6eL2Um3eMqGgBogSlgtg0A2gn5weNRygO
+         fKtbFZg/LVVpbczh4nApeOyva3aMoECS7pAJtAbKwnaGOylwWrv9F4tPvXw4eb1TaCwj
+         618TqawcRkrF6mwC0oU9IG1Ncik0NwJQDqiicbMVxuxPHC0JRI5ABY/4dnQ9oKErJr+y
+         2y/e2Bzzvp1qvD8CoZr3Crk3ndnyZQFkMsgwDIroDIrZ+O7/oBumJ0wvRn80yDFX01sW
+         bh2g==
+X-Gm-Message-State: AO0yUKXFAvEOoqb97tONtRkn0ouHxnemINwTtMU9mBag7jvYelPuGoKf
+	5E2g8osgxQmconphfb8EtcOBpxQ0TbXZ
+X-Google-Smtp-Source: AK7set/EzSiXKhIlnWZGFQXSX4Ttf2a7ec3Qre0VGbOsMKnsjqZTP111F1zCvSTSfNtsmpqkl4lGGYYDMsVP
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a02:854b:0:b0:3a7:e46f:1016 with SMTP id
- g69-20020a02854b000000b003a7e46f1016mr298jai.0.1676311363803; Mon, 13 Feb
- 2023 10:02:43 -0800 (PST)
-Date: Mon, 13 Feb 2023 18:02:25 +0000
+ (user=rananta job=sendgmr) by 2002:a05:6902:1c4:b0:87e:a15b:4e55 with SMTP id
+ u4-20020a05690201c400b0087ea15b4e55mr2919839ybh.21.1676311364919; Mon, 13 Feb
+ 2023 10:02:44 -0800 (PST)
+Date: Mon, 13 Feb 2023 18:02:26 +0000
 In-Reply-To: <20230213180234.2885032-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,8 +44,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230213180234.2885032-1-rananta@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230213180234.2885032-5-rananta@google.com>
-Subject: [PATCH 04/13] selftests: KVM: aarch64: Add PMU cycle counter helpers
+Message-ID: <20230213180234.2885032-6-rananta@google.com>
+Subject: [PATCH 05/13] selftests: KVM: aarch64: Consider PMU event filters for
+ VM creation
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Oliver Upton <oupton@google.com>, Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>, 
 	Ricardo Koller <ricarkol@google.com>, James Morse <james.morse@arm.com>, 
@@ -56,68 +57,155 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jing Zhang <jingzhangos@google.com>,
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Add basic helpers for the test to access the cycle counter
-registers. The helpers will be used in the upcoming patches
-to run the tests related to cycle counter.
+Accept a list of KVM PMU event filters as an argument while creating
+a VM via create_vpmu_vm(). Upcoming patches would leverage this to
+test the event filters' functionality.
 
 No functional change intended.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- .../testing/selftests/kvm/aarch64/vpmu_test.c | 40 +++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ .../testing/selftests/kvm/aarch64/vpmu_test.c | 64 +++++++++++++++++--
+ 1 file changed, 60 insertions(+), 4 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-index d72c3c9b9c39f..15aebc7d7dc94 100644
+index 15aebc7d7dc94..2b3a4fa3afa9c 100644
 --- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
 +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-@@ -147,6 +147,46 @@ static inline void disable_counter(int idx)
- 	isb();
+@@ -15,10 +15,14 @@
+ #include <vgic.h>
+ #include <asm/perf_event.h>
+ #include <linux/bitfield.h>
++#include <linux/bitmap.h>
+ 
+ /* The max number of the PMU event counters (excluding the cycle counter) */
+ #define ARMV8_PMU_MAX_GENERAL_COUNTERS	(ARMV8_PMU_MAX_COUNTERS - 1)
+ 
++/* The max number of event numbers that's supported */
++#define ARMV8_PMU_MAX_EVENTS		64
++
+ /*
+  * The macros and functions below for reading/writing PMEV{CNTR,TYPER}<n>_EL0
+  * were basically copied from arch/arm64/kernel/perf_event.c.
+@@ -224,6 +228,8 @@ struct pmc_accessor pmc_accessors[] = {
+ 	{ read_sel_evcntr, write_pmevcntrn, read_sel_evtyper, write_pmevtypern },
+ };
+ 
++#define MAX_EVENT_FILTERS_PER_VM 10
++
+ #define INVALID_EC	(-1ul)
+ uint64_t expected_ec = INVALID_EC;
+ uint64_t op_end_addr;
+@@ -232,6 +238,7 @@ struct vpmu_vm {
+ 	struct kvm_vm *vm;
+ 	struct kvm_vcpu *vcpu;
+ 	int gic_fd;
++	unsigned long *pmu_filter;
+ };
+ 
+ enum test_stage {
+@@ -541,8 +548,51 @@ static void guest_code(void)
+ #define GICD_BASE_GPA	0x8000000ULL
+ #define GICR_BASE_GPA	0x80A0000ULL
+ 
++static unsigned long *
++set_event_filters(struct kvm_vcpu *vcpu, struct kvm_pmu_event_filter *pmu_event_filters)
++{
++	int j;
++	unsigned long *pmu_filter;
++	struct kvm_device_attr filter_attr = {
++		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
++		.attr = KVM_ARM_VCPU_PMU_V3_FILTER,
++	};
++
++	/*
++	 * Setting up of the bitmap is similar to what KVM does.
++	 * If the first filter denys an event, default all the others to allow, and vice-versa.
++	 */
++	pmu_filter = bitmap_zalloc(ARMV8_PMU_MAX_EVENTS);
++	TEST_ASSERT(pmu_filter, "Failed to allocate the pmu_filter");
++
++	if (pmu_event_filters[0].action == KVM_PMU_EVENT_DENY)
++		bitmap_fill(pmu_filter, ARMV8_PMU_MAX_EVENTS);
++
++	for (j = 0; j < MAX_EVENT_FILTERS_PER_VM; j++) {
++		struct kvm_pmu_event_filter *pmu_event_filter = &pmu_event_filters[j];
++
++		if (!pmu_event_filter->nevents)
++			break;
++
++		pr_debug("Applying event filter:: event: 0x%x; action: %s\n",
++				pmu_event_filter->base_event,
++				pmu_event_filter->action == KVM_PMU_EVENT_ALLOW ? "ALLOW" : "DENY");
++
++		filter_attr.addr = (uint64_t) pmu_event_filter;
++		vcpu_ioctl(vcpu, KVM_SET_DEVICE_ATTR, &filter_attr);
++
++		if (pmu_event_filter->action == KVM_PMU_EVENT_ALLOW)
++			__set_bit(pmu_event_filter->base_event, pmu_filter);
++		else
++			__clear_bit(pmu_event_filter->base_event, pmu_filter);
++	}
++
++	return pmu_filter;
++}
++
+ /* Create a VM that has one vCPU with PMUv3 configured. */
+-static struct vpmu_vm *create_vpmu_vm(void *guest_code)
++static struct vpmu_vm *
++create_vpmu_vm(void *guest_code, struct kvm_pmu_event_filter *pmu_event_filters)
+ {
+ 	struct kvm_vm *vm;
+ 	struct kvm_vcpu *vcpu;
+@@ -586,6 +636,9 @@ static struct vpmu_vm *create_vpmu_vm(void *guest_code)
+ 		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
+ 
+ 	/* Initialize vPMU */
++	if (pmu_event_filters)
++		vpmu_vm->pmu_filter = set_event_filters(vcpu, pmu_event_filters);
++
+ 	vcpu_ioctl(vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
+ 	vcpu_ioctl(vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
+ 
+@@ -594,6 +647,8 @@ static struct vpmu_vm *create_vpmu_vm(void *guest_code)
+ 
+ static void destroy_vpmu_vm(struct vpmu_vm *vpmu_vm)
+ {
++	if (vpmu_vm->pmu_filter)
++		bitmap_free(vpmu_vm->pmu_filter);
+ 	close(vpmu_vm->gic_fd);
+ 	kvm_vm_free(vpmu_vm->vm);
+ 	free(vpmu_vm);
+@@ -631,7 +686,7 @@ static void run_counter_access_test(uint64_t pmcr_n)
+ 	guest_data.expected_pmcr_n = pmcr_n;
+ 
+ 	pr_debug("Test with pmcr_n %lu\n", pmcr_n);
+-	vpmu_vm = create_vpmu_vm(guest_code);
++	vpmu_vm = create_vpmu_vm(guest_code, NULL);
+ 	vcpu = vpmu_vm->vcpu;
+ 
+ 	/* Save the initial sp to restore them later to run the guest again */
+@@ -676,7 +731,7 @@ static void run_counter_access_error_test(uint64_t pmcr_n)
+ 	guest_data.expected_pmcr_n = pmcr_n;
+ 
+ 	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
+-	vpmu_vm = create_vpmu_vm(guest_code);
++	vpmu_vm = create_vpmu_vm(guest_code, NULL);
+ 	vcpu = vpmu_vm->vcpu;
+ 
+ 	/* Update the PMCR_EL0.N with @pmcr_n */
+@@ -719,9 +774,10 @@ static uint64_t get_pmcr_n_limit(void)
+ 	struct vpmu_vm *vpmu_vm;
+ 	uint64_t pmcr;
+ 
+-	vpmu_vm = create_vpmu_vm(guest_code);
++	vpmu_vm = create_vpmu_vm(guest_code, NULL);
+ 	vcpu_get_reg(vpmu_vm->vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
+ 	destroy_vpmu_vm(vpmu_vm);
++
+ 	return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
  }
  
-+static inline uint64_t read_cycle_counter(void)
-+{
-+	return read_sysreg(pmccntr_el0);
-+}
-+
-+static inline void reset_cycle_counter(void)
-+{
-+	uint64_t v = read_sysreg(pmcr_el0);
-+
-+	write_sysreg(ARMV8_PMU_PMCR_C | v, pmcr_el0);
-+	isb();
-+}
-+
-+static inline void enable_cycle_counter(void)
-+{
-+	uint64_t v = read_sysreg(pmcntenset_el0);
-+
-+	write_sysreg(ARMV8_PMU_CNTENSET_C | v, pmcntenset_el0);
-+	isb();
-+}
-+
-+static inline void disable_cycle_counter(void)
-+{
-+	uint64_t v = read_sysreg(pmcntenset_el0);
-+
-+	write_sysreg(ARMV8_PMU_CNTENSET_C | v, pmcntenclr_el0);
-+	isb();
-+}
-+
-+static inline void write_pmccfiltr(unsigned long val)
-+{
-+	write_sysreg(val, pmccfiltr_el0);
-+	isb();
-+}
-+
-+static inline uint64_t read_pmccfiltr(void)
-+{
-+	return read_sysreg(pmccfiltr_el0);
-+}
-+
- static inline uint64_t get_pmcr_n(void)
- {
- 	return FIELD_GET(ARMV8_PMU_PMCR_N, read_sysreg(pmcr_el0));
 -- 
 2.39.1.581.gbfd45094c4-goog
 
