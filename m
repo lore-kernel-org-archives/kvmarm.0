@@ -1,210 +1,95 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 259992572
-	for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 10:18:39 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 94EE21FC7;
-	Mon, 13 Feb 2023 02:19:21 -0800 (PST)
-Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com [10.7.66.42])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 20EBE3F703;
-	Mon, 13 Feb 2023 02:18:38 -0800 (PST)
-From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	andrew.jones@linux.dev
-Cc: pbonzini@redhat.com,
-	alexandru.elisei@arm.com,
-	ricarkol@google.com
-Subject: [PATCH v4 30/30] arm64: Add an efi/run script
-Date: Mon, 13 Feb 2023 10:17:59 +0000
-Message-Id: <20230213101759.2577077-31-nikos.nikoleris@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
-References: <20230213101759.2577077-1-nikos.nikoleris@arm.com>
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DED68F5F
+	for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 15:36:57 +0000 (UTC)
+Received: by mail-pl1-f169.google.com with SMTP id w5so13848778plg.8
+        for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 07:36:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b6CbHZgVu581b1kpbiWv3nRa+aQ1/ZXT+MQVUlqtRFg=;
+        b=pEH4a2cNcp+iU0rZP+xPv6deo4b/2AIkO0DLOBo0ZLFyrYsyMt4C3A1kCYsiwS+YQE
+         62VVo10wQW9iH02plX08czAlafCzRsNyRdBI+2kZSoa9AxYrWF9tURFi019LNtyBNByw
+         0orb8j6cueSHwxygMEDtVZVnzh91IEdRKbv22kmtywCxuJ83EdUV7ghG2gA8QFgQ7gDs
+         tcLnKRAA5Cq5cZ11IcmhZ04iEw5Vqp6Y3mJQSRc1zEt62CbLAdNzT09W0VapHLBwtIE6
+         SFcVuFmm0JoLrifqo/tuwbRawC9RbRg2HIGIOz7iMLZ4RUEG/gz/qLdoMZpH+Mbm1YEN
+         bgAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b6CbHZgVu581b1kpbiWv3nRa+aQ1/ZXT+MQVUlqtRFg=;
+        b=0HmT+dge2AYzSphSxs6P/Qn56307G5hNJOgx1Bth1Q8jjGV81tVrKK4A4R8qwY44ax
+         q8j5CrS04AwYV517oCb18baWXeAZTREtFSr8duHfT5JnZQiNL0+/JNXInw7GMGGW3DhZ
+         dbatBQ/ARny2l96ixW96AFC/w2r9AoG+Jvg0BRxgGxyF7iu0NBchMCZfzOfCgRXoDMFY
+         stpA0Hxp0mDsyIrVelh+n1RhmqOB1Lsparh+FwoISwXUKrvCI+RxzcT06cMHqf5xmqIg
+         VUU7A59Of6vtq6fYsXuTh8QehV/bm1xXr9UCBr5nEQ27Hb8zmnzwPu11fPZhdX2z/7TA
+         ag4w==
+X-Gm-Message-State: AO0yUKVpB6O4+EuceNUtuNT5kp3xmO7bxFZGipTM+Z3oKaJk9E7i/6r2
+	si+BEWd7KRu0m4nl2f3UISh54Q==
+X-Google-Smtp-Source: AK7set8dKx5P9Hgy5FMcBhM5YT9HLmTmVXFXC6zApAbnhBc+IHN95yI1sjydVL/fWr6sZFUiQqTBGQ==
+X-Received: by 2002:a17:903:4094:b0:198:af50:e4e3 with SMTP id z20-20020a170903409400b00198af50e4e3mr421077plc.9.1676302616875;
+        Mon, 13 Feb 2023 07:36:56 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id e9-20020a170902784900b00198f9fa23a3sm8301318pln.287.2023.02.13.07.36.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Feb 2023 07:36:56 -0800 (PST)
+Date: Mon, 13 Feb 2023 15:36:52 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Salil Mehta <salil.mehta@huawei.com>
+Subject: Re: [RFC PATCH v2 1/6] KVM: arm64: Add a helper to check if a VM has
+ ran once
+Message-ID: <Y+pZFOmOSrH+G2Rf@google.com>
+References: <20230211013759.3556016-1-oliver.upton@linux.dev>
+ <20230211013759.3556016-2-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-ARM-No-Footer: FoSSMail
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230211013759.3556016-2-oliver.upton@linux.dev>
 
-This change adds a efi/run script inspired by the one in x86. This
-script will setup a folder with the test compiled as an EFI app and a
-startup.nsh script. The script launches QEMU providing an image with
-EDKII and the path to the folder with the test which is executed
-automatically.
+On Sat, Feb 11, 2023, Oliver Upton wrote:
+> The test_bit(...) pattern is quite a lot of keystrokes. Replace
+> existing callsites with a helper.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 3 +++
+>  arch/arm64/kvm/pmu-emul.c         | 4 ++--
+>  2 files changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 35a159d131b5..012e94bc9e4a 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1019,6 +1019,9 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+>  	(system_supports_32bit_el0() &&				\
+>  	 !static_branch_unlikely(&arm64_mismatched_32bit_el0))
+>  
+> +#define kvm_vm_has_ran_once(kvm)					\
 
-For example:
+From the peanut gallery...
 
-$> ./arm/efi/run ./arm/selftest.efi setup smp=2 mem=256
+The ONCE part of the flag+API is unnecessary and flawed from a pendatic point of
+view, e.g. if a VM has ran twice...
 
-Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
----
- arm/Makefile.common  |  1 +
- arm/dummy.c          | 12 +++++++++
- arm/efi/run          | 61 ++++++++++++++++++++++++++++++++++++++++++++
- arm/run              | 14 +++++++---
- scripts/runtime.bash | 13 +++++++---
- 5 files changed, 94 insertions(+), 7 deletions(-)
- create mode 100644 arm/dummy.c
- create mode 100755 arm/efi/run
+What about kvm_vm_has_run() to align with a similar proposed x86 API for individual
+vCPUs[*], if either one ever gets moved to common code?
 
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index e251f6a8..90a6ff3a 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -12,6 +12,7 @@ tests-common += $(TEST_DIR)/gic.$(exe)
- tests-common += $(TEST_DIR)/psci.$(exe)
- tests-common += $(TEST_DIR)/sieve.$(exe)
- tests-common += $(TEST_DIR)/pl031.$(exe)
-+tests-common += $(TEST_DIR)/dummy.$(exe)
- 
- tests-all = $(tests-common) $(tests)
- all: directories $(tests-all)
-diff --git a/arm/dummy.c b/arm/dummy.c
-new file mode 100644
-index 00000000..7033bb7c
---- /dev/null
-+++ b/arm/dummy.c
-@@ -0,0 +1,12 @@
-+#include "libcflat.h"
-+
-+int main(int argc, char **argv)
-+{
-+	/*
-+	 * scripts/runtime.bash uses this test as a canary to determine if the
-+	 * basic setup is functional.  Print a magic string to let runtime.bash
-+	 * know that all is well.
-+	 */
-+	printf("Dummy Hello World!");
-+	return 0;
-+}
-diff --git a/arm/efi/run b/arm/efi/run
-new file mode 100755
-index 00000000..dfff717a
---- /dev/null
-+++ b/arm/efi/run
-@@ -0,0 +1,61 @@
-+#!/bin/bash
-+
-+set -e
-+
-+if [ $# -eq 0 ]; then
-+	echo "Usage $0 TEST_CASE [QEMU_ARGS]"
-+	exit 2
-+fi
-+
-+if [ ! -f config.mak ]; then
-+	echo "run './configure --enable-efi && make' first. See ./configure -h"
-+	exit 2
-+fi
-+source config.mak
-+source scripts/arch-run.bash
-+source scripts/common.bash
-+
-+: "${EFI_SRC:=$(realpath "$(dirname "$0")/../")}"
-+: "${EFI_UEFI:=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd}"
-+: "${EFI_TEST:=efi-tests}"
-+: "${EFI_CASE:=$(basename $1 .efi)}"
-+
-+if [ ! -f "$EFI_UEFI" ]; then
-+	echo "UEFI firmware not found: $EFI_UEFI"
-+	echo "Please install the UEFI firmware to this path"
-+	echo "Or specify the correct path with the env variable EFI_UEFI"
-+	exit 2
-+fi
-+
-+# Remove the TEST_CASE from $@
-+shift 1
-+
-+# Fish out the arguments for the test, they should be the next string
-+# after the "-append" option
-+qemu_args=()
-+cmd_args=()
-+while (( "$#" )); do
-+	if [ "$1" = "-append" ]; then
-+		cmd_args=$2
-+		shift 2
-+	else
-+		qemu_args+=("$1")
-+		shift 1
-+	fi
-+done
-+
-+if [ "$EFI_CASE" = "_NO_FILE_4Uhere_" ]; then
-+	EFI_CASE=dummy
-+fi
-+
-+: "${EFI_CASE_DIR:="$EFI_TEST/$EFI_CASE"}"
-+mkdir -p "$EFI_CASE_DIR"
-+
-+cp "$EFI_SRC/$EFI_CASE.efi" "$EFI_TEST/$EFI_CASE/"
-+echo "@echo -off" > "$EFI_TEST/$EFI_CASE/startup.nsh"
-+echo "$EFI_CASE.efi" "${cmd_args[@]}" >> "$EFI_TEST/$EFI_CASE/startup.nsh"
-+
-+EFI_RUN=y $TEST_DIR/run \
-+       -bios "$EFI_UEFI" \
-+       -drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
-+       "${qemu_args[@]}"
-diff --git a/arm/run b/arm/run
-index 12848912..62f845b3 100755
---- a/arm/run
-+++ b/arm/run
-@@ -65,8 +65,10 @@ if $qemu $M -chardev testdev,id=id -initrd . 2>&1 \
- 	exit 2
- fi
- 
--chr_testdev='-device virtio-serial-device'
--chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
-+if [ "$EFI_RUN" != "y" ]; then
-+	chr_testdev='-device virtio-serial-device'
-+	chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
-+fi
- 
- pci_testdev=
- if $qemu $M -device '?' 2>&1 | grep pci-testdev > /dev/null; then
-@@ -75,7 +77,11 @@ fi
- 
- A="-accel $ACCEL"
- command="$qemu -nodefaults $M $A -cpu $processor $chr_testdev $pci_testdev"
--command+=" -display none -serial stdio -kernel"
-+command+=" -display none -serial stdio"
- command="$(migration_cmd) $(timeout_cmd) $command"
- 
--run_qemu $command "$@"
-+if [ "$EFI_RUN" = "y" ]; then
-+	ENVIRON_DEFAULT=n run_qemu_status $command "$@"
-+else
-+	run_qemu $command -kernel "$@"
-+fi
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index f8794e9a..13eade26 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -130,11 +130,18 @@ function run()
-         done
-     fi
- 
--    last_line=$(premature_failure > >(tail -1)) && {
-+    log=$(premature_failure) && {
-         skip=true
--        if [ "${CONFIG_EFI}" == "y" ] && [[ "${last_line}" =~ "Dummy Hello World!" ]]; then
--            skip=false
-+        if [ "${CONFIG_EFI}" == "y" ]; then
-+            if [ "$ARCH" == "x86_64" ] &&
-+               [[ "$(tail -1 <<<"$log")" =~ "Dummy Hello World!" ]]; then
-+                   skip=false
-+            elif [ "$ARCH" == "arm64" ] &&
-+               [[ "$(tail -2 <<<"$log" | head -1)" =~ "Dummy Hello World!" ]]; then
-+                   skip=false
-+            fi
-         fi
-+
-         if [ ${skip} == true ]; then
-             print_result "SKIP" $testname "" "$last_line"
-             return 77
--- 
-2.25.1
-
+[*] https://lore.kernel.org/all/20230210003148.2646712-3-seanjc@google.com
