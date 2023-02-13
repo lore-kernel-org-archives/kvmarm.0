@@ -1,40 +1,40 @@
-Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
+Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47802A958
-	for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 18:02:41 +0000 (UTC)
-Received: by mail-il1-f201.google.com with SMTP id l7-20020a056e020dc700b0031534e3f1dbso3573832ilj.2
-        for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 10:02:41 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7D4A945
+	for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 18:02:42 +0000 (UTC)
+Received: by mail-io1-f73.google.com with SMTP id i124-20020a6b3b82000000b0073440a80b1aso8794153ioa.4
+        for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 10:02:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=70xvWuvYdaN0RHC9y2y+6cAohvWGNUH5IWQYtqhnjZE=;
-        b=URPZnrYEApr1It+IVm3J16L4qUg2cigXzrcfhjuyLm3gPm2LeW9+RwiQI/kFr/6ju1
-         QRO6gvU1kY6dLPzMq2+wCiHIcftw3NDrPbCYlTgca1cM2BNmpFb0BRx5X9OGtMV8iMKn
-         4GC9+VjpgnH3ZAy+lR+VvnIrWIq2xvRyCFftvMcT7dG5qXF65SenNlCXkyi51D30k9MG
-         Abkslkc8PQo9JTtVqLGYkkodvZP1FK5TTm+dDZmUgRPrThCwyXSKOQumFLGyGTRNrShi
-         Ag9sAoQFvgZNJPH5i4fSQ1WSw6K2yJobD3ohEm/lMQeQ/f+tIPe4oookQuuonepQMnv3
-         WQQA==
+        bh=AsmO5eDYgPGzRFknyAuV3lp4/AdQBm/C7SIWaQDWgzs=;
+        b=Cwyfu8Bq2PKtWPxrul5ebBEulrHVwsUaI40rkksHoY18wRNmgXilA9Ert3lhPhjxON
+         UCkt9lQB7j/+RRwya+RbcV290veQl/3Jw9F88H6SqsjLrU4nnVODSYYiH9eJRouyB6II
+         /qsFUZ1PIKaOYDahsLErY6Coe/tm9FDtSwspmSQtN/9CvXjv2wMaURvCiX889j+22PzX
+         vuO8LqDxX6XxAYUscu7nk0JOconpZMPtvAIYFtHR8VruBW6vPhrRKWjPWxxQXFkgIak3
+         EoV8Q6qNkksBj3c9dDHndoddsc+ebUAGqCjGhrZUp5yDhA/EKml6KO8XoFTYbGu4zm9S
+         Fz6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=70xvWuvYdaN0RHC9y2y+6cAohvWGNUH5IWQYtqhnjZE=;
-        b=E6thaSB4ilZd5QRYCxGWqYQxV8dt3nF6johcHegUaRpceBsdw67UDJ30Fw7EGuyFHH
-         O68rMXGBYlPOISPYTNIlj+53btF/DFJ+/+ZZNNecEOGoKBLwBt2qTaCG+cbv7mhoWQI4
-         bzuVeYPjpTf4HocS56kjuqwS6JVI4tgIMUflRTutMXAaTwNnR0XL8hvOwyo39kSYwr/g
-         c2Ov1CWiNRtdIayngVJLLumG3VLgMhEmFUh/rh6P22U5jk+aCFcbM5zTM9BTyk8VtXdk
-         TkQNp/Vj8Rpl40BgMZ7iZZdMVQkjEiLiQTwZbdWzRqyHuXtv8STf7DMxEWOBkAsvB2OG
-         DXlg==
-X-Gm-Message-State: AO0yUKUrKEGCf+E6DZ170GgTuVz9lgoW4p65GxtM5n95MtwJrzGqnTDz
-	Rm4SzCTC8gj290VXwW3UnuqTjcY2Xep0
-X-Google-Smtp-Source: AK7set/8lUVnM/xUxlc5ev5n38xMQU6UonaUcN7oe3E/mMvqt3yuPRKRB7RT8I01SIqBC8WTFb8l0KoRBFtB
+        bh=AsmO5eDYgPGzRFknyAuV3lp4/AdQBm/C7SIWaQDWgzs=;
+        b=zw8qpg+IqLlxIOTtvOrjZxwhFeL2F4tpucsvmZhes+Vlh0MD8oldiXGoizaBq8gY9P
+         CauYRfEHeARSuqnki/6rdnjgeygkVJ45fC3AXdjk/6mh2+nKi8VrU5wq7uEWm8jpW0mD
+         998dvT3rnPu0ndWmYLEHykRTWQrO9CRN2KKK/5SRaQ/pc4iqM75IxZrPcWrqCq2P1fxx
+         6Vk8RSkuPgpZZPFcUAUe/BO9k1rV7Mwndi7WsArXWpeCDikq0cIH6qxyRBMCtWC2S+8M
+         nJdeMOsoy6Dvwxi+fYE57cIl/KnX5BOmbEhVSub4c47huodK5S0l5sJVfffdfhQY6CBD
+         jzBQ==
+X-Gm-Message-State: AO0yUKXNaFtvJuyeaU9s+WxNqZD88irOa9PloQnlVSvhWWo+R3iWybZT
+	HFEPm4auclVcPYO4XissXuKqzuZ0tnDn
+X-Google-Smtp-Source: AK7set9pNf3dQ3WTwUtipCs3HqOPBdYIZEdSHW/5bEFYmaEXSbjn7kq84XWVTKBORlsRqT+UT9RJi2sQZ2qi
 X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a92:2613:0:b0:310:9afc:aa6 with SMTP id
- n19-20020a922613000000b003109afc0aa6mr2640960ile.0.1676311360373; Mon, 13 Feb
- 2023 10:02:40 -0800 (PST)
-Date: Mon, 13 Feb 2023 18:02:22 +0000
+ (user=rananta job=sendgmr) by 2002:a02:a144:0:b0:3c4:8536:446a with SMTP id
+ m4-20020a02a144000000b003c48536446amr241jah.1.1676311361559; Mon, 13 Feb 2023
+ 10:02:41 -0800 (PST)
+Date: Mon, 13 Feb 2023 18:02:23 +0000
 In-Reply-To: <20230213180234.2885032-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -44,9 +44,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20230213180234.2885032-1-rananta@google.com>
 X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230213180234.2885032-2-rananta@google.com>
-Subject: [PATCH 01/13] selftests: KVM: aarch64: Rename vpmu_counter_access.c
- to vpmu_test.c
+Message-ID: <20230213180234.2885032-3-rananta@google.com>
+Subject: [PATCH 02/13] selftests: KVM: aarch64: Refactor the vPMU counter
+ access tests
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Oliver Upton <oupton@google.com>, Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>, 
 	Ricardo Koller <ricarkol@google.com>, James Morse <james.morse@arm.com>, 
@@ -57,44 +57,310 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jing Zhang <jingzhangos@google.com>,
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-The upcoming patches would add more vPMU related tests to the file.
-Hence, rename it to be more generic.
+Refactor the existing counter access tests into its own
+independent functions and make running the tests generic
+to make way for the upcoming tests.
+
+No functional change intended.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- tools/testing/selftests/kvm/Makefile                            | 2 +-
- .../kvm/aarch64/{vpmu_counter_access.c => vpmu_test.c}          | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
- rename tools/testing/selftests/kvm/aarch64/{vpmu_counter_access.c => vpmu_test.c} (99%)
+ .../testing/selftests/kvm/aarch64/vpmu_test.c | 140 ++++++++++++------
+ 1 file changed, 98 insertions(+), 42 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index b27fea0ce5918..a4d262e139b18 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -143,7 +143,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/psci_test
- TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
--TEST_GEN_PROGS_aarch64 += aarch64/vpmu_counter_access
-+TEST_GEN_PROGS_aarch64 += aarch64/vpmu_test
- TEST_GEN_PROGS_aarch64 += access_tracking_perf_test
- TEST_GEN_PROGS_aarch64 += demand_paging_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-similarity index 99%
-rename from tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-rename to tools/testing/selftests/kvm/aarch64/vpmu_test.c
-index 453f0dd240f44..581be0c463ad1 100644
---- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
+index 581be0c463ad1..d72c3c9b9c39f 100644
+--- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
 +++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-@@ -1,6 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0-only
+@@ -147,6 +147,11 @@ static inline void disable_counter(int idx)
+ 	isb();
+ }
+ 
++static inline uint64_t get_pmcr_n(void)
++{
++	return FIELD_GET(ARMV8_PMU_PMCR_N, read_sysreg(pmcr_el0));
++}
++
  /*
-- * vpmu_counter_access - Test vPMU event counter access
-+ * vpmu_test - Test the vPMU
-  *
-  * Copyright (c) 2022 Google LLC.
-  *
+  * The pmc_accessor structure has pointers to PMEV{CNTR,TYPER}<n>_EL0
+  * accessors that test cases will use. Each of the accessors will
+@@ -183,6 +188,23 @@ struct pmc_accessor pmc_accessors[] = {
+ uint64_t expected_ec = INVALID_EC;
+ uint64_t op_end_addr;
+ 
++struct vpmu_vm {
++	struct kvm_vm *vm;
++	struct kvm_vcpu *vcpu;
++	int gic_fd;
++};
++
++enum test_stage {
++	TEST_STAGE_COUNTER_ACCESS = 1,
++};
++
++struct guest_data {
++	enum test_stage test_stage;
++	uint64_t expected_pmcr_n;
++};
++
++static struct guest_data guest_data;
++
+ static void guest_sync_handler(struct ex_regs *regs)
+ {
+ 	uint64_t esr, ec;
+@@ -295,7 +317,7 @@ static void test_bitmap_pmu_regs(int pmc_idx, bool set_op)
+ 		write_sysreg(test_bit, pmovsset_el0);
+ 
+ 		/* The bit will be set only if the counter is implemented */
+-		pmcr_n = FIELD_GET(ARMV8_PMU_PMCR_N, read_sysreg(pmcr_el0));
++		pmcr_n = get_pmcr_n();
+ 		set_expected = (pmc_idx < pmcr_n) ? true : false;
+ 	} else {
+ 		write_sysreg(test_bit, pmcntenclr_el0);
+@@ -424,15 +446,14 @@ static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
+  * if reading/writing PMU registers for implemented or unimplemented
+  * counters can work as expected.
+  */
+-static void guest_code(uint64_t expected_pmcr_n)
++static void guest_counter_access_test(uint64_t expected_pmcr_n)
+ {
+-	uint64_t pmcr, pmcr_n, unimp_mask;
++	uint64_t pmcr_n, unimp_mask;
+ 	int i, pmc;
+ 
+ 	GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS);
+ 
+-	pmcr = read_sysreg(pmcr_el0);
+-	pmcr_n = FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
++	pmcr_n = get_pmcr_n();
+ 
+ 	/* Make sure that PMCR_EL0.N indicates the value userspace set */
+ 	GUEST_ASSERT_2(pmcr_n == expected_pmcr_n, pmcr_n, expected_pmcr_n);
+@@ -462,6 +483,18 @@ static void guest_code(uint64_t expected_pmcr_n)
+ 		for (pmc = pmcr_n; pmc < ARMV8_PMU_MAX_GENERAL_COUNTERS; pmc++)
+ 			test_access_invalid_pmc_regs(&pmc_accessors[i], pmc);
+ 	}
++}
++
++static void guest_code(void)
++{
++	switch (guest_data.test_stage) {
++	case TEST_STAGE_COUNTER_ACCESS:
++		guest_counter_access_test(guest_data.expected_pmcr_n);
++		break;
++	default:
++		GUEST_ASSERT_1(0, guest_data.test_stage);
++	}
++
+ 	GUEST_DONE();
+ }
+ 
+@@ -469,14 +502,14 @@ static void guest_code(uint64_t expected_pmcr_n)
+ #define GICR_BASE_GPA	0x80A0000ULL
+ 
+ /* Create a VM that has one vCPU with PMUv3 configured. */
+-static struct kvm_vm *create_vpmu_vm(void *guest_code, struct kvm_vcpu **vcpup,
+-				     int *gic_fd)
++static struct vpmu_vm *create_vpmu_vm(void *guest_code)
+ {
+ 	struct kvm_vm *vm;
+ 	struct kvm_vcpu *vcpu;
+ 	struct kvm_vcpu_init init;
+ 	uint8_t pmuver, ec;
+ 	uint64_t dfr0, irq = 23;
++	struct vpmu_vm *vpmu_vm;
+ 	struct kvm_device_attr irq_attr = {
+ 		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
+ 		.attr = KVM_ARM_VCPU_PMU_V3_IRQ,
+@@ -487,7 +520,10 @@ static struct kvm_vm *create_vpmu_vm(void *guest_code, struct kvm_vcpu **vcpup,
+ 		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
+ 	};
+ 
+-	vm = vm_create(1);
++	vpmu_vm = calloc(1, sizeof(*vpmu_vm));
++	TEST_ASSERT(vpmu_vm, "Failed to allocate vpmu_vm");
++
++	vpmu_vm->vm = vm = vm_create(1);
+ 	vm_init_descriptor_tables(vm);
+ 	/* Catch exceptions for easier debugging */
+ 	for (ec = 0; ec < ESR_EC_NUM; ec++) {
+@@ -498,9 +534,9 @@ static struct kvm_vm *create_vpmu_vm(void *guest_code, struct kvm_vcpu **vcpup,
+ 	/* Create vCPU with PMUv3 */
+ 	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+ 	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
+-	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
++	vpmu_vm->vcpu = vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
+ 	vcpu_init_descriptor_tables(vcpu);
+-	*gic_fd = vgic_v3_setup(vm, 1, 64, GICD_BASE_GPA, GICR_BASE_GPA);
++	vpmu_vm->gic_fd = vgic_v3_setup(vm, 1, 64, GICD_BASE_GPA, GICR_BASE_GPA);
+ 
+ 	/* Make sure that PMUv3 support is indicated in the ID register */
+ 	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &dfr0);
+@@ -513,15 +549,21 @@ static struct kvm_vm *create_vpmu_vm(void *guest_code, struct kvm_vcpu **vcpup,
+ 	vcpu_ioctl(vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
+ 	vcpu_ioctl(vcpu, KVM_SET_DEVICE_ATTR, &init_attr);
+ 
+-	*vcpup = vcpu;
+-	return vm;
++	return vpmu_vm;
++}
++
++static void destroy_vpmu_vm(struct vpmu_vm *vpmu_vm)
++{
++	close(vpmu_vm->gic_fd);
++	kvm_vm_free(vpmu_vm->vm);
++	free(vpmu_vm);
+ }
+ 
+-static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
++static void run_vcpu(struct kvm_vcpu *vcpu)
+ {
+ 	struct ucall uc;
+ 
+-	vcpu_args_set(vcpu, 1, pmcr_n);
++	sync_global_to_guest(vcpu->vm, guest_data);
+ 	vcpu_run(vcpu);
+ 	switch (get_ucall(vcpu, &uc)) {
+ 	case UCALL_ABORT:
+@@ -539,16 +581,18 @@ static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
+  * Create a guest with one vCPU, set the PMCR_EL0.N for the vCPU to @pmcr_n,
+  * and run the test.
+  */
+-static void run_test(uint64_t pmcr_n)
++static void run_counter_access_test(uint64_t pmcr_n)
+ {
+-	struct kvm_vm *vm;
++	struct vpmu_vm *vpmu_vm;
+ 	struct kvm_vcpu *vcpu;
+-	int gic_fd;
+ 	uint64_t sp, pmcr, pmcr_orig;
+ 	struct kvm_vcpu_init init;
+ 
++	guest_data.expected_pmcr_n = pmcr_n;
++
+ 	pr_debug("Test with pmcr_n %lu\n", pmcr_n);
+-	vm = create_vpmu_vm(guest_code, &vcpu, &gic_fd);
++	vpmu_vm = create_vpmu_vm(guest_code);
++	vcpu = vpmu_vm->vcpu;
+ 
+ 	/* Save the initial sp to restore them later to run the guest again */
+ 	vcpu_get_reg(vcpu, ARM64_CORE_REG(sp_el1), &sp);
+@@ -559,23 +603,22 @@ static void run_test(uint64_t pmcr_n)
+ 	pmcr |= (pmcr_n << ARMV8_PMU_PMCR_N_SHIFT);
+ 	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), pmcr);
+ 
+-	run_vcpu(vcpu, pmcr_n);
++	run_vcpu(vcpu);
+ 
+ 	/*
+ 	 * Reset and re-initialize the vCPU, and run the guest code again to
+ 	 * check if PMCR_EL0.N is preserved.
+ 	 */
+-	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
++	vm_ioctl(vpmu_vm->vm, KVM_ARM_PREFERRED_TARGET, &init);
+ 	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
+ 	aarch64_vcpu_setup(vcpu, &init);
+ 	vcpu_init_descriptor_tables(vcpu);
+ 	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), sp);
+ 	vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
+ 
+-	run_vcpu(vcpu, pmcr_n);
++	run_vcpu(vcpu);
+ 
+-	close(gic_fd);
+-	kvm_vm_free(vm);
++	destroy_vpmu_vm(vpmu_vm);
+ }
+ 
+ /*
+@@ -583,15 +626,18 @@ static void run_test(uint64_t pmcr_n)
+  * the vCPU to @pmcr_n, which is larger than the host value.
+  * The attempt should fail as @pmcr_n is too big to set for the vCPU.
+  */
+-static void run_error_test(uint64_t pmcr_n)
++static void run_counter_access_error_test(uint64_t pmcr_n)
+ {
+-	struct kvm_vm *vm;
++	struct vpmu_vm *vpmu_vm;
+ 	struct kvm_vcpu *vcpu;
+-	int gic_fd, ret;
++	int ret;
+ 	uint64_t pmcr, pmcr_orig;
+ 
++	guest_data.expected_pmcr_n = pmcr_n;
++
+ 	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
+-	vm = create_vpmu_vm(guest_code, &vcpu, &gic_fd);
++	vpmu_vm = create_vpmu_vm(guest_code);
++	vcpu = vpmu_vm->vcpu;
+ 
+ 	/* Update the PMCR_EL0.N with @pmcr_n */
+ 	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr_orig);
+@@ -603,8 +649,25 @@ static void run_error_test(uint64_t pmcr_n)
+ 	TEST_ASSERT(ret, "Setting PMCR to 0x%lx (orig PMCR 0x%lx) didn't fail",
+ 		    pmcr, pmcr_orig);
+ 
+-	close(gic_fd);
+-	kvm_vm_free(vm);
++	destroy_vpmu_vm(vpmu_vm);
++}
++
++static void run_counter_access_tests(uint64_t pmcr_n)
++{
++	uint64_t i;
++
++	guest_data.test_stage = TEST_STAGE_COUNTER_ACCESS;
++
++	for (i = 0; i <= pmcr_n; i++)
++		run_counter_access_test(i);
++
++	for (i = pmcr_n + 1; i < ARMV8_PMU_MAX_COUNTERS; i++)
++		run_counter_access_error_test(i);
++}
++
++static void run_tests(uint64_t pmcr_n)
++{
++	run_counter_access_tests(pmcr_n);
+ }
+ 
+ /*
+@@ -613,30 +676,23 @@ static void run_error_test(uint64_t pmcr_n)
+  */
+ static uint64_t get_pmcr_n_limit(void)
+ {
+-	struct kvm_vm *vm;
+-	struct kvm_vcpu *vcpu;
+-	int gic_fd;
++	struct vpmu_vm *vpmu_vm;
+ 	uint64_t pmcr;
+ 
+-	vm = create_vpmu_vm(guest_code, &vcpu, &gic_fd);
+-	vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
+-	close(gic_fd);
+-	kvm_vm_free(vm);
++	vpmu_vm = create_vpmu_vm(guest_code);
++	vcpu_get_reg(vpmu_vm->vcpu, KVM_ARM64_SYS_REG(SYS_PMCR_EL0), &pmcr);
++	destroy_vpmu_vm(vpmu_vm);
+ 	return FIELD_GET(ARMV8_PMU_PMCR_N, pmcr);
+ }
+ 
+ int main(void)
+ {
+-	uint64_t i, pmcr_n;
++	uint64_t pmcr_n;
+ 
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_PMU_V3));
+ 
+ 	pmcr_n = get_pmcr_n_limit();
+-	for (i = 0; i <= pmcr_n; i++)
+-		run_test(i);
+-
+-	for (i = pmcr_n + 1; i < ARMV8_PMU_MAX_COUNTERS; i++)
+-		run_error_test(i);
++	run_tests(pmcr_n);
+ 
+ 	return 0;
+ }
 -- 
 2.39.1.581.gbfd45094c4-goog
 
