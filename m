@@ -1,417 +1,376 @@
-Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A0EA958
-	for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 18:02:54 +0000 (UTC)
-Received: by mail-il1-f201.google.com with SMTP id w3-20020a92d2c3000000b003152aeb055eso4826070ilg.11
-        for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 10:02:54 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D31AD20;
+	Mon, 13 Feb 2023 18:09:05 +0000 (UTC)
+Received: by mail-il1-f181.google.com with SMTP id h29so3694786ila.8;
+        Mon, 13 Feb 2023 10:09:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YKcCEtcasEy96yYR95uUDcecBsDQdV3knxsKnUz3/Gk=;
-        b=mnjrGM5wUez2KEVI/vFMV4+FbMOaoVOnfJ9xGgmJ4Zd0uoapoTt5c95+fncj1Ro61W
-         TUPQy0EqHajLx4de1Fdfds2Ob5QycOCdI8eHnPwd/MexlEbNJPqJVys/+MnhBemJq29N
-         ebNk/piULaEcMtvxd9QBPD5koG96A4AWJ6140gil1zQe/bYGnJWni59OsnV2d5tEhHNU
-         X8QeFM0m+JtgdYxf7dURm6TMD3wCQ6HecN9oWny4BBbrHhW+3+yPtkFaWufSdEvy3thw
-         ma3Cmg32IIfK0X5DtalBNaYeROcLkG7mk6jnQNONfmBTH2cxoarIDk15wHj6mi2GgKOq
-         41Lg==
+        d=gmail.com; s=20210112; t=1676311744;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7fCyiADTFkffN0YGHJqOV166FXiIeSdHDo8OhIMqjkY=;
+        b=iB2f4ocXCpV/FvA732vU9pTASYAVc7i5Pp7ET9ZmlcNG3pCoV1+X2dX6uP3seaxtsy
+         h34Ka+q2dLladO7aDKYYc/kTm8rjvypfFly7hGyodK49bKqBaHMvA1kwtWK/DjnL+3Q3
+         p++TXlk/KzI4iFUnCz+BFIvEfNSBpqWuVLrNvcaJ2sufKrA0PbEHKVKr6K2uSU2gVUTp
+         z7hwWgYfX1RMhsZJfuloHeXhAet3OnD9mVSN45EclvkorjgwpXsELDiwSCnvBvaomslJ
+         8M+L/d2Hbqu63dG8dEGSKzQa86DsUdIc2201a3C0enBVuNxBceggwTaBIEvRNXx3VjVy
+         EVIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YKcCEtcasEy96yYR95uUDcecBsDQdV3knxsKnUz3/Gk=;
-        b=IMqFljIX7kcf6ios8nL9NlfGuAfQ0Nf7NzCtHXTVJy3tEWdsHDXXr26H6DwiRNQ8a2
-         VYBAfTvIaGN+ItBHiECnLGXrD181AXHcDHpSDvZLqv/V87xQ7ETiIutUGwYlMmU683XF
-         Bbgv7gxV22XuJvniuugzS7cwbrOvwYc5lVzWDQs8WkIXRkKg+7eav4b4rtdphhbd8/cn
-         QrnxU5zbpaIhRI7oNm1hSjkT3XfgtSDO8KahYPHJDrlh4tKekE1/JTuULi6A1XZ+43Gp
-         eML25ro5gZR3Cpia+ypA0DAATyhe2XuOwBLqqrHog+pXmnsPa5HGgLpBGSMcynqyCtgf
-         xONA==
-X-Gm-Message-State: AO0yUKVa7TbB8DPe1PSKECHhVWwYIFUEmpvB8lseZDeTftBzz5CMWjUQ
-	EpzSTZmRexyCNStRFLQHsF9KFG6We8u/
-X-Google-Smtp-Source: AK7set9z6n5ru7Pp9s5RYw/d+TMzl0POKn/BVaGF5c9dcAeZ9wYFw3I4Z3GF+X4eobdissRqds0fajtDfTdM
-X-Received: from rananta-linux.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:22b5])
- (user=rananta job=sendgmr) by 2002:a92:b513:0:b0:310:a381:d0a2 with SMTP id
- f19-20020a92b513000000b00310a381d0a2mr2582318ile.0.1676311374044; Mon, 13 Feb
- 2023 10:02:54 -0800 (PST)
-Date: Mon, 13 Feb 2023 18:02:34 +0000
-In-Reply-To: <20230213180234.2885032-1-rananta@google.com>
+        d=1e100.net; s=20210112; t=1676311744;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7fCyiADTFkffN0YGHJqOV166FXiIeSdHDo8OhIMqjkY=;
+        b=Uy5m4YBUyL+DDe/BxYfa/Aq3O1ZrE47sDVt3JUEFIvi1ld8TAeBKi/PZrAlIFzFdMV
+         9GBVQOXzxxL1nBUBlAtt/0B6TxNpIfVlmZ5b6olcvDbJCiaSQGszrAIv6zj/80JviAvJ
+         I9sZk1NHJdRosnflYA3S/O5hH4VYJpP0U4+1jUSzmYM+oCmOkL7b8A+8vWMwAMMndRth
+         K6FZujRsklgfjH+b5UIptmzPpasp4hUWQ8GHQMajdBNiMbb7q4HNTAXhzA54zuFZlwHi
+         oLKtZfd8ZdAQM7yvvddp0nzNLU97L5YRln3oGBC1tT0CEQlBx6dctCgQP3qg1oQWiLpr
+         MPvA==
+X-Gm-Message-State: AO0yUKVITE5DSr6wzWuY4h3kX2Zb7kS9u+Gvlj/Vsg8sEaRET/SoTEfY
+	H7DbYxZgCNRmuCcLIXeg1UM=
+X-Google-Smtp-Source: AK7set8A20rRlZg2lkC+gCRHnVv3oU7t32KtOZKX/4p++cl5o7oKKY77zLgisxyfU9yajusxiGwY3g==
+X-Received: by 2002:a92:c74a:0:b0:314:11c9:955b with SMTP id y10-20020a92c74a000000b0031411c9955bmr10724389ilp.1.1676311744079;
+        Mon, 13 Feb 2023 10:09:04 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id g10-20020a92cdaa000000b0030314a7f039sm2868693ild.10.2023.02.13.10.09.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Feb 2023 10:09:03 -0800 (PST)
+Date: Mon, 13 Feb 2023 20:08:57 +0200
+From: Zhi Wang <zhi.wang.linux@gmail.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Catalin Marinas
+ <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
+ <will@kernel.org>, James Morse <james.morse@arm.com>, Oliver Upton
+ <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, Alexandru
+ Elisei <alexandru.elisei@arm.com>, Christoffer Dall
+ <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev
+Subject: Re: [RFC PATCH 10/28] arm64: RME: Allocate/free RECs to match vCPUs
+Message-ID: <20230213200857.00007575@gmail.com>
+In-Reply-To: <20230127112932.38045-11-steven.price@arm.com>
+References: <20230127112248.136810-1-suzuki.poulose@arm.com>
+	<20230127112932.38045-1-steven.price@arm.com>
+	<20230127112932.38045-11-steven.price@arm.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20230213180234.2885032-1-rananta@google.com>
-X-Mailer: git-send-email 2.39.1.581.gbfd45094c4-goog
-Message-ID: <20230213180234.2885032-14-rananta@google.com>
-Subject: [PATCH 13/13] selftests: KVM: aarch64: Extend the vCPU migration test
- to multi-vCPUs
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: Oliver Upton <oupton@google.com>, Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Ricardo Koller <ricarkol@google.com>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jing Zhang <jingzhangos@google.com>, 
-	Colton Lewis <coltonlewis@google.com>, Raghavendra Rao Anata <rananta@google.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-To test KVM's handling of multiple vCPU contexts together, that are
-frequently migrating across random pCPUs in the system, extend the test
-to create a VM with multiple vCPUs and validate the behavior.
+On Fri, 27 Jan 2023 11:29:14 +0000
+Steven Price <steven.price@arm.com> wrote:
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- .../testing/selftests/kvm/aarch64/vpmu_test.c | 166 ++++++++++++------
- 1 file changed, 114 insertions(+), 52 deletions(-)
+> The RMM maintains a data structure known as the Realm Execution Context
+> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
+> virtual CPUs. KVM must delegate memory and request the structures are
+> created when vCPUs are created, and suitably tear down on destruction.
+> 
 
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_test.c b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-index 239fc7e06b3b9..c9d8e5f9a22ab 100644
---- a/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/vpmu_test.c
-@@ -19,11 +19,12 @@
-  * higher exception levels (EL2, EL3). Verify this functionality by
-  * configuring and trying to count the events for EL2 in the guest.
-  *
-- * 4. Since the PMU registers are per-cpu, stress KVM by frequently
-- * migrating the guest vCPU to random pCPUs in the system, and check
-- * if the vPMU is still behaving as expected. The sub-tests include
-- * testing basic functionalities such as basic counters behavior,
-- * overflow, overflow interrupts, and chained events.
-+ * 4. Since the PMU registers are per-cpu, stress KVM by creating a
-+ * multi-vCPU VM, then frequently migrate the guest vCPUs to random
-+ * pCPUs in the system, and check if the vPMU is still behaving as
-+ * expected. The sub-tests include testing basic functionalities such
-+ * as basic counters behavior, overflow, overflow interrupts, and
-+ * chained events.
-  *
-  * Copyright (c) 2022 Google LLC.
-  *
-@@ -348,19 +349,22 @@ struct guest_irq_data {
- 	struct spinlock lock;
- };
- 
--static struct guest_irq_data guest_irq_data;
-+static struct guest_irq_data guest_irq_data[KVM_MAX_VCPUS];
- 
- #define VCPU_MIGRATIONS_TEST_ITERS_DEF		1000
- #define VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS	2
-+#define VCPU_MIGRATIONS_TEST_NR_VPUS_DEF	2
- 
- struct test_args {
- 	int vcpu_migration_test_iter;
- 	int vcpu_migration_test_migrate_freq_ms;
-+	int vcpu_migration_test_nr_vcpus;
- };
- 
- static struct test_args test_args = {
- 	.vcpu_migration_test_iter = VCPU_MIGRATIONS_TEST_ITERS_DEF,
- 	.vcpu_migration_test_migrate_freq_ms = VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS,
-+	.vcpu_migration_test_nr_vcpus = VCPU_MIGRATIONS_TEST_NR_VPUS_DEF,
- };
- 
- static void guest_sync_handler(struct ex_regs *regs)
-@@ -396,26 +400,34 @@ static void guest_validate_irq(int pmc_idx, uint32_t pmovsclr, uint32_t pmc_idx_
- 	}
- }
- 
-+static struct guest_irq_data *get_irq_data(void)
-+{
-+	uint32_t cpu = guest_get_vcpuid();
-+
-+	return &guest_irq_data[cpu];
-+}
-+
- static void guest_irq_handler(struct ex_regs *regs)
- {
- 	uint32_t pmc_idx_bmap;
- 	uint64_t i, pmcr_n = get_pmcr_n();
- 	uint32_t pmovsclr = read_pmovsclr();
- 	unsigned int intid = gic_get_and_ack_irq();
-+	struct guest_irq_data *irq_data = get_irq_data();
- 
- 	/* No other IRQ apart from the PMU IRQ is expected */
- 	GUEST_ASSERT_1(intid == PMU_IRQ, intid);
- 
--	spin_lock(&guest_irq_data.lock);
--	pmc_idx_bmap = READ_ONCE(guest_irq_data.pmc_idx_bmap);
-+	spin_lock(&irq_data->lock);
-+	pmc_idx_bmap = READ_ONCE(irq_data->pmc_idx_bmap);
- 
- 	for (i = 0; i < pmcr_n; i++)
- 		guest_validate_irq(i, pmovsclr, pmc_idx_bmap);
- 	guest_validate_irq(ARMV8_PMU_CYCLE_COUNTER_IDX, pmovsclr, pmc_idx_bmap);
- 
- 	/* Mark IRQ as recived for the corresponding PMCs */
--	WRITE_ONCE(guest_irq_data.irq_received_bmap, pmovsclr);
--	spin_unlock(&guest_irq_data.lock);
-+	WRITE_ONCE(irq_data->irq_received_bmap, pmovsclr);
-+	spin_unlock(&irq_data->lock);
- 
- 	gic_set_eoi(intid);
- }
-@@ -423,35 +435,40 @@ static void guest_irq_handler(struct ex_regs *regs)
- static int pmu_irq_received(int pmc_idx)
- {
- 	bool irq_received;
-+	struct guest_irq_data *irq_data = get_irq_data();
- 
--	spin_lock(&guest_irq_data.lock);
--	irq_received = READ_ONCE(guest_irq_data.irq_received_bmap) & BIT(pmc_idx);
--	WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_idx_bmap & ~BIT(pmc_idx));
--	spin_unlock(&guest_irq_data.lock);
-+	spin_lock(&irq_data->lock);
-+	irq_received = READ_ONCE(irq_data->irq_received_bmap) & BIT(pmc_idx);
-+	WRITE_ONCE(irq_data->irq_received_bmap, irq_data->pmc_idx_bmap & ~BIT(pmc_idx));
-+	spin_unlock(&irq_data->lock);
- 
- 	return irq_received;
- }
- 
- static void pmu_irq_init(int pmc_idx)
- {
-+	struct guest_irq_data *irq_data = get_irq_data();
-+
- 	write_pmovsclr(BIT(pmc_idx));
- 
--	spin_lock(&guest_irq_data.lock);
--	WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_idx_bmap & ~BIT(pmc_idx));
--	WRITE_ONCE(guest_irq_data.pmc_idx_bmap, guest_irq_data.pmc_idx_bmap | BIT(pmc_idx));
--	spin_unlock(&guest_irq_data.lock);
-+	spin_lock(&irq_data->lock);
-+	WRITE_ONCE(irq_data->irq_received_bmap, irq_data->pmc_idx_bmap & ~BIT(pmc_idx));
-+	WRITE_ONCE(irq_data->pmc_idx_bmap, irq_data->pmc_idx_bmap | BIT(pmc_idx));
-+	spin_unlock(&irq_data->lock);
- 
- 	enable_irq(pmc_idx);
- }
- 
- static void pmu_irq_exit(int pmc_idx)
- {
-+	struct guest_irq_data *irq_data = get_irq_data();
-+
- 	write_pmovsclr(BIT(pmc_idx));
- 
--	spin_lock(&guest_irq_data.lock);
--	WRITE_ONCE(guest_irq_data.irq_received_bmap, guest_irq_data.pmc_idx_bmap & ~BIT(pmc_idx));
--	WRITE_ONCE(guest_irq_data.pmc_idx_bmap, guest_irq_data.pmc_idx_bmap & ~BIT(pmc_idx));
--	spin_unlock(&guest_irq_data.lock);
-+	spin_lock(&irq_data->lock);
-+	WRITE_ONCE(irq_data->irq_received_bmap, irq_data->pmc_idx_bmap & ~BIT(pmc_idx));
-+	WRITE_ONCE(irq_data->pmc_idx_bmap, irq_data->pmc_idx_bmap & ~BIT(pmc_idx));
-+	spin_unlock(&irq_data->lock);
- 
- 	disable_irq(pmc_idx);
- }
-@@ -783,7 +800,8 @@ static void test_event_count(uint64_t event, int pmc_idx, bool expect_count)
- static void test_basic_pmu_functionality(void)
- {
- 	local_irq_disable();
--	gic_init(GIC_V3, 1, (void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA);
-+	gic_init(GIC_V3, test_args.vcpu_migration_test_nr_vcpus,
-+			(void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA);
- 	gic_irq_enable(PMU_IRQ);
- 	local_irq_enable();
- 
-@@ -1093,11 +1111,13 @@ static void guest_evtype_filter_test(void)
- 
- static void guest_vcpu_migration_test(void)
- {
-+	int iter = test_args.vcpu_migration_test_iter;
-+
- 	/*
- 	 * While the userspace continuously migrates this vCPU to random pCPUs,
- 	 * run basic PMU functionalities and verify the results.
- 	 */
--	while (test_args.vcpu_migration_test_iter--)
-+	while (iter--)
- 		test_basic_pmu_functionality();
- }
- 
-@@ -1472,17 +1492,23 @@ static void run_kvm_evtype_filter_test(void)
- 
- struct vcpu_migrate_data {
- 	struct vpmu_vm *vpmu_vm;
--	pthread_t *pt_vcpu;
--	bool vcpu_done;
-+	pthread_t *pt_vcpus;
-+	unsigned long *vcpu_done_map;
-+	pthread_mutex_t vcpu_done_map_lock;
- };
- 
-+struct vcpu_migrate_data migrate_data;
-+
- static void *run_vcpus_migrate_test_func(void *arg)
- {
--	struct vcpu_migrate_data *migrate_data = arg;
--	struct vpmu_vm *vpmu_vm = migrate_data->vpmu_vm;
-+	struct vpmu_vm *vpmu_vm = migrate_data.vpmu_vm;
-+	unsigned int vcpu_idx = (unsigned long)arg;
- 
--	run_vcpu(vpmu_vm->vcpus[0]);
--	migrate_data->vcpu_done = true;
-+	run_vcpu(vpmu_vm->vcpus[vcpu_idx]);
-+
-+	pthread_mutex_lock(&migrate_data.vcpu_done_map_lock);
-+	__set_bit(vcpu_idx, migrate_data.vcpu_done_map);
-+	pthread_mutex_unlock(&migrate_data.vcpu_done_map_lock);
- 
- 	return NULL;
- }
-@@ -1504,7 +1530,7 @@ static uint32_t get_pcpu(void)
- 	return pcpu;
- }
- 
--static int migrate_vcpu(struct vcpu_migrate_data *migrate_data)
-+static int migrate_vcpu(int vcpu_idx)
- {
- 	int ret;
- 	cpu_set_t cpuset;
-@@ -1513,9 +1539,9 @@ static int migrate_vcpu(struct vcpu_migrate_data *migrate_data)
- 	CPU_ZERO(&cpuset);
- 	CPU_SET(new_pcpu, &cpuset);
- 
--	pr_debug("Migrating vCPU to pCPU: %u\n", new_pcpu);
-+	pr_debug("Migrating vCPU %d to pCPU: %u\n", vcpu_idx, new_pcpu);
- 
--	ret = pthread_setaffinity_np(*migrate_data->pt_vcpu, sizeof(cpuset), &cpuset);
-+	ret = pthread_setaffinity_np(migrate_data.pt_vcpus[vcpu_idx], sizeof(cpuset), &cpuset);
- 
- 	/* Allow the error where the vCPU thread is already finished */
- 	TEST_ASSERT(ret == 0 || ret == ESRCH,
-@@ -1526,48 +1552,74 @@ static int migrate_vcpu(struct vcpu_migrate_data *migrate_data)
- 
- static void *vcpus_migrate_func(void *arg)
- {
--	struct vcpu_migrate_data *migrate_data = arg;
-+	struct vpmu_vm *vpmu_vm = migrate_data.vpmu_vm;
-+	int i, n_done, nr_vcpus = vpmu_vm->nr_vcpus;
-+	bool vcpu_done;
- 
--	while (!migrate_data->vcpu_done) {
-+	do {
- 		usleep(msecs_to_usecs(test_args.vcpu_migration_test_migrate_freq_ms));
--		migrate_vcpu(migrate_data);
--	}
-+		for (n_done = 0, i = 0; i < nr_vcpus; i++) {
-+			pthread_mutex_lock(&migrate_data.vcpu_done_map_lock);
-+			vcpu_done = test_bit(i, migrate_data.vcpu_done_map);
-+			pthread_mutex_unlock(&migrate_data.vcpu_done_map_lock);
-+
-+			if (vcpu_done) {
-+				n_done++;
-+				continue;
-+			}
-+
-+			migrate_vcpu(i);
-+		}
-+
-+	} while (nr_vcpus != n_done);
- 
- 	return NULL;
- }
- 
- static void run_vcpu_migration_test(uint64_t pmcr_n)
- {
--	int ret;
-+	int i, nr_vcpus, ret;
- 	struct vpmu_vm *vpmu_vm;
--	pthread_t pt_vcpu, pt_sched;
--	struct vcpu_migrate_data migrate_data = {
--		.pt_vcpu = &pt_vcpu,
--		.vcpu_done = false,
--	};
-+	pthread_t pt_sched, *pt_vcpus;
- 
- 	__TEST_REQUIRE(get_nprocs() >= 2, "At least two pCPUs needed for vCPU migration test");
- 
- 	guest_data.test_stage = TEST_STAGE_VCPU_MIGRATION;
- 	guest_data.expected_pmcr_n = pmcr_n;
- 
--	migrate_data.vpmu_vm = vpmu_vm = create_vpmu_vm(1, guest_code, NULL);
-+	nr_vcpus = test_args.vcpu_migration_test_nr_vcpus;
-+
-+	migrate_data.vcpu_done_map = bitmap_zalloc(nr_vcpus);
-+	TEST_ASSERT(migrate_data.vcpu_done_map, "Failed to create vCPU done bitmap");
-+	pthread_mutex_init(&migrate_data.vcpu_done_map_lock, NULL);
-+
-+	migrate_data.pt_vcpus = pt_vcpus = calloc(nr_vcpus, sizeof(*pt_vcpus));
-+	TEST_ASSERT(pt_vcpus, "Failed to create vCPU thread pointers");
-+
-+	migrate_data.vpmu_vm = vpmu_vm = create_vpmu_vm(nr_vcpus, guest_code, NULL);
- 
- 	/* Initialize random number generation for migrating vCPUs to random pCPUs */
- 	srand(time(NULL));
- 
--	/* Spawn a vCPU thread */
--	ret = pthread_create(&pt_vcpu, NULL, run_vcpus_migrate_test_func, &migrate_data);
--	TEST_ASSERT(!ret, "Failed to create the vCPU thread");
-+	/* Spawn vCPU threads */
-+	for (i = 0; i < nr_vcpus; i++) {
-+		ret = pthread_create(&pt_vcpus[i], NULL,
-+					run_vcpus_migrate_test_func,  (void *)(unsigned long)i);
-+		TEST_ASSERT(!ret, "Failed to create the vCPU thread: %d", i);
-+	}
- 
- 	/* Spawn a scheduler thread to force-migrate vCPUs to various pCPUs */
--	ret = pthread_create(&pt_sched, NULL, vcpus_migrate_func, &migrate_data);
-+	ret = pthread_create(&pt_sched, NULL, vcpus_migrate_func, NULL);
- 	TEST_ASSERT(!ret, "Failed to create the scheduler thread for migrating the vCPUs");
- 
- 	pthread_join(pt_sched, NULL);
--	pthread_join(pt_vcpu, NULL);
-+
-+	for (i = 0; i < nr_vcpus; i++)
-+		pthread_join(pt_vcpus[i], NULL);
- 
- 	destroy_vpmu_vm(vpmu_vm);
-+	free(pt_vcpus);
-+	bitmap_free(migrate_data.vcpu_done_map);
- }
- 
- static void run_tests(uint64_t pmcr_n)
-@@ -1596,12 +1648,14 @@ static uint64_t get_pmcr_n_limit(void)
- 
- static void print_help(char *name)
- {
--	pr_info("Usage: %s [-h] [-i vcpu_migration_test_iterations] [-m vcpu_migration_freq_ms]\n",
--		name);
-+	pr_info("Usage: %s [-h] [-i vcpu_migration_test_iterations] [-m vcpu_migration_freq_ms]"
-+		"[-n vcpu_migration_nr_vcpus]\n", name);
- 	pr_info("\t-i: Number of iterations of vCPU migrations test (default: %u)\n",
- 		VCPU_MIGRATIONS_TEST_ITERS_DEF);
- 	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. (default: %u)\n",
- 		VCPU_MIGRATIONS_TEST_MIGRATION_FREQ_MS);
-+	pr_info("\t-n: Number of vCPUs for vCPU migrations test. (default: %u)\n",
-+		VCPU_MIGRATIONS_TEST_NR_VPUS_DEF);
- 	pr_info("\t-h: print this help screen\n");
- }
- 
-@@ -1609,7 +1663,7 @@ static bool parse_args(int argc, char *argv[])
- {
- 	int opt;
- 
--	while ((opt = getopt(argc, argv, "hi:m:")) != -1) {
-+	while ((opt = getopt(argc, argv, "hi:m:n:")) != -1) {
- 		switch (opt) {
- 		case 'i':
- 			test_args.vcpu_migration_test_iter =
-@@ -1619,6 +1673,14 @@ static bool parse_args(int argc, char *argv[])
- 			test_args.vcpu_migration_test_migrate_freq_ms =
- 				atoi_positive("vCPU migration frequency", optarg);
- 			break;
-+		case 'n':
-+			test_args.vcpu_migration_test_nr_vcpus =
-+				atoi_positive("Nr vCPUs for vCPU migrations", optarg);
-+			if (test_args.vcpu_migration_test_nr_vcpus > KVM_MAX_VCPUS) {
-+				pr_info("Max allowed vCPUs: %u\n", KVM_MAX_VCPUS);
-+				goto err;
-+			}
-+			break;
- 		case 'h':
- 		default:
- 			goto err;
--- 
-2.39.1.581.gbfd45094c4-goog
+It would be better to leave some pointers to the spec here. It really saves
+time for reviewers. 
+
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |   2 +
+>  arch/arm64/include/asm/kvm_host.h    |   3 +
+>  arch/arm64/include/asm/kvm_rme.h     |  10 ++
+>  arch/arm64/kvm/arm.c                 |   1 +
+>  arch/arm64/kvm/reset.c               |  11 ++
+>  arch/arm64/kvm/rme.c                 | 144 +++++++++++++++++++++++++++
+>  6 files changed, 171 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 5a2b7229e83f..285e62914ca4 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -504,6 +504,8 @@ static inline enum realm_state kvm_realm_state(struct kvm *kvm)
+>  
+>  static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
+>  {
+> +	if (static_branch_unlikely(&kvm_rme_is_available))
+> +		return vcpu->arch.rec.mpidr != INVALID_HWID;
+>  	return false;
+>  }
+>  
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 04347c3a8c6b..ef497b718cdb 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -505,6 +505,9 @@ struct kvm_vcpu_arch {
+>  		u64 last_steal;
+>  		gpa_t base;
+>  	} steal;
+> +
+> +	/* Realm meta data */
+> +	struct rec rec;
+
+I think the name of the data structure "rec" needs a prefix, it is too common
+and might conflict with the private data structures in the other modules. Maybe
+rme_rec or realm_rec?
+>  };
+>  
+>  /*
+> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+> index eea5118dfa8a..4b219ebe1400 100644
+> --- a/arch/arm64/include/asm/kvm_rme.h
+> +++ b/arch/arm64/include/asm/kvm_rme.h
+> @@ -6,6 +6,7 @@
+>  #ifndef __ASM_KVM_RME_H
+>  #define __ASM_KVM_RME_H
+>  
+> +#include <asm/rmi_smc.h>
+>  #include <uapi/linux/kvm.h>
+>  
+>  enum realm_state {
+> @@ -29,6 +30,13 @@ struct realm {
+>  	unsigned int ia_bits;
+>  };
+>  
+> +struct rec {
+> +	unsigned long mpidr;
+> +	void *rec_page;
+> +	struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
+> +	struct rec_run *run;
+> +};
+> +
+
+It is better to leave some comments for above members or pointers to the spec,
+that saves a lot of time for review.
+
+>  int kvm_init_rme(void);
+>  u32 kvm_realm_ipa_limit(void);
+>  
+> @@ -36,6 +44,8 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+>  int kvm_init_realm_vm(struct kvm *kvm);
+>  void kvm_destroy_realm(struct kvm *kvm);
+>  void kvm_realm_destroy_rtts(struct realm *realm, u32 ia_bits, u32 start_level);
+> +int kvm_create_rec(struct kvm_vcpu *vcpu);
+> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
+>  
+>  #define RME_RTT_BLOCK_LEVEL	2
+>  #define RME_RTT_MAX_LEVEL	3
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index badd775547b8..52affed2f3cf 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -373,6 +373,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  	/* Force users to call KVM_ARM_VCPU_INIT */
+>  	vcpu->arch.target = -1;
+>  	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
+> +	vcpu->arch.rec.mpidr = INVALID_HWID;
+>  
+>  	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+>  
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 9e71d69e051f..0c84392a4bf2 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -135,6 +135,11 @@ int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
+>  			return -EPERM;
+>  
+>  		return kvm_vcpu_finalize_sve(vcpu);
+> +	case KVM_ARM_VCPU_REC:
+> +		if (!kvm_is_realm(vcpu->kvm))
+> +			return -EINVAL;
+> +
+> +		return kvm_create_rec(vcpu);
+>  	}
+>  
+>  	return -EINVAL;
+> @@ -145,6 +150,11 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
+>  	if (vcpu_has_sve(vcpu) && !kvm_arm_vcpu_sve_finalized(vcpu))
+>  		return false;
+>  
+> +	if (kvm_is_realm(vcpu->kvm) &&
+> +	    !(vcpu_is_rec(vcpu) &&
+> +	      READ_ONCE(vcpu->kvm->arch.realm.state) == REALM_STATE_ACTIVE))
+> +		return false;
+
+That's why it is better to introduce the realm state in the previous patches so
+that people can really get the idea of the states at this stage.
+
+> +
+>  	return true;
+>  }
+>  
+> @@ -157,6 +167,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  	if (sve_state)
+>  		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
+>  	kfree(sve_state);
+> +	kvm_destroy_rec(vcpu);
+>  }
+>  
+>  static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+> index f7b0e5a779f8..d79ed889ca4d 100644
+> --- a/arch/arm64/kvm/rme.c
+> +++ b/arch/arm64/kvm/rme.c
+> @@ -514,6 +514,150 @@ void kvm_destroy_realm(struct kvm *kvm)
+>  	kvm_free_stage2_pgd(&kvm->arch.mmu);
+>  }
+>  
+> +static void free_rec_aux(struct page **aux_pages,
+> +			 unsigned int num_aux)
+> +{
+> +	unsigned int i;
+> +
+> +	for (i = 0; i < num_aux; i++) {
+> +		phys_addr_t aux_page_phys = page_to_phys(aux_pages[i]);
+> +
+> +		if (WARN_ON(rmi_granule_undelegate(aux_page_phys)))
+> +			continue;
+> +
+> +		__free_page(aux_pages[i]);
+> +	}
+> +}
+> +
+> +static int alloc_rec_aux(struct page **aux_pages,
+> +			 u64 *aux_phys_pages,
+> +			 unsigned int num_aux)
+> +{
+> +	int ret;
+> +	unsigned int i;
+> +
+> +	for (i = 0; i < num_aux; i++) {
+> +		struct page *aux_page;
+> +		phys_addr_t aux_page_phys;
+> +
+> +		aux_page = alloc_page(GFP_KERNEL);
+> +		if (!aux_page) {
+> +			ret = -ENOMEM;
+> +			goto out_err;
+> +		}
+> +		aux_page_phys = page_to_phys(aux_page);
+> +		if (rmi_granule_delegate(aux_page_phys)) {
+> +			__free_page(aux_page);
+> +			ret = -ENXIO;
+> +			goto out_err;
+> +		}
+> +		aux_pages[i] = aux_page;
+> +		aux_phys_pages[i] = aux_page_phys;
+> +	}
+> +
+> +	return 0;
+> +out_err:
+> +	free_rec_aux(aux_pages, i);
+> +	return ret;
+> +}
+> +
+> +int kvm_create_rec(struct kvm_vcpu *vcpu)
+> +{
+> +	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
+> +	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
+> +	struct realm *realm = &vcpu->kvm->arch.realm;
+> +	struct rec *rec = &vcpu->arch.rec;
+> +	unsigned long rec_page_phys;
+> +	struct rec_params *params;
+> +	int r, i;
+> +
+> +	if (kvm_realm_state(vcpu->kvm) != REALM_STATE_NEW)
+> +		return -ENOENT;
+> +
+> +	/*
+> +	 * The RMM will report PSCI v1.0 to Realms and the KVM_ARM_VCPU_PSCI_0_2
+> +	 * flag covers v0.2 and onwards.
+> +	 */
+> +	if (!test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features))
+> +		return -EINVAL;
+> +
+> +	BUILD_BUG_ON(sizeof(*params) > PAGE_SIZE);
+> +	BUILD_BUG_ON(sizeof(*rec->run) > PAGE_SIZE);
+> +
+> +	params = (struct rec_params *)get_zeroed_page(GFP_KERNEL);
+> +	rec->rec_page = (void *)__get_free_page(GFP_KERNEL);
+> +	rec->run = (void *)get_zeroed_page(GFP_KERNEL);
+> +	if (!params || !rec->rec_page || !rec->run) {
+> +		r = -ENOMEM;
+> +		goto out_free_pages;
+> +	}
+> +
+> +	for (i = 0; i < ARRAY_SIZE(params->gprs); i++)
+> +		params->gprs[i] = vcpu_regs->regs[i];
+> +
+> +	params->pc = vcpu_regs->pc;
+> +
+> +	if (vcpu->vcpu_id == 0)
+> +		params->flags |= REC_PARAMS_FLAG_RUNNABLE;
+> +
+> +	rec_page_phys = virt_to_phys(rec->rec_page);
+> +
+> +	if (rmi_granule_delegate(rec_page_phys)) {
+> +		r = -ENXIO;
+> +		goto out_free_pages;
+> +	}
+> +
+
+Wouldn't it be better to extend the alloc_rec_aux() to allocate and delegate
+pages above? so that you can same some gfps and rmi_granuale_delegates().
+
+> +	r = alloc_rec_aux(rec->aux_pages, params->aux, realm->num_aux);
+> +	if (r)
+> +		goto out_undelegate_rmm_rec;
+> +
+> +	params->num_rec_aux = realm->num_aux;
+> +	params->mpidr = mpidr;
+> +
+> +	if (rmi_rec_create(rec_page_phys,
+> +			   virt_to_phys(realm->rd),
+> +			   virt_to_phys(params))) {
+> +		r = -ENXIO;
+> +		goto out_free_rec_aux;
+> +	}
+> +
+> +	rec->mpidr = mpidr;
+> +
+> +	free_page((unsigned long)params);
+> +	return 0;
+> +
+> +out_free_rec_aux:
+> +	free_rec_aux(rec->aux_pages, realm->num_aux);
+> +out_undelegate_rmm_rec:
+> +	if (WARN_ON(rmi_granule_undelegate(rec_page_phys)))
+> +		rec->rec_page = NULL;
+> +out_free_pages:
+> +	free_page((unsigned long)rec->run);
+> +	free_page((unsigned long)rec->rec_page);
+> +	free_page((unsigned long)params);
+> +	return r;
+> +}
+> +
+> +void kvm_destroy_rec(struct kvm_vcpu *vcpu)
+> +{
+> +	struct realm *realm = &vcpu->kvm->arch.realm;
+> +	struct rec *rec = &vcpu->arch.rec;
+> +	unsigned long rec_page_phys;
+> +
+> +	if (!vcpu_is_rec(vcpu))
+> +		return;
+> +
+> +	rec_page_phys = virt_to_phys(rec->rec_page);
+> +
+> +	if (WARN_ON(rmi_rec_destroy(rec_page_phys)))
+> +		return;
+> +	if (WARN_ON(rmi_granule_undelegate(rec_page_phys)))
+> +		return;
+> +
+
+The two returns above feels off. What is the reason to skip the below page
+undelegates?
+
+> +	free_rec_aux(rec->aux_pages, realm->num_aux);
+> +	free_page((unsigned long)rec->rec_page);
+> +}
+> +
+>  int kvm_init_realm_vm(struct kvm *kvm)
+>  {
+>  	struct realm_params *params;
 
