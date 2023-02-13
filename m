@@ -1,131 +1,96 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3FC78F5F;
-	Mon, 13 Feb 2023 15:59:11 +0000 (UTC)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 840444B3;
-	Mon, 13 Feb 2023 07:59:53 -0800 (PST)
-Received: from [10.57.13.51] (unknown [10.57.13.51])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9CC353F703;
-	Mon, 13 Feb 2023 07:59:07 -0800 (PST)
-Message-ID: <748a6bcf-ec16-0870-8e33-bc29ab311211@arm.com>
-Date: Mon, 13 Feb 2023 15:59:05 +0000
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9998F5F
+	for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 16:01:34 +0000 (UTC)
+Received: by mail-pj1-f51.google.com with SMTP id a8-20020a17090a6d8800b002336b48f653so11364828pjk.3
+        for <kvmarm@lists.linux.dev>; Mon, 13 Feb 2023 08:01:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HfKMheuMnk2N2hnnABuf2/07WBxZ/fjWOaNC2gda/eQ=;
+        b=mNDXaatgSfc8naau84uWhzZcsql/fhj3yH/4/0kDcOgwGklnFmSAmam+weDVjFDPnu
+         o/dNPkJRxgPzStSSXOzCPlKQHOT0rb1Ih5t3qQ/IavNTDo1OoNRMiinqeh7Ee4fn3eXb
+         EoNI1vgOk2Dq2bsBgMzYsRToCf3fb5a+jV+BZv5civX3pinCfmB7QXggCoOlEnVepa37
+         9oQSMyT9VLDj8RcT+FzXG9eLNmroee+DVezSCupMGXJcWs35TLeIe1KX0EYjb5OlR2k9
+         6xtMpiYoCALs3pjnk5Ls4CzSACzmeO19HHhb1KXsD506/MCMr3O7Boopf2Oi6JyTL0Oe
+         httg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HfKMheuMnk2N2hnnABuf2/07WBxZ/fjWOaNC2gda/eQ=;
+        b=hy5gecvbh2wS1JdCtOF+Ez1UGRlWHfgg2g0a6MiFJhboBvfbrafFrHOo4dUo1gW0NF
+         aY01PTkdTU7IUZ94BxlEbeoWGa78QKOAynBw5tPOu5tISnMnijMavxwL1pWbp07F+myy
+         VMW60Cx6ob6lpdynSF4HDLYLRuRM3VazBslcnJ/CMPUUOmF4rLeiceBTxa8DGDQfG8rM
+         3h7inns3F4wRt2sh79bwJHYE2PpeS+MllSMUGsM7UV6qIjhmmDl91Xdr105MKBoUskBK
+         yvzheBunB6PH/rRlMFwf28deG48ZxCH8IyY0xK1Zn2nqwFHToF9PaCEnGZ9OE9cEW5lD
+         pgiQ==
+X-Gm-Message-State: AO0yUKVuZc40W8T4QjgNTi3JErBJfNQwPPpYAvVRoZKasttHV/uB0Dwr
+	OAW5fKmQwJFnuddDI7PMoZi8YQ==
+X-Google-Smtp-Source: AK7set91zlp5gLivK7fJ76YzrLhyC6/M7PZRmP+Ohh69tUMrhNnlq5foVfkJZNHiszA+axklomXnGQ==
+X-Received: by 2002:a17:903:3113:b0:198:af50:e4de with SMTP id w19-20020a170903311300b00198af50e4demr496739plc.4.1676304094069;
+        Mon, 13 Feb 2023 08:01:34 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id e23-20020a62ee17000000b00594235980e4sm8162073pfi.181.2023.02.13.08.01.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Feb 2023 08:01:33 -0800 (PST)
+Date: Mon, 13 Feb 2023 16:01:29 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Salil Mehta <salil.mehta@huawei.com>
+Subject: Re: [RFC PATCH v2 5/6] KVM: arm64: Add support for KVM_EXIT_HYPERCALL
+Message-ID: <Y+pe2T2uK2efUNve@google.com>
+References: <20230211013759.3556016-1-oliver.upton@linux.dev>
+ <20230211013759.3556016-6-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH 04/28] arm64: RME: Check for RME support at KVM init
-Content-Language: en-GB
-To: Zhi Wang <zhi.wang.linux@gmail.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
- <20230127112932.38045-1-steven.price@arm.com>
- <20230127112932.38045-5-steven.price@arm.com>
- <20230213174846.00003fad@gmail.com>
-From: Steven Price <steven.price@arm.com>
-In-Reply-To: <20230213174846.00003fad@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230211013759.3556016-6-oliver.upton@linux.dev>
 
-On 13/02/2023 15:48, Zhi Wang wrote:
-> On Fri, 27 Jan 2023 11:29:08 +0000
-> Steven Price <steven.price@arm.com> wrote:
-> 
->> Query the RMI version number and check if it is a compatible version. A
->> static key is also provided to signal that a supported RMM is available.
->>
->> Functions are provided to query if a VM or VCPU is a realm (or rec)
->> which currently will always return false.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>  arch/arm64/include/asm/kvm_emulate.h | 17 ++++++++++
->>  arch/arm64/include/asm/kvm_host.h    |  4 +++
->>  arch/arm64/include/asm/kvm_rme.h     | 22 +++++++++++++
->>  arch/arm64/include/asm/virt.h        |  1 +
->>  arch/arm64/kvm/Makefile              |  3 +-
->>  arch/arm64/kvm/arm.c                 |  8 +++++
->>  arch/arm64/kvm/rme.c                 | 49 ++++++++++++++++++++++++++++
->>  7 files changed, 103 insertions(+), 1 deletion(-)
->>  create mode 100644 arch/arm64/include/asm/kvm_rme.h
->>  create mode 100644 arch/arm64/kvm/rme.c
->>
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->> index 9bdba47f7e14..5a2b7229e83f 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> @@ -490,4 +490,21 @@ static inline bool vcpu_has_feature(struct kvm_vcpu *vcpu, int feature)
->>  	return test_bit(feature, vcpu->arch.features);
->>  }
->>  
->> +static inline bool kvm_is_realm(struct kvm *kvm)
->> +{
->> +	if (static_branch_unlikely(&kvm_rme_is_available))
->> +		return kvm->arch.is_realm;
->> +	return false;
->> +}
->> +
->> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
->> +{
->> +	return READ_ONCE(kvm->arch.realm.state);
->> +}
->> +
->> +static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
->> +{
->> +	return false;
->> +}
->> +
->>  #endif /* __ARM64_KVM_EMULATE_H__ */
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 35a159d131b5..04347c3a8c6b 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -26,6 +26,7 @@
->>  #include <asm/fpsimd.h>
->>  #include <asm/kvm.h>
->>  #include <asm/kvm_asm.h>
->> +#include <asm/kvm_rme.h>
->>  
->>  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
->>  
->> @@ -240,6 +241,9 @@ struct kvm_arch {
->>  	 * the associated pKVM instance in the hypervisor.
->>  	 */
->>  	struct kvm_protected_vm pkvm;
->> +
->> +	bool is_realm;
->                ^
-> It would be better to put more comments which really helps on the review.
+On Sat, Feb 11, 2023, Oliver Upton wrote:
+> Finally, we need a flag to let userspace know what conduit instruction
+> was used (i.e. SMC vs. HVC). Redefine the remaining padding in
+> kvm_run::hypercall to accomplish this. Let's all take a moment
+> to admire the flowers and see how 'longmode' tied up a full u32 in the
+> UAPI. Weep.
 
-Thanks for the feedback - I had thought "is realm" was fairly
-self-documenting, but perhaps I've just spent too much time with this code.
+I don't think it has to, at least not for other architectures.  No other arch
+currently supports KVM_EXIT_HYPERCALL, so breakage is extremely unlikely.  E.g.
+we can likely get away with this, and then just have x86 add new flags at bit 32.
 
-> I was looking for the user of this memeber to see when it is set. It seems
-> it is not in this patch. It would have been nice to have a quick answer from the
-> comments.
-
-The usage is in the kvm_is_realm() function which is used in several of
-the later patches as a way to detect this kvm guest is a realm guest.
-
-I think the main issue is that I've got the patches in the wrong other.
-Patch 7 "arm64: kvm: Allow passing machine type in KVM creation" should
-probably be before this one, then I could add the assignment of is_realm
-into this patch (potentially splitting out the is_realm parts into
-another patch).
-
-Thanks,
-
-Steve
-
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 55155e262646..7d3ad820d55c 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -341,8 +341,14 @@ struct kvm_run {
+                        __u64 nr;
+                        __u64 args[6];
+                        __u64 ret;
+-                       __u32 longmode;
+-                       __u32 pad;
++                       union {
++                               /*
++                                * Long Mode, a.k.a. 64-bit mode, takes up the
++                                * first 32 flags on x86 (historical sludge).
++                                */
++                               __u32 longmode;
++                               __u64 flags;
++                       };
+                } hypercall;
+                /* KVM_EXIT_TPR_ACCESS */
+                struct {
+ 
